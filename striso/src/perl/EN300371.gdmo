@@ -1,0 +1,2835 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Tue Sep 18 22:23:26 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Document "ETSI EN 300 371"
+--  { ccitt(0) identified-organization(4) etsi(0) ets371(371) informationModel(0) } >--
+--< GDMO.Namespace etsi_371 >--
+MODULE "ETSI EN 300 371" { ccitt(0) identified-organization(4) etsi(0) ets371(371) informationModel(0) }
+-- 5 PDH fragment
+-- This clause provides managed objects required to model PDH interfaces.
+-- In this context, the IMPORTS clause specifies the object classes which can be instantiated in the scope of the present
+-- document. The IMPORT clause does not include uninstantiated super classes.
+-- BEGIN
+-- IMPORTS
+-- alarmSeverityAssignmentProfile
+-- FROM ASN1DefinedTypesModule {itu(0) recommendation(0) m(13) gnm(3100) informationModel(0)
+-- managedObjectClass (3)};
+-- END
+-- 5.1 Object classes definitions
+-- 5.1.1 Electrical PDH physical interface
+-- This clause describes the object classes required to model the PDH physical interface.
+-- NOTE 1: Whether these require attributes to model more features (e.g. PDH level, line code, etc.) are for further
+-- study.
+
+pPITTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100: 1995":trailTerminationPointBidirectional,
+		pPITTPSinkR1,
+		pPITTPSource;
+REGISTERED AS { en371ObjectClass 100 };
+
+
+pPITTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100: 1995":trailTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation X.721: 1992":administrativeStatePackage,
+		"Recommendation M.3100: 1995":createDeleteNotificationsPackage,
+		"Recommendation M.3100: 1995":stateChangeNotificationPackage,
+		"Recommendation M.3100: 1995":tmnCommunicationsAlarmInformationPackage,
+		"Recommendation M.3100: 1995":userLabelPackage,
+		"Recommendation M.3100: 1995":alarmSeverityAssignmentPointerPackage,
+		pPITTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				alarmReportingControlBehaviour,
+				pPITTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This managed object class represents the point where the incoming interface 
+						signal is converted into an internal logic level and the timing is recovered 
+						from the line signal. The upStream connectivity pointer is NULL for an instance 
+						of this class.
+
+						A communicationsAlarm notification shall be issued if a Loss of Signal (LOS) is 
+						detected. The probableCause parameter of the notification shall indicate 
+						lossOfSignal [3].
+
+						The operational state is disabled if a failure of the equipment affecting an 
+						instance of this class prevents the resource from operation";;
+			ATTRIBUTES
+				pPITTPId GET;;;
+	CONDITIONAL PACKAGES
+		tpSpecificPersistanceTimePkg
+			PRESENT IF
+				"the persistancy time for raising / clearing alarms can be set specifically for 
+				an instance of this class thus superseding the values which are in effect for 
+				all termination points of a NE",
+		portModePkg
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { en371ObjectClass 101 };
+
+
+pPITTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100: 1995":trailTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100: 1995":createDeleteNotificationsPackage,
+		"Recommendation M.3100: 1995":userLabelPackage,
+		pPITTPSourcePkg PACKAGE
+			BEHAVIOUR
+				pPITTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This managed object class represents the point where the internal logic level 
+						and the timing is converted into a line signal.
+
+						The operational state is disabled if a failure of the equipment affecting an 
+						instance of this class prevents the resource from operation.
+
+						The downStream connectivity pointer is NULL for an instance of this class.";;
+			ATTRIBUTES
+				pPITTPId GET;;;
+REGISTERED AS { en371ObjectClass 3 };
+-- NOTE 2: As for the attribute operationalState the decision has been taken in the ETSI/TM2 Meeting Dublin
+-- (Oct.97) that no transmission failures but equipment failures will impact the value of that attribute. This
+-- behaviour is applicable in general for the PDH TP fragment. No re-registration is considered to be
+-- necessary in the pPITTPSource class definition.
+-- 5.1.2 European PDH Alarm Indication Signal (AIS) trail termination point
+-- This generic object class represents a particular case of termination point used in a managed element where no
+-- connectivity at respective level is provided. Instances of this object class are used when, in one layer, no flexibility is
+-- provided, but a direct adaptation to client is present.
+-- The sink object class includes the AIS and LOF monitoring function of a respective Connection Termination Point
+-- (CTP) which is not instantiated where no connectivity on the respective level is provided.
+-- Object classes inherited from this class are labelled according to the European PDH hierarchy (exATTP, where x = 0
+-- stands for 64 kbit/s, x = 1 for 2 Mbit/s, x = 2 for 8 Mbit/s, x = 3 for 34 Mbit/s and x = 4 for 140 Mbit/s.)
+-- NOTE: The possibility of adding conditional packages (present if the equipment supports the features) in order to
+-- model the capability to reveal Excessive Bit Error Ratio (EBER) is for further study.
+-- The subclasses represent two types of combined functions:
+-- 1) En/Pne_A [10] and Pne_TT [8]
+-- The function En/Pne_A is the adaptation from physical section layer to the client PDH path layer (Pne) and the
+-- function Pne_TT terminates the trail in that path layer.
+-- 2) Pme/Pne_A and Pne_TT [8]
+-- The function Pme/Pne_A adapts from the server PDH path layer (Pme) to a framed, client PDH path layer (Pne)
+-- characteristic information (P31e_CI, P22e_CI, P12s_CI). The function Pne_TT terminates the trail in that path
+-- layers.
+-- In both cases the management information exchanged with the combined functions is identical. As a consequence one
+-- object exATTP reflects the management view for the particular PDH path (x=1,2,3,4). Using the objects exATTP a
+-- PDH interface can be represented by a fewer number of instances than is obtained if objects are used which do not
+-- represent combined functions. These alternative representations are shown in figure 5 and figure 4, respectively.
+
+
+ePDHATTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPBidirectionalR1,
+		ePDHATTPSinkR1,
+		ePDHATTPSource;
+REGISTERED AS { en371ObjectClass 102 };
+
+
+ePDHATTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPSinkR1;
+	CHARACTERIZED BY
+		ePDHATTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				ePDHATTPSinkR1Behaviour BEHAVIOUR
+					DEFINED AS
+						"This object class includes the AIS and LOF monitoring function of a respective 
+						CTP which is not instantiated where no connectivity on the respective level is 
+						provided.
+
+						A communicationsAlarm notification shall be issued if an AIS is detected. The 
+						probableCause parameter of the notification shall indicate aIS.
+
+						A communicationsAlarm notification shall be issued if a LOF is detected. The 
+						probableCause parameter of the notification shall indicate lossOfFrame.
+
+						An instance of this object class is used when, in one layer, no flexibility is 
+						provided, but a direct adaptation to client is present.
+
+						The upStream connectivity pointer attribute value of an instance of this object 
+						class is equal to NULL";;;;
+REGISTERED AS { en371ObjectClass 103 };
+
+
+ePDHATTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPSource;
+	CHARACTERIZED BY
+		ePDHTPSourcePkg PACKAGE
+			BEHAVIOUR
+				ePDHATTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"The downStream connectivity pointer attribute value of an instance of this 
+						object class is equal to NULL.";;;;
+REGISTERED AS { en371ObjectClass 5 };
+-- 5.1.3 European PDH connection termination point
+-- This clause describes an object class (sink, source or bi-directional) which represents the model for a generic PDH
+-- connection termination point (2, 8, 34 and 140 Mbit/s).
+-- Object classes inherited from this class are labelled according to the European PDH hierarchy (exCTP, where x = 0
+-- stands for 64 kbit/s, x = 1 for 2 Mbit/s, x = 2 for 8 Mbit/s, x = 3 for 34 Mbit/s and x = 4 for 140 Mbit/s).
+-- The subclasses represent two types of adaptation functions:
+-- 1) En/Pne_A or En/Pnx_A [10]
+-- The function En/Pne_A adapts from physical section layer (En) to a framed PDH path layer characteristic
+-- information (P4e_CI, P31e_CI, P22e_CI, P12s_CI).
+-- The function En/Pnx_A adapts from physical section layer (En) to an unframed PDH path layer characteristic
+-- information (Pnx_CI), which is a signal of non-specified content [10].
+-- 2) Pme/Pne_A or Pme/Pnx_A [8]
+-- The function Pme/Pne_A adapts from the server PDH path layer (Pme) to a framed, client PDH path layer (Pne)
+-- characteristic information (P31e_CI, P22e_CI, P12s_CI). The function Pme/Pnx_A adapts from the server PDH
+-- path layer (Pme) to an unframed PDH path layer characteristic information (Pnx_CI), which is a signal of
+-- non-specified content [8].
+
+
+ePDHCTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100: 1995":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100: 1995":createDeleteNotificationsPackage,
+		"Recommendation M.3100: 1995":operationalStatePackage,
+		"Recommendation M.3100: 1995":stateChangeNotificationPackage,
+		"Recommendation M.3100: 1995":tmnCommunicationsAlarmInformationPackage,
+		"Recommendation M.3100: 1995":alarmSeverityAssignmentPointerPackage,
+		ePDHCTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				alarmReportingControlBehaviour,
+				ePDHCTPSinkR1Behaviour BEHAVIOUR
+					DEFINED AS
+						"This object class represents the termination of a PDH connection and models the 
+						adaptation sink function in different PDH path layers represented by subclasses 
+						of this class.
+
+						An instance of this object class shall be used when, in one layer, flexibility 
+						is available or when there is no termination of a client characteristic 
+						information (Pnx-CI).
+
+						The attribute framedSignalMode may have the values 'active' and 'inactive'. An 
+						attributeValueChange notification is issued when the value is modified and the 
+						inherited conditional package attributeValueChangeNotificationPackage is 
+						instantiated.
+
+						If the value is set 'active', then the adaptation processing of a framed signal 
+						is provisioned and the detection of the defects LOF and AIS is enabled. A 
+						communicationsAlarm notification shall be issued if an AIS is detected. The 
+						probableCause parameter of the notification shall indicate aIS [3]. A 
+						communicationsAlarm notification shall be issued if an LOF is detected. The 
+						probableCause parameter of the notification shall indicate lossOfFrame [3]. In 
+						case of defect detection the consequent action aSSF (all-ONES) is performed.
+
+						If the value is set 'inactive', then this adaptation function is deactivated 
+						assuming the reception of an unframed signal (characteristic information 
+						Pnx_CI).
+
+						An attributeValueChange notification is issued when the value of the attribute 
+						frameStatus is changed and the inherited conditional package 
+						attributeValueChangeNotificationPackage is instantiated.
+
+						The operational state is disabled if a failure of the equipment affecting an 
+						instance of this class prevents the resource from operation.";;
+			ATTRIBUTES
+				ePDHCTPId GET,
+				framedSignalMode GET-REPLACE,
+				frameStatus GET;;;
+	CONDITIONAL PACKAGES
+		tpSpecificPersistanceTimePkg
+			PRESENT IF
+				"the persistency time for raising / clearing alarms can be set specifically for 
+				an instance of this class thus superseding the values which are in effect for 
+				all termination points of a NE";
+REGISTERED AS { en371ObjectClass 104 };
+
+
+ePDHCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100: 1995":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100: 1995":createDeleteNotificationsPackage,
+		ePDHCTPSourcePkg PACKAGE
+			BEHAVIOUR
+				ePDHCTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a PDH hierarchy connection.
+
+						The operational state is disabled if a failure of the equipment affecting an 
+						instance of this class prevents the resource from operation.";;
+			ATTRIBUTES
+				ePDHCTPId GET;;;
+REGISTERED AS { en371ObjectClass 8 };
+-- NOTE 1: As for the attribute operationalState, no transmission failures but equipment failures will impact the value
+-- of that attribute. This behaviour is applicable in general for the PDH TP fragment. No re-registration is
+-- considered to be necessary in the ePDHCTPSource class definition.
+-- NOTE 2: The superclass ePDHCTPBidirectionalR1 (not instantiated) needs not to be defined since the instantiable
+-- bidirectional subclasses e*CTPBidirectionalR1 should inherit from ePDHCTPSinkR1 and / Source only.
+-- Note that the superclass CTPBidirectional inherits from cTPSink / Source without special properties
+-- added.
+
+
+eMonitoringCTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHCTPSinkR1;
+	CHARACTERIZED BY
+		eMonitoringCTPSinkPkg PACKAGE
+			BEHAVIOUR
+				pathTerminationMonitoringBehavior,
+				eMonitoringCTPSinkBeh BEHAVIOUR
+					DEFINED AS
+						"An instance incorporates the monitoring capabilities of the trail termination 
+						sink function (TTm- Sk) defined at the path layer represented by the subclass of 
+						this class. The monitoring capabilities do not apply in case of unframed signals 
+						expected when the inherited attribute framedSignalMode is set to value 
+						'inactive'";;;;
+REGISTERED AS { en371ObjectClass 105 };
+-- NOTE: No eMonitoringCTPSource class is introduced since the existing definition of the eCTPSource class is
+-- equivalent.
+-- 5.1.4 European PDH trail termination point
+-- This clause describes an object class (sink, source or bidirectional) which represents the model for a generic PDH trail
+-- termination point (2, 8, 34 and 140 Mbit/s).
+-- Object classes inherited from this class are labelled according to the European PDH hierarchy (exTTP, where x = 1
+-- stands for 2 Mbit/s, x = 2 for 8 Mbit/s, x = 3 for 34 Mbit/s and x = 4 for 140 Mbit/s).
+-- These subclasses represent the trail termination functions Pne_TT [8] which terminate the trails at the corresponding
+-- PDH path layers 2/8/34/140 Mbit/s (n=12, 22, 31, 4, respectively).
+
+
+ePDHTTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100: 1995":trailTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation X.721: 1992":administrativeStatePackage,
+		"Recommendation M.3100: 1995":createDeleteNotificationsPackage,
+		"Recommendation M.3100: 1995":stateChangeNotificationPackage,
+		"Recommendation M.3100: 1995":tmnCommunicationsAlarmInformationPackage,
+		"Recommendation M.3100: 1995":alarmSeverityAssignmentPointerPackage,
+		ePDHTTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				alarmReportingControlBehaviour,
+				pathTerminationMonitoringBehavior,
+				ePDHTTPSinkR1Behaviour BEHAVIOUR
+					DEFINED AS
+						"This object class represents the termination sink of a PDH trail.
+
+						The operationalState is disabled when a failure of the equipment affecting an 
+						instance of this class prevents the resource from operation.";;
+			ATTRIBUTES
+				ePDHTTPId GET;;;
+	CONDITIONAL PACKAGES
+		tpSpecificPersistanceTimePkg
+			PRESENT IF
+				"the persistancy time for raising / clearing alarms can be set specifically for 
+				an instance of this class thus superseding the values which are in effect for 
+				all termination points of a NE";
+REGISTERED AS { en371ObjectClass 106 };
+
+
+ePDHTTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100: 1995":trailTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100: 1995":createDeleteNotificationsPackage,
+		ePDHTTPSourcePkg PACKAGE
+			BEHAVIOUR
+				ePDHTTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a PDH hierarchy trail.
+
+						The operational state is disabled if a failure of the equipment affecting an 
+						instance of this class prevents the resource from operation.";;
+			ATTRIBUTES
+				ePDHTTPId GET;;;
+REGISTERED AS { en371ObjectClass 11 };
+-- NOTE: As for the attribute operationalState the decision has been taken in the ETSI/TM2 Meeting Dublin
+-- (Oct.97) that no transmission failures but equipment failures will impact the value of that attribute. This
+-- behaviour is applicable in general for the PDH TP fragment. No re-registration is considered to be
+-- necessary in the ePDHTTPSource class definition.
+
+
+ePDHTTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100: 1995":trailTerminationPointBidirectional,
+		ePDHTTPSinkR1,
+		ePDHTTPSource;
+	CHARACTERIZED BY
+		ePDHTTPBidirectionalR1Pkg PACKAGE
+			BEHAVIOUR
+				ePDHTTPBidirectionalR1Behaviour BEHAVIOUR
+					DEFINED AS
+						"The Far End Receiver Failure is signalized by a bidirectional trail termination 
+						that is represented by an instance of this (sub-)class if a Server Signal Fail 
+						condition is detected.";;;;
+REGISTERED AS { en371ObjectClass 107 };
+-- 5.1.5 European PDH TTP's for transport SDH VC's and ATM cells
+-- This generic object class models the PDH trail used to transport SDH VC's and ATM cells and the label Int stands for
+-- interworking.
+-- The subclasses represent the combined functions En/Pns_A [10] and Pns_TT [8].
+-- The function En/Pns_A is the adaptation from physical section layer to the client PDH path layer (Pns) and the function
+-- Pns_TT terminates the trail in that path layer (n=31,4).
+
+
+ePDHIntTTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPSinkR1;
+	CHARACTERIZED BY
+		ePDHIntTTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				ePDHIntTTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a ETS 300 337 [1] trail transporting ATM cells or 
+						SDH elements. A communicationsAlarm notification shall be issued if the trail 
+						trace received (TR byte) does not match the trail trace expected. The 
+						probableCause parameter of the notification shall indicate trail trace mismatch.
+
+						A communicationsAlarm notification shall be issued if the signal label received 
+						contains the all'0' code. The probableCause parameter of the notification shall 
+						indicate 'unequipped'.";;
+			ATTRIBUTES
+				trTrailTraceExpected GET-REPLACE,
+				trTrailTraceReceived GET;;;
+REGISTERED AS { en371ObjectClass 108 };
+
+
+ePDHIntTTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPSource;
+	CHARACTERIZED BY
+		ePDHIntTTPSourcePkg PACKAGE
+			BEHAVIOUR
+				ePDHIntTTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a ETS 300 337 [1] trail transporting ATM cells or 
+						SDH elements.";;
+			ATTRIBUTES
+				trTrailTraceSend GET-REPLACE;;;
+REGISTERED AS { en371ObjectClass 14 };
+
+
+ePDHIntTTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPBidirectionalR1,
+		ePDHIntTTPSinkR1,
+		ePDHIntTTPSource;
+REGISTERED AS { en371ObjectClass 109 };
+-- 5.1.6 140 Mbit/s object classes
+
+
+e4ATTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPSinkR1;
+	CHARACTERIZED BY
+		e4ATTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e4ATTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a CCITT Recommendation G.702 [2] 140 Mbit/s trail.";;;;
+REGISTERED AS { en371ObjectClass 110 };
+
+
+e4ATTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPSource;
+	CHARACTERIZED BY
+		e4ATTPSourcePkg PACKAGE
+			BEHAVIOUR
+				e4ATTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a CCITT Recommendation G.702 [2] 140 Mbit/s trail.";;;;
+REGISTERED AS { en371ObjectClass 17 };
+
+
+e4ATTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPBidirectionalR1,
+		e4ATTPSinkR1,
+		e4ATTPSource;
+REGISTERED AS { en371ObjectClass 111 };
+
+
+e4CTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHCTPSinkR1;
+	CHARACTERIZED BY
+		e4CTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e4CTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a CCITT Recommendation G.702 [2] 140 Mbit/s 
+						connection.";;;;
+REGISTERED AS { en371ObjectClass 112 };
+
+
+e4CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHCTPSource;
+	CHARACTERIZED BY
+		e4CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				e4CTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a CCITT Recommendation G.702 [2] 140 Mbit/s 
+						connection.";;;;
+REGISTERED AS { en371ObjectClass 20 };
+
+
+e4CTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		e4CTPSinkR1,
+		e4CTPSource;
+REGISTERED AS { en371ObjectClass 113 };
+
+
+e4MonitoringCTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		eMonitoringCTPSink;
+	CHARACTERIZED BY
+		e4MonitoringCTPSinkPkg PACKAGE
+			BEHAVIOUR
+				e4MonitoringCTPSinkBeh BEHAVIOUR
+					DEFINED AS
+						"An instance of this class represents the adaptation sink function but 
+						incorporates the monitoring capabilities of a 140Mbit/s path termination sink 
+						function";;;;
+REGISTERED AS { en371ObjectClass 114 };
+
+
+e4MonitoringCTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		e4MonitoringCTPSink,
+		e4CTPSource;
+REGISTERED AS { en371ObjectClass 115 };
+
+
+e4TTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPSinkR1;
+	CHARACTERIZED BY
+		e4TTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e4TTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a CCITT Recommendation G.702 [2] 140 Mbit/s trail.";;;;
+REGISTERED AS { en371ObjectClass 116 };
+
+
+e4TTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPSource;
+	CHARACTERIZED BY
+		e4TTPSourcePkg PACKAGE
+			BEHAVIOUR
+				e4TTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a CCITT Recommendation G.702 [2] 140 Mbit/s trail.";;;;
+REGISTERED AS { en371ObjectClass 23 };
+
+
+e4TTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPBidirectionalR1,
+		e4TTPSinkR1,
+		e4TTPSource;
+REGISTERED AS { en371ObjectClass 117 };
+
+
+e4IntTTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHIntTTPSinkR1;
+	CHARACTERIZED BY
+		e4IntTTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e4IntTTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a ETS 300 337 [1] 140 Mbit/s trail transporting ATM 
+						cells or SDH elements.";;;;
+REGISTERED AS { en371ObjectClass 118 };
+
+
+e4IntTTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHIntTTPSource;
+	CHARACTERIZED BY
+		e4IntTTPSourcePkg PACKAGE
+			BEHAVIOUR
+				e4IntTTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a ETS 300 337 [1] 140 Mbit/s trail transporting ATM 
+						cells or SDH elements.";;;;
+REGISTERED AS { en371ObjectClass 26 };
+
+
+e4IntTTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHIntTTPBidirectionalR1,
+		e4IntTTPSinkR1,
+		e4IntTTPSource;
+REGISTERED AS { en371ObjectClass 119 };
+-- 5.1.7 34 Mbit/s object classes
+
+
+e3ATTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPSinkR1;
+	CHARACTERIZED BY
+		e3ATTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e3ATTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a CCITT Recommendation G.702 [2] 34 Mbit/s trail.";;;;
+REGISTERED AS { en371ObjectClass 120 };
+
+
+e3ATTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPSource;
+	CHARACTERIZED BY
+		e3ATTPSourcePkg PACKAGE
+			BEHAVIOUR
+				e3ATTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a CCITT Recommendation G.702 [2] 34 Mbit/s trail.";;;;
+REGISTERED AS { en371ObjectClass 29 };
+
+
+e3ATTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPBidirectionalR1,
+		e3ATTPSinkR1,
+		e3ATTPSource;
+REGISTERED AS { en371ObjectClass 121 };
+
+
+e3CTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHCTPSinkR1;
+	CHARACTERIZED BY
+		e3CTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e3CTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a CCITT Recommendation G.702 [2] 34 Mbit/s 
+						connection.";;;;
+REGISTERED AS { en371ObjectClass 122 };
+
+
+e3CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHCTPSource;
+	CHARACTERIZED BY
+		e3CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				e3CTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a CCITT Recommendation G.702 [2] 34 Mbit/s 
+						connection.";;;;
+REGISTERED AS { en371ObjectClass 32 };
+
+
+e3CTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		e3CTPSinkR1,
+		e3CTPSource;
+REGISTERED AS { en371ObjectClass 123 };
+
+
+e3MonitoringCTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		eMonitoringCTPSink;
+	CHARACTERIZED BY
+		e3MonitoringCTPSinkPkg PACKAGE
+			BEHAVIOUR
+				e3MonitoringCTPSinkBeh BEHAVIOUR
+					DEFINED AS
+						"An instance of this class represents the adaptation sink function but 
+						incorporates the monitoring capabilities of a 34Mbit/s path termination sink 
+						function";;;;
+REGISTERED AS { en371ObjectClass 124 };
+
+
+e3MonitoringCTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		e3MonitoringCTPSink,
+		e3CTPSource;
+REGISTERED AS { en371ObjectClass 125 };
+
+
+e3TTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPSinkR1;
+	CHARACTERIZED BY
+		e3TTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e3TTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a CCITT Recommendation G.702 [2] 34 Mbit/s trail.";;;;
+REGISTERED AS { en371ObjectClass 126 };
+
+
+e3TTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPSource;
+	CHARACTERIZED BY
+		e3TTPSourcePkg PACKAGE
+			BEHAVIOUR
+				e3TTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a CCITT Recommendation G.702 [2] 34 Mbit/s trail.";;;;
+REGISTERED AS { en371ObjectClass 35 };
+
+
+e3TTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPBidirectionalR1,
+		e3TTPSinkR1,
+		e3TTPSource;
+REGISTERED AS { en371ObjectClass 127 };
+
+
+e3IntTTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHIntTTPSinkR1;
+	CHARACTERIZED BY
+		e3IntTTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e3IntTTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a ETS 300 337 [1] 34 Mbit/s trail transporting ATM 
+						cells or SDH elements.";;;;
+REGISTERED AS { en371ObjectClass 128 };
+
+
+e3IntTTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHIntTTPSource;
+	CHARACTERIZED BY
+		e3IntTTPSourcePkg PACKAGE
+			BEHAVIOUR
+				e3IntTTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a ETS 300 337 [1] 34 Mbit/s trail transporting ATM 
+						cells or SDH elements.";;;;
+REGISTERED AS { en371ObjectClass 38 };
+
+
+e3IntTTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHIntTTPBidirectionalR1,
+		e3IntTTPSinkR1,
+		e3IntTTPSource;
+REGISTERED AS { en371ObjectClass 129 };
+-- 5.1.8 8 Mbit/s object classes
+
+
+e2ATTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPSinkR1;
+	CHARACTERIZED BY
+		e2ATTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e2ATTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a CCITT Recommendation G.702 [2] 8 Mbit/s trail.";;;;
+REGISTERED AS { en371ObjectClass 130 };
+
+
+e2ATTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPSource;
+	CHARACTERIZED BY
+		e2ATTPSourcePkg PACKAGE
+			BEHAVIOUR
+				e2ATTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a CCITT Recommendation G.702 [2] 8 Mbit/s trail.";;;;
+REGISTERED AS { en371ObjectClass 41 };
+
+
+e2ATTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPBidirectionalR1,
+		e2ATTPSinkR1,
+		e2ATTPSource;
+REGISTERED AS { en371ObjectClass 131 };
+
+
+e2CTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHCTPSinkR1;
+	CHARACTERIZED BY
+		e2CTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e2CTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a CCITT Recommendation G.702 [2] 8 Mbit/s 
+						connection.";;;;
+REGISTERED AS { en371ObjectClass 132 };
+
+
+e2CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHCTPSource;
+	CHARACTERIZED BY
+		e2CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				e2CTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a CCITT Recommendation G.702 [2] 8 Mbit/s 
+						connection.";;;;
+REGISTERED AS { en371ObjectClass 44 };
+
+
+e2CTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		e2CTPSinkR1,
+		e2CTPSource;
+REGISTERED AS { en371ObjectClass 133 };
+
+
+e2MonitoringCTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		eMonitoringCTPSink;
+	CHARACTERIZED BY
+		e2MonitoringCTPSinkPkg PACKAGE
+			BEHAVIOUR
+				e2MonitoringCTPSinkBeh BEHAVIOUR
+					DEFINED AS
+						"An instance of this class represents the adaptation sink function but 
+						incorporates the monitoring capabilities of a 8Mbit/s path termination sink 
+						function";;;;
+REGISTERED AS { en371ObjectClass 134 };
+
+
+e2MonitoringCTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		e2MonitoringCTPSink,
+		e2CTPSource;
+REGISTERED AS { en371ObjectClass 135 };
+
+
+e2TTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPSinkR1;
+	CHARACTERIZED BY
+		e2TTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e2TTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a CCITT Recommendation G.702 [2] 8 Mbit/s trail.";;;;
+REGISTERED AS { en371ObjectClass 136 };
+
+
+e2TTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPSource;
+	CHARACTERIZED BY
+		e2TTPSourcePkg PACKAGE
+			BEHAVIOUR
+				e2TTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a CCITT Recommendation G.702 [2] 8 Mbit/s trail.";;;;
+REGISTERED AS { en371ObjectClass 47 };
+
+
+e2TTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPBidirectionalR1,
+		e2TTPSinkR1,
+		e2TTPSource;
+REGISTERED AS { en371ObjectClass 137 };
+-- 5.1.9 2 Mbit/s object classes
+
+
+e1ATTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPSinkR1;
+	CHARACTERIZED BY
+		e1ATTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e1ATTPSinkR1Behaviour BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a CCITT Recommendation G.702 [2] 2 Mbit/s trail.";;
+			ATTRIBUTES
+				frameStatus GET;;;
+	CONDITIONAL PACKAGES
+		crcMonitoringPkg
+			PRESENT IF
+				"an instance supports CRC-4 procedures [6] and [7]";
+REGISTERED AS { en371ObjectClass 138 };
+
+
+e1ATTPSourceR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPSource;
+	CHARACTERIZED BY
+		e1ATTPSourceR1Pkg PACKAGE
+			BEHAVIOUR
+				e1ATTPSourceR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a CCITT Recommendation G.702 [2] 2 Mbit/s trail.
+
+						The attribute crcOperationMode contained in the conditional package 
+						crcOperationPkg determines the operation of the 2 Mbit/s trail termination 
+						source. The value 'disabled' sets the transmitted Sibits (bit 1 of the frame) to 
+						the binary '1' state [5].
+
+						The value 'forced' configures CRC-4 procedure. The value 'automatic' triggers 
+						the modified CRC-4 multiframe algorithm in order to allow interworking of 
+						equipments with and without a CRC-4 capability [6].";;;;
+	CONDITIONAL PACKAGES
+		crcOperationPkg
+			PRESENT IF
+				"an instance supports CRC-4 procedures [6] and [7]";
+REGISTERED AS { en371ObjectClass 139 };
+
+
+e1ATTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHATTPBidirectionalR1,
+		e1ATTPSinkR1,
+		e1ATTPSourceR1;
+	CHARACTERIZED BY
+		e1ATTPBidirectionalR1Pkg PACKAGE
+			BEHAVIOUR
+				e1ATTPBidirectionalR1Beh BEHAVIOUR
+					DEFINED AS
+						"Either both or none of the inherited conditional packages crcMonitoringPkg and 
+						crcOperationPkg should be instantiated.
+
+						The attribute crcOperationMode contained in the conditional package 
+						crcOperationPkg determines the operation of the 2 Mbit/s trail termination. The 
+						value 'disabled' sets the transmitted Si-bits (bit 1 of the frame) to the binary 
+						'1' state and disables processing of the Si-bits in the receive signal [5].
+
+						The value 'forced' configures CRC-4 procedure with consequent actions [6]: in 
+						case of loss of CRC4- submultiframe all-ONES (aTSF) is inserted downstream and 
+						Far End Receiver Failure (FERF) is signalized upstream (as in case of LOF). A 
+						communicationsAlarm notification is emitted with probableCause 
+						'lossOfMultiFrame' [3].
+
+						The value 'automatic' triggers the modified CRC-4 multiframe algorithm in order 
+						to allow interworking of equipments with and without a CRC-4 capability [6]. If 
+						this procedure fails then further CRC-4 processing is inhibited and transmitted 
+						E-bits are kept in binary state '0'.";;;;
+REGISTERED AS { en371ObjectClass 140 };
+
+
+e1CTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHCTPSinkR1;
+	CHARACTERIZED BY
+		e1CTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e1CTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a CCITT Recommendation G.702 [2] 2 Mbit/s 
+						connection..";;;;
+REGISTERED AS { en371ObjectClass 141 };
+
+
+e1CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHCTPSource;
+	CHARACTERIZED BY
+		e1CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				e1CTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"This object class originates a CCITT Recommendation G.702 [2] 2 Mbit/s 
+						connection.";;;;
+REGISTERED AS { en371ObjectClass 53 };
+
+
+e1CTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		e1CTPSinkR1,
+		e1CTPSource;
+REGISTERED AS { en371ObjectClass 142 };
+
+
+e1MonitoringCTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		eMonitoringCTPSink;
+	CHARACTERIZED BY
+		e1MonitoringCTPSinkPkg PACKAGE
+			BEHAVIOUR
+				e1MonitoringCTPSinkBeh BEHAVIOUR
+					DEFINED AS
+						"An instance of this class represents the adaptation sink function but 
+						incorporates the monitoring capabilities of a 2Mbit/s path termination sink 
+						function. The conditional package crcMonitoring (if instantiated) is in effect 
+						when the inherited attribute framedSignalMode is set to value 'active'.";;;;
+	CONDITIONAL PACKAGES
+		crcMonitoringPkg
+			PRESENT IF
+				"an instance supports CRC-4 procedures [6] and [7]";
+REGISTERED AS { en371ObjectClass 143 };
+
+
+e1MonitoringCTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		e1MonitoringCTPSink,
+		e1CTPSource;
+	CONDITIONAL PACKAGES
+		iSDNPackage
+			PRESENT IF
+				"The 2 MBit/s PDH port is configured as ISDN.";
+REGISTERED AS { en371ObjectClass 144 };
+
+
+e1TTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPSinkR1;
+	CHARACTERIZED BY
+		e1TTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				e1TTPSinkR1Behaviour BEHAVIOUR
+					DEFINED AS
+						"This object class terminates a CCITT Recommendation G.702 [2] 2 Mbit/s trail.";;;;
+	CONDITIONAL PACKAGES
+		crcMonitoringPkg
+			PRESENT IF
+				"an instance supports CRC-4 procedures [6] and [7]";
+REGISTERED AS { en371ObjectClass 145 };
+
+
+e1TTPSourceR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPSource;
+	CHARACTERIZED BY
+		e1TTPSourceR1Pkg PACKAGE
+			BEHAVIOUR
+				e1TTPSourceR1Behaviour BEHAVIOUR
+					DEFINED AS
+						"This object class originates a CCITT Recommendation G.702 [2] 2 Mbit/s trail.
+
+						The attribute crcOperationMode contained in the conditional package 
+						crcOperationPkg determines the operation of the 2 Mbit/s trail termination 
+						source. The value 'disabled' sets the transmitted Sibits (bit 1 of the frame) to 
+						the binary '1' state [5].
+
+						The value 'forced' configures CRC-4 procedure. The value 'automatic' triggers 
+						the modified CRC-4 multiframe algorithm in order to allow interworking of 
+						equipments with and without a CRC-4 capability [6].";;;;
+	CONDITIONAL PACKAGES
+		crcOperationPkg
+			PRESENT IF
+				"an instance supports CRC-4 procedures [6] and [7]";
+REGISTERED AS { en371ObjectClass 146 };
+
+
+e1TTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		ePDHTTPBidirectionalR1,
+		e1TTPSinkR1,
+		e1TTPSourceR1;
+	CHARACTERIZED BY
+		e1TTPBidirectionalR1Pkg PACKAGE
+			BEHAVIOUR
+				e1TTPBidirectionalR1Beh BEHAVIOUR
+					DEFINED AS
+						"Either both or none of the inherited conditional packages crcMonitoringPkg and 
+						crcOperationPkg should be instantiated.
+
+						The attribute crcOperationMode contained in the conditional package 
+						crcOperationPkg determines the operation of the 2 Mbit/s trail termination. The 
+						value 'disabled' sets the transmitted Si-bits (bit 1 of the frame) to the binary 
+						'1' state and disables processing of the Si-bits in the receive signal [5].
+
+						The value 'forced' configures CRC-4 procedure with consequent actions [6]: in 
+						case of loss of CRC4- submultiframe all-ONES (aTSF) is inserted downstream and 
+						Far End Receiver Failure (FERF) is signalized upstream (as in case of LOF). A 
+						communicationsAlarm notification is emitted with probableCause 
+						'lossOfMultiFrame' [3].
+
+						The value 'automatic' triggers the modified CRC-4 multiframe algorithm in order 
+						to allow interworking of equipments with and without a CRC-4 capability [6]. If 
+						this procedure fails then further CRC-4 processing is inhibited and transmitted 
+						E-bits are kept in binary state '0'.";;;;
+REGISTERED AS { en371ObjectClass 147 };
+-- 5.1.10 64 kbit/s object classes
+
+
+e0CTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100: 1995":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100: 1995":createDeleteNotificationsPackage,
+		"Recommendation M.3100: 1995":operationalStatePackage,
+		"Recommendation M.3100: 1995":stateChangeNotificationPackage,
+		e0CTPSinkPkg PACKAGE
+			BEHAVIOUR
+				e0CTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"An instance of this object class terminates a 64 kbit/s connection. Where 
+						additional features are requested and supported by the equipment, appropriate 
+						subclassing is recommended (e.g. where monitoring is required, the 
+						tmnCommunicationsAlarmInformationPkg should be included)";;
+			ATTRIBUTES
+				e0CTPId GET;;;
+REGISTERED AS { en371ObjectClass 58 };
+
+
+e0CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100: 1995":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100: 1995":createDeleteNotificationsPackage,
+		e0CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				e0CTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						"An instance of this object class originates a 64 kbit/s connection.";;
+			ATTRIBUTES
+				e0CTPId GET;;;
+REGISTERED AS { en371ObjectClass 59 };
+
+
+e0CTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100: 1995":connectionTerminationPointBidirectional,
+		e0CTPSink,
+		e0CTPSource;
+REGISTERED AS { en371ObjectClass 60 };
+-- 5.2 Attributes definitions
+
+
+pPITTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		pPITTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a Relative Distinguished Name (RDN) for naming 
+				instances of the pPITTP object classes.";;
+REGISTERED AS { en371Attribute 1 };
+
+
+ePDHCTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		ePDHCTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a RDN for naming instances of the ePDHCTP object 
+				classes.";;
+REGISTERED AS { en371Attribute 2 };
+
+
+ePDHTTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		ePDHTTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a RDN for naming instances of the ePDHTTP object 
+				classes.";;
+REGISTERED AS { en371Attribute 3 };
+
+
+trTrailTraceExpected ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.TrailTrace;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		trTrailTraceExpectedBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to specify the value of the expected TR byte PDH trail 
+				trace 16 bytes message for instances of the e3IntTTP and e4IntTTP object class.";;
+REGISTERED AS { en371Attribute 4 };
+
+
+trTrailTraceReceived ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.TrailTrace;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		trTrailTraceReceivedBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to know the value of the incoming TR byte PDH trail trace 
+				16 bytes message for instances of the e3IntTTP and e4IntTTP object class.";;
+REGISTERED AS { en371Attribute 5 };
+
+
+trTrailTraceSend ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.TrailTrace;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		trTrailTraceSendBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to specify the value of the outgoing TR byte PDH trail 
+				trace 16 bytes message for instances of the e3IntTTP and eg4IntTTP object class.";;
+REGISTERED AS { en371Attribute 6 };
+
+
+e0CTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		e0CTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a RDN for naming instances of the e0CTP object 
+				classes.";;
+REGISTERED AS { en371Attribute 7 };
+-- 5.2.1 Additional attributes
+-- The following attributes definitions have to be added:
+
+
+availableTimeSlots ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.AvailableTimeSlots;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		availableTimeSlotsBeh BEHAVIOUR
+			DEFINED AS
+				*This attribute is used to indicate the available Time Slots.
+				If a TS is set to TRUE, the corresponding Time Slot is available and vice versa.*;;
+REGISTERED AS { en371Attribute 10 };
+
+
+burstyDegradeConsecutive ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.NCSBSRange;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		burstyDegradeConsecutiveBehaviour;
+REGISTERED AS { en371Attribute 11 };
+
+
+burstyDegradeConsecutiveBehaviour BEHAVIOUR
+	DEFINED AS
+		"The attribute burstyDegradeConsecutive indicates the number of consecutive BAD 
+		seconds that should be counted before the declaration of degradedSignal. It 
+		indicates also number of consecutive GOOD seconds that are necessary for the 
+		degradedSignal clearing.";
+
+
+burstyDegradeThreshold ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.CapThreshold;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		burstyDegradeThresholdBehaviour;
+REGISTERED AS { en371Attribute 12 };
+
+
+burstyDegradeThresholdBehaviour BEHAVIOUR
+	DEFINED AS
+		"The attribute burstyDegradeThreshold contains the value that should be compared 
+		with errored blocks in that second in order to consider that second as a GOOD 
+		one or a BAD one.";
+
+
+clearingTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.PersistanceTime;
+	MATCHES FOR EQUALITY, ORDERING;
+REGISTERED AS { en371Attribute 13 };
+
+
+crcOperationMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.CRCOperationMode;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { en371Attribute 14 };
+
+
+enableCRCMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.Activation;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { en371Attribute 15 };
+
+
+framedSignalMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.FramedSignalMode;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { en371Attribute 16 };
+
+
+frameStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.FrameStatus;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		frameStatusBehaviour;
+REGISTERED AS { en371Attribute 17 };
+
+
+frameStatusBehaviour BEHAVIOUR
+	DEFINED AS
+		*The attribute indicates the detected framing properties of the characteristic 
+		information at the
+		corresponding PDH path layer. If the detection process is not activated or 
+		pending then the value is
+		0 (noIndication)*;
+
+
+portMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.PortMode;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		portModeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the current state of the port mode for the containing 
+				managed object instance. The states indicated are:
+
+				0 - Port Mode is in the MON state.
+
+				1 - Port Mode is in the NMON state.
+
+				2 - Port Mode is in the AUTO state.";;
+REGISTERED AS { en371Attribute 18 };
+
+
+raisingTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.PersistanceTime;
+	MATCHES FOR EQUALITY, ORDERING;
+REGISTERED AS { en371Attribute 19 };
+
+
+remoteCRCIndication ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule1.Activation;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { en371Attribute 20 };
+-- 5.3 Name bindings definitions
+
+
+pPITTPSinkR1-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS pPITTPSinkR1 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100: 1995":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		pPITTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { en371NameBinding 50 };
+
+
+pPITTPSource-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS pPITTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100: 1995":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		pPITTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { en371NameBinding 2 };
+
+
+ePDHTTPSinkR1-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS ePDHTTPSinkR1 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100: 1995":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ePDHTTPId;
+	BEHAVIOUR
+		ePDHTTPSinkR1-managedElementBehaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 51 };
+
+
+ePDHTTPSource-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS ePDHTTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100: 1995":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ePDHTTPId;
+	BEHAVIOUR
+		ePDHTTPSource-managedElementBehaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 4 };
+
+
+ePDHCTPSinkR1-pPITTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS ePDHCTPSinkR1 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS pPITTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ePDHCTPId;
+	BEHAVIOUR
+		ePDHCTPSinkR1-pPITTPSinkR1Behaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 52 };
+
+
+ePDHCTPSource-pPITTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS ePDHCTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS pPITTPSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ePDHCTPId;
+	BEHAVIOUR
+		ePDHCTPSource-pPITTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 6 };
+
+
+e0CTPSink-pPITTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS e0CTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS pPITTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		e0CTPId;
+	BEHAVIOUR
+		e0CTPSink-pPITTPSinkR1Behaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 53 };
+
+
+e0CTPSource-pPITTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS e0CTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS pPITTPSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		e0CTPId;
+	BEHAVIOUR
+		e0CTPSource-pPITTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 8 };
+
+
+ePDHCTPSinkR1-ePDHTTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS ePDHCTPSinkR1 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS ePDHTTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ePDHCTPId;
+	BEHAVIOUR
+		ePDHCTPSinkR1-ePDHTTPSinkR1Behaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 54 };
+
+
+ePDHCTPSource-ePDHTTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS ePDHCTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS ePDHTTPSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ePDHCTPId;
+	BEHAVIOUR
+		ePDHCTPSource-ePDHTTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 10 };
+
+
+e0CTPSink-e1TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS e0CTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS e1TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		e0CTPId;
+	BEHAVIOUR
+		e0CTPSink-e1TTPSinkR1Behaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 55 };
+
+
+e0CTPSource-e1TTPSourceR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS e0CTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS e1TTPSourceR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		e0CTPId;
+	BEHAVIOUR
+		e0CTPSource-e1TTPSourceR1Behaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 12 };
+
+
+ePDHATTPSinkR1-pPITTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS ePDHATTPSinkR1 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS pPITTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ePDHTTPId;
+	BEHAVIOUR
+		ePDHATTPSinkR1-pPITTPSinkR1Behaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 56 };
+
+
+ePDHATTPSource-pPITTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS ePDHATTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS pPITTPSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ePDHTTPId;
+	BEHAVIOUR
+		ePDHATTPSinkR1-pPITTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 14 };
+
+
+e0CTPSink-e1ATTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS e0CTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS e1ATTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		e0CTPId;
+	BEHAVIOUR
+		e0CTPSink-e1ATTPSinkR1Behaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 57 };
+
+
+e0CTPSource-e1ATTPSourceR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS e0CTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS e1ATTPSourceR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		e0CTPId;
+	BEHAVIOUR
+		e0CTPSource-e1ATTPSourceR1Behaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 16 };
+
+
+e3ATTPSinkR1-e4ATTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS e3ATTPSinkR1 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS e4ATTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ePDHTTPId;
+	BEHAVIOUR
+		e3ATTPSinkR1-e4ATTPSinkR1Behaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 58 };
+
+
+e3ATTPSource-e4ATTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS e3ATTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS e4ATTPSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ePDHTTPId;
+	BEHAVIOUR
+		e3ATTPSource-e4ATTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 18 };
+
+
+e2ATTPSinkR1-e3ATTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS e2ATTPSinkR1 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS e3ATTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ePDHTTPId;
+	BEHAVIOUR
+		e2ATTPSinkR1-e3ATTPSinkR1Behaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 59 };
+
+
+e2ATTPSource-e3ATTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS e2ATTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS e3ATTPSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ePDHTTPId;
+	BEHAVIOUR
+		e2ATTPSource-e3ATTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 20 };
+
+
+e1ATTPSinkR1-e2ATTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS e1ATTPSinkR1 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS e2ATTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ePDHTTPId;
+	BEHAVIOUR
+		e1ATTPSinkR1-e2ATTPSinkR1Behaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 60 };
+
+
+e1ATTPSourceR1-e2ATTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS e1ATTPSourceR1 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS e2ATTPSource;
+	WITH ATTRIBUTE
+		ePDHTTPId;
+	BEHAVIOUR
+		e1ATTPSourceR1-e2ATTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.";;
+REGISTERED AS { en371NameBinding 22 };
+-- 5.3.1 Additional name bindings
+
+
+defaultNMONAlarmSeverityAssignment-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation M.3100: 1995":alarmSeverityAssignmentProfile AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100: 1995":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation M.3100: 1995":alarmSeverityAssignmentProfileId;
+	BEHAVIOUR
+		defaultNMONAlarmSeverityAssignment-managedElementBeh BEHAVIOUR
+			DEFINED AS
+				*One instance of the subordinate class is auto created by the node.
+				The default values of this object instance shall always map all possible alarms 
+				which the node can
+				generate to the "non-alarmed" severity code.*;;
+REGISTERED AS { en371NameBinding 61 };
+-- 5.5 Packages
+
+
+crcMonitoringPkg PACKAGE
+	BEHAVIOUR
+		crcMonitoringPkgBeh BEHAVIOUR
+			DEFINED AS
+				"This packages defines the monitoring capabilities applied to signals with a CRC 
+				submultiframe structure.
+
+				The attribute enableCRCMode set to TRUE selects the near/far-end performance 
+				processing of the receive signal based on CRC-4 block errors.
+
+				During this mode of operation the degraded signal criteria are in effect 
+				dependent on the setting of the attributes burstyDegradeConsecutive and 
+				burstyDegradeThreshold. A communicationsAlarm notification shall be issued if 
+				the account for the detection of the degraded defect is encountered. The 
+				probableCause parameter of the notification shall indicate 'degradedSignal' [3].
+
+				The attribute remoteCRCIndication reflects the CRC-4 multiframe generator / 
+				detector status at the far-end NE [8].
+
+				The value of burstyDegradeConsecutive attribute represents the number of 
+				consecutive seconds that should be taken into account for the detection or 
+				clearing of the degraded defect. The attribute burstyDegradeThreshold contains 
+				the value that should be compared with errored blocks in that second in order to 
+				consider that second as a GOOD one or a BAD one [9].";;
+	ATTRIBUTES
+		burstyDegradeConsecutive
+			DEFAULT VALUE ASN1DefinedTypesModule1.degradeConsecutiveDefault
+			GET-REPLACE,
+		burstyDegradeThreshold GET-REPLACE,
+		enableCRCMode GET-REPLACE,
+		remoteCRCIndication GET;
+REGISTERED AS { en371Package 1 };
+
+
+crcOperationPkg PACKAGE
+	BEHAVIOUR
+		crcOperationPkgBeh BEHAVIOUR
+			DEFINED AS
+				"This packages enables to control the operation modes defined for interworking 
+				with equipment which may or may not incorporate CRC procedure";;
+	ATTRIBUTES
+		crcOperationMode GET-REPLACE;
+REGISTERED AS { en371Package 2 };
+
+
+iSDNPackage PACKAGE
+	BEHAVIOUR
+		iSDNPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				*This package permits to blank n (1=<n=<31) time slots on a 2 Mbit/s signal, by 
+				setting the
+				attribute availableTimeSlots. The default value of availableTimeSlots is all 
+				TS="FALSE", that is all
+				time slots are written with 'all ones'.*;;
+	ATTRIBUTES
+		availableTimeSlots GET-REPLACE;
+REGISTERED AS { en371Package 3 };
+
+
+tpSpecificPersistanceTimePkg PACKAGE
+	BEHAVIOUR
+		tpSpecificPersistanceTimePkgBehaviour;
+	ATTRIBUTES
+		raisingTime REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1DefinedTypesModule1.defaultRaisingPersistancy
+			GET-REPLACE,
+		clearingTime REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1DefinedTypesModule1.defaultClearingPersistancy
+			GET-REPLACE;
+REGISTERED AS { en371Package 4 };
+
+
+tpSpecificPersistanceTimePkgBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package models the filter (f4) applied for correlated fault causes in order 
+		to indicate failures.
+
+		The integer values (p) of the contained attributes raisingTime and clearingTime 
+		define intervals of persistance time (Tp). The nominal values Tp are associated 
+		to the integer value p by the equation
+
+		Tp=px0.1 sec.
+
+		The range and the default intervals of activating and clearing a failure are 
+		specified in ETS 300 417-1 [9].";
+
+
+portModePkg PACKAGE
+	BEHAVIOUR
+		portModePkgBehaviour BEHAVIOUR
+			DEFINED AS
+				"Any object supporting this package can support the portMode function. It has 
+				three states: AUTO, NMON and MON. The AUTO shall be the default.
+
+				In the AUTO state the value of the portMode attribute is AUTO and the containing 
+				managed object's alarmSeverityAssignmentProfilePointer attribute shall point at 
+				the instance of the AlarmSeverityAssignmentProfile managed object class which 
+				has a nameBinding value of 
+				defaultNMONAlarmSeverityAssignmentProfile-managedElement.
+
+				In the NMON state the value of the portMode is NMON and the containing managed 
+				object's alarmSeverityProfilePointer attribute shall point at the same instance 
+				as in AUTO mode, i.e. it points to the AlarmSeverityAssignmentProfile managed 
+				object class which has a nameBinding value of 
+				defaultNMONAlarmSeverityAssignment-managedElement.
+
+				In the MON state the value of the portMode is MON and the containing managed 
+				object's alarmSeverityAssignmentProfilePointer attribute shall has a value 
+				indicating some other AlarmSeverityAssignmentProfile instance than the one used 
+				in NMON/AUTO state or it should be NULL. When portMode changes from AUTO or NMON 
+				to MON the alarmSeverityAssignmentProfilePointer shall revert to the value as 
+				stated above.
+
+				The MON, NMON or AUTO state is entered via M-Set of the portMode attribute by a 
+				managing system. In addition, the containing object leaves the AUTO state when a 
+				valid signal is detected (i.e. LOS is cleared) by the containing object, and in 
+				this case an attributeValueChange notification is emitted. An attempt from 
+				management system to change the portMode attribute from either MON or NMON to 
+				AUTO is rejected, when there is a valid signal.
+
+				When the portMode attribute changes, the alarmSeverityAssignmentProfilePointer 
+				attribute of the containing object changes automatically by NE according to the 
+				behaviour specified in this package. In NMON or AUTO state the 
+				alarmSeverityAssignmentProfilePointer should always point to the 
+				alarmSeverityAssignmentProfile instance with nameBinding 
+				defaultNMONAlarmSeverityAssignmentProfilemanagedElement.";;
+	ATTRIBUTES
+		portMode GET-REPLACE;
+	NOTIFICATIONS
+		"Recommendation X.721: 1992":attributeValueChange;
+REGISTERED AS { en371Package 5 };
+-- 5.6 Behaviour definitions
+
+
+alarmReportingControlBehaviour BEHAVIOUR
+	DEFINED AS
+		"If the attribute alarmSeverityProfilePointer points to an instance of the MOC 
+		alarmSeverityAssignmentProfile then the perceivedSeverity associated with the 
+		probableCause in the communicationsAlarm is determined by the assignment given 
+		in the attribute alarmSeverityAssignmentList of that instance. The value 
+		'non-alarmed' of the severity assigned to a problem inhibits the emission of the 
+		potential communicationsAlarm notification of that problem. This behaviour meets 
+		the ability to configure the defect correlation filter not to report selected 
+		fault causes (i.e. problems) and hence no associated failures will be alerted by 
+		communicationsAlarm notifications.
+
+		The alarmSeverityProfilePointer may point to an instance of 
+		alarmSeverityAssignmentProfile which is auto-created by the NE according the 
+		name-binding label 'defaultNMONAlarmSeverityAssignmentmanagedElement'. This 
+		relationship of the termination point reflects the NMON state during which no 
+		communicationsAlarm is reported at all.
+
+		When the severity changes to a value 'non-alarmed' for a problem which has been 
+		notified by an instance of this class then a communicationsAlarm notification 
+		with the perceivedSeverity 'cleared' is issued and the corresponding entry in 
+		the attributes currentProblemList and alarmStatus is removed. When the severity 
+		changes from 'non-alarmed' to a value other than 'non-alarmed' then a pending, 
+		persistent defect will be notified.
+
+		If the alarm severity cannot be assigned by the way of an 
+		alarmSeverityAssignmentProfile object (e.g. the attribute 
+		alarmSeverityProfilePointer has the value NULL or no assignment is given in the 
+		attribute alarmSeverityAssignmentList) then one of the two choices applies when 
+		reporting alarms:
+
+		a) agent assigns the severity,
+
+		b) the value 'indeterminate' is used.";
+
+
+pathTerminationMonitoringBehavior BEHAVIOUR
+	DEFINED AS
+		"A communicationsAlarm notification shall be issued if a Server Signal Fail (SSF) 
+		is detected. The probableCause parameter of the notification shall indicate 
+		serverSignalFailure.
+
+		A communicationsAlarm notification shall be issued if a Far End Receiver Failure 
+		is detected. The probableCause parameter of the notification shall indicate 
+		farEndReceiverFailure (fERF) [3]. Detection of a fERF has no effect on the 
+		operationalState.
+
+		Instances of the subclasses of this class may be used at the different PDH path 
+		layers to provide with performance data monitoring capabilities based on Frame 
+		Alignment Signal Errors (FASE) [8].";
+
+END
+--< GDMO.EndDocument "ETSI EN 300 371"
+--  { ccitt(0) identified-organization(4) etsi(0) ets371(371) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@
+--@@ These modules reference "Recommendation M.3100: 1995" 40 times.
+--@@
+--@@
+--@@ These modules define " CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define " ITU-T X.721|ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec X.721 | ISO/IEC 10165-2"
+--@@ These modules define "CCITT Rec. 721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. 721 | ISO/IEC10162:1992"
+--@@ These modules define "CCITT Rec. 721| ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. M.3100"
+--@@ These modules define "CCITT Rec. M.3100(1992)"
+--@@ These modules define "CCITT Rec. X.721"
+--@@ These modules define "CCITT Rec. X.721 (1992)"
+--@@ These modules define "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO /IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2 :1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721(1992)"
+--@@ These modules define "CCITT Rec. X.721|ISO/IEC 10165-2"
+--@@ These modules define "CCITT Rec. X.723 (1993)"
+--@@ These modules define "CCITT Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
+--@@ These modules define "CCITT Rec. X.723 | ISO/IEC 10165-5"
+--@@ These modules define "CCITT Recommendation Q.822"
+--@@ These modules define "CCITT X.521"
+--@@ These modules define "DMI"
+--@@ These modules define "ETSI EN 300 371"
+--@@ These modules define "GMI"
+--@@ These modules define "GNM"
+--@@ These modules define "ITU Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "ITU-T G.774.1 (02/2001)"
+--@@ These modules define "ITU-T G.774.4 (02/2001)"
+--@@ These modules define "ITU-T Rec. G.774"
+--@@ These modules define "ITU-T Rec. G.774 : 2001"
+--@@ These modules define "ITU-T Rec. G.774.3"
+--@@ These modules define "ITU-T Rec. G.774.3 : 2001"
+--@@ These modules define "ITU-T Rec. G.774.5"
+--@@ These modules define "ITU-T Rec. M.3100 (1992)"
+--@@ These modules define "ITU-T Rec. M.3100 (1995)"
+--@@ These modules define "ITU-T Rec. M.3100:1995"
+--@@ These modules define "ITU-T Rec. Q.821 (2000)"
+--@@ These modules define "ITU-T Rec. Q.822"
+--@@ These modules define "ITU-T Rec. Q.822 (1994)"
+--@@ These modules define "ITU-T Rec. X.521"
+--@@ These modules define "ITU-T Rec. X.721 (1992)"
+--@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2: 1992"
+--@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define "ITU-T Rec. X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "ITU-T Rec. X.723 (1993)"
+--@@ These modules define "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
+--@@ These modules define "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1993"
+--@@ These modules define "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994"
+--@@ These modules define "ITU-T Rec. X.723 | ISO/IEC 10165-5"
+--@@ These modules define "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995"
+--@@ These modules define "ITU-T Rec. X.738 (1993)/Cor.1 (1998): | ISO/IEC 10164-13 : 1995/Cor.1 : 1999"
+--@@ These modules define "ITU-T Rec. X.738 (1993)/Cor.2 (2000): | ISO/IEC 10164-13 : 1995/Cor.2 : 2002"
+--@@ These modules define "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993"
+--@@ These modules define "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994"
+--@@ These modules define "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994"
+--@@ These modules define "ITU-T Rec. X.739 (1993)/Cor.1 (1998) | ISO/IEC 10164-11 : 1994/Cor.1 : 1999"
+--@@ These modules define "ITU-T Rec. X.739 (1993)|ISO/IEC 10164-11:1994"
+--@@ These modules define "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995"
+--@@ These modules define "ITU-T Rec. X.742 (1995)/Cor.1 (1998) | ISO/IEC 10164-10 : 1995/Cor.1 : 1999"
+--@@ These modules define "ITU-T Rec. X.742 (1995)/Cor.2 (2000) | ISO/IEC 10164-10 : 1995/Cor.2 : 2001"
+--@@ These modules define "ITU-T Rec. X.742 | ISO/IEC 10164-10"
+--@@ These modules define "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993"
+--@@ These modules define "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12:1994"
+--@@ These modules define "ITU-T Rec. X.745 (1993)/Cor.1 (1997) | ISO/IEC 10164-12 : 1993/Cor.1 : 1998"
+--@@ These modules define "ITU-T Rec. X.745 (1993)/Cor.2 (1998) | ISO/IEC 10164-12 : 1993/Cor.2 : 1999"
+--@@ These modules define "ITU-T Rec. X.745 (1993)/Cor.3 (2000) | ISO/IEC 10164-12 : 1993/Cor.3 : 2001"
+--@@ These modules define "ITU-T Rec. X.745 | ISO/IEC 10164-12"
+--@@ These modules define "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002"
+--@@ These modules define "ITU-T Rec. X.746 | ISO/IEC 10164-15"
+--@@ These modules define "ITU-T Recommendation G.774-04"
+--@@ These modules define "ITU-T Recommendation M.3100"
+--@@ These modules define "ITU-T Recommendation M.3100: 1995"
+--@@ These modules define "ITU-T Recommendation M.3100:1995"
+--@@ These modules define "ITU-T Recommendation Q.822"
+--@@ These modules define "ITU-T Recommendation X.721"
+--@@ These modules define "ITU-T Recommendation X.721:1992"
+--@@ These modules define "ITU-T Recommendation X.739 | ISO/IEC 10164-11"
+--@@ These modules define "ITU-T Recommendation X.746"
+--@@ These modules define "ITU-T X.721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "ITU-T X.721|ISO/IEC 10165-2:1992"
+--@@ These modules define "M.3100:1995"
+--@@ These modules define "Rec. CCITT X.721 | ISO/IEC 10165-2"
+--@@ These modules define "Rec. G.774.3"
+--@@ These modules define "Rec. M.3100"
+--@@ These modules define "Rec. M.3100 : 1992"
+--@@ These modules define "Rec. M.3100:1995"
+--@@ These modules define "Rec. X. 723 | ISO/IEC 10165-5"
+--@@ These modules define "Rec. X.721 (1992)"
+--@@ These modules define "Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define "Rec. X.721 | ISO/IEC 10165-2"
+--@@ These modules define "Rec. X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Rec. X.721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "Rec. X.721|ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Rec. X.723 (1993)"
+--@@ These modules define "Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
+--@@ These modules define "Rec. X.723 | ISO/IEC 10165-5"
+--@@ These modules define "Rec. X.723 | ISO/IEC 10165-5 : 1994"
+--@@ These modules define "Rec. X.738 (1993)"
+--@@ These modules define "Rec. X.738|ISO/IEC 10164-13:1992"
+--@@ These modules define "Rec. X.739 (1993)"
+--@@ These modules define "Rec. X.739 (1993) | ISO/IEC 10164-11:1994"
+--@@ These modules define "Rec. X.742 (1995)"
+--@@ These modules define "Rec. X.745 (1993)"
+--@@ These modules define "Rec. X.745 (1993) | ISO/IEC 10164-12:1994"
+--@@ These modules define "Rec. X.745 (1993) | ISO/IEC 10164-12:1994 "
+--@@ These modules define "Rec. X.746 (1995)"
+--@@ These modules define "Recommendation G.774"
+--@@ These modules define "Recommendation G.774 : 1992"
+--@@ These modules define "Recommendation G.774.01"
+--@@ These modules define "Recommendation G.774.03"
+--@@ These modules define "Recommendation G.774.05"
+--@@ These modules define "Recommendation G.774.3"
+--@@ These modules define "Recommendation G.774.5"
+--@@ These modules define "Recommendation M.3100"
+--@@ These modules define "Recommendation M.3100 : 1992"
+--@@ These modules define "Recommendation M.3100:1992"
+--@@ These modules define "Recommendation M.3100:1995"
+--@@ These modules define "Recommendation Q.821:1992"
+--@@ These modules define "Recommendation Q.822"
+--@@ These modules define "Recommendation Q.822 : 1993"
+--@@ These modules define "Recommendation Q.822:1994"
+--@@ These modules define "Recommendation X.721"
+--@@ These modules define "Recommendation X.721 "
+--@@ These modules define "Recommendation X.721 : 1992"
+--@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2"
+--@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Recommendation X.721: 1992"
+--@@ These modules define "Recommendation X.721:1992"
+--@@ These modules define "Recommendation X.738 : 1992"
+--@@ These modules define "Recommendation X.738:1993"
+--@@ These modules define "Recommendation X.739"
+--@@ These modules define "Recommendation X.739:1993"
+--@@ These modules define "X.721"
+--@@ These modules define "X.721:1992"
+--@@ These modules define "X.723"
+--@@ These modules define "X.739"
+--@@ These modules define "X.742"
+--@@ These modules define "X.745"
+--@@ These modules define "X.746"
+--@@
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ +- itut_x723::subsystem
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  |  +- etsi_371::e0CTPBidirectional
+--@@ |  |  +- etsi_371::ePDHCTPSinkR1
+--@@ |  |  |  +- etsi_371::eMonitoringCTPSink
+--@@ |  |  |  |  +- etsi_371::e4MonitoringCTPSink
+--@@ |  |  |  |  |  +- etsi_371::e4MonitoringCTPBidirectional
+--@@ |  |  |  |  +- etsi_371::e3MonitoringCTPSink
+--@@ |  |  |  |  |  +- etsi_371::e3MonitoringCTPBidirectional
+--@@ |  |  |  |  +- etsi_371::e2MonitoringCTPSink
+--@@ |  |  |  |  |  +- etsi_371::e2MonitoringCTPBidirectional
+--@@ |  |  |  |  +- etsi_371::e1MonitoringCTPSink
+--@@ |  |  |  |  |  +- etsi_371::e1MonitoringCTPBidirectional
+--@@ |  |  |  +- etsi_371::e4CTPSinkR1
+--@@ |  |  |  |  +- etsi_371::e4CTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::e3CTPSinkR1
+--@@ |  |  |  |  +- etsi_371::e3CTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::e2CTPSinkR1
+--@@ |  |  |  |  +- etsi_371::e2CTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::e1CTPSinkR1
+--@@ |  |  |  |  +- etsi_371::e1CTPBidirectionalR1
+--@@ |  |  +- etsi_371::e0CTPSink
+--@@ |  |  |  +- etsi_371::e0CTPBidirectional
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  |  +- etsi_371::e0CTPBidirectional
+--@@ |  |  +- etsi_371::ePDHCTPSource
+--@@ |  |  |  +- etsi_371::e4CTPSource
+--@@ |  |  |  |  +- etsi_371::e4CTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e4MonitoringCTPBidirectional
+--@@ |  |  |  +- etsi_371::e3CTPSource
+--@@ |  |  |  |  +- etsi_371::e3CTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e3MonitoringCTPBidirectional
+--@@ |  |  |  +- etsi_371::e2CTPSource
+--@@ |  |  |  |  +- etsi_371::e2CTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e2MonitoringCTPBidirectional
+--@@ |  |  |  +- etsi_371::e1CTPSource
+--@@ |  |  |  |  +- etsi_371::e1CTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e1MonitoringCTPBidirectional
+--@@ |  |  +- etsi_371::e0CTPSource
+--@@ |  |  |  +- etsi_371::e0CTPBidirectional
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- etsi_371::pPITTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::ePDHTTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::ePDHATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::ePDHIntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e4IntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e3IntTTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e4ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e3ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e2ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e1ATTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e4TTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e3TTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e2TTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e1TTPBidirectionalR1
+--@@ |  |  +- etsi_371::pPITTPSinkR1
+--@@ |  |  |  +- etsi_371::pPITTPBidirectionalR1
+--@@ |  |  +- etsi_371::ePDHTTPSinkR1
+--@@ |  |  |  +- etsi_371::ePDHATTPSinkR1
+--@@ |  |  |  |  +- etsi_371::ePDHATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::ePDHIntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e4IntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e3IntTTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e4ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e3ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e2ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e1ATTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::ePDHIntTTPSinkR1
+--@@ |  |  |  |  |  +- etsi_371::ePDHIntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e4IntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e3IntTTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e4IntTTPSinkR1
+--@@ |  |  |  |  |  |  +- etsi_371::e4IntTTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e3IntTTPSinkR1
+--@@ |  |  |  |  |  |  +- etsi_371::e3IntTTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e4ATTPSinkR1
+--@@ |  |  |  |  |  +- etsi_371::e4ATTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e3ATTPSinkR1
+--@@ |  |  |  |  |  +- etsi_371::e3ATTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e2ATTPSinkR1
+--@@ |  |  |  |  |  +- etsi_371::e2ATTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e1ATTPSinkR1
+--@@ |  |  |  |  |  +- etsi_371::e1ATTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::ePDHTTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::ePDHATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::ePDHIntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e4IntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e3IntTTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e4ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e3ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e2ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e1ATTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e4TTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e3TTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e2TTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e1TTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::e4TTPSinkR1
+--@@ |  |  |  |  +- etsi_371::e4TTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::e3TTPSinkR1
+--@@ |  |  |  |  +- etsi_371::e3TTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::e2TTPSinkR1
+--@@ |  |  |  |  +- etsi_371::e2TTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::e1TTPSinkR1
+--@@ |  |  |  |  +- etsi_371::e1TTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- etsi_371::pPITTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::ePDHTTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::ePDHATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::ePDHIntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e4IntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e3IntTTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e4ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e3ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e2ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e1ATTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e4TTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e3TTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e2TTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e1TTPBidirectionalR1
+--@@ |  |  +- etsi_371::pPITTPSource
+--@@ |  |  |  +- etsi_371::pPITTPBidirectionalR1
+--@@ |  |  +- etsi_371::ePDHTTPSource
+--@@ |  |  |  +- etsi_371::ePDHATTPSource
+--@@ |  |  |  |  +- etsi_371::ePDHATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::ePDHIntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e4IntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e3IntTTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e4ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e3ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e2ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e1ATTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::ePDHIntTTPSource
+--@@ |  |  |  |  |  +- etsi_371::ePDHIntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e4IntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e3IntTTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e4IntTTPSource
+--@@ |  |  |  |  |  |  +- etsi_371::e4IntTTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e3IntTTPSource
+--@@ |  |  |  |  |  |  +- etsi_371::e3IntTTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e4ATTPSource
+--@@ |  |  |  |  |  +- etsi_371::e4ATTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e3ATTPSource
+--@@ |  |  |  |  |  +- etsi_371::e3ATTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e2ATTPSource
+--@@ |  |  |  |  |  +- etsi_371::e2ATTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e1ATTPSourceR1
+--@@ |  |  |  |  |  +- etsi_371::e1ATTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::ePDHTTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::ePDHATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::ePDHIntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e4IntTTPBidirectionalR1
+--@@ |  |  |  |  |  |  +- etsi_371::e3IntTTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e4ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e3ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e2ATTPBidirectionalR1
+--@@ |  |  |  |  |  +- etsi_371::e1ATTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e4TTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e3TTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e2TTPBidirectionalR1
+--@@ |  |  |  |  +- etsi_371::e1TTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::e4TTPSource
+--@@ |  |  |  |  +- etsi_371::e4TTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::e3TTPSource
+--@@ |  |  |  |  +- etsi_371::e3TTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::e2TTPSource
+--@@ |  |  |  |  +- etsi_371::e2TTPBidirectionalR1
+--@@ |  |  |  +- etsi_371::e1TTPSourceR1
+--@@ |  |  |  |  +- etsi_371::e1TTPBidirectionalR1
+--@@ +- itut_m3100::tpPool
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ |  >- etsi_371::pPITTPSinkR1
+--@@ |  |  >- etsi_371::ePDHCTPSinkR1
+--@@ |  |  >- etsi_371::e0CTPSink
+--@@ |  |  >- etsi_371::ePDHATTPSinkR1
+--@@ |  >- etsi_371::pPITTPSource
+--@@ |  |  >- etsi_371::ePDHCTPSource
+--@@ |  |  >- etsi_371::e0CTPSource
+--@@ |  |  >- etsi_371::ePDHATTPSource
+--@@ |  >- etsi_371::ePDHTTPSinkR1
+--@@ |  |  >- etsi_371::ePDHCTPSinkR1
+--@@ |  >- etsi_371::ePDHTTPSource
+--@@ |  |  >- etsi_371::ePDHCTPSource
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ etsi_371::e4ATTPSinkR1
+--@@ >- etsi_371::e3ATTPSinkR1
+--@@ |  >- etsi_371::e2ATTPSinkR1
+--@@ |  |  >- etsi_371::e1ATTPSinkR1
+--@@ |  |  |  >- etsi_371::e0CTPSink
+--@@ etsi_371::e1TTPSinkR1
+--@@ >- etsi_371::e0CTPSink
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@ etsi_371::e4ATTPSource
+--@@ >- etsi_371::e3ATTPSource
+--@@ |  >- etsi_371::e2ATTPSource
+--@@ |  |  >- etsi_371::e1ATTPSourceR1
+--@@ |  |  |  >- etsi_371::e0CTPSource
+--@@ etsi_371::e1TTPSourceR1
+--@@ >- etsi_371::e0CTPSource
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

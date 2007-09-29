@@ -1,0 +1,371 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: XOM.3.man,v 0.9.2.1 2007/09/29 14:08:30 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:30 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: XOM.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:30  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH XOM 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B XOM
+\- 
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xom.h>
+.HP
+.BI "OM_return_code om_copy();"
+.PD 0
+.HP
+.BI "OM_return_code om_copy_value();"
+.HP
+.BI "OM_return_code om_create();"
+.HP
+.BI "OM_return_code om_decode();"
+.HP
+.BI "OM_return_code om_delete();"
+.HP
+.BI "OM_return_code om_encode();"
+.HP
+.BI "OM_return_code om_get();"
+.HP
+.BI "OM_return_code om_instance();"
+.HP
+.BI "OM_return_code om_put();"
+.HP
+.BI "OM_return_code om_read();"
+.HP
+.BI "OM_return_code om_remove();"
+.HP
+.BI "OM_return_code om_write();"
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+Various.
+.\"
+.\"
+.SH FUNCTIONS
+.TP
+.BR om_copy ()
+This function creates an independent copy of an existing private object, and
+all of its subobjects.  The copy is placed in the workspace specified by the
+client.
+.TP
+.BR om_copy_value ()
+This function replaces an existing attribute value or inserts a new value in
+one private object with a copy of an existing attribute value found in
+another.  Both values must be strings.
+.TP
+.BR om_create ()
+This function creates a new private object that is an instance of a particular
+calss.  The object may be initalised with the attribute values specified as
+initial in the class' definition.
+.sp
+The service need not permit the client to explicitly create instances of all
+classes, but rather only those indicated, by a package's definition, as having
+this property.
+.TP
+.BR om_decode ()
+This function creates a new private object that is an exact, but independent,
+copy of the object that an existing private object encodes.  The encoding
+identifies the class of the existing object and the rules used to encode it.
+The allowed rules include, but are not limitied to, the BER and the canonical
+BER.
+.sp
+THe serivce need not permit the client to decode instances of all classes, but
+rather only those indicated, by a package's definition, as having this
+property.
+.TP
+.BR om_delete ()
+This function deletes a service-generated public object, or makes a private
+object inaccessible.
+.TP
+.BR om_encode ()
+This function creates a new private object that encodes an existing private
+object for conveyance between workspaces, transport via a newtork, or storage
+in a file.  The client identifies the encoding rules that the service is to
+follow.  The allowed rules include, but are not limited to, the BER and the
+cannonical BER.
+.sp
+The service need not permit the client to encode instances of all classes, but
+rather only those indicated, by a package's definition, as having this
+property.
+.TP
+.BR om_get ()
+This function creates a new public object that is an exact, but independent,
+copy of an existing private object.  The client may request certain
+exxclusions, each of which reduces the copy to a portion of the original.  The
+client may also reqeust that values are converted from one syntax to another
+before they are returned.
+.sp
+The copy may exclude attributes of other than specified types, values at other
+than sepcified positions within an attribute, the values of multi-valued
+attributes, copies of (not handles for) subobjects, or all attribute values
+(revealing only an attribute's presence).
+.TP
+.BR om_instance ()
+This function determines whether an object is an instance of a particular
+class.  The client can determin an object's class by inspection.  The utility
+of this function is that it reveals that an object is an instance of a
+particular class, even if the object is an instance of a subclass of that
+class.
+.TP
+.BR om_put ()
+This function palces or replaces, in one private object, copies of the
+attribute values of another public or private object.
+.sp
+The source values may be inserted before any existing destination values,
+before the value at a specified position in the destination attribute, or
+after any existing destination values.  Alternatively, the source values may
+be substituted for any existing destination values or for the values at
+specified postitions in the destination attribute.
+.TP
+.BR om_read ()
+This function reads a segment of a value of an attribute of a private object.
+The value must be a string.  The value may first be converted from one syntax
+to another.  The function enables the client to read an arbitrarily long value
+without requiring that the service place a copy of the entire value in memory.
+.TP
+.BR om_remove ()
+This function removes and discards particular values of an attribute of a
+private object.  The attribute itself is removed if no values remain.
+.TP
+.BR om_write ()
+This function writes a segment of a value of an attribute to a private object.
+The value must be a string.  The segment may first be converted from one syntax
+to another.  The written segment is made the value's last, any elements beyond
+it being discarded.  The function enables the client to write an arbitrarily
+long value without having to place a copy of the entire value in memory.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+In the C interface, the functions are realized by macros.  The function protocol int he C Synopsis clause of a
+function's specification is only an exposition aid.
+.PP
+The intent of the interface definition is that each function is atomic, that is, that it either carries out its
+assigned task in full and reports success, or fails to carry out even a portion of the task and reports an exception.
+However, the service does not guarantee that a task will not occasionally be carried out in part but not in full.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion, the zero value of
+.RB [ OM_SUCCESS ]
+is returned by most functions. Otherwise, a non-zero diagnostic error value is returned by those functions.
+.PP
+Whether a function detects and reports each of the exceptions listed in the Errors clause of its specification is
+unspecified. If a function detects two or more exceptions, which it reports, is unspecified. If a function reports an
+exception for which a return code is defined, however, it uses that (rather than another) return code to do so.
+.\"
+.\"
+.SH ERRORS
+.PP
+Each function returns a non-zero
+.B OM_return_code
+when an error occurs, or returns the zero
+.B OM_return_code,
+.RB [ OM_SUCCESS ],
+when successful.
+Error return codes can be one of the following:
+.TP \w'[\fBOM_NO_SUCH_MODIFICATION\fR]\(em'u
+.RB [ OM_SUCCESS ]
+.PD 0
+.TP
+.RB [ OM_ENCODING_INVALID ]
+.TP
+.RB [ OM_FUNCTION_DECLINED ]
+.TP
+.RB [ OM_FUNCTION_INTERRUPTED ]
+.TP
+.RB [ OM_MEMORY_INSUFFICIENT ]
+.TP
+.RB [ OM_NETWORK_ERROR ]
+.TP
+.RB [ OM_NO_SUCH_CLASS ]
+.TP
+.RB [ OM_NO_SUCH_EXCLUSION ]
+.TP
+.RB [ OM_NO_SUCH_MODIFICATION ]
+.TP
+.RB [ OM_NO_SUCH_OBJECT ]
+.TP
+.RB [ OM_NO_SUCH_RULES ]
+.TP
+.RB [ OM_NO_SUCH_SYNTAX ]
+.TP
+.RB [ OM_NO_SUCH_TYPE ]
+.TP
+.RB [ OM_NO_SUCH_WORKSPACE ]
+.TP
+.RB [ OM_NOT_AN_ENCODING ]
+.TP
+.RB [ OM_NOT_CONCRETE ]
+.TP
+.RB [ OM_NOT_PRESENT ]
+.TP
+.RB [ OM_NOT_PRIVATE ]
+.TP
+.RB [ OM_NOT_THE_SERVICES ]
+.TP
+.RB [ OM_PERMANENT_ERROR ]
+.TP
+.RB [ OM_POINTER_INVALID ]
+.TP
+.RB [ RC_SYSTEM_ERROR ]
+.TP
+.RB [ OM_TEMPORARY_ERROR ]
+.TP
+.RB [ OM_TOO_MANY_VALUES ]
+.TP
+.RB [ OM_WRONG_VALUE_LENGTH ]
+.TP
+.RB [ OM_WRONG_VALUE_MAKEUP ]
+.TP
+.RB [ OM_WRONG_VALUE_NUMBER ]
+.TP
+.RB [ OM_WRONG_VALUE_POSITION ]
+.TP
+.RB [ OM_WRONG_VALUE_SYNTAX ]
+.TP
+.RB [ OM_WRONG_VALUE_TYPE ]
+.PD
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR om_copy (3),
+.BR om_copy_value (3),
+.BR om_create (3),
+.BR om_decode (3),
+.BR om_delete (3),
+.BR om_encode (3),
+.BR om_get (3),
+.BR om_instance (3),
+.BR om_put (3),
+.BR om_read (3),
+.BR om_remove (3),
+.BR om_write (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR XOM
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR XOM
+is compatible with XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR XOM
+first appeared in XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XOM Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

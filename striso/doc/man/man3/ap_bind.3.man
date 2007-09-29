@@ -1,0 +1,226 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_bind.3.man,v 0.9.2.1 2007/09/29 14:08:30 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:30 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_bind.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:30  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_BIND 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ap_bind
+\- Bind a Presentation Address to an XAP Instance
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.BI "int ap_bind(int " fd ", unsigned long *" aperrno_p );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I fd
+.TP
+.I apperrno_p
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function associates the Presentation Address stored in the
+.B AP_BIND_PADDR
+environment vairable witht he XAP Instances specified by
+.IR fd .
+Upon successful completion the service provider may begin enqueueing incoming
+associations or sending outbound associations requests.  All necessary
+environment variables (e.g.
+.BR AP_BIND_PADDR ,
+.BR AP_ROLE_ALLOWED )
+should be set prior to calling
+.BR ap_bind ().
+.PP
+When this function is called, an attempt may be made to bind to the specified
+address.  As a part of the bind procedure, an authroization check may be
+performed to verify that all of the processes that share this XAP instance are
+authorized to use the new address.  If all are authorized to do so, the bind
+request will succeed and the XAP instance may be used to send (receive)
+primitives from (addressed to) the new address.  Successfully calling this
+function causes the state of XAP to move from
+.BR AP_UNBOUND " to " AP_IDLE .
+.PP
+Some implementations may perform not authorization checking.  In this case the
+.RB [ AP_ACCES ]
+error response will not be returned.  Other implementations may defer binding
+and authorization until a
+.BR A_ASSOC_REQ " or " A_ASSOC_RSP
+primtive is issued.  In this case, if the authorization check failes, the
+.RB [ AP_ACCES ]
+error will be returned by
+.BR ap_snd (3).
+The local address can be changed to an acceptable value and the primitive
+reissued, or the connection can be closed.
+.PP
+An instance can be bound to a presentation address only if all of the processes
+that share it are authorized to use the requested address.  Consequently, when
+an attempt is made to bind an address, the effective UIDs of all of the
+processes that share this instance of XAP may be checked against the list of
+users allowed to use the requested address. If all are authorised to use the
+address,
+.BR ap_bind ()
+succeeds and the instance is bound to the specified presentation address. On the
+other hand, if any of the processes is not authorised to use the requested
+address,
+.BR ap_bind ()
+fails and the instance remains unbound.
+.I aperrno_p
+must be set to point to a location which will be used to carry an error code
+back to the user.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion, a value of zero
+.RB ( 0 )
+is returned. Otherwise, a value of
+minus one
+.RB ( -1 )
+is returned and the location pointed to by
+.I aperrno_p
+is set to indicate the error.
+.\"
+.\"
+.SH ERRORS
+.TP
+.RB [ AP_ACCES ]
+Request to bind to specified address denied.
+.TP
+.RB [ AP_BADF ]
+The
+.I fd
+paramter does not identify an XAP instance.
+.TP
+.RB [ AP_BADNSAP ]
+The format of the NSAP portion of the Presentation Address is not supported.
+.TP
+.RB [ AP_NOENV ]
+There is no XAP environment associated with
+.IR fd .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ap_snd (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR ap_bind ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ap_bind ()
+is compatible with XAP.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_bind ()
+first appeared in XAP.
+.[
+xap
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XAP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

@@ -1,0 +1,2761 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Sep 19 13:08:03 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.742.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Document "I-ETS 300 819: June 1998"
+--  { ccitt(0) identified-organization(4) etsi(0) usageMeteringInformationManagement(819) informationModel(0) } >--
+--< GDMO.Namespace etsi_819 >--
+MODULE "I-ETS 300 819: June 1998" { ccitt(0) identified-organization(4) etsi(0) usageMeteringInformationManagement(819) informationModel(0) }
+-- A.4 Managed object classes
+-- A.4.1 Block generating log
+-- This managed object class is a subclass of the "Log" class described in
+-- ITU-T Recommendation X.735 [22] and defined in ITU-T Recommendation X.721 [18] and therefore
+-- inherits all of the properties of the "log" class.
+
+blockGeneratingLog MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 | ISO/IEC 10165-2: 1992":log;
+	CHARACTERIZED BY
+		blockGeneratingLogPackage PACKAGE
+			BEHAVIOUR
+				blockGeneratingLogBehavior BEHAVIOUR
+					DEFINED AS
+						"This log is considered to be infinite and therefore it does not have to 
+						instantiate the finite-log size package from its superclass log. The 
+						blockGeneratingLog stores all records that satisfy its discriminator construct. 
+						The log provides the value (sequence number) for the 'recordId' (field of tne 
+						UMR).
+
+						An instance of this log emits the blockRecordNotification when any of the 
+						following events occurs:
+
+						- the number of records in the log becomes equal to the maximum block size;
+
+						- the time interval elapsed since the first record currently contained in the 
+						  log exceeds the value maxTimeInterval attribute;
+
+						- an internal system limitation has been exceeded, including the block 
+						  generating log itself overflowing.
+
+						Upon emitting the blockRecordNotification all records stored in the block 
+						generating log are deleted and the log is ready to store new records. Because of 
+						the self-emptying nature of this log, any of the inherited log-full action may 
+						be selected and the behaviour of the log will not change.";;
+			ATTRIBUTES
+				maxBlockSize GET-REPLACE,
+				maxTimeInterval GET-REPLACE;
+			NOTIFICATIONS
+				blockRecordNotification;;;
+REGISTERED AS { managedObjectClass 3 };
+-- A.4.2 File generating log
+-- This managed object class is a subclass of the "Log" class described in
+-- ITU-T Recommendation X.735 [22] and defined in ITU-T Recommendation X.721 [18] and therefore
+-- inherits all of the properties of the "log" class.
+
+
+fileGeneratingLog MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 | ISO/IEC 10165-2: 1992":log;
+	CHARACTERIZED BY
+		fileGeneratingLogPkg PACKAGE
+			BEHAVIOUR
+				fileGeneratingLogBhv BEHAVIOUR
+					DEFINED AS
+						"This log is used to create files that can be exchanged using an appropriate file 
+						transfer protocol. The log provides the value (sequence number) for the 
+						'recordId' (field of tne UMR).
+
+						- The action create file is used to generate the file to be exchanged. The file 
+						  created consists of a concatenation of stripped record,; i.e. the UMRs without 
+						  the log overhead (Log Record Id, Managed Object Class and Instance and Logging 
+						  Time). The layout of the file is defined in the ASN1 module as 
+						  UsageMeteringRecordFile. The firstRecordId and LastRecordId included in the 
+						  file header and trailer contain the record id of the first and the last UMR 
+						  stored in the file.
+
+						- To avoid duplication of UMRs, logging of blockRecord notifications emitted by 
+						  the block generating log should be excluded by configuration of the 
+						  fileGeneratingLog's discriminator construct. Files may also be created due to 
+						  internal trigger events. One such internal trigger is based on time of day. 
+						  When files are created the corresponding records in the log will be deleted 
+						  automatically.";;
+			ACTIONS
+				createFile;;;
+	CONDITIONAL PACKAGES
+		dailyTriggeringPackage
+			PRESENT IF
+				"if the file creation is to be triggered on a daily basis",
+		fileCreationNotificationPackage
+			PRESENT IF
+				"if the file creation is triggered using the daily scheduling mechanism 
+				triggering method or an internal mechanism.";
+REGISTERED AS { managedObjectClass 2 };
+-- A.4.3 Simple usage metering control
+
+
+simpleUsageMeteringControl MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.742 | ISO/IEC 10164-10: 1995":usageMeteringControlObject;
+	CHARACTERIZED BY
+		simpleUsageMeteringControlPackage PACKAGE
+			BEHAVIOUR
+				usageMeteringControlBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class controls the generation of UMRs in the NE. See subclause 6.1 
+						for details";;
+			ATTRIBUTES
+				creationTriggerList GET-REPLACE
+					DEFAULT VALUE ASN1UsageMeteringModule.defaultCreationTrigger
+					;;;
+REGISTERED AS { managedObjectClass 4 };
+-- A.4.4 Usage metering data
+-- This managed object class emits notifications that permit the NE to transmit UMRs to the OS.
+-- A UMR notification is sent out if one of the following events occurs:
+-- - change or termination of the service;
+-- - expiration of the periodic timer (defined in the usage metering control object);
+-- - NE internal reasons e.g. reaching a volume threshold (this may also be manufacture specific).
+
+
+usageMeteringData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 | ISO/IEC 10165-2: 1992":top;
+	CHARACTERIZED BY
+		usageMeteringDataPackage PACKAGE
+			BEHAVIOUR
+				usageMeteringDataBehaviour BEHAVIOUR
+					DEFINED AS
+						"The only purpose of this object class is to emit 
+						usageMeteringRecordNotification, and no management operation is allowed on this 
+						object class.
+
+						NOTE: the indication of the GET action on the usageMeteringDataId was kept for 
+						formal (compiler) reasons. .";;
+			ATTRIBUTES
+				usageMeteringDataId GET;
+			NOTIFICATIONS
+				usageMeteringRecordNotification;;;
+REGISTERED AS { managedObjectClass 5 };
+-- A.4.5 Usage metering log record
+-- This managed object class is a subclass of the "eventLogRecord" class described in
+-- ITU-T Recommendation X.735 [22] and defined in ITU-T Recommendation X.721 [18] and therefore
+-- inherits all of the properties of both the "logRecord" and eventLogRecord" classes.
+
+
+usageMeteringLogRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 | ISO/IEC 10165-2: 1992":eventLogRecord;
+	CHARACTERIZED BY
+		usageMeteringLogRecordPackage PACKAGE
+			BEHAVIOUR
+				usageMeteringLogRecordBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class describes the layout of a log record created for each single 
+						usage metering record notification";;
+			ATTRIBUTES
+				recordType GET,
+				startTimeStamp GET,
+				serviceType GET,
+				serviceUser GET,
+				callIdentificationNumber GET;;;
+	CONDITIONAL PACKAGES
+		recordIdPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		dataValidityPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		networkProviderIdPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		callingPartyNumberPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		calledPartyNumberPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		redirectingNumberPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		redirectionNumberPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		originalCalledNumberPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		callingPartyNumberNotScreenedPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		operatorSpecific1NumberPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		operatorSpecific2NumberPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		operatorSpecific3NumberPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		supplementaryServiceListPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		immediateNotificationPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		causePackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		iNPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		partialGenerationPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		exchangeInfoPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		relatedCallNumberPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		uMRPurposePackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		physicalLineCodePackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		receivedDigitsPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		operatorSpecific1AdditionalNumberPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		operatorSpecific2AdditionalNumberPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		operatorSpecific3AdditionalNumberPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		callingPartyCategoryPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		callingPartyTypePackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		chargingInformationPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		progressPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		accessDeliveryPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		trunkGroupOutgoingPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		trunkGroupIncomingPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		fallbackServicePackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		conversationTimePackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		durationTimeACMPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		durationTimeB-AnswerPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		durationTimeNoB-AnswerPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		uUInfoCountersPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		standardExtensionsPackage
+			PRESENT IF
+				"this parameter was present in the received notification",
+		recordExtensionsPackage
+			PRESENT IF
+				"this parameter was present in the received notification";
+REGISTERED AS { managedObjectClass 1 };
+-- A.5 Packages
+-- A.5.1 Access delivery package
+
+
+accessDeliveryPackage PACKAGE
+	ATTRIBUTES
+		accessDelivery GET;
+REGISTERED AS { package 1 };
+-- A.5.2 Called party number package
+
+
+calledPartyNumberPackage PACKAGE
+	ATTRIBUTES
+		calledPartyNumber GET;
+REGISTERED AS { package 2 };
+-- A.5.3 Calling party category package
+
+
+callingPartyCategoryPackage PACKAGE
+	ATTRIBUTES
+		callingPartyCategory GET;
+REGISTERED AS { package 3 };
+-- A.5.4 Calling party number not screened package
+
+
+callingPartyNumberNotScreenedPackage PACKAGE
+	ATTRIBUTES
+		callingPartyNumberNotScreened GET;
+REGISTERED AS { package 4 };
+-- A.5.5 Calling party number package
+
+
+callingPartyNumberPackage PACKAGE
+	ATTRIBUTES
+		callingPartyNumber GET;
+REGISTERED AS { package 5 };
+-- A.5.6 Calling party type package
+
+
+callingPartyTypePackage PACKAGE
+	ATTRIBUTES
+		callingPartyType GET;
+REGISTERED AS { package 6 };
+-- A.5.7 Cause package
+
+
+causePackage PACKAGE
+	ATTRIBUTES
+		cause GET;
+REGISTERED AS { package 7 };
+-- A.5.8 Charging information package
+
+
+chargingInformationPackage PACKAGE
+	ATTRIBUTES
+		chargingInformation GET;
+REGISTERED AS { package 8 };
+-- A.5.9 Conversation time package
+
+
+conversationTimePackage PACKAGE
+	ATTRIBUTES
+		conversationTime GET;
+REGISTERED AS { package 9 };
+-- A.5.10 Daily triggering package
+
+
+dailyTriggeringPackage PACKAGE
+	ATTRIBUTES
+		timesOfDay GET-REPLACE ADD-REMOVE;
+REGISTERED AS { package 10 };
+-- A.5.11 Data validity package
+
+
+dataValidityPackage PACKAGE
+	ATTRIBUTES
+		dataValidity GET;
+REGISTERED AS { package 11 };
+-- A.5.12 Duration time ACM package
+
+
+durationTimeACMPackage PACKAGE
+	ATTRIBUTES
+		durationTimeACM GET;
+REGISTERED AS { package 12 };
+-- A.5.13 Duration time B-answer package
+
+
+durationTimeB-AnswerPackage PACKAGE
+	ATTRIBUTES
+		durationTimeB-Answer GET;
+REGISTERED AS { package 13 };
+-- A.5.14 Duration time No B-answer package
+
+
+durationTimeNoB-AnswerPackage PACKAGE
+	ATTRIBUTES
+		durationTimeNoB-Answer GET;
+REGISTERED AS { package 14 };
+-- A.5.15 Exchange info package
+
+
+exchangeInfoPackage PACKAGE
+	ATTRIBUTES
+		exchangeInfo GET;
+REGISTERED AS { package 15 };
+-- A.5.16 Fallback service package
+
+
+fallbackServicePackage PACKAGE
+	ATTRIBUTES
+		fallbackService GET;
+REGISTERED AS { package 16 };
+-- A.5.17 File creation notification package
+
+
+fileCreationNotificationPackage PACKAGE
+	NOTIFICATIONS
+		fileCreationNotification;
+REGISTERED AS { package 17 };
+-- A.5.18 Immediate notification package
+
+
+immediateNotificationPackage PACKAGE
+	ATTRIBUTES
+		immediateNotification GET;
+REGISTERED AS { package 18 };
+-- A.5.19 IN package
+
+
+iNPackage PACKAGE
+	ATTRIBUTES
+		iNServiceInformationList GET,
+		iNSpecificInformation GET;
+REGISTERED AS { package 19 };
+-- A.5.20 Network provider Id package
+
+
+networkProviderIdPackage PACKAGE
+	ATTRIBUTES
+		networkProviderId GET;
+REGISTERED AS { package 20 };
+-- A.5.21 Operator specific1 additional number package
+
+
+operatorSpecific1AdditionalNumberPackage PACKAGE
+	ATTRIBUTES
+		operatorSpecific1AdditionalNumber GET;
+REGISTERED AS { package 21 };
+-- A.5.22 Operator specific1 number package
+
+
+operatorSpecific1NumberPackage PACKAGE
+	ATTRIBUTES
+		operatorSpecific1Number GET;
+REGISTERED AS { package 22 };
+-- A.5.23 Operator specific2 additional number package
+
+
+operatorSpecific2AdditionalNumberPackage PACKAGE
+	ATTRIBUTES
+		operatorSpecific2AdditionalNumber GET;
+REGISTERED AS { package 23 };
+-- A.5.24 Operator specific2 number package
+
+
+operatorSpecific2NumberPackage PACKAGE
+	ATTRIBUTES
+		operatorSpecific2Number GET;
+REGISTERED AS { package 24 };
+-- A.5.25 Operator specific3 additional number package
+
+
+operatorSpecific3AdditionalNumberPackage PACKAGE
+	ATTRIBUTES
+		operatorSpecific3AdditionalNumber GET;
+REGISTERED AS { package 25 };
+-- A.5.26 Operator specific3 number package
+
+
+operatorSpecific3NumberPackage PACKAGE
+	ATTRIBUTES
+		operatorSpecific3Number GET;
+REGISTERED AS { package 26 };
+-- A.5.27 Original called number package
+
+
+originalCalledNumberPackage PACKAGE
+	ATTRIBUTES
+		originalCalledNumber GET;
+REGISTERED AS { package 27 };
+-- A.5.28 Partial generation package
+
+
+partialGenerationPackage PACKAGE
+	ATTRIBUTES
+		partialGeneration GET;
+REGISTERED AS { package 28 };
+-- A.5.29 Physical line code package
+
+
+physicalLineCodePackage PACKAGE
+	ATTRIBUTES
+		physicalLineCode GET;
+REGISTERED AS { package 29 };
+-- A.5.30 Progress package
+
+
+progressPackage PACKAGE
+	ATTRIBUTES
+		progress GET;
+REGISTERED AS { package 30 };
+-- A.5.31 Received digits package
+
+
+receivedDigitsPackage PACKAGE
+	ATTRIBUTES
+		receivedDigits GET;
+REGISTERED AS { package 31 };
+-- A.5.32 Record extensions package
+
+
+recordExtensionsPackage PACKAGE
+	ATTRIBUTES
+		recordExtensions GET;
+REGISTERED AS { package 32 };
+-- A.5.33 Record Id package
+
+
+recordIdPackage PACKAGE
+	ATTRIBUTES
+		recordId GET;
+REGISTERED AS { package 33 };
+-- A.5.34 Redirecting number package
+
+
+redirectingNumberPackage PACKAGE
+	ATTRIBUTES
+		redirectingNumber GET;
+REGISTERED AS { package 34 };
+-- A.5.35 Redirection number package
+
+
+redirectionNumberPackage PACKAGE
+	ATTRIBUTES
+		redirectionNumber GET;
+REGISTERED AS { package 35 };
+-- A.5.36 Related call number package
+
+
+relatedCallNumberPackage PACKAGE
+	ATTRIBUTES
+		relatedCallNumber GET;
+REGISTERED AS { package 36 };
+-- A.5.37 Standard extensions package
+
+
+standardExtensionsPackage PACKAGE
+	ATTRIBUTES
+		standardExtensions GET;
+REGISTERED AS { package 37 };
+-- A.5.38 Supplementary service list package
+
+
+supplementaryServiceListPackage PACKAGE
+	ATTRIBUTES
+		supplementaryServiceList GET;
+REGISTERED AS { package 38 };
+-- A.5.39 Trunk group incoming package
+
+
+trunkGroupIncomingPackage PACKAGE
+	ATTRIBUTES
+		trunkGroupIncoming GET;
+REGISTERED AS { package 39 };
+-- A.5.40 Trunk group outgoing package
+
+
+trunkGroupOutgoingPackage PACKAGE
+	ATTRIBUTES
+		trunkGroupOutgoing GET;
+REGISTERED AS { package 40 };
+-- A.5.41 UMR purpose package
+
+
+uMRPurposePackage PACKAGE
+	ATTRIBUTES
+		uMRPurpose GET;
+REGISTERED AS { package 41 };
+-- A.5.42 User to user info counters package
+
+
+uUInfoCountersPackage PACKAGE
+	ATTRIBUTES
+		uUInfoCounters GET;
+REGISTERED AS { package 42 };
+-- A.6 Attributes
+-- A.6.1 Access delivery
+
+
+accessDelivery ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.AccessDelivery;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		accessDeliveryBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the Access delivery information which indicates if the 
+				call has been delivered to the called subscriber. Normally the value is derived 
+				from the ISDN User Part (ISUP) signalling. In the case of local calls, where no 
+				ISUP signalling is used, a similar value shall be adopted. Access delivery can 
+				be used for statistical purposes or to determine whether the charged subscriber 
+				should be charged with call attempt charge or not.";;
+REGISTERED AS { attribute 1 };
+-- A.6.2 Call identification number
+
+
+callIdentificationNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.CallIdentificationNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callIdentificationNumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"An identification number that identifies the call. All records produced for the 
+				same call have the same call identification number.
+
+				With the call identification number it is possible to link partial outputs, 
+				outputs due to supplementary services during the call and to discriminate 
+				between simultaneous call establishments. If a global call reference is received 
+				through signalling, this can be used as call identification number thus allowing 
+				the correlation of UMRs generated for the same call in different NEs. If no 
+				global call reference is signalled in the network, the call identification will 
+				only have local significance";;
+REGISTERED AS { attribute 2 };
+-- A.6.3 Called party number
+
+
+calledPartyNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.CalledPartyNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		calledPartyNumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the telephone number of the called subscriber if the UMR 
+				is generated due to a call.
+
+				If the UMR is generated due to activation or invocation of the diversion 
+				supplementary service, then attribute contains the telephone number of the 
+				diverted - to number. In special cases this attribute may contain the translated 
+				number. This would be the case when abbreviated dialling is used. As an option, 
+				this information element may also include information to indicate the Numbering 
+				Plan Identification (NPI) and the Type Of Number (TON) of the called party 
+				number. In EN 300 403-1 [5] the different NPI-values and possible TON-values are 
+				defined.";;
+REGISTERED AS { attribute 3 };
+-- A.6.4 Calling party category
+-- A.6.4 Calling party category
+
+
+callingPartyCategory ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.CallingPartyCategory;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callingPartyCategoryBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the calling subscriber category. This information may 
+				also be related to the redirecting party for a forwarded call in accordance to 
+				the definition and use of this information in ETS 300 356-1 [3].";;
+REGISTERED AS { attribute 4 };
+-- A.6.5 Calling party number
+
+
+callingPartyNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.CallingPartyNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callingPartyNumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the telephone number of the calling party.
+
+				The calling party will, for non Universal Personal Telecommunication (UPT) calls 
+				be identical to the calling party user. For UMRs of record type 'call' and when 
+				subscribing to either Multiple Subscriber Number (MSN) or Direct Dialling In 
+				(DDI) the information element indicates the screened and verified number for 
+				transfer towards the called subscriber. This attribute contains the default 
+				number if the exchange is requested to use that number for transfer towards the 
+				called subscriber. If the UMR is generated due to an event concerning a 
+				supplementary service then this attribute contains the telephone number of the 
+				subscriber that caused the event.
+
+				It should be noted that in the case of an exchange with a diverted call, the 
+				subscriber for which the UMR is generated is indicated by the redirecting 
+				number.";;
+REGISTERED AS { attribute 5 };
+-- A.6.6 Calling party number not screened
+
+
+callingPartyNumberNotScreened ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.CallingPartyNumberNotScreened;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callingPartyNumberNotScreenedBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains an additional, user-provided, not screened telephone 
+				number of the calling party if the UMR is generated due to a call.
+
+				This attribute is relevant in connection with users subscribing to the special 
+				arrangement according to e.g. the Calling Line Identity Presentation (CLIP) 
+				supplementary service.";;
+REGISTERED AS { attribute 6 };
+-- A.6.7 Calling party type
+
+
+callingPartyType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.CallingPartyType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callingPartyTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This information element shall contain the calling subscriber type. This 
+				information may also be related to the redirecting party for a forwarded call in 
+				accordance to the definition and use of calling party in ETS 300 356-1 [3].
+
+				The Calling party Type is defined as:
+
+				Analogue;
+
+				Customer link (2 Mbit/s PSTN digital access);
+
+				Basic Access;
+
+				Primary Rate Access;";;
+REGISTERED AS { attribute 7 };
+-- A.6.8 Cause
+
+
+cause ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.Cause;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		causeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the cause and location value for the termination of the 
+				call. The location value shall indicate the origin of the cause value. Cause and 
+				location values are defined in ITU-T Recommendation Q.850 [11]. For Public 
+				Switched Telephone Network (PSTN) the values for call failure shall correspond 
+				to the ISDN cause values. Cause and location values can be used for statistical 
+				purposes or for determining whether the subscriber should be charged with call 
+				attempt charge or not. In the case this information is not included in the UMR 
+				it is assumed that the call is successful.";;
+REGISTERED AS { attribute 8 };
+-- A.6.9 Charging information
+
+
+chargingInformation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.ChargingInformation;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		chargingInformationBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the charging information generated by an NE which is 
+				capable of charging. This information can either be passed on to the billing 
+				application or in the case where the NE calculates charging information for 
+				presentation to the user, this information can be used to compare the values 
+				generated by the off-line charging application. The attribute contains the 
+				charged amount either in recorded currency or call charge units.";;
+REGISTERED AS { attribute 9 };
+-- A.6.10 Conversation time
+
+
+conversationTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.ConversationTime;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		conversationTimeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is only valid for answered calls. If no partial records are 
+				generated this attribute contains the time consumption from B-answer to 
+				termination time. For partial call records the first record contains the time 
+				consumption from B-answer until reporting time. The intermediate partial records 
+				contain the time consumption since the previous reporting. The final partial 
+				record contains the time consumption from the previous reporting until 
+				termination time. The call is considered terminated when communication between 
+				the parties is no longer possible.";;
+REGISTERED AS { attribute 10 };
+-- A.6.11 Creation trigger list
+
+
+creationTriggerList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.CreationTriggerList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION;
+	BEHAVIOUR
+		creationTriggerListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute consists of a list of values that specify the conditions that 
+				will lead to the creation of usage metering data objects. Triggers can be call 
+				related (Seizure or first digit or ACM received or B-answer received) and 
+				non-call related (supplementary service invocation and/or input).";;
+REGISTERED AS { attribute 11 };
+-- A.6.12 Data validity
+
+
+dataValidity ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.DataValidity;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dataValidityBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates that the NE is having problems and that the content of 
+				the generated UMR is not reliable. This indication enables the OS to take the 
+				necessary actions on the collected UMRs.";;
+REGISTERED AS { attribute 12 };
+-- A.6.13 Duration time ACM
+
+
+durationTimeACM ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.DurationTimeACM;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		durationTimeACMBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the time consumption from the seizure time until ACM is 
+				received. This attribute is not included if no ACM is received. In the case of a 
+				terminating exchange the event ACM received will occur when the ACM is normally 
+				generated. This is either when a Bsubscriber port is free (early ACM) or when a 
+				B-subscriber terminal is free (late ACM). The choice between early and late ACM 
+				is a network option in the terminating network. For local calls a corresponding 
+				time shall be used.";;
+REGISTERED AS { attribute 13 };
+-- A.6.14 Duration time B-answer
+
+
+durationTimeB-Answer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.DurationTimeB-Answer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		durationTimeB-AnswerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the time consumption from seizure time until received 
+				BAnswer. This attribute is only included if B-Answer is received.";;
+REGISTERED AS { attribute 14 };
+-- A.6.15 Duration time no B-answer
+
+
+durationTimeNoB-Answer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.DurationTimeNoB-Answer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		durationTimeNoB-AnswerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the time consumption from seizure time to termination 
+				time. This attribute is only included if no B-Answer is received.";;
+REGISTERED AS { attribute 15 };
+-- A.6.16 Exchange info
+
+
+exchangeInfo ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.ExchangeInfo;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		exchangeInfoBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the exchange identity. By means of the exchange identity 
+				it is always possible to identify the exchange where a specific UMR was 
+				generated. In addition to the identity of the exchange, additional information 
+				can be added to indicate the program version of the originator. This information 
+				is provided to assist in interpreting the UMR when new software releases, that 
+				affect the UMR format, are introduced in the network. When all records to be 
+				transferred originate from the same exchange, this information can optionally be 
+				provided in the file header.";;
+REGISTERED AS { attribute 16 };
+-- A.6.17 Fallback service
+
+
+fallbackService ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.FallbackService;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		fallbackServiceBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the fallback service information for a call or 
+				concerning a supplementary service. This attribute is only provided in the case 
+				of fallback i.e. the bearer and/or tele service are not identical to the initial 
+				requested service.";;
+REGISTERED AS { attribute 17 };
+-- A.6.18 Immediate notification
+-- This attribute may be used to define the filter of an EFD.
+
+
+immediateNotification ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.ImmediateNotification;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		immediateNotificationBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute shall contain an indication that the record requires immediate 
+				data transfer to the OS. This I-ETS does not specify if this indication is due 
+				to a subscriber action or contained in the user data.";;
+REGISTERED AS { attribute 18 };
+-- A.6.19 IN specific information
+
+
+iNSpecificInformation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.INSpecificInformation;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		iNSpecificInformationBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains information about the user of the IN service. The user 
+				information is identified by one or more of the following.
+
+				personalUserId
+
+				This element has only relevance when UPT calls are made. It is a network 
+				requirement that the provided international personal User Identity is unique and 
+				verified by the network
+
+				chargedParticipant
+
+				This information element shall indicate one of the participants, i.e. calling, 
+				called, redirecting, redirection or original called party, etc. to be charged 
+				for the usage.
+
+				chargedDirectoryNumber
+
+				This information element shall contain the charged Directory Number (DN) in the 
+				case where the number can not be indicated by the charged participant element.
+
+				percentageToBeBilled
+
+				This information element shall contain the percentage to be billed in the case 
+				where normal billing rules are not followed.
+
+				accountCodeInput
+
+				This information element shall contain the code to which accounting is to be 
+				referred and input by the subscriber. Examples of use are authorization code, 
+				PIN, bank account, VPN code or credit card number to be used for billing.";;
+REGISTERED AS { attribute 19 };
+-- A.6.20 IN service information list
+
+
+iNServiceInformationList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.INServiceInformationList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		iNServiceInformationListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains information about the use of one or more IN services. 
+				Information about the use of more than one service is only possible in 
+				connection with a call record type. For each service this attribute contains the 
+				IN service code, possible queue information and additional information (OCTET 
+				STRING).
+
+				Queue information is stored in connection with IN calls to record usage of 
+				queuing resources. This information element is present only if the call was 
+				queued during its treatment by the IN and contains the time when the call was 
+				queued and the duration of the queuing.
+
+				The service information is made available in the Core Intelligent Network 
+				Application Protocol (INAP) Furnish Charging Information (FCI) according to ETS 
+				300 374-1 [4].";;
+REGISTERED AS { attribute 20 };
+-- A.6.21 Max block size
+
+
+maxBlockSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.MaxBlockSize;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maxBlockSizeBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute specifies the maximum number of UMRs that may be 
+				contained in the blockRecordNotification emitted by the blockGeneratingLog. If 
+				the value '0' is entered, it means that this output trigger is not used.";;
+REGISTERED AS { attribute 21 };
+-- A.6.22 Max time interval
+
+
+maxTimeInterval ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.MaxTimeInterval;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maxTimeIntervalBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute specifies the maximum time interval that may elapse 
+				from receipt of the first record currently in the log to the time at which a 
+				blockRecordNotification shall be emitted. This value, therefore, specifies the 
+				maximum latency with which near-real-time UMR data will be transmitted to the 
+				upstream system. If the value '0' is entered, it means that this output trigger 
+				is not used.";;
+REGISTERED AS { attribute 22 };
+-- A.6.23 Network provider Id
+
+
+networkProviderId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.NetworkProviderId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		networkProviderIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This information element indicates the network provider for whom the UMR is 
+				generated. This information is only necessary in the case of multiple providers.";;
+REGISTERED AS { attribute 23 };
+-- A.6.24 Operator specific1 additional number
+
+
+operatorSpecific1AdditionalNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.OperatorSpecific1AdditionalNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		operatorSpecific1AdditionalNumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains operator defined additional participant information and 
+				is used when the elements defined elsewhere are not adequate.";;
+REGISTERED AS { attribute 24 };
+-- A.6.25 Operator specific1 number
+
+
+operatorSpecific1Number ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.OperatorSpecific1Number;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		operatorSpecific1NumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains operator defined participant information and is used 
+				when the elements defined elsewhere are not adequate.";;
+REGISTERED AS { attribute 25 };
+-- A.6.26 Operator specific2 additional number
+
+
+operatorSpecific2AdditionalNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.OperatorSpecific2AdditionalNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		operatorSpecific2AdditionalNumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains operator defined additional participant information and 
+				is used when the elements defined elsewhere are not adequate.";;
+REGISTERED AS { attribute 26 };
+-- A.6.27 Operator specific2 number
+
+
+operatorSpecific2Number ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.OperatorSpecific2Number;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		operatorSpecific2NumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains operator defined participant information and is used 
+				when the elements defined elsewhere are not adequate.";;
+REGISTERED AS { attribute 27 };
+-- A.6.28 Operator specific3 additional number
+
+
+operatorSpecific3AdditionalNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.OperatorSpecific3AdditionalNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		operatorSpecific3AdditionalNumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains operator defined additional participant information and 
+				is used when the elements defined elsewhere are not adequate.";;
+REGISTERED AS { attribute 28 };
+-- A.6.29 Operator specific3 number
+
+
+operatorSpecific3Number ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.OperatorSpecific3Number;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		operatorSpecific3NumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains operator defined participant information and is used 
+				when the elements defined elsewhere are not adequate.";;
+REGISTERED AS { attribute 29 };
+-- A.6.30 Original called number
+
+
+originalCalledNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.OriginalCalledNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		originalCalledNumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"This information element shall contain the telephone number of the original 
+				called party. This is the information, when using ISUP, that is sent in the 
+				forward direction when a call is redirected and identifies the original called 
+				party.";;
+REGISTERED AS { attribute 30 };
+-- A.6.31 Partial generation
+
+
+partialGeneration ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.PartialGeneration;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		partialGenerationBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is included if the UMR output is partial. Included in the element 
+				is a field indicating the partial record number and the reason for partial 
+				output. The partial record number, is a sequential number which consecutively 
+				numbers the partial records in a specific call.";;
+REGISTERED AS { attribute 31 };
+-- A.6.32 Physical line code
+
+
+physicalLineCode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.PhysicalLineCode;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		physicalLineCodeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This information element shall be used to identify the physical line used by the 
+				calling subscriber. This element is used for customer care purposes and is only 
+				relevant in the case where multiple lines are used by a common DN.";;
+REGISTERED AS { attribute 32 };
+-- A.6.33 Progress
+
+
+progress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.Progress;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		progressBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute describes an event which has occurred during the life of a call. 
+				The attribute contains a location value as well as the progress description. 
+				Progress information can be used e.g. for determining whether the subscriber 
+				shall be charged for the use of a supplementary service towards a non-ISDN user. 
+				Only the Progress indicator received from the far end is of relevance and should 
+				be used. In the case where more than one value is received only the last 
+				Progress indicator is used. The location and progress description values are 
+				defined in EN 300 403-1 [5].";;
+REGISTERED AS { attribute 33 };
+-- A.6.34 Received digits
+
+
+receivedDigits ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.ReceivedDigits;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		receivedDigitsBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the digits dialled by the subscriber or sent by the 
+				subscriber terminal. Normally this information is only included for customer 
+				care purposes. It should however be noted that the use of functional signalling 
+				in ISDN as well as requirements to restrict this information, will require 
+				operator or manufacturer specific coding of this element. Alternatively 
+				functional information should be included in the supplementary service field.";;
+REGISTERED AS { attribute 34 };
+-- A.6.35 Record extensions
+
+
+recordExtensions ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.RecordExtensions;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		recordExtensionBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute shall contain information elements that network operators and/ or 
+				manufacturers have added to the standard UMR. This information element contains 
+				a set of 'management extensions' as defined in ITU-T Recommendation X.721 [18].";;
+REGISTERED AS { attribute 35 };
+-- A.6.36 Record Id
+
+
+recordId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.RecordId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		recordIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for audit trail purposes to check if all logged UMRs are 
+				transfered to the OS. It is a sequential number provided by the log object when 
+				the UMR is logged.";;
+REGISTERED AS { attribute 36 };
+-- A.6.37 Record type
+
+
+recordType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.RecordType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		recordTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This information element indicates the type of the UMR and it also indicates the 
+				way some of the following information elements are used.";;
+REGISTERED AS { attribute 37 };
+-- A.6.38 Redirecting number
+
+
+redirectingNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.RedirectingNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		redirectingNumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the telephone number of the party who has redirected the 
+				call. This is the information, when using ISUP, that is sent in the forward 
+				direction when a call is redirected, indicating the number from which the call 
+				was diverted. This number is identical to the original called number for a 
+				single diversion. In the case of a diverted call the Service User will be 
+				indicated by the redirecting number.";;
+REGISTERED AS { attribute 38 };
+-- A.6.39 Redirection number
+
+
+redirectionNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.RedirectionNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		redirectionNumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the telephone number of the party that the call shall be 
+				forwarded to. This is the information, when using ISUP, that is sent in the 
+				backward direction indicating the number towards which the call shall be 
+				re-routed or has been forwarded. The redirection number is identical to the 
+				diverted to number which can be either a forwarded to number or a deflected to 
+				number.";;
+REGISTERED AS { attribute 39 };
+-- A.6.40 Related call number
+
+
+relatedCallNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.RelatedCallNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		relatedCallNumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the Call identification number of an associated call 
+				record. This number is used for associating different call records generated in 
+				the same exchange.";;
+REGISTERED AS { attribute 40 };
+-- A.6.41 Service type
+
+
+serviceType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.ServiceType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bearerServiceBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the information on the bearer capability / tele service 
+				/ basic service for a call or concerning a supplementary service. The bearer 
+				service coding shall be based on EN 300 403-1 [5]. The bearer service allocated 
+				to PSTN is 'audio 3,1 kHz'. The tele service element shall contain the high 
+				layer compatibility information, the coding shall be based on EN 300 403-1 [5]. 
+				The basic service coding shall be based on ETS 300 196 [2].";;
+REGISTERED AS { attribute 41 };
+-- A.6.42 Service user
+
+
+serviceUser ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.ServiceUser;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		serviceUserBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute provides information of the party whose use of resources has been 
+				accounted for. The information provided in this element is a pointer to the 
+				party number provided elsewhere in the record. In the case where e.g. the UMR is 
+				generated on a transit exchange and no calling party number is available, this 
+				element will indicate that the service user is unknown.";;
+REGISTERED AS { attribute 42 };
+-- A.6.43 Standard extensions
+
+
+standardExtensions ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.StandardExtensions;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		standardExtensionBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute shall contain standardized extensions that are added to the 
+				standard UMR. This field contains a set of 'management extensions' as defined in 
+				ITU-T Recommendation X.721 [18].";;
+REGISTERED AS { attribute 43 };
+-- A.6.44 Start time stamp
+
+
+startTimeStamp ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.StartTimeStamp;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		startTimeStampBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains a time stamp for the start of the call. The start time 
+				is defined as either the seizure time for a non-answered call, when the exchange 
+				is ready for receiving digits or for an answered call, the time when a call is 
+				answered, i.e. the receipt of an answer message. For transit calls the start 
+				time stamp (seizure) will relate to the first message received e.g. Initial 
+				Address Message (IAM).
+
+				If the UMR is generated by an event concerning a supplementary service not 
+				related to a call, then this information element contains the time stamp for 
+				that event.
+
+				Date and time values shall be derived from the exchange clock.This attribute 
+				includes year, month, day, hour, minute, second and centisecond.
+
+				For partial outputs the start date time is the end time when the previous output 
+				was made.";;
+REGISTERED AS { attribute 44 };
+-- A.6.45 Supplementary service list
+-- A.6.45 Supplementary service list
+
+
+supplementaryServiceList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.SupplementaryServiceList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		supplementaryServiceBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains relevant information about the use of one or more 
+				supplementary services. For each recorded service this attribute contains a 
+				service code identifying the supplementary service and in addition information 
+				about the action taken. An optional time stamp is provided for time dependent 
+				charging of supplementary services. The time stamp is a duration time relative 
+				to the startTimeStamp and is recorded in centisecond.
+
+				The supplementary service codes shall be based on ETS 300 738 [6].
+
+				For each service code information is provided indicating the action taken. 
+				Following actions are defined:
+
+				- provision of supplementary service;
+
+				- withdrawal of supplementary service;
+
+				- registration of supplementary service;
+
+				- erasure of supplementary service;
+
+				- activation of supplementary service;
+
+				- deactivation of supplementary service;
+
+				- invocation of supplementary service;
+
+				- disabling of supplementary service;
+
+				- interrogation of supplementary service.
+
+				If provided by the network, actions can be made on supplementary service by the 
+				operator. In such a case the service user element in the UMR will indicate the 
+				operator as the initiator of the action. In the case of functional signalling on 
+				ISDN further information of the supplementary service usage is provided by the 
+				optional functional information field. This field contains a set of 'management 
+				extensions' as defined by ITU-T Recommendation X.721 [18].";;
+REGISTERED AS { attribute 45 };
+-- A.6.46 Times of day
+
+
+timesOfDay ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.TimesOfDay;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		timesOfDayBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the times of the day at which the log will 
+				automatically generate a file.";;
+REGISTERED AS { attribute 46 };
+-- A.6.47 Trunk group incoming
+
+
+trunkGroupIncoming ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.TrunkGroupIncoming;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		trunkGroupIncomingBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the symbolic name of the trunk that is used by the 
+				incoming call as seen by the NE. If the calling subscriber is a local subscriber 
+				then this information element is not relevant.";;
+REGISTERED AS { attribute 47 };
+-- A.6.48 Trunk group outgoing
+
+
+trunkGroupOutgoing ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.TrunkGroupOutgoing;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		trunkGroupOutgoingBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains the symbolic name of the trunk that is used by the 
+				outgoing call as seen from the NE. If the called subscriber is a local 
+				subscriber then this information element is not relevant.";;
+REGISTERED AS { attribute 48 };
+-- A.6.49 UMR purpose
+
+
+uMRPurpose ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.UMRPurpose;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		uMRPurposeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute provides information to the OS on the reason for triggering of 
+				the record. In most networks the OS will be aware of the triggering conditions 
+				of the network and hence this information will not be required.";;
+REGISTERED AS { attribute 49 };
+-- A.6.50 Usage metering data identifier
+
+
+usageMeteringDataId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.UsageMeteringDataId;
+	BEHAVIOUR
+		usageMeteringDataIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute uniquely identifies the usageMeteringData object.";;
+REGISTERED AS { attribute 50 };
+-- A.6.51 User to user info counters
+
+
+uUInfoCounters ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1UsageMeteringModule.UUInfoCounters;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		uUInfoCountersBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute shall contain the User To User info counters. The counters shall 
+				indicate the total number of octets and/or messages transmitted or received by 
+				the subscriber using the User to user signalling supplementary service. Separate 
+				counters can be assigned to the 3 different User to user signalling services.";;
+REGISTERED AS { attribute 51 };
+-- A.7 Actions
+-- A.7.1 Create file
+
+
+createFile ACTION
+	BEHAVIOUR
+		createFileBehaviour BEHAVIOUR
+			DEFINED AS
+				"Receipt of this action causes the creation of a file containing the concatenated 
+				content of all the records currently contained in the log.
+
+				The records shall be deleted from the log upon successful creation of the file.
+
+				As action input a file name can be given by the OS. If no file name is entered, 
+				the NE will generate the file name.
+
+				The action response contains the name of the created file.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX ASN1UsageMeteringModule.FileName;
+	WITH REPLY SYNTAX ASN1UsageMeteringModule.CreatedFile;
+REGISTERED AS { action 1 };
+-- A.8 Notifications
+-- Unless otherwise stated, all notifications shall be sent via the M-EVENT-REPORT operation in confirmed
+-- mode.
+-- A.8.1 Block record notification
+
+
+blockRecordNotification NOTIFICATION
+	BEHAVIOUR
+		blockRecordNotificationBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is emitted whenever one of the triggering events described in 
+				the object class template occurs. The notification consists of a concatenation 
+				of stripped records; i.e. the UMRs without the log overhead (Log Record Id, 
+				Managed Object Class and Instance and Logging Time).";;
+	WITH INFORMATION SYNTAX ASN1UsageMeteringModule.BlockRecordInfo;
+REGISTERED AS { notification 1 };
+-- A.8.2 File creation notification
+
+
+fileCreationNotification NOTIFICATION
+	BEHAVIOUR
+		fileCreationNotificationBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is emitted whenever the fileGeneratingLog creates a new file 
+				in order to let the managing system know that the file is available for 
+				retrieval.";;
+	WITH INFORMATION SYNTAX ASN1UsageMeteringModule.FileCreationInfo;
+REGISTERED AS { notification 2 };
+-- A.8.3 UMR notification
+
+
+usageMeteringRecordNotification NOTIFICATION
+	BEHAVIOUR
+		usageMeteringRecordNotificationBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is issued to transmit a UMR. The 'immediate notification' may 
+				be used by the Call Forwarding Discriminator to select records requiring real 
+				time handling by the OS.";;
+	WITH INFORMATION SYNTAX ASN1UsageMeteringModule.RecordContent;
+REGISTERED AS { notification 3 };
+-- A.9 Name bindings
+
+
+blockGeneratingLog-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS blockGeneratingLog;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100 : 1992":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.721 | ISO/IEC 10165-2: 1992":logId;
+	CREATE;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { nameBinding 1 };
+
+
+fileGeneratingLog-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS fileGeneratingLog;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100 : 1992":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.721 | ISO/IEC 10165-2: 1992":logId;
+	CREATE;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { nameBinding 2 };
+
+
+simpleUsageMeteringControl-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS simpleUsageMeteringControl;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100 : 1992":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.742 | ISO/IEC 10164-10: 1995":controlObjectId;
+	CREATE;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { nameBinding 3 };
+
+
+usageMeteringData-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS usageMeteringData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100 : 1992":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		usageMeteringDataId;
+REGISTERED AS { nameBinding 4 };
+
+
+usageMeteringLogRecord-fileGeneratingLog NAME BINDING
+	SUBORDINATE OBJECT CLASS usageMeteringLogRecord AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS fileGeneratingLog;
+	WITH ATTRIBUTE
+		"Recommendation X.721 | ISO/IEC 10165-2: 1992":logRecordId;
+REGISTERED AS { nameBinding 5 };
+
+
+usageMeteringLogRecord-blockGeneratingLog NAME BINDING
+	SUBORDINATE OBJECT CLASS usageMeteringLogRecord AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS blockGeneratingLog;
+	WITH ATTRIBUTE
+		"Recommendation X.721 | ISO/IEC 10165-2: 1992":logRecordId;
+REGISTERED AS { nameBinding 6 };
+
+--< ASN1.Version 1990 ASN1UsageMeteringModule
+--  { ccitt(0) identified-organization(4) etsi(0) usageMeteringInformationManagement(819) informationModel(0) asn1Module(2) asn1UsageMeteringModule(0) } >--
+-- A.10 ASN.1 defined types module
+-- For a better understanding of this module please refer to the definitions of record types and record
+-- elements given in annex B.
+-- Rules of extensibility
+-- The following types will be indicated as being extensible:
+-- ENUMERATED;
+-- named INTEGER;
+-- named BIT STRING;
+-- tagged SET;
+-- tagged SEQUENCE;
+-- tagged CHOICE;
+-- Under the rules of extensibility new enumeration's (for ENUMERATED types), new bit name
+-- assignments (for named BIT STRING types), new named numbers (for named INTEGER types), and
+-- new tagged elements (for tagged SET, SEQUENCE, and CHOICE types) may be added in future
+-- versions of this Recommendation.
+-- When processing information in a System Management Protocol (SMAP) PDU, the accepting SMAP
+-- machine shall ignore:
+-- enumeration's not recognized;
+-- unrecognized named numbers;
+-- unrecognized named bits;
+-- unrecognized tagged elements of sets, sequences, and choices.
+ASN1UsageMeteringModule { ccitt(0) identified-organization(4) etsi(0) usageMeteringInformationManagement(819) informationModel(0) asn1Module(2) asn1UsageMeteringModule(0) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+ManagementExtension
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(1) 1 }
+---see ITU-T Recommendation X.721 [18]
+BasicService
+	FROM Basic-Service-Elements { ccitt identified-organization etsi(0) 196 basic-serviceelements(8) }
+---see ETSI Standard ETS 300 196 [2]
+NameType
+	FROM ASN1DefinedTypesModule { ccitt(0) recommendation(0) m(13) gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) };
+---see ITU-T Recommendation M.3100
+-- OBJECT IDENTIFIERS
+informationModel OBJECT IDENTIFIER ::= { ccitt(0) identified-organization(4) etsi(0) usageMeteringInformationManagement(819) informationModel(0) }
+managedObjectClass OBJECT IDENTIFIER ::= { informationModel managedObjectClass(3) }
+package OBJECT IDENTIFIER ::= { informationModel package(4) }
+nameBinding OBJECT IDENTIFIER ::= { informationModel nameBinding(6) }
+attribute OBJECT IDENTIFIER ::= { informationModel attribute(7) }
+action OBJECT IDENTIFIER ::= { informationModel action(9) }
+notification OBJECT IDENTIFIER ::= { informationModel notification(10) }
+behaviour OBJECT IDENTIFIER ::= { informationModel behaviour(11) }
+-- BLOCK CONTENTS
+BlockRecordInfo ::= SEQUENCE {
+	blockHeaderRecord [0] BlockHeaderRecord OPTIONAL,
+	usageRecords [1] SEQUENCE OF RecordContent }
+BlockHeaderRecord ::= SEQUENCE {
+	exchangeInfo [0] ExchangeInfo OPTIONAL,
+	sequenceNumber [1] SequenceNumber,
+	reasonForOutput [2] ReasonForOutput OPTIONAL,
+	blockExtensions [3] ManagementExtensions OPTIONAL }
+-- FILE CONTENTS
+UsageMeteringRecordFile ::= SEQUENCE {
+	header FileHeaderRecord,
+	body SEQUENCE OF RecordContent,
+	trailer Trailer OPTIONAL }
+FileHeaderRecord ::= SEQUENCE {
+	productionDateTime [0] StartDateTime,
+	exchangeInfo [1] ExchangeInfo,
+	fileName [2] FileName,
+	reasonForOutput [3] ReasonForOutput,
+	firstRecordId [4] RecordId,
+	fileHeaderExtensions [5] ManagementExtensions OPTIONAL }
+Trailer ::= SEQUENCE {
+	numberOfRecords [0] INTEGER,
+	lastRecordId [1] RecordId }
+-- USAGE METERING RECORDS
+RecordContent ::= CHOICE {
+	callRecord [0] CallRecord,
+	supplServiceInputRecord [1] SupplServiceInputRecord,
+	standardAdditionalRecordTypes [2] ManagementExtensions,
+	additionalRecordTypes [3] ManagementExtensions }
+CallRecord ::= SEQUENCE {
+	recordType [0] RecordType,
+	startTimeStamp [1] StartTimeStamp,
+	participantInfo [2] ParticipantInfo,
+	serviceType [3] ServiceType,
+	serviceUser [4] ServiceUser,
+	callIdentificationNumber [5] CallIdentificationNumber,
+	recordId [6] RecordId OPTIONAL,
+	dataValidity [7] DataValidity OPTIONAL,
+	networkProviderId [8] NetworkProviderId OPTIONAL,
+	supplementaryServiceLis [9] SupplementaryServiceList OPTIONAL,
+	immediateNotification [10] ImmediateNotification OPTIONAL,
+	cause [11] Cause OPTIONAL,
+	iNServiceInformationList [12] INServiceInformationList OPTIONAL,
+	iNSpecificInformation [13] INSpecificInformation OPTIONAL,
+	partialGeneration [14] PartialGeneration OPTIONAL,
+	exchangeInfo [15] ExchangeInfo OPTIONAL,
+	relatedCallNumber [16] RelatedCallNumber OPTIONAL,
+	uMRPurpose [17] UMRPurpose OPTIONAL,
+	additionalParticipantInfo [18] AdditionalParticipantInfo OPTIONAL,
+	callingPartyCategory [19] CallingPartyCategory OPTIONAL,
+	callingPartyType [20] CallingPartyType OPTIONAL,
+	chargingInformation [21] ChargingInformation OPTIONAL,
+	progress [22] Progress OPTIONAL,
+	accessDelivery [23] AccessDelivery OPTIONAL,
+	trunkGroupOutgoing [24] TrunkGroupOutgoing OPTIONAL,
+	trunkGroupIncoming [25] TrunkGroupIncoming OPTIONAL,
+	fallbackService [26] FallbackService OPTIONAL,
+	callDuration [27] CallDuration OPTIONAL,
+	uUInfo [28] UUInfoCounters OPTIONAL,
+	standardExtensions [29] StandardExtensions OPTIONAL,
+	recordExtensions [30] RecordExtensions OPTIONAL }
+UpplServiceInputRecord ::= CallRecord(WITH COMPONENTS {
+	recordType PRESENT,
+	startTimeStamp PRESENT,
+	participantInfo PRESENT,
+	serviceType PRESENT,
+	serviceUser PRESENT,
+	callIdentificationNumber PRESENT,
+	recordId OPTIONAL,
+	dataValidity OPTIONAL,
+	networkProviderId OPTIONAL,
+	supplementaryServiceList PRESENT,
+	immediateNotification OPTIONAL,
+	cause OPTIONAL,
+	iNServiceInformationList OPTIONAL,
+	iNSpecificInformation OPTIONAL,
+	exchangeInfo OPTIONAL,
+	uMRPurpose OPTIONAL,
+	additionalParticipantInfo OPTIONAL,
+	callingPartyCategory OPTIONAL,
+	callingPartyType OPTIONAL,
+	chargingInformation OPTIONAL,
+	standardExtensions OPTIONAL,
+	recordExtensions OPTIONAL })
+-- DEFAULT VALUE DEFINITION
+defaultCreationTrigger CreationTriggerList ::= { seizure(0) }
+-- SUPPORTING PRODUCTIONS
+AccessDelivery ::= BIT STRING {
+	setupMessageGenerated(0) }(SIZE(8))
+-- Bit 0 (setupMessageGeneration) has the following meaning:
+-- 0 No set-up message generated
+-- 1 Set-up message generated
+-- Bit 1 to 7 are not used.
+-- See ETS 300 356-1 [3].
+AccountCodeInput ::= OCTET STRING(SIZE(1..18))
+-- This type is used to represent information, which is provided by the subscriber necessary for
+-- use by some services. Coding is in accordance with Generic digits ETS 300 356-1 [3].
+-- a) bits 876: Encoding scheme
+-- 000 BCD even (even number of digits)
+-- 001 BCD odd (odd number of digits)
+-- 010 IA5 character
+-- 011 Binary coded
+-- 100
+-- ... spare
+-- 111
+--
+-- b) bits 54321: Type of digits
+-- 00000reserved for account code
+-- 00001 reserved for autorization code
+-- 00010 reserved for private network travelling class mark
+-- 00011 reserved for business communication
+-- 00100
+-- ... spare for international use
+-- 01111
+-- 10000
+-- ... spare for national use
+-- 11111
+--
+-- c) Digits:
+-- Coding in accordance to the coding scheme and type of digits.
+AdditionalParticipantInfo ::= SET {
+	physicalLineCode [0] PhysicalLineCode OPTIONAL,
+	receivedDigits [1] ReceivedDigits OPTIONAL,
+	operatorSpecific1AdditionalNumber [2] OperatorSpecific1AdditionalNumber OPTIONAL,
+	operatorSpecific2AdditionalNumber [3] OperatorSpecific2AdditionalNumber OPTIONAL,
+	operatorSpecific3AdditionalNumber [4] OperatorSpecific3AdditionalNumber OPTIONAL }
+Amount ::= SEQUENCE {
+	currencyAmount [0] NumberOfUnits,
+	multiplier [1] Multiplier }
+AutomaticRecordDeletion ::= BOOLEAN
+BearerService ::= SEQUENCE {
+	capability ENUMERATED {
+		speech(0),
+		audio3dot1kHz(1),
+		uni64(2),
+		uni64withT-A(3),
+		multipleRate(4),
+		packetModeB-Ch(5),
+		all(6) },
+	multiplier INTEGER(2..30) OPTIONAL }
+-- Multiplier present only if capability = multipleRate
+CallDuration ::= SET {
+	conversationTime [0] ConversationTime OPTIONAL,
+	durationTimeACM [1] DurationTimeACM OPTIONAL,
+	durationTimeB-Answer [2] DurationTimeB-Answer OPTIONAL,
+	durationTimeNoB-Answer [3] DurationTimeNoB-Answer OPTIONAL }
+CalledPartyNumber ::= Number
+CallIdentificationNumber ::= OCTET STRING
+-- Octet string identifying the call.
+CallingPartyCategory ::= BIT STRING(SIZE(8))
+-- See ETS 300 356-1 [3] subclause 3.9.
+CallingPartyNumber ::= Number
+CallingPartyNumberNotScreened ::= Number
+CallingPartyType ::= ENUMERATED {
+	analogue(0),
+	customerLink(1),-- 2Mbit/s PSTN digital access
+	basicAccess(2),
+	primaryRateAccess(3) }
+Cause ::= SEQUENCE {
+	causeValue CauseValue,
+	location Location }
+CauseValue ::= BIT STRING(SIZE(8))
+-- Coded according to ITU-T Recommendation Q.850 [11]: Table 1/Q.850
+ChargedDirectoryNumber ::= Number
+ChargingInformation ::= CHOICE {
+	recordedCurrency [0] RecordedCurrency,
+	recordedUnitsList [1] RecordedUnitsList,
+	freeOfCharge [2] NULL,
+	chargeInfoNotAvailable [3] NULL }
+-- Charging information provided is related to the recorded charges for the usage at the time of
+-- UMR generation, see ETS 300 182 [1] AOC-E.
+ChargedParticipant ::= ParticipantType
+ConversationTime ::= Duration
+Count ::= OCTET STRING(SIZE(1..3))
+-- A maximum 3 byte counter.
+CreatedFile ::= FileName
+CreationTriggerList ::= SET OF CreationTrigger
+CreationTrigger ::= ENUMERATED {
+	seizure(0),
+	firstDigitReceived(1),
+	aCMReceived(2),
+	b-AnswerReceived(3),
+	supplementaryServiceInvocation(4),
+	supplementaryServiceInput(5) }
+-- ACMreceived is defined as the receipt of ACM for an external call. In the case of a terminating
+-- exchange the event ACM received will occur when the ACM is normally generated. This is either
+-- when a B-subscriber port is free (early ACM) or when a B-subscriber terminal is free (late ACM).
+-- The choice between early and late ACM is a network option in the terminating network. For local
+-- calls a corresponding time shall be used.
+DataValidity ::= ENUMERATED {
+	unreliableData(0) }
+Duration ::= OCTET STRING(SIZE(1..3))
+-- Duration in centiseconds. Maximum value in centiseconds is approx. 46 hours.
+DurationTimeACM ::= Duration
+DurationTimeB-Answer ::= Duration
+DurationTimeNoB-Answer ::= Duration
+ExchangeInfo ::= SET {
+	exchangeID [0] ExchangeID OPTIONAL,
+	softwareVersion [1] SoftwareVersion OPTIONAL }
+ExchangeID ::= VisibleString(SIZE(1..11))
+FallbackService ::= SEQUENCE {
+	teleService [0] TeleService OPTIONAL,
+	bearerService [1] BearerService OPTIONAL }
+FileName ::= NameType
+FileCreationInfo ::= SEQUENCE {
+	fileName FileName,
+	reasonForOutput ReasonForOutput }
+ImmediateNotification ::= BOOLEAN
+INServiceInformationList ::= SEQUENCE OF INServiceInformation
+INServiceInformation ::= SEQUENCE {
+	iNServiceCode [0] INServiceCode,
+	queueInfo [1] QueueInfo OPTIONAL,
+	serviceSpecificINInformation [2] OCTET STRING OPTIONAL }
+INSpecificInformation ::= SET {
+	iNpersonalUserId [0] PersonalUserId OPTIONAL,
+	chargedParticipant [1] ChargedParticipant OPTIONAL,
+	chargedDirectoryNumber [2] ChargedDirectoryNumber OPTIONAL,
+	percentageToBeBilled [3] PercentageToBeBilled OPTIONAL,
+	accountCodeInput [4] AccountCodeInput OPTIONAL }
+INServiceCode ::= OCTET STRING(SIZE(2))
+Location ::= INTEGER {
+	user(0),
+	localUserPrivateNetwork(1),
+	localUserPublicNetwork(2),
+	transitNetwork(3),
+	remoteUserPublicNetwork(4),
+	remoteUsePrivateNetwork(5),
+	internationalNetwork(7),
+	beyondInterworkPoint(10) }
+-- See ITU-T Recommendation Q.850 [11]: subclause 2.2.3
+MaxBlockSize ::= INTEGER(0..32767)
+MaxTimeInterval ::= INTEGER(0..32767)
+-- time interval in seconds.
+ManagementExtensions ::= SET OF ManagementExtension
+-- A set of network/manufacturer specific extensions.
+NetworkProviderId ::= VisibleString(SIZE(1..11))
+Multiplier ::= ENUMERATED {
+	oneThousandth(0),
+	oneHundredth(1),
+	oneTenth(2),
+	one(3),
+	ten(4),
+	hundred(5),
+	thousand(6) }
+Number ::= OCTET STRING(SIZE(1..14))
+-- This type is used to represent a number for addressing purposes. The used coding is similar to
+-- that used for numbers in ETS 300 356-1 [3]. It is composed of
+-- a) one octet for odd/even indicator and nature of address indicator
+-- b) one octet for numbering plan indicator
+-- c) digits of the address encoded as TBCD String
+-- a)
+-- bits 8: Odd/even indicator
+-- 0 even number of address signals
+-- 1 odd number of address signals
+-- bits 7654321: Natur of address indicator
+-- 0000000 spare
+-- 0000001 subscriber number
+-- 0000010 unknown
+-- 0000011 national (significant) number
+-- 0000100 international number
+-- 0000101 ü
+-- to ý spare
+-- 1101111 þ
+-- 1110000 ü
+-- to ý reserved for national use
+-- 1111110 þ
+-- 1111111 spare
+-- b)
+-- bits 765: numbering plan indicator
+-- 000 spare
+-- 001 ISDN(Telephony) Number Plan (Rec CCITT E.164)
+-- 010 spare
+-- 011 data numbering plan (ITU-T Recommendation X.121)
+-- 100 telex numbering plan (ITU-T Recommendation F.69)
+-- 101 reserved for national use
+-- 110 reserved for national use
+-- 111 spare
+--
+-- c) The following octets representing digits of an address encoded as a TBCD-STRING.
+-- TBCD-STRING ::= OCTET STRING
+-- This type (Telephony Binary Coded Decimal String) is used to represent digits from 0
+-- through 9, *, #, a, b, c, two digits per octet, each digit encoded 0000 to 1001 (0 to 9), 1010 (*),
+-- 1011(#), 1100 (a), 1101 (b) or 1110 (c); 1111 (end of pulsing signal-ST); 0000 is used as a filler
+-- when there is an odd number of digits.
+-- The most significant address signal is sent first. Subsequent address signals are sent in
+-- successive 4-bit fields.
+NumberOfUnits ::= INTEGER(0..16777215)
+OperatorSpecific1AdditionalNumber ::= VisibleString
+OperatorSpecific2AdditionalNumber ::= VisibleString
+OperatorSpecific3AdditionalNumber ::= VisibleString
+OperatorSpecific1Number ::= Number
+OperatorSpecific2Number ::= Number
+OperatorSpecific3Number ::= Number
+OriginalCalledNumber ::= Number
+ParticipantId ::= CHOICE {
+	callingPartyNumber [0] CallingPartyNumber,
+	calledPartyNumber [1] CalledPartyNumber,
+	redirectingNumber [2] RedirectingNumber,
+	redirectionNumber [3] RedirectionNumber,
+	originalCalledNumber [4] OriginalCalledNumber,
+	callingPartyNumberNotScreened [5] CallingPartyNumberNotScreened,
+	operatorSpecific1Number [6] OperatorSpecific1Number,
+	operatorSpecific2Number [7] OperatorSpecific2Number,
+	operatorSpecific3Number [8] OperatorSpecific3Number }
+ParticipantInfo ::= SET OF ParticipantId
+ParticipantType ::= ENUMERATED {
+	callingPartyNumber(0),
+	calledPartyNumber(1),
+	redirectingNumber(2),
+	redirectionNumber(3),
+	originalCalledNumber(4),
+	callingPartyNumberNotScreened(5),
+	operatorSpecific1Number(6),
+	operatorSpecific2Number(7),
+	operatorSpecific3Number(8),
+	operator(9),
+	unknown(10) }
+PartialRecordNumber ::= BIT STRING(SIZE(8))
+-- A sequential number in the range 0-255 indicating the partial record generated for the same call
+PartialGeneration ::= SET {
+	partialRecordNumber [0] PartialRecordNumber,
+	partialRecordReason [1] PartialRecordReason }
+PartialRecordReason ::= ENUMERATED {
+	timeLimit(0),
+	serviceChange(1),
+	overflow(2),
+	networkInternalReasons(3),
+	lastUMR(4) }
+PercentageToBeBilled ::= INTEGER(0..99)
+PersonalUserId ::= OCTET STRING(SIZE(1..10))
+-- This type is used to represent the Personal User Id. For UMT the Personal User Id is defined
+-- according to E.212 as a International Mobil Station Identity (IMSI). Accordingly only numerical
+-- characters (0-9) are used.
+-- The PersonalNumber type does however not exclude the use of other formats. These formats
+-- can be indicated in the numbering plan indicator.
+-- The type is composed of:
+-- a) one octet for odd/even indicator and numbering plan indicator
+-- b) digits of the address encoded as TBCD String
+-- a)
+-- bits 8: Odd/even indicator
+-- 0 even number of address signals
+-- 1 odd number of address signals
+-- bits 765: numbering plan indicator
+-- 000 E.212 (IMSEI)
+-- 001 ISDN(Telephony) Number Plan (Rec CCITT E.164)
+-- 010 spare
+-- 011 spare
+-- 100 spare
+--
+-- b) The following octets representing the personal number encoded as a TBCD-STRING.
+-- TBCD-STRING ::= OCTET STRING
+-- This type (Telephony Binary Coded Decimal String) is used to represent digits from 0
+-- through 9, *, #, a, b, c, two digits per octet, each digit encoded 0000 to 1001 (0 to 9), 1010 (*),
+-- 1011(#), 1100 (a), 1101 (b) or 1110 (c); 1111 (end of pulsing signal-ST); 0000 is used as a filler
+-- when there is an odd number of digits.
+-- The most significant address signal is sent first. Subsequent address signals are sent in
+-- successive 4-bit fields.
+PhysicalLineCode ::= VisibleString
+Progress ::= SEQUENCE {
+	description ProgressDescription,
+	location Location }
+ProgressDescription ::= INTEGER {
+	notEndToEndISDN(1),
+	nonISDNDestination(2),
+	nonISDNOrigination(3),
+	returnedToISDN(4),
+	interworkingServiceChange(5),
+	inBandInfo(8) }
+-- See EN 300 403-1 [5]
+QueueInfo ::= SEQUENCE {
+	queueTimeStamp [0] StartDateTime,
+	queueDuration [1] Duration }
+ReasonForOutput ::= ENUMERATED {
+	absoluteTimeEvent(0),
+	maxBlockSizeReached(1),
+	maxTimeIntervalElapsed(2),
+	internalSizeLimitReached(3),
+	oSAction(4) }
+ReceivedDigits ::= OCTET STRING(SIZE(1..18))
+-- This type is used to represent digits input by the subscriber. It is composed of
+-- a) one octet for odd/even indicator
+-- b) digits of the address encoded as TBCD String
+-- a)
+-- bits 8: Odd/even indicator
+-- 0 even number of address signals
+-- 1 odd number of address signals
+--
+-- b) The following octets representing the received digits encoded as a TBCD-STRING.
+-- TBCD-STRING ::= OCTET STRING
+-- This type (Telephony Binary Coded Decimal String) is used to represent digits from 0
+-- through 9, *, #, a, b, c, two digits per octet, each digit encoded 0000 to 1001 (0 to 9), 1010 (*),
+-- 1011(#), 1100 (a), 1101 (b) or 1110 (c); 1111 (end of pulsing signal-ST); 0000 is used as a filler
+-- when there is an odd number of digits.
+-- The most significant address signal is sent first. Subsequent address signals are sent in
+-- successive 4-bit fields.
+RecordedCurrency ::= CHOICE {
+	currency [0] IA5String(SIZE(1..10)),
+	amount [1] Amount }
+RecordExtensions ::= ManagementExtensions
+RecordedUnitsList ::= SEQUENCE SIZE(1..32) OF RecordedUnits
+RecordedUnits ::= SEQUENCE {
+	units CHOICE {
+		recordedNumberOfUnits [0] NumberOfUnits,
+		notAvailable [1] NULL },
+	recordedTypeOfUnits INTEGER(1..16) OPTIONAL }
+RecordId ::= Count
+-- The record id is a sequence number that is incremented for each logged UMR. It is generated by the
+-- log
+RecordType ::= INTEGER {
+	call(0),
+	supplServiceInputRecord(1) }
+RedirectingNumber ::= Number
+RedirectionNumber ::= Number
+RelatedCallNumber ::= CallIdentificationNumber
+ServiceType ::= SEQUENCE {
+	basicService [0] BasicService OPTIONAL,
+	teleService [1] TeleService OPTIONAL,
+	bearerService [2] BearerService OPTIONAL }
+ServiceUser ::= ParticipantType
+SequenceNumber ::= Count
+-- The record block sequence number is incremented by one for each block generation. This
+-- number is locally generated by the exchange.
+SoftwareVersion ::= VisibleString(SIZE(1..12))
+StandardExtensions ::= ManagementExtensions
+StartTimeStamp ::= CHOICE {
+	answerTime [0] StartDateTime,
+	seizureTime [1] StartDateTime,
+	-- For calls a choice between seizure time or answer time
+	-- is dependent on the occurrence of a B-answer (ANM).
+	partialTime [2] StartDateTime,
+	-- Partial time is used for partial records.
+	eventTime [3] StartDateTime }
+-- Event time is used in connection with supplementary service input records.
+StartDateTime ::= OCTET STRING(SIZE(7))
+-- YYMMDDHHmmSSCC (Year, Month, Day, Hour, Minute, Second, Centisecond),
+-- each field one digit, two digits per octet, the digits 0 through 9, encoded as
+-- 0000 to 1001 "hstring". 1st digit in the LSB.
+SupplementaryServiceList ::= SEQUENCE OF SupplementaryService
+SupplementaryService ::= SEQUENCE {
+	supplementaryServiceCode [0] SupplementaryServiceCode,
+	supplementaryAction [1] SupplementaryAction,
+	supplementaryTimeStamp [2] Duration OPTIONAL,
+	functionalInformation [3] OCTET STRING OPTIONAL }
+SupplementaryServiceCode ::= OCTET STRING(SIZE(2))
+-- see ETS 300 738 [6]
+SupplementaryAction ::= ENUMERATED {
+	provision(0),
+	withdrawal(1),
+	registration(2),
+	erasure(3),
+	activation(4),
+	deactivation(5),
+	invocation(6),
+	disabling(7),
+	interrogation(8) }
+TeleService ::= BIT STRING(SIZE(8))
+-- See EN 300 403-1 [5]
+TrunkGroupIncoming ::= TrunkGroupId
+TrunkGroupOutgoing ::= TrunkGroupId
+TrunkGroupId ::= SEQUENCE {
+	trunkGroupId [0] NameType,
+	trunkId [1] NameType OPTIONAL,
+	pCMId [2] NameType OPTIONAL,
+	channelNumber [3] INTEGER OPTIONAL }
+TimesOfDay ::= OCTET STRING(SIZE(2))
+-- HHmm (Hours, Minutes)
+-- each field one digit, two digits per octet, the digits 0 through 9, encoded as
+-- 0000 to 1001 "hstring". 1st digit in the LSB.
+UsageMeteringDataId ::= NameType
+UMRPurpose ::= ENUMERATED {
+	billing(0),
+	accounting(1),
+	billingAndAccounting(2),
+	operatorSpecific1(3),
+	operatorSpecific2(4),
+	operatorSpecific3(5) }
+UUInfoCounters ::= SET {
+	uu1Info [0] UUxInfo OPTIONAL,
+	uu2Info [1] UUxInfo OPTIONAL,
+	uu3Info [2] UUxInfo OPTIONAL }
+UUxInfo ::= SET {
+	receivedMessages [0] Count OPTIONAL,
+	transmittedMessages [1] Count OPTIONAL,
+	receivedOctets [2] Count OPTIONAL,
+	transmittedOctets [3] Count OPTIONAL }
+END-- end of ASN1DefinedTypesModule
+
+
+END
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ |  +- etsi_819::blockGeneratingLog
+--@@ |  +- etsi_819::fileGeneratingLog
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ |  |  +- etsi_819::usageMeteringLogRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ |  +- etsi_819::simpleUsageMeteringControl
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ +- itut_x723::subsystem
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ +- itut_m3100::tpPool
+--@@ +- etsi_819::usageMeteringData
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ |  >- etsi_819::blockGeneratingLog
+--@@ |  |  >- etsi_819::usageMeteringLogRecord
+--@@ |  >- etsi_819::fileGeneratingLog
+--@@ |  |  >- etsi_819::usageMeteringLogRecord
+--@@ |  >- etsi_819::simpleUsageMeteringControl
+--@@ |  >- etsi_819::usageMeteringData
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

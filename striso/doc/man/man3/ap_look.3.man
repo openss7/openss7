@@ -1,0 +1,577 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_look.3.man,v 0.9.2.1 2007/09/29 14:08:31 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:31 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_look.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:31  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_LOOK 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ap_look
+\- Examine next ACSE/Presentation primitive from the association/connection.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.BI "int ap_look(int " fd ", unsigned long *" sptype ", ap_cdata_t *" cdata ", ap_osi_vbuf_t **" ubuf ", int *" flags ", unsigned long *" aperrno_p );
+.\"
+.\"
+.SH ARGUMENTS
+.TP \w'\fIaperrno_p\fR\(em'u
+.I fd
+A file descriptor identifying the XAP instance.
+.TP
+.I sptype
+.TP
+.I cdata
+.TP
+.I ubuf
+.TP
+.I flags
+.TP
+.I aperrno_p
+A pointer to a memory extent into which to receive an error number.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function is used to examine an indication or confirmation primitive without affecting the state
+of XAP.
+.PP
+.I fd
+identifies the XAP instance for which the user wishes to examine primitives.
+.pP
+When
+.BR ap_look ()
+is called,
+.I sptype
+must point to an
+.BR "unsigned long" ,
+and
+.I cdata
+must point to an
+.B ap_cdata_t
+structure.
+.PP
+Upon return, the value of the
+.B unsigned long
+pointed to by
+.I sptype
+will indicate the type of primitive that is currently ready to be received.
+.PP
+Protocol information associated with a primitive will be conveyed by the
+.B ap_cdata_t
+structure pointed to by
+.IR cdata .
+The value returned in
+.I sptype
+serves as the discriminant for what members of the
+.I cdata
+are affected. A complete discussion of the use of the
+.I cdata
+parameter is provided for each XAP primitive in Chapter 7.
+.PP
+A successful call to
+.BR ap_look ()
+always returns all the protocol information of a primitive (i.e. those fields in
+.IR cdata )
+and may return some or all of the user data associated with that primitive.
+.PP
+Repeated calls will return the same protocol information, the same user data and may return further
+user data if the primitive was incomplete
+.RB ( AP_MORE
+flag was returned by the previous call) until such time as some or all of the pending primitive is
+removed. It is a local matter whether an implementation returns further user data on the subsequent
+call.
+.PP
+User-data received with a primitive will be returned to the user in the
+.I ubuf
+parameter. The XAP interface supports a vectored buffering scheme for handling user data. All data
+buffers are passed to XAP by the user in a chain of one or more
+.BR ap_osi_vbuf_t / ap_osi_dbuf_t
+pairs. If there are not sufficient buffers, and
+.BR ap_look ()
+was called with the
+.BR AP_ALLOC
+flag set, XAP will use the user-supplied buffer allocation routines. If however, the XAP-user failed
+to supply these routines in the
+.BR ap_open (3)
+call,
+.BR ap_look ()
+returns -1, with the location pointed at by aperrno_p set to
+.BR [ AP_BADFLAGS ].
+If the
+.B AP_ALLOC
+flag is not set, and the (user) data buffer(s) are filled before completion of processing by XAP,
+.BR ap_look ()
+returns with the
+.BR AP_MORE
+flag set.
+.I ubuf
+must point to a location holding a pointer to an
+.B ap_osi_vbuf_t
+structure, defined as follows:
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+    unsigned char *db_base; /* beginning of buffer */
+    unsigned char *db_lim;  /* last octet+1 of buffer */
+    unsigned char db_ref;   /* reference count */
+} ap_osi_dbuf_t;
+
+typedef struct ap_osi_vbuf ap_osi_vbuf_t;
+
+struct ap_osi_vbuf {
+    ap_osi_vbuf_t *b_cont;  /* next message block */
+    unsigned char *b_rptr;  /* 1st octet of data */
+    unsigned char *b_wptr;  /* 1st free location */
+    ap_osi_dbuf_t *b_datap; /* data block */
+};
+\s+1\fP
+.fi
+.PP
+User-data associated with XAP primitives is returned in a linked list of message blocks. Each message
+block is represented by an
+.B ap_osi_vbuf_t
+structure and is associated with a data block.  Data blocks, which are represented by
+.B ap_osi_dbuf_t
+structures, may be associated with more than one message block. The
+.B db_ref
+field of the
+.B ap_osi_dbuf_t
+structure indicates the number of
+.B ap_osi_vbuf_t
+structures that reference a particular data block. The
+.BR db_base " and " db_lim
+fields of the
+.B ap_osi_dbuf_t
+structure point to the beginning and end of the data block respectively. The
+.BR b_rptr " and " b_wptr
+fields of the referencing
+.BR ap_osi_vbuf_t
+structures point to the first octets to be read and written within the data block respectively. The
+.B b_cont
+field of the
+.B ap_osi_vbuf_t
+points to the next message block in the chain or is NULL if this is the end of the list.
+.PP
+The user allocation routine is responsible for setting up all fields of the
+.BR ap_osi_vbuf_t " and " ap_osi_dbuf_t
+structures when allocating buffers.  If buffers are allocated by another mechanism,
+the user must ensure that the fields of each
+.BR ap_osi_vbuf_t " and " ap_osi_dbuf_t
+pair in the chain are set up prior to calling
+.BR ap_look ().
+.PP
+.BR ap_look ()
+places data into any buffer where write space is available
+.BR ( b_wptr " < " db_lim )
+and updates
+.B b_wptr
+- no other fields in the
+.BR ap_osi_vbuf_t / ap_osi_dbuf_t
+structures are updated (with the exception of
+.BR b_cont ,
+which is updated when adding further
+.BR ap_osi_vbuf_t / ap_osi_dbuf_t
+pairs to the chain).
+.PP
+The user may pass full, partially full and empty receive buffers to
+.BR ap_look ().
+The user is responsible for ensuring that it is valid for the XAP library to fill any of the supplied
+buffers from
+.BR b_wptr " to " db_lim .
+.PP
+If the user wishes all the buffers for
+.BR ap_look ()
+to be allocated using the user allocation routine, then the
+.I ubuf
+pointer will point to a
+.B NULL ap_osi_vbuf_t
+pointer.
+.PP
+The XAP user is responsible for decoding the user data received in the
+.I ubuf
+parameter. The general rules for decoding user data are stated here, please see individual manual
+pages in Chapter 4 for specific exceptions to these rules.
+.IP \(bu \w'\(bu\(em'u
+If the
+.RI \(lq X.410-1984 \(rq
+mode of operation is in effect (i.e., the
+.B AP_X410_MODE
+bit of
+.B AP_MODE_SEL
+is set), the contents of
+.I ubuf
+buffer(s) are mapped directly from the SS-user data parameter of the equivalent session service
+primitive. Refer to the ISO Presentation Layer Protocol Specification (see reference ISO 8823) for
+further information concerning the encoding of these values. (The primary exception to this rule is
+the A-ASSOC primitives).
+.IP \(bu
+If the
+.RI \(lq X.410-1984 \(rq
+mode of operation is not in effect and the primitive received is an ACSE primitive, the data received
+in the ubuf buffer(s) must be decoded according to the definition specified in the ACSE Protocol
+Specification (reference ISO 8650):
+.sp
+.RS
+.nf
+\fC\s-1\
+[30] IMPLICIT SEQUENCE OF EXTERNAL
+\s+1\fP
+.fi
+.RE
+.IP \(bu
+If the
+.RI \(lq X.410-1984 \(rq
+mode of operation is not in effect and the primitive received is a Presentation primitive, the data
+received in the
+.I ubuf
+buffer(s) must be decoded according to the User-data definition specified in the Presentation Protocol
+Specification (reference ISO 8823):
+.sp
+.RS
+.nf
+\fC\s-1\
+CHOICE {
+    [APPLICATION 0] IMPLICIT OCTET STRING,
+    [APPLICATION 1] IMPLICIT SEQUENCE OF PDV-list
+}
+\s+1\fP
+.fi
+.RE
+.PP
+The
+.I flags
+argument is a bit mask used to control certain aspects of XAP processing. Values for this field are
+formed by OR ing together zero or more of the following flags:
+.\".TP \w'\fBAP_ALLOC\fR\(em'u
+.TP
+.B AP_ALLOC
+If
+.B AP_ALLOC
+is set and the user did not specify an allocation routine on
+.BR ap_open (3)
+(or
+.BR ap_restore (3))
+then -1 is returned and the location pointed to by
+.I aperrno_p
+is set to the
+.RB [ AP_BADFLAGS ]
+error code.
+.IP ""
+If no space is available in the supplied buffer chain (or the location pointed to by
+.I ubuf
+contains
+.BR NULL )
+and either
+.B AP_ALLOC
+is not set or
+.B AP_ALLOC
+is set but the user allocation routine refuses to supply any buffers, then the call to
+.BR ap_look ()
+fails, -1 is returned and the location pointed to by
+.I aperrno_p
+is set to the
+.RB [ AP_NOBUF ]
+error code.
+.IP ""
+Regardless of the setting of
+.BR AP_ALLOC ,
+the user must have set the location pointed to by
+.I ubuf
+either to
+.B NULL
+or to point to a chain of one or more buffers. The
+.B AP_ALLOC
+flag setting only takes effect when any supplied buffers have been filled and more data remains to be
+returned to the user:
+.sp
+.RS
+.IP \(bu \w'\(bu\(em'u
+If the
+.B AP_ALLOC
+flag is set and space was available in the supplied buffer chain, the user allocation routine is
+called to supply further buffers as they are needed.  If the user allocation routine refuses to supply
+further buffers then the
+.B AP_MORE
+flag is set and the call to
+.BR ap_look ()
+completes; 0 is returned. The user must free any buffers allocated by the user allocation routine
+either by calling the
+.BR ap_free (3)
+function or by calling the
+.BR ap_user_dealloc (3)
+function directly.
+.IP \(bu
+If
+.B AP_ALLOC
+is not set and space was available in the supplied buffers, then the
+.B AP_MORE
+flag is set and 0 is returned.
+.RE
+.TP
+.B AP_MORE
+This flag is ignored by XAP when
+.BR ap_look ()
+is called.  Upon return, if all data associated with a primitive has not been received, the
+.B AP_MORE
+bit of the flags argument will be set. This indicates to the user that subsequent calls to
+.BR ap_look ()
+will return the same protocol information and user data as this call, and may as a local matter return
+additional user data.  If the
+.B AP_MORE
+bit is not set, all data associated with the primitive has been received.
+.PP
+It should be noted that the
+.I sptype
+argument must be checked after each invocation of
+.BR ap_look ()
+since an unsequenced primitive (e.g.,
+.BR A_PABORT_IND )
+may arrive and replace the original primitive. In some cases, the original primitive may be lost.
+.PP
+Note it is possible for
+.BR ap_look ()
+to return with the
+.B AP_MORE
+flag set even when the
+.B AP_ALLOC
+flag is set, if non-blocking execution mode is being used or an expedited data primitive arrives at
+the XAP instance (see below).
+.PP
+If XAP is being used in blocking execution mode
+.RB ( AP_NDELAY
+bit of the
+.B AP_FLAGS
+environment attribute is not set),
+.BR ap_look ()
+blocks until the protocol information of a primitive (i.e. those fields in
+.IR cdata )
+is available. Some or all of the user data associated with the primitive may also be returned to the
+user.
+.PP
+If XAP is being used in non-blocking execution mode
+.RB ( AP_NDELAY
+bit of the
+.B AP_FLAGS
+enviromnent attribute is set),
+.BR ap_look ()
+will return a value of -1 and the location pointed to by
+.I aperrno_p
+is set to the
+.RB [ AP_AGAIN ]
+error code until the protocol information of a primitive is available. Some or all of the user data
+associated with the primitive may also be returned to the user.
+.PP
+If an expedited data primitive arrives while an earlier primitive is being processed (that is, an
+earlier indication or confirm primitive has been examined with
+.BR ap_look ()
+or has been partly received with
+.BR ap_rcv (3)),
+.BR ap_look ()
+returns the expedited data primitive.  Processing of the earlier primitive is suspended. The user
+should use the
+.BR ap_rcv (3)
+function to retrieve the expedited data primitive. Once the expedited data primitive has been
+successfully received, XAP re-presents the original primitive. Note that it is possible for the
+original primitive to be deferred by an expedited data primitive more than once.
+.PP
+If an abort primitive arrives while an earlier primitive is being processed (that is, an earlier
+indication or confirm primitive has been examined with
+.BR ap_look ()
+or has been partly received with
+.BR ap_rcv (3)),
+.BR ap_look ()
+will return the abort primitive. The original primitive is discarded. The user should use the
+.BR ap_rcv (3)
+function to retrieve the abort primitive.
+.PP
+.I aperrno_p
+must be set to point to a location which will be used to carry an error code back to the user.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion, a value of zero
+.RB ( 0 )
+is returned. Otherwise, a value of
+minus one
+.RB ( -1 )
+is returned and the location pointed to by
+.I aperrno_p
+is set to indicate the error.
+.\"
+.\"
+.SH ERRORS
+.TP \w'[\fBAP_NOT_SUPPORTED\fR]\(em'u
+.RB [ AP_AGAIN ]
+XAP was unable to complete the requested action. Try again.
+.TP
+.RB [ AP_BADF ]
+The
+.I fd
+parameter does not identify an XAP instance.
+.TP
+.RB [ AP_BADFLAGS ]
+.B AP_ALLOC
+was set but a user-supplied buffer allocation routine was not specified on
+.BR ap_open "(3) or " ap_restore (3).
+.TP
+.RB [ AP_BADLSTATE ]
+XAP is in a state where
+.BR ap_look ()
+is not allowed (i.e.,
+.BR AP_UNBOUND ).
+.TP
+.RB [ AP_BADUBUF ]
+The buffers pointed to by
+.I ubuf
+are invalid.
+.TP
+.RB [ AP_NOBUF ]
+The supplied user data buffers contained no unused buffer space and, if
+.B AP_ALLOC
+was set, then no more buffers could be obtained.
+.TP
+.RB [ AP_NOENV ]
+There is no XAP environment associated with
+.IR fd .
+.TP
+.RB [ AP_NOMEM ]
+Out of memory.
+.TP
+.RB [ AP_NOT_SUPPORTED ]
+.BR ap_look ()
+operation is not supported by this implementation of XAP.
+.TP
+.RB [ AP_PDUREJ ]
+XAP rejected the received PDU.
+.PP
+In addition, operating system and asn.1 class errors are reported.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ap_open (3)
+.BR ap_restore (3)
+.BR ap_free (3)
+.BR ap_user_dealloc (3)
+.BR ap_rcv (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR ap_look ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ap_look ()
+is compatible with XAP.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_look ()
+first appeared in XAP.
+.[
+xap
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XAP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+
