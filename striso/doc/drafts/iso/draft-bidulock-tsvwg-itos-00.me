@@ -1,0 +1,1858 @@
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: draft-bidulock-tsvwg-itos-00.me,v 0.9.2.1 2007/09/29 14:58:26 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:58:26 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: draft-bidulock-tsvwg-itos-00.me,v $
+.\" Revision 0.9.2.1  2007/09/29 14:58:26  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.ds version Version\ 0.0
+.ds date September\ 16,\ 2007
+.ds expiry March\ 2007
+.nr levels 0
+.so ../draft4.me
+.bp
+.sz \n(tp
+.he 'Internet Draft'ISO Transport over SCTP (ITOS)'\\\\*[date]'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+Intended status: PROPOSED STANDARD;;\*[date]
+.bl
+Expires in \*[expiry]
+.bl
+.TE
+.(l C
+.sz \n(tp
+\fB\
+ISO Transport Service on top of the SCTP (ITOS)
+Version: 1
+<draft-bidulock-tsvwg-itos-00.\*(|x>
+.)l
+.rr |x
+.ne 4
+.#S 2007 \*[expiry]
+.uh "Abstract"
+.pp
+This document is a revision to ISOT,
+.[
+rfc1006
+%Z 1
+.]
+written by Marshall T. Rose and Dwight E. Cass, and ITOT
+.[
+rfc2126
+%Z 1
+.]
+written by Yanick Pouffary and Alan Young.  Since the release of
+ISOT
+.[
+rfc1006
+.]
+in May 1987, and the revision with RFC2126 in March 1997, a new IP transport
+protocol, Stream Control Transmission Protocol (SCTP) RFC2960,
+.[
+rfc2960
+%Z 1
+.]
+.[
+rfc3309
+%Z 1
+.]
+has been released as a Proposed Standard which provides superior services to
+TCP in some respects, particularly related to OSI or Signalling protocols.
+.pp
+This document describes the mechanism to allow ISO Transport Services to run
+over SCTP over IPv4 or IPv6.  In also defines a number of new features which
+are not provided in ISOT
+.[
+rfc1006
+.]
+or ITOT
+.[
+rfc2126
+.]
+due to the superior transport support provided by SCTP.
+.pp
+The goal of this version is to minimize the number of changes to
+ISOT
+.[
+rfc1006
+.]
+and
+ITOT
+.[
+rfc2126
+.]
+as well as ITU-T Rec. X.224 | ISO/IEC 8073 transport protocol defintions,
+.[
+x224
+%Z 2
+.]
+while maximizing performance, extending its applicability and
+protecting the install based of ISOT
+.[
+rfc1006
+.]
+users.
+.\"
+.\"
+.sh 1 "Introduction, Motivation"
+.lp
+There are two basic approaches which can be taken when porting ISO
+applications to SCTP.
+.[
+rfc2960
+.]
+.[
+rfc3309
+.]
+One approach is to port each individual application separately, developing
+local protocols on top of SCTP.  A second approach is based  on the notion of
+layering the ISO Transport Service over SCTP.  This approach solves the
+problem for all applications which use the ISO Transport Service.  This
+document describes the second approach.
+.pp
+The protocol described in this memo is based on the observation that both the
+Internet Protocol Suite and the ISO Protocol Suite are layered systems.  A
+key aspect of the layering principle is that of layer-independence.  The
+concept of layer-independence means that if one preserves the services offered
+by a particular layer (the Service-Provider) then the Service-User at that
+layer is completely unaffected by changes in the underlying layers or by the
+protocol used within the layer.
+.pp
+There are two layers at which interworking can be performed to accomplish ISO
+transport over the Internet protocol suite following the OSI model: the
+Network layer and the Transport Layer.
+Version 2 of ISOT
+.[
+rfc983
+%Z 2
+.]
+attempted to describe a modified Transport Protocol that preserved the Network
+Services Definition
+.[
+x213
+%Z 1
+.]
+interface at the lower boundary and the Transport Services Definition
+.[
+x214
+%Z 1
+.]
+at the upper boundary.  When Version 3 of ISOT
+.[
+rfc1006
+%Z 1
+.]
+was issued, it was discovered that this modified Transport Protocol could be
+precisely the ISO Transport Protocol
+.[
+x224
+%Z 1
+.]
+class 0, and that TCP could be adapted, using a protocol shim, to provide a
+Network Services Definition
+.[
+x213
+.]
+that TP0 could not distinguish from the normal CONS Network Protocol.
+.[
+x223
+%Z 2
+.]
+The updated Version 3 ITOT protocol
+.[
+rfc2126
+.]
+sought to again provide a modified Transport Protocol which provided separate
+classes and options from that of the ISO Transport Protocol.
+.[
+x224
+.]
+.pp
+This memo defines a Network Service which appears to be identical to the
+Services and Interfaces offered by the ISO Network Service Definition,
+.[
+x213
+.]
+but which will in fact provide support for the standard ISO Transport Protocol
+.[
+x224
+.]
+on top of SCTP,
+.[
+rfc2960
+.]
+.[
+rfc3309
+.]
+rather than the ISO Network Service.
+.[
+x213
+.]
+.pp
+The basis of this documents is ISOT
+.[
+rfc1006
+.]
+written by Marshall T. Rose and Dwight E. Cass and ITOT
+.[
+rfc2126
+.]
+written by Yanick Pouffary and Alan Young.
+This memo defines and Network Services layer based on SCTP that provides
+support for all five clases of ISO Transport Protocol over a Connection
+Oriented Newtork Service.  SCTP provides a more direct implementation of the
+Newtork Services Definition than does TCP and requires less protocol
+adaptation to support ISO Transport.  SCTP provides a natural separate of
+ordered (normal) and unordered (expedited) data channels using SCTP streams as
+well as providing superior multiplexing of transport connections over SCTP
+associations using separate pairs of inbound and outbound SCTP streams.
+.pp
+This memo specifies enhancements to the standards mentioned above in
+support of ISO Transport over SCTP and should be read in the context of the
+above mentioned standards, but will also be meaningful on its own.
+.pp
+The 'well known' SCTP port 102 is reserved for hosts which implement the
+Protocol described in this document.  This is the same port number that is 
+reserved for TCP by ISOT
+.[
+rfc1006
+.]
+and
+ITOT.
+.[
+rfc2126
+.]
+Note that the Protocol does not mandate the use of SCTP port 102 for all
+connections.
+.#e
+.\"
+.\"
+.sh 1 "The Model"
+.lp
+This section describes the differences between the model used by the ISO
+Transport and that described in this document.
+.sh 2 "ISO Transport Model"
+.lp
+The ITU-T Rec. X.214 | ISO/IEC 8072 standard
+.[
+x214
+.]
+describes the ISO Transport Service Definition (TSD).  The ISO Transport
+Service Definition describes the services offered by the Transport Service
+Provider and the interfaces used to access these services.
+.pp
+The ITU-T Rec. X.224 | ISO/IEC 8073 standard
+.[
+x224
+.]
+describes the ISO Transport Protocol Specification (TP).  The ISO Transport
+Protocol specifies common encoding rules and a number of classes of transport
+protocol procedure which can be used with different network Quality of
+Service.
+.pp
+The ITU-T Rec. X.213 | ISO/IEC 8348 standard
+.[
+x213
+.]
+describes the ISO Network Service Definition (NSD).  The ISO Network Service
+Definition describes the services offered by the network service Provider and
+the interfaces used to access these services.
+.pp
+The ISO Network Service specifies two types of service:
+.ip \(bu \w'\(bu\(em'u
+Connection Oriented Network Service (CONS)
+.ip \(bu \w'\(bu\(em'u
+Connectionless Network Service (CLNS)
+.pp
+The ISO Transport Protocol specifies five classes of procedures when operating
+over CONS (classes 0, 1, 2, 3 and 4) and one class of procedure when operating
+over CLNS (class 4).  These classes are commonly referred to as TP0, TP1, TP2,
+TP3 and TP4.
+.pp
+The relationship of these ISO standards is illustrated below:
+.(b
+.ie '\*(.T'ps' \{\
+.so itos-00.fig1.pic
+.\}
+.el \{\
+.(c
+.nf
+\fC\s-2\
+    Transport Service User
+      |
+      |- ISO Transport Service Definition [X.214]
+      |
+ +------------------------------------------------+
+ |  Transport Service Provider                    |
+ |  ISO Transport Protocol Specification [X.224]  |
+ +------------------------------------------------+
+      |
+      |- ISO Network Service Definition [X.213]
+      |
+ +------------------------------------------------+
+ |  Network Service Provider                      |
+ |  ISO Network Protocol Specification [X.223]    |
+ +------------------------------------------------+
+\s+2\fP
+.fi
+.)c
+.\}
+.#f "ISO Protocol Relationship"
+.)b
+.\"
+.\"
+.sh 2 "ISO Transport over SCTP (ITOS) Model"
+.lp
+This document defines a module that provides support for ISO Transport
+Service,
+.[
+x214
+.]
+running over SCTP,
+.[
+rfc2960
+.]
+.[
+rfc3309
+.]
+adapted to provide the ITU-T Rec. X.213 | ISO/IEC 8348 Network Service.
+.[
+x213
+.]
+.pp
+The ITU-T Rec. X.214 | ISO/IEC 8072 Transport Service
+.[
+x214
+.]
+is supported without modifications.
+.pp
+The ITU-T Rec. X.224 | ISO/IEC 8073 Transport Protocol, without modifications,
+is used to provide the Transport Service.
+.pp
+The Stream Control Transmission Protocol (SCTP)
+.[
+rfc2960
+.]
+.[
+rfc3309
+.]
+is used in place of the ITU-T Rec. X.223 | ISO/IEC 8478-1
+.[
+x223
+%Z 2
+.]
+Network Protocol to provide a CONS like service.
+.pp
+ITU-T Rec. X.224 | ISO/IEC 8073 Transport Protocol
+.[
+x224
+.]
+specifies five classes when operating over
+ITU-T Rec. X.213 | ISO/IEC 8348 CONS.
+.[
+x213
+.]
+This memo specifies the adaptation of SCTP to the ITU-T Rec. X.213 | ISO/IEC
+8348 CONS service in support of ITU-T Rec. X.224 | ISO/IEC 8073 Transport
+Protocol classes 0, 1, 2, 3 and 4.
+.pp
+The relationship of these standards is illustrated below:
+.(b
+.ie '\*(.T'ps' \{\
+.so itos-00.fig2.pic
+.\}
+.el \{\
+.(c
+.nf
+\fC\s-2\
+    Transport Service User
+      |
+      |- ISO Transport Service Definintion [X.214]
+      |
+ +------------------------------------------------+
+ |  Transport Service Provider                    |
+ |  ISO Transport Protocol Specification [X.224]  |
+ +------------------------------------------------+
+      |
+      |- ISO Network Service Definition [X.213]
+      |
+ +------------------------------------------------+
+ |  Network Service Provider                      |
+ |  SCTP Protocol Adaptation (this memo)          |
+ +------------------------------------------------+
+\s+2\fP
+.fi
+.)c
+.\}
+.#f "ITOS Protocol Relationship"
+.)b
+.sh 2 "Overview of Protocol and Service"
+.lp
+This document defines use of the ISO Transport Protocol (without modification)
+running over SCTP.  All five classes of the protocol are supported:
+.np
+\(lqTP Class 0 over SCTP,\(rq
+.np
+\(lqTP Class 1 over SCTP,\(rq
+.np
+\(lqTP Class 2 over SCTP,\(rq
+.np
+\(lqTP Class 3 over SCTP,\(rq and,
+.np
+\(lqTP Class 4 over SCTP.\(rq
+.lp
+The protocol classes are identical to the ISO Transport Class 0, 1, 2, 3 and
+4 Protocol.
+.pp
+ITU-T Recommmendation X.214 | ISO/IEC 8072
+.[
+x214
+.]
+defines the services offered to the Transport Service User by the Trasnport Protocol.
+.[
+x224
+.]
+ITU-T Recommendation X.213 | ISO/IEC 8348
+.[
+x213
+.]
+Section 3 defines the services expected by the Transport Protocol.
+.[
+x224
+.]
+This memo provides a mapping betweent he Service primitives in the ITU-T
+Recommendation X.213 | ISO/IEC 8348 CONS
+.[
+x213
+.]
+service and the primitives provided
+by SCTP to its Upper Layer Program (ULP).
+.[
+rfc2960
+.]
+.[
+rfc3309
+.]
+The mapping between Service primitives in the ISO Network Service and SCTP are
+defined.
+.#e
+.\"
+.\"
+.sh 1 "Service Definition"
+.lp
+This section describes the mapping between the Network Service Definition
+.[
+x213
+.]
+and the SCTP Service Definition.
+.[
+rfc2960
+.]
+.sh 2 "Network Service Definition"
+.lp
+This section describes how SCTP is used to provide ITU-T X.213 | ISO/IEC 8348
+Connection Oriented Network Service (CONS) as defined in the NSD.
+.[
+x213
+.]
+.sh 3 "ITU-T Rec. X.213 | ISO/IEC 8348 CONS Primitives"
+.lp
+Information is transfered to and from the NS-Provider with the Newtork
+Service Primitives listed below:
+.(b
+.lp
+Actions
+.ba +\n(iiu
+.ip "N\-CONNECT Request"
+\- a NS-User specifies that it wants to establish a network connection
+.ip "N\-CONNECT Response"
+\- a NS-User specifies that it will honor the request
+.ip "N\-DISCONNECT Request"
+\- a NS-User specifies that the network connection is to be closed
+.ip "N\-DATA Request"
+\- a NS-User sends data
+.ip "N\-DATA ACKNOWLEDGEMENT Request"
+\- a NS-User requests acknowledgement of receipt of data
+.ip "N\-RESET Request"
+\- a NS-User requests reset of the network connection
+.ip "N\-RESET Response"
+\- a NS-User responds to reset of the network connection
+.ip "N\-EXPEDITED_DATA Request"
+\- a NS-User sends \(lqexpedited\(rq data
+.ba -\n(iiu
+.)b
+.(b
+.lp
+Events
+.ba +\n(iiu
+.ip "N\-CONNECT Indication"
+\- a NS-User is notified that a network connection establishment is in
+progress
+.ip "N\-CONNECT Confirmation"
+\- a NS-User is notified that the network connection has been established
+.ip "N\-DATA Indication"
+\- a NS-User is notified that data can be read from the network connection
+.ip "N\-DATA ACKNOWLEGEMENT Indication"
+\- a NS-User is notified that outstanding data is acknowledged
+.ip "N\-EXPEDITED_DATA Indication"
+\- a NS-User is notified that that expedited data can be read from the
+.ip "N\-RESET Indication"
+\- a NS-User is notified that the network connection is reset
+.ip "N\-RESET Confirmation"
+\- a NS-User is notified that the reset of the network connection is complete
+.ip "N\-DISCONNECT Indication"
+\- a NS-User is notified that the network connection is closed
+connection
+.ba -\n(iiu
+.)b
+.sh 3 "SCTP Service Primitives"
+.lp
+The mapping between ITU-T Rec. X.213 | ISO/IEC 8348 CONS primitives and SCTP
+Service  primitives defined in this document assumes that SCTP offers the
+following service primitives (see SCTP
+.[
+rfc2960
+.]
+Section 10):
+.(b
+.lp
+Actions
+.ba +\n(iiu
+.ip "SCTP-INITIALIZE"
+\- this primitive allows SCTP to initialize its internal data structures and
+allocate necessary resources for setting up its operation environment
+.ip "SCTP-ASSOCIATE"
+\- this primitive allows the upper layer to intiate an association to a
+specific peer endpoint
+.ip "SCTP-SHUTDOWN"
+\- gracefully closes an association
+.ip "SCTP-ABORT"
+\- ungracefully closes an association
+.ip "SCTP-SEND"
+\- send user data
+.ip "SCTP-SETPRIMARY"
+\- instructs the local SCTP to use the specified destination transport address
+as primary path for sending packets
+.ip "SCTP-RECEIVE"
+\- read the first user message in the SCTP in-queue
+.ip "SCTP-STATUS"
+\- obtain status information
+.ip "SCTP-CHANGEHEARTBEAT"
+\- enable or disable heartbeat on the specified destination transport address
+.ip "SCTP-GETHEARTBEAT"
+\- requests that the local endpoint perform a heartbeat on the specified
+destination transport address
+.ip "SCTP-GETSRTTREPORT"
+\- instructs the local SCTP to report the current SRTT measurement on the
+specified destination transport address
+.ip "SCTP-SETFAILURETHRESHOLD"
+\- customize the reachability failure detection threashold for the specified
+destination address
+.ip "SCTP-SETPROTOCOLPARAMETERS"
+\- customize protocol parameters
+.ip "SCTP-RECEIVE_UNSENT"
+\- receive unsent message
+.ip "SCTP-RECEIVE_UNACKED"
+\- receive unacknowledged message
+.ip "SCTP-DESTROY"
+\- destroy SCTP instance
+.ba -\n(iiu
+.)b
+.(b
+.lp
+Events
+.ba +\n(iiu
+.ip "SCTP-DATA_ARRIVE"
+\- notifies the ULP when a user message is successfully received and ready for
+retrieval
+.ip "SCTP-SEND_FAILURE"
+\- notifies the ULP when a message cannot be delivered
+.ip "SCTP-NETWORK_STATUS_CHANGE"
+\- notifies the ULP when a destination transport address is marked inactive or
+active
+.ip "SCTP-COMMUNICATION_UP"
+\- notifies the ULP when SCTP becomes read to send or receive user messages
+or when a lost communication to an endpoint is restored
+.ip "SCTP-COMMUNICATION_LOST"
+\- notifies the ULP when SCTP loses communication to an endpoint completely or
+detects that the endpoint has performed an abort operation
+.ip "SCTP-COMMUNICATION_ERROR"
+\- notifies the ULP when SCTP receives an ERROR chunk from its peer and
+decides to notify the ULP
+.ip "SCTP-RESTART"
+\- notifies the ULP when SCTP detects that the peer has restarted
+.ip "SCTP-SHUTDOWN_COMPLETE"
+\- notifies the ULP when SCTP completes the shutdown procedures
+.ba -\n(iiu
+.)b
+.sh 3 "Mapping SCTP as a Network Service Provider"
+.lp
+The mapping between the SCTP service primitives and the service primitives
+expected by the transport provider are straightforward:
+.(b
+.TS
+tab(:);
+lbsw(3.0i)lbw(2.5i).
+_:_
+Network Service:SCTP
+_:_
+.T&
+lissw(5.5i).
+CONNECTION ESTABLISHMENT
+.T&
+lw(0.5i)lw(2.5i)lw(2.5i).
+:N\-CONNECT\ Request:T{
+.#v
+SCTP\-ASSOCIATE
+T}
+
+:N\-CONNECT\ Indication:T{
+.#v
+a SCTP\-COMMUNICATION_UP
+T}
+
+:N\-CONNECT\ Response:T{
+.#v
+SCTP\-COMMUNICATIONS_UP
+T}
+
+:N\-CONNECT\ Confirmation:T{
+.#v
+SCTP\-COMMUNICATIONS_UP after SCTP\-ASSOCIATE
+T}
+
+.T&
+lissw(5.5i).
+DATA TRANSFER
+.T&
+lw(0.5i)lw(2.5i)lw(2.5i).
+:N\-DATA\ Request:T{
+.#v
+SCTP-sEND
+T}
+
+:N\-DATA\ Indication:T{
+.#v
+SCTP-DATA_ARRIVE
+T}
+
+.T&
+lissw(5.5i).
+CONNECTION RESET
+.T&
+lw(0.5i)lw(2.5i)lw(2.5i).
+:N\-RESET\ Request:T{
+.#v
+SCTP\-ABORT
+T}
+
+:N\-RESET\ Indication:T{
+.#v
+SCTP\-RESTART
+T}
+
+:N\-RESET\ Response:T{
+.#v
+Not supported.
+T}
+
+:N\-RESET\ Confirmation:T{
+.#v
+Not supported.
+T}
+
+.T&
+lissw(5.5i).
+CONNECTION RELEASE
+.T&
+lw(0.5i)lw(2.5i)lw(2.5i).
+:N\-DISCONNECT\ Request:T{
+.#v
+SCTP\-SHUTDOWN or SCTP\-ABORT
+T}
+
+:N\-DISCONNECT\ Indication:T{
+.#v
+SCTP\-COMMUNICATION_LOST or SCTP\-COMMUNICATION_ERROR
+T}
+.TE
+.)b
+
+.sh 4 "Network Connection Establishment"
+.lp
+Upon receipt of a N\-CONNECT\ Request primitive issued by the NS-User, the
+NS-Provider performs an SCTP-INITIALIZE and SCTP-ASSOCIATE to the desired IPv4
+or IPv6 address using the selected SCTP port.  When the SCTP signals either
+success or failure, this results in a N\-CONNECT\ Indication or N\-DISCONNECT\
+Indication primitive issued by the NS-Provider.
+.pp
+To await a N\-CONNECT\ Indication event, a server performs a SCTP-INITIALIZE to
+the selected SCTP port.  When a client successfully connects to this port, the
+SCTP-COMMUNICATION_UP event occurs and an implicit N\-CONNECT\ Response action is
+performed.
+.pp
+Mapping parameters between the SCTP service and the ITU-T X.213 | ISO/IEC 8348
+CONS service is done as follows:
+.(b
+.TS
+tab(:);
+lbsw(2.1i)lbw(3.4i).
+_:_
+Network Service:SCTP
+_:_
+.T&
+lissw(5.5i).
+CONNECTION ESTABLISHMENT
+.T&
+lw(0.1i)lw(2.0i)lw(3.4i).
+:Called Address:T{
+.#v
+Server's IPv4 or IPv6 address(es) and SCTP port number passed to
+SCTP\-ASSOCIATE as \fI\)destination transport address(es)\fP\).
+T}
+
+:Calling Address:T{
+.#v
+Client's IPv4 or IPv6 address(es) and SCTP port number passed to
+SCTP\-INITIALIZE as \fI\)local eligible address list\fP\) and \fI\)local
+port\fP\).
+T}
+
+:Responding Address:T{
+.#v
+Server's IPv4 or IPv6 address(es) and SCTP port number.
+T}
+
+:T{
+Receipt Confirmation Selection
+T}:T{
+.#v
+ignored
+T}
+
+:T{
+Expedited Data Selection
+T}:T{
+.#v
+ignored
+T}
+
+:QOS-Parameter Set:T{
+.#v
+The QOS-Paraemter Set can be mapped onto equivalent SCTP protocol parameters.
+T}
+
+:NS-user-data:T{
+.#v
+ignored
+T}
+_
+.TE
+.)b
+.pp
+The \fI\)outbound stream count\fP\) requested in the SCTP\-ASSOCIATE primitive
+should be sufficient to provide the transport class requested.  When
+multiplexing is supported, sufficient outbound streams should be provided to
+support the anticipated number of multiplexed transport connections.
+.ip "Called Address"
+.ip "Calling Address"
+.ip "Responding Address"
+.ip "Receipt Confirmation Selection"
+Because only class 0 and class 2 are supported, receipt confirmation selection
+will not be selected and can be ignored by the SCTP NS-Provider.
+.ip "Expedited Data Selection"
+Because only class 0 and class 2 are supported, expedited data selection will
+not be selected and can be ignored by the SCTP NS-Provider.
+.ip "QOS-Parameter Set"
+.ip "NS-User-Data"
+There is no requirement to send user data with the N\-CONNECTION\ Request nor
+N\-CONNECTION\ Response primitive, nor to indicate it with the
+N\-CONNECTION\ Indication nor N\-CONNECTION\ Confirmation primitive.  The SCTP
+NS-Provider may report that it does not support connection data and may ignore
+this parameter.
+.pp
+Please also refer to \(lqNotes to Implementors,\(rq section 6.1.
+.pp
+SCTP port 102 is reserved for impelemntations conforming to this
+specification.  Use of any SCTP port is conformant to this specification.
+.sh 4 "Network Data Transfer"
+.lp
+To perform a N\-DATA\ Request action, the TS-Provider constructs the desired
+transport protocol data unit (TPDU),  and uses the SCTP-SEND_DATA primitive.
+Please also refer to \(lqNotes to Implementors,\(rq section 6.2.
+.pp
+To trigger a N\-DATA\ Indication action, the SCTP indicates that data is ready
+through SCTP-DATA_READY event and a TPDU is read using the SCTP-READ_DATA
+primitive.
+.pp
+Mapping parameters between the SCTP service and the ITU-T X.213 | ISO/IEC 8348
+CONS service is done as follows:
+.(b
+.TS
+tab(:);
+lbsw(3.0i)lbw(2.5i).
+_:_
+Network Service:SCTP
+_:_
+.T&
+lissw(5.5i).
+DATA TRANSFER
+.T&
+lw(0.5i)lw(2.5i)lw(2.5i).
+:NS\-User\-Data (NSDU):T{
+.#v
+DATA
+T}
+
+:Confirmation Request:T{
+.#v
+ignored
+T}
+_
+.TE
+.)b
+.ip "NS\-User\-Data"
+NS\-User\-Data is mapped directly into SCTP data to the SCTP\-SEND primitive.
+When multiplexing is supported, concatenated TPDUs passed in NS\-User\-Data
+may optionally be separated and sent using separate SCTP\-SEND primitives on
+difference SCTP streams, each stream corresponding to one or more transport
+connections.
+.ip "Confirmation Request"
+Because only class 0 and class 2 are supported, Confirmation Request is not
+selected and can be ignored by the SCTP NS-Provider.
+.sh 4 "Network Connection Release"
+.lp
+To perform a N\-DISCONNECT\ Request action, the TS-Provider simply closes the
+SCTP connection through the SCTP-CLOSE primitive.
+.pp
+To trigger a N\-DISCONNECT\ Indication, the SCTP indicates that the connection
+has been closed through SCTP-CLOSE event.  If the SCTP connection has failed
+the SCTP indicates that the connection has been closed through SCTP-ERRORED
+event, this triggers a N\-DISCONNECT\ Indication.
+.pp
+Mapping parameters between the SCTP service and the ITU-T Rec. X.213 | ISO/IEC
+8348 CONS service is done as follows:
+.(b
+.TS
+tab(:);
+lbsw(3.0i)lbw(2.5i).
+_:_
+Network Service:SCTP
+_:_
+.T&
+lissw(5.5i).
+CONNECTION RELEASE
+.T&
+lw(0.5i)lw(2.5i)lw(2.5i).
+:all parameters:ignored\*#
+
+:Originator:T{
+.#v
+ignored
+T}
+
+:Reason:T{
+.#v
+ignored
+T}
+
+:NS\-User\-Data:T{
+.#v
+ignored
+T}
+
+:Responding Address:T{
+.#v
+ignored
+T}
+_
+.TE
+.)b
+.(d
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\)\  It is possible to map the SCTP error onto the
+disconnect reason.
+.)d
+.ip "Originator"
+The originator parameter is only included in the N\-DISCONNECT\ Indication and
+indicates the originator of the disconnect.  The SCTP NS-Provider should map
+information from the SCTP\-COMMUNICATION_LOST, SCTP\-COMMUNICATION_ERROR or
+SCTP\-SHUTDOWN_COMPLETE primitives into the Originator Parameter of the
+N\-DISCONNECT\ Indication.
+.TS
+tab(:) box;
+cb|cbs.
+:N\-DISCONNECT\ Indication
+SCTP Error:_
+.T&
+cbw(1.0i)|cbw(1.0i)|cbw(3.5i).
+:Originator:Description
+_:_:_
+.T&
+ll.
+:Provider:T{
+.#v
+provider-originated disconnect
+T}
+:User:T{
+.#v
+user-originated disconnect
+T}
+:Undefined:T{
+.#v
+disconnect originator undefined
+T}
+.TE
+.ip "Reason"
+The Reason parameter is only included in the N\-DISCONNECT\ Indication and
+indicates the reason for the disconnection.  The SCTP NS-Provider should map
+information from the SCTP\-COMMUNICATION_LOST, SCTP\-COMMUNICATION_ERROR or
+SCTP\-SHUTDOWN_COMPLETE primitives into the Reason parameter of the
+N\-DISCONNECT\ Indication.
+.TS
+tab(:) box;
+cb|cbss.
+:N\-DISCONNECT\ Indication
+SCTP Error:_
+.T&
+cbw(1.0i)|cbw(1.0i)|cbw(0.2i)|cbw(3.0i).
+:Originator:P/T:Reason
+_:_:_:_
+.T&
+l|l|c|l.
+MISSING_PARM:Provider:P:T{
+.#v
+disconnect
+T}
+BAD_CHUNK_TYPE
+INVALID_PARM
+BAD_PARM
+PROTOCOL_VIOLATION
+::_:_
+INVALID_STR::T:T{
+.#v
+disconnect
+T}
+STALE_COOKIE
+NO_RESOURCE
+BAD_ADDRESS
+NO_DATA
+SHUTDOWN
+NEW_ADDR
+LAST_ADDR
+RES_SHORTAGE
+SOURCE_ADDR
+ILLEGAL_ASCONF
+::_:_
+ICMP Error::P:T{
+.#v
+connection rejection NSAP unknown
+T}
+::_:_
+ICMP Error::P:T{
+.#v
+connection rejection NSAP unreachable
+T}
+::_:_
+ICMP Error::T:T{
+.#v
+connection rejection NSAP unreachable
+T}
+:_:_:_
+USER_INITIATED:User::T{
+.#v
+disconnect normal
+T}
+::_:_
+:::T{
+.#v
+disconnect abnormal
+T}
+::_:_
+SCTP\-ABORT::P:T{
+.#v
+connection rejection
+T}
+SCTP\-ABORT::_:_
+::T:T{
+.#v
+connection rejection
+T}
+NO_RESOURCE:
+RES_SHORTAGE:
+SHUTDOWN:
+::_:_
+:::T{
+.#v
+incompatible information in NS-User-Data
+T}
+:_:_:_
+OOTB:Undefined::T{
+.#v
+reason undefined
+T}
+.TE
+.ba +\n(iiu
+.lp
+SCTP\-SHUTDOWN_COMPLETE always has an originator of "User" and a reason of
+"disconnect normal".
+.ip "Provider Originated Transient Disconnect"
+The provider originated transient disconnect is indicated when the SCTP
+aborts the association due path failure.
+.ip "SCTP_CAUSE_INVALID_STR"
+.ip "SCTP_CAUSE_MISSING_PARM"
+.ip "SCTP_CAUSE_STALE_COOKIE"
+.ip "SCTP_CAUSE_NO_RESOURCE"
+.ip "SCTP_CAUSE_BAD_ADDRESS"
+.ip "SCTP_CAUSE_BAD_CHUNK_TYPE"
+.ip "SCTP_CAUSE_INVALID_PARM"
+.ip "SCTP_CAUSE_BAD_PARM"
+.ip "SCTP_CAUSE_NO_DATA"
+.ip "SCTP_CAUSE_SHUTDOWN"
+.ip "SCTP_CAUSE_NEW_ADDR"
+.ip "SCTP_CAUSE_USER_INITIATED"
+.ip "SCTP_CAUSE_PROTO_VIOLATION"
+.ip "SCTP_CAUSE_LAST_ADDR"
+.ip "SCTP_CAUSE_RES_SHORTAGE"
+.ip "SCTP_CAUSE_SOURCE_ADDR"
+.ip "SCTP_CAUSE_ILLEGAL_ASCONF"
+.ba -\n(iiu
+.ip "NS\-User\-Data"
+There is no requirement to support disconnection data to support TP.
+.[
+x224
+.]
+The SCTP NS-Provider may report that it does not support disconnection data
+and may ignore this parameter.
+.ip "Responding Address"
+The Responding Address is only included in the N\-DISCONNECT\ Indication when
+the Responding Address is different from the Called Address provided to the
+N\-CONNECTION\ Request primitive.  For SCTP this is never the case.  Therefore,
+the Responding Address should not be present in the N\-DISCONNECT\\ Indication
+and is not necessary in the N\-DISCONNECT\ Request.  The SCTP NS-Provider may
+ignore this parameter.
+.#e
+.\"
+.\"
+.sh 1 "Transport Protocol Specification"
+.lp
+ITU-T Rec. X.224 | ISO/IEC 8073 Transport Protocol Classes 0 and 2 are
+supported with extensions as defined in each of the subsections below.
+.pp
+A Transport Protocol class is selected for a particular transport connection
+based on the requirements of the TS-User.
+.pp
+ITU-T Rec. X.224 | ISO/IEC 8073 Transport Protocol exchanges information
+between peers in discrete units of information called transport protocol data
+units (TPDU).  The protocol defined in this documents maps these TPDUs
+directly to SCTP data records.
+.pp
+This document mandates the implementation of ITU-T X.224 | ISO/IEC 8073
+Transport Protocol options negotiation (which includes class negotiation).
+.pp
+Please refer to \(lqNotes to Implementors,\(rq section 6.3 with respect to
+class negotiation and to the \(lqRationale\(rq section 7 with respect to
+interoperability with ISOS.
+.sh 2 "Class 0 over SCTP"
+.lp
+Class 0 is designed to have minimal functionality.  It provides only the
+functions needed for connection establishment with negotiation, data transfer
+with segmenting and protocol error reporting.  Class 0 provides transport
+connections with flow control based on the network service provided flow
+control, and disconnection based on the network service disconnection.
+.pp
+Class 0 is suitable for data transfer with no Explicit Transport
+Disconnection.
+.sh 3 "Connection Establishment"
+.lp
+The principles used in connection establishment are based upon those described
+in ITU-T Rec. X.224 | ISO/IEC 8073, with the following extensions:
+.ip \(bu \w'\(bu\(em'u
+Connect data may be exchanged using the user data fields of Connect Request
+(CR) and Connect Confirm (CC) TPDUs.
+.ip \(bu \w'\(bu\(em'u
+Use of \(lqExpedited Data Transfer Service\(rq may be negotiated using the
+negotiation mechanism specified in ITU-T Rec. X.224 | ISO/IEC 8073.  The
+default is to not use \(lqExpedited Data Transfer Service\(rq.
+.ip \(bu \w'\(bu\(em'u
+Non-standard TPDU size may be negotiated using the negotiation mechanism
+specified in ITU-T Rec. X.224 | ISO/IEC 8073.  The maximum TPDU size is
+unlimited.\*#
+.(d
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\)\  This is the maximum size of a data record in
+SCTP, which is not arbitrarily large, but is practically unlimited.
+.)d
+The default maximum TPDU size is 65531 octets.  Please refer to \(lqNotes to
+Implementors\(rq section 6.4.
+.sh 3 "Data Transfer"
+.lp
+The elements of procedure used during transfer are based upon those presented
+in ITU-T Rec. X.224 | ISO/IEC 8348, with the following extensions:
+.ip \(bu \w'\(bu\(em'u
+All TPDUs other than Expedited Data TPDUs are sent on the SCTP stream
+associated with the transport connection and are sent with the ordered bit
+set.
+.ip \(bu \w'\(bu\(em'u
+Expedited Data may be supported (if negotiated during connection
+establishment) by sending the defined Expedited Data (ED) TPDU.  ED and EA
+TPDUs are sent on the SCTP stream associated with the transport connection and
+MAY be sent with the ordered bit clear (i.e. sent as unordered DATA chunks).
+.pp
+The ED TPDU is sent on the same SCTP connection and stream as the other TPDUs,
+however, they may be sent unordered.  Normal TPDUs are sent on the same
+connection and stream as other TPDUs, however, they must be sent ordered.\*#
+.(d
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\)\  Unlike the TCP version of this protocol, ETPDUs
+are not restricted in size compared to TPDUs.
+.)d
+.pp
+For TPDU bit encoding please refer to \(lqNotes to Implementors\(rq section
+6.5.
+.sh 3 "Connection Release"
+.lp
+The elements of procedure used during a connection release are identical to
+those presented in ITU-T Rec. X.224 | ISO/IEC 8073.
+.pp
+Transport Disconnection is based on the NS-Provider (SCTP) Disconnection
+(SCTP\-ABORT) and is therefore disruptive.
+.sh 2 "Class 1 over SCTP"
+.lp
+Class 1 provides transport connections with flow control based on the network
+service provided flow control, error recovery, expedited data transfer,
+disconnection, and also the ability to support consecutive transport
+connections on a network connection.
+.pp
+This class provides the functionality of class 0 plus the ability to recover
+after failure signalled by the Network Service, without involving the
+TS-User.
+.sh 3 "Connection Establishment"
+.lp
+The principles used in connection establishment are based upon those described
+in ITU-T Rec. X.224 | ISO/IEC 8073, with the following extensions:
+.sh 2 "Class 2 over SCTP"
+.lp
+Class 2 provides transport connections with or without individual flow
+control; no error detection or error recovery is provided.  If the network
+connection resets or disconnects, the transport connection is terminated
+without the transport release procedure and the TS-User is informed.  When
+explicit flow control is used, a credit mechanism is defined allowing the
+receiver to inform the sender of the exact amout of data he is willing to
+receive and that the expedited data transfer is available.
+.pp
+Class 2 is suitable when independence of Normal and Expedited Data channels
+are required or when Explicit Transport Disconnection is needed.
+.sh 3 "Connection Establishment"
+.lp
+The principles used in connection establishment are based upon those described
+in ITU-T Rec. X.224 | ISO/IEC 8073, with the following extensions:
+.ip \(bu
+Connection Request and Connection Confirmation TPDUs may negotiate use of
+\(lqTransport Expedited Data Transfer\(rq service.  \(lqTransport Expedited
+Data Transfer\(rq service is selected by setting bit 1 or the \(lqAdditional
+Option\(rq parameter, and is negotiated using the mechanism specified in ITU-T
+Rec. X.224 | ISO/IEC 8073.
+.bl
+The default is to not use the \(lqTransport Expedited Data Transfer
+Service.\(rq
+.ip \(bu
+Contrary to ITOT,
+.[
+rfc2126
+.]
+Connection Request and Connection Confirmation TPDUs may not negotiate use of
+\(lqExpedited Data Acknowledgement.\(rq.  All TP protocol classes acknowledge
+expedited data.
+.ip \(bu
+Contrary to ITOT,
+.[
+rfc2126
+.]
+Connection Request and Connection Confirmation TPDUs may not negotiate use of
+\(lqNon-blocking Expedited Data\(rq service.  TP protocol class 0, 1, 2 and 3
+always perform non-blocking expedited data transfer.  That is, they allow the
+sending of normal data following an ED and before an EA.
+.ip \(bu
+Connection Request and Connection Confirmation TPDUs may negotiate use of
+either \(lqForward Connection (Splitting and Recombining)\(rq or \(lqReverse
+Connection\(rq procedure for Expedited Data transfer.
+.bl
+Use of \(lqForward Connection\(rq or use of \(lqReverse Connection\(rq
+procedure is selected by setting bit 4 of the
+\(lqAdditional Option\(rq parameter, and is negotiated using the mechanism
+specified in ITU-T Rec. X.224 | ISO/IEC 8073.
+.bl
+The default is to use \(lqForward Connection\(rq procedure for Expedited Data
+transfer.
+.ip \(bu
+Connection Request and Connection Confirmation TPDUs must not negotiate the
+use of \(lqExplicit Flow Control\(rq.
+.ip \(bu
+Non-standard TPDU size may be negotiated using the negotiation mechanism
+specified in ITU-T Rec. X.224 | ISO/IEC 8073.
+The maximum TPDU size is unlimited.  The default maximum TPDU size is 65531
+octets.  Please refer to \(lqNotes to Implementors\(rq section 6.4.
+.pp
+In the absense of a Flow Control policy, the use of ITU-T Rec. X.224 | ISO/IEC
+8073 Multiplexing procedure leads to degradation of the quality of service.
+The Protocol defined in this document does not support Multiplexing.\*#
+.(d
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\)\  It may be possible for SCTP to support
+Multiplexing.
+.)d
+.pp
+For the values of the \(lqAdditional Option\(rq parameter, please refer to
+\(lqNotes to Implementors\(rq section 6.6.
+.sh 3 "Data Transfer"
+.lp
+The elements of procedure using during data transfer are based upon those
+presented in
+ITU-T Rec. X.224 | ISO/IEC 8073,
+with the following extensions:
+.ip \(bu
+Expedited Data may be supported (if negotiated during connection
+establishment) by sending Expedited Data (ED) TPDU.
+.ip \(bu
+\(lqExpedited Data Acknowledgement\(rq may be supported (if negotiated during
+connection establishment) by sending Expedited Data Acknolwedgement (EA) TPDU.
+.bl
+When using \(lqExpedited Data Acknowledgement,\(rq ED TPDUs require
+acknowledgement, and once an ED TPDU is transmitted not further DT/ED TPDUs
+may be sent until the outstanding ED TPDU has been acknowledged.
+.bl
+When non-use of \(lqExpedited Data Acknowledgement\(rq has been negotiated, ED
+TPDUs require no acknowledgement, and further DT/ED TPDUs may be sent
+immediately.
+.bl
+Please refer to \(lqNotes to Implementors\(rq section 6.7 and section 6.8.
+.ip \(bu
+\(lqNon-blocking Expedited Data\(rq service may be supported (if negotiated
+during connection establishment).
+.bl
+When using \(lqNon-blocking Expedited Data\(rq service, the sender of an ED
+TPDU shall send the ED TPDU on both the Normal Data and Expedited Data SCTP
+streams.  Transmission of subsequent DT TPDU will not be interrupted.  The
+receiver of ED TPDU counts how many ED TPDU it has seen on each SCTP stream,
+and will only deliver to the TS-User the ED TPDU from the SCTP stream with
+the higher count.
+.bl
+When non-use of \(lqNon-blocking Expedited Data\(rq has been negotiated, ED
+TPDUs will not be duplicated.
+.bl
+Please refer to \(lqNotes to Implementors\(rq section 6.7 and section 6.8.
+.ip \(bu
+For Expedited Data transfer, there are two possible procedures for the
+establishment and assignment of the Expedited Data SCTP connection. Which
+one is used is negotiated during connection establishment.
+.bl
+Both the \(lqForward Connection\(rq procedure and \(lqReverse Connection\(rq
+procedure guarantee independence of the Normal Data SCTP connection from the
+Expedited Data SCTP connection.  They also ensure that a busy Normal Data SCTP
+connection cannot block an Expedited Data SCTP connection.
+.bl
+The Expedited Data SCTP connection created by either procedure must be between
+the same pair of hosts as the Normal Data SCTP connection, must not be shared
+among Transport Connections, and must remain established until the Transport
+Connection is terminated, at which time it must be closed.
+.bl
+SCTP connections created for Expedited Data transfer should also use the SCTP
+primitives defined in this document.
+.bl
+The Forward Connection (Splitting and Recombining) procedure is defined in
+ITU-T Rec. X.224 | ISO/IEC 8073.
+This procedure allows a transport connection to make use of multiple SCTP
+connections. Please refer to \(lqNotes to Implementors,\(rq section 6.9.
+.bl
+The Reverse Connection procedure is not defined in
+ITU-T Rec. X.224 | ISO/IEC 8073.
+When using the Reverse Connection procedure the initiator of a Transport
+Connection creates a Normal Data SCTP connection using an arbitrarily-chosen
+local SCTP port 'x' and a known remote SCTP port (either the ITOS well-known
+port, or some other).  The initiator listens for an incoming SCTP connection on
+the SCTP port 'x'. The responder of the Transport Connection must create a
+second SCTP connection (to be used for Expedited Data) using an
+arbitrarily-chosen local SCTP port 'y' and the remote SCTP port 'x' , before
+it can issue a CC TPDU on the Normal Data SCTP connection. The initiator need
+not listen for further SCTP connections on port 'x' after the Expedited Data
+SCTP connection is established.
+.sh 3 "Connection Release"
+.lp
+The elements of procedure used during a connection release are based upon
+those described in
+ITU-T Rec. X.224 | ISO/IEC 8073.
+A connection can be terminated by the TS-user in one of two ways:
+.ip \(bu \w'\(bu\(em'u
+Disruptive Disconnect
+.ip \(bu \w'\(bu\(em'u
+Non-Disruptive Disconnect
+.pp
+Disconnect Request (DR) and Disconnect Confirm (DC) TPDUs are exchanged in
+both cases. The DR TPDU carries a Reason code indicating the reason for the
+Disconnection.
+.pp
+Disruptive Disconnect specifies that all TPDUs still at the source are not
+required to be sent to the destination before the connection is disconnected.
+The DR Reason code is normal (80 hex).
+.pp
+Non-Disruptive Disconnect specifies that all TPDUs already given to the local
+TS-provider must be delivered to the remote TS-user, before the connection is
+disconnected. The DR Reason code is normal (80 hex) with Additional
+Information parameter value set to 80 hex.
+.sh 3 "Packet Format"
+.lp
+A fundamental difference between ITOT
+.[
+rfc2126
+.]
+and the ITOS protocol described by the current document is that SCTP preserves
+record boundaries whereas TCP does not.
+.pp
+ISO Transport expects information to be sent and delivered in discrete objects
+termed Network Service Data Units (NSDU).  Although ISO Transport allows
+combination of more than one TPDU inside a single NSDU for the purposes of
+discussion an NSDU is identical to a TPDU.  Please refer to
+ITU-T Rec. X.224 | ISO/IEC 8073
+for the valid set of concatentated TPDUs.
+.pp
+The protocol described by this memo uses the services of SCTP to delimit
+TPDUs.
+.\".sh 2 "Class 3 over SCTP"
+.\".lp
+.\"Class 3 provides the functionality of class 2 (with use of explicit flow
+.\"control) plus the ability to recover after a failure signalled by the Network
+.\"Layer without involving the TS-User.  The mechanisms used to acheive this
+.\"functionality also allow the implementation of more flexible flow control.
+.#e
+.\"
+.\"
+.sh 1 "Address Representations"
+.lp
+It is desirable to be able to represent ITOT access point addresses as:
+.ip \(bu \w'\(bu\(em'u
+Printable strings, or,
+.ip \(bu \w'\(bu\(em'u
+OSI Network Addresses (often known as NSAP addresses or simply NSAPAs).
+.lp
+This section defines the formats which MUST be used in each case.
+.sh 2 "String Representation of ITOS Access Point Addresses"
+.lp
+RFC1278
+.[
+rfc1278
+%Z 1
+.]
+defines a general string representation for OSI Presentation Addresses,
+including specific reference to
+ISOT
+.[
+rfc1006
+.]
+addresses which encapsulate IPv4 addresses.  RFC1278 is also applicable to
+ITOS addresses which encapsulate IPv4 addresses.
+.pp
+This RFC is currently being updated to define a string representation for ITOS
+addresses which encapsulate IPv6 addresses.  
+.pp
+ITOS access point address string representation specify one or more IP
+addresses (IPv4 or IPv6) and an optional SCTP port number.
+.sh 2 "OSI Network Address Encoding"
+.lp
+RFC1277
+.[
+rfc1277
+%Z 1
+.]
+defines a general mechanism to encode addressing information within OSI
+Network Addresses (NSAPA), including specific reference to ISOT
+.[
+rfc1006
+.]
+using IPv4.  RFC1277 is also applicable to ITOS addresses using IPv4.
+.pp
+The RFC "IPv6 addresses inside an NSAPA"
+.[
+rfc1888
+%Z 1
+.]
+defines general mechanisms for the support of NSAP addressing in an IPv6
+network. It also defines how to embed an IPv6 address inside a OSI NSAP
+address.
+.pp
+This RFC is applicable to ITOS addresses using IPv6. For ITOT addresses, the
+default selector of the NSAPA is defined to have the value '10000000'B.
+.pp
+It should be noted that given that an IPv6 addresses can encode IPv4
+addresses, this format can also encode ITOS addresses using IPv4.
+.#e
+.\"
+.\"
+.sh 1 "Notes to Implementors"
+.sh 2 "SCTP Connection Establishment"
+.lp
+Implementors should be aware that ISO transport protocols assume that they
+will be told by the network service provider (in this case SCTP) when the
+network connection being used to transmit their TPDUs is unexpectedly
+terminated.  It is therefore strongly suggested that the SCTP heartbeat 
+mechanism be selected, as this ensures reporting of network connection loss.
+.sh 2 "SCTP Data Transfer"
+.lp
+For performance reasons it is suggested that the Nagle algorithm
+.[
+rfc896
+%Z 1
+.]
+be disabled (using the SCTP_NODELAY socket option). This feature allows TPDU
+data to be sent without delay.
+.sh 2 "Class Negotiation"
+.lp
+The principle used in Class negotiation is identical to those described in
+ITU-T Rec. X.224 | ISO/IEC 8073.
+Class and options are negotiated during Connection establishment. The choice
+made by the Transport will depend upon the TS-User requirements as expressed
+via T-CONNECT service primitives.
+.pp
+The initiator of the Transport Connection proposes a preferred class and may
+propose an alternative class.
+.pp
+The responder selects one class defined in the table below.
+.pp
+If the preferred class is not selected then on receipt of the connect confirm
+TPDU the initiator adjusts its operation according to the class selected.
+.(b
+.#t "Class Negotiation"
+.(c
+.TS
+tab(:) box;
+csw(3.6i)|cw(1.8i).
+Proposed in CR TPDU:CC TPDU
+_:
+.T&
+lw(1.8i)|lw(1.8i)|cw(1.8i).
+Preferred Class:Alternative Class:Response
+.T&
+lw(1.8i)|lw(1.8i)|lw(1.8i).
+_
+class 0:none:class 0
+class 2:class 0:class 2 or 0
+class 2:none:class 2
+.TE
+.)c
+.)b
+.sh 2 "Default Maximum TPDU Size"
+.lp
+The default maximum TPDU size value specified in this document breaks ISO
+Transport negotiation rule which states that the maximum TPDU size specified
+or defaulted by the CC TPDU cannot be greater than the maximum TPDU size
+proposed by the CR TPDU.
+.pp
+To avoid the consequences of this, it is strongly recommended that the CC TPDU
+always specifies the maximum TPDU size value.
+.sh 2 "Class 0 TPDU Bit Encoding"
+.lp
+This protocol no longer allows credit and TPDU-NR (bits 0 to 6) fields to be
+ignored on input, which is in line with
+ITU-T Rec. X.224 | ISO/IEC 8073
+encoding rules.  ISOT
+.[
+rfc1006
+.]
+TPDU encoding defined inconsistent encoding rules.
+.sh 2 "Class 2 Options"
+.(b
+.#t "Class 2 Additional Option Parameter Value \*#"
+.(c
+.TS
+tab(:) box;
+cbw(0.3i)|cbw(5.7i)
+nw(0.3i)|lw(5.7i).
+BIT:OPTION
+_
+8:T{
+.#v
+Not applicable.
+T}
+
+7:T{
+.#v
+=1 Use of Non-blocking Expedited Data
+T}
+:T{
+.#v
+=0 non-use of Non-blocking Expedited Data (default)
+T}
+
+6:T{
+.#v
+=1 Use of Request Acknowledgement
+T}
+:T{
+.#v
+=0 non-use of Request Acknowldgement (default)
+T}
+
+5:T{
+.#v
+Not applicable.
+T}
+
+4:T{
+.#v
+=1 Use of Network Expedited
+T}
+:T{
+.#v
+=0 non-use of Network Expedited (default)
+T}
+
+3:T{
+.#v
+Not applicable.
+T}
+
+2:T{
+.#v
+Not applicable.
+T}
+
+1:T{
+.#v
+=1 Use of Transport Expedited Data Service
+T}
+:T{
+.#v
+=0 non-use of Transport Expedited Data Service (default)
+T}
+.TE
+.)c
+.)b
+.(d
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\)\  RFC 2126
+.[
+rfc2126
+.]
+defines bit 4 as Reverse Connection procedure or Forward Connection procedure
+instead of Network Expedited.
+This memo restores the correct ITU-T Rec. X.224 | ISO/IEC 8073 definition.
+.bl
+RFC 2126
+.[
+rfc2126
+.]
+defines bit 6 as Expedited Data Acknolwedgement instead of Request
+Acknowledgement.  This memo restores the correct
+ITU-T Rec. X.224 | ISO/IEC 8073
+definition.
+.)d
+.(b
+.#t "Class 2 Options Profile"
+.(c
+.TS
+tab(:) box;
+cw(1.0i)lssw(4.5i).
+Bits:Service Selected
+1 4 6 7:
+_
+.T&
+cw(1.0i)lssw(4.5i).
+0 x x x:T{
+.#v
+Non-use of Transport Expedited Data Service
+T}
+:_
+.T&
+cw(1.0i)lw(0.2i)lw(0.3i)lw(4.0i).
+:::T{
+.#v
+Bits 4 6 7 are not applicable (*)
+T}
+_
+.T&
+cw(1.0i)lssw(4.5i).
+1 x x x:T{
+.#v
+Use of Transport Expedited Data Service
+T}
+:_
+.T&
+cw(1.0i)lw(0.5i)lsw(4.0i).
+1 0 x x::T{
+.#v
+Use of Expedited Data Service without Request Acknowledgement
+T}
+::_
+.T&
+cw(1.0i)lw(0.2i)lw(0.3i)lw(4.0i).
+1 0 1 0:::T{
+.#v
+Forward Connection with Expedited Data Acknowledgement
+T}
+1 0 1 1:::T{
+.#v
+Forward Connection with Expedited Data Acknowledgement and use of Non-blocking Expedited Data (*)
+T}
+.T&
+cw(1.0i)lw(0.5i)lsw(4.0i).
+::_
+1 1 x x::T{
+.#v
+Use of Expedited Data Service with Request Acknowledgement
+T}
+::_
+.T&
+cw(1.0i)lw(0.2i)lw(0.3i)lw(4.0i).
+1 1 1 0:::T{
+.#v
+Reverse Connection with Expedited Data Acknowledgement
+T}
+1 1 1 1:::T{
+.#v
+Reverse Connection with Expedited Data Acknowledgement and use of Non-blocking Expedited Data (**)
+T}
+:::_
+1 1 0 0:::T{
+.#v
+Reverse Connection with non-use of Expedited Data Acknowledgement (***)
+T}
+1 1 0 1:::T{
+.#v
+Reverse Connection with non-use of Expedited Data Acknowledgement and use of Non-blocking Expedited Data
+T}
+.TE
+.)c
+.ip "(*)" \w'(***)\(em'u
+Note the default (0000) provides an ISOT
+.[
+rfc1006
+.]
+like service with Explicit Transport Disconnection.
+.ip "(**)" \w'(***)\(em'u
+Note in this case use of Expedited Data Acknowledgement with use of
+Non-blocking Expedited Data is a wasted effort (See section 6.5).
+.ip "(***)" \w'(***)\(em'u
+Note in this case Normal and Expedited TPDU are not synchronized. (See section
+6.6).
+.)b
+.sh 2 "Class 2 Expedited Data Acknowledgement"
+.lp
+The Protocol specified in this document does not define any relationship
+between use of \(lqExpedited Data Acknowledgement\(rq option and use of
+\(lqNon-blocking Expedited Data\(rq service.
+.pp
+However please note that when using \(lqNon-blocking Expedited Data\(rq
+service it is a wasted effort to use \(rqExpedited Data Acknowledgement,\(rq
+since ED TPDUs are duplicated and sent on both the Normal Data and Expedited
+Data TCP connections.
+.sh 2 "Class 2 Normal Data and Expedited Data Handling"
+.lp
+There exist two separate application requirements for using Expedited Data:
+.np
+Synchronisation of the order of delivery between Normal and Expedited Data
+TPDU.
+.np
+Independence of Normal and Expedited data channels. A busy Normal Data channel
+should not block an Expedited Data channel.
+.pp
+The protocol described in this document can accommodate both requirements,
+separately or in combination.
+.ip "Synchornization:"
+If synchronised order of delivery between Normal and Expedited Data TPDU is
+required then use of either \(lqExpedited Data Acknowledgement\(rq TPDU or use
+of the \(lqNon-blocking Expedited Data\(rq service must be negotiated during
+connection establishment.
+.bl
+If synchronised order of delivery between Normal and Expedited Data TPDU is
+not required then non-use of \(lqExpedited Data Acknowledgement\(rq need not
+be negotiated during connection establishment.
+.ip "Independence:"
+If Independence of Normal and Expedited data channels is required then Forward
+or Reverse connection must be negotiated during connection establishment.
+Expedited data TPDU must be sent on the Expedited data channel.
+.bl
+If Independence of Normal and Expedited data channels is not required then
+Forward connection should be negotiated during connection establishment and
+the Expedited data channels should never be established. Expedited data TPDU
+is then sent inband on the Normal data channel.
+.pp
+Finally please note that independence of Normal and Expedited data channels
+without synchronisation relaxes the Transport Service definition of Expedited
+data and is not consistent with ISO 8072.
+.sh 2 "Class 2 Forward Connection Procedure"
+.lp
+As defined in ITU-T Rec. X.224 | ISO/IEC 8073, when \(lqForward Connection\(rq
+(Splitting and Recombining) procedure is used for Expedited Data transmission,
+ED TPDU must only be sent over an outgoing NS-provider SCTP connection.
+.pp
+As defined in ITU-T Rec. X.224 | ISO/IEC 8073, this document does not mandate
+use of the Splitting procedure for Expedited Data transmission. The
+Recombination procedure, which associates Data (normal and expedited) TPDUs
+arriving for a transport connection over two SCTP connections must be handled.
+.pp
+It is legal to send Expedited Data TPDU inband on the Normal Data SCTP
+connection.
+.pp
+Please note that the protocol specified in this document does not define when
+an Expedited Data SCTP connection should be established.  This is an
+implementation choice.
+.pp
+When using \(lqNon-blocking Expedited Data\(rq service it is recommended to not
+delay establishing Expedited Data SCTP connection.
+.#e
+.\"
+.\"
+.sh 1 "Security Considerations"
+.lp
+Security issues are not specifically addressed in this document.  Operation of
+this protocol is no more and no less secure than operation of SCTP
+.[
+rfc2960
+.]
+.[
+rfc3309
+.]
+and
+ITU-T Rec. X.224 | ISO/IEC 8073
+.[
+x224
+.]
+protocols. The reader is directed there for further reading.
+.#e
+.\"
+.\"
+.sh 1 "IANA Considerations"
+.sh 2 "SCTP Payload Protocol ID"
+.lp
+IANA has assigned an ITOS value for the Payload Protocol Identifier in the
+SCTP DATA chunk.  The following SCTP Payload Protocol Identifier is
+registered:
+.ip "ISOT" \w'ISOT\(em'u
+XXX\*#
+.pp
+The SCTP Payload Protocol Identifier value "XXX" SHOULD be included in each
+SCTP DATA chunk, to indicate that the SCTP is carrying the ITOS protocol.  The
+value "0" (unspecified) is also allowed but any other values MUST NOT be used.
+This Payload Protocol Identifier is not directly used by SCTP but MAY be used
+by certain network entities to identify the type of information being carried
+in a DATA chunk.
+.(d
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\)\  The value shown above as "XXX" is to be assigned
+by IANA and may change in future versions of this document.
+.)d
+.sh 2 "Port Number"
+.lp
+IANA has registered SCTP Port Number 102 for ITOS.\*#  It is recommended that
+TS-Users use this SCTP port number for listening for new connections.
+Additional unreserved port numbers may also be used.
+.(d
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\)\  The value shown above as "102" is to be assigned
+by IANA and may change in future versions of this document.
+.)d
+.#e
+.\"
+.\"
+.(b M
+.sh 1 "Change History" 0
+.lp
+This section provides historical information on the changes made to this
+draft.  This section will be removed from the document when the document is
+minor formattting changes.
+.sh 2 "Changes from Version 0.0 to Version 0.1" 0 1
+.bu
+.bu
+.uh "Change Log"
+.lp
+.(l I
+.nf
+\fC\s-3
+$Log: draft-bidulock-tsvwg-itos-00.me,v $
+Revision 0.9.2.1  2007/09/29 14:58:26  brian
+- added new files
+
+.)l
+.)b
+.\"
+.\"
+.#E
+.(b M
+.[
+$LIST$
+.]
+.)b
+.\"
+.\"
+.(b M
+.uh "Acknowledgments"
+.pp
+The authors would like to thank
+Marshall T. Rose
+for leading the way.
+.#A
+.bl 3
+.lp
+This draft expires \*[expiry].
+.)b
+.#T 2007
