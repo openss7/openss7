@@ -1,0 +1,8 @@
+draft-bidulock-tsvwg-isos-00.ps: ../draft4.me
+draft-bidulock-tsvwg-itos-00.ps: ../draft4.me
+draft-bidulock-tsvwg-itos-00.ps: itos-00.fig1.pic
+draft-bidulock-tsvwg-itos-00.ps: itos-00.fig2.pic
+draft-bidulock-tsvwg-isos-00.txt: ../draft4.me
+draft-bidulock-tsvwg-itos-00.txt: ../draft4.me
+draft-bidulock-tsvwg-itos-00.txt: itos-00.fig1.pic
+draft-bidulock-tsvwg-itos-00.txt: itos-00.fig2.pic
