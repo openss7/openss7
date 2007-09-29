@@ -1,3 +1,7 @@
+2007-09-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/drafts/idrefs: add new SCTP 4960 reference
+
 2007-08-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: do not need YFLAG
