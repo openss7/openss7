@@ -1,0 +1,253 @@
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-SS7-TC.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/29 14:31:39 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under
+-- the terms of the GNU General Public License as published by the Free Software
+-- Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+-- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU General Public License along with
+-- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+-- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2007/09/29 14:31:39 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-SS7-TC.mib,v $
+-- Revision 0.9.2.1  2007/09/29 14:31:39  brian
+-- - added new mib files
+--
+-- =============================================================================
+
+OPENSS7-SS7-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	OpenSS7Modules
+		FROM OPENSS7-SMI;
+
+Ss7TC MODULE-IDENTITY
+	LAST-UPDATED	"200709260000Z"
+	ORGANIZATION
+		"OpenSS7 Corporation"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta T6L 6T1
+		 Canada
+
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 E-mail: bidulock@openss7.org"
+	DESCRIPTION
+		""
+	::= { OpenSS7Modules 5 }
+
+Ss7LoadShareAlgorithm ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This is a SS7 load sharing algorithm as identified by 
+		the SS7 MTP GDMOs."
+	REFERENCE
+		"ITU-T Rec. Q.751.1"
+	SYNTAX		OBJECT IDENTIFIER
+
+SlsList ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"1d,"
+	STATUS		current
+	DESCRIPTION
+		"This is a way of specifying a list of SLS values.  
+		Because SLS values can be 4, 5 or 8 bits, depending on 
+		the protocol variant, issue year,  and options, one 
+		octet is used to represent one SLS value.  If 4 bit SLSs 
+		apply, each octet is set to a value constrained to the 
+		range (0..15) and the size of the string is constrained 
+		to SIZE(0..16); 5-bits, (0..31), SIZE(0..32); and 8-bits 
+		(0..255), SIZE(0..256).  No SLS value can be repeated in 
+		the list.  What we really want is a SET OF Sls here, but 
+		SNMP won't have it."
+	REFERENCE
+		"ITU-T Rec. Q.751.1 slsList ATTRIBUTE"
+	SYNTAX		OCTET STRING (SIZE(0..256))
+
+MtpCongestionLevel ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This type specifies an SS7 MTP congestion level."
+	REFERENCE
+		"ITU-T Rec. Q.751.1 CongestionLevel"
+	SYNTAX		INTEGER { -- labels from Q.751.1
+				none(0),
+				congestionLevel1(1),
+				congestionLevel2(2),
+				congestionLevel3(3)
+			}
+
+MtpLinkStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This type specifes an SS7 MTP Level 2 Link protocol status."
+	REFERENCE
+		"ITU-T Rec. Q.751.1 LinkTpStatus"
+	SYNTAX		BITS { -- labels from Q.751.1
+				localBlocked(0),
+				remoteBlocked(1),
+				localInhibited(2),
+				remoteInhibited(3),
+				failed(4),
+				deactivated(5)
+			}
+
+SpType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This textual covention describes the type of signalling 
+		point.  One of the of the major reasons for 
+		understanding this information is so that the MTP 
+		Restart procedures can be properly performed against an 
+		adjacent signalling point.  When sep(0), it indicates 
+		that the signalling point is a signalling end point that 
+		is not equipped with the transfer function; when step 
+		(1), it indicates that the signalling point is both a 
+		signalling end point (it has user parts) and a 
+		signalling transfer point (it has the transfer 
+		function); or, stp(2), the signalling point is has the 
+		trasnfer function but does not have user parts."
+	REFERENCE
+		"ITU-T Recommendation Q.751.1 (1996)"
+	SYNTAX	INTEGER {
+			sep(0),
+			step(1),
+			stp(2)
+		}
+
+NetworkPointCode ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"1d:1d-"
+	STATUS		current
+	DESCRIPTION
+		"This is a network referenced signalling point code 
+		which uniquely identifies both the national or 
+		international SS7 network (point code numbering space) 
+		to which the point code belongs as well as the point 
+		code within the network.  The first octet is a newtork 
+		identifier which identifies the larger national or 
+		international SS7 network; the second octet is the 
+		'network' portion of the signalling point code as 
+		defined in Q.704; the third, the 'cluster'; and, the 
+		fourth and last, the 'member'.  This is displayed with a 
+		colon separating the network number and the normal 
+		numbers and dashes notation for the signalling point 
+		code: e.g. 1:5-1-1.  Note that an ITU-T signalling point 
+		code is unpacked by network, cluster and member into 
+		separate octets."
+	SYNTAX		OCTET STRING (SIZE(4))
+
+MtpLinkFailureReason ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This is the detailed reason for a link failure.  It has 
+		the following enumeration: unspecified(0), the reason 
+		for failure is unknown or none of the other failure 
+		reasons apply; contTimeout(1), T6 timeout; 
+		ackTimeout(2), T7 timeout; abnormalBsnr(3), receipt of 
+		excessive abnormal BSNs; abnormalFibr(4), receipt of 
+		excessive abnormal FIBs; suermEim(5), error rate monitor 
+		exceeded the threshold; alignmentNotPossible(6), 
+		alignment failed; receivedSio(7), an unexpected SIO was 
+		received; receivedSin(8), an unexpected SIN was 
+		received; receivedSie(9) an unexpected SIE was received; 
+		receivedSios(10), the link was shut down by the other 
+		side; t1Timeout(11), T1 timeout."
+	REFERENCE
+		"ITU-T Recommendation Q.703 (1996)"
+	SYNTAX	INTEGER {
+			unspecified(0),
+			congTimeout(1),
+			ackTimeout(2),
+			abnormalBsnr(3),
+			abnormalFibr(4),
+			suermEim(5),
+			alignmentNotPossible(6),
+			receivedSio(7),
+			receivedSin(8),
+			receivedSie(9),
+			receivedSios(10),
+			t1Timeout(11)
+		}
+
+MtpUserPartStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This textual convention can be used for reporting the 
+		 availability of MTP user parts as well as providing a 
+		 mechanism for controlling the availability of user 
+		 parts.  unknown(0) means that the availabilty of the 
+		 user part is unknown; inaccessible(1) means that the 
+		 user part is present but currently inaccessible; 
+		 unequipped(2) means that the user part is not present."
+	SYNTAX	INTEGER {
+			unknown(0),
+			inaccessible(1),
+			unequipeed(2)
+		}
+
+MtpUserPart ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This textual convention provides an enumerated user part value which 
+		 corresponds to the MTP SI value for the user part.  SI values snmm(0), sntm(1) 
+		 and snsm(2) are reserved for MTP management messages; other values may be 
+		 assigned to user parts."
+	SYNTAX	INTEGER {
+			snmm(0),
+			sntm(1),
+			snsm(2),
+			sccp(3),
+			tup(4),
+			isup(5),
+			dup1(6),
+			dup2(7),
+			mtup(8)
+		}
+
+
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi

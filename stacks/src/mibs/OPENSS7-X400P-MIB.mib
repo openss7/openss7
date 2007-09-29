@@ -1,0 +1,383 @@
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-X400P-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/29 14:31:39 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under
+-- the terms of the GNU General Public License as published by the Free Software
+-- Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+-- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU General Public License along with
+-- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+-- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2007/09/29 14:31:39 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-X400P-MIB.mib,v $
+-- Revision 0.9.2.1  2007/09/29 14:31:39  brian
+-- - added new mib files
+--
+-- =============================================================================
+
+OPENSS7-X400P-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+		FROM SNMPv2-SMI
+	OpenSS7Modules
+		FROM OPENSS7-MIB;
+
+x400pMIB MODULE-IDENTITY
+	LAST-UPDATED
+		"200709290553Z"
+	ORGANIZATION
+		"OpenSS7 Corporation"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta
+		 Canada
+		 T6L 6T1
+
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 E-Mail: bidulock@openss7.org"
+	DESCRIPTION
+		"MIB Module for the X400P Drivers and Cards."
+	::= { OpenSS7Modules 10 }
+
+-- top level oragnization of the MIB
+
+x400pMIBNotifs		    OBJECT IDENTIFIER ::= { x400pMIB	    1 }
+x400pMIBObjects		    OBJECT IDENTIFIER ::= { x400pMIB	    2 }
+x400pMIBConformance	    OBJECT IDENTIFIER ::= { x400pMIB	    3 }
+
+
+x400pMIBTables		    OBJECT IDENTIFIER ::= { x400pMIBObjects 1 }
+x400pMIBScalars		    OBJECT IDENTIFIER ::= { x400pMIBObjects 2 }
+x400pMIBStats		    OBJECT IDENTIFIER ::= { x400pMIBObjects 3 }
+
+x400pCard		    OBJECT IDENTIFIER ::= { x400pMIBTables  1 }
+x400pSpan		    OBJECT IDENTIFIER ::= { x400pMIBTables  2 }
+x400pCircuit		    OBJECT IDENTIFIER ::= { x400pMIBTables  3 }
+
+-- ====================================================================
+
+x400pCardTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X400pCardEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides the x400pCard table which indexes each card in the managed element."
+	::= { x400pCard 1 }
+
+x400pCardEntry OBJECT-TYPE
+	SYNTAX		X400pCardEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an entry in the x400pCard table.  Each entry in the table indexes a 
+		 card in the managed element.  Cards are not intended on being added to or 
+		 removed from this table by management stations.  Physical insertion and removal 
+		 of cards is required and as these cards do not support PCI hotplug, the system
+		 needs to be rebooted in which case the cards will appear in this table on 
+		 reboot.  Therefore there is no NextIndex scalar or RowStatus column for this 
+		 table."
+	::= { x400pCardTable 1 }
+
+X400pCardEntry ::=
+	SEQUENCE {
+		x400pCardIndex
+			Unsigned32,
+		x400pCardName
+			CommonLanguageName,
+		x400pCardOperationalState
+			OperationalState,
+		x400pCardUsageState
+			UsageState,
+		x400pCardAdministrativeState
+			AdministrativeState,
+		x400pCardAlarmStatus
+			AlarmStatus,
+		x400pCardProcedrualStatus
+			ProceduralStatus,
+		x400pCardAvailabilityStatus
+			AvailabilityStatus,
+		x400pCardControlStatus
+			ControlStatus,
+		x400pCardStandbyStatus
+			StandbyStatus,
+		x400pCardUnknownStatus
+			UnknownStatus
+	}
+
+
+x400pCardIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides an index for the x400p card in the managed element.  This is the 
+		 ordinal value of the card number and is used as a handle to refer to this x400p 
+		 card."
+	::= { x400pCardEntry xx }
+
+x400pCardName OBJECT-TYPE
+	SYNTAX		CommonLanguageName
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the name of the x400p card using COMMON LANGUAGE procedures and the 
+		 CommonLanguageName textual convention."
+	REFERENCE	"OPENSS7-TC"
+	::= { x400pCardEntry xx }
+
+
+x400pCardOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the operational state of the x400p card using the OperationalState 
+		 textual convention.  When disabled(0), the card is totally inoperable and 
+		 unable to provide service to users.  When enabled(1), the card is partially or 
+		 fully operable and available for use.
+		 "
+	REFERENCE	"OPENSS7-TMN-TC"
+	DEFVAL		{ disabled(0) }
+	::= { x400pCardEntry xx }
+
+
+x400pCardUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the usage state of the x400p card using the UsageState textual 
+		 convention.  When idle(0), no channels are in use.  When active(1), some 
+		 channels are in use.  When busy(2), all channels are in use.
+		 "
+	REFERENCE	"OPENSS7-TMN-TC"
+	DEFVAL		{ idle(0) }
+	::= { x400pCardEntry xx }
+
+
+x400pCardAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the administrative state of the x400p card using the 
+		 AdministrativeState textual convention.
+
+		 - locked(0): no user will be permitted to access a channel on the card.
+
+		 - unlocked(1): users will be permitted to access channels on the card.
+
+		 - shuttingDown(2): no new users will be permitted to access channels on the 
+		   card, however, existing users will be allowed to continue using channels 
+		   until they are released by the user.
+		"
+	REFERENCE	"OPENSS7-TMN-TC"
+	DEFVAL		{ locked(0) }
+	::= { x400pCardEntry xx }
+
+
+x400pCardAlarmStatus OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the alarm status for the x400p card using the AlarmStatus texutal 
+		 convention.
+		 
+		 - underRepair(0): the card is currently being repaired, the operational state 
+		   is disabled(0);
+
+		 - critical(1): does not occur;
+
+		 - major(2) does not occur;
+
+		 - minor(3): indicates that one or more minor alarms indicating a faults have 
+		   been detected in the resource, and have not yet been cleared, the operational 
+		   status is enabled(1);
+
+		 - alarmOutstanding(4): indicates that one or more alarms have been detected in 
+		   the resource, and have not yet been cleared, the condition of which may be 
+		   disabling.  When alarmOutstanding(4) is set, and the operational state is 
+		   enabled(1), other status and state attributes provide additional information, 
+		   particularly the carrier alarm related columns.
+		"
+	REFERENCE	"OPENSS7-TMN-TC"
+	::= { x400pCardEntry xx }
+
+
+x400pCardProcedrualStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the procedural status of the x400p card using the ProceduralStatus 
+		 textual convention.
+
+		 - initializationRequired(0): a driver has not been loaded against this card or 
+		   the card has not been configured for operation.  The operational state is 
+		   disabled(0).
+
+		 - notIntitialized(1): a driver has been loaded against the card and the card 
+		   has been configured for operation; however, spans still require configuration 
+		   before the channels on the card are usable.  The operational state is 
+		   disabled(1).
+
+		 - intializing(2): spans are being initialized.  The operational state is 
+		   enabled(1).
+
+		 - terminating(4): the resource is in a termination phase and the driver is 
+		   being unloaded.  The operational state is disabled(0).
+		 "
+	REFERENCE	"OPENSS7-TMN-TC"
+	::= { x400pCardEntry xx }
+
+
+x400pCardAvailabilityStatus OBJECT-TYPE
+	SYNTAX		AvailabilityStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the availability status of the x400p card using the AvailabilityStatus 
+		 textual convention.
+
+		 - inTest(0):  Not applicable.  The card is not tested as a whole.
+
+		 - failed(1):  x400p cards fail when firmware cannot be loaded, or the card 
+		   cannot be configured for operation, or some aspect of the hardware is 
+		   incompatible with a driver.  The operational state is disabled.  An alarm 
+		   will have been generated.
+
+		 - powerOff(2):  Not applicable.  x400p cards do not support power management.
+
+		 - offLine(3): When the card is configured for use but the transmitters and 
+		   receivers have been powered down, the card is considered offline.
+
+		 - offDuty(4):  Not applicable.
+
+		 - dependency(5):  x400p cards have the dependency that spans and channels must 
+		   at least be partially configured before they are available for use.  This 
+		   value is reflected until at least one span and one channel are configured.
+
+		 - degraded(6):  x400p cards are degraded when thier spans or circuits are 
+		   degraded.
+
+		 - notInstalled(7):  The x400p card does not exist in the system, or the card 
+		   exists in the system but is not loaded with a driver.  The operational state 
+		   is diabled(0).
+
+		 - logFull(8): Not applicable.
+
+		 "
+	REFERENCE	"OPENSS7-TMN-TC"
+	::= { x400pCardEntry xx }
+
+
+x400pCardControlStatus OBJECT-TYPE
+	SYNTAX		ControlStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the x400p card control status according to the ControlStatus textual 
+		 convention.
+
+		 - subjectToTest(0): Not applicable.
+
+		 - partOfServicesLocked(1):  The x400p card may exhibit this value when the card 
+		   is unlocked(1), but one or more of its spans or channels is locked(1).
+
+		 - reservedForTest(2): Not applicable.
+
+		 - suspended(3): Not applicable.
+		"
+	REFERENCE	"OPENSS7-TMN-TC"
+	::= { x400pCardEntry xx }
+
+
+x400pCardStandbyStatus OBJECT-TYPE
+	SYNTAX		StandbyStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the standby status of the x400p card according to the StandbyStatus 
+		 textual convention.  This status returns a standby status when the card has 
+		 been configured in the system to act as a backup unit for another card 
+		 providing service to the same span.  This is performed by placing the receivers 
+		 into high impedance mode, and powering down the transmitters.
+
+		 - hotStandby(0): The receivers are in high impedance mode and are monitoring 
+		   the T1/E1/J1 spans, however, the transmitters are open-circuited.  In this 
+		   case, the card is syncrhonized to the incoming frames and ready to be brought 
+		   into service by merely powering up the transmitters.
+
+		 - coldStandby(1): Both the receives and the transmitters are open-circuited, or 
+		   are connected to a separate facility via a DACCS or other cross-connect 
+		   system which will be connected when a changeover occurs.
+
+		 - providingService(2): Both the receivers and transmitters are connects and 
+		   powered up.  The spans on the card are passing data to and from the wire.
+
+		 There are a number of backup arrangements possible with this card, however, 
+		 have an entire card act as a backup for another entire card is the only way 
+		 that line synchronization can be made the same for both cards.
+		"
+	REFERENCE	"OPENSS7-TMN-TC"
+	::= { x400pCardEntry xx }
+
+
+x400pCardUnknownStatus OBJECT-TYPE
+	SYNTAX		UnknownStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	"OPENSS7-TMN-TC"
+	::= { x400pCardEntry xx }
+
+
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+

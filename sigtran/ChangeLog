@@ -2,6 +2,11 @@
 
 	* doc/drafts/idrefs: add new SCTP 4960 reference
 
+	* src/mibs/OPENSS7-M2UA-ASP-MIB.mib: add mibs
+	* src/mibs/OPENSS7-M2UA-MIB.mib: add mibs
+	* src/mibs/OPENSS7-M3UA-ASP-MIB.mib: add mibs
+	* src/mibs/OPENSS7-SIGTRAN-TC.mib: add mibs
+
 2007-08-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: do not need YFLAG

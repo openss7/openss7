@@ -1,0 +1,1535 @@
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-TMN-SMI.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/29 14:31:39 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under
+-- the terms of the GNU General Public License as published by the Free Software
+-- Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+-- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU General Public License along with
+-- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+-- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2007/09/29 14:31:39 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-TMN-SMI.mib,v $
+-- Revision 0.9.2.1  2007/09/29 14:31:39  brian
+-- - added new mib files
+--
+-- =============================================================================
+
+OPENSS7-TMN-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	OpenSS7Modules
+		FROM OPENSS7-SMI
+	ProbableCause
+		FROM OPENSS7-TMN-TC;
+
+TmnMIB MODULE-IDENTITY
+	LAST-UPDATED	"200709250000Z"
+	ORGANIZATION
+		"OpenSS7 Corporation"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta T6L 6T1
+		 Canada
+
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 E-mail: bidulock@openss7.org"
+	DESCRIPTION
+		"This is a basic MIB module providing definitions of 
+		 objects based on the TMN (ITU-T Rec. X.721 (1992))."
+	::= { OpenSS7Modules 4 }
+
+--
+-- Top level organization of the MIB
+--
+
+tmnNotifications	OBJECT IDENTIFIER ::= { TmnMIB		 0 }
+tmnObjects		OBJECT IDENTIFIER ::= { TmnMIB		 1 }
+tmnConformance		OBJECT IDENTIFIER ::= { TmnMIB		 2 }
+
+tmnScalars		OBJECT IDENTIFIER ::= { tmnObjects	 1 }
+tmnTables		OBJECT IDENTIFIER ::= { tmnObjects	 2 }
+tmnNotifObjects		OBJECT IDENTIFIER ::= { tmnObjects	 3 }
+
+tmnCompliances		OBJECT IDENTIFIER ::= { tmnConformance	 1 }
+tmnGroups		OBJECT IDENTIFIER ::= { tmnConformance	 2 }
+
+tmnSeverityMapping	OBJECT IDENTIFIER ::= { tmnTables	 1 }
+tmnAlarmSummary		OBJECT IDENTIFIER ::= { tmnTables	 2 }
+
+-- ====================================================================
+--
+-- NOTIFICATION
+--
+-- ====================================================================
+-- These are general purpose notifications taken from X.721.  They rely 
+-- on the definition of some Scalars from this module and some textual 
+-- conventions from the OPENSS7-TMN-TC module.
+
+attributeValueChange NOTIFICATION-TYPE
+--	OBJECTS {
+--		-- sourceIndicator
+--		-- attributeIdentifierList
+--		attributeValueChangeDefinition
+--		-- notificationIdentifier
+--		-- correlatedNotifications
+--		-- additionalText
+--		-- additionalInformation
+--	}
+	OBJECTS {
+		objectInstance
+	}
+	STATUS	    current
+	DESCRIPTION
+		"This notification type is used to report changes to the attribute such as 
+		 addition or deletion of members to one or more set valued attributes, 
+		 replacement of the value of one or more attributes and setting attribute values 
+		 to their defaults.
+		 
+		 The attribute value changes specification in TMN is a complicated thing.  Here 
+		 is is required that the issuer of the notification include the attributes whose 
+		 values have changed, first the attribute with the old value and next the 
+		 attribute with the new value for each attribute reported."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : attributeValueChange"
+	::= { tmnNotifications 1 }
+
+communicationsAlarm NOTIFICATION-TYPE
+	OBJECTS {
+		objectInstance,
+		probableCause,
+		-- specificProblems,
+		perceivedSeverity
+		-- backedUpStatus,
+		-- backUpObject,
+		-- trendIndication,
+		-- thresholdInfo,
+		-- notificationIdentifier,
+		-- correlatedNotifications,
+		-- stateChangeDefinition,
+		-- monitoredAttributes,
+		-- proposedRepairActions,
+		-- additionalText,
+		-- additionalInformation
+	}
+	STATUS		current
+	DESCRIPTION
+		"This notification type is used to report when the object detects a 
+		 communications error.
+
+		 This is one of two mechanisms of providing communications alarms corresponding 
+		 to TMN alarms.  One method is to provide a single notification which is 
+		 parameterized in a similar fashion to TMN.  The other method is providing 
+		 indepdendent notifications for each cause.  The advantages of providing a 
+		 single notification for communications alarms is that the management station 
+		 need only monitor a single trap to receive all alarm indications.  On a managed 
+		 system with thousands of unique alarms, this has scale benefits.
+
+		 The communicationsAlarm is modelled on the TMN notification of the same name.  
+		 TMN too has the ability to provide independent notifications and chose a 
+		 similar unified alarm notification.
+
+		 The first parameter of the communicationsAlarm is the probable cause, which is 
+		 an object identifier defined with the OBJECT-IDENTITY macro.  The probable 
+		 cause identifies the alarm.  The third parameter (second object in SNMP) is the 
+		 perceived severity.  Following the PerceivedSeverity textual convention, this 
+		 parameter indicates when the alarm has onset or cleared, and when indicating 
+		 onset, the relative severity in telecommunications terms (warning, minor, 
+		 major, critical).  The second parameter (optional additiona object in SNMP) is 
+		 a sequence of specific problems that refined the alarm indication.
+
+		 Because their values are defined by an OBJECT-IDENTITY macro, the DESCRIPTION 
+		 clause in that macro defining a probable cause or specific problem should 
+		 clearly identify the purpose of the alarm, when it is generated, when it is 
+		 cleared, and how a specific problem refines the probable cause.  This makes 
+		 this information available to managers via the MIB generating the alarms.  
+		 Where a generic value is not used, the probable cause and specific problems 
+		 should be defined within the MIB module that use them.
+
+		 State changes and attribute value changes can be reported by simply including 
+		 the object with the old value and the object with the new value for each object 
+		 reported."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : communicationsAlarm"
+	::= { tmnNotifications 2 }
+
+environmentalAlarm NOTIFICATION-TYPE
+	OBJECTS {
+		objectInstance,
+		probableCause,
+		perceivedSeverity
+	}
+	STATUS		current
+	DESCRIPTION
+		"This notification type is used to report a problem in the environment.
+
+		 This is similar to the communicationsAlarm. The first parameter is the probable 
+		 cause which follows the ProbableCause textual convention.  The second parameter 
+		 is the perceived severity which follows the PerceivedSeverity textual 
+		 convention.  Additional specificProblem parameters may be added along with 
+		 other information.  See communicationsAlarm for more information."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : envronmentalAlarm"
+	::= { tmnNotifications 3 }
+
+equipmentAlarm NOTIFICATION-TYPE
+	OBJECTS {
+		objectInstance,
+		probableCause,
+		-- specificProblems,
+		perceivedSeverity
+		-- backedUpStatus,
+		-- backUpObject,
+		-- trendIndication,
+		-- thresholdInfo,
+		-- notificationIdentifier,
+		-- correlatedNotifications,
+		-- stateChangeDefinition,
+		-- monitoredAttributes,
+		-- proposedRepairActions,
+		-- additionalText,
+		-- additionalInformation
+	}
+	STATUS		current
+	DESCRIPTION
+		"This notification type is used to report failure in the equipment.
+
+		 This is similar to both the environmentalAlarm and the communicationsAlarm.  
+		 The first parameter is the probaable cause which follows the ProbableCause 
+		 textual convention.  The second parameter is the perceived severity which 
+		 follows the PerceivedSeverity textual convention.  Additional SpecificProblems 
+		 parameters may be added along with other information.  See communicationsAlarm 
+		 for more information."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : equipmentAlarm"
+	::= { tmnNotifications 4 }
+
+integrityViolation NOTIFICATION-TYPE
+	OBJECTS {
+		objectInstance,
+		securityAlarmCause,
+		securityAlarmSeverity,
+		securityAlarmDetector,
+		serviceUser,
+		serviceProvider
+		-- notificationIdentifier
+		-- correlatedNotifications
+		-- additionalText
+		-- additionalInformation
+	}
+	STATUS		current
+	DESCRIPTION
+		"This notification is used to report a potention interruption in information 
+		 flow has occurred such that information may have been illegally modified, 
+		 inserted or deleted."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : integrityViolation"
+	::= { tmnNotifications 5 }
+
+objectCreation NOTIFICATION-TYPE
+--	OBJECTS {
+--		-- sourceIndicator
+--		-- attributeList
+--		-- notificationIdentifier
+--		-- correlatedNotifications
+--		-- additionalText
+--		-- additionalInformation
+--	}
+	OBJECTS {
+		objectInstance
+	}
+	STATUS		current
+	DESCRIPTION
+		"This notification type is used to report the creation of a managed object to 
+		 another open system.
+
+		 Note that the reporting agent should include a RowPointer identification of the 
+		 object instance that has been created."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : objectCreation"
+	::= { tmnNotifications 6 }
+
+objectDeletion NOTIFICATION-TYPE
+--	OBJECTS {
+--		-- sourceIndicator
+--		-- attributeList
+--		-- notificationIdentifier
+--		-- correlatedNotifications
+--		-- additionalText
+--		-- additionalInformation
+--	}
+	OBJECTS {
+		objectInstance
+	}
+	STATUS		current
+	DESCRIPTION
+		"This notification type is used to report the deletion of a managed object to 
+		 another open system.
+
+		 Note that the reporting agent should include a RowPointer identification and 
+		 all the previous attribtues in the notification."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : objectDeletion"
+	::= { tmnNotifications 7 }
+
+operationalViolation NOTIFICATION-TYPE
+	OBJECTS {
+		objectInstance,
+		securityAlarmCause,
+		securityAlarmSeverity,
+		securityAlarmDetector,
+		serviceUser,
+		serviceProvider
+		-- notificationIdentifier
+		-- correlatedNotifications
+		-- additionalText
+		-- additionalInformation
+	}
+	STATUS		current
+	DESCRIPTION
+		"This notification is used to report that the provision of the requested service 
+		 was not possible due to the unavailability, malfunction or incorrect invocation 
+		 of the service."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : operationalViolation"
+	::= { tmnNotifications 8 }
+
+physicalViolation NOTIFICATION-TYPE
+	OBJECTS {
+		objectInstance,
+		securityAlarmCause,
+		securityAlarmSeverity,
+		securityAlarmDetector,
+		serviceUser,
+		serviceProvider
+		-- notificationIdentifier
+		-- correlatedNotifications
+		-- additionalText
+		-- additionalInformation
+	}
+	STATUS		current
+	DESCRIPTION
+		"This notification is used to report that a physical resource has been violated 
+		 in a way that indicates a potential security attack."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : physicalViolation"
+	::= { tmnNotifications 9 }
+
+processingErrorAlarm NOTIFICATION-TYPE
+	OBJECTS {
+		objectInstance,
+		probableCause,
+		-- specificProblems,
+		perceivedSeverity
+		-- backedUpStatus,
+		-- backUpObject,
+		-- trendIndication,
+		-- thresholdInfo,
+		-- notificationIdentifier,
+		-- correlatedNotifications,
+		-- stateChangeDefinition,
+		-- monitoredAttributes,
+		-- proposedRepairActions,
+		-- additionalText,
+		-- additionalInformation
+	}
+	STATUS		current
+	DESCRIPTION
+		"This notification type is used to report a failure in the quality of service of 
+		 the managed object.
+
+		 The agent should include the identification of the row or variable generating 
+		 the alarm."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : processingErrorAlarm"
+	::= { tmnNotifications 10 }
+
+qualityofServiceAlarm NOTIFICATION-TYPE
+	OBJECTS {
+		objectInstance,
+		probableCause,
+		-- specificProblems,
+		perceivedSeverity
+		-- backedUpStatus,
+		-- backUpObject,
+		-- trendIndication,
+		-- thresholdInfo,
+		-- notificationIdentifier,
+		-- correlatedNotifications,
+		-- stateChangeDefinition,
+		-- monitoredAttributes,
+		-- proposedRepairActions,
+		-- additionalText,
+		-- additionalInformation
+	}
+	STATUS		current
+	DESCRIPTION
+		"This notification type is used to report a failure in the quality of service of 
+		 the managed object."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : qualityofServiceAlarm"
+	::= { tmnNotifications 11 }
+
+relationshipChange NOTIFICATION-TYPE
+--	OBJECTS {
+--		-- sourceIndicator
+--		-- attributeIdentifierList
+--		relationshipChangeDefinition
+--		-- notificationIdentifier
+--		-- correlatedNotifications
+--		-- additionalText
+--		-- additionalInformation
+--	}
+	OBJECTS {
+		objectInstance
+	}
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : relationshipChange"
+	::= { tmnNotifications 12 }
+
+securityServiceOrMechanismViolation NOTIFICATION-TYPE
+	OBJECTS {
+		objectInstance,
+		securityAlarmCause,
+		securityAlarmSeverity,
+		securityAlarmDetector,
+		serviceUser,
+		serviceProvider
+		-- notificationIdentifier
+		-- correlatedNotifications
+		-- additionalText
+		-- additionalInformation
+	}
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : securityServiceOrMechanismViolation"
+	::= { tmnNotifications 13 }
+
+stateChange NOTIFICATION-TYPE
+--	OBJECTS {
+--		-- sourceIndicator
+--		-- attributeIdentifierList
+--		stateChangeDefinition
+--		-- notificationIdentifier
+--		-- correlatedNotifications
+--		-- additionalText
+--		-- additionalInformation
+--	}
+	OBJECTS {
+		objectInstance
+	}
+	STATUS		current
+	DESCRIPTION
+		"This notification type is used to report the change in the value of one or more 
+		 state attributes of a managed object, that result through either internal 
+		 operation of the managed object or via management operation.  The 
+		 stateChangeDefinition in TMN is a complicated thing.  Here the issuer of this 
+		 norification should include the old value of the attribute followed by the new 
+		 value of the attribute for each attribute reported."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : stateChange"
+	::= { tmnNotifications 14 }
+
+timeDomainViolation NOTIFICATION-TYPE
+	OBJECTS {
+		objectInstance,
+		securityAlarmCause,
+		securityAlarmSeverity,
+		securityAlarmDetector,
+		serviceUser,
+		serviceProvider
+		-- notificationIdentifier
+		-- correlatedNotifications
+		-- additionalText
+		-- additionalInformation
+	}
+	STATUS		current
+	DESCRIPTION
+		"This notification is used to report that an event has occurred at an unexpected 
+		 or prohibited time."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : timeDomainViolation"
+	::= { tmnNotifications 15 }
+
+-- ====================================================================
+--
+-- NOTIFICATION (and ALARM) TYPE (from X.721)
+--
+-- ====================================================================
+
+smi2Notification OBJECT IDENTIFIER ::= { joint-iso-ccitt(2) ms(9) smi(3) part2(2) notification(10) }
+
+attributeValueChangeType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : attributeValueChange"
+	::= { smi2Notification 1 }
+
+communicationsAlarmType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : communicationsAlarm"
+	::= { smi2Notification 2 }
+
+environmentalAlarmType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : environmentalAlarm"
+	::= { smi2Notification 3 }
+
+equiptmentAlarmType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : equiptmentAlarm"
+	::= { smi2Notification 4 }
+
+integrityViolationType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : integrityViolation"
+	::= { smi2Notification 5 }
+
+objectCreationType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : objectCreation"
+	::= { smi2Notification 6 }
+
+objectDeletionType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : objectDeletion"
+	::= { smi2Notification 7 }
+
+operationViolationType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : operationViolation"
+	::= { smi2Notification 8 }
+
+physicalViolationType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : physicalViolation"
+	::= { smi2Notification 9 }
+
+processingErrorAlarmType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : processingErrorAlarm"
+	::= { smi2Notification 10 }
+
+qualityofServiceAlarmType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : qualityofServiceAlarm"
+	::= { smi2Notification 11 }
+
+relationshipChangeType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : relationshipChange"
+	::= { smi2Notification 12 }
+
+securityServiceOrMechanismViolationType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : securityServiceOrMechanismViolation"
+	::= { smi2Notification 13 }
+
+stateChangeType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : stateChange"
+	::= { smi2Notification 14 }
+
+timeDomainViolationType OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simply copy of X.721 notification type"
+	REFERENCE	"ITU-T Rec. X.721 (1992) : timeDomainViolation"
+	::= { smi2Notification 15 }
+
+-- ====================================================================
+--
+-- PROBABLE CAUSES (from X.721)
+--
+-- ====================================================================
+
+arfProbableCause OBJECT IDENTIFIER ::= { joint-iso-ccitt(2) ms(9) smi(3) part2(2) standardSpecificationExtension(0) arf(0) }
+
+adapterError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : adapterError"
+	::= { arfProbableCause 1 }
+
+applicationSubsystemFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : applicationSubsystemFailure"
+	::= { arfProbableCause 2 }
+
+bandwidthReduced OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : bandwidthReduced"
+	::= { arfProbableCause 3 }
+
+callEstablishmentError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : callEstablishmentError"
+	::= { arfProbableCause 4 }
+
+communicationsProtocolError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : communicationsProtocolError"
+	::= { arfProbableCause 5 }
+
+communicationsSubsystemFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : communicationsSubsystemFailure"
+	::= { arfProbableCause 6 }
+
+configurationOrCustomizationError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : configurationOrCustomizationError"
+	::= { arfProbableCause 7 }
+
+congestion OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : congestion"
+	::= { arfProbableCause 8 }
+
+corruptData OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : corruptData"
+	::= { arfProbableCause 9 }
+
+cpuCyclesLimitExceeded OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : cpuCyclesLimitExceeded"
+	::= { arfProbableCause 10 }
+
+dataSetOrModemError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : dataSetOrModemError"
+	::= { arfProbableCause 11 }
+
+degradedSignal OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : degradedSignal"
+	::= { arfProbableCause 12 }
+
+dTE-DCEInterfaceError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : dTE-DCEInterfaceError"
+	::= { arfProbableCause 13 }
+
+enclosureDoorOpen OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : enclosureDoorOpen"
+	::= { arfProbableCause 14 }
+
+equipmentMalfunction OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : equipmentMalfunction"
+	::= { arfProbableCause 15 }
+
+excessiveVibration OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : excessiveVibration"
+	::= { arfProbableCause 16 }
+
+fileError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : fileError"
+	::= { arfProbableCause 17 }
+
+fireDetected OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : fireDetected"
+	::= { arfProbableCause 18 }
+
+floodDetected OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : floodDetected"
+	::= { arfProbableCause 19 }
+
+framingError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : framingError"
+	::= { arfProbableCause 20 }
+
+heatingOrVentilationOrCoolingSystemProblem OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : heatingOrVentilationCoolingSystemProblem"
+	::= { arfProbableCause 21 }
+
+humidityUnacceptable OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : humidityUnacceptable"
+	::= { arfProbableCause 22 }
+
+inputOutputDeviceError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : inputOutputDeviceError"
+	::= { arfProbableCause 23 }
+
+inputDeviceError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : adapterError"
+	::= { arfProbableCause 24 }
+
+lANError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : inputDeviceError"
+	::= { arfProbableCause 25 }
+
+leakDetected OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : leakDetected"
+	::= { arfProbableCause 26 }
+
+localNodeTransmissionError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : localNodeTransmissionError"
+	::= { arfProbableCause 27 }
+
+lossOfFrame OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : lossOfFrame"
+	::= { arfProbableCause 28 }
+
+lossOfSignal OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : lossOfSignal"
+	::= { arfProbableCause 29 }
+
+materialSupplyExhausted OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : materialSupplyExhausted"
+	::= { arfProbableCause 30 }
+
+multiplexerProblem OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : multiplexerProblem"
+	::= { arfProbableCause 31 }
+
+outOfMemory OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : outOfMemory"
+	::= { arfProbableCause 32 }
+
+ouputDeviceError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : outputDeviceError"
+	::= { arfProbableCause 33 }
+
+performanceDegraded OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : performanceDegraded"
+	::= { arfProbableCause 34 }
+
+powerProblem OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : powerProblem"
+	::= { arfProbableCause 35 }
+
+pressureUnacceptable OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : pressureUnacceptable"
+	::= { arfProbableCause 36 }
+
+processorProblem OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : processorProblem"
+	::= { arfProbableCause 37 }
+
+pumpFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : pumpFailure"
+	::= { arfProbableCause 38 }
+
+queueSizeExceeded OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : queueSizeExceeded"
+	::= { arfProbableCause 39 }
+
+receiveFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : receiveFailure"
+	::= { arfProbableCause 40 }
+
+receiverFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : receiverFailure"
+	::= { arfProbableCause 41 }
+
+remoteNodeTransmissionError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : remoteNodeTransmissionError"
+	::= { arfProbableCause 42 }
+
+resourceAtOrNearingCapacity OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : resourceAtOrNearingCapacity"
+	::= { arfProbableCause 43 }
+
+responseTimeExcessive OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : responseTimeExcessive"
+	::= { arfProbableCause 44 }
+
+retransmissionRateExcessive OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : retransmissionRateExcessive"
+	::= { arfProbableCause 45 }
+
+softwareError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : softwareError"
+	::= { arfProbableCause 46 }
+
+softwareProgramAbnormallyTerminated OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : softwareProgramAbnormallyTerminated"
+	::= { arfProbableCause 47 }
+
+softwareProgramError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : softwareProgramError"
+	::= { arfProbableCause 48 }
+
+storageCapacityProblem OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : storageCapacityProblem"
+	::= { arfProbableCause 49 }
+
+temperatureUnacceptable OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : temperatureUnacceptable"
+	::= { arfProbableCause 50 }
+
+thresholdCrossed OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : thresholdCrossed"
+	::= { arfProbableCause 51 }
+
+timingProblem OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : timingProblem"
+	::= { arfProbableCause 52 }
+
+toxicLeakDetected OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : toxicLeaKDetected"
+	::= { arfProbableCause 53 }
+
+transmitFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : transmitFailure"
+	::= { arfProbableCause 54 }
+
+transmitterFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : transmitterFailure"
+	::= { arfProbableCause 55 }
+
+underlyingResourceUnavailable OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : underlyingResourceUnavailable"
+	::= { arfProbableCause 56 }
+
+versionMismatch OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 probable cause error for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : versionMismatch"
+	::= { arfProbableCause 57 }
+
+-- ====================================================================
+--
+-- SECURITY ALARM CAUSES (from X.721)
+--
+-- ====================================================================
+
+sarfSecurityAlarmCause OBJECT IDENTIFIER ::= { joint-iso-ccitt(2) ms(9) smi(3) part2(2) standardSpecificationExtension(0) sarf(1) }
+
+authenticationFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : authenticationFailure"
+	::= { sarfSecurityAlarmCause 1 }
+
+breachOfConfidentiality OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : breachOfConfidentiality"
+	::= { sarfSecurityAlarmCause 2 }
+
+cableTamper OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : cableTamper"
+	::= { sarfSecurityAlarmCause 3 }
+
+delayedInformation OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : delayedInformation"
+	::= { sarfSecurityAlarmCause 4 }
+
+denialOfService OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : denialOfService"
+	::= { sarfSecurityAlarmCause 5 }
+
+duplicateInformation OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : duplicateInformation"
+	::= { sarfSecurityAlarmCause 6 }
+
+informationMissing OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : informationMissing"
+	::= { sarfSecurityAlarmCause 7 }
+
+informationModificationDetected OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : informationModificationDetected"
+	::= { sarfSecurityAlarmCause 8 }
+
+informationOutOfSequence OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : informationOutOfSequence"
+	::= { sarfSecurityAlarmCause 9 }
+
+intrusionDetection OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : intrusionDetection"
+	::= { sarfSecurityAlarmCause 10 }
+
+keyExpired OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : keyExpired"
+	::= { sarfSecurityAlarmCause 11 }
+
+nonRepudiationFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : nonRepudiationFailure"
+	::= { sarfSecurityAlarmCause 12 }
+
+outOfHoursActivity OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : outOfHoursActivity"
+	::= { sarfSecurityAlarmCause 13 }
+
+outOfService OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : outOfService"
+	::= { sarfSecurityAlarmCause 14 }
+
+proceduralError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : proceduralError"
+	::= { sarfSecurityAlarmCause 15 }
+
+unauthorizedAccessAttempt OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : unauthorizedAccessAttempt"
+	::= { sarfSecurityAlarmCause 16 }
+
+unexpectedInformation OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : unexpectedInformation"
+	::= { sarfSecurityAlarmCause 17 }
+
+unspecifiedReason OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Simple copy of X.721 security alarm cause for use in traps."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : unspecifiedReason"
+	::= { sarfSecurityAlarmCause 18 }
+
+
+-- ====================================================================
+--
+-- NOTIFICATION OBJECTS
+--
+-- ====================================================================
+-- Definition of some notification objects is required so that we can 
+-- use these types in notifications.  Basically we need a notification 
+-- object for each textual convention that we want to use in the 
+-- notification.
+
+probableCause OBJECT-TYPE
+	SYNTAX ProbableCause
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"This is the probable cause of the alarm condition in accordance with TMN SMI 
+		 defintions.  The probable cause is a required parameter of the 
+		 communicationsAlarm notification.  It contains an object identity which 
+		 indicates the probable cause of the alarm in accordance with the ProbableCause 
+		 textual convention.
+
+		 The meaning and purpose of object identifiers that are used to populate this 
+		 parameter for the communicationsAlarm notification must be specified in the 
+		 DESCRIPTION clause of an OBJECT-IDENTITY macro defining the object identifier 
+		 associated with the probable cause.  The precise conditions under which the 
+		 alarm is raised and cleared (see perceivedSeverity) must also be defined in the 
+		 DESCRIPTION clause whenever the value is used to raise generic alarms such as 
+		 the communicationsAlarm.  When used with a specific notification, the use of 
+		 the probable cause parameter must be defined in the NOTIFICATION-TYPE macro's 
+		 DESCRIPTION clause.
+
+		 In all cases, the object identifier defined by the corresponding standard (i.e.  
+		 TMN specification) should be used as specified in the corresponding standard.  
+		 Private values of the probable cause may also be defined in OBJECT-IDENTITY 
+		 macros within a private or enterprise module definition.  Where possible, 
+		 however, a standard values should be used."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : probableCause"
+	::= { tmnNotifObjects 1 }
+
+specificProblem OBJECT-TYPE
+	SYNTAX SpecificProblems
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"This is a specific problem of an alarm condition in accordance with the TMN SMI 
+		 definitions.  It is an optional parameter of the communicationsAlarm and may 
+		 occur multiply in that notification when an alarm condition is set (it is not 
+		 normally included when an alarm condition is cleared).  This is a specific 
+		 problem indication that supplements the probable cause.  It contains a single 
+		 object identity which indiates the specific problem in accordance with the 
+		 SpecificProblems textual convention.
+
+		 The meaning and purpose of the object identifiers that are used to populate 
+		 this parameter for the communicationsAlarm notification must be specified in 
+		 the DESCRIPTION clause of an OBJECT-IDENTITY macro defining the object 
+		 identifier associated with the specific problem.  The precise conditions under 
+		 which the alarm is raised and cleared (see perceivedSeverity) must also be 
+		 defined in the DESCRIPTION clause whenever the value is used to raise generic 
+		 alarms such as the communicationsAlarm.  When used with a specific 
+		 notification, the use of the specific problem parameter must be defined in the 
+		 NOTIFICATION-TYPE macro's DESCRIPTION clause.
+
+		 In all cases, the object identifier defined by the corresponding standard (i.e. 
+		 TMN specification) should be used as specified in the corresponding standard.  
+		 Private values of the specific problem may also be defined in OBJECT-IDENTITY 
+		 marcos within a private or enterprise module definition.  Where possible, 
+		 however, standard values should be used."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : specificProblems"
+	::= { tmnNotifObjects 2 }
+
+perceivedSeverity OBJECT-TYPE
+	SYNTAX		PerceivedSeverity
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"This is the perceived severity level which is set according to the 
+		 PerceiveSeverity textual convention.  This value is used along with a 
+		 probableCause and specificProblem identifiers with a generic alarm such as the 
+		 communicationsAlarm, or is used with a specifically defined alarm.  The value 
+		 of the parameter to the notification should be set to other than cleared(5) to 
+		 indicate that onset or assertion of an alarm condition and set tot cleared(5) 
+		 to indicate the cessation or deassertion of the alarm condition.
+		 
+		 The DESCRIPTION of the OBJECT-IDENTITY associated with this perceived severity, 
+		 such as the probableCause paraemter, should describe the conditions under which 
+		 the alarm is asserted and cleared, as well a specifying the applicable 
+		 severities."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : perceivedSeverity"
+	::= { tmnNotifObjects 3 }
+
+securityAlarmCause OBJECT-TYPE
+	SYNTAX		SecurityAlarmCause
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"This is the security alarm cause of the security alarm condition in accordance 
+		 with TMN SMI defintions.  The security alarm cause is a required parameter of 
+		 the intergrityViolation, operationalViolation, physicalViolation, 
+		 securityServiceOrMechanismViolation, and timeDomainViolation notifications.  It 
+		 contains an object identity which indicates the cause of the alarm in 
+		 accordance with SecurityAlarmCause textual convention.
+
+		 The meaning and purpose of object identifiers that are used to populate this 
+		 parameter for these alarm notifications must be specified in the DESCRIPTION 
+		 clause of an OBJECT-IDENTITY macro defining the object identifier associated 
+		 with the security alarm cause.  The precise conditions under which the alarm is 
+		 raised and cleared (see perceivedSeverity) must also be defined in the 
+		 DESCRIPTION clause whenever the value is used to raise generic alarms such as 
+		 the integrityViolation.  When used with a specific notification, the use of the 
+		 security alarm cause parameter must be defined in the NOTIFICATION-TYPE marco's 
+		 DESCRIPTION clause.
+
+		 In all cases, the object identifier defined by the corresponding standard (i.e. 
+		 TMN specification) should be used as specified in the corresponding standard.  
+		 Private values of the probable cuase may also be defined in OBJECT-IDENTITY 
+		 marcos within a private or enterprise module definition.  Where possible, 
+		 however, a standard value should be used."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : securityAlarmCause"
+	::= { tmnNotifObjects 4 }
+
+securityAlarmSeverity OBJECT-TYPE
+	SYNTAX		SecurityAlarmSeverity
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"This is the same as perceivedSeverity but for security alarms.  Security alarms 
+		 do not clear and this has no cleared(5) value."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : securityAlarmSeverity"
+	::= { tmnNotifObjects 5 }
+
+securityAlarmDetector OBJECT-TYPE
+	SYNTAX		SecurityAlarmDetector
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"This is an identifier of the detector following the SecurityAlarmDetector 
+		 textual convention."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : securityAlarmDetector"
+	::= { tmnNotifObjects 6 }
+
+serviceUser OBJECT-TYPE
+	SYNTAX		ServiceUser
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"This is the identification of the service user following the ServiceUser 
+		 textual convention."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : serviceUser"
+	::= { tmnNotifObjects 7 }
+
+serviceProvider OBJECT-TYPE
+	SYNTAX		ServiceProvider
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"This is the identification of the service provider following the ServiceProvider 
+		 textual convention."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : serviceProvider"
+	::= { tmnNotifObjects 8 }
+
+sourceIndicator OBJECT-TYPE
+	SYNTAX		SourceIndicator
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"This is the source indicator which indicates the source of the change for 
+		 notifications according to the SourceIndicator textual convention.
+		 
+		 This is optionally added tot he attributeValueChange, objectCreation, 
+		 objectDeletion, relationshipChange or stateChange notifications."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : sourceIndicator"
+	::= { tmnNotifObjects 9 }
+
+additionalText OBJECT-TYPE
+	SYNTAX		AdditionalText
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"This is the additional text for an alarm notification following the 
+		 AdditionalText textual convention."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : additionalText"
+	::= { tmnNotifObjects 10 }
+
+additionalInformation OBJECT-TYPE
+	SYNTAX		AdditionalInformation
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"This is the additional information for an alarm notification following the 
+		 AdditionalInformation textual convention."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : additionalInformation"
+	::= { tmnNotifObjects 11 }
+
+objectInstance OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"This is a pointer to an object instance to be included in notifications where 
+		 the generating object instances needs be included."
+	REFERENCE
+		"ITU-T Recommendation X.721 (1992) : Pointer"
+	::= { tmnNotifObjects 12 }
+
+-- ====================================================================
+--
+-- TABLES
+--
+-- ====================================================================
+--
+-- NOTE: TMN has a mechanism for mapping perceived severities.  This 
+-- could be accomplished by the manager; however, it is possible for the 
+-- manager to create a table of mappings and that is presented here.
+--
+
+tmnSeverityMappingTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF TmnSeverityMappingEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is severity mapping table that can be used to arbitrarily map the severity 
+		 of an alarm to another severity.  It is similar to the TMN capability."
+	REFERENCE	"ITU-T Recommendation X.721 (1992)"
+	::= { tmnSeverityMapping 1 }
+
+tmnSeverityMappingEntry OBJECT-TYPE
+	SYNTAX		TmnSeverityMappingEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is an entry in the severity mapping table.  It is indexed from a probable 
+		 cause and also by a perceived severity.  This permits each probable cause, 
+		 specific problem and severity value to be mapped to a new severity value."
+	INDEX		{ tmnProbableCause, tmnSpecificProblem, tmnPerceivedSeverity }
+	::= { tmnSeverityMappingTable 1 }
+
+TmnSeverityMappingEntry ::=
+	SEQUENCE {
+		tmnProbableCause		ProbableCause,
+		tmnSpecificProblem		SpecificProblems,
+		tmnOriginalPerceivedSeverity	PerceivedSeverity,
+		tmnReplacementPerceivedSeverity	PerceivedSeverity,
+		tmnSeverityMappingStatus	RowStatus
+	}
+
+tmnProbableCause OBJECT-TYPE
+	SYNTAX		ProbableCause
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the probable cause which is the primary alarm type as an index into 
+		 the mapping table."
+	::= { tmnSeverityMappingEntry 1 }
+
+tmnSpecificProblem OBJECT-TYPE
+	SYNTAX		SpecificProblem
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the sepcific problem (or zeroDotZero for no or any specific problem)
+		 as an index into the mapping table."
+	DEFVAL		{ zeroDotZero }
+	::= { tmnSeverityMappingEntry 2 }
+
+tmnOriginalPerceivedSeverity OBJECT-TYPE
+	SYNTAX		PerceivedSeverity
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the original perceived severity as an index into the mapping table.  
+		 The value cleared(5) will be refused.  The value indeterminate(0) means any 
+		 severity if no other value exists."
+	DEFVAL		{ indeterminate(0) }
+	::= { tmnSeverityMappingEntry 3 }
+
+tmnReplacementPerceivedSeverity OBJECT-TYPE
+	SYNTAX		PerceivedSeverity
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the replacement perceived severity for this entry."
+	::= { tmnSeverityMappingEntry 4 }
+
+tmnSeverityMappingStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism for management stations to add and delete entries from 
+		 this table in accordance with the RowStatus textual convention."
+	::= { tmnSeverityMappingEntry 5 }
+
+
+-- ====================================================================
+
+tmnAlarmSummaryTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF TmnAlarmSummaryEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The alarm summary table provides a summary of 
+		 oustanding alarms generated by the agent that have not 
+		 yet been cleared."
+	::= { tmnAlarmSummary 1 }
+
+tmnAlarmSummaryEntry OBJECT-TYPE
+	SYNTAX		TmnAlarmSummaryEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an alarm summary entry which represents an alarm generated by an 
+		 object which remains outstanding.  The entry is indexed by the objectInstance 
+		 which identifies the managed object generating the alarm, and the alarm 
+		 identifier which is a combination of ProbableCause and SpecificProblem.  If no 
+		 specific problem was specified, the value zeroDotZero is used for the the 
+		 specific problem."
+	INDEX	{
+			tmnAlarmSummaryPerceivedSeverity,
+			tmnAlarmSummaryTimeStamp,
+			tmnAlarmSummaryAlarmType,
+			tmnAlarmSummaryProbableCause,
+			tmnAlarmSummarySpecificProblem
+		}
+	::= { tmnAlarmSummaryTable 1 }
+
+TmnAlarmSummaryEntry ::=
+	SEQUENCE {
+		tmnAlarmSummaryPerceivedSeverity    PerceivedSeverity,
+		tmnAlarmSummaryTimeStamp	    TimeStamp,
+		tmnAlarmSummaryAlarmType	    AlarmType,
+		tmnAlarmSummaryProbableCause	    ProbableCause,
+		tmnAlarmSummarySpecificProblem	    SpecificProblem,
+		tmnAlarmSummaryObjectInstance	    RowPointer
+	}
+
+tmnAlarmSummaryPerceivedSeverity OBJECT-TYPE
+	SYNTAX		PerceivedSeverity
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Provides the mapped perceived severity of the alarm associated with this 
+		 instance of an alarm in this table which is outstanding using the 
+		 PerceivedSeverity textual convention.
+
+		 Management stations may set this value to a different severity level to upgrade 
+		 or downgrade the perceived severity.  Values set will not survive an agent 
+		 reboot."
+	REFERENCE
+		"OPENSS7-TMN-TC PerceivedSeverity"
+	::= { tmnAlarmSummaryEntry 1 }
+
+tmnAlarmSummaryTimeStamp OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides a time stamp of the time at which the alarm was raised following the 
+		 TimeStamp textual convention."
+	::= { tmnAlarmSummaryEntry 2 }
+
+tmnAlarmSummaryAlarmType OBJECT-TYPE
+	SYNTAX		AlarmType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides an alarm type object identifier, using the AlarmType textual 
+		 convention, which is the registration of one of the alarm norification 
+		 generated by this module: communicationsAlarm, environmentalAlarm, 
+		 equipmentAlarm, processingErrorAlarm, or qualityofSerivceAlarm.  Security 
+		 alarms are not included in this table.
+		 "
+	::= { tmnAlarmSummaryEntry 3 }
+
+tmnAlarmSummaryProbableCause OBJECT-TYPE
+	SYNTAX		ProbableCause
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the probable cause for this instance of an alarm in this table which 
+		 is outstanding using the ProbableCause textual convention."
+	REFERENCE
+		"OPENSS7-TMN-TC ProbableCause"
+	::= { tmnAlarmSummaryEntry 4 }
+
+tmnAlarmSummarySpecificProblem OBJECT-TYPE
+	SYNTAX		SpecificProblem
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the specific problem associated with the probable cause for this 
+		 instance of an alarm in this table which is outstanding using the 
+		 SpecificProblem textual convention.  If no specific problem was associated with 
+		 the probable cause for this alarm instance, the value of this column is 
+		 zeroDotZero."
+	REFERENCE
+		"OPENSS7-TMN-TC SpecificProblem"
+	::= { tmnAlarmSummaryEntry 5 }
+
+tmnAlarmSummaryObjectInstance OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the object instance that generated an alarm in this table which is 
+		 outstanding using the RowPointer textual convention.  Note that if the agent 
+		 deletes this row from the corresponding table, the agent alarm must remove the 
+		 alarm from this table as well."
+	::= { tmnAlarmSummaryEntry 6 }
+
+--
+--  Scalars for alarm summary.
+--
+
+tmnAlarmOutstanding OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides a pointer to the oldest outstanding highest severity alarm in the 
+		 alarm summary table using the RowPointer textual convention, or zeroDotZero if 
+		 there is no oustanding alarm."
+	::= { tmnScalars 1 }
+
+tmpAlarmOutstandingCritical OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides a pointer to the oldest outstanding critical alarm in the alarm 
+		 summary table using the RowPointer textual convention, or zeroDotZero if there 
+		 is no oustanding critical alarm."
+	::= { tmnScalars 2 }
+
+tmpAlarmOutstandingMajor OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides a pointer to the oldest outstanding major alarm in the alarm 
+		 summary table using the RowPointer textual convention, or zeroDotZero if there 
+		 is no oustanding major alarm."
+	::= { tmnScalars 3 }
+
+tmpAlarmOutstandingMinor OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides a pointer to the oldest outstanding minor alarm in the alarm 
+		 summary table using the RowPointer textual convention, or zeroDotZero if there 
+		 is no oustanding minor alarm."
+	::= { tmnScalars 4 }
+
+
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
