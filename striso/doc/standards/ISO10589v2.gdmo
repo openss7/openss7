@@ -1,0 +1,2520 @@
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Include "ISO10733.gdmo" >--
+--< GDMO.Document "ISO/IEC 10589: 2001" >--
+--< GDMO.Alias "ISO/IEC 10589: 2001"
+--  "ISO 10589: 2001",
+--  "ISO/IEC 10589",
+--  "ISIS" >--
+--< GDMO.Version 1.3 >--
+--< GDMO.Copyright
+--  =============================================================================
+--  
+--  @(#) $RCSfile: ISO10589v2.gdmo,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/29 14:40:02 $
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--  
+--  All Rights Reserved.
+--  
+--  This program is free software; you can redistribute it and/or modify it under
+--  the terms of the GNU General Public License as published by the Free Software
+--  Foundation; version 3 of the License.
+--  
+--  This program is distributed in the hope that it will be useful, but WITHOUT
+--  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+--  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+--  details.
+--  
+--  You should have received a copy of the GNU General Public License along with
+--  this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+--  Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+--  behalf of the U.S. Government ("Government"), the following provisions apply
+--  to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+--  is classified as "Commercial Computer Software" under paragraph 252.227-7014
+--  of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+--  successor regulations) and the Government is acquiring only the license rights
+--  granted herein (the license rights customarily provided to non-Government
+--  users).  If the Software is supplied to any unit or agency of the Government
+--  other than DoD, it is classified as "Restricted Computer Software" and the
+--  Government's rights in the Software are defined in paragraph 52.227-19 of the
+--  Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+--  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+--  (or any successor regulations).
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Commercial licensing and support of this software is available from OpenSS7
+--  Corporation at a fee.  See http://www.openss7.com/
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Last Modified $Date: 2007/09/29 14:40:02 $ by $Author: brian $
+--  
+--  =============================================================================
+--  >--
+MODULE "ISO/IEC 10589: 2001"
+--11 System management
+--11.1 General
+--The operation of the Intra-domain ISIS routeing functions may
+--be monitored and controlled using System Management. This
+--clause is the management specification for this International
+--Standard in the GDMO notation as defined in ISO/IEC 10165-4.
+--Generic managed object and attribute definitions are imported
+--from ISO/IEC 10165-5 and from ISO/IEC 10733.
+--The containment hierarchy for this International Standard is
+--illustrated below in figure 8.
+--Annex E contains a number of definitions which are intended to
+--be incorporated in ISO/IEC 10165-5. In those cases where a
+--GDMO imported definition cannot be found by consulting
+--ISO/IEC 10165-5, or conflicts with the definition in Annex E, the
+--definition in Annex E shall be used.
+--11.2 GDMO definition
+--11.2.1 Common GDMO definitions
+--11.2.1.1 Behaviours
+
+supplyValueOnCreate-B BEHAVIOUR
+	DEFINED AS
+		Value is supplied either by the protocol machine if the MO is automatically created, or supplied
+		via the CREATE Operation. The value cannot be changed thereafter.;
+
+
+resettingTimer-B BEHAVIOUR
+	DEFINED AS
+		This attribute specifies the interval between certain events in the operation of the protocol state
+		machine. If the value of this attribute is changed to a new value while the protocol state machine
+		is in operation, the implementation shall take the necessary steps to ensure that for any time
+		interval which was in progress when the corresponding attribute was changed, the next expiration of
+		the that interval takes place the specified time after the original start of that interval, or
+		immediately, whichever is later. The precision with which this time shall be implemented shall be
+		the same as that associated with the basic operation of the timer attribute;
+
+
+resettingHoldingTimer-B BEHAVIOUR
+	DEFINED AS
+		This attribute specifies the interval between certain events in the operation of the protocol state
+		machine. If the value of this attribute is changed to a new value while the protocol state machine
+		is in operation, the implementation shall take the necessary steps to ensure that for any time
+		interval which was in progress when the corresponding attribute was changed, the next expiration of
+		that interval takes place no later than the expiration of the interval in progress or the specified
+		interval, whichever is sooner. The precision with which this time shall be implemented shall be the
+		same as that associated with the basic operation of the timer attribute;
+
+
+replaceOnlyWhileDisabled-B BEHAVIOUR
+	DEFINED AS
+		This attribute shall only permit the REPLACE operation to be performed on it while the MO is in the
+		Disabled Operational State. An attempt to perform a REPLACE operation while the MO is in the
+		Enabled Operation State shall fail with the generation of the constraintViolation specific error.;
+
+
+resourceLimiting-B BEHAVIOUR
+	DEFINED AS
+		This attribute places limits on some "resource". In general implementations may allocate resources
+		up to this limit when the managed object is enabled and it may be impossible to change the
+		allocation without first disabling and re-enabling the managed object. Therefore this International
+		Standard only requires that it shall be possible to perform a REPLACE operation on this attribute
+		while the MO is disabled. However some implementations may be able to change the allocation of
+		resources without first disabling the MO. In this case it is permitted to increase the value of the
+		attribute at any time, but it shall not be decreased below the currently "used" value of the
+		resource. Where an attempt to perform a REPLACE operation fails either because the MO is enabled,
+		or because an attempt has been made to decrease the value, the REPLACE operation shall fail with
+		the generation of the constraintViolation specific error.;
+--11.2.1.2 Common attributes
+
+
+addressPrefix ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.AddressPrefix;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		addressPrefix-B BEHAVIOUR
+			DEFINED AS
+				An Area Address of a destination area or a prefix for a reachable address;;
+REGISTERED AS { ISIS.aoi addressPrefix(98) };
+
+
+authenticationFailures ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		authenticationFailures-B BEHAVIOUR
+			DEFINED AS
+				Count of authentication Failure events;;
+REGISTERED AS { ISIS.aoi authenticationFailures(117) };
+
+
+networkEntityTitle ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.NAddress;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { ISIS.aoi networkEntityTitle(88) };
+--11.2.1.3 Common parameters
+
+
+constraintViolation PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX ISIS.Null;
+	BEHAVIOUR
+		constraintViolation-B BEHAVIOUR
+			DEFINED AS
+				The specific error returned on failure of a REPLACE operation when the MO prohibits such operations
+				under certain conditions, for example while the MO is in the disabled operational state.;;
+REGISTERED AS { ISIS.proi constraintViolation(10) };
+
+
+notificationReceivingAdjacency PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ISIS.LocalDistinguishedName;
+	BEHAVIOUR
+		notificationReceivingAdjacency-B BEHAVIOUR
+			DEFINED AS
+				The local managed object name of the adjacency upon which the NPDU was received;;
+REGISTERED AS { ISIS.proi notificationReceivingAdjacency(11) };
+
+
+notificationIDLength PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ISIS.IDLength;
+	BEHAVIOUR
+		notificationIDLength-B BEHAVIOUR
+			DEFINED AS
+				The IDLength specified in the ignored PDU;;
+REGISTERED AS { ISIS.proi notificationIDLength(12) };
+
+
+notificationAreaAddress PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ISIS.AreaAddress;
+	BEHAVIOUR
+		notificationAreaAddress-B BEHAVIOUR
+			DEFINED AS
+				The Area Address which caused MaximumAreaAddresses to be exceeded;;
+REGISTERED AS { ISIS.proi notificationAreaAddress(13) };
+
+
+notificationAreaAddresses PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ISIS.AreaAddresses;
+	BEHAVIOUR
+		notificationAreaAddresses-B BEHAVIOUR
+			DEFINED AS
+				The set of Area Address from the neighbour's IIH PDU;;
+REGISTERED AS { ISIS.proi notificationAreaAddresses(29) };
+
+
+notificationSourceId PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ISIS.SourceId;
+	BEHAVIOUR
+		notificationSourceId-B BEHAVIOUR
+			DEFINED AS
+				The source ID of the LSP;;
+REGISTERED AS { ISIS.proi notificationSourceId(14) };
+
+
+notificationMaximumAreaAddresses PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ISIS.MaximumAreaAddresses;
+	BEHAVIOUR
+		notificationMaximumAreaAddresses-B BEHAVIOUR
+			DEFINED AS
+				The maximum area addresses field of the received PDU;;
+REGISTERED AS { ISIS.proi notificationMaximumAreaAddresses(28) };
+
+
+notificationVirtualLinkChange PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ISIS.VirtualLinkChange;
+	BEHAVIOUR
+		notificationVirtualLinkChange-B BEHAVIOUR
+			DEFINED AS
+				This indicates whether the event was generated as a result of the creation or deletion of a Virtual
+				Link between two Level 2 Intermediate Systems.;;
+REGISTERED AS { ISIS.proi notificationVirtualLinkChange(15) };
+
+
+notificationVirtualLinkAddress PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ISIS.NAddress;
+	BEHAVIOUR
+		notificationVirtualLinkAddress-B BEHAVIOUR
+			DEFINED AS
+				The Network Entity Title of the Level 2 Intermediate System at the remote end of the virtual link;;
+REGISTERED AS { ISIS.proi notificationVirtualLinkAddress(16) };
+
+
+notificationSystemId PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ISIS.SystemId;
+	BEHAVIOUR
+		notificationSystemId-B BEHAVIOUR
+			DEFINED AS
+				The system ID of the source system generating the notification;;
+REGISTERED AS { ISIS.proi notificationSystemId(19) };
+
+
+notificationVersion PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ISIS.Version;
+	BEHAVIOUR
+		notificationVersion-B BEHAVIOUR
+			DEFINED AS
+				The version number reported by the other system;;
+REGISTERED AS { ISIS.proi notificationVersion(23) };
+
+
+notificationDesignatedIntermediateSystemChange PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ISIS.DesignatedISChange;
+	BEHAVIOUR
+		notificationDesignatedIntermediateSystemChange-B BEHAVIOUR
+			DEFINED AS
+				The direction of the change in Designated Intermediate System status of this system;;
+REGISTERED AS { ISIS.proi notificationDesignatedIntermediateSystemChange(24) };
+
+
+notificationOverloadStateChange PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ISIS.OverloadStateChange;
+	BEHAVIOUR
+		notificationOverloadStateChange-B BEHAVIOUR
+			DEFINED AS
+				The direction of the change in Overload status;;
+REGISTERED AS { ISIS.proi notificationOverloadStateChange(25) };
+
+
+reservedName PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX ISIS.Null;
+	BEHAVIOUR
+		reservedName-B BEHAVIOUR
+			DEFINED AS
+				The specific error returned on failure of a create operation using a name reserved for other
+				purposes.;;
+REGISTERED AS { ISIS.proi reservedName(27) };
+
+
+notificationLSPHeader PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ISIS.OctetString;
+	BEHAVIOUR
+		notificationLSPHeader-B BEHAVIOUR
+			DEFINED AS
+				The header of the LSP;;
+REGISTERED AS { ISIS.proi notificationLSPHeader(28) };
+--11.2.2 Conditional packages attached to objects defined in ISO/IEC 10733
+--11.2.2.1 Basis ISIS package attached to cLNS managed object
+
+
+cLNSISISBasic-P PACKAGE
+	BEHAVIOUR
+		cLNSISISBasicImportedAlarmNotifications-B BEHAVIOUR
+			DEFINED AS
+				Imports the communicationsAlarm notification from ISO/IEC 10165-2. It is used to report the
+				following protocol events: pDUDiscard: Generated when an 8473 data PDU is discarded. In addition to
+				the parameters specified by ISO/IEC 10733, the local adjacencyId of the adjacency upon which the
+				NPDU was received shall be reported in the additionalInformation field using the
+				notificationReceivingAdjacency parameter. The significance sub-parameter of each item of
+				additionalInformation shall be set to the value "false" (i.e. not significant) so that a managing
+				system receiving the event report will be less likely to reject it. lSPL1DatabaseOverload:
+				Generated when the l1State of the system changes between On and Waiting or Waiting and On. The
+				resulting state, shall be reported in the additionalInformation field using the
+				notificationOverloadStateChange parameter and in the case of Waiting the SourceId of the LSP which
+				precipitated the overload shall be reported in the additionalInformation field using the
+				notificationSourceId parameter. The significance sub-parameter of each item of
+				additionalInformation shall be set to the value "false" (i.e. not significant) so that a managing
+				system receiving the event report will be less likely to reject it. The value
+				ISIS.lSPL1DatabaseOverload shall be reported in the specificProblems parameter. The probableCause
+				shall be set to NLM.resourceAtOrNearingCapacity. The perceivedSeverity shall be set to 'Major'. A
+				subsequent communicationsAlarm with a perceivedSeverity value of "Cleared" shall not be generated.
+				No other fields or parameters shall be used, with the exception of further parameters in the
+				additionalInformation field. The occurrence of this event shall be counted by the
+				lSPL1DatabaseOverloads counter. manualAddressDroppedFromArea: Generated when one of the
+				manualareaAddresses assigned to this system is ignored when computing partitionAreaAddresses or
+				areaAddresses because there are more than MaximumAreaAddresses distinct Area Addresses. The ignored
+				Area Address shall be reported in the additionalInformation field using the notificationAreaAddress
+				parameter. The significance sub-parameter of each item of additionalInformation shall be set to the
+				value "false" (i.e. not significant) so that a managing system receiving the event report will be
+				less likely to reject it. The event is generated once for each Area Address in manualAreaAddresses
+				which is dropped. It is not generated again for that Area Address until after it has been
+				reinstated into areaAddresses (i.e. it is only the action of dropping the Area Address and not the
+				state of being dropped, which causes the event to be generated). The value
+				ISIS.manualAddressDroppedFromArea shall be reported in the specificProblems parameter. The
+				probableCause shall be set to NLM.configurationOrCustomisationError. The perceivedSeverity shall be
+				set to 'Major'. A subsequent communicationsAlarm with a perceivedSeverity value of "Cleared" shall
+				not be generated. No other fields or parameters shall be used, with the exception of further
+				parameters in the additionalInformation field. The occurrence of this event shall be counted by the
+				manualAddressDroppedFromAreas counter. corruptedLSPDetected: Generated when a corrupted Link State
+				PDU is detected in memory. The value ISIS.corruptedLSPDetected shall be reported in the
+				specificProblems parameter. The probableCause shall be set to NLM.corruptData. The
+				perceivedSeverity shall be set to 'Minor'. A subsequent communicationsAlarm with a
+				perceivedSeverity value of "Cleared" shall not be generated. No other fields or parameters shall be
+				used, with the exception of further parameters in the additionalInformation field. The occurrence
+				of this event is counted by the corruptedLSPsDetected counter.
+				attemptToExceedMaximumSequenceNumber: Generated when an attempt is made to increment the sequence
+				number of an LSP beyond the maximum sequence number. The value
+				ISIS.attemptToExceedMaximumSequenceNumber shall be reported in the specificProblems parameter. The
+				probableCause shall be set to NLM.communicationsProtocolError. The perceivedSeverity shall be set
+				to 'Major'. A subsequent communicationsAlarm with a perceivedSeverity value of "Cleared" shall not
+				be generated. No other fields or parameters shall be used, with the exception of further parameters
+				in the additionalInformation field. The occurrence of this event is counted by the
+				attemptsToExceedMaximumSequenceNumber counter. iDFieldLengthMismatch: Generated when a PDU is
+				received with a different value for ID field length to that of the receiving Intermediate system.
+				The received ID LENGTH and SOURCE ID are reported in the additionalInformation field using the
+				notificationIDLength and notificationSourceId parameters respectively. The significance
+				sub-parameter of each item of additionalInformation shall be set to the value "false" (i.e. not
+				significant) so that a managing system receiving the event report will be less likely to reject it.
+				The value ISIS.iDFieldLengthMismatch shall be reported in the specificProblems parameter. The
+				probableCause shall be set to NLM.configurationOrCustomisationError. The perceivedSeverity shall be
+				set to 'Major'. A subsequent communicationsAlarm with a perceivedSeverity value of "Cleared" shall
+				not be generated. No other fields or parameters shall be used, with the exception of further
+				parameters in the additionalInformation field. The occurence of this event is counted by the
+				iDFieldLengthMismatches counter. maximumAreaAddressesMismatch: Generated when a PDU is received
+				with a different value for maximumAreaAddresses from that of the receiving Intermediate system. The
+				received Maximum Area Addresses and Source ID are reported in the additionalInformation field using
+				the notificationMaximumAreaAddresses and notificationSourceId parameters respectively. The
+				significance sub-parameter of each item of additionalInformation shall be set to the value "false"
+				(i.e. not significant) so that a managing system receiving the event report will be less likely to
+				reject it. The value ISIS.MaximumAreaAddressesMismatch shall be reported in the specificProblems
+				parameter. The probableCause shall be set to NLM.configurationOrCustomisationError. The
+				perceivedSeverity shall be set to 'Major'. A subsequent communicationsAlarm with a
+				perceivedSeverity value of "Cleared" shall not be generated. No other fields or parameters shall be
+				used, with the exception of further parameters in the additionalInformation field. The occurence of
+				this event is counted by the MaximumAreaAddressesMismatches counter. ownLSPPurge: Generated when a
+				zero aged copy of a system's own LSP is received from some other system. This represents an
+				erroneous attempt to purge the local system's LSP. The value ISIS.ownLSPPurge shall be reported in
+				the specificProblems parameter. The probableCause shall be set to NLM.communicationsProtocolError.
+				The perceivedSeverity shall be set to 'Minor'. A subsequent communicationsAlarm with a
+				perceivedSeverity value of "Cleared" shall not be generated. No other fields or parameters shall be
+				used, with the exception of further parameters in the additionalInformation field. The occurrence
+				of this event is counted by the ownLSPPurges counter. originatingLSPBufferSizeMismatch: Generated
+				when a Level 1 LSP or Level 2 LSP is received which is larger than the local value for
+				originatingL1LSPBufferSize or originatingL2LSPBufferSize respectively or when a Level 1 LSP or
+				Level2 LSP is received containing the originatingLSPBufferSize option and the value in the PDU
+				option field does not match the local value for originatingL1LSPBufferSize or
+				originatingL2LSPBufferSize respectively. The contents of the LSP header are reported in the
+				additionalInformation field using the notificationLSPHeader parameter. The significance
+				sub-parameter of each item of additionalInformation shall be set to False (i.e. not significant) so
+				that a managing system receiving the event report will be less likely to reject it. The value
+				ISIS.originatingLSPBufferSizeMismatch shall be reported in the specificProblems parameter. The
+				probable cause shall be set to NLM.configurationOrCustomisationError. The perceivedSeverity shall
+				be set to 'Minor'. A subsequent communicationsAlarm with a perceivedSeverity value of Cleared shall
+				not be generated. No other fields or parameters shall be used, with the exception of further
+				parameters in the additionalInformation field. The occurrence of this event is counted by the
+				originatingLSPBufferSizeMismatches counter. lSPTooLargeToPropagate: Generated when an attempt is
+				made to propagate an LSP PDU which is larger than the dataLinkBlockSize for a circuit. The contents
+				of the LSP header are reported in the additionalInformation field using the notificaitonLSPHeader
+				parameter. The significance sub-parameter of each item of additionalInformation shall be set to
+				False (i.e. not significant) so that a managing system receiving the event report will be less
+				likely to reject it. The value ISIS.lSPTooLargeToPropagate shall be reported in the
+				specificProblems parameter. The probable cause shall be set to
+				NLM.configurationOrCustomisationError. The perceivedSeverity shall be set to 'Major'. A subsequent
+				communicationsAlarm with a preceivedSeverity value of Cleared shall not be generated. No other
+				fields or parameters shall be used, with the exception of further parameters in the
+				additionalInformation field. The occurrence of this event is counted by the lSPTooLargeToPropagate
+				counter.;,
+		cLNSISISBasicImportedInfoNotifications-B BEHAVIOUR
+			DEFINED AS
+				Imports the communicationsInfomation notification from ISO/IEC 10165-5. It is used to report the
+				following protocol events. sequenceNumberSkip: Generated when the sequence number of an LSP is
+				incremented by more than one. The value ISIS.sequenceNumberSkip shall be reported in the
+				informationType parameter. No other fields or parameters shall be used, with the exception of
+				parameters in the informationData field. The occurrence of this event is counted by the
+				sequenceNumberSkips counter.;;
+	ATTRIBUTES
+		version
+			GET,
+		iSType
+			INITIAL VALUE DERIVATION RULE
+				supplyValueOnCreate-B
+			GET,
+		systemId
+			GET,
+		maximumPathSplits
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.maximumPathSplits-Default
+			GET-REPLACE,
+		minimumLSPTransmissionInterval
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.minimumLSPTransmissionInterval-Default
+			GET-REPLACE,
+		maximumLSPGenerationInterval
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.maximumLSPGenerationInterval-Default
+			GET-REPLACE,
+		minimumBroadcastLSPTransmissionInterval
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.minimumBroadcastLSPTransmissionInterval-Default
+			GET-REPLACE,
+		-- Note: this is defined for all Circuits, but would only be required if
+		-- one of them were a broadcast Circuit
+		completeSNPInterval
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.completeSNPInterval-Default
+			GET-REPLACE,
+		-- Note: this is defined for all linkages, but would only be required if
+		-- one of them were a broadcast linkage
+		originatingL1LSPBufferSize
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.originatingL1LSPBufferSize-Default
+			GET-REPLACE,
+		manualAreaAddresses
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.manualAreaAddresses-Default
+			GET
+			ADD-REMOVE,
+		maximumAreaAddresses
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.maximumAreaAddresses-Default
+			GET-REPLACE,
+		minimumLSPGenerationInterval
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.minimumLSPGenerationInterval-Default
+			GET-REPLACE,
+		pollESHelloRate
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.pollESHelloRate-Default
+			GET-REPLACE,
+		partialSNPInterval
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.partialSNPInterval-Default
+			GET-REPLACE,
+		waitingTime
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.waitingTime-Default
+			GET-REPLACE,
+		dRISISHelloTimer
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.dRISISHelloTimer-Default
+			GET-REPLACE,
+		l1State
+			GET,
+		areaAddresses
+			GET,
+		corruptedLSPsDetected
+			GET,
+		lSPL1DatabaseOverloads
+			GET,
+		manualAddressesDroppedFromArea
+			GET,
+		attemptsToExceedMaximumSequenceNumber
+			GET,
+		sequenceNumberSkips
+			GET,
+		ownLSPPurges
+			GET,
+		iDFieldLengthMismatches
+			GET,
+		maximumAreaAddressesMismatches
+			GET,
+		originatingLSPBufferSizeMismatches
+			GET,
+		lSPTooLargeToPropagate
+			GET;
+	ATTRIBUTE GROUPS
+		"Rec. X.723 | ISO/IEC 10165-5":counters
+			corruptedLSPsDetected
+			lSPL1DatabaseOverloads
+			manualAddressesDroppedFromArea
+			attemptsToExceedMaximumSequenceNumber
+			sequenceNumberSkips
+			ownLSPPurges
+			iDFieldLengthMismatches
+			maximumAreaAddressesMismatches,
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":state
+			l1State;
+	NOTIFICATIONS
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":communicationsAlarm
+			notificationAreaAddress
+			notificationIDLength
+			notificationMaximumAreaAddresses
+			notificationOverloadStateChange
+			notificationReceivingAdjacency
+			notificationSourceId
+			notificationSystemId
+			notificationLSPHeader
+			notificationlSPTooLargeToPropagate,
+		"Rec. X.723 | ISO/IEC 10165-5":communicationsInformation;
+REGISTERED AS { ISIS.poi cLNSISISBasic-P(1) };
+--11.2.2.2 Level 2 ISIS package attached to cLNS managed object
+
+
+cLNSISISLevel2-P PACKAGE
+	BEHAVIOUR
+		cLNSISISLevel2ImportedAlarmNotifications-B BEHAVIOUR
+			DEFINED AS
+				Imports the communicationsAlarm notification from ISO/IEC 10165-2. It is used to report the
+				following protocol events. lSPL2DatabaseOverload: generated when the L2State of the system changes
+				between On and Waiting or Waiting and On. The resulting state, shall be reported in the
+				additionalInformation field using the notificationOverloadStateChange parameter and in the case of
+				Waiting the SourceId of the LSP which precipitated the overload shall be reported in the
+				additionalInformation field using the notificationSourceId parameter. The significance
+				sub-parameter of each item of additionalInformation shall be set to the value "false" (i.e. not
+				significant) so that a managing system receiving the event report will be less likely to reject it.
+				The value ISIS.lSPL2DatabaseOverload shall be reported in the specificProblems parameter. The
+				probableCause shall be set to NLM.resourceAtOrNearingCapacity. The perceivedSeverity shall be set
+				to 'Major'. A subsequent communicationsAlarm with a perceivedSeverity value of "Cleared" shall not
+				be generated. No other fields or parameters shall be used, with the exception of further parameters
+				in the additionalInformation field. The occurence of this event shall be counted by the
+				lSPL2DatabaseOverloads counter.;;
+	ATTRIBUTES
+		originatingL2LSPBufferSize
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.originatingL2LSPBufferSize-Default
+			GET-REPLACE,
+		l2State
+			GET,
+		lSPL2DatabaseOverloads
+			GET;
+	ATTRIBUTE GROUPS
+		"Rec. X.723 | ISO/IEC 10165-5":counters
+			lSPL2DatabaseOverloads,
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":state
+			l2State;
+	NOTIFICATIONS
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":communicationsAlarm
+			notificationOverloadStateChange
+			notificationSourceId;
+REGISTERED AS { ISIS.poi cLNSISISLevel2-P(2) };
+--11.2.2.3 ISIS partition repair package attached to the cLNS managed object
+
+
+cLNSISISPartitionRepair-P PACKAGE
+	BEHAVIOUR
+		cLNSISISPartitionRepair-P-ImportedInfoNotifications-B BEHAVIOUR
+			DEFINED AS
+				Imports the communicationsInformation notification from ISO/IEC 10165-5. It is used to report the
+				following protocol events. partitionVirtualLinkChange: generated when a virtual link (for the
+				purposes of Level 1 partition repair) is either created or deleted. The direction of the change and
+				the networkEntityTitle of the corresponding virtual adjacency managed object are reported in the
+				communicationData field using the notificationVirtualLinkChange and notificationVirtualLinkAddress
+				parameters respectively. The value ISIS.partitionVirtualLinkChange shall be reported in the
+				informationType parameter. No other fields or parameters shall be used, with the exception of
+				further parameters in the informationData field. The relative order of events relating to the same
+				Virtual Link must be preserved. The occurrence of this event is counted by the
+				partitionVirtualLinkChanges counter.;;
+	ATTRIBUTES
+		maximumVirtualAdjacencies
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.maximumVirtualAdjacencies-Default
+			GET-REPLACE,
+		partitionAreaAddresses
+			GET,
+		partitionDesignatedL2IntermediateSystem
+			GET,
+		partitionVirtualLinkChanges
+			GET;
+	ATTRIBUTE GROUPS
+		"Rec. X.723 | ISO/IEC 10165-5":counters
+			partitionVirtualLinkChanges;
+	NOTIFICATIONS
+		"Rec. X.723 | ISO/IEC 10165-5":communicationsInformation
+			notificationVirtualLinkChange
+			notificationVirtualLinkAddress;
+REGISTERED AS { ISIS.poi cLNSISISPartitionRepair-P(3) };
+--11.2.3 ISIS authentication package attached to the cLNS managed object
+
+
+cLNSISISAuthentication-P PACKAGE
+	BEHAVIOUR
+		cLNSISISAuthentication-P-ImportedAlarmNotifications-B BEHAVIOUR
+			DEFINED AS
+				Imports the communicationsAlarm notification from ISO/IEC 10165-2. It is used to report the
+				following protocol events. authenticationFailure: generated when a PDU is received with an
+				incorrect Authentication information field. The SystemId of the source system shall be reported in
+				the additionalInformation field using the notificationSystemId parameter. The significance
+				sub-parameter of each item of additionalInformation shall be set to the value "false" (i.e. not
+				significant) so that a managing system receiving the event report will be less likely to reject it.
+				The value ISIS.authenticationFailure shall be reported in the specificProblems parameter. The
+				probableCause shall be set to NLM.configurationOrCustomisationError. The perceivedSeverity shall be
+				set to 'Major'. A subsequent communicationsAlarm with a perceivedSeverity value of "Cleared" shall
+				not be generated. No other fields or parameters shall be used, with the exception of further
+				parameters in the additionalInformation field. The occurrence of this event is counted by the
+				authenticationFailures counter.;;
+	ATTRIBUTES
+		areaTransmitPassword
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.password-Default
+			GET-REPLACE,
+		areaReceivePasswords
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.passwords-Default
+			GET-REPLACE
+			ADD-REMOVE,
+		authenticationFailures
+			GET;
+	ATTRIBUTE GROUPS
+		"Rec. X.723 | ISO/IEC 10165-5":counters
+			authenticationFailures;
+	NOTIFICATIONS
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":communicationsAlarm
+			notificationSystemId;
+REGISTERED AS { ISIS.poi cLNSISISAuthentication-P(4) };
+--11.2.3.1 ISIS Level 2 Authentication package attached to the cLNS managed object
+
+
+cLNSISISLevel2Authentication-P PACKAGE
+	ATTRIBUTES
+		domainTransmitPassword
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.password-Default
+			GET-REPLACE,
+		domainReceivePasswords
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.passwords-Default
+			GET-REPLACE
+			ADD-REMOVE;
+REGISTERED AS { ISIS.poi cLNSISISLevel2Authentication-P(5) };
+--11.2.4 Attributes of cLNS object added by conditional packages
+
+
+areaAddresses ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.AreaAddresses;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		areaAddresses-B BEHAVIOUR
+			DEFINED AS
+				The union of the sets of manualAreaAddresses reported in all Level 1 Link State PDUs received by
+				this Intermediate System;;
+REGISTERED AS { ISIS.aoi areaAddresses(18) };
+
+
+areaReceivePasswords ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.Passwords;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+	BEHAVIOUR
+		areaReceivePasswords-B BEHAVIOUR
+			DEFINED AS
+				The values to be used as receive passwords to check the receipt of Level 1 LSP, and SNP PDUs;;
+REGISTERED AS { ISIS.aoi areaReceivePasswords(112) };
+
+
+areaTransmitPassword ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.Password;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		areaTransmitPassword-B BEHAVIOUR
+			DEFINED AS
+				The value to be used as a transmit password in Level 1 LSP, and SNP PDUs transmitted by this
+				Intermediate System;;
+REGISTERED AS { ISIS.aoi areaTransmitPassword(111) };
+
+
+attemptsToExceedMaximumSequenceNumber ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		attemptsToExceedMaximumSequenceNumber-B BEHAVIOUR
+			DEFINED AS
+				Number of times the attemptToExceedMaximumSequenceNumber event has been generated;;
+REGISTERED AS { ISIS.aoi attemptsToExceedMaximumSequenceNumber(22) };
+
+
+completeSNPInterval ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":timer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		completeSNPInterval-B BEHAVIOUR
+			DEFINED AS
+				Interval between generation of Complete Sequence Numbers PDUs by a Designated Intermediate System
+				on a broadcast circuit;,
+		resettingTimer-B;
+REGISTERED AS { ISIS.aoi completeSNPInterval(8) };
+
+
+corruptedLSPsDetected ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		corruptedLSPsDetected-B BEHAVIOUR
+			DEFINED AS
+				Number of Corrupted LSP Detected events generated;;
+REGISTERED AS { ISIS.aoi corruptedLSPsDetected(19) };
+
+
+domainTransmitPassword ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.Password;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		domainTransmitPassword-B BEHAVIOUR
+			DEFINED AS
+				The value to be used as a transmit password in Level 2 LSP, and SNP PDUs transmitted by this
+				Intermediate System;;
+REGISTERED AS { ISIS.aoi domainTransmitPassword(113) };
+
+
+domainReceivePasswords ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.Passwords;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		domainReceivePasswords-B BEHAVIOUR
+			DEFINED AS
+				The values to be used as receive passwords to check the receipt of Level 2 LSP, and SNP PDUs;;
+REGISTERED AS { ISIS.aoi domainReceivePasswords(114) };
+
+
+dRISISHelloTimer ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":timer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		dRISISHelloTimer-B BEHAVIOUR
+			DEFINED AS
+				The interval between the generation of IIH PDUs by the designated IS on a LAN;,
+		resettingHoldingTimer-B;
+REGISTERED AS { ISIS.aoi dRISISHelloTimer(16) };
+
+
+iDFieldLengthMismatches ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		iDFieldLengthMismatches-B BEHAVIOUR
+			DEFINED AS
+				Number of times the iDFieldLengthMismatch event has been generated;;
+REGISTERED AS { ISIS.aoi iDFieldLengthMismatches(25) };
+
+
+iSType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.ISType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		iSType-B BEHAVIOUR
+			DEFINED AS
+				The type of this Intermediate System. The value of this attribute is only settable via the create
+				parameter;;
+REGISTERED AS { ISIS.aoi iSType(2) };
+
+
+l1State ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.DatabaseState;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		l1State-B BEHAVIOUR
+			DEFINED AS
+				The state of the Level 1 database;;
+REGISTERED AS { ISIS.aoi l1State(17) };
+
+
+l2State ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.DatabaseState;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		l2State-B BEHAVIOUR
+			DEFINED AS
+				The state of the Level 2 database;;
+REGISTERED AS { ISIS.aoi l2State(28) };
+
+
+lSPL1DatabaseOverloads ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		lSPL1DatabaseOverloads-B BEHAVIOUR
+			DEFINED AS
+				Number of times the l1LSPDatabaseOverload event has been generated;;
+REGISTERED AS { ISIS.aoi lSPL1DatabaseOverloads(20) };
+
+
+lSPL2DatabaseOverloads ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		lSPL2DatabaseOverloads-B BEHAVIOUR
+			DEFINED AS
+				Number of times the l2LSPDatabaseOverload event has been generated;;
+REGISTERED AS { ISIS.aoi lSPL2DatabaseOverloads(32) };
+
+
+manualAddressesDroppedFromArea ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		manualAddressesDroppedFromArea-B BEHAVIOUR
+			DEFINED AS
+				Number of times the manualAddressesDroppedFromArea event has been generated;;
+REGISTERED AS { ISIS.aoi manualAddressesDroppedFromArea(21) };
+
+
+manualAreaAddresses ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.AreaAddresses;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		manualAreaAddresses-B BEHAVIOUR
+			DEFINED AS
+				Area Addresses to be used for this Intermediate System. At least one value must be supplied. The
+				maximum number of Area Addresses which may exist in the set is MaximumAreaAddresses;;
+REGISTERED AS { ISIS.aoi manualAreaAddresses(10) };
+
+
+maximumAreaAddresses ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.MaximumAreaAddresses;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maximumAreaAddresses-B BEHAVIOUR
+			DEFINED AS
+				maximum number of area addresses to be permitted for this ISs area. Note that all ISs in the area
+				must have the same value configured for this attribute if correct operation is to be assured.;,
+		replaceOnlyWhileDisabled-B;
+	PARAMETERS
+		constraintViolation;
+REGISTERED AS { ISIS.aoi maximumAreaAddresses(4) };
+
+
+maximumAreaAddressesMismatches ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		maximumAreaAddressesMismatches-B BEHAVIOUR
+			DEFINED AS
+				Count of maximumAreaAddressesMismatch events.;;
+REGISTERED AS { ISIS.aoi maximumAreaAddressesMismatches(118) };
+
+
+maximumLSPGenerationInterval ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":timer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maximumLSPGenerationInterval-B BEHAVIOUR
+			DEFINED AS
+				Maximum interval between generated LSPs by this system;,
+		resettingTimer-B;
+REGISTERED AS { ISIS.aoi maximumLSPGenerationInterval(6) };
+
+
+maximumPathSplits ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.MaximumPathSplits;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maximumPathSplits-B BEHAVIOUR
+			DEFINED AS
+				Maximum number of paths which it is permitted to split traffic between;,
+		replaceOnlyWhileDisabled-B;
+	PARAMETERS
+		constraintViolation;
+REGISTERED AS { ISIS.aoi maximumPathSplits(3) };
+
+
+maximumVirtualAdjacencies ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.MaximumVirtualAdjacencies;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maximumVirtualAdjacencies-B BEHAVIOUR
+			DEFINED AS
+				Maximum number of Virtual Adjacencies which may be created to repair partitioned Level 1 domains;,
+		resourceLimiting-B;
+	PARAMETERS
+		constraintViolation;
+REGISTERED AS { ISIS.aoi maximumVirtualAdjacencies(27) };
+
+
+minimumBroadcastLSPTransmissionInterval ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":timer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		minimumBroadcastLSPTransmissionInterval-B BEHAVIOUR
+			DEFINED AS
+				Minimum interval between transmission of LSPs on a broadcast circuit (See clause 7.3.15.6). This
+				timer shall be capable of a resolution not coarser than 10 ms;,
+		resettingTimer-B;
+REGISTERED AS { ISIS.aoi minimumBroadcastLSPTransmissionInterval(7) };
+
+
+minimumLSPGenerationInterval ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":timer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		minimumLSPGenerationInterval-B BEHAVIOUR
+			DEFINED AS
+				Minimum interval between successive generation of LSPs with the same LSPID by this IS;,
+		resettingTimer-B;
+REGISTERED AS { ISIS.aoi minimumLSPGenerationInterval(11) };
+
+
+minimumLSPTransmissionInterval ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":timer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		minimumLSPTransmissionInterval-B BEHAVIOUR
+			DEFINED AS
+				Minimum interval between retransmissions of an LSP;,
+		resettingTimer-B;
+REGISTERED AS { ISIS.aoi minimumLSPTransmissionInterval(5) };
+
+
+originatingL1LSPBufferSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.OriginatingLSPBufferSize;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		originatingL1LSPBufferSize-B BEHAVIOUR
+			DEFINED AS
+				The maximum size of Level 1 LSPs and SNPs originated by this system;,
+		replaceOnlyWhileDisabled-B;
+	PARAMETERS
+		constraintViolation;
+REGISTERED AS { ISIS.aoi originatingL1LSPBufferSize(9) };
+
+
+originatingL2LSPBufferSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.OriginatingLSPBufferSize;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		originatingL2LSPBufferSize-B BEHAVIOUR
+			DEFINED AS
+				The maximum size of Level 2 LSPs and SNPs originated by this system;,
+		replaceOnlyWhileDisabled-B;
+	PARAMETERS
+		constraintViolation;
+REGISTERED AS { ISIS.aoi originatingL2LSPBufferSize(26) };
+
+
+ownLSPPurges ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		ownLSPPurges-B BEHAVIOUR
+			DEFINED AS
+				Number of times the ownLSPPurged event has been generated;;
+REGISTERED AS { ISIS.aoi ownLSPPurges(24) };
+
+
+partialSNPInterval ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":timer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		partialSNPInterval-B BEHAVIOUR
+			DEFINED AS
+				Minimum interval between sending Partial Sequence Number PDUs;,
+		resettingTimer-B;
+REGISTERED AS { ISIS.aoi partialSNPInterval(14) };
+
+
+partitionAreaAddresses ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.AreaAddresses;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		partitionAreaAddresses-B BEHAVIOUR
+			DEFINED AS
+				The set union of all manualAreaAddresses of all Intermediate systems in the partition reachable by
+				non-virtual links (calculated from their Level 1 LSPs);;
+REGISTERED AS { ISIS.aoi partitionAreaAddresses(29) };
+
+
+partitionDesignatedL2IntermediateSystem ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.SystemId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		partitionDesignatedL2IntermediateSystem-B BEHAVIOUR
+			DEFINED AS
+				The ID of the Partition Designated Level 2 Intermediate System for this system;;
+REGISTERED AS { ISIS.aoi partitionDesignatedL2IntermediateSystem(30) };
+
+
+partitionVirtualLinkChanges ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		partitionVirtualLinkChanges-B BEHAVIOUR
+			DEFINED AS
+				Number of times the partitionVirtualLink hange event has been generated;;
+REGISTERED AS { ISIS.aoi partitionVirtualLinkChanges(31) };
+
+
+pollESHelloRate ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":timer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		pollESHelloRate-B BEHAVIOUR
+			DEFINED AS
+				The value to be used for the suggested ES configuration timer in ISH PDUs when soliciting the ES
+				configuration;;
+REGISTERED AS { ISIS.aoi pollESHelloRate(13) };
+
+
+sequenceNumberSkips ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		sequenceNumberSkips-B BEHAVIOUR
+			DEFINED AS
+				Number of times the sequenceNumberSkipped event has been generated;;
+REGISTERED AS { ISIS.aoi sequenceNumberSkips(23) };
+
+
+systemId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.SystemId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		systemId-B BEHAVIOUR
+			DEFINED AS
+				The ID for the local system, to be appended to each of the system's area address(es) to form the
+				Network Entity Titles valid for this IS. The derivation of a value for SystemId is a local matter.;;
+REGISTERED AS { ISIS.aoi systemId(119) };
+
+
+version ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.Version;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		version-B BEHAVIOUR
+			DEFINED AS
+				The edition of this International Standard to which the implementation conforms;;
+REGISTERED AS { ISIS.aoi version(1) };
+
+
+waitingTime ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":timer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		waitingTime-B BEHAVIOUR
+			DEFINED AS
+				Amount of time to delay in waiting state before entering On state;,
+		resettingTimer-B;
+REGISTERED AS { ISIS.aoi waitingTime(15) };
+
+
+originatingLSPBufferSizeMismatches ATTRIBUTE
+	DERIVED FROM
+		"Rec. X. 723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		originatingLSPBufferSizeMismatches-B BEHAVIOUR
+			DEFINED AS
+				Count of originatingLSPBufferSizeMismatch events;;
+REGISTERED AS { ISIS.aoi originatingLSPBufferSizeMismatches(124) };
+
+
+lSPTooLargeToPropagate ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		lSPTooLargeTooPropagate-B BEHAVOUR
+			DEFINED AS
+				Count of lSPTooLargeToPropagate events;;
+REGISTERED AS { ISIS.aoi lSPTooLargeToPropagate(125) };
+--11.2.5 Conditional packages for linkage MO defined in ISO 10733
+--11.2.5.1 Basic ISIS linkage package
+
+
+linkageISISBasic-P PACKAGE
+	BEHAVIOUR
+		linkageISISBasicImportedAlarmNotifications-B BEHAVIOUR
+			DEFINED AS
+				Imports the communicationsAlarm notification from ISO/IEC 10165-2. It is used to report the
+				following protocol events. versionSkew: generated when an attempt to initialise with an adjacent
+				system fails as a result of the versions of the protocol are not compatible. The protocol version
+				field from the received PDU shall be reported in the additionalInformation field using the
+				notificationVersion parameter. The significance sub-parameter of each item of additionalInformation
+				shall be set to the value "false" (i.e. not significant) so that a managing system receiving the
+				event report will be less likely to reject it. The value ISIS.versionSkew shall be reported in the
+				specificProblems parameter. The probableCause shall be set to NLM.versionMismatch. The
+				perceivedSeverity shall be set to 'Major'. A subsequent communicationsAlarm with a
+				perceivedSeverity value of "Cleared" shall not be generated. No other fields or parameters shall be
+				used, with the exception of further parameters in the additionalInformation field. The occurrence
+				of this event is counted by the initialisationFailures counter. areaMismatch: generated when an
+				attempt to initialise with an adjacent system fails as a result of two level 1 ISs not sharing any
+				area addresses in common. The AREA ADDRESSES field and the ID field of the received PDU are
+				reported in the additionalInformation field using the notificationAreaAddresses and
+				notificationSystemId parameters respectively. The significance sub-parameter of each item of
+				additionalInformation shall be set to the value "false" (i.e. not significant) so that a managing
+				system receiving the event report will be less likely to reject it. The value ISIS.areaMismatch
+				shall be reported in the specificProblems parameter. The probableCause shall be set to
+				NLM.configurationOrCustomisationError. The perceivedSeverity shall be set to 'Major'. A subsequent
+				communicationsAlarm with a perceivedSeverity value of "Cleared" shall not be generated. No other
+				fields or parameters shall be used, with the exception of further parameters in the
+				additionalInformation field. The occurrence of this event is counted by the initialisationFailures
+				counter. rejectedAdjacency: generated when an attempt to create a new adjacency is rejected,
+				because of a lack of resources. The ID field of the received PDU is reported in the additionaldata
+				field using the notificationSystemId parameter. The value ISIS.rejectedAdjacency shall be reported
+				in the specificProblems parameter. The probableCause shall be set to
+				NLM.resourceAtOrNearingCapacity. The perceivedSeverity shall be set to 'Major'. A subsequent
+				communicationsAlarm with a perceivedSeverity value of "Cleared" shall not be generated. No other
+				fields or parameters shall be used, with the exception of further parameters in the
+				additionalInformation field. The occurrence of this event is counted by the rejectedAdjacencies
+				counter. iDFieldLengthMismatch: generated when a PDU is received with a different value for ID
+				field length to that of the receiving Intermediate system. The received ID LENGTH and SOURCE ID are
+				reported in the additionalInformation field using the notificationIDLength and notificationSourceId
+				parameters respectively. The significance sub-parameter of each item of additionalInformation shall
+				be set to the value "false" (i.e. not significant) so that a managing system receiving the event
+				report will be less likely to reject it. The value ISIS.iDFieldLengthMismatch shall be reported in
+				the specificProblems parameter. The probableCause shall be set to
+				NLM.configurationOrCustomisationError. The perceivedSeverity shall be set to 'Major'. A subsequent
+				communicationsAlarm with a perceivedSeverity value of "Cleared" shall not be generated. No other
+				fields or parameters shall be used, with the exception of further parameters in the
+				additionalInformation field. The occurence of this event is counted by the iDFieldLengthMismatches
+				counter. maximumAreaAddressesMismatch: generated when a PDU is received with a different value for
+				maximumAreaAddresses from that of the receiving Intermediate system. The received MAXIMUM AREA
+				ADDRESSES and SOURCE ID are reported in the additionalInformation field using the notification
+				maximumAreaAddresses and notificationSourceId parameters respectively. The significance
+				sub-parameter of each item of additionalInformation shall be set to the value "false" (i.e. not
+				significant) so that a managing system receiving the event report will be less likely to reject it.
+				The value ISIS.maximumAreaAddressesMismatch shall be reported in the specificProblems parameter.
+				The probableCause shall be set to NLM.configurationOrCustomisationError. The perceivedSeverity
+				shall be set to 'Major'. A subsequent communicationsAlarm with a perceivedSeverity value of
+				"Cleared" shall not be generated. No other fields or parameters shall be used, with the exception
+				of further parameters in the additionalInformation field. The occurence of this event is counted by
+				the maximumAreaAddressesMismatches counter.;;
+	ATTRIBUTES
+		type
+			INITIAL VALUE DERIVATION RULE
+				supplyValueOnCreate-B
+			GET,
+		iSISHelloTimer
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.iSISHelloTimer-Default
+			GET-REPLACE,
+		l1DefaultMetric
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.defaultMetric-Default
+			PERMITTED VALUES ISIS.DefaultMetric-Permitted
+			GET-REPLACE,
+		l1DelayMetric
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.optionalMetric-Default
+			GET-REPLACE,
+		l1ExpenseMetric
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.optionalMetric-Default
+			GET-REPLACE,
+		l1ErrorMetric
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.optionalMetric-Default
+			GET-REPLACE,
+		externalDomain
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.externalDomain-Default
+			GET-REPLACE,
+		changesInAdjacencyState
+			GET,
+		initialisationFailures
+			GET,
+		rejectedAdjacencies
+			GET,
+		iSISControlPDUsSent
+			GET,
+		iSISControlPDUsReceived
+			GET,
+		iDFieldLengthMismatches
+			GET,
+		maximumAreaAddressesMismatches
+			GET;
+	ATTRIBUTE GROUPS
+		"Rec. X.723 | ISO/IEC 10165-5":counters
+			changesInAdjacencyState
+			initialisationFailures
+			rejectedAdjacencies
+			iSISControlPDUsSent
+			iSISControlPDUsReceived
+			iDFieldLengthMismatches;
+	NOTIFICATIONS
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":communicationsAlarm
+			notificationAreaAddresses
+			notificationIDLength
+			notificationMaximumAreaAddresses
+			notificationSourceId
+			notificationSystemId
+			notificationVersion;
+REGISTERED AS { ISIS.poi linkageISISBasic-P(6) };
+--11.2.5.2 ISIS broadcast linkage package
+
+
+linkageISISBroadcast-P PACKAGE
+	BEHAVIOUR
+		linkageISISBroadcastImportedInfoNotifications-B BEHAVIOUR
+			DEFINED AS
+				Imports the communicationsInformation notification from ISO/IEC 10165-5. It is used to report the
+				following protocol events. lanL1DesignatedIntermediateSystemChange: generated when the local system
+				either elects itself or resigns as being the LAN L1 Designated Intermediate System on this circuit.
+				The direction of the change is reported in the communicationData field using the
+				notificationDesignatedIntermediateSystemChange parameter. The value
+				ISIS.lanL1DesignatedIntermediateSystemChange shall be reported in the informationType parameter. No
+				other fields or parameters shall be used, with the exception of further parameters in the
+				informationData field. The relative order of these events must be preserved. The occurrence of this
+				event is counted by the lanL1DesignatedIntermediateSystemChanges counter.;;
+	ATTRIBUTES
+		l1IntermediateSystemPriority
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.l1IntermediateSystemPriority-Default
+			GET-REPLACE,
+		l1CircuitID
+			GET,
+		l1DesignatedIntermediateSystem
+			GET,
+		lanL1DesignatedIntermediateSystemChanges
+			GET;
+	ATTRIBUTE GROUPS
+		"Rec. X.723 | ISO/IEC 10165-5":counters
+			lanL1DesignatedIntermediateSystemChanges;
+	NOTIFICATIONS
+		"Rec. X.723 | ISO/IEC 10165-5":communicationsInformation
+			notificationDesignatedIntermediateSystemChange;
+REGISTERED AS { ISIS.poi linkageISISBroadcast-P(7) };
+--11.2.5.3 ISIS point-to-point linkage package
+
+
+linkageISISPtToPt-P PACKAGE
+	ATTRIBUTES
+		ptPtCircuitID
+			GET;
+REGISTERED AS { ISIS.poi linkageISISPtToPt-P(8) };
+--11.2.5.4 ISIS call establishment metric increment linkage package
+
+
+linkageISISDACallEstablishmentMetricIncrement-P PACKAGE
+	BEHAVIOUR
+		linkageISISDACallEstablishmentMetricIncrement-P-B BEHAVIOUR
+			DEFINED AS
+				Present when values of call establishment metric increment greater than zero are supported and the
+				parent cLNS MO has iSType Level2;;
+	ATTRIBUTES
+		callEstablishmentDefaultMetricIncrement
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.callEstablishmentMetricIncrement-Default
+			GET-REPLACE,
+		callEstablishmentDelayMetricIncrement
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.callEstablishmentMetricIncrement-Default
+			GET-REPLACE,
+		callEstablishmentExpenseMetricIncrement
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.callEstablishmentMetricIncrement-Default
+			GET-REPLACE,
+		callEstablishmentErrorMetricIncrement
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.callEstablishmentMetricIncrement-Default
+			GET-REPLACE;
+REGISTERED AS { ISIS.poi linkageISISDACallEstablishmentMetricIncrement-P(9) };
+--11.2.5.5 ISIS static linkage package
+
+
+linkageISISStatic-P PACKAGE
+	ATTRIBUTES
+		outgoingCallIVMO
+			REPLACE-WITH-DEFAULT
+			GET-REPLACE,
+		ptPtCircuitID
+			GET,
+		neighbourSNPAAddress
+			REPLACE-WITH-DEFAULT
+			GET-REPLACE;
+REGISTERED AS { ISIS.poi linkageISISStatic-P(11) };
+--11.2.5.6 ISIS level 2 linkage package
+
+
+linkageISISLevel2-P PACKAGE
+	ATTRIBUTES
+		l2DefaultMetric
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.defaultMetric-Default
+			PERMITTED VALUES ISIS.DefaultMetric-Permitted
+			GET-REPLACE,
+		l2DelayMetric
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.optionalMetric-Default
+			GET-REPLACE,
+		l2ExpenseMetric
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.optionalMetric-Default
+			GET-REPLACE,
+		l2ErrorMetric
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.optionalMetric-Default
+			GET-REPLACE,
+		manualL2OnlyMode
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.manualL2OnlyMode-Default
+			GET-REPLACE;
+REGISTERED AS { ISIS.poi linkageISISLevel2-P(13) };
+--11.2.5.7 ISIS level 2 broadcast linkage package
+
+
+linkageISISLevel2Broadcast-P PACKAGE
+	BEHAVIOUR
+		linkageISISlevel2BroadcastImportedInfoNotifications-B BEHAVIOUR
+			DEFINED AS
+				Imports the communicationsInformation notification from ISO/IEC 10165-5. It is used to report the
+				following protocol events. lanL2DesignatedIntermediateSystemChange: generated when the local system
+				either elects itself or resigns as being the LAN L2 Designated Intermediate System on this circuit.
+				The direction of the change is reported in the communicationData field using the
+				notificationDesignatedIntermediateSystemChange parameter. The value
+				ISIS.lanL2DesignatedIntermediateSystemChange shall be reported in the informationType parameter. No
+				other fields or parameters shall be used, with the exception of further parameters in the
+				informationData field. The relative order of these events must be preserved. The occurrence of this
+				event is counted by the lanL2DesignatedIntermediateSystemChanges counter.;;
+	ATTRIBUTES
+		l2IntermediateSystemPriority
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.l2IntermediateSystemPriority-Default
+			GET-REPLACE,
+		l2CircuitID
+			GET,
+		l2DesignatedIntermediateSystem
+			GET,
+		lanL2DesignatedIntermediateSystemChanges
+			GET;
+	ATTRIBUTE GROUPS
+		"Rec. X.723 | ISO/IEC 10165-5":counters
+			lanL2DesignatedIntermediateSystemChanges;
+	NOTIFICATIONS
+		"Rec. X.723 | ISO/IEC 10165-5":communicationsInformation
+			notificationDesignatedIntermediateSystemChange;
+REGISTERED AS { ISIS.poi linkageISISLevel2Broadcast-P(14) };
+--11.2.5.8 ISIS linkage authentication package
+
+
+linkageISISAuthentication-P PACKAGE
+	BEHAVIOUR
+		linkageISISAuthentication-P-ImportedAlarmNotifications-B BEHAVIOUR
+			DEFINED AS
+				Imports the communicationsAlarm notification from ISO/IEC 10165-2. It is used to report the
+				following protocol events. authenticationFailure: generated when a PDU is received with an
+				incorrect Authentication information field. The SystemId of the source system is reported in the
+				additionalInformation field using the notificationSystemId parameter. The significance
+				sub-parameter of each item of additionalInformation shall be set to the value "false" (i.e. not
+				significant) so that a managing system receiving the event report will be less likely to reject it.
+				The value ISIS.authenticationFailure shall be reported in the specificProblems parameter. The
+				probableCause shall be set to NLM.configurationOrCustomisationError. The perceivedSeverity shall be
+				set to 'Major'. A subsequent communicationsAlarm with a perceivedSeverity value of "Cleared" shall
+				not be generated. No other fields or parameters shall be used, with the exception of further
+				parameters in the additionalInformation field. The occurrence of this event is counted by the
+				authenticationFailures counter.;;
+	ATTRIBUTES
+		circuitTransmitPassword
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.password-Default
+			GET-REPLACE,
+		circuitReceivePasswords
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.passwords-Default
+			GET-REPLACE
+			ADD-REMOVE,
+		authenticationFailures
+			GET;
+	ATTRIBUTE GROUPS
+		"Rec. X.723 | ISO/IEC 10165-5":counters
+			authenticationFailures;
+	NOTIFICATIONS
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":communicationsAlarm
+			notificationSystemId;
+REGISTERED AS { ISIS.poi linkageISISAuthentication-P(15) };
+--11.2.5.9 Attributes for the linkage MO from ISO 10733 added by ISIS conditional packages
+
+
+callEstablishmentDefaultMetricIncrement ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		callEstablishmentDefaultMetricIncrement-B BEHAVIOUR
+			DEFINED AS
+				Additional value to be reported for the default metric value of unestablished DA adjacencies;;
+REGISTERED AS { ISIS.aoi callEstablishmentDefaultMetricIncrement(52) };
+
+
+callEstablishmentDelayMetricIncrement ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		callEstablishmentDelayMetricIncrement-B BEHAVIOUR
+			DEFINED AS
+				Additional value to be reported for the delay metric value of unestablished DA adjacencies;;
+REGISTERED AS { ISIS.aoi callEstablishmentDelayMetricIncrement(53) };
+
+
+callEstablishmentErrorMetricIncrement ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		callEstablishmentErrorMetricIncrement-B BEHAVIOUR
+			DEFINED AS
+				Additional value to be reported for the Error metric value of unestablished DA adjacencies;;
+REGISTERED AS { ISIS.aoi callEstablishmentErrorMetricIncrement(55) };
+
+
+callEstablishmentExpenseMetricIncrement ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		callEstablishmentExpenseMetricIncrement-B BEHAVIOUR
+			DEFINED AS
+				Additional value to be reported for the Expense metric value of unestablished DA adjacencies;;
+REGISTERED AS { ISIS.aoi callEstablishmentExpenseMetricIncrement(54) };
+
+
+changesInAdjacencyState ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		changesInAdjacencyState-B BEHAVIOUR
+			DEFINED AS
+				Number of Adjacency State Change events generated;;
+REGISTERED AS { ISIS.aoi changesInAdjacencyState(40) };
+
+
+circuitReceivePasswords ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.Passwords;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		circuitReceivePasswords-B BEHAVIOUR
+			DEFINED AS
+				The values to be used as receive passwords to check the receipt of IIH PDUs;;
+REGISTERED AS { ISIS.aoi circuitReceivePasswords(116) };
+
+
+circuitTransmitPassword ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.Password;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		circuitTransmitPassword-B BEHAVIOUR
+			DEFINED AS
+				The value to be used as a transmit password in IIH PDUs transmitted by this Intermediate System;;
+REGISTERED AS { ISIS.aoi circuitTransmitPassword(115) };
+
+
+externalDomain ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		externalDomain-B BEHAVIOUR
+			DEFINED AS
+				If TRUE, suppress normal transmission of and interpretation of Intra-domain ISIS PDUs on this
+				circuit.;;
+REGISTERED AS { ISIS.aoi externalDomain(46) };
+
+
+initialisationFailures ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		initialisationFailures-B BEHAVIOUR
+			DEFINED AS
+				Number of Initialisation Failure events generated;;
+REGISTERED AS { ISIS.aoi initialisationFailures(41) };
+
+
+iSISControlPDUsReceived ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		iSISControlPDUsReceived-B BEHAVIOUR
+			DEFINED AS
+				Number of control PDUs received on this circuit;;
+REGISTERED AS { ISIS.aoi iSISControlPDUsReceived(44) };
+
+
+iSISControlPDUsSent ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		iSISControlPDUsSent-B BEHAVIOUR
+			DEFINED AS
+				Number of control PDUs sent on this circuit;;
+REGISTERED AS { ISIS.aoi iSISControlPDUsSent(43) };
+
+
+iSISHelloTimer ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":timer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		iSISHelloTimer-B BEHAVIOUR
+			DEFINED AS
+				The period between IIH PDUs. It is also used as the period between ISH PDUs when polling the ES
+				configuration;,
+		resettingHoldingTimer-B;
+REGISTERED AS { ISIS.aoi iSISHelloTimer(45) };
+
+
+l1CircuitID ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.CircuitID;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		l1CircuitID-B BEHAVIOUR
+			DEFINED AS
+				The LAN ID allocated by the LAN Level 1 Designated Intermediate System. Where this system is not
+				aware of the value (because it is not participating in the Level 1 Designated Intermediate System
+				election), this attribute has the value which would be proposed for this circuit. (i.e. the
+				concatenation of the local system ID and the one octet local Circuit ID for this circuit.;;
+REGISTERED AS { ISIS.aoi l1CircuitID(48) };
+
+
+l1ErrorMetric ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		l1ErrorMetric-B BEHAVIOUR
+			DEFINED AS
+				The error metric value of this circuit for Level 1 traffic. The value of zero is reserved to
+				indicate that this metric is not supported;;
+REGISTERED AS { ISIS.aoi l1ErrorMetric(38) };
+
+
+l1ExpenseMetric ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		l1ExpenseMetric-B BEHAVIOUR
+			DEFINED AS
+				The expense metric value of this circuit for Level 1 traffic. The value of zero is reserved to
+				indicate that this metric is not supported;;
+REGISTERED AS { ISIS.aoi l1ExpenseMetric(37) };
+
+
+l1DefaultMetric ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		l1defaultMetric-B BEHAVIOUR
+			DEFINED AS
+				The default metric value of this circuit for Level 1 traffic.;;
+REGISTERED AS { ISIS.aoi l1DefaultMetric(35) };
+
+
+l1DelayMetric ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		l1DelayMetric-B BEHAVIOUR
+			DEFINED AS
+				The delay metric value of this circuit for Level 1 traffic. The value of zero is reserved to
+				indicate that this metric is not supported;;
+REGISTERED AS { ISIS.aoi l1DelayMetric(36) };
+
+
+l1DesignatedIntermediateSystem ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.SystemId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		l1DesignatedIntermediateSystem-B BEHAVIOUR
+			DEFINED AS
+				The ID of the LAN Level 1 Designated Intermediate System on this circuit. If, for any reason this
+				system is not partaking in the relevant Designated Intermediate System election process, then the
+				value returned is the zero length OCTET STRING;;
+REGISTERED AS { ISIS.aoi l1DesignatedIntermediateSystem(49) };
+
+
+l1IntermediateSystemPriority ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.IntermediateSystemPriority;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		l1IntermediateSystemPriority-B BEHAVIOUR
+			DEFINED AS
+				Priority for becoming LAN Level 1 Designated Intermediate System;;
+REGISTERED AS { ISIS.aoi l1IntermediateSystemPriority(47) };
+
+
+l2CircuitID ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.CircuitID;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		l2CircuitID-B BEHAVIOUR
+			DEFINED AS
+				The LAN ID allocated by the LAN Level 2 Designated Intermediate System. Where this system is not
+				aware of the value (because it is not participating in the Level 2 Designated Intermediate System
+				election), this attribute has the value which would be proposed for this circuit. (i.e. the
+				concatenation of the local system ID and the one octet local Circuit ID for this circuit.;;
+REGISTERED AS { ISIS.aoi l2CircuitID(74) };
+
+
+l2DefaultMetric ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		l2defaultMetric-B BEHAVIOUR
+			DEFINED AS
+				The default metric value of this circuit for Level 2 traffic.;;
+REGISTERED AS { ISIS.aoi l2DefaultMetric(68) };
+
+
+l2DelayMetric ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		l2DelayMetric-B BEHAVIOUR
+			DEFINED AS
+				The delay metric value of this circuit for Level 2 traffic. The value of zero is reserved to
+				indicate that this metric is not supported;;
+REGISTERED AS { ISIS.aoi l2DelayMetric(69) };
+
+
+l2DesignatedIntermediateSystem ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.SystemId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		l2DesignatedIntermediateSystem-B BEHAVIOUR
+			DEFINED AS
+				The ID of the LAN Level 2 Designated Intermediate System on this circuit. If, for any reason this
+				system is not partaking in the relevant Designated Intermediate System election process, then the
+				value returned is the zero length OCTET STRING;;
+REGISTERED AS { ISIS.aoi l2DesignatedIntermediateSystem(75) };
+
+
+l2ErrorMetric ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		l2ErrorMetric-B BEHAVIOUR
+			DEFINED AS
+				The error metric value of this circuit for Level 2 traffic. The value of zero is reserved to
+				indicate that this metric is not supported;;
+REGISTERED AS { ISIS.aoi l2ErrorMetric(71) };
+
+
+l2ExpenseMetric ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		l2ExpenseMetric-B BEHAVIOUR
+			DEFINED AS
+				The expense metric value of this circuit for Level 2 traffic. The value of zero is reserved to
+				indicate that this metric is not supported;;
+REGISTERED AS { ISIS.aoi l2ExpenseMetric(70) };
+
+
+l2IntermediateSystemPriority ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.IntermediateSystemPriority;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		l2IntermediateSystemPriority-B BEHAVIOUR
+			DEFINED AS
+				Priority for becoming LAN Level 2 Designated Intermediate System;;
+REGISTERED AS { ISIS.aoi l2IntermediateSystemPriority(73) };
+
+
+lanL1DesignatedIntermediateSystemChanges ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		lanL1DesignatedIntermediateSystemChanges-B BEHAVIOUR
+			DEFINED AS
+				Number of LAN L1 Designated Intermediate System Change events generated;;
+REGISTERED AS { ISIS.aoi lanL1DesignatedIntermediateSystemChanges(50) };
+
+
+lanL2DesignatedIntermediateSystemChanges ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		lanL2DesignatedIntermediateSystemChanges-B BEHAVIOUR
+			DEFINED AS
+				Number of LAN L2 Designated Intermediate System Change events generated;;
+REGISTERED AS { ISIS.aoi lanL2DesignatedIntermediateSystemChanges(76) };
+
+
+manualL2OnlyMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		manualL2OnlyMode-B BEHAVIOUR
+			DEFINED AS
+				When True, indicates that this Circuit is to be used only for Level 2;,
+		replaceOnlyWhileDisabled-B;
+	PARAMETERS
+		constraintViolation;
+REGISTERED AS { ISIS.aoi manualL2OnlyMode(72) };
+
+
+outgoingCallIVMO ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.LocalDistinguishedName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		outgoingCallIVMO-B BEHAVIOUR
+			DEFINED AS
+				reference to the virtualCallIVMO to be used to establish communication with a neighbour over this
+				circuit. This IVMO contains, among other things,the SNPA Address to use as the called address.;;
+REGISTERED AS { ISIS.aoi outgoingCallIVMO(120) };
+
+
+ptPtCircuitID ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.CircuitID;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		ptPtCircuitID-B BEHAVIOUR
+			DEFINED AS
+				The ID of the circuit allocated during initialisation. If no value has been negotiated (either
+				because the adjacency is to an End system, or because initialisation has not yet successfully
+				completed), this attribute has the value which would be proposed for this circuit. (i.e. the
+				concatenation of the local system ID and the one octet local Circuit ID for this circuit.;;
+REGISTERED AS { ISIS.aoi ptPtCircuitID(51) };
+
+
+rejectedAdjacencies ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+	BEHAVIOUR
+		rejectedAdjacencies-B BEHAVIOUR
+			DEFINED AS
+				Number of Rejected Adjacency events generated;;
+REGISTERED AS { ISIS.aoi rejectedAdjacencies(42) };
+
+
+type ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.CircuitType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type-B BEHAVIOUR
+			DEFINED AS
+				The type of the circuit. This attribute may only be set when the linkage MO is created.
+				Subsequently it is read-only;;
+REGISTERED AS { ISIS.aoi type(33) };
+--11.2.6 Adjacency managed object
+-- Created either through the adjacency-linkage Name binding for
+-- adjacencies instantiated by protocol operation, or the
+-- adjacency-linkage-management name binding for adjacencies created
+-- via explicit system management operation
+
+
+adjacency MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		adjacency-P PACKAGE
+			BEHAVIOUR
+				adjacencyStateChange-B BEHAVIOUR
+					DEFINED AS
+						This Managed Object imports the 10165-2 stateChange notification. It is used to report changes to
+						the adjacencyState attribute. The value "Down" shall be reported when the adjacency is deleted. A
+						single parameter set shall be included in the State Change definition field. Only the (mandatory)
+						attributeId and newAttributeValue parameters shall be used.;;
+			ATTRIBUTES
+				adjacencyId
+					GET,
+				adjacencyState
+					GET,-- Note: this is NOT operational state
+				neighbourSNPAAddress
+					INITIAL VALUE DERIVATION RULE
+						supplyValueOnCreate-B
+					GET,
+				neighbourSystemType
+					GET,
+				neighbourSystemIds
+					INITIAL VALUE DERIVATION RULE
+						supplyValueOnCreate-B
+					GET;
+			NOTIFICATIONS
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		iSAdjacency-P
+			PRESENT IF
+				"the adjacency is to an IS (i.e the neighbourSystemType is Intermediate System, L1 Intermediate
+				System or L2 Intermediate System)",
+		broadcastISAdjacency-P
+			PRESENT IF
+				the parent Linkage MO is of type broadcast and is to an IS as above;
+REGISTERED AS { ISIS.moi adjacency(1) };
+--11.2.6.1 IS adjacency package of the adjacency managed object
+
+
+iSAdjacency-P PACKAGE
+	ATTRIBUTES
+		adjacencyUsage
+			GET,
+		areaAddressesOfNeighbour
+			GET,
+		holdingTimer
+			GET;
+REGISTERED AS { ISIS.poi iSAdjacency-P(19) };
+--11.2.6.2 Broadcast IS adjacency package of the adjacency managed object
+
+
+broadcastISAdjacency-P PACKAGE
+	ATTRIBUTES
+		priorityOfNeighbour
+			GET;
+REGISTERED AS { ISIS.poi broadcastISAdjacency-P(20) };
+--11.2.6.3 Name bindings for the adjacency managed object
+
+
+adjacency-linkage NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		adjacency
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ISO/IEC 10733":linkage
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		adjacencyId;
+	BEHAVIOUR
+		adjacency-linkage-B BEHAVIOUR
+			DEFINED AS
+				This Name Binding is used for adjacencies created automatically by operation of the ISO/IEC 10589
+				protocol machine.;,
+		adjacencyId-B;
+REGISTERED AS { ISIS.nboi adjacency-linkage(7) };
+
+
+adjacency-linkage-management NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		adjacency
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ISO/IEC 10733":linkage
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		adjacencyId;
+	BEHAVIOUR
+		adjacency-linkage-management-B BEHAVIOUR
+			DEFINED AS
+				This Name Binding is used for adjacencies created by system management.;,
+		adjacencyId-B;
+	CREATE
+		WITH-REFERENCE-OBJECT
+	reservedName;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ISIS.nboi adjacency-linkage-management(8) };
+--11.2.6.4 Attributes of the adjacency managed object
+
+
+adjacencyId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.GraphicString;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		adjacencyId-B BEHAVIOUR
+			DEFINED AS
+				A string which is the Identifier for the Adjacency and which is unique amongst the set of
+				Adjacencies maintained for this linkage. If this is an adjacency created by system management, it
+				is set by the System Manager when the Adjacency is created, otherwise it is generated by the
+				implementation such that it is unique. The set of identifiers containing the leading string "Auto"
+				are reserved for Automatic Adjacencies. An attempt by system management to create an adjacency with
+				such an identifier will cause a reserved name violation;;
+REGISTERED AS { ISIS.aoi adjacencyId(77) };
+
+
+adjacencyState ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.AdjacencyState;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		adjacencyState-B BEHAVIOUR
+			DEFINED AS
+				The state of the adjacency;;
+REGISTERED AS { ISIS.aoi adjacencyState(78) };
+
+
+adjacencyUsage ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.AdjacencyUsage;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		adjacencyUsage-B BEHAVIOUR
+			DEFINED AS
+				The usage of the Adjacency. An Adjacency of type Level 1 will be used for Level 1 traffic only. An
+				adjacency of type Level 2 will be used for Level 2 traffic only. An adjacency of type Level 1 and 2
+				will be used for both Level 1 and Level 2 traffic. There may be two adjacencies (of types Level 1
+				and Level 2 between the same pair of Intermediate Systems.;;
+REGISTERED AS { ISIS.aoi adjacencyUsage(82) };
+
+
+areaAddressesOfNeighbour ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.AreaAddresses;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		areaAddressesOfNeighbour-B BEHAVIOUR
+			DEFINED AS
+				This contains the Area Addresses of a neighbour Intermediate System from the IIH PDU.;;
+REGISTERED AS { ISIS.aoi areaAddressesOfNeighbour(84) };
+
+
+holdingTimer ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5":timer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		holdingTimer-B BEHAVIOUR
+			DEFINED AS
+				Holding time for this adjacency updated from the IIH PDUs;;
+REGISTERED AS { ISIS.aoi holdingTimer(85) };
+
+
+priorityOfNeighbour ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.IntermediateSystemPriority;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		priorityOfNeighbour-B BEHAVIOUR
+			DEFINED AS
+				Priority of neighbour on this adjacency for becoming LAN Level 1 Designated Intermediate System if
+				adjacencyType is L1 Intermediate System or LAN Level 2 Designated Intermediate System if
+				adjacencyType is L2 Intermediate System;;
+REGISTERED AS { ISIS.aoi priorityOfNeighbour(86) };
+
+
+neighbourSNPAAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.SNPAAddress;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		neighbourSNPAAddress-B BEHAVIOUR
+			DEFINED AS
+				The SNPA address of the neighbour system;,
+		replaceOnlyWhileDisabled-B;
+	PARAMETERS
+		constraintViolation;
+REGISTERED AS { ISIS.aoi neighbourSNPAAddress(79) };
+
+
+neighbourSystemIds ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.SystemIds;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		neighbourSystemIds-B BEHAVIOUR
+			DEFINED AS
+				For Intermediate system neighbours: Contains the single SystemId of the neighbouring Intermediate
+				system obtained from the Source ID field of the neighbour's IIH PDU. For End system neighbours:
+				Contains the set of system ID(s) of a neighbour End system.;;
+REGISTERED AS { ISIS.aoi neighbourSystemIds(83) };
+
+
+neighbourSystemType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.NeighbourSystemType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		neighbourSystemType-B BEHAVIOUR
+			DEFINED AS
+				"The type of the neighbour system one of: Unknown, End system, Intermediate system, L1 Intermediate
+				system, L2 Intermediate system";;
+REGISTERED AS { ISIS.aoi neighbourSystemType(80) };
+--11.2.7 Virtual adjacency managed object
+
+
+virtualAdjacency MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		virtualAdjacency-P PACKAGE
+			ATTRIBUTES
+				networkEntityTitle
+					GET,
+				metric
+					GET;;;
+REGISTERED AS { ISIS.moi virtualAdjacency(2) };
+--11.2.7.1 Name bindings for the virtual adjacency managed object
+
+
+virtualAdjacency-cLNS NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		virtualAdjacency
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ISO/IEC 10733":cLNS
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		networkEntityTitle;
+	BEHAVIOUR
+		virtualAdjacency-cLNS-B BEHAVIOUR
+			DEFINED AS
+				This name binding is only applicable where the superior object has an iSType of Level2;;
+REGISTERED AS { ISIS.nboi virtualAdjacency-cLNS(3) };
+--11.2.7.2 Attributes of the virtual adjacency managed object
+
+
+metric ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.PathMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		metric-B BEHAVIOUR
+			DEFINED AS
+				Cost of least cost L2 path(s) to destination area based on the default metric;;
+REGISTERED AS { ISIS.aoi metric(89) };
+--11.2.8 Destination managed object
+-- This MO class is never instantiated. It exists only to allow the destinationSystem and destinationArea
+-- MO classes to be derived from it.
+
+
+destination MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		destination-P PACKAGE
+			ATTRIBUTES
+				defaultMetricPathCost
+					GET,
+				defaultMetricOutputAdjacencies
+					GET,
+				delayMetricPathCost
+					GET,
+				delayMetricOutputAdjacencies
+					GET,
+				expenseMetricPathCost
+					GET,
+				expenseMetricOutputAdjacencies
+					GET,
+				errorMetricPathCost
+					GET,
+				errorMetricOutputAdjacencies
+					GET;;;
+REGISTERED AS { ISIS.moi destination(3) };
+--11.2.9 Attributes of the destination managed object
+
+
+defaultMetricOutputAdjacencies ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.OutputAdjacencies;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		defaultMetricOutputAdjacencies-B BEHAVIOUR
+			DEFINED AS
+				The set of Adjacency (or Reachable Address) managed object identifiers representing the forwarding
+				decisions based upon the default metric for the destination;;
+REGISTERED AS { ISIS.aoi defaultMetricOutputAdjacencies(91) };
+
+
+defaultMetricPathCost ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.PathMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		defaultMetricPathCost-B BEHAVIOUR
+			DEFINED AS
+				Cost of least cost path(s) using the default metric to destination;;
+REGISTERED AS { ISIS.aoi defaultMetricPathCost(90) };
+
+
+delayMetricOutputAdjacencies ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.OutputAdjacencies;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		delayMetricOutputAdjacencies-B BEHAVIOUR
+			DEFINED AS
+				The set of Adjacency (or Reachable Address) managed object identifiers representing the forwarding
+				decisions based upon the delay metric for the destination;;
+REGISTERED AS { ISIS.aoi delayMetricOutputAdjacencies(93) };
+
+
+delayMetricPathCost ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.PathMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		delayMetricPathCost-B BEHAVIOUR
+			DEFINED AS
+				Cost of least cost path(s) using the delay metric to destination;;
+REGISTERED AS { ISIS.aoi delayMetricPathCost(92) };
+
+
+errorMetricOutputAdjacencies ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.OutputAdjacencies;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		errorMetricOutputAdjacencies-B BEHAVIOUR
+			DEFINED AS
+				The set of Adjacency (or Reachable Address) managed object identifiers representing the forwarding
+				decisions based upon the error metric for the destination;;
+REGISTERED AS { ISIS.aoi errorMetricOutputAdjacencies(97) };
+
+
+errorMetricPathCost ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.PathMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		errorMetricPathCost-B BEHAVIOUR
+			DEFINED AS
+				Cost of least cost path(s) using the error metric to destination;;
+REGISTERED AS { ISIS.aoi errorMetricPathCost(96) };
+
+
+expenseMetricOutputAdjacencies ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.OutputAdjacencies;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		expenseMetricOutputAdjacencies-B BEHAVIOUR
+			DEFINED AS
+				The set of Adjacency (or Reachable Address) managed object identifiers representing the forwarding
+				decisions based upon the expense metric for the destination;;
+REGISTERED AS { ISIS.aoi expenseMetricOutputAdjacencies(95) };
+
+
+expenseMetricPathCost ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.PathMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		expenseMetricPathCost-B BEHAVIOUR
+			DEFINED AS
+				Cost of least cost path(s) using the expense metric to destination;;
+REGISTERED AS { ISIS.aoi expenseMetricPathCost(94) };
+--11.2.10 Destination system managed object
+
+
+destinationSystem MANAGED OBJECT CLASS
+	DERIVED FROM
+		destination;
+	CHARACTERIZED BY
+		destinationSystem-P PACKAGE
+			ATTRIBUTES
+				networkEntityTitle
+					GET;;;
+REGISTERED AS { ISIS.moi destinationSystem(4) };
+--11.2.10.1 Name bindings
+
+
+destinationSystem-cLNS NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		destinationSystem
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ISO/IEC 10733":cLNS
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		networkEntityTitle;
+REGISTERED AS { ISIS.nboi destinationSystem-cLNS(1) };
+--11.2.11 Destination area managed object
+
+
+destinationArea MANAGED OBJECT CLASS
+	DERIVED FROM
+		destination;
+	CHARACTERIZED BY
+		destinationArea-P PACKAGE
+			ATTRIBUTES
+				addressPrefix
+					GET;;;
+REGISTERED AS { ISIS.moi destinationArea(7) };
+--11.2.11.1 Name bindings
+
+
+destinationArea-cLNS NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		destinationArea
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ISO/IEC 10733":cLNS
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		addressPrefix;
+	BEHAVIOUR
+		destinationArea-cLNS-B BEHAVIOUR
+			DEFINED AS
+				This name binding is only applicable where the superior object has an iSType of Level2;;
+REGISTERED AS { ISIS.nboi destinationArea-cLNS(2) };
+--11.2.12 Reachable address managed object
+-- Created either through the reachableAddress-linkage-imported
+-- Name binding for reachable addresses instantiated by
+-- the importation of routeing information from another
+-- routeing protocol (such as the interdomain routeing protocol), or the
+-- reachableAddress-linkage-management name binding for adjacencies created
+-- via explicit system management operation.
+
+
+reachableAddress MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		reachableAddress-P PACKAGE
+			BEHAVIOUR
+				"ISO/IEC 10733":commonCreationDeletion-B,
+				"ISO/IEC 10733":commonStateChange-B;
+			ATTRIBUTES
+				reachableAddressId
+					GET,
+				addressPrefix
+					INITIAL VALUE DERIVATION RULE
+						supplyValueOnCreate-B
+					GET,
+				mappingType
+					INITIAL VALUE DERIVATION RULE
+						supplyValueOnCreate-B
+					GET,
+				defaultMetric
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ISIS.defaultMetric-Default
+					PERMITTED VALUES ISIS.DefaultMetric-Permitted
+					GET-REPLACE,
+				delayMetric
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ISIS.optionalMetric-Default
+					GET-REPLACE,
+				expenseMetric
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ISIS.optionalMetric-Default
+					GET-REPLACE,
+				errorMetric
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ISIS.optionalMetric-Default
+					GET-REPLACE,
+				defaultMetricType
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ISIS.metricType-Default
+					GET-REPLACE,
+				delayMetricType
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ISIS.metricType-Default
+					GET-REPLACE,
+				expenseMetricType
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ISIS.metricType-Default
+					GET-REPLACE,
+				errorMetricType
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ISIS.metricType-Default
+					GET-REPLACE,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":operationalState
+					GET;
+			ACTIONS
+				"Rec. X.723 | ISO/IEC 10165-5":activate,
+				"Rec. X.723 | ISO/IEC 10165-5":deactivate;
+			NOTIFICATIONS
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":objectCreation,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":objectDeletion,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		explicitSNPA-P
+			PRESENT IF
+				the value of mappingType is "explicit",
+		extractDSP-P
+			PRESENT IF
+				the value of mappingType is "extractDSP";
+REGISTERED AS { ISIS.moi reachableAddress(8) };
+--11.2.12.1 Explicit SNPA package
+
+
+explicitSNPA-P PACKAGE
+	ATTRIBUTES
+		sNPAAddresses
+			GET-REPLACE;
+REGISTERED AS { ISIS.poi explicitSNPA-P(22) };
+--11.2.12.2 Extract DSP package
+
+
+extractDSP-P PACKAGE
+	BEHAVIOUR
+		extractDSP-P-B BEHAVIOUR
+			DEFINED AS
+				When present, the remote SNPA address is determined by extracting the bits from the effective NSAP
+				address indicated by 1's in the sNPAMask and concatenating them to the sNPAPrefix.;;
+	ATTRIBUTES
+		sNPAMask
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.sNPAMask-Default
+			GET-REPLACE,
+		sNPAPrefix
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ISIS.sNPAPrefix-Default
+			GET-REPLACE;
+REGISTERED AS { ISIS.poi extractDSP-P(23) };
+--11.2.12.3 Name bindings
+
+
+reachableAddress-linkage-imported NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		reachableAddress
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ISO/IEC 10733":linkage
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		reachableAddressId;
+	BEHAVIOUR
+		reachableAddress-linkage-imported-B BEHAVIOUR
+			DEFINED AS
+				This name binding is only applicable where the superior object of the linkage instance is an object
+				with iSType level2IS It is used for the automatic creation of reachable address MOs. This is useful
+				when injecting intra-domain routes obtained through the operation of an interdomain routeing
+				protocol.;;
+REGISTERED AS { ISIS.nboi reachableAddress-linkage-imported(5) };
+
+
+reachableAddress-linkage-management NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		reachableAddress
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ISO/IEC 10733":linkage
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		reachableAddressId;
+	BEHAVIOUR
+		reachableAddress-linkage-management-B BEHAVIOUR
+			DEFINED AS
+				This name binding is only applicable where the superior object of the linkage instance is an object
+				with iSType level2IS It is used for the manual creation of reachable address MOs by system
+				management.;,
+		reachableAddressId-B;
+	CREATE
+		WITH-REFERENCE-OBJECT
+	reservedName;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ISIS.nboi reachableAddress-linkage-management(6) };
+--11.2.12.4 Attributes of the reachable address managed object
+
+
+defaultMetric ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		defaultMetric-B BEHAVIOUR
+			DEFINED AS
+				The default metric value for reaching the specified prefix over this Circuit. If this attribute is
+				changed while both the Reachable Address and the linkage are Enabled (i.e. state On), the actions
+				described in clause 8.3.5.4 must be taken.;;
+REGISTERED AS { ISIS.aoi defaultMetric(99) };
+
+
+defaultMetricType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.MetricType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		defaultMetricType-B BEHAVIOUR
+			DEFINED AS
+				Indicates whether the default metric is internal or external;;
+REGISTERED AS { ISIS.aoi defaultMetricType(103) };
+
+
+delayMetric ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		delayMetric-B BEHAVIOUR
+			DEFINED AS
+				The delay metric value for reaching the specified prefix over this Circuit. If this attribute is
+				changed while both the Reachable Address and the linkage are Enabled (i.e. state On), the actions
+				described in clause 8.3.5.4 must be taken. The value of zero is reserved to indicate that this
+				metric is not supported;;
+REGISTERED AS { ISIS.aoi delayMetric(100) };
+
+
+delayMetricType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.MetricType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		delayMetricType-B BEHAVIOUR
+			DEFINED AS
+				Indicates whether the delay metric is internal or external;;
+REGISTERED AS { ISIS.aoi delayMetricType(104) };
+
+
+errorMetric ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		errorMetric-B BEHAVIOUR
+			DEFINED AS
+				The error metric value for reaching the specified prefix over this Circuit. If this attribute is
+				changed while both the Reachable Address and the linkage are Enabled (i.e. state On), the actions
+				described in clause 8.3.5.4 must be taken. The value of zero is reserved to indicate that this
+				metric is not supported;;
+REGISTERED AS { ISIS.aoi errorMetric(102) };
+
+
+errorMetricType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.MetricType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		errorMetricType-B BEHAVIOUR
+			DEFINED AS
+				Indicates whether the error metric is internal or external;;
+REGISTERED AS { ISIS.aoi errorMetricType(106) };
+
+
+expenseMetric ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.HopMetric;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		expenseMetric-B BEHAVIOUR
+			DEFINED AS
+				The expense metric value for reaching the specified prefix over this Circuit. If this attribute is
+				changed while both the Reachable Address and the linkage are Enabled (i.e. state On), the actions
+				described in clause 8.3.5.4 must be taken. The value of zero is reserved to indicate that this
+				metric is not supported;;
+REGISTERED AS { ISIS.aoi expenseMetric(101) };
+
+
+expenseMetricType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.MetricType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		expenseMetricType-B BEHAVIOUR
+			DEFINED AS
+				Indicates whether the expense metric is internal or external;;
+REGISTERED AS { ISIS.aoi expenseMetricType(105) };
+
+
+mappingType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.MappingType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		mappingType-B BEHAVIOUR
+			DEFINED AS
+				The type of mapping to be employed to ascertain the SNPA Address which should be used in forwarding
+				NPDUs for this Reachable Address Prefix. The following values of mappingType are defined: none: The
+				mapping is null because the neighbour SNPA is implicit by nature of the subnetwork (e.g. a
+				point-to-point linkage). explicit: The set of subnetwork addresses in the sNPAAddresses attribute
+				are to be used. extractIDI: The SNPA is embedded in the IDI of the destination NSAP address. The
+				mapping algorithm extracts the SNPA to be used according to the format and encoding rules of
+				ISO8348/Add2. This SNPA extraction algorithm can be used in conjunction with Reachable Address
+				Prefixes from the X.121, F.69, E.163, and E.164 addressing subdomains. extractDSP: All, or a
+				suffix, of the SNPA is embedded in the DSP of the destination address. This SNPA extraction
+				algorithm extracts the embedded subnetwork addressing information by performing a logical AND of
+				the sNPAMask attribute with the destinaition address. The part of the SNPA extracted from the
+				destination NSAP is appended to the sNPAPrefix to form the next hop subnetwork addressing
+				information.;;
+REGISTERED AS { ISIS.aoi mappingType(107) };
+
+
+reachableAddressId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.GraphicString;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		reachableAddressId-B BEHAVIOUR
+			DEFINED AS
+				A string which is the Identifier for the ReachableAddress and which is unique amongst the set of
+				reachable addresses maintained for this linkage. If this is a reachableAddress created by system
+				management, it is set by the System Manager when the ReachableAddress is created, otherwise it is
+				generated by the implementation such that it is unique. The set of identifiers containing the
+				leading string "Auto" are reserved for reachable addresses imported from other routeing protocols.
+				An attempt by system management to create a reachableAddress with such an identifier will cause a
+				reserved name violation;;
+REGISTERED AS { ISIS.aoi reachableAddressId(121) };
+
+
+sNPAMask ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.NAddress;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sNPAMask-B BEHAVIOUR
+			DEFINED AS
+				A Bit mask with 1 bits indicating the positions in the effective destination address from which
+				embedded SNPA information is to be extracted. For the extraction the first octect of the sNPAMask
+				is aligned with the first octet (AFI) of the NSAP Address. If the sNPAMask and NSAP Address are of
+				different lengths, the shorter of the two is logically padded with zeros before performing the
+				extraction;;
+REGISTERED AS { ISIS.aoi sNPAMask(122) };
+
+
+sNPAPrefix ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.SNPAPrefix;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sNPAPrefix-B BEHAVIOUR
+			DEFINED AS
+				A fixed SNPA prefix manually configured as an attribute of a Reachable Address with mappingType
+				extractDSP. The SNPA address to use is formed by concatenating the fixed sNPAPrefix with a variable
+				SNPA part that is extracted from the effective destination address. For Reachable Address Prefixes
+				in which then entire SNPA is embedded in the DSP the sNPAPrefix shall be null;;
+REGISTERED AS { ISIS.aoi sNPAPrefix(123) };
+
+
+sNPAAddresses ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ISIS.SNPAAddresses;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		sNPAAddresses-B BEHAVIOUR
+			DEFINED AS
+				A set of SNPA addresses to which pdu may be forwarded in order to reach an address which matches
+				the address prefix of the Reachable Address.;;
+REGISTERED AS { ISIS.aoi sNPAAddresses(109) };
+
+END
+--< GDMO.ChangeLog
+--  =============================================================================
+--  
+--  $Log: ISO10589v2.gdmo,v $
+--  Revision 0.9.2.1  2007/09/29 14:40:02  brian
+--  - added new gdmos idls asns
+--
+--  =============================================================================
+--  >--
+--< GDMO.EndDocument "ISO/IEC 10589: 2001" >--
