@@ -1,0 +1,2404 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Sep 19 11:47:10 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Include "TS132106-4.gdmo" >--
+--< GDMO.Include "TS132111-4.gdmo" >--
+--< GDMO.Document "ETSI TS 132 106-7 V3.3.0 (2001-12)"
+--  { ccitt(0) identified-organization(4) etsi(0) mobileDomain(0) umts-Operation-Maintenance(3) ts-32-106(106) part7(7) informationModel(0) } >--
+--< GDMO.Alias "ETSI TS 132 106-7 V3.3.0 (2001-12)" "3GPP TS 32.106-7" >--
+--< GDMO.Namespace etsi_106_7 >--
+MODULE "ETSI TS 132 106-7 V3.3.0 (2001-12)" { ccitt(0) identified-organization(4) etsi(0) mobileDomain(0) umts-Operation-Maintenance(3) ts-32-106(106) part7(7) informationModel(0) }
+-- 5 GDMO Definitions
+-- 5.1 Managed Object Classes (MOCs)
+
+aucFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		aucFunctionBasicPackage PACKAGE
+			BEHAVIOUR
+				aucFunctionBasicPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						"An instance of MOC represents the logical function of an AUC";;
+			ATTRIBUTES
+				aucFunctionId GET;;;
+REGISTERED AS { ts32-106-7BCMObjectClass 1 };
+
+
+bcmControl MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		bcmControlBasicPackage,
+		bcmIRPVersionPackage;
+REGISTERED AS { ts32-106-7BCMObjectClass 2 };
+
+
+bgFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		bgFunctionBasicPackage PACKAGE
+			BEHAVIOUR
+				bgFunctionBasicPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						"An instance of MOC represents the logical function of an BG";;
+			ATTRIBUTES
+				bgFunctionId GET;;;
+REGISTERED AS { ts32-106-7BCMObjectClass 3 };
+
+
+eirFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		eirFunctionBasicPackage PACKAGE
+			BEHAVIOUR
+				eirFunctionBasicPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						"An instance of MOC represents the logical function of an EIR";;
+			ATTRIBUTES
+				eirFunctionId GET;;;
+REGISTERED AS { ts32-106-7BCMObjectClass 4 };
+
+
+ggsnFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		ggsnFunctionBasicPackage PACKAGE
+			BEHAVIOUR
+				ggsnFunctionBasicPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						"An instance of MOC represents the logical function of an GGSN";;
+			ATTRIBUTES
+				ggsnFunctionId GET;;;
+REGISTERED AS { ts32-106-7BCMObjectClass 5 };
+
+
+g3ManagedElement MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		g3ManagedElementBasicPackage,
+		g3ManagedElementAssociationPackage;
+	CONDITIONAL PACKAGES
+		"Recommendation M.3100: 1995":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and the objectDeletion defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		"Recommendation M.3100: 1995":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		"Recommendation M.3100: 1995":processingErrorAlarmPackage
+			PRESENT IF
+				"the processingErrorAlarm notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		"Recommendation M.3100: 1995":environmentalAlarmPackage
+			PRESENT IF
+				"the environmentalAlarm notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		communicationsAlarmPackage
+			PRESENT IF
+				"the communicationsAlarm notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		equipmentAlarmPackage
+			PRESENT IF
+				"the equipmentAlarm notifications defined in Recommendation X.721 are supported 
+				by an instance of this class.";
+REGISTERED AS { ts32-106-7BCMObjectClass 6 };
+
+
+g3SubNetwork MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		g3SubNetworkBasicPackage;
+	CONDITIONAL PACKAGES
+		"Recommendation M.3100: 1995":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		"Recommendation M.3100: 1995":environmentalAlarmPackage
+			PRESENT IF
+				"the environmentalAlarm notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.";
+REGISTERED AS { ts32-106-7BCMObjectClass 7 };
+
+
+hlrFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		hlrFunctionBasicPackage PACKAGE
+			BEHAVIOUR
+				hlrFunctionBasicPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						"An instance of MOC represents the logical function of a HLR";;
+			ATTRIBUTES
+				hlrFunctionId GET;;;
+REGISTERED AS { ts32-106-7BCMObjectClass 8 };
+
+
+gmscFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		gmscFunctionBasicPackage PACKAGE
+			BEHAVIOUR
+				gmscFunctionBasicPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						"An instance of MOC represents the logical function of a GMSC";;
+			ATTRIBUTES
+				gmscFunctionId GET;;;
+REGISTERED AS { ts32-106-7BCMObjectClass 9 };
+
+
+irpAgent MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		irpAgentBasicPackage;
+	CONDITIONAL PACKAGES
+		"Recommendation M.3100: 1995":processingErrorAlarmPackage
+			PRESENT IF
+				"the processingErrorAlarm notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		communicationsAlarmPackage
+			PRESENT IF
+				"the communicationsAlarm notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.";
+REGISTERED AS { ts32-106-7BCMObjectClass 10 };
+
+
+iubLink MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		iubLinkBasicPackage,
+		iubLinkAssociationPackage;
+REGISTERED AS { ts32-106-7BCMObjectClass 11 };
+
+
+managedFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		managedFunctionBasicPackage;
+	CONDITIONAL PACKAGES
+		"Recommendation M.3100: 1995":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and the objectDeletion defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		"Recommendation M.3100: 1995":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		"Recommendation M.3100: 1995":processingErrorAlarmPackage
+			PRESENT IF
+				"the processingErrorAlarm notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		communicationsAlarmPackage
+			PRESENT IF
+				"the communicationsAlarm notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		qualityOfServiceAlarmPackage
+			PRESENT IF
+				"the qualityOfServiceAlarm notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.";
+REGISTERED AS { ts32-106-7BCMObjectClass 12 };
+
+
+managementNode MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		managementNodeBasicPackage,
+		managementNodeAssociationPackage;
+	CONDITIONAL PACKAGES
+		"Recommendation M.3100: 1995":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and the objectDeletion defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		"Recommendation M.3100: 1995":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		"Recommendation M.3100: 1995":processingErrorAlarmPackage
+			PRESENT IF
+				"the processingErrorAlarm notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		"Recommendation M.3100: 1995":environmentalAlarmPackage
+			PRESENT IF
+				"the environmentalAlarm notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		communicationsAlarmPackage
+			PRESENT IF
+				"the communicationsAlarm notifications defined in Recommendation X.721 are 
+				supported by an instance of this class.",
+		equipmentAlarmPackage
+			PRESENT IF
+				"the equipmentAlarm notifications defined in Recommendation X.721 are supported 
+				by an instance of this class.";
+REGISTERED AS { ts32-106-7BCMObjectClass 13 };
+
+
+meContext MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		meContextBasicPackage;
+	CONDITIONAL PACKAGES
+		"Recommendation M.3100: 1995":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and the objectDeletion defined in Recommendation X.721 are 
+				supported by an instance of this class.";
+REGISTERED AS { ts32-106-7BCMObjectClass 14 };
+
+
+mscFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		mscFunctionBasicPackage PACKAGE
+			BEHAVIOUR
+				mscFunctionBasicPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						"An instance of MOC represents the logical function of a MSC";;
+			ATTRIBUTES
+				mscFunctionId GET;;;
+REGISTERED AS { ts32-106-7BCMObjectClass 15 };
+
+
+nodeBFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		nodeBFunctionBasicPackage,
+		nodeBFunctionAssociationPackage;
+REGISTERED AS { ts32-106-7BCMObjectClass 16 };
+
+
+rncFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		rncFunctionBasicPackage;
+REGISTERED AS { ts32-106-7BCMObjectClass 17 };
+
+
+sgsnFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		sgsnFunctionBasicPackage PACKAGE
+			BEHAVIOUR
+				sgsnFunctionBasicPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						"An instance of MOC represents the logical function of an SGSN";;
+			ATTRIBUTES
+				sgsnFunctionId GET;;;
+REGISTERED AS { ts32-106-7BCMObjectClass 18 };
+
+
+smsGmscFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		smsGmscFunctionBasicPackage PACKAGE
+			BEHAVIOUR
+				smsGmscFunctionBasicPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						"An instance of MOC represents the logical function of an smsGMSC";;
+			ATTRIBUTES
+				smsGmscFunctionId GET;;;
+REGISTERED AS { ts32-106-7BCMObjectClass 19 };
+
+
+smsIwmscFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		smsIwmscFunctionBasicPackage PACKAGE
+			BEHAVIOUR
+				smsIwmscFunctionBasicPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						"An instance of MOC represents the logical function of an smsIWMSC";;
+			ATTRIBUTES
+				smsIwmscFunctionId GET;;;
+REGISTERED AS { ts32-106-7BCMObjectClass 20 };
+
+
+utranCell MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		utranCellBasicPackage,
+		utranCellIubLinkAssociationPackage;
+REGISTERED AS { ts32-106-7BCMObjectClass 21 };
+
+
+vlrFunction MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedFunction;
+	CHARACTERIZED BY
+		vlrFunctionBasicPackage PACKAGE
+			BEHAVIOUR
+				vlrFunctionBasicPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						"An instance of MOC represents the logical function of a VLR";;
+			ATTRIBUTES
+				vlrFunctionId GET;;;
+REGISTERED AS { ts32-106-7BCMObjectClass 22 };
+-- 5.2 Packages
+
+
+bcmControlBasicPackage PACKAGE
+	BEHAVIOUR
+		bcmControlBasicPackageBehaviour;
+	ATTRIBUTES
+		bcmControlId GET;
+REGISTERED AS { ts32-106-7BCMPackage 1 };
+
+
+bcmIRPVersionPackage PACKAGE
+	BEHAVIOUR
+		bcmIRPVersionPackageBehaviour;
+	ATTRIBUTES
+		supportedBcmIRPVersions GET;
+	ACTIONS
+		getBCmIRPVersion;
+REGISTERED AS { ts32-106-7BCMPackage 2 };
+
+
+communicationsAlarmPackage PACKAGE
+	NOTIFICATIONS
+		"Recommendation X.721:1992":communicationsAlarm;
+REGISTERED AS { ts32-106-7BCMPackage 3 };
+
+
+equipmentAlarmPackage PACKAGE
+	NOTIFICATIONS
+		"Recommendation X.721:1992":equipmentAlarm;
+REGISTERED AS { ts32-106-7BCMPackage 4 };
+
+
+g3ManagedElementAssociationPackage PACKAGE
+	BEHAVIOUR
+		g3ManagedElementAssociationPackageBehaviour;
+	ATTRIBUTES
+		meManagedBy GET;
+REGISTERED AS { ts32-106-7BCMPackage 5 };
+
+
+g3ManagedElementBasicPackage PACKAGE
+	BEHAVIOUR
+		g3ManagedElementBasicPackageBehaviour;
+	ATTRIBUTES
+		managedElementId GET,
+		managedElementType GET,
+		userDefinedState GET,
+		"Recommendation X.721: 1992":systemTitle GET,
+		"Recommendation M.3100: 1995":userLabel GET,
+		"Recommendation M.3100: 1995":vendorName GET,
+		"Recommendation M.3100: 1995":locationName GET;
+REGISTERED AS { ts32-106-7BCMPackage 6 };
+
+
+g3SubNetworkBasicPackage PACKAGE
+	BEHAVIOUR
+		g3SubNetworkBasicPackageBehaviour;
+	ATTRIBUTES
+		g3SubNetworkId GET,
+		"Recommendation X.721: 1992":systemTitle GET,
+		"Recommendation M.3100: 1995":userLabel GET;
+REGISTERED AS { ts32-106-7BCMPackage 7 };
+
+
+irpAgentBasicPackage PACKAGE
+	BEHAVIOUR
+		irpAgentBasicPackageBehaviour;
+	ATTRIBUTES
+		irpAgentId GET,
+		"Recommendation M.3100: 1995":userLabel GET,
+		supportedIRPs GET;
+REGISTERED AS { ts32-106-7BCMPackage 8 };
+
+
+iubLinkAssociationPackage PACKAGE
+	BEHAVIOUR
+		iubLinkAssociationPackageBehaviour;
+	ATTRIBUTES
+		iubLinkNodeBFunctionLink GET,
+		iubLinkUtranCellLink GET;
+REGISTERED AS { ts32-106-7BCMPackage 9 };
+
+
+iubLinkBasicPackage PACKAGE
+	BEHAVIOUR
+		iubLinkBasicPackageBehaviour;
+	ATTRIBUTES
+		iubLinkId GET;
+REGISTERED AS { ts32-106-7BCMPackage 11 };
+
+
+managedFunctionBasicPackage PACKAGE
+	BEHAVIOUR
+		managementFunctionBasicPackageBehaviour;
+	ATTRIBUTES
+		"Recommendation M.3100: 1995":userLabel GET;
+REGISTERED AS { ts32-106-7BCMPackage 12 };
+
+
+managementNodeAssociationPackage PACKAGE
+	BEHAVIOUR
+		managementNodeAssociationPackageBehaviour;
+	ATTRIBUTES
+		mnManagesList GET;
+REGISTERED AS { ts32-106-7BCMPackage 13 };
+
+
+managementNodeBasicPackage PACKAGE
+	ATTRIBUTES
+		managementNodeId GET,
+		userDefinedState GET,
+		"Recommendation M.3100: 1995":userLabel GET,
+		"Recommendation M.3100: 1995":vendorName GET,
+		"Recommendation M.3100: 1995":locationName GET;
+REGISTERED AS { ts32-106-7BCMPackage 14 };
+
+
+meContextBasicPackage PACKAGE
+	BEHAVIOUR
+		meContextBasicPackageBehaviour;
+	ATTRIBUTES
+		meContextId GET,
+		"Recommendation X.721: 1992":systemTitle GET;
+REGISTERED AS { ts32-106-7BCMPackage 15 };
+
+
+nodeBFunctionAssociationPackage PACKAGE
+	BEHAVIOUR
+		nodeBFunctionAssociationPackageBehaviour;
+	ATTRIBUTES
+		nodeBiubLinkLink GET;
+REGISTERED AS { ts32-106-7BCMPackage 17 };
+
+
+nodeBFunctionBasicPackage PACKAGE
+	BEHAVIOUR
+		nodeBFunctionBasicPackageBehaviour;
+	ATTRIBUTES
+		nodeBFunctionId GET;
+REGISTERED AS { ts32-106-7BCMPackage 18 };
+
+
+qualityOfServiceAlarmPackage PACKAGE
+	NOTIFICATIONS
+		"Recommendation X.721:1992":qualityofServiceAlarm;
+REGISTERED AS { ts32-106-7BCMPackage 19 };
+
+
+rncFunctionBasicPackage PACKAGE
+	BEHAVIOUR
+		rncFunctionBasicPackageBehaviour;
+	ATTRIBUTES
+		rncFunctionId GET;
+REGISTERED AS { ts32-106-7BCMPackage 20 };
+
+
+utranCellIubLinkAssociationPackage PACKAGE
+	BEHAVIOUR
+		utranCellIubLinkAssociationPackageBehaviour;
+	ATTRIBUTES
+		utranCelliubLinkLink GET;
+REGISTERED AS { ts32-106-7BCMPackage 21 };
+
+
+utranCellBasicPackage PACKAGE
+	BEHAVIOUR
+		utranCellBasicPackageBehaviour;
+	ATTRIBUTES
+		utranCellId GET;
+REGISTERED AS { ts32-106-7BCMPackage 23 };
+-- 5.3 Actions
+
+
+getBCmIRPVersion ACTION
+	BEHAVIOUR
+		getBCmIRPVersionBehaviour;
+	MODE CONFIRMED;
+	WITH REPLY SYNTAX TS32-106-7TypeModule.GetBCmIRPVersionReply;
+REGISTERED AS { ts32-106-7BCMAction 1 };
+-- 5.4 Attributes
+
+
+aucFunctionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		aucFunctionIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 1 };
+
+
+bcmControlId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bcmControlIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 2 };
+
+
+bgFunctionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bgFunctionIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 3 };
+
+
+eirFunctionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		eirFunctionIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 4 };
+
+
+ggsnFunctionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		ggsnFunctionIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 5 };
+
+
+gmscFunctionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gmscFunctionIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 6 };
+
+
+g3SubNetworkId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		g3SubNetworkIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 7 };
+
+
+hlrFunctionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		hlrFunctionIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 8 };
+
+
+irpAgentId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		irpAgentIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 9 };
+
+
+iubLinkNodeBFunctionLink ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectPointer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		iubLinkNodeBFunctionLinkBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 10 };
+
+
+iubLinkUtranCellLink ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectPointerList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		iubLinkUtranCellLinkBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 11 };
+
+
+iubLinkId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		iubLinkIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 12 };
+
+
+managedElementId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		managedElementIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 13 };
+
+
+managedElementType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.ManagedElementType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		managedElementBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 14 };
+
+
+managementNodeId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		managmentNodeIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 15 };
+
+
+meContextId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		meContextIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 16 };
+
+
+meManagedBy ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectPointer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		meManagedByBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 17 };
+
+
+mnManagesList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectPointerList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		mnManagesListBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 18 };
+
+
+mscFunctionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		mscFunctionIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 19 };
+
+
+nodeBiubLinkLink ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectPointer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nodeBiubLinkLinkBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 20 };
+
+
+nodeBFunctionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nodeBFunctionIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 22 };
+
+
+rncFunctionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		rncFunctionIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 23 };
+
+
+sgsnFunctionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sgsnFunctionIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 24 };
+
+
+smsIwmscFunctionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		smsIwmscFunctionIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 25 };
+
+
+smsGmscFunctionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		smsGmscFunctionIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 26 };
+
+
+supportedBcmIRPVersions ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.SupportedBCmIRPVersions;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		supportedBCmIRPVersionsBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 27 };
+
+
+supportedIRPs ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.SupportedIRPs;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		supportedIRPsBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 28 };
+
+
+vlrFunctionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		vlrFunctionIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 29 };
+
+
+utranCelliubLinkLink ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectPointer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		utranCelliubLinkLinkBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 30 };
+
+
+userDefinedState ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.UserDefinedState;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		userDefinedStateBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 32 };
+
+
+utranCellId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-7TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		utranCellIdBehaviour;
+REGISTERED AS { ts32-106-7BCMAttribute 33 };
+-- 5.5 Name Bindings
+
+
+alarmControl-irpAgent NAME BINDING
+	SUBORDINATE OBJECT CLASS "3GPP TS 32.111-4":alarmControl;
+	NAMED BY
+	SUPERIOR OBJECT CLASS irpAgent;
+	WITH ATTRIBUTE
+		"3GPP TS 32.111-4":alarmControlId;
+	BEHAVIOUR
+		alarmControl-irpAgentBehavior;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 1 };
+
+
+aucFunction-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS aucFunction;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		aucFunctionId;
+	BEHAVIOUR
+		aucFunction-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 2 };
+
+
+bcmControl-irpAgent NAME BINDING
+	SUBORDINATE OBJECT CLASS bcmControl;
+	NAMED BY
+	SUPERIOR OBJECT CLASS irpAgent;
+	WITH ATTRIBUTE
+		bcmControlId;
+	BEHAVIOUR
+		bcmControl-irpAgentBehavior;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 3 };
+
+
+bsFunction-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS bgFunction;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		bgFunctionId;
+	BEHAVIOUR
+		bgFunction-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 4 };
+
+
+eirFunction-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS eirFunction;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		eirFunctionId;
+	BEHAVIOUR
+		eirFunction-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 5 };
+
+
+ggsnFunction-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS ggsnFunction;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		ggsnFunctionId;
+	BEHAVIOUR
+		ggsnFunction-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 6 };
+
+
+gmscFunction-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS mscFunction;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		gmscFunctionId;
+	BEHAVIOUR
+		gmscFunction-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 7 };
+
+
+g3ManagedElement-meContext NAME BINDING
+	SUBORDINATE OBJECT CLASS g3ManagedElement;
+	NAMED BY
+	SUPERIOR OBJECT CLASS meContext;
+	WITH ATTRIBUTE
+		managedElementId;
+	BEHAVIOUR
+		g3ManagedElement-meContextBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 8 };
+
+
+g3ManagedElement-g3SubNetwork NAME BINDING
+	SUBORDINATE OBJECT CLASS g3ManagedElement;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3SubNetwork;
+	WITH ATTRIBUTE
+		managedElementId;
+	BEHAVIOUR
+		g3ManagedElement-g3SubNetworkBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 9 };
+
+
+hlrFunction-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS hlrFunction;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		hlrFunctionId;
+	BEHAVIOUR
+		hlrFunction-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 10 };
+
+
+irpAgent-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS irpAgent;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		irpAgentId;
+	BEHAVIOUR
+		irpAgent-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 11 };
+
+
+irpAgent-g3SubNetwork NAME BINDING
+	SUBORDINATE OBJECT CLASS irpAgent;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3SubNetwork;
+	WITH ATTRIBUTE
+		irpAgentId;
+	BEHAVIOUR
+		irpAgent-g3SubNetworkBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 12 };
+
+
+irpAgent-managementNode NAME BINDING
+	SUBORDINATE OBJECT CLASS irpAgent;
+	NAMED BY
+	SUPERIOR OBJECT CLASS managementNode;
+	WITH ATTRIBUTE
+		irpAgentId;
+	BEHAVIOUR
+		irpAgent-managementNodeBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 13 };
+
+
+iubLink-rncFunction NAME BINDING
+	SUBORDINATE OBJECT CLASS iubLink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS rncFunction;
+	WITH ATTRIBUTE
+		iubLinkId;
+	BEHAVIOUR
+		iubLink-rncFunctionBahaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 14 };
+
+
+managementNode-g3SubNetwork NAME BINDING
+	SUBORDINATE OBJECT CLASS managementNode;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3SubNetwork;
+	WITH ATTRIBUTE
+		managementNodeId;
+	BEHAVIOUR
+		managementNode-g3SubNetworkBahaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 15 };
+
+
+meContext-g3SubNetwork NAME BINDING
+	SUBORDINATE OBJECT CLASS meContext;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3SubNetwork;
+	WITH ATTRIBUTE
+		meContextId;
+	BEHAVIOUR
+		meContext-g3SubNetworkBahaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 16 };
+
+
+mscFunction-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS mscFunction;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		mscFunctionId;
+	BEHAVIOUR
+		mscFunction-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 17 };
+
+
+nodeBFunction-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS nodeBFunction;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		nodeBFunctionId;
+	BEHAVIOUR
+		nodeBFunction-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 18 };
+
+
+notificationControl-irpAgent NAME BINDING
+	SUBORDINATE OBJECT CLASS "3GPP TS 32.106-4":notificationControl;
+	NAMED BY
+	SUPERIOR OBJECT CLASS irpAgent;
+	WITH ATTRIBUTE
+		"3GPP TS 32.106-4":notificationControlId;
+	BEHAVIOUR
+		notificationControl-irpAgentBehavior;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 19 };
+
+
+rncFunction-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS rncFunction;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		rncFunctionId;
+	BEHAVIOUR
+		rncFunction-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 20 };
+
+
+sgsnFunction-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS sgsnFunction;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		sgsnFunctionId;
+	BEHAVIOUR
+		sgsnFunction-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 21 };
+
+
+smsGmscFunction-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS smsGmscFunction;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		smsGmscFunctionId;
+	BEHAVIOUR
+		smsGmscFunction-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 22 };
+
+
+smsIwmscFunction-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS smsIwmscFunction;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		smsIwmscFunctionId;
+	BEHAVIOUR
+		smsIwmscFunction-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 23 };
+
+
+utranCell-rncFunction NAME BINDING
+	SUBORDINATE OBJECT CLASS utranCell;
+	NAMED BY
+	SUPERIOR OBJECT CLASS rncFunction;
+	WITH ATTRIBUTE
+		utranCellId;
+	BEHAVIOUR
+		utranCell-rncFunctionBahaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 24 };
+
+
+vlrFunction-g3ManagedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS vlrFunction;
+	NAMED BY
+	SUPERIOR OBJECT CLASS g3ManagedElement;
+	WITH ATTRIBUTE
+		vlrFunctionId;
+	BEHAVIOUR
+		vlrFunction-g3ManagedElementBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { ts32-106-7BCMNameBinding 25 };
+-- 5.6 Behaviours
+
+
+alarmControl-irpAgentBehavior BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a irpAgent contains and 
+		controls an alarmControl. When automatic instance naming is used, the choice of 
+		name bindings left as a local matter.";
+
+
+aucFunctionIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute identifies a aucFunction instance.";
+
+
+aucFunction-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gManagedElement contains 
+		and controls a aucFunction. When automatic instance naming is used, the choice 
+		of name bindings left as a local matter.";
+
+
+bcmControlBasicPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"The object class bcmControl offers the functions defined in the CM IRP IS 
+		enabling to control the behaviour and to retrieve the management information 
+		related a Basic CM IRP agent.
+
+		An instance of the 'BCmControl' MOC is identified by the value of the attribute 
+		'bcmControlId'.";
+
+
+bcmControlIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute names an instance of the 'bcmControl' object class.";
+
+
+bcmIRPVersionPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package has been defined to allow the Manager to get information about the 
+		Basic CM IRP versions supported by the Agent.
+
+		The attribute 'supportedBCmIRPVersions' indicates all versions of the Basic IRP 
+		currently supported by the Agent. .
+
+		With the action 'getBasicCmIRPVersion' a manager can find out the versions of 
+		the Basic CM IRP CMIP solution sets the Agent supports.";
+
+
+bcmControl-irpAgentBehavior BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a irpAgent contains and 
+		controls an bcmControl. When automatic instance naming is used, the choice of 
+		name bindings left as a local matter.";
+
+
+bgFunctionIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute identifies a bgFunction instance.";
+
+
+bgFunction-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gManagedElement contains 
+		and controls a bgFunction. When automatic instance naming is used, the choice of 
+		name bindings left as a local matter.";
+
+
+eirFunctionIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute identifies a eirFunction instance.";
+
+
+eirFunction-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gManagedElement contains 
+		and controls a eirFunction. When automatic instance naming is used, the choice 
+		of name bindings left as a local matter.";
+
+
+getBCmIRPVersionBehaviour BEHAVIOUR
+	DEFINED AS
+		"A Manager invokes this action to enquiry about the versions of the Basic CM IRP 
+		CMIP solution set which the concerned Agent supports.
+
+		The 'Action information' field contains no data:
+
+		The 'Action response' is composed of the following data:
+
+		* versionNumbersList It contains a list of versions supported by the concerned 
+		agent which are backwards compatible. A list containing no element, i.e. a NULL 
+		list means that the concerned agent doesn't support any version of the 
+		Notification IRP.
+
+		* status It contains the results of this action. Possible values: noError (0), 
+		error (the value indicates the reason of the error).";
+
+
+ggsnFunctionIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute identifies a ggsnFunction instance.";
+
+
+ggsnFunction-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gManagedElement contains 
+		and controls a ggsnFunction. When automatic instance naming is used, the choice 
+		of name bindings left as a local matter.";
+
+
+g3ManagedElement-meContextBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a meContext contains and 
+		controls a 3gManagedElement. When automatic instance naming is used, the choice 
+		of name bindings left as a local matter.";
+
+
+g3ManagedElement-g3SubNetworkBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gMnetwork contains and 
+		controls a 3gManagedElement. When automatic instance naming is used, the choice 
+		of name bindings left as a local matter.";
+
+
+g3ManagedElementAssociationPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"The attribute 'meManagedBy' points to the g3ManagmentNode instance which manages 
+		this g3ManagedElement instance. It implements the attribute managedBy of MOC 
+		G3ManagedElement defined in TS32.106-5.";
+
+
+g3ManagedElementBasicPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This managed object class represents telecommunications equipment within the 
+		telecommunications network that performs managed element functions, i.e. 
+		provides support and/or service to the subscriber. A managed element 
+		communicates with a manager (directly or indirectly) over one or more standard 
+		interfaces for the purpose of being monitored and/or controlled. A managed 
+		element contains equipment that may or may not be geographically distributed. A 
+		Managed Element is often referred to as a 'node' or a 'network element'.";
+
+
+g3SubNetworkBasicPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This managed object class represents collections of interconnected 
+		telecommunications and management objects (logical or physical) capable of 
+		exchanging information. A network may be nested within another (larger) network, 
+		thereby forming a containment relationship.";
+
+
+g3SubNetworkIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute names an instance of the '3gSubNetwork' object class.";
+
+
+gmscFunctionIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute identifies a gmscFunction instance.";
+
+
+gmscFunction-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gManagedElement contains 
+		and controls a gmscFunction. When automatic instance naming is used, the choice 
+		of name bindings left as a local matter.";
+
+
+hlrFunctionIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute identifies a hlrFunction instance.";
+
+
+hlrFunction-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gManagedElement contains 
+		and controls a hlrFunction. When automatic instance naming is used, the choice 
+		of name bindings left as a local matter.";
+
+
+irpAgentBasicPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This MOC may have only one instance in R99. The instance of this MOC represents 
+		the behavior of an IRP Agent which implements one or more IRPs, e.g. AlarmIRP 
+		defined in 3GPP TS 32.111-2, NotificationIRP defined in TS32.106-2 and Basic CM 
+		IRP defined in 3GPP TS 32.106-5";
+
+
+irpAgentIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute identifies an irpAgent instance.";
+
+
+irpAgent-g3SubNetworkBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a g3SubNetwork contains and 
+		controls a irpAgent. When automatic instance naming is used, the choice of name 
+		bindings left as a local matter.";
+
+
+irpAgent-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a g3ManagedElement contains 
+		and controls a irpAgent. When automatic instance naming is used, the choice of 
+		name bindings left as a local matter.";
+
+
+irpAgent-managementNodeBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a managementNode contains 
+		and controls a irpAgent. When automatic instance naming is used, the choice of 
+		name bindings left as a local matter.";
+
+
+iubLinkNodeBFunctionLinkBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute points to the nodeBFunction instance which this iubLink instance 
+		connects directly to.";
+
+
+iubLink-rncFunctionBahaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a rncFunction contains and 
+		controls a iubLink. When automatic instance naming is used, the choice of name 
+		bindings left as a local matter.";
+
+
+iubLinkAssociationPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"The attribute 'iubLinkNodeBFunctionLink' points to the nodeBFunction instance 
+		which this iubLink instance connects to. The attribute iubLinkUtranCellLinkc 
+		points from an iubLink to a list of utranCell.";
+
+
+iubLinkBasicPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This managed object class models the Iub Link between a Node-B and a RNC.";
+
+
+iubLinkIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute names an instance of the 'iubLink' object class.";
+
+
+iubLinkUtranCellLinkBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute points from an iubLink instance to a list of utranCell instance";
+
+
+managedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"This is a multi-value attribute specifying the sub-classes of managedFunction 
+		this managedElement instance is containing, for instances, RNC, NodeB or 
+		RNC+NodeB.";
+
+
+managedElementIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute names an instance of the '3gManagedElement' object class.";
+
+
+managementFunctionBasicPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This Managed Object class corresponds to the class gsmManagedFunction defined in 
+		GSM 12.20 0 and is provided for sub-classing only. It provides the attributes 
+		that are common to functional MO classes. Note that a managed element may 
+		contain several managed functions. The ManagedFunction may be extended in the 
+		future if more common characteristics to functional objects are identified.";
+
+
+managementNode-g3SubNetworkBahaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gSubNetwork contains and 
+		controls a managementNode. When automatic instance naming is used, the choice of 
+		name bindings left as a local matter.";
+
+
+managementNodeAssociationPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"The attribute 'mnManagesList' points to all g3ManagedElement instances which 
+		this managementNode instance manages. It implements the attribute manages of MOC 
+		ManagementNode defined in TS32.106-5.";
+
+
+managementNodeBasicPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This managed object class represents a telecommunications management system (EM 
+		or NM) within the TMN, that manages a number of Managed Elements. The management 
+		system communicates with the MEs directly or indirectly over one or more 
+		standard interfaces for the purpose of monitoring and/or controlling these MEs.";
+
+
+managmentNodeIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute names an instance of the 'managmentNode' object class.";
+
+
+meContext-g3SubNetworkBahaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gSubnetwork contains and 
+		controls a meContext. When automatic instance naming is used, the choice of name 
+		bindings left as a local matter.";
+
+
+meContextBasicPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This managed object class represents the Managed Element from the network 
+		perspective. It can be used to hold surveillance status information, and also 
+		planning status information for the case when the managed element is part of a 
+		planned configuration in a management system, before it has been taken into 
+		service. It can also support unambiguous naming in all cases, also for scenarios 
+		when the Managed Elements have been pre-configured where some of them may have 
+		equal names (to avoid necessary administration to make all of them globally 
+		unique at creation/installation time). Thus, by means of globally unique names 
+		for the MEContext instances, and by using these in the DN, the DNs for all MEs 
+		(and MOIs contained in them) can be assured to be globally unique, even in such 
+		a scenario as described above.";
+
+
+meContextIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute names an instance of the 'MEContext' object class.";
+
+
+meManagedByBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute points to the managementNode instance which manages the related 
+		3gManagedElement instance.";
+
+
+mnManagesListBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute points to all 3gManagedElement instances which this 
+		3gManagmentNode instance manages.";
+
+
+mscFunctionIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute identifies a mscFunction instance.";
+
+
+mscFunction-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gManagedElement contains 
+		and controls a mscFunction. When automatic instance naming is used, the choice 
+		of name bindings left as a local matter.";
+
+
+nodeBiubLinkLinkBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute points to the IubLink instance which connectes to the related 
+		nodeBFunction instance directly.";
+
+
+nodeBFunction-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gManagedElement contains 
+		and controls a nodeBFunction. When automatic instance naming is used, the choice 
+		of name bindings left as a local matter.";
+
+
+nodeBFunctionAssociationPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"The attribute 'nodeBiubLinkLink' points to the iubLink instance which connectes 
+		to this nodeBFunction instance directly. It implements the attribute 
+		nodeB-IubLink of MOC NodeBFunction defined in TS32.106-5.";
+
+
+nodeBFunctionBasicPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This managed object class represents the NodeB functionality.";
+
+
+nodeBFunctionIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute names an instance of the 'nodeBFunction' object class.";
+
+
+notificationControl-irpAgentBehavior BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a irpAgent contains and 
+		controls an otificationControl. When automatic instance naming is used, the 
+		choice of name bindings left as a local matter.";
+
+
+rncFunction-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gManagedElement contains 
+		and controls a rncFunction. When automatic instance naming is used, the choice 
+		of name bindings left as a local matter.";
+
+
+rncFunctionBasicPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This MOC represents RNC function.";
+
+
+rncFunctionIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute names an instance of the 'rncFunction' object class.";
+
+
+sgsnFunctionIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute identifies a sgsnFunction instance.";
+
+
+sgsnFunction-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gManagedElement contains 
+		and controls a sgsnFunction. When automatic instance naming is used, the choice 
+		of name bindings left as a local matter.";
+
+
+smsGmscFunctionIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute identifies a smsGmscFunction instance.";
+
+
+smsGmscFunction-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gManagedElement contains 
+		and controls a smsGmscFunction. When automatic instance naming is used, the 
+		choice of name bindings left as a local matter.";
+
+
+smsIwmscFunctionIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute identifies a iwmscFunction instance.";
+
+
+smsIwmscFunction-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gManagedElement contains 
+		and controls a smsIwmscFunction. When automatic instance naming is used, the 
+		choice of name bindings left as a local matter.";
+
+
+supportedBCmIRPVersionsBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute provides the information concerning the Basic CM IRP versions 
+		currently supported by the Agent.";
+
+
+supportedIRPsBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute provides the information about IRPs an IRPAgent supports.";
+
+
+utranCelliubLinkLinkBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute implements the attribute UtranCell-IubLink of MOC UtranCell 
+		Defined in TS32.106-5.";
+
+
+userDefinedStateBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute specifies an operator defined state for operator specific usage.";
+
+
+utranCell-rncFunctionBahaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a rncFunction contains and 
+		controls a utranCell. When automatic instance naming is used, the choice of name 
+		bindings left as a local matter.";
+
+
+utranCellIubLinkAssociationPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"The attribute 'utranCelliubLinkLink' points to the iubLink instance which 
+		connectes to this utranCell instance.";
+
+
+utranCellNodeBAssociationPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"The attribute 'utranCellNodeBLink' points to the nodeBFunction instance which 
+		connectes to this utranCell instance.";
+
+
+utranCellBasicPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This managed object class represents the radio cell controlled by the RNC.";
+
+
+utranCellIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute names an instance of the 'utranCell' object class.";
+
+
+vlrFunctionIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute identifies a vlrFunction instance.";
+
+
+vlrFunction-g3ManagedElementBehaviour BEHAVIOUR
+	DEFINED AS
+		"The name binding represents a relationship in which a 3gManagedElement contains 
+		and controls a vlrFunction. When automatic instance naming is used, the choice 
+		of name bindings left as a local matter.";
+-- 6. ASN.1 Definitions
+
+--< ASN1.Version 1994 TS32-106-7TypeModule
+--  { ccitt(0) identified-organization(4) etsi(0) mobileDomain(0) umts-Operation-Maintenance(3) ts-32-106(106) part7(7) informationModel(0) asn1Module(2) version1(1) } >--
+TS32-106-7TypeModule { ccitt(0) identified-organization(4) etsi(0) mobileDomain(0) umts-Operation-Maintenance(3) ts-32-106(106) part7(7) informationModel(0) asn1Module(2) version1(1) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+--EXPORTS everything
+IMPORTS
+ObjectInstance
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) };
+-- 3GPP TS 32.106-7 related Object Identifiers
+baseNodeUMTS OBJECT IDENTIFIER ::= { itu-t(0) identified-organization(4) etsi(0) mobileDomain(0) umts-Operation-Maintenance(3) }
+ts32-106Prefix OBJECT IDENTIFIER ::= { baseNodeUMTS ts-32-106(106) }
+ts32-106Part7 OBJECT IDENTIFIER ::= { ts32-106Prefix part7(7) }
+ts32-106-7InfoModel OBJECT IDENTIFIER ::= { ts32-106Part7 informationModel(0) }
+ts32-106-7BCMObjectClass OBJECT IDENTIFIER ::= { ts32-106-7InfoModel managedObjectClass(3) }
+ts32-106-7BCMPackage OBJECT IDENTIFIER ::= { ts32-106-7InfoModel package(4) }
+ts32-106-7BCMParameter OBJECT IDENTIFIER ::= { ts32-106-7InfoModel parameter(5) }
+ts32-106-7BCMNameBinding OBJECT IDENTIFIER ::= { ts32-106-7InfoModel nameBinding(6) }
+ts32-106-7BCMAttribute OBJECT IDENTIFIER ::= { ts32-106-7InfoModel attribute(7) }
+ts32-106-7BCMAction OBJECT IDENTIFIER ::= { ts32-106-7InfoModel action(9) }
+ts32-106-7BCMNotification OBJECT IDENTIFIER ::= { ts32-106-7InfoModel notification(10) }
+-- Start of 3gPP SA5 own definitions
+ErrorCauses ::= ENUMERATED {
+	noError(0),
+	wrongInput(1),
+	unspecifiedErrorReason(255) }
+GeneralObjectId ::= INTEGER
+GeneralObjectPointer ::= ObjectInstance
+GeneralObjectPointerList ::= SEQUENCE OF ObjectInstance
+GeneralUserLable ::= GraphicString
+GetBCmIRPVersionReply ::= SEQUENCE {
+	versionNumbersList SupportedBCmIRPVersions,
+	status ErrorCauses }
+IRPNames ::= SET OF ENUMERATED {
+	notificationIRP(1),
+	alarmIRP(2),
+	basicCMIRP(3) }
+IRPVersionNumber ::= GraphicString
+ManagedElementType ::= SET OF ENUMERATED {
+	rnc(1),
+	nodeB(2),
+	msc(3),
+	hLR(4),
+	vLR(5),
+	aUC(6),
+	eIR(7),
+	sms-IWNSC(8),
+	sms-GMSC(9),
+	sGSN(10),
+	gGSN(11),
+	bG(12),
+	gmsc(13) }
+SupportedBCmIRPVersions ::= SET OF IRPVersionNumber
+SupportedIRPs ::= SET OF IRPNames
+UserDefinedState ::= INTEGER
+END-- of TS32-106-7TypeModule
+
+
+END
+--< GDMO.EndDocument "ETSI TS 132 106-7 V3.3.0 (2001-12)"
+--  { ccitt(0) identified-organization(4) etsi(0) mobileDomain(0) umts-Operation-Maintenance(3) ts-32-106(106) part7(7) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ +- itut_x723::subsystem
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ +- itut_m3100::tpPool
+--@@ +- etsi_106_4::notificationControl
+--@@ +- etsi_111_4::alarmControl
+--@@ +- etsi_106_7::bcmControl
+--@@ +- etsi_106_7::g3ManagedElement
+--@@ +- etsi_106_7::g3SubNetwork
+--@@ +- etsi_106_7::irpAgent
+--@@ +- etsi_106_7::managedFunction
+--@@ |  +- etsi_106_7::aucFunction
+--@@ |  +- etsi_106_7::bgFunction
+--@@ |  +- etsi_106_7::eirFunction
+--@@ |  +- etsi_106_7::ggsnFunction
+--@@ |  +- etsi_106_7::hlrFunction
+--@@ |  +- etsi_106_7::gmscFunction
+--@@ |  +- etsi_106_7::iubLink
+--@@ |  +- etsi_106_7::mscFunction
+--@@ |  +- etsi_106_7::nodeBFunction
+--@@ |  +- etsi_106_7::rncFunction
+--@@ |  +- etsi_106_7::sgsnFunction
+--@@ |  +- etsi_106_7::smsGmscFunction
+--@@ |  +- etsi_106_7::smsIwmscFunction
+--@@ |  +- etsi_106_7::utranCell
+--@@ |  +- etsi_106_7::vlrFunction
+--@@ +- etsi_106_7::managementNode
+--@@ +- etsi_106_7::meContext
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@ etsi_106_7::g3SubNetwork
+--@@ >- etsi_106_7::g3ManagedElement
+--@@ |  >- etsi_106_7::aucFunction
+--@@ |  >- etsi_106_7::bgFunction
+--@@ |  >- etsi_106_7::eirFunction
+--@@ |  >- etsi_106_7::ggsnFunction
+--@@ |  >- etsi_106_7::mscFunction
+--@@ |  >- etsi_106_7::hlrFunction
+--@@ |  >- etsi_106_7::irpAgent
+--@@ |  |  >- etsi_111_4::alarmControl
+--@@ |  |  >- etsi_106_7::bcmControl
+--@@ |  |  >- etsi_106_4::notificationControl
+--@@ |  >- etsi_106_7::mscFunction
+--@@ |  >- etsi_106_7::nodeBFunction
+--@@ |  >- etsi_106_7::rncFunction
+--@@ |  |  >- etsi_106_7::iubLink
+--@@ |  |  >- etsi_106_7::utranCell
+--@@ |  >- etsi_106_7::sgsnFunction
+--@@ |  >- etsi_106_7::smsGmscFunction
+--@@ |  >- etsi_106_7::smsIwmscFunction
+--@@ |  >- etsi_106_7::vlrFunction
+--@@ >- etsi_106_7::irpAgent +++
+--@@ >- etsi_106_7::managementNode
+--@@ |  >- etsi_106_7::irpAgent +++
+--@@ >- etsi_106_7::meContext
+--@@ |  >- etsi_106_7::g3ManagedElement +++
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

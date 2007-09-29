@@ -1,0 +1,684 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Sep 19 11:16:09 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Document "ETSI TS 132 106-4 V3.2.1 (2002-09)"
+--  { itu-t(0) identified-organization(4) etsi(0) mobileDomain(0) umts-Operation-Maintenance(3) ts-32-106(106) part4(4) informationModel(0) } >--
+--< GDMO.Alias "ETSI TS 132 106-4 V3.2.1 (2002-09)" "3GPP TS 32.106-4" >--
+--< GDMO.Namespace etsi_106_4 >--
+MODULE "ETSI TS 132 106-4 V3.2.1 (2002-09)" { itu-t(0) identified-organization(4) etsi(0) mobileDomain(0) umts-Operation-Maintenance(3) ts-32-106(106) part4(4) informationModel(0) }
+-- 5 GDMO definitions
+-- 5.1 Managed Object Classes
+-- 5.1.1 notificationControl
+
+notificationControl MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		notificationControlBasicPackage,
+		notificationControlInfoPackage,
+		notificationIRPVersionPackage;
+REGISTERED AS { ts32-106NotificationsObjectClass 1 };
+-- 5.2 Packages
+-- 5.2.1 notificationControlBasicPackage
+
+
+notificationControlBasicPackage PACKAGE
+	BEHAVIOUR
+		notificationControlBasicPackageBehaviour;
+	ATTRIBUTES
+		notificationControlId GET;
+	ACTIONS
+		changeSubscriptionFilter,
+		resumeSubscription,
+		subscribe,
+		suspendSubscription,
+		unsubscribe;
+REGISTERED AS { ts32-106NotificationsPackage 1 };
+
+
+notificationControlBasicPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"The object class notificationControl offers all functions defined in the 
+		Notification IRP IS enabling managers to subscribe to agents for getting 
+		notifications they are concerned. It enables the managers to control the 
+		behaviour and to retrieve the management information related to subscriptions
+
+		An instance of the 'notificationControl' MOC is identified by the value of the 
+		attribute 'notificationControlId'.
+
+		The action 'changeSubscriptionFilter' is the means, for the Manager, to change 
+		the active filter for the current subscription.
+
+		The action 'resumeSubscription' is invoked by the Manager to resume a 
+		subscription previously suspended.
+
+		The action 'subscribe' is the means, for the Manager, to establish the 
+		communication to an Agent in order to receive event reports.
+
+		The action 'suspendSubscription' is invoked by the Manager to suspend an active 
+		subscription.
+
+		The action 'unsubscribe' is invoked by the Manager to cancel one or all 
+		subscriptions to the Agent.";
+-- 5.2.2 notificationControlInfoPackage
+
+
+notificationControlInfoPackage PACKAGE
+	BEHAVIOUR
+		notificationControlInfoPackageBehaviour;
+	ATTRIBUTES
+		supportedNotificationCategories GET;
+	ACTIONS
+		getNotificationCategories,
+		getSubscriptionStatus,
+		getSubscriptionIds;
+REGISTERED AS { ts32-106NotificationsPackage 2 };
+
+
+notificationControlInfoPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package has been defined to allow the Manager to get information about its 
+		currently active subscriptions.
+
+		The attribute 'supportedNotificationCategories' indicates the categories of 
+		notifications supported by the current Agent.
+
+		The action 'getNotificationCategories' is the means, for the Manager, to query 
+		the supported categories of notifications.
+
+		The action 'getSubscriptionStatus' is invoked by the Manager to get information 
+		about the status of the specified subscription.
+
+		The action 'getSubscriptionIds' allows the Manager to get all currently valid 
+		subscriptionId values assigned by the Agent to this Manager.";
+-- 5.2.3 notificationIRPVersionPackage
+
+
+notificationIRPVersionPackage PACKAGE
+	BEHAVIOUR
+		notificationIRPVersionPackageBehaviour;
+	ATTRIBUTES
+		supportedNotificationIRPVersions GET;
+	ACTIONS
+		getNotificationIRPVersion;
+REGISTERED AS { ts32-106NotificationsPackage 3 };
+
+
+notificationIRPVersionPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package has been defined to allow the Manager to get information about the 
+		Notification IRP versions supported by the Agent.
+
+		The attribute 'supportedNotificationIRPVersions' indicates all versions of the 
+		NotificationIRP currently supported by the Agent.
+
+		The action 'getNotificationIRPVersion' is invoked by the Manager to get 
+		information about the NotificationIRP versions supported by the Agent.";
+-- 5.3 Actions
+-- 5.3.1 changeSubscriptionFilter (O)
+
+
+changeSubscriptionFilter ACTION
+	BEHAVIOUR
+		changeSubscriptionFilterBehaviour;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX TS32-106-NotificationsAsn1TypeModule.ChangeSubscriptionFilter;
+	WITH REPLY SYNTAX TS32-106-NotificationsAsn1TypeModule.ChangeSubscriptionFilterReply;
+REGISTERED AS { ts32-106NotificationsAction 1 };
+
+
+changeSubscriptionFilterBehaviour BEHAVIOUR
+	DEFINED AS
+		"A Manager invokes this action to change the active filter for the subscription 
+		specified with subscriptionId in the request. The Agent will modify in the 
+		related EFD instance the value of the attribute discriminatorConstruct 
+		accordingly.
+
+		The 'Action information' contains the following data:
+
+		- subscriptionId
+
+		This mandatory parameter identifies unambiguously the Manager subscription.
+
+		- filter
+
+		This mandatory parameter is used to change the value of the attribute 
+		discriminatorConstruct of the EFD taking into account the additional 
+		information:
+
+		 Parameter notificatioCategories (as specified in the subscribe action)
+
+		 An insertion which discriminates all notifications containing at the beginning 
+		 of the attribute additionaText the string'(ALIGNMENT'. (see TS 32.111-4 for 
+		 more details).
+
+		The Action responset is composed of the following data:
+
+		- status It contains the results of this action. Possible values: noError (0), 
+		  error (the value indicates the reason of the error).";
+-- 5.3.2 getNotificationCategories (O)
+
+
+getNotificationCategories ACTION
+	BEHAVIOUR
+		getNotificationCategoriesBehaviour;
+	MODE CONFIRMED;
+	WITH REPLY SYNTAX TS32-106-NotificationsAsn1TypeModule.GetNotificationCategoriesReply;
+REGISTERED AS { ts32-106NotificationsAction 2 };
+
+
+getNotificationCategoriesBehaviour BEHAVIOUR
+	DEFINED AS
+		" A manager may invoke this action to query the categories of notifications 
+		 supported by a concerned agent. This action is irrelevant to any subscriptions. 
+		 A manager may invoke this action before or after a subscribtion.
+
+		The Action responset is composed of the following data:
+
+		- notificationCategoryList
+
+		This parameter identifies a list of categories of notifications supported by the 
+		concerned agent. A list containing no element, i.e. a NULL list means that the 
+		agent does not support any category of notification.
+
+		- status
+
+		It contains the results of this action. Possible values: noError (0), error (the 
+		value indicates the reason of the error).";
+-- 5.3.3 getSubscriptionStatus (O)
+
+
+getSubscriptionStatus ACTION
+	BEHAVIOUR
+		getSubscriptionStatusBehaviour;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX TS32-106-NotificationsAsn1TypeModule.GetSubscriptionStatus;
+	WITH REPLY SYNTAX TS32-106-NotificationsAsn1TypeModule.GetSubscriptionStatusReply;
+REGISTERED AS { ts32-106NotificationsAction 3 };
+
+
+getSubscriptionStatusBehaviour BEHAVIOUR
+	DEFINED AS
+		"A manager invokes this action to query the status of the current subscription, 
+		identified by means of the subscriptionId value, returned by the Agent in the 
+		subscribe operation.
+
+		Some subscription status values relate to attributes of the EFD instance created 
+		by the manager within the agent, while other parameters refer to properties of 
+		the Manager-Agent communication.
+
+		The 'Action information' field contains the following data:
+
+		- subscriptionId
+
+		This mandatory parameter identifies unambiguously the Manager subscription.
+
+		The response of this action is composed of the following data:
+
+		- notificationCategoryList
+
+		This parameter identifies the categories of notifications supported in the 
+		current subscription. If the parameter value is NULL, all notification 
+		categories supported by the Agent are emitted towards the Manager.
+
+		- filterInEffect
+
+		This parameter specifies the current discriminatorConstruct value of the EFD 
+		instance used by the Agent in the communication with the Manager. The value NULL 
+		means that no filter constraint applies to the notifications generated by the 
+		Agent.
+
+		- subscriptionStatus
+
+		This optional parameter specifies if the current subscription is in the state 
+		'suspended' or not.
+
+		- timeTick
+
+		This optional parameter identifies the value of a timer controlled by the Agent 
+		for the supervision of the current subscription. The value is set by the Manager 
+		in the subscribe operation.
+
+		- status
+
+		It contains the results of this action. Possible values: noError (0), error (the 
+		value indicates the reason of the error).";
+-- 5.3.4 getSubscriptionIds (O)
+
+
+getSubscriptionIds ACTION
+	BEHAVIOUR
+		getSubscriptionIdsBehaviour;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX TS32-106-NotificationsAsn1TypeModule.GetSubscriptionIds;
+	WITH REPLY SYNTAX TS32-106-NotificationsAsn1TypeModule.GetSubscriptionIdsReply;
+REGISTERED AS { ts32-106NotificationsAction 4 };
+
+
+getSubscriptionIdsBehaviour BEHAVIOUR
+	DEFINED AS
+		"A Manager invokes this action to query all currently valid subscriptionId values 
+		assigned by Agent to this Manager as result of previous subscribe operations 
+		triggered by this Manager.
+
+		The 'Action information' field contains the following data:
+
+		- managerReference
+
+		This parameter identifies unambiguously the Manager invoking the current 
+		operation.
+
+		The response of this action is composed of the following data:
+
+		- subscriptionIdList
+
+		This parameter identifies all subscriptionId currently valid for the Manager 
+		invoking this operation. The value of this parameter is NULL, if the Manager did 
+		not yet subscribed to that Agent or the Manager lost all subscription-related 
+		information.
+
+		- status
+
+		It contains the results of this action. Possible values: noError (0), error (the 
+		value indicates the reason of the error).";
+-- 5.3.5 getNotificationIRPVersion (M)
+
+
+getNotificationIRPVersion ACTION
+	BEHAVIOUR
+		getNotificationIRPVersionBehaviour;
+	MODE CONFIRMED;
+	WITH REPLY SYNTAX TS32-106-NotificationsAsn1TypeModule.GetNotificationIRPVersionReply;
+REGISTERED AS { ts32-106NotificationsAction 5 };
+
+
+getNotificationIRPVersionBehaviour BEHAVIOUR
+	DEFINED AS
+		"A Manager invokes this action to enquiry about the version of the Notification 
+		IRP the concerned Agent supports.
+
+		The 'Action information' field contains no data:
+
+		The Action responset is composed of the following data:
+
+		- versionNumbersList
+
+		It contains a list of versions supported by the concerned agent which are 
+		backwards compatible. A list containing no element, i.e. a NULL list means that 
+		the concerned agent doesnct support any version of the Notification IRP.
+
+		- status
+
+		It contains the results of this action. Possible values: noError (0), error (the 
+		value indicates the reason of the error).";
+-- 5.3.6 resumeSubscription (O)
+
+
+resumeSubscription ACTION
+	BEHAVIOUR
+		resumeSubscriptionBehaviour;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX TS32-106-NotificationsAsn1TypeModule.ResumeSubscription;
+	WITH REPLY SYNTAX TS32-106-NotificationsAsn1TypeModule.ResumeSubscriptionReply;
+REGISTERED AS { ts32-106NotificationsAction 6 };
+
+
+resumeSubscriptionBehaviour BEHAVIOUR
+	DEFINED AS
+		"A Manager invokes this action to resume a subscription previously suspended. The 
+		Agent will set to 'unlocked' the value of the attribute administrativeState of 
+		the EFD instance related to the subscription specified in the Manager request. 
+		Therefore the forwarding of notifications according to the current filter 
+		(discriminatorConstruct attribute value) is possible again.
+
+		The 'Action information' field contains the following data:
+
+		- subscriptionId
+
+		This mandatory parameter identifies unambiguously the Manager subscription which 
+		shall be resumed.
+
+		The Action responsem is composed of the following data:
+
+		- status
+
+		It contains the results of this action. Possible values: noError (0), error (the 
+		value indicates the reason of the error).";
+-- 5.3.7 subscribe (M)
+
+
+subscribe ACTION
+	BEHAVIOUR
+		subscribeBehaviour;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX TS32-106-NotificationsAsn1TypeModule.Subscribe;
+	WITH REPLY SYNTAX TS32-106-NotificationsAsn1TypeModule.SubscribeReply;
+REGISTERED AS { ts32-106NotificationsAction 7 };
+
+
+subscribeBehaviour BEHAVIOUR
+	DEFINED AS
+		"A Manager invokes this action to establish a subscription to the Agent for the 
+		specified notifications.
+
+		In the context of the CMIP Solution Set for Notification IRP, the availability 
+		of at least one EFD instance is a necessary pre-requisite for the Manager to 
+		receive event reports from the Agent The subscribe action allows the Manager to 
+		specify parameters related to the Manager-Agent communication.
+
+		After receiving the subscribe request, the Agent defines an unambiguous 
+		subscriptionId value for the current subscription and, if necessary, creates a 
+		new EFD instance according to the parameters specified in the action request.
+
+		The 'Action information' contains the following data:
+
+		- managerReference
+
+		This parameter identifies unambiguously the Manager invoking the current 
+		subscribe operation.
+
+		- destination
+
+		This parameter identifies the destination to which event reports that have 
+		passed the filter conditions are sent. According to ITU-T X.721, if no 
+		destination is specified in the request, then the discriminator is created with 
+		the destination defaulted to the AE-Title of the invoker.
+
+		- filter
+
+		This parameter defines the conditions a notification shall fulfil in order to be 
+		forwarded to the Manager.
+
+		- timeTick
+
+		This optional parameter identifies the value of a timer controlled by the Agent 
+		for the supervision of the current subscription. The timer is reset every time 
+		the Manager invokes the getSubscriptionStatus action. If the timer expires, the 
+		Agent considers the communication with the current Manager as aborted and 
+		subsequently releases the resources allocated for this Manager (similar 
+		behaviour as in case of an unsubscribe action). In order to re-establish the 
+		communication, the Manager shall invoke again the subscribe action.
+
+		- notificationCategoryList
+
+		This optional parameter identifies one or more types of notifications required 
+		in the current subscription. If the parameter value is NULL or absent, the 
+		Manager requires that all notification types supported by the Agent shall be 
+		emitted.
+
+		NOTE: The discriminatorConstruct of the EFD is composed taking into account the 
+		following information:
+
+		 Parameter filter
+
+		 Parameter notificatioCategories
+
+		 An insertion which discriminates all notifications containing at the beginning 
+		 of the attribute additionaText the string '(ALIGNMENT'. (see TS 32.111-4 for 
+		 more details).
+
+		The Action responset is composed of the following data:
+
+		- subscriptionId
+
+		This parameter identifies unambiguously the current Manager subscription in the 
+		scope of the Agent and shall be used later only by the Manager invoking this 
+		action.
+
+		- status
+
+		It contains the results of this action. Possible values: noError (0), error (the 
+		value indicates the reason of the error).";
+-- 5.3.8 suspendSubscription (O)
+
+
+suspendSubscription ACTION
+	BEHAVIOUR
+		suspendSubscriptionBehaviour;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX TS32-106-NotificationsAsn1TypeModule.SuspendSubscription;
+	WITH REPLY SYNTAX TS32-106-NotificationsAsn1TypeModule.SuspendSubscriptionReply;
+REGISTERED AS { ts32-106NotificationsAction 8 };
+
+
+suspendSubscriptionBehaviour BEHAVIOUR
+	DEFINED AS
+		"A Manager invokes this action to suspend an active subscription. The Agent will 
+		set to 'locked' the value of the attribute administrativeState of the EFD 
+		instance related to the subscription specified in the Manager request. The 
+		forwarding of notifications via the current EFD instance is not possible any 
+		more.
+
+		The 'Action information' field contains the following data:
+
+		- subscriptionId
+
+		This mandatory parameter identifies unambiguously the Manager subscription which 
+		shall be suspended.
+
+		The Action responsem is composed of the following data:
+
+		- status
+
+		It contains the results of this action. Possible values: noError (0), error (the 
+		value indicates the reason of the error).";
+-- 5.3.9 unsubscribe (M)
+
+
+unsubscribe ACTION
+	BEHAVIOUR
+		unsubscribeBehaviour;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX TS32-106-NotificationsAsn1TypeModule.Unsubscribe;
+	WITH REPLY SYNTAX TS32-106-NotificationsAsn1TypeModule.UnsubscribeReply;
+REGISTERED AS { ts32-106NotificationsAction 9 };
+
+
+unsubscribeBehaviour BEHAVIOUR
+	DEFINED AS
+		"A Manager invokes this action to cancel a subscription to the Agent. For the 
+		CMIP solution set this may result in the deletion of the related EFD instance.
+
+		The 'Action information' contains the following data:
+
+		- managerReference
+
+		This parameter identifies unambiguously the Manager invoking the current 
+		unsubscribe operation. In order to cancel a particular subscription, the Manager 
+		shall indicate additionally a specific subscriptionId value.
+
+		- subscriptionId
+
+		This parameter identifies unambiguously a Manager subscription, established by 
+		means of a previous subscribe operation. If the parameter value is NULL, all 
+		current subscriptions of the Manager identified by means of the managerReference 
+		are cancelled, i.e. all related EFD instances may be deleted as well.
+
+		The Action responser is composed of the following data:
+
+		- status
+
+		It contains the results of this action. Possible values: noError (0), error (the 
+		value indicates the reason of the error).";
+-- 5.4 Attributes
+-- 5.4.1 notificationControlId
+
+
+notificationControlId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-NotificationsAsn1TypeModule.GeneralObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		notificationControlIdBehaviour;
+REGISTERED AS { ts32-106NotificationsAttribute 1 };
+
+
+notificationControlIdBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute names an instance of a notificationControl object class.";
+-- 5.4.2 supportedNotificationCategories
+
+
+supportedNotificationCategories ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-NotificationsAsn1TypeModule.NotificationCategory;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		supportedNotificationCategoriesBehaviour;
+REGISTERED AS { ts32-106NotificationsAttribute 2 };
+
+
+supportedNotificationCategoriesBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute provides the information concerning the categories of 
+		notifications currently supported by the Agent.";
+-- 5.4.3 supportedNotificationIRPVersions
+
+
+supportedNotificationIRPVersions ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TS32-106-NotificationsAsn1TypeModule.SupportedNotificationIRPVersions;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		supportedNotificationIRPVersionsBehaviour;
+REGISTERED AS { ts32-106NotificationsAttribute 3 };
+
+
+supportedNotificationIRPVersionsBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute provides the information concerning the NotificationIRP versions 
+		currently supported by the Agent.";
+-- 6 ASN.1 definitions
+
+--< ASN1.Version 1994 TS32-106-NotificationsAsn1TypeModule
+--  { itu-t(0) identified-organization(4) etsi(0) mobileDomain(0) umts-Operation-Maintenance(3) ts-32-106(106) part4(4) informationModel(0) asn1Module(2) version1(1) } >--
+TS32-106-NotificationsAsn1TypeModule { itu-t(0) identified-organization(4) etsi(0) mobileDomain(0) umts-Operation-Maintenance(3) ts-32-106(106) part4(4) informationModel(0) asn1Module(2) version1(1) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+--EXPORTS everything
+IMPORTS
+Destination, DiscriminatorConstruct
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
+CMISFilter
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) };
+baseNode3gpp OBJECT IDENTIFIER ::= { itu-t(0) identified-organization(4) etsi(0) mobileDomain(0) umts-Operation-Maintenance(3) }
+ts32-106Notifications OBJECT IDENTIFIER ::= { baseNode3gpp ts-32-106(106) part4(4) informationModel(0) }
+ts32-106NotificationsObjectClass OBJECT IDENTIFIER ::= { ts32-106Notifications managedObjectClass(3) }
+ts32-106NotificationsPackage OBJECT IDENTIFIER ::= { ts32-106Notifications package(4) }
+ts32-106NotificationsAttribute OBJECT IDENTIFIER ::= { ts32-106Notifications attribute(7) }
+ts32-106NotificationsAction OBJECT IDENTIFIER ::= { ts32-106Notifications action(9) }
+-- Start of 3GPP SA5 own definitions
+ErrorCauses ::= ENUMERATED {
+	noError(0),-- operation / notification successfully performed
+	wrongSubscriptionId(1),-- the value of the parameter subscriptionId is not known for the Agent
+	wrongManagedReference(2),-- for the current Manager there is no subscription available
+	notificationIRPVersionNotSupported(3),-- Notification IRP version requested by NM not supported by Agent
+	wrongFilter(4),-- the value of the filter parameter is not valid
+	wrongDestination(5),-- the value of the destination parameter (subscribe) is not valid
+	duplicatedSubscription(6),-- the current Manager already performed a subscription with the same parameters
+	wrongTimeTick(7),-- the value of the timeTick parameter (subscribe) is not valid
+	wrongNotificationCategory(8),-- the notification category specified in the subscribe request is unknown
+	unspecifiedErrorReason(255)-- operation failed, specific error unknown
+	}
+ChangeSubscriptionFilter ::= SEQUENCE {
+	subscriptionId GraphicString,
+	filter CMISFilter-- ITU-T X.711
+	}
+ChangeSubscriptionFilterReply ::= SEQUENCE {
+	status ErrorCauses }
+GeneralObjectId ::= INTEGER
+GetNotificationCategoriesReply ::= SEQUENCE {
+	notificationCategoryList NotificationCategoryList,
+	status ErrorCauses }
+GetNotificationIRPVersionReply ::= SEQUENCE {
+	versionNumbersList SupportedNotificationIRPVersions,
+	status ErrorCauses }
+GetSubscriptionStatus ::= SEQUENCE {
+	subscriptionId GraphicString }
+GetSubscriptionStatusReply ::= SEQUENCE {
+	notificationCategoryList NotificationCategoryList,
+	filterInEffect CMISFilter,-- ITU-T X.711
+	subscriptionState [2] SubscriptionState OPTIONAL,
+	timeTick [3] INTEGER OPTIONAL,
+	status [4] ErrorCauses }
+GetSubscriptionIds ::= SEQUENCE {
+	managerReference INTEGER }
+GetSubscriptionIdsReply ::= SEQUENCE {
+	subscriptionIdList SubscriptionIdList,
+	status ErrorCauses }
+IRPVersionNumber ::= GraphicString
+NotificationCategory ::= ENUMERATED {
+	alarm(1),--the notification category defined in the alarm IRP
+	basicCM(2)--the notification category defined in the basic CM IRP
+	}
+NotificationCategoryList ::= SET OF NotificationCategory
+ResumeSubscription ::= SEQUENCE {
+	subscriptionId GraphicString }
+ResumeSubscriptionReply ::= SEQUENCE {
+	status ErrorCauses }
+Subscribe ::= SEQUENCE {
+	managerReference INTEGER,
+	destination Destination,-- ITU-T X.721
+	filter DiscriminatorConstruct,-- ITU-T X.721
+	timeTick INTEGER OPTIONAL,
+	notificationCategoryList NotificationCategoryList OPTIONAL }
+SubscribeReply ::= SEQUENCE {
+	subscriptionId GraphicString,
+	status ErrorCauses }
+SubscriptionIdList ::= SET OF GraphicString
+SubscriptionState ::= ENUMERATED {
+	suspended(0),
+	notSuspended(1) }
+SupportedNotificationIRPVersions ::= SET OF IRPVersionNumber
+SuspendSubscription ::= SEQUENCE {
+	subscriptionId GraphicString }
+SuspendSubscriptionReply ::= SEQUENCE {
+	status ErrorCauses }
+Unsubscribe ::= SEQUENCE {
+	managerReference INTEGER,
+	subscriptionId GraphicString }
+UnsubscribeReply ::= SEQUENCE {
+	status ErrorCauses }
+END-- of module TS32-106-NotificationsAsn1TypeModule
+
+
+END
+--< GDMO.EndDocument "ETSI TS 132 106-4 V3.2.1 (2002-09)"
+--  { itu-t(0) identified-organization(4) etsi(0) mobileDomain(0) umts-Operation-Maintenance(3) ts-32-106(106) part4(4) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ +- itut_x721::system
+--@@ +- etsi_106_4::notificationControl
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

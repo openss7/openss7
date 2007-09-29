@@ -1,0 +1,319 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_error.3.man,v 0.9.2.1 2007/09/29 14:08:30 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:30 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_error.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:30  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_ERROR 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ap_error
+\- Return an error message.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.BI "char *ap_error(unsigned long " apperno );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I aperrno
+The error number for which to return the error string.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function returns a pointer to a message that describes the error
+indicated by
+.IR aperrno .
+The message is in the natural language of the currently defined
+.BR LOCALE .
+The pointer will point to
+.B NULL
+if no such message is available under the currently defined
+.BR LOCALE .
+For English language locales, the message will be one of the messages listed
+under
+.RB \(lq "ERROR STRINGS" ,\(rq
+below.  The message pointer points to an internal buffer area.  If the caller
+wishes to retain the message text, before calling
+.BR ap_error ()
+again, then the text should be copied to some private storage.
+.PP
+All error codes that are not XAP errors and thus do not map to error strings
+will return a generic error string.
+.SH "ERROR STRINGS"
+.PP
+Following are the English language error strings:
+.TP \w'[\fBAP_SUCCESS_DATA_PENDING\fR]\(em'u
+.RB [ AP_ACCES ]
+.RI \(lq "Request to bind to specified address denied." \(rq
+.PD 0
+.TP
+.RB [ AP_AGAIN ]
+.RI \(lq "Request not completed." \(rq
+.TP
+.RB [ AP_AGAIN_DATA_PENDING ]
+.RI \(lq "XAP was unable to complete the requested action.  Try again. There is an event available for the user to receive." \(rq
+.TP
+.RB [ AP_BADATTRVAL ]
+.RI \(lq "Bad value for environment attribute." \(rq
+.TP
+.RB [ AP_BADALLOC ]
+.RI \(lq "The ap_user_alloc/ap_user_dealloc argument combination was invalid." \(rq
+.TP
+.RB [ AP_BADASLSYN ]
+.RI \(lq "The transfer syntaxes proposed for the ACSE syntax are not supported." \(rq
+.TP
+.RB [ AP_BADCD_ACT_ID ]
+.RI \(lq "Cdata field value invalid: act_id." \(rq
+.TP
+.RB [ AP_BADCD_DIAG ]
+.RI \(lq "Cdata field value invalid: diag." \(rq
+.TP
+.RB [ AP_BADCD_EVT ]
+.RI \(lq "Cdata field value invalid: event." \(rq
+.TP
+.RB [ AP_BADCD_OLD_ACT_ID ]
+.RI \(lq "Cdata field value invalid: old_act_id." \(rq
+.TP
+.RB [ AP_BADCD_OLD_CONN_ID ]
+.RI \(lq "Cdata field value invalid: old_conn_id." \(rq
+.TP
+.RB [ AP_BADCD_RES ]
+.RI \(lq "Cdata field value invalid: res." \(rq
+.TP
+.RB [ AP_BADCD_RESYNC_TYPE ]
+.RI \(lq "Cdata field value invalid: resync_type." \(rq
+.TP
+.RB [ AP_BADCD_RSN ]
+.RI \(lq "Cdata field value invalid: rsn." \(rq
+.TP
+.RB [ AP_BADCD_SYNC_P_SYN ]
+.RI \(lq "Cdata field value invalid: sync_p_sn." \(rq
+.TP
+.RB [ AP_BADCD_SYNC_TYPE ]
+.RI \(lq "Cdata field value invalid: sync_type." \(rq
+.TP
+.RB [ AP_BADCD_TOKENS ]
+.RI \(lq "Cdata field value invalid: tokens." \(rq
+.TP
+.RB [ AP_BADDATA ]
+.RI \(lq "User data not allowed on this service." \(rq
+.TP
+.RB [ AP_BADENV ]
+.RI \(lq "A mandatory attribute is not set." \(rq
+.TP
+.RB [ AP_BADF ]
+.RI \(lq "Not a presentation service endpoint." \(rq
+.TP
+.RB [ AP_BADFLAGS ]
+.RI \(lq "The specified combination of flags is invalid." \(rq
+.TP
+.RB [ AP_BADFREE ]
+.RI \(lq "Could not free structure members." \(rq
+.TP
+.RB [ AP_BADKIND ]
+.RI \(lq "Unknown struture type." \(rq
+.TP
+.RB [ AP_BADLSTATE ]
+.RI \(lq "Instance in bad state for that command." \(rq
+.TP
+.RB [ AP_BADNSAP ]
+.RI \(lq "The format of the NSAP portion of the Presentation Address is not supported." \(rq
+.TP
+.RB [ AP_BADPARSE ]
+.RI \(lq "Attribute parse failed." \(rq
+.TP
+.RB [ AP_BADPRIM ]
+.RI \(lq "Unrecognized primitive from user." \(rq
+.TP
+.RB [ AP_BADRESTR ]
+.RI \(lq "Attributes not restored due to more bit on." \(rq
+.TP
+.RB [ AP_BADROLE ]
+.RI \(lq "Request invalid due to value of AP_ROLE." \(rq
+.TP
+.RB [ AP_BADSAVE ]
+.RI \(lq "Attribtues not saved due to more bit on." \(rq
+.TP
+.RB [ AP_BADSAVEF ]
+.RI \(lq "Invalid FILE pointer." \(rq
+.TP
+.RB [ AP_BADUBUF ]
+.RI \(lq "Bad length for user data." \(rq
+.TP
+.RB [ AP_DATA_OVERFLOW ]
+.RI \(lq "User data and presentation service pci exceeds 512 bytes on session IV or the length of user data exceeds a locally defined limit, as state in the CSQ." \(rq
+.TP
+.RB [ AP_HANGUP ]
+.RI \(lq "Association close or aborted." \(rq
+.TP
+.RB [ AP_LOOK ]
+.RI \(lq "A pending event requires attention." \(rq
+.TP
+.RB [ AP_NOATTR ]
+.RI \(lq "No such attribute." \(rq
+.TP
+.RB [ AP_NOBUF ]
+.RI \(lq "Could not allocate enough buffers." \(rq
+.TP
+.RB [ AP_NODATA ]
+.RI \(lq "An attempt was made to send a primitive with no user data." \(rq
+.TP
+.RB [ AP_NOENV ]
+.RI \(lq "No environment for that fd." \(rq
+.TP
+.RB [ AP_NOMEM ]
+.RI \(lq "Could not allocate enough memory." \(rq
+.TP
+.RB [ AP_NOREAD ]
+.RI \(lq "Attribute is not readable." \(rq
+.TP
+.RB [ AP_NOWRITE ]
+.RI \(lq "Attribute is not writable." \(rq
+.TP
+.RB [ AP_NO_PRECEDENCE ]
+.RI \(lq "The resynchronization requested by the local user does not have precedence over the one requested by the remote user." \(rq
+.TP
+.RB [ AP_NOT_SUPPORTED ]
+.RI \(lq "The action requested is not supported by this implementation of XAP." \(rq
+.TP
+.RB [ AP_PDUREJ ]
+.RI \(lq "Invalid PDU rejected." \(rq
+.TP
+.RB [ AP_SUCCESS_DATA_PENDING ]
+.RI \(lq "The requested action was completed successfully. There is an event available for the user to receive." \(rq
+.PD
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon completion, a pointer to the appropriate error message is returned.
+.\"
+.\"
+.SH ERRORS
+.PP
+No error conditions are reported by this function.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR xap (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR ap_error ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ap_error ()
+is compatible with XAP.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_error ()
+first appeared in XAP.
+.[
+xap
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XAP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

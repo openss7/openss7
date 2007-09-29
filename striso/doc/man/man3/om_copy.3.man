@@ -1,0 +1,209 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: om_copy.3.man,v 0.9.2.1 2007/09/29 14:08:31 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:31 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: om_copy.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:31  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH OM_COPY 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B om_copy
+\- Create a private copy of an existing private XOM object.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xom.h>
+.HP
+.BI "OM_return_code om_copy(const OM_private_object " original ", const OM_workspace " workspace ", OM_private_object *" copy );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I original
+The original XOM object, which remains accessible.
+.TP
+.I workspace
+The workspace in which the copy is to be created.  The original's class shall
+be in a package associated with this workspace.
+.TP
+.I copy
+A pointer to the object to be returned.  The returned object will only be
+accessible if the call is successful.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function creates a new private object, the
+.IR copy ,
+that is an exact, but independent copy of an existing private object, the
+.IR original .
+The function is recursive in that copying the original also copies its
+subobjects.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion, the zero value of
+.RB [ OM_SUCCESS ]
+is returned and the new copy of the original is returned in the object pointed to by
+.IR copy .
+Otherwise, a non-zero diagnostic error value is returned and
+.I copy
+is unaffected.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR om_copy ()
+fails, it returns a non-zero error code, as follows:
+.TP
+.RB [ OM_FUNCTION_INTERRUPTED ]
+.TP
+.RB [ OM_MEMORY_INSUFFICIENT ]
+.TP
+.RB [ OM_NETWORK_ERROR ]
+.TP
+.RB [ OM_NO_SUCH_CLASS ]
+.TP
+.RB [ OM_NO_SUCH_OBJECT ]
+.TP
+.RB [ OM_NO_SUCH_WORKSPACE ]
+.TP
+.RB [ OM_NOT_PRIVATE ]
+.TP
+.RB [ OM_PERMANENT_ERROR ]
+.TP
+.RB [ OM_POINTER_INVALID ]
+.TP
+.RB [ OM_SYSTEM_ERROR ]
+.TP
+.RB [ OM_TEMPORARY_ERROR ]
+.TP
+.RB [ OM_TOO_MANY_VALUES ]
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR om_create (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR om_copy ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR om_copy ()
+is compatible with XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR om_copy ()
+first appeared in XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XOM Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

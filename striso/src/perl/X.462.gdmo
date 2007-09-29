@@ -1,0 +1,2091 @@
+--< GDMO.Document "ITU-T Rec. X.462 (1996) | ISO/IEC 11588-3 : 1997" { joint-iso-itu-t mhs (6) management (9) } >--
+--< GDMO.Namepsace itut_x462 >--
+MODULE "ITU-T Rec. X.462 (1996) | ISO/IEC 11588-3 : 1997" { joint-iso-itu-t mhs (6) management (9) }
+-- 10 Definition of managed object classes
+-- The following definitions are given using the GDMO notation defined in CCITT Rec. X.722 | ISO/IEC 10165-4.
+-- 10.1 acctRequest
+-- This managed object is used to represent the generic Service request described in 7.1. Conditional packages provide
+-- specific instances with capabilities for either the Settlement account service of 7.2 or the Customer account service
+-- of 7.3.
+-- NOTE  In digression with what was stated in clause 5, this subclause has been kept at the upper level of structure within
+-- clause 10 because the object is subordinate to more than one other defined in this Recommendation | International Standard
+-- (see Figure 4).
+acctRequest MANAGED OBJECT CLASS
+DERIVED FROM serviceRequest;
+CHARACTERIZED BY acctRequestPackage;
+CONDITIONAL PACKAGES
+customerAcctRequestPackage
+PRESENT IF "the object is created to represent a Customer accounting request",
+settlementAcctRequestPackage
+PRESENT IF "the object is created to represent a Settlement accounting request";
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-acctRequest };
+-- 10.2 contact
+-- The Contact managed object class refers to a person or organization having responsibility for one or more managed
+-- object instances.
+-- NOTE  In digression with what was stated in clause 5, this subclause has been kept at the upper level of structure within
+-- clause 10 because the object is subordinate to more than one other defined in this Recommendation | International Standard (see
+-- Figure 4).
+contact MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721 | ISO/IEC 10165-2":top;
+CHARACTERIZED BY
+commonCreationDeletionPackage,
+contactPackage,
+"Rec. M3100":locationNamePackage;
+REGISTERED AS {MhsAcctObjectIdentifiers.id-moc-contact };
+-- 10.3 customer
+-- The Customer managed object class describes a Customer of an MD.
+customer MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721 | ISO/IEC 10165-2":top;
+CHARACTERIZED BY commonCreationDeletionPackage, customerPackage;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-customer };
+-- 10.3.1 customerAcctLog
+-- This object enables, for each Customer of an MD, to record accounting information. An instance, at least, of this log
+-- shall be created for each customer who has subscribed to the Customer Accounting service.
+customerAcctLog MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721 | ISO/IEC 10165-2":log;
+CHARACTERIZED BY commonCreationDeletionPackage;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-customerAcctLog };
+-- 10.3.1.1 customerAcctRecord
+-- This object enables to record customer accounting information. One record shall be created for each transaction with the
+-- customer.
+-- NOTE  The structure of the information contained within such records is for further study.
+customerAcctRecord MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721 | ISO/IEC 10165-2":eventLogRecord;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-customerAcctRecord };
+-- 10.3.2 customerEFD
+-- This managed object is used to represent the criteria that shall be satisfied by potential events reports before the event
+-- report is forwarded to a Customer.
+customerEFD MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721 | ISO/IEC 10165-2":eventForwardingDiscriminator;
+CHARACTERIZED BY customerEFDPackage;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-customerEFD };
+-- 10.4 interworkingMD
+-- The interworkingMD managed object class refers to a MHS management domain that has settlement arrangements with
+-- the managed MHS management domain.
+interworkingMD MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721 | ISO/IEC 10165-2":top;
+CHARACTERIZED BY
+commonCreationDeletionPackage,
+interworkingMDPackage;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-interworkingMD };
+-- 10.4.1 interworkingMD-EFD
+-- This managed object is used to represent the criteria that shall be satisfied by potential events reports before the event
+-- report is forwarded to an interworkingMD.
+interworkingMD-EFD MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721 | ISO/IEC 10165-2":eventForwardingDiscriminator;
+CHARACTERIZED BY
+commonCreationDeletionPackage,
+interworkingMD-EFDPackage;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-interworkingMD-EFD };
+-- 10.4.2 settlementAcctLog
+-- This object enables, for each InterworkingMD of an MD, to record accounting information. An instance, at least, of this
+-- log shall be created for each InterworkingMD.
+settlementAcctLog MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721|ISO/IEC 10165-2":log;
+CHARACTERIZED BY
+commonCreationDeletionPackage;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-settlementAcctLog };
+-- 10.4.2.1 settlementAcctRecord
+-- Information captured in the settlementAcctRecord enables to support the "estimated accounting method" and the "exact
+-- accounting method" specified in Recommendation D.36. Information captured is sufficient to produce the "account
+-- statement" specified in Annex D/D.36.
+-- NOTE  The comments next to the attributes refer to components of the formulae in 6.1/D.36 and 6.2.2.1/D.36.
+settlementAcctRecord MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721 | ISO/IEC 10165-2":eventLogRecord;
+CHARACTERIZED BY settlementAcctRecordPackage;
+CONDITIONAL PACKAGES
+originatingDomainTransferOutPackage
+PRESENT IF "subject message is transferred out by the originating domain",
+transitDomainTransferOutPackage
+PRESENT IF "subject message is transferred out by the transit domain",
+destinationDomainDeliveryPackage
+PRESENT IF "subject message is delivered",
+d36-commonAttributesPackage
+PRESENT IF
+"the settlementAcctPolicy attribute references D.36",
+d36-deliveryViaAccessUnitPackage
+PRESENT IF
+"the settlementAcctPolicy attribute references D.36 and the record is created regarding a message being
+delivered via one or many delivery services (fax, PDS, telex, etc.)";
+d36-directDeliveryPackage
+PRESENT IF
+"the settlementAcctPolicy attribute references D.36 and the record is created regarding a message being
+delivered to UAs belonging to the ADMD or to PRMDs that are clients of the ADMD.";
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-settlementAcctRecord };
+-- 10.5 mdServiceManagementPointOfAccess
+-- The mdServiceManagementPointOfAccess object class provides a point of access to a subset of MHS management
+-- services and MHS management information. Such services and information may be provided to MIS-users, Customers
+-- and Interworking management domains of an MD.
+mdServiceManagementPointOfAccess MANAGED OBJECT CLASS
+DERIVED FROM "Rec. M.3100":Network;
+CHARACTERIZED BY mdServiceManagementPointOfAccessPackage;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-mdServiceMgtPOA };
+-- 10.6 mhsEventLog
+-- This object enables to record bindAcctRecord, MASEAcctRecord, messageAcctRecord, changeAutoRecord,
+-- MRSEAcctRecord and alertRecord.
+mhsEventLog MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721 | ISO/IEC 10165-2":log;
+CHARACTERIZED BY commonCreationDeletionPackage;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-mhsEventLog };
+-- 10.6.1 bindEventRecord
+-- This record enables to capture information related to a Bind or Unbind abstract operation.
+bindEventRecord MANAGED OBJECT CLASS
+DERIVED FROM messageEventRecord;
+CHARACTERIZED BY bindEventRecordPackage;
+CONDITIONAL PACKAGES
+commonBindArgumentsPackage
+PRESENT IF "the record is created following an abstract-bind operation",
+mtsBindArgumentsPackage
+PRESENT IF "the record is created following a MTSBind abstract-bind operation",
+mtaBindArgumentsPackage
+PRESENT IF "the record is created following a MTABind abstract-bind operation",
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-bindEventRecord };
+-- 10.6.2 discardEventRecord
+-- This enables to capture information related to one internal operation which causes a message, report, or probe to be
+-- discarded. Records of this class are kept in the mhsEventLog.
+discardEventRecord MANAGED OBJECT CLASS
+DERIVED FROM messageEventRecord;
+CHARACTERIZED BY discardEventRecordPackage, processingPackage;
+CONDITIONAL PACKAGES
+messageTransferPackage
+PRESENT IF "the record is created due to a non-delivery operation on a message",
+reportTransferPackage
+PRESENT IF "the record is created due to a non-delivery operation on a report",
+probeTransferPackage
+PRESENT IF "the record is created due to an affirmation or non-affirmation operation on a probe";
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-discardEventRecord };
+-- 10.6.3 maseEventRecord
+-- This enables to capture accounting information related to one operation via the administration port of a MS. Records of
+-- this class are kept in mhsEventLog.
+maseEventRecord MANAGED OBJECT CLASS
+DERIVED FROM messageEventRecord;
+CHARACTERIZED BY maseEventRecordPackage;
+CONDITIONAL PACKAGES
+registerPackage
+PRESENT IF "the record is created due to register operation",
+changeCredentialPackage
+PRESENT IF "the record is created due to change credential operation";
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-maseEventRecord };
+-- 10.6.4 mdseEventRecord
+-- This enables to capture accounting information related to one operation via the message-delivery-port of a UA, MTA,
+-- MS (, or AU). Records of this class are kept in mhsEventLog.
+mdseEventRecord MANAGED OBJECT CLASS
+DERIVED FROM messageEventRecord;
+CHARACTERIZED BY mdseEventRecordPackage;
+CONDITIONAL PACKAGES
+messageDeliveryPackage
+PRESENT IF"the record is created due to message delivery operation",
+messageDeliveryEnvelopePackage
+PRESENT IF"messageDeliveryPackage is present and
+MHS Events Attributes and Envelopes logging function is supported",
+reportDeliveryPackage
+PRESENT IF"the record is created due to report delivery operation",
+reportDeliveryEnvelopePackage
+PRESENT IF"reportDeliveryPackage is present and
+MHS Events Attributes and Envelopes logging function is supported",
+deliveryControlPackage
+PRESENT IF"the record is created due to delivery control operation",
+processingPackage
+PRESENT IF"the record is created inside an MTA due to a message delivery or a
+report delivery operation";
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-mdseEventRecord };
+-- 10.6.5 messageEventRecord
+-- This enables to capture information relating to an event, e.g. when an abstract operation defined in X.400-Series of
+-- Recommendations is performed. Information captured may be used for, but not limited to, financial accounting
+-- management and security management purposes.
+messageEventRecord MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721|ISO/IEC 10165-2":eventLogRecord;
+CHARACTERIZED BY messageEventRecordPackage;
+CONDITIONAL PACKAGE
+tracePackage
+PRESENT IF "it is necessary to record trace information on the mesage.";
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-messageEventRecord };
+-- 10.6.6 mrseEventRecord
+-- This enables to capture accounting information related to one operation via the message-retrieval-port of a MS. Records
+-- of this class are kept in mhsEventLog.
+mrseEventRecord MANAGED OBJECT CLASS
+DERIVED FROM messageEventRecord;
+CHARACTERIZED BY mrseEventRecordPackage;
+CONDITIONAL PACKAGES
+summarizePackage
+PRESENT IF "the record is created due to summarize operation",
+listPackage
+PRESENT IF "the record is created due to list operation",
+fetchPackage
+PRESENT IF "the record is created due to fetch operation",
+deletePackage
+PRESENT IF "the record is created due to delete operation",
+registerMSPackage
+PRESENT IF "the record is created due to register MS operation",
+alertPackage
+PRESENT IF "the record is created due to alert operation";
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-mrseEventRecord };
+-- 10.6.7 msseEventRecord
+-- This enables to capture accounting information related to one operation via the message-submission-port of a UA, MTA,
+-- MS (, or AU). Records of this class are kept in mhsEventLog.
+msseEventRecord MANAGED OBJECT CLASS
+DERIVED FROM messageEventRecord;
+CHARACTERIZED BY msseEventRecordPackage;
+CONDITIONAL PACKAGES
+probeSubmissionPackage
+PRESENT IF"the record is created due to probe submission operation",
+probeSubmissionEnvelopePackage
+PRESENT IF"probeSubmissionPackage is present and
+MHS Events Attributes and Envelopes logging function is supported",
+messageSubmissionPackage
+PRESENT IF"the record is created due to message submission operation",
+messageSubmissionEnvelopePackage
+PRESENT IF"messageSubmissionPackage is present and
+MHS Events Attributes and Envelopes logging function is supported",
+cancelDeferredDeliveryPackage
+PRESENT IF"the record is created due to cancel deferred-delivery operation",
+submissionControlPackage
+PRESENT IF"the record is created due to submission control operation";
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-msseEventRecord };
+-- 10.6.8 mtseEventRecord
+-- This enables to capture accounting information related to one operation via the message-transfer-port of a MTA.
+-- Records of this class are kept in mhsEventLog.
+mtseEventRecord MANAGED OBJECT CLASS
+DERIVED FROM messageEventRecord;
+CHARACTERIZED BY
+mtseEventRecordPackage,
+processingPackage;
+CONDITIONAL PACKAGES
+messageTransferPackage
+PRESENT IF "the record is created due to message-transfer operation",
+reportTransferPackage
+PRESENT IF "the record is created due to report-transfer operation",
+probeTransferPackage
+PRESENT IF "the record is created due to a probe-transfer operation";
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-mtseEventRecord };
+-- 10.6.9 securityAcctRecord
+-- This managed object enables to record security features of an event that a domains management policy might want to
+-- charge for.
+securityAcctRecord MANAGED OBJECT CLASS
+DERIVED FROM messageEventRecord;
+CHARACTERIZED BY securityAcctRecordPackage;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-securityAcctRecord };
+-- 10.7 misManagementDomain
+-- The misManagementDomain object class enables to represent an MIS Management Domain.
+misManagementDomain MANAGED OBJECT CLASS
+DERIVED FROM "Rec. M3010":Network;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-misManagementDomain };
+-- 10.8 serviceRequest
+-- The serviceRequest managed object provides the mean for an Indirect MIS-user to ask for a special service that is not
+-- directly accessible through the interoperable interface. It contains the basic attributes that allow an Indirect MIS-user to
+-- request and negotiate dates of application of a requested service.
+serviceRequest MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721 | ISO/IEC 10165-2":top;
+CHARACTERIZED BY serviceRequestPackage;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-moc-serviceRequest };
+-- 11 Definitions of packages
+-- This clause specifies packages definitions for the managed object class definitions of clause 10.
+-- 11.1 acctRequestPackage
+-- This package lists the attributes of a acctRequest managed object.
+acctRequestPackage PACKAGE
+ATTRIBUTES
+logStartTime GET-REPLACE,
+logStopTime GET-REPLACE,
+"Rec. X.721 | ISO/IEC 10165-2":logId GET-REPLACE;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-acctRequest };
+-- 11.1.1 customerAcctRequestPackage
+-- This packages lists the specific attributes of a customer-oriented acctRequest managed object.
+customerAcctRequestPackage PACKAGE
+BEHAVIOUR customerAcctRequestPackageBehaviour;
+ATTRIBUTES
+customerAcctPolicy GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-customerAcctRequest };
+customerAcctRequestPackageBehaviour BEHAVIOUR
+DEFINED AS
+"The customerAcctRequest managed object provides the mean for a Customer to ask for Customer accounting
+information for a period of time. A log identifier is provided in response.";
+-- 11.1.2 settlementAcctRequestPackage
+-- This packages lists the specific attributes of a settlement-oriented acctRequest managed object.
+settlementAcctRequestPackage PACKAGE
+BEHAVIOUR settlementAcctRequestPackageBehaviour;
+ATTRIBUTES
+settlementPolicy GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-settlementAcctRequest };
+settlementAcctRequestPackageBehaviour BEHAVIOUR
+DEFINED AS
+"The SettlementAcctRequest managed object provides the mean for an interworkingADMD to ask for Settlement
+accounting information for a period of time. A log identifier is provided in response.";
+-- 11.2 bindEventRecordPackage
+-- This packages lists the attributes of a bindEventRecord managed object.
+bindEventRecordPackage PACKAGE
+BEHAVIOUR bindEventRecordPackageBehaviour;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-bindEventRecord };
+bindEventRecordPackageBehaviour BEHAVIOUR
+DEFINED AS
+"This record is created to keep information related to binding and unbinding operations. The eventType attribute
+stores what kind of operation generated the record.";
+-- 11.2.1 commonBindArgumentPackage
+-- This packages lists the common attributes of a bindEventRecord managed object created following a Bind abstract
+-- operation.
+commonBindArgumentsPackage PACKAGE
+BEHAVIOUR commonBindArgumentsPackageBehaviour;
+ATTRIBUTES
+-- Arguments
+initiatorName GET,
+initiatorCredentials GET,
+securityContext GET,
+--
+-- Results
+responderCredentials GET,
+--
+-- Errors
+bindingError GET;
+--
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-commonBindArguments };
+commonBindArgumentsPackageBehaviour BEHAVIOUR
+DEFINED AS
+"This package contains those attributes which are common to all the binding abstract operations, whether MS-Bind,
+MTS-Bind or MTA-Bind.";
+-- 11.2.2 mtaBindArgumentsPackage
+-- This package lists the specific attributes of a bindEventRecord managed object created following a MTA-Bind abstract
+-- operation.
+mtaBindArgumentsPackage PACKAGE
+BEHAVIOUR mtaBindArgumentsPackageBehaviour;
+ATTRIBUTES
+-- Results
+responderName GET;
+--
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-mtaBindArguments };
+mtaBindArgumentsPackageBehaviour BEHAVIOUR
+DEFINED AS
+"This package contains those attributes which are specific to the MTA-Bind abstract operation.";
+-- 11.2.3 mtsBindArgumentsPackage
+-- This package lists the specific attributes of a bindEventRecord managed object created following a MTS-Bind abstract
+-- operation.
+mtsBindArgumentsPackage PACKAGE
+BEHAVIOUR mtsBindArgumentsPackageBehaviour;
+ATTRIBUTES
+-- Results
+responderName GET,
+--
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-mtsBindArguments };
+mtsBindArgumentsPackageBehaviour BEHAVIOUR
+DEFINED AS
+"This package contains those attributes which are specific to the MTS-Bind abstract operation.";
+-- 11.3 commonCreationDeletionPackage
+-- This package contains updated versions of the basic operations that can be applied to managed objects.
+commonCreationDeletionPackage PACKAGE
+BEHAVIOUR commonCreationDeletionBehaviour;
+NOTIFICATIONS
+objectCreation,
+objectDeletion;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-commonCreationDeletion };
+commonCreationDeletionBehaviour BEHAVIOUR
+DEFINED AS
+"This package extends upon the Rec. X.721 | ISO/IEC 10165-2 objectCreation and objectDeletion notifications by
+specifying the values sent with the notification.";
+-- 11.4 contactPackage
+-- This package lists the attributes of a contact managed object.
+contactPackage PACKAGE
+BEHAVIOUR contactPackageBehaviour;
+ATTRIBUTES
+contactId GET,
+contactName GET-REPLACE,
+contactCompany GET-REPLACE,
+contactFunction GET-REPLACE,
+contactDetails GET-REPLACE,
+electronicMailAddress, GET-REPLACE,
+telephoneNumberList GET-REPLACE ADD-REMOVE,
+facsimileTelephoneNumberList GET-REPLACE ADD-REMOVE;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-contact };
+contactPackageBehaviour BEHAVIOUR
+DEFINED AS
+"A value for the contactId attribute shall be provided when the object is created. This value cannot be modified.";
+-- 11.5 customerEFDPackage
+-- This package lists the attributes of a customerEFD managed object.
+customerEFDPackage PACKAGE
+BEHAVIOUR customerEFDPackageBehaviour;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-customerEFD };
+customerEFDPackageBehaviour BEHAVIOUR
+DEFINED AS
+"The Customer may modify the discriminator construct, or suspend / resume the EventforwardingDiscriminator
+activity.";
+-- 11.6 customerPackage
+-- This package lists the attributes of a customer managed object.
+customerPackage PACKAGE
+BEHAVIOUR customerPackageBehaviour;
+ATTRIBUTES
+customerId GET,
+customerName GET-REPLACE;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-customer };
+customerPackageBehaviour BEHAVIOUR
+DEFINED AS
+"A value for the customerId attribute shall be provided when the object is created. This value cannot be
+modified.";
+-- 11.7 discardEventRecordPackage
+-- This package lists the common attributes of a messageEventRecord managed object related to the internal processing
+-- that occurred on a message, probe, or report inside a MHS entity.
+discardEventRecordPackage PACKAGE
+BEHAVIOUR discardEventRecordPackageBehaviour;
+ATTRIBUTES
+recipientsOnResponsibilityList GET, -- identifes recipients whose perRecipientIndicator responsibility
+-- bit is set to "responsible" (see Figure 4/X.411, Part 5 of 7)
+"Rec. X.721 | ISO/IEC 10165-2":eventType PERMITTED VALUES MhsAcctAsn1Module.DiscardOperations;
+-- to indicate Affirmation, Non-Affirmation, or Non-Delivery operation --
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-discardEventRecord };
+discardEventRecordPackageBehaviour BEHAVIOUR
+DEFINED AS
+"In managed objects of this class, the messageTransferEnvelope, probeTransferEnvelope, or
+reportTransferEnvelope attribute shall show the state such an envelope at the time the error creating the
+discardEventRecord occured. In addition, if the error is being reported in respect of a subset of the recipients, there
+is no requirement to split the message before creating the messageTransferEnvelope, probeTransferEnvelope, or
+reportTransferEnvelope attribute. The recipientsOnResponsibilityList attribute shall be used in such a situation to
+indicate which recipients caused the error to occur.";
+-- 11.8 interworkingMD-EFDPackage
+-- This package lists the attributes of a interworkingMD-EFD managed object.
+interworkingMD-EFDPackage PACKAGE
+BEHAVIOUR interworkingMD-EFDPackagebehaviour;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-interworkingMD-EFD };
+interworkingADMDLogPkgBehaviour BEHAVIOUR
+DEFINED AS
+"The interworkingMD may modify the discriminator construct, suspend or resume the
+eventForwardingDiscriminator activity.";
+-- 11.9 interworkingMDPackage
+-- This package lists the attributes of a interworkingMD managed object.
+interworkingMDPackage PACKAGE
+BEHAVIOUR interworkingMDPackageBehaviour;
+ATTRIBUTES
+interworkingMDId GET,
+interworkingMDName GET-REPLACE,
+globalDomainId GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-interworkingMD };
+interworkingMDPackageBehaviour BEHAVIOUR
+DEFINED AS
+"A value for the interworkingMDId attribute shall be provided when the object is created. This value cant be
+modified.";
+-- 11.10 maseEventRecordPackage
+-- This package lists the common attributes of a messageEventRecord managed object created following an abstract
+-- operation at the administration port of a MHS entity.
+maseEventRecordPackage PACKAGE
+ATTRIBUTES
+"Rec. X.721 | ISO/IEC 10165-2":eventType PERMITTED VALUES
+MhsAcctAsn1Module.AdminstrationPortOperations;
+-- to indicate register or change-credential operation --
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-maseEventRecord };
+-- 11.10.1 changeCredentialPackage
+-- This package lists the specific attributes of a maseEventRecord managed object created following a Charge-Credential
+-- abstract operation.
+changeCredentialPackage PACKAGE
+BEHAVIOUR changeCredentialPackageBehaviour;
+ATTRIBUTES
+oldCredentials GET,
+newCredentials GET,
+administrationError PERMITTED VALUES MhsAcctAsn1Module.ChangeCredentialsErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-changeCredential };
+changeCredentialPackageBehaviour BEHAVIOUR
+DEFINED AS
+"This package contains the attributes of the Change-Credentials abstract operation.";
+-- 11.10.2 registerPackage
+-- This package lists the specific attributes of a maseEventRecord managed object created following a Register abstract
+-- operation.
+registerPackage PACKAGE
+BEHAVIOUR registerPackageBehaviour;
+ATTRIBUTES
+userName GET,
+userAddress GET,
+deliverableEncodedInformationTypes GET,
+deliverableMaximumContentLength GET,
+defaultDeliveryControls GET,
+deliverableContentTypes GET,
+labelsAndRedirections GET,
+administrationError PERMITTED VALUES MhsAcctAsn1Module.RegisterErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-register };
+registerPackageBehaviour BEHAVIOUR
+DEFINED AS
+"This package contains the attributes of the Register abstract operation.";
+-- 11.11 mdseEventRecordPackage
+-- This package lists the common attributes of a messageEventRecord managed object created following an abstract
+-- operation at the Message-Delivery port of a MHS entity.
+mdseEventRecordPackage PACKAGE
+ATTRIBUTES
+originatorName GET,
+"Rec. X.721 | ISO/IEC 10165-2":eventType PERMITTED VALUES
+MhsAcctAsn1Module.DeliveryPortOperations;
+-- to indicate message delivery, report delivery or delivery control operation --
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-mdseEventRecord };
+-- 11.11.1 deliveryControlPackage
+-- This package lists the specific attributes of a mdseEventRecord managed object created following a Delivery-Control
+-- abstract operation.
+deliveryControlPackage PACKAGE
+BEHAVIOUR deliveryControlPackageBehaviour;
+ATTRIBUTES
+deliveryControls GET,
+deliveryError PERMITTED VALUES MhsAcctAsn1Module.DeliveryControlErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-deliveryControl };
+deliveryControlPackageBehaviour BEHAVIOUR
+DEFINED AS "Captures accounting information on a delivery control";
+-- 11.11.2 messageDeliveryPackage
+-- This package lists the specific attributes of a mdseEventRecord managed object created following a Message-Delivery
+-- abstract operation.
+messageDeliveryPackage PACKAGE
+BEHAVIOUR messageDeliveryPackageBehaviour;
+ATTRIBUTES
+thisRecipientName GET,
+-- The following ones are extracted from messageDeliveryEnvelope
+priority GET,
+contentType GET,
+MTSIdentifier GET,
+messageContentSize GET, -- This one not extracted but inferred
+-- Operation results
+proofOfDelivery GET,
+recipientCertificate GET,
+deliveryError PERMITTED VALUES MhsAcctAsn1Module.MessageDeliveryErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-messageDelivery };
+messageDeliveryPackageBehaviour BEHAVIOUR
+DEFINED AS
+"Captures accounting information on a message delivery. All but one of the attributes are directly taken from the event itself
+or from the messageDeliveryEnvelope field. Only the messageContentSize must be calculated to indicate the length, in octets,
+of the  contents field in the messageDeliveryEnvelope attribute of the managed object, if present.";
+-- 11.11.3 messageDeliveryEnvelopePackage
+-- This package lists a specific attribute of a mdseEventRecord managed object created following a Message-Delivery
+-- abstract operation in non-co-located entities.
+messageDeliveryEnvelopePackage PACKAGE
+BEHAVIOUR messageDeliveryEnvelopePackageBehaviour;
+ATTRIBUTES
+messageDeliveryEnvelope GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-messageDeliveryEnvelope };
+messageDeliveryEnvelopePackageBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute was isolated so that co-located entities would not have to actually generate a whole envelope just to meet the
+requirements of Logging Information.";
+-- 11.11.4 reportDeliveryPackage
+-- This package lists the specific attributes of a mdseEventRecord managed object created following a Report-Delivery
+-- abstract operation.
+reportDeliveryPackage PACKAGE
+BEHAVIOUR reportDeliveryPackageBehaviour;
+ATTRIBUTES
+actualRecipientName GET,
+contentType GET,
+subjectSubmissionIdentifier GET,
+MTSIdentifier GET,
+deliveryError PERMITTED VALUES MhsAcctAsn1Module.ReportDeliveryErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-reportDelivery };
+reportDeliveryPackageBehaviour BEHAVIOUR
+DEFINED AS "Captures accounting information on a report delivery";
+-- 11.11.5 reportDeliveryEnvelopePackage
+-- This package lists a specific attribute of a mdseEventRecord managed object created following a Report-Delivery
+-- abstract operation in non-co-located entities.
+reportDeliveryEnvelopePackage PACKAGE
+BEHAVIOUR reportDeliveryEnvelopePackageBehaviour;
+ATTRIBUTES
+reportDeliveryEnvelope GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-reportDeliveryEnvelope };
+reportDeliveryEnvelopePackageBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute was isolated so that co-located entities would not have to actually generate a whole envelope just to meet the
+requirements of Logging Information.";
+-- 11.12 mdServiceManagementPointOfAccessPackage
+-- This package lists the attributes of a mdServiceManagementPointOfAccess managed object.
+mdServiceManagementPointOfAccessPackage PACKAGE
+ATTRIBUTES
+globalDomainId GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-mdServiceMgtPOA };
+-- 11.13 messageEventRecordPackage
+-- This package lists the common attributes to all messageEventRecord managed objects. The eventType attribute is
+-- reproduced here in a comment as a reminder of its presence in the managed object class through the inheritance
+-- mechanism.
+messageEventRecordPackage PACKAGE
+BEHAVIOUR messageEventRecordPackageBehaviour;
+ATTRIBUTES
+-- "Rec. X.721 | ISO/IEC 10165-2":eventType GET,
+consumerOfOperation GET,
+supplierOfOperation GET,
+serviceFlag GET, -- indicates if this is a service message (no charge) --
+operationStatus GET; -- indicates if the operation is progress, OK, in error --
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-messageEventRecord };
+messageEventRecordPackageBehaviour BEHAVIOUR
+DEFINED AS
+"The eventType attribute (which is inherited from the "Rec. X.721 | ISO/IEC 10165-2":eventLogRecord managed
+object class) has its range of values restricted in the various subclasses of this managed object class. In all those
+subclasses, it remains a read-only attribute."
+-- 11.13.1 tracePackage
+-- This package contains the trace information which documents the passage of the message, probe, or report through
+-- the MIS.
+tracePackage PACKAGE
+ATTRIBUTES
+trace GET,
+internalTrace GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-trace };
+-- 11.14 mrseEventRecordPackage
+-- This package lists the common attributes of a messageEventRecord managed object created following an abstract
+-- operation at the Message-Retrieval port of a MHS entity.
+mrseEventRecordPackage PACKAGE
+ATTRIBUTES
+"Rec. X.721 | ISO/IEC 10165-2":eventType PERMITTED VALUES
+MhsAcctAsn1Module.RetrievalPortOperations;
+-- to indicate summarize, list, fetch, delete, register MS or alert operation --
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-mrseEventRecord };
+-- 11.14.1 alertPackage
+-- This package lists the specific attributes of a mrseEventRecord managed object created following an Alert abstract
+-- operation.
+alertPackage PACKAGE
+BEHAVIOUR alertPackageBehaviour;
+ATTRIBUTES
+alertArgument GET,
+alertResult GET,
+retrievalError PERMITTED VALUES MhsAcctAsn1Module.AlertErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-alert };
+alertPackageBehaviour BEHAVIOUR
+DEFINED AS
+"This package contains the attributes of the Alert abstract operation.";
+-- 11.14.2 deletePackage
+-- This package lists the specific attributes of a mrseEventRecord managed object created following a Delete abstract
+-- operation.
+deletePackage PACKAGE
+BEHAVIOUR deletePackageBehaviour;
+ATTRIBUTES
+deleteArgument GET,
+deleteResult GET,
+retrievalError PERMITTED VALUES MhsAcctAsn1Module.DeleteErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-delete };
+deletePackageBehaviour BEHAVIOUR
+DEFINED AS
+"This package contains the attributes of the Delete abstract operation.";
+-- 11.14.3 fetchPackage
+-- This package lists the specific attributes of a mrseEventRecord managed object created following a Fetch abstract
+-- operation.
+fetchPackage PACKAGE
+BEHAVIOUR fetchPackageBehaviour;
+ATTRIBUTES
+fetchArgument GET,
+fetchResult GET,
+retrievalError PERMITTED VALUES MhsAcctAsn1Module.FetchErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-fetch };
+fetchPackageBehaviour BEHAVIOUR
+DEFINED AS
+"This package contains the attributes of the Fetch abstract operation.";
+-- 11.14.4 listPackage
+-- This package lists the specific attributes of a mrseEventRecord managed object created following a List abstract
+-- operation.
+listPackage PACKAGE
+BEHAVIOUR listPackageBehaviour;
+ATTRIBUTES
+listArgument GET,
+listResult GET,
+retrievalError PERMITTED VALUES MhsAcctAsn1Module.ListErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-list };
+listPackageBehaviour BEHAVIOUR
+DEFINED AS
+"This package contains the attributes of the List abstract operation.";
+-- 11.14.5 registerMSPackage
+-- This package lists the specific attributes of a mrseEventRecord managed object created following a Register-MS abstract
+-- operation.
+registerMSPackage PACKAGE
+BEHAVIOUR registerMSPackageBehaviour;
+ATTRIBUTES
+registerMSArgument GET,
+registerMSResult GET,
+retrievalError PERMITTED VALUES MhsAcctAsn1Module.RegisterMSErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-registerMS };
+registerMSPackageBehaviour BEHAVIOUR
+DEFINED AS
+"This package contains the attributes of the Register-MS abstract operation.";
+-- 11.14.6 summarizePackage
+-- This package lists the specific attributes of a mrseEventRecord managed object created following a Sumarize abstract
+-- operation.
+summarizePackage PACKAGE
+BEHAVIOUR summarizePackageBehaviour;
+ATTRIBUTES
+summarizeArgument GET,
+summarizeResult GET,
+retrievalError PERMITTED VALUES MhsAcctAsn1Module.SummarizeErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-summarize };
+summarizePackageBehaviour BEHAVIOUR
+DEFINED AS
+"This package contains the attributes of the Summarize abstract operation.";
+-- 11.15 msseEventRecordPackage
+-- This package lists the common attributes of a messageEventRecord managed object created following an abstract
+-- operation at the Message-Submission port of a MHS entity.
+msseEventRecordPackage PACKAGE
+ATTRIBUTES
+"Rec. X.721 | ISO/IEC 10165-2":eventType PERMITTED VALUES
+MhsAcctAsn1Module.SubmissionPortOperations;
+-- to indicate message submission, probe submission, cancel deferred delivery or
+-- submission control operation --
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-msseEventRecord };
+-- 11.15.1 cancelDeferredDeliveryPackage
+-- This package lists the specific attributes of a msseEventRecord managed object created following a Cancel-Deferred-
+-- Delivery abstract operation.
+cancelDeferredDeliveryPackage PACKAGE
+BEHAVIOUR cancelDeferredDeliveryBehaviour;
+ATTRIBUTES
+MTSIdentifier GET,
+submissionError PERMITTED VALUES MhsAcctAsn1Module.CancelDeferredDeliverySubmissionErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-cancelDeferredDelivery };
+cancelDeferredDeliveryBehaviour BEHAVIOUR
+DEFINED AS "Captures accounting information on a cancel deferred delivery submission";
+-- 11.15.2 messageSubmissionPackage
+-- This package lists the specific attributes of a msseEventRecord managed object created following a Message-Submission
+-- abstract operation.
+messageSubmissionPackage PACKAGE
+BEHAVIOUR messageSubmissionPackageBehaviour;
+ATTRIBUTES
+originatorName GET,
+priority GET,
+contentType GET,
+messageContentSize GET,
+-- Operation Result
+contentIdentifier GET,
+MTSIdentifier GET,
+SubmissionTime GET,
+originatingMTACertificate GET,
+proofOfSubmission GET,
+submissionError PERMITTED VALUES MhsAcctAsn1Module.MessageSubmissionErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-messageSubmission };
+messageSubmissionPackageBehaviour BEHAVIOUR
+DEFINED AS "Captures accounting information on a message submission";
+-- 11.15.3 messageSubmissionEnvelopePackage
+-- This package lists a specific attribute of a msseEventRecord managed object created following a Message-Submission
+-- abstract operation in non-co-located entities.
+messageSubmissionEnvelopePackage PACKAGE
+BEHAVIOUR messageSubmissionEnvelopePackageBehaviour;
+ATTRIBUTES
+messageSubmissionEnvelope GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-messageSubmissionEnvelope };
+messageSubmissionEnvelopePackageBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute was isolated so that co-located entities would not have to actually generate a w hole envelope just to
+meet the requirements of Logging Information.";
+-- 11.15.4 probeSubmissionPackage
+-- This package lists the specific attributes of a msseEventRecord managed object created following a Probe-Submission
+-- abstract operation.
+probeSubmissionPackage PACKAGE
+BEHAVIOUR probeSubmissionPackageBehaviour;
+ATTRIBUTES
+originatorName GET,
+contentType GET,
+-- Operation result
+MTSIdentifier GET,
+SubmissionTime GET,
+contentIdentifier GET,
+submissionError PERMITTED VALUES MhsAcctAsn1Module.ProbeSubmissionErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-probeSubmission };
+probeSubmissionPackageBehaviour BEHAVIOUR
+DEFINED AS "Captures accounting information on a probe submission";
+-- 11.15.5 probeSubmissionEnvelopePackage
+-- This package lists a specific attribute of a msseEventRecord managed object created following a Probe-Submission
+-- abstract operation in non-co-located entities.
+probeSubmissionEnvelopePackage PACKAGE
+BEHAVIOUR probeSubmissionEnvelopePackageBehaviour;
+ATTRIBUTES
+probeSubmissionEnvelope GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-probeSubmissionEnvelope };
+probeSubmissionEnvelopePackageBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute was isolated so that co-located entities would not have to actually generate a whole envelope just to
+meet the requirements of Logging Information.";
+-- 11.15.6 submissionControlPackage
+-- This package lists the specific attributes of a msseEventRecord managed object created following a Submission-Control
+-- abstract operation.
+submissionControlPackage PACKAGE
+BEHAVIOUR submissionControlPackageBehaviour;
+ATTRIBUTES
+submissionControls GET,
+submissionError PERMITTED VALUES MhsAcctAsn1Module.SubmissionControlErrors;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-submissionControl };
+submissionControlPackageBehaviour BEHAVIOUR
+DEFINED AS "Captures accounting information on a submission control operation";
+-- 11.16 mtseEventRecordPackage
+-- This package lists the common attributes of a messageEventRecord managed object created following an abstract
+-- operation at the Message-Transmission port of a MHS entity.
+mtseEventRecordPackage PACKAGE
+BEHAVIOUR mtseEventRecordPackageBehaviour;
+ATTRIBUTES
+recipientsOnResponsibilityList GET, -- identifies recipients whose perRecipientIndicator responsibility
+-- bit is set to "responsible" (see Figure 4/X.411, Part 5 of 7)
+"Rec. X.721 | ISO/IEC 10165-2":eventType PERMITTED VALUES
+MhsAcctAsn1Module.TransferPortOperations;
+-- to indicate message transfer, probe transfer or report transfer operation --
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-mtseEventRecord };
+mtseEventRecordPackageBehaviour BEHAVIOUR
+DEFINED AS "The originatorName attributeRs value can be instantly extracted from
+the probeTransferEnvelope or the messageTransferEnvelope. In the case of
+the report transfer operation, the attribute shall be given the value of the first
+OR-name in the Originator-and-DL-expansion-history field of the
+reportTransferEnvelope (see X.411, 8.3.1.2.1.3), if that field is present.
+If that field is not present, then the Report-destination-name (see X.411,
+12.2.1.3.1.2) shall be used in its stead.";
+-- 11.16.1 messageTransferPackage
+-- This package lists the specific attributes of a mtseEventRecord managed object created following a Message-Transfer
+-- abstract operation.
+messageTransferPackage PACKAGE
+BEHAVIOUR messageTransferPackageBehaviour;
+ATTRIBUTES
+MTSIdentifier GET,
+originatorName GET,
+priority GET,
+contentType GET,
+messageContentSize GET, -- before conversion --
+messageTransferEnvelope GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-messageTransfer };
+messageTransferPackageBehaviour BEHAVIOUR
+DEFINED AS "Captures accounting information on a message transfer.";
+-- 11.16.2 probeTransferPackage
+-- This package lists the specific attributes of a mtseEventRecord managed object created following a Probe-Transfer
+-- abstract operation.
+probeTransferPackage PACKAGE
+BEHAVIOUR probeTransferPackageBehaviour;
+ATTRIBUTES
+MTSIdentifier GET,
+originatorName GET,
+contentType GET,
+probeTransferEnvelope GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-probeTransfer };
+probeTransferPackageBehaviour BEHAVIOUR
+DEFINED AS "Captures accounting information on a probe transfer";
+-- 11.16.3 reportTransferPackage
+-- This package lists the specific attributes of a mtseEventRecord managed object created following a Report-Transfer
+-- abstract operation.
+reportTransferPackage PACKAGE
+BEHAVIOUR reportTransferPackageBehaviour;
+ATTRIBUTES
+reportIdentifier GET,
+subjectIdentifier GET,
+contentType GET,
+reportTransferEnvelope GET,
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-reportTransfer };
+reportTransferPackageBehaviour BEHAVIOUR
+DEFINED AS "Captures accounting information on a report transfer";
+-- 11.17 processingPackage
+-- This package contains attributes used to list the internal processing that happened on a message, probe, or report inside
+-- the MTA.
+processingPackage PACKAGE
+BEHAVIOUR processingPackageBehaviour;
+ATTRIBUTES
+processingErrorFlag GET,
+processingSummary GET,
+processingDetails GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-processing };
+processingPackageBehaviour BEHAVIOUR
+DEFINED AS
+"This package contains attributes used to list the internal processing that happened on a message, probe, or report inside
+the MTA";
+-- 11.18 securityAcctRecordPackage
+-- This package lists the attributes of a securityAcctRecord managed object.
+securityAcctRecordPackage PACKAGE
+BEHAVIOUR securityAcctRecordPackageBehaviour;
+ATTRIBUTES
+authenticationCheck GET,
+authenticationGeneration GET,
+bindAuthenticationCheck GET,
+bindToken GET,
+certificate GET,
+contentConfidentialityAlgorithmIdentifier GET,
+contentIntegrityCheck GET,
+decipherment GET,
+encipherment GET,
+globalDomainId GET,
+initiatorCredentials GET,
+messageOriginAuthenticationCheck GET,
+messageSecurityLabel GET,
+messageToken GET,
+msBindAuthenticationCheck GET,
+newCredentials GET,
+oldCredentials GET,
+operationTime GET,
+originatorCertificate GET,
+permissibleSecurityContext GET,
+probeOriginAuthenticationCheck GET,
+proofOfDelivery GET,
+proofOfDeliveryRequest GET,
+proofOfSubmission GET,
+proofOfSubmissionRequest GET,
+recipientCertificate GET,
+reportingMTACertificate GET,
+reportOriginAuthenticationCheck GET,
+securityContext GET,
+securityError GET,
+securityProblem GET,
+signatureCheck GET,
+signatureGeneration GET,
+userSecurityLabel GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-securityAcctRecord };
+securityAcctRecordPackageBehaviour BEHAVIOUR
+DEFINED AS
+"This object is only present if there is a security policy in use in the MD. ";
+-- 11.19 serviceRequestPackage
+-- This package lists the attributes of a serviceRequest managed object.
+serviceRequestPackage PACKAGE
+BEHAVIOUR serviceRequestPackageBehaviour;
+ATTRIBUTES
+contactInstance GET-REPLACE,
+serviceRequestId GET,
+status GET-REPLACE,
+limitValidityDate GET-REPLACE,
+startUpDate GET-REPLACE;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-serviceRequest };
+serviceRequestPackageBehaviour BEHAVIOUR
+DEFINED AS
+"When an instance of the Service Request managed object class is created, the contactInstance and
+ServiceRequestID attribute values shall be supplied. The contactInstance attribute shall contain the name of a
+managed object that already exists.
+The performance of the creation of a ServiceRequest object is reported to the Indirect MIS-user as an object
+creation report.
+All changes on attributes values of a ServiceRequest object are reported to the Indirect MIS-user as Attribute
+change value notifications.
+The performance of the deletion of a ServiceRequest object is reported to the Indirect MIS-user as an object
+deletion report.";
+-- 11.20 settlementAcctRecordPackage
+-- This package lists the common attributes of a settlementAcctRecord managed object.
+settlementAcctRecordPackage PACKAGE
+ATTRIBUTES
+entryExitMtaNames GET,
+MTSIdentifier GET,
+encodedInformationTypes GET,
+envelopeType GET,
+priority GET,
+messageContentSize GET, -- P1s content in octets, when message enters domain --
+processingComponentRate GET; -- see page 27 of D.36 --
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-settlementAcctRecord };
+-- 11.20.1 d36-commonAttributesPackage
+-- This package lists the common attributes of a settlementAcctRecord managed object under the settlement policy
+-- described in Recommendation D.36.
+d36-commonAttributesPackage PACKAGE
+ATTRIBUTES
+MTSIdentifier GET,
+originatingADMD GET,
+destinationADMD GET, -- MTA names
+messageSize GET, -- P1e
+totalNumberOfORAddresses GET, -- a
+currency GET; -- R
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-d36-commonAttributes };
+-- 11.20.2 d36-deliveryViaAccessUnitPackage
+-- This package lists the specific attributes of a settlementAcctRecord managed object under the settlement policy
+-- described in Recommendation D.36 when processing a delivery via an AU.
+d36-deliveryViaAccessUnitPackage PACKAGE
+BEHAVIOUR deliveryViaAccessUnitPackageBehaviour;
+ATTRIBUTES
+numberOfMessagesPerDeliveryServiceType GET, -- x(i)
+componentRatesPerOctetPerDeliveryServiceType GET, -- D(i)
+accessRatePerDeliveryServiceType GET, -- E(i)
+deliveryServiceTypes GET; -- i
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-d36-deliveryViaAccessUnit };
+deliveryViaAccessUnitPackageBehaviour BEHAVIOUR
+DEFINED AS "Used when the concerned message is delivered by the ADMD via an access unit.";
+-- 11.20.3 d36-directDeliveryPackage
+-- This package lists the specific attributes of a settlementAcctRecord managed object under the settlement policy
+-- described in Recommendation D.36 when processing a delivery via an AU.
+d36-directDeliveryPackage PACKAGE
+BEHAVIOUR directDeliveryPackageBehaviour;
+ATTRIBUTES
+numberOfAddressedUAs GET, -- b
+numberOfAddressedPRMDs GET, -- c
+deliveryComponentRateToUa GET, -- D
+deliveryComponentRateToPRMD GET; -- D
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-d36-directDelivery };
+directDeliveryPackageBehaviour BEHAVIOUR
+DEFINED AS "Used when the concerned message is directly delivered by the ADMD.";
+-- 11.20.4 destinationDomainDeliveryPackage
+-- This package lists the specific attributes of a settlementAcctRecord managed object regarding the destination domain of
+-- a delivered message.
+destinationDomainDeliveryPackage PACKAGE
+BEHAVIOUR destinationDomainDeliveryPackageBehaviour;
+ATTRIBUTES
+destinationDomainDeliveryList GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-destinationDomainDelivery };
+destinationDomainDeliveryPackageBehaviour BEHAVIOUR
+DEFINED AS "Captures accounting information on a destination domain after it delivers message(s) via AU, to UA
+and to MS";
+-- 11.20.5 originatingDomainTransferOutPackage
+-- This package lists the specific attributes of a settlementAcctRecord managed object regarding the originating domain of
+-- a transferred message.
+originatingDomainTransferOutPackage PACKAGE
+BEHAVIOUR transferOutPackageBehaviour;
+ATTRIBUTES
+serviceAccessCharge GET,
+-- Note  To use monetary unit or other units like type of access is for further study --
+originatingDomainTransferOutList GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-originatingDomainTransferOut };
+transferOutPackageBehaviour BEHAVIOUR
+DEFINED AS "Captures accounting information on an originating domain";
+-- 11.20.6 transitDomainTransferOutPackage
+-- This package lists the specific attributes of a settlementAcctRecord managed object regarding the transit domain of a
+-- delivered message
+transitDomainTransferOutPackage PACKAGE
+BEHAVIOUR transitDomainTransferOutPackageBehaviour;
+ATTRIBUTES
+transitDomainTransferOutList GET;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-package-transitDomainTransferOut };
+transitDomainTransferOutPackageBehaviour BEHAVIOUR
+DEFINED AS "Captures accounting information on a transit domain after it transfers out a message";
+-- 12 Definition of attributes
+-- 12.1 Access Rate Per Delivery Service Type
+-- This attribute is part of the settlement record and is described in Recommendation. D.36.
+accessRatePerDeliveryServiceType ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.AccessRatePerDeliveryServiceType;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-accessRatePerDeliveryServiceType };
+-- 12.2 Actual Recipient Name
+-- This attribute enables to store the corresponding parameter of a Report Delivery abstract-operation. This attribute may
+-- have one of the possible values of an actual-recipient-name abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4.
+actualRecipientName ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ActualRecipientName;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-actualRecipientName };
+-- 12.3 Administration Error
+-- This attribute enables to store an error occuring at the administration port of an MHS entity.
+administrationError ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.AdministrationError;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-administrationError };
+-- 12.4 Alert Argument
+-- This attribute enables to store the corresponding MS Alert abstract-operation argument. This attribute may have one of
+-- the possible values of an alert-argument abstract service parameter defined in ITU-T Rec. X.413 | ISO/IEC 10021-5.
+alertArgument ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.AlertArgument;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-alertArgument };
+-- 12.5 Alert Result
+-- This attribute enables to store the corresponding MS Alert abstract-operation result. This attribute may have one of the
+-- possible values of an alert-result abstract service parameter defined in ITU-T Rec. X.413 | ISO/IEC 10021-5.
+alertResult ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.AlertResult;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-alertResult };
+-- 12.6 Authentication Check
+-- The use of this attribute, as part of the security Accounting Record is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+authenticationCheck ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.AuthenticationCheck;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-authenticationCheck };
+-- 12.7 Authentication Generation
+-- The use of this attribute, as part of the security Accounting Record is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+authenticationGeneration ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.AuthenticationGeneration;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-authenticationGeneration };
+-- 12.8 Available Attribute Types
+-- This attribute enables to store the corresponding parameter of an MS-Bind abstract-operation. This attribute may have
+-- one of the possible values of an available-attribute-types abstract service parameter defined in ITU-T Rec. X.413 |
+-- ISO/IEC 10021-5.
+availableAttributeTypes ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.AvailableAttributeTypes;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-availableAttributeTypes };
+-- 12.9 Bind Authentication Check
+-- The use of this attribute, as part of the security Accounting Record is described in ITU-T Rec. X.464 | ISO/IEC11588-4.
+bindAuthenticationCheck ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.BindAuthenticationCheck;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-bindAuthenticationCheck };
+-- 12.10 Binding Error
+-- This attribute enables to store an error occurring during a bind abstract operation.
+bindingError ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.BindingError;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-bindingError };
+-- 12.11 Bind Token
+-- This attribute enables to store the corresponding parameter of an MHS abstract operation. This attribute may have one of
+-- the possible values of a bind-token abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4. The use
+-- of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+bindToken ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.BindToken;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-bindToken };
+-- 12.12 Certificate
+-- This attribute enables to store the corresponding parameter of an MHS abstract operation. This attribute may have one of
+-- the possible values of a certificate abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4. The use
+-- of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+certificate ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Certificate;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-certificate };
+-- 12.13 Component Rates per Octets per Delivery Service Type
+-- This attribute is part of the settlement record and is described in Recommendation D.36.
+componentRatesPerOctetsPerDeliveryServiceType ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ComponentRatesPerOctetsPerDeliveryServiceType;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-componentRatesPerOctetsPerDeliveryServiceType };
+-- 12.14 Consumer of Operation
+-- This attribute enables to store the identification of the consumer of an operation.
+consumerOfOperation ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ObjectInstance;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-consumerOfOperation };
+-- 12.15 Contact Company
+-- This attribute enables to store the company name of the contact represented by the Contact managed object instance.
+contactCompany ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ContactCompany;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-contactCompany };
+-- 12.16 Contact Details
+-- This attribute enables to store the details of the contact represented by the Contact managed object instance.
+contactDetails ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ContactDetails;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-contactDetails };
+-- 12.17 Contact Function
+-- This attribute enables to store the function of the contact represented by the Contact managed object instance.
+contactFunction ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ContactFunction;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-contactFunction };
+-- 12.18 Contact ID
+-- This attribute enables to identify a Contact managed object instance within the containment hierarchy.
+contactId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ContactId;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-contactId };
+-- 12.19 Contact Instance
+-- This attribute enables to store the Relative distinguished name of a Contact managed object instance.
+contactInstance ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ObjectInstance;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-contactInstance };
+-- 12.20 Contact Name
+-- This attribute enables to store the name of the contact represented by the Contact managed object instance.
+contactName ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ContactName;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-contactName };
+-- 12.21 Content Confidentiality Algorithm Identifier
+-- This attribute enables to store the corresponding parameter of an MHS abstract operation. This attribute may have one of
+-- the possible values of a content-confidentiality-algorithm-identifier abstract service parameter defined in ITU-T
+-- Rec. X.411 | ISO/IEC 10021-4. The use of this attribute, as part of the security Accounting Record is described in ITU-T
+-- Rec. X.464 | ISO/IEC 11588-4.
+contentConfidentialityAlgorithmIdentifier ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ContentConfidentialityAlgorithmIdentifier;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-contentConfidentialityAlgorithmIdentifier };
+-- 12.22 Content Identifier
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a content-identifier abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+contentIdentifier ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ContentIdentifier;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-contentIdentifier};
+-- 12.23 ContentIntegrity Check
+-- This attribute is used for security purposes. The reader is referred to ITU-T Rec. X.464 | ISO/IEC 11588-4.
+contentIntegrityCheck ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ContentIntegrityCheck;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-contentIntegrityCheck };
+-- 12.24 Content Type
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a content-type abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+contentType ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ContentType;
+MATCHES FOR EQUALITY;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-contentType };
+-- 12.25 Currency
+-- This attribute is part of the settlement record and is described in Recommendation D.36.
+currency ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Currency;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-currency };
+-- 12.26 customerAcct Policy
+-- This attribute enables to store the Customer acounting policy enforced in the MIS management domain.
+customerAcctPolicy ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.CustomerAcctPolicy;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-customerAcctPolicy };
+-- 12.27 Customer ID
+-- This attribute enables to identify a Customer managed object instance within the containment hierarchy.
+customerId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.CustomerId;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-customerId };
+-- 12.28 Customer Name
+-- This attribute enables to store the name of the Customer represented by a Customer managed object instance.
+customerName ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.CustomerName;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-customerName };
+-- 12.29 Decipherment
+-- The use of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+decipherment ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Decipherment;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-decipherment };
+-- 12.30 Default Delivery Controls
+-- This attribute enables to store the corresponding parameter of a Register abstract operation. This attribute may have one
+-- of the possible values of a default-delivery-controls abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4.
+defaultDeliveryControls ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.DefaultDeliveryControls;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-defaultDeliveryControls };
+-- 12.31 Delete Argument
+-- This attribute enables to store the corresponding MS Delete abstract-operation argument. This attribute may have one of
+-- the possible values of a delete-argument abstract service parameter defined in ITU-T Rec. X.413 | ISO/IEC 10021-5.
+deleteArgument ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.DeleteArgument;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-deleteArgument };
+-- 12.32 Delete Result
+-- This attribute enables to store the corresponding MS Delete abstract-operation result. This attribute may have one of the
+-- possible values of a delete-result abstract service parameter defined in ITU-T Rec. X.413 | ISO/IEC 10021-5.
+deleteResult ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.DeleteResult;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-deleteResult };
+-- 12.33 Deliverable Content Types
+-- This attribute enables to store the corresponding parameter of a Register abstract operation. This attribute may have one
+-- of the possible values of a deliverable-content-types abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4.
+deliverableContentTypes ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.DeliverableContentTypes;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-deliverableContentTypes };
+-- 12.34 Deliverable Encoded Information Types
+-- This attribute enables to store the corresponding parameter of a Register abstract operation. This attribute may have one
+-- of the possible values of a deliverable-encoded-Information-types abstract service parameter defined in ITU-T
+-- Rec. X.411 | ISO/IEC 10021-4.
+deliverableEncodedInformationTypes ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.EncodedInformationTypes;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-deliverableEncodedInformationTypes };
+-- 12.35 Deliverable Maximum Content Length
+-- This attribute enables to store the corresponding parameter of a Register abstract operation. This attribute may have one
+-- of the possible values of a deliverable-maximum-content-length abstract service parameter defined in ITU-T
+-- Rec. X.411 | ISO/IEC 10021-4.
+deliverableMaximumContentLength ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ContentLength;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-deliverableMaximumContentLength };
+-- 12.36 Delivery Component Rate to PRMD
+-- This attribute is part of the settlement record and is described in Recommendation D.36.
+deliveryComponentRateToPrmd ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.DeliveryComponentRateToPrmd;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-deliveryComponentRateToPrmd };
+-- 12.37 Delivery Component Rate To UA
+-- This attribute is part of the settlement record and is described in Recommendation D.36.
+deliveryComponentRateToUa ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.DeliveryComponentRateToUa;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-deliveryComponentRateToUa };
+-- 12.38 Delivery Controls
+-- This attribute enables to store the corresponding parameter of a Delivery-control abstract operation. This attribute may
+-- have one of the possible values of a delivery-controls abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4.
+deliveryControls ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.DeliveryControls;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-deliveryControls };
+-- 12.39 Delivery Error
+-- This attribute enables to store an error occurring at the MTS Delivery port.
+deliveryError ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.DeliveryError;
+PARAMETERS
+securityError;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-deliveryError };
+-- 12.40 Delivery Service Types
+-- This attribute is part of the settlement record and is described in Recommendation D.36.
+deliveryServiceTypes ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.DeliveryServiceTypes;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-deliveryServiceTypes };
+-- 12.41 DestinationADMD
+-- This attribute is part of the settlement record and is described in Recommendation D.36.
+destinationAdmd ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.DestinationADMD;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-destinationAdmd };
+-- 12.42 Destination Domain Delivery List
+-- This attribute is part of the settlement record and is described in Recommendation D.36.
+destinationDomainDeliveryList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.DestinationDomainDeliveryList;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-destinationDomainDeliveryList };
+-- 12.43 Electronic Mail Address
+-- This attribute enables to store the e-mail address of the person in charge of the contact represented by a Contact managed
+-- object instance.
+electronicMailAddress ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ElectronicMailAddress;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-electronicMailAddress };
+-- 12.44 Encipherment
+-- The use of this attribute, as part of the security Accounting Record is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+encipherment ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Encipherment;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-encipherment };
+-- 12.45 Encoded Information Types
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of an encoded-information-types abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4.
+encodedInformationTypes ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.EncodedInformationTypes;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-encodedInformationTypes };
+-- 12.46 Entry Exit MTA Names
+-- This attribute is part of the settlement record and is described in Recommendation D.36.
+entryExitMtaNames ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.EntryExitMTANames;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-entryExitMtaNames };
+-- 12.47 Envelope Type
+-- This attribute is part of the settlement record and is described in Recommendation D.36.
+envelopeType ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.EnvelopeType;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-envelopeType };
+-- 12.48 Facsimile Telephone Number List
+-- This attribute enables to store the fax numbers associated with the contact represented by a Contact managed object
+-- instance.
+facsimileTelephoneNumberList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.TelephoneNumberList;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-faxTelephoneNumberList };
+-- 12.49 Fetch Argument
+-- This attribute enables to store the corresponding MS Fetch abstract-operation argument. This attribute may have one of
+-- the possible values of a fetch-argument abstract service parameter defined in ITU-T Rec. X.413 | ISO/IEC 10021-5.
+fetchArgument ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.FetchArgument;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-fetchArgument };
+-- 12.50 Fetch Result
+-- This attribute enables to store the corresponding MS Fetch abstract-operation result. This attribute may have one of the
+-- possible values of a fetch-result abstract service parameter defined in ITU-T Rec. X.413 | ISO/IEC 10021-5.
+fetchResult ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.FetchResult;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-fetchResult };
+-- 12.51 Global Domain ID
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a global-domain-identifier abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4. The use of this attribute, as part of the security Accounting Record, is described in ITU-T
+-- Rec. X.464 | ISO/IEC 11588-4.
+globalDomainId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.GlobalDomainIdentifier;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-globalDomainId };
+-- 12.52 InitiatorCredentials
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a credentials abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4. The use
+-- of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+initiatorCredentials ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.InitiatorCredentials;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-initiatorCredentials };
+-- 12.53 Initiator Name
+-- This attribute enables to store the corresponding parameter of a Bind abstract-operation. This attribute may have one of
+-- the possible values of an OR-name abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+initiatorName ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ObjectName;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-initiatorName };
+-- 12.54 Internal Trace
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of an OR-name abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+internalTrace ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.InternalTrace;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-internalTrace };
+-- 12.55 InterworkingMD ID
+-- This attribute enables to identify an InterworkingMD managed object instance within the containment hierarchy.
+interworkingMDId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.InterworkingMDId;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-interworkingAdmdId };
+-- 12.56 InterworkingMD Name
+-- This attribute enables to store the name of the InterworkingMD represented by an InterworkingMD managed object
+-- instance.
+interworkingMDName ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.InterworkingMDName;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-interworkingAdmdName };
+-- 12.57 Labels and Redirections
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a labels-and-redirections abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4.
+labelsAndRedirections ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.LabelsAndRedirections;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-labelsAndRedirections };
+-- 12.58 Limit Validity Date
+-- This attribute enables to provide information on the validity period of a Service request.
+limitValidityDate ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.LimitValidityDate;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-limitValidityDate };
+-- 12.59 List Argument
+-- This attribute enables to store the corresponding MS List abstract-operation argument. This attribute may have one of the
+-- possible values of a list-argument abstract service parameter defined in ITU-T Rec. X.413 | ISO/IEC 10021-5.
+listArgument ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ListArgument;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-listArgument };
+-- 12.60 List Result
+-- This attribute enables to store the corresponding MS List abstract-operation result. This attribute may have one of the
+-- possible values of a list-result abstract service parameter defined in ITU-T Rec. X.413 | ISO/IEC 10021-5.
+listResult ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ListResult;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-listResult };
+-- 12.61 Log Start Time
+-- This attribute enables to store the time at which logging shall be started.
+logStartTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Time;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-logStartTime };
+-- 12.62 Log Stop Time
+-- This attribute enables to store the time at which logging shall be stopped.
+logStopTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Time;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-logStopTime };
+-- 12.63 Message Content Size
+-- This attribute indicates the size of the content of a message in octets.
+messageContentSize ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.MessageContentSize;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-messageContentSize };
+-- 12.64 Message Delivery Envelope
+-- This attribute enables to store the corresponding parameter of a Message Delivery abstract-operation. This attribute may
+-- have one of the possible values of a message-delivery-envelope abstract service parameter defined in ITU-T
+-- Rec. X.411 | ISO/IEC 10021-4.
+messageDeliveryEnvelope ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.MessageDeliveryEnvelope;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-messageDeliveryEnvelope };
+-- 12.65 MTS Identifier
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of an MTS-identifier abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+MTSIdentifier ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.MTSIdentifier;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-MTSIdentifier };
+-- 12.66 Message Origin Authentication Check
+-- The use of this attribute, as part of the security Accounting Record is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+messageOriginAuthenticationCheck ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.MessageOriginAuthenticationCheck;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-messageOriginAuthenticationCheck };
+-- 12.67 Message Security Label
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a message-security-label abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4. The use of this attribute, as part of the security Accounting Record, is described in ITU-T
+-- Rec. X.464 | ISO/IEC 11588-4.
+messageSecurityLabel ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.MessageSecurityLabel;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-messageSecurityLabel };
+-- 12.68 Message Size
+-- This attribute enables to store the size of a message in octets.
+messageSize ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.MessageSize;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-messageSize };
+-- 12.69 Message Submission Envelope
+-- This attribute enables to store the corresponding parameter of a Message Submission abstract-operation. This attribute
+-- may have one of the possible values of a message-submission-envelope abstract service parameter defined in ITU-T
+-- Rec. X.411 | ISO/IEC 10021-4.
+messageSubmissionEnvelope ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.MessageSubmissionEnvelope;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-messageSubmissionEnvelope };
+-- 12.70 Submission Time
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a time abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+submissionTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Time;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-submissionTime};
+-- 12.71 Message Token
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a message-token abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4. The
+-- use of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+messageToken ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.MessageToken;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-messageToken };
+-- 12.72 Message Transfer Envelope
+-- This attribute enables to store the corresponding parameter of a Message Transfer abstract-operation. This attribute may
+-- have one of the possible values of a message-Transfer-envelope abstract service parameter defined in ITU-T
+-- Rec. X.411 | ISO/IEC 10021-4.
+messageTransferEnvelope ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.MessageTransferEnvelope;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-messageTransferEnvelope };
+-- 12.73 MS-Bind Authentication Check
+-- The use of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+msBindAuthenticationCheck ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.MsBindAuthenticationCheck;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-msBindAuthenticationCheck };
+-- 12.74 New Credentials
+-- This attribute enables to store the corresponding parameter of a Change Credentials abstract-operation. This attribute
+-- may have one of the possible values of a credentials abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4. The use of this attribute, as part of the security Accounting Record, is described in ITU-T
+-- Rec. X.464 | ISO/IEC 11588-4.
+newCredentials ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Credentials;
+MATCHES FOR EQUALITY;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-newCredentials };
+-- 12.75 Number of Addressed PRMDs
+-- This attribute enables to store the number of PRMDs that received this message directly from this ADMD.
+numberOfAddressedPrmds ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.NumberOfAddressedPrmds;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-numberOfAddressedPrmds };
+-- 12.76 Number of Addressed UAs
+-- This attribute enables to store the number of UAs that received this message directly from this ADMD.
+numberOfAddressedUas ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.NumberOfAddressedUas;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-numberOfAddressedUas };
+-- 12.77 Number of Messages per Delivery Service Type
+-- This attribute enables to store, for each delivery service type, the number of messages that were sent to it by this ADMD.
+numberOfMessagesPerDeliveryServiceType ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.NumberOfMessagesPerDeliveryServiceType;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-numberOfMessagesPerDeliveryServiceType };
+-- 12.78 Old Credentials
+-- This attribute enables to store the corresponding parameter of a Change Credentials abstract-operation. This attribute
+-- may have one of the possible values of a credentials abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4. The use of this attribute, as part of the security Accounting Record, is described in ITU-T
+-- Rec. X.464 | ISO/IEC 11588-4.
+oldCredentials ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Credentials;
+MATCHES FOR EQUALITY;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-oldCredentials };
+-- 12.79 Operation Status
+-- This attribute indicates if the operation is in progress, has terminated successfully or returned an error code.
+operationStatus ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.OperationStatus;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-operationStatus };
+-- 12.80 Operation Time
+-- This attribute enables to store the time at which the operation was performed. The use of this attribute, as part of the
+-- security Accounting Record is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+operationTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.OperationTime;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-operationTime };
+-- 12.81 Originating Domain Transfer out List
+-- This attribute enables to store the MDs that the message was transfered to.
+-- originatingDomainTransferOutList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.OriginatingDomainTransferOutList;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-originatingDomainTransferOutList };
+-- 12.82 Originating Admd
+-- This attribute enables to store the originating ADMD in a settlement record (using Recommendation D.36).
+originatingAdmd ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.OriginatingADMD;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-originatingAdmd };
+-- 12.83 Originating MTA Certificate
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of an originating-MTA-certificate abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4.
+originatingMTACertificate ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.OriginatingMTACertificate;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-originatingMTACertificate};
+-- 12.84 Originator Certificate
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of an originating-certificate abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4. The use of this attribute, as part of the security Accounting Record, is described in ITU-T
+-- Rec. X.464 | ISO/IEC 11588-4.
+originatorCertificate ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.OriginatorCertificate;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-originatorCertificate };
+-- 12.85 Originator Name
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of an OR-name abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+originatorName ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.OriginatorName;
+MATCHES FOR EQUALITY;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-originatorName };
+-- 12.86 Permisible Security Context
+-- The use of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+permisibleSecurityContext ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.PermisibleSecurityContext;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-permisibleSecurityContext };
+-- 12.87 Priority
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a priority abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+priority ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Priority;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-priority };
+-- 12.88 Probe Origin Authentication Check
+-- The use of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+probeOriginAuthenticationCheck ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ProbeOriginAuthenticationCheck;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-probeOriginAuthenticationCheck };
+-- 12.89 Probe Submission Envelope
+-- This attribute enables to store the corresponding parameter of a Probe Submission abstract-operation. This attribute may
+-- have one of the possible values of a probe-submission-envelope abstract service parameter defined in ITU-T
+-- Rec. X.411 | ISO/IEC 10021-4.
+probeSubmissionEnvelope ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ProbeSubmissionEnvelope;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-probeSubmissionEnvelope };
+-- 12.90 Probe Transfer Envelope
+-- This attribute enables to store the corresponding parameter of a Probe Transfer abstract-operation. This attribute may
+-- have one of the possible values of a probe-transfer-envelope abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4.
+probeTransferEnvelope ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ProbeTransferEnvelope;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-probeTransferEnvelope };
+-- 12.91 Processing Component Rate
+-- This attribute enables to store component rate associated to the processing message.
+processingComponentRate ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ProcessingComponentRate;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-processingComponentRate };
+-- 12.92 Processing Details
+-- This attribute enables to store information about the processing that occurred on a message, probe, or report while inside
+-- an MTA and which is indicated in the processingSummary attribute.
+processingDetails ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ProcessingDetails;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-processingDetails };
+-- 12.93 Processing Error Flag
+-- This attribute enables to indicate whether the managed object was created following an internal error in the MHS entity.
+processingErrorFlag ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ProcessingErrorFlag;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-processingErrorFlag };
+-- 12.94 Processing Summary
+-- This attribute enables to store the processing that occurred on a message, probe, or report while inside an MTA.
+processingSummary ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ProcessingSummary;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-processingSummary };
+-- 12.95 Proof of Delivery
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a proof-of-delivery abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+-- The use of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+proofOfDelivery ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ProofOfDelivery;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-proofOfDelivery };
+-- 12.96 Proof of Delivery Request
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a proof-of-delivery-request abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4. The use of this attribute, as part of the security Accounting Record, is described in ITU-T
+-- Rec. X.464 | ISO/IEC 11588-4.
+proofOfDeliveryRequest ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ProofOfDeliveryRequest;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-proofOfDeliveryRequest };
+-- 12.97 Proof of Submission
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a proof-of-submission abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4. The use of this attribute, as part of the security Accounting Record, is described in ITU-T
+-- Rec. X.464 | ISO/IEC 11588-4.
+proofOfSubmission ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ProofOfSubmission;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-proofOfSubmission };
+-- 12.98 Proof of Submission Request
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a proof-of-submission-request abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4. The use of this attribute, as part of the security Accounting Record, is described in ITU-T
+-- Rec. X.464 | ISO/IEC 11588-4.
+proofOfSubmissionRequest ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ProofOfSubmissionRequest;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-proofOfSubmissionRequest };
+-- 12.99 Recipient Certificate
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a recipient-certificate abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-
+-- 4. The use of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 |
+-- ISO/IEC 11588-4.
+recipientCertificate ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.RecipientCertificate;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-recipientCertificate };
+-- 12.100 Recipients on Responsibility List
+-- This attribute enables to store the recipients whose perRecipientIndicator reponsibility bit is set to responsible
+-- (see Figure 4 of ITU-T Rec. X.411 | ISO/IEC 10021-4).
+recipientsOnResponsibilityList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.RecipientsOnResponsibilityList;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-recipientsOnResponsibilityList };
+-- 12.101 Register MS Argument
+-- This attribute enables to store the corresponding Register-MS abstract-operation argument. This attribute may have one
+-- of the possible values of a Register-MS-argument abstract service parameter defined in ITU-T Rec. X.413 |
+-- ISO/IEC 10021-5.
+registerMSArgument ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Register-MSArgument;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-registerMSArgument };
+-- 12.102 Register MS Result
+-- This attribute enables to store the corresponding Register-MS abstract-operation result. This attribute may have one of
+-- the possible values of a Register-MS-result abstract service parameter defined in ITU-T Rec. X.413 | ISO/IEC 10021-5.
+registerMSResult ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Register-MSResult;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-registerMSResult };
+-- 12.103 Report Delivery Envelope
+-- This attribute enables to store the corresponding parameter of a Report Delivery abstract-operation. This attribute may
+-- have one of the possible values of a Report-delivery-envelope abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4.
+reportDeliveryEnvelope ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ReportDeliveryEnvelope;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-reportDeliveryEnvelope };
+-- 12.104 Report Identifier
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of an MTS-identifier abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+reportIdentifier ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ReportIdentifier;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-reportIdentifier };
+-- 12.105 Reporting MTA Certificate
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of a reporting-MTA-certificate abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC-10021-4. The use of this attribute, as part of the security Accounting Record, is described in ITU-T
+-- Rec. X.464 | ISO/IEC 11588-4.
+reportingMtaCertificate ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ReportingMtaCertificate;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-reportingMtaCertificate };
+-- 12.106 Report Origin Authentication Check
+-- The use of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+reportOriginAuthenticationCheck ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ReportOriginAuthenticationCheck;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-reportOriginAuthenticationCheck };
+-- 12.107 Report Transfer Envelope
+-- This attribute enables to store the corresponding parameter of a Report Transfer abstract-operation. This attribute may
+-- have one of the possible values of a report-transfer-envelope abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4.
+reportTransferEnvelope ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ReportTransferEnvelope;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-reportTransferEnvelope };
+-- 12.108 Responder Credentials
+-- This attribute enables to store the corresponding parameter of a Bind abstract-operation. This attribute may have one of
+-- the possible values of a credentials abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+responderCredentials ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ResponderCredentials;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-responderCredentials };
+-- 12.109 Responder Name
+-- This attribute enables to store the corresponding parameter of a Bind abstract-operation. This attribute may have one of
+-- the possible values of an OR-name abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+responderName ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ObjectName;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-responderName };
+-- 12.110 Retrieval Error
+-- This attribute enables to store an error occurring at the retrieval port.
+retrievalError ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.RetrievalError;
+PARAMETERS
+attributeError,
+autoActionRequestError,
+deleteError,
+fetchRestrictionError,
+rangeError,
+sequenceNumberError,
+serviceError;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-retrievalError };
+-- 12.111 Security Context
+-- This attribute enables to store the corresponding parameter of a Bind abstract-operation. This attribute may have one of
+-- the possible values of a security-context abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+-- The use of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+securityContext ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.SecurityContext;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-securityContext };
+-- 12.112 Security Error
+-- This attribute enables to store a security error. The use of this attribute, as part of the security Accounting Record, is
+-- described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+securityError ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.SecurityError;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-securityError };
+-- 12.113 Security Problem
+-- This attribute enables to store the corresponding parameter of a Bind abstract-operation. This attribute may have one of
+-- the possible values of a security-problem abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+-- The use of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 |
+-- ISO/IEC 11588-4.
+securityProblem ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.SecurityProblem;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-securityProblem };
+-- 12.114 Service Access Charge
+-- This attribute enables to store the cost of accessing the MTS service.
+serviceAccessCharge ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ServiceAccessCharge;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-serviceAccessCharge };
+-- 12.115 Service Flag
+-- This attribute enables to tell whether this message is a service message (no charge) or not.
+serviceFlag ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ServiceFlag;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-serviceFlag };
+-- 12.116 Service Request ID
+-- This attribute enables to identify a ServiceRequest managed object instance within the containment hierarchy.
+serviceRequestId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ServiceRequestId;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-serviceRequestId };
+-- 12.117 Settlement Policy
+-- This attribute enables to store the Settlement policy enforced in the MIS management domain.
+settlementPolicy ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.SettlementPolicy;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-settlementPolicy };
+-- 12.118 Signature Check
+-- The use of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+signatureCheck ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.SignatureCheck;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-signatureCheck };
+-- 12.119 Signature Generation
+-- The use of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+signatureGeneration ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.SignatureGeneration;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-signatureGeneration };
+-- 12.120 Start-Up Date
+-- This attribute enables to store the date and time since which a service has been working without interruption.
+startUpDate ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.StartUpDate;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-startUpDate };
+-- 12.121 Status
+-- This attribute enables to store the status of a Service request in progress.
+status ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Status;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-status };
+-- 12.122 Subject Identifer
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of an MTS-Identifier abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+subjectIdentifier ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.SubjectIdentifier;
+MATCHES FOR EQUALITY;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-subjectIdentifier };
+-- 12.123 Subject Submission Identifier
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of an MTS-Identifier abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+subjectSubmissionIdentifier ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.SubjectSubmissionIdentifier;
+MATCHES FOR EQUALITY;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-subjectSubmissionIdentifier };
+-- 12.124 Submission Controls
+-- This attribute enables to store the corresponding Submission control abstract-operation parameter. This attribute may
+-- have one of the possible values of a submission-Controls abstract service parameter defined in ITU-T Rec. X.413 |
+-- ISO/IEC 10021-5.
+submissionControls ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.SubmissionControls;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-submissionControls };
+-- 12.125 Submission Error
+-- This attribute enables to store an error occurring at the submission port.
+submissionError ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.SubmissionError;
+PARAMETERS
+improperlySpecifiedRecipients,
+securityError;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-submissionError };
+-- 12.126 Summarize Argument
+-- This attribute enables to store the corresponding Summarize abstract-operation argument. This attribute may have one of
+-- the possible values of a summarize-argument abstract service parameter defined in ITU-T Rec. X.413 |
+-- ISO/IEC 10021-5.
+summarizeArgument ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.SummarizeArgument;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-summarizeArgument };
+-- 12.127 Summarize Result
+-- This attribute enables to store the corresponding Summarize abstract-operation result. This attribute may have one of the
+-- possible values of a summarize-result abstract service parameter defined in ITU-T Rec. X.413 | ISO/IEC 10021-5.
+summarizeResult ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.SummarizeResult;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-summarizeResult };
+-- 12.128 Supplier of Operation
+-- This attribute enables to store the identification of the supplier of an operation.
+supplierOfOperation ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ObjectInstance;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-supplierOfOperation };
+-- 12.129 Telephone Number List
+-- This attribute enables to store the telephone numbers associated with the contact represented by a Contact managed
+-- object instance.
+telephoneNumberList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.TelephoneNumberList;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-telephoneNumberList };
+-- 12.130 This Recipient Name
+-- This attribute enables to store the corresponding parameter of an MHS abstract-operation. This attribute may have one of
+-- the possible values of an OR-Name abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4.
+thisRecipientName ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.ThisRecipientName;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-thisRecipientName };
+-- 12.131 Total Number of O/R Addresses
+-- This attribute enables to store the total number of O/R addresses contained in the message. This attribute is used for
+-- settlement purposes as outlined in Recommendation D.36.
+totalNumberOfORAddresses ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.TotalNumberOfORAddresses;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-totalNumberOfORAddresses };
+-- 12.132 Trace
+-- This attribute enables for security audit purposes. The reader is referred to ITU-T Rec. X.464 | ISO/IEC 11588-4.
+trace ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.Trace;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-trace };
+-- 12.133 Transit Domain Transfer out List
+-- This attribute enables to store the MDs that the message was transferred to.
+transitDomainTransferOutList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.TransitDomainTransferOutList;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-transitDomainTransferOutList };
+-- 12.134 User Address
+-- This attribute enables to store the corresponding parameter of a change credentials abstract-operation. This attribute may
+-- have one of the possible values of a user-address abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4.
+userAddress ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.UserAddress;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-userAddress };
+-- 12.135 User Name
+-- This attribute enables to store the corresponding parameter of a change credentials abstract-operation. This attribute may
+-- have one of the possible values of an ORName abstract service parameter defined in ITU-T Rec. X.411 |
+-- ISO/IEC 10021-4.
+userName ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.UserName;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-userName };
+-- 12.136 User Security Label
+-- This attribute enables to store the corresponding parameter of a Bind abstract-operation. This attribute may have one of
+-- the possible values of a security-label abstract service parameter defined in ITU-T Rec. X.411 | ISO/IEC 10021-4. The
+-- use of this attribute, as part of the security Accounting Record, is described in ITU-T Rec. X.464 | ISO/IEC 11588-4.
+userSecurityLabel ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MhsAcctAsn1Module.UserSecurityLabel;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-attribute-userSecurityLabel };
+-- 13 Definition of attribute groups
+-- No attribute groups are defined for accounting management functions.
+-- 14 Definition of Notifications
+-- 14.1 objectCreation
+-- This notification is sent whenever a managed object containing the commonCreationDeletionPackage is created.
+objectCreation NOTIFICATION
+BEHAVIOUR objectCreationBehaviour;
+WITH INFORMATION SYNTAX MhsAcctAsn1Module.CommonCreationAndDeletionInfo;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-notification-objectCreation };
+objectCreationBehaviour BEHAVIOUR
+DEFINED AS
+"Generated whenever an instance of the class is created.
+If creation occurred as a result of internal operation, the value resourceOperation shall be used. If creation
+occurred in response to a management operation, the value emanagementOperationa shall be used. A value of
+ounknown  shall be used if it is not possible to determine the source of the operation. No other optional parameter
+shall be used.";
+-- 14.2 objectDeletion
+-- This notification is sent whenever a managed object containing the commonCreateionDeletionPackage is deleted.
+objectDeletion NOTIFICATION
+BEHAVIOUR objectDeletionBehaviour;
+WITH INFORMATION SYNTAX MhxAcctAsn1Module.CommonCreationAndDeletionInfo;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-notification-objectDeletion };
+objectDeletionBehaviour BEHAVIOUR
+DEFINED AS
+"Generated whenever an instance of the class is deleted.
+If deletion occurred as a result of internal operation, the value resourceOperation shall be used. If deletion
+occurred in response to a management operation, the value emanagementOperationa shall be used. A value of
+ounknown  shall be used if it is not possible to determine the source of the operation. No other optional parameters
+shall be used.";
+-- 15 Definition of actions
+-- No actions are defined for accounting management functions.
+-- 16 Definition of parameters
+-- This clause describes the error parameters associated with the bindingError attribute of the
+-- commonBindArgumentPackage. At the time of writing, the CONTEXT construct of each parameter cannot be specified
+-- as the referenced notifications were not specified using GDMO.
+-- 16.1 attributeError
+-- The parameter addresses the Attribute-Error error returned by some MHS abstract operations.
+attributeError PARAMETER
+CONTEXT SPECIFIC-ERROR;
+WITH SYNTAX MhsAcctAsn1Module.AttributeError;
+BEHAVIOUR attributeErrorBehaviour;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-parameter-attributeError };
+attributeErrorBehaviour BEHAVIOUR
+DEFINED AS
+"The value of the parameter is only pertinent if the parameter is associated with a retrievalError
+attribute that has a value referencing the attribute-error abstract error defined in ITU-T Rec. X.413 |
+ISO/IEC 10021-5";
+-- 16.2 autoActionRequestError
+-- The parameter addresses the Auto-Action-Request-Error error returned by some MHS abstract operations.
+autoActionRequestError PARAMETER
+CONTEXT SPECIFIC-ERROR;
+WITH SYNTAX MhsAcctAsn1Module.AutoActionRequestError;
+BEHAVIOUR autoActionRequestBehaviour;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-parameter-autoActionRequestError };
+autoActionRequestBehaviour BEHAVIOUR
+DEFINED AS
+"The value of the parameter is only pertinent if the parameter is associated with a retrievalError attribute
+that has a value referencing the auto-action-request-error abstract error defined in ITU-T Rec. X.413 |
+ISO/IEC 10021-5";
+-- 16.3 deleteError
+-- The parameter addresses the Delete-Error error returned by some MHS abstract operations.
+deleteError PARAMETER
+CONTEXT SPECIFIC-ERROR;
+WITH SYNTAX MhsAcctAsn1Module.DeleteError;
+BEHAVIOUR deleteErrorBehaviour;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-parameter-deleteError };
+deleteErrorBehaviour BEHAVIOUR
+DEFINED AS
+"The value of the parameter is only pertinent if the parameter is associated with a retrievalError attribute
+that has a value referencing the delete-error abstract error defined in ITU-T Rec. X.413 | ISO/IEC 10021-5";
+-- 16.4 fetchRestrictionError
+-- The parameter addresses the Fetch-Restriction-Error error returned by some MHS abstract operations.
+fetchRestrictionError PARAMETER
+CONTEXT SPECIFIC-ERROR;
+WITH SYNTAX MhsAcctAsn1Module.FetchRestrictionError;
+BEHAVIOUR fetchRestrictionErrorBehaviour;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-parameter-fetchRestrictionError };
+fetchRestrictionErrorBehaviour BEHAVIOUR
+DEFINED AS
+"The value of the parameter is only pertinent if the parameter is associated with a retrievalError attribute
+that has a value referencing the fetch-restriction-error abstract error defined in ITU-T Rec. X.413 |
+ISO/IEC 10021-5";
+-- 16.5 improperlySpecifiedRecipients
+-- The parameter addresses the Improperly-Specified-Recipients error returned by some MHS abstract operations.
+improperlySpecifiedRecipients PARAMETER
+CONTEXT SPECIFIC-ERROR;
+WITH SYNTAX MhsAcctAsn1Module.ImproperlySpecifiedRecipients;
+BEHAVIOUR improperlySpecifiedRecipientsBehaviour;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-parameter-improperlySpecifiedRecipients };
+improperlySpecifiedRecipientsBehaviour BEHAVIOUR
+DEFINED AS
+"The value of the parameter is only pertinent if the parameter is associated with a submissionError attribute
+that has a value referencing the recipient-improperly-specified abstract error defined in ITU-T Rec. X.411 |
+ISO/IEC 10021-4";
+-- 16.6 rangeError
+-- The parameter addresses the Range-Error error returned by some MHS abstract operations.
+rangeError PARAMETER
+CONTEXT SPECIFIC-ERROR;
+WITH SYNTAX MhsAcctAsn1Module.RangeError;
+BEHAVIOUR rangeErrorBehaviour;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-parameter-rangeError };
+rangeErrorBehaviour BEHAVIOUR
+DEFINED AS
+"The value of the parameter is only pertinent if the parameter is associated with a retrievalError attribute
+that has a value referencing the range-error abstract error defined in ITU-T Rec. X.413 | ISO/IEC 10021-5";
+-- 16.7 securityError
+-- The parameter addresses the Security-Error error returned by some MHS abstract operations.
+securityError PARAMETER
+CONTEXT SPECIFIC-ERROR;
+WITH SYNTAX MhsAcctAsn1Module.SecurityProblem;
+BEHAVIOUR securityErrorBehaviour;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-parameter-securityError };
+securityErrorBehaviour BEHAVIOUR
+DEFINED AS
+"The value of the parameter is only pertinent if the parameter is associated with a submissionError or
+deliveryError attribute that has a value referencing the security-error abstract error defined in
+ITU-T Rec. X.411 | ISO/IEC 10021-4";
+-- 16.8 sequenceNumberError
+-- The parameter addresses the Sequence-Number-Error error returned by some MHS abstract operations.
+sequenceNumberError PARAMETER
+CONTEXT SPECIFIC-ERROR;
+WITH SYNTAX MhsAcctAsn1Module.SequenceNumberError;
+BEHAVIOUR sequenceNumberErrorBehaviour;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-parameter-sequenceNumberError };
+sequenceNumberErrorBehaviour BEHAVIOUR
+DEFINED AS
+"The value of the parameter is only pertinent if the parameter is associated with a retrievalError attribute
+that has a value referencing the sequence-number-error abstract error defined in ITU-T Rec. X.413 |
+ISO/IEC 10021-5";
+-- 16.9 serviceError
+-- The parameter addresses the Service-Error error returned by some MHS abstract operations.
+serviceError PARAMETER
+CONTEXT SPECIFIC-ERROR;
+WITH SYNTAX MhsAcctAsn1Module.ServiceError;
+BEHAVIOUR serviceErrorBehaviour;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-parameter-serviceError };
+serviceErrorBehaviour BEHAVIOUR
+DEFINED AS
+"The value of the parameter is only pertinent if the parameter is associated with a retrievalError attribute
+that has a value referencing the service-error abstract error defined in ITU-T Rec. X.413 | ISO/IEC 10021-5";
+-- 17 Name bindings
+-- This clause formalizes the naming hierarchy outlined in 8.1.
+-- NOTES
+-- 1 The record-log relationships are already covered by the logRecord-log name binding defined in 7.3 of
+-- ITU-T Rec. X.721 | ISO/IEC 10165-2.
+-- 2 The log-system relationships are already covered by the log-system name binding defined in 7.2 of
+-- ITU-T Rec. X.721 | ISO/IEC 10165-2.
+-- 17.1 acctRequest-customer
+-- This template formalizes the relationship between the customer and the acctRequest managed objects.
+acctRequest-customer NAME BINDING
+SUBORDINATE OBJECT CLASS acctRequest;
+NAMED BY SUPERIOR OBJECT CLASS customer;
+WITH ATTRIBUTE serviceRequestId;
+CREATE WITH-REFERENCE-OBJECT;
+DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-name-binding-acctRequest-customer };
+-- 17.2 acctRequest-interworkingMD
+acctRequest-interworkingMD NAME BINDING
+SUBORDINATE OBJECT CLASS acctRequest;
+NAMED BY SUPERIOR OBJECT CLASS interworkingMD;
+WITH ATTRIBUTE serviceRequestId;
+CREATE WITH-REFERENCE-OBJECT;
+DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-name-binding-acctRequest-interworkingMD };
+-- 17.3 contact-customer
+-- This template formalizes the relationship between the customer and the contact managed objects.
+contact-customer NAME BINDING
+SUBORDINATE OBJECT CLASS contact;
+NAMED BY SUPERIOR OBJECT CLASS customer;
+WITH ATTRIBUTE contactId;
+CREATE WITH-REFERENCE-OBJECT;
+DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-name-binding-contact-customer };
+-- 17.4 contact-interworkingMD
+-- This template formalizes the relationship between the interworkingMD and the contact managed objects.
+contact-interworkingMD NAME BINDING
+SUBORDINATE OBJECT CLASS contact;
+NAMED BY SUPERIOR OBJECT CLASS interworkingMD;
+WITH ATTRIBUTE contactId;
+CREATE WITH-REFERENCE-OBJECT;
+DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-name-binding-contact-interworkingMD };
+-- 17.5 customer-mdServiceManagementPointOfAccess
+-- This template formalizes the relationship between the mdServiceManagementPointOfAccess and the managed objects.
+customer-mdServiceManagementPointOfAccess NAME BINDING
+SUBORDINATE OBJECT CLASS customer;
+NAMED BY SUPERIOR OBJECT CLASS mdServiceManagementPointOfAccess;
+WITH ATTRIBUTE customerId;
+CREATE WITH-REFERENCE-OBJECT;
+DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-name-binding-customer-mdServiceManagementPointOfAccess };
+-- 17.6 customerAcctLog-customer
+-- This template formalizes the relationship between the customer and the customerAcctLog managed objects.
+customerAcctLog-customer NAME BINDING
+SUBORDINATE OBJECT CLASS customerAcctLog AND SUBCLASSES;
+NAMED BY SUPERIOR OBJECT CLASS customer;
+WITH ATTRIBUTE "Rec. X.721 | ISO/IEC 10165-2":logId;
+CREATE WITH-REFERENCE-OBJECT;
+DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-name-binding-customerAcctLog-customer };
+-- 17.7 customerEFD-customer
+-- This template formalizes the relationship between the customer and the customerEFD managed objects.
+customerEFD-customer NAME BINDING
+SUBORDINATE OBJECT CLASS customerEFD;
+NAMED BY SUPERIOR OBJECT CLASS customer;
+WITH ATTRIBUTE "Rec. X.721 | ISO/IEC 10165-2":discriminator;
+CREATE WITH-REFERENCE-OBJECT;
+DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-name-binding-customerEFD-customer };
+-- 17.8 interworkingMD-EFD-interworkingMD
+-- This template formalizes the relationship between the interworkingMD and the interworkingMD-EFD managed objects.
+interworkingMD-EFD-interworkingMD NAME BINDING
+SUBORDINATE OBJECT CLASS interworkingMD-EFD;
+NAMED BY SUPERIOR OBJECT CLASS interworkingMD;
+WITH ATTRIBUTE "Rec. X.721 | ISO/IEC 10165-2":discriminator;
+CREATE WITH-REFERENCE-OBJECT;
+DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-name-binding-interworkingMD-EFD-interworkingMD };
+-- 17.9 interworkingMD-mdServiceManagementPointOfAccess
+-- This template formalizes the relationship between the mdServiceManagementPointOfAccess and the interworkingMD
+-- managed objects.
+interworkingMD-mdServiceManagementPointOfAccess NAME BINDING
+SUBORDINATE OBJECT CLASS interworkingMD;
+NAMED BY SUPERIOR OBJECT CLASS mdServiceManagementPointOfAccess;
+WITH ATTRIBUTE interworkingMDId;
+CREATE WITH-REFERENCE-OBJECT;
+DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-name-binding-interworkingMD-mdServiceManagementPointOfAccess };
+-- 17.10 mdServiceManagementPointOfAccess-misManagementDomain
+-- This template formalizes the relationship between the mhsEventLog and the maseEventRecord managed objects.
+mdServiceManagementPointOfAccess-md NAME BINDING
+SUBORDINATE OBJECT CLASS mdServiceManagementPointOfAccess;
+NAMED BY SUPERIOR OBJECT CLASS md;
+WITH ATTRIBUTE "Rec. M.3100":networkId;
+CREATE WITH-REFERENCE-OBJECT;
+DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-name-binding-mdServiceManagementPointOfAccessmisManagementDomain
+};
+-- 17.11 settlementAcctLog-interworkingMD
+-- This template formalizes the relationship between the interworkingMD and the settlementAcctLog managed objects.
+settlementAcctLog-interworkingMD NAME BINDING
+SUBORDINATE OBJECT CLASS settlementAcctLog AND SUBCLASSES;
+NAMED BY SUPERIOR OBJECT CLASS interworkingMD;
+WITH ATTRIBUTE "Rec. X.721 | ISO/IEC 10165-2":logId;
+CREATE WITH-REFERENCE-OBJECT;
+DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MhsAcctObjectIdentifiers.id-name-binding-settlementAcctLog-interworkingMD };
+END
+--< GDMO.EndDocument "ITU-T Rec. X.462 (1996) | ISO/IEC 11588-3 : 1997" { joint-iso-itu-t mhs (6) management (9) } >--

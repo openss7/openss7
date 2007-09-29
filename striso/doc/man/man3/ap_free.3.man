@@ -1,0 +1,308 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_free.3.man,v 0.9.2.1 2007/09/29 14:08:30 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:30 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_free.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:30  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_FREE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ap_free
+\- Free user memory associated with XAP data structures.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.BI "int ap_free(int " fd ", unsigned long " kind ", void *" val ", unsigned long *" aperrno_p );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I fd
+A file descriptor identifying the XAP instance.
+.TP
+.I kind
+The kind of structure to free.
+.TP
+.I val
+A pointer to the structure.
+.TP
+.I aperrno_p
+A pointer to an extent into which to receive an error number.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function frees memory for values of XAP environment attributes and data
+structures allocated on the XAP instance identified by
+.IR fd .
+Common uses of this function would be to free memory allocated for the value
+of an environment attribute by XAP following an
+.BR ap_get_env (3)
+invocation, and to free an
+.B ap_a_assoc_env_t
+structure returned with an
+.I A_ASSOC_IND
+by an ap_rcv invocation when the
+.B AP_COPYENV
+environment attribute is set. The argument
+.I kind
+identifies the kind of structure that is to be freed. Legal values for this
+argument are:
+.IP \(bu \w'\(bu\(em'u
+.B #define
+identifiers associated with environment attributes whose type is not a
+.BR long .
+These are the names listed in the
+.RI \(lq Attribute \(rq
+column of the environment attribute summary table given in Chapter 3 (for
+example,
+.BR AP_INIT_TOKENS ).
+.IP \(bu
+.B #define
+identifiers associated with data structures that are used to represent the
+values of environment attributes. These data structures are those listed in
+the
+.RI \(lq Type/Value \(rq
+column of the environment attribute summary table given in Chapter 3. The
+identifier for a data structure is derived from the
+.B typedef
+name by converting it to upper case.
+.IP \(bu
+.B #define
+identifiers associated with certain important C data structures not associated
+with environment attributes. These are as follows:
+.sp
+.TS
+tab(:);
+lblb
+lbli.
+C Data Structure:Identifier
+_
+ap_cdata_t:AP_CDATA_T
+ap_a_assoc_env_t:AP_A_ASSOC_ENV_T
+ap_osi_vbuf_t:AP_OSI_VBUF_T
+.TE
+.IP \(bu
+The
+.B #define
+identifier
+.I AP_BUFFERS
+for a chain of user data buffers.
+.PP
+The argument
+.I val
+must be a pointer to a structure of the type indicated by
+.IR kind .
+.PP
+The behaviour of
+.BR ap_free ()
+differs when releasing buffers and when releasing memory.
+.PP
+The user can release buffers by calling
+.BR ap_free ()
+with
+.I kind
+set to
+.IR AP_BUFFERS " or " AP_OSI_VBUF_T .
+An
+.BR ap_free ()
+call with
+.I kind
+set to
+.I AP_BUFFERS
+releases ALL buffers in the supplied chain (including the first
+osi_vbuf/osi_dbuf/data buffer in the chain) by passing the entire chain to the
+user dealloc function. An
+.BR ap_free ()
+call with
+.I kind
+set to
+.I AP_OSI_VBUF_T
+releases all buffers in the chain EXCEPT the first osi_vbuf/osi_dbuf/data
+buffer, and sets
+.I bcont
+in the first
+.I osi_vbuf
+to
+.BR NULL .
+Note that because all freeing of buffers is performed by the user dealloc
+function, osi_dbufs and buffers cannot be freed in isolation.  When releasing
+memory, the
+.BR ap_free ()
+function follows and frees all internal pointers. The top level structure (the
+structure pointed to by
+.IR val )
+is not freed. If the user has supplied a deallocation function on the
+.BR ap_open (3)
+call then:
+.IP \(bu \w'\(bu\(em'u
+the
+.BR ap_user_dealloc (3)
+function is called to free any buffers, and buffer chains, passed to
+.BR ap_free ()
+.IP \(bu
+if the
+.B AP_BUFFERS_ONLY
+flag was not set on the
+.BR ap_open (3)
+call, then the
+.BR ap_user_dealloc (3)
+function will be called to free the memory comprising data structures pointed
+at by members of the data structure passed to
+.BR ap_free ().
+.PP
+.I aperrno_p
+must be set to point to a location which will be used to carry an error code
+back to the user.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion, a value of zero
+.RB ( 0 )
+is returned. Otherwise, a value of
+minus one
+.RB ( -1 )
+is returned and the location pointed to by
+.I aperrno_p
+is set to indicate the error.
+.\"
+.\"
+.SH ERRORS
+.TP
+.RB [ AP_BADF ]
+The
+.I fd
+paramter does not identify an XAP instance.
+.TP
+.RB [ AP_BADFREE ]
+The function could not free the structure.
+.TP
+.RB [ AP_BADKIND ]
+The
+.I kind
+argument does not identify a known structure type.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ap_get_env (3),
+.BR ap_open (3),
+.BR ap_user_dealloc (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR ap_free ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ap_free ()
+is compatible with XAP.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_free ()
+first appeared in XAP.
+.[
+xap
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XAP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

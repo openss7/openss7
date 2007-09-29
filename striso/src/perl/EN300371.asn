@@ -1,0 +1,34 @@
+--< GDMO.Document "ETSI EN 300 371" { ccitt(0) identified-organization(4) etsi(0) ets371(371) informationModel(0) } >--
+MODULE "ETSI EN 300 371" { ccitt(0) identified-organization(4) etsi(0) ets371(371) informationModel(0) }
+--< ASN1.Version 1994 ASN1DefinedTypesModule1 { ccitt(0) identified-organization(4) etsi(0) ets371(371) informationModel(0) asn1Module(2) asn1DefinedTypesModule1(1) } >--
+-- 5.4 ASN.1 definitions
+ASN1DefinedTypesModule1 {ccitt(0) identified-organization(4) etsi(0) ets371(371) informationModel(0)
+asn1Module(2) asn1DefinedTypesModule1(1)}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+NameType FROM ASN1DefinedTypesModule {ccitt(0) recommendation(0) m(13) m3100(3100)
+informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0)};
+TrailTrace ::= CHOICE {
+null NULL,
+pathtrace [1] GraphicString
+}
+Activation::=BOOLEAN
+AvailableTimeSlots ::= SEQUENCE SIZE (1..31) OF TS
+CapThreshold::= INTEGER
+CRCOperationMode::=ENUMERATED {disabled(0), forced(1), automatic(2)}
+FramedSignalMode::=ENUMERATED {inactive(0), active(1)}
+FrameStatus::= INTEGER
+--0: noIndication
+--1: edcMF
+NCSBSRange::=INTEGER(2..10)
+degradeConsecutiveDefault NCSBSRange::=6
+PersistanceTime::=INTEGER(1..300)
+defaultRaisingPersistancy PersistanceTime::=25
+defaultClearingPersistancy PersistanceTime::=100
+PortMode::=INTEGER
+TS ::= BOOLEAN
+END -- end of ASN1DefinedTypesModule
+END
+--< GDMO.EndDocument "ETSI EN 300 371" { ccitt(0) identified-organization(4) etsi(0) ets371(371) informationModel(0) } >--

@@ -1,0 +1,309 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_init_env.3.man,v 0.9.2.1 2007/09/29 14:08:30 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:30 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_init_env.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:30  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_INIT_ENV 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ap_init_env
+\- Establish an instance of XAP and initialize the XAP environment.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.BI "int ap_init_env(int " fd ", const char *" env_file ", int " flags ", unsigned long *" aperrno_p );
+.\"
+.\"
+.SH ARGUMENTS
+.TP \w'\fIaperrno_p\fR\(em'u
+.I fd
+A file descriptor that identifies the XAP instance.
+.TP
+.I env_file
+A pointer to a string that provides the path and filename of the environment
+file with which to initialized the XAP instance.
+.TP
+.I flags
+Unused.
+.TP
+.I aperrno_p
+A pointer to a memory extent into which to receive an error number.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function initialises an otherwise uninitialised XAP instance identified
+by
+.IR fd .
+In addition,
+.BR ap_init_env ()
+may be used to set the values of several writable environment attributes with
+a single function call rather than using
+.BR ap_set_env (3)
+to set each attribute individually.
+.PP
+If no environment exists when
+.BR ap_init_env ()
+is called, memory will be allocated for the environment attributes in the
+calling processs data space and the attributes will be set to their default
+values (see the environment description in Chapter 3). If the user wishes to
+override the defaults for certain writable attributes, values for those
+attributes may be specified in an initialisation file as described below.
+.PP
+If an environment already exists when
+.BR ap_init_env ()
+is called, attributes will be assigned values.
+In this case, attributes will not automatically be set to their default
+values.
+.PP
+To set the environment attributes from values stored in a file,
+.I env_file
+must point to a null-terminated string that is the initialisation files
+pathname. An environment initialisation file is generated by processing an
+.B ap_env_file
+file using the
+.BR ap_osic (1)
+command. Setting
+.I env_file
+to
+.B NULL
+indicates that no values are to be taken from an environment initialisation
+file. No error is reported if the file identified by
+.I env_file
+is zero length.
+.PP
+The environment initialisation file may contain assignments for any or all of
+the attributes that are writable in the current state. The
+.BR ap_init_env ()
+call will fail if env_file contains an assignment for an attribute that is not
+writable in the current state. Attributes that are not included in the file
+will not be modified. The following specific points about initialisation of
+the environment from a file should be noted:
+.IP \(bu \w'\(bu\(em'u
+The values of read-only attributes are not affected by
+.BR ap_init_env ().
+The one exception to this is
+.BR AP_LCL_PADDR .
+Since
+.B AP_LCL_PADDR
+is set as a side effect of setting
+.BR AP_BIND_PADDR ,
+its value may change as an indirect result of invoking
+.BR ap_init_env ()
+if the value of
+.B AP_BIND_PADDR
+is modified.
+.IP \(bu
+If the environment file assigns a value to the
+.B AP_BIND_PADDR
+attribute, it should be noted that the Presentation address set will not be
+used until the
+.BR ap_bind (3)
+function is called.  Calling
+.BR ap_bind (3)
+after
+.BR ap_init_env ()
+will cause the Presentation address to be validated and if the authorisation
+check succeeds, then the endpoint will be moved to the
+.B AP_IDLE
+state. If the
+.BR ap_init_env ()
+function is called after a successful
+.BR ap_bind (3),
+then if a new Presentation address is assigned to
+.BR AP_BIND_PADDR ,
+the endpoint will not be re-bound until
+.BR ap_bind (3)
+is called again.
+.PP
+The
+.I flags
+argument to this function is currently unused.
+.PP
+.I aperrno_p
+must be set to point to a location which will be used to carry an error code
+back to the user.
+.\"
+.\"
+.SH "CAVEATS"
+.PP
+The output from the
+.BR ap_osic (1)
+command of one XAP implementation is not necessarily readable by the
+.BR ap_init_env ()
+function of another XAP implementation, as the format of the intermediate file
+is not defined. Environment initialisation files are therefore only guaranteed
+to be portable in the
+.B ap_env_file
+form.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion, a value of
+zero
+.RB ( 0 )
+is returned. Otherwise, if the call fails because of an attempt to either set
+an attribute to an illegal value or set an attribute in an illegal state,
+.BR ap_init_env ()
+will return the value of the symbolic constant that identifies that attribute.
+If the call fails for some other reason, a value of minus one
+.RB ( -1 )
+is returned. Either type of failure will result in the location pointed at by
+.I aperrno_p
+being set to indicate the error.
+.\"
+.\"
+.SH ERRORS
+.TP \w'[\fBAP_NOT_SUPPORTED\fR]\(em'u
+.RB [ AP_BADATTRVAL ]
+An invalid value assignment was found in the initialisation file.
+.TP
+.RB [ AP_BADF ]
+The
+.I fd
+argument does not identify an XAP instance.
+.TP
+.RB [ AP_NOATTR ]
+An invalid attribute type appears in the initialisation file.
+.TP
+.RB [ AP_NOMEM ]
+XAP could not allocate sufficient memory to create an environment.
+.TP
+.RB [ AP_NOT_SUPPORTED ]
+The use of a
+.RB non- NULL
+value for
+.I env_file
+is not supported by this implementation of XAP.
+.TP
+.RB [ AP_NOWRITE ]
+An assignment for an attribute that is not writable in the current state
+appears in the initialisation file.
+.PP
+In addition, operating system class errors are reported.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ap_init_env (3)
+.BR ap_osic (1)
+.BR ap_bind (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR ap_init_env ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ap_init_env ()
+is compatible with XAP.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_init_env ()
+first appeared in XAP.
+.[
+xap
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XAP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

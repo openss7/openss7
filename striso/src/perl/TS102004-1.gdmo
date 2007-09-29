@@ -1,0 +1,2685 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Sep 19 10:43:36 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.739.gdmo" >--
+--< GDMO.Include "Q.822.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Document "ETSI TS 102 004-1"
+--  { 1 3 6 1 4 1 adslForum(3561) adslForumNetworkManagement(1) adslfLineMIB(1) informationModel(0) } >--
+--< GDMO.Namespace etsi_004_1 >--
+MODULE "ETSI TS 102 004-1" { 1 3 6 1 4 1 adslForum(3561) adslForumNetworkManagement(1) adslfLineMIB(1) informationModel(0) }
+-- Annex B (informative):
+-- Referenced definitions
+-- This annex contains the referenced GDMO and ASN.1 definitions from ADSL Forum TR-028 [1]. This is provided for
+-- convenience only and TR-028 [1] should be consulted for the normative text.
+-- B.1 Object classes
+-- B.1.1 adslChannelTTP
+
+adslChannelTTP MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. M.3100":trailTerminationPointBidirectional;
+	CHARACTERIZED BY
+		"Rec. X.721 | ISO/IEC 10165-2":administrativeStatePackage,
+		"Rec. M.3100":createDeleteNotificationsPackage,
+		"Rec. M.3100":attributeValueChangeNotificationPackage,
+		adslChannelTTPPkg PACKAGE
+			BEHAVIOUR
+				adslChannelTTPbeh;
+			ATTRIBUTES
+				adslChannelTTPId GET,
+				channelType GET SET-BY-CREATE,
+				currentChannelRate GET,
+				previousChannelRate GET;;;
+	CONDITIONAL PACKAGES
+		interleaveDelayPkg
+			PRESENT IF
+				"The channelType is Interleaved",
+		currentCrcBLPkg
+			PRESENT IF
+				"The channelType is Fast or Interleaved",
+		rateAdaptationNotificationPkg
+			PRESENT IF
+				"The channelType is Fast or Interleaved, and Run-time rate adaptation is 
+				supported";
+REGISTERED AS { adslfNMObjectClass 1 };
+
+
+adslChannelTTPbeh BEHAVIOUR
+	DEFINED AS
+		"adslChannelTTP object is used to model channel terminations on ATU-C and ATU-R. 
+		It represent both connection and trail termination aspects. One instance of this 
+		managed object class is created for each supported channel.
+
+		For a given adslLineTTP object instance the total of current channel rates of 
+		the contained adslChannelTTP instances cannot exceed its line rate.
+
+		The inherited supportedByObjectList attribute points to the associated equipment 
+		unit(s).";
+-- B.1.2 adslChannelTTPCurrentData
+
+
+adslChannelTTPCurrentData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. Q.822":currentData;
+	CHARACTERIZED BY
+		"Rec. M.3100":createDeleteNotificationsPackage,
+		"Rec. M.3100":attributeValueChangeNotificationPackage,
+		"Rec. Q.822":thresholdPkg,
+		adslChannelTTPCurrentDataPkg PACKAGE
+			BEHAVIOUR
+				adslChannelTTPCurrentDataBeh;;;
+	CONDITIONAL PACKAGES
+		adslChannelRcvBlocksPkg
+			PRESENT IF
+				"an instance supports it",
+		adslChannelTxBlocksPkg
+			PRESENT IF
+				"an instance supports it",
+		adslChannelCorrectedBlocksPkg
+			PRESENT IF
+				"an instance supports it",
+		adslChannelUncorrectedBlocksPkg
+			PRESENT IF
+				"an instance supports it",
+		adslChannelCodeViolationsPkg
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { adslfNMObjectClass 2 };
+
+
+adslChannelTTPCurrentDataBeh BEHAVIOUR
+	DEFINED AS
+		"adslChannelTTPCurrentData object is used to monitor performance monitoring 
+		aspects of an ADSL channel. Instances of this managed object class shall model 1 
+		Day counters";
+-- B.1.3 adslChannelTTPHistoryData
+
+
+adslChannelTTPHistoryData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. Q.822":historyData;
+	CHARACTERIZED BY
+		"Rec. Q.822":objectDeleteNotificationPkg,
+		"Rec. Q.822":historyDataSuspectIntervalFlagPkg,
+		adslChannelTTPHistoryDataPkg PACKAGE
+			BEHAVIOUR
+				adslChannelTTPHistoryDataBeh;;;
+	CONDITIONAL PACKAGES
+		adslChannelRcvBlocksRecordPkg
+			PRESENT IF
+				"an instance supports it",
+		adslChannelTxBlocksRecordPkg
+			PRESENT IF
+				"an instance supports it",
+		adslChannelCorrectedBlocksRecordPkg
+			PRESENT IF
+				"an instance supports it",
+		adslChannelUncorrectedBlocksRecordPkg
+			PRESENT IF
+				"an instance supports it",
+		adslChannelCodeViolationsRecordPkg
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { adslfNMObjectClass 3 };
+
+
+adslChannelTTPHistoryDataBeh BEHAVIOUR
+	DEFINED AS
+		"adslChannelTTPHistorytData object is used to keep previous performance 
+		monitoring counters of an ADSL channel.";
+-- B.1.4 adslConfigurationProfile
+
+
+adslConfigurationProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":top;
+	CHARACTERIZED BY
+		"Rec. M.3100":createDeleteNotificationsPackage,
+		"Rec. M.3100":attributeValueChangeNotificationPackage,
+		adslConfigurationProfilePkg PACKAGE
+			BEHAVIOUR
+				adslConfigurationProfileBeh;
+			ATTRIBUTES
+				adslConfigurationProfileId GET,
+				rateModeAtuC GET SET-BY-CREATE,
+				targetSnrMarginAtuC GET SET-BY-CREATE,
+				maxSnrMarginAtuC GET SET-BY-CREATE,
+				minSnrMarginAtuC GET SET-BY-CREATE,
+				rateModeAtuR GET SET-BY-CREATE,
+				targetSnrMarginAtuR GET SET-BY-CREATE,
+				maxSnrMarginAtuR GET SET-BY-CREATE,
+				minSnrMarginAtuR GET SET-BY-CREATE,
+				configuredChannelTypes GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		rateAdaptivePkg
+			PRESENT IF
+				"Rate adaptive ADSL mode is available",
+		fastPkg
+			PRESENT IF
+				"Fast channel mode is supported",
+		interleavedPkg
+			PRESENT IF
+				"Interleaved channel mode is supported",
+		rateChangeRatioPkg
+			PRESENT IF
+				"Rate adaptive ADSL mode is available, and, both Fast and Interleaved channels 
+				are supported at the same time",
+		powerManagementPkg
+			PRESENT IF
+				"Optional power management procedures are supported";
+REGISTERED AS { adslfNMObjectClass 4 };
+
+
+adslConfigurationProfileBeh BEHAVIOUR
+	DEFINED AS
+		"adslConfigurationProfile managed object class contains a list of parameters to 
+		be used in configuring an ADSL Modem.
+
+		The instances of this object class is pointed to by adslLineTTP object instances 
+		representing ATU-C side of an ADSL Line. However, this object class defines the 
+		attributes pertaining to both the ATU-C, as well as the related ATU-R. Note that 
+		the ATU-C configures the ATUR.
+
+		The fastPkg and interleavedPkg control the configuration of channels to be 
+		supported. If fastPkg is present, fast channel is configured. If interleavedPkg 
+		is present, the interleaved channel is configured. If both fastPkg and 
+		interleavedPkg are present, both channels are configured.";
+-- B.1.5 adslLineTTP
+
+
+adslLineTTP MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. M.3100":trailTerminationPointBidirectional;
+	CHARACTERIZED BY
+		"Rec. X.721 | ISO/IEC 10165-2":administrativeStatePackage,
+		"Rec. M.3100":createDeleteNotificationsPackage,
+		"Rec. M.3100":attributeValueChangeNotificationPackage,
+		"Rec. M.3100":stateChangeNotificationPackage,
+		initFailurePkg,
+		adslLineTTPPkg PACKAGE
+			BEHAVIOUR
+				adslLineTTPBeh;
+			ATTRIBUTES
+				adslLineTTPId GET SET-BY-CREATE,
+				lineCoding GET,
+				currentSnrMargin GET,
+				currentAttenuation GET,
+				currentOutputPower GET,
+				currentAttainableRate GET,
+				currentLineRate GET,
+				previousLineRate GET,
+				supportedChannelTypes GET,
+				adslAvailabilityStatus GET,
+				supportedOperationalModes GET,
+				currentOperationalMode GET;;;
+	CONDITIONAL PACKAGES
+		adslConfigurationProfilePointerPkg
+			PRESENT IF
+				"The object instance represents the ATU-C side of the ADSL line",
+		allowedOperationalModesPkg
+			PRESENT IF
+				"The object instance represents the ATU-C side of the ADSL line";
+REGISTERED AS { adslfNMObjectClass 5 };
+
+
+adslLineTTPBeh BEHAVIOUR
+	DEFINED AS
+		"adslLineTTP object is used to model a Physical ADSL line termination.
+
+		The inherited supportedByObjectList attribute points to the associated equipment 
+		unit(s). The inherited downstreamConnectivityPointer of an adslLineTTP instance 
+		representing the ATUC side of the ADSL line, points to the related adslLineTTP 
+		instance representing the ATU-R side of the ADSL line.
+
+		The inherited upstreamConnectivityPointer of an adslLineTTP instance 
+		representing the ATU-R side of the ADSL line, points to the related adslLineTTP 
+		instance representing the ATU-C side of the ADSL line.
+
+		The configurationProfilePointer attribute, which is only present for the 
+		instances of adslLineTTP object representing the ATU-C side of the ADSL line, 
+		points to the object class instance representing physical line configuration 
+		information for both ATU-C and ATU-R.
+
+		The adslAvailabilityStatus attribute further qualifies the inherited 
+		operationState attribute.
+
+		The lineCodeSpecificProfilePointer attribute is included for future expansion of 
+		the model with vendor or line code specific information";
+-- B.1.6 adslLineTTPCurrentData
+
+
+adslLineTTPCurrentData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. Q.822":currentData;
+	CHARACTERIZED BY
+		"Rec. M.3100":createDeleteNotificationsPackage,
+		"Rec. M.3100":attributeValueChangeNotificationPackage,
+		"Rec. Q.822":thresholdPkg,
+		adslLineTTPCurrentDataPkg PACKAGE
+			BEHAVIOUR
+				adslLineTTPCurrentDataBeh;;;
+	CONDITIONAL PACKAGES
+		adslLofsPkg
+			PRESENT IF
+				"an instance supports it",
+		adslLolsPkg
+			PRESENT IF
+				"an instance supports it",
+		adslLossPkg
+			PRESENT IF
+				"an instance supports it",
+		adslLprsPkg
+			PRESENT IF
+				"an instance supports it",
+		adslEssPkg
+			PRESENT IF
+				"an instance supports it",
+		adslSessPkg
+			PRESENT IF
+				"an instance supports it",
+		adslUassPkg
+			PRESENT IF
+				"an instance supports it",
+		adslFastRetrainPkg
+			PRESENT IF
+				"an instance supports it",
+		adslFecsPkg
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { adslfNMObjectClass 6 };
+
+
+adslLineTTPCurrentDataBeh BEHAVIOUR
+	DEFINED AS
+		"adslLineTTPCurrentData object is used to monitor performance monitoring aspects 
+		of an ADSL physical line. Instances of this managed object class shall model 15 
+		Min and 1 Day counters";
+-- B.1.7 adslLineTTPHistoryData
+
+
+adslLineTTPHistoryData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. Q.822":historyData;
+	CHARACTERIZED BY
+		"Rec. Q.822":objectDeleteNotificationPkg,
+		"Rec. Q.822":historyDataSuspectIntervalFlagPkg,
+		adslLineTTPHistoryDataPkg PACKAGE
+			BEHAVIOUR
+				adslLineTTPHistoryDataBeh;;;
+	CONDITIONAL PACKAGES
+		adslLofsRecordPkg
+			PRESENT IF
+				"an instance supports it",
+		adslLolsRecordPkg
+			PRESENT IF
+				"an instance supports it",
+		adslLossRecordPkg
+			PRESENT IF
+				"an instance supports it",
+		adslLprsRecordPkg
+			PRESENT IF
+				"an instance supports it",
+		adslEssRecordPkg
+			PRESENT IF
+				"an instance supports it",
+		adslSessRecordPkg
+			PRESENT IF
+				"an instance supports it",
+		adslUassRecordPkg
+			PRESENT IF
+				"an instance supports it",
+		adslFastRetrainRecordPkg
+			PRESENT IF
+				"an instance supports it",
+		adslFecsRecordPkg
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { adslfNMObjectClass 7 };
+
+
+adslLineTTPHistoryDataBeh BEHAVIOUR
+	DEFINED AS
+		"adslLineTTPHistoryData object is used to keep previous performance counters of 
+		an ADSL physical line.";
+-- B.2 Name bindings
+-- B.2.1 adslChannelTTP-adslLineTTP
+
+
+adslChannelTTP-adslLineTTP NAME BINDING
+	SUBORDINATE OBJECT CLASS adslChannelTTP;
+	NAMED BY
+	SUPERIOR OBJECT CLASS adslLineTTP;
+	WITH ATTRIBUTE
+		adslChannelTTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { adslfNMNameBinding 1 };
+-- B.2.2 adslChannelTTPCurrentData-adslChannelTTP
+
+
+adslChannelTTPCurrentData-adslChannelTTP NAME BINDING
+	SUBORDINATE OBJECT CLASS adslChannelTTPCurrentData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS adslChannelTTP;
+	WITH ATTRIBUTE
+		"Rec. X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { adslfNMNameBinding 2 };
+-- B.2.3 adslChannelTTPHistoryData-adslChannelTTPCurrentData
+
+
+adslChannelTTPHistoryData-adslChannelTTPCurrentData NAME BINDING
+	SUBORDINATE OBJECT CLASS adslChannelTTPHistoryData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS adslChannelTTPCurrentData;
+	WITH ATTRIBUTE
+		"Rec. Q.822":historyDataId;
+REGISTERED AS { adslfNMNameBinding 3 };
+-- B.2.4 adslConfigurationProfile-managedElementR1
+
+
+adslConfigurationProfile-managedElementR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS adslConfigurationProfile;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. M.3100":managedElementR1;
+	WITH ATTRIBUTE
+		adslConfigurationProfileId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { adslfNMNameBinding 4 };
+-- B.2.5 adslLineTTP-managedElementR1
+
+
+adslLineTTP-managedElementR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS adslLineTTP;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. M.3100":managedElementR1;
+	WITH ATTRIBUTE
+		adslLineTTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { adslfNMNameBinding 5 };
+-- B.2.6 adslLineTTPCurrentData-adslLineTTP
+
+
+adslLineTTPCurrentData-adslLineTTP NAME BINDING
+	SUBORDINATE OBJECT CLASS adslLineTTPCurrentData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS adslLineTTP;
+	WITH ATTRIBUTE
+		"Rec. X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { adslfNMNameBinding 6 };
+-- B.2.7 adslLineTTPHistoryData-adslLineTTPCurrentData
+
+
+adslLineTTPHistoryData-adslLineTTPCurrentData NAME BINDING
+	SUBORDINATE OBJECT CLASS adslLineTTPHistoryData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS adslLineTTPCurrentData;
+	WITH ATTRIBUTE
+		"Rec. Q.822":historyDataId;
+REGISTERED AS { adslfNMNameBinding 7 };
+-- B.3 Packages
+-- B.3.1 adslChannelCorrectedBlocksPkg
+
+
+adslChannelCorrectedBlocksPkg PACKAGE
+	ATTRIBUTES
+		adslChannelCorrectedBlocks REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 1 };
+-- B.3.2 adslChannelCorrectedBlocksRecordPkg
+
+
+adslChannelCorrectedBlocksRecordPkg PACKAGE
+	ATTRIBUTES
+		adslChannelCorrectedBlocks GET;
+REGISTERED AS { adslfNMPackage 2 };
+-- B.3.3 adslChannelRcvBlocksPkg
+
+
+adslChannelRcvBlocksPkg PACKAGE
+	ATTRIBUTES
+		adslChannelRcvBlocks REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 3 };
+-- B.3.4 adslChannelRcvBlocksRecordPkg
+
+
+adslChannelRcvBlocksRecordPkg PACKAGE
+	ATTRIBUTES
+		adslChannelRcvBlocks GET;
+REGISTERED AS { adslfNMPackage 4 };
+-- B.3.5 adslChannelTxBlocksPkg
+
+
+adslChannelTxBlocksPkg PACKAGE
+	ATTRIBUTES
+		adslChannelTxBlocks REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 5 };
+-- B.3.6 adslChannelTxBlocksRecordPkg
+
+
+adslChannelTxBlocksRecordPkg PACKAGE
+	ATTRIBUTES
+		adslChannelTxBlocks GET;
+REGISTERED AS { adslfNMPackage 6 };
+-- B.3.7 adslChannelUncorrectedBlocksPkg
+
+
+adslChannelUncorrectedBlocksPkg PACKAGE
+	ATTRIBUTES
+		adslChannelUncorrectedBlocks REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 7 };
+-- B.3.8 adslChannelUncorrectedBlocksRecordPkg
+
+
+adslChannelUncorrectedBlocksRecordPkg PACKAGE
+	ATTRIBUTES
+		adslChannelUncorrectedBlocks GET;
+REGISTERED AS { adslfNMPackage 8 };
+-- B.3.9 adslConfigurationProfilePointerPkg
+
+
+adslConfigurationProfilePointerPkg PACKAGE
+	ATTRIBUTES
+		adslConfigurationProfilePointer GET-REPLACE,
+		lineCodeSpecificProfilePointer GET-REPLACE;
+REGISTERED AS { adslfNMPackage 9 };
+-- B.3.10 adslEssPkg
+
+
+adslEssPkg PACKAGE
+	ATTRIBUTES
+		adslEss REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 10 };
+-- B.3.11 adslEssRecordPkg
+
+
+adslEssRecordPkg PACKAGE
+	ATTRIBUTES
+		adslEss GET;
+REGISTERED AS { adslfNMPackage 11 };
+-- B.3.12 adslFastRetrainPkg
+
+
+adslFastRetrainPkg PACKAGE
+	ATTRIBUTES
+		adslNumFastRetrains REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET,
+		adslFailedFastRetrains REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 12 };
+-- B.3.13 adslFastRetrainRecordPkg
+
+
+adslFastRetrainRecordPkg PACKAGE
+	ATTRIBUTES
+		adslNumFastRetrains GET,
+		adslFailedFastRetrains GET;
+REGISTERED AS { adslfNMPackage 13 };
+-- B.3.14 adslLofsPkg
+
+
+adslLofsPkg PACKAGE
+	ATTRIBUTES
+		adslLofs REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 14 };
+-- B.3.15 adslLofsRecordPkg
+
+
+adslLofsRecordPkg PACKAGE
+	ATTRIBUTES
+		adslLofs GET;
+REGISTERED AS { adslfNMPackage 15 };
+-- B.3.16 adslLolsPkg
+
+
+adslLolsPkg PACKAGE
+	ATTRIBUTES
+		adslLols REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 16 };
+-- B.3.17 adslLolsRecordPkg
+
+
+adslLolsRecordPkg PACKAGE
+	ATTRIBUTES
+		adslLols GET;
+REGISTERED AS { adslfNMPackage 17 };
+-- B.3.18 adslLossPkg
+
+
+adslLossPkg PACKAGE
+	ATTRIBUTES
+		adslLoss REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 18 };
+-- B.3.19 adslLossRecordPkg
+
+
+adslLossRecordPkg PACKAGE
+	ATTRIBUTES
+		adslLoss GET;
+REGISTERED AS { adslfNMPackage 19 };
+-- B.3.20 adslLprsPkg
+
+
+adslLprsPkg PACKAGE
+	ATTRIBUTES
+		adslLprs REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 20 };
+-- B.3.21 adslLprsRecordPkg
+
+
+adslLprsRecordPkg PACKAGE
+	ATTRIBUTES
+		adslLprs GET;
+REGISTERED AS { adslfNMPackage 21 };
+-- B.3.22 adslSessPkg
+
+
+adslSessPkg PACKAGE
+	ATTRIBUTES
+		adslSess REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 22 };
+-- B.3.23 adslSessRecordPkg
+
+
+adslSessRecordPkg PACKAGE
+	ATTRIBUTES
+		adslSess GET;
+REGISTERED AS { adslfNMPackage 23 };
+-- B.3.24 adslUassPkg
+
+
+adslUassPkg PACKAGE
+	ATTRIBUTES
+		adslUass REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 24 };
+-- B.3.25 adslUassRecordPkg
+
+
+adslUassRecordPkg PACKAGE
+	ATTRIBUTES
+		adslUass GET;
+REGISTERED AS { adslfNMPackage 25 };
+-- B.3.26 allowedOperationalModesPkg
+
+
+allowedOperationalModesPkg PACKAGE
+	ATTRIBUTES
+		allowedOperationalModes GET-REPLACE ADD-REMOVE;
+REGISTERED AS { adslfNMPackage 26 };
+-- B.3.27 currentCrcBLPkg
+
+
+currentCrcBLPkg PACKAGE
+	ATTRIBUTES
+		currentCrcBL GET;
+REGISTERED AS { adslfNMPackage 27 };
+-- B.3.28 fastPkg
+
+
+fastPkg PACKAGE
+	ATTRIBUTES
+		fastMinTxRateAtuC GET SET-BY-CREATE,
+		fastMaxTxRateAtuC GET SET-BY-CREATE,
+		fastMinTxRateAtuR GET SET-BY-CREATE,
+		fastMaxTxRateAtuR GET SET-BY-CREATE;
+REGISTERED AS { adslfNMPackage 28 };
+-- B.3.29 initFailurePkg
+
+
+initFailurePkg PACKAGE
+	ATTRIBUTES
+		initFailedNotificationSwitch GET-REPLACE;
+	NOTIFICATIONS
+		initFailedNotification;
+REGISTERED AS { adslfNMPackage 29 };
+-- B.3.30 interleavedPkg
+
+
+interleavedPkg PACKAGE
+	ATTRIBUTES
+		interleavedMinTxRateAtuC GET SET-BY-CREATE,
+		interleavedMaxTxRateAtuC GET SET-BY-CREATE,
+		maxInterleaveDelayAtuC GET SET-BY-CREATE,
+		interleavedMinTxRateAtuR GET SET-BY-CREATE,
+		interleavedMaxTxRateAtuR GET SET-BY-CREATE,
+		maxInterleaveDelayAtuR GET SET-BY-CREATE;
+REGISTERED AS { adslfNMPackage 30 };
+-- B.3.31 interleaveDelayPkg
+
+
+interleaveDelayPkg PACKAGE
+	ATTRIBUTES
+		interleaveDelay GET;
+REGISTERED AS { adslfNMPackage 31 };
+-- B.3.32 rateAdaptationNotificationPkg
+
+
+rateAdaptationNotificationPkg PACKAGE
+	ATTRIBUTES
+		upThreshold GET-REPLACE,
+		downThreshold GET-REPLACE;
+	NOTIFICATIONS
+		rateChangeNotification;
+REGISTERED AS { adslfNMPackage 32 };
+-- B.3.33 rateAdaptivePkg
+
+
+rateAdaptivePkg PACKAGE
+	ATTRIBUTES
+		downShiftSnrMarginAtuC GET SET-BY-CREATE,
+		upShiftSnrMarginAtuC GET SET-BY-CREATE,
+		minDownShiftTimeAtuC GET SET-BY-CREATE,
+		minUpShiftTimeAtuC GET SET-BY-CREATE,
+		downShiftSnrMarginAtuR GET SET-BY-CREATE,
+		upShiftSnrMarginAtuR GET SET-BY-CREATE,
+		minDownShiftTimeAtuR GET SET-BY-CREATE,
+		minUpShiftTimeAtuR GET SET-BY-CREATE;
+REGISTERED AS { adslfNMPackage 33 };
+-- B.3.34 rateChangeRatioPkg
+
+
+rateChangeRatioPkg PACKAGE
+	ATTRIBUTES
+		rateChangeRatioAtuC GET SET-BY-CREATE,
+		rateChangeRatioAtuR GET SET-BY-CREATE;
+REGISTERED AS { adslfNMPackage 34 };
+-- B.3.35 powerManagementPkg
+
+
+powerManagementPkg PACKAGE
+	ATTRIBUTES
+		lowPowerDataRateAtuC GET SET-BY-CREATE,
+		lowPowerDataRateAtuR GET SET-BY-CREATE;
+REGISTERED AS { adslfNMPackage 35 };
+-- B.3.36 adslChannelCodeViolationsPkg
+
+
+adslChannelCodeViolationsPkg PACKAGE
+	ATTRIBUTES
+		adslChannelCodeViolations REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 36 };
+-- B.3.37 adslChannelCodeViolationsRecordPkg
+
+
+adslChannelCodeViolationsRecordPkg PACKAGE
+	ATTRIBUTES
+		adslChannelCodeViolations GET;
+REGISTERED AS { adslfNMPackage 37 };
+-- B.3.38 adslFecsPkg
+
+
+adslFecsPkg PACKAGE
+	ATTRIBUTES
+		adslFecs REPLACE-WITH-DEFAULT
+			DEFAULT VALUE AdslfMIBMod.integerZero
+			GET;
+REGISTERED AS { adslfNMPackage 38 };
+-- B.3.39 adslFecsRecordPkg
+
+
+adslFecsRecordPkg PACKAGE
+	ATTRIBUTES
+		adslFecs GET;
+REGISTERED AS { adslfNMPackage 39 };
+-- B.4 Attributes
+-- B.4.1 adslAvailabilityStatus
+
+
+adslAvailabilityStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.AdslAvailabilityStatus;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		adslAvailabilityStatusBeh;
+REGISTERED AS { adslfNMAttribute 1 };
+
+
+adslAvailabilityStatusBeh BEHAVIOUR
+	DEFINED AS
+		"This set-valued attribute further qualifies the operationState of the object 
+		instance. Valid conditions that may be included in this set-valued attribute, 
+		for an instance representing the ATU-C side of an ADSL Line are: LOF, LOS, LPR, 
+		LOL, lossOfSigQuality, dataInitFailure, configInitFailure, protocolInitFailure, 
+		noPeerPresent, and lowPowerMode. For an instance representing ATU-R side of an 
+		ADSL Line the valid values are: LOF, LOS, LPR, lossOfSigQuality, and 
+		lowPowerMode";
+-- B.4.2 adslChannelCorrectedBlocks
+
+
+adslChannelCorrectedBlocks ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslChannelCorrectedBlocksBeh;
+REGISTERED AS { adslfNMAttribute 2 };
+
+
+adslChannelCorrectedBlocksBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of all blocks received with an error and 
+		corrected.";
+-- B.4.3 adslChannelCTPId
+
+
+adslChannelCTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		adslChannelCTPIdBeh;
+REGISTERED AS { adslfNMAttribute 3 };
+
+
+adslChannelCTPIdBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute is the object instance identifier for the adslChannelCTP.";
+-- B.4.4 adslChannelRcvBlocks
+
+
+adslChannelRcvBlocks ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslChannelRcvBlocksBeh;
+REGISTERED AS { adslfNMAttribute 4 };
+
+
+adslChannelRcvBlocksBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of all received encoded blocks.";
+-- B.4.5 adslChannelTxBlocks
+
+
+adslChannelTxBlocks ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslChannelTxBlocksBeh;
+REGISTERED AS { adslfNMAttribute 5 };
+
+
+adslChannelTxBlocksBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of all transmitted encoded blocks.";
+-- B.4.6 adslChannelUncorrectedBlocks
+
+
+adslChannelUncorrectedBlocks ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslChannelUncorrectedBlocksBeh;
+REGISTERED AS { adslfNMAttribute 6 };
+
+
+adslChannelUncorrectedBlocksBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of all blocks received with uncorrectable 
+		errors.";
+-- B.4.7 adslConfigurationProfileId
+
+
+adslConfigurationProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		adslConfigurationProfileIdBeh;
+REGISTERED AS { adslfNMAttribute 7 };
+
+
+adslConfigurationProfileIdBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute is the object instance identifier for the 
+		adslConfigurationProfile.";
+-- B.4.8 adslConfigurationProfilePointer
+
+
+adslConfigurationProfilePointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		adslConfigurationProfilePointerBeh;
+REGISTERED AS { adslfNMAttribute 8 };
+
+
+adslConfigurationProfilePointerBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute is a pointer to the applicable ADSL Configuration Profile.";
+-- B.4.9 adslEss
+
+
+adslEss ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslEssBeh;
+REGISTERED AS { adslfNMAttribute 9 };
+
+
+adslEssBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of errored seconds (one ore more crc, one or 
+		more los or sef defects).";
+-- B.4.10 adslFailedFastRetrains
+
+
+adslFailedFastRetrains ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslFailedFastRetrainsBeh;
+REGISTERED AS { adslfNMAttribute 10 };
+
+
+adslFailedFastRetrainsBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of failed fast-retrain attempts.";
+-- B.4.11 adslLineTTPId
+
+
+adslLineTTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		adslLineTTPIdBeh;
+REGISTERED AS { adslfNMAttribute 11 };
+
+
+adslLineTTPIdBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute is the object instance identifier for the adslLineTTP.";
+-- B.4.12 adslLofs
+
+
+adslLofs ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslLofsBeh;
+REGISTERED AS { adslfNMAttribute 12 };
+
+
+adslLofsBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of seconds where there was a Loss of Frame.";
+-- B.4.13 adslLols
+
+
+adslLols ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslLolsBeh;
+REGISTERED AS { adslfNMAttribute 13 };
+
+
+adslLolsBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of seconds where there was a Loss of Link.";
+-- B.4.14 adslLoss
+
+
+adslLoss ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslLossBeh;
+REGISTERED AS { adslfNMAttribute 14 };
+
+
+adslLossBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of seconds where there was a Loss of Signal.";
+-- B.4.15 adslLprs
+
+
+adslLprs ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslLprsBeh;
+REGISTERED AS { adslfNMAttribute 15 };
+
+
+adslLprsBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of seconds where there was a Loss of Power.";
+-- B.4.16 adslNumFastRetrains
+
+
+adslNumFastRetrains ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslNumFastRetrainsBeh;
+REGISTERED AS { adslfNMAttribute 16 };
+
+
+adslNumFastRetrainsBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of modem fast-retrain attempts.";
+-- B.4.17 adslSess
+
+
+adslSess ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslSessBeh;
+REGISTERED AS { adslfNMAttribute 17 };
+
+
+adslSessBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of Severely Errored Seconds (SES).";
+-- B.4.18 adslUass
+
+
+adslUass ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslUassBeh;
+REGISTERED AS { adslfNMAttribute 18 };
+
+
+adslUassBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of Unavailable Seconds (UAS).";
+-- B.4.19 allowedOperationalModes
+
+
+allowedOperationalModes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.AdslOperationalModes;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		allowedOperationalModesBeh;
+REGISTERED AS { adslfNMAttribute 19 };
+
+
+allowedOperationalModesBeh BEHAVIOUR
+	DEFINED AS
+		"This set-valued attribute configures the modem Operational Modes that should be 
+		allowed by the ATU-C. The allowed Modes should be a subset of the Modes 
+		supported by the ATU-C (as per the supportedOperationalModes attribute).";
+-- B.4.20 channelType
+
+
+channelType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.AdslChannelType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		channelTypeBeh;
+REGISTERED AS { adslfNMAttribute 20 };
+
+
+channelTypeBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the channel type (Fast, Interleaved, other).";
+-- B.4.21 currentAttainableRate
+
+
+currentAttainableRate ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":gauge;
+	BEHAVIOUR
+		currentAttainableRateBeh;
+REGISTERED AS { adslfNMAttribute 21 };
+
+
+currentAttainableRateBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the current maximum attainable transmit rate for the 
+		ATU in kbps. This value is greater than or equal to the current line rate.";
+-- B.4.22 currentAttenuation
+
+
+currentAttenuation ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":gauge;
+	BEHAVIOUR
+		currentAttenuationBeh;
+REGISTERED AS { adslfNMAttribute 22 };
+
+
+currentAttenuationBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the measured difference in the total power transmitted 
+		by peer ATU and the total power received by this ATU in 1/10th of a dB.";
+-- B.4.23 currentChannelRate
+
+
+currentChannelRate ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":gauge;
+	BEHAVIOUR
+		currentChannelRateBeh;
+REGISTERED AS { adslfNMAttribute 23 };
+
+
+currentChannelRateBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the current transmit rate in kbps for the associated 
+		ADSL channel.";
+-- B.4.24 currentCrcBL
+
+
+currentCrcBL ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":gauge;
+	BEHAVIOUR
+		currentCrcBLBeh;
+REGISTERED AS { adslfNMAttribute 24 };
+
+
+currentCrcBLBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute represents the current length of the channel data-block on which 
+		the CRC is calculated in bytes.";
+-- B.4.25 currentLineRate
+
+
+currentLineRate ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":gauge;
+	BEHAVIOUR
+		currentLineRateBeh;
+REGISTERED AS { adslfNMAttribute 25 };
+
+
+currentLineRateBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute represents the current data rate for the ADSL line in kbps.";
+-- B.4.26 currentOperationalMode
+
+
+currentOperationalMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.AdslOperationalMode;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		currentOperationalModeBeh;
+REGISTERED AS { adslfNMAttribute 26 };
+
+
+currentOperationalModeBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute represents the currently selected modem Operational Mode.";
+-- B.4.27 currentOutputPower
+
+
+currentOutputPower ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":gauge;
+	BEHAVIOUR
+		currentOutputPowerBeh;
+REGISTERED AS { adslfNMAttribute 27 };
+
+
+currentOutputPowerBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the measured total output power transmitted by the 
+		associated ATU in 1/10th dBm.";
+-- B.4.28 currentSnrMargin
+
+
+currentSnrMargin ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":gauge;
+	BEHAVIOUR
+		currentSnrMarginBeh;
+REGISTERED AS { adslfNMAttribute 28 };
+
+
+currentSnrMarginBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the current noise margin for the received signal on the 
+		associated ATU in 1/10th of a dB.";
+-- B.4.29 downShiftSnrMarginAtuC
+
+
+downShiftSnrMarginAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		downShiftSnrMarginAtuCBeh;
+REGISTERED AS { adslfNMAttribute 29 };
+
+
+downShiftSnrMarginAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the signal/noise margin for rate downshift, in the case 
+		of a rateadaptive ATU-C in 1/10th of a dB.";
+-- B.4.30 downShiftSnrMarginAtuR
+
+
+downShiftSnrMarginAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		downShiftSnrMarginAtuRBeh;
+REGISTERED AS { adslfNMAttribute 30 };
+
+
+downShiftSnrMarginAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the signal/noise margin for rate downshift, in the case 
+		of a rateadaptive ATU-R in 1/10th of a dB.";
+-- B.4.31 downThreshold
+
+
+downThreshold ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		downThresholdBeh;
+REGISTERED AS { adslfNMAttribute 31 };
+
+
+downThresholdBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the amount of decrement in the channel rate from the 
+		last time a rate-change notification was issued that will cause another 
+		rateChangeNotification to be sent. It is in kbps.";
+-- B.4.32 fastMaxTxRateAtuC
+
+
+fastMaxTxRateAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		fastMaxTxRateAtuCBeh;
+REGISTERED AS { adslfNMAttribute 32 };
+
+
+fastMaxTxRateAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the maximum transmit rate allowed for the fast channel 
+		for the associated ATU-C in kbps.";
+-- B.4.33 fastMaxTxRateAtuR
+
+
+fastMaxTxRateAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		fastMaxTxRateAtuRBeh;
+REGISTERED AS { adslfNMAttribute 33 };
+
+
+fastMaxTxRateAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the maximum transmit rate allowed for the fast channel 
+		for the associated ATU-R in kbps.";
+-- B.4.34 fastMinTxRateAtuC
+
+
+fastMinTxRateAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		fastMinTxRateAtuCBeh;
+REGISTERED AS { adslfNMAttribute 34 };
+
+
+fastMinTxRateAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the minimum transmit rate acceptable for the fast 
+		channel in the associated ATU-C in kbps.";
+-- B.4.35 fastMinTxRateAtuR
+
+
+fastMinTxRateAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		fastMinTxRateAtuRBeh;
+REGISTERED AS { adslfNMAttribute 35 };
+
+
+fastMinTxRateAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the minimum transmit rate acceptable for the fast 
+		channel in the associated ATU-R in kbps.";
+-- B.4.36 initFailedNotificationSwitch
+
+
+initFailedNotificationSwitch ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		initFailedNotificationSwitchBeh;
+REGISTERED AS { adslfNMAttribute 36 };
+
+
+initFailedNotificationSwitchBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute is used to enable (TRUE) / disable (FALSE) the 
+		initFailedNotifications";
+-- B.4.37 interleaveDelay
+
+
+interleaveDelay ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":gauge;
+	BEHAVIOUR
+		interleaveDelayBeh;
+REGISTERED AS { adslfNMAttribute 37 };
+
+
+interleaveDelayBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the current interleaved delay on the associated 
+		interleaved channel in milli-seconds.";
+-- B.4.38 interleavedMaxTxRateAtuC
+
+
+interleavedMaxTxRateAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		interleavedMaxTxRateAtuCBeh;
+REGISTERED AS { adslfNMAttribute 38 };
+
+
+interleavedMaxTxRateAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the maximum transmit rate allowed on the interleaved 
+		channel for the associated ATU-C in kbps.";
+-- B.4.39 interleavedMaxTxRateAtuR
+
+
+interleavedMaxTxRateAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		interleavedMaxTxRateAtuRBeh;
+REGISTERED AS { adslfNMAttribute 39 };
+
+
+interleavedMaxTxRateAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the maximum transmit rate on the interleaved channel 
+		for the associated ATU-R in kbps.";
+-- B.4.40 interleavedMinTxRateAtuC
+
+
+interleavedMinTxRateAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		interleavedMinTxRateAtuCBeh;
+REGISTERED AS { adslfNMAttribute 40 };
+
+
+interleavedMinTxRateAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the minimum transmit rate acceptable on the 
+		interleaved channel for the associated ATU-C in kbps.";
+-- B.4.41 interleavedMinTxRateAtuR
+
+
+interleavedMinTxRateAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		interleavedMinTxRateAtuRBeh;
+REGISTERED AS { adslfNMAttribute 41 };
+
+
+interleavedMinTxRateAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the minimum transmit rate acceptable on the 
+		interleaved channel for the associated ATU-R in kbps.";
+-- B.4.42 lineCodeSpecificProfilePointer
+
+
+lineCodeSpecificProfilePointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.PointerOrNull;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		lineCodeSpecificProfilePointerBeh;
+REGISTERED AS { adslfNMAttribute 42 };
+
+
+lineCodeSpecificProfilePointerBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute is a pointer to an optional line-code / vendor specific 
+		Configuration Profile. If the value is NULL, no profile is specified.";
+-- B.4.43 lineCoding
+
+
+lineCoding ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.AdslLineCoding;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		lineCodingBeh;
+REGISTERED AS { adslfNMAttribute 43 };
+
+
+lineCodingBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the supported line coding for the ADSL Line (DMT, CAP, 
+		QAM, other).";
+-- B.4.44 maxInterleaveDelayAtuC
+
+
+maxInterleaveDelayAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maxInterleaveDelayAtuCBeh;
+REGISTERED AS { adslfNMAttribute 44 };
+
+
+maxInterleaveDelayAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the maximum Interleave delay acceptable for the 
+		interleaved channel on the associated ATU-C in milli-seconds.";
+-- B.4.45 maxInterleaveDelayAtuR
+
+
+maxInterleaveDelayAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maxInterleaveDelayAtuRBeh;
+REGISTERED AS { adslfNMAttribute 45 };
+
+
+maxInterleaveDelayAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the maximum acceptable Interleave delay for the 
+		interleaved channel on the associated ATU-R in milli-seconds.";
+-- B.4.46 maxSnrMarginAtuC
+
+
+maxSnrMarginAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maxSnrMarginAtuCBeh;
+REGISTERED AS { adslfNMAttribute 46 };
+
+
+maxSnrMarginAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the maximum signal/noise margin the ATU-C should try 
+		to maintain before increasing the data-rate. The units are 1/10th of a dB";
+-- B.4.47 maxSnrMarginAtuR
+
+
+maxSnrMarginAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maxSnrMarginAtuRBeh;
+REGISTERED AS { adslfNMAttribute 47 };
+
+
+maxSnrMarginAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the maximum signal/noise margin the ATU-R should 
+		attempt to maintain before increasing the data-rate. The units are 1/10th of a 
+		dB.";
+-- B.4.48 minDownShiftTimeAtuC
+
+
+minDownShiftTimeAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		minDownShiftTimeAtuCBeh;
+REGISTERED AS { adslfNMAttribute 48 };
+
+
+minDownShiftTimeAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the minimum time for which the noise margin should be 
+		below the downShiftSnrMargin before the ATU-C should attempt a rate downshift. 
+		Only applicable to rateadaptive modems. The unit is seconds.";
+-- B.4.49 minDownShiftTimeAtuR
+
+
+minDownShiftTimeAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		minDownShiftTimeAtuRBeh;
+REGISTERED AS { adslfNMAttribute 49 };
+
+
+minDownShiftTimeAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the minimum time for which current margin should be 
+		below the downShiftSnrMargin before the ATU-R should attempt a rate downshift. 
+		Only applicable to rateadaptive modems. The unit is seconds.";
+-- B.4.50 minSnrMarginAtuC
+
+
+minSnrMarginAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		minSnrMarginAtuCBeh;
+REGISTERED AS { adslfNMAttribute 50 };
+
+
+minSnrMarginAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the minimum acceptable signal/noise margin in 1/10th 
+		of a dB for the associated ATU-C.";
+-- B.4.51 minSnrMarginAtuR
+
+
+minSnrMarginAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		minSnrMarginAtuRBeh;
+REGISTERED AS { adslfNMAttribute 51 };
+
+
+minSnrMarginAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the minimum acceptable signal/noise margin in 1/10th of 
+		a dB for the associated ATU-R.";
+-- B.4.52 minUpShiftTimeAtuC
+
+
+minUpShiftTimeAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		minUpShiftTimeAtuCBeh;
+REGISTERED AS { adslfNMAttribute 52 };
+
+
+minUpShiftTimeAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the minimum time that the noise margin for the 
+		associated ATU-C should remain above the upShiftSnrMargin, before it should 
+		attempt a rate upshift. Only applicable to rate adaptive modems. Units are 
+		seconds";
+-- B.4.53 minUpShiftTimeAtuR
+
+
+minUpShiftTimeAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		minUpShiftTimeAtuRBeh;
+REGISTERED AS { adslfNMAttribute 53 };
+
+
+minUpShiftTimeAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the minimum time that the noise margin for the 
+		associated ATU-C should remain above the upShiftSnrMargin, before it should 
+		attempt a rate upshift. Only applicable to rate adaptive modems. Units are 
+		seconds";
+-- B.4.54 previousChannelRate
+
+
+previousChannelRate ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":gauge;
+	BEHAVIOUR
+		previousChannelRateBeh;
+REGISTERED AS { adslfNMAttribute 54 };
+
+
+previousChannelRateBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the previous rate of the associated ADSL channel in 
+		kbps for a rate-adaptive ATU following rate-change.";
+-- B.4.55 previousLineRate
+
+
+previousLineRate ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":gauge;
+	BEHAVIOUR
+		previousLineRateBeh;
+REGISTERED AS { adslfNMAttribute 55 };
+
+
+previousLineRateBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the previous rate of the ADSL line in kbps for the 
+		associated rate-adaptive ATU following rate-change.";
+-- B.4.56 rateChangeRatioAtuC
+
+
+rateChangeRatioAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		rateChangeRatioAtuCBeh;
+REGISTERED AS { adslfNMAttribute 56 };
+
+
+rateChangeRatioAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the allocation ratio of excess transmit bandwidth 
+		between fast and interleaved channels, in the case where rate adaptive ADSL mode 
+		is available and both fast and interleaved channels are supported at the same 
+		time. The value is between 0..100 and is computed as follows:
+
+		rateChangeRatio = [Fast / (Fast + Interleaved)] * 100.";
+-- B.4.57 rateChangeRatioAtuR
+
+
+rateChangeRatioAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		rateChangeRatioAtuRBeh;
+REGISTERED AS { adslfNMAttribute 57 };
+
+
+rateChangeRatioAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the allocation ratio of excess transmit bandwidth 
+		between fast and interleaved channels, in the case where rate adaptive ADSL mode 
+		is available and both fast and interleaved channels are supported at the same 
+		time. The value is between 0..100 and is computed as follows:
+
+		rateChangeRatio = [Fast / (Fast + Interleaved)] * 100.";
+-- B.4.58 rateModeAtuC
+
+
+rateModeAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.AdslRateMode;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		rateModeAtuCBeh;
+REGISTERED AS { adslfNMAttribute 58 };
+
+
+rateModeAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates what type of rate adaptation mode is supported. (Fixed, 
+		Adapt-At- Start, Adapt-At-Runtime)";
+-- B.4.59 rateModeAtuR
+
+
+rateModeAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.AdslRateMode;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		rateModeAtuRBeh;
+REGISTERED AS { adslfNMAttribute 59 };
+
+
+rateModeAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates what type of rate adaptation mode is supported. (Fixed, 
+		Adapt-At- Start, Adapt-At-Runtime)";
+-- B.4.60 supportedChannelTypes
+
+
+supportedChannelTypes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.AdslChannelOptions;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		supportedChannelTypesBeh;
+REGISTERED AS { adslfNMAttribute 60 };
+
+
+supportedChannelTypesBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates supported channel types over an ADSL Line. (noChanne, 
+		fastOnly, interleavedOnly, fastAndInterleaved, fastOrInterleaved)";
+-- B.4.61 supportedOperationalModes
+
+
+supportedOperationalModes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.AdslOperationalModes;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		supportedOperationalModesBeh;
+REGISTERED AS { adslfNMAttribute 61 };
+
+
+supportedOperationalModesBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates which ADSL Operational Modes are supported by the 
+		modem.";
+-- B.4.62 targetSnrMarginAtuC
+
+
+targetSnrMarginAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		targetSnrMarginAtuCBeh;
+REGISTERED AS { adslfNMAttribute 62 };
+
+
+targetSnrMarginAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the signal/noise margin (in 1/10th of dB) the modem 
+		must achieve with a BER of 10-7 or better.";
+-- B.4.63 targetSnrMarginAtuR
+
+
+targetSnrMarginAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		targetSnrMarginAtuRBeh;
+REGISTERED AS { adslfNMAttribute 63 };
+
+
+targetSnrMarginAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the signal/noise margin (in 1/10th of dB) the modem 
+		must achieve with a BER of 10-7 or better.";
+-- B.4.64 upShiftSnrMarginAtuC
+
+
+upShiftSnrMarginAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		upShiftSnrMarginAtuCBeh;
+REGISTERED AS { adslfNMAttribute 64 };
+
+
+upShiftSnrMarginAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the signal/noise margin for rate upshift, in the case 
+		of rate adaptive ADSL in 1/10th of a dB.";
+-- B.4.65 upShiftSnrMarginAtuR
+
+
+upShiftSnrMarginAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		upShiftSnrMarginAtuRBeh;
+REGISTERED AS { adslfNMAttribute 65 };
+
+
+upShiftSnrMarginAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the signal/noise margin for rate upshift, in the case 
+		of rate adaptive ADSL in 1/10th of a dB.";
+-- B.4.66 upThreshold
+
+
+upThreshold ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		upThresholdBeh;
+REGISTERED AS { adslfNMAttribute 66 };
+
+
+upThresholdBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the minimum amount by which the rate must increase 
+		since the last notification in order to issue a new rate change notification. It 
+		is specified in kbps.";
+-- B.4.67 configuredChannelTypes
+
+
+configuredChannelTypes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.AdslChannelOptions;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		configuredChannelTypesBeh;
+REGISTERED AS { adslfNMAttribute 67 };
+
+
+configuredChannelTypesBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute controls which channel type(s) are to be configured. (noChannel, 
+		fastOnly, interleavedOnly, fastAndInterleaved)";
+-- B.4.68 lowPowerDataRateAtuC
+
+
+lowPowerDataRateAtuC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		lowPowerDataRateAtuCBeh;
+REGISTERED AS { adslfNMAttribute 68 };
+
+
+lowPowerDataRateAtuCBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the L1 (low-power/power-down) state transmit bit-rate 
+		for the ATU-C in kbps.";
+-- B.4.69 lowPowerDataRateAtuR
+
+
+lowPowerDataRateAtuR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		lowPowerDataRateAtuRBeh;
+REGISTERED AS { adslfNMAttribute 69 };
+
+
+lowPowerDataRateAtuRBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute configures the L1 (low-power/power-down) state transmit bit-rate 
+		for the ATU-R in kbps.";
+-- B.4.70 adslChannelCodeViolations
+
+
+adslChannelCodeViolations ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslChannelCodeViolationsBeh;
+REGISTERED AS { adslfNMAttribute 70 };
+
+
+adslChannelCodeViolationsBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of crc-8 anomalies occurring in the data 
+		stream associated with this channel.";
+-- B.4.71 adslChannelTTPId
+
+
+adslChannelTTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		adslChannelTTPIdBeh;
+REGISTERED AS { adslfNMAttribute 71 };
+
+
+adslChannelTTPIdBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute is the object instance identifier for the adslChannelTTP.";
+
+
+adslFecs ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		adslFecsBeh;
+REGISTERED AS { adslfNMAttribute 72 };
+
+
+adslFecsBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute indicates the count of FEC events.";
+
+
+integer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AdslfMIBMod.Integer;
+REGISTERED AS { adslfNMAttribute 73 };
+-- B.5 Notifications
+-- B.5.1 initFailedNotification
+
+
+initFailedNotification NOTIFICATION
+	BEHAVIOUR
+		initFailedNotificationBeh;
+	WITH INFORMATION SYNTAX AdslfMIBMod.AdslInitFailedInfo
+		AND ATTRIBUTE IDS
+			probableCause
+				"Rec. X.721 | ISO/IEC 10165-2":probableCause,
+			notificationIdentifier
+				"Rec. X.721 | ISO/IEC 10165-2":notificationIdentifier;
+REGISTERED AS { adslfNMNotification 1 };
+
+
+initFailedNotificationBeh BEHAVIOUR
+	DEFINED AS
+		"This notification is sent when the ATU-C cannot initialize the ATU-R, and the 
+		value of the initFailedNotificationSwitch attribute is TRUE (on). The 
+		probableCause attribute indicates reason for initialzation failure.";
+-- B.5.2 rateChangeNotification
+
+
+rateChangeNotification NOTIFICATION
+	BEHAVIOUR
+		rateChangeNotificationBeh;
+	WITH INFORMATION SYNTAX AdslfMIBMod.AdslRateChangeInfo
+		AND ATTRIBUTE IDS
+			oldRate
+				integer,
+			newRate
+				integer,
+			notificationIdentifier
+				"Rec. X.721 | ISO/IEC 10165-2":notificationIdentifier;
+REGISTERED AS { adslfNMNotification 2 };
+
+
+rateChangeNotificationBeh BEHAVIOUR
+	DEFINED AS
+		"This notification is sent for Fast and Interleaved channels in the following 
+		cases: Rate increased since last notification by more than the 'upThreshold' 
+		value. Rate decreased since last notification by more than the 'downThreshold' 
+		value.";
+
+--< ASN1.Version 1994 AdslfMIBMod
+--  { 1 3 6 1 4 1 adslForum(3561) adslForumNetworkManagement(1) adslfLineMIB(1) informationModel(0) asn1Module(2) adslfMIBMod(0) } >--
+-- B.6 Type definitions
+AdslfMIBMod { 1 3 6 1 4 1 adslForum(3561) adslForumNetworkManagement(1) adslfLineMIB(1) informationModel(0) asn1Module(2) adslfMIBMod(0) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- exports everything
+IMPORTS
+Boolean, NameType, PointerOrNull, ProblemCause
+	FROM ASN1DefinedTypesModule { ccitt recommendation m(13) gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
+DistinguishedName, RelativeDistinguishedName
+	FROM InformationFramework { joint-iso-ccitt ds(5) modules(1) informationFramework(1) }
+EventTypeId, ObjectInstance
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
+AdministrativeState, AttributeList, NotificationIdentifier, ProbableCause, SimpleNameType
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 };
+adslfNMInformationModel OBJECT IDENTIFIER ::= { 1 3 6 1 4 1 adslForum(3561) adslForumNetworkManagement(1) adslfLineMIB(1) informationModel(0) }
+adslfNMStandardSpecificExtension OBJECT IDENTIFIER ::= { adslfNMInformationModel 0 }
+adslfNMObjectClass OBJECT IDENTIFIER ::= { adslfNMInformationModel 3 }
+adslfNMPackage OBJECT IDENTIFIER ::= { adslfNMInformationModel 4 }
+adslfNMAttribute OBJECT IDENTIFIER ::= { adslfNMInformationModel 5 }
+adslfNMNameBinding OBJECT IDENTIFIER ::= { adslfNMInformationModel 6 }
+adslfNMAction OBJECT IDENTIFIER ::= { adslfNMInformationModel 7 }
+adslfNMNotification OBJECT IDENTIFIER ::= { adslfNMInformationModel 8 }
+-- default value definitions
+booleanFalseDefault Boolean ::= FALSE
+booleanTrueDefault Boolean ::= TRUE
+integerZero INTEGER ::= 0
+-- Additional probableCause Definitions
+adslfNMProbableCause OBJECT IDENTIFIER ::= { adslfNMStandardSpecificExtension 0 }
+lossOfPower ProbableCause ::= globalValue : { adslfNMProbableCause 1 }
+lossOfLink ProbableCause ::= globalValue : { adslfNMProbableCause 2 }
+lossOfSignalQuality ProbableCause ::= globalValue : { adslfNMProbableCause 3 }
+dataInitFailure ProbableCause ::= globalValue : { adslfNMProbableCause 4 }
+configInitFailure ProbableCause ::= globalValue : { adslfNMProbableCause 5 }
+protocolInitFailure ProbableCause ::= globalValue : { adslfNMProbableCause 6 }
+noPeerAtuPresent ProbableCause ::= globalValue : { adslfNMProbableCause 7 }
+-- Additional eventTypes Definitions
+adslfNMEventTypes OBJECT IDENTIFIER ::= { adslfNMStandardSpecificExtension 1 }
+-- Supporting productions
+AdslAvailabilityStatus ::= SET OF AdslLineCondition
+AdslChannelOptions ::= ENUMERATED {
+	noChannels(0),
+	fastOnly(1),
+	interleavedOnly(2),
+	fastOrInterleaved(3),
+	fastAndInterleaved(4) }
+AdslChannelType ::= ENUMERATED {
+	fast(0),
+	interleaved(1) }
+AdslInitFailedInfo ::= SEQUENCE {
+	probableCause ProbableCause,
+	notificationIdentifier NotificationIdentifier OPTIONAL }
+AdslLineCoding ::= ENUMERATED {
+	other(0),
+	dmt(1),
+	cap(2),
+	qam(3) }
+AdslLineCondition ::= ENUMERATED {
+	lossOfFraming(0),
+	lossOfSignal(1),
+	lossOfPower(2),
+	lossOfLink(3),
+	lossOfSignalQuality(4),
+	dataInitFailure(5),
+	configInitFailure(6),
+	protocolInitFailure(8),
+	noPeerAtuPresent(9),
+	lowPowerMode(10) }
+-- ADSL modem Operational Mode
+AdslOperationalMode ::= ENUMERATED {
+	ansi(0),-- ANSI T1.413
+	etsi(1),-- ETSI DTS/TM06006
+	potsNonOverlapped(2),-- ITU G.992.1 POTS non-overlapped
+	potsOverlapped(3),-- ITU G.992.1 POTS overlapped
+	isdnNonOverlapped(4),-- ITU G.992.1 ISDN non-overlapped
+	isdnOverlapped(5),-- ITU G.992.1 ISDN overlapped
+	isdnTcm(6),-- ITU G.992.1 with TCM-ISDN
+	potsNonOverlappedLite(7),-- ITU G.992.2 POTS non-overlapped
+	potsOverlappedLite(8),-- ITU G.992.2 POTS overlapped
+	isdnTcmLite(9) }-- ITU G.992.2 with TCM-ISDN
+AdslOperationalModes ::= SET OF AdslOperationalMode
+AdslRateChangeInfo ::= SEQUENCE {
+	oldRate Integer,
+	newRate Integer,
+	notificationIdentifier NotificationIdentifier OPTIONAL }
+AdslRateMode ::= ENUMERATED {
+	fixed(0),
+	adaptAtStartup(1),
+	adaptAtRuntime(2) }
+Integer ::= INTEGER
+END
+
+END
+--< GDMO.EndDocument "ETSI TS 102 004-1"
+--  { 1 3 6 1 4 1 adslForum(3561) adslForumNetworkManagement(1) adslfLineMIB(1) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ +- itut_x723::subsystem
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ |  +- etsi_004_1::adslChannelTTPHistoryData
+--@@ |  +- etsi_004_1::adslLineTTPHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- etsi_004_1::adslChannelTTP
+--@@ |  |  |  +- etsi_004_1::adslLineTTP
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- etsi_004_1::adslChannelTTP
+--@@ |  |  |  +- etsi_004_1::adslLineTTP
+--@@ +- itut_m3100::tpPool
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ |  |  +- etsi_004_1::adslChannelTTPCurrentData
+--@@ |  |  +- etsi_004_1::adslLineTTPCurrentData
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ +- etsi_004_1::adslConfigurationProfile
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ >- itut_x739::scanner
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_m3100::managedElementR1
+--@@ >- etsi_004_1::adslConfigurationProfile
+--@@ >- etsi_004_1::adslLineTTP
+--@@ |  >- etsi_004_1::adslChannelTTP
+--@@ |  |  >- etsi_004_1::adslChannelTTPCurrentData
+--@@ |  |  |  >- etsi_004_1::adslChannelTTPHistoryData
+--@@ |  >- etsi_004_1::adslLineTTPCurrentData
+--@@ |  |  >- etsi_004_1::adslLineTTPHistoryData
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi
