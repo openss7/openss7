@@ -6,6 +6,9 @@
 --@@ Special File: <(standard input).specials>
 --@@ Date: Sat Sep 15 10:37:58 MDT 2007
 --@@ 
+--< GDMO.Document "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" { joint-iso-ccitt ms(9) function(2) part10(10) } >--
+MODULE "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" { joint-iso-ccitt ms(9) function(2) part10(10) }
+--< ASN1.Version 1990 UMFObjId { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 0 } >--
 -- A.9 Definition of ASN.1 modules
 UMFObjId { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 0 }
 DEFINITIONS ::=
@@ -247,6 +250,8 @@ UsageInfoSet UMF-USAGE ::= {
 -- registration block shall always be present. This constraint ensures that a usage metering record
 -- only applies to the one requester and that there is only one set of correlation information.
 END-- Corrigendum 1
+END
+--< GDMO.EndDocument "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" { joint-iso-ccitt ms(9) function(2) part10(10) } >--
 
 
 --@@ 

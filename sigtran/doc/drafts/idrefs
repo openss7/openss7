@@ -3383,7 +3383,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 
-%k h323
+%K h323
 %L H.323
 %A ITU
 %Q International Telecommunication Union
@@ -3634,7 +3634,7 @@ Part 1: Protocol Specification
 
 %L SVR3SPG
 %R SVR 3
-%k svr3spg
+%K svr3spg
 %T UNIX\(rg System V Release 3 STREAMS Programmer's Guide
 %Q AT&T UNIX System Laboratories, Inc.
 %I Prentice Hall
@@ -3642,7 +3642,7 @@ Part 1: Protocol Specification
 
 %L svr3sp
 %R SVR 3
-%k svr3sp
+%K svr3sp
 %T UNIX\(rg System V Release 3 STREAMS Primer
 %Q AT&T UNIX System Laboratories, Inc.
 %I Prentice Hall
@@ -5380,6 +5380,17 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2959.txt
 
+%K rfc4960
+%L SCTP
+%R RFC 4960
+%E Randall R. Stewart
+%Q Internet Engineering Task Force
+%T Stream Control Transmission Protocol (SCTP)
+%D September 2007
+%O (Obsoletes RFC 4960, RFC 3309) (Status: PROPOSED STANDARD)
+%I The IETF Trust
+%U http://www.ietf.org/rfc/rfc4960.txt
+
 %K rfc2960
 %L SCTP
 %R RFC 2960
@@ -5397,11 +5408,11 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force
 %T Stream Control Transmission Protocol (SCTP)
 %D October 2000
-%O (Updated by RFC 3309) (Status: PROPOSED STANDARD)
+%O (Obsoleted by RFC 4960) (Updated by RFC 3309) (Status: PROPOSED STANDARD)
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2960.txt
 
-%k rfc3309
+%K rfc3309
 %L SCTPCRC
 %R RFC 3309
 %A Jonathan Stone
@@ -5410,7 +5421,7 @@ Part 1: Protocol Specification
 %E Jonathan Stone
 %T Stream Control Transmission Protocol (SCTP) Checksum Change
 %D September 2002
-%O (Updates RFC 2960) (Status: PROPOSED STANDARD)
+%O (Obsoleted by RFC 4960) (Updates RFC 2960) (Status: PROPOSED STANDARD)
 %Q Internet Engineering Task Force
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3309.txt

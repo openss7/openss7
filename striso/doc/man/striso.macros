@@ -88,17 +88,29 @@ Trademarks mentioned are the property of their owners.
 \fB\\*([R\fR,
 .rm [R
 .\}
+.if !'\\*([S'' \{\
+\fI\\*([S\fR:\ \c
+.rm [S
+.\}
 \fI\\*([T\fR\c
 .if !'\\*([J'' \{\
 ,\ \fB\\*([J\fR\c
 .rm [J
-.\}
 .if !'\\*([V'' \{\
 ,\ Vol.\ \fB\\*([V\fR\c
 .rm [V
 .\}
 .if !'\\*([N'' \{\
 ,\ No.\ \fB\\*([N\fR\c
+.rm [N
+.\}
+.\}
+.if !'\\*([V'' \{\
+,\ \fI\\*([V\fR\c
+.rm [V
+.\}
+.if !'\\*([N'' \{\
+,\ \fI\\*([N\fR\c
 .rm [N
 .\}
 .if !'\\*([D'' \{\
@@ -150,6 +162,7 @@ Trademarks mentioned are the property of their owners.
 .rm [F
 .rm [L
 .rm [R
+.rm [S
 .rm [T
 .rm [C
 .rm [N
