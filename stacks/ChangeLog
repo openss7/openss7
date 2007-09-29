@@ -2,6 +2,15 @@
 
 	* src/test/sl/test-sl.c: quiet gcc 3.4.3
 
+	* src/mibs/OPENSS7-MIB.mib: add mibs
+	* src/mibs/OPENSS7-MTP-MIB.mib: add mibs
+	* src/mibs/OPENSS7-MTP-TC.mib: add mibs
+	* src/mibs/OPENSS7-SS7-TC.mib: add mibs
+	* src/mibs/OPENSS7-TC.mib: add mibs
+	* src/mibs/OPENSS7-TMN-SMI.mib: add mibs
+	* src/mibs/OPENSS7-TMN-TC.mib: add mibs
+	* src/mibs/OPENSS7-X400P-MIB.mib: add mibs
+
 2007-09-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: added manual page for test-sl program

@@ -1,0 +1,1311 @@
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-M2UA-ASP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/29 14:31:32 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under
+-- the terms of the GNU General Public License as published by the Free Software
+-- Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+-- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU General Public License along with
+-- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+-- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2007/09/29 14:31:32 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-M2UA-ASP-MIB.mib,v $
+-- Revision 0.9.2.1  2007/09/29 14:31:32  brian
+-- - added new mib files
+--
+-- =============================================================================
+
+OPENSS7-M2UA-ASP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OpenSS7Modules
+		FROM OPENSS7-SMI
+
+M2uaAspMIB MODULE-IDENTITY
+	LAST-UPDATED	"200709250000Z"
+	ORGANIZATION	"OpenSS7 Corporation"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta T6L 6T1
+		 Canada
+
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 E-Mail: bidulock@openss7.org"
+	DESCRIPTION
+		"MIB Module for SIGTRAN M2UA ASP management."
+	::= { OpenSS7Modules 21 }
+
+-- Top-level structure of the MIB
+
+m2uaAspMIBNotifications		OBJECT IDENTIFIER ::= { M2uaAspMIB		0 }
+m2uaAspMIBObjects		OBJECT IDENTIFIER ::= { M2uaAspMIB		1 }
+m2uaAspMIBConformance		OBJECT IDENTIFIER ::= { M2uaAspMIB		2 }
+
+--
+-- From STD 58: [To] achieve compatiblity with SNMPv1 traps, both when converting SMIv1 information 
+-- modules to an dfrom this SMI, and in the procedures employed by multi-lingual systems and proxy 
+-- forwarding applications, the next to last subidentifier must have the value zero.
+--
+m2uaAspNotifications		OBJECT IDENTIFIER ::= { m2uaAspMIBNotifications	0 }
+
+m2uaAspScalars			OBJECT IDENTIFIER ::= { m2uaAspMIBObjects	1 }
+m2uaAspTables			OBJECT IDENTIFIER ::= { m2uaAspMIBObjects	2 }
+
+m2uaAspAsp			OBJECT IDENTIFIER ::= { m2uaAspTables		1 }
+m2uaAspSg			OBJECT IDENTIFIER ::= { m2uaAspTables		2 }
+m2uaAspAspSg			OBJECT IDENTIFIER ::= { m2uaAspTables		3 }
+m2uaAspAs			OBJECT IDENTIFIER ::= { m2uaAspTables		4 }
+m2uaAspIf			OBJECT IDENTIFIER ::= { m2uaAspTables		5 }
+m2uaAspAsIf			OBJECT IDENTIFIER ::= { m2uaAspTables		6 }
+m2uaAspSgAs			OBJECT IDENTIFIER ::= { m2uaAspTables		7 }
+m2uaAspAspAs			OBJECT IDENTIFIER ::= { m2uaAspTables		8 }
+m2uaAspAspSgAs			OBJECT IDENTIFIER ::= { m2uaAspTables		9 }
+
+
+-- ====================================================================
+--
+-- NOTIFICATIONS
+--
+-- ====================================================================
+
+
+communicationsAlarn NOTIFICATION-TYPE
+
+
+--
+-- Containment:
+--
+-- Each Asp contains a number of Sg.  An Sg may be contained by zero or 
+-- more Asps.  An Sg contained by an Asp is a signalling gateway that 
+-- provides service to the As for that Asp.
+--
+-- Each Sg contains a number of As.  The As contained by the Sg are 
+-- application servers that are served by the Sg.
+--
+-- Each As served by an Sg contains a number of If.  The If contained by 
+-- the As are the interfaces associated with the As.
+--
+-- Each Asp contains a number of Sg.  The Sg contained by the Asp are 
+-- the Sgs that provide service to the Asp.
+
+
+--
+--  m2uaAspAsp  The M2UA ASP table.
+--
+--  The ASP table provides a list of all of the ASPs known to this host.
+--
+
+m2uaAspNextIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the next available index in the ASP table for use by management stations 
+		 when adding rows to this table."
+	REFERENCE	"STD 58"
+	::= { m2uaAspAsp 1 }
+
+m2uaAspTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M2uaAspEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides the ASP table.  The ASP table is a list of all of the ASPs known to this 
+		 host."
+	::= { m2uaAspAsp 1 }
+
+m2uaAspEntry OBJECT-TYPE
+	SYNTAX		M2uaAspEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is an entry in the ASP table."
+	INDEX		{ m2uaAspIndex }
+	::= { m2uaAspTable 1 }
+
+M2uaAspEntry ::=
+	SEQUENCE {
+		m2uaAspIndex			Unsigned32,
+		m2uaAspAdministrativeState	AdministrativeState,
+		m2uaAspProceduralStatus		ProceduralStatus,
+		m2uaAspUsageState		UsageState,
+		m2uaAspAspState			AspState,
+		m2uaAspCapablities		SigtranOptions
+		m2uaAspRegistrationPolicy	RegistrationPolicy
+		m2uaAspStatus			RowStatus
+	}
+
+m2uaAspIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible -- shared
+	STATUS		current
+	DESCRIPTION
+		"This is the index of the M2UA ASP table."
+	::= { m2uaAspEntry 1 }
+
+m2uaAspAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState,
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the overall administrative state of the ASP.  When locked(0) the ASP is 
+		 disabled and no local AS will be served and no association to any SG is in place.  
+		 When unlocked, local AS will be able to use the ASP and it will form associations 
+		 to remote SG.
+		 
+		 This is a convenience as the value could be determined by examining the 
+		 administrative state of each of the ASP-SG relations; however, the agent must 
+		 maintain this information for proper generation of alarms."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : administrativeState"
+	::= { m2uaAspEntry xx }
+
+m2uaAspProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus,
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is the overall procedural status of the ASP following the ProceduralStatus 
+		 textual convention.  Procedural status is a set valued state and this is simply the 
+		 intersection (logical OR) of the procedural status of the ASP for each SG that 
+		 supports it.
+		 
+		 This is a convenience as the value could be determined by examining the procedural 
+		 status of each of the ASP-SG associations; however, the agent must maintain this 
+		 information for proper generation of alarms.."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : proceduralStatus"
+	::= { m2uaAspEntry xx }
+
+m2uaAspUsageState OBJECT-TYPE
+	SYNTAX		UsageState,
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is the overall usage state of the ASP following the UsageState textual 
+		 convention.  When idle(0) none of the ASP-SG associations are active or busy 
+		 (including the case where no ASP-SG associations have been provisioned).  When 
+		 active(1), at least one of the ASP-SG relations are active and none are busy.  WHen 
+		 busy(2), at least one of the ASP-SG relations are busy.
+		 
+		 This is a convenience in that the value could be determined by examining the usage 
+		 state for each of the ASP-SG relations; however, the overall state is necessary to 
+		 determine the severity of alarms."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : usageState"
+	::= { m2uaAspEntry xx }
+
+m2uaAspAspState OBJECT-TYPE
+	SYNTAX		AspState,
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the overal ASP state of the ASP following the AspState textual convention.  
+		 The overall state is the most active state of the ASP-SG associations for this ASP.  
+		 If an ASP-SG relation is in the up state, then this state is up.  Otherwise, if 
+		 there is an ASP-SG relation in the terminating state, then this state is 
+		 terminating.  Otherwise, if there is an ASP-SG relation in the initializing state,
+		 then this state is initializing.  Otherwise, this state is down.
+
+		 This is a convenience in that the value could be determined by examining the ASP 
+		 state for each of the ASP-SG relations; however, the overall state is necessary to 
+		 determin the severity of alarms."
+	::= { m2uaAspEntry xx }
+
+m2uaAspCapablities OBJECT-TYPE
+	SYNTAX		SigtranOptions
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides the capabilities of the ASP using the SigtranOptions textual 
+		 convention."
+	::= { m2uaAspEntry xx }
+
+m2uaAspRegistrationPolicy OBJECT-TYPE
+	SYNTAX		RegistrationPolicy
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides the registration policy for the ASP and is intended on reflecting the 
+		 registration policy of the ASP towards the local AS that it serves.  It is tempered 
+		 by the registration policy of the particular SG that serves an ASP."
+	DEFVAL		{ unknown(0) }
+	::= { m2uaAspEntry xx }
+
+m2uaAspStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the mechnism by which management stations can add, modify and delete rows 
+		 from this table."
+	::= { m2uaAspEntry xx }
+
+--
+-- m2uaAspSg  The M2UA SG Table.
+--
+-- The SG table provides a list of all the SGs known to this host.  The 
+-- purpose of this table is to identify all of the remote SG that this 
+-- host can contact and the information for contacting the SG.  It also 
+-- contains the general options associated with the SG.
+--
+
+m2uaSgNextIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the next available index in the SG table for use by management stations 
+		 when adding rows to this table."
+	REFERENCE	"STD 58"
+	::= { m2uaAspSg 1 }
+
+m2uaSgTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M2uaSgEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides the SG table.  The SG table is a list of all the SGs known to this host."
+	::= { m2uaAspSg 2 }
+
+m2uaSgEntry OBJECT-TYPE
+	SYNTAX		M2uaSgEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is an entry in the SG table.  The entry consists of known characteristics 
+		 about the remote SG."
+	INDEX		{ m2uaSgIndex }
+	::= { m2uaSgTable 1 }
+
+M2uaSgEntry ::=
+	SEQUENCE {
+		m2uaSgIndex			Unsigned32,
+		m2uaSgName			CommonLanaguageName,
+		m2uaSgAdministrativeState	AdministrativeState,
+		m2uaSgProceduralStatus		ProceduralStatus,
+		m2uaSgAspState			AspState,
+		m2uaSgUsageState		UsageState,
+		m2uaSgVersion			INTEGER,
+		m2uaSgOptions			SigtranOptions,
+		m2uaSgRegistrationPolicy	RegistrationPolicy,
+		m2uaSgProtocolPayloadId		INTEGER,
+		m2uaSgIpPort			IpPort,
+		m2uaSgPrimaryAddress		IpAddress,
+		m2uaSgMinOstreams		INTEGER,
+		m2uaSgMaxIstreams		INTEGER,
+		m2uaSgStatus			RowStatus
+	}
+
+m2uaSgIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible -- shared
+	STATUS		current
+	DESCRIPTION
+		"This is the index of an entry in the SG table.  It is shared with other tables."
+	::= { m2uaSgEntry 1 }
+
+m2uaSgName OBJECT-TYPE
+	SYNTAX		CommonLanguageName
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the name of the signalling gateway following COMMON LANGUAGE procedures and 
+		 the CommonLanguageName text convention."
+	::= { m2uaSgEntry 2 }
+
+m2uaSgAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the adminstrative state of the SG following the AdministrativeState textual 
+		 convention.  The administrative state can be locked(0) or unlocked(1).  When 
+		 locked(0) no association exists between the local host and the remote SG.  When 
+		 unlocked(1), associations can be formed to this SG.  When set to locked(0), 
+		 associations that exist between this host and the remote SG will be dropped."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : administrativeState"
+	DEFVAL		{ locked(0) }
+	::= { m2uaSgEntry 3 }
+
+m2uaSgProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is the procedural state of the SG following the ProceduralStatus textual 
+		 convention.  The procedural state is set valued and represents the intersection 
+		 (logical OR) of the procedural status of the ASP-SG relationships or associations 
+		 to this SG.
+		
+		 This is a convenience as this procedural state could be determined by examining the 
+		 procedural states of the individual ASP-SG relations."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : operationalState"
+	DEFVAL		{ 0 }
+	::= { m2uaSgEntry 4 }
+
+m2uaSgAspState OBJECT-TYPE
+	SYNTAX		AspState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides the overall state of all ASPs for this SG using the AspState textual 
+		 convention.  It represents the most active state of all of the ASPs.  When at least 
+		 one ASP is in the up state, the state is up.  When no ASPs are in the up state but 
+		 at least one ASP is in the terminating state, the state is terminating.  When no 
+		 ASP is in those states, but at least one ASP is in the initializing state, the 
+		 state is initializing, when no ASP is in any state other than down, the state is 
+		 down.
+		 
+		 When set to the down state, all ASPs will execute the ASP Down procedure if they 
+		 are not in the terminating or down state already.  When set to the up state, all 
+		 ASPs will execute the ASP Up procedure if they are not in the intiializing or up 
+		 state already.  Note that this does not affect the long term state of the ASPs, use 
+		 the AdministrativeState textual convention for that purpose"
+	DEFVAL		{ down(0) }
+	::= { m2uaSgEntry 5 }
+
+m2uaSgUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This it the overall usage state of the SG following the UsageState textual 
+		 convention.  The usage state may be idle(0), active(1) or busy(2).  When idle(0), 
+		 no ASP-SG relation is in the active(1) or busy(2) operational state.  When 
+		 active(1), a least one ASP-SG relation is in the active(1) operational state and no 
+		 ASP-SG relation is in the busy(2) operational state.  When busy(2), at least one 
+		 ASP-SG relation is in the busy(2) operational state.
+
+		 This is a convenience as this operational state could be determined by examining 
+		 the operational state of the individual ASP-SG relations."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : operationalState"
+	DEFVAL		{ idle(0) }
+	::= { m2uaSgEntry 6 }
+
+m2uaSgVersion OBJECT-TYPE
+	SYNTAX		INTEGER {
+				interoperable(0),
+				rfc3331(1),
+				ts102141(2)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides the protocol version associated with the remote signalling gateway.  
+		 The version is either rfc3331(1) for RFC 3331 standard behaviour, or ts102141(2) 
+		 for ETSI TS 102 141 behaviour, or interoperable(0) for interoperable behaviour that 
+		 can accomodate both."
+	REFERENCE	"RFC 3331, ETSI TS 102 141"
+	DEFVAL		{ rfc3331(1) }
+	::= { m2uaSgEntry 7 }
+
+m2uaSgOptions OBJECT-TYPE
+	SYNTAX		SigtranOptions
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This represents the overall options associated with the remote SG and follows the 
+		 SigtranOptions textual convention.  Options that are not pertinent to M2UA may be 
+		 ignored.  If the SG supports ASPEXT, the agent will be able to update these options 
+		 after an ASP Up procedure has been established with the SG."
+	::= { m2uaSgEntry 8 }
+
+m2uaSgRegistrationPolicy OBJECT-TYPE
+	SYNTAX		RegistrationPolicy
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"The provide the registration policy of the SG following the RegistrationPolicy 
+		 textual convention."
+	DEFVAL		{ unknown(0) }
+	::= { m2uaSgEntry 9 }
+
+m2uaSgProtocolPayloadId OBJECT-TYPE
+	SYNTAX		INTEGER (0|2)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This column provides the SCTP Protocol Payload Identifier that will be used in 
+		 packet sent on associations to this SG.  The default is the PID assigned to M2UA.  
+		 In accordance with RFC 3331, the value must either be 0 or 2.  The default value is 
+		 2 to assist with protocol analysis."
+	DEFVAL		{ 2 }
+	::= { m2uaSgEntry 10 }
+
+m2uaSgIpPort OBJECT-TYPE
+	SYNTAX		IpPort
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This column provides the IP port number at which to contact the SG.   The default 
+		 is the well known port number for M2UA."
+	DEFVAL		{ 2904 }
+	::= { m2uaSgEntry 11 }
+
+m2uaSgPrimaryIpAddress OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the primary Ip address at which the SG may be contacted.  Secondary 
+		 addresses may also be added in a side table."
+	::= { m2uaSgEntry 12 }
+
+m2uaSgMinOstreams OBJECT-TYPE
+	SYNTAX		INTEGER (2..16384)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the minimun number of outbound streams that must be supported by the 
+		 connection to the SG.  The minimum value is 2 per RFC 3331.  A reasonable default 
+		 is 32."
+	DEFVAL		{ 32 }
+	::= { m2uaSgEntry 13 }
+
+m2uaSgMaxIstreams OBJECT-TYPE
+	SYNTAX		INTEGER (2..16384)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides the maximum number of inbound streams that will be reported when 
+		 forming a connection to the SG.  The minimum value to support RFC 3331 is 2.  The 
+		 value of 32 is a more reasonable default."
+	DEFVAL		{ 32 }
+	::= { m2uaSgEntry 14 }
+
+-- TODO: other primary SCTP protocol parameters for the association 
+-- needd to be included here.
+
+m2uaSgStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides the ability for a management station to add, delete and otherwise 
+		 control the contianing row in the SG table.  read-create columns, with the 
+		 exception of AdministrativeState cannot be changed while the row is in the active 
+		 state.  RowStatus cannot be changed while the row is in the unlocked(1) 
+		 administrative state."
+	REFERENCE	"STD 58"
+	::= { m2uaSgEntry 15 }
+
+
+--
+--  m2uaAspSg  The ASP-SG relation table.
+--
+--  The ASP-SG relation table lists all of the allowable connections 
+--  between ASPs and SG and provides the ASP characeteristic of the 
+--  association.
+--
+
+m2uaAspSgTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M2uaAspSgEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This proivdes the ASP-SG table.  Each entry in this table is a possible SCTP 
+		 association between an ASP and the SG."
+	::= { m2uaAspAspSg 1 }
+
+m2uaAspSgEntry OBJECT-TYPE
+	SYNTAX		M2uaAspSgEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This provides an entry in the ASP-SG table.  When combined with the informatoin in 
+		 the ASP and SG tables, it provides all of the information necessary to form an 
+		 association between the ASP and the SG."
+	INDEX	{
+			m2uaAspIndex,		-- shared
+			m2uaSgIndex		-- shared
+		}
+	::= { m2uaAspSgTable 1 }
+
+M2uaAspSgEntry ::=
+	SEQUENCE {
+		m2uaAspSgAdministrativeState	AdministrativeState,
+		m2uaAspSgProceduralStatus	ProceduralStatus,
+		m2uaAspSgUsageState		UsageState,
+		m2uaAspSgAspState		AspState,
+		m2uaAspSgAspIdPolicy		AspIdPolicy,
+		m2uaAspSgAspId			Unsigned32,
+		m2uaAspSgAssociationPolicy	AssociationPolicy,
+		m2uaAspSgIpPort			IpPort,
+		m2uaAspSgPrimaryIpAddress	IpAddress,
+		mu2aAspSgStatus			RowStatus
+	}
+
+m2uaAspSgAdminstrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides the administrative state of the ASP-SG association, following the 
+		 AdministrativeState textual convention.  The administrative state may be locked(0) 
+		 or unlocked(1).  When locked(0) no association will exist between the ASP and the 
+		 SG.  When unlocked(1), an association may be formed between the ASP and the SG.  
+		 When set to locked(0) from unlocked(1), any SCTP associoation that exists from this 
+		 ASP to the SG will be dropped."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : administrativeState"
+	::= { m2uaAspSgEntry 1 }
+
+m2uaAspSgProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This provides the procedural status of the ASP-SG association, following the 
+		 ProceduralStatus textual convention.  The procedural status is set valued and
+		 may contain initializationRequired(0), notInitialized(1), initializing(2), 
+		 reporting(3), terminating(4).  When initializationRequired(0) is set, no bound 
+		 local association instance (e.g. socket descriptor) exists for the SCTP 
+		 association.  When notInitialized(1) is set, a bound descriptor exists for the SCTP 
+		 association, but no connection attempt has been made on the descriptor.  When 
+		 initializing(3) is set, the SCTP association is connecting.  When terminating(4) is 
+		 set, the SCTP association is shutting down.  When no bits are set, the SCTP 
+		 association is connected."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : proceduralStatus"
+	::= { m2uaAspSgEntry 2 }
+
+m2uaAspSgUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This provides the usage state of the ASP-SG association, following the UsageState 
+		textual convention.  The usage state is on of idle(0), active(1) or busy(2).  When 
+		idle(0), the SCTP association is unable to carry user traffic, when active(1) it is 
+		able to carry user traffic, when busy(2) it is congested with user traffic."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : usageState"
+	::= { m2uaAspSgEntry 3 }
+
+m2uaAspSgAspState OBJECT-TYPE
+	SYNTAX		AspState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides the ASP state for the ASP for the ASP-SG asscociation following the 
+		 AspState textual convention.  When down, the ASP is in the ASP-DOWN state for the 
+		 association or the association does not exist.  When initializing, the ASP is 
+		 performing the ASP Up procedure.  When terminating, the ASP is performing the ASP 
+		 Down procedure.  When up, the ASP is in the ASP-UP state.
+
+		 When the management station sets this column to down from the up state, the ASP 
+		 will execute the ASP Down procedure (but the association will not be dropped).  
+		 When set to up from the downs state, the ASP will execute the ASP Up procedure.  Be 
+		 forewarned that the ASP will attempt to return itself to the previous state.  For a 
+		 stable administrative control, use the AdministrativeState column."
+	REFERENCE	"RFC 3331"
+	::= { m2uaAspSgEntry 4 }
+
+
+m2uaAspSgAspIdPolicy OBJECT-TYPE
+	SYNTAX		AspIdPolicy
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This column provides an ASP Identifier policy to use with the SG when connecting 
+		 from this ASP according to 
+		 the AspIdPolicy textual convention.  The value can be 
+		 permitted(0), forbidden(1) or required(2)."
+	REFERENCE	"RFC 3331 3.3.2.1"
+	::= { m2uaAspSgEntry 5 }
+
+m2uaAspSgAspId OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides the ASP Identifier to be provided to the SG on the ASP Up which 
+		 identifies this ASP to the SG, depending on the value of m2uaAspSgAspIdPolicy."
+	REFERENCE	"RFC 3331 3.3.2.1"
+	DEFVAL		{ 0 }
+	::= { m2uaAspSgEntry 6 }
+
+m2uaAspSgAssociationPolicy OBJECT-TYPE
+	SYNTAX		AssociationPolicy
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides the assocation policy for this SCTP association using the 
+		 AssociationPolicy textual convention.  The policy can be unknown, in which case the 
+		 formation and cessation of SCTP associations is left to the implementation; always, 
+		 the SCTP associations are formed and released under management control; 
+		 ondemand(2), associations are formed when local AS require service and are released 
+		 when there is no local AS requiring service; and other(3) some other implementation 
+		 defined mechanism."
+	DEFVAL		{ unknown(0)}
+	::= { m2uaAspSgEntry 7 }
+
+m2uaAspSgIpPort OBJECT-TYPE
+	SYNTAX		IpPort
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides the port number from which the ASP will connect to the SG.  This is 
+		 for when the SG requires that the ASP identify itself will full transport endpoint 
+		 address.  When set to the reserved value of zero(0), it indicates that the ASP may 
+		 use any port number to connect to the SG."
+	REFERENCE	"RFC 3331 3.3.2.1"
+	DEFVAL		{ 0 }
+	::= { m2uaAspSgEntry 8 }
+
+m2uaAspSgPrimaryIpAddress OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides the primary IP address from which the ASP will connect.  This is for 
+		 the case where the host is multihomed and yet must connect from a specific IP 
+		 address for the SG to identify it.  The default value is the zero address 
+		 indicating that any Ip address may be used to connect."
+	DEFVAL		{ '00000000'X }
+	::= { m2uaAspSgEntry 9 }
+
+m2uaAspSgStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the status used by management stations to create, modify or delete a row.  
+		 Altering ASPId, IpPort and IpAddress on a row in the active state will have no 
+		 effect upon an existing association."
+	::= { m2uaAspSgEntry 10 }
+
+--
+-- m2uaAs  The AS table.
+--
+-- The AS table provides a list of all application servers know to this 
+-- host.
+--
+
+m2uaAsNextIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This proivdes the next available index in the AS table for use by management 
+		 stations when adding rows to this table."
+	REFERENCE	"STD 58"
+	::= { m2uaAspAs 1 }
+
+m2uaAsTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M2uaAsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This provides the AS table.  The AS table is a list of all of the application 
+		 servers known to this host."
+	::= { m2uaAspAs 2 }
+
+m2uaAsEntry OBJECT-TYPE
+	SYNTAX		M2uaAsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is an entry in the AS table."
+	INDEX		{ m2uaAsIndex }
+	::= { m2uaAsTable 1 }
+
+M2uaAsEntry ::=
+	SEQUENCE {
+		m2uaAsIndex			Unsigned32,
+		m2uaAsName			CommonLanguageName,
+		m2uaAsTrafficMode		TrafficMode,
+		m2uaAsAdministrativeState	AdministrativeState,
+		m2uaAsProceduralStatus		ProceduralStatus,
+		m2uaAsUsageState		UsageState,
+		m2uaAsAsState			AsState,
+		mu2aAsStatus			RowStatus
+	}
+
+m2uaAsIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible	-- shared
+	STATUS		current
+	DESCRIPTION
+		"This is the index of the AS table.  This index may also be used as a local 
+		 application server identifier."
+	::= { m2uaAsEntry 1 }
+
+m2uaAsName OBJECT-TYPE
+	SYNTAX		CommonLanguageName
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the name of the application server following COMMON LANGUAGE procedures and 
+		 the CommongLanguageName textual convention.  Names should be derived from the 
+		 COMMON LANGUAGE location identifier identifying the location of the service or 
+		 facility rather than a local identifier.  Note that this is not necessarily the SG 
+		 CLLI as the AS could be served by multiple SGs at different locations."
+	::= { m2uaAsEntry 2 }
+
+m2uaAsTrafficMode OBJECT-TYPE
+	SYNTAX		TrafficMode
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the traffic mode for the application server in all SG that serve the AS, 
+		 following the TrafficMode textual convention."
+	::= { m2uaAsEntry 3 }
+
+m2uaAsAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the administrative state of the AS following AdministrativeState textual 
+		 convention.  The state can be locked(0) or unlocked(1).  When locked(0), the AS 
+		 will be in the AS Down state in all ASPs.  When unlocked(1), the AS may be 
+		 activated for an ASP.  When set to the locked(0) state from the unlocked(1) state 
+		 by a management station, the agent will move the AS to the down AS state for all 
+		 SGs that serve the AS."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : administrativeState"
+	::= { m2uaAsEntry 4 }
+
+m2uaAsProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the procedural status of the AS following the ProceduralStatus textual 
+		 conventions.  The procedural status is a set value which may contain 
+		 initializationReqired(0), notInitialized(1), initializing(2), reporting(3), 
+		 terminating(4).  This value represents the intersection (logical OR) of the 
+		 procedural status of the AS for each SG in which it is served.
+
+		 This is a convenience as the value could be determined by examining the procedural 
+		 status of the AS for each SG which serves it."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : proceduralStatus"
+	::= { m2uaAsEntry 5 }
+
+m2uaAsUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the usage state of the AS following the UsageState textual convention.  The 
+		 usage state may be idle(0), active(1) or busy(2).  When idle(0), the AS is in the 
+		 idle state in all SG serving it.  When active(1), it is in the active state for at 
+		 least one of the SG serving it, and not in the busy state for any SG serving it.  
+		 When busy(2), it is in the busy state for at least one SG serving it."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : usageState"
+	::= { m2uaAsEntry 6 }
+
+m2uaAsAsState OBJECT-TYPE
+	SYNTAX		AsState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the overall AS state of this AS for all SG that serve it. This state is the 
+		 most active state of the states of the individual SG supporting the AS.  If there 
+		 is one ore more SG for which the AS is active(4) then the state is active, 
+		 otherwise if there is one ore more SG in the deactivating(3) state, the state is 
+		 deactivating, otherwise, if there is one or more in the activating(2) state, the state 
+		 is activating, otherwise, one or more inactive(1), inactive, else down(0).
+		 
+		 This is a convenience because the value could be determined by examining the 
+		 individual AS states for each SG; however, the value is required by the agent to 
+		 determine alarm severity."
+	::= { m2uaAsEntry 7 }
+
+m2uaAsStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This object is used to create, modify and delete rows according to the RowStatus 
+		 textual convention."
+	::= { m2uaAsEntry 8 }
+
+
+
+
+--
+-- m2uaIf The IF Table.
+--
+-- The IF table provides a list of all interfaces known to this host.
+--
+
+m2uaIfNextIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This provides the next available index in the IF table for use by management 
+		 stations when adding rows to this table."
+	REFERENCE	"STD 58"
+	::= { m2uaAspIf 1 }
+
+m2uaIfTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M2uaIfEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is the IF table.  It provides a list of all interfaces known to the host."
+	::= { m2uaAspIf 2 }
+
+m2uaIfEntry OBJECT-TYPE
+	SYNTAX		M2uaIfEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is an entry in the IF table."
+	INDEX	{ m2uaIfIndex }
+	::= { m2uaIfTable 1 }
+
+M2uaIfEntry ::=
+	SEQUENCE {
+		m2uaIfIndex			Unsigned32,
+		m2uaIfAsIndex			Unsigned32,
+		m2uaIfIdentifier		Unsigned32,
+		m2uaIfName			CommonLanguageName,
+		m2uaIfStatus			RowStatus
+	}
+
+m2uaIfIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible -- shared
+	STATUS		current
+	DESCRIPTION
+		"This is an index into the IF table."
+	::= { m2uaIfEntry 1 }
+
+
+m2uaIfAsIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides an index into the AS table which identifies the application server to 
+		 which this interface belongs."
+	::= { m2uaIfEntry 2 }
+
+m2uaIfIdentifier OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(1..16))
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides a local physical point of attachment identifiers that identifies the 
+		 interface for the purposes of local binding."
+	::= { m2uaIfEntry 3 }
+
+m2uaIfName OBJECT-TYPE
+	SYNTAX		CommonLanguageName
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides a COMMON LANGUAGE name for the interface folowing the 
+		 CommonLanguageName textual convention that provides a local name of the interface 
+		 for the purposes of local binding."
+	::= { m2uaIfEntry 4 }
+
+m2uaIfStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides a mechanism for management stations to add, modify and delete rows in 
+		 this table according to the RowStatus textual convention."
+	::= { m2uaIfEntry 5 }
+
+--
+--  m2uaAsIf  The AS-IF table.
+--
+--  This table provides the containment relationship between application 
+--  servers and interfaces.  It is a convenience table because 
+--  interfaces are assigned to application server when the interface is 
+--  created.
+--
+
+m2uaAsIfTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M2uaAsIfEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is the AS-IF table that maps interfaces to application servers."
+	::= { m2uaAspAsIf 1 }
+
+m2uaAsIfEntry OBJECT-TYPE
+	SYNTAX		M2uaAsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is an entry in the AS-IF table."
+	INDEX	{
+			m2uaAsIndex,		-- shared
+			m2uaIfIndex		-- shared
+		}
+	::= { m2uaAsIfTable 1 }
+
+M2uaAsIfEntry ::=
+	SEQUENCE {
+	}
+
+--
+--  m2uaSgAs  The SG-AS table.
+--
+--  This table provides a mappoing of AS onto the SG that serve the AS.  
+--  Note that an AS can be served by more than one SG.
+--
+
+m2uaSgAsTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M2uaSgAsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is the SG-AS table that maps AS onto the SG that serve them.  Note that an AS 
+		can be served by more than one SG."
+	::= { m2uaAspSgAs 1 }
+
+m2uaSgAsEntry OBJECT-TYPE
+	SYNTAX		M2uaSgAsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is an entry in the SG-AS table that represents an 
+		 AS served by an SG."
+	INDEX	{
+			m2uaSgIndex,		-- shared
+			m2uaAsIndex		-- shared
+		}
+	::= { m2uaSgAsTable 1 }
+
+M2uaSgAsEntry ::=
+	SEQUENCE {
+		m2uaSgAsOrdering		Unsigned32,
+		m2uaSgAsAdministrativeState	AdministrativeState,
+		m2uaSgAsProceduralStatus	ProceduralStatus,
+		m2uaSgAsUsageState		UsageState,
+		m2uaSgAsAsState			AsState,
+		m2uaSgAsStatus			RowStatus
+	}
+
+m2uaSgAsOrdering OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provides the ordering of the SG serving the AS.  When AS are served by 
+		 multiple SG, they can only serve the AS in an primary-backup fashion.  This 
+		 ordering provides the order in which the SG will be used by the ASP, with low 
+		 values being the first used and then the next higher ordinal.  The ASP will only 
+		 register and activate for one SG at a time.  If the activation procedure fails with 
+		 one SG due to a permanent cause (e.g. failure to establish an SCTP association), 
+		 the next oridinal SG in the list will be attempted.  Once activated with a given 
+		 SG, no attempt will be made to activate with another SG until the current SG fails 
+		 or the AS has been deactivated using the  AsState or
+		 AdministrativeState columns."
+	DEFVAL		{ 0 }
+	::= { m2uaSgAsEntry 1 }
+
+m2uaSgAsAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the administrative state of the AS for the SG, following the 
+		 AdministrativeState textual convention.  When locked(0), the AS will be inactive 
+		 for the SG and any link keys for contained interfaces will be unregistered.  When 
+		 unlocked(1), an ASP may resister a link key for an interface contained by the AS 
+		 and may activate the AS."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : administrativeState"
+	::= { m2uaSgAsEntry 2 }
+
+m2uaSgAsProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is the procedural status of the AS for the SG following the ProceduralStatus 
+		 textual convention.  This is a set value which contains the intersection (logical 
+		 OR) of the AS for this SG in each ASP using the AS.
+		 
+		 This is a convenience as the value could be determined by examining the procedural 
+		 status of the AS for this SG in each of the ASPs using the AS."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : proceduralStatus"
+	DEFVAL		{ '000000'B }
+	::= { m2uaSgAsEntry 3 }
+
+m2uaSgAsUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is the usage state of the AS for the SG following the UsageState textual 
+		 convention.  When idle(0) the AS has a usage state of idle(0) for all ASPs using 
+		 this AS at this SG.  When active(1), the AS is active for at least one ASP-SG 
+		 relation, but is not busy in any ASP-SG relation.  When busy(2), the AS is busy for 
+		 at least one ASP-SG relation."
+	DEFVAL		{ idle(0) }
+	::= { m2uaSgAsEntry 4 }
+
+m2uaSgAsAsState OBJECT-TYPE
+	SYNTAX		AsState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is the overall AS state for the SG, following the AsState textual convention.  
+		 It is the most active states of the individual states for the ASP-SG associations 
+		 for this SG.  If at least one ASP-SG association is in the active state for the AS, 
+		 the state is active; one deactivating, deactivating; one activating, activating; 
+		 one, inactive, inactive; else down.
+
+		 This is a convenience in that the value could be determined by a management station 
+		 by examining the individual states of the AS in each ASP-SG relation, however, the 
+		 value is necessary for the agent to determine the correct severity level for 
+		 alarms."
+	DEFVAL		{ down(0) }
+	::= { m2uaSgAsEntry 5 }
+
+
+m2uaSgAsStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This provide a mechanism for management stations to add, modify and delete rows 
+		 from this table.  To add rows, the associated index values must exist in their 
+		 primary tables.  To delete a row, the entry must be in the locked(0) administrative 
+		 state."
+	::= { m2uaSgAsEntry 6 }
+
+--
+-- m2uaAspAs    The ASP AS table.
+--
+-- This tale provides a mapping of which AS are served to which ASPs.
+--
+
+m2uaAspAsTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M2uaAspAsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This provides the ASP AS table that provides the state of the AS at each ASP to 
+		which it is served."
+	::= { m2uaAspAspAs 1 }
+
+m2uaAspAsEntry OBJECT-TYPE
+	SYNTAX		M2uaAspAsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is an entry in the ASP AS table."
+	INDEX	{
+			m2uaAspIndex,	-- shared
+			m2uaAsIndex	-- shared
+		}
+	::= { m2uaAspAsTable 1 }
+
+M2uaAspAsEntry ::=
+	SEQUENCE {
+		m2uaAspAsAdministrativeState	AdministrativeState,
+		m2uaAspAsProceduralStatus	ProceduralStatus,
+		m2uaAspAsUsageState		UsageState,
+		m2uaAspAsAsState		AsState,
+		m2uaAspAsStatus			RowStatus
+	}
+
+m2uaAspAsAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	"ITU-T Rec. X.721 (1992) : administrativeState"
+	DEFVAL		{ locked(0) }
+	::= { m2uaAspAsEntry 1 }
+
+m2uaAspAsProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	"ITU-T Rec. X.721 (1992) : proceduralStatus"
+	DEFVAL		{ '000000'B }
+	::= { m2uaAspAsEntry 2 }
+
+m2uaAspAsUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	"ITU-T Rec. X.721 (1992) : usageState"
+	DEFVAL		{ idle((0) }
+	::= { m2uaAspAsEntry 3 }
+
+m2uaAspAsAsState OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the overall AS state for the AS as used by this ASP.  This is the reverse 
+		 direction of view from most of the AS states: it is the state of the local AS within 
+		 the host as viewed from the ASP instead of the state within the SG as viewed from 
+		 the ASP.
+
+		 When down(0), there is no local AS bound to the interfaces, when inactive, there is 
+		 a local AS bound to the interace, when activating, there is a local AS activating 
+		 for the interface, when deactivating, the local AS is deactivating the interface, 
+		 and when active, there is a local AS active for the interface.
+
+		 When a management station sets this state to down(0) from other than the down 
+		 state, the local AS is hung up.  When a management station sets the state to 
+		 inactive from the active state, the local AS is deactivated an informed.  Note that 
+		 these are not long term measures: see the AdministrativeState textual convention in 
+		 this row for lasting effects."
+	::= { m2uaAspAsEntry 4 }
+
+m2uaAspAsStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { m2uaAspAsEntry 5 }
+
+
+--
+-- m2uaAspSgAs  The ASP-SG-AS table.
+--
+-- This table provides the state of each AS for each ASP-SG association.
+--
+
+m2uaAspSgAsTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M2uaAspSgAsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This provides the ASP-SG-AS table that provides the state of each AS for each 
+		 ASP-SG association."
+	::= { m2uaAspAspSgAs 1 }
+
+m2uaAspSgAsEntry OBJECT-TYPE
+	SYNTAX		M2uaAspSgAsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This provides an entry in the ASP-SG AS table."
+	INDEX	{
+			m2uaAspIndex,	-- shared
+			m2uaSgIndex,	-- shared
+			m2uaAsIndex	-- shared
+		}
+	::= { m2uaAspSgAsTable 1 }
+
+M2uaAspSgAsEntry ::=
+	SEQUENCE {
+		m2uaAspSgAsAdministrativeState	AdministrativeState,
+		m2uaAspSgAsProceduralState	ProceduralState,
+		m2uaAspSgAsUsageState		UsageState,
+		m2uaAspSgAsAsState		AsState
+	}
+
+m2uaAspSgAsAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"This provides the administrative state of the AS for the ASP-SG association 
+		 following the AdministrativeState textual convention.  When locked(0), the ASP will 
+		 deactivate the AS and deregister any link keys registered for the contained 
+		 interfaces.  When unlocked(1), the ASP will be permitted to register link keys for 
+		 the contained interfaces and activate the AS."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : administrativeState"
+	::= { m2uaAspSgAsEntry 1 }
+
+m2uaAspSgAsProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This provides the procedural status of the AS for the ASP-SG association.  When the 
+		 procedural status contains initializationRequired, the AS has not yet had link keys 
+		 for its contained interfaces registered and registration is required.  When it 
+		 contains notInitialized, the AS is inactive.  When it contains initializting, the 
+		 ASP Active procedure is being performed for the AS.  When it contains terminating, 
+		 the ASP Inactive procedure is being performed for the AS."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : proceduralStatus"
+	::= { m2uaAspSgAsEntry 2 }
+
+m2uaAspSgAsUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This provides the usage state of the AS for the ASP-SG association following the 
+		 UsageState textual convention.  When idle(0), the AS is down or inactive for the 
+		 ASP-SG association.  When active(1), the AS is active for the ASP-SG association.  
+		 When busy(2), the AS is active an experiencing congestion for the ASP-SG 
+		 association."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : usageState"
+	::= { m2uaAspSgAsEntry 3 }
+
+m2uaAspSgAsAsState OBJECT-TYPE
+	SYNTAX		AsState
+	MAX-ACCESS	read-write
+	STATUS
+		"This provides the AS state for the ASP-SG association following the AsState textual 
+		 convention.  The AS statis is down(0) when the ASP has not completed an ASP Up 
+		 procedure or has completed an ASP Down procedure.  Also, the ASP may be up but the 
+		 AS has not completed registering its contained interfaces and regisration is 
+		 required.  When inactive, the AS is inactive.  When activating, the ASP is 
+		 performing the ASP Active procedure for the AS.  WHen deactivating, the ASP is 
+		 performing the ASP Inactive procedure for the AS.  When active, the AS is active 
+		 for the ASP-SG association.
+
+		 When a management station sets this column to down(0) from any other state, the ASP 
+		 will deactivate and deregister the AS.  When a management station sets this column 
+		 to inactive(1) from any other state, the ASP will deactivate or register the AS.  
+		 When set to active, the ASP will regiseter and activate the AS as requilred."
+	REFERENCE	"RFC 3331"
+	::= { m2uaAspSgAsEntry 4 }
+
+
+
+
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi
