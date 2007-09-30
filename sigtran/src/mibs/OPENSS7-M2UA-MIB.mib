@@ -68,7 +68,7 @@ IMPORTS
 		FROM SNMPv2-CONF
 	AdministrativeState, OperationalState
 		FROM OPENSS7-TMN-TC
-	OpenSS7Modules
+	openss7Modules
 		FROM OPENSS7-SMI
 	CommonLanguageName
 		FROM OPENSS7-TC
@@ -92,7 +92,7 @@ M2uaMIB MODULE-IDENTITY
 		 E-Mail: bidulock@openss7.org"
 	DESCRIPTION
 		"MIB Module for SIGTRAN M2UA management."
-	::= { OpenSS7Modules 22 }
+	::= { openss7Modules 22 }
 
 -- Top-level structure of the MIB
 
