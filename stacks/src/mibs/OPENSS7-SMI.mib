@@ -1,0 +1,51 @@
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi
+
+OPENSS7-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+		FROM SNMPv2-SMI;
+
+openss7 MODULE-IDENTITY
+	LAST-UPDATED	"200709250000Z"
+	ORGANIZATION	"OpenSS7 Corporation"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta T6L 6T1
+		 Canada
+
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 E-Mail: bidulock@openss7.org"
+	DESCRIPTION
+		"MIB Module for SIGTRAN M2UA ASP management."
+	::= { enterprises 29591 } -- 29591 assigned by IANA
+
+-- Uppermost arcs of the OpenSS7 tree.
+
+openss7MIBs OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This is the arc under which OpenSS7 MIBS are defined."
+	::= { openss7 1 }
+
+openss7Modules OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This is the arc under which individual MIB modules are 
+		 registered."
+	::= { openss7MIBs 1 }
+
+--  FIXME: document mib assigned values, at least as comments
+
+openss7Capabilities OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This is the arg under which OpenSS7 agent capabilities 
+		 are registered."
+	::= { openss7MIBs 2 }
+
+END
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi

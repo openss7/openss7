@@ -61,10 +61,10 @@ OPENSS7-SS7-TC DEFINITIONS ::= BEGIN
 IMPORTS
 	MODULE-IDENTITY
 		FROM SNMPv2-SMI
-	OpenSS7Modules
+	openss7Modules
 		FROM OPENSS7-SMI;
 
-Ss7TC MODULE-IDENTITY
+ss7TC MODULE-IDENTITY
 	LAST-UPDATED	"200709260000Z"
 	ORGANIZATION
 		"OpenSS7 Corporation"
@@ -80,7 +80,7 @@ Ss7TC MODULE-IDENTITY
 		 E-mail: bidulock@openss7.org"
 	DESCRIPTION
 		""
-	::= { OpenSS7Modules 5 }
+	::= { openss7Modules 5 }
 
 Ss7LoadShareAlgorithm ::= TEXTUAL-CONVENTION
 	STATUS		current
@@ -250,4 +250,5 @@ MtpUserPart ::= TEXTUAL-CONVENTION
 		}
 
 
+END
 -- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi

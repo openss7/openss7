@@ -56,6 +56,33 @@
 --
 -- =============================================================================
 
+OPENSS7-MTP-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SMNPv2-SMI
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	openss7Modules
+		FROM OPENSS7-SMI;
+
+mtpTC MODULE-IDENTITY
+	LAST-UPDATED	"200709290000Z"
+	ORGANIZATION	"OpenSS7 Corporation"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta T6L 6T1
+		 Canada
+
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 E-mail: bidulock@openss7.org"
+	DESCRIPTION
+		"Textual conventions for MTP."
+	::= { openss7Modules 2 }
+
 MtpAvailabilityStatus ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
@@ -100,4 +127,5 @@ MtpOptions ::= TEXTUAL-CONVENTION
 			linkOscillationB(5)
 		}
 
+END
 -- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi
