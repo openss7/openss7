@@ -1,3 +1,133 @@
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under
+-- the terms of the GNU General Public License as published by the Free Software
+-- Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+-- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU General Public License along with
+-- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+-- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+OPENSS7-SIGTRAN-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	openss7Modules
+		FROM OPENSS7-SMI;
+
+sigtranTC MODULE-IDENTITY
+	LAST-UPDATED	"200709300514Z"
+	ORGANIZATION	"OpenSS7 Corporation"
+	CONTACT-INFO	"The OpenSS7 Project
+			 c/o Brian Bidulock
+			 OpenSS7 Corporation
+			 1469 Jefferys Crescent
+			 Edmonton, Alberta
+			 Canada  T6L 6T1
+			 Tel: +1 780 490 1141
+			 Fax: +1 780 490 1241
+			 Mob: +1 780 953 0667
+			 E-Mail: bidulock@openss7.org"
+	DESCRIPTION	"Provides textual conventions for common SIGTRAN subtypes."
+	::= { openss7Modules 10 }
+
+sigtranTrafficMode		OBJECT IDENTIFIER ::= { sigtranTC	 1 }
+sigtranProtocolVersion		OBJECT IDENTIFIER ::= { sigtranTC	 2 }
+
+ProtocolVersion ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This is a tetual convention that provides a prtoocol version for a SIGTRAN 
+		 implementation of an adaptation layer.  It can take on the values of 
+		 interoperable, or a value based on a protocol standard for the UA."
+	SYNTAX		OBJECT IDENTIFIER
+
+interoperableVersion ::= OBJECT-IDENTITY
+	SYNTAX		current
+	DESCRIPTION	"This is the interoperable version of the SIGTRAN UA and can be used to 
+			 refer to a universally interoperable version of any of the the SIGTRAN 
+			 UAs."
+	::= { sigtranProtocolVersion 1 }
+
+rfc3332Version OBJECT-IDENTITY
+	SYNTAX		current
+	DESCRIPTION	"This is a version which supports M3UA as specified in RFC 3332."
+	REFERENCE	"RFC 3332"
+	::= { sigtranProtocolVersion 2 }
+
+ts102142Version OBJECT-IDENTITY
+	SYNTAX		current
+	DESCRIPTION	"This is a version which supports M3UA as specified in RFC 3332 and ETSI 
+			 ETS 102 142."
+	REFERENCE	"RFC 3332, ETSI TS 102 142"
+	::= { sigtranProtocolVersion 2 }
+
+rfc4666Version OBJECT-IDENTITY
+	SYNTAX		current
+	DESCRIPTION	"This is a version which supports M3UA as specified in RFC 4666."
+	REFERENCE	"RFC 4666"
+	::= { sigtranProtocolVersion 3 }
+
+rfc3331Version OBJECT-IDENTITY
+	SYNTAX		current
+	DESCRIPTION	"This is a version which supports M2UA as specified in RFC 3331."
+	REFERENCE	"RFC 3331"
+	::= { sigtranProtocolVersion 4 }
+
+ts102141Version OBJECT-IDENTITY
+	SYNTAX		current
+	DESCRIPTION	"This is a version which supports M2UA as specified in RFC 3331 and ETSI 
+			 TS 102 141."
+	REFERENCE	"RFC 3331, ETSI TS 102 141"
+	::= { sigtranProtocolVersion 5 }
 
 TrafficMode ::= TEXTUAL-CONVENTION
 	STATUS		current
@@ -6,7 +136,6 @@ TrafficMode ::= TEXTUAL-CONVENTION
 		 adaptation layer.  It can take on values of activeStandby, loadShare or broadCast,
 		 or an implementation defined type."
 	SYNTAX		AutonomousType
-	::= { sigtranTC 1 }
 
 activeStandby OBJECT-IDENTITY
 	STATUS		current
@@ -29,96 +158,90 @@ broadCast OBJECT-IDENTITY
 RegistrationPolicy TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This is a  textual convention that provides a registration policy for SIGTRAN user
-		 adaptation layers.  It can take on values of forbidden, permitted or required.
+		"This is a  textual convention that provides a registration policy for SIGTRAN 
+		 user adaptation layers.  It can take on values of forbidden, permitted or 
+		 required.
 		
-		 When forbidden, at an SG, the SG will not permit an ASP to dynamically register a
-		 link or routing key associated with an AS; at an ASP, the ASP will not attempt to
-		 dynamically register a link or routing key associated with an AS.
+		 When forbidden, at an SG, the SG will not permit an ASP to dynamically register 
+		 a link or routing key associated with an AS; at an ASP, the ASP will not 
+		 attempt to dynamically register a link or routing key associated with an AS.
 		
-		 When permitted, at an SG, the SG will permit, but not require, an ASP to register a
-		 link or routing key before activating the associated AS using its IID or RC; at an
-		 ASP, the ASP will only attempt to dynamically register a link or routing key when
-		 it has not been provisioned with an IID or RC value for the AS.
+		 When permitted, at an SG, the SG will permit, but not require, an ASP to 
+		 register a link or routing key before activating the associated AS using its 
+		 IID or RC; at an ASP, the ASP will only attempt to dynamically register a link 
+		 or routing key when it has not been provisioned with an IID or RC value for the 
+		 AS.
 		
-		 When required, at an SG, the SG will require an ASP to register a link or routing
-		 key before activating the asscoiated AS using its IID or RC; at an ASP, the ASP
-		 will dynamically register a link or routing key even when it knows the IID or RC
-		 value from configuration data."
+		 When required, at an SG, the SG will require an ASP to register a link or 
+		 routing key before activating the asscoiated AS using its IID or RC; at an ASP, 
+		 the ASP will dynamically register a link or routing key even when it knows the 
+		 IID or RC value from configuration data."
 	SYNTAX		INTEGER {
-				unknown(0),
-				forbidden(1),
-				permitted(2),
-				required(3)
+				unknown(1),
+				forbidden(2),
+				permitted(3),
+				required(4)
 			}
-	::= { sigtranTC 2 }
 
 AspState ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This is a textual convention that provides ASP state at an SG or ASP.  When down,
-		 the ASP has not initiated an ASP Up procedure or has completed an ASP Down
-		 procedure; when initializing, the ASP is executing the ASP Up procedure; when
-		 terminating, the ASP is executing the ASP Down procedure, and when up, the ASP has
-		 completed the ASP Up procedure."
+		"This is a textual convention that provides ASP state at an SG or ASP.  When 
+		 down, the ASP has not initiated an ASP Up procedure or has completed an ASP 
+		 Down procedure; when initializing, the ASP is executing the ASP Up procedure; 
+		 when terminating, the ASP is executing the ASP Down procedure, and when up, the 
+		 ASP has completed the ASP Up procedure."
 	SYNTAX		INTEGER {
-				down(0),
-				initializing(1),
-				terminating(2),
-				up(3)
+				down(1),
+				initializing(2),
+				terminating(3),
+				up(4)
 			}
-	::= { sigtranTC 2 }
 
 AsState ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This is a textual convention that provides AS state at an SG or ASP.  When down,
-		 the ASP has not completed an ASP Up procedure or has completed an ASP Down
-		 procedure.  When inactive an ASP has completed an ASP Up procedure or has completed
-		 an ASP Inactive procedure.  When activating, an ASP is performing an ASP Active
-		 procedure.  When deactivating, and ASP is performing an ASP Inactive procedure.
-		 When active and ASP has completed an ASP Active procedure."
+		"This is a textual convention that provides AS state at an SG or ASP.  When 
+		 down, the ASP has not completed an ASP Up procedure or has completed an ASP 
+		 Down procedure.  When inactive an ASP has completed an ASP Up procedure or has 
+		 completed an ASP Inactive procedure.  When activating, an ASP is performing an 
+		 ASP Active procedure.  When deactivating, and ASP is performing an ASP Inactive 
+		 procedure.  When active and ASP has completed an ASP Active procedure."
 	SYNTAX		INTEGER {
-				down(0),
-				initializing(1),
-				terminating(2),
-				inactive(3),
-				activating(4),
-				deactivating(5),
-				active(6)
+				down(1),
+				initializing(2),
+				terminating(3),
+				inactive(4),
+				activating(5),
+				deactivating(6),
+				active(7)
 			}
-	::= { sigtranTC 3 }
 
 InterfaceIdentifier ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This is the integer interface identifier (IID) used by
-		 IUA, V5UA and M2UA.  This identifier uniquely
-		 identifies an interface (D-channel, V5.2 control
-		 channel, signalling link) at an SG.  This value should
-		 never be zero for practical reasons."
+		"This is the integer interface identifier (IID) used by IUA, V5UA and M2UA.  
+		 This identifier uniquely identifies an interface (D-channel, V5.2 control 
+		 channel, signalling link) at an SG.  This value should never be zero for 
+		 practical reasons."
 	SYNTAX		INTEGER (1..4294967295)
-	::= { sigtranTC 4 }
 
 InterfaceIdentifierText ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This is the text-based interface identifier (Text-IID)
-		 use IUA, V5UA and M2UA.  This identifier uniquely
-		 identifies an interface (D-channel, V5.2 control
-		 channel, signalling link) at an SG.  This value must
-		 not be a NULL string, for practical reasons.  The
-		 alphabet is ANSI X3.4-1986 (ASCII).  For practical
-		 reasons, the string should not contain control
-		 characters, nor leading not trailing whitespace."
+		"This is the text-based interface identifier (Text-IID) use IUA, V5UA and M2UA.  
+		 This identifier uniquely identifies an interface (D-channel, V5.2 control 
+		 channel, signalling link) at an SG.  This value must not be a NULL string, for 
+		 practical reasons.  The alphabet is ANSI X3.4-1986 (ASCII).  For practical 
+		 reasons, the string should not contain control characters, nor leading not 
+		 trailing whitespace."
 	SYNTAX		OCTET STRING (1..255)
-	::= { sigtranTC 5 }
 
 SigtranOptions ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This text convention provides options associated with 
-		 Application Server Processes or Signalling Gateways.  
+		"This text convention provides options associated with Application Server 
+		 Processes or Signalling Gateways.  
 
 		 When the aspext(0) bit is set, the ASP/SG supports 
 		 draft-bidulock-sigtran-aspext.
@@ -158,62 +281,52 @@ SigtranOptions ::= TEXTUAL-CONVENTION
 				aspcong(8),
 				textiid(9)
 			}
-	::= { sigtranTC 6 }
 
 AspIdPolicy ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This textual convention provides a policy for the ASP 
-		 Identifier option for SIGTRAN UAs.
+		"This textual convention provides a policy for the ASP Identifier option for 
+		SIGTRAN UAs.
 		 
-		 When permitted(0), the ASP will provide an ASP 
-		 identifier when the SGP indicates that one is required 
-		 but will first attempt ASP Up procedures without one.  
-		 The SGP will accept an ASP Identifier but will not 
-		 require one.
+		 When permitted(2), the ASP will provide an ASP identifier when the SGP 
+		 indicates that one is required but will first attempt ASP Up procedures without 
+		 one.  The SGP will accept an ASP Identifier but will not require one.
 
-		 When required(1), the ASP will always provide an ASP 
-		 Identifier and the SGP will always require one.
+		 When required(3), the ASP will always provide an ASP Identifier and the SGP 
+		 will always require one.
 		 
-		 When forbidden(2), the ASP will not provide an ASP 
-		 Identifier and the SGP will ignore any provided ASP 
-		 Identifier."
+		 When forbidden(4), the ASP will not provide an ASP Identifier and the SGP will 
+		 ignore any provided ASP Identifier."
 	SYNTAX		INTEGER {
-				unknown(0),
-				permitted(1),
-				required(2),
-				forbidden(3),
+				unknown(1),
+				permitted(2),
+				required(3),
+				forbidden(4),
 			}
-	::= { sigtranTC 7 }
 
 AssociationPolicy ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This textual convention determines the policy with 
-		 regard to forming and dropping SCTP associations.  
-		 There are three policies described here:
+		"This textual convention determines the policy with regard to forming and 
+		 dropping SCTP associations.  There are three policies described here:
 
-		 unknown(0) means that the decision as to when to form 
-		 and relase SCTP assocations is left to the 
-		 implemenation.
+		 unknown(1) means that the decision as to when to form and release SCTP 
+		 assocations is left to the implemenation.
 
-		 always(1) means that SCTP associations are formed 
-		 whenever they are able to be formed.  SCTP association 
-		 stay connected until they are explicitly disabled.
+		 always(2) means that SCTP associations are formed whenever they are able to be 
+		 formed.  SCTP association stay connected until they are explicitly disabled.
 
-		 ondemand(2) means that SCTP associations are formed 
-		 only when they are needed, that is, whenever there is a 
-		 local AS that attempts to activate and is served by an 
-		 SG.  When there is no longer any local AS for the 
-		 association, the SCTP asslocation is shut down.
+		 ondemand(3) means that SCTP associations are formed only when they are needed, 
+		 that is, whenever there is a local AS that attempts to activate and is served 
+		 by an SG.  When there is no longer any local AS for the association, the SCTP 
+		 asslocation is shut down.
 
-		 other(3) is intended to handle some other 
-		 implementation specific method."
+		 other(3) is intended to handle some other implementation specific method."
 	SYNTAX		INTEGER {
-				unknown(0),
-				always(1),
-				ondemand(2),
-				other(3)
+				unknown(1),
+				always(2),
+				ondemand(3),
+				other(4)
 			}
 
 RestorationPolicy ::= TEXTUAL-CONVENTION
@@ -230,32 +343,34 @@ RestorationPolicy ::= TEXTUAL-CONVENTION
 		 Association osciallation filtering is a local procedure.  Five procedures are 
 		 optionally provided:
 
-		 manual(0), provides manual association restoration to and removal from service 
+		 manual(1), provides manual association restoration to and removal from service 
 		 only (management action is required and no automatic restoration is attempted);
 
-		 simple(1), provides association oscillation filtering based on ITU-T Q.704 link 
+		 simple(2), provides association oscillation filtering based on ITU-T Q.704 link 
 		 oscillation filtering procedures and uses two timers, T17;
 
-		 procedureA(2), provides association oscillation filtering based on ANSI 
+		 procedureA(3), provides association oscillation filtering based on ANSI 
 		 T1.111.4 link osciallation procedure A and uses one timer, T32A;
 
-		 procedureB(3), provides association oscillation filtering based on ANSI 
+		 procedureB(4), provides association oscillation filtering based on ANSI 
 		 T1.111.4 link oscilation procedure B and uses two timers, T33A and T34A; and,
 
-		 other(4), provides an implementation dependent link oscillation procedure based 
+		 other(5), provides an implementation dependent link oscillation procedure based 
 		 on implementation defined parameters.
 
 		 Note that one timer, T19A, is applicable to all automatic restoration 
-		 procedures, simple(1), procedureA(2), procedureB(3) and other(4)."
+		 procedures, simple(2), procedureA(3), procedureB(4) and other(5)."
 	REFERENCE
 		"ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
 	SYNTAX	INTEGER {
-			manual(0),
-			simple(1),
-			procedureA(2),
-			procedureB(3),
-			other(4)
+			manual(1),
+			simple(2),
+			procedureA(3),
+			procedureB(4),
+			other(5)
 		}
 		
 
--- vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+END
+
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi

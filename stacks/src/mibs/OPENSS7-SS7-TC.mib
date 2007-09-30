@@ -249,6 +249,18 @@ MtpUserPart ::= TEXTUAL-CONVENTION
 			mtup(8)
 		}
 
+Ss7ProtocolVariant ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This textual convetion provides the SS7 protocol variant as an object 
+		 identifier.  The object identifiers used as a value for this convention must be 
+		 defined with an OBJECT-IDENTITY macro definition.  The DESCRIPTION of the 
+		 definition should identify that the the object identifier is intended for use 
+		 with this textual convention.  The OPENSS7-SS7-MIB defines a number of object 
+		 for identifying ITU-T, ETSI, ANSI, JTTC and PNOC that may be used; however, any 
+		 object identity that is known to the agent may be used, including private 
+		 protocol definitions within enterprise MIBS."
+	SYNTAX	OBJECT IDENTIFIER
 
 END
 -- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi

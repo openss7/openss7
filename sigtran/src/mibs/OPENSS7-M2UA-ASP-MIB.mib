@@ -59,7 +59,7 @@
 OPENSS7-M2UA-ASP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	OpenSS7Modules
+	openss7Modules
 		FROM OPENSS7-SMI
 
 M2uaAspMIB MODULE-IDENTITY
@@ -77,7 +77,7 @@ M2uaAspMIB MODULE-IDENTITY
 		 E-Mail: bidulock@openss7.org"
 	DESCRIPTION
 		"MIB Module for SIGTRAN M2UA ASP management."
-	::= { OpenSS7Modules 21 }
+	::= { openss7Modules 21 }
 
 -- Top-level structure of the MIB
 

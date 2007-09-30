@@ -61,7 +61,10 @@ OPENSS7-M3UA-ASP-MIB DEFINITIONS ::= BEGIN
 IMPORTS
 	MtpOptions, MtpAvailabilityStatus
 		FROM OPENSS7-MTP-TC
-	OpenSS7Modules
+	ProtocolVersion, SigtranOptions, RegistrationPolicy, AspIdPolicy, AssociationPolicy, 
+	AspState
+		FROM OPENSS7-SIGTRAN-TC
+	openss7Modules
 		FROM OPENSS7-SMI;
 
 M2uaAspMIB MODULE-IDENTITY
@@ -109,7 +112,7 @@ M2uaAspMIB MODULE-IDENTITY
 		 MTP model.
 
 		"
-	::= { OpenSS7Modules 31 }
+	::= { openss7Modules 31 }
 
 -- Top-level structure of the MIB
 
@@ -185,15 +188,15 @@ M3uaAspEntry ::=
 		m3uaAspUsageState
 			UsageState,
 		m3uaAspState
-			AspState,
+			AspState, -- OPENSS7-SIGTRAN-TC
 		m3uaAspCapabilities
-			SigtranOptions,
+			SigtranOptions, -- OPENSS7-SIGTRAN-TC
 		m3uaAspIdPolicy
-			AspIdPolicy,
+			AspIdPolicy, -- OPENSS7-SIGTRAN-TC
 		m3uaAspRegistrationPolicy
-			RegistrationPolicy,
+			RegistrationPolicy, -- OPENSS7-SIGTRAN-TC
 		m3uaAspAssociationPolicy
-			AssociationPolicy,
+			AssociationPolicy, -- OPENSS7-SIGTRAN-TC
 		m3uaAspStatus
 			RowStatus
 	}
@@ -249,7 +252,7 @@ m3uaAspUsageState OBJECT-TYPE
 	::= { m3uaAspEntry 2 }
 
 m3uaAspState OBJECT-TYPE
-	SYNTAX		AspState
+	SYNTAX		AspState -- OPENSS7-SIGTRAN-TC
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
@@ -259,7 +262,7 @@ m3uaAspState OBJECT-TYPE
 	::= { m3uaAspEntry 3 }
 
 m3uaAspCapabilities OBJECT-TYPE
-	SYNTAX		SigtranOptions
+	SYNTAX		SigtranOptions -- OPENSS7-SIGTRAN-TC
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -268,7 +271,7 @@ m3uaAspCapabilities OBJECT-TYPE
 	::= { m3uaAspEntry 4 }
 
 m3uaAspIdPolicy OBJECT-TYPE
-	SYNTAX		AspIdPolicy
+	SYNTAX		AspIdPolicy -- OPENSS7-SIGTRAN-TC
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -277,7 +280,7 @@ m3uaAspIdPolicy OBJECT-TYPE
 	::= { m3uaAspEntry 5 }
 
 m3uaAspRegistrationPolicy OBJECT-TYPE
-	SYNTAX		RegistrationPolicy
+	SYNTAX		RegistrationPolicy -- OPENSS7-SIGTRAN-TC
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -287,7 +290,7 @@ m3uaAspRegistrationPolicy OBJECT-TYPE
 	::= { m3uaAspEntry 6 }
 
 m3uaAspAssociationPolicy OBJECT-TYPE
-	SYNTAX		AssociationPolicy
+	SYNTAX		AssociationPolicy -- OPENSS7-SIGTRAN-TC
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -340,14 +343,14 @@ M3uaAspAgEntry ::=
 	SEQUENCE {
 		m3uaAspAgIndex
 			Unsigned32,
-		m3uaAspAgVersion
-			INTEGER,
+		m3uaAspAgProtocolVersion
+			ProtocolVersion,	-- OPENSS7-SIGTRAN-TC
 		m3uaAspAgOptions
-			SigtranOptions,
+			SigtranOptions,		-- OPENSS7-SIGTRAN-TC
 		m3uaAspAgRegistrationPolicy
-			RegistrationPolicy,
+			RegistrationPolicy,	-- OPENSS7-SIGTRAN-TC
 		m3uaAspAgAspIdPolicy
-			AspIdPolicy,
+			AspIdPolicy,		-- OPENSS7-SIGTRAN-TC
 		m3uaAspAgAspProtocolPayloadId
 			INTEGER,
 		m3uaAspAgIpPort
@@ -383,13 +386,8 @@ m3uaAspAgIndex OBJECT-TYPE
 		 groupings of SG."
 	::= { m3uaAspAgEntry 1 }
 
-m3uaAspAgVersion OBJECT-TYPE
-	SYNTAX		INTEGER {
-				interoperable(0),
-				rfc3332(1),
-				ts102142(2),
-				rfc4666(3)
-			}
+m3uaAspAgProtocolVersion OBJECT-TYPE
+	SYNTAX		ProtocolVersion -- OPENSS7-SIGTRAN-TC
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -402,7 +400,7 @@ m3uaAspAgVersion OBJECT-TYPE
 	::= { m3uaAspAgEntry 2 }
 
 m3uaAspAgOptions OBJECT-TYPE
-	SYNTAX		SigtranOptions
+	SYNTAX		SigtranOptions -- OPENSS7-SIGTRAN-TC
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -415,7 +413,7 @@ m3uaAspAgOptions OBJECT-TYPE
 	::= { m3uaAspAgEntry 3 }
 
 m3uaAspAgRegistrationPolicy OBJECT-TYPE
-	SYNTAX		RegistrationPolicy
+	SYNTAX		RegistrationPolicy -- OPENSS7-SIGTRAN-TC
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -424,7 +422,7 @@ m3uaAspAgRegistrationPolicy OBJECT-TYPE
 	::= { m3uaAspAgEntry 4 }
 
 m3uaAspAgAspIdPolicy OBJECT-TYPE
-	SYNTAX		AspIdPolicy
+	SYNTAX		AspIdPolicy -- OPENSS7-SIGTRAN-TC
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -724,7 +722,7 @@ M3uaAspSgEntry ::=
 		m3uaAspSgUsgageState
 			UsageState,
 		m3uaAspSgAspState
-			AspState,
+			AspState, -- OPENSS7-SIGTRAN-TC
 		m3uaAspSgMaxInitRetrans
 			Unsigned32,
 		m3uaAspSgMaxPathRetrans
@@ -832,7 +830,7 @@ m3uaAspSgUsgageState OBJECT-TYPE
 	::= { m3uaAspSgEntry 6 }
 
 m3uaAspSgAspState OBJECT-TYPE
-	SYNTAX		AspState
+	SYNTAX		AspState -- OPENSS7-SIGTRAN-TC
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1337,7 +1335,7 @@ M3uaAspSgpEntry ::=
 		m3uaAspSgpUsageState
 			UsageState,
 		m3uaAspSgpAspState
-			AspState,
+			AspState, -- OPENSS7-SIGTRAN-TC
 		m3uaAspSgpPrimaryAddress
 			IpAddress,
 		m3uaAspSgpHostName
@@ -1417,7 +1415,7 @@ m3uaAspSgpUsageState OBJECT-TYPE
 	::= { m3uaAspSgpEntry 6 }
 
 m3uaAspSgpAspState OBJECT-TYPE
-	SYNTAX		AspState
+	SYNTAX		AspState -- OPENSS7-SIGTRAN-TC
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -2688,7 +2686,7 @@ M3uaAspRcEntry ::=
 		m3uaAspRcValue
 			Unsigned32,
 		m3uaAspRcRegistrationPolicy
-			RegistrationPolicy,
+			RegistrationPolicy, -- OPENSS7-SIGTRAN-TC
 		m3uaAspRcTrafficMode
 			TrafficMode,
 		m3uaAspRcStatus
@@ -2707,7 +2705,7 @@ m3uaAspRcValue OBJECT-TYPE
 	::= { m3uaAspRcEntry 1 }
 
 m3uaAspRcRegstrationPolicy OBJECT-TYPE
-	SYNTAX		RegistrationPolicy
+	SYNTAX		RegistrationPolicy -- OPENSS7-SIGTRAN-TC
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
