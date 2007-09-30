@@ -61,12 +61,12 @@ OPENSS7-TMN-SMI DEFINITIONS ::= BEGIN
 IMPORTS
 	MODULE-IDENTITY
 		FROM SNMPv2-SMI
-	OpenSS7Modules
+	openss7Modules
 		FROM OPENSS7-SMI
 	ProbableCause
 		FROM OPENSS7-TMN-TC;
 
-TmnMIB MODULE-IDENTITY
+tmnMIB MODULE-IDENTITY
 	LAST-UPDATED	"200709250000Z"
 	ORGANIZATION
 		"OpenSS7 Corporation"
@@ -83,15 +83,15 @@ TmnMIB MODULE-IDENTITY
 	DESCRIPTION
 		"This is a basic MIB module providing definitions of 
 		 objects based on the TMN (ITU-T Rec. X.721 (1992))."
-	::= { OpenSS7Modules 4 }
+	::= { openss7Modules 4 }
 
 --
 -- Top level organization of the MIB
 --
 
-tmnNotifications	OBJECT IDENTIFIER ::= { TmnMIB		 0 }
-tmnObjects		OBJECT IDENTIFIER ::= { TmnMIB		 1 }
-tmnConformance		OBJECT IDENTIFIER ::= { TmnMIB		 2 }
+tmnNotifications	OBJECT IDENTIFIER ::= { tmnMIB		 0 }
+tmnObjects		OBJECT IDENTIFIER ::= { tmnMIB		 1 }
+tmnConformance		OBJECT IDENTIFIER ::= { tmnMIB		 2 }
 
 tmnScalars		OBJECT IDENTIFIER ::= { tmnObjects	 1 }
 tmnTables		OBJECT IDENTIFIER ::= { tmnObjects	 2 }
@@ -1531,5 +1531,5 @@ tmpAlarmOutstandingMinor OBJECT-TYPE
 		 is no oustanding minor alarm."
 	::= { tmnScalars 4 }
 
-
+END
 -- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi

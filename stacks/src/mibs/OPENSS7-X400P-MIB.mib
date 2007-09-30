@@ -61,7 +61,7 @@ OPENSS7-X400P-MIB DEFINITIONS ::= BEGIN
 IMPORTS
 	MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
 		FROM SNMPv2-SMI
-	OpenSS7Modules
+	openss7Modules
 		FROM OPENSS7-MIB;
 
 x400pMIB MODULE-IDENTITY
@@ -82,7 +82,7 @@ x400pMIB MODULE-IDENTITY
 		 E-Mail: bidulock@openss7.org"
 	DESCRIPTION
 		"MIB Module for the X400P Drivers and Cards."
-	::= { OpenSS7Modules 10 }
+	::= { openss7Modules 10 }
 
 -- top level oragnization of the MIB
 
@@ -378,6 +378,6 @@ x400pCardUnknownStatus OBJECT-TYPE
 	REFERENCE	"OPENSS7-TMN-TC"
 	::= { x400pCardEntry xx }
 
-
+END
 -- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
 

@@ -67,6 +67,8 @@ IMPORTS
 		FROM SNMPv2-CONF
 	CircuitIdentificationCode, TimeIntervalMilliseconds
 		FROM OPENSS7-TC
+	openss7Modules
+		FROM OPENSS7-SMI
 	NetworkPointCode, MtpUserPartStatus, MtpLinkFailureReason, NetworkPointCode, 
 	MtpLinkStatus, MtpCongestionLevel
 		FROM OPENSS7-SS7-TC
@@ -75,7 +77,7 @@ IMPORTS
 	UsageState, AvailabilityStatus
 		FROM OPENSS7-TMN-SMI;
 
-MtpMIB MODULE-IDENTITY
+mtpMIB MODULE-IDENTITY
 	LAST-UPDATED	"200709220000Z"
 	ORGANIZATION
 		"OpenSS7 Corporation"
@@ -133,13 +135,13 @@ MtpMIB MODULE-IDENTITY
 		 -   A signalling data link is associated with a piece of physical equipment or 
 		     software.
 		"
-	::= { Ss7MIBs 1 }
+	::= { openss7Modules 1 }
 
 -- Top-level structure of the MIB
 
-mtpNotifications		OBJECT IDENTIFIER ::= { MtpMIB		 0 }
-mtpObjects			OBJECT IDENTIFIER ::= { MtpMIB		 1 }
-mtpConformance			OBJECT IDENTIFIER ::= { MtpMIB		 2 }
+mtpNotifications		OBJECT IDENTIFIER ::= { mtpMIB		 0 }
+mtpObjects			OBJECT IDENTIFIER ::= { mtpMIB		 1 }
+mtpConformance			OBJECT IDENTIFIER ::= { mtpMIB		 2 }
 
 mtpScalars			OBJECT IDENTIFIER ::= { mtpObjects	 1 }
 mtpTables			OBJECT IDENTIFIER ::= { mtpObjects	 2 }
@@ -5979,4 +5981,5 @@ sdlStatBipolarViolations OBJECT-TYPE
 		 E1 carrier."
 	::= { sdlStatsEntry 10 }
 
+END
 -- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi

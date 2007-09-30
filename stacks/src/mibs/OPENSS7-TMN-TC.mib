@@ -63,7 +63,7 @@ IMPORTS
 		FROM SNMPv2-SMI
 	TEXTUAL-CONVENTION
 		FROM SNMPv2-TC
-	OpenSS7Modules
+	openss7Modules
 		FROM OPENSS7-SMI;
 
 TmnTC MODULE-IDENTITY
@@ -95,7 +95,7 @@ TmnTC MODULE-IDENTITY
 		 Note that there is also an OPENSS7-TMN-SMI mib that defines object identities 
 		 and general purpose notifications for use with some of these textual 
 		 conventions."  
-	::= { OpenSS7Modules 3 }
+	::= { openss7Modules 3 }
 
 AlarmType ::= TEXTUAL-CONVENTION
 	STATUS		current
@@ -734,5 +734,5 @@ UnknownStatus ::= TEXTUAL-CONVENTION
 
 
 
-
+END
 -- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
