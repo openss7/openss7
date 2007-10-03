@@ -1,0 +1,55 @@
+
+
+-- Notifications
+--
+-- Useful notifications are when the allocation of some allocation hits 
+-- its threshold.
+
+-- Another useful notification would be information issued to the 
+-- STREAMS error log.
+
+strStrlogMid OBJECT-TYPE
+	SYNTAX		Unsigned32 (0..16383)
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { strNotifs 1 }
+
+strStrlogSid OBJECT-TYPE
+	SYNTAX		Unsigned32 (0..16383)
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { strNotifs 2 }
+
+strStrlogLevel OBJECT-TYPE
+	SYNTAX		Unsigned32 (0..255)
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { strNotifs 3 }
+
+strStrlogFlags OBJECT-TYPE
+	SYNTAX		Unsigned32 (0..16383)
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { strNotifs 4 }
+
+strStrlogFmtString OBJECT-TYPE
+	SYNTAX		OCTET STRING(SIZE(0..255))
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { strNotifs 5 }
+
+
+strStrlogInteger OBJECT-TYPE
+
+strStrlogString OBJECT-TYPE
+

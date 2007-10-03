@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+
+MIBS=+OPENSS7-STREAMS-MIB
+MIBDIRS=./mibs:/usr/share/snmp/mibs
+MIBFILES=./mibs/OPENSS7-STREAMS-MIB.mib
+
+export MIBS
+export MIBDIRS
+export MIBFILES
+
+all: basic storage
+
+basic:
+	./mib2c -c ./mib2c.conf -f strMIB_simple strMIB
+	indent -nhnl strMIB_simple.[ch]
+
+storage:
+	./mib2c -c ./mib2c.storage.conf -f strMIB_storage strMIB
+	indent -nhnl strMIB_storage.[ch]
+
+clean:
+	rm -f strMIB_simple.[ch]
+	rm -f strMIB_storage.[ch]
+	rm -f strMIB_simple.[ch]~
+	rm -f strMIB_storage.[ch]~
