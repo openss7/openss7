@@ -879,13 +879,13 @@ hup_handler(int signum)
 int
 hup_catch(void)
 {
-	return sig_register(SIGALRM, &hup_handler);
+	return sig_register(SIGHUP, &hup_handler);
 }
 
 int
 hup_block(void)
 {
-	return sig_register(SIGALRM, NULL);
+	return sig_register(SIGHUP, NULL);
 }
 
 int
@@ -927,13 +927,13 @@ trm_handler(int signum)
 int
 trm_catch(void)
 {
-	return sig_register(SIGALRM, &trm_handler);
+	return sig_register(SIGTERM, &trm_handler);
 }
 
 int
 trm_block(void)
 {
-	return sig_register(SIGALRM, NULL);
+	return sig_register(SIGTERM, NULL);
 }
 
 void strlog_exit(int retval);
