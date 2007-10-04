@@ -113,8 +113,8 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * Check whether variable (vp) matches name.
  */
 int
-header_generic(struct variable *vp,
-	       oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
+header_generic(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
+	       WriteMethod ** write_method)
 {
 	oid newname[MAX_OID_LEN];
 	int result;
@@ -200,8 +200,8 @@ header_complex_generate_varoid(struct variable_list *var)
 			break;
 
 		default:
-			DEBUGMSGTL(("header_complex_generate_varoid",
-				    "invalid asn type: %d\n", var->type));
+			DEBUGMSGTL(("header_complex_generate_varoid", "invalid asn type: %d\n",
+				    var->type));
 			return SNMPERR_GENERR;
 		}
 	}
@@ -277,8 +277,8 @@ header_complex_parse_oid(oid * oidIndex, size_t oidLen, struct variable_list *da
 			*var->val.integer = (long) *oidIndex++;
 			var->val_len = sizeof(long);
 			oidLen--;
-			DEBUGMSGTL(("header_complex_parse_oid",
-				    "Parsed int(%d): %d\n", var->type, *var->val.integer));
+			DEBUGMSGTL(("header_complex_parse_oid", "Parsed int(%d): %d\n", var->type,
+				    *var->val.integer));
 			break;
 
 		case ASN_OBJECT_ID:
@@ -336,13 +336,13 @@ header_complex_parse_oid(oid * oidIndex, size_t oidLen, struct variable_list *da
 			var->val.string[itmp] = '\0';
 			oidLen -= itmp;
 
-			DEBUGMSGTL(("header_complex_parse_oid",
-				    "Parsed str(%d): %s\n", var->type, var->val.string));
+			DEBUGMSGTL(("header_complex_parse_oid", "Parsed str(%d): %s\n", var->type,
+				    var->val.string));
 			break;
 
 		default:
-			DEBUGMSGTL(("header_complex_parse_oid",
-				    "invalid asn type: %d\n", var->type));
+			DEBUGMSGTL(("header_complex_parse_oid", "invalid asn type: %d\n",
+				    var->type));
 			return SNMPERR_GENERR;
 		}
 		var = var->next_variable;
@@ -362,9 +362,8 @@ header_complex_find_entry(struct header_complex_index *thestuff, void *theentry)
 }
 
 void
-header_complex_generate_oid(oid * name,	/* out */
-			    size_t *length,	/* out */
-			    oid * prefix, size_t prefix_len, struct variable_list *data)
+header_complex_generate_oid(oid * name, size_t *length, oid * prefix, size_t prefix_len,
+			    struct variable_list *data)
 {
 
 	oid *oidptr;
@@ -392,8 +391,8 @@ header_complex_generate_oid(oid * name,	/* out */
 }
 
 struct header_complex_index *
-header_complex_add_data(struct header_complex_index **thedata,
-			struct variable_list *var, void *data)
+header_complex_add_data(struct header_complex_index **thedata, struct variable_list *var,
+			void *data)
 {
 	struct header_complex_index *hciptrn, *hciptrp, *ourself;
 	oid newoid[MAX_OID_LEN];
@@ -404,19 +403,17 @@ header_complex_add_data(struct header_complex_index **thedata,
 
 	header_complex_generate_oid(newoid, &newoid_len, NULL, 0, var);
 
-	for (hciptrn = *thedata, hciptrp = NULL;
-	     hciptrn != NULL; hciptrp = hciptrn, hciptrn = hciptrn->next)
+	for (hciptrn = *thedata, hciptrp = NULL; hciptrn != NULL;
+	     hciptrp = hciptrn, hciptrn = hciptrn->next)
 		/* XXX: check for == and error (overlapping table entries) */
-		if (snmp_oid_compare(hciptrn->name, hciptrn->namelen, newoid, newoid_len)
-		    > 0)
+		if (snmp_oid_compare(hciptrn->name, hciptrn->namelen, newoid, newoid_len) > 0)
 			break;
 
 	/* nptr should now point to the spot that we need to add ourselves in front of, and pptr
 	   should be our new 'prev'. */
 
 	/* create ourselves */
-	ourself = (struct header_complex_index *)
-	    SNMP_MALLOC_STRUCT(header_complex_index);
+	ourself = (struct header_complex_index *) SNMP_MALLOC_STRUCT(header_complex_index);
 
 	/* change our pointers */
 	ourself->prev = hciptrp;
@@ -444,10 +441,20 @@ header_complex_add_data(struct header_complex_index **thedata,
 
 	return hciptrp;
 }
+
+/*
+ * header_complex: - validate varbind with complex indexes
+ * @datalist: pointer to data list contaning valid indexes and data
+ * @vp: pointer to our prefix (if any, usually yes)
+ * @name: in - varbind name, out - actual instance name considering getnext
+ * @length: in - varbind name length, out - returned name length
+ * @exact: whether to match exact, or next lexical ordered instance
+ * @var_len: length of variable contents (simply set to sizeof(long))
+ * @write_method: write method (simply set to NULL)
+ */
 void *
-header_complex(struct header_complex_index *datalist,
-	       struct variable *vp,
-	       oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
+header_complex(struct header_complex_index *datalist, struct variable *vp, oid * name,
+	       size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
 
 	struct header_complex_index *nptr, *found = NULL;
@@ -682,18 +689,25 @@ init_strMIB(void)
 	/* register our config handler(s) to deal with registrations */
 	snmpd_register_config_handler("strMIB", parse_strMIB, NULL, "HELP STRING");
 	snmpd_register_config_handler("strModTable", parse_strModTable, NULL, "HELP STRING");
-	snmpd_register_config_handler("strModInfoTable", parse_strModInfoTable, NULL, "HELP STRING");
-	snmpd_register_config_handler("strModStatTable", parse_strModStatTable, NULL, "HELP STRING");
+	snmpd_register_config_handler("strModInfoTable", parse_strModInfoTable, NULL,
+				      "HELP STRING");
+	snmpd_register_config_handler("strModStatTable", parse_strModStatTable, NULL,
+				      "HELP STRING");
 	snmpd_register_config_handler("strApshTable", parse_strApshTable, NULL, "HELP STRING");
 	snmpd_register_config_handler("strStatsTable", parse_strStatsTable, NULL, "HELP STRING");
 
 	/* we need to be called back later to store our data */
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strMIB, NULL);
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strModTable, NULL);
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strModInfoTable, NULL);
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strModStatTable, NULL);
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strStatsTable, NULL);
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strApshTable, NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strModTable,
+			       NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA,
+			       store_strModInfoTable, NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA,
+			       store_strModStatTable, NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strStatsTable,
+			       NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strApshTable,
+			       NULL);
 
 	/* place any other initialization junk you need here */
 
@@ -784,27 +798,40 @@ store_strMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		cptr = line + strlen(line);
 
 		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strCltime, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxApush, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxApush, &tmpint);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxMblk, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxStramod, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxStrdev, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxStrmod, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strMsgPriority, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxStramod, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxStrdev, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxStrmod, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strMsgPriority, &tmpint);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strNband, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strNstrmsgs, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strNstrpush, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strNstrmsgs, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strNstrpush, &tmpint);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strHiwat, &tmpint);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strLowat, &tmpint);
 		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strMaxpsz, &tmpint);
 		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strMinpsz, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strReuseFmodsw, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strReuseFmodsw, &tmpint);
 		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strRtime, &tmpint);
 		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strStrhold, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strStrctlsz, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strStrmsgsz, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strStrthresh, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strLowthresh, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMedthresh, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strStrctlsz, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strStrmsgsz, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strStrthresh, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strLowthresh, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMedthresh, &tmpint);
 		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strIoctime, &tmpint);
 
 		snmpd_store_config(line);
@@ -827,7 +854,8 @@ strModTable_add(struct strModTable_data *thedata)
 	   the data */
 
 	/* strModIdnum */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) thedata->strModIdnum, sizeof(thedata->strModIdnum));
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) thedata->strModIdnum,
+				  sizeof(thedata->strModIdnum));
 
 	header_complex_add_data(&strModTableStorage, vars, thedata);
 	DEBUGMSGTL(("strModTable", "registered an entry\n"));
@@ -855,7 +883,9 @@ parse_strModTable(const char *token, char *line)
 	}
 
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strModIdnum, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->strModName, &StorageTmp->strModNameLen);
+	line =
+	    read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->strModName,
+				  &StorageTmp->strModNameLen);
 	if (StorageTmp->strModName == NULL) {
 		config_perror("invalid specification for strModName");
 		return;
@@ -892,10 +922,14 @@ store_strModTable(int majorID, int minorID, void *serverarg, void *clientarg)
 		strcat(line, "strModTable ");
 		cptr = line + strlen(line);
 
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModIdnum, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strModName, &StorageTmp->strModNameLen);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModIdnum, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strModName,
+					   &StorageTmp->strModNameLen);
 		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strModType, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModMajor, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModMajor, &tmpint);
 
 		snmpd_store_config(line);
 /*   } */
@@ -947,7 +981,9 @@ parse_strModInfoTable(const char *token, char *line)
 
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strModInfoIndex, &tmpint);
 
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->strModInfoQueues, &StorageTmp->strModInfoQueuesLen);
+	line =
+	    read_config_read_data(ASN_BIT_STR, line, &StorageTmp->strModInfoQueues,
+				  &StorageTmp->strModInfoQueuesLen);
 	if (StorageTmp->strModInfoQueues == NULL) {
 		config_perror("invalid specification for strModInfoQueues");
 		return;
@@ -957,7 +993,8 @@ parse_strModInfoTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->strModInfoMaxpsz, &tmpint);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strModInfoHiwat, &tmpint);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strModInfoLowat, &tmpint);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strModInfoTraceLevel, &tmpint);
+	line =
+	    read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strModInfoTraceLevel, &tmpint);
 
 	strModInfoTable_add(StorageTmp);
 
@@ -988,13 +1025,27 @@ store_strModInfoTable(int majorID, int minorID, void *serverarg, void *clientarg
 		strcat(line, "strModInfoTable ");
 		cptr = line + strlen(line);
 
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModInfoIndex, &tmpint);
-		cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->strModInfoQueues, &StorageTmp->strModInfoQueuesLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strModInfoMinpsz, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strModInfoMaxpsz, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModInfoHiwat, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModInfoLowat, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModInfoTraceLevel, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModInfoIndex,
+					   &tmpint);
+		cptr =
+		    read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->strModInfoQueues,
+					   &StorageTmp->strModInfoQueuesLen);
+		cptr =
+		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strModInfoMinpsz,
+					   &tmpint);
+		cptr =
+		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strModInfoMaxpsz,
+					   &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModInfoHiwat,
+					   &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModInfoLowat,
+					   &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModInfoTraceLevel,
+					   &tmpint);
 
 		snmpd_store_config(line);
 /*   } */
@@ -1046,7 +1097,9 @@ parse_strModStatTable(const char *token, char *line)
 
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strModStatIndex, &tmpint);
 
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->strModStatQueues, &StorageTmp->strModStatQueuesLen);
+	line =
+	    read_config_read_data(ASN_BIT_STR, line, &StorageTmp->strModStatQueues,
+				  &StorageTmp->strModStatQueuesLen);
 	if (StorageTmp->strModStatQueues == NULL) {
 		config_perror("invalid specification for strModStatQueues");
 		return;
@@ -1057,7 +1110,9 @@ parse_strModStatTable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->strModStatOcnt, &tmpint);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->strModStatCcnt, &tmpint);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->strModStatAcnt, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->strModStatPrivate, &StorageTmp->strModStatPrivateLen);
+	line =
+	    read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->strModStatPrivate,
+				  &StorageTmp->strModStatPrivateLen);
 	if (StorageTmp->strModStatPrivate == NULL) {
 		config_perror("invalid specification for strModStatPrivate");
 		return;
@@ -1093,15 +1148,28 @@ store_strModStatTable(int majorID, int minorID, void *serverarg, void *clientarg
 		strcat(line, "strModStatTable ");
 		cptr = line + strlen(line);
 
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModStatIndex, &tmpint);
-		cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->strModStatQueues, &StorageTmp->strModStatQueuesLen);
-		cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->strModStatPCnt, &tmpint);
-		cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->strModStatScnt, &tmpint);
-		cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->strModStatOcnt, &tmpint);
-		cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->strModStatCcnt, &tmpint);
-		cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->strModStatAcnt, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strModStatPrivate, &StorageTmp->strModStatPrivateLen);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModStatFlags, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModStatIndex,
+					   &tmpint);
+		cptr =
+		    read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->strModStatQueues,
+					   &StorageTmp->strModStatQueuesLen);
+		cptr =
+		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->strModStatPCnt, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->strModStatScnt, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->strModStatOcnt, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->strModStatCcnt, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->strModStatAcnt, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strModStatPrivate,
+					   &StorageTmp->strModStatPrivateLen);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModStatFlags,
+					   &tmpint);
 
 		snmpd_store_config(line);
 /*   } */
@@ -1123,7 +1191,8 @@ strApshTable_add(struct strApshTable_data *thedata)
 	   the data */
 
 	/* strApshName */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->strApshName, thedata->strApshNameLen);
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->strApshName,
+				  thedata->strApshNameLen);
 	/* strApshMinor */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) thedata->strApshMinor,
 				  sizeof(thedata->strApshMinor));
@@ -1153,7 +1222,9 @@ parse_strApshTable(const char *token, char *line)
 		return;
 	}
 
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->strApshName, &StorageTmp->strApshNameLen);
+	line =
+	    read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->strApshName,
+				  &StorageTmp->strApshNameLen);
 	if (StorageTmp->strApshName == NULL) {
 		config_perror("invalid specification for strApshName");
 		return;
@@ -1162,7 +1233,9 @@ parse_strApshTable(const char *token, char *line)
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strApshMajor, &tmpint);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strApshMinor, &tmpint);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strApshLastMinor, &tmpint);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->strApshModules, &StorageTmp->strApshModulesLen);
+	line =
+	    read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->strApshModules,
+				  &StorageTmp->strApshModulesLen);
 	if (StorageTmp->strApshModules == NULL) {
 		config_perror("invalid specification for strApshModules");
 		return;
@@ -1198,12 +1271,21 @@ store_strApshTable(int majorID, int minorID, void *serverarg, void *clientarg)
 		strcat(line, "strApshTable ");
 		cptr = line + strlen(line);
 
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strApshName, &StorageTmp->strApshNameLen);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strApshMajor, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strApshMinor, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strApshLastMinor, &tmpint);
-		cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strApshModules, &StorageTmp->strApshModulesLen);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strApshStatus, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strApshName,
+					   &StorageTmp->strApshNameLen);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strApshMajor, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strApshMinor, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strApshLastMinor,
+					   &tmpint);
+		cptr =
+		    read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strApshModules,
+					   &StorageTmp->strApshModulesLen);
+		cptr =
+		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strApshStatus, &tmpint);
 
 		snmpd_store_config(line);
 /*   } */
@@ -1225,7 +1307,8 @@ strStatsTable_add(struct strStatsTable_data *thedata)
 	   the data */
 
 	/* strStatsStructure */
-	snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) thedata->strStatsStructure,
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER,
+				  (u_char *) thedata->strStatsStructure,
 				  sizeof(thedata->strStatsStructure));
 
 	header_complex_add_data(&strStatsTableStorage, vars, thedata);
@@ -1286,9 +1369,15 @@ store_strStatsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 		strcat(line, "strStatsTable ");
 		cptr = line + strlen(line);
 
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strStatsStructure, &tmpint);
-		cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->strStatsCurrentAllocs, &tmpint);
-		cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->strStatsHighWaterMark, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strStatsStructure,
+					   &tmpint);
+		cptr =
+		    read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->strStatsCurrentAllocs,
+					   &tmpint);
+		cptr =
+		    read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->strStatsHighWaterMark,
+					   &tmpint);
 
 		snmpd_store_config(line);
 /*   } */
@@ -1310,7 +1399,8 @@ store_strStatsTable(int majorID, int minorID, void *serverarg, void *clientarg)
  *   and mibII directories.
  */
 unsigned char *
-var_strMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
+var_strMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
+	   WriteMethod ** write_method)
 {
 
 	/* variables we may use later */
@@ -1536,7 +1626,8 @@ var_strMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *v
  *   The workings of this are basically the same as for var_strMIB above.
  */
 unsigned char *
-var_strModTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
+var_strModTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
+		WriteMethod ** write_method)
 {
 
 	struct strModTable_data *StorageTmp = NULL;
@@ -1545,7 +1636,9 @@ var_strModTable(struct variable *vp, oid * name, size_t *length, int exact, size
 	/* 
 	 * this assumes you have registered all your data properly
 	 */
-	if ((StorageTmp = header_complex(strModTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
+	if ((StorageTmp =
+	     header_complex(strModTableStorage, vp, name, length, exact, var_len,
+			    write_method)) == NULL)
 		return NULL;
 
 	/* 
@@ -1580,7 +1673,8 @@ var_strModTable(struct variable *vp, oid * name, size_t *length, int exact, size
  *   The workings of this are basically the same as for var_strMIB above.
  */
 unsigned char *
-var_strModInfoTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
+var_strModInfoTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
+		    WriteMethod ** write_method)
 {
 
 	struct strModInfoTable_data *StorageTmp = NULL;
@@ -1589,7 +1683,9 @@ var_strModInfoTable(struct variable *vp, oid * name, size_t *length, int exact, 
 	/* 
 	 * this assumes you have registered all your data properly
 	 */
-	if ((StorageTmp = header_complex(strModInfoTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
+	if ((StorageTmp =
+	     header_complex(strModInfoTableStorage, vp, name, length, exact, var_len,
+			    write_method)) == NULL)
 		return NULL;
 
 	/* 
@@ -1639,7 +1735,8 @@ var_strModInfoTable(struct variable *vp, oid * name, size_t *length, int exact, 
  *   The workings of this are basically the same as for var_strMIB above.
  */
 unsigned char *
-var_strModStatTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
+var_strModStatTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
+		    WriteMethod ** write_method)
 {
 
 	struct strModStatTable_data *StorageTmp = NULL;
@@ -1648,7 +1745,9 @@ var_strModStatTable(struct variable *vp, oid * name, size_t *length, int exact, 
 	/* 
 	 * this assumes you have registered all your data properly
 	 */
-	if ((StorageTmp = header_complex(strModStatTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
+	if ((StorageTmp =
+	     header_complex(strModStatTableStorage, vp, name, length, exact, var_len,
+			    write_method)) == NULL)
 		return NULL;
 
 	/* 
@@ -1708,7 +1807,8 @@ var_strModStatTable(struct variable *vp, oid * name, size_t *length, int exact, 
  *   The workings of this are basically the same as for var_strMIB above.
  */
 unsigned char *
-var_strApshTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
+var_strApshTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
+		 WriteMethod ** write_method)
 {
 
 	struct strApshTable_data *StorageTmp = NULL;
@@ -1717,7 +1817,9 @@ var_strApshTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 	/* 
 	 * this assumes you have registered all your data properly
 	 */
-	if ((StorageTmp = header_complex(strApshTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
+	if ((StorageTmp =
+	     header_complex(strApshTableStorage, vp, name, length, exact, var_len,
+			    write_method)) == NULL)
 		return NULL;
 
 	/* 
@@ -1752,7 +1854,8 @@ var_strApshTable(struct variable *vp, oid * name, size_t *length, int exact, siz
  *   The workings of this are basically the same as for var_strMIB above.
  */
 unsigned char *
-var_strStatsTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
+var_strStatsTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
+		  WriteMethod ** write_method)
 {
 
 	struct strStatsTable_data *StorageTmp = NULL;
@@ -1761,7 +1864,9 @@ var_strStatsTable(struct variable *vp, oid * name, size_t *length, int exact, si
 	/* 
 	 * this assumes you have registered all your data properly
 	 */
-	if ((StorageTmp = header_complex(strStatsTableStorage, vp, name, length, exact, var_len, write_method)) == NULL)
+	if ((StorageTmp =
+	     header_complex(strStatsTableStorage, vp, name, length, exact, var_len,
+			    write_method)) == NULL)
 		return NULL;
 
 	/* 
@@ -1791,8 +1896,8 @@ var_strStatsTable(struct variable *vp, oid * name, size_t *length, int exact, si
 }
 
 int
-write_strModInfoMinpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name,
-		       size_t name_len)
+write_strModInfoMinpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		       u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strModInfoTable_data *StorageTmp = NULL;
@@ -1801,8 +1906,9 @@ write_strModInfoMinpsz(int action, u_char *var_val, u_char var_val_type, size_t 
 
 	DEBUGMSGTL(("strMIB", "write_strModInfoMinpsz entering action=%d...  \n", action));
 	if ((StorageTmp =
-	     header_complex(strModInfoTableStorage, NULL, &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL,
-			    NULL)) == NULL)
+	     header_complex(strModInfoTableStorage, NULL,
+			    &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
+			    NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
@@ -1844,8 +1950,8 @@ write_strModInfoMinpsz(int action, u_char *var_val, u_char var_val_type, size_t 
 }
 
 int
-write_strModInfoMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name,
-		       size_t name_len)
+write_strModInfoMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		       u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strModInfoTable_data *StorageTmp = NULL;
@@ -1854,8 +1960,9 @@ write_strModInfoMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t 
 
 	DEBUGMSGTL(("strMIB", "write_strModInfoMaxpsz entering action=%d...  \n", action));
 	if ((StorageTmp =
-	     header_complex(strModInfoTableStorage, NULL, &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL,
-			    NULL)) == NULL)
+	     header_complex(strModInfoTableStorage, NULL,
+			    &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
+			    NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
@@ -1897,7 +2004,8 @@ write_strModInfoMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t 
 }
 
 int
-write_strModInfoHiwat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strModInfoHiwat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		      u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strModInfoTable_data *StorageTmp = NULL;
@@ -1906,8 +2014,9 @@ write_strModInfoHiwat(int action, u_char *var_val, u_char var_val_type, size_t v
 
 	DEBUGMSGTL(("strMIB", "write_strModInfoHiwat entering action=%d...  \n", action));
 	if ((StorageTmp =
-	     header_complex(strModInfoTableStorage, NULL, &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL,
-			    NULL)) == NULL)
+	     header_complex(strModInfoTableStorage, NULL,
+			    &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
+			    NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
@@ -1949,7 +2058,8 @@ write_strModInfoHiwat(int action, u_char *var_val, u_char var_val_type, size_t v
 }
 
 int
-write_strModInfoLowat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strModInfoLowat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		      u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strModInfoTable_data *StorageTmp = NULL;
@@ -1958,8 +2068,9 @@ write_strModInfoLowat(int action, u_char *var_val, u_char var_val_type, size_t v
 
 	DEBUGMSGTL(("strMIB", "write_strModInfoLowat entering action=%d...  \n", action));
 	if ((StorageTmp =
-	     header_complex(strModInfoTableStorage, NULL, &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL,
-			    NULL)) == NULL)
+	     header_complex(strModInfoTableStorage, NULL,
+			    &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
+			    NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
@@ -2001,8 +2112,8 @@ write_strModInfoLowat(int action, u_char *var_val, u_char var_val_type, size_t v
 }
 
 int
-write_strModInfoTraceLevel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name,
-			   size_t name_len)
+write_strModInfoTraceLevel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+			   u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strModInfoTable_data *StorageTmp = NULL;
@@ -2011,8 +2122,9 @@ write_strModInfoTraceLevel(int action, u_char *var_val, u_char var_val_type, siz
 
 	DEBUGMSGTL(("strMIB", "write_strModInfoTraceLevel entering action=%d...  \n", action));
 	if ((StorageTmp =
-	     header_complex(strModInfoTableStorage, NULL, &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL,
-			    NULL)) == NULL)
+	     header_complex(strModInfoTableStorage, NULL,
+			    &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
+			    NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
@@ -2054,7 +2166,8 @@ write_strModInfoTraceLevel(int action, u_char *var_val, u_char var_val_type, siz
 }
 
 int
-write_strApshModules(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strApshModules(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		     u_char *statP, oid * name, size_t name_len)
 {
 	static char *tmpvar;
 	struct strApshTable_data *StorageTmp = NULL;
@@ -2063,8 +2176,9 @@ write_strApshModules(int action, u_char *var_val, u_char var_val_type, size_t va
 
 	DEBUGMSGTL(("strMIB", "write_strApshModules entering action=%d...  \n", action));
 	if ((StorageTmp =
-	     header_complex(strApshTableStorage, NULL, &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1, NULL,
-			    NULL)) == NULL)
+	     header_complex(strApshTableStorage, NULL,
+			    &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
+			    NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
@@ -2110,7 +2224,8 @@ write_strApshModules(int action, u_char *var_val, u_char var_val_type, size_t va
 }
 
 int
-write_strCltime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strCltime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP,
+		oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2159,7 +2274,8 @@ write_strCltime(int action, u_char *var_val, u_char var_val_type, size_t var_val
 }
 
 int
-write_strMaxApush(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strMaxApush(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		  u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2210,7 +2326,8 @@ write_strMaxApush(int action, u_char *var_val, u_char var_val_type, size_t var_v
 }
 
 int
-write_strMaxMblk(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strMaxMblk(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		 u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2261,7 +2378,8 @@ write_strMaxMblk(int action, u_char *var_val, u_char var_val_type, size_t var_va
 }
 
 int
-write_strMaxStramod(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strMaxStramod(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		    u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2312,7 +2430,8 @@ write_strMaxStramod(int action, u_char *var_val, u_char var_val_type, size_t var
 }
 
 int
-write_strMsgPriority(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strMsgPriority(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		     u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2363,7 +2482,8 @@ write_strMsgPriority(int action, u_char *var_val, u_char var_val_type, size_t va
 }
 
 int
-write_strNstrmsgs(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strNstrmsgs(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		  u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2414,7 +2534,8 @@ write_strNstrmsgs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 }
 
 int
-write_strNstrpush(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strNstrpush(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		  u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2465,7 +2586,8 @@ write_strNstrpush(int action, u_char *var_val, u_char var_val_type, size_t var_v
 }
 
 int
-write_strHiwat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strHiwat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP,
+	       oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2516,7 +2638,8 @@ write_strHiwat(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 }
 
 int
-write_strLowat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strLowat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP,
+	       oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2567,7 +2690,8 @@ write_strLowat(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 }
 
 int
-write_strMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP,
+		oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2618,7 +2742,8 @@ write_strMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val
 }
 
 int
-write_strMinpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strMinpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP,
+		oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2669,7 +2794,8 @@ write_strMinpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val
 }
 
 int
-write_strReuseFmodsw(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strReuseFmodsw(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		     u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2720,7 +2846,8 @@ write_strReuseFmodsw(int action, u_char *var_val, u_char var_val_type, size_t va
 }
 
 int
-write_strRtime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strRtime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP,
+	       oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2771,7 +2898,8 @@ write_strRtime(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 }
 
 int
-write_strStrhold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strStrhold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		 u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2822,7 +2950,8 @@ write_strStrhold(int action, u_char *var_val, u_char var_val_type, size_t var_va
 }
 
 int
-write_strStrctlsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strStrctlsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		  u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2873,7 +3002,8 @@ write_strStrctlsz(int action, u_char *var_val, u_char var_val_type, size_t var_v
 }
 
 int
-write_strStrmsgsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strStrmsgsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		  u_char *statP, oid * name, size_t name_len)
 {
 	static unsigned long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2924,7 +3054,8 @@ write_strStrmsgsz(int action, u_char *var_val, u_char var_val_type, size_t var_v
 }
 
 int
-write_strStrthresh(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strStrthresh(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		   u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -2971,7 +3102,8 @@ write_strStrthresh(int action, u_char *var_val, u_char var_val_type, size_t var_
 }
 
 int
-write_strLowthresh(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strLowthresh(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		   u_char *statP, oid * name, size_t name_len)
 {
 	static int tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -3022,7 +3154,8 @@ write_strLowthresh(int action, u_char *var_val, u_char var_val_type, size_t var_
 }
 
 int
-write_strMedthresh(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strMedthresh(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		   u_char *statP, oid * name, size_t name_len)
 {
 	static unsigned long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -3074,7 +3207,8 @@ write_strMedthresh(int action, u_char *var_val, u_char var_val_type, size_t var_
 }
 
 int
-write_strIoctime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strIoctime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		 u_char *statP, oid * name, size_t name_len)
 {
 	static unsigned long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
@@ -3126,7 +3260,8 @@ write_strIoctime(int action, u_char *var_val, u_char var_val_type, size_t var_va
 }
 
 int
-write_strApshStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_strApshStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
+		    u_char *statP, oid * name, size_t name_len)
 {
 	struct strApshTable_data *StorageTmp = NULL;
 	static struct strApshTable_data *StorageNew, *StorageDel;
@@ -3138,8 +3273,9 @@ write_strApshStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 	char who[MAX_OID_LEN], flagName[MAX_OID_LEN];
 
 	StorageTmp =
-	    header_complex(strApshTableStorage, NULL, &name[sizeof(strApshTable_variables_oid) / sizeof(oid) + 3 - 1], &newlen, 1,
-			   NULL, NULL);
+	    header_complex(strApshTableStorage, NULL,
+			   &name[sizeof(strApshTable_variables_oid) / sizeof(oid) + 3 - 1], &newlen,
+			   1, NULL, NULL);
 
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		fprintf(stderr, "write to strApshStatus not ASN_INTEGER\n");
@@ -3199,7 +3335,9 @@ write_strApshStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			/* strApshMinor */
 			snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0);
 
-			if (header_complex_parse_oid(&(name[sizeof(strApshTable_variables_oid) / sizeof(oid) + 2]), newlen, vars)
+			if (header_complex_parse_oid
+			    (&(name[sizeof(strApshTable_variables_oid) / sizeof(oid) + 2]), newlen,
+			     vars)
 			    != SNMPERR_SUCCESS) {
 				/* XXX: free, zero vars */
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -3211,17 +3349,20 @@ write_strApshStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			memdup((u_char **) &(StorageNew->strModIdnum), vp->val.string, vp->val_len);
 			StorageNew->strModIdnumLen = vp->val_len;
 			vp = vp->next_variable;
-			memdup((u_char **) &(StorageNew->strModInfoIndex), vp->val.string, vp->val_len);
+			memdup((u_char **) &(StorageNew->strModInfoIndex), vp->val.string,
+			       vp->val_len);
 			StorageNew->strModInfoIndexLen = vp->val_len;
 			vp = vp->next_variable;
-			memdup((u_char **) &(StorageNew->strModStatIndex), vp->val.string, vp->val_len);
+			memdup((u_char **) &(StorageNew->strModStatIndex), vp->val.string,
+			       vp->val_len);
 			StorageNew->strModStatIndexLen = vp->val_len;
 			vp = vp->next_variable;
 #endif
 			memdup((u_char **) &(StorageNew->strApshName), vp->val.string, vp->val_len);
 			StorageNew->strApshNameLen = vp->val_len;
 			vp = vp->next_variable;
-			memdup((u_char **) &(StorageNew->strApshMinor), vp->val.string, vp->val_len);
+			memdup((u_char **) &(StorageNew->strApshMinor), vp->val.string,
+			       vp->val_len);
 #if 0
 			StorageNew->strApshMinorLen = vp->val_len;
 #endif
@@ -3310,7 +3451,7 @@ static char sa_errpath[256] = "";
 static char sa_basname[256] = "";
 static char sa_outpdir[256] = "/var/log/streams";
 static char sa_pidfile[256] = "";
-static char sa_sysctlf[256];
+static char sa_sysctlf[256] = "";
 
 static void
 sa_version(int argc, char *argv[])
@@ -3385,7 +3526,7 @@ Options:\n\
         prints the version and exits\n\
     -C, --copying\n\
         prints copying permissions and exits\n\
-", argv[0], sa_sysctlf);
+", argv[0], sa_sysctlf, sa_basname);
 }
 
 static void
@@ -3476,12 +3617,12 @@ sa_alm_handler(int signum)
 	return (RETSIGTYPE) (0);
 }
 
-static void sa_snmp_alm_handler(unsigned int reg, void *clientarg)
+static void
+sa_snmp_alm_handler(unsigned int reg, void *clientarg)
 {
 	sa_alm_signal = 1;
 	return;
 }
-
 
 static int
 sa_alm_catch(void)
@@ -3659,9 +3800,11 @@ sa_start_timer(long duration)
 		struct timeval setting = {
 			duration / 1000, (duration % 1000) * 1000
 		};
+
 		sa_alm_handle = snmp_alarm_register_hr(setting, 0, sa_snmp_alm_handler, NULL);
 #else
-		sa_alm_handle = snmp_alarm_register((duration+999)/1000, 0, sa_snmp_alm_handler, NULL);
+		sa_alm_handle =
+		    snmp_alarm_register((duration + 999) / 1000, 0, sa_snmp_alm_handler, NULL);
 #endif
 		return (sa_alm_handle ? 0 : -1);
 	}
@@ -3846,14 +3989,16 @@ sa_mloop(int argc, char *argv[])
 	for (;;) {
 		int retval;
 
-		/* to use select or poll you need to use the snmp_select() or obtain the fd of the
-		   agentx socket and add it to the fdset. */
+		/* to use select or poll you need to use the snmp_select_info() to obtain the fd of
+		 * the agentx socket and add it to the fdset. */
 		/* note that SIGALRM is used by snmp: use the snmp_alarm() api instead */
 
+#if 0
 		if (snmp_select() == 0) {
 			if (sa_alarms == 0)
 				run_alarms();
 		}
+#endif
 		retval = agent_check_and_process(0);	/* 0 == don't block */
 
 		if (sa_fclose) {

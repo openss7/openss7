@@ -18,6 +18,14 @@ storage:
 	./mib2c -c ./mib2c.storage.conf -f strMIB_storage strMIB
 	indent -nhnl strMIB_storage.[ch]
 
+tables:
+	./mib2c -c ./mib2c.storage.conf strModTable
+	./mib2c -c ./mib2c.storage.conf strModInfoTable
+	./mib2c -c ./mib2c.storage.conf strModStatTable
+	./mib2c -c ./mib2c.storage.conf strStatsTable
+	./mib2c -c ./mib2c.storage.conf strApshTable
+	indent -nhnl str*Table.[ch]
+
 clean:
 	rm -f strMIB_simple.[ch]
 	rm -f strMIB_storage.[ch]
