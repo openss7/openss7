@@ -1,0 +1,168 @@
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under
+-- the terms of the GNU General Public License as published by the Free Software
+-- Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+-- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU General Public License along with
+-- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+-- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+OPENSS7-SL-MUX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE
+		FROM SNMPv2-SMI
+	RowStatus
+		FROM SNMPv2-TC
+	openss7Modules
+		FROM OPENSS7-MIB;
+
+slMuxMIB MODULE-IDENTITY
+	LAST-UPDATED	"200710010724Z"
+	ORGANIZATION	"The OpenSS7 Project"
+	CONTACT-INFO	"Brian Bidulock
+			 OpenSS7 Corporation
+			 1469 Jefferys Crescent
+			 Emonton, Alberta T6L 6T1
+			 CANADA
+			 Tel: +1 780 490 1141
+			 Fax: +1 780 490 1241
+			 Mob: +1 780 953 0557
+			 mailto:bidulock@openss7.org"
+	DESCRIPTION	"MIB module for the Signalling Link Multiplexer.
+
+			 The SL-MUX is a signalling link multiplexer implemented as a STREAMS 
+			 multiplexing driver that is used to organize and manage signalling 
+			 links on the OpenSS7 platform.  Streams are opened on device drivers to 
+			 obtain signalling link Streams which are then linked under the 
+			 multiplexing driver and assigned a global PPA (Physical Point of 
+			 Attachement) and a CLEI (Common Language Equipment Identifier) or other 
+			 administrative string.  Signalling links so established can be accessed 
+			 by opening a Stream on the SL multiplexer.  The multiplexer hides 
+			 device specifics from the user of the SL multiplexer.  This MIB 
+			 provides the ability to establish these Streams and reference them from 
+			 other MIBs."
+	::= { openss7Modules 5 }
+
+-- top level organization of the MIB
+
+slMuxNotifications	OBJECT IDENTIFIER ::= { slMuxMIB	 0 }
+slMuxObjects		OBJECT IDENTIFIER ::= { slMuxMIB	 1 }
+slMuxConformance	OBJECT IDENTIFIER ::= { slMuxMIB	 2 }
+
+slMuxTables		OBJECT IDENTIFIER ::= { slMuxObjects	 1 }
+slMuxScalars		OBJECT IDENTIFIER ::= { slMuxScalars	 2 }
+slMuxNotifs		OBJECT IDENTIFIER ::= { slMuxObjects	 3 }
+slMuxOids		OBJECT IDENTIFIER ::= { slMuxObjects	 4 }
+slMuxStats		OBJECT IDENTIFIER ::= { slMuxObjects	 5 }
+
+slMuxLinks		OBJECT IDENTIFIER ::= { slMuxTables	 1 }
+
+slMuxCompliances	OBJECT IDENTIFIER ::= { slMuxConformance 1 }
+slMuxObjects		OBJECT IDENTIFIER ::= { slMuxConformance 2 }
+
+-- ====================================================================
+
+GlobalPPA ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"1x:"
+	STATUS		current
+	DESCRIPTION	"The GlobalPPA textual convention defines a Global PPA (Physical Point 
+			 of Attachement).  The syntax is a 4 octet string.  Embedded in the 
+			 octet string is the encoding of a reference to a specific TDM channel 
+			 on the managed element."
+	SYNTAX		OCTET STRING (SIZE(4))
+
+LocalPPA ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"1x:"
+	STATUS		current
+	DESCRIPTION	"The LocalPPA textual convention defines a Local PPA (Physical Point of 
+			 Attachment).  The syntax is a 2 octet string.  The interpretation of 
+			 the bits within the octets is device specific."
+	SYNTAX		OCTET STRING (SIZE(2))
+
+LinkDriver ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION	"The LinkDriver textual convention defines a STREAMS driver that will be 
+			 used to provide
+
+
+-- ====================================================================
+
+SlMuxNameEntry ::=
+	SEQUENCE {
+		slMuxNameName		SnmpAdminString,
+		slMuxNamePPA		GlobalPPA
+	}
+
+SlMuxLinkEntry ::=
+	SEQUENCE {
+		slMuxLinkPPA			GlobalPPA,
+		slMuxLinkName			SnmpAdminString,
+
+		slMuxLinkOperationalState	OperationalState,
+		slMuxLinkUsageState		UsageState,
+		slMuxLinkAdministrativeState	AdministrativeState,
+
+		slMuxLinkAlarmStatus		AlarmStatus,
+		slMuxLinkProceduralStatus	ProceduralStatus,
+		slMuxLinkAvailabilityStatus	AvailabilityStatus,
+		slMuxLinkControlStatus		ControlStatus,
+		slMuxLinkUnknownStatus		UnknownStatus,
+
+		slMuxLinkDriver			OBJECT IDENTIFIER,
+		slMuxLinkLocalPPA		LocalPPA,
+
+		slMuxLinkStatus			RowStatus
+	}
+
+
+END
+
+-- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+
