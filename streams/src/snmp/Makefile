@@ -3,10 +3,9 @@ all: strmibd
 
 LIBS= -lucdmibs -lucdagent -lsnmp -ldl -lrpm -lrpmio -lrpmdb -lpopt -lz -lcrypto -lm -lsensors -lresolv -lnsl -ldl -lm -lcrypt -lutil -lpthread -lc -lrt
 
-strmibd: strMIB.c
-	gcc -D_GNU_SOURCE=1 $(LIBS) -o $@ $<
-
-#	gcc -D_GNU_SOURCE=1 `net-snmp-config --agent-libs` -o $@ $<
+strmibd: strMIB.c Makefile
+	gcc -g -D_GNU_SOURCE=1 `net-snmp-config --agent-libs` -o $@ strMIB.c
+#	gcc -D_GNU_SOURCE=1 $(LIBS) -o $@ $<
 
 #	gcc -D_GNU_SOURCE=1 -lssl -lucdagent -lucdmibs -lsnmp -o $@ $<
 
