@@ -187,8 +187,8 @@ __STREAMS_EXTERN void __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp);
 #endif
 
 /* stuff for examining streams information lists */
-BIG_STATIC struct streams_fastcall strinfo Strinfo[DYN_SIZE];
-BIG_STATIC_STH struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
+extern struct strinfo Strinfo[];
+BIG_STATIC_STH struct strthread strthreads[];
 
 #define this_thread (&strthreads[smp_processor_id()])
 

@@ -507,6 +507,191 @@ str_mlist_count(void)
 	return (cdev_count + fmod_count);
 }
 
+/**
+ * sc_slist_copy: copy stats for a given index
+ *
+ * @_slist: pointer to area to fill with stats structure
+ * @index: index into stats array
+ * @flag: flag indicating 32bit or native model
+ *
+ * Copies the stats structure for @index into the area pointed to by @_slist
+ * and returns the number of bytes to increment @_slist by to point to the
+ * next element in the list considering the data model indicated by @flag. 
+ */
+static size_t
+sc_slist_copy(caddr_t _slist, const int index, const uint flag)
+{
+	struct strinfo *si = &Strinfo[index];
+
+#ifdef WITH_32BIT_CONVERSION
+	if (flag == IOC_ILP32) {
+		struct sc_stat32 *slist = (typeof(slist)) _slist;
+
+		if (index < DYN_SIZE) {
+			slist->sc_alloc = atomic_read(&si->si_cnt);
+			slist->sc_hiwat = si->si_hwl;
+		} else {
+			slist->sc_alloc = 0;
+			slist->sc_hiwat = 0;
+		}
+		return (sizeof(struct sc_stat32));
+	} else
+#endif				/* WITH_32BIT_CONVERSION */
+	{
+		struct sc_stat *slist = (typeof(slist)) _slist;
+
+		if (index < DYN_SIZE) {
+			slist->sc_alloc = atomic_read(&si->si_cnt);
+			slist->sc_hiwat = si->si_hwl;
+		} else {
+			slist->sc_alloc = 0;
+			slist->sc_hiwat = 0;
+		}
+		return (sizeof(struct sc_stat));
+	}
+}
+
+static size_t
+str_slist_count(void)
+{
+	return (DYN_SIZE);
+}
+
+/**
+ * sc_tlist_tune: perform tuning for a given index
+ *
+ * @_tlist: pointer to area to tune from
+ * @index: index into tune array
+ * @flag: flag indicating 32bit or native model
+ *
+ * Sets the parameters that are requested to be set by flags and returns all
+ * parameters for the requested queue information structures.  Trace levels
+ * are not really supported yet.
+ *
+ */
+static size_t
+sc_tlist_tune(struct streamtab *st, caddr_t _tlist, const int index, const uint flag)
+{
+	struct module_info *mi = NULL;
+
+#ifdef WITH_32BIT_CONVERSION
+	if (flag == IOC_ILP32) {
+		struct sc_tune32 *tlist = (typeof(tlist)) _tlist;
+
+		if (tlist->sc_flags & SC_SET_RDQUEUE) {
+			if (tlist->sc_flags & SC_SET_LOWERMUX) {
+				if (st->st_muxrinit)
+					mi = st->st_muxrinit->qi_minfo;
+			} else {
+				if (st->st_rdinit)
+					mi = st->st_rdinit->qi_minfo;
+			}
+			if (mi) {
+				if (tlist->sc_flags & SC_SET_MINPSZ)
+					mi->mi_minpsz = tlist->sc_minpsz;
+				if (tlist->sc_flags & SC_SET_MAXPSZ)
+					mi->mi_maxpsz = tlist->sc_maxpsz;
+				if (tlist->sc_flags & SC_SET_HIWAT)
+					mi->mi_hiwat = tlist->sc_hiwat;
+				if (tlist->sc_flags & SC_SET_LOWAT)
+					mi->mi_lowat = tlist->sc_lowat;
+				tlist->sc_minpsz = mi->mi_minpsz;
+				tlist->sc_maxpsz = mi->mi_maxpsz;
+				tlist->sc_hiwat = mi->mi_hiwat;
+				tlist->sc_lowat = mi->mi_lowat;
+			}
+		}
+		if (tlist->sc_flags & SC_SET_WRQUEUE) {
+			if (tlist->sc_flags & SC_SET_LOWERMUX) {
+				if (st->st_muxwinit)
+					mi = st->st_muxwinit->qi_minfo;
+			} else {
+				if (st->st_wrinit)
+					mi = st->st_wrinit->qi_minfo;
+			}
+			if (mi) {
+				if (tlist->sc_flags & SC_SET_MINPSZ)
+					mi->mi_minpsz = tlist->sc_minpsz;
+				if (tlist->sc_flags & SC_SET_MAXPSZ)
+					mi->mi_maxpsz = tlist->sc_maxpsz;
+				if (tlist->sc_flags & SC_SET_HIWAT)
+					mi->mi_hiwat = tlist->sc_hiwat;
+				if (tlist->sc_flags & SC_SET_LOWAT)
+					mi->mi_lowat = tlist->sc_lowat;
+				tlist->sc_minpsz = mi->mi_minpsz;
+				tlist->sc_maxpsz = mi->mi_maxpsz;
+				tlist->sc_hiwat = mi->mi_hiwat;
+				tlist->sc_lowat = mi->mi_lowat;
+			}
+		}
+		if (tlist->sc_flags & SC_SET_TRCLEVEL) {
+			/* trace levels not supported yet. */
+		}
+		return (sizeof(*tlist));
+	} else
+#endif
+	{
+		struct sc_tune *tlist = (typeof(tlist)) _tlist;
+
+		if (tlist->sc_flags & SC_SET_RDQUEUE) {
+			if (tlist->sc_flags & SC_SET_LOWERMUX) {
+				if (st->st_muxrinit)
+					mi = st->st_muxrinit->qi_minfo;
+			} else {
+				if (st->st_rdinit)
+					mi = st->st_rdinit->qi_minfo;
+			}
+			if (mi) {
+				if (tlist->sc_flags & SC_SET_MINPSZ)
+					mi->mi_minpsz = tlist->sc_minpsz;
+				if (tlist->sc_flags & SC_SET_MAXPSZ)
+					mi->mi_maxpsz = tlist->sc_maxpsz;
+				if (tlist->sc_flags & SC_SET_HIWAT)
+					mi->mi_hiwat = tlist->sc_hiwat;
+				if (tlist->sc_flags & SC_SET_LOWAT)
+					mi->mi_lowat = tlist->sc_lowat;
+				tlist->sc_minpsz = mi->mi_minpsz;
+				tlist->sc_maxpsz = mi->mi_maxpsz;
+				tlist->sc_hiwat = mi->mi_hiwat;
+				tlist->sc_lowat = mi->mi_lowat;
+			}
+		}
+		if (tlist->sc_flags & SC_SET_WRQUEUE) {
+			if (tlist->sc_flags & SC_SET_LOWERMUX) {
+				if (st->st_muxwinit)
+					mi = st->st_muxwinit->qi_minfo;
+			} else {
+				if (st->st_wrinit)
+					mi = st->st_wrinit->qi_minfo;
+			}
+			if (mi) {
+				if (tlist->sc_flags & SC_SET_MINPSZ)
+					mi->mi_minpsz = tlist->sc_minpsz;
+				if (tlist->sc_flags & SC_SET_MAXPSZ)
+					mi->mi_maxpsz = tlist->sc_maxpsz;
+				if (tlist->sc_flags & SC_SET_HIWAT)
+					mi->mi_hiwat = tlist->sc_hiwat;
+				if (tlist->sc_flags & SC_SET_LOWAT)
+					mi->mi_lowat = tlist->sc_lowat;
+				tlist->sc_minpsz = mi->mi_minpsz;
+				tlist->sc_maxpsz = mi->mi_maxpsz;
+				tlist->sc_hiwat = mi->mi_hiwat;
+				tlist->sc_lowat = mi->mi_lowat;
+			}
+		}
+		if (tlist->sc_flags & SC_SET_TRCLEVEL) {
+			/* trace levels not supported yet. */
+		}
+		return (sizeof(*tlist));
+	}
+}
+
+static size_t
+str_tlist_count(void)
+{
+	return (4);
+}
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -519,7 +704,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 {
 	union ioctypes *ioc;
 	int err = 0, rval = 0, reset = 0;
-	mblk_t *dp = mp->b_cont;
+	mblk_t *dp = mp->b_cont, *cp = NULL;
 
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
@@ -550,20 +735,21 @@ sc_wput(queue_t *q, mblk_t *mp)
 		_trace();
 		ioc = (typeof(ioc)) mp->b_rptr;
 
-#ifdef WITH_32BIT_CONVERSION
-		if (ioc->iocblk.ioc_flag == IOC_ILP32) {
-			uaddr = (caddr_t) (unsigned long) (uint32_t) *(unsigned long *) dp->b_rptr;
-			usize = sizeof(struct sc_list32);
-		} else
-#endif
-		{
-			uaddr = (caddr_t) *(unsigned long *) dp->b_rptr;
-			usize = sizeof(struct sc_list);
-		}
 		switch (ioc->iocblk.ioc_cmd) {
 		case SC_IOC_RESET:
 			reset = 1;
 		case SC_IOC_LIST:
+#ifdef WITH_32BIT_CONVERSION
+			if (ioc->iocblk.ioc_flag == IOC_ILP32) {
+				uaddr = (caddr_t) (unsigned long) (uint32_t) *(unsigned long *)
+				    dp->b_rptr;
+				usize = sizeof(struct sc_list32);
+			} else
+#endif
+			{
+				uaddr = (caddr_t) *(unsigned long *) dp->b_rptr;
+				usize = sizeof(struct sc_list);
+			}
 			/* there is really no reason why a regular user cannot list modules and
 			   related information. */
 #if 0
@@ -591,6 +777,60 @@ sc_wput(queue_t *q, mblk_t *mp)
 			}
 			_trace();
 			/* doesn't support I_STR yet, just TRANSPARENT */
+			err = -EINVAL;
+			goto nak;
+		case SC_IOC_TUNE:
+#ifdef LFS
+#ifdef WITH_32BIT_CONVERSION
+			if (ioc->iocblk.ioc_flag == IOC_ILP32) {
+				uaddr = (caddr_t) (unsigned long) (uint32_t) *(unsigned long *)
+				    dp->b_rptr;
+				usize = sizeof(struct sc_tlist32);
+			} else
+#endif
+			{
+				uaddr = (caddr_t) *(unsigned long *) dp->b_rptr;
+				usize = sizeof(struct sc_tlist);
+			}
+			if (ioc->iocblk.ioc_count == TRANSPARENT) {
+				mp->b_datap->db_type = M_COPYIN;
+				ioc->copyreq.cq_addr = uaddr;
+				ioc->copyreq.cq_size = usize;
+				ioc->copyreq.cq_flag = 0;
+				ioc->copyreq.cq_private = (mblk_t *) 0;
+				qreply(q, mp);
+				return (0);
+			}
+			/* doesn't support I_STR yet, just TRANSPARENT */
+			/* not supported under LIS */
+#endif
+			err = -EINVAL;
+			goto nak;
+		case SC_IOC_STATS:
+#ifdef LFS
+#ifdef WITH_32BIT_CONVERSION
+			if (ioc->iocblk.ioc_flag == IOC_ILP32) {
+				uaddr =
+				    (caddr_t) (unsigned long) (uint32_t) *(unsigned long *) dp->
+				    b_rptr;
+				usize = sizeof(struct sc_slist32);
+			} else
+#endif
+			{
+				uaddr = (caddr_t) *(unsigned long *) dp->b_rptr;
+				usize = sizeof(struct sc_slist);
+			}
+			if (ioc->iocblk.ioc_count == TRANSPARENT) {
+				mp->b_datap->db_type = M_COPYIN;
+				ioc->copyreq.cq_addr = uaddr;
+				ioc->copyreq.cq_size = usize;
+				ioc->copyreq.cq_flag = 0;
+				ioc->copyreq.cq_private = (mblk_t *) 0;
+				qreply(q, mp);
+				return (0);
+			}
+			/* doesn't support I_STR yet, just TRANSPARENT */
+#endif
 			err = -EINVAL;
 			goto nak;
 		}
@@ -698,9 +938,8 @@ sc_wput(queue_t *q, mblk_t *mp)
 							if (n >= count)
 								break;
 							st = cdev->f_str;
-							mlist +=
-							    sc_mlist_copy(i, st, mlist, reset,
-									  flag);
+							mlist += sc_mlist_copy(i, st, mlist,
+									       reset, flag);
 							n++;
 						}
 					}
@@ -717,9 +956,8 @@ sc_wput(queue_t *q, mblk_t *mp)
 							if (n >= count)
 								break;
 							st = fmod->f_str;
-							mlist +=
-							    sc_mlist_copy(0, st, mlist, reset,
-									  flag);
+							mlist += sc_mlist_copy(0, st, mlist,
+									       reset, flag);
 							n++;
 						}
 					}
@@ -745,9 +983,8 @@ sc_wput(queue_t *q, mblk_t *mp)
 							cdev =
 							    list_entry(pos, struct cdevsw, d_list);
 							st = cdev->d_str;
-							mlist +=
-							    sc_mlist_copy(cdev->d_major, st,
-									  mlist, reset, flag);
+							mlist += sc_mlist_copy(cdev->d_major, st,
+									       mlist, reset, flag);
 							n++;
 						}
 						read_unlock(&cdevsw_lock);
@@ -766,9 +1003,8 @@ sc_wput(queue_t *q, mblk_t *mp)
 							fmod =
 							    list_entry(pos, struct fmodsw, f_list);
 							st = fmod->f_str;
-							mlist +=
-							    sc_mlist_copy(0, st, mlist, reset,
-									  flag);
+							mlist += sc_mlist_copy(0, st,
+									       mlist, reset, flag);
 							n++;
 						}
 						read_unlock(&fmodsw_lock);
@@ -791,6 +1027,278 @@ sc_wput(queue_t *q, mblk_t *mp)
 				return (0);
 			} else {
 				_trace();
+				/* done */
+				rval = (int) (long) ioc->copyresp.cp_private;
+				goto ack;
+			}
+		case SC_IOC_TUNE:
+		{
+			int n = 0, count;
+			caddr_t uaddr;
+			size_t usize;
+
+			cp = ioc->copyresp.cp_private;
+			ioc->copyresp.cp_private = NULL;
+			if (ioc->copyresp.cp_rval != 0) {
+				freemsg(cp);
+				_ptrace(("Aborting ioctl!\n"));
+				goto abort;
+			}
+			if (cp == NULL) {
+				if (!dp || dp->b_wptr == dp->b_rptr) {
+					rval = str_tlist_count();
+					goto ack;
+				}
+#ifdef WITH_32BIT_CONVERSION
+				if (ioc->copyresp.cp_flag == IOC_ILP32) {
+					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_tlist32)) {
+						_ptrace(("Error path taken!\n"));
+						err = -EFAULT;
+						goto nak;
+					} else {
+						struct sc_tlist32 *sclp = (typeof(sclp)) dp->b_rptr;
+
+						count = sclp->sc_ntune;
+						uaddr = (caddr_t) (unsigned long) sclp->sc_tlist;
+						usize = count * sizeof(struct sc_tune32);
+					}
+				} else
+#endif				/* WITH_32BIT_CONVERSION */
+				{
+					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_tlist)) {
+						_ptrace(("Error path taken!\n"));
+						err = -EFAULT;
+						goto nak;
+					} else {
+						struct sc_tlist *sclp = (typeof(sclp)) dp->b_rptr;
+
+						count = sclp->sc_ntune;
+						uaddr = (caddr_t) (unsigned long) sclp->sc_tlist;
+						usize = count * sizeof(struct sc_tune);
+					}
+				}
+				if (count < 0) {
+					_ptrace(("Error path taken!\n"));
+					err = -EINVAL;
+					goto nak;
+				}
+				if (count > 4) {
+					_ptrace(("Error path taken!\n"));
+					err = -ERANGE;
+					goto nak;
+				}
+				if (count == 0) {
+					rval = str_tlist_count();
+					goto ack;
+				}
+				if (!(dp = allocb(usize, BPRI_MED))) {
+					_ptrace(("Error path taken!\n"));
+					err = -ENOSR;
+					goto nak;
+				}
+				dp->b_wptr = dp->b_rptr + usize;
+				bzero(dp->b_rptr, usize);
+				dp = XCHG(&mp->b_cont, dp);
+
+				mp->b_datap->db_type = M_COPYIN;
+				ioc->copyreq.cq_addr = uaddr;
+				ioc->copyreq.cq_size = usize;
+				ioc->copyreq.cq_flag = 0;
+				ioc->copyreq.cq_private = dp;
+				qreply(q, mp);
+				return (0);
+
+			}
+			if ((long) cp >= 1 && (long) cp <= 4) {
+				/* done */
+				rval = (int) (long) cp;
+				goto ack;
+			}
+			{
+				uint flag = ioc->copyresp.cp_flag;
+				caddr_t tlist = (typeof(tlist)) dp->b_rptr;
+				struct fmodsw *fmod = NULL;
+				struct cdevsw *cdev = NULL;
+				struct streamtab *st = NULL;
+
+#ifdef WITH_32BIT_CONVERSION
+				if (flag == IOC_ILP32) {
+					struct sc_tlist32 *sclp = (typeof(sclp)) cp->b_rptr;
+
+					if (cp->b_wptr < cp->b_rptr + sizeof(*sclp)) {
+						_ptrace(("Error path taken!\n"));
+						freemsg(cp);
+						err = -EFAULT;
+						goto nak;
+					}
+					count = sclp->sc_ntune;
+					uaddr = (caddr_t) (unsigned long) sclp->sc_tlist;
+					usize = count * sizeof(struct sc_tune32);
+
+					/* First order of business is to find the STREAMS driver or 
+					   module streamtab structure. */
+					if (sclp->sc_major == 0) {
+						if ((fmod = fmod_find(sclp->sc_name)))
+							st = fmod->f_str;
+						else if ((cdev = cdev_find(sclp->sc_name)))
+							st = cdev->d_str;
+					} else {
+						if ((cdev = sdev_get(sclp->sc_major)))
+							st = cdev->d_str;
+					}
+				} else
+#endif
+				{
+					struct sc_tlist *sclp = (typeof(sclp)) cp->b_rptr;
+
+					if (cp->b_wptr < cp->b_rptr + sizeof(*sclp)) {
+						_ptrace(("Error path taken!\n"));
+						freemsg(cp);
+						err = -EFAULT;
+						goto nak;
+					}
+					count = sclp->sc_ntune;
+					uaddr = (caddr_t) (unsigned long) sclp->sc_tlist;
+					usize = count * sizeof(*sclp->sc_tlist);
+
+					/* First order of business is to find the STREAMS driver or 
+					   module streamtab structure. */
+					if (sclp->sc_major == 0) {
+						if ((fmod = fmod_find(sclp->sc_name)))
+							st = fmod->f_str;
+						else if ((cdev = cdev_find(sclp->sc_name)))
+							st = cdev->d_str;
+					} else {
+						if ((cdev = sdev_get(sclp->sc_major)))
+							st = cdev->d_str;
+					}
+				}
+				if (st == NULL) {
+					_ptrace(("Error path taken!\n"));
+					if (fmod != NULL)
+						fmod_put(fmod);
+					if (cdev != NULL)
+						sdev_put(cdev);
+					freemsg(cp);
+					err = -EINVAL;
+					goto nak;
+				}
+				if (dp->b_wptr < dp->b_rptr + usize) {
+					_ptrace(("Error path taken!\n"));
+					if (fmod != NULL)
+						fmod_put(fmod);
+					if (cdev != NULL)
+						sdev_put(cdev);
+					freemsg(cp);
+					err = -EFAULT;
+					goto nak;
+				}
+
+				for (; n < count; n++)
+					tlist += sc_tlist_tune(st, tlist, n, flag);
+
+				rval = count;
+				if (fmod != NULL)
+					fmod_put(fmod);
+				if (cdev != NULL)
+					sdev_put(cdev);
+				freemsg(cp);
+			}
+			mp->b_datap->db_type = M_COPYOUT;
+			ioc->copyreq.cq_addr = uaddr;
+			ioc->copyreq.cq_size = usize;
+			ioc->copyreq.cq_flag = 0;
+			ioc->copyreq.cq_private = (mblk_t *) (long) count;
+			qreply(q, mp);
+			return (0);
+		}
+		case SC_IOC_STATS:
+			if (ioc->copyresp.cp_rval != 0) {
+				_ptrace(("Aborting ioctl!\n"));
+				goto abort;
+			}
+			if (ioc->copyresp.cp_private == (mblk_t *) 0) {
+				int n = 0, count;
+				caddr_t uaddr;
+				size_t usize;
+
+				if (!dp || dp->b_wptr == dp->b_rptr) {
+					rval = str_slist_count();
+					goto ack;
+				}
+#ifdef WITH_32BIT_CONVERSION
+				if (ioc->copyresp.cp_flag == IOC_ILP32) {
+					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_slist32)) {
+						_ptrace(("Error path taken!\n"));
+						err = -EFAULT;
+						goto nak;
+					} else {
+						struct sc_slist32 *sclp = (typeof(sclp)) dp->b_rptr;
+
+						count = sclp->sc_nstat;
+						uaddr = (caddr_t) (unsigned long) sclp->sc_slist;
+						usize = count * sizeof(struct sc_stat32);
+					}
+				} else
+#endif
+				{
+					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_slist)) {
+						_ptrace(("Error path taken!\n"));
+						err = -EFAULT;
+						goto nak;
+					} else {
+						struct sc_slist *sclp = (typeof(sclp)) dp->b_rptr;
+
+						count = sclp->sc_nstat;
+						uaddr = (caddr_t) sclp->sc_slist;
+						usize = count * sizeof(struct sc_stat);
+					}
+				}
+				if (count < 0) {
+					_ptrace(("Error path taken!\n"));
+					err = -EINVAL;
+					goto nak;
+				}
+				if (count > 100) {
+					_ptrace(("Error path taken!\n"));
+					err = -ERANGE;
+					goto nak;
+				}
+				if (count == 0) {
+					rval = str_slist_count();
+					goto ack;
+				}
+				if (!(dp = allocb(usize, BPRI_MED))) {
+					_ptrace(("Error path taken!\n"));
+					err = -ENOSR;
+					goto nak;
+				}
+				dp->b_wptr = dp->b_rptr + usize;
+				bzero(dp->b_rptr, usize);
+				freemsg(mp->b_cont);
+				mp->b_cont = dp;
+#ifdef LIS
+				err = -EINVAL;
+				goto nak;
+#endif
+#ifdef LFS
+				{
+					uint flag = ioc->copyresp.cp_flag;
+					caddr_t slist = (typeof(slist)) dp->b_rptr;
+
+					for (; n < count; n++)
+						slist += sc_slist_copy(slist, n, flag);
+					rval = str_slist_count();
+				}
+#endif
+				mp->b_datap->db_type = M_COPYOUT;
+				ioc->copyreq.cq_addr = uaddr;
+				ioc->copyreq.cq_size = usize;
+				ioc->copyreq.cq_flag = 0;
+				ioc->copyreq.cq_private = (mblk_t *) (long) count;
+				qreply(q, mp);
+				return (0);
+			} else {
 				/* done */
 				rval = (int) (long) ioc->copyresp.cp_private;
 				goto ack;

@@ -428,7 +428,11 @@ skballoc(struct sk_buff *skb, uint priority)
 		// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
 		// _ensure(mp->b_cont == NULL, mp->b_cont = NULL);
 		mp->b_rptr = skb->data;
+#ifdef NET_SKBUFF_DATA_USES_OFFSET
+		mp->b_wptr = skb_tail_pointer(skb);
+#else
 		mp->b_wptr = skb->tail;
+#endif
 		// _ensure(mp->b_datap == db, mp->b_datap = db);
 		// _ensure(mp->b_band == 0, mp->b_band = 0);
 		// _ensure(mp->b_flag == 0, mp->b_flag = 0);
@@ -436,10 +440,18 @@ skballoc(struct sk_buff *skb, uint priority)
 		/* set up data block */
 		db->db_frtnp = frtnp;
 		db->db_base = skb->head;
+#ifdef NET_SKBUFF_DATA_USES_OFFSET
+		db->db_lim = skb_end_pointer(skb);
+#else
 		db->db_lim = skb->end;
+#endif
 		// _ensure(db->db_ref == 1, db->db_ref = 1);
 		// _ensure(db->db_type == M_DATA, db->db_type = M_DATA);
+#ifdef NET_SKBUFF_DATA_USES_OFFSET
+		db->db_size = skb->end;
+#else
 		db->db_size = skb->end - skb->head;
+#endif
 		db->db_flag = DB_SKBUFF;
 		return (mp);
 	}

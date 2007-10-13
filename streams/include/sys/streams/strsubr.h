@@ -441,6 +441,8 @@ struct strinfo {
 #endif
 };
 
+extern struct strinfo Strinfo[];
+
 enum {
 	DYN_STREAM,			/* struct shinfo */
 	DYN_QUEUE,			/* struct queinfo */

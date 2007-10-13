@@ -317,11 +317,11 @@ by
 regardless of the space provided by the caller.
 .TP
 .I sc_list
-Provides a pointer to auser buffer that contains at least
+Provides a pointer to a user buffer that contains at least
 .I sc_ntune
 number of
 .B sc_tune
-structure in an array.
+structures in an array.
 The module will return no more than the number of tunable objects available,
 or the number of tunable objects requested, whichever is less.  However,
 .I sc_ntune
@@ -347,8 +347,8 @@ structure contains the following members:
 .nf
 \fC\s-1\
 struct sc_tune {
+    long sc_major;
     char sc_name[FMNAMSZ + 1];
-    long sc_addr;
     int sc_flags;
     ssize_t sc_minpsz;
     ssize_t sc_maxpsz;
@@ -359,16 +359,17 @@ struct sc_tune {
 \s+1\fP
 .fi
 .TP \w'\fIsc_trclevel\fR\(em'u
+.I sc_major
+On call, specifies the major device number for the driver whose information is
+to be tuned or zero for a module.  When unused, this member is set to zero.
+This member is always set on return to the major device number of the STREAMS
+driver or zero for a STREAMS module.
+.TP
 .I sc_name
 On call, provides the name of the STREAMS module or driver to which tunables
 are to be applied.  When unused, the first character of this field is set to
 null (0).  This member is always set on return to the name of the STREAMS
 driver or module to which the tunable object applies.
-.TP
-.I sc_addr
-On call, provides the address (in core) of the queue, queue pair or Stream to
-which the tunables are to be applied.  When unused, this field is set to zero
-(0).
 .TP
 .I sc_flags
 Flags that indicate which of the folllowing tunables are to be applied an to
@@ -450,6 +451,207 @@ significant if
 is set in
 .IR sc_flags .
 .RE
+.\"
+.SS SC_IOC_STATS
+.PP
+.I arg
+is a pointer to an
+.B sc_slist
+structures in the user's address space.
+.PP
+The
+.B sc_slist
+structure contains the following members:
+.PP
+.RS
+.nf
+struct sc_slist {
+    int sc_nstat;
+    struct sc_stat *sc_list;
+};
+.fi
+.TP
+.I sc_nstat
+On call, specifies the number of
+.B sc_stat
+structures that are provided in the caller's buffer point to be
+.IR sc_list .
+On return, specifies the number of
+.B sc_stat
+structure that are available to be written to the caller's buffer pointed to
+by
+.IR sc_list ,
+regardless of the spaced provided by the caller.
+.TP
+.I sc_list
+Provides a pointer to a user buffer that contains at least
+.I sc_nstat
+mber of
+.B sc_stat
+structures in an array.
+The module will return no more than the number of statistics objects
+available, or the number of statistics objects requested, whichever is less.
+However,
+.I sc_nstat
+will always return the number of objects available.
+.PP
+By calling with a
+.I sc_nstat
+of zero and a
+.I sc_list
+of
+.BR NULL ,
+the caller can determine the number of objects that are available to be
+returned in
+.IR sc_list
+so that the buffer may be appropriately sized for a subsequent call.
+.RE
+.PP
+The
+.B sc_stat
+structure contains the following members:
+.sp
+.RS
+.nf
+\fC\s-1\
+struct sc_stat {
+    unsigned long sc_alloc;
+    unsigned long sc_hiwat;
+};
+\s+1\fP
+.fi
+.TP \w'\fIsc_hiwat\fR\(em'u
+.I sc_alloc
+On return, this member is set to the current number of allocated objects of the
+type indicated by the index into the array.
+.TP
+.I sc_hiwat
+On return, this member is set to the high water mark of allocations of objects
+of the type indicated by the index into the array since the last system
+reboot.
+.RE
+.PP
+Each index in the array pointed to by
+.I sc_list
+corresponds to a different dynamically allocated object as follows (in order
+of index):
+.TP \w'\fBSC_DYN_STREVENT\fR\(em'u
+.B SC_DYN_STREAM
+The number of
+.B shinfo
+structures allocated, which corresponds to the number of Stream heads
+allocated.
+.TP
+.B SC_DYN_QUEUE
+The nunber of
+.B queinfo
+structures allocated, which corresponds to the number of queue pairs
+allocated.
+.TP
+.B SC_DYN_MSGBLOCK
+The number of
+.B mbinfo
+structure allocated separately, which corresponds to the number of message,
+.BR mblk_t (9),
+blocks allocated.
+Linux Fast-STREAMS does not separately allocate message blocks, but allocates
+a message block, data block and fast buffer simultaneously, and this number is
+always zero.
+.TP
+.B SC_DYN_MDBBLOCK
+The number of
+.B dbinfo
+structures allocated separately, which corresponds to the number of data,
+.BR dblk_t (9)
+blocks allocated.
+Linux Fast-STREAMS does not separately allocate data blocks, but allocates a
+message block, data block and fast buffer simultaneously, and this number
+represents the number of combined message-data-fast-buffer allocations.
+.TP
+.B SC_DYN_LINKBLK
+The number of
+.B linkinfo
+structures allocated, which corresponds to the number of link,
+.BR linkblk (9)
+blocks allocated.  Link blocks are used when performing temporary or permanent
+linkage of a Stream under a multiplexing driver.  See
+.IR I_LINK (9)
+and
+.IR I_PLINK (9).
+.TP
+.B SC_DYN_STREVENT
+The number of
+.B seinfo
+structures allocated, which corresponds to the number of STREAMS event,
+.BR strevent (9),
+blocks allocated.  STREAMS event blocks are used for timers, bufcalls, and
+welds.
+.TP
+.B SC_DYN_QBAND
+The number of
+.B bandinfo
+structures allocated, which corresponds to the number of queue band,
+.BR qband (9),
+structures allocated.  Queue band structures are allocated for every message
+band from 1 to the highest referenced queue band for a queue in a queue pair.
+.TP
+.B SC_DYN_STRAPUSH
+The number of
+.B apinfo
+structures allocated, which corresponds to the number of autopush structures
+allocated.  An autopush structure is allocated for each autopush specification
+for a driver.
+.TP
+.B SC_DYN_DEVINFO
+The number of
+.B devinfo
+structures allocated, which corresponds to the number of device information
+structures allocated for Solaris compatibility.
+.TP
+.B SC_DYN_MODINFO
+The number of
+.B mdlinfo
+structures allocated, which corresponds to the number of module information
+structures allocated for Solaris compatibility.
+.TP
+.B SC_DYN_SYNQ
+The number of
+.B syncq
+structures allocated, which corresponds to the number of syncrhonization
+barriers associated with STREAMS modules and drivers requiring
+synchronization.
+.\"
+.\"
+.SH SIGNALS
+.PP
+When a configuration change is detected by the
+.B sc
+module that would result in a different response to the
+.B SC_IOC_LIST
+input-output control (that is, the addition, removal or alteration of the
+characteristics of a STREAMS module or driver), the module will issue a
+.BR M_PCSIG (9)
+message,
+containing the
+.RI { SIGPOLL }
+signal,
+to all open Stream heads (except not necessarily the Stream head which effected the
+change).
+This results in the immediate generation of a
+.RI { SIGPOLL }
+signal to processes registered for the
+.B S_MSG
+event using the
+.IR I_SETSIG (7)
+input-output control, or to the process group leader.  See
+.BR M_PCSIG (9).
+.PP
+This feature was added to permit the STREAMS SNMP agent to cache configuration
+information and hold open a Stream with the
+.B sc
+module pushed and receive a
+.RI { SIGPOLL }
+signal whenever the agent cache is invalidated.
 .\"
 .\"
 .SH NOTICES
@@ -583,6 +785,24 @@ implementation of the
 .B sc
 module.
 Compatibility with other implementations is not guaranteed.
+.IP \(em
+The
+.B SC_IOC_TUNE
+input-output control is specific to
+.B "Linux Fast-STREAMS"
+and should not be used by portable programs.
+.IP \(em
+The
+.B SC_IOC_STAT
+input-output control is specific to
+.B "Linux Fast-STREAMS"
+and should not be used by portable programs.
+.IP \(em
+The generation of
+.RI { SIGPOLL }
+signals on configuration changes is specific to
+.B "Linux Fast-STREAMS"
+and should not be expected by portable programs.
 .\"
 .\"
 .SH CONFORMANCE
@@ -610,6 +830,22 @@ and
 hpuxspg
 .]
 documentation.
+.PP
+The
+.B SC_IOC_TUNE
+and
+.B SC_IOC_STATS
+capabilities,
+and
+.RI { SIGPOLL }
+feature,
+are specific to
+.B "Linux Fast-STREAMS"
+and were first added in release
+.B 0.9.2.4
+of the
+.B streams
+package.
 .\"
 .\"
 .[

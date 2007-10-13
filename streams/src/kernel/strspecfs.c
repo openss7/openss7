@@ -1373,7 +1373,9 @@ snode_init_once(void *data, kmem_cachep_t cachep, unsigned long flags)
 {
 	struct inode *inode = (struct inode *) data;
 
+#if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
+#endif
 		inode_init_once(inode);
 }
 

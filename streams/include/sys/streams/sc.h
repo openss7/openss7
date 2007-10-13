@@ -141,6 +141,10 @@
   * Request that the tunables in the associated str_tune structure be set and
   * current values returned. */
 
+#define SC_IOC_STATS	((SC_IOC_MAGIC << 8) | 0x04) /**< Get statistics.
+  * Requests that general STREAMS statistics be returned in an array of 12
+  * sc_stat structures. */
+
 #define SC_SET_MINPSZ	(1<<0)	/**< Set minimum packet size. */
 #define SC_SET_MAXPSZ	(1<<1)	/**< Set maximum packet size. */
 #define SC_SET_HIWAT	(1<<2)	/**< Set high water mark. */
@@ -220,7 +224,7 @@ struct sc_mlist {
 
 /** @struct sc_list include/sys/streams/sc.h <sys/sc.h>
   *
-  * STREAMS Configuraiton Module List.  Provides a pointer to an array,
+  * STREAMS Configuration Module List.  Provides a pointer to an array,
   * #sc_mlist, and the number of elements in the array, #sc_nmods.  */
 struct sc_list {
 	int sc_nmods;			/**< Number of structures in #sc_mlist. */
@@ -235,8 +239,6 @@ struct sc_list {
   * return to the input-output control.
   */
 struct sc_tune {
-	long sc_addr;			/**< Address of queue. */
-	char sc_name[FMNAMESZ + 1];	/**< Module name. */
 	int sc_flags;			/**< Tunable flags. */
 	ssize_t sc_minpsz;		/**< Min packet size accepted. */
 	ssize_t sc_maxpsz;		/**< Max packet size accepted. */
@@ -244,6 +246,49 @@ struct sc_tune {
 	size_t sc_lowat;		/**< Lo water mark. */
 	int sc_trclevel;		/**< Trace level. */
 };
+
+/** @struct sc_tlist include/sys/streams/sc.h <sys/sc.h>
+  *
+  * STREAMS Tunables list.  Provides a pointer to an array,
+  * #sc_tlist, and the number of elements in the array, #sc_ntune.  */
+struct sc_tlist {
+	long sc_major;			/**< Major device number, -1 for module. */
+	char sc_name[FMNAMESZ + 1];	/**< Module name. */
+	int sc_ntune;			/**< Number of structures in #sc_tlist. */
+	struct sc_tune *sc_tlist;	/**< Pointer to array of #sc_ntune elements. */
+};
+
+/**
+  * @struct sc_stat include/sys/streams/sc.h <sys/sc.h>
+  *
+  * STREAMS Statistic Structure.  Provides a statistics structure for querying
+  * STREAMS statistics.  The #sc_alloc member returns the currently allocated
+  * value, the #sc_hiwat member returns the allocation high water mark for the
+  * statistic.  These structures are returned in an array, where each element
+  * in the array represents a different statistic.
+  */
+struct sc_stat {
+	unsigned long sc_alloc;
+	unsigned long sc_hiwat;
+};
+
+struct sc_slist {
+	int sc_nstat;			/**< Number of structures in #sc_slist. */
+	struct sc_stat *sc_slist;	/**< Pointer to array of #sc_nstat elements. */
+};
+
+#define SC_DYN_STREAM	0	/* struct shinfo */
+#define SC_DYN_QUEUE	1	/* struct queinfo */
+#define SC_DYN_MSGBLOCK	2	/* struct mbinfo */
+#define SC_DYN_MDBBLOCK	3	/* struct dbinfo */
+#define SC_DYN_LINKBLK	4	/* struct linkinfo */
+#define SC_DYN_STREVENT	5	/* struct seinfo */
+#define SC_DYN_QBAND	6	/* struct bandinfo */
+#define SC_DYN_STRAPUSH	7	/* struct apinfo */
+#define SC_DYN_DEVINFO	8	/* struct devinfo */
+#define SC_DYN_MODINFO	9	/* struct mdlinfo */
+#define SC_DYN_SYNQ	10	/* struct syncq */
+#define SC_DYN_BUFFERS	11	/* buffer memory */
 
 #ifdef __KERNEL__
 #ifdef __LP64__
@@ -284,14 +329,29 @@ struct sc_list32 {
 };
 
 struct sc_tune32 {
-	int32_t sc_addr;		/**< Address of queue. */
-	char sc_name[FMNAMESZ + 1];	/**< Module name. */
 	int32_t sc_flags;		/**< Tunable flags. */
 	int32_t sc_minpsz;		/**< Min packet size accepted. */
 	int32_t sc_maxpsz;		/**< Max packet size accepted. */
 	u_int32_t sc_hiwat;		/**< Hi water mark. */
 	u_int32_t sc_lowat;		/**< Lo water mark. */
 	int32_t sc_trclevel;		/**< Trace level. */
+};
+
+struct sc_tlist32 {
+	int32_t sc_major;		/**< Major device number. */
+	char sc_name[FMNAMESZ + 1];	/**< Module name. */
+	int32_t sc_ntune;
+	u_int32_t sc_tlist;
+};
+
+struct sc_stat32 {
+	uint32_t sc_alloc;
+	uint32_t sc_hiwat;
+};
+
+struct sc_slist32 {
+	int32_t sc_nstat;
+	u_int32_t sc_slist;
 };
 #endif				/* __LP64__ */
 #endif				/* __KERNEL__ */

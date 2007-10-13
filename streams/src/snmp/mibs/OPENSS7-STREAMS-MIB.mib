@@ -735,8 +735,7 @@ strStatsStructure OBJECT-TYPE
 			dyn-strapush(8),
 			dyn-devinfo(9),
 			dyn-modinfo(10),
-			dyn-synq(11),
-			dyn-buffers(12)
+			dyn-synq(11)
 		}
 	MAX-ACCESS	read-only
 	STATUS		current
@@ -775,9 +774,6 @@ strStatsStructure OBJECT-TYPE
 
 		 - dyn-synq: the number of STREAMS synchronization queue 
 		   structures allocated.
-
-		 - dyn-buffers: the number of bytes of message buffer 
-		   allocated.
 
 		 Of the statistic presented here, the statistics for 
 		 dyn-mdbblock is probably most important.  This is the 
@@ -1315,7 +1311,6 @@ strTunablesMandatoryGroup OBJECT-GROUP
 			strMinpsz,
 			strStrctlsz,
 			strStrmsgsz,
-			strStrthresh,
 			strIoctime
 		}
 	STATUS		current
@@ -1328,6 +1323,7 @@ strTunablesMandatoryGroup OBJECT-GROUP
 strMessagePoolsConditionalGroup OBJECT-GROUP
 	OBJECTS	{
 			strMsgPriority,
+			strStrthresh,
 			strLowthresh,
 			strMedthresh
 		}
@@ -1536,133 +1532,133 @@ strMIBCompliance MODULE-COMPLIANCE
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strMaxApush
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strMaxMblk
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strMaxStramod
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strMsgPriority
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strNstrmsgs
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strNstrpush
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strHiwat
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strLowat
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strMaxpsz
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strMinpsz
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strRtime
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strStrhold
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strStrctlsz
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strStrmsgsz
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strIoctime
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strStrthresh
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strLowthresh
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strMedthresh
 		MIN-ACCESS read-only
 		DESCRIPTION
 			"It is permitted to provide this tunable a 
 			 read-only where the STREAMS subsystem is 
-			 incapable of changing if without exceptional 
+			 incapable of changing it without exceptional 
 			 action such as recompiling the kernel."
 	OBJECT strModInfoMinpsz
 		MIN-ACCESS read-only

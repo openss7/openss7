@@ -518,8 +518,18 @@ struct str_list {
 .RE
 .TP \w'sap_lastminor\(em'u
 .I sl_nmods
+Specifies the number of
+.B str_mlist
+structures in the the memory extent pointed to by the
+.I sl_modlist
+member.
 .TP
 .I sl_modlist
+Pointers to a memory extent which contains
+.I sl_nmods
+number of
+.B str_mlist
+structures, each containing a module name, formatted as follows:
 .RS
 .nf
 \fC\s-1
@@ -528,6 +538,9 @@ struct str_mlist {
 };
 \s+1\fP
 .fi
+.TP
+.I l_name
+Contains the null terminated module name.
 .RE
 .\"
 .\"
@@ -612,6 +625,39 @@ may be set to any of the errors returned by the
 system call.
 .\"
 .\"
+.SH SIGNALS
+.PP
+When a configuration change is detected by the
+.B sad
+driver that would result in a different response to the
+.B SAD_GAP
+or
+.B SAD_VML
+input-output controls (that is, the addition, removal or alteration of the autopush characteristics
+of a STREAMS module or driver), the module will issue a
+.BR M_PCSIG (9)
+message, containing the
+.RI { SIGPOLL }
+signal,
+to all open Stream heads (except not necessarily the Stream head which effected the change).
+This results in the immediate generation of a
+.RI { SIGPOLL }
+signal to processes registered for the
+.B S_MSG
+event using the
+.IR I_SETSIG (7)
+input-output control, or to the process group leader.  See
+.BR M_PCSIG (9).
+.PP
+This feature was added to permit the STREAMS SNMP agent to cache configuration information and hold
+open a Stream to the
+.B sad
+driver and receive a
+.RI { SIGPOLL }
+signal whenever the agent cache is invalidated.
+
+.\"
+.\"
 .SH NOTICES
 .PP
 Historically, the
@@ -693,6 +739,12 @@ SVR 4.2,
 .IR Solaris \(rg
 or
 .IR LiS .
+.IP \(em
+The generation of
+.RI { SIGPOLL }
+signals on configuration changes is specific to
+.B "Linux Fast-STREAMS"
+and should not be expected by portable programs.
 .\"
 .\"
 .SH CONFORMANCE
@@ -726,6 +778,16 @@ SVR 4.
 .[
 svr4
 .]
+.PP
+The
+.RI { SIGPOLL }
+feature is specific to
+.B "Linux Fast-STREAMS"
+and was first added in release
+.B 0.9.2.4
+of the
+.B streams
+package.
 .\"
 .\"
 .[

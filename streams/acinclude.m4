@@ -67,6 +67,9 @@ m4_include([m4/libraries.m4])
 m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
 m4_include([m4/doxy.m4])
+m4_include([m4/lib32.m4])
+m4_include([m4/perl.m4])
+m4_include([m4/snmp.m4])
 
 # =============================================================================
 # AC_LFS
@@ -139,6 +142,8 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     CPPFLAGS=
     CFLAGS=
     _LFS_OUTPUT
+    _PERL
+    _SNMP
     _AUTOTEST
     _DOXY
 ])# AC_LFS
