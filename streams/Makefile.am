@@ -121,6 +121,8 @@ sbin_PROGRAMS			+= \
 				  strvf
 endif
 
+sbin_PROGRAMS			+= strmib
+
 dist_sbin_SCRIPTS		=
 if CONFIG_STREAMS_LOG
 dist_sbin_SCRIPTS		+= src/util/strclean
@@ -715,6 +717,12 @@ strvf_CFLAGS			= $(USER_CFLAGS)
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+
+strmib_SOURCES			= src/snmp/strMIB.c
+strmib_LDFLAGS			= $(SNMP_LDFLAGS)
+strmib_LDADD			= libstreams.la $(SNMP_LDADD)
+strmib_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+strmib_CFLAGS			= $(USER_CFLAGS)
 
 test_clone_SOURCES		= src/test/test-clone.c
 test_clone_LDFLAGS		=

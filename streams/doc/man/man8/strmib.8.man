@@ -1,0 +1,1414 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: strmib.8.man,v 0.9.2.10 2006/04/05 09:43:59 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/04/05 09:43:59 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: strmib.8.man,v $
+.\" Revision 0.9.2.10  2006/04/05 09:43:59  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so streams.macros
+.\"
+.\"
+.TH STRMIB 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B strmib
+\- OPENSS7-STREAMS-MIB SNMP Agent and AgentX Sub-agent
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.RS 0
+.hy 0
+.HP
+\fBexport PATH="/usr/sbin:$PATH"\fP
+.HP
+\fBstrmib\fP [\fIGENERAL\-OPTIONS\fP] [\fIOPTIONS\fP] [\fIARGUMENTS\fP]
+.ad l
+.HP
+\fBstrmib\fP\ [{\fB\-q\fP|\fB\-\-quiet\fP|\fB\-\-quick\fP}]
+[{\fB\-d\fP|\fB\-\-debug\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
+[{\fB\-V\fP|\fB\-\-verbose\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
+.br
+[\fIOPTIONS\fP]\ [\fIARGUMENTS\fP]
+.ad b
+.ad l
+.HP
+\fBstrmib\fP\ [{\fB\-q\fP|\fB\-\-quiet\fP|\fB\-\-quick\fP}]
+[{\fB\-d\fP|\fB\-\-debug\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
+[{\fB\-V\fP|\fB\-\-verbose\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
+.br
+[{\fB\-f\fP|\fB\-\-dont\-fork\fP}]
+[{\fB\-D\fP|\fB\-\-debug\-tokens\fP[\fB=\fP]}[\ ][\fITOKEN\fP[\fB,\fP\fITOKEN\fP]*]]
+[{\fB\-M\fP|\fB\-\-master\fP}]
+[{\fB\-x\fP|\fB\-\-agentx\-socket\fP[\fB=\fP]}[\ ][\fISOCKET\fP]]
+[{\fB\-L\fP|\fB\-\-log\-console\fP}]
+[{\fB\-a\fP|\fB\-\-log\-addresses\fP}]
+[{\fB\-d\fP|\fB\-\-dump\fP}]
+[{\fB\-p\fP|\fB\-\-port\fP[\fB=\fP]}[\ ]\fIPORTNUM\fP]
+[{\fB\-X\fP|\fB\-\-agentx\fP}]
+[{\fB\-c\fP|\fB\-\-config\-file\fP[\fB=\fP]}[\ ]\fICONFIGFILE\fP]
+[{\fB\-C\fP|\fB\-\-config\-only\fP}]
+[{\fB\-s\fP|\fB\-\-syslog\fP}]
+[{\fB\-A\fP|\fB\-\-append\fP}]
+[{\fB\-r\fP|\fB\-\-noroot\fP}]
+[{\fB\-l\fP|\fB\-\-logfile\fP[\fB=\fP]}[\ ][\fILOGFILE\fP]}]
+[{\fB\-g\fP|\fB\-\-gid\fP|\fB\-\-groupid\fP[\fB=\fP]}[\ ]\fIGID\fP]
+[{\fB\-u\fP|\fB\-\-uid\fP|\fB\-\-userid\fP[\fB=\fP]}[\ ]\fIUID\fP]
+[{\fB\-T\fP|\fB\-\-transport\fP[\fB=\fP]}[\ ][{\fIUDP\fP|\fITCP\fP}]]
+[{\fB\-P\fP|\fB\-\-pidfile\fP[\fB=\fP]}[\ ]\fIPIDFILE\fP]
+[{\fB\-k\fP|\fB\-\-keep\-open\fP}]
+[{\fB\-S\fP|\fB\-\-sysctl\-file\fP[\fB=\fP]}[\ ]\fIFILENAME\fP]
+[{\fB\-t\fP|\fB\-\-agent\-alarms\fP}]
+.br
+[\fIARGUMENT\fP[\ \fIARGUMENT\fP]*]
+.ad b
+.HP
+\fBstrmib\fP\ {\fB\-H\fP|\fB\-\-help\-directives\fP}\ [\fI...\fP]
+.PD 0
+.HP
+\fBstrmib\fP\ {\fB\-h\fP|\fB\-\-help\fP}\ [\fI...\fP]
+.HP
+\fBstrmib\fP\ {\fB\-v\fP|\fB\-\-version\fP}\ [\fI...\fP]
+.HP
+\fBstrmib\fP\ {\fB\-y\fP|\fB\-\-copying\fP}\ [\fI...\fP]
+.PD
+.RE
+.\"
+.\"
+.SH OPTIONS
+.PP
+The options recognized by
+.B strmib
+are summarized, alphabetically sorted by short option, as follows (see
+.RI \(lq DESCRIPTION ,\(rq
+below, for more detailed option descriptions):
+.TP \w'\fB-I\fP,\ \fB--initialize\fP\ [\fB-\fP][\fIMODULE\fP[\fB,\fP\fIMODULE\fP]*]\(em'u
+\fB-a\fP, \fB--log-addresses\fP
+Log addresses connecting to agent.
+.PD 0
+.TP
+\fB-A\fP, \fB--append\fP
+Append to log files without truncating.
+.TP
+\fB-c\fP, \fB--config-file\fP \fICONFIGFILE\fP
+Use optional configuration file.
+.TP
+\fB-C\fP, \fB--config-only\fP
+Only use specified configuration files.
+.TP
+\fB-d\fP, \fB--dump\fP
+Dump sent and received PDUs in hexadecimal.
+.TP
+\fB-D\fP, \fB--debug\fP [\fILEVEL\fP]
+Set debugging level.
+.TP
+\fB-D\fP, \fB--debug-tokens\fP [\fITOKEN\fP[\fB,\fP\fITOKEN\fP]*]
+Set debugging tokens.
+.TP
+\fB-f\fP, \fB--dont-fork\fP
+Run in the foreground.
+.TP
+\fB-g\fP, \fB--gid\fP, \fB--groupid\fP \fIGID\fP
+Become group \fIGID\fP after listening on sockets.
+.TP
+\fB-h\fP, \fB--help\fP, \fB-?\fP, \fB--?\fP
+Print usage information to
+.I stdout
+and exit.
+.TP
+\fB-H\fP, \fB--help-directives\fP
+List agent config directives and exit.
+.TP
+\fB-I\fP, \fB--initialize\fP [\fB-\fP][\fIMODULE\fP[\fB,\fP\fIMODULE\fP]*]
+Specifies modules to initialize (or not).
+.TP
+\fB-k\fP, \fB--keep-open\fP
+Keep management files open between requests.
+.TP
+\fB-l\fP, \fB--logfile\fP [\fILOGFILE\fP]
+Log to file
+.IR LOGFILE .
+.TP
+\fB-L\fP, \fB--log-console\fP
+Log to the terminal (i.e.
+.IR stderr ).
+.TP
+\fB-M\fP, \fB--master\fP
+Run as SNMP master agent.
+.TP
+\fB-M\fP, \fB--mibdirs\fP \fIMIBDIRS\fP
+Read MIBs from directories in
+.IR MIBDIRS .
+.TP
+\fB-n\fP, \fB--nodaemon\fP
+Run in the foreground.
+.TP
+\fB-n\fP, \fB--name\fP \fINAME\fP
+Use name
+.I NAME
+when looking up config files.
+.TP
+\fB-p\fP, \fB--port\fP \fIPORTNUM\fP
+Listen on port number
+.IR PORTNUM .
+.TP
+\fB-p\fP, \fB--pidfile\fP \fIPIDFILE\fP
+Write daemon process identifier to
+.IR PIDFILE .
+.TP
+\fB-P\fP, \fB--pidfile\fP \fIPIDFILE\fP
+Write daemon process identifier to
+.IR PIDFILE .
+.TP
+\fB-q\fP, \fB--quiet\fP
+Suppress normal output.
+.TP
+\fB-q\fP, \fB--quick\fP
+Abbrevaite output for machine readiblity.
+.TP
+\fB-r\fP, \fB--noroot\fP
+Run from non-root process.
+.TP
+\fB-s\fP, \fB--syslog\fP
+Log to the system logs.
+.TP
+\fB-S\fP, \fB--sysctl-file\fP \fIFILENAME\fP
+Use backing sysctl file,
+.IR FILENAME .
+.TP
+\fB-t\fP, \fB--agent-alarms\fP
+Agent blocks
+.RI { SIGALRM }.
+.TP
+\fB-T\fP, \fB--transport\fP [\fITRANSPORT\fP]
+Default transport (udp or tcp).
+.TP
+\fB-u\fP, \fB--uid\fP, \fB--userid\fP \fIUID\fP
+Become user \fIUID\fP after listening on sockets.
+.TP
+\fB-U\fP, \fB--dont-remove-pidfile\fP
+Do not remove
+.I PIDFILE
+when shutting down.
+.TP
+\fB-v\fP, \fB--version\fP
+Print version info on
+.I stdout
+and exit.
+.TP
+\fB-V\fP, \fB--verbose\fP [\fILEVEL\fP]
+Be verbose.
+.TP
+\fB-x\fP, \fB--agentx-socket\fP [\fISOCKET\fP]
+Attach to AgentX socket,
+.IR SOCKET .
+.TP
+\fB-X\fP, \fB--agentx\fP
+Run as AgentX agent instead of master.
+.TP
+\fB-y\fP, \fB--copyring\fP
+Print copying info to
+.I stdout
+and exit.
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B strmib
+provides a daemon or foreground executable which provides an AgentX
+.[
+AgentX
+.]
+sub-agent implementation of the
+.I OPENSS7-STREAMS-MIB
+which provides a generic management information base for
+.I STREAMS
+in general, and
+.B Linux Fast-STREAMS
+specifically.
+The
+.I OPENSS7-STREAMS-MIB
+provides management station access to
+.I STREAMS
+subsystem, driver and module configuration information and statistics as well
+as system-wide
+.I STREAMS
+tunables.
+.PP
+.B strmib
+is implemented as a typical UCD-SNMP or NET-SNMP SNMP master agent or AgentX
+.[
+agentx
+.]
+sub-agent.  It is normally run as an AgentX sub-agent, with the NET-SNMP SNMP
+agent daemon,
+.BR snmpd (8),
+running as the master agent.  Running in this manner,
+.B strmib
+running as an AgentX sub-agent takes most of its default configuration from
+the same configuration file as the master agent.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+Non-option arguments can be used to provide additional addresses on which an
+SNMP agent or AgentX sub-agent can listen for or register for requests.  In
+accordance with UCD-SNMP or NET-SNMP agent configuration.  Each address
+represents an address and port combination to be listened upon by an agent, or
+connected to by an AgentX subagent.
+.\"
+.\"
+.SH OPTIONS
+.PP
+When executed without any options,
+.B strmib
+will fork twice; become its own session leader; close standard input, error
+and output; begin logging to system logs; writes its daemon process id to
+.BR /var/run/strmib.pid ;
+and, runs as an AgentX sub-agent.
+.\"
+.SS UCD-SNMP and NET-SNMP Subagent Options
+.PP
+The following options are compatible with NET-SNMP automatically generated
+subagents.  Long options are STRMIB specific.
+.\"
+.TP
+\fB-D\fP, \fB--debug-tokens\fP [\fITOKEN\fP[\fB,\fP\fITOKEN\fP]*]
+Turns on debugging output for the specified
+.IR TOKEN s.
+Without any
+.IR TOKEN s
+specified, the default is to print all the tokens (which is also equivalent to
+the keyword
+.RI ' all ').
+You might want to try
+.RI ' all '
+for extremely verbose output.  Note: You cannot put a space between the
+.B -D
+and the
+.IR TOKEN s.
+This
+.B -D
+option is provided for compatibility with
+.BR snmpd (8)
+and
+NET-SNMP autogenerated subagents.
+.\"
+.TP
+\fB-f\fP, \fB--dont-fork\fP, \fB-n\fP, \fB--nodaemon\fP
+By default,
+.B strmib
+will place itself in the background by forking twice, becoming its own session
+leader, redirecting standard error to a log file, and standard output to an
+output file, and close standard input.  This option causes
+.B strmib
+to run in the foreground.  Errors are logged to standard error and output is
+generated to standard output.  This mode is primarily for testing and works
+well in conjunction with the debug and verbose options.
+The
+.B -f
+form of this option is provided for compatibility with
+.BR snmpd (8)
+and NET-SNMP autogenerated subagents.
+.\"
+.TP
+\fB-L\fP, \fB--log-console\fP
+Normally
+.B strmib
+will open a log file to log errors and output, particularly when run as a
+daemon process.  This option suppresses the opening of a log file and causes
+both
+.I stderr
+and
+.I stdout
+to be sent to the controlling terminal (that is, they are not redirected).
+This
+.B -L
+option is provided for compatibility with
+.BR snmpd (8)
+and
+NET-SNMP autogenerated subagents.
+.IP ""
+Note that recent versions of NET-SNMP have a far more sophisticated
+.B -L
+option than was provided with UCD-SNMP.  Note that NET-SNMP autogenerated
+subagents use this simple version, while
+.BR snmpd (8)
+and other NET-SNMP utility commands use the more sophisticated version.
+.\"
+.TP
+\fB-M\fP, \fB--master\fP
+By default,
+.B strmib
+will attempt to run as an AgentX sub-agent.  This option will cause
+.B strmib
+to run as an SNMP master agent.
+Do not use this option.  Use a complete master agent and run
+.B strmib
+as an AgentX sub-agent.
+This
+.B -M
+option is for compatiblity with NET-SNMP autogenerated subagents.
+.IP ""
+Note that recent NET-SNMP master agents,
+.BR snmpd (8),
+use this option to specify the directories which will be searched for MIBs in
+a fashion similar to the
+.B MIBDIRS
+environment variable.
+.\"
+.TP
+\fB-M\fP, \fB--mibdirs\fP \fIMIBDIRS\fP
+.\"
+.TP
+\fB-x\fP, \fB--agentx-socket\fP [\fISOCKET\fP]
+Specifies the AgentX socket,
+.IR  SOCKET ,
+to which the agent will attempt to connect as an AgentX sub-agent.  This option
+implies AgentX operation and overrides the
+.B -M
+switch.
+This
+.B -x
+switch is provided for compatibility with
+.BR snmpd (8)
+and
+NET-SNMP autogenerated subagents.
+.\"
+.SS UCD-SNMP and NET-SNMP Agent Options
+.PP
+The following options are compatible with NET-SNMP and UCD-SNMP agents, and in
+particular,
+.BR snmpd (8).
+.\"
+.TP
+\fB-a\fP, \fB--log-addresses\fP
+Log addresses accessing the SNMP agent.
+This
+.B -a
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-A\fP, \fB--append\fP
+Normally
+.B strmib
+truncates existing log files when they are opened.  This option causes
+.B strmib
+to append to existing log files instead of truncating them when opened.
+This
+.B -A
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-c\fR, \fB--config-file\fP \fICONFIGFILE\fP
+Normally
+.B strmib
+reads the default configuration file provided for the agent (the default is
+.RB \(lq strMIB.conf \(rq
+in the SNMP configuration directory (usually
+.RB \(lq /etc/snmp \(rq).
+This option causes the full pathname
+.I CONFIGFILE
+to be used as the configuration file instead.
+This
+.B -c
+option is provide for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-C\fP, \fB--config-only\fP
+Normally
+.B strmib
+reads some files automatically when the SNMP library is configured.  This
+option causes
+.B strmib
+to only read configuration files optionally specified with the
+.B -c
+option.  If no configuration file is specified with the
+.B -c
+option, no configuration files will be read when this option is specified.
+That is, all configuration values will be set to their default values.
+This
+.B -C
+option is provide for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-d\fP, \fB--dump\fP
+Dump send and received UDP SNMP packets.
+This
+.B -d
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-g\fP, \fB--gid\fP, \fB--groupid\fP \fIGID\fP
+Normally
+.B strmib
+runs with the real user and group id of the invoking process unless the
+executable is setuid or setgid in the filesystem.  This option causes
+.BR strmib ,
+after opening ports and files, to downgrade to group id,
+.IR GID .
+This option is effective both when
+.B strmib
+is run in the foreground and as a daemon process.
+This
+.B -g
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-I\fP, \fB--initialize\fP [\fB-\fP][\fIMODULE\fP[\fB,\fP\fIMODULE\fP]*]
+Specifies which moudles should or should not be initialized when the agent
+starts up.  If the comma-separated list of
+.IR MODULE s
+is preceded by a '-', the
+.IR MODULE s
+specified represent the modules that should not be initialized when the agent
+starts up; otherwise,
+the
+.IR MODULES s
+specified represent the modules that should be initialized when the agent
+starts up.
+Note that the use of this option is only necessary if
+.B strmib
+runs as a master agent.
+This
+.B -I
+option is provided for compatibility with the UCD-SNMP and NET-SNMP master
+agent,
+.BR snmpd (8).
+.\"
+.TP
+\fB-l\fP, \fB--logfile\fP [\fILOGFILE\fP]
+Output warnings, errors and messages to the log file,
+.IR LOGFILE .
+By default,
+.I LOGFILE
+is
+.RB \(lq /var/log/snmpd.log \(rq.
+This
+.B -l
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-n\fP, \fB--name\fP \fINAME\fP
+Specifies an alternative application name (which will affect the configuration
+files and persistent data loaded).  By default this will be
+.IR strmib ,
+regardless of the name of the actual binary executable or path to the
+executable (i.e. symbolic link).
+This
+.B -n
+option is provided for compatibility with the NET-SNMP master agent,
+.BR snmpd (8).
+This option should not be necessary.
+.\"
+.TP
+\fB-p\fP, \fB--port\fP \fIPORTNUM\fP
+Run on port number
+.I PORTNUM
+instead of the default,
+.BR 161 .
+This
+.B -p
+option is provided for compatibility with UCD-SNMP master agent,
+.BR snmpd (8).
+Note that recent NET-SNMP master agents use the
+.B -p
+option for specifying a
+.IR PIDFILE ;
+on these agents, the port is specified by encoding it into the address format
+instead of using a command line option.
+.IP ""
+For compatiblity with both UCD-SNMP and NET-SNMP master agents, if the
+argument to this option is a number from 1 to 16383, the argument will be
+interpreted as a port number,
+.IR PORTNUM .
+If the value is not a number and corresponds to a path to a file which can be
+created or written by the aget, the agent will interpret the argument as a
+process identifier file,
+.IR PIDFILE .
+.\"
+.TP
+\fB-P\fP, \fB--pidfile\fP \fIPIDFILE\fP
+When
+.B strmib
+runs as a daemon (the default),
+.I PIDFILE
+is the full path to the file to which the daemon process id is written.  This
+assists System V initscripts by helping them locate running daemons to
+terminate when shutting down subsystems.   The default pidfile, unless
+overridden by this option, is
+.BR /var/run/streams.pid .
+This
+.B -P
+option is provided for compatibility with the UCD-SNMP master agent,
+.BR snmpd (8).
+Note that recent versions of the NET-SNMP master agent,
+.BR snmpd (8),
+use the
+.B -p
+option (lowercase instead of uppercase 'p') for this purpose.  UCD-SNMP master
+agents use the
+.B -p
+option to specify port numbers.  The recent NET-SNMP agents encode the port
+number into the address specification for command line option and non-option
+address arguments.
+.\"
+.TP
+\fB-r\fP, \fB--noroot\fP
+Normally
+.B strmib
+expects to run with super-user privilege and will terminate if permission
+errors occur when opening sockets or files, even if proceding is possible.
+When this option is specified,
+.B strmib
+does not expect to run with super-user privilege and will not terminate if
+permission errors occur when opening sockets or files, providing that the
+agent can still proceed and function.
+This
+.B -r
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-s\fP, \fB--syslog\fP
+Normally
+.B strmib
+logs to
+.I stderr
+and lets the SNMP library decide from configuration where standard error is
+redirected.  This option causes
+.B strmib
+to log warnnings, errors and messages to the system logs.
+This
+.B -s
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-T\fP, \fB--transport\fR [\fITRANSPORT\fP]
+Specifies or resets the default transport mapping for the AgentX sub-agent.
+When the
+.I TRANSPORT
+argument is not specified, the transport reverts to the default (UNIX
+transport).
+When specified,
+.I TRANSPORT
+must be one of the following transport names:
+.RS
+.TP
+.B unix
+UNIX domain socket of the SOCK_STREAM variety.
+.PD 0
+.TP
+.B tcp
+TCP socket of the SOCK_STREAM variety.
+.TP
+.B udp
+UDP socket of the SOCK_DGRAM variety.
+.PD
+.RE
+.IP ""
+This
+.B -T
+option is provided for compatibiltiy with
+.BR snmpd (8).
+.\"
+.TP
+\fB-u\fP, \fB--uid\fP, \fB--userid\fP \fIUID\fP
+Normally
+.B strmib
+runs with the real user and group id of the invoking process unless th
+executable is setuid or setgid in the filesystem.  This option causes
+.BR strmib ,
+after opening ports and files, to downgrade to user id,
+.IR UID .
+This option is effective both when
+.B strmib
+is run in the foreground and as a daemon process.
+This
+.B -u
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-U\fP, \fB--dont-remove-pidfile\fP
+By default, when the daemon shuts down and a
+.I PIDFILE
+has been specified with the
+.B -p
+option, or a defualt
+.I PIDFILE
+is being used, the
+.I PIDFILE
+is removed before the daemon exits.
+This
+.B -U
+option specifies that the master agent or AgentX sub-agent is not to remove
+its
+.I PIDFILE
+when shutting down.
+This
+.B -U
+option is provided for compatibility wtih the NET-SNMP master agent,
+.BR snmpd (8).
+This option should not be necessary, and will often cause Linux System V init
+scripts to erroneously report that the daemon is dead but is pidfile exists as
+though the daemon exited abnormally.
+.\"
+.TP
+\fB-X\fP, \fB--agentx\fP
+Run as an AgentX sub-agent rather than an SNMP master agent.
+Note that the default behaviour of
+.I strmib
+is to run as an AgentX sub-agent.  Therefore, this option has no effect unless
+the
+.B -M
+option is also specified on the same command line.
+This
+.B -X
+option is provided for compatibility with UCD-SNMP and NET-SNMP master agent,
+.BR snmpd (8).
+.\"
+.SS STRMIB Subagent Options
+.PP
+The following options are specific to the STRMIB sub-agent.
+.\"
+.TP
+\fB-k\fP, \fB--keep-open\fP
+By default,
+.B strmib
+will close open files and Streams between requests, causing them to be
+reopened on then next request.  This is less intrusive on the STREAMS
+subsystem, but is also less efficient if many closely spaced requests are
+issued.  This option causes
+.B strmib
+to keep Streams and files open between requests.
+Note that even with this option in effect,
+.B strmib
+can be made to close Streams and files by sending it a
+.RI { SIGHUP }
+signal.
+.\"
+.TP
+\fB-S\fP, \fB--sysctl-file\fP \fIFILENAME\fP
+When system controls are altered by the agent in such a fashion that the new
+settings must persist between system reboots,
+.I FILENAME
+specifies the file to which the prevailing values of system controls will be
+written when the agent terminates.  Entries will be written to this file in
+a format suitable for use by
+.BR sysctl (8)
+with the
+.B -p
+option.
+The default is the system default system
+control configuration
+file,
+.BR "/etc/streams.conf" .
+.\"
+.TP
+\fB-t\fP, \fB--agent-alarms\fP
+By default,
+.B strmib
+allows the agent library to use and intercept
+.RI { SIGALRM }
+signals.  When this option is set, the agent informs the SNMP library that
+the agent will use and intercept
+.RI { SIGALRM }
+signals and that the SNMP library must use
+.BR select (2)
+timeouts to effect timers.
+Depending on the specific version and generation of SNMP library (whether
+ucd-snmp or net-snmp and the version), one or the other might work better.
+See
+.BR snmp_select_info (3)
+and
+.BR snmp_alarm (3)
+for more information.
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\".TP
+.\"\fB-d\fP, \fB--directory\fP \fIDIRECTORY\fP
+.\"Specifies a directory to contain output and error logs.  The default is to
+.\"serach for
+.\".RB \(lq /var/adm/streams \(rq
+.\"and then
+.\".RB \(lq /var/log/streams .\(rq
+.\"
+.\".TP
+.\"\fB-b\fP, \fB--basename\fP \fIBASENAME\fP
+.\"Specifiy the log file basename.  The default is
+.\".RB \(lq strmib .\(rq
+.\"
+.\".TP
+.\"\fB-o\fP, \fB--outfile\fP \fIOUTFILE\fP
+.\"Specify the log file output name.  When run as a daemon, the default is
+.\".RI \(lq base-name . mm-dd ,\(rq
+.\"where
+.\".I mm-dd
+.\"is the current month and day of month.  When run in the foreground, the
+.\"default is ignored and all output is to
+.\".IR stdout .
+.\"When specified, standard output is redirected to the specified file regardless
+.\"of whether
+.\".B strmib
+.\"is being run in the foreground or as a daemon.
+.\"
+.\".TP
+.\"\fB-e\fP, \fB--errfile\fP \fIERRFILE\fP
+.\"Specify the error file output name.  When run as a daemon, the default is
+.\".RI \(lq /dev/null \(rq
+.\"and all errors are logged to
+.\".BR syslogd (8).
+.\"When run in the foreground, the default is ignored and all errors are logged
+.\"to
+.\".IR stderr .
+.\"When specified, standard error is redirected to the specified file regardless
+.\"of whether
+.\".B strmib
+.\"is being run in the foreground or as a daemon.
+.\"
+.SS Command Options
+.PP
+Command options invoke alternate behaviour of the
+.B strmib
+daemon, as a command, such as displaying information and exiting.  When the
+following command options are encountered during option processing,
+.B strmib
+invokes the appropriate command function and then exits.  No further
+processing of options or arguments is performed and no agent actions are
+taken.  Note that all options specified following the comand option are
+ignored.
+.\"
+.TP
+\fB-H\fP, \fB--help-directives\fP
+When this option is encountered during option processing,
+.B strmib
+outputs a list of configuration file directives that are understood by the
+agent and then exits.
+No further processing of options or arguments is performed and no actions are
+taken.
+Note that all options specified following this option are ignored.
+This
+.B -H
+option is provided for compatibility with
+.BR snmpd (8)
+and
+NET-SNMP autogenerated subagents.
+.\"
+.TP
+\fB-h\fP, \fB--help\fP, \fB-?\fP, \fB--?\fP
+When this option is encountered during option processing,
+.B strmib
+prints usage information to
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are
+taken.
+Note that all options specified following this option are ignored.
+.\"
+.TP
+\fB-v\fP, \fB--version\fP
+When this option is encountered during option processing,
+.B strmib
+prints version information to
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are
+taken.
+Note that all options specified following this option are ignored.
+This
+.B -v
+option is provided for compatibility with
+.BR snmpd (8).
+(Normally for OpenSS7 programs, the
+.B -V
+short option is used for version, but this conflicts with the same option
+which provides verbose output for the
+.BR snmpd (8)
+daemon.)
+.\"
+.TP
+\fB-y\fP, \fB--copying\fP
+When this option is encountered during option processing,
+.B strmib
+prints copying information to
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are
+taken.
+Note that all options specified following this option are ignored.
+(Normally for OpenSS7 programs, the
+.B -C
+short option is used for copying, but this conflicts with the same option
+which provides suppression of automatic configuration files for the
+.BR snmpd (8)
+daemon.)
+.\"
+.\"
+.SS General Options
+.PP
+General options applicable to all commands are as follows:
+.\"
+.TP
+\fB-q\fP, \fB--quiet\fP, \fB--quick\fP
+Specifies that the call is interested only in the return code and error
+diagnostics and that normal output should be suppressed.  The default
+verbosity level if this option is not specified is one
+.RB ( 1 ).
+This option is equivalent to
+.BR --verbose = 0 .
+This
+.B -q
+option is provided for compatibility with
+.BR snmpd (8).
+Under UCD-SNMP this option does not fully suppress normal output but
+abbreviates the output into a form more suitable for machine processing.
+.\"
+.TP
+\fB-d\fP, \fB--debug\fP [\fILEVEL\fP]
+This
+.B -d
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-V\fP, \fB--verbose\fP [\fILEVEL\fP]
+Increases or sets the verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the verbosity level should be increased by one.
+If the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This
+option can be repeated.  The default verbosity level if this option is not
+specified is one
+.RB ( 1 ).
+For example,
+.B -VVVV
+is equivalent to
+.BR --verbose = 5 .
+This
+.B -V
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero
+.RB ( 0 )
+indicates that the command was successful; one
+.RB ( 1 )
+indicates that an error occurred and a diagnostic message is printed to
+.I stderr
+or the log file if
+.I stderr
+is redirected to a log file; two
+.RB ( 2 )
+indicates that the option syntax was in error and a diagnostic message is
+printed to
+.IR stderr .
+.PP
+Errors may result form inadequate permissions, inability to open the
+.BR sad (4)
+driver or push the
+.BR sc (4)
+module.
+.\"
+.\"
+.SH ENVIRONMENT
+.PP
+The following environment variables have an effect on the behaviour of the
+.B strmib
+agent:
+.TP
+.B SNMPCONFPATH
+When this environment variable is exported to
+.BR strmib ,
+the
+.BR read_config_files ()
+function will look for configuration and persistent data files in the paths
+specified in the exported envirnoment variable (separated by colons).
+If this variable is not exported to
+.BR strmib ,
+the
+.BR read_config_files ()
+function will look for configuration and persistent data in the default
+configuration and persistent data directories (in that order).
+Note that configuration and persistent data will not be read when the
+.B -C
+option is secified, unless the configuration data and persistent data files
+are also listed using the
+.B -c
+option.
+.TP
+.B SNMP_PERSISTENT_FILE
+When this environment variable is exported to
+.BR strmib ,
+the
+.BR read_config ()
+functions will look for a peristent data file in the file specified in the
+value of the
+.B SNMP_PERSISTENT_FILE
+environment variable.  If this variable is not exported to
+.BR strmib ,
+the
+.BR read_config ()
+functions will look for a persistent data in the file "strMIB.conf" in the
+default persistent directory.
+Note that persistent data will not be read when the
+.B -C
+option is specified, unless the persistent data file is also listed using the
+.B -c
+option.
+.TP
+.B HOME
+When exported to
+.BR strmib ,
+this environment variable specifies the home directory of the real user
+associated with the executing process.  When the "$HOME/snmp/mibs" directory
+exists, it will be added to the default MIB directories searched.
+If this variable is not exported, no such directory is added unless it is
+explicity included in the the
+.B MIBDIRS
+evironment variable.
+The
+.BR strmib
+daemon does not require MIBs to be loaded, and for the most part this
+environment variable is ignored.
+.TP
+.B MIBDIRS
+When exported to
+.BR strmib ,
+this environment variable specifies the directories or directories in
+addition to the default directories (when prefixed with a '+'), that will be
+searched for MIBs.  If this variable is not exported to
+.BR strmib ,
+only the default directories (or premib defined default directories) will be
+loaded.
+The
+.BR strmib
+daemon does not require MIBs to be loaded, and for the most part this
+environment variable is ignored.
+.TP
+.B MIBS
+When exported to
+.BR strmib ,
+this environment variable specifies the MIBs or MIBs in addition to the
+default MIBs (when prefixed with a '+') or all MIBs (when "all" is specified),
+that will be loaded.  If this variable is not exported to
+.BR strmib ,
+only the default MIBs (or premib defined default MIBs) will be loaded.
+The
+.BR strmib
+daemon does not require MIBs to be loaded, and for the most part this
+environment variable is ignored.
+.TP
+.B MIBFILES
+When exported to
+.BR strmib ,
+this environment variable specifies MIB files or MIB files in addition to the
+default MIB files (when prefixed with a '+'), that will be loaded.  If this
+variable is not exported to
+.BR strmib ,
+only the default MIB files will be loaded.
+The
+.BR strmib
+daemon does not require MIBs to be loaded, and for the most part this
+environment variable is ignored.
+.TP
+.B PREFIX
+When exported to
+.BR strmib ,
+this environment varibale specifies an OID in numbers an dots notation that
+specifies the prefix of the MIB tree to be loaded.
+The
+.BR strmib
+daemon does not require MIBs to be loaded, and for the most part this
+environment variable is ignored.
+.TP
+.B SUFFIX
+When exported to
+.BR strmib ,
+regardless of its contents,
+this variable will cause only suffixes of OIDs to be output.  Otherwise, the
+default is to output complete OIDs.
+The
+.BR strmib
+daemon does not print OIDs except for debugging, and for the most part this
+environment variable is ignored.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B strmib
+AgentX sub-agent requires the
+.BR sc (4)
+.I STREAMS
+modules and the
+.BR sad (4)
+.I STREAMS
+driver.  If either one is not available, the
+.B strmib
+command will not be successful.  See
+.BR sc "(4) and " sad (4)
+for more information.
+.PP
+.B strmib
+is normally invoked from the
+.B /etc/init.d/streams
+init script when the presence of an SNMP master agent providing an AgentX interface
+on
+.IR /var/agentx/master ,
+or
+.IR localhost : 705
+is detected.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B strmib
+is implemented using a subset of the UCD-SNMP application programming
+interfaces which are also provided in recent NET-SNMP releases (called the
+old-API).  This implementation maintains compatibility across as many
+distributions of NET-SNMP as possible.  Where additional NET-SNMP capabilities
+are present, they are used in support of option compatibility with recent
+NET-SNMP master SNMP agents, such as
+.BR snmpd (8).
+Consult the NET-SNMP documentation on your specific distribution for more
+information.
+.PP
+.B strmib
+is implemented and recommended to be run as an AgentX sub-agent to a running
+.BR snmpd (8)
+configured for master SNMP agent operation and supporting the AgentX
+.[
+agentx
+.]
+interface.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR sad (4)
+.B strmib
+uses the
+.BR sad (4)
+driver to provide information about autopush entries and to verify module
+lists.
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.BR sc (4)
+.B strmib
+uses the
+.BR sc (4)
+driver to provide information on loaded modules and drivers as well as
+configuration information and statistics for drivers and modules as well as
+the overall STREAMS subsystem.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/strmib
+contains the
+.B strmib
+command.
+.PP
+The
+.B strmib
+agent checks for the existence of and parses the following files:
+.TP
+.B /etc/snmp/snmp.conf
+Common configuration file for the agent and applications.  See
+.BR snmp.conf (5)
+for more information.
+.TP
+.BR /etc/snmp/strMIB.conf ", " /etc/snmp/strMIB.local.conf
+Provides the
+.B strmib
+agent-specific configuration.  See
+.BR snmpd.conf (5)
+for more information.  These files are optional and may be used to configure
+access control, trap generation, subagent protocols and more.  Also, the agent
+will read any files with the names
+.IR strMIB.conf " or " strMIB.local.conf
+in a colon separated path specified in the
+.B SNMPCONFPATH
+environment variable.
+.TP
+.B /usr/share/snmp/mibs/
+The aggent will also load all files in this directory as MIBs.  It will not,
+however, load an file that beings with a '.' or descend into subdirectories.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.B strmib
+has no known bugs.  All bugs are unknown and have yet to be discovered.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B strmib
+implements the
+.I OPENSS7-STREAMS-MIB
+SNMPv2 management information base which provides SNMPv2c or SNMPv3 management
+of the
+.B Linux Fast-STREAMS
+subsystem.  The
+.I OPENSS7-STREAMS-MIB
+is an
+.B OpenSS7
+project specific MIB, but it is suitably generic to provide SNMP management of
+most STREAMS subsystems and implementations.
+.PP
+The
+.B strmib
+executable is most suitable as an AgentX sub-agent.  The program uses the
+facilities of the UCD-SNMP or NET-SNMP packages and libraries found on almost
+Linux system distributions.
+.IP \(em \w'\(em\(em'u
+Although implemented using the UCD-SNMP application programming interfaces and
+UCD-SNMP or NET-SNMP libraries,
+.B strmib
+is suitable as a standalone AgentX
+.[
+AgentX
+.]
+sub-agent, and does not require that the UCD-SNMP or NET-SNMP master SNMP agent
+be running (some other master agent listening on a suitable port or path
+supporting the AgentX
+.[
+AgentX
+.]
+protocol will suffice).
+.IP \(em
+The options
+.BR -D ,
+.BR -f ,
+.BR -H ,
+.BR -L ,
+.BR -M ,
+.BR -x ,
+are provided for compatibility with NET-SNMP autogenerated AgentX sub-agents.
+The long versions of these options are not documented for NET-SNMP
+autogenerated AgentX sub-agents.
+.IP \(em
+The options
+.BR -A ,
+.BR -a ,
+.BR -C ,
+.BR -c ,
+.BR -D ,
+.BR -d ,
+.BR -f ,
+.BR -g ,
+.BR -H ,
+.BR -h ,
+.BR -I ,
+.BR -L ,
+.BR -l ,
+.BR -M ,
+.BR -P ,
+.BR -p ,
+.BR -q ,
+.BR -r ,
+.BR -s ,
+.BR -T ,
+.BR -u ,
+.BR -V ,
+.BR -v ,
+.BR -X ,
+.BR -x ,
+are provided for compatibility with NET-SNMP and UCD-SNMP master SNMP agents,
+and in particular,
+.BR snmpd (8).
+The long versions of these options are not documented for NET-SNMP or UCD-SNMP
+master SNMP agents.
+.IP \(em
+The options
+.BR -A ,
+.BR -a ,
+.BR -C ,
+.BR -c ,
+.BR -D ,
+.BR -d ,
+.BR -f ,
+.BR -g ,
+.BR -H ,
+.BR -h ,
+.BR -I ,
+.BR -L ,
+.BR -l ,
+.BR -M ,
+.BR -m ,
+.BR -n ,
+.BR -p ,
+.BR -q ,
+.BR -r ,
+.BR -U ,
+.BR -u ,
+.BR -V ,
+.BR -v ,
+.BR -X ,
+.BR -x ,
+are provided for compatibility with NET-SNMP master SNMP agents,
+and in particular,
+.BR snmpd (8).
+The long version of these options, with the exception of
+.BR --help ,
+.BR --version ,
+are not documented for NET-SNMP master SNMP agents.
+.BR
+.IP \(em
+UCD-SNMP and NET-SNMP agents and autogenerated subagents do not normally
+provide long options.  All OpenSS7 agents provide long options for all short
+options.
+.IP \(em
+Options
+.B --help
+and
+.B --version
+are provided for compatibilty with GNU coding standards;
+.BR --copying  ,
+OpenSS7 coding standards.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.B strmib
+conforms to SNMPv1, SNMPv2,
+.[
+std58
+.]
+SNMPv2c, SNMPv3 and AgentX.
+.[
+agentx
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B strmib
+is provided with the
+.I @PACKAGE_TITLE@
+package.
+.B strmib
+was initially released in version
+.B 0.9.2.4
+of the
+.B @PACKAGE@
+package.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -5233,6 +5233,20 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2078.txt
 
+%K AgentX
+%L RFC2741
+%R RFC 2741
+%A M. Daniele
+%A B. Wijnen
+%E M. Ellison
+%E D. Francisco
+%D January 2000
+%T Agent Extensibility (AgentX) Protocol, Version 1
+%O (Obsoletes RFC 2257)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2741.txt
+
 %K GSSAPI
 %K rfc2743
 %L RFC2743

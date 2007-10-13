@@ -65,21 +65,99 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ucd-snmp/ucd-snmp-agent-includes.h>
 #include <ucd-snmp/callback.h>
 #include <ucd-snmp/snmp-tc.h>
+#include <ucd-snmp/default_store.h>
+#include <ucd-snmp/ds_agent.h>
+#include "header_complex.h"
+#include "util_funcs.h"
 #else
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
 #include <net-snmp/agent/net-snmp-agent-includes.h>
 #endif
 
-#include "header_complex.h"
+
+#ifndef DS_AGENT_VERBOSE
+#define DS_AGENT_VERBOSE			NETSNMP_DS_AGENT_VERBOSE
+#define DS_AGENT_ROLE				NETSNMP_DS_AGENT_ROLE
+#define DS_AGENT_NO_ROOT_ACCESS			NETSNMP_DS_AGENT_NO_ROOT_ACCESS
+#define DS_AGENT_AGENTX_MASTER			NETSNMP_DS_AGENT_AGENTX_MASTER
+#define DS_AGENT_QUIT_IMMEDIATELY		NETSNMP_DS_AGENT_QUIT_IMMEDIATELY
+#define DS_AGENT_DISABLE_PERL			NETSNMP_DS_AGENT_DISABLE_PERL
+#define DS_AGENT_NO_CONNECTION_WARNINGS		NETSNMP_DS_AGENT_NO_CONNECTION_WARNINGS
+#define DS_AGENT_LEAVE_PIDFILE			NETSNMP_DS_AGENT_LEAVE_PIDFILE
+#define DS_AGENT_NO_CACHING			NETSNMP_DS_AGENT_NO_CACHING
+#define DS_AGENT_STRICT_DISMAN			NETSNMP_DS_AGENT_STRICT_DISMAN
+#define DS_AGENT_DONT_RETAIN_NOTIFICATIONS	NETSNMP_DS_AGENT_DONT_RETAIN_NOTIFICATIONS
+#define DS_AGENT_PROGNAME			NETSNMP_DS_AGENT_PROGNAME
+#define DS_AGENT_X_SOCKET			NETSNMP_DS_AGENT_X_SOCKET
+#define DS_AGENT_PORTS				NETSNMP_DS_AGENT_PORTS
+#define DS_AGENT_INTERNAL_SECNAME		NETSNMP_DS_AGENT_INTERNAL_SECNAME
+#define DS_AGENT_PERL_INIT_FILE			NETSNMP_DS_AGENT_PERL_INIT_FILE
+#define DS_SMUX_SOCKET				NETSNMP_DS_SMUX_SOCKET
+#define DS_NOTIF_LOG_CTX			NETSNMP_DS_NOTIF_LOG_CTX
+#define DS_AGENT_FLAGS				NETSNMP_DS_AGENT_FLAGS
+#define DS_AGENT_USERID				NETSNMP_DS_AGENT_USERID
+#define DS_AGENT_GROUPID			NETSNMP_DS_AGENT_GROUPID
+#define DS_AGENT_AGENTX_PING_INTERVAL		NETSNMP_DS_AGENT_AGENTX_PING_INTERVAL
+#define DS_AGENT_AGENTX_TIMEOUT			NETSNMP_DS_AGENT_AGENTX_TIMEOUT
+#define DS_AGENT_AGENTX_RETRIES			NETSNMP_DS_AGENT_AGENTX_RETRIES
+#define DS_AGENT_X_SOCK_PERM			NETSNMP_DS_AGENT_X_SOCK_PERM
+#define DS_AGENT_X_DIR_PERM			NETSNMP_DS_AGENT_X_DIR_PERM
+#define DS_AGENT_X_SOCK_USER			NETSNMP_DS_AGENT_X_SOCK_USER
+#define DS_AGENT_X_SOCK_GROUP			NETSNMP_DS_AGENT_X_SOCK_GROUP
+#define DS_AGENT_CACHE_TIMEOUT			NETSNMP_DS_AGENT_CACHE_TIMEOUT
+#define DS_AGENT_INTERNAL_VERSION		NETSNMP_DS_AGENT_INTERNAL_VERSION
+#define DS_AGENT_INTERNAL_SECLEVEL		NETSNMP_DS_AGENT_INTERNAL_SECLEVEL
+#endif				/* DS_AGENT_VERBOSE */
+
 #include "strMIB.h"
 
 #include <signal.h>
+#include <sys/stat.h>		/* for struct stat, fstat() */
+#include <sys/types.h>
+#include <pwd.h>		/* for getpwuid() getpwnam() */
+#include <grp.h>		/* for getgrgid() getgrnam() */
+#include <libgen.h>		/* for basename() */
+#include <fcntl.h>		/* for O_CREAT */
+
+#include <sys/sysctl.h>		/* for sysctl */
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
 
+static const char sa_program[] = "strMIB";
+
+static int sa_dump = 0;			/* default packet dump */
+static int sa_debug = 0;		/* default no debug */
+static int sa_nomead = 1;		/* default daemon mode */
+static int sa_output = 1;		/* default normal output */
+static int sa_agentx = 1;		/* default agentx mode */
+static int sa_alarms = 1;		/* default application alarms */
+static int sa_fclose = 1;		/* default close files between requests */
+
+static int sa_logaddr = 0;		/* log addresses */
+static int sa_logfillog = 0;		/* log to sa_logfile */
+static int sa_logstderr = 0;		/* log to standard error */
+static int sa_logstdout = 0;		/* log to standard output */
+static int sa_logsyslog = 0;		/* log to system logs */
+static int sa_logcallog = 1;		/* log to callback logs */
+static int sa_appendlog = 0;		/* append to log file without truncating */
+
+static char sa_outfile[256] = "";
+static char sa_errfile[256] = "";
+static char sa_logfile[256] = "/var/log/streams.log";
+static char sa_outpath[256] = "";
+static char sa_errpath[256] = "";
+static char sa_basname[256] = "";
+static char sa_outpdir[256] = "/var/log/streams";
+static char sa_pidfile[256] = "/var/run/streams.pid";
+static char sa_sysctlf[256] = "/etc/streams.conf";
+
+int allow_severity = LOG_ERR;
+int deny_severity = LOG_ERR;
+
+#if 0
 /*
   header_generic(...
   Arguments:
@@ -508,9 +586,16 @@ header_complex(struct header_complex_index *datalist, struct variable *vp, oid *
 
 	return NULL;
 }
+#endif
 
 /* file descriptor for SAD/SC driver */
 int sad_fd = 0;
+
+/* indication to reread SAD/SC configuration */
+int sad_changed = 1;
+
+/* indications that stats need to be refreshed */
+int sa_stats_refresh = 1;
 
 /* /proc/streams */
 enum {
@@ -541,6 +626,10 @@ enum {
 	STREAMS_MAX_MBLK = 20,
 	STREAMS_MSG_PRIORITY = 21,
 };
+
+/* name conflict */
+#undef STRMAXPSZ
+#undef STRMINPSZ
 
 /* 
  * strMIB_variables_oid:
@@ -669,6 +758,9 @@ static struct header_complex_index *strModStatTableStorage = NULL;
 
 static struct header_complex_index *strApshTableStorage = NULL;
 
+/* Global storage of stats table data: this data is created on initialization
+ * and is read from kernel information whenever sa_stats_refresh is set to 1
+ * but no more than once per request. */
 static struct header_complex_index *strStatsTableStorage = NULL;
 
 /*
@@ -692,7 +784,6 @@ init_strMIB(void)
 	snmpd_register_config_handler("strModStatTable", parse_strModStatTable, NULL,
 				      "HELP STRING");
 	snmpd_register_config_handler("strApshTable", parse_strApshTable, NULL, "HELP STRING");
-	snmpd_register_config_handler("strStatsTable", parse_strStatsTable, NULL, "HELP STRING");
 
 	/* we need to be called back later to store our data */
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strMIB, NULL);
@@ -702,8 +793,6 @@ init_strMIB(void)
 			       store_strModInfoTable, NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA,
 			       store_strModStatTable, NULL);
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strStatsTable,
-			       NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_strApshTable,
 			       NULL);
 
@@ -779,62 +868,87 @@ parse_strMIB(const char *token, char *line)
 int
 store_strMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
-	char line[SNMP_MAXBUF];
-	char *cptr;
-	size_t tmpint;
 	struct strMIB_data *StorageTmp;
-	struct header_complex_index *hcindex;
+	FILE *f;
 
 	DEBUGMSGTL(("strMIB", "storing data...  "));
 
-	if ((StorageTmp = strMIBStorage) != NULL) {
+	if ((StorageTmp = strMIBStorage) == NULL)
+		goto done;
 
-/*   XXX:  if (StorageTmp->strMIBStorageType == ST_NONVOLATILE) { */
+	/* A this point we do not want to store information to the SNMP persistent configuration
+	   files, but to the system initialization sysctl configuration files for streams which are 
+	   present in the sa_sysctlf file.  Open it for creation or truncation, and then print each 
+	   system control to the file. */
 
-		memset(line, 0, sizeof(line));
-		strcat(line, "strMIB ");
-		cptr = line + strlen(line);
-
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strCltime, &tmpint);
-		cptr =
-		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxApush, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxMblk, &tmpint);
-		cptr =
-		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxStramod, &tmpint);
-		cptr =
-		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxStrdev, &tmpint);
-		cptr =
-		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxStrmod, &tmpint);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strMsgPriority, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strNband, &tmpint);
-		cptr =
-		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strNstrmsgs, &tmpint);
-		cptr =
-		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strNstrpush, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strHiwat, &tmpint);
-		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strLowat, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strMaxpsz, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strMinpsz, &tmpint);
-		cptr =
-		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strReuseFmodsw, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strRtime, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strStrhold, &tmpint);
-		cptr =
-		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strStrctlsz, &tmpint);
-		cptr =
-		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strStrmsgsz, &tmpint);
-		cptr =
-		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strStrthresh, &tmpint);
-		cptr =
-		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strLowthresh, &tmpint);
-		cptr =
-		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMedthresh, &tmpint);
-		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strIoctime, &tmpint);
-
-		snmpd_store_config(line);
-/*   } */
+/* XXX: if (StorageTmp->strMIBStorageType == ST_NONVOLATILE) { */
+	if ((f = fopen(sa_sysctlf, "w")) == NULL) {
+		snmp_perror("strMIB");
+		goto done;
 	}
+	fprintf(f, "\
+; ===========================================================================\n\
+;\n\
+; Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
+; Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+;\n\
+; All Rights Reserved.\n\
+;\n\
+; ===========================================================================\n\
+\n\
+; default system controls\n\
+\n\
+streams.cltime        = %ld\n\
+streams.max_apush     = %ld\n\
+streams.max_mblk      = %ld\n\
+streams.max_stramod   = %ld\n\
+streams.max_strdev    = %ld\n\
+streams.max_strmod    = %ld\n\
+streams.msg_prioirity = %ld\n\
+streams.nband         = %ld\n\
+streams.nstrmsgs      = %ld\n\
+streams.nstrpush      = %ld\n\
+streams.hiwat         = %ld\n\
+streams.lowat         = %ld\n\
+streams.maxpsz        = %ld\n\
+streams.minpsz        = %ld\n\
+streams.reuse_fmodsw  = %ld\n\
+streams.rtime         = %ld\n\
+streams.strhold       = %ld\n\
+streams.strctlsz      = %ld\n\
+streams.strmsgsz      = %ld\n\
+streams.strthresh     = %ld\n\
+streams.lowthresh     = %ld\n\
+streams.medthresh     = %ld\n\
+streams.ioctime       = %ld\n",	// 
+		(long) (StorageTmp->strCltime * 10),	// 
+		(long) (StorageTmp->strMaxApush),	// 
+		(long) (StorageTmp->strMaxMblk),	// 
+		(long) (StorageTmp->strMaxStramod),	// 
+		(long) (StorageTmp->strMaxStrdev),	// 
+		(long) (StorageTmp->strMaxStrmod),	// 
+		(long) (StorageTmp->strMsgPriority),	// 
+		(long) (StorageTmp->strNband),	// 
+		(long) (StorageTmp->strNstrmsgs),	// 
+		(long) (StorageTmp->strNstrpush),	// 
+		(long) (StorageTmp->strHiwat),	// 
+		(long) (StorageTmp->strLowat),	// 
+		(long) (StorageTmp->strMaxpsz),	// 
+		(long) (StorageTmp->strMinpsz),	// 
+		(long) (StorageTmp->strReuseFmodsw),	// 
+		(long) (StorageTmp->strRtime * 10),	// 
+		(long) (StorageTmp->strStrhold),	// 
+		(long) (StorageTmp->strStrctlsz),	// 
+		(long) (StorageTmp->strStrmsgsz),	// 
+		(long) (StorageTmp->strStrthresh),	// 
+		(long) (StorageTmp->strLowthresh),	// 
+		(long) (StorageTmp->strMedthresh),	// 
+		(long) (StorageTmp->strIoctime * 10));
+	fflush(f);
+	fclose(f);
+/* } */
+
+      done:
 	DEBUGMSGTL(("strMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
@@ -871,7 +985,6 @@ parse_strModTable(const char *token, char *line)
 {
 	size_t tmpint;
 	struct strModTable_data *StorageTmp = SNMP_MALLOC_STRUCT(strModTable_data);
-	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("strModTable", "parsing config...  "));
 
@@ -968,7 +1081,6 @@ parse_strModInfoTable(const char *token, char *line)
 {
 	size_t tmpint;
 	struct strModInfoTable_data *StorageTmp = SNMP_MALLOC_STRUCT(strModInfoTable_data);
-	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("strModInfoTable", "parsing config...  "));
 
@@ -1084,7 +1196,6 @@ parse_strModStatTable(const char *token, char *line)
 {
 	size_t tmpint;
 	struct strModStatTable_data *StorageTmp = SNMP_MALLOC_STRUCT(strModStatTable_data);
-	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("strModStatTable", "parsing config...  "));
 
@@ -1211,7 +1322,6 @@ parse_strApshTable(const char *token, char *line)
 {
 	size_t tmpint;
 	struct strApshTable_data *StorageTmp = SNMP_MALLOC_STRUCT(strApshTable_data);
-	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("strApshTable", "parsing config...  "));
 
@@ -1317,6 +1427,48 @@ strStatsTable_add(struct strStatsTable_data *thedata)
 }
 
 /*
+ * create_strStatsTable(): create the strStatsTable
+ */
+int
+create_strStatsTable(void)
+{
+	struct strStatsTable_data *StorageTmp;
+	int index;
+
+	/* There are twelve entries in this table. */
+	for (index = 1; index < 12 + 1; index++) {
+		StorageTmp = SNMP_MALLOC_STRUCT(strStatsTable_data);
+		if (StorageTmp == NULL) {
+			config_perror("malloc failure");
+			return (-1);
+		}
+		StorageTmp->strStatsStructure = index;
+		StorageTmp->strStatsCurrentAllocs = 0;
+		StorageTmp->strStatsHighWaterMark = 0;
+		strStatsTable_add(StorageTmp);
+	}
+	return (0);
+}
+
+/*
+ * read_strStatsTable(): read the strStatsTable
+ */
+void
+read_strStatsTable(void)
+{
+	struct strStatsTable_data *StorageTmp;
+	struct header_complex_index *hcindex;
+	int index;
+
+	for (hcindex = strStatsTableStorage; hcindex != NULL; hcindex = hcindex->next) {
+		StorageTmp = (struct strStatsTable_data *) hcindex->data;
+		index = StorageTmp->strStatsStructure - 1;
+		StorageTmp->strStatsCurrentAllocs = 0; // myarray[index].currentallocs;
+		StorageTmp->strStatsHighWaterMark = 0; // myarray[index].highwatermark;
+	}
+}
+
+/*
  * parse_strStatsTable():
  *   parses .conf file entries needed to configure the mib.
  */
@@ -1325,7 +1477,6 @@ parse_strStatsTable(const char *token, char *line)
 {
 	size_t tmpint;
 	struct strStatsTable_data *StorageTmp = SNMP_MALLOC_STRUCT(strStatsTable_data);
-	struct variable_list *vars = NULL;
 
 	DEBUGMSGTL(("strStatsTable", "parsing config...  "));
 
@@ -1404,13 +1555,14 @@ var_strMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *v
 	/* variables we may use later */
 	static long long_ret;
 	static u_long ulong_ret;
-	static unsigned char string[SPRINT_MAX_LEN];
-	static oid objid[MAX_OID_LEN];
-	static struct counter64 c64;
+	//static unsigned char string[SPRINT_MAX_LEN];
+	//static oid objid[MAX_OID_LEN];
+	//static struct counter64 c64;
 
 	int cvec[] = { CTL_STREAMS, 0 };
 	int clen = 2;
 	int value;
+	size_t vallen;
 
 	if (header_generic(vp, name, length, exact, var_len, write_method)
 	    == MATCH_FAILED)
@@ -1422,191 +1574,214 @@ var_strMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *v
 	switch (vp->magic) {
 
 	case STRCLTIME:
-		*write_method = write_strCltime;
+		*write_method = write_strCltime;	/* read-write */
 		long_ret = 0;
 		cvec[1] = STREAMS_CLTIME;
-		if (sysctl(cvec, clen, &long_ret, sizeof(long_ret), NULL, 0))
+		vallen = sizeof(long_ret);
+		if (sysctl(cvec, clen, &long_ret, &vallen, NULL, 0))
 			break;
 		long_ret = (long_ret + 9) / 10;	/* convert milliseconds to centiseconds */
 		return (unsigned char *) &long_ret;
 
 	case STRMAXAPUSH:
-		*write_method = write_strMaxApush;
+		*write_method = write_strMaxApush;	/* read-write */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_MAX_APUSH;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong_ret), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRMAXMBLK:
-		*write_method = write_strMaxMblk;
+		*write_method = write_strMaxMblk;	/* read-write */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_MAX_MBLK;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong_ret), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRMAXSTRAMOD:
-		*write_method = write_strMaxStramod;
+		*write_method = write_strMaxStramod;	/* read-write */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_MAX_STRAMOD;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong_ret), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRMAXSTRDEV:
-
+		*write_method = NULL;	/* read-only */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_MAX_STRDEV;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong_ret), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRMAXSTRMOD:
-
+		*write_method = NULL;	/* read-only */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_MAX_STRMOD;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong_ret), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRMSGPRIORITY:
-		*write_method = write_strMsgPriority;
+		*write_method = write_strMsgPriority;	/* read-write */
 		long_ret = 0;
 		cvec[1] = STREAMS_MSG_PRIORITY;
-		if (sysctl(cvec, clen, &long_ret, sizeof(long_ret), NULL, 0))
+		vallen = sizeof(long_ret);
+		if (sysctl(cvec, clen, &long_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &long_ret;
 
 	case STRNBAND:
-
+		*write_method = NULL;	/* read-only */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_NBAND;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong_ret), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRNSTRMSGS:
-		*write_method = write_strNstrmsgs;
+		*write_method = write_strNstrmsgs;	/* read-write */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_NSTRMSGS;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong_ret), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRNSTRPUSH:
-		*write_method = write_strNstrpush;
+		*write_method = write_strNstrpush;	/* read-write */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_NSTRPUSH;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong_ret), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRHIWAT:
-		*write_method = write_strHiwat;
+		*write_method = write_strHiwat;	/* read-write */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_HIWAT;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong_ret), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRLOWAT:
-		*write_method = write_strLowat;
+		*write_method = write_strLowat;	/* read-write */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_LOWAT;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong_ret), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRMAXPSZ:
-		*write_method = write_strMaxpsz;
+		*write_method = write_strMaxpsz;	/* read-write */
 		long_ret = 0;
 		cvec[1] = STREAMS_MAXPSZ;
-		if (sysctl(cvec, clen, &long_ret, sizeof(long_ret), NULL, 0))
+		vallen = sizeof(long_ret);
+		if (sysctl(cvec, clen, &long_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &long_ret;
 
 	case STRMINPSZ:
-		*write_method = write_strMinpsz;
+		*write_method = write_strMinpsz;	/* read-write */
 		long_ret = 0;
 		cvec[1] = STREAMS_MINPSZ;
-		if (sysctl(cvec, clen, &long_ret, sizeof(long_ret), NULL, 0))
+		vallen = sizeof(long_ret);
+		if (sysctl(cvec, clen, &long_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &long_ret;
 
 	case STRREUSEFMODSW:
-		*write_method = write_strReuseFmodsw;
+		*write_method = write_strReuseFmodsw;	/* read-write */
 		long_ret = 0;
 		cvec[1] = STREAMS_REUSE_FMODSW;
-		if (sysctl(cvec, clen, &value, sizeof(value), NULL, 0))
+		vallen = sizeof(value);
+		if (sysctl(cvec, clen, &value, &vallen, NULL, 0))
 			break;
 		long_ret = (value ? TV_TRUE : TV_FALSE);
 		return (unsigned char *) &long_ret;
 
 	case STRRTIME:
-		*write_method = write_strRtime;
+		*write_method = write_strRtime;	/* read-write */
 		long_ret = 0;
 		cvec[1] = STREAMS_RTIME;
-		if (sysctl(cvec, clen, &long_ret, sizeof(long_ret), NULL, 0))
+		vallen = sizeof(long_ret);
+		if (sysctl(cvec, clen, &long_ret, &vallen, NULL, 0))
 			break;
 		/* convert milliseconds to centiseconds */
 		long_ret = (long_ret + 9) / 10;
 		return (unsigned char *) &long_ret;
 
 	case STRSTRHOLD:
-		*write_method = write_strStrhold;
+		*write_method = write_strStrhold;	/* read-write */
 		long_ret = 0;
 		cvec[1] = STREAMS_STRHOLD;
-		if (sysctl(cvec, clen, &value, sizeof(value), NULL, 0))
+		vallen = sizeof(value);
+		if (sysctl(cvec, clen, &value, &vallen, NULL, 0))
 			break;
 		long_ret = (value ? TV_TRUE : TV_FALSE);
 		return (unsigned char *) &long_ret;
 
 	case STRSTRCTLSZ:
-		*write_method = write_strStrctlsz;
+		*write_method = write_strStrctlsz;	/* read-write */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_STRCTLSZ;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRSTRMSGSZ:
-		*write_method = write_strStrmsgsz;
+		*write_method = write_strStrmsgsz;	/* read-write */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_STRMSGSZ;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRSTRTHRESH:
-		*write_method = write_strStrthresh;
+		*write_method = write_strStrthresh;	/* read-write */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_STRTHRESH;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRLOWTHRESH:
-		*write_method = write_strLowthresh;
+		*write_method = NULL;	/* read-only */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_STRTHRESH;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRMEDTHRESH:
-		*write_method = write_strMedthresh;
+		*write_method = NULL;	/* read-only */
 		ulong_ret = 0;
 		cvec[1] = STREAMS_STRTHRESH;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		return (unsigned char *) &ulong_ret;
 
 	case STRIOCTIME:
-		*write_method = write_strIoctime;
-		long_ret = 0;
+		*write_method = write_strIoctime;	/* read-write */
+		ulong_ret = 0;
 		cvec[1] = STREAMS_IOCTIME;
-		if (sysctl(cvec, clen, &ulong_ret, sizeof(ulong_ret), NULL, 0))
+		vallen = sizeof(ulong_ret);
+		if (sysctl(cvec, clen, &ulong_ret, &vallen, NULL, 0))
 			break;
 		/* convert milliseconds to centiseconds */
 		ulong_ret = (ulong_ret + 9) / 10;
@@ -1634,9 +1809,8 @@ var_strModTable(struct variable *vp, oid * name, size_t *length, int exact, size
 	/* 
 	 * this assumes you have registered all your data properly
 	 */
-	if ((StorageTmp =
-	     header_complex(strModTableStorage, vp, name, length, exact, var_len,
-			    write_method)) == NULL)
+	if ((StorageTmp = header_complex(strModTableStorage, vp, name, length, exact, var_len,
+					 write_method)) == NULL)
 		return NULL;
 
 	/* 
@@ -1681,9 +1855,8 @@ var_strModInfoTable(struct variable *vp, oid * name, size_t *length, int exact, 
 	/* 
 	 * this assumes you have registered all your data properly
 	 */
-	if ((StorageTmp =
-	     header_complex(strModInfoTableStorage, vp, name, length, exact, var_len,
-			    write_method)) == NULL)
+	if ((StorageTmp = header_complex(strModInfoTableStorage, vp, name, length, exact, var_len,
+					 write_method)) == NULL)
 		return NULL;
 
 	/* 
@@ -1743,9 +1916,8 @@ var_strModStatTable(struct variable *vp, oid * name, size_t *length, int exact, 
 	/* 
 	 * this assumes you have registered all your data properly
 	 */
-	if ((StorageTmp =
-	     header_complex(strModStatTableStorage, vp, name, length, exact, var_len,
-			    write_method)) == NULL)
+	if ((StorageTmp = header_complex(strModStatTableStorage, vp, name, length, exact, var_len,
+					 write_method)) == NULL)
 		return NULL;
 
 	/* 
@@ -1815,9 +1987,8 @@ var_strApshTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 	/* 
 	 * this assumes you have registered all your data properly
 	 */
-	if ((StorageTmp =
-	     header_complex(strApshTableStorage, vp, name, length, exact, var_len,
-			    write_method)) == NULL)
+	if ((StorageTmp = header_complex(strApshTableStorage, vp, name, length, exact, var_len,
+					 write_method)) == NULL)
 		return NULL;
 
 	/* 
@@ -1859,12 +2030,18 @@ var_strStatsTable(struct variable *vp, oid * name, size_t *length, int exact, si
 	struct strStatsTable_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "var_strStatsTable: Entering...  \n"));
+	/* We refresh the data once for each request that requests data within the statistics
+	   table.  The main loop of the agent resets the variable indicating that data needs to be
+	   refreshed each time that an SNMP request is processed. */
+	if (sa_stats_refresh) {
+		/* FIXME: refresh statistics */
+		sa_stats_refresh = 0;
+	}
 	/* 
 	 * this assumes you have registered all your data properly
 	 */
-	if ((StorageTmp =
-	     header_complex(strStatsTableStorage, vp, name, length, exact, var_len,
-			    write_method)) == NULL)
+	if ((StorageTmp = header_complex(strStatsTableStorage, vp, name, length, exact, var_len,
+					 write_method)) == NULL)
 		return NULL;
 
 	/* 
@@ -1873,17 +2050,17 @@ var_strStatsTable(struct variable *vp, oid * name, size_t *length, int exact, si
 	switch (vp->magic) {
 
 	case STRSTATSSTRUCTURE:
-
+		*write_method = NULL;	/* read only */
 		*var_len = sizeof(StorageTmp->strStatsStructure);
 		return (u_char *) &StorageTmp->strStatsStructure;
 
 	case STRSTATSCURRENTALLOCS:
-
+		*write_method = NULL;	/* read only */
 		*var_len = sizeof(StorageTmp->strStatsCurrentAllocs);
 		return (u_char *) &StorageTmp->strStatsCurrentAllocs;
 
 	case STRSTATSHIGHWATERMARK:
-
+		*write_method = NULL;	/* read only */
 		*var_len = sizeof(StorageTmp->strStatsHighWaterMark);
 		return (u_char *) &StorageTmp->strStatsHighWaterMark;
 
@@ -1897,16 +2074,14 @@ int
 write_strModInfoMinpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		       u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static long tmpvar;
 	struct strModInfoTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1);
 
 	DEBUGMSGTL(("strMIB", "write_strModInfoMinpsz entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(strModInfoTableStorage, NULL,
-			    &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(strModInfoTableStorage, NULL,
+					 &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1],
+					 &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
@@ -1951,16 +2126,14 @@ int
 write_strModInfoMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		       u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static long tmpvar;
 	struct strModInfoTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1);
 
 	DEBUGMSGTL(("strMIB", "write_strModInfoMaxpsz entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(strModInfoTableStorage, NULL,
-			    &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(strModInfoTableStorage, NULL,
+					 &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1],
+					 &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
@@ -2005,16 +2178,14 @@ int
 write_strModInfoHiwat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		      u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static unsigned long tmpvar;
 	struct strModInfoTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1);
 
 	DEBUGMSGTL(("strMIB", "write_strModInfoHiwat entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(strModInfoTableStorage, NULL,
-			    &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(strModInfoTableStorage, NULL,
+					 &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1],
+					 &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
@@ -2059,16 +2230,14 @@ int
 write_strModInfoLowat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		      u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static unsigned long tmpvar;
 	struct strModInfoTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1);
 
 	DEBUGMSGTL(("strMIB", "write_strModInfoLowat entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(strModInfoTableStorage, NULL,
-			    &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(strModInfoTableStorage, NULL,
+					 &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1],
+					 &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
@@ -2113,16 +2282,14 @@ int
 write_strModInfoTraceLevel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 			   u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static unsigned long tmpvar;
 	struct strModInfoTable_data *StorageTmp = NULL;
-	static size_t tmplen;
 	size_t newlen = name_len - (sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1);
 
 	DEBUGMSGTL(("strMIB", "write_strModInfoTraceLevel entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(strModInfoTableStorage, NULL,
-			    &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(strModInfoTableStorage, NULL,
+					 &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1],
+					 &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
@@ -2173,10 +2340,9 @@ write_strApshModules(int action, u_char *var_val, u_char var_val_type, size_t va
 	size_t newlen = name_len - (sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1);
 
 	DEBUGMSGTL(("strMIB", "write_strApshModules entering action=%d...  \n", action));
-	if ((StorageTmp =
-	     header_complex(strApshTableStorage, NULL,
-			    &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1], &newlen, 1,
-			    NULL, NULL)) == NULL)
+	if ((StorageTmp = header_complex(strApshTableStorage, NULL,
+					 &name[sizeof(strMIB_variables_oid) / sizeof(oid) + 7 - 1],
+					 &newlen, 1, NULL, NULL)) == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 
 	switch (action) {
@@ -2201,7 +2367,7 @@ write_strApshModules(int action, u_char *var_val, u_char var_val_type, size_t va
 		   in the UNDO case */
 		tmpvar = StorageTmp->strApshModules;
 		tmplen = StorageTmp->strApshModulesLen;
-		memdup((u_char **) &StorageTmp->strApshModules, var_val, var_val_len);
+		memdup((void *) &StorageTmp->strApshModules, var_val, var_val_len);
 		StorageTmp->strApshModulesLen = var_val_len;
 		break;
 
@@ -2225,10 +2391,8 @@ int
 write_strCltime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP,
 		oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
-	static size_t tmplen;
-	size_t newlen = name_len - (sizeof(strMIB_variables_oid) / sizeof(oid) + 5 - 1);
 
 	DEBUGMSGTL(("strMIB", "write_strCltime entering action=%d...  \n", action));
 	StorageTmp = strMIBStorage;
@@ -2238,6 +2402,14 @@ write_strCltime(int action, u_char *var_val, u_char var_val_type, size_t var_val
 		if (var_val_type != ASN_INTEGER) {
 			fprintf(stderr, "write to strCltime not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(long)) {
+			fprintf(stderr, "write to strCltime: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		if ((tmpvar = *((long *) var_val)) < 0) {
+			fprintf(stderr, "write to strCltime: bad value %ld\n", tmpvar);
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 
@@ -2263,10 +2435,21 @@ write_strCltime(int action, u_char *var_val, u_char var_val_type, size_t var_val
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_CLTIME };
+		int clen = 2;
+		unsigned long value = StorageTmp->strCltime * 10;	/* centiseconds to
+									   milliseconds */
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strCltime: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2275,7 +2458,7 @@ int
 write_strMaxApush(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		  u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static unsigned long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strMaxApush entering action=%d...  \n", action));
@@ -2315,10 +2498,20 @@ write_strMaxApush(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_MAX_APUSH };
+		int clen = 2;
+		unsigned long value = StorageTmp->strMaxApush;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strMaxApush: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2327,7 +2520,7 @@ int
 write_strMaxMblk(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		 u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static unsigned long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strMaxMblk entering action=%d...  \n", action));
@@ -2367,10 +2560,20 @@ write_strMaxMblk(int action, u_char *var_val, u_char var_val_type, size_t var_va
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_MAX_MBLK };
+		int clen = 2;
+		unsigned long value = StorageTmp->strMaxMblk;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strMaxMblk: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2379,7 +2582,7 @@ int
 write_strMaxStramod(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		    u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static unsigned long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strMaxStramod entering action=%d...  \n", action));
@@ -2419,10 +2622,20 @@ write_strMaxStramod(int action, u_char *var_val, u_char var_val_type, size_t var
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_MAX_STRAMOD };
+		int clen = 2;
+		unsigned long value = StorageTmp->strMaxStramod;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strMaxStramod: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2431,7 +2644,7 @@ int
 write_strMsgPriority(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		     u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strMsgPriority entering action=%d...  \n", action));
@@ -2471,10 +2684,20 @@ write_strMsgPriority(int action, u_char *var_val, u_char var_val_type, size_t va
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_MSG_PRIORITY };
+		int clen = 2;
+		long value = StorageTmp->strMsgPriority;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strMsgPriority: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2483,7 +2706,7 @@ int
 write_strNstrmsgs(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		  u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static unsigned long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strNstrmsgs entering action=%d...  \n", action));
@@ -2523,10 +2746,20 @@ write_strNstrmsgs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_NSTRMSGS };
+		int clen = 2;
+		unsigned long value = StorageTmp->strNstrmsgs;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strNstrmsgs: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2535,7 +2768,7 @@ int
 write_strNstrpush(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		  u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static unsigned long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strNstrpush entering action=%d...  \n", action));
@@ -2575,10 +2808,20 @@ write_strNstrpush(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_NSTRPUSH };
+		int clen = 2;
+		unsigned long value = StorageTmp->strNstrpush;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strNstrpush: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2587,7 +2830,7 @@ int
 write_strHiwat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP,
 	       oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static unsigned long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strHiwat entering action=%d...  \n", action));
@@ -2627,10 +2870,20 @@ write_strHiwat(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_HIWAT };
+		int clen = 2;
+		unsigned long value = StorageTmp->strHiwat;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strHiwat: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2639,7 +2892,7 @@ int
 write_strLowat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP,
 	       oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static unsigned long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strLowat entering action=%d...  \n", action));
@@ -2679,10 +2932,20 @@ write_strLowat(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_LOWAT };
+		int clen = 2;
+		unsigned long value = StorageTmp->strLowat;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strLowat: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2691,7 +2954,7 @@ int
 write_strMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP,
 		oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strMaxpsz entering action=%d...  \n", action));
@@ -2706,6 +2969,10 @@ write_strMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val
 		if (var_val_len > sizeof(long)) {
 			fprintf(stderr, "write to strMaxpsz: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
+		}
+		if ((tmpvar = *((long *) var_val)) <= 0) {
+			fprintf(stderr, "write to strMaxpsz: bad value %ld\n", tmpvar);
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 
@@ -2731,10 +2998,20 @@ write_strMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_MAXPSZ };
+		int clen = 2;
+		long value = StorageTmp->strMaxpsz;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strMaxpsz: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2743,7 +3020,7 @@ int
 write_strMinpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP,
 		oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strMinpsz entering action=%d...  \n", action));
@@ -2758,6 +3035,10 @@ write_strMinpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val
 		if (var_val_len > sizeof(long)) {
 			fprintf(stderr, "write to strMinpsz: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
+		}
+		if ((tmpvar = *((long *) var_val)) < 0) {
+			fprintf(stderr, "write to strMinpsz: bad value %ld\n", tmpvar);
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 
@@ -2783,10 +3064,20 @@ write_strMinpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_MINPSZ };
+		int clen = 2;
+		long value = StorageTmp->strMinpsz;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strMinpsz: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2795,7 +3086,7 @@ int
 write_strReuseFmodsw(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		     u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strReuseFmodsw entering action=%d...  \n", action));
@@ -2810,6 +3101,14 @@ write_strReuseFmodsw(int action, u_char *var_val, u_char var_val_type, size_t va
 		if (var_val_len > sizeof(long)) {
 			fprintf(stderr, "write to strReuseFmodsw: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
+		}
+		switch ((tmpvar = *((long *) var_val))) {
+		case TV_TRUE:
+		case TV_FALSE:
+			break;
+		default:
+			fprintf(stderr, "write to strReuseFmodsw: bad value %ld\n", tmpvar);
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 
@@ -2835,10 +3134,20 @@ write_strReuseFmodsw(int action, u_char *var_val, u_char var_val_type, size_t va
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_REUSE_FMODSW };
+		int clen = 2;
+		int value = (StorageTmp->strReuseFmodsw == TV_TRUE) ? 1 : 0;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strReuseFmodsw: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2847,7 +3156,7 @@ int
 write_strRtime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP,
 	       oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strRtime entering action=%d...  \n", action));
@@ -2862,6 +3171,10 @@ write_strRtime(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 		if (var_val_len > sizeof(long)) {
 			fprintf(stderr, "write to strRtime: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
+		}
+		if ((tmpvar = *((long *) var_val)) <= 0) {
+			fprintf(stderr, "write to strRtime: bad value %ld\n", tmpvar);
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 
@@ -2887,10 +3200,21 @@ write_strRtime(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_RTIME };
+		int clen = 2;
+		unsigned long value = StorageTmp->strRtime * 10;	/* centiseconds to
+									   milliseconds */
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strRtime: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2899,7 +3223,7 @@ int
 write_strStrhold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		 u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strStrhold entering action=%d...  \n", action));
@@ -2914,6 +3238,14 @@ write_strStrhold(int action, u_char *var_val, u_char var_val_type, size_t var_va
 		if (var_val_len > sizeof(long)) {
 			fprintf(stderr, "write to strStrhold: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
+		}
+		switch ((tmpvar = *((long *) var_val))) {
+		case TV_TRUE:
+		case TV_FALSE:
+			break;
+		default:
+			fprintf(stderr, "write to strStrhold: bad value %ld\n", tmpvar);
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 
@@ -2939,10 +3271,20 @@ write_strStrhold(int action, u_char *var_val, u_char var_val_type, size_t var_va
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_STRHOLD };
+		int clen = 2;
+		int value = (StorageTmp->strStrhold == TV_TRUE) ? 1 : 0;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strStrhold: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -2951,7 +3293,7 @@ int
 write_strStrctlsz(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		  u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static unsigned long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strStrctlsz entering action=%d...  \n", action));
@@ -2966,6 +3308,13 @@ write_strStrctlsz(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		if (var_val_len > sizeof(u_long)) {
 			fprintf(stderr, "write to strStrctlsz: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* values less than about 1024 are not really usable, and values greater than about 
+		   262,144 are not workable. */
+		tmpvar = *((unsigned long *) var_val);
+		if (1024 > tmpvar || tmpvar > 262144) {
+			fprintf(stderr, "write to strStrctlsz: bad value %lu\n", tmpvar);
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 
@@ -2991,10 +3340,20 @@ write_strStrctlsz(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_STRCTLSZ };
+		int clen = 2;
+		unsigned long value = StorageTmp->strStrctlsz;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strStrctlsz: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -3018,6 +3377,13 @@ write_strStrmsgsz(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		if (var_val_len > sizeof(u_long)) {
 			fprintf(stderr, "write to strStrmsgsz: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
+		}
+		/* values less than about 1024 are not really usable, and values greater than about 
+		   262,144 are not workable. */
+		tmpvar = *((unsigned long *) var_val);
+		if (1024 > tmpvar || tmpvar > 262144) {
+			fprintf(stderr, "write to strStrmsgsz: bad value %lu\n", tmpvar);
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 
@@ -3043,10 +3409,20 @@ write_strStrmsgsz(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_STRMSGSZ };
+		int clen = 2;
+		unsigned long value = StorageTmp->strStrmsgsz;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strStrmsgsz: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -3055,7 +3431,7 @@ int
 write_strStrthresh(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		   u_char *statP, oid * name, size_t name_len)
 {
-	static int tmpvar;
+	static unsigned long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strStrthresh entering action=%d...  \n", action));
@@ -3066,6 +3442,10 @@ write_strStrthresh(int action, u_char *var_val, u_char var_val_type, size_t var_
 		if (var_val_type != ASN_UNSIGNED) {
 			fprintf(stderr, "write to strStrthresh not ASN_UNSIGNED\n");
 			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(u_long)) {
+			fprintf(stderr, "write to strStrthresh: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 
@@ -3091,115 +3471,20 @@ write_strStrthresh(int action, u_char *var_val, u_char var_val_type, size_t var_
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_STRTHRESH };
+		int clen = 2;
+		unsigned long value = StorageTmp->strStrthresh;
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+			fprintf(stderr, "write to strStrthresh: commit failed\n");
+			return SNMP_ERR_COMMITFAILED;
+		}
 		break;
 	}
-	return SNMP_ERR_NOERROR;
-}
-
-int
-write_strLowthresh(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
-		   u_char *statP, oid * name, size_t name_len)
-{
-	static int tmpvar;
-	struct strMIB_data *StorageTmp = NULL;
-
-	DEBUGMSGTL(("strMIB", "write_strLowthresh entering action=%d...  \n", action));
-	StorageTmp = strMIBStorage;
-
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_UNSIGNED) {
-			fprintf(stderr, "write to strLowthresh not ASN_UNSIGNED\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(u_long)) {
-			fprintf(stderr, "write to strLowthresh: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		break;
-
-	case FREE:
-		/* Release any resources that have been allocated */
-		break;
-
-	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
-		tmpvar = StorageTmp->strLowthresh;
-		StorageTmp->strLowthresh = *((unsigned long *) var_val);
-		break;
-
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		StorageTmp->strLowthresh = tmpvar;
-		break;
-
-	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
-
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-int
-write_strMedthresh(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
-		   u_char *statP, oid * name, size_t name_len)
-{
-	static unsigned long tmpvar;
-	struct strMIB_data *StorageTmp = NULL;
-
-	DEBUGMSGTL(("strMIB", "write_strMedthresh entering action=%d...  \n", action));
-	StorageTmp = strMIBStorage;
-
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_UNSIGNED) {
-			fprintf(stderr, "write to strMedthresh not ASN_UNSIGNED\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(u_long)) {
-			fprintf(stderr, "write to strMedthresh: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-
-		break;
-
-	case FREE:
-		/* Release any resources that have been allocated */
-		break;
-
-	case ACTION:
-		/* The variable has been stored in ulong_ret for you to use, and you have just been 
-		   asked to do something with it.  Note that anything done here must be reversable
-		   in the UNDO case */
-		tmpvar = StorageTmp->strMedthresh;
-		StorageTmp->strMedthresh = *((unsigned long *) var_val);
-		break;
-
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		StorageTmp->strMedthresh = tmpvar;
-		break;
-
-	case COMMIT:
-		/* Things are working well, so it's now safe to make the change permanently.  Make
-		   sure that anything done here can't fail! */
-
-		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -3208,7 +3493,7 @@ int
 write_strIoctime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len,
 		 u_char *statP, oid * name, size_t name_len)
 {
-	static unsigned long tmpvar;
+	static long tmpvar;
 	struct strMIB_data *StorageTmp = NULL;
 
 	DEBUGMSGTL(("strMIB", "write_strIoctime entering action=%d...  \n", action));
@@ -3223,6 +3508,10 @@ write_strIoctime(int action, u_char *var_val, u_char var_val_type, size_t var_va
 		if (var_val_len > sizeof(long)) {
 			fprintf(stderr, "write to strIoctime: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
+		}
+		if ((tmpvar = *((long *) var_val)) <= 0) {
+			fprintf(stderr, "write to strIoctime: bad value %ld\n", tmpvar);
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 
@@ -3249,10 +3538,19 @@ write_strIoctime(int action, u_char *var_val, u_char var_val_type, size_t var_va
 		break;
 
 	case COMMIT:
+	{
+		int cvec[] = { CTL_STREAMS, STREAMS_IOCTIME };
+		int clen = 2;
+		unsigned long value = StorageTmp->strIoctime * 10;	/* centiseconds to
+									   milliseconds */
+
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
+		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value)))
+			return SNMP_ERR_COMMITFAILED;
 		break;
+	}
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -3268,12 +3566,11 @@ write_strApshStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 	int set_value;
 	static struct variable_list *vars, *vp;
 	struct header_complex_index *hciptr;
-	char who[MAX_OID_LEN], flagName[MAX_OID_LEN];
+	//char who[MAX_OID_LEN], flagName[MAX_OID_LEN];
 
-	StorageTmp =
-	    header_complex(strApshTableStorage, NULL,
-			   &name[sizeof(strApshTable_variables_oid) / sizeof(oid) + 3 - 1], &newlen,
-			   1, NULL, NULL);
+	StorageTmp = header_complex(strApshTableStorage, NULL,
+				    &name[sizeof(strApshTable_variables_oid) / sizeof(oid) + 3 - 1],
+				    &newlen, 1, NULL, NULL);
 
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		fprintf(stderr, "write to strApshStatus not ASN_INTEGER\n");
@@ -3344,22 +3641,22 @@ write_strApshStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 
 			StorageNew = SNMP_MALLOC_STRUCT(strApshTable_data);
 #if 0
-			memdup((u_char **) &(StorageNew->strModIdnum), vp->val.string, vp->val_len);
+			memdup((void *) &StorageNew->strModIdnum, vp->val.string, vp->val_len);
 			StorageNew->strModIdnumLen = vp->val_len;
 			vp = vp->next_variable;
-			memdup((u_char **) &(StorageNew->strModInfoIndex), vp->val.string,
+			memdup((void *) &StorageNew->strModInfoIndex, vp->val.string,
 			       vp->val_len);
 			StorageNew->strModInfoIndexLen = vp->val_len;
 			vp = vp->next_variable;
-			memdup((u_char **) &(StorageNew->strModStatIndex), vp->val.string,
+			memdup((void *) &StorageNew->strModStatIndex, vp->val.string,
 			       vp->val_len);
 			StorageNew->strModStatIndexLen = vp->val_len;
 			vp = vp->next_variable;
 #endif
-			memdup((u_char **) &(StorageNew->strApshName), vp->val.string, vp->val_len);
+			memdup((void *) &StorageNew->strApshName, vp->val.string, vp->val_len);
 			StorageNew->strApshNameLen = vp->val_len;
 			vp = vp->next_variable;
-			memdup((u_char **) &(StorageNew->strApshMinor), vp->val.string,
+			memdup((void *) &StorageNew->strApshMinor, vp->val.string,
 			       vp->val_len);
 #if 0
 			StorageNew->strApshMinorLen = vp->val_len;
@@ -3433,24 +3730,6 @@ write_strApshStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 	return SNMP_ERR_NOERROR;
 }
 
-static const char sa_program[] = "strMIB";
-
-static int sa_debug = 0;		/* default no debug */
-static int sa_nomead = 1;		/* default daemon mode */
-static int sa_output = 1;		/* default normal output */
-static int sa_agentx = 1;		/* default agentx mode */
-static int sa_alarms = 1;		/* default application alarms */
-static int sa_fclose = 1;		/* default close files between requests */
-
-static char sa_outfile[256] = "";
-static char sa_errfile[256] = "";
-static char sa_outpath[256] = "";
-static char sa_errpath[256] = "";
-static char sa_basname[256] = "";
-static char sa_outpdir[256] = "/var/log/streams";
-static char sa_pidfile[256] = "";
-static char sa_sysctlf[256] = "";
-
 static void
 sa_version(int argc, char *argv[])
 {
@@ -3471,7 +3750,8 @@ sa_usage(int argc, char *argv[])
 		return;
 	fprintf(stderr, "\
 Usage:\n\
-    %1$s [options]\n\
+    %1$s [general-options] [options] [arguments]\n\
+    %1$s {-H|--help-directives}\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
@@ -3485,46 +3765,88 @@ sa_help(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 Usage:\n\
-    %1$s [options]\n\
+    %1$s [general-options] [options] [arguments]\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
 Arguments:\n\
     None.\n\
 Options:\n\
+    -a, --log-addresses\n\
+        log addresses of connecting management stations.\n\
+    -A, --append\n\
+        append to logfiles without truncating.\n\
+    -c, --config-file CONFIGFILE\n\
+        use configuration file CONFIGFILE.\n\
+    -C, --config-only\n\
+        only load configuration given by -c option.\n\
+    -d, --dump\n\
+        dump sent and received PDUs.\n\
+    -D, --debug [LEVEL]\n\
+        set debugging verbosity to LEVEL.\n\
+    -D, --debug-tokens [TOKEN[,TOKEN]*]\n\
+        debug specified TOKEN's.\n\
+    -f, --dont-fork\n\
+        run in the foreground.\n\
+    -g, --gid, --groupid GID\n\
+        become group GID after listening.\n\
+    -h, --help, -?, --?\n\
+        print usage information and exit.\n\
+    -H, --help-directives\n\
+        print config directives and exit.\n\
+    -I, --initialize [-]MODULE[,MODULE]*\n\
+        initialize (or not, '-') these MODULE's.\n\
     -k, --keep-open\n\
-        keep files open between requests, default: close\n\
-    -s, --sysctl-file FILENAME\n\
-        used sysctl boot file FILENAME, default: %2$s\n\
-    -a, --agent-alarms\n\
-        use agent alarms, default: application alarms\n\
-    -m, --master\n\
-        run as SNMP master, default: agentx\n\
+        keep system files open between requests.\n\
+    -l, --log-file [LOGFILE]\n\
+        log to log file name LOGFILE.  [default: /var/log/strmib.log]\n\
+    -L, --log-stderr\n\
+        log to controlling terminal standard error.\n\
+    -m, --mibs [+]MIB[,MIB]*\n\
+        load these (additional '+') MIBs.\n\
+    -M, --master\n\
+        run as SNMP master instead of AgentX sub-agent.\n\
+    -M, --mibdirs [+]MIBDIR[:MIBDIR]*\n\
+        search these (additional, '+') colon separated directories for MIBs.\n\
     -n, --nodaemon\n\
-        do not daemonize, run in the foreground, default: daemon\n\
-    -d, --directory DIRECTORY\n\
-        specify a directory for log files, default: '/var/log/streams'\n\
-    -b, --basename BASENAME\n\
-        file basename, default: '%3$s'\n\
-    -o, --outfile OUTFILE\n\
-        redirect output to OUTFILE, default: BASENAME.mm-dd\n\
-    -e, --errfile ERRFILE\n\
-        redirect errors to ERRFILE, default: BASENAME.errors\n\
+        run in the foreground.\n\
+    -n, --name NAME\n\
+        use NAME for configuration file base.  [default: strmib]\n\
+    -p, --port PORTNUM\n\
+        listen on port number PORTNUM.  [default: 161]\n\
     -p, --pidfile PIDFILE\n\
-        when running as daemon, output pid to PIDFILE, default: /var/run/%2$s.pid\n\
+        write daemon pid to PIDFILE.  [default: /var/run/strmib.pid]\n\
+    -P, --pidfile PIDFILE\n\
+        write daemon pid to PIDFILE.  [default: /var/run/strmib.pid]\n\
     -q, --quiet\n\
-        suppress output\n\
-    -d, --debug [LEVEL]\n\
-        increase or set debugging verbosity\n\
-    -v, --verbose [LEVEL]\n\
-        increase or set output verbosity\n\
-    -h, --help\n\
-        prints this usage information and exits\n\
-    -V, --version\n\
-        prints the version and exits\n\
-    -C, --copying\n\
-        prints copying permissions and exits\n\
-", argv[0], sa_sysctlf, sa_basname);
+        suppress normal output.\n\
+    -q, --quick\n\
+        abbreviate output for machine readability.\n\
+    -r, --noroot\n\
+        do not require root privilege.\n\
+    -s, --log-syslog\n\
+        log to system logs.\n\
+    -S, --sysctl-file FILENAME\n\
+        write sysctl config file FILENAME.  [default: /etc/streams.conf]\n\
+    -t, --agent-alarms\n\
+        agent blocks {SIGALARM}.\n\
+    -T, --transport [TRANSPORT]\n\
+        default transport TRANSPORT.  [default: udp]\n\
+    -u, --uid, --userid UID\n\
+        become user UID after listening.\n\
+    -U, --dont-remove-pidfile\n\
+        do not remove PIDFILE when shutting down.\n\
+    -v, --version\n\
+        print version information and exit.\n\
+    -V, --verbose [LEVEL]\n\
+        be verbose to LEVEL.  [default: 1]\n\
+    -x, --agentx-socket [SOCKET]\n\
+        master AgentX on SOCKET.  [default: /var/agentx/master]\n\
+    -X, --agentx\n\
+        run as AgentX sub-agent instead of master (the default).\n\
+    -y, --copying\n\
+        print copying information and exit.\n\
+", argv[0]);
 }
 
 static void
@@ -3573,6 +3895,20 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
+void
+sa_help_directives(int argc, char *argv[])
+{
+	ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_NO_ROOT_ACCESS, 1);
+	init_agent("strMIB");
+	//init_mib_modules();
+	init_mib();
+	init_snmp("strMIB");
+	snmp_log(LOG_INFO, "Configuration directives understood:\n");
+	/* Unfortunately, read_config_print_usage() uses snmp_log(), meaning that it can only be
+	   writen to standard error and not standard output. */
+	read_config_print_usage("    ");
+}
+
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
 
 static int
@@ -3593,13 +3929,14 @@ sa_sig_register(int signum, RETSIGTYPE(*handler) (int))
 }
 
 static int sa_alm_signal = 0;
+static int sa_pol_signal = 0;
 static int sa_hup_signal = 0;
 static int sa_int_signal = 0;
 static int sa_trm_signal = 0;
 
 static int sa_alm_handle = 0;
 
-static void
+void
 sa_alm_callback(unsigned int req, void *arg)
 {
 	if (req == sa_alm_handle)
@@ -3648,6 +3985,52 @@ static int
 sa_alm_action(void)
 {
 	sa_alm_signal = 0;
+	return (0);
+}
+
+static RETSIGTYPE
+sa_pol_handler(int signum)
+{
+	sa_pol_signal = 1;
+	return (RETSIGTYPE) (0);
+}
+
+static int
+sa_pol_catch(void)
+{
+	return sa_sig_register(SIGPOLL, &sa_pol_handler);
+}
+
+static int
+sa_pol_block(void)
+{
+	return sa_sig_register(SIGPOLL, NULL);
+}
+
+/*
+ * Both the sc(4) module and sad(4) driver issue an M_PCSIG message with
+ * SIGPOLL to the stream head whenever the STREAMS configuration or autopush
+ * configuration changes, indicating to the agent which has the sc(4) or
+ * sad(4) Stream open that it is necessary to reread information from the
+ * kernel.  This fact is merely recorded, as this information is not read each
+ * time that a configuration change occurs, but only after a request from some
+ * portion of that information occurs. This condition is also set when the
+ * sc(4) and sad(4) Streams are first opened. The SIGPOLL will also deliver in
+ * siginfo the file descriptor issuing the signal, so we could distiguish
+ * between sc(4) and sad(4) signals, but since one can be pushed over the
+ * other, there is little point in distinguishing.
+ *
+ * sc(4) or sad(4) also should be modified to provide the general streams
+ * statistics supported here; even though they are available through the /proc
+ * filesystem on Linux Fast-STREAMS.
+ */
+static int
+sa_pol_action(void)
+{
+	sa_pol_signal = 0;
+	syslog(MY_FACILITY(LOG_INFO), "%s: Caught SIGPOLL, will re-read data structures",
+	       sa_program);
+	sad_changed = 1;
 	return (0);
 }
 
@@ -3764,6 +4147,7 @@ static void
 sa_sig_catch(void)
 {
 	sa_alm_catch();
+	sa_pol_catch();
 	sa_hup_catch();
 	sa_int_catch();
 	sa_trm_catch();
@@ -3773,12 +4157,13 @@ static void
 sa_sig_block(void)
 {
 	sa_alm_block();
+	sa_pol_block();
 	sa_hup_block();
 	sa_int_block();
 	sa_trm_block();
 }
 
-static int
+int
 sa_start_timer(long duration)
 {
 	if (sa_alarms) {
@@ -3846,7 +4231,7 @@ sa_enter(int argc, char *argv[])
 				FILE *pidf;
 
 				/* initialize default filename */
-				if (sa_pidfile[0] = '\0')
+				if (sa_pidfile[0] == '\0')
 					snprintf(sa_pidfile, sizeof(sa_pidfile), "/var/run/%s.pid",
 						 sa_program);
 				if (sa_output > 1)
@@ -3935,6 +4320,23 @@ sa_enter(int argc, char *argv[])
 static void
 sa_mloop(int argc, char *argv[])
 {
+	snmp_disable_log();
+	if (sa_logfillog) {
+		snmp_enable_filelog(sa_logfile, sa_appendlog);
+	}
+	if (sa_logstderr | sa_logstdout) {
+		snmp_enable_stderrlog();
+	}
+	if (sa_logsyslog) {
+#if !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT
+		snmp_enable_syslog();
+#else				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
+		snmp_enable_syslog_ident("strMIB", LOG_DAEMON);
+#endif				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
+	}
+	if (sa_logcallog) {
+		snmp_enable_calllog();
+	}
 	if (sa_debug)
 		fprintf(stderr, "%s: redirecting SNMP logs to stderr\n", argv[0]);
 	/* we have already directed standard error to our own log if necessary */
@@ -3947,22 +4349,19 @@ sa_mloop(int argc, char *argv[])
 		if (sa_debug)
 			fprintf(stderr, "%s: running as AgentX client\n", argv[0]);
 		/* run as an AgentX client */
-#if !defined NETSNMP_DS_APPLICATION_ID
 		ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 1);
-#else
-		netsnmp_ds_set_boolean(NETSNMP_DS_APPLICATION_ID, NETSNMP_DS_AGENT_ROLE, 1);
-#endif
+	} else {
+		if (sa_debug)
+			fprintf(stderr, "%s: running as SNMP master agent\n", argv[0]);
+		/* run as SNMP master */
+		ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 0);
 	}
 
 	if (sa_alarms) {
 		if (sa_debug)
 			fprintf(stderr, "%s: using application alarms\n", argv[0]);
 		/* use application alarms */
-#if !defined NETSNMP_DS_APPLICATION_ID
 		ds_set_boolean(DS_LIBRARY_ID, DS_LIB_ALARM_DONT_USE_SIG, 1);
-#else
-		netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_ALARM_DONT_USE_SIG, 1);
-#endif
 	}
 
 	/* initialize agent */
@@ -3987,8 +4386,8 @@ sa_mloop(int argc, char *argv[])
 	for (;;) {
 		int retval;
 
-		/* to use select or poll you need to use the snmp_select_info() to obtain the fd of
-		 * the agentx socket and add it to the fdset. */
+		/* to use select or poll you need to use the snmp_select_info() to obtain the fd of 
+		   the agentx socket and add it to the fdset. */
 		/* note that SIGALRM is used by snmp: use the snmp_alarm() api instead */
 
 #if 0
@@ -3997,48 +4396,50 @@ sa_mloop(int argc, char *argv[])
 				run_alarms();
 		}
 #endif
-		retval = agent_check_and_process(0);	/* 0 == don't block */
-
-		if (sa_fclose) {
-			/* close files after each request */
-			if (sad_fd != 0) {
-				int fd = sad_fd;
-
-				sad_fd = 0;
-				close(fd);
-			}
-		}
-
-		if (sa_alm_signal)
-			sa_alm_action();
-		if (sa_hup_signal)
-			sa_hup_action();
-		if (sa_int_signal) {
-			if (sa_debug)
-				fprintf(stderr, "%s: shutting down\n");
-			snmp_shutdown("strMIB");
-			sa_int_action();	/* no return */
-		}
-		if (sa_trm_signal) {
-			if (sa_debug)
-				fprintf(stderr, "%s: shutting down\n");
-			snmp_shutdown("strMIB");
-			sa_trm_action();	/* no return */
-		}
+		retval = agent_check_and_process(1);	/* 0 == don't block */
 
 		if (retval == 0) {
-			/* alarm occurred, check alarm conditions */
+			/* alarm occurred, alarm conditions checked */
 		} else if (retval == -1) {
-			/* error occurred */
+			/* error (or signal) ocurred */
+			if (sa_alm_signal) {
+				sa_alm_action();
+			}
+			if (sa_pol_signal) {
+				sa_pol_action();
+			}
+			if (sa_hup_signal) {
+				sa_hup_action();
+			}
+			if (sa_int_signal) {
+				if (sa_debug)
+					fprintf(stderr, "%s: shutting down\n", argv[0]);
+				snmp_shutdown("strMIB");
+				sa_int_action();	/* no return */
+			}
+			if (sa_trm_signal) {
+				if (sa_debug)
+					fprintf(stderr, "%s: shutting down\n", argv[0]);
+				snmp_shutdown("strMIB");
+				sa_trm_action();	/* no return */
+			}
 		} else if (retval > 0) {
 			/* processed packets */
-		} else {
-			/* documentation error */
+			if (sa_fclose) {
+				/* close files after each request */
+				if (sad_fd != 0) {
+					int fd = sad_fd;
+
+					sad_fd = 0;
+					close(fd);
+				}
+			}
+			sa_stats_refresh = 1;
 		}
 	}
 
 	if (sa_debug)
-		fprintf(stderr, "%s: shutting down\n");
+		fprintf(stderr, "%s: shutting down\n", argv[0]);
 	snmp_shutdown("strMIB");
 }
 
@@ -4046,37 +4447,86 @@ int
 main(int argc, char *argv[])
 {
 	for (;;) {
-		int c, val;
+		int c, val, fd;
+		char *cptr;
+		struct passwd *pw;
+		struct group *gr;
+		struct stat st;
 
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
-			{"keep-open",	 no_argument,		NULL, 'k'},
-			{"sysctl-file",	 required_argument,	NULL, 's'},
-			{"agent-alarms", no_argument,		NULL, 'a'},
-			{"master",	 no_argument,		NULL, 'm'},
-			{"nodaemon",	 no_argument,		NULL, 'n'},
-			{"directory",	 required_argument,	NULL, 'd'},
-			{"basename",	 required_argument,	NULL, 'b'},
-			{"outfile",	 required_argument,	NULL, 'o'},
-			{"errfile",	 required_argument,	NULL, 'e'},
-			{"pidfile",	 required_argument,	NULL, 'p'},
-			{"quiet",	 no_argument,		NULL, 'q'},
-			{"debug",	 optional_argument,	NULL, 'D'},
-			{"verbose",	 optional_argument,	NULL, 'v'},
-			{"help",	 no_argument,		NULL, 'h'},
-			{"version",	 no_argument,		NULL, 'V'},
-			{"copying",	 no_argument,		NULL, 'C'},
-			{"?",		 no_argument,		NULL, 'H'},
+			{"log-addresses",	no_argument,		NULL, 'a'},
+			{"append",		no_argument,		NULL, 'A'},
+			{"config-file",		required_argument,	NULL, 'c'},
+			{"no-configs",		no_argument,		NULL, 'C'},
+			{"dump",		no_argument,		NULL, 'd'},
+			{"debug",		optional_argument,	NULL, 'D'},
+			{"debug-tokens",	optional_argument,	NULL, 'D'},
+			{"dont-fork",		no_argument,		NULL, 'f'},
+			{"gid",			required_argument,	NULL, 'g'},
+			{"groupid",		required_argument,	NULL, 'g'},
+			{"help",		no_argument,		NULL, 'h'},
+			{"?",			no_argument,		NULL, 'h'},
+			{"help-directives",	no_argument,		NULL, 'H'},
+			{"initialize",		required_argument,	NULL, 'I'},
+			{"init-modules",	required_argument,	NULL, 'I'},
+			{"keep-open",		no_argument,		NULL, 'k'},
+			{"log-file",		optional_argument,	NULL, 'l'},
+			{"logfile",		optional_argument,	NULL, 'l'},
+			{"Lf",			optional_argument,	NULL, 'l'},
+			{"LF",			required_argument,	NULL, 'l'},
+			{"log-stderr",		no_argument,		NULL, 'L'},
+			{"Le",			no_argument,		NULL, 'L'},
+			{"LE",			required_argument,	NULL, 'L'},
+			{"mibs",		required_argument,	NULL, 'm'},
+			{"master",		no_argument,		NULL, 'M'},
+			{"mibdirs",		required_argument,	NULL, 'M'},
+			{"nodaemon",		no_argument,		NULL, 'n'},
+			{"name",		required_argument,	NULL, 'n'},
+			{"dry-run",		no_argument,		NULL, 'N'},
+			{"log-stdout",		no_argument,		NULL, 'o'},
+			{"Lo",			no_argument,		NULL, 'o'},
+			{"LO",			required_argument,	NULL, 'o'},
+			{"port",		required_argument,	NULL, 'p'},
+			{"pidfile",		required_argument,	NULL, 'P'},
+			{"quiet",		no_argument,		NULL, 'q'},
+			{"quick",		no_argument,		NULL, 'q'},
+			{"noroot",		no_argument,		NULL, 'r'},
+			{"log-syslog",		no_argument,		NULL, 's'},
+			{"Ls",			no_argument,		NULL, 's'},
+			{"LS",			required_argument,	NULL, 's'},
+			{"syslog",		no_argument,		NULL, 's'},
+			{"sysctl-file",		required_argument,	NULL, 'S'},
+			{"agent-alarms",	no_argument,		NULL, 't'},
+			{"transport",		optional_argument,	NULL, 'T'},
+			{"uid",			required_argument,	NULL, 'u'},
+			{"userid",		required_argument,	NULL, 'u'},
+			{"dont-remove-pidfile",	no_argument,		NULL, 'U'},
+			{"leave-pidfile",	no_argument,		NULL, 'U'},
+			{"version",		no_argument,		NULL, 'v'},
+			{"verbose",		optional_argument,	NULL, 'V'},
+			{"agentx-socket",	required_argument,	NULL, 'x'},
+			{"agentx",		no_argument,		NULL, 'X'},
+			{"copying",		no_argument,		NULL, 'y'},
+#if 0
+			{"directory",		required_argument,	NULL, 'd'},
+			{"basename",		required_argument,	NULL, 'b'},
+			{"outfile",		required_argument,	NULL, 'o'},
+			{"errfile",		required_argument,	NULL, 'e'},
+#endif
 			{ 0, }
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "s:amnd:b:o:e:p:qD::v::hVC?W:", long_options,
-				     &option_index);
+		c = getopt_long_only(argc, argv,
+				":aAc:CdD::fg:hHI:kl::L::m:M::n::o::p:P:qrs::S:tT::u:UvV::x:Xy",
+				long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "s:amnd:b:o:e:p:qDvhVC?");
+		c = getopt(argc, argv,
+				":aAc:CdD::fg:hHI:kl::L::m:M::n::o::p:P:qrs::S:tT::u:UvV::x:Xy"
+				);
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			if (sa_debug)
@@ -4086,93 +4536,338 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 0:
 			goto bad_usage;
+		case 'a':	/* -a, --log-addresses */
+			if (sa_debug)
+				fprintf(stderr, "%s: logging addresses\n", argv[0]);
+			sa_logaddr++;
+			break;
+		case 'A':	/* -A, --append */
+			if (sa_debug)
+				fprintf(stderr, "%s: will not truncate logfile\n", argv[0]);
+#if defined NETSNMP_DS_LIB_APPEND_LOGFILES
+			ds_set_boolean(DS_LIBRARY_ID, NETSNMP_DS_LIB_APPEND_LOGFILES, 1);
+#endif				/* defined NETSNMP_DS_LIB_APPEND_LOGFILES */
+			sa_appendlog = 1;
+			break;
+		case 'c':	/* -c, --config-file CONFIGFILE */
+			if (optarg == NULL)
+				goto bad_option;
+			if (sa_debug)
+				fprintf(stderr, "%s: using configuration file %s\n", argv[0],
+					optarg);
+			ds_set_string(DS_LIBRARY_ID, DS_LIB_OPTIONALCONFIG, optarg);
+			break;
+		case 'C':	/* -C, --no-configs */
+			if (sa_debug)
+				fprintf(stderr, "%s: not reading default config files\n", argv[0]);
+			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_DONT_READ_CONFIGS, 1);
+			break;
+		case 'd':	/* -d, --dump */
+			if (sa_debug)
+				fprintf(stderr, "%s: setting packet dump\n", argv[0]);
+			sa_dump = 1;
+			// snmp_set_dump_packet(sa_dump);
+			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_DUMP_PACKET, sa_dump);
+			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, sa_dump);
+			break;
+		case 'D':	/* -D, --debug [LEVEL], --debug-tokens [TOKENS] */
+			if (sa_debug)
+				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
+			if (optarg == NULL) {
+				/* no option: must be -D, --debug */
+				sa_debug++;
+				if (sa_debug)
+					fprintf(stderr, "%s: debug level is now %d\n", argv[0],
+						sa_debug);
+				if (sa_debug)
+					fprintf(stderr, "%s: debugging all tokens\n", argv[0]);
+				if (sa_debug)
+					debug_register_tokens("ALL");
+			} else {
+				cptr = optarg;
+				if ((val = strtol(optarg, &cptr, 0)) < 0)
+					goto bad_option;
+				if (*cptr == '\0') {
+					/* it is just a number, must be -D, --debug [LEVEL] */
+					sa_debug = val;
+					if (sa_debug)
+						fprintf(stderr, "%s: debug level is now %d\n",
+							argv[0], sa_debug);
+				} else {
+					/* not a number, must be -D, --debug-tokens TOKENS */
+					if (sa_debug)
+						fprintf(stderr, "%s: debugging tokens %s\n",
+							argv[0], optarg);
+					debug_register_tokens(optarg);
+				}
+			}
+			break;
+		case 'f':	/* -f, --dont-fork */
+			if (sa_debug)
+				fprintf(stderr, "%s: suppressing daemon mode\n", argv[0]);
+			sa_nomead = 0;
+			break;
+		case 'u':	/* -u, --uid, --userid UID */
+			cptr = optarg;
+			if ((val = strtol(optarg, &cptr, 0)) < 0)
+				goto bad_option;
+			/* UID can be name or number */
+			if ((pw = (*cptr == '\0') ? getpwuid((uid_t)val) : getpwnam(optarg)) == NULL)
+				goto bad_option;
+			if (sa_debug)
+				fprintf(stderr, "%s: will run as uid %s(%d)\n", argv[0],
+					pw->pw_name, pw->pw_uid);
+			ds_set_int(DS_APPLICATION_ID, DS_AGENT_USERID, pw->pw_uid);
+			break;
+		case 'g':	/* -g, --gid, --groupdid GID */
+			cptr = optarg;
+			if ((val = strtol(optarg, &cptr, 0)) < 0)
+				goto bad_option;
+			/* GID can be name or number */
+			if ((gr = (*cptr == '\0') ? getgrgid((gid_t)val) : getgrnam(optarg)) == NULL)
+				goto bad_option;
+			if (sa_debug)
+				fprintf(stderr, "%s: will run as gid %s(%d)\n", argv[0],
+					gr->gr_name, gr->gr_gid);
+			ds_set_int(DS_APPLICATION_ID, DS_AGENT_GROUPID, gr->gr_gid);
+			break;
+		case 'h':	/* -h, --help, -?, --? */
+			if (sa_debug)
+				fprintf(stderr, "%s: printing help message\n", argv[0]);
+			sa_help(argc, argv);
+			exit(0);
+		case 'H':	/* -H, --help-directives */
+			if (sa_debug)
+				fprintf(stderr, "%s: printing config directives\n", argv[0]);
+			sa_help_directives(argc, argv);
+			exit(0);
+		case 'I':	/* -I, --init-modules, --initialize MODULE[{,| |:}MODULE]* */
+			if (sa_debug)
+				fprintf(stderr, "%s: will initialize modules: %s\n", argv[0],
+					optarg);
+			add_to_init_list(optarg);
+			break;
 		case 'k':	/* -k, --keep-open */
 			if (sa_debug)
 				fprintf(stderr, "%s: keeping files open\n", argv[0]);
 			sa_fclose = 0;
 			break;
-		case 's':	/* -s, -sysctl-file FILENAME */
+		case 'l':	/* -l, --log-file, --logfile, -Lf, -LF p1[-p2] [LOGFILE] */
+			if (optarg != NULL)
+				strncpy(sa_logfile, optarg, sizeof(sa_logfile));
 			if (sa_debug)
-				fprintf(stderr, "%s: using %s for backing\n", argv[0], optarg);
-			strncpy(sa_sysctlf, optarg, 256);
+				fprintf(stderr, "%s: will log to file %s\n", argv[0], sa_logfile);
+			sa_logfillog = 1;
 			break;
-		case 'a':	/* -a, --agent-alarms */
+		case 'L':	/* -L, --log-stderr, -Le, -LE p1[-p2] */
+			/* Note that the recent NET-SNMP version of this option is far more
+			   complicated: -Le is the same as the old version of the option; -Lf
+			   LOGFILE is like the -l option; -Ls is like the -s option; -Lo logs
+			   messages to standard output; -LX p1[-p2] [LOGFILE], where X = E, F, S or 
+			   O, logs priority p1 and above to X, or p1 thru p2 to X. */
 			if (sa_debug)
-				fprintf(stderr, "%s: setting agent alarms\n", argv[0]);
-			sa_alarms = 0;
+				fprintf(stderr, "%s: logging to standard error\n", argv[0]);
+			sa_logstderr = 1;
 			break;
-		case 'm':	/* -m, --master */
+		case 'm':	/* -m, --mibs MIBS */
 			if (sa_debug)
-				fprintf(stderr, "%s: setting SNMP master\n", argv[0]);
-			sa_agentx = 0;
+				fprintf(stderr, "%s: using MIBS %s\n", argv[0], optarg);
 			break;
-		case 'n':	/* -n, --nodaemon */
+		case 'M':	/* -M, --master or -M, --mibdirs MIBDIRS */
+			if (optarg) {
+				/* -M, --mibdirs MIBDIRS */
+				if (sa_debug)
+					fprintf(stderr, "%s: using MIBDIRS %s\n", argv[0], optarg);
+			} else {
+				/* -M, --master */
+				if (sa_debug)
+					fprintf(stderr, "%s: setting SNMP master\n", argv[0]);
+				sa_agentx = 0;
+				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 0);
+			}
+			break;
+		case 'n':	/* -n, --nodaemon or -n, --name NAME */
+			if (optarg) {
+				/* -n, --name NAME */
+				if (sa_debug)
+					fprintf(stderr, "%s: using name %s\n", argv[0], optarg);
+				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PROGNAME, optarg);
+			} else {
+				/* -n, --nodaemon */
+				if (sa_debug)
+					fprintf(stderr, "%s: suppressing deamon mode\n", argv[0]);
+				sa_nomead = 0;
+				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PROGNAME,
+					      basename(argv[0]));
+			}
+			break;
+		case 'N':	/* -N, --dry-run */
+#if defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY
 			if (sa_debug)
-				fprintf(stderr, "%s: suppressing deamon mode\n", argv[0]);
-			sa_nomead = 0;
+				fprintf(stderr, "%s: setting for dry-runs startup\n", argv[0]);
+			ds_set_boolean(DS_APPLICATION_ID, NETSNMP_DS_AGENT_QUIT_IMMEDIATELY, 1);
 			break;
-		case 'd':	/* -d, --directory DIRECTORY */
-			strncpy(sa_outpdir, optarg, 256);
-			break;
-		case 'b':	/* -b, --basename BASNAME */
-			strncpy(sa_basname, optarg, 256);
-			break;
-		case 'o':	/* -o, --outfile OUTFILE */
-			strncpy(sa_outfile, optarg, 256);
-			break;
-		case 'e':	/* -e, --errfile ERRFILE */
-			strncpy(sa_errfile, optarg, 256);
-			break;
-		case 'p':	/* -p, --pidfile PIDFILE */
+#else				/* defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY */
+			fprintf(stderr, "%s: -N option not supported\n", argv[0]);
+			goto bad_option;
+#endif				/* defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY */
+		case 'o':	/* -o, --log-stdout, -Lo, -LO p1[-p2] */
 			if (sa_debug)
-				fprintf(stderr, "%s: setting pid file to %s\n", argv[0], optarg);
-			strncpy(sa_pidfile, optarg, 256);
+				fprintf(stderr, "%s: logging to stdout\n", argv[0]);
+			sa_logstdout = 1;
 			break;
-		case 'q':	/* -q, --quiet */
+		case 'p':	/* -p, --port PORTNUM or -p, --pidfile PIDFILE */
+			cptr = optarg;
+			if ((val = strtol(optarg, &cptr, 0)) < 0 || val > 16383)
+				goto bad_option;
+			if (*cptr == '\0') {
+				char buf[4096];
+
+				/* -p, --port PORTNUM */
+				if ((cptr = ds_get_string(DS_APPLICATION_ID, DS_AGENT_PORTS)))
+					snprintf(buf, sizeof(buf), "%s,%s", cptr, optarg);
+				else
+					strncpy(buf, optarg, sizeof(buf));
+				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PORTS, buf);
+				break;
+			}
+			/* fall through */
+		case 'P':	/* -p, -P, --pidfile PIDFILE */
+			if (optarg) {
+				/* either it exists */
+				if (stat(optarg, &st) == -1) {
+					/* or we can create it */
+					if ((fd = open(optarg, O_CREAT, 0600)) == -1) {
+						perror(argv[0]);
+						goto bad_option;
+					}
+					close(fd);
+				}
+				if (sa_debug)
+					fprintf(stderr, "%s: setting pid file to %s\n", argv[0],
+						optarg);
+				strncpy(sa_pidfile, optarg, sizeof(sa_pidfile));
+			}
+			if (sa_debug)
+				fprintf(stderr, "%s: using pidfile %s\n", argv[0], sa_pidfile);
+			break;
+		case 'q':	/* -q, --quiet, --quick */
 			if (sa_debug)
 				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
 			sa_debug = 0;
 			sa_output = 0;
+			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 0);
+			// snmp_set_quick_print();
+			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_QUICK_PRINT, 1);
 			break;
-		case 'D':	/* -D, --debug [level] */
+		case 'r':	/* -r, --noroot */
 			if (sa_debug)
-				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
-			if (optarg == NULL) {
-				sa_debug++;
-			} else {
-				if ((val = strtol(optarg, NULL, 0)) < 0)
-					goto bad_option;
-				sa_debug = val;
-			}
+				fprintf(stderr, "%s: setting for non-root access\n", argv[0]);
+			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_NO_ROOT_ACCESS, 1);
 			break;
-		case 'v':	/* -v, --verbose [level] */
+		case 's':	/* -s, --log-syslog, -Ls, -LS p1[-p2] */
 			if (sa_debug)
-				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
-			if (optarg == NULL) {
-				sa_output++;
-				break;
-			}
-			if ((val = strtol(optarg, NULL, 0)) < 0)
+				fprintf(stderr, "%s: logging to system logs\n", argv[0]);
+			sa_logsyslog = 1;
+			break;
+		case 'S':	/* -S, -sysctl-file FILENAME */
+			if (sa_debug)
+				fprintf(stderr, "%s: using %s for backing\n", argv[0], optarg);
+			strncpy(sa_sysctlf, optarg, sizeof(sa_sysctlf));
+			break;
+		case 't':	/* -t, --agent-alarms */
+			if (sa_debug)
+				fprintf(stderr, "%s: setting agent alarms\n", argv[0]);
+			sa_alarms = 0;
+			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_ALARM_DONT_USE_SIG, 1);
+			break;
+		case 'T':	/* -T, --transport [TRANSPORT] */
+			if (optarg == NULL)
+				goto udp_transport;
+			if (!strcasecmp("TCP", optarg)) {
+				if (sa_debug)
+					fprintf(stderr, "%s: setting default transport to TCP\n",
+						argv[0]);
+				val = ds_get_int(DS_APPLICATION_ID, DS_AGENT_FLAGS);
+				val |= SNMP_FLAGS_STREAM_SOCKET;
+				ds_set_int(DS_APPLICATION_ID, DS_AGENT_FLAGS, val);
+			} else if (!strcasecmp("UDP", optarg)) {
+			      udp_transport:
+				if (sa_debug)
+					fprintf(stderr, "%s: setting default transport to UDP\n",
+						argv[0]);
+				val = ds_get_int(DS_APPLICATION_ID, DS_AGENT_FLAGS);
+				val &= ~SNMP_FLAGS_STREAM_SOCKET;
+				ds_set_int(DS_APPLICATION_ID, DS_AGENT_FLAGS, val);
+			} else
 				goto bad_option;
-			sa_output = val;
 			break;
-		case 'h':	/* -h, --help */
-		case 'H':	/* -H, --? */
+		case 'U':
+#if defined NETSNMP_DS_AGENT_LEAVE_PIDFILE
 			if (sa_debug)
-				fprintf(stderr, "%s: printing help message\n", argv[0]);
-			sa_help(argc, argv);
-			exit(0);
-		case 'V':	/* -V, --version */
+				fprintf(stderr, "%s: will leave pidfile after shutdown\n", argv[0]);
+			ds_set_boolean(DS_APPLICATION_ID, NETSNMP_DS_AGENT_LEAVE_PIDFILE, 1);
+#else
+			fprintf(stderr, "%s: -U option not supported\n");
+			goto bad_option;
+#endif				/* defined NETSNMP_DS_AGENT_LEAVE_PIDFILE */
+			break;
+		case 'v':	/* -v, --version */
 			if (sa_debug)
 				fprintf(stderr, "%s: printing version message\n", argv[0]);
 			sa_version(argc, argv);
 			exit(0);
-		case 'C':	/* -C, --copying */
+		case 'V':	/* -V, --verbose [LEVEL] */
+			if (sa_debug)
+				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
+			if (optarg == NULL) {
+				sa_output++;
+			} else {
+				if ((val = strtol(optarg, NULL, 0)) < 0)
+					goto bad_option;
+				sa_output = val;
+			}
+			if (sa_output > 1)
+				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 1);
+			else
+				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 0);
+			break;
+		case 'x':	/* -x, --agentx-socket SOCKET */
+			if (sa_debug)
+				fprintf(stderr, "%s: setting AgentX socket to %s\n", argv[0],
+					optarg);
+			ds_set_string(DS_APPLICATION_ID, DS_AGENT_X_SOCKET, optarg);
+			// ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_AGENTX_MASTER, 1);
+			break;
+		case 'X':	/* -X, --agentx */
+			if (sa_debug)
+				fprintf(stderr, "%s: setting AgentX sub-agent\n", argv[0]);
+			sa_agentx = 1;
+			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 1);
+			break;
+		case 'y':	/* -y, --copying */
 			if (sa_debug)
 				fprintf(stderr, "%s: printing copying message\n", argv[0]);
 			sa_copying(argc, argv);
 			exit(0);
+/* -------------------------------------------------- */
+
+#if 0
+		case 'd':	/* -d, --directory DIRECTORY */
+			strncpy(sa_outpdir, optarg, sizeof(sa_outpdir));
+			break;
+		case 'b':	/* -b, --basename BASNAME */
+			strncpy(sa_basname, optarg, sizeof(sa_basname));
+			break;
+		case 'o':	/* -o, --outfile OUTFILE */
+			strncpy(sa_outfile, optarg, sizeof(sa_outfile));
+			break;
+		case 'e':	/* -e, --errfile ERRFILE */
+			strncpy(sa_errfile, optarg, sizeof(sa_errfile));
+			break;
+#endif
 		case '?':
+		case ':':
 		default:
 		      bad_option:
 			optind--;
