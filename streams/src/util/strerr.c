@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/13 22:46:37 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/10/13 08:51:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:37 $ by $Author: brian $
+ Last Modified $Date: 2007/10/13 08:51:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strerr.c,v $
+ Revision 0.9.2.26  2007/10/13 08:51:50  brian
+ - updates for 2.6.22 FC6 kernel and added MIBs
+
  Revision 0.9.2.25  2007/08/13 22:46:37  brian
  - GPLv3 header updates
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/13 22:46:37 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/10/13 08:51:50 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/13 22:46:37 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/10/13 08:51:50 $";
 
 /*
  *  SVR 4.2 Daemon: strerr - (Daemon) Receives error log messages from the STREAMS

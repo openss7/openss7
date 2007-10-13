@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsched.h,v 0.9.2.35 2007/08/13 22:46:19 brian Exp $
+ @(#) $Id: strsched.h,v 0.9.2.36 2007/10/13 08:51:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:19 $ by $Author: brian $
+ Last Modified $Date: 2007/10/13 08:51:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.h,v $
+ Revision 0.9.2.36  2007/10/13 08:51:44  brian
+ - updates for 2.6.22 FC6 kernel and added MIBs
+
  Revision 0.9.2.35  2007/08/13 22:46:19  brian
  - GPLv3 header updates
 
@@ -73,7 +76,7 @@
 #ifndef __LOCAL_STRSCHED_H__
 #define __LOCAL_STRSCHED_H__
 
-#ident "@(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.35 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.36 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __EXTERN
 #define __EXTERN extern

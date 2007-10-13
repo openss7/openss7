@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/08/12 19:05:32 $
+# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/10/13 08:51:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/12 19:05:32 $ by $Author: brian $
+# Last Modified $Date: 2007/10/13 08:51:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -195,7 +195,7 @@ AC_DEFUN([_SNMP_CHECK_LIBS], [dnl
 *** Compiling native SNMP agents requires the native library
 *** libucdagent.  Most likely you need to install the net-snmp
 *** or ucd-snmp runtime package.
-*** ]) ])
+*** ]) ], [-lucdmibs])
 	    AC_CHECK_LIB([ucdmibs], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
@@ -288,7 +288,7 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libucdagent.  Most likely you need to install the net-snmp
 *** or ucd-snmp runtime package.
-*** ]) ])
+*** ]) ], [-lucdmibs])
 	    AC_CHECK_LIB32([ucdmibs], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
@@ -346,7 +346,13 @@ AC_DEFUN([_SNMP_], [dnl
 
 # =============================================================================
 #
-# $Log$
+# $Log: snmp.m4,v $
+# Revision 0.9.2.2  2007/10/13 08:51:41  brian
+# - updates for 2.6.22 FC6 kernel and added MIBs
+#
+# Revision 0.9.2.1  2007/10/13 08:13:17  brian
+# - added macros for SNMP agents
+#
 # =============================================================================
 # 
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
