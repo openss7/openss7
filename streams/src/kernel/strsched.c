@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2007/08/13 22:46:18 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2007/10/13 08:51:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:18 $ by $Author: brian $
+ Last Modified $Date: 2007/10/13 08:51:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.167  2007/10/13 08:51:42  brian
+ - updates for 2.6.22 FC6 kernel and added MIBs
+
  Revision 0.9.2.166  2007/08/13 22:46:18  brian
  - GPLv3 header updates
 
@@ -182,10 +185,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2007/08/13 22:46:18 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2007/10/13 08:51:42 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2007/08/13 22:46:18 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2007/10/13 08:51:42 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>

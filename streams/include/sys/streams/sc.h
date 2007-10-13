@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sc.h,v 0.9.2.19 2007/08/13 22:46:09 brian Exp $
+ @(#) $Id: sc.h,v 0.9.2.20 2007/10/13 08:51:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:09 $ by $Author: brian $
+ Last Modified $Date: 2007/10/13 08:51:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.h,v $
+ Revision 0.9.2.20  2007/10/13 08:51:40  brian
+ - updates for 2.6.22 FC6 kernel and added MIBs
+
  Revision 0.9.2.19  2007/08/13 22:46:09  brian
  - GPLv3 header updates
 
@@ -84,7 +87,7 @@
 #ifndef __SYS_STREAMS_SC_H__
 #define __SYS_STREAMS_SC_H__
 
-#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.19 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.20 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_SC_H__
 #warning "Do no include sys/streams/sc.h directly, include sys/sc.h instead."

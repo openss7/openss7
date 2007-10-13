@@ -1,3 +1,35 @@
+2007-10-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added strmib agent
+	* acinclude.m4: added checks for SNMP
+	* doc/man/streams.refs: added AgentX reference
+	* doc/man/man4/sad.4.man: documentation updates
+	* doc/man/man4/sc.4.man: documentation updates
+	* include/sys/streams/sc.h: changed tunable format, added stats
+	* include/sys/streams/strsubr.h: export Strinfo for sc(4) stats
+	* m4/snmp.m4: interdependent libs
+	* src/kernel/strsched.c: changes to compile under 2.6.22.5-49.fc6
+	* src/kernel/strsched.h: export Strinfo for sc(4) stats
+	* src/kernel/strspecfs.c: changes to compile under 2.6.22.5-49.fc6
+	* src/kernel/strutil.c: changes to compile under 2.6.22.5-49.fc6
+	* src/modules/sc.c: new input-output controls
+	* src/util/strace.c: defect correction by inspection
+	* src/util/strerr.c: defect correction by inspection
+
+	* doc/man/man3/snmp_logging.3.man: added snmp docs
+	* doc/man/man8/strmib.8.man: added manual page for agent
+	* src/snmp/header_complex.h: added header
+	* src/snmp/makestubs: added stub makefile
+	* src/snmp/mib2c: added UCD api scripts
+	* src/snmp/mib2c.conf: added UCD api scripts
+	* src/snmp/mib2c.storage.conf: added UCD api scripts
+	* src/snmp/mib2c.vartypes.conf: added UCD api scripts
+	* src/snmp/strMIB.c: added agent iplementation
+	* src/snmp/strMIB.h: added agent iplementation
+	* src/snmp/struct.h: added header
+	* src/snmp/util_funcs.h: added header
+	* src/snmp/mibs/OPENSS7-STREAMS-MIB.mib: added MIB
+
 2007-08-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: GPLv3 updates

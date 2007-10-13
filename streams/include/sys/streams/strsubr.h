@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.83 2007/08/13 22:46:09 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.84 2007/10/13 08:51:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:09 $ by $Author: brian $
+ Last Modified $Date: 2007/10/13 08:51:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.84  2007/10/13 08:51:40  brian
+ - updates for 2.6.22 FC6 kernel and added MIBs
+
  Revision 0.9.2.83  2007/08/13 22:46:09  brian
  - GPLv3 header updates
 
@@ -109,7 +112,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.83 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.84 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
