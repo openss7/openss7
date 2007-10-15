@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2007/10/13 08:51:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2007/10/15 17:21:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/13 08:51:35 $ by $Author: brian $
+# Last Modified $Date: 2007/10/15 17:21:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,7 +121,9 @@ sbin_PROGRAMS			+= \
 				  strvf
 endif
 
+if WITH_SNMP_AGENT
 sbin_PROGRAMS			+= strmib
+endif
 
 dist_sbin_SCRIPTS		=
 if CONFIG_STREAMS_LOG
@@ -1065,6 +1067,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.149  2007/10/15 17:21:25  brian
+# - SNMP updates
+#
 # Revision 0.9.2.148  2007/10/13 08:51:35  brian
 # - updates for 2.6.22 FC6 kernel and added MIBs
 #

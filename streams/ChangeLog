@@ -7,6 +7,9 @@
 	* m4/snmp.m4: added prologues to libwrap dependent checks
 	* src/snmp/strMIB.c: mods for caching scalars
 	* src/snmp/mibs/OPENSS7-STREAMS-MIB.mib: corrections to strStrhold type
+	* Makefile.am: added WITH_SNMP_AGENT conditional
+	* m4/agent.m4: added WITH_SNMP_AGENT conditional
+	* src/snmp/strMIB.c: correct include file for net-snmp 5.2.1
 
 2007-10-13  Brian Bidulock  <bidulock@openss7.org>
 
