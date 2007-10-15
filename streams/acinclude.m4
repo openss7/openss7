@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2007/10/13 08:51:35 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2007/10/15 06:47:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/13 08:51:35 $ by $Author: brian $
+# Last Modified $Date: 2007/10/15 06:47:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,6 +70,7 @@ m4_include([m4/doxy.m4])
 m4_include([m4/lib32.m4])
 m4_include([m4/perl.m4])
 m4_include([m4/snmp.m4])
+m4_include([m4/agent.m4])
 
 # =============================================================================
 # AC_LFS
@@ -142,8 +143,7 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     CPPFLAGS=
     CFLAGS=
     _LFS_OUTPUT
-    _PERL
-    _SNMP
+    _AGENT
     _AUTOTEST
     _DOXY
 ])# AC_LFS
@@ -1687,6 +1687,9 @@ AC_DEFUN([_LFS_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.148  2007/10/15 06:47:48  brian
+# - update to SNMP agent build
+#
 # Revision 0.9.2.147  2007/10/13 08:51:35  brian
 # - updates for 2.6.22 FC6 kernel and added MIBs
 #

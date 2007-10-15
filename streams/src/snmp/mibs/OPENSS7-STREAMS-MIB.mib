@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-STREAMS-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/10/13 08:54:37 $
+-- @(#) $RCSfile: OPENSS7-STREAMS-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/10/15 06:47:51 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +46,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/10/13 08:54:37 $ by $Author: brian $
+-- Last Modified $Date: 2007/10/15 06:47:51 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-STREAMS-MIB.mib,v $
+-- Revision 0.9.2.2  2007/10/15 06:47:51  brian
+-- - update to SNMP agent build
+--
 -- Revision 0.9.2.1  2007/10/13 08:54:37  brian
 -- - added MIB agent files
 --
@@ -1164,14 +1167,15 @@ strRtime OBJECT-TYPE
 	::= { strTunables 16 }
 
 strStrhold OBJECT-TYPE
-	SYNTAX		TruthValue
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION
 		"Specifies whether the SNDHOLD feature is active or not.  
-		 When false, the SNDHOLD feature is deactivated.  When 
-		 true, the SNDHOLD feature is activated.  Value values 
-		 are true or false.  The default value is false.  This 
+		 When zero (0), the SNDHOLD feature is deactivated.  When 
+		 non-zero, the SNDHOLD feature is activated.  Value values 
+		 are non-zero or zero.  The default value is zero.  This 
 		 is the default value for all new Streams.  Existing 
 		 Streams are unaffected.  This setting can be examined 
 		 and altered on an open Stream using the I_GWROPT and 
