@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.1 2006/10/13 07:57:35 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.2 2007/10/15 17:18:52 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/13 07:57:35 $ by $Author: brian $
+@c Last Modified $Date: 2007/10/15 17:18:52 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: bugs.texi,v $
+@c Revision 0.9.2.2  2007/10/15 17:18:52  brian
+@c - fix for freezestr on 2.4 kernels
+@c
 @c Revision 0.9.2.1  2006/10/13 07:57:35  brian
 @c - added initial STREAMS Channel package
 @c
@@ -67,7 +70,13 @@ This package is not completely implemented yet, so the bugs are still being
 designed and will not be available until a later date.
 
 @table @code
-@item (no items)
+@item 001.  2007-10-15T16:17:08+0000
+
+Removing definition of freezestr() and unfreezestr() in ch_pmod.c and mx_pmod.c was causing loss of
+version information on old 2.4 kernels.  Workaround is to use the _SUN versions as is until it can
+be fixed in streams or strcompat.
+
+@emph{*fixed*} in @command{strchan-0.9.2.4}
 @end table
 
 

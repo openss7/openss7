@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $
+ @(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/15 17:18:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:32:59 $ by $Author: brian $
+ Last Modified $Date: 2007/10/15 17:18:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch_pmod.c,v $
+ Revision 0.9.2.6  2007/10/15 17:18:50  brian
+ - fix for freezestr on 2.4 kernels
+
  Revision 0.9.2.5  2007/08/15 05:32:59  brian
  - GPLv3 updates
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $"
+#ident "@(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/15 17:18:50 $"
 
 static char const ident[] =
-    "$RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $";
+    "$RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/15 17:18:50 $";
 
 /*
  *  This is CH-PMOD.  This is a pushable STREAMS module that can be pushed on one end of a
@@ -89,11 +92,11 @@ static char const ident[] =
 #include <sys/chi_ioctl.h>
 
 /* don't really want the SUN version of these */
-#undef freezestr
-#undef unfreezestr
+//#undef freezestr
+//#undef unfreezestr
 
 #define CH_DESCRIP	"CH (Channel) STREAMS PIPE MODULE."
-#define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $"
+#define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/15 17:18:50 $"
 #define CH_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_DEVICE	"Provides OpenSS7 CH pipe driver."
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1246,16 +1249,15 @@ static void
 ch_block(struct ch *ch, queue_t *q)
 {
 	mblk_t *mp;
-	pl_t pl;
 
 	/* find the first M_DATA block on the queue, or M_PPROTO message block containing an
 	   CH_DATA_REQ primitive. */
-	pl = freezestr(q);
+	freezestr(q);
 	for (mp = q->q_first; mp && DB_TYPE(mp) != M_DATA
 	     && (DB_TYPE(mp) != M_PROTO || *(ch_ulong *) mp->b_rptr != CH_DATA_REQ);
 	     mp = mp->b_next) ;
 	rmvq(q, mp);
-	unfreezestr(q, pl);
+	unfreezestr(q);
 	if (mp) {
 		if (canputnext(q)) {
 			/* If it is an CH_DATA_REQ primitive, alter it to an CH_DATA_IND primitive. 

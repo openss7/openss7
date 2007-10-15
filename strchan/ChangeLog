@@ -1,3 +1,10 @@
+2007-10-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/ch_pmod.c: freezestr workaround for 2.4 kernels
+	* src/modules/mx_pmod.c: freezestr workaround for 2.4 kernels
+	* doc/manual/news.texi: documented fix
+	* doc/manual/bugs.texi: documented fix
+
 2007-08-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/ch.c: move stdbool.h
