@@ -1,3 +1,17 @@
+2007-10-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: added check for pci_module_init
+	* src/drivers/ctimod/ctimod.c: use pci_register_driver instead of
+	  pci_module_init
+	* src/drivers/mercd/source/mercd_linux_entry.c: use pci_register_driver
+	  instead of pci_module_init
+	* src/drivers/mercd/source/mercd_ossdl_linux.c: change deprecated
+	  SA_SHIRQ flag to IRQF_SHARED
+	* src/drivers/pmacd/source/pmacd_linux_entry.c: change deprecated
+	  SA_SHIRQ flag to IRQF_SHARED
+	* doc/manual/news.texi: documented updates for 2.6.22.5-49.fc6
+
+
 2007-08-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/dlgn/source/srmap.c: some stdbool.h (incorrectly) define true as a macro

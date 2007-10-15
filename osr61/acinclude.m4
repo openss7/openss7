@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 09:06:31 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/10/15 17:16:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 09:06:31 $ by $Author: brian $
+# Last Modified $Date: 2007/10/15 17:16:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -633,7 +633,7 @@ my_autoconf_function_pointer1 = my_autoconf_function_pointer2;
     else
 	AC_DEFINE_UNQUOTED([kmem_cachep_t], [kmem_cache_t *])
     fi
-    _LINUX_CHECK_FUNCS([remap_pfn_range remap_page_range], [:], [:], [
+    _LINUX_CHECK_FUNCS([remap_pfn_range remap_page_range pci_module_init], [:], [:], [
 #include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -656,9 +656,29 @@ my_autoconf_function_pointer1 = my_autoconf_function_pointer2;
 #ifdef HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif
 #include <linux/interrupt.h>	/* for cpu_raise_softirq */
 #ifdef HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
+#include <linux/ioport.h>	/* for check_region */
+#include <linux/pci.h>		/* for pci checks */
+#ifdef HAVE_KINC_ASM_UACCESS_H
+#include <asm/uaccess.h>
+#endif
+#ifdef HAVE_KINC_LINUX_COMPAT_H
+#include <linux/compat.h>
 #endif
 #include <linux/mm.h>
 ])
@@ -880,6 +900,9 @@ AC_DEFUN([_OSR61_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.15  2007/10/15 17:16:56  brian
+# - updates for 2.6.22.5-49.fc6 kernel
+#
 # Revision 0.9.2.14  2007/08/14 09:06:31  brian
 # - GPLv3 header update
 #
