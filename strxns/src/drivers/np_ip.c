@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/08/15 05:35:43 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/10/15 17:26:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:43 $ by $Author: brian $
+ Last Modified $Date: 2007/10/15 17:26:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.46  2007/10/15 17:26:10  brian
+ - updates for 2.6.22.5-49.fc6 kernel
+
  Revision 0.9.2.45  2007/08/15 05:35:43  brian
  - GPLv3 updates
 
@@ -205,10 +208,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/08/15 05:35:43 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/10/15 17:26:10 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/08/15 05:35:43 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/10/15 17:26:10 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -269,7 +272,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.45 $) $Date: 2007/08/15 05:35:43 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.46 $) $Date: 2007/10/15 17:26:10 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -391,6 +394,73 @@ MODULE_STATIC struct streamtab np_info = {
 	.st_rdinit = &np_rinit,		/* Upper read queue */
 	.st_wrinit = &np_winit,		/* Upper write queue */
 };
+
+#if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
+{
+	return skb->tail;
+}
+static inline unsigned char *skb_end_pointer(const struct sk_buff *skb)
+{
+	return skb->end;
+}
+static inline void skb_reset_tail_pointer(struct sk_buff *skb)
+{
+	skb->tail = skb->data;
+}
+static inline void skb_set_tail_pointer(struct sk_buff *skb, const int offset)
+{
+	skb_reset_tail_pointer(skb);
+	skb->tail += offset;
+}
+static inline unsigned char *skb_transport_header(const struct sk_buff *skb)
+{
+	return skb->h.raw;
+}
+static inline unsigned char *skb_network_header(const struct sk_buff *skb)
+{
+	return skb->nh.raw;
+}
+static inline unsigned char *skb_mac_header(const struct sk_buff *skb)
+{
+	return skb->mac.raw;
+}
+static inline void skb_reset_tail_pointer(struct sk_buff *skb)
+{
+	skb->tail = skb->data;
+}
+static inline void skb_reset_end_pointer(struct sk_buff *skb)
+{
+	skb->end = skb->data;
+}
+static inline void skb_reset_transport_header(struct sk_buff *skb)
+{
+	skb->h.raw = skb->data;
+}
+static inline void skb_reset_network_header(struct sk_buff *skb)
+{
+	skb->nh.raw = skb->data;
+}
+static inline void skb_reset_mac_header(struct sk_buff *skb)
+{
+	skb->mac.raw = skb->data;
+}
+static inline void skb_set_transport_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_transport_header(skb);
+	skb->h.raw += offset;
+}
+static inline void skb_set_network_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_network_header(skb);
+	skb->nh.raw += offset;
+}
+static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_mac_header(skb);
+	skb->mac.raw += offset;
+}
+#endif				/* !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 
 /*
  *  Primary data structures.
@@ -884,9 +954,11 @@ np_v4_rcv_next(struct sk_buff *skb)
 {
 	struct np_prot_bucket *pb;
 	struct mynet_protocol *pp;
+	struct iphdr *iph;
 	unsigned char proto;
 
-	proto = skb->nh.iph->protocol;
+	iph = (typeof(iph)) skb_network_header(skb);
+	proto = iph->protocol;
 	if ((pb = np_prots[proto]) && (pp = pb->prot.next)) {
 		pp->handler(skb);
 		return (1);
@@ -1264,7 +1336,7 @@ STATIC INLINE __hot_out int
 np_ip_queue_xmit(struct sk_buff *skb)
 {
 	struct dst_entry *dst = skb->dst;
-	struct iphdr *iph = skb->nh.iph;
+	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #if defined NETIF_F_TSO
 	ip_select_ident_more(iph, dst, NULL, 0);
@@ -1399,7 +1471,7 @@ np_alloc_skb_slow(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 				if ((blen = b->b_wptr - b->b_rptr) > 0) {
 					bcopy(b->b_rptr, data, blen);
 					data += blen;
-					__assert(data <= skb->tail);
+					__assert(data <= skb_tail_pointer(skb));
 				} else
 					rare();
 			}
@@ -1548,8 +1620,12 @@ np_alloc_skb_old(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 	atomic_set(&skb->users, 1);
 	skb->head = mp->b_datap->db_base;
 	skb->data = mp->b_rptr;
-	skb->tail = mp->b_wptr;
+	skb_set_tail_pointer(skb, mp->b_wptr - mp->b_rptr);
+#if defined NET_SKBUFF_DATA_USES_OFFSET
+	skb->end = end - skb->head;
+#else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
 	skb->end = end;
+#endif				/* defined NET_SKBUFF_DATA_USES_OFFSET */
 	skb->len = mp->b_wptr - mp->b_rptr;
 	skb->cloned = 0;
 	skb->data_len = 0;
@@ -1727,12 +1803,13 @@ np_senddata(struct np *np, uint8_t protocol, uint32_t daddr, mblk_t *mp)
 
 			/* find headers */
 
-			skb->nh.raw = __skb_push(skb, sizeof(struct iphdr));
+			__skb_push(skb, sizeof(struct iphdr));
+			skb_reset_network_header(skb);
 
 			skb->dst = &rt->u.dst;
 			skb->priority = 0;	// np->qos.priority;
 
-			iph = skb->nh.iph;
+			iph = (typeof(iph)) skb_network_header(skb);
 			iph->version = 4;
 			iph->ihl = 5;
 			iph->tos = np->qos.tos;
@@ -6277,8 +6354,8 @@ STATIC __hot_in int
 np_v4_rcv(struct sk_buff *skb)
 {
 	struct np *np;
-	struct iphdr *iph = skb->nh.iph;
-	struct udphdr *uh = (struct udphdr *) (skb->nh.raw + (iph->ihl << 2));
+	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
+	struct udphdr *uh = (struct udphdr *) (skb_network_header(skb) + (iph->ihl << 2));
 	struct rtable *rt;
 
 #ifdef HAVE_KFUNC_NF_RESET
@@ -6319,10 +6396,10 @@ np_v4_rcv(struct sk_buff *skb)
 	{
 		mblk_t *mp;
 		frtn_t fr = { &np_free, (caddr_t) skb };
-		size_t plen = skb->len + (skb->data - skb->nh.raw);
+		size_t plen = skb->len + (skb->data - skb_network_header(skb));
 
 		/* now allocate an mblk */
-		if (unlikely((mp = esballoc(skb->nh.raw, plen, BPRI_MED, &fr)) == NULL))
+		if (unlikely((mp = esballoc(skb_network_header(skb), plen, BPRI_MED, &fr)) == NULL))
 			goto no_buffers;
 #ifndef LIS
 		/* tell others it is a socket buffer */
@@ -6399,7 +6476,7 @@ np_v4_err(struct sk_buff *skb, u32 info)
 	{
 		mblk_t *mp;
 		queue_t *q;
-		size_t plen = skb->len + (skb->data - skb->nh.raw);
+		size_t plen = skb->len + (skb->data - skb_network_header(skb));
 
 		/* Create a queue a specialized M_CTL message to the Stream's read queue for
 		   further processing.  The Stream will convert this message into a N_UDERROR_IND,
@@ -6411,7 +6488,7 @@ np_v4_err(struct sk_buff *skb, u32 info)
 			goto flow_controlled;
 		mp->b_datap->db_type = M_CTL;
 		mp->b_band = 1;
-		bcopy(skb->nh.raw, mp->b_wptr, plen);
+		bcopy(skb_network_header(skb), mp->b_wptr, plen);
 		mp->b_wptr += plen;
 		put(q, mp);
 		goto discard_put;

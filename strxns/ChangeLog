@@ -1,3 +1,15 @@
+2007-10-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: added checks for dev_base_head and
+	  sk_buff.transport_header
+	* src/drivers/ldl.c:
+	  - support for new dev_base list and new sk_buff format
+	* src/drivers/np_ip.c:
+	  - support for new dev_base list and new sk_buff format
+	* src/modules/ip_strm_mod.c:
+	  - support for new dev_base list and new sk_buff format
+	* doc/manual/news.texi: documented support for 2.6.22.5-49.fc6
+
 2007-08-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/dl2.c: move stdbool.h to compat.h
