@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mib_modules.h,v 0.9.2.1 2007/10/15 06:49:08 brian Exp $
+ @(#) $Id: mib_modules.h,v 0.9.2.2 2007/10/15 19:02:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/10/15 06:49:08 $ by $Author: brian $
+ Last Modified $Date: 2007/10/15 19:02:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mib_modules.h,v $
+ Revision 0.9.2.2  2007/10/15 19:02:42  brian
+ - net-snmp build corrections
+
  Revision 0.9.2.1  2007/10/15 06:49:08  brian
  - added agent checks and mib header
 
@@ -58,7 +61,7 @@
 #ifndef __LOCAL_MIB_MODULES_H__
 #define __LOCAL_MIB_MODULES_H__
 
-#ident "@(#) $RCSfile: mib_modules.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mib_modules.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #define DO_INITIALIZE   1
 #define DONT_INITIALIZE 0
@@ -68,7 +71,7 @@ struct module_init_list {
 	struct module_init_list *next;
 };
 
-void add_to_init_list(const char *module_list);
+void add_to_init_list(char *module_list);
 int should_init(const char *module_name);
 void init_mib_modules(void);
 
