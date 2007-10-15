@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: agent.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/10/15 06:49:07 $
+# @(#) $RCSfile: agent.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/10/15 17:21:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/15 06:49:07 $ by $Author: brian $
+# Last Modified $Date: 2007/10/15 17:21:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,7 +80,7 @@ AC_DEFUN([_AGENT_OPTIONS], [dnl
 	AS_HELP_STRING([--with-snmp-agent],
 	    [include SNMP agents in build. @<:@default=yes@:>@]),
 	[with_snmp_agent="$withval"],
-	[with_snmp_agent='no'])
+	[with_snmp_agent=''])
 ])# _AGENT_OPTIONS
 # =============================================================================
 
@@ -146,6 +146,9 @@ AC_DEFUN([_AGENT_], [dnl
 # =============================================================================
 #
 # $Log: agent.m4,v $
+# Revision 0.9.2.2  2007/10/15 17:21:26  brian
+# - SNMP updates
+#
 # Revision 0.9.2.1  2007/10/15 06:49:07  brian
 # - added agent checks and mib header
 #
