@@ -1,3 +1,9 @@
+2007-10-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/lib32.m4: added macros for 32-bit lib checks
+	* m4/perl.m4: added macros for embedded perl checks
+	* m4/snmp.m4: added macros for ucd-snmp checks
+
 2007-08-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* texi/install.texi: add bison and flex to dependencies
