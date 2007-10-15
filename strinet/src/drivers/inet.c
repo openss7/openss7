@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2007/08/15 05:33:49 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2007/10/15 17:22:48 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:33:49 $ by $Author: brian $
+ Last Modified $Date: 2007/10/15 17:22:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.89  2007/10/15 17:22:48  brian
+ - updates for 2.6.22.5-49.fc6 kernel
+
  Revision 0.9.2.88  2007/08/15 05:33:49  brian
  - GPLv3 updates
 
@@ -142,10 +145,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2007/08/15 05:33:49 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2007/10/15 17:22:48 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2007/08/15 05:33:49 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2007/10/15 17:22:48 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -633,7 +636,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2007/08/15 05:33:49 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2007/10/15 17:22:48 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -10282,9 +10285,9 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 	return (-EFAULT);
 }
 
-#ifndef HAVE___TCP_PUSH_PENDING_FRAMES_EXPORT
-#ifdef  HAVE___TCP_PUSH_PENDING_FRAMES_ADDR
-#ifdef HAVE_OLD_SOCK_STRUCTURE
+#if !defined HAVE___TCP_PUSH_PENDING_FRAMES_EXPORT
+#if defined  HAVE___TCP_PUSH_PENDING_FRAMES_ADDR
+#if defined HAVE_OLD_SOCK_STRUCTURE
 void
 __tcp_push_pending_frames(struct sock *sk, struct tcp_opt *tp, unsigned int cur_mss, int nonagle)
 {
@@ -10292,7 +10295,8 @@ __tcp_push_pending_frames(struct sock *sk, struct tcp_opt *tp, unsigned int cur_
 	    (typeof(func)) HAVE___TCP_PUSH_PENDING_FRAMES_ADDR;
 	return (*func) (sk, tp, cur_mss, nonagle);
 }
-#else
+#else				/* defined HAVE_OLD_SOCK_STRUCTURE */
+#if !defined HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS
 void
 __tcp_push_pending_frames(struct sock *sk, struct tcp_sock *tp, unsigned int cur_mss, int nonagle)
 {
@@ -10300,9 +10304,18 @@ __tcp_push_pending_frames(struct sock *sk, struct tcp_sock *tp, unsigned int cur
 	    (typeof(func)) HAVE___TCP_PUSH_PENDING_FRAMES_ADDR;
 	return (*func) (sk, tp, cur_mss, nonagle);
 }
-#endif
-#endif
-#endif
+#else				/* !defined HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS */
+void
+__tcp_push_pending_frames(struct sock *sk, unsigned int cur_mss, int nonagle)
+{
+	void (*func) (struct sock * sk, unsigned int cur_mss, int nonagle) =
+	    (typeof(func)) HAVE___TCP_PUSH_PENDING_FRAMES_ADDR;
+	return (*func) (sk, cur_mss, nonagle);
+}
+#endif				/* !defined HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS */
+#endif				/* defined HAVE_OLD_SOCK_STRUCTURE */
+#endif				/* defined HAVE___TCP_PUSH_PENDING_FRAMES_ADDR */
+#endif				/* !defined HAVE___TCP_PUSH_PENDING_FRAMES_EXPORT */
 
 /*
  *  Process Options
@@ -10915,8 +10928,13 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 								goto einval;
 						}
 						t->options.tcp.nodelay = *valp;
+#if !defined HAVE_KFUNC_TCP_PUSH_PENDING_FRAMES_1_ARG
 						if ((tp->nonagle = (*valp == T_YES) ? 1 : 0))
 							tcp_push_pending_frames(sk, tp);
+#else				/* !defined HAVE_KFUNC_TCP_PUSH_PENDING_FRAMES_1_ARG */
+						if ((tp->nonagle = (*valp == T_YES) ? 1 : 0))
+							tcp_push_pending_frames(sk);
+#endif				/* !defined HAVE_KFUNC_TCP_PUSH_PENDING_FRAMES_1_ARG */
 					}
 					if (ih->name != T_ALLOPT)
 						continue;

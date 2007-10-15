@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:33:58 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/10/15 17:22:57 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:33:58 $ by $Author: brian $
+ Last Modified $Date: 2007/10/15 17:22:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.23  2007/10/15 17:22:57  brian
+ - updates for 2.6.22.5-49.fc6 kernel
+
  Revision 0.9.2.22  2007/08/15 05:33:58  brian
  - GPLv3 updates
 
@@ -119,10 +122,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:33:58 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/10/15 17:22:57 $"
 
 static char const ident[] =
-    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:33:58 $";
+    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/10/15 17:22:57 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -201,7 +204,7 @@ static char const ident[] =
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:33:58 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/10/15 17:22:57 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -313,6 +316,73 @@ MODULE_STATIC struct streamtab tpi_info = {
 	.st_rdinit = &tpi_rinit,	/* Upper read queue */
 	.st_wrinit = &tpi_winit,	/* Upper write queue */
 };
+
+#if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
+{
+	return skb->tail;
+}
+static inline unsigned char *skb_end_pointer(const struct sk_buff *skb)
+{
+	return skb->end;
+}
+static inline void skb_reset_tail_pointer(struct sk_buff *skb)
+{
+	skb->tail = skb->data;
+}
+static inline void skb_set_tail_pointer(struct sk_buff *skb, const int offset)
+{
+	skb_reset_tail_pointer(skb);
+	skb->tail += offset;
+}
+static inline unsigned char *skb_transport_header(const struct sk_buff *skb)
+{
+	return skb->h.raw;
+}
+static inline unsigned char *skb_network_header(const struct sk_buff *skb)
+{
+	return skb->nh.raw;
+}
+static inline unsigned char *skb_mac_header(const struct sk_buff *skb)
+{
+	return skb->mac.raw;
+}
+static inline void skb_reset_tail_pointer(struct sk_buff *skb)
+{
+	skb->tail = skb->data;
+}
+static inline void skb_reset_end_pointer(struct sk_buff *skb)
+{
+	skb->end = skb->data;
+}
+static inline void skb_reset_transport_header(struct sk_buff *skb)
+{
+	skb->h.raw = skb->data;
+}
+static inline void skb_reset_network_header(struct sk_buff *skb)
+{
+	skb->nh.raw = skb->data;
+}
+static inline void skb_reset_mac_header(struct sk_buff *skb)
+{
+	skb->mac.raw = skb->data;
+}
+static inline void skb_set_transport_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_transport_header(skb);
+	skb->h.raw += offset;
+}
+static inline void skb_set_network_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_network_header(skb);
+	skb->nh.raw += offset;
+}
+static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_mac_header(skb);
+	skb->mac.raw += offset;
+}
+#endif				/* !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 
 /*
  *  TLI Interface state flags
@@ -4428,7 +4498,7 @@ STATIC INLINE int
 t_tpi_queue_xmit(struct sk_buff *skb)
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
-	struct iphdr *iph = skb->nh.iph;
+	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #if defined NETIF_F_TSO
 	ip_select_ident_more(iph, &rt->u.dst, NULL, 0);
@@ -4532,7 +4602,15 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 				iph->saddr = rt->rt_src;
 			iph->protocol = IPPROTO_TCP;
 			iph->tot_len = htons(tlen);
+#if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if defined NET_SKBUFF_DATA_USES_OFFSET
+			skb->network_header = (unsigned char *) iph - skb->head;
+#else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
+			skb->network_header = (void *) iph;
+#endif				/* defined NET_SKBUFF_DATA_USES_OFFSET */
+#else				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 			skb->nh.iph = iph;
+#endif				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 #if !defined HAVE_KFUNC_DST_OUTPUT
 #if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
@@ -6435,7 +6513,7 @@ tpi_v4_rcv(struct sk_buff *skb)
 
 //      UDP_INC_STATS_BH(UdpInDatagrams);
 	/* pull up the udp header */
-	th = skb->h.th;
+	th = (typeof(th)) skb_transport_header(skb);
 	ulen = skb->len;
 #if 0
 	ulen = ntohs(th->len);
@@ -6446,7 +6524,7 @@ tpi_v4_rcv(struct sk_buff *skb)
 		goto too_small;
 #endif
 	/* we do the lookup before the checksum */
-	iph = skb->nh.iph;
+	iph = (typeof(iph)) skb_network_header(skb);
 	read_lock(&tpi_lock);
 	if (!(tpi = t_tpi_lookup(th->dest, th->source, iph->daddr, iph->saddr)))
 		goto no_stream;
@@ -6470,14 +6548,14 @@ tpi_v4_rcv(struct sk_buff *skb)
 #endif				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 	{
 		mblk_t *mp;
-		size_t mlen = skb->len + (skb->data - skb->nh.raw);
+		size_t mlen = skb->len + (skb->data - skb_network_header(skb));
 
 		/* now allocate an mblk */
-		if (!(mp = esballoc(skb->nh.raw, mlen, BPRI_MED, &fr)))
+		if (!(mp = esballoc(skb_network_header(skb), mlen, BPRI_MED, &fr)))
 			goto no_buffers;
 		mp->b_wptr = mp->b_rptr + mlen;
 		/* trim the ip header */
-		mp->b_rptr = skb->h.raw;
+		mp->b_rptr = skb_network_header(skb);
 		th2 = (typeof(th2)) mp->b_rptr;
 		if (th->check != th2->check)
 			goto sanity;
@@ -6579,7 +6657,7 @@ tpi_v4_err(struct sk_buff *skb, u32 info)
 		if (!(mp = allocb(mlen, BPRI_MED)))
 			goto no_buffers;
 		mp->b_datap->db_type = M_ERROR;
-		bcopy(skb->h.icmph, mp->b_wptr, sizeof(struct icmphdr));
+		bcopy(skb_transport_header(skb), mp->b_wptr, sizeof(struct icmphdr));
 		mp->b_wptr += sizeof(struct icmphdr);
 		bcopy(skb->data, mp->b_wptr, skb->len);
 		mp->b_rptr = mp->b_wptr + ihl;
