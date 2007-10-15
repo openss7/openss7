@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:19:10 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/10/15 17:17:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:19:10 $ by $Author: brian $
+ Last Modified $Date: 2007/10/15 17:17:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.24  2007/10/15 17:17:01  brian
+ - updates for 2.6.22.5-49.fc6 kernel
+
  Revision 0.9.2.23  2007/08/15 05:19:10  brian
  - GPLv3 updates
 
@@ -88,10 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:19:10 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/10/15 17:17:01 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:19:10 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/10/15 17:17:01 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -131,7 +134,7 @@ static char const ident[] =
 #define STRLOGDA	6	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:19:10 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/10/15 17:17:01 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -20413,7 +20416,7 @@ sl_r_data(queue_t *q, mblk_t *mp)
 	struct sl *sl;
 	int err = -EAGAIN;
 
-	if (likely((sl = sl_acquire(q)))) {
+	if (likely(!!(sl = sl_acquire(q)))) {
 		err = sl_data(q, mp);
 		sl_release(sl);
 	}

@@ -297,9 +297,14 @@ void ctimod_bzero(void *s, size_t n) {
 	return;
 }
 
-int ctimod_pci_module_init(struct pci_driver *drv) {
+int ctimod_pci_module_init(struct pci_driver *drv)
+{
 	ctimod_dbg("ctimod: pci_module_init \n");
+#ifdef HAVE_KFUNC_PCI_MODULE_INIT
 	return pci_module_init(drv);
+#else				/* HAVE_KFUNC_PCI_MODULE_INIT */
+	return pci_register_driver(drv);
+#endif				/* HAVE_KFUNC_PCI_MODULE_INIT */
 }
 
 int ctimod_pci_register_driver(struct pci_driver *drv) {
