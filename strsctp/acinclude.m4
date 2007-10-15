@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/08/15 05:34:28 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2007/10/15 17:24:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/15 05:34:28 $ by $Author: brian $
+# Last Modified $Date: 2007/10/15 17:24:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -469,7 +469,8 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
 			  struct net_protocol.next,
 			  struct net_protocol.no_policy,
 			  struct dst_entry.path,
-			  struct dst_entry.path], [], [], [
+			  struct dst_entry.path,
+			  struct sk_buff.transport_header], [], [], [
 #include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -508,7 +509,8 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
 			   ip_frag_mem,
 			   __xfrm_policy_check,
 			   xfrm_policy_delete,
-			   __xfrm_sk_clone_policy])
+			   __xfrm_sk_clone_policy,
+			   dev_base_head])
     if test :"${linux_cv_have_ip_route_output:-no}" = :yes ; then
 	AC_DEFINE([HAVE_IP_ROUTE_OUTPUT], [1], [Most 2.4 kernels have
 	the function ip_route_output() defined.  Newer RH kernels (EL3) use
@@ -1247,6 +1249,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.74  2007/10/15 17:24:23  brian
+# - updates for 2.6.22.5-49.fc6 kernel
+#
 # Revision 0.9.2.73  2007/08/15 05:34:28  brian
 # - GPLv3 updates
 #
