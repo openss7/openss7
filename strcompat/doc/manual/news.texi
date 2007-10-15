@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.33 2007/08/15 05:33:06 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.34 2007/10/15 17:20:16 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/08/15 05:33:06 $ by $Author: brian $
+@c Last Modified $Date: 2007/10/15 17:20:16 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -109,6 +109,9 @@ Build corrections for XEN kernels that define paddr_t.
 
 @item
 License upgrade to GPL Version 3.
+
+@item
+Fixes for older 2.4 kernels.
 
 @end itemize
 
