@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: struct.h,v 0.9.2.2 2007/10/15 01:04:51 brian Exp $
+ @(#) $Id: ds_agent.h,v 0.9.2.1 2007/10/15 01:03:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,62 +45,37 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/10/15 01:04:51 $ by $Author: brian $
+ Last Modified $Date: 2007/10/15 01:03:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log: struct.h,v $
- Revision 0.9.2.2  2007/10/15 01:04:51  brian
- - updated SNMP build
-
- Revision 0.9.2.1  2007/10/13 08:54:36  brian
- - added MIB agent files
+ $Log: ds_agent.h,v $
+ Revision 0.9.2.1  2007/10/15 01:03:06  brian
+ - added local file for compatibility
 
  *****************************************************************************/
 
-#ifndef __LOCAL_STRUCT_H__
-#define __LOCAL_STRUCT_H__
+#ifndef __LOCAL_DS_AGENT_H__
+#define __LOCAL_DS_AGENT_H__
 
-#ident "@(#) $RCSfile: struct.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ds_agent.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
-#define STRMAX			1024
+/* defines agent's default store registrations */
 
-#define SHPROC			1
-#define EXECPROC		2
-#define PASSTHRU		3
-#define PASSTHRU_PERSIST	4
+/* booleans */
+#define DS_AGENT_VERBOSE		0	/* 1 if verbose output desired */
+#define DS_AGENT_ROLE			1	/* 0 if master, 1 if client */
+#define DS_AGENT_NO_ROOT_ACCESS		2	/* 1 if we can't get root access */
+#define DS_AGENT_AGENTX_MASTER		3	/* 1 if AgentX desired */
 
-#define MIBMAX			30
+/* strings */
+#define DS_AGENT_PROGNAME		0	/* argv[0] */
+#define DS_AGENT_X_SOCKET		1	/* AF_UNIX or ip:port socket addr */
+#define DS_AGENT_PORTS			2	/* localhost:9161,tcp:localhost:9161... */
 
-struct extensible {
-	char name[STRMAX];
-	char command[STRMAX];
-	char fixcmd[STRMAX];
-	int type;
-	int result;
-	char output[STRMAX];
-	struct extensible *next;
-	unsigned long miboid[MIBMAX];
-	size_t miblen;
-	int pid;
-};
+/* integers */
+#define DS_AGENT_FLAGS			0	/* session.flags */
+#define DS_AGENT_USERID			1
+#define DS_AGENT_GROUPID		2
 
-struct myproc {
-	char name[STRMAX];
-	char fixcmd[STRMAX];
-	int min;
-	int max;
-	struct myproc *next;
-};
-
-/*
-struct mibinfo 
-{
-   int numid;
-   unsigned long mibid[10];
-   char *name;
-   void (*handle) ();
-};
-*/
-
-#endif				/* __LOCAL_STRUCT_H__ */
+#endif				/* __LOCAL_DS_AGENT_H__ */

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.36 2007/08/15 05:33:18 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.37 2007/10/15 01:04:49 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/08/15 05:33:18 $ by $Author: brian $
+@c Last Modified $Date: 2007/10/15 01:04:49 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -106,6 +106,14 @@ Kernel module license made explicit "GPL v2".  And then changed back to "GPL".
 
 @item
 License upgrade to GPL Version 3.
+
+@item
+Modifications to build under Fedora 2.6.22.5-49 kernel.
+
+@item
+Added SNMP MIB and AgentX sub-agent for STREAMS.  This is a rather significant
+addition to Linux Fast-STREAMS which permits remote management of the entire
+STREAMS subsystem using SNMP.
 
 @end itemize
 
