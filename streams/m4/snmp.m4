@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/10/13 08:51:41 $
+# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/10/15 01:04:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/13 08:51:41 $ by $Author: brian $
+# Last Modified $Date: 2007/10/15 01:04:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -139,8 +139,8 @@ AC_DEFUN([_SNMP_CHECK_LIBS], [dnl
 	AC_CHECK_LIB([z], [main]) ###
 	AC_CHECK_LIB([popt], [main]) ###
 	AC_CHECK_LIB([rpmio], [main])
+	AC_CHECK_LIB([rpmdb], [main], [], [], [-lrpm]) #xxx
 	AC_CHECK_LIB([rpm], [main])
-	AC_CHECK_LIB([rpmdb], [main]) #xxx
 	AC_CHECK_LIB([dl], [main])
 
 	snmp_cv_libs="$LIBS"
@@ -232,8 +232,8 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 	AC_CHECK_LIB32([z], [main]) ###
 	AC_CHECK_LIB32([popt], [main]) ###
 	AC_CHECK_LIB32([rpmio], [main])
+	AC_CHECK_LIB32([rpmdb], [main], [], [], [-lrpm]) #xxx
 	AC_CHECK_LIB32([rpm], [main])
-	AC_CHECK_LIB32([rpmdb], [main]) #xxx
 	AC_CHECK_LIB32([dl], [main])
 
 	snmp_cv_libs32="$LIBS"
@@ -347,6 +347,9 @@ AC_DEFUN([_SNMP_], [dnl
 # =============================================================================
 #
 # $Log: snmp.m4,v $
+# Revision 0.9.2.3  2007/10/15 01:04:50  brian
+# - updated SNMP build
+#
 # Revision 0.9.2.2  2007/10/13 08:51:41  brian
 # - updates for 2.6.22 FC6 kernel and added MIBs
 #
