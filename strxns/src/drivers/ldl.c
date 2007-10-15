@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/15 05:35:42 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/10/15 17:26:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:42 $ by $Author: brian $
+ Last Modified $Date: 2007/10/15 17:26:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 0.9.2.41  2007/10/15 17:26:09  brian
+ - updates for 2.6.22.5-49.fc6 kernel
+
  Revision 0.9.2.40  2007/08/15 05:35:42  brian
  - GPLv3 updates
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/15 05:35:42 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/10/15 17:26:09 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/15 05:35:42 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/10/15 17:26:09 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -124,7 +127,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.40 $) $Date: 2007/08/15 05:35:42 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.41 $) $Date: 2007/10/15 17:26:09 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -227,6 +230,66 @@ struct streamtab ldl_info = {
 	.st_rdinit = &ldl_rinit,	/* Upper read queue */
 	.st_wrinit = &ldl_winit,	/* Upper write queue */
 };
+
+
+#if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
+{
+	return skb->tail;
+}
+static inline unsigned char *skb_end_pointer(const struct sk_buff *skb)
+{
+	return skb->end;
+}
+static inline unsigned char *skb_transport_header(const struct sk_buff *skb)
+{
+	return skb->h.raw;
+}
+static inline unsigned char *skb_network_header(const struct sk_buff *skb)
+{
+	return skb->nh.raw;
+}
+static inline unsigned char *skb_mac_header(const struct sk_buff *skb)
+{
+	return skb->mac.raw;
+}
+static inline void skb_reset_tail_pointer(struct sk_buff *skb)
+{
+	skb->tail = skb->data;
+}
+static inline void skb_reset_end_pointer(struct sk_buff *skb)
+{
+	skb->end = skb->data;
+}
+static inline void skb_reset_transport_header(struct sk_buff *skb)
+{
+	skb->h.raw = skb->data;
+}
+static inline void skb_reset_network_header(struct sk_buff *skb)
+{
+	skb->nh.raw = skb->data;
+}
+static inline void skb_reset_mac_header(struct sk_buff *skb)
+{
+	skb->mac.raw = skb->data;
+}
+static inline void skb_set_transport_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_transport_header(skb);
+	skb->h.raw += offset;
+}
+static inline void skb_set_network_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_network_header(skb);
+	skb->nh.raw += offset;
+}
+static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_mac_header(skb);
+	skb->mac.raw += offset;
+}
+#endif				/* !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
+
 
 /*
  *  ldl: Yet another unfinished DLPI driver
@@ -609,10 +672,10 @@ ldl_skbuff_dump(char *msg, struct sk_buff *skb, int alldata)
 
 	printk("head=%lx data=%lx tail=%lx end=%lx truesize=%d\n"
 	       "h.raw=%lx nh.raw=%lx mac.raw=%lx type=%s len=%d\n", (L) skb->head, (L) skb->data,
-	       (L) skb->tail, (L) skb->end, skb->truesize, (L) skb->h.raw, (L) skb->nh.raw,
-	       (L) skb->mac.raw, ldl_pkt_type(skb->pkt_type), skb->len);
+	       (L) skb_tail_pointer(skb), (L) skb_end_pointer(skb), skb->truesize, (L) skb_transport_header(skb), (L) skb_network_header(skb),
+	       (L) skb_mac_header(skb), ldl_pkt_type(skb->pkt_type), skb->len);
 	if (alldata)
-		cnt = skb->tail - skb->head;	/* dump everything in the buffer */
+		cnt = skb_tail_pointer(skb) - skb->head;	/* dump everything in the buffer */
 	else
 		alldata = cnt = 64;	/* make alldata non-zero */
 
@@ -1081,6 +1144,19 @@ ndev_find(struct ldldev *dev)
 	return ndev;
 }
 
+#if !defined HAVE_DEV_BASE_HEAD_SYMBOL
+static inline struct net_device *
+first_net_device(void)
+{
+	return (dev_base);
+}
+static inline struct net_device *
+next_net_device(struct net_device *dev)
+{
+	return (dev->next);
+}
+#endif				/* !defined HAVE_DEV_BASE_HEAD_SYMBOL */
+
 /*
  *  ndev_get  - create or find netdevice
  *
@@ -1094,7 +1170,8 @@ ndev_get(dl_ulong ppa)
 	struct ndev *ndev;
 
 	/* Find the Linux netdevice to attach to */
-	for (dev = dev_base, i = 0; dev; dev = dev->next, ++i)
+	for (dev = (struct ldldev *) first_net_device(), i = 0;
+	     dev; dev = (struct ldldev *) next_net_device((struct net_device *) dev), ++i)
 		if (ppa == i)
 			break;
 
@@ -1360,7 +1437,7 @@ ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 	ASSERT(ndev->magic == NDEV_MAGIC);
 	ASSERT(ndev->dev != NULL);
 
-	skb->mac.raw = skb->data;
+	skb_reset_mac_header(skb);
 	skb->dev = ndev->dev;
 	atomic_add(skb->truesize, &ndev->wr_cur);
 	skb->sk = (struct sock *) ndev;
@@ -1406,7 +1483,7 @@ ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 	ASSERT(ndev->magic == NDEV_MAGIC);
 	ASSERT(ndev->dev != NULL);
 
-	skb->mac.raw = skb->data;
+	skb_reset_mac_header(skb);
 	skb->dev = dev = ndev->dev;
 	atomic_add(skb->truesize, &ndev->wr_cur);
 	(struct ndev *) skb->sk = ndev;
@@ -2637,7 +2714,7 @@ rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
 	struct sap *sap;
 
 #if 0
-	struct ethhdr *hdr = (struct ethhdr *) skb->mac.raw;
+	struct ethhdr *hdr = (struct ethhdr *) skb_mac_header(skb);
 #endif
 	unsigned char *fr_ptr, fr_buf[LDL_MAX_HDR_LEN];
 	int fr_len;
@@ -2673,17 +2750,17 @@ rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
 #if 1
 	mblk_rtn.free_func = mblk_destructor;
 	mblk_rtn.free_arg = (char *) skb;
-	fr_len = skb->tail - skb->mac.raw;
-	if ((dp = esballoc(skb->mac.raw - 2, fr_len + 2, BPRI_LO, &mblk_rtn)) != NULL) {
+	fr_len = skb_tail_pointer(skb) - skb_mac_header(skb);
+	if ((dp = esballoc(skb_mac_header(skb) - 2, fr_len + 2, BPRI_LO, &mblk_rtn)) != NULL) {
 		dp->b_rptr = dp->b_wptr += 2;
 		fr_ptr = dp->b_rptr;
 		dp->b_wptr += fr_len;
 		skb_get(skb);
 	} else {		/* We still need the frame type for correct drop stats */
 		fr_ptr = &fr_buf[0];
-		fr_len = min(skb->end - skb->mac.raw, (ptrdiff_t) LDL_MAX_HDR_LEN);
+		fr_len = min(skb_end_pointer(skb) - skb_mac_header(skb), (ptrdiff_t) LDL_MAX_HDR_LEN);
 		ASSERT(fr_len > 0);
-		memcpy(fr_buf, skb->mac.raw, fr_len);
+		memcpy(fr_buf, skb_mac_header(skb), fr_len);
 	}
 #else
 	if ((dp = allocb(2 + fr_len, BPRI_LO)) != NULL) {
@@ -2696,14 +2773,14 @@ rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
 		 */
 		dp->b_rptr = dp->b_wptr += 2;
 		dp->b_datap->db_type = M_DATA;
-		memcpy(dp->b_wptr, skb->mac.raw, fr_len);
+		memcpy(dp->b_wptr, skb_mac_header(skb), fr_len);
 		fr_ptr = dp->b_rptr;
 		dp->b_wptr += fr_len;
 	} else {		/* We still need the frame type for correct drop stats */
 		fr_ptr = &fr_buf[0];
-		fr_len = min(skb->end - skb->mac.raw, LDL_MAX_HDR_LEN);
+		fr_len = min(skb_end_pointer(skb) - skb_mac_header(skb), LDL_MAX_HDR_LEN);
 		ASSERT(fr_len > 0);
-		memcpy(fr_buf, skb->mac.raw, fr_len);
+		memcpy(fr_buf, skb_mac_header(skb), fr_len);
 	}
 #endif
 
@@ -2985,7 +3062,7 @@ tx_func_proto(struct dl *dl, mblk_t *mp)
 	 */
 	skb_reserve(skb, dl->machdr_reserve);
 #ifdef KERNEL_2_1
-	skb->nh.raw = skb->data;
+	skb_reset_network_header(skb);
 #endif
 	if (dl->mkhdr(dl, (char *) reqp + reqp->dl_dest_addr_offset, dlen, skb) != 1) {
 #ifdef KERNEL_2_1
@@ -3064,7 +3141,7 @@ tx_func_raw(struct dl *dl, mblk_t *mp)
 	if ((skb = alloc_skb(dlen, GFP_ATOMIC)) == NULL)
 		return tx_failed(dl, mp, TXE_NOMEM);
 #ifdef KERNEL_2_1
-	skb->nh.raw = skb->data + dl->machdr_len;
+	skb_set_network_header(skb, dl->machdr_len);
 #else
 	skb->free = 1;
 #endif
@@ -4267,7 +4344,8 @@ ioc_findppa(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	dp = mp->b_cont;
 
 	/* Find device with this name */
-	for (dev = dev_base, ppa = 0; dev != NULL; dev = dev->next, ++ppa)
+	for (dev = (struct ldldev *) first_net_device(), ppa = 0; dev != NULL;
+	     dev = (struct ldldev *) next_net_device((struct net_device *) dev), ++ppa)
 		if (!strcmp(dev->name, dp->b_rptr))
 			break;
 	if (dev == NULL)
