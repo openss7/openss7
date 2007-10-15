@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/10/15 01:04:50 $
+# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/10/15 06:47:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/15 01:04:50 $ by $Author: brian $
+# Last Modified $Date: 2007/10/15 06:47:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -195,14 +195,20 @@ AC_DEFUN([_SNMP_CHECK_LIBS], [dnl
 *** Compiling native SNMP agents requires the native library
 *** libucdagent.  Most likely you need to install the net-snmp
 *** or ucd-snmp runtime package.
-*** ]) ], [-lucdmibs])
+*** ]) ], [-lucdmibs], [
+int allow_severity = 0;
+int deny_severity = 0;
+])
 	    AC_CHECK_LIB([ucdmibs], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Compiling native SNMP agents requires the native library
 *** libucdmibs.  Most likely you need to install the net-snmp or
 *** ucd-snmp runtime package.
-*** ]) ])
+*** ]) ], [], [
+int allow_severity = 0;
+int deny_severity = 0;
+])
 	fi
 
 	snmp_cv_ldadd="$LIBS"
@@ -216,6 +222,12 @@ AC_DEFUN([_SNMP_CHECK_LIBS], [dnl
 
 # =============================================================================
 # _SNMP_CHECK_LIBS32
+# -----------------------------------------------------------------------------
+# NET-SNMP has some of the worst shared library construction I have ever seen.
+# Although we have ELF for so many years now, NET-SNMP cannot build it s
+# shared libraries to depend upon the shared libraries against which it was
+# compiled (as we do).  The result is having to look for all the dependent
+# shared libraries and link them explicitly with the application.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
     AC_CACHE_CHECK([for snmp 32-bit libs], [snmp_cv_libs32], [dnl
@@ -288,14 +300,20 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libucdagent.  Most likely you need to install the net-snmp
 *** or ucd-snmp runtime package.
-*** ]) ], [-lucdmibs])
+*** ]) ], [-lucdmibs], [
+int allow_severity = 0;
+int deny_severity = 0;
+])
 	    AC_CHECK_LIB32([ucdmibs], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libucdmibs.  Most likely you need to install the net-snmp or
 *** ucd-snmp runtime package.
-*** ]) ])
+*** ]) ], [], [
+int allow_severity = 0;
+int deny_severity = 0;
+])
 	fi
 
 	snmp_cv_ldadd32="$LIBS"
@@ -347,6 +365,9 @@ AC_DEFUN([_SNMP_], [dnl
 # =============================================================================
 #
 # $Log: snmp.m4,v $
+# Revision 0.9.2.4  2007/10/15 06:47:49  brian
+# - update to SNMP agent build
+#
 # Revision 0.9.2.3  2007/10/15 01:04:50  brian
 # - updated SNMP build
 #

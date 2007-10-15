@@ -1,3 +1,13 @@
+2007-10-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/agent.m4: added SNMP agent macros
+	* src/snmp/mib_modules.h: added mangled header file
+	* acinclude.m4: converted to use agent.m4 macros
+	* m4/lib32.m4: added AC_CHECK_LIB with prologue
+	* m4/snmp.m4: added prologues to libwrap dependent checks
+	* src/snmp/strMIB.c: mods for caching scalars
+	* src/snmp/mibs/OPENSS7-STREAMS-MIB.mib: corrections to strStrhold type
+
 2007-10-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added strmib agent
