@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.6.16 $) $Date: 2007/08/19 11:21:05 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.6.17 $) $Date: 2007/10/16 06:04:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/19 11:21:05 $ by $Author: brian $
+# Last Modified $Date: 2007/10/16 06:04:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([LiS],[2.18],[bugs@openss7.org],[LiS])
-AC_REVISION([$Name:  $($Revision: 1.1.6.16 $) $Date: 2007/08/19 11:21:05 $])
+AC_REVISION([$Name:  $($Revision: 1.1.6.17 $) $Date: 2007/10/16 06:04:20 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -155,7 +155,7 @@ AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_MALLOC fi
 AC_FUNC_MEMCMP
 AC_FUNC_MMAP
-AC_FUNC_REALLOC
+if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_REALLOC fi
 AC_FUNC_SELECT_ARGTYPES
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_SETPGRP fi
 AC_TYPE_SIGNAL
@@ -186,6 +186,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.6.17  2007/10/16 06:04:20  brian
+# - fix cross-compile bug
+#
 # Revision 1.1.6.16  2007/08/19 11:21:05  brian
 # - instead of hardcoding directories
 #

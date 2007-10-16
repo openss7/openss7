@@ -1,3 +1,7 @@
+2007-10-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
+
 2007-10-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/agent.m4: added SNMP agent macros

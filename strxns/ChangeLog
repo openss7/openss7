@@ -1,3 +1,7 @@
+2007-10-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
+
 2007-10-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: added checks for dev_base_head and
