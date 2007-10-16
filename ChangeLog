@@ -1,3 +1,9 @@
+2007-10-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
+	* doc/manual/news.texi: documented problem
+	* doc/manual/bugs.texi: documented problem
+
 2007-10-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/lib32.m4: added macros for 32-bit lib checks
