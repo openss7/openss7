@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/15 04:53:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/10/16 07:46:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/15 04:53:56 $ by $Author: brian $
+# Last Modified $Date: 2007/10/16 07:46:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -116,6 +116,19 @@ endif
 dist_noinst_SCRIPTS		+= scripts/cflagcheck $(top_srcdir)/scripts/modpost.sh
 EXTRA_SCRIPTS			+= scripts/cflagcheck
 
+EXTRA_TEX			+= \
+				scripts/texinfo.cnf \
+				scripts/texi/args.texi.in \
+				scripts/texi/fdl.texi \
+				scripts/texi/gpl.texi \
+				scripts/texi/install.texi \
+				scripts/texi/lesser.texi \
+				scripts/texi/testsuite.texi
+
+EXTRA_DIST			+= $(EXTRA_TEX)
+dist_noinst_SCRIPTS		+= configure.nexusware
+EXTRA_SCRIPTS			+= configure.nexusware
+
 ##
 ## Rules for lsms
 ##
@@ -168,6 +181,9 @@ DISTCLEANFILES			+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.34  2007/10/16 07:46:31  brian
+# - makefile corrections and additions
+#
 # Revision 0.9.2.33  2007/08/15 04:53:56  brian
 # - GPLv3 updates
 #

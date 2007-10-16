@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/08/14 07:26:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/10/16 07:46:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 07:26:43 $ by $Author: brian $
+# Last Modified $Date: 2007/10/16 07:46:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -153,6 +153,7 @@ endif
 endif
 
 dist_noinst_SCRIPTS		+= configure.nexusware
+EXTRA_SCRIPTS			+= configure.nexusware
 
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(dist_sbin_SCRIPTS)
 
@@ -290,6 +291,9 @@ EXTRA_DIST			+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.49  2007/10/16 07:46:33  brian
+# - makefile corrections and additions
+#
 # Revision 0.9.2.48  2007/08/14 07:26:43  brian
 # - GPLv3 header update
 #

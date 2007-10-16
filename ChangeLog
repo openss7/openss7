@@ -3,6 +3,7 @@
 	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
 	* doc/manual/news.texi: documented problem
 	* doc/manual/bugs.texi: documented problem
+	* Makefile.am: add missing configure.nexusware and texinfo files
 
 2007-10-13  Brian Bidulock  <bidulock@openss7.org>
 

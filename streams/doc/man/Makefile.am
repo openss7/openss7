@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2007/08/13 22:45:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2007/10/16 07:46:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 22:45:57 $ by $Author: brian $
+# Last Modified $Date: 2007/10/16 07:46:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -942,6 +942,10 @@ util_pages += \
 	man8/strload.8 \
 	man8/strsetup.8 \
 	man8/strvf.8
+endif
+if WITH_SNMP_AGENT
+util_pages += \
+	man8/strmib.8
 endif
 
 MANS_UNUSED = \
@@ -2091,7 +2095,8 @@ dist_noinst_util_pages = \
 	man8/insf.8.man \
 	man8/strload.8.man \
 	man8/strsetup.8.man \
-	man8/strvf.8.man
+	man8/strvf.8.man \
+	man8/strmib.8.man
 
 dist_noinst_MANS = \
 	man2/fattach.2.man \
@@ -2511,6 +2516,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.88  2007/10/16 07:46:35  brian
+# - makefile corrections and additions
+#
 # Revision 0.9.2.87  2007/08/13 22:45:57  brian
 # - GPLv3 header updates
 #
