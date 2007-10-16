@@ -1,6 +1,7 @@
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
+	* doc/man/Makefile.am: add strmib manpage
 
 2007-10-15  Brian Bidulock  <bidulock@openss7.org>
 
