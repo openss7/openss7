@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/08/19 11:17:34 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/10/17 07:36:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/19 11:17:34 $ by $Author: brian $
+# Last Modified $Date: 2007/10/17 07:36:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -221,6 +221,20 @@ dnl
     then
 	enable_static='no'
     fi
+    AC_MSG_CHECKING([for documentation included])
+    AC_ARG_ENABLE([docs],
+	AS_HELP_STRING([--disable-docs],
+	    [disable documentation build and install.  @<:@default=enabled@:>@]),
+	[dnl
+	    if test :"${USE_MAINTAINER_MODE:-no}" != :no
+	    then
+		enable_docs='yes'
+	    else
+		enable_docs="$enableval"
+	    fi
+	], [enable_docs='yes'])
+    AC_MSG_RESULT([$enable_docs])
+    AM_CONDITIONAL([DOCUMENTATION], [test :"${enable_docs:-yes}" = :yes])dnl
 ])# _OPENSS7_DIRCHANGE
 # =============================================================================
 
@@ -746,6 +760,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.46  2007/10/17 07:36:09  brian
+# - added documentation suppression
+#
 # Revision 0.9.2.45  2007/08/19 11:17:34  brian
 # - spelling correction
 #
