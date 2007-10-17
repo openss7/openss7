@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/10/17 07:36:09 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/10/17 17:43:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/17 07:36:09 $ by $Author: brian $
+# Last Modified $Date: 2007/10/17 17:43:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -144,6 +144,7 @@ Corporation at a fee.  See http://www.openss7.com/
     _OPENSS7_OPTIONS
     _OPENSS7_CACHE
     _OPENSS7_OPTIONS_CFLAGS
+    _OPENSS7_MISSING
     AC_SUBST([cross_compiling])dnl
 ])# _OPENSS7_PACKAGE
 # =============================================================================
@@ -221,20 +222,6 @@ dnl
     then
 	enable_static='no'
     fi
-    AC_MSG_CHECKING([for documentation included])
-    AC_ARG_ENABLE([docs],
-	AS_HELP_STRING([--disable-docs],
-	    [disable documentation build and install.  @<:@default=enabled@:>@]),
-	[dnl
-	    if test :"${USE_MAINTAINER_MODE:-no}" != :no
-	    then
-		enable_docs='yes'
-	    else
-		enable_docs="$enableval"
-	    fi
-	], [enable_docs='yes'])
-    AC_MSG_RESULT([$enable_docs])
-    AM_CONDITIONAL([DOCUMENTATION], [test :"${enable_docs:-yes}" = :yes])dnl
 ])# _OPENSS7_DIRCHANGE
 # =============================================================================
 
@@ -456,6 +443,7 @@ AC_DEFUN([_OPENSS7_DEBUG], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS], [dnl
     _OPENSS7_OPTIONS_CHECK
+    _OPENSS7_OPTIONS_DOCS
     _OPENSS7_OPTIONS_GPG
     _OPENSS7_OPTIONS_PKG_EPOCH
     _OPENSS7_OPTIONS_PKG_RELEASE
@@ -483,6 +471,27 @@ AC_DEFUN([_OPENSS7_OPTIONS_CHECK], [dnl
     AC_MSG_RESULT([$enable_checks])
     AM_CONDITIONAL([PERFORM_CHECKS], [test :"${enable_checks:-yes}" = :yes])dnl
 ])# _OPENSS7_OPTIONS_CHECK
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS_DOCS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_DOCS], [dnl
+    AC_MSG_CHECKING([for documentation included])
+    AC_ARG_ENABLE([docs],
+	AS_HELP_STRING([--disable-docs],
+	    [disable documentation build and install.  @<:@default=enabled@:>@]),
+	[dnl
+	    if test :"${USE_MAINTAINER_MODE:-no}" != :no
+	    then
+		enable_docs='yes'
+	    else
+		enable_docs="$enableval"
+	    fi
+	], [enable_docs='yes'])
+    AC_MSG_RESULT([$enable_docs])
+    AM_CONDITIONAL([DOCUMENTATION], [test :"${enable_docs:-yes}" = :yes])dnl
+])# _OPENSS7_OPTIONS_DOCS
 # =============================================================================
 
 # =============================================================================
@@ -751,6 +760,42 @@ dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wdisabled-optimization"
 # =============================================================================
 
 # =============================================================================
+# _OPENSS7_MISSING
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_MISSING], [dnl
+    test x"${MISSING2+set}" = xset || MISSING2="\${SHELL} $am_aux_dir/missing2"
+    if eval "$MISSING2 --run true" ; then
+	am_missing2_run="$MISSING2 --run "
+    else
+	am_missing2_run=
+	AC_MSG_WARN(['missing2' script is too old or missing])
+    fi
+    LATEX=${LATEX-"${am_missing2_run}latex"}
+    AC_SUBST([LATEX])dnl
+    PSLATEX=${PSLATEX-"${am_missing2_run}pslatex"}
+    AC_SUBST([PSLATEX])dnl
+    PDFLATEX=${PDFLATEX-"${am_missing2_run}pdflatex"}
+    AC_SUBST([PDFLATEX])dnl
+    BIBTEX=${BIBTEX-"${am_missing2_run}bibtex"}
+    AC_SUBST([BIBTEX])dnl
+    DVIPS=${DVIPS-"${am_missing2_run}dvips"}
+    AC_SUBST([DVIPS])dnl
+    DVIPDF=${DVIPDF-"${am_missing2_run}dvipdf"}
+    AC_SUBST([DVIPDF])dnl
+    GNUPLOT=${GNUPLOT-"${am_missing2_run}gnuplot"}
+    AC_SUBST([GNUPLOT])dnl
+    FIG2DEV=${FIG2DEV-"${am_missing2_run}fig2dev"}
+    AC_SUBST([FIG2DEV])dnl
+    CONVERT=${CONVERT-"${am_missing2_run}convert"}
+    AC_SUBST([CONVERT])dnl
+    PS2EPSI=${PS2EPSI-"${am_missing2_run}ps2epsi"}
+    AC_SUBST([PS2EPSI])dnl
+    EPSTOPDF=${EPSTOPDF-"${am_missing2_run}epstopdf"}
+    AC_SUBST([EPSTOPDF])dnl
+])# _OPENSS7_MISSING
+# =============================================================================
+
+# =============================================================================
 # _OPENSS7
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7], [dnl
@@ -760,6 +805,18 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.50  2007/10/17 17:43:02  brian
+# - build updates
+#
+# Revision 0.9.2.49  2007/10/17 13:22:19  brian
+# - correction
+#
+# Revision 0.9.2.48  2007/10/17 08:18:30  brian
+# - corrections
+#
+# Revision 0.9.2.47  2007/10/17 08:07:39  brian
+# - added missing checks
+#
 # Revision 0.9.2.46  2007/10/17 07:36:09  brian
 # - added documentation suppression
 #

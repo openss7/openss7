@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/13 22:46:01 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/17 17:43:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 22:46:01 $ by $Author: brian $
+# Last Modified $Date: 2007/10/17 17:43:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -131,34 +131,34 @@ ALL_LOCAL += all-papers
 
 $(PLOTFIGS): %.fig: %.plot
 	@make all-dat
-	gnuplot $<
+	$(GNUPLOT) $<
 
 $(EPSFIGS): %.eps: %.fig
-	fig2dev -L eps -e -g '#ffffff' -b 0 $< > $@
+	$(FIG2DEV) -L eps -e -g '#ffffff' -b 0 $< $@
 
 $(PLOTS:.plot=.eps): %.eps: %.fig
-	fig2dev -L eps -e -g '#f7f7f7' -b 0 $< > $@
+	$(FIG2DEV) -L eps -e -g '#f7f7f7' -b 0 $< $@
 
 $(PDFFIGS): %.pdf: %.fig
-	fig2dev -L pdf -e -p dummy -g '#ffffff' -b 0 $< > $@
+	$(FIG2DEV) -L pdf -e -p dummy -g '#ffffff' -b 0 $< $@
 
 $(PLOTS:.plot=.pdf): %.pdf: %.fig
-	fig2dev -L pdf -e -p dummy -g '#f7f7f7' -b 0 $< > $@
+	$(FIG2DEV) -L pdf -e -p dummy -g '#f7f7f7' -b 0 $< $@
 
 $(GIFFIGS): %.gif: %.fig
-	fig2dev -L gif -g '#c0d0f0' -t '#c0d0f0' -b 0 -S 2 $< > $@
+	$(FIG2DEV) -L gif -g '#c0d0f0' -t '#c0d0f0' -b 0 -S 2 $< $@
 
 $(PLOTS:.plot=.gif): %.gif: %.fig
-	fig2dev -L gif -g 'white' -b 15 -S 2 $< > $@
+	$(FIG2DEV) -L gif -g 'white' -b 15 -S 2 $< $@
 
 #$(PNGFIGS): %.png: %.fig
-#	fig2dev -L png -b 0 -S 4 $< > $@
+#	$(FIG2DEV) -L png -b 0 -S 4 $< $@
 
 $(PNGFIGS): %.png: %.gif
-	convert -background '#c0d0f0' -transparent '#ffffff' -interlace Line $< $@
+	$(CONVERT) -background '#c0d0f0' -transparent '#ffffff' -interlace Line $< $@
 
 $(PLOTS:.plot=.png): %.png: %.gif
-	convert -background 'white' -interlace Line $< $@
+	$(CONVERT) -background 'white' -interlace Line $< $@
 
 MY_PHONY += gif png eps pdf
 
@@ -219,31 +219,31 @@ clean-dat:
 	done
 
 $(NAME).aux: $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
-	latex $(NAME).tex
-	latex $(NAME).tex
+	$(LATEX) $(NAME).tex
+	$(LATEX) $(NAME).tex
 
 $(NAME).bbl: $(NAME).bib $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
 	if test -f $(NAME).aux ; then :; else make $(NAME).aux ; fi
-	bibtex $(NAME)
+	$(BIBTEX) $(NAME)
 
 $(NAME).dvi: $(NAME).tex $(NAME).bbl $(EPSFIGS) $(PLOTS:.plot=.eps)
 	rm -f $(GIFFIGS) $(PLOTS:.plot=.gif)
 	rm -f $(PNGFIGS) $(PLOTS:.plot=.png)
-	latex $(NAME).tex
-	latex $(NAME).tex
+	$(LATEX) $(NAME).tex
+	$(LATEX) $(NAME).tex
 
 $(NAME).ps: $(NAME).tex $(NAME).bbl $(EPSFIGS) $(PLOTS:.plot=.eps)
 	rm -f $(GIFFIGS) $(PLOTS:.plot=.gif)
 	rm -f $(PNGFIGS) $(PLOTS:.plot=.png)
-	pslatex $(NAME).tex
-	pslatex $(NAME).tex
-	dvips -t letter -f -o $@ $(NAME).dvi
+	$(PSLATEX) $(NAME).tex
+	$(PSLATEX) $(NAME).tex
+	$(DVIPS) -t letter -f -o $@ $(NAME).dvi
 
 $(NAME).pdf: $(NAME).tex $(NAME).bbl $(PDFFIGS) $(PLOTS:.plot=.pdf)
 	rm -f $(GIFFIGS) $(PLOTS:.plot=.gif)
 	rm -f $(PNGFIGS) $(PLOTS:.plot=.png)
-	pdflatex $(NAME).tex
-	pdflatex $(NAME).tex
+	$(PDFLATEX) $(NAME).tex
+	$(PDFLATEX) $(NAME).tex
 
 $(NAME).html: $(NAME).tex $(NAME).bbl $(PNGFIGS) $(PLOTS:.plot=.png)
 	/usr/bin/latex2html -split 0 -noexternal_images -noascii_mode -font_size 12pt \
@@ -280,12 +280,22 @@ MY_PHONY += clean-papers clean-fig clean-gif clean-png clean-eps clean-pdf clean
 
 EXTRA_DIST += $(NAME).pdf $(NAME).tex $(NAME).bib $(FIGFIGS) $(PLOT_DATS) $(PLOTS) org.css
 
+.INTERMEDIATE: \
+	$(PNGFIGS) $(PLOTS:.plot=.png) \
+	$(EPSFIGS) $(PLOTS:.plot=.eps) \
+	$(PDFFIGS) $(PLOTS:.plot=.pdf) \
+	$(GIFFIGS) $(PLOTS:.plot=.gif) \
+	$(PLOTS:.plot=.fig)
+
 ## DEVELOPMENT
 endif
 
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.6  2007/10/17 17:43:00  brian
+# - build updates
+#
 # Revision 0.9.2.5  2007/08/13 22:46:01  brian
 # - GPLv3 header updates
 #
