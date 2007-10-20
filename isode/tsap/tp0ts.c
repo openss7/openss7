@@ -1041,8 +1041,10 @@ struct TSAPdisconnect *td;
 	        != qb -> qb_len) {
 	    if (nc == NOTOK) {
 		if (errno != EWOULDBLOCK) {
-		    result = tsaplose (td, DR_NETWORK, "failed",
-				      "write to network");
+		    (void) tpktlose (tb, td, DR_NETWORK, "failed",
+			"write to network");
+		    result = NOTOK;
+
 		    goto out;
 		}
 

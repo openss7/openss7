@@ -43,8 +43,9 @@ extern char * edbtmp_path;
 extern AttributeType at_acl;
 extern AttributeType at_objectclass;
 
-Entry cache_dsp_entry (ptr)
+Entry cache_dsp_entry (ptr,complete)
 EntryInfo      *ptr;
+char complete;
 {
 	/* assumes entry passed is complete */
 
@@ -89,7 +90,7 @@ EntryInfo      *ptr;
 			as_free (eptr->e_attributes);
 			as_write_files(ptr->ent_attr,edbtmp_path);
 			eptr->e_attributes = as_cpy(ptr->ent_attr);
-			eptr->e_complete = TRUE;
+			eptr->e_complete = complete;
 			eptr->e_data = E_TYPE_CACHE_FROM_MASTER;
 			eptr->e_age = timenow;
 			if (eptr->e_inherit)
@@ -103,7 +104,7 @@ EntryInfo      *ptr;
 			return NULLENTRY;
 		local_cache_size++;
 		eptr->e_name = rdn_cpy (dnptr->dn_rdn);
-		eptr->e_complete = TRUE;
+		eptr->e_complete = complete;
 		eptr->e_data = E_TYPE_CACHE_FROM_MASTER;
 		as_write_files(ptr->ent_attr,edbtmp_path);
 		eptr->e_attributes = as_cpy(ptr->ent_attr);
@@ -153,10 +154,11 @@ DN binddn;
 EntryInfo *ptr;
 Entry entryptr;
 Attr_Sequence as, eis_select (), attr_eis_select ();
+char cache_search = FALSE;
 
     switch(arg->arg_type) {    
     case OP_READ:
-	entryptr = cache_dsp_entry (&res->res_rd.rdr_entry);
+	entryptr = cache_dsp_entry (&res->res_rd.rdr_entry,TRUE);
 	if (ctx == DS_CTX_X500_DAP)
 	   if (entryptr != NULLENTRY) {
 	    
@@ -182,8 +184,12 @@ Attr_Sequence as, eis_select (), attr_eis_select ();
 	   }
 	break;
     case OP_SEARCH:
+        if ((arg->arg_sr.sra_eis.eis_allattributes == TRUE) &&
+            (arg->arg_sr.sra_eis.eis_infotypes == EIS_ATTRIBUTESANDVALUES)) 
+		cache_search = TRUE;
+
 	for (ptr = res->res_sr.CSR_entries; ptr != NULLENTRYINFO; ptr = ptr->ent_next) 
- 			(void) cache_dsp_entry (ptr);
+ 			(void) cache_dsp_entry (ptr,cache_search);
      	break;
     case OP_LIST:
 	if (ctx == DS_CTX_QUIPU_DSP)

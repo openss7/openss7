@@ -39,7 +39,7 @@ Attr_Sequence eis_select ();
 Attr_Sequence dsa_eis_select ();
 extern Attr_Sequence entry_find_type();
 static cant_use_cache();
-static attribute_not_cached ();
+static attribute_not_cache ();
 extern AttributeType at_control;
 extern unsigned bind_policy;
 extern unsigned strong_policy;
@@ -254,7 +254,8 @@ char dfltacl = FALSE;
 	if (dn == NULLDN) 
 		return FALSE;
 
-	if ((ptr->e_data == E_DATA_MASTER) || (ptr->e_data == E_TYPE_SLAVE))
+	if ((ptr->e_data == E_DATA_MASTER) || (ptr->e_data == E_TYPE_SLAVE) ||
+	    (ptr->e_complete == FALSE))
 		return FALSE;
 
 	/* see if more than cached data is required */	
