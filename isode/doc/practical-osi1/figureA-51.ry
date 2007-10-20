@@ -1,0 +1,6 @@
+m-ConfirmedEventReport OPERATION
+	ARGUMENT EventReportArgument
+	RESULT   EventReportResult
+	ERRORS { noSuchObject, noSuchEventType, accessDenied,
+		    noSuchMgmtInfoId, invalidMgmtInfoValue }
+	::= 1

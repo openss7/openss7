@@ -1,0 +1,21 @@
+\File{figureD\-20.py},{14:11},{Mar  4 1991}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{    \K{IF} (x = findCache (base, \{ aliasedObjectname \})}}
+\L{\LB{        base = x;}}
+\L{\LB{}}
+\L{\LB{    \C{}\-\- map onto Directory Search}}
+\CE{}\L{\LB{    \C{}\-\- baseObject: `base\'}}
+\CE{}\L{\LB{    \C{}\-\- subset: `subsetType\'}}
+\CE{}\L{\LB{    \C{}\-\- filter:}}
+\CE{}\L{\LB{    \C{}\-\-     build OR\-conjuction of `s\' using approximateMatch over `alist\'}}
+\CE{}\L{\LB{    \C{}\-\-     if `qual\' isn\'t empty:}}
+\CE{}\L{\LB{    \C{}\-\-         build filter\-item of `qual\' using equality over `qlist\'}}
+\CE{}\L{\LB{    \C{}\-\-         AND with original filter}}
+\CE{}\L{\LB{    \C{}\-\- selection: attributes and values of}}
+\CE{}\L{\LB{    \C{}\-\-     telephoneNumber, rfc822Mailbox}}
+\CE{}\L{\LB{}}
+\L{\LB{    \C{}\-\- cache returned entries and associated attributes\/values}}
+\CE{}\L{\LB{}}
+\L{\LB{    \K{RETURN} search\-results;}}
+\L{\LB{\}}}

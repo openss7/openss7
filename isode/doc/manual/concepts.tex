@@ -1,0 +1,275 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Motivation and Concepts}\label{cook:concepts}
+Remote operations are a well understood technique for building distributed
+applications.
+Currently,
+OSI technology provides a powerful notation for specifying the external
+interactions of these systems.
+Remote operations in OSI are particularly attractive as they specify the
+homogeneous externally visible and verifiable characteristics needed for
+interconnection compatibility,
+while avoiding unnecessary constraints upon and changes to the heterogeneous
+internal design and the implementation of the information processing systems
+to be interconnected.
+Many feel
+that this capability is likely to be a key factor in the overall success of
+OSI standardization.
+
+In \cite{ECMA.ROS},
+a methodology for remote operations is presented which aims to package this
+technology concisely.
+Although the latter half of this document has been rendered obsolete by more
+recent work in the standards bodies
+(e.g., \cite{ISO.ROS.Service,ISO.ROS.Protocol})
+The aim of this volume, {\sl The Applications Cookbook},
+is to provide programming support for this methodology.
+
+\section	{A Model for Distributed Applications}
+Remote operations are viewed as part of a methodology for building
+distributed applications.%
+\footnote{This section presents a (hopefully) simplified version of the
+information presented in the first half of \cite{ECMA.ROS}.
+Interested readers should consult this original work for further details.}
+In order to understand the role remote operations play in this programming
+model,
+one other notion must be explained first.
+
+\subsection	{Abstract Data Types}
+An {\em abstract data type\/} is a concept for describing a data structure
+which is accessed in a well-defined manner.
+This has several implications:
+\begin{itemize}
+\item	Although the data structure may have a {\em concrete representation\/}
+	on a given local system (e.g., a {\em C\/} \verb"struct"),
+	its corresponding abstract data type is defined in an
+	implementation-independent fashion,
+	termed its {\em abstract syntax}.
+
+\item	A well-defined set of rules,
+	defined by an {\em abstract transfer notation},
+	is used to serialize the abstract syntax so that a data structure
+	corresponding to the abstract data type may be unambiguously
+	transmitted on the network.
+	There are actually two mappings here:
+	\begin{itemize}
+	\item	First, the data structure is mapped to the abstract syntax
+		for the abstract data type.
+		This is an implementation-dependent mapping.
+
+	\item	Second, the abstract syntax is mapped to the concrete
+		syntax.
+		This is a serializing activity resulting in a stream of octets
+		(although some concrete syntaxes produce bit-aligned,
+		rather than octet-aligned, streams).
+		Do not confuse the concrete representation described above
+		(which deals with programming languages), with the concrete
+		syntax (which deals with transmission properties).
+	\end{itemize}
+
+\item	Access to an abstract data type is defined by a set of unitary actions
+	termed {\em operations},
+	which define the complete behavior of an instance of the abstract data
+	type.
+
+\item	{\em Strong typing\/} results when operations are the only permitted
+	means of accessing an abstract data type.
+
+\item	An {\em object model\/} for programming follows from the use of
+	abstract data types rather than concrete data structures.
+	Since operations are used to ultimately manipulate the data structures,
+	an important level of indirection has been introduced:
+	data structures may be accessed without regard to their actual
+	implementation.
+\end{itemize}
+
+\subsection	{Operations}
+Having described the relationship between data structures,
+abstract data types,
+and operations,
+consider the generic structure of an operation.
+An {\em operation}, in its most primitive form,
+is a simple request/reply interaction.
+The interaction takes the following form:
+\begin{itemize}
+\item	The operation is {\em invoked}.
+	An invocation consists of:
+	\begin{itemize}
+	\item	an {\em operation number},
+		which uniquely identifies the operation to be performed;
+
+	\item	an arbitrarily complex {\em argument\/};
+
+	\item	an {\em invocation identifier},
+		which is used to distinguish this invocation from other
+		previous invocations;
+		and,
+
+	\item	possibly a {\em linked invocation identifier},
+		which is used to indicate that this invocation results
+		during the processing of a previous invocation.
+	\end{itemize}
+
+\item	If the operation succeeds, then a {\em result\/} may be returned.
+	A result consists of:
+	\begin{itemize}
+	\item	an invocation identifier corresponding to the operation
+		which succeeded;
+		and,
+
+	\item	(possibly) an arbitrarily complex {\em result}.
+	\end{itemize}
+
+\item	If the operation fails, then an {\em error\/} is returned.
+	An error consists of:
+	\begin{itemize}
+	\item	an invocation identifier corresponding to the operation
+		which failed;
+
+	\item	an {\em error number},
+		which uniquely identifies the error that occurred;
+		and,
+
+	\item	(possibly) an arbitrarily complex {\em parameter}.
+	\end{itemize}
+
+\item	If the operation was not performed for some reason
+	(e.g., an unknown operation number, mistyped arguments for
+	the operation, and so on), then a {\em reject\/} is returned.
+	A reject consists of:
+	\begin{itemize}
+	\item	an invocation identifier corresponding to the operation
+		which was performed
+		(in degenerate cases this information may not be available);
+		and,
+
+	\item	a {\em reason},
+		which describes, in general terms, the rejection which
+		occurred.
+	\end{itemize}
+\end{itemize}
+Note that in all cases,
+operations are seen as being {\em total}.
+This means that for any given operation,
+the normal outcome (the result)
+and all exception outcomes (the errors) are well-defined and mutually
+exclusive (unambiguously distinguished).
+
+\subsection	{Associations}
+Thus far, we have implicitly assumed some communications relationship
+(i.e., a {\em binding\/}) between the entity invoking operations,
+the {\em invoker},
+and the entity performing them,
+{\em performer}.
+It is necessary formalize these notions somewhat.
+
+An {\em association\/} is a binding between two entities,
+which are referred to as
+the {\em initiator\/} and the {\em responder}.
+Although this sounds straight-forward,
+there is actually one level of indirection present:
+the initiator does not directly select a responder for binding,
+but rather selects a {\em service\/} that it wishes to use.
+During this process a responder is located and the binding established.
+
+The binding process is actually two-step:
+first,
+the initiator determines which service it requires and asks to have this
+service mapped onto the entities available on the network;
+second,
+based on the initiator's communications requirements,
+an association will be bound to one of those entities,
+which becomes the responder.
+
+Note that there is no requirement that the initiator of an association be the
+entity which requests operations to be invoked
+(i.e., the initiator need not be an invoker),
+nor that the responder of an association be the entity which performs the
+operations
+(i.e., the responder need not be a performer).
+
+\section	{Design Guidelines}
+Although the characteristics of operations will vary between applications,
+there are certain guidelines which should be of universal interest.
+
+\subsection	{Reliability Characteristics}
+When executing an operation in a distributed environment,
+there is always an element of uncertainity with regards to the occurrence of
+remote events,
+particularly when failures occur.
+One classification of reliability might be as follows:
+for a given invocation,
+a guarantee is given that it occurs {\em exactly once},
+{\em at least once}, or {\em at most once}.
+
+The first two guarantees require an end-to-end confirmation,
+with the proviso that the semantics of {\em exactly once\/} require a
+recovery scheme in the event of failures.
+When an operation has the semantics of {\em at least once},
+it is called {\em idempotent}.
+These are operations which read information,
+but do not modify the remote state.
+
+In practice,
+implementing these semantics can be surprisingly straight-forward,
+given the judicious use of invocation identifiers:
+\begin{describe}
+\item[exactly once:] The invoker repeatedly requests the operation
+(using the same invocation identifier)
+until either a confirmation (result or error) is received
+or a rejection of ``duplicate operation'' is received.
+The performer keeps track of the invocation identifiers of all
+performed operations requested by an entity from an epoch date.
+If the performer finds an invocation identifier being repeated,
+rather than perform the operation,
+it rejects the operation as a ``duplicate operation''.
+
+\item[at least once:] The invoker repeatedly requests the operation
+(with any invocation identifier)
+until a confirmation (result or error) is received.
+The performer has no state information regarding previously used invocation
+identifiers.
+
+\item[at most once:] The invoker requests the operation exactly once with any
+invocation identifier.
+The performer has no state information regarding previously used invocation
+identifiers.
+\end{describe}
+
+\subsection	{Keeping Total Operations Total}
+An operation may be thought of as {\em confirmed\/} when either a result or
+error is returned by the performer.
+However,
+under the OSI framework for remote operations,
+it is possible to have an operation which may only return a result,
+or may only return errors.
+This is a subtle point,
+but one worth emphasizing:
+in the past some operations have been defined which on success do not return
+a result,
+this lead to ambiguity in as much as the invoker could not determine the
+``correct'' time to terminate the association,
+since ``silence'' on the part of the performer could mean that the operation
+completed successfully or that the operation was still in progress and an
+error return might be forthcoming.
+In keeping with the philosophy of total operations,
+it is important to have an operation return a result,
+even if the information is \verb"NULL".
+
+\section	{For Further Reading}
+The first half of \cite{ECMA.ROS} is the most authoritative reference on
+using remote operations.
+In particular, Section~4.4
+presents a simple template methodology for using remote operations.
+As mentioned earlier,
+Section~5 and beyond have been obsoleted by work in ISO and CCITT.
+
+In as much as the standards from these bodies deal with the remote operations
+service and protocol,
+they are not particularly germane here.
+The ISO work on remote operations is presented in
+\cite{ISO.ROS.Service} and \cite{ISO.ROS.Protocol}.
+The corresponding CCITT work is
+described in \cite{CCITT.ROS.Service} and \cite{CCITT.ROS.Protocol}.
+The native interface to these services are discussed in
+Chapter~\ref{librosap} of \volone/.

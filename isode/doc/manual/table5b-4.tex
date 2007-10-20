@@ -1,0 +1,25 @@
+% run this through LaTeX with the appropriate wrapper
+%	SSAP Failure Codes
+
+\normalsize
+\[\begin{tabular}{rp{3.0in}}
+	\multicolumn{2}{c}{\bf Provider-initiated Abort (fatal)}\\
+\tt SC\_SSAPID&		SSAP identifier unknown\\
+\tt SC\_SSUSER&		SS-user not attached to SSAP\\
+\tt SC\_CONGEST&	Congestion at SSAP\\
+\tt SC\_VERSION&	Proposed protocol versions supported\\
+\tt SC\_ADDRESS&	Address unknown\\
+\tt SC\_REFUSED&	Connect request refused on this network connection\\
+\tt SC\_TRANSPORT&	Transport disconnect\\
+\tt SC\_ABORT&		Provider-initiated abort\\
+\tt SC\_PROTOCOL&	Protocol error\\[0.2in]
+	\multicolumn{2}{c}{\bf User-initiated Abort (fatal)}\\
+\tt SC\_NOTSPECIFIED&	Reason not specifed\\
+\tt SC\_CONGESTION&	Temporary congestion\\
+\tt SC\_REJECTED&	Rejected\\[0.2in]
+	\multicolumn{2}{c}{\bf Interface Errors (non-fatal)}\\
+\tt SC\_PARAMETER&	Invalid parameter\\
+\tt SC\_OPERATION&	Invalid operation\\
+\tt SC\_TIMER&		Timer expired\\
+\tt SC\_WAITING&	Indications waiting
+\end{tabular}\]

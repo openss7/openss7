@@ -1,0 +1,76 @@
+.PS
+#.ps 20
+## figure 2
+boxht = boxht/2
+ellipseht = boxht
+movewid = boxwid/4
+##
+ROOT:	circle rad .05i
+	move to ROOT down left
+B1:	box shaded
+	move to B1 down left
+B2:	box shaded
+	move to B2 down left
+B3:	box shaded
+	move to B2 down right
+E1:	ellipse "\xx Alias"
+	move to B1 down right
+B4:	box shaded
+	move to ROOT down right
+B5:	box shaded
+	move to B5 down right
+B6:	box shaded
+	move to B6 down left
+B7:	box shaded
+	move to B6 down right
+B8:	box shaded
+##
+L1:	line from ROOT.s to B1.n
+L2:	line from B1.s to B2.n
+L3:	line from B2.s to B3.n
+L4:	line from B2.s to E1.n
+L5:	line from B1.s to B4.n
+##
+L7:	line from ROOT.s to B5.n
+L8:	line from B5.s to B6.n
+L9:	line from B6.s to B7.n
+L10:	line from B6.s to B8.n
+##
+A1:	line -> from E1.e to B7.w
+##
+##
+boxht = boxht + boxht
+	move to (B3.sw.x - boxwid/2,B3.s.y - moveht - moveht)
+B9:	box width B8.se.x - B3.sw.x + boxwid
+	move to B9 down moveht * 1.5
+B10:	box same
+##
+L11:	line from B8.sw to B9.nw dashed
+L12:	line from B8.se to B9.ne dashed
+##
+M1:	move to B9.sw right boxwid/4 up boxht/6
+M2:	move to B10.sw right boxwid/4 up boxht/3
+##
+boxht = boxht/6 * 4
+B11:	box with .sw at M1
+B12:	box with .sw at (B11.se.x + boxwid/4,B11.se.y)
+B13:	box with .sw at (B12.se.x + boxwid/4,B11.se.y)
+B14:	box with .sw at (B13.se.x + boxwid/4,B11.se.y) invis
+B15:	box with .sw at (B14.se.x + boxwid/4,B11.se.y)
+##
+H1:	circle at B14.w rad .025i
+H2:	circle at B14.c same
+H3:	circle at B14.e same
+##
+L13:	line from B12.sw to B10.nw dashed
+L14:	line from B12.se to B10.ne dashed
+##
+boxht = boxht/2
+B16:	box with .sw at M2 "\xx Type"
+B17:	box with .sw at (B16.se.x + boxwid/2,B16.se.y) "\xx Values"
+##
+B18:	box at (B3.x - boxwid * 2,ROOT.y) "DIT" invis
+B19:	box at (B18.x,B9.y) "Entry" invis
+B20:	box at (B18.x,B10.y) "Attribute" invis
+##
+.PE

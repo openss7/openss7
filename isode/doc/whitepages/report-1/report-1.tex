@@ -1,0 +1,61 @@
+% -*- LaTeX -*-
+
+\input lcustom
+
+\documentstyle[11pt,sfwmac,titlepage]{article}
+
+\advance\textwidth by0.5in
+\advance\oddsidemargin by-0.25in
+\advance\evensidemargin by-0.25in
+
+\makeatletter
+\let\titlep@ge=\titlepage
+\def\titlepage{\titlep@ge \def\thefootnote{\fnsymbol{footnote}}}
+
+\let\endtitlep@ge=\endtitlepage
+\let\endtitlepage=\relax
+
+\let\m@ketitle=\maketitle
+\def\maketitle{\m@ketitle\let\titlepage=\relax\let\endtitlepage=\endtitlep@ge}
+\makeatother
+
+\begin{document}
+
+\title{NYSERNet White Pages Pilot Project:\\ Status Report}
+\author{Marshall T.~Rose\\ NYSERNet, Inc.}
+\date{December 31, 1989\\[0.25in]
+NYSERNet Technical Report \#89--12--31--1}
+\maketitle
+
+\begin{abstract}
+This note summarizes the activities of the first six months of the NYSERNet
+White Pages Pilot Project.
+This pilot is interesting in three respects:
+it is a large, distributed information service involving administration by
+multiple organizations;
+it is the first production-quality field test of the OSI Directory (X.500);
+and,
+it is the first large scale production application of OSI technology on top of
+the popular Internet (TCP/IP) suite of protocols.
+
+\footnotetext[0]{\hskip -2\parindent
+This work was partially supported by the
+U.S.~Defense Advanced Research Projects Agency
+and the Rome Air Development Center of the U.S.~Air Force Systems Command
+under contract number F30602--88--C--0016.
+The content of the information contained herein does not necessarily reflect
+the position or the policy of the U.S.~Government,
+and no official endorsement should be inferred.} 
+\end{abstract}
+
+\newpage\thispagestyle{empty}
+\tableofcontents
+\footnotetext[0]{\hskip -\parindent
+This document (version \versiontag/)
+was \LaTeX set \today\ with \fmtname\ v\fmtversion.}
+
+\input text
+
+\showsummary
+
+\end{document}

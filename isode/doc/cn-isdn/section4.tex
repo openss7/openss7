@@ -1,0 +1,171 @@
+% run this through LaTeX with the appropriate wrapper
+
+\section	{Migration Strategies}
+Let us now consider the larger question of how a migration
+strategy based on the approach we've suggested might be devised.
+In practice,
+successful migration strategies are based on careful planning and a
+step-by-step progression toward the final goal,
+wherein each step consists of changing only one logical portion of the
+environment.
+This tends to isolate the effect of unexpected consequences,
+and also to minimize the degree of ``culture shock'' suffered by users of the
+system.
+In our approach,
+we suggest three phases which are not clearly distinct.
+We imagine all three to be on-going projects in which the first phase enjoys
+the most emphasis initially,
+and as time progresses,
+emphasis shifts to later phases.
+
+An interesting exception to our strategy should be briefly mentioned.
+Although there is little utility in having a host support both the DDN and
+OSI protocols for virtual terminal applications or file transfer applications,
+the store-and-forward nature of electronic mail suggests that a gateway
+between MHS and DDN mail is essential during a transition period.
+Fortunately,
+work is proceeding in this area along a separate line
+(interested readers should consult \cite{ARPA.MHS}).
+
+Finally,
+note that an underlying assumption of our migration strategy,
+is that any new hosts introduced into our internet must support TCP/IP
+until the end of the final phase.
+Although it is preferable that these hosts also support the OSI protocol suite,
+this is not mandatory.
+
+\subsection	{Phase One: Development Environment for OSI Applications}
+Phase one of our migration strategy has the goal of building an OSI
+application development environment on a DDN foundation.
+Our intention is then to build OSI applications and gain experience using them,
+and to do so within the robust and mature DDN network community.
+
+To accomplish this,
+we make use of the OSI TSAP on top of the TCP.
+We will also need
+implementations of the OSI session layer\cite{ISO.SP.Protocol,ISO.SP.Service},
+and the OSI presentation layer\cite{ISO.PP.Syntax,ISO.PP.Encoding},
+and the common Application Service Elements Kernel
+(CASE)\cite{ISO.CASE.Service}.
+During the integration of this software,
+it will be important to track the work currently being done in the area
+of programming language interfaces,
+in order to utilize these applications in later phases.
+
+Finally,
+as new applications are developed during this phase,
+we will also need to develop user agents.
+As an application and its corresponding user agent software is brought
+on-line,
+users of applications in the DDN protocol suite will be encouraged to try the
+new OSI equivalents instead.
+Although progress will be slow at first,
+this has several advantages:
+first, it helps prepare users for the final phase,
+in which only OSI applications are available;
+second, it allows us to make use of the vast wealth of application and user
+experience to be found in the many existing communities that use the DDN
+protocol suite.
+
+Of course,
+there is an important side-effect that this phase introduces:
+properly designed user-interfaces for network services
+(e.g., file transfer) should be able to distinguish between the DDN and OSI
+services which could be offered by the remote host.
+For example,
+a user-interface to a file transfer facility,
+could select either an FTAM or FTP client,
+depending on the protocols supported by the service host.
+In either case,
+a TCP/IP underpinning is used to support these services,
+and the user is naive with respect to the actual application protocols used.
+
+\subsection	{Phase Two: Experiment with Migration Engines}
+Phase two of our migration strategy consists of putting in the field several
+computers which have both the DDN and the OSI protocol suites implemented in
+them.
+We term these hosts {\em migration engines}.%
+\footnote{Readers should not be misled by the use of this colorful term.
+A migration engine is simply any host having both the DDN and OSI protocol
+suites resident.
+In many cases,
+installing additional software in the host operating system is sufficient to
+meet this criterion.}
+Although it is tempting to consider these migration engines as potential
+gateways, particularly application gateways,
+between the DDN and OSI protocol suites,
+considering the many reasons previously discussed,
+this is highly undesirable.
+Rather,
+we use these migration engines to test whether the applications developed in
+our DDN-style environment will function correctly in an OSI-style environment.
+
+Of course,
+once a migration engine is in place,
+it allows us to experiment with performing gatewaying at the internet layer
+(e.g., as suggested by \cite{TCP.convert.ISO}).
+This has the potential of permitting additional connectivity between networks
+using the DDN protocols and those using the OSI protocols.
+Although this will not achieve interoperability between the DDN and OSI
+applications (as was discussed in the previous section),
+it does achieve interoperability between OSI applications running in DDN-style
+networks and OSI-style networks.
+
+Initially,
+the number of migration engines available from different vendors
+will be rather small, and the implementations of the OSI protocols on them
+will be immature and most likely inefficient.
+This is to be expected.
+As the expertise with the technology is gained,
+we can expect these deficiencies to be lessened.
+As the OSI implementations improve,
+more and more OSI applications developed in phase one can be migrated.
+
+\subsection	{Phase Three: Deploy Migration Engines}
+Phase three of our migration strategy consists of an upgrade or replacement
+of existing computers with hosts speaking both protocol suites.
+Once we find that vendors are able to supply OSI capability with robust and
+mature characteristics,
+then we can begin to field the migration engines throughout our DDN-style
+network.
+During phase three,
+the majority of users will employ user agents for OSI instead of DDN
+applications,
+since all hosts will be supporting the OSI user agents
+(even those which only support the DDN protocol suite).
+
+Finally,
+at the end of phase three,
+the ratio of hosts speaking only the DDN protocol suite to hosts speaking at
+least the OSI protocol suite will be very low,
+and the requirement that hosts speak the DDN protocol suite can be lifted.
+It is critical to a smooth transition however,
+that this requirement not be lifted prematurely.
+Recall that,
+given the wide range of OSI applications now implemented
+and the availability of the software developed during phase one,
+it will be relatively inexpensive to maintain support of the DDN protocol
+suite.
+
+\subsection	{Work To Date}
+We have implemented an ISO Development Environment (ISODE) at the Northrop
+Research and Technology Center.
+The version~1.0 distribution was released in September, {\oldstyle 1986}.
+Although ISODE is not proprietary,
+it was not placed in the public domain in order to include a ``hold
+harmless'' clause in the release.
+However, for all intents and purposes, the release is openly available.
+
+ISODE currently runs on native Berkeley 4.2~\unix/,
+and on AT\&T SVR2~\unix/ with an Excelan \exos/ card
+(a board-level that implements the TCP).
+Current modules in the release include the TSAP described in the previous
+section, an OSI Basic Combined Subset (BCS) session,
+an ASN.1 encoding mechansism,
+a parser which takes an ASN.1 specification and produces a program fragment
+which recognizes the corresponding APDUs,
+and an implementation of the ECMA Remote Operations Services
+(ROS)\cite{ECMA.ROS}.
+
+For information on receiving a copy of the ISODE distribution,
+consult Appendix~\ref{distribution}.

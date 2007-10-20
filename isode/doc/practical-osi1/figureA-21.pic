@@ -1,0 +1,64 @@
+.PS
+.ps 20
+## figure A-21
+
+boxwid	= 2*boxwid
+
+B1:	box "manager"
+B2:	box with .n at (B1.s.x,B1.s.y-boxht) width 1.5*boxwid height 6*boxht
+B3:	box "CMISE" \
+	    with .n at (B2.n.x,B2.n.y-(boxht/3)) width 1.25*boxwid height 1.5*boxht
+B4:	box "presentation" with .sw at B2.sw width 1.5*boxwid
+B5:	box "acse" with .e at (B3.e.x,B4.ne.y+(B3.se.y-B4.ne.y)/3) \
+	    width .5*boxwid height .75*boxht
+B6:	box invis "$\ldots$" with .nw at B2.sw width 1.5*boxwid
+B7:	box "rose" with .e at (B5.n.x,B3.sw.y-(B3.sw.y-B4.nw.y)/3) \
+	    width .75*boxwid height .75*boxht
+##
+L1:	line <-> from (B1.sw.x-(B1.sw.x-B1.s.x)/2,B1.s.y) \
+	           to (B1.sw.x-(B1.sw.x-B1.s.x)/2,B3.n.y)
+L2:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B1.s.y) \
+	           to (B1.se.x-(B1.se.x-B1.s.x)/2,B3.n.y)
+L3:	line <-> from (B1.sw.x-(B1.sw.x-B1.s.x)/2,B3.s.y) \
+	          to (B1.sw.x-(B1.sw.x-B1.s.x)/2,B7.n.y)
+L4:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B3.s.y) \
+	          to (B1.se.x-(B1.se.x-B1.s.x)/2,B7.n.y)
+L5:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B5.s.y) \
+	          to (B1.se.x-(B1.se.x-B1.s.x)/2,B4.n.y)
+L6:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B7.s.y) \
+	          to (B1.se.x-(B1.se.x-B1.s.x)/2,B5.n.y)
+L7:	line <-> from (B1.sw.x-(B1.sw.x-B1.s.x)/2,B7.s.y) \
+	          to (B1.sw.x-(B1.sw.x-B1.s.x)/2,B4.n.y)
+##
+B11:	box invis with .nw at (B1.ne.x+boxwid,B1.ne.y) width 3.75*boxwid
+B12:	box with .nw at (B11.sw.x,B11.s.y-boxht) width 1.5*boxwid height 6*boxht
+B13:	box "CMISE" \
+	    with .n at (B12.n.x,B12.n.y-(boxht/3)) width 1.25*boxwid height 1.5*boxht
+B14:	box "presentation" with .sw at B12.sw width 1.5*boxwid
+B15:	box "acse" with .e at (B13.e.x,B14.ne.y+(B13.se.y-B14.ne.y)/3) \
+	    width .5*boxwid height .75*boxht
+B16:	box invis "$\ldots$" with .nw at B12.sw width 1.5*boxwid
+B17:	box "rose" with .e at (B15.n.x,B13.sw.y-(B13.sw.y-B14.nw.y)/3) \
+	    width .75*boxwid height .75*boxht
+B10:	box invis with .nw at (B1.nw.x+(B12.nw.x-B2.nw.x),B1.nw.y)
+##
+L13:	line <-> from (B10.sw.x-(B10.sw.x-B10.s.x)/2,B13.s.y) \
+	          to (B10.sw.x-(B10.sw.x-B10.s.x)/2,B17.n.y)
+L14:	line <-> from (B10.se.x-(B10.se.x-B10.s.x)/2,B13.s.y) \
+	          to (B10.se.x-(B10.se.x-B10.s.x)/2,B17.n.y)
+L15:	line <-> from (B10.se.x-(B10.se.x-B10.s.x)/2,B15.s.y) \
+	          to (B10.se.x-(B10.se.x-B10.s.x)/2,B14.n.y)
+L16:	line <-> from (B10.se.x-(B10.se.x-B10.s.x)/2,B17.s.y) \
+	          to (B10.se.x-(B10.se.x-B10.s.x)/2,B15.n.y)
+L17:	line <-> from (B10.sw.x-(B10.sw.x-B10.s.x)/2,B17.s.y) \
+	          to (B10.sw.x-(B10.sw.x-B10.s.x)/2,B14.n.y)
+##
+B22:	box "MIB" with .ne at (B11.se.x,B11.s.y-boxht) width 1.5*boxwid height 6*boxht
+##
+L30:	line <-> dashed from B3.e to B13.w "CMIP" ""
+L31:	line <-> dashed from (B12.e.x,B13.n.y) to (B22.w.x,B13.n.y)
+L32:	line <-> dashed from (B12.e.x,B13.s.y) to (B22.w.x,B13.s.y)
+L33:	line <-> dashed from (B12.e.x,B14.n.y - boxht/6) to (B22.w.x,B14.n.y - boxht/6)
+L34:	line <-> dashed from (B12.e.x,B14.s.y + boxht/6) to (B22.w.x,B14.s.y + boxht/6)
+##
+.PE

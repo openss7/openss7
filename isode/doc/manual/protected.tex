@@ -1,0 +1,11 @@
+\File{protected.py},{07:58},{Nov 27 1989}
+\L{\LB{\Proc{ProtectedPassword}ProtectedPassword ::=}}
+\L{\LB{        \K{SEQUENCE} \{}}
+\L{\LB{        algorithm [0] AlgorithmIdentifier \K{OPTIONAL},}}
+\L{\LB{        salt [1] \K{SET} \{}}
+\L{\LB{                time1 [0] UTCTime \K{OPTIONAL},}}
+\L{\LB{                time2 [1] UTCTime \K{OPTIONAL},}}
+\L{\LB{                random1 [2] \K{BIT} \K{STRING} \K{OPTIONAL},}}
+\L{\LB{                random2 [3] \K{BIT} \K{STRING} \K{OPTIONAL}\}}}
+\L{\LB{                \K{OPTIONAL},}}
+\L{\LB{        password [2] \K{OCTET} \K{STRING}\}}}

@@ -1,0 +1,45 @@
+Dvi2ps is program the translates DVI files to PostScript (PostScript is a
+trademark of Adobe Systems, Inc).  When the output of dvi2ps is preceded by
+about 2 pages of PostScript code, TeX output can be printed on PostScript
+devices (such as an Apple LaserWriter).
+
+It uses the TeX-compatible set of 300 dpi fonts, and downloads the bitmap
+description of each character, once, as it is needed, for every job (i.e., 
+resident fonts  are not used).  While this sounds expensive, it is not too 
+bad.  After the conversion to PostScript is done, and considering "normal 
+documents" and 9600 baud communication, the first page can take a minute or 
+so to transmit and print.  Thereafter, pages are usually printed faster.
+Simple documents of 20 & 30 pages have printed at an overall average of
+3.2 pages/minute (it is unlikely that you will ever get substantially 
+higher than this with the program as it currently stands).  More typical
+rates will be 2.5 pages/min.  Conversion time is extra, of course, but
+does not seem to be excessive.
+
+Dvi2ps currently runs on Apollo (AEGIS) and Vax 4.2BSD machines (and shortly
+Macintosh XL with MacWorks).
+
+There are many problems:
+
+  1. It is not very clever about which fonts and characters to download on
+     a per-job basis, except that each character is sent only once, just before
+     it is needed.  All character and fonts are then made resident on the printer
+     until the end of the job.  This consumes more memory on the printer (at least 
+     on the Apple LaserWriter) than is necessary, and can limit the size of the
+     job than can be printed.  "Simple" 50 page documents can be printed
+     with room to spare (I suspect the limit is in the range of 70-100 pages for
+     these, but we haven't tried any that large yet).  On the other hand,
+     a section out of the LaTeX test files (manual) that uses 30 or more
+     different fonts, some of them very large, was limited to 30 pages.
+     Dvi2ps has -from and -to options to extract ranges of pages.
+
+  2. The resulting PostScript files are very large (they can easily be 5 times
+     the size of the DVI file).
+
+  3. Character positioning is not calculated in the "official" dvitype manner,
+     and so there *might* be *VERY* small anomolies.  However, care is taken,
+     and the result is quite acceptable (at least to many untrained eyes).
+     In fact, positioning is better than some other common processors, and
+     no anomolies have as yet been noticed.
+
+In summary, it was quite easy to develop and will serve us well until something
+better comes along.

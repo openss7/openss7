@@ -1,0 +1,265 @@
+.TH DVI2PS L 11/21/85
+.SH NAME
+dvi2ps \- convert a DVI file to PostScript
+(PostScript is a trademark of Adobe Systems, Inc).
+.SH SYNOPSIS
+.in +.5i
+.ti -.5i
+.B dvi2ps
+[-a
+.IR fontpath ]
+[-b
+.IR prefix ]
+[-d] [-f
+.IR n ]
+[-h] [-i
+.IR file ]
+[-m
+.IR n ]
+[-n
+.IR n ]
+[-o
+.IR fmt ]
+[-p] [-q] [-r] [-s] [-t
+.IR n ]
+[-z
+.IR increment ]
+dvifile[.dvi]
+.in -.5i
+.SH DESCRIPTION
+This program converts a DVI file to PostScript, and writes the result
+to standard output.
+The result requires a small amount of PostScript
+source to precede it to the printer, before it can be successfully printed.
+(By default, that PostScript code is prepended to the output).
+Note that the argument-key letters can be in  either case.
+.SH ARGUMENTS
+.TP
+.BI \-a \ fontpath
+specify a different area for font files.
+Specifying this causes the directories in
+.I fontpath
+to be searched for all font files, instead of the default directory.
+This will override the TEXFONTS environment variable, if it exists.
+Unless USEPXL has been defined, the default is to use gf files
+rather than pxl files.
+.TP
+.BI \-b \ prefix
+generate multiple output files in the current directory using
+the named prefix.
+Each file will contain consecutive pages from the input.
+This allows very large TeX jobs to be easily spooled to a
+PostScript device.
+(See also the \fB\-z\fR switch.)
+.TP
+.B \-d
+select debugging output (you probably don't want to).
+.TP
+.BI \-f \ n
+specify a starting page number.
+(this is a TeX page number -- \\count0).
+.TP
+.B \-h
+do not copy the standard header file.
+This option prevents the standard PostScript header file being
+prepended to the output.
+.TP
+.BI \-i \ file
+copy the named file to the output
+The contents of the file named will be copied to the output
+after the standard header file (if any) has been copied.
+.TP
+.BI \-m x
+where
+.I x
+is one of 0,h,1,2,3,4
+specifies a magstep to use to print the document.
+This overrides whatever might be in the DVI file.
+.TP
+.BI \-m \ n
+specify a magnification to use to print the document.
+This should probably be one of the magic numbers
+1000, 1095, 1200, 1440, 1728, but no checking is done.
+Note: if your site does not have the
+complete set of 300 dpi fonts, this option might be disabled.
+.TP
+.BI \-n \ n
+specify the number of copies to print
+.TP
+.BI \-o \ fmt
+specify a printing format.
+Valid options are
+.I letter,
+.I note,
+.I legal,
+.I landscape
+and
+.I manualfeed
+This argument may be repeated several times.
+.TP
+.B \-p
+do not preload font information.
+Occasionally there may be insufficent memory to hold the
+information about all of the fonts in the system.
+Portions of the document may be converted by including the -p option
+on the command line.
+This will prevent the preloading of
+fonts into the system and instead use demand loading of
+the font tables. 
+It will also cause the printing of pages in normal (unreversed)
+order.
+.TP
+.B \-q
+be quiet.
+Don't chatter about pages converted, etc.
+.TP         
+.B \-r
+stack pages in forward order.  
+Normally, the DVI pages are processed in reverse order, with the
+result that they are stacked in the correct order in the output
+tray.
+This option inverts that.
+.TP
+.B \-s
+turn on printing of statistics.
+Some versions of dvi2ps will optionally print statistics about
+font usage and some other information that is generally only 
+interesting to developers.
+On these systems,
+.B \-s
+turns on the statistics printing.
+.TP
+.BI \-t \ n
+specify an ending page number.
+.TP
+.B \-w
+Don't print out warnings.
+.TP
+.BI \-z \ increment
+defines the maximum number of pages to occur in an output file.
+This switch is interpreted only if the \fB\-b\fR option is also given.
+The default increment is 12 pages.
+For jobs using large fonts (e.g., SLiTeX jobs),
+it may be necessary to change the increment to 8 or 10 pages.
+.SH NOTES
+This is a `bare bones' DVI-to-PostScript program.
+Minimal error checking is done.
+.PP
+Not all fonts are available in the resolution needed to display on the 
+laser printer;
+when a missing font is encountered,
+.I dvi2ps
+will continue 
+to process your dvi file, and and will log a warning message.
+Gaps will appear in the document where the missing characters should have been.
+.PP
+It can take up to 60 seconds for the first page to be output.
+After a head of steam has been built up, it can roll along at 5-10 seconds
+per page.
+.PP
+.B TeX
+.I \\\\special
+.B command:
+.sp
+This program supports use of the
+.B \\\\special
+command in TeX to include
+special PostScript code for graphics, etc.
+Specifying
+.B \\\\special{psfile=foo.ps}
+in the TeX source will result in the contents
+of file
+.I foo.ps
+(assumed to contain PostScript code) being copied 
+into the output at that point.
+For most included graphics, the
+users (0,0) point will be set to the point of the \\special command
+with x and y coordinates increasing up and to the right and in units
+of PostScript points (72/inch) -- thus you must explicitly leave space
+above the \\special command for most graphics.
+For graphics produced by 
+Apple Macintoshes (i.e., MacDraw, MacPaint, etc.), the top left corner of 
+the drawing will be at the point of the \\special command; in this case you 
+must leave the required space below the \\special.
+.PP
+The \\special string can contain any number of the following 
+.I keyword=value
+pairs, seperated by blanks:
+.sp
+.nf
+.na
+Keyword		Value Type
+-------		----------
+psfile		string	- specifies a PostScript file to include
+hsize		dimension	- specifies maximum horizontal size (for clipping)
+vsize		dimension	- specifies maximum vertical size (for clipping)
+hoffset		dimension	- specifies amount to shift right
+voffset		dimension	- specifies amount to shift up (or down, for MacDrwgs)
+hscale		number	- specifies a scale factor in x-dimension
+vscale		number	- specifies a scale factor in y-dimension
+.fi
+.ad
+.sp
+.ce
+dimensions are given in PostScript points (72 per inch).
+.sp
+THUS:
+.sp
+.ce
+\\special{psfile=foo.ps hoffset=72 hscale=0.9 vscale=0.9}
+.sp
+will shift the graphics produced by file
+.I foo.ps
+right by 1 inch, and will draw it at 0.9 normal size.
+.PP
+hsize and vsize are given relative to the (0,0) point of the drawing
+and are unaffected by offsets and scales.
+.PP
+offsets are given relative to the point of the \\special command,
+and are unaffected by scales.
+.PP
+If Macintosh drawings are to be included, the proper LaserPrep file
+must be downloaded to the printer, either permanently or as another
+header file in addition to the standard "tex.ps" header file.
+.SH FILES
+.TP 2.5i
+*.dvi
+TeX DeVice Independent output file
+.TP 2.5i
+/usr/lib/tex/fonts/*.{pxl,gf}
+TeX default font rasters
+.TP 2.5i
+/usr/lib/tex/tex.ps
+PostScript support code.
+.SH SEE ALSO
+tex
+.SH BUGS
+Probably too numerous to mention.
+.PP
+There is likely a limit to the size of documents that can be printed (at 
+least, on the Apple LaserWriter).
+If you get VMerrors reported when printing, use the
+.I -f
+and
+.I -t
+options, to select a range of pages.
+The exact limit is unknown, but is probably well in excess of 50 pages
+for "normal" documents, decreasing with number of different fonts used,
+size of fonts, etc.
+Alternately,
+just use the
+.I -b
+and
+.I -z
+options to have the program automatically generate multiple PostScript files.
+.PP
+If the Mac LaserPrep file has been loaded, offsets, sizes and scales
+in \\special{} will not work properly for non-Macintosh graphics (don't ask).
+.SH AUTHOR(s)
+Mark Senn wrote the early versions of this program for the
+BBN BitGraph.
+Stephan Bechtolsheim, Bob Brown, Richard
+Furuta, James Schaad and Robert Wells improved it.
+Norm Hutchinson ported the program to the Sun.
+Neal Holtz ported
+it to the Apollo, and then to produce PostScript.

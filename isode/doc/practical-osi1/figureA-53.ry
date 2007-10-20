@@ -1,0 +1,6 @@
+noSuchObject ERROR
+	PARAMETER NoSuchObject
+	::= 1
+
+NoSuchObject ::=
+	OBJECT IDENTIFIER

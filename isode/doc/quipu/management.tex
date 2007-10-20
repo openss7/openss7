@@ -1,0 +1,507 @@
+
+\chapter {Management}
+\section {Introduction}
+
+Perhaps the most significant change between QUIPU 5.0 and QUIPU 6.0 will be
+the addition of the management facilities described in this chapter.  Whilst
+most of the things specified here can be achieved in QUIPU 5.0, much needs to
+be done by direct editing of the EDB files.  It is expected to be able to
+move to a very high level of remote management in the next version.  Except
+where stated, this chapter applies to QUIPU 6.0.
+
+Most of the focus in this section is in management of the directory itself.
+However, there is also discussion of some issues relating to management of
+user data.
+
+
+\section {DUA Configuration}
+
+\label {dua-mgt}
+
+Most of the issues of DUA management are those of standard software
+installation, and beyond the scope of this document.  The use of a Directory
+for software management might be an interesting research issue.   
+We assume conventional installation practices.  
+
+In this section, we consider a DUA to be a system accessing the directory
+using the DAP, which may or may not have a name registered in the directory.
+The only information which a DUA needs is a list of DSAs to contact, in
+order to ``get into the system''.  This can be done by use of a system wide
+file, which may be overridden by the DUA.  This file must be updated
+manually at present.
+
+A problem with this is that DSAs move, and there is no way to keep the DUA
+configuration up to date.  It is assumed that each host supporting DUAs has
+the concept of ``site'', which is a name (e.g.,
+``@Country=GB@Organisation=University College London''), and that each host
+has a local name (e.g., ``pyr1.cs.ucl.ac.uk'').  This is mapped onto an
+entry in the directory with an attribute in the entry, giving a list of appropriate DSAs (typically 2-3, to
+give redundancy).  A process is provided which runs on the machine and
+updates the default address list (file) at intervals.  By automatically
+installing defaults which point to ``well known'' DSAs, the initial manual
+step can be avoided.  This leads to the following DUA installation procedure:
+
+\begin {enumerate}
+\item Bootstrap  by use of default ``well known'' DSAs
+\item Define Default Site 
+\item Register Site and Machines in Directory, including list of default
+DSAs.   This may well require installation of local DSAs as a pre-requisite.
+\item Run DUA default update program at intervals
+\end {enumerate}
+
+
+DUAs overriding the host defaults should take analogous precautions to
+ensure information is up to date.  Explicit storing of presentation
+addresses, other than in a cache, is deprecated.
+
+\section {DSA Management}
+
+The basic level of management is of a single DSA.  This section discussed
+procedures for dealing with a single DSA.  Installation of a single DSA
+affects multiple DSAs, and is discussed in Section~\ref{add-dsa}.
+
+\subsection {DSA Static Configuration}
+
+There are tools to view the the configuration of a single DSA.  These are
+provided by DISH scripts (QUIPU 6.0).
+Dish is described in the QUIPU Manual \cite{QUIPU.Manual}.
+First there is an overall summary, which includes.
+
+\begin {itemize}
+\item Software version
+\item List of EDBs held 
+\item Address
+\end {itemize}
+
+Then for each EDB, the following information may be obtained:
+
+\begin {itemize}
+\item Version number
+\item Master / Slave / Cache
+\item Number of Entries
+\item Volume of Data
+\item All RDNs 
+\item All data
+\end {itemize}
+
+There will be a tool to list the tree (name only) for all the information
+held in a DSA.   
+
+\subsection {DSA Dynamic Configuration}
+
+There is a need to determine the operational state of a given DSA.  This
+will be done either by use of a QUIPU specific operation or by reading
+pseudo-attributes.  It will include information on:
+
+\begin {itemize}
+\item  Listens available
+\item  Calls open
+\item  Queries in progress
+\end {itemize}
+
+To be defined.  
+
+\subsection {DSA Control}
+\label {dsa-control}
+
+There is a need to control the operation of a DSA.  Rather than invent
+protocol, which would restrict operations to QUIPU DUAs, we utilise a special
+attribute stored in the DSAs own EDB (``DSAControl'').  This (virtual) attribute is only
+writable by the DSA Manager, and is not readable.   Values written into it
+control operation of the DSA.  These are described fully in the QUIPU Manual.
+The operations include:
+
+\begin {itemize}
+\item Lock the DSA (to prevent updates).
+\item Alter the logging level (globally, or on a the current association).
+This is primarily for debugging.
+\item Reread EDBs from disk.
+\item Refresh: reread DSA parameters, and adapt to any changes.  This operation is
+used when changing the Directory Configuration.
+\item Stop DSA (cause process to exit)
+\end {itemize}
+
+
+QUIPU 6.0 will add the functionality to control specific EDBs stored in a
+DSA.
+
+
+\subsection {Consistency Checks}
+
+The following consistency checks should be carried out by a DSA.
+Some are applied at DSA startup.  Others are costly, and so should be
+applied at intervals using special tools.
+The following checks should be made:
+
+\begin {enumerate}
+\item Spurious (Unix) directories in the database
+\item Extra attribute files
+
+\item For all master non-leaf entries:
+\begin {itemize}
+\item
+Check that the master and slave DSAs
+referenced (EDB Info) have copies of the implied EDB.
+\item Check that referenced DSAs are accessible (directly or indirectly).
+This might be expensive, and so not be undertaken too often.
+\end {itemize}
+
+
+\item For the DSAs own EDB Info (master and slave), as determined from the
+DSAs own entry:
+\begin {itemize}
+\item
+check that the EDB files
+are present (should happen at boot time)
+\item Check that from and to DSAs and correctly listed (they exist, have the
+implied EDB, and the distance is acceptable)
+\end {itemize}
+
+Note that the introduction of replication by subtree may well have an effect
+on this.
+
+\item Check that all file attributes referenced in each EDB  are present
+
+
+\end {enumerate}
+
+\section {Configuration Inspection}
+
+It will be important to have tools to enable viewing of the overall
+Directory Configuration.  These will be provided by the use of DISH scripts.
+The basic function should operate at an EDB level, and for an EDB should be
+able to provide:
+
+\begin {itemize}
+\item Master DSA
+\item Registered Slave DSAs
+\item Unregistered Slave DSAs
+\item Propagation tree 
+\item References to non-QUIPU DSAs
+\item Spot shadow information 
+\item List of child EDBs (a basis for recursive operation)
+\end {itemize}
+
+This is non-trivial.
+
+
+\section {Configuration Changes}
+
+\subsection {General Approach}
+
+This section describes how the directory is manipulated to give a coherent
+configuration.   There are some general principles:
+
+\begin {itemize}
+\item  As much as possible is done by use of standard directory operations.
+\item These operations are for DSA managers, and not naiive users.  Access
+Control needs to be set up appropriately.
+\end {itemize}
+
+Many of these operations will be provided by use of DISH scripts, giving
+manual directions where external action must be taken (e.g., loading
+software).   
+
+Operations will often affect multiple DSAs.  The tools will be designed so
+that if later operations fail, earlier ones will be unrolled.  There is
+clearly some potential for getting the overall system into an incoherent
+state.  At this point the tool will complain loudly, and expect intelligent
+intervention.   
+
+\subsection {Add DSA}
+\label {add-dsa}
+
+Adding a new DSA proceeds in the following manner:
+
+\begin {enumerate}
+\item Install software at OSI location.  No tailoring should be needed,
+other than that in the software configuration.
+Installation will include:
+\begin {itemize}
+\item All of the relevant DSA binaries 
+\item A default DSA tailor file, which will include pointers to ``well
+known'' DSAs.
+\item A base directory for the database, owned by an appropriate uid.
+\end {itemize}
+
+\item Add DSA entry to the global directory (using a DUA pointed at an
+existing DSA).
+\label{global-step}
+
+\item Boot new DSA.
+\item Add local DSA information (over DAP).
+\item Refresh DSA (see Section~\ref{dsa-control}).
+\end {enumerate}
+
+For testing purposes, step \ref{global-step} may be replaced by adding an
+EDB which gives the DSA a dummy name stored locally.  This will enable a DSA
+to be tested in isolation from the rest of the directory.
+
+\subsection {Remove DSA}
+
+\begin {enumerate}
+\item Needs name of DSA
+\item Ensure no EDBs held by DSA
+\item Turn off DSA
+\item Remove DSA entry
+\item Remove software
+\end {enumerate}
+
+
+\subsection {Modify DSA info}
+
+Most DSA information can be changed as an aspect of local configuration.
+The name of a DSA cannot be changed externally.  It is necessary to remove
+one DSA and then recreate a new one (or vice versa).  In practice, the tools
+for DSA creation and EDB manipulation will make this straightforward.  
+
+Moving the OSI location of a DSA is straightforward, as the naming rules will
+ensure that this propagates without deadlock.  DUAs will adapt to the change
+by use of backup DSAs (which must not be moved at the same time) and the
+techniques described in Section~\ref{dua-mgt}.
+This will cause some level of disruption, and so OSI location changes should be
+avoided as far as possible.
+
+Note that the presentation address of a DSA is stored in two entries, and
+that both must be modified.
+
+\subsection {Add new EDB}
+
+AddEntry will only work if the appropriate EDB is in place (although subtree
+propagation might enable a sensible defaulting mechanism to be achieved).   
+AddEntry should not create EDBs, as this affects multiple DSAs, and a failure
+could leave the directory in an inconsistent state.  This also gives
+management control over the addition of new layers into the DIT.
+The following steps are followed by the EDB creation tool.
+
+\begin {enumerate}
+\item Need to specify Name of EDB and Master DSA
+\item Check the EDB of parent exists
+\item Add EDB info to DSA entry of the master DSA
+\item Add master pointer in parent Entry
+\item Refresh master DSA, which will cause EDB file to be created
+\end {enumerate}
+
+
+\subsection {Add EDB copy}
+
+Usually, an EDB will be given a number of slave copies.
+
+\begin {enumerate}
+\item Needs name of EDB, slave DSA, update mechanism, and whether EDB will be visible
+\item Add EDB info to slave DSA
+\item Modify EDB Info of DSA sending update (often, but not necessarily the
+master)
+\item Refresh slave DSA and DSA sending update
+\item Optionally add slave pointer to entry.  Every EDB will be given a
+small number of ``visible'' copies.  EDBs high in the tree will often have
+many private copies.   
+
+\end {enumerate}
+
+\subsection {Remove EDB copy}
+
+An EDB copy is removed as follows:
+
+\begin {enumerate}
+\item Needs name of EDB and DSA name
+\item Ensure no copies being sent from this DSA
+\item Modify EDB Info of sending DSA
+\item Modify pointer in Entry (if needed)
+\item Remove EDB Info from DSA
+\item Refresh DSA
+
+\end {enumerate}
+
+\subsection {Remove EDB}
+
+After removing all copies, a master EDB is removed as follows:
+
+\begin {enumerate}
+\item Ensure no copies being sent from the DSA
+\item Ensure that EDB has no remaining entries (might optionally
+remove all such entries)
+\item Remove pointer in entry
+\item Remove EDB from DSA
+\item Get DSA to refresh (or wait for reboot)
+\end {enumerate}
+
+\subsection {Change EDB Master}
+
+It is sometimes necessary to change a master or EDB propagation path, and
+their should be tools to facilitate this.
+
+The propagation path can be viewed as a tree.  The basic tool acts like the
+unix mv command.  It works as follows:
+
+\begin {enumerate}
+\item Needs the EDB/DSA pair being moved, and name of new feed DSA
+\item If incremental update is used, remove item from old feed DSA
+\item Optionally remove DSA from getEDB list of old feed DSA
+\item Change source in DSA
+\item If incremental update is used, add item to new feed DSA
+\item Optionally add DSA to getEDB list of new feed DSA
+\item Optionally modify the associated entry list of slaves
+\item Extra twiddles if moving a parent to a child
+\end {enumerate}
+
+Changing the master is a special case of this.  In addition:
+\begin {itemize}
+\item The EDB entry must be updated to reflect change of master
+\item The new master must not
+\end {itemize}
+
+
+\subsection {References}
+
+Facilities will be provided to establish, update, and remove references to
+non-QUIPU DSAs.
+
+\subsection {Spot Shadows}
+
+Facilities will be provided to establish, update, and remove spot shadows.
+
+\section {Bootstrap}
+
+The only thing {\em not} automated is installation of the software, and
+setup of tsapd info (for non-QUIPU OSI software).  The former might be
+tractable by use of QUIPU, but is not considered here.  
+
+For the latter, tsapd might contact the Directory dynamically (probably at
+start time) or a special tool might down load the isoservices file from the
+directory.   It is almost certainly worth doing one of these.
+
+\section {Authorisation}
+
+QUIPU 6.0 will tackle authorisation of access.  The following will be
+considered:
+
+\begin {enumerate}
+\item Who can connect
+\begin {itemize}
+\item DSA and DUA rights
+\item Specification by entry/subtree/filter
+\end {itemize}
+
+\item Which networks the authorised entity is allowed access to
+
+\item Level of access (authentication policy variations)
+
+\end {enumerate}
+
+
+\section {User Data Management}
+
+QUIPU 6.0 will provide additional facilities for checking data stored in the
+directory.
+
+\subsection {Aliases}
+
+A special interface is provided for managing aliases (built on DISH).
+This has two functions, achieved as described.
+
+\begin {itemize}
+\item 
+
+Add alias:
+\begin {enumerate}
+\item Check if object pointed to exists and is not an alias
+\item Add the alias
+\end {enumerate}
+
+Delete alias:
+\begin {enumerate}
+\item Simply remove the entry.
+\end {enumerate}
+
+\end {itemize}
+
+
+
+\subsection {Externally mastered data}
+
+It is important to recognise that in most early uses of the the directory,
+much data will be downloaded from external sources of data.  This needs to
+deal with:
+
+\begin {itemize}
+\item There will be multiple external sources, and user modification of data
+in the {\em same} entry
+\item Different sources will have different names for the same object
+\item There must be a mechanism to delete old entries.  This needs to cope
+with multiple sources.
+\end {itemize}
+
+The approach taken here, is intended to overcome some of the deficiencies
+found with earlier bulk loading techniques.
+
+
+A basic rule is: Each source of data views a single object to have one
+unique name;  This unique name is stored as a value of an attribute in an
+entry in the context of a Distinguished Name (e.g., ``Steve Kille'' in the
+context of ``@Country=GB@Organisation=University College London='').
+
+This rule will facilitate unique merging from multiple sources.  Tools (DISH
+scripts) will be provided to facilitate this merging.  It is assumed that
+such scripts will be adapted to local data.  
+
+The following two tools are expected:
+
+\begin {enumerate}
+\item Given a list of values relative to a DN:
+\begin {itemize}
+\item If there is is an exact match to a single entry, do nothing.
+\item If there is a unique approximate match, add in the value given as an
+alternate value (typically of the common name).  Log this match (for 
+possible human verification).
+\item If there is no approximate match, create an entry.  Use the value as
+the distinguished name.  Other parameters should be a set of supplied
+defaults.  Optionally allocate a randomly generated password.
+\item If there are multiple approximate matches, or an exact match to
+multiple entries, break for human intervention
+to disambiguate.
+\item  Optionally, delete any children of the DN not identified.
+\end {itemize}
+This tool gives a general facility for namespace management.
+
+\item Given an RDN {\em or} unique value relative to a DN, merge in
+specified attributes.  This can be used to merge in partial data from many
+sources, having used the previous tool to control the namespace.
+
+\end {enumerate}
+
+
+
+
+\subsection {Consistency Checking}
+
+Tools to check the data stored will include:
+
+\begin {itemize}
+\item Presence of attributes
+\item Syntax checking
+\item Old entries
+\item Misc (e.g., searching for swear words)
+\end {itemize}
+
+
+\subsection {Changing Names and Arboriculture}
+
+It is useful to be able to change non-leaf names, and to move around
+portions of the DIT.  This is rather easy to do locally, because of the
+nature of the QUIPU EDB format.  However, much care must be taken to
+correctly preserve external references.  Often, there will be the need to
+use aliases as a part of the transition.
+
+Moving is not supported directly by the directory.  This needs to be done by 
+creation and deletion, with appropriate additional EDB management (pointers).
+Tools should be provided to:
+
+\begin {itemize}
+\item Delete EDBs (recursively)
+\item Copy EDBs
+\item Move EDBs (combining the previous two)
+\end {itemize}
+
+These sound easy, but much care must be taken with the propagation aspects.
+

@@ -1,0 +1,79 @@
+.PS 5.5i
+.ps 20
+boxht	=	boxht/2
+lineht	=	3*lineht/4
+linewid	=	3*linewid/4
+## figure 8
+## EXAMPLE: THE ALTERNATE FILESYSTEM APPROACH (cont.)
+B2:	box "flintstones"
+B2a:	box "descriptor" with .w at (B2.e.x+linewid, B2.e.y)
+B2b:	box "attributes" with .w at (B2.e.x+linewid, B2.e.y-lineht)
+B2c:	box "DU" with .w at (B2.e.x+linewid, B2.e.y-2*lineht)
+##
+B3:	box "1" with .w at (B2.e.x+linewid, B2.e.y-3*lineht)
+B3a:	box "descriptor" with .w at (B3.e.x+linewid, B3.e.y)
+	move to B3a.e; "\ \ depth 1" ljust
+##
+B4:	box "1" with .w at (B3.e.x+linewid, B3.e.y-lineht)
+B4a:	box "descriptor" with .w at (B4.e.x+linewid, B4.e.y)
+	move to B4a.e; "\ \ depth 1, fred" ljust
+B4b:	box "DU" with .w at (B4.e.x+linewid, B4.e.y-lineht)
+B5:	box "2" with .w at (B3.e.x+linewid, B4.e.y-2*lineht)
+B5a:	box "descriptor" with .w at (B5.e.x+linewid, B5.e.y)
+	move to B5a.e; "\ \ depth 1, wilma" ljust
+B5b:	box "DU" with .w at (B5.e.x+linewid, B5.e.y-lineht)
+##
+B6:	box "2" with .w at (B2.e.x+linewid, B4.e.y-4*lineht)
+B6a:	box "descriptor" with .w at (B6.e.x+linewid, B6.e.y)
+	move to B6a.e; "\ \ depth 2, pebbles" ljust
+##
+B7:	box "3" with .w at (B2.e.x+linewid, B4.e.y-5*lineht)
+B7a:	box "descriptor" with .w at (B7.e.x+linewid, B7.e.y)
+	move to B7a.e; "\ \ depth 1" ljust
+B7b:	box "DU" with .w at (B7.e.x+linewid, B7.e.y-lineht)
+##
+B8:	box "1" with .w at (B7.e.x+linewid, B7.e.y-2*lineht)
+B8a:	box "descriptor" with .w at (B8.e.x+linewid, B8.e.y)
+	move to B8a.e; "\ \ depth 1, dino" ljust
+B8b:	box "DU" with .w at (B8.e.x+linewid, B8.e.y-lineht)
+##
+	line from ((B2.e.x+B2a.w.x)/2, B2.e.y) to ((B2.e.x+B2a.w.x)/2, B7.w.y)
+	line from B2.e to ((B2.e.x+B2a.w.x)/2, B2.e.y)
+	line from ((B2.e.x+B2a.w.x)/2, B2a.w.y) to B2a.w
+	line from ((B2.e.x+B2a.w.x)/2, B2b.w.y) to B2b.w
+	line from ((B2.e.x+B2a.w.x)/2, B2c.w.y) to B2c.w
+	line from ((B2.e.x+B2a.w.x)/2, B3.w.y) to B3.w
+	line from ((B2.e.x+B2a.w.x)/2, B6.w.y) to B6.w
+	line from ((B2.e.x+B2a.w.x)/2, B7.w.y) to B7.w
+##
+	line from ((B3.e.x+B3a.w.x)/2, B3.e.y) to ((B3.e.x+B3a.w.x)/2, B5.w.y)
+	line from B3.e to ((B3.e.x+B3a.w.x)/2, B3.e.y)
+	line from ((B3.e.x+B3a.w.x)/2, B3a.e.y) to B3a.w
+	line from ((B3.e.x+B3a.w.x)/2, B4.e.y) to B4.w
+	line from ((B3.e.x+B3a.w.x)/2, B5.e.y) to B5.w
+##
+	line from ((B4.e.x+B4a.w.x)/2, B4.e.y) to ((B4.e.x+B4a.w.x)/2, B4b.w.y)
+	line from B4.e to ((B4.e.x+B4a.w.x)/2, B4.e.y)
+	line from ((B4.e.x+B4a.w.x)/2, B4a.e.y) to B4a.w
+	line from ((B4.e.x+B4a.w.x)/2, B4b.w.y) to B4b.w
+##
+	line from ((B5.e.x+B5a.w.x)/2, B5.e.y) to ((B5.e.x+B5a.w.x)/2, B5b.w.y)
+	line from B5.e to ((B5.e.x+B5a.w.x)/2, B5.e.y)
+	line from ((B5.e.x+B5a.w.x)/2, B5a.e.y) to B5a.w
+	line from ((B5.e.x+B5a.w.x)/2, B5b.w.y) to B5b.w
+##
+	line from B6.e to B6a.w
+##
+	line from ((B7.e.x+B7a.w.x)/2, B7.e.y) to ((B7.e.x+B7a.w.x)/2, B8.w.y)
+	line from B7.e to ((B7.e.x+B7a.w.x)/2, B7.e.y)
+	line from ((B7.e.x+B7a.w.x)/2, B7a.w.y) to B7a.w
+	line from ((B7.e.x+B7a.w.x)/2, B7b.w.y) to B7b.w
+	line from ((B7.e.x+B7a.w.x)/2, B8.w.y) to B8.w
+
+##
+	line from ((B8.e.x+B8a.w.x)/2, B8.e.y) to ((B8.e.x+B8a.w.x)/2, B8b.w.y)
+	line from B8.e to ((B8.e.x+B8a.w.x)/2, B8.e.y)
+	line from ((B8.e.x+B8a.w.x)/2, B8a.e.y) to B8a.w
+	line from ((B8.e.x+B8a.w.x)/2, B8b.w.y) to B8b.w
+##
+.PE

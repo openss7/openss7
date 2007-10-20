@@ -1,0 +1,20 @@
+\File{inherit.py},{17:20},{Feb 12 1991}
+\L{\LB{\Proc{InheritedListSyntax}InheritedListSyntax ::= \K{SET} \K{OF} \K{CHOICE} \{}}
+\L{\LB{    AttributeType,}\Tab{24}{\C{}\-\- Take value from the entry}}
+\CE{}\L{\LB{    Attribute \}}}
+\L{\LB{}}
+\L{\LB{\Proc{InheritedAttributeSyntax}InheritedAttributeSyntax ::= \K{SET} \{}}
+\L{\LB{    default [0] InheritedListSyntax \K{OPTIONAL},}}
+\L{\LB{        \C{}\-\- default which can be overriden in lower entry.}}
+\CE{}\L{\LB{    always  [1] InheritedListSyntax \K{OPTIONAL},}}
+\L{\LB{        \C{}\-\- always present in lower entry.}}
+\CE{}\L{\LB{    objectclass \K{OBJECT} \K{IDENTIFIER} \K{OPTIONAL} }}
+\L{\LB{        \C{}\-\- object class to inherit to.}}
+\CE{}\L{\LB{        \C{}\-\- The null case means the objectclass attribute }}
+\CE{}\L{\LB{        \C{}\-\-    itself is inherited}}
+\CE{}\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{InheritedAttribute \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} InheritedAttributeSyntax}}
+\L{\LB{    \K{MULTI} \K{VALUE}}}
+\L{\LB{}}

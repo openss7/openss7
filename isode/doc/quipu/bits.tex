@@ -1,0 +1,14 @@
+% LaTeX customizations for the ISODE User's Manual
+
+\makeatletter
+
+
+\makeindex
+
+%%% LaTeX has its margins mixed up!
+\newdimen\foosidemargin
+\let\foosidemargin=\oddsidemargin
+\let\oddsidemargin=\evensidemargin
+\let\evensidemargin=\foosidemargin
+
+\pagestyle{headings}

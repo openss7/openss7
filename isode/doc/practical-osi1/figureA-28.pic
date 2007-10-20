@@ -1,0 +1,39 @@
+.PS
+## figure A-28
+boxwid	=	3*boxwid/2
+boxht	=	2*boxht/3
+##
+B1:	box "\sf 00" width 2*boxwid/8
+B2:	box "\sf 0"  with .w at B1.e width boxwid/8
+B3:	box "\sf 2" with .w at B2.e width 5*boxwid/8
+B4:	box "\sf 1" with .w at (B3.e.x+linewid/4, B3.e.y)
+B5:	box "\sf 0" with .w at (B4.e.x+linewid/4, B4.e.y) width boxwid/8
+B5a:	box "\sf 0" with .w at (B5.e.x, B4.e.y) width boxwid/8
+B5b:	box "\sf 0" with .w at (B5a.e.x, B4.e.y) width boxwid/8
+B5c:	box "\sf 1" with .w at (B5b.e.x, B4.e.y) width boxwid/8
+B5d:	box "\sf 1" with .w at (B5c.e.x, B4.e.y) width boxwid/8
+B5e:	box "\sf 0" with .w at (B5d.e.x, B4.e.y) width boxwid/8
+B5f:	box "\sf 1" with .w at (B5e.e.x, B4.e.y) width boxwid/8
+B5g:	box "\sf 0" with .w at (B5f.e.x, B4.e.y) width boxwid/8
+##
+L1:	box "\sf class" invis width 2*boxwid/8  height boxht/3\
+		with .nw at (B1.sw.x, B1.sw.y-lineht/4)
+	line from L1.nw to L1.sw
+	line from L1.ne to L1.se
+L2:	box "\sf c" invis width boxwid/8 \
+		with .w at L1.e height boxht/3
+	line from L2.nw to L2.sw
+	line from L2.ne to L2.se
+L3:	box "\sf number" invis width 5*boxwid/8 \
+		with .w at L2.e height boxht/3
+	line from L3.nw to L3.sw
+	line from L3.ne to L3.se
+L4:	box "\sf length" invis with .nw at (B4.sw.x, B4.sw.y-lineht/4) height boxht/3
+	line from L4.nw to L4.sw
+	line from L4.ne to L4.se
+##
+L5:	box "\sf contents" invis with .nw at (B5.sw.x, B5.sw.y-lineht/4) height boxht/3
+	line from L5.nw to L5.sw
+	line from L5.ne to L5.se
+##
+.PE

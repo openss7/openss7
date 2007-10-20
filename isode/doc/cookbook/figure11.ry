@@ -1,0 +1,27 @@
+...
+
+CMIPUserInformation ::=
+	FunctionalUnits
+
+FunctionalUnits ::=
+	BIT STRING {
+	    eventReportInvoker(0),
+	    eventReportPerformer(1),
+	    confirmedEventReportInvoker(2),
+	    confirmedEventReportPerformer(3),
+	    linkedReplyInvoker(4),
+	    linkedReplyPerformer(5),
+	    confirmedGetInvoker(6),
+	    confirmedGetPerformer(7),
+	    setInvoker(8),
+	    setPerformer(9),
+	    confirmedSetInvoker(10),
+	    confirmedSetPerformer(11),
+	    actionInvoker(12),
+	    actionPerformer(13),
+	    confirmedActionInvoker(14),
+	    confirmedActionPerformer(15)
+	}
+-- Function i is supported if and only if bit i is one.
+
+...

@@ -1,0 +1,34 @@
+\def\tpservice{[ISO 8073]}
+\def\tcpservice{[MIL 1778]}
+.PS 6i
+.ps 20
+lineht	=	3*lineht/2
+## figure 4
+B1:	box "TS-user"
+	line down from B1.s
+B3:	box "TS-provider" "(client)"
+	line down from B3.s
+B5:	box invis
+##
+B2:	box "TS-user" with .w at (B1.e.x+3*linewid, B1.e.y)
+	line down from B2.s
+B4:	box "TS-provider" "(server)"
+	line down from B4.s
+B6:	box invis
+##
+	line dashed from (B1.w.x-linewid/2, (B1.s.y+B3.n.y)/2) \
+		    to	 (B2.e.x+linewid/2, (B2.s.y+B4.n.y)/2)
+	move to (B2.e.x, (B2.s.y+B4.n.y)/2) \
+	    "\begin{tabular}{r}TSAP interface\\ \tpservice\end{tabular}" ljust
+##
+	line dashed from (B3.w.x-linewid/2, (B3.s.y+B5.n.y)/2) \
+		    to	 (B4.e.x+linewid/2, (B4.s.y+B6.n.y)/2)
+	move to (B4.e.x, (B4.s.y+B6.n.y)/2) \
+	    "\begin{tabular}{r}TCP interface\\ \tcpservice\end{tabular}" ljust
+##
+	line from B3.e to B4.w dashed \
+	    "{\em magic box\/} protocol" ""
+##
+B7:	box "The TCP" with .nw at B5.nw width (B6.ne.x-B5.nw.x)
+##
+.PE

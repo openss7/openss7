@@ -1,0 +1,27 @@
+\File{figureB\-21.ry},{08:28},{Feb 13 1990}
+\L{\LB{Diagnostic\-Reason ::=}}
+\L{\LB{    \K{CHOICE} \{}}
+\L{\LB{}\Tab{8}{serviceError[1]}}
+\L{\LB{}\Tab{8}{    ServiceProblem,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{securityError[2]}}
+\L{\LB{}\Tab{8}{    SecurityProblem}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{\Proc{ServiceProblem}ServiceProblem ::=}}
+\L{\LB{    \K{INTEGER} \{}}
+\L{\LB{}\Tab{8}{busy(1),}}
+\L{\LB{}\Tab{8}{unavailable(2),}}
+\L{\LB{}\Tab{8}{unwillingToPerform(3),}}
+\L{\LB{}\Tab{8}{chainingRequired(4),}}
+\L{\LB{}\Tab{8}{unableToProceed(5),}}
+\L{\LB{}\Tab{8}{invalidReference(6),}}
+\L{\LB{}\Tab{8}{timeLimitExceeded(7),}}
+\L{\LB{}\Tab{8}{administrativeLimitExceeded(8),}}
+\L{\LB{}\Tab{8}{loopDetected(9),}}
+\L{\LB{}\Tab{8}{unavailableCriticalExtension(10),}}
+\L{\LB{}\Tab{8}{outOfScope(11),}}
+\L{\LB{}\Tab{8}{badVersion(12)}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{...}}

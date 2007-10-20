@@ -1,0 +1,28 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{ar 1750 875 375 249  0.000  6.283}%
+    \rlap{\kern  1.750in\lower 0.916in\hbox to 0pt{\hss DUA\hss}}%
+    \rlap{\kern  0.875in\lower 0.833in\hbox to 0pt{\hss Directory\hss}}%
+    \rlap{\kern  0.875in\lower 0.999in\hbox to 0pt{\hss User\hss}}%
+    \special{ar 875 875 875 875  0.278  6.006}%
+    \special{ar 4250 1125 1500 999  0.000  6.283}%
+    \rlap{\kern  4.250in\lower 1.083in\hbox to 0pt{\hss The\hss}}%
+    \rlap{\kern  4.250in\lower 1.249in\hbox to 0pt{\hss Directory\hss}}%
+    \special{pa 2125 875}%
+    \special{pa 2750 1125}%
+    \special{fp}%
+    \special{pa 2648 1111}%
+    \special{pa 2750 1125}%
+    \special{fp}%
+    \special{pa 2666 1065}%
+    \special{pa 2750 1125}%
+    \special{fp}%
+    \kern  5.751in
+  }\vss}%
+  \kern  2.125in
+}

@@ -1,0 +1,42 @@
+\File{grind4\-9b.py},{11:13},{Jul  4 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\/*    \K{ERRORS} *\/}}
+\L{\LB{}}
+\L{\LB{\#include \<varargs.h\>}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\/* VARARGS2 *\/}}
+\L{\LB{}}
+\L{\LB{void}\Tab{8}{adios (what, fmt, va\_alist)}}
+\L{\LB{char   *what,}}
+\L{\LB{       *fmt;}}
+\L{\LB{va\_dcl}}
+\L{\LB{\{}}
+\L{\LB{    advise (what, fmt, va\_alist);}}
+\L{\LB{}}
+\L{\LB{    \_exit (1);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\/* VARARGS2 *\/}}
+\L{\LB{}}
+\L{\LB{void}\Tab{8}{advise (what, fmt, va\_alist)}}
+\L{\LB{char   *what,}}
+\L{\LB{       *fmt;}}
+\L{\LB{va\_dcl}}
+\L{\LB{\{}}
+\L{\LB{    char    buffer[BUFSIZ];}}
+\L{\LB{}}
+\L{\LB{    asprintf (buffer, what, fmt, va\_alist);}}
+\L{\LB{}}
+\L{\LB{    (void) fflush (stdout);}}
+\L{\LB{}}
+\L{\LB{    fprintf (stderr, \S{}\"\%s: \"\SE{}, myname);}}
+\L{\LB{    (void) fputs (buffer, stderr);}}
+\L{\LB{    (void) fputc (\S{}\'\!n\'\SE{}, stderr);}}
+\L{\LB{}}
+\L{\LB{    (void) fflush (stderr);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\%\}}}

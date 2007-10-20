@@ -1,0 +1,1805 @@
+.\" smux-api.rf - How to export...
+.ie \nh \{\
+.ll 66 
+.po 2 \}
+.el \{\
+.ll 62 
+.pl 58
+.nr sf R
+.nr fm 0 \}
+.he 'draft'Exporting MIBs for BSD UNIX'May 1991'
+.fo 'M.T. Rose''[Page %]'
+.de $0
+.(x t
+\\$2 \\$1
+.)x
+..
+.lp
+.na
+.nh
+.ce 3
+\fBHow to export a MIB module
+from a BSD UNIX daemon
+using the 4BSD/ISODE SMUX API\fR
+.sp 1
+.ce
+Thu May  9 16:39:17 1991
+.sp 3
+.ce 3
+Marshall T. Rose
+Performance Systems International, Inc.
+mrose@psi.com
+.sp 3
+
+.sh 1 "Status of this Memo"
+.lp
+This document defines an API for UNIX daemons wishing to implement a
+MIB module on a BSD UNIX system using the 4BSD/ISODE SNMP software.
+This is a local mechanism.
+
+.bp
+.sh 1 "The Environment"
+.lp
+This document gives an overview of how one modifies a UNIX program
+to export a MIB module to the local SNMP agent.
+.lp
+All of the files necessary to interface to the SNMP agent is contained
+in the ISODE source tree,
+in the \fBsnmp/\fR directory.
+Since this document avoids giving the actual \fIC\fR procedural
+definitions,
+you should familiarize yourself with the \fIlint\fR library, \fBllib-lisnmp\fR.
+.lp
+For the purposes of example,
+throughout this document we will reference a simple UNIX daemon,
+\fIunixd\fR, 
+which implements a MIB module for \*(lqmbuf statistics\*(rq.
+
+.sh 2 "The ISODE"
+.lp
+As you might have guessed,
+this document assumes that you're running the ISODE on your system.
+You should read the \fBREAD-ME\fR file at the base of the source tree
+for instructions on how to configure, generate, and install the ISODE.
+In the future, an abbreviated set of instructions, 
+for those interested in running the only 4BSD/ISODE SNMP software,
+will be written.
+.lp
+For now,
+follow the \fBREAD-ME\fR,
+generate the base system and SNMP, e.g.,
+.sp
+.in +.5i
+.nf
+% ./make all all-snmp
+.fi
+.in -.5i
+.sp
+and then install only the 4BSD/ISODE SNMP software:
+.sp
+.in +.5i
+.nf
+# ./make inst-all inst-snmp
+.fi
+.in -.5i
+.sp
+However, 
+be sure to read the entire \fBREAD-ME\fR file,
+as there are other steps involved in installing the SNMP software.
+
+.bp
+.sh 1 "MIB Modules"
+.lp
+The first thing you need to do is to define the actual managed objects
+which your program will implement.
+This is done by writing a \*(lqMIB module\*(rq.
+The syntax of the module is defined in the Internet-standard SMI, RFC1155.
+It is not the purpose of this document to describe the rules used for
+writing a MIB module.
+However, here are the basics to speed you on your way.
+.lp
+The MIB module is defined in a file called \fImodule\fR.my,
+e.g., \fBunix.my\fR.
+In general,
+there are three kinds of MIB modules:
+.np
+If you are defining a MIB module for something UNIX specific,
+it should probably go under the BSD UNIX MIB
+(contact Marshall Rose or Keith Sklower to get a number under the UNIX
+enterprise tree).
+In this case,
+the definition might start something like this:
+.sp
+.in +.5i
+.nf
+SendMail-MIB { iso org(3) dod(6) internet(1) private(4)
+               enterprises(1) unix (4) sendmail (99) }
+
+DEFINITIONS ::= BEGIN
+
+IMPORTS
+        unix --*, OBJECT-TYPE *--
+            FROM RFC1155-SMI;
+
+sendMail OBJECT IDENTIFIER ::= { unix 99 }
+.fi
+.in -.5i
+.sp
+.np
+If you are defining a MIB module on a multilateral, experimental basis,
+e.g., for a protocol like the NTP,
+then you should contact the Internet Assigned Numbers Authority (jkrey@isi.edu)
+and ask for an experimental number.
+In this case,
+the definition might start something like this:
+.sp
+.in +.5i
+.nf
+FIZBIN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        experimental, OBJECT-TYPE
+            FROM RFC1155-SMI;
+
+fizBin OBJECT IDENTIFIER ::= { experimental 99 }
+.fi
+.in -.5i
+.sp
+.np
+Otherwise,
+if you are defining a MIB module for something specific to your
+enterprise,
+then you contact the Internet Assigned Numbers Authority (jkrey@isi.edu) and
+ask for an enterprise number (assuming you don't already have one).
+In this case,
+the definition might start something like this:
+.sp
+.in +.5i
+.nf
+FIZZBIN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises, OBJECT-TYPE
+            FROM RFC1155-SMI;
+
+cheetah OBJECT IDENTIFIER ::= { enterprises 9999 }
+
+fizBin OBJECT IDENTIFIER ::= { cheetah 1 }
+.fi
+.in -.5i
+.sp
+.lp
+Regardless of the kind of MIB module,
+this last OBJECT IDENTIFIER points to the root of the tree which your
+agent is going to export.
+.lp
+Following this start,
+you have the actual definitions of the MIB objects,
+followed by
+.sp
+.in +.5i
+.nf
+END
+.fi
+.in -.5i
+.sp
+
+.sh 2 "Compiling MIB modules"
+.lp
+The next step is to compile the MIB module into a form that your
+program can read.
+This is done using the \fImosy\fR program:
+.sp
+.in +.5i
+.nf
+% others/mosy/xmosy \fImodule\fR.my
+.fi
+.in -.5i
+.sp
+which will create the file \fImodule\fR.defs.
+In most cases you will need to prefix this file with definitions from
+the root of the OBJECT IDENTIFIER tree,
+e.g.,
+.sp
+.in +.5i
+.nf
+% cat $(INCDIR)isode/snmp/smi.defs \fImodule\fR.defs > \fIdaemon\fR.defs
+.fi
+.in -.5i
+.sp
+where the \fBdaemon.defs\fR file will be the one which you install with
+your program binary.
+
+.sh 3 "The Syntax of compiled MIB modules"
+.lp
+The syntax is pretty simple:
+.np
+Comments start with \*(lq--\*(rq or \*(lq#\*(rq at the beginning of a line.
+.np
+Object identifiers are defined like this:
+.sp
+.in +.5i
+.nf
+name            value
+.fi
+.in -.5i
+.sp
+e.g.,
+.sp
+.in +.5i
+.nf
+internet        iso.3.6.1
+.fi
+.in -.5i
+.sp
+.np
+Object types are defined like this:
+.sp
+.in +.5i
+.nf
+name      oid       syntax         access     status
+.fi
+.in -.5i
+.sp
+e.g.,
+.sp
+.in +.5i
+.nf
+sysDescr  system.1  DisplayString  read-only  mandatory
+.fi
+.in -.5i
+.sp
+where \*(lqname\*(rq and \*(lqoid\*(rq are fairly obvious.
+For the rest:
+.sp
+.in +.5i
+.nf
+\*(lqsyntax\*(rq is the name of a defined syntax;
+.sp
+\*(lqaccess\*(rq is one of \fIread-only\fR, \fIread-write\fR", or \fInone\fR;
+and,
+.sp
+\*(lqstatus\*(rq is one of \fImandatory\fR, \fIoptional\fR,
+\fIdeprecated\fR, or \fIobsolete\fR. 
+.fi
+.in -.5i
+.sp
+Names of objects are \fIalways\fR case-sensitive.
+
+.bp
+.sh 1 "SMUX Peers"
+.lp
+A program which exports a MIB module is termed a \*(lqSMUX peer\*(rq
+(SMUX is the name of the protocol used by these programs to
+communicate with an SNMP agent.)
+.lp
+There is a textual database,
+\fB$(ETCDIR)snmpd.peers\fR,
+which defines the SMUX peers known to the local SNMP agent.
+The syntax of this file is pretty simple:
+.np
+Comments start with \*(lq#\*(rq at the beginning of a line.
+.np
+Each peer is identified in a single line:
+.sp
+.in +.5i
+.nf
+name        oid         password    [priority]
+.fi
+.in -.5i
+.sp
+where \*(lqname\*(rq and \*(lqoid\*(rq are fairly obvious.
+For the rest:
+.sp
+.in +.5i
+.nf
+\*(lqpassword\*(rq is a string which the agent will use to
+authenticate the SMUX peer;
+and,
+.sp
+\*(lqpriority\*(rq,
+if present,
+is the highest priority with which the SMUX peer can register subtrees.
+.fi
+.in -.5i
+.sp
+The name/oid pairs are assigned by the authority for the BSD UNIX MIB
+(contact Marshall Rose or Keith Sklower to register the name of your
+program and get an for your program).
+.lp
+Note that this file contains things resembling passwords in the clear.
+As such, it should be protected mode 0600 and owned by root.
+
+.bp
+.sh 1 "Daemon Skeleton"
+.lp
+Now it's time to modify your daemon to export the MIB.
+Your source code should include these lines:
+.sp
+.in +.5i
+.nf
+#include <isode/snmp/smux.h>
+#include <isode/snmp/objects.h>
+#include <isode/tailor.h>
+.fi
+.in -.5i
+.sp
+which will include the definitions for:
+talking to the SNMP agent via the SMUX protocol,
+the object management package,
+and the ISODE tailoring subsystem.
+.lp
+When loading your daemon,
+you should add this to the end of your command to the loader:
+.sp
+.in +.5i
+.nf
+-lisnmp -lisode
+.fi
+.in -.5i
+.sp
+which includes the 4BSD/SNMP and ISODE libraries.
+.lp
+You should decide if you want to use the ISODE logging subsystem.
+This is a convenient mechanism for using a unified logging system.
+If you are modifying an already existing daemon,
+you probably have your own logging package.
+Otherwise,
+you should consider using the ISODE subsystem.
+
+.sh 2 "Declarations"
+.lp
+There are some global variables that your program will have to declare:
+.sp
+.in +.5i
+.nf
+int     debug = 0;
+static  char   *myname = "unixd";
+
+static LLog     _pgm_log = {
+    "unixd.log", NULLCP, NULLCP,
+    LLOG_FATAL | LLOG_EXCEPTIONS | LLOG_NOTICE,
+    LLOG_FATAL, -1, LLOGCLS | LLOGCRT | LLOGZER, NOTOK
+};
+static  LLog   *pgm_log = &_pgm_log;
+
+static  OID     subtree = NULLOID;
+static  struct smuxEntry *se = NULL;
+
+static  int     smux_fd = NOTOK;
+static  int     rock_and_roll = 0;
+static  int     dont_bother_anymore = 0;
+
+static  int     quantum = 0;
+.fi
+.in -.5i
+.sp
+You only need the definition of \fI_pgm_log\fR and \fIpgm_log\fR if
+you will be using the ISODE logging subsystem.
+
+.sh 2 "Initialization"
+.lp
+When your program initializes itself,
+it should contain some code like this:
+.sp
+.in +.5i
+.nf
+    if (myname = rindex (argv[0], '/'))
+        myname++;
+    if (myname == NULL || *myname == NULL)
+        myname = argv[0];
+
+    isodetailor (myname, 0);
+    ll_hdinit (pgm_log, myname);
+
+/* scan argv, set debug if need be... */
+
+    if (debug)
+        ll_dbinit (pgm_log, myname);
+.fi
+.in -.5i
+.sp
+Of course,
+if you're not using the ISODE logging subsystem,
+you don't have the calls to \fIll_hdinit\fR or \fIll_dbinit\fR.
+.lp
+After cracking argv,
+your program should do the usual detaching actions.
+Usually at this point,
+your program reads the compiled MIB module definitions and starts
+talking to the SNMP agent.
+
+.sh 2 "Reading the compiled MIB module"
+.lp
+You program should call the \fIreadobjects\fR routine to read the module,
+look-up the subtree which it will export to the SNMP agent,
+and call the \fIgetsmuxEntrybyname\fR routine to find its entry in the
+\fBsnmpd.peers\fR database.
+Finally,
+it should call a routine you define,
+e.g., \fIinit_mib\fR,
+to initialize it's internal MIB structures.
+(We'll look at this routine in greater detail later on.)
+.sp
+.in +.5i
+.nf
+    OT      ot;
+
+    if (readobjects ("unixd.defs") == NOTOK)
+        error ("readobjects: %s", PY_pepy);
+
+    if ((ot = text2obj ("mbuf")) == NULL)
+        error ("object \"%s\" not in \"%s\"", "mbuf", "unix.defs");
+    subtree = ot -> ot_name;
+
+    if (se = getsmuxEntrybyname ("unixd")) == NULL)
+        error ("no SMUX entry for \"%s\"", "unixd");
+
+    init_mib ();
+.fi
+.in -.5i
+.sp
+If any of these routines fail,
+then don't bother trying to export the MIB module.
+
+.sh 2 "Talking to the SNMP agent"
+.lp
+All of the SMUX routines return \fINOTOK\fR on failure.
+Unless otherwise noted,
+these routines also return \fIOK\fR on success.
+On failure, the variable
+.sp
+.in +.5i
+.nf
+extern int  smux_errno;
+.fi
+.in -.5i
+.sp
+is set to a symbolic value defined in \fBsmux.h\fR, one of:
+.sp
+.in +.5i
+.nf
+invalidOperation
+parameterMissing
+systemError
+youLoseBig
+congestion
+inProgress
+.fi
+.in -.5i
+.sp
+In addition, the variable
+.sp
+.in +.5i
+.nf
+extern char smux_info[BUFSIZ];
+.fi
+.in -.5i
+.sp
+contains a printable explanation of what happened on failure.
+.lp
+All errors are FATAL except for \fIinProgress\fR.
+This means retry your operation later on.
+
+.sh 3 "Initialization"
+.lp
+You program should call the routine \fIsmux_init\fR,
+which initializes a SMUX connection to the local SNMP agent.
+This starts a TCP connection,
+but most likely does not complete it.
+You program will need to call an open routine (there is only one at present)
+to finish the connect and establish the SMUX association.
+.lp
+If successful,
+the return value is a file-descriptor,
+suitable for use with \fIselect\fR, etc.
+.lp
+On failure,
+\fIsmux_errno\fR will be set to one of
+\fIcongestion\fR, \fIyouLoseBig\fR, or \fIsystemError\fR.
+In this case,
+you should probably have your program retry the operation every 5
+minutes or so.
+.sp
+.in +.5i
+.nf
+if ((smux_fd = smux_init (debug)) == NOTOK)
+    error ("smux_init: %s [%s]",
+           smux_error (smux_errno), smux_info);
+else
+    rock_and_roll = 0;
+.fi
+.in -.5i
+.sp
+
+.sh 3 "Opening"
+.lp
+Once \fIsmux_init\fR returns OK,
+you should start selecting for writability on the file-descriptor returned.
+Once select says your program can write to the fd,
+your program should call the routine \fIsmux_simple_open\fR,
+which establishes the SMUX association.
+.lp
+On failure,
+\fIsmux_error\fR will be set to one of
+\fIparameterMissing\fR, \fIinvalidOperation\fR, \fIinProgress\fR,
+\fIsystemError\fR, \fIcongestion\fR, or \fIyouLoseBig\fR.
+If the error code is \fIinProgress\fR,
+then your program should continue retrying the fd for writability,
+and then call \fIsmux_simple_open again.
+Otherwise,
+your program should take the appropriate action based on the error
+code returned.
+.sp
+.in +.5i
+.nf
+if (smux_simple_open (&se -> se_identity,
+                      "SMUX UNIX daemon",
+                      se -> se_password,
+                      strlen (se -> se_password))
+        == NOTOK) {
+    if (smux_errno == inProgress)
+        return;
+
+    error ("smux_simple_open: %s [%s]", 
+           smux_error (smux_errno), smux_info);
+    smux_fd = NOTOK;
+}
+else
+    rock_and_roll = 1;
+.fi
+.in -.5i
+.sp
+
+.sh 3 "Closing"
+.lp
+If, for some reason, your program wishes to close the SMUX
+association.
+There are several reasons that are allowed:
+.sp
+.in +.5i
+.nf
+goingDown
+unsupportedVersion
+packetFormat
+protocolError
+internalError
+authenticationFailure
+.fi
+.in -.5i
+.sp
+On failure,
+\fIsmux_error\fR will be set to one of
+\fIinvalidOperation\fR, \fIcongestion\fR, or \fIyouLoseBig\fR.
+
+.sh 3 "Registering Subtrees"
+.lp
+Once \fIsmux_simple_open\fR returns OK,
+your program should register the MIB module that your daemon will
+export by calling \fIsmux_register\fR.
+A subtree can be registered in one of three modes:
+.sp
+.in +.5i
+.nf
+readOnly
+readWrite
+delete
+.fi
+.in -.5i
+.sp
+which are all fairly obvious.
+.lp
+Note that a return value of OK from \fIsmux_register\fR means only
+that the registration request was queued for the SNMP agent via the
+SMUX protocol.
+Some time later the SNMP agent's response will be forthcoming.
+.lp
+On failure,
+\fIsmux_error\fR will be set to one of 
+\fIparameterMissing\fR, \fIinvalidOperation\fR, \fIcongestion\fR, or
+\fIyouLoseBig\fR.
+Your program should take the appropriate action based on the error
+code returned.
+.sp
+.in +.5i
+.nf
+if (smux_register (subtree, -1, readOnly) == NOTOK) {
+    error ("smux_register: %s [%s]",
+            smux_error (smux_errno), smux_info);
+    smux_fd = NOTOK;
+}
+.fi
+.in -.5i
+.sp
+
+.sh 3 "Main Loop"
+.lp
+At this point,
+your program is more or less in it's main loop
+(actually, it probably entered the main loop after the very first call
+to \fIsmux_init\fR).
+.sp
+.in +.5i
+.nf
+int     nfds;   /* these are set for other fd's... */
+
+fd_set  ifds;
+fd_set  ofds;
+
+    for (;;) {
+        int     n,
+                secs;
+        fd_set  rfds,
+                wfds;
+
+        secs = NOTOK;
+
+        rfds = ifds;    /* struct copy */
+        wfds = ofds;    /*   .. */
+
+        if (smux_fd == NOTOK && !dont_bother_anymore)
+            secs = 5 * 60L;
+        else
+            if (rock_and_roll)
+                FD_SET (smux_fd, &rfds);
+            else
+                FD_SET (smux_fd, &wfds);
+        if (smux_fd >= nfds)
+            nfds = smux_fd + 1;
+
+        if ((n = xselect (nfds, &rfds, &wfds, NULLFD, secs))
+                == NOTOK) {
+            error ("xselect failed");
+\0            ...
+        }
+
+/* check fd's for other purposes here... */
+
+        if (smux_fd == NOTOK && !dont_bother_anymore) {
+            if (n == 0) {
+                if ((smux_fd = smux_init (debug)) == NOTOK)
+                    error ("smux_init: %s [%s]",
+                           smux_error (smux_errno),
+                           smux_info);
+                else
+                    rock_and_roll = 0;
+            }
+        }
+        else
+            if (rock_and_roll) {
+                if (FD_ISSET (smux_fd, &rfds))
+                    doit_smux ();
+            }
+            else
+                if (FD_ISSET (smux_fd, &wfds)) {
+                    if (smux_simple_open (&se -> se_identity, 
+                                  "SMUX UNIX daemon",
+                                  se -> se_password, 
+                                  strlen (se -> se_password))
+                            == NOTOK) {
+                        if (smux_errno != inProgress) {
+                            error ("smux_simple_open: %s [%s]",
+                                   smux_error (smux_errno), 
+                                   smux_info);
+                            smux_fd = NOTOK;
+                        }
+                    }
+                    else {
+                        rock_and_roll = 1;
+
+                        if (smux_register (subtree, -1, 
+                                    readOnly) == NOTOK) {
+                            error ("smux_register: %s [%s]",
+                                   smux_error (smux_errno),
+                                   smux_info);
+                            smux_fd = NOTOK;
+                        }
+                }
+    }
+.fi
+.in -.5i
+.sp
+So,
+all that remains is to take a look at the routine \fIdoit_smux\fR
+mentioned above.
+This is called when select indicates the SMUX file-descriptor is ready
+for reading.
+
+.sh 3 "Events"
+.lp
+When \fIselect\fR indicates the SMUX file-descriptor is ready for
+reading,
+your program calls the routine \fIsmux_wait\fR to return the next
+event from the SNMP agent.
+.lp
+Note that the event is filled-in from a static area.
+On the next call to \fIsmux_init\fR, \fIsmux_close\fR, or
+\fIsmux_wait\fR,
+the value will be overwritten.
+As such,
+do not free this structure yourself.
+.lp
+On failure,
+\fIsmux_error\fR will be set to one of 
+\fIparameterMissing\fR, \fIinvalidOperation\fR, \fIinProgress\fR,
+or \fIyouLoseBig\fR.
+Your program should take the appropriate action based on the error
+code returned.
+.sp
+.in +.5i
+.nf
+    struct type_SNMP_SMUX__PDUs *event;
+
+    if (smux_wait (&event, NOTOK) == NOTOK) {
+        if (smux_errno == inProgress)
+            return;
+
+        error ("smux_wait: %s [%s]",
+               smux_error (smux_errno), smux_info);
+losing: ;
+        smux_fd = NOTOK;
+        return;
+    }
+.fi
+.in -.5i
+.sp
+Next,
+your program should switch based on the actual event returned:
+.sp
+.in +.5i
+.nf
+type_SNMP_SMUX__PDUs_registerResponse
+type_SNMP_SMUX__PDUs_get__request
+type_SNMP_SMUX__PDUs_get__next__request
+type_SNMP_SMUX__PDUs_set__request
+type_SNMP_SMUX__PDUs_commitOrRollback
+type_SNMP_SMUX__PDUs_close
+.fi
+.in -.5i
+.sp
+The actual code is fairly straight-forward:
+.sp
+.in +.5i
+.nf
+switch (event -> offset) {
+    case type_SNMP_SMUX__PDUs_registerResponse:
+        {
+            struct type_SNMP_RRspPDU *rsp =
+                        event -> un.registerResponse;
+
+            if (rsp -> parm == int_SNMP_RRspPDU_failure) {
+                error ("SMUX registration of %s failed",
+                       oid2ode (subtree));
+                dont_bother_anymore = 1;
+                (void) smux_close (goingDown);
+                break;
+            }
+        }
+        if (smux_trap (int_SNMP_generic__trap_coldStart,
+                       0, (struct type_SNMP_VarBindList *) 0)
+                == NOTOK) {
+            error ("smux_trap: %s [%s]",
+                   smux_error (smux_errno), smux_info);
+            break;
+        }
+        return;
+
+    case type_SNMP_SMUX__PDUs_get_request:
+    case type_SNMP_SMUX__PDUs_get__next__request:
+        get_smux (event -> un.get__request, event -> offset);
+        return;
+
+    case type_SNMP_SMUX__PDUs_close:
+        notice ("SMUX close: %s", 
+                smux_error (event -> un.close -> parm));
+        break;
+
+    case type_SNMP_SMUX__PDUs_set__request:
+    case type_SNMP_SMUX__PDUs_commitOrRollback:
+        set_smux (event);
+        return;
+
+    default:
+        error ("bad SMUX operation: %d", event -> offset);
+        (void) smux_close (protocolError);
+        break;
+}
+smux_fd = NOTOK;
+.fi
+.in -.5i
+.sp
+Note the use of the \fIsmux_trap\fR routine to send a \fIcoldStart\fR
+trap once the daemon has successful registered the MIB module it is exporting.
+The trap codes are:
+.sp
+.in +.5i
+.nf
+int_SNMP_generic__trap_coldStart
+int_SNMP_generic__trap_warmStart
+int_SNMP_generic__trap_linkDown
+int_SNMP_generic__trap_linkUp
+int_SNMP_generic__trap_authenticationFailure
+int_SNMP_generic__trap_egpNeighborLoss
+int_SNMP_generic__trap_enterpriseSpecific
+.fi
+.in -.5i
+.sp
+If this routine fails,
+\fIsmux_errno\fR will be set to one of
+\fIinvalidOperation\fR, \fIcongestion\fR, or \fIyouLoseBig\fR.
+.lp
+This peer doesn't implement sets,
+so it handles the SNMP set operation thusly:
+.sp
+.in +.5i
+.nf
+static  set_smux (event)
+struct type_SNMP_SMUX__PDUs *event;
+{
+    switch (event -> offset) {
+        case type_SNMP_SMUX__PDUs_set__request:
+            {
+                register struct type_SNMP_GetRequest__PDU *pdu =
+                                    event -> un.get__response;
+
+                pdu -> error__status =
+                            int_SNMP_error__status_noSuchName;
+                pdu -> error__index =
+                            pdu -> variable__bindings ? 1 : 0;
+
+                if (smux_response (pdu) == NOTOK) {
+                    advise (LLOG_EXCEPTIONS, NULLCP,
+                            "smux_response: %s [%s]",
+                            smux_error (smux_errno),
+                            smux_info);
+                    smux_fd = NOTOK;
+                }
+            }
+            break;
+
+        case type_SNMP_SMUX__PDUs_commitOrRollback:
+            {
+                struct type_SNMP_SOutPDU *cor =
+                                event -> un.commitOrRollback;
+
+                if (cor -> parm == int_SNMP_SOutPDU_commit) {
+                                    /* "should not happen" */
+                    (void) smux_close (protocolError);
+                    smux_fd = NOTOK;
+                }
+            }
+            break;
+    }
+}
+.fi
+.in -.5i
+.sp
+
+.lp
+So,
+all that remains is to take a look at the routine \fIget_smux\fR which
+implements the SNMP get and powerful get-next operators.
+We will return to this routine once the structures and routines which
+implement the managed object abstraction are explained. 
+
+.bp
+.sh 1 "Managed Objects"
+.lp
+A managed object is an abstraction with a syntax and a semantics.
+The syntax defines what instances of the object look like on the network.
+The semantics define what the object actually is.
+
+.sh 2 "Syntax"
+.lp
+The syntax of MIB objects is modeled by the \fIOS\fR structure:
+.sp
+.in +.5i
+.nf
+typedef struct object_syntax {
+    char   *os_name;                    /* syntax name */
+
+    IFP     os_encode;                  /* data -> PE */
+    IFP     os_decode;                  /* PE -> data */
+    IFP     os_free;                    /* free data */
+
+    IFP     os_parse;                   /* str -> data */
+    IFP     os_print;                   /* data -> tty */
+
+\0        ...
+}               object_syntax, *OS;
+#define NULLOS  ((OS) 0)
+.fi
+.in -.5i
+.sp
+The syntaxes defined by the Internet-standard MIB are already implemented:
+.sp
+.in +.5i
+.nf
+.ta \w'NetworkAddress  'u
+syntax  structure
+INTEGER integer
+OctetString     struct qbuf (OCTET STRING)
+ObjectID        struct OIDentifier (OBJECT IDENTIFIER)
+NULL    char
+DisplayString   struct qbuf
+IpAddress       struct sockaddr_in
+NetworkAddress  struct sockaddr_in
+Counter integer
+Gauge   integer
+TimeTicks       integer
+ClnpAddress     struct sockaddr_iso
+.re
+.fi
+.in -.5i
+.sp
+where \*(lqsyntax\*(rq is the name appearing in a compiled MIB module,
+and \*(lqstructure\*(rq is the \fIC\fR language data type
+corresponding to the object's syntax.
+.lp
+To take a syntax name and get back the structure, use the routine
+\fItext2syn\fR.
+
+.sh 3 "Abstractions for Standard Syntaxes"
+.lp
+Here are the structures and routine used to implement the low-level
+MIB abstractions.
+
+.sh 4 "integer"
+.lp
+This is used for the \fIINTEGER\fR, \fICounter\fR, \fIGauge\fR, and
+\fITimeTicks\fR syntax.
+.lp
+The definition is:
+.sp
+.in +.5i
+.nf
+typedef int integer;
+.fi
+.in -.5i
+.sp
+which is hardly surprising.
+
+.sh 4 "struct qbuf"
+.lp
+This is used for the \fIOctetString\fR (OBJECT IDENTIFIER)
+and \fIDisplayString\fR syntaxes.
+.lp
+The definition is:
+.sp
+.in +.5i
+.nf
+struct qbuf {
+    struct qbuf *qb_forw;   /* doubly-linked list */
+    struct qbuf *qb_back;   /*   .. */
+
+    int     qb_len;         /* length of data */
+    char   *qb_data;        /* current pointer into data */
+    char    qb_base[1];     /* extensible... */
+};
+.fi
+.in -.5i
+.sp
+The macro \fIQBFREE\fR is used to traverse \fIqb_forw\fR to free all
+qbufs in the ring:
+.sp
+.in +.5i
+.nf
+QBFREE (qb)
+struct qbuf *qb;
+.fi
+.in -.5i
+.sp
+To allocate a new string from the qbuf use:
+.sp
+.in +.5i
+.nf
+char *qb2str (q)
+struct qbuf *q
+.fi
+.in -.5i
+.sp
+The string is NULL-terminated,
+but there may be other NULLs in the string to foil things like \fIstrlen\fR.
+.lp
+To allocate a new qbuf of \fIlen\fR octets from string \fIs\fR,
+use:
+.sp
+.in +.5i
+.nf
+struct qbuf str2qb (s, len, head)
+char    *s;
+int      len,
+         head;
+.fi
+.in -.5i
+.sp
+(\fIhead\fR should always be \fI1\fR).
+.lp
+To free an allocated qbuf, use \fIqb_free\fR which calls \fIQBFREE\fR
+and then \fIfree\fR on its argument.
+
+.sh 4 "struct OIDentifier"
+.lp
+This is used for the \fIObjectID\fR (OBJECT IDENTIFIER) syntax.
+The definition is:
+.sp
+.in +.5i
+.nf
+typedef struct OIDentifier {
+    int     oid_nelem;  /* number of sub-identifiers */
+
+    unsigned int *oid_elements;
+        /* the (ordered) list of sub-identifiers */
+}                       OIDentifier, *OID;
+#define NULLOID ((OID) 0)
+.fi
+.in -.5i
+.sp
+To compare two \fIOIDs\fR, use
+.sp
+.in +.5i
+.nf
+int     oid_cmp (p, q)
+OID     p,
+        q;
+.fi
+.in -.5i
+.sp
+which returns \fI-1\fR if \fIp<q\fR, \fI1\fR if \fIp>q\fR, \fI0\fR otherwise.
+.lp
+To allocate a new \fIOID\fR and copy it from another, use \fIoid_cpy\fR.
+.lp
+To free an allocated \fIOID\fR, use \fIoid_free\fR.
+.lp
+To take an \fIOID\fR and produce a string in numeric form use
+.sp
+.in +.5i
+.nf
+char   *sprintoid (oid)
+OID     oid;
+.fi
+.in -.5i
+.sp
+The result is returned in a static area.
+The inverse routine is:
+.sp
+.in +.5i
+.nf
+OID     str2oid (s)
+char    *s;
+.fi
+.in -.5i
+.sp
+which returns an OID from a static area
+
+.sh 4 "struct sockaddr_in"
+.lp
+This is used for the \fIIpAddress\fR and \fINetworkAddress\fR syntaxes.
+Presumably you are overly familiar with this structure.
+
+.sh 4 "struct sockaddr_iso"
+.lp
+This is used for the \fIClnpAddress\fR syntax.
+If your are not running a BSD/OSI system,
+don't worry about this.
+
+.sh 3 "Defining a new Syntax"
+.lp
+The routine \fIadd_syntax\fR is used to define a new syntax.
+(if this routine returns \fINOTOK\fR,
+then the internal syntax table has overflowed;
+adjust the constant \fIMAXSYN\fR in the file \fBsyntax.c\fR).
+The first argument is the name of the syntax.
+The other five are pointers to integer-valued routines that are called
+to operate on an opaque pointer:
+.sp
+.in +.5i
+.nf
+/* returns OK if x is encoded into pe (allocates pe),
+   NOTOK otherwise */
+
+f_encode (x, pe)                
+pointer *x;                             
+PE      *pe;                    
+
+
+/* returns OK if pe is decoded into x (allocates x),
+   NOTOK otherwise */
+
+f_decode (x, pe)                
+pointer **x;                    
+PE        pe;                   
+
+
+/* free's an allocated x (from f_decode or f_parse) */
+
+f_free (x)
+pointer *x;
+
+
+/* returns OK if s is decoded into x (allocates x),
+   NOTOK otherwise */
+
+f_parse (x, s)
+pointer **x;
+char     *s;
+
+
+/* prints x on the user's tty */
+
+f_print (x, os)
+pointer *x;
+OS       os;
+.fi
+.in -.5i
+.sp
+Presentation elements (PEs) are discussed later on.
+
+.sh 2 "Objects"
+.lp
+MIB objects are modeled by the \fIOT\fR structure:
+.sp
+.in +.5i
+.nf
+typedef struct object_type {
+    char   *ot_text;                /* OBJECT DESCRIPTOR */
+    char   *ot_id;                  /* OBJECT IDENTIFIER */
+    OID     ot_name;                /*   .. */
+
+    OS      ot_syntax;              /* SYNTAX */
+
+    int     ot_access;              /* ACCESS */
+#define OT_NONE         0x00
+#define OT_RDONLY       0x01
+#define OT_RDWRITE      0x02
+
+    int     ot_status;              /* STATUS */
+#define OT_OBSOLETE     0x00
+#define OT_MANDATORY    0x01
+#define OT_OPTIONAL     0x02
+#define OT_DEPRECATED   0x03
+
+\0    ...
+}               object_type, *OT;
+#define NULLOT  ((OT) 0)
+.fi
+.in -.5i
+.sp
+There are lots of routines to manipulate MIB objects.
+.lp
+The routine \fIname2obj\fR takes an object identifier and returns the
+object type, either exact or prefix, e.g.,
+.sp
+.in +.5i
+.nf
+name2obj ( OID { ipRouteDest.0.0.0.0 } )
+.fi
+.in -.5i
+.sp
+returns the object type for \*(lqipRouteDest\*(rq
+.lp
+The routine \fItext2obj\fR takes a string and returns the exact object type,
+e.g.,
+.sp
+.in +.5i
+.nf
+text2obj (\*(lqipRouteDest\*(rq)
+.fi
+.in -.5i
+.sp
+will succeed, but
+.sp
+.in +.5i
+.nf
+text2obj (\*(lqipRouteDest.0.0.0.0\*(rq)
+.fi
+.in -.5i
+.sp
+will fail.
+.lp
+The routine \fItext2oid\fR takes a string and returns the object identifier
+associated with the corresponding object.
+The string can be numeric (e.g., \*(lq1.3.6.1\*(rq),
+symbolic (e.g., \*(lqinternet\*(rq),
+or symbolic.numeric (e.g., \*(lqiso.3.6.1\*(rq).
+.lp
+The routine \fIoid2ode\fR takes an \fIOID\fR and returns a string suitable
+for pretty-printing, in the form symbolic or symbolic.numeric.
+
+.sh 2 "Instances"
+.lp
+MIB instances are modeled by the \fIOI\fR structure:
+.sp
+.in +.5i
+.nf
+typedef struct object_instance {
+    OID     oi_name;                /* instance OID */
+
+    OT      oi_type;                /* prototype */
+}               object_instance, *OI;
+#define NULLOI  ((OI) 0)
+.fi
+.in -.5i
+.sp
+There are lots of routines to manipulate MIB instances.
+.lp
+The routine \fIname2inst\fR takes a variable name and returns the
+corresponding instance, e.g.,
+.sp
+.in +.5i
+.nf
+name2inst ( OID { ipRouteDest.0.0.0.0 } )
+.fi
+.in -.5i
+.sp
+will return an \fIOI\fR with \fIoi_name\fR set to its argument and
+\fIoi_type\fR set to the object type for \*(lqipRouteDest\*(rq.
+.lp
+The routine \fInext2inst\fR finds the closest object type before the
+variable name and returns an \fIOI\fR corresponding to that object type.
+.lp
+The routine \fItext2inst\fR first calls \fItext2oid\fR to get the \fIOID\fR
+corresponding to the argument, then calls \fIname2obj\fR to get the
+type associated with that \fIOID\fR.
+
+.bp
+.sh 1 "Linkage"
+.lp
+It is now time to tie up all the loose ends.
+When your program starts,
+it needs to establish some linkage between the objects defined in the
+compiled MIB module and the data structures in your program.
+Further,
+when the SNMP agent asks to manipulate the object instances in the MIB
+module your program exported (e.g., using the powerful SNMP get-next
+operator), you need to have a small protocol engine to field these requests.
+.lp
+The way the linkage is established is to associate a \fIC\fR routine
+with each of the leaf objects defined in the compiled MIB module.
+When the protocol engine fields a request from the SNMP agent,
+it will invoke that routine to \*(lqdo the right thing\*(rq.
+Typically,
+for each table in the compiled MIB module,
+you define a \fIC\fR routine to handle requests for the leaf objects
+of that table.
+In addition,
+there is usually one more routine defined to handle those leaf objects
+not found under any one table.
+For each \fIC\fR routine you define,
+you define a group of constant integer symbols which identify a leaf
+object that is handled by that routine
+(e.g., for each routine, you start numbering the symbols starting at
+\fI0\fR and going up).
+By convention,
+these symbols have the same name as the leaf objects.
+
+.sh 2 "Initialization"
+.lp
+Earlier it was noted that your program will probably call a routine
+called \fIinit_mib\fR which initializes it's internal MIB structures.
+The routine should look something like this:
+.sp
+.in +.5i
+.nf
+register OT     ot;
+
+if (ot = text2obj ("mbufS"))
+    ot -> ot_getfnx = o_mbuf,
+    ot -> ot_info = (caddr_t) mbufS;
+
+\0...
+
+if (ot = text2obj ("mbufType"))
+    ot -> ot_getfnx = o_mbufType,
+    ot -> ot_info = (caddr_t) mbufType;
+.fi
+.in -.5i
+.sp
+where we can imagine that \fIo_mbuf\fR and \fIo_mbufType\fR are
+routines that are defined in your program,
+and \fImbufS\fR and \fImbufType\fR are constant symbols defined with
+those routines.
+
+.sh 2 "Generic Event Handling"
+.lp
+Earlier it was noted that your program will probably call a routine
+called \fIget_smux\fR which implements the SNMP get and powerful
+get-next operators.
+The routine should look something like this:
+.sp
+.in +.5i
+.nf
+static  get_smux (pdu, offset)
+register struct type_SNMP_GetRequest__PDU *pdu;
+int     offset;
+{
+    int     idx,
+            status;
+    object_instance ois;
+    register struct type_SNMP_VarBindList *vp;
+
+    quantum = pdu -> request__id;
+    idx = 0;
+    for (vp = pdu -> variable__bindings; vp; vp = vp -> next) {
+        register OI     oi;
+        register OT     ot;
+        register struct type_SNMP_VarBind *v = vp -> VarBind;
+
+        idx++;
+
+        if (offset == type_SNMP_SMUX__PDUs_get__next__request) {
+            if ((oi = name2inst (v -> name)) == NULLOI
+                    && (oi = next2inst (v -> name)) == NULLOI)
+                goto no_name;
+
+            if ((ot = oi -> oi_type) -> ot_getfnx == NULLIFP)
+                goto get_next;
+        }
+        else
+            if ((oi = name2inst (v -> name)) == NULLOI
+                    || (ot = oi -> oi_type) -> ot_getfnx
+                            == NULLIFP) {
+no_name: ;
+                pdu -> error__status =
+                        int_SNMP_error__status_noSuchName;
+                goto out;
+            }
+
+try_again: ;
+	switch (offset) {
+	    case type_SNMP_SMUX__PDUs_get__request:
+		if (!(method = ot -> ot_getfnx))
+		    goto no_name;
+		break;
+		
+	    case type_SNMP_SMUX__PDUs_get__next__request:
+		if (!(method = ot -> ot_getfnx))
+		    goto get_next;
+		break;
+		
+	    case type_SNMP_SMUX__PDUs_set__request:
+		if (!(method = ot -> ot_setfnx))
+		    goto no_name;
+		break;
+
+	    default:
+		goto no_name;
+	}
+		
+        switch (status = (*ot -> ot_getfnx) (oi, v, offset)) {
+            case NOTOK:     /* get-next wants a bump */
+get_next: ;
+                oi = &ois;
+                for (;;) {
+                    if ((ot = ot -> ot_next) == NULLOT) {
+                        pdu -> error__status =
+                              int_SNMP_error__status_noSuchName;
+                        goto out;
+                    }
+                    oi -> oi_name =
+                                (oi -> oi_type = ot) -> ot_name;
+                    if (ot -> ot_getfnx)
+                        goto try_again;
+                }
+
+            case int_SNMP_error__status_noError:
+                break;
+
+            default:
+                pdu -> error__status = status;
+                goto out;
+        }
+    }
+    idx = 0;
+
+out: ;
+    pdu -> error__index = idx;
+
+    if (smux_response (pdu) == NOTOK) {
+        error ("smux_response: %s [%s]",
+               smux_error (smux_errno), smux_info);
+        smux_fd = NOTOK;
+    }
+}
+.fi
+.in -.5i
+.sp
+The actual code is fairly straight-forward:
+First,
+the variable \fIquantum\fR is set to the request ID for this transaction.
+The SMUX protocol requires that this number change for each SNMP
+operation that the SNMP agent fields,
+so your program can use it as a cookie to see when it should re-read
+kernel variables.
+(A single SNMP operation received by the SNMP agent might result in
+multiple SMUX protocol transactions with your program.)
+.lp
+Next, the code loops through the list of variables requested.
+The object instance is determined and loaded into \fIoi\fRn
+and the corresponding object type is loaded into \fIot\fR,
+and the access is checked.
+.lp
+Finally, the user-defined routine is invoked.
+This routine returns one of these values:
+.sp
+.in +.5i
+.nf
+NOTOK
+int_SNMP_error__status_noError
+int_SNMP_error__status_tooBig
+int_SNMP_error__status_noSuchName
+int_SNMP_error__status_badValue
+int_SNMP_error__status_readOnly
+int_SNMP_error__status_genErr
+.fi
+.in -.5i
+.sp
+the first value is returned only if the powerful get-next operator is
+being invoked and the routine didn't have any more object instances
+for the object type in question.
+The remainder are all self-explanatory.
+.lp
+Once an answer is returned,
+the loop either continues or is broken and a response is written back
+using the \fIsmux_response\fR routine.
+On failure,
+\fIsmux_error\fR will be set to one of
+\fIparameterMissing\fR, \fIinvalidOperation\fR, or \fIyouLoseBig\fR.
+
+.sh 2 "Specific Event Handling: Outside a table"
+.lp
+Now let's look at one of these user-defined routines,
+which handles leaf objects that are not part of a table:
+.sp
+.in +.5i
+.nf
+static  int     lastq = -1;
+static  struct mbstat mbstat;
+
+
+#define mbufS           0
+#define mbufClusters    1
+\0...
+#define mbufFrees       6
+
+
+static int  o_mbuf (oi, v, offset)
+OI      oi;
+register struct type_SNMP_VarBind *v;
+int     offset;
+{
+    int     ifvar;
+    register struct mbstat *m = &mbstat;
+    register OID    oid = oi -> oi_name;
+    register OT     ot = oi -> oi_type;
+
+    ifvar = (int) ot -> ot_info;
+    switch (offset) {
+        case type_SNMP_SMUX__PDUs_get__request:
+            if (oid -> oid_nelem !=
+                        ot -> ot_name -> oid_nelem + 1
+                    || oid -> oid_elements[oid -> oid_nelem - 1]
+                            != 0)
+                return int_SNMP_error__status_noSuchName;
+            break;
+
+        case type_SNMP_SMUX__PDUs_get__next__request:
+            if (oid -> oid_nelem
+                    == ot -> ot_name -> oid_nelem) {
+                OID     new;
+
+                if ((new = oid_extend (oid, 1)) == NULLOID)
+                    return int_SNMP_error__status_genErr;
+                new -> oid_elements[new -> oid_nelem - 1] = 0;
+
+                if (v -> name)
+                    free_SNMP_ObjectName (v -> name);
+                v -> name = new;
+            }
+            else
+                return NOTOK;
+            break;
+
+        default:
+            return int_SNMP_error__status_genErr;
+    }
+
+    if (quantum != lastq) {
+        lastq = quantum;
+
+        if (getkmem (nl + N_MBSTAT, (caddr_t) m, sizeof *m)
+                == NOTOK)
+            return int_SNMP_error__status_genErr;
+    }
+
+    switch (ifvar) {
+        case mbufS:
+            return o_integer (oi, v, m -> m_mbufs);
+
+        case mbufClusters:
+            return o_integer (oi, v, m -> m_clusters);
+
+\0...
+
+        case mbufFrees:
+            return o_integer (oi, v, m -> m_mbfree);
+
+        default:
+            return int_SNMP_error__status_noSuchName;
+    }
+}
+.fi
+.in -.5i
+.sp
+The actual code is fairly straight-forward:
+First,
+the constant offsets are defined.
+Then, the \fIo_mbuf\fR routine is defined.
+.lp
+The first action is to determine which leaf object is being referenced.
+This corresponding symbolic constant is placed in the variable \fIifvar\fR.
+Then a switch is made based on the operation.
+.np
+For the get operation,
+all instances are identified by the object type followed by \*(lq.0\*(rq
+(e.g., \*(lqmbufS.0\*(rq).
+So,
+the code checks to see if the \fIOID\fR associated with the object
+instance is exactly one longer than the \fIOID\fR associated with the
+object type,
+and that the extra sub-identifier has the value \fI0\fR.
+.np
+For the powerful get-next operation,
+there are really two cases,
+depending on whether some instance identifier is present.
+If some instance identifier is present,
+then for a non-tabular leaf object,
+the next variable belongs to some other object type,
+so the routine simply returns the value \fINOTOK\fR,
+and the \fIget_smux\fR routine will find the next object accordingly.
+Otherwise,
+if no instance is identified,
+a new \fIOID\fR is constructed and initialized.
+The old \fIOID\fR is free'd and the new one inserted in its place.
+.lp
+Now that the correct instance has been identified,
+a check is made to see if \fIkmem\fR should be consulted.
+(Obviously other programs might consult other data stores.)
+Finally,
+the instance value is encoded and the routine returns.
+
+.sh 3 "Instance handling"
+.lp
+Several routines are provided to encode instance values:
+.lp
+The \fIo_number\fR routine encodes an integer value,
+such as an INTEGER, Counter, Guage, or TimeTick.
+The macro \fIo_integer\fR is simply a synonym for \fIo_number\fR.
+.lp
+The \fIo_string\fR routine encodes a string value,
+such as an OctetString or DisplayString,
+e.g.,
+.sp
+.in +.5i
+.nf
+o_string (oi, v, "lo0", strlen ("lo0"));
+.fi
+.in -.5i
+.sp
+or
+.sp
+.in +.5i
+.nf
+o_string (oi, v, ether_addr, sizeof ether_addr);
+.fi
+.in -.5i
+.sp
+.lp
+The \fIo_specific\fR routine takes a structure corresponding to a
+syntax,
+such as an \fIOID\fR for ObjectID,
+and does the encoding,
+e.g.,
+.sp
+.in +.5i
+.nf
+OID nullSpecific = ...;
+
+o_specific (oi, v, nullSpecific);
+.fi
+.in +.5i
+.sp
+
+.sh 3 "A special case"
+.lp
+A special user-defined routine is provided for those cases for
+leaf-objects containing information that is initialized on start-up,
+\fIo_generic\fR.
+For example:
+.sp
+.in +.5i
+.nf
+char    buffer[BUFSIZ];
+
+if (ot = text2obj ("sysName"))
+    ot -> ot_getfnx = o_generic,
+    ot -> ot_info = (caddr_t) sysName;
+
+(void) gethostname (buffer, sizeof buffer);
+(void) (*ot -> ot_syntax -> os_parse)
+                ((struct qbuf **) &ot -> ot_info, buffer);
+.fi
+.in -.5i
+.sp
+The idea is that the \fIot_info\fR field contains a pointer to a
+data structure corresponding to the syntax of the object.
+Since all of the structures are rather strange (except for integers),
+\fIo_generic\fR probably won't receive a lot of use.
+
+.sh 2 "Specific Event Handling: Inside a table"
+.lp
+Now let's look at one of these user-defined routines,
+which handles leaf objects that are part of a table:
+.sp
+.in +.5i
+.nf
+#define mbufType        0
+#define mbufAllocates   1
+
+
+static int  o_mbufType (oi, v, offset)
+OI      oi;
+register struct type_SNMP_VarBind *v;
+int     offset;
+{
+    int     ifnum,
+            ifvar;
+    register struct mbstat *m = &mbstat;
+    register OID    oid = oi -> oi_name;
+    register OT     ot = oi -> oi_type;
+
+    ifvar = (int) ot -> ot_info;
+    switch (offset) {
+        case type_SNMP_SMUX__PDUs_get__request:
+            if (oid -> oid_nelem
+                    != ot -> ot_name -> oid_nelem + 1)
+                return int_SNMP_error__status_noSuchName;
+            ifnum = 
+                  oid -> oid_elements[oid -> oid_nelem - 1];
+            if (ifvar >= sizeof m -> m_mtypes /
+                            sizeof m -> m_mtypes[0])
+                return int_SNMP_error__status_noSuchName;
+            break;
+
+        case type_SNMP_SMUX__PDUs_get__next__request:
+            if (oid -> oid_nelem
+                    == ot -> ot_name -> oid_nelem) {
+                OID     new;
+
+                ifnum = 0;
+
+                if ((new = oid_extend (oid, 1)) == NULLOID)
+                    return int_SNMP_error__status_genErr;
+                new -> oid_elements[new -> oid_nelem - 1] =
+                                ifnum;
+
+                if (v -> name)
+                    free_SNMP_ObjectName (v -> name);
+                v -> name = new;
+            }
+            else {
+                int     i = ot -> ot_name -> oid_nelem;
+
+                ifnum = oid -> oid_elements[i] + 1;
+                if (ifnum >= sizeof m -> m_mtypes /
+                                sizeof m -> m_mtypes[0])
+                    return NOTOK;
+
+                oid -> oid_elements[i] = ifnum;
+                oid -> oid_nelem = i + 1;
+            }
+            break;
+
+        default:
+            return int_SNMP_error__status_genErr;
+    }
+
+    if (quantum != lastq) {
+        lastq = quantum;
+
+        if (getkmem (nl + N_MBSTAT, (caddr_t) m, sizeof *m)
+                == NOTOK)
+            return int_SNMP_error__status_genErr;
+    }
+
+    switch (ifvar) {
+        case mbufType:
+            return o_integer (oi, v, ifnum);
+
+        case mbufAllocates:
+            return o_integer (oi, v,
+                              m -> m_mtypes[ifnum]);
+
+        default:
+            return int_SNMP_error__status_noSuchName;
+    }
+}
+.fi
+.in -.5i
+.sp
+The actual code is fairly straight-forward:
+First,
+the constant offsets are defined.
+Then, the \fIo_mbufType\fR routine is defined.
+.lp
+The first action is to determine which leaf object is being referenced.
+This corresponding symbolic constant is placed in the variable \fIifvar\fR.
+Then a switch is made based on the operation.
+Because these are tabular objects,
+the instance refers to a row in the table
+(and the leaf object refers to a column in the table, of course).
+.np
+For the get operation,
+all instances are identified by the object type followed by
+\*(lq.\fIrowno\fR\*(rq
+(e.g., \*(lqmbufAllocates.10\*(rq) refers to the value in the
+\fImbufAllocates\fR column of the thenth row).
+So,
+the code checks to see if the \fIOID\fR associated with the object
+instance is exactly one longer than the \fIOID\fR associated with the
+object type,
+and that the extra sub-identifier is within the range 0..rowno-1.
+.np
+For the powerful get-next operation,
+there are really two cases,
+depending on whether some instance identifier is present.
+If no instance is identified,
+a new \fIOID\fR is constructed and initialized for the first row
+(row 0) of the table. 
+The old \fIOID\fR is free'd and the new one inserted in its place.
+Otherwise,
+if some instance identifier is present,
+then the corresponding row must be identified,
+the row number incremented, and a check made to see if this is still
+in range
+(if not, \fINOTOK\fR is returned to signal that the next object type
+should be used).
+Otherwise,
+the \fIOID\fR is updated in place.
+.lp
+Now that the correct instance has been identified,
+a check is made to see if \fIkmem\fR should be consulted.
+(Obviously other programs might consult other data stores.)
+Finally,
+the instance value is encoded and the routine returns.
+
+.sh 3 "The general case"
+.lp
+Obviously,
+this is a simple example of table handling.
+In general, the table will be implemented via linked lists,
+sorted according to object instance.
+In this case, 
+there is usually a special routine that is called to get a particular
+instance or the next instance.
+Take a look at the routines \fIget_tbent\fR and \fIo_smuxTree\fR in
+the file \fIsnmpd.c\fR.
+These implement the \fIsmuxTree\fR table.
+
+.\" some day talk about:
+.\"     PEs
+.\"     mediaddr2oid
+
+.bp
+.sh 1 "For Further Reading"
+.lp
+For an example of a complete SMUX peer,
+look at the \fBunixd\fR daemon.
+It performs both multiple registrations and sets.
+The source is in \fBsnmp/unixd.c\fR.
+
+.bp
+.lp
+\fBTable of Contents\fR
+.sp 2
+.xp t

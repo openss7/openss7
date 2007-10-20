@@ -1,0 +1,20 @@
+.PS
+.ps 20
+## figure 2
+boxwid = 4 * boxwid
+boxht  = 2 * boxht
+B1:	box height boxht*7/4
+B2:	box with .n at (B1.s.x, B1.s.y-lineht) "\normalsize RTS"
+B3:	box with .n at (B2.s.x, B2.s.y-lineht) "\normalsize SESSION"
+	line dotted from B1.n to B1.s
+	line from B1.s to B2.n "\ bulk datastructures" ljust
+	line from B2.s to B3.n "\ dialogues" ljust
+##
+boxwid = boxwid / 4
+boxht =	 boxht / 2
+B1a:	box with .w at (B1.w.x+boxwid/2, B1.w.y) "P1" dashed
+B1b:	box with .ne at (B1.ne.x-boxwid/2, B1.n.y-boxht/2) "P3" dashed
+B1c:	box with .se at (B1.ne.x-boxwid/2, B1.s.y+boxht/2) "ROS"
+	line from B1b.s to B1c.n
+##
+.PE

@@ -1,0 +1,199 @@
+\File{passwd\-resp.c},{22:53},{Jul  6 1990}
+\L{\LB{\C{}\/* lookup\_service.c \- password lookup service \-\- responder *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{\#include} \<stdio.h\>}}
+\L{\LB{\K{\#include} \<pwd.h\>}}
+\L{\LB{\K{\#include} \S{}\"ryresponder.h\"\SE{}}\Tab{40}{\C{}\/* for generic idempotent responders *\/\CE{}}}
+\L{\LB{\K{\#include} \S{}\"PasswordLookup\-ops.h\"\SE{}}\Tab{40}{\C{}\/* operation definitions *\/\CE{}}}
+\L{\LB{\K{\#include} \S{}\"PasswordLookup\-types.h\"\SE{}}\Tab{40}{\C{}\/* type definitions *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{\#define}}\Tab{8}{xalloc(p, type) \!}}
+\L{\LB{}\Tab{8}{((p) = (type) calloc (1, \K{sizeof} *(p)))}}
+\L{\LB{}}
+\L{\LB{\K{\#define}}\Tab{8}{salloc(s) \!}}
+\L{\LB{}\Tab{8}{str2qb ((s), strlen (s), 1)}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{\#ifdef}}\Tab{8}{SYS5}}
+\L{\LB{\K{struct} passwd *getpwnam (), *getpwuid ();}}
+\L{\LB{\K{\#endif}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\/* DATA *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{char} *myservice = \S{}\"passwdstore\"\SE{};}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{char} *mycontext = \S{}\"isode passwd lookup demo\"\SE{};}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{}\Tab{40}{\C{}\/* OPERATIONS *\/\CE{}}}
+\L{\LB{\K{int}}\Tab{8}{op\_lookupUser (), op\_lookupUID ();}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{struct} dispatch dispatches[] = \{}}
+\L{\LB{    \S{}\"lookupUser\"\SE{}, operation\_PasswordLookup\_lookupUser, op\_lookupUser,}}
+\L{\LB{}}
+\L{\LB{    \S{}\"lookupUID\"\SE{}, operation\_PasswordLookup\_lookupUID, op\_lookupUID,}}
+\L{\LB{}}
+\L{\LB{    NULL}}
+\L{\LB{\};}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\/* MAIN *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ARGSUSED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\Proc{main}main (argc, argv, envp)}}
+\L{\LB{\K{int}}\Tab{8}{argc;}}
+\L{\LB{\K{char}  **argv,}}
+\L{\LB{      **envp;}}
+\L{\LB{\{}}
+\L{\LB{    ryresponder (argc, argv, PLocalHostName (), myservice, mycontext,}}
+\L{\LB{}\Tab{16}{ dispatches, table\_PasswordLookup\_Operations,}}
+\L{\LB{}\Tab{16}{ NULLIFP, NULLIFP);}}
+\L{\LB{}}
+\L{\LB{    exit (0);}\Tab{32}{\C{}\/* NOTREACHED *\/\CE{}}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\/* OPERATIONS *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  op\_lookupUser (sd, ryo, rox, in, roi)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{struct} RyOperation *ryo;}}
+\L{\LB{\K{struct} RoSAPinvoke *rox;}}
+\L{\LB{caddr\_t}\Tab{8}{in;}}
+\L{\LB{\K{struct} RoSAPindication *roi;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}     result;}}
+\L{\LB{    \K{char}   *cp;}}
+\L{\LB{    \K{register} \K{struct} type\_PasswordLookup\_UserName   *arg =}}
+\L{\LB{}\Tab{16}{(\K{struct} type\_PasswordLookup\_UserName   *) in;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (rox \-\> rox\_nolinked == 0) \{}}
+\L{\LB{}\Tab{8}{advise (LLOG\_NOTICE, NULLCP,}}
+\L{\LB{}\Tab{16}{\S{}\"RO\-INVOKE.INDICATION\/\%d: \%s, unknown linkage \%d\"\SE{},}}
+\L{\LB{}\Tab{16}{sd, ryo \-\> ryo\_name, rox \-\> rox\_linkid);}}
+\L{\LB{}\Tab{8}{\K{return} ureject (sd, ROS\_IP\_LINKED, rox, roi);}}
+\L{\LB{    \}}}
+\L{\LB{    \K{if} (debug)}}
+\L{\LB{}\Tab{8}{advise (LLOG\_DEBUG, NULLCP, \S{}\"RO\-INVOKE.INDICATION\/\%d: \%s\"\SE{},}}
+\L{\LB{}\Tab{16}{sd, ryo \-\> ryo\_name);}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((cp = qb2str (arg)) == NULL)}}
+\L{\LB{}\Tab{8}{result = error (sd, error\_PasswordLookup\_congested, (caddr\_t) NULL,}}
+\L{\LB{}\Tab{24}{rox, roi);}}
+\L{\LB{    \K{else} \{}}
+\L{\LB{}\Tab{8}{result = lookup (sd, getpwnam (cp), rox, roi);}}
+\L{\LB{}\Tab{8}{free (cp);}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{return} result;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  op\_lookupUID (sd, ryo, rox, in, roi)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{struct} RyOperation *ryo;}}
+\L{\LB{\K{struct} RoSAPinvoke *rox;}}
+\L{\LB{caddr\_t}\Tab{8}{in;}}
+\L{\LB{\K{struct} RoSAPindication *roi;}}
+\L{\LB{\{}}
+\L{\LB{    \K{register} \K{struct} type\_PasswordLookup\_UserID   *arg =}}
+\L{\LB{}\Tab{16}{(\K{struct} type\_PasswordLookup\_UserID   *) in;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (rox \-\> rox\_nolinked == 0) \{}}
+\L{\LB{}\Tab{8}{advise (LLOG\_EXCEPTIONS, NULLCP,}}
+\L{\LB{}\Tab{16}{\S{}\"RO\-INVOKE.INDICATION\/\%d: \%s, unknown linkage \%d\"\SE{},}}
+\L{\LB{}\Tab{16}{sd, ryo \-\> ryo\_name, rox \-\> rox\_linkid);}}
+\L{\LB{}\Tab{8}{\K{return} ureject (sd, ROS\_IP\_LINKED, rox, roi);}}
+\L{\LB{    \}}}
+\L{\LB{    \K{if} (debug)}}
+\L{\LB{}\Tab{8}{advise (LLOG\_DEBUG, NULLCP, \S{}\"RO\-INVOKE.INDICATION\/\%d: \%s\"\SE{},}}
+\L{\LB{}\Tab{16}{sd, ryo \-\> ryo\_name);}}
+\L{\LB{}}
+\L{\LB{    \K{return} lookup (sd, getpwuid (arg \-\> arg), rox, roi);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  lookup (sd, pw, rox, roi)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{struct} passwd *pw;}}
+\L{\LB{\K{struct} RoSAPinvoke *rox;}}
+\L{\LB{\K{struct} RoSAPindication *roi;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}}\Tab{8}{    result;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (pw) \{}}
+\L{\LB{}\Tab{8}{\K{register} \K{struct} type\_PasswordLookup\_Passwd *res = NULL;}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{if} (xalloc (res, \K{struct} type\_PasswordLookup\_Passwd *) == NULL}}
+\L{\LB{}\Tab{16}{\|\| (res \-\> name = salloc (pw \-\> pw\_name)) == NULL}}
+\L{\LB{}\Tab{16}{\|\| (*pw \-\> pw\_passwd}}
+\L{\LB{}\Tab{24}{\&\& (res \-\> passwd = salloc (pw \-\> pw\_passwd)) == NULL)}}
+\L{\LB{}\Tab{16}{\|\| xalloc (res \-\> uid, \K{struct} type\_PasswordLookup\_UserID *)}}
+\L{\LB{}\Tab{24}{== NULL}}
+\L{\LB{}\Tab{16}{\|\| xalloc (res \-\> gid, \K{struct} type\_PasswordLookup\_GroupID *)}}
+\L{\LB{}\Tab{24}{== NULL}}
+\L{\LB{}\Tab{16}{\|\| (pw \-\> pw\_comment}}
+\L{\LB{}\Tab{24}{\&\& (res \-\> comment = salloc (pw \-\> pw\_comment))}}
+\L{\LB{}\Tab{32}{== NULL)}}
+\L{\LB{}\Tab{16}{\|\| (pw \-\> pw\_gecos}}
+\L{\LB{}\Tab{24}{\&\& (res \-\> gecos = salloc (pw \-\> pw\_gecos)) == NULL)}}
+\L{\LB{}\Tab{16}{\|\| (pw \-\> pw\_dir}}
+\L{\LB{}\Tab{24}{\&\& (res \-\> dir = salloc (pw \-\> pw\_dir)) == NULL)}}
+\L{\LB{}\Tab{16}{\|\| (pw \-\> pw\_shell}}
+\L{\LB{}\Tab{24}{\&\& (res \-\> shell = salloc (pw \-\> pw\_shell))}}
+\L{\LB{}\Tab{32}{    == NULL))}}
+\L{\LB{}\Tab{8}{    result = error (sd, error\_PasswordLookup\_congested, (caddr\_t) NULL,}}
+\L{\LB{}\Tab{16}{rox, roi);}}
+\L{\LB{}\Tab{8}{\K{else} \{}}
+\L{\LB{}\Tab{8}{    res \-\> uid \-\> arg = pw \-\> pw\_uid;}}
+\L{\LB{}\Tab{8}{    res \-\> gid \-\> arg = pw \-\> pw\_gid;}}
+\L{\LB{}\Tab{8}{    res \-\> quota = pw \-\> pw\_quota;}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \K{if} (RyDsResult (sd, rox \-\> rox\_id, (caddr\_t) res, ROS\_NOPRIO, roi)}}
+\L{\LB{}\Tab{16}{    == NOTOK)}}
+\L{\LB{}\Tab{16}{ros\_adios (\&roi \-\> roi\_preject, \S{}\"RESULT\"\SE{});}}
+\L{\LB{}\Tab{8}{    result = OK;}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{free\_PasswordLookup\_Passwd (res);}}
+\L{\LB{    \}}}
+\L{\LB{    \K{else}}}
+\L{\LB{}\Tab{8}{result = error (sd, error\_PasswordLookup\_noSuchUser, (caddr\_t) NULL,}}
+\L{\LB{}\Tab{16}{rox, roi);}}
+\L{\LB{}}
+\L{\LB{    \K{return} result;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ERROR *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  error (sd, err, param, rox, roi)}}
+\L{\LB{\K{int}}\Tab{8}{sd,}}
+\L{\LB{}\Tab{8}{err;}}
+\L{\LB{caddr\_t}\Tab{8}{param;}}
+\L{\LB{\K{struct} RoSAPinvoke *rox;}}
+\L{\LB{\K{struct} RoSAPindication *roi;}}
+\L{\LB{\{}}
+\L{\LB{    \K{if} (RyDsError (sd, rox \-\> rox\_id, err, param, ROS\_NOPRIO, roi) == NOTOK)}}
+\L{\LB{}\Tab{8}{ros\_adios (\&roi \-\> roi\_preject, \S{}\"ERROR\"\SE{});}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\/* U\-REJECT *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  ureject (sd, reason, rox, roi)}}
+\L{\LB{\K{int}}\Tab{8}{sd,}}
+\L{\LB{}\Tab{8}{reason;}}
+\L{\LB{\K{struct} RoSAPinvoke *rox;}}
+\L{\LB{\K{struct} RoSAPindication *roi;}}
+\L{\LB{\{}}
+\L{\LB{    \K{if} (RyDsUReject (sd, rox \-\> rox\_id, reason, ROS\_NOPRIO, roi) == NOTOK)}}
+\L{\LB{}\Tab{8}{ros\_adios (\&roi \-\> roi\_preject, \S{}\"U\-REJECT\"\SE{});}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}

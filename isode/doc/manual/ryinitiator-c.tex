@@ -1,0 +1,360 @@
+\File{ryinitiator\-c.c},{11:48},{Dec 10 1990}
+\L{\LB{\C{}\/* ryinitiator.c \- generic interactive initiator *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{\#include} \<stdio.h\>}}
+\L{\LB{\K{\#include} \<varargs.h\>}}
+\L{\LB{\K{\#include} \S{}\"ryinitiator.h\"\SE{}}}
+\L{\LB{}}
+\L{\LB{\C{}\/*    DATA *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{char} *myname = \S{}\"ryinitiator\"\SE{};}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{extern} \K{char} *isodeversion;}}
+\L{\LB{}}
+\L{\LB{\C{}\/*    INITIATOR *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\Proc{ryinitiator}ryinitiator (argc, argv, myservice, mycontext, mypci, ops, dispatches, quit)}}
+\L{\LB{\K{int}}\Tab{8}{argc;}}
+\L{\LB{\K{char}  **argv,}}
+\L{\LB{       *myservice,}}
+\L{\LB{       *mycontext,}}
+\L{\LB{       *mypci;}}
+\L{\LB{\K{struct} RyOperation ops[];}}
+\L{\LB{\K{struct} dispatch *dispatches;}}
+\L{\LB{IFP}\Tab{8}{quit;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}}\Tab{8}{    iloop,}}
+\L{\LB{}\Tab{8}{    sd;}}
+\L{\LB{    \K{char}    buffer[BUFSIZ],}}
+\L{\LB{}\Tab{8}{   *vec[NVEC + 1];}}
+\L{\LB{    \K{register} \K{struct} dispatch   *ds;}}
+\L{\LB{    \K{struct} SSAPref sfs;}}
+\L{\LB{    \K{register} \K{struct} SSAPref *sf;}}
+\L{\LB{    \K{register} \K{struct} PSAPaddr *pa;}}
+\L{\LB{    \K{struct} AcSAPconnect accs;}}
+\L{\LB{    \K{register} \K{struct} AcSAPconnect   *acc = \&accs;}}
+\L{\LB{    \K{struct} AcSAPindication  acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPindication *aci = \&acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPabort *aca = \&aci \-\> aci\_abort;}}
+\L{\LB{    AEI}\Tab{8}{    aei;}}
+\L{\LB{    OID}\Tab{8}{    ctx,}}
+\L{\LB{}\Tab{8}{    pci;}}
+\L{\LB{    \K{struct} PSAPctxlist pcs;}}
+\L{\LB{    \K{register} \K{struct} PSAPctxlist *pc = \&pcs;}}
+\L{\LB{    \K{struct} RoSAPindication rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (myname = rindex (argv[0], \S{}\'\/\'\SE{}))}}
+\L{\LB{}\Tab{8}{myname++;}}
+\L{\LB{    \K{if} (myname == NULL \|\| *myname == NULL)}}
+\L{\LB{}\Tab{8}{myname = argv[0];}}
+\L{\LB{}}
+\L{\LB{    \K{if} (argc \< 2)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"usage: \%s host [operation [ arguments ... ]]\"\SE{}, myname);}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((aei = \_str2aei (argv[1], myservice, mycontext, argc \< 3,}}
+\L{\LB{}\Tab{24}{ NULLCP, NULLCP)) == NULLAEI)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"unable to resolve service: \%s\"\SE{}, PY\_pepy);}}
+\L{\LB{    \K{if} ((pa = aei2addr (aei)) == NULLPA)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"address translation failed\"\SE{});}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((ctx = ode2oid (mycontext)) == NULLOID)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"\%s: unknown object descriptor\"\SE{}, mycontext);}}
+\L{\LB{    \K{if} ((ctx = oid\_cpy (ctx)) == NULLOID)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"out of memory\"\SE{});}}
+\L{\LB{    \K{if} ((pci = ode2oid (mypci)) == NULLOID)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"\%s: unknown object descriptor\"\SE{}, mypci);}}
+\L{\LB{    \K{if} ((pci = oid\_cpy (pci)) == NULLOID)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"out of memory\"\SE{});}}
+\L{\LB{    pc \-\> pc\_nctx = 1;}}
+\L{\LB{    pc \-\> pc\_ctx[0].pc\_id = 1;}}
+\L{\LB{    pc \-\> pc\_ctx[0].pc\_asn = pci;}}
+\L{\LB{    pc \-\> pc\_ctx[0].pc\_atn = NULLOID;}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((sf = addr2ref (PLocalHostName ())) == NULL) \{}}
+\L{\LB{}\Tab{8}{sf = \&sfs;}}
+\L{\LB{}\Tab{8}{(\K{void}) bzero ((\K{char} *) sf, \K{sizeof} *sf);}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{if} (argc \< 3) \{}}
+\L{\LB{}\Tab{8}{printf (\S{}\"\%s\"\SE{}, myname);}}
+\L{\LB{}\Tab{8}{\K{if} (sf \-\> sr\_ulen \> 2)}}
+\L{\LB{}\Tab{8}{    printf (\S{}\" running on host \%s\"\SE{}, sf \-\> sr\_udata + 2);}}
+\L{\LB{}\Tab{8}{\K{if} (sf \-\> sr\_clen \> 2)}}
+\L{\LB{}\Tab{8}{    printf (\S{}\" at \%s\"\SE{}, sf \-\> sr\_cdata + 2);}}
+\L{\LB{}\Tab{8}{printf (\S{}\" [\%s, \"\SE{}, oid2ode (ctx));}}
+\L{\LB{}\Tab{8}{printf (\S{}\"\%s]\!n\"\SE{}, oid2ode (pci));}}
+\L{\LB{}\Tab{8}{printf (\S{}\"using \%s\!n\"\SE{}, isodeversion);}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{printf (\S{}\"\%s... \"\SE{}, argv[1]);}}
+\L{\LB{}\Tab{8}{(\K{void}) fflush (stdout);}}
+\L{\LB{    }}
+\L{\LB{}\Tab{8}{iloop = 1;}}
+\L{\LB{    \}}}
+\L{\LB{    \K{else} \{}}
+\L{\LB{}\Tab{8}{\K{for} (ds = dispatches; ds \-\> ds\_name; ds++)}}
+\L{\LB{}\Tab{8}{    \K{if} (strcmp (ds \-\> ds\_name, argv[2]) == 0)}}
+\L{\LB{}\Tab{16}{\K{break};}}
+\L{\LB{}\Tab{8}{\K{if} (ds \-\> ds\_name == NULL)}}
+\L{\LB{}\Tab{8}{    adios (NULLCP, \S{}\"unknown operation \!\"\%s\!\"\"\SE{}, argv[2]);}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{iloop = 0;}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{if} (AcAssocRequest (ctx, NULLAEI, aei, NULLPA, pa, pc, NULLOID,}}
+\L{\LB{}\Tab{16}{0, ROS\_MYREQUIRE, SERIAL\_NONE, 0, sf, NULLPEP, 0, NULLQOS,}}
+\L{\LB{}\Tab{16}{acc, aci)}}
+\L{\LB{}\Tab{8}{    == NOTOK)}}
+\L{\LB{}\Tab{8}{acs\_adios (aca, \S{}\"A\-ASSOCIATE.REQUEST\"\SE{});}}
+\L{\LB{}}
+\L{\LB{    \K{if} (acc \-\> acc\_result != ACS\_ACCEPT) \{}}
+\L{\LB{}\Tab{8}{\K{if} (iloop)}}
+\L{\LB{}\Tab{8}{    printf (\S{}\"failed\!n\"\SE{});}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"association rejected: [\%s]\"\SE{},}}
+\L{\LB{}\Tab{16}{AcErrString (acc \-\> acc\_result));}}
+\L{\LB{    \}}}
+\L{\LB{    \K{if} (iloop) \{}}
+\L{\LB{}\Tab{8}{printf (\S{}\"connected\!n\"\SE{});}}
+\L{\LB{}\Tab{8}{(\K{void}) fflush (stdout);}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    sd = acc \-\> acc\_sd;}}
+\L{\LB{    ACCFREE (acc);}}
+\L{\LB{}}
+\L{\LB{    \K{if} (RoSetService (sd, RoPService, roi) == NOTOK)}}
+\L{\LB{}\Tab{8}{ros\_adios (rop, \S{}\"set RO\/PS fails\"\SE{});}}
+\L{\LB{}}
+\L{\LB{    \K{if} (iloop) \{}}
+\L{\LB{}\Tab{8}{\K{for} (;;) \{}}
+\L{\LB{}\Tab{8}{    \K{if} (getline (buffer) == NOTOK)}}
+\L{\LB{}\Tab{16}{\K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \K{if} (str2vec (buffer, vec) \< 1)}}
+\L{\LB{}\Tab{16}{\K{continue};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \K{for} (ds = dispatches; ds \-\> ds\_name; ds++)}}
+\L{\LB{}\Tab{16}{\K{if} (strcmp (ds \-\> ds\_name, vec[0]) == 0)}}
+\L{\LB{}\Tab{16}{    \K{break};}}
+\L{\LB{}\Tab{8}{    \K{if} (ds \-\> ds\_name == NULL) \{}}
+\L{\LB{}\Tab{16}{advise (NULLCP, \S{}\"unknown operation \!\"\%s\!\"\"\SE{}, vec[0]);}}
+\L{\LB{}\Tab{16}{\K{continue};}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    invoke (sd, ops, ds, vec + 1);}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{    \}}}
+\L{\LB{    \K{else}}}
+\L{\LB{}\Tab{8}{invoke (sd, ops, ds, argv + 3);}}
+\L{\LB{}}
+\L{\LB{    (*quit) (sd, (\K{struct} dispatch *) NULL, (\K{char} **) NULL, (caddr\_t *) NULL);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\C{}\/*  *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static}}\Tab{8}{invoke (sd, ops, ds, args)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{struct} RyOperation ops[];}}
+\L{\LB{\K{register} \K{struct} dispatch *ds;}}
+\L{\LB{\K{char}  **args;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}}\Tab{8}{    result;}}
+\L{\LB{    caddr\_t in;}}
+\L{\LB{    \K{struct} RoSAPindication  rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject   *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{}}
+\L{\LB{    in = NULL;}}
+\L{\LB{    \K{if} (ds \-\> ds\_argument \&\& (*ds \-\> ds\_argument) (sd, ds, args, \&in) == NOTOK)}}
+\L{\LB{}\Tab{8}{\K{return};}}
+\L{\LB{}}
+\L{\LB{    \K{switch} (result = RyStub (sd, ops, ds \-\> ds\_operation, RyGenID (sd), NULLIP,}}
+\L{\LB{}\Tab{16}{    in, ds \-\> ds\_result, ds \-\> ds\_error, ROS\_SYNC, roi)) \{}}
+\L{\LB{}\Tab{8}{\K{case} NOTOK:}\Tab{32}{\C{}\/* failure *\/\CE{}}}
+\L{\LB{}\Tab{8}{    \K{if} (ROS\_FATAL (rop \-\> rop\_reason))}}
+\L{\LB{}\Tab{16}{ros\_adios (rop, \S{}\"STUB\"\SE{});}}
+\L{\LB{}\Tab{8}{    ros\_advise (rop, \S{}\"STUB\"\SE{});}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} OK:}\Tab{32}{\C{}\/* got a result\/error response *\/\CE{}}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} DONE:}\Tab{32}{\C{}\/* got RO\-END? *\/\CE{}}}
+\L{\LB{}\Tab{8}{    adios (NULLCP, \S{}\"got RO\-END.INDICATION\"\SE{});}}
+\L{\LB{}\Tab{8}{    \C{}\/* NOTREACHED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}:}}
+\L{\LB{}\Tab{8}{    adios (NULLCP, \S{}\"unknown return from RyStub=\%d\"\SE{}, result);}}
+\L{\LB{}\Tab{8}{    \C{}\/* NOTREACHED *\/\CE{}}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{if} (ds \-\> ds\_free \&\& in)}}
+\L{\LB{}\Tab{8}{(\K{void}) (*ds \-\> ds\_free) (in);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\C{}\/*  *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  getline (buffer)}}
+\L{\LB{\K{char}   *buffer;}}
+\L{\LB{\{}}
+\L{\LB{    \K{register} \K{int}    i;}}
+\L{\LB{    \K{register} \K{char}  *cp,}}
+\L{\LB{                   *ep;}}
+\L{\LB{    \K{static} \K{int}  sticky = 0;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (sticky) \{}}
+\L{\LB{}\Tab{8}{sticky = 0;}}
+\L{\LB{}\Tab{8}{\K{return} NOTOK;}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    printf (\S{}\"\%s\> \"\SE{}, myname);}}
+\L{\LB{    (\K{void}) fflush (stdout);}}
+\L{\LB{}}
+\L{\LB{    \K{for} (ep = (cp = buffer) + BUFSIZ \- 1; (i = getchar ()) != \S{}\'\!n\'\SE{};) \{}}
+\L{\LB{}\Tab{8}{\K{if} (i == EOF) \{}}
+\L{\LB{}\Tab{8}{    printf (\S{}\"\!n\"\SE{});}}
+\L{\LB{}\Tab{8}{    clearerr (stdin);}}
+\L{\LB{}\Tab{8}{    \K{if} (cp != buffer) \{}}
+\L{\LB{}\Tab{16}{sticky++;}}
+\L{\LB{}\Tab{16}{\K{break};}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \K{return} NOTOK;}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{if} (cp \< ep)}}
+\L{\LB{}\Tab{8}{    *cp++ = i;}}
+\L{\LB{    \}}}
+\L{\LB{    *cp = NULL;}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\C{}\/*  *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{ros\_adios (rop, event)}}
+\L{\LB{\K{register} \K{struct} RoSAPpreject *rop;}}
+\L{\LB{\K{char}   *event;}}
+\L{\LB{\{}}
+\L{\LB{    ros\_advise (rop, event);}}
+\L{\LB{}}
+\L{\LB{    \_exit (1);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{ros\_advise (rop, event)}}
+\L{\LB{\K{register} \K{struct} RoSAPpreject *rop;}}
+\L{\LB{\K{char}   *event;}}
+\L{\LB{\{}}
+\L{\LB{    \K{char}    buffer[BUFSIZ];}}
+\L{\LB{}}
+\L{\LB{    \K{if} (rop \-\> rop\_cc \> 0)}}
+\L{\LB{}\Tab{8}{(\K{void}) sprintf (buffer, \S{}\"[\%s] \%*.*s\"\SE{}, RoErrString (rop \-\> rop\_reason),}}
+\L{\LB{}\Tab{16}{rop \-\> rop\_cc, rop \-\> rop\_cc, rop \-\> rop\_data);}}
+\L{\LB{    \K{else}}}
+\L{\LB{}\Tab{8}{(\K{void}) sprintf (buffer, \S{}\"[\%s]\"\SE{}, RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}}
+\L{\LB{    advise (NULLCP, \S{}\"\%s: \%s\"\SE{}, event, buffer);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\C{}\/*  *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{acs\_adios (aca, event)}}
+\L{\LB{\K{register} \K{struct} AcSAPabort *aca;}}
+\L{\LB{\K{char}   *event;}}
+\L{\LB{\{}}
+\L{\LB{    acs\_advise (aca, event);}}
+\L{\LB{}}
+\L{\LB{    \_exit (1);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{acs\_advise (aca, event)}}
+\L{\LB{\K{register} \K{struct} AcSAPabort *aca;}}
+\L{\LB{\K{char}   *event;}}
+\L{\LB{\{}}
+\L{\LB{    \K{char}    buffer[BUFSIZ];}}
+\L{\LB{}}
+\L{\LB{    \K{if} (aca \-\> aca\_cc \> 0)}}
+\L{\LB{}\Tab{8}{(\K{void}) sprintf (buffer, \S{}\"[\%s] \%*.*s\"\SE{},}}
+\L{\LB{}\Tab{16}{AcErrString (aca \-\> aca\_reason),}}
+\L{\LB{}\Tab{16}{aca \-\> aca\_cc, aca \-\> aca\_cc, aca \-\> aca\_data);}}
+\L{\LB{    \K{else}}}
+\L{\LB{}\Tab{8}{(\K{void}) sprintf (buffer, \S{}\"[\%s]\"\SE{}, AcErrString (aca \-\> aca\_reason));}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{advise (NULLCP, \S{}\"\%s: \%s (source \%d)\"\SE{}, event, buffer,}}
+\L{\LB{}\Tab{16}{aca \-\> aca\_source);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\C{}\/*  *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{\#ifndef}}\Tab{8}{lint}}
+\L{\LB{\K{void}}\Tab{8}{\_advise ();}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{adios (va\_alist)}}
+\L{\LB{va\_dcl}}
+\L{\LB{\{}}
+\L{\LB{    va\_list ap;}}
+\L{\LB{}}
+\L{\LB{    va\_start (ap);}}
+\L{\LB{}}
+\L{\LB{    \_advise (ap);}}
+\L{\LB{}}
+\L{\LB{    va\_end (ap);}}
+\L{\LB{}}
+\L{\LB{    \_exit (1);}}
+\L{\LB{\}}}
+\L{\LB{\K{\#else}}}
+\L{\LB{\C{}\/* VARARGS *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{adios (what, fmt)}}
+\L{\LB{\K{char}   *what,}}
+\L{\LB{       *fmt;}}
+\L{\LB{\{}}
+\L{\LB{    adios (what, fmt);}}
+\L{\LB{\}}}
+\L{\LB{\K{\#endif}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{\#ifndef}}\Tab{8}{lint}}
+\L{\LB{\K{void}}\Tab{8}{advise (va\_alist)}}
+\L{\LB{va\_dcl}}
+\L{\LB{\{}}
+\L{\LB{    va\_list ap;}}
+\L{\LB{}}
+\L{\LB{    va\_start (ap);}}
+\L{\LB{}}
+\L{\LB{    \_advise (ap);}}
+\L{\LB{}}
+\L{\LB{    va\_end (ap);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{void}  \_advise (ap)}}
+\L{\LB{va\_list}\Tab{8}{ap;}}
+\L{\LB{\{}}
+\L{\LB{    \K{char}    buffer[BUFSIZ];}}
+\L{\LB{}}
+\L{\LB{    asprintf (buffer, ap);}}
+\L{\LB{}}
+\L{\LB{    (\K{void}) fflush (stdout);}}
+\L{\LB{}}
+\L{\LB{    fprintf (stderr, \S{}\"\%s: \"\SE{}, myname);}}
+\L{\LB{    (\K{void}) fputs (buffer, stderr);}}
+\L{\LB{    (\K{void}) fputc (\S{}\'\!n\'\SE{}, stderr);}}
+\L{\LB{}}
+\L{\LB{    (\K{void}) fflush (stderr);}}
+\L{\LB{\}}}
+\L{\LB{\K{\#else}}}
+\L{\LB{\C{}\/* VARARGS *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{advise (what, fmt)}}
+\L{\LB{\K{char}   *what,}}
+\L{\LB{       *fmt;}}
+\L{\LB{\{}}
+\L{\LB{    advise (what, fmt);}}
+\L{\LB{\}}}
+\L{\LB{\K{\#endif}}}

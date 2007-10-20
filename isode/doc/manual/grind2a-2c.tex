@@ -1,0 +1,38 @@
+\File{grind2a\-2c.c},{22:23},{Jun 12 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  ros\_work (fd)}}
+\L{\LB{\K{int}}\Tab{8}{fd;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}}\Tab{8}{    result;}}
+\L{\LB{    \K{struct} AcSAPindication  acis;}}
+\L{\LB{    \K{struct} RoSAPindication  rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject   *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{}}
+\L{\LB{    \K{switch} (setjmp (toplevel)) \{}}
+\L{\LB{}\Tab{8}{\K{case} OK: }}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}: }}
+\L{\LB{}\Tab{8}{    (\K{void}) AcUAbortRequest (fd, NULLPEP, 0, \&acis);}}
+\L{\LB{}\Tab{8}{    \K{return} NOTOK;}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{switch} (result = RoWaitRequest (fd, OK, roi)) \{}}
+\L{\LB{}\Tab{8}{\K{case} NOTOK: }}
+\L{\LB{}\Tab{8}{    \K{if} (rop \-\> rop\_reason == ROS\_TIMER)}}
+\L{\LB{}\Tab{16}{\K{break};}}
+\L{\LB{}\Tab{8}{\K{case} OK: }}
+\L{\LB{}\Tab{8}{\K{case} DONE: }}
+\L{\LB{}\Tab{8}{    ros\_indication (fd, roi);}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}: }}
+\L{\LB{}\Tab{8}{    fatal (NULLCP, \S{}\"unknown return from RoWaitRequest=\%d\"\SE{}, result);}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{...}}

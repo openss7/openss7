@@ -1,0 +1,86 @@
+.PS
+.ps 20
+	boxht = .754; boxwid = 1.75
+## figure 1
+UPRG:	box
+	move from UPRG.w up .015
+	line invisible right 1.75 "{USER}" " "
+	move from UPRG.w down .015
+	line invisible right 1.75 " " "{PROGRAMS}"
+APP:	box with .n at UPRG.s
+	move from APP.w up .015
+	line invisible right 1.75 "{LAYER 7}" " "
+	move from APP.w down .015
+	line invisible right 1.75 " " "{APPLICATION}"
+PRES:	box with .n at APP.s
+	move from PRES.w up .015
+	line invisible right 1.75 "{LAYER 6}" " "
+	move from PRES.w down .015
+	line invisible right 1.75 " " "{PRESENTATION}"
+SESS:	box with .n at PRES.s
+	move from SESS.w up .015
+	line invisible right 1.75 "{LAYER 5}" " "
+	move from SESS.w down .015
+	line invisible right 1.75 " " "{SESSION}"
+TRANS:	box shaded with .n at SESS.s
+	line from TRANS.ne to TRANS.nw
+	move from TRANS.sw up .005
+	line right 1.75
+	move from TRANS.sw up .010
+	line right 1.75
+	move from TRANS.w up .015
+	line invisible right 1.75 "{LAYER 4}" " "
+	move from TRANS.w down .015
+	line invisible right 1.75 " " "{TRANSPORT}"
+NET:	box shaded with .n at TRANS.s
+	move from NET.sw up .005
+	line right 1.75
+	move from NET.sw up .010
+	line right 1.75
+	move from NET.w up .015
+	line invisible right 1.75 "{LAYER 3}" " "
+	move from NET.w down .015
+	line invisible right 1.75 " " "{NETWORK}"
+DL:	box shaded with .n at NET.s
+	move from DL.sw up .005
+	line right 1.75
+	move from DL.sw up .010
+	line right 1.75
+	move from DL.w up .015
+	line invisible right 1.75 "{LAYER 2}" " "
+	move from DL.w down .015
+	line invisible right 1.75 " " "{DATA LINK}"
+PHY:	box shaded with .n at DL.s
+	line from PHY.se to PHY.sw
+	line from TRANS.ne to PHY.se
+	line from TRANS.nw to PHY.sw
+	move from PHY.w up .015
+	line invisible right 1.75 "{LAYER 1}" " "
+	move from PHY.w down .015
+	line invisible right 1.75 " " "{PHYSICAL}"
+#
+#
+	boxwid = 6.0
+	move from PRES.e right .5; X1: Here
+	line invis right 6.0 "\hbox to 6.0in{$\circ\ $ IMMEDIATE VACUUM IN THE DEVELOPMENT OF\hfil}" " "
+	move from X1 down .25; X2: Here
+	line invis right 6.0 "\hbox to 6.0in{\hphantom{$\circ\ \ $ I} APPLICATION PROTOCOLS\hfil}" " "
+	move from X2 down .25; X3: Here
+	move from X3 down .2; X4: Here
+	line invis right 6.0 "\hbox to 6.0in{\hphantom{\ IMMEI} EXPERIENCE SHOWS THAT APPLICATION\hfil}" " "
+	move from X4 down .25; X5: Here
+	line invis right 6.0 "\hbox to 6.0in{\hphantom{\ IMMEI$\circ\ \ $ I} PROTOCOL DEVELOPMENT TAKES AT\hfil}" " "
+	move from X5 down .25; X6: Here
+	line invis right 6.0 "\hbox to 6.0in{\hphantom{\ IMMEI$\circ\ \ $ I} LEAST AS MUCH TIME AS DEVELOPMENT\hfil}" " "
+	move from X6 down .25; X7: Here
+	line invis right 6.0 "\hbox to 6.0in{\hphantom{\ IMMEI$\circ\ \ $ I} OF THE LOWER--LEVEL PROTOCOLS\hfil}" " "
+	move from X7 down .25; X8: Here
+	move from X8 down .3; X9: Here
+	line invis right 6.0 "\hbox to 6.0in{$\circ\ $ LACK OF NEAR--TERM AVAILABILITY OF ISO\hfil}" " "
+	move from X9 down .25; X10: Here
+XA:	line invis right 6.0 "\hbox to 6.0in{\hphantom{$\circ\ \ $ I} ON ALL MACHINES\hfil}" " "
+.ps 1
+	move from XA.e left .75; XA1: Here
+	line dotted from XA1 right .001
+##
+.PE

@@ -1,0 +1,482 @@
+% -*- LaTeX -*-		(really SLiTeX)
+
+\documentstyle[blackandwhite,landscape,oval,pagenumbers,small]{NRslides}
+
+\font\xx=cmbx10
+\font\yy=cmbx7
+
+\raggedright
+
+\input trademark
+\let\tradeNAMfont=\relax
+\let\tradeORGfont=\relax
+
+\begin{document}
+
+\title	{ISODE FUTURE}
+\author	{Marshall T.~Rose\\ NYSERNet, Inc.}
+\date	{October 26, 1989}
+\maketitlepage
+
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]		WHAT'S THERE NOW
+
+\item[PART II:]		WHAT'S IN PROGRESS
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHAT IS THE ISODE?}
+
+\begin{nrtc}
+\item	THE ISO DEVELOPMENT ENVIRONMENT
+
+\item	AN OPENLY AVAILABLE IMPLEMENATION OF THE UPPER LAYERS OF OSI?
+
+\item	A BASIS FOR THE TRANSITION TO OSI?
+
+\item	A PLAYGROUND FOR ``THE PIED-PIPER OF OSI''?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{WHAT'S THERE NOW}\bf
+
+\begin{nrtc}
+\item	TRANSPORT SWITCH
+
+\item	APPLICATION ARCHITECTURE
+
+\item	APPLICATION COOKBOOK
+
+\item	APPLICATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{TRANSPORT SWITCH}\bf
+
+\begin{nrtc}
+\item	DECIDES WHICH TS-STACK TO USE FOR A CONNECTION
+
+\item	FOR RFC1006:
+    \begin{nrtc}
+    \item	TCP
+    \end{nrtc}
+
+\item	FOR TP0:
+    \begin{nrtc}
+    \item	X.25
+    \end{nrtc}
+
+\item	FOR TP4:
+    \begin{nrtc}
+    \item	4.4BSD OSI
+
+    \item	SunLink OSI
+    \end{nrtc}
+
+\item	EXPERIENCE SHOWS IT IS FAIRLY EASY TO ADD A NEW TS-STACK TO THE SWITCH
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRANSPORT-SERVICE BRIDGES}
+
+\vskip.5in
+\diagram[p]{figureT-9}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TCP vs. X.25 CONNECTIVITY}
+
+\vskip.5in
+\diagram[p]{figureI-7}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONS vs. CLNS CONNECTIVITY}
+
+\vskip.5in
+\diagram[p]{figureT-19}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{POSSIBLE XNS SCENARIO}
+
+\vskip.5in
+\diagram[p]{figureI-9}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{APPLICATION ARCHITECTURE}\bf
+
+\begin{nrtc}
+\item	A (NEARLY) COMPLETE IMPLEMENTATION OF THE UPPER LAYERS
+
+\item	``IS'' LEVEL SINCE 5.0 RELEASE
+
+\item	ALIGNED WITH VARIOUS NATIONAL OSI PROFILES
+    \begin{nrtc}
+    \item	(INFORMALLY, OF COURSE!)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE APPLICATION ENVIRONMENT}
+
+\vskip.5in
+\diagram[p]{figureI-1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN ALTERNATE ENVIRONMENT:\\ LIGHTWEIGHT PRESENTATION}
+
+\vskip.5in
+\diagram[p]{figureI-8}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN ALTERNATE ENVIRONMENT:\\ MHS ARCHITECTURE (c.~1984)}
+
+\vskip.5in
+\diagram[p]{figureI-2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{THE APPLICATIONS COOKBOOK}\bf
+
+\begin{nrtc}
+\item	TOOLS TO FACILITATE DEVELOPMENT OF APPLICATIONS ARE CRITICAL
+
+\item	IDEA IS TO DEVELOP TOOLS TO AUTOMATE USE OF OSI REMOTE OPERATIONS
+	SERVICE AS A GENERAL REMOTE PROCEDURE CALL FACILITY
+
+\item	FOR MORE DETAILS:
+\begin{quote}
+BUILDING DISTRIBUTED APPLICATIONS IN AN OSI FRAMEWORK
+\end{quote}
+APPEARING IN ConneXions, MARCH, 1988
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REMOTE OPERATIONS SERVICE (ROS)}
+
+\begin{nrtc}
+\item	STANDARDIZED MECHANISM FOR SPECIFYING TRANSACTIONS
+
+\item	EMPLOYS POWER OF ASN.1
+
+\item	USED IN MANY INTERESTING OSI APPLICATIONS
+    \begin{nrtc}
+    \item	MESSAGE HANDLING SYSTEMS
+
+    \item	DIRECTORY SERVICES
+
+    \item	NETWORK MANAGEMENT
+
+    \item	REMOTE DATABASE ACCESS
+    \end{nrtc}
+
+\item	CURRENTLY CONNECTION-ORIENTED, BUT CONNECTIONLESS-MODE IS UNDER STUDY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GENERAL ORGANIZATION}
+
+\begin{nrtc}
+\item	AT COMPILE-TIME:
+    \begin{nrtc}
+    \item	USE RO-SPECIFICATION TO GENERATE SUPPORT FACILITIES
+    \end{nrtc}
+
+\item	AT RUN-TIME:
+    \begin{nrtc}
+    \item	USE DIRECTORY SERVICES TO LOCATE/REGISTER NETWORK SERVICES
+		(NEARLY THERE!)
+
+    \item	USE ASSOCIATION CONTROL TO BIND/UNBIND APPLICATIONS
+
+    \item	USE REMOTE OPERATIONS TO INVOKE TRANSACTIONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STATIC (COMPILE-TIME) ORGANIZATION}
+
+\vskip.15in
+\diagram[p]{figureI-10}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DYNAMIC (RUN-TIME) ORGANIZATION}
+
+\vskip.15in
+\diagram[p]{figureI-11}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PERFORMANCE}
+
+\begin{nrtc}
+\item	USE OF ASN.1 TOOLS LEADS TO LARGE PROCESSES:
+    \begin{nrtc}
+    \item	MINIMUM 300KB, DSA: 500KB, FTAM: 800KB
+
+    \item	INITIALIZATION SPEED SUFFERS MOST OWING TO PAGING IN
+    \end{nrtc}
+
+\item	A LOT OF TIME SPENT AVOIDING BYTE COPYING
+
+\item	SPEEDS SLOWER (BUT COMPARITIVE) TO INTERNET APPLICATIONS WHEN USING
+	TCP-BASED TRANSPORT
+
+\item	X.25 TOO SLOW FOR COMPARISON
+
+\item	USE OF LIGHTWEIGHT PRESENTATION SOMETIMES RESULTS IN PROCESSES HALF
+	AS LARGE AND TWICE AS FAST
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{APPLICATIONS}\bf
+
+\begin{nrtc}
+\item	EVERYTHING BUT MHS (sigh!)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CURRENT APPLICATIONS}
+
+\begin{nrtc}
+\item	FILE TRANSFER, ACCESS AND MANAGEMENT (FTAM)
+
+\item	FTAM-FTP GATEWAY
+
+\item	DIRECTORY SERVICES (X.500)
+    \begin{nrtc}
+    \item	AND WHITE PAGES ABSTRACTION
+    \end{nrtc}
+
+\item	VIRTUAL TERMINAL
+
+\item	ISODE MISCELLANY SERVICE
+    \begin{nrtc}
+    \item	e.g., FINGER, QUOTE-OF-THE-DAY, etc.
+    \end{nrtc}
+
+\item	PLUS NUMEROUS ``DEMO'' PROGRAMS
+    \begin{nrtc}
+    \item	e.g., IMAGE SERVICE, PASSWORD LOOKUP, IDIST, etc.
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NETWORK MANAGEMENT}
+
+\begin{nrtc}
+\item	FOR BERKELEY UNIX SYSTEMS:
+    \begin{nrtc}
+    \item	SNMP!
+    \end{nrtc}
+
+\item	WHY?
+    \begin{nrtc}
+    \item	IT WORKS
+
+    \item	CONTINUED SURVIVAL OF THE INTERNET HINGES ON ALL NODES BEING
+		NETWORK MANAGEABLE
+    \end{nrtc}
+
+\item	NOT A COMPLETE PACKAGE
+    \begin{nrtc}
+    \item	AN AGENT WITH A MINIMAL INITIATOR
+
+    \item	(NO NOC)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{WHAT'S IN PROGRESS}\bf
+
+\begin{nrtc}
+\item	MESSAGE HANDLING SYSTEMS
+
+\item	INTEROPERABILITY TESTING
+
+\item	OSI-POSIX PROJECT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{MESSAGE HANDLING SYSTEMS}
+
+\begin{nrtc}
+\item	UCL AND UNott ARE DEVELOPING AN X.400 TRANSPORT SYSTEM (PP)
+
+\item	USE EXPERIENCE GAINED FROM NUMEROUS SOPHISTICATED TEXT-BASED MESSAGE
+	TRANSFER SYSTEMS
+
+\item	OWES MANY OF ITS DESIGN IDEAS TO THE UNIVERSITY OF DELAWARE MESSAGE
+	SYSTEM, MMDF
+
+\item	WILL UTILIZE DIRECTORY SERVICES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TOP-LEVEL ARCHITECTURE}
+
+\vskip.15in
+\diagram[p]{figureI-12}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INTERESTING FEATURES}
+
+\begin{nrtc}
+\item	SUPPORT FOR A WIDE RANGE OF ENCODED INFORMATION TYPES 
+    \begin{nrtc}
+    \item	AND REFORMATTING BETWEEN THEM
+    \end{nrtc}
+
+\item	SUPPORT FOR DIFFERENT MESSAGE TRANSPORT PROTOCOLS
+    \begin{nrtc}
+    \item	AND CONVERSION BETWEEN THEM
+    \end{nrtc}
+    e.g., INCLUDES RFC987 (X.400 TO 821/822)
+
+\item	ROBUSTNESS FOR USE IN LARGE SCALE SERVICE ENVIRONMENTS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MAJOR GOALS}
+
+\begin{nrtc}
+\item	FULL X.400(84/88) SUPPORT, EXCEPT FOR X.400(88) SECURITY SERVICES
+
+\item	PROVIDES A ``CLEAN'' INTERFACE FOR MESSAGE SUBMISSION AND DELIVERY
+    \begin{nrtc}
+    \item	TO SUPPORT A WIDE RANGE OF USER AGENTS,
+
+    \item	AND APPLICATIONS OTHER THAN INTERPERSONAL MESSAGING
+    \end{nrtc}
+
+\item	QUEUE MANAGEMENT DONE VIA A ROS-BASED PROTOCOL
+    \begin{nrtc}
+    \item	SOPHISTICATED SCHEDULING OF MESSAGE DELIVERY
+
+    \item	LOCAL AND REMOTE MONITORING FOR MANAGERS AND USERS
+
+    \item	ROBUSTNESS REQUIRED TO SUPPORT HIGH LEVELS OF TRAFFIC
+
+    \item	SUPPORT FOR ADMINISTRATIVE POLICIES ON SUBMISSION
+    \end{nrtc}
+
+\item	LIST EXPLODER AND LIST MANAGMENT    
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OTHER THINGS}
+
+\begin{nrtc}
+\item	TWO USER INTERFACES PLANNED
+    \begin{nrtc}
+    \item	MH INTERFACE
+
+    \item	WINDOW-BASED INTERFACE
+    \end{nrtc}
+
+\item	INTEGRATION OF FAX PLANNED
+
+\item	ALPHA TESTING STARTED IN JULY
+    \begin{nrtc}
+    \item	BETA WILL BE BASED ON ISODE 6.0
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{INTEROPERABILITY TESTING}\bf
+
+\begin{nrtc}
+\item	THERE IS NO SUBSTITUTE FOR PAIRWISE INTEROPERABILITY TESTING
+
+\item	LET GROUPS SUCH AS OSInet, EUROSInet, etc., CONNECT TO HOSTS
+	RUNNING X.25 AND ISODE
+
+\item	TESTING IS UNATTENDED UNLESS PROBLEMS ARE WITH THE ISODE (gasp!)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{OSI-POSIX PROJECT}\bf
+
+\begin{nrtc}
+\item	GOAL: ACCELLERATE THE UBIQUITY OF OSI
+
+\item	APPROACH: OPENLY AVAILABLE, COMPLETE OSI IMPLEMENTATION FOR NEXT MAJOR
+	RELEASE OF BERKELEY \unix/
+
+\item	FOR MORE DETAILS:
+\begin{quote}
+OSI PROTOCOLS WITHIN AN OPENLY AVAILABLE, POSIX-CONFORMANT, BERKELEY UNIX
+ENVIRONMENT
+\end{quote}
+APPEARING IN ConneXions, OCTOBER, 1988
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\diagram[p]{figureT-15}
+\end{bwslide}
+
+
+\begin{bwslide}
+\diagram[p]{figureT-16}
+\end{bwslide}
+
+
+\end{document}

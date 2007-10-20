@@ -1,0 +1,28 @@
+.PS 7.75i
+.ps 20
+## figure T-4
+B1:	box "IP/ICMP"
+C1:	box invis with .n at (B1.s.x, B1.s.y-lineht) "$\cdots$"
+C2:	box invis with .n at (B1.s.x-(boxwid+linewid), B1.s.y-lineht) \
+	    "subnetwork$_{1}$"
+C3:	box invis with .n at (B1.s.x+(boxwid+linewid), B1.s.y-lineht) \
+	    "subnetwork$_{N}$"
+	line from B1.s to C1.n
+	line from (B1.s.x-boxwid/4, B1.s.y) to C2.n
+	line from (B1.s.x+boxwid/4, B1.s.y) to C3.n
+##
+B2:	box "TCP" with .s at (B1.n.x-(3*boxwid/2+linewid), B1.n.y+lineht)
+	line from (B1.n.x-boxwid/3, B1.n.y) to B2.s
+B3:	box "SMTP" with .s at (B2.n.x-(boxwid+linewid), B2.n.y+lineht)
+B4:	box "FTP" with .s at (B2.n.x, B2.n.y+lineht)
+B5:	box "TELNET" with .s at (B2.n.x+(boxwid+linewid), B2.n.y+lineht)
+	line from (B2.n.x-boxwid/4, B2.n.y) to B3.s
+	line from B2.n to B4.s
+	line from (B2.n.x+boxwid/4, B2.n.y) to B5.s
+##
+B6:	box "UDP" with .s at (B1.n.x+(3*boxwid/2+linewid), B1.n.y+lineht)
+	line from (B1.n.x+boxwid/3, B1.n.y) to B6.s
+B7:	box "DNS" with .s at (B6.n.x, B6.n.y+lineht)
+	line from B6.n to B7.s
+##
+.PE

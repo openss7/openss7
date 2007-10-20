@@ -1,0 +1,12 @@
+.PS
+.ps 20
+## figure E-10
+B1:	box "TP0"
+B2:	box "8881" with .n at B1.s
+B3:	box "8802" with .n at B2.s
+##
+S1:	box with .nw at (B2.ne.x+linewid/2, B2.ne.y) \
+		height B2.ne.y-B3.se.y width boxwid/6 shaded
+	move to S1.e; "\ CONS" ljust
+##
+.PE

@@ -1,0 +1,55 @@
+% run this through LaTeX with the appropriate wrapper
+
+\smaller
+
+\[\begin{tabular}{|l|c|l|}
+\hline
+\multicolumn{3}{|c|}{\bf Superclass Attributes}\\
+\hline
+\multicolumn{1}{|c|}{\bf Attribute Name}&
+			\multicolumn{1}{c|}{\bf Status}&
+				\multicolumn{1}{c|}{\bf Value}\\
+\hline
+\verb"objectClass"&	M&	\verb"top & quipuObject"\\
+&			&	\verb"  & quipuNonLeafObject"\\
+&			&	\verb"  & domainRelatedObject"\\
+\verb"acl"&		M&	\\
+\verb"masterDSA"&	M&	\\
+\verb"slaveDSA"&	O&	\\
+\hline
+\hline
+\multicolumn{3}{|c|}{\bf Primary Class Attributes}\\
+\hline
+\multicolumn{1}{|c|}{\bf Attribute Name}&
+			\multicolumn{1}{c|}{\bf Status}&
+				\multicolumn{1}{c|}{\bf Value}\\
+\hline
+\verb"objectClass"&	M&	\verb"organization"\\
+\verb"organizationName"&
+			RDN&	\\
+\verb"associatedDomain"&
+			O&	\\
+\verb"postalAddress"&	O&	\\
+\verb"registeredAddress"&
+			O&	\\
+\verb"streetAddress"&	O&	\\
+\verb"physicalDeliveryOfficeName"&
+			O&	\\
+\verb"stateOrProvinceName"&
+			O&	\\
+\verb"postalCode"&	O&	\\
+\verb"localityName"&	O&	\\
+\verb"telephoneNumber"&	O&	\\
+\verb"facsimileTelephoneNumber"&
+			O&	\\
+\verb"telexNumber"&	O&	\\
+\verb"description"&	O&	\\
+\hline
+\end{tabular}\]
+
+\[\begin{tabular}{rp{4in}}
+\multicolumn{2}{c}{\bf Legend}\\
+M:&	mandatory\\
+O:&	optional, but recommended\\
+RDN:&	mandatory, must form the RDN for object
+\end{tabular}\]

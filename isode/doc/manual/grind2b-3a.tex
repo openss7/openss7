@@ -1,0 +1,38 @@
+\File{grind2b\-3a.c},{22:23},{Jun 12 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int} ros\_indication (sd, roi)}}
+\L{\LB{\K{int}     sd;}}
+\L{\LB{\K{register} \K{struct} RoSAPindication *roi;}}
+\L{\LB{\{}}
+\L{\LB{    \K{switch} (roi \-\> roi\_type) \{}}
+\L{\LB{}\Tab{8}{\K{case} ROI\_INVOKE: }}
+\L{\LB{}\Tab{8}{    ros\_invoke (sd, \&roi \-\> roi\_invoke);}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} ROI\_RESULT: }}
+\L{\LB{}\Tab{8}{    ros\_result (sd, \&roi \-\> roi\_result);}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} ROI\_ERROR: }}
+\L{\LB{}\Tab{8}{    ros\_error (sd, \&roi \-\> roi\_error);}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} ROI\_UREJECT: }}
+\L{\LB{}\Tab{8}{    ros\_ureject (sd, \&roi \-\> roi\_ureject);}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} ROI\_PREJECT: }}
+\L{\LB{}\Tab{8}{    ros\_preject (sd, \&roi \-\> roi\_preject);}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} ROI\_FINISH: }}
+\L{\LB{}\Tab{8}{    ros\_finish (sd, \&roi \-\> roi\_finish);}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}: }}
+\L{\LB{}\Tab{8}{    error (\S{}\"unknown indication type=\%d\"\SE{}, roi \-\> roi\_type);}}
+\L{\LB{    \}}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{...}}

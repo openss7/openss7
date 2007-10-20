@@ -1,0 +1,38 @@
+% run this through LaTeX with the appropriate wrapper
+
+\smaller
+\begin{verbatim}
+% dish -c "Alpaca"
+Dish -> search -filter cn=manager
+1   commonName=Manager
+Dish -> show 1
+(Alias dereferenced)
+objectClass           - pilotPerson
+commonName            - Manager
+surname               - Manager
+description           - Manager of the US DMD
+postalAddress         - PSI Inc.
+			PSI California Office
+			5201 Great America Parkway
+			Suite 3106
+			Santa Clara, CA 95054
+postalCode            - 95054
+telephoneNumber       - +1 408-562-6222
+facsimileTelephoneNumber - +1 408-562-6223
+seeAlso               - countryName=US
+			organizationName=Performance Systems International
+			organizationalUnitName=Research and Development
+			organizationalUnitName=Mountain View
+			commonName=Marshall Rose
+rfc822Mailbox         - wpp-manager@psi.com
+otherMailbox          - internet: wpp-manager@psi.com
+lastModifiedTime      - Tue Sep 18 16:39:02 1990
+lastModifiedBy        - countryName=US
+			commonName=Manager
+Dish -> quit
+\end{verbatim}
+
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\empty

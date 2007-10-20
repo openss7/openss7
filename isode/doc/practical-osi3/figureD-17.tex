@@ -1,0 +1,24 @@
+\File{figureD\-17.py},{11:01},{Apr  6 1991}
+\L{\LB{twoLevelMatch (kind: ObjectClass; name, qual, location: String;}}
+\L{\LB{               bases: Table): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    x: DN;}}
+\L{\LB{    dlist, matches: \K{SET} \K{OF} DN;}}
+\L{\LB{}}
+\L{\LB{    matches = \K{NULL};}}
+\L{\LB{    \K{IF} (location) \K{THEN}}}
+\L{\LB{        \K{IF} (dlist = simpleMatch (\S{}\"organization\"\SE{}, location, \K{NULL},}}
+\L{\LB{                                 findTable (\S{}\"organization\"\SE{}, bases))) \K{THEN}}}
+\L{\LB{            \K{IF} (length (dlist) \> 1) \K{THEN}}}
+\L{\LB{                \K{FOR} x \K{IN} dlist \K{DO}}}
+\L{\LB{                    \K{IF} (userSaysSo (x)) \K{THEN}}}
+\L{\LB{                        matches += simpleMatch (kind, name, qual, x);}}
+\L{\LB{                \K{RETURN} matches;}}
+\L{\LB{            \K{ELSE}}}
+\L{\LB{                \K{RETURN} simpleMatch (kind, name, qual, head (dlist));}}
+\L{\LB{        \K{ELSE}}}
+\L{\LB{            \C{}\-\- tell user nowhere to look}}
+\CE{}\L{\LB{            \K{RETURN} \K{NULL};}}
+\L{\LB{    \K{ELSE}}}
+\L{\LB{        \K{RETURN} simpleMatch (kind, name, qual, findTable (kind, bases));}}
+\L{\LB{\}}}

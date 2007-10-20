@@ -1,0 +1,148 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{UNIX Implementation}\label{unixvt}
+The Virtual Terminal (VT) standard is the OSI terminal service.
+Included in the release is an implementation of VT that is roughly comparable
+to an average \pgm{telnet} implementation.
+
+The implementation included runs only on Berkeley \unix/.
+
+\section	{Implementation}\label{unixvt:code}
+If you have access to the source tree for this release,
+the directory \file{vt/} contains the code for the responder and initiator.
+
+\subsection	{The Initiator}
+There is currently one initiator which uses VT: \man vt(1c).
+Supported is the VT TELNET profile from the NIST OSI Implementors Workshop
+Agreements.
+
+The \pgm{vt} program is an interactive VT initiator
+which prompts the user for commands.
+Command mode is entered by typing an escape character
+(``\verb"^]"'' by default).
+
+\subsubsection	{Commands}
+Here are the commands to \pgm{vt}:
+\begin{describe}
+\item[ayt]
+Sends an ``are you there'' message to the remote login server.
+
+\item[break]
+Flushes data queued in both directions and interrupts the remote process.
+
+\item[close]
+Terminates the association with the terminal service.
+
+\item[escape]
+Set the ``escape character'' used to enter command mode.
+Control characters may be specified as ``\verb"^"'' followed by a single
+letter (e.g., ``control-X'' is ``\verb"^X"'').
+
+\item[help {\tt [command]}]
+Prints help information.
+For detailed information, try ``\verb*"help ?"''.
+
+\item[open {\tt host user [account]}]
+Associates with the temrinal service.
+
+\item[quit]
+Terminates the association with the terminal service and exits.
+
+\item[set {\tt variable value}]
+Displays or changes variables.
+For detailed information, try ``\verb*"set ?"''.
+
+\item[status]
+Shows the current status.
+
+\item[suspend]
+Suspends \pgm{vt}.
+This works only if the program was invoked under a shell with job control
+(e.g., \pgm{csh}).
+\end{describe}
+
+\subsubsection	{Variables}
+Here are the variables which effect \pgm{vt}'s behavior.
+\begin{describe}
+\item[crmod]
+This enables the mapping of CR characters received from the
+remote host into CR-LF pairs.
+This does not affect those characters typed by the user,
+only those received.
+Boolean (values: {\bf on\/} or {\bf off\/}).
+
+\item[debug]
+This enables voluminous output during file transfers,
+among other things.  Boolean.
+
+\item[echo]
+Determines whether echoing is done locally or remotely.
+Values: \verb"local", \verb"remote".
+
+\item[escape]
+Sets the escape character.
+Value: any single character or ``\verb"^"'' followed by a character.
+
+\item[options]
+Determines if option processing is shown.
+Boolean.
+
+\item[repetoire]
+Determines which character set (repetoire) shall be used.
+Values: \verb"ascii", \verb"transparent" (binary).
+
+\item[tracelevel]
+This enables the tracing of VT.
+Values: \verb"none", \verb"exceptions", \verb"notice", \verb"pdus",
+\verb"trace", and \verb"debug".
+
+\item[tracefile]
+This defines the file where tracing information is appended.
+Values: any filename, or \verb"-" for the diagnostic output.
+
+\item[verbose]
+This enables printing of informative diagnostics during operation.  Boolean.
+
+\item[{\em xyz\/}sapfile]
+This defines the file where {\em xyz\/}PDU tracing information is appended.
+Values: any filename, or \verb"-" for the diagnostic output.
+
+\item[{\em xyz\/}saplevel]
+This enables tracing of the {\em xyz\/} module.\\
+Values: \verb"none", \verb"exceptions", \verb"notice", \verb"pdus",
+\verb"trace", and \verb"debug".
+\end{describe}
+
+\subsubsection	{Options}
+Here are the command line options:
+\begin{describe}
+\item[-B]
+Do not negotiate use of the VT BREAK functional unit.
+
+\item[-D]
+Use the VT asynchronous DEFAULT profile rather than the TELNET profile.
+
+\item[-F {\em logfile}]
+Sets the logging file to be used.
+
+\item[-g]
+Use only the G0 character set for the {\it ascii\/} repetoire (graphics only).
+
+\item[-f]
+Inhibits reading of the user's \file{\$HOME/.vtrc} file on startup.
+\end{describe}
+
+\subsection	{The Responder}
+The \man vtd(8c) program implements the terminal service.
+Supported is the VT TELNET profile from the NIST OSI Implementors Workshop
+Agreements.
+
+\subsubsection	{Options}
+Here are the command line options:
+\begin{describe}
+\item[-F {\em logfile}]
+Sets the logging file to be used.
+
+\item[-d {\em level}]
+Sets the debug level from \verb"0" (none) to \verb"7" (verbose).
+\end{describe}

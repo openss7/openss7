@@ -1,0 +1,19 @@
+\File{figureS\-19.py},{11:49},{May  5 1990}
+\L{\LB{\C{}\-\- insert PDU}}
+\CE{}\L{\LB{}}
+\L{\LB{\Proc{RReqPDU}RReqPDU ::=}}
+\L{\LB{    [\K{APPLICATION} 2] \K{IMPLICIT}}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    subtree}}
+\L{\LB{}\Tab{16}{ObjectName,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    priority    \C{}\-\- the lower the better, \"\-1\" means default}}
+\CE{}\L{\LB{}\Tab{16}{\K{INTEGER} (\-1..2147483647),}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    operation}}
+\L{\LB{}\Tab{16}{\K{INTEGER} \{}}
+\L{\LB{}\Tab{16}{    delete(0),}}
+\L{\LB{}\Tab{16}{    readOnly(1),}}
+\L{\LB{}\Tab{16}{    readWrite(2)}}
+\L{\LB{}\Tab{16}{\}}}
+\L{\LB{}\Tab{8}{\}}}

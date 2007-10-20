@@ -1,0 +1,32 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pa 0 333}%
+    \special{pa 0 0}%
+    \special{pa 750 0}%
+    \special{pa 750 333}%
+    \special{pa 0 333}%
+    \special{fp}%
+    \rlap{\kern  0.375in\lower 0.208in\hbox to 0pt{\hss tag\hss}}%
+    \special{pa 750 333}%
+    \special{pa 750 0}%
+    \special{pa 1500 0}%
+    \special{pa 1500 333}%
+    \special{pa 750 333}%
+    \special{fp}%
+    \rlap{\kern  1.125in\lower 0.208in\hbox to 0pt{\hss length\hss}}%
+    \special{pa 1500 333}%
+    \special{pa 1500 0}%
+    \special{pa 2250 0}%
+    \special{pa 2250 333}%
+    \special{pa 1500 333}%
+    \special{fp}%
+    \rlap{\kern  1.875in\lower 0.208in\hbox to 0pt{\hss value\hss}}%
+    \kern  2.251in
+  }\vss}%
+  \kern  0.334in
+}

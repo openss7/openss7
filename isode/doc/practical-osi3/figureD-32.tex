@@ -1,0 +1,66 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \special{pa 0 1500}%
+    \special{pa 0 1000}%
+    \special{pa 1125 1000}%
+    \special{pa 1125 1500}%
+    \special{pa 0 1500}%
+    \special{fp}%
+    \rlap{\kern  0.563in\lower 1.208in\hbox to 0pt{\hss Directory\hss}}%
+    \rlap{\kern  0.563in\lower 1.374in\hbox to 0pt{\hss Assistant\hss}}%
+    \special{pa 2125 1500}%
+    \special{pa 2125 1000}%
+    \special{pa 3250 1000}%
+    \special{pa 3250 1500}%
+    \special{pa 2125 1500}%
+    \special{fp}%
+    \rlap{\kern  2.688in\lower 1.291in\hbox to 0pt{\hss DSA\hss}}%
+    \special{pa 0 3000}%
+    \special{pa 0 2500}%
+    \special{pa 1125 2500}%
+    \special{pa 1125 3000}%
+    \special{pa 0 3000}%
+    \special{fp}%
+    \rlap{\kern  0.563in\lower 2.791in\hbox to 0pt{\hss DA-client\hss}}%
+    \special{pa 2025 1275}%
+    \special{pa 2125 1250}%
+    \special{fp}%
+    \special{pa 2025 1225}%
+    \special{pa 2125 1250}%
+    \special{pa 1125 1250}%
+    \special{fp}%
+    \special{pa 1225 1225}%
+    \special{pa 1125 1250}%
+    \special{fp}%
+    \special{pa 1225 1275}%
+    \special{pa 1125 1250}%
+    \special{fp}%
+    \special{pa 588 1600}%
+    \special{pa 563 1500}%
+    \special{fp}%
+    \special{pa 537 1600}%
+    \special{pa 563 1500}%
+    \special{pa 563 2500}%
+    \special{fp}%
+    \special{pa 537 2400}%
+    \special{pa 563 2500}%
+    \special{fp}%
+    \special{pa 588 2400}%
+    \special{pa 563 2500}%
+    \special{fp}%
+    \special{pa 1625 0}%
+    \special{pa 1625 4000}%
+    \special{da  0.050}%
+    \rlap{\kern  1.625in\lower 0.041in\hbox to0pt{\ \begin{tabular}{l} Directory Service\\ \ \ provided via DAP\end{tabular}\hss}}%
+    \rlap{\kern  1.625in\lower 4.041in\hbox to 0pt{\hss Directory User\ }}%
+    \rlap{\kern  0.563in\lower 2.041in\hbox to 0pt{\hss \begin{tabular}{l} DA-service\\ \ \ provided via\\ \ \ DA-protocol\end{tabular}\ }}%
+    \kern  3.251in
+  }\vss}%
+  \kern  4.042in
+}

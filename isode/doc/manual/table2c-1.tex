@@ -1,0 +1,28 @@
+% run this through LaTeX with the appropriate wrapper
+%	RtSAP Failure Codes
+
+\normalsize
+\[\begin{tabular}{rp{3.0in}}
+    \multicolumn{2}{c}{\bf Provider-Initiated Aborts (fatal)}\\
+\tt RTS\_ADDRESS&	Address unknown\\
+\tt RTS\_REFUSED&	Connect request refused on this network connection\\
+\tt RTS\_SESSION&	Session disconnect\\
+\tt RTS\_PROTOCOL&	Protocol error\\
+\tt RTS\_CONGEST&	Congestion at RtSAP\\
+\tt RTS\_REMOTE&	Remote system problem\\
+\tt RTS\_PRESENTATION&	Presentation disconnect\\
+\tt RTS\_ACS&		ACS disconnect\\
+\tt RTS\_ABORTED&	Peer aborted association\\[0.1in]
+    \multicolumn{2}{c}{\bf User-Initiated Rejects (fatal)}\\
+\tt RTS\_BUSY&		Busy\\
+\tt RTS\_RECOVER&	Cannot recover\\
+\tt RTS\_VALIDATE&	Validation failure\\
+\tt RTS\_MODE&		Unacceptable dialogue mode\\
+\tt RTS\_REJECT&	Rejected by responder\\[0.1in]
+    \multicolumn{2}{c}{\bf Interface Errors (non-fatal)}\\
+\tt RTS\_PARAMETER&	Invalid parameter\\
+\tt RTS\_OPERATION&	Invalid operation\\
+\tt RTS\_TIMER&		Timer expired\\
+\tt RTS\_WAITING&	Indications waiting\\
+\tt RTS\_TRANSFER&	Transfer failure
+\end{tabular}\]

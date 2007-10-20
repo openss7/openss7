@@ -1,0 +1,315 @@
+\contentsline {part}{\uppercase {i}\phspace {1em}Introduction}{1}
+\contentsline {chapter}{\numberline {1}Overview}{3}
+\contentsline {section}{\numberline {1.1}Fanatics Need Not Read Further}{4}
+\contentsline {section}{\numberline {1.2}The Name of the Game}{5}
+\contentsline {section}{\numberline {1.3}Operating Environments}{5}
+\contentsline {section}{\numberline {1.4}Organisation of the Release}{7}
+\contentsline {section}{\numberline {1.5}A Note on This Implementation}{9}
+\contentsline {section}{\numberline {1.6}Changes Since the Last Release}{10}
+\contentsline {chapter}{\numberline {2}Overview of QUIPU}{12}
+\contentsline {section}{\numberline {2.1}Summary}{12}
+\contentsline {section}{\numberline {2.2}Pronouncing QUIPU}{14}
+\contentsline {section}{\numberline {2.3}Why QUIPU}{14}
+\contentsline {section}{\numberline {2.4}Objectives}{14}
+\contentsline {subsection}{\numberline {2.4.1}General Aims}{14}
+\contentsline {subsection}{\numberline {2.4.2}Technical Goals}{14}
+\contentsline {section}{\numberline {2.5}Roadmap}{15}
+\contentsline {section}{\numberline {2.6}QUIPU Support Address}{15}
+\contentsline {section}{\numberline {2.7}Acknowledgements}{16}
+\contentsline {part}{\uppercase {ii}\phspace {1em}User's Guide}{19}
+\contentsline {chapter}{\numberline {3}The OSI Directory}{21}
+\contentsline {section}{\numberline {3.1}The Model}{21}
+\contentsline {section}{\numberline {3.2}Information Representation}{23}
+\contentsline {subsection}{\numberline {3.2.1}Object Identifiers}{23}
+\contentsline {subsection}{\numberline {3.2.2}Attributes}{23}
+\contentsline {subsection}{\numberline {3.2.3}Names}{25}
+\contentsline {section}{\numberline {3.3}Directory User Agent}{26}
+\contentsline {section}{\numberline {3.4}Directory System Agent}{27}
+\contentsline {chapter}{\numberline {4}DISH}{29}
+\contentsline {section}{\numberline {4.1}Commands}{30}
+\contentsline {subsection}{\numberline {4.1.1}Moveto}{30}
+\contentsline {subsection}{\numberline {4.1.2}Showentry}{31}
+\contentsline {subsubsection}{read flags}{32}
+\contentsline {subsection}{\numberline {4.1.3}List}{32}
+\contentsline {subsection}{\numberline {4.1.4}Search}{33}
+\contentsline {subsubsection}{More on Matching}{35}
+\contentsline {subsubsection}{FRED flags}{37}
+\contentsline {subsection}{\numberline {4.1.5}Add Entry}{37}
+\contentsline {subsection}{\numberline {4.1.6}Editentry}{38}
+\contentsline {subsection}{\numberline {4.1.7}Delete Entry}{38}
+\contentsline {subsection}{\numberline {4.1.8}Modify Entry}{38}
+\contentsline {subsection}{\numberline {4.1.9}ModifyRDN}{39}
+\contentsline {subsection}{\numberline {4.1.10}Showname}{39}
+\contentsline {subsection}{\numberline {4.1.11}Compare}{39}
+\contentsline {subsection}{\numberline {4.1.12}Squid}{40}
+\contentsline {subsection}{\numberline {4.1.13}Bind}{40}
+\contentsline {subsection}{\numberline {4.1.14}Unbind}{41}
+\contentsline {subsection}{\numberline {4.1.15}FRED}{42}
+\contentsline {section}{\numberline {4.2}Sequences}{42}
+\contentsline {section}{\numberline {4.3}Service Controls}{43}
+\contentsline {section}{\numberline {4.4}Tailoring}{44}
+\contentsline {subsection}{\numberline {4.4.1}.quipurc}{44}
+\contentsline {section}{\numberline {4.5}Remote Management of the DSA}{46}
+\contentsline {section}{\numberline {4.6}Caching in the DUA}{47}
+\contentsline {section}{\numberline {4.7}Running DISH from the Shell}{47}
+\contentsline {subsection}{\numberline {4.7.1}DISHinit}{48}
+\contentsline {subsection}{\numberline {4.7.2}Example Scripts}{48}
+\contentsline {subsection}{\numberline {4.7.3}Files}{49}
+\contentsline {chapter}{\numberline {5}SID}{50}
+\contentsline {section}{\numberline {5.1}Quickstart}{50}
+\contentsline {section}{\numberline {5.2}Example Usage}{53}
+\contentsline {section}{\numberline {5.3}Use of Nicknames}{54}
+\contentsline {section}{\numberline {5.4}SID Commands}{54}
+\contentsline {section}{\numberline {5.5}Standard DISH Commands}{55}
+\contentsline {section}{\numberline {5.6}QUIPU Profile}{56}
+\contentsline {chapter}{\numberline {6}DE}{58}
+\contentsline {section}{\numberline {6.1}Using DE}{58}
+\contentsline {subsection}{\numberline {6.1.1}Starting up}{58}
+\contentsline {subsection}{\numberline {6.1.2}Searching for a Person}{58}
+\contentsline {subsection}{\numberline {6.1.3}Searching for other information}{60}
+\contentsline {subsection}{\numberline {6.1.4}Interrupting}{60}
+\contentsline {subsection}{\numberline {6.1.5}Quitting}{60}
+\contentsline {section}{\numberline {6.2}Configuration of DE}{60}
+\contentsline {chapter}{\numberline {7}FRED}{64}
+\contentsline {section}{\numberline {7.1}Giving Commands to FRED}{64}
+\contentsline {section}{\numberline {7.2}Let Your Fingers Do the Walking}{64}
+\contentsline {subsection}{\numberline {7.2.1}The Alias Command}{65}
+\contentsline {subsection}{\numberline {7.2.2}Back to Searching}{65}
+\contentsline {subsection}{\numberline {7.2.3}The Area Command}{68}
+\contentsline {subsection}{\numberline {7.2.4}Getting Help}{69}
+\contentsline {subsection}{\numberline {7.2.5}Quitting}{70}
+\contentsline {section}{\numberline {7.3}Advanced Usage}{70}
+\contentsline {chapter}{\numberline {8}SD}{71}
+\contentsline {section}{\numberline {8.1}Types of Widget}{71}
+\contentsline {subsection}{\numberline {8.1.1}Label Widgets}{72}
+\contentsline {subsection}{\numberline {8.1.2}Command Widgets}{72}
+\contentsline {subsection}{\numberline {8.1.3}Dialog Widgets}{72}
+\contentsline {subsection}{\numberline {8.1.4}Toggle Widgets}{72}
+\contentsline {section}{\numberline {8.2}Using SD}{72}
+\contentsline {subsection}{\numberline {8.2.1}Main Options}{72}
+\contentsline {subsection}{\numberline {8.2.2}List}{73}
+\contentsline {subsection}{\numberline {8.2.3}Search For}{73}
+\contentsline {subsection}{\numberline {8.2.4}Go To Number}{73}
+\contentsline {subsection}{\numberline {8.2.5}Scrolling Lists}{73}
+\contentsline {subsection}{\numberline {8.2.6}Help}{73}
+\contentsline {section}{\numberline {8.3}Configuration of SD}{74}
+\contentsline {subsection}{\numberline {8.3.1}The .duarc file}{74}
+\contentsline {subsection}{\numberline {8.3.2}The readTypes file}{75}
+\contentsline {subsection}{\numberline {8.3.3}The filterTypes files}{75}
+\contentsline {subsection}{\numberline {8.3.4}The typeDefaults file}{76}
+\contentsline {chapter}{\numberline {9}POD}{77}
+\contentsline {section}{\numberline {9.1}Types of Widget}{77}
+\contentsline {subsection}{\numberline {9.1.1}Buttons}{77}
+\contentsline {subsection}{\numberline {9.1.2}Dialogue Boxes}{77}
+\contentsline {subsection}{\numberline {9.1.3}Menus}{78}
+\contentsline {section}{\numberline {9.2}Using POD}{78}
+\contentsline {subsection}{\numberline {9.2.1}The Main Window}{78}
+\contentsline {subsubsection}{Current Directory Position}{78}
+\contentsline {subsubsection}{Searching for Entries}{79}
+\contentsline {subsubsection}{Main Functions}{79}
+\contentsline {subsection}{\numberline {9.2.2}The List Window}{79}
+\contentsline {subsubsection}{List Display}{79}
+\contentsline {subsubsection}{Close and Keep Buttons}{80}
+\contentsline {subsection}{\numberline {9.2.3}The Read Window}{80}
+\contentsline {subsection}{\numberline {9.2.4}The Modify Window}{80}
+\contentsline {subsection}{\numberline {9.2.5}Error and Message Popups}{81}
+\contentsline {section}{\numberline {9.3}Configuration of POD}{81}
+\contentsline {subsection}{\numberline {9.3.1}The .podrc File}{82}
+\contentsline {subsection}{\numberline {9.3.2}The readTypes File}{82}
+\contentsline {subsection}{\numberline {9.3.3}The friendlyNames File}{83}
+\contentsline {subsection}{\numberline {9.3.4}The filterTypes Files}{83}
+\contentsline {subsection}{\numberline {9.3.5}The typeDefaults File}{84}
+\contentsline {chapter}{\numberline {10}Attribute Syntaxes}{85}
+\contentsline {section}{\numberline {10.1}Standard Syntaxes}{85}
+\contentsline {subsection}{\numberline {10.1.1}PrintableString}{86}
+\contentsline {subsection}{\numberline {10.1.2}CaseExactString}{86}
+\contentsline {subsection}{\numberline {10.1.3}CaseIgnoreString}{89}
+\contentsline {subsection}{\numberline {10.1.4}CaseIgnoreList}{90}
+\contentsline {subsection}{\numberline {10.1.5}CountryString}{91}
+\contentsline {subsection}{\numberline {10.1.6}IA5String}{91}
+\contentsline {subsection}{\numberline {10.1.7}OctetString}{91}
+\contentsline {subsection}{\numberline {10.1.8}NumericString}{92}
+\contentsline {subsection}{\numberline {10.1.9}DestinationString}{92}
+\contentsline {subsection}{\numberline {10.1.10}TelephoneNumber}{92}
+\contentsline {subsection}{\numberline {10.1.11}PostalAddress}{93}
+\contentsline {subsection}{\numberline {10.1.12}DN}{93}
+\contentsline {subsection}{\numberline {10.1.13}OID}{95}
+\contentsline {subsection}{\numberline {10.1.14}ObjectClass}{95}
+\contentsline {subsection}{\numberline {10.1.15}TelexNumber}{95}
+\contentsline {subsection}{\numberline {10.1.16}TeletexTerminalIdentifier}{96}
+\contentsline {subsection}{\numberline {10.1.17}FacsimileTelephoneNumber}{96}
+\contentsline {subsection}{\numberline {10.1.18}DeliveryMethod}{96}
+\contentsline {subsection}{\numberline {10.1.19}PresentationAddress}{97}
+\contentsline {subsection}{\numberline {10.1.20}Password}{97}
+\contentsline {subsection}{\numberline {10.1.21}Certificate}{97}
+\contentsline {subsection}{\numberline {10.1.22}CertificatePair}{98}
+\contentsline {subsection}{\numberline {10.1.23}CertificateList}{98}
+\contentsline {subsection}{\numberline {10.1.24}Guide}{98}
+\contentsline {subsection}{\numberline {10.1.25}UTCTime}{99}
+\contentsline {subsection}{\numberline {10.1.26}Boolean}{99}
+\contentsline {subsection}{\numberline {10.1.27}Integer}{100}
+\contentsline {subsection}{\numberline {10.1.28}AccessPoint}{100}
+\contentsline {section}{\numberline {10.2}QUIPU Attribute Syntaxes}{100}
+\contentsline {subsection}{\numberline {10.2.1}ACL}{100}
+\contentsline {subsection}{\numberline {10.2.2}Schema}{101}
+\contentsline {subsection}{\numberline {10.2.3}ProtectedPassword}{101}
+\contentsline {subsection}{\numberline {10.2.4}SecurityPolicy}{101}
+\contentsline {subsection}{\numberline {10.2.5}EdbInfo}{101}
+\contentsline {subsection}{\numberline {10.2.6}InheritedAttribute}{102}
+\contentsline {section}{\numberline {10.3}COSINE/Internet Attribute Syntaxes}{102}
+\contentsline {subsection}{\numberline {10.3.1}Mailbox}{102}
+\contentsline {subsection}{\numberline {10.3.2}CaseIgnoreIA5String}{102}
+\contentsline {subsection}{\numberline {10.3.3}Photo}{103}
+\contentsline {subsection}{\numberline {10.3.4}Audio}{103}
+\contentsline {subsection}{\numberline {10.3.5}Data Quality}{103}
+\contentsline {subsection}{\numberline {10.3.6}DSA Quality}{104}
+\contentsline {section}{\numberline {10.4}MHS Attribute Syntaxes}{104}
+\contentsline {section}{\numberline {10.5}ASN.1}{105}
+\contentsline {chapter}{\numberline {11}Introduction to Security Features}{106}
+\contentsline {section}{\numberline {11.1}Passwords}{106}
+\contentsline {subsection}{\numberline {11.1.1}Choosing a Password}{106}
+\contentsline {subsection}{\numberline {11.1.2}Taking Care of Your Password}{107}
+\contentsline {section}{\numberline {11.2}Discretionary Access Control}{108}
+\contentsline {subsection}{\numberline {11.2.1}Model}{108}
+\contentsline {subsection}{\numberline {11.2.2}Detect Access}{109}
+\contentsline {subsection}{\numberline {11.2.3}Effect of ACLs on Operations}{109}
+\contentsline {subsection}{\numberline {11.2.4}Example Use of ACLs}{111}
+\contentsline {subsection}{\numberline {11.2.5}Extended Example}{113}
+\contentsline {part}{\uppercase {iii}\phspace {1em}Administrator's Guide}{117}
+\contentsline {chapter}{\numberline {12}Installing QUIPU}{119}
+\contentsline {section}{\numberline {12.1}Compile Options}{120}
+\contentsline {section}{\numberline {12.2}TURBO Options for Large Sites}{121}
+\contentsline {section}{\numberline {12.3}Files}{123}
+\contentsline {chapter}{\numberline {13}Configuring a DUA}{126}
+\contentsline {section}{\numberline {13.1}Connecting to a DSA}{126}
+\contentsline {section}{\numberline {13.2}Tailoring}{127}
+\contentsline {chapter}{\numberline {14}Configuring a DSA}{131}
+\contentsline {section}{\numberline {14.1}Basic Formats and Structures}{131}
+\contentsline {subsection}{\numberline {14.1.1}Entry Data Block}{131}
+\contentsline {subsection}{\numberline {14.1.2}Object Class Attribute}{133}
+\contentsline {subsection}{\numberline {14.1.3}Database Structure}{135}
+\contentsline {subsection}{\numberline {14.1.4}Long Distinguished Names}{136}
+\contentsline {section}{\numberline {14.2}Setting Up an Initial DSA}{137}
+\contentsline {subsection}{\numberline {14.2.1}Presentation Addresses}{139}
+\contentsline {subsection}{\numberline {14.2.2}Choosing a Name for Your DSA}{141}
+\contentsline {subsection}{\numberline {14.2.3}Setting up Your DSA}{142}
+\contentsline {section}{\numberline {14.3}Tailoring}{146}
+\contentsline {subsection}{\numberline {14.3.1}Tailoring a Running DSA}{151}
+\contentsline {section}{\numberline {14.4}Modifying your DSA's Entry}{152}
+\contentsline {section}{\numberline {14.5}Connection to Other DSAs}{153}
+\contentsline {subsection}{\numberline {14.5.1}Connection to the Global Directory}{154}
+\contentsline {section}{\numberline {14.6}Connecting to a Non-QUIPU DSA}{155}
+\contentsline {section}{\numberline {14.7}Adding More Data}{156}
+\contentsline {subsection}{\numberline {14.7.1}More on Object Classes}{156}
+\contentsline {subsubsection}{Person}{157}
+\contentsline {subsubsection}{OrganizationalPerson}{157}
+\contentsline {subsubsection}{ThornPerson}{158}
+\contentsline {subsubsection}{OrganizationalRole}{158}
+\contentsline {subsubsection}{Alias}{159}
+\contentsline {subsubsection}{OrganizationalUnit}{160}
+\contentsline {subsubsection}{Organisation}{160}
+\contentsline {subsubsection}{domainRelatedObject}{161}
+\contentsline {subsection}{\numberline {14.7.2}Schemas}{161}
+\contentsline {subsection}{\numberline {14.7.3}Photograph Attributes}{162}
+\contentsline {subsubsection}{Generating Photos}{163}
+\contentsline {subsection}{\numberline {14.7.4}File Attributes}{164}
+\contentsline {subsection}{\numberline {14.7.5}Attribute Inheritance}{165}
+\contentsline {section}{\numberline {14.8}How a DSA Starts}{168}
+\contentsline {section}{\numberline {14.9}Adding More DSAs}{169}
+\contentsline {section}{\numberline {14.10}Receiving EDB Updates}{170}
+\contentsline {section}{\numberline {14.11}Tables}{171}
+\contentsline {section}{\numberline {14.12}More Help Installing QUIPU}{173}
+\contentsline {chapter}{\numberline {15}Security Management}{174}
+\contentsline {section}{\numberline {15.1}QUIPU Userid}{174}
+\contentsline {section}{\numberline {15.2}Shared Libraries}{174}
+\contentsline {section}{\numberline {15.3}File Permissions}{175}
+\contentsline {section}{\numberline {15.4}Discretionary Access Control}{175}
+\contentsline {subsection}{\numberline {15.4.1}What Must be Publicly Readable}{175}
+\contentsline {section}{\numberline {15.5}Audit}{176}
+\contentsline {subsection}{\numberline {15.5.1}Enabling Auditing}{176}
+\contentsline {subsection}{\numberline {15.5.2}Relating Events to Users}{176}
+\contentsline {subsection}{\numberline {15.5.3}Format of Audit Records}{176}
+\contentsline {subsection}{\numberline {15.5.4}Start of an Association}{177}
+\contentsline {subsection}{\numberline {15.5.5}End of an Association}{177}
+\contentsline {subsection}{\numberline {15.5.6}DAP Operation}{177}
+\contentsline {subsection}{\numberline {15.5.7}DAP Result}{178}
+\contentsline {subsection}{\numberline {15.5.8}Chaining}{178}
+\contentsline {subsection}{\numberline {15.5.9}Updates}{178}
+\contentsline {subsection}{\numberline {15.5.10}Other Events}{178}
+\contentsline {subsection}{\numberline {15.5.11}Processing the Log Files}{179}
+\contentsline {subsubsection}{Configuring dsastats}{179}
+\contentsline {subsubsection}{Running the script}{180}
+\contentsline {part}{\uppercase {iv}\phspace {1em}Programmer's Guide}{183}
+\contentsline {chapter}{\numberline {16}Programming the Directory}{185}
+\contentsline {section}{\numberline {16.1}Conventions}{185}
+\contentsline {section}{\numberline {16.2}Attributes}{188}
+\contentsline {section}{\numberline {16.3}Distinguished Names}{192}
+\contentsline {subsection}{\numberline {16.3.1}User-Friendly Naming}{194}
+\contentsline {section}{\numberline {16.4}Adding New Syntaxes to QUIPU}{195}
+\contentsline {subsection}{\numberline {16.4.1}Where to Add the Syntax Definition}{197}
+\contentsline {subsection}{\numberline {16.4.2}Modifying Previous Definitions}{198}
+\contentsline {chapter}{\numberline {17}The Procedural DUA}{200}
+\contentsline {section}{\numberline {17.1}Procedure Model}{200}
+\contentsline {section}{\numberline {17.2}Common Parameters}{201}
+\contentsline {subsection}{\numberline {17.2.1}Arguments}{201}
+\contentsline {subsection}{\numberline {17.2.2}Results}{202}
+\contentsline {section}{\numberline {17.3}Continuation References}{202}
+\contentsline {section}{\numberline {17.4}Errors}{204}
+\contentsline {subsection}{\numberline {17.4.1}Attribute Error}{205}
+\contentsline {subsection}{\numberline {17.4.2}Name Error}{206}
+\contentsline {subsection}{\numberline {17.4.3}Referral Errors}{206}
+\contentsline {subsection}{\numberline {17.4.4}Security Error}{206}
+\contentsline {subsection}{\numberline {17.4.5}Service Error}{207}
+\contentsline {subsection}{\numberline {17.4.6}Update Error}{207}
+\contentsline {subsection}{\numberline {17.4.7}Abandon Failure}{208}
+\contentsline {subsection}{\numberline {17.4.8}Error Handling Procedures}{208}
+\contentsline {section}{\numberline {17.5}Binding and Unbinding}{209}
+\contentsline {subsection}{\numberline {17.5.1}No Authentication}{211}
+\contentsline {subsection}{\numberline {17.5.2}Simple Authentication}{211}
+\contentsline {subsection}{\numberline {17.5.3}Protected Simple Authentication}{211}
+\contentsline {subsection}{\numberline {17.5.4}Strong Authentication}{211}
+\contentsline {section}{\numberline {17.6}Unbind}{211}
+\contentsline {section}{\numberline {17.7}Read}{212}
+\contentsline {subsection}{\numberline {17.7.1}Entry Information Selection}{213}
+\contentsline {subsection}{\numberline {17.7.2}Entry Information}{213}
+\contentsline {section}{\numberline {17.8}Compare}{214}
+\contentsline {subsection}{\numberline {17.8.1}Attribute Value Assertion}{215}
+\contentsline {section}{\numberline {17.9}List}{216}
+\contentsline {section}{\numberline {17.10}Search}{218}
+\contentsline {subsection}{\numberline {17.10.1}Filters}{220}
+\contentsline {section}{\numberline {17.11}Modification Operations}{223}
+\contentsline {subsection}{\numberline {17.11.1}Add}{223}
+\contentsline {subsection}{\numberline {17.11.2}Remove}{224}
+\contentsline {subsection}{\numberline {17.11.3}Modify}{225}
+\contentsline {subsection}{\numberline {17.11.4}ModifyRDN}{226}
+\contentsline {section}{\numberline {17.12}Abandon}{227}
+\contentsline {section}{\numberline {17.13}Multiple Associations}{227}
+\contentsline {subsection}{\numberline {17.13.1}Multiple Binds}{227}
+\contentsline {subsection}{\numberline {17.13.2}Other DAP Operations}{228}
+\contentsline {chapter}{\numberline {18}The Async DAP Procedural Interface}{229}
+\contentsline {section}{\numberline {18.1}Procedure Model}{230}
+\contentsline {subsection}{\numberline {18.1.1}Styles of Behaviour}{230}
+\contentsline {subsection}{\numberline {18.1.2}Arguments}{232}
+\contentsline {subsection}{\numberline {18.1.3}Indications}{232}
+\contentsline {subsection}{\numberline {18.1.4}Return Values}{235}
+\contentsline {section}{\numberline {18.2}Binding and Unbinding}{236}
+\contentsline {subsection}{\numberline {18.2.1}Binding}{236}
+\contentsline {subsection}{\numberline {18.2.2}Unbinding}{239}
+\contentsline {section}{\numberline {18.3}DAP Remote Operations}{240}
+\contentsline {subsection}{\numberline {18.3.1}Invoking Requests}{241}
+\contentsline {subsection}{\numberline {18.3.2}Receiving Responses}{241}
+\contentsline {section}{\numberline {18.4}Programming Comments}{242}
+\contentsline {chapter}{\numberline {19}Caching in a DUA}{244}
+\contentsline {section}{\numberline {19.1}The Entry Structure}{244}
+\contentsline {section}{\numberline {19.2}Caching Results}{247}
+\contentsline {section}{\numberline {19.3}Finding Data in the Cache}{248}
+\contentsline {section}{\numberline {19.4}Caching List Results}{248}
+\contentsline {section}{\numberline {19.5}Changes}{249}
+\contentsline {part}{\uppercase {v}\phspace {1em}Appendices}{251}
+\contentsline {chapter}{\numberline {A}The QUIPU Pilot DIT}{253}
+\contentsline {chapter}{\numberline {B}BNF used by QUIPU}{257}
+\contentsline {chapter}{\numberline {C}ASN.1 Summary}{264}
+\contentsline {chapter}{\numberline {D}The QUIPU Naming Architecture}{271}
+\contentsline {chapter}{\numberline {E}Attribute Matching}{275}
+\contentsline {section}{\numberline {E.1}Approximate Matches}{275}
+\contentsline {section}{\numberline {E.2}Exact Matches Only}{275}

@@ -1,0 +1,29 @@
+\def\pservice{[ISO/IEC 8822]}
+.PS 7.25i
+lineht	=	3*lineht/2
+## figure U-1
+B1:	box "$\cdots$" width 7*boxwid/2 height 5*boxht/2
+B2:	box "ASE$_{1}$" with .w at (B1.w.x+boxwid/4, B1.c.y)
+B3:	box "ASE$_{n}$" with .e at (B1.e.x-boxwid/4, B1.c.y)
+	box invis with .n at B1.n "application entity" height boxht/2
+	line down from B1.s
+##
+B4:	box "$\cdots$" width 7*boxwid/2 height 5*boxht/2 \
+	    with .w at (B1.e.x+3*linewid, B1.e.y)
+B5:	box "ASE$_{1}$" with .w at (B4.w.x+boxwid/4, B4.c.y)
+B6:	box "ASE$_{n}$" with .e at (B4.e.x-boxwid/4, B4.c.y)
+	box invis with .n at B4.n "application entity" height boxht/2
+	line down from B4.s
+##
+B7:	box "presentation provider" with .nw at (B1.sw.x, B1.sw.y-lineht) \
+		width B4.se.x-B1.sw.x
+	line dashed from (B1.w.x-linewid/2, (B1.s.y+B7.n.y)/2) \
+		    to   (B4.e.x+linewid/2, (B4.s.y+B7.n.y)/2)
+	move to (B4.e.x-boxwid/2, (B1.s.y+B7.n.y)/2) \
+	    "\ \ \begin{tabular}{r}presentation service\\ \pservice\end{tabular}"
+##
+	line from B1.e to B4.w dashed
+	move to ((B1.e.x+B4.w.x)/2, B1.e.y) \
+	    "\begin{tabular}{c} application\\ protocol\end{tabular}"
+##
+.PE

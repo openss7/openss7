@@ -1,0 +1,69 @@
+\File{ryinit\-estab.c},{11:48},{Dec 10 1990}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{\#define}}\Tab{8}{myservice}\Tab{24}{\S{}\"servicestore\"\SE{}}}
+\L{\LB{\K{\#define}}\Tab{8}{mycontext}\Tab{24}{\S{}\"local service\"\SE{}}}
+\L{\LB{\K{\#define}}\Tab{8}{mypci}\Tab{24}{\S{}\"local service pci\"\SE{}}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{    \K{int}}\Tab{8}{    sd;}}
+\L{\LB{    \K{struct} SSAPref sfs;}}
+\L{\LB{    \K{register} \K{struct} SSAPref *sf;}}
+\L{\LB{    \K{register} \K{struct} PSAPaddr *pa;}}
+\L{\LB{    \K{struct} AcSAPconnect accs;}}
+\L{\LB{    \K{register} \K{struct} AcSAPconnect   *acc = \&accs;}}
+\L{\LB{    \K{struct} AcSAPindication  acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPindication *aci = \&acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPabort *aca = \&aci \-\> aci\_abort;}}
+\L{\LB{    AEI}\Tab{8}{    aei;}}
+\L{\LB{    OID}\Tab{8}{    ctx,}}
+\L{\LB{}\Tab{8}{    pci;}}
+\L{\LB{    \K{struct} PSAPctxlist pcs;}}
+\L{\LB{    \K{register} \K{struct} PSAPctxlist *pc = \&pcs;}}
+\L{\LB{    \K{struct} RoSAPindication rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((aei = \_str2aei (argv[1], myservice, mycontext,}}
+\L{\LB{\Proc{isatty}}\Tab{24}{ isatty (fileno (stdin)), NULLCP, NULLCP))}}
+\L{\LB{}\Tab{8}{    == NULLAEI)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"unable to resolve service: \%s\"\SE{}, PY\_pepy);}}
+\L{\LB{\Proc{if}    \K{if} ((pa = aei2addr (aei)) == NULLPA)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"address translation failed\"\SE{});}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} ((ctx = ode2oid (mycontext)) == NULLOID)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"\%s: unknown object descriptor\"\SE{}, mycontext);}}
+\L{\LB{\Proc{if}    \K{if} ((ctx = oid\_cpy (ctx)) == NULLOID)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"out of memory\"\SE{});}}
+\L{\LB{\Proc{if}    \K{if} ((pci = ode2oid (mypci)) == NULLOID)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"\%s: unknown object descriptor\"\SE{}, mypci);}}
+\L{\LB{\Proc{if}    \K{if} ((pci = oid\_cpy (pci)) == NULLOID)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"out of memory\"\SE{});}}
+\L{\LB{    pc \-\> pc\_nctx = 1;}}
+\L{\LB{    pc \-\> pc\_ctx[0].pc\_id = 1;}}
+\L{\LB{    pc \-\> pc\_ctx[0].pc\_asn = pci;}}
+\L{\LB{    pc \-\> pc\_ctx[0].pc\_atn = NULLOID;}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} ((sf = addr2ref (PLocalHostName ())) == NULL) \{}}
+\L{\LB{}\Tab{8}{sf = \&sfs;}}
+\L{\LB{}\Tab{8}{(\K{void}) bzero ((\K{char} *) sf, \K{sizeof} *sf);}}
+\L{\LB{    \}}}
+\ProcCont{if}\L{\LB{}}
+\L{\LB{    \K{if} (AcAssocRequest (ctx, NULLAEI, aei, NULLPA, pa, pc, NULLOID,}}
+\L{\LB{}\Tab{16}{0, ROS\_MYREQUIRE, SERIAL\_NONE, 0, sf, NULLPEP, 0, NULLQOS,}}
+\L{\LB{}\Tab{16}{acc, aci)}}
+\L{\LB{}\Tab{8}{    == NOTOK)}}
+\L{\LB{}\Tab{8}{acs\_adios (aca, \S{}\"A\-ASSOCIATE.REQUEST\"\SE{});}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} (acc \-\> acc\_result != ACS\_ACCEPT)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"association rejected: [\%s]\"\SE{},}}
+\L{\LB{}\Tab{16}{AcErrString (acc \-\> acc\_result));}}
+\L{\LB{}}
+\L{\LB{    sd = acc \-\> acc\_sd;}}
+\L{\LB{    ACCFREE (acc);}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} (RoSetService (sd, RoPService, roi) == NOTOK)}}
+\L{\LB{}\Tab{8}{ros\_adios (rop, \S{}\"set RO\/PS fails\"\SE{});}}
+\L{\LB{}}
+\L{\LB{...}}

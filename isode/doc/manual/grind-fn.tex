@@ -1,0 +1,18 @@
+\File{grind\-fn.c},{14:51},{Jul 12 1991}
+\L{\LB{   E\-ANY ::= ANY [[ a * ]] [[ E get\_pe ]]}}
+\L{\LB{}}
+\L{\LB{   D\-ANY ::= ANY [[ a * ]]  [[ D put\_pe ]] [[ F fr\_pe ]]}}
+\L{\LB{}}
+\L{\LB{   DE\-ANY ::= ANY [[ a * ]]  [[ D put\_pe ]] [[ E get\_pe ]]}}
+\L{\LB{}}
+\L{\LB{    CodeOpt [[ P struct codedata * ]] ::= SEQUENCE \{}}
+\L{\LB{        a [PRIVATE 5] BasicANY [[ p cd\_a ]] OPTIONAL,}}
+\L{\LB{        b [35] E\-ANY [[ p cd\_b ]] OPTIONAL,}}
+\L{\LB{        c [45] EXPLICIT D\-ANY [[ p cd\_c ]] OPTIONAL \<\<cd\_opt\_set \$ CD\_C\>\>,}}
+\L{\LB{        d [1] DE\-ANY [[ p cd\_d ]] OPTIONAL \<\<cd\_opt\_set \$ CD\_D\>\>,}}
+\L{\LB{        e [15] IMPLICIT INTEGER [[ i cd\_int ]] [[ E get\_int ]] [[ D put\_int ]]}}
+\L{\LB{                OPTIONAL \<\< cd\_opt\_set \$ CD\_INT \>\>,}}
+\L{\LB{        f GraphicString [[ s cd\_string ]] [[ E get\_string ]][[ D put\_string ]]}}
+\L{\LB{                OPTIONAL}}
+\L{\LB{    \}}}
+\L{\LB{}}

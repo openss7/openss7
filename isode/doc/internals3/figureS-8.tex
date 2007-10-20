@@ -1,0 +1,21 @@
+\File{figureS\-8.c},{11:21},{May  5 1990}
+\L{\LB{\Proc{switch}    \K{switch} (offset) \{}}
+\L{\LB{}\Tab{8}{\K{case} type\_SNMP\_SMUX\_\_PDUs\_get\_\_request:}}
+\L{\LB{}\Tab{8}{    \K{if} (oid \-\> oid\_nelem != ot \-\> ot\_name \-\> oid\_nelem + 1}}
+\L{\LB{}\Tab{16}{    \|\| oid \-\> oid\_elements[oid \-\> oid\_nelem \- 1] != 0)}}
+\L{\LB{}\Tab{16}{\K{return} int\_SNMP\_error\_\_status\_noSuchName;}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} type\_SNMP\_SMUX\_\_PDUs\_get\_\_next\_\_request:}}
+\L{\LB{}\Tab{8}{    \K{if} (oid \-\> oid\_nelem != ot \-\> ot\_name \-\> oid\_nelem)}}
+\L{\LB{}\Tab{16}{\K{return} NOTOK;}}
+\L{\LB{}\Tab{8}{    \K{if} ((new = oid\_extend (oid, 1)) == NULLOID)}}
+\L{\LB{}\Tab{16}{\K{return} int\_SNMP\_error\_\_status\_genErr;}}
+\L{\LB{}\Tab{8}{    new \-\> oid\_elements[new \-\> oid\_nelem \- 1] = 0;}}
+\L{\LB{}\Tab{8}{    \K{if} (v \-\> name) free\_SNMP\_ObjectName (v \-\> name);}}
+\L{\LB{}\Tab{8}{    v \-\> name = new;}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}:}}
+\L{\LB{}\Tab{8}{    \K{return} int\_SNMP\_error\_\_status\_genErr;}}
+\L{\LB{    \}}}

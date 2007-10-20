@@ -1,0 +1,336 @@
+% run this through LaTeX with the appropriate wrapper
+
+\section	{The OSI Directory}
+The OSI Directory is designed to provide
+for the management of information objects.
+The Directory's representation of an information object,
+typically called an {\em entry},
+contains information about a person, a place, an organization, etc.
+Each entry consists of one or more attributes.
+
+Each attribute consists of a type,
+indicating what kind of attribute it is,
+and one or more values
+(one of which is termed the {\em distinguished value\/}).
+Attribute values are structured using a data definition language
+called Abstract Syntax Notation One (ASN.1).
+This structuring is important.
+With structuring,
+different programs using the Directory will interpret information in the same
+way.
+In addition,
+the Directory will perform type-checking on the values in order
+to keep things consistent.
+
+\subsection	{Naming}
+One of the attributes of an entry is particularly special:
+it is referred to as the {\em Relative Distinguished Name\/} (RDN) of
+the entry.
+The RDN is formed by taking the name of the attribute and its
+distinguished value.
+For example,
+if the attribute in question was called \verb"countryName" and it had
+a distinguished value of \verb"US", then we might say that the RDN
+for the entry was \verb"countryName=US".
+Of course,
+this is strictly a ``user-friendly'' notation:
+the Directory uses a concise binary format for representing an RDN.
+Fortunately,
+the pilot project software allows simple textual strings to be used in their
+place and converts back and forth accordingly.
+
+In the OSI Directory,
+information is primarily organized according to a hierarchical tree
+structure.
+The top of the tree is termed the {\em root},
+and has no explicit name.
+To find the name of an object,
+termed its {\em Distinguished Name\/} (DN),
+one concatenates the RDNs found when traversing the tree by starting
+at the root and proceeding directly to the object's entry.
+
+For purposes of discussion,
+we write a Distinguished Name as an ordered series of RDNs separated by
+an \verb"`@'"-sign with the most significant RDN appearing at the left;
+e.g.,
+\begin{quote}\small\begin{verbatim}
+countryName=US@organizationName=Performance Systems International
+\end{verbatim}\end{quote}
+refers to an entry with an RDN of
+\verb"organizationName=Performance Systems International"
+whose parent has an RDN of \verb"countryName=US".
+In turn,
+this parent entry is an immediate child of the root.
+
+To avoid any potential ambiguity when using an interface to the Directory
+such as \man fred(1c) or \man dish(1c),
+one prefixes a \verb"`@'"-sign to a string when referring to a fully
+qualified Distinguished Name;
+e.g.,
+\begin{quote}\small\begin{verbatim}
+@countryName=US@organizationName=Performance Systems International
+\end{verbatim}\end{quote}
+always refers to the same entry regardless of context.
+Note that this is a convention only for interface programs such as these.
+
+As a rule,
+unless searching,
+text before the \verb"`='"-sign is not case sensitive,
+neither is text after the \verb"`='"-sign.
+
+The Directory itself is distributed,
+being composed of {\em Directory System Agents\/} (DSAs).
+A group of DSAs under a common administration is responsible for a portion of
+the tree,
+termed a {\em Directory Management Domain\/} (DMD).
+When a user wishes to access the Directory,
+a {\em Directory User Agent\/} (DUA) is invoked.
+This DUA contacts a DSA and issues requests.
+The DSA may (or may not) have the information locally available.
+If not,
+a decision has to be made:
+either the DSA can contact another DSA to get the information
+(this is called {\em chaining\/}); or,
+the DSA can tell the DUA to contact another DSA directly
+(this is called {\em referral\/}).
+
+In short,
+the DSAs provide mechanisms for traversing the tree and manipulating the
+information contained therein.
+
+In the context of the pilot project,
+each participating organization runs its own DMD for that organization.
+This usually consists of a single DSA containing information on that
+organization,
+with some of this information being replicated on additional DSAs.
+
+\section	{Ramifications on the White Pages Service}
+In order to appreciate the ``feel'' of the white pages service,
+it is instructive to compare the white pages to an existing facility.
+
+You might be familiar with an older facility called WHOIS.
+This uses a centralized database to keep track of information on various
+people, networks, hosts, and so on.
+This facility has proven useful for many years.
+Only recently,
+with the explosive growth of the Internet,
+has the WHOIS mechanism become unworkable.
+
+\subsection	{Unique Identification of Users}
+Each entry in the WHOIS database is identified by a unique key,
+called a {\em handle}.
+This is (typically) a short string such as \verb"MTR".
+For a community many orders of magnitude larger than the current entries in
+the WHOIS database,
+a handle must contain some structure.
+This makes it possible to delegate naming authority to different organizations
+and thus de-centralize management of the white pages service.
+
+In the white pages service,
+a Directory Distinguished Name is used to uniquely identify a person.
+Thus,
+while \verb"MTR" might be enough to identify someone named ``Marshall Rose''
+in the WHOIS database,
+the DN
+\begin{quote}\small\begin{verbatim}
+c=US
+    @o=Performance Systems International
+    @ou=Research and Development
+    @ou=Mountain View
+    @cn=Marshall Rose
+\end{verbatim}\end{quote}
+serves as the handle for the same person in the white pages service.
+(That's progress for you!)
+
+Of course,
+you don't {\em really\/} have to type all that information in.
+The user interfaces provided with the pilot project allow you to manage very
+short strings to refer to these DNs.
+These interfaces also provide a means for incrementally building up a DN from
+scratch.
+
+Actually,
+the handle in the example above is probably a somewhat longer than the average.
+In terms of the pilot project,
+a handle probably looks closer to:
+\begin{quote}\small\begin{verbatim}
+c=US@o=Organization Name@ou=Unit Name@cn=FirstName LastName
+\end{verbatim}\end{quote}
+While this is still a far cry from a simple three or four letter acronym,
+it is the price one pays for using a service designed to meet the needs of a
+global (or galactic) population.
+
+\subsection	{Searching the White Pages}
+When the WHOIS database is searched,
+{\em all\/} entries in the database are examined for a match.
+Since the current size of the WHOIS database is estimated at roughly 70,000
+entries,
+this is an appropriate strategy.
+
+Unfortunately,
+the potential size of the white pages is many orders of magnitude larger than
+that of the WHOIS database.
+As such,
+the information contained in the white pages is distributed.
+This makes management of the information a shared responsibility,
+and has the potential to address organization-specific privacy concerns.
+
+Thus,
+when the white pages service is invoked,
+searches are performed relative to a particular {\em area}.
+This is similar to the White Pages of the telephone system~---~there are
+several white pages, one for each particular geographical area.
+As such,
+before you can find someone's entry in the white pages,
+you have to already know the area in which they are listed.
+
+The default area is the portion of the Directory corresponding to your own
+organization.
+Of course,
+if you specify a user's handle (a fully-qualified Distinguished Name),
+this bypasses the default area and goes directly to the portion of
+the Directory containing the desired entry.
+
+Usually,
+when you are trying to find an entry,
+you have only partial information.
+For example,
+you might know parts of the name of the organization and the person you're
+looking for.
+In this case,
+it is natural to use an iterative process to find the information you desire.
+You begin by finding the organization(s) likely to contain the entry,
+you then initiate a search starting at that area.
+
+Having said that,
+I'll let you in on a little secret:
+in addition to people,
+organizations and organizational units also have entries in the Directory.
+As such,
+searching an {\em area\/} is nothing more than starting a search at a
+particular node at the tree.
+Thus,
+you might look for the organization starting at the \verb"@c=US" node.
+In order to make searching easy,
+the pilot project requires that all organizations be listed directly under
+this node.
+How the subtree is structured beyond that is an organization-specific matter,
+although the pilot project provides various guidelines.
+
+Thus,
+to find someone,
+you look for the organization name in the \verb"@c=US" area.
+This should give you back a single entry in the Directory,
+perhaps two or three at the most.
+You then look for that person in the area corresponding to that entry.
+To make this easier,
+the white pages user interface, \pgm{fred}, has a special command syntax
+which directs it to find out the names of the likely organizations and then
+search each one for the person you're looking for, automatically!
+
+Of course,
+if you have the cycles and network bandwidth to burn,
+in theory there is nothing to stop you from simply going to the top of the
+tree and searching for the person.
+However,
+this is {\em very\/} resource-expensive,
+particularly in terms of time.
+Since time is probably the most valuable resource you have,
+it is worth it to issue two commands which complete quickly,
+rather than one command which may take hours.
+
+There are  two user interfaces provided with the pilot software.
+With the ``simple'' one,
+you follow this two-step process.
+With the ``complicated'' one,
+you can form {\em arbitrarily\/} complex queries to the Directory.
+Thus,
+if you  want to type just one command and don't mind typing a bit more,
+you can still have an optimized search.
+Both of these interfaces will be introduced in due course.
+
+\subsection	{Structure of Information}
+In addition to a handle,
+an entry in the WHOIS database consists of a {\em type},
+which indicates what kind of user is recorded by the entry
+(e.g., a person);
+and,
+several {\em fields}, each containing a textual description.
+
+For example,
+an entry for a person might look like:
+\begin{quote}\small\begin{verbatim}
+Rose, Marshall T. (MTR)    mrose@psi.com
+    PSI, Inc.
+    PSI California Office
+    POB 391776
+    Mountain View, CA  94039
+    (415) 961-3380
+\end{verbatim}\end{quote}
+The first line contains both the handle and all fields available for searching.
+Here,
+the handle is \verb"MTR",
+and there are two fields available for searching:
+a name and a mailbox.
+The remainder of the entry is a textual annotation.
+
+Because the Directory must accommodate many kinds of access from various users
+and programs.
+It is important that the information contained therein be highly structured.
+As noted earlier,
+this allows universal understanding of the information,
+and hence consistent interpretation.
+Fortunately,
+most of the information is represented by textual strings.
+
+It is important to remember however that all information associated with an
+entry is contained in an attribute.
+This attribute has a type,
+describing both its syntax and semantics.
+For example,
+the \verb"surName" attribute of a person has a textual string syntax and
+semantics corresponding to someone's last name.
+
+How the information associated with an entry is displayed to you
+is {\em strictly\/} a function of the interface you use when talking to the
+Directory.
+The Directory will enforce all of the syntactic constraints associated with
+the attributes,
+but only the users of the Directory can assign meaning to the attribute
+semantics.
+
+With this in mind,
+here's an entry associated with a person,
+as it might be displayed by a user interface:
+\begin{quote}\small\begin{verbatim}
+Marshall Rose (3)            mrose@psi.com
+    aka: Marshall T. Rose
+
+Principal Scientist
+PSI, Inc.
+    PSI California Office
+    POB 391776
+    Mountain View, CA  94039
+
+Telephone:    +1 415-961-3380
+FAX:          +1 415-961-3282
+
+Mailbox information:
+    Internet: mrose@psi.com
+    UUCP:     uupsi!mrose
+
+Principal Implementor of the ISO Development Environment
+
+Name:          Marshall Rose, Mountain View, ...
+\end{verbatim}\end{quote}
+Of course,
+there are dozens of possible ways that this information could have been
+displayed.
+Or {\em not\/} displayed~---~for example,
+there are other attributes which the interface may not care (or be able) to
+display,
+such as access control information, passwords, and so on.
+
+Appendix~\ref{person:attributes} on page~\pageref{person:attributes} lists all
+of the attributes which may be present for a person participating in the pilot
+project.

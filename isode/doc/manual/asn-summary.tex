@@ -1,0 +1,216 @@
+\File{asn\-summary.py},{12:01},{Jul 12 1991}
+\L{\LB{QuipuDirectoryDefinitions}}
+\L{\LB{\Proc{DEFINITIONS}DEFINITIONS ::=}}
+\L{\LB{}}
+\L{\LB{BEGIN}}
+\L{\LB{}}
+\L{\LB{IMPORTS}}
+\L{\LB{EVERYTHING}}
+\L{\LB{    FROM QuipuNameDefinitions}}
+\L{\LB{    }}
+\L{\LB{mhs\-or\-addresses }}
+\L{\LB{    FROM MHSDirectoryObjectsAndAttributes }}
+\L{\LB{            \{joint\-iso\-ccitt mhs\-motis(6) arch(5) modules(0) directory(1)\}}}
+\L{\LB{}}
+\L{\LB{ABSTRACT\-OPERATION, ABSTRACT\-ERROR }}
+\L{\LB{    FROM AbstractServiceNotation \{joint\-iso\-ccitt mhs\-motis(6) asdc(2) modules(0) notation(1)\}}}
+\L{\LB{}}
+\L{\LB{NameError, ServiceError, SecurityError }}
+\L{\LB{    FROM DirctoryAbstractService \{joint\-iso\-ccitt ds(5) modules(1) directoryAbstractService(2)\}}}
+\L{\LB{}}
+\L{\LB{DistinguishedName, RelativeDistinguishedName, Attribute, AttributeType, }}
+\L{\LB{ATTRIBUTE, ATTRIBUTE\-SYNTAX, \K{OBJECT}\-CLASS }}
+\L{\LB{    FROM InformationFramework \{joint\-iso\-ccitt ds(5) modules(1) informationFramework(1)\}}}
+\L{\LB{}}
+\L{\LB{distinguishedNameSyntax, commonName, description, presentationAddress}}
+\L{\LB{    FROM SelectedAttributeTypes \{joint\-iso\-ccitt ds(5) modules(1) selectedAttributeTypes(5)\}}}
+\L{\LB{}}
+\L{\LB{top, dsa }}
+\L{\LB{    FROM SelectedObjectClasses \{joint\-iso\-ccitt ds(5) modules(1) selectedObjectClasses(6)\}}}
+\L{\LB{}}
+\L{\LB{AccessPoint }}
+\L{\LB{    FROM DistributedOperations \{joint\-iso\-ccitt ds(5) modules(1) distributedOperations(3)\} ;}}
+\L{\LB{}}
+\L{\LB{QuipuObject ::= \K{OBJECT}\-CLASS}}
+\L{\LB{}\Tab{8}{SUBCLASS OF top}}
+\L{\LB{}\Tab{8}{MUST CONTAIN \{aCL\}}}
+\L{\LB{}\Tab{8}{MAY CONTAIN \{lastModifiedBy, lastModifiedTime, entrySecurityPolicy\}}}
+\L{\LB{}}
+\L{\LB{QuipuNonLeafObject ::= OBJECTCLASS}}
+\L{\LB{}\Tab{8}{SUBCLASS OF quipuObject}}
+\L{\LB{}\Tab{8}{MUST CONTAIN \{masterDSA\}}}
+\L{\LB{}\Tab{8}{MAY CONTAIN \{slaveDSA, treeStructure, inheritedAttribute\}}}
+\L{\LB{}}
+\L{\LB{ExternalNonLeafObject ::= OBJECTCLASS}}
+\L{\LB{}\Tab{8}{SUBCLASS OF quipuObject}}
+\L{\LB{}\Tab{8}{MAY CONTAIN \{subordinateReference, crossReference, }}
+\L{\LB{                     nonSpecificSubordinateReference\}}}
+\L{\LB{}}
+\L{\LB{QuipuDSA ::= \K{OBJECT}\-CLASS }}
+\L{\LB{    SUBCLASS OF dsa}}
+\L{\LB{    MUST CONTAIN \{ aCL, edbInfo, userPassword, manager, quipuVersion\}}}
+\L{\LB{    MAY CONTAIN \{ description, lastModifiedBy, lastModifiedTime, }}
+\L{\LB{}\Tab{8}{dsaDefaultSecurityPolicy, dsaPermittedSecurityPolicy, relayDSA, }}
+\L{\LB{}\Tab{8}{listenAddress, info \} }}
+\L{\LB{}}
+\L{\LB{EDBInfoSyntax ::= SEQUENCE \{}}
+\L{\LB{}\Tab{8}{edb          DistinguishedName,}}
+\L{\LB{}\Tab{8}{getFromDSA   DistinguishedName OPTIONAL,}}
+\L{\LB{}\Tab{32}{\C{}\-\- If omitted DSA is master}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- Determine mode of update from this DSA}}
+\CE{}\L{\LB{}\Tab{8}{sendToDSAs   NameList,}}
+\L{\LB{}\Tab{32}{\C{}\-\- Send these DSAs incremental updates}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- Namelist is defined with the ACLs}}
+\CE{}\L{\LB{}\Tab{8}{getEDBAllowed NameList}}
+\L{\LB{}\Tab{32}{\C{}\-\- List of DSAs allowed to pull EDB}}
+\CE{}\L{\LB{}\Tab{8}{\}}}
+\L{\LB{    }}
+\L{\LB{EdbInfo ::= ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX EDBInfo}}
+\L{\LB{    MULTI VALUE}}
+\L{\LB{}}
+\L{\LB{MasterDSA ::= ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX distinguishedNameSyntax}}
+\L{\LB{    }\Tab{24}{\C{}\-\- Master QSR}}
+\CE{}\L{\LB{    }\Tab{24}{\C{}\-\- Usually, but not necessarily single valued}}
+\CE{}\L{\LB{}}
+\L{\LB{SlaveDSA ::= ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX distinguishedNameSyntax}}
+\L{\LB{    }\Tab{24}{\C{}\-\- Slave QSR}}
+\CE{}\L{\LB{}}
+\L{\LB{SubordinateReference ::= ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX AccessPoint}}
+\L{\LB{    SINGLE VALUE}}
+\L{\LB{ }}
+\L{\LB{CrossReference ::= ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX AccessPoint}}
+\L{\LB{    SINGLE VALUE}}
+\L{\LB{ }}
+\L{\LB{NonSpecificSubordinateReference ::= ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX AccessPoint}}
+\L{\LB{}}
+\L{\LB{QuipuVersion ::= ATTRIBUTE}}
+\L{\LB{   WITH ATTRIBUTE\-SYNTAX caseIgnoreStringSyntax}}
+\L{\LB{}}
+\L{\LB{DSAControl ::= ATTRIBUTE}}
+\L{\LB{   WITH ATTRIBUTE\-SYNTAX caseIgnoreStringSyntax}}
+\L{\LB{ }}
+\L{\LB{TreeStructureSyntax ::= SET \{}}
+\L{\LB{    mandatoryObjectClasses [1] SET OF \K{OBJECT} IDENTIFIER,}}
+\L{\LB{    optionalObjectClasses [2] SET OF \K{OBJECT} IDENTIFIER OPTIONAL,}}
+\L{\LB{    permittedRDNs [3] SET OF SET OF AttributeType \}}}
+\L{\LB{    }}
+\L{\LB{TreeStructure ::= ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX TreeStructureSyntax}}
+\L{\LB{    MULTI VALUE}}
+\L{\LB{}}
+\L{\LB{InheritedListSyntax ::= SET OF CHOICE \{}}
+\L{\LB{    AttributeType,}\Tab{24}{\C{}\-\- Take value from the entry}}
+\CE{}\L{\LB{    Attribute \}}}
+\L{\LB{}}
+\L{\LB{InheritedAttributeSyntax ::= SET \{}}
+\L{\LB{    default [0] InheritedListSyntax OPTIONAL,}}
+\L{\LB{        \C{}\-\- default which can be overriden in lower entry.}}
+\CE{}\L{\LB{    always  [1] InheritedListSyntax OPTIONAL,}}
+\L{\LB{        \C{}\-\- always present in lower entry.}}
+\CE{}\L{\LB{    objectclass \K{OBJECT} IDENTIFIER OPTIONAL }}
+\L{\LB{        \C{}\-\- object class to inherit to.}}
+\CE{}\L{\LB{        \C{}\-\- The null case means the objectclass attribute }}
+\CE{}\L{\LB{        \C{}\-\-    itself is inherited}}
+\CE{}\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{InheritedAttribute ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX InheritedAttributeSyntax}}
+\L{\LB{    MULTI VALUE}}
+\L{\LB{}}
+\L{\LB{GetEntryDataBlock ABSTRACT\-OPERATION}}
+\L{\LB{}\Tab{8}{ARGUMENT GetEntryDataBlockArgument}}
+\L{\LB{}\Tab{8}{RESULT GetEntryDataBlockResult}}
+\L{\LB{}\Tab{8}{ERRORS \{NameError,ServiceError,SecurityError\}}}
+\L{\LB{}}
+\L{\LB{getEntryDataBlock GetEntryDataBlock ::= 10}}
+\L{\LB{}\Tab{32}{\C{}\-\- will make this an OBJECT IDENTIFER}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- when ISODE can support this form }}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- of operation code}}
+\CE{}\L{\LB{}}
+\L{\LB{GetEntryDataBlockArgument ::= SET \{}}
+\L{\LB{}\Tab{8}{entry}}
+\L{\LB{}\Tab{16}{[0] DistinguishedName [[p ga\_entry]] ,}}
+\L{\LB{}\Tab{8}{CHOICE \{}}
+\L{\LB{                    \C{}\-\- Can only use CHOICE [1] if remote DSA is }}
+\CE{}\L{\LB{                    \C{}\-\- version is QUIPU 6.8 or less.}}
+\CE{}\L{\LB{}\Tab{8}{       sendIfMoreRecentThan [1] EDBVersion,}}
+\L{\LB{}\Tab{8}{       getVersionNumber [2] NULL,}}
+\L{\LB{}\Tab{8}{       getEDB [3] NULL,}}
+\L{\LB{}\Tab{8}{       continuation [4] SEQUENCE \{}}
+\L{\LB{                        EDBVersion,}}
+\L{\LB{                        nextEntryPosition INTEGER \}}}
+\L{\LB{                \},}}
+\L{\LB{}\Tab{8}{maxEntries [5] INTEGER OPTIONAL }}
+\L{\LB{                    \C{}\-\- Must omit if remote DSA is QUIPU 6.8 or less}}
+\CE{}\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{GetEntryDataBlockResult ::= SEQUENCE \{}}
+\L{\LB{}\Tab{16}{versionHeld [0] EDBVersion,}}
+\L{\LB{}\Tab{16}{[1] EntryDataBlock OPTIONAL,}}
+\L{\LB{}\Tab{16}{nextEntryPostion INTEGER OPTIONAL}}
+\L{\LB{                    \C{}\-\- Must omit if remote DSA is QUIPU 6.8 or less}}
+\CE{}\L{\LB{}\Tab{8}{\}}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{EDBVersion ::= UTCTime}}
+\L{\LB{}}
+\L{\LB{ACLInfo ::= SET OF SEQUENCE \{}}
+\L{\LB{        AccessSelector,}}
+\L{\LB{        AccessCategories \}}}
+\L{\LB{}}
+\L{\LB{AccessCategories ::= ENUMERATED \{}}
+\L{\LB{        none (0),       }}
+\L{\LB{        detect (1),}}
+\L{\LB{        compare (2),}}
+\L{\LB{        read (3),}}
+\L{\LB{        add (4),}}
+\L{\LB{        write (5) \}}}
+\L{\LB{}}
+\L{\LB{AccessSelector ::= CHOICE \{}}
+\L{\LB{        entry [0] NULL,}}
+\L{\LB{                \C{}\-\- DUA identified by the entry}}
+\CE{}\L{\LB{        other [2] NULL,}}
+\L{\LB{                \C{}\-\- This indicates ``public\'\' rights}}
+\CE{}\L{\LB{        prefix [3] NameList,}}
+\L{\LB{                \C{}\-\- This identifies a prefix name for specified DUAs}}
+\CE{}\L{\LB{                \C{}\-\- e.g., anyone in the UK}}
+\CE{}\L{\LB{        group [4] NameList}}
+\L{\LB{                \C{}\-\- For specifying group rights}}
+\CE{}\L{\LB{        \}}}
+\L{\LB{}}
+\L{\LB{NameList ::= SET OF DistinguishedName   }}
+\L{\LB{}}
+\L{\LB{ACLSyntax ::= SEQUENCE \{ }}
+\L{\LB{    childACL            [0] ACLInfo DEFAULT \{\{other, read\}\},}}
+\L{\LB{    entryACL            [1] ACLInfo DEFAULT \{\{other, read\}\},}}
+\L{\LB{    defaultAttributeACL [2] ACLInfo DEFAULT \{\{other, read\}\},}}
+\L{\LB{    [3] SET OF AttributeACL \}}}
+\L{\LB{                                \C{}\-\- Defaults to a publicly readable}}
+\CE{}\L{\LB{                                \C{}\-\- read only directory}}
+\CE{}\L{\LB{    }}
+\L{\LB{AttributeACL ::= SEQUENCE \{}}
+\L{\LB{    SET OF AttributeType,}}
+\L{\LB{    ACLInfo \}    }}
+\L{\LB{}}
+\L{\LB{ACL ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX ACLSyntax}}
+\L{\LB{    SINGLE VALUE}}
+\L{\LB{}}
+\L{\LB{ProtectedPassword ::=}}
+\L{\LB{        SEQUENCE \{}}
+\L{\LB{        algorithm [0] AlgorithmIdentifier OPTIONAL,}}
+\L{\LB{        salt [1] SET \{}}
+\L{\LB{                time1 [0] UTCTime OPTIONAL,}}
+\L{\LB{                time2 [1] UTCTime OPTIONAL,}}
+\L{\LB{                random1 [2] BIT STRING OPTIONAL,}}
+\L{\LB{                random2 [3] BIT STRING OPTIONAL\}}}
+\L{\LB{                OPTIONAL,}}
+\L{\LB{        password [2] OCTET STRING\}}}
+\L{\LB{}}
+\L{\LB{END}}

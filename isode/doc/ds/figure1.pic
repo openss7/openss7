@@ -1,0 +1,16 @@
+.PS
+#.ps 20
+## figure 1
+E1:	ellipse "DUA"
+##
+M1:	move to E1.w - (.5,0)
+##
+E2:	arc from E1.n to E1.s at M1 rad E1.x - M1.x \
+				"Directory" "User"
+M2:	move
+M3:	move
+E3:	ellipse height 2i width 3i "The" "Directory"
+##
+L1:     line -> cw from E1.e to E3.w
+##
+.PE

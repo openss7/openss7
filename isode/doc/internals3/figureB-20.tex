@@ -1,0 +1,28 @@
+\File{figureB\-20.ry},{08:28},{Feb 13 1990}
+\L{\LB{\C{}\-\- some of the types}}
+\CE{}\L{\LB{}}
+\L{\LB{Service\-Requirements ::=}}
+\L{\LB{    \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{version[0]}}
+\L{\LB{}\Tab{8}{    Versions,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{credentials[1]}}
+\L{\LB{}\Tab{8}{    Credentials \K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{extensions[2]}}
+\L{\LB{}\Tab{8}{    \K{SET} \K{OF} Extension \K{OPTIONAL}}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{\Proc{Versions}Versions ::=}}
+\L{\LB{    \K{BIT} \K{STRING} \{ version\-1 (0) \}}}
+\L{\LB{    }}
+\L{\LB{Service\-Diagnostic ::=}}
+\L{\LB{    \K{SET} \{}}
+\L{\LB{}\Tab{8}{versions[0]}}
+\L{\LB{}\Tab{8}{    \K{SEQUENCE} \K{OF} Versions \K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{reason}}
+\L{\LB{}\Tab{8}{    Diagnostic\-Reason}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{...}}

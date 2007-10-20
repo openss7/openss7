@@ -1,0 +1,403 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{The ISODE Logging Facility}\label{logging}
+Although not a database mechanisms, per se, the ISODE logging facility 
+is used to manipulate general logs:
+used by both the ISODE and programs which use the ISODE.
+
+\subsection	{Data-Structures}
+There is one primary data-structure, the \verb"LLog":
+\begin{quote}\index{LLog}\small\begin{verbatim}
+typedef struct  ll_struct {
+    char   *ll_file;
+
+    char   *ll_hdr;
+    char   *ll_dhdr;
+
+    int	    ll_events;
+#define	LLOG_NONE	0
+#define	LLOG_FATAL	0x01
+#define	LLOG_EXCEPTIONS	0x02
+#define	LLOG_NOTICE	0x04
+#define	LLOG_PDUS	0x08
+#define	LLOG_TRACE	0x10
+#define	LLOG_DEBUG	0x20
+#define	LLOG_ALL	0xff
+#define	LLOG_MASK \
+    "\020\01FATAL\02EXCEPTIONS\03NOTICE\04PDUS\05TRACE\06DEBUG"
+
+    int	    ll_syslog;
+
+    int     ll_msize;
+
+    int     ll_stat;
+#define	LLOGNIL		0x00
+#define	LLOGCLS		0x01
+#define	LLOGCRT		0x02
+#define	LLOGZER		0x04
+#define	LLOGERR		0x08
+#define	LLOGTTY		0x10
+#define	LLOGHDR		0x20
+#define	LLOGDHR		0x40
+
+    int     ll_fd;
+} LLog;
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ll\_file":] the name of the file to use for the log,
+unless an absolute pathname (e.g., \file{/usr/tmp/logfile})
+or an anchored pathname (e.g., \file{./logfile}),
+the name is interpreted relative to the the \verb"logpath" directory
+in the ISODE tailoring file (see Chapter~\ref{isotailor});
+
+\item[\verb"ll\_hdr":] the logging header which
+is usually set by one of the utility routines described below;
+
+\item[\verb"ll\_hdr"/\verb"ll\_dhdr":] the so-called dynamic header;
+
+\item[\verb"ll\_events"/\verb"ll\_syslog":] a bitmask describing the logging
+events which are interesting to this log, any combination of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Meaning}\\
+\hline
+    \tt LLOG\_FATAL&		fatal errors\\
+    \tt LLOG\_EXCEPTIONS&	exceptional events\\
+    \tt LLOG\_NOTICE&		informational notices\\
+    \tt LLOG\_PDUS&		PDU printing\\
+    \tt LLOG\_TRACE&		program tracing\\
+    \tt LLOG\_DEBUG&		full debugging\\
+\hline
+\end{tabular}\]
+In addition, the values \verb"LLOG_NONE" by itself refers to no events
+and \verb"LLOG_ALL" refers to all events being of interest.
+For those systems with a \man syslog(3) routine,
+the \verb"ll_syslog" element indicates if the event should be given to 
+\man syslog(8) as well;
+
+\item[\verb"ll\_msize":] the maximum size of the log, in units of Kbytes
+(a non-positive number indicates no limit);
+
+\item[\verb"ll\_stat":] assorted switches, any combination of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+	\multicolumn{1}{c|}{\bf Meaning}\\
+\hline
+    \tt LOGCLS&		keep log closed, except when writing\\
+    \tt LOGCRT&		create log if necessary\\
+    \tt LOGZER&		truncate log when limits reached\\
+    \tt LOGERR&		log closed due to (soft) error\\
+    \tt LOGTTY&		also log to stderr\\
+    \tt LOGHDR&		static header allocated\\
+    \tt LOGDHR&		dynamic header allcoated\\
+\hline
+\end{tabular}\]
+
+\item[\verb"ll\_fd":] the file-descriptor corresponding to the log.
+\end{describe}
+
+\section	{Accessing the Log}
+Typically,
+logs are not opened or closed directly~---~when an entry is made to a log,
+the log is opened (if necessary), the entry is written, and (usually) the log
+is then closed.
+
+To open a log associated with a \verb"LLog" structure,
+the routine \verb"ll_open" is used:
+\begin{quote}\index{ll\_open}\small\begin{verbatim}
+int     ll_open (lp)
+LLog   *lp;
+\end{verbatim}\end{quote}
+The parameter to this routine is:
+\begin{describe}
+\item[\verb"lp":] a pointer to a \verb"LLog" structure.
+\end{describe}
+The \verb"ll_open" routine will open the log,
+creating the corresponding file (if necessary).
+Logs are created mode \verb"0666".
+If the name of the file to use for the log is ``\verb"-"'',
+then the \verb"LLOGTTY" option is enabled and no file is actually opened.
+When determining the actual name of the file to use,
+a ``\verb"%d"'' in the name will be replaced by the process-id of the program
+opening the log.
+On failure, the manifest constant \verb"NOTOK" is returned.
+Otherwise, the log is opened
+(and left open, regardless of the presence of the \verb"LLOGCLS" option),
+and the manifest constant \verb"OK" is returned.
+
+To close a log, the routine \verb"ll_close" is used:
+\begin{quote}\index{ll\_close}\small\begin{verbatim}
+int     ll_close (lp)
+LLog   *lp;
+\end{verbatim}\end{quote}
+The parameter to this routine is:
+\begin{describe}
+\item[\verb"lp":] a pointer to a \verb"LLog" structure.
+\end{describe}
+This routine returns the manifest constant \verb"OK" on success
+(even if the log was already closed),
+or \verb"NOTOK" otherwise.
+
+\subsection	{Timestamps}
+One of the characteristics of a log is that it contains an informational
+timestamp for each entry.
+This timestamp contains the date and time of the log and also two ``header''
+strings, a static header and a dynamic header.
+Normally, these strings are constructed from the name of the program or
+subsystem using the log.
+The routine \verb"ll_hdinit" is used to initialize the static header:
+\begin{quote}\index{ll\_hdinit}\small\begin{verbatim}
+void   ll_hdinit (lp, prefix)
+LLog   *lp;
+char   *prefix;
+\end{verbatim}\end{quote}
+The parameters to this routine are:
+\begin{describe}
+\item[\verb"lp":] a pointer to a \verb"LLog" structure; and,
+
+\item[\verb"prefix":] the name of the program or subsystem using the log.
+\end{describe}
+This routine will form a header consisting of the program name,
+the process-id, and the user-name.
+
+The routine \verb"ll_dbinit" is similar, but also enables debugging features:
+\begin{quote}\index{ll\_dbinit}\small\begin{verbatim}
+void   ll_dbinit (lp, prefix)
+LLog   *lp;
+char   *prefix;
+\end{verbatim}\end{quote}
+The parameters to this routine are:
+\begin{describe}
+\item[\verb"lp":] a pointer to a \verb"LLog" structure; and,
+
+\item[\verb"prefix":] the name of the program or subsystem using the log.
+\end{describe}
+This routine will form a header identical to the one formed by
+\verb"ll_hdinit".
+It will then set the name of the file associated with the log to be relative
+to the current working directory.
+Finally, it turns on all event logging and logging to the user's terminal.
+
+\subsection	{Making Log Entries}
+At the lowest level, the \verb"ll_log" routine is used to append an entry to a
+log: 
+\begin{quote}\index{ll\_log}\small\begin{verbatim}
+int     ll_log (lp, event, what, fmt, args ...)
+LLog   *lp;
+int     event;
+char   *what,
+       *fmt;
+\end{verbatim}
+\end{quote}
+The parameters to this routine are:
+\begin{describe}
+\item[\verb"lp":] a pointer to a \verb"LLog" structure;
+
+\item[\verb"event":] the event type being logged (e.g., \verb"LLOG_NOTICE");
+
+\item[\verb"what":] some text associated with a system call error
+(use the manifest constant \verb"NULLCP" if the entry is not associated with
+an error in a system call); and,
+
+\item[\verb"fmt"/\verb"args":] an argument list to \man printf(3s).
+\end{describe}
+The entry is only made if the log is enabled
+(in the \verb"ll_events" field of the \verb"LLog" structure)
+for the event listed as a parameter to \verb"ll_log".
+If there was a problem in writing to the log,
+\verb"ll_log" returns the manifest constant \verb"NOTOK".
+Otherwise, \verb"OK" is returned.
+
+The \verb"ll_log" routine is actually a simple wrapper around the
+\verb"_ll_log" routine:
+\begin{quote}\index{\_ll\_log}\small\begin{verbatim}
+int     _ll_log (lp, event, ap)
+LLog   *lp;
+int     event;
+va_list ap;
+\end{verbatim}
+\end{quote}
+The parameters to this routine are:
+\begin{describe}
+\item[\verb"lp":] a pointer to a \verb"LLog" structure;
+
+\item[\verb"event":] the event type being logged; and,
+
+\item[\verb"ap":] an argument pointer to a variable-length argument list
+as described in \man varargs(3).
+\end{describe}
+
+It may be necessary to have multi-line log entries.
+In this case, the first line of the entry should be made with \verb"ll_log".
+The remaining lines should be made with the \verb"ll_printf" routine:
+\begin{quote}\index{ll\_printf}\small\begin{verbatim}
+int     ll_printf (lp, fmt, args ...)
+LLog   *lp;
+char   *fmt;
+\end{verbatim}
+\end{quote}
+The parameters to this routine are:
+\begin{describe}
+\item[\verb"lp":] a pointer to a \verb"LLog" structure; and,
+
+\item[\verb"fmt"/\verb"args ...":] an argument list to \man printf(3s).
+\end{describe}
+As with \verb"ll_log", this routine returns either \verb"OK" on success or
+\verb"NOTOK" on error.
+Unlink \verb"ll_log" however,
+\verb"ll_printf" will ignore the setting of the \verb"LLOGCLS" option.
+As such, when the last line of a multi-line entry has been made,
+the routine \verb"ll_sync" should always be called to synchronize the log:
+\begin{quote}\index{ll\_sync}\small\begin{verbatim}
+int     ll_sync (lp)
+LLog   *lp;
+\end{verbatim}
+\end{quote}
+The parameter to this routine is:
+\begin{describe}
+\item[\verb"lp":] a pointer to a \verb"LLog" structure.
+\end{describe}
+
+\subsection	{More About Making Log Entries}
+Although the \verb"ll_log" routine has a basic functionality,
+programmers often prefer a slightly simpler interface.
+A few macros have been defined for this purpose.
+
+The \verb"SLOG" macro is the most commonly used:
+\begin{quote}\index{SLOG}\small\begin{verbatim}
+SLOG (lp, event, what, args)
+\end{verbatim}\end{quote}
+The parameters to this macro are:
+\begin{describe}
+\item[\verb"lp":] a pointer to a \verb"LLog" structure;
+
+\item[\verb"event":] the event type being logged;
+
+\item[\verb"what":] some text associated with a system call error
+(use the manifest constant \verb"NULLCP" if the entry is not associated with
+an error in a system call); and,
+
+\item[\verb"args":] a parenthesized argument list for \man printf(3s).
+\end{describe}
+The \verb"SLOG" macro compares the event enabled for a log to the event being
+logged to see if \verb"ll_log" should be called.
+
+Since, the need for a \verb"what" parameter is not common in many
+applications,
+the \verb"LLOG" macro has been supplied.
+It is essentially the \verb"SLOG" macro but with a value of \verb"NULLCP"
+supplied for the \verb"what" parameter of \verb"ll_log":
+\begin{quote}\index{LLOG}\small\begin{verbatim}
+LLOG (lp, what, args)
+\end{verbatim}\end{quote}
+
+Further,
+even though logging is contingent on an event type being enabled,
+a programmer may still wish that calls to logging package still be
+conditionally compiled.
+The \verb"DLOG" macro has been supplied for this purpose.
+If the pre-processor symbol \verb"DEBUG" is defined,
+then \verb"DLOG" is equivalent to \verb"LLOG" otherwise it compiles no code
+whatsoever:
+\begin{quote}\index{DLOG}\small\begin{verbatim}
+DLOG (lp, what, args)
+\end{verbatim}\end{quote}
+
+Finally, it may be useful to log PDUs (protocol data units), again under
+conditional compilation.
+The \verb"PLOG" macro takes the address of a pretty-printer function generated
+by \man pepy(1)
+(see Section~\ref{pepy:pretty} on page~\pageref{pepy:pretty} in \volfour/)
+along with a presentation element
+(as described in Chapter~\ref{libpsap} in \volone/)
+and a brief textual title, and directs the pretty-printer to output to the log:
+\begin{quote}\index{PLOG}\small\begin{verbatim}
+PLOG (lp, fnx, pe, text, rw)
+\end{verbatim}\end{quote}
+The \verb"rw" parameter is an integer saying wheter the PDU was read from the
+network (non-zero) or written to the network (zero-valued).
+As with the \verb"DLOG" macro,
+if the \verb"DDEBUG" symbol is not defined,
+then no code is generated.
+
+\subsection	{Miscellaneous Routines}
+In order to support some of the more esoteric log capabilities,
+there are a few utility routines.
+
+The routine \verb"ll_preset" evaluates a \man printf(3s) argument list
+and returns a pointer to static buffer containing the result:
+\begin{quote}\index{ll\_preset}\small\begin{verbatim}
+char   *ll_preset (fmt, args ...)
+char   *fmt;
+\end{verbatim}
+\end{quote}
+
+The routine \verb"ll_check" determines if a log has exceeded its size,
+and if so, if a correction can be made:
+\begin{quote}\index{ll\_check}\small\begin{verbatim}
+int     ll_check (lp)
+LLog   *lp;
+\end{verbatim}
+\end{quote}
+This routine returns \verb"OK" if the log is within its bounds.
+
+\section	{Use of Logging in Programs}
+From the perspective of applications programmers,
+there are three kinds of styles for using the logging package,
+depending on the kind of program being written.
+
+In all three cases,
+\verb"LLog" structures are usually declared statically in the main module of a
+program and a pointer to the structure is made available for general use:
+\begin{quote}\small\begin{verbatim}
+static LLog _pgm_log = {
+    "myname.log", NULLCP, NULLCP,
+    LLOG_FATAL | LLOG_EXCEPTIONS | LLOG_NOTICE,
+    LLOG_FATAL,
+    -1,
+    LLOGCLS | LLOGCRT | LLOGZER,
+    NOTOK
+};
+
+LLog *pgm_log = &_pgm_log;
+\end{verbatim}\end{quote}
+Where the \verb"myname" in ``\verb"myname.log"'' is replaced with the name of
+the program.
+
+Note that in all cases,
+in order to ensure consistent logging it is {\bf critical\/} that the call to
+\verb"isodetailor" be the first call made to {\em any \/} of the ISODE
+routines.
+
+For static responders,
+two routines are called in the initialization code:
+\begin{quote}\small\begin{verbatim}
+isodetailor (argv[0], 0);
+ll_hdinit (pgm_log, argv[0]);
+\end{verbatim}\end{quote}
+Later on, after argument parsing, if a debug option is enabled, then
+\begin{quote}\small\begin{verbatim}
+ll_dbinit (pgm_log, argv[0]);
+\end{verbatim}\end{quote}
+is called.
+
+For dynamic responders,
+a similiar code sequence is used:
+\begin{quote}\small\begin{verbatim}
+isodetailor (argv[0], 0);
+if (debug = isatty (fileno (stderr)))
+    ll_hdinit (pgm_log, argv[0]);
+else
+    ll_dbinit (pgm_log, argv[0]);
+\end{verbatim}\end{quote}
+
+For user-interfaces, the code is simply:
+\begin{quote}\small\begin{verbatim}
+isodetailor (argv[0], 1);
+ll_hdinit (pgm_log, argv[0]);
+\end{verbatim}\end{quote}
+which will ask the tailoing system to read both the standard tailoring file
+and a user-specific tailoring file and then to initialize the program log.

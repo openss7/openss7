@@ -1,0 +1,135 @@
+\contentsline {part}{\uppercase {i}\phspace {1em}Introduction}{1}
+\contentsline {chapter}{\numberline {1}Overview}{3}
+\contentsline {section}{\numberline {1.1}Fanatics Need Not Read Further}{4}
+\contentsline {section}{\numberline {1.2}The Name of the Game}{5}
+\contentsline {section}{\numberline {1.3}Operating Environments}{5}
+\contentsline {section}{\numberline {1.4}Organisation of the Release}{7}
+\contentsline {section}{\numberline {1.5}A Note on This Implementation}{9}
+\contentsline {section}{\numberline {1.6}Changes Since the Last Release}{10}
+\contentsline {part}{\uppercase {ii}\phspace {1em}Underlying Services}{13}
+\contentsline {chapter}{\numberline {2}Presentation Services}{15}
+\contentsline {section}{\numberline {2.1}Warning}{16}
+\contentsline {section}{\numberline {2.2}Addresses}{16}
+\contentsline {subsection}{\numberline {2.2.1}Calling Address}{18}
+\contentsline {section}{\numberline {2.3}Connection Establishment}{18}
+\contentsline {subsection}{\numberline {2.3.1}Connection Negotiation}{18}
+\contentsline {subsubsection}{Session Parameters}{18}
+\contentsline {subsubsection}{Presentation Contexts}{18}
+\contentsline {subsection}{\numberline {2.3.2}Server Initialization}{19}
+\contentsline {subsection}{\numberline {2.3.3}Client Initialization}{28}
+\contentsline {section}{\numberline {2.4}Data Transfer}{34}
+\contentsline {subsection}{\numberline {2.4.1}Restrictions on User Data}{35}
+\contentsline {section}{\numberline {2.5}Error Conventions}{35}
+\contentsline {section}{\numberline {2.6}Compiling and Loading}{36}
+\contentsline {section}{\numberline {2.7}An Example}{36}
+\contentsline {section}{\numberline {2.8}Lightweight Presentation Protocol}{39}
+\contentsline {section}{\numberline {2.9}For Further Reading}{40}
+\contentsline {chapter}{\numberline {3}Session Services}{41}
+\contentsline {section}{\numberline {3.1}Warning}{42}
+\contentsline {section}{\numberline {3.2}Addresses}{42}
+\contentsline {subsection}{\numberline {3.2.1}Calling Address}{44}
+\contentsline {subsection}{\numberline {3.2.2}Address Encodings}{44}
+\contentsline {section}{\numberline {3.3}Connection Establishment}{44}
+\contentsline {subsection}{\numberline {3.3.1}Connection Negotiation}{45}
+\contentsline {subsubsection}{Maximum SSDU Size}{45}
+\contentsline {subsubsection}{Session Requirements}{45}
+\contentsline {subsubsection}{Session Tokens}{47}
+\contentsline {subsubsection}{Initial Token Settings}{48}
+\contentsline {subsection}{\numberline {3.3.2}Server Initialization}{49}
+\contentsline {subsection}{\numberline {3.3.3}Client Initialization}{57}
+\contentsline {section}{\numberline {3.4}Data Transfer}{61}
+\contentsline {subsection}{\numberline {3.4.1}Sending Data}{62}
+\contentsline {subsection}{\numberline {3.4.2}Receiving Data}{65}
+\contentsline {subsubsection}{Token Indications}{68}
+\contentsline {subsubsection}{Synchronization Indications}{69}
+\contentsline {subsubsection}{Activity Indications}{71}
+\contentsline {subsubsection}{Report Indications}{72}
+\contentsline {subsubsection}{Finish Indication}{73}
+\contentsline {subsection}{\numberline {3.4.3}Token Management}{74}
+\contentsline {subsubsection}{Sending Tokens}{74}
+\contentsline {subsubsection}{Requesting Tokens}{75}
+\contentsline {subsection}{\numberline {3.4.4}Synchronization Management}{76}
+\contentsline {subsubsection}{Major Synchronization}{76}
+\contentsline {subsubsection}{Minor Synchronization}{77}
+\contentsline {subsubsection}{ReSynchronization}{79}
+\contentsline {subsection}{\numberline {3.4.5}Activity Management}{80}
+\contentsline {subsubsection}{Activity Start/Resume}{80}
+\contentsline {subsubsection}{Activity Interrupt/Discard}{83}
+\contentsline {subsubsection}{Activity End}{85}
+\contentsline {subsection}{\numberline {3.4.6}Exception Reporting}{86}
+\contentsline {subsection}{\numberline {3.4.7}User-initiated Aborts}{87}
+\contentsline {subsection}{\numberline {3.4.8}Asynchronous Event Handling}{87}
+\contentsline {subsection}{\numberline {3.4.9}Synchronous Event Multiplexing}{91}
+\contentsline {section}{\numberline {3.5}Connection Release}{92}
+\contentsline {section}{\numberline {3.6}Restrictions on User Data}{95}
+\contentsline {section}{\numberline {3.7}Error Conventions}{96}
+\contentsline {section}{\numberline {3.8}Compiling and Loading}{96}
+\contentsline {section}{\numberline {3.9}An Example}{96}
+\contentsline {section}{\numberline {3.10}For Further Reading}{100}
+\contentsline {chapter}{\numberline {4}Transport Services}{101}
+\contentsline {section}{\numberline {4.1}Addresses}{101}
+\contentsline {subsection}{\numberline {4.1.1}Calling Address}{102}
+\contentsline {subsection}{\numberline {4.1.2}Address Encodings}{104}
+\contentsline {section}{\numberline {4.2}Connection Establishment}{105}
+\contentsline {subsection}{\numberline {4.2.1}Connection Negotiation}{105}
+\contentsline {subsubsection}{Expedited Data}{105}
+\contentsline {subsubsection}{Maximum TSDU Size}{105}
+\contentsline {subsection}{\numberline {4.2.2}Server Initialization}{106}
+\contentsline {subsection}{\numberline {4.2.3}Client Initialization}{110}
+\contentsline {subsubsection}{Asynchronous Connections}{112}
+\contentsline {section}{\numberline {4.3}Data Transfer}{115}
+\contentsline {subsection}{\numberline {4.3.1}Sending Data}{116}
+\contentsline {subsection}{\numberline {4.3.2}Receiving Data}{117}
+\contentsline {subsection}{\numberline {4.3.3}Asynchronous Event Handling}{119}
+\contentsline {subsection}{\numberline {4.3.4}Synchronous Event Multiplexing}{121}
+\contentsline {section}{\numberline {4.4}Connection Release}{123}
+\contentsline {section}{\numberline {4.5}State Saving and Restoration}{123}
+\contentsline {subsection}{\numberline {4.5.1}Saving the State}{123}
+\contentsline {subsection}{\numberline {4.5.2}Restoring the State}{124}
+\contentsline {section}{\numberline {4.6}Cookie Parameters}{124}
+\contentsline {subsection}{\numberline {4.6.1}Network Addresses}{125}
+\contentsline {subsection}{\numberline {4.6.2}Quality of Service}{128}
+\contentsline {section}{\numberline {4.7}Listen Facility}{129}
+\contentsline {section}{\numberline {4.8}Queued (non-blocking) Writes Facility}{132}
+\contentsline {section}{\numberline {4.9}Error Conventions}{133}
+\contentsline {section}{\numberline {4.10}Compiling and Loading}{133}
+\contentsline {section}{\numberline {4.11}An Example}{133}
+\contentsline {section}{\numberline {4.12}Compatibility Issues}{136}
+\contentsline {section}{\numberline {4.13}For Further Reading}{137}
+\contentsline {section}{\numberline {4.14}Changes Since the Last Release}{137}
+\contentsline {part}{\uppercase {iii}\phspace {1em}Databases}{139}
+\contentsline {chapter}{\numberline {5}The ISODE Services Database}{141}
+\contentsline {section}{\numberline {5.1}Accessing the Database}{142}
+\contentsline {chapter}{\numberline {6}The ISODE Tailoring File}{145}
+\contentsline {section}{\numberline {6.1}Tailor Variables}{145}
+\contentsline {subsection}{\numberline {6.1.1}Local Environment Tailoring}{145}
+\contentsline {subsection}{\numberline {6.1.2}Logging Tailoring}{147}
+\contentsline {subsection}{\numberline {6.1.3}Directory Services Tailoring}{148}
+\contentsline {subsection}{\numberline {6.1.4}Transport Switch Tailoring}{148}
+\contentsline {subsubsection}{Transport-Service Bridge}{150}
+\contentsline {subsection}{\numberline {6.1.5}Interface Specific Tailoring}{151}
+\contentsline {subsubsection}{General X.25 Tailoring}{151}
+\contentsline {subsubsection}{SunLink X.25}{151}
+\contentsline {subsubsection}{Camtec CCL}{153}
+\contentsline {subsubsection}{Bridge X.25}{153}
+\contentsline {section}{\numberline {6.2}Accessing the Tailoring File}{154}
+\contentsline {chapter}{\numberline {7}The ISODE Logging Facility}{156}
+\contentsline {subsection}{\numberline {7.0.1}Data-Structures}{156}
+\contentsline {section}{\numberline {7.1}Accessing the Log}{158}
+\contentsline {subsection}{\numberline {7.1.1}Timestamps}{159}
+\contentsline {subsection}{\numberline {7.1.2}Making Log Entries}{160}
+\contentsline {subsection}{\numberline {7.1.3}More About Making Log Entries}{162}
+\contentsline {subsection}{\numberline {7.1.4}Miscellaneous Routines}{163}
+\contentsline {section}{\numberline {7.2}Use of Logging in Programs}{163}
+\contentsline {part}{\uppercase {iv}\phspace {1em}Configuration}{165}
+\contentsline {chapter}{\numberline {8}The Transport Switch}{167}
+\contentsline {section}{\numberline {8.1}Transport Stacks}{167}
+\contentsline {section}{\numberline {8.2}OSI Communities}{168}
+\contentsline {subsection}{\numberline {8.2.1}Defining a new OSI community}{170}
+\contentsline {subsubsection}{Defining a new TCP-based community}{171}
+\contentsline {subsubsection}{Defining a new X.25-based community}{171}
+\contentsline {subsection}{\numberline {8.2.2}Heuristic Support}{172}
+\contentsline {section}{\numberline {8.3}Transport-Service Bridges}{173}
+\contentsline {subsection}{\numberline {8.3.1}Client Hosts}{173}
+\contentsline {subsection}{\numberline {8.3.2}Server Hosts}{174}
+\contentsline {section}{\numberline {8.4}In Retrospect}{174}

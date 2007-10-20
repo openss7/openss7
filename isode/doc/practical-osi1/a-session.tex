@@ -1,0 +1,504 @@
+%\begin{bwslide}
+%\part	{SESSION SERVICES}\bf
+%\end{bwslide}
+
+
+\begin{bwslide}
+\part	{SESSION SERVICES}\bf
+
+\vskip.5in
+\diagram[p]{figureA-6}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {SESSION LAYER\\PURPOSE}
+
+\begin{nrtc}
+\item	ADD STRUCTURE TO DATA CIRCUIT PROVIDED BY TRANSPORT
+\item	MORE ``APPLICATIONS ORIENTED'' STREAM TO USER
+\item	ADD CONTROL MECHANISMS TO DATA EXCHANGE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {SESSION}
+
+\vskip.5in
+\diagram[p]{figureA-13}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {SESSION}
+%
+%\begin{nrtc}
+%\item	22 SERVICES
+%\item	50+ PRIMITIVES
+%\item	COMPLEX STATE MACHINE RULES
+%\item	QUITE COMPLEX COMPARED TO TRANSPORT SERVICE
+%%\item	PRIMITIVES PREFIXED WITH {\em S--\ldots}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {USERS}
+%
+%\begin{nrtc}
+%\item	{\em SS--user} TYPICALLY A PRESENTATION ENTITY
+%\item	NOT ALWAYS THE CASE
+%	\begin{nrtc}
+%	\item	1984 MHS (X.400) USED RELIABLE TRANSFER TO DIRECTLY 
+%							ACCESS SESSION
+%	\end{nrtc}
+%\item	SESSION PROVIDER INTERACTS WITH A SINGLE {\em SS-user} ENTITY
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {\em SS-users}
+%
+%\begin{nrtc}
+%\item	CONNECTION ESTABLISHMENT
+%	\begin{nrtc}
+%	\item	CALLING {\em SS-user}
+%	\item	CALLED {\em SS-user}
+%	\end{nrtc}
+%\item	ACTION INITIATION
+%	\begin{nrtc}
+%	\item	REQUESTING {\em SS-user}
+%	\item	ACCEPTING {\em SS-user}
+%	\end{nrtc}
+%\item	CONNECTIONS ARE SYMMETRIC
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {SESSION ADDRESSING}
+%
+%\begin{nrtc}
+%\item	{\em SS-user} ADDRESSED AT SESSION SERVICE ACCESS POINT (SSAP) BY:
+%\item	SSAP CONTENT:
+%	\begin{nrtc}
+%	\item	SESSION SELECTOR
+%	\item	TRANSPORT ADDRESS
+%	\end{nrtc}
+%%\item	SELECTOR IS A STRING OF OCTETS
+%\item	TRANSPORT ADDRESS IDENTIFIES A GIVEN SESSION ENTITY
+%\item	SESSION SELECTOR IDENTIFIES A SPECIFIC USER OF THAT ENTITY
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {U.S. GOSIP SESSION SELECTOR}
+%diagram
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {SESSION ADDRESSING (cont.)}
+%
+%\begin{nrtc}
+%\item	DE-MULTIPLEXING ON nSAPs
+%	\begin{nrtc}
+%	\item	KERNEL
+%	\item	USER
+%	\end{nrtc}
+%\item	IMPLEMENTATION CONSIDERATION
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {SERIAL NUMBERS}
+%
+%\begin{nrtc}
+%\item	{\em OPTIONALLY} MAINTAINED DURING SESSION CONNECTION
+%\item	AVAILABILITY DEPENDS ON CONNECTION FUNCTIONALITY NEGOTIATIONS
+%\item	USED TO COORDINATE AND REFERENCE TRANSACTIONS ON CONNECTION
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {CONNECTION IDENTIFIER}
+%
+%\begin{nrtc}
+%\item	{\em SS-users} ASSIGN A UNIQUE IDENTIFIER TO A CONNECTION
+%%\item	{NOT A LOCAL MECHANISM SUCH AS A FILE DESCRIPTOR}
+%\item	TYPICALLY
+%	\begin{nrtc}
+%	\item	EACH SYSTEM PROVIDES A HOST NAME
+%	\item	CURRENT UTC TIME IS PROVIDED IN A COMMON PORTION
+%	\end{nrtc}
+%\item	USED TO RE--ESTABLISH BROKEN CONNECTIONS
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {SESSION PROVIDES}
+
+\begin{nrtc}
+\item	DIALOGUE CONTROL (TOKENS)
+\item	SYNCHRONIZATION (CHECKPOINTING)
+\item	ACTIVITY MANAGEMENT
+\item	EXCEPTION REPORTING
+\item	{\em TRANSPORT FUNCTIONALITY}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {TOKENS}
+%
+%\begin{nrtc}
+%\item	MANY APPLICATION EXCHANGES ARE ACTUALLY HALF-DUPLEX
+%\item	``TOKENS'' KEEP TRACK OF WHO MAY SEND DATA
+%\item	REQUESTS FOR A TOKEN CARRY A PRIORITY
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{TOKENS}
+%
+%\begin{nrtc}
+%\item	CONTROL EXCLUSIVE ACCESS TO PARTICULAR SERVICE
+%\item	TRAFFIC SIGNAL OF SESSION COMMUNICATIONS
+%\item	TOKENS ARE ONE OF:
+%	\begin{nrtc}
+%	\item	AVAILABLE \& OWNED
+%	\item	AVAILABLE \& NOT OWNED
+%	\item	UNAVAILABLE
+%	\end{nrtc}
+%\item	EXCHANGED BETWEEN PEERS
+%\item	MAINTAINED BY SS-PROVIDER
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {TOKENS (cont.)}
+%
+%\begin{nrtc}
+%\item	4 TYPES OF TOKENS
+%	\begin{nrtc}
+%	\item	DATA, SYNC MINOR, MAJOR/ACTIVITY, RELEASE
+%	\end{nrtc}
+%\item	PERMITTED OPERATIONS
+%	\begin{nrtc}
+%	\item	GIVE TOKENS, PLEASE TOKENS, GIVE CONTROL
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {CHECKPOINTING}
+%
+%\begin{nrtc}
+%\item	MANY APPLICATIONS EXCHANGE LARGE AMOUNTS OF DATA
+%\item	CHECKPOINTS MAY BE INSERTED IN THE DATA STREAM, SO THAT
+%	\begin{nrtc}
+%	\item	IF THE TRANSPORT CONNECTION BREAKS AND IS RE-ESTABLISHED,
+%		DATA EXCHANGE MAY RESUME AT THE LAST CONFIRMED CHECKPOINT
+%	\end{nrtc}
+%\item	SEMANTICS PROVIDED BY SS-USER
+%\item	THREE KINDS OF SYNCHRONIZATION
+%	\begin{nrtc}
+%	\item	MINOR CHECKPOINTS (NEED NOT BE CONFIRMED)
+%	\item	MAJOR CHECKPOINTS
+%	\item	RESYNCHRONIZATION
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{note}
+%diagram sync example using ftam
+%\end{note}
+
+
+%\begin{bwslide}
+%\ctitle {RESYNC}
+%
+%\begin{nrtc}
+%\item	INITIATED BY EITHER SS-USER
+%\item	SETS SESSION TO DEFINED STATE
+%\item	3 OPTIONS
+%	\begin{nrtc}
+%	\item	ABANDON
+%	\item	RESTART
+%	\item	SET
+%	\end{nrtc}
+%\item	PERMITTED OPERATIONS
+%	\begin{nrtc}
+%	\item	RESYNC ACK
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {RESYNCHRONIZATION EXAMPLE}
+
+\vskip.5in
+\diagram[p]{figureA-33}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {ACTIVITIES}
+%
+%\begin{nrtc}
+%\item	MANY APPLICATION EXCHANGES CONSIST OF SEVERAL SMALLER EXCHANGES
+%\item	LOGICALLY DIFFERENT TASKS
+%	\begin{nrtc}
+%	\item	ACTIVITIES CAN BE INTERRUPTED OR DISCARDED
+%	\item	DIALOGS WITHIN AN ACTIVITY DISTINGUISH PARTS OF  ``TASK''
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {ACTIVITIES (cont.)}
+%
+%\begin{nrtc}
+%\item	TRANSFER OF LOGICALLY RELATED DATA
+%\item	SEVERAL CONSECUTIVE ACTIVITIES ALLOWED
+%\item	OPERATIONS
+%	\begin{nrtc}
+%	\item	START, END, INTERRUPT, RESUME, DISCARD
+%	\end{nrtc}
+%\item	SEMANTICS PROVIDED BY SS-USER
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{note}
+%diagram activities example
+%\end{note}
+
+
+%\begin{bwslide}
+%\ctitle	{ACTIVITIES (cont.)}
+%
+%\begin{nrtc}
+%\item	IMPLEMENTATION CONCERNS
+%	\begin{nrtc}
+%	\item	INTERRUPT/RESUME = SAVE/RESTORE STATE
+%	\item	BURDEN ON SS-USER
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {EXCEPTIONS}
+%
+%\begin{nrtc}
+%\item	SOME APPLICATIONS MAY EXPERIENCE ABNORMAL EVENTS REQUIRING DRASTIC ACTION
+%\item	AN EXCEPTION CAN BE REPORTED INSTEAD OF ABORTING THE CONNECTION
+%\item	THE CONNECTION MUST BE BROUGHT TO A KNOWN STATE TO CLEAR AN EXCEPTION AND
+%	REQUIRES EXPLICIT ACTION ON THE OTHER SIDE
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {SESSION QUALITY OF SERVICE (QOS)}
+%
+%\begin{nrtc}
+%\item	MOST PARAMETERS PASSED TO TRANSPORT SERVICE
+%\item	OF CONCERN TO SESSION ENTITY:
+%	\begin{nrtc}
+%	\item	BATCH SEVERAL PRIMITIVES FOR SENDING
+%	\item	ALLOW FLOW--CONTROL BYPASS
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {SESSION QUALITY OF SERVICE (cont.)}
+%
+%\begin{nrtc}
+%\item	RULES FOR NEGOTIATION
+%\item	NOT REFLECTED IN PROTOCOL!
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {TRANSPORT FUNCTIONALITY}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {CONNECTION ESTABLISHMENT}
+%
+%\begin{nrtc}
+%\item	NEGOTIATES
+%	\begin{nrtc}
+%	\item	FUNCTIONAL UNITS
+%	\item	INITIAL TOKEN POSITIONS
+%	\item	MAXIMUM TSDU SIZE
+%	\item	OPTIONS/VERSION/...
+%	\end{nrtc}
+%\item	TWO WAY EXCHANGE
+%\item	LITTLE ADDED FUNCTIONALITY OVER TRANSPORT, {\bf BUT A LOT MORE WORK!}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {CONNECTION RELEASE}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {DATA TRANSFER\\SESSION USER DATA}
+%
+%\begin{nrtc}
+%\item	SESSION SERVICE DATA UNIT (SSDU)
+%\item	COMPOSED OF OCTETS (1 OR MORE)
+%\item	PASS OPAQUELY THROUGH SESSION SERVICE
+%\item	3 TYPES OF SSDUs, WE WILL JUST CALL THEM SSDUs
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {SESSION USER DATA (cont.)}
+
+\begin{nrtc}
+\item	ORIGINAL RESTRICTIONS ON SSDU SIZE FOR CONNECTION ESTABLISHMENT
+	\begin{nrtc}
+	\item	LIMIT OF 512 OCTETS
+	\item	SESSION VERSION 1
+	\end{nrtc}
+\item	TOO RESTRICTIVE FOR MANY OSI APPLICATIONS
+	\begin{nrtc}
+	\item	e.g., PASSING OSI DIRECTORY NAMES ON CONNECTIONS
+	\end{nrtc}
+\item	RECENT ADDENDA REMOVE THIS LIMIT
+	\begin{nrtc}
+	\item	PRACTICAL LIMIT OF 10K OCTETS USED
+	\item	SESSION VERSION 2
+	\end{nrtc}
+\item	VERSION 1 \& 2 DO \underline{NOT} INTERWORK
+	\begin{nrtc}
+	\item	NO NEGOTIATION POSSIBLE
+	\item	VERSION 2 MAY DOWNGRADE TO VERSION 1
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+
+
+%\begin{bwslide}
+%\ctitle{DATA UNITS}
+%
+%\begin{nrtc}
+%\item	SSDU --- PASSED BETWEEN SS-USERS
+%\item	SPDU --- PASSED BETWEEN SS-PROVIDERS
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {SPDU STRUCTURE}
+%
+%\begin{nrtc}
+%\item	4 COMPONENTS
+%\item	USER DATA vs. USER INFORMATION
+%\item	USER INFORMATION PRESENT ONLY ON NORMAL \& TYPED DATA SPDUs
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{note}
+%diagram spdu structure
+%\end{note}
+
+
+%\begin{bwslide}
+%\ctitle {SESSION FUNCTIONAL UNITS}
+%
+%\begin{tabular}{ll}
+%KERNEL			&	CAPABILITY DATA	\\
+%NEGOTIATED RELEASE	&	MINOR SYNC	\\
+%DUPLEX			&	MAJOR SYNC	\\
+%HALF DUPLEX		&	RESYNC		\\
+%EXPEDITED DATA		&	ACTIVITY	\\
+%TYPED DATA		&	EXCEPTIONS	\\
+%\end{tabular}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{FUNCTIONAL UNIT SUBSETS}
+%
+%\begin{nrtc}
+%\item	FOR SOME TIME ``POPULAR'' FUNCTIONAL UNIT SUBSETS WERE DEFINED:
+%	\begin{nrtc}
+%	\item	BCS --- BASIC COMBINED SUBSET
+%	\item	BSS --- BASIC SYNCHRONIZATION SUBSET
+%	\item	BAS --- BASIC ACTIVITY SUBSET
+%	\end{nrtc}
+%\item	NO LONGER USED, REFERENCE INDIVIDUAL FUNCTIONAL UNITS
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {IMPLEMENTATION CONSIDERATIONS}
+
+\begin{nrtc}
+\item	SIMILAR TO OTHER UPPER LAYERS
+\item	WHERE
+	\begin{nrtc}
+	\item	USER LIBRARY
+	\item	DISTINCT PROCESS
+	\item	KERNEL RESIDENT
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {SESSION VERSION 2}
+%
+%\begin{nrtc}
+%\item	``UNLIMITED'' USER DATA ON CONNECT
+%	\begin{nrtc}
+%	\item	STANDARDS LIMIT IS 64K OCTETS IN SINGLE SPDU
+%	\item	PRACTICAL LIMIT IS 10K OCTETS ON CONNECTION ESTABLISHMENT
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {SESSION}
+%
+%\center{\huge ``The sewer of OSI''}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {REFERENCES}
+%
+%\begin{description}
+%\item[ISO/IEC 8326:]	Basic Connection Oriented Session Service Definition
+%\item[ISO/IEC 8327:]	Basic Connection Oriented Session Protocol Specification
+%\end{description}
+%\end{bwslide}

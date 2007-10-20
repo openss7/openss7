@@ -1,0 +1,39 @@
+% run this through LaTeX with the appropriate wrapper
+
+\section	{Conclusions}
+In this paper we have suggested that it is better to perform
+{\em interface translation\/} rather than {\em protocol translation\/}
+when one is interested in migrating between two protocol suites.
+In our method,
+which uses such an interface translation approach,
+we implement the interface to the OSI Transport Services on top of the TCP.
+This has the additional advantage of facilitating the development of OSI
+applications in a robust and mature network environment,
+and in allowing us to avoid any additional work in the future when we migrate.
+In short,
+we are able to make use of a complementary co-existence between the two
+suites,
+utilizing the best of both.
+Our fundamental assumption in doing this is that the lower levels of the OSI
+protocol suite will become fully supported as we follow our
+migration strategy.
+
+Furthermore,
+we have discussed the difficulties inherent in providing interoperability at
+the application level,
+and concluded that, as a part of a migration strategy,
+building the special-purpose gateways required for each pair of related
+applications is not a practical approach.
+Neither the protocol translation or the interface translation approach is of
+any benefit in building these gateways.
+
+Finally,
+we have demonstrated that the DDN protocol suite,
+because of both its maturity and closeness to to the OSI suite at the TSAP
+provides an excellent migration vehicle for those users in need of
+immediate electronic communications.
+In view of the many new major investments being made in TCP/IP networks
+(e.g., by the NSF and NASA),
+we feel that our approach,
+which emphasizes {\em evolution\/} rather than {\em revolution\/},
+is a useful solution.

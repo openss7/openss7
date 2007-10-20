@@ -1,0 +1,1403 @@
+% run this through LaTeX with the appropriate wrapper
+
+\dotopic{END-TO-END SERVICES}
+
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]		CONCEPTS
+
+\item[PART II:]		BUILDING BLOCKS
+
+\item[PART III:]	ACHIEVING CONNECTIVITY
+
+\item[PART IV:]		COMPARISON TO TCP/IP
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A BIG ACKNOWLEDGEMENT}
+
+\begin{nrtc}
+\item	MY INTEREST IN END-TO-END SERVICES IS ONLY AS A USER,
+	NOT A PROVIDER
+
+\item	AS SUCH, I'D PREFER TO USE THEM AS A BLACK BOX
+
+\item	UNFORTUNATELY, THIS APPROACH DOESN'T WORK IN PRACTICE
+    \begin{nrtc}
+    \item	THE LOWER-LAYERS AREN'T HOMOGENEOUS
+    \end{nrtc}
+
+\item	THE PRACTICAL PERSPECTIVE PRESENTED HERE IS HEAVILY INFLUENCED BY
+    \begin{nrtc}
+    \item	STEPHEN E.~KILLE OF UNIVERSITY COLLEGE LONDON
+    \end{nrtc}
+
+\item	AND HIS PAPER
+    \begin{nrtc}
+    \item	``AN INTERIM APPROACH TO USE OF NETWORK ADDRESSES''
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{CONCEPTS}\bf
+
+\begin{nrtc}
+\item	BASIC TERMINOLOGY
+
+\item	NETWORK SERVICE
+
+\item	TRANSPORT SERVICE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{BASIC TERMINOLOGY}\bf
+
+\begin{nrtc}
+\item	END-TO-END SERVICES RESPONSIBLE FOR
+    \begin{nrtc}
+    \item	DATA TRANSFER
+    \end{nrtc}
+
+\item	APPLICATION SERVICES RESPONSIBLE FOR
+    \begin{nrtc}
+    \item	INFORMATION TRANSFER
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BASIC TERMINOLOGY (cont.)}
+
+\begin{nrtc}
+\item	TERMINOLOGY DIFFERS BETWEEN NETWORKING COMMUNITIES
+    \begin{nrtc}
+    \item	WE'LL USE ``OSIFIED'' TERMINOLOGY
+    \end{nrtc}
+
+\item	A NETWORK CONSISTS OF A COLLECTION OF SUBNETWORKS CONNECTED
+	BY INTERMEDIATE SYSTEMS AND POPULATED BY END-SYSTEMS
+
+\item	DATA TRANSFER OCCURS BETWEEN TWO END-SYSTEMS,
+	POTENTIALLY GOING THROUGH ONE OR MORE INTERMEDIATE-SYSTEMS
+	IF THE END-SYSTEMS RESIDE ON DIFFERENT SUBNETWORKS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE NETWORK}
+
+\vskip.5in
+\diagram[p]{figureE-2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{END-SYSTEMs (ES)}
+
+\begin{nrtc}
+\item	CONTAIN BOTH: 
+    \begin{nrtc}
+    \item	THE LOWER-LAYER PROTOCOLS NECESSARY FOR DATA TRANSFER, AND
+
+    \item	THE UPPER-LAYER PROTOCOLS NECESSARY FOR INFORMATION TRANSFER
+    \end{nrtc}
+
+\item	WHERE THE APPLICATIONS LIVE
+
+\item	WHAT THE USERS ARE INTERESTED IN
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INTERMEDIATE-SYSTEMs (IS)}
+
+\begin{nrtc}
+\item	CONTAIN ONLY:
+    \begin{nrtc}
+    \item	THE LOWER-LAYER PROTOCOLS NECESSARY FOR DATA TRANSFER
+    \end{nrtc}
+
+\item	ULTIMATELY CONTAIN HIGHER-LAYER PROTOCOLS TO SUPPORT MANAGEMENT
+
+\item	IN ADDITION TO PASSING ALONG APPLICATION DATA,
+	INTERMEDIATE-SYSTEMS COOPERATE AMONGST THEMSELVES
+    \begin{nrtc}
+    \item	e.g., EXCHANGE ROUTING DATA
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{NETWORK SERVICE}\bf
+
+\begin{nrtc}
+\item	NETWORK SERVICE IS RESPONSIBLE FOR MOVING DATA FROM ONE END-SYSTEM
+	TO ANOTHER
+
+\item	UNFORTUNATELY, THERE ARE TWO DIFFERENT VIEWS AS TO WHAT THIS MEANS:
+    \begin{nrtc}
+    \item	CONNECTION-ORIENTED
+
+    \item	CONNECTIONLESS-MODE
+    \end{nrtc}
+
+\item	PERHAPS THE GREATEST ``RELIGIOUS'' ISSUE OF THE LAST DECADE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONNECTION-ORIENTED NETWORK SERVICE\\ (CONS)}
+
+\begin{nrtc}
+\item	BASED ON THE NOTION OF ``RESERVATIONS'':
+    \begin{nrtc}
+    \item	ON CONNECTION REQUEST, MINIMUM REQUIREMENTS ARE STATED
+	\begin{nrtc}
+	\item	(e.g., THROUGHPUT)
+	\end{nrtc}
+
+    \item	IF REQUEST IS GRANTED, THESE RESOURCES ARE RESERVED FOR THE
+		CONNECTION'S DURATION
+    \end{nrtc}
+
+\item	CO-MODE SERVICE PRIMITIVES
+    \begin{nrtc}
+    \item	N-CONNECT: CONNECTION ESTABLISHMENT
+
+    \item	N-DATA (N-DATA-ACKNOWLEDGE): DATA TRANSFER 
+
+    \item	N-EXPEDITED-DATA: EXPEDITED DATA TRANSFER
+
+    \item	N-DISCONNECT: CONNECTION RELEASE
+
+    \item	N-RESET: CONNECTION RESYNCHRONIZATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONS (cont.)}
+
+\begin{nrtc}
+\item	GOOD POINTS:
+    \begin{nrtc}
+    \item	LOW OVERHEAD FOR DATA TRANSIT
+
+    \item	IMMUNITY FROM OTHER NETWORK TRAFFIC
+
+    \item	ACCOUNTABILITY
+    \end{nrtc}
+
+\item	BAD POINTS:
+    \begin{nrtc}
+    \item	HIGH OVERHEAD FOR CONNECTION ESTABLISHMENT
+
+    \item	QUESTIONABLE RECOVERY CHARACTERISTICS
+
+    \item	IF RESOURCES ARE RESERVED, BUT NOT IN USE,
+		NEW CONNECTION REQUESTS ARE DENIED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONNECTIONLESS-MODE NETWORK SERVICE\\ (CLNS)}
+
+\begin{nrtc}
+\item	BASED ON THE NOTION OF ``COME AS YOU ARE'':
+    \begin{nrtc}
+    \item	NO CONNECTION REQUEST, JUST SEND DATA
+
+    \item	TRANSPORT MUST DYNAMICALLY DETERMINE IF REQUIREMENTS ARE
+		BEING MET
+    \end{nrtc}
+
+\item	CL-MODE SERVICE PRIMITIVES
+    \begin{nrtc}
+    \item	N-UNITDATA: DATA TRANSFER
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CLNS (cont.)}
+
+\begin{nrtc}
+\item	GOOD POINTS:
+    \begin{nrtc}
+    \item	LESS DELAY FOR INITIAL DATA TRANSIT
+
+    \item	POTENTIALLY MORE ROBUST WITH CHANGES IN THE NETWORK
+
+    \item	SQUEEZES ``LAST DROP'' FROM AVAILABLE RESOURCES
+    \end{nrtc}
+
+\item	BAD POINTS:
+    \begin{nrtc}
+    \item	HIGHER OVERHEAD FOR DATA TRANSIT IF MULTIPLE SUBNETWORKS
+		ARE INVOLVED
+
+    \item	REQUIRES WELL-BEHAVED USERS TO PREVENT OVER-SUBSCRIPTION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{TRANSPORT SERVICE}
+
+\begin{nrtc}
+\item	TRANSPORT SERVICE IS RESPONSIBLE FOR MOVING DATA FROM ONE END-SYSTEM
+	TO ANOTHER~---~RELIABLY
+    \begin{nrtc}
+    \item	(WE'RE CONSIDERING ONLY CO-MODE TRANSPORT SERVICE)
+    \end{nrtc}
+
+\item	IF CO-MODE NETWORK SERVICE IS USED, THIS IS TRIVIAL
+
+\item	OTHERWISE, SOPHISTICATED ALGORITHMS ARE REQUIRED IN PROTOCOLS
+	WHICH IMPLEMENT TRANSPORT SERVICE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRANSPORT SERVICE (cont.)}
+
+\begin{nrtc}
+\item	IMPORTANT IMPLICATION:\\
+    \begin{nrtc}
+    \item	AVAILABLE NETWORK SERVICE DETERMINES WHICH
+		TRANSPORT PROTOCOL CAN BE USED
+
+    \item	HOWEVER, WHEN INITIATING A CONNECTION,
+		TRANSPORT SERVICE IS ACTIVE PRIOR TO NETWORK SERVICE!
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CHOICE OF NETWORK SERVICE}
+
+\begin{nrtc}
+\item	CHOICE OF NETWORK SERVICE IS ECO-POLITICAL NOT TECHNICAL
+    \begin{nrtc}
+    \item	EITHER APPROACH CAN BE MADE TO WORK WELL
+    \end{nrtc}
+
+\item	CO-MODE NETWORK SERVICE IS MORE SUITED TOWARDS A COMMON-CARRIER MODEL
+    \begin{nrtc}
+    \item	ACCOUNTABILITY AND ISOLATION
+    \end{nrtc}
+    THIS IS TYPIFIED BY PUBLIC DATA NETWORKS
+
+\item	CL-MODE NETWORK SERVICE IS MORE GENERAL
+    \begin{nrtc}
+    \item	ADAPTABILITY AND COOPERATION
+    \end{nrtc}
+    THIS IS TYPIFIED BY CLOSED COMMUNITY NETWORKS
+
+\item	HOWEVER, THE TWO APPROACHES DON'T MIX WELL
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{BUILDING BLOCKS}\bf
+
+\begin{nrtc}
+\item	ADDRESS FORMATS
+
+\item	NETWORK BINDING
+
+\item	TRANSPORT PROTOCOLS
+
+\item	APPLICATION USE OF END-TO-END SERVICES
+
+\item	EMULATION OF OSI END-TO-END SERVICES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{ADDRESS FORMATS}\bf
+
+\begin{nrtc}
+\item	HIERARHICALLY STRUCTURED
+    \begin{nrtc}
+    \item	ADDRESSING DOMAINS, SUB-DOMAINS
+
+    \item	UNAMBIGUOUS PREFIXES
+    \end{nrtc}
+
+\item	MAIN GOAL: FACILITATE ALLOCATION
+
+\item	NO IMPLICATIONS ON ``HOW TO GET THERE''
+    \begin{nrtc}
+    \item	BUT STRUCTURE MAY FACILITATE ROUTING DECISIONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ADDRESS FORMATS (cont.)}
+
+\begin{nrtc}
+\item	AN ADDRESSING AUTHORITY DEFINES STRUCTURE OF DOMAIN
+    \begin{nrtc}
+    \item	TERMED AN ABSTRACT SYNTAX
+    \end{nrtc}
+    AND ALSO ALLOCATES VALUES
+
+\item	A TRANSFER SYNTAX DEFINES HOW ADDRESSES ARE ENCODED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TOP-LEVEL}
+
+\begin{nrtc}
+\item	ADDRESS IS DIVIDED INTO TWO PARTS:
+    \begin{nrtc}
+    \item	INITIAL DOMAIN PART (IDP), AND
+
+    \item	DOMAIN SPECIFIC PART (DSP)
+    \end{nrtc}
+\end{nrtc}
+
+\diagram[p]{figureE-3}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TOP-LEVEL (cont.)}
+
+\begin{nrtc}
+\item	AUTHORITY AND FORMAT IDENTIFIER (AFI) DEFINES HOW
+    \begin{nrtc}
+    \item	IDI IS INTERPRETED, AND
+
+    \item	HOW DSP IS FORMATTED
+	\begin{nrtc}
+	\item	(DECIMAL/BINARY ABSTRACT SYNTAX)
+	\end{nrtc}
+    \end{nrtc}
+
+\item	INITIAL DOMAIN IDENTIFIER (IDI) SAYS WHO OWNS THE DSP
+    \begin{nrtc}
+    \item	MIGHT BE VARIABLE LENGTH
+
+    \item	MIGHT HAVE (SIGNIFICANT) LEADING ZEROS
+    \end{nrtc}
+
+\item	DOMAIN SPECIFIC PART (DSP) IS JUST THAT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE 1:\\ X.121 ADDRESS}
+
+\begin{nrtc}
+\item	AN X.121 ADDRESS MAY BE ENCODED USING
+    \begin{nrtc}
+    \item	AFI = 36
+
+    \item	IDI = X.121 ADDRESS (UP TO 14~DIGITS)
+    \end{nrtc}
+\end{nrtc}
+
+\diagram[p]{figureE-4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE 2:\\ ICD ADDRESS}
+
+\begin{nrtc}
+\item	AN INTERNATIONALLY RECOGNIZED ENTITY MAY ALLOCATE ADDRESSES USING
+    \begin{nrtc}
+    \item	AFI = 47
+
+    \item	IDI = INTERNATIONAL CODE DESIGNATOR (4~DIGITS)
+    \end{nrtc}
+\end{nrtc}
+
+\diagram[p]{figureE-5}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE 3:\\ LOCAL ADDRESS}
+
+\begin{nrtc}
+\item	ANYONE MIGHT USE A ``LOCAL'' ADDRESSING FORMAT
+    \begin{nrtc}
+    \item	AFI = 49
+
+    \item	IDI = NULL (0~DIGITS)
+    \end{nrtc}
+\end{nrtc}
+
+\diagram[p]{figureE-6}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{NETWORK BINDING}\bf
+
+\begin{nrtc}
+\item	HOW DOES DATA GO FROM ORIGINATING TO DESTINATION END-SYSTEM?
+    \begin{nrtc}
+    \item	i.e., HOW IS ROUTING ACCOMPLISHED?
+    \end{nrtc}
+
+\item	NETWORK SERVICE AT ORIGINATING END-SYSTEM DECIDES ``NEXT HOP''
+
+\item	IF DESTINATION END-SYSTEM IS ON SAME SUBNETWORK,
+	THEN NEXT HOP IS DESTINATION END-SYSTEM
+
+\item	OTHERWISE, NEXT HOP IS AN INTERMEDIATE SYSTEM (ON THE SAME SUBNETWORK)
+	WHICH IS ``CLOSER'' TO THE DESTINATION END-SYSTEM
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DETERMINING THE NEXT HOP}
+
+\begin{nrtc}
+\item	NETWORK ADDRESSES DO NOT CONTAIN ROUTING INFORMATION
+    \begin{nrtc}
+    \item	IN THEORY, AT LEAST
+    \end{nrtc}
+
+\item	INTERMEDIATE-SYSTEMS MAINTAIN ROUTING TABLES WHICH TELL
+	``HOW TO GET THERE''
+
+\item	SO, ONCE THE DESTINATION END-SYSTEM'S SUBNETWORK HAS BEEN REACHED,
+	NEED A WAY OF DETERMINING ``WHERE IT IS'' ON A PARTICULAR
+	SUBNETWORK
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SUBNETWORK POINT OF ATTACHMENT (SNPA)}
+
+\begin{nrtc}
+\item	A NODE (ES or IS) IS ATTACHED TO A SUBNETWORK AT A
+    \begin{nrtc}
+    \item	SUBNETWORK POINT OF ATTACHMENT (SNPA)
+    \end{nrtc}
+
+\item	NEED A WAY TO MAP BETWEEN A NETWORK ADDRESS
+	AND ITS CORRESPONDING SNPA
+
+\item	THE PROBLEM:
+    \begin{nrtc}
+    \item	ROUTING IS A NETWORK-WIDE FUNCTION,
+
+    \item	SO INFORMATION MUST BE COHERENT NETWORK-WIDE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MAPPING TO SNPA}
+
+\begin{nrtc}
+\item	TWO WAYS TO ACHIEVE DYNAMIC MAPPINGS
+
+\item	RUN A PROTOCOL (ES-IS) ON THE SUBNETWORK
+
+\item	USE A LOCAL TABLE
+
+\item	OTHERWISE MUST EMBED THE SNPA IN THE NETWORK ADDRESS
+    \begin{nrtc}
+    \item	LOSES A LOT OF FLEXIBILITY
+    \end{nrtc}
+	(AND PRONE TO CONFIGURATION ERRORS)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{TRANSPORT PROTOCOLS}\bf
+
+\begin{nrtc}
+\item	AVAILABLE NETWORK SERVICE DETERMINES CHOICE OF TRANSPORT PROTOCOL
+
+\item	OSI PROVIDES 5 TRANSPORT PROTOCOLS, TP0--TP4
+    \begin{nrtc}
+    \item	CLASSES 0--3 WORKS WITH A CO-MODE NETWORK SERVICE
+
+    \item	CLASS 4 WORKS WITH BOTH CO/CL-MODE NETWORK SERVICES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NETWORK CLASSES}
+
+\begin{nrtc}
+\item	``A'' --- LOW LOSS, ERRORS SIGNALLED
+
+\item	``B'' --- ERRORS SIGNALLED
+
+\item	``C'' --- ERRORS NOT SIGNALLED
+    \begin{nrtc}
+    \item	LOSS
+
+    \item	DUPLICATION
+
+    \item	RE-ORDERING
+
+    \item	CORRUPTION
+    \end{nrtc}
+    OF DATA
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROTOCOLS USING\\ CO-MODE NETWORK SERVICE}
+
+\begin{nrtc}
+\item	TP0: SIMPLE CLASS
+    \begin{nrtc}
+    \item	NOTHING MORE THAN TRANSPORT ADDRESSING AND SEGMENTATION
+
+    \item	``A'' NETWORKS
+    \end{nrtc}
+
+\item	TP1: BASIC ERROR RECOVERY CLASS
+    \begin{nrtc}
+    \item	RECOVER FROM NETWORK RESETS\\ (MAY INVOLVE RE-ROUTING)
+
+    \item	``B'' NETWORKS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROTOCOLS USING\\ CO-MODE NETWORK SERVICE (cont.)}
+
+\begin{nrtc}
+\item	TP2: MULTIPLEXING CLASS
+    \begin{nrtc}
+    \item	MULTIPLEX OVER A SINGLE NETWORK CONNECTION
+
+    \item	OPTIONAL FLOW CONTROL	
+
+    \item	``A'' NETWORKS
+    \end{nrtc}
+
+\item	TP3: ERROR RECOVERY AND MULTIPLEXING CLASS
+    \begin{nrtc}
+    \item	ALL OF THE ABOVE
+
+    \item	``B'' NETWORKS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROTOCOLS WHICH CAN USE\\ CL-MODE NETWORK SERVICE}
+
+\begin{nrtc}
+\item	TP4: ERROR DETECTION AND RECOVERY CLASS
+    \begin{nrtc}
+    \item	RELIABILITY THROUGH RETRANSMISSION
+
+    \item	``C'' NETWORKS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{APPLICATION USE OF END-TO-END SERVICES}\bf
+
+\begin{nrtc}
+\item	APPLICATION IDENTIFIES APPLICATION ENTITY WHICH PROVIDES
+	DESIRED SERVICE
+    \begin{nrtc}
+    \item	e.g., AN FTAM APPLICATION IDENTIFIES A FILESTORE SERVICE
+		PROVIDED BY A PARTICULAR APPLICATION ENTITY    
+    \end{nrtc}
+
+\item	THE APPLICATION ENTITY IS IDENTIFIED BY ITS DISTINGUISHED NAME IN
+	THE OSI DIRECTORY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STEP 1:\\ MAP DISTINGUISHED NAME\\ TO PRESENTATION ADDRESS}
+
+\begin{nrtc}
+\item	ESTABLISH ASSOCIATION TO DIRECTORY SERVICE AGENT (DSA)
+	USING DIRECTORY ACCESS PROTOCOL (DAP)
+
+\item	RETRIEVE THE \verb"presentationAddress" ATTRIBUTE FROM
+	THE OBJECT WITH THE GIVEN DISTINGUISHED NAME
+\end{nrtc}
+
+\begin{quote}\small\begin{verbatim}
+PSAPaddr ::=
+    SEQUENCE {
+        pSelector[0]
+            OCTET STRING
+            OPTIONAL,
+
+        sSelector[1]
+            OCTET STRING
+            OPTIONAL,
+
+        tSelector[2]
+            OCTET STRING
+            OPTIONAL,
+
+        nAddresses[3]
+            SET OF (1..MAX) OCTET STRING
+    }
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STEP 2:\\ DETERMINE USE OF NETWORK ADDRESSES}
+
+\begin{nrtc}
+\item	PRESENTATION ADDRESS IS GIVEN TO THE ASSOCIATION CONTROL SERVICE
+	ELEMENT (ACSE), WHICH ESTABLISHES THE ASSOCIATION
+
+\item	ACSE PASSES THE ADDRESS TO THE PRESENTATION SERVICE,
+	WHICH USES THE PRESENTATION SELECTOR
+
+\item	THE REMAINDER IS GIVEN TO THE SESSION SERVICE,
+	WHICH USES THE SESSION SELECTOR
+
+\item	THE REMAINDER IS GIVEN TO THE TRANSPORT SERVICE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STEP 2 (cont.)}
+
+\begin{nrtc}
+\item	TRANSPORT SERVICE LOOKS AT EACH NETWORK ADDRESS AND MUST DECIDE
+    \begin{nrtc}
+    \item	WHICH MODE NETWORK SERVICE WILL BE USED FOR THIS ADDRESS
+    \end{nrtc}
+
+\item	TRANSPORT SERVICE SELECTS A TRANSPORT PROTOCOL BASED ON THE
+	DERIVED NETWORK SERVICE AND THE COMMUNICATIONS QUALITY OF SERVICE (QOS)
+	DESIRED BY THE APPLICATION
+
+\item	THIS COMBINATION
+    \begin{nrtc}
+    \item	 (NETWORK SERVICE+TRANSPORT PROTOCOL)
+    \end{nrtc}
+	IS TERMED A
+    \begin{nrtc}
+    \item	TRANSPORT SERVICE STACK (TS-STACK)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STILL MORE ON\\ STEP 2}
+
+\begin{nrtc}
+\item	IN MANY ENVIRONMENTS ONLY A SINGLE MODE OF NETWORK SERVICE AND A
+	SINGLE TRANSPORT PROTOCOL ARE AVAILABLE 
+
+\item	THIS IMPLIES THAT ONLY A SUBSET (OR PERHAPS NONE) OF THE
+	NETWORK ADDRESSES WILL BE USABLE AT THE ORIGINATING END-SYSTEM
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STEP 3:\\ ORDER NETWORK ADDRESSES}
+
+\begin{nrtc}
+\item	THE NETWORK ADDRESSES ARE THEN ORDERED BY PREFERENCE
+
+\item	PREFERENCE IS BASED BOTH ON COMMUNICATIONS-QOS AND ``CLOSENESS''
+	OF NETWORK ADDRESSES
+
+\item	FOR EXAMPLE:
+    \begin{nrtc}
+    \item	TWO NETWORK ADDRESSES, EACH IMPLYING A CO-MODE NETWORK
+		SERVICE, MIGHT BE PRESENT
+
+    \item	ONE OF THE NETWORK ADDRESS MIGHT BELONG TO A PRIVATE
+		NETWORK, WHILST THE OTHER BELONGS TO A PDN
+
+    \item	THE TRANSPORT SERVICE MIGHT PREFER THE PRIVATE NETWORK,
+		FOR COST REASONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STEP 4:\\ ATTEMPT CONNECTIONS}
+
+\begin{nrtc}
+\item	FOR EACH NETWORK ADDRESS:
+    \begin{nrtc}
+    \item	THE APPROPRIATE TRANSPORT PROTOCOL ENGINE IS STARTED,
+		AND THE NETWORK SERVICE INVOKED
+
+    \item	ONCE A TRANSPORT CONNECTION IS ESTABLISHED,
+		THE REMAINDER OF THE NETWORK ADDRESSES ARE IGNORED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{EMULATION OF OSI END-TO-END SERVICES}\bf
+
+\begin{nrtc}
+\item	IS IT POSSIBLE TO PROVIDE OSI APPLICATIONS IN NON-OSI NETWORKS?
+
+\item	A SOLUTION IS OFFERED BY LAYERING
+    \begin{nrtc}
+    \item	THE OSI TRANSPORT \underline{SERVICE} IS VERY SIMPLE
+    \end{nrtc}
+
+\item	CAN WE BUILD TS-STACKS USING NON-OSI PROTOCOLS?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERVICE EMULATOR AT TRANSPORT}
+
+\vskip.5in
+\diagram[p]{figureE-13}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH:\\ TRANSPORT SERVICE\\ CONVERGENCE PROTOCOL}
+
+\begin{nrtc}
+\item	USE THE CONNECTION-ORIENTED TRANSPORT SERVICE PROVIDED BY
+	THE NON-OSI PROTOCOL SUITE
+
+\item	DEFINE A ``TSCP'' WHICH SMOOTHS OVER THE DIFFERENCES IN THE SERVICES
+	OFFERED
+    \begin{nrtc}
+    \item	IN PRACTICE, THESE ARE QUITE SMALL
+    \end{nrtc}
+
+\item	FOR EXAMPLE, THE RFC1006 METHOD DEFINES A TSCP FOR TCP/IP NETWORKS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OSI TRANSPORT SERVICES\\ ON TOP OF THE TCP}
+
+\vskip.25in
+\diagram[p]{figureE-14}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{ACHIEVING CONNECTIVITY}\bf
+
+\begin{nrtc}
+\item	THE REAL WORLD OF OSI
+
+\item	INTERIM USE OF NETWORK ADDRESSES
+
+\item	TRANSPORT BRIDGING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NOW THE HARD PART}
+
+\begin{nrtc}
+\item	A LOT OF FLEXIBILITY IS AVAILABLE
+
+\item	BUT PRACTICALLY, CAN THIS BE MADE TO WORK?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{THE REAL WORLD OF OSI}\bf
+
+\begin{nrtc}
+\item	THE ``REAL WORLD'' DEPENDS ENTIRELY WHERE YOU LIVE
+
+\item	A COMMUNITY IS A COLLECTION OF END-SYSTEMS SHARING COMPATIBLE
+	TS-STACKS AND CONNECTED TOGETHER
+
+\item	WHAT KIND OF OSI COMMUNITIES EXIST TODAY?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMUNITY 1:\\ INTERNATIONAL X.25}
+
+\begin{nrtc}
+\item	X.121 FORMAT ADDRESSES ARE USED
+
+\item	NETWORK PROTOCOL IS X.25(80) WHICH DOES NOT PROVIDE TRUE
+	OSI NETWORK SERVICE
+    \begin{nrtc}
+    \item	EVENTUALLY UPGRADING TO X.25(84)
+    \end{nrtc}
+
+\item	TP0 IS FAVORED TRANSPORT PROTOCOL
+
+\item	TS-STACKS:
+\end{nrtc}
+
+\diagram[p]{figureE-7}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMUNITY 2:\\ PRIVATE X.25}
+
+\begin{nrtc}
+\item	SIMILAR TO INTERNATIONAL X.25 COMMUNITY,
+	BUT OWNED BY A PARTICULAR ENTERPRISE
+    \begin{nrtc}
+    \item	e.g., THE U.K.~JOINT ACADEMIC NETWORK (JANET)    
+    \end{nrtc}
+
+\item	ADDRESSES ARE X.121-BASED, BUT ARE PRIVATELY ALLOCATED
+    \begin{nrtc}
+    \item	THUS THE X.121 NETWORK ADDRESS FORMAT CAN'T BE USED
+    \end{nrtc}
+
+\item	TS-STACKS:
+\end{nrtc}
+
+\diagram[p]{figureE-7}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMUNITY 3:\\ VARIANT U.S. USE OF X.25}
+
+\begin{nrtc}
+\item	X.25 TREATED AS A SUBNETWORK PROTOCOL
+
+\item	CL-MODE NETWORK SERVICE RUN OVER THIS
+
+\item	TS-STACKS:
+\end{nrtc}
+
+\diagram[p]{figureE-9}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMUNITY 4:\\ CONS-BASED LANS}
+
+\begin{nrtc}
+\item	CO-MODE NETWORK SERVICE OFFERRED OVER 8802 SUBNETWORK
+
+\item	COMMONLY TERMED ``X.25 OVER ETHERNET'' (LLC2)
+
+\item	TS-STACKS:
+\end{nrtc}
+
+\diagram[p]{figureE-10}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMUNITY 5:\\ CLNS-BASED LANS}
+
+\begin{nrtc}
+\item	CL-MODE NETWORK SERVICE OFFERRED OVER 8802 SUBNETWORK
+
+\item	COMMONLY TERMED ``MAP/TOP LANs'' (LLC1)
+
+\item	TS-STACKS:
+\end{nrtc}
+
+\diagram[p]{figureE-11}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMUNITY 6:\\ TCP/IP-BASED INTERNET USING RFC1006}
+
+\begin{nrtc}
+\item	RFC1006 DEFINES A MAPPING FROM THE OSI TRANSPORT SERVICE ONTO THE TCP
+
+\item	PROBLEM: WHAT FORMAT TO USE NETWORK ADDRESS?
+
+\item	TS-STACKS:
+\end{nrtc}
+
+\diagram[p]{figureE-12}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMUNITY 7:\\ TCP/IP-BASED LAN USING RFC1006}
+
+\begin{nrtc}
+\item	SIMILAR TO INTERNET COMMUNITY,
+	BUT ON AN ISOLATED TCP/IP LAN
+    \begin{nrtc}
+    \item	e.g., A CAMPUS NETWORK RUNNING TCP/IP LOCALLY AND HAVING A
+		CONNECTION TO A PDN
+    \end{nrtc}
+
+\item	TS-STACKS:
+\end{nrtc}
+
+\diagram[p]{figureE-12}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMUNITY INTEROPERATION}
+
+\begin{nrtc}
+\item	SO, THERE ARE (AT LEAST) SEVEN DIFFERENT COMMUNITIES IN THE OSI WORLD
+
+\item	IDEALLY WOULD LIKE THIS INTERWORKING MATRIX:
+\end{nrtc}
+
+\diagram[p]{figureE-15}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMUNITY INTEROPERATION (cont.)}
+
+\begin{nrtc}
+\item	COMMUNITY 7 IS ISOLATED BY LACK OF CONNECTIVITY
+\end{nrtc}
+
+\diagram[p]{figureE-16}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMUNITY INTEROPERATION (cont.)}
+
+\begin{nrtc}
+\item	PRIVATE X.25 AND RFC1006--BASED COMMUNITIES NEED DIFFERENT ADDRESS
+	SPACE
+\end{nrtc}
+
+\diagram[p]{figureE-17}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REAL WORLD CONNECTIVITY MATRIX}
+
+\begin{nrtc}
+\item	IN PRACTICE, CONS-BASED LANS DON'T INTEROPERATE WITH CONS-BASED WANS 
+    \begin{nrtc}
+    \item	ROUTING OF CONS-BASED SUBNETWORKS ISN'T WIDELY IMPLEMENTED
+		OUTSIDE OF X.75
+    \end{nrtc}
+\end{nrtc}
+
+\diagram[p]{figureE-18}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMUNITY INTEROPERATION (cont.)}
+
+\begin{nrtc}
+\item	CLNS-BASED AND CONS-BASED TS-STACKS DON'T ALWAYS INTEROPERATE
+    \begin{nrtc}
+    \item	IT IS NOT ENOUGH TO START WITH TP4 AND DOWN-NEGOTIATE
+    \end{nrtc}
+\end{nrtc}
+
+\diagram[p]{figureE-19}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE MYTH OF TRANSPORT NEGOTIATION}
+
+\begin{nrtc}
+\item	IF INITIATOR SELECTS TP4, MUST ALSO DECIDE CONS/CLNS
+    \begin{nrtc}
+    \item	IF CLNS IS USED, THEN MUST STAY WITH TP4
+
+    \item	IF CLNS ISN'T USED, THEN CAN'T TALK TO CLNS-BASED LAN    
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{INTERIM USE OF NETWORK ADDRESSES}\bf
+
+\begin{nrtc}
+\item	WANT TO ACCOMODATE ALL OSI COMMUNITIES IN OSI DIRECTORY
+
+\item	PROBLEM: ALL ADDRESSES MUST CONFORM TO DIRECTORY DEFINED SYNTAX
+
+\item	PROBLEM: ALL ADDRESSES MUST BE GLOBALLY UNIQUE YET LOCALLY
+	INTERPRETABLE
+
+\item	SOLUTION: KILLE'S INTERIM APPROACH
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONFORMANCE TO\\ DIRECTORY DEFINED SYNTAX}
+
+\begin{nrtc}
+\item	A PROBLEM FOR THE PRIVATE X.25 AND RFC1006--BASED COMMUNITIES
+
+\item	TAKE A PART OF THE SPACE ASSIGNED TO TELEX ADDRESSES
+    \begin{nrtc}
+    \item	NO ONE WILL USE TELEX AFI FOR NETWORK ADDRESSES
+    \end{nrtc}
+
+\item	SUB-DIVIDE THIS ADDRESS SPACE FOR EACH COMMUNITY, e.g.,
+    \begin{nrtc}
+    \item	AFI = 54
+
+    \item	IDI = 00728722
+    \end{nrtc}
+\end{nrtc}
+
+\diagram[p]{figureE-8}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INTERPRETATION OF ADDRESSES}
+
+\begin{nrtc}
+\item	FROM EACH NETWORK ADDRESS
+    \begin{nrtc}
+    \item	COMMUNITY (TS-STACK, IDENTITY OF NETWORK) MUST BE DEDUCIBLE
+
+    \item	NETWORK-SPECIFIC INFORMATION (i.e., SNPA) MUST BE DEDUCIBLE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{TRANSPORT BRIDGING}\bf
+
+\begin{nrtc}
+\item	PROBLEM: SUPPOSE THE ORIGINATING END-SYSTEM DETERMINES THAT
+	IT IS IN A DIFFERENT COMMUNITY THAN THE DESTINATION END-SYSTEM
+
+\item	FROM A PURIST PERSPECTIVE:
+    \begin{nrtc}
+    \item	INTEROPERATION CAN NOT OCCUR!
+    \end{nrtc}
+
+\item	FROM A PRAGMATIC PERSPECTIVE:
+    \begin{nrtc}
+    \item	IGNORE THE CURSED MODEL AND BUILD A LEVEL-4 RELAY
+    \end{nrtc}
+
+\item	FOR AN AMUSING READ, TRY ISO/DTR10172
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TS-BRIDGES}
+
+\begin{nrtc}
+\item	ALTHOUGH MANY DIFFERENT TS-STACKS EXIST,
+	THEY ALL PROVIDE THE SAME TRANSPORT SERVICE
+
+\item	SO, IT IS STRAIGHT-FORWARD TO BUILD A BOX THAT:
+    \begin{nrtc}
+    \item	KNOWS NOTHING ABOUT TRANSPORT PROTOCOLS, BUT
+
+    \item	KNOWS HOW TO USE THE RELATIVELY SIMPLE OSI TRANSPORT SERVICE
+    \end{nrtc}
+
+\item	A TS-BRIDGE ``COPIES'' SERVICE PRIMITIVES FROM ONE TS-STACK TO THE
+	OTHER, e.g.,
+    \begin{nrtc}
+    \item	UPON RECEIVING A T-CONNECT.INDICATION PRIMITIVE FROM ONE
+		TS-STACK,
+
+    \item	IT ISSUES A T-CONNECT.REQUEST PRIMITIVE TO THE OTHER TS-STACK
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TS-BRIDGES (cont.)}
+
+\vskip.5in
+\diagram[p]{figureE-1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE PROBLEMS OF LEVEL-4 RELAYS}
+
+\begin{nrtc}
+\item	THE TS-BRIDGE MAINTAINS STATE AS TO THE EXISTING CONNECTIONS
+
+\item	EACH TS-STACK PROVIDES A CHECKSUM,
+	NEITHER OF WHICH IS REALLY END-TO-END
+    \begin{nrtc}
+    \item	(CHECKSUM AT EITHER TRANSPORT OR NETWORK SERVICE)
+    \end{nrtc}
+
+\item	THIS ALSO DEFEATS TRANSPORT-LEVEL ENCRYPTION
+
+\item	\underline{MAY} THWART SOPHISTICATED BACK-PRESSURE TECHNIQUES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AND WHAT ABOUT?}
+
+\begin{nrtc}
+\item	ACCOUNTING
+
+\item	ACCESS CONTROL
+
+\item	LOAD BALANCING
+
+\item	CONCATENATION OF TS-BRIDGES
+
+\item	and so on$\ldots$
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{USE OF THE TS-BRIDGE}
+
+\begin{nrtc}
+\item	MUST NOW SUBTLY MODIFY TRANSPORT SERVICE OF ORIGINATING END-SYSTEM
+    \begin{nrtc}
+    \item	STEP 2: DETERMINE USE OF NETWORK ADDRESSES
+    \end{nrtc}
+
+\item	IF NO USABLE NETWORK ADDRESSES ARE AVAILABLE
+
+\item	THEN SELECT A TS-BRIDGE WHICH SERVICES THE OSI COMMUNITY FOR ONE OF
+	THE NETWORK ADDRESSES
+    \begin{nrtc}
+    \item	 RECALL, OSI COMMUNITY EQUALS TS-STACK PLUS CONNECTIVITY
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{USE OF THE TS-BRIDGE (cont.)}
+
+\begin{nrtc}
+\item	ENCODE THE NETWORK ADDRESS AND TRANSPORT SELECTOR AS AN OCTET STRING,
+    \begin{nrtc}
+    \item	(USING KILLE'S STRING FORMAT)
+    \end{nrtc}
+	CALL THIS THE NEW TRANSPORT SELECTOR
+
+\item	USE THE NETWORK ADDRESS OF THE TS-BRIDGE FOR THE REMAINING STEPS
+
+\item	WHEN TS-BRIDGE RECEIVES CONNECTION,
+	IT SIMPLY DECODES TRANSPORT SELECTOR TO FIND ADDRESS OF
+	DESTINATION END-SYSTEM
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TS-BRIDGE ADDRESSING}
+
+\vskip.5in
+\diagram[p]{figureE-20}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{COMPARISON TO TCP/IP}\bf
+
+\begin{nrtc}
+\item	NETWORK SERVICE
+
+\item	TRANSPORT SERVICE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMPARISONS}
+
+\begin{nrtc}
+\item	ALL COMPARISONS ARE PARTISAN IN NATURE
+
+\item	HOWEVER, WITHOUT BIAS OR LOSS OF GENERALITY,\\ I CAN HONESTLY STATE:
+    \begin{nrtc}
+    \item	THE OSI LOWER-LAYERS ARE CURRENTLY INCOHERENT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{NETWORK SERVICE}\bf
+
+\begin{nrtc}
+\item	THE INTERNET PROTOCOL (IP) PROVIDES A CL-NETWORK SERVICE
+    \begin{nrtc}
+    \item	SIMILAR TO CLNP, BUT MORE EFFICIENT
+    \end{nrtc}
+
+\item	THE LEAST COMMON DENOMINATOR, USABLE OVER BOTH WANs AND LANs
+    \begin{nrtc}
+    \item	BEST EFFORT DELIVERY
+
+    \item	RELIABILITY RESPONSIBILITY OF TRANSPORT SERVICE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ARE TWO OSI NETWORK SERVICES\\ ONE TOO MANY?}
+
+\begin{nrtc}
+\item	IN A WORD: YES
+
+\item	OSI COMMUNITIES ARE SEPERATED BY TS-STACKS AND CONNECTIVITY
+
+\item	CONNECTIVITY ISN'T A TECHNICAL ISSUE
+
+\item	BUT, TS-STACKS ARE, SO:
+    \begin{nrtc}
+    \item	IF THERE WAS A SINGLE NETWORK SERVICE,
+		THEN THERE COULD BE A SINGLE TRANSPORT PROTOCOL
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{TRANSPORT SERVICE}\bf
+
+\begin{nrtc}
+\item	THE TRANSMISSION CONTROL PROTOCOL (TCP) PROVIDES A CO-TRANSPORT
+	SERVICE
+
+\item	SEVERAL DIFFERENCES FROM THE OSI TRANSPORT SERVICE
+    \begin{nrtc}
+    \item	TCP IS STREAM-ORIENTED
+
+    \item	TCP USES GRACEFUL RELEASE
+
+    \item	TCP USES URGENT DATA
+    \end{nrtc}
+
+\item	THESE ARE DIFFERENCES, NOT PROS AND CONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMPARISON OF PROTOCOLS}
+
+\begin{nrtc}
+\item	REALLY CAN COMPARE ONLY THE TCP AND TP4
+
+\item	TP4 PACKET ORIENTATION PREVENTS USE OF SOPHISTICATED CONGESTION
+	COLLAPSE ALGORITHMS
+
+\item	TP4 PACKET ORIENTATION HELPS BUFFER MANAGEMENT,
+	POSSIBLY MORE EFFICIENT
+
+\item	TP4 RETRANSMISSION ALGORITHMS ARE SIMPLISTIC
+
+\item	TP4 END-TO-END CHECKSUM IS INAPPROPRIATE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRANSPORT BRIDGING}
+
+\begin{nrtc}
+\item	UNNECESSARY IN TCP/IP WORLD
+    \begin{nrtc}
+    \item	COMMON NETWORK PROTOCOL
+
+    \item	UNIFORM NETWORK ADDRESS FORMAT
+	\begin{nrtc}
+	\item	(ALL IN 32--BITS!)
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{CONCLUSIONS}\bf
+
+\begin{nrtc}
+\item	DEPRESSING
+    \begin{nrtc}
+    \item	WORLD-WIDE OSI ``CAN'T HAPPEN''
+
+    \item	THIS WILL CURTAIL USE OF WONDERFUL APPLICATIONS
+    \end{nrtc}
+
+\item	FORTUNATELY, CLOSED COMMUNITIES WILL BE RELATIVELY IMMUNE
+\end{nrtc}
+\end{bwslide}
+

@@ -1,0 +1,55 @@
+\File{grind4\-1.py},{11:13},{Jul  4 1988}
+\L{\LB{PERSONNEL \K{DEFINITIONS}}\Tab{24}{::=}}
+\L{\LB{}}
+\L{\LB{\K{BEGIN}}}
+\L{\LB{}}
+\L{\LB{PersonnelRecord ::=}}
+\L{\LB{}\Tab{8}{[\K{APPLICATION} 0]}}
+\L{\LB{}\Tab{8}{    \K{IMPLICIT} \K{SET} \{}}
+\L{\LB{}\Tab{16}{    Name,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{title[0]}}
+\L{\LB{}\Tab{16}{    IA5String,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{    EmployeeNumber,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{dateOfHire[1]}}
+\L{\LB{}\Tab{16}{    Date,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{nameOfSpouse[2]}}
+\L{\LB{}\Tab{16}{    Name,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{[3]}}
+\L{\LB{}\Tab{16}{    \K{IMPLICIT} \K{SEQUENCE} \K{OF} ChildInformation \K{DEFAULT} \{\}}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}}
+\L{\LB{ChildInformation ::=}}
+\L{\LB{}\Tab{8}{\K{SET} \{}}
+\L{\LB{}\Tab{16}{Name,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    dateofBirth[0]}}
+\L{\LB{}\Tab{16}{Date}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{Name ::=}}
+\L{\LB{}\Tab{8}{[\K{APPLICATION} 1]}}
+\L{\LB{}\Tab{8}{    \K{IMPLICIT} \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{16}{givenName}}
+\L{\LB{}\Tab{16}{    IA5String,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{initial}}
+\L{\LB{}\Tab{16}{    IA5String,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{familyName}}
+\L{\LB{}\Tab{16}{    IA5String}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}}
+\L{\LB{EmployeeNumber ::=}}
+\L{\LB{}\Tab{8}{[\K{APPLICATION} 2]}}
+\L{\LB{}\Tab{8}{    \K{IMPLICIT} \K{INTEGER}}}
+\L{\LB{}}
+\L{\LB{Date ::=}}
+\L{\LB{}\Tab{8}{[\K{APPLICATION} 3]}}
+\L{\LB{}\Tab{8}{    \K{IMPLICIT} IA5String \C{}\-\- YYYYMMDD \-\-\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{END}}}

@@ -1,0 +1,34 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{The ISO Macros Database}\label{isomacros}
+The database \file{isomacros} in the ISODE \verb"ETCDIR" directory
+(usually \file{/usr/etc/})
+contains a simple mapping between
+user-friendly strings and network addresses.
+This database is used by when trying to resolve textual respresentations of
+network addresses
+(as desccribed in Section~\ref{addr:encodings}) for use with the network.
+
+The database itself is an ordinary ASCII text file containing an entry for
+each locally defined macro.
+Each entry contains
+\begin{itemize}
+\item	the macro, a simple string; and,
+
+\item	the prefix of the corresponding network address.
+\end{itemize}
+Blanks and/or tab characters are used to seperate items.
+However, double-quotes may be used to prevent separation for items containing
+embedded whitspace.
+The sharp character (`\verb"#"') at the beginning of a line indicates a
+commentary line.
+
+Unlike the other databases in the ISODE,
+the user may not directly access this file.
+The routine \verb"str2paddr" and \verb"paddr2str" use this automatically.
+
+\section	{User-Specific Macros}
+By default a user-specific macros database is consulted before the
+system-wide macros file.
+The user-specific file is called \file{\$HOME/.isode\_macros} in the user's
+home directory.

@@ -1,0 +1,25 @@
+% run this through LaTeX with the appropriate wrapper
+%	RoSAP Failure Codes
+
+\normalsize
+\[\begin{tabular}{rp{3.0in}}
+    \multicolumn{2}{c}{\bf Provider-Initiated Aborts (fatal)}\\
+\tt ROS\_ADDRESS&	Address unknown\\
+\tt ROS\_REFUSED&	Connect request refused on this network connection\\
+\tt ROS\_SESSION&	Session disconnect\\
+\tt ROS\_PROTOCOL&	Protocol error\\
+\tt ROS\_CONGEST&	Congestion at RoSAP\\
+\tt ROS\_REMOTE&	Remote system problem\\
+\tt ROS\_DONE&		Assocation done via async handler\\
+\tt ROS\_ABORTED&	Peer aborted association\\
+\tt ROS\_RTS&		RTS disconnect\\
+\tt ROS\_PRESENTATION&	Presentation disconnect\\
+\tt ROS\_ACS&		ACS disconnect\\[0.1in]
+    \multicolumn{2}{c}{\bf Provider-Initiated Rejects (non-fatal)}\\
+\tt ROS\_GP\_UNRECOG&	Unrecognized APDU\\
+\tt ROS\_GP\_MISTYPED&	Mistyped APDU\\
+\tt ROS\_GP\_STRUCT&	Badly structured APDU\\[0.1in]
+    \multicolumn{2}{c}{\bf User-Initiated Rejects (fatal)}\\
+\tt ROS\_VALIDATE&	Authentication failure\\
+\tt ROS\_BUSY&		Busy
+\end{tabular}\]

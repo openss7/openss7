@@ -1,0 +1,76 @@
+% -*- LaTeX -*-		(really SLiTeX)
+
+\documentstyle[blackandwhite,landscape,oval,pagenumbers,small,tgrind]{TWGslides}
+
+\def\emph#1{\underline{#1}}
+
+\font\xx=cmbx10
+\font\yy=cmbx7
+\font\sf=cmss10
+
+\raggedright
+
+\input trademark
+\let\tradeNAMfont=\relax
+\let\tradeORGfont=\relax
+
+\makeatletter
+\def\@part[#1]#2{%
+    \stepcounter{part}
+    \begin{center}
+	\Large\bf\partext{} \thepart\\
+	\huge\bf #2%
+    \end{center}
+    \vskip1.25in plus.25in
+}
+
+\def\dotopic#1{\doPT{TOPIC}{#1}
+\stepcounter{topic}\setcounter{slide}{0}}
+\def\doparts{\doPT{PART}{0}}
+
+\def\doPT#1#2{%
+    \def\partext{#1}%
+    \setcounter{part}{#2}%
+}
+
+\def\partext{PART}
+\makeatother
+
+\begin{document}
+
+\title	{PRACTICAL PERSPECTIVES\\ ON OSI NETWORKING}
+\author	{Christopher W.~Moore\\ The Wollongong Group, Inc.\\[0.25in]
+	 Marshall T.~Rose\\ NYSERNet, Inc.}
+\date	{October 2--3, 1989}
+\maketitlepage
+
+\setcounter{slide}{-1}
+
+\begin{bwslide}
+\part*	{AGENDA}\bf
+
+\begin{description}
+\item[TOPIC I:]		END-TO-END SERVICES
+
+\item[TOPIC II:]	APPLICATION SERVICES
+
+\item[TOPIC III:]	TRANSITION AND COEXISTENCE WITH TCP/IP
+\end{description}
+\end{bwslide}
+
+
+\include{end-to-end}
+
+\include{a-overview}
+\include{a-session}
+\include{a-abstract}
+\include{a-presentation}
+\include{a-ase}
+\include{a-apps}
+\include{a-build-1}
+\include{a-build-2}
+\include{a-build-3}
+
+\include{transition}
+
+\end{document}

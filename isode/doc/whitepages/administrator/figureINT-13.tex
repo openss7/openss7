@@ -1,0 +1,33 @@
+% run this through LaTeX with the appropriate wrapper
+
+\tiny
+\begin{verbatim}
+cn=Toucan
+acl= others # read # entry
+acl= group # c=US@o=Performance Systems International@cn=Manager # write # entry
+acl= others # read # default
+acl= group # c=US@o=Performance Systems International@cn=Manager # write # default
+acl= others # compare # attributes # accessControlList$userPassword
+acl= group # c=US@o=Performance Systems International@cn=Manager # write # attributes # accessControlList$userPassword
+cn= Toucan
+eDBinfo= # c=US@cn=Spectacled Bear # 
+eDBinfo= c=US # c=US@cn=Spectacled Bear # 
+eDBinfo= c=US@o=Performance Systems International # c=US@cn=Spectacled Bear # 
+eDBinfo= c=US@o=Performance Systems International@ou=Example Unit # # c=US@cn=Spectacled Bear
+presentationAddress= '0101'H/Internet=130.117.128.4+17003
+manager= c=US@o=Performance Systems International@cn=Manager#
+manager= c=US@cn=Manager#
+userPassword= toucan
+quipuVersion= 6.0 Distribution
+description= An Example of Endangered South American Wildlife
+description= Master DSA for an Example Unit in PSI
+objectClass= top & quipuObject
+objectClass= appliationEntity & dSA & quipuDSA
+supportedApplicationContext= x500DSP & x500DAP & quipuDSP
+
+\end{verbatim}
+
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\empty

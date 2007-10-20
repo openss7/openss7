@@ -1,0 +1,299 @@
+\begin{theindex}\makeatletter
+\raggedright
+\def\newindex#1{{\huge\hspace{-.5in}\parbox[t]{.5in}{\makebox[.35in][c]{\uppercase{#1}}}\vspace{-1.5ex}}}
+\newindex{a}
+\item addr2ref, 22
+\item aetbuild, 10
+\item Aziz, Ashar, xix
+\indexspace
+\newindex{b}
+\item Betzler, Uli, xx
+\item Braun, Hans-Werner, xviii
+\item Brezak, John, xix
+\indexspace
+\newindex{c}
+\item Cass, Dwight E., xvi
+\item Chirieleison, Don, xix
+\item Cowin, Godfrey, xvii
+\indexspace
+\newindex{d}
+\item dish, 9
+\item DLOG, 162
+\item dotoken, 48
+\item dotokens, 48
+\item DR\_FATAL, 115
+\item DR\_OFFICIAL, 115
+\item dsabuild, 10
+\item Dubous, Olivier, xviii
+\indexspace
+\newindex{e}
+\item Easterbrook, Stephen, xvii
+\item EEC, xvii
+\item endisoservent, 143
+\item ESPRIT, xvii
+\item execve, 123, 142
+\indexspace
+\newindex{f}
+\item Finni, Olli, xviii
+\indexspace
+\newindex{g}
+\item getisoservent, 143
+\item getisoserventbyname, 143
+\item getisoserventbyport, 144
+\item getisoserventbyselector, 144
+\item getpid, 148
+\item Gosling, James, xx
+\indexspace
+\newindex{h}
+\item Hein\"{a}nen, Juha, xix
+\item Horton, Mark R., xviii
+\item Horvath, Nandor, xix
+\indexspace
+\newindex{i}
+\item is2paddr, 16
+\item is2saddr, 42
+\item is2taddr, 102
+\item \_isodefile, 155
+\item isodesetailor, 154
+\item isodesetvar, 154
+\item isodetailor, 154
+\item isodexport, 155
+\item isoentities, 16, 42, 102
+\item isomacros, 170, 171
+\item isoservent, 142
+\item isoservices, 133
+\item isotailor, 167, 170, 171
+\indexspace
+\newindex{j}
+\item Jacobsen, Ole-Jorgen, xix
+\item Jelfs, Philip B., xix
+\item Jordan, Kevin E., xix
+\indexspace
+\newindex{k}
+\item Keogh, Paul, xix
+\item Kille, Stephen E., xvii
+\item Knight, Graham, xix
+\indexspace
+\newindex{l}
+\item Lamport, Leslie, xx
+\item \LaTeX {}, xx, 179
+\item Lavender, Greg, xviii
+\item libacsap, 7, 147, 148
+\item libdsap, 9
+\item libicompat, 136, 142, 147, 148
+\item libpsap, xvii, 7, 9, 147, 148
+\item libpsap2, 7, 8, 15, 21, 34, 36, 147, 148
+\item libpsap2-lpp, 8
+\item librosap, xvii, 7, 147, 148
+\item librosy, 9
+\item librtsap, 7, 147, 148
+\item libssap, 7, 34, 41, 61, 66, 67, 91, 95, 96, 147, 148
+\item libtsap, xix, 8, 101, 113, 115, 119, 121, 123, 129, 133, 147, 148
+\item lint, 10
+\item ll\_check, 163
+\item ll\_close, 159
+\item ll\_dbinit, 160
+\item ll\_hdinit, 159
+\item ll\_log, 160
+\item \_ll\_log, 161
+\item LLog, 156
+\item LLOG, 162
+\item ll\_open, 158
+\item ll\_preset, 163
+\item ll\_printf, 161
+\item ll\_sync, 161
+\item lppd, 40
+\indexspace
+\newindex{m}
+\item make, 5
+\item malloc, 21, 24, 32, 67, 89, 119, 121
+\item McLoughlin, L., xix
+\item Michaelson, George, xvi
+\item Miller, Steve D., xviii
+\item Moore, Christopher W., xvi
+\indexspace
+\newindex{n}
+\item na2norm, 127
+\item na2str, 127
+\item NBS, xviii
+\item NIST, xviii
+\item Nordmark, Erik, xix
+\item NSAPaddr, 125
+\indexspace
+\newindex{o}
+\item Onions, Julian, xvii
+\indexspace
+\newindex{p}
+\item PAFREE, 24, 35
+\item PAsynConnRequest, 32
+\item PAsynRetryRequest, 33
+\item Pavel, John, xvii
+\item Pavlou, George, xix
+\item PC\_FATAL, 34
+\item PCFREE, 32
+\item PC\_OFFICIAL, 34
+\item PConnRequest, 28
+\item PConnResponse, 27
+\item pepsy, xviii, 9, 10
+\item pepy, xvii, 9, 10, 162
+\item PErrString, 35
+\item PFFREE, 35
+\item PInit, 19
+\item PLocalHostName, 18
+\item PLOG, 163
+\item PNFREE, 35
+\item posy, xvii, 8, 9, 10
+\item PPFREE, 35
+\item Prafullchandra, Hemma, xix
+\item Preuss, Don, xix
+\item PRFREE, 35
+\item Pring, Ed, xx
+\item printf, 160, 161, 162, 163
+\item PSAPabort, 24
+\item PSAPaddr, 16
+\item PSAPconnect, 30
+\item PSAPctxlist, 22
+\item PSAPindication, 23
+\item PSAPstart, 20
+\item PSFREE, 21
+\item PTFREE, 35
+\item PVFREE, 35
+\item PXFREE, 35
+\indexspace
+\newindex{q}
+\item qbuf, 118
+\item QOStype, 128
+\item quipu, 9
+\indexspace
+\newindex{r}
+\item Reinart, John A., xx
+\item Rekhter, Jacob, xix
+\item Robbins, Colin J., xvii
+\item Roe, Mike, xvii
+\item Romine, John L., xvi
+\item Rose, Marshall T., xx
+\item rosy, 8
+\item Ruttle, Keith, xvii
+\indexspace
+\newindex{s}
+\item SActDiscRequest, 84
+\item SActDiscResponse, 84
+\item SActEndRequest, 85
+\item SActEndResponse, 85
+\item SActIntrRequest, 83
+\item SActIntrResponse, 83
+\item SActResumeRequest, 82
+\item SActStartRequest, 81
+\item saddr2str, 44
+\item SAsynConnRequest, 60
+\item SAsynRetryRequest, 61
+\item SCapdRequest, 64
+\item SCapdResponse, 64
+\item SC\_FATAL, 62
+\item SC\_OFFICIAL, 62
+\item SConnRequest, 57
+\item SConnResponse, 54
+\item Scott, John A., xviii
+\item SDataRequest, 62
+\item SErrString, 96
+\item setisoservent, 143
+\item SExpdRequest, 63
+\item SGControlRequest, 75
+\item SGTokenRequest, 74
+\item SInit, 49
+\item SLocalHostName, 44
+\item SLOG, 162
+\item SMajSyncRequest, 76
+\item SMajSyncResponse, 77
+\item SMinSyncRequest, 77
+\item SMinSyncResponse, 78
+\item sprintref, 22
+\item SPTokenRequest, 75
+\item SReadRequest, 65
+\item SRelRequest, 92
+\item SRelResponse, 94
+\item SRelRetryRequest, 93
+\item SReSyncRequest, 79
+\item SReSyncResponse, 80
+\item Srinivasan, Raj, xix
+\item SSAPabort, 53
+\item SSAPactivity, 71
+\item SSAPaddr, 42
+\item SSAPconnect, 58
+\item SSAPdata, 66
+\item SSAPfinish, 74
+\item SSAPindication, 53
+\item SSAPref, 52, 81
+\item SSAPrelease, 93
+\item SSAPreport, 72
+\item SSAPstart, 51
+\item SSAPsync, 69
+\item SSAPtoken, 68
+\item SSelectMask, 91
+\item SSetIndications, 87
+\item str2saddr, 44
+\item str2taddr, 104
+\item STypedRequest, 63
+\item SUAbortRequest, 87
+\item SUReportRequest, 86
+\item SWriteRequest, 65
+\item SXFREE, 67
+\item syslog, 158
+\indexspace
+\newindex{t}
+\item taddr2str, 104
+\item tar, xi
+\item TAsynConnRequest, 112
+\item TAsynRetryRequest, 113
+\item Taylor, Jem, xviii
+\item TConnRequest, 111
+\item TConnResponse, 108
+\item TDataRequest, 116
+\item TDiscRequest, 110, 123
+\item TErrString, 133
+\item TExpdRequest, 117
+\item TGetAddresses, 104
+\item TInit, 106
+\item Titcombe, Steve, xvii
+\item TLocalHostName, 102
+\item TNetAccept, 130
+\item TNetAcceptAux, 131
+\item TNetClose, 132
+\item TNetListen, 129
+\item TNetUnique, 129
+\item TReadRequest, 118
+\item TRestoreState, 124
+\item TSAPaddr, 102
+\item TSAPconnect, 111
+\item tsapd, 19, 49, 96, 106
+\item TSAPdata, 118
+\item TSAPdisconnect, 108
+\item TSAPstart, 107
+\item TSaveState, 123
+\item TSelectMask, 121
+\item TSelectOctets, 122
+\item TSetIndications, 120
+\item TSetQueuesOK, 132
+\item Turland, Alan, xvii
+\item TWriteRequest, 116
+\item TXFREE, 119
+\indexspace
+\newindex{u}
+\item U.C.~Berkeley, xx
+\item udvec, 116
+\indexspace
+\newindex{v}
+\item Vanderbilt, Peter, xix
+\item varargs, 161
+\indexspace
+\newindex{w}
+\item Walton, Simon, xvii
+\item Weller, Daniel, xix
+\item Wenzel, Oliver, xix
+\item Wilder, Rick, xix
+\item Willson, Stephen H., xvi
+\item Worsley, Andrew, xviii
+\indexspace
+\newindex{y}
+\item Young, Alan, xx
+\end{theindex}

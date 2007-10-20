@@ -1,0 +1,68 @@
+% run this through LaTeX
+
+% \documentstyle[11pt,a4,sfwmac,tgrind,twoside,ucl-rn,draft-vrsn]{report}
+\documentstyle[sfwmac,tgrind,twoside,ucl-rn]{report}
+
+\rnnumber {RN/89/19}
+
+\input bits
+
+\pagenumbering{roman}
+
+\begin{document}
+
+
+\title{\huge The Design of QUIPU \\
+{\large (Version 2)}}
+\author{S.E.~Kille}
+
+\date {March 1988}
+
+\maketitle
+
+\begin {abstract}
+This document describes the design of the QUIPU Directory Service.
+This version is released with QUIPU version 5.0.
+\end {abstract}
+
+
+
+\thispagestyle{empty}
+\setcounter{page}{0}
+\mbox{}
+\newpage
+
+\tableofcontents
+
+
+\listoffigures
+
+\newpage
+\ifodd\value{page} \else
+    \mbox{}
+    \newpage
+\fi
+\pagenumbering{arabic}
+
+\include{introduction}
+
+\include {design}
+
+\include {nameservice}
+
+\include {distribution}
+
+\include {update}
+
+\include {management}
+
+\include {implementation}
+
+\appendix 
+
+\include {appendix-a}
+
+\bibliography{../../../bib/sek}
+\bibliographystyle{alpha}
+
+\end{document}

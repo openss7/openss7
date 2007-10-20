@@ -1,0 +1,15 @@
+.PS 4.5in
+.ps 20
+## figure S-25
+B1:	box invis "ip"
+	line up from B1.n
+B2:	box invis "ipFragOKs" with .n at (B1.s.x, B1.s.y-lineht)
+	line from B2.n to B1.s
+B3:	box invis "ipForwarding" with .ne at (B1.sw.x-linewid, B1.sw.y-lineht)
+	line from B3.n to B1.sw
+B4:	box invis "ipRouteTable" with .nw at (B1.se.x+linewid, B1.se.y-lineht)
+	line from B4.n to B1.se
+B5:	box invis "$\cdots$" with .n at (B4.s.x, B4.s.y-lineht)
+	line from B5.n to B4.s
+##
+.PE

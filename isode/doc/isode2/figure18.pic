@@ -1,0 +1,19 @@
+.PS 6.5
+.ps 20
+## figure 2
+B1:	box "TP4"
+B2:	box "CLNP" with .n at (B1.s.x, B1.s.y-lineht)
+B3:	box "802.2/.3" with .n at (B2.s.x, B2.s.y-lineht)
+	line from B1.s to B2.n; line from B2.s to B3.n
+B4:	box "ES-IS" with .e at (B2.w.x-linewid, B2.w.y)
+	line from B4.e to B2.w
+B5:	box "EON" "" "(DoD-IP)" with .n at (B4.s.x, B4.s.y-lineht)
+	line from (B2.s.x-boxwid/4, B2.s.y) to B5.n
+B6:	box "X.25" with .w at (B3.e.x+linewid, B3.e.y)
+	line from (B2.s.x+boxwid/4, B2.s.y) to (B6.n.x-boxwid/3, B6.n.y)
+B7:	box "TP0" with .w at (B1.e.x+linewid, B1.e.y)
+	line from B7.s to B6.n
+B8:	box "IS-IS" dashed with .e at (B4.w.x-linewid, B4.w.y)
+	line dashed from B8.e to B4.w
+##
+.PE

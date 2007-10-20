@@ -1,0 +1,30 @@
+.PS
+.ps 20
+##
+lineht	=	2*lineht/3
+## figure A-4
+B1:	box "user-element" width 2*boxwid
+B1a:	box invis with .w at B1.w
+B1b:	box invis with .e at B1.e
+B2:	box "ROSE" with .ne at (B1.se.x, B1.se.y-lineht)
+B3:	box "RTSE" with .ne at (B2.se.x, B2.se.y-lineht) width 2*boxwid
+B3a:	box invis with .w at B3.w
+B3b:	box invis with .e at B3.e
+B4:	box "ACSE" with .nw at (B3.sw.x, B3.sw.y-lineht)
+B5:	box with .n at (B1.n.x, B1.n.y+boxht/2) width 3*boxwid \
+	height boxht+B1.n.y-B4.s.y
+##
+	line from B1a.s to B3a.n
+	line from B3a.s to B4.n
+	line from B4.s to (B4.s.x, B5.s.y)
+	line from B1b.s to B2.n
+	line from B2.s to B3b.n
+	line from B3b.s to (B3b.s.x, B5.s.y)
+##
+	line down from B5.s
+	line dashed from (B5.w.x-linewid/2, B5.s.y-lineht) \
+		    to   (B5.e.x+linewid/2, B5.s.y-lineht)
+	move to (B5.e.x+linewid/2 , B5.s.y-lineht); \
+	    "\ \ presentation service" ljust
+##
+.PE

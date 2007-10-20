@@ -1,0 +1,63 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{The ISODE Little Services}\label{imisc}
+The {\em ISODE Little Services\/} are examples of a few simple
+applications written using {\em The ISO Development Environment}.
+The programs described herein should work on all systems on which the
+software runs.
+All of these programs have \unix/ manual entries.
+
+The little services are based on the protocols of the same name found in
+the \dod/ TCP/IP protocol suite.
+There are several services:
+\begin{describe}
+\item[utcTime:] the universal time
+
+\item[genTime:] the generalized time
+
+\item[timeOfDay:]	the current date and time since the \unix/ epoch
+
+\item[users:]	the users logged in on the system
+
+\item[charGen:]	a character generation pattern
+
+\item[qotd:]	a quote of the data
+
+\item[finger:]	``fingers'' users logged in
+
+\item[pwdGen:]	six pseudo-randomly generated (allegedly mnemonic) passwords
+
+\item[tellUser:] sends a message to a remote user
+
+\item[ping:] ping test for performance measurement
+
+\item[sink:] sink test for performance measurement
+
+\item[echo:] echo test for performance measurement
+\end{describe}
+Only the {\em finger\/} service takes any arguments,
+the individuals on whom to report.
+
+\section	{Implementation}
+If you have access to the source tree for this release,
+the directory \file{imisc/} contains the code for the responder and initiator.
+
+\subsection	{The Initiator}
+The \man imisc(1c) program is the initiator which requests the little
+services.
+If invoked with arguments,
+it executes that exact operation and terminates.
+Otherwise, it enters interactive mode,
+prompting for each operation and argument until end-of-file is found.
+
+In addition, the pseudo-operations \verb"help" and \verb"quit" do the
+obvious things.
+
+\subsection	{The Responder}
+The \man imiscd(8c) program is the responder which implements the little
+services.
+
+As shown in Figure~\ref{imisc:ros} on the following page,
+the ROS-based definition is very simple.
+\newpage
+\tagrindfile{grindimisc-1}{ROS definition of ISODE Little Services}{imisc:ros}

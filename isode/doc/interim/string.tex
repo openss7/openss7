@@ -1,0 +1,147 @@
+\documentstyle [tgrind,ucl-rn] {article}
+\rnnumber{RN/89/14}
+\author {S.E. Kille}
+\date {\today}
+\title {A string encoding of Presentation Address}
+\begin {document}
+\bibliographystyle{alpha}
+\maketitle
+\begin {abstract}
+There are a number of environments where a simple string encoding of
+Presentation Address is desirable. 
+This specification is agreed for use in the ISODE and THORN projects, and
+may be of wider interest.
+This document is also THORN Document UCL-59.
+\end {abstract}
+
+\section {Introduction}
+
+There is a need to represent presentation addresses as strings in a number
+of different contexts.
+This note is defines a unified syntax for the THORN and ISODE
+projects, which might also 
+be appropriate as a de facto standard for a wider community.  
+
+Christian Huitema or Inria and Marshall Rose or The Wollongong Group gave
+much useful input to this document.
+
+\section {Requirements}
+
+The main requirements are: 
+
+\begin {itemize}
+\item Must be able to specify any legal value
+\item Should be clean in the common case of no selectors
+\item Needs to deal with selectors in the following encodings:
+\begin {itemize}
+\item IA5
+\item Digits encoded as IA5 (this is the most common syntax in
+Europe, as it is required by X.400(84) and should receive an optimal
+encoding)
+\item Numeric encoded as integer (US GOSIP).  This is mapped onto two
+octets, with the first octet being the high order byte of the integer.
+\item General Hexadecimal
+\end {itemize}
+
+\item Should give special encodings for the ad hoc encoding proposed
+in ``An interim approach to use of Network Addresses'' \cite{NSAP.Approach}.
+\begin {itemize}
+\item X.25(80) Networks
+\item TCP/IP Networks
+\end {itemize}
+
+\item Should be extensible for additional forms
+
+\item Should provide a compact representation (e.g., for use in a TSEL
+encoding).
+
+\end {itemize}
+
+\section {Format}
+
+The BNF is given in figure \ref{bnf}.
+
+\tagrindfile{bnf}{String BNF}{bnf}
+
+Four examples:
+
+\begin {verbatim}
+"256"/NS+a433bb93c1|NS+aa3106
+
+#63/#41/#12/X121+234219200300
+
+'3a'H/TELEX+00728722+X.25(80)+02+00002340555+CUDF+"892796"
+
+TELEX+00728722+RFC-1006+03+10.0.0.6
+
+\end{verbatim}
+
+Note that the RFC 1006 encoding permits use of either domain or IP address.
+The former is primarily for ease of entry.  If this domain maps onto multiple IP
+addresses, then multiple network addresses should be generated.  When
+mapping from an encoded address to string form, the reverse mapping (dotted quad to domain)
+should not be used.
+
+\section {Encoding}
+
+Selectors are represented in a manner which can be easily encoded.
+In the NS notation, the concrete binary form of network address is given.
+Otherwise, this string notation provides a mechanism for representing 
+the Abstract 
+Syntax of a Network Address.  This must be encoded according to Addendum 2
+of ISO 8348.
+
+\section {Macros}
+
+There are often common addresses, for which a cleaner representation is
+desired.  This is achieved by use of Macros.  If a \verb|<network-address>|
+can be parsed
+as:
+
+\begin {verbatim}
+<otherstring> "=" *( any )
+\end{verbatim}
+
+Then the leading string is taken as a Macro, which is substituted.  
+This may be applied recursively.  When
+presenting Network Address to humans, the longest available substitution
+should be used. For example:
+
+\begin {center}
+\begin {tabular}{|l|l|}
+\hline
+Macro & Value \\
+\hline
+UK.AC & DCC+826+d110000 \\
+Leeds & UK.AC=120 \\
+\hline
+\end {tabular}
+
+\end {center}
+
+Then ``Leeds=22'' would be expanded to ``DCC+826+d11000012022''.
+
+
+\section {Standard Macros}
+
+No Macros should ever be relied on.  However, the following are suggested as
+standard.
+
+\begin {center}
+\begin {tabular}{|l|l|}
+\hline
+Macro & Value \\
+\hline
+Int-X25(80) & TELEX+00728722+X25(80)+01+ \\
+Janet-X25(80) & TELEX+00728722+X25(80)+02+ \\
+Internet-RFC-1006 & TELEX+00728722+RFC-1006+03+ \\
+\hline
+\end {tabular}
+
+\end {center}
+
+\section {References}
+
+\bibliography {../../../bib/sek}
+
+\end {document}

@@ -1,0 +1,781 @@
+% -*- LaTeX -*-		(really SLiTeX)
+
+\begin{bwslide}
+\part	{UNDERLYING SERVICES}\bf
+
+\begin{nrtc}
+\item	ABSTRACT SYNTAX NOTATION ONE (ASN.1)
+
+\item	THE REMOTE OPERATIONS SERVICE
+
+\item	THE BINDING SERVICE
+
+\item	A DISCIPLINE FOR MEAL PREPARATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+this part of the presentation corresponds to
+the definition of abstract syntax notation one ([ISO~8824])
+and both the old- and new-style ros
+(namely [X.410] and [ISO~9072/1]),
+along with chapter~3 of The Applications Cookbook
+\end{note}
+
+
+\begin{bwslide}
+\part*	{ABSTRACT SYNTAX NOTATION ONE (ASN.1)}\bf
+
+\begin{nrtc}
+\item	UNIVERSAL LANGUAGE TO DESCRIBE DATA WITH STRONG TYPING
+
+\item	RICH, EXTENSIBLE SYNTAX
+
+\item	USEFUL FOR SPECIFICATION OF NEW PROTOCOLS
+    \begin{nrtc}
+    \item	``CLEAR TO READ'' SPECIFICATIONS (ha!)
+
+    \item	NOT TIED TO MACHINE-ORIENTED STRUCTURES AND RESTRICTIONS
+    \end{nrtc}
+
+\item	REPRESENTATION CURRENTLY USED BY ALL OSI APPLICATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SYNTAX}
+
+\begin{nrtc}
+\item	FORMAT OF A MODULE:
+\begin{verbatim}
+<<module>> DEFINITIONS ::=
+BEGIN
+
+<<linkage>>
+
+<<declarations>>
+
+END
+\end{verbatim}
+
+\item	LINKAGE IS USED TO REFERENCE DECLARATIONS IN OTHER MODULES
+
+\item	THREE KINDS OF DECLARATIONS
+    \begin{nrtc}
+    \item	TYPES: DATA STRUCTURES	
+
+    \item	VALUES: INSTANCES OF TYPES
+
+    \item	MACROS: LANGUAGE EXTENSION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SOME EXAMPLES:\\ LINKAGE}
+
+\vskip.5in
+\begin{verbatim}
+MTSAbstractService {
+    joint-iso-ccitt mhs-motis(6) mts(3) modules(0)
+        mts-abstract-service(3)
+} DEFINITIONS ::=
+
+BEGIN
+    IMPORTS OBJECT, PORT FROM AbstractServiceNotation {
+        joint-iso-ccitt mhs-motis(6) asdc(2) modules(0)
+            notation(1)
+    }
+
+...
+
+END
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SOME EXAMPLES:\\ TYPES AND VALUES}
+
+\vskip.5in
+\begin{verbatim}
+Multiple-defined-contexts ::=
+    BOOLEAN
+
+simple Multiple-defined-contexts ::=
+    FALSE    -- or TRUE
+
+ContentLength ::=
+    INTEGER
+
+RegistrationMailType ::=
+    INTEGER {
+        non-registered-mail (0),
+        registered-mail (1),
+        registered-mail-to-addressee-in-person (2)
+    }
+
+mymail RegistrationMailType ::=
+    registered-mail    --or 1
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SOME EXAMPLES:\\ TYPES AND VALUES (cont.)}
+
+\vskip.5in
+\begin{verbatim}
+RandomNumber ::=
+    BIT STRING
+
+Attribute-Groups ::=
+    BITSTRING {
+        storage(0), security(1), private(2)
+    }
+
+groups Attribute-Groups ::=
+    { storage, private }    -- or '101'B
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SOME EXAMPLES:\\ TYPES AND VALUES (cont.)}
+
+\vskip.5in
+\begin{verbatim}
+Content ::=
+    OCTET STRING
+
+NULL
+
+SEQUENCE
+
+SET
+
+BilateralInfo ::=
+    ANY
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SOME EXAMPLES:\\ TYPES AND VALUES (cont.)}
+
+\vskip.5in
+\begin{verbatim}
+Name ::=
+    SEQUENCE OF
+        ISO8571-FADU.Node-Name
+
+SecurityContext ::=
+    SET OF SecurityLabel
+
+MessageDeliveryEnvelope ::=
+    SEQUENCE {
+        message-delivery-identifier
+            MessageDeliveryIdentifier,
+
+        message-delivery-time
+            MessageDeliveryTime,
+
+        other-fields
+            OtherMessageDeliveryFields
+    }
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SOME EXAMPLES:\\ TYPES AND VALUES (cont.)}
+
+\vskip.5in
+\begin{verbatim}
+MessagesWaiting ::=
+    SET {
+        urgent[0]
+            DeliveryQueue,
+
+        normal[1]
+            DeliveryQueue,
+
+        nonUrgent[2]
+            DeliveryQueue,
+    }
+
+queue MessagesWaiting ::=
+    {
+        urgent { ... }, normal { ... }, nonUrgent { ... }
+    }
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {SOME EXAMPLES:\\ TYPES AND VALUES (cont.)}\small
+
+\vskip.5in
+\begin{verbatim}
+PerMessageSubmissionFields ::=
+    SET {
+	...
+
+        content-type
+            ContentType,
+
+        content-identifier
+            ContentIdentifier
+            OPTIONAL,
+
+        priority
+            Priority
+            DEFAULT normal,
+
+        per-message-indicators
+            PerMessageIndicators
+            DEFAULT {},
+
+	...
+    }
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SOME EXAMPLES:\\ TYPES AND VALUES (cont.)}
+
+\vskip.5in
+\begin{verbatim}
+PDU ::=
+    CHOICE {
+        FTAM-Regime-PDU,
+        File-PDU,
+        Bulk-Data-PDU
+    }
+
+SecurityPolicyIdentifier ::=
+    OBJECT IDENTIFIER
+
+ISO8571-FADU.Node-Name
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SOME EXAMPLES:\\ MACROS}
+
+\vskip.5in
+\begin{verbatim}
+OPERATION MACRO ::=
+    BEGIN
+    TYPE NOTATION  ::= "ARGUMENT" NamedType Result Errors | empty
+    VALUE NOTATION ::= value (VALUE INTEGER)
+    Result         ::= "RESULT" NamedType | empty
+    Errors         ::= "ERRORS" { ErrorNames } | empty
+
+    NamedType      ::= identifier type | type    
+    ErrorNames     ::= IdentifierList | empty
+    IdentifierList ::= identifier | IdentifierList "," identifier
+    END
+
+users OPERATION
+        RESULT       IA5List
+        ERRORS       { congested, unableToOpenFile }
+        ::=          2
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {SOME EXAMPLES:\\ MACROS (cont.)}
+
+\vskip.5in
+\begin{verbatim}
+ERROR MACRO ::=
+    BEGIN
+    TYPE NOTATION  ::= "PARAMETER" NamedType | empty
+    VALUE NOTATION ::= value (VALUE INTEGER)
+
+    NamedType      ::= identifier type | type
+    END
+
+unableToOpenFile
+        ERROR
+        PARAMETER    IA5List
+        ::=          2
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{THE REMOTE OPERATIONS SERVICE}\bf
+
+\begin{nrtc}
+\item	STANDARDIZED OSI MECHANISM FOR SPECIFYING TRANSACTIONS
+
+\item	CURRENTLY ONLY CONNECTION-ORIENTED\\
+	(i.e., ONLY CO-ROS IS DEFINED)
+
+\item	TERMINOLOGY: ROS-USER, ROS-PROVIDER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE INTERACTIONS:\\ INVOKE}
+
+\vskip.5in
+\diagram[p]{figure25}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE INTERACTIONS:\\ RESULT}
+
+\vskip.5in
+\diagram[p]{figure26}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE INTERACTIONS:\\ ERROR}
+
+\vskip.5in
+\diagram[p]{figure27}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE INTERACTIONS:\\ USER REJECTION}
+
+\vskip.5in
+\diagram[p]{figure28}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE INTERACTIONS:\\ PROVIDER REJECTION}
+
+\vskip.5in
+\diagram[p]{figure29}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RO-INVOKE SERVICE}
+
+\begin{nrtc}
+\item	UNCONFIRMED SERVICE:\\ RO-INVOKE.REQUEST, RO-INVOKE.INDICATION
+
+\item	PARAMETERS
+\[\begin{tabular}{ll}
+    OPERATION NUMBER&		integer\\
+    OPERATION CLASS&		(a)synchronous (local)\\
+    \ \ \ (optional)&		\\
+    ARGUMENT&			asn.1 type (APDU)\\
+    INVOCATION IDENTIFIER&	integer\\
+    LINKED-INVOCATION ID&	integer\\
+    PRIORITY (optional)&	integer (local)
+\end{tabular}\]
+
+\item	ARGUMENT IS OPTIONAL IN NEW-STYLE ROS
+
+\item	THE LINKED-INVOCATION IDENTIFIER IS NOT PRESENT IN OLD-STYLE ROS
+
+\item	APDU IS THE USER-SUPPLIED DATA STRUCTURE, AN APPLICATION PROTOCOL DATA
+	UNIT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RO-RESULT SERVICE}
+
+\begin{nrtc}
+\item	UNCONFIRMED SERVICE:\\ RO-RESULT.REQUEST, RO-RESULT.INDICATION
+
+\item	PARAMETERS
+\[\begin{tabular}{ll}
+    INVOCATION IDENTIFIER&	integer\\
+    RESULT&			asn.1 type (APDU)\\
+    PRIORITY (optional)&	integer (local)
+\end{tabular}\]
+
+\item	RESULT IS OPTIONAL IN NEW-STYLE ROS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RO-ERROR SERVICE}
+
+\begin{nrtc}
+\item	UNCONFIRMED SERVICE:\\ RO-ERROR.REQUEST, RO-ERROR.INDICATION
+
+\item	PARAMETERS
+\[\begin{tabular}{ll}
+    INVOCATION IDENTIFIER&	integer\\
+    ERROR NUMBER&		integer\\
+    PARAMETER (optional)&	asn.1 type (APDU)\\
+    PRIORITY (optional)&	integer (local)
+\end{tabular}\]
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RO-U-REJECT SERVICE}
+
+\begin{nrtc}
+\item	UNCONFIRMED SERVICE:\\ RO-U-REJECT.REQUEST, RO-U-REJECT.INDICATION
+
+\item	PARAMETERS
+\[\begin{tabular}{ll}
+    INVOCATION IDENTIFIER&	integer\\
+    REASON&			integer\\
+
+    PRIORITY (optional)&	integer (local)
+\end{tabular}\]
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RO-P-REJECT SERVICE}
+
+\begin{nrtc}
+\item	PROVIDER-INITIATED SERVICE:\\ RO-P-REJECT.INDICATION
+
+\item	PARAMETERS
+\[\begin{tabular}{ll}
+    INVOCATION IDENTIFIER&	integer\\
+    \ \ \ (optional)&		\\
+    REASON&			integer\\
+    APDU (optional)&		asn.1 type\\
+\end{tabular}\]
+
+\item	INVOCATION IDENTIFIER MAY NOT BE PRESENT IF:
+    \begin{nrtc}
+    \item	PROBLEM IS NOT RELATED TO A PARTICULAR INVOCATION, OR
+
+    \item	THE INFORMATION IS UNAVAILABLE
+    \end{nrtc}
+
+\item	IF THE LOCAL PROVIDER COULD NOT SEND AN INVOCATION (OR RESULT OR ERROR)
+	THEN APDU IS THE ASSOCIATED USER-SUPPLIED ARGUMENT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REASONS FOR REJECTIONS}
+
+\begin{nrtc}
+\item	FOUR CLASSES OF REJECTIONS
+    \begin{nrtc}
+    \item	GENERAL PROBLEMS
+
+    \item	INVOKE PROBLEMS
+
+    \item	RETURN RESULT PROBLEMS
+
+    \item	RETURN ERROR PROBLEMS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GENERAL PROBLEMS:\\ DETECTED BY THE ROS-PROVIDER}
+
+\begin{nrtc}
+\item	UNRECOGNIZED APDU
+
+\item	MISTYPED APDU
+
+\item	BADLY STRUCTURED APDU   
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INVOKE PROBLEMS:\\ DETECTED BY THE ROS-USER}
+
+\begin{nrtc}
+\item	DUPLICATE INVOCATION
+
+\item	UNRECOGNIZED OPERATION
+
+\item	MISTYPED ARGUMENT
+
+\item	RESOURCE LIMITATION
+
+\item	INITIATOR RELEASING\footnote{not allowed in old-style ros}
+
+\item	UNRECOGNIZED LINKED ID$^*$
+
+\item	LINKED RESPONSE UNEXPECTED$^*$
+
+\item	UNEXPECTED CHILD OPERATION$^*$
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RETURN RESULT PROBLEMS:\\ DETECTED BY THE ROS-USER}
+
+\begin{nrtc}
+\item	UNRECOGNIZED INVOCATION
+
+\item	RESULT RESPONSE UNEXPECTED
+
+\item	MISTYPED RESULT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RETURN ERROR PROBLEMS:\\ DETECTED BY THE ROS-USER}
+
+\begin{nrtc}
+\item	UNRECOGNIZED INVOCATION
+
+\item	ERROR RESPONSE UNEXPECTED
+
+\item	UNRECOGNIZED ERROR
+
+\item	UNEXPECTED ERROR
+
+\item	MISTYPED PARAMETER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REMOTE OPERATION MACROS}
+
+\begin{nrtc}
+\item	THE DEFINITIONS FOR REMOTE OPERATIONS USE THE ASN.1 MACRO FACILITY
+
+\item	ALTHOUGH PROBLEMATIC FOR PARSERS, IT RESULTS IN VASTLY SIMPLIFIED
+	SPECIFICATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE}
+
+\vskip.5in
+\begin{verbatim}
+finger  OPERATION
+        ARGUMENT        IA5List
+        RESULT          IA5List
+        ERRORS          { congested, unableToAccessFile,
+                          unableToPipe, unableToFork,
+                          errorReading }
+        ::=             5
+
+congested
+        ERROR
+        ::=             0
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REMOTE OPERATION MACROS (cont.)}
+
+\begin{nrtc}
+\item	USING THE \verb"LINKED" CLAUSE, AN OPERATION CAN DEFINE LINKED
+	OPERATIONS
+
+\item	AN OPERATION OR ERROR VALUE CAN ALSO TAKE A GLOBAL VALUE
+    \begin{nrtc}
+    \item	AN OBJECT IDENTIFIER IS USED IN ADDITION TO THE
+		OPERATION OR ERROR CODE    
+    \end{nrtc}
+
+\item	THE \verb"BIND" AND \verb"UNBIND" MACROS ARE USED TO DEFINE BINDING
+	INFORMATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{THE BINDING SERVICE}\bf
+
+\begin{nrtc}
+\item	OLD- AND NEW-STYLE ROS USE DIFFERENT METHODS FOR BINDING
+
+\item	FOR OUR PURPOSES, THE METHOD OF BINDING IS UNIMPORTANT
+
+\item	BUT WE'LL BRIEFLY REVIEW THEM ANYWAY FOR COMPLETENESS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OLD-STYLE BINDING}
+
+\begin{nrtc}
+\item	IN OLD-STYLE ROS, BINDING WAS DONE IN ONE OF TWO WAYS:
+    \begin{nrtc}
+    \item	BY USING AN EXISTING RELIABLE TRANSFER SERVICE ASSOCIATION
+
+    \item	BY USING THE RO-BEGIN AND RO-END SERVICE ([ECMA~TR/31] ONLY)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OLD-STYLE BINDING (cont.)}
+
+\vskip.5in
+\diagram[p]{figure7}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NEW-STYLE BINDING}
+
+\begin{nrtc}
+\item	IN NEW-STYLE ROS, BINDING IS ALSO DONE IN ONE OF TWO WAYS:
+    \begin{nrtc}
+    \item	BY USING AN EXISTING RELIABLE TRANSFER SERVICE ASSOCIATION
+
+    \item	BY USING ASSOCIATION CONTROL
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NEW-STYLE BINDING (cont.)}
+
+\vskip.5in
+\diagram[p]{figure8}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{A DISCIPLINE FOR MEAL PREPARATION}\bf
+
+\begin{nrtc}
+\item	WE HAVE INTRODUCED
+    \begin{nrtc}
+    \item	A MODEL FOR DISTRIBUTED APPLICATIONS, AND
+
+    \item	THE SERVICES AVAILABLE TO THE APPLICATION TO REALIZE THIS
+    \end{nrtc}
+
+\item	WHAT WE NEED IS THE ``DISCIPLINE'' TO FOCUS OUR ENERGIES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INITIATORS}
+
+\begin{nrtc}
+\item	IN GENERAL, THERE ARE TWO KINDS OF INITIATOR IMPLEMENTATIONS
+
+\item	INTERACTIVE
+    \begin{nrtc}
+    \item	A USER RUNS A PROGRAM AND INTERACTIVELY DIRECTS THE
+		INVOCATION OF OPERATIONS
+    \end{nrtc}
+
+\item	EMBEDDED
+    \begin{nrtc}
+    \item	A PROGRAM CAUSES AN ASSOCIATION TO BE AUTOMATICALLY FORMED
+		AND OPERATIONS TO BE INVOKED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RESPONDERS}
+
+\begin{nrtc}
+\item	IN GENERAL, THERE ARE TWO KINDS OF RESPONDER IMPLEMENTATIONS,
+	DEPENDING ON HOW ASSOCIATIONS ARE GIVEN TO THE PROGRAM WHICH
+	IMPLEMENTS THE SERVICE
+
+\item	SINGLE ASSOCIATION (a.k.a. THE DYNAMIC APPROACH)
+    \begin{nrtc}
+    \item	EACH TIME THE SERVICE IS REQUESTED, A NEW INSTANCE OF
+		THE PROGRAM IS EXECUTED
+    \end{nrtc}
+
+\item	MULTIPLE ASSOCIATION (a.k.a. THE STATIC APPROACH)
+    \begin{nrtc}
+    \item	EACH TIME THE SERVICE IS REQUESTED, THE REQUEST IS GIVEN TO A
+		SINGLE, ALREADY EXECUTING, INSTANCE OF THE PROGRAM
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GENERAL ORGANIZATION}
+
+\begin{nrtc}
+\item	AT COMPILE-TIME:
+    \begin{nrtc}
+    \item	USE RO-SPECIFICATION TO GENERATE SUPPORT FACILITIES
+    \end{nrtc}
+
+\item	AT RUN-TIME:
+    \begin{nrtc}
+    \item	USE DIRECTORY SERVICES TO LOCATE/REGISTER SERVICES
+
+    \item	USE ASSOCIATION CONTROL TO BIND/UNBIND APPLICATIONS
+
+    \item	USE REMOTE OPERATIONS TO INVOKE TRANSACTIONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STATIC (COMPILE-TIME) ORGANIZATION}
+
+\vskip.15in
+\diagram[p]{figure9}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DYNAMIC (RUN-TIME) ORGANIZATION}
+
+\vskip.15in
+\diagram[p]{figure10}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{IN PERSPECTIVE}
+
+\begin{nrtc}
+\item	\emph{THE COOKBOOK} PRESENTS \emph{ONE} POSSIBLE METHOD
+	FOR REALIZING THE MODEL USING THE UNDERLYING FACILITIES
+
+\item	MANY MORE ARE POSSIBLE\\
+    \begin{nrtc}
+    \item	AND SOME WILL BE VASTLY SUPERIOR
+    \end{nrtc}
+
+\item	THE APPROACH TAKEN BY \emph{THE COOKBOOK} ATTEMPTS TO BALANCE
+	SIMPLICTY AND EXTENSIBILITY
+
+\item	HENCE, IT MAY STILL BE UNDERDONE FOR SOME CHEFS AND OVERDONE FOR
+	OTHERS
+\end{nrtc}
+\end{bwslide}

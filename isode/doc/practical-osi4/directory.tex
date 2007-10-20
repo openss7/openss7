@@ -1,0 +1,1463 @@
+% run this through LaTeX with the appropriate wrapper
+
+\dotopic{DIRECTORY SERVICES}
+
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]		INFORMATION FRAMEWORK
+
+\item[PART II:]		DISTRIBUTED OPERATIONS
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ACKNOWLEDGEMENTS}
+
+\begin{nrtc}
+\item	ALL OF THESE OBSERVATIONS COME FROM RUNNING A WHITE PAGES PILOT
+
+\item	STEPHEN E.~KILLE (UCL) AND COLIN J.~ROBBINS (X-TEL~LTD.)
+	DESERVE A LOT OF CREDIT FOR THEIR WORK IN DIRECTORY
+
+\item	ANTHONY E.~HODSON (ICL) AND OTHERS DESERVE A LOT OF CREDIT FOR
+	THE WORK IN SHARED NAMESPACES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INTRODUCTION TO THE DIRECTORY}
+
+\begin{nrtc}
+\item	A VERY BRIEF OVERVIEW TO ``LEVEL THE FIELD''
+
+\item	THE DIRECTORY MANAGES \emph{INFORMATION OBJECTS} MODELED AS
+	\emph{ENTRIES} IN THE DIRECTORY INFORMATION BASE (DIB)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY CONCEPTS:\\ ENTRIES}
+
+\vskip.5in
+\diagram[p]{figureD-1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY CONCEPT: SCHEMA}
+
+\begin{nrtc}
+\item	THE \verb"objectClass" ATTRIBUTE DETERMINES
+    \begin{nrtc}
+    \item	WHICH ATTRIBUTES MUST BE PRESENT
+
+    \item	WHICH ATTRIBUTES MAY BE PRESENT
+    \end{nrtc}
+
+\item	ALL ENTRIES MUST BELONG TO THE \verb"top" OBJECT CLASS
+
+\item	OBJECT CLASS PROPERTIES ARE INHERITED, e.g.,
+    \begin{nrtc}
+    \item	\verb"residentialPerson" IS SUBORDINATE TO \verb"person"
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY CONCEPTS: DIT}
+
+\vskip.5in
+\diagram[p]{figureD-2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY CONCEPTS: DUAs, DSAs}
+
+\vskip.5in
+\diagram[p]{figureD-3}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY CONCEPTS: OPERATIONS}
+
+\begin{nrtc}
+\item	INTERROGATION:
+    \begin{nrtc}
+    \item	READ, COMPARE, LIST, SEARCH
+
+    \item	ABANDON
+    \end{nrtc}
+
+\item	MODIFICATION:
+    \begin{nrtc}
+    \item	ADD ENTRY, REMOVE ENTRY, MODIFY ENTRY
+
+    \item	MODIFY RDN
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{INFORMATION FRAMEWORK}\bf
+
+\begin{nrtc}
+\item	NAMING ARCHITECTURE
+
+\item	INTERROGATION ALGORITHMS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{NAMING ARCHITECTURE}\bf
+
+\begin{nrtc}
+\item	NAMING IS HARD TO DO
+
+\item	DIRECTORY STANDARDS ARE LESS THAN HELPFUL IN THIS REGARD
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROBLEMS WITH NAMING}
+
+\begin{nrtc}
+\item	TOO MUCH FLEXIBILITY IN DIT STRUCTURE
+    \begin{nrtc}
+    \item	(DIFFICULT FOR INTERROGATION ALGORITHMS)
+    \end{nrtc}
+
+\item	NO NAMING AUTHORITIES
+    \begin{nrtc}
+    \item	(PART OF A MORE GENERAL PROBLEM)
+    \end{nrtc}
+
+\item	ADDMDs WANT TO MINIMIZE SHARING OF INFORMATION
+
+\item	CAN NOT LEGISLATE HOW PRDMDs ARE ORGANIZED
+
+\item	EACH COUNTRY MUST MAKE ``NATIONAL DECISION''
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ANNEX B OF ISO9594-7/X.521(88)}
+
+\vskip.5in
+\diagram[p]{figureD-33}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROGRESS}
+
+\begin{nrtc}
+\item	SOME GROUPS HAVE BEEN (INDEPENDENTLY) WORKING ON NAMING ARCHITECTURES
+    \begin{nrtc}
+    \item	THORN (NOW COSINE/INTERNET)
+
+    \item	EUROPEAN WORKSHOP FOR OPEN SYSTEMS (EWOS)
+
+    \item	NORTH AMERICAN DIRECTORY FORUM (NADF)
+    \end{nrtc}
+
+\item	HOW MIGHT THE HYPOTHETICAL COUNTRY OF FREEDONIA (FF)
+	DECIDE THIS:
+    \begin{nrtc}
+    \item	USE CIVIL AUTHORITY FOR NAMING
+
+    \item	TREAT PRDMDs AS BLACK BOXES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING UNIVERSES}
+
+\begin{nrtc}
+\item	SEVERAL POSSIBLE NAMING UNIVERSES COULD BE REALIZED IN THE DIT:
+    \begin{nrtc}
+    \item	GEOGRAPHICAL
+
+    \item	COMMUNITY
+
+    \item	POLITICAL
+    \end{nrtc}
+
+\item	CHOICE OF UNIVERSE DETERMINES DIFFICULTY OF MAPPING QUERIES
+
+\item	SUPPORT OF MULTIPLE UNIVERSES IS LIKELY TO BE UNNATURAL
+
+\item	CHOOSE CIVIL AUTHORITY
+    \begin{nrtc}
+    \item	MINIMIZES AMOUNT OF NEW REGISTRATION INFRASTRUCTURE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CHOICE OF RDNs}
+
+\begin{nrtc}
+\item	PRIMARY GOAL:
+    \begin{nrtc}
+    \item	AVOID NAMING COLLISIONS
+    \end{nrtc}
+
+\item	SECONDARY GOAL:
+    \begin{nrtc}
+    \item	VALUES SHOULD BE MEANINGFUL, i.e.,
+	\begin{nrtc}
+	\item	``USER-FRIENDLY''
+	\end{nrtc}
+    \end{nrtc}
+
+\item	OBSERVATION:
+    \begin{nrtc}
+    \item	GUESSING CAN BE DONE VIA AVs RATHER THAN RDNs
+	\begin{nrtc}
+	\item	(AN ENTRY CAN HAVE MANY AVs, INDEPENDENT OF D-AVs)
+	\end{nrtc}
+
+    \item	SO ``USER-FRIENDLY'' RDNs AREN'T CRITICAL
+	\begin{nrtc}
+	\item	IN SPITE OF ANNEX~E OF ISO9594--2/X.501(88)
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE}
+
+\begin{nrtc}
+\item	CONSIDER AN ENTRY FOR
+\begin{quote}\begin{verbatim}
+Ministry of Finance
+\end{verbatim}\end{quote}
+
+\item	(SUPERFICIALLY) WOULD WANT RDN OF
+\begin{quote}\begin{verbatim}
+o=Ministry of Finance
+\end{verbatim}\end{quote}
+
+\item	BUT WOULD ALSO WANT AV OF
+\begin{quote}\begin{verbatim}
+o=MOF
+\end{verbatim}\end{quote}
+TO AID SEARCHING
+
+\item	SO, INSTEAD COULD HAVE AVs OF
+\begin{quote}\begin{verbatim}
+o=Ministry of Finance
+o=MOF
+\end{verbatim}\end{quote}
+TO AID SEARCHING, AND SOMETHING ELSE FOR AN RDN
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING AT THE NATIONAL LEVEL}
+
+\begin{nrtc}
+\item	PROVINCES
+\begin{quote}\begin{verbatim}
+ffProvince OBJECT-CLASS
+    SUBCLASS OF locality
+    MUST CONTAIN { fipsProvNumericCode, -- FF FIPS PUB
+                   fipsProvAlphaCode,   -- FF FIPS PUB
+                   stateOrProviceName }
+    ::= { ffObjectClass 1 }
+\end{verbatim}\end{quote}
+RDN IS \verb"fipsProvNumericCode"
+
+\item	ORGANIZATIONS WITH NATIONAL STANDING
+\begin{quote}\begin{verbatim}
+ffOrganization OBJECT-CLASS
+    SUBCLASS OF organization
+    MUST CONTAIN { fnsiOrgNumericCode }  -- FNSI registry
+    ::= { ffObjectClass 4 }
+\end{verbatim}\end{quote}
+RDN IS \verb"fnsiOrgNumericCode"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING AT THE NATIONAL LEVEL (cont.)}
+
+\begin{nrtc}
+\item	ADDMD OPERATORS
+\begin{quote}\begin{verbatim}
+ffADDMD OBJECT-CLASS
+    SUBCLASS OF top
+    MUST CONTAIN { addmdName }           -- FF registry
+    ::= { ffObjectClass 6 }
+\end{verbatim}\end{quote}
+RDN IS \verb"addmdName"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING WITHIN A PROVINCE}
+
+\begin{nrtc}
+\item	POPULATED PLACES
+\begin{quote}\begin{verbatim}
+ffPlace OBJECT-CLASS
+    SUBCLASS OF locality
+    MUST CONTAIN { fipsPlaceNumericCode, -- FF FIPS PUB
+                   localityName }
+    ::= { ffObjectClass 2 }
+\end{verbatim}\end{quote}
+RDN IS \verb"fipsPlaceNumericCode"
+
+\item	ORGANIZATIONS WITH REGIONAL STANDING:
+    \begin{nrtc}
+    \item	\verb"organization"
+    \end{nrtc}
+RDN IS \verb"organizationName" -- REGISTRAR IS PROVINCIAL SECRETARY
+
+\item	REGIONAL GOVERNMENT:
+    \begin{nrtc}
+    \item	\verb"organization"
+    \end{nrtc}
+RDN IS \verb"o=Government"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING WITHIN A POPULATED PLACE}
+
+\begin{nrtc}
+\item	CITIZENS:
+    \begin{nrtc}
+    \item	\verb"residentialPerson"
+    \end{nrtc}
+RDN IS \verb"commonName" (USUALLY WITH SOMETHING ELSE)
+
+\item	ORGANIZATIONS WITH LOCAL STANDING:
+    \begin{nrtc}
+    \item	\verb"organization"
+    \end{nrtc}
+RDN IS \verb"organizationName" -- REGISTRAR IS COUNTY CLERK (OR EQUIVALENT)
+
+\item	LOCAL GOVERNMENT:
+    \begin{nrtc}
+    \item	\verb"organization"
+    \end{nrtc}
+RDN IS \verb"o=Government"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING OF OSI ENTITIES}
+
+\begin{nrtc}
+\item	APPLICATION PROCESSES:
+    \begin{nrtc}
+    \item	\verb"applicationProcess"
+    \end{nrtc}
+RDN IS \verb"commonName"
+
+\item	APPLICATION ENTITIES:
+\begin{quote}\begin{verbatim}
+ffApplicationEntity OBJECT-CLASS
+    SUBCLASS OF applicationEntity
+    MUST CONTAIN { supportedApplicationContext }
+    ::= { ffObjectClass 5 }
+\end{verbatim}\end{quote}
+RDN IS \verb"commonName"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING WITHIN ORGANIZATIONS/ADDMDs}
+
+\begin{nrtc}
+\item	UP TO EACH ORGANIZATION/ADDMD
+
+\item	MAY BE UNPUBLISHED
+    \begin{nrtc}
+    \item	(ALMOST CERTAINLY IN LATTER CASE)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FREEDONIAN DIT STRUCTURE}
+\font\twlsf=cmss10 scaled \magstep 1
+\twlsf
+
+\[\begin{tabular}{|r|c|l|c|l|}
+\hline
+\multicolumn{1}{|c|}{\bf Level}&
+\multicolumn{1}{c|}{\bf Element}&
+	\multicolumn{1}{c|}{\bf objectClass}&
+			\multicolumn{1}{c|}{\bf Superior}&
+				\multicolumn{1}{c|}{\bf RDN}\\
+\hline
+root&
+\ 0&	&		&	\\
+\hline
+international&
+\ 1&	country&	0&	countryName\\
+\hline
+national&
+ \ 2&	ffProvince&	1&	fipsProvNumericCode\\
+&\ 3&	ffOrganization&	1&	fnsiOrgNumericCode\\
+&\ 4&	ffADDMD&	1&	addmdName\\
+\hline
+regional&
+ \ 5&	organization&	2&	organizationName\\
+&\ 6&	ffPlace&	2&	fipsPlaceNumericCode\\
+\hline
+local&
+\ 7&	organization&	6&	organizationName\\
+& 8&	residentialPerson&
+			6&	commonName, other\\
+\hline
+organizational&
+\ 9&	organizationalUnit&
+			3,5,7,9&
+				organizationalUnitName\\
+&10&	organizationalRole&
+			3,5,7,9&
+				commonName\\
+&11&	organizationalPerson&
+			3,5,7,9&
+				commonName\\
+\hline
+application&
+12&	applicationProcess&
+			3,5,7,9&
+				commonName\\
+&13&	ffApplicationEntity&
+			12&	commonName\\
+\hline
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{LESSONS LEARNED}
+
+\begin{nrtc}
+\item	USE OF CIVIL INFRASTRUCTURE MINIMIZES NEW WORK
+
+\item	CERTAINLY NOT PERFECT
+
+\item	ALPHANUMERIC NAME FORMS PREFERRED FOR RDNs,
+    \begin{nrtc}
+    \item	BUT USE OF NUMERIC NAME FORMS
+    \end{nrtc}
+    ILLUSTRATES ``REAL'' RELATIONSHIP BETWEEN RDNs AND AVs
+
+\item	HOW TO WRITE A FREEDONIAN BROWSER?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{INTERROGATION ALGORITHMS}\bf
+
+\begin{nrtc}
+\item	A CRITICAL OBSERVATION:
+    \begin{nrtc}
+    \item	AN INTERROGATION ALGORITHM MUST HAVE DETAILED
+		KNOWLEDGE OF THE NAMING STRUCTURE
+    \end{nrtc}
+
+\item	GOAL:
+    \begin{nrtc}
+    \item	PROVIDE THE ``USER-FRIENDLY'' CHARACTERISTIC OF
+		GUESSABILITY
+
+    \item	USER SUPPLIES A (TEXTUAL) \emph{PURPORTED NAME}
+		AND ALGORITHM IDENTIFIES ZERO OR MORE DNs
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INTERROGATION ALGORITHMS}
+
+\begin{nrtc}
+\item	START WITH (SOME) KNOWLEDGE OF THE DIT (SUB-)STRUCTURE
+
+\item	TAKE INPUT FROM THE USER
+    \begin{nrtc}
+    \item	(ALONG WITH AN ENVIRONMENT OF USER-OPTIONS)
+    \end{nrtc}
+
+\item	INVOKE DIRECTORY OPERATIONS
+    \begin{nrtc}
+    \item	(MOSTLY SEARCH AND READ)
+    \end{nrtc}
+
+\item	IN-BETWEEN OPERATIONS
+    \begin{nrtc}
+    \item	INTERACT WITH USER (AS APPROPRIATE)
+    \end{nrtc}
+    TO FOCUS USE OF OPERATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE CHALLENGE}
+
+\begin{nrtc}
+\item	DESIGN AN INTERROGATION ALGORITHM
+    \begin{nrtc}
+    \item	WHICH REQUIRES MINIMAL-KNOWLEDGE
+
+    \item	WHILST EXECUTING RELATIVELY EFFICIENTLY
+    \end{nrtc}
+
+\item	NO STANDARDS IN THIS AREA
+
+\item	BUT FIRST, WE NEED TO UNDERSTAND HOW SEARCHING WORKS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY SEARCH OPERATION}
+
+\begin{nrtc}
+\item \verb"baseobject": WHERE SEARCH STARTS
+
+\item \verb"subset": DEPTH OF SEARCH, ONE OF:
+    \begin{nrtc}
+    \item	\verb"baseobject", \verb"oneLevel", \verb"wholeSubtree"
+    \end{nrtc}
+
+\item \verb"filter": BOOLEAN EXPRESSION APPLIED TO ATTRIBUTES OF EACH ENTRY
+\[\begin{tabular}{|r|l|}
+\hline
+\multicolumn{1}{|c|}{\bf operator}&
+			\multicolumn{1}{c|}{\bf abbrev.}\\
+\hline
+logical-and&		$\land$\\
+logical-or&		$\lor$\\
+logical-not&		$\lnot$\\
+equality&		$=$\\
+substring-containment&	$\in$\\
+greater-than or equal&	$\geq$\\
+less-than or equal&	$\leq$\\
+value is present&	$\exists$\\
+approximately equal&	$\approx$\\
+\hline
+\end{tabular}\]
+
+\item \verb"searchaliases": FILTER SHOULD BE APPLIED TO ALIASES
+
+\item	\verb"entryInformationSelection": WHICH ATTRIBUTES SHOULD BE RETURNED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERVICE CONTROLS}
+
+\begin{nrtc}
+\item \verb"options", ANY OF:
+\begin{quote}\begin{tabular}{l}
+preferChaining\\
+chainingProhibited\\
+dontUseCopy\\
+dontDereferenceAliases\\
+localScope
+\end{tabular}\end{quote}
+
+\item \verb"priority", ONE OF:
+    \begin{nrtc}
+    \item	\verb"low", \verb"medium", \verb"high"
+    \end{nrtc}
+
+\item \verb"timelimit"/\verb"sizelimit": MAXIMUM NUMBER OF SECONDS/ENTRIES TO
+BE USED/RETURNED
+
+\item \verb"scopeOfReferral", ONE OF:
+    \begin{nrtc}
+    \item	\verb"dmd", \verb"country"
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM \#1:\\ KILLE'S USER-FRIENDLY NAMING SCHEME}
+
+\begin{nrtc}
+\item	USE LIKELY NAMING INFORMATION
+\begin{quote}\small\begin{verbatim}
+marshall rose, psi
+\end{verbatim}\end{quote}
+	(THESE ARE ORDERED)
+
+\item	NAMES ARE (POSSIBLY) INCOMPLETE, e.g.,
+\begin{quote}\small\begin{verbatim}
+kille, ucl, gb
+kille, cs, ucl, gb
+\end{verbatim}\end{quote}
+	MIGHT RESOLVE TO THE SAME ENTRY
+
+\item	ALGORITHM USES IMPRECISE MATCHING AND ASSIGNS ``GOODNESS'' LEVEL TO
+	MATCHES
+
+\item	USERS ARE QUERIED FOR ASSISTANCE ON QUESTIONABLE MATCHES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{UFN: KNOWLEDGE}
+
+\begin{nrtc}
+\item	MULTI-LEVEL NAMING ARCHITECTURE
+
+\item	KNOWLEDGE OF ISO3166 CODES FROM ROOT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{UFN: USER INPUT}
+
+\begin{nrtc}
+\item	ONE OR MORE ORDERED NAMING COMPONENTS, e.g.,
+\begin{quote}\small\begin{verbatim}
+marshall rose, psi
+kille, cs, ucl, gb
+L. Eagle, "Sue, Grabbit, and Runn", Oxford
+\end{verbatim}\end{quote}
+
+\item	USUALLY UNTYPED, BUT MAY BE
+\begin{quote}\small\begin{verbatim}
+James Hacker, l=Oxford, Widget Inc.
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{UFN: USER ENVIRONMENT\\ (PUBLIC DUA IN NORTH AMERICA)}
+
+\[\begin{tabular}{|r|l|}
+\hline
+\multicolumn{1}{|c|}{\bf Range}&
+		\multicolumn{1}{|c|}{\bf Bases}\\
+\hline
+1,2:&		\tt c=US\\
+&		\tt c=CA\\
+&		\tt -\\
+\hline
+3,+:&		\tt -\\
+&		\tt c=US\\
+&		\tt c=CA\\
+\hline
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{UFN: USER ENVIRONMENT\\ (PRIVATE DUA)}
+
+\[\begin{tabular}{|r|l|}
+\hline
+\multicolumn{1}{|c|}{\bf Range}&
+		\multicolumn{1}{|c|}{\bf Bases}\\
+\hline
+1:&		\tt c=US@o=Performance Systems International@ou=Sales\\
+&		\tt c=US@o=Performance Systems International\\
+&		\tt c=US\\
+&		\tt -\\
+\hline
+2:&		\tt c=US\\
+&		\tt c=US@o=Performance Systems International\\
+&		\tt -\\
+\hline
+3,+:&		\tt -\\
+&		\tt c=US\\
+&		\tt c=US@o=Performance Systems International\\
+\hline
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM: DATA STRUCTURES}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureD-5\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM: DATA STRUCTURES (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureD-6\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM: TOP-LEVEL}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureD-7\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM: FIND MATCH}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureD-8\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM: FIND MATCH (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureD-15\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM: SEARCHING THE ROOT}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureD-9\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM: SEARCHING BELOW THE ROOT}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureD-10\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM: SEARCHING BELOW THE ROOT (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureD-13\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM: SEARCHING FOR LEAVES, etc.}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureD-11\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM: SEARCH OPERATION}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureD-12\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM: DETERMINE GOODNESS}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureD-14\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE:\\ ``\verb"rose, psi"''}
+
+\begin{nrtc}
+\item	USE \verb"purportedMatch"
+\begin{quote}\small\begin{verbatim}
+base:    {
+           { { countryName, "US" } }
+         }
+p:       { "psi", "rose" }
+\end{verbatim}\end{quote}
+
+\item	USE \verb"intermediateSearch"
+\begin{quote}\small\begin{verbatim}
+base:    {
+           { { countryName, "US" } }
+         }
+s:       "psi"
+\end{verbatim}\end{quote}
+WHICH CALLS \verb"search"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE (cont.)}
+
+\begin{nrtc}
+\item	SEARCH ARGUMENTS:
+\begin{quote}\small\begin{verbatim}
+baseObject:     {
+                  { { countryName, "US" } }
+                }
+subsetType:     oneLevel
+filter:
+\end{verbatim}\end{quote}
+\[\begin{array}{lllll}
+\multicolumn{5}{l}{(\mbox{\tt organizationName}=\mbox{\tt "*PSI*"}}\\
+&	&	\lor&	\multicolumn{2}{l}{\mbox{\tt organizationName}\approx\mbox{\tt "PSI"}}\\
+&	&	\lor&	\multicolumn{2}{l}{\mbox{\tt localityName}=\mbox{\tt "*PSI*"}}\\
+&	&	\lor&	\multicolumn{2}{l}{\mbox{\tt localityName}\approx\mbox{\tt "PSI"})}\\
+&	\land&	\multicolumn{3}{l}{(\mbox{\tt objectClass}=\mbox{\tt organization}}\\
+&	&	&	\lor&	    \mbox{\tt objectClass}=\mbox{\tt locality})\\
+\end{array}\]
+
+\item	RETURNS
+\begin{quote}\small\begin{verbatim}
+c=US@o=Performance Systems International
+\end{verbatim}\end{quote}
+A ``GOOD'' MATCH
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE (cont.)}
+
+\begin{nrtc}
+\item	\verb"purportedMatch" RECURSES WITH
+\begin{quote}\small\begin{verbatim}
+base:    {
+           { { countryName, "US" } },
+           { { organizationName,
+               "Performance Systems International" } }
+         }
+p:       { "rose" }
+\end{verbatim}\end{quote}
+
+\item	USE \verb"leafSearch"
+\begin{quote}\small\begin{verbatim}
+base:          {
+                 { { countryName, "US" } },
+                 { { organizationName,
+                     "Performance Systems International" }
+                 }
+               }
+s:             "rose"
+subsettype:    wholeSubtree
+\end{verbatim}\end{quote}
+WHICH CALLS \verb"search"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE (cont.)}
+
+\begin{nrtc}
+\item	SEARCH ARGUMENTS:
+\begin{quote}\small\begin{verbatim}
+baseObject:    {
+                 { { countryName, "US" } },
+                 { { organizationName,
+                     "Performance Systems International" }
+                 }
+               }
+subsetType:    wholeSubtree
+filter:
+\end{verbatim}\end{quote}
+\[\begin{array}{lll}
+\multicolumn{3}{l}{\mbox{\tt commonName}=\mbox{\tt "*rose*"}}\\
+&	\lor&	\mbox{\tt commonName}\approx\mbox{\tt "rose"}\\
+&	\lor&	\mbox{\tt surName}=\mbox{\tt "*rose*"}\\
+&	\lor&	\mbox{\tt surName}\approx\mbox{\tt "rose"}\\
+&	\lor&	\mbox{\tt userID}=\mbox{\tt "*rose*"}\\
+&	\lor&	\mbox{\tt userID}\approx\mbox{\tt "rose"}
+\end{array}\]
+
+\item	RETURNS
+\begin{quote}\small\begin{verbatim}
+c=US
+    @o=Performance Systems International
+    @ou=Research and Development
+    @ou=Santa Clara
+    @cn=Marshall Rose
+\end{verbatim}\end{quote}
+A ``GOOD'' MATCH
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM \#2:\\ AE LOOKUP}
+
+\begin{nrtc}
+\item	NEED TO DERIVE
+    \begin{nrtc}
+    \item	APPLICATION ENTITY TITLE
+    \end{nrtc}
+
+\item	FOR MAPPING INTO
+    \begin{nrtc}
+    \item	PRESENTATION ADDRESS
+    \end{nrtc}
+
+\item	USER SUPPLIES (PREFERABLY SHORT) TYPE-IN, e.g.,
+\begin{quote}\small\begin{verbatim}
+% ftam nisc,psi,us
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH: AE LOOKUP WITH UFN}
+
+\begin{nrtc}
+\item	ONE POSSIBILITY
+    \begin{nrtc}
+    \item	LEVERAGE KILLE'S ALGORITHM
+    \end{nrtc}
+
+\item	USE UFN TO FIND \verb"applicationProcess"
+
+\item	THEN SEARCH RESULTS TO FIND \verb"applicationEntity"
+
+\item	IF MULTIPLE AE's
+    \begin{nrtc}
+    \item	ASK USER WHICH ONE (IF INTERACTIVE)
+
+    \item	OTHERWISE, JUST TAKE FIRST
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AE/UFN: KNOWLEDGE}
+
+\begin{nrtc}
+\item	\verb"applicationEntity" RESIDES BELOW \verb"applicationProcess"
+
+\item	IMMEDIATE SUBORDINATES FAVORED OVER DISTANT ONES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AE/UFN: USER INPUT}
+
+\begin{nrtc}
+\item	ONE OR MORE ORDERED NAMING COMPONENTS
+\begin{quote}\small\begin{verbatim}
+nisc, psi, us
+hubris, cs, ucl, gb
+\end{verbatim}\end{quote}
+
+\item	DESIRED \verb"supportedApplicationContext"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM: TOP-LEVEL}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureD-21\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALGORITHM: SEARCH OPERATION}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureD-22\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE:\\ ``\verb"ftam nisc,psi,us"''}
+
+\begin{nrtc}
+\item	USE \verb"aeLookup"
+\begin{quote}\small\begin{verbatim}
+p:       { "us", "psi", "nisc" }
+sac:     1.0.8571.1.1
+\end{verbatim}\end{quote}
+WHICH CALLS \verb"friendlyMatch"
+
+\item	RETURNS
+\begin{quote}\small\begin{verbatim}
+c=US
+    @o=Performance Systems International
+    @ou=Operations
+    @cn=nisc
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE (cont.)}
+
+\begin{nrtc}
+\item	USE \verb"aeSearch"
+\begin{quote}\small\begin{verbatim}
+base:          {
+                 { { countryName, "US" } },
+                 { { organizationName,
+                     "Performance Systems International" } },
+                 { { organizationalUnitName, "Operations" } },
+                 { { commonName, "nisc" } }
+               }
+sac:            1.0.8571.1.1
+subtreeType:    oneLevel
+\end{verbatim}\end{quote}
+WHICH INVOKES SEARCH WITH FILTER
+$$\mbox{\tt supportedApplicationContext}=\mbox{\tt 1.0.8571.1.1}$$
+
+\item	RETURNS
+\begin{quote}\small\begin{verbatim}
+c=US
+    @o=Performance Systems International
+    @ou=Operations
+    @cn=nisc
+    @cn=filestore
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{DISTRIBUTED OPERATIONS}\bf
+
+\begin{nrtc}
+\item	KNOWLEDGE
+
+\item	MODES OF OPERATION
+
+\item	ENTRY GRANULARITY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{KNOWLEDGE}\bf
+
+\begin{nrtc}
+\item	NAMING CONTEXTS
+
+\item	DSA INFORMATION MODEL
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING CONTEXTS}
+
+\begin{nrtc}
+\item	NEED A MEANS FOR DETERMINING WHICH DSA HOLDS INFORMATION ON AN ENTRY
+
+\item	DIVIDE THE ENTIRE DIT INTO NON-OVERLAPPING SUBTREES
+	TERMED \emph{NAMING CONTEXTS},
+	THE ``ROOT'' OF WHICH IS TERMED A \emph{CONTEXT PREFIX}
+
+\item	EACH ENTRY RESIDES IN EXACTLY ONE NAMING CONTEXT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A SKELETAL DIT}
+
+\vskip.5in
+\diagram[p]{figureD-35}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING CONTEXTS AND KNOWLEDGE}
+
+\begin{nrtc}
+\item	EACH DSA MASTERS ONE OR MORE NAMING CONTEXTS
+
+\item	HENCE, EACH ENTRY IS MASTERED IN ONE DSA
+
+\item	SO, NOW NEED A WAY TO MODEL WHAT A DSA ``KNOWS'' AND ``NEEDS TO KNOW''
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DSA INFORMATION TREE}
+
+\begin{nrtc}
+\item	REPRESENTATION OF A NAMING CONTEXT WITHIN A DSA
+
+\item	SAYS THREE THINGS:
+    \begin{nrtc}
+    \item	DSA KNOWS RDNs OF ALL SUPERIORS TO THE NAMING CONTEXT
+
+    \item	DSA HAS COMPLETE INFORMATION ABOUT ENTRIES IN SUBTREE
+
+    \item	DSA MUST KNOW ABOUT DSAs WHICH HOLD SUBORDINATES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INFORMATION TREE IN ONE DSA}
+
+\vskip.5in
+\diagram[p]{figureD-36}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{KNOWLEDGE INFORMATION}
+
+\begin{nrtc}
+\item	DSA HAS NO KNOWLEDGE OF ROOT-SUBORDINATES, THEN IT HAS:
+
+\item	A SUPERIOR REFERENCE (DSA-AP=DSA NAME/ADDR)
+    \begin{nrtc}
+    \item	USED TO ``MOVE UP AND OVER''
+    \end{nrtc}
+
+\item	SUBORDINATE KNOWLEDGE FOR EACH NAMING CONTEXT IT MASTERS
+    \begin{nrtc}
+    \item	SUBORDINATE REFERENCE: DSA-AP AND CONTEXT PREFIX
+
+    \item	NON-SPECIFIC SUBORDINATE REFERENCE: DSA-AP
+    \end{nrtc}
+    USED TO ``MOVE DOWN''
+
+\item	CROSS-REFERENCES (DSA-AP AND CONTEXT PREFIX)
+    \begin{nrtc}
+    \item	USED TO ``MOVE OVER''
+    \end{nrtc}
+    (OPTIONAL)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE:\\ DSA FOR CALIFORNIA}
+
+\vskip.5in
+\diagram[p]{figureD-37}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{KNOWLEDGE INFORMATION (cont.)}
+
+\begin{nrtc}
+\item	DSA HAS KNOWLEDGE OF ROOT-SUBORDINATES
+    \begin{nrtc}
+    \item	IT'S CALLED A FIRST-LEVEL DSA
+    \end{nrtc}
+    THEN IT HAS:
+
+\item	FOR EACH ROOT-SUBORDINATE,
+    \begin{nrtc}
+    \item	THE DSA-AP WHICH MASTERS THAT NAMING CONTEXT
+    \end{nrtc}
+
+\item	SUBORDINATE KNOWLEDGE FOR EACH NAMING CONTEXT IT MASTERS
+
+\item	``REAL'' FIRST-LEVEL DSAs ARE LIKELY VIRTUAL ENTITIES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{MODES OF OPERATION}\bf
+
+\begin{nrtc}
+\item	REFERRAL v. CHAINING
+
+\item	RELAYING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REFERRAL v. CHAINING}
+
+\begin{nrtc}
+\item	ANOTHER HARD DECISION
+
+\item	IN THE ABSENCE OF
+    \begin{nrtc}
+    \item	ACCOUNTING AND SETTLEMENT
+    \end{nrtc}
+	CHOICE IS MADE ON CONNECTIVITY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{USE OF PRESENTATION ADDRESS}
+
+\begin{nrtc}
+\item	MUST ACCOMMODATE DIVERSE COMMUNITIES
+
+\item	CHAINING/REFERRAL
+    \begin{nrtc}
+    \item	SEE IF ORIGINATING NADDR IS IN SAME COMMUNITY
+
+    \item	FOR DSA, LOOK AT PRESENTATION ADDRESS
+
+    \item	FOR DUA, LOOK AT DAP ASSOCIATION
+    \end{nrtc}
+    AS ANY OF THE NADDRs FOR TARGET DSA
+
+\item	DIRECT CONTACT
+    \begin{nrtc}
+    \item	SEE IF LOCAL END-SYSTEM IS IN SAME COMMUNITY
+    \end{nrtc}
+    AS ANY OF THE NADDRs FOR TARGET DSA
+
+\item	REALLY A TREMENDOUS LAYERING VIOLATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RELAYING}
+
+\begin{nrtc}
+\item	MINIMALLY CONNECTED DSAs NEED AN
+    \begin{nrtc}
+    \item	AN APPLICATION RELAY
+    \end{nrtc}
+
+\item	SIMILAR IN CONCEPT TO SUPERIOR DSA
+    \begin{nrtc}
+    \item	BUT RELAY NEEDN'T BE MORE KNOWLEDGEABLE,
+		SIMPLY BETTER CONNECTED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{ENTRY GRANULARITY}\bf
+
+\begin{nrtc}
+\item	IN A COMMERCIAL ENVIRONMENT
+    \begin{nrtc}
+    \item	NO SINGLE ENTITY CAN CLAIM SOLE RIGHT TO MANAGE ALL THE
+		INFORMATION CORRESPONDING TO AN OBJECT
+    \end{nrtc}
+
+\item	WITH COMPETING DIRECTORY SERVICES
+    \begin{nrtc}
+    \item	THERE IS NO NATURAL ADMINISTRATOR FOR ENTRIES NAMED
+		VIA ANNEX~B OR CIVIL AUTHORITY
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DISTRIBUTED ENTRIES}
+
+\begin{nrtc}
+\item	ONE SOLUTION
+    \begin{nrtc}
+    \item	WINDING ITS WAY THROUGH THE STANDARDS PROCESS
+    \end{nrtc}
+
+\item	A SERIES OF INVASIVE ARCHITECTURAL CHANGES BASED ON KNOWLEDGE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SHARED NAMESPACES}
+
+\begin{nrtc}
+\item	ANOTHER SOLUTION
+    \begin{nrtc}
+    \item	DEVELOPED BY ANTHONY HODSON (ICL) AND OTHERS
+    \end{nrtc}
+
+\item	RELIES ON NAMING LINKS AND ADMINISTRATIVE COOPERATION
+
+\item	NO CHANGES TO X.500 MODELS, SERVICE, PROCEDURES, OR PROTOCOLS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A SHARED DOMAIN IN THE DIT}
+
+\vskip.5in
+\diagram[p]{figureD-34}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SHARING NAMESPACES}
+
+\begin{nrtc}
+\item	SERVICE PROVIDERS AGREE TO COOPERATIVELY MANAGE SHARED SPACE
+    \begin{nrtc}
+    \item	CONTAINING PUBLIC INFORMATION
+
+    \item	PUBLISHED DIT STRUCTURE
+
+    \item	AVAILABLE FOR INTERROGATION ONLY
+
+    \item	HIGHLY-REPLICATED BETWEEN PROVIDERS
+    \end{nrtc}
+
+\item	EACH SERVICE PROVIDER MAINTAINS OWN PRIVATE SPACE
+    \begin{nrtc}
+    \item	(POSSIBLY) PRIVATE INFORMATION
+
+    \item	(RESTRICTIVE) ADMINISTRATIVE POLICIES
+
+    \item	AUTONOMOUSLY OPERATED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONTENTS OF ENTRIES IN THE SHARED SPACE}
+
+\begin{nrtc}
+\item	DAVs FOR RDNs
+
+\item	AVs FOR SEARCHING
+
+\item	NAMING LINKS
+
+\item	(POSSIBLY) MANAGEMENT INFORMATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING LINKS}
+
+\begin{nrtc}
+\item	USED AS POINTERS FROM SHARED SPACE TO PRIVATE SPACES
+\begin{quote}\begin{verbatim}
+namingLink ATTRIBUTE
+    WITH ATTRIBUTE-SYNTAX distinguishedNameSyntax
+    ::= { -- tbd -- }
+\end{verbatim}\end{quote}
+
+\item	AGENT ENTERS INTO PRIVATE AGREEMENT WITH PROVIDER
+    \begin{nrtc}
+    \item	TO ESTABLISH ENTRY IN SHARED SPACE
+
+    \item	AND NAMING LINK TO PRIVATE SPACE
+    \end{nrtc}
+
+\item	NAMING LINKS ARE ADDED/REMOVED ON THE BASIS OF SUBSEQUENT PRIVATE
+	AGREEMENTS BETWEEN AGENT AND VARIOUS PROVIDERS
+
+\item	BACK LINKS MIGHT PROVIDE INVERSE MAPPING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DUA OPERATION}
+
+\begin{nrtc}
+\item	WHEN AN INTERROGATION ALGORITHM YIELDS AN ENTRY WITH A NAMING LINK
+    \begin{nrtc}
+    \item	ASK USER IF NAMING LINK SHOULD BE FOLLOWED
+    \end{nrtc}
+    FOR FURTHER INFORMATION
+\end{nrtc}
+\end{bwslide}

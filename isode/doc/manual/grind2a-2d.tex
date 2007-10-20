@@ -1,0 +1,12 @@
+\File{grind2a\-2d.c},{22:20},{Jul  8 1989}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  ros\_lose (td)}}
+\L{\LB{\K{struct} TSAPdisconnect *td;}}
+\L{\LB{\{}}
+\L{\LB{    \K{if} (td \-\> td\_cc \> 0)}}
+\L{\LB{}\Tab{8}{fatal (\S{}\"TNetAccept: [\%s] \%*.*s\"\SE{}, TErrString (td \-\> td\_reason),}}
+\L{\LB{}\Tab{16}{td \-\> td\_cc, td \-\> td\_cc, td \-\> td\_data);}}
+\L{\LB{    \K{else}}}
+\L{\LB{}\Tab{8}{fatal (\S{}\"TNetAccept: [\%s]\"\SE{}, TErrString (td \-\> td\_reason));}}
+\L{\LB{\}}}

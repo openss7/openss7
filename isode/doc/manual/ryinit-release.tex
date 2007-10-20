@@ -1,0 +1,20 @@
+\File{ryinit\-release.c},{19:46},{Oct 14 1989}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{    \K{struct} AcSAPrelease acrs;}}
+\L{\LB{    \K{register} \K{struct} AcSAPrelease   *acr = \&acrs;}}
+\L{\LB{    \K{struct} AcSAPindication  acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPindication *aci = \&acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPabort *aca = \&aci \-\> aci\_abort;}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} (AcRelRequest (sd, ACF\_NORMAL, NULLPEP, 0, NOTOK, acr, aci) == NOTOK)}}
+\L{\LB{}\Tab{8}{acs\_adios (aca, \S{}\"A\-RELEASE.REQUEST\"\SE{});}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} (!acr \-\> acr\_affirmative) \{}}
+\L{\LB{}\Tab{8}{(\K{void}) AcUAbortRequest (sd, NULLPEP, 0, aci);}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"release rejected by peer: \%d\"\SE{}, acr \-\> acr\_reason);}}
+\L{\LB{    \}}}
+\ProcCont{if}\L{\LB{}}
+\L{\LB{    ACRFREE (acr);}}
+\L{\LB{}}
+\L{\LB{...}}

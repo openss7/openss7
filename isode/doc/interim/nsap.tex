@@ -1,0 +1,467 @@
+\documentstyle [ucl-rn] {article}
+\rnnumber{RN/89/13}
+\author {S.E. Kille}
+\date {February 1989}
+\title {An interim approach to use of Network Addresses}
+\begin {document}
+\bibliographystyle {alpha}
+\maketitle
+\begin {abstract} The OSI Directory specifies an encoding of
+Presentation Address, which utilises OSI Network Addresses as
+defined in the OSI Network Layer standards \cite{CCITT.Directory}
+\cite{ISO.Network.Naming}.
+The OSI Directory, and any OSI application
+utilising the OSI Directory must be able to deal with these Network
+Addresses.  Currently, most environments cannot cope with them.  It
+is not reasonable or desirable for groups wishing to investigate and
+use OSI Applications in conjunction with the OSI Directory to have
+to wait for the lower layers to sort out.  This note is a proposal
+for mechanisms to utilise Network Addresses in the context of
+existing networks, and is agreed for use in the THORN and ISODE projects.
+This document is also THORN document UCL-58.
+
+\end {abstract}
+
+\section {Scope}
+
+The Author is working on two projects with an immediate need for a
+solution to this problem:
+
+\begin {itemize}
+\item The THORN project, which is an Esprit Project building an OSI
+Directory \cite{THORN.ECW88}.
+
+\item The ISODE project \cite{ISODE.Manual}, and in particular the
+QUIPU directory being developed at UCL \cite{QUIPU.IFIP}.
+\end {itemize}
+
+The initial aim of the note is to specify a solution for these two
+projects.  As full interworking between these systems is seen as
+essential (to the author at least!), the same solution should be
+adopted by both projects.
+
+It is likely that other groups will encounter the same problem, and
+so it may be useful for this proposal to be adopted in a wider
+forum.
+
+\begin {description}
+\item[NOTE:] This document must be read in the context of ISO 8348 Addendum 2
+\cite{ISO.Naming}.
+\end {description}
+
+
+\section {The Problem}
+
+When utilising the OSI Directory, the OSI location of an End System
+will be determined by a Network Address, which is taken from a
+Presentation Address, looked up in the OSI Directory.   
+
+The ``real world'' of OSI (at least the one the author is in) consists of:
+
+\begin {itemize}
+\item An international X.25 network, which routes on the basis of
+X.121 addresses. By and large this is X.25(80), but some parts are
+now X.25(84) and will carry Network Addresses as user data.  OSI
+Transport is mapped onto the variant of X.25 which is to hand.
+
+\item Large private X.25 networks, which do not have DNICs, but are
+otherwise similar to the previous (in particular Janet). 
+
+\item Isolated networks running Connection Oriented Network Service
+(e.g., Pink Book Ethernets).
+
+\item Isolated networks running Connectionless Network Service
+(e.g., MAP LANs).
+
+\item Isolated TCP/IP LANs, utilising RFC 1006 to
+support the OSI Transport Service\cite{RFC-1006}.
+
+\item The DARPA/NSF Internet, also using RFC 1006.
+\end {itemize}
+
+In general, these systems need to be interconnected by the
+unfortunate mechanisms of transport bridging --- but this is another
+story.  It is hoped that the mechanisms described in this note will
+reduce the need for Transport Bridging, and make more of these
+networks behave as subnetworks (OSI Terminology).
+
+Where End Systems do have access to Network Service, there is no
+general mechanism for Network Address to SNPA binding (local table
+lookup is the norm).
+
+\section {The ``Right Solution''}
+
+Before diving into ugliness, it is worth noting briefly what the
+intended solution is.  Network Addresses are globally allocated, and
+do not imply anything about routing or location.  An End System is
+attached to one or more subnetworks at Subnetwork Points of
+Attachment (SNPAs).  Intermediate Systems join subnetworks, again
+being attached at SNPAs.  Routing is achieved by repeated binding of
+Network Address to SNPA (initially at the Originating End System,
+and then at each Intermediate System).  This binding is achieved by
+use of a directory service\footnote{The OSI Directory is almost
+certainly inappropriate for this function --- a special purpose
+network directory is needed.}. 
+
+The rest of this section is a polemic --- mainly to make the author
+feel better.  Network Addresses have been designed for general
+purpose allocation.  Whilst this is one important characteristic of
+a Network Address, others have been entirely neglected.  The
+practicalities of routing and lookup in directory service appear to
+have been ignored in the design.  The issue of building the
+mechanisms for routing are being discussed as some sort of
+afterthought.  This is sad, and it seems to the author that the
+network address specification will need to be entirely rewritten
+before large scale OSI can become a reality.  
+
+\section {The General Approach Proposed}
+
+The means of connecting to a remote Application Entity is broadly as
+follows.  
+
+\begin {enumerate}
+\item Look up the Application Entity in the OSI Directory to obtain
+the Presentation Address \footnote{Strictly an Application Entity
+should have only one Presentation Address.  In practice it may have
+several, and the network addresses of each Presentation Address
+should be considered.}.
+
+\item Take each Network Address, and determine if it can be used
+(and how).
+
+\item Determine an order of preference for the Network Addresses.
+
+\item Attempt to connect to one or more of the Network Addresses.
+\end {enumerate}
+
+This note is concerned with the second step, and will probably have
+implications on the third.  The following mechanisms for Network
+Address are discussed in this note:
+
+\begin {itemize}
+\item X.121 form
+\item A special encoding for networks which do not provide Network
+Service.
+\item Other forms
+\end {itemize}
+
+\section {X.121 Form}
+
+In principle, the IDP is only an allocation mechanism, and has no
+routing implications.  However, due to the lack of a network
+directory service, it is recommended that any End System with
+Connection Oriented Network Service and access to the international
+X.25 service uses X.121 form relative to its access point.
+Allocation of DSP is a private issue.  
+
+Conversely it is recommended that if an X.121 IDP form Network
+Address is interpreted, then the X.121 address will provide a route (by
+defining an SNPA on the international X.25 network).
+There may be additional and perhaps preferable routes which can be
+determined by private means.  
+
+If the DSP is absent, the form should be interpreted as implying a mapping
+of Transport onto X.25(80).   
+
+\section {Requirements}
+
+The requirements for use of OSI over existing networks, when using the
+OSI Directory are:
+
+\begin {enumerate}
+\item The information for the layers below Transport must be
+obtained from the Network Address.  This is essential, because we
+wish to use the OSI Directory in a standard manner, and the Network
+Address is the information available.
+
+\item The Network Addresses must be globally unique, as they can be
+looked up by anyone with access to the Directory.
+
+\item The Network Address should be allocated so that confusion with
+a ``real'' Network Address is minimal.
+
+\item Network Addresses must be interpretable on the basis of a
+well known information, or on information which can be obtained from
+the (application level) OSI Directory.
+
+\item The identity of the network in question must be deduceable from
+the Network Address
+
+\item All network specific addressing information (including the
+SNPA) must be deducible
+from the Network Address
+\end {enumerate}
+
+\section {Proposal}
+
+The following approach is proposed.  
+
+\begin {itemize}
+\item A (sub)network is identified by the IDP and a {\em small} part of
+the DSP.
+
+\item The remainder of the DSP encodes network specific information
+
+\item It is suggested that the following IDPs are not used:
+\begin {itemize}
+\item Local (the values must be globally unique)
+\item X.121 (because it will be confused with real Network Addresses)
+\item DCC (because it seems like a bad move)
+\end {itemize}
+
+\item It is suggested that a Telex form IDP is used because:
+\begin {itemize}
+\item It gives the largest DSP
+\item It is less likely than other forms to be used for ``real''
+Network Addresses
+\end {itemize}
+
+\end {itemize}
+
+The scope of the proposed encoding is where:
+
+\begin {itemize}
+\item The value of the IDP is recognised
+\item The encoding of the DSP is abstract decimal
+\item The first two digits of the DSP are recognised
+\end {itemize}
+
+In these cases, the IDP + 2 digit prefix identify a subnetwork in which the
+value of the DSP is to be interpreted.
+
+\section {The DSP Encoding}
+
+It is proposed to use a decimal abstract encoding for the DSP.  This
+is a new encoding, as the only alternative on the table (ECMA 117)
+\cite{ECMA.117},
+is not entirely suitable.  Use of a binary
+encoding, with the DSP structured in ASN.1 would have been a very
+attractive approach.  However, it appears that there is insufficient
+space in the Network Address for this to be feasible.  
+
+The following structure is proposed:
+
+\begin {center}
+\begin {tabular}{|l||c|c|}
+\hline
+Digit   & 1-2     & 3-27 \\
+\hline
+Meaning  & Prefix & Network Specific \\
+\hline
+\end {tabular}
+\end {center}
+
+\begin {description}
+\item [2 digits] Prefix.  This allows for multiple usage of the same DSP, by
+not consuming it all.  It also allows for the DSP to be used with different
+encodings.
+
+\item [Network Specific]
+
+The network specific allocation should be less than 20 digits if
+this DSP structure is to be used with any IDI format.  This is
+increased to 27 for the Telex format.
+
+
+\end {description}
+
+\subsection {X.25(80) Allocation}
+
+The IDP/Prefix identifies an X.25(80) subnetwork.
+There is a need to represent a DTE Number, and optionally an X.25
+Protocol ID or CUDF (many implementations require these due 
+to shortage of X.121 address space) in the DSP.
+This is structured in one of two possible ways:
+
+\begin {center}
+\begin {tabular}{|l||c|c|}
+\hline
+Digit   & 1 & Remainder \\
+\hline 
+Meaning  & 0 & DTE \\
+\hline
+\end {tabular}
+\end {center}
+
+
+\begin {center}
+\begin {tabular}{|l||c|c|c|c|}
+\hline
+Digit   & 1  & 2 & 3 -- (n*3)+2 & Remainder \\
+\hline
+Meaning   & 1 or 2 & n  &  PID or CUDF & DTE \\
+\hline
+\end {tabular}
+\end {center}
+
+The network specific part is structured as follows:
+
+\begin {description}
+\item [1]  This has the following values
+\begin {description}
+\item [0] DTE only
+\item [1] DTE + PID 
+\item [2] DTE + CUDF 
+\item [3-9] Reserved
+\end {description}
+
+\item[2]
+
+The length of the PID/CUDF in octets
+
+\item [Remainder] The PID/CUDF takes as many digits as indicated by
+3 times octet 2, and the DTE is terminated by the end of the Network Address.
+Each octet of the PID/CUDF is encoded as three decimal digits, representing
+the decimal value of the octet.
+
+\item 
+\end {description}
+
+For example, the JANET DTE 000005111600 with ASCII CUDF ``12'' would be
+encoded in the following way.  The first lines describe the abstract
+notation.  Note that where the IDI is not of maximum length, that the
+translation to concrete decimal is not mechanical
+
+\begin {center}
+\begin {small}
+\begin {tabular}{|l||c|c|c|c|c|c|}
+\hline
+Part & \multicolumn{2}{c|}{IDP} &  \multicolumn{4}{c|}{DSP} \\
+\hline
+Component & AFI & IDI & Prefix & Dte+Cudf & Len & CUDF + DTE  \\
+\hline
+Octet & & & 1-2 & 3 & 4 & 5-20 \\
+\hline
+Value & Telex & 007 28722 & 02 & 2 & 2 &  049050 000005111600 \\
+\hline
+\hline
+Cncrt Decimal & 54  & 007 28722 & 02 & 2 & 2 &  049050 000005111600 \\
+\hline
+Cncrt Binary & 54 & 00 72 87 22 & 02 & \multicolumn{2}{c|}{22} & 04 90 50
+ 00 00 51 11 60 0f \\
+\hline
+\end {tabular}
+\end {small}
+\end {center}
+
+Note that concrete binary is representing octets in hexadecimal.  This is
+the syntax most likely to be used in practice.
+
+\subsection {TCP/IP (RFC 1006) Allocation}
+
+
+The IDP and 2 digit prefix identifies a TCP/IP network here RFC 1006 is
+applied.
+It is necessary to use an IP Address, as there are insufficient bits
+to fit in a domain.  It is structured as follows:
+
+\begin {center}
+\begin {tabular}{|l||c|c|c|}
+\hline
+Digit & 1-12 & 13-17 (optional) & 18-22 (optional) \\
+\hline
+Meaning  & IP Address & port & Transport Set \\
+\hline
+\end {tabular}
+\end {center}
+
+
+For TCP/IP there shall be a 20 digit long network-specific part.  First
+12 digits are for the IP address.  The port number can be upto 65535, and
+needs 5 digits (this is optional, and is defaulted as defined in RFC 1006).
+Finally,
+there is a third part to the address, which is defined here as 
+``transport set''
+that indicates what kind of IP-based transport protocols is used.
+This is a decimal number from 0-65535 which is really a 16-bit flag
+word.  1 is TCP, 2 is UDP.  If the transport set is not there or
+no bits are set, it means ``default'' which is TCP.  This is
+encoded in 5 digits.
+
+
+
+Note that RFC 986 is not appropriate \cite{RFC-986}, as this currently applies to a
+different architecture (we are considering RFC 1006 here).
+
+
+For example, the IP Address 10.0.0.6 with port 9 over UDP is
+encoded as:
+
+\begin {center}
+\begin {small}
+\begin {tabular}{|l||c|c|c|c|c|c|}
+\hline
+Part & \multicolumn{2}{c|}{IDP} &  \multicolumn{4}{c|}{DSP} \\
+\hline
+Component & AFI & IDI & Prefix & IP Address & Port & T Set \\
+\hline
+Octet & & & 1-2 & 3-14 & 15-19 & 20-24 \\
+\hline
+Value & Telex & 007 28722 & 03 & 010 000 000 006 & 00009 & 00002 \\
+\hline
+\hline
+Concrete Decimal & 54 & 007 28722 & 03 & 010 000 000 006 & 00009 & 00002 \\
+\hline 
+Concrete Binary & 54 & 00 72 87 22 & 03 & 01 00 00 00 00 06 & 00 00 9 & 0 00 02 \\
+\hline
+\end {tabular}
+\end {small}
+\end {center}
+
+
+\section {Other Forms}
+
+Recognition of other forms of address is a local matter.
+
+\section {Transport Bridges}
+
+The provision of this form of Network Address encoding will
+facilitate the transparent use of Transport Bridges.  Whenever a
+protocol is used which can carry the Network Address, this can be
+used to contact a transport bridge as if it was the end system
+\footnote{This suggests that it would be beneficial to extend RFC
+1006 to carry Network Addresses.}.
+The hex (concrete) form of network address should be used.
+
+\section {Encoding}
+
+This document describes allocation of Network Addresses, with the DSP
+considered in Abstract Decimal.  The encoding of this for use in protocols
+(typically as Concrete Binary) is
+described in 
+ISO 8348 Addendum 2
+\cite{ISO.Network.Naming}.
+
+\section {Conclusions}
+
+This is all pretty horrible, but there do not appear to be any
+better choices.
+
+\section {References}
+
+\bibliography {../../../bib/sek}
+\pagebreak
+\appendix 
+\section {Some initial Allocations}
+
+This appendix gives some allocations for a few well known networks.
+All are allocated on the basis of Telex numbers.  
+
+\begin {center}
+\begin {tabular}{|l|	ll|}
+\hline
+\multicolumn{1}{|c}{Net} &
+\multicolumn{1}{c}{Telex} &
+\multicolumn{1}{c|}{Prefix} \\
+\hline
+International X.25  & 007 28722 & 01 \\
+Janet & 007 28722 & 02 \\
+Darpa/NSF Internet  & 007 28722 & 03 \\
+\hline
+\end {tabular}
+\end {center}
+
+The international X.25 allocation is only used where a CUDF or PID is needed.
+In other cases, an X.121 form Network Address with no DSP may be used.
+
+\end {document}

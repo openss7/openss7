@@ -1,0 +1,32 @@
+% run this through LaTeX with the appropriate wrapper
+
+\documentstyle[11pt]{article}
+
+\advance\textwidth by0.75in
+\advance\oddsidemargin by-0.375in
+\advance\evensidemargin by-0.375in
+
+\pagestyle{empty}
+
+\bibcite{ISO.TP.Service}{ISO85b}
+\bibcite{TCP}{DDN81c}
+
+\begin{document}
+
+\input figure2-1
+\centerline{\box\graph}
+\vspace{1in}
+\begin{center}
+Figure 1: Comparison of the Protocol Stacks
+\end{center}
+
+\newpage
+
+\input figure3-1
+\centerline{\box\graph}
+\vspace{2in}
+\begin{center}
+Figure 2: OSI Transport Services on top of the TCP
+\end{center}
+
+\end{document}

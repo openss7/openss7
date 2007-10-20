@@ -1,0 +1,17 @@
+\File{figureB\-14.c},{11:21},{May  5 1990}
+\L{\LB{    \K{else} \{}}
+\L{\LB{}\Tab{8}{\K{struct} type\_MODULE\_parameter *parm;}}
+\L{\LB{}}
+\L{\LB{\C{}\/* allocate and initialize ``parm\'\' here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{if} (RyDsError (sd, rox \-\> rox\_id, error\_MODULE\_error1, (caddr\_t) parm,}}
+\L{\LB{}\Tab{16}{       ROS\_NOPRIO, roi) == NOTOK)}}
+\L{\LB{}\Tab{8}{    ros\_adios (\&roi \-\> roi\_preject, \S{}\"ERROR\"\SE{});}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{free\_MODULE\_parameter (parm);}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \C{}\/* ``arg\'\' will be automatically free\'d when op\_name returns *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}

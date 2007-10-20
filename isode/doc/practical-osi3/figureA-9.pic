@@ -1,0 +1,28 @@
+.PS 4.75i
+.ps 20
+## figure A-9
+lineht	=	2*lineht
+##
+C1:	circle invis "iso(1)"
+	line from C1.n to (C1.n.x, C1.n.y+lineht/2)
+##
+C2:	circle invis "standard(0)" with .c at (C1.c.x-3*linewid/2, C1.c.y-lineht)
+	line from C1.s to C2.n
+C3:	circle invis "$\cdots$" with .c at (C1.c.x+3*linewid/2, C1.c.y-lineht)
+	line from C1.s to C3.n
+##
+C6:	circle invis "$\cdots$" with .c at (C2.c.x-3*linewid/2, C2.c.y-lineht)
+	line from C2.s to C6.n
+C7:	circle invis "ftam(8571)" with .c at (C2.c.x+3*linewid/2, C2.c.y-lineht)
+	line from C2.s to C7.n
+##
+D2:	circle invis "application-context(1)" with .c at (C7.c.x-9*linewid/2, C7.c.y-lineht)
+	line from C7.s to D2.n
+D3:	circle invis "" with .c at (C7.c.x-3*linewid/2, C7.c.y-lineht)
+D4:	circle invis "" with .c at (C7.c.x+3*linewid/2, C7.c.y-lineht)
+D5:	circle invis "abstract-syntax(2)" with .c at (C7.c.x+9*linewid/2, C7.c.y-lineht)
+	line from C7.s to D5.n
+##
+lineht	=	lineht/2
+##
+.PE

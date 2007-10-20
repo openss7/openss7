@@ -1,0 +1,816 @@
+% run this through SLiTeX with the appropriate wrapper
+
+\dotopic	{UPPER LAYER INFRASTRUCTURE}
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]	APPLICATION SERVICE ELEMENTS
+
+\item[PART II:]	PRESENTATION ABSTRACTIONS
+
+\item[PART III:] DEFINING A NEW SERVICE
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{APPLICATION SERVICE ELEMENTS}\bf
+
+\begin{nrtc}
+\item	ASSOCIATION CONTROL (ACSE)
+
+\item	RELIABLE TRANSFER (RTSE)
+
+\item	REMOTE OPERATIONS (ROSE)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{ASSOCIATION CONTROL (ACSE)}\bf
+
+\begin{nrtc}
+\item	USED BY \emph{ALL} OSI APPLICATIONS TO PERFORM ASSOCIATION
+	ESTABLISHMENT AND RELEASE
+
+\item	ALL OSI APPLICATIONS DEFINE HOW THE ACSE IS USED
+
+\item	ONLY THE ACSE INVOKES PRESENTATION CONNECTION ESTABLISHMENT AND
+	RELEASE SERVICES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BINDING SERVICE}
+
+\begin{nrtc}
+\item	AN ASSOCIATION \emph{BINDS} AN INITIATOR TO A RESPONDER
+    \begin{nrtc}
+    \item	TYPICALLY FOR A CONSUMER/PROVIDER MODEL
+    \end{nrtc}
+
+\item	BINDING IS TWO-STEP:
+    \begin{nrtc}
+    \item	MAP SERVICE ONTO AVAILABLE ENTITIES
+	\begin{nrtc}
+	\item	 (VIA DIRECTORY SERVICE)
+	\end{nrtc}
+
+    \item	SELECT ENTITY BASED ON COMMUNICATIONS REQUIREMENTS
+	\begin{nrtc}
+	\item	 (VIA TRANSPORT SERVICE)
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{(AT LEAST)\\ THREE WAYS OF DOING FIRST MAPPING}
+
+\begin{nrtc}
+\item	VIA OSI DIRECTORY USING DAP
+
+\item	VIA OSI DIRECTORY USING USER-FRIENDLY NAMESERVICE
+
+\item	VIA STUB DIRECTORY (LOCAL TABLE)
+\end{nrtc}
+\begin{quote}\small\begin{verbatim}
+AEI    aei;
+struct PSAPaddr *pa;
+
+char *designator = user_typein;
+char *qualifier = "filestore";
+char *context = "iso ftam";
+
+if ((aei = _str2aei (designator, qualifier, context,
+                     isatty (fileno (stdin)))) == NULLAEI)
+    error ("unable to resolve service: %s", PY_pepy);
+
+if ((pa = aei2addr (aei)) == NULLPA)
+    error ("address translation failed");
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION ENTITY INFORMATION}
+
+\begin{quote}\small\begin{verbatim}
+typedef struct AEInfo {
+    PE      aei_ap_title;
+    PE      aei_ae_qualifier;
+
+    int     aei_ap_id;
+    int     aei_ae_id;
+
+    int     aei_flags;
+#define AEI_NULL        0x00
+#define AEI_AP_ID       0x01
+#define AEI_AE_ID       0x02
+}       AEInfo, *AEI;
+#define NULLAEI         ((AEI) 0)
+
+#define AEIFREE(aei)     ...
+
+AEI     _str2aei ();
+char   *sprintaei ();
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION ENTITY INFORMATION (cont.)}
+
+\begin{nrtc}
+\item	SEE IF TAILORING VARIABLE \verb"ns_enable" IS ON
+    \begin{nrtc}
+    \item	IF SO, USE DIRECTORY TO RESOLVE NAME
+    \end{nrtc}
+    ON FAILURE, CONTINUE
+
+\item	SEE IF COMPILE-TIME OPTION \verb"NOSTUB" IS OFF
+    \begin{nrtc}
+    \item	IF SO, USE STUB DIRECTORY TO RESOLVE NAME
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OSI DIRECTORY SUPPORT FOR NAMING}
+
+\begin{nrtc}
+\item	A DISTINGUISHED NAME (DN) IS AN ASN.1 OBJECT CONSISTING OF
+    \begin{nrtc}
+    \item	A SEQUENCE OF ATTRIBUTE/VALUE PAIRS
+    \end{nrtc}
+    IMPLYING A SUPERIOR/SUBORDINATE RELATIONSHIP, e.g.,
+\begin{quote}\small\begin{verbatim}
+countryName            = US
+organizationName       = Performance Systems International
+commonName             = nisc
+commonName             = filestore
+\end{verbatim}\end{quote}
+REFERS TO AN INFORMATION OBJECT IN THE OSI DIRECTORY
+
+\item	SO FIRST STEP IS TO FIND DISTINGUISHED NAME
+    \begin{nrtc}
+    \item	USE THIS AS AP-TITLE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISOALIASES FILE}
+
+\begin{nrtc}
+\item	ENTRIES ARE PREFIXES OF DISTINGUISHED NAMES
+\begin{quote}\small\begin{verbatim}
+nisc     "c=US@o=Performance Systems International@cn=nisc"
+\end{verbatim}\end{quote}
+
+\item	A SIMPLE-MINDED APPROACH:
+    \begin{nrtc}
+    \item	CONSTRUCT DN FROM LOCAL KNOWLEDGE
+    \end{nrtc}
+
+\item	USER SUPPLIES DESIGNATOR, APPLICATION SUPPLIES QUALIFIER
+    \begin{nrtc}
+    \item	e.g., FOR \verb"ftam nisc" 
+    \end{nrtc}
+    DESIGNATOR IS \verb"nisc" AND QUALIFIER IS \verb"filestore"
+
+\item	ENTRIES IN \verb"isoaliases" ARE DESIGNATOR PREFIX PAIRS
+
+\item	AND APPEND \verb"cn="QUALIFIER
+
+\item	THIS YIELDS THE \verb"AEI":
+\begin{quote}\small\begin{verbatim}
+c=US@o=Performance Systems International@cn=nisc@cn=filestore
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NEXT STEP IS TO TALK TO THE DIRECTORY}
+
+\begin{nrtc}
+\item	DAP READ OF \verb"presentationAddress" IS PERFORMED
+
+\item	IF READ FAILS, THEN CALL TO \verb"aei2addr" WILL FAIL
+
+\item	CALL \verb"set_lookup_dap (flag);" TO SELECT THE DAP
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN ALTERNATE APPROACH:\\ USER-FRIENDLY NAMESERVICE}
+
+\begin{nrtc}
+\item	NEW WORK IS USING KILLE'S USER-FRIENDLY NAMING SCHEME, e.g.,
+\begin{quote}\small\begin{verbatim}
+% ftam "cs, ucl, gb"
+\end{verbatim}\end{quote}
+
+\item	NAMES ARE ORDERED, UNTYPED, AND (POSSIBLY) INCOMPLETE, e.g.,
+\begin{quote}\small\begin{verbatim}
+kille, ucl, gb
+kille, cs, ucl, gb
+\end{verbatim}\end{quote}
+	MIGHT RESOLVE TO THE SAME DISTINGUISHED NAME
+
+\item	ALGORITHM USES IMPRECISE MATCHING AND ASSIGNS ``GOODNESS'' LEVEL TO
+	MATCHES
+
+\item	USERS ARE QUERIED FOR ASSISTANCE ON QUESTIONABLE MATCHES
+    \begin{nrtc}
+    \item	(IF APPLICATION IS INTERACTIVE)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{USER-FRIENDLY NAMESERVICE (cont.)}
+
+\begin{nrtc}
+\item	ENTRIES IN \verb"isoaliases" ARE USER-FRIENDLY STRINGS,
+	e.g.,
+\begin{quote}\small\begin{verbatim}
+psi    "performance systems international, us"
+\end{verbatim}\end{quote}
+
+\item	ALGORITHM IS USED TO FIND ENTRIES WITH APPROPRIATE
+	\verb"supportedApplicationContext", e.g.,
+\begin{quote}\small\begin{verbatim}
+1.0.8571.1. -- "iso ftam"
+\end{verbatim}\end{quote}
+	SO
+\begin{quote}\small\begin{verbatim}
+ftam "performance systems international, us"
+\end{verbatim}\end{quote}
+	MIGHT YIELD
+\begin{quote}\small\begin{verbatim}
+c=US@o=Performance Systems International@cn=nisc@cn=filestore
+\end{verbatim}\end{quote}
+
+\item	NEXT STEP IS TO PERFORM DAP READ OF \verb"presentationAddress"
+
+\item	IF READ FAILS, THEN CALL TO \verb"aei2addr" WILL FAIL
+
+\item	CALL \verb"set_lookup_ufn (flag);" TO SELECT THE UFN
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {SPLIT-MODEL FOR NAMESERVICE}
+
+\begin{nrtc}
+\item	THE DEFAULT IS TO TALK TO A PROGRAM CONTAINING THE UFN
+
+\item	SET TAILORING VARIABLE \verb"ns_address" TO ADDRESS OF PROGRAM,
+	e.g.,
+\begin{quote}\small\begin{verbatim}
+Internet=localhost+17006
+\end{verbatim}\end{quote}
+
+\item	THIS IS STRICTLY A LOCAL ISSUE
+\end{nrtc}
+\vskip.5in
+\diagram[p]{figureH-3}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STUB DIRECTORY SUPPORT FOR NAMING}
+
+\begin{nrtc}
+\item	THE \verb"isoentities" FILE IS USED TO MAP A D/Q PAIR INTO AE INFO
+\begin{quote}\small\begin{verbatim}
+default    filestore    1.17.4.0.16    #259/
+
+hubris     default      1.17.4.3.2.5.0 \
+           Int-X25(80)=23421920030047|Internet=128.16.8.3
+
+osi        Z39.50       1.17.4.3.32.1.1 \
+           #1025/Internet=osi.nyser.net
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STUB DIRECTORY SUPPORT FOR NAMING}
+
+\begin{nrtc}
+\item	FIRST TRY FOR EXACT D/Q MATCH
+
+\item	IF NOT, TRY FOR
+    \begin{nrtc}
+    \item	D/\verb"default" TO GET NETWORK ADDRESSES
+
+    \item	\verb"default"/Q TO GET SELECTORS
+    \end{nrtc}
+
+\item	IF NOT, TRY FOR
+    \begin{nrtc}
+    \item	INTUITITION OF NETWORK ADDRESS FROM DESIGNATOR
+
+    \item	\verb"default"/Q TO GET SELECTORS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{RELIABLE TRANSFER}\bf
+
+\begin{nrtc}
+\item	TWO STYLES OF INTERACTION
+    \begin{nrtc}
+    \item	X.400(84) RTS
+
+    \item	RTSE
+    \end{nrtc}
+
+\item	PLUS INCREMENTAL READING/WRITING OF USER-DATA
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{X.400(84) RTS}
+
+\begin{quote}\small\begin{verbatim}
+int     RtBeginRequest (called, mode, turn, data, rtc, rti);
+
+int     RtBInit (vecp, vec, rts, rti);
+int     RtBeginResponse (sd, status, data, rti);
+
+int     RtEndRequest (sd, rti);
+int     RtEndResponse (sd, rti);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RTSE}
+
+\begin{quote}\small\begin{verbatim}
+int     RtOpenRequest (mode, turn, context, callingtitle, calledtitle,
+                       callingaddr, calledaddr, ctxlist, defctxname,
+                       data, qos, rtc, rti);
+
+int     RtInit (vecp, vec, rts, rti);
+int     RtOpenResponse (sd, status, context, respondtitle, respondaddr,
+                        ctxlist, defctxresult, data, rti);
+
+int     RtCloseRequest (sd, reason, data, acr, rti);
+int     RtCloseResponse (sd, reason, data, rti);
+
+int     RtUAbortRequest (sd, data, rti);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GENERIC CALLS}
+
+\begin{quote}\small\begin{verbatim}
+int     RtPTurnRequest (sd, priority, rti);
+int     RtGTurnRequest (sd, rti);
+
+int     RtTransferRequest (sd, data, secs, rti);
+
+int     RtWaitRequest (sd, secs, rti);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INCREMENTAL WRITING OF USER-DATA}
+
+\begin{quote}\small\begin{verbatim}
+int     RtSetDownTrans (sd, fnx, rti);
+
+/* get octets from user */
+result = (*fnx) (fd, char **base, int *len, size, ssn, ack, rti);
+/* on failure do ACTIVITY DISCARD */
+
+/* tell user of PLEASE */
+result = (*fnx) (fd, NULLVP, NILLIP, priority, 0, 0, rti);
+/* on failure do ACTIVITY INTERRUPT */
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INCREMENTAL READING OF USER-DATA}
+
+\begin{quote}\small\begin{verbatim}
+int     RtSetUpTrans (sd, fnx, rti);
+
+/* user-data */
+result = (*fnx) (fd, SI_DATA, qb, rti);
+
+/* synchronization */
+result = (*fnx) (fd, SI_SYNC, pn, rti);
+
+/* activity start, end */
+result = (*fnx) (fd, SI_ACTIVITY, pv, rti);
+/* on failure do user-exception */
+
+/* activity interrupt, discard */
+(void)   (*fnx) (fd, SI_ACTIVITY, pv, rti);
+
+/* exception report */
+(void)   (*fnx) (fd, SI_REPORT, pp, rti);
+
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{REMOTE OPERATIONS}\bf
+
+\begin{nrtc}
+\item	THREE STYLES OF INTERACTION
+    \begin{nrtc}
+    \item	X.400(84) ROS
+
+    \item	ECMA ROS
+
+    \item	ROSE
+    \end{nrtc}
+
+\item	USE \verb"RoSetService (sd, bfunc, roi)" TO INDICATE WHICH
+    \begin{nrtc}
+    \item	\verb"RoRtService" ROS(E) OVER RTS(E)
+
+    \item	\verb"RoPService" ROSE OVER PRESENTATION
+
+    \item	\verb"RoPService" ROS OVER SESSION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ECMA ROS}
+
+\begin{quote}\small\begin{verbatim}
+int     RoBeginRequest (called, data, roc, roi);
+
+int     RoInit (vecp, vec, ros, roi);
+int     RoBeginResponse (sd, status, data, roi);
+
+int     RoEndRequest (sd, priority, roi);
+int     RoEndResponse (sd, roi);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{PRESENTATION ABSTRACTIONS}\bf
+
+\begin{nrtc}
+\item	PRESENTATION ELEMENTS
+
+\item	PRESENTATION STREAMS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{PRESENTATION ELEMENTS}\bf
+
+\begin{nrtc}
+\item	AN INTERNAL FORM FOR AN INSTANCE OF A TYPE DESCRIBED BY ABSTRACT
+	SYNTAX
+
+\item	CAN REPRESENT ANY ASN.1 TYPE AS EITHER
+    \begin{nrtc}
+    \item	A STRING OF OCTETS OR BITS
+
+    \item	A LINKED-LIST OF PRESENTATION ELEMENTS
+    \end{nrtc}
+
+\item	VIEWED AT TWO LEVELS:
+    \begin{nrtc}
+    \item	RAW (INTERNAL)
+
+    \item	COOKED (OPAQUE)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONVERSION ROUTINES}
+
+\begin{nrtc}
+\item	DEFINE C STRUCTURE EQUIVALENT TO ASN.1 TYPE:
+\begin{quote}\small\begin{verbatim}
+typedef int integer;
+\end{verbatim}\end{quote}
+
+\item	STRUCTURE TO PE:
+\begin{quote}\small\begin{verbatim}
+PE      num2prim (i, class, id);
+\end{verbatim}\end{quote}
+\verb"NULLPE" RETURNED ON ERROR
+
+\item	PE TO STRUCTURE:
+\begin{quote}\small\begin{verbatim}
+integer prim2num (pe);
+\end{verbatim}\end{quote}
+DISTINGUISHED VALUE RETURNED ON ERROR
+    \begin{nrtc}
+    \item	(CHECK \verb"pe_errno" FOR REASON)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{UTILITY ROUTINES}
+
+\begin{quote}\small\begin{verbatim}
+PE      pe_alloc (class, form, id);
+int     pe_free (pe);
+
+int     pe_cmp (p, q);
+PE      pe_cpy (pe);
+
+int     pe_pullup (pe);      /* for experts */
+
+PE      pe_expunge (pe, r);  /*   .. */
+int     pe_extract (pe, r);  /*   .. */
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{QBUFs}
+
+\begin{quote}\small\begin{verbatim}
+PE      qb2prim_aux (qb, class, id, in_line);
+struct qbuf *prim2qb ();
+
+char   *qb2str (q);
+struct qbuf *str2qb (s, len, head);
+
+int     qb_pullup (qb);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBJECT IDENTIFIERS}
+
+\begin{quote}\small\begin{verbatim}
+typedef struct OIDentifier {
+    int     oid_nelem;  /* number of sub-identifiers */
+
+    unsigned int *oid_elements;
+              /* the (ordered) list of sub-identifiers */
+}                       OIDentifier, *OID;
+#define NULLOID ((OID) 0)
+
+PE      obj2prim (o, class, id);
+OID     prim2oid (pe);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBJECT IDENTIFIERS (cont.)}
+
+\begin{quote}\small\begin{verbatim}
+int     oid_cmp (p, q);
+OID     oid_cpy (p);
+OID     oid_free (oid);
+
+char   *sprintoid (p);
+OID     str2oid (s);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{PRESENTATION STREAMS}\bf
+
+\begin{nrtc}
+\item	MAPS PEs TO/FROM DIFFERENT INPUT-OUTPUT ABSTRACTIONS, e.g.,
+    \begin{nrtc}
+    \item	in-core buffers;
+
+    \item	\unix/ FILES;
+
+    \item	OSI services (e.g., SESSION);
+
+    \item	non-OSI services (e.g., UDP).
+    \end{nrtc}
+
+\item	TWO PARTS:
+    \begin{nrtc}
+    \item	A UNIFORM FRONT-END
+
+    \item	ONE OF SEVERAL DOMAIN-SPECIFIC BACK-ENDs
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FRONT-END}
+
+\begin{quote}\small\begin{verbatim}
+PS      ps_alloc (io);
+void    ps_free (ps);
+
+int     ps_flush (ps);
+int     ps_prime (ps);
+
+PE      ps2pe (ps);
+int     pe2ps (ps, pe);
+
+PE      pl2pe (ps);
+int     pe2pl (ps, pe);
+
+int     ps_get_abs (pe);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BACK-ENDs}
+
+\begin{nrtc}
+\item   STDIO:
+\begin{quote}\small\begin{verbatim}
+int     std_open (ps);
+int     std_setup (ps, fp);
+\end{verbatim}\end{quote}
+
+\item   STRINGs:
+\begin{quote}\small\begin{verbatim}
+int     str_open (ps);
+int     str_setup (ps, cp, cc, in_line);
+\end{verbatim}\end{quote}
+
+\item   DATAGRAMs:
+\begin{quote}\small\begin{verbatim}
+int     dg_open (ps);
+int     dg_setup (ps, fd, size, rfx, wfx);
+\end{verbatim}\end{quote}
+
+\item   FULL-DUPLEX FDs:
+\begin{quote}\small\begin{verbatim}
+int     fdx_open (ps);
+int     fdx_setup (ps, fd);
+\end{verbatim}\end{quote}
+
+\item   QBUFs (INPUT ONLY):
+\begin{quote}\small\begin{verbatim}
+int     qbuf_open (ps);
+int     qbuf_setup (ps, qb);
+\end{verbatim}\end{quote}
+
+\item   UDVECs (OUTPUT ONLY):
+\begin{quote}\small\begin{verbatim}
+int     uvec_open (ps);
+int     uvec_setup (ps, len);
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{DEFINING A NEW SERVICE}\bf
+
+\begin{nrtc}
+\item	THINGS TO BE DEFINED:
+    \begin{nrtc}
+    \item	ABSTRACT SYNTAX
+
+    \item	APPLICATION CONTEXT NAME
+
+    \item	APPLICATION ENTITY TITLE
+
+    \item	PRESENTATION ADDRESS
+
+    \item	LOCAL PROGRAM
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ABSTRACT SYNTAX}
+
+\begin{nrtc}
+\item	DESCRIBES THE DATA STRUCTURES BEING EXCHANGED BY THE SERVICE
+
+\item	DEFINED IN THE \verb"isobjects" FILE:
+\begin{verbatim}
+"ftam pci"                 1.0.8571.2.1
+\end{verbatim}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION CONTEXT NAME}
+
+\begin{nrtc}
+\item	DESCRIBES THE ELEMENTS AND PROTOCOL BEING USED BY THE SERVICE
+
+\item	DEFINED IN THE \verb"isobjects(5)" FILE:
+\begin{verbatim}
+"iso ftam"                1.0.8571.1.1
+\end{verbatim}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION ENTITY TITLE}
+
+\begin{nrtc}
+\item	APPLICATION ENTITY TITLE UNIQUELY NAMES AN ENTITY IN THE NETWORK
+
+\item	IF AET TO BE KNOWN TO THE OSI DIRECTORY
+    \begin{nrtc}
+    \item	CHOOSE DISTINGUISHED NAME
+
+    \item	CREATE \verb"applicationEntity" OBJECT
+
+    \item	POSSIBLY UPDATE \verb"isoaliases" FILE
+    \end{nrtc}
+
+\item	IF AET TO BE KNOWN TO THE STUB DIRECTORY
+    \begin{nrtc}
+    \item	ADD ENTRY TO \verb"isoentities" FILE:
+    \end{nrtc}
+\begin{quote}\small\begin{verbatim}
+hubris      filestore   1.17.4.4.1.1     ...
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PRESENTATION ADDRESS}
+
+\begin{nrtc}
+\item	PRESENTATION ADDRESS LOCATES AN ENTITY IN THE NETWORK
+
+\item	DETERMINE ADDRESSES FOR LISTENING
+    \begin{nrtc}
+    \item	(USUALLY UNDER \verb"tsapd")
+    \end{nrtc}
+    AND CHOOSE UNIQUE TRANSPORT SELECTOR
+
+\item	STORE ADDRESS EITHER IN
+    \begin{nrtc}
+    \item	OSI DIRECTORY (AS \verb"presentationAddress" ATTRIBUTE)
+
+    \item	STUB DIRECTORY (as FOURTH TOKEN IN ENTRY)
+\begin{quote}\small\begin{verbatim}
+hubris      filestore   1.17.4.4.1.1     ...
+\end{verbatim}\end{quote}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{LOCAL PROGRAM}
+
+\begin{nrtc}
+\item	IDENTIFIES THE PROGRAM ON THE LOCAL SYSTEM WHICH IMPLEMENTS THE SERVICE
+
+\item	DEFINED IN THE \verb"isoservices(5)" FILE:
+\begin{verbatim}
+"tsap/filestore"    #259    iso.ftam -c
+\end{verbatim}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FOR FURTHER READING}
+
+\begin{nrtc}
+\item	Volume 1: Application Services
+\end{nrtc}
+\end{bwslide}

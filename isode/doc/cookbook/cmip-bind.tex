@@ -1,0 +1,37 @@
+\File{cmip\-bind.ry},{20:48},{Jan 14 1988}
+\L{\LB{AssociationInformation}}
+\L{\LB{    \{iso standard(0) ips\-osi\-mips(9596) cmip(2) version(1)}}
+\L{\LB{}\Tab{8}{ associationInformation(2)\}}}
+\L{\LB{}}
+\L{\LB{\Proc{DEFINITIONS}\K{DEFINITIONS} ::=}}
+\L{\LB{}}
+\L{\LB{\K{BEGIN}}}
+\L{\LB{}}
+\L{\LB{CMIPUserInformation ::=}}
+\L{\LB{        FunctionalUnits}}
+\L{\LB{\C{}\-\- accessControl and userData are provided as separate EXTERNALs}}
+\CE{}\L{\LB{\C{}\-\- in the A\-ASSOCIATE parameter definition: }}
+\CE{}\L{\LB{\C{}\-\-     Association\-information ::= SEQUENCE OF EXTERNAL}}
+\CE{}\L{\LB{}}
+\L{\LB{FunctionalUnits ::=}}
+\L{\LB{        \K{BIT} \K{STRING} \{}}
+\L{\LB{            eventReportInvoker(0),}}
+\L{\LB{            eventReportPerformer(1),}}
+\L{\LB{            confirmedEventReportInvoker(2),}}
+\L{\LB{            confirmedEventReportPerformer(3),}}
+\L{\LB{            linkedReplyInvoker(4),}}
+\L{\LB{            linkedReplyPerformer(5),}}
+\L{\LB{            confirmedGetInvoker(6),}}
+\L{\LB{            confirmedGetPerformer(7),}}
+\L{\LB{            setInvoker(8),}}
+\L{\LB{            setPerformer(9),}}
+\L{\LB{            confirmedSetInvoker(10),}}
+\L{\LB{            confirmedSetPerformer(11),}}
+\L{\LB{            actionInvoker(12),}}
+\L{\LB{            actionPerformer(13),}}
+\L{\LB{            confirmedActionInvoker(14),}}
+\L{\LB{            confirmedActionPerformer(15)}}
+\L{\LB{        \}}}
+\L{\LB{\C{}\-\- Function i is supported if and only if bit i is one.}}
+\CE{}\L{\LB{}}
+\L{\LB{\K{END}}}

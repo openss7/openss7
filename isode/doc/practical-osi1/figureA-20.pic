@@ -1,0 +1,67 @@
+.PS
+.ps 20
+## figure A-15
+
+boxwid	= 2*boxwid
+
+B1:	box "user"
+B2:	box with .n at (B1.s.x,B1.s.y-boxht/1.5) width 1.5*boxwid height 5*boxht
+B4:	box "session" with .sw at B2.sw width 1.5*boxwid
+B3:	box "UA" \
+	    with .n at (B2.n.x,B2.n.y-(B2.n.y-B4.n.y)/6) width 1.25*boxwid height boxht
+B5:	box "MTA" \
+	    with .s at (B2.n.x,B4.n.y+(B2.n.y-B4.n.y)/6) width 1.25*boxwid height boxht
+B6:	box invis "$\ldots$" with .nw at B2.sw width 1.5*boxwid
+##
+L1:	line <-> from (B1.sw.x-(B1.sw.x-B1.s.x)/2,B1.s.y) \
+	          to (B1.sw.x-(B1.sw.x-B1.s.x)/2,B3.n.y)
+L2:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B1.s.y) \
+	          to (B1.se.x-(B1.se.x-B1.s.x)/2,B3.n.y)
+L3:	line <-> from (B1.sw.x-(B1.sw.x-B1.s.x)/2,B3.s.y) \
+	          to (B1.sw.x-(B1.sw.x-B1.s.x)/2,B5.n.y)
+L4:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B3.s.y) \
+	          to (B1.se.x-(B1.se.x-B1.s.x)/2,B5.n.y)
+L5:	line <-> from (B1.sw.x-(B1.sw.x-B1.s.x)/2,B5.s.y) \
+	          to (B1.sw.x-(B1.sw.x-B1.s.x)/2,B4.n.y)
+L6:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B5.s.y) \
+	          to (B1.se.x-(B1.se.x-B1.s.x)/2,B4.n.y)
+##
+B21:	box invis with .nw at (B1.ne.x+(B2.ne.x-B2.nw.x),B1.nw.y)
+B22:	box with .n at (B21.s.x,B3.s.y-(B3.s.y-B5.n.y)/2) width 1.5*boxwid \
+		height (B3.s.y - B2.s.y) - (B3.s.y-B5.n.y)/2 
+B24:	box "session" with .sw at B22.sw width 1.5*boxwid
+B25:	box "MTA" with .s at (B22.c.x,B5.s.y) width 1.25*boxwid
+B26:	box invis "$\ldots$" with .nw at B22.sw width 1.5*boxwid
+##
+L25:	line <-> from (B21.sw.x-(B21.sw.x-B21.s.x)/2,B25.s.y) \
+	          to (B21.sw.x-(B21.sw.x-B21.s.x)/2,B24.n.y)
+L26:	line <-> from (B21.se.x-(B21.se.x-B21.s.x)/2,B25.s.y) \
+	          to (B21.se.x-(B21.se.x-B21.s.x)/2,B24.n.y)
+##
+B11:	box "user" with .nw at (B21.ne.x+(B22.ne.x-B22.nw.x),B21.nw.y)
+B12:	box with .n at (B11.s.x,B11.s.y-boxht/1.5) width 1.5*boxwid height 5*boxht
+B14:	box "session" with .sw at B12.sw width 1.5*boxwid
+B13:	box "UA" \
+	    with .n at (B12.n.x,B12.n.y-(B12.n.y-B14.n.y)/6) width 1.25*boxwid height boxht
+B15:	box "MTA" \
+	    with .s at (B12.n.x,B14.n.y+(B12.n.y-B14.n.y)/6) width 1.25*boxwid height boxht
+B16:	box invis "$\ldots$" with .nw at B12.sw width 1.5*boxwid
+##
+L11:	line <-> from (B11.sw.x-(B11.sw.x-B11.s.x)/2,B11.s.y) \
+	          to (B11.sw.x-(B11.sw.x-B11.s.x)/2,B13.n.y)
+L12:	line <-> from (B11.se.x-(B11.se.x-B11.s.x)/2,B11.s.y) \
+	          to (B11.se.x-(B11.se.x-B11.s.x)/2,B13.n.y)
+L13:	line <-> from (B11.sw.x-(B11.sw.x-B11.s.x)/2,B13.s.y) \
+	          to (B11.sw.x-(B11.sw.x-B11.s.x)/2,B15.n.y)
+L14:	line <-> from (B11.se.x-(B11.se.x-B11.s.x)/2,B13.s.y) \
+	          to (B11.se.x-(B11.se.x-B11.s.x)/2,B15.n.y)
+L15:	line <-> from (B11.sw.x-(B11.sw.x-B11.s.x)/2,B15.s.y) \
+	          to (B11.sw.x-(B11.sw.x-B11.s.x)/2,B14.n.y)
+L16:	line <-> from (B11.se.x-(B11.se.x-B11.s.x)/2,B15.s.y) \
+	          to (B11.se.x-(B11.se.x-B11.s.x)/2,B14.n.y)
+##
+L30:	line <-> dashed from B3.e to B13.w "P2" ""
+L31:	line <-> dashed from B5.e to B25.w "P1" ""
+L32:	line <-> dashed from B25.e to B15.w "P1" ""
+##
+.PE

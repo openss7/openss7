@@ -1,0 +1,47 @@
+\def\vb#1{\verb|"#1"|}
+\def\bar{$\emptyset$}
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \special{pa 0 1000}%
+    \special{pa 0 0}%
+    \special{pa 2250 0}%
+    \special{pa 2250 1000}%
+    \special{pa 0 1000}%
+    \special{fp}%
+    \rlap{\kern  1.125in\lower 0.375in\hbox to 0pt{\hss Enterprise \#1 INOC\hss}}%
+    \rlap{\kern  1.125in\lower 0.541in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  1.125in\lower 0.707in\hbox to 0pt{\hss (uses \vb{pub})\hss}}%
+    \special{pa 0 3000}%
+    \special{pa 0 2000}%
+    \special{pa 2250 2000}%
+    \special{pa 2250 3000}%
+    \special{pa 0 3000}%
+    \special{fp}%
+    \rlap{\kern  1.125in\lower 2.375in\hbox to 0pt{\hss router in\hss}}%
+    \rlap{\kern  1.125in\lower 2.541in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  1.125in\lower 2.707in\hbox to 0pt{\hss Enterprise \#1\hss}}%
+    \special{pa 1075 1800}%
+    \special{pa 1125 2000}%
+    \special{fp}%
+    \special{pa 1175 1800}%
+    \special{pa 1125 2000}%
+    \special{pa 1125 1000}%
+    \special{fp}%
+    \special{pa 1175 1200}%
+    \special{pa 1125 1000}%
+    \special{fp}%
+    \special{pa 1075 1200}%
+    \special{pa 1125 1000}%
+    \special{fp}%
+    \rlap{\kern  2.250in\lower 2.541in\hbox to0pt{\ \begin{tabular}[t]{|lllr|} \multicolumn{4}{c}{access policy table}\\ \hline defViewWholeRO& \vb{pub}& \bar& 3\\ \hline \end{tabular}\hss}}%
+    \rlap{\kern  1.125in\lower 3.291in\hbox to 0pt{\hss \begin{tabular}[t]{|llllr|} \multicolumn{5}{c}{primitive view table}\\ \hline defViewWholeRO& localAgent& \bar& \bar& \bar\\ \hline\end{tabular}\hss}}%
+    \kern  2.251in
+  }\vss}%
+  \kern  3.292in
+}

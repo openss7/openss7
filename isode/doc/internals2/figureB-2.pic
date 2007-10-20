@@ -1,0 +1,49 @@
+.PS 7.5i
+.ps 20
+## figure B-2
+B1:	box width 3*boxwid height 3*boxht+2*lineht
+##
+B2:	box "UE" with .nw at (B1.nw.x+linewid/2, B1.nw.y-lineht/2)
+B3:	box "\yy INITIATOR" "\yy DISCIPLINE" \
+		with .n at (B2.s.x, B2.s.y-lineht/2)
+	line from B2.s to B3.n
+B4:	box "\yy RUN-TIME" "\yy ENVIRON." \
+		with .n at (B3.s.x, B3.s.y-lineht/2)
+	line from B3.s to B4.n
+B5:	box dashed "static" "" "stuff" height B4.s.y-B2.n.y \
+		with .ne at (B1.se.x-linewid/2, B1.se.y+lineht/2)
+##
+D1:	box width 3*boxwid height 3*boxht+2*lineht \
+		with .w at (B1.e.x+3*linewid, B1.e.y)
+##
+D2:	box "UE" with .nw at (D1.nw.x+linewid/2, D1.nw.y-lineht/2)
+D3:	box "\yy RESPONDER" "\yy DISCIPLINE" \
+		with .n at (D2.s.x, D2.s.y-lineht/2)
+	line from D2.s to D3.n
+D4:	box "\yy RUN-TIME" "\yy ENVIRON." \
+		with .n at (D3.s.x, D3.s.y-lineht/2)
+	line from D3.s to D4.n
+D5:	box dashed "static" "" "stuff" height D4.s.y-D2.n.y \
+		with .ne at (D1.se.x-linewid/2, D1.se.y+lineht/2)
+##
+A1:	box width 3*boxwid  height boxht*2/3+lineht \
+		with .n at (B1.s.x, B1.s.y-lineht)
+	line from B1.s to A1.n
+A2:	box "\xx ACSE" width boxwid*2/3 height boxht*2/3\
+		with .nw at (A1.nw.x+boxwid/4, A1.nw.y-lineht/2)
+A3:	box "\xx DASE" width boxwid*2/3 height boxht*2/3\
+		with .w at (A2.e.x+boxwid/4, A2.e.y)
+A4:	box "\xx ROSE" width boxwid*2/3 height boxht*2/3\
+		with .w at (A3.e.x+boxwid/4, A3.e.y)
+##
+C1:	box width 3*boxwid  height boxht*2/3+lineht \
+		with .n at (D1.s.x, D1.s.y-lineht)
+	line from D1.s to C1.n
+C2:	box "\xx ACSE" width boxwid*2/3 height boxht*2/3\
+		with .nw at (C1.nw.x+boxwid/4, C1.nw.y-lineht/2)
+C3:	box "\xx DASE" width boxwid*2/3 height boxht*2/3\
+		with .w at (C2.e.x+boxwid/4, C2.e.y)
+C4:	box "\xx ROSE" width boxwid*2/3 height boxht*2/3\
+		with .w at (C3.e.x+boxwid/4, C3.e.y)
+##
+.PE

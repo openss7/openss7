@@ -1,0 +1,20 @@
+.PS
+## figure A-29
+boxwid	=	3*boxwid/2
+boxht	=	2*boxht/3
+##
+B1:	box "\sf class" width 2*boxwid/8
+B2:	box "\sf c" with .w at B1.e width boxwid/8
+B3:	box "\sf number" with .w at B2.e width 5*boxwid/8
+##
+	box invis "\sf 8" height boxht/3 with .nw at (B1.sw.x, B1.sw.y-lineht/4) width boxwid/8
+	line from last box.nw to last box.sw
+	line from last box.ne to last box.se
+define tick @
+	box invis "\sf $1" height boxht/3 with .w at last box.e width boxwid/8
+	line from last box.nw to last box.sw
+	line from last box.ne to last box.se
+@
+	tick(7); tick(6); tick(5); tick(4); tick(3); tick(2); tick(1)
+##
+.PE

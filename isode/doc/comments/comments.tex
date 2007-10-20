@@ -1,0 +1,304 @@
+\documentstyle [small,blackandwhite] {NRslides}
+
+\author {S.E. Kille \\
+Department of Computer Science \\
+University College London}
+
+\date {October 1988}
+\raggedright
+\title {ISODE --- Further Comments}
+
+\begin {document}
+
+\maketitlepage
+
+\begin {bwslide}
+\ctitle {Overview}
+\begin {itemize}
+\item To complement Marshall Rose's talk
+\item To give a European perspective
+\item To give some more details on lower layers and ASEs (other talks focus
+on the applications)
+\end {itemize}
+\end {bwslide}
+
+\begin {bwslide}
+\ctitle {Coding Approaches}
+\begin {itemize}
+\item Procedural interfaces corresponding to service definitions
+\begin {itemize}
+\item Easy to understand
+\item Flexible
+\item General
+\item Sometimes wrong (e.g. RTS)
+\end {itemize}
+
+\item Full implementations of the protocols and services
+
+\item All ASEs and lower layers can be used asynchronously
+\begin {itemize}
+\item Must be suitable support from Transport or Network interface (e.g.,
+Sockets)
+\item Needs to have sufficient kernel buffering for OPDU writes
+\item ISODE deals with OPDU read buffering
+\end {itemize}
+
+\item Flexible layering 
+\end {itemize}
+\end {bwslide}
+
+
+
+\begin {bwslide}
+\ctitle {What about the X.25}
+\begin {itemize}
+
+\item X.25/CONS is essential for real OSI 
+\begin {itemize}
+\item Statement of religion
+\item TCP/IP or TP4/CLNS are not suitable/desirable for WANs
+\end {itemize}
+
+\item Current implementations
+\begin {itemize}
+\item SUNOS + SUNLINK X.25
+\item Vax + BSD UNIX + UBC Code + DMF 32
+\item Vax + Ultrix + CAMTEC Dexpand with X.25 or Pink Book (latter is not a
+product).    
+\item Straightforward to add in others
+\begin {itemize}
+\item Easiest if socket-like interface
+\item Device-like interface possible
+\end {itemize}
+
+\end {itemize}
+\end {itemize}
+\end {bwslide}
+
+
+\begin {bwslide}
+\ctitle {What about the X.25 (2)}
+
+(or why TCP/IP is used on UNIX LANs)
+
+
+\begin {itemize}
+
+\item Problems with UNIX X.25
+\begin {itemize}
+\item Not sufficient coverage
+\item No standard interface
+\item Poor performance
+\item Not robust
+\item Some interfaces will not allow for asynchronous working 
+\item Problem with the implementations, not X.25
+\end {itemize}
+
+\item What is needed
+\begin {itemize}
+\item Standard interface (POSIX transport may give this)
+\item Pink Book
+\item Realistic Performance
+\end {itemize}
+
+\item ISODE supports X.25, but X.25 does not support ISODE
+
+\end {itemize}
+\end {bwslide}
+
+\begin {bwslide}
+\ctitle {Transport}
+\begin {itemize}
+\item TP0 is a part of ISODE
+\item TP0++ over TCP in ISODE
+\begin {itemize}
+\item RFC 1006
+\item Best choice in LAN environment (currently)
+\end {itemize}
+
+\item Straightforward to interface to other Transport {\em Services}
+
+Variety of application disciplines:
+\begin {itemize}
+\item Use of Transport Daemon (tsapd) 
+\item Application Servers
+\item Callback
+\item Multithreading
+\end {itemize}
+
+\item TP0 extensively tested
+\end {itemize}
+\end {bwslide}
+
+\begin {bwslide}
+\ctitle {Session}
+
+\begin {itemize}
+\item Full Session Protocol and Service implemented
+\item Substantial interworking tests
+\item Version 2 (88) in ISODE 4.0 
+\end {itemize}
+
+\end {bwslide}
+
+
+\begin {bwslide}
+\ctitle {Presentation}
+\begin {itemize}
+\item Most of Protocol and Service implemented
+\item IS
+\item Simple and Full encoding
+\item X.410 mode
+\item Some interworking (FTAM + VTP)
+\end {itemize}
+
+\end {bwslide}
+
+
+
+\begin {bwslide}
+\ctitle {ASN.1}
+
+\begin {itemize}
+\item Not bound to presentation layer
+\item Special Tools (discussed elsewhere)
+\item Abstract representation as C structures as intermediate form 
+\item Used extensively
+\item Tools have handled a wide range of specifications
+\end {itemize}
+\end {bwslide}
+
+\begin {bwslide}
+\ctitle {ACSE}
+\begin {itemize}
+\item Full implementation (lots of parameters)
+\item The interface used by the application
+\item AE Titles still a problem
+\begin {itemize}
+\item OBJECT IDENTIFIER used by stub directory
+\item Distinguished Name will be used in QUIPU context
+\end {itemize}
+
+\end {itemize}
+\end {bwslide}
+
+
+
+\begin {bwslide}
+\ctitle {RTS}
+\begin {itemize}
+\item 1988 and 1984 (X.410)
+\item Some interworking tests of X.410 done
+\item Not spooled (i.e. RTS application has to do the work)
+\item New interface being done
+\end {itemize}
+\end {bwslide}
+
+
+\begin {bwslide}
+\ctitle {ROS}
+
+
+\begin {itemize}
+\item Full implementation
+\item  ROSY/POSY facilitate use
+\item  Various versions 
+\begin {itemize}
+\item X.410 
+\item ECMA ROS (BCS Session)
+\item 1988 ROS (RTS optional)
+\end {itemize}
+
+\item Common interface, except for initialisation
+
+\item ECMA ROS used by THORN
+
+\item 1988 ROS (no RTS) used by other ROS applications
+\end {itemize}
+\end {bwslide}
+
+
+
+\begin {bwslide}
+\ctitle {Performance}
+\begin {itemize}
+\item Full implementation leads to large processes:
+\begin {itemize}
+\item Minimum 300kbyte
+\item DSA 500 kbyte
+\item FTAM 800 kbyte
+\end {itemize}
+
+\item Substantial effort to avoid byte copying
+\begin {itemize}
+\item qbufs
+\item PPPPPP
+\end {itemize}
+
+\item Low bulk transfer overheads
+\begin {itemize}
+\item  ROS is 12\% slower than raw TCP
+\item  FTAM is 8\% slower than Arpanet FTP
+\item  More CPU intensive
+\item  X.25 too slow to be relevant
+\end {itemize}
+
+\item Initialisation not so fast
+\begin {itemize}
+\item Typically a few seconds
+\item Paging in process is a big overhead
+\end {itemize}
+
+\end {itemize}
+\end {bwslide}
+
+
+\begin {bwslide}
+\ctitle {How good is it really?}
+\begin {itemize}
+\item Does not claim to be production quality
+\item Better than much ``production software'' I have seen
+\item Code Quality
+\begin {itemize}
+\item Few comments
+\item Well structured
+\item Long variable names
+\item Documented (700 pages)
+\item Careful version control
+\item Thorough testing of releases
+\end {itemize}
+
+\item Ideal for experimentation and early services
+
+\item Possible drawbacks for products
+\begin {itemize}
+\item Lower layers and ASEs not tuned for specific applications
+
+\item ASN.1 Tools
+\begin {itemize}
+\item Good overall functionality, but
+\item Too much code output
+\item Memory based
+\item Need SOPY
+\end {itemize}
+
+\end {itemize}
+
+
+\end {itemize}
+
+\end {bwslide}
+
+\begin {bwslide}
+\ctitle {Other Applications}
+\begin {itemize}
+\item NRS Lookup Protocol
+\item IDIST (ROS based RDIST)
+\item Management Protocols
+\item ODA/ODIF
+\end {itemize}
+
+\end {bwslide}
+
+
+\end {document}

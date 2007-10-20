@@ -1,0 +1,32 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \rlap{\kern  2.250in\lower 1.079in\hbox to 0pt{\hss ip\hss}}%
+    \special{pa 2250 692}%
+    \special{pa 2250 0}%
+    \special{fp}%
+    \rlap{\kern  2.250in\lower 2.464in\hbox to 0pt{\hss ipFragOKs\hss}}%
+    \special{pa 2250 2077}%
+    \special{pa 2250 1385}%
+    \special{fp}%
+    \rlap{\kern  0.519in\lower 2.464in\hbox to 0pt{\hss ipForwarding\hss}}%
+    \special{pa 519 2077}%
+    \special{pa 1731 1385}%
+    \special{fp}%
+    \rlap{\kern  3.981in\lower 2.464in\hbox to 0pt{\hss ipRouteTable\hss}}%
+    \special{pa 3981 2077}%
+    \special{pa 2769 1385}%
+    \special{fp}%
+    \rlap{\kern  3.981in\lower 3.849in\hbox to 0pt{\hss $\cdots$\hss}}%
+    \special{pa 3981 3462}%
+    \special{pa 3981 2769}%
+    \special{fp}%
+    \kern  3.982in
+  }\vss}%
+  \kern  3.850in
+}

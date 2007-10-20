@@ -1,0 +1,714 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Old-Style Associations}\label{old-style}
+As discussed in Section~\ref{acs:note},
+there are several ways to establish an association.
+In the interests of compatibility with previously specified applications,
+the \man librosap(3n) and \man librtsap(3n) libraries support ``old-style''
+mechanisms for binding associations.
+These are discussed in this appendix.
+Use of these facilities for new applications is strongly discouraged.
+
+\section	{Remote Operations}\label{ros:old-style}
+Under old-style association handling for remote operations,
+the mechanism used for establishing the association determines the
+remote operations service discipline to be used.
+If the basic service discipline is desired,
+then continue reading this section which describes the addressing and
+initialization mechanisms for native ROS associations.
+These make use of the {\sf RO-BEGIN\/} and {\sf RO-END\/} primitives.
+Instead,
+if the advanced service discipline is desired,
+then read Section~\ref{rts:old-style} on page~\pageref{rts:old-style}
+which describes how
+associations are established and released by the reliable transfer service
+(RTS) using the {\sf X.410 OPEN\/} and {\sf X.410 CLOSE\/} primitives.
+(Be sure to also read Section~\ref{ros:underlying} on
+page~\pageref{ros:underlying}).
+
+\subsection	{Addresses}
+Addresses at the remote operations service access point are represented by the
+\verb"RoSAPaddr" structure.
+\begin{quote}\index{RoSAPaddr}\small\begin{verbatim}
+struct RoSAPaddr {
+    struct SSAPaddr roa_addr;
+
+    u_short     roa_port;
+};
+\end{verbatim}\end{quote}
+This structure contains two elements:
+\begin{describe}
+\item[\verb"roa\_addr":]	the session address,
+as described in Section~\ref{ssap:addresses} on page~\pageref{ssap:addresses}
+of \voltwo/;
+and,
+
+\item[\verb"roa\_port":] the port number of the entity residing above the
+RoSAP.
+\end{describe}
+
+In Figure~\ref{getDSentity},
+an example of how one constructs the RoSAP address for the directory services
+entity on host \verb"RemoteHost" is presented.
+(The routine \verb"is2saddr" is described on page~\pageref{ssap:addresses}
+of \voltwo/.)
+\tagrind[tp]{grindB-1}%
+        {Constructing the RoSAP address for the Directory Services entity}%
+        {getDSentity}
+
+\subsection       {Association Establishment}
+The \man librosap(3n) library distinguishes between the user which started an
+association,
+the {\em initiator},
+and the user which subsequently was bound to the association,
+the {\em responder}.
+We sometimes term these two entities the {\em client\/} and the {\em server},
+respectively.
+
+\subsubsection     {Server Initialization}
+The \man tsapd(8c) daemon,
+upon accepting a connection from an initiating host,
+consults the ISO services database to determine which program
+on the local system implements the desired RoSAP entity.
+In the case of the remote operations service,
+the \pgm{tsapd} program contains the bootstrap for the remote operations
+provider.
+The daemon will again consult the ISO services database to determine which
+program on the system implements the desired RoSAP entity.
+
+Once the program has been ascertained,
+the daemon runs the program with any arguments listed in the database.
+In addition,
+it appends some {\em magic arguments\/} to the argument vector.
+Hence,
+the very first action performed by the responder is to re-capture the RoSAP
+state contained in the magic arguments.
+This is done by calling the routine \verb"RoInit",
+which on a successful return,
+is equivalent to a {\sf RO-BEGIN.INDICATION\/} from the remote operations
+service provider.
+\begin{quote}\index{RoInit}\small\begin{verbatim}
+int     RoInit (vecp, vec, ros, roi)
+int     vecp;
+char  **vec;
+struct RoSAPstart *ros;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"vecp":] the length of the argument vector;
+
+\item[\verb"vec":] the argument vector;
+
+\item[\verb"ros":] a pointer to a \verb"RoSAPstart" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If \verb"RoInit" is successful,
+it returns information in the \verb"ros" parameter,
+which is a pointer to a \verb"RoSAPstart" structure.
+\begin{quote}\index{RoSAPstart}\small\begin{verbatim}
+struct RoSAPstart {
+    int     ros_sd;
+
+    struct RoSAPaddr ros_initiator;
+
+    u_short ros_port;
+
+    PE      ros_data;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ros\_sd":] the association-descriptor to be used to
+reference this association;
+
+\item[\verb"ros\_initiator":] the ``unique identifier'' of the initiator
+(containing the initiator's host address);
+
+\item[\verb"ros\_port":] the application number the initiator wishes to use
+to govern the association;
+and
+
+\item[\verb"ros\_data":] any initial data (this is a pointer to a
+\verb"PElement" structure, which is fully explained in Chapter~\ref{libpsap}).
+\end{describe}
+Note that the \verb"ros_data" element is allocated via \man malloc(3) and
+should be released using the \verb"ROSFREE" macro  when no longer referenced.
+The \verb"ROSFREE" macro behaves as if it was defined as:
+\begin{quote}\index{ROSFREE}\small\begin{verbatim}
+void    ROSFREE (ros)
+struct RoSAPstart *ros;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"RoInit",
+and not the \verb"RoSAPstart" structure itself.
+Further,
+\verb"ROSFREE" should be called only if the call to the \verb"RoInit"
+routine returned \verb"OK".
+
+If the call to \verb"RoInit" is not successful,
+then a {\sf RO-P-REJECT.IN\-DI\-CA\-TION\/} event is simulated,
+and the relevant information is returned in an encoded
+\verb"RoSAPindication" structure.
+
+After examining the information returned by \verb"RoInit" on a successful call
+(and possibly after examining the argument vector),
+the responder should either accept or reject the association.
+For either response,
+the responder should use
+the \verb"RoBeginResponse" routine
+(which corresponds to the {\sf RO-BEGIN.RESPONSE\/} action).
+\begin{quote}\index{RoBeginResponse}\small\begin{verbatim}
+int     RoBeginResponse (sd, status, data, roi)
+int     sd;
+int     status;
+PE      data;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"status":] the acceptance indicator
+(either \verb"ROS_ACCEPT" if the association is to be accepted,
+or one of the ``fatal'' user-initiated rejection codes listed in
+Table~\ref{RoSAPreasons} on page~\pageref{RoSAPreasons});
+
+\item[\verb"data":] any initial data if the association is to be accepted;
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"RoBeginResponse" is successful,
+and the \verb"status" parameter is set to \verb"ROS_ACCEPT",
+then association establishment has now been completed.
+If the call is successful,
+but the \verb"status" parameter is not \verb"ROS_ACCEPT",
+then the association has been rejected and the responder may exit.
+Otherwise,
+if the call fails and the reason is ``fatal'',
+then the association is closed.
+
+\subsubsection     {Client Initialization}
+A program wishing to associate itself with another user of remote operation
+services calls the \verb"RoBeginRequest" routine,
+which corresponds to the {\sf RO-BEGIN.REQUEST\/} action.
+\begin{quote}\index{RoBeginRequest}\small\begin{verbatim}
+int     RoBeginRequest (called, data, roc, roi)
+struct  RoSAPaddr *called;
+PE      data;
+struct RoSAPconnect *roc;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"called":] the RoSAP address of the responder;
+
+\item[\verb"data":] any initial data;
+
+\item[\verb"roc":] a pointer to a \verb"RoSAPconnect" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"RoBeginRequest" is successful
+(this corresponds to a {\sf RO-BEGIN.CONFIRMATION\/} event),
+it returns information in the \verb"roc" parameter,
+which is a pointer to a \verb"RoSAPconnect" structure.
+\begin{quote}\index{RoSAPconnect}\small\begin{verbatim}
+struct RoSAPconnect {
+    int     roc_sd;
+
+    int     roc_result;
+
+    PE      roc_data;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"roc\_sd":] the association-descriptor to be used to
+reference this association;
+
+\item[\verb"roc\_result":] the association response;
+and,
+
+\item[\verb"roc\_data":] any initial data if the association was accepted.
+\end{describe}
+If the call to \verb"RoBeginRequest" is successful,
+and the \verb"roc_result" element is set to \verb"ROS_ACCEPT",
+then association establishment has completed.
+If the call is successful,
+but the \verb"roc_result" element is not \verb"ROS_ACCEPT",
+the the association attempt has been rejected,
+consult Table~\ref{RoSAPreasons} to determine the reason for the reject.
+Otherwise, if the call fails then the association is not established and
+the \verb"RoSAPpreject" structure of the \verb"RoSAPindication" discriminated
+union has been updated.
+
+Note that the \verb"roc_data" element is allocated via \man malloc(3) and
+should be released using the \verb"ROCFREE" macro  when no longer referenced.
+The \verb"ROCFREE" macro behaves as if it was defined as:
+\begin{quote}\index{ROCFREE}\small\begin{verbatim}
+void    ROCFREE (roc)
+struct RoSAPconnect *roc;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"RoBeginRequest",
+and not the \verb"RoSAPconnect" structure itself.
+Further,
+\verb"ROCFREE" should be called only if the call to the \verb"RoBeginRequest"
+routine returned \verb"OK".
+
+Note that in the basic service the arguement parameter to an Invoke request
+cannot be NULL.
+As well only the initiator may make invoke requests.
+
+\subsection       {Association Release}
+The \verb"RoEndRequest" routine is used to request the release of an
+association,
+and corresponds to a {\sf RO-END.REQUEST\/} action.
+This action may be taken by only the initiator of an association.
+\begin{quote}\index{RoEndRequest}\small\begin{verbatim}
+int     RoEndRequest (sd, priority, roi)
+int     sd;
+int     priority;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"priority":] the priority of this request;
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"RoEndRequest" is successful,
+then the association has been released.
+Otherwise if the call fails and the error is not fatal,
+then the association remains established and the \verb"RoSAPpreject" structure
+contained in
+the \verb"RoSAPindication" parameter \verb"roi" contains the reason for the
+failure.
+
+Upon receiving a {\sf RO-END.INDICATION\/} event,
+the user is required to generate a {\sf RO-END.RESPONSE\/} action
+using the \verb"RoEndResponse" routine.
+\begin{quote}\index{RoEndResponse}\small\begin{verbatim}
+int     RoEndResponse (sd, roi)
+int     sd;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"RoEndResponse" is successful,
+then the association has been released.
+
+\subsection	{An Example}
+Let's consider how one might construct a generic server which uses remote
+operations services.
+This entity will use an asynchronous interface and the basic service
+discipline.
+Note that we could have selected the advanced service discipline by using
+\verb"RtBInit" instead of \verb"RoInit",
+\verb"RtBeginResponse" instead of \verb"RoBeginResponse",
+and
+\verb"RtEndResponse" instead of \verb"RoEndResponse" (respectively).
+This is demonstrated later in this appendix.
+
+There are two parts to the program:
+initialization and the request/reply loop.
+In our example,
+we assume that the routine \verb"error" results in the process being
+terminated after printing a diagnostic.
+
+In Figure~\ref{initROS:OLDresponder},
+the initialization steps for the generic responder,
+including the outer {\em C\/} wrapper,
+is shown.
+First, the RoSAP state is re-captured by calling \verb"RoInit".
+If this succeeds,
+then the association is authenticated and any command line arguments
+are parsed.
+Assuming that the responder is satisfied with the proposed association,
+it calls \verb"RoBeginResponse" to accept the association.
+Then,
+\verb"RoSetIndications" is set to specify an asynchronous event handler.
+Finally,
+the main request/reply loop is realized.
+The server simply uses \man pause(2) to wait for the next event.
+{\let\small=\scriptsize			%%% yikes!
+\tagrind[tp]{grindB-2}{Initializing the generic ROS responder}%
+	{initROS:OLDresponder}}
+
+Figure~\ref{doROSresponder} on page~\pageref{doROSresponder}
+contains the definition of the
+\verb"ros_indication" routine and associated routines.
+Since the remote operations service was used to establish the association,
+a different closing handler must be used.
+This is shown in Figure~\ref{finROS:OLDresponder}.
+{\let\small=\scriptsize			%%% yikes!
+\tagrind[tp]{grindB-3}%
+	{Finalizing the generic ROS responder}{finROS:OLDresponder}}
+
+\section	{Reliable Transfer}\label{rts:old-style}
+Under old-style association handling for reliable transfer,
+the {\sf X.410 OPEN\/} and {\sf X.410 CLOSE\/} primitives are used.
+
+\subsection	{Addresses}
+Addresses at the reliable transfer service access point are represented by the
+\verb"RtSAPaddr" structure.
+\begin{quote}\index{RtSAPaddr}\small\begin{verbatim}
+struct RtSAPaddr {
+    struct SSAPaddr rta_addr;
+
+    u_short     rta_port;
+};
+\end{verbatim}\end{quote}
+This structure contains two elements:
+\begin{describe}
+\item[\verb"rta\_addr":]	the session address,
+as described in Section~\ref{ssap:addresses} on page~\pageref{ssap:addresses}
+of \voltwo/;
+and,
+
+\item[\verb"rta\_port":] the port number of the entity residing above the
+RtSAP.
+\end{describe}
+
+In Figure~\ref{getP1entity},
+an example of how one constructs the RtSAP address for the message transfer
+entity on host \verb"RemoteHost" is presented.
+(The routine \verb"is2saddr" is described on page~\pageref{ssap:addresses}
+of \voltwo/.)
+\tagrind[tp]{grindB-4}%
+        {Constructing the RtSAP address for the Message Transfer entity}%
+        {getP1entity}
+
+\subsection       {Association Establishment}
+The \man librtsap(3n) library distinguishes between the user which started an
+association,
+the {\em initiator},
+and the user which was subsequently bound to the association,
+the {\em responder}.
+We sometimes term these two entities the {\em client\/} and the {\em server},
+respectively.
+
+\subsubsection     {Server Initialization}
+The \man tsapd(8c) daemon,
+upon accepting a connection from an initiating host,
+consults the ISO services database to determine which program
+on the local system implements the desired SSAP entity.
+In the case of the reliable transfer service,
+the \pgm{tsapd} program contains the bootstrap for the reliable transfer
+provider.
+The daemon will again consult the ISO services database to determine which
+program on the system implements the desired RtSAP entity.
+
+Once the program has been ascertained,
+the daemon runs the program with any arguments listed in the database.
+In addition,
+it appends some {\em magic arguments\/} to the argument vector.
+Hence,
+the very first action performed by the responder is to re-capture the RtSAP
+state contained in the magic arguments.
+This is done by calling the routine \verb"RtBInit",
+which on a successful return,
+is equivalent to a {\sf X.410 OPEN.INDICATION\/} from the reliable transfer
+service provider.
+\begin{quote}\index{RtBInit}\small\begin{verbatim}
+int     RtBInit (vecp, vec, rts, rti)
+int     vecp;
+char  **vec;
+struct RtSAPstart *rts;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"vecp":] the length of the argument vector;
+
+\item[\verb"vec":] the argument vector;
+
+\item[\verb"rts":] a pointer to a \verb"RtSAPstart" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If \verb"RtBInit" is successful,
+it returns information in the \verb"rts" parameter,
+which is a pointer to a \verb"RtSAPstart" structure.
+\begin{quote}\index{RtSAPstart}\small\begin{verbatim}
+struct RtSAPstart {
+    int     rts_sd;
+
+    struct RtSAPaddr rts_initiator;
+
+    int     rts_mode;
+#define RTS_MONOLOGUE   0
+#define RTS_TWA         1
+
+    int     rts_turn;
+#define RTS_INITIATOR   0
+#define RTS_RESPONDER   1
+
+    u_short rts_port;
+
+    PE      rts_data;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"rts\_sd":] the association-descriptor to be used to
+reference this association;
+
+\item[\verb"rts\_initiator":] the address of the initiator;
+
+\item[\verb"rts\_mode":] the dialogue mode (either monologue or two-way
+alternate),
+
+\item[\verb"rts\_turn":] the owner of the turn initially;
+
+\item[\verb"rts\_port":] the application number the initiator wishes to use
+to govern the association;
+and
+
+\item[\verb"rts\_data":] any initial data (this is a pointer to a
+\verb"PElement" structure, which is fully explained in Chapter~\ref{libpsap}).
+\end{describe}
+Note that the \verb"rts_data" element is allocated via \man malloc(3) and
+should be released by using the \verb"RTSFREE" macro when no longer referenced.
+The \verb"RTSFREE" macro behaves as if it was defined as:
+\begin{quote}\index{RTSFREE}\small\begin{verbatim}
+void    RTSFREE (rts)
+struct RtSAPstart *rts;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"RtBInit",
+and not the \verb"RtSAPstart" structure itself.
+Further,
+\verb"RTSFREE" should be called only if the call to the \verb"RtBInit"
+routine returned \verb"OK".
+
+If the call to \verb"RtBInit" is not successful,
+then a {\sf RT-P-ABORT.INDICATION\/} event is simulated,
+and the relevant information is returned in an encoded
+\verb"RtSAPindication" structure.
+
+After examining the information returned by \verb"RtBInit" on a successful call
+(and possibly after examining the argument vector),
+the responder should either accept or reject the association.
+For either response,
+the responder should use
+the \verb"RtBeginResponse" routine
+(which corresponds to the {\sf X.410 OPEN.RESPONSE\/} action).
+\begin{quote}\index{RtBeginResponse}\small\begin{verbatim}
+int     RtBeginResponse (sd, status, data, rti)
+int     sd;
+int     status;
+PE      data;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"status":] the acceptance indicator
+(either \verb"RTS_ACCEPT" if the association is to be accepted,
+or one of the ``fatal'' user-initiated rejection codes,
+other tha \verb"RTS_REJECT",
+listed in Table~\ref{RtSAPreasons} on page~\pageref{RtSAPreasons});
+
+\item[\verb"data":] any initial data if the association is to be accepted;
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"RtBeginResponse" is successful,
+and the \verb"status" parameter is set to \verb"RTS_ACCEPT",
+then association establishment has now been completed.
+If the call is successful,
+but the \verb"status" parameter is not \verb"RTS_ACCEPT",
+then the association has been rejected and the responder may exit.
+Otherwise,
+if the call fails and the reason is ``fatal'',
+then the association is closed.
+
+\subsubsection     {Client Initialization}
+A program wishing to associate itself with another user of reliable transfer
+services calls the \verb"RtBeginRequest" routine,
+which corresponds to the {\sf X.410 OPEN.REQUEST\/} action.
+\begin{quote}\index{RtBeginRequest}\small\begin{verbatim}
+int     RtBeginRequest (called, mode, turn, data, rtc, rti)
+struct  RtSAPaddr *called;
+int     mode,
+        turn;
+PE      data;
+struct RtSAPconnect *rtc;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"called":] the RtSAP address of the responder;
+
+\item[\verb"mode":] the dialogue mode;
+
+\item[\verb"turn":] who gets the initial turn;
+
+\item[\verb"data":] any initial data;
+
+\item[\verb"rtc":] a pointer to a \verb"RtSAPconnect" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"RtBeginRequest" is successful
+(this corresponds to a {\sf X.410 OPEN.CONFIRMATION\/} event),
+it returns information in the \verb"rtc" parameter,
+which is a pointer to a \verb"RtSAPconnect" structure.
+\begin{quote}\index{RtSAPconnect}\small\begin{verbatim}
+struct RtSAPconnect {
+    int     rtc_sd;
+
+    int     rtc_result;
+
+    PE      rtc_data;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"rtc\_sd":] the association-descriptor to be used to
+reference this association;
+
+\item[\verb"rtc\_result":] the association response;
+and,
+
+\item[\verb"rtc\_data":] any initial data if the association was accepted.
+\end{describe}
+If the call to \verb"RtBeginRequest" is successful,
+and the \verb"rtc_result" element is set to \verb"RTS_ACCEPT",
+then association establishment has completed.
+If the call is successful,
+but the \verb"rtc_result" element is not \verb"RTS_ACCEPT",
+the the association attempt has been rejected;
+consult Table~\ref{RtSAPreasons} to determine the reason for the reject.
+Otherwise, if the call fails then the association is not established and
+the \verb"RtSAPabort" structure of the \verb"RtSAPindication" discriminated
+union has been updated.
+
+Note that the \verb"rtc_data" element is allocated via \man malloc(3) and
+should be released using the \verb"RTCFREE" macro  when no longer referenced.
+The \verb"RTCFREE" macro behaves as if it was defined as:
+\begin{quote}\index{RTCFREE}\small\begin{verbatim}
+void    RTCFREE (rtc)
+struct RtSAPconnect *rtc;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"RtBeginRequest",
+and not the \verb"RtSAPconnect" structure itself.
+Further,
+\verb"RTCFREE" should be called only if the call to the \verb"RtBeginRequest"
+routine returned \verb"OK".
+
+\subsection       {Association Release}
+The \verb"RtEndRequest" routine is used to request the release of an
+association,
+and corresponds to a {\sf X.410 CLOSE.REQUEST\/} action.
+This action may be taken by only the initiator of an association,
+and, if the dialogue mode is two-way alternate,
+if the initiator has the turn as well.
+\begin{quote}\index{RtEndRequest}\small\begin{verbatim}
+int     RtEndRequest (sd, rti)
+int     sd;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"RtEndRequest" is successful,
+then the association has been released.
+Otherwise if the call fails and the error is not fatal,
+then the association remains established and the \verb"RtSAPabort" structure
+contained in
+the \verb"RtSAPindication" parameter \verb"rti" contains the reason for the
+failure.
+
+Upon receiving a {\sf X.410 CLOSE.INDICATION\/} event,
+the user is required to generate a {\sf X.410 CLOSE.RESPONSE\/} action
+using the \verb"RtEndResponse" routine.
+\begin{quote}\index{RoEndResponse}\small\begin{verbatim}
+int     RtEndResponse (sd, rti)
+int     sd;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"RtEndResponse" is successful,
+then the association has been released.
+
+\subsection	{An Example}
+Let's consider how one might construct a generic server that uses
+reliable transfer services to establish an association,
+but then uses remote operation services to communicate with its peer.
+This entity will use a synchronous interface.
+
+There are two parts to the program:
+initialization and the request/reply loop.
+In our example,
+we assume that the routine \verb"error" results in the process being
+terminated after printing a diagnostic.
+
+In Figure~\ref{initRTS:OLDresponder},
+the initialization steps for the generic responder,
+including the outer {\em C\/} wrapper,
+is shown.
+First, the RtSAP state is re-captured by calling \verb"RtBInit".
+If this succeeds,
+then the association is authenticated and any command line arguments
+are parsed.
+Assuming that the responder is satisfied with the proposed association,
+it calls \verb"RtBeginResponse" to accept the association.
+The \verb"RoSetService" routine is called to set the underlying service to be
+used for remote operations.
+Finally,
+the main request/reply loop is realized.
+The responder calls \verb"RoWaitRequest" to get the next event,
+and then calls \verb"ros_indication" to decode that event.
+{\let\small=\scriptsize			%%% yikes!
+\tagrind[tp]{grindB-5}{Initializing the generic RTS responder}%
+	{initRTS:OLDresponder}}
+
+Figure~\ref{doROSresponder} on page~\pageref{doROSresponder}
+contains the definition of the
+\verb"ros_indication" routine and associated routines.
+Since the reliable transfer service was used to establish the association,
+a different closing handler must be used.
+This is shown in Figure~\ref{finRTS:OLDresponder}.
+{\let\small=\scriptsize			%%% yikes!
+\tagrind[tp]{grindB-6}{Finalizing the generic RTS responder}%
+	{finRTS:OLDresponder}}

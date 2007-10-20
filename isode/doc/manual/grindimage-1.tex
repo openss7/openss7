@@ -1,0 +1,145 @@
+\File{grindimage\-1.ry},{20:50},{Jan 16 1989}
+\L{\LB{IMAGE \K{DEFINITIONS} ::=}}
+\L{\LB{}}
+\L{\LB{\K{BEGIN}}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- operations}}
+\CE{}\L{\LB{}}
+\L{\LB{initialize \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT}}\Tab{24}{Initialize\-INV}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{Initialize\-RSP}}
+\L{\LB{}\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested, versionNotSupported \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{1}}
+\L{\LB{}}
+\L{\LB{readImage \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT}}\Tab{24}{ReadImage\-INV}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{ReadImage\-RSP}}
+\L{\LB{}\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested, noMatches, formatNotSupported \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{2}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- errors}}
+\CE{}\L{\LB{}}
+\L{\LB{congested \K{ERROR}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{1}}
+\L{\LB{}}
+\L{\LB{versionNotSupported \K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER}}\Tab{24}{VersionsSupported}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{2}}
+\L{\LB{}}
+\L{\LB{noMatches \K{ERROR}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{3}}
+\L{\LB{}}
+\L{\LB{formatNotSupported \K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER}}\Tab{24}{FormatsSupported}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{4}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- types}}
+\CE{}\L{\LB{}}
+\L{\LB{Initialize\-INV ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    proposed[0]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} Version}}
+\L{\LB{}\Tab{16}{\K{DEFAULT} \{ version\-1 \}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{Initialize\-RSP ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    negotiated[0]}\Tab{32}{\C{}\-\- need not be present if only one}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- version was requested and that was chosen,}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- otherwise exactly one bit is set}}
+\CE{}\L{\LB{}\Tab{16}{\K{IMPLICIT} Version}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{VersionsSupported ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    supported[0]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} Version}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{Version ::=}}
+\L{\LB{}\Tab{8}{\K{BITSTRING} \{ version\-1(0) \}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{ReadImage\-INV ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{32}{\C{}\-\- in order of preference for searching}}
+\CE{}\L{\LB{}\Tab{8}{    \K{SEQUENCE} \K{OF}}}
+\L{\LB{}\Tab{16}{\K{CHOICE} \{}}
+\L{\LB{}\Tab{16}{    file\-name[0]}}
+\L{\LB{}\Tab{24}{\K{IMPLICIT} Filename,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{    mail\-address[1]}}
+\L{\LB{}\Tab{24}{\K{IMPLICIT} Mail\-Address}}
+\L{\LB{}\Tab{16}{\},}}
+\L{\LB{}}
+\L{\LB{}\Tab{32}{\C{}\-\- in order of preference for retrieval}}
+\CE{}\L{\LB{}\Tab{8}{    \K{SEQUENCE} \K{OF}}}
+\L{\LB{}\Tab{16}{Format}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{ReadImage\-RSP ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    \K{CHOICE} \{}}
+\L{\LB{}\Tab{16}{x\-windows}}
+\L{\LB{}\Tab{16}{    X\-Windows\-Bitmap}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{FormatsSupported ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    supported[0]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} Format}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{Format ::=}}
+\L{\LB{}\Tab{8}{\K{BITSTRING} \{ x\-windows\-bitmap(0) \}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- discriminants}}
+\CE{}\L{\LB{}}
+\L{\LB{Filename ::=}}
+\L{\LB{}\Tab{8}{[\K{APPLICATION} 1]}}
+\L{\LB{}\Tab{8}{    \K{IMPLICIT} GraphicString}}
+\L{\LB{}}
+\L{\LB{Mail\-Address ::=}}
+\L{\LB{}\Tab{8}{[\K{APPLICATION} 2]}}
+\L{\LB{}\Tab{8}{    \K{IMPLICIT} \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{16}{local[0]}}
+\L{\LB{}\Tab{16}{    \K{IMPLICIT} GraphicString,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{domain[1]}}
+\L{\LB{}\Tab{16}{    \K{IMPLICIT} GraphicString,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{options[2]}}
+\L{\LB{}\Tab{16}{    \K{IMPLICIT} \K{BITSTRING} \{ default\-local(0), default\-host(1) \}}}
+\L{\LB{}\Tab{16}{    \K{DEFAULT} \{ default\-local, default\-host \}}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- image formats}}
+\CE{}\L{\LB{}}
+\L{\LB{X\-Windows\-Bitmap ::=}}
+\L{\LB{}\Tab{8}{[\K{APPLICATION} 100]}}
+\L{\LB{}\Tab{8}{    \K{IMPLICIT} \K{SET} \{}}
+\L{\LB{}\Tab{16}{width[0]}}
+\L{\LB{}\Tab{16}{    \K{IMPLICIT} \K{INTEGER},}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{height[1]}}
+\L{\LB{}\Tab{16}{    \K{IMPLICIT} \K{INTEGER},}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{hot\-spot\-x[2]}}
+\L{\LB{}\Tab{16}{    \K{IMPLICIT} \K{INTEGER}}}
+\L{\LB{}\Tab{16}{    \K{DEFAULT} \-1,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{hot\-spot\-y[3]}}
+\L{\LB{}\Tab{16}{    \K{IMPLICIT} \K{INTEGER}}}
+\L{\LB{}\Tab{16}{    \K{DEFAULT} \-1,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{data[4]}\Tab{32}{\C{}\-\- padded to short boundaries}}
+\CE{}\L{\LB{}\Tab{16}{    \K{IMPLICIT} \K{OCTETSTRING}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{\K{END}}}

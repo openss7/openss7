@@ -1,0 +1,18 @@
+\def\vb#1{\verb|"#1"|}
+\def\bar{$\emptyset$}
+.PS 2.25i
+.ps 20
+##
+boxwid	=	3*boxwid/2
+## figure S-27
+B1:	box \
+		"Enterprise \#1 INOC" "" "(uses \vb{pub})"
+B2:	box with .n at (B1.s.x, B1.s.y-lineht) \
+		"router in" "" "Enterprise \#1"
+	line <- -> from B2.n to B1.s
+	move to B2.e; \
+	"\ \begin{tabular}[t]{|lllr|} \multicolumn{4}{c}{access policy table}\\ \hline defViewWholeRO& \vb{pub}& \bar& 3\\ \hline \end{tabular}" ljust
+	move to (B2.s.x, B2.s.y-lineht/4); \
+	"\begin{tabular}[t]{|llllr|} \multicolumn{5}{c}{primitive view table}\\ \hline defViewWholeRO& localAgent& \bar& \bar& \bar\\ \hline\end{tabular}"
+##
+.PE

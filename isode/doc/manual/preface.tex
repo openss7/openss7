@@ -1,0 +1,590 @@
+% run this through LaTeX with the appropriate wrapper
+
+\preface
+The software described herein has been developed as a research tool and
+represents an effort to promote the use of the International 
+Organisation for Standardisation (ISO) interpretation of open systems interconnection (OSI),
+particularly in the Internet and RARE research communities.
+
+\newpage\section*	{Notice, Disclaimer, and Conditions of Use}\label{license}
+The ISODE is openly available but is {\bf NOT\/} in the public domain.
+You are allowed and encouraged to take this software and build commercial
+products.
+However, as a condition of use, you are required to ``hold harmless'' all
+contributors.
+
+\noindent
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted, provided
+that this notice and the reference to this notice
+appearing in each software module be retained unaltered, 
+and that the name of any contributors shall not be used in advertising
+or publicity pertaining to distribution of the software without specific
+written prior permission.
+No contributor makes any
+representations about the suitability of this software for any purpose.
+It is provided ``as is'' without express or implied warranty.
+
+\vskip 0.15in
+\noindent
+\begin{small}
+{\bf All contributors disclaim all warranties with regard to this
+software, including all implied warranties of me\-chan\-ti\-bil\-ity
+and fitness. In no event shall any contributor be liable for any
+special, indirect or consequential damages or any damages whatsoever
+resulting from loss of use, data or profits, whether in action of
+contract, ne\-gli\-gence or other tortuous action, arising out of or
+in connection with, the use or performance of this software.}
+\end{small}
+
+\vskip 0.15in
+\noindent
+As used above,
+``contributor'' includes, but is not limited to:
+\begin{quote}
+\begin{tabular}{l}
+The MITRE Corporation\\
+The Northrop Corporation\\
+NYSERNet, Inc.\\
+Performance Systems International, Inc.\\
+University College London\\
+The University of Nottingham\\
+X-Tel Services Ltd\\
+The Wollongong Group, Inc.\\
+Marshall T. Rose
+\end{tabular}
+\end{quote}
+In particular,
+the Northrop Corporation provided the initial sponsorship for the ISODE
+and the Wollongong Group, Inc., also supported this effort.
+The ISODE received partial support from the U.S.~Defense Advanced Research
+Projects Agency and the Rome Air Development Center of the U.S.~Air Force
+Systems Command under contract number F30602--88--C--0016 to NYSERNet Inc.
+
+\newpage\section*	{Revision Information}
+This document (version \versiontag/) and its companion volumes are believed
+to accurately reflect release v~\isodevrsn/ of \today{}.
+
+\newpage\section*	{Release Information}
+If you would like a copy of the release described in this document,
+there are several avenues available:
+\begin{itemize}
+\item	NORTH AMERICA\\
+For mailings in NORTH AMERICA,
+send a check for 375 U.S. Dollars to:
+\[\begin{tabular}{ll}
+Postal address:&University of Pennsylvania\\
+&		\small Department of Computer and Information Science\\
+&		Moore School\\
+&		Attn: David J. Farber (ISODE Distribution)\\
+&		200 South 33rd Street\\
+&		Philadelphia, PA 19104-6314\\
+&		U.S.A.\\[0.1in]
+Telephone:&	+1 215 898 8560
+\end{tabular}\]
+
+\pagebreak[3]
+Specify one:
+\begin{enumerate}
+\item	1600bpi 1/2--inch tape, or
+
+\item	Sun 1/4--inch cartridge tape.
+\end{enumerate}
+The tape will be written in \pgm{tar} format and returned with
+a documentation set.
+Do not send tapes or envelopes.
+Documentation only is the same price.  
+
+\item	EUROPE\\
+For mailings in EUROPE, send a cheque or bankers draft and a purchase order
+for 200 Pounds Sterling to:  
+\[\begin{tabular}{ll}
+Postal address:&	Department of Computer Science\\
+&			Attn: Natalie May/Dawn Bailey\\
+&			University College London\\
+&			Gower Street\\
+&			London, WC1E 6BT\\
+&			UK
+\end{tabular}\]
+For information only:
+\[\begin{tabular}{ll}
+\ Telephone:&		+44 71 380 7214\\
+\ Fax:&			+44 71 387 1397\\
+\ Telex:&		28722\\
+\ Internet:&		\verb"natalie@cs.ucl.ac.uk"\\
+&			\verb"dawn@cs.ucl.ac.uk"
+\end{tabular}\]
+Specify one:
+\begin{enumerate}
+\item	1600bpi 1/2--inch tape, or
+
+\item	Sun 1/4--inch cartridge tape.
+\end{enumerate}
+The tape will be written in \pgm{tar} format and returned with
+a documentation set.
+Do not send tapes or envelopes.
+Documentation only is the same price.  
+
+\item	EUROPE (tape only)\\
+Tapes without hardcopy documentation can be obtained via the European
+Forum for Open Systems (EurOpen, formerly known as EUUG).
+The ISODE~\isodevrsn/ distribution is called EurOpenD14.
+\[\begin{tabular}{ll}
+Postal address:&	EurOpen Software Distributions\\
+&			c/o Frank Kuiper\\
+&			Centrum voor Wiskunde en Informatica\\
+&			Kruislann 413\\
+&			1098 SJ  Amsterdam\\
+&			The Netherlands\\[0.1in]
+For information only:&\\
+\ Telephone:&		+31 20 5924056\\
+	&		(or +31 20 5929333)\\
+\ Telex:&		12571 mactr nl\\
+\ Telefax:&		+31 20 5924199\\
+\ Internet:&		\verb"euug-tapes@cwi.nl"
+\end{tabular}\]
+Specify one:
+\begin{enumerate}
+\item	1600bpi 1/2--inch tape: 140 Dutch Guilders.
+
+\item	Sun 1/4--inch cartridge tape (QIC-24 format): 200 Dutch Guilders.
+
+\end{enumerate}
+If you require DHL this is possible and will be billed through.
+Note that if you are not a member of EurOpen
+then there is an additional handling fee of 300 Dutch Guilders
+(please enclose a copy of your membership or contribution payment form when
+ordering). 
+Do not send money, cheques, tapes or envelopes,
+you will be invoiced.
+
+\item	PACIFIC RIM\\
+For mailings in the Pacific Rim,
+send a cheque for 300 dollars Australian to:  
+\[\begin{tabular}{ll}
+Postal address:&	Isode Distribution\\
+&			(Attn: Andrew Waugh)\\
+&			723 Swanston St\\
+&			Carlton, VIC 3053\\
+&			Australia
+\end{tabular}\]
+For information only:
+\[\begin{tabular}{ll}
+\ Telephone:&		+61 3 282 2615\\
+\ Fax:&			+61 3 282 2600\\
+\ Internet:&		\verb"ajw@mel.dit.csiro.au"
+\end{tabular}\]
+Specify one:
+\begin{enumerate}
+\item	1600/3200/6250bpi 1/2-inch tape, or
+
+\item	Sun 1/4-inch cartridge tape in either QIC-11, QIC-24 or QIC-150 format.
+
+\item	Exabyte 2.3 Gigabyte or 5 Gigabyte format
+
+\end{enumerate}
+The tape will be written in \pgm{tar} format and returned with a documentation set.
+Do not send tapes or envelopes.
+Documentation only is the same price.
+
+\item	Internet\\
+If you can FTP to the Internet,
+you can use anonymous FTP to the host \verb"uu.psi.com"
+\verb"[136.161.128.3]"
+to retrieve \compressfile/ in BINARY mode from the \tarplace/ directory.
+This file is the \pgm{tar} image after being run through the compress program
+and is approximately \compressize/ in size.
+
+\item	NIFTP\\
+If you run NIFTP over the public X.25 or over JANET, and are
+registered in the NRS at Salford, you can use NIFTP with username
+``guest'' and your own name as password, to access \verb"UK.AC.UCL.CS" to
+retrieve the file \ukcompressfile/.
+This file is the \pgm{tar} image after being run through the compress program
+and is approximately \compressize/ in size.
+
+\item	FTAM on the JANET, IXI or PSS\\
+The source code is available by FTAM at the University College London
+over X.25 using 
+\begin{describe}
+\item JANET 
+(DTE \verb"00000511160013")
+\item IXI 
+(DTE \verb+20433450420113+)
+\item PSS 
+(DTE \verb"23421920030013") 
+\end{describe}
+Use TSEL~\verb"259" (ASCII encoding).
+Use the ``anon'' user-identity and retrieve the file 
+\compressfile/ from the \uktarplace/ directory.
+This file is the \pgm{tar} image after being run through the compress program
+and is approximately \compressize/ in size.
+
+The file service is provided by the FTAM implementation in ISODE~6.0 or later
+(IS FTAM) and is registered in the pilot OSI Directory below
+\begin{quote}\footnotesize\begin{verbatim}
+bells, Computer Science, University College London, GB
+\end{verbatim}\end{quote}
+
+
+%%%\item	FTAM on the Internet\\
+%%%The source code is available by FTAM over the
+%%%Internet at host 
+%%%\linebreak
+%%%\verb"osi.nyser.net" \verb"[192.33.4.10]"
+%%%(TCP port~102 selects the OSI transport service)
+%%%with TSEL~\verb"259" (numeric encoding).
+%%%Use the ``anon'' user-identity, supply any password,
+%%%and retrieve \compressfile/ from the \tarplace/ directory.
+%%%This file is the \pgm{tar} image after being run through the compress program
+%%%and is approximately \compressize/ in size.
+
+\end{itemize}
+
+For distributions via either FTAM or FTP, there are two additional files
+available for retrieval:
+
+\begin{itemize}
+
+\item  \Docfile/\\
+This is the \LaTeX source for the entire documentation set.
+It is a compressed \pgm{tar} image (\DocSize/).
+
+\item  \PSfile/\\
+This contains the five volume manual in PostScript format.
+It is a compressed \pgm{tar} image (\PSsize/).
+
+\end{itemize}
+
+
+
+\newpage\section*	{Discussion Groups}
+The Internet discussion group {\tt ISODE@NIC.DDN.MIL\/} is
+used as a forum to discuss ISODE.
+Contact the Internet mailbox {\tt ISODE-Request@NIC.DDN.MIL\/}
+to be asked to be added to this list.
+
+\subsection*{Support}
+Although the ISODE is not ``supported'' per se, it does have a problem
+reporting address, {\tt Bug-ISODE@XTEL.CO.UK\/}.  
+Bug reports (and fixes) are
+welcome by the way. 
+
+\subsection*{Commercial Support}
+A UK company has been set up to provide commercial support for the ISODE and
+associated packages --- X-Tel~Services Ltd.  This company provides an update
+service, general assistance and site specific support.  Although inclusion
+of this information should not be considered an endorsement, it should be
+noted that two of the primary ISODE developers now work at X-Tel~Services
+Ltd.
+
+\[\begin{tabular}{ll}
+Postal address:&	X-Tel Services Ltd.\\
+&	University Park,\\
+&	Nottingham, NG7 2RD\\
+&        UK\\[2em]
+Telephone&	+44 602 412648\\
+Fax&		+44 602 790278\\
+Internet&	support@xtel.co.uk\\
+\end{tabular}\]
+
+If other organisations offering formal support for the ISODE wish to be
+included in future announcements, a suitable index will be organized.
+
+
+
+\newpage\section*	{Acknowledgements}
+Many people have made comments about and contributions to the ISODE which have
+been most helpful.
+The following list is by no means complete:
+
+The first three releases of the ISODE were developed at the Northrop
+Research and Technology Center,
+and the first version of this manual is referenced as NRTC Technical
+Paper \#702.
+The initial work was supported in part by Northrop's Independent
+Research and Development program.
+
+The Wollongong Group supported ISODE for its 4.0 and 5.0 release.
+They deserve much credit for that.
+Furthermore,
+they contributed an implementation of RFC1085,
+a lightweight presentation protocol for TCP/IP-based internets.
+
+The ISODE development up until version 7.0 was 
+supported by Performance Systems International,
+Inc.~and \mbox{NYSERNet}, Inc.
+This was a 
+substantial commitment to which the project in indebted.
+Before their support, ISODE was always an after-hours activity.
+The \mbox{NYSERNet} effort was partially supported by the U.S.~Defense Advanced Research
+Projects Agency and the Rome Air Development Center of the U.S.~Air Force
+Systems Command under contract number F30602--88--C--0016 to NYSERNet Inc.
+
+Christopher W.~Moore\index{Moore, Christopher W.}
+of the Wollongong Group has provided much help with ISODE in terms of both
+policy and implementational matters.
+He also performed Directory interoperability testing against a different
+implementation of the OSI Directory.
+
+Dwight E.~Cass\index{Cass, Dwight E.}
+of the Northrop Research and Technology Center was one of the original
+architects of {\em The ISO Development Environment}.
+His work was critical for the original proof of concept and should not be
+forgotten.
+John L.~Romine\index{Romine, John L.}
+also of the Northrop Research and Technology Center provided many
+fine comments concerning the presentation of the material herein.
+This resulted in a much more readable manuscript.
+Stephen H.~Willson\index{Willson, Stephen H.},
+also of the Northrop Research and Technology Center,
+provided some help in verifying the operation of the
+software on a system running the AT\&T variant of \unix/.
+
+The \man librosap(3n) library was heavily influenced by an earlier native-TCP
+version written by George Michaelson\index{Michaelson, George},
+formerly of University College London, in
+the United Kingdom.
+Stephen E.~Kille\index{Kille, Stephen E.},
+of University College London,
+provided valuable feedback on the \man pepy(1) utility.
+In addition,
+both Steve and George provided us with some good comments concerning the
+\man libpsap(3) library.
+Steve is also the conceptual architect for the addressing scheme used in
+the software,
+and he modified the \man librosap(3n) library to support half-duplex mode when
+providing ECMA ROS service.
+George contributed the CAMTEC and \ultrix/ X.25 interfaces.
+Simon Walton\index{Walton, Simon},
+also of University College London,
+has been very helpful in providing constant feedback on the ISODE during
+beta-testing.
+
+The INCA project donated the QUIPU Directory implementation to the ISODE.
+Stephen E.~Kille\index{Kille, Stephen E.},
+Colin J.~Robbins\index{Robbins, Colin J.},
+and Alan Turland\index{Turland, Alan},
+at the time all of University College London,
+are the three principals who developed the 6.0 version of the
+directory software.
+In addition,
+Steve Titcombe\index{Titcombe, Steve},
+also of UCL
+spent considerable time on the DIrectory SHell (DISH), and 
+Mike Roe\index{Roe, Mike} formerly of UCL,
+put a large amount of effort into the security requirements of QUIPU.
+Development of the current version of QUIPU has been coordinated by 
+Colin J.~Robbins now of X-Tel Services Ltd, and designed by
+Stephen E.~Kille.
+
+The UCL work has been partially supported by the commission of the
+EEC\index{EEC} under its ESPRIT\index{ESPRIT} program,
+as a stage in the promotion of OSI standards.
+Their support has been vital to the UCL activity.
+In addition,
+QUIPU is also funded by the UK Joint Network Team (JNT).
+
+Julian P.~Onions\index{Onions, Julian},
+of X-Tel Services Ltd
+is the current \man pepy(1) guru,
+having brainstormed and implemented the encoding functionality along with
+Stephen E.~Easterbrook\index{Easterbrook, Stephen}
+formerly of University College London.
+Julian also contributed the UBC X.25 interface 
+along with the TCP/X.25 TP0 bridge,
+and has also contributed greatly to \man posy(1).
+Julian's latest contribution has been a {\em transport service bridge}.
+This is used to masterfully solve interworking problems between different OSI
+stacks (TP0/X.25, TP4/CLNP, RFC1006/TCP, and so on).
+
+John Pavel\index{Pavel, John}
+and Godfrey Cowin\index{Cowin, Godfrey}
+of the Department of Trade and Industry/ National Physical Laboratory in the
+United Kingdom
+both contributed significant comments during beta-testing.
+In particular, John gave us a lot of feedback on \man pepy(1)
+and on the early FTAM DIS implementation.
+John also contributed the SunLink X.25 interface.
+
+Keith Ruttle\index{Ruttle, Keith} of CAMTEC Electronics Limited in the United
+Kingdom contributed both the driver for the new CAMTEC X.25 interface and
+the CAMTEC CONS interface (X.25 over 802 networks).
+This latter driver was later removed from the distribution for lack of use.
+
+In addition,
+Andrew Worsley\index{Worsley, Andrew}
+of the Department of Computer Science at the University of Melbourne in
+Australia
+pointed out several problems with the FTAM DIS implementation.
+He also developed a replacement for \pgm{pepy} and \pgm{posy} called
+\pgm{pepsy}.
+After moving to University College London,
+he improved this system and integrated into the ISODE.
+
+Olivier Dubous\index{Dubous, Olivier}
+of BIM sa in Belgium contributed some fixes to concurrency control in the FTAM
+initiator to allow better interworking with the \vms/ implementation of the
+filestore.
+He also suggested some changes to allow interworking with the FTAM T1 and
+A/111 profiles.
+
+Olli Finni\index{Finni, Olli}
+of Nokia Telecommunications
+provided several fixes found when testing interoperability with the TOSI
+implementation of FTAM.
+
+Mark R.~Horton\index{Horton, Mark R.}
+of AT\&T Bell Laboratories
+also provided some help in verifying the operation of the
+software on a 3B2~system running \unix/ System~V release~2.
+In addition,
+Greg Lavender\index{Lavender, Greg} of NetWorks One,
+under contract to the U.S.~Navy Regional Data Automation Center (NARDAC),
+provided modifications to allow the software to run on a generic port of
+\unix/ System~V release~3.
+
+Steve D.~Miller\index{Miller, Steve D.}
+of the University of Maryland
+provided several fixes to make the software run better on the \ultrix/ variant
+of \unix/.
+
+Jem Taylor\index{Taylor, Jem}
+of the Computer Science Department at the University of Glasgow
+provided some comments on the documentation.
+
+Hans-Werner Braun\index{Braun, Hans-Werner}
+of the University of Michigan provided the inspiration for the initial part of
+Section~\ref{name}.
+
+A previous release of the software contained an ISO TP4/CLNP package
+derived from a public-domain implementation developed by the National
+Institute of Standards and Technology\index{NIST}
+(then called the National Bureau of Standards\index{NBS}).
+The purpose of including the NIST package (and associated support)
+was to give an example of how one would interface the code to a ``generic'' TP4
+implementation.
+As the software has now been interfaced to various native TP4 implementations,
+the NIST package is no longer present in the distribution.
+
+John A.~Scott\index{Scott, John A.}
+of the MITRE Corporation contributed the SunLink OSI interface for TP4.
+He also wrote the FTAM/FTP gateway which the MITRE Corporation has generously
+donated to this package. 
+
+Philip B.~Jelfs\index{Jelfs, Philip B.}
+of the Wollongong Group upgraded the FTAM/FTP gateway to the
+``IS-level'' (International Standard) FTAM.
+
+Rick Wilder\index{Wilder, Rick}
+and
+Don Chirieleison\index{Chirieleison, Don}
+of the MITRE Corporation contributed the VT implementation which the MITRE
+Corporation has generously donated to this package.
+
+Jacob Rekhter\index{Rekhter, Jacob}
+of the T.~J.~Watson Research Center, IBM Corporation,
+provided some suggestions as to how the system should be ported
+to the IBM RT/PC running either AIX or 4.3\bsd/.
+He also fixed the incompatibilities of the FTAM/FTP gateway when running on
+4.3\bsd/ systems.
+
+Ashar Aziz\index{Aziz, Ashar}
+and
+Peter Vanderbilt\index{Vanderbilt, Peter},
+both of of Sun Microsystems Inc.,
+provided some very useful information on modifying the SunLink OSI interface
+for TP4.
+
+Later on,
+elements of the SunNet 7.0 Development Team
+(Hemma Prafullchandra, Raj Srinivasan, Daniel Weller, and Erik Nordmark)
+\index{Prafullchandra, Hemma}
+\index{Srinivasan, Raj}
+\index{Weller, Daniel}
+\index{Nordmark, Erik}
+made numerous enhancements and fixes to the system.
+
+John Brezak\index{Brezak, John}
+of Apollo Computer, Incorporated 
+ported the ISODE to the Apollo workstation.
+Don Preuss\index{Preuss, Don},
+also of Apollo,
+contributed several enhancements and minor fixes.
+
+Ole-Jorgen Jacobsen\index{Jacobsen, Ole-Jorgen} of Advanced Computing
+Environments provided some suggestions on the presentation of the material
+herein.
+
+Nandor Horvath\index{Horvath, Nandor}
+of the Computer and Automation Institute of the Hungarian Academy of Sciences
+while a guest researcher at the DFN/GMD in Darmstadt, FRG,
+provided several fixes to the FTAM implementation and documentation.
+
+George Pavlou\index{Pavlou, George}
+and Graham Knight\index{Knight, Graham}
+of University College London contributed some management instrumentation to
+the \man libtsap(3n) library.
+
+Juha Hein\"{a}nen\index{Hein\"{a}nen, Juha}
+of Tampere University of Technology
+provided many valuable comments and fixes on the ISODE.
+
+Paul Keogh\index{Keogh, Paul}
+of the Nixdorf Research and Development Center, in Dublin, Ireland,
+provided some fixes to the FTAM implementation.
+
+Oliver Wenzel\index{Wenzel, Oliver}
+of GMD Berlin contributed the RFA system.
+
+L.~McLoughlin\index{McLoughlin, L.}
+of Imperial College contributed Kerberos support for the FTAM responder.
+
+Kevin E.~Jordan\index{Jordan, Kevin E.}
+of CDC provided many enhancements to the G3FAX library.
+
+John A.~Reinart\index{Reinart, John A.}
+of Cray Research contributed many performance enhancements.
+
+Ed Pring\index{Pring, Ed}
+of the T.~J.~Watson Research Center, IBM Corporation,
+provided several fixes to the SMUX implementation in ISODE's SNMP
+agent.
+
+Uli Betzler\index{Betzler, Uli}
+of University of Karlsruhe
+donated the HP X.25 interface and other HP-UX modifications.
+
+Alan Young\index{Young, Alan}
+of Concurrent Computer Corporation contributed many helpful changes to
+the transport code.
+
+James Gosling,\index{Gosling, James}
+author of the superb Emacs screen editor for \unix/,
+and
+Leslie Lamport,\index{Lamport, Leslie}
+author of the excellent \LaTeX{} document preparation system
+both deserve much praise for such winning software.
+Of course,
+the whole crew at U.C.~Berkeley\index{U.C.~Berkeley}
+also deserves tremendous praise for their wonderful work on their variant of
+\unix/.\\[1.5ex]
+
+Finally, full credit for this release must be given to 
+Marshall T. Rose\index{Rose, Marshall T.}.
+Marshall has for so long master-minded the whole ISODE effort.
+Although he has not been involved in the last month or so leading upto
+this release, the vast majority of the effort getting ISODE-7.0 into 
+shape came from Marshall.
+
+\vspace{0.25in}
+%%%{\raggedleft /mtr\par}
+%%%{\raggedright Mountain View, California\par}
+{\raggedleft jpo \& cjr \par}
+{\raggedright Nottingham, England\\
+\ifcase\month
+    \number\month\or
+    January\or February\or March\or April\or May\or June\or
+    July\or August\or September\or October\or November\or December\else
+\number\month\fi,
+{\oldstyle\number\year}\par}

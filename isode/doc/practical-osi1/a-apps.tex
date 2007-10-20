@@ -1,0 +1,822 @@
+\begin{bwslide}
+\part	{APPLICATIONS}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {APPLICATIONS}
+
+\begin{nrtc}
+\item	AS AN EXAMPLE OF HOW ALL THE PARTS FIT TOGETHER,
+	WE WILL TAKE A QUICK LOOK AT:
+	\begin{nrtc}
+	\item	FILE TRANSFER, ACCESS AND MANAGEMENT (FTAM)
+	\item	MESSAGE HANDLING SYSTEMS (X.400)
+	\item	DIRECTORY SERVICES (X.500)
+	\item	NETWORK MANAGEMENT (CMISE)
+	\item	VIRTUAL TERMINAL (VT)
+	\end{nrtc}
+\item	AND THEN LOOK AT HOW APPLICATIONS ARE BUILT
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {APPLICATIONS (cont.)}
+%
+%\begin{nrtc}
+%\item	FINALLY, WE WILL CONSIDER APPLICATION LAYER REQUIREMENTS FOR DEFINING
+%	A NEW SERVICE
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {FILE TRANSFER, ACCESS AND MANAGEMENT (FTAM)}
+
+\vskip.5in
+\diagram[p]{figureA-19}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {THE OSI FILE SERVICE --- FTAM}
+
+\begin{nrtc}
+\item	NOT ``JUST'' FILE TRANSFER
+\item	BUILDING BLOCK FOR OSI:
+	\begin{nrtc}
+	\item	FILESTORE TO FILESTORE TRANSFER
+	\item	WORKSTATION FILE RETRIEVAL
+	\item	DISKLESS WORKSTATION PROTOCOL
+	\item	SPECIAL APPLICATIONS (e.g., PRINTING, SPOOLING)
+	\item	REMOTE FILE ACCESS
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {FTAM PHILOSOPHY}
+
+\begin{nrtc}
+\item	AS WITH ALL ``OPEN SYSTEM'' SERVICES
+	\begin{nrtc}
+	\item	DESCRIBES A CONCEPTUAL MODEL OF THE VIRTUAL SERVICE
+	\item	SPECIFIES THE SERVICE AND THE PROTOCOL
+	\item	INDEPENDENT OF ACTUAL LOCAL SYSTEMS
+		\begin{nrtc}
+		\item	PROGRAMMING LANGUAGE BINDINGS ARE NOT SPECIFIED
+		\end{nrtc}
+	\end{nrtc}
+\item	THE FUNDAMENTAL ABSTRACTION:
+	\begin{nrtc}
+	\item	THE VIRTUAL FILESTORE
+	\end{nrtc}
+\item	PROVIDES A CONCEPTUAL MODEL OF A FILE SERVICE ON A LOCAL SYSTEM (LOCALSTORE)
+\item	DIFFICULT TASK --- EXISTING FILE SERVICE ARE QUITE DIFFERENT
+\item	POTENTIALLY VERY REWARDING!
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {RELATIONSHIP OF THE VIRTUAL FILESTORE AND LOCALSTORE}
+%
+%diagram
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {FTAM --- ELEMENTS}
+
+\begin{nrtc}
+\item	A (VIRTUAL) FILESTORE IS A COLLECTION OF FILES
+\item	A FILENAME IDENTIFIES EXACTLY ONE FILE IN THE FILESTORE
+\item	THERE IS NO EXPLICIT RELATIONSHIP BETWEEN DIFFERENT FILES IN THE FILESTORE
+	\begin{nrtc}
+	\item	i.e., NO DIRECTORY STRUCTURE
+	\end{nrtc}
+\item	FILES HAVE
+	\begin{nrtc}
+	\item	ATTRIBUTES (e.g., OWNERSHIP INFORMATION)
+	\item	CONTENTS (e.g., RANDOM--ACCESS RECORDS)
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {FTAM ELEMENTS --- ATTRIBUTES}
+%
+%\begin{nrtc}
+%\item	TWO KINDS OF ATTRIBUTES ARE DEFINED
+%\item	FILE ATTRIBUTES, WHICH EXIST ON A PER-FILE BASIS
+%	\begin{nrtc}
+%	\item	SIMULTANEOUS CLIENTS OF THE FILESTORE SEE THE SAME INFORMATION
+%	\item	e.g., THE NAME OF THE FILE
+%	\end{nrtc}
+%\item	ACTIVITY ATTRIBUTES, WHICH EXIST ON A PER-CLIENT BASIS
+%	\begin{nrtc}
+%	\item	INTERACTIONS BY A CLIENT ARE NOT DIRECTLY VISIBLE TO OTHER CLIENTS
+%	\item	e.g., HOW THE FILE IS BEING TRAVERSED
+%	\end{nrtc}
+%\item	THE CLIENT INTERACTS ON AT MOST ONE FILE
+%	\begin{nrtc}
+%	\item	THE ``SELECTED'' FILE
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {FTAM ELEMENTS --- CONTENTS}
+%
+%\begin{nrtc}
+%\item	TYPICALLY, FILES ARE DEFINED IN TERMS OF A ``DOCUMENT TYPE''
+%\item	STATIC CHARACTERISTICS
+%	\begin{nrtc}
+%	\item	THE COMPOSITION OF THE FILE IN TERMS OF FILE ACCESS DATA UNITS (FADUs)
+%		\begin{nrtc}
+%		\item	e.g., A SEQUENTIAL COLLECTION OF RECORDS	
+%		\end{nrtc}
+%	\item	THE STRUCTURE OF EACH DATA UNIT (DUs)
+%		\begin{nrtc}
+%		\item	e.g., EACH RECORD CONTAINS A PERSONNEL RECORD
+%		\end{nrtc}
+%	\end{nrtc}
+%\item	DYNAMIC CHARACTERISTICS
+%	\begin{nrtc}
+%	\item	HOW DATA UNITS ARE ENCODED ON THE NETWORK
+%	\item	HOW DATA UNITS ARE REFERENCED (e.g., CURRENT POSITION)
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {FTAM --- FILE ATTRIBUTES}
+%
+%\begin{nrtc}
+%\item	4 GROUPS OF FILE ATTRIBUTES
+%\item	KERNEL GROUP (REQUIRED)
+%	\begin{nrtc}
+%	\item	NECESSARY FOR FILE SELECTION AND BASIC FILE TRANSFER
+%	\end{nrtc}
+%\item	STORAGE GROUP (OPTIONAL)
+%	\begin{nrtc}
+%	\item	DESCRIBES THE STORAGE CHARACTERISTICS FOR THE FILE
+%	\end{nrtc}
+%\item	SECURITY GROUP (OPTIONAL)
+%	\begin{nrtc}
+%	\item	DESCRIBES THE ACCESS CONTROL MECHANISMS FOR THE FILE
+%	\end{nrtc}
+%\item	PRIVATE GROUP (OPTIONAL)
+%	\begin{nrtc}
+%	\item	A MECHANISM TO CAPTURE NON-STANDARD (PROPRIETARY) MECHANISMS
+%		THAT CAN'T BE OTHERWISE REPRESENTED
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {FTAM --- KERNEL GROUP}
+%
+%\begin{nrtc}
+%\item	FILENAME:  A SEQUENCE OF STRINGS
+%	\begin{nrtc}
+%	\item	MAPPING TO THE LOCALSTORE NAMING CONVENTIONS IS A 
+%		``LOCAL IMPLEMENTATION CHOICE''
+%	\end{nrtc}
+%\item	CONTENTS TYPE:  STRUCTURING INFORMATION
+%\item	PERMITTED ACTIONS
+%	\begin{nrtc}
+%	\item	DESCRIBES THE TYPES OF DATA ACCESS THAT CAN BE PERFORMED ON THE FILE
+%	\item	HOW DATA UNITS MAY BE ACCESSED (READ, WRITE, EXTEND, etc.)
+%	\item	HOW THE FILE MAY BE TRAVERSED (MOVING FROM ONE DATA UNIT TO ANOTHER)
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {FTAM --- STORAGE GROUP}
+%
+%\begin{nrtc}
+%\item	STORAGE ACCOUNT:  A STRING
+%	\begin{nrtc}
+%	\item	ENTITY ACCRUING FILE STORAGE CHARGES
+%	\end{nrtc}
+%\item	IDENTITY OF USER AND THE DATE/TIME OF
+%	\begin{nrtc}
+%	\item	FILE CREATION
+%	\item	LAST READ \& LAST MODIFICATION OF FILE CONTENTS
+%	\item	LAST MODIFICATION OF FILE ATTRIBUTES
+%	\end{nrtc}
+%\item	FILE AVAILABILITY
+%	\begin{nrtc}
+%	\item	IMMEDIATE (FILE IS ``ON-LINE'')
+%	\item	DEFERRED (ACCESS TO FILE MAY ENCOUNTER DELAY, e.g., AWAITING
+%		ARCHIVE RETRIEVAL
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {FTAM --- STORAGE GROUP (cont.)}
+%
+%\begin{nrtc}
+%\item	FILESIZE (IN OCTETS)
+%	\begin{nrtc}
+%	\item	AN ESTIMATE OF THE TOTAL SIZE OF THE FILE'S CONTENTS
+%	\end{nrtc}
+%\item	FUTURE FILESIZE (IN OCTETS)
+%	\begin{nrtc}
+%	\item	A SOFT LIMIT ON THE TOTAL SIZE OF THE FILE'S CONTENTS
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {FTAM --- SECURITY GROUP}
+%
+%\begin{nrtc}
+%\item	ACCESS CONTROL (AN ACCESS CONTROL LIST) FOR EACH ELEMENT OF THE LIST:
+%	\begin{nrtc}
+%	\item	FILE ACTION PERMITTED
+%	\item	CONCURRENCY CONSTRAINTS
+%	\item	ENTITY PERMITTED TO REQUEST ACTION (OPTIONAL)
+%	\item	PASSWORDS REQUIRED TO VALIDATE EACH ACTION
+%	\end{nrtc}
+%\item	LEGAL QUALIFICATIONS
+%	\begin{nrtc}
+%	\item	DEFINED THE ``LEGAL STATUS'' OF THE FILE
+%	\item	MEANT TO BE USED WITH A NATIONAL PRIVACY LEGISLATION
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {FTAM --- PRIVATE GROUP}
+%
+%\begin{nrtc}
+%\item	A ``CATCH--ALL''
+%\item	USE IS STRONGLY DISCOURAGED
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {FTAM --- ACTIVITY ATTRIBUTES}
+%
+%\begin{nrtc}
+%\item	ACTIVITY ATTRIBUTES ARE ALSO DEFINED IN TERMS OF GROUPS
+%	\begin{nrtc}
+%	\item	KERNEL, STORAGE, AND SECURITY (NO PRIVATE GROUP, OBVIOUSLY)
+%	\end{nrtc}
+%\item	THESE ARE USUALLY INITIALIZED WHEN A FILE IS EITHER
+%	\begin{nrtc}
+%	\item	SELECTED
+%	\item	OPENED FOR TRANSFER/ACCESS
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {FTAM --- DOCUMENT TYPES}
+%
+%\begin{nrtc}
+%\item	STATIC CHARACTERISTICS
+%	\begin{nrtc}
+%	\item	THE FILE ACCESS STRUCTURE (CONSTRAINT SET NAME)
+%	\item	THE PRESENTATION STRUCTURE (ABSTRACT SYNTAX NAME)
+%	\end{nrtc}
+%\item	DYNAMIC CHARACTERISTICS
+%	\begin{nrtc}
+%	\item	THE TRANSFER STRUCTURE (TRANSFER SYNTAX NAME)
+%	\item	A IDENTIFICATION STRUCTURE (ACCESS CONTEXTS)
+%	\end{nrtc}
+%\item	``REGISTERED'' AND REFERENCED VIA A UNIQUE IDENTIFIER
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {FTAM --- SUMMARY}
+%
+%\begin{nrtc}
+%\item	THE VIRTUAL FILESTORE IS THE OSI ABSTRACTION OF A LOCALSTORE
+%\item	FILES CONTAIN ATTRIBUTES AND STRUCTURING INFORMATION IN ADDITION
+%	TO ``TYPED'' DATA
+%\item	FILES ARE DISTINGUISHED BY NAME
+%\item	SOME ATTRIBUTES ARE DYNAMIC, ON A PER-CLIENT BASIS
+%\item	STRUCTURE IS BASED ON A HIERARCHAL MODEL
+%\item	DATA A STRUCTURE ARE SEPARATE AND DISTINCT
+%\item	DOCUMENT TYPES PROVIDE AN ABBREVIATED METHOD FOR REFERRING TO THE
+%	FILE STRUCTURE
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {FILE TRANSFER, ACCESS AND MANAGEMENT \\ REFERENCES}
+%
+%\begin{description}
+%\item[ISO/IEC 8571:]	File Transfer, Access and Management (Parts 1---4)
+%			\begin{description}
+%			\item[Part 1:] General Information
+%			\item[Part 2:] Virtual Filestore Definition
+%			\item[Part 3:] The Filestore Definition
+%			\item[Part 4:] File Protocol Specification
+%			\end{description}
+%\end{description}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {MESSAGE HANDLING SYSTEMS (MHS)\\ X.400}
+
+\vskip.5in
+\diagram[p]{figureA-20}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {MESSAGE HANDLING SYSTEMS}
+
+\begin{nrtc}
+\item	ELECTRONIC MESSAGING SERVICE
+\item	PURPOSE
+	\begin{nrtc}
+	\item	A GENERAL PURPOSE STORE--AND--FORWARD ENVIRONMENT
+	\item	AN ENVIRONMENT WHICH SUPPORTS HUMAN TO HUMAN ELECTRONIC MESSAGING
+	\item	A SERVICE WHICH CAN BE USED BY OTHER APPLICATIONS
+	\item	TRANSPORT STRUCTURE MESSAGES
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {MHS}
+
+\begin{nrtc}
+\item	ALMOST CERTAINLY TO BE THE MOST ``POPULAR'' OSI APPLICATION
+\item	TECHNICALLY A VERY COMPREHENSIVE \& LARGE STANDARD
+\item	DEVELOPMENT OF MHS RESULTED IN MUCH OF THE OSI UPPER LAYER DEVELOPMENT
+\item	THE MOST COMPLEX OSI APPLICATION DUE TO ITS SIZE
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {MHS VERSIONS}
+%
+%\begin{nrtc}
+%\item	1984 --- FIRST PASS, PROVIDES A VERY EXTENSIVE FACILITY
+%\item	1988 --- SECOND PASS, REFLECTS A TREMENDOUS AMOUNT OF EXPERIENCE
+%		WITH THE 1984 WORK.  A SIGNIFICANTLY MORE ``MATURE'' STANDARD
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {MHS PIECES}
+
+\vskip.5in
+\diagram[p]{figureA-36}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {MESSAGE HANDLING SYSTEMS \\ REFERENCES}
+%
+%\begin{description}
+%\item[ISO/IEC 10021:]	Message Handling Systems (Parts 1---7)
+%			\begin{description}
+%			\item[Part 1:] System and Service Overview
+%			\item[Part 2:] Overall Architecture
+%			\item[Part 3:] Abstract Service Definition Conventions
+%			\item[Part 4:] Abstract Service Definition Procedures
+%			\item[Part 5:] Message Store Abstract Service Definition
+%			\item[Part 6:] Protocol SPecifications
+%			\item[Part 7:] Interpersonal Messaging System
+%			\end{description}
+%\end{description}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {DIRECTORY SERVICES (DS)\\ X.500}
+
+\vskip.5in
+\diagram[p]{figureA-17}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {DIRECTORY SERVICES}
+
+\begin{nrtc}
+\item	PURPOSE
+	\begin{nrtc}
+	\item	PROVIDE A MECHANISM TO DISTRIBUTE AND RETRIEVE INFORMATION
+	\item	LET APPLICATIONS MAP FROM NAMES TO ADDRESSES {\em (RECALL
+		DISCUSSION OF THE DSE)}
+	\item	ALLOW HUMAN USERS TO ``INTUIT'' NAMES OF OBJECTS AND THEN
+		RETRIEVE INFORMATION FROM THOSE OBJECTS
+		\begin{nrtc}
+		\item e.g., ELECTRONIC MAIL ADDRESSES FOR OTHER USERS
+		\end{nrtc}
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {DIRECTORY SERVICES (cont.)}
+
+\begin{nrtc}
+\item	INFORMATION IS ARRANGED HIERARCHICALLY
+\item	TOP LEVEL IS IMAGINED TO BE PRIMARILY COUNTRIES
+\item	RULES ABOUT WHAT APPEARS BENEATH A GIVEN POINT
+	ARE LEFT TO INDIVIDUAL ADMINISTRATORS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {THE DIRECTORY INFORMATION TREE}
+
+\vskip.5in
+\diagram[p]{figureA-37}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {HOW THE DIRECTORY IS DISTRIBUTED}
+
+\begin{nrtc}
+\item	MANY SERVERS (DSAs) COOPERATE TO PROVIDE THE HIERARCHICAL DIRECTORY
+\item	USERS (DUAs) COMMUNICATE WITH SERVERS
+\item	SERVERS ALSO COMMUNICATE WITH OTHER SERVERS
+\item	OPERATIONS MAY BE PASSED FROM ONE SERVER TO ANOTHER FOR THE USER {\em (CHAINING)}
+\item	SERVERS MAY RETURN REFERRALS TO OTHER SERVERS TO THE USER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {DIRECTORY OPERATION}
+
+\vskip.5in
+\diagram[p]{figureA-38}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {SECURITY AND THE DIRECTORY}
+
+\begin{nrtc}
+\item	OSI APPLICATIONS MAY USE THE DIRECTORY TO PROVIDE AUTHENTICATION INFORMATION
+\item	USERS MAY STORE PUBLIC ENCRYPTION KEYS IN THE DIRECTORY
+\item	OTHER USERS MAY READ THOSE KEYS TO VALIDATE DIGITAL SIGNATURES AND THE LIKE
+\end{nrtc}
+\begin{nrtc}
+\item	SIMPLE AUTHENTICATION MAY JUST STORE PASSWORDS IN THE DIRECTORY
+\item	OTHER USERS MAY ONLY BE ALLOWED TO \underline{COMPARE} A VALUE TO 
+		SEE IF IT MATCHES	
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {DIRECTORY SERVICES \\ REFERENCES}
+%
+%\begin{description}
+%\item[ISO/IEC 9594:]	The Directory (Parts 1-8)
+%			\begin{description}
+%			\item[Part 1:]	Overview of Concepts, Models and Services
+%			\item[Part 2:]	Models					
+%			\item[Part 3:]	Abstract Service Definition	
+%			\item[Part 4:]	Procedures for Distributed Operation
+%			\item[Part 5:]	Protocol Specifications		
+%			\item[Part 6:]	Selected Attribute Types
+%			\item[Part 7:]	Selected Object Classes
+%			\item[Part 8:]	Authentication Framework
+%			\end{description}
+%\end{description}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {NETWORK MANAGEMENT (CMISE)}
+
+\vskip.5in
+\diagram[p]{figureA-21}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {\small COMMON MANAGEMENT INFORMATION SERVICE ELEMENT}
+
+\begin{nrtc}
+\item	PURPOSE
+	\begin{nrtc}
+	\item	PROVIDE A COMMON PROTOCOL FOR MANAGING OSI AND NON-OSI NETWORKS
+	\item	MANAGEMENT STANDARDS ALSO DEFINE MANAGED OBJECT IN THE
+		MANAGEMENT INFORMATION BASE (MIB)
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {NETWORK MANAGEMENT \\ REFERENCES}
+%
+%\begin{description}
+%\item[ISO/IEC 9595:]	Management Information Service Definition 
+%			\begin{description}
+%			\item[Part 1:] Overview
+%			\item[Part 2:] Common Management Information Service
+%			\end{description}
+%\item[ISO/IEC 9596:]	Management Information Protocol Specification
+%			\begin{description}
+%			\item[Part 1:] Overview
+%			\item[Part 2:] Common Management Information Protocol
+%			\end{description}
+%\end{description}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {VIRTUAL TERMINAL (VT)}
+
+\vskip.5in
+\diagram[p]{figureA-22}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {VIRTUAL TERMINAL}
+
+\begin{nrtc}
+\item	PURPOSE
+	\begin{nrtc}
+	\item	PROVIDE REMOTE TERMINAL CAPABILITY
+	\item	ALLOW ACCESS TO REMOTE COMPUTER SYSTEMS ACROSS AN OSI NETWORK
+	\item	ULTIMATELY ALLOW A MAPPING BETWEEN ANY APPLICATION AND ANY TERMINAL
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {VIRTUAL TERMINAL \\ REFERENCES}
+%
+%\begin{description}
+%\item[ISO/IEC 9040:]	Virtual Terminal Service --- Basic Class
+%\item[ISO/IEC 9041:]	Virtual Terminal Protocol --- Basic Class
+%\end{description}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {INTRODUCTION}
+%
+%\begin{nrtc}
+%\item   LOOSELY COUPLED SYSTEMS THAT ARE BUILT USING REMOTE PROCEDURE CALLS
+%        (RPC) ARE GAINING POPULARITY, e.g., NFS
+%
+%\item   THE OSI REMOTE OPERATIONS CONCEPT IS INTENDED TO PROVIDE THIS
+%        FUNCTIONALITY FOR:
+%    \begin{nrtc}
+%    \item       MESSAGING
+%
+%    \item       DIRECTORY SERVICES
+%
+%    \item       NETWORK MANAGEMENT
+%
+%    \item       REMOTE DATABASE ACCESS
+%    \end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle {MOTIVATION}
+%
+%\begin{nrtc}
+%\item   MANY FEEL THAT THIS CAPABILITY MAY BE A KEY FACTOR IN THE OVERALL
+%        SUCCESS OF OSI STANDARDIZATION
+%
+%\item   BUT, REMOTE OPERATIONS ARE SUFFICIENTLY GENERAL TO REQUIRE
+%        ADDITIONAL DISCIPLINE, BEYOND THE ISO/CCITT STANDARDS,
+%        FOR THEIR USE AS AN RPC MECHANISM
+%\end{nrtc}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle {THE APPLICATIONS COOKBOOK}
+%
+%\begin{nrtc}
+%\item   THE SET OF RULES AND LOCAL IMPLEMENTATION DECISIONS PLACED ON REMOTE
+%        OPERATIONS TO MAKE THE PROBLEM MANAGEABLE:
+%    \begin{nrtc}
+%    \item       LANGUAGE BINDINGS (``C'')
+%
+%    \item       TOOLS FOR AUTOMATICALLY GENERATING PARTS OF THE
+%                PROGRAMS WHICH USE REMOTE OPERATIONS
+%
+%    \item       A RUN-TIME ENVIRONMENT AND SOME BOILERPLATE
+%
+%    \item       CONVENTIONS FOR NAMING AND ADDRESSING SERVICES AND ENTITIES
+%    \end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\part*	{\bf DEFINING A SERVICE}
+%
+%\begin{nrtc}
+%\item	TWO ASPECT TO SERVICE DEFINITION
+%\item	STATIC CHARACTERISTICS
+%	\begin{nrtc}
+%	\item	DEFINED IN SERVICE DEFINITION
+%	\item	GENERIC TO ANY ENTITY REALIZING THE SERVICE
+%	\end{nrtc}
+%\item	DYNAMIC CHARACTERISTICS
+%	\begin{nrtc}
+%	\item	DEFINED BY SERVICE PROVIDER
+%	\item	VARIES BETWEEN ENTITIES
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle {STATIC CHARACTERISTICS: \\ ABSTRACT SYNTAX}
+%
+%\begin{nrtc}
+%\item	DEFINES THE DATA STRUCTURES BEING EXCHANGED BY THE SERVICE
+%\item	VALUE IS AN OBJECT IDENTIFIER, e.g.:
+%	\begin{quote}\small
+%	ftam pci	1.0.8571.2.1
+%	\end{quote}
+%\item	ALL SERVICES USE AT LEAST TWO
+%	\begin{nrtc}
+%	\item	``PRIMARY'' PROTOCOL
+%	\item	ASSOCIATION CONTROL
+%	\end{nrtc}
+%\item	SOME USE MORE, e.g., FTAM USES AN ABSTRACT SYNTAX FOR EACH NEGOTIATED
+%	DOCUMENT TYPE
+%\end{nrtc}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle {STATIC CHARACTERISTICS: \\ APPLICATION CONTEXT NAME}
+%
+%\begin{nrtc}
+%\item	DEFINES THE APPLICATION SERVICE ELEMENTS (ASEs) USED BY THE SERVICE AND
+%	HOW THEY INTERACT
+%\item	VALUE IS AN OBJECT IDENTIFIER, e.g.:
+%	\begin{quote}\small
+%	iso ftam	1.0.8571.1.1
+%	\end{quote}
+%	INDICATES USE OF THE FTAM ASE AND THE ACSE
+%\item	SOME RELATIONSHIPS ARE MORE COMPLICATED, e.g., USE PROTOCOL ``p17''
+%	ON TOP OF ROSE ON TOP OF RTSE ON TOP OF ACSE
+%\end{nrtc}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle {DYNAMIC CHARACTERISTICS: \\ APPLICATION ENTITY TITLE}
+%
+%\begin{nrtc}
+%\item	UNIQUELY NAMES AN ENTITY IN THE NETWORK
+%\item	VALUE IS A DISTINGUISHED NAME, e.g.,
+%	\begin{quote}\small\begin{verbatim}
+%	c=US@o=TWG@ou=Software Engineering@cn=boomer@cn=filestore
+%	\end{verbatim}\end{quote}
+%	(THIS IS A STRING REPRESENTATION OF A COMPLEX ASN.1 TYPE!)
+%\item	SIMPLER APPROACH IS TO USE LOCAL ALIASING (``boomer-filestore'') PRIOR TO
+%	RESOLUTION:
+%	\begin{nrtc}
+%	\item	LHS (QUALIFIER) MAPS TO INITIAL PART OF DISTINGUISHED NAME
+%	\item	RHS (DESIGNATOR) MAPS TO SUFFIX
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle {APPLICATION ENTITY TITLE}
+%
+%\begin{nrtc}
+%\item	FOR INITIATORS, THE DIRECTORY IS ASKED TO RETURN THE ``PRESENTATION ADDRESS''
+%	ATTRIBUTE OF THIS OBJECT
+%\item	CONCEPTUALLY, RESPONDERS STORE THIS INFORMATION IN THE DIRECTORY
+%\end{nrtc}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle {DYNAMIC CHARACTERISTICS: \\ PRESENTATION ADDRESS}
+%
+%\begin{nrtc}
+%\item	UNIQUELY IDENTIFIES THE LOCATION OF AN ENTITY
+%\item	VALUE IS
+%	\begin{nrtc}
+%	\item	PRESENTATION SELECTOR (0+ OCTETS)
+%	\item	SESSION SELECTOR (0+ OCTETS)
+%	\item	TRANSPORT SELECTOR (0+ OCTETS)
+%	\item	NETWORK ADDRESSES (AT LEAST 1)
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle {LOCAL ENVIRONMENT: \\ CURRENT METHOD}
+%
+%\begin{nrtc}
+%\item	TRANSPORT LISTENER RESIDES ON EACH END-SYSTEM
+%\item	FOR EACH SERVICE LISTED IN LOCAL DATABASE
+%	\begin{nrtc}
+%	\item	LISTEN ON ASSOCIATED TRANSPORT ADDRESS
+%	\item	UPON RECEIVING AN INCOMING CONNECTION, TSAPD
+%		INVOKES ASSOCIATED PROGRAM
+%	\end{nrtc}
+%\item	PROGRAM IS CALLED A DYNAMIC RESPONDER
+%\end{nrtc}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle {LOCAL ENVIRONMENT: \\ CURRENT METHOD (cont.)}
+%
+%\begin{nrtc}
+%\item	SOME RESPONDERS MAY WISH TO SERVICE MULTIPLE INITIATORS
+%\item	DIFFERENT APPROACH:
+%	\begin{nrtc}
+%	\item	SERVICE NOT LISTED IN LOCAL DATABASE
+%	\item	PROGRAM LISTENS ON OWN TRANSPORT ADDRESS
+%	\end{nrtc}
+%\item	PROGRAM IS CALLED A STATIC RESPONDER
+%\end{nrtc}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle {LOCAL ENVIRONMENT: \\ FUTURE METHOD}
+%
+%\begin{nrtc}
+%\item	LOCAL DATABASE CONTAINS
+%	\begin{nrtc}
+%	\item	SERVICE NAME
+%	\item	LOCAL PROGRAM
+%	\end{nrtc}
+%	BUT NOT TRANSPORT ADDRESS
+%\item	FOR EACH SERVICE
+%	\begin{nrtc}
+%	\item	TRANSPORT LISTENER LISTENS ON RANDOM TRANSPORT ADDRESS
+%	\item	LISTENER REGISTERS SERVICE \& TRANSPORT ADDRESS WITH THE DIRECTORY
+%	\end{nrtc}
+%\item	SIMILAR APPROACH IS USED BY STATIC RESPONDERS
+%\end{nrtc}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle {UPPER--LAYER ADDRESSING}
+%
+%\begin{nrtc}
+%\item	TOO MUCH FREEDOM
+%\item	DYNAMIC RESPONDER PREFER TO ``DISPATCH'' ON TRANSPORT SELECTOR
+%\item	STATIC RESPONDERS MAY REQUIRE A UNIQUE NETWORK ADDRESS
+%\end{nrtc}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle {UPPER--LAYER ADDRESSING}
+%
+%\begin{nrtc}
+%\item	U.S. GOSIP CALLS FOR DISPATCHING ON PRESENTATION SELECTOR
+%\item	OKAY FOR DYNAMIC RESPONDERS
+%\item	STATIC RESPONDERS MAY STILL REQUIRE A UNIQUE NETWORK ADDRESS
+%	\begin{nrtc}
+%	\item	WITH REAL OSI NETWORK SERVICE, STATIC RESPONDERS CAN DISPATCH
+%		ON TRANSPORT SELECTOR
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}

@@ -1,0 +1,37 @@
+\File{grind5b\-3b.c},{08:54},{Jun 29 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} ((sz = is2saddr (argv[1], NULLCP, is)) == NULLSA)}}
+\L{\LB{}\Tab{8}{error (\S{}\"address translation failed\"\SE{});}}
+\L{\LB{    (\K{void}) bzero ((\K{char} *) sf, \K{sizeof} *sf);}}
+\L{\LB{}}
+\L{\LB{    settings = 0;}}
+\L{\LB{\K{\#define}}\Tab{8}{dotoken(requires,shift,bit,type) \!}}
+\L{\LB{\{ \!}}
+\L{\LB{    \K{if} (requirements \& requires) \!}}
+\L{\LB{}\Tab{8}{settings \|= ST\_INIT\_VALUE \<\< shift; \!}}
+\L{\LB{\}}}
+\L{\LB{    dotokens ();}}
+\L{\LB{\K{\#undef}}\Tab{8}{dotoken}}
+\L{\LB{}}
+\L{\LB{    \K{if} (SConnRequest (sf, NULLSA, sz, requirements, settings, SERIAL\_NONE,}}
+\L{\LB{}\Tab{8}{    NULLCP, 0, NULLQOS, sc, si) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"S\-CONNECT.REQUEST: \%s\"\SE{}, SErrString (sa \-\> sa\_reason));}}
+\L{\LB{\Proc{if}    \K{if} (sc \-\> sc\_result != SC\_ACCEPT)}}
+\L{\LB{}\Tab{8}{error (\S{}\"connection rejected by sink[\%s]: \%s\"\SE{},}}
+\L{\LB{}\Tab{16}{    SErrString (sa \-\> sa\_reason),}}
+\L{\LB{}\Tab{16}{    SErrString (sc \-\> sc\_result));}\Tab{56}{}}
+\L{\LB{}}
+\L{\LB{    sd = sc \-\> sc\_sd;}}
+\L{\LB{    requirements = sc \-\> sc\_requirements;}}
+\L{\LB{}}
+\L{\LB{\K{\#define} dotoken(requires,shift,bit,type) \!}}
+\L{\LB{\{ \!}}
+\L{\LB{    \K{if} (requirements \& requires) \!}}
+\L{\LB{}\Tab{8}{\K{if} ((sc \-\> sc\_settings \& (ST\_MASK \<\< shift)) == ST\_INIT\_VALUE) \!}}
+\L{\LB{}\Tab{8}{    owned \|= bit; \!}}
+\L{\LB{\}}}
+\L{\LB{}\Tab{8}{dotokens ();}}
+\L{\LB{\K{\#undef}}\Tab{8}{dotoken}}
+\L{\LB{}}
+\L{\LB{...}}

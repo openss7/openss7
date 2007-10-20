@@ -1,0 +1,11 @@
+.PS 6i
+.ps 20
+## figure 3a
+B1:	box "TCP/IP-only"
+B2:	box invis with .w at (B1.e.x+linewid, B1.e.y)
+B3:	box "``DUAL''" "" "TCP/IP" "" "FULL ISO" with .n at (B1.s.x, B1.s.y-lineht)
+B4:	box "ISO-only" with .w at (B3.e.x+linewid, B3.e.y)
+##
+	line from B1.s to B3.n
+##
+.PE

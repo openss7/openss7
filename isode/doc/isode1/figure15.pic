@@ -1,0 +1,25 @@
+.PS 6.5i
+.ps 20
+## figure 15
+B1:	box invis width boxwid/2
+	move to (B1.e.x+linewid/2, B1.e.y) \
+	    "\small\begin{tabular}{ll}designator:&gonzo\\ qualifier:&filestore\end{tabular}" rjust
+B2:	box shaded with .w at (B1.e.x+3*linewid/4, B1.e.y) \
+		width 2*boxwid height 3*boxht/2
+	arrow from B1.e to B2.w
+B6:	box shaded with .w at (B2.e.x+linewid, B2.e.y) \
+		width boxwid/2 height 3*boxht/2
+	arrow from B2.e to B6.w
+	box invis with .c at ((B2.e.x+B6.w.x)/2, B6.w.y) "AET" "" ""
+B3:	box invis with .w at (B6.e.x+3*linewid/4, B6.e.y) width boxwid/2
+	arrow from B6.e to B3.w
+	move to B3.w \
+"\small\begin{tabular}{ll}nadr\#1:&TCP $\ldots$\\tsel:& \#256\\ssel:& null\\psel:& null\end{tabular}" ljust
+##
+B4:	box "DNS" with .nw at (B2.sw.x, B2.sw.y-lineht) width 3*boxwid/4
+	line <- -> from B4.n to (B4.n.x, B2.s.y)
+B5:	box "LOCAL" "FILES" with .ne at (B2.se.x, B2.se.y-lineht) \
+		width 3*boxwid/4
+	line <- -> from B5.n to (B5.n.x, B2.s.y)
+##
+.PE

@@ -1,0 +1,43 @@
+\File{grind2a\-2a.c},{11:48},{Dec 10 1990}
+\L{\LB{\K{\#include} \<stdio.h\>}}
+\L{\LB{\K{\#include} \S{}\"generic.h\"\SE{}}\Tab{32}{\C{}\/* defines OPERATIONS and ERRORS *\/\CE{}}}
+\L{\LB{\K{\#include} \<isode\/rosap.h\>}}
+\L{\LB{\K{\#include} \<isode\/tsap.h\>}\Tab{32}{\C{}\/* for listening *\/\CE{}}}
+\L{\LB{\K{\#include} \<setjmp.h\>}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{char} *myservice = \S{}\"service\"\SE{};}}
+\L{\LB{\K{static} \K{char} *mycontext = \S{}\"context\"\SE{};}}
+\L{\LB{}}
+\L{\LB{\K{static} jmp\_buf toplevel;}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{int}}\Tab{8}{ros\_init (), ros\_work (), ros\_lose ();}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\Proc{main}main (argc, argv, envp)}}
+\L{\LB{\K{int}}\Tab{8}{argc;}}
+\L{\LB{\K{char}  **argv,}}
+\L{\LB{      **envp;}}
+\L{\LB{\{}}
+\L{\LB{    AEI}\Tab{8}{    aei;}}
+\L{\LB{    \K{struct} TSAPdisconnect tds;}}
+\L{\LB{    \K{register} \K{struct} TSAPdisconnect *td = \&tds;}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((aei = \_str2aei (PLocalHostName (), myservice, mycontext, 0,}}
+\L{\LB{}\Tab{24}{ NULLCP, NULLCP)) == NULLAEI)}}
+\L{\LB{}\Tab{8}{fatal (\S{}\"unable to resolve service: \%s\"\SE{}, PY\_pepy);}}
+\L{\LB{}}
+\L{\LB{    \K{if} (isodeserver (argc, argv, aei, ros\_init, ros\_work, ros\_lose, td)}}
+\L{\LB{}\Tab{8}{    == NOTOK) \{}}
+\L{\LB{}\Tab{8}{\K{if} (td \-\> td\_cc \> 0)}}
+\L{\LB{}\Tab{8}{    fatal (\S{}\"isodeserver: [\%s] \%*.*s\"\SE{}, TErrString (td \-\> td\_reason),}}
+\L{\LB{}\Tab{16}{    td \-\> td\_cc, td \-\> td\_cc, td \-\> td\_data);}}
+\L{\LB{}\Tab{8}{\K{else}}}
+\L{\LB{}\Tab{8}{    fatal (\S{}\"isodeserver: [\%s]\"\SE{}, TErrString (td \-\> td\_reason));}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    exit (0);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{...}}

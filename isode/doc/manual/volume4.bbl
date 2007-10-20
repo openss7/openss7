@@ -1,0 +1,78 @@
+\begin{thebibliography}{CCI88b}
+
+\bibitem[CCI88a]{CCITT.ROS.Service}
+{Remote Operations: Model, Notation and Service Definition}.
+\newblock International Telegraph and Telephone Consultative Committee, March
+  1988.
+\newblock Recommendation X.219.
+
+\bibitem[CCI88b]{CCITT.ROS.Protocol}
+{Remote Operations: Protocol Specification}.
+\newblock International Telegraph and Telephone Consultative Committee, March
+  1988.
+\newblock Recommendation X.229.
+
+\bibitem[CCI88c]{CCITT.PP.Syntax}
+{Specification of Abstract Syntax Notation One}.
+\newblock International Telegraph and Telephone Consultative Committee, 1988.
+\newblock Recommendation X.208.
+
+\bibitem[Coo82]{Courier.BSD}
+Eric~C. Cooper.
+\newblock {Writing Distributed Programs with Courier}.
+\newblock Technical report, Computer Science Division~---~EECS, University of
+  California, Berkeley, March 1982.
+
+\bibitem[ECM85]{ECMA.ROS}
+{Remote Operations: Concepts, Notation and Connection-Oriented Mappings},
+  December 1985.
+\newblock ECMA TR/31.
+
+\bibitem[ISO87]{ISO.PP.Syntax}
+{Information Processing~---~Open Systems Interconnection~---~Specification of
+  Abstract Syntax Notation One (ASN.1)}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, 1987.
+\newblock International Standard 8824.
+
+\bibitem[ISO88a]{ISO.ROS.Service}
+{Information Processing Systems~---~Text Communication~---~Remote Operations
+  Part~1: Model, Notation and Service Definition}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, March 1988.
+\newblock Working Document for International Standard 9072-1.
+
+\bibitem[ISO88b]{ISO.ROS.Protocol}
+{Information Processing Systems~---~Text Communication~---~Remote Operations
+  Part~2: Protocol Specification}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, March 1988.
+\newblock Working Document for International Standard 9072-2.
+
+\bibitem[KR78]{C.Language}
+Brian~W. Kernighan and Dennis~M. Ritchie.
+\newblock {\em {The C Programming Language}}.
+\newblock Software Series. Prentice-Hall, Inc., Englewood Cliffs, New Jersey,
+  1978.
+
+\bibitem[Pos81]{TCP}
+Jon~B. Postel.
+\newblock {Transmission Control Protocol}.
+\newblock Request for Comments 793, DDN Network Information Center, SRI
+  International, September 1981.
+\newblock See also \milstd/ 1778.
+
+\bibitem[RC86]{ISO.on.DDN}
+Marshall~T. Rose and Dwight~E. Cass.
+\newblock {OSI Transport Services on top of the TCP}.
+\newblock {\em Computer Networks and ISDN Systems}, 12(3), 1986.
+\newblock Also available as NRTC Technical Paper \#700.
+
+\bibitem[Ros90]{Open.Book}
+Marshall~T. Rose.
+\newblock {\em {The Open Book: A Practical Perspective on Open Systems
+  Interconnection}}.
+\newblock Prentice-hall, 1990.
+\newblock ISBN 0--13--643016--3.
+
+\end{thebibliography}

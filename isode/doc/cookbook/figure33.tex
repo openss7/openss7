@@ -1,0 +1,24 @@
+\File{figure33.c},{13:12},{Feb 28 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} error\_MODULE\_error1:}}
+\L{\LB{}\Tab{8}{\{}}
+\L{\LB{}\Tab{8}{    \K{register} \K{struct} type\_MODULE\_parameter *parm =}}
+\L{\LB{}\Tab{24}{    (\K{struct} type\_MODULE\_parameter *) parameter;}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \C{}\/* do something with ``parm\'\' here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\C{}\/* other errors are handled here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}:}}
+\L{\LB{}\Tab{8}{    adios (NULLCP, \S{}\"unknown error returned (\%d)\"\SE{}, error);}}
+\L{\LB{}\Tab{8}{    \C{}\/* NOTREACHED *\/\CE{}}}
+\L{\LB{    \}}}
+\L{\LB{    }}
+\L{\LB{    \C{}\/* ``parameter\'\' will be automatically free\'d when do\_error returns *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}

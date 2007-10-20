@@ -1,0 +1,13 @@
+...
+
+SecurityProblem ::=
+    INTEGER {
+	inappropriateAuthentication(1),
+	invalidCredentials(2),
+	insufficientAccessRights(3),
+	invalidSignature(4),
+	protectionRequired(5),
+	noInformation(6)
+    }
+
+END

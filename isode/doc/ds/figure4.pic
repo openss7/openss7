@@ -1,0 +1,30 @@
+.PS
+#.ps 20
+## figure 4
+C1:	circle rad 2i
+##
+B1:	box with .n at C1.n invis "The" "Directory"
+##
+C2:	circle at C1.c rad .4i			"DSA"
+C3:	circle with .w at C1.w rad .4i		"DSA"
+C4:	circle with .s at C1.s rad .4i		"DSA"
+C5:	circle with .ne at C1.ne rad .4i	"DSA"
+##
+S1:	spline from C2.se \
+		right .3i down .3i \
+		then left .6i down .3i \
+		then to C4.n
+S2:	spline from C2.e \
+		right .3i \
+		then up .6i left .15i \
+		then to C5.sw
+S3:	spline from C2.nw \
+		up .3i left .3i \
+		then down .6i left .15i \
+		then to C3.e
+##
+B2:	box at C3.w shaded	height .06i width .18
+B3:	box at C4.s shaded 	height .18i width .06i
+B4:	box at C5.ne shaded	height .06i width .18i
+##
+.PE

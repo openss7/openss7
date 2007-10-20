@@ -1,0 +1,25 @@
+.PS
+.ps 20
+## figure E-2
+C1:	circle radius 10*circlerad
+B1:	box "ES" with .e at (C1.w.x-linewid, C1.w.y)
+B2:	box "ES" with .w at (C1.e.x+linewid, C1.e.y)
+B3:	box "IS" with .se at (C1.c.x-linewid, B1.n.y)
+B4:	box "IS" with .nw at (C1.c.x+linewid, B2.s.y)
+##
+	line from (B3.nw.x-linewid, B3.nw.y) \
+	     to   (B3.nw.x-linewid, B1.se.y)
+	line from B1.e to (B3.nw.x-linewid, B1.e.y)
+	line from B3.w to (B3.nw.x-linewid, B3.w.y)
+##
+	line from (B4.se.x+linewid, B4.se.y) \
+	     to   (B4.se.x+linewid, B2.ne.y)
+	line from B2.w to (B4.se.x+linewid, B2.w.y)
+	line from B4.e to (B4.se.x+linewid, B4.e.y)
+##
+	line from (C1.c.x, B3.ne.y) \
+	     to   (C1.c.x, B4.se.y)
+	line from B3.e to (C1.c.x, B3.e.y)
+	line from B4.w to (C1.c.x, B4.w.y)
+##
+.PE

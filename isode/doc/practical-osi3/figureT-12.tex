@@ -1,0 +1,52 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \rlap{\kern  0.750in\lower 1.541in\hbox to 0pt{\hss \begin{tabular}[b]{r} STOR\\ open\\ send data\\ \ $\ldots$\\ close\end{tabular}\ }}%
+    \rlap{\kern  2.813in\lower 1.541in\hbox to 0pt{\hss GATEWAY\hss}}%
+    \rlap{\kern  2.813in\lower 2.541in\hbox to 0pt{\hss DISK\hss}}%
+    \special{pa 2563 1750}%
+    \special{pa 2563 2250}%
+    \special{fp}%
+    \special{pa 2537 2150}%
+    \special{pa 2563 2250}%
+    \special{fp}%
+    \special{pa 2588 2150}%
+    \special{pa 2563 2250}%
+    \special{fp}%
+    \special{pa 3063 2250}%
+    \special{pa 3063 1750}%
+    \special{fp}%
+    \special{pa 3088 1850}%
+    \special{pa 3063 1750}%
+    \special{fp}%
+    \special{pa 3037 1850}%
+    \special{pa 3063 1750}%
+    \special{fp}%
+    \rlap{\kern  4.875in\lower 1.541in\hbox to0pt{\ \begin{tabular}[t]{l} F-SELECT\\ F-OPEN\\ F-WRITE\\ F-DATA\\ \ $\ldots$\\ F-DATA-END\\ F-TRANSFER-END\\ F-CLOSE\\ F-DESELECT\end{tabular}\hss}}%
+    \special{pa 1000 1500}%
+    \special{pa 2000 1500}%
+    \special{fp}%
+    \special{pa 1900 1525}%
+    \special{pa 2000 1500}%
+    \special{fp}%
+    \special{pa 1900 1475}%
+    \special{pa 2000 1500}%
+    \special{fp}%
+    \special{pa 3625 1500}%
+    \special{pa 4625 1500}%
+    \special{fp}%
+    \special{pa 4525 1525}%
+    \special{pa 4625 1500}%
+    \special{fp}%
+    \special{pa 4525 1475}%
+    \special{pa 4625 1500}%
+    \special{fp}%
+    \kern  4.876in
+  }\vss}%
+  \kern  2.542in
+}

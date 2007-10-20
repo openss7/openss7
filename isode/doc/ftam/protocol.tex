@@ -1,0 +1,416 @@
+% run this through SLiTeX with the appropriate wrapper
+
+\begin{bwslide}
+\part	{THE FILE PROTOCOL}
+
+\begin{nrtc}\bf
+\item	ELEMENTS OF PROCEDURE
+
+\item	DEFINITION AND ENCODING OF DATA UNITS
+
+\item	FTAM USE OF LOWER-LAYER SERVICES
+
+\item	EXAMPLES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{ELEMENTS OF PROCEDURE}%%%\bf
+
+\begin{nrtc}
+\item	THE FILE SERVICE PROVIDER EXECUTES THE FILE PROTOCOL
+
+\item	THE PROVIDER IS ACTUALLY TWO PEER ENTITIES
+
+\item	ASSOCIATION CONTROL IS USED TO MANAGE THE END-TO-END ASSOCIATION
+	BETWEEN FILE USERS
+
+\item	PRESENTATION SERVICES ARE USED TO EXCHANGE DATA IN A
+	MACHINE-INDEPENDENT FASHION
+
+\item	COMMITMENT, CONCURRENCY AND RECOVERY (CCR) SERVICES CAN ALSO BE USED
+	FOR THE FILE TRANSFER CLASS
+
+\item	ALL DATA UNITS (FPDUs and FADUs) ARE EXPRESSED IN TERMS OF
+	ABSTRACT SYNTAX NOTATION ONE (ASN.1)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FILE SERVICE REQUESTS}
+
+\begin{nrtc}
+\item	THE VALIDITY OF THE REQUEST IS VERIFIED
+    \begin{nrtc}
+    \item	i.e., CHECK NEGOTIATED FUNCTIONAL UNITS, INNER-MOST REGIME,
+		INTERNAL STATE, and so on
+    \end{nrtc}
+
+\item	THE PARAMETERS OF THE REQUEST ARE ENCODED IN A
+	FILE PROTOCOL DATA UNIT (FPDU)
+
+\item	THE FPDU IS GIVEN TO THE PRESENTATION PROVIDER FOR DELIVERY
+	TO THE REMOTE SYSTEM
+
+\item	THE PROVIDER UPDATES ITS INTERNAL STATE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ON RECEIPT OF A FILE PROTOCOL DATA UNIT}
+
+\begin{nrtc}
+\item	THE VALIDITY OF THE FPDU IS VERIFIED
+    \begin{nrtc}
+    \item	i.e., CHECK NEGOTIATED FUNCTIONAL UNITS, INNER-MOST REGIME,
+		INTERNAL STATE,	and so on
+    \end{nrtc}
+
+\item	THE PARAMETERS OF THE FPDU ARE ENCODED IN A SERVICE .INDICATION
+	OR .CONFIRMATION EVENT
+
+\item	THE EVENT IS GIVEN TO THE FILE SERVICE USER
+
+\item	THE PROVIDER UPDATES ITS INTERNAL STATE
+
+\item	FADUs (DETERMINED BY PRESENTATION CONTEXT) ARE GIVEN DIRECTLY TO THE
+	USER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{DEFINITION AND ENCODING OF DATA UNITS}\bf
+
+\begin{nrtc}
+\item	TWO KINDS OF DATA UNITS ARE EXCHANGED IN THE FILE SERVICE
+
+\item	FILE PROTOCOL DATA UNITS (FPDUs) ARE EXCHANGED WITHIN THE
+	FILE SERVICE PROVIDER
+
+\item	FILE ACCESS DATA UNITS (FADUs) ARE EXCHANGED BY THE USERS OF THE
+	FILE SERVICE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ABSTRACT SYNTAX NOTATION ONE (ASN.1)}
+
+\begin{nrtc}
+\item	ABSTRACT SYNTAX NOTATION ONE (ASN.1) IS USED TO DESCRIBE THE STRUCTURE
+	AND ENCODING OF DATA UNITS
+
+\item	ASN.1 IS A DATA STRUCTURE DESCRIPTION LANGUAGE AND AN ENCODING
+	SPECIFICATION
+    \begin{nrtc}
+    \item	IT IS USED TO DESCRIBE DATA STRUCTURES INDEPENDENT OF A
+		GIVEN MACHINE'S INTERNAL REPRESENTATION
+
+    \item	IT ALSO DEFINES HOW TO UNIVERSALLY ENCODE THOSE STRUCTURES
+		AS THEY ARE TRANSMITTED FROM ONE MACHINE TO ANOTHER
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{FTAM USE OF LOWER-LAYER SERVICES}\bf
+
+\begin{nrtc}
+\item	ASSOCIATION CONTROL
+
+\item	PRESENTATION SERVICES
+
+\item	SESSION SERVICES
+
+\item	COMMITMENT, CONCURRENCY AND RECOVERY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FTAM USE OF LOWER-LAYER SERVICES (cont.)}
+
+\vskip.5in
+\diagram[p]{figure7}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASSOCIATION CONTROL}
+
+\begin{nrtc}
+\item	ASSOCIATION CONTROL IS USED BY
+    \begin{nrtc}
+    \item	FTAM REGIME ESTABLISHMENT SERVICE: A-ASSOCIATE
+
+    \item	FTAM REGIME TERMINATION SERVICE: A-RELEASE
+
+    \item	FTAM REGIME ABORT SERVICE: A-(U-)ABORT, A-P-ABORT
+    \end{nrtc}
+
+\item	NOTE THAT ASSOCIATION CONTROL MAPS DIRECTLY ONTO PRESENTATION
+	SERVICES
+    \begin{nrtc}
+    \item	A PART OF THE APPLICATION LAYER
+		(SO-CALLED COMMON APPLICATION SERVICE ENTITY)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ADDRESSES AND APPLICATION ENTITY TITLES}
+
+\begin{nrtc}
+\item	INITIATOR PROVIDES
+    \begin{nrtc}
+    \item	DESCRIPTION OF FILE SERVICE DESIRED,
+		e.g., ``gremlin-filestore''
+    \end{nrtc}
+        
+\item	AND (SOMEHOW) PERFORMS TWO MAPPINGS
+    \begin{nrtc}
+    \item	DESCRIPTOR TO APPLICATION ENTITY TITLE PROVIDING SERVICE:
+		CURRENTLY AN OBJECT IDENTIFIER
+
+    \item	AET TO PRESENTATION ADDRESS:
+		CURRENTLY P-SELECTOR, S-SELECTOR, T-SELECTOR, AND A LIST OF
+		NETWORK ADDRESSES
+    \end{nrtc}
+
+\item	IN THE FUTURE, DIRECTORY SERVICES ARE USED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PRESENTATION SERVICES}
+
+\begin{nrtc}
+\item	PRESENTATION SERVICES ARE USED BY THE REMAINING FTAM REGIMES: P-DATA
+
+\item	FURTHER
+    \begin{nrtc}
+    \item	THE FILE OPEN SERVICE MAY REQUIRE: P-ALTER-CONTEXT
+
+    \item	THE CANCEL DATA SERVICE REQUIRES: P-RESYNCHRONIZE
+
+    \item	THE CHECKPOINT SERVICE REQUIRES: P-SYNC-MINOR
+
+    \item	THE RESTART SERVICE REQUIRES: P-ALTER-CONTEXT
+    \end{nrtc}
+
+\item	IN ADDITION, ASSOCIATION CONTROL REQUIRES:
+	P-CONNECT, P-RELEASE, P-U-ABORT, P-P-ABORT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PRESENTATION CONTEXTS}
+
+\begin{nrtc}
+\item	ASSOCIATION CONTROL PCI (PRESENTATION CONTEXT INFORMATION)
+
+\item	FTAM PCI
+
+\item	IF THE PRESENTATION CONTEXT MANAGEMENT SERVICE IS UNAVAILABLE, THEN
+    \begin{nrtc}
+    \item	FTAM REQUESTS A CONTEXT FOR EACH DOCUMENT TYPE THAT MIGHT BE
+		EXCHANGED
+    \end{nrtc}
+
+\item	FTAM PROVIDES BOTH THE ABSTRACT SYNTAX AND TRANSFER SYNTAX
+	OF EACH CONTEXT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMITMENT, CONCURRENCY AND RECOVERY}
+
+\begin{nrtc}
+\item	IF THE FILE TRANSFER CLASS IS SELECTED, AS A USER OPTION,
+	THE ISO COMMITMENT, CONCURENCY, AND RECOVERY PROTOCOL CAN BE USED
+
+\item	NEEDED FOR ATOMIC TRANSFER OF FILES (BUT NOT REALLY NEEDED FOR
+	RESUMPTION OF FILE TRANSFER)
+
+\item	PERSONAL OPINION
+    \begin{nrtc}
+    \item	A TREMENDOUS ``OVERKILL'' FOR ATOMIC FILE TRANSFER
+
+    \item	NOT REALLY WELL-DEFINED AT THIS POINT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SESSION SERVICES}
+
+\begin{nrtc}
+\item	THE FILE PROVIDER DOES NOT USE SESSION SERVICES DIRECTLY
+
+\item	HOWEVER MOST PRESENTATION SERVICES MAP DIRECTLY ONTO SESSION SERVICES
+
+\item	HENCE: AT LEAST S-CONNECT, S-DATA, S-RELEASE, S-U-ABORT, AND S-P-ABORT
+	ARE REQUIRED
+
+\item	AND OPTIONALLY: S-TYPED-DATA, S-RESYNCHRONIZE and S-SYNC-MINOR ARE
+	ALSO REQUIRED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{EXAMPLES}\small
+
+\begin{verbatim}
+wrote F-INITIALIZE-request, context 1
+{
+   {
+      service-class transfer-and-management-class,
+      functional-units { read, write, limited-file-management,
+                         enhanced-file-management },
+      attribute-groups { storage, security },
+      contents-type-list {
+         { document-types { 1.0.8571.6.3, 1.17.3.6.1, 1.17.3.6.8 } }
+      },
+      initiator-identity "ANON",
+      filestore-password { "mrose" }
+   }
+}
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}\small
+\begin{verbatim}
+wrote AARQapdu, context 9
+{
+   protocolVersion { version1 },
+   calledAEtitle 1.17.4.3.1,
+   applicationContextName 1.0.8571.2.1,
+   userInformation {
+      data-value-identifier { indirect-reference 1 },
+      encodings {
+         single-ASN1-type {
+            [3] '03'H,
+            [4] '0136'H,
+            [5] '06c0'H,
+            [7] {
+               [0] {
+                  [APPLICATION 7] '28c27b0603'H,
+                  [APPLICATION 7] '39030601'H,
+                  [APPLICATION 7] '39030608'H
+               }
+            },
+            [APPLICATION 4] "ANON",
+            [APPLICATION 6] { "mrose" }
+         }
+      }
+   }
+}
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}\small
+\begin{verbatim}
+wrote CPppdu
+{
+   { nonx410mode },
+   [2] {
+      [2] TRUE,
+      [3] {
+         { 1, 1.0.8571.1.1, { 1.0.8825 } },
+         { 3, 1.0.8571.2.4, { 1.0.8571.3.4 } },
+         { 5, 1.17.3.2.0, { 1.17.3.3.0 } },
+         { 7, 1.17.3.2.2, { 1.17.3.3.0 } },
+         { 9, 1.0.8650.2.1, { 1.0.8825 } }
+      },
+      [4] { 1.0.8571.1.1, 1.0.8825 },
+      [5] { version-1 },
+      {
+         {
+            {
+               data-value-identifier { indirect-reference 9 },
+               encodings {
+                  single-ASN1-type {
+                     [0] '0780'H,
+                     [1] { 1.17.4.3.1 },
+                     [3] { 1.0.8571.2.1 },
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}\small
+\begin{verbatim}
+                     [4] {
+                        [UNIVERSAL 8] {
+                           1,
+                           [0] {
+                              [0] {
+                                 [3] '03'H,
+                                 [4] '0136'H,
+                                 [5] '06c0'H,
+                                 [7] {
+                                    [0] {
+                                       [APPLICATION 7] '28c27b0603'H,
+                                       [APPLICATION 7] '39030601'H,
+                                       [APPLICATION 7] '39030608'H
+                                    }
+                                 },
+                                 [APPLICATION 4] "ANON",
+                                 [APPLICATION 6] { "mrose" }
+                              }
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}\small
+\begin{verbatim}
+---> (: dump of SPDU 0xb8404, errno=0xffffffff mask=0x409f
+---> LI/ 281
+---> CODE/ CONNECT
+---> REFERENCE/ <USER "gremlin", COMMON  "870601045854Z", ADDITIONAL 0>
+---> OPTIONS/ 0x0<>
+---> TSDU/ INITIATOR: 65528, RESPONDER: 65528
+---> VERSION/ 0x1
+---> ISN/ 1
+---> REQUIREMENTS/ 0x22<DUPLEX,RESYNC>
+---> USER DATA/ 225 bytes
+---> )
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{SUMMARY}\bf
+
+\begin{nrtc}
+\item	THE FILE SERVICE PROVIDER IS A ``STATE MACHINE'' COMPOSED OF TWO
+	PEERS EXECUTING THE FILE PROTOCOL
+
+\item	IN ADDITION TO RESOURCES ON THEIR HOST SYSTEMS,
+	THEY USE THE ASSOCIATION CONTROL AND PRESENTATION SERVICES
+
+\item	ASN.1 IS USED TO DEFINE AND ENCODE THE DATA UNITS WHICH ARE EXCHANGED
+\end{nrtc}
+\end{bwslide}

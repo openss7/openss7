@@ -1,0 +1,18 @@
+.PS
+.ps 20
+## figure 1
+B1:	box shaded
+B2:	box invis with .s at (B1.n.x, B1.n.y+lineht) "SERVICE" "OFFERED"
+B3:	box invis with .n at (B1.s.x, B1.s.y-lineht) "SERVICE" "USED"
+##
+B4:	box dashed with .w at (B1.e.x+5*linewid, B1.e.y) "PEER"
+B5:	box invis with .s at (B4.n.x, B4.n.y+lineht)
+B6:	box invis with .n at (B4.s.x, B4.s.y-lineht)
+##
+	arrow from B1.n to B2.s
+	arrow from B3.n to B1.s
+	line <- -> dashed from B1.e to B4.w "COMMUNICATION" ""
+	arrow dashed from B4.n to B5.s
+	arrow dashed from B6.n to B4.s
+##
+.PE

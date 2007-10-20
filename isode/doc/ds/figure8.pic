@@ -1,0 +1,35 @@
+.PS
+#.ps 20
+## figure 9
+C1:	circle rad 1.75i
+##
+B1:	box with .n at C1.n invis "The" "Directory"
+##
+C2:	circle at C1.c rad .4i			"DSA"
+C3:	circle with .w at C1.w rad .4i		"DSA"
+C4:	circle with .s at C1.s rad .4i		"DSA"
+C5:	circle with .ne at C1.ne rad .4i	"DSA"
+##
+C6:	circle at (C1.w.x - (C1.c.x - C1.w.x), C3.w.y) \
+					rad .4i "DUA"
+##
+B2:	box at C3.w shaded	height .06i width .18i
+B3:	box at C6.e shaded	height .06i width .18i
+##
+L1:	line from B3.e to B2.w
+##
+L2:	move to L1.w up .1i; line -> "\xx Request" above to L1.e up .1i
+L3:	move to L1.e down .1i; line -> "\xx Response" below to L1.w down .1i
+##
+B4:	box at C3.e invis height .06i width .18i
+B5:	box at C2.w invis height .06i width .18i
+##
+L4:	move to B4.e up .1i; line -> to B5.w up .1i
+L5:	move to B5.w down .1i; line -> to B4.e down .1i
+##
+L6:	move to C3.se up .05i right .07i; \
+		line -> to C4.nw up .05i right .07i
+L7:	move to C4.nw down .05i left .07i; \
+		line -> to C3.se down .05i left .07i
+##
+.PE

@@ -1,0 +1,28 @@
+-- operations
+
+evalOperation OPERATION
+    ARGUMENT	EvalObject
+    RESULT	EvalObject
+    ERRORS	{ evalError }
+    LINKED	{ read, write }
+	::= 0
+
+read OPERATION
+    RESULT	EvalObject
+    ERRORS	{ endOfInput }
+	::= 1
+
+write OPERATION
+    ARGUMENT	EvalObject
+	::= 2
+
+-- errors
+
+evalError ERROR
+    PARAMETER	Service-Diagnostic
+	::= 0
+
+endOfInput ERROR
+	::= 1
+
+...

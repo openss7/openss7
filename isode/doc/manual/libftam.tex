@@ -1,0 +1,2798 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{User Library}\label{libftam}
+The \man libftam(3n) library implements the filestore-independent parts of
+the International Standard of the OSI file service, FTAM
+(which stands for File Transfer, Access and Management).
+Currently supported are:
+the no-recovery FTAM Quality-of-Service;
+the transfer, access, management, and transfer and management service classes;
+the kernel, read, write, access, limited file management,
+enhanced file management, grouping, and fadu-locking functional units;
+and, the kernel, storage, security, and private attribute groups.
+
+Unlike most OSI services,
+FTAM distinguishes between the {\em initiator\/} of an FTAM association and
+the {\em responder}.
+However,
+as with most models of OSI services,
+an asynchronous environment is assumed.
+That is,
+the service provider may generate events for the service user without the
+latter triggering the actions which led to the event.
+For example,
+in a synchronous environment,
+an indication that data has arrived usually occurs only when the service user
+asks the service provider to read data;
+in an asynchronous environment,
+the service provider may interrupt the service user at any time to announce
+the arrival of data.
+
+The \verb"ftam" module in this release initially uses a synchronous interface;
+however once the connection is established,
+an asynchronous interface may be selected.
+
+All of the routines in the \man libftam(3n) library are integer-valued.
+They return the manifest constant \verb"OK" on success,
+or \verb"NOTOK" otherwise.
+
+\section	{Warning}\label{ftam:note}
+Please read the following important message.
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	Readers of this chapter should have an intimate understanding
+		of FTAM.
+		It is not the intent of this
+		chapter to present a tutorial on these services, so novice
+		users will suffer greatly if they choose to read further.
+
+		As previous versions of this software included an
+		implementation of DIS FTAM, and the release contains an IS
+		implementation, users of the \man libftam(3n) library
+		are urged to re-read this chapter.
+\end{tabular}}\]
+
+\section	{Constants}
+There are several important constants, described below:
+
+\subsection	{FTAM Quality-of-Service}
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf FTAM-QoS}\\
+\hline
+    \tt FQOS\_NORECOVERY&	no recovery\\
+    \tt FQOS\_CLASS1&	class 1 recovery\\
+    \tt FQOS\_CLASS2&	class 2 recovery\\
+    \tt FQOS\_CLASS3&	class 3 recovery\\
+\hline
+\end{tabular}\]
+Currently, only the no-recovery FTAM-QoS is supported.
+
+\subsection	{Service Classes}
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Service Class}\\
+\hline
+    \tt FCLASS\_TRANSFER&	transfer\\
+    \tt FCLASS\_ACCESS&		access\\
+    \tt FCLASS\_MANAGE&		management\\
+    \tt FCLASS\_TM&		transfer and management\\
+    \tt FCLASS\_UNCONS&		unconstrained\\
+\hline
+\end{tabular}\]
+Currently, all service classes other than the unconstrained class are
+supported.
+
+\subsection	{Functional Units}
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Functional Unit}\\
+\hline
+    \tt FUNIT\_READ&		read\\
+    \tt FUNIT\_WRITE&		write\\
+    \tt FUNIT\_ACCESS&		file access\\
+    \tt FUNIT\_LIMITED&		limited file management\\
+    \tt FUNIT\_ENHANCED&	enhanced file management\\
+    \tt FUNIT\_GROUPING&	grouping\\
+    \tt FUNIT\_FADULOCK&	fadu locking\\
+    \tt FUNIT\_RECOVERY&	recovery\\
+    \tt FUNIT\_RESTART&		restart data transfer\\
+\hline
+\end{tabular}\]
+Currently, all functional units other than the
+recovery and restart units are supported.
+Further, the grouping unit {\em must\/} be specified.
+
+\subsection	{Attribute Groups}
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Attribute Group}\\
+\hline
+    \tt FATTR\_STORAGE&		storage\\
+    \tt FATTR\_SECURITY&	security\\
+    \tt FATTR\_PRIVATE&		private\\
+\hline
+\end{tabular}\]
+Currently, all attribute groups other than the
+private group are supported.
+
+\subsection	{State Results}
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf State Result}\\
+\hline
+    \tt FSTATE\_SUCCESS&	success\\
+    \tt FSTATE\_FAILURE&	failure\\
+\hline
+\end{tabular}\]
+
+\subsection	{Action Results}
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Action Result}\\
+\hline
+    \tt FACTION\_SUCCESS&	success\\
+    \tt FACTION\_TRANS&		transient error\\
+    \tt FACTION\_PERM&		permanent error\\
+\hline
+\end{tabular}\]
+
+\section	{Data-Structures}
+There are several important data structures, described below:
+
+\subsection	{Contents Type}
+An FTAM document type is represented by the \verb"FTAMcontent" structure.
+\begin{quote}\index{FTAMcontent}\small\begin{verbatim}
+struct FTAMcontent {
+    OID     fc_dtn;
+
+    int     fc_id;
+    int     fc_result;
+};
+\end{verbatim}\end{quote}
+This elements of this structure are:
+\begin{describe}
+\item[\verb"fc\_dtn":] the document type name,
+represented as an object identifier
+(consult Section~\ref{psap:oid} of \volone/);
+
+\item[\verb"fc\_id":] the presentation context identifier
+(consult Section~\ref{psap:context} of \voltwo/)
+associated with the document type;
+and,
+
+\item[\verb"fc\_result":] the status indicator for the presentation context
+(codes are listed in Table~\ref{PSAPreasons} of \voltwo/).
+\end{describe}
+
+A list of FTAM documents types is represented by the \verb"FTAMcontentlist"
+structure.
+\begin{quote}\index{FTAMcontentlist}\small\begin{verbatim}
+struct FTAMcontentlist {
+    int     fc_ncontent;
+
+#define NFCONT  (NPCTX - 2)
+    struct FTAMcontent fc_contents[NFCONT];
+};
+\end{verbatim}\end{quote}
+This elements of this structure are:
+\begin{describe}
+\item[\verb"fc\_contents"/\verb"fc\_ncontent":] the contents list
+(and the number of contents in the list).
+\end{describe}
+A limitation of this implementation is that a fixed number of document types
+may be supported,
+as denoted by the manifest constant \verb"NFCONT".
+
+\subsection	{Diagnostics}
+An FTAM diagnostic is represented by the \verb"FTAMdiagnostic" structure.
+\begin{quote}\index{FTAMcontent}\small\begin{verbatim}
+struct FTAMdiagnostic {
+    int     ftd_type;
+
+    int     ftd_identifier;
+
+    int     ftd_observer;
+    int     ftd_source;
+
+    int     ftd_delay;
+
+#define FTD_SIZE        512
+    int     ftd_cc;
+    char    ftd_data[FTD_SIZE];
+};
+\end{verbatim}\end{quote}
+This elements of this structure are:
+\begin{describe}
+\item[\verb"ftd\_type":] the diagnostic type, one of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Meaning}\\
+\hline
+    \tt DIAG\_INFORM&	informative\\
+    \tt DIAG\_TRANS&	transient\\
+    \tt DIAG\_PERM&	permanent\\
+\hline
+\end{tabular}\]
+
+\item[\verb"ftd\_identifier":] the error-identifier
+(consult \verb"<isode/ftam.h>" for the list,
+there are far too many to list here);
+
+\item[\verb"ftd\_observer"/\verb"ftd\_source":] the observer and source of
+the error, one of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Meaning}\\
+\hline
+    \tt EREF\_NONE&	no categorization possible\\
+    \tt EREF\_IFSU&	initiating file service user\\
+    \tt EREF\_IFPM&	initiating file service machine\\
+    \tt EREF\_SERV&	service support the file protocol machine\\
+    \tt EREF\_RFPM&	responding file protocol machine\\
+    \tt EREF\_RFSU&	responding file service user\\
+\hline
+\end{tabular}\]
+
+\item[\verb"ftd\_delay":] the suggested delay that might be honored prior to
+retrying the operation (use \verb"DIAG_NODELAY" if a delay is not
+appropriate);
+and,
+
+\item[\verb"ftd\_data"/\verb"ftd\_cc":] a diagnostic string
+(and the length of that string).
+\end{describe}
+A limitation of this implementation
+is that the routines and data structures which support diagnostics have a
+fixed limit as to the number of diagnostics permitted.
+This is currently denoted by the manifest constant \verb"NFDIAG".
+
+\subsection	{Charging}
+A list of FTAM charges is represented by the \verb"FTAMcharging" structure.
+\begin{quote}\index{FTAMcharging}\small\begin{verbatim}
+struct FTAMcharging {
+    int     fc_ncharge;
+
+#define NFCHRG  5
+    struct fc_charge {
+        char   *fc_resource;
+        char   *fc_unit;
+        int     fc_value;
+    }           fc_charges[NFCHRG];
+};
+\end{verbatim}\end{quote}
+This elements of this structure are:
+\begin{describe}
+\item[\verb"fc\_charges"/\verb"fc\_ncharge":] the charging list
+(and the number of charges in the list, which may not exceed
+the manifest constant \verb"NFCHRG").
+Each charge consists of:
+    \begin{describe}
+    \item[\verb"fc\_resource":] the resource identifier;
+
+    \item[\verb"fc\_unit":] the charging unit;
+	and,
+
+    \item[\verb"fc\_value":] the charging value.
+    \end{describe}
+\end{describe}
+A limitation of this implementation
+is that a fixed number of charges may be supported,
+as denoted by the manifest constant \verb"NFCHRG".
+
+\subsection	{Passwords}
+A list of FTAM passwords is represented by the \verb"FTAMpasswords" structure.
+\begin{quote}\index{FTAMpasswords}\small\begin{verbatim}
+struct FTAMpasswords {
+    char   *fp_read;
+    int     fp_readlen;
+
+    char   *fp_insert;
+    int     fp_insertlen;
+
+    char   *fp_replace;
+    int     fp_replacelen;
+
+    char   *fp_extend;
+    int     fp_extendlen;
+
+    char   *fp_erase;
+    int     fp_eraselen;
+
+    char   *fp_readattr;
+    int     fp_readattrlen;
+
+    char   *fp_chngattr;
+    int     fp_chngattrlen;
+
+    char   *fp_delete;
+    int     fp_deletelen;
+};
+\end{verbatim}\end{quote}
+This elements of this structure are:
+\begin{describe}
+\item[\verb"fp\_read"/\verb"fp\_readlen":] the read password
+(and the length of the password);
+
+\item[\verb"fp\_insert"/\verb"fp\_insertlen":] the insert password
+(and the length of the password);
+
+\item[\verb"fp\_replace"/\verb"fp\_replacelen":] the replace password
+(and the length of the password);
+
+\item[\verb"fp\_extend"/\verb"fp\_extendlen":] the extend password
+(and the length of the password);
+
+\item[\verb"fp\_erase"/\verb"fp\_eraselen":] the erase password
+(and the length of the password);
+
+\item[\verb"fp\_readattr"/\verb"fp\_readattrlen":] the read attribute password
+(and the length of the password);
+
+\item[\verb"fp\_chngattr"/\verb"fp\_chngattrlen":] the change attribute
+password (and the length of the password);
+and,
+
+\item[\verb"fp\_delete"/\verb"fp\_deletelen":] the delete password
+(and the length of the password).
+\end{describe}
+The \verb"FPFREE" macro can be used to free the storage associated with an
+\verb"FTAMpasswords" structure (without freeing the structure itself).
+It behaves as if it was defined as:
+\begin{quote}\index{FPFREE}\small\begin{verbatim}
+void    FPFREE (fp)
+struct FTAMpasswords *fp;
+\end{verbatim}\end{quote}
+
+\subsection	{Access Control}
+An FTAM access control element is represented by the \verb"FTAMacelement"
+structure.
+\begin{quote}\index{FTAMacelement}\small\begin{verbatim}
+struct FTAMacelement {
+    int     fe_actions;
+
+    struct FTAMconcurrency fe_concurrency;
+
+    char   *fe_aet;
+
+    struct FTAMpasswords fe_passwords;
+
+    AEI    fe_aet;
+
+    struct FTAMacelement *fe_next;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"fe\_actions":] the action list,
+containing the inclusive-or of any of the values shown in
+Table~\ref{FTAMaccess};
+
+\item[\verb"fe\_concurrency":] any concurrency-control constraints;
+
+\item[\verb"fe\_aet":] the user identity;
+
+\item[\verb"fe\_passwords"] the passwords;
+
+\item[\verb"fe\_aet":] the application-entity title
+(defined in Section~\ref{acs:aei} on page~\pageref{acs:aei} in \volone/);
+and,
+
+\item[\verb"fe\_next":] the next access element in the linked list.
+\end{describe}
+The \verb"FEFREE" macro can be used to free the storage associated with a
+list of FTAM access elements,
+including the head element on the list.
+It behaves as if it was defined as:
+\begin{quote}\index{FEFREE}\small\begin{verbatim}
+void    FEFREE (fe)
+struct FTAMacelement *fe;
+\end{verbatim}\end{quote}
+\tagtable[tp]{ftam-1}{FTAM Requested Access Values}{FTAMaccess}
+
+\subsection	{Attributes}
+An FTAM attribute list is represented by the \verb"FTAMattributes" structure.
+\begin{quote}\index{FTAMattributes}\small\begin{verbatim}
+struct FTAMattributes {
+    long    fa_present;
+    long    fa_novalue;
+
+#define NFFILE  5
+    int     fa_nfile;
+    char   *fa_files[NFFILE];
+    
+    int     fa_permitted;
+
+    OID     fa_contents;
+    PE      fa_parameter;
+
+    char   *fa_account;
+
+    struct UTCtime fa_date_create;
+    struct UTCtime fa_date_modify;
+    struct UTCtime fa_date_read;
+    struct UTCtime fa_date_attribute;
+
+    char   *fa_id_create;
+    char   *fa_id_modify;
+    char   *fa_id_read;
+    char   *fa_id_attribute;
+
+    int     fa_availability;
+
+    int     fa_filesize;
+    int     fa_futuresize;
+
+    struct FTAMacelement fa_control;
+    char   *fa_legal;
+};
+\end{verbatim}\end{quote}
+
+\newpage	%%% hack
+
+The elements of this structure are:
+\begin{describe}
+\item[\verb"fa\_present":] the values present,
+containing the inclusive-or of any of the values shown in
+Table~\ref{FTAMattributes};
+
+\item[\verb"fa\_novalue":] the values which are not available are not available
+(using the same values listed in Table~\ref{FTAMattributes},
+the value of this element is a subset of the value of the \verb"fa_present"
+element);
+
+\item[\verb"fa\_files"/\verb"fa\_nfile":] the list of filename components
+(and the number of components, which may not exceed
+the manifest constant \verb"NFFILE");
+
+\item[\verb"fa\_permitted":] permitted actions,
+containing the inclusive-or of any of the values shown in
+Table~\ref{FTAMaccess} on page~\pageref{FTAMaccess},
+in addition to any of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Meaning}\\
+\hline
+    \tt FA\_PERM\_TRAV&		traversal\\
+    \tt FA\_PERM\_RVTRAV&	reverse-traversal\\
+    \tt FA\_PERM\_RANDOM&	random-order\\
+\hline
+\end{tabular}\]
+
+\item[\verb"fa\_contents"/\verb"fa\_parameter":] the contents type;
+
+\item[\verb"fa\_account":] the account;
+
+\item[\verb"fa\_date\_create":] the date and time of creation;
+
+\item[\verb"fa\_date\_modify":] the date and time of last modification;
+
+\item[\verb"fa\_date\_read":] the date and time of last read access;
+
+\item[\verb"fa\_date\_attribute":] the date and time of last attribute
+modification;
+
+\item[\verb"fa\_id\_create":] the identity of creator;
+
+\item[\verb"fa\_id\_modify":] the identity of last modifier;
+
+\item[\verb"fa\_id\_read":] the identity of last reader;
+
+\item[\verb"fa\_id\_attribute":] the identity of last attribute modifier;
+
+\item[\verb"fa\_availability":] file availability,
+one of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Meaning}\\
+\hline
+    \tt FA\_AVAIL\_IMMED&	immediate\\
+    \tt FA\_AVAIL\_DEFER&	deferred\\
+\hline
+\end{tabular}\]
+
+\item[\verb"fa\_filesize":] filesize;
+
+\item[\verb"fa\_futuresize":] future filesize;
+
+\item[\verb"fa\_control":] access control;
+
+\item[\verb"fa\_encrypt":] encryption name;
+and,
+
+\item[\verb"fa\_legal":] legal qualification.
+\end{describe}
+A limitation of this implementation
+is that a fixed number of filename components may be supported,
+as denoted by the manifest constant \verb"NFFILE".
+
+The routine \verb"FAFREE" can be used to free the storage associated with an
+\verb"FTAMattributes" structure (without freeing the structure itself).
+It is defined as:
+\begin{quote}\index{FAFREE}\small\begin{verbatim}
+void    FAFREE (fa)
+struct FTAMattributes *fa;
+\end{verbatim}\end{quote}
+\tagtable[tp]{ftam-2}{FTAM Attribute Values}{FTAMattributes}
+
+\subsection	{Concurrency}
+An FTAM concurrency list is represented by the \verb"FTAMconcurrency"
+structure.
+\begin{quote}\index{FTAMconcurrency}\small\begin{verbatim}
+struct FTAMconcurrency {
+#define FLOCK_SHARED    00      /* shared */
+#define FLOCK_EXCLUSIVE 01      /* exclusive */
+#define FLOCK_NOTREQD   02      /* not-required */
+#define FLOCK_NOACCESS  03      /* no-access */
+
+    char    fc_readlock;
+    char    fc_insertlock;
+    char    fc_replacelock;
+    char    fc_extendlock;
+    char    fc_eraselock;
+    char    fc_readattrlock;
+    char    fc_chngattrlock;
+    char    fc_deletelock;
+};
+\end{verbatim}\end{quote}
+This elements of this structure are:
+\begin{describe}
+\item[\verb"fc\_readlock":] the concurrency constraints for the read operation;
+
+\item[\verb"fc\_insertlock":] the concurrency constraints for the insert
+operation; 
+
+\item[\verb"fc\_replacelock":] the concurrency constraints for the replace
+operation;
+
+\item[\verb"fc\_extendlock":] the concurrency constraints for the extend
+operation; 
+
+\item[\verb"fc\_eraselock":] the concurrency constraints for the erase
+operation; 
+
+\item[\verb"fc\_readattrlock":] the concurrency constraints for the read
+attribute operation;
+
+\item[\verb"fc\_chngattrlock":] the concurrency constraints for the change
+attribute operation;
+and,
+
+\item[\verb"fc\_deletelock":] the concurrency constraints for the delete
+operation.
+\end{describe}
+The \verb"FCINIT" macro can be used to initialize an
+\verb"FTAMconcurrency" structure.
+It behaves as if it was defined as:
+\begin{quote}\index{FCINIT}\small\begin{verbatim}
+void    FCINIT (fc)
+struct FTAMconcurrency *fc;
+\end{verbatim}\end{quote}
+
+\subsection	{FADU Identity}
+An FADU identity is represented by the \verb"FADUidentity" structure.%
+\footnote{FADU stands for File Access Data Unit;
+if you didn't already know this, you shouldn't be reading this chapter.
+Read Section~\ref{ftam:note} right now.}
+\begin{quote}\index{FADUidentity}\small\begin{verbatim}
+struct FADUidentity {
+    int     fa_type;
+#define FA_FIRSTLAST    0       /* first-last */
+#define FA_RELATIVE     1       /* relative */
+#define FA_BEGINEND     2       /* begin-end */
+#define FA_SINGLE       3       /* single-name */
+#define FA_NAMELIST     4       /* name-list */
+#define FA_FADUNUMBER   5       /* fadu-number */
+
+    union {
+        int     fa_un_firstlast;
+#define FA_FIRST        0
+#define FA_LAST         1
+
+        int     fa_un_relative;
+#define FA_PREVIOUS     0
+#define FA_CURRENT      1
+#define FA_NEXT         2
+
+        int     fa_un_beginend;
+#define FA_BEGIN        0
+#define FA_END          1
+
+        char   *fa_un_singlename;
+
+#define NANAME  5
+        struct {
+            char   *fa_un_names[NANAME];
+            int     fa_un_nname;
+        }       fa_un_list;
+
+        int     fa_un_fadunumber;
+    }   fa_un;
+#define fa_firstlast    fa_un.fa_un_firstlast
+#define fa_relative     fa_un.fa_un_relative
+#define fa_beginend     fa_un.fa_un_beginend
+#define fa_singlename   fa_un.fa_un_singlename
+#define fa_names        fa_un.fa_un_list.fa_un_names
+#define fa_nname        fa_un.fa_un_list.fa_un_nname
+#define fa_fadunumber   fa_un.fa_un_fadunumber
+};
+\end{verbatim}\end{quote}
+As shown, this structure is really a discriminated union
+(a structure with a tag element followed by a union).
+The elements are:
+\begin{describe}
+\item[\verb"fa\_type":] indicates what type of FADU identity is represented;
+Depending on this type, one of the following elements is valid:
+\begin{describe}
+\item[\verb"fa\_firstlast":] the location, identified as first or last;
+
+\item[\verb"fa\_relative":] the location, identified as previous,
+current, or next;
+
+\item[\verb"fa\_beginend":] the location, identified as begin or end;
+
+\item[\verb"fa\_singlename":] the location, as identified by name;
+
+\item[\verb"fa\_names"/\verb"fa\_nname":] the location,
+as identified by a list of names (and the length of that list,
+which may not exceed the manifest constant \verb"NANAME");
+or,
+
+\item[\verb"fa\_fadunumber":] the location, as identified by number.
+\end{describe}
+\end{describe}
+A limitation of this implementation
+is that a fixed number of FADU names may be supported,
+as denoted by the manifest constant \verb"NANAME".
+
+The \verb"FUFREE" macro can be used to free the storage associated with an
+\verb"FADUidentity" structure (without freeing the structure itself).
+It behaves as if it was defined as:
+\begin{quote}\index{FUFREE}\small\begin{verbatim}
+void    FUFREE (fu)
+struct FADUidentity *fu;
+\end{verbatim}\end{quote}
+
+\section	{Association Establishment}
+The \man libftam(3n) library distinguishes between the entity which started an
+association,
+the {\em initiator},
+and the entity which was subsequently bound to the association,
+the {\em responder}.
+We sometimes term these two entities the {\em client\/} and the {\em server},
+respectively.
+
+Section~\ref{acs:addresses} of \volone/ describes the use of addressing
+for the application layer.
+In particular,
+Figure~\ref{getFTAMentity} on page~\pageref{getFTAMentity} of \volone/
+presents
+an example of how one constructs the address for the File Transfer, Access
+and Management (FTAM) service on host \verb"RemoteHost".
+
+\subsection	{Responder}
+The \man tsapd(8c) daemon,
+upon accepting a connection from an initiating host,
+consults the ISO services database to determine which program
+on the local system implements the desired application context.
+
+Once the program has been ascertained,
+the daemon runs the program with any arguments listed in the database.
+In addition,
+it appends some {\em magic arguments\/} to the argument vector.
+Hence,
+the very first action performed by the responder is to re-capture the FTAM
+state contained in the magic arguments.
+This is done by calling the routine \verb"FInit",
+which on a successful return,
+is equivalent to an {\sf F-INITIALIZE.INDICATION\/} event.
+\begin{quote}\index{FInit}\small\begin{verbatim}
+int     FInit (vecp, vec, fts, tracing, fti)
+int     vecp;
+char  **vec;
+struct FTAMstart *fts;
+int   (*tracing) ();
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"vecp":] the length of the argument vector;
+
+\item[\verb"vec":] the argument vector;
+
+\item[\verb"fts":] a pointer to an \verb"FTAMstart" structure,
+which is updated only if the call succeeds;
+
+\item[\verb"tracing":] the address of a tracing routine to be invoked when an
+FTAM event occurs (consult Section~\ref{ftam:tracing});
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure,
+which is updated only if the call fails.
+\end{describe}
+If \verb"FInit" is successful,
+it returns information in the \verb"fts" parameter,
+which is a pointer to an \verb"FTAMstart" structure.
+\begin{quote}\index{FTAMstart}\small\begin{verbatim}
+struct FTAMstart {
+    int     fts_sd;
+
+    AEInfo  fts_calledtitle;
+    AEInfo  fts_callingtitle;
+
+    struct PSAPaddr fts_calledaddr;
+    struct PSAPaddr fts_callingaddr;
+
+    OID     fts_context;
+
+    int     fts_manage;
+
+    int     fts_class;
+
+    int     fts_units;
+    int     fts_attrs;
+
+    PE      fts_sharedASE;
+
+    int     fts_fqos;
+
+    struct FTAMcontentlist fts_contents;
+
+    char   *fts_initiator;
+    char   *fts_account;
+    char   *fts_password;
+    int     fts_passlen;
+
+    int     fts_ssdusize;
+
+    struct QOStype fts_qos;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"fts\_sd":] the association-descriptor to be used to reference
+this association;
+
+\item[\verb"fts\_calledtitle":] information on the called application-entity,
+if any (consult Section~\ref{acs:aei} of \volone/);
+
+\item[\verb"fts\_callingtitle":] information on the the calling
+application-entity, if any;
+
+\item[\verb"fts\_calledaddr":] the called presentation address
+(consult Section~\ref{psap:addresses} of \voltwo/);
+
+\item[\verb"fts\_callingaddr":] the calling presentation address;
+
+\item[\verb"fts\_context":] the application context name;
+
+\item[\verb"fts\_manage":] a flag indicating if presentation context
+management is available for use (zero if unavailable);
+
+\item[\verb"fts\_class":] the inclusive-or of the service classes offered;
+
+\item[\verb"fts\_units":] the functional units;
+
+\item[\verb"fts\_attrs":] the attribute groups;
+
+\item[\verb"fts\_sharedASE":] shared ASE information;
+
+\item[\verb"fts\_fqos":] the FTAM Quality-of-Service;
+
+\item[\verb"fts\_contents":] the contents type list;
+
+\item[\verb"fts\_initiator":] the user-identity of the initiator, if any;
+
+\item[\verb"fts\_account":] the account, if any;
+
+\item[\verb"fts\_password"/\verb"fts\_passlen":] the password (and its
+length), if any;
+
+\item[\verb"fts\_ssdusize":] the largest atomic SSDU size that can be used
+on the underlying connection;
+and,
+
+\item[\verb"qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos} in \voltwo/).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released by using the \verb"FTSFREE" macro when no longer
+referenced.
+The \verb"FTSFREE" macro,
+behaves as if it was defined as:
+\begin{quote}\index{FTSFREE}\small\begin{verbatim}
+void    FTSFREE (fts)
+struct FTAMstart *fts;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FInit",
+and not the \verb"FTAMstart" structure itself.
+Further,
+\verb"FTSFREE" should be called only if the call to the \verb"FInit"
+routine returned \verb"OK".
+
+If the call to \verb"FInit" is not successful,
+then an {\sf F-P-ABORT.INDICATION\/} event is simulated,
+and the relevant information is returned in an encoded \verb"FTAMindication"
+structure.\label{FTAMindication}
+\begin{quote}\index{FTAMindication}\small\begin{verbatim}
+struct FTAMindication {
+    int     fti_type;
+#define FTI_FINISH      0x00
+#define FTI_ABORT       0x01
+#define FTI_MANAGEMENT  0x02
+#define FTI_BULKBEGIN   0x03
+#define FTI_BULKEND     0x04
+#define FTI_ACCESS      0x05
+#define FTI_READWRITE   0x06
+#define FTI_DATA        0x07
+#define FTI_DATAEND     0x08
+#define FTI_CANCEL      0x09
+#define FTI_TRANSEND    0x10
+
+    union {
+        struct FTAMfinish   fti_un_finish;
+        struct FTAMabort    fti_un_abort;
+        struct FTAMgroup    fti_un_group;
+        struct FTAMaccess   fti_un_access;
+        struct FTAMreadwrite fti_un_readwrite;
+        struct PSAPdata     fti_un_data;
+        struct FTAMdataend  fti_un_dataend;
+        struct FTAMcancel   fti_un_cancel;
+        struct FTAMtransend fti_un_transend;
+    }   fti_un;
+#define fti_finish      fti_un.fti_un_finish
+#define fti_abort       fti_un.fti_un_abort
+#define fti_group       fti_un.fti_un_group
+#define fti_access      fti_un.fti_un_access
+#define fti_readwrite   fti_un.fti_un_readwrite
+#define fti_data        fti_un.fti_un_data
+#define fti_dataend     fti_un.fti_un_dataend
+#define fti_cancel      fti_un.fti_un_cancel
+#define fti_transend    fti_un.fti_un_transend
+};
+\end{verbatim}\end{quote}
+As shown, this structure is really a discriminated union
+(a structure with a tag element followed by a union).
+Hence, on a failure return,
+one first coerces a pointer to the \verb"FTAMabort" structure contained
+therein,
+and then consults the elements of that structure.
+\begin{quote}\index{FTAMabort}\small\begin{verbatim}
+struct FTAMabort {
+    int     fta_peer;
+
+    int     fta_action;
+
+#define NFDIAG  5
+    int     fta_ndiag;
+    struct FTAMdiagnostic fta_diags[NFDIAG];
+};
+\end{verbatim}\end{quote}
+The elements of an \verb"FTAMabort" structure are:
+\begin{describe}
+\item[\verb"fta\_peer":] if set, indicates that a user-initiated abort occurred
+(an {\sf F-U-ABORT.INDICATION\/} event);
+if not set, indicates that a provider-initiated abort occurred
+(an {\sf F-P-ABORT.INDICATION\/} event);
+
+\item[\verb"fta\_action":] an action result;
+and,
+
+\item[\verb"fta\_diags"/\verb"fta\_ndiag":] any diagnostic information
+(and the number of diagnostics present).
+\end{describe}
+For each diagnostic present (typically only one) in the \verb"FTAMabort"
+structure,
+information regarding the failure is present.
+In particular,
+the error code can be found in the
+the \verb"ftd_identifier" element of each diagnostic.
+
+After examining the information returned by \verb"FInit" on a successful call
+(and possibly after examining the argument vector),
+the responder should either accept or reject the association.
+For either response,
+the responder should use the \verb"FInitializeResponse" routine
+(which corresponds to the {\sf F-INITIALIZE.RESPONSE\/} action).
+\begin{quote}\index{FInitializeResonse}\small\begin{verbatim}
+int     FInitializeResponse (sd, state, action, context,
+        respondtitle, respondaddr, manage, class, units,
+        attrs, sharedASE, fqos, contents, diag, ndiag, fti)
+int     sd;
+int     state,
+        action,
+        manage,
+        class,
+        units,
+        attrs,
+        fqos;
+OID     context;
+AEI     respondtitle;
+struct PSAPaddr *respondaddr;
+PE      sharedASE;
+struct FTAMcontentlist *contents;
+struct FTAMdiagnostic diag[];
+int     ndiag;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"state":] a state result;
+
+\item[\verb"action":] an action result;
+
+\item[\verb"context":] the application context name
+(use the manifest constant \verb"NULLOID" if the proposed name should be used);
+
+\item[\verb"manage":] the negotiated use of presentation context management;
+
+\item[\verb"respondtitle":] information on the responding application-entity,
+if any;
+
+\item[\verb"respondaddr":] the responding presentation address, if any;
+
+\item[\verb"manage":] the negotiated service class;
+
+\item[\verb"units":] the negotiated functional units
+(specify both mandatory and optional functional units for the service class);
+
+\item[\verb"attrs":] the negotiated attribute groups;
+
+\item[\verb"sharedASE":] shared ASE information;
+
+\item[\verb"fqos":] the negotiated FTAM Quality-of-Service;
+
+\item[\verb"contents":] the negotiated contents type list;
+
+\item[\verb"diag"/\verb"ndiag":] a list of diagnostics
+(and the number of diagnostics in the list);
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call to \verb"FInitializeResponse" is successful,
+then association establishment has now been completed.
+Otherwise,
+if the call failed and the reason is ``fatal'',
+then the association is lost.
+
+\subsection	{Initiator}
+A program wishing to associate itself with a filestore
+calls the routine \verb"FInitializeRequest",
+which corresponds to the user taking the {\sf F-INIT\-IAL\-IZE.REQUEST\/}
+action.
+\begin{quote}\index{FInitializeRequest}\small\begin{verbatim}
+int     FInitializeRequest (context, callingtitle, calledtitle, 
+        callingaddr, calledaddr, manage, class, units, attrs,
+        sharedASE, fqos, contents, initiator, account,
+        password, passlen, qos, tracing, ftc, fti)
+OID     context;
+AEI     calledtitle,
+        callingtitle;
+struct PSAPaddr *calledaddr,
+                *callingaddr;
+int     manage,
+        class,
+        units,
+        attrs,
+        fqos,
+        passlen;
+PE      sharedASE;
+struct FTAMcontentlist *contents;
+char   *initiator,
+       *account,
+       *password;
+struct QOStype *qos;
+IFP     tracing;
+struct FTAMconnect *ftc;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"context":] the application context name
+(use the manifest constant \verb"NULLOID" to invoke the default
+file transfer context);
+
+\item[\verb"callingtitle":] information on the the calling application-entity,
+if any (consult Section~\ref{acs:aei} of \volone/);
+
+\item[\verb"calledtitle":] information on the called application-entity,
+if any;
+
+\item[\verb"callingaddr":] the calling presentation address
+(consult Section~\ref{psap:addresses} of \voltwo/);
+
+\item[\verb"calledaddr":] the called presentation address;
+
+\item[\verb"manage":] a flag indicating if presentation context management is
+available for use (zero if unavailable);
+
+\item[\verb"class":] the proposed service classes;
+
+\item[\verb"units":] the proposed functional units
+(specify both mandatory and optional functional units for the indicated
+service class);
+
+\item[\verb"attrs":] the proposed attribute groups;
+
+\item[\verb"sharedASE":] shared ASE information;
+
+\item[\verb"fqos":] the proposed FTAM Quality-of-Service;
+
+\item[\verb"contents":] the contents type list;
+
+\item[\verb"initiator":] the user-identity of the initiator, if any;
+
+\item[\verb"account":] the account, if any
+
+\item[\verb"password"/\verb"passlen":] the password (and its length), if any;
+
+\item[\verb"qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos} in \voltwo/);
+
+\item[\verb"tracing":] the address of a tracing routine to be invoked when an
+FTAM event occurs (consult Section~\ref{ftam:tracing});
+
+\item[\verb"ftc":] a pointer to an \verb"FTAMconnect" structure,
+which is updated only if the call succeeds;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call to \verb"FInitializeRequest" is successful
+(the {\sf F-INITIALIZE.CON\-FIR\-MA\-TION\/} event occurs),
+it returns information in the \verb"ftc" parameter
+which is a pointer to an \verb"FTAMconnect" structure.
+\begin{quote}\index{FTAMconnect}\small\begin{verbatim}
+struct FTAMconnect {
+    int	    ftc_sd;
+
+    int	    ftc_state;
+    int	    ftc_action;
+
+    AEInfo  ftc_respondtitle;
+
+    struct PSAPaddr ftc_respondaddr;
+
+    int	    ftc_manage;
+
+    int	    ftc_units;
+    int	    ftc_attrs;
+
+    int	    ftc_rollback;
+
+    struct FTAMcontentlist ftc_contents;
+
+    int	    ftc_ndiag;
+    struct FTAMdiagnostic  ftc_diags[NFDIAG];
+
+    int	    ftc_ssdusize;
+
+    struct QOStype ftc_qos;
+};
+\end{verbatim}\end{quote}
+The elements of an \verb"FTAMconnect" structure are:
+\begin{describe}
+\item[\verb"ftc\_sd":] the association-descriptor to be used to reference
+this association;
+
+\item[\verb"ftc\_state":] a state result
+
+\item[\verb"ftc\_action":] an action result
+
+\item[\verb"ftc\_respondtitle":] the responding application-entity title, if
+any;
+
+\item[\verb"ftc\_respondaddr":] the responding presentation address, if any;
+
+\item[\verb"ftc\_manage":] the negotiated use of presentation context
+management;
+
+\item[\verb"ftc\_units":] the negotiated functional units;
+
+\item[\verb"ftc\_attrs":] the negotiated attribute groups;
+
+\item[\verb"ftc\_rollback":] the negotiated rollback availability;
+
+\item[\verb"ftc\_contents":] the negotiated contents type list;
+
+\item[\verb"ftc\_diags"/\verb"ftc\_ndiag":] any diagnostic information
+(and the number of diagnostics present)
+
+\item[\verb"ftc\_ssdusize":] the largest atomic SSDU size that can be used
+on the underlying connection;
+and,
+
+\item[\verb"ftc\_qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos} in \voltwo/).
+\end{describe}
+If the call to \verb"FInitializeRequest" is successful,
+and the \verb"ftc_state" element is set to \verb"FSTATE_SUCCESS",
+then association establishment has completed.
+If the call is successful,
+but the \verb"acc_result" element is not \verb"FSTATE_SUCCESS",
+the the association attempt has been rejected
+and the diagnostics present indicate the reason for the rejection.
+Otherwise, if the call fails then the association is not established and
+the \verb"FTAMabort" structure contained in the \verb"FTAMindication"
+discriminated union has been updated.
+
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released by using the \verb"FTCFREE" macro when no longer
+referenced.
+The \verb"FTCFREE" macro,
+behaves as if it was defined as:
+\begin{quote}\index{FTCFREE}\small\begin{verbatim}
+void    FTCFREE (ftc)
+struct FTAMconnect *ftc;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FInitializeRequest",
+and not the \verb"FTAMconnect" structure itself.
+Further,
+\verb"FTCFREE" should be called only if the call to the
+\verb"FInitializeRequest" routine returned \verb"OK".
+
+\section	{Event Handling}
+Once the association has been established,
+an association-descriptor is used to reference the connection.
+This is usually the first parameter given to any of the remaining routines in
+the \man libftam(3n) library.
+Further,
+the last parameter is usually a pointer to an \verb"FTAMindication" structure
+(as described on page~\pageref{FTAMindication}).
+If a call to one of these routines fails,
+then the structure is updated.
+Consult the \verb"FTAMabort" element of the \verb"FTAMindication" structure
+and look at the diagnostics (typically only one) present.
+When a diagnostic is reported by the provider,
+the \verb"ftd_type" element indicates if the error is ``fatal'' by having the
+value \verb"DIAG_PERM".
+Other values, such as \verb"DIAG_TRANS" indicate non-fatal errors
+(the association still exists).
+The most common non-fatal error to occur is \verb"FS_GEN_WAITING" which
+indicates that an indication is waiting to be read.
+
+The \verb"FWaitRequest" routine is used to wait for an event to occur.
+\begin{quote}\index{FWaitRequest}\small\begin{verbatim}
+int     FWaitRequest (sd, secs, fti)
+int     sd;
+int     secs;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"secs":] the maximum number of seconds to wait for the event
+(a value of \verb"NOTOK" indicates that the call should block indefinitely,
+whereas a value of \verb"OK" indicates that the call should not block at all,
+e.g., a polling action);
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure,
+which is always updated.
+\end{describe}
+If the call to \verb"FWaitRequest" returns the manifest constant \verb"NOTOK",
+then the \verb"FTAMabort" structure contained in the \verb"FTAMindication"
+parameter \verb"fti" contains the reason for the failure.
+Similarly,
+if the manifest constant \verb"OK" is returned,
+an event is encoded in the \verb"fti" parameter,
+depending on the value of the \verb"fti_type" element:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+			\multicolumn{1}{c|}{\bf Event}\\
+\hline
+    \tt FTI\_FINISH&		\sf F-TERMINATE.INDICATION\\
+\hline
+    \tt FTI\_MANAGEMENT&	grouped management operation\\
+\hline
+    \tt FTI\_BULKBEGIN&		begin of grouped file transfer operation\\
+\hline
+    \tt FTI\_BULKEND&		end of grouped file transfer operation\\
+\hline
+    \tt FTI\_ACCESS&		\sf F-LOCATE.INDICATION\\
+	&			\sf F-LOCATE.CONFIRMATION\\
+	&			\sf F-ERASE.INDICATION\\
+	&			\sf F-ERASE.CONFIRMATION\\
+\hline
+    \tt FTI\_READWRITE&		\sf F-READ.INDICATION\\
+	&			\sf F-WRITE.INDICATION\\
+\hline
+    \tt FTI\_DATA&		\sf F-DATA.INDICATION\\
+\hline
+    \tt FTI\_DATAEND&		\sf F-DATA-END.INDICATION\\
+\hline
+    \tt FTI\_CANCEL&		\sf F-CANCEL.INDICATION\\
+	&			\sf F-CANCEL.CONFIRMATION\\
+\hline
+    \tt FTI\_TRANSEND&		\sf F-TRANSFER-END.INDICATION\\
+	&			\sf F-TRANSFER-END.CONFIRMATION\\
+\hline
+\end{tabular}\]
+These are now discussed in turn.
+
+\subsubsection	{Termination Indication}
+When an event associated with association release occurs,
+the \verb"fti_type" field of the \verb"fti" parameter contains the value
+\verb"FTI_FINISH".
+Further,
+an \verb"FTAMfinish" structure is contained inside the \verb"fti" parameter,
+indicating an {\sf F-TERMINATE.INDICATION\/} event.
+\begin{quote}\index{FTAMfinish}\small\begin{verbatim}
+struct FTAMfinish {
+    int     ftf_sharedASE;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftf\_sharedASE":] shared ASE information.
+\end{describe}
+The \verb"FTFFREE" macro can be used to free the storage associated with an
+\verb"FTAMdfinish" structure (without freeing the structure itself).
+It behaves as if it was defined as:
+\begin{quote}\index{FTFFREE}\small\begin{verbatim}
+void    FTFFREE (ftf)
+struct FTAMfinish *ftf;
+\end{verbatim}\end{quote}
+
+\subsubsection	{Group Indications}
+Use of the grouping function unit is required in the current implementation,
+hence
+when a transfer or management indication occurs,
+the \verb"fti_type" field of the \verb"fti" parameter contains one of three
+values:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+			\multicolumn{1}{c|}{\bf Event}\\
+\hline
+    \tt FTI\_MANAGEMENT&	grouped management operation\\
+    \tt FTI\_BULKBEGIN&		begin of grouped file transfer operation\\
+    \tt FTI\_BULKEND&		end of grouped file transfer operation\\
+\hline
+\end{tabular}\]
+and an \verb"FTAMgroup" structure is contained inside the \verb"fti" parameter.
+\begin{quote}\index{FTAMgroup}\small\begin{verbatim}
+struct FTAMgroup {
+    int     ftg_threshold;
+
+    int     ftg_flags;
+
+    union {
+        struct FTAMselect   ftg_un1_select;
+        struct FTAMcreate   ftg_un1_create;
+        struct FTAMclose    ftg_un1_close;
+    }                   ftg_un1;
+#define ftg_select      ftg_un1.ftg_un1_select
+#define ftg_create      ftg_un1.ftg_un1_create
+#define ftg_close       ftg_un1.ftg_un1_close
+
+    struct FTAMreadattr ftg_readattr;
+
+    struct FTAMchngattr ftg_chngattr;
+
+    union {
+        struct FTAMdeselect ftg_un2_deselect;
+        struct FTAMdelete   ftg_un2_delete;
+        struct FTAMopen     ftg_un2_open;
+    } ftg_un2;
+#define ftg_deselect    ftg_un2.ftg_un2_deselect
+#define ftg_delete      ftg_un2.ftg_un2_delete
+#define ftg_open        ftg_un2.ftg_un2_open
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:\label{FTAMgroup}
+\begin{describe}
+\item[\verb"ftg\_threshold":] the grouping threshold;
+
+\item[\verb"ftg\_flags":] the indications which are present,
+containing the inclusive-or of any of the values:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Meaning}\\
+\hline
+    \tt FTG\_BEGIN&	F-BEGIN-GROUP\\
+    \tt FTG\_SELECT&	F-SELECT\\
+    \tt FTG\_CREATE&	F-CREATE\\
+    \tt FTG\_RDATTR&	F-READ-ATTRIB\\
+    \tt FTG\_CHATTR&	F-CHANGE-ATTRIB\\
+    \tt FTG\_OPEN&	F-OPEN\\
+    \tt FTG\_CLOSE&	F-CLOSE\\
+    \tt FTG\_DESELECT&	F-DESELECT\\
+    \tt FTG\_DELETE&	F-DELETE\\
+    \tt FTG\_END&	F-END-GROUP\\
+\hline
+\end{tabular}\]
+
+\item[\verb"ftg\_select":]	an \verb"FTAMselect" structure;
+
+\item[\verb"ftg\_create":]	an \verb"FTAMcreate" structure;
+
+\item[\verb"ftg\_close":]	an \verb"FTAMclose" structure;
+
+\item[\verb"ftg\_readattr":]	an \verb"FTAMreadattr" structure;
+
+\item[\verb"ftg\_chngattr":]	an \verb"FTAMchngattr" structure;
+
+\item[\verb"ftg\_deselect":]	an \verb"FTAMdeselect" structure;
+
+\item[\verb"ftg\_delete":]	an \verb"FTAMdelete" structure;
+and,
+
+\item[\verb"ftg\_open":]	an \verb"FTAMopen" structure.
+\end{describe}
+The \verb"FTGFREE" macro can be used to free the storage associated with an
+\verb"FTAMgroup" structure (without freeing the structure itself).
+It behaves as if it was defined as:
+\begin{quote}\index{FTGFREE}\small\begin{verbatim}
+void    FTGFREE (ftg)
+struct FTAMgroup *ftg;
+\end{verbatim}\end{quote}
+
+If the flag \verb"FTG_SELECT" is present,
+then \verb"ftg_select" element contains an {\sf F-SELECT\/} event encoded in an
+\verb"FTAMselect" structure:
+\begin{quote}\index{FTAMselect}\small\begin{verbatim}
+struct FTAMselect {
+    int     ftse_state;
+    int     ftse_action;
+
+    struct FTAMattributes ftse_attrs;
+
+    int	    ftse_access;
+    struct FTAMpasswords ftse_pwds;
+    struct FTAMconcurrency ftse_conctl;
+
+    PE      ftse_sharedASE;
+
+    char   *ftse_account;
+
+    int	    ftse_ndiag;
+    struct FTAMdiagnostic ftse_diags[NFDIAG];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftse\_state":] the state result ({\sf .RESPONSE\/} only);
+
+\item[\verb"ftse\_action":] the action result ({\sf .RESPONSE\/} only);
+
+\item[\verb"ftse\_attrs":] file attributes;
+
+\item[\verb"ftse\_access":] requested access,
+containing the inclusive-or of any of the values
+found in Table~\ref{FTAMaccess} ({\sf .REQUEST\/} only);
+
+\item[\verb"ftse\_pwds":] access passwords ({\sf .REQUEST\/} only);
+
+\item[\verb"ftse\_conctl":] concurrency control ({\sf .REQUEST\/} only);
+
+\item[\verb"ftse\_sharedASE":] shared ASE information ({\sf .REQUEST\/} only);
+
+\item[\verb"ftse\_account":] account ({\sf .REQUEST\/} only);
+and,
+
+\item[\verb"ftse\_diags"/\verb"ftse\_ndiag":] any diagnostic information
+(and the number of diagnostics present, {\sf .RESPONSE\/} only).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTSEFREE" macro when no longer needed.
+The \verb"FTSEFREE" macro
+behaves as if it was defined as:
+\begin{quote}\index{FTSEFREE}\small\begin{verbatim}
+void    FTSEFREE (ftse)
+struct FTAMselect *ftse;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FWaitRequest",
+and not the \verb"FTAMselect" structure itself.
+Note that the macro \verb"FTGFREE" when applied to the group,
+will call \verb"FTSEFREE" as appropriate.
+
+If the flag \verb"FTG_CREATE" is present,
+then \verb"ftg_create" element contains an {\sf F-CREATE\/} event encoded in an
+\verb"FTAMcreate" structure:
+\begin{quote}\index{FTAMcreate}\small\begin{verbatim}
+struct FTAMcreate {
+    int     ftce_state;
+    int     ftce_action;
+
+    int     ftce_override;
+    char   *ftce_create;
+    int     ftce_crelen;
+
+    struct FTAMattributes ftce_attrs;
+
+    int     ftce_access;
+    struct FTAMpasswords ftce_pwds;
+    struct FTAMconcurrency ftce_conctl;
+
+    PE      ftce_sharedASE;
+
+    char   *ftce_account;
+
+    int     ftce_ndiag;
+    struct FTAMdiagnostic ftce_diags[NFDIAG];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftce\_state":] the state result ({\sf .RESPONSE\/} only);
+
+\item[\verb"ftce\_action":] the action result ({\sf .RESPONSE\/} only);
+
+\item[\verb"ftce\_override":] the override setting, one of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Meaning}\\
+\hline
+    \tt FOVER\_FAIL&		fail, if already exists\\
+    \tt FOVER\_SELECT&		select, if already exists\\
+    \tt FOVER\_WRITE&		zero-truncate, if already exists\\
+    \tt FOVER\_DELETE&		delete, if already exists\\
+\hline
+\end{tabular}\]
+({\sf .REQUEST\/} only);
+
+\item[\verb"ftce\_attrs":] file attributes;
+
+\item[\verb"ftce\_create"/\verb"ftce\_crelen":] the
+create password and its length, if any ({\sf .REQUEST\/} only);
+
+\item[\verb"ftce\_access":] requested access,
+containing the inclusive-or of any of the values
+found in Table~\ref{FTAMaccess} ({\sf .REQUEST\/} only);
+
+\item[\verb"ftce\_pwds":] access passwords ({\sf .REQUEST\/} only);
+
+\item[\verb"ftce\_conctl":] concurrency control ({\sf .REQUEST\/} only);
+
+\item[\verb"ftce\_sharedASE":] shared ASE information ({\sf .REQUEST\/} only);
+
+\item[\verb"ftce\_account":] account ({\sf .REQUEST\/} only);
+and,
+
+\item[\verb"ftce\_diags"/\verb"ftce\_ndiag":] any diagnostic information
+(and the number of diagnostics present, {\sf .RESPONSE\/} only).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTCEFREE" macro when no longer needed.
+The \verb"FTCEFREE" macro
+behaves as if it was defined as:
+\begin{quote}\index{FTCEFREE}\small\begin{verbatim}
+void    FTCEFREE (ftce)
+struct FTAMcreate *ftce;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FWaitRequest",
+and not the \verb"FTAMcreate" structure itself.
+Note that the macro \verb"FTGFREE" when applied to the group,
+will call \verb"FTCEFREE" as appropriate.
+
+If the flag \verb"FTG_RDATTR" is present,
+then \verb"ftg_readattr" element contains an {\sf F-READ-ATTRIB\/} event encoded in an
+\verb"FTAMreadattr" structure:
+\begin{quote}\index{FTAMreadattr}\small\begin{verbatim}
+struct FTAMreadattr {
+    int     ftra_action;
+
+    int     ftra_attrnames;
+
+    struct FTAMattributes ftra_attrs;
+    int     ftra_ndiag;
+    struct FTAMdiagnostic ftra_diags[NFDIAG];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftra\_action":] the action result ({\sf .RESPONSE\/} only);
+
+\item[\verb"ftra\_attrnames":] the attributes to read,
+containing the inclusive-or of any of the values shown in
+Table~\ref{FTAMattributes} on page~\pageref{FTAMattributes}
+({\sf .REQUEST\/} only);
+
+\item[\verb"ftra\_attrs":] the attribute values
+({\sf .RESPONSE\/} only);
+and,
+
+\item[\verb"ftra\_diags"/\verb"ftra\_ndiag":] any diagnostic information
+(and the number of diagnostics present, {\sf .RESPONSE\/} only).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTRAFREE" macro when no longer needed.
+The \verb"FTRAFREE" macro
+behaves as if it was defined as:
+\begin{quote}\index{FTRAFREE}\small\begin{verbatim}
+void    FTRAFREE (ftra)
+struct FTAMreadattr *ftra;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FWaitRequest",
+and not the \verb"FTAMreadattr" structure itself.
+Note that the macro \verb"FTGFREE" when applied to the group,
+will call \verb"FTRAFREE" as appropriate.
+
+If the flag \verb"FTG_CHNGATTR" is present,
+then \verb"ftg_chngattr" element contains an {\sf F-CHANGE-ATTRIB\/} event encoded in
+an \verb"FTAMchngattr" structure:
+\begin{quote}\index{FTAMchngattr}\small\begin{verbatim}
+struct FTAMchngattr {
+    int ftca_action;
+
+    struct FTAMattributes ftca_attrs;
+
+    int     ftca_ndiag;
+    struct FTAMdiagnostic ftca_diags[NFDIAG];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftca\_action":] the action result ({\sf .RESPONSE\/} only);
+
+\item[\verb"ftca\_attrs":] the attribute values to change
+(in a {\sf .REQUEST\/}),
+and possibly the new values (in a {\sf .RESPONSE\/});
+and,
+
+\item[\verb"ftca\_diags"/\verb"ftca\_ndiag":] any diagnostic information
+(and the number of diagnostics present, {\sf .RESPONSE\/} only).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTCAFREE" macro when no longer needed.
+The \verb"FTCAFREE" macro
+behaves as if it was defined as:
+\begin{quote}\index{FTCAFREE}\small\begin{verbatim}
+void    FTCAFREE (ftca)
+struct FTAMchngattr *ftca;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FWaitRequest",
+and not the \verb"FTAMchngattr" structure itself.
+Note that the macro \verb"FTGFREE" when applied to the group,
+will call \verb"FTCAFREE" as appropriate.
+
+If the flag \verb"FTG_OPEN" is present,
+then \verb"ftg_open" element contains an {\sf F-OPEN\/} event encoded in an
+\verb"FTAMopen" structure:
+\begin{quote}\index{FTAMopen}\small\begin{verbatim}
+struct FTAMopen {
+    int     ftop_state;
+    int     ftop_action;
+
+    int     ftop_mode;
+
+    OID     ftop_contents;
+    PE      ftop_parameter;
+    struct FTAMconcurrency ftop_conctl;
+    PE      ftop_sharedASE;
+
+    int     ftop_locking;
+
+    int     ftop_ndiag;
+    struct FTAMdiagnostic ftop_diags[NFDIAG];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftop\_state":] the state result ({\sf .RESPONSE\/} only);
+
+\item[\verb"ftop\_action":] the action result ({\sf .RESPONSE\/} only);
+
+\item[\verb"ftop\_mode":] the processing mode,
+containing the inclusive-or of any of the values shown in
+Table~\ref{FTAMaccess} on page~\pageref{FTAMaccess}
+({\sf .REQUEST\/} only);
+
+\item[\verb"ftop\_contents"/\verb"ftop\_parameter":] the contents type;
+
+\item[\verb"ftop\_conctl":] concurrency control;
+
+\item[\verb"ftop\_sharedASE":] shared ASE information;
+
+\item[\verb"ftop\_locking":] enable FADU locking ({\sf .REQUEST\/} only);
+and,
+
+\item[\verb"ftop\_diags"/\verb"ftop\_ndiag":] any diagnostic information
+(and the number of diagnostics present, {\sf .RESPONSE\/} only).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTOPFREE" macro when no longer needed.
+The \verb"FTOPFREE" macro
+behaves as if it was defined as:
+\begin{quote}\index{FTOPFREE}\small\begin{verbatim}
+void    FTOPFREE (ftop)
+struct FTAMopen *ftop;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FWaitRequest",
+and not the \verb"FTAMopen" structure itself.
+Note that the macro \verb"FTGFREE" when applied to the group,
+will call \verb"FTOPFREE" as appropriate.
+
+If the flag \verb"FTG_CLOSE" is present,
+then \verb"ftg_close" element contains an {\sf F-CLOSE\/} event encoded in an
+\verb"FTAMclose" structure:
+\begin{quote}\index{FTAMclose}\small\begin{verbatim}
+struct FTAMclose {
+    int     ftcl_action;
+
+    PE      ftcl_sharedASE;
+
+    int     ftcl_ndiag;
+    struct FTAMdiagnostic   ftcl_diags[NFDIAG];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftcl\_action":] the action result;
+
+\item[\verb"ftcl\_sharedASE":] shared ASE information;
+and,
+
+\item[\verb"ftcl\_diags"/\verb"ftcl\_ndiag":] any diagnostic information
+(and the number of diagnostics present).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTCLFREE" macro when no longer needed.
+The \verb"FTCLFREE" macro
+behaves as if it was defined as:
+\begin{quote}\index{FTCLFREE}\small\begin{verbatim}
+void    FTCLFREE (ftcl)
+struct FTAMclose *ftcl;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FWaitRequest",
+and not the \verb"FTAMclose" structure itself.
+Note that the macro \verb"FTGFREE" when applied to the group,
+will call \verb"FTCLFREE" as appropriate.
+
+If the flag \verb"FTG_DESELECT" is present,
+then \verb"ftg_deselect" element contains an {\sf F-DESELECT\/} event encoded in an
+\verb"FTAMdeselect" structure:
+\begin{quote}\index{FTAMdeselect}\small\begin{verbatim}
+struct FTAMdeselect {
+    int     ftde_action;
+
+    PE      ftde_sharedASE;
+
+    struct FTAMcharging ftde_charges;
+    int     ftde_ndiag;
+    struct FTAMdiagnostic   ftde_diags[NFDIAG];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftde\_action":] the action result ({\sf .RESPONSE\/} only);
+
+\item[\verb"ftde\_sharedASE":] shared ASE information;
+
+\item[\verb"ftde\_charges":] any charges ({\sf .RESPONSE\/} only);
+and,
+
+\item[\verb"ftde\_diags"/\verb"ftde\_ndiag":] any diagnostic information
+(and the number of diagnostics present, {\sf .RESPONSE\/} only).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTDEFREE" macro when no longer needed.
+The \verb"FTDEFREE" macro
+behaves as if it was defined as:
+\begin{quote}\index{FTDEFREE}\small\begin{verbatim}
+void    FTDEFREE (ftde)
+struct FTAMdeselect *ftde;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FWaitRequest",
+and not the \verb"FTAMdeselect" structure itself.
+Note that the macro \verb"FTGFREE" when applied to the group,
+will call \verb"FTDEFREE" as appropriate.
+
+If the flag \verb"FTG_DELETE" is present,
+then \verb"ftg_delete" element contains an {\sf F-DELETE\/} event encoded in an
+\verb"FTAMdelete" structure:
+\begin{quote}\index{FTAMdelete}\small\begin{verbatim}
+struct FTAMdelete {
+    int     ftxe_action;
+    
+    PE      ftxe_sharedASE;
+
+    struct FTAMcharging ftxe_charges;
+    int     ftxe_ndiag;
+    struct FTAMdiagnostic   ftxe_diags[NFDIAG];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftxe\_action":] the action result ({\sf .RESPONSE\/} only);
+
+\item[\verb"ftxe\_sharedASE":] shared ASE information;
+
+\item[\verb"ftxe\_charges":] any charges ({\sf .RESPONSE\/} only);
+and,
+
+\item[\verb"ftxe\_diags"/\verb"ftxe\_ndiag":] any diagnostic information
+(and the number of diagnostics present, {\sf .RESPONSE\/} only).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTXEFREE" macro when no longer needed.
+The \verb"FTXEFREE" macro
+behaves as if it was defined as:
+\begin{quote}\index{FTXEFREE}\small\begin{verbatim}
+void    FTXEFREE (ftxe)
+struct FTAMdeltee *ftxe;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FWaitRequest",
+and not the \verb"FTAMdelete" structure itself.
+Note that the macro \verb"FTGFREE" when applied to the group,
+will call \verb"FTXEFREE" as appropriate.
+
+\subsubsection	{Access Indications}
+When an event associated with file access occurs,
+the \verb"fti_type" field of the \verb"fti" parameter contains the value
+\verb"FTI_ACCESS".
+Further,
+an \verb"FTAMaccess" structure is contained inside the \verb"fti" parameter,
+indicating an {\sf F-LOCATE\/} or {\sf F-ERASE\/} event.
+\begin{quote}\index{FTAMaccess}\small\begin{verbatim}
+struct FTAMaccess {
+    int	    ftac_operation;
+
+    int	    ftac_action;
+
+    struct FADUidentity ftac_identity;
+
+    int     ftac_locking;
+
+    int     ftac_ndiag;
+    struct FTAMdiagnostic   ftac_diags[NFDIAG];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftac\_operation":] the operation,
+one of the values shown in Table~\ref{FTAMaccessops};
+
+\item[\verb"ftac\_action":] the action result ({\sf .CONFIRMATION\/} only);
+
+\item[\verb"ftac\_identity":] the FADU identity
+(either {\sf .INDICATION\/} and optionally on {\sf F-LOCATE.CONFIRMATION\/});
+
+\item[\verb"ftac\_locking":] FADU locked ({\sf F-LOCATE.INDICATION\/} only);
+and,
+
+\item[\verb"ftac\_diags"/\verb"ftac\_ndiag":] any diagnostic information
+(and the number of diagnostics present, {\sf .CONFIRMATION\/} only).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTACFREE" macro when no longer needed.
+The \verb"FTACFREE" macro
+behaves as if it was defined as:
+\begin{quote}\index{FTACFREE}\small\begin{verbatim}
+void    FTACFREE (ftac)
+struct FTAMaccess *ftac;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FWaitRequest",
+and not the \verb"FTAMaccess" structure itself.
+\tagtable[tp]{ftam-5}{FTAM Access Operations}{FTAMaccessops}
+
+\subsubsection	{Read/Write Indications}
+When an event associated with the beginning of bulk data transfer occurs,
+the \verb"fti_type" field of the \verb"fti" parameter contains the value
+\verb"FTI_READWRITE".
+Further,
+an \verb"FTAMreadwrite" structure is contained inside the \verb"fti" parameter,
+indicating an {\sf F-READ.INDICATION\/} or {\sf F-WRITE.INDICATION\/} event.
+\begin{quote}\index{FTAMreadwrite}\small\begin{verbatim}
+struct FTAMreadwrite {
+    int     ftrw_operation;
+
+    struct FADUidentity ftrw_identity;
+
+    int     ftrw_context;
+    int     ftrw_level;
+
+    int     ftrw_locking;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftrw\_operation":] the operation,
+one of the values shown in Table~\ref{FTAMdataops};
+
+\item[\verb"ftrw\_identity":] the FADU identity;
+
+\item[\verb"ftrw\_context"/\verb"ftrw\_level":] the access context,
+one of the values shown in Table~\ref{FTAMcontexts}
+({\sf F-READ.INDICATION\/} only);
+and,
+
+\item[\verb"ftrw\_locking":] FADU locked.
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTRWFREE" macro when no longer needed.
+The \verb"FTRWFREE" macro
+behaves as if it was defined as:
+\begin{quote}\index{FTRWFREE}\small\begin{verbatim}
+void    FTRWFREE (ftrw)
+struct FTAMreadwrite *ftrw;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FWaitRequest",
+and not the \verb"FTAMreadwrite" structure itself.
+\tagtable[tp]{ftam-4}{FTAM Data Operations}{FTAMdataops}
+\tagtable[tp]{ftam-3}{FTAM Access Contexts}{FTAMcontexts}
+
+\subsubsection	{Data Indications}\label{ftam:data}
+When an event associated with user data occurs,
+the \verb"fti_type" field of the \verb"fti" parameter contains the value
+\verb"FTI_DATA",
+and an \verb"PSAPdata" structure
+(described in Chapter~\ref{libpsap2} of \voltwo/)
+is contained inside the \verb"fti" parameter,
+indicating an {\sf F-DATA.INDICATION\/} event.
+To distinguish between structure and contents,
+FTAM uses different presentation context identifiers.
+If the \verb"pe_context" field of any presentation element contains the value
+\verb"PE_DFLT_CONTEXT",
+then the element contains structuring information in the FTAM PCI,
+and the \verb"pe_id" element should be consulted to determine the particular
+structuring information being conveyed:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Meaning}\\
+\hline
+    \tt FADU\_NODESCR&		node descriptor data element\\
+    \tt FADU\_ENTERTREE&	enter subtree data element\\
+    \tt FADU\_EXITREE&		exit subtree data element\\
+\hline
+\end{tabular}\]
+Otherwise,
+the element contains file contents as defined in the PCI for the
+document type being transferred.
+
+\subsubsection	{Data End Indication}
+When an event associated with the end of bulk data transfer occurs,
+the \verb"fti_type" field of the \verb"fti" parameter contains the value
+\verb"FTI_DATAEND".
+Further,
+an \verb"FTAMdataend" structure is contained inside the \verb"fti" parameter,
+indicating an {\sf F-DATA-END.INDICATION\/} event.
+\begin{quote}\index{FTAMdataend}\small\begin{verbatim}
+struct FTAMdataend {
+    int     ftda_action;
+
+    int     ftda_ndiag;
+    struct FTAMdiagnostic   ftda_diags[NFDIAG];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftda\_action":] the action result;
+and,
+
+\item[\verb"ftda\_diags"/\verb"ftda\_ndiag":] any diagnostic information
+(and the number of diagnostics present).
+\end{describe}
+
+\subsubsection	{Cancel Indications}
+When an event associated with the cancellation of bulk data transfer occurs,
+the \verb"fti_type" field of the \verb"fti" parameter contains the value
+\verb"FTI_CANCEL".
+Further,
+an \verb"FTAMcancel" structure is contained inside the \verb"fti" parameter,
+indicating an {\sf F-CANCEL\/} event.
+\begin{quote}\index{FTAMcancel}\small\begin{verbatim}
+struct FTAMcancel {
+    int     ftcn_action;
+
+    PE      ftcn_sharedASE;
+
+    int     ftcn_ndiag;
+    struct FTAMdiagnostic   ftcn_diags[NFDIAG];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftcn\_action":] the action result;
+
+\item[\verb"ftcn\_sharedASE":] shared ASE information;
+and,
+
+\item[\verb"ftcn\_diags"/\verb"ftcn\_ndiag":] any diagnostic information
+(and the number of diagnostics present).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTCNFREE" macro when no longer needed.
+The \verb"FTCNFREE" macro
+behaves as if it was defined as:
+\begin{quote}\index{FTCNFREE}\small\begin{verbatim}
+void    FTCNFREE (ftcn)
+struct FTAMcancel *ftcn;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FWaitRequest",
+and not the \verb"FTAMcancel" structure itself.
+
+\subsubsection	{Transfer End Indications}
+When an event associated with the termination of bulk data transfer occurs,
+the \verb"fti_type" field of the \verb"fti" parameter contains the value
+\verb"FTI_TRANSEND".
+Further,
+an \verb"FTAMtransend" structure is contained inside the \verb"fti" parameter,
+indicating an {\sf F-TRANSFER-END\/} event.
+\begin{quote}\index{FTAMtransend}\small\begin{verbatim}
+struct FTAMtransend {
+    int     ftre_action;
+
+    PE      ftre_sharedASE;
+
+    int     ftre_ndiag;
+    struct FTAMdiagnostic   ftre_diags[NFDIAG];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftre\_action":] the action result ({\sf .RESPONSE\/} only);
+
+\item[\verb"ftre\_sharedASE":] shared ASE information;
+and,
+
+\item[\verb"ftre\_diags"/\verb"ftre\_ndiag":] any diagnostic information
+(and the number of diagnostics present, {\sf .RESPONSE\/} only).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTREFREE" macro when no longer needed.
+The \verb"FTREFREE" macro
+behaves as if it was defined as:
+\begin{quote}\index{FTREFREE}\small\begin{verbatim}
+void    FTREFREE (ftre)
+struct FTAMtransend *ftre;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FWaitRequest",
+and not the \verb"FTAMtransend" structure itself.
+
+\subsection	{Asynchronous Event Handling}
+Thus far the discussion on event handling has been synchronous in nature.
+Some users of FTAM may wish an asynchronous interface.
+The \verb"FSetIndications" routine is used to change the service associated
+with an association-descriptor to or from an asynchronous interface.
+\begin{quote}\index{FSetIndications}\small\begin{verbatim}
+int     FSetIndications (sd, indication, fti)
+int     sd;
+int   (*indication) ();
+struct FTAMindication  *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"indication":] the address of an event-handler routine to be
+invoked when an indication occurs;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the service is to be made asynchronous,
+then the event handler is specified,
+otherwise,
+if the service is to be made synchronous,
+then the handler should not be specified
+(use the manifest constant \verb"NULLIFP").
+The most likely reason for the call failing is \verb"FS_GEN_WAITING",
+which indicates that an event is waiting for the user.
+
+When an event-handler is invoked,
+future invocations of the event-hander are blocked until it returns.
+The return value of the event-handler is ignored.
+Further,
+during the execution of a synchronous call to the library,
+the event-handler will be blocked from being invoked.
+
+When an event occurs,
+the event-handler routine is invoked with two parameters:
+\begin{quote}\small\begin{verbatim}
+(*indication) (sd, fti);
+int     sd;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+and,
+
+\item[\verb"fti":] a pointer to the \verb"FTAMindication" structure containing
+the indication.
+\end{describe}
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	The \man libftam(3n) library uses the SIGEMT signal to provide
+		these services.
+		Programs using asynchronous association-descriptors should NOT
+		use SIGEMT for other purposes.
+\end{tabular}}\]
+
+\subsection	{Synchronous Event Multiplexing}
+A user of FTAM may wish to manage multiple
+association-descriptors simultaneously;
+the routine \verb"FSelectMask" is provided for this purpose.
+This routine updates a file-descriptor mask and associated counter for use
+with \verb"xselect".
+\begin{quote}\index{FSelectMask}\small\begin{verbatim}
+int     FSelectMask (sd, mask, nfds, fti)
+int     sd;
+fd_set *mask;
+int    *nfds;
+struct FTAMindication  *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"mask":] a pointer to a file-descriptor mask meaningful to
+\verb"xselect";
+
+\item[\verb"nfds":] a pointer to an integer-valued location meaningful to
+\verb"xselect";
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is updated
+only if the call fails.
+\end{describe}
+If the call is successful, then the \verb"mask" and \verb"nfds" parameters can
+be used as arguments to \verb"xselect".
+The most likely reason for the call failing is \verb"FS_GEN_WAITING",
+which indicates that an event is waiting for the user.
+
+If \verb"xselect" indicates that the association-descriptor is ready for
+reading,
+\verb"FWaitRequest" should be called with the \verb"secs" parameter equal to
+\verb"OK".
+If the network activity does not constitute an entire event for the user,
+then \verb"FWaitRequest" will return \verb"NOTOK" with error code
+\verb"FS_PRO_TIMEOUT".
+
+\subsection	{Tracing}\label{ftam:tracing}
+Users may wish to trace FTAM events as they are processed.
+The routine \verb"FHookRequest" is used to set (or unset) the user-defined
+tracing routine.
+\begin{quote}\index{FHookRequest}\small\begin{verbatim}
+int     FHookRequest (sd, tracing, fti)
+int     sd;
+int   (*tracing) ();
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"tracing":] the address of a tracing routine to be invoked when an
+FTAM event occurs;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is updated
+only if the call fails.
+\end{describe}
+If tracing is to be enabled,
+then the tracing routine is specified,
+otherwise,
+if tracing is to be turned off, the manifest constant \verb"NULLIFP" should
+be used.
+
+When an event occurs,
+the tracing routine is invoked with five parameters:
+\begin{quote}\small\begin{verbatim}
+(*tracing) (sd, event, fpdu, pe, rw)
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"event":] the name of the underlying service primitive
+(association control or presentation) associated with the FTAM event;
+
+\item[\verb"fpdu":] the name of the FTAM PDU, if any;
+
+\item[\verb"pe":] a presentation element containing the FTAM PDU
+associated with the FTAM event
+(described in Chapter~\ref{libpsap} of \volone/), if any;
+and,
+
+\item[\verb"rw":] a flag saying whether the event is being initiated (zero)
+or being received (non-zero).
+\end{describe}
+The return value of the tracing routine is ignored.
+
+One pre-defined tracing routine is available, \verb"FTraceHook"
+\index{FHookRequest},
+which simply appends tracing information to the log determined by
+\begin{quote}\index{ftamfile}\small\begin{verbatim}
+LLog *ftam_log;
+\end{verbatim}\end{quote}
+See Chapter~\ref{logging} in \voltwo/ for all the details.
+
+\section	{Grouped Operations: File Transfer}
+The \verb"FBulkBeginRequest" routine is used to issue a grouped file transfer
+request consisting of:
+\begin{itemize}
+\item	{\sf F-BEGIN-GROUP.REQUEST\/};
+
+\item	{\sf F-SELECT.REQUEST\/} or {\sf F-CREATE.REQUEST\/};
+
+\item	optionally, {\sf F-READ-ATTRIB.REQUEST\/};
+
+\item	optionally, {\sf F-CHANGE-ATTRIB.REQUEST\/};
+
+\item	{\sf F-OPEN.REQUEST\/};
+and,
+
+\item	{\sf F-END-GROUP.REQUEST}.
+\end{itemize}
+The user initializes an \verb"FTAMgroup" structure
+(described in tedious detail on page~\pageref{FTAMgroup})
+and then invokes \verb"FBulkRequest".
+\begin{quote}\index{FBulkRequest}\small\begin{verbatim}
+int     FBulkRequest (sd, ftg, fti)
+int     sd;
+struct FTAMgroup *ftg;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"ftg":] a pointer to an \verb"FTAMgroup" structure;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+always updated.
+\end{describe}
+If the call to \verb"FBulkBeginRequest" is successful,
+then this corresponds to the appropriate {\sf .CONFIRMATION\/} events,
+the \verb"fti_type" element of the \verb"fti" parameter is set to
+\verb"FTI_BULKBEGIN",
+and the \verb"fti_group" element contains the results.
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTGFREE" macro when no longer needed.
+
+Otherwise if the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+Upon receiving an \verb"FTI_BULKBEGIN" indication,
+containing the appropriate {\sf .INDICATION\/} events,
+the responder is required to generate the appropriate {\sf .RESPONSE\/}
+events using the \verb"FBulkBeginResponse" routine.
+\begin{quote}\index{FBulkResponse}\small\begin{verbatim}
+int     FBulkBeginResponse (sd, ftg, fti)
+int     sd;
+struct FTAMgroup *ftg;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"ftg":] a pointer to an \verb"FTAMgroup" structure;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+The \verb"FBulkEndRequest" routine is used to issue a grouped file transfer
+request consisting of:
+\begin{itemize}
+\item	{\sf F-BEGIN-GROUP.REQUEST\/};
+
+\item	{\sf F-CLOSE.REQUEST\/};
+
+\item	{\sf F-DESELECT.REQUEST\/} or {\sf F-DELETE.REQUEST\/};
+and,
+
+\item	{\sf F-END-GROUP.REQUEST}.
+\end{itemize}
+The user initializes an \verb"FTAMgroup" structure
+(described in tedious detail on page~\pageref{FTAMgroup})
+and then invokes \verb"FBulkEndRequest".
+\begin{quote}\index{FBulkEndRequest}\small\begin{verbatim}
+int     FBulkEndRequest (sd, ftg, fti)
+int     sd;
+struct FTAMgroup *ftg;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"ftg":] a pointer to an \verb"FTAMgroup" structure;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+always updated.
+\end{describe}
+If the call to \verb"FBulkEndRequest" is successful,
+then this corresponds to the appropriate {\sf .CONFIRMATION\/} events,
+the \verb"fti_type" element of the \verb"fti" parameter is set to
+\verb"FTI_BULKEND",
+and the \verb"fti_group" element contains the results.
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTGFREE" macro when no longer needed.
+
+Otherwise if the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+Upon receiving an \verb"FTI_BULKEND" indication,
+containing the appropriate {\sf .INDICATION\/} events,
+the responder is required to generate the appropriate {\sf .RESPONSE\/}
+events using the \verb"FBulkEndResponse" routine.
+\begin{quote}\index{FBulkEndResponse}\small\begin{verbatim}
+int     FBulkEndResponse (sd, ftg, fti)
+int     sd;
+struct FTAMgroup *ftg;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"ftg":] a pointer to an \verb"FTAMgroup" structure;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+\section	{File Access}
+The \verb"FAccessRequest" routine is equivalent to an {\sf F-LOCATE.REQUEST\/}
+or {\sf F-ERASE.REQUEST\/} action on the part of the user.
+\begin{quote}\index{FAccessRequest}\small\begin{verbatim}
+int     FAccessRequest (sd, operation, identity, fti)
+int     sd;
+int     operation;
+struct FADUidentity *identity;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"operation":] the operation to be performed,
+one of the values shown in Table~\ref{FTAMaccessops};
+
+\item[\verb"identity":] the identity of the FADU to locate or erase;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+always updated.
+\end{describe}
+If the call to \verb"FAccessRequest" is successful,
+then this corresponds to the appropriate {\sf .CONFIRMATION\/} event,
+the \verb"fti_type" element of the \verb"fti" parameter is set to
+\verb"FTI_ACCESS",
+and the \verb"fti_access" element contains the results.
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTACFREE" macro when no longer needed.
+
+Otherwise if the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+Upon receiving an {\sf F-LOCATE.INDICATION\/}
+or an {\sf F-ERASE.IN\-DI\-CA\-TION\/}
+event,
+the user is required to generate the appropriate {\sf .RESPONSE\/} action
+using the \verb"FAccessResponse" routine.
+\begin{quote}\index{FAccessResponse}\small\begin{verbatim}
+int     FAccessResponse (sd, action, identity, diag, ndiag,
+            fti)
+int     sd;
+int     action;
+struct FADUidentity *identity;
+struct FTAMdiagnostic diag[];
+int     ndiag;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"action":] the action result;
+
+\item[\verb"identity":] the identity of the FADU located
+(not present for the {\sf F-ERASE.RESPONSE\/} action);
+
+\item[\verb"diag"/\verb"ndiag":] a list of diagnostics
+(and the number of diagnostics in the list);
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"AccessResponse" is successful,
+then the {\sf .RESPONSE\/} event has been queued for sending to the
+initiator.
+Otherwise the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+\section	{Data Transfer}
+Once group file transfer request has been made,
+and after any file access requests,
+data transfer may occur.
+This occurs in three steps:
+the initiator requests reading or writing of an FADU,
+the source sends the data,
+the transfer is then either cancelled (by either side) or terminated by the
+initiator.
+
+\subsection	{Read/Write}
+The \verb"FReadWriteRequest" routine is equivalent to a {\sf
+F-READ.REQUEST\/} or {\sf F-WRITE.REQUEST\/} action on the part of the user.
+\begin{quote}\index{FReadWriteRequest}\small\begin{verbatim}
+int     FReadWriteRequest (sd, operation, identity, context,
+                level, lock, fti)
+int     sd;
+int     operation;
+struct FADUidentity *identity;
+int     context,
+        level,
+        lock;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"operation":] the operation to be performed,
+one of the values shown in Table~\ref{FTAMdataops} on
+page~\pageref{FTAMdataops};
+
+\item[\verb"identity":] the identity of the FADU to be transferred;
+
+\item[\verb"context"/\verb"level":] the access context,
+one of the values shown in Table~\ref{FTAMcontexts};
+
+\item[\verb"lock":] lock FADU;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+\subsection	{Sending Data}
+The FADU is transmitted as a series of presentation elements.
+A group of presentation elements may be sent using the \verb"FDataRequest"
+routine,
+which corresponds to the {\sf F-DATA.REQUEST\/} action.
+\begin{quote}\index{FDataRequest}\small\begin{verbatim}
+int     FDataRequest (sd, fadus, nfadu, fti)
+int     sd;
+PE      fadus[];
+int     nfadu;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"fadus"/\verb"nfadu":] the list of data elements
+(and the number of data elements which may not exceed the manifest constant
+\verb"NPDATA" described in Chapter~\ref{libpsap2}),
+consult Section~\ref{ftam:data} on page~\pageref{ftam:data} for important
+information on the use of presentation context identifiers;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+When the last data element in the FADU has been sent,
+the {\sf F-DATA-END.REQUEST\/} action should be performed
+using the \verb"FDataEndRequest" routine.
+\begin{quote}\index{FDataEndRequest}\small\begin{verbatim}
+int     FDataEndRequest (sd, action, diag, ndiag, fti)
+int     sd;
+int     action;
+struct FTAMdiagnostic diag[];
+int     ndiag;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"action":] the action result;
+
+\item[\verb"diag"/\verb"ndiag":] a list of diagnostics
+(and the number of diagnostics in the list);
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+\subsection	{Canceling Transfer}
+Either the initiator or the responder may cancel the transfer prior to
+orderly termination of the data transfer.
+The \verb"FCancelRequest",
+which corresponds to the {\sf F-CANCEL.REQUEST\/} action,
+is used to initiate cancellation.
+\begin{quote}\index{FCancelRequest}\small\begin{verbatim}
+int     FCancelRequest (sd, action, sharedASE, diag, ndiag,
+                        fti)
+int     sd;
+int     action;
+PE      sharedASE;
+struct FTAMdiagnostic diag[];
+int     ndiag;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"action":] the action result;
+
+\item[\verb"sharedASE":] shared ASE information;
+
+\item[\verb"diag"/\verb"ndiag":] a list of diagnostics
+(and the number of diagnostics in the list);
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+always updated.
+\end{describe}
+If the call to \verb"FCancelRequest" is successful,
+then this corresponds to the {\sf F-CANCEL.CONFIRMATION\/} event,
+the \verb"fti_type" element of the \verb"fti" parameter is set to
+\verb"FTI_CANCEL",
+and the \verb"fti_cancel" element contains the results.
+
+Otherwise if the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+Upon receiving an {\sf F-CANCEL.INDICATION\/} event,
+the user is required to generate the {\sf F-CANCEL.RESPONSE\/}
+events using the \verb"FCancelResponse" routine.
+\begin{quote}\index{FCancelResponse}\small\begin{verbatim}
+int     FCancelResponse (sd, action, sharedASE, diag, ndiag,
+                         fti)
+int     sd;
+int     action;
+PE      sharedASE;
+struct FTAMdiagnostic diag[];
+int     ndiag;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"action":] the action result;
+
+\item[\verb"sharedASE":] shared ASE information;
+
+\item[\verb"diag"/\verb"ndiag":] a list of diagnostics
+(and the number of diagnostics in the list);
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+\subsection	{Terminating Transfer}
+After generating the {\sf F-DATA-END.REQUEST\/}
+(or after receiving the {\sf F-DATA-END.RESPONSE\/}) action,
+the initiator is required to perform the {\sf F-TRANSFER-END.REQUEST\/}
+action using the \verb"FTransEndRequest" routine.
+\begin{quote}\index{FTransEndRequest}\small\begin{verbatim}
+int     FTransEndRequest (sd, sharedASE, fti)
+int     sd;
+PE	sharedASE;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"sharedASE":] shared ASE information;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+always updated.
+\end{describe}
+If the call to \verb"FTransEndRequest" is successful,
+then this corresponds to the {\sf F-TRANSFER-END.CONFIRMATION\/} event,
+the \verb"fti_type" element of the \verb"fti" parameter is set to
+\verb"FTI_TRANSEND",
+and the \verb"fti_transend" element contains the results.
+
+Otherwise, if the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+Upon receiving an {\sf F-TRANSFER-END.INDICATION\/} event,
+the responder is required to generate the {\sf F-TRANSFER-END.RESPONSE\/}
+events using the \verb"FTransEndResponse" routine.
+\begin{quote}\index{FTransEndResponse}\small\begin{verbatim}
+int     FTransEndResponse (sd, action, sharedASE, diag, ndiag,
+            fti)
+int     sd;
+int     action;
+PE      sharedASE;
+struct FTAMdiagnostic diag[];
+int     ndiag;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"action":] the action result;
+
+\item[\verb"sharedASE":] shared ASE information;
+
+\item[\verb"diag"/\verb"ndiag":] a list of diagnostics
+(and the number of diagnostics in the list);
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+\section	{Grouped Operations: File Management}
+The \verb"FManageRequest" routine is used to issue a grouped management
+request consisting of:
+\begin{itemize}
+\item	{\sf F-BEGIN-GROUP.REQUEST\/};
+
+\item	{\sf F-SELECT.REQUEST\/} or {\sf F-CREATE.REQUEST\/};
+
+\item	optionally, {\sf F-READ-ATTRIB.REQUEST\/};
+
+\item	optionally, {\sf F-CHANGE-ATTRIB.REQUEST\/};
+
+\item	{\sf F-DESELECT.REQUEST\/} or {\sf F-DELETE.REQUEST\/};
+and,
+
+\item	{\sf F-END-GROUP.REQUEST}.
+\end{itemize}
+The user initializes an \verb"FTAMgroup" structure
+(described in tedious detail on page~\pageref{FTAMgroup})
+and then invokes \verb"FManageRequest".
+\begin{quote}\index{FManageRequest}\small\begin{verbatim}
+int     FManageRequest (sd, ftg, fti)
+int     sd;
+struct FTAMgroup *ftg;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"ftg":] a pointer to an \verb"FTAMgroup" structure;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+always updated.
+\end{describe}
+If the call to \verb"FManageRequest" is successful,
+then this corresponds to the appropriate {\sf .CONFIRMATION\/} events,
+the \verb"fti_type" element of the \verb"fti" parameter is set to
+\verb"FTI_MANAGEMENT",
+and the \verb"fti_group" element contains the results.
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTGFREE" macro when no longer needed.
+
+Otherwise if the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+Upon receiving an \verb"FTI_MANAGEMENT" indication,
+containing the appropriate {\sf .INDICATION\/} events,
+the responder is required to generate the appropriate {\sf .RESPONSE\/}
+events using the \verb"FManageResponse" routine.
+\begin{quote}\index{FManageResponse}\small\begin{verbatim}
+int     FManageResponse (sd, ftg, fti)
+int     sd;
+struct FTAMgroup *ftg;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"ftg":] a pointer to an \verb"FTAMgroup" structure;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call fails,
+the \verb"FTAMabort" structure contained in the
+\verb"FTAMindication" parameter \verb"fti" contains the reason for the failure.
+
+\section	{Association Release}
+The \verb"FTerminateRequest" routine is used to request the release of an
+association,
+and corresponds to an {\sf F-TERMINATE.REQUEST\/} action.
+\begin{quote}\index{FTerminateRequest}\small\begin{verbatim}
+int     FTerminateRequest (sd, sharedASE, ftr, fti)
+int     sd;
+PE      sharedASE;
+struct FTAMrelease *ftr;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+\newpage	%%% yikes!
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"sharedASE":] shared ASE information;
+
+\item[\verb"ftr":] a pointer to an \verb"FTAMrelease" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"FTerminateRequest" is successful,
+then this corresponds to an {\sf F-TERMINATE.CONFIRMATION\/} event,
+and it returns information in the \verb"ftr" parameter,
+which is a pointer to an \verb"FTAMrelease" structure.
+\begin{quote}\index{FTAMrelease}\small\begin{verbatim}
+struct FTAMrelease {
+    PE     ftr_sharedASE;
+
+    struct FTAMcharging ftr_charges;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ftr\_sharedASE":] shared ASE information;
+and,
+
+\item[\verb"ftr\_charges":] any charges.
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"FTRFREE" macro when no longer needed.
+The \verb"FTRFREE" macro
+behaves as if it was defined as:
+\begin{quote}\index{FTRFREE}\small\begin{verbatim}
+void    FTRFREE (ftr)
+struct FTAMrelease *ftr;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"FTerminateRequest",
+and not the \verb"FTAMrelease" structure itself.
+Further,
+\verb"FTRFREE" should be called only if the call to the
+\verb"FTerminateRequest" routine returned \verb"OK".
+
+If the call to \verb"FTerminateRequest" is successful,
+then the association has been released.
+Otherwise the \verb"FTAMabort" structure contained in
+the \verb"FTAMindication" parameter
+\verb"fti" contains the reason for failure.
+
+Upon receiving an {\sf F-TERMINATE.INDICATION\/} event,
+the user is required to generate an {\sf F-TERMINATE.RESPONSE\/} action
+using the\\	%%% hack
+\verb"FTerminateResponse" routine.
+\begin{quote}\index{FTerminateResponse}\small\begin{verbatim}
+int     FTerminateResponse (sd, sharedASE, charging, fti)
+int     sd;
+PE      sharedASE;
+struct FTAMcharging *charging;
+struct FTAMindication  *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"sharedASE":] shared ASE information;
+
+\item[\verb"charging":] charging information (if any);
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"FTerminateResponse" is successful,
+then the association has been released.
+
+\section	{Association Abort}
+The \verb"FUAbortRequest" routine is used to request the ungraceful release
+of an association,
+and corresponds to an {\sf F-U-ABORT.REQUEST\/} action.
+\begin{quote}\index{FUAbortRequest}\small\begin{verbatim}
+int     FUAbortRequest (sd, action, diag, ndiag, fti)
+int     sd;
+int     action;
+struct FTAMdiagnostic diag[];
+int     ndiag;
+struct FTAMindication *fti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"action":] an action result;
+
+\item[\verb"diag"/\verb"ndiag":] a list of diagnostics
+(and the number of diagnostics in the list);
+and,
+
+\item[\verb"fti":] a pointer to an \verb"FTAMindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"FUAbortRequest" is successful,
+then the connection is immediately closed,
+and any data queued for the connection may be lost.
+
+\section	{Error Conventions}
+All of the routines in this library return the manifest constant \verb"NOTOK"
+on error,
+and also update the \verb"fti" parameter given to the routine.
+The \verb"fti_abort" element of the \verb"FTAMindication" structure contains a
+\verb"FTAMabort" structure detailing the reason for the failure.
+For each diagnostic present (typically only one) in the \verb"FTAMabort"
+structure,
+the \verb"ftd_identifier" element of each diagnostic can be given as a
+parameter to the procedure \verb"FErrString" which returns a null-terminated
+diagnostic string.
+\begin{quote}\index{FErrString}\small\begin{verbatim}
+char   *FErrString (c)
+int     c;
+\end{verbatim}\end{quote}
+
+\section	{Compiling and Loading}
+Programs using the \man libftam(3n) library should include
+\verb"<isode/ftam.h>".
+These programs should also be loaded with \verb"-lftam" and \verb"-lisode".
+
+\section	{An Example}
+Read Section~\ref{unixftam:code} on page~\pageref{unixftam:code}.
+
+\section	{For Further Reading}
+The ISO specification for the International Standard on
+File Transfer, Access, and Management is found in \cite{ISO.FTAM},
+which is a four-part document.
+
+%%% \section	{Changes Since the Last Release}\label{ftam:changes}
+%%% A brief summary of the major changes between v~\isodeprevrsn/ and
+%%% v~\isodevrsn/ are now presented.
+%%% These are the user-visible changes only;
+%%% changes of a strictly internal nature are not discussed.
+

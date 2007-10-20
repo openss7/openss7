@@ -1,0 +1,41 @@
+\tt
+.PS 3.0i
+.ps 20
+boxwid = 4*boxwid/3
+##
+define subtree @
+	line from $1.s \
+	     to   ($1.s.x-boxwid, $1.s.y-3*boxht)
+	line from ($1.s.x-boxwid, $1.s.y-3*boxht) \
+	     to   ($1.s.x+boxwid, $1.s.y-3*boxht)
+	line from ($1.s.x+boxwid, $1.s.y-3*boxht) \
+	     to $1.s
+	move to ($1.s.x, $1.s.y-boxht*2); "$\cdots$"
+@
+## figure D-24
+B1:	box invis "root"
+B2:	box with .n at (B1.s.x, B1.s.y-lineht) "c=XX"
+	line from B2.n to B1.s
+##
+B3:	box with .n at (B2.s.x, B2.s.y-lineht) "o=O$_i$"
+	line from B3.n to B2.s
+	subtree(B3)
+B4a:	box invis with .n at (B3.s.x, B3.s.y-3*boxht-lineht) "$\cdots$"
+B4b:	box invis with .e at B4a.w "$\cdots$"
+B4c:	box invis with .w at B4a.e "$\cdots$"
+##
+	line from (B2.ne.x+2*linewid, B1.se.y) \
+	     to   (B2.ne.x+2*linewid, B2.se.y)
+	move to (B2.ne.x+2*linewid, (B1.se.y+B2.se.y)/2); \
+		"\ name only, no attributes" ljust
+	line from (B2.ne.x+2*linewid, B3.ne.y) \
+	     to   (B2.ne.x+2*linewid, B3.s.y-3*boxht)
+	move to (B2.ne.x+2*linewid, (B3.ne.y+B3.s.y-3*boxht)/2); \
+		"\ complete information" ljust
+
+	line from (B2.ne.x+2*linewid, B3.s.y-3*boxht-lineht) \
+	     to   (B2.ne.x+2*linewid, B3.s.y-3*boxht-lineht-boxht)
+	move to   (B2.ne.x+2*linewid, B3.s.y-3*boxht-lineht-boxht/2); \
+		"\ subordinate knowledge" ljust
+##
+.PE

@@ -1,0 +1,58 @@
+.PS 9.5i
+.ps 20
+## figure T-10
+B1:	box "8802.3" height 3*boxht/2
+B2:	box "CLNP" with .s at B1.n
+B3:	box "TP4" with .s at B2.n
+B4:	box "OSI TS" with .s at (B3.n.x, B3.n.y+lineht) invis
+	arrow from B3.n to B4.s
+C11:	box "8802.3" with .sw at (B1.se.x+2*linewid, B1.se.y) \
+		height 3*boxht/2
+C12:	box "CLNP" with .sw at C11.nw width 2*boxwid
+C13:	box "IP" "" "Ether" with .w at C11.e height 3*boxht/2
+	line from C13.w to C13.e
+B5:	box "IP" "" "" with .w at (C13.e.x+2*linewid, C11.e.y) width 2*boxwid  height 3*boxht/2
+	line dashed from B5.w to B5.e
+B5a:	box invis with .sw at B5.sw "Ether"
+	line from B5.s to B5.c; line from B5.w to B5.e
+B5b:	box invis with .se at B5.se "X.25"
+B6:	box "IP" "" "X.25" with .w at (B5.e.x+2*linewid, B5.e.y) height 3*boxht/2
+	line from B6.w to B6.e
+B7:	box "CLNP" with .sw at B6.nw width 2*boxwid
+B11:	box "8802.3" with .ne at B7.se height 3*boxht/2
+B8:	box "CLNP" with .w at (B7.e.x+2*linewid, B7.e.y)
+B12:	box "8802.3" with .n at B8.s height 3*boxht/2
+B9:	box "TP4" with .s at B8.n
+B10:	box "OSI TS" with .s at (B9.n.x, B9.n.y+lineht) invis
+	arrow from B9.n to B10.s
+##
+	line from B1.s to (B1.s.x, B1.s.y-lineht) \
+		       to (C11.s.x, C11.s.y-lineht) \
+		       to C11.s
+	line from C13.s to (C13.s.x, C13.s.y-lineht) \
+		       to (B5.s.x-boxwid/2, C13.s.y-lineht) \
+		       to (B5.s.x-boxwid/2, B5.s.y)
+	line from (B5.s.x+boxwid/2, B5.s.y) \
+		       to (B5.s.x+boxwid/2, B5.s.y-lineht) \
+		       to (B6.s.x, B5.s.y-lineht) \
+		       to (B6.s.x, B6.s.y)
+	line from (B11.s.x, B11.s.y) \
+		       to (B11.s.x, B6.s.y-lineht) \
+		       to (B12.s.x, B6.s.y-lineht) to B12.s
+##
+	line dashed from B3.e to B9.w
+	line dashed from B2.e to C12.w
+	line dashed from C12.e to B7.w
+	line dashed from B7.e to B8.w
+	line dashed from B1.e to C11.w
+	line dashed from (C13.e.x, (C13.n.y+C13.e.y)/2) \
+		    to (B5.w.x, (C13.n.y+B5.w.y)/2)
+	line dashed from (C13.e.x, (C13.s.y+C13.e.y)/2) \
+		    to (B5.w.x, (C13.s.y+B5.w.y)/2)
+	line dashed from (B5.e.x, (B5.n.y+B5.e.y)/2) \
+		    to (B6.w.x, (B6.n.y+B6.w.y)/2)
+	line dashed from (B5.e.x, (B5.s.y+B5.e.y)/2) \
+		    to (B6.w.x, (B6.s.y+B6.w.y)/2)
+	line dashed from B11.e to B12.w
+##
+.PE

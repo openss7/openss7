@@ -1,0 +1,95 @@
+\contentsline {chapter}{\numberline {1}Introduction}{1}
+\contentsline {section}{\numberline {1.1}Informational Model}{3}
+\contentsline {subsection}{\numberline {1.1.1}Naming}{3}
+\contentsline {subsection}{\numberline {1.1.2}How Entries and Objects are Described}{4}
+\contentsline {subsection}{\numberline {1.1.3}Object Classes}{9}
+\contentsline {subsubsection}{The top objectClass}{11}
+\contentsline {subsubsection}{The quipuObject objectClass}{11}
+\contentsline {subsubsection}{The quipuNonLeafObject objectClass}{14}
+\contentsline {subsubsection}{The domainRelatedObject objectClass}{14}
+\contentsline {subsubsection}{The friendlyCountry objectClass}{15}
+\contentsline {subsubsection}{The organization objectClass}{18}
+\contentsline {subsubsection}{The organizationalUnit objectClass}{21}
+\contentsline {subsubsection}{The locality objectClass}{24}
+\contentsline {subsubsection}{The pilotPerson objectClass}{24}
+\contentsline {subsubsection}{The alias objectClass}{29}
+\contentsline {subsubsection}{The organizationalRole objectClass}{31}
+\contentsline {subsubsection}{The quipuDSA objectClass}{34}
+\contentsline {section}{\numberline {1.2}Functional Model}{36}
+\contentsline {section}{\numberline {1.3}Organizational Model}{39}
+\contentsline {subsection}{\numberline {1.3.1}Level-0 DSAs}{40}
+\contentsline {subsection}{\numberline {1.3.2}Level-1 DSAs}{43}
+\contentsline {subsection}{\numberline {1.3.3}Level-2 DSAs}{44}
+\contentsline {subsection}{\numberline {1.3.4}DUAs}{44}
+\contentsline {section}{\numberline {1.4}Security Model}{45}
+\contentsline {section}{\numberline {1.5}Running your DMD}{46}
+\contentsline {chapter}{\numberline {2}Installation and Configuration}{47}
+\contentsline {section}{\numberline {2.1}Software}{47}
+\contentsline {subsection}{\numberline {2.1.1}Selecting a Machine}{48}
+\contentsline {subsection}{\numberline {2.1.2}Files}{48}
+\contentsline {subsection}{\numberline {2.1.3}Source Release}{50}
+\contentsline {subsubsection}{Configuration of the ISODE}{51}
+\contentsline {subsubsection}{Generation of the ISODE}{51}
+\contentsline {subsubsection}{Installation of the ISODE}{52}
+\contentsline {section}{\numberline {2.2}Starting the ISODE}{53}
+\contentsline {section}{\numberline {2.3}ISODE Tailoring}{54}
+\contentsline {section}{\numberline {2.4}Testing of the ISODE}{54}
+\contentsline {section}{\numberline {2.5}Configuration of DUAs}{54}
+\contentsline {subsection}{\numberline {2.5.1}DUA Failure}{56}
+\contentsline {section}{\numberline {2.6}An Important Note}{57}
+\contentsline {section}{\numberline {2.7}Configuring your Level-1 DSA}{57}
+\contentsline {subsection}{\numberline {2.7.1}Choosing a DSA Name}{57}
+\contentsline {subsection}{\numberline {2.7.2}Editing the DSA configuration file}{58}
+\contentsline {subsection}{\numberline {2.7.3}Running the DSA configuration program}{61}
+\contentsline {subsection}{\numberline {2.7.4}Testing the stand-alone DSA}{62}
+\contentsline {subsection}{\numberline {2.7.5}DSA Failure}{62}
+\contentsline {subsubsection}{Attribute Errors}{63}
+\contentsline {subsubsection}{Structure Errors}{63}
+\contentsline {subsubsection}{Network Errors}{64}
+\contentsline {subsection}{\numberline {2.7.6}Editing the DUA tailoring file}{64}
+\contentsline {subsection}{\numberline {2.7.7}Joining the Pilot DMD}{65}
+\contentsline {subsubsection}{Contact the c=US Manager}{66}
+\contentsline {subsubsection}{Connecting In and Checking Out}{66}
+\contentsline {subsubsection}{More System Administration}{67}
+\contentsline {section}{\numberline {2.8}Configuring the White Pages}{69}
+\contentsline {subsection}{\numberline {2.8.1}White Pages via the DA-service}{69}
+\contentsline {subsubsection}{Fred-only hosts}{69}
+\contentsline {subsection}{\numberline {2.8.2}White Pages via TELNET}{70}
+\contentsline {subsubsection}{Fred-only hosts}{70}
+\contentsline {subsection}{\numberline {2.8.3}White Pages via WHOIS}{71}
+\contentsline {subsubsection}{The whitepages Command}{72}
+\contentsline {subsection}{\numberline {2.8.4}White Pages via mail}{72}
+\contentsline {subsection}{\numberline {2.8.5}An Undocumented Feature}{73}
+\contentsline {section}{\numberline {2.9}Other Services}{75}
+\contentsline {subsection}{\numberline {2.9.1}Faces}{75}
+\contentsline {subsubsection}{Xphoto}{75}
+\contentsline {subsubsection}{xwho and xface}{76}
+\contentsline {subsection}{\numberline {2.9.2}Mail Composition}{76}
+\contentsline {section}{\numberline {2.10}Tell The Users!}{77}
+\contentsline {subsection}{\numberline {2.10.1}More New and Exciting Stuff}{78}
+\contentsline {chapter}{\numberline {3}Maintenance}{79}
+\contentsline {section}{\numberline {3.1}A file you should know about}{79}
+\contentsline {section}{\numberline {3.2}Nightly Maintenance}{79}
+\contentsline {subsection}{\numberline {3.2.1}Logs}{80}
+\contentsline {subsection}{\numberline {3.2.2}Limiting the size of Logs}{80}
+\contentsline {subsection}{\numberline {3.2.3}Reading Logs}{80}
+\contentsline {section}{\numberline {3.3}Adding Entries}{81}
+\contentsline {subsection}{\numberline {3.3.1}Using Dish}{82}
+\contentsline {section}{\numberline {3.4}Adding organizationalUnits}{82}
+\contentsline {section}{\numberline {3.5}Inherited Attributes}{83}
+\contentsline {section}{\numberline {3.6}Adding a Level-2 DSA}{85}
+\contentsline {subsection}{\numberline {3.6.1}Modifying the Level-1 DSA}{85}
+\contentsline {subsection}{\numberline {3.6.2}Configuring a Level-2 DSA}{87}
+\contentsline {subsubsection}{Editing the DSA tailoring file}{87}
+\contentsline {subsubsection}{Editing the DSA startup file}{88}
+\contentsline {subsubsection}{Building an Initial Database}{89}
+\contentsline {subsubsection}{Testing the Level-2 DSA}{89}
+\contentsline {subsubsection}{Editing the DUA tailoring file}{89}
+\contentsline {subsection}{\numberline {3.6.3}Moving portions of the Directory Tree}{90}
+\contentsline {subsubsection}{Editing the DUA tailoring file}{93}
+\contentsline {subsubsection}{System Administration}{93}
+\contentsline {section}{\numberline {3.7}Miscellaneous Topics}{94}
+\contentsline {subsection}{\numberline {3.7.1}Moving a Level-1 DSA}{94}
+\contentsline {subsection}{\numberline {3.7.2}A Final Word on DSAs and Knowledge Information}{95}
+\contentsline {subsection}{\numberline {3.7.3}Naming People}{96}
+\contentsline {subsection}{\numberline {3.7.4}Installing the Software on other hosts}{97}

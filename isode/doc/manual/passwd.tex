@@ -1,0 +1,84 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter       {A Complete Example}\label{cook:example}
+Now, let's consider a complete example.
+Our application is modeled after the example given in \cite{Courier.BSD}.
+In short,
+we wish to implement a remote lookup facility of the \unix/ \file{/etc/passwd}
+database.
+
+\section	{Service Definitions}
+We begin by defining the mundane naming and addressing information for the
+service.
+Using the ``standard'' approach described in Section~\ref{service:define},
+we select:
+\begin{describe}
+\item[abstract syntax:]	defined in the \man isobjects(5) file as:
+\begin{quote}\small\begin{verbatim}
+"local service pci"      1.17.2.n.1
+\end{verbatim}\end{quote}
+If we select \verb"n" as the lowest unassigned number in the \verb"1.17.2"
+subtree, e.g., \verb"7", we might have:
+\begin{quote}\small\begin{verbatim}
+"isode passwd lookup pci"      1.17.2.7.1
+\end{verbatim}\end{quote}
+
+\item[application context name:] defined in the \man isobjects(5) file as:
+\begin{quote}\small\begin{verbatim}
+"local service"          1.17.2.n.2
+\end{verbatim}\end{quote}
+Similarly, for a value of \verb"7" for \verb"n", we have:
+\begin{quote}\small\begin{verbatim}
+"isode passwd lookup"          1.17.2.7.2
+\end{verbatim}\end{quote}
+
+\item[Directory entry:]
+if we select \verb"p" as the lowest unassigned TSAP ID between \verb"1024"
+and \verb"2047" inclusive, e.g., \verb"1040", 
+and decide to name the service as \verb"passwdstore",
+we have:
+\begin{quote}\small\begin{verbatim}
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= passwdstore
+presentationAddress= #1040/Internet=mydomainame
+supportedApplicationContext= isode passwd lookup
+acl=
+execVector= ros.lookup
+\end{verbatim}\end{quote}
+\end{describe}
+
+\section	{Remote Operations Module}
+The remote operations module for the service is placed in \file{lookup.ry}.
+This file shown in Figure~\ref{passwd:rom} starting on
+page~\pageref{passwd:rom}.
+
+The \file{Makefile} for the service is shown in Figure~\ref{passwd:make}
+starting on page~\pageref{passwd:make}.
+
+\newpage
+\tagrindfile{passwd-ops}%
+	{Remote Operations Module for the Password Lookup Service}{passwd:rom}
+\newpage
+\tagrindfile{passwd-make}{Makefile for the Password Lookup Service}%
+	{passwd:make}
+\newpage
+
+\section	{Interactive Initiator}\label{passwd:initiator}
+The interactive initiator of the service is placed in \file{lookup.c}.
+This file is shown in Figure~\ref{passwd:init} starting on
+page~\pageref{passwd:init}.
+
+\tagrindfile{passwd-init}{Initiator for the Password Lookup Service}%
+	{passwd:init}
+\newpage
+
+\section	{Responder}\label{passwd:responder}
+The responder for the service is placed in \file{lookupd.c}.
+This file is shown in Figure~\ref{passwd:resp} starting on
+page~\pageref{passwd:resp}.
+Note that if actual network addresses were associated with the service
+definitions made earlier,
+then the responder could operate using the static discipline.
+
+\tagrindfile{passwd-resp}{Responder for the Password Lookup Service}%
+	{passwd:resp}

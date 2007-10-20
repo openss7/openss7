@@ -1,0 +1,115 @@
+\File{na\-defs.py},{17:23},{Jul 11 1991}
+\L{\LB{QuipuNameDefinitions DEFINITIONS ::=}}
+\L{\LB{}}
+\L{\LB{BEGIN}}
+\L{\LB{}}
+\L{\LB{IMPORTS}}
+\L{\LB{ABSTRACT\-OPERATION, ABSTRACT\-ERROR}}
+\L{\LB{    FROM AbstractServiceNotation}}
+\L{\LB{}\Tab{8}{\{joint\-iso\-ccitt mhs\-motis(6) asdc(2) modules(0) notation(1)\}}}
+\L{\LB{}}
+\L{\LB{NameError, ServiceError, SecurityError}}
+\L{\LB{    FROM DirctoryAbstractService}}
+\L{\LB{}\Tab{8}{\{joint\-iso\-ccitt ds(5) modules(1) directoryAbstractService(2)\}}}
+\L{\LB{}}
+\L{\LB{DistinguishedName, RelativeDistinguishedName, Attribute,}}
+\L{\LB{ATTRIBUTE, ATTRIBUTE\-SYNTAX, \K{OBJECT}\-CLASS}}
+\L{\LB{    FROM InformationFramework}}
+\L{\LB{}\Tab{8}{\{joint\-iso\-ccitt ds(5) modules(1) informationFramework(1)\}}}
+\L{\LB{}}
+\L{\LB{caseIgnoreStringSyntax}}
+\L{\LB{    FROM SelectedAttributeTypes}}
+\L{\LB{}\Tab{8}{\{joint\-iso\-ccitt ds(5) modules(1) selectedAttributeTypes(5)\}}}
+\L{\LB{}}
+\L{\LB{TreeStructure, ACL, EDBInfo, MasterDSA, SlaveDSA, DSA, QuipuVersion, }}
+\L{\LB{InheritedAttribute, SubordinateReference, Crossreference, }}
+\L{\LB{NonSpecificSubordinateReference,}}
+\L{\LB{QuipuDSA, QuipuObject, QuipuNonLeafObject, ExternalNonLeafObject,}}
+\L{\LB{    FROM QuipuDirectoryDefinitions;}}
+\L{\LB{}}
+\L{\LB{quipu \K{OBJECT} IDENTIFIER}\Tab{24}{::= \{ccitt data(9) pss(2342) ucl(19200300) quipu(99)\}}}
+\L{\LB{}\Tab{32}{\C{}\-\- interim QUIPU OID}}
+\CE{}\L{\LB{}}
+\L{\LB{attributeType \K{OBJECT} IDENTIFIER ::= \{quipu attributeType(1)\}    }}
+\L{\LB{}}
+\L{\LB{attributeSyntax \K{OBJECT} IDENTIFIER ::= \{quipu attributeSyntax(2)\}}}
+\L{\LB{}}
+\L{\LB{objectClass \K{OBJECT} IDENTIFIER ::= \{quipu objectClass(3)\}}}
+\L{\LB{}}
+\L{\LB{treeStructure TreeStructure ::= \{attributeType 1\}}}
+\L{\LB{}}
+\L{\LB{acl ACL ::= \{attributeType 2\}}}
+\L{\LB{}}
+\L{\LB{eDBInfo EDBInfo ::= \{attributeType 3\}}}
+\L{\LB{}}
+\L{\LB{masterDSA MasterDSA ::= \{attributeType 4\}}}
+\L{\LB{}}
+\L{\LB{slaveDSA SlaveDSA ::= \{attributeType 5\}}}
+\L{\LB{}}
+\L{\LB{control DSAControl ::= \{attributeType 15\}}}
+\L{\LB{}}
+\L{\LB{quipuVersion QuipuVersion ::= \{attributeType 16\}}}
+\L{\LB{}}
+\L{\LB{protectedPassword ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX    ProtectedPassword}}
+\L{\LB{          ::= \{attributeType 17\}}}
+\L{\LB{}}
+\L{\LB{SecurityPolicy ::= ANY }}
+\L{\LB{}\Tab{8}{       \C{}\-\- to be defined}}
+\CE{}\L{\LB{}}
+\L{\LB{entrySecurityPolicy ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX}}
+\L{\LB{    SecurityPolicy ::= \{attributeType 18\}}}
+\L{\LB{}}
+\L{\LB{dsaDefaultSecurityPolicy ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX}}
+\L{\LB{    SecurityPolicy ::= \{attributeType 19\}}}
+\L{\LB{}}
+\L{\LB{dsaPermittedSecurityPolicy ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX}}
+\L{\LB{    SecurityPolicy ::= \{attributeType 20\}}}
+\L{\LB{}}
+\L{\LB{inheritedAttribute InheritedAttribute ::= \{attributeType 21\}}}
+\L{\LB{}}
+\L{\LB{execVector ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX}}
+\L{\LB{    PrintableString ::= \{attributeType 22\}}}
+\L{\LB{}}
+\L{\LB{relayDSA ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX}}
+\L{\LB{    distinguishedNameSyntax ::= \{attributeType 23\}}}
+\L{\LB{}}
+\L{\LB{subordinateReference SubordinateReference ::= \{attributeType 25\}}}
+\L{\LB{}}
+\L{\LB{crossReference Crossreference ::= \{attributeType 26\}}}
+\L{\LB{}}
+\L{\LB{nonSpecificSubordinateReference NonSpecificSubordinateReference }}
+\L{\LB{                              ::= \{attributeType 27\}}}
+\L{\LB{}}
+\L{\LB{listenAddress ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX}}
+\L{\LB{    PresentationAddress ::= \{attributeType 28\}}}
+\L{\LB{}}
+\L{\LB{cachedEDB ATTRIBUTE}}
+\L{\LB{    WITH ATTRIBUTE\-SYNTAX}}
+\L{\LB{    distinguishedNameSyntax ::= \{attributeType 29\}}}
+\L{\LB{}}
+\L{\LB{quipuDSA QuipuDSA ::= \{objectClass 1\}}}
+\L{\LB{}}
+\L{\LB{quipuObject QuipuObject}\Tab{24}{::= \{objectClass 2\}}\Tab{48}{}}
+\L{\LB{}}
+\L{\LB{quipuNonLeafObject QuipuNonLeafObject ::= \{objectClass 6\}}}
+\L{\LB{}}
+\L{\LB{externalNonLeafObject ExternalNonLeafObject ::= \{objectClass 9\}}}
+\L{\LB{}}
+\L{\LB{quipuSecurityUser \K{OBJECT}\-CLASS}}
+\L{\LB{    SUBCLASS OF quipuObject}}
+\L{\LB{    MUST CONTAIN \{protectedPassword\}}}
+\L{\LB{         ::= \{objectClass 7\}}}
+\L{\LB{}}
+\L{\LB{iSODEApplicationEntity \K{OBJECT}\-CLASS}}
+\L{\LB{    SUBCLASS OF applicationEntity}}
+\L{\LB{    MUST CONTAIN \{execVector\}}}
+\L{\LB{         ::= \{objectclass 8\}}}
+\L{\LB{}}
+\L{\LB{END}}

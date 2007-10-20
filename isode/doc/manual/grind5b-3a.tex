@@ -1,0 +1,39 @@
+\File{grind5b\-3a.c},{22:23},{Jun 12 1988}
+\L{\LB{\K{\#include} \<stdio.h\>}}
+\L{\LB{\K{\#include} \<isode\/ssap.h\>}}
+\L{\LB{\K{\#include} \<isode\/isoservent.h\>}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int} requirements = SR\_HALFDUPLEX \| SR\_NEGOTIATED;}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int} owned = 0;}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ARGSUSED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\Proc{main}main (argc, argv, envp)}}
+\L{\LB{\K{int}}\Tab{8}{argc;}}
+\L{\LB{\K{char}  **argv,}}
+\L{\LB{      **envp;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}     sd,}}
+\L{\LB{}\Tab{8}{    settings;}}
+\L{\LB{    \K{char}    buffer[BUFSIZ];}}
+\L{\LB{    \K{register} \K{struct} SSAPaddr   *sz;}}
+\L{\LB{    \K{struct} SSAPref  sfs;}}
+\L{\LB{    \K{register} \K{struct} SSAPref *sf = \&sfs;}}
+\L{\LB{    \K{struct} SSAPconnect  scs;}}
+\L{\LB{    \K{register} \K{struct} SSAPconnect *sc = \&scs;}}
+\L{\LB{    \K{struct} SSAPrelease  srs;}}
+\L{\LB{    \K{register} \K{struct} SSAPrelease *sr = \&srs;}}
+\L{\LB{    \K{struct} SSAPindication   sis;}}
+\L{\LB{    \K{register} \K{struct} SSAPindication *si = \&sis;}}
+\L{\LB{    \K{register} \K{struct} SSAPabort *sa = \&si \-\> si\_abort;}}
+\L{\LB{    \K{register} \K{struct} isoservent *is;}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((is = getisoserventbyname (\S{}\"sink\"\SE{}, \S{}\"ssap\"\SE{})) == NULL)}}
+\L{\LB{}\Tab{8}{error (\S{}\"ssap\/sink: unknown provider\/entity pair\"\SE{});}}
+\L{\LB{    \K{if} (argc != 2)}}
+\L{\LB{}\Tab{8}{error (\S{}\"usage: source \!\"host\!\"\"\SE{});}}
+\L{\LB{}}
+\L{\LB{...}}

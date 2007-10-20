@@ -1,0 +1,154 @@
+% -*- LaTeX -*-
+
+\input lcustom
+
+\documentstyle[10pt]{article}
+
+\advance\textwidth by1in
+\advance\oddsidemargin by-0.5in
+\advance\evensidemargin by-0.5in
+
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}\LARGE\bf
+WHITE PAGES\\ 
+\large\bf QUICK REFERENCE SHEET
+\end{center}
+
+\section*	{Query Syntax}
+\begin{verbatim}
+whois input-field [record-type] [area-designator] [output-control]
+    input-field is one of:
+        name NAME               e.g., surname "smith", or fullname "john smith"
+        handle HANDLE           e.g., handle @c=US@cn=Manager
+        mailbox LOCAL@DOMAIN    e.g., mailbox postmaster@nisc.psi.net
+
+    record-type is one of:
+        person or -title NAME   e.g., -title scientist
+        organization
+        unit (a division under an organization)
+        role (a role within an organization)
+        locality
+        dsa (white pages server)
+
+    area-designator is one of:
+        -org NAME       e.g., -org psi
+        -unit NAME      e.g., -unit engineering
+        -locality NAME  e.g., -locality rensselaer
+        -area HANDLE    e.g., -area "@c=US@o=Performance Systems International"
+            and may be followed by -geo HANDLE, e.g., -geo @c=GB
+
+    output-control is any of:
+        expand     - give a detailed listing, followed by children
+        subdisplay - give a one-listing listing, followed by children
+        full       - give a detailed listing, even on ambiguous matches
+        summary    - give a one-line listing, even on unique matches
+\end{verbatim}
+\vfill\noindent
+The most common usage:
+\begin{quote}\small\begin{verbatim}
+fred> whois schoffstall -org psi
+Trying @c=US@o=Performance Systems International ...
+3 matches found.
+  2. Marvin Schoffstall                         marv@psi.com
+  3. Martin Schoffstall                         schoff@psi.com
+  4. Steve Schoffstall                          steve@psi.com
+
+fred> whois !3
+Martin Schoffstall (3)                          schoff@psi.com
+    ...
+\end{verbatim}\end{quote}
+
+\newpage
+
+\section*	{Examples of usage}
+\begin{verbatim}
+fred> whois "smith"
+\end{verbatim}
+\begin{quote}
+looks for any entries with this name in the default area
+(choice of matching on the entry's surname or fullname is based on the value
+of the \verb"namesearch" variable)
+\end{quote}
+
+\begin{verbatim}
+fred> whois surname "smith"
+\end{verbatim}
+\begin{quote}
+looks for any entries with this name in the default area
+\end{quote}
+
+\begin{verbatim}
+fred> whois fullname "john smith"
+\end{verbatim}
+\begin{quote}
+looks for any entries with this name in the default area
+\end{quote}
+
+\begin{verbatim}
+fred> whois "smith" -org psi
+fred> whois smith@psi
+\end{verbatim}
+\begin{quote}
+looks for any entries with this name in any organization containing ``psi''
+\end{quote}
+
+\begin{verbatim}
+fred> whois "smith" -area "@c=US@o=Performance Systems International"
+\end{verbatim}
+\begin{quote}
+could be used if you already know the "area" that the user resides in
+\end{quote}
+
+\begin{verbatim}
+fred> whois "smith" -area 17
+\end{verbatim}
+\begin{quote}
+could be used if an alias were already established for this area
+\end{quote}
+
+\begin{verbatim}
+fred> whois @c=US@cn=Manager
+\end{verbatim}
+\begin{quote}
+looks for the entry with this distinguished name (handle)
+\end{quote}
+
+\begin{verbatim}
+fred> whois !7
+\end{verbatim}
+\begin{quote}
+could be used if an alias were already established for this entry
+\end{quote}
+
+\begin{verbatim}
+fred> whois smith@psi.com
+\end{verbatim}
+\begin{quote}
+looks for any entries with the given mailbox
+\end{quote}
+
+\begin{verbatim}
+fred> whois -title operator
+\end{verbatim}
+\begin{quote}
+looks for any entries who are operators
+\end{quote}
+
+\begin{verbatim}
+fred> whois -org *
+\end{verbatim}
+\begin{quote}
+reports on all registered organizations
+\end{quote}
+
+\begin{verbatim}
+fred> whois -org * -geo @c=GB
+\end{verbatim}
+\begin{quote}
+reports on all registered organizations under @c=GB
+\end{quote}
+
+\end{document}

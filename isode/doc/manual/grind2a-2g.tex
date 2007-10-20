@@ -1,0 +1,20 @@
+\File{grind2a\-2g.bnf},{09:46},{Mar  4 1989}
+\L{\LB{\<prefix\>}\Tab{16}{::= \<digit\> \<digit\>}}
+\L{\LB{}}
+\L{\LB{\<ip\>}\Tab{16}{::= \<otherstring\>}}
+\L{\LB{}\Tab{24}{\C{}\-\- dotted decimal form (e.g., 10.0.0.6)}}
+\CE{}\L{\LB{}\Tab{24}{\C{}\-\- or domain (e.g., twg.com)}}
+\CE{}\L{\LB{\<port\>}\Tab{16}{::= \<digitstring\>}}
+\L{\LB{\<tset\>}\Tab{16}{::= \<digitstring\>}}
+\L{\LB{}}
+\L{\LB{\<dte\>         }\Tab{16}{::= \<digitstring\>}}
+\L{\LB{\<cudf\-or\-pid\>}\Tab{16}{::= \S{}\"CUDF\"\SE{} \| \S{}\"PID\"\SE{}}}
+\L{\LB{}}
+\L{\LB{\<digitstring\> }\Tab{16}{::= \<digit\>    \<digitstring\> \| \<digit\>}}
+\L{\LB{\<digit\>       }\Tab{16}{::= [0\-9]}}
+\L{\LB{}}
+\L{\LB{\<otherstring\> }\Tab{16}{::= \<other\>    \<otherstring\> \| \<other\>}}
+\L{\LB{\<other\>       }\Tab{16}{::= [0\-9a\-zA\-Z+\-.]}}
+\L{\LB{}}
+\L{\LB{\<hexstring\>   }\Tab{16}{::= \<hexdigit\> \<hexstring\>   \| \<hexdigit\>}}
+\L{\LB{\<hexdigit\>    }\Tab{16}{::= [0\-9a\-f]}}

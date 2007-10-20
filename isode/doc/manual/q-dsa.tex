@@ -1,0 +1,2621 @@
+%run this through LaTeX with the appropriate wrapper
+
+\chapter {Installing QUIPU}
+
+\label{quipu:install}
+
+This section describes how to install QUIPU, and make it operate in a basic
+fashion.  This is reasonably prescriptive, as it should be possible to
+install and operate a QUIPU DUA and/or DSA without too much 
+knowledge about how it functions.
+
+QUIPU comes in various separate parts of the ISODE source tree.  Only the
+\man libdsap(3n) library, the DSA \pgm{ros.quipu} 
+and the DUA interface DISH are 
+``made'' as part of the default installation of ISODE.
+This section assumes you have installed this part of ISODE.  
+You should consult the \file{READ-ME} file in the
+top level of the source tree to find out how to do this.
+Your attention is drawn to the discussion of the \pgm{iaed} and
+\pgm{dased} programs in this \file{READ-ME} file.  This can be used to
+replace the \man isoentities(5n) and \man isoservices(5n) static files
+with dynamic directory lookup\footnote{In fact, you are encouraged to
+use these services rather that the static (potentially out of date) files.}.
+\volone/ to \volfour/ of this manual describe other features of 
+this installation of ISODE not specific to the OSI directory.
+
+Before you install QUIPU
+there are various compile time options you could consider setting which control
+the operation of QUIPU, in particular of the DSA. 
+These options are set in the file \file{h/quipu/config.h}, and are
+described in the next section.
+If you consider yourself a QUIPU ``novice'', then these 
+are probably best left to their default values initially.
+However, if you qualify as a ``large'' site you may want to consider enabling
+the TURBO\_DISK options.
+
+
+In the \file{others/quipu/uips/} directory of the ISODE source tree
+there are various sub-directories, one for each optional user interface
+(FRED, SD, POD and DE).
+A version of DISH that runs directly 
+from a \unix/ shell, \pgm{dishinit};
+a script to create a default \file{.quipurc} file for new users, and 
+\pgm{sid}: a set of scripts that utilise the shell version of DISH,
+are all installed from the \file{dish} sub-directory.
+The \file{manage} sub-directory contains an enhanced version of DISH
+that can be used to manage alias attributes.
+You should consult \file{others/quipu/uips/READ-ME}, for precise installation
+details of all of these interfaces.
+
+Each of these interfaces knows about the \verb+photo+ attribute that an entry
+in the DIT can have.  In order to display the photographs, the photo
+handling code must be compiled. Instructions on this can be found in
+Section~\ref{dua:photo} of this manual and the file
+\file{others/quipu/photo/READ-ME}.
+
+\section{Compile Options}
+\label{DSA:compile}
+This section describes the options that can be set in the
+\file{h/quipu/config.h} before compilation of the QUIPU code.
+
+\begin{describe}
+
+\item [\verb+\#define PDU\_DUMP+:]
+If this is defined, and DISH is invoked with
+\begin{quote}\begin{verbatim}
+dish -pdu foobar
+\end{verbatim}\end{quote}
+then a directory \file{foobar} will be created, and 
+will contain logs of all the X.500 PDUs sent to and from the DSA.
+This is useful for debugging.
+
+\item [\verb+\#define NO\_STATS+:]
+If defined, the QUIPU will {\em not} produce statistical
+and audit logs either the DSA or DUA.
+These logs are useful to see what has been happening to your system.
+If logging is allowed it can be turned off at runtime.
+From the standpoint of security, it is advisable not
+to select this option. Audit logs are very useful for detecting and tracing
+attempts to break the security of the system.
+
+\item [\verb+\#define CHECK\_FILE\_ATTRIBUTES+:]
+If an EDB entry contains a FILE attribute, check that
+the corresponding file exists at load time.  This significantly
+increases the time taken to start a DSA.
+
+\item [\verb+\#define QUIPU\_MALLOC+:]
+Use a version of malloc() optimised for the memory
+resident QUIPU DSA database.  It is believed to behave about 20\%
+faster than the standard malloc algorithm in QUIPU's case.
+
+\item [\verb+\#define TURBO\_DISK+:]
+This option is described in the next section of this manual.
+
+\item [\verb+\#define TURBO\_INDEX+:]
+This option is described in the next section of this manual.
+
+\item [\verb+\#define SOUNDEX\_PREFIX+:]
+Consider soundex prefixes as matches.  For example, make
+``fred'' match ``frederick''.  Defining this option gives
+approximate matching behavior the same as in QUIPU-6.0.
+
+\item [\verb+\#define COMPAT\_6\_0+:]
+Operate in a manner compatible with QUIPU-6.0.  
+For operations involving subtree searching across
+multiple DSA this option is required when one of the DSAs is based on
+QUIPU-6.0.  It is {\em not} required for QUIPU-6.1 and above.
+
+\item [\verb+\#define USE\_BUILTIN\_OIDS+:] 
+A DSA needs to know the OIDs
+for various attribute type and object classes.  With this option, the
+OIDs are built into the code (for efficiency, and to remove the table 
+dependency), without it the {\em oidtables} are used.
+\end{describe}
+
+For the DISH interface, a compile option can be set to allow the use
+of the GNU\index{GNU} {\em readline}\index{readline} package from the 
+Free Software
+Foundation.
+Full details are given in the \file{quipu/dish/Makefile}.
+
+
+\section{TURBO Options for Large Sites}
+\index{TURBO}
+This section describes two options (TURBO\_INDEX 
+and TURBO\_DISK) that
+can be set in the file \file{h/quipu/config.h}.  Both options are
+most useful for sites with a large amount of data (e.g., thousands of
+entries, or hundreds of EDB files).
+The TURBO\_INDEX option is set by default.
+If your DSA only holds a small amount of data you can skip this 
+section.
+\footnote{The TURBO\_AVL and TURBO\_LOAD options available in previous
+releases of QUIPU are no longer required.}
+
+The first option, TURBO\_INDEX, can be used to speed certain
+kinds of searches by building an index based on selected
+attribute types.  There are three DSA tailor file options
+that are used to specify which attributes and
+which portions of the tree are to be indexed.  They are
+\verb"optimize_attr", \verb+index_subtree+, and \verb"index_siblings".
+Section~\ref{dsa:tailor} describes these options in more
+detail.  For the selected attributes and portions of the tree,
+the index is searched for queries involving equality, approximate
+equality, initial substring matching, and attribute existence.
+{\em and} and {\em or} combinations of the above queries are also supported.
+Queries involving negation, inequality, or substring matching
+with no initial substring supplied are not indexed and will be
+handled as usual, by a linear search of the database.
+
+The second option, TURBO\_DISK, can be used to make modify operations
+much faster, especially on large data sets.  It requires the use
+of the \pgm{gdbm} library.  \pgm{Gdbm} is a
+library of simple database routines
+providing functionality similar to \pgm{dbm}
+and \pgm{ndbm}, but without the
+filesystem page size limitations of those systems.  
+\pgm{Gdbm} is GNU\index{GNU}
+software and is available from the Free Software Foundation.  It is
+not a part of the ISODE.
+
+Normally, when an
+entry is modified, QUIPU writes the entire EDB file containing the entry
+out to disk.  If the EDB file is very large, this can
+take some time, especially on a heavily loaded system.  The TURBO\_DISK
+option works by keeping the disk data in \pgm{gdbm} files instead of the
+regular EDB files.  This way, when an update is made, only the 
+affected entry need be written.  The performance increase 
+is directly proportional to the size of the EDB file.
+Whereas a normal update operation takes time proportional to the size
+of the EDB file, with the TURBO\_DISK option it takes a small constant
+amount of time.  If you don't have EDB files with
+at least several hundred entries, it's probably not worth enabling
+the TURBO\_DISK option.
+
+To use the TURBO\_DISK option, you should add the following define to the 
+\file{h/quipu/config.h} file:
+\begin{quote}\begin{verbatim}
+#define TURBO_DISK /* enable fast EDB update operations */
+\end{verbatim}\end{quote}
+You should also add the following to the 
+\file{config/CONFIG.make} file:
+\begin{quote}\begin{verbatim}
+LIBGDBM=	-lgdbm
+\end{verbatim}\end{quote}
+
+If you have defined TURBO\_DISK, you will have to
+convert your EDB file hierarchy into a gdbm file hierarchy
+before running QUIPU.  This step
+is only necessary once.  The \file{quipu/turbo} directory contains some
+tools to help in this process.  The shell script \pgm{tree2dbm} will
+convert an EDB file hierarchy to a \pgm{gdbm} file hierarchy.  To use it,
+type \verb+tree2dbm database-directory+ where database-directory is the
+directory where the EDB file hierarchy begins.  This script does a
+find starting in the specified directory
+for files named EDB and runs them through the
+\pgm{edb2dbm} program which creates a file called \file{EDB.gdbm}.
+The original EDB file is neither removed nor
+molested, so you'll need roughly twice the disk space.  Alternatively, you
+can run \pgm{edb2dbm} by hand on each EDB file.  The reverse operation
+(converting from a \pgm{gdbm} hierarchy to an EDB hierarchy) is done
+by the \pgm{synctree} shell script.  It is a good idea to run 
+\pgm{synctree} out of \file{crontab} once in a while to update the
+EDB file hierarchy.
+
+Finally, it should be noted that parse errors will be reported
+somewhat differently in the \file{dsap.log} file with the
+TURBO\_DISK option enabled.  Since line numbers do not make much
+sense in a \pgm{gdbm} file, errors will be reported based on the
+Relative Distinguished Name of the offending entry.  If you get
+a parse error (because of a non-printable character, for example),
+the best approach is to do something like this:
+\begin{quote}\begin{verbatim}
+	edbcat EDB >bob
+\end{verbatim}\end{quote}
+Edit the file \file{bob}, locate the entry, fix the problem, then
+\begin{quote}\begin{verbatim}
+	edb2dbm bob
+	mv bob.gdbm EDB.gdbm
+\end{verbatim}\end{quote}
+where this procedure assumes you are in the directory containing
+the bad EDB.gdbm file.  The \pgm{edbcat} program can be found in the
+\file{quipu/turbo} directory and is used to convert from \pgm{gdbm}
+back to plain text EDB format.
+
+\section{Files}
+Regardless of how you install QUIPU and the ISODE,
+the number of files needed to run QUIPU is quite small.
+
+In ISODE's \verb"BINDIR" directory,
+typically \file{/usr/local/bin/},
+there are a few programs of interest:
+\begin{describe}
+\item[\verb+dish+:]	The directory shell\\
+		This is discussed in Chapter~\ref{dish}.
+
+\item[\verb+bind+:]	Shell interface to DISH\\
+		There are actually several links (listed below) to a program called
+		\pgm{bind}.
+		These act to export the DISH interface to the \unix/
+		shell.
+		As such,
+		you can issue commands to DISH from the shell,
+		rather than running DISH directly.
+\begin{quote}
+\begin{tabular}{ll}
+\verb+add+ &
+\verb+compare+\\
+\verb+delete+ &
+\verb+dsacontrol+\\
+\verb+list+ &
+\verb+modify+\\
+\verb+modifyrdn+ &
+\verb+moveto+\\
+\verb+search+ &
+\verb+showentry+\\
+\verb+showname+ &
+\verb+squid+
+\end{tabular}
+\end{quote}
+
+\item[\verb+fred+:]	A white pages user interface\\
+		See Chapter~\ref{DUA:fred}.
+
+\item[\verb+editentry+:]	Edit a directory entry\\
+		This is a simple shell script that DISH invokes when you
+		ask DISH to edit an entry in the directory.
+
+\item[\verb+unbind+:]	Unbind from DISH\\
+		This command is used to terminate DISH.
+\end{describe}
+In ISODE's \verb"SBINDIR" directory,
+typically \file{/usr/etc/},
+the DSA resides:
+\begin{describe}
+\item[\verb+ros.quipu+:]	The QUIPU DSA\\
+			This program will be started once, for each DSA you
+			are running, from rc.local.
+			A script is provided to invoke this program,
+			in case you need to restart it.
+
+%%%\item[\verb+dsaconfig+:]	a configurator for Level-1 DSAs.
+\end{describe}
+In ISODE's \verb"ETCDIR" directory,
+also typically \file{/usr/etc/},
+there are a few programs and files of interest:
+\begin{describe}\sloppy
+\item[\verb+oidtable.at+, \verb+oidtable.gen+, \verb+oidtable.oc+:]
+
+			These define the attribute types,
+			generic object identifiers,
+			and object classes known to the system.
+			(An object identifier is a method used to unambiguously
+			encode, among other things,
+			the names of attributes and object classes.)
+			These files you never deal with unless they are
+			accidentally corrupted.
+			
+\item[\verb+dsaptailor+:]	
+
+			This is the run-time tailor file for the DUAs.
+			You will configure this file initially and then
+			probably leave it alone.
+
+
+\item[\verb+isoaliases+, \verb+isobjects+, \verb+isoentities+, \verb+isomacros+, \verb+isoservices+:]
+
+			These are 
+			various databases used by the ISODE.
+			These files you never deal with unless they are
+			accidentally corrupted.
+
+\item[\verb+isologs+:]
+
+			This script runs nightly under \man cron(8) to
+			trim the ISODE log files, kept in ISODE's \verb"LOGDIR"
+			directory,
+			typically \file{/usr/tmp/}.
+			This file you never deal with unless it is
+			accidentally corrupted.
+
+\item[\verb+isotailor+:]	
+
+			This is the run-time tailor file for the ISODE.
+			You will configure this file initially and then
+			probably leave it alone.
+\end{describe}
+
+\chapter {Configuring a DUA}
+
+It is suggested that you try to get a DUA operational by connecting to
+a ``well-known'' DSA before you attempt
+to operate a local DSA.
+Or, if you have a DSA from a previous release of QUIPU --- try and connect to
+that.
+
+\section {Connecting to a DSA}
+\label{dua:connect}
+
+A DUA essentially only needs to know one thing to be able to contact a
+DSA: that is the OSI network address of the DSA.
+This parameter is defined in the file \file{dsaptailor}, 
+together with some other parameters.
+The full set of parameters is described in Section~\ref{dua:tailor}.
+
+The \verb"dsa_address" parameter defines a local name and the network 
+address of the DSA to 
+initially contact. For example,
+\begin{quote}\begin{verbatim}
+dsa_address  vicuna  Internet=bells.cs.ucl.ac.uk+50987
+\end{verbatim}\end{quote}
+declares that the DSA locally referred to by the name \verb"vicuna" is 
+contacted by calling the network
+address \verb"Internet=bells.cs.ucl.ac.uk+50987".
+The syntax of network addresses is discussed in
+briefly in Section~\ref{DSA:address} and more fully in 
+\voltwo/ of this manual 
+and \cite{String.Addresses}.
+\index{presentation addresses}
+
+As shown, the address is preceded by a private key \verb"vicuna".  This can
+be used in some DUAs (including DISH) to specifying the address of the DSA 
+to contact.
+If there are more than one \verb"dsa_address" entries, the first
+entry will be used to supply the default DSA address.
+
+A default \file{dsaptailor} file 
+(taken from the \file{dsap/dsaptailor} file of the ISODE source tree) 
+is installed as
+\file{dsaptailor} in the ISODE \verb"ETCDIR" directory
+(usually \file{/usr/etc/}) when
+the \file{dsap} library is installed, this supplies the addresses
+of various DSAs that you
+may be able to access.
+ 
+To try to connect to one of the DSAs listed in \file{dsaptailor}, 
+invoke DISH, with a \verb"-call"
+flag; e.g., \verb"dish -call giant" will try to contact the DSA
+``giant'' (Giant Tortoise!)
+running at the University of London Computer Centre (ULCC).
+If the connection is successful, then the prompt \verb"Dish ->" will be returned.
+If the connection fails, the
+program will exit with an appropriate error
+message.
+
+If this fails
+you might want to 
+try connecting to some of the other registered DSAs,
+for example, try \verb"dish -call alpaca", \verb"dish -call eel"
+or 
+\verb"dish -call anaconda".
+
+Many of these top level DSAs do not allow anonymous connections.  If
+you see the 
+message \verb+inappropriate authentication+ as a result of your
+connection attempt you will probably need
+to supply a DN using the \verb+-username+ flag to DISH.
+
+If you fail to contact a DSA at this point, there are likely to be lower
+level problems. You should turn up the ISODE logging 
+(see \voltwo/ of this manual) to see what is happening to the 
+network calls.
+
+If you invoke DISH without a \verb"-c" flag (using the default \file{dsaptailor}), it will 
+try to connect to the DSA defined by the first
+\verb"dsa_address" entry.
+
+DISH is described in full in Chapter~\ref{dish} 
+of this manual.
+
+\section{Tailoring}
+\label{dua:tailor}
+\index{dsaptailor}
+
+The program configuration is tailored to
+allow you to change logging levels, and other parameters at
+runtime.  
+It is used by the QUIPU DUA procedures, and by the QUIPU User Interfaces.
+
+The file \file{dsaptailor} is used for this purpose and
+consists of single value entries (e.g., oidtable), unless otherwise
+stated (e.g., dsaplog). 
+Each entry has a parameter followed by its
+value.
+The various options are:
+\begin{describe}
+\item [\verb"oidtable":]
+The path for the OID definition tables.
+Note: It is best to have this appear as the first entry of the
+\file{tailor} file, as 
+other entries may contain attributes that need to be looked up in these
+tables
+There are three:
+\begin{enumerate}
+\item \file{file.gen},
+which contains generic names for building OIDs;
+\item \file{file.at},
+which contains the OIDs for attributes; and,
+\item \file{file}.oc,
+which contains the OIDs for object classes.
+\end{enumerate}
+For example,
+\begin{quote}\small\begin{verbatim}
+oidtable    /usr/lib/quipu/OIDTable
+\end{verbatim}\end{quote}
+will direct the DSA to consult:
+\begin{quote}\begin{verbatim}
+/usr/lib/quipu/OIDTable.gen
+/usr/lib/quipu/OIDTable.at
+/usr/lib/quipu/OIDTable.oc
+\end{verbatim}\end{quote}
+By default this variable is set to \verb"oidtable" which refers to the tables
+\file{oidtable.*} in the ISODE \verb"ETCDIR" directory.
+
+\item [\verb"dsa\_address":]
+This parameter is described in Section~\ref{dua:connect}.
+
+\item [\verb"dsaplog":]
+Tailoring for the normal logging file.
+Each entry consists of one or more key/value pairs expressed as:
+\begin{quote}\small\begin{verbatim}
+key=value
+\end{verbatim}\end{quote}
+The keys are:
+\begin{describe}
+\item [\verb"file":]
+The name of the logfile.
+\item [\verb"size":]
+The size in KBytes to which the logfile should be allowed to grow.
+When the log has reached this size, if the ``zero'' option
+below is set, then the log will be truncated; otherwise, no further
+logging will take place.
+\item [\verb"level":]
+The levels of logging to be written to this log file.
+This can be any of the following levels:
+\begin{describe}
+\item [\verb"fatal":]
+fatal errors only.
+\item [\verb"exceptions":]
+serious, but hopefully temporary, errors.
+\item [\verb"notice":]
+general logging information.
+\item [\verb"trace":]
+program tracing.
+\item [\verb"pdus":]
+pdu tracing.
+\item [\verb"debug":]
+full tracing of events.
+\item [\verb"all":]
+log all events.
+\end{describe}
+For example to have all errors written to the file you will need
+\begin{quote}\footnotesize\begin{verbatim}
+dsaplog level=fatal level=exceptions
+\end{verbatim}\end{quote}
+\item [\verb"dlevel":]
+Do not log the specified log level, this is the opposite of the above
+entry.
+\item [\verb"dflags"/\verb"sflags":]
+The flags associated with the log may be set (with \verb"sflag")
+or unset (with \verb"dflag"). The allowable options are:
+\begin{describe}
+\item [\verb"close":]
+close the log after each entry.
+\item [\verb"create":]
+create the log file if it does not exist.
+\item [\verb"zero":]
+truncate the file when it gets too big.
+\item [\verb"tty":]
+copy the logging information to the users tty.
+\end{describe}
+\end{describe}
+An example might be:
+\begin{quote}\footnotesize\begin{verbatim}
+dsaplog level=notice size=30 file=quipulog dflags=close
+\end{verbatim}\end{quote}
+This says log events at ``notice'' level into the file \file{quipulog}, do not
+let the file grow larger than 30Kbytes; and do not close the file
+after each logging message.
+
+\item [\verb"stats":] Used to control the level of statistical logging
+(parameters as for \verb+dsaplog+ above).
+
+\item [\verb"local\_DIT":]
+The argument is a distinguished name.  When some User Interfaces start, you
+will be automatically moved to this position in the DIT.
+
+\item [\verb"oidformat":]
+Defines how object identifiers should be printed.
+Use
+\begin{quote}\small\begin{verbatim}
+oidformat   short
+\end{verbatim}\end{quote}
+
+to print in short local key form, e.g.,
+\begin{quote}\small\begin{verbatim}
+Country
+\end{verbatim}\end{quote}
+or,
+\begin{quote}\small\begin{verbatim}
+oidformat   long
+\end{verbatim}\end{quote}
+
+to print in long object identifier form, e.g.,
+\begin{quote}\small\begin{verbatim}
+joint.ds.attributeType.country
+\end{verbatim}\end{quote}
+or,
+\begin{quote}\small\begin{verbatim}
+oidformat   numeric
+\end{verbatim}\end{quote}
+
+to print in numeric form, e.g.,
+\begin{quote}\small\begin{verbatim}
+2.5.4.6
+\end{verbatim}\end{quote}
+
+\item [\verb"photo":]
+The argument has two parts, a ``terminal type'' such as
+``sun'' or ``xterm''; the second is the name of the process that should
+handle displaying of photographs; for example,
+\begin{quote}
+photo xterm Xphoto
+\end{quote}
+tells the DUA to call the process Xphoto to handle photograph attributes if
+the user is on a terminal of type ``xterm''.
+Handling photographs is described more fully in Section~\ref{dua:photo}.
+
+\item [\verb"quipurc":]
+If the argument has the value \verb"on", then a program called 
+\pgm{dishinit} will be run every time a user without a \file{.quipurc}
+file tries to access the directory. \pgm{dishinit} is discussed 
+in Section~\ref{dishinit}.
+
+\item [\verb"sizelimit":]
+Defines the maximum number of entries a successful list or search should
+return.
+For example,
+\begin{quote}\small\begin{verbatim}
+sizelimit 20
+\end{verbatim}\end{quote}
+sets the DAP default service control ``sizelimit'' to be 20 entries.
+
+\item [\verb"timelimit":]
+Defines the maximum number of seconds a list or search should
+return.
+For example,
+\begin{quote}\small\begin{verbatim}
+timelimit 30
+\end{verbatim}\end{quote}
+sets the DAP default service control ``timelimit'' to be 30 seconds.
+
+\item [\verb"ch\_set":]
+If set to \verb+ISO8859+ this tells a DUA you have access to an ISO
+8859-1 font which can be used for displaying T.61 characters, see
+Section~\ref{T61String} for details.
+
+\end{describe}
+
+\chapter {Configuring a DSA}
+
+This chapter discusses how to configure a QUIPU DSA.
+We recommend that you get a DUA running before you try to
+get a DSA working.
+
+\section{Basic Formats and Structures}
+
+All of the information a DSA requires is
+stored on disk and is text-structured.  This includes
+various files (described later), and the local DIT database itself.
+A complete BNF description of the files 
+is given in Appendix~\ref{bnf} on page~\pageref{bnf}.
+
+\subsection {Entry Data Block}
+\label{edb}
+A key component of the directory database is the entry data block, which is
+described fully in \cite{QUIPU.Design}.
+Figure \ref{example_edb} shows an example EDB \index{EDB} file containing two \verb+person+
+entries.
+
+\begin{figure}
+\smaller
+\begin{quote}\begin{verbatim}
+MASTER
+19891025113003Z
+CN= Colin Robbins 
+CN= Colin John Robbins 
+Phone= +44-1-387-7050 ext 3683 
+Surname= Robbins 
+Room= G10 
+Userid= crobbins
+userClass= csstaff
+rfc822Mailbox= C.Robbins@cs.ucl.ac.uk
+Photo= {FILE}crobbins.photo 
+objectClass =thornPerson & quipuObject
+acl=others # none # attribute # photo 
+acl=self # read # attribute # photo 
+
+CN= Steve Kille 
+CN= Steve E. Kille & Stephen Kille 
+Phone= +44-1-387-7050 ext 7294 
+Surname= Kille 
+objectClass = thornPerson & quipuObject 
+Room= G24 
+Userid= steve
+userClass= csstaff
+rfc822Mailbox= S.Kille@cs.ucl.ac.uk
+\end{verbatim}\end{quote}
+\caption{Example EDB File}
+\label{example_edb}
+\end{figure}
+
+
+An EDB file contains a header, this is optionally
+but typically followed by a sequence of entries.
+
+The header consists of two lines of text, the first must contain the string
+\verb"MASTER", \verb"SLAVE" or \verb"CACHE", 
+which indicates whether the data in the EDB
+file represents the authoritative \verb"master" data, a \verb"slave"
+copy of all the data, or some \verb"cached"d entries.
+
+The next line of the EDB 
+is a string that describes the version of the EDB. Every
+time the EDB is altered, the version\index{version --- of an EDB} number
+should be changed, so that
+\verb"SLAVE" EDBs elsewhere will be automatically updated.
+When a DSA alters an EDB file, it writes the current (UTC) time in string
+format as the version string.
+
+Generally following the header are a sequence of blank line separated
+entries.  The concept of a null EDB file that contains just a
+header is allowed but discouraged.  However it is sometimes useful as
+a temporary measure when creating a database.
+
+An entry consists of a set of attributes, each attribute begins on a
+new line of the file.
+Section~\ref{attributes} discusses attributes in more detail and
+Chapter~\ref{syntaxes} describes the syntaxes used by all the
+attributes QUIPU recognises.
+
+The first line of an entry is the relative distinguished name
+\index{RDN} (RDN) of the entry.
+The subsequent line contains the non distinguished attributes.
+
+
+\subsection{Object Class Attribute}
+Of all the attributes an entry may have, the \verb+objectClass+\index{objectClass attribute}
+attribute is one of the most important from the configuration point of view.
+It defines the set of mandatory and optional attributes that must and may be
+present in the entry.
+For example, the object class \verb+person+ insists that there is a \verb+surname+
+attribute, and there may optionally be a \verb+telephomeNumber+ attribute.
+QUIPU knows about all the standard object classes and attributes, 
+those defined by COSINE/Internet \cite{Cosine.NA} and
+those defined by QUIPU itself (see Appendix~\ref{naming}).
+The full set of object classes and attributes a DSA knows about is
+defined by the ``oidtables'' which are explained in Section~\ref{oidtables}.
+
+An entry can belong to more that one object class.
+For example, an entry representing an organisation might have the following
+object class attribute:
+\begin{quote}\small\begin{verbatim}
+objectClass = organization & quipuNonLeafObject
+\end{verbatim}\end{quote}
+And a person within that organisation might use the following object class
+definition:
+\begin{quote}\small\begin{verbatim}
+objectClass = organizationalPerson & quipuObject & thornPerson
+\end{verbatim}\end{quote}
+Every entry in a QUIPU DSA should belong to either the \verb"quipuObject"
+or 
+\verb"quipuNonLeafObject" object classes\footnote{An
+entry may belong to \verb"ExternalNonLeafObject" instead IF it is
+actually represented in the DIT by a non-QUIPU DSA  --- See
+Section~\ref{DSA:nonquipu}.}, as this allows
+attributes the DSA needs to be added to an entry.
+
+Further, object classes posses the notion of 
+\verb"class inheritance".
+This means that an object class can be defined as a subclass of
+a previously defined object class with additional refinements.
+As a subclass,
+the newly defined object inherits all the semantics of its
+superclass,
+in addition to having additional semantics.
+
+For example,
+the directory defines an object class called \verb"person".
+This object class defines the attributes which a person in
+the real world might have.
+It may be useful to refine this somewhat to talk about persons
+who have network access.
+So, we need a new object class, e.g., \verb"netPerson".
+This can be defined in a straight-forward fashion:
+\begin{itemize}
+\item The object class \verb"netPerson" is a subclass of the object class
+\verb"person" which {\em may\/} contain an additional attribute,
+\verb"netMailbox".
+
+\item The syntax of an \verb"netMailbox" is a simple string of printable
+characters which is not case sensitive when performing comparisons.
+\end{itemize}
+
+It is a QUIPU requirement that every entry that is not a leaf of the DIT 
+should belong to the object class
+\verb"quipuNonLeafObject". 
+
+This class has one mandatory attribute:
+\begin{describe}
+\item[\verb+masterDSA+:]\index{masterDSA attribute}
+			identifies the directory entity which is responsible
+			for maintaining the master EDB for the children of
+			this entry.
+			The value is a Distinguished Name.
+\end{describe}
+There is typically a single master for a particular entry in the tree.
+Hence, this value is usually single-valued.
+When an entry is to be modified,
+the directory must contact the entity responsible for the MASTER EDB for
+that entry in order to perform the modification.
+
+This class has two optional attributes:
+\begin{describe}
+\item[\verb+slaveDSA+:]\index{slaveDSA attribute}
+			identifies any directory entities which have
+			authoritative copies of the EDB for the children
+			of this entry, and are prepared to resolve 
+			operations on that EDB file for a remote DSA.
+			The value is one or more Distinguished Names.
+
+\item[\verb+treeStructure+:]\index{treeStructure attribute}
+			identifies the object classes which may exist
+			immediately below this entry.
+			The value is one or more object classes.
+			See Section~\ref{quipu:schema} for full details
+			of how to set this attribute.
+\end{describe}
+Since a fundamental assumption of the directory is that reads (queries)
+occur much more frequently than writes (updates),
+it is common to have several entities containing authoritative copies of an
+EDB.
+By keeping copies locally,
+queries can be answered with less latency.
+
+\subsection {Database Structure}
+
+All the local information held by a QUIPU directory is held in an in-core
+database, this is loaded from disk when the DSA starts. 
+
+The data on disk is held in a \unix/ tree of EDB\footnote{Throughout
+this section the term EDB is used in the generic sense, and
+includes \file{EDB.gdbm} files if the TURBO\_DISK compile option is used}
+files that map the DIT.
+At every level in the DIT for which the DSA holds data, there is a single
+file called \file{EDB}\index{EDB}\index{EDB.gdbm file}.
+The top level of the DIT is stored in the \unix/ directory defined by
+the \verb+treedir+ variable in the \file{quiputailor} file.
+For example, the setting
+\begin{quote}\small\begin{verbatim}
+treedir     /usr/etc/quipu-db/
+\end{verbatim}\end{quote}
+would define that the top level of the DIT would be found in this
+\unix/ directory.
+If you hold a copy of the root EDB file, it will be found here.
+
+If an entry defined in an \file{EDB} file has
+children stored locally, then the \file{EDB} file for the children 
+will be found in a
+sub-directory whose name is the string encoded relative
+distinguished name of the entry.
+For example, underneath the root, there are typically countries such
+as ``c=GB''.  The data for this will be held in the file
+\file{c=GB/EDB}, or to give the fullpath name
+\file{/usr/etc/quipu-db/c=GB/EDB}.
+
+This mapping continues all the way down the DIT hierarchy, so for example, if an \file{EDB} file has an entry whose RDN is
+``ou= Computer Science'', then if the entry for
+``ou= Computer Science'' has sibling entries and these are stored locally,
+they can be found in the file \file{ou=Computer Science/EDB} 
+relative to the directory that contains the EDB file with the
+``ou=Computer Science'' entry.
+
+NOTE that the case sensitivity of the sub-directory naming is one of the
+few areas within QUIPU where string matching is case sensitive.
+The case of the attribute type is taken from the definition of the attribute
+in the oid tables, whereas the case of the attribute value is the same as
+that found in the EDB file.
+Spacing is also important.  There should be no spaces either side of
+the ``='' sign, and only one space between each word contained in the name.
+
+When an entry is modified, a new \file{EDB} file is rewritten to
+disk.  The old \file{EDB} is renamed \file{EDB.bak} to provide
+a limited backup.  
+
+\subsection{Long Distinguished Names}
+\label{EDB:mapped}
+There is a problem with the above method for naming \unix/ sub-directories
+with some versions of \unix/ --- particularly System~V.
+In these systems directory names are limited in length.
+Some versions of \unix/ will not allow space characters in filenames
+(in any case they are hard to manage because of all the quoting required).
+
+To allow for this, \verb"any" distinguished name can be given a 
+``mapping name'', which will be used as the \unix/ sub-directory name.
+For example the entry for ``o=University College London'', may be
+mapped onto the name ``UCL'' and thus
+stored in the file \file{UCL/EDB}.
+The mapping names are specified in a file called
+\file{EDB.map}\index{EDB.map file},
+found in the same directory as the
+EDB file holding the entry to be mapped.
+So if the file \file{c=GB/EDB} contains an entry for 
+``o=X-Tel Services Ltd'', then the file \file{c=GB/EDB.map} may be
+used to map this onto ``X-Tel''.
+
+The syntax of the \file{EDB.map} file is:
+\begin{quote}\begin{verbatim}
+<Distinguished Name> "#" <Mapped name>
+\end{verbatim}\end{quote}
+so for the example used above, the file will contain:
+\begin{quote}\begin{verbatim}
+o=X-Tel Services Ltd#X-Tel
+\end{verbatim}\end{quote}
+Only RDNs you want to map need to be in this file.
+If a name is not found in the mapping file, then the long directory name will
+be used. 
+
+When a DSA needs to create a sub-directory (e.g., after an add operation)
+it will use the relative distinguished name for each sub-directory,
+unless the name is longer than the maximum number of allowed
+characters (usually 15).  In this case, the DSA will generate a shorter
+mapped name and write this to the \file{EDB.map} file.
+A generated mapped name is based on the \unix/ {\em mktemp} procedure
+call and produces names such as ``XTelServia01950''.
+
+\section {Setting Up an Initial DSA}
+
+These instructions are assuming that you are trying to set up a DSA with the
+following characteristics:
+\begin{itemize}
+\item It is the first DSA in an Organisation.
+\item It is not the first DSA in the Country.
+\item It holds a copy of the root EDB.
+\end{itemize}
+
+This is found in the example:
+\begin{quote}
+\file{others/quipu/quipu-db/organisation} 
+\end{quote}
+
+There are two other examples which might also be used as illustrations for
+national DSAs and organisational DSAs not holding a copy of the root EDB.
+These are in :
+\begin{quote}
+\file{others/quipu/quipu-db/national}
+\end{quote}
+and
+\begin{quote}
+\file{others/quipu/quipu-db/non-root}.
+\end{quote}
+
+Note that if you are going to be running a DSA in the United States,
+then you should skip this section and refer to the document
+\cite{PSI.Admin},
+which is provided in the ISODE documentation set
+(look in the source tree area for the directory \file{doc/whitepages/admin/}).
+This document describes turn-key installation mechanisms for DSAs in the
+United States.
+
+To start a DSA with one of these example databases
+go into the relevant database directory and type:
+\begin{quote}\begin{verbatim}
+$(SBINDIR)ros.quipu -t ./quiputailor
+\end{verbatim}\end{quote}
+
+The \tt -t\rm \ flag tells QUIPU to use the \file{tailor} file \file{./quiputailor}
+rather than the default file (\file{quiputailor} in the ISODE \verb"ETCDIR"
+directory).
+
+This will cause the DSA to print some logging information onto the screen,
+followed by the message
+\begin{quote}\begin{verbatim}
+DSA c=GB@cn=toucan has started on localHost=17003
+\end{verbatim}\end{quote}
+
+\begin{figure}
+\smaller
+\center
+\begin{quote}\begin{verbatim}
+cn=Toucan
+presentationAddress= localHost=17003
+edbinfo= #cn=giant tortoise#
+description= Demonstration DSA
+description= Bird with large colourful bill.
+objectClass= quipuDSA & quipuObject
+manager= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= others # compare # attributes # userPassword
+userPassword = toucan
+quipuVersion= quipu 6.8 #3 (trellis) of Mon Feb 4 09:26:47 GMT 1991
+supportedApplicationContext= QuipuDSP & X500DSP & X500DAP
+\end{verbatim}\end{quote}
+\caption{Example DSA Entry}
+\label{DSA:Toucan}
+\end{figure}
+
+The default setup assumes you have TCP/IP access and starts a DSA on the IP
+address of the local machine (127.0.0.1).  If you do not have TCP/IP, you
+will need to change the address the DSA will attempt to listen on. The
+next section delves into the world of addresses!
+
+The presentation address of the example DSA is found in the file
+\begin{quote}
+\file{others/quipu/quipu-db/organisation/c=GB/EDB}
+\end{quote}
+The first entry in this file is the entry for a DSA called
+``c=GB@cn=Toucan'', which is the name of the DSA we are trying to start (as
+defined by the ``mydsaname'' entry in \file{quiputailor}).
+The entry is shown in Figure~\ref{DSA:Toucan}.
+The attribute \verb"presentationAddress" defines the address that the DSA is
+going to listen to the network on.
+If you need to listen on a different address, you should change the value of
+the attribute to the address you want to listen on.
+
+Having started your DSA you should be able to connect to it by
+invoking DISH. If you are using the default DSA address, and are
+using the default \file{dsaptailor} file, then invoking DISH
+without arguments is sufficient.
+If you are not using the default address or \file{dsaptailor} file, then you
+will need to edit \file{dsaptailor} in the ISODE \verb"ETCDIR" directory.
+You should add an entry
+\begin{quote}\begin{verbatim}
+dsa_address  toucan  <presentation address>
+\end{verbatim}\end{quote}
+Note that \verb+<presentation address>+ should have {\em exactly} the same
+value as 
+the \verb+presentationAddress+ attribute in the DSAs entry in the EDB file.
+Now to contact the DSA use
+\begin{quote}\begin{verbatim}
+dish -c toucan
+\end{verbatim}\end{quote}
+
+
+Once connected to the DSA, try issuing the
+command:
+\begin{quote}\small\begin{verbatim}
+list "@c=GB@o=University College London@ou=Computer Science"
+\end{verbatim}\end{quote}
+You should get a list of four names 
+back:
+\begin{quote}\begin{verbatim}
+1. commonName=Colin Robbins
+2. userid=quipu%commonName=Colin Robbins
+3. commonName=Steve Kille
+4. commonName=Michael Roe
+\end{verbatim}\end{quote}
+If this happens you have a working DSA.
+(The entry numbered 2 is an example of an RDN with multiple values !)
+
+\subsection{Presentation Addresses}\index{presentation addresses}
+\label{DSA:address}
+
+This section is a brief introduction into presentation addresses, and
+may be all you need to know.  For the brave, more details are given in
+\voltwo/ of this manual and
+\cite{String.Addresses}.
+
+The example address used in the previous section for the demonstration
+DSA was ``\verb+localHost=17003+''.  This is an address using the
+TCP/IP transport stack, and is the TCP loop back address.  You should
+{\em not} use this address in any DSA involved in the pilot DIT for reasons
+explained at the end of the section.
+
+If you want to use the TCP/IP transport stack (using RFC1006) there are two
+possibilites for an address.  
+If you are connected to the Capital-I Intenet network, you can use
+addresses of the form
+\begin{quote}\begin{verbatim}
+Internet=128.16.5.31+17003
+\end{verbatim}\end{quote}
+``128.16.5.31'' is the IP address of your machine, which can usually be
+found in the \file{/etc/hosts} file on your system.  You can use the
+DNS name of your host instead, but the ISODE will replace this with the
+IP address when possible to aid portability of addresses.
+``17003'' is the TCP port number the DSA will listen on.
+
+If you want to use TCP/IP on a local \ethernet/, that is not connected to
+the Capital-I Internet, you will need to define a local network
+community. 
+This process is described in full in \voltwo/ of this
+manual and should result in addresses of the form
+\begin{quote}\begin{verbatim}
+LOCAL-ETHER=128.16.5.31+17003
+\end{verbatim}\end{quote}
+
+Do {\em not} use \verb+Internet=+ addresses {\bf unless} you are connected to the Internet.
+
+
+Now onto the X.25(80) community.
+If you have IPSS access, you can use addresses of the form
+\begin{quote}\begin{verbatim}
+Int-X25(80)=23421920030045
+\end{verbatim}\end{quote}
+where 23421920030045 is the DTE of you host.
+If you plan to have more than just a DSA (e.g., \pgm{iaed} or
+\pgm{tsapd}) listening on X.25 on the same machine, we advise 
+the use of a two-digit
+subaddress (45 in the example).
+The DTE should have the DNIC included; full details of tailoring
+DNICs are given in \man isotailor(5n).
+The X.25 parameters PID and CUDF can be specifed if needed, see
+\cite{String.Addresses} for details.
+
+If you do not have connectivity to the IPSS network, as in the TCP/IP
+case, you will need to define a local community.
+The ISODE has knowledge of two such X.25 communites built in.
+In Europe, the IXI network should be addressed using an address of the form
+\begin{quote}\begin{verbatim}
+IXI=20433450210398
+\end{verbatim}\end{quote}
+In Great Britain, the Janet network should be addressed using an
+address of the form
+\begin{quote}\begin{verbatim}
+Janet=00002100102998
+\end{verbatim}\end{quote}
+
+Your DSAs address should contain a component for every network you
+have access to.  Multiple components can be linked using the
+``\verb+|+'' symbol; for example:
+\begin{quote}\begin{verbatim}
+Internet=128.16.5.31+17003|IXI=20433450210398
+\end{verbatim}\end{quote}
+
+
+Using this addressing mechanism it is possible to use transport,
+session and presentation selectors; however, in the context of a QUIPU
+DSA they are unnecessary. Hence we advise against their use; again
+details can be found in 
+\cite{String.Addresses}.
+
+
+Correctly defining your DSA's address is important. A paper 
+\cite{QUIPU.Navigate} describes the problem in detail.  Briefly, X.500
+was defined assuming a single global network. Unfortunately the world
+is not yet like that: there are at least two major communities.  QUIPU
+DSAs know about this, and make a careful choice between use of
+referrals and chaining in an attempt to make sure all operations
+suceed.  If your DSA is incorrectly addressed, other DSAs may make the
+wrong assumption about your DSA, and so your DSA will not be able to contact
+certain parts of the DIT, and they will not be able to contact you.
+For a similar reason you should not use the ``localHost'' macro for
+addreses, as other DSAs will think they can connect to the DSA in question.
+
+
+\subsection {Choosing a Name for Your DSA}
+\label{dsa:naming}
+Every QUIPU DSA {\em must} have an entry in the DIT, hence your DSA will
+need a unique {\bf distinguished} name.  This entry is used by other DSAs to
+identify your DSA, and so is needed if other DSAs are going to be able
+to see your DSA.  The examples are tailored to start a DSA called
+``toucan'', and will be sufficient to get an example DSA started, but it
+is not unique, so will not be of much use when you want to start
+adding your own data, and want to connect into the global DIT.  
+{\em Note} that the DN has to be unique, but not the RDN component, thus both
+``cn=Wombat'' and ``c=GB @ cn=Wombat'' are allowed!
+
+There are other two aspects to consider in choosing a name for your DSA.
+
+
+Firstly, it is a QUIPU convention that DSAs should be named 
+after endangered South
+American wildlife, and that the entry for the DSA should contain a
+description of the animal or plant in question.
+Some example animal names are shown in Table~\ref{wildlife}; names of
+wild plants can also be used!
+A more comprehensive list of animal names 
+can be found in the IUCN's ``Red Book''
+\cite{IUCN.Mammal}.
+This is not a just a game, there is a serious point.  The authors
+believe it is wrong to name DSA ``UCL.DSA'' or similar, as this binds
+the DSA to the organisation too tightly, especially at the higher
+levels of the DIT.
+
+Secondly, the entry for your DSA must be visible to other DSAs that do not know
+how to contact your DSA.
+So, the {\em master} copy of your DSA's own entry must be held at least one level higher up
+in the DIT than the part of the DIT it holds as \verb"MASTER" data.
+For example the DSA which holds
+``c=GB @ o=University College London @ ou=Computer Science'', 
+must be held at the
+``c=GB @ o=University College London'' level 
+(e.g., ``c=GB @ o=University College London @ cn=wombat'') or above.
+Such naming also helps prevent loops as described more fully in
+\cite{QUIPU.Design}.
+
+Typically, you will not hold the master EDB file containing your DSA
+locally.  However, you do still have control of the entry as if you
+held the master copy.  This is explained in more detail in
+Section~\ref{DSA:ownentry}. 
+
+In practice DSAs should be named fairly high up the tree.
+Each country should have at least two DSAs named at the root level.
+Each Organisation should have at least two DSAs named at the national level.
+
+\tagtable[tp]{q-1}{Endangered South American Wildlife}{wildlife}
+
+You should use DISH to find out if the name you want is already taken.
+For example,
+if you are creating a DSA for an organisation in Great Britain,
+you might use:
+\begin{quote}\small\begin{verbatim}
+% dish -c "Giant Tortoise"
+Welcome to Dish (DIrectory SHell)
+Dish -> search @c=GB -filter objectClass=dsa -nosize
+\end{verbatim}\end{quote}
+This will print out the list of names already in use.
+
+\subsection{Setting up Your DSA}
+
+Having chosen a name, you will need to tell your DSA its name, and 
+make sure it can find an EDB file for its own entry.
+
+A DSA finds it own name from the ``mydsaname'' variable defined in the file
+\file{quiputailor} (see Section~\ref{dsa:tailor} for details).
+An example \file"quiputailor" entry would be:
+\begin{quote}\small\begin{verbatim}
+mydsaname:	"c=GB@cn=a dsa name"
+\end{verbatim}\end{quote}
+Having read this name from \file"quiputailor", a DSA will try to find
+the corresponding entry, in this case by looking in the \file{c=GB/EDB} file.
+
+If you hold the EDB that the entry should be in, simply
+make sure the entry is in that EDB and then it will be found.
+If you do not hold, and do not want to hold the EDB in which your
+DSA is named (e.g., your DSA is called \verb"c=GB@cn=toucan" but 
+you do not hold the EDB \verb"c=GB"), then you should (normally)
+supply a cached copy of the EDB which contains only the 
+entry for the DSA, and not all the other entries the full EDB would have.
+If you do not supply it, your DSA will have to rely on other DSAs before it
+can start.
+
+Having located its own entry, a DSA will know its network 
+address by looking at the \verb+presentionAddress+ attribute,
+hence it can start listening for operations.
+
+But first it must load the database. This process is described in full
+in Section~\ref{dsa:starting}. 
+
+In its own entry it will find a \verb"edbInfo" attribute, this 
+describes which EDBs the DSA is expected to hold.
+The format of the \verb"edbInfo" \index{edbInfo attribute} attribute is described fully in 
+Section~\ref{slave_update}, but essentially the first parameter
+supplied says ``load this EDB''. Thus the attribute
+\begin{quote}\begin{verbatim}
+edbInfo = ##
+edbInfo = c=US@o=The Wollongong Group ##
+edbInfo = c=GB ##
+\end{verbatim}\end{quote}
+requests that the EDB files 
+\begin{quote}
+\file{quipu-db/EDB}
+\end{quote}
+(signified by no data before the first ``\verb+#+'' sign),
+\begin{quote}
+\file{quipu-db/c=US/o=The Wollongong Group/EDB} 
+\end{quote}
+and 
+\begin{quote}
+\file{quipu-db/c=GB/EDB}
+\end{quote}
+are loaded.
+
+There are a few other important attributes your DSAs entry should have, the ``toucan''
+entry in Figure~\ref{DSA:Toucan} on page~\pageref{DSA:Toucan}
+gives examples of the other attributes.
+They are briefly described below.
+\begin{describe}
+
+\item[\verb+description+:] A textual message describing the DSA, and the wildlife!
+
+
+\item[\verb+quipuVersion+:] This should contain the version number of the
+QUIPU software you are using. 
+\index{quipuVersion attribute}
+This can be found by using the DISH
+command \verb+squid -version+.  You only have to set this once.  From
+then on the DSA will manage it, updating the entry when required.
+
+
+\item[\verb+manager+:] The DN of the manager of the DSA. This user will not
+be blocked by
+access control when modifying the local database over DAP.
+
+
+\item[\verb+supportedApplicationContext+:] This should always have the value
+\begin{quote}\begin{verbatim}
+QuipuDSP & X500DSP & X500DAP & InternetDSP
+\end{verbatim}\end{quote}
+for this version of QUIPU.
+It is used by remote DSAs to decide which protocols your
+ DSA supports, and
+thus how best to contact it.
+
+\item[\verb+objectclass+:] This must contain ``\verb+quipuDSA+''.
+
+\item[\verb+listenAddress+:] Sometimes, (particularly in the X.25 world, or
+when using a transport service bridge), the
+address a server should listen on, is not the same as the address
+clients should call.  The presentationAddress attribute defines the 
+address clients will always call.  If, and only if, this is not the
+address the server should listen on, the address for the server should
+be given in the listernAddress attribute.
+
+\item[\verb+acl+:] A DSAs entry, like any other, can be protected by access
+control lists\index{acl attribute}.  Care should be taken to make sure 
+all remote DSAs can
+see all the attributes they need.  The following ACL is recommended
+for use in a DSAs entry.  The string ``\verb+MANAGER DN+'' should be
+replaced with the distinguished name of the DSA manager as defined by
+the ``manager'' attribute.
+\begin{quote}\small\begin{verbatim}
+acl= group # MANAGER DN # write # entry
+acl= group # MANAGER DN # write # default
+acl= others # read # entry
+acl= others # read # default
+acl= others # read # child
+\end{verbatim}\end{quote}
+A little explaination may help as this might seem somewhat cryptic.
+The \verb+others # read # child+
+line is to prevent anybody from adding children to the entry; it is
+the only line referencing the children, so nobody is given write
+access.
+The userpassword attribute in the entry does not need protecting for
+two reasons.  Firstly nothing can make use of it, self has
+only got read access to the entry (as defined by the others clause).
+Secondly, the password will probably be in a highly replicated EDB
+file, so despite the pseudo crypting, is easily breakable.
+
+\item[\verb+relayDSA+:]\index{DSA relay}\index{Relay DSA}\label{dsarelay} If 
+your DSA is not connected to
+one of the major networks (Internet, IPSS\ldots), it may from time to time
+get references to a DSA that it cannot connect to directly.  For the
+operation to succeed, your DSA will need to chain the operation to a
+DSA that can progress the query.
+
+This attribute is the DN of a DSA or DSAs that are connected to both your network and 
+the major networks you are not connected to.
+There needs to be an agreement between the managers of the two 
+DSAs because the
+relay DSA will be asked to perform operations on your behalf.
+For example, if the DSA ``x'' has access to IPSS and Internet, but DSA ``y''
+only has IPSS access, DSA ``y'' might add a relayDSA attribute to it own
+entry, with the DN of DSA ``x'' as the value.
+Then, when DSA ``y'' gets a reference to an Internet based DSA, it will chain
+the operation the DSA ``x''.
+Clearly, if every DSA chooses the same relay DSA, that DSA will soon
+become overloaded and reject your association attempts with a ``busy''
+error.  So some care is needed in choosing the ``right'' DSA (The
+QUIPU team
+recognise that there 
+needs to be some form of ``relay authorisation'' and are
+looking at possible solutions for future versions of QUIPU).
+Section~\ref{dspchain} describes how to prevent your DSA (e.g., DSA ``x'') from
+chaining operations on behalf of other DSAs.
+
+\item[\verb+photo+:] A picture of the wildlife !
+
+\end{describe}
+
+
+
+Section~\ref{adding_data} describes how you can add data to your DSA by
+extending the supplied textual database to include your 
+own data
+or by sending data to the directory via the DUA modify operations.
+This may be done independently from connecting to the global directory.
+
+\section {Tailoring}\label{dsa:tailor}
+
+The previous sections have described how to start a basic DSA, and
+connect a DUA to it.  Having done this, there are various
+configuration options you can set, which are described in this section.
+
+On startup the DSA first consults a runtime tailor file \index{quiputailor}
+(the default DSA tailor file is called \file{quiputailor} in the ISODE
+\verb"ETCDIR" directory, but can be
+changed with a \verb"-t" parameter to \pgm{ros.quipu};
+consult \man quipu(8c) for details),
+which indicates such things as:
+
+\begin{itemize}
+\item
+name of the DSA.
+\item
+location of the database.
+\item
+location and level of the logs that the DSA will produce.
+\item
+location of any other DSAs for initial bootstrap
+\end{itemize}
+
+At startup, the \man isotailor(5n) file is also 
+consulted to configure the system-wide ISODE parameters.
+
+The format is identical to the DUA \file{tailor} file
+described in Section~\ref{dua:tailor}, with the addition of the
+following options:
+\begin{describe}
+\item [\verb"mydsaname":]
+The distinguished name of the DSA.
+For example,
+\begin{quote}\small\begin{verbatim}
+mydsaname   cn=Axolotl
+\end{verbatim}\end{quote}
+declares this DSA to have the common name of \verb"Axolotl".
+Quotes will be needed in the name contains a space characer, for example
+\begin{quote}\small\begin{verbatim}
+mydsaname   "c=GB@cn=Long Moustached Owl"
+\end{verbatim}\end{quote}
+
+\item [\verb"parent":]
+This entry consists of a name/address pair of a parent DSA.
+The DSA referenced needs to hold a master or slave copy of an EDB
+higher up in the DIT than the highest locally held EDB.
+For example,
+\begin{quote}\small\begin{verbatim}
+parent C=GB@CN=vicuna Internet=vs1.ucl.cs.ac.uk+50987
+\end{verbatim}\end{quote}
+\index{presentation addresses}
+declares the parent DSA to be C=GB@CN=vicuna at the
+indicated address.
+If more than one \verb"parent" tailor entries are found, the DSA
+will chose which DSA to contact.  
+The first DSA in the list is taken as the master reference, with
+the subsequent entries as slave references.
+
+If your DSA holds a copy of the ROOT EDB file, this parameter should have
+just one value which is a reference to the DSA holding the master copy
+of the root EDB file (currently cn=Giant Tortoise).
+
+\item [\verb"stats":]
+The value has the same format as the \verb"dsaplog" entry described in
+Section~\ref{dua:tailor}, and is used to control the level of
+DSA statistical logging.
+
+\item [\verb"treedir":]
+Defines the directory in which the textual database is stored.
+For example,
+\begin{quote}\small\begin{verbatim}
+treedir     /usr/etc/quipu-db/
+\end{verbatim}\end{quote}
+declares the directory \file{/usr/etc/quipu-db/} to contain the local
+part of the directory information tree.
+Be sure to remember the trailing slash ``\verb+/+''.
+
+\item [\verb"shadow":]
+When searching, often a large part of the
+time is involved with chaining off to other DSAs to search aliases.
+To enhance performance it
+is sometimes useful to have a cached copy of the alias locally, this
+tailor variable allows such attributes to be ``spot shadowed''.
+The value of this variable is an attribute type.  
+The attribute value associated with
+this type should have DN syntax.  When the database has been loaded,
+if any instance of this attribute references a DN that is not held
+locally your DSA will ``spot shadow''\index{spot shadow} that entry.
+That is from time
+to time it will read the entry from a remote DSA, and cache the
+result.
+
+\item [\verb"optimize\_attr":]
+If TURBO\_INDEX has been defined, this option
+specifies the attribute types to index.  Each attribute type must
+be on a separate line.  For example the lines:
+\begin{quote}\begin{verbatim}
+optimize_attr commonName
+optimize_attr surname
+\end{verbatim}\end{quote}
+would arrange  to index both the commonName and surname attributes.
+Only string attributes are allowed.
+{\em Note}: this option must come before any
+\verb"index_subtree" or
+\verb"index_siblings" options.
+
+\item [\verb"index\_subtree":]
+If TURBO\_INDEX has been defined, this option
+specifies the distinguished name of a subtree to index for
+subtree searches.  Multiple
+subtrees may be specified by multiple lines.  For example, the lines
+\begin{quote}\begin{verbatim}
+index_subtree "c=US@o=your org"
+index_subtree "c=US@o=your org@ou=really big OU"
+\end{verbatim}\end{quote}
+arrange to have two indexes built, one for each subtree specified.  Be
+aware that the indexes take up extra space in core, so care should be
+taken to index things sparingly.
+
+\item [\verb"index\_siblings":]
+If TURBO\_INDEX has been defined, this option
+specifies the distinguished name of the parent of a group of
+siblings to index.  For example, the line
+\begin{quote}\begin{verbatim}
+index_siblings "c=US@o=your org@ou=really big OU"
+\end{verbatim}\end{quote}
+arranges to have an index built for one-level searches directly below
+the specified entry.  Multiple indexes may be specified by multiple
+lines.  Be aware that the indexes take up extra space in core, so care
+should be taken to index things sparingly.
+
+\item [\verb"optimized\_only":]
+If TURBO\_INDEX has been defined, the value {\bf on}
+tells the DSA to refuse any searches that do not consist entirely of 
+optimized attributes and filters.  Any such non-indexed queries
+will be rejected with an ``unwilling to perform'' service error.
+
+\item [\verb"update":]
+The value {\bf on} tells the DSA to update slave and cached EDB files 
+when it starts up.
+See Section~\ref{slave_update} for further details; by default 
+this parameter is {\bf off}.
+
+\item [\verb"searchlevel":] Defines the level below which users will be able
+to search the DIT, for example, default 2 (e.g., below organisations).
+If they try to search from higher up, a n``unwilling to perform'' service
+error will result.
+
+\item [\verb"lastmodified":] If the value is {\bf off}, 
+the attributes \verb+lastmodifiedby+ and  
+\verb+lastmodifiedtime+
+will not be added by the DSA when an entry is altered.
+
+\item[\verb"readonly":] Bring the DSA up in read only mode, that is,
+prevent user modification.  Slave updates are still allowed.
+
+\item [\verb"dspchaining":]
+\label{dspchain}\index{Chaining DSP operations}
+The value {\bf on} tells the DSA it is allowed to chain DSP 
+requests to other DSAs 
+if necessary.
+The default mode of operation is to return a DSA referral, unless a
+chain is needed due to a disjoint network.
+The full set of issues deciding whether to use chaining or referrals
+is discussed in the QUIPU design document (\cite{QUIPU.Design}), and 
+\cite{QUIPU.Navigate}.
+
+\item [\verb"adminsize":] The administrative size limit for use on search
+and list operations.
+
+\item[\verb"admintime":] The maximum time allowed to spend on a user query.
+
+\item[\verb"cachetime":] The length of time to keep / use ``cached''
+information.
+
+\item[\verb"conntime":] The length of time to hold a unused connection open.
+
+\item[\verb"nsaptime":] The length of time to wait before deciding a
+connection cannot be established for a given NSAP.
+
+\item[\verb"retrytime":] The length of time before deciding it is worth
+attempting to connect to a DSA that could not be contacted earlier.
+
+\item[\verb"slavetime":] The length of time between attempting to update
+slave EDB files.
+
+\item[\verb"preferdsa":] When a DSA has creates a reference to other DSAs it
+tries to discriminate, and choose the ``best'' DSA to contact.
+This variable gives you a handle on controlling the choice. For example the
+lines
+\begin{quote}\begin{verbatim}
+preferDSA c=GB@cn=Vicuna
+preferDSA "cn=Giant Tortoise"
+\end{verbatim}\end{quote}
+tell the DSA to use either c=GB@cn=Vicuna or cn=Giant Tortoise in
+preference to any other DSA.  Furthermore, use the DSA c=GB@cn=Vicuna
+rather than cn=Giant Tortoise if possible.
+
+\item[\verb"cainfo":] For authentication.
+
+\item[\verb"secretkey":] For authentication.
+
+\item[\verb"bindwindow":] For authentication.
+
+\item [\verb"isode":]
+The argument is an \verb"isodevariable" \verb"isodevalue" pair as would 
+be found in \file{isotailor}.  This is used to ``override'' isotailor
+settings.
+
+\item [\verb"authentication":]
+The argument describes the minimum level of authentication required to
+bind to the DSA over DAP.  The value should be one of:
+\begin{describe}
+\item [\verb"none":]	Anonymous binds are accepted.
+\item [\verb"dn":]	A DN must be supplied.
+\item [\verb"simple":]	Simple authentication must be used.
+\item [\verb"protected":]	Protected simple authentication must
+be used.
+\item [\verb"strong":]  Strong authentication must be used.
+\end{describe}
+\item [\verb"reject\_prefix":]	Do not allow DAP bind operations from
+DNs with the specified prefix.
+\item [\verb"reject\_length":]   Do not allow DAP bind operations with
+DNs having less that $n$ components.
+\item [\verb"relay\_for":]	Only DSP chain operations for the
+specified DSAs.
+\item [\verb"accept\_prefix":]	Allow DAP binds from the given prefix ONLY.
+\item [\verb"getedb\_size":]	For a getEDB operation, an EDB is
+split into slices of $n$ entries, default 10.  This parameter allows
+you to change this number.
+\item [\verb"edbtmp\_path":]	The directory used to store temporary
+fragments of EDB during a getEDB operation --- default \file{/tmp}.
+
+\end{describe}
+
+\subsection {Tailoring a Running DSA}
+\label{dsa:mgmt}
+
+The tailoring described above is performed when the DSA is
+booted.  It is sometimes useful to alter the tailor settings
+after the DSA has started without having to bring
+the DSA down and reboot.  This can be done via
+the  special \pgm{dsacontrol} command in the DISH program
+as described in Section~\ref{dua:mgmt} on page~\pageref{dua:mgmt}.
+
+The DUA invokes a modify operation, with a
+single special attribute \verb+dSAControl+ defined in \cite{QUIPU.Design}.
+The DSA recognises the special attribute, and provided you are
+bound as the manager of the DSA, passes the attribute value to the
+appropriate routine.
+
+
+
+\cite{QUIPU.Design} describes this process in full.
+
+
+\section {Modifying your DSA's Entry}
+\label{DSA:ownentry}
+
+A DSA manages its own entry in the DIT.
+Generally the master EDB in
+which your DSAs entry resides is not held by your DSA.  
+For security reasons, this means it is
+difficult for a DSA to modify its own entry directly, so, for example it cannot
+keep its version number \index{quipuVersion attribute} up to date.
+However, a  DSA holding the
+master EDB knows that any QUIPU DSA\footnote{Any 
+QUIPU DSA for which the version number is 6.8 or greater}
+wants to manage its own entry.
+To allow this to happen, the DSA holding the master EDB 
+``spot shadows''\index{spot shadow}
+the remote DSA entry.  That is, from
+time to time it connects to the DSA in question, reads its entry,
+and writes the result back into the master EDB file.  
+So modify
+operations on the DSA's entry can now take place in your local DSA.  This 
+has the advantage that attributes such as the version number are
+kept up to date.
+
+To perform this shadowing, the DSA has to read its own entry across an
+un-authenticated DSP link; thus it cannot read any attributes that
+are protected by ACLs.  
+So all important attributes in the DSAs entry {\em must} be publicly
+readable (this includes the unused userPassword attribute).
+If they are not readable the shadowing operation will fail.
+
+To keep the database consistent with the master EDB, when a modify 
+takes place, your DSA
+cannot rewrite the information back to its slave copy EDB.
+So it writes the entry in a file called
+\file{DSA.real}\index{DSA.real}
+in the top
+level of your database.  If there is an inconsistency found, it is
+this file that is ``trusted''.
+
+There is also a file called \file{DSA.pseudo}\index{DSA.pseudo}, which
+contains some attributes managed by the DSA, that it does not need to
+make public (such as which cached EDB files it holds).
+You should {\em never} need to edit this file.
+
+There is a problem when modifying the presentation address
+\index{presentation address --- changing} of a DSA. 
+You must make
+sure the DSA with the master EDB reads the new address, {\em before} you
+move the DSA.  If not, it will always attempt to connect to the wrong
+address to try to shadow the entry, and never find the new address.
+(Alternatively you could use a ts\_bridge to make it look as if the 
+old address still works.)
+You can check the master EDB has updated by making a DAP 
+bind to the DSA managing the EDB
+and reading the address it has got.
+If it is out of date, you should wait for it to be updated; this
+usually takes place every six hours.
+To summarise, the sequence of events is
+\begin{enumerate}
+\item Change the address attribute using a DAP modify operation.
+\item Wait for the DSA with the master EDB to read the entry.
+\item Restart the DSA on the new address.
+\end{enumerate}
+
+
+\section {Connection to Other DSAs}
+
+\label{dsa:connect}
+
+All QUIPU DSAs should be connected. This section describes how you should 
+configure your DSA to connect to other DSAs in order
+to read the data not held locally.
+Section \ref{dsa:global} describes how to make sure that other DSAs 
+can access your DSA.
+
+A dynamic approach is used to bootstrap a new DSA.
+The ``global master'' DSA is administered at 
+the University of London Computer Center\footnote{The DSA has moved from
+University College London.} (ULCC),
+and other DSAs should be configured in relation to this one.
+
+Every DSA needs to know the distinguished name and
+presentation address of one
+or more DSAs nearer to, or actually holding, the root EDB.  This parameter
+is supplied in the \file{tailor} file (see Section~\ref{dsa:tailor})
+under the name \verb"parent".
+This information is used by the QUIPU DSA when it cannot find a DSA's entry
+in the local database, or can find no pointers in the local database to the
+whereabouts of the data.
+If you hold a slave copy of the root EDB, then your 
+parent should be a DSA that is ``closer'' to the master copy of the root
+EDB, and probably the master itself.
+
+The example databases are set up with default parents (defined in the file
+\file{quipu-db/organisation/quiputailor}).
+To see if your DSA can contact the ``parent'', connect to
+the local test (root holding) DSA using DISH, and type
+
+\begin{quote}\begin{verbatim}
+list @
+\end{verbatim}\end{quote}
+This will list the locally held root. Now try
+
+\begin{quote}\begin{verbatim}
+list @ -dontusecopy
+\end{verbatim}\end{quote}
+This will try to connect to the parent DSA.
+
+Care should be taken in choosing the parent
+DSA. If all DSAs have the same parent
+DSA then that DSA may become overloaded.
+Typically each site will have several DSAs. One of these should
+be the default parent for all the other DSAs, with only one DSA having a 
+default parent outside the site.
+
+
+When ``walking down'' the DIT, QUIPU needs access to information to tell it
+on which DSA the next level of the DIT is stored.
+To do this each nonleaf entry {\em must} have a \verb+masterDSA+\index{masterDSA attribute}
+or \verb+slaveDSA+
+attribute.  The value of the attribute is the distinguished name of the DSA
+holding the next level of the DIT (it may be your own DSA name, if you hold
+the next level as well).  If there is no such attribute, QUIPU assumes the
+entry is a leaf.
+If the information required is not held in the local DSA then QUIPU
+chains the request to the named DSA or returns a referral 
+--- depending upon the mode of operation.
+(The named DSAs entry is read to establish the
+address. This may mean a connection to another DSA 
+in order to read the entry.)
+
+Once you have started your DSA, you should try to connect to other DSAs 
+using the DISH program (this connects to the local DSA, which will
+chain requests to other DSAs).  Try listing the children of
+organisations other than yourself, to find which organisations are connected,
+try listing your countrys' children.
+
+\subsection {Connection to the Global Directory}\label{dsa:global}
+
+
+To enable the global directory to connect to you, you must contact the
+manager of the DSA immediately above the node you want to added under.
+Supply them with the entry for your DSA, and the top level 
+entry of the subtree
+you want to hold.
+For example, to add the organisation o=foobar below c=US,
+contact the manager of the DSA holding c=US as a master, giving them the
+entry for c=US@o=foobar and c=US@cn=foobar\_dsa, assuming
+c=US@cn=foobar\_dsa is the name of your DSA (see Section~\ref{dsa:naming}
+on naming a DSA).
+
+By convention,
+to find out who administers the master EDB for a particular node,
+run the DISH program and retrieve the \verb"manager" attribute
+from the entry for the DSA holding that node.
+
+You can then find a mail address by looking that person up in the directory.
+
+The following example shows you how to get the mail address of the
+manager of the c=GB subtree. 
+
+\begin{footnotesize}\begin{quote}\begin{verbatim}
+% dish
+Welcome to Dish (DIrectory SHell)
+Dish -> showentry @c=GB -type masterDSA
+masterDSA 	- cn = Giant Tortoise
+Dish -> showentry "@cn=Giant Tortoise" -type manager -edb 
+manager= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+manager= o=Cosine@ou=Paradise@cn=Camayoc
+Dish -> moveto "@c=GB@o=X-Tel Services Ltd@cn=Camayoc"
+Dish -> showentry -edb
+cn= Camayoc
+roleOccupant= c=GB@o=X-Tel Services Ltd@cn=Colin Robbins
+objectClass= organizationalRole & quipuObject
+Dish -> moveto "@c=GB@o=X-Tel Services Ltd@cn=Colin Robbins"
+Dish -> showentry -type rfc822mailBox
+rfc822Mailbox         - C.Robbins@xtel.co.uk
+Dish -> quit
+%
+\end{verbatim}\end{quote}\end{footnotesize}
+
+If you want to add data to the root node of the ``global tree''.
+The new entries should be sent to {\em QUIPU-support} at the address given in
+Section~\ref{quipu:support}.
+
+When you think you are connected to the ``global DIT'', 
+you should test that you are.  To do this use DISH to connect 
+to a DSA higher than you in the DIT (using the \verb"-call" flag as described
+in Section~\ref{dua:tailor}); then see if you can navigate to your
+own part of the DIT, and look at your data: if you can,  
+then the DSA is connected.
+
+\section {Connecting to a Non-QUIPU DSA}
+\label{DSA:nonquipu}
+
+QUIPU has the concept of mastering all entries in one EDB file built
+into its design.  Other implementations may not share this model.
+The entry represented by the non-QUIPU DSA can be 
+``spot shadowed''.\index{spot shadow}
+For example, if you wanted to add ``o=foobar'' to the DIT and this was
+mastered by a non-QUIPU DSA, you would add an entry of the form
+\begin{quote}\small\begin{verbatim}
+o=foobar
+objectClass= ExternalNonLeafObject & organization
+subordinateReference= cn=The DSA # Internet=123.456.1.2+17003
+\end{verbatim}\end{quote}
+where cn=The DSA is the DN of the DSA, and
+Internet=\ldots is the presentation address of the DSA.
+Instead of a subordinate reference, a cross-reference or  nonspecific
+subordinate reference can be given using the \verb+crossReference+
+or \verb+nonSpecificSubordinateReference+ attributes respectively.
+
+Although this is entry is in a master EDB file, QUIPU recognises that
+is may not actually hold the authorative master, and contacts 
+the referenced DSA as required.
+
+\section {Adding More Data}
+\label{adding_data}
+
+Having got a DSA started, and connected to the global DIT, you should start
+to add lots of data.
+There are many sources of such data, and with just a relatively small amount
+of effort this data can be added to the directory.
+
+There are two ways such data can be added.
+First of all you can use one of the DUA programs to bind to the DSA as the
+DSA manager, and send data to the directory via the {\em add} and {\em modify} 
+operations (see Sections~\ref{dish:add} and \ref{dish:modify}).
+This is probably the best way to add relatively small amounts of data
+or make minor changes to the data.
+
+To add a large amount of data (i.e., during the initial creation of a 
+large database), it is probably easiest to write a shell script using \unix/
+tools such as \verb"awk" and \verb"grep" to create the EDB files directly.
+
+When adding data for users it is advisable to allocate a 
+userPassword\index{user password attribute}, and a suitable
+ACL to protect
+this password.
+Chapter~\ref{Security} describes how to do this.
+
+\subsection {More on Object Classes}
+The only object class discussed so far is the quipuDSA object class.
+When you start to add data, you will probably want to add information about
+people, sub-divisions of your organisation, and other application entities.
+This section introduces some of the more important object classes, and the
+attributes they may contain.
+In many cases, only the attribute type is specified, for details of typical
+values and the value syntax you should read Chapter~\ref{syntaxes}.
+
+As already described, every entry in the DIT must belong to the object
+class \verb+top+, which means every entry must have an \verb+objectClass+
+attribute.
+Also, every entry in the QUIPU DIT should belong to either the
+\verb+quipuNonLeafObject+ or \verb+quipuObject+.
+
+The following part of this chapter describes some of the basic
+object classes and the attributes implied.
+
+\subsubsection{Person}
+This is a base object class used to represent a person.
+
+There are two mandatory attributes:
+\begin{describe}
+\item[1. \verb+commonName+:]
+			which gives a (potentially ambiguous) name for
+			the person.
+			The value of this attribute is a string usually
+			containing the person's first and last names; e.g.,
+\small\begin{quote}\begin{verbatim}
+Marshall Rose
+\end{verbatim}\end{quote}
+			This attribute is usually multivalued, containing
+			variations on the first, middle, and last names; e.g.,
+\small\begin{quote}\begin{verbatim}
+Colin Robbins
+Colin John Robbins
+Colin J. Robbins
+\end{verbatim}\end{quote}
+			Generally this attribute will supply the
+			distinguished attribute of the entry.
+\item[2. \verb+surName+:]
+			which gives the person's last name.
+\end{describe}
+
+The optional attributes are:
+\begin{quote}\small\begin{verbatim}
+userPassword                   seeAlso
+telephoneNumber                description
+\end{verbatim}\end{quote}
+
+\subsubsection{OrganizationalPerson}
+This is a subclass of the \verb+person+ person object class 
+and introduces the following optional
+attributes:
+\begin{quote}\small\begin{verbatim}
+preferredDeliveryMethod        destinationIndicator
+registeredAddress              internationaliSDNNumber
+x121Address                    facsimileTelephoneNumber
+teletexTerminalIdentifier      telexNumber
+physicalDeliveryOfficeName     postOfficeBox
+postalCode                     postalAddress
+title                          organizationalUnitName
+streetAddress                  stateOrProvinceName
+locality
+\end{verbatim}\end{quote}
+
+\subsubsection{ThornPerson}
+Like \verb+OrganizationalPerson+, this is also a subclass of \verb+person+ 
+and introduces the following optional
+attributes:
+\begin{quote}\small\begin{verbatim}
+homePostalAddress              lastModifiedBy
+lastModifiedTime               secretary
+homePhone                      userClass
+photo                          roomNumber
+favouriteDrink                 info
+rfc822Mailbox                  textEncodedORaddress
+userid
+\end{verbatim}\end{quote}
+
+Two example \verb+ThornPerson+ entries are given in Figure~\ref{example_edb} on
+page~\pageref{example_edb}.
+
+\subsubsection{OrganizationalRole}
+Entries of this class are used to represent a position or role within an
+organisation.  
+
+There is one mandatory attribute:
+\begin{describe}
+\item[\verb+commonName+:]	gives the name of the role.
+			The value of this attribute is a string; e.g.:
+\begin{quote}\small\begin{verbatim}
+PostMaster
+\end{verbatim}\end{quote}
+\end{describe}
+
+There are many optional attributes including:
+\begin{describe}
+\item[\verb+roleOccupant+:]    the distinguished name of the person 
+			who fulfills the role, e.g.:
+\begin{quote}\small\begin{verbatim}
+c=US@o=X-Tel Services Ltd@cn=Peter Cowen
+\end{verbatim}\end{quote}
+\end{describe}
+
+The other optional attributes are:
+\begin{quote}\small\begin{verbatim}
+seeAlso                        preferredDeliveryMethod
+destinationIndicator           registeredAddress
+internationaliSDNNumber        x121Address
+facsimileTelephoneNumber       teletexTerminalIdentifier
+telexNumber                    telephoneNumber
+locality                       postOfficeBox
+postalCode                     postalAddress
+description                    organizationalUnitName
+streetAddress                  stateOrProvinceName
+physicalDeliveryOfficeName
+\end{verbatim}\end{quote}
+
+
+\subsubsection{Alias}
+Objects of this class represent an alias to some other entry in the
+DIT.  It is generally used when an entity belongs in one or more subtrees of
+the DIT, and is used to ``point'' one entry at the other.
+
+There are two mandatory attributes:
+\begin{describe}
+\item[\verb+commonName+:]	gives the name of the alias.
+			The value of this attribute is a string; e.g.:
+\begin{quote}\small\begin{verbatim}
+Colin Robbins
+\end{verbatim}\end{quote}
+
+\item[\verb+aliasedObjectName+:] a pointer to another object in the directory;
+			e.g.:
+\begin{quote}\small\begin{verbatim}
+c=GB@o=X-Tel Services Ltd@cn=Colin Robbins
+\end{verbatim}\end{quote}
+\end{describe}
+There are no optional attributes for this object class.
+An example of an Alias entry is given below:
+\begin{quote}\small\begin{verbatim}
+cn= QUIPU-support
+aliasedObjectName= c=GB@o=University College London
+		   @ou=Computer Science@cn=Incads
+objectClass= quipuObject & alias & top
+\end{verbatim}\end{quote}
+
+\subsubsection{OrganizationalUnit}
+The \verb+OrganisationalUnit+ object class is used to represent a unit within
+organisation.
+There is one mandatory attribute
+\begin{describe}
+\item[\verb+organizationalUnitName+:]
+			which gives the name of the organisational unit.
+			The value of this attribute is a string; e.g.:
+\begin{quote}\small\begin{verbatim}
+Research and Development
+\end{verbatim}\end{quote}
+\end{describe}
+
+The optional attributes are:
+\begin{quote}\small\begin{verbatim}
+userPassword                   seeAlso
+preferredDeliveryMethod        destinationIndicator
+registeredAddress              internationaliSDNNumber
+x121Address                    facsimileTelephoneNumber
+teletexTerminalIdentifier      telexNumber
+telephoneNumber                physicalDeliveryOfficeName
+postOfficeBox                  postalCode
+postalAddress                  businessCategory
+searchGuide                    description
+streetAddress                  stateOrProvinceName
+locality
+\end{verbatim}\end{quote}
+
+\subsubsection{Organisation}
+Objects of this class represent a top-level organisational entity,
+such as a corporation, university, government entity, and so on.
+
+There is one mandatory attribute:
+\begin{describe}
+\item[\verb+organisationName+:]
+			which gives the name of the organisation.
+			The value of this attribute is a string; e.g.:
+\begin{quote}\small\begin{verbatim}
+Performance Systems International
+\end{verbatim}\end{quote}
+\end{describe}
+
+The optional attributes are:
+\begin{quote}\small\begin{verbatim}
+userPassword                   seeAlso
+preferredDeliveryMethod        destinationIndicator
+registeredAddress              internationaliSDNNumber
+x121Address                    facsimileTelephoneNumber
+teletexTerminalIdentifier      telexNumber
+telephoneNumber                physicalDeliveryOfficeName
+postOfficeBox                  postalCode
+postalAddress                  businessCategory
+searchGuide                    description
+streetAddress                  stateOrProvinceName
+locality
+\end{verbatim}\end{quote}
+
+\subsubsection	{domainRelatedObject}
+If an object has some relationship to the Internet Domain Name System (DNS),
+then this can be represented in the DIT using this object class.
+
+This class has one mandatory attribute:
+\begin{describe}
+\item[\verb+associatedDomain+:]
+			identifies the domain which corresponds to this object.
+			The value is a domain string; e.g.:
+\begin{quote}\small\begin{verbatim}
+psi.com
+xtel.co.uk
+\end{verbatim}\end{quote}
+\end{describe}
+
+\subsection {Schemas}
+\label{quipu:schema}
+
+Directories should provide a very flexible tool
+which enable any information to be stored.  There is a danger that schemas,
+as specified in the OSI directory, will lead to Procrustean directory implementations
+which impose unreasonable restrictions.  The QUIPU directory does not, per
+se, place restrictions on what can be placed in a DSA.
+It does, however, give control so that managers may control what is stored in the
+directory.
+
+The first aspect of structure is with respect to attributes which may be
+present in an entry.  A QUIPU DSA will allow an entry to belong to one or
+more object classes which are known to the DSA (stored in a table).  An
+entry will typically have a small number of object classes (e.g., TOP
+(implicit) + Person + Organisational Person + QUIPU Object).  The DSA will
+maintain a table of mandatory and optional attributes for each object class
+supported.  This will follow the guidelines of the standard or
+specification identifying the object class in question.  From this
+information, the DSA can determine the permitted and mandatory attributes for a
+given entry by calculating the union of all the object classes of that
+entry.  Free extension (i.e., the ability to store any attribute) was
+rejected, as there does not appear to be a reasonable mechanism to manage
+this.  However, it is straightforward for managers to create new object
+classes as desired.
+
+\tagrind[htb]{schema}{Schema Definition}{schema-py}
+
+It is important 
+to allow management control of what is permitted at a given level.
+Therefore a \verb+treeStructure+
+attribute may be created.  
+This attribute is defined in Figure~\ref{schema-py}, with the string syntax
+discussed in Section~\ref{tree_struct}.
+This specifies for the level below,
+what types of object are permitted.  
+Each attribute value identifies a class of object which can exist at the level
+below, and 
+defines a set of mandatory and optional object classes.
+This can be considered as defining a (private) object class implied by the
+combination of these classes.
+
+For each type of object, the attribute types permitted in the RDN are also
+listed.  This is not checked in the current version of QUIPU.
+The directory knows about the treeStructure attribute and will
+ensure consistency.  
+When creating an entry, the DSA must check that it conforms to the
+treeStructure attribute of the parent entry.
+When removing information from a treeStructure attribute, the
+directory will  check that all of the children conform to the
+modified attribute.
+
+\subsection {Photograph Attributes}
+\label{dua:photo}
+
+The data that a DSA can hold does not have to be limited to data that can be
+represented by printable strings.
+Any attribute a QUIPU DSA does not know a string syntax for, will be held as
+a block of ASN.1.
+One such attribute is the \verb+photo+ attribute.
+Photographs of people and objects are stored in the directory as a
+g3fax-encoded block of ASN.1, and are best stored as ``file'' attributes
+described in the next section.
+There is an example of a photograph attribute in the example database.
+This can be looked at by connecting to the directory with DISH
+and looking at the entry ``Steve Kille, CS, UCL, GB''.
+
+
+Unless you you have compiled and installed the ``photo'' code as 
+described in Section~\ref{quipu:install} you will see the message
+\begin{quote}\begin{verbatim}
+"No display process defined"
+\end{verbatim}\end{quote}
+
+Having compiled the ``photo'' code, you will need to add a line such
+as
+\begin{quote}\small\begin{verbatim}
+photo xterm Xphoto
+\end{verbatim}\end{quote}
+to your \file{dsaptailor} file (see Section~\ref{dua:tailor})
+This says that if the user in logged on to a terminal
+of the type \verb"xterm" then use the process \file{g3fax/Xphoto}
+in the ISODE \verb"ETCDIR" directory to display the photograph.
+
+There are display routines provided for the \xwindows/\index{X Windows},
+SunView, 
+Tektronix~4014, and ``dumb'' terminals.
+
+\subsubsection{Generating Photos}
+
+The photograph files used by QUIPU need to be two-dimensionally
+g3fax-encoded.   QUIPU contains some tools to help you get your files into
+the required format.  These are found in the \file{others/quipu/photo}
+directory of the ISODE source tree.
+
+Getting pictures onto your machine is a local problem that will need
+discussing with your system manager.  You may have them in a different
+format from that required by QUIPU.
+
+If they are in SunView {\em pixrect} format, the tool \verb+pr2pe+ can be used
+to convert them.
+For other formats, there are two utilities, \verb+pbmtofax+ and \verb+faxtopbm+,
+which can convert from the ``PBM''\index{PBM} format to two-dimension
+fax, and vice versa.
+The PBM format is that defined and used by 
+Jef~Poskanzer's\index{Poskanzer, Jef} ``pbmplus package''.  This package
+can convert a large range of bitmap formats into the PBM 
+format\footnote{You should not confuse \verb+pbmtofax+ with the \verb+pbmtog3+
+tools which are part of the pbmplus package; this uses a
+one-dimensional encoding scheme}.
+You will need to obtain this package to compile the \verb+pbmtofax+ 
+and \verb+faxtopbm+ utilities.
+
+{\em Note}: with this version of QUIPU, the \verb+pbmtofax+ tool should always be
+used with a \verb+-old+ flag to ensure user at remote sites with 
+older code can still decode and display your photograph files.
+
+\subsection {File Attributes}
+\label{file_attr}
+Attributes values are generally stored in the EDB file, and loaded 
+into memory when the DSA starts.
+For some large attributes such a photos, this is not a sensible approach, so the
+concept of a ``file'' attribute is introduced.
+
+If an attribute value is prefixed by \verb"FILE", then the value is assumed
+to be stored on disk.
+For example, if the following were found in an EDB file:
+\begin{quote}\small\begin{verbatim}
+photo={FILE}/usr/local/pictures/steve
+\end{verbatim}\end{quote}
+then the value for the photo attribute would be read from the file
+\begin{quote}
+\verb"/usr/local/pictures/steve".
+\end{quote}
+
+The syntax of the data in the file is expected to be the same as
+the string syntax, except in the case of ASN.1 and photo attributes which
+are expected to be in raw ASN.1.
+
+If there is not a file name supplied, then a default name is allocated.
+The default file name is the RDN of the entry the attribute belongs to
+followed by a dot ``.'', followed by the attributeType. This file is expected
+to be in the same directory as the EDB file for the entry.
+For example the default file for photo attribute, representing the entry
+for 
+``c= GB @ o= University College London @ 
+ou= Computer Science @ cn= Colin Robbins''
+ would be:
+\begin{quote}\small\begin{verbatim}
+cn=Colin Robbins.photo
+\end{verbatim}\end{quote}
+in the directory
+\begin{quote}\small\begin{verbatim}
+quipu-db/c=GB/o=University College London/ou=Computer Science
+\end{verbatim}\end{quote}
+or equivalent mapped file as described in Section~\ref{EDB:mapped}.
+
+The process defined so far allows for attributes stored in an EDB in file
+format to be read by a DSA.
+Writing the attributes back to files if modified/added by a DUA requires
+a little more.
+The DSA needs to know which attributes should be stored on disk.
+This information is supplied in the attribute ``oidtables'' which are 
+defined in Section~\ref{oidtables}.
+For example if the following entry was found in the file
+\file{oidtable.at} in the ISODE \verb"ETCDIR" directory
+then a \verb+photo+ attribute would always be written
+back to disk.
+\begin{quote}\small\begin{verbatim}
+photo:  thornAttribute.7: photo : file
+\end{verbatim}\end{quote}
+
+\subsection {Attribute Inheritance}
+\label{attr_inherit}
+\index{inherited attribute}\index{attribute inheritance}
+
+Attribute inheritance is a mechanism whereby an entry can get default
+attribute values from its parent entry.
+This can make management of common attributes much easier.
+Inheritance can be used to make the in-core database significantly
+smaller, which as a side effect should make the DSA run faster.    
+For example, entries of the object class \verb+person+ for a particular
+organisation might all have the same postal address attribute.
+Using inheritance this attribute can be placed in the organisation entry
+and inherited down to all \verb+person+ entries.
+
+\tagrind[htb]{inherit}{Attribute Inheritance}{inherit-py}
+
+The information is placed in the entry above using the \verb+inheritedAttribute+
+attribute type, defined in Figure~\ref{inherit-py}. The QUIPU string syntax
+to represent this is:
+\begin{quote}\begin{verbatim}
+<InheritedAttributeValue> ::= [ <oid> "$" ] 
+                      [ "always" <InheritedList> ]
+                      [ "default" <InheritedList> ]
+<InheritedList> ::= "(" NEWLINE <AttributeSequence> 
+                        NEWLINE ")"
+\end{verbatim}\end{quote}
+
+For example, if the following was an attribute of an entry
+\begin{quote}\begin{verbatim}
+inheritedAttribute = person $ always (
+postalAddress= UCL $ Gower Street $ London $ WC1E 6BT
+postalCode= WC1E 6BT
+) default (
+telephoneNumber= +44 71-387-7050
+)
+\end{verbatim}\end{quote}
+then all entries of objectclass \verb+person+ positioned one level
+below the entry would always inherit the attributes
+\begin{quote}\begin{verbatim}
+postalAddress= UCL $ Gower Street $ London $ WC1E 6BT
+postalCode= WC1E 6BT
+\end{verbatim}\end{quote}
+and {\bf if} the entry does not contain a \verb+telephoneNumber+ attribute itself,
+it would inherit
+\begin{quote}\begin{verbatim}
+telephoneNumber= +44 71-387-7050
+\end{verbatim}\end{quote}
+
+The attribute value in the inherited attribute can be left blank, for example
+\begin{quote}\begin{verbatim}
+inheritedAttribute = person $ always (
+postalAddress
+)
+\end{verbatim}\end{quote}
+in which case the value is taken from the same entry as the
+inherited attribute itself.  This avoids duplicating attributes.
+
+The OID representing the object class can only appear in one attribute value,
+thus the following, which may seem similar to the above is {\em not}
+allowed: the attributes need to be combined.
+\begin{quote}\begin{verbatim}
+inheritedAttribute = person $ always (
+postalAddress= UCL $ Gower Street $ London $ WC1E 6BT
+)
+inheritedAttribute = person $ always (
+postalCode= WC1E 6BT
+)
+inheritedAttribute = person $ default (
+telephoneNumber= +44 71-387-7050
+)
+\end{verbatim}\end{quote}
+
+If the OID representing the object class is omitted, then the values are
+inherited to entries that themselves do not contain an object class
+attribute. Thus the inherited attribute must define an object class to
+inherit down (as schema checking still takes place).  For example
+\begin{quote}\begin{verbatim}
+inheritedAttribute = default (
+ObjectClass= person & quipuobject
+postalAddress= UCL $ Gower Street $ London $ WC1E 6BT
+postalCode= WC1E 6BT
+)
+\end{verbatim}\end{quote}
+
+Inheritance can be used for any attribute with the following exceptions:
+\begin{itemize}
+
+\item An entry cannot inherit its distinguished attributes.
+
+\item An inherited \verb+userPassword+ attribute in not used to authenticate a user
+at bind time.
+
+\item The following system attributes 
+\begin{quote}\small\begin{tabular}{ll}
+objectClass &
+ACL\\
+masterDSA &
+slaveDSA\\
+aliasedObjectName &
+edbInfo\\
+presentationAddress &
+relayDSA\\
+treeStructure &
+supportedApplicationContext\\
+inheritedAttribute
+\end{tabular}\end{quote}
+can only be used in the ``default'' clause.  They can 
+not appear in the ``always'' clause as there is the potential for
+an inconsistency to occur.
+
+\item You must hold at least one copy of the EDB file containing
+the parent entry.
+
+\end{itemize}
+
+If an entry belongs to more than one object class, and more than one
+of these classes is listed in the inherited attribute of the parent entry,
+then only attributes from {\em one} of these will be inherited into the entry.
+It is undefined which.
+
+The inheritance described thus far only covers one level of the
+DIT, whereas it is often useful to inherit attributes down the
+whole subtree.  This can be achieved by inheriting the inheritance
+attribute!
+Consider the multivalued attribute
+\begin{quote}\begin{verbatim}
+iattr= organizationalUnit $ default (
+iattr
+) 
+iattr= person $ default (
+telephoneNumber
+)
+\end{verbatim}\end{quote}
+Every \verb+person+ immediately below will inherit the telephone
+number attribute.
+Every \verb+organizationalUnit+ will inherit the same inheritance
+attribute, thus any \verb+person+ entries below \verb+organizationalUnit+
+entries will get the telephone number attribute as well.
+by the same token, this works for multiple levels of
+\verb+organizationalUnit+.
+
+
+\section {How a DSA Starts}
+\label{dsa:starting}
+
+The section gives a brief description of how a QUIPU DSA starts.
+This is intended to help people who have experienced problems in getting
+their DSAs started.
+
+First of all the tailor file \file{quiputailor} in the ISODE \verb"ETCDIR" directory
+is read (unless you
+specify a different tailor file using the \verb"-t" option to
+\pgm{ros.quipu}).
+This tells the DSA, amongst other things, its own name, and its parent
+DSA(s).
+
+The first thing a DSA need to do is find its own entry, thus it tries to
+load the EDB that should contain it.
+If it cannot find its own entry, then it will try connecting to the
+parent DSA to read its own entry. If this fails the DSA will stop.
+
+Having found its own entry, the DSA will check to see if it is a cached
+entry read fron disk; if so, it will attempt to read a new version from the
+relevant remote DSA. If successfu,l a new cache EDB file will be written.
+
+Now the rest of the local DIT can be loaded.  Each EDB specified in the
+\verb+edbInfo+ attribute \index{edbInfo attribute} is in turn loaded
+from disk, followed by any cached EDB files.
+
+As each EDB is loaded from disk, it is checked to make sure all the
+attributes in the entry are allowed, as defined by the \verb+objectClass+
+attribute, \index{objectClass attribute} and that the tree shape conforms to that defined by the
+\verb+treeStruture+ attribute. \index{treeStructure attribute}
+If any EDB fails these checks then the DSA will not start, and an appropriate
+message will be logged.
+
+Having loaded all its data, the DSA will start listening for DAP and DSP
+associations.
+
+\section {Adding More DSAs}
+
+Many organisations will need to have more than one DSA to meet 
+their requirements. This section suggests how you might arrange your
+DSAs to get the most out of the system.
+
+You will almost certainly need at least one DSA that holds a
+copy of the root EDB, and your country EDB.
+This DSA should also hold the master copy of your organisation's own EDB.
+Subsequent DSAs that are set up should have this DSA defined 
+as one of their parent DSAs.
+
+For robustness, it is a good idea to have some other DSAs replicating 
+these EDBs, so that if one local machine or DSA becomes unavailable, then
+there is another copy elsewhere that can be used.
+EDBs that contain addresses of other DSAs that you may want to contact
+regularly should also be replicated, to prevent extra associations
+having to be made just to read DSA addresses.
+In short, if you know that data from a certain 
+EDB is going to be accessed a lot, replicate it locally.
+Replication does not have a high cost.
+
+When setting up multiple DSAs be sure to name them as described in 
+Section~\ref{dsa:naming};
+ensure the DSA entries are sufficiently high in the DIT, so that other DSAs
+can read the entry without having to contact the DSA concerned.
+
+\section {Receiving EDB Updates}
+\label{slave_update}
+If your DSA holds a slave copy of one or more EDBs, then it can
+automatically update these for you.
+The current approach is very simple minded, but will be extended for future
+versions.
+
+There are two ways to ask a DSA to update its slave EDBs, either use DISH
+program and issue a \verb+dsacontrol -slave+ command (see 
+Section~\ref{dua:mgmt}), or set the \file"quiputailor" parameter
+``update'' to {\bf on} (see Section~\ref{dsa:tailor}),
+in which case the DSA will try to update its slaves
+when it starts up.
+
+To update the slaves, the DSA uses the \verb+edbinfo+ attribute that the DSAs
+entry in the DIT {\em must} have.
+This attribute specifies which EDBs you hold, and where to get updates of
+the from.
+{\em Note}: you do not necessarily have to get updates from a master EDB,  
+a slave is acceptable.
+In many cases this will be preferable to prevent the 
+load on the master DSA being too high.
+For example, a ``national'' EDB is likely to be highly replicated,
+it would not be a good idea to have just one DSA
+handling updates.  It would be better to have the load spread over several
+DSAs.
+
+The syntax of the attribute is \index{edbInfo attribute}
+\begin{quote}\begin{verbatim}
+edbinfo = EDB concerned # get from # send to
+\end{verbatim}\end{quote}
+It is a multivalued attribute. 
+
+A few examples:
+\begin{quote}\small\begin{verbatim}
+# cn=Giant Tortoise # cn=Fruit Bat
+c=US # # cn=Fruit Bat
+c=US # # c=US@cn=Spectacled Bear
+c=US@l=NY # cn=Fruit Bat #
+\end{verbatim}\end{quote}
+Note that there is no harm to using multiple \verb"eDBinfo" lines,
+even if they refer to the same EDB.
+These lines indicate that:
+\begin{itemize}
+\item	The root EDB is read from the \verb"cn=Giant Tortoise" DSA,
+	further the \verb"cn=Fruit Bat" DSA is allowed to read the
+	root EDB from this DSA.
+	This is an important point --- A DSA has to explicitly say it will
+	allow you to update from it, before it will send EDB files.
+	Thus if you want to pull EDB files from a remote DSA, you will need
+	to ask the manager to add your DSA to their DSAs ``send to'' field.
+
+\item	The \verb"cn=Fruit Bat" DSA and the \verb"c=US@cn=Spectacled Bear" DSA
+	are allowed to read the EDB for \verb"c=US". 
+	Note that the second and third line could be combined as:
+\begin{quote}\small\begin{verbatim}
+c=US # # cn=Fruit Bat$c=US@cn=Spectacled Bear
+\end{verbatim}\end{quote}
+\item	The DSA-named \verb"cn=Fruit Bat" supplies the EDB for \verb"c=US@l=NY"
+	to this DSA.
+\end{itemize}
+
+Some EDB files, such as the ROOT, and country level EDB files are highly
+replicated, and having to list all the DSAs that are allowed to pull such EDBs
+is too restrictive.
+Thus the following syntax can be used as an abbreviation:
+\begin{quote}\small\begin{verbatim}
+c=US # # c=US
+\end{verbatim}\end{quote}
+This indicates that the c=US EDB file can be sent to DSA named at the c=US
+level of the DIT, for example;
+\begin{quote}\small\begin{verbatim}
+c=US@cn=Wombat
+\end{verbatim}\end{quote}
+is allowed to pull the EDB, but the following are not:
+\begin{quote}\small\begin{verbatim}
+cn=Wombat
+c=US@o=Foobar Inc.@cn=Wombat
+c=GB@cn=Wombat
+\end{verbatim}\end{quote}
+
+Whether to update is decided upon by looking at the version string; if the
+two EDB files have a different version string, then the EDB will be updated.
+
+\section {Tables}
+\label {oidtables}
+Throughout QUIPU, all the Object Identifiers that need to be specified are
+specified using a string representation, for example:
+
+\[\begin{tabular}{|l|l|} \hline
+String representation & Object Identifier  \\ \hline 
+attributeType & 2.5.4 \\
+surname & 2.5.4.4 \\
+streetAddress & 2.5.4.9 \\
+organizationName & attributeType.10 \\ \hline
+\end{tabular}\]
+
+A set of Object Identifier tables in the ISODE \verb"ETCDIR" directory are
+used to 
+provide this mapping (see also Section~\ref{isobjects} in \volone/).
+In general the default table will be sufficient.
+This section describes the tables for those who want to extend
+the default definitions.
+
+This basic format is used to build up the specification of general object
+identifiers.  
+This file is by default named \file{oidtable.gen}, and has simple
+mappings from string to oid.
+These strings can then be used in the definition of further oids (for example
+the \verb+organizationName+ oid in the table above).
+
+This simple table is extended to give table formats for attributes
+This file is by default named \file{oidtable.at}.
+Each entry in this table is assumed to represent an attribute, so
+in addition to mapping strings onto oids, 
+it also defines the syntax for that attribute:
+
+\[\begin{tabular}{|l|l|l|} \hline
+String representation & Object Identifier & Syntax\\ \hline
+objectClass:&		attributeType.0:	&objectclass \\
+aliasedObjectName:&     attributeType.1:	&dn\\
+commonName,cn:&		attributeType.3:	&caseignorestring\\
+searchGuide:&           attributeType.14:	&asn\\
+x121Address:&           attributeType.24:	&numericstring\\
+presentationAddress:& 	attributeType.29:	&presentationaddress\\
+\hline
+\end{tabular}\]
+
+This says that the attribute named \verb+objectclass+ represents the oid
+``attributeType.0''; using the expansion of ``attributeType'' (
+as defined in the 
+file \file{oidtable.gen}) thus gives the oid ``2.5.4.0''.
+The syntax taken by the attribute value is \verb+objectclass+.
+
+Similarly an \verb+aliasedObjectName+ has \verb+dn+ (DistinguishedName) syntax.
+The recognised syntaxes are defined in the BNF in 
+Appendix~\ref{bnf}.
+
+After the ``syntax'', an extra optional parameter is allowed;
+if this is the string ``\verb"file"'' the the relevant attribute is 
+designated a file attribute; see Section~\ref{file_attr} for a
+description of file attributes.
+
+
+The file \file{oidtable.oc} defines the object classes\index{object
+class} QUIPU knows about.
+The file again maps strings onto oids.
+Each string is assumed to represent an object class, and for each it
+defines the hierarchy (which object classes it is a subclass of),
+the mandatory attributes of the object class, and the optional attributes of
+the object class.
+
+For example the entry
+\begin{quote}\small\begin{verbatim}
+quipuObject:  	quipuObjectClass.2 : top : acl : \
+                masterDSA, slaveDSA, treeStructure
+\end{verbatim}\end{quote}
+defines \verb+quipuObject+ to be an objectClass represented by the oid
+``quipuObjectClass.2''.
+It is a {\em subclass} of the object class \verb+top+.
+An entry having this object class {\em must} have the attribute
+\verb+acl+, and {\em may}
+have the attributes \verb+masterDSA+, \verb+slaveDSA+ and \verb+treeStructure+
+(Note: The similarity between this definition and the ASN.1 definition of
+a \verb+quipuObject+ in Appendix \ref{naming}).
+
+To allow for definitions of ``attribute sets'', there is a simple 
+macro facility provided, for example, using the macro
+\begin{quote}\small\begin{verbatim}
+localeAttributeSet = localityName, streetAddress ...
+\end{verbatim}\end{quote}
+every occurrence of \verb"localeAttributeSet" will be replaced by
+the right-hand side expression.
+
+
+With the definition of the ``string'' form of the oid it is also possible
+to specify {\em one} abbreviation for the name.
+The standard tables use the following abbreviations:
+
+\[\begin{tabular}{|l|l|}
+\hline
+c & countryName \\
+o & organizationName \\
+ou & organizationalUnitName \\
+cn & commonName \\
+co & friendlyCountryName \\
+\hline
+\end{tabular}\]
+
+The abbreviated name may be used anywhere the full name would be allowed.
+
+
+Every entry stored in the QUIPU DSA is checked against these tables to see if
+the attributes supplied are allowed in the entry, to make sure the mandatory
+attributes are present, and the attributes themselves have the correct syntax.
+
+If you wish to add you own definitions to the tables you should add them to
+the files 
+\file{isode/dsap/oidtable.at.local},
+\file{isode/dsap/oidtable.oc.local} and
+\file{isode/dsap/oidtable.gen.local}
+in that way, if a new set of tables is issued, your local entries will be
+preserved.
+
+\section{More Help Installing QUIPU}
+Contact ``QUIPU-support''.
+The mail address is given in Section~\ref{quipu:support}.
+

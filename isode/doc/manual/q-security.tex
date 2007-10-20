@@ -1,0 +1,405 @@
+% Run this through LaTeX with the appropriate wrapper.
+
+\chapter{Introduction to Security Features}
+\label{Security}
+
+\section{Passwords}
+\label{Passwords}\index{user password attribute}
+
+When you bind to a DSA, to get write access you need to tell the DSA who you
+are --- you do this by supplying your distinguished name.
+So that the DSA can authenticate you, you also need to supply your QUIPU
+password.
+Anyone knowing your
+password can act as you and alter your data. Therefore your password
+should be well chosen
+and kept safe.
+
+\subsection{Choosing a Password}
+
+\begin{itemize}
+\item
+Do not use the same password for QUIPU as you do for login.
+It is always bad practise (but convenient!) to use the same password on
+different systems. The manager of your QUIPU DSA can discover your QUIPU
+password. This doesn't affect the security of QUIPU (as your DSA manager
+can alter local data anyway), 
+but the QUIPU manager is probably not allowed access to
+your login account.
+\item
+Do not choose an obvious word.
+
+Your password should {\bf not} be any of the following:
+\begin{itemize}
+\item
+Your name, initials, date of birth, place of work or similar
+personal details.
+\item
+Any girl's name in any language.
+\item
+The name of a film star, television personality, and so forth.
+\item
+The name of a character from a science-fiction or fantasy novel.
+\item
+Computer jargon e.g., ``foobar''.
+\item
+Any of the above, spelt backwards.
+\item
+Any word from your system's on-line dictionary. Ideally, your password
+should not be a word at all (it could be the concatenation of two unrelated
+words, for example).
+\end{itemize}
+\item
+Change your password from time to time.
+\end{itemize}
+
+\subsection{Taking Care of Your Password}
+
+\begin{itemize}
+\item
+Configuration Files.
+It is possible to put your QUIPU password in a configuration file in your
+home directory (see the later Chapters on user interfaces).
+If you do this, you must make sure that the configuration file (.quipurc)
+is not publicly readable (by using the \unix/ {\em chmod} command, for
+example).
+\item
+Access Control Lists.
+Your QUIPU password is itself stored in QUIPU, as the {\em userPassword}
+attribute of your entry. You should make sure that the access control list
+for your entry grants public {\em compare} but not {\em read} access to
+this attribute. (The attribute must be publicly comparable so that QUIPU
+can check that you have presented the right password when you start a session).
+The next section will explain how to set up access control lists.
+\item
+Do not give your password to other people.
+
+If several people need to be able
+to modify the same data, the access control lists can be set up so that this
+is possible without them sharing passwords.
+\item
+Do not write your password down!
+\end{itemize}
+
+\section{Discretionary Access Control}
+\label{disc_acl}\index{acl attribute}
+
+``Discretionary access aontrol'' is any means by which users can (at their
+discretion) give other users access to data which they control. In QUIPU,
+access control lists are used to provide discretionary access control.
+
+\subsection{Model}
+
+Each node in the DIT held by a QUIPU DSA has a QUIPU access control list (ACL).
+The ACL is divided into three parts:
+
+\begin{enumerate}
+\item
+Child ACL.
+This controls who may discover or change which entries are placed immediately
+below the node in the DIT.
+\item
+Entry ACL.
+This controls who may access the entry placed at the node.
+\item
+Attribute ACL.
+For every attribute of the entry, there is an attribute ACL which controls who 
+may access that attribute. To keep the representation compact, each entry has
+a default attribute ACL. This is used for all the attributes of the entry that
+have not been explicitly given a different attribute ACL.
+\end{enumerate}
+
+Each entry, child, or attribute ACL (henceforth called an object ACL) consists
+of a list of (access selector, access level) pairs. It associates every
+distinguished name with an access level, according to the following rule:
+
+\begin{quote} 
+Take every pair where the selector
+(left hand side) matches the name. The associated access level is the maximum 
+of the corresponding right-hand sides. If no selectors match the name, the
+associated access level is {\em none}.
+\end{quote}
+
+The levels of access are as follows:
+
+\begin{describe}
+\item
+[\verb+None+:]
+No accesses to the object are allowed.
+\item
+[\verb+Detect+:]
+A DUA can detect that the protected object exists.
+\item
+[\verb+Compare+:]
+A filter (e.g., test for equality to some value) may be applied to the object.
+\item
+[\verb+Read+:]
+The contents of the object may be read.
+\item
+[\verb+Add+:]
+The contents of the object may be added to, but not removed from.
+\item
+[\verb+Write+:]
+The contents of the object may be modified in any way.
+\end{describe}
+
+The possible Access Selectors are as follows:
+
+\begin{describe}
+\item
+[\verb+Entry+:]
+Matches the entry itself only.
+\item
+[\verb+Other+:]
+Matches everything.
+\item
+[\verb+Prefix $<$name$>$+:]
+Matches $<$name$>$ and everything below it in the DIT.
+\item
+[\verb+Group $<$name$>$+:]
+Matches $<$name$>$.
+(This is not what the ``group'' selector was originally designed for, but it is
+currently what it does!)
+
+\end{describe}
+
+The attribute syntax used to represent this is defined in Section~\ref{acl_syntax}, 
+with the ASN.1 definition shown in Figure~\ref{acl-py}.
+
+\tagrind {acl}{ACL Definition}{acl-py}
+
+
+
+\subsection{Detect Access}
+
+QUIPU treats the access level {\em none} as though it were {\em detect}.
+This means that it is often possible to detect the presence of protected data,
+even if you have no access to it.
+
+The reason for this is that it is very difficult for the directory to
+pretend that data isn't there; carefully chosen queries can catch it out.
+Access control mechanisms that can be by-passed are very dangerous; they
+give a false sense of security. Accordingly, we have decided not to
+implement ``undetectable data''.
+
+\subsection{Effect of ACLs on Operations}
+
+This section explains which ACLs are checked for each of the X.500 operations.
+
+\begin{describe}
+\item
+[\verb+List+:]
+The child ACL of the target must give at least {\em read} access. In addition,
+each child will only be listed if its entry ACL gives at least {\em read}.
+Later versions of QUIPU may also require that the attribute ACL of the
+distinguished (naming) attribute of the child give at least {\em read} access.
+\item
+[\verb+Search+:]
+To search the immediate descendants of a node, that node's child ACL must give
+at least {\em read} access. In addition, each child will only be searched
+if its entry ACL gives at least {\em compare} access. The filter ``present''
+may be applied to any attribute. Other basic
+filters evaluate to {\em maybe} unless the relevant attribute ACL gives at
+least compare access.
+If an attribute within an entry does not have public read access, normally
+subtree searches on that attribute will fail.  This is intentional, as it
+would be difficult to provide a consistent picture of the DIT, when unauthenticated 
+DSP links are involved in the search.
+This restriction is lifted if, and only if, the entire subtree to be 
+searched (using master or
+slave EDB files) is held within one DSA, and the association
+to that DSA is an authenticated DAP association.
+\item
+[\verb+Read+:]
+The entry ACL of the target must give at least {\em read} access and the 
+attribute ACL of each attribute read must give at least {\em read} access.
+\item
+[\verb+Compare+:]
+The entry ACL of the target must give at least {\em compare} access. The
+attribute ACL of the tested attribute must give at least {\em compare}
+access.
+\item
+[\verb+Modify+:]
+The entry ACL of the target must give at least {\em add} access if attributes
+or values are to be added, and at least {\em write} access if they are to
+be removed. For each attribute changed, the attribute ACL must give at
+least {\em add} access for an attribute or value to be added, and at least
+{\em write} access for an attribute or value to be removed.
+\item
+[\verb+Add Entry+:]
+To add an entry below a node, that node's child ACL must give at least
+{\em add} access.
+\item
+[\verb+Remove Entry+:]
+
+To remove an entry, the child ACL of its parent must give at least {\em write}
+access. No rights to the entry itself are required.
+\item[\verb+Modify RDN+:]
+
+The child ACL of the target's parent must give at least {\em write} access.
+If the operation needs to add an attribute (value), the target's entry ACL must
+give {\em add} access and the attribute ACL of the attribute must give
+{\em add} access.
+If the operation needs to remove an attribute (value), the target's entry ACL 
+must give {\em write} access and the attribute ACL of the attribute must give
+{\em write} access.
+\end{describe}
+
+\subsection {Example Use of ACLs}
+
+A node representing a user might be given the following ACL:
+
+\begin{itemize}
+\item
+childACL is not applicable, and so omitted.
+\item
+EntryACL is \{other, read\} + \{self, write\} + \{group=$<$Manager$>$,
+write\}, so that only the user or a manager can change the entry.
+Using the ACL syntax, this is expressed as:
+\begin{quote}\begin{verbatim}
+acl= other # read # entry
+acl= self # write # entry
+acl= group # <Manager Name> # write # entry
+\end{verbatim}\end{quote}
+\item
+DefaultAttributeACL is \{other, read\} + \{self, write\}, which leads to
+publicly readable attributes modifyable by the user.
+Using the ACL syntax, this is expressed as:
+\begin{quote}\begin{verbatim}
+acl= other # read # default
+acl= self # write # default
+\end{verbatim}\end{quote}
+\item
+The attribute ACL for ACL is \{other, read\} + \{group = $<$manager name$>$,
+write\},  so that only the manager can change the ACL.
+Using the ACL syntax, this is expressed as:
+\begin{quote}\small\begin{verbatim}
+acl= other # read # attributes # acl
+acl= group # <Manager Name> # write # attributes # acl
+\end{verbatim}\end{quote}
+\item
+The attribute ACL for Password is \{self, write\} + \{other, compare\} so that
+the user can change the password, DSAs can check the password, and only
+the user can read it.
+\begin{quote}\begin{verbatim}
+acl= self # write # attributes # userPassword
+acl= other # compare # attributes # userPassword
+\end{verbatim}\end{quote}
+\end{itemize}
+
+A node representing an organisation or organisational unit might be given the
+following ACL:
+
+\begin{itemize}
+\item
+childACL is \{other, read\} + \{group=$<$manager name$>$, write\}. Everybody can
+search the members of the organisation, but only the manager is allowed to add
+or delete members.
+This is represented as an attribute with:
+\begin{quote}\begin{verbatim}
+acl= other # read # child
+acl= group # <Manager Name> # write # child
+\end{verbatim}\end{quote}
+\item
+EntryACL is \{other, read\} + \{group=$<$manager name$>$, write\}.
+This is represented as an attribute with:
+\begin{quote}\begin{verbatim}
+acl= other # read # entry
+acl= group # <Manager Name> # write # entry
+\end{verbatim}\end{quote}
+\item
+DefaultAttributeACL is \{other, read\} + \{group=$<$manager name$>$, write\}.
+This is represented as an attribute with:
+\begin{quote}\begin{verbatim}
+acl= other # read # default
+acl= group # <Manager Name> # write # default
+\end{verbatim}\end{quote}
+\end{itemize}
+
+Every entry in the QUIPU DIT must have an acl attribute.
+If you do not supply one, the the default is added.
+The default ACL is often printed as
+\begin{quote}\begin{verbatim}
+acl=
+\end{verbatim}\end{quote}
+with no value.
+The default ACL is everybody read everything, but self can write, in long
+form this is expressed as:
+\begin{quote}\begin{verbatim}
+acl= self # write # entry
+acl= self # write # child
+acl= self # write # default
+acl= others # read # entry
+acl= others # read # child
+acl= others # read # default
+\end{verbatim}\end{quote}
+For many entries this is sufficient.  
+
+It can be seen that this scheme gives a great deal of flexibility,
+without the addition of any protocol elements.
+The encoding is designed so that the volume overhead is not excessive
+for sensible access policies.
+
+
+
+\subsection {Extended Example}
+
+As an extended example, suppose we wanted to set up an ACL for the 
+following situation:
+
+\begin{enumerate}
+\item Anybody can read most attributes.
+\item Nobody can read password except the user.
+\item User can modify homeTelephone number, everybody else can read it.
+\item Sys Admin can modify workTelephoneNumber and PayrollNumber, everybody
+	else can read them.
+\item Only user and Sys Admin can read the PayrollNumber.
+\end{enumerate}
+
+The first stage is to consider the requirements of various groups of
+users, so we could write:
+
+\begin{quote}\small\begin{verbatim}
+acl= group  # c=GB@o=UCL@cn=Admin # write # entry
+acl= group  # c=GB@o=UCL@cn=Admin # write # \
+            attributes # workTelephone $ PayrollNumber
+\end{verbatim}\end{quote}
+
+But later on in the ACL definition we will want different ACLs for 
+certain attributes, so we need to split into two different groups
+at this stage.
+
+\begin{quote}\small\begin{verbatim}
+acl= group  # c=GB@o=UCL@cn=Admin # write # entry
+acl= group  # c=GB@o=UCL@cn=Admin # write # \
+            attributes # workTelephone
+acl= group  # c=GB@o=UCL@cn=Admin # write # \
+            attributes # PayrollNumber
+\end{verbatim}\end{quote}
+
+If you do not do this, the DSA will complain about inconsistent ACL
+definitions, as it will be unable to determine which ACL line to use
+for which attribute.
+
+We need to give ``self'' access to various parts of the entry.
+We do not need to mention workPhone as the access given to ``others''
+is sufficient.  Again we split the attribute definitions into small groups.
+\begin{quote}\small\begin{verbatim}
+acl= self   # write # entry
+acl= self   # write # default
+acl= self   # write # attributes # userpassword
+acl= self   # write # attributes # homeTelephone
+acl= self   # read  # attributes # PayrollNumber
+\end{verbatim}\end{quote}
+
+Finally, we need to give others access to required attributes.
+\begin{quote}\small\begin{verbatim}
+acl= others # read # entry
+acl= others # read # default
+acl= others # compare # attributes # userpassword
+acl= others # read # attributes # homeTelephone
+acl= others # read # attributes # workTelephone
+acl= others # none # attributes # PayrollNumber
+\end{verbatim}\end{quote}
+
+

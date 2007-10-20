@@ -1,0 +1,87 @@
+\contentsline {part}{\uppercase {i}\phspace {1em}Introduction}{1}
+\contentsline {chapter}{\numberline {1}Overview}{3}
+\contentsline {section}{\numberline {1.1}Fanatics Need Not Read Further}{4}
+\contentsline {section}{\numberline {1.2}The Name of the Game}{5}
+\contentsline {section}{\numberline {1.3}Operating Environments}{5}
+\contentsline {section}{\numberline {1.4}Organisation of the Release}{7}
+\contentsline {section}{\numberline {1.5}A Note on This Implementation}{9}
+\contentsline {section}{\numberline {1.6}Changes Since the Last Release}{10}
+\contentsline {part}{\uppercase {ii}\phspace {1em}File Transfer, Access and Management}{13}
+\contentsline {chapter}{\numberline {2}User Library}{15}
+\contentsline {section}{\numberline {2.1}Warning}{16}
+\contentsline {section}{\numberline {2.2}Constants}{16}
+\contentsline {subsection}{\numberline {2.2.1}FTAM Quality-of-Service}{16}
+\contentsline {subsection}{\numberline {2.2.2}Service Classes}{16}
+\contentsline {subsection}{\numberline {2.2.3}Functional Units}{17}
+\contentsline {subsection}{\numberline {2.2.4}Attribute Groups}{17}
+\contentsline {subsection}{\numberline {2.2.5}State Results}{17}
+\contentsline {subsection}{\numberline {2.2.6}Action Results}{17}
+\contentsline {section}{\numberline {2.3}Data-Structures}{18}
+\contentsline {subsection}{\numberline {2.3.1}Contents Type}{18}
+\contentsline {subsection}{\numberline {2.3.2}Diagnostics}{19}
+\contentsline {subsection}{\numberline {2.3.3}Charging}{20}
+\contentsline {subsection}{\numberline {2.3.4}Passwords}{21}
+\contentsline {subsection}{\numberline {2.3.5}Access Control}{22}
+\contentsline {subsection}{\numberline {2.3.6}Attributes}{24}
+\contentsline {subsection}{\numberline {2.3.7}Concurrency}{26}
+\contentsline {subsection}{\numberline {2.3.8}FADU Identity}{28}
+\contentsline {section}{\numberline {2.4}Association Establishment}{30}
+\contentsline {subsection}{\numberline {2.4.1}Responder}{31}
+\contentsline {subsection}{\numberline {2.4.2}Initiator}{37}
+\contentsline {section}{\numberline {2.5}Event Handling}{41}
+\contentsline {subsubsection}{Termination Indication}{42}
+\contentsline {subsubsection}{Group Indications}{43}
+\contentsline {subsubsection}{Access Indications}{53}
+\contentsline {subsubsection}{Read/Write Indications}{54}
+\contentsline {subsubsection}{Data Indications}{55}
+\contentsline {subsubsection}{Data End Indication}{57}
+\contentsline {subsubsection}{Cancel Indications}{57}
+\contentsline {subsubsection}{Transfer End Indications}{58}
+\contentsline {subsection}{\numberline {2.5.1}Asynchronous Event Handling}{59}
+\contentsline {subsection}{\numberline {2.5.2}Synchronous Event Multiplexing}{60}
+\contentsline {subsection}{\numberline {2.5.3}Tracing}{61}
+\contentsline {section}{\numberline {2.6}Grouped Operations: File Transfer}{62}
+\contentsline {section}{\numberline {2.7}File Access}{65}
+\contentsline {section}{\numberline {2.8}Data Transfer}{67}
+\contentsline {subsection}{\numberline {2.8.1}Read/Write}{67}
+\contentsline {subsection}{\numberline {2.8.2}Sending Data}{68}
+\contentsline {subsection}{\numberline {2.8.3}Canceling Transfer}{69}
+\contentsline {subsection}{\numberline {2.8.4}Terminating Transfer}{70}
+\contentsline {section}{\numberline {2.9}Grouped Operations: File Management}{72}
+\contentsline {section}{\numberline {2.10}Association Release}{73}
+\contentsline {section}{\numberline {2.11}Association Abort}{75}
+\contentsline {section}{\numberline {2.12}Error Conventions}{76}
+\contentsline {section}{\numberline {2.13}Compiling and Loading}{76}
+\contentsline {section}{\numberline {2.14}An Example}{76}
+\contentsline {section}{\numberline {2.15}For Further Reading}{76}
+\contentsline {chapter}{\numberline {3}The ISO Documents Database}{77}
+\contentsline {section}{\numberline {3.1}Accessing the Database}{77}
+\contentsline {chapter}{\numberline {4}UNIX Implementation}{80}
+\contentsline {section}{\numberline {4.1}Implementation}{80}
+\contentsline {subsection}{\numberline {4.1.1}The Initiator}{80}
+\contentsline {subsubsection}{Commands}{81}
+\contentsline {subsubsection}{Variables}{82}
+\contentsline {subsubsection}{Options}{84}
+\contentsline {subsection}{\numberline {4.1.2}The Responder}{84}
+\contentsline {subsubsection}{Authentication}{85}
+\contentsline {subsubsection}{Virtual Filestore}{86}
+\contentsline {chapter}{\numberline {5}FTAM-FTP gateway}{88}
+\contentsline {section}{\numberline {5.1}Implementation}{88}
+\contentsline {subsection}{\numberline {5.1.1}The FTAM/FTP side}{88}
+\contentsline {subsubsection}{Limitations}{89}
+\contentsline {subsection}{\numberline {5.1.2}The FTP/FTAM side}{89}
+\contentsline {subsubsection}{Limitations}{89}
+\contentsline {part}{\uppercase {iii}\phspace {1em}Virtual Terminal}{91}
+\contentsline {chapter}{\numberline {6}UNIX Implementation}{93}
+\contentsline {section}{\numberline {6.1}Implementation}{93}
+\contentsline {subsection}{\numberline {6.1.1}The Initiator}{93}
+\contentsline {subsubsection}{Commands}{93}
+\contentsline {subsubsection}{Variables}{94}
+\contentsline {subsubsection}{Options}{95}
+\contentsline {subsection}{\numberline {6.1.2}The Responder}{95}
+\contentsline {subsubsection}{Options}{96}
+\contentsline {part}{\uppercase {iv}\phspace {1em}Miscellaneous Applications}{97}
+\contentsline {chapter}{\numberline {7}The ISODE Little Services}{99}
+\contentsline {section}{\numberline {7.1}Implementation}{100}
+\contentsline {subsection}{\numberline {7.1.1}The Initiator}{100}
+\contentsline {subsection}{\numberline {7.1.2}The Responder}{100}

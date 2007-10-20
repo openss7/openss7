@@ -1,0 +1,78 @@
+
+
+Issues in Transition and Coexistence for TCP/IP to OSI  (1/2 day)
+
+Dr. Marshall T. Rose
+
+
+Overview
+
+     The U.S. DoD Internet suite of protocols (commonly known as TCP/IP)
+     is the de facto open (non-proprietary) standard for
+     computer-communications in multi-vendor and multi-administration
+     networks.  TCP/IP has enjoyed unprecedented success as the open
+     systems solution of choice for inter-connecting networks and hosts.
+     However based on international cooperative work, it is commonly
+     acknowledged that protocols based on the Open Systems
+     Interconnection (OSI) model and promulgated by the International
+     Organization for Standardization (ISO) will eventually achieve
+     dominance and enjoy even greater success than TCP/IP.
+
+     Although previously an "academic" problem, the widespread
+     investment in TCP/IP-based systems has made practical solutions to
+     transition and coexistence an overwhelming concern:  organizations
+     using TCP/IP protocols today will be less willing to adopt OSI
+     protocols tomorrow unless interruption of production facilities is
+     minimized and the underlying investment is protected.
+
+
+What You Will Learn
+
+     You will achieve a thorough understanding of the technology
+     involved when interconnecting TCP/IP-based systems to OSI-based
+     systems.
+
+
+Syllabus
+
+     - Motivation: the need for transition and coexistence
+
+     - Background: concepts, terminology, and metrics of comparison
+
+     - Protocol-based approaches: dual-stacks, application gateways, and
+       transport gateways; discussion of existing implementations
+
+     - Re-defining the problem: understanding the difference between
+       transition and coexistence
+
+     - Service-based approaches: transport-service bridges, and network
+       tunnels; discussion of existing and planned implementations
+
+     - Examples: scenarios for different environments; the DoD OSI
+       transition plan
+
+
+Who Should Attend
+
+     This tutorial is intended for professionals interested in planning,
+     implementing, or managing environments containing both TCP/IP and
+     OSI implementations.  Although detailed knowledge of neither TCP/IP
+     nor OSI is required, basic familiarity with both protocols suites
+     is assumed.  No knowledge of protocol translation issues is
+     required.
+
+
+Speaker
+
+     Marshall T. Rose is a Principal Software Engineer at The Wollongong
+     Group where he works on OSI protocols and transition strategies.
+     He is the principal implementor of the ISO Development Environment
+     (ISODE), an openly available implementation of the upper layers of
+     the OSI protocol suite.  He was co-author of RFC1006 (ISO Transport
+     Services on top of the TCP), and was a member of the IFIP working
+     group committee whose efforts led to RFC987 (Mapping between X.400
+     and RFC822).  He is currently an advisor to the National Science
+     Foundation, serving on its Network Technical Advisory Group.  He is
+     also an adjunct Assistant Professor at the University of Delaware.
+     Rose received the Ph.D. degree in Information and Computer Science
+     from the University of California, Irvine, in 1984.

@@ -1,0 +1,912 @@
+% run this through SLiTeX with the appropriate wrapper
+
+\dotopic	{LOWER LAYER INFRASTRUCTURE}
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]		THE TRANSPORT SERVICE
+
+\item[PART II:]		THE TRANSPORT-SWITCH
+
+\item[PART III:]	ADDING A TRANSPORT-STACK
+
+\item[PART IV:]		``TYPICAL'' SITE CONFIGURATIONS
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A BIG ACKNOWLEDGEMENT}
+
+\begin{nrtc}
+\item	STEPHEN E.~KILLE OF UNIVERSITY COLLEGE LONDON
+
+\item	AND HIS PAPER
+    \begin{nrtc}
+    \item	An Interim Approach to Use of Network Addresses
+    \end{nrtc}
+
+\item	HAD A BIG IMPACT ON THE END-TO-END ABSTRACTIONS USED IN THE ISODE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{THE TRANSPORT SERVICE}\bf
+
+\begin{nrtc}
+\item	8072 ROUTINES
+
+\item	UTILITY ROUTINES
+
+\item	LISTENING ROUTINES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE BASICS}
+
+\begin{nrtc}
+\item	PUBLIC INCLUDE FILE: \verb"tsap.h"
+
+\item	PRIVATE INCLUDE FILE: \verb"tpkt.h"
+
+\item	LINT LIBRARY: \verb"llib-ltsap"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{8072 ROUTINES}\bf
+
+\begin{nrtc}
+\item	STRAIGHT-FORWARD MAPPING TO C API
+
+\item	PLUS SUPPORT FOR ASYNCHRONOUS CONNECTION ESTABLISHMENT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INITIATOR}
+
+\begin{quote}\small\begin{verbatim}
+int     TAsynConnRequest (calling, called, expedited, data, cc, qos, tc, td,
+                          async);
+
+int     TAsynRetryRequest (sd, tc, td);
+
+int     TAsynNextRequest (sd, tc, td);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INITIATOR (cont.)}
+
+\begin{quote}\small\begin{verbatim}
+struct TSAPconnect {
+    int     tc_sd;              /* TRANSPORT descriptor */
+
+    struct TSAPaddr tc_responding;/* address of peer responding */
+
+    int     tc_expedited;       /* EXPEDITED DATA ok */
+
+    int     tc_tsdusize;        /* largest atomic TSDU */
+
+    struct QOStype tc_qos;      /* quality of service */
+
+                                /* initial DATA from peer */
+#define TC_SIZE         32
+    int     tc_cc;              /*   length */
+    char    tc_data[TC_SIZE];   /*   data */
+};
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RESPONDER}
+
+\begin{quote}\small\begin{verbatim}
+int     TInit (vecp, vec, ts, td);
+
+int     TConnResponse (sd, responding, expedited, data, cc, qos, td);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RESPONDER (cont.)}
+
+\begin{quote}\small\begin{verbatim}
+struct TSAPstart {
+    int     ts_sd;              /* TRANSPORT descriptor */
+
+    struct TSAPaddr ts_calling; /* address of peer calling */
+    struct TSAPaddr ts_called;  /* address of peer called */
+
+    int     ts_expedited;       /* EXPEDITED DATA ok */
+
+    int     ts_tsdusize;        /* largest atomic TSDU */
+
+    struct QOStype ts_qos;      /* quality of service */
+
+                                /* initial DATA from peer */
+#define TS_SIZE         32
+    int     ts_cc;              /*   length */
+    char    ts_data[TS_SIZE];   /*   data */
+};
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DATA TRANSFER}
+
+\begin{quote}\small\begin{verbatim}
+int     TDataRequest (sd, data, cc, td);
+
+int     TWriteRequest (sd, uv, td);
+        /* e.g., uv[0]= SPCI, uv[1] = SSDU, uv[2] = NULL */
+
+int     TExpdRequest (sd, data, cc, td);
+
+int     TReadRequest (sd, tx, secs, td);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DATA TRANSFER (cont.)}
+
+\begin{quote}\small\begin{verbatim}
+struct TSAPdata {
+    int     tx_expedited;
+
+                                /* DATA from peer */
+#define TX_SIZE         16      /* EXPEDITED DATA only */
+    int     tx_cc;              /*   total length */
+    struct qbuf tx_qbuf;        /*   chained data */
+};
+#define TXFREE(tx)      QBFREE (&((tx) -> tx_qbuf))
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DISCONNECT}
+
+\begin{quote}\small\begin{verbatim}
+int     TDiscRequest (sd, data, cc, td);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DISCONNECT (cont.)}
+
+\begin{quote}\small\begin{verbatim}
+struct TSAPdisconnect {
+    int     td_reason;          /* reason for DISCONNECT */
+#define DR_NORMAL       (DR_BASE + 0)   /* NORMAL disconnect by SESSION
+                                           entity */
+    ...
+#define DR_FATAL(r)     ((r) < DR_PARAMETER)
+#define DR_OFFICIAL(r)  ((r) < DR_NETWORK)
+
+                                /* disconnect DATA from peer */
+#define TD_SIZE         64
+    int     td_cc;              /*   length */
+    char    td_data[TD_SIZE];   /*   data */
+};
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{UTILITY ROUTINES}\bf
+
+\begin{quote}\small\begin{verbatim}
+int     TSetIndications (sd, data, disc, td);
+
+int     TSelectMask (sd, mask, nfds, td);
+
+int     TSelectOctets (sd, nbytes, td);
+
+int     TGetAddresses (sd, initiating, responding, td);
+
+int     TSetManager (sd, fnx, td);
+
+char   *TErrString (c);
+
+extern char *tsapversion;
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+
+\begin{bwslide}
+\part*	{LISTENING ROUTINES}\bf
+
+\begin{nrtc}
+\item	PROVIDE AN ABSTRACTION TO DEAL WITH
+    \begin{nrtc}
+    \item	INCOMING CONNECTIONS
+
+    \item	ACTIVITY ON EXISTING CONNECTIONS
+
+    \item	QUEUED (NON-BLOCKING) WRITES TO NETWORK
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{START/STOP LISTENING}
+
+\begin{quote}\small\begin{verbatim}
+int     TNetListen (ta, td);
+
+int     TNetUnique (ta, td);
+
+int     TNetClose (ta, td);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WAIT FOR SOMETHING}
+
+\begin{quote}\small\begin{verbatim}
+int     TNetAcceptAux (vecp, vec, newfd, ta, nfds, rfds, wfds, efds, secs,
+                       td);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DISPATCH NEW PROCESS}
+
+\begin{nrtc}
+\item	\verb"iaed" DETERMINES WHICH PROGRAM TO INVOKE AND THEN CALLS
+\begin{quote}\small\begin{verbatim}
+int     TNetFork (vecp, vec, td);
+\end{verbatim}\end{quote}
+PRIOR TO DOING THE EXEC
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STATE SAVING/RESTORATION}
+
+\begin{quote}\small\begin{verbatim}
+int     TSaveState (sd, vec, td);
+
+int     TRestoreState (buffer, ts, td);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NON-BLOCKING WRITES}
+
+\begin{quote}\small\begin{verbatim}
+int     TSetQueuesOK (sd, onoff, td);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{THE TRANSPORT-SWITCH}\bf
+
+\begin{nrtc}
+\item	TRANSPORT STACKS
+
+\item	OSI COMMUNITIES
+
+\item	CONNECTION ESTABLISHMENT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE TRANSPORT-SWITCH (cont.)}
+
+\begin{nrtc}
+\item	THE FUNDAMENTAL END-TO-END ABSTRACTION IN THE ISODE
+
+\item	IT ALLOWS AN OSI APPLICATION TO BE NAIVE AS TO THE UNDERLYING
+	END-TO-END PROTOCOLS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{TRANSPORT STACKS}\bf
+
+\begin{nrtc}
+\item	A COMBINATION OF END-TO-END PROTOCOLS WHICH REALIZE
+	THE OSI TRANSPORT SERVICE
+
+\item	AN ``OFFICIAL'' STACK CONSISTS OF
+    \begin{nrtc}
+    \item	AN OSI TRANSPORT PROTOCOL (TP0--TP4)
+
+    \item	THE CORRESPONDING OSI NETWORK SERVICE (CONS or CLNS)
+    \end{nrtc}
+
+\item	OTHER COMBINATIONS ARE POSSIBLE, USING A TSCP
+    \begin{nrtc}
+    \item	e.g., THE RFC1006 METHOD
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SUPPORTED TRANSPORT STACKS}
+
+\vskip.15in
+\diagram[p]{figureL-1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CHOICE OF TRANSPORT STACKS}
+
+\begin{nrtc}
+\item	INTERSECTION OF
+    \begin{nrtc}
+    \item	COMPILE-TIME OPTIONS
+
+    \item	SETTING OF \verb"ts_stacks" TAILOR VARIABLE    
+\[\begin{tabular}{rl}
+\multicolumn{1}{c}{\bf Mnemonic}&
+		\multicolumn{1}{c}{\bf TS-Stack}\\
+\verb"tcp"&	RFC1006 over TCP/IP\\
+\verb"x25"&	TP0 over X.25\\
+\verb"tp4"&	TP4 over CLNP
+\end{tabular}\]
+    \end{nrtc}
+
+\item	THIS ALLOWS THE SAME BINARIES TO RUN ON HOSTS WITH DIFFERENT
+INTERFACES, e.g.,
+\begin{quote}\small\begin{verbatim}
+ts_stacks: tcp
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{OSI COMMUNITIES}\bf
+
+\begin{nrtc}
+\item	A COLLECTION OF HOSTS WITH
+    \begin{nrtc}
+    \item	THE SAME TS-STACK
+
+    \item	BASIC CONNECTIVITY    
+    \end{nrtc}
+
+\item	THE SHORT LIST:
+\[\begin{tabular}{rll}
+\multicolumn{1}{c}{\bf Mnemonic}&
+		\multicolumn{1}{c}{\bf Community}&
+					\multicolumn{1}{c}{\bf TS-stack}\\
+\verb"int-x25"&	the International X.25&	\verb"x25"\\
+\verb"janet"&	the JANET in the UK&	\verb"x25"\\
+\verb"internet"& the capital-I Internet&\verb"tcp"\\
+\verb"localTCP"& the TCP loopback address&
+					\verb"tcp"\\
+\verb"IXI"&	International X.25 Interconnect&
+					\verb"x25"
+\end{tabular}\]
+
+\item	ALL OF WHICH ARE ``INTERIM'' COMMUNITIES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CHOICE OF OSI COMMUNITIES}
+
+\begin{nrtc}
+\item	DEFAULTS TO ALL INTERIM COMMUNITIES PLUS \verb"realNS"
+
+\item	MAY BE CHANGED WITH \verb"ts_communities" TAILOR VARIABLE, e.g.,
+\begin{quote}\small\begin{verbatim}
+ts_communities: int-x25 internet
+\end{verbatim}\end{quote}
+
+\item	ORDERING IS IMPORTANT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{TRANSPORT BRIDGING}\bf
+
+\begin{nrtc}
+\item	HOW CAN TWO HOSTS COMMUNICATE IF THEY ARE IN DIFFERENT COMMUNITIES
+
+\item	IF A THIRD HOST SHARES COMMUNITES, IT CAN ACT AS LEVEL-4 RELAY (ugh!)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TS-BRIDGES}
+
+\begin{nrtc}
+\item	ALTHOUGH MANY DIFFERENT TS-STACKS EXIST,
+	THEY ALL PROVIDE THE SAME TRANSPORT SERVICE
+
+\item	SO, IT IS STRAIGHT-FORWARD TO BUILD A BOX THAT:
+    \begin{nrtc}
+    \item	KNOWS NOTHING ABOUT TRANSPORT PROTOCOLS, BUT
+
+    \item	KNOWS HOW TO USE THE RELATIVELY SIMPLE OSI TRANSPORT SERVICE
+    \end{nrtc}
+
+\item	A TS-BRIDGE ``COPIES'' SERVICE PRIMITIVES FROM ONE TS-STACK TO THE
+	OTHER, e.g.,
+    \begin{nrtc}
+    \item	UPON RECEIVING A T-CONNECT.INDICATION PRIMITIVE FROM ONE
+		TS-STACK,
+
+    \item	IT ISSUES A T-CONNECT.REQUEST PRIMITIVE TO THE OTHER TS-STACK
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TS-BRIDGES (cont.)}
+
+\vskip.5in
+\diagram[p]{figureL-2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE PROBLEMS OF LEVEL-4 RELAYS}
+
+\begin{nrtc}
+\item	THE TS-BRIDGE MAINTAINS STATE AS TO THE EXISTING CONNECTIONS
+
+\item	EACH TS-STACK PROVIDES A CHECKSUM,
+	NEITHER OF WHICH IS REALLY END-TO-END
+    \begin{nrtc}
+    \item	(CHECKSUM AT EITHER TRANSPORT OR NETWORK SERVICE)
+    \end{nrtc}
+
+\item	THIS ALSO DEFEATS TRANSPORT-LEVEL ENCRYPTION
+
+\item	\underline{MAY} THWART SOPHISTICATED BACK-PRESSURE TECHNIQUES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AND WHAT ABOUT?}
+
+\begin{nrtc}
+\item	ACCOUNTING
+
+\item	ACCESS CONTROL
+
+\item	LOAD BALANCING
+
+\item	CONCATENATION OF TS-BRIDGES
+
+\item	and so on$\ldots$
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{IDENTIFYING TS-BRIDGES}
+
+\begin{nrtc}
+\item	DEFINED WITH THE \verb"tsb_communities" TAILOR VARIABLE, e.g.,
+\begin{quote}\small\begin{verbatim}
+tsb_communities: internet Int-X25(80)=31344152401010+PID+03018000
+\end{verbatim}\end{quote}
+
+\item	WHICH IS A SUBSET OF \verb"ts_communities"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{HOW TO COMMUNICATE FINAL\\ DESTINATION ADDRESS}
+
+\begin{nrtc}
+\item	ENCODE THE NETWORK ADDRESS AND TRANSPORT SELECTOR AS AN OCTET STRING,
+    \begin{nrtc}
+    \item	(USING SOME ENCODING FORMAT)
+    \end{nrtc}
+	CALL THIS THE NEW TRANSPORT SELECTOR
+
+\item	USE THE NETWORK ADDRESS OF THE TS-BRIDGE FOR THE REMAINING STEPS
+
+\item	WHEN TS-BRIDGE RECEIVES CONNECTION,
+	IT SIMPLY DECODES TRANSPORT SELECTOR TO FIND ADDRESS OF
+	DESTINATION END-SYSTEM
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TS-BRIDGE ADDRESSING\\ (KILLE'S STRING FORMAT)}
+
+\vskip.5in
+\diagram[p]{figureL-3}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TS-BRIDGE ADDRESSING\\ (CO/CL WORKSHOP FORMAT)}
+
+\vskip.5in
+\diagram[p]{figureL-4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{CONNECTION ESTABLISHMENT}\bf
+
+\begin{nrtc}
+\item	AT HIGHEST LEVEL, PRESENTATION ADDRESS IS DETERMINED
+    \begin{nrtc}
+    \item	USUALLY FROM OSI DIRECTORY
+    \end{nrtc}
+
+\item	NSAPs ARE CONVERTED TO \verb"NSAPaddr" TO DETERMINE
+    \begin{nrtc}
+    \item	TS-STACK (\verb"na_stack")
+
+    \item	COMMUNITY (\verb"na_community")
+    \end{nrtc}
+    BASED ON NSAP PREFIXES FOUND IN TABLE OF KNOWN COMMUNITIES
+
+\item	UNKNOWN NSAPs ARE MARKED AS
+    \begin{nrtc}
+    \item	TS-STACK: \verb"tp4"
+
+    \item	COMMUNITY: \verb"realNS" 
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ADDRESS TRANSFORMATIONS}\small
+
+\[\begin{tabular}{|l|lll|}
+\hline
+\multicolumn{1}{|c|}{\empty}&
+	\multicolumn{3}{c|}{\tt NSAPaddr}\\
+\multicolumn{1}{|c|}{\bf network address}&
+	\multicolumn{1}{c}{\bf TS-stack}&
+		\multicolumn{1}{c}{\bf community}&
+			\multicolumn{1}{c|}{\bf value}\\[0.05in]
+\hline
+4700602001234&
+	tp4&	realNS&	4700602001234\\[0.05in]
+\hline
+540072872203010000000006&
+	tcp&	Internet&
+			IP 10.0.0.6\\[0.05in]
+\hline
+54007287220223137039150000002340555&
+	x25&	Janet&	DTE 00002340555\\
+&	&	&	CUDF 892796\\
+\hline
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AT TRANSPORT LAYER}
+
+\begin{nrtc}
+\item	NETWORK ADDRESSES ARE ORDERED ACCORDING TO \verb"ts_communities"
+    \begin{nrtc}
+    \item	BY LOOKING AT \verb"na_community" FIELD
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FOR EACH ADDRESS}
+
+\begin{nrtc}
+\item	CHECK IS MADE TO SEE IF COMMUNITY IS SERVED BY TS-BRIDGE
+    \begin{nrtc}
+    \item	IF SO, NEW TADDR IS CONSTRUCTED
+    \end{nrtc}
+
+\item	NOW SEE IF TS-STACK IS ENABLED
+    \begin{nrtc}
+    \item	BY LOOKING AT \verb"na_stack" FIELD
+    \end{nrtc}
+    IF NOT, TRY NEXT ADDRESS
+
+\item	NOW INVOKE PROTOCOL MACHINE FOR TS-STACK
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{ADDING A TS-STACK}\bf
+
+\begin{nrtc}
+\item	INTERFACING TO NATIVE COTS IMPLEMENTATION
+    \begin{nrtc}
+    \item	e.g., BSD/OSI SOCKETS, SunLink OSI, TLI, etc.
+    \end{nrtc}
+
+\item	PIGGY-BACK ONTO INTERNAL TP0-ENGINE (TSCP)
+    \begin{nrtc}
+    \item	e.g., RFC1006, X.25
+    \end{nrtc}
+
+\item	ONLY THE FIRST WILL BE CONSIDERED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{NATIVE COTS INTERFACE}\bf
+
+\begin{nrtc}
+\item	DEFINE COMPILE-TIME SYMBOL, e.g., \verb"XXX_TP4"
+    \begin{nrtc}
+    \item	WHICH IS A SUB-OPTION TO \verb"#ifdef TP4"
+    \end{nrtc}
+    PUT THIS IN YOUR \verb"config.h" FILE
+
+\item	CREATE NEW FILE CONTAINING DRIVER, e.g., \verb"tsap/ts2xxx.c"
+    \begin{nrtc}
+    \item	ADD THIS TO \verb"tsap/Makefile"    
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{h/tp4.h}
+
+\begin{nrtc}
+\item	MODIFY FOR HEADER FILE INCLUSION
+
+\item	AND OTHER USEFUL DEFINITIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{h/tpkt.h}
+
+\begin{nrtc}
+\item	ADD UNIQUE VALUE FOR \verb"NT_XXX"
+    \begin{nrtc}
+    \item	USED FOR STATE SAVING/RESTORATION
+    \end{nrtc}
+    e.g.,
+\begin{quote}\small\begin{verbatim}
+#define NT_XXX     'A'
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{tsap/tsaplisten.c}
+
+\begin{quote}\small\begin{verbatim}
+static int  tp4listen (lb, ta, td);
+
+static int  tp4accept1 (lb, td);
+
+static int  tp4accept2 (lb, vecp, vec, td);
+
+static int  tp4unique (ta, td);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{tsap/tsaprespond.c}
+
+\begin{nrtc}
+\item	ADD CASE FOR \verb"NT_XXX" TO \verb"TInit"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{tsap/ts2xxx.c\\ UPPER HALF}
+
+\begin{quote}\small\begin{verbatim}
+/* all routines are accessed indirectly through 
+   dispatch vectors... */
+
+static int  TConnect (tb, expedited, data, cc, td);
+static int  TRetry (tb, async, tc, td);
+
+static int  TStart (tb, cp, ts, td);
+static int  TAccept (tb, responding, data, cc, qos, td);
+
+static int  TWrite (tb, uv, expedited, td);
+static int  TDrain (tb, td);
+static int  TRead (tb, tx, td, async, oob);
+static int  TDisconnect (tb, data, cc, td);
+static int  TLose (tb, reason, td);
+
+/* be sure to update td if call returns NOTOK... */
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{tsap/ts2xxx.c\\ LOWER HALF}
+
+\begin{quote}\small\begin{verbatim}
+int     tp4open (tb, local_ta, local_na, remote_ta, remote_na, td,
+                 async);
+static int  retry_tp4_socket (tb, td);
+
+int     tp4init (tb);
+
+int     start_tp4_server (local_ta, backlog, opt1, opt2, td);
+int     join_tp4_client (fd, remote_ta, td);
+char   *tp4save (fd, td);
+int     tp4restore (tb, buffer, td);
+
+static  int  gen2tp4 (generic, specific);
+int     tp42gen (generic, specific);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{``TYPICAL'' SITE CONFIGURATIONS}\bf
+
+\begin{nrtc}
+\item	INTERNET-CONNECTED HOST
+
+\item	PDN-CONNECTED HOST
+
+\item	HOSTS ON OTHER NETWORKS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DATABASES}
+
+\begin{nrtc}
+\item	\verb"isomacros" DEFINITIONS OF COMMUNITY NAMES
+    \begin{nrtc}
+    \item	(DISCUSSED LATER)
+    \end{nrtc}
+
+\item	\verb"isotailor" TAILORING FILE
+\begin{quote}\small\begin{verbatim}
+ts_stacks:       tcp x25 tp4 all
+ts_interim:      name ...
+ts_communities:  int-x25 janet internet realNS localTCP IXI all
+tsb_communities: name naddr ...
+tsb_default_address: naddrs
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{INTERNET-CONNECTED HOST}\bf
+
+\begin{nrtc}
+\item	COMPILE WITH \verb"TCP" OPTION
+
+\item	TAILORING DEFAULTS TO
+\begin{quote}\small\begin{verbatim}
+ts_stacks: tcp
+ts_communities: internet localTCP
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TSB TO INTERNATIONAL-X.25 COMMUNITY}
+
+\begin{nrtc}
+\item	CLIENT TAILORING:
+\begin{quote}\small\begin{verbatim}
+ts_communities: internet int-x25
+tsb_communities: int-x25 Internet=foo.bar+17004
+\end{verbatim}\end{quote}
+
+\item	SERVER TAILORING:
+\begin{quote}\small\begin{verbatim}
+tsb_default_address: Internet=foo.bar+17004
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{PDN-CONNECTED HOST}\bf
+
+\begin{nrtc}
+\item	COMPILE WITH \verb"X25" OPTION
+
+\item	TAILORING DEFAULTS TO
+\begin{quote}\small\begin{verbatim}
+ts_stacks: x25
+ts_communities: int-x25 janet ixi
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TSB TO INTERNET COMMUNITY}
+
+\begin{nrtc}
+\item	CLIENT TAILORING:
+\begin{quote}\small\begin{verbatim}
+ts_communities: int-x25 internet
+tsb_communities: internet  Int-X25(80)=23426020017299+PID+03018000
+\end{verbatim}\end{quote}
+
+\item	SERVER TAILORING:
+\begin{quote}\small\begin{verbatim}
+tsb_default_address: Int-X25(80)=23426020017299+PID+03018000
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+
+\begin{bwslide}
+\part*	{HOSTS ON OTHER NETWORKS}\bf
+
+\begin{nrtc}
+\item	NEED TO DEFINE A NEW OSI COMMUNITY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DEFINING A NEW OSI COMMUNITY}
+
+\begin{nrtc}
+\item	EDIT THE \verb"support/macros.local" FILE:
+\begin{quote}\small\begin{verbatim}
+name    nsap-prefix
+\end{verbatim}\end{quote}
+	e.g.,
+\begin{quote}\small\begin{verbatim}
+psinet  NS+47000580fffc00
+\end{verbatim}\end{quote}
+
+\item	\verb"# ./make macros"
+
+\item	SINGLE-HOMED HOSTS HAVE TAILORING OF
+\begin{quote}\small\begin{verbatim}
+ts_interim: psinet
+ts_communities: psinet
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}

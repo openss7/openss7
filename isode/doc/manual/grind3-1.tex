@@ -1,0 +1,21 @@
+\File{grind3\-1.c},{22:23},{Jun 12 1988}
+\L{\LB{\K{\#include} \<isode\/psap.h\>}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{register} \K{struct} PE pe, p;}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{for}\K{for} (p = first\_member (pe); p; p = next\_member (pe, p))}}
+\L{\LB{\Proc{switch}    \K{switch} (PE\_ID (p \-\> pe\_class, p \-\> pe\_id)) \{}}
+\L{\LB{}\Tab{8}{\K{case} PE\_ID (PE\_CLASS\_UNIV, PE\_DEFN\_IA5S):}}
+\L{\LB{}\Tab{8}{    ...}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} PE\_ID (PE\_CLASS\_UNIV, PE\_DEFN\_T61S):}}
+\L{\LB{}\Tab{8}{    ...}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{...}}
+\L{\LB{    \}}}
+\ProcCont{for}\L{\LB{}}
+\L{\LB{...}}

@@ -1,0 +1,10 @@
+\File{schema.py},{04:49},{Oct  6 1989}
+\L{\LB{\Proc{TreeStructureSyntax}TreeStructureSyntax ::= \K{SET} \{}}
+\L{\LB{    mandatoryObjectClasses [1] \K{SET} \K{OF} \K{OBJECT} \K{IDENTIFIER},}}
+\L{\LB{    optionalObjectClasses [2] \K{SET} \K{OF} \K{OBJECT} \K{IDENTIFIER} \K{OPTIONAL},}}
+\L{\LB{    permittedRDNs [3] \K{SET} \K{OF} \K{SET} \K{OF} AttributeType \}}}
+\L{\LB{    }}
+\L{\LB{\Proc{TreeStructure}TreeStructure ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} TreeStructureSyntax}}
+\L{\LB{    \K{MULTI} \K{VALUE}}}
+\L{\LB{}}

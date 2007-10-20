@@ -1,0 +1,13 @@
+.PS
+.ps 20
+## figure 16
+boxwid = (5 * .75) * boxwid
+boxht  = 1.5 * boxht
+##
+B2:     box shaded "\normalsize PRESENTATION"
+B3:     box with .n at (B2.s.x, B2.s.y-lineht) "\normalsize SESSION"
+B4:     box shaded with .n at (B3.s.x, B3.s.y-lineht) "\normalsize TRANSPORT"
+        line from B2.s to B3.n "\ dialogues" ljust
+        line from B3.s to B4.n "\ circuits" ljust
+##
+.PE
