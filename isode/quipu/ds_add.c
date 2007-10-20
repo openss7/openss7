@@ -67,6 +67,9 @@ int retval;
 int authp;
 extern int read_only;
 extern int	entry_cmp();
+char add_edbinfo = FALSE;
+Attr_Sequence newas;
+		
 
 	DLOG (log_dsap,LLOG_TRACE,("ds_add"));
 
@@ -204,6 +207,11 @@ extern int	entry_cmp();
 	ptr->e_name = rdn_cpy (dn->dn_rdn);
 	ptr->e_attributes = as_cpy (arg->ada_entry);
  
+	/* Add QUIPU object to object class -> may not be a QUIPU DUA ! */
+	newas = as_comp_new (AttrT_cpy(at_objectclass),
+		 str2avs(QUIPUOBJECT,at_objectclass),NULLACL_INFO);
+	ptr->e_attributes = as_merge (ptr->e_attributes,newas);
+
 	modify_attr (ptr,binddn);
 
 	DLOG (log_dsap,LLOG_TRACE,("add - unravel"));
@@ -260,8 +268,6 @@ extern int	entry_cmp();
 		/* Turn leaf into non leaf, and add child */
 		/* Temporary until managemnet tools do it */
 
-		Attr_Sequence newas;
-		
 		if (entryptr->e_data != E_DATA_MASTER) {
 			DN dn_found;
 			struct dn_seq	* dn_stack = NULLDNSEQ;

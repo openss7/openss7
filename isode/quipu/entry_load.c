@@ -198,8 +198,9 @@ char *cp;
         free (cp);
 
         nptr = (aps->ps_base + strlen (mapdir));
-        aps->ps_ptr = nptr;
 #endif /* TEMPNAM */
+
+	aps->ps_ptr = aps->ps_base + strlen(aps->ps_base);
 
 	DLOG(log_dsap,LLOG_DEBUG,("mapped name %s",aps->ps_base));
 

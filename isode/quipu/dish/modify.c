@@ -81,6 +81,7 @@ char          **argv;
 	DN		moddn;
 	char	       *home;
 	RDN		new_rdn;
+	char		force_del_draft = FALSE;
 
 struct  list_element   *start = 0 ;
 struct  list_element   *last ;
@@ -247,6 +248,16 @@ struct  list_element   *l_temp ;
 	entry_ptr->e_attributes = get_attributes (fd);
 #endif
 
+	/* Fix ref count of all file attrs */
+	for (as = entry_ptr->e_attributes;as != NULLATTR; as = as->attr_link) {
+	   AV_Sequence avs;
+           for (avs = as->attr_value; avs != NULLAV; avs=avs->avseq_next)
+	       if (avs->avseq_av.av_syntax == AV_FILE) {
+		 ((struct file_syntax *)(avs->avseq_av.av_struct)) -> fs_ref++;
+		 force_del_draft = TRUE;
+	       }
+        }
+		
 	(void) fclose (fd);
 	if (parse_status != 0)
 		return;
@@ -354,6 +365,8 @@ struct  list_element   *l_temp ;
 	while (ds_modifyentry (&mod_arg, &error) != DS_OK) {
 		if (dish_error (OPT, &error) == 0) {
 			entry_free (entry_ptr);
+			if (force_del_draft)
+				make_old (fname,draft_flag);
 			return;
 		}
 		mod_arg.mea_object = error.ERR_REFERRAL.DSE_ref_candidates->cr_name;

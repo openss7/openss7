@@ -541,9 +541,13 @@ extern struct qbuf *Hqb;
 extern struct qbuf *Fqb;
 extern struct qbuf *Qb;
 
+#ifdef USE_QBUF2PE_FAST
+	/*  This is a faster version of qbuf2pe, but it has a memory leak. */
 #define qbuf2pe(qb, len, result) (Byteno = 0, Hqb = qb, \
                                         Fqb = (Qb = (qb) -> qb_forw), \
                                         qbuf2pe_f (result))
+#endif
+
 PE	qbuf2pe_f ();
 char   *qb2str ();
 struct qbuf *str2qb ();

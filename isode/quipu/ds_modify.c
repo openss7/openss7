@@ -268,23 +268,6 @@ extern AttributeType at_dsa_control ;
 		}
 	}
 
-	/* check the last value of an attribute has not been removed */
-	for (as = entryptr->e_attributes; as!=NULLATTR; as=as->attr_link)
-		if (as->attr_value == NULLAV) {
-			error->dse_type = DSE_ATTRIBUTEERROR;
-			error->ERR_ATTRIBUTE.DSE_at_name = 
-				get_copy_dn (entryptr);
-			error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_what =
-				DSE_AT_CONSTRAINTVIOLATION;
-			error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_type = 
-				AttrT_cpy (as->attr_type);
-			error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_value = 
-				NULLAttrV;
-			error->ERR_ATTRIBUTE.DSE_at_plist.dse_at_next = 
-				DSE_AT_NOPROBLEM;
-			entry_free (entryptr);
-			return (DS_ERROR_REMOTE);
-		}
 	
 	DATABASE_HEAP;
 	modify_attr (entryptr,binddn);

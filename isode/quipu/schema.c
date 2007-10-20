@@ -108,6 +108,23 @@ extern OID alias_oc;
 		}
 	}
 
+	/* check the each attribute has at least one value */
+	for (at = eptr->e_attributes; at!=NULLATTR; at=at->attr_link)
+		if (at->attr_value == NULLAV) {
+			error->dse_type = DSE_ATTRIBUTEERROR;
+			error->ERR_ATTRIBUTE.DSE_at_name = 
+				get_copy_dn (eptr);
+			error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_what =
+				DSE_AT_CONSTRAINTVIOLATION;
+			error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_type = 
+				AttrT_cpy (at->attr_type);
+			error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_value = 
+				NULLAttrV;
+			error->ERR_ATTRIBUTE.DSE_at_plist.dse_at_next = 
+				DSE_AT_NOPROBLEM;
+			return (DS_ERROR_REMOTE);
+		}
+
 	/* now check 'must contain' attributes */
 	for (; avs != NULLAV; avs = avs->avseq_next) {
 	    oc = (objectclass *) avs->avseq_av.av_struct;

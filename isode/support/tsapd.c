@@ -332,9 +332,18 @@ char  **vec;
 		== NULL) {
 #else
     for (is = iae; is < iz; is++)
+	
+#if 0
+	/* THIS doesn't work - JPO */
 	if (tsap_addr_cmp (&is -> is_addr, &ts -> ts_called) == OK)
 	    break;
-
+#else
+        if (is -> is_addr.ta_selectlen == ts -> ts_called.ta_selectlen
+	    && bcmp (is -> is_addr.ta_selector,
+		     ts -> ts_called.ta_selector,
+		     is -> is_addr.ta_selectlen) == 0)
+	    break;
+#endif
     if (is >= iz) {
 #endif
 	    (void) sprintf (buffer, "OSI service tsap/%s not found",

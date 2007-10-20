@@ -65,6 +65,24 @@ static pull_up_result ();
 static edb_start ();
 static edb_continue ();
 
+#ifdef USE_DSA_WAIT
+
+/*
+dsa_wait() causes problems sometimes -> it is not re-entrant.
+If the connection we are serving fails, then we free the oper struct
+we are currently using.
+Easiest solution is to remove the dsa_wait() calls.
+But eventually need to work out	how to put them back.  Without then the 
+blocking during an EDB update will be worse.
+
+Also need to look as dsa_wait() calls in ds_search().
+
+*/
+
+
+#endif
+
+
 char * edbtmp_path = NULLCP;
 
 #ifndef TURBO_DISK
@@ -411,8 +429,9 @@ int		  success;
 		if(dn || isroot)
 		    break;
 
+#ifdef USE_DSA_WAIT
 		(void) dsa_wait (0);	/* accept any results of previous ops */
-
+#endif
 	}
 	avs_free (avs_head);
 
@@ -702,8 +721,9 @@ char got_subtree = TRUE;
 	}
 
 
+#ifdef USE_DSA_WAIT
 	(void) dsa_wait (0);	/* progress any other connections before writing EDB */
-
+#endif
 	if (eptr->e_children == NULLAVL)
 		slave_edbs++;
 
@@ -916,8 +936,9 @@ out:;
 	}
 
 	/* This is a slow process, take a look at the network... */
+#ifdef USE_DSA_WAIT
 	(void) dsa_wait (0);
-
+#endif
 	/* write PE to file */
 
 	/* Make file name - this is where we could be clever an pick up
@@ -1010,7 +1031,9 @@ out:;
 	edbops = nextop;
 
 	/* This is a slow process, take a look at the network... */
+#ifdef USE_DSA_WAIT
 	(void) dsa_wait (0);
+#endif
 
 	pe_free (pe);
 
@@ -1284,7 +1307,9 @@ PE pe, npe, spe, lpe, zpe;	/* what useful names ! */
 
 	pe_free(pe);
 
+#ifdef USE_DSA_WAIT
 	(void) dsa_wait (0);	/* accept any results of previous ops */
+#endif
 
 	return TRUE;
 }
