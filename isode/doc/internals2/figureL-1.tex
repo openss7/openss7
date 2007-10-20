@@ -1,0 +1,55 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \special{pa 0 500}%
+    \special{pa 0 0}%
+    \special{pa 750 0}%
+    \special{pa 750 500}%
+    \special{pa 0 500}%
+    \special{fp}%
+    \rlap{\kern  0.375in\lower 0.291in\hbox to 0pt{\hss TP0\hss}}%
+    \special{pa 0 1000}%
+    \special{pa 0 500}%
+    \special{pa 750 500}%
+    \special{pa 750 1000}%
+    \special{pa 0 1000}%
+    \special{fp}%
+    \rlap{\kern  0.375in\lower 0.791in\hbox to 0pt{\hss X.25\hss}}%
+    \special{pa 1250 500}%
+    \special{pa 1250 0}%
+    \special{pa 2000 0}%
+    \special{pa 2000 500}%
+    \special{pa 1250 500}%
+    \special{fp}%
+    \rlap{\kern  1.625in\lower 0.291in\hbox to 0pt{\hss TP4\hss}}%
+    \special{pa 1250 1000}%
+    \special{pa 1250 500}%
+    \special{pa 2000 500}%
+    \special{pa 2000 1000}%
+    \special{pa 1250 1000}%
+    \special{fp}%
+    \rlap{\kern  1.625in\lower 0.791in\hbox to 0pt{\hss CLNP\hss}}%
+    \special{pa 2500 500}%
+    \special{pa 2500 0}%
+    \special{pa 3250 0}%
+    \special{pa 3250 500}%
+    \special{pa 2500 500}%
+    \special{fp}%
+    \rlap{\kern  2.875in\lower 0.291in\hbox to 0pt{\hss \xx RFC1006\hss}}%
+    \special{pa 2500 1000}%
+    \special{pa 2500 500}%
+    \special{pa 3250 500}%
+    \special{pa 3250 1000}%
+    \special{pa 2500 1000}%
+    \special{fp}%
+    \rlap{\kern  2.875in\lower 0.708in\hbox to 0pt{\hss TCP\hss}}%
+    \rlap{\kern  2.875in\lower 0.874in\hbox to 0pt{\hss IP\hss}}%
+    \kern  3.251in
+  }\vss}%
+  \kern  1.001in
+}

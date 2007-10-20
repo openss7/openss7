@@ -1,0 +1,100 @@
+% run this through LaTeX
+
+\input lcustom
+
+\documentstyle[12pt,sfwmac,tgrind,twoside]{report}
+
+\newcount\volnum
+\volnum=1
+\input manual
+
+\pagenumbering{roman}
+
+\begin{document}
+
+\readauxfiles
+
+\title{{\huge The ISO\\ Development Environment:\\
+	User's Manual}\vskip 1.5em
+	\LARGE\sl Volume 1: Application Services}
+
+\author{
+     Marshall T.~Rose\\
+     Performance Systems International, Inc.\\
+\and 
+     Julian~P.~Onions\\
+     X-Tel Services Ltd\\
+\and 
+     Colin~J.~Robbins\\
+     X-Tel Services Ltd\\
+}
+
+\date{\vskip 2em
+        \ifdraft \versiondate/\\ \tt Draft Version \versiontag/
+	\else \today\\
+	(Version \isodevrsn/)\fi
+}
+
+\maketitle
+\newpage
+
+\thispagestyle{empty}
+\setcounter{page}{0}
+\mbox{}
+\newpage
+
+\tableofcontents
+\footnotetext[0]{\hskip -\parindent
+This document (version \versiontag/)
+was \LaTeX set \today\ with \fmtname\ v\fmtversion.}
+
+\listoftables
+
+\listoffigures
+
+\include{preface}
+
+\newpage
+\ifodd\value{page} \else
+    \mbox{}
+    \newpage
+\fi
+\pagenumbering{arabic}
+
+\part	{Introduction}
+\include{introduction}
+
+\part	{Application Services}
+\include{acsap}
+\include{rosap}
+\include{rtsap}
+
+\part	{Data Services}
+\include{psap}
+
+\part	{Databases}
+\include{aliases}
+\include{entities}
+\include{macros}
+\include{objects}
+\include{defining}
+
+\part	{Appendices}
+
+\appendix
+\include{appendix2}
+
+\bibliography{bcustom,sfwdoc,networking}
+\bibliographystyle{alpha}
+
+\input volume1.ind
+
+\clearpage
+\ifodd\value{page} \else
+    \mbox{}
+    \newpage
+\fi
+
+\typeout{you can usually ignore the message about Label(s) may have changed}
+
+\end{document}

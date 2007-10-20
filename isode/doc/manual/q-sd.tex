@@ -1,0 +1,271 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter {SD}
+\label{sd}
+
+SD is a simple directory user agent for X.500 directory services.
+
+SD supports the following directory operations:
+\begin{itemize}
+\item read
+\item list
+\item search
+\end{itemize}
+
+SD is limited in it's flexibility and does not allow modification of entries.
+If you want to use the full power of X.500 you should use the DISH interface 
+described in Chapter~\ref{dish}.
+
+SD is curses based, and splits the users screen up into a number of
+small areas called ``widgets''.  Each widget is used to enter information.
+
+\section {Types of Widget}
+
+There are various types of ``widget'' used by the SD program, these are
+described in the following sections.
+
+Each widget (except label widgets) have an identification
+``letter'' associated with them,
+this is indicated by the left most character in the widget, for example,
+the widget below is identified by the letter ``\tt b\rm ''.
+
+\begin{tabular}{|l|}
+\hline
+\tt h help\ \ \\
+\hline
+\end{tabular}
+
+\subsection {Label Widgets}
+Label widgets are used to simply write information to the screen, they do not 
+accept any form of input.
+
+\subsection {Command Widgets}
+A command widget is used to make the program take some kind of action, such as
+send a {\em list} operation to the directory,
+or to change the set of widgets displayed.
+  
+To issue the command type the letter indicated in
+the widget. 
+
+\subsection {Dialog Widgets}
+
+Dialog widgets are used to get information from the user.
+To use a dialog widget, press the letter associated with the widget.
+Any further input from the keyboard will be entered into the widget,
+a ``return'' character is used to end the input.
+
+\subsection {Toggle Widgets}
+
+Toggle widgets are used to select one of a set of pre-determined values.
+Simply enter the widget letter, and the value will change the next value in
+the circular list.
+
+\section {Using SD}
+
+The SD interface is invoked with the \pgm{sd} command.  
+Help is given at any stage by typing ``\tt ?\rm '', type ``\tt q\rm '' to quit.
+
+\subsection {Main Options}
+The ``main options'' set of widgets,
+presents the users with {\em quit, help, list, widen, history, search for} and
+{\em goto} commands.
+
+The {\em search area} label widget informs the user of the currently visited
+directory entry.
+All directory operations are performed relative to the current {\em search
+area}.
+
+\subsection {List}
+
+The {\em list} operation causes SD to list a limited number of entries below
+the {\em search area}.
+The results are displayed in an enumerated list.
+
+\subsection {Search For}
+
+The {\em search for} command requires the user to enter a {\em search value}
+after invocation.
+The {\em search value} can be a single filter item or a value based on the 
+current search type, 
+displayed in the {\em type} label widget.
+In general a value based on the current type is used.
+For example if the current type is ``Person'' a suitable value might be
+``findlay'' or ``nahajski'',
+or if the current type is ``Department'' then a suitable value might be
+``Computer Centre''.
+
+The attribute type is selected with the {\em type} toggle widget.
+
+Any entries that match the given information are displayed in an enumerated
+list.
+If a single match is made then the contents of that entry are displayed
+and it also becomes the current {\em search area},
+assuming that it is a non-leaf entry.
+
+\subsection {Go To Number}
+
+The {\em go to number} operation allows the user to visit and read a listed
+entry (lists can be displayed as a result of {\em list} or {\em search}
+operations).
+To visit and view a listed entry,
+simply type in the number of the entry directly.
+
+\subsection {Scrolling Lists}
+
+In order to simplify viewing of long lists of entry names a simple scrollbar
+feature is provided.
+
+The scrollbar is displayed on the left side of the viewing area.
+The entries currently being viewed are represented by the block of ``*''
+characters, 
+the length of the complete scrollbar represents the length of the entire
+list.
+
+To scroll downwards press the ``['' key,
+to scroll upwards press the ``]'' key.
+
+\subsection {Help}
+
+The {\em help} command invokes a set of command widgets.
+Each command will bring up help text concerning the specified topic,
+e.g., the {\em search for} operation.
+
+\section {Configuration of SD}
+
+SD can be configured on a system-wide or per-user basis.
+SD installs system default files into a directory called \file{sd/duaconfig/}
+under \verb+ISODE+'s ETCDIR.
+
+Per-user configuration files other than \file{.duarc},
+must be held under a directory \file{.duaconfig/} 
+contained in a user's home directory.
+
+The SD configuration files are: 
+\begin{verbatim}
+<CONFIGDIR>/readTypes,
+<CONFIGDIR>/duaconfig/filterTypes/Type_*,
+<CONFIGDIR>/duaconfig/typeDefaults.
+\end{verbatim}
+
+\subsection {The .duarc file}
+
+The \file{.duarc} file is analogous to the \file{.quipurc} file for DISH
+(see Section~\ref{quipurc}),
+though less extensive in the number and flexibility of options provided.
+It has the following format:
+
+\begin{verbatim}
+flag: value
+\end{verbatim}
+
+The following flags are currently recognised:
+
+\begin{describe}
+
+\item [\verb+username+:] The name of the user to bind as.
+
+\item [\verb+password+:] The password to use when binding. For this reason care
+should be taken to ensure your \file{.duarc} file is not publicly readable.
+
+\item [\verb+service+:] A list of default service control flags
+(as defined in Section~\ref{dish_serv}).
+
+\item [\verb+dsap+:] This can be followed by one of the dsaptailor options
+described in Section~\ref{dua:tailor}.\index{dsaptailor}
+
+\item [\verb+isode+:]
+This can be followed by one of the ISODE tailor options
+described in \volone/ of this manual.
+
+\item [\verb+history+:]
+This can be followed by a number that specifies the number of entry names
+to be maintained in the history buffer.
+
+\item [\verb+prefergreybook+:]
+For those who prefer grey book mail address format.
+This takes values of TRUE or FALSE.
+
+\end{describe}
+
+\subsection {The readTypes file}
+
+The file \file{readTypes} contains a list of attributes that are to be read for
+entry display.
+The format of this file is;
+\begin{quote}\small\begin{verbatim}
+"quotedAttributeName" numericOid
+\end{verbatim}\end{quote}
+an example line then being
+\begin{quote}\small\begin{verbatim}
+"photo"         0.9.2342.19200300.100.1.7
+\end{verbatim}\end{quote}
+
+This format was chosen as it is the same format as the output from the OIDDUMP
+utility provided with ISODE.
+
+\subsection {The filterTypes files}
+	
+SD searches are based upon a complex filter,
+e.g., the default filter for the type {\em Person} is:
+\begin{verbatim}
+objectClass=person AND (cn~=* OR sn~=* OR title~=*)
+\end{verbatim}
+Where \* represents a value supplied at search
+time.
+
+The directory \file{filterTypes/} contains a set of files,
+each with a prefix \file{Type\_},
+describing the set of such abstract types used in SD.
+The set of contained files may be edited or added to.
+
+The syntax used in these files is shown in the example below:
+
+\begin{verbatim}
+<filter_type> ::= <filter_name> <filter>
+<name> ::= "name:" <asciistring>
+<filter> ::= <filter_item> | <assertion>
+<assertion> ::= "(" <filt_type> <filter> <filter> 
+                                         <filter_list> ")"
+<filter_list> ::= <filter> <filter_list> | <filter> | NULL
+<filter> ::= <filter_item> | <assertion>
+<filter_item> ::= "(" NUMERIC_OID <match_type> <value> ")"
+<filt_type> ::= "&" | "|"
+<match_type> ::= "=" | "~=" | "%="
+<value> ::= "*" | STRING
+<comment> ::= "#" STRING
+\end{verbatim}
+
+Where the symbol ``~='' represents approximate match,
+``\%='' represents substring match and ``='' represents exact match.
+The ``*'' character for value represents a value supplied at search time.
+
+As an example,
+the file representing the default type {\em Person} is:
+
+\begin{verbatim}
+#Composition of type Person
+name:"Person"
+( & (2.5.4.0="2.5.6.6") # objectClass = person
+    ( | (2.5.4.3~=*)	# cn (common name)
+	(2.5.4.4~=*)	# sn (surname)
+	(2.5.4.12~=*)))	# title
+\end{verbatim}
+
+\subsection {The typeDefaults file}
+
+The \file{typeDefaults} file defines the relationships between each of the
+type defined in the \file{filterTypes} directory.
+This is best described by the following example line from the provided
+\file{typeDefaults} file.
+\begin{verbatim}
+2.5.4.10:Person, Place, Department: Person
+\end{verbatim}
+The first field defines the type of entry to which this line applies,
+the OID shown here is the one for {\em organizationName}.
+The second field lists the SD search types which are available when visiting 
+an entry of the specified type. 
+So this line specifies that the types {\em Person},
+{\em Place} and {\em Department} are available when visiting an entry of
+type {\em organizationName}.
+The third field defines the default search type to be used when visiting
+an entry of the specified type.

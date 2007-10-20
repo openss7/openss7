@@ -1,0 +1,66 @@
+
+<digit> ::= [0-9]
+<other> ::= [0-9a-zA-Z+-.]
+<hexdigit> ::= [0-9a-f]
+
+<digitstring> ::= <digit> <digitstring>
+                        | <digit>
+<otherstring> ::= <other> <otherstring>
+                        | <other>
+<hexstring> ::= <hexdigit> <hexstring> | <hexdigit>
+
+
+                        
+
+<presentation-address> ::= 
+                [[[ <psel> "/" ] <ssel> "/" ] <tsel> "/" ] 
+                <network-address-list>
+
+<network-address-list> ::= <network-address> "|" <network-address-list> 
+                           | <network-address>
+
+<psel> ::= <selector>
+<ssel> ::= <selector>
+<tsel> ::= <selector>
+
+<selector>  ::= '"' <otherstring> '"'        -- IA5
+                                             -- For chars not in this
+                                             -- string use hex
+                | "#" <digitstring>          -- US GOSIP
+                | "'" <hexstring> "'H"       -- Hex
+                | ""                         -- Empty but present
+
+<network-address> ::=   "NS" "+" <hexstring>
+                                 -- Concrete Binary Representation
+                                 -- This is the compact encoding
+        | <afi> "+" <idi> [ "+" <dsp> ]
+
+
+<dsp>  ::=
+        | "d" <digitstring>          -- Abstract Decimal
+        | "x" <hexstring>            -- Abstract Binary
+        | "l" <otherstring>             -- IA5: local form only
+        | "RFC-1006" "+" <prefix> "+" <ip> 
+           [ "+" <port> [ "+" <tset> ]]
+        | "X.25(80)" "+" <prefix> "+" <dte> 
+           [ "+" <cudf-or-pid> "+" <hexstring> ]
+        | "ECMA-117-Binary" "+" <hexstring> "+" <hexstring> 
+           "+" <hexstring>
+        | "ECMA-117-Decimal" "+" <digitstring> "+" 
+           <digitstring> "+" <digitstring>
+                
+<idi> ::= <digitstring>
+<afi> ::= "X121" | "DCC" | "TELEX" | "PSTN" | "ISDN" 
+                | "ICD" | "LOCAL" 
+
+<prefix> ::= <digit> <digit>         
+
+<ip> ::= <otherstring>
+                        -- dotted decimal form (e.g., 10.0.0.6)
+                        -- or domain (e.g., twg.com)
+<port> ::= <digitstring>
+<tset> ::= <digitstring>
+
+<dte> ::= <digitstring>
+<cudf-or-pid> ::= "CUDF" | "PID"
+

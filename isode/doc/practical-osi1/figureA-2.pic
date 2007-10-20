@@ -1,0 +1,22 @@
+.PS
+.ps 20
+## figure 2
+boxwid = 5 * boxwid
+boxht  = 2 * boxht
+##
+B1:     box shaded
+B2:     box shaded with .n at (B1.s.x, B1.s.y-lineht) \
+                "\normalsize PRESENTATION"
+B3:     box shaded with .n at (B2.s.x, B2.s.y-lineht) "\normalsize SESSION"
+B4:     box shaded with .n at (B3.s.x, B3.s.y-lineht) "\normalsize TRANSPORT"
+        line from B1.s to B2.n "\ data structures" ljust
+        line from B2.s to B3.n "\ dialogues" ljust
+        line from B3.s to B4.n "\ circuits" ljust
+##
+boxwid = boxwid / 5
+boxht =  boxht / 2
+B1a:    box with .nw at (B1.nw.x+boxwid/2, B1.nw.y-boxht/2) "ACSE"
+B1b:    box with .n at (B1.n.x, B1.n.y-boxht/2) dashed "$\ldots$"
+B1c:    box with .ne at (B1.ne.x-boxwid/2, B1.ne.y-boxht/2) "ROSE"
+##
+.PE

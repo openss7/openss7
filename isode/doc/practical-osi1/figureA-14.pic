@@ -1,0 +1,19 @@
+.PS
+.ps 20
+## figure 13
+B1:     box "SDU" width 3*boxwid
+B2:     box "PCI" with .ne at (B1.sw.x, B1.sw.y-lineht)
+B3:     box "PDU" with .nw at (B2.sw.x, B2.sw.y-lineht) width 4*boxwid
+        line from B1.s to (B1.s.x, B3.n.y)
+        line from B2.s to (B2.s.x, B3.n.y)
+B4:     box "ICI" with .e at B3.w dashed
+B5:     box "IDU" with .nw at (B4.sw.x, B4.sw.y-lineht) width 5*boxwid dashed
+B6:     box "ICI" with .nw at (B5.sw.x, B5.sw.y-lineht) dashed
+B7:     box "SDU" with .w at B6.e width 4*boxwid
+##
+        line dashed from B5.e to (B5.e.x+3*linewid, B5.e.y)
+        move to (B5.e.x+3*linewid, B5.n.y); "layer-N" rjust
+        line dashed from B5.w to (B5.w.x-3*linewid, B5.w.y)
+        move to (B5.e.x+3*linewid, B5.s.y); "layer-(N-1)" rjust
+##
+.PE

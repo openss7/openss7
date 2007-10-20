@@ -1,0 +1,51 @@
+\File{grindB\-5.c},{22:23},{Jun 12 1988}
+\L{\LB{\K{\#include} \<stdio.h\>}}
+\L{\LB{\K{\#include} \<isode\/rtsap.h\>}}
+\L{\LB{\K{\#include} \<isode\/isoservent.h\>}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\Proc{main}main (argc, argv, envp)}}
+\L{\LB{\K{int}}\Tab{8}{argc;}}
+\L{\LB{\K{char}  **argv,}}
+\L{\LB{      **envp;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}}\Tab{8}{    result,}}
+\L{\LB{}\Tab{8}{    sd;}}
+\L{\LB{    \K{struct} RoSAPindication  rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject   *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{    \K{struct} RtSAPstart   rtss;}}
+\L{\LB{    \K{register} \K{struct} RtSAPstart *rts = \&rtss;}}
+\L{\LB{    \K{struct} RtSAPindication  rtis;}}
+\L{\LB{    \K{register} \K{struct} RtSAPindication *rti = \&rtis;}}
+\L{\LB{    \K{register} \K{struct} RtSAPabort   *rta = \&rti \-\> rti\_abort;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (RtInit (argc, argv, rts, rti) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"initialization fails: \%s\"\SE{}, RtErrString (rta \-\> rta\_reason));}}
+\L{\LB{}}
+\L{\LB{    sd = rts \-\> rts\_sd;}}
+\L{\LB{\C{}\/*  do authentication using rts \-\> rts\_data here... *\/\CE{}}}
+\L{\LB{    RTSFREE (rts);}}
+\L{\LB{    }}
+\L{\LB{\C{}\/* read command line arguments here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* could use RTS\_BUSY, RTS\_VALIDATE, or RTS\_MODE instead and then exit *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{    \K{if} (RtBeginResponse (sd, RTS\_ACCEPT, NULLPE, rti) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"RT\-BEGIN.RESPONSE: \%s\"\SE{}, RtErrString (rta \-\> rta\_reason));}}
+\L{\LB{}}
+\L{\LB{    \K{if} (RoSetService (sd, RoPService, roi) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"RoSetService: \%s\"\SE{}, RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}}
+\L{\LB{    \K{for} (;;)}}
+\L{\LB{}\Tab{8}{\K{switch} (result = RoWaitRequest (sd, NOTOK, roi)) \{}}
+\L{\LB{}\Tab{8}{    \K{case} NOTOK: }}
+\L{\LB{}\Tab{8}{    \K{case} OK: }}
+\L{\LB{}\Tab{8}{    \K{case} DONE: }}
+\L{\LB{}\Tab{16}{ros\_indication (sd, roi);}}
+\L{\LB{}\Tab{16}{\K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \K{default}: }}
+\L{\LB{}\Tab{16}{error (\S{}\"unknown return from RoWaitRequest=\%d\"\SE{}, result);}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{\}}}

@@ -1,0 +1,384 @@
+%%% Damy @ Brunel
+
+\chapter {POD}
+\label{pod}
+
+POD is a directory user agent developed for the \xwindows/\index{X Windows}
+version 11 release 4, using the Athena widget set.
+It is intended to be an interface for the ``naive'' user.
+If you want to use the full power of X.500 you should use the DISH interface
+described in Chapter~\ref{dish} of this manual.
+
+\section {Types of Widget}
+
+POD makes use of various simple on-screen devices called widgets.
+The most important of these are described in the following sections.
+
+\subsection {Buttons}
+
+A button is a rectangular screen area which when selected will activate some
+specific function.
+A button is selected by pointing at it with the cursor and then
+clicking with the first mouse button.
+
+Most buttons contain a label and sometimes graphics
+which denote the button's function.
+In addition POD buttons are denoted by a change to a pointing hand cursor or by
+a border becoming highlighted.
+
+A button box is simply a collection of buttons.
+
+\subsection {Dialogue Boxes}
+
+A dialogue box is a means of supplying textual information to an application,
+and can be thought of as a miniature text editor.
+The dialogue boxes used in POD follow the command structure of the EMACS
+editor.
+
+Dialogue boxes,
+like most others widgets,
+only become active (or have the input focus) when pointed at by the cursor.
+
+\subsection {Menus}
+
+A menu is a vertically arranged collection of buttons that appears
+on selection of a menu button.
+
+\section {Using POD}
+
+\pgm{pod} is invoked with the following command:
+
+\begin{quote}\begin{verbatim}
+pod [-t <tailor file>] [-T <oidtable>] 
+    [-c <dsa address>] [-u <quoted username>] 
+    [-p <password>]
+\end{verbatim}\end{quote}
+
+\tt -t\rm \ is used to tell POD which \file{tailor} file to use in place of the
+default system dsaptailor file.
+
+\tt -T\rm \ is used to force POD to use an alternative oidtable.
+
+\tt -c\rm \ is used to bind to a DSA other than the local default.
+
+\tt -u\rm \ is used to bind as a specific user.
+
+\tt -p\rm \ is used to bind against the given password.
+
+POD is made up of a number of separate windows,
+described in the following sections.
+
+\subsection {The Main Window}
+
+POD's main window is comprised of three sections:
+a current position display,
+a search input box and a button box.
+Each of these is described below.
+
+\subsubsection {Current Directory Position}
+
+All operations are performed relative to a base directory entry.
+The name of this entry is displayed in the main window under the title 
+``Current Directory Position''.
+
+Parts of the displayed entry name can be selected in order to move to
+other positions in the directory.
+
+\subsubsection {Searching for Entries}
+
+The search input area contains a dialogue box and a menu button.
+
+The dialogue box is used to enter a value describing an entry to be searched
+for;
+for example if searching for the entry for ``Damanjit Mahl'' a suitable value
+would be ``D Mahl''.
+
+The menu button specifies the type of entry being searched for (the search
+type);
+in the above example this would be ``Person''.
+The search type can be changed by pulling down the menu attached to the type
+button and selecting from the contained list of types.
+
+Searches are activated by clicking on the ``Search'' button or by pressing the 
+Return key.
+
+\subsubsection {Main Functions}
+
+The buttons displayed in POD's main window are:
+\begin{describe}
+\item [\verb+Quit+:] Quit from POD.
+\item [\verb+Help+:] Invoke interactive help.
+\item [\verb+Search+:] Search for specified entry.
+\item [\verb+List+:] List entries under current position.
+\item [\verb+History+:] Display history of visited entries.
+\end{describe}
+	
+\subsection {The List Window}
+
+A {\em list} window displays a list of named directory entries,
+which can be returned as a result of list,
+search or history operations.
+It comprises a pair of buttons,
+a list display and two message bars.
+
+The upper message bar contains the information regarding the source of the
+displayed list, e.g., ``Result of List under Brunel University''.
+The lower message bar contains errors and constraint messages.
+
+\subsubsection {List Display}
+
+To move to or read a listed entry simply click on that entry's name.
+Non-leaf entries cause a move and read,
+whereas leaf entries only cause a read.
+
+\subsubsection {Close and Keep Buttons}
+
+The {\em close} button can be used to close the {\em list} window.
+Note that this does not iconify the window but rather deletes it and all
+contained information.
+
+The {\em keep} button can be used to make the information contained in
+the {\em list}
+window semi-permanent.
+In the default case,
+results from ensuing list/search operations overwrite any unkept list 
+windows,
+thereby limiting the number of windows containing temporary information to one.
+If the {\em keep} button is selected,
+displayed information becomes semi-permanent,
+and is only removed if the {\em close} button is selected.
+The text in a {\em keep} button changes from Keep to Kept upon selection,
+in order to distinguish from list windows containing transient data.
+
+The {\em list} window that displays the session history does not have
+a {\em keep} button.
+
+\subsection {The Read Window}
+
+The {\em read} window displays selected parts of a directory entry.
+It is comprised of a message bar, 
+a button box and a {\em text} window.
+
+The message bar displays the entry's name.
+If selected this bar places the complete distinguished name of an entry
+into the primary X cut buffer.
+Ordinarily this is of little use,
+though it can help when modifying attributes that require a distinguished name as
+a value.
+
+The {\em text} window displays the body of the entry,
+which currently contains textual information and may contain
+a (single) fax image stored in the photo attribute.
+
+It is possible to cut text from the {\em text} window.
+
+The {\em close} and {\em keep} buttons perform a similar function to those described above
+for the {\em list} window.
+
+The {\em modify} button activates a window containing facilities to modify the
+entry being read.
+
+\subsection {The Modify Window}
+
+The {\em modify} window allows the user to modify the attributes of an entry.
+Each attribute value displayed in the {\em text} window is contained in its
+own dialogue box.
+Pointing to a dialogue box will allow editing of the contained value.
+
+Each value has an associated menu button (denoted by the menu
+icon) which allows various operations on a particular value,
+e.g., delete value,
+undo changes, etc.
+In addition each attribute label, e.g., 
+``commonName'',
+is itself a menu button and allows various operations on all values
+associated with that attribute,
+e.g., delete all values,
+undo all changes to this attribute,
+add a new value field.
+Undo operations only undo all changes since the last successful modify
+operation or else return all affected values to their original states.
+
+The {\em close} and {\em keep} buttons behave consistently with those described for
+the {\em read} and {\em list} windows.
+
+The {\em modify} button attempts to make the modification entered into
+the {\em text} window.
+A message reporting the success (or otherwise) of a modification request
+is displayed in the lower right {\em message} window.
+
+\subsection {Error and Message Popups}
+
+From time to time,
+during or after directory operations,
+POD will provide error or status reports in a popup that appears in
+the top left corner of the screen.
+Errors sometime require the user to click on the {\em error} window before
+normal operation can resume.
+
+\section {Configuration of POD}
+
+POD can be configured on a system-wide or per-user basis.
+POD installs system default files into a directory called \file{xd/duaconfig/}
+under ISODE's ETCDIR.
+
+Per-user configuration files other than \file{.podrc},
+must be held under a directory \file{.duaconfig/} 
+contained in a user's home directory.
+
+The POD configuration files are
+\begin{quote}\begin{verbatim}
+<CONFIGDIR>/readTypes,
+<CONFIGDIR>/duaconfig/friendlyNames,
+<CONFIGDIR>/duaconfig/filterTypes/Type_*,
+<CONFIGDIR>/duaconfig/typeDefaults.
+\end{verbatim}\end{quote}
+
+\subsection {The .podrc File}
+
+The \file{.podrc} file is analogous to the \file{.quipurc} file for DISH
+(see Section~\ref{quipurc}),
+though less extensive in the number and flexibility of options provided.
+It has the following format:
+
+\begin{quote}\begin{verbatim}
+flag: value
+\end{verbatim}\end{quote}
+
+The following flags are currently recognised:
+
+\begin{describe}
+
+\item [\verb+username+:] The name of the user to bind as.
+
+\item [\verb+password+:] The password to use when binding. For this reason care
+should be taken to ensure your \file{.podrc} file is not publicly readable.
+
+\item [\verb+service+:] A list of default service control flags
+(as defined in Section~\ref{dish_serv}).
+
+\item [\verb+dsap+:] This can be followed by one of the dsaptailor options
+described in Section~\ref{dua:tailor}.\index{dsaptailor}
+
+\item [\verb+isode+:]
+This can be followed by one of the ISODE tailor options
+described in \volone/ of this manual.
+
+\item [\verb+history+:]
+This can be followed by a number that specifies the number of entry names
+to be maintained in the history buffer.
+
+\item [\verb+prefergreybook+:]
+For those who prefer grey book mail address format.
+This takes values of TRUE or FALSE.
+
+\item [\verb+readnonleaf+:]
+This tells POD whether or not to read non-leaf entries.
+Values are TRUE or FALSE.
+
+\end{describe}
+
+\subsection {The readTypes File}
+
+The file \file{readTypes} contains a list of attributes that are to be read for
+entry display.
+The format of this file is;
+\begin{quote}\small\begin{verbatim}
+"quotedAttributeName" numericOid
+\end{verbatim}\end{quote}
+an example line then being
+\begin{quote}\small\begin{verbatim}
+"photo"               0.9.2342.19200300.100.1.7
+\end{verbatim}\end{quote}
+
+This format was chosen as it is the same format as the output from the
+{\em oiddump}
+utility provided with ISODE.
+
+\subsection {The friendlyNames File}
+
+This file maps attribute names onto user-friendly names,
+for use in displaying the ``Current Directory Position''.
+The current defaults map the names onto empty strings so that the
+bare values are shown,
+e.g.:
+
+\begin{quote}\begin{verbatim}
+The World
+GB
+Brunel University
+\end{verbatim}\end{quote}
+
+The format of the file is
+
+\begin{quote}\begin{verbatim}
+attribute list : friendly name
+\end{verbatim}\end{quote}
+where an attribute list can be one or more comma-separated attribute names.
+
+\subsection {The filterTypes Files}
+	
+POD searches are based upon a complex filter;
+e.g., the default filter for the type {\em Person} is
+\begin{quote}\begin{verbatim}
+objectClass=person AND (cn~=* OR sn~=* OR title~=*)
+\end{verbatim}\end{quote}
+Where ``*'' represents a value supplied at search
+time.
+
+The directory \file{filterTypes/} contains a set of files,
+each with a prefix \file{Type\_},
+describing the set of such abstract types used in POD.
+The set of contained files may be edited or added to.
+
+The syntax used in these files is shown in the example below:
+
+\begin{quote}\small\begin{verbatim}
+<filter_type> ::= <filter_name> <filter>
+<name> ::= "name:" <asciistring>
+<filter> ::= <filter_item> | <assertion>
+<assertion> ::= "(" <filt_type> <filter> <filter>
+                <filter_list> ")"
+<filter_list> ::= <filter> <filter_list> | <filter> | NULL
+<filter> ::= <filter_item> | <assertion>
+<filter_item> ::= "(" NUMERIC_OID <match_type> <value> ")"
+<filt_type> ::= "&" | "|"
+<match_type> ::= "=" | "~=" | "%="
+<value> ::= "*" | STRING
+<comment> ::= "#" STRING
+\end{verbatim}\end{quote}
+
+Where the symbol ``$~$='' represents approximate match,
+``\%='' represents substring match and ``='' represents exact match.
+The ``*'' character for value represents a value supplied at search time.
+
+As an example,
+the file representing the default type ``Person'' is:
+
+\begin{quote}\begin{verbatim}
+#Composition of type Person
+name:"Person"
+( & (2.5.4.0="2.5.6.6") # objectClass = person
+    ( | (2.5.4.3~=*)	# cn (common name)
+	(2.5.4.4~=*)	# sn (surname)
+	(2.5.4.12~=*)))	# title
+\end{verbatim}\end{quote}
+
+\subsection {The typeDefaults File}
+
+The \file{typeDefaults} file defines the relationships between each of the
+type defined in the \file{filterTypes} directory.
+This is best described by the following example line from the provided
+\file{typeDefaults} file:
+\begin{quote}\begin{verbatim}
+2.5.4.10:Person, Place, Department: Person
+\end{verbatim}\end{quote}
+The first field defines the type of entry to which this line applies,
+the OID shown here is the one for {\em organizationName}.
+The second field lists the POD search types which are available when visiting 
+an entry of the specified type. 
+So this line specifies that the types {\em Person},
+{\em Place} and {\em Department} are available when visiting an entry of
+type {\em organizationName}.
+The third field defines the default search type to be used when visiting
+an entry of the specified type.

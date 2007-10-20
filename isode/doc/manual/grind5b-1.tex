@@ -1,0 +1,21 @@
+\File{grind5b\-1.c},{22:23},{Jun 12 1988}
+\L{\LB{\K{\#include} \<isode\/ssap.h\>}}
+\L{\LB{\K{\#include} \<isode\/isoservent.h\>}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{register} \K{struct} SSAPaddr *sa;}}
+\L{\LB{\K{register} \K{struct} isoservent *is;}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{if}\K{if} ((is = getisoserventbyname (\S{}\"presentation\"\SE{}, \S{}\"ssap\"\SE{})) == NULL)}}
+\L{\LB{    error (\S{}\"ssap\/presentation\"\SE{});}}
+\L{\LB{    }}
+\L{\LB{\C{}\/* RemoteHost is the host we\'re interested in,}}
+\L{\LB{   e.g., ``gremlin.nrtc.northrop.com\'\' *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\Proc{if}\K{if} ((sa = is2saddr (RemoteHost, NULLCP, is)) == NULLSA)}}
+\L{\LB{    error (\S{}\"address translation failed\"\SE{});}}
+\L{\LB{}}
+\L{\LB{...}}

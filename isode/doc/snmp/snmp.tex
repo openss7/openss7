@@ -1,0 +1,602 @@
+% -*- LaTeX -*-
+
+\input lcustom
+
+\documentstyle[12pt,sfwmac]{article}
+
+\begin{document}
+
+\begin{center}\Large\bf
+4BSD/ISODE SNMP Roadmap\\[0.25in]
+\normalsize\bf Marshall T. Rose\\ Performance Systems International, Inc.%
+\footnote{This work was partially supported by the U.S.~Defense Advanced
+Research Projects Agency and the Rome Air Development Center of the U.S.~Air
+Force Systems Command under contract number F30602--88--C-0016.
+The content of the information contained herein does not necessarily reflect
+the position or the policy of the U.S.~Government,
+and no official endorsement should be inferred.}
+\end{center}
+
+\section*	{Introduction}
+You might consider it strange that the ISODE,
+an openly available implementation of the upper-layers of OSI,
+includes an implementation of the SNMP.
+Inasmuch as the continued survival of the Internet hinges on all nodes
+becoming network manageable,
+this package was developed using the ISODE and is being freely
+distributed with releases of Berkeley \unix/.
+
+The purpose of this {\em Roadmap} is simply to point out where you can find
+the various components in the 4BSD/ISODE SNMP package.
+
+\section*	{SNMP Agent}
+The SNMP agent (the \pgm{snmpd} program) along with the simple initiator
+(the \pgm{snmpi} program) are in the directory \file{snmp/}.
+The \file{READ-ME} file in the top-level directory describes how to generate
+and install these.
+
+\subsection*	{Streamlined Installation}
+The standard installation directions assume that you wish to install the base
+ISODE system in addition to the 4BSD/ISODE SNMP package.
+However,
+you might wish to install only SNMP software.
+If this is the case,
+then follow these steps and ignore the \file{READ-ME} file.
+\begin{enumerate}
+\item	Configure the ISODE by selecting the appropriate configuration files
+in the \file{config/} directory.
+For example,
+\begin{quote}\small\begin{verbatim}
+% cp config/sunos3.h h/config.h
+% cp config/sunos3.make config/CONFIG.make
+% cp config/*.local support/
+\end{verbatim}\end{quote}
+is all that's required to configure the ISODE on a Sun workstation running
+SunOS~3.5.
+
+You might wish to consult the {\bf CONFIGURATION} section of the
+\file{READ-ME} file for information on other target platforms.
+
+\item	Generate both the base ISODE system and the SNMP software:
+\begin{quote}\small\begin{verbatim}
+% ./make all all-snmp
+\end{verbatim}\end{quote}
+
+\item	Make sure the ISODE installation directories are created:
+\begin{quote}\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{1}{|c|}{\bf name}&
+		\multicolumn{1}{c|}{\bf usually}&
+					\multicolumn{1}{c|}{\bf containing}\\
+\hline
+\verb"BINDIR"&	\file{/usr/local/bin/}&	user programs\\
+\verb"SBINDIR"&	\file{/usr/etc/}&	administrator programs\\
+\verb"ETCDIR"&	\file{/usr/etc/}&	administrator files\\
+\verb"INCDIR"&	\file{/usr/include/}&	{\em C} include files\\
+\verb"LOGDIR"&	\file{/usr/spool/isode/}&
+					log files\\
+\hline
+\end{tabular}\end{quote}
+
+\item	Check the \file{/etc/services} file and make sure that these three
+	lines are present:
+\begin{quote}\small\begin{verbatim}
+snmp       161/udp
+snmp-trap  162/udp
+smux       199/tcp
+\end{verbatim}\end{quote}
+If you are running Sun Yellow Pages,
+then you will need to modify this file on the YP master and run a command to
+export the changes to the other YP hosts.
+
+\item	Add these lines to the \file{/etc/rc.local} file:
+\begin{quote}\small\begin{verbatim}
+if [ -f $(SBINDIR)snmpd ]; then
+    $(SBINDIR)snmpd & (echo -n ' snmp') > /dev/console
+fi
+\end{verbatim}\end{quote}
+
+\item	If you wish to allow user management (\file{passwd} and \file{group})
+with SNMP,
+then add these lines to the \file{/etc/rc.local} file:
+\begin{quote}\small\begin{verbatim}
+if [ -f $(SBINDIR)smux.unixd -a -f $(SBINDIR)snmpd ]; then
+    $(SBINDIR)smux.unixd &
+        (echo -n ' smux-unix') > /dev/console
+fi
+\end{verbatim}\end{quote}
+Note that if you do this and if you allow sets,
+then you should make sure that your agent configuration file
+(\file{snmpd.rc} in the \verb"ETCDIR" directory)
+is readable only by root.
+Note that the daemon expects you to be using ``vanilla'' \file{passwd}
+and \file{group} files, no shadowing, etc.
+
+\item	If you wish to have an SNMP trap sink on your system,
+	also add these lines to the \file{/etc/rc.local} file:
+\begin{quote}\small\begin{verbatim}
+if [ -f $(SBINDIR)snmpt ]; then
+    $(SBINDIR)snmpt &
+        (echo -n ' snmp-trap') > /dev/console
+fi
+\end{verbatim}\end{quote}
+Usually the trap sink is started before the agent,
+so if the agent sends any traps initially,
+then can be audited.
+
+\item	Install a partial ISODE system, as the super-user:
+\begin{quote}\small\begin{verbatim}
+# ./make inst-partial
+\end{verbatim}\end{quote}
+
+\item	Install the 4BSD/ISODE SNMP software:
+\begin{quote}\small\begin{verbatim}
+# ./make inst-snmp
+\end{verbatim}\end{quote}
+
+\item	Configure the SNMP agent by editing the file \file{snmpd.rc} in the
+\verb"ETCDIR" directory:
+    \begin{itemize}
+    \item	Fill-in the value for \verb"sysContact" and \verb"sysLocation".
+
+    \item	If your site has a management station that listens for traps,
+		fill-in the information for the trap sink, e.g.,
+\begin{quote}\small	\begin{verbatim}
+trap    traps   a.b.c.d
+\end{verbatim}\end{quote}
+	where \verb"traps" is the community that traps should be logged under
+	and \verb"a.b.c.d" is the IP address of the host where a trap sink is
+	listening on UDP port~162.
+
+    \item	For each of your network interfaces
+		(as reported by the
+\begin{quote}\small\begin{verbatim}
+netstat -i
+\end{verbatim}\end{quote}
+		command)
+		make sure that it is defined in the configuration file with
+		the appropriate type and speed.
+		For the vast majority of BSD-derived systems,
+		the definitions already appear.
+    \end{itemize}
+
+\item	Finally, start the SNMP agent.
+The command from \pgm{CShell} is:
+\begin{quote}\small\begin{verbatim}
+# $(SBINDIR)snmpd >& /dev/null
+\end{verbatim}\end{quote}
+which starts the agent and directs it to automatically detach.
+The agent logs activity to the file \file{snmpd.log} in the ISODE
+\verb"LOGDIR" directory.
+
+If you wish to allow user management with SNMP,
+then you will need to start that daemon as well:
+\begin{quote}\small\begin{verbatim}
+# $(SBINDIR)smux.unixd >& /dev/null
+\end{verbatim}\end{quote}
+
+If you are going to run a sink for SNMP traps,
+then you will need to start that daemon as well:
+\begin{quote}\small\begin{verbatim}
+# $(SBINDIR)snmpt >& /dev/null
+\end{verbatim}\end{quote}
+By default,
+the trap sink will audit all traps to the file \file{snmp.traps} in the
+ISODE \verb"LOGDIR" directory.
+The \verb"audit" command in \pgm{snmpi} can be used to examine the file.
+\end{enumerate}
+
+\section*	{Exporting MIB Modules}
+You might wish to modify your existing daemons to export MIB modules for
+access via the SNMP agent.
+The SMUX protocol is used for this.
+The SMUX protocol is defined in the file \file{doc/rfcs/smux.txt}.
+You should read this document once just to familiarize yourself with the
+general concepts of SNMP multiplexing.
+
+However,
+when you instrument your agent to export the MIB,
+you use the SMUX Applications Programming Interface (SMUX API) which is
+defined in the file \file{doc/rfcs/smux-api.txt}.
+This API is fully implemented in the 4BSD/ISODE SNMP software.
+
+The SMUX \unix/ daemon is an example of a program which uses the software.
+The source for this daemon is in the \file{snmp/} directory.
+At present,
+this daemon exports information on the \file{passwd} and \file{group} files.
+
+\subsection*	{One day}
+$\ldots$ it would be nice to have MIBs defined to allow management
+applications to be written which have equivalent functionality to:
+\begin{quote}\begin{tabular}{l}
+mailq/mailstats\\
+df/ps\\
+finger/rwho\\
+iostat/pstat/vmstat\\
+named (DNS)\\
+nntpd (NTP)\\
+bgpd (BGP)\\
+nfsstat/rpcinfo
+\end{tabular}\end{quote}
+
+\section*	{SNMP-capable gawk}
+If you are interested in prototyping network management applications,
+then you might find it interesting to run a version of GNU \pgm{awk}
+(the \pgm{gawk} program) which is SNMP-capable.
+
+The directory \file{snmp/gawk-2.11 contains} the modifications to the GNU
+\pgm{awk} 2.11~ release necessary to achieve this.
+Follow the instructions in the \file{READ-ME-FIRST} file in this directory to
+install this modified \pgm{gawk}.
+
+\subsection*	{Accessing SNMP variables}
+The current implementation allows both reading and writing of variables in an
+SNMP MIB.
+This means that MIB variables can occur either as {\em rvalues} or
+{\em lvalues} in expressions.
+
+\subsubsection*	{Non-tabular variables}
+To access an object which does not occur inside a table,
+simply use the name of that object, e.g.,
+\begin{quote}\small\begin{verbatim}
+% gawk 'BEGIN { print sysDescr; }'
+\end{verbatim}\end{quote}
+Instead,
+if you want to supply a special instance identifier,
+then reference the variable as an array.
+Hence,
+an equivalent command is:
+\begin{quote}\small\begin{verbatim}
+% gawk 'BEGIN { print sysDescr[0]; }'
+\end{verbatim}\end{quote}
+This is less intuitive,
+but it's your choice.
+
+Of course,
+you may not be able to retrieve a variable.
+For example, \verb"sysDescr[1]", according to the MIB,
+doesn't make much sense.
+There is a special built-in variable,
+\verb"DIAGNOSTIC" which returns a textual description of any problem which
+occurred with the last SNMP operation,
+hence:
+\begin{quote}\small\begin{verbatim}
+% gawk 'BEGIN { print "sysDescr: ", sysDescr, DIAGNOSTIC; }'
+\end{verbatim}\end{quote}
+prints either the system description of the agent you are talking to,
+or a diagnostic,
+depending on what happened with the SNMP interaction.
+
+\subsubsection*	{Tabular variables}
+To access an object occurring in a table,
+there are also two methods.
+
+First,
+you can simply put the instance identifier inside an array reference,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+ifDescr[1]
+\end{verbatim}\end{quote}
+which is equivalent to an SNMP get operation on the variable
+\begin{quote}\small\begin{verbatim}
+ifDescr.1
+\end{verbatim}\end{quote}
+or
+\begin{quote}\small\begin{verbatim}
+ipRouteNextHop["10.0.0.0"]
+\end{verbatim}\end{quote}
+which is equivalent to an SNMP get operation on the variable
+\begin{quote}\small\begin{verbatim}
+ipRouteNextHop.10.0.0.0
+\end{verbatim}\end{quote}
+This is called the ``subscript notation''.
+
+Note that care should be taken to make sure that the subscript doesn't look
+like a floating-point number to \pgm{gawk}.
+These are all the same, valid, references:
+\begin{quote}\small\begin{verbatim}
+ipRouteNextHop[10,0,0,0]
+ipRouteNextHop["10.0.0.0"]
+\end{verbatim}\end{quote}
+In contrast,
+this is a bogus reference:
+\begin{quote}\small\begin{verbatim}
+ipRouteNextHop[10.0.0.0]
+\end{verbatim}\end{quote}
+
+Second,
+you can traverse the table (referred to as ``walking the tree'').
+This is done with the \verb"for-in" construct, e.g.,
+\begin{quote}\small\begin{verbatim}
+for (i in ipRouteDest) {
+    printf "route to %s from %s\n",
+        ipRouteDest, ipRouteNextHop;
+}
+\end{verbatim}\end{quote}
+which says to traverse the table containing the object \verb"ipRouteDest".
+The for-loop body will be executed once for each row of the table;
+for each iteration,
+the control variable will be assigned the value of the instance-identifier for
+that row ({\bf not} the value of the column in that row).
+This allows you to reference other parts of the MIB using the same
+instance-identifier, e.g.,
+\begin{quote}\small\begin{verbatim}
+for (i in ipRouteDest) {
+    printf "ipRoutingTable[%s]: to %s from %s\n",
+        i, ipRouteDest, ipRouteNextHop;
+}
+\end{verbatim}\end{quote}
+
+The \verb"for-in" construct retrieves a row of a table using a single powerful
+SNMP get-next operator.
+If a particular column is unsupported by the agent,
+then referencing the corresponding variable will return the empty string.
+Note that within the for-loop body,
+repeated references to a column of a table will not result in additional SNMP
+operations.
+If, for some reason, you want to force a refresh of the variable's value,
+use the subscript notation, e.g.,
+\begin{quote}\small\begin{verbatim}
+for (i in ipRouteDest) {
+    printf "route to %s from %s\n",
+        ipRouteDest, ipRouteNextHop[i];
+}
+\end{verbatim}\end{quote}
+which causes each iteration to use the powerful SNMP get-next operation
+to bind values to each column in the \verb"ipRoutingTable",
+and the corresponding instance-identifier is assigned to \verb"i".
+Then,
+when the \verb"printf" statement is executed,
+a separate SNMP get operation will be used to supply a (possibly) new value
+for \verb"ipRouteNextHop".
+Usually,
+you use the subscript notation when you want to look at a variable in another
+table, e.g.,
+\begin{quote}\small\begin{verbatim}
+for (i in ipRouteDest) {
+    printf "route to %s from %s on %s (interface #%d)\n",
+        ipRouteDest, ipRouteNextHop,;
+        ifDescr[ipRouteIfIndex], ipRouteIfIndex;
+}
+\end{verbatim}\end{quote}
+which causes each iteration to perform the powerful SNMP get-next operation
+being to bind values to each column in the \verb"ipRoutingTable",
+and the corresponding instance-identifier is assigned to \verb"i".
+Then,
+when the \verb"printf" statement is executed,
+a separate SNMP get operation will be used to supply the corresponding value
+of \verb"ifDescr".
+
+Of course,
+there's always the question of dealing with agents which may not support the
+table or when an error occurs.
+Usually, the following code fragment is sufficient:
+\begin{quote}\small\begin{verbatim}
+didone = 0;
+for (i in tabularVariable) {
+    didone = 1;
+
+#   handle one row of the table here...
+}
+if (didone == 0) {
+    if (DIAGNOSTIC) {
+#       handle table error here...
+    }
+    else {
+#       handle empty table here...
+    }
+}
+else
+    if (DIAGNOSTIC) {
+#       handle partial table here...
+    }
+\end{verbatim}\end{quote}
+Finding an empty or partial table is often unimportant,
+so the boilerplate usually is:
+\begin{quote}\small\begin{verbatim}
+didone = 0;
+for (i in tabularVariable) {
+    didone = 1;
+
+#   handle one row of the table here...
+}
+if (!didone && DIAGNOSTIC)
+    printf "table: %s\n", DIAGNOSTIC;
+\end{verbatim}\end{quote}
+
+\subsubsection*	{Non-tabular variables (revisited)}
+If you are accessing a lot of non-tabular variables sharing a common parent
+(e.g., within the \verb"system" group),
+you can use the \verb"for-in" construct to walk this degenerate tree,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+for (i in sysDescr) {
+#   this for-loop is executed at most once...
+}
+\end{verbatim}\end{quote}
+will cause all the non-tabular variables having the same immediate parent as
+\verb"sysDescr" to be retrieved in a single SNMP operation,
+and the corresponding instance-identifier (i.e., \verb"0") is assigned to
+\verb"i".
+
+This syntax is used only for optimization of network traffic.
+
+\subsubsection*	{Tabular variables (revisited)}
+If you are interested in stepping through only part of a table,
+the \verb"for-in" construct has a special syntax,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+for (i in ipRouteDest, "192.33.4") {
+    printf "route to %s from %s\n",
+        ipRouteDest, ipRouteNextHop;
+}
+\end{verbatim}\end{quote}
+which will step through only those entries in the routing table that start
+with the specified instance-identifier.
+
+\subsubsection*	{Illegal References}
+If you do not use the subscript notation,
+then it is illegal to reference a tabular variable outside of a \verb"for-in"
+loop.
+This causes a fatal error in a \pgm{gawk} script.
+
+Furtehr,
+non-leaf variables,
+(e.g., \verb"ifTable") are not recognized by the \pgm{gawk} front-end as being
+accessible via the SNMP.
+These are treated as ordinary \pgm{gawk} variables without any SNMP semantics.
+
+\subsubsection*	{Assigning values to SNMP variables}
+The current implementation supports this in a sub-optimal fashion.
+Each assignment operation results in a single SNMP set operation.
+Hence,
+a compound assignment,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+ipForwarding = clnpForwarding = 1;
+\end{verbatim}\end{quote}
+results in two SNMP operations,
+each with one operand.
+The optimal approach would be to have a single SNMP operation,
+with two operands.
+
+\subsection*	{Data typing}
+The \pgm{gawk} program has two kinds of data types: numbers and strings.
+When mapping MIB objects to these data types,
+the following conventions are used: 
+\[\begin{tabular}{|r|l|l|l|}
+\hline
+\multicolumn{1}{|c|}{\bf Syntax}&
+		\multicolumn{1}{c|}{\bf Type}&
+			\multicolumn{1}{c|}{\bf Format}\\
+\hline
+INTEGER&		number&		\\
+OCTET STRING&		string&		\verb|"%02x: ... : %02x"|\\
+DisplayString&		string&		\\
+PhysAddress&		string&		\verb|"%02x: ... : %02x"|\\
+OBJECT IDENTIFIER&	string&		\verb|"%u. ... .%u"|\\
+NULL&			string&		\verb|"NULL"|\\
+IpAddress&		string&		\verb|"a.b.c.d"|\\
+NetworkAddress&		string&		\verb|"a.b.c.d"|\\
+Counter&		number&		\\
+Gauge&			number&		\\
+TimeTicks&		number&		\\
+ClnpAddress&		string&		\verb|"%02x: ... : %02x"|\\
+\hline
+\end{tabular}\]
+
+\subsection*	{Modifications to gawk}
+The functional changes to \pgm{gawk} are quite straight-forward:
+
+\subsubsection*	{Switches}
+The \switch"s" turns on SNMP debugging to level 1,
+whilst the \switch"S" turns on SNMP debugging to level 2.
+
+At level~1 debugging and above,
+exceptional events are reported to the diagnostic output.
+At level~2 debugging and above,
+SNMP PDUs are logged to the standard output.
+For any debugging activity to occur,
+the modules \file{main.c} and \file{snmp.c} in \pgm{gawk} must be compiled
+with \verb"-DDEBUG".
+
+\subsubsection*	{Variables}
+There are a few built-in, read-write variables added:
+\begin{small}
+\[\begin{tabular}{|r|l|l|l|}
+\hline
+\multicolumn{1}{|c|}{\bf Variable}&
+		\multicolumn{1}{|c|}{\bf Type}&
+			\multicolumn{1}{|c|}{\bf Value of}&
+					\multicolumn{1}{|c|}{\bf Default}\\
+\hline
+\smaller AGENT&		string&	SNMP agent name or address&	local IP-addr\\
+\smaller COMMUNITY&	string&	SNMP community name&		public\\
+\smaller DIAGNOSTIC&	string&	last thing to go wrong&		\\
+\smaller ERROR&		number&	last SNMP error status&		\\
+\smaller RETRIES&	number&	times to retry SNMP operation&	3\\
+\smaller TIMEOUT&	number&	seconds between retries&	10\\
+\hline
+\end{tabular}\]\normalsize
+The \verb"DIAGNOSTIC" and \verb"ERROR" variables are set after each SNMP
+operation.
+If no error occurs,
+then \verb"DIAGNOSTIC" variable is set to the empty string,
+and \verb"ERROR" variable is set to \verb"0".
+\end{small}
+
+\subsubsection*	{Functions}
+There are a few built-in functions added:
+\begin{itemize}
+\item	The \verb"bitwise_and(i,j)" function returns the bit-wise AND of the
+	two unsigned long quantities, \verb"i" and \verb"j".
+
+\item	The \verb"bitwise_or(i,j)" function returns the bit-wise OR of the
+	two unsigned long quantities, \verb"i" and \verb"j".
+\end{itemize}
+
+\subsection*	{Community Database}
+It may be useful to derive community names based on the IP-address of the
+agent.
+\pgm{gawk} provides such a mechanism under the following conditions:
+\begin{enumerate}
+\item	Create a mapping file, and use the \unix/ protection mechanism to
+	secure this file as desired.
+
+	The syntax of this file is a series of entries, one to a line.
+	Each line contains:
+    \begin{itemize}
+    \item	a IP-network address,
+		in the familiar ``dot'' notation, e.g.,
+\begin{quote}
+\verb"192.33.4"
+\end{quote}
+
+    \item	(optionally) a IP-address mask,
+		in the familiar ``dot'' notation, e.g.,
+\begin{quote}
+\verb"255.255.255.0"
+\end{quote}
+		and,
+
+    \item	a community string
+		(e.g., \verb|"public"|).
+    \end{itemize}
+Blanks and/or tab characters are used to separate items.
+However, double-quotes may be used to prevent separation for items containing
+embedded whitspace.
+The sharp character (`\verb"#"') at the beginning of a line indicates a
+commentary line.
+
+\item	When a new \verb"AGENT" is defined,
+and the value of \verb"COMMUNITY" starts with a slash
+\pgm{gawk} will automatically read the named file,
+looking for the first entry satisfying:
+$$\mbox{(AGENT IP-address)} \land \mbox{(IP-address mask)}\ \equiv\ 
+\mbox{(IP-network address)}$$
+Upon finding such an entry,
+\pgm{gawk} will use the named community.
+\end{enumerate}
+
+Of course,
+the ordering of entries in the mapping file is important!
+It is suggested that the file begin with host-specific entries
+(those with an IP-address mask of \verb"255.255.255.255"),
+and then entries follow in decreasing order by the number of bits on in the
+IP-address mask.
+The very last entry should be the ``default'' entry,
+which matches any \verb"AGENT" IP-address.
+The format of this entry is simply:
+\begin{quote}\small\begin{verbatim}
+0.0.0.0        0.0.0.0        "public"
+\end{verbatim}\end{quote}
+
+\subsection*	{An Example}
+After installing the SNMP-capable \pgm{gawk},
+the \file{READ-ME-FIRST} file describes how to install \pgm{s-netstat},
+a program which provides the functionality of \pgm{netstat} using the SNMP
+rather than reading \file{/dev/kmem}.
+This script and associated \pgm{gawk} scripts provide an excellent example of
+how the new \pgm{gawk} can be used to prototype new management applications.
+
+\end{document}

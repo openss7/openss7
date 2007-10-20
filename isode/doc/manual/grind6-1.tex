@@ -1,0 +1,21 @@
+\File{grind6\-1.c},{22:23},{Jun 12 1988}
+\L{\LB{\K{\#include} \<isode\/tsap.h\>}}
+\L{\LB{\K{\#include} \<isode\/isoservent.h\>}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{register} \K{struct} TSAPaddr *ta;}}
+\L{\LB{\K{register} \K{struct} isoservent *is;}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{if}\K{if} ((is = getisoserventbyname (\S{}\"session\"\SE{}, \S{}\"tsap\"\SE{})) == NULL)}}
+\L{\LB{    error (\S{}\"tsap\/session\"\SE{});}}
+\L{\LB{}}
+\L{\LB{\C{}\/* RemoteHost is the host we\'re interested in,}}
+\L{\LB{   e.g., ``gremlin.nrtc.northrop.com\'\' *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\Proc{if}\K{if} ((ta = is2taddr (RemoteHost, NULLCP, is)) == NULLTA)}}
+\L{\LB{    error (\S{}\"address translation failed\"\SE{});}}
+\L{\LB{}}
+\L{\LB{...}}

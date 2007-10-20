@@ -1,0 +1,1131 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Reliable Transfer}\label{librtsap}
+The \man librtsap(3n) library implements the reliable transfer service (RTS).
+The abstraction provided to applications is that of an {\em association\/}
+for reliably transfering data.
+Most applications use the remote operations facilities,
+described in the previous chapter,
+and do not directly use the reliable transfer service.%
+\footnote{Actually, applications such as message-handling systems explicitly
+use the reliable transfer service to perform association management,
+and then optionally utilize the remote operations service for actual
+communication (otherwise they use reliable transfer directly). 
+Both usages are permitted and encouraged in this implementation.}
+However,
+for those applications which do not base themselves in remote operations,
+the reliable transfer interface is used.
+
+As with most models of OSI services,
+the underlying assumption is one of a symmetric, asynchronous environment.
+That is,
+although peers exist at a given layer,
+one does not necessary view a peer as either a client or a server.
+Further,
+the service provider may generate events for the service user without the
+latter entity triggering the actions which led to the event.
+For example,
+in a synchronous environment,
+an indication that data has arrived usually occurs only when the service user
+asks the service provider to read data;
+in an asynchronous environment,
+the service provider may interrupt the service user at any time to announce
+the arrival of data.
+
+The \verb"rtsap" module in this release initially uses a client/server
+paradigm to start communications.
+Once the connection is established,
+a symmetric view is taken.
+In addition,
+initially the interface is synchronous;
+however once the connection is established,
+an asynchronous interface may be selected.
+
+All of the routines in the \man librtsap(3n) library are integer-valued.
+They return the manifest constant \verb"OK" on success,
+or \verb"NOTOK" otherwise.
+
+\section	{Associations}\label{rts:associations}
+As briefly mentioned earlier,
+an association is the binding between two applications.
+An association is formed when one application,
+termed the {\em initiator},
+specifies the address of a {\em responder\/} and asks the reliable transfer
+service to establish a connection.
+
+There are three aspects of association management:
+{\em association establishment},
+{\em association release},
+and,
+{\em association abort}.
+Each of these are now described in turn.
+All of these facilities rely on the mechanisms described in
+Section~\ref{acs:associations} on page~\pageref{acs:associations}.
+
+\subsection	{Association Establishment}
+The \man librtsap(3n) library distinguishes between the user which started an
+assocoation,
+the {\em initiator},
+and the user which was subsequently bound to the association,
+the {\em responder}.
+We sometimes term these two entities the {\em client\/} and the {\em server},
+respectively.
+
+\subsubsection	{Addresses}
+Addresses for the reliable transfer service entity consist of two parts:
+a presentation address (as discussed in Section~\ref{psap:addresses} on
+page~\pageref{psap:addresses} of \voltwo/),
+and application-entity information
+(as discussed in Section~\ref{acs:aei} on page~\pageref{acs:aei}).
+
+In Figure~\ref{getFTAMentity} on page~\pageref{getFTAMentity},
+an example of how these components are determined is given.
+
+\subsubsection	{Server Initialization}
+The \man tsapd(8c) daemon,
+upon accepting a connection from an initiating host,
+consults the ISO services database to determine which program
+on the local system implements the desired application context.
+Once the program has been ascertained,
+the daemon runs the program with any argument listed in the database.
+In addition,
+it appends some {\em magic arguments\/} to the argument vector.
+Hence,
+the very first action performed by the responder is to re-capcture the RTSE
+state contained in the magic arguments.
+This is done by calling the routine \verb"RtInit",
+which on a successful return,
+is equivalent to a {\sf RT-OPEN.INDICATION\/} from the reliable transfer
+service provider.
+\begin{quote}\index{RtInit}\small\begin{verbatim}
+int     RtInit (vecp, vec, rts, rti)
+int     vecp;
+char  **vec;
+struct RtSAPstart *rts;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"vecp":] the length of the argument vector;
+
+\item[\verb"vec":] the argument vector;
+
+\item[\verb"rts":] a pointer to a \verb"RtSAPstart" structure,
+which is updated only if the call succeeds;
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure,
+which is updated only if the call fails.
+\end{describe}
+If \verb"RtInit" is successful,
+it returns information in the \verb"rts" parameter,
+which is a pointer to a \verb"RtSAPstart" structure.
+\begin{quote}\index{RtSAPstart}\small\begin{verbatim}
+struct RtSAPstart {
+    int     rts_sd;
+
+    int     rts_mode;
+#define RTS_MONOLOGUE   0
+#define RTS_TWA         1
+
+    int     rts_turn;
+#define RTS_INITIATOR   0
+#define RTS_RESPONDER   1
+
+    PE      rts_data;
+
+    struct AcSAPstart rts_start;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"rts\_sd":] the association-descriptor to be used to
+reference this association;
+
+\item[\verb"rts\_mode":] the dialogue mode (either monologue or two-way
+alternate),
+
+\item[\verb"rts\_turn":] the owner of the turn initially;
+
+\item[\verb"rts\_data":] any initial data (this is a pointer to a
+\verb"PElement" structure, which is fully explained in Chapter~\ref{libpsap});
+and,
+
+\item[\verb"rts\_start":] a \verb"AcSAPstart" structure
+(consult page~\pageref{AcSAPstart}).
+\end{describe}
+Note that the \verb"rts_data" element is allocated via \man malloc(3) and
+should be released by using the \verb"RTSFREE" macro when no longer referenced.
+The \verb"RTSFREE" macro behaves as if it was defined as:
+\begin{quote}\index{RTSFREE}\small\begin{verbatim}
+void    RTSFREE (rts)
+struct RtSAPstart *rts;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"RtInit",
+and not the \verb"RtSAPstart" structure itself.
+Further,
+\verb"RTSFREE" should be called only if the call to the \verb"RtInit"
+routine returned \verb"OK".
+
+If the call to \verb"RtInit" is not successful,
+then a {\sf RT-P-ABORT.INDICATION\/} event is simulated,
+and the relevant information is returned in an encoded
+\verb"RtSAPindication" structure
+(discussed in Section~\ref{rts:transfer} on page~\pageref{rts:transfer}).
+
+After examining the information returned by \verb"RtInit" on a successful call
+(and possibly after examining the argument vector),
+the responder should either accept or reject the association.
+For either response,
+the responder should use
+the \verb"RtOpenResponse" routine
+(which corresponds to the {\sf RT-OPEN.RESPONSE\/} action).
+\begin{quote}\index{RtOpenResponse}\small\begin{verbatim}
+int     RtOpenResponse (sd, status, context, respondtitle, 
+        respondaddr, ctxlist, defctxresult, data, rti)
+int     sd,
+        status;
+OID     context;
+AEI     respondtitle;
+struct PSAPaddr *respondaddr;
+struct PSAPctxlist *ctxlist;
+int     defctxresult;
+PE      data;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"status":] the acceptance indicator
+(either \verb"ACS_ACCEPT" if the association is to be accepted,
+or one of the user-initiated rejection codes listed in
+Table~\ref{AcSAPreasons} on page~\pageref{AcSAPreasons});
+
+\item[\verb"data":] any initial data
+(regardless of whether the association is to be accepted);
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure,
+which is updated only if the call fails.
+\end{describe}
+The remaining parameters are for the association control service,
+consult the description of the \verb"AcAssocResponse" routine on
+page~\pageref{AcAssocResponse}.
+
+If the call to \verb"RtOpenResponse" is successful,
+and the \verb"status" parameter was set to \verb"ACS_ACCEPT",
+then association establishment has now been completed.
+If the call was successful,
+but the \verb"status" parameter was not \verb"ACS_ACCEPT",
+then the association has been rejected and the responder may exit.
+Otherwise,
+if the call failed and the reason is ``fatal'',
+then the association is lost.
+
+\subsubsection	{Client Initialization}
+A program wishing to associate itself with another user of reliable transfer
+services calls the \verb"RtOpenRequest" routine,
+which corresponds to the {\sf RT-OPEN.REQUEST\/} action.
+\begin{quote}\index{RtOpenRequest}\small\begin{verbatim}
+int     RtOpenRequest (mode, turn, context, callingtitle,
+        calledtitle, callingaddr, calledaddr, ctxlist,
+        defctxname, data, qos, rtc, rti)
+int     mode,
+        turn;
+AEI     callingtitle,
+        calledtitle;
+OID     context;
+struct PSAPaddr *callingaddr,
+                *calledaddr;
+int     single;
+struct PSAPctxlist *ctxlist;
+OID     defctxname;
+PE      data;
+struct QOStype *qos;
+struct RtSAPconnect *rtc;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"mode":] the dialogue mode;
+
+\item[\verb"turn":] who gets the initial turn;
+
+\item[\verb"data":] any initial data;
+
+\item[\verb"qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos} in \voltwo/);
+
+\item[\verb"rtc":] a pointer to a \verb"RtSAPconnect" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+The remaining parameters are for the association control service,
+consult the description of the \verb"AcAssocRequest" routine on
+page~\pageref{AcAssocRequest}.
+If the call to \verb"RtOpenRequest" is successful
+(this corresponds to a {\sf RT-OPEN.CON\-FIR\-MA\-TION\/} event),
+it returns information in the \verb"rtc" parameter,
+which is a pointer to a \verb"RtSAPconnect" structure.
+\begin{quote}\index{RtSAPconnect}\small\begin{verbatim}
+struct RtSAPconnect {
+    int     rtc_sd;
+
+    int     rtc_result;
+
+    PE      rtc_data;
+
+    struct AcSAPconnect rtc_connect;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"rtc\_sd":] the association-descriptor to be used to
+reference this association;
+
+\item[\verb"rtc\_result":] the association response;
+
+\item[\verb"rtc\_data":] any initial data
+(regardless of whether the association was accepted);
+and,
+
+\item[\verb"rtc\_connect":] a \verb"AcSAPconnect" structure
+(consult page~\pageref{AcSAPconnect}).
+\end{describe}
+If the call to \verb"RtOpenRequest" is successful,
+and the \verb"rtc_result" element is set to \verb"RTS_ACCEPT",
+then association establishment has completed.
+If the call is successful,
+but the \verb"rtc_result" element is not \verb"RTS_ACCEPT",
+then the association attempt has been rejected;
+consult Table~\ref{RtSAPreasons} to determine the reason for the reject.
+Otherwise, if the call fails then the association is not established and
+the \verb"RtSAPabort" structure of the \verb"RtSAPindication" discriminated
+union has been updated.
+
+Note that the \verb"rtc_data" element is allocated via \man malloc(3) and
+should be released using the \verb"RTCFREE" macro  when no longer referenced.
+The \verb"RTCFREE" macro behaves as if it was defined as:
+\begin{quote}\index{RTCFREE}\small\begin{verbatim}
+void    RTCFREE (rtc)
+struct RtSAPconnect *rtc;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"RtOpenRequest",
+and not the \verb"RtSAPconnect" structure itself.
+Further,
+\verb"RTCFREE" should be called only if the call to the \verb"RtOpenRequest"
+routine returned \verb"OK".
+
+\subsection	{Association Release}
+The \verb"RtCloseRequest" routine is used to request the release of an
+association,
+and corresponds to a {\sf RT-CLOSE.REQUEST\/} action.
+\begin{quote}\index{RtCloseRequest}\small\begin{verbatim}
+int     RtCloseRequest (sd, reason, data, acr, rti)
+int     sd,
+        reason;
+PE      data;
+struct AcSAPrelease *acr;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"reason":] the reason why the association should be released,
+one of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Reason}\\
+\hline
+    \tt ACF\_NORMAL&	normal\\
+    \tt ACF\_URGENT&	urgent\\
+    \tt ACF\_UNDEFINED&	undefined\\
+\hline
+\end{tabular}\]
+
+\item[\verb"data":] any final data;
+
+\item[\verb"acr":] a pointer to a \verb"AcSAPrelease" structure,
+which is updated only if the call succeeds;
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call to \verb"RtCloseRequest" is successful,
+then this corresponds to a {\sf RT-CLOSE.CONFIRMATION\/} event,
+and it returns information in the \verb"acr" parameter,
+which is a pointer to a \verb"AcSAPrelease" structure
+(consult page~\pageref{AcSAPrelease}).
+
+If the call to \verb"RtCloseRequest" is successful,
+then the association has been released.
+Otherwise the \verb"RtSAPabort" element of the \verb"RtSAPindication"
+parameter \verb"rti" contains the reason for failure.
+
+Upon receiving a {\sf RT-CLOSE.INDICATION\/} event,
+the user is required to generate a {\sf RT-CLOSE.RESPONSE\/} action
+using the \verb"RtCloseResponse" routine.
+\begin{quote}\index{RtCloseResponse}\small\begin{verbatim}
+int     RtCloseResponse (sd, reason, data, rti)
+int     sd,
+        reason;
+PE      data;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"reason":] the reason for the indicator,
+one of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Reason}\\
+\hline
+    \tt ACR\_NORMAL&		normal\\
+    \tt ACR\_NOTFINISHED&	not finished\\
+    \tt ACR\_UNDEFINED&		undefined\\
+\hline
+\end{tabular}\]
+
+\item[\verb"data":] any final data;
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call to \verb"RtCloseResponse" is successful,
+then the association has been released.
+If the call was successful,
+but the \verb"reason" parameter was not \verb"ACR_NORMAL",
+then the association remains established.
+
+\subsection	{Association Abort}
+To unilaterally abort an association,
+the routine \verb"RtUAbortRequest" routine is used
+which corresponds to the {\sf RT-U-ABORT.REQUEST\/} action.
+\begin{quote}\index{RtUAbortRequest}\small\begin{verbatim}
+int     RtUAbortRequest (sd, data, rti)
+int     sd;
+PE      data;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"data":] any abort data;
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call to \verb"RtUAbortRequest" is successful,
+then the association is immediately relesaed,
+and any data queued for the association may be lost.
+
+\section	{Reliable Transfer}\label{rts:transfer}
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	Users should also consult Sectin~\ref{rts:revisited} on
+		page~\pageref{rts:revisited} for optional routines to
+		make RTS behave more sanely.
+\end{tabular}}\]
+
+Once the association has been established,
+an association-descriptor is used to reference the association.
+This is usually the first parameter given to any of the remaining routines in
+the \man librtsap(3n) library.
+Further,
+the last parameter is usually a pointer to a \verb"RtSAPindication"
+structure.
+If a call to one of these routines fails,
+then the structure is updated.
+\begin{quote}\index{RtSAPindication}\small\begin{verbatim}
+struct RtSAPindication {
+    int     rti_type;
+#define RTI_TURN        0x00
+#define RTI_TRANSFER    0x01
+#define RTI_ABORT       0x02
+#define RTI_CLOSE       0x03 (X.410 CLOSE)
+#define RTI_FINISH      0x04 (RT-CLOSE)
+
+    union {
+        struct RrSAPturn rti_un_turn;
+        struct RtSAPtransfer rti_un_transfer;
+        struct RtSAPabort rti_un_abort;
+        struct RtSAPclose rti_un_close;
+        struct AcSAPfinish rti_un_finish
+    }   rti_un;
+#define rti_turn        rti_un.rti_un_turn
+#define rti_transfer    rti_un.rti_un_transfer
+#define rti_abort       rti_un.rti_un_abort
+#define rti_close       rti_un.rti_un_close
+#define rti_finish      rti_un.rti_un_finish
+};
+\end{verbatim}\end{quote}
+As shown, this structure is really a discriminated union
+(a structure with a tag element followed by a union).
+Hence, on a failure return,
+one first coerces a pointer to the \verb"RtSAPabort" structure contained
+therein,
+and then consults the elements of that structure.
+\begin{quote}\index{RtSAPabort}\small\begin{verbatim}
+struct RtSAPabort {
+    int     rta_peer;
+
+    int     rta_reason;
+
+    PE      rta_udata;
+
+#define RTA_SIZE        512
+    int     rta_cc;
+    char    rta_data[RTA_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of a \verb"RtSAPabort" structure are:
+\begin{describe}
+\item[\verb"rta\_peer":] if set, indicates a user-initiated abort
+(a {\sf RT-U-A\-BORT.IN\-DI\-CA\-TION\/} event);
+if not set, indicates a provider-initiated abort
+(a {\sf RT-P-ABORT.INDICATION\/} event);
+
+\item[\verb"rta\_reason":] the reason for the abort
+(codes are listed in Table~\ref{RtSAPreasons});
+
+\item[\verb"rta\_udata":] optionally, data associated with the user-initiated
+abort;
+and,
+
+\item[\verb"rta\_data"/\verb"rta\_cc":] a diagnostic string from the provider.
+\end{describe}
+\tagtable[tp]{2c-1}{RtSAP Failure Codes}{RtSAPreasons}
+Note that the \verb"rta_udata" element is allocated via \man malloc(3) and
+should be released using the \verb"RTAFREE" macro  when no longer referenced.
+The \verb"RTAFREE" macro behaves as if it was defined as:
+\begin{quote}\index{RTAFREE}\small\begin{verbatim}
+void    RTAFREE (rta)
+struct RtSAPabort *rta;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated in the \verb"RtSAPabort" structure
+and not the structure itself.
+
+On a failure return,
+if the \verb"rta_reason" element of the \verb"RtSAPabort" structure is
+associated with a fatal error,
+the the association is released.
+The \verb"RTS_FATAL" macro can be used to determine this.
+\begin{quote}\index{RTS\_FATAL}\small\begin{verbatim}
+int     RTS_FATAL (r)
+int     r;
+\end{verbatim}\end{quote}
+For protocol purists,
+the \verb"RTS_OFFICIAL" macro can be used to determine if the error is an
+``official'' error as defined by the specification,
+or an ``unofficial'' error used by the implementation.
+\begin{quote}\index{RTS\_OFFICIAL}\small\begin{verbatim}
+int     RTS_OFFICIAL (r)
+int     r;
+\end{verbatim}\end{quote}
+
+\subsection	{Sending Data}
+When the user has the turn,
+it can use the \verb"RtTransferRequest" routine
+(this corresponds to the {\sf RT-TRANSFER.REQUEST\/} action)
+to request the reliable transfer of a data structure.
+\begin{quote}\index{RtTransferRequest}\small\begin{verbatim}
+int     RtTransferRequest (sd, data, secs, rti)
+int     sd;
+PE      data;
+int     secs;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"data":] the data to be transferred;
+
+\item[\verb"secs":] the amount of time, in seconds, permitted to transfer the
+data (use the manifest constant \verb"NOTOK" if time is unimportant);
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If \verb"RtTransferRequest" succeeds,
+then the data has been reliably transferred to the other user.
+Otherwise the \verb"RtSAPabort" structure contained in
+the \verb"RtSAPindication" parameter \verb"rti"
+contains the reason for failure.
+
+\subsection	{Receiving Data}
+The \verb"RtWaitRequest" routine is used to wait for an event
+(usually incoming data) to occur.
+\begin{quote}\index{RtWaitRequest}\small\begin{verbatim}
+int     RtWaitRequest (sd, secs, rti)
+int     sd;
+int     secs;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"secs":] the maximum number of seconds to wait for the event
+(a value of \verb"NOTOK" indicates that the call should block indefinitely,
+whereas a value of \verb"OK" indicates that the call should not block at all,
+e.g., a polling action);
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure,
+which is always updated.
+\end{describe}
+Unlike the other routines in the \man librtsap(3n) library,
+the \verb"RtWaitRequest" routine returns one of three values:
+\verb"NOTOK" (on failure),
+\verb"OK" (on reading data)
+or
+\verb"DONE" (when something else happens).
+
+If the call to \verb"RtWaitRequest" returns the manifest constant
+\verb"NOTOK",
+then the \verb"RtSAPabort" structure contained in
+the \verb"RtSAPindication" parameter
+\verb"rti" contains the reason for the failure.
+
+Otherwise if the call to \verb"RoWaitRequest" returns the manifest constant
+\verb"OK",
+then data has arrived.
+This event is encoded in the \verb"rti" parameter,
+depending on the value of the \verb"rti_type" element.
+Currently,
+when \verb"RoWaitRequest" returns \verb"OK",
+the \verb"rti_type" element is set to \verb"RTI_TRANSFER",
+which indicates that a {\sf RT-TRANSFER.REQUEST\/} event has occurred.
+
+Otherwise if the call to \verb"RtWaitRequest" returns the manifest constant
+\verb"DONE",
+then some event other than data arriving has occurred.
+This event is also encoded in the \verb"rti" parameter,
+depending on the value of the \verb"rti_type" element.
+Currently,
+when \verb"RoWaitRequest" returns \verb"DONE",
+the \verb"rti_type" element is set to one of two values:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+			\multicolumn{1}{c|}{\bf Event}\\
+\hline
+    \tt RTI\_TURN&	\sf RT-TURN-PLEASE.INDICATION\\
+\hline
+    \tt RTI\_TURN&	\sf RT-TURN-GIVE.INDICATION\\
+\hline
+    \tt RTI\_CLOSE&	\sf X.410 CLOSE.INDICATION\\
+	&		\ \ (for old-style associations)\\
+\hline
+    \tt RTI\_FINISH&	\sf RT-CLOSE.INDICATION\\
+\hline
+\end{tabular}\]
+
+\subsubsection	{Transfer Indication}
+When an {\sf RT-TRANSFER.INDICATION\/} event occurs,
+the \verb"rti_type" field of the \verb"rti" parameter contains the value
+\verb"RTI_TRANSFER",
+and a \verb"RtSAPtransfer" structure is contained inside the \verb"rti"
+parameter.
+\begin{quote}\index{RtSAPtransfer}\small\begin{verbatim}
+struct RtSAPtransfer {
+    PE      rtt_data;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"rtt\_data":] the data received.
+\end{describe}
+Note that the \verb"rtt_data" element is allocated via \man malloc(3) and
+should be released using the \verb"RTTFREE" macro  when no longer referenced.
+The \verb"RTTFREE" macro behaves as if it was defined as:
+\begin{quote}\index{RTTFREE}\small\begin{verbatim}
+void    RTTFREE (rtt)
+struct RtSAPtransfer *rtt;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated in the \verb"RtSAPtransfer" structure
+and not the structure itself.
+
+\subsubsection	{Turn Indication}
+When an {\sf RT-TURN-GIVE.INDICATION\/} or {\sf RT-TURN-PLEASE.INDICATION\/}
+events occur,
+the \verb"rti_type" field of the \verb"rti" parameter contains the value
+\verb"RTI_TURN",
+and a \verb"RtSAPturn" structure is contained inside the \verb"rti"
+parameter.
+\begin{quote}\index{RtSAPturn}\small\begin{verbatim}
+struct RtSAPturn {
+    int     rtu_please;
+
+    int     rtu_priority;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"rtu\_please":] if set, indicates that a
+{\sf RT-PLEASE-TURN.INDICATION\/} event has occurred;
+if not set,
+indicates that a {\sf RT-GIVE-TURN.IN\-DI\-CA\-TION\/} event has occurred;
+and,
+
+\item[\verb"rtu\_priority":] the priority at which the turn is requested
+(meaningful only if \verb"rtu_please" is set).
+\end{describe}
+
+\subsubsection	{Close Indication}
+When an {\sf X.410 CLOSE.INDICATION\/} event occurs,
+the \verb"rti_type" field of the \verb"rti" parameter contains the value
+\verb"RTI_CLOSE",
+and a \verb"RtSAPclose" structure is contained inside the \verb"rti"
+parameter.
+\begin{quote}\index{RtSAPclose}\small\begin{verbatim}
+struct RtSAPclose {
+    int     rtc_dummy;
+};
+\end{verbatim}\end{quote}
+
+\subsubsection	{Finish Indication}
+When an {\sf RT-CLOSE.INDICATION\/} event occurs,
+the \verb"rti_type" field of the \verb"rti" parameter contains the value
+\verb"RTI_FINISH",
+and a \verb"AcSAPfinish" structure is contained inside the \verb"rti"
+parameter.
+
+\subsection	{Managing the Turn}
+The user with the turn is permitted to send data to the other user.
+To request the turn,
+one invokes the \verb"RtPTurnRequest" routine,
+which corresponds to the {\sf RT-PLEASE-TURN.REQUEST}.
+\begin{quote}\index{RtPTurnRequest}\small\begin{verbatim}
+int     RtPTurnRequest (sd, priority, rti)
+int     sd;
+int     priority;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"priority":] the priority at which the turn is requested
+(this is defined by each application);
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to the \verb"RtPTurnRequest" routine succeeds,
+then the turn has been requested of the remote user.
+Otherwise the \verb"RtSAPabort" structure contained in
+the \verb"RtSAPindication" parameter
+\verb"rti" contains the reason for failure.
+
+To relinquish the turn,
+one invokes the \verb"RtGTurnRequest" routine,
+which corresponds to the {\sf RT-GIVE-TURN.REQUEST}.
+\begin{quote}\index{RGPTurnRequest}\small\begin{verbatim}
+int     RtGTurnRequest (sd, rti)
+int     sd;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to the \verb"RtGTurnRequest" routine succeeds,
+then the turn has been relinquished to the remote user.
+Otherwise the \verb"RtSAPabort" structure contained in
+the \verb"RtSAPindication" parameter
+\verb"rti" contains the reason for failure.
+
+\subsection     {Asynchronous Event Handling}
+The events discussed thus far have been synchronous in nature.
+Some users of the reliable transfer service may wish an asynchronous interface.
+The \verb"RtSetIndications" routine is used to change the service associated
+with an association-descriptor to an asynchronous interface.
+\begin{quote}\index{RtSetIndications}\small\begin{verbatim}
+int   RtSetIndications (sd, indication, rti)
+int   sd;
+IFP   indication;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"indication":] the address of an event-handler routine to be
+invoked when an event occurs;
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the service is to be made asynchronous,
+then \verb"indication" is specified;
+otherwise,
+if the service is to be made synchronous,
+it is not specified (use the manifest constant \verb"NULLIFP").
+The most likely reason for the call failing is \verb"RTS_WAITING",
+which indicates that an event is waiting for the user.
+
+When an event occurs,
+the event-handler routine is invoked with two parameters:
+\begin{quote}\small\begin{verbatim}
+(*handler) (sd, rti);
+int     sd;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure encoding
+the event.
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the appropriate macro
+(either \verb"RTTFREE" or \verb"RTPFREE")
+when no longer needed.
+
+When an event-handler is invoked,
+future invocations of the event-hander are blocked until it returns.
+The return value of the event-handler is ignored.
+Further,
+during the execution of a synchronous call to the library,
+the event-handler will be blocked from being invoked.
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	The \man librtsap(3n) library uses the SIGEMT signal to
+		provide these services.
+		Programs using asynchronous association-descriptors should NOT
+		use SIGEMT for other purposes.
+\end{tabular}}\]
+
+\subsection     {Synchronous Event Multiplexing}
+A user of the reliable transfer service may wish to manage multiple
+asso\-ci\-ation-descriptors simultaneously;
+the routine \verb"RtSelectMask" is provided for this purpose.
+This routine updates a file-descriptor mask and associated counter for use
+with \verb"xselect" (consult Section~\ref{acs:select}),
+as assocation-descriptors are file-descriptors.
+\begin{quote}\index{RtSelectMask}\small\begin{verbatim}
+int     RtSelectMask (sd, mask, nfds, rti)
+int     sd;
+fd_set *mask,
+int    *nfds;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"mask":] a pointer to a file-descriptor mask meaningful to
+\verb"xselect";
+
+\item[\verb"nfds":] a pointer to an integer-valued location meaningful to
+\verb"xselect";
+and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call is successful, then the \verb"mask" and \verb"nfds" parameters can
+be used as arguments to \verb"xselect".
+The most likely reason for the call failing is \verb"RTS_WAITING",
+which indicates that an event is waiting for the user.
+
+If \verb"xselect" indicates that the association-descriptor is ready for
+reading,
+\verb"RtWaitRequest" should be called with the \verb"secs" parameter equal to
+\verb"OK".
+If the network activity does not constitute an entire event for the user,
+then \verb"RtWaitRequest" will return \verb"NOTOK" with error code
+\verb"RTS_TIMER".
+
+\subsection     {Reliable Transfer (revisited)}\label{rts:revisited}
+The mechanism provided by \verb"RtTransferRequest" may not be useful for
+applications which have large amounts of data to transfer.
+In most cases,
+it is preferable to transfer data incrementally.
+To provide for this functionality,
+the routine \verb"RtSetDownTrans" is provided:
+\begin{quote}\index{RtSetDownTrans}\small\begin{verbatim}
+int     RtSetDownTrans (sd, fnx, rti)
+int     sd;
+IFP     fnx;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association descriptor;
+
+\item[\verb"fnx":] the address of an event-handler routine to be invoked when
+data is needed; and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the \verb"fnx" parameter is some value other than the manifest constant
+\verb"NULLIFP",
+then upon successful return from \verb"RtSetDownTrans",
+the behavior of the routine \verb"RtTransferRequest" is altered.
+\begin{enumerate}
+\item	The \verb"data" parameter to \verb"RtTransferRequest" may be
+	\verb"NULLPE".
+
+\item	In this case, the event-handler routine \verb"fnx" will be invoked
+	in order to retrieve a portion of the data to be transferred:
+\begin{quote}\small\begin{verbatim}
+result = (*fnx) (sd, base, len, size, ack, ssn, rti);
+int     sd;
+char  **base;
+int    *len,
+        size;
+long    ack,
+        ssn;
+struct RtSAPindication *rti;
+\end{verbatim}
+\end{quote}
+where \verb"sd" is the association-descriptor which was given to the routine
+\verb"RtTransferRequest".
+
+\item	If the \verb"base" parameter has the value \verb"NULLVP",
+	then a {\sf RT-PLEASE.IN\-DI\-CA\-TION\/} event is being signaled,
+	and the \verb"size" parameter has the value of the priority associated
+	with the event.
+
+\item	Otherwise, the \verb"base" and \verb"len" parameters point to a
+	pointer/length pair which should be set by the event handler to upto
+	\verb"size" octets.  The event handler is responsible for any
+	memory allocation (e.g., allocating a buffer of \verb"size" octets and
+	then assigning the address of the buffer to \verb"*base").
+	Once a buffer is chosen, the event handler should read upto
+	\verb"size" octets into the buffer and set \verb"*len" to the number
+	of octets actually read.  The \verb"ssn" and \verb"ack" parameters
+	given the values of the last synchronization point requested and
+	acknolwedged (how this information should be used is unknown at this
+	time).  If the value assigned to \verb"*len" is zero, then this
+	indicates that all data has been read and the transfer should be
+	completed.
+
+\item	If the value of the \verb"size" is zero, then this indicates that the
+	provider could not negotiate a incremental transfer and the event
+	handler should allocate a buffer of arbitrary size, read all of the
+	data to be transferred into that one buffer, and then update
+	\verb"*base" and \verb"*len" accordingly.
+
+\item	If the event handler encounters an error, it should return the
+	manifest constant \verb"NOTOK" (otherwise, it should return
+	\verb"OK").
+	If an error is signaled, the event handler should update the
+	\verb"rti" structure accordingly.  The easiest way to do this is:
+\begin{quote}\small\begin{verbatim}
+return rtsaplose (rti, RTS_TRANSFER, NULLCP, "text");
+\end{verbatim}\end{quote}
+If the event is {\sf RT-PLEASE.REQUEST},
+then signaling an error results in the provider generating an
+{\sf S-ACTIVITY-INTERRUPT.REQUEST};
+otherwise when an error is signaled, the provider will generate an
+{\sf S-ACTIVITY-DISCARD.REQUEST\/} to abort the transfer.
+\end{enumerate}
+
+For similar reasons,
+the mechanism employed by \verb"RtWaitRequest" may not be useful for
+applications which have large amounts of data to transfer.
+Again,
+in most cases it is preferable to transfer data incrementally.
+To provide for this functionality,
+the routine \verb"RtSetUpTrans" is provided:
+\begin{quote}\index{RtSetUpTrans}\small\begin{verbatim}
+int     RtSetUpTrans (sd, fnx, rti)
+int     sd;
+IFP     fnx;
+struct RtSAPindication *rti;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association descriptor;
+
+\item[\verb"fnx":] the address of an event-handler routine to be invoked when
+data has been received; and,
+
+\item[\verb"rti":] a pointer to a \verb"RtSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the \verb"fnx" parameter is some value other than the manifest constant
+\verb"NULLIFP",
+then upon successful return from \verb"RtSetUpTrans",
+the behavior of the routine \verb"RtWaitRequest" is altered when it returns an
+{\sf RT-TRANSFER.INDICATION\/}
+(the \verb"rti_type" field of the \verb"rti" parameter contains the value
+\verb"RTI_TRANSFER",
+and a \verb"RtSAPtransfer" structure is contained inside the \verb"rti"
+parameter).
+No data is returned by \verb"RtWaitRequest",
+rather as data is received, the event routine is invoked:
+\begin{enumerate}
+\item	When data is received, the event-handler routine \verb"fnx" will 
+	be invoked
+	in order to store a portion of the data being transferred:
+\begin{quote}\small\begin{verbatim}
+result = (*fnx) (sd, event, addr, rti);
+int     sd;
+int     event;
+caddr_t addr;
+struct RtSAPindication *rti;
+\end{verbatim}
+\end{quote}
+where \verb"sd" is the association-descriptor which was given to the routine
+\verb"RtWaitRequest".
+
+\item	If the \verb"event" parameter has the value \verb"SI_DATA",
+	then the \verb"addr" parameter is really a pointer to a
+	\verb"struct qbuf" structure, and the event handler should
+	traverse the qbuf writing out the data found therein.
+
+\item	If the \verb"event" parameter has the value \verb"SI_SYNC",
+	then the \verb"addr" parameter is really a pointer to a 
+	\verb"struct SSAPsync" structure, and the event handler should note
+	the information contained therein.Currently, this will only
+	occur when a {\sf S-MINOR-SYNC.INDICATION\/} event is signaled.
+
+\item	If the \verb"event" parameter has the value \verb"SI_ACTIVITY",
+	then the \verb"addr" parameter is really a pointer to a
+	\verb"struct SSAPactivity" structure, and the event handler should note
+	the information contained therein.  Currently, there are four events
+	that are signaled:
+    \begin{itemize}
+    \item	{\sf S-ACTIVITY-START.INDICATION\/} which indicates that a
+		transfer is about to begin;
+
+    \item	{\sf S-ACTIVITY-END.INDICATION\/} which indicates that a
+		transfer is about to complete; and,
+
+    \item	{\sf S-ACTIVITY-INTERRUPT.IN\-DI\-CA\-TION\/} and\\ %%%
+		{\sf S-ACTIVITY-DIS\-CARD.IN\-DI\-CA\-TION\/} which indicate
+		that an activity is either suspended or aborted.
+    \end{itemize}
+
+\item	If the \verb"event" parameter has the value \verb"SI_REPORT",
+	then the \verb"addr" parameter is really a pointer to a
+	\verb"struct SSAPreport" structure, and the event handler should note
+	the information contained therein.  Currently, this will only
+	occur when a {\sf S-U-EXCEPTION-REPORT.IN\-DI\-CA\-TION\/} event is
+	signaled.
+
+\item	If the event handler encounters an error, it should return the
+	manifest constant \verb"NOTOK" (otherwise, it should return
+	\verb"OK").
+	If an error is signaled, the event handler should update the
+	\verb"rti" structure accordingly.  The easiest way to do this is:
+\begin{quote}\small\begin{verbatim}
+return rtsaplose (rti, RTS_TRANSFER, NULLCP, "text");
+\end{verbatim}\end{quote}
+If the event is {\sf S-ACTIVITY-INTERRUPT.INDICATION},
+{\sf S-ACTIVITY-INTERRUPT.INDICATION},
+or {\sf S-ACTIVITY-INTERRUPT.IN\-DI\-CA\-TION},
+then signaling an error is ignorred by the provider;
+otherwise, when an error is signaled, the provider will generate an
+{\sf S-U-EXCEPTION-REPORT.REQUEST\/} to abort the transfer.
+\end{enumerate}
+
+\section	{Error Conventions}
+All of the routines in this library return the manifest constant \verb"NOTOK"
+on error,
+and also update the \verb"rti" parameter given to the routine.
+The \verb"rti_abort" element of the \verb"RtSAPindication" structure
+encodes the reason for the failure.
+One coerces a pointer to a \verb"RtSAPabort" structure,
+and consults the \verb"rta_reason" element of this latter structure.
+This element can be given as a
+parameter to the routine \verb"RtErrString" which returns a null-terminated
+diagnostic string.
+\begin{quote}\index{RtErrString}\small\begin{verbatim}
+char   *RtErrString (c)
+int     c;
+\end{verbatim}\end{quote}
+
+\section	{Compiling and Loading}
+Programs using the \man librtsap(3n) library should include
+\verb"<isode/rtsap.h>",
+which automatically includes the header file \verb"<isode/psap.h>" described in
+Chapter~\ref{libpsap}.
+The programs should also be loaded with \verb"-lisode".
+
+\section	{An Example}
+Let's consider how one might construct a generic server that uses
+reliable transfer services to establish an association,
+but then uses remote operation services to communicate with its peer.
+This entity will use a synchronous interface.
+
+There are two parts to the program:
+initialization and the request/reply loop.
+In our example,
+we assume that the routine \verb"error" results in the process being
+terminated after printing a diagnostic.
+
+In Figure~\ref{initRTSresponder},
+the initialization steps for the generic responder,
+including the outer {\em C\/} wrapper,
+is shown.
+First, the RtSAP state is re-captured by calling \verb"RtInit".
+If this succeeds,
+then the association is authenticated and any command line arguments
+are parsed.
+Assuming that the responder is satisfied with the proposed association,
+it calls \verb"RtOpenResponse" to accept the association.
+The \verb"RoSetService" routine is called to set the underlying service to be
+used for remote operations.
+Finally,
+the main request/reply loop is realized.
+The responder calls \verb"RoWaitRequest" to get the next event,
+and then calls \verb"ros_indication" to decode that event.
+
+Figure~\ref{doROSresponder} on page~\pageref{doROSresponder}
+contains the definition of the
+\verb"ros_indication" routine and associated routines.
+Since the reliable transfer service was used to establish the association,
+a different closing handler must be used.
+This is shown in Figure~\ref{finRTSresponder}.
+{\let\small=\scriptsize			%%% yikes!
+\clearpage
+\tagrind[tp]{grind2c-2}{Initializing the generic RTS responder}%
+	{initRTSresponder}
+\clearpage
+\tagrind[tp]{grind2c-3}{Finalizing the generic RTS responder}%
+	{finRTSresponder}}
+
+\section	{For Further Reading}
+\cite{MHS.RTS} is the CCITT recommendation describing the reliable transfer
+service.
+The draft CCITT work which assumes the use of new-style associations is
+defined in \cite{CCITT.RTS.Service} and \cite{CCITT.RTS.Protocol}.
+Similarly,
+the corresponding ISO work is
+\cite{ISO.RTS.Service} and \cite{ISO.RTS.Protocol}.
+
+%%% \section	{Changes Since the Last Release}\label{rtsap:changes}
+%%% A brief summary of the major changes between v~\isodeprevrsn/ and
+%%% v~\isodevrsn/ are now presented.
+%%% These are the user-visible changes only;
+%%% changes of a strictly internal nature are not discussed.
+

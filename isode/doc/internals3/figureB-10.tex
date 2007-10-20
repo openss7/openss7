@@ -1,0 +1,24 @@
+\File{figureB\-10.c},{11:21},{May  5 1990}
+\L{\LB{}\Tab{8}{\K{case} OK:}\Tab{32}{\C{}\/* got a result\/error response *\/\CE{}}}
+\L{\LB{\Proc{switch}}\Tab{8}{    \K{switch} (response) \{}}
+\L{\LB{}\Tab{16}{\K{case} RY\_RESULT:}\Tab{32}{\C{}\/* got a result *\/\CE{}}}
+\L{\LB{}\Tab{16}{    \{}}
+\L{\LB{}\Tab{24}{\K{register} \K{struct} type\_MODULE\_result *res =}}
+\L{\LB{}\Tab{32}{    (\K{struct} type\_MODULE\_result *) out;}}
+\L{\LB{}}
+\L{\LB{\C{}\/* do something with ``res\'\' here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{}\Tab{24}{free\_MODULE\_result (res);}}
+\L{\LB{}\Tab{24}{\K{break};}}
+\L{\LB{}\Tab{16}{    \}}}
+\L{\LB{}\Tab{8}{}}
+\L{\LB{}\Tab{16}{\K{case} error\_MODULE\_error1:}}
+\L{\LB{}\Tab{16}{    \{}}
+\L{\LB{}\Tab{24}{\K{register} \K{struct} type\_MODULE\_parameter *parm =}}
+\L{\LB{}\Tab{32}{    (\K{struct} type\_MODULE\_parameter *) out;}}
+\L{\LB{}}
+\L{\LB{\C{}\/* do something with ``parm\'\' here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{}\Tab{24}{free\_MODULE\_parameter (parm);}}
+\L{\LB{}\Tab{24}{\K{break};}}
+\L{\LB{}\Tab{16}{    \}}}

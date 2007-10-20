@@ -1,0 +1,17 @@
+\File{grind2c\-3.c},{22:23},{Jun 12 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  ros\_finish (sd, rof)}}
+\L{\LB{\K{int}     sd;}}
+\L{\LB{\K{struct} AcSAPfinish *acf;}}
+\L{\LB{\{}}
+\L{\LB{    \K{struct} RtSAPindication  rtis;}}
+\L{\LB{    \K{register} \K{struct} RtSAPabort   *rta = \&rtis.rti\_abort;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (RtCloseResponse (sd, ACR\_NORMAL, NULLPE, \&rtis) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"RT\-CLOSE.RESPONSE: \%s\"\SE{}, RtErrString (rta \-\> rta\_reason));}}
+\L{\LB{}}
+\L{\LB{    ACFFREE (acf);}}
+\L{\LB{}}
+\L{\LB{    exit (0);}}
+\L{\LB{\}}}

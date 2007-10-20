@@ -1,0 +1,19 @@
+\File{grind\-repeat.c},{14:51},{Jul 12 1991}
+\L{\LB{    Repeated [[ P struct repeats * ]]::= SEQUENCE \{}}
+\L{\LB{        a SEQUENCE OF [[ T struct rep\_int * \$ rp\_sq1 ]]}}
+\L{\LB{            \<\<r\>\> [1] INTEGER [[ i i ]],}}
+\L{\LB{}}
+\L{\LB{        b SEQUENCE OF [[ T struct rep\_elem * \$ rp\_sq2 ]] \<\<r\_next\>\>}}
+\L{\LB{                Rep\-elem [[ p * ]],}}
+\L{\LB{}}
+\L{\LB{        c SET OF [[ T struct rep\_int * \$ rp\_st1 ]] \<\<r\>\> INTEGER [[ i i ]],}}
+\L{\LB{}}
+\L{\LB{        d SET OF [[ T struct rep\_elem * \$ rp\_st2 ]] \<\<r\_next\>\>}}
+\L{\LB{                [3] IMPLICIT Rep\-elem [[ p * ]],}}
+\L{\LB{}}
+\L{\LB{        e CHOICE [[ T struct repeats  * \$ * ]] \<\<rp\_choice\>\> \{}}
+\L{\LB{                [1] INTEGER [[ i rp\_int ]],}}
+\L{\LB{                [2] BOOLEAN [[ b rp\_bool ]],}}
+\L{\LB{                [3] OCTET STRING [[ o rp\_ostring \$ rp\_int ]]}}
+\L{\LB{            \}}}
+\L{\LB{        \}}}

@@ -1,0 +1,1574 @@
+% Run this through LaTeX with the appropriate wrappe
+
+\chapter{The OSI Directory}
+\label{dir_model}
+
+This chapter is designed as a quick introduction to the model of X.500
+directories, to provide the reader with sufficient information to be able to
+understand the following chapters.
+For full coverage of X.500 readers should consult
+\cite{little.black.book}.
+
+\section {The Model}
+The OSI directory is intended to support human user querying, allowing
+users to find, {\em inter alia}, telephone and address information of
+organisations and other users.  
+
+It is also intended to support electronic
+communication such as message handling systems and file transfer.
+The directory provides name to address mapping to support, for example, OSI
+presentation address look-ups. Message handling systems will be provided with 
+support for user-friendly naming, security and
+distribution lists.
+
+\tagfigure[tp]{q-dit}{Example DIT}{qfig:dit}
+
+In essence the directory is a database with certain key characteristics.
+\begin{itemize}
+\item
+The directory is intended to be very large and highly distributed. It is
+anticipated that the directory will be distributed largely on an
+organisational basis.
+\item
+The directory is hierarchically structured, the entries being arranged in
+the form of a tree called the directory information tree (DIT).
+An example DIT is shown in Figure~\ref{qfig:dit}. 
+Entries near the root of the tree will usually represent
+objects such as countries (e.g., ``GB'') and organisations (e.g., ``University 
+College London''), entries at or near the leaves
+of the tree will represent people (e.g., ``Colin Robbins''), 
+equipment or application processes.
+
+\item
+Read and search operations will dominate over modification operations.
+\item
+Temporary inconsistencies in the data are acceptable.  This greatly
+facilitates the replication of data in the directory by obviating concerns
+about record locking and atomic operations.
+\end{itemize}
+
+
+\section{Information Representation}
+\label{attributes}
+There are various structures needed to represent the data required in the
+directory database. These are described
+briefly below.
+
+\subsection {Object Identifiers}
+An important part of the OSI world is the object identifier (OID).
+
+An OID is a hierarchy of numbers used uniquely to describe various objects
+within the OSI world: for example, ``1.0.8571.1.1'' describes the FTAM
+protocol; ``0.9.2342.19200300.99.1'' 
+defines a QUIPU attribute type.
+The strings of numbers look ``horrible'' and can be difficult to remember.
+As such, QUIPU provides a mapping from OIDs to ``strings'', so that 
+easy-to-remember strings can be used in place of the numeric OIDs, for
+example ``iso~ftam'' or ``quipuAttributeType''.
+
+The mappings are defined in a set of oidtables which are discussed
+in Section~\ref{oidtables}. 
+
+\subsection {Attributes}
+
+\tagfigure[tp]{q-entry}{Structure of an Entry}{qfig:entry}
+
+The directory holds information about various entities, such as a person or
+an organisation.  The information is held in an information object,
+typically referred to as an {\em entry}. 
+An entry consists of a set of one of more attributes
+(see Figure~\ref{qfig:entry}).
+
+An attribute is represented by an attribute type and a set of attribute values.
+An attribute with a single value is represented as follows:
+\begin{quote}	
+$<$attribute type$>$ ``='' $<$attribute value$>$
+\end{quote}
+The attribute type can either be a string (which must be in the attribute
+oidtable --- see Section~\ref{oidtables}) or the OID in a dotted decimal
+format.
+
+Each attribute value is represented by a string, the format of the attribute value
+depends upon the
+syntax defined in the oidtables, but in general will be a string.
+
+So
+\begin{quote}\begin{verbatim}	
+roomNumber = G24
+2.5.4.20   = 453-5674
+commonName = Colin Robbins & Colin John Robbins
+photo      = {ASN} 0308207b4001488001fd...
+\end{verbatim}\end{quote}
+is an example of an entry, with 4 attributes. The ``commonName'' attribute
+is multivalued, 
+with the two values separated by the ``\&'' symbol.
+Notice how the ``photo'' attribute does not have a specific string format,
+so a hexadecimal ``ASN.1'' representation is used.
+``2.5.4.20'' is an object identifier represented in numeric form.
+
+
+\subsection {Names}
+\label{quipu_name}
+Within an entry, some attributes (generally one) have special importance,
+and are called  distinguished attributes.  The collection of these
+attributes form the relative distinguished name
+(RDN).\index{RDN}
+
+An RDN is usually represented by a single valued attribute, thus
+\begin{quote}	\begin{verbatim}
+commonName = Alan Turland
+organization = University College London
+\end{verbatim}\end{quote}
+are valid RDNs. 
+
+An RDN made up of multiple distinguished attributes uses the \verb+%+ symbol
+to separate the values, for
+example
+\begin{quote}	\begin{verbatim}
+userid = quipu % commonName = Colin Robbins
+\end{verbatim}\end{quote}
+
+A distinguished name (DN) is the sequence of RDNs that uniquely define
+a node in the directory information tree (DIT).
+These are represented as follows:
+\begin{quote}
+RDN [ ``@'' RDN \ldots]
+\end{quote}
+So
+\begin{quote}\small\begin{verbatim}
+countryName = GB @ organization = University College London 
+\end{verbatim}\end{quote}
+is an example of a valid DN.
+
+In some cases an RDN or DN is specified relative to a node other than the
+root in the DIT.
+To be unambiguous a DN may be rooted using a leading ``@'', for example
+\begin{quote}\small\begin{verbatim}
+@ countryName = GB @ organization = University College London 
+\end{verbatim}\end{quote}
+
+
+\section{Directory User Agent}
+The directory user agent (DUA) is the entity you as a user will
+connect to when you interact with the directory service.
+It will help you formulate your queries, wrap them up in the required
+protocol, pass them to the
+directory, and then show you the results obtained.
+
+The X.500 standard defines only the protocol the DUA should use when talking
+to the directory, and as such DUAs come in many varieties, but the basic
+concepts are the same.
+
+A DUA talks to the directory using the directory access protocol
+(DAP)\index{DAP}.
+
+The following chapters of this part of the manual describe several such
+DUA interfaces available in the ISODE.  It is left to system
+managers to decide which form of interface is appropriate at your
+site, and which to install.  There now follows a brief description of
+each interface:
+
+\begin{description}
+\item [DISH:]	The {\bf DI}rectory {\bf SH}ell 
+		(Chapter~\ref{dish}).\\
+		This interface give a user full access to the DAP, and
+		as such may be complex for novice users.
+
+\item [SID:]	{\bf S}teve's {\bf I}nterface to {\bf D}ISH 
+		(Chapter~\ref{DUA:sid}).\\
+		A set of scripts that make DISH usable for novice users.
+
+\item [DE:]	{\bf D}irecory {\bf E}nquires
+		(Chapter~\ref{DUA:de}).\\
+		A DUA for line mode terminals
+
+\item [FRED:]	{\bf FR}ont {\bf E}nd to {\bf D}ISH
+		(Chapter~\ref{DUA:fred}).\\
+
+		FRED provides a white pages user interface, which hides most
+		of the complexity of the OSI directory.
+
+\item [SD:]	{\bf S}creen {\bf D}irectory
+		(Chapter~\ref{sd}).\\
+		A curses-based DUA.
+
+\item [POD:]	{\bf PO}pup {\bf D}irectory
+		(Chapter~\ref{pod}).\\
+		A DUA for the \xwindows/.
+
+\end{description}
+
+\section{Directory System Agent}
+
+\tagfigure[tp]{q-dsa}{DUA/DSA Interaction}{qfig:dsa}
+
+The directory system agent (DSA) is the entity that generates the results to
+requests from a DUA.
+It may handle the request itself, ask another DSA (using the directory system
+protocol\index{DSP}), or advise the DUA to
+contact another DSA (see Figure~\ref{qfig:dsa}).
+This part of the directory is discussed more in Part III of this
+manual.  Here we shall concentrate on the DUA.
+
+
+\chapter{DISH}
+\label{dish}
+
+This chapter describes DISH, a directory shell interface to the directory.
+It provides an interface to the directory in an similar manner
+to the way that \MH/ provides an interface to a message handling systems.
+As with \MH/, DISH can either be invoked as a single process with the full
+repertoire of commands built in, or it can be invoked by individual shell
+commands.
+This latter style allows DISH to be used with others tools to provide very
+flexible access to the directory.
+
+DISH provides a very powerful interface onto the directory and gives a user
+access to the full directory access protocol(DAP).
+The price of such comprehensiveness is complexity.
+DISH has a large number of flags, and both the syntax and volume of typing
+required can seem forbidding to the novice user.
+One compromise solution is to use DISH to build interfaces which are easier
+to use and more intuitive.
+
+To run DISH in interactive mode invoke \pgm{dish}, then issue any of the
+commands described in Section~\ref{dish_commands}.
+This mode of operation is especially useful for novice users.
+The process of connecting to the directory --- binding ---
+takes place automatically when the program is invoked, and an unbind
+is issued when you quit.  
+
+The arguments to DISH are the same as for bind (see 
+Section~\ref{dish_bind}), with the addition of a ``-pipe'' flag
+which is used to start DISH in ``shell'' mode (see Section~\ref{dish_shell})
+(Note: ``dish -pipe \&'' has the same effect as the shell command ``bind'').
+
+\section {Commands}
+\label{dish_commands}
+
+Each of the DISH commands described in this section
+has a large number of valid flags.
+The full names of the flags are given below; however, the shortest unique
+name is sufficient to select the flag.
+Similarly, when DISH is used interactively the shortest unique name is taken
+for the command name (e.g., ``l'' for ``list'').
+There is an exception in that ``sh'' is interpreted as ``showentry'', 
+``shown'' must be typed for ``showname''.
+
+The additional flag \tt -help\rm \ can be specified with 
+every command to get limited runtime help.
+
+\subsection{Moveto}
+\label{dish_start}\index{moveto}
+With nearly every command it is possible to supply the distinguished name of
+the object you want to reference.
+In the syntax used to describe the DISH commands this is represented by 
+\begin{quote}\begin{verbatim}
+	<object>.  
+\end{verbatim}\end{quote}
+An initial ``\tt @\rm '' in an object description specifies that the name
+is relative to the root of the directory information tree (DIT), 
+otherwise the name is taken as being relative to the current
+position in the DIT.  
+The special name component ``..'' is used to mean ``one
+position up'' from the current position.  
+Some examples of valid names and their interpretation relative to
+how a distinguished name is built up are shown below by the following
+sequence of names:
+
+\begin{describe}
+
+\item [\verb+@c=GB@o=University College London@ou=Computer Science+:]
+\ \\
+The specified object is \\
+``c= GB @ o= University College London @ ou= Computer Science''.
+
+\item [\verb+cn=Colin Robbins+:]
+describes the object
+cn=Colin Robbins relative to the current 
+position (``c= GB @ o= University College London @ ou= Computer Science @ cn= Colin Robbins''). 
+Spaces in a name will be seen as the start of a separate 
+argument by the shell, so the name must be quoted.
+
+\item [\verb+..@cn=Steve Titcombe+:]
+describes the entry 
+cn=Steve Titcombe at the same level
+in the DIT as the current position (``c= GB @ o= University College London @
+ou= Computer Science @ cn= Steve Titcombe'').
+
+\end{describe}
+
+Objects can also be expressed in the form of sequence numbers and nicknames.
+See Sections~\ref{sequences} and \ref{quipurc}.
+
+When you specify an object, the current position in the DIT is not changed.
+To change the current position you should use the command
+\begin{quote}\begin{verbatim}
+moveto [-[no]pwd] [-[no]check] <position>
+\end{verbatim}\end{quote}
+
+The \tt -pwd\rm \ flag tells moveto to print the current position in the
+DIT.
+The \tt -nocheck\rm \ flag tells moveto NOT to check the entry exists,
+normally, moveto will invoke  \verb"read" to check that the named entry exists.
+
+The current position can also be changed with the \tt -move\rm \ flag to 
+showentry and list commands (see Sections~\ref{dua:list} and ~\ref{dua:show}).
+
+
+\subsection{Showentry}\index{showentry}
+\label{dua:show}
+
+\begin{quote}\begin{verbatim}
+showentry [<object>] [-[no]cache] [-[no]name]
+          [-[no]move]
+          [<any of the read arguments>]
+          [<any of the FRED arguments>]
+\end{verbatim}\end{quote}
+
+Showentry will display some or all of the attributes of the specified entry.
+A combination of the  read argument flags and your \file{.quipurc} file 
+described later in the chapter are used to define which attributes to show.
+
+The \tt -noname\rm \ option tells showentry to show the distinguished 
+name of the current entry as well as the attributes.
+
+\tt -cache\rm \ is used to tell showentry to use cached information only ---
+do not issue a read operation. 
+This is used to see what the DUA has cached, and then get information when
+the local DSA is unavailable.
+
+\tt -nocache\rm \ is used to enforce a directory read. This is used to
+update the cache directly.
+
+\tt -move\rm \ is used to tell DISH to change the current position in the DIT
+to the object specified as well as showing the requested attributes.
+
+See Section~\ref{fred:flags} for a discussion of the flags for FRED.
+
+\subsubsection{read flags}
+
+These flags are used by {\em showentry}, {\em showname} and {\em search}.
+
+\begin{quote}\begin{verbatim}
+[-[no]types <attribute-type> *] [-[no]all] 
+[-[no]value] [-[no]show] 
+[-[no]key] [-edb]
+[-proc <syntax> <process>]
+\end{verbatim}\end{quote}
+
+The \tt all\rm \ flag request that all attributes are read (default).
+
+The \tt value\rm \ flag reads the attribute value, which is the default, 
+the inverse is to read the attribute types only.
+
+The \tt novalue\rm \ flag says print the attribute types only.
+
+The \tt show\rm \ flag is used to make DISH show the requested
+attributes (this is the default for read, but not for search).
+
+The \tt key\rm \ flag determines whether the key (attribute type) will 
+be shown along with the attribute value.
+
+The \tt edb\rm \ flag requests that the data is displayed in ``EDB'' format,
+that is, a format which can be used in QUIPU data files.  This is not such 
+a nice format to present users, but is easier to manage in shell scripts.
+
+The \tt type\rm \ flag requests that only the supplied attributes are 
+read from the DSA; the inverse of this \tt -notype\rm \ does not 
+prevent the attributes being read (as there is no
+easy mechanism to perform this within X.500), 
+but it does stop them being shown.
+
+The \tt proc\rm \ flag is used to instruct the display routines to use an
+external process to display the attribute.
+For example if you have a process that displays presentation elements
+representing OIDs in a particular
+way, then you can use
+\begin{quote}\begin{verbatim}
+showentry -proc OID /usr/bin/oid_display_process.
+\end{verbatim}\end{quote}
+All OIDs will then be displayed using ``/usr/bin/oid\_display\_process''.
+The process should read the presentation element from the standard input, and
+place any textual results on the standard output.
+
+\subsection{List}\index{list}
+\label{dua:list}
+\begin{quote}\begin{verbatim}
+list [<object>] [-nocache] [-noshow] [-[no]move]
+\end{verbatim}\end{quote}
+This function displays the relative distinguished names of 
+the children below your current position in the DIT.
+Typically, if there are a large number of children, 
+you will not be able to list them all, as a ``sizelimit'' will prevent you.
+For example
+\begin{quote}\small\begin{verbatim}
+Dish -> list
+1   commonName=Camayoc
+2   commonName=Colin Robbins
+3   commonName=Jess
+4   commonName=Julian Onions
+5   commonName=lancaster
+6   commonName=PP Support
+7   commonName=QUIPU Support
+8   commonName=Tony Roadknight
+9   commonName=Hugh Smith
+10  commonName=Peter Cowen
+(Limit problem)
+Dish ->
+\end{verbatim}\end{quote}
+shows a size limit of 10.
+Using the \tt -sizelimit\rm \ service control you can often increase this limit
+up to some administrative limit (typically 100) set by the 
+DSA you are connected to.
+
+\tt -nocache\rm \ tells list to reread the directory --- do not use cached information.
+
+\tt -noshow\rm \ tells list not to display the names found, but 
+still construct sequences (see Section~\ref{sequences}).
+
+\tt -move\rm \ is used to tell DISH to change the current position in the DIT
+to the object specified. 
+
+\subsection{Search}\index{search}
+\label{search}
+
+\begin{quote}\begin{verbatim}
+search  [[-object] <object>] 
+        [-baseobject] [-singlelevel] [-subtree]
+        [[-filter] <filter>] 
+        [-[no]relative] [-[no]searchaliases]
+        [-[no]partial] [-hitone]
+        [<any of the read arguments>]
+        [-fred [-expand] [-full] [-summary] 
+               [-nofredseq] [-subdisplay]]
+\end{verbatim}\end{quote}
+
+Search the DIT, starting at the object specified, for entries that match
+the given filter.
+When an entry is found to match the filter, only distinguished name is printed
+unless a \tt-show\rm \ option is 
+specified, when the attributes are displayed as well.
+
+If no filter is specified, a default filter (which matches any object in
+the DIT) is used.
+This operation has a similar effect to a 
+list operation, but attributes can be shown at the same time.
+
+If no flags are given to a search command, then only one 
+parameter is allowed. This is taken to be the
+filter and NOT the base object as in ALL the other commands.
+The flags \tt -filter\rm \ and \tt -object\rm \ are supplied to allow the
+user to specify if both a filter and base object are required.
+({\em Note:} only one need be flagged.)
+For example, the following are all valid search commands:
+\begin{quote}\begin{verbatim}
+search
+search <filter>
+search -filter <filter>
+search -object <object>
+search -filter <filter> -object <object>
+search <filter> -object <object>
+search -filter <filter> <object>
+\end{verbatim}\end{quote}
+whereas 
+\begin{quote}\begin{verbatim}
+search <object>           (interpreted as a filter !)
+search <filter> <object>
+\end{verbatim}\end{quote}
+are not valid.
+
+The three flags 
+\tt -baseobject\rm,  
+\tt -singlelevel\rm,  and
+\tt -subtree\rm \ 
+are mutually exclusive.  They are used to control the depth of the 
+search operation.
+The \tt -baseobject\rm\ option searches only the specified object.
+The \tt -singlelevel\rm \ option specifies all siblings of the 
+specified object should be  searched.
+The flag \tt -subtree\rm \ searches all the 
+levels below and including the current position recursively.
+The default is
+\tt -singlelevel\rm.
+
+For example:
+\begin{quote}\small\begin{verbatim}
+search -object 
+   "@c=GB@o=University College London@ou=Computer Science"
+   -subtree -filter "cn=colin robbins" -type telephoneNumber
+   -show
+\end{verbatim}\end{quote}
+will search the DIT subtree below 
+``c=GB @ o=University College London @ 
+ou=Computer Science'' for
+an exact match of ``colin robbins'', and then call showentry to 
+display the {\em telephoneNumber} attribute.
+
+The \tt -norelative\rm \ flag is used to tell \verb"showname" to print the full
+distinguished name of the results; otherwise, the name relative to the current
+position is printed.
+
+The \tt -[no]searchaliases\rm \ flag directs the search as to whether aliases
+encountered in the search should be dereferenced and thus searched.
+This is different to the \tt -[dont]dereferencealias\rm \ service control which
+defines what happens to 
+aliases found when locating the base object of the search, whilst the 
+\tt -[no]searchaliases\rm \ controls aliases encountered in the siblings of 
+base search object.
+The default is ``\tt -dereferencealias -nosearchaliases\rm ''.
+
+The \tt -hitone\rm \ flag is used to tell DISH to consider it an error if
+the search returns more than one entry.  This is particularly useful when
+using DISH from shell scripts (see Section~\ref{dish_shell}).
+
+From time to time, search will not be able to do the entire search, and will
+return partial results; the \tt -nopartial\rm \ directs DISH not to print
+the partial result information.  To see the full set of partial results, both
+\tt -partial\rm \ and \tt -show\rm \ are needed; otherwise only a summary is
+printed.
+Unlike referral errors, DISH does not follow these partial references.
+
+\subsubsection{More on Matching}
+
+\begin{figure}[tp]
+\begin{center}
+\small
+\begin{tabular}{|c|l|}
+\hline
+Class	&	Characters\\
+\hline
+1       &	BFPV\\
+2	&	SCGJKQXZ\\
+3	&	DT\\
+4	&	L\\
+5	&	MN\\
+6	&	R\\
+0	&	all others (ignored)\\
+\hline
+\end{tabular}
+\end{center}
+\caption{Soundex Character Classes}
+\label{soundex:classes}
+\end{figure}
+
+
+When searching for an exact match (``=''),
+the ``\tt *\rm '' character is used as a wildcard, and a substring
+match takes place (unless only a ``\tt *\rm '' is specified, when a {\em
+presence} match is used; hence any entry 
+containing that attribute will be matched). 
+For example, ``\verb+Colin*+'' will 
+match any attribute value starting with the 
+string ``\verb+Colin+'' and ``\verb+*Robbins+'' any 
+attribute value ending in the 
+string ``\verb+Robbins+''.
+When constructing a substring filter, it should be noted that a QUIPU
+DSA can resolve searches of the form \verb+string*+ significantly faster
+than searches of the \verb+*string*+ or \verb+*string+ form.
+
+Remember that a large number of the standard attributes match case
+independently; for example ``x-tel'' will match ``X-Tel''.
+
+As well as an exact equality match, the 
+following types of match can be specified:
+\begin{quote}\begin{verbatim}
+~=     Approximately equals.
+>=     Greater than or equal.
+<=     Less than or equal.
+\end{verbatim}\end{quote}
+
+The Approximate match method used is DSA dependent.  A QUIPU DSA uses
+a soundex based algorithm.  This works by grouping 
+similar-sounding characters into classes.  The classes
+and their corresponding characters are shown in
+Figure~\ref{soundex:classes}.
+The first character of a word is always used as the first character of
+its corresponding soundex code. Adjacent similar characters are
+ignored. Thus, the word ``Robbins'' has soundex
+code ``R152''. Since the word
+``Robens'' also has soundex code ``R152'', these two words are
+approximately equal.
+To match multiple words
+each of the target words must appear in order in the string
+to which it is being compared.  There may, however, be other items in
+between the words matched.  For example:  ``Tim Howes'' would match
+``Timothy Alan Howes'' since ``Tim'' matches ``Timothy,'' 
+``Howes'' matches ``Howes,'' and the matched words are in the
+proper order.
+
+
+Filter items can be linked with {\em and} ``\tt \&\rm '', or {\em or} 
+``\tt $|$\rm ''.  Brackets ``\tt( )\rm '' 
+should be used to enforce the Boolean 
+ordering of the expressions, otherwise the evaluation is left to right.
+A {\em not} ``\tt !\rm '' can be used to specify the Boolean {\em not}
+operator.
+
+If a filter does not have a type specified, e.g., ``-filter steve'',
+then an approximate match for the specified common name is assumed
+(in this case ``-filter cn$\tilde{\ }$=steve'' is assumed).
+
+A more complex example of a filter 
+that searches for anybody whose is a member of staff 
+or a student, who has a ``drink'' attribute,
+whose name approximately matches ``steve'', but whose surname is 
+not ``Kille'':
+\begin{quote}\small\begin{verbatim}
+cn~=steve & (userClass = staff | userClass = student) &
+            (! surname = Kille) & drink = *
+\end{verbatim}\end{quote}
+
+A list of all the attributes that can be used to search for an entry
+is given in 
+Chapter~\ref{syntaxes}, together with a description of the type
+matching allowed.
+
+\subsubsection{FRED flags}\label{fred:flags}
+These flags are used by FRED,
+and are activated when the \tt -fred\rm \ flag is given.
+
+The \tt -expand\rm \ flag indicates that any matched entry should be
+displayed in full followed by children entries.
+
+The \tt -full\rm \ flag indicates that if more than one entry is matched on a
+search,
+then all entries should be displayed in full.
+
+The \tt -summary\rm \ flag indicates that a one-line display should be used for
+the entry.
+
+The \tt -subdisplay\rm \ flag indicates that a one-line display should be used
+for the entry, followed by the entry's children.
+
+The \tt -nofredseq\rm \ flag indicates that the entry (and children) should
+not be added to the current sequence.
+
+The \tt -fredlist\rm \ flag indicates that any attributes containing
+DNs should be flagged when using the DA service.
+
+\subsection {Add Entry}\index{add}
+\label{dish:add}
+
+\begin{quote}\begin{verbatim}
+add [<object>] [-draft <draft> [-noedit]] 
+    [-template <draft>] 
+    [-newdraft] [-objectclass <objectclass>]
+\end{verbatim}\end{quote}
+
+Add is used to add entries to the DIT.
+This invokes editentry
+on the draft entry.
+If there is not a draft entry specified, a draft entry of the specified 
+objectclass (default --- thornperson \& quipuObject) is created.
+The default draft file is \file{.dishdraft} in your home directory, this can be
+altered with the \tt -draft\rm \ option.
+
+When editing has finished, an add operation is sent to the directory
+(the \tt -noedit\rm \ flag following a \tt -draft\rm \ stops the editor
+being invoked).
+
+\tt -newdraft\rm \ causes the current draft to be overwritten with a new
+template of the appropriate objectclass.
+
+\tt -template\rm \ is used to specify a template that should be used during
+editing.
+
+On successful completion of the add, the draft entry is renamed with a suffix of
+``.old''.
+
+\subsection{Editentry}\index{editentry}
+
+\begin{quote}\begin{verbatim}
+editentry <draft>
+\end{verbatim}\end{quote}
+
+This option is only available from the shell, and not from the DISH
+program.  It is generally not invoked directly by a user, but by the
+other DISH commands.
+
+editentry invokes an editor (as defined by the users
+\$EDITOR environment variable) on the current draft entry.
+In a future release it is hoped to have an editor that knows about the syntax
+of an entry, and thus ensures that the entry you have supplied is syntactically
+correct.
+
+\subsection {Delete Entry}\index{delete}
+\begin{quote}\begin{verbatim}
+delete [<object>]
+\end{verbatim}\end{quote}
+The specified entry is removed from the DIT (remember that 
+X.500 only allows leaf
+entries to be deleted).
+
+\subsection {Modify Entry}\index{modify}
+\label{dish:modify}
+\begin{quote}\begin{verbatim}
+modify [<object>] [-draft <draft> [-noedit]] [-newdraft] 
+       [-add <attribute type>=<attribute value>]
+       [-remove <attribute type>=<attribute value>]
+       [<any of the showentry arguments>]
+\end{verbatim}\end{quote}
+Modify is used to modify existing entries in the DIT, and has two modes of
+operation. The first is used to modify specific attributes and uses the {\tt
+-add} and {\tt -remove} flags to add and remove single attributes and
+values. Many of these can be strung together in the same command, e.g.,
+\begin{quote}\smaller\begin{verbatim}
+modify -add "description=new attribute" -remove "drink=Chocolate".
+\end{verbatim}\end{quote}
+
+The second method is used for altering many attributes at the same time.
+Initially ``\tt showentry -all -edb -nocache\rm ''
+is used to get the current DIT entry, and place a copy of it in your
+.dishdraft file.  If the \tt -draft\rm \ option is 
+specified then the given file is used.
+After editing, any changes to the entry are sent to the directory
+(the \tt -noedit\rm \ flag following a \tt -draft\rm \ stops the editor
+being invoked).
+
+The draft file is handled in the same way as with add, except that when a
+new draft is created, the current values of the attributes are read from the
+directory.
+
+\subsection {ModifyRDN}\index{modifyrdn}
+\begin{quote}\begin{verbatim}
+modifyrdn [<object>] -name <newrdn> [-[no]delete]
+\end{verbatim}\end{quote}
+This is used to modify the RDN of an entry.
+The RDN cannot be changed using the modify operation (remember, as
+with delete X.500 only allows this operation on leaf nodes).
+
+The \tt -nodelete\rm \ flag is used to prevent the old RDN being removed as
+an attribute of the entry.
+
+
+\subsection{Showname}\index{showname}
+\label{showname}
+
+\begin{quote}\begin{verbatim}
+showname [<object>] [-[no]compact] [-[no]cache] [-[no]ufn]
+         [<any of the read arguments>]
+\end{verbatim}\end{quote}
+
+A name can be printed either in compact form (as seen in EDB or
+.dishdraft files), just showing the distinguished
+name, in a UFN format (default), or by showing the distinguished
+attributes one per line.
+
+\subsection{Compare}\index{compare}
+\label{dua:compare}
+\begin{quote}\begin{verbatim}
+compare [<object>] -attribute <attribute> [-[no]print]
+\end{verbatim}\end{quote}
+For example
+\begin{quote}\begin{verbatim}
+compare userclass=student
+\end{verbatim}\end{quote}
+This command has a return value of true or false (1 or 0).
+
+If \tt -print\rm \  is specified the strings ``TRUE'' or ``FALSE'' are printed.
+
+\subsection {Squid}\index{squid}
+
+\begin{quote}\begin{verbatim}
+squid [-sequence [<name>]] 
+      [-alias <object>] [-version]
+      [-user] [-syntax]
+      [-fred]
+\end{verbatim}\end{quote}
+
+The command \pgm {squid} (status QUIPU DISH) with no 
+parameters will inform you of the current status
+of your DISH process for example:
+\begin{quote}\begin{verbatim}
+Connected to Armadillo at Internet=128.40.16.220+2005
+Current position: @c=GB@o=Nottingham University
+User name: @c=GB@o=University College London@
+           ou=Computer Science@cn=Colin Robbins
+Current sequence 'default'
+\end{verbatim}\end{quote}
+
+\tt -sequence\rm \ makes squid print the specified sequence.
+Sequences are described in Section~\ref{sequences}.
+
+\tt -alias\rm \ adds the given DN to the current sequence.
+
+\tt -version\rm \ prints the version number of the DISH process and
+associated ISODE and DSAP libraries.
+
+\tt -user\rm\ prints the DN you are bound as.
+
+\tt -syntax\rm\ prints the directory syntaxes known to DISH.
+
+\tt -fred\rm\ must be the first argument if supplied. It causes
+any Distinguished names printed by the command to be shown
+using the user-friendly naming
+notation rather than the DN notation.
+
+\subsection {Bind}\index{bind}
+\label{dish_bind}
+
+\begin{quote}\begin{verbatim}
+bind [-noconnect] [[-user] [<username>]] 
+     [-password [<password>]] [-[no]refer]
+     [-call <dsaname>]
+     [-simple] [-protected] [-strong] [-noauthentication]
+\end{verbatim}\end{quote}
+
+This is used to (re)connect to the directory.  This is not normally
+required, as each command will bind as necessary, but allows advanced users
+to contact specified DSAs and change their username.
+
+\tt -noconnect\rm \ is used to start DISH (and cache) without connection to a
+directory.
+
+\tt -[no]refer\rm \ is used to tell DISH whether to automatically follow
+referrals issued by the DSA, by default they are followed.
+
+To connect to the directory you need to be authenticated.
+There are four flags to control the level of authentication DISH
+attempts to use.
+The lowest level of authentication is ``anonymous'', which is used
+when you do not supply a distinguished name.  A DSA may respond with
+``inappropriate authentication'' which means you should use a higher
+level of authentication.
+The next level of authentication is achieved by supplying a 
+Distinguished Name only, with no password.  The \tt
+-noauthentication\rm \ is used to tell DISH not to prompt for a password.
+The next levels are ``simple'' and ``protected simple'' authentication which
+use the \tt -simple\rm \ and \tt -protected\rm \ flags respectively.
+These present a textual password to the
+directory which the directory the uses to authenticate you.
+Using \tt -simple\rm \ the password is sent across the network ``in the
+clear,'' whereas \tt -protected\rm \ encrypts it; thus you are advised to
+used \tt -protected\rm \ if your directory supports it.
+
+The \tt -strong\rm \ flag tells DISH to send strong authentication
+credentials to the directory. This is not fully implemented in this version
+of QUIPU.
+
+To connect to the DSA using ``simple'' or ``protected'' authentication, 
+you must supply a
+distinguished name (\tt -user\rm ) and password (\tt -password\rm ).
+This, however, reveals your password to anybody who is looking at your 
+terminal but is useful for issuing bind operations from
+a shell script. To prevent this, you need to place the 
+password in your \unix/ protected \file{.quipurc} (see Section~\ref{quipurc}).
+Alternatively, if you do not supply a password, you will be prompted
+for one (with echoing turned off).
+
+
+\subsection {Unbind}\index{unbind}
+
+\begin{quote}\begin{verbatim}
+unbind [-noquit]
+\end{verbatim}\end{quote}
+This is used to break the connection to a DSA.
+If \tt -noquit\rm \ is specified, the DISH process does not die (This is used to
+maintain the cache).
+
+To be ``friendly''
+to other users, you should unbind 
+when you have finished using the directory --- put an \tt unbind\rm \ in
+your \file{.logout} file if you use DISH from the shell.
+
+\subsection{FRED}
+\label{dish_fred}
+
+\begin{small}\begin{quote}\begin{verbatim}
+fred [-display <name>]
+     [-dm2dn [-list] [-phone] [-photo] <domain-or-mailbox>]
+     [-expand [-full] <DN>]
+     [-ufn [-list,][-mailbox,][-phone,]
+           [-photo,][-options %x,]<name...>]
+     [-ufnrc <list...>]
+\end{verbatim}\end{quote}\end{small}
+
+This is used by the FRED program to provide some functions which would
+otherwise  require
+complicated interactions between FRED and DISH.
+
+\tt -display\rm\ is used to set the address of an \xwindows/ display.
+
+\tt -dm2dn\rm\ is used to map a domain name from the DNS or a mailbox into a
+distinguished name in the directory.
+The \tt -list\rm\ suboption returns a list of possible matches, 
+\tt -phone\rm\ returns the phone number attribute of the matched
+entry, and
+\tt -photo\rm\ returns the photo attribute of the matched entry.
+
+\tt -expand\rm\ is used to see if a node has children.
+
+\tt -ufn\rm\ is used to perform a user-friendly naming match.
+The \tt -list\rm\ suboption returns a list of possible matches, 
+\tt -mailbox\rm\ returns the mailbox attribute of the matched entry,
+\tt -phone\rm\ returns the phone number attribute of the matched entry,
+\tt -photo\rm\ returns the photo attribute of the matched entry, and
+\tt -options\rm\ is used to customise the behavior of the matching algorithm.
+
+\tt -ufnrc\rm\ is used to set the search list for user-friendly naming.
+
+\section {Sequences}
+\label{sequences}
+
+Results returned by {\em search} and {\em list} operations 
+may be long, and for 
+this reason have a reference number printed beside them.
+The reference number can be used as the ``object'' in any of the calls to the 
+directory.  Thus
+\begin{quote}\begin{verbatim}
+showentry 6
+\end{verbatim}\end{quote}
+shows the entry labelled with the sequence number
+6 by a previous {\em search} or {\em list} operation.
+
+When you come into DISH
+by default, the resultant numbers of list and search operations 
+are added to a sequence called ``default''.
+
+Two flags
+\begin{quote}\begin{verbatim}
+[-sequence <name>] [-nosequence]
+\end{verbatim}\end{quote}
+are used to control sequences.
+The \tt -nosequence\rm \ flag is use to completely remove the 
+concept of sequences (so no numbers are printed by list
+or search).
+
+To get a different sequence (hence renumber from 1 again), you can change
+this to mysequence with a 
+\begin{quote}\begin{verbatim}
+-sequence mysequence
+\end{verbatim}\end{quote}
+flag.
+
+The special keyword \tt reset\rm \ is used to reset the current sequence,
+thus causing future operations to be renumbered from 1.
+This is different to setting a new sequence, as the old sequence values are
+removed.
+
+Occasionally you will want to search an entry defined in one sequence,
+putting the results in another. For this purpose the special token
+\verb+result+ is recognised, thus
+\begin{quote}\begin{verbatim}
+search 4 -sequence xxx -sequence result yyy
+\end{verbatim}\end{quote}
+will search entry 4 as defined by sequence ``xxx'', but place the results in
+sequence ``yyy''.
+
+\section {Service Controls}
+\label{dish_serv}
+
+All the commands described in Sections~\ref{dua:show} 
+through \ref{dua:compare} 
+have additional flags to control the type of service provided.  The
+advice to a novice user is let these flags take their default values. 
+
+The flags recognised are listed below:
+
+\begin{describe}
+
+\item [\tt -(no)preferchain\rm :] Advise the DSA (not) to chain the operation if
+required --- The DSA {\bf IS} allowed to ignore the advice!
+
+\item [\tt -(no)chaining\rm :] (Prohibit) Allow the use of chaining.
+
+\item [\tt -(dont)usecopy\rm :] (Prohibit) Allow the use of a cached or slave 
+copy of the data.  
+Note that this refers to data cached in the DSA; there are separate flags
+(already described)
+for data cached in the DUA.
+
+\item [\tt -(dont)dereferencealias\rm :] (Do not) dereference aliases if found in
+the path of a query.
+
+\item [\tt -low\rm :] Flag the query as low priority.
+\item [\tt -medium\rm :] Flag the query as medium (default) priority.
+\item [\tt -high\rm :]  Flag the query as high priority.
+
+\item [\tt -timelimit $n$\rm :] Set the time limit to $n$ seconds.
+\item [\tt -notimelimit\rm :] Do not specify a time limit.
+
+\item [\tt -sizelimit $n$\rm :] Set the size limit to $n$ entries.
+\item [\tt -nosizelimit\rm :] Do not specify a size limit.
+
+\item [\tt -(no)localscope\rm :] (Do not) limit operation to local scope.
+
+\item [\tt -(no)refer\rm :] (Do not) automatically follow referrals issued by the DSA.
+
+\item [\tt -strong\rm :]	Ask the DSA to use strong authentication when sending the
+results.
+
+\end{describe}
+
+
+
+\section {Tailoring}
+
+There are two levels of tailoring that control the operation of the DISH DUA.
+First of all there is the system wide tailor file \file{dsaptailor}
+(found in the ISODE \verb"ETCDIR" directory, usually \file{/usr/etc/}), and
+then users private tailor file \file{.quipurc}.
+
+The file \file{dsaptailor} is described in Section~\ref{dua:tailor}.
+
+\subsection {.quipurc}
+\label{quipurc}\index{.quipurc}
+The file \file{.quipurc} is read by DISH on start up, and
+has the following format:
+
+\begin{quote}\begin{verbatim}
+flag:  value
+\end{verbatim}\end{quote}
+
+The following flags are currently recognised:
+\begin{describe}
+
+\item [\tt username:] The name of the user to be used when binding.
+
+\item [\tt password:] The password to use when binding.  For this reason care
+should be taken to ensure you .quipurc file is not publicly readable.
+
+\item [\tt cache\_time:] How long to keep the DISH process alive after unbinding
+(specified in minutes).
+
+\item [\tt connect\_time:] How long to keep a connection open, if there is no
+activity (specified in minutes).
+
+\item [\tt service:] A list of default service control flags 
+(as defined in Section~\ref{dish_serv}).
+
+\item [\tt sequence:] Add the supplied DN parameter to the default sequence.
+
+\item [\tt dsap:] This can be followed by one of the \file{dsaptailor}
+options
+described in Section~\ref{dua:tailor}.\index{dsaptailor}
+
+\item [\tt isode:] 
+This can be followed by one of the ISODE tailor options
+described in Volume~1 of the ISODE manual.
+
+\item [\tt notype:] The argument is expected to be an attribute type.
+This attribute will not be displayed by showentry by default.
+
+\item [\tt type:] The only valid argument for this entry is ``unknown,'' and says 
+that unknown attributes should be shown; by default, they are not shown.
+
+\item [\tt certificate:] Used for strong authentication.
+
+\item [\tt secret\_key:] Used for strong authentication.
+
+\item [\tt $<$dish command$>$:] A list of default flags 
+to be used when ``command'' is used.
+For example:
+\begin{quote}\begin{verbatim}
+showname: -compact
+\end{verbatim}\end{quote}
+says that \verb|showname| should always be invoked with the 
+\tt -compact\rm \ flag set.
+
+\item [\tt $<$nickname$>$:] A nickname entry, for example
+\begin{quote}\small\begin{verbatim}
+cjr: "c=GB@o=X-Tel Services Ltd@cn=Colin Robbins"
+\end{verbatim}\end{quote}
+This can then be used in distinguished name arguments, for example
+\begin{quote}\begin{verbatim}
+showentry cjr
+\end{verbatim} \end{quote}
+will show the entry for ``Colin Robbins''.
+
+\end{describe}
+
+
+\section {Remote Management of the DSA}\label{dua:mgmt}\index{dsacontrol}
+\begin{quote}\begin{verbatim}
+dsacontrol [-[un]lock <entry>] [-dump <directory>] 
+           [-tailor <string>] [-abort] 
+           [-restart] [-info] [-refresh <entry>]
+           [-resync <entry>] [-slave [<entry>]]
+\end{verbatim}\end{quote}
+
+If the DISH program is bound to the DSA as the directory manager
+(See Section~\ref{dish_bind} on binding),
+then it may be used (primitively) to manage the DSA.
+This feature is discussed in \cite{QUIPU.Design} and Section~\ref{dsa:mgmt}
+of this manual.
+
+\tt (un)lock\rm \ used to (un)lock subtrees of the DIT held locally. This
+(allows) prevents users to modify the DIT.
+
+\tt dump\rm \ causes a copy of the local DIT to be dumped into the specified 
+directory.
+Note that when the DSA dumps its in-core database,
+it does so relative to the possibly remote \unix/ directory from which the
+DSA was started,
+not the directory that DISH was invoked in.
+So it is best to specify path names in full to ensure the database is dumped
+where you expect it to be.
+
+\tt tailor\rm \ is used to pass tailor command to a running DSA.  The format of
+``string'' is the same as a line in the \file{quiputailor} file.
+For example:
+\begin{quote}\begin{verbatim}
+dsacontrol -tailor "dsaplog level=all"
+\end{verbatim}\end{quote}
+will turn the DSA logging on full.
+
+\tt refresh\rm \ tells the DSA to reread subtree ``entry'' from disk.
+As with all dsacontrol commands, entry must be the full 
+DN of the target
+entry, the DISH concept of current position is not used.
+Also, if relating to a disk operation, the CASE of the DN must be correct
+as well.
+
+\tt resync\rm \ tells the DSA to re-write the subtree entry to disk.
+
+\tt slave\rm \ tell the DSA to update its SLAVE EDB files.
+The keyword root is used to identify the root EDB file.
+The keyword {\em shadow} is used to tell the DSA to update any entries
+it has shadow copies of.
+See Section~\ref{slave_update} for details.
+
+\tt abort\rm \ tells the DSA to stop.
+\tt restart\rm \ tells the DSA to stop, then restart.
+
+\tt info\rm \ asks the DSA to return some statistics about its database.
+
+The error messages returned from a DSA are somewhat obscure when using
+dsacontrol. 
+There are four things DISH may report: 
+\begin{enumerate}
+\item \verb+DONE+: the operation has been successfully completed; 
+\item \verb+Scheduled+: the operation has been scheduled, and will be
+completed as soon as possible;
+\item \verb+Access rights insufficient+: you are not bound as the DSA manager;
+\item \verb+Unwilling to perform+:  the DSA was unable to perform 
+the task, this generally means the argument to dsacontrol was wrong.
+\end{enumerate}
+
+\section {Caching in the DUA}
+\label {dua_cache}
+
+All results returned from read and list operations are cached in memory
+in the DUAs.  The cache is then used if possible to answer queries.
+The cache is kept for {\em cache\_time} minutes as specified in the
+\file{tailor} files.
+
+Disk caching has not been implemented yet,
+but it is intended to extend the in-core caching, 
+so that the cached data can be written to disk.  When the DUAs start up, the
+user will have the option to read this cache.
+Similar support for private data may be provided.
+
+\section {Running DISH from the Shell}
+\label{dish_shell}
+
+Each of the DISH commands mentioned in this chapter
+can be applied directly to the shell, without having to first invoke
+DISH.  This has the advantage that the result can be piped through
+programs like \pgm{more} thus giving the users flexibility in how
+they view the data.
+
+Chapter~\ref{quipu:install} describes how to install this extra feature of
+DISH.
+
+Each time a new shell is invoked and a DISH command entered, a new DISH will
+be invoked.  This is sometimes not required.  To prevent this from happening
+an environment variable DISHPROC can be set, and should be the TCP
+address to use for communication, for example:
+\begin{quote}\begin{verbatim}
+127.0.0.1 12345
+\end{verbatim}\end{quote}
+where 127.0.0.1 is the IP address, and 12345 is the TCP port.
+The two example scripts show how the TCP port may be generated if required
+under \verb+sh+.
+For \verb+csh+ you might use
+\begin{quote}\begin{verbatim}
+if (${?DISHPROC} == 0) then
+        setenv DISHPROC "127.0.0.1 `expr $$ + 10000`"
+endif
+\end{verbatim}\end{quote}
+
+\subsection {DISHinit}
+A program called \pgm{dishinit} 
+\label{dishinit}
+can be use to 
+bind to the directory as the manager, read certain information
+and create a 
+default \verb".quipurc"
+file for a specified user.
+This is a useful utility for new databases.
+If the \verb"dsaptailor" variable \verb"dishinit" is set to \verb"on",
+dishinit will be invoked by DISH whenever is cannot find a 
+.quipurc file.
+
+\verb"dishinit" needs three parameters to be set in order to bind as the 
+manager, and search the local subtree.
+These parameters are defined at the top of the dishinit script and are:
+\begin{describe}
+\item [\verb+manager+:] The DN of the manager of the local DSA.
+\item [\verb+password+:] The manager's password (the script should be protected 
+with \unix/ file protection).
+\item [\verb+position+:] The DN of the local sub-set of the DIT. This is where 
+the entries for users will be looked for
+\end{describe}
+
+\subsection{Example Scripts}
+Two example scripts have been supplied as part of ISODE, and can be found in
+the \file{others/quipu/uips/dish} directory.
+\begin{describe}
+\item [\verb+dsaping+:] Contacts all the DSAs at a given level in the DIT, and
+gathers some statistics.
+\item [\verb+dsalist+:] Produces a list of all the known DSAs in the DIT.
+\end{describe}
+
+\subsection {Files}
+
+
+When the multiple command version of DISH is compiled on a machine that does
+not support sockets, name pipes are used 
+to communicate with the
+a background process.
+
+The file /tmp/dish$<$pid$>$ is used by DISH to write results to the calling
+processes, where the pid is the process id of the calling process.
+
+The file /tmp/dish--$<$tty$>$--$<$uid$>$ is used by calling process to send commands to
+DISH, where {\em tty} is the users terminal number, and {\em uid} their user id.
+
+
+\chapter {SID}
+\index{sid}
+\label{DUA:sid}
+SID (Steve's interface to DISH) is a directory user agent, designed to be
+incredibly easy to use.
+It is implemented as a simple set of scripts to the DISH DUA.
+
+There are a lot of flags to DISH. This can make it awkward to use, and in
+general shows too much directory-specific information.
+FRED has a centralised view of the world, and does not give
+the advantages of a shell based interface.
+
+SID is a simple approach of giving appropriate aliases to access DISH
+commands.   It is targetted for searching for people and organisations.
+It may be useful ``as is'' to others, and also give an indication as to how
+DISH may be used.
+
+
+\section {Quickstart}
+
+
+\begin{describe}
+\item[WARNING] Before you start to try SID, you must have the variable
+DISHPROC set in your environment.  The mechanism suggested in
+Section~\ref{profile} is a good way to achieve this.  To experiment,
+csh users can type the incantation:
+\end{describe}
+\begin{quote}\begin{verbatim}
+% setenv DISHPROC "127.0.0.1 `expr $$ + 1000`"
+\end{verbatim}\end{quote}
+
+
+To find users within your Organisation is very easy.  
+The default setup is optimised for
+your particular Organisational Unit.  Simply use the command {\bf psearch}
+with a single argument to identify the user looked for.  This will identify
+all users with this key as a substring.  For example:
+
+\begin{quote}\small\begin{verbatim}
+% psearch steve
+countryName=GB
+organisation=University College London
+department=Computer Science
+
+1   cn=Steve Kille
+telephoneNumber    - +44-1-380-7294 (work)
+telephoneNumber    - 01-350-2888 (home)
+2   cn=Stephen Titcombe
+telephoneNumber    - +44-1-387-7050 x 3674/5 
+telephoneNumber    - Term = 01-388-4741
+3   cn=Stephen Sackin
+4   cn=Steve Wilbur
+telephoneNumber    - +44-1-380-7287
+5   cn=Stephen Usher
+telephoneNumber    - +44-1-387-7050 x 3674/5 
+6   cn=Kevin Steptoe
+7   cn=Tomasz Stepniak
+8   cn=Stefan Penter
+telephoneNumber    - +44-1-387-7050 x 3674/5 
+9   cn=Stephania Loizidou
+10  cn=Steve Hodges
+telephoneNumber    - +44-1-387-7050 x 3674/5 
+11  cn=Steve Davey
+telephoneNumber    - +44-1-387-7050 x 7280 or 7289
+12  cn=Steve Chan
+telephoneNumber    - +44-1-387-7050 x 3674/5 
+13  cn=Steven Britton
+telephoneNumber    - +44-1-387-7050 x 3715
+14  cn=Stephen Beckles
+telephoneNumber    - +44-1-387-7050 x 3674/5 
+15  cn=Steven Bacall
+telephoneNumber    - +44-1-387-7050 x 3674/5 
+telephoneNumber    - dd 01-387-6978 (Campbell House)
+\end{verbatim}\end{quote}
+
+
+Each match will have an associated number.  To show a given entry, just use
+the command {\bf showentry}, with the number identifying the entry as the
+single argument.  For example, to show entry 1 (Steve Kille):
+
+\begin{quote}\smaller\begin{verbatim}
+% showentry 1
+c=GB@o=University College London@ou=Computer Science@cn=Steve Kille
+Address            - 35 Elspeth Road
+                     London
+                     SW11 1DW
+userClass - csresstaff
+photo - (See X window, pid 598)
+roomNumber         - G24
+favouriteDrink     - Pinta - Brakspears
+info               - Directory worker
+rfc822Mailbox      - S.Kille@cs.ucl.ac.uk
+textEncodedORaddress - /Pn=Stephen.Kille/Ou=cs/O=ucl/ \
+                     Prmd=uk.ac/admd=gold 400/c=gb/
+userid             - steve
+telephoneNumber    - +44-1-380-7294 (work)
+telephoneNumber    - 01-350-2888 (home)
+description        - New Description
+surname            - Kille
+name               - Steve E. Kille
+name               - Stephen Kille
+name               - Steve Kille
+\end{verbatim}\end{quote}
+
+If you are running the \xwindows/ a picture will be displayed if it is present.
+
+If you wish to search all of your Organisation, simply give a second argument 
+to {\bf
+psearch}.  For example, to search UCL give ``ucl'' as shown:
+
+\begin{quote}\small\begin{verbatim}
+% psearch baker ucl
+Searching for People matching "baker" under:
+countryName=GB
+organisation=University College London
+
+4   ou=French Lang and Lit@cn=F Baker
+telephoneNumber  - 3077
+5   ou=Economics@cn=V Bashkar
+telephoneNumber  - 2286
+6   ou=Biochemistry@cn=J Basra
+telephoneNumber  - 2185
+7   ou=Bartlett School@cn=H Bowker
+telephoneNumber  - 7453
+8   ou=Anatomy and Embryol@cn=D Becker
+telephoneNumber  - 3293
+9   ou=Computer Science@cn=Malcolm Booker
+telephoneNumber  - +44-1-387-7050 x 3645 
+10  ou=Computer Science@cn=Imtiaz Bashir
+telephoneNumber  - +44-1-387-7050 x 7304 
+11  ou=Computer Science@cn=Benjamin Bacarisse
+telephoneNumber  - +44-1-380-7212 (work)
+telephoneNumber  - 01 987 2746 (home)
+12  ou=Surgery@cn=L Baker
+telephoneNumber  - 82-5255
+13  ou=History Of Art@cn=B A Boucher
+telephoneNumber  - 7210
+14  ou=Geological Sciences@cn=J R Baker
+telephoneNumber  - 2382
+15  ou=Secretary's Office@cn=I H Baker
+telephoneNumber  - 3000
+\end{verbatim}\end{quote}
+
+\pagebreak[3]
+\section {Example Usage}
+
+A typical sequence to find someone outside your organisation is now shown:
+
+
+\begin{quote}\small\begin{verbatim}
+% osearch nott
+Searching in country "gb" for Organisations matching "nott"
+1   o=Nottingham University
+telephoneNumber  - +44-0602-484848x2862
+2   o=NPL
+3   o=JNT
+telephoneNumber  - +44-0235-445724
+% psearch smith 1
+Searching for People matching "smith" under:
+countryName=GB
+organisation=Nottingham University
+
+4   ou=Computer Science@cn=Hugh Smith
+telephoneNumber  - extn 2862 (Departmental Secretary)
+% showentry 4
+c=GB@o=Nottingham University@ou=Computer Science@cn=Hugh Smith
+photo            - (See X window, pid 1076)
+telephoneNumber  - extn 2862 (Departmental Secretary)
+description      - lecturer
+surname          - Smith
+name             - Hugh.Smith
+name             - Hugh Smith
+\end{verbatim}\end{quote}
+
+
+
+\section {Use of Nicknames}
+
+It is convenient to have nicknames (private aliases) set up for commonly accessed parts of the
+directory information tree.  These can be set up in the QUIPU profile (see
+Section~\ref{profile}), which sets up the nickname ``us''.
+Two nicknames used in the examples are:
+
+\begin{describe}
+\item[\verb+ucl+:]  Country GB; Organsisation University College London.
+\item[\verb+cs+:] Country GB; Organsisation University College London;
+Organisational Unit Computer Science.
+\end{describe}
+
+Aliases may be used as an alternative to sequence numbers.
+
+\section {SID Commands}
+
+The initial SID commands are:
+
+\begin{describe}
+
+\item[\verb+osearch+:] (Organisation Search) Search for an organisation.  The first argument is the
+organisation being searched for.  For example:
+
+\begin{quote}\begin{verbatim}
+% osearch nott
+\end{verbatim}\end{quote}
+
+This searches for any organisations approximating to this string, or
+containing it as a substring.
+
+The second (optional) argument is the two letter country code (e.g., GB, US,
+ES, etc).  Use {\bf clist} to find these codes.  The default country is the
+previous one searched.  Example:
+
+\begin{quote}\begin{verbatim}
+% osearch psi us
+\end{verbatim}\end{quote}
+
+\item[\verb+psearch+:] (Person Search) Search for a person.  The first argument is a key to identify
+the person.  Approximate and substring matches are made.
+There are two ways of using psearch.  
+
+
+\begin{enumerate}
+\item Search an identified organisation, using the second argument to
+osearch.  Example where the organisation is identified by a nickname:
+
+\begin{quote}\begin{verbatim}
+% psearch kirstein ucl
+\end{verbatim}\end{quote}
+
+Example where the organisation is identified by a sequence number, 
+returned by a previous osearch command.
+
+\begin{quote}\begin{verbatim}
+% psearch steve 29 
+\end{verbatim}\end{quote}
+
+
+\item Move explicitly to an organistion, and then use psearch with only one
+argument.  This is useful when repeated searches will be made from one point.
+Example:
+
+\begin{quote}\begin{verbatim}
+% moveto  ucl
+% psearch kirstein
+\end{verbatim}\end{quote}
+
+\end{enumerate}
+
+
+
+\item[\verb+clist+:] (Country List) Used to give a list of countries, with friendly descriptions,
+as well as the two-letter code.
+
+\item[\verb+ousearch+:] (Organisational Unit Search) Search for an OU.  Analogous to psearch.  This is
+appropriate for use where organisations are large, and a full search takes
+too long.
+
+\item[\verb+dlist+:] (Directory List) This uses the search command to provide a listing of directory
+information, without a clutter of wild South American animals.
+
+\end{describe}
+
+\section {Standard DISH Commands}
+
+The following DISH commands are useful ``as is'' for normal users, and are
+considered to be a part of SID.
+
+\begin{describe}
+\item[\verb+showentry+:] Show an entry.  The single argument is typically the numeric
+key returned by a search.  This will be used a lot, and it is likely to be
+worthwhile setting up an alias.  The author uses ds (directory show).
+Example, using a sequence number returned by a search:
+
+\begin{quote}\begin{verbatim}
+% showentry 36
+\end{verbatim}\end{quote}
+
+
+\item[\verb+moveto+:] Move to a defined location.  Example of moving to a nickname
+defined location:
+
+\begin{quote}\begin{verbatim}
+% moveto ucl
+\end{verbatim}\end{quote}
+
+
+\item[\verb+modify+:] To modify your own entry, this command is used with the single
+argument ``me''.  For example:
+\begin{quote}\begin{verbatim}
+% modify me
+\end{verbatim}\end{quote}
+
+\end{describe}
+
+
+\section {QUIPU Profile}
+\label {profile}
+This is a suggested template for \file{.quipurc}, note that this is very
+similar to the default file installed by \pgm{dishinit} described in
+Section~\ref{dishinit}.
+
+
+\begin{quote}\small\begin{verbatim}
+username:c=GB@o=University College London@
+    ou=Computer Science@cn=Steve Kille
+me:c=GB@o=University College London@
+    ou=Computer Science@cn=Steve Kille
+password:steve
+
+position:@c=GB@o=University College London@ou=Computer Science
+notype: acl
+notype: treestructure
+notype: masterdsa
+notype: slavedsa
+notype: objectclass
+notype: lastmodifiedby
+notype: lastmodifiedtime
+notype: userpassword
+cache_time: 30
+connect_time: 2
+
+us: c=us
+moveto: -pwd
+showentry: -name
+
+\end{verbatim}\end{quote}
+
+You must set the environment variable DISHPROC.  This can be done by the
+following in the \file{.login} file (csh):
+
+\begin{quote}\begin{verbatim}
+if (${?DISHPROC} == 0) then
+        setenv DISHPROC "127.0.0.1 `expr $$ + 1000`"
+endif
+\end{verbatim}\end{quote}
+

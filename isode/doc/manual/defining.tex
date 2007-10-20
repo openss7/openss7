@@ -1,0 +1,158 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Defining New Services}\label{services}
+The OSI Directory is used to register new services.
+The steps involved are simple:
+\begin{itemize}
+\item	the application context and abstract syntax for the
+	service is registered in the \man isobjects(5) file,
+	this allows for your program to use the textual designator for these
+	values rather than the object identifier form;
+	and,
+
+\item	an entry is created in the Directory containing information indicating
+	where the service resides in the network,
+	and, optionally,
+	what \unix/~program will be invoked whenever there is an incoming
+	connection for the service.
+\end{itemize}
+
+Please read the following important message.
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	Consult the \file{READ-ME} file for information on how
+		to generate the initial Directory entries for your system.
+\end{tabular}}\]
+
+\section	{Standard Services}\label{service:standard}
+The ``standard'' approach is used when an incoming connection should result in
+\pgm{tsapd} invoking the service.
+
+First, edit the \man isoentities(5) database
+(described in Chapter~\ref{isoentities}),
+and add the appropriate lines to define
+\begin{itemize}
+\item	the abstract syntax used by the service
+	(the description of the data structures exchanged at the application
+	layer);
+	and,
+
+\item	the application context providing the service
+	(the description of the service elements contained in the application
+	layer along with the interactions between them and the presentation
+	layer).
+\end{itemize}
+These are object identifiers (as described in Section~\ref{psap:oid} on
+page~\pageref{psap:oid}).
+The object identifier tree \verb"1.17.2" has been usurped for
+defining local services using {\em The ISO Development Environment}.
+Choose \verb"n",
+where \verb"n" is the lowest unassigned number in the \verb"1.17.2.n" subtree,
+for use by the service
+(\verb"n" should be an integer greater than \verb"0").
+Now edit the \man isobjects(5) file thusly:
+\begin{quote}\small\begin{verbatim}
+"local service pci"    1.17.2.n.1
+"local service"        1.17.2.n.2
+\end{verbatim}\end{quote}
+
+Second,
+add an entry to the Directory so that initiator entities can locate the
+service.
+The following attributes will have to be entered:
+\begin{describe}
+\item[commonName:]
+The name that the entry is registered under,
+(e.g., \verb"cn=servicestore").
+
+\item[presentationAddress:]
+The location in the network where the service resides,
+consisting of a transport-selector and one or more network addresses
+(if your host is multi-homed).
+It is easiest to use a 16--bit binary space for the transport selector:
+choose \verb"t",
+where \verb"t" is the lowest unassigned TSAP ID between \verb"1024" and
+\verb"2047" inclusive.
+
+\item[supportedApplicationContext:]
+The application context providing the service.
+Use the same string that you entered in the \man isobjects(5) file.
+
+\item[execVector:]
+The command string which \pgm{tsapd} will invoke for each incoming connection.
+The first token is interpreted relative to the ISODE \verb"SBINDIR" directory
+(usually \file{/usr/etc/}).
+\end{describe}
+So,
+the entry  looks something like this:
+\begin{quote}\small\begin{verbatim}
+objectClass= top & applicationEntity & quipuObject
+objectClass= iSODEApplicationEntity
+cn= servicestore
+presentationAddress= #t/Internet=mydomainame
+supportedApplicationContext= local service
+acl=
+execVector= program arg1 arg2 ... argN
+\end{verbatim}\end{quote}
+
+\section	{Static Servers}\label{service:static}
+In Section~\ref{acs:server},
+two different server disciplines,
+the dynamic and the static approaches,
+were described.
+Thus far,
+this chapter has described the dynamic approach.
+The distinguishing mechanism of this discipline depends on whether
+the \verb"objectClass" attribute for the entry contains the value
+\begin{quote}\small\begin{verbatim}
+iSODEApplicationEntity
+\end{verbatim}\end{quote}
+If so,
+then the entry describes a dynamic approach,
+and \pgm{tsapd} will listen for incoming connections.
+
+If not,
+then the entry does not contain a \verb"execVector" attribute,
+and \pgm{tsapd} will ignore the entry in the Directory.
+In order to avoid listening conflicts with \pgm{tsapd},
+the network address chosen should be different:
+\begin{itemize}
+\item	If the network-address is TCP-based,
+	use a TCP port, \verb"p", that is different than
+	the one used by \pgm{tsapd} (which, by default, is 102), e.g.,
+\begin{quote}\small\begin{verbatim}
+presentationAddress= #t/Internet=mydomainame+p
+\end{verbatim}\end{quote}
+
+\item	If the network-address is X.25--based,
+	use an X.25 protocol-ID, \verb"p", that is different than
+	the one used by \pgm{tsapd} (which, by default is empty), e.g.,
+\begin{quote}\small\begin{verbatim}
+presentationAddress= #t/Int-X25=mydomainame+PID+p
+\end{verbatim}\end{quote}
+
+\item	If the network-address is CLNS--based,
+	then simply choose any unused transport-selector, \verb"p", e.g.,
+\begin{quote}\small\begin{verbatim}
+presentationAddress= #t/NS+470005...
+\end{verbatim}\end{quote}
+\end{itemize}
+After making a suitable entry in the Directory,
+the server program must be started
+(either by hand or automatically from some system startup file,
+e.g., \file{/etc/rc.local}) without any arguments.
+The server program,
+using the \verb"isodeserver" routine described on page~\pageref{isodeserver}
+will then perform the appropriate actions to start listening on the desired
+addresses.
+
+Finally,
+note that in order for the \verb"isodeserver" routine to work correctly,
+you will need an entry in the \man isoaliases(5) file mapping
+the local host name (as returned by \verb"PLocalHostName")
+into a Directory Distinguished Name, e.g.,
+\begin{quote}\small\begin{verbatim}
+hubris    hubris, cs, university college london, gb
+\end{verbatim}\end{quote}
+This is necessary so that the call to \verb"_str2aei" (or \verb"str2aeinfo")
+can find the appropriate application-entity information which is subsequently
+passed to \verb"isodeserver".

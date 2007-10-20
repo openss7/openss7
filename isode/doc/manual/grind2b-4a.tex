@@ -1,0 +1,54 @@
+\File{grind2b\-4a.c},{11:48},{Dec 10 1990}
+\L{\LB{\K{\#include} \<stdio.h\>}}
+\L{\LB{\K{\#include} \S{}\"generic.h\"\SE{}}\Tab{32}{\C{}\/* defines OPERATIONS and ERRORS *\/\CE{}}}
+\L{\LB{\K{\#include} \<isode\/rosap.h\>}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{char} *myservice = \S{}\"service\"\SE{};}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{char} *mycontext = \S{}\"iso service\"\SE{};}}
+\L{\LB{\K{static} \K{char} *mypci = \S{}\"service pci version m.n\"\SE{};}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\Proc{main}main (argc, argv, envp)}}
+\L{\LB{\K{int}}\Tab{8}{argc;}}
+\L{\LB{\K{char}  **argv,}}
+\L{\LB{      **envp;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}}\Tab{8}{    sd;}}
+\L{\LB{    \K{struct} SSAPref sfs;}}
+\L{\LB{    \K{register} \K{struct} SSAPref *sf;}}
+\L{\LB{    \K{register} \K{struct} PSAPaddr *pa;}}
+\L{\LB{    \K{struct} AcSAPconnect accs;}}
+\L{\LB{    \K{register} \K{struct} AcSAPconnect   *acc = \&accs;}}
+\L{\LB{    \K{struct} AcSAPrelease acrs;}}
+\L{\LB{    \K{register} \K{struct} AcSAPrelease   *acr = \&acrs;}}
+\L{\LB{    \K{struct} AcSAPindication  acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPindication *aci = \&acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPabort *aca = \&aci \-\> aci\_abort;}}
+\L{\LB{    \K{struct} RoSAPindication  rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject   *rop = \&rois.roi\_preject;}}
+\L{\LB{    \K{register} AEI aei;}}
+\L{\LB{    \K{register} OID ctx, pci;}}
+\L{\LB{    \K{struct} PSAPctxlist pcs;}}
+\L{\LB{    \K{register} \K{struct} PSAPctxlist *pc = \&pcs;}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((aei = \_str2aei (argv[1], myservice, mycontext, 0,}}
+\L{\LB{}\Tab{24}{ NULLCP, NULLCP)) == NULLAEI)}}
+\L{\LB{}\Tab{8}{error (\S{}\"unable to resolve service: \%s\"\SE{}, PY\_pepy);}}
+\L{\LB{    \K{if} ((pa = aei2addr (aei)) == NULLPA)}}
+\L{\LB{}\Tab{8}{error (\S{}\"address translation failed\"\SE{});}}
+\L{\LB{    \K{if} ((ctx = ode2oid (mycontext)) == NULLOID)}}
+\L{\LB{}\Tab{8}{error (\S{}\"\%s: unknown object descriptor\"\SE{}, mycontext);}}
+\L{\LB{    \K{if} ((ctx = oid\_cpy (ctx)) == NULLOID)}}
+\L{\LB{}\Tab{8}{error (\S{}\"oid\_cpy\"\SE{});}}
+\L{\LB{    \K{if} ((pci = ode2oid (mypci)) == NULLOID)}}
+\L{\LB{}\Tab{8}{error (\S{}\"\%s: unknown object descriptor\"\SE{}, mypci);}}
+\L{\LB{    \K{if} ((pci = oid\_cpy (pci)) == NULLOID)}}
+\L{\LB{}\Tab{8}{error (\S{}\"oid\_cpy\"\SE{});}}
+\L{\LB{    pc \-\> pc\_nctx = 1;}}
+\L{\LB{    pc \-\> pc\_ctx[0].pc\_id = 1;}}
+\L{\LB{    pc \-\> pc\_ctx[0].pc\_asn = pci;}}
+\L{\LB{    pc \-\> pc\_ctx[0].pc\_atn = NULLOID;}}
+\L{\LB{}}
+\L{\LB{...}}

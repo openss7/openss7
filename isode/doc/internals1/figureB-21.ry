@@ -1,0 +1,26 @@
+Diagnostic-Reason ::=
+    CHOICE {
+	serviceError[1]
+	    ServiceProblem,
+
+	securityError[2]
+	    SecurityProblem
+    }
+
+ServiceProblem ::=
+    INTEGER {
+	busy(1),
+	unavailable(2),
+	unwillingToPerform(3),
+	chainingRequired(4),
+	unableToProceed(5),
+	invalidReference(6),
+	timeLimitExceeded(7),
+	administrativeLimitExceeded(8),
+	loopDetected(9),
+	unavailableCriticalExtension(10),
+	outOfScope(11),
+	badVersion(12)
+    }
+
+...

@@ -1,0 +1,42 @@
+<presentation-address> ::=
+		[[[ <psel> "/" ] <ssel> "/" ] <tsel> "/" ]
+		<network-address-list>
+
+<network-address-list> ::=
+		<network-address> "|" <network-address-list>
+	      | <network-address>
+
+<psel> ::=	<selector>
+<ssel> ::= 	<selector>
+<tsel> ::= 	<selector>
+
+<selector> ::=
+		'"' <otherstring> '"'		-- IA5
+						-- (for other chars use hex)
+	      | "#" <digitstring>		-- US GOSIP
+	      | "'" <hexstring> "'H"		-- hex
+	      | ""				-- empty but present
+
+<network-address> ::=
+		"NS" "+" <hexstring>		-- concrete binary
+						-- this is the compact
+						--   encoding
+	      | <afi> "+" <idi> [ "+" <dsp> ]
+
+
+<afi>		::= "X121" | "DCC" | "TELEX" | "PSTN" | "ISDN"
+			| "ICD" | "LOCAL"
+
+<idi>		::= <digitstring>
+
+<dsp>  ::=	"d" <digitstring>		-- abstract decimal
+	      | "x" <hexstring>			-- abstract binary
+	      | "l" <otherstring>		-- IA5: local form only
+	      | "RFC-1006" "+" <prefix> "+" <ip>
+			[ "+" <port> [ "+" <tset> ]]
+	      | "X.25(80)" "+" <prefix> "+" <dte>
+			[ "+" <cudf-or-pid> "+" <hexstring> ]
+	      | "ECMA-117-Binary" "+" <hexstring> "+" <hexstring>
+			"+" <hexstring>
+	      | "ECMA-117-Decimal" "+" <digitstring> "+" <digitstring>
+			"+" <digitstring>

@@ -1,0 +1,167 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{The ISODE Services Database}\label{isoservices}
+The database \file{isoservices} in the ISODE \verb"ETCDIR" directory
+(usually \file{/usr/etc/})
+contains a simple mapping between
+textual descriptions of services, service selectors, and local programs.
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	Use of this database is deprecated.
+		Consult Chapter~\ref{services} on page~\pageref{services}
+		of \volone/ for further information.
+\end{tabular}}\]
+
+The database itself is an ordinary ASCII text file containing information
+regarding the known services on the host.
+Each line contains
+\begin{itemize}
+\item	the name of an entity and the provider on which the entity resides;
+
+\item	the selector used to identify the entity to the provider,
+	interpreted as a:
+    \begin{describe}
+    \item[number,]	if the selector starts with a hash-mark (`\verb"#"').
+			More precisely, this denotes the so-called
+			GOSIP method for denoting selectors, which
+			uses a two octet, network byte-order representation.
+
+    \item[ascii string,]
+			if the selector appears in double-quotes (`\verb|"|').
+			The usual escape mechanisms can be used to
+			introduce non-printable characters.
+
+    \item[octet string,]
+			if all else fails.  The standard ``explosion''
+			encoding is used, each octet in the string is
+			represented by a two-digit hexadecimal quantity.
+    \end{describe}
+	and,
+
+\item	the program and argument vector to \man execve(2) when the service is
+	requested.
+\end{itemize}
+Blanks and/or tab characters are used to separate items.
+All items after the first two are interpreted as an argument vector.
+However, double-quotes may be used to prevent separation for items containing
+embedded whitspace.
+The sharp character (`\verb"#"') at the beginning of a line indicates a
+commentary line.
+
+\section	{Accessing the Database}\label{isoservent}
+The \man libicompat(3n) library contains the routines used to access the
+database.
+These routines ultimately manipulate an \verb"isoservent" structure,
+which is the internal form.
+\begin{quote}\index{isoservent}\small\begin{verbatim}
+struct isoservent {
+    char   *is_entity;
+    char   *is_provider;
+
+#define ISSIZE  64
+    int     is_selectlen;
+    char    is_selector[ISSIZE];
+
+    char  **is_vec;
+    char  **is_tail;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"is\_entity":] the name of the entity;
+
+\item[\verb"is\_provider":] the name of the provider on which the entity
+resides;
+
+\item[\verb"is\_selector"\verb"is\_selectlen":] the selector used to
+identify the entity to the provider
+(the element \verb"is_port" is an alias for this concept,
+used to denote the entity to the provider by means of a two-octet number
+specified in network-byte order);
+
+\item[\verb"is\_vec":] the \man execve(2) vector;
+and,
+
+\item[\verb"is\_tail":] the next free slot in \verb"is_vec".
+\end{describe}
+
+The routine \verb"getisoservent" reads the next entry in the database,
+opening the database if necessary.
+\begin{quote}\index{getisoservent}\small\begin{verbatim}
+struct isoservent *getisoservent ()
+\end{verbatim}\end{quote}
+It returns the manifest constant \verb"NULL" on error or end-of-file.
+
+The routine \verb"setisoservent" opens and rewinds the database.
+\begin{quote}\index{setisoservent}\small\begin{verbatim}
+int     setisoservent (f)
+int     f;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"f":] the ``stayopen'' indicator,
+if non-zero, then the database will remain open over subsequent calls to the
+library.
+\end{describe}
+The routine \verb"endisoservent" closes the database.
+\begin{quote}\index{endisoservent}\small\begin{verbatim}
+int     endisoservent ()
+\end{verbatim}\end{quote}
+Both of these routines return non-zero on success and zero otherwise.
+
+There are two routines used to fetch a particular entry in the database.
+The routine \verb"getisoserventbyname" maps textual descriptions into the
+internal form.
+\begin{quote}\index{getisoserventbyname}\small\begin{verbatim}
+struct isoservent *getisoserventbyname (entity, provider)
+char   *entity,
+       *provider;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"entity":] the entity providing the desired service;
+and,
+
+\item[\verb"provider":] the provider supporting the named \verb"entity".
+\end{describe}
+On a successful return,
+the \verb"isoservent" structure describing that service is returned.
+On failure, the manifest constant \verb"NULL" is returned instead.
+
+The routine \verb"getisoserventbyselector" performs the inverse function.
+\begin{quote}\index{getisoserventbyselector}\small\begin{verbatim}
+struct isoservent *getisoserventbyselector (provider,
+                        selector, selectlen)
+char   *provider,
+       *selector;
+int     selectlen;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"provider":] the provider supporting the desired entity;
+and,
+
+\item[\verb"selector"/\verb"selectlen":] the selector on the provider
+where the desired entity resides.
+\end{describe}
+On a successful return,
+an \verb"isoservent" structure describing the entity residing on the provider
+is returned.
+
+The routine \verb"getisoserventbyport" performs a similar function.
+\begin{quote}\index{getisoserventbyport}\small\begin{verbatim}
+struct isoservent *getisoserventbyport (provider, port)
+char   *provider;
+unsigned short port;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"provider":] the provider supporting the desired entity;
+and,
+
+\item[\verb"port":] the port on the provider (in network-byte order)
+where the desired entity resides.
+\end{describe}
+On a successful return,
+an \verb"isoservent" structure describing the entity residing on the provider
+is returned.

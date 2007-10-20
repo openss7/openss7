@@ -1,0 +1,82 @@
+% -*- LaTeX -*-		(really SLiTeX)
+
+\documentstyle[blackandwhite,landscape,oval,pagenumbers,small,tgrind]{NRslides}
+
+\def\emph#1{\underline{#1}}
+\def\X/{$\surd$}
+
+\font\xx=cmbx10
+\font\yy=cmbx7
+\font\sf=cmss10
+
+\raggedright
+
+\input trademark
+\let\tradeNAMfont=\relax
+\let\tradeORGfont=\relax
+
+
+%\includeonly	{}
+
+\begin{document}
+
+\title	{PRACTICAL PERSPECTIVES\\ ON OSI NETWORKING}
+\author	{Marshall T.~Rose}
+\date	{}
+\maketitlepage
+
+
+\begin{bwslide}\thispagestyle{empty}
+\part*	{AGENDA}\bf
+
+\begin{description}
+\item[TOPIC I:]		END-TO-END SERVICES
+
+\item[TOPIC II:]	APPLICATION SERVICES
+
+\item[TOPIC III:]	DIRECTORY SERVICES
+
+\item[TOPIC IV:]	TRANSITION AND COEXISTENCE WITH TCP/IP
+\end{description}
+\end{bwslide}
+
+\setcounter{slide}{0}
+
+\begin{bwslide}
+\ctitle	{WHAT?  NO TALK OF THE MODEL!}
+
+\begin{nrtc}
+\item	THERE ARE SOME THINGS WE TAKE FOR GRANTED:
+    \begin{nrtc}
+    \item	LAYERS, SERVICES, PROTOCOLS, ARCHITECTURES
+
+    \item	THE UBIQUITOUS 7--LAYER MODEL
+
+    \item	STANDARDS ORGANIZATIONS
+    \end{nrtc}
+
+\item	THERE ARE SOME THINGS WE WILL HAVE FUN WITH:
+    \begin{nrtc}
+    \item	POLITICS, DOGMA
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{(OBLIGATORY SLIDE SHOWING)\\ THE 7--LAYER STACK}
+
+\vskip.5in
+\diagram[p]{figureP-1}
+\end{bwslide}
+
+
+\include{end-to-end}
+\include{application}
+\include{directory}
+\include{transition}
+
+\dotopic	{THE ISODE}
+\input	isode
+
+\end{document}

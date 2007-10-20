@@ -1,0 +1,17 @@
+.PS
+.ps 20
+## figure E-7
+B1:	box "TP0"
+B2:	box "X.25" with .n at B1.s
+##
+B3:	box "TP2" with .w at (B1.e.x+linewid, B1.e.y)
+B4:	box "X.25" with .n at B3.s
+##
+B5:	box "TP4" with .w at (B3.e.x+linewid, B3.e.y)
+B6:	box "X.25" with .n at B5.s
+##
+S1:	box with .nw at (B6.ne.x+linewid/2, B6.ne.y) \
+		height B6.ne.y-B6.se.y width boxwid/6 shaded
+	move to S1.e; "\ CONS" ljust
+##
+.PE

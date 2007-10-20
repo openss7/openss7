@@ -1,0 +1,267 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter {Caching in a DUA}
+
+This part of the manual is written for implementors who wish to
+perform caching in their DUA.  This used to require the use of the
+the \man libquipu(3n) library.  However the functionality has now been
+rolled into the \man libdsap(3n) library and the \man libquipu(3n) 
+library removed.
+
+The library provides some routines to manage the data returned by the DUA
+procedure calls described in Chapter~\ref{DUA:proc}.
+
+
+\section{The Entry Structure}
+
+The \verb"Entry" structure is used by the QUIPU DSA to store the data
+in the local DIT.  
+This structure can also be used by a DUA to cache information from a
+successful read operation, and so the structure is described.
+In fact, this is how DISH maintains its cache.
+
+The structure is shown below.
+Many of the fields are not appropriate to a DUA, but are briefly described for
+completeness.
+
+\begin{quote}\index{Entry}\small\begin{verbatim}
+typedef struct entry {
+    RDN              e_name;
+    Attr_Sequence    e_attributes; 
+    InheritAttr      e_iattr;
+    char             e_leaf;         
+    char             e_complete;     
+    int              e_data;         
+#define E_DATA_MASTER             1
+#define E_TYPE_SLAVE              2
+#define E_TYPE_CACHE_FROM_MASTER  3
+#define E_TYPE_CONSTRUCTOR        4
+    char              e_allchildrenpresent;
+    struct acl      * e_acl;         
+    DN                e_alias;        
+    struct dsa_info * e_dsainfo; 
+    char            * e_edbversion;
+    AV_Sequence       e_oc;
+    AV_Sequence       e_inherit;
+    struct entry    * e_parent;
+    Avlnode         * e_children;
+    time_t            e_age;
+    char              e_lock;         
+    char              e_external;  
+                      /* 0 -> Quipu, 1 -> External */
+    union  {
+       struct {
+       AV_Sequence un_master;
+       AV_Sequence un_slave;
+       } un_in;
+       struct {
+       int         un_reftype;
+       AV_Sequence  un_reference;
+       } un_out;
+    } e_un;
+#define e_master        e_un.un_in.un_master
+#define e_slave         e_un.un_in.un_slave
+#define e_reference     e_un.un_out.un_reference
+#define e_reftype       e_un.un_out.un_reftype
+
+    int         e_refcount;
+} entry, *Entry;
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"e\_name":] The RDN of the entry, to find the DN, use the routine
+\begin{quote}\small\begin{verbatim}
+DN get_copy_dn (entryptr)
+Entry entryptr;
+\end{verbatim}\end{quote}
+\item [\verb"e\_attributes":] The attributes returned by the DSA.
+\item [\verb"e\_iattr":] pointer to attributes inherited into the
+entry.  This will always be NULL in a DUA --- all attributes whether or
+not inherited will be in the \verb+e_attributes+ field.
+\item [\verb"e\_leaf":] Set to \verb"TRUE" if the entry is known to be a leaf.
+\item [\verb"e\_complete":] Set to \verb"TRUE" if it is know that we have
+{\em all} the attributes.
+\item [\verb"e\_data":] This takes one of four values. in the DUA only two
+apply. 
+\verb"E_TYPE_CACHE_FROM_MASTER" implies the entry has data that has
+been read from the DSA.
+\verb"E_TYPE_CONSTRUCTOR" is used when the entry has been ``made'' by the
+caching mechanism to fill in a missing part of the DIT on the way down to 
+another entry.  An entry of this type will contain no data except from the
+RDN of the entry.
+\item [\verb"e\_allchildrenpresent":] Set to \verb"TRUE" when it is known
+that all the children are held.  
+This is a DSA-specific field.
+\item [\verb"e\_acl":] A pointer to the ``Access Control List'' attribute.
+\item [\verb"e\_alias":] Set to \verb"TRUE" if the entry represents an alias.
+This is a DSA specific field.
+\item [\verb"e\_dsainfo":] pointers to the ``EDBInfo'' and
+``PresentationAddress'' attribute of entries representing DSAs.
+\item [\verb"e\_edbversion":]
+This is a DSA specific field representing the EDB version number of the
+children.
+\item [\verb"e\_parent":] Pointer to the parent entry.
+\item [\verb"e\_children":] ACL pointer to the children.
+\item [\verb"e\_age":] If the data type is \verb"E_TYPE_CACHE_FROM_MASTER",
+then the entry is time stamped. This enables the cache to be ``timed out''.
+{\em Note}: in a DUA all entries are cached!
+\item [\verb"e\_lock":] This field has a dual purpose! In the DSA it is used
+to prevent an entry from being modified.  In the DUA, if \verb"FALSE", then
+is suggests that in the field \verb"e_attributes" there are only the
+attribute types for some attributes, this is a result of caching an results
+from an operation in which the entry info selection requested that
+attribute type only were returned (see Section~\ref{eis}).
+
+\item [\verb"e\_external":] Indicates type of reference --- QUIPU or
+non-QUIPU.
+\item [\verb"e\_master":] Pointer to the ``MasterDSA'' attribute.
+\item [\verb"e\_slave":] Pointer to the ``SlaveDSA'' attribute.
+\item [\verb"e\_reftype":] Type of a reference to a non-QUIPU DSA.
+\item [\verb"e\_reference":] Reference to a non-QUIPU DSA.
+
+\item [\verb"e\_refcount":] Reference count used to make sure entry is
+not freed too early.
+
+\end{describe}
+
+Using this structure a tree, mapping the DIT can be built up.
+The tree is rooted by the external \verb"Entry" ``\verb"database_root"''.
+This entry will {\em never} have any attributes or siblings,
+{\em only} children.
+
+\section {Caching Results}
+
+There are four routines to create a cache from results of DAP operations:
+
+To cache results returned from a \verb"read" or \verb"search" operation call
+\begin{quote}\index{cache\_entry}\small\begin{verbatim}
+cache_entry (ptr, complete, vals)
+EntryInfo      *ptr;
+char            complete;
+char            vals;
+\end{verbatim}\end{quote}
+
+The \verb"complete" parameter should be \verb"TRUE" if all attributes were requested
+and returned.
+
+The \verb"vals" parameter should be \verb"TRUE" if the attribute values were
+asked for.
+
+The external \verb"Entry" ``\verb"current_entry"'' will be a pointer to 
+the newly created entry.
+
+To remove an entry from the cache use:
+\begin{quote}\index{delete\_cache}\small\begin{verbatim}
+delete_cache (adn)
+DN              adn;
+\end{verbatim}\end{quote}
+
+\section{Finding Data in the Cache}
+
+The procedure 
+\begin{quote}\index{local\_find\_entry}\small\begin{verbatim}
+Entry local_find_entry (object,deref)
+DN                      object;
+char                    deref;
+\end{verbatim}\end{quote}
+is used to find an entry in the cache.
+If the entry exists, it will be returned, otherwise \verb"NULLENTRY"
+will be returned.
+\verb"object" is the DN of the entry you want to find.
+If \verb"deref" is \verb"TRUE" then any aliases encountered in trying 
+to find the entry will be de-referenced.
+
+The cache is only maintained for the period specified in a
+\verb+cache_timeout+ external variable (this is initially set to six hours).
+If the cache expires then 
+\verb+local_find_entry+
+will return \verb"NULLENTRY".
+To prevent timeouts, the routine
+\verb+local_find_entry_aux+ will return 
+the cached entry even if the timeout has expired.
+
+\section {Caching List Results}
+List results are cached slightly differently, as only the RDN is known.
+\begin{quote}\index{cache\_list}\small\begin{verbatim}
+cache_list (ptr, prob,dn,sizelimit)
+struct subordinate *ptr;
+int             prob;
+DN              dn;
+int             sizelimit;
+\end{verbatim}\end{quote}
+The parameters are as follows:
+\begin{describe}
+\item [\verb"ptr":] A pointer to the subordinates returned by the search.
+\item [\verb"prob":] The \verb"srr_limitproblem" field of the search
+results,\\ see
+Section~\ref{proc_search}.
+\item [\verb"dn":] The DN of the entry that has been listed.
+\item [\verb"ptr":] The \verb"svc_sizelimit" field of the common argument of
+the list argument (see Section~\ref{common_args}).
+\end{describe}
+
+To inspect the cache use
+\begin{quote}\small\begin{verbatim}
+struct list_cache *find_list_cache (dn,sizelimit)
+DN dn;
+int sizelimit;
+\end{verbatim}\end{quote}
+The \verb"sizelimit" parameter is the sizelimit you would send in the list
+request.
+
+This returns a \verb"list_cache" structure; if the result is NULL, then the
+entry is not cached, or has less than ``sizelimit'' results.
+\begin{quote}\small\begin{verbatim}
+struct list_cache {
+        DN              list_dn;
+        struct subordinate *list_subs;
+        struct subordinate *list_sub_top;
+        int             list_count;
+        int             list_problem;
+        struct list_cache *list_next;
+};
+\end{verbatim}\end{quote}
+The subordinates can be found in \verb"list_sub_top".
+The other field should be ignored, as they are for internal management only.
+
+
+\section {Changes}
+
+To conclude this part of the manual, a brief summary of the changes
+between this version and the QUIPU-6.0 version of the \man libdsap(3n)
+library is given.
+
+Calls to the \verb+x_decode()+ routines are no longer required and should be
+removed.  All the decoding is performed as the attributes come across
+the network.
+
+The AttributeType structure is now just a pointer into the OID tables,
+thus ``at\_table'' structure reference is no longer needed.
+Code of the form
+\begin{quote}\begin{verbatim}
+at->at_table.oa_syntax  
+\end{verbatim}\end{quote}
+should be replaced with
+\begin{quote}\begin{verbatim}
+at->oa_syntax
+\end{verbatim}\end{quote}
+and
+\begin{quote}\begin{verbatim}
+at->at_oid
+\end{verbatim}\end{quote}
+replaced with
+\begin{quote}\begin{verbatim}
+at->oa_at.ot_oid
+\end{verbatim}\end{quote}
+
+
+Finally, to avoid a symbol clash, 
+a search filter now uses the structure
+\index{filter}\index{s\_filter}
+\begin{quote}\begin{verbatim}
+s_filter
+\end{verbatim}\end{quote}
+In previous releases of QUIPU this was just
+\begin{quote}\begin{verbatim}
+filter
+\end{verbatim}\end{quote}

@@ -1,0 +1,14 @@
+\File{figureD\-9.py},{14:11},{Mar  4 1991}
+\L{\LB{rootSearch (s: String): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    \K{IF} (is3166 (s)) \K{THEN}}}
+\L{\LB{        \K{RETURN} search (\K{NULL}, oneLevel, s,}}
+\L{\LB{                       \{ countryName, friendlyCountryName, organizationName \},}}
+\L{\LB{                       \{ equality \},}}
+\L{\LB{                       \K{NULL});}}
+\L{\LB{    \K{ELSE}}}
+\L{\LB{        \K{RETURN} search (\K{NULL}, oneLevel, s,}}
+\L{\LB{                       \{ friendlyCountryName, organizationName, localityName \},}}
+\L{\LB{                       \{ substrings, approximateMatch \},}}
+\L{\LB{                       \K{NULL});}}
+\L{\LB{\}}}

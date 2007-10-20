@@ -1,0 +1,40 @@
+% run this through LaTeX with the appropriate wrapper
+
+\scriptsize
+\begin{verbatim}
+objectClass= top & person & thornObject & thornPerson & quipuObject & pilotPerson
+cn= mtr &\
+	Marshall T. Rose &\
+	Marshall Rose
+sn= rose &\
+	mtr
+l= Santa Clara, California
+st= California
+streetAddress= 5201 Great American Parkway, Suite 3106
+title= Principal Scientist
+description= Principal Implementor of the ISO Development Environment &\
+	Beleaguered Manager of the PSI/NYSERNet White Pages Pilot Project &\
+	A savvyNerd according to noSauce
+postalAddress= PSI, Inc. $ POB 391776 $ Mountain View, CA 94039 $ US &\
+	PSI, Inc. $ 5201 Great American Parkway $ Suite 3106 $ Santa Clara, CA 95054 $ US
+postalCode= 95054
+physicalDeliveryOfficeName= Santa Clara
+telephoneNumber= +1 415-961-3380 &\
+	+1 408-562-6222 x6221
+facsimileTelephoneNumber= +1 415-961-3282 &\
+	+1 408-562-6223
+uid= mrose
+mail= mrose\40psi.com
+drink= Iced Tea (and lots of it...)
+photo= {FILE}/tmp/photo_17355
+otherMailbox= internet $ mrose@psi.com &\
+	internet $ mrose@cheetah.ca.psi.com
+lastModifiedTime= 900924214336Z
+lastModifiedBy= c=US@cn=Manager
+
+\end{verbatim}
+
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\empty

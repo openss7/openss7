@@ -1,0 +1,472 @@
+
+\chapter {General Design}
+
+\section {Overview}
+
+This chapter describes general decisions.  
+In particular, issues relating to use of
+the OSI Directory are covered,
+rather than
+system implementation decisions.
+However, the two are somewhat bound up.
+Attention is drawn to the protocol extensions defined in section
+\ref{edb-ros}.  Note that this does {\em not} affect interactions with
+non-QUIPU DSAs (or DUAs).
+The following aspects of the OSI Directory are not handled in QUIPU 5.0.
+
+\begin {itemize}
+\item The protocol elements for support of directory use of authentication
+are handled in a conformant manner, but the associated services are not
+available to the end user.
+
+\item
+Search is always supported by multicasting.  This does
+{\em not} affect the basic service offered to the user, but means that
+prohibition of chaining is not possible in all cases.  
+
+\item For full subtree searches the filter is not applied to the base object.
+
+\item Partial Outcome Qualifier is not supported for List.
+
+\item There are some aspects of distributed operation, where interaction
+with another conforming system would not be fully general.  In particular,
+QUIPU might not be able to be configured with references to point at a
+complex configuration where not all sibling entries are held.  
+\end {itemize}
+
+Otherwise, QUIPU 5.0 is believed to conform to the standard.
+
+\section {Service Controls}
+
+QUIPU use of service controls conforms to the OSI Directory.
+Comments are made on those
+controls where QUIPU makes a choice with respect to some option
+given by the OSI Directory.
+
+\begin {description}
+\item [preferChaining]
+Chaining will be done.
+
+\item [chainingProhibited]
+Chaining will not be done.
+For some cases of the search operation, this means that the QUIPU Directory
+Service will not be able to provide the service, and will return a
+``chaining required'' error.
+
+
+\item [localScope]
+The scope will be restricted to the DSA concerned (i.e., no chaining will be
+done).
+
+\item [dontUseCopy] If this is set, the master data will be used.  This may
+have a significant impact on performance for operations on entries which are
+high up the tree and for the DSAs which master this information.  These issues
+need study.
+
+
+\item [dontDereferenceAliases]
+Followed as per the OSI Directory.
+
+\item [priority]
+This will be used to help control scheduling within the DSA, but is not done
+in QUIPU 5.0.
+
+\item [timeLimit]
+Followed as per the OSI Directory.
+
+\item [sizeLimit]
+Followed as per the OSI Directory.
+
+\item [scopeOfReferral]
+The OSI Directory is followed, although QUIPU does not make use of this control.
+\end {description}
+
+
+
+\section {Access Control}
+\label {acl-def}
+
+The term Access Control is used to mean the control of user access
+to data.  Access Control relies on authentication, which is discussed
+separately.
+Although there is no Access Control defined in the standard, it is
+essential for any real system.  The QUIPU directory handles this by
+specifying an Access Control List (ACL) for each entry, which is stored as
+an attribute.  
+This mechanism allows for access control to be added without change
+of protocol.
+The ACL is defined in a manner which also
+allows specification of rights to update the ACL itself.  
+The Directory System knows about this attribute, and
+so can make choices based on it.  QUIPU Access Control is designed so that it is {\em
+not} required, and so will not prevent QUIPU interworking with other
+systems.  Non-QUIPU DUAs will not in general be able to specify or update
+QUIPU Access Control Lists,  as they will not support the special syntax.
+The syntax
+is given in Figure~\ref{acl-py}.
+
+\tagrind {acl}{ACL definition}{acl-py}
+\clearpage
+
+Access control is performed by a structure ACL, which is implemented as an
+attribute stored with each entry.  The ACL contains a number of elements
+called ACLInfo, which are applied to various objects.
+The ACLInfo is
+composed of two components: the AccessSelector and a list of Access
+Categories.
+The ACLSelector
+describes which DUAs are granted rights, and has four types:
+
+\begin {itemize}
+\item
+The DUA corresponding to the entry.
+\item
+All DUAs (i.e., public access)
+\item
+Specific subtrees of the DIT - typically this will be a single DUA (i.e., a
+degenerate subtree).
+This can also be used to restrict information to within Organisations.
+\item
+Groups of DUAs.
+In this case, the entry specified must be of object class ``Organisational
+Role'' or ``Group of Names''.
+The DUAs with rights are identified by the ``Role Occupant'' and ``Member''
+attributes respectively.
+\end {itemize}
+
+The AccessCategories can be applied to Attributes, Entries, and Children, in
+the manner described below.
+The values of access category are ordered, and a given level implies all
+previous rights.
+
+\subsection {ACLInfo applied to Attributes}
+
+This describes the semantics of each Access Category between the identified
+attribute and DUAs identified by the AccessSelector.
+
+\begin {description}
+\item [none]
+
+This prevents any knowledge of the attribute.
+\item [detect]
+
+Detect if the attribute is present.
+\item [compare]
+Compare given value with all attribute values
+\item [read]
+Read all attribute values
+\item [add]
+As for read, and allows addition of new values.
+\item [write]
+As for add, and allows removal (and thus modification) of
+existing values.
+\end {description}
+
+\subsection {ACLInfo applied to entries}
+
+\begin {description}
+\item [none]
+
+This prevents any knowledge of the entry.
+\item [detect]
+
+This allows the existence of the entry to be determined.
+\item [compare]
+This allows the RDN to be compared.
+\item [read]
+This allows the RDN to be read.
+\item [add]
+This allows new attributes to be added.
+\item [write]
+This allows the RDN to be changed, and attributes to be
+deleted.
+\end {description}
+
+\subsection {childACL}
+
+This applies to the level 
+{\em immediately}
+below the entry in question.
+There is no implication for levels further down.
+
+\begin {description}
+\item [none]
+The DUA is completely blocked from downwards progress.
+\item [detect]
+
+This allows admission of the existence of lower layers  (e.g., a read
+would return securityError rather than name error).
+\item [compare]
+This allows exactly specified RDNs to be matched, but no more.
+\item [read]
+This allows child information to be listed, and for searching of the DIT
+below this entry.
+\item [add]
+This allows new children to be added.
+\item [write]
+Add access, and allows deletion of existing children.
+\end {description}
+
+The add access category is subtly different when applied to the (single valued)
+ACL attribute.
+A DUA which has add access to the ACL may modify the ACL Attribute 
+extend access to any
+attribute.
+It may not give more access rights to any attribute or default than the DUA
+itself has (i.e., if you have write access to an attribute, you can
+permit someone else to have write access to it {\em if} you have add access to
+the ACL).
+
+\subsection {Example Use of ACLs}
+
+An example of how this structure might be used is given.
+An organisation might give a leaf attribute the following values:
+
+\begin {itemize}
+\item
+ChildACL is not applicable, and so omitted.
+\item
+EntryACL is \{other, read\} + \{group = DSA Managers, write\}, which
+restricts addition of new attributes to managers.
+\item
+DefaultAttributeACL is \{other, read\} + \{self, write\}, which leads to
+publicly readable attributes modifyable by the owner.
+\item
+Common Name is
+\{other, read\} + \{group = DSA Managers, write\}, which restricts name
+changes to the manager.
+\item
+ACL is \{self, add\} + \{group = DSA Managers, write\}, which allows the
+user to grant access, but not to reduce it.
+\item
+Password is \{self, write\} + \{group = DSA Managers, write\}
+\end {itemize}
+
+It can be seen that this scheme gives a great deal of flexibility,
+without the addition of any protocol elements.
+The encoding is designed so that the volume overhead is not excessive
+for sensible access policies.
+
+\subsection {An issue for further study}
+
+One serious problem not tackled is that of allowing limited access, where
+some level of matching is allowed, but exhaustive listing by repeated query
+is made prohibitively expensive.  No satisfactory solution has been devised,
+and so this problem is being left for further study.
+
+
+
+\section {Authentication}
+
+QUIPU takes a minimal approach to authentication.
+Simple Authentication is seen as a minimum, which is straightforward to
+implement.
+The Password attribute is used.
+
+Simple Authentication is used between DUA and DSA.
+Simple authentication will be used between DSAs in QUIPU 6.0\footnote{It is
+not used in QUIPU 5.0, because the performance degradation has proven to be
+too high prior to the introduction of on-disk caching as described in
+Section~\ref{disk-cache}.}.
+This is felt to be the minimum level acceptable for some aspects of
+the planned usage (e.g., user modification of data).
+Other uses of QUIPU will not require authentication (e.g., lookup of
+some OSI information).
+DSAs authenticate each other to provide the basis
+for mutual trust.  
+The first DSA will authenticate the DUA on the basis of password plus
+DUA name in the A\_Associate, as described in the OSI Directory.
+Subsequent DSAs will trust the DUA parameter given in the DSP (i.e.
+there is mutual trust between QUIPU DSAs, with DSAs performing mutual
+authentication).
+Looping (livelock) is possible, as each DSA must use the directory to
+perform authentication.   
+This will be prevented by the DSA naming procedures described in the
+Section~\ref{dsa-naming} on page \pageref{dsa-naming}, as well as by use of
+DSA Trace.
+
+\section {Schemas}
+
+Directories should provide a very flexible tool
+which enables any information to be stored.  There is a danger that Schemas,
+as specified in the OSI Directory, will lead to procrustean directory implementations
+which impose unreasonable restrictions.  The QUIPU Directory will not, per
+se, place restrictions on what can be placed in a DSA.
+It will give control so that managers may control what is stored in the
+directory.
+
+\subsection {Matching}
+
+There is a need to understand Attribute Syntaxes in order to perform correct
+matching.
+The QUIPU DSA ``knows'' about a limited number of standard
+syntaxes, and some  special ones defined in this document.
+These receive an optimised internal encoding, and special (typically
+faster) matching.
+Any other structures are mapped to one of the known syntaxes (if the ASN.1 is
+unambiguous --- e.g. ``PrintableString'' is unambiguous, whereas ``[0] IMPLICIT
+PrintableString'' is not), or treated as generic ASN.1.
+
+The supported standard syntaxes are:
+
+\begin {enumerate}
+\item Case Exact String.
+\item Case Ignore String.
+\item Numeric String.
+\item Distinguished Name.
+\item Boolean
+\item Integer
+\item UTC Time
+\item Object Identifier
+\item Presentation Address. 
+\end {enumerate}
+
+Other supported syntaxes are: 
+
+\begin {enumerate}
+\item ASN.1.  This is a general catch-all, and will deal with most syntaxes
+which do not have ``special'' rules (see below).
+\item Object Class (some special QUIPU handling)
+\item QUIPU ACL
+\item QUIPU Schema (Tree Structure).
+\item QUIPU Update Control.
+\item Photographs encoded in G3 Fax
+\end {enumerate}
+
+Generic attributes stored as ASN.1, will usually be matched correctly, with
+the following exceptions:
+
+\begin {itemize}
+\item
+There is an IMPLICIT Set in the ASN.1.  The DSA will not detect the
+set, and so will not know to match components in arbitrary order.
+
+\item
+If special matching rules apply: for example, special rules to
+determine equivalence of telephone numbers.  Such rules would need
+to be represented by code in the DSA.
+\end {itemize}
+
+\subsection {Structure}
+
+The first aspect of structure is with respect to attributes which may be
+present in an entry.  A QUIPU DSA will allow an entry to belong to one or
+more object classes which are known to the DSA (stored in a table).  An
+entry will typically have a small number of object classes (e.g., TOP
+(implicit) + Person + Organisational Person + QUIPU Object).  The DSA will
+maintain a table of mandatory and optional attributes for each object class
+supported.  This will be follow the guidelines of the standard or
+specification identifying the object class in question.  From this
+information, the DSA can determine the permitted and mandatory attributes for a
+given entry, by calculating the union of all the object classes of that
+entry.  Free extension (i.e., the ability to store any attribute) was
+rejected, as there does not appear to be a reasonable mechanism to manage
+this.  However, it is straightforward for managers to create new object
+classes as desired.
+
+It is important 
+to allow management control of what is permitted at a given level.
+Therefore a ``tree structure''
+attribute may be created.  
+This attribute is defined in Figure~\ref{schema-py}.
+This specifies for the level below,
+what types of object are permitted.  
+Each attribute value identifies a class of object which can exist at the level
+below, and 
+defines a set of mandatory and optional object classes.
+This can be considered as defining a (private) object class implied by the
+combination of these classes.
+For each type of object, the attribute types permitted in the RDN are also
+listed.  This is not checked in QUIPU 5.0.
+The directory knows about the tree structure attribute, and will
+ensure consistency.  
+When creating an entry, the DSA must check that it conforms to the
+treeStructure attribute of the parent entry.
+When removing information from a treeStructure attribute, the
+Directory will  check that all of the children conform to the
+modified attribute.
+There may be some synchronisation problems in this area, if the tree
+structure was being modified at the same time as other data was added.
+However, this is a pathological case, and ignored by QUIPU at runtime.
+Management tools will be able to detect inconsistency at a later point.
+
+
+\tagrind[htb]{schema}{Schema definition}{schema-py}
+
+
+It is important to provide a mechanism whereby a user can examine the
+type structure of the  DIT.
+This is also achieved by the same mechanism.
+As well as giving the manager control, it allows the user to
+determine the (potential) shape of the tree, by reading and
+displaying the TreeStructure attribute.
+This can be used as a complement to the standard Search Guide attribute, 
+which indicates how searches in that region of the DIT are keyed.
+
+\section {Extended Searching}
+
+Phonetic searching is supported for all string based attributes.
+This will is done by holding a short array of soundex keys for each
+attribute value.
+The soundex keys are generated by the DSA at loadtime.
+Typically, there is  one soundex key for each component of a name.
+
+
+There is a problem with some attributes which can be looked at in a general
+or specific manner (e.g. phone number / home phone number).  This may be
+tackled in the standards bodies by introduction of Attribute Classes.
+We propose to investigate this area, prior to 1992.  Attribute Subclasses
+and Attribute Aliases will be
+defined {\em internally} to a QUIPU DSA.  Externally, all attributes will be
+shown, even where this means sending both subclass and superclass.
+Care must be taken on modifications, as all members of a superclass do not
+have to be members of the subclass.
+
+There is a serious problem in handling personal names, and some other
+attributes.  It is intended to handle this as a generalisation of the
+attribute class mechanism.  Initially, this will be hard coded in as a
+special case for human names.  A name is considered to be represented as 
+either a string encoded common name, or a series of other attributes
+(Surname, Given Name, Initials, Title).  This can be viewed as a structured
+and unstructured representation of the same information.  These should be
+modified to be aligned.  All components of the structured form should be
+represented in the unstructured form, and vice versa.  In addition, any
+``preferred form'' should be represented in the common name.  Initially, it
+will be mandatory for update to be via the structured form.
+
+The details of this section will be expanded, and additions made to the naming
+architecture.
+
+\section {Update}
+
+Update is achieved by the operations specified in the OSI Directory.
+This gives fully general update on the basis of three considerations:
+
+\begin {itemize}
+\item
+Access Control is specified by an attribute.
+Thus sophisticated control of remote update can be made.
+\item
+Because of the master/slave concept, updates can work in a distributed
+environment, where multiple DSAs are affected.
+This is described in Chapter~\ref{dist-update}.
+\item 
+Within the OSI Directory, the update operations give no indication as to the DSA
+where an entry should be added.
+In QUIPU, the 
+configuration of the Directory is represented in the Directory, and so
+updates can be made in the ``correct'' DSA(s).  
+\end {itemize}
+
+
+
+
+\section {Operation Status}
+
+Some operations will take a long time.  Real implementations also hang up,
+and block.  It is useful for the user to determine how an operation is
+progressing.  It is proposed to add a QUIPU specific operation to the DAP,
+which allows a user to query how a given operation is progressing.  
+This might be done by a DUA invoked operation, or by a DSA invoked linked
+operation, which returns status at DUA specified intervals.
+

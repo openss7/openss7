@@ -1,0 +1,77 @@
+\def\mservice{[RFC 1006]}
+\def\tpservice{[ISO 8073]}
+\def\tcpservice{[MIL 1778]}
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \special{pa 429 857}%
+    \special{pa 429 0}%
+    \special{pa 1714 0}%
+    \special{pa 1714 857}%
+    \special{pa 429 857}%
+    \special{fp}%
+    \rlap{\kern  1.071in\lower 0.470in\hbox to 0pt{\hss TS-user\hss}}%
+    \special{pa 1071 857}%
+    \special{pa 1071 2143}%
+    \special{fp}%
+    \special{pa 429 3000}%
+    \special{pa 429 2143}%
+    \special{pa 1714 2143}%
+    \special{pa 1714 3000}%
+    \special{pa 429 3000}%
+    \special{fp}%
+    \rlap{\kern  1.071in\lower 2.529in\hbox to 0pt{\hss TS-provider\hss}}%
+    \rlap{\kern  1.071in\lower 2.695in\hbox to 0pt{\hss (client)\hss}}%
+    \special{pa 1071 3000}%
+    \special{pa 1071 4286}%
+    \special{fp}%
+    \special{pa 4286 857}%
+    \special{pa 4286 0}%
+    \special{pa 5571 0}%
+    \special{pa 5571 857}%
+    \special{pa 4286 857}%
+    \special{fp}%
+    \rlap{\kern  4.929in\lower 0.470in\hbox to 0pt{\hss TS-user\hss}}%
+    \special{pa 4929 857}%
+    \special{pa 4929 2143}%
+    \special{fp}%
+    \special{pa 4286 3000}%
+    \special{pa 4286 2143}%
+    \special{pa 5571 2143}%
+    \special{pa 5571 3000}%
+    \special{pa 4286 3000}%
+    \special{fp}%
+    \rlap{\kern  4.929in\lower 2.529in\hbox to 0pt{\hss TS-provider\hss}}%
+    \rlap{\kern  4.929in\lower 2.695in\hbox to 0pt{\hss (server)\hss}}%
+    \special{pa 4929 3000}%
+    \special{pa 4929 4286}%
+    \special{fp}%
+    \special{pa 0 1500}%
+    \special{pa 6000 1500}%
+    \special{da  0.050}%
+    \rlap{\kern  5.571in\lower 1.541in\hbox to0pt{\begin{tabular}{r}TSAP interface\\ \tpservice\end{tabular}\hss}}%
+    \special{pa 0 3643}%
+    \special{pa 6000 3643}%
+    \special{da  0.050}%
+    \rlap{\kern  5.571in\lower 3.684in\hbox to0pt{\begin{tabular}{r}TCP interface\\ \tcpservice\end{tabular}\hss}}%
+    \rlap{\kern  3.000in\lower 2.529in\hbox to 0pt{\hss \begin{tabular}{c} {\em magic box\/} protocol\end{tabular}\hss}}%
+    \rlap{\kern  3.000in\lower 2.695in\hbox to 0pt{\hss \begin{tabular}{c}\ \\ \mservice\end{tabular}\hss}}%
+    \special{pa 1714 2571}%
+    \special{pa 4286 2571}%
+    \special{da  0.050}%
+    \special{pa 429 5143}%
+    \special{pa 429 4286}%
+    \special{pa 5571 4286}%
+    \special{pa 5571 5143}%
+    \special{pa 429 5143}%
+    \special{fp}%
+    \rlap{\kern  3.000in\lower 4.755in\hbox to 0pt{\hss DoD TCP\hss}}%
+    \kern  6.001in
+  }\vss}%
+  \kern  5.144in
+}

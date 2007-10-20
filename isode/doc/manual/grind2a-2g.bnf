@@ -1,0 +1,19 @@
+<prefix>	::= <digit> <digit>
+
+<ip>		::= <otherstring>
+			-- dotted decimal form (e.g., 10.0.0.6)
+			-- or domain (e.g., twg.com)
+<port>		::= <digitstring>
+<tset>		::= <digitstring>
+
+<dte>         	::= <digitstring>
+<cudf-or-pid>	::= "CUDF" | "PID"
+
+<digitstring> 	::= <digit>    <digitstring> | <digit>
+<digit>       	::= [0-9]
+
+<otherstring> 	::= <other>    <otherstring> | <other>
+<other>       	::= [0-9a-zA-Z+-.]
+
+<hexstring>   	::= <hexdigit> <hexstring>   | <hexdigit>
+<hexdigit>    	::= [0-9a-f]

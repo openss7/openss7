@@ -1,0 +1,87 @@
+\File{ryinit\-async.c},{22:23},{Jun 12 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{int}}\Tab{8}{do\_result (), do\_error ();}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{    \K{int}}\Tab{8}{    result;}}
+\L{\LB{    \K{struct} RoSAPindication rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject   *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{}}
+\L{\LB{    \C{}\/* allocate and initialize ``arg\'\' here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{    \K{switch} (result = stub\_MODULE\_operation (sd, RyGenID (sd), arg, do\_result,}}
+\L{\LB{}\Tab{40}{    do\_error, ROS\_SYNC, roi)) \{}}
+\L{\LB{}\Tab{8}{\K{case} NOTOK:}\Tab{32}{\C{}\/* failure *\/\CE{}}}
+\L{\LB{}\Tab{8}{    \K{if} (ROS\_FATAL (rop \-\> rop\_reason))}}
+\L{\LB{}\Tab{16}{ros\_adios (rop, \S{}\"STUB\"\SE{});}}
+\L{\LB{}\Tab{8}{    ros\_advise (rop, \S{}\"STUB\"\SE{});}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} OK:}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} DONE:}\Tab{32}{\C{}\/* got RO\-END? *\/\CE{}}}
+\L{\LB{}\Tab{8}{    adios (NULLCP, \S{}\"got RO\-END.INDICATION\"\SE{});}}
+\L{\LB{}\Tab{8}{    \C{}\/* NOTREACHED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}:}}
+\L{\LB{}\Tab{8}{    adios (NULLCP, \S{}\"unknown return from RyStub=\%d\"\SE{}, result);}}
+\L{\LB{}\Tab{8}{    \C{}\/* NOTREACHED *\/\CE{}}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    free\_MODULE\_argument (arg);}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{do\_result}do\_result (sd, id, dummy, result, roi)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{int}}\Tab{8}{id,}}
+\L{\LB{}\Tab{8}{dummy;}}
+\L{\LB{\K{struct} type\_MODULE\_result *result;}}
+\L{\LB{\K{struct} RoSAPindication *roi;}}
+\L{\LB{\{}}
+\L{\LB{    \C{}\/* do something with ``result\'\' here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{    \C{}\/* ``result\'\' will be automatically free\'d when do\_result returns *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\Proc{do\_error}do\_error (sd, id, error, parameter, roi)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{int}}\Tab{8}{id,}}
+\L{\LB{}\Tab{8}{error;}}
+\L{\LB{caddr\_t parameter;}}
+\L{\LB{\K{struct} RoSAPindication *roi;}}
+\L{\LB{\{}}
+\L{\LB{    \K{switch} (error) \{}}
+\L{\LB{}\Tab{8}{\K{case} error\_MODULE\_error1:}}
+\L{\LB{}\Tab{8}{\{}}
+\L{\LB{}\Tab{8}{    \K{register} \K{struct} type\_MODULE\_parameter *parm =}}
+\L{\LB{}\Tab{24}{    (\K{struct} type\_MODULE\_parameter *) parameter;}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \C{}\/* do something with ``parm\'\' here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\C{}\/* other errors are handled here... *\/\CE{}}}
+\L{\LB{}\Tab{8}{}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}:}}
+\L{\LB{}\Tab{8}{    adios (NULLCP, \S{}\"unknown error returned (\%d)\"\SE{}, error);}}
+\L{\LB{}\Tab{8}{    \C{}\/* NOTREACHED *\/\CE{}}}
+\L{\LB{    \}}}
+\L{\LB{    }}
+\L{\LB{    \C{}\/* ``parameter\'\' will be automatically free\'d when do\_error returns *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{...}}

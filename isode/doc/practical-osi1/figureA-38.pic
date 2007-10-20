@@ -1,0 +1,31 @@
+.PS 4.0i
+## figure A-38
+C1:	circle rad 1.75i
+##
+B1:	box with .n at C1.n invis "\sf The" "\sf Directory"
+##
+C2:	circle at C1.c rad .4i			"\sf DSA"
+C3:	circle with .w at C1.w rad .4i		"\sf DSA"
+C4:	circle with .s at C1.s rad .4i		"\sf DSA"
+C5:	circle with .ne at C1.ne rad .4i	"\sf DSA"
+##
+C6:	circle at (C1.w.x - (C1.c.x - C1.w.x), C3.w.y) \
+					rad .4i "\sf DUA"
+##
+L1:	line invis from C6.e to C3.w
+##
+L2:	move to L1.w up .1i; line -> "\sf request" above to L1.e up .1i
+L3:	move to L1.e down .1i; line -> "\sf reply" below to L1.w down .1i
+##
+B4:	box height .2i with .w at C3.e width C2.w.x-C3.e.x invis
+	line -> from B4.nw to B4.ne
+	line -> from B4.se to B4.sw
+	move to (B4.n.x, B4.n.y+.15i); "\sf 1"
+	move to (B4.s.x, B4.s.y-.15i); "\sf 4"
+B5:	box width .2i with .n at C2.s height C2.s.y-C4.n.y invis
+	line -> from B5.ne to B5.se
+	line -> from B5.sw to B5.nw
+	move to B5.e; "\sf \ 2" ljust
+	move to B5.w; "\sf 3\ " rjust
+##
+.PE

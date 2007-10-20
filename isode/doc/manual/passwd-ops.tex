@@ -1,0 +1,84 @@
+\File{passwd\-ops.ry},{22:23},{Jun 12 1988}
+\L{\LB{PasswordLookup \K{DEFINITIONS} ::=}}
+\L{\LB{}}
+\L{\LB{\K{BEGIN}}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- operations}}
+\CE{}\L{\LB{}}
+\L{\LB{}\Tab{24}{\C{}\-\- given a user name, return a Passwd type}}
+\CE{}\L{\LB{lookupUser \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT}}\Tab{24}{UserName}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{Passwd}}
+\L{\LB{}\Tab{8}{\K{ERRORS}}\Tab{24}{\{ noSuchUser, congested \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{0}}
+\L{\LB{}}
+\L{\LB{}\Tab{24}{\C{}\-\- given a user ID, return a Passwd type}}
+\CE{}\L{\LB{lookupUID \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT}}\Tab{24}{UserID}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{Passwd}}
+\L{\LB{}\Tab{8}{\K{ERRORS}}\Tab{24}{\{ noSuchUser, congested \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{1}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- errors}}
+\CE{}\L{\LB{}}
+\L{\LB{}\Tab{24}{\C{}\-\- no matching user in the database}}
+\CE{}\L{\LB{noSuchUser \K{ERROR}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{0}}
+\L{\LB{}}
+\L{\LB{}\Tab{24}{\C{}\-\- congestion at responder}}
+\CE{}\L{\LB{congested \K{ERROR}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{1}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- types}}
+\CE{}\L{\LB{}}
+\L{\LB{}\Tab{24}{\C{}\-\- similar to an entry in \<pwd.h\>}}
+\CE{}\L{\LB{Passwd ::=}}
+\L{\LB{    [\K{APPLICATION} 1]}}
+\L{\LB{}\Tab{8}{\K{IMPLICIT} \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    name[0]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} UserName,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    passwd[1]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} IA5String}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    uid[2]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} UserID,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    gid[3]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} GroupID,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    quota[4]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{INTEGER}}}
+\L{\LB{}\Tab{16}{\K{DEFAULT} 0,}}
+\L{\LB{}\Tab{8}{    }}
+\L{\LB{}\Tab{8}{    comment[5]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} IA5String}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    gecos[6]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} IA5String}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    dir[7]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} IA5String}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    shell[8]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} IA5String}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{UserName ::=}}
+\L{\LB{    [\K{APPLICATION} 2]}}
+\L{\LB{}\Tab{8}{\K{IMPLICIT} GraphicString}}
+\L{\LB{}}
+\L{\LB{UserID ::=}}
+\L{\LB{    [\K{APPLICATION} 3]}}
+\L{\LB{}\Tab{8}{\K{IMPLICIT} \K{INTEGER}}}
+\L{\LB{}}
+\L{\LB{GroupID ::=}}
+\L{\LB{    [\K{APPLICATION} 4]}}
+\L{\LB{}\Tab{8}{\K{IMPLICIT} \K{INTEGER}}}
+\L{\LB{}}
+\L{\LB{\K{END}}}

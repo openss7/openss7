@@ -1,0 +1,20 @@
+.PS
+.ps 20
+circlerad=circlerad/2
+advance=	2*circlerad + linewid/2 + boxwid + linewid
+define node @
+C$1:	circle shaded with .n at (C0.s.x$2$3*advance$2advance/2, C0.s.y-3*lineht)
+	line from C$1.n to C0.s
+
+B$1:	box with .w at (C$1.e.x+linewid/2, C$1.e.y) "DU"
+	line from C$1.e to B$1.w
+@
+## figure 3
+## EXAMPLE: SEQUENTIAL FLAT CONSTRAINT SET
+C0:	circle shaded
+	node(1,-,1)
+	node(2,-,0)
+	node(3,+,0)
+	node(4,+,1)
+##
+.PE

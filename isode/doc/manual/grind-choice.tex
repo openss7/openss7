@@ -1,0 +1,15 @@
+\File{grind\-choice.c},{14:51},{Jul 12 1991}
+\L{\LB{}}
+\L{\LB{SearchResultData [[P struct ds\_search\_result *]]}}
+\L{\LB{        ::=}}
+\L{\LB{        CHOICE \<D\<(*parm)\-\>srr\_correlated\>\>}}
+\L{\LB{        \<E\<((parm\-\>srr\_correlated == FALSE) ? 2 : 1)\>\>}}
+\L{\LB{        \{}}
+\L{\LB{        searchInfo}}
+\L{\LB{                SET [[ T struct ds\_search\_unit * \$ srr\_un.srr\_unit ]]}}
+\L{\LB{......}}
+\L{\LB{                \},}}
+\L{\LB{        uncorrelatedSearchInfo}}
+\L{\LB{                [0] SET OF [[ T struct ds\_search\_result * \$ srr\_un.srr\_parts ]]}}
+\L{\LB{                    \<\<srr\_next\>\> SearchResult [[p *]]}}
+\L{\LB{        \}}}

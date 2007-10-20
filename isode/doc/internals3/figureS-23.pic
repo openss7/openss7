@@ -1,0 +1,22 @@
+\tiny
+.PS 8.0i
+.ps 20
+## figure S-23
+B1:	box invis "0.0"
+B2:	box invis "sysDescr" with .w at B1.e
+B3:	box invis "sysDescr.0" with .nw at B2.se
+B4:	box invis "ipRouteDest" with .sw at B3.ne
+B5:	box invis "ipRouteDest.0.0.0.0\ \ \ \ \ " with .nw at B4.se
+B7:	box invis "ipRouteDest.1" with .nw at B5.se
+B8:	box invis "ipRouteDest.1.0.0.0" with .sw at B7.ne
+##
+B9:	box invis with .s at ((B1.s.x+B8.s.x)/2, B1.n.y+lineht*3)
+	line from B9.s to B1.n
+	line from B9.s to B2.n
+	line from B9.s to B3.n
+	line from B9.s to B4.n
+	line from B9.s to B5.n
+	line from B9.s to B7.n
+	line from B9.s to B8.n
+##
+.PE

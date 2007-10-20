@@ -1,0 +1,14 @@
+.PS 8.5i
+.ps 20
+boxht = 4*boxht/5
+## figure 1
+B1:	box "NETWORK SERVICES (CLNP AND ES-IS)" "" "[U.~WISCONSIN]" \
+		width 3*boxwid
+##
+B2:	box "TRANSPORT SERVICES" "" "[U.~WISCONSIN]" width 3*boxwid \
+		with .s at B1.n
+##
+B3:	box "SUBNETWORK SUPPORT (802.x AND X.25)" "" "[U.~WISCONSIN]" \
+		width 3*boxwid with .n at B1.s
+##
+.PE

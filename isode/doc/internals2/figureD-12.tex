@@ -1,0 +1,12 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pbm 104 100 118 118 figureD-12.pbm%
+    }%
+    \kern 0.881in
+  }\vss}%
+  \kern 0.847in
+}

@@ -1,0 +1,238 @@
+\begin{theindex}\makeatletter
+\raggedright
+\def\newindex#1{{\huge\hspace{-.5in}\parbox[t]{.5in}{\makebox[.35in][c]{\uppercase{#1}}}\vspace{-1.5ex}}}
+\newindex{a}
+\item access, 87
+\item aetbuild, 10
+\item Aziz, Ashar, xviii
+\indexspace
+\newindex{b}
+\item Betzler, Uli, xix
+\item Braun, Hans-Werner, xvii
+\item Brezak, John, xviii
+\indexspace
+\newindex{c}
+\item Cass, Dwight E., xv
+\item chgrp, 85, 86
+\item Chirieleison, Don, xviii
+\item chown, 85
+\item chroot, 85
+\item Cowin, Godfrey, xvi
+\item csh, 94
+\indexspace
+\newindex{d}
+\item dish, 9
+\item dsabuild, 10
+\item Dubous, Olivier, xvii
+\indexspace
+\newindex{e}
+\item Easterbrook, Stephen, xvi
+\item EEC, xvi
+\item endisodocument, 78
+\item ESPRIT, xvi
+\indexspace
+\newindex{f}
+\item FAccessRequest, 65
+\item FAccessResponse, 66
+\item FADUidentity, 29
+\item FAFREE, 26
+\item FBulkEndRequest, 64
+\item FBulkEndResponse, 65
+\item FBulkRequest, 63
+\item FBulkResponse, 63
+\item FCancelRequest, 69
+\item FCancelResponse, 70
+\item FCINIT, 28
+\item FDataEndRequest, 68
+\item FDataRequest, 68
+\item FEFREE, 23
+\item FErrString, 76
+\item FHookRequest, 61, 62
+\item FInit, 31
+\item FInitializeRequest, 37
+\item FInitializeResonse, 36
+\item Finni, Olli, xvii
+\item FManageRequest, 72
+\item FManageResponse, 73
+\item FPFREE, 22
+\item FReadWriteRequest, 67
+\item FSelectMask, 60
+\item FSetIndications, 59
+\item FTACFREE, 54
+\item ftam, 80, 81, 82, 83, 88
+\item FTAMabort, 35
+\item FTAMaccess, 53
+\item FTAMacelement, 22
+\item FTAMattributes, 24
+\item FTAMcancel, 58
+\item FTAMcharging, 20
+\item FTAMchngattr, 49
+\item FTAMclose, 51
+\item FTAMconcurrency, 26
+\item FTAMconnect, 39
+\item FTAMcontent, 18, 19
+\item FTAMcontentlist, 18
+\item FTAMcreate, 46
+\item ftamd, 84, 85
+\item FTAMdataend, 57
+\item FTAMdelete, 52
+\item FTAMdeselect, 52
+\item ftamfile, 62
+\item FTAMfinish, 43
+\item FTAMgroup, 43
+\item FTAMindication, 34
+\item FTAMopen, 50
+\item FTAMpasswords, 21
+\item FTAMreadattr, 48
+\item FTAMreadwrite, 55
+\item FTAMrelease, 74
+\item FTAMselect, 45
+\item FTAMstart, 31
+\item FTAMtransend, 58
+\item FTCAFREE, 49
+\item FTCEFREE, 48
+\item FTCFREE, 41
+\item FTCLFREE, 51
+\item FTCNFREE, 58
+\item FTDEFREE, 52
+\item FTerminateRequest, 73
+\item FTerminateResponse, 75
+\item FTFFREE, 43
+\item FTGFREE, 45
+\item FTOPFREE, 51
+\item ftp, 89
+\item ftpd, 85
+\item FTRAFREE, 49
+\item FTransEndRequest, 70
+\item FTransEndResponse, 71
+\item FTREFREE, 59
+\item FTRFREE, 74
+\item FTRWFREE, 55
+\item FTSEFREE, 46
+\item FTSFREE, 33
+\item FTXEFREE, 53
+\item FUAbortRequest, 75
+\item FUFREE, 30
+\item FWaitRequest, 41
+\indexspace
+\newindex{g}
+\item getisodocument, 78
+\item getisodocumentbyentry, 79
+\item getisodocumentbytype, 79
+\item Gosling, James, xix
+\item group, 86
+\indexspace
+\newindex{h}
+\item Hein\"{a}nen, Juha, xviii
+\item Horton, Mark R., xvii
+\item Horvath, Nandor, xviii
+\indexspace
+\newindex{i}
+\item imisc, 100
+\item imiscd, 100
+\item isodocument, 78
+\indexspace
+\newindex{j}
+\item Jacobsen, Ole-Jorgen, xviii
+\item Jelfs, Philip B., xviii
+\item Jordan, Kevin E., xviii
+\indexspace
+\newindex{k}
+\item Keogh, Paul, xviii
+\item Kille, Stephen E., xvi
+\item Knight, Graham, xviii
+\indexspace
+\newindex{l}
+\item Lamport, Leslie, xix
+\item \LaTeX {}, xix, 107
+\item Lavender, Greg, xvii
+\item libacsap, 7
+\item libdsap, 9
+\item libftam, 15, 16, 30, 41, 60, 76, 77
+\item libpsap, xvi, 7, 9
+\item libpsap2, 7, 8
+\item libpsap2-lpp, 8
+\item librosap, xvi, 7
+\item librosy, 9
+\item librtsap, 7
+\item libssap, 7
+\item libtsap, xviii, 8
+\item lint, 10
+\indexspace
+\newindex{m}
+\item make, 5
+\item malloc, 33, 41, 46, 48, 49, 51, 52, 53, 54, 55, 58, 59, 63, 64, 66, 72, 74
+\item McLoughlin, L., xviii
+\item Michaelson, George, xv
+\item Miller, Steve D., xvii
+\item mkdir, 85
+\item Moore, Christopher W., xv
+\indexspace
+\newindex{n}
+\item NBS, xvii
+\item NIST, xvii
+\item Nordmark, Erik, xviii
+\indexspace
+\newindex{o}
+\item Onions, Julian, xvi
+\indexspace
+\newindex{p}
+\item passwd, 85, 86
+\item Pavel, John, xvi
+\item Pavlou, George, xviii
+\item pepsy, xvii, 9, 10
+\item pepy, xvii, 9, 10
+\item posy, xvi, 8, 9, 10
+\item Prafullchandra, Hemma, xviii
+\item Preuss, Don, xviii
+\item Pring, Ed, xix
+\indexspace
+\newindex{q}
+\item quipu, 9
+\indexspace
+\newindex{r}
+\item Reinart, John A., xix
+\item Rekhter, Jacob, xviii
+\item rename, 86
+\item rmdir, 85
+\item Robbins, Colin J., xvi
+\item Roe, Mike, xvi
+\item Romine, John L., xv
+\item Rose, Marshall T., xix
+\item rosy, 8
+\item Ruttle, Keith, xvi
+\indexspace
+\newindex{s}
+\item Scott, John A., xvii
+\item setisodocument, 78
+\item Srinivasan, Raj, xviii
+\item stat, 86
+\indexspace
+\newindex{t}
+\item tar, xiii
+\item Taylor, Jem, xvii
+\item telnet, 93
+\item Titcombe, Steve, xvi
+\item tsapd, 31
+\item Turland, Alan, xvi
+\indexspace
+\newindex{u}
+\item U.C.~Berkeley, xix
+\indexspace
+\newindex{v}
+\item Vanderbilt, Peter, xviii
+\item vt, 93, 94
+\item vtd, 95
+\indexspace
+\newindex{w}
+\item Walton, Simon, xvi
+\item Weller, Daniel, xviii
+\item Wenzel, Oliver, xviii
+\item Wilder, Rick, xviii
+\item Willson, Stephen H., xv
+\item Worsley, Andrew, xvii
+\item wtmp, 85
+\indexspace
+\newindex{y}
+\item Young, Alan, xix
+\end{theindex}

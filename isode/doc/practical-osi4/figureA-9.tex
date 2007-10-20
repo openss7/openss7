@@ -1,0 +1,42 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \rlap{\kern  2.375in\lower 0.754in\hbox to 0pt{\hss iso(1)\hss}}%
+    \special{pa 2375 475}%
+    \special{pa 2375 0}%
+    \special{fp}%
+    \rlap{\kern  1.663in\lower 1.704in\hbox to 0pt{\hss standard(0)\hss}}%
+    \special{pa 2375 950}%
+    \special{pa 1663 1425}%
+    \special{fp}%
+    \rlap{\kern  3.088in\lower 1.704in\hbox to 0pt{\hss $\cdots$\hss}}%
+    \special{pa 2375 950}%
+    \special{pa 3088 1425}%
+    \special{fp}%
+    \rlap{\kern  0.950in\lower 2.654in\hbox to 0pt{\hss $\cdots$\hss}}%
+    \special{pa 1663 1900}%
+    \special{pa 950 2375}%
+    \special{fp}%
+    \rlap{\kern  2.375in\lower 2.654in\hbox to 0pt{\hss ftam(8571)\hss}}%
+    \special{pa 1663 1900}%
+    \special{pa 2375 2375}%
+    \special{fp}%
+    \rlap{\kern  0.238in\lower 3.604in\hbox to 0pt{\hss application-context(1)\hss}}%
+    \special{pa 2375 2850}%
+    \special{pa 238 3325}%
+    \special{fp}%
+    \rlap{\kern  1.663in\lower 3.604in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  3.088in\lower 3.604in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  4.513in\lower 3.604in\hbox to 0pt{\hss abstract-syntax(2)\hss}}%
+    \special{pa 2375 2850}%
+    \special{pa 4513 3325}%
+    \special{fp}%
+    \kern  4.514in
+  }\vss}%
+  \kern  3.605in
+}

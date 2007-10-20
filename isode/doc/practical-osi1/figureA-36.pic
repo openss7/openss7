@@ -1,0 +1,48 @@
+.PS 5.0i
+## figure APS-88
+B1:	box "\sf MTA"
+B2:	box "\sf MTA" with .e at (B1.w.x-linewid, B1.s.y-lineht)
+B3:	box "\sf MTA" with .w at (B1.e.x+linewid, B1.s.y-lineht)
+B4:	box "\sf MTA" with .n at (B1.n.x, B1.s.y-(lineht+boxht))
+##
+	line <- -> from B1.w to B2.n
+	line <- -> from B2.s to B4.w
+	line <- -> from B4.e to B3.s
+	line <- -> from B3.n to B1.e
+	line <- -> from B2.e to B3.w
+B5:	box dashed with .nw at (B2.w.x-linewid/2, B1.n.y+lineht/2) \
+		width (B3.e.x-B2.w.x)+linewid \
+		height (B1.n.y-B4.s.y)+lineht
+	move to (B5.nw.x, B5.nw.y-lineht/2); "\sf \ \ MTS" ljust
+##
+B6:	box "\sf UA" with .s at (B1.n.x, B5.n.y+lineht)
+	line <- -> from B6.s to B1.n
+B7:	box "\sf UA" with .se at (B2.nw.x-3*linewid/2, B2.nw.y+lineht)
+	line <- -> from B7.e to (B2.w.x, B2.w.y+boxht/6)
+B8:	box "\sf UA" with .ne at (B2.sw.x-3*linewid/2, B2.sw.y-lineht)
+	line <- -> from B8.e to (B2.w.x, B2.w.y-boxht/6)
+B9:	box "\sf MS" with .w at (B3.e.x+linewid, B3.e.y)
+	line <- -> from B9.w to B3.e
+B10:	box "\sf UA" with .w at (B9.e.x+linewid, B9.e.y)
+	line <- -> from B10.w to B9.e
+##
+B11:	box dashed with .nw at (B7.w.x-linewid/2, B6.n.y+lineht/2) \
+		width (B10.e.x-B7.w.x)+linewid \
+		height (B6.n.y-B8.s.y)+lineht
+	move to (B11.nw.x, B11.nw.y-lineht/2); "\sf \ \ MHS" ljust
+##
+B12:	box "\sf user" with .s at (B6.n.x, B6.n.y+lineht)
+	line <- -> from B12.s to B6.n
+B13:	box "\sf user" with .e at (B7.w.x-linewid, B7.w.y)
+	line <- -> from B13.e to B7.w
+B14:	box "\sf user" with .e at (B8.w.x-linewid, B8.w.y)
+	line <- -> from B14.e to B8.w
+B15:	box "\sf user" with .w at (B10.e.x+linewid, B10.e.y)
+	line <- -> from B15.w to B10.e
+##
+##B16:	box dashed with .nw at (B13.w.x-linewid/2, B12.n.y+lineht/2) \
+##		width (B15.e.x-B13.w.x)+linewid \
+##		height (B12.n.y-B14.s.y)+lineht
+##	move to (B16.nw.x, B16.nw.y-lineht/2); "\sf \ \ xxx" ljust
+##
+.PE

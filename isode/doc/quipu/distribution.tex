@@ -1,0 +1,784 @@
+
+\chapter {Distributed Operation}
+\label {dist-op}
+
+\section {Overview}
+
+
+Distributed Operation is a major aspect of the QUIPU
+Directory Service
+Sadly, the OSI Directory specifications in this area are, in the author's
+opinion, rather unsatisfactory.   
+Therefore, the QUIPU distributed operations are described in a slightly
+different manner.  The concept of ``Naming Context'' is not used, and the
+significance of ``Knowledge'' is de-emphasised.  The external view of this
+functionality is fully in line with the standard.   
+
+Some of the concepts 
+defined in this chapter  do {\em not} correspond to the
+ISO/CCITT terms, and so new terminology is introduced. 
+Standard terminology is used in the standard way.
+
+
+\section {DSA/DUA Interaction Model}
+
+There are some interesting choices to be made between DSA Referral and
+Chaining.  A DUA will start by contacting a local DSA, specifying that
+chaining is preferred (i.e., DSA referrals should not be passed back to the
+DUA).  After that, the first DSA will proceed by use of DSA Referral, except
+for operations where this is not possible in the QUIPU framework (some cases
+of search).  The advantages of this approach are:
+
+\begin {itemize}
+\item
+The DUA code can be kept to a minimum, as there is no need to handle
+referrals.
+This does mean that the DUA must always interact with the Directory
+Service through a DSA which supports chaining (which might exclude
+some implementations).
+\item
+Always going thorough a local DSA allows a ``per system'' cache to
+be maintained in a coherent manner.
+\item
+The overhead of maintaining chained connections is not passed
+on too far.
+\end {itemize}
+
+Note that whilst the DUA procedural does not handle referrals transparently,
+they are defined in the service interface, so that an application can
+choose to handle the referrals directly if it wishes to do so.
+
+\section {Model of Data Distribution}
+\label {model-dist}
+
+This is a critical section of the design.   It is essential to understand it
+before studying distributed operation.
+
+\subsection {Entry Data Blocks}
+
+For the root and every non-leaf vertex, there will be an
+{\em Entry Data Block} (EDB)
+which contains
+{\em all}
+information pertaining
+to the next level down in the DIT.
+Figure~\ref{edbf} gives and ASN.1 description of
+the Entry Data Block format.
+
+\tagrind [htbp] {edb}{Entry Data Block Format}{edbf}
+
+
+It should be noted and remembered that 
+the Entry Data Block associated with an entry and described as ``the Entry
+Data Block of the entry'' contains the entries children (i.e., their
+attributes and RDNs)
+and not the attributes of the entry itself.
+This is {\em not} necessarily intuitive.
+
+
+
+\subsection {Masters and Slaves}
+
+Every Entry Data Block has {\em Master}  and {\em Slave} copies.
+There will typically be only one master (although there may be
+multiple master copies, where data is maintained ``out of band'').
+Slave copies are automatically replicated from a Master EDB.
+This may be direct or indirect.  The full propagation path must be acyclic
+(loop free).
+
+A DSA has either all or none of an Entry Data Block 
+as a Master or Slave
+(viz: Entry Data Blocks are atomic).
+Any other DIT information it contains is treated as cached
+data.
+A DSA does not need to have any Master or Slave data.
+
+
+DSAs are named, and represented in the DIT.
+One of the reasons for this, is to enable use of the
+Directory to identify the OSI location of DSAs.
+This OSI location can then be adjusted transparent to the
+logical mapping of the DIT onto DSAs.
+This can be seen as treating a DSA in the same manner as any other
+Application Entity.
+This simplifies the implementation, as there does not need  to be
+specific storage of additional configuration information (knowledge).
+
+An important piece of information stored in the entry of each DSA is the
+list of EDBs and how they are replicated.  This information is the basis for
+automatic replication.   
+
+\subsection {QUIPU Subordinate References}
+
+An entry has associated with it, attributes which indicate  the
+DSAs which have Master or Slave Entry Data Blocks for the entry
+in question.
+These pointers are known as {\em Quipu Subordinate References} (QSR).
+For every QSR, the DSA must have a Master or Slave copy of the EDB, as
+implied  by the QSR.
+The converse it not true:  DSAs may have copies of EDBs without there being
+QSRs.
+The  DSAs with QSRs have the information {\em and} are
+prepared to answer public queries about the Entry Data Block in
+question.
+DSAa with EDBs (typically slave copies) and no QSRs usually have copies for
+performance or robustness reasons.  
+
+Quipu Subordinate References are similar to the standardised Non-Specific
+Subordinate References (NSSR).  There are the following differences:
+
+\begin {itemize}
+\item QSRs admit to replication, and therefore there are Master QSRs and
+Slave QSRs.
+
+\item A QSR always points to all of the relevant information, whereas an NSSR
+may only point to a part of it and must be used in ``and'' conjunction with
+other NSSRs.
+\end {itemize}
+
+
+\subsection {Access to the root EDB}
+
+There is no requirement for a given DSA to hold a copy of the
+root Entry Data Block.
+However, to be able to systematically process all queries, there
+must be direct or indirect access to the root Entry Data Block.
+Therefore, every DSA which does not have a copy of the root
+Entry Data Block must know the name and address of one or more
+DSA which either has a copy of the root Entry Data Block, or is
+closer (in terms of these references) to a DSA which has a
+copy.  This approach is similar to, but not the same as, use of superior
+references defined in the standard.
+
+\section {Standard Knowledge References}
+
+
+In addition, to the QUIPU specific QSRs, an entry might also contain
+standard Knowledge References, as defined in the OSI Directory.  This is
+used to point to data not contained in a QUIPU DSA.  There are three types
+of reference defined in the standard:
+
+\begin {description}
+\item[Subordinate Reference]  Pointer to an Entry
+
+\item[Cross Reference] From the QUIPU standpoint, the same as a subordinate
+reference
+
+\item[Non Specific Subordinate Reference] Pointer to multiple subordinates
+which must be queried for the next level down.  QSRs are similar to this
+(see previous section).
+
+\end {description}
+
+In the first two cases, the entry in the Entry Data
+Block is considered to be ``Knowledge only'' (although other entry
+information may be cached). 
+In the third case the entry will also have full information on itself.  
+If any of these are present, there will be no QUIPU master or slave pointers.
+These three types of pointer are mutually exclusive\footnote{Thought(SEK) ---
+does the standard let you have a subordinate reference plus a cached NSSR?}.
+
+These attributes are not supported in QUIPU 5.0.
+
+\section {Navigation}
+
+Given this data model, a straightforward navigation algorithm
+can now be specified.
+The requirement is to locate the entry associated with a
+specified Distinguished Name.
+When the entry is arrived at, the operations will behave
+as proscribed.
+
+The basis of the navigation strategy is that the first DSA (i.e., the one
+accessed by the DAP) does all of the hard work.  Other DSAs, accessed by DSA
+Referral, either answer the question or return an error.  This is important,
+as it is the basic strategy by which the system ensures completion of
+queries.
+
+First consider the behaviour of a DSA accessed by the Directory
+System Protocol (DSP):
+
+\begin {enumerate}
+\item 
+Look up the Distinguished Name.
+\item 
+If the Distinguished Name is found, go to step 6.
+\item 
+If there is a local copy of
+the Entry Data Block of the parent,
+return a nameError.
+The ``matched'' parameter should be set to the Distinguished Name
+of the Entry Data Block (i.e., the level above the offered name).
+This is an authoritative NO.
+\item 
+Strip the lowest component off the Distinguished Name, and go
+to step 1.
+If there are no more components, go to step 5.
+This process checks for authoritative NO.
+\item 
+At this point, the name has not been found, and no relevant
+Entry Data Block has been found.
+This implies that the DSA does not hold the root Entry Data
+Block.
+Therefore the DSA should return a DSA Referral.
+The DSA Referral should be the list of DSAs (names and
+addresses) which are known
+to be closer to the root.
+\item 
+We now have an entry which matches some or all of the original
+Distinguished Name.
+Consider this entry.
+\item 
+If the entry contains an Alias attribute, dereference, and goto step 1.
+Note that if a referral is returned, that the appropriate parameters should
+be set to indicate all dereferences.
+\item 
+If the entry is the one specified in the query, return the
+answer to the query, or the appropriate (authoritative) error.
+\item 
+If the entry is of object class ``QuipuNonLeafObject'', return a Referral.
+This is simply a redirect to a DSA which can take the query at least one
+step further.  The names for the DSA Referral should be taken from the
+master and slave Quipu Subordinate References.  Where the calling DSA is a
+non-QUIPU DSA, the Presentation address of the Master DSA must be looked up,
+and only this one returned.
+\item
+If the entry contains a reference, the appropriate referral should be
+returned.
+\item 
+The query refers to an entry below the bottom of the DIT.
+An authoritative nameError can be returned.
+\end {enumerate}
+
+Now consider the slightly more complex case of the initial
+DSA (doing the DSA Referral).
+Steps 1-4 are followed as above
+as above, to determine authoritative NO.
+
+\begin {enumerate}
+\setcounter{enumi}{4}
+\item
+At this point, the name has not been found, and no relevant
+Entry Data Block has been found.
+This implies that the DSA does not hold the root Entry Data
+Block.
+The list of DSAs which are known
+to be closer to the root, are the starting point for the
+iterative query.
+Go to step \ref{step-iter}.
+\item 
+We now have an entry which matches some or all of the original
+Distinguished Name.
+Consider this entry.
+\item 
+If the entry contains an Alias attribute, apply the relevant
+dereference to the original query, and go back to the start.
+\item 
+If the entry is the one specified in the query, return the
+answer to the query, or the appropriate (authoritative) error.
+\item 
+If the entry is of object class ``QuipuNonLeafObject'', 
+this gives a list of QSRs to start the iterative query.
+Go to step \ref{step-iter}.
+\item
+If the entry contains a standard knowledge reference, then
+go to step \ref{step-iter}.  Note that for non-specific subordinate
+references, {\em all} of the references must
+be followed before giving up.
+\item 
+The query refers to an entry below the bottom of the DIT.
+An authoritative nameError can be returned,
+\item 
+\label{step-iter}
+Select one of the DSAs from the referral list.
+The order to try the DSAs is arbitrary.
+However, it is attempted to  select ones with the
+topologically closest name first (e.g., a UK DSA will prefer to
+query another UK DSA before asking a French one).
+Try DSAs in turn until one gives an answer or you get bored.
+Consider the answer.
+Authoritative answers (yes or no) should be passed back to the
+DUA.
+If a Referral is received, recurse to step, watching
+carefully for loops.
+\end {enumerate}
+
+It can be seen that this navigation is relying on data being
+distributed correctly, and DSAs other than the one doing the
+work behaving in a correct manner.
+Information provided in the referral should be used to ensure that the
+iteration is progressing, and thus detect livelock situations.
+
+
+
+\section {List}
+
+The Entry Data Block concept allows the list operation to fall out in a
+straightforward manner.
+Navigation to the Entry Data Block belonging to the name provided, will
+give access to the full result for the list operation.
+
+Note that where cross/subordinate references are involved, it will be
+assumed that these are not alias entries (reasonable in practice).
+This will allow list to be performed in a single DSA in all cases.
+
+\section {Search}
+
+This section describes how the OSI Directory search is supported.  This is
+one of the hardest parts of the implementation, and care must be taken.
+Note that the DAP argument in DSP is always that provided by the
+DUA\footnote {Whilst this is in principle one of the key aspects of the way
+the DSP works, the recommendations for distributed operations violate this
+principle when dealing with aliases during search.}.  This means that the
+work done by a given DSA must be in relation to the target object.  With
+other operations, this is (fairly) straightforward, as the target object
+always references the base object of the operation.  For searching, care
+must be taken to correctly verify whether the base object has been reached.
+This is done by use of the operation progress information, setting the name
+resolution phase to completed.
+
+The search operation functions by searching the part of the tree implied
+by the ``subset'' specification.
+Rather than returning all of the information, the queried DSA will apply
+the associated filter to the entries in question, and return the
+filtered result, along with appropriate continuation pointers.
+This should minimise network traffic.
+
+
+The case of ``subset = baseObject'' is handled by navigating to the Entry
+Data Block of the object's parent, and applying the given filter.
+If the entry is a cross reference or subordinate reference, the reference
+should be followed (using the same query).
+
+The case of ``subset = oneLevel'' is handled by navigating to the object's
+own Entry Data Block.
+There the filter is applied to each of its children.
+If any of the children are alias entries, the alias should be
+de-referenced, and a baseObject search applied to the new entry.
+For each child which is a cross references or subordinate references, 
+the references should be followed, setting the target object to be the child.
+
+The case of ``subset = wholeSubtree'' is handled by navigating to the
+object's own Entry Data Block.
+There, the filter is applied to the object and to each of its
+children\footnote{QUIPU 5.0 gets this wrong, and does not apply the filter
+to the base object.}.
+If any of the children are alias entries, the alias should be
+de-referenced, and a wholeSubtree search applied to the new entry.
+For each child which has QUIPU children (determined
+by the prescence of a masterDSA attribute), the search should be applied to
+the master or one of the slave DSAs, with target object set to the child.
+For each child which is a cross reference or subordinate reference, 
+the references should be followed, setting the target object to the child.
+For each child which has non-specific subordinate references, the search
+should be applied to {\em all} of the referenced DSAs, with the target
+object set to the child.
+
+There are three procedures for operating:
+
+\begin {enumerate}
+\item Everything handled by the first DSA, with other DSAs returning a
+mixture of results and partial outcome qualifiers.  This is not currently
+supported due to some awkward implications of holding state, but will be the
+default in QUIPU 6.0.
+
+\item Proceed by referral until a DSA is reached which has a copy of the
+base object.  Then this DSA proceeds by referral, and returns the full
+result to the first DSA.  This is how QUIPU 5.0 works.  It has the advantage
+of often accumulating search results in a local environment, and so will be
+selectable in QUIPU 6.0 (possibly in a complex manner).
+
+\item Proceed by referral until a DSA is reached which has a copy of the
+base object.  Then proceed entirely by chaining.  This is not done.
+
+\end {enumerate}
+
+
+There is potential for looping in this procedure.
+This will be detected and broken by noting loops in the DSA trace
+information.
+This takes account of the fact that some distribution will allow
+for a query to re-enter the same DSA a number of times.
+
+
+The Search and list operations make use of the ``partial results''
+functionality to return information if a time or size limit is reached.
+Thus, setting a low size limit will allow a user to easily examine 
+sample information (either by list or search).
+
+\section {Unavailable DSAs}
+
+In the case where a DSA is unavailable, and chaining is preferred, a reference
+will be returned by a QUIPU DSA.  
+A QUIPU DUA, which knows it is talking to a QUIPU DSA
+can rely on this behaviour, and simply use the referral as a diagnostic to
+the user.  It is hoped that the next version of the standard will add an
+obvious extra parameter.
+
+
+
+\section {Presentation Addresses}
+
+In terms of the directory, presentation addresses are handled according to
+the standard.  Presentation addresses are stored in text form according to 
+\cite {PSAP.String}.   The network encoding follows \cite {NSAP.Approach}.
+
+\section {Operating When DSAs are not fully interconnected}
+\label {tcp-only}
+
+Whilst global interconnection of all application entities is an OSI ideal,
+it will not be achievable in the short or medium term.  Application relaying
+by DSAs will be needed to achieve full directory connectivity.  
+
+
+In general, it is not desirable for DSAs to proceed by chaining - it wastes
+unnecessary application level resources.  Later, there may be policy reasons
+to prefer chaining, but these are ignored for now.  The internal structure
+of network addresses allows a DSA to determine if two DSAs can communicate
+directly.  For QUIPU 5.0, referrals will be used if the calling and
+referenced DSA can communicate directly and chaining otherwise.  For QUIPU
+6.0, authorisation will be required for chaining to take place.
+
+
+\section {The External view of QUIPU}
+
+To a non-QUIPU system, QUIPU will appear to work exactly according to the
+standard.  This is not quite true for QUIPU 5.0, but is sufficiently close to
+allow a high level of interworking with a non-QUIPU system.  This is an
+optimistic statement, not written in the light of experience with
+interoperability testing.
+
+When a QUIPU DSA interacts with another DSA, it will look up its object
+classes (and probably other information).  This will allow it to determine if
+the other DSA is a QUIPU DSA.  When interacting with another QUIPU DSA, the
+following deviations from the standard are possible.  These are primarily
+concerned with the introduction of replication:
+
+\begin {itemize}
+\item Presentation Address might be omitted from Access Point (always
+present in QUIPU 5.0, for consideration in QUIPU 6.0).
+\item Cross References and Subordinate References have multiple values
+(although QUIPU will probably never send these to itself).
+\item Multiple values of Non Specific Subordinate Reference are assumed to
+have OR conjunction (i.e., they are really QSRs).
+\item Use of QUIPU Access control as describe in Section~\ref{dsp-acl}
+\end {itemize}
+
+When a QUIPU DSA returns references which are derived from reference
+attributes, it will return them as specified.  If it returns information
+derived from QUIPU internal pointers, it will return a non-specific
+subordinate reference.  If the DSA being communicated with is not a QUIPU
+DSA, it will return only a reference to the master DSA (as replication is
+not admitted within the protocol).
+
+\section {Use of ACLs in DSP}
+\label{dsp-acl}
+
+Within the DSP, between a pair of QUIPU DSAs, the ACL
+attribute becomes special.  It is used as a roadmap of the entry for
+a DSA which is caching information.  For this reason, the ACL is
+always asked for in read operations invoked by DSP --- irrespective
+of whether the corresponding DAP operation asked for it.  The ACL
+will always be returned to the DSA, even if the DUA in question does
+not have rights to it.  This will allow the DSA to perform caching
+``correctly''.  When an ACL is passed in the DSP, it will be encoded
+so that ALL of the attributes of the entry are explicitly referred
+to.  Thus, the caching DSA will be able to determine whether or not
+it has all the attributes of a given entry.  This should be a useful
+performance gain.
+
+This will be added in QUIPU 6.0.
+
+\section {Access Control and Authentication}
+
+All operations must take account of access control prior to being performed.
+Authentication must be done at BIND time, as this is the only point at which
+the DSA can return an error to the DUA which indicates authentication
+failure.
+
+If there is public right on the information, then the effort of doing the
+authentication was wasted.
+Therefore, if a user is accessing information {\em known} to be publicly
+readable, it will be optimal {\em not} to supply credentials.
+
+For policy reasons, QUIPU 6.0 may make specification of DUA and the
+associated simple authentication mandatory.  
+
+\section {Cached Data}
+\label {cache-all}
+
+Cached data is not mentioned in the basic algorithm.
+However, the algorithm can utilise cached
+data in some circumstances.
+This is because of the manner in which identification of copy data has been
+introduced in the final stage of the OSI Directory specification.
+Cached data may be used whenever this is not prohibited by the service
+controls.
+The standard does not clearly define what ``copy'' data is.  In general,
+QUIPU treats master and slave data as authoritative.
+Both slave and cached data are returned to the user as
+``copy'' data.  For this reason, the distinction between slave and copy data
+can only be internal to QUIPU.
+
+There is no time to live or age information in the OSI Directory Protocols.
+Care must be taken when caching, that spurious information is not passed
+around indefinitely between DSAs
+
+When QUIPU holds cached data, it will note:
+
+\begin {itemize}
+\item How long it has had it
+\item If it came from a master, slave, or cache.  
+\item If it is complete (e.g., are all values of an attribute present)
+\end {itemize}
+
+This section is open ended.
+The exact approaches to caching, and determining suitable timeout values
+will be the subject of experiment.
+
+QUIPU 5.0 supports the caching techniques described in section
+\ref{cache-all}, except:
+
+\begin {itemize}
+\item Holding age information
+\item Storage on disk
+\item Timeouts 
+\item Negative caching
+\end {itemize}
+
+
+\subsection {Caching Configuration Data}
+
+
+When the DSA is using cached data (e.g., the Presentation Address of another
+DSA), it should be aware of this fact, and should update the information
+(from non-cache information) if it fails to establish an OSI connection,
+or some inconsistency appears to occur in the data.  If there is some doubt
+(e.g., if the error might be due to the DSA being unavailable), the age of
+the cache should be take into account when determining whether or not to do
+a refresh.
+
+The important thing about managing cached data is to handle timeouts
+sensibly.
+Data cached from a cache may have an indeterminate age.
+It is important that this data is given a relatively short timeout, to
+prevent it being circulated indefinitely amongst a set of DSAs.
+However, {\em if} the data can be verified by usage (e.g., correctly 
+connecting to a DSA verifies a presentation address), it should then be
+treated as if cached from a master/slave.  
+Non-verified data should be treated in the same manner as user data, which
+is described in the next section.
+Data cached from master/slave information should be given a longer timeout.
+Data is discarded, rather than refreshed automatically.  A timeout of some
+number of days seems appropriate for most data.   
+
+A special case is made for comparing passwords, because it is a user
+expectation to use the new password immediately.  For this reason, if a
+password compare fails, a check should be made against the master copy.
+Note that old passwords will sometimes be valid for a
+short while beyond their change.  
+
+\subsection {Caching User Data}
+
+User data is cached in a manner similar to configuration data.  Data cached
+from a cache will only be held for a short period of time (perhaps a few
+minutes).  This time should be short enough to ensure that spurious cached
+information will die out, but long enough to give the necessary performance
+improvements for repeated queries.   
+
+Other data may be cached for longer.  If ever a query is made asking for
+authoritative data, any cached values should be flushed immediately ---
+irrespective of whether the query succeeds.  A query for authoritative data
+is a strong hint about the inaccuracy of cached data, or that a recent
+change might have occurred.
+
+\subsection {Negative Data}
+
+Usage of directories has shown that incorrect queries are often repeated,
+particularly when the user is a mail system.  For this reason, negative
+answers will be cached for a short period of time (QUIPU 6.0).
+
+\subsection {Writing Caches to disk}
+\label {disk-cache}
+
+This is beyond the scope of QUIPU 5.0, but essential for QUIPU 6.0 for
+improved performance. 
+
+The astute will notice that without any cached information, DSA startup for
+DSAs which do not have copies of a few relevant EDBs, will be an expensive
+operation.  
+Data cached from a cache will never be saved on disk.  
+
+Disk caching is important to ensure that this overhead is only be incurred
+in practice, on the occasion of the initial startup.  This means that QUIPU
+5.0 DSAs (without disk caching) should always be given copies of at least
+their parent EDB.
+
+\section {Configuration and Slave Update}
+
+A given DSA will have copies of zero or more Entry Data Blocks.
+A DSA may either be a master for a given Entry Data Block, or a
+slave.
+If there are multiple master copies, it is assumed that these
+are kept coherent by some out of band mechanism.
+For example, one of them is the ``real'' master, and the others
+are updated by file transfer when modifications occur.
+This discussion will proceed for the single master case.
+
+There are three distinct types of DSA:
+
+\begin {enumerate}
+\item 
+A DSA with a master copy of the root Entry Data Block.
+\item 
+A DSA with a slave copy of the root Entry Data Block.
+\item 
+A DSA with no copy of the root Entry Data Block.
+\end {enumerate}
+
+As noted in Section~\ref{model-dist}, DSAs of type 2 and 3 will have pointer(s) to
+a DSA which is ``closer'' to the master copy of the root Entry
+Data Block.
+Specifying this hierarchical distribution, as opposed to requiring
+direct access to the master (as in earlier versions of the OSI Directory)
+means that there can be many copies of information which needs to be highly
+replicated, without excessive
+redundant copying across the Wide Area Network.   
+This will be particularly important for the root Entry Data Block.
+
+DSAs of type 2 will only need the pointer information for initial
+startup or recovery after catastrophic corruption.
+When the slave copy of the root Entry Data Block has been
+obtained for the first time, this will supercede the pointers.
+DSAs of type 3 will usually use cached information in preference to
+these pointers, and will only need the pointers if cached information is
+(or appears to be) invalid.
+
+The only information which a DSA has to obtain locally at initial boot time,
+other than the DSA pointers, is its own name.  All other information may be
+obtained from the Directory.
+Beyond this, the Directory Service manages its own
+configuration.
+There is little point in having a Directory Service providing
+general high speed access to global information, and then
+requiring an additional system (knowledge) to deal with its own
+configuration.
+
+Associated with the DSA's entry in the DIT is a specification of
+the entries for which the DSA is a master, and for which it is
+a slave.
+A DSA will be able to derive the location of an Entry Data
+Block for which it is master from this information.
+Thus at initial boot, a DSA will utilise its initial DSA pointers
+to read its own entry.
+The location of master Entry Data Blocks will be derivable from
+their name, and so their existence can then be verified by the
+DSA in question.
+A DSA which is a master for the root Entry Data Block will have
+no pointers.
+However, it can go straight to the master root Entry Data
+Block, read the information about itself, and proceed as for
+other DSAs.
+
+
+It is believed that for early pilots, a high level of copying configuration
+data will be desirable to achieve robustness.  The root and national EDBs
+will be very highly replicated, even though QUIPU can operate with a rather
+low level of replication.
+
+\section {DSA Naming}
+\label {dsa-naming}
+
+\subsection {Choice of Names to prevent loops}
+
+Care must be taken to prevent the situation where the location
+of a DSA is only known through itself (and other more complex
+variants).
+A simple rule for naming DSAs will ensure that this cannot
+happen.
+The master DSA for a given entry (i.e., the DSA controlling the Entry Data Block of
+containing 
+the entry's children) should have its
+name in the Entry Data Block of the entry's parent or at a
+level higher in the DIT.
+For example, the master DSA of 
+\begin{quote}\small\begin{verbatim}
+Country=UK, Org=University College London, OU=Computer Science
+\end{verbatim}\end{quote}
+which contains information on entries below Computer Science, may be labelled
+\begin{quote}\small\begin{verbatim}
+Country=UK, Org=University College London, DSA=Three Toed Sloth
+\end{verbatim}\end{quote}
+or
+\begin{quote}\small\begin{verbatim}
+Country=France, DSA=Capybara
+\end{verbatim}\end{quote}
+It may not be labelled
+\begin{quote}\small\begin{verbatim}
+Country=UK, Org=University College London, OU=Computer Science, 
+            DSA=Alpaca
+\end{verbatim}\end{quote}
+or
+\begin{quote}\small\begin{verbatim}
+Country=France, Org=Inria, DSA=Llama
+\end{verbatim}\end{quote}
+
+
+A little more flexibility could be allowed;
+However, this rule is simple, it prevents deadlock, and allows
+for reasonable labelling practices.
+The restriction may be relaxed somewhat, when the concept of Directory
+Management Domains is introduced more formally.
+
+\section {Local DSA Information}
+
+
+The basic entry for the DSA contains information which must be widely known.
+Essentially this is the OSI location of the DSA.  There is other information
+which it is useful to store in the Directory, but which is primarily needed
+by the DSA itself.  Because of the naming rules in the previous section, the
+DSA's entry will usually be mastered in a different DSA.  Therefore, we have
+a second entry for each DSA, which is the child of the prime DSA Entry.
+This entry will always have common name ``Info'', and be mastered in the DSA
+itself.  There will usually not be slave copies.  The DSA Address is also
+stored in this entry.  This duplication (and therefore extra management) is
+seen as worthwhile, as it allows a DSA to start without access to any other
+DSA.  This information may be absent (usually only when a DSA is being
+created).
+
+Initially, the following information will be stored in this entry:
+
+\begin {itemize}
+\item The EDB management information
+\item DSA Control (see Section~\ref{dsa-control})
+\item Software Version --- this attribute is automatically maintained
+by the DSA.
+\end {itemize}
+
+For QUIPU 5.0, these entries are supported, but are in the main DSA entry.
+
+The following items will be added for QUIPU 6.0, to allow for more
+sophisticated remote
+management:
+
+\begin {itemize}
+\item Authorisation policy
+\item Tailoring
+\item The schema files (OID, Attribute, Object Class)
+\end {itemize}
+
+Replication will also allow common management of multiple DSAs (e.g., to share
+a common schema).
+
+
+\section {DSA Naming Architecture }
+
+The following Naming Architecture components are needed in order to support
+the QUIPU Mechanism for distributed operations.
+These are defined here, as a convenient location.
+Numbers are assigned in the QUIPU Naming Architecture contained in Volume~5
+of the User's
+Manual \cite{QUIPU.Manual}.
+
+\tagrindfile {na}{Naming Architecture}{na}
+

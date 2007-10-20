@@ -1,0 +1,25 @@
+\File{grind6\-3.c},{22:23},{Jun 12 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{for}    \K{for} (;;) \{}}
+\L{\LB{}\Tab{8}{\K{if} (TReadRequest (sd, tx, NOTOK, td) == NOTOK) \{}}
+\L{\LB{}\Tab{8}{    \K{if} (td \-\> td\_reason != DR\_NORMAL)}}
+\L{\LB{}\Tab{16}{error (\S{}\"T\-READ.REQUEST: \%s\"\SE{}, TErrString (td \-\> td\_reason));}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{if} (tx \-\> tx\_expedited)}}
+\L{\LB{}\Tab{8}{    result = TExpdRequest (sd, tx \-\> tx\_base, tx \-\> tx\_cc, td);}}
+\L{\LB{}\Tab{8}{\K{else}}}
+\L{\LB{}\Tab{8}{    result = TDataRequest (sd, tx \-\> tx\_base, tx \-\> tx\_cc, td);}}
+\L{\LB{}\Tab{8}{\K{if} (tx \-\> tx\_base)}}
+\L{\LB{}\Tab{8}{    free (tx \-\> tx\_base);}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{if} (result == NOTOK)}}
+\L{\LB{}\Tab{8}{    error (\S{}\"\%s: \%s\"\SE{}, tx \-\> tx\_expedited ? \S{}\"T\-EXPEDITED\-DATA.REQUEST\"\SE{}}}
+\L{\LB{}\Tab{16}{    : \S{}\"T\-DATA.REQUEST\"\SE{}, TErrString (td \-\> td\_reason));}}
+\L{\LB{}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    exit (0);}}
+\L{\LB{\}}}

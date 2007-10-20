@@ -1,0 +1,217 @@
+\begin{thebibliography}{CCITT84b}
+
+\bibitem[CCITT84a]{CCITT.SP.Protocol}
+{Session Protocol Specification for Open Systems Interconnection (OSI) for
+  CCITT Applications}.
+\newblock Malaga-Torremolinos, October, {\oldstyle 1984}.
+\newblock International Telegraph and Telephone Consultative Committee
+  Recommendation X.225.
+
+\bibitem[CCITT84b]{CCITT.TP.Protocol}
+{Transport Protocol Specification for Open Systems Interconnection (OSI) for
+  CCITT Applications}.
+\newblock Malaga-Torremolinos, October, {\oldstyle 1984}.
+\newblock International Telegraph and Telephone Consultative Committee
+  Recommendation X.224.
+
+\bibitem[CCITT84c]{CCITT.TP.Service}
+{Transport Service Definition for Open Systems Interconnection (OSI) for CCITT
+  Applications}.
+\newblock Malaga-Torremolinos, October, {\oldstyle 1984}.
+\newblock International Telegraph and Telephone Consultative Committee
+  Recommendation X.214.
+
+\bibitem[DCass86]{TSAP.on.TCP.old}
+Dwight~E. Cass and Marshall~T. Rose.
+\newblock {\it {ISO Transport Services on top of the TCP}}.
+\newblock Request for Comments~983, DDN Network Information Center, SRI
+  International, April, {\oldstyle 1986}.
+
+\bibitem[DDN81a]{IP}
+{Internet Protocol}.
+\newblock DDN Protocol Handbook, Volume One: \dod/ Military Standard Protocols,
+  DDN Network Information Center, SRI International, September, {\oldstyle
+  1981}.
+\newblock \milstd/ 1777 (also available as ARPA Internet Request for Comments
+  791).
+
+\bibitem[DDN81b]{SMTP}
+{Simple Mail Transfer Protocol}.
+\newblock DDN Protocol Handbook, Volume One: \dod/ Military Standard Protocols,
+  DDN Network Information Center, SRI International, September, {\oldstyle
+  1981}.
+\newblock \milstd/ 1781 (also available as ARPA Internet Request for Comments
+  821).
+
+\bibitem[DDN81c]{TCP}
+{Transmission Control Protocol}.
+\newblock DDN Protocol Handbook, Volume One: \dod/ Military Standard Protocols,
+  DDN Network Information Center, SRI International, September, {\oldstyle
+  1981}.
+\newblock \milstd/ 1778 (also available as ARPA Internet Request for Comments
+  793).
+
+\bibitem[DDN83]{TELNET}
+{Telnet Protocol Specification}.
+\newblock DDN Protocol Handbook, Volume One: \dod/ Military Standard Protocols,
+  DDN Network Information Center, SRI International, May, {\oldstyle 1983}.
+\newblock \milstd/ 1782 (also available as ARPA Internet Request for Comments
+  854).
+
+\bibitem[DDN84]{FTP}
+{File Transfer Protocol}.
+\newblock DDN Protocol Handbook, Volume One: \dod/ Military Standard Protocols,
+  DDN Network Information Center, SRI International, May, {\oldstyle 1984}.
+\newblock \milstd/ 1780 (also available as ARPA Internet Request for Comments
+  765).
+
+\bibitem[ECMA85]{ECMA.ROS}
+{Remote Operations: Concepts, Notation and Connection-Oriented Mappings}.
+\newblock December, {\oldstyle 1985}.
+\newblock ECMA TR/31.
+
+\bibitem[IBM82]{SNA}
+{\it {Systems Network Architecture Technical Overview}}.
+\newblock International Business Machines, Incorporated, Data Processing
+  Division, White Plains, New York, March, {\oldstyle 1982}.
+\newblock Document Number GC30--3073--0.
+
+\bibitem[IGroe86]{TCP.convert.ISO}
+Inge Groenbaek.
+\newblock {Conversion Between the TCP and ISO Transport Protocols as a Method
+  of Achieving Interoperability Between Data Communication Systems}.
+\newblock {\it IEEE Journal on Selected Areas in Communications},
+  SAC-4(2):288--296, March, {\oldstyle 1986}.
+
+\bibitem[ISO84a]{OSI}
+{Information Processing Systems~---~Open Systems Interconnection: Basic
+  Reference Model}.
+\newblock {\oldstyle 1984}.
+\newblock Interational Standard 7498.
+
+\bibitem[ISO84b]{ISO.SP.Protocol}
+{Information Processing Systems~---~Open Systems Interconnection: Session
+  Protocol Specification}.
+\newblock June, {\oldstyle 1984}.
+\newblock Draft International Standard 8327.
+
+\bibitem[ISO84c]{ISO.SP.Service}
+{Information Processing Systems~---~Open Systems Interconnection: Session
+  Service Definition}.
+\newblock June, {\oldstyle 1984}.
+\newblock Draft International Standard 8326.
+
+\bibitem[ISO85a]{ISO.TP.Protocol}
+{Information Processing Systems~---~Open Systems Interconnection: Transport
+  Protocol Specification}.
+\newblock {\oldstyle 1985}.
+\newblock Draft International Standard 8073.
+
+\bibitem[ISO85b]{ISO.TP.Service}
+{Information Processing Systems~---~Open Systems Interconnection: Transport
+  Service Definition}.
+\newblock {\oldstyle 1985}.
+\newblock Draft International Standard 8072.
+
+\bibitem[ISO86a]{ISO.FTAM}
+{Information Processing Systems~---~File Transfer, Access, and Management}.
+\newblock August, {\oldstyle 1986}.
+\newblock Draft International Standard 8571.
+
+\bibitem[ISO86b]{ISO.CASE.Service}
+{Information Processing Systems~---~Open Systems Interconnection: Service
+  Definition for Common Application-Service-Elements}.
+\newblock June, {\oldstyle 1986}.
+\newblock Draft International Standard 8649.
+
+\bibitem[ISO86c]{ISO.PP.Syntax}
+{Information Processing~---~Open Systems Interconnection: Specification of
+  Abstract Syntax Notation One (ASN.1)}.
+\newblock {\oldstyle 1986}.
+\newblock 2$^{\underline{\mbox{\scriptsize nd}}}$ Draft International Standard
+  8824.
+
+\bibitem[ISO86d]{ISO.PP.Encoding}
+{Information Processing~---~Open Systems Interconnection: Specification of
+  basic encoding rules for Abstract Syntax Notation One (ASN.1)}.
+\newblock {\oldstyle 1986}.
+\newblock 2$^{\underline{\mbox{\scriptsize nd}}}$ Draft International Standard
+  8825.
+
+\bibitem[JReyn85]{Assigned.Numbers}
+Joyce~K. Reynolds and Jon~B. Postel.
+\newblock {\it {Assigned Numbers}}.
+\newblock Request for Comments~960, DDN Network Information Center, SRI
+  International, December, {\oldstyle 1985}.
+
+\bibitem[KZoli85]{SNA.convert.XNS}
+Kenneth~O. Zoline and William~P. Lidinksy.
+\newblock {An Approach for Interconnecting SNA and XNS Networks}.
+\newblock In {\it {Proceedings, Ninth Data Communications Symposium}},
+  pages~184--198, ACM Special Interest Group on Communications, IEEE Computer
+  Society Press, September, {\oldstyle 1985}.
+
+\bibitem[MHS84a]{MHS.P1}
+{Message Handling Systems: Message Transfer Layer}.
+\newblock Malaga-Torre\-molinos, October, {\oldstyle 1984}.
+\newblock International Telegraph and Telephone Consultative Committee
+  (Recommendation X.411).
+
+\bibitem[MHS84b]{MHS}
+{Message Handling Systems: System Model-Service Elements}.
+\newblock Malaga-Torremolinos, October, {\oldstyle 1984}.
+\newblock International Telegraph and Telephone Consultative Committee
+  (Recommendation X.400).
+
+\bibitem[MPadl85]{ARM}
+Michael~A. Padlipksy.
+\newblock {A Perspective on the ARPANET Reference Model}.
+\newblock In {\it {The Elements of Networking Style and Other Essays and
+  Animadversions on the Art of Intercomputer Networking}}, chapter~5,
+  pages~89--115, Prentice-Hall, Inc., Englewood Cliffs, New Jersey, {\oldstyle
+  1985}.
+\newblock Also available as ARPA Internet Request for Comments 871.
+
+\bibitem[NBS85]{NBS.TP}
+{Implementation Agreements Among Implementors of OSI Protocols}.
+\newblock May, {\oldstyle 1985}.
+\newblock National Bureau of Standards.
+
+\bibitem[NRC85]{NRC.Report}
+{Transport Protocols for Department of Defense Data Networks}.
+\newblock National Academy Press, February, {\oldstyle 1985}.
+\newblock Report to the Department of Defense and the National Bureau of
+  Standards by the Committee on Computer-Computer Communication Protocols,
+  Board on Telecommunications and Computer Applications Commission on
+  Engineering and Technical Systems, National Research Council, C. Chaplin
+  Cutler, chair (Executive Summary available as ARPA Internet Request for
+  Comments 939).
+
+\bibitem[NSF86]{IP.Requirements}
+{Requirement for Internet Gateways~---~Draft}.
+\newblock May, {\oldstyle 1986}.
+\newblock ARPA Internet Request for Comments 985, prepared by the Gateway
+  Requirements Subcommitee of the National Science Foundation's Network
+  Technical Advisory Group, David L.~Mills, chair.
+
+\bibitem[PGree86]{Protocol.Conversion}
+Paul~E. Green, Jr.
+\newblock {Protocol Conversion}.
+\newblock {\it IEEE Transactions on Communications}, COM--34(3):257--268,
+  March, {\oldstyle 1986}.
+
+\bibitem[SKill86]{ARPA.MHS}
+Steve~E. Kille.
+\newblock {\it {Mapping between X.400 and RFC822}}.
+\newblock Request for Comments~987, DDN Network Information Center, SRI
+  International, June, {\oldstyle 1986}.
+\newblock Also available as UCL Technical Report number~120 and Mailgroup Note
+  number~19.
+
+\bibitem[VCerf83]{Internet.Architecture}
+Vinton~G. Cerf and Edward~A. Cain.
+\newblock {The DoD Internet Architecture Model}.
+\newblock {\it Computer Networks and ISDN Systems}, 7(10):307--318, October,
+  {\oldstyle 1983}.
+
+\end{thebibliography}

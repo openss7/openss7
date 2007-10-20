@@ -1,0 +1,223 @@
+\File{passwd\-init.c},{19:46},{Oct 14 1989}
+\L{\LB{\C{}\/* lookup.c \- password lookup service \-\- initiator *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{\#include} \<stdio.h\>}}
+\L{\LB{\K{\#include} \S{}\"ryinitiator.h\"\SE{}}\Tab{40}{\C{}\/* for generic interctive initiators *\/\CE{}}}
+\L{\LB{\K{\#include} \S{}\"PasswordLookup\-ops.h\"\SE{}}\Tab{40}{\C{}\/* operation definitions *\/\CE{}}}
+\L{\LB{\K{\#include} \S{}\"PasswordLookup\-types.h\"\SE{}}\Tab{40}{\C{}\/* type definitions *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* DATA *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{char} *myservice = \S{}\"passwdstore\"\SE{};}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{char} *mycontext = \S{}\"isode passwd lookup demo\"\SE{};}}
+\L{\LB{\K{static} \K{char} *mypci = \S{}\"isode passwd lookup demo pci\"\SE{};}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{}\Tab{40}{\C{}\/* ARGUMENTS *\/\CE{}}}
+\L{\LB{\K{int}}\Tab{8}{do\_lookupUser (), do\_lookupUID (), do\_help (), do\_quit ();}}
+\L{\LB{}}
+\L{\LB{}\Tab{40}{\C{}\/* RESULTS *\/\CE{}}}
+\L{\LB{\K{int}}\Tab{8}{lookup\_result ();}}
+\L{\LB{}}
+\L{\LB{}\Tab{40}{\C{}\/* ERRORS *\/\CE{}}}
+\L{\LB{\K{int}}\Tab{8}{lookup\_error ();}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{struct} dispatch dispatches[] = \{}}
+\L{\LB{    \S{}\"lookupUser\"\SE{}, operation\_PasswordLookup\_lookupUser,}}
+\L{\LB{    do\_lookupUser, free\_PasswordLookup\_UserName,}}
+\L{\LB{    lookup\_result, lookup\_error,}}
+\L{\LB{    \S{}\"find user by name\"\SE{},}}
+\L{\LB{}}
+\L{\LB{    \S{}\"lookupUID\"\SE{}, operation\_PasswordLookup\_lookupUID,}}
+\L{\LB{    do\_lookupUID, free\_PasswordLookup\_UserID,}}
+\L{\LB{    lookup\_result, lookup\_error,}}
+\L{\LB{    \S{}\"find user by id\"\SE{},}}
+\L{\LB{}}
+\L{\LB{    \S{}\"help\"\SE{}, 0,}}
+\L{\LB{    do\_help, NULLIFP,}}
+\L{\LB{    NULLIFP, NULLIFP,}}
+\L{\LB{    \S{}\"print this information\"\SE{},}}
+\L{\LB{}}
+\L{\LB{    \S{}\"quit\"\SE{}, 0,}}
+\L{\LB{    do\_quit, NULLIFP,}}
+\L{\LB{    NULLIFP, NULLIFP,}}
+\L{\LB{    \S{}\"terminate the association and exit\"\SE{},}}
+\L{\LB{}}
+\L{\LB{    NULL}}
+\L{\LB{\};}}
+\L{\LB{}}
+\L{\LB{\C{}\/* MAIN *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ARGSUSED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\Proc{main}main (argc, argv, envp)}}
+\L{\LB{\K{int}}\Tab{8}{argc;}}
+\L{\LB{\K{char}  **argv,}}
+\L{\LB{      **envp;}}
+\L{\LB{\{}}
+\L{\LB{    (\K{void}) ryinitiator (argc, argv, myservice, mycontext, mypci,}}
+\L{\LB{}\Tab{24}{table\_PasswordLookup\_Operations, dispatches, do\_quit);}}
+\L{\LB{}}
+\L{\LB{    exit (0);}\Tab{32}{\C{}\/* NOTREACHED *\/\CE{}}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ARGUMENTS *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ARGSUSED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  do\_lookupUser (sd, ds, args, arg)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{struct} dispatch *ds;}}
+\L{\LB{\K{char}  **args;}}
+\L{\LB{\K{register} \K{struct} type\_PasswordLookup\_UserName **arg;}}
+\L{\LB{\{}}
+\L{\LB{    \K{char}   *cp;}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((cp = *args++) == NULL) \{}}
+\L{\LB{}\Tab{8}{advise (NULLCP, \S{}\"usage: lookupUser username\"\SE{});}}
+\L{\LB{}\Tab{8}{\K{return} NOTOK;}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((*arg = str2qb (cp, strlen (cp), 1)) == NULL)}}
+\L{\LB{}\Tab{8}{    adios (NULLCP, \S{}\"out of memory\"\SE{});}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\C{}\/*  *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ARGSUSED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  do\_lookupUID (sd, ds, args, arg)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{struct} dispatch *ds;}}
+\L{\LB{\K{char}  **args;}}
+\L{\LB{\K{register} \K{struct} type\_PasswordLookup\_UserID **arg;}}
+\L{\LB{\{}}
+\L{\LB{    \K{char}   *cp;}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((cp = *args++) == NULL) \{}}
+\L{\LB{}\Tab{8}{advise (NULLCP, \S{}\"usage: lookupUID userid\"\SE{});}}
+\L{\LB{}\Tab{8}{\K{return} NOTOK;}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((*arg = (\K{struct} type\_PasswordLookup\_UserID *) calloc (1, \K{sizeof} **arg))}}
+\L{\LB{}\Tab{8}{    == NULL)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"out of memory\"\SE{});}}
+\L{\LB{}}
+\L{\LB{    (*arg) \-\> parm = atoi (cp);}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\C{}\/*  *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ARGSUSED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  do\_help (sd, ds, args, dummy)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{register} \K{struct} dispatch *ds;}}
+\L{\LB{\K{char}  **args;}}
+\L{\LB{caddr\_t *dummy;}}
+\L{\LB{\{}}
+\L{\LB{    printf (\S{}\"\!nCommands are:\!n\"\SE{});}}
+\L{\LB{    \K{for} (ds = dispatches; ds \-\> ds\_name; ds++)}}
+\L{\LB{}\Tab{8}{printf (\S{}\"\%s\!t\%s\!n\"\SE{}, ds \-\> ds\_name, ds \-\> ds\_help);}}
+\L{\LB{}}
+\L{\LB{    \K{return} NOTOK;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\C{}\/*  *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ARGSUSED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  do\_quit (sd, ds, args, dummy)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{struct} dispatch *ds;}}
+\L{\LB{\K{char}  **args;}}
+\L{\LB{caddr\_t *dummy;}}
+\L{\LB{\{}}
+\L{\LB{    \K{struct} AcSAPrelease acrs;}}
+\L{\LB{    \K{register} \K{struct} AcSAPrelease   *acr = \&acrs;}}
+\L{\LB{    \K{struct} AcSAPindication  acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPindication *aci = \&acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPabort *aca = \&aci \-\> aci\_abort;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (AcRelRequest (sd, ACF\_NORMAL, NULLPEP, 0, NOTOK, acr, aci) == NOTOK)}}
+\L{\LB{}\Tab{8}{acs\_adios (aca, \S{}\"A\-RELEASE.REQUEST\"\SE{});}}
+\L{\LB{}}
+\L{\LB{    \K{if} (!acr \-\> acr\_affirmative) \{}}
+\L{\LB{}\Tab{8}{(\K{void}) AcUAbortRequest (sd, NULLPEP, 0, aci);}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"release rejected by peer: \%d\"\SE{}, acr \-\> acr\_reason);}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    ACRFREE (acr);}}
+\L{\LB{}}
+\L{\LB{    exit (0);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* RESULTS *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ARGSUSED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  lookup\_result (sd, id, dummy, result, roi)}}
+\L{\LB{\K{int}}\Tab{8}{sd,}}
+\L{\LB{    }\Tab{8}{id,}}
+\L{\LB{    }\Tab{8}{dummy;}}
+\L{\LB{\K{register} \K{struct} type\_PasswordLookup\_Passwd *result;}}
+\L{\LB{\K{struct} RoSAPindication *roi;}}
+\L{\LB{\{}}
+\L{\LB{    print\_qb (result \-\> name);}}
+\L{\LB{    putchar (\S{}\':\'\SE{});}}
+\L{\LB{    print\_qb (result \-\> passwd);}}
+\L{\LB{    printf (\S{}\":\%d:\%d:\"\SE{}, result \-\> uid \-\> parm, result \-\> gid \-\> parm);}}
+\L{\LB{    print\_qb (result \-\> gecos);}}
+\L{\LB{    putchar (\S{}\':\'\SE{});}}
+\L{\LB{    print\_qb (result \-\> dir);}}
+\L{\LB{    putchar (\S{}\':\'\SE{});}}
+\L{\LB{    print\_qb (result \-\> shell);}}
+\L{\LB{    putchar (\S{}\'\!n\'\SE{});}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static}}\Tab{8}{print\_qb (q)}}
+\L{\LB{\K{register} \K{struct} qbuf *q;}}
+\L{\LB{\{}}
+\L{\LB{    \K{register} \K{struct} qbuf *p;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (q == NULL)}}
+\L{\LB{}\Tab{8}{\K{return};}}
+\L{\LB{}}
+\L{\LB{    \K{for} (p = q \-\> qb\_forw; p != q; p = p \-\> qb\_forw)}}
+\L{\LB{}\Tab{8}{printf (\S{}\"\%*.*s\"\SE{}, p \-\> qb\_len, p \-\> qb\_len, p \-\> qb\_data);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ERRORS *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ARGSUSED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  lookup\_error (sd, id, error, parameter, roi)}}
+\L{\LB{\K{int}}\Tab{8}{sd,}}
+\L{\LB{}\Tab{8}{id,}}
+\L{\LB{    }\Tab{8}{error;}}
+\L{\LB{caddr\_t parameter;}}
+\L{\LB{\K{struct} RoSAPindication *roi;}}
+\L{\LB{\{    }}
+\L{\LB{    \K{register} \K{struct} RyError *rye;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (error == RY\_REJECT) \{}}
+\L{\LB{}\Tab{8}{advise (NULLCP, \S{}\"\%s\"\SE{}, RoErrString ((\K{int}) parameter));}}
+\L{\LB{}\Tab{8}{\K{return} OK;}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{if} (rye = finderrbyerr (table\_PasswordLookup\_Errors, error))}}
+\L{\LB{}\Tab{8}{advise (NULLCP, \S{}\"\%s\"\SE{},  rye \-\> rye\_name);}}
+\L{\LB{    \K{else}}}
+\L{\LB{}\Tab{8}{advise (NULLCP, \S{}\"Error \%d\"\SE{}, error);}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}

@@ -1,0 +1,39 @@
+.PS
+.ps 20
+## figure D-4
+B1:	box "DAP"
+B2:	box "dish" with .se at (B1.nw.x-3*linewid/2, B1.nw.y+2*lineht)
+B3:	box "xwp" with .w at (B2.e.x+linewid, B2.e.y)
+B4:	box invis "$\cdots$" with .w at (B3.e.x+linewid, B3.e.y)
+B5:	box "dad" with .e at (B2.w.x-3*linewid, B2.w.y)
+B6:	box "csh" with .sw at (B2.n.x+linewid/2, B2.ne.y+2*lineht)
+B7:	box "fred" with .se at (B2.n.x-linewid/2, B2.nw.y+2*lineht)
+B8:	box "PSIWP" with .e at (B7.w.x-linewid, B7.w.y) width 3*boxwid/2
+B9:	box "MH" with .e at (B8.w.x-linewid, B8.w.y)
+##
+	line from (B2.w.x, B2.s.y-lineht) \
+	     to   (B4.e.x, B4.s.y-lineht)
+	move to   (B2.w.x, B2.s.y-lineht); "`C' API\ " rjust
+	move to   (B4.e.x, B4.s.y-lineht); "\ libdsap" ljust
+	line up   from B1.n
+	line down from B2.s
+	line down from B3.s
+##
+	line from (B9.w.x, B9.s.y-lineht) \
+	     to   (B7.n.x-boxwid/12, B7.s.y-lineht)
+	line from B5.e to B2.w
+	line from ((B2.w.x+B5.e.x)/2, B2.w.y) \
+	     to   ((B2.w.x+B5.e.x)/2, B2.n.y+lineht)
+	line down from B9.s
+	line down from B8.s
+	line down from (B7.s.x-boxwid/4, B7.s.y)
+	move to (B9.w.x, B9.s.y-lineht); "DA-service\ " rjust
+##
+	line from (B7.n.x+boxwid/12, B7.s.y-lineht) \
+	     to   (B6.e.x, B6.s.y-lineht)
+	line up from (B2.n.x+boxwid/4, B2.n.y)
+	line down from B6.s
+	line down from (B7.s.x+boxwid/4, B7.s.y)
+	move to   (B6.e.x, B6.s.y-lineht); "\ text API" ljust
+##
+.PE

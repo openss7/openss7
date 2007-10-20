@@ -1,0 +1,51 @@
+.PS
+#.ps 20
+## figure 3
+boxht = boxht/2
+ellipseht = boxht
+movewid = boxwid/2
+##
+ROOT:	box invis "\xx root"
+	move to ROOT down left
+B1:	box invis "\xx C=US"
+	move to B1 down left
+B2:	box invis "\xx O=Wollongong"
+	move to B2 down left
+B3:	box invis "\xx OU=Engineering"
+	move to B3 down moveht * 1.4 left
+B4:	box invis "\xx CN=Chris Moore"
+	move to B3 down right
+B5:	box invis "\xx CN=Marshall Rose"
+	move to B2 down right
+B6:	box invis "\xx OU=Marketing"
+	move to B6 down moveht * 1.4 right
+B7:	box invis "\xx CN=Norman Lombino"
+	move to B1 down right
+B8:	box invis "\xx O=Prime"
+	move to ROOT down right
+B9:	box invis "\xx C=AU"
+	move to B9 down right
+B10:	box invis "\xx O=CSIRO"
+	move to B10 down left
+B11:	box invis "\xx OU=Administration"
+	move to B10 down right
+B12:	box invis "\xx OU=Development"
+	move to B12 down right
+B13:	box invis "\xx CN=Trevor Hales"
+##
+L1:	line from ROOT.s to B1.n
+L2:	line from B1.s to B2.n
+L3:	line from B2.s to B3.n
+L4:	line from B3.s to B4.n
+L5:	line from B3.s to B5.n
+L6:	line from B2.s to B6.n
+L7:	line from B6.s to B7.n
+L8:	line from B1.s to B8.n
+##
+L9:	line from ROOT.s to B9.n
+L10:	line from B9.s to B10.n
+L11:	line from B10.s to B11.n
+L12:	line from B10.s to B12.n
+L13:	line from B12.s to B13.n
+##
+.PE

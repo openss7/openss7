@@ -1,0 +1,45 @@
+% run this through LaTeX with the appropriate wrapper
+
+\section	{Changes to RFC983}\label{changes}
+The current version, version~2, of the protocol described in this paper
+incorporates four minor changes to RFC983\cite{TSAP.on.TCP.old}.
+These are:
+\begin{itemize}
+\item	``Infinite'' length TSDUs are supported\\
+The original protocol supported transport service data unit (TSDU) lengths
+of no more than approximately 65K octets.
+This restriction was removed.
+From the performance standpoint,
+it turns out that a TSDU with length on the order of 65K octets (or less) can
+be handled very efficiently by most implementations.
+If a user of transport services requires a larger TSDU size,
+the current protocol will support this,
+but any implementations of the protocol will most likely do this less
+efficiently.
+
+\item	More correct use TSAP IDs\\
+The original protocol mistakenly placed entities other than OSI session
+on top of the TSAP.
+This has been corrected.
+
+\item	Negotiation of Expedited Data\\
+The original protocol mistakenly aborted the connection establishment attempt
+if there was a mismatch in the proposed use of expedited data.
+This has been corrected:
+the use of expedited data is negotiated downwards, as per the ISO specification.
+
+\item	Handling of Expedited Data\\
+As described earlier,
+RFC983 tried to manage two TCP connections,
+one for expedited TSDUs and the second for all other traffic.
+Although intuitively natural,
+this method could not guarantee the semantics of the expedited data service
+in the TP without a complex buffer management scheme.
+Hence, currently only a single connection is employed.
+Owing to the properties of the TCP,
+the expedited data semantics of the TP are handled properly.
+\end{itemize}
+
+Although all of these changes were rather small,
+regretably version~2 of the protocol is incompatible with the original
+protocol found in RFC983.

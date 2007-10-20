@@ -1,0 +1,54 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \special{pa 0 500}%
+    \special{pa 0 0}%
+    \special{pa 750 0}%
+    \special{pa 750 500}%
+    \special{pa 0 500}%
+    \special{fp}%
+    \rlap{\kern  0.375in\lower 0.291in\hbox to 0pt{\hss ``abcd''\hss}}%
+    \special{pa 1000 500}%
+    \special{pa 1000 0}%
+    \special{pa 3250 0}%
+    \special{pa 3250 500}%
+    \special{pa 1000 500}%
+    \special{fp}%
+    \rlap{\kern  2.125in\lower 0.291in\hbox to 0pt{\hss 3623421920030013\hss}}%
+    \rlap{\kern  0.375in\lower 0.791in\hbox to 0pt{\hss T-SEL\hss}}%
+    \rlap{\kern  2.125in\lower 0.791in\hbox to 0pt{\hss network address\hss}}%
+    \special{pa 0 2000}%
+    \special{pa 0 1500}%
+    \special{pa 3250 1500}%
+    \special{pa 3250 2000}%
+    \special{pa 0 2000}%
+    \special{fp}%
+    \special{pa 0 500}%
+    \special{pa 0 1500}%
+    \special{da  0.050}%
+    \special{pa 3250 500}%
+    \special{pa 3250 1500}%
+    \special{da  0.050}%
+    \rlap{\kern  0.375in\lower 1.791in\hbox to 0pt{\hss ``abcd''\hss}}%
+    \rlap{\kern  2.125in\lower 1.791in\hbox to 0pt{\hss 3623421920030013\hss}}%
+    \rlap{\kern  0.875in\lower 1.791in\hbox to 0pt{\hss +\hss}}%
+    \special{pa 3500 2000}%
+    \special{pa 3500 1500}%
+    \special{pa 5000 1500}%
+    \special{pa 5000 2000}%
+    \special{pa 3500 2000}%
+    \special{fp}%
+    \rlap{\kern  4.250in\lower 1.791in\hbox to 0pt{\hss TSB address\hss}}%
+    \rlap{\kern  1.625in\lower 2.291in\hbox to 0pt{\hss transport selector\hss}}%
+    \rlap{\kern  4.250in\lower 2.291in\hbox to 0pt{\hss network address\hss}}%
+    \rlap{\kern  0.000in\lower 0.291in\hbox to 0pt{\hss called address\ \ }}%
+    \rlap{\kern  0.000in\lower 1.791in\hbox to 0pt{\hss actual address used\ \ }}%
+    \kern  5.001in
+  }\vss}%
+  \kern  2.292in
+}

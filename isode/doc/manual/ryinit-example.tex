@@ -1,0 +1,57 @@
+\File{ryinit\-example.c},{19:46},{Oct 14 1989}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{struct} dispatch dispatches[] = \{}}
+\L{\LB{\C{}\/* real user\-supplied routines go here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{    \S{}\"help\"\SE{}, 0, do\_help, NULLIFP, NULLIFP, NULLIFP,}}
+\L{\LB{}\Tab{8}{\S{}\"print this information\"\SE{},}}
+\L{\LB{    \S{}\"quit\"\SE{}, 0, do\_quit, NULLIFP, NULLIFP, NULLIFP,}}
+\L{\LB{}\Tab{8}{\S{}\"terminate the association and exit\"\SE{},}}
+\L{\LB{}}
+\L{\LB{    NULL}}
+\L{\LB{\};}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ARGSUSED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  do\_help (sd, ds, args, dummy)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{register} \K{struct} dispatch *ds;}}
+\L{\LB{\K{char}  **args;}}
+\L{\LB{caddr\_t *dummy;}}
+\L{\LB{\{}}
+\L{\LB{    printf (\S{}\"\!nCommands are:\!n\"\SE{});}}
+\L{\LB{    \K{for} (ds = dispatches; ds \-\> ds\_name; ds++)}}
+\L{\LB{}\Tab{8}{printf (\S{}\"\%s\!t\%s\!n\"\SE{}, ds \-\> ds\_name, ds \-\> ds\_help);}}
+\L{\LB{}}
+\L{\LB{    \K{return} NOTOK;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ARGSUSED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  do\_quit (sd, ds, args, dummy)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{struct} dispatch *ds;}}
+\L{\LB{\K{char}  **args;}}
+\L{\LB{caddr\_t *dummy;}}
+\L{\LB{\{}}
+\L{\LB{    \K{struct} AcSAPrelease acrs;}}
+\L{\LB{    \K{register} \K{struct} AcSAPrelease   *acr = \&acrs;}}
+\L{\LB{    \K{struct} AcSAPindication  acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPindication *aci = \&acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPabort *aca = \&aci \-\> aci\_abort;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (AcRelRequest (sd, ACF\_NORMAL, NULLPEP, 0, NOTOK, acr, aci) == NOTOK)}}
+\L{\LB{}\Tab{8}{acs\_adios (aca, \S{}\"A\-RELEASE.REQUEST\"\SE{});}}
+\L{\LB{}}
+\L{\LB{    \K{if} (!acr \-\> acr\_affirmative) \{}}
+\L{\LB{}\Tab{8}{(\K{void}) AcUAbortRequest (sd, NULLPEP, 0, aci);}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"release rejected by peer: \%d\"\SE{}, acr \-\> acr\_reason);}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    ACRFREE (acr);}}
+\L{\LB{}}
+\L{\LB{    exit (0);}}
+\L{\LB{\}}}

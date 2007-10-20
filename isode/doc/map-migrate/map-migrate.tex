@@ -1,0 +1,291 @@
+% run this through SLiTeX
+
+
+\documentstyle
+    [blackandwhite,landscape,oval,pagenumbers,nrtc]{NRslides}
+
+\raggedright
+
+\begin{document}
+\small
+\title	{MIGRATING TO MAP/TOP\\ WHY, HOW AND WHEN?}
+\author	{Dwight E.~Cass\\
+	Automation Sciences Laboratory\\
+	Northrop Research and Technology Center\\
+	One Research Park\\
+	Palos Verdes Peninsula, CA  90274}
+\date	{September 16, 1986}
+\maketitlepage
+\normalsize
+
+
+\begin{bwslide}
+\ctitle	{THE CURRENT SITUATION}
+
+\begin{nrtc}
+\item	IMMEDIATE VACUUM IN THE DEVELOPMENT OF
+	APPLICATION PROTOCOLS
+    \begin{nrtc}
+    \item	EXPERIENCE SHOWS THAT APPLICATION
+		PROTOCOL DEVELOPMENT TAKES AT
+		LEAST AS MUCH TIME AS DEVELOPMENT OF
+ 		LOWER-LEVEL PROTOCOLS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE CURRENT SITUATION (CONT.)}
+
+\begin{nrtc}
+\item	LACK OF NEAR-TERM AVAILABILITY OF MAP/TOP ON ALL
+	MACHINES
+    \begin{nrtc}
+    \item	NORTHROP HAS A STRONG COMMITTMENT
+		TO COMMUNICATE WITH THE CUSTOMER (DoD) ELECTRONICALLY
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE PROBLEM}
+
+\begin{nrtc}
+\item	NORTHROP HAS REQUIREMENTS NOW
+    \begin{nrtc}
+    \item	FACTORY- AND DIVISION-WIDE NETWORKING
+		REQUIRED IN THE 88--89 TIMEFRAME
+    \item	SINCE MAP/TOP SOLUTIONS AREN'T AVAILABLE ON EXISTING
+		FACILITIES,
+		INTERIM SOLUTIONS MUST BE PUT INTO PLACE QUICKLY
+    \item	SOLUTIONS MUST BE CONSISTENT WITH THE
+		DIRECTION OF THE MAP/TOP COMMUNITY
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBSERVATIONS}
+
+\begin{nrtc}
+\item	MANY OF THESE PROBLEMS HAVE PREVIOUSLY BEEN SOLVED, IN DIFFERENT
+	SETTINGS, WITHOUT LOSS OF GENERALITY
+    \begin{nrtc}
+    \item	SOME OF THESE SOLUTIONS ARE QUITE MATURE (STABLE, ROBUST,
+		AND ENJOY A HIGH DEGREE OF VENDOR SUPPORT)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBSERVATIONS (CONT.)}
+
+\begin{nrtc}
+\item	MAP/TOP, BASED ON THE OSI MODEL, IS A STRONGLY
+	LAYERED ARCHITECTURE, WHICH FACILITATES
+	APPLICATION-INDEPENDENCE OF UNDERLYING PROTOCOLS
+    \begin{nrtc}
+    \item	SERVICES ARE IMPORTANT,\\ IMPLEMENTATIONS ARE NOT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {THE SOLUTION}
+
+\begin{nrtc}
+\item	USE MILSTD TCP/IP AS THE MIGRATION VEHICLE
+    \begin{nrtc}
+    \item	OFFER MAP/TOP SERVICES ON TOP OF THE
+		TCP/IP PROTOCOL SUITE
+    \item	DEVELOP MAP/TOP APPLICATIONS NOW
+    \item	NO (OR MINIMAL) RECODING LATER
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {TCP/IP CREDENTIALS}
+
+\begin{nrtc}
+\item	MILSTD PROTOCOL SUITE MANDATED FOR ALL DoD NETWORKING
+    \begin{nrtc}
+    \item	MATURE SET OF PROTOCOLS SINCE 1980\\ (DATING FROM c.1970)
+    \item	EMPHASIS ON RELIABILITY AND SECURITY
+    \item	WIDE VENDOR SUPPORT AND USER POPULATION
+    \item	VENDOR SUPPORT TO OTHER TECHNOLOGIES (e.g., SNA)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MIGRATION PHILOSOPHY}
+
+\begin{nrtc}
+\item	COMPLEMENTARY CO-EXISTANCE:
+    \begin{nrtc}
+    \item	UTILIZE TCP/IP FUNCTIONALITY NOT CURRENTLY PRESENT IN MAP
+    \item	UTILIZE MAP/TOP FUNCTIONALITY AS IT BECOMES AVAILABLE
+    \end{nrtc}
+\item	DEVELOP APPLICATIONS IN AN EVOLUTIONARY,
+	NOT REVOLUTIONARY FASHION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {A MIGRATION STRATEGY}
+
+\begin{nrtc}
+\item	THREE PHASES FROM TCP/IP TO MAP/TOP
+	PROTOCOL SUITE
+\item	REQUIRES ALL NEW HOSTS TO SPEAK TCP/IP UNTIL PHASE THREE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {PHASE ONE:\\ BUILD ISO DEVELOPMENT ENVIRONMENT}
+
+\begin{nrtc}
+\item	BEGIN WORK ON MAP/TOP APPLICATION PROTOCOLS
+\item	NORTHROP DEVELOPED TSAP OFFERS TP4 SERVICE
+\item	DEVELOP COMMON USER AGENTS
+    \begin{nrtc}
+    \item	COMMON USER INTERFACE
+    \item	ALLOWS USE OF EITHER TCP/IP OR MAP/TOP APPLICATION SERVICE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{PHASE TWO:\\ EXPERIMENT WITH MIGRATION ENGINES}
+
+\begin{nrtc}
+\item	START USING HOSTS WITH BOTH MAP/TOP AND TCP/IP PROTOCOL SUITES
+\item	TEST APPLICATIONS IN A ``PURE'' MAP/TOP ENVIRONMENT
+\item	USE LAYER 3 (INTERNET) LEVEL GATEWAYS TO FORM TWO LOGICAL INTERNETS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{PHASE THREE:\\ DEPLOY MIGRATION ENGINES}
+
+\begin{nrtc}
+\item	NEW HOSTS CAN BE MAP/TOP ONLY
+\item	USER AGENTS BEGIN TO SPEAK MAP/TOP ONLY
+\item	RELATIVELY INEXPENSIVE (AT FIRST) TO KEEP SOME
+	TCP/IP-ONLY HOSTS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE FIRST STEP}
+
+\begin{nrtc}
+\item	AN OPENLY AVAILABLE ISO DEVELOPMENT
+	ENVIRONMENT HAS BEEN IMPLEMENTED
+	AT NORTHROP
+\item	CODED ENTIRELY IN C
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {OPERATING ENVIRONMENTS}
+
+\begin{nrtc}
+\item 4.2bsd UNIX
+\item AT\&T SVR2 UNIX WITH AN EXCELAN EXOS 8044 TCP/IP PACKAGE
+\item VAX/VMS RELEASE 4.4 WITH AN EXOS CARD (PLANNED FOR VERSION 2.0)
+\item PC-DOS WITH THE MIT PC-IP SOFTWARE (PLANNED FOR VERSION 2.0)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{SOFTWARE}
+
+\begin{nrtc}
+\item 	TRANSPORT: IMPLEMENTS VERSION 2 OF THE TSAP PROTOCOL (RFC983,
+	PRESENTED AT MAY MAP/TOP USERS MEETING)
+\item 	SESSION: FULL BASIC COMBINED SUBSET (BCS) WITH SOME ADDITIONAL
+	FEATURES
+\item	PRESENTATION: ASN.1 ENCODING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {APPLICATION PROTOCOL SOFTWARE}
+
+\begin {nrtc}
+\item	ASN.1 SPECIFICATION PARSER FOR THE AUTOMATIC GENERATION
+	OF APDU PARSERS
+\item	ECMA REMOTE OPERATIONS SERVICE (ROS) SUPPORT
+\end {nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{PLANNED FOR FUTURE RELEASE}
+
+\begin{nrtc}
+\item	MAP/TOP VERSION 3.0 COMPATIBILITY
+\item	COMMON APPLICATION SERVICE ELEMENTS (CASE) SUPPORT
+\item	IBM MVS SUPPORT
+\item	BASIC ACTIVITY SUBSET (BAS) OF SESSION
+\end {nrtc}
+\end {bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DOCUMENTATION}
+
+\begin{nrtc}
+\item	USER'S MANUAL AND LIBRARY SYNOPSIS
+	(APPROXIMATELY 130 PAGES)
+\item	VARIOUS REPRINTS OF PAPERS, NOTES AND PRESENTATIONS
+\end {nrtc}
+\end {bwslide}
+
+
+\begin{bwslide}
+\ctitle{DISTRIBUTION MECHANICS}
+
+\begin{nrtc}
+\item	AVAILABILITY: 1 SEPTEMBER 1986
+    \begin {nrtc}
+    \item	FILE TRANSFER (FTP) ON ARPAnet
+    \item	MAGNETIC TAPE
+    \end {nrtc}
+\item	LICENSING: OPENLY AVAILABLE -- NOT PROPRIETARY
+\item	COST: FREE
+\end {nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {CONCLUSIONS}
+
+\begin{nrtc}
+\item	THIS TOOL WILL PROMOTE ACCELERATED
+	APPLICATION PROTOCOL DEVELOPMENT
+\item	NORTHROP HOPES THAT MAKING THIS SOFTWARE
+	OPENLY AVAILABLE WILL STIMULATE
+	ADDITIONAL USER PARTICIPATION
+\item	ALLOWS DoD RESEARCHERS TO BECOME ACTIVE PARTICIPANTS
+	IN MAP/TOP
+\end{nrtc}
+\end{bwslide}
+
+\end{document}

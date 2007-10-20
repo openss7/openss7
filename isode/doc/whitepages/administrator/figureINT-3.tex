@@ -1,0 +1,25 @@
+% run this through LaTeX with the appropriate wrapper
+
+\tiny
+\begin{verbatim}
+objectClass= top & organizationalUnit & quipuObject & quipuNonLeafObject
+l= Reston, Virginia
+streetAddress= 11800 Sunrise Valley Drive, Suite 1100
+ou= Research and Development & Development
+postalAddress= PSI Inc. $ Reston International Center $ 11800 Sunrise Valley Drive $ Suite 1100 $ Reston, VA 22091 $ USA
+postalCode= 22091
+physicalDeliveryOfficeName= Reston
+telephoneNumber= +1 703-620-6651
+facsimileTelephoneNumber= +1 703-620-4586
+lastModifiedTime= 900107205334Z
+lastModifiedBy= c=US@cn=Manager
+masterDSA= c=US@cn=Spectacled Bear
+masterDSA= c=US@o=Performance Systems International@cn=Toucan#
+slaveDSA= c=US@cn=Spectacled Bear#
+
+\end{verbatim}
+
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\empty

@@ -1,0 +1,42 @@
+\File{grind4\-6b.py},{11:13},{Jul  4 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\/*    MAIN *\/}}
+\L{\LB{}}
+\L{\LB{\/* ARGSUSED *\/}}
+\L{\LB{}}
+\L{\LB{main (argc, argv, envp)}}
+\L{\LB{int}\Tab{8}{argc;}}
+\L{\LB{char  **argv,}}
+\L{\LB{      **envp;}}
+\L{\LB{\{}}
+\L{\LB{    PE}\Tab{8}{    pe;}}
+\L{\LB{    PS}\Tab{8}{    ps;}}
+\L{\LB{}}
+\L{\LB{    myname = *argv;}}
+\L{\LB{    if ((ps = ps\_alloc (std\_open)) == NULLPS)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"ps\_alloc loses\"\SE{});}}
+\L{\LB{    if (std\_setup (ps, stdin) == NOTOK)}}
+\L{\LB{}\Tab{8}{ps\_adios (ps, \S{}\"std\_setup\"\SE{});}}
+\L{\LB{}}
+\L{\LB{    for (;;) \{}}
+\L{\LB{}\Tab{8}{if ((pe = ps2pe (ps)) == NULLPE)}}
+\L{\LB{}\Tab{8}{    if (ps \-\> ps\_errno)}}
+\L{\LB{}\Tab{16}{ps\_adios (ps, \S{}\"ps2pe\"\SE{});}}
+\L{\LB{}\Tab{8}{    else}}
+\L{\LB{}\Tab{16}{break;}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{(void) parse\_PERSONNEL\_PersonnelRecord (pe, 1, NULLIP, NULLVP,}}
+\L{\LB{}\Tab{16}{    NULLCP);}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{pe\_free (pe);}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    ps\_free (ps);}}
+\L{\LB{}}
+\L{\LB{    exit (0);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\%\}}}
+\L{\LB{}}
+\L{\LB{...}}

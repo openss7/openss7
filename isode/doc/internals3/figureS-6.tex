@@ -1,0 +1,15 @@
+\File{figureS\-6.c},{11:21},{May  5 1990}
+\L{\LB{    msg = NULL;}}
+\L{\LB{\Proc{if}    \K{if} (decode\_SNMP\_Message (pe, 1, NULLIP, NULLVP, \&msg) == NOTOK) \{}}
+\L{\LB{}\Tab{8}{advise (LLOG\_EXCEPTIONS, NULLCP, \S{}\"decode\_SNMP\_Message: \%s (\%s)\"\SE{},}}
+\L{\LB{}\Tab{16}{PY\_pepy, source);}}
+\L{\LB{}\Tab{8}{snmpstat.s\_asnparseerrs++;}}
+\L{\LB{\K{\#ifdef}}\Tab{8}{COTS}}
+\L{\LB{}\Tab{8}{\K{if} (rfx == ts\_read) \{}}
+\L{\LB{\C{}\/* clear connection... *\/\CE{}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{\K{\#endif}}}
+\L{\LB{}\Tab{8}{\K{goto} out;}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    PLOG (pgm\_log, print\_SNMP\_Message, pe, \S{}\"Message\"\SE{}, 1);}}

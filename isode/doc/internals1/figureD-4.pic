@@ -1,0 +1,23 @@
+.PS 4.5i
+.ps 20
+## figure 4
+B1:	box "DAP"
+	line up from B1.n
+	line from (B1.n.x-3*linewid, B1.n.y+lineht) \
+	     to   (B1.n.x+3*linewid, B1.n.y+lineht)
+	move to (B1.n.x+3*linewid, B1.n.y+lineht); "\ `C' API" ljust
+B2:	box "dish" with .s at (B1.n.x-2*linewid, B1.n.y+2*lineht)
+	line down from B2.s
+B3:	box "xwp" with .s at (B1.n.x+1*linewid, B1.n.y+2*lineht)
+	line down from B3.s
+B4:	box "$\ldots$" with .s at (B1.n.x+3*linewid, B1.n.y+2*lineht) invis
+##
+	line up from B2.n
+	line from (B2.n.x-2*linewid, B2.n.y+lineht) \
+	     to   (B2.n.x+2*linewid, B2.n.y+lineht)
+	move to (B2.n.x-2*linewid, B2.n.y+lineht); "text API\ " rjust
+B5:	box "fred" with .s at (B2.n.x-1*linewid, B2.n.y+2*lineht)
+	line down from B5.s
+B6:	box "csh" with .s at (B2.n.x+1*linewid, B2.n.y+2*lineht)
+	line down from B6.s
+.PE

@@ -1,0 +1,24 @@
+.PS 3i
+.ps 20
+## figure 5
+B2:	box invis "ISO T-Service"
+##
+B4:	box "switch" with .n at (B2.s.x, B2.s.y-lineht/2)
+	line from B2.s to B4.n
+B5:	box "RFC983" "method" \
+	with .n at (B4.s.x-3*linewid/2, B4.s.y-lineht) dashed
+	line from (B4.s.x-boxwid/6, B4.s.y) to B5.n dashed
+B6:	box "TP4" with .n at (B4.s.x+3*linewid/2, B4.s.y-lineht)
+	line from (B4.s.x+boxwid/6, B4.s.y) to B6.n
+##
+B7:	box "RFCxxx" "method" with .n at (B6.s.x, B6.s.y-lineht)
+	line from B6.s to B7.n
+##
+B8:	box "TCP" with .n at (B5.s.x, B5.s.y-lineht) dashed
+	line from B5.s to B8.n dashed
+##
+B9:	box "DDN-IP" with .n at ((B7.n.x+B8.n.x)/2, B7.s.y-lineht)
+	line from B7.s to (B9.n.x+boxwid/6, B9.n.y)
+	line from B8.s to (B9.n.x-boxwid/6, B9.n.y) dashed
+##
+.PE

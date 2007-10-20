@@ -1,0 +1,37 @@
+.PS 4.375i
+lineht	=	3*lineht/2
+## OSI Transport Services on top of the TCP
+B1:	box "TS-user"
+	line down from B1.s
+B3:	box "TS-provider" "(client)"
+	line down from B3.s
+B5:	box invis
+##
+B2:	box "TS-user" with .w at (B1.e.x+3*linewid, B1.e.y)
+	line down from B2.s
+B4:	box "TS-provider" "(server)"
+	line down from B4.s
+B6:	box invis
+##
+	line dashed from (B1.w.x-linewid/2, (B1.s.y+B3.n.y)/2) \
+		    to	 (B2.e.x+linewid/2, (B2.s.y+B4.n.y)/2)
+	move to (B2.e.x, (B2.s.y+B4.n.y)/2) \
+	    "\begin{tabular}{c}TSAP interface\\ \cite{ISO.TP.Service}\end{tabular}" ljust
+##
+	line dashed from (B3.w.x-linewid/2, (B3.s.y+B5.n.y)/2) \
+		    to	 (B4.e.x+linewid/2, (B4.s.y+B6.n.y)/2)
+	move to (B4.e.x, (B4.s.y+B6.n.y)/2) \
+	    "\begin{tabular}{c}TCP interface\\ \cite{TCP}\end{tabular}" ljust
+##
+	line from B3.e to B4.w dashed \
+	    "{\em magic box\/} protocol" ""
+##
+B7:	box "The TCP" with .nw at B5.nw width (B6.ne.x-B5.nw.x)
+##
+	move to (B3.nw.x, B3.n.y+lineht/4); "OSI TSAP\ " rjust
+	arrow from (B3.nw.x, B3.n.y+lineht/4) to (B3.n.x-linewid/10, B3.n.y+lineht/4)
+	move to (B3.sw.x, B3.s.y-lineht/4); "TCP port 102\ " rjust
+	arrow from (B3.sw.x, B3.s.y-lineht/4) to (B3.s.x-linewid/10, B3.s.y-lineht/4)
+##
+lineht	=	2/lineht*3
+.PE

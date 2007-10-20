@@ -1,0 +1,96 @@
+% run this through LaTeX
+
+\input lcustom
+
+\documentstyle[12pt,tgrind]{article}
+
+\begin{document}
+
+\title{Building Distributed\\ Applications in an\\ OSI Framework}
+\author{Marshall T.~Rose\\ The Wollongong Group}
+\date{April 27, 1988}
+\maketitle
+
+Included in this tutorial are a copy of the presentation notes,
+a draft of {\em The Applications Cookbook},
+and this brief overview.
+
+The tutorial is divided into six parts:
+\begin{itemize}
+\item	Review of Background Material\\
+This presents an elementary review of the Open Systems Interconnection Model.
+In particular,
+we focus on the upper-layer architecture and the service elements found in the
+application layer.
+Following this,
+a brief discussion of OSI modeling nomenclature takes place.
+
+\item	A Model for Distributed Applications\\
+This presents a formal model for how distributed applications are organized.
+The fundamental concept is that of the {\em abstract data type\/} which
+seperates the ``what'' from the ``how''.
+The notion of an {\em operation\/} is then introduced as the means by which
+this level of indirection can be introduced.
+Following this,
+a brief discussion of associations takes place.
+Finally,
+some design guidelines for applications built using this model are considered.
+
+\item	Underlying Services\\
+This presents the underyling facilities which OSI makes available to the
+distributed application:
+{\em abstract syntax notation one\/} (ASN.1),
+which provides a means for describing data structures in a machine-independent
+fashion;
+the {\em remote operations\/} service,
+which provides the rules for requesting actions to be performed elsewhere in
+the network;
+and,
+the {\em binding\/} service,
+which provides the mechanisms for establishing associations.
+Given these facilities,
+the problem of organizing them into a solution is considered.
+
+\item	Static Facilities\\
+This presents the toolkit used for building distributed applications.
+First,
+a review of remote operations specifications takes place.
+Then,
+the three tools,
+a stub generator, a structure generator, and an element parser are discussed.
+
+\item	Dynamic Facilities\\
+This presents the support libraries used for building distributed applications.
+First,
+the run-time environment is discussed,
+then boilerplate for initiators and responders are considered.
+Finally,
+the administrative details of defining a new service are examined.
+
+\item	What Now?\\
+A comparison is made to two ``popular'' rpc systems.
+\end{itemize}
+
+Throughout the tutorial,
+the ISO network management specification is used as an example.
+Starting on the next page,
+the actual source used for the examples is shown.
+
+\vspace{0.25in}
+{\raggedleft /mtr\par}
+{\raggedright Palo Alto, California\\
+April, {\oldstyle\number\year}\par}
+
+\newpage
+\tgrindfile{cmip-bind}
+
+\newpage
+\tgrindfile{cmip-rosy}
+
+%%% \newpage
+%%% \tgrindfile{cmip-posy}
+
+%%% \newpage
+%%% \tgrindfile{cmip-pepy}
+
+\end{document}

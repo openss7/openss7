@@ -1,0 +1,134 @@
+% run this through SLiTeX with the appropriate wrapper
+
+\dotopic	{OTHER SERVICES}
+
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]	FILE TRANSFER, ACCESS AND MANAGEMENT
+
+\item[PART II:]	VIRTUAL TERMINAL
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{FILE TRANSFER,\\ ACCESS AND MANAGEMENT}\bf
+
+\begin{nrtc}
+\item	IMPLEMENTATION OF OSI FILE SERVICE
+
+\item	CURRENT IMPLEMENTATION ROUGHLY COMPARABLE TO AN ABOVE-AVERAGE
+	FTP IMPLEMENTATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FTAM LIBRARY}
+
+\begin{nrtc}
+\item	NO-RECOVERY FPM
+
+\item	SERVICE CLASSES:
+    \begin{nrtc}
+    \item	TRANSFER, ACCESS, MANAGEMENT, T-AND-M
+    \end{nrtc}
+
+\item	FUNCTIONAL UNITS:
+    \begin{nrtc}
+    \item	KERNEL, READ, WRITE, ACCESS
+
+    \item	LIMITED AND ENHANCED FILE MANAGEMENT
+
+    \item	GROUPING, FADU-LOCKING
+    \end{nrtc}
+
+\item	ATTRIBUTE GROUPS:
+    \begin{nrtc}
+    \item	KERNEL, STORAGE, SECURITY, PRIVATE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FTAM INITIATOR}
+
+\begin{nrtc}
+\item	INTERACTIVE IMPLEMENTATION
+
+\item	DOCUMENT TYPES:
+    \begin{nrtc}
+    \item	UNSTRUCTURED TEXT (FTAM-1)
+
+    \item	UNSTRUCTURED BINARY (FTAM-3)
+
+    \item	FILEDIRECTORY (NBS-9)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FTAM RESPONDER}
+
+\begin{nrtc}
+\item	USER-LEVEL (DAEMON) IMPLEMENTATION
+
+\item	SAME DOCUMENT TYPES AS INITIATOR
+
+\item	TRANSFER AND/OR MANAGEMENT
+
+\item	SERVICE CLASSES:
+    \begin{nrtc}
+    \item	TRANSFER, MANAGEMENT, T-AND-M
+    \end{nrtc}
+
+\item	FUNCTIONAL UNITS:
+    \begin{nrtc}
+    \item	KERNEL, READ, WRITE
+
+    \item	LIMITED AND ENHANCED FILE MANAGEMENT
+
+    \item	GROUPING
+    \end{nrtc}
+
+\item	ATTRIBUTE GROUPS:
+    \begin{nrtc}
+    \item	KERNEL, STORAGE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{VIRTUAL TERMINAL}\bf
+
+\begin{nrtc}
+\item	IMPLEMENTATION OF THE OSI TERMINAL SERVICE
+
+\item	CURRENT IMPLEMENTATION ROUGHLY COMPARABLE TO AN AVERAGE
+	TELNET IMPLEMENTATION
+
+\item	SUPPORTS ``VT TELNET PROFILE'' FROM NIST OIW AGREEMENTS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{VIRTUAL TERMINAL (cont.)}
+
+\begin{nrtc}
+\item	FOR BERKELEY UNIX ONLY
+
+\item	NO ``SERVICE LIBRARY''
+    \begin{nrtc}
+    \item	JUST INITIATOR AND RESPONDER
+    \end{nrtc}
+
+\item	DIS IMPLEMENTATION
+\end{nrtc}
+\end{bwslide}

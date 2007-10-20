@@ -1,0 +1,32 @@
+% run this through LaTeX with the appropriate wrapper
+
+\smaller
+\begin{verbatim}
+cn=Fruit Bat
+acl= others # read # entry
+acl= group # c=US@cn=Manager # write # entry
+acl= others # read # default
+acl= group # c=US@cn=Manager # write # default
+cn= Fruit Bat
+eDBinfo= # cn=Alpaca #
+eDBinfo= # # c=US@cn=Spectacled Bear
+eDBinfo= c=US # cn= Alpaca # 
+eDBinfo= c=US # # c=US@cn=Spectacled Bear
+eDBinfo= c=US@l=NY # # cn=Alpaca
+eDBinfo= c=US@o=Performance Systems International # c=US@cn=Spectacled Bear #
+presentationAddress= '0101'H/Internet=130.117.128.3+17007
+manager= c=US@cn=Manager
+userPassword= fruitbat
+quipuVersion= 5.0 Distribution
+description= The Mischievous Varmint
+description= a MASTER DSA for l=NY under c=US & a SLAVE DSA for c=US
+objectClass= top & quipuObject
+objectClass= appliationEntity & dSA & quipuDSA
+supportedApplicationContext= x500DSP & x500DAP & quipuDSP
+
+\end{verbatim}
+
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\empty

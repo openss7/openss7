@@ -1,0 +1,261 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Attributes for Persons in the Pilot Project}%
+		\label{person:attributes}
+Here is the list of the attributes which may be present for a person
+represented in the PSI White Pages Pilot Project.
+
+There are two mandatory attributes:
+\begin{describe}
+\item[commonName:]
+			which gives a (potentially ambiguous) name for
+			the person.
+			The value of this attribute is a string usually
+			containing the person's first and last names; e.g.,
+\begin{quote}\small\begin{verbatim}
+Marshall Rose
+\end{verbatim}\end{quote}
+			This attribute is usually multi-valued, containing
+			variations on the first, middle, and last names; e.g.,
+\begin{quote}\small\begin{verbatim}
+Colin Robbins
+Colin John Robbins
+Colin J. Robbins
+\end{verbatim}\end{quote}
+			For purposes of the pilot project, the distinguished
+			value of the attribute should contain only the
+			person's first and last names.
+
+\item[surName:]
+			which gives the person's last name.
+			The value of this attribute is a string; e.g.,
+\begin{quote}\small\begin{verbatim}
+Rose
+\end{verbatim}\end{quote}
+\end{describe}
+There are several attributes that may be present,
+which are divided into five groups:
+physical address, telecommunication information, 
+computer environment,
+miscellaneous information,
+and home information.
+
+The first group describes the physical address of the object:
+\begin{describe}
+\item[postalAddress:]
+			which describes how physical mail is addressed to the
+			object.
+			The syntax of this attribute's value is special:
+			it consists of~1 to~6 fields, seperated by the
+			``\verb"$"''-sign, each field being from~1 to~30
+			characters long; e.g.
+\begin{quote}\tiny\begin{verbatim}
+Performance Systems International $ 11800 Sunrise Valley Drive $ Reston, VA  22091
+\end{verbatim}\end{quote}
+
+\item[registeredAddress:]
+			which defines how registered physical mail is
+			addressed to the object.
+			The syntax is identical to that of the
+			\verb"postalAddress" attribute.
+
+\item[roomNumber:]
+			which is a string describing where the object resides
+			at the location, e.g.,
+\begin{quote}\small\begin{verbatim}
+Building T-30
+\end{verbatim}\end{quote}
+
+\item[streetAddress:]
+			which is a string describing where the object
+			physically resides
+			(i.e., the street name, place, avenue, and building
+			number); e.g.,
+			object
+\begin{quote}\small\begin{verbatim}
+165 Jordan Road
+\end{verbatim}\end{quote}
+			This need have no relationship to the object's
+			postal address.
+
+\item[postOfficeBox:]
+			which is a string describing the box at which the
+			object will receive physical postal delivery; e.g.,
+\begin{quote}\small\begin{verbatim}
+1010
+\end{verbatim}\end{quote}
+
+\item[physicalDeliveryOfficeName:]
+			which is a string describing the geographical location
+			of the physical delivery office which services the
+			postal address of this object; e.g.,
+\begin{quote}\small\begin{verbatim}
+Troy
+\end{verbatim}\end{quote}
+
+\item[stateOrProvinceName:]
+			which is a string describing the state in which
+			the \verb"locality" is found; e.g.,
+\begin{quote}\small\begin{verbatim}
+New York
+\end{verbatim}\end{quote}
+
+\item[postalCode:]
+			which is a string containing the ZIP code; e.g.,
+\begin{quote}\small\begin{verbatim}
+12180
+\end{verbatim}\end{quote}
+or
+\begin{quote}\small\begin{verbatim}
+94043-2112
+\end{verbatim}\end{quote}
+
+\item[localityName:]
+			which is a string describing the geographical
+			area containing the \verb"streetAddress"; e.g.,
+\begin{quote}\small\begin{verbatim}
+Troy, New York
+\end{verbatim}\end{quote}
+\end{describe}
+The second optional group describes telecommunications addressing information
+for the object.
+\begin{describe}
+\item[telephoneNumber:]
+		which is a string describing the phone number of the object
+		using the international notation; e.g.,
+\begin{quote}\small\begin{verbatim}
++1 518-283-8860
+\end{verbatim}\end{quote}
+
+\item[facsimileTelephoneNumber:]
+		which is a string describing the fax number of the object
+		using the international notation; e.g.,
+\begin{quote}\small\begin{verbatim}
++1 518-283-8904
+\end{verbatim}\end{quote}
+
+\item[telexNumber:]
+		which is defines the TELEX address of the object in a
+		three-part string:
+\begin{quote}\small\begin{verbatim}
+number $ country $ answerback
+\end{verbatim}\end{quote}
+		e.g.,
+\begin{quote}\small\begin{verbatim}
+650 103 7390 $ US $ MCI UW
+\end{verbatim}\end{quote}
+\end{describe}
+The third group describes information relating to the person's
+computer environment:
+\begin{describe}
+\item[rfc822Mailbox:]
+			which is the user's computer mail address,
+			e.g., 
+\begin{quote}\small\begin{verbatim}
+mrose@psi.com
+\end{verbatim}\end{quote}
+
+\item[otherMailbox:]
+			which is the user's computer mail address
+			in various domains.
+			The syntax of this attribute's value is special:
+\begin{quote}\small\begin{verbatim}
+<domain> $ <mailbox>
+\end{verbatim}\end{quote}
+			e.g., 
+\begin{quote}\small\begin{verbatim}
+internet $ mrose@psi.com
+\end{verbatim}\end{quote}
+			or
+\begin{quote}\small\begin{verbatim}
+uucp $ uupsi!mrose
+\end{verbatim}\end{quote}
+
+\item[userid:]
+			which is the user's login name; e.g.,
+\begin{quote}\small\begin{verbatim}
+mrose
+\end{verbatim}\end{quote}
+
+\item[userClass:]
+			which describe's the user's classification; e.g.,
+\begin{quote}\small\begin{verbatim}
+staff
+\end{verbatim}\end{quote}
+\end{describe}
+The next optional group contains a few miscellaneous attributes:
+\begin{describe}
+\item[description:]
+			which is a simple textual description;
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+Principal Implementor of the ISO Development Environment
+\end{verbatim}\end{quote}
+
+\item[info:]
+			which is additional information about the object;
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+It's nearly as good as BIND
+\end{verbatim}\end{quote}
+
+\item[businessCategory:]
+			which describes the person's business,
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+networking
+\end{verbatim}\end{quote}
+
+\item[title:]
+			which is the person's job title,
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+Senior Scientist
+\end{verbatim}\end{quote}
+
+\item[userPassword:]
+			which is a string containing the object's
+			password in the Directory.  This is used,
+			for example, when the user wants to update
+			the entry.
+			The password is kept in the clear; e.g.,
+\begin{quote}\small\begin{verbatim}
+secret
+\end{verbatim}\end{quote}
+
+\item[mobileTelephoneNumber:]
+			which is a string describing the user's mobile
+			number (e.g., for a cellular phone).
+
+\item[pagerTelephoneNumber:]
+			which is a string describing the user's pager number.
+
+\item[favouriteDrink:]
+			which is a string describing the user's favorite drink.
+
+\item[secretary:]
+			which is the Distinguished Name of the user's
+			administrative support.
+
+\item[seeAlso:]
+			which is a Distinguished Name pointing to another
+			entry related to the user (perhaps in a different
+			role).
+
+\item[photo:]
+			which is a facsimile bitmap of the user's face.
+\end{describe}
+The final optional group contains a few attributes about the person at home:
+\begin{describe}
+\item[homePostalAddress:]
+			which describes how physical mail is addressed to the
+			person's home.
+			The syntax of this attribute's value is special:
+			it consists of~1 to~6 fields, seperated by the
+			``\verb"$"''-sign, each field being from~1 to~30
+			characters long.
+
+\item[homePhone:]
+		which is a string describing the phone number of the object
+		using the international notation.
+\end{describe}

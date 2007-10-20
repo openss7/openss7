@@ -1,0 +1,764 @@
+% -*- LaTeX -*-		(really SLiTeX)
+
+\documentstyle[blackandwhite,landscape,oval,pagenumbers,small]{NRslides}
+
+\def\emph#1{\underline{#1}}
+
+\font\xx=cmbx10
+\font\yy=cmbx7
+\font\sf=cmss10
+
+\raggedright
+
+\input trademark
+\let\tradeNAMfont=\relax
+\let\tradeORGfont=\relax
+
+\begin{document}
+
+\title	{NYSERNet WHITE PAGES\\ PILOT PROJECT}
+\author	{Marshall T.~Rose\\ NYSERNet, Inc.}
+\date	{October 26, 1989}
+\maketitlepage
+
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]		THE WHITE PAGES
+
+\item[PART II:]		ACCESSING THE SERVICE
+
+\item[PART III:]	THE FUTURE
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SUMMARY}
+
+\begin{nrtc}
+\item	A LARGE DISTRIBUTED INFORMATION SERVICE INVOLVING ADMINISTRATION BY
+	DIFFERENT ORGANIZATIONS
+
+\item	THE FIRST PRODUCTION-QUALITY FIELD TEST OF THE OSI DIRECTORY (X.500)
+
+\item	THE FIRST LARGE SCALE PRODUCTION APPLICATION OF OSI TECHNOLOGY ON TOP
+	OF THE TCP/IP SUITE OF PROTOCOLS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{THE WHITE PAGES}\bf
+
+\begin{nrtc}
+\item	INTRODUCTION
+
+\item	RELATION TO OSI DIRECTORY
+
+\item	REALIZING THE WHITE PAGES SERVICE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{INTRODUCTION}\bf
+
+\begin{nrtc}
+\item	NETWORKS PROVIDE THE INFRASTRUCTURE BETWEEN USERS
+
+\item	NEED INFRASTRUCTURAL INFORMATION TO FACILITATE INTERACTIONS
+    \begin{nrtc}
+    \item	e.g., E-MAIL ADDRESSES
+    \end{nrtc}
+
+\item	WHITE PAGES CONTAIN 
+    \begin{nrtc}
+    \item	\emph{INFRASTRUCTURAL INFORMATION}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHITE PAGES IN THE REAL WORLD}
+
+\begin{nrtc}
+\item	THE TELEPHONE BOOK IS THE BEST EXAMPLE
+
+\item	MANY PROVEN FEATURES:
+    \begin{nrtc}
+    \item	MULTIPLE TYPES OF INFORMATION 
+	\begin{nrtc}
+	\item	(USEFUL IN FINDING THE ``RIGHT'' ENTRY)
+	\end{nrtc}
+
+    \item	YELLOW PAGES KEYED BY BUSINESS SERVICE
+
+    \item	LOCALITY OF INFORMATION
+
+    \item	DIRECTORY ASSISTANCE
+	\begin{nrtc}
+	\item	(IMPRECISE MATCHING)
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{WHITE PAGES IN THE COMPUTER WORLD}
+
+\begin{nrtc}
+\item	CONTAINS TELEPHONE BOOK INFORMATION
+    \begin{nrtc}
+    \item	ALONG WITH LOCAL ``PHONE'' INFORMATION
+
+    \item	SUGGESTS BOTH LOCALITY AND ACCESS CONTROL
+    \end{nrtc}
+
+\item	CONTAINS NETWORK-SPECIFIC INFORMATION
+    \begin{nrtc}
+    \item	E-MAIL ADDRESSES
+
+    \item	PRIVATE MAIL
+
+    \item	NETWORK MANAGEMENT
+    \end{nrtc}
+
+\item	ULTIMATELY: ``THE'' REPOSITORY OF ALL SYSTEM AND
+	NETWORK ADMINISTRATIVE INFORMATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A SMALL DISTINCTION}
+
+\begin{nrtc}
+\item	WHITE PAGES IMPLIES SEARCH BASED ON \emph{NAME}
+
+\item	YELLOW PAGES IMPLIES SEARCH BASED ON \emph{ATTRIBUTES}
+
+\item	NETWORK SERVICE HAS FEATURES OF BOTH
+    \begin{nrtc}
+    \item	PERHAPS \emph{RAINBOW PAGES}$^{\hbox{\tiny TM}}$ IS BETTER TERM
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{RELATION TO OSI DIRECTORY}\bf
+
+\begin{nrtc}
+\item	NEED THREE THINGS TO IMPLEMENT THE SERVICE
+    \begin{nrtc}
+    \item	OSI INFRASTRUCTURE
+
+    \item	OSI DIRECTORY
+
+    \item	WHITE PAGES ABSTRACTION
+    \end{nrtc}
+
+\item	ISODE PROVIDES OSI INFRASTRUCTURE
+
+\item	QUIPU PROVIDES OSI DIRECTORY
+
+\item	NOW NEED TO SEE HOW DIRECTORY \emph{TECHNOLOGY} INFLUENCES
+	WHITE PAGES \emph{SERVICE}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RAMIFICATION 1:\\ UNIQUE IDENTIFICATION OF USERS}
+
+\begin{nrtc}
+\item	EACH ENTRY IN THE WHITE PAGES IS IDENTIFIED BY A \emph{HANDLE}
+
+\item	ONE TO ONE MAPPING BETWEEN ENTRIES IN DIRECTORY AND WHITE PAGES
+
+\item	USE DIRECTORY DISTINQUISHED NAME, e.g.,
+\begin{quote}\begin{verbatim}
+c=US
+    @o=NYSERNet Inc.
+    @ou=Research and Development
+    @ou=Western Development Office
+    @cn=Marshall Rose
+\end{verbatim}\end{quote}
+FOR WHITE PAGES HANDLE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RAMIFICATION 2:\\ SEARCHING THE WHITE PAGES}
+
+\begin{nrtc}
+\item	SEARCHES OCCUR RELATIVE TO AN AREA
+
+\item	INTERACTIVE MODEL
+    \begin{nrtc}
+    \item	FIRST, IDENTIFY AREAS LIKELY TO CONTAIN INFORMATION
+
+    \item	SECOND, SEARCH AREAS
+    \end{nrtc}
+
+\item	SINCE AREAS ARE JUST PARTS OF THE DIRECTORY,
+	BOTH STEPS INVOLVE SEARCHING
+
+\item	USER INTERFACE PROVIDES SIMPLE SYNTAX FOR DOING BOTH AUTOMATICALLY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RAMIFICATION 3:\\ STRUCTURE OF INFORMATION}
+
+\begin{nrtc}
+\item	INFORMATION IS STRUCTURED USING ASN.1:
+    \begin{nrtc}
+    \item	FORMAL DEFINITION
+
+    \item	DIRECTORY ENFORCES SYNTAX
+
+    \item	USERS ENFORCE SEMANTICS
+    \end{nrtc}
+
+\item	IT'S ALL BINARY
+    \begin{nrtc}
+    \item	SO USER INTERFACE MUST SELECT PLEASING OUTPUT STRATEGY
+
+    \item	(UNLIKE MOST INTERNET-STYLE INTERFACES)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{REALIZING THE WHITE PAGES SERVICE}\bf
+
+\begin{nrtc}
+\item	PILOT COMMUNITY IS NYSERNet MEMBERSHIP
+    \begin{nrtc}
+    \item	AND BROAD INTERNET COMMUNITY
+    \end{nrtc}
+
+\item	ISODE PROVIDES OSI INFRASTRUCTURE OVER TCP/IP USING RFC1006
+
+\item	THE WHITE PAGES ABSTRACTION
+    \begin{nrtc}
+    \item	ADMINISTRATIVE DISCIPLINE
+
+    \item	USER INTERFACE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ADMINISTRATIVE DISCIPLINE}
+
+\begin{nrtc}
+\item	BASED ON THE FOUR MODELS OF THE DIRECTORY
+    \begin{nrtc}
+    \item	INFORMATIONAL PERSPECTIVE
+
+    \item	FUNCTIONAL PERSPECTIVE
+
+    \item	ORGANIZATIONAL PERSPECTIVE
+
+    \item	SECURITY PERSPECTIVE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INFORMATIONAL PERSPECTIVE}
+
+\begin{nrtc}
+\item	EACH ENTRY IN THE WHITE PAGES CORRESPONDS TO AN ENTRY IN THE OSI
+	DIRECTORY
+
+\item	SINCE DISTINGUISHED NAMES ARE HIERARCHICAL,
+	SO ARE HANDLES IN THE WHITE PAGES 
+
+\item	ONLY LIMITED INFORMATION TYPES SUPPORTED
+    \begin{nrtc}
+    \item	ORGANIZATIONS
+
+    \item	ORGANIZATIONAL UNITS AND ROLES
+
+    \item	LOCALITIES
+
+    \item	PERSONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ATTRIBUTE TYPES FOR PERSONS}\small
+
+\[\begin{tabular}{lll}
+commonName&		    physicalDeliveryOfficeName&	stateOrProvinceName\\
+description&		    photo&			streetAddress\\
+facsimileTelephoneNumber&   postOfficeBox&		surName\\
+favouriteDrink&		    postalAddress&		telephoneNumber\\
+mobileTelephoneNumber&      postalCode&			title\\
+otherMailbox&		    rfc822Mailbox&		userPassword\\
+pagerTelephoneNumber&	    roomNumber&			userid
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FUNCTIONAL PERSPECTIVE}
+
+\begin{nrtc}
+\item	DUA CONTACTS DSA FOR INFORMATION
+
+\item	IF DSA DOES NOT HAVE INFORMATION RESIDENT,
+	IT EITHER
+    \begin{nrtc}
+    \item	\emph{CHAINS} REQUEST TO A DSA CLOSER TO THE INFORMATION
+
+    \item	\emph{REFERS} DUA TO A DSA CLOSER TO THE INFORMATION
+    \end{nrtc}
+
+\item	WHAT DOES \emph{RESIDENT} MEAN?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ENTRY DATA BLOCK}
+
+\begin{nrtc}
+\item	AN ENTRY DATA BLOCK (OR BLOCK) CONSISTS OF A SMALL PORTION OF THE TREE
+    \begin{nrtc}
+    \item	THE NAMES AND ATTRIBUTES OF THE IMMEDIATE CHILDREN OF OF A
+		PARTICULAR NODE
+    \end{nrtc}
+
+\item	THREE KINDS OF BLOCKS
+    \begin{nrtc}
+    \item	SLAVE COPY: COMPLETE AND AUTHORITATIVE
+	\begin{nrtc}
+	\item	REGULARLY UPDATED FROM UPSTREAM DSA
+	\end{nrtc}
+
+    \item	CACHE COPY: POSSIBLY PARTIAL INFORMATION
+	\begin{nrtc}
+	\item	INFORMATION DETERMINED FROM CHAINING
+
+        \item	INVALIDATED RELATIVE QUICKLY
+	\end{nrtc}
+
+    \item	MASTER COPY: THE ORIGINAL
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE RESIDENCY REQUIREMENT}
+
+\[\small\begin{tabular}{rl}
+\bf OPERATION REQUESTED&
+		\bf COPY REQUIRED FOR RESIDENCY\\
+READ, COMPARE&	MASTER, SLAVE, OR CACHE\\
+LIST, SEARCH&	MASTER, OR SLAVE\\
+UPDATE&		MASTER\\
+\end{tabular}\]
+
+\begin{nrtc}
+\item	IN ORDER TO IMPROVE SEARCHING,
+	SLAVE COPIES OF THE ROOT and \verb"c=US" ARE KEPT AT EACH DSA
+
+\item	UPDATES STILL RELY ON CENTRALIZED ENTITY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ORGANIZATIONAL PERSPECTIVE}
+
+\begin{nrtc}
+\item	RESPONSIBILITY FOR INFORMATION DIVIDED INTO DIRECTORY MANAGEMENT
+	DOMAINS (DMDs)
+
+\item	LEVEL-0: HIGHLY-AVAILABLE AUTHORITATIVE SERVERS
+    \begin{nrtc}
+    \item	ROOT
+
+    \item	\verb"c=US"
+    \end{nrtc}
+
+\item	LEVEL-1: AUTHORITATIVE SERVER FOR EACH ORGANIZATION
+
+\item	LEVEL-2: OVERFLOW DSAs FOR AN ORGANIZATION
+    \begin{nrtc}
+    \item	USE NOT RECOMMENDED AT PRESENT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TOPOLOGY OF THE PILOT PROJECT}
+
+\vskip.5in
+\diagram[p]{figureW-2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SECURITY PERSPECTIVE}
+
+\begin{nrtc}
+\item	\emph{SIMPLE} SECURITY MODEL (PASSWORD-BASED)
+    \begin{nrtc}
+    \item	WON'T TOUCH \emph{STRONG} SECURITY MODEL WHICH USES PKS
+    \end{nrtc}
+
+\item	ACCESS CONTROL LISTS
+    \begin{nrtc}
+    \item	NONE, DETECT, COMPARE, READ, ADD, WRITE
+    \end{nrtc}
+    FOR ENTRIES, ATTRIBUTES, AND CHILDREN
+
+\item	PASSWORDS MUST NOT BE REPLICATED OUTSIDE OF ORGANIZATION'S DMD
+\end{nrtc}
+\end{bwslide}
+
+
+
+\begin{bwslide}
+\part	{ACCESSING THE SERVICE}\bf
+
+\begin{nrtc}
+\item	FRED
+
+\item	FACES
+
+\item	MH
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{FRED}\bf
+
+\begin{nrtc}
+\item	BASED ON SRI-NIC WHOIS SERVICE
+    \begin{nrtc}
+    \item	EXPERIENCE SHOWS SYNTAX IS WELL-LIKED
+
+    \item	TRAINING PROBLEM REDUCED
+    \end{nrtc}
+
+\item	INTERACTIVE PROGRAM
+    \begin{nrtc}
+    \item	ALSO AVAILABLE VIA NETWORK AND MAIL
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHOIS COMMAND}
+
+{\small\begin{verbatim}
+whois input-field [record-type] [area-designator] [output-control]
+\end{verbatim}}
+
+\begin{nrtc}
+\item	PARTIAL NAME, e.g.,
+    \begin{nrtc}
+    \item	\verb"rose"
+    \end{nrtc}
+
+\item	FULLY-QUALIFIED HANDLE, e.g.,
+    \begin{nrtc}
+    \item	 \verb"@c=US@cn=Manager" OR \verb"!1"
+    \end{nrtc}
+
+\item	MAILBOX SPECIFICATION, e.g.,
+    \begin{nrtc}
+    \item	\verb"mrose@nisc.nyser.net"
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MATCHING RULES}
+
+\begin{nrtc}
+\item	IF ``\verb"*"''-SIGN PRESENT, USE WILDCARDING, ELSE
+
+\item	IF USER WANTS IMPRECISE MATCHING, USE SOUNDEX, ELSE
+
+\item	IF USER WANTS SURNAME MATCHING, LOOK THERE, ELSE
+
+\item	FORCE LIBERAL WILDCARDING, e.g., \verb"*rose*"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ALTERNATE QUERY FORMS}
+
+\begin{nrtc}
+\item	USE THE \verb"-title" SWITCH WHEN LOOKING FOR PEOPLE
+
+\item	FOR EXAMPLE,
+\begin{quote}\small\begin{verbatim}
+whois rose -title scientist
+\end{verbatim}\end{quote}
+LOOKS FOR SOMEONE NAMED \verb"rose" WHO IS A SCIENTIST
+
+\item	WHILE
+\begin{quote}\small\begin{verbatim}
+whois -title operator
+\end{verbatim}\end{quote}
+LOOKS FOR ANYONE WHO IS AN OPERATOR
+
+\item	SEARCHES ARE RELATIVE TO THE APPROPRIATE AREA
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AREA DESIGNATOR}
+
+\begin{nrtc}
+\item	SAYS WHERE TO SEARCH, EITHER
+
+\item	DIRECT REFERENCE, e.g.,
+    \begin{nrtc}
+    \item	\verb|"@c=US@o=NYSERNet Inc."| OR \verb"!3"
+    \end{nrtc}
+
+\item	INDIRECT REFERENCE, e.g.,
+    \begin{nrtc}
+    \item	\verb"-org nyser"
+    \end{nrtc}
+
+\item	INDIRECT REFERENCE CAUSES IMPLICIT SEARCH TO DETERMINE LIST OF AREAS
+	FOR SEARCH
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE}
+
+\smaller
+\begin{verbatim}
+
+
+fred> whois goodfellow -org anterior
+Trying @c=US@o=Anterior Technology ...
+Geoffrey Goodfellow (2)         Geoff@Fernwood.MPK.CA.US
+     aka: Geoffrey S. Goodfellow
+
+President
+Anterior Technology
+  POB 1206
+  Menlo Park, CA  94026-1206
+
+Telephone: +1 415 328 5615
+FAX:       +1 415 328 5649
+TELEX:     number: 650 103 7391, country: US, answerback: MCI UW
+
+Mailbox information:
+  MCI-Mail: Geoff
+  Internet: Geoff@Fernwood.MPK.CA.US
+  UUCP: fernwood!Geoff
+
+Drinks:   chilled water
+Picture:  /usr/etc/g3fax/Xphoto invoked
+
+Handle:   @c=US@o=Anterior Technology@ou=Corporate@cn=Geoffrey Goodfellow (2)
+Modified: Fri Jul 21 11:41:27 1989
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{FACES}\bf
+
+\begin{nrtc}
+\item	YOU CAN STORE ARBITRARY DATA IN THE WHITE PAGES
+
+\item	ONE ATTRIBUTE IS A FACSIMILE IMAGE CALLED \verb"photo"
+
+\item	THERE ARE TWO X WINDOWS PROGRAMS WHICH DISPLAY THIS INFORMATION
+    \begin{nrtc}
+    \item	XFACE: WHEN READING A MESSAGE WITH MH, DISPLAYS PHOTO
+
+    \item	XWHO: LIKE RWHO, BUT WITH PHOTOs
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MAPPING TO HANDLES}
+
+\begin{nrtc}
+\item	MAPPING \verb"local@domain" to A DISTINGUISHED NAME IS A PROBLEM
+
+\item	COULD USE SEARCH ON \verb"rfc822Mailbox" ATTRIBUTE,
+	BUT HOW TO LIMIT SEARCH? 
+
+\item	ON LOCAL AREA NETWORK (XWHO), PROBLEM IS SIMPLER
+    \begin{nrtc}
+    \item	SEARCH LOCAL PART OF TREE FOR \verb"userid" ATTRIBUTE
+    \end{nrtc}
+
+\item	FOR E-MAIL (XFACE), USE DIRECTORY TO PROVIDE INVERSE MAPPING TO
+	DOMAIN NAMES
+    \begin{nrtc}
+    \item	COUNTRIES, ORGANIZATIONS HAVE \verb"domainRelatedObject" IN
+		OBJECT CLASS
+
+    \item	OBJECTS OF THIS CLASS HAVE \verb"associatedDomain" ATTRIBUTE
+
+    \item	USE A RECURSIVE ALGORITHM TO DERIVE DI-SUBTREES LIKELY TO HAVE
+		DESIRED INFORMATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{MH}\bf
+
+\begin{nrtc}
+\item	WHEN COMPOSING MAIL, IT WOULD BE NICE TO USE THE WHITE PAGES TO GET
+	E-MAIL ADDRESSES
+
+\item	MH IS MODIFIED TO USE FRED FOR THIS PURPOSE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MH USE OF FRED}
+
+\begin{nrtc}
+\item	SPECIFY A NAME BY USING ``\verb"{"'' AND ``\verb"}"''  INSTEAD OF
+AN ADDRESS, e.g.,
+    \begin{nrtc}
+    \item	\verb"To: { rose -org nyser }"
+    \end{nrtc}
+
+\item	\verb"SEND" AND \verb"WHOM" COMMANDS WILL EXPAND QUERY
+    \begin{nrtc}
+    \item	USER IS ASKED TO CONFIRM/REFINE
+    \end{nrtc}
+
+\item	NOT AVAILABLE FOR \verb"PUSH"
+    \begin{nrtc}
+    \item	(MUST BE INTERACTIVE USE OF MH)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{THE FUTURE}\bf
+
+\begin{nrtc}
+\item	LEVEL-1 SLAVE DSAs
+
+\item	DEVELOPMENT
+
+\item	NAME CHANGES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{LEVEL-1 SLAVE DSAs}\bf
+
+\begin{nrtc}
+\item	LEVEL-1 DSAs ARE A SINGLE POINT OF FAILURE
+
+\item	START LOOKING FOR PEER TO RUN LEVEL-1 DSA FOR YOUR DATA
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{DEVELOPMENT}\bf
+
+\begin{nrtc}
+\item	WHENEVER MAINTENANCE COMES UP, DEVELOPMENT GOES OUT THE DOOR!
+
+\item	SO, MAJOR DEVELOPMENT IS OVER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SOME AREAS OF INTEREST}
+
+\begin{nrtc}
+\item	PRIVATE MAIL (KEY RETRIEVAL)
+
+\item	USER-DEFINED TEMPLATES FOR FRED OUTPUT
+
+\item	DOCUMENT SEARCHING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{NAME CHANGES}\bf
+
+\begin{nrtc}
+\item	PUTTING EVERYONE UNDER \verb"c=US" WON'T SCALE
+
+\item	SO, UNLESS YOUR ORGANIZATION IS INTER-STATE, PLAN ON
+    \begin{nrtc}
+    \item	\verb"c=US@l=NY@o=O_i"
+    \end{nrtc}
+
+\item	ALSO PLAN ON HAVING ONLY INCOMPLETE INFORMATION ON \verb"c=US"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{CONCLUSIONS}\bf
+
+\begin{nrtc}
+\item	WHITE PAGES SERVICE
+    \begin{nrtc}
+    \item	USING THE OSI DIRECTORY
+
+    \item	RUNNING IN A TCP/IP-BASED INTERNET
+    \end{nrtc}
+    SOUNDS UNLIKELY!
+
+\item	ACTUALLY, IT'S OPTIMAL FOR A PILOT
+    \begin{nrtc}
+    \item	SHEER SIZE OF THE INTERNET
+
+    \item	INTERNET SUITE OF PROTOCOLS FOR STABLE END-TO-END SERVICES
+
+    \item	OSI DIRECTORY SERVICE FOR RICH SERVICE ENVIRONMENT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\end{document}

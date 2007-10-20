@@ -1,0 +1,32 @@
+.PS 6.0i
+.ps 20
+## figure 6
+B1:	box "RFCxxx" "method"
+B2:	box "DDN-IP" with .n at (B1.s.x, B1.s.y-lineht)
+	line from B1.s to B2.n
+B3:	box "ISO-IP" with .w at B1.e
+##
+B4:	box "RFCxxx" "method" with .e at (B2.w.x-linewid, B1.w.y)
+B5:	box "TP4" with .s at (B4.n.x, B4.n.y+lineht)
+	line from B5.s to B4.n
+B6:	box "DDN-IP" with .n at (B5.s.x, B4.s.y-lineht)
+	line from B6.n to B4.s
+##
+B7:	box "ISO-IP" with .w at (B3.e.x+linewid, B3.e.y)
+B8:	box "TP4" with .n at (B7.n.x, B5.n.y)
+	line from B7.n to B8.s
+##
+	line dashed from B1.w to B4.e
+	line dashed from B2.w to B6.e
+	line dashed from B3.e to B7.w
+	line dashed from B5.e to B8.w
+##
+B9:	box invis "``DUAL''" with .n at (B2.e.x, B2.s.y-lineht/2)
+	line dotted from ((B6.c.x+B2.c.x)/2, B5.n.y+lineht/2) \
+		    to   ((B6.c.x+B2.c.x)/2, B6.s.y-lineht/2)
+B10:	box invis "HYBRID" with .n at (B6.s.x, B6.s.y-lineht/2)
+	line dotted from ((B3.c.x+B7.c.x)/2, B8.n.y+lineht/2) \
+		    to   ((B3.c.x+B7.c.x)/2, B6.s.y-lineht/2)
+B11:	box invis "ISO-only" with .n at (B7.s.x, B6.s.y-lineht/2)
+##
+.PE

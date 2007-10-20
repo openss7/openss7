@@ -1,0 +1,855 @@
+% run this through SLiTeX
+
+\documentstyle
+    [blackandwhite,landscape,oval,pagenumbers,small,plain]{NRslides}
+
+\input trademark
+\def\tradeORGfont{\rm}
+\def\tradeNAMfont{\rm}
+
+\raggedright
+
+\begin{document}
+
+\title	{PROTOCOL ADVANCES 3:\\ ISO DEVELOPMENT ENVIRONMENT}
+\author	{Stephen E.~Kille\\ University College, London\\[0.15in]
+	Ronald G.~Minnich\\ University of Delaware\\[0.15in]
+	Marshall T.~Rose\\ Northrop Corporation}
+\date	{March 17, 1987}
+\maketitlepage
+
+
+\begin{bwslide}
+\part*	{AGENDA}\bf
+
+\begin{nrtc}
+\item	ISODE: INTRODUCTION AND STATUS REPORT (ROSE)
+
+\item	PUTTING ISODE TO WORK (KILLE)
+
+\item	ISODE AT THE UNIVERSITY OF DELAWARE (MINNICH)
+
+\item	A STRATEGY FOR CONVERGENCE WITH ISO\\
+	(ANOTHER SERMON FROM MT.~ROSE?)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{ISODE:\\ INTRODUCTION AND\\ STATUS REPORT}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISODE}
+
+\begin{nrtc}
+\item	AN OPENLY AVAILABLE ISO DEVELOPMENT ENVIRONMENT
+
+\item	ISO APPLICATION, PRESENTATION, SESSION, AND LAYERED TRANSPORT
+
+\item	CODED ENTIRELY IN C
+
+\item	OPERATING SYSTEMS
+    \begin{nrtc}
+    \item	4.2\bsd/ \unix/
+
+    \item	SVR2 AT\&T \unix/ WITH AN EXCELAN \exos/~8044 TCP/IP PACKAGE
+
+    \item	\vms/ AND \pcdos/ (STILL) UNDER DEVELOPMENT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MOTIVATION}
+
+\begin{nrtc}
+\item	WANT TO BE CONSISTENT WITH ISO'S DIRECTION,
+	BUT WANT TO GET WORK DONE NOW
+    \begin{nrtc}
+    \item	MANY NEW, MAJOR INVESTMENTS BEING MADE IN CURRENT TECHNOLOGY
+		(e.g., NSFnet, NASA's NEW INTERNET, etc.)
+    \end{nrtc}
+
+\item	CURRENTLY, TCP/IP HAS SEVERAL ADVANTAGES OVER TP4/IP:
+    \begin{nrtc}
+    \item	WORKING IS-IS (GATEWAY-GATEWAY) PROTOCOL
+
+    \item	MATURITY
+
+    \item	VENDOR SUPPORT
+
+    \item	LARGE BODY OF EXPERTISE
+    \end{nrtc}
+
+\item	WOULD LIKE TO WORK IN AN ISO ENVIRONMENT,
+	BUT WILL USE TCP/IP's STRENGTHS TO DO SO NOW
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE APPLICATION ENVIRONMENT}
+
+\vskip.15in
+\diagram[p]{figure1}
+\end{bwslide}
+
+
+\begin{note}\em
+other ASEs: RTSE, CCR, and so on
+
+presentation: manage presentation contexts~---~abstract syntax and transfer
+
+session: manage tokens, activities, checkpointing, and so on
+
+about 35K lines of code
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{AN ALTERNATE ENVIRONMENT:\\ MHS ARCHITECTURE (c.~1984)}
+
+\vskip.15in
+\diagram[p]{figure2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATIONS IN PROGRESS}
+
+\begin{nrtc}
+\item	FTAM - FILE TRANSFER, ACCESS AND MANAGEMENT (NRTC)
+
+\item	MHS - MESSAGE HANDLING SYSTEM (UCL)
+
+\item	DS - DIRECTORY SERVICES (UCL)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PERFORMANCE OBSERVATIONS}
+
+\begin{nrtc}
+\item	THE 5-P PRINCIPLE:\\
+	PROPER PLANNING PREVENTS POOR PERFORMANCE
+
+\item	INITIAL BENCHMARKING SUGGESTS THROUGHPUT RATES VERY CLOSE TO RAW TCP
+	FOR BOTH TRANSPORT AND SESSION ECHO AND SINK ENTITIES
+
+\item	AT THE APPLICATION INTERFACE (ABOVE ACSE/ROSE),
+	THROUGHPUT IS ONLY 10\%-12\% WORSE THAN RAW TCP FOR DATA TRANSFER
+
+\item	RESULTS PRIMARILY DUE TO MINIMIZED BYTE-COPYING BETWEEN LAYERS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHERE NEXT?}
+
+\begin{nrtc}
+\item	VALIDATE/TEST AGAINST PURE ISO\\
+	(SOMEBODY ELSE'S IMPLEMENTATION)
+
+\item	SYNCHRONIZE WITH GOSIP SPECIFICATION
+
+\item	EXPAND SOME MODULES AS NEW APPLICATIONS REQUIRE
+
+\item	CONVERGENCE WORK (DESCRIBED LATER)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AVAILABILITY INFORMATION}
+
+\begin{nrtc}
+\item	VERSION 2 AVAILABLE MARCH 15, 1987
+
+\item	USPS: SEND TAPE AND PREPAID MAILER TO:
+\begin{small}
+    \[\begin{tabular}{l}
+	NORTHROP RESEARCH AND TECHNOLOGY CENTER\\
+	ATTN: AUTOMATION SCIENCES LABORATORY (0330/T30)\\
+	ONE RESEARCH PARK\\
+	PALOS VERDES PENINSULA, CA  90274\\
+	USA\\
+    \end{tabular}\]
+\end{small}
+    \begin{nrtc}
+    \item	ADD 3 POUNDS AND 1--1/2 INCHES FOR DOCUMENTATION SET
+
+    \item	SEND ONLY POSTAGE, NO MONEY
+
+    \item	TELCO: 213--544--5393
+    \end{nrtc}
+
+\item	ANONYMOUS FTP: HOST louie.udel.edu, FILE portal/isode-2.tar
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{PUTTING ISODE TO WORK}\large\bf
+
+\vskip-0.5in
+\[\begin{tabular}[t]{c}\large\bf
+    Stephen E.~Kille\\
+    Department of Computer Science\\
+    University College, London
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{note}\em
+with credits to:
+
+\begin{nrtc}
+\item	at UCL:\\
+	George G.~Michaelson, Stephen E.~Easterbrook, Thomas Woo
+
+\item	at the Department of Computer Science, Nottingham University:\\
+	Julian P.~Onions
+\end{nrtc}
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{OVERVIEW}
+
+\begin{nrtc}
+\item	DISCUSSION OF WORK AT UCL USING ISODE
+
+\item	WORK ON DISTRIBUTED APPLICATIONS
+
+\item	EMPHASIS ON MESSAGE HANDLING AND DIRECTORY SERVICES
+
+\item	FOCUS ON WORK ALIGNED WITH INTERNATIONAL STANDARDS
+
+\item	AIM TO DESCRIBE HOW ISODE FACILITATES THIS WORK
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OSI INFRASTRUCTURE}
+
+\begin{nrtc}
+\item	UCL RUNS A WIDE VARIETY OF UNIX SYSTEMS
+
+\item	NEEDS OSI ENVIRONMENT WHICH CAN OPERATE ON ALL OF THESE,
+	FOR WORKING IN BOTH LANs AND WANs
+
+\item	CURRENTLY USE TCP/IP OVER THE LAN,
+	AS THIS IS THE ONLY PROTOCOL COMMON TO ALL OF THE MACHINES IN QUESTION
+
+\item	TP0/X.25 WILL BE USED FOR WAN ACCESS
+
+\item	TP4 MAY ALSO BE USED (IF WE HAVE TO)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ADVANTAGES OF TP0/X.25}
+
+\begin{nrtc}
+\item	THE PREFERRED EUROPEAN APPROACH
+
+\item	EFFICIENT UTILIZATION OF PTT X.25 SERVICES
+
+\item	UTILIZATION OF X.25 HARDWARE TO REDUCE CPU LOAD
+
+\item	WILL ALLOW FOR EXTENSIVE TESTING OF ISODE AGAINST OTHER OSI
+	IMPLEMENTATIONS AT UCL AND ELSEWHERE
+
+\item	MIGRATION TO USE OF X.25 OVER IEEE~802 LLC
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ABSTRACT SYNTAX NOTATION 1 (ASN.1)}
+
+\begin{nrtc}
+\item	REPRESENTATION CURRENTLY USED BY ALL OSI APPLICATIONS
+
+\item	RICH, EXTENSIBLE SYNTAX
+
+\item	USEFUL FOR SPECIFICATION OF NEW PROTOCOLS
+    \begin{nrtc}
+    \item	CLEAR TO READ SPECIFICATIONS
+
+    \item	NOT TIED TO MACHINE-ORIENTED STRUCTURES AND RESTRICTIONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REMOTE OPERATIONS SERVICE (ROS)}
+
+\begin{nrtc}
+\item	STANDARDIZED MECHANISM FOR SPECIFYING TRANSACTIONS
+
+\item	MAKES FULL POWER OF ASN.1 AVAILABLE
+
+\item	USED IN MANY INTERESTING OSI APPLICATIONS
+    \begin{nrtc}
+    \item	MESSAGING
+
+    \item	DIRECTORY SERVICES
+
+    \item	NETWORK MANAGEMENT
+
+    \item	REMOTE DATABASE ACCESS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{WHY ISODE}
+
+\begin{nrtc}
+\item	FULL AND UP-TO-DATE IMPLEMENTATION OF OSI LAYERS
+
+\item	REMOTE OPERATIONS SERVICE
+
+\item	ASN.1 ELEMENT HANDLING
+
+\item	COMPILER FOR DECODING ASN.1 (PEPY)
+
+\item	FLEXIBILITY TO USE DIFFERENT TRANSPORT SERVICES
+
+\item	GOOD PERFORMANCE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{RARE DIRECTORY SERVICES}
+
+\begin{nrtc}
+\item	R\'{E}SEAUX ASSOCI\'{E}S POUR LA RECHERCHE EUROP\'{E}ENNE (RARE)
+
+\item	TRANSLATION: EUROPEAN ACADEMIC RESEARCH NETWORK
+
+\item	AN ASSOCIATION OF THE VARIOUS NATIONAL RESEARCH NETS
+
+\item	WISH TO PROVIDE EARLY DIRECTORY SERVICES, UTILIZING
+	A CENTRAL DATABASE (LIKE THE ARPA ``WHOIS'')
+
+\item	CONTAINS FACILITY, PROJECT, AND PERSON DATA
+
+\item	THE DATA IS MORE VALUABLE THAN THE INITIAL SERVICE
+
+\item	DATA STANDARD FORMAT IS DESIRED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{RARE ASN.1 STRUCTURE}
+
+\begin{nrtc}
+\item	UCL HAS SPECIFIED A FIRST VERSIONS OF THE DATA STRUCTURE
+
+\item	ASN.1 USED
+
+\item	CAN REPRESENT DETAILED STRUCTURE, WHICH WILL BE USEFUL IN
+	LATER DISTRIBUTED DIRECTORY SERVICES
+
+\item	PEPY (ISODE) MADE ASN.1 VERIFICATION STRAIGHTFORWARD IN THE
+	DESIGN PHASE
+
+\item	ALLOWED EASY IMPLEMENTATION OF ``PRETTY PRINTER'' AND
+	ENCODING OF TEST DATA
+
+\item	IS LIKELY TO BE USED TO SUPPORT THE WIDER INTRODUCTION OF
+	THIS FORMAT FOR ENCODING AND DECODING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{NRS LOOKUP PROTOCOL}
+
+\begin{nrtc}
+\item	NAME REGISTRATION SCHEME (NRS) IS A DATABASE OF THE HOSTS
+	(DOMAINS) IN THE UK ACADEMIC COMMUNITY.
+
+\item	CURRENTLY CONTAINS ABOUT 1000 HOSTS, AND IS GROWING RAPIDLY
+
+\item	THE CENTRALIZED DATABASE HAS DISTRIBUTED MANAGEMENT AND
+	IS WIDELY REPLICATED
+
+\item	NRS LOOKUP PROTOCOL SPECIFIES A LIGHTWEIGHT TRANSACTION
+	OVER X.25, TO ENABLE LOOKUP OF INFORMATION IN THE NRS
+
+\item	THE PACKET FORMATS ARE SPECIFIED IN ASN.1
+
+\item	HANDLES BOTH CURRENT ``COLOURED BOOK'' APPLICATIONS AND
+	PLANNED OSI APPLICATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{NRS LOOKUP PROTOCOL IMPLEMENTATION}
+
+\begin{nrtc}
+\item	IMPLEMENTATION DONE IN PARALLEL WITH FINAL WORK ON SPECIFICATION
+
+\item	3RD YEAR STUDENT PROJECT (3 MONTHS)
+
+\item	PEPY FOUND A NUMBER OF ERRORS IN THE PROTOCOL SPECIFICATION
+
+\item	PEPY ALLOWED A FULL PROTOCOL DECODER TO BE BUILT WITH MINIMUM EFFORT
+
+\item	EARLY RESULTS SUGGEST GOOD PERFORMANCE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{MESSAGE HANDLING}
+
+\begin{nrtc}
+\item	UCL AND NOTTINGHAM UNIVERSITY ARE DEVELOPING AN X.400 SYSTEM (PP)
+
+\item	OWES MANY OF ITS DESIGN IDEAS TO MMDF (THE CSNET MESSAGE SYSTEM)
+
+\item	FLEXIBLE HANDLING OF MULTI-MEDIA
+
+\item	PROTOCOL AND FORMAT CONVERSION
+
+\item	UTILIZATION WITH DIRECTORY SERVICES
+
+\item	MAY BE DISTRIBUTED WITH LATER VERSIONS OF ISODE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{CURRENT USE OF ISODE IN PP}
+
+\begin{nrtc}
+\item	MOST OF THE EARLY WORK HAS NOT NEEDED ISODE
+
+\item	PEPY CAN HANDLE P1 AND P2
+
+\item	INTEGRATION OF P1 AND ISODE'S RELIABLE TRANSFER SERVICE (RTS) HAS
+	STARTED AND HAS BEEN SATISFYINGLY STRAIGHTFORWARD
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{PLANNED USE OF ISODE IN PP}
+
+\begin{nrtc}
+\item	RFC987 WILL BE IMPLEMENTED, TO PROVIDE FULL MAPPINGS
+	BETWEEN X.400 AND RFC822 MAIL
+
+\item	QUEUE MANAGEMENT WILL UTILIZE A ROS PROTOCOL
+    \begin{nrtc}
+    \item	THIS WILL PROVIDE HIGH FUNCTIONALITY, AND ALLOW FOR REMOTE
+		MANAGEMENT
+    \end{nrtc}
+
+\item	A SYSTEM FOR MANAGING LOCAL LISTS WILL BE SPECIFIED IN ROS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{UCL DIRECTORIES}
+
+\begin{nrtc}
+\item	HAVE ESTABLISHED DATABASE OF UCL USERS IN CENTRAL DATABASE
+    \begin{nrtc}
+    \item	DATA SEEMS TO BE A PRE-REQUISITE OF A DIRECTORY SERVICE!
+    \end{nrtc}
+
+\item	ACCESS USING ROS TO ALLOW INFORMATION TO BE UPDATED AND QUERIED
+
+\item	GENERATION OF LOCAL MAIL TABLES IS AUTOMATED FROM THIS DATABASE
+
+\item	ALL UCL PASSWORD FILES ARE MANAGED FROM THIS DATABASE
+  \begin{nrtc}\small
+    \item	MUCH HARDER THAN WE THOUGHT
+
+    \item	ALL PASSWORD FILE RELATED TOOLS (passwd(1), chsh(1), etc.)
+		EMULATED OVER ROS
+
+    \item	SOME EXTENSIONS
+		(E.G., ABILITY TO CHANGE PASSWORDS ON ALL MACHINES)
+
+    \item	PASSWORD FILES PULLED BY MACHINES USING ROS
+
+    \item	UCL SPECIFIC (SIMPLE) APPROACH TO AUTHENTICATION
+    \end{nrtc}
+
+\item	CURRENT SYSTEM IS SEEN AS A STEPPING STONE TO FULL OSI
+	DIRECTORY SERVICES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{WORK AT UCL TO EXTEND ISODE}
+
+\begin{nrtc}
+\item	TOOLS TO FACILITATE DEVELOPMENT OF APPLICATIONS ARE SEEN AS CRITICAL
+
+\item	CURRENTLY EXTENDING PEPY TO PERFORM ENCODING AS WELL AS DECODING
+
+\item	WILL EXTEND PEPY TO SUPPORT ROS IN AN AUTOMATIC MANNER,
+	MIXING ENCODING AND DECODING FUNCTIONS
+
+\item	ENABLE ROS TO BE USED IN A MANNER VERY LIKE
+	SOME REMOTE PROCEDURE CALL APPROACHES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{ISODE AT\\ THE UNIVERSITY OF DELAWARE}\bf
+
+\vskip-0.5in
+\[\begin{tabular}[t]{c}\large\bf
+    Ronald G.~Minnich\\
+    Dept. of Electrical Engineering\\
+    University of Delaware
+\end{tabular}\hskip1em plus.17fil
+\begin{tabular}[t]{c}\large\bf
+    David J.~Farber\\
+    Dept. of Electrical Engineering\\
+    Dept. of Computer and Information Sciences\\
+    University of Delaware
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STANDARD DISCLAIMER}
+
+\begin{nrtc}
+\item	ISODE HAS JUST COME INTO USE AT UDEL AS OF 1987 
+
+\item	WE KNOW ABOUT ISO BUT HAVE NEVER USED ISO OR ISODE~---
+    \begin{nrtc}
+    \item	WE ARE NOT ALONE IN THAT; THAT IS WHY ISODE EXISTS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISODE AFFECTS THREE AREAS}
+
+\begin{nrtc}
+\item	EXPERIMENTAL COMPUTER NETWORK RESEARCH
+
+\item	SYSTEMS PROGRAMMING
+
+\item	APPLICATIONS PROGRAMMING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{IMPLICATIONS OF ISO FOR OUR NETWORK RESEARCH}
+
+\begin{nrtc}
+\item	IF THE ISO MODEL IS THE FUTURE,
+	THEN xxxNET HAD BETTER SUPPORT IT EFFECTIVELY
+
+\item	WE HAVE SEEN A SIMILAR PHENOMENON WITH UNIX AND COMPUTER ARCHITECTURE
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{EXPERIMENTAL COMPUTER NETWORK RESEARCH}
+
+\begin{nrtc}
+\item	MEMNET[DELP86]~---~LARGE PHYSICALLY DISTRIBUTED MEMORY CONNECTED BY A
+	TOKEN RING
+    \begin{nrtc}
+    \item	IT IS UNDER CONSTRUCTION NOW AND SIMULATIONS PREDICT VERY HIGH
+		THROUGHPUT
+
+    \item	WE ARE CONSIDERING PUTTING ISODE ON TOP OF MEMNET;
+		MEMNET BECOMES THE TRANSPORT
+
+    \item	WE CONSIDER THIS A GOOD TEST OF MEMNET'S CAPABILITIES AS WELL
+		AS BEING POTENTIALLY WORTHWHILE IN AND OF ITSELF
+    \end{nrtc}
+
+\item	NOAHNET[PARULKAR86]~---~FLOOD NETWORK
+    \begin{nrtc}
+    \item	WHAT IMPLICATIONS DOES THE ISO MODEL HAVE FOR NOAHNET?
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISO FOR SYSTEMS PROGRAMMING}
+
+\begin{nrtc}
+\item	WE NEED TO LEARN HOW TO USE IT FOR `HOUSEKEEPING'\\
+	(e.g. KERNAL DATA STRUCTURE MONITORS, FONT LOADERS,\\
+	MAN PAGE PROGRAMS, etc.)
+
+\item	WHERE WE HAVE BEEN USING THE UNSTRUCTURED ``PIPE''-LIKE CHANNEL
+	PROVIDED BY TCP/IP, WE NOW USE THE HIGHER-LEVEL ISO CONSTRUCTS
+
+\item	A LOGICAL CONSEQUENCE OF THE ABOVE IS THAT WE WILL NOT NEED AS
+	MANY CUSTOM PROTOCOLS (e.g., rdump, rman, etc.)
+	AND WILL THUS (WE HOPE) HAVE LESS CONFUSION WHEN AN 'r'-PROGRAM
+	BREAKS (AND THEY HAVE~---~EXAMPLE ON REQUEST)
+
+\item	ISODE AND PEPY MAKE THE PROCESS MUCH EASIER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+example slides here...
+\end{note}
+
+\begin{bwslide}
+\ctitle	{WHERE DO I SIGN?}
+
+\begin{nrtc}
+\item	BUT: WE HAVE TO CLIMB A STEEP LEARNING CURVE
+
+\item	MUCH BIGGER BUT: WE HAVE TO CONVINCE OTHERS TO CLIMB IT TOO
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISO FOR THE APPLICATIONS PROGRAMMER}
+
+\begin{nrtc}
+\item	MAIL SYSTEMS
+
+\item	MULTI-MEDIA SYSTEMS (E.G. NETWORKED APA DISPLAYS)
+
+\item	NETWORK MONITORING PROGRAMS[AMER87]
+
+\item	IMAGE PROCESSING
+
+\item	SPEECH PROCESSING
+
+\item	NETWORKED PCs~---~USING PCs TO HELP MANAGE VAX RESOURCES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TWO PROBLEMS}
+\begin{nrtc}
+\item	CONVINCING VERY BUSY PEOPLE TO TAKE THE TIME TO LEARN IT
+
+\item	ONCE THEY LEARN IT, DO THEY FIND IT BOTH USABLE AND USEFUL? 
+\end{nrtc}
+
+SO FAR, AT UDEL, THERE IS NOT ENOUGH TIME TO TELL
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONCLUSIONS}
+
+\begin{nrtc}
+\item	 EXPERIMENTAL NETWORKS AT UDEL WILL SUPPORT ISODE
+    \begin{nrtc}
+    \item	BOTH AS A TEST OF ISODE\\ AND AS A TEST OF THE NETWORK
+    \end{nrtc}
+
+\item	WE ARE PLANNING TO USE ISODE FOR SYSTEM PROGRAMS THAT 
+	PREVIOUSLY WOULD HAVE BEEN IMPLEMENTED IN THE 'r'-PROGRAM STYLE OR
+	THAT COULD NOT HAVE BEEN EASILY WRITTEN AT ALL
+
+\item	WE ARE ENCOURAGING OTHER RESEARCHERS AT UDEL TO USE ISODE FOR THEIR
+	APPLICATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{A STRATEGY FOR CONVERGENCE WITH ISO}\bf
+
+\vskip-0.5in
+\[\begin{tabular}[t]{c}\large\bf
+    Marshall T.~Rose\\
+    Computer Science Laboratory\\
+    Northrop Research and Technology Center
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE PROBLEM}
+
+\begin{nrtc}
+\item	TCP/IP IS HERE NOW AND IT WORKS
+
+\item	ISO IS INEVITABLE!
+
+\item	HOW DO WE GET TO THERE FROM HERE?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PREMISES}
+
+\begin{nrtc}
+\item	START WITH AN EXISTING TCP/IP INTERNET
+
+\item	ADD SOME ISO-ONLY HOSTS/NETWORKS
+
+\item	MAKE NO MODIFICATIONS TO ISO-ONLY HOSTS
+	(AND MINIMIZE CHANGES TO TCP/IP HOSTS)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DESIRED INTEROPERABILITY}
+
+\begin{nrtc}
+\item	WANT SERVICES BETWEEN END-SYSTEMS AT HIGHER-LEVELS
+
+\item	AVOID APPLICATION-LEVEL GATEWAYS
+
+\item	IMPLIES INTEROPERABILITY AT TRANSPORT LAYER AND ABOVE
+
+\item	CONVERGE ON HIGHER-LEVELS IN THE ISO SUITE
+
+\item	NEEDED: VIRTUAL TRANSPORT SERVICE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TCP TRANSPORT SERVICE}
+
+\vspace{0.25in}
+\diagram[p]{figure3a}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISO TRANSPORT SERVICE}
+
+\vspace{0.25in}
+\diagram[p]{figure3b}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A CONVERGENCE STRATEGY}
+
+\begin{nrtc}
+\item	NEED TWO THINGS:
+    \begin{nrtc}
+    \item	HIGHER-LEVEL ISO SERVICES FOR TCP/IP HOSTS
+
+    \item	ISO-IP ENCAPSULATION ON DDN-IP
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{VIRTUAL ISO TRANSPORT SERVICE}
+
+\vspace{0.25in}
+\diagram[p]{figure3c}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISO DEVELOPMENT ENVIRONMENT}
+
+\begin{nrtc}
+\item	PROVIDES HIGHER-LEVEL ISO SERVICES FOR TCP/IP HOSTS
+
+\item	A MAGIC-BOX OFFERS TP4 SERVICE OVER TCP (RFC983)
+
+\item	GAIN EXPERIENCE WITH THE ISO SUITE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISO TRANSPORT SERVICES ON TOP OF THE TCP}
+
+\diagram[p]{figure4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MIXED ISO TRANSPORT SERVICE}
+
+\vspace{0.25in}
+\diagram[p]{figure3d}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DUAL-IP ``GATEWAYS''}
+
+\begin{nrtc}
+\item	NEED TWO MORE THINGS:
+    \begin{nrtc}
+    \item	PUT A REAL TP4 AND ISO-IP IN THE HYBRID HOST
+
+    \item	WITH ISO-IP ENCAPSULATED IN DDN-IP
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{HYBRID HOST}
+
+\diagram[p]{figure5}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE BIG PICTURE}
+
+\vspace{0.25in}
+\diagram[p]{figure6}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{VIRTUAL TRANSPORT SERVICES (REVIEW)}
+
+\vspace{0.25in}
+\diagram[p]{figure7}
+\end{bwslide}
+
+
+\begin{note}\em
+to migrate: just stop buying tcp/ip when both of these are done
+
+you need an application gateway to go from tcp/ip-only to iso-only
+(essential for mail, probably not needed otherwise)
+\end{note}
+
+
+\end{document}

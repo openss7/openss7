@@ -1,0 +1,420 @@
+%\begin{bwslide}
+%\part	{PRESENTATION SERVICES}\bf
+%\end{bwslide}
+
+
+\begin{bwslide}
+\part	{PRESENTATION SERVICES}\bf
+
+%\vskip.5in
+\diagram[p]{figureA-7}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {PRESENTATION LAYER\\PURPOSE}
+
+\begin{nrtc}
+\item	COMBINES
+	\begin{nrtc}
+	\item	STRUCTURING ASPECTS OF ABSTRACT SYNTAX
+	\item	COMMUNICATIONS CONTROL OF SESSION SERVICES
+	\end{nrtc}
+\item	EXCHANGES DATA STRUCTURES OVER SESSION DIALOGUES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {THE PRESENTATION LAYER}
+
+\vskip.5in
+{\tiny\diagram[p]{figureA-23}}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PRESENTATION}
+
+\begin{nrtc}
+\item	QUITE SIMPLE COMPARED TO SESSION SERVICE
+	\begin{nrtc}
+	\item	{\em ALTHOUGH IT MAY NOT APPEAR SO}
+	\end{nrtc}
+%\item	PRIMITIVES PREFIXED WITH {\em P---\ldots}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {USERS}
+%
+%\begin{nrtc}
+%\item	{\em PS--users} ARE APPLICATION SERVICE ELEMENTS (ASEs)
+%\item	PRESENTATION VIEW:  SINGLE ENTITY IS A {\em PS--user}
+%\item	APPLICATION VIEW:  MANY ASEs COOPERATE TO APPEAR AS ONE {\em PS-user}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {\em PS-users}
+%
+%\begin{nrtc}
+%\item	CONNECTION ESTABLISHMENT
+%	\begin{nrtc}
+%	\item	CALLING {\em PS-user}
+%	\item	CALLED {\em PS-user}
+%	\end{nrtc}
+%\item	ACTION INITIATION
+%	\begin{nrtc}
+%	\item	REQUESTING {\em PS-user}  
+%	\item	ACCEPTING {\em PS-user}
+%	\end{nrtc}
+%\item	CONNECTIONS ARE SYMMETRIC
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {ADDRESSING}
+%
+%\begin{nrtc}
+%\item	USER ADDRESSED AT PRESENTATION SERVICE ACCESS POINT (PSAP)
+%	\begin{nrtc}
+%	\item	PRESENTATION SELECTOR
+%	\item	SESSION ADDRESS
+%	\end{nrtc}
+%\item	SELECTOR IS A STRING OF OCTETS
+%\item	SESSION ADDRESS IDENTIFIES A GIVEN PRESENTATION ENTITY
+%\item	PRESENTATION SELECTOR IDENTIFIES A SPECIFIC USER OF THAT ENTITY
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {PRESENTATION PROVIDES}
+%
+%\begin{nrtc}
+%\item	{\em PRESENTATION} CONTEXT MANAGEMENT
+%\item	{\em SESSION FUNCTIONALITY}
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {PRESENTATION CONTEXTS}
+
+\begin{nrtc}
+\item	A CONTEXT IS A PAIRING OF:
+	\begin{nrtc}
+	\item	A SET OF DATA STRUCTURE DEFINITIONS (ABSTRACT SYNTAX)
+	\item	RULES FOR ENCODING THOSE DATA STRUCTURES ON THE NETWORK 
+		(TRANSFER SYNTAX)
+	\end{nrtc}
+\item	PRESENTATION CONTEXT IDENTIFIER (PCI)
+	\begin{nrtc}
+	\item	{\small (DIFFERENT THAN PROTOCOL CONTROL INFORMATION --- PCI)}
+	\end{nrtc}
+\item	USER DATA GIVEN TO PRESENTATION IS MARKED WITH A CONTEXT
+	\begin{nrtc}
+	\item	FOR A GIVEN ASE, e.g., ASSOCIATION CONTROL
+	\end{nrtc}
+\item	CONTEXTS MAY BE DEFINED OR REMOVED FOLLOWING PRESENTATION CONNECTION
+	ESTABLISHMENT
+\item	EVENTS MAY ALTER DEFINED CONTEXT SET (e.g., RESYNCHRONIZATION)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {TRANSFER SYNTAXS}
+
+\begin{nrtc}
+\item	PRESENTATION NEGOTIATES TRANSFER SYNTAX ASSOCIATED WITH EACH
+	ABSTRACT SYNTAX
+	\begin{nrtc}
+	\item	THIS IS AN EASY JOB, \underline{TODAY}!
+	\end{nrtc}
+\item	THE {\em BER} IS THE ONLY TRANSFER SYNTAX DEFINED TODAY
+\item	{\em ASN.1} IS THE ONLY ABSTRACT SYNTAX DEFINED TODAY
+\item	APPLICATION MAY NEED TO ``HINT'' AT TRANSFER SYNTAX {\em IN THE FUTURE}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {DEFINED CONTEXT SET (DCS)}
+
+\begin{nrtc}
+\item	SET OF CONTEXTS BEING USED ON CONNECTION
+\item	INITIALLY SUPPLIED BY USER
+\item	NEGOTIATED BY PRESENTATION
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{note}
+%provide negotiation scenario?
+%\end{note}
+
+
+\begin{bwslide}
+\ctitle {CONTEXT MANAGEMENT}
+
+\begin{nrtc}
+\item \underline{OPTIONAL} FUNCTIONALITY TO CHANGE {\em DCS} DURING CONNECTION
+\item NEGOTIATION PROCESS DURING CONNECTION SAME AS ORIGINAL, {\em IF AVAILABLE}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {FUNCTIONAL UNITS}
+%
+%\begin{nrtc}
+%\item	KERNEL
+%	\begin{nrtc}
+%	\item	MANDATORY
+%	\end{nrtc}
+%\item	CONTEXT MANAGEMENT
+%	\begin{nrtc}
+%	\item	OPTIONAL
+%	\end{nrtc}
+%\item	CONTEXT RESTORATION
+%	\begin{nrtc}
+%	\item	OPTIONAL
+%	\item	{\em ONLY POSSIBLE IF CONTEXT MANAGEMENT AVAILABLE}
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {PRESENTATION USER DATA}
+%
+%\begin{nrtc}
+%\item	PRESENTATION SERVICE DATA UNIT (PSDU)
+%\item	COMPOSED OF:
+%	\begin{nrtc}
+%	\item	PRESENTATION DATA VALUES
+%	\end{nrtc}
+%\item	{\em EXCEPTION}: EXPEDITED DATA IS ALWAYS SENT IN THE DEFAULT CONTEXT
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {PRESENTATION DATA VALUES}
+%
+%\begin{nrtc}
+%\item	EACH HAS AN ASSOCIATED PCI
+%\item	IMPLEMENTOR MAY CHOOSE LOCAL REPRESENTATION
+%\item	ORDER OF VALUES IS PRESERVED IN PSDUs
+%\item	MAY CONTAIN DATA OF ANOTHER ABSTRACT SYNTAX
+%	\begin{nrtc}
+%	\item	BUT ONLY ONE TRANSFER SYNTAX USED
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {?}
+%
+%THE PRESENTATION SERVICE HAS NO EXPLICIT KNOWLEDGE OF ASN.1 OR THE BER.
+%BUT THE PROVIDER USES BOTH CONCEPTS INTERNALLY.
+%
+%PROVIDE SOME SUPPORT FOR THIS IDEA.
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {ACCESS TO SESSION SERVICE}
+%
+%\begin{nrtc}
+%\item	PRESENTATION HAS A STRAIGHT FORWARD MAPPING TO THE SESSION SERVICE
+%\item	SESSION PRIMITIVES HAVE CORRESPONDING PRESENTATION PRIMITIVES
+%\item	PRESENTATION REQUIREMENTS IMPLY REQUIREMENTS ON SESSION FUNCTIONAL UNITS
+%\item	SOME PRESENTATION CONCEPTS ARE ``PASS--THROUGH'' TO SESSION
+%	\begin{nrtc}
+%	\item	e.g., QUALITY OF SERVICE
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {IMPLEMENTATION CONSIDERATIONS}
+
+\begin{nrtc}
+\item	STRONG MAPPING TO SESSION SIMPLIFIES PRESENTATION IMPLEMENTATION
+\item	PRESENTATION STATE MACHINE OFTEN PROVIDED IMPLICITLY BY SESSION
+\item	EXTRA WORK OVER SESSION:
+	\begin{nrtc}
+	\item	TRANSFORMING PSDUs INTO SSDUs \& BACK
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {IMPLEMENTATION CONSIDERATIONS (cont.)}
+
+\begin{nrtc}
+\item	PRESENTATION PRIMITIVES MAP EASILY TO PROCEDURE CALLS/RETURNS
+\item	USING SESSION TO ENFORCE MOST RULES MOST PRESENTATION PRIMITIVES 
+	ARE SIMPLE
+	\begin{nrtc}
+	\item	CHECK ANY SPECIFIC PRESENTATION INTERFACE POLICIES
+	\item	MAP PSDU TO SSDU
+	\item	INVOKE CORRESPONDING SESSION SERVICE
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {ENCODINGS}
+%
+%\begin{nrtc}
+%\item	ASN.1 USED TO DEFINE PPDUs
+%\item	THE BER IS USED TO ``SERIALIZE'' PPDUs TO \& FROM SSDUs
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {LIGHTWEIGHT PRESENTATION PROTOCOL}
+
+\vskip.5in
+\diagram[p]{figureA-25}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {LIGHTWEIGHT PRESENTATION (cont.)}
+
+\begin{nrtc}
+\item	INTERNET COMMUNITY CREATION
+\item	STREAM--LINED PRESENTATION \& SESSION SERVICES
+\item	AVOIDS CUMBERSOME OVERHEAD OF COMPLETE SERVICES
+\item	INTENDED FOR USE BY SPECIFIC ASEs
+\item	WILL \underline{NOT} SATISFY ALL ASE REQUIREMENTS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {LIGHTWEIGHT PRESENTATION (cont.)}
+
+\begin{nrtc}
+\item	SUPPLIES FUNCTIONALITY REQUIRED BY:
+	\begin{nrtc}
+	\item	ASSOCIATION CONTROL
+	\item	REMOTE OPERATIONS
+	\end{nrtc}
+\item	SATISFIES EXISTING OSI APPLICATIONS
+	\begin{nrtc}
+	\item	NETWORK MANAGEMENT ({\em ORIGINAL MOTIVATION})
+	\item	DIRECTORY SERVICES
+	\end{nrtc}
+\item	SHOWN TO BE UP TO TWICE AS PERFORMANT
+	\begin{nrtc}
+	\item	(PLUS MUCH SMALLER APPLICATION PROGRAMS)
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {LIGHTWEIGHT PRESENTATION (cont.)}
+
+\begin{nrtc}
+\item	PROVIDES IDENTICAL APPLICATION PROGRAM INTERFACE
+	\begin{nrtc}
+	\item	IMPLIES APPLICATIONS CAN BE EASILY PORTED TO ``REAL'' OSI
+	\end{nrtc}
+\item	\underline{PROTOCOL} DOES \underline{NOT} INTEROPERATE 
+		WITH ``REAL'' OSI APPLICATIONS
+	\begin{nrtc}
+	\item	WOULD REQUIRE AN APPLICATION LAYER GATEWAY TO AN OSI STACK
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {USER CONSIDERATIONS}
+%
+%\begin{nrtc}
+%\item	{\em P-CONNECT}
+%	\begin{nrtc}
+%	\item	PASSING A DATA VALUE WITH AN ABSTRACT SYNTAX UNKNOWN TO 
+%		THE RESPONDER MAY RESULT IN A REJECT
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GENERAL POINTS}
+
+PRESENTATION, SYNTAXES, AND CONTEXTS WHILE NOT VERY COMPLEX CAN PRESENT A GREAT 
+DEAL OF CONFUSION.  SORTING OUT THE TERMS AND THEIR SIGNIFICANCE WILL MAKE ANY
+OSI APPLICATION DEVELOPERS LIFE MUCH EASIER.  UNDERSTANDING THESE CONCEPTS IS
+VITAL TO SUCCESSFUL INTEROPERABILITY TESTING.
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {PURPOSE}
+%
+%\begin{nrtc}
+%\item	SEMANTIC EQUIVALENCE
+%	\begin{nrtc}
+%	\item	SENDING ENTITY
+%	\item	RECEIVING ENTITY
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle{PROBLEMS}
+%
+%\begin{nrtc}
+%\item	REPRESENTATION OF PRIMATIVE VALUES
+%	\begin{nrtc}
+%	\item	INTEGERS
+%		\begin{nrtc}
+%		\item	1's OR 2's COMPLEMENT
+%		\item	BIT ORDERING
+%		\item	RANGE RESTRICTIONS
+%		\end{nrtc}
+%	\item	ENUMERATIONS, SCALARS
+%	\item	CHARACTER SETS
+%	\item	FLOATING POINT!
+%	\end{nrtc}
+%\item	REPRESENTATION OF CONSTRUCTORS
+%	\begin{nrtc}
+%	\item	ARRAY, RECORDS, FILES, ...
+%		\begin{nrtc}
+%		\item	ORDERING, PACKING, ALIGNMENT
+%		\end{nrtc}
+%	\item	VARIANTS, CHOICES, etc.
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {REFERENCES}
+%
+%\begin{description}
+%\item[ISO/IEC 8322:]	Basic Connection Oriented Presentation 
+%							Service Definition
+%\item[ISO/IEC 8323:]	Basic Connection Oriented Presentation 
+%							Protocol Specification
+%\end{description}
+%\end{bwslide}

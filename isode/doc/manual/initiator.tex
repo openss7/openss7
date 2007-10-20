@@ -1,0 +1,207 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter       {Boilerplate for Initiators}\label{cook:initiator}
+Let's consider how to build an initiator which is also an invoker.
+In Chapter~\ref{cook:discipline},
+two forms for an initiator were identified:
+{\em interactive}, and {\em embedded}.
+The interactive initiator can be thought of as simply being a special case of
+an embedded initiator.
+Hence,
+we will start by describing the embedded initiator and then describe the
+additional structure added to form an interactive initiator.
+
+If you have access to the source tree for this release,
+the directory \file{others/lookup/} contains the boilerplate described herein.
+
+\section	{Embedded Initiator}
+An embedded initiator is characterized as automatically managing an association
+and invoking operations as required.
+There are four areas: association establishment, operation invocation,
+association release, and error handling.
+
+\subsection	{Association Establishment}
+The application-entity information and presentation address for the desired
+service are computed,
+along with the application context and default presentation context
+information for the service.
+In addition,
+a session reference identifier is chosen.
+
+The routine \verb"AcAssocRequest" is called to establish an association for
+the service.
+The arguments are strictly boilerplate:
+they will work unaltered for most applications.
+If the association is established,
+then the routine \verb"RoSetService" is used to tell the remote operations
+library to use the presentation service as its underlying service.
+
+\tgrindfile{ryinit-estab}
+\newpage
+
+\subsection	{Operation Invocation}
+We'll consider how an operation is invoked using both the synchronous and
+asynchronous interfaces.
+
+\subsubsection	{Synchronous Invocation}
+First, the argument (if any) for the operation is allocated and initialized.
+Then the macro \verb"op_MODULE_operation" is called,
+which is really a call to the \verb"RyOperation" routine described in
+Section~\ref{ryoperation} on page~\pageref{ryoperation}.
+One of three values is expected to be returned.
+
+If the manifest constant \verb"NOTOK" is returned,
+then some error has occured prior to invoking the operation.
+The most common error is the association being abruptly terminated due to
+network failure.
+
+If the manifest constant \verb"OK" is returned,
+then the responder replied with either a result or an error for the invocation.
+The variable \verb"response" is consulted to determine if a result is
+present, or if not, which error is present.
+For each case,
+the \verb"out" variable is cast to the appropriate variable,
+the application-specific code is executed,
+and then the structure is freed.
+
+If the manifest constant \verb"DONE" is returned,
+then the responder indicated that it wished to terminate the association.
+Since the association was established in a way which prohibited this behavior,
+this return is unlikely.
+
+\tgrindfile{ryinit-invoke}
+\newpage
+
+\subsubsection	{ASynchronous Invocation}
+
+\tgrindfile{ryinit-async}
+\newpage
+
+
+\subsection	{Association Release}
+Terminating the assocation is simple:
+the routine \verb"AcRelRequest" is called.
+
+\tgrindfile{ryinit-release}
+\newpage
+
+\subsection	{Error Handling}
+These routines for the most part are all straight-forward.
+\begin{describe}
+\item[\verb"ros\_adios":] used to report a ROS error and terminate;
+
+\item[\verb"ros\_advise":] used to report a ROS error;
+
+\item[\verb"acs\_adios":] used to report an ACS error and terminate;
+
+\item[\verb"acs\_advise":] used to report an ACS error;
+
+\item[\verb"adios":] used to report an error and terminate;
+and,
+
+\item[\verb"advise":] used to report an error.
+\end{describe}
+It is assumed that there is a definition of the form
+\begin{quote}\small\begin{verbatim}
+char   *myname = "myname";
+\end{verbatim}\end{quote}
+for use by the \verb"advise" routine.
+
+\tgrindfile{ryinit-error}
+\newpage
+
+\section	{Interactive Initiator}
+Now, let's build on these routines to write an initiator which is interactive:
+the user runs a program and interactively directs the invocation of
+operations.
+
+\subsection	{Include File}
+Let's consider what an \verb"#include" file, say \verb"ryinitiator.h",
+might look like.
+First, the standard \man librosy(3n) definitions are included,
+then a \verb"dispatch" structure is defined,
+along with the boilerplate routines.
+The \verb"dispatch" structure will be used by the boilerplate to invoke a
+user-supplied routine that will invoke the operation.
+
+\tgrindfile{ryinitiator-h}
+\newpage
+
+\subsection	{Worker Routines}
+Now, let's consider the routines which implement the interactive initiator.
+There are only two: \verb"ryinitiator" and \verb"getline".
+
+The \verb"ryinitiator" routine does most of the work:
+\begin{quote}\index{ryinitiator}\small\begin{verbatim}
+int     ryinitiator (argc, argv, myservice, mycontext,
+                mypci, ops, dispatches, quit)
+int     argc;
+char  **argv,
+       *myservice,
+       *mycontext,
+       *mypci;
+struct RyOperation ops[];
+struct dispatch *dispatches;
+IFP    quit;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"argc"/\verb"argv":] the argument vector (and its length)
+that the program was invoked with;
+
+\item[\verb"myservice":] the non-host portion of the application-entity
+information;
+
+\item[\verb"mycontext":] the application context name of the service;
+
+\item[\verb"mypci":] the abstract syntax of the service;
+
+\item[\verb"ops":] the operations defined for the service;
+
+\item[\verb"dispatches":] a pointer to a \verb"dispatch" table;
+and,
+
+\item[\verb"quit":] a routine to call when the association is to be
+terminated.
+\end{describe}
+The function of this routine is straight-forward though tedious.
+First, \verb"myname" is initialized to the name that the program was invoked
+with.
+Next, a rudimentary argument check is done,
+and the application-entity information and presentation address for the desired
+service are computed.
+This is followed by computing the application context and default
+presentation context information for the service,
+along with a session reference identifier.
+Finally, some diagnostic information may be printed out if the program will
+operate in interactive mode.
+
+The routine \verb"AcAssocRequest" is called to establish an association for
+the service.
+If successful,
+the routine \verb"RoSetService" is used to tell the remote operations library
+to use the presentation service as the underlying service.
+
+The interactive loop is then entered:
+a line is read from the standard input (the \verb"getline" routine is called),
+it is broken into components,
+a search is performed on the dispatch table to find a matching keyword,
+and then finally the user-supplied routine is called.
+When end-of-file is reached
+(or if the user-supplied routine returns the manifest constant \verb"DONE"),
+the assocation is released.
+
+If additional arguments were present on the invocation line,
+then the named operation is invoked instead of entering an interactive loop.
+
+\tgrindfile{ryinitiator-c}
+\newpage
+
+\subsection	{An Example}
+An example of an interactive initiator written using this boilerplate is
+shown in Section~\ref{passwd:initiator} on page~\pageref{passwd:initiator}.
+However,
+a brief exposition of the \verb"dispatch" structure and possible
+\verb"help" and \verb"quit" routines are shown here.
+
+\tgrindfile{ryinit-example}

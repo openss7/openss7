@@ -1,0 +1,107 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{The ISO Documents Database}\label{isodocuments}
+The database \file{isodocuments} in the ISODE \verb"ETCDIR" directory
+(usually the directory \file{/usr/etc/})
+contains a simple mapping between
+textual descriptions of FTAM document types and the various object
+identifiers which compose each document type.
+
+The database itself is an ordinary ASCII text file containg information
+regarding the known FTAM document types on the host.
+Each line contains
+\begin{itemize}
+\item	the entry number of the document type, a simple string;
+
+\item	the document type, an object identifier;
+
+\item	the constraint set, an object identifier;
+
+\item	the abstract syntax, an object identifier;
+and,
+
+\item	the transfer syntax, an object identifier
+\end{itemize}
+Blanks and/or tab characters are used to seperate items.
+However, double-quotes may be used to prevent separation for items containing
+embedded whitspace.
+The sharp character (`\verb"#"') at the beginning of a line indicates a
+commentary line.
+
+\section	{Accessing the Database}
+The \man libftam(3n) library contains the routines used to access the database.
+These routines ultimately manipulate an \verb"isodocment" structure,
+which is the internal form.
+\begin{quote}\index{isodocument}\small\begin{verbatim}
+struct isodocument {
+    char   *id_entry;
+
+    OID     id_type;
+    OID     id_constraint;
+    OID     id_abstract;
+    OID     id_transfer;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"id\_entry":] the entry number of the document type;
+
+\item[\verb"id\_type":] the document type;
+
+\item[\verb"id\_constraint":] the constraint set;
+
+\item[\verb"id\_abstract":] the abstract syntax;
+and,
+
+\item[\verb"id\_transfer":] the transfer syntax.
+\end{describe}
+
+The routine \verb"getisodocument" reads the next entry in the database,
+opening the database if necessary
+\begin{quote}\index{getisodocument}\small\begin{verbatim}
+struct isodocument *getisodocument ()
+\end{verbatim}\end{quote}
+It returns the manifest constant \verb"NULL" on error or end-of-file.
+
+The routine \verb"setisodocument" opens and rewinds the database.
+\begin{quote}\index{setisodocument}\small\begin{verbatim}
+int     setisodocument (f)
+int     f;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"f":] the ``stayopen'' indicator,
+if non-zero, then the database will remain open over subsequent calls to the
+library.
+\end{describe}
+The routine \verb"endisodocument" closes the database.
+\begin{quote}\index{endisodocument}\small\begin{verbatim}
+int     endisodocument ()
+\end{verbatim}\end{quote}
+Both of these routines return non-zero on success and zero otherwise.
+
+There are two routines used to fetch a particular entry in the database.
+The routine \verb"getisodocumentbyentry" maps textual descriptions into
+the internal form.
+\begin{quote}\index{getisodocumentbyentry}\small\begin{verbatim}
+struct isodocument *getisodocumentbyentry (entry)
+char   *entry;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"entry":] the descriptor of the object.
+\end{describe}
+and returns the \verb"isodocument" structure describing that document.
+On failure, the manifest constant \verb"NULL" is returned instead.
+
+The routine \verb"getisodocumentbytype" performs the inverse function.
+\begin{quote}\index{getisodocumentbytype}\small\begin{verbatim}
+struct isodocument *getisodocumentbytype (tpye)
+OID     type;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"type":] the identifier of the document.
+\end{describe}
+On a successful return,
+an \verb"isodocument" structure describing the document is returned.

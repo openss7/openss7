@@ -1,0 +1,42 @@
+\contentsline {chapter}{\numberline {1}Introduction}{1}
+\contentsline {section}{\numberline {1.1}The White Pages Service}{3}
+\contentsline {section}{\numberline {1.2}The OSI Directory}{3}
+\contentsline {subsection}{\numberline {1.2.1}Naming}{4}
+\contentsline {section}{\numberline {1.3}Ramifications on the White Pages Service}{5}
+\contentsline {subsection}{\numberline {1.3.1}Unique Identification of Users}{5}
+\contentsline {subsection}{\numberline {1.3.2}Searching the White Pages}{6}
+\contentsline {subsection}{\numberline {1.3.3}Structure of Information}{7}
+\contentsline {section}{\numberline {1.4}Where to turn for help}{9}
+\contentsline {chapter}{\numberline {2}The White Pages User Interface}{10}
+\contentsline {section}{\numberline {2.1}Invoking Fred}{10}
+\contentsline {subsection}{\numberline {2.1.1}Fred resides locally}{10}
+\contentsline {subsection}{\numberline {2.1.2}Fred resides remotely}{12}
+\contentsline {subsubsection}{via Guest account}{12}
+\contentsline {subsubsection}{via WHOIS}{13}
+\contentsline {subsubsection}{via mail}{13}
+\contentsline {section}{\numberline {2.2}Giving commands to Fred}{13}
+\contentsline {section}{\numberline {2.3}Let your fingers do the walking}{14}
+\contentsline {subsection}{\numberline {2.3.1}The Alias Command}{14}
+\contentsline {subsection}{\numberline {2.3.2}Back to Searching}{15}
+\contentsline {subsection}{\numberline {2.3.3}The Area Command}{18}
+\contentsline {subsection}{\numberline {2.3.4}Getting Help}{19}
+\contentsline {subsection}{\numberline {2.3.5}Reporting problems}{19}
+\contentsline {subsection}{\numberline {2.3.6}Quitting}{20}
+\contentsline {subsection}{\numberline {2.3.7}Setting Variables}{20}
+\contentsline {subsection}{\numberline {2.3.8}via WHOIS or mail}{21}
+\contentsline {section}{\numberline {2.4}More on Searching}{21}
+\contentsline {subsection}{\numberline {2.4.1}Input Field}{21}
+\contentsline {subsection}{\numberline {2.4.2}Record Type}{22}
+\contentsline {subsubsection}{More on the Area Command}{23}
+\contentsline {subsection}{\numberline {2.4.3}Area Designator}{24}
+\contentsline {subsection}{\numberline {2.4.4}Output Control}{25}
+\contentsline {section}{\numberline {2.5}Editing your Entry}{25}
+\contentsline {subsection}{\numberline {2.5.1}Who are You?}{26}
+\contentsline {subsection}{\numberline {2.5.2}Editing the Entry}{26}
+\contentsline {chapter}{\numberline {3}The Directory User Interface}{27}
+\contentsline {chapter}{\numberline {4}Other Programs of Interest}{28}
+\contentsline {section}{\numberline {4.1}Faces}{28}
+\contentsline {subsection}{\numberline {4.1.1}xwho}{28}
+\contentsline {subsection}{\numberline {4.1.2}xface}{29}
+\contentsline {section}{\numberline {4.2}Mail Composition}{29}
+\contentsline {chapter}{\numberline {A}Attributes for Persons in the Pilot Project}{30}

@@ -1,0 +1,64 @@
+\File{na.py},{10:21},{Feb 27 1989}
+\L{\LB{}}
+\L{\LB{\Proc{QuipuObject}QuipuObject ::= \K{OBJECT}\-\K{CLASS}}}
+\L{\LB{}\Tab{8}{\K{SUBCLASS} \K{OF} top}}
+\L{\LB{}\Tab{8}{\K{MUST} \K{CONTAIN} \{aCL\}}}
+\L{\LB{}}
+\L{\LB{\Proc{QuipuNonLeafObject}QuipuNonLeafObject ::= OBJECTCLASS}}
+\L{\LB{}\Tab{8}{\K{SUBCLASS} \K{OF} quipuObject}}
+\L{\LB{}\Tab{8}{\K{MUST} \K{CONTAIN} \{masterDSA\}}}
+\L{\LB{}\Tab{8}{\K{MAY} \K{CONTAIN} \{slaveDSA,treeStructure\}}}
+\L{\LB{}}
+\L{\LB{\Proc{QuipuDSA}QuipuDSA ::= \K{OBJECT}\-\K{CLASS} }}
+\L{\LB{    \K{SUBCLASS} \K{OF} dsa}}
+\L{\LB{}\Tab{32}{\C{}\-\- No Attributes, just object class}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- to tell you what it is}}
+\CE{}\L{\LB{}}
+\L{\LB{\Proc{QuipuDSAInfo}QuipuDSAInfo ::= \K{OBJECT}\-\K{CLASS}}\Tab{32}{\C{}\-\- always has common name \"Info\"}}
+\CE{}\L{\LB{    \K{SUBCLASS} \K{OF} top}}
+\L{\LB{    \K{MUST} \K{CONTAIN} \{ commonName, edbInfo, quipuVersion, dSAControl \}}}
+\L{\LB{    \K{MAY} \K{CONTAIN} \{ presentationAddress, mhs\-or\-addresses, description \}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\Proc{EDBInfoSyntax}EDBInfoSyntax ::= \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{edb          DistinguishedName,}}
+\L{\LB{}\Tab{8}{getFromDSA   DistinguishedName \K{OPTIONAL},}}
+\L{\LB{}\Tab{32}{\C{}\-\- If omitted DSA is master}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- Determine mode of update from this DSA}}
+\CE{}\L{\LB{}\Tab{8}{sendToDSAs   NameList,}}
+\L{\LB{}\Tab{32}{\C{}\-\- Send these DSAs incremental updates}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- Namelist is defined with the ACLs}}
+\CE{}\L{\LB{}\Tab{8}{getEDBAllowed NameList}}
+\L{\LB{}\Tab{32}{\C{}\-\- List of DSAs allowed to pull EDB}}
+\CE{}\L{\LB{}\Tab{8}{\}}}
+\L{\LB{    }}
+\L{\LB{\Proc{EdbInfo}EdbInfo ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} EDBInfo}}
+\L{\LB{    \K{MULTI} \K{VALUE}}}
+\L{\LB{}}
+\L{\LB{\Proc{MasterDSA}MasterDSA ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} distinguishedNameSyntax}}
+\L{\LB{    }\Tab{24}{\C{}\-\- Master QSR}}
+\CE{}\L{\LB{    }\Tab{24}{\C{}\-\- Usually, but not necessarily single valued}}
+\CE{}\L{\LB{}}
+\L{\LB{\Proc{SlaveDSA}SlaveDSA ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} distinguishedNameSyntax}}
+\L{\LB{    }\Tab{24}{\C{}\-\- Slave QSR}}
+\CE{}\L{\LB{}}
+\L{\LB{\Proc{SubordinateReference}SubordinateReference ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} AccessPoint}}
+\L{\LB{    \K{SINGLE} \K{VALUE}}}
+\L{\LB{ }}
+\L{\LB{\Proc{CrossReference}CrossReference ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} AccessPoint}}
+\L{\LB{    \K{SINGLE} \K{VALUE}}}
+\L{\LB{ }}
+\L{\LB{\Proc{NonSpecificSubordinateReference}NonSpecificSubordinateReference ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} AccessPoint}}
+\L{\LB{}}
+\L{\LB{\Proc{QuipuVersion}QuipuVersion ::= \K{ATTRIBUTE}}}
+\L{\LB{   \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} caseIgnoreStringSyntax}}
+\L{\LB{}}
+\L{\LB{\Proc{DSAControl}DSAControl ::= \K{ATTRIBUTE}}}
+\L{\LB{   \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} caseIgnoreStringSyntax}}
+\L{\LB{ }}

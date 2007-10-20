@@ -1,0 +1,23 @@
+.PS 5.5i
+.ps 20
+## figure T-7
+E1:	ellipse height 5*boxwid width 2*boxwid "CLNS" "subnetwork"
+B1:	box "ES" with .e at (E1.w.x-linewid, E1.w.y)
+	line from B1.e to E1.w
+##
+E2:	ellipse height 3*boxwid width 2*boxwid "CONS" "subnetwork" \
+		with .sw at (E1.ne.x+2*linewid+boxwid, E1.ne.y)
+B2:	box "ES" with .w at (E2.e.x+linewid, E2.e.y)
+	line from B2.w to E2.e
+G1:	box "GW" with .e at (E2.sw.x-linewid, E2.sw.y)
+	line from G1.e to E2.sw; line from E1.ne to G1.w
+G3:	box "GW" with .e at (E2.nw.x-linewid, E2.nw.y)
+	line from G3.e to E2.nw; line from E1.n to G3.w
+E3:	ellipse height 3*boxwid width 2*boxwid "CONS" "subnetwork" \
+		with .nw at (E1.se.x+2*linewid+boxwid, E1.se.y)
+B3:	box "ES" with .w at (E3.e.x+linewid, E3.e.y)
+	line from B3.w to E3.e
+G2:	box "GW" with .e at (E3.w.x-linewid, E3.w.y)
+	line from G2.e to E3.w; line from E1.se to G2.w
+##
+.PE

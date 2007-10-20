@@ -1,0 +1,25 @@
+.PS 7.5i
+.ps 20
+## figure 5
+B1:	box "SESSION SERVICES" width 3*boxwid
+B2:	box "PRESENTATION SERVICES" width 3*boxwid with .sw at B1.nw
+B3:	box "ASN.1" with .se at (B1.ne.x+boxwid, B1.ne.y+boxht/2) \
+		height 2*boxht
+B7:	box "\xx DIRECTORY" "\xx SERVICES" with .se at B2.ne \
+		width 3*boxwid/5
+B4:	box "\yy ASSOCIATION" "\yy CONTROL" with .ne at B7.nw \
+		width 3*boxwid/5
+B6:	box "\yy COMMITMENT" "\yy CONCURRENCY" "\yy AND RECOVERY" \
+		with .ne at B4.nw width 3*boxwid/5
+B8:	box "\xx REMOTE" "\xx OPERATIONS" with .ne at B6.nw width 3*boxwid/5
+B9:	box "\xx RELIABLE" "\xx TRANSFER" with .ne at B8.nw width 3*boxwid/5
+##
+	line from B2.nw \
+	     to (B2.nw.x, B3.n.y+boxht/2) \
+	     to (B3.nw.x, B3.n.y+boxht/2) \
+	     to B3.nw
+B5:	box invis width 3*boxwid height B3.n.y+boxht/2-B2.nw.y \
+	    with .sw at B2.nw
+	move to (B5.n.x, B5.n.y-lineht/2); "APPLICATION (SASE)"
+##
+.PE

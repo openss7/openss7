@@ -1,0 +1,17 @@
+.PS 6.0i
+.ps 20
+## figure D-3
+C1:	circle rad 1.75i
+##
+B1:	box with .n at C1.n invis "The" "Directory"
+##
+C2:	circle at C1.c rad .4i			"DSA"
+C3:	circle with .w at C1.w rad .4i		"DSA"
+C4:	circle with .s at C1.s rad .4i		"DSA"
+C5:	circle with .ne at C1.ne rad .4i	"DSA"
+##
+C6:	circle at (C1.w.x - (C1.c.x - C1.w.x), C3.w.y) \
+					rad .4i "DUA"
+##
+	line <- -> from C6.e to C3.w "DAP" above
+.PE

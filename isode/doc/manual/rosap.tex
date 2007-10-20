@@ -1,0 +1,981 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter       {Remote Operations}\label{librosap}
+The \man librosap(3n) library implements the Remote Operations Service (ROS).
+Three service disciplines are implemented:
+when the ECMA interpretation of the ROS is used,
+we term this the {\em basic\/} service discipline;
+when the CCITT X.400 interpretation is used,
+we term this the {\em advanced\/} service discipline;
+and,
+when the new ISO and CCITT MOTIS interpretation is used,
+we term this the {\em complete\/} service discipline.
+The advanced discipline is somewhat less restrictive than the basic
+discipline,
+at the cost of requiring a more complex implementation on the part of both
+the provider and the user.
+The complete discipline, in addition to all of the facilities provided by the
+advanced discipline, also supports the notion of {\em linked\/} operations.
+
+The abstraction provided to applications is that of an {\em association\/}
+for remote operations.
+An association is a binding between two users:
+the {\em initiator\/} of the association,
+and the {\em responder\/} to the association.
+Once an association is established,
+the initiator requests the responder to perform remote operations.
+The responder in turn attempts these operations,
+replying with either a result or an error.
+This process continues until the initiator decides to release the association.
+
+Like most models of OSI services,
+the underlying assumption is one of an asynchronous environment:
+the service provider may generate events for the service user without the
+latter entity triggering the actions which led to the event.
+For example,
+in a synchronous environment,
+an indication that data has arrived usually occurs only when the service user
+asks the service provider to read data;
+in an asynchronous environment,
+the service provider may interrupt the service user at any time to announce
+the arrival of data.
+
+The \verb"rosap" module in this release presents a synchronous interface.
+However once the association is established,
+an asynchronous interface may be selected.
+
+All of the routines in the \man librosap(3n) library are integer-valued.
+They return the manifest constant \verb"OK" on success,
+or \verb"NOTOK" otherwise.
+
+\section	{Notice}
+Please read the following important message.
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	The interface described herein is a ``raw'' interface to the
+		remote operations service.
+		Consult \volfour/ for a ``cooked'' interface.
+\end{tabular}}\]
+
+\section	{Service Disciplines and Associations}\label{ros:disciplines}
+There are three service disciplines for remote operations:
+{\em basic}, {\em remote}, and {\em complete}.
+The basic service discipline limits its users by permitting only the
+initiator to invoke remote operations.
+Certain applications,
+e.g., message handling systems,
+require more freedom than this,
+along with more reliability.
+
+The Remote Operations Service Element does not establish associations.
+Consult Section~\ref{acs:note} to determine which mechanism you should use to
+manage associations for your application.
+Since the advanced and complete disciplines are both proper supersets of the
+basic service discipline,
+two users of an association can utilize exactly the features of the basic
+service discipline even though the advanced or complete service discipline has
+been selected,
+without a loss of generality.
+
+\section       {Remote Operations}\label{ros:operations}
+Once the association has been established,
+an association-descriptor is used to reference the association.
+This is usually the first parameter given to any of the remaining routines in
+the \man librosap(3n) library.
+Further,
+the last parameter is usually a pointer to a \verb"RoSAPindication"
+structure.
+If a call to one of these routines fails,
+then the structure is updated.
+\begin{quote}\index{RoSAPindication}\small\begin{verbatim}
+struct RoSAPindication {
+    int     roi_type;
+#define ROI_INVOKE      0x00
+#define ROI_RESULT      0x01
+#define ROI_ERROR       0x02
+#define ROI_UREJECT     0x03
+#define ROI_PREJECT     0x04
+#define ROI_END         0x05
+#define ROI_FINISH      0x06
+
+    union {
+        struct RoSAPinvoke roi_un_invoke;
+        struct RoSAPresult roi_un_result;
+        struct RoSAPerror roi_un_error;
+        struct RoSAPureject roi_un_ureject;
+        struct RoSAPpreject roi_un_preject;
+        struct RoSAPend roi_un_end;
+        struct AcSAPfinish roi_un_finish;
+    }   roi_un;
+#define roi_invoke      roi_un.roi_un_invoke
+#define roi_result      roi_un.roi_un_result
+#define roi_error       roi_un.roi_un_error
+#define roi_ureject     roi_un.roi_un_ureject
+#define roi_preject     roi_un.roi_un_preject
+#define roi_end         roi_un.roi_un_end
+#define roi_finish      roi_un.roi_un_finish
+};
+\end{verbatim}\end{quote}
+As shown, this structure is really a discriminated union
+(a structure with a tag element followed by a union).
+Hence, on a failure return,
+one first coerces a pointer to the \verb"RoSAPpreject" structure contained
+therein,
+and then consults the elements of that structure.
+\begin{quote}\index{RoSAPpreject}\small\begin{verbatim}
+struct RoSAPpreject {
+    int     rop_reason;
+
+    int     rop_id;
+    PE      rop_apdu;
+
+#define ROP_SIZE        512
+    int     rop_cc;
+    char    rop_data[ROP_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of a \verb"RoSAPpreject" structure are:
+\begin{describe}
+\item[\verb"rop\_reason":] the reason for the provider-initiated reject
+(codes are listed in Table~\ref{RoSAPreasons}),
+
+\item[\verb"rop\_id"/\verb"rop\_apdu":] if an APDU could not be transferred
+(\verb"rop_reason" is \verb"ROS_APDU"), then this is the invocation ID
+of the APDU and (possibly) the APDU itself, respectively;
+and,
+
+\item[\verb"rop\_data"/\verb"rop\_cc":] a diagnostic string from the provider.
+\end{describe}
+\tagtable[tp]{2b-1a}{RoSAP Failure Codes}{RoSAPreasons}
+\tagtable[tp]{2b-1b}{RoSAP Failure Codes (continued)}\empty
+Note that the \verb"rop_apdu" element is allocated via \man malloc(3) and
+should be released using the \verb"ROPFREE" macro  when no longer referenced.
+The \verb"ROPFREE" macro behaves as if it was defined as:
+\begin{quote}\index{ROPFREE}\small\begin{verbatim}
+void    ROPFREE (rop)
+struct RoSAPpreject *rop;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated in the \verb"RoSAPpreject" structure
+and not the structure itself.
+
+On a failure return,
+if the \verb"rop_reason" element of the \verb"RoSAPpreject" structure is
+associated with a fatal error,
+the the association is released.
+The \verb"ROS_FATAL" macro can be used to determine this.
+\begin{quote}\index{ROS\_FATAL}\small\begin{verbatim}
+int     ROS_FATAL (r)
+int     r;
+\end{verbatim}\end{quote}
+For protocol purists,
+the \verb"ROS_OFFICIAL" macro can be used to determine if the error is an
+``official'' error as defined by the specification,
+or an ``unofficial'' error used by the implementation.
+\begin{quote}\index{ROS\_OFFICIAL}\small\begin{verbatim}
+int     ROS_OFFICIAL (r)
+int     r;
+\end{verbatim}\end{quote}
+
+Finally,
+some of these routines also take a \verb"priority" parameter indicating the
+relative importance of the remote operation.
+Under the basic service discipline,
+this parameter is ignored.
+Under the advanced or complete service discipline,
+each application decides on its own integer-valued definitions.
+The manifest constant \verb"ROS_NOPRIO" can be used if the application is
+unconcerned with the priority.
+
+\subsection	{Selecting an Underlying Service}\label{ros:underlying}
+As should be obvious from Section~\ref{ros:disciplines},
+the \man librosap(3n) library supports the use of three different underlying
+services,
+depending on the method used to establish the association.
+The \man librosap(3n) library is constructed in such a way as to 
+avoid loading the object code for all three underlying services
+when only one is desired.
+In order to effect this,
+it is necessary to give the loader a small hint.
+
+Once an association has been established,
+the \verb"RoSetService" routine should be called.
+\begin{quote}\index{RoSetService}\small\begin{verbatim}
+int     RoSetService (sd, bfunc, roi)
+int     sd;
+IFP     bfunc;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"bfunc":] a {\em magic\/} argument, use:
+\[\begin{tabular}{|l|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Underlying Service}&
+		\multicolumn{1}{c|}{\bf Routine}\\
+\hline
+    \tt RoRtService&	Reliable Transfer&	\tt RtOpenResponse\\
+	&		&			\tt RtOpenRequest\\
+	&		&			\tt RtBeginResponse\\
+	&		&			\tt RtBeginRequest\\
+\hline
+    \tt RoPService&	Presentation&		\tt AcAssocResponse\\
+	&		&			\tt AcAssocRequest\\
+\hline
+    \tt RoSService&	Session&		\tt RoBeginResponse\\
+	&		&			\tt RoBeginRequest\\
+\hline
+\end{tabular}\]
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure,
+which is updated only if the call fails.
+\end{describe}
+The call to \verb"RoSetService" should be made after a successful return from
+any of the routines listed above.
+
+\subsection     {Invoking Operations}
+The \verb"RoInvokeRequest" routine is used to request an operation to be
+performed remotely,
+and corresponds to a {\sf RO-INVOKE.REQUEST\/} action.
+Under the basic service discipline,
+this action may be taken by only the initiator of an association;
+under the advanced or complete service discipline,
+no such restriction is made.
+\begin{quote}\index{RoInvokeRequest}\small\begin{verbatim}
+int     RoInvokeRequest (sd, op, class, args, invoke,
+                linked, priority, roi)
+int     sd;
+int     op,
+        class,
+        invoke,
+       *linked,
+        priority;
+PE      args;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"op":] the operation code;
+
+\item[\verb"class":] the operation class
+(either \verb"ROS_SYNC" for a synchronous operation,
+or \verb"ROS_ASYNC" for an asynchronous one);
+
+\item[\verb"args":] the arguments for the operation;
+
+\item[\verb"invoke":] the invocation ID of this request;
+
+\item[\verb"linked":] the linked ID of this request
+(only present if the complete service discipline has been selected,
+use \verb"NULLIP" otherwise);
+
+\item[\verb"priority":] the priority of this request
+(use \verb"ROS_NOPRIO" if the priority is undetermined);
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure, which is
+always updated on synchronous operations,
+and only updated if the call fails for asynchronous operations.
+\end{describe}
+If the \verb"class" parameter was \verb"ROS_ASYNC",
+then \verb"RoInvokeRequest" returns immediately.
+Otherwise,
+after queuing the request,
+the \verb"RoWaitRequest" routine
+(described in Section~\ref{replies} on page~\pageref{replies})
+is called implicitly to return the reply of the request.
+Every attempt will be made to return the corresponding reply to the request.
+Nevertheless,
+it is the responsibility of the user to verify the invocation ID which is
+returned.
+
+The routine \verb"RoIntrRequest" is similar to \verb"RoInvokeRequest"
+with a \verb"class" argument of \verb"ROS_SYNC":
+it invokes an operation and then waits for a response.
+However,
+if the user generates an interrupt,
+usually by typing control-C (`\verb"^C"'),
+then \verb"RoIntrRequest" will return immediately by simulating
+a {\sf RO-U-REJECT.INDICATION\/} with reason \verb"ROS_INTERRPUTED"
+(see section~\ref{rejections} on page~\pageref{rejections}).
+This is useful for users of remote operations which support an
+``abandon'' functionality (e.g., the OSI Directory).
+\begin{quote}\index{RoInvokeRequest}\small\begin{verbatim}
+int     RoIntrRequest (sd, op, args, invoke, linked,
+                priority, roi)
+int     sd;
+int     op,
+        invoke,
+       *linked,
+        priority;
+PE      args;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"op":] the operation code;
+
+\item[\verb"args":] the arguments for the operation;
+
+\item[\verb"invoke":] the invocation ID of this request;
+
+\item[\verb"linked":] the linked ID of this request
+(only present if the complete service discipline has been selected,
+use \verb"NULLIP" otherwise);
+
+\item[\verb"priority":] the priority of this request
+(use \verb"ROS_NOPRIO" if the priority is undetermined);
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure, which is
+always updated on synchronous operations,
+and only updated if the call fails for asynchronous operations.
+\end{describe}
+
+
+\subsection     {Replying to Requests}
+When a request to perform a remote operation has been received by the
+responder to an association,
+the responder either returns a result or an error
+(or in some cases, returns nothing at all).
+
+The \verb"RoResultRequest" routine is used to return a result,
+and corresponds to the {\sf RO-RESULT.REQUEST\/} action.
+Under the basic service discipline,
+this action may only be taken by the responder to an association;
+under the advanced or complete service discipline,
+no such restriction is made.
+\begin{quote}\index{RoResultRequest}\small\begin{verbatim}
+int     RoResultRequest (sd, invoke, op, result, priority, roi)
+int     sd;
+int     invoke,
+        op,
+        priority;
+PE      result;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"invoke":] the invocation ID of the request corresponding to this
+reply;
+
+\item[\verb"op":] the operation code of the operation performed
+(meaningful only in the complete service discipline);
+
+\item[\verb"result":] the results of the operation;
+
+\item[\verb"priority":] the priority of this reply;
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+
+The \verb"RoErrorRequest" routine is used to return an error,
+and corresponds to the {\sf RO-ERROR.REQUEST\/} action.
+Under the basic service discipline,
+this action may only be taken by the responder to an association;
+under the advanced or complete service discipline,
+no such restriction is made.
+\begin{quote}\index{RoErrorRequest}\small\begin{verbatim}
+int     RoErrorRequest (sd, invoke, error, params,
+                priority, roi)
+int     sd;
+int     invoke,
+        error,
+        priority;
+PE      params;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"invoke":] the invocation ID of the request corresponding to this
+reply;
+
+\item[\verb"op":] the error code;
+
+\item[\verb"params":] the parameters for the error;
+
+\item[\verb"priority":] the priority of this request;
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+
+\subsection     {Reading Replies}\label{replies}
+The \verb"RoWaitRequest" routine is used to await either a request or a
+reply from the other user.
+\begin{quote}\index{RoWaitRequest}\small\begin{verbatim}
+int     RoWaitRequest (sd, secs, roi)
+int     sd;
+int     secs;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"secs":] the maximum number of seconds to wait for the data
+(a value of \verb"NOTOK" indicates that the call should block indefinitely,
+whereas a value of \verb"OK" indicates that the call should not block at all,
+e.g., a polling action);
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure,
+which is always updated.
+\end{describe}
+Unlike the other routines in the \man librosap(3n) library,
+the \verb"RoWaitRequest" routine returns one of three values:
+\verb"NOTOK" (on failure),
+\verb"OK" (on reading a request or a reply),
+or
+\verb"DONE" (when something else happens).
+
+If the call to \verb"RoWaitRequest" returns the manifest constant
+\verb"NOTOK",
+then the \verb"RoSAPpreject" structure contained in
+the \verb"RoSAPindication" parameter
+\verb"roi" contains the reason for the failure.
+
+Otherwise if the call to \verb"RoWaitRequest" returns the manifest constant
+\verb"OK",
+then a request or a reply has arrived.
+This event is encoded in the \verb"roi" parameter,
+depending on the value of the \verb"roi_type" element.
+Currently,
+when \verb"RoWaitRequest" returns \verb"OK",
+the \verb"roi_type" element is set to one of four values:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+			\multicolumn{1}{c|}{\bf Event}\\
+\hline
+    \tt ROI\_INVOKE&	\sf RO-INVOKE.INDICATION\\
+    \tt ROI\_RESULT&	\sf RO-RESULT.INDICATION\\
+    \tt ROI\_ERROR&	\sf RO-ERROR.INDICATION\\
+    \tt ROI\_UREJECT&	\sf RO-U-REJECT.INDICATION\\
+\hline
+\end{tabular}\]
+
+Otherwise if the call to \verb"RoWaitRequest" returns the manifest constant
+\verb"DONE",
+then some event other than a request or reply arriving has occurred.
+This event is encoded in the \verb"roi" parameter,
+depending on the value of the \verb"roi_type" element.
+Currently,
+when \verb"RoWaitRequest" returns \verb"DONE",
+the \verb"roi_type" element is set to one of two values:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+			\multicolumn{1}{c|}{\bf Event}\\
+\hline
+    \tt ROI\_END&	\sf RO-END.INDICATION\\
+	&		\ \ (for old-style associations)\\
+\hline
+    \tt ROI\_FINISH&	\sf A-RELEASE.INDICATION\\
+	&		\ \ (or {\sf RT-CLOSE.INDICATION\/})\\
+\hline
+\end{tabular}\]
+
+\subsubsection  {Invocation Indication}
+When an {\sf RO-INVOKE.INDICATION\/} event occurs,
+the \verb"roi_type" field of the \verb"roi" parameter contains the value
+\verb"ROI_INVOKE",
+and a \verb"RoSAPinvoke" structure is contained inside the \verb"roi"
+parameter.
+\begin{quote}\index{RoSAPinvoke}\small\begin{verbatim}
+struct RoSAPinvoke {
+    int     rox_id;
+
+    int     rox_linkid;
+    int     rox_nolinked;
+
+    int     rox_op;
+    PE      rox_args;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"rox\_id":] the invocation ID of this request;
+
+\item[\verb"rox\_linkid":] if \verb"rox_nolinked" is not set,
+then this contains the invocation ID of the linked request;
+
+\item[\verb"rox\_nolinked":] the linked ID indicator
+(if set, then this invocation is not linked to another operation);
+
+\item[\verb"rox\_op":] the operation code;
+and,
+
+\item[\verb"rox\_args":] the arguments for the operation.
+\end{describe}
+Note that the \verb"rox_data" element is allocated via \man malloc(3) and
+should be released using the \verb"ROXFREE" macro  when no longer referenced.
+The \verb"ROXFREE" macro behaves as if it was defined as:
+\begin{quote}\index{ROXFREE}\small\begin{verbatim}
+void    ROXFREE (rox)
+struct RoSAPinvoke *rox;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated in the \verb"RoSAPinvoke" structure
+and not the structure itself.
+
+Under the basic service discipline,
+only the responder to an association will receive this event;
+it is expected that the user will (eventually) call either
+the \verb"RoResultRequest", the \verb"RoErrorRequest",
+or perhaps the \verb"RoURejectRequest" routine in response.
+
+\subsubsection  {Result Indication}
+When an {\sf RO-RESULT.INDICATION\/} event occurs,
+the \verb"roi_type" field of the \verb"roi" parameter contains the value
+\verb"ROI_RESULT",
+and a \verb"RoSAPresult" structure is contained inside the \verb"roi"
+parameter.
+\begin{quote}\index{RoSAPresult}\small\begin{verbatim}
+struct RoSAPresult {
+    int     ror_id;
+
+    PE      ror_result;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ror\_id":] the invocation ID of this reply,
+which is identical to the ID of the request which generated the results;
+
+\item[\verb"ror\_op":] the operation code of the operation performed
+(meaningful only in the complete service discipline);
+and,
+
+\item[\verb"ror\_result":] the results of the operation.
+\end{describe}
+Note that the \verb"ror_result" element is allocated via \man malloc(3) and
+should be released using the \verb"RORFREE" macro  when no longer referenced.
+The \verb"RORFREE" macro behaves as if it was defined as:
+\begin{quote}\index{RORFREE}\small\begin{verbatim}
+void    RORFREE (ror)
+struct RoSAPresult *ror;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated in the \verb"RoSAPresult" structure
+and not the structure itself.
+
+Under the basic service discipline,
+only the initiator to an association will receive this event in response to
+an earlier call to \verb"RoInvokeRequest".
+
+\subsubsection  {Error Indication}
+When an {\sf RO-ERROR.INDICATION\/} event occurs,
+the \verb"roi_type" field of the \verb"roi" parameter contains the value
+\verb"ROI_ERROR",
+and a \verb"RoSAPerror" structure is contained inside the \verb"roi"
+parameter.
+\begin{quote}\index{RoSAPerror}\small\begin{verbatim}
+struct RoSAPerror {
+    int     roe_id;
+
+    int     roe_error;
+    PE      roe_param;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"roe\_id":] the invocation ID of this reply,
+which is identical to the ID of the request which generated the error;
+
+\item[\verb"roe\_error":] the error code;
+and,
+
+\item[\verb"roe\_param":] the parameters of the error.
+\end{describe}
+Note that the \verb"roe_param" element is allocated via \man malloc(3) and
+should be released using the \verb"ROEFREE" macro  when no longer referenced.
+The \verb"ROEFREE" macro behaves as if it was defined as:
+\begin{quote}\index{ROEFREE}\small\begin{verbatim}
+void    ROEFREE (roe)
+struct RoSAPerror *roe;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated in the \verb"RoSAPerror" structure
+and not the structure itself.
+
+Under the basic service discipline,
+only the initiator to an association will receive this event in response to
+an earlier call to \verb"RoInvokeRequest".
+
+\subsubsection  {User-Reject Indication}\label{rejections}
+When an {\sf RO-U-REJECT.INDICATION\/} event occurs,
+the \verb"roi_type" field of the \verb"roi" parameter contains the value
+\verb"ROI_UREJECT",
+and a \verb"RoSAPureject" structure is contained inside the \verb"roi"
+parameter.
+\begin{quote}\index{RoSAPureject}\small\begin{verbatim}
+struct RoSAPureject {
+    int     rou_id;
+    int     rou_noid;
+
+    int     rou_reason;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"rou\_id":] if \verb"rou_noid" is not set,
+then this contains the invocation ID of the request which generated the
+rejection;
+
+\item[\verb"rou\_noid":] the invocation ID indicator
+(if set, then no request in particular caused the rejection to be generated);
+and,
+
+\item[\verb"rou\_reason":] the reason for the rejection
+(a ``non-fatal'' user-initiated rejection code listed in
+Table~\ref{RoSAPreasons}).
+\end{describe}
+
+\subsubsection  {End Indication}\label{ros:end}
+When the \verb"roi_type" field of the \verb"roi" parameter contains the value
+\verb"ROI_END",
+a \verb"RoSAPend" structure is contained inside the \verb"roi"
+parameter.
+\begin{quote}\index{RoSAPend}\small\begin{verbatim}
+struct RoSAPend {
+    int     roe_dummy;
+};
+\end{verbatim}\end{quote}
+Depending on whether the reliable transfer service was used to start the
+association,
+a {\sf X.400 CLOSE.INDICATION\/} or a {\sf RO-END.INDICATION\/} event has
+occurred,
+and the user should respond appropriately.
+
+\subsubsection	{Finish Indication}\label{ros:finish}
+When the \verb"roi_type" field of the \verb"RoSAPindication" parameter
+\verb"roi" contains the value
+\verb"ROI_FINISH",
+a \verb"AcSAPfinish" structure is contained inside the \verb"roi" parameter.
+Depending on whether the reliable transfer service was used to start the
+association,
+an {\sf RT-CLOSE.INDICATION\/} or an {\sf A-RELEASE.INDICATION\/} event has
+occurred, and the user should respond appropriately.
+
+\subsection     {Rejecting Requests and Replies}
+The \verb"RoURejectRequest" routine is used to perform user-level
+error-recovery.
+Usually,
+it signals the rejection of a previously received request or reply.
+\begin{quote}\index{RoURejectRequest}\small\begin{verbatim}
+int     RoURejectRequest (sd, invoke, reason, priority, roi)
+int     sd;
+int    *invoke,
+        reason,
+        priority;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"invoke":] a pointer to the invocation ID of the request in
+question (or \verb"NULLIP" if this rejection does not apply to a particular
+request or reply);
+
+\item[\verb"reason":] a ``non-fatal'' user-initiated rejection code as
+listed in Table~\ref{RoSAPreasons} on page~\pageref{RoSAPreasons};
+
+\item[\verb"priority":] the priority of this request;
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+Upon a successful return from this call,
+a {\sf ROU-U-REJECT.INDICATION\/} event has been queued for the other user.
+
+\subsection     {Asynchronous Event Handling}
+The request/reply events discussed thus far have been synchronous in nature.
+Some users of the remote operations service may wish an asynchronous interface.
+The \verb"RoSetIndications" routine is used to change the service associated
+with an association-descriptor to an asynchronous interface.
+\begin{quote}\index{RoSetIndications}\small\begin{verbatim}
+int   RoSetIndications (sd, indication, roi)
+int   sd;
+IFP   indication;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"indication":] the address of an event-handler routine to be
+invoked when an event occurs;
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the service is to be made asynchronous,
+then \verb"indication" is specified;
+otherwise,
+if the service is to be made synchronous,
+it is not specified (use the manifest constant \verb"NULLIFP").
+The most likely reason for the call failing is \verb"ROS_WAITING",
+which indicates that an event is waiting for the user.
+
+When an event occurs,
+the event-handler routine is invoked with two parameters:
+\begin{quote}\small\begin{verbatim}
+(*handler) (sd, roi);
+int     sd;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure encoding
+the event.
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the appropriate macro
+(i.e., \verb"ROPFREE", \verb"ROXFREE", \verb"RORFREE", or \verb"ROEFREE")
+when no longer needed.
+
+When an event-handler is invoked,
+future invocations of the event-hander are blocked until it returns.
+The return value of the event-handler is ignored.
+Further,
+during the execution of a synchronous call to the library,
+the event-handler will be blocked from being invoked.
+The one exception to this is a call to \verb"RoInvokeRequest" with the
+\verb"class" parameter set to \verb"ROS_SYNC".
+In this circumstance,
+replies to invocations other than the one being waited for will result in the
+event-handler being invoked as appropriate.
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	The \man librosap(3n) library uses the SIGEMT signal to
+		provide these services.
+		Programs using asynchronous association-descriptors should NOT
+		use SIGEMT for other purposes.
+\end{tabular}}\]
+
+\subsection     {Synchronous Event Multiplexing}
+A user of the remote operations service may wish to manage multiple
+association-descriptors simultaneously;
+the routine \verb"RoSelectMask" is provided for this purpose.
+This routine updates a file-descriptor mask and associated counter for use
+with \verb"xselect" (consult Section~\ref{acs:select}),
+as assocation-descriptors are file-descriptors.
+\begin{quote}\index{RoSelectMask}\small\begin{verbatim}
+int     RoSelectMask (sd, mask, nfds, roi)
+int     sd;
+fd_set *mask;
+int    *nfds;
+struct RoSAPindication *roi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"mask":] a pointer to a file-descriptor mask meaningful to
+\verb"xselect";
+
+\item[\verb"nfds":] a pointer to an integer-valued location meaningful to
+\verb"xselect";
+and,
+
+\item[\verb"roi":] a pointer to a \verb"RoSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call is successful, then the \verb"mask" and \verb"nfds" parameters can
+be used as arguments to \verb"xselect".
+The most likely reason for the call failing is \verb"ROS_WAITING",
+which indicates that an event is waiting for the user.
+
+If \verb"xselect" indicates that the association-descriptor is ready for
+reading,
+\verb"RoWaitRequest" should be called with the \verb"secs" parameter equal to
+\verb"OK".
+If the network activity does not constitute an entire event for the user,
+then \verb"RoWaitRequest" will return \verb"NOTOK" with error code
+\verb"ROS_TIMER".
+
+\section       {Error Conventions}
+All of the routines in this library return the manifest constant \verb"NOTOK"
+on error,
+and also update the \verb"roi" parameter given to the routine.
+The element called \verb"roi_preject" in the \verb"RoSAPindication" structure
+encodes the reason for the failure.
+To determine the reason,
+one coerces a pointer to a \verb"RoSAPpreject" structure,
+and consults the \verb"rop_reason" element of this latter structure.
+This element can be given as a
+parameter to the routine \verb"RoErrString" which returns a null-terminated
+diagnostic string.
+\begin{quote}\index{RoErrString}\small\begin{verbatim}
+char   *RoErrString (c)
+int     c;
+\end{verbatim}\end{quote}
+
+\section       {Compiling and Loading}
+Programs using the \man librosap(3n) library should include
+\verb"<isode/rosap.h>",
+which automatically includes the header file \verb"<isode/psap.h>" described in
+Chapter~\ref{libpsap} and the header file \verb"<isode/acsap.h>" described in
+Chapter~\ref{libacsap}.
+The programs should also be loaded with \verb"-lisode".
+
+\section       {Two Examples}\label{ros:example}
+Two examples are now presented:
+a detailed exposition on the construction of a responder for remote operations;
+and,
+a terse presentation of an initiator process.
+
+\subsection	{The Generic Server}\label{ros:example:server}
+Let's consider how one might construct a generic server which uses remote
+operations services.
+This entity will use an asynchronous interface.
+
+There are two parts to the program:
+initialization and the request/reply loop.
+In our example,
+we assume that the routine \verb"error" results in the process being
+terminated after printing a diagnostic.
+
+In Figure~\ref{initROSresponder},
+the initialization steps for the generic responder,
+including the outer {\em C\/} wrapper,
+is shown.
+First, the ACSE state is re-captured by calling \verb"AcInit".
+If this succeeds,
+then any command line arguments
+are parsed.
+Assuming that the responder is satisfied with the proposed association,
+it calls \verb"AcAssocResponse" to accept the association.
+Then,
+\verb"RoSetService" is called
+to set the underlying service to be used for remote operations.
+The
+\verb"RoSetIndications" routine is called
+to specify an asynchronous event handler.
+Finally,
+the main request/reply loop is realized.
+The server simply uses \man pause(2) to wait for the next event.
+
+In Figure~\ref{doROSresponder} on page~\pageref{doROSresponder},
+the \verb"ros_indication" routine simply dispatches based on the value of the
+\verb"roi_type" element of the \verb"RoSAPindication" structure.
+{\let\small=\scriptsize			%%% yikes!
+\clearpage
+\tagrind[tp]{grind2b-2}{Initializing the generic ROS responder}%
+	{initROSresponder}
+\clearpage
+\tagrind[tp]{grind2b-3a}{The request/reply loop for the generic ROS responder}%
+	{doROSresponder}
+\clearpage
+\tagrind[tp]{grind2b-3b}%
+	{The request/reply loop for the generic ROS responder (continued)}%
+	\empty
+\clearpage
+\tagrind[tp]{grind2b-3c}%
+	{The request/reply loop for the generic ROS responder (continued)}%
+	\empty
+\clearpage
+\tagrind[tp]{grind2b-3d}%
+	{The request/reply loop for the generic ROS responder (continued)}%
+	\empty
+\clearpage
+\tagrind[tp]{grind2b-3e}%
+	{The request/reply loop for the generic ROS responder (continued)}%
+	\empty}
+
+If the event was caused by a request to invoke an operation,
+then \verb"ros_invoke" is called.
+This routine consults a dispatch table to find the function which will
+execute the operation.
+Based on the return value of the function,
+either the result is returned,
+an error is returned,
+or the request to perform the operation is rejected.
+
+If the event was caused by a reply to the invocation of an operation
+(i.e., either  results or an error),
+this is rejected.
+The basic service discipline prohibits this event from happening to
+responders;
+hence, the \verb"ros_result" and \verb"ros_error" routines are used as stubs.
+
+If the event was caused by a rejection of a previous reply,
+then the \verb"ros_ureject" routine is called to handle this.
+If the event was caused by the provider initiating a rejection,
+then the \verb"ros_preject" routine is called to handle this.
+
+Finally,
+if the event was caused by the association being released,
+the \verb"ros_finish" routine is called to handle this.
+
+\subsection	{The Generic Client}
+As the previous example described~---~in great detail~---~how users of the
+remote operations services employ the \man librosap(3n) library,
+we now present a short example of how a client connects to the server.
+
+In Figure~\ref{initROSinitiator},
+the initialization steps for the generic initiator,
+including the outer {\em C\/} wrapper,
+is shown.
+First, the application-entity information and presentation address are
+looked-up.
+Second, the application context and protocol control information objects are
+looked-up
+(and copied, since \verb"ode2oid" returns a pointer to a static area).
+Next, the session connection reference is initialized.
+Then, the call to \verb"AcAssocRequest" is made.
+The arguments to this routine are the minimal required for remote operations.
+If the call succeeds,
+then the client checks to see if the association is successfully established.
+If so, the association descriptor is captured, and then the routine
+\verb"invoke",
+which is not described in this example,
+is called.
+This routine presumably requests remote operations from the responder
+previously described.
+Upon the return of the \verb"invoke" routine,
+the association is (forcibly) released,
+and the program exits.
+{\let\small=\scriptsize			%%% yikes!
+\clearpage
+\tagrind[tp]{grind2b-4a}{Initializing the generic ROS initiator}%
+	{initROSinitiator}
+\clearpage
+\tagrind[tp]{grind2b-4b}{Initializing the generic ROS initiator (continued)}%
+	\empty}
+
+\section       {For Further Reading}\label{ros:reading}
+The ECMA technical report on remote operation services is defined in
+\cite{ECMA.ROS}.
+The CCITT recommendation describing remote operations,
+as supported by the reliable transfer service,
+is \cite{MHS.RTS}.
+These both assume the use of old-style associations;
+the draft CCITT work which assumes the use of new-style associations is
+defined in \cite{CCITT.ROS.Service} and \cite{CCITT.ROS.Protocol}.
+Similarly,
+the corresponding ISO work is
+\cite{ISO.ROS.Service} and \cite{ISO.ROS.Protocol}.
+
+%%% \section	{Changes Since the Last Release}\label{rosap:changes}
+%%% A brief summary of the major changes between v~\isodeprevrsn/ and
+%%% v~\isodevrsn/ are now presented.
+%%% These are the user-visible changes only;
+%%% changes of a strictly internal nature are not discussed.
+

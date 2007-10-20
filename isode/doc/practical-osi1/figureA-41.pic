@@ -1,0 +1,20 @@
+.PS
+.ps 20
+## figure A-41
+## EXAMPLE: CONFIRMED SERVICE (cont.)
+B1:	box "USER"
+	arrow down from B1.s "\ .REQUEST" ljust
+B2:	box "PROVIDER" width 4*boxwid with .nw at (B1.sw.x, B1.sw.y-lineht)
+B3:	box "USER" with .se at (B2.ne.x, B2.ne.y+lineht)
+	line <- down from B3.s "\ .INDICATION" ljust
+##
+B4:	box "USER" with .n at (B1.s.x, B2.s.y-2*lineht)
+	line <- down from B4.s "\ .CONFIRMATION" ljust
+B5:	box "PROVIDER" width 4*boxwid with .nw at (B4.sw.x, B4.sw.y-lineht)
+B6:	box "USER" with .se at (B5.ne.x, B5.ne.y+lineht)
+	arrow down from B6.s "\ .RESPONSE" ljust
+##
+	line dashed from (B2.sw.x, B2.sw.y-lineht) \
+		    to   (B2.se.x, B2.se.y-lineht)
+##
+.PE

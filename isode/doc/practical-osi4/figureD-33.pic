@@ -1,0 +1,63 @@
+.PS
+.ps 20
+## figure D-33
+ellipsewid=	7*ellipsewid/4
+##
+E1:	ellipse "root" invis
+E2:	ellipse "country" with .n at (E1.s.x, E1.s.y-lineht)
+E3:	ellipse "locality" with .ne at (E2.sw.x-linewid, E2.sw.y-lineht)
+E4:	ellipse "organization" with .nw at (E2.se.x+linewid, E2.se.y-lineht)
+E5:	ellipse "res.~person" \
+		with .ne at (E3.sw.x-linewid, E3.sw.y-lineht)
+E6:	ellipse "org.~unit" \
+		with .nw at (E4.se.x+linewid, E4.se.y-lineht)
+E7:	ellipse "group" "of names" \
+		with .n at (E3.s.x, E3.s.y-lineht)
+E8:	ellipse "device" \
+		with .s at (E6.n.x, E6.n.y+2*lineht)
+E11:	ellipse "appl." "process" \
+		with .n at (E2.s.x, E7.s.y-lineht)
+E12:	ellipse "appl.~entity" \
+		 with .n at (E11.s.x, E11.s.y-lineht)
+E10:	ellipse "org.~person" \
+		with .n at (E6.s.x, E11.n.y)
+E9:	ellipse "org.~role" \
+		with .ne at (E6.sw.x-linewid, E10.ne.y)
+##
+	arrow from E1.s to E2.n
+	arrow from E1.sw to E3.n
+	arrow from E1.se to E4.n
+##
+	arrow from E2.sw to E3.ne
+	arrow from E2.se to E4.nw
+##
+	line <- -> from E3.e to E4.w
+	arrow from E3.sw to E5.ne
+	arrow from E3.s to E7.n
+	line <- -> from E3.se to E6.w
+	line -> from E3.nw \
+		  to (E3.nw.x-linewid/2, E3.nw.y+linewid/2) \
+		  to ((E3.nw.x+E3.w.x)/2-linewid/2, (E3.nw.y+E3.w.y)/2+linewid/2) \
+		  to (E3.w.x-linewid/2, E3.w.y+linewid/2) \
+		  to E3.w
+##
+	arrow from E4.sw to E7.ne
+	arrow from E4.sw to E11.n
+	arrow from E4.ne to E8.sw
+	arrow from E4.s to E9.nw
+	arrow from E4.s to E10.nw
+	arrow from E4.se to E6.nw
+##
+	arrow from E6.n to E8.s
+	arrow from E6.sw to E11.ne
+	arrow from E6.sw to E9.n
+	arrow from E6.s to E10.ne
+	line -> from E6.ne \
+		  to (E6.ne.x+linewid/2, E6.ne.y+linewid/2) \
+		  to ((E6.ne.x+E6.e.x)/2+linewid/2, (E6.ne.y+E6.e.y)/2+linewid/2) \
+		  to (E6.e.x+linewid/2, E6.e.y+linewid/2) \
+		  to E6.e
+##
+	arrow from E11.s to E12.n
+##
+.PE

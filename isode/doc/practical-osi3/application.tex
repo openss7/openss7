@@ -1,0 +1,1294 @@
+% run this through LaTeX with the appropriate wrapper
+
+\dotopic{APPLICATION SERVICES}
+
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]		APPLICATION LAYER STRUCTURE
+
+\item[PART II:]		APPLICATION SERVICE ELEMENTS
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A BIG ACKNOWLEDGEMENT}
+
+\begin{nrtc}
+\item	THIS PART OF THE TALK HAS BEEN REWORKED SEVERAL TIMES
+
+\item	IN AN EFFORT TO BALANCE UNDERSTANDABILITY AND COMPLETENESS
+
+\item	IT IS BASED, IN PART, ON AN EARLIER PRESENTATION BY
+	CHRISTOPHER W.~MOORE AND MARSHALL T.~ROSE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{APPLICATION LAYER STRUCTURE}\bf
+
+\begin{nrtc}
+\item	UPPER LAYER INFRASTRUCTURE
+
+\item	APPLICATION CONTEXTS
+
+\item	APPLICATION ENTITIES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{UPPER LAYERS INFRASTRUCTURE}\bf
+
+\begin{nrtc}
+\item	PROVIDES A COMMON FRAMEWORK FOR APPLICATIONS \emph{DESIGNERS}
+
+\item	TO MAKE BUILDING APPLICATIONS EASIER FOR \emph{IMPLEMENTORS}
+
+\item	IN THEORY, THIS YIELDS BETTER APPLICATIONS FOR THE \emph{USERS}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PAYOFF OF THE INFRASTRUCTURE}
+
+\begin{nrtc}
+\item	RAPID PROTOTYPING OF APPLICATIONS
+
+\item	FOCUS DESIGN/DEVELOPMENT ON \emph{APPLICATION} ISSUES,
+	RATHER THAN UNDERLYING ISSUES
+
+\item	MINIMIZE LONG-TERM INVESTMENT OF SOFTWARE-RELATED INVESTMENT
+    \begin{nrtc}
+    \item	(AT EXPENSE OF START-UP COST)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OSI UPPER-LAYER INFRASTRUCTURE}
+
+%\vskip.5in
+\diagram[p]{figureA-1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{UPPER LAYERS INTERFACE TO\\ TRANSPORT SERVICE}
+
+\begin{nrtc}
+\item	FULL-DUPLEX CIRCUITS
+
+\item	PUMP BYTES RELIABLY ACROSS THE NETWORK
+
+\item	ALL DISCUSSION HENCE FORTH WILL BE CO-MODE
+    \begin{nrtc}
+    \item	AND VERY BRIEF!
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SESSION SERVICE}
+
+\begin{nrtc}
+\item	ADD \emph{CONTROL} FACILITIES TO MANIPULATE DIALOGUES
+
+\item	THAT ARE SPECIFIC TO A PARTICULAR APPLICATION TASK
+    \begin{nrtc}
+    \item	e.g., ACCESSING A FILE OR DELIVERYING A MAIL MESSAGE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SESSION SERVICE (cont.)}
+
+\begin{nrtc}
+\item	IN ADDITION TO TRANSPORT FUNCTIONALITY:
+    \begin{nrtc}
+    \item	TOKEN MANAGEMENT
+
+    \item	DIALOGUE CONTROL
+
+    \item	ACTIVITY MANAGEMENT
+
+    \item	EXCEPTION REPORTING
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+
+\begin{bwslide}
+\ctitle {MOVING DATA AT SESSION}
+
+\begin{nrtc}
+\item	VERSION 1 OF SESSION RESTRICTS SSDU SIZE TO 512 OCTETS FOR MANY
+	SERVICES (e.g., \verb"S-CONNECT")
+
+\item	TOO RESTRICTIVE FOR MANY OSI APPLICATIONS
+    \begin{nrtc}
+    \item	e.g., PASSING OSI DIRECTORY NAMES ON CONNECTIONS
+    \end{nrtc}
+
+\item	VERSION 2 REMOVES THIS LIMIT
+    \begin{nrtc}
+    \item	PRACTICAL LIMIT OF 10K OCTETS USED
+    \end{nrtc}
+
+\item	SESSON PROVIDES FOR DOWN-NEGOTIATION
+	\begin{nrtc}
+	\item	BUT MUST BE CAREFUL SINCE NOT ALL IMPLEMENTATIONS SUPPORT IT
+
+	\item	CHOICES
+	    \begin{nrtc}
+	    \item	APPLICATION CHOOSES ONE, ELSE
+
+	    \item	IF CONNECT SSDU $>$ 512: USE VERSION 2
+	    \end{nrtc}
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ABSTRACT SYNTAX}
+
+\begin{nrtc}
+\item	ADD \emph{STRUCTURE} FACILITIES TO MANIPULATE THE DATA
+
+\item	THAT IS EXCHANGED BETWEEN APPLICATIONS
+    \begin{nrtc}
+    \item	e.g., RECORD STRUCTURE IN A FILE OR BODY PARTS IN A MAIL
+		MESSAGE 
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ABSTRACT SYNTAX (cont.)}
+
+\begin{nrtc}
+\item	ABSTRACT SYNTAX NOTATION
+    \begin{nrtc}
+    \item	FORMAL LANGUAGE FOR DESCRIBING DATA STRUCTURES
+
+    \item	ASN.1 PROVIDES DESCRIPTIVE FRAMEWORK FOR UPPER TWO LAYERS
+    \end{nrtc}
+
+\item	TRANSFER SYNTAX NOTATION
+    \begin{nrtc}
+    \item	RESPONSIBLE FOR MAPPING INSTANCES OF DATA STRUCTURES
+		INTO A BIT STREAM (SERIALIZATION)
+
+    \item	BASIC ENCODING RULES (BER) ARE USED FOR ASN.1
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PRESENTATION SERVICE}
+
+\begin{nrtc}
+\item	APPLY
+    \begin{nrtc}
+    \item	\emph{STRUCTURE} FROM ABSTRACT SYNTAX
+    \end{nrtc}
+	ON TOP OF
+    \begin{nrtc}
+    \item	\emph{CONTROL} FROM SESSION SERVICE
+\end{nrtc}
+
+\item	REALLY NO MORE THAN ABSTRACT SYNTAX ON TOP OF PASS-THROUGH TO SESSION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PRESENTATION SERVICE (cont.)}
+
+\begin{nrtc}
+\item	IN ADDITION TO SESSION FUNCTIONALITY:
+    \begin{nrtc}
+    \item	CONTEXT MANAGEMENT
+
+    \item	SYNTAX MATCHING
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {INFRASTRUCTURE REVISITED}
+
+\begin{nrtc}
+\item	STRENGTHS
+    \begin{nrtc}
+    \item	COMMON INFRASTRUCTURE
+
+    \item	MORE TECHNICALLY COMPREHENSIVE
+    \end{nrtc}
+
+\item	WEAKNESSES
+    \begin{nrtc}
+    \item	COMPLEXITY
+
+    \item	POLITICAL POLARIZATION
+
+    \item	LACK OF PRACTICAL EXPERIENCE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{APPLICATION CONTEXTS}\bf
+
+\begin{nrtc}
+\item	OSI APPLICATION LAYER IS DIVIDED INTO
+    \begin{nrtc}
+    \item	APPLICATION SERVICE ELEMENTS (ASEs)
+    \end{nrtc}
+	EACH WITH A PARTICULAR FUNCTION
+
+\item	USE OF SERVICE ELEMENTS
+    \begin{nrtc}
+    \item	DIVIDES RESPONSIBILITY OF ``TOTAL'' APPLICATION PROTOCOL
+
+    \item	PROMOTES ``REUSE'' OF APPLICATION LAYER FACILITIES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE APPLICATION ENTITY}
+
+\vskip.5in
+\diagram[p]{figureA-6}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION CONTEXTS (cont.)}
+
+\begin{nrtc}
+\item	AN APPLICATION PROTOCOL IS DEFINED BY
+    \begin{nrtc}
+    \item	SELECTING DIFFERENT SERVICE ELEMENTS
+
+    \item	AND DECIDING HOW THEY INTERACT WITH EACH OTHER AND THE
+		PRESENTATION SERVICE 
+    \end{nrtc}
+    AND IS TERMED AN \emph{APPLICATION CONTEXT}
+
+\item	EACH APPLICATION CONTEXT IS ASSIGNED AN AUTHORITATIVE NUMBER
+    \begin{nrtc}
+    \item	TERMED AN OBJECT IDENTIFIER
+    \end{nrtc}
+    WHICH UNIQUELY IDENTIFIES THE PARTICULAR APPLICATION PROTOCOL, e.g.,
+\begin{quote}\smaller\begin{verbatim}
+{ iso standard(0) ftam(8571) application-context(1) iso-ftam(1) }
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{(PARTIAL) OBJECT IDENTIFIER TREE}
+
+\vskip.5in
+\diagram[p]{figureA-9}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION LAYER}
+
+\vskip.5in
+\diagram[p]{figureA-2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION ASSOCIATIONS}
+
+\begin{nrtc}
+\item	AN APPLICATION \emph{ASSOCIATION} IS A PRESENTATION CONNECTION WITH
+    \begin{nrtc}
+    \item	ADDITIONAL APPLICATION LAYER SEMANTICS
+    \end{nrtc}
+
+\item	AT PRESENT, THIS IS LITTLE MORE THAN APPLICATION LAYER NAMING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{APPLICATION ENTITIES}\bf
+
+\begin{nrtc}
+\item	AN APPLICATION PROCESS (AP) IS SOMETHING WHICH EXECUTES IN THE NETWORK
+
+\item	THE OSI COMMUNICATIONS ASPECT OF SUCH A PROCESS IS TERMED AN
+    \begin{nrtc}
+    \item	APPLICATION ENTITY (AE)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHEN AEs COMMUNICATE}
+
+\begin{nrtc}
+\item	PEERS ARE COMPOSED OF PRECISELY THE SAME ASEs
+
+\item	EACH ASE TALKS ONLY WITH ITS PEER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {HOW TO KEEP TRACK OF DATA STREAMS?}
+
+\begin{nrtc}
+\item	A PRESENTATION CONTEXT IS A PAIRING OF:
+    \begin{nrtc}
+    \item	A SET OF DATA STRUCTURE DEFINITIONS (ABSTRACT SYNTAX), AND
+
+    \item	RULES FOR ENCODING THOSE DATA STRUCTURES ON THE NETWORK 
+		(TRANSFER SYNTAX)
+    \end{nrtc}
+
+\item	REPRESENTED BY A PRESENTATION CONTEXT IDENTIFIER (PCI)
+
+\item	ALL USER DATA GIVEN TO PRESENTATION IS TAGGED ACCORDINGLY
+
+\item	CONTEXTS NORMALLY DEFINED DURING CONNECTION ESTABLISHMENT
+
+\item	BUT MIGHT BE CHANGED
+    \begin{nrtc}
+    \item	EXPLICITLY: BY THE APPLICATION, OR,
+
+    \item	IMPLICITLY: BY RESYNCHRONIZATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A FEW OTHER DETAILS}
+
+\begin{nrtc}
+\item	MULTIPLE APPLICATION \emph{ENTITIES} MAY BE PRESENT IN A SINGLE
+	APPLICATION \emph{PROCESS}
+
+\item	CURRENT SPECIFICATION ON
+    \begin{nrtc}
+    \item	OSI APPLICATION LAYER STRUCTURE
+    \end{nrtc}
+    BEARS LITTLE RESEMBLENCE TO THE ARCHITECTURE OF EXISTING OSI
+    APPLICATIONS!
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{APPLICATION SERVICE ELEMENTS}\bf
+
+\begin{nrtc}
+\item	ASSOCIATION CONTROL (ACSE)
+
+\item	RELIABLE TRANSFER (RTSE)
+
+\item	REMOTE OPERATIONS (ROSE)
+
+\item	USE OF APPLICATION SERVICES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THERE ARE A LOT OF ASEs}
+
+\begin{nrtc}
+\item	EACH APPLICATION TYPICALLY DEFINES AT LEAST ONE ASE WHICH IS SPECIFIC
+	TO THE APPLICATION
+
+\item	HOWEVER,
+    \begin{nrtc}
+    \item	ACSE, ROSE, and RTSE
+    \end{nrtc}
+    ARE USED QUITE FREQUENTLY
+    \begin{nrtc}
+    \item	(OFTEN TERMED \emph{COMMON} ASEs)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{ASSOCIATION CONTROL (ACSE)}\bf
+
+\begin{nrtc}
+\item	USED BY \emph{ALL} OSI APPLICATIONS TO PERFORM ASSOCIATION
+	ESTABLISHMENT AND RELEASE
+
+\item	ALL OSI APPLICATIONS DEFINE HOW THE ACSE IS USED
+
+\item	ONLY THE ACSE INVOKES PRESENTATION CONNECTION ESTABLISHMENT AND
+	RELEASE SERVICES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BINDING SERVICE}
+
+\begin{nrtc}
+\item	AN ASSOCIATION \emph{BINDS} AN INITIATOR TO A RESPONDER
+    \begin{nrtc}
+    \item	TYPICALLY FOR A CONSUMER/PROVIDER MODEL
+    \end{nrtc}
+
+\item	BINDING IS TWO-STEP:
+    \begin{nrtc}
+    \item	MAP SERVICE ONTO AVAILABLE ENTITIES
+
+    \item	SELECT ENTITY BASED ON COMMUNICATIONS REQUIREMENTS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NEGOTIATION}
+
+\begin{nrtc}
+\item	THIS IS THE VERY HEART OF ASSOCIATION ESTABLISHMENT
+    \begin{nrtc}
+    \item	SESSION: TOKENS, SERIAL NUMBERS, etc.
+
+    \item	PRESENTATION: CONTEXTS
+
+    \item	APPLICATION: ASSOCIATION CONTEXT (MOOT)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING}
+
+\begin{nrtc}
+\item	APPLICATION ENTITY IDENTIFIED AS:
+    \begin{nrtc}
+    \item	APPLICATION PROCESS TITLE
+
+    \item	APPLICATION ENTITY QUALIFIER
+    \end{nrtc}
+    TERMED AN APPLICATION ENTITY TITLE
+
+\item	AP TITLE: A DIRECTORY DISTINGUISHED NAME
+
+\item	AE QUALIFIER: USUALLY NONE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING (cont.)}
+
+\begin{nrtc}
+\item	A DISTINGUISHED NAME (DN) IS AN ASN.1 OBJECT CONSISTING OF
+    \begin{nrtc}
+    \item	A SEQUENCE OF ATTRIBUTE/VALUE PAIRS
+    \end{nrtc}
+    IMPLYING A SUPERIOR/SUBORDINATE RELATIONSHIP, e.g.,
+\begin{quote}\small\begin{verbatim}
+countryName            = US
+organizationName       = Performance Systems International
+organizationalUnitName = Operations
+commonName             = nisc
+commonName             = filestore
+\end{verbatim}\end{quote}
+
+\item	REFERS TO AN INFORMATION OBJECT IN THE OSI DIRECTORY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE DIRECTORY ENTRY}
+
+\begin{quote}\small\begin{verbatim}
+c=US
+    @o=Performance Systems International@ou=Operations
+    @cn=nisc@cn=filestore
+
+    objectClass= top & applicationEntity
+    presentationAddress= { "", "", "ftam",
+                           { 47000580fffc000000000100020123456789ab00 } }
+    supportedApplicationContext= 1.0.8571.1.1
+
+    description=
+    locality=
+    organizationName=
+    organizationalUnitName=
+    seeAlso=
+
+    objectClass= quipuObject
+    acl=
+    objectClass= iSODEApplicationEntity
+    execVector= iso.ftam -c
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ADDRESSING}
+
+\begin{nrtc}
+\item	SIMPLY READ THE \verb"presentationAddress" ATTRIBUTE OF THE ENTRY IN
+	THE DIRECTORY
+\begin{quote}\small\begin{verbatim}
+PresentationAddress ::=
+    SEQUENCE {
+        pSelector[0]  OCTET STRING OPTIONAL,
+        sSelector[1]  OCTET STRING OPTIONAL,
+        tSelector[2]  OCTET STRING OPTIONAL,
+        nAddresses[3] SET OF (1..MAX) OCTET STRING
+    }
+\end{verbatim}\end{quote}
+
+\item	NOTE THAT THIS IS THE EXTERNAL MACHINE FORM, ALSO NEED
+    \begin{nrtc}
+    \item	FORM WHEN CARRIED INSIDE PROTOCOLS
+
+    \item	FORM WHEN TEXTUALLY DESCRIBED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A STRING ENCODING OF\\ PRESENTATION ADDRESS}
+
+\smaller
+\begin{verbatim}
+<address> ::= [[[ <psel> "/" ] <ssel> "/" ] <tsel> "/" ] <naddrs>
+
+<naddrs>  ::= <naddr> "|" <naddrs> | <naddr>
+
+<naddr>   ::= "NS" "+" <hexstring> | <afi> "+" <idi> [ "+" <dsp> ]
+
+<psel>    ::= <selector>
+<ssel>    ::= <selector>
+<tsel>    ::= <selector>
+
+<selector>::= '"' <ia5string> '"' | "#" digits | "'" <hexstring> "'H" | ""
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLES}
+
+\begin{verbatim}
+"256"/NS+a433bb93c1|NS+aa3106
+
+#63/#41/#12/X121+234219200300
+
+'3a'H/Janet=00002340555+CUDF+"892796"
+
+"s"//Internet=10.0.0.6
+
+psinet=0000000100020123456789ab00
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING REVISITED}
+
+\begin{nrtc}
+\item	HOW TO BUILD DISTINGUISHED NAME?
+
+\item	USERS PREFER THINGS LIKE
+\begin{quote}\small\begin{verbatim}
+% ftam nisc
+% ftam nisc,psi,us
+\end{verbatim}\end{quote}
+
+\item	WHICH DON'T LOOK LIKE DIRECTORY DISTINGUISHED NAMES
+
+\item	WE'LL LOOK AT A SOLUTION LATER ON
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{RELIABLE TRANSFER (RTSE)}\bf
+
+\begin{nrtc}
+\item	RESPONSIBLE FOR BULK-MODE TRANSFER
+    \begin{nrtc}
+    \item	OPTIONALLY WITH RECOVERY
+    \end{nrtc}
+
+\item	SIMPLIFY USE OF SESSION SERVICES FOR APPLICATIONS
+    \begin{nrtc}
+    \item	THE SO-CALLED ``THE SEWER OF OSI''
+    \end{nrtc}
+
+\item	USES THE ACSE FOR BINDING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RELIABILITY IN THE RTSE}
+
+\begin{nrtc}
+\item	SERVICE SPECIFICATION IS PROBLEMATIC SINCE RTSE, NOT ACCEPTOR,
+	PROVIDES CONFIRMATION
+
+\end{nrtc}
+\vskip.5in
+\diagram[p]{figureA-3}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN INCONSISTENCY IN THE MODEL!}
+
+\begin{nrtc}
+\item	RTSE DEALS WITH LARGE PRESENTATION DATA VALUES
+
+\item	BUT, PRESENTATION REQUIRES SYNCHRONIZATION OCCUR \emph{BETWEEN} DATA
+	VALUES
+
+\item	SO, RTSE SERIALIZES EACH DATA VALUE INTO AN OCTET STRING
+    \begin{nrtc}
+    \item	AND BREAKS THAT UP FOR SYNCHRONIZATION PURPOSES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{REMOTE OPERATIONS (ROSE)}\bf
+
+\begin{nrtc}
+\item	MANAGE REQUEST/REPLY INTERACTIONS
+    \begin{nrtc}
+    \item	(SIMILAR TO REMOTE PROCEDURE CALLS)
+    \end{nrtc}
+
+\item	AS WITH ALL CURRENT SERVICES, CO-MODE
+
+\item	DISTINGUISHES BETWEEN
+    \begin{nrtc}
+    \item	INITIATOR/RESPONDER
+
+    \item	CONSUMER/PROVIDER
+
+    \item	INVOKER/PERFORMER
+    \end{nrtc}
+\item	PROBABLY THE ``BUILDING BLOCK'' FOR THE NEXT WAVE OF APPLICATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REMOTE OPERATIONS}
+
+\begin{nrtc}
+\item	INVOKER REQUESTS AN OPERATION
+
+\item	PERFORMER GENERATES ONE OF THREE OUTCOMES:
+    \begin{nrtc}
+    \item       A \emph{RESULT}, IF THE OPERATION SUCCEEDS;
+
+    \item       AN \emph{ERROR}, IF THE OPERATION FAILED; or,
+
+    \item       A \emph{REJECTION}, IF THE OPERATION WAS NOT PERFORMED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONTEXT WITH THE RTSE}
+
+\vskip.5in
+\diagram[p]{figureA-4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONTEXT WITHOUT THE RTSE}
+
+\vskip.5in
+\diagram[p]{figureA-5}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{USE OF APPLICATION SERVICES}\bf
+
+\begin{nrtc}
+\item	HOW DOES IT ALL COME TOGETHER?
+
+\item	FINALLY, AN EXAMPLE!
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: FILE TRANSFER}
+
+\vskip.5in
+\diagram[p]{figureA-6}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CAUSALITY OF EVENTS FOR}
+
+\begin{nrtc}
+\item	ASSOCIATION ESTABLISHMENT
+
+\item	DATA TRANSFER
+
+\item	ASSOCIATION RELEASE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASSOCIATION ESTABLISHMENT (USER)}
+
+\begin{nrtc}
+\item	USER TYPES
+\begin{quote}\small\begin{verbatim}
+% ftam nisc,psi,us
+\end{verbatim}\end{quote}
+	WHICH INVOKES FTAM USER INTERFACE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PRIOR TO BINDING}
+
+\vskip.5in
+\diagram[p]{figureA-7}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY ACCESS}
+
+\begin{nrtc}
+\item	DIRECTORY ACCESS SERVICE ELEMENT (DASE) IS INVOKED TO RETRIEVE
+	PRESENTATION ADDRESS
+
+\item	DASE USES HARD-WIRED INFORMATION TO DERIVE ADDRESS OF DIRECTORY SYSTEM
+	AGENT (DSA)
+
+\item	DASE INVOKES ACSE TO ESTABLISH A DAP ASSOCIATION TO DSA
+
+\item	USER ELEMENT MUST CONSTRUCT DISTINGUISHED NAME
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY ACCESS (cont.)}
+
+\begin{nrtc}
+\item	DASE ISSUES READ OPERATION ON ENTRY FOR \verb"presentationAddress"
+	ATTRIBUTE
+
+\item	DIRECTORY READ OPERATION IS MAPPED ONTO THE REMOTE OPERATIONS SERVICE
+
+\item	WHEN OPERATION COMPLETES, DASE MIGHT CLOSE DAP ASSOCIATION
+
+\item	PRESENTATION ADDRESS IS RETURNED TO USER ELEMENT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AND NOW THE FUN BEGINS!}
+
+\vskip.5in
+\diagram[p]{figureA-8}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASSOCIATION ESTABLISHMENT (FTAM)}
+
+\begin{nrtc}
+\item	THE FTAM ASE GENERATES A DATA OBJECT TO INITIALIZE ITS PEER
+
+\item	THIS IS PASSED AS USER DATA TO THE ACSE FOR ASSOCIATION ESTABLISHMENT
+
+\item	THE FTAM ASE REQUESTS PRESENTATION CONTEXTS FOR ITSELF
+    \begin{nrtc}
+    \item	AND A CONTEXT FOR THE ACSE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{F-INITIALIZE-request FPDU}
+
+\smaller
+\begin{verbatim}
+{
+   service-class {
+      management-class, transfer-class,
+      transfer-and-management-class
+   },
+   functional-units {
+      read, write, limited-file-management,
+      enhanced-file-management, grouping
+   },
+   attribute-groups { storage },
+   ftam-quality-of-service no-recovery,
+   contents-type-list {
+      1.0.8571.5.3,    -- FTAM-3 document
+      1.0.8571.5.1,    -- FTAM-1 document
+      1.3.9999.1.5.9   -- NBS-9 document
+   },
+   initiator-identity "cheetah"
+}
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASSOCIATION ESTABLISHMENT (ACSE)}
+
+\begin{nrtc}
+\item	THE ACSE GENERATES A DATA OBJECT TO INITIALIZE ITS PEER
+
+\item	THIS IS PASSED AS USER DATA DURING PRESENTATION CONNECTION
+	ESTABLISHMENT 
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AARQ APDU}
+
+\smaller
+\begin{verbatim}
+{
+   application-context-name 1.0.8571.1.1,    -- iso ftam
+   user-information {
+      {
+         direct-reference 2.1.1,
+         indirect-reference 1,               -- indicates FTAM PCI
+         encoding {
+            single-ASN1-type {
+                [3] '0370'H,
+                [4] '053700'H,
+                [5] '0580'H,
+                [6] '00'H,
+                [7] {
+                    [APPLICATION 14] '28c27b0503'H,
+                    [APPLICATION 14] '28c27b0501'H,
+                    [APPLICATION 14] '2bce0f010509'H
+                },
+                [APPLICATION 22] "cheetah"
+         }
+      }
+   }
+}
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASSOCIATION ESTABLISHMENT (PRESENTATION)}
+
+\begin{nrtc}
+\item	THE LOCAL PRESENTATION ENTITY GENERATES A DATA OBJECT TO INITIALIZE
+	ITS PEER
+
+\item	THIS IS PASSED AS USER DATA DURING SESSION CONNECTION ESTABLISHMENT 
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CP-type PPDU}
+
+\scriptsize
+\begin{verbatim}
+{
+   mode {
+      normal-mode
+   },
+   normal-mode {
+      context-list {
+         {                -- ftam pci abstract syntax
+            identifier 1,
+            abstract-syntax 1.0.8571.2.1,
+            transfer-syntax-list { 2.1.1 }
+         },
+...
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CP-type PPDU (cont.)}
+
+\scriptsize
+\begin{verbatim}
+{
+...
+         {                -- FTAM-3 abstract syntax
+            identifier 3,
+            abstract-syntax 1.0.8571.2.4,
+            transfer-syntax-list { 2.1.1 }
+         },
+         {                -- FTAM-1 abstract syntax
+            identifier 5,
+            abstract-syntax 1.0.8571.2.3,
+            transfer-syntax-list { 2.1.1 }
+         },
+         {                -- NBS-9 abstract syntax
+            identifier 7,
+            abstract-syntax 1.3.999.1.2.2,
+            transfer-syntax-list { 2.1.1 }
+         },
+         {                -- acse pci abstract syntax
+            identifier 9,
+            abstract-syntax 2.2.1.0.1,
+            transfer-syntax-list { 2.1.1 }
+         }
+      },
+...
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CP-type PPDU (cont.)}
+
+\scriptsize
+\begin{verbatim}
+...
+      user-data {
+         complex {
+            {
+               identifier 9,                -- indicates ACSE PCI
+               presentation-data-values {
+                  single-ASN1-type {
+                     [1] { 1.0.8571.1.1 },
+                     [30] {
+                        {
+                           direct-reference 2.1.1,
+                           indirect-reference 1,
+                           encoding {
+                              single-ASN1-type {
+                                 [3] '0370'H,
+                                 [4] '053700'H,
+                                 [5] '0580'H,
+                                 [6] '00'H,
+                                 [7] {
+                                    [APPLICATION 14] '28c27b0503'H,
+                                    [APPLICATION 14] '28c27b0501'H,
+                                    [APPLICATION 14] '2bce0f010509'H
+                                 },
+                                 [APPLICATION 22] "cheetah"
+}  }  }  }  }  }  }  }  }  }  }
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASSOCIATION ESTABLISHMENT (SESSION)}
+
+\begin{nrtc}
+\item	THE LOCAL SESSION ENTITY GENERATES A DATA OBJECT TO INITIALIZE
+	ITS PEER
+
+\item	ONCE A TRANSPORT CONNECTION IS ESTABLISHED, THIS IS PASSED AS USER DATA
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONNECT SPDU}
+
+\smaller
+\begin{verbatim}
+LI/           241
+CODE/         CONNECT
+REFERENCE/    <USER        9 140763686565746168,
+               COMMON     15 170d3930303132363031313434355a,
+               ADDITIONAL  0>
+OPTIONS/      0x0<>
+VERSION/      0x2
+REQUIREMENTS/ 0x2<DUPLEX>
+USER DATA/    197 3180a003800101a280a45a30100201 ...
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERVICE MAPPINGS}
+
+\scriptsize
+\begin{verbatim}
+A-ASSOCIATE.REQUEST
+    AARQ    ---->    P-CONNECT.REQUEST
+                         CP-type    ---->    S-CONNECT.REQUEST
+                                                 CONNECT SPDU
+
+                                                 T-CONNECT stuff
+                                                 T-DATA.REQUEST     ---->
+                                                    ...
+                                                 T-DATA.INDICATION <----
+
+                                                 ACCEPT SPDU
+                         CPA-type  <----    S-CONNECT.CONFIRMATION
+    AARE    <----    P-CONNECT.CONFIRMATION
+A-ASSOCIATE.CONFIRMATION
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PARAMETER MAPPINGS}
+
+\scriptsize
+\[\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\begin{tabular}{c}A-ASSOCIATE\\ .REQUEST\end{tabular}&
+		\begin{tabular}{c}AARQ\\ APDU\end{tabular}&
+			\begin{tabular}{c}P-CONN\\ .REQ\end{tabular}&
+				\begin{tabular}{c}CP-type\\ PPDU\end{tabular}&
+					\begin{tabular}{c}S-CONN\\ .REQ\end{tabular}&
+						\begin{tabular}{c}CN\\ SPDU\end{tabular}\\
+\hline
+mode&		&	\X/&	&	&	\\
+\hline
+application&	&	&	&	&	\\
+\ \ context name&\X/&	&	&	&	\\
+\hline
+calling AE info&\X/&	&	&	&	\\
+\hline
+called AE info&	\X/&	&	&	&	\\
+\hline
+user-data&	\X/&	&	&	&	\\
+\hline
+calling P-address&
+		&	P-addr&
+				P-sel&
+					S-addr&	
+						S-sel\\
+\hline
+called P-address&
+		&	P-addr&
+				P-sel&
+					S-addr&	
+						S-sel\\
+\hline
+presentation&	&	&	&	&	\\
+\ \ context&	&	\X/&	\X/&	&	\\
+\ \ definition list&
+		&	&	&	&	\\
+\hline
+default&	&	&	&	&	\\
+\ \ presentation&&	\X/&	\X/&	&	\\
+\ \ context name&
+		&	&	&	&	\\
+\hline
+quality of service&
+		&	\X/&	&	\X/&	\\
+\hline
+presentation&	&	&	&	&	\\
+\ \ requirements&&	\X/&	\X/&	&	\\
+\hline
+session&	&	&	&	&	\\
+\ \ requirements&&	\X/&	&	\X/&	\X/\\
+\hline
+initial serial&	&	&	&	&	\\
+\ \ number&	&	\X/&	&	\X/&	\X/\\
+\hline
+initial token&	&	&	&	&	\\
+\ \ assignment&	&	\X/&	&	\X/&	\X/\\
+\hline
+session connection&
+		&	&	&	&	\\
+\ \ identifier&	&	\X/&	&	\X/&	\X/\\
+\hline
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DATA TRANSFER}
+
+\begin{nrtc}
+\item	DO FTAM PRIMITIVES TO SELECT, OPEN FILE, etc.
+
+\item	SEND FILE DATA ELEMENT USING CORRECT PRESENTATION CONTEXT:
+\begin{quote}\small\begin{verbatim}
+{
+   complex {
+      {                   -- FTAM-1 abstract syntax
+         identifier 5,
+         presentation-data-values { -- a single DE
+            single-ASN1-type ...
+         }
+      }
+   }
+}
+\end{verbatim}\end{quote}
+
+\item	SERVICE MAPPINGS:
+\begin{quote}\small\begin{verbatim}
+F-DATA.REQUEST
+    FADU    ---->    P-DATA.REQUEST
+                         User-data    ---->    S-DATA.REQUEST
+                                                   DT SPDU
+
+                                                 T-DATA.REQUEST  ---->
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASSOCIATION RELEASE}
+
+\begin{nrtc}
+\item	FTAM ASE GENERATES AN \verb"F-TERMINATE-request" FPDU
+\begin{quote}\small\begin{verbatim}
+{}
+\end{verbatim}\end{quote}
+
+\item	WHICH IS PASSED AS USER DATA TO THE ACSE FOR ASSOCIATION RELEASE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASSOCIATION RELEASE (ACSE)}
+
+\begin{nrtc}
+\item	THE ACSE GENERATES AN \verb"RLRQ" APDU
+\begin{quote}\small\begin{verbatim}
+{
+   reason normal,
+   user-information {
+      {
+         indirect-reference 1,
+         encoding {
+            single-ASN1-type {}
+         }
+       }
+   }
+}
+\end{verbatim}\end{quote}
+
+\item	WHICH IS PASSED AS USER DATA TO THE LOCAL PRESENTATION ENTITY FOR
+	CONNECTION RELEASE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASSOCIATION RELEASE (PRESENTATION)}
+
+\begin{nrtc}
+\item	THE LOCAL PRESENTATION ENTITY GENERATES AN \verb"User-Data" PPDU
+\begin{quote}\small\begin{verbatim}
+{
+   complex {
+      {
+         identifier 9,
+         presentation-data-values {
+            single-ASN1-type {
+               [0] '00'H,
+               [30] {
+                  {
+                     indirect-reference 1,
+                     encoding {
+                        single-ASN1-type {}
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+\end{verbatim}\end{quote}
+
+\item	WHICH IS PASSED AS USER DATA TO THE LOCAL SESSION ENTITY FOR
+	CONNECTION RELEASE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASSOCIATION RELEASE (SESSION)}
+
+\begin{nrtc}
+\item	THE LOCAL SESSION ENTITY GENERATES A \verb"FINISH" SPDU
+\begin{quote}\small\begin{verbatim}
+LI/           30
+CODE/         FINISH
+DISCONNECT/   0x1<RELEASE>
+USER DATA/    25 61173015020109a010620e800100be ...
+\end{verbatim}\end{quote}
+
+\item	WHICH IS PASSED AS USER DATA TO THE TRANSPORT SERVICE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERVICE MAPPINGS}
+
+\scriptsize
+\begin{verbatim}
+A-RELEASE.REQUEST
+    RLRQ    ---->    P-RELEASE.REQUEST
+                         User-Data  ---->    S-RELEASE.REQUEST
+                                                 FINISH SPDU
+
+                                                 T-DATA.REQUEST     ---->
+                                                    ...
+                                                 T-DATA.INDICATION <----
+
+                                                 DISCONNECT SPDU
+                                                 T-DISCONNECT stuff
+                         User-data <----    S-RELEASE.CONFIRMATION
+    RLRE    <----    P-RELEASE.CONFIRMATION
+A-RELEASE.CONFIRMATION
+\end{verbatim}
+\end{bwslide}

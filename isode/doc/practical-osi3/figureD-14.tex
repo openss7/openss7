@@ -1,0 +1,20 @@
+\File{figureD\-14.py},{08:50},{Mar 13 1991}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{    exact = \K{NULL}, good = \K{NULL};}}
+\L{\LB{    \K{FOR} x \K{IN} dlist \K{DO}}}
+\L{\LB{        \K{IF} (last (DN).value == s) \K{THEN}}}
+\L{\LB{            exact += x;}}
+\L{\LB{        \K{ELSE}}}
+\L{\LB{            \K{FOR} y \K{IN} cache (x, alist) \K{DO}}}
+\L{\LB{                \K{IF} (y.value == s) \K{THEN}}}
+\L{\LB{                    good += x;}}
+\L{\LB{}}
+\L{\LB{    \K{IF} (exact) \K{THEN}}}
+\L{\LB{        \K{RETURN} exact;}}
+\L{\LB{    \K{IF} (good)  \K{THEN}}}
+\L{\LB{        \K{RETURN} good;}}
+\L{\LB{}}
+\L{\LB{    \C{}\-\- present dlist to user}}
+\CE{}\L{\LB{    \C{}\-\- return only those that are of interest}}
+\CE{}\L{\LB{\}}}

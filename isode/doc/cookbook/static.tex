@@ -1,0 +1,779 @@
+% -*- LaTeX -*-		(really SLiTeX)
+
+\begin{bwslide}
+\part	{STATIC FACILITIES}\bf
+
+\begin{nrtc}
+\item	REMOTE OPERATIONS SPECIFICATION
+
+\item	STUB GENERATOR
+
+\item	STRUCTURE GENERATOR
+
+\item	ELEMENT PARSER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+this part of the presentation corresponds to part~iii of The Applications
+Cookbook
+
+note that some of the facilities described herein are also useful for services
+which aren't ROS-based, e.g., ODIF
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{STATIC FACILITIES\\ OVERVIEW}
+
+\vskip.15in
+\diagram[p]{figure9}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{REMOTE OPERATIONS SPECIFICATION}\bf
+
+\begin{nrtc}
+\item	A ``TYPICAL'' STANDARD FOR AN APPLICATION CONTAINS:
+    \begin{nrtc}
+    \item	A SERVICE DEFINITION, AND
+
+    \item	A PROTOCOL SPECIFICATION
+    \end{nrtc}
+
+\item	THE PROTOCOL SPECIFICATION CONTAINS A FORMAL DESCRIPTION OF THE REMOTE
+OPERATIONS USED BY THE APPLICATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ NETWORK MANAGEMENT}
+
+\begin{nrtc}
+\item	{}[ISO~9596/2] DEFINES A ``COMMON MANAGEMENT INFORMATION PROTOCOL''
+	USED FOR NETWORK MANAGEMENT
+    \begin{nrtc}
+    \item	NOTE THAT CMIP IS NOT A ``DONE DEAL''
+    \end{nrtc}
+
+\item	IT CONTAINS INFORMATION FOR BINDING AND OPERATIONS
+
+\item	WE'LL LOOK AT A PORTION OF THE FORMAL DESCRIPTION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BINDING}\small
+
+\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\input figure11\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OPERATIONS}\small
+
+\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\input figure12\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OPERATIONS (cont.)}\small
+
+\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\input figure13\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ERRORS}\small
+
+\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\input figure14\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{STUB GENERATOR}\bf
+
+\begin{nrtc}
+\item	WHAT WE WOULD LIKE: MAGIC!
+
+\item	WHAT WE REALLY GET: HARD WORK.
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONCEPT: STUBS}
+
+\begin{nrtc}
+\item	A PROCEDURE WHICH IS CALLED LOCALLY BUT EXECUTES REMOTELY
+
+\item	IN OUR CONTEXT, A SYNCHRONOUS STUB:
+    \begin{nrtc}
+    \item	INVOKES THE OPERATION
+
+    \item	AWAITS A RESPONSE
+
+    \item	RETURNS A RESULT OR ERROR
+    \end{nrtc}
+
+\item	AN ASYNCHRONOUS STUB:
+    \begin{nrtc}
+    \item	INVOKES THE OPERATION, AND EVENTUALLY
+
+    \item	DISPATCHES A RESULT OR ERROR HANDLER
+    \end{nrtc}
+
+\item	WHAT TO DO ABOUT REJECTIONS, NETWORK PROBLEMS, ETC?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ROSY}
+
+\begin{nrtc}
+\item	REMOTE OPERATIONS STUB-GENERATOR (YACC-BASED)
+
+\item	INPUT:
+    \begin{nrtc}
+    \item	A RO SPEC
+    \end{nrtc}
+
+\item	OUTPUT:
+    \begin{nrtc}
+    \item	AN ASN.1 SPEC
+
+    \item	STUB DEFINITIONS FOR C
+
+    \item	C DATA STRUCTURES FOR RUN-TIME ENVIRONMENT
+
+    \item	STUB DEFINITIONS FOR LINT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ NETWORK MANAGEMENT}\small
+
+\vskip.15in
+\begin{verbatim}
+% rosy cmip.ry
+rosy 3.2 #17 (gonzo) of Fri Jan  8 13:42:05 PST 1988
+CMIP operations: m-EventReport m-ConfirmedEventReport m-LinkedReply
+     m-Confirmed-Get m-Set m-ConfirmedSet m-Action m-ConfirmedAction
+
+CMIP errors: noSuchObject accessDenied syncNotSupported invalidFilter
+     noSuchMgmtInfoId invalidMgmtInfoValue getListError setListError
+     noSuchAction processingFailure noSuchEventType
+
+CMIP types: EventReportArgument EventReportResult LinkedReplyArgument
+     GetArgument GetResult SetArgument SetResult ActionArgument ActionResult
+     NoSuchObject SyncNotSupported InvalidFilter NoSuchMgmtInfoId
+     InvalidMgmtInfoValue GetListError MISGetInfoStatus MgmtInfoIdError
+     SetListError MISSetInfoStatus MgmtInfoError ErrorStatus NoSuchAction
+     ProcessingFailure NoSuchEventType ObjectClass ObjectInstance CMISSync
+     CMISFilter FilterItem AccessControl EventTypeId EventInfo MgmtInfo
+     MgmtInfoId MgmtInfoValue ActionTypeId ActionInfo SpecificErrorInfo
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ STUB DEFINITIONS FOR C}\small
+
+\vskip.15in
+\begin{verbatim}
+#define operation_CMIP_m__ConfirmedEventReport  1
+
+#define stub_CMIP_m__ConfirmedEventReport(sd,id,in,rfx,efx,class,roi) \
+RyStub ((sd), table_CMIP_Operations, \
+        operation_CMIP_m__ConfirmedEventReport, (id), \
+        (caddr_t) (in), (rfx), (efx), (class), (roi))
+
+#define op_CMIP_m__ConfirmedEventReport(sd,in,out,rsp,roi) \
+RyOperation ((sd), table_CMIP_Operations, \
+        operation_CMIP_m__ConfirmedEventReport, \
+        (caddr_t) (in), (out), (rsp), (roi))
+
+#define error_CMIP_noSuchObject 1
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ C DATA STRUCTURES FOR\\ RUN-TIME ENVIRONMENT}\small
+
+\vskip.15in
+\begin{verbatim}
+struct RyOperation table_CMIP_Operations[] = {
+    ...
+
+                                        /* OPERATION m-ConfirmedEventReport */
+    "m-ConfirmedEventReport", operation_CMIP_m__ConfirmedEventReport,
+        encode_CMIP_m__ConfirmedEventReport_argument,
+        decode_CMIP_m__ConfirmedEventReport_argument,
+        1, encode_CMIP_m__ConfirmedEventReport_result,
+           decode_CMIP_m__ConfirmedEventReport_result,
+           free_CMIP_m__ConfirmedEventReport_result,
+        errors_CMIP_m__ConfirmedEventReport,
+
+    ...
+
+    NULL
+};
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ C DATA STRUCTURES FOR\\ RUN-TIME ENVIRONMENT\\ (cont.)}
+\small
+
+\vskip.15in
+\begin{verbatim}
+static struct RyError *errors_CMIP_m__ConfirmedEventReport[] = {
+    &table_CMIP_Errors[0],
+    &table_CMIP_Errors[10],
+    &table_CMIP_Errors[1],
+    &table_CMIP_Errors[4],
+    &table_CMIP_Errors[5]
+};
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ C DATA STRUCTURES FOR\\ RUN-TIME ENVIRONMENT\\ (cont.)}
+\small
+
+\vskip.15in
+\begin{verbatim}
+struct RyError table_CMIP_Errors[] = {
+                                        /* ERROR noSuchObject */
+    "noSuchObject", error_CMIP_noSuchObject,
+        encode_CMIP_noSuchObject_parameter,
+        decode_CMIP_noSuchObject_parameter,
+        free_CMIP_noSuchObject_parameter,
+
+    ...
+
+    NULL
+};
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ STUB DEFINITIONS FOR LINT}\small
+
+\vskip.15in
+\begin{verbatim}
+int     stub_CMIP_m__ConfirmedEventReport (sd, id, in, rfx, efx, class, roi)
+int     sd,
+        id,
+        class;
+struct type_CMIP_EventReportArgument* in;
+IFP     rfx,
+        efx;
+struct RoSAPindication *roi;
+{
+    return RyStub (sd, table_CMIP_Operations,
+                operation_CMIP_m__ConfirmedEventReport, id,
+                (caddr_t) in, rfx, efx, class, roi);
+}
+\end{verbatim}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ STUB DEFINITIONS FOR LINT (cont.)}\small
+
+\vskip.15in
+\begin{verbatim}
+int     op_CMIP_m__ConfirmedEventReport (sd, in, out, rsp, roi)
+int     sd;
+struct type_CMIP_EventReportArgument* in;
+caddr_t *out;
+int    *rsp;
+struct RoSAPindication *roi;
+{
+    return RyOperation (sd, table_CMIP_Operations,
+                operation_CMIP_m__ConfirmedEventReport,
+                (caddr_t) in, out, rsp, roi);
+}
+\end{verbatim}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{ROSY LIMITATIONS}
+
+\begin{nrtc}
+\item	SOMEWHAT LIMITED IN THE FRONT-END, CURRENTLY DOESN'T RECOGNIZE
+    \begin{nrtc}
+    \item	\verb"BIND" AND \verb"UNBIND" MACROS
+
+    \item	\verb"OBJECT IDENTIFIER" NOTATION FOR OPERATION CODES
+    \end{nrtc}
+
+\item	IGNORES THE \verb"LINKED" CLAUSE IN OPERATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{STRUCTURE GENERATOR}\bf
+
+\begin{nrtc}
+\item	WHAT WE WOULD LIKE: MAGIC!
+
+\item	WHAT WE REALLY GET: HARD WORK.
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERIALIZING DATA STRUCTURES}
+
+\begin{nrtc}
+\item	{}[ISO~8825] (ASN.1 ENCODING)
+	SAYS HOW TO MAP THE ABSTRACT SYNTAX TO THE CONCRETE SYNTAX
+
+\item	HOW TO MAP DATA STRUCTURES TO THE ABSTRACT SYNTAX?
+    \begin{nrtc}
+    \item	\verb"struct { ... }" $\rightarrow$ \verb"EventReportArgument"
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A SOLUTION}
+
+\begin{nrtc}
+\item	GENERATE C STRUCTURES DIRECTLY FROM ABSTRACT SYNTAX
+
+\item	GENERATE TRANSLATOR TO DO THE MAPPING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SIMPLE TYPES}
+
+\begin{nrtc}
+\item	\verb"BOOLEAN" $\rightarrow$ \verb"char"
+
+\item	\verb"INTEGER" $\rightarrow$ \verb"int"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SIMPLE TYPES (cont.)}
+
+\begin{nrtc}
+\item	FOR RANGE-LIMITED INTEGERs,
+\begin{verbatim}
+ErrorStatus ::=
+        INTEGER {
+            accessDenied(2),
+            noSuchMgmtInfoId(5),
+            invalidMgmtInfoValue(7)
+        }
+\end{verbatim}
+
+SYMBOLIC VALUES ARE DEFINED AS WELL
+\begin{verbatim}
+struct type_CMIP_ErrorStatus {
+    int     parm;
+#define	int_CMIP_ErrorStatus_accessDenied 2
+#define	int_CMIP_ErrorStatus_noSuchMgmtInfoId 5
+#define	int_CMIP_ErrorStatus_invalidMgmtInfoValue 7
+};
+\end{verbatim}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SIMPLE TYPES (cont.)}
+
+\begin{nrtc}
+\item	\verb"BIT STRING" $\rightarrow$ \verb"struct PElement"
+\begin{verbatim}
+BIT STRING {
+    eventReportInvoker(0),
+    ...
+
+#define	bit_CMIP_FunctionalUnits_eventReportInvoker 0
+#define	bits_CMIP_FunctionalUnits \
+        "\020\01eventReportInvoker..."
+\end{verbatim}
+
+\item	\verb"OCTET STRING" $\rightarrow$ \verb"struct qbuf"
+
+\item	\verb"OBJECT IDENTIFIER" $\rightarrow$ \verb"struct OIDentifier"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMPLEX TYPES:\\ SEQUENCE OF}
+
+\begin{nrtc}
+\item	A LINKED LIST
+\begin{verbatim}
+SEQUENCE OF
+    MgmtInfoId
+\end{verbatim}
+
+WITH SOME GENERATED NAMES
+\begin{verbatim}
+struct element_CMIP_0 {
+    struct type_CMIP_MgmtInfoId *element_CMIP_1;
+
+    struct element_CMIP_0 *next;
+} *element_CMIP_0;
+\end{verbatim}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMPLEX TYPES:\\ SEQUENCE}
+
+\begin{nrtc}
+\item	A ``SIMPLE'' STRUCTURE
+\begin{verbatim}
+MgmtInfoIdError ::=
+        SEQUENCE {
+            errorStatus[0]
+                IMPLICIT ErrorStatus,
+
+            mgmtInfoId[1]
+                MgmtInfoId
+        }
+\end{verbatim}
+
+USING TAGS FOR NAMES, WHEN POSSIBLE
+\begin{verbatim}
+struct type_CMIP_MgmtInfoIdError {
+    struct type_CMIP_ErrorStatus *errorStatus;
+
+    struct type_CMIP_MgmtInfoId *mgmtInfoId;
+};
+\end{verbatim}
+
+\item	SETS ARE HANDLED ANALAGOUSLY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMPLEX TYPES:\\ CHOICE}
+
+\begin{nrtc}
+\item	A STRUCTURE WITH A TAG AND A UNION
+\begin{verbatim}
+ObjectClass ::=
+        CHOICE {
+            globalForm[0]
+                IMPLICIT OBJECT IDENTIFIER,
+
+            nonSpecificForm[1]
+                IMPLICIT OCTET STRING
+        }
+\end{verbatim}
+
+e.g.,
+\begin{verbatim}
+struct type_CMIP_ObjectClass {
+    int     offset;
+#define type_CMIP_ObjectClass_globalForm 1
+#define type_CMIP_ObjectClass_nonSpecificForm 2
+
+    union {
+        struct OIDentifier *globalForm;
+        struct qbuf *nonSpecificForm;
+    }       un;
+};
+\end{verbatim}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DEFAULT/OPTIONAL}
+
+\begin{nrtc}
+\item	A VERY SLICK FACILITY WOULD BE TO SUPPORT THE \verb"DEFAULT" AND
+	\verb"OPTIONAL" CLAUSES FOR COMPLEX TYPES
+
+\item	BUT, IMPLEMENTATION IS PROBLEMATIC:
+    \begin{nrtc}
+    \item	NEED ASN.1 VALUE PARSING IN FRONT-END
+
+    \item	NEED EXTENSIVE SYMBOL TABLE SEMANTICS IN BACK-END
+    \end{nrtc}
+
+\item	SO, A SIMPLE APPROACH IS TAKEN
+    \begin{nrtc}
+    \item	SCALARS ARE HANDLED DIRECTLY:
+	\begin{nrtc}
+	\item	BOOLEANS, INTEGERS
+	\end{nrtc}
+
+    \item	NON-SCALARS ARE EXAMINED FOR INEQUALITY TO \verb"NULL"
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{HEURISTICS}
+
+\begin{nrtc}
+\item	FOR CONSTRUCTED TYPES, IF ONLY ONE MEMBER,\\ PULL IT UP
+\begin{verbatim}
+TestInfoIdError ::=
+        SEQUENCE {
+            errorStatus[0]
+                IMPLICIT ErrorStatus
+        }
+\end{verbatim}
+\verb"TestInfoIdError" $\rightarrow$ \verb"struct type_CMIP_ErrorStatus"
+
+\item	TRY TO USE TAGS WHENEVER POSSIBLE FOR STRUCTURE NAMES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{POSY}
+
+\begin{nrtc}
+\item	PEPY OPTIONAL STRUCTURE-GENERATOR (YACC-BASED)
+
+\item	INPUT:
+    \begin{nrtc}
+    \item	AN ASN.1 SPEC
+    \end{nrtc}
+
+\item	OUTPUT:
+    \begin{nrtc}
+    \item	AN AUGMENTED ASN.1 SPEC
+
+    \item	C STRUCTURE DEFINITIONS
+
+    \item	``FREE'' ROUTINES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ NETWORK MANAGEMENT}\small
+
+\vskip.15in
+\begin{verbatim}
+% posy -f -h -o cmip-asn.py cmip.py
+posy 3.2 #15 (gonzo) of Fri Jan  8 12:03:11 PST 1988
+CMIP types: EventReportArgument EventReportResult LinkedReplyArgument
+     GetArgument GetResult SetArgument SetResult ActionArgument ActionResult
+     NoSuchObject SyncNotSupported InvalidFilter NoSuchMgmtInfoId
+     InvalidMgmtInfoValue GetListError MISGetInfoStatus MgmtInfoIdError
+     SetListError MISSetInfoStatus MgmtInfoError ErrorStatus NoSuchAction
+     ProcessingFailure NoSuchEventType ObjectClass ObjectInstance CMISSync
+     CMISFilter FilterItem AccessControl EventTypeId EventInfo MgmtInfo
+     MgmtInfoId MgmtInfoValue ActionTypeId ActionInfo SpecificErrorInfo
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ C STRUCTURE DEFINITIONS}\small
+
+\vskip.15in
+\begin{verbatim}
+struct type_CMIP_EventReportArgument {
+    struct type_CMIP_ObjectClass *managedObjectClass;
+
+    struct type_CMIP_ObjectInstance *managedObjectInstance;
+
+    struct type_CMIP_EventTypeID *eventType;
+
+    struct type_UNIV_GeneralizedTime *eventTime;
+
+    struct type_CMIP_EventInfo *eventInfo;
+};
+
+#define	type_CMIP_NoSuchObject	OIDentifier
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ ``FREE'' ROUTINES}\small
+
+\vskip.15in
+\begin{verbatim}
+free_CMIP_EventReportArgument (arg)
+struct type_CMIP_EventReportArgument *arg;
+{
+    if (arg == NULL)
+        return;
+
+    if (arg -> managedObjectClass)
+        free_CMIP_ObjectClass (arg -> managedObjectClass),
+            arg -> managedObjectClass = NULL;
+
+...
+
+    if (arg)
+        free ((char *) arg);
+}
+
+#define	free_CMIP_NoSuchObject	oid_free
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{POSY LIMITATIONS}
+
+\begin{nrtc}
+\item	STEMS FROM A LACK OF INTELLIGENCE WHEN DEALING WITH COMPLEX
+	ASN.1 VALUE NOTATION:
+    \begin{nrtc}
+    \item	USES ``NULL INEQUALITY'' RULE FOR \verb"OPTIONAL"
+
+    \item	HANDLES \verb"DEFAULT" ONLY FOR SCALARS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{ELEMENT PARSER}\bf
+
+\begin{nrtc}
+\item	WE NOW KNOW ABOUT
+    \begin{nrtc}
+    \item	DATA STRUCTURES\ \ \verb"struct { ... }"
+
+    \item	ABSTRACT SYNTAX\ \ \verb"EventReportArgument"
+
+    \item	CONCRETE SYNTAX\ \ \verb"1f8a ..."
+    \end{nrtc}
+
+\item	THE \emph{PRESENTATION ELEMENT} TIES THESE TOGETHER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PRESENTATION ELEMENTS}
+
+\begin{nrtc}
+\item	AN INTERNAL FORM FOR AN INSTANCE OF A TYPE DESCRIBED BY ABSTRACT
+	SYNTAX
+
+\item	CAN REPRESENT ANY ASN.1 TYPE AS EITHER
+    \begin{nrtc}
+    \item	A STRING OF OCTETS OR BITS
+
+    \item	A LINKED-LIST OF PRESENTATION ELEMENTS
+    \end{nrtc}
+
+\item	THE CONCEPUTAL MAPPING IS:
+    \begin{nrtc}
+    \item	\verb"struct { ... }" $\rightarrow$ \verb"EventReportArgument"
+    \end{nrtc}
+
+\item	THE ACTUAL MAPPING IS:
+    \begin{nrtc}
+    \item	\verb"struct { ... }" $\rightarrow$ \verb"struct PElement"
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PEPY}
+
+\begin{nrtc}
+\item	PRESENTATION ELEMENT PARSER (YACC-BASED)
+
+\item	INPUT:
+    \begin{nrtc}
+    \item	AN AUGMENTED ASN.1 SPEC
+    \end{nrtc}
+
+\item	OUTPUT:
+    \begin{nrtc}
+    \item	AN ENCODER
+
+    \item	A DECODER
+
+    \item	A PRETTY-PRINTER
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ NETWORK MANAGEMENT}\small
+
+\vskip.15in
+\begin{verbatim}
+% pepy cmip-asn.py
+pepy 3.2 #15 (gonzo) of Fri Jan  8 12:03:11 PST 1988
+CMIP encode none none: EventReportArgument EventReportResult
+     LinkedReplyArgument GetArgument GetResult SetArgument SetResult
+     ActionArgument ActionResult NoSuchObject SyncNotSupported InvalidFilter
+     NoSuchMgmtInfoId InvalidMgmtInfoValue GetListError MISGetInfoStatus
+     MgmtInfoIdError SetListError MISSetInfoStatus MgmtInfoError ErrorStatus
+     NoSuchAction ProcessingFailure NoSuchEventType ObjectClass ObjectInstance
+     CMISSync CMISFilter FilterItem AccessControl EventTypeId EventInfo
+     MgmtInfo MgmtInfoId MgmtInfoValue ActionTypeId ActionInfo
+     SpecificErrorInfo
+
+CMIP none decode none: EventReportArgument EventReportResult
+     LinkedReplyArgument GetArgument GetResult SetArgument SetResult
+     ActionArgument ActionResult NoSuchObject SyncNotSupported InvalidFilter
+     NoSuchMgmtInfoId InvalidMgmtInfoValue GetListError MISGetInfoStatus
+     MgmtInfoIdError SetListError MISSetInfoStatus MgmtInfoError ErrorStatus
+     NoSuchAction ProcessingFailure NoSuchEventType ObjectClass ObjectInstance
+     CMISSync CMISFilter FilterItem AccessControl EventTypeId EventInfo
+     MgmtInfo MgmtInfoId MgmtInfoValue ActionTypeId ActionInfo
+     SpecificErrorInfo
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STATIC FACILITIES:\\ REVIEW}
+
+\vskip.15in
+\diagram[p]{figure9}
+\end{bwslide}

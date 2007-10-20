@@ -1,0 +1,12 @@
+.PS
+.ps 20
+## figure E-9
+B1:	box "TP4"
+B2:	box "CLNP" with .n at B1.s
+B3:	box "X.25" with .n at B2.s
+##
+S1:	box with .nw at (B2.ne.x+linewid/2, B2.ne.y) \
+		height B2.ne.y-B3.se.y width boxwid/6 shaded
+	move to S1.e; "\ CLNS" ljust
+##
+.PE

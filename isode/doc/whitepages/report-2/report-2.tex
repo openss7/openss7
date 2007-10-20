@@ -1,0 +1,61 @@
+% -*- LaTeX -*-
+
+\input lcustom
+
+\documentstyle[11pt,sfwmac,titlepage]{article}
+
+\makeatletter
+\let\titlep@ge=\titlepage
+\def\titlepage{\titlep@ge \def\thefootnote{\fnsymbol{footnote}}}
+
+\let\endtitlep@ge=\endtitlepage
+\let\endtitlepage=\relax
+
+\let\m@ketitle=\maketitle
+\def\maketitle{\m@ketitle\let\titlepage=\relax\let\endtitlepage=\endtitlep@ge}
+\makeatother
+
+\advance\textwidth by0.5in
+\advance\oddsidemargin by-0.25in
+\advance\evensidemargin by-0.25in
+
+\begin{document}
+
+\title{Realizing the White Pages\\ using the OSI Directory Service}
+\author{Marshall T.~Rose\\ Performance Systems International, Inc.\\
+	\tt mrose@psi.com}
+\date{May 10, 1990\\[0.25in] PSI Technical Report \#90--05--10--1}
+\maketitle
+
+\begin{abstract}
+This note describes the mappings onto the OSI Directory Service which are used
+by the NYSERNet/PSI White Pages Pilot Project,
+in terms  of ``refinements'' to the operational behavior of both DSAs and
+DUAs.
+It should be stressed that the system remains X.500-conformant,
+as these refinements merely speak to matters on which the standard is silent,
+e.g., replication.
+
+\footnotetext[0]{\hskip -2\parindent
+This work was partially supported by the
+U.S.~Defense Advanced Research Projects Agency
+and the Rome Air Development Center of the U.S.~Air Force Systems Command
+under contract number F30602--88--C--0016.
+The content of the information contained herein does not necessarily reflect
+the position or the policy of the U.S.~Government,
+and no official endorsement should be inferred.} 
+\end{abstract}
+
+\newpage\thispagestyle{empty}
+\tableofcontents
+\footnotetext[0]{\hskip -\parindent
+This document (version \versiontag/)
+was \LaTeX set \today\ with \fmtname\ v\fmtversion.}
+
+\input text
+
+\newpage
+\bibliography{bcustom,directory,networking,sfwdoc}
+\bibliographystyle{alpha}
+
+\end{document}

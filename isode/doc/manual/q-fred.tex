@@ -1,0 +1,294 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter{FRED}
+\label{DUA:fred}
+FRED is a DUA optimised for White Pages queries; it is actually
+implemented as an interface to DISH, hence the name FRED --- {\bf FR}ont 
+{\bf E}nd to {\bf D}ISH.
+
+\section	{Giving Commands to FRED}\label{fred:commands}
+After invoking \pgm{fred}
+you are prompted with \verb"fred> " indicating that FRED is ready.
+
+If FRED is invoked interactively,
+it will look for a file in your home directory called \file{.fredrc}.
+It will execute the commands contained in this file just as if you had typed
+them directly to FRED.
+Following this,
+you are given the \verb"fred>" prompt.
+
+\section	{Let Your Fingers Do the Walking}
+Although FRED has several commands,
+the most interesting command is \verb"whois",
+which performs a white pages query.
+
+Let's begin with some simple examples and introduce the other commands along
+the way.
+If you already know the handle of the person you are interested in finding out
+about,
+just give the handle:
+\begin{quote}\smaller\begin{verbatim}
+fred> whois @c=US@cn=Manager
+Manager (1)
+
+Handle:        @c=US@cn=Manager
+\end{verbatim}\end{quote}
+
+\subsection	{The Alias Command}
+Since handles are long strings,
+FRED will automatically maintain a list of aliases of the entries you
+have seen in the current session.
+The alias is always a number.
+When an entry is displayed,
+it appears on the first line in parenthesis after the name of the object.
+In the example above,
+the alias is \verb"1".
+
+To find out what aliases are currently defined,
+use the \verb"alias" command:
+\begin{quote}\smaller\begin{verbatim}
+fred> alias
+1    @c=US@cn=Manager
+\end{verbatim}\end{quote}
+Thus,
+the previous \verb"whois" command could have been shortened to simply:
+\begin{quote}\small\begin{verbatim}
+fred> whois !1
+Manager (1)
+
+Handle:        @c=US@cn=Manager
+\end{verbatim}\end{quote}
+Each time you invoke FRED,
+its list of aliases is empty.
+If there are few handles which you use often,
+you might wish to define them in your \file{.fredrc} file,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+alias "@c=US@o=DMD@cn=Manager"
+\end{verbatim}\end{quote}
+Of course,
+the ordering of aliases is important.
+FRED will start numbering from~1 starting with the first \verb"alias"
+command.
+
+\subsection	{Back to Searching}
+Suppose however,
+that you don't know the handle for the person.
+In this case,
+you need to specify some search parameters.
+Logically,
+the first step is to ascertain the organisation which the person is likely to
+be associated with, e.g.,
+``Performance Systems International''.
+This is done as:
+\begin{quote}\footnotesize\begin{verbatim}
+fred> whois organization psi
+Performance Systems International (1)  +1 800-836-0400 (Operations)
+     aka: PSI
+
+PSI Inc.
+  Reston International Center
+  11800 Sunrise Valley Drive
+  Suite 1100
+  Reston, VA 22091
+  US
+
+PSI Inc.
+  5201 Great American Parkway
+  Suite 3106
+  Santa Clara, CA 95054
+  US
+
+PSI Inc.
+  165 Jordan Road
+  Troy, NY 12180
+  US
+
+Telephone: +1 800-836-0400 (Operations)
+           +1 800-82PSI82 (Sales)
+           +1 703-620-6651 (Corporate/Reston Office)
+           +1 518-283-8860 (Troy Office)
+           +1 408-562-6222 (Santa Clara Office)
+FAX:       +1 703-620-4586
+           +1 518-283-8904
+           +1 408-562-6223
+
+value-added provider of networking services
+
+Locality:    Reston, Virginia
+
+Name:     Performance Systems International, US (1)
+Modified: Mon Jul 30 05:18:24 1990
+      by: Manager, Performance Systems International,
+            US (2)
+\end{verbatim}\end{quote}
+Second,
+to search for a particular person,
+you might use:
+\begin{quote}\small\begin{verbatim}
+fred> whois rose -area 2
+Marshall Rose (3)             mrose@psi.com
+     aka: mtr
+     aka: Marshall T. Rose
+
+Principal Scientist
+PSI, Inc.
+  POB 391776
+  Mountain View, CA 94039
+  US
+
+PSI, Inc.
+  5201 Great American Parkway
+  Suite 3106
+  Santa Clara, CA 95054
+  US
+
+Telephone: +1 415-961-3380
+           +1 408-562-6222 x6221
+FAX:       +1 415-961-3282
+           +1 408-562-6223
+
+Mailbox information:
+  internet: mrose@psi.com
+  internet: mrose@cheetah.ca.psi.com
+
+Principal Implementor of the ISO Development Environment
+
+Beleaguered Manager of the PSI White Pages Pilot Project
+
+A savvyNerd according to noSauce
+
+Locality:    Santa Clara, California
+
+Drinks:       Iced Tea (and lots of it...)
+
+Name:     Marshall Rose, Mountain View,
+            Research and Development,
+            Performance Systems International,
+            US (3)
+Modified: Mon Sep 24 14:43:36 1990
+      by: Manager, US (5)
+\end{verbatim}\end{quote}
+Note the use of the alias \verb"2".
+The command could also have been:
+\begin{quote}\small\begin{verbatim}
+fred> whois rose -area "@c=US@o=Performance Systems..."
+    ...
+\end{verbatim}\end{quote}
+Double-quotes are used so that the DN appears as a single token to FRED.
+
+Of course,
+this two-step process,
+whilst logical, is tedious.
+Thus, you can combine them like this:
+\begin{quote}\small\begin{verbatim}
+fred> whois rose -org psi
+    ...
+\end{verbatim}\end{quote}
+which says to look for any organisations with ``psi'' in its name.
+Then, for each one,
+look for something called ``rose''.
+
+\subsection	{The Area Command}
+Suppose
+you want information on several persons belonging to an organisation.
+You can use the \verb"area" command,
+by itself,
+to tell FRED where to search for subsequent commands.
+For example,
+\begin{quote}\small\begin{verbatim}
+fred> area "@c=US@o=Performance Systems International"
+\end{verbatim}\end{quote}
+or simply
+\begin{quote}\small\begin{verbatim}
+fred> area 2
+\end{verbatim}\end{quote}
+Both tell FRED the default area used by the \verb"whois" command.
+Of course,
+you can still use the \switch"area" area with the \verb"whois" command to
+override the default area.
+Thus,
+\begin{quote}\small\begin{verbatim}
+fred> whois alan -area "@c=US@o=Columbia University"
+\end{verbatim}\end{quote}
+will do what you expect.
+
+If you use the \verb"area" command without any arguments,
+FRED will tell you what its default area is:
+\begin{quote}\small\begin{verbatim}
+fred> area
+@c=US@o=Yoyodyne
+\end{verbatim}\end{quote}
+This indicates the default area for all commands,
+{\em including\/} any subsequent \verb"area" commands.
+Thus, issuing
+
+\begin{quote}\small\begin{verbatim}
+fred> area @c=US@o=Yoyodyne
+@c=US@o=Yoyodyne
+
+fred> area ou=Research
+@c=US@o=Yoyodyne@ou=Research
+\end{verbatim}\end{quote}
+is equivalent to
+\begin{quote}\small\begin{verbatim}
+fred> area @c=US@o=Yoyodyne@ou=Research
+@c=US@o=Yoyodyne@ou=Research
+\end{verbatim}\end{quote}
+because a leading ``\verb"@"''-sign was not used before \verb"ou=Research".
+
+As you might expect,
+there is a special string ``\verb".."'' which may be used to move up one level:
+\begin{quote}\small\begin{verbatim}
+fred> area ..
+@c=US@o=Yoyodyne
+\end{verbatim}\end{quote}
+Combinations are possible as well,
+such as
+\begin{quote}\small\begin{verbatim}
+fred> area ..@"o=Performance Systems International"
+@c=US@o=Performance Systems International
+\end{verbatim}\end{quote}
+which moves up a level and then down to\\
+\verb"o=Performance Systems International"
+
+\subsection	{Getting Help}
+For a brief summary of FRED commands,
+type:
+\begin{quote}\small\begin{verbatim}
+fred> help ?
+\end{verbatim}\end{quote}
+This will list the commands that FRED knows about
+along with a one-line summary of their function.
+
+For help on a particular command,
+type the name of the command followed by \switch"help",
+e.g.,
+\begin{quote}\small\begin{verbatim}
+fred> alias -help
+\end{verbatim}\end{quote}
+
+If you need more help,
+try
+\begin{quote}\small\begin{verbatim}
+fred> manual
+\end{verbatim}\end{quote}
+which is the same as
+\begin{quote}\small\begin{verbatim}
+% man fred
+\end{verbatim}\end{quote}
+from the shell.
+
+\subsection	{Quitting}
+To terminate FRED,
+simply use:
+\begin{quote}\small\begin{verbatim}
+fred> quit
+\end{verbatim}\end{quote}
+
+\section {Advanced Usage}
+
+This chapter has given a very brief overview of the basic FRED commands.
+For full details you should consult~\cite{PSI.Fred}, which tells you how
+to make more complex search requests, edit your own entry, and how to use
+FRED to compose mail addresses using the \MH/ mail system.

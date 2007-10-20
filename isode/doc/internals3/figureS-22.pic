@@ -1,0 +1,35 @@
+.PS 5.5i
+.ps 20
+## figure S-22
+lineht	=	2*lineht
+##
+C1:	circle invis "iso(1)"
+	line from C1.n to (C1.n.x, C1.n.y+lineht/2)
+##
+C2:	circle invis "$\cdots$" with .c at (C1.c.x-3*linewid/2, C1.c.y-lineht)
+	line from C1.s to C2.n
+C3:	circle invis "org(3)" with .c at (C1.c.x+3*linewid/2, C1.c.y-lineht)
+	line from C1.s to C3.n
+##
+C4:	circle invis "dod(6)" with .c at (C3.c.x-3*linewid/2, C3.c.y-lineht)
+	line from C3.s to C4.n
+C5:	circle invis "$\cdots$" with .c at (C3.c.x+3*linewid/2, C3.c.y-lineht)
+	line from C3.s to C5.n
+##
+C6:	circle invis "$\cdots$" with .c at (C4.c.x-3*linewid/2, C4.c.y-lineht)
+	line from C4.s to C6.n
+C7:	circle invis "internet(1)" with .c at (C4.c.x+3*linewid/2, C4.c.y-lineht)
+	line from C4.s to C7.n
+##
+D2:	circle invis "directory(1)" with .c at (C7.c.x-9*linewid/2, C7.c.y-lineht)
+	line from C7.s to D2.n
+D3:	circle invis "mgmt(2)" with .c at (C7.c.x-3*linewid/2, C7.c.y-lineht)
+	line from C7.s to D3.n
+D4:	circle invis "experimental(3)" with .c at (C7.c.x+3*linewid/2, C7.c.y-lineht)
+	line from C7.s to D4.n
+D5:	circle invis "private(4)" with .c at (C7.c.x+9*linewid/2, C7.c.y-lineht)
+	line from C7.s to D5.n
+##
+lineht	=	lineht/2
+##
+.PE

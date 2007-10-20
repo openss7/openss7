@@ -1,0 +1,490 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{The ISODE Tailoring File}\label{isotailor}
+The file \file{isotailor} in the ISODE \verb"ETCDIR" directory
+(usually \file{/usr/etc/})
+contains a simple run-time configuration
+mechanism for programs loaded with the \verb"-lisode" library.
+
+The file itself is an ordinary ASCII text file containing information
+regarding the known tailoring options.
+Each line contains the option's name, a colon, the option's value, and a
+newline.
+The sharp character (`\verb"#"') at the beginning of a line indicates a
+commentary line.
+
+\section	{Tailor Variables}
+The options available,
+along with default values and a description of their meanings,
+are now described.
+
+\subsection	{Local Environment Tailoring}
+\begin{describe}
+\item[\verb"localname":] The name of the localhost.
+If not set,
+depending on the TCP/IP implementation you are running,
+the system will be queried for this value.
+
+\item[\verb"binpath":] Where user programs are found.
+
+\item[\verb"sbinpath":] Where system programs are bound.
+
+\item[\verb"etcpath":] Where configuration files are found.
+\end{describe}
+
+\vspace{0.1in}		%%% yikes!
+\begin{center}\em
+(continued on the next page)
+\end{center}
+\newpage
+
+\subsection	{Logging Tailoring}
+\begin{describe}
+\item[\verb"logpath":] Where log files are found.
+
+\item[\em xyz\/\verb"level":] The debugging level for the {\em xyz\/}
+module,
+defaulting to \verb"none".
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Option}&
+		\multicolumn{1}{c|}{\bf Module}\\
+\hline
+    \tt compatlevel&	\man libicompat(3n)\\
+    \tt addrlevel&	various\\
+    \tt tsaplevel&	\man libtsap(3n)\\
+    \tt ssaplevel&	\man libssap(3n)\\
+    \tt psaplevel&	\man libpsap(3)\\
+    \tt psap2level&	\man libpsap2(3n)\\
+    \tt acsaplevel&	\man libacsap(3n)\\
+    \tt rtsaplevel&	\man librtsap(3n)\\
+    \tt rosaplevel&	\man librosap(3n)\\
+\hline
+\end{tabular}\]
+Options are seperated by whitespace.
+The debugging options available are:
+\begin{describe}
+\item[\verb"fatal":] fatal errors;
+
+\item[\verb"exceptions":] exceptional events;
+
+\item[\verb"notice":] informational notices;
+
+\item[\verb"pdus":] {\em xyz\/}PDU printing;
+
+\item[\verb"trace":] program tracing;
+
+\item[\verb"debug":] full debugging
+(not fully defined at this point);
+and,
+
+\item[\verb"all":] all of the above.
+\end{describe}
+Logging of levels other than \verb"fatal",
+\verb"exceptions", or \verb"notice" are subject
+to conditional compilation
+(the \verb"-DDEBUG" option must be used during compilation).
+
+\item[\em xyz\/\verb"file":] The file to be used for {\em xyz\/}PDU tracing.
+The file is written in append mode.
+If the filename supplied is \arg"-" (a single dash),
+then the diagnostic output is used instead.
+\[\begin{tabular}{|l|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Option}&
+		\multicolumn{1}{c|}{\bf Default}&
+		\multicolumn{1}{c|}{\bf Module}\\
+\hline
+    \tt compatfile&	\tt \%d.log&	\man libicompat(3n)\\
+    \tt addrfile&	\tt \%d.log&	various\\
+    \tt tsapfile&	\tt \%d.tpkt&	\man libtsap(3n)\\
+    \tt ssapfile&	\tt \%d.spkt&	\man libssap(3n)\\
+    \tt psapfile&	\tt \%d.pe&	\man libpsap(3)\\
+    \tt psap2file&	\tt \%d.ppkt&	\man libpsap2(3n)\\
+    \tt acsapfile&	\tt \%d.acpkt&	\man libacsap(3n)\\
+    \tt rtsapfile&	\tt \%d.rtpkt&	\man librtsap(3n)\\
+    \tt rosapfile&	\tt \%d.ropkt&	\man librosap(3n)\\
+\hline
+\end{tabular}\]
+The \man getpid(2) call is used to supply the value for \verb"%d".
+\end{describe}
+
+\subsection	{Directory Services Tailoring}\label{dse:tailor}
+\begin{describe}
+\item[\verb"ns\_enable":] enables use of a ``user-friendly nameservice''
+to perform name/address resolution.
+This takes the value either \verb+"on"+ or \verb+"off"+.
+If \verb+"on"+,
+then an OSI Directory-based service will be use.
+If the nameservice lookup fails,
+the stub-directory will be used as a fallback.
+
+\item[\verb"ns\_address":] the transport address of the nameservice.
+It is specified using the ISODE ``string'' format,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+Internet=wp.psi.net+17006
+\end{verbatim}\end{quote}
+which indicates that the nameservice lives in the TCP/IP communications domain
+on TCP port \verb"17006" at host \verb"wp.psi.net".
+The nameservice is accessed via the OSI CO-mode transport service,
+so other kinds of addresses (e.g., X.25 addresses can be used as well).
+\end{describe}
+
+\subsection	{Transport Switch Tailoring}
+The use of these variables is more usefully described in Chapter~\ref{tswitch}.
+\begin{describe}
+\item[\verb"ts\_stacks":] Specifies which configured TS-stacks are
+enabled.
+This is useful when multiple machines (with different interfaces)
+share the same executables.
+Options are seperated by whitespace:
+\begin{describe}
+\item[\verb"tcp":] RFC1006 over TCP/IP;
+
+\item[\verb"x25":] TP0 over X.25;
+
+\item[\verb"cons":] TP0 over CONS;
+
+\item[\verb"bridge":] TP0 over the TP0--bridge;
+
+\item[\verb"tp4":] TP4 over CLNP;
+and,
+
+\item[\verb"all":] all of the above.
+\end{describe}
+Using this method,
+the \file{isotailor} file is a normally symbolic link to
+\file{/private/etc/isotailor}.
+
+\item[\verb"ts\_interim":] Defines new OSI communities.
+Each community is defined by a macro in the \file isomacros(5) file.
+
+\item[\verb"ts\_communities":] Specifies which OSI communities are attached
+(either directly or through a transport-service bridge).
+Options are seperated by whitespace:
+\begin{describe}
+\item[\verb"int-x25":] International X.25;
+
+\item[\verb"janet":] UK JANET;
+
+\item[\verb"internet":] the capital-I Internet;
+
+\item[\verb"realns":] OSI Internet (ha, ha);
+
+\item[\verb"localTCP":] the TCP loopback address;
+and,
+
+\item[\verb"all":] all of the above OSI communities, along with those
+communities defined by the \verb"ts_interim" variable;
+\end{describe}
+For example,
+a site with an X.25 connection might be attached to the International X.25
+network, but not the JANET.
+Thus \verb"ts_stacks" would include ``x25'',
+and \verb"ts_communities" would include ``int-x25'' but not ``janet''.
+
+Note that the ordering of communities is important:
+network addresses will be tried in the order that their respective
+communities are listed with this variable.
+
+\item[\verb"default\_nsap\_community":] the default community to be
+used for NSAP addresses.
+
+\item[\verb"default\_x25\_community":] the default community to be
+used for X.25 (DTE) addresses.
+
+\item[\verb"default\_tcp\_community":] the default community to be
+used for TCP (RFC1006) addresses.
+\end{describe}
+
+\subsubsection{Transport-Service Bridge}
+There are two variables that can be specified.
+One is used on hosts making use of the TS-bridge,
+the other is used by hosts which run the TS-bridge:
+\begin{describe}
+\item[\verb|tsb\_communities|]	A list of pairs of values.
+The first of each value should be a community name as defined in
+the \verb"ts_communities" variable.
+The second value of the pair should be a presentation address using the ISODE
+``string'' format.
+When a call is to be placed and the network corresponds to one
+of the communities given here, then a call through the TS-bridge given in
+the second variable will be made automatically.
+
+\item[\verb|tsb\_default\_address|] This variable contains a string encoded
+presentation address which the TS-bridge will listen on by default.
+This should normally consist of a set of network addresses with no selectors
+present.
+\end{describe}
+Consider the case of a host with access to both the Internet and the
+International X.25 network.
+This host might have this entry in its \file{isotailor} file:
+\begin{quote}\tiny\begin{verbatim}
+tsb_default_address: Internet=sheriff+17004\|Int-X25(80)=23426020017299+PID+03018000
+\end{verbatim}\end{quote}
+This tells the TS-bridge to listen on two network endpoints.
+Hosts in the Internet community wishing to reach the International
+X.25 community would have this entry in their \file{isotailor} file:
+\begin{quote}\smaller\begin{verbatim}
+tsb_communities: int-x25 Internet=sheriff+17004
+\end{verbatim}\end{quote}
+Similarly,
+hosts in the International X.25 community wishing to reach the
+Internet community, would have the entry:
+\begin{quote}\smaller\begin{verbatim}
+tsb_communities: internet Int-X25(80)=23426020017299+PID+03018000
+\end{verbatim}\end{quote}
+
+\subsection{Interface Specific Tailoring}
+Some network implementations used by ISODE require ISODE to be
+tailored for their correct use.
+
+\subsubsection{General X.25 Tailoring}
+The following tailoring variables are generally applicable to
+X.25 networks.
+\begin{describe}
+\item[\verb"x25\_local\_dte"] It is normally
+necessary for ISODE to know it's local DTE
+address.
+This variable is used to set this.
+The default is empty, i.e., do not set a calling address in call
+requests.
+
+\item[\verb"x25\_local\_pid"] It is normally
+necessary for ISODE to know the X.25 protocol ID to listen on
+This is specified in hex-notation,
+e.g., \verb"03010100".
+
+\item[\verb"x25\_intl\_zero"] Some Public Data Networks
+require that X.121 addresses be
+modified before being conveyed.
+If this variable has the value \verb"on" then any addresses
+with a non-local DNIC will have a leading zero appended.
+
+\item[\verb"x25\_strip\_dnic"] If this variable has
+the value \verb"on" then any address with
+a local DNIC will have this removed.
+
+\item[\verb"x25\_dnic\_prefix"] If you use either or both of the
+preceding two mechanisms then you must use this variable to
+inform ISODE of the local DNIC for your host.
+
+\item[\verb"x25level":]
+Defines the level of logging to be used for X.25 statistics logging.
+(At present, only \verb"notice" messages are generated.)
+
+\item[\verb"x25file":]
+Defines the filename to be used for X.25 statistics logging.
+\end{describe}
+
+\subsubsection{SunLink X.25}
+The following variables are currently only supported by the
+SunLink X.25 interface.
+They control the X.25 Facilities that are requested or accepted.
+\begin{describe}
+\item[\verb"reverse\_charge"]  If \verb"0" then don't
+request/allow (initiator/responder) reverse charging.
+If \verb"1" then request/allow reverse charging.
+
+\item[\verb"recvpktsize"/\verb"sendpktsize"] Size of level 3 packets.
+Valid values are \verb"0" (default size),
+\verb"16", \verb"32", \verb"64", \verb"128",
+\verb"256", \verb"512", \verb"1024" (octets in decimal).
+
+\item[\verb"recvwndsize"/\verb"sendwndsize"] Size of level 3 window.
+Valid values are \verb"0" (default window size),
+\verb"1"--\verb"7" or \verb"1"--\verb"127" (decimal).
+
+\item[\verb"recvthruput"/\verb"sendthruput"] Send/receive throughput.
+\nopagebreak
+\begin{quote}
+\begin{tabbing}
+100\=1200\hspace{2em}\=100\=\kill
+\verb"0"\> default throughput \\
+\verb"3"\> 75\> \verb"8"\> 2400 \\
+\verb"4"\> 150\> \verb"9"\> 4800 \\
+\verb"5"\> 300\> \verb"10"\> 9600 \\
+\verb"6"\> 600\> \verb"11"\> 19200 \\
+\verb"7"\> 1200\> \verb"12"\> 48000  \\
+\end{tabbing}
+\end{quote}
+Values in bps decimal.
+
+\item[\verb"cug\_req"] If \verb"0" then don't use closed user group, if
+\verb"1" then use closed user group specified by
+\verb"cug_index".
+
+\item[\verb"cug\_index"] Closed user group in decimal
+(\verb"00"--\verb"99").
+
+\item[\verb"fast\_select\_type"] \verb"0" = don't use/allow fast
+select.
+\verb"1" = calling side --- only accept clear in response to
+fast select, called side --- send clear in response to fast
+select.
+% is any of this fast select stuff applicable to ISODE?
+\verb"2" = clear or accept is valid response to fast select.
+
+\item[\verb"rpoa\_req"] If \verb"0" then don't request RPOA
+(Recognised Private Operating Agency) transit.
+If \verb"1" then request RPOA transit.
+
+\item[\verb"rpoa"] If \verb"rpoa_req" is \verb"1" then this is
+RPOA transit group in decimal (\verb"0000"--\verb"9999").
+\end{describe}
+% actually cug_index and rpoa seem to be ignored in the current version
+See the SunLink X.25 Programmer's Manual for
+further explanations of these
+facilities.
+
+\subsubsection{Camtec CCL}
+There is one tailoring variable for the Camtec X.25 when used
+with the socket abstraction.%
+\footnote{The old device level interface is no longer supported.}
+\begin{describe}
+\item[\verb"x25\_outgoing\_port"] selects the physical port on the
+Camtec card for outgoing calls.
+It may take the value \verb"A", \verb"B" or \verb"#".
+\verb"A" and \verb"B" are the X.121 WAN ports and \verb"#" is
+the IEEE 802.3 (Ethernet) port.
+Incoming calls will be accepted on any port.
+\end{describe}
+
+\subsubsection{Bridge X.25}
+There are several tailorable variables that can specified for the
+bridge connection. These are:
+\begin{describe}
+\item[\verb|x25\_bridge\_host|]	selects the host that runs the
+tp0bridge being used. This should be a TCP accessible host.
+
+\item[\verb|x25\_bridge\_port|]	selects the TCP port that the
+tp0bridge will be listening on. The default for this is port 146 (an
+internet assigned number), which should be defined in \verb|/etc/services|.
+
+\item[\verb|x25\_bridge\_addr|]	the X.121 address of the remote host.
+
+\item[\verb|x25\_bridge\_listen|]	the X.121 address that this host will
+be listening on for incoming calls via the bridge.
+
+\item[\verb|x25\_bridge\_pid|]	the protocol id used for listening
+along with the above address. This is a set of eight hex digits.
+
+\item[\verb|x25\_bridge\_discrim|] selects the network layer to use.
+When attempting to place a call with the bridge code configured as
+well as real X.25, the string selects the interface to use. If the
+string is empty, the bridge will always be used. If it is set to
+``--'' the bridge will not be used. If the string is anything else, it
+is compared against the initial portion of the called X.121 address.
+If there is a match then the bridge is used, otherwise the real
+interface is called.
+\end{describe}
+
+\section	{Accessing the Tailoring File}
+The tailoring file is read usually when a program attempts or accepts its
+first connection.
+The \verb"-lisode" library does this by calling the routine
+\verb"isodetailor":
+\begin{quote}\index{isodetailor}\small\begin{verbatim}
+void    isodetailor (myname, wantuser)
+char   *myname;
+int     wantuser;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"myname":] the name that the program was invoked with
+(used by the logging package described in Chapter~\ref{logging}); and,
+
+\item[\verb"wantuser":] if non-zero,
+then a user-specific tailoring file,
+with the name \verb"~/.myname_tailor",
+should be consulted.
+\end{describe}
+Note that in order to ensure consistent logging it is {\bf critical\/} that
+the call to \verb"isodetailor" be the first call made to {\em any \/} of the
+ISODE routines.
+
+To override the default location of the tailoring file,
+use the routine \verb"isodesetailor":
+\begin{quote}\index{isodesetailor}\small\begin{verbatim}
+char   *isodesetailor (file)
+char   *file;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"file":] the filename to be used instead of the default.
+Future versions of this routine might act differently.
+\end{describe}
+The filename is interpreted relative to the \verb"-lisode" system area.
+To override this, specify a anchored pathname
+(e.g., on \unix/, one which starts with \verb"/" or \verb"./").
+The routine returns the name of the default tailoring file.
+
+To set a tailoring variable from some other configuration file,
+the routines \verb"isodesetvar" and \verb"isodexport" are used:
+\begin{quote}\index{isodesetvar}\small\begin{verbatim}
+int     isodesetvar (name, value, dynamic)
+char   *name,
+       *value;
+int     dynamic;
+\end{verbatim}
+\end{quote}
+When this routine is invoked,
+it acts as though
+\begin{quote}\small\begin{verbatim}
+name: value
+\end{verbatim}\end{quote}
+was found in the tailoring file.
+The \verb"dynamic" parameter, if non-zero,
+indicates that \verb"value" may be freed if a subsequent
+call to \verb"isodesetvar" is made which overrides the previous value.
+
+The \verb"isodexport" routine is called after one or more calls to
+\verb"isodesetvar",
+it performs any post-processing necessary to resynchronize the tailoring
+facilities.
+\begin{quote}\index{isodexport}\small\begin{verbatim}
+void    isodexport ()
+\end{verbatim}
+\end{quote}
+Thus,
+to read a private tailoring file,
+\verb"isodesetvar" should be called for each tailoring line.
+Then,
+\verb"isodexport" should be called once to resynchronize things.
+
+Finally, it may be necessary to access files in the \verb"-lisode" system area.
+The routine \verb"isodefile" takes an filename and returns an anchored
+pathname.
+\begin{quote}\index{isodefile}\small\begin{verbatim}
+char   *isodefile (file, ispgm)
+char   *file;
+int	ispgm;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"file":] the filename to be expanded;
+and,
+
+\item[\verb"ispgm":] non-zero if the target file is an executable
+(otherwise it is a database of some kind).
+\end{describe}
+This routine is actually a macro which invokes the routine \verb"_isodefile":
+\begin{quote}\index{\_isodefile}\small\begin{verbatim}
+char   *_isodefile (path, file)
+char   *path,
+       *file;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"path":] the directory where the filename should be expanded; and,
+
+\item[\verb"file":] the filename to be expanded.
+\end{describe}
+
+%%% \section	{Changes Since the Last Release}\label{compat:changes}
+%%% A brief summary of the major changes between v~\isodeprevrsn/ and
+%%% v~\isodevrsn/ are now presented.
+%%% These are the user-visible changes only;
+%%% changes of a strictly internal nature are not discussed.
+

@@ -1,0 +1,27 @@
+\File{getedb.py},{15:15},{Feb 24 1989}
+\L{\LB{GetEntryDataBlock \K{ABSTRACT}\-\K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT} GetEntryDataBlockArgument}}
+\L{\LB{}\Tab{8}{\K{RESULT} GetEntryDataBlockResult}}
+\L{\LB{}\Tab{8}{\K{ERRORS} \{NameError,ServiceError,SecurityError\}}}
+\L{\LB{}}
+\L{\LB{getEntryDataBlock GetEntryDataBlock ::= 10}}
+\L{\LB{}}
+\L{\LB{}\Tab{32}{\C{}\-\- will make this an OBJECT IDENTIFER}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- when ISODE can support this form }}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- of operation code}}
+\CE{}\L{\LB{}}
+\L{\LB{\Proc{GetEntryDataBlockArgument}GetEntryDataBlockArgument ::= \K{SET} \{}}
+\L{\LB{}\Tab{8}{entry [0] DistinguishedName,}}
+\L{\LB{}\Tab{8}{sendIfMoreRecentThan [1] EDBVersion \K{OPTIONAL}}}
+\L{\LB{}\Tab{24}{\C{}\-\- if omitted, just return version held}}
+\CE{}\L{\LB{}\Tab{24}{\C{}\-\- To force send, specify old version}}
+\CE{}\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\Proc{GetEntryDataBlockResult}GetEntryDataBlockResult ::= \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{16}{versionHeld [0] EDBVersion}}
+\L{\LB{}\Tab{16}{[1] EntryDataBlock \K{OPTIONAL}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\Proc{EDBVersion}EDBVersion ::= UTCTime}}

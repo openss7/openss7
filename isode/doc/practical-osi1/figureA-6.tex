@@ -1,0 +1,43 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \special{sh}%
+    \special{pa 0 750}%
+    \special{pa 0 0}%
+    \special{pa 2812 0}%
+    \special{pa 2812 750}%
+    \special{pa 0 750}%
+    \special{fp}%
+    \rlap{\kern  1.406in\lower 0.416in\hbox to 0pt{\hss \normalsize PRESENTATION\hss}}%
+    \special{pa 0 2000}%
+    \special{pa 0 1250}%
+    \special{pa 2812 1250}%
+    \special{pa 2812 2000}%
+    \special{pa 0 2000}%
+    \special{fp}%
+    \rlap{\kern  1.406in\lower 1.666in\hbox to 0pt{\hss \normalsize SESSION\hss}}%
+    \special{sh}%
+    \special{pa 0 3249}%
+    \special{pa 0 2500}%
+    \special{pa 2812 2500}%
+    \special{pa 2812 3249}%
+    \special{pa 0 3249}%
+    \special{fp}%
+    \rlap{\kern  1.406in\lower 2.915in\hbox to 0pt{\hss \normalsize TRANSPORT\hss}}%
+    \rlap{\kern  1.406in\lower 1.041in\hbox to0pt{\ dialogues\hss}}%
+    \special{pa 1406 750}%
+    \special{pa 1406 1250}%
+    \special{fp}%
+    \rlap{\kern  1.406in\lower 2.291in\hbox to0pt{\ circuits\hss}}%
+    \special{pa 1406 2000}%
+    \special{pa 1406 2500}%
+    \special{fp}%
+    \kern  2.813in
+  }\vss}%
+  \kern  3.250in
+}

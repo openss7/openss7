@@ -1,0 +1,13 @@
+.PS
+.ps 20
+## figure L-1
+B1:	box "TP0"
+B2:	box "X.25" with .n at B1.s
+##
+B3:	box "TP4" with .w at (B1.e.x+linewid, B1.e.y)
+B4:	box "CLNP" with .n at B3.s
+##
+B5:	box "\xx RFC1006" with .w at (B3.e.x+linewid, B3.e.y)
+B6:	box "TCP" "IP" with .n at B5.s
+##
+.PE

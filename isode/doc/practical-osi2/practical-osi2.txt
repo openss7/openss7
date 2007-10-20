@@ -1,0 +1,142 @@
+Practical Perspectives on OSI Networking
+
+Marshall T. Rose
+Performance Systems International, Inc.
+
+Introduction
+
+     This two day course provides a practical perspective on the
+     issues involved in developing and deploying OSI networks.
+     Organized for those with a basic familiarity with OSI and with
+     practical networking experience, the presentation will provide a
+     more comprehensive understanding of the OSI Reference Model, OSI
+     application and network services as well as a detailed
+     understanding of various transition strategies which may be
+     utilized in the realization of OSI networks from existing
+     technology, in particular TCP/IP-based networks.
+
+     After completion, you will achieve a thorough understanding of the
+     technology involved in developing OSI applications, building OSI
+     networks, and transiting to (or coexisting with) TCP/IP-based networks.
+
+
+Overview
+
+     Based on international cooperative work, it is commonly
+     acknowledged that protocols based on the Open Systems
+     Interconnection (OSI) model and promulgated by the International
+     Organization for Standardization (ISO) and the International
+     Electrotechnical Commission (IEC) will eventually achieve dominance
+     and enjoy even greater success than current networking
+     technologies.  OSI enjoy substantial political and marketing
+     support, and its use has even been mandated for procurement for use
+     in various national governments.  It not enough to simply mandate
+     the use of OSI.  Rather, OSI must be implemented before it can be
+     used!  Whilst a rather self-evident statement, the history of OSI,
+     starting in the late '70s, has not been particularly successful in
+     this regard.
+
+     This course focuses on the technical, pragmatic aspects of OSI which
+     are critical if OSI is to ever be realized in production
+     environments of meaningful size.  In order to emphasize this
+     practical perspective, throughout the course, a widely-used
+     implementation will be used to provide insights into what works in OSI.
+
+
+Audience
+
+     This tutorial is intended for professionals interested in planning,
+     implementing, or managing OSI networks.  A basic familiarity with
+     networking and OSI is assumed: this course is NOT an introduction
+     to, or a tutorial on, OSI.  Detailed knowledge of the protocols is
+     not required, but experience with implementing networking protocols
+     is very helpful.  Experience with the "C" programming language is also
+     useful.
+
+
+Course Outline
+
+     - End-to-End Services
+
+       A discussion of current OSI network and transport technologies
+       and how they may be used to build networks.
+
+	- Concepts:  basic terminology, network service, transport service
+
+	- Building Blocks:  address formats, network binding, transport
+	  protocols, application use of end-to-end services, emulation
+	  of OSI end-to-end services
+
+	- Comparison with relevant TCP/IP technology:  network service,
+	  transport service.
+
+
+     - Application Services
+
+       A discussion of current OSI application support and how they are used
+       to construct OSI applications.
+
+	- Application Layer Structure:  upper layer infrastructure,
+	  application contexts, application entities
+
+	- Application Service Elements:  association control, reliable
+	  transfer, remote operations, use of application services
+
+
+     - Building an OSI application:
+
+       A discussion on the use of remote operations to design and implement
+       an applications in an OSI framework.
+
+	- A Model for Distributed Applications:  abstract data types,
+	  operations, reliability characteristics
+
+	- The RO-Notation:  an annotated example
+
+	- Static Facilities:  stub generator, structure generator,
+	  element parser
+
+	- Dynamic Facilities:  run-time environment, boilerplate for
+	  consumers, boilerplate for providers
+
+
+     - Transition and Coexistence with TCP/IP
+
+       A discussion of how existing, production TCP/IP-based networks
+       may either transition to OSI, or coexist with OSI for maximal
+       functionality.
+
+	- Motivation and Background:  concepts, terminology, history,
+	  metrics of comparison
+
+	- Protocol-based Approaches:  dual stack, application gateways,
+	  transport gateways
+
+	- Service-based Approaches:  transport-service bridges, network
+	  tunnels 
+
+	- Examples: DoD OSI implementation plan, generic example
+
+
+Required Text
+
+     The Open Book: A Practical Perspective on OSI by Rose, published by
+     Prentice-hall (available at the Computer Literacy Bookstore, Techmart).
+
+
+Instructor
+
+     Marshall T. Rose is Principal Scientist at Performance Systems
+     International, Inc., where he works on OSI protocols and network
+     management.  He is the principal implementor of the ISO Development
+     Environment (ISODE), an openly available implementation of the
+     upper layers of the OSI protocol suite.  He is the author of "The
+     Open Book: A Practical Perspective on OSI", a professional text
+     discussing OSI in both theory and practice, published by Prentice-hall.
+     Rose received the Ph.D. degree in Information and Computer Science
+     from the University of California, Irvine, in 1984.
+
+
+Dates
+
+     Two meetings, July 16-17, Monday-Tuesday, 9AM-5PM

@@ -1,0 +1,21 @@
+\File{figureS\-5.c},{11:21},{May  5 1990}
+\L{\LB{\Proc{if}    \K{if} ((pe = ps2pe (ps)) == NULLPE) \{}}
+\L{\LB{\K{\#ifdef}}\Tab{8}{COTS}}
+\L{\LB{}\Tab{8}{\K{if} (rfx == ts\_read) \{}}
+\L{\LB{\C{}\/* note T\-DISCONNECT... *\/\CE{}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{\K{\#endif}}}
+\L{\LB{}\Tab{8}{advise (LLOG\_EXCEPTIONS, NULLCP, \S{}\"ps2pe: \%s (\%s)\"\SE{},}}
+\L{\LB{}\Tab{16}{ps\_error (ps \-\> ps\_errno), source);}}
+\L{\LB{}\Tab{8}{snmpstat.s\_inpkts++;}}
+\L{\LB{}\Tab{8}{snmpstat.s\_asnparseerrs++;}}
+\L{\LB{}\Tab{8}{\K{goto} out;}}
+\L{\LB{    \}}}
+\L{\LB{\K{\#ifdef}}\Tab{8}{COTS}}
+\L{\LB{\Proc{if}    \K{if} (rfx == ts\_read)}}
+\L{\LB{}\Tab{8}{advise (LLOG\_XXX, NULLCP, \S{}\"T\-DATA.INDICATION: \%d (\%s)\"\SE{}, fd, source);}}
+\L{\LB{    \K{else}}}
+\L{\LB{\K{\#endif}}}
+\L{\LB{}\Tab{8}{advise (LLOG\_XXX, NULLCP, \S{}\"packet from \%s\"\SE{}, source);}}
+\L{\LB{}}
+\L{\LB{    snmpstat.s\_inpkts++;}}

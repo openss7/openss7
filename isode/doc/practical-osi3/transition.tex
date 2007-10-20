@@ -1,0 +1,1271 @@
+% run this through LaTeX with the appropriate wrapper
+
+\dotopic{TRANSITION AND\\ COEXISTENCE\\ WITH TCP/IP}
+
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]		MOTIVATION
+
+\item[PART II:]		BACKGROUND
+
+\item[PART III:]	PROTOCOL-BASED APPROACHES
+
+\item[PART IV:]		SERVICE-BASED APPROACHES
+
+\item[PART V:]		EXAMPLES
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A BIG ACKNOWLEDGEMENT}
+
+\begin{nrtc}
+\item	TRANSITION IS MOSTLY SMOKE AND MIRRORS
+
+\item	THE PRACTICAL PERSPECTIVED PRESENTED HERE IS HEAVILY INFLUENCED BY
+	DISCUSSIONS WITH
+    \begin{nrtc}
+    \item	EINAR A.~STEFFERUD (NMA)
+
+    \item	DAVID H.~CROCKER (DEC)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{MOTIVATION}\bf
+
+\begin{nrtc}
+\item	THERE ARE MANY TCP/IP NETWORKS TODAY; THERE WILL BE MORE TOMORROW
+
+\item	BY THE TIME OSI BECOMES A WORTHWHILE OPERATIONAL ALTERNATIVE,
+	THERE WILL BE MANY MORE TCP/IP NETWORKS THAN THERE ARE TODAY!
+
+\item	PROBLEM: HOW TO PROTECT INSTALLED BASE?
+
+\item	PROBLEM: HOW TO TRANSITION GRACEFULLY?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GROWTH OF TCP/IP}
+
+\begin{nrtc}
+\item	SALES OF TCP/IP-BASED TECHNOLOGY
+    \begin{nrtc}
+    \item	PARTICULARLY IN EUROPE
+    \end{nrtc}
+	CONTINUES TO GROW
+
+\item	SEVERAL TECHNICAL AND MARKET ASPECTS CONTRIBUTE TO THIS PHENOMENA:
+    \begin{nrtc}
+    \item	SUPERIORITY OF TCP/IP IN LOWER-LAYER CONNECTIVITY
+
+    \item	MATURITY OF TCP/IP PRODUCTS\\ (e.g., RANGE OF PLATFORMS)
+    \end{nrtc}
+
+\item	ALTHOUGH OSI WILL DOMINATE, IT DOESN'T YET
+
+\item	HENCE, TCP/IP IS BECOMING MORE FIRMLY ENTRENCHED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FEAR AND LOATHING IN THE MARKET}
+
+\begin{nrtc}
+\item	F.U.D. IN THE MARKETPLACE:
+\begin{quote}\em
+``All marketing is fear, uncertainty, and doubt.''\\ \raggedleft
+-- Einar Stefferud, Network Management Associates
+\end{quote}
+
+\item	WHAT THE VENDORS SAY:
+\begin{quote}\em
+``$\ldots$ protect your investment while assuring a path to an OSI
+future.''\\ \raggedleft
+-- Vendor A
+\end{quote}
+AND
+\begin{quote}\em
+``$\ldots$ plans for a smooth, painless guaranteed migration to OSI standards
+as they are approved.''\\ \raggedleft
+--Vendor B
+\end{quote}
+AND
+\begin{quote}\em
+``Once you've scrapped your existing production networks,
+come to us for OSI.
+It will be wonderful!''\\ \raggedleft
+--Vendor C
+\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE SAD TRUTH}
+
+\begin{quote}\em
+``You can't win, and you can't quit, but you \underline{can} reduce the
+pain.''\\ \raggedleft
+-- Marshall Rose, PSI, Inc.
+\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{BACKGROUND}\bf
+
+\begin{nrtc}
+\item	CONCEPTS
+
+\item	TERMINOLOGY
+
+\item	HISTORY
+
+\item	METRICS FOR COMPARISON
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE FUNDAMENTAL ASSUMPTION}
+
+\begin{nrtc}
+\item	TCP/IP IS HERE TODAY, WIDELY INSTALLED, AND USEFUL
+
+\item	OSI WILL EVENTUALLY REPLACE TCP/IP AS THE OFF-THE-SHELF TECHNOLOGY FOR
+	BUILDING INTEROPERABLE SYSTMS
+
+\item	BOTH WILL BE SIMULTANEOUSLY WIDESPREAD FOR QUITE SOME TIME
+    \begin{nrtc}
+    \item	DURING WHICH OSI WILL GAIN DOMINANCE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{CONCEPTS}\bf
+
+\begin{nrtc}
+\item	TRANSITION:
+    \begin{nrtc}
+    \item	TO MOVE FROM ONE PROTOCOL SUITE TO ANOTHER
+    \end{nrtc}
+
+\item	COEXISTENCE:
+    \begin{nrtc}
+    \item	TO LIVE TOGETHER WITHOUT HOSTILITY OR CONFLICT DESPITE
+		DIFFERENCES
+    \end{nrtc}
+
+\item	MIGRATION:
+    \begin{nrtc}
+    \item	TO MOVE BACK AND FORTH, AS THE SEASONS CHANGE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MAPPINGS}
+
+\begin{nrtc}
+\item	TRANSITION AND COEXISTENCE CAN BE DESCRIBED BY THE MAPPINGS THEY
+	REQUIRE
+
+\item	SOME MAPPINGS ARE SIMPLE
+    \begin{nrtc}
+    \item	i.e., SYNTACTIC CHANGES
+    \end{nrtc}
+
+\item	SOME MAPPINGS ARE COMPLEX
+    \begin{nrtc}
+    \item	i.e., SEMANTIC CHANGES
+    \end{nrtc}
+
+\item	THE MORE COMPLEX THE MAPPING, THE GREATER THE LOSS OF INFORMATION OR
+	INTENT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{TERMINOLOGY}\bf
+
+\begin{nrtc}
+\item	WE'LL FAVOR OSI TERMINOLOGY, BUT STILL NEED SOME INTERNET (TCP/IP)
+	TERMINOLOGY
+
+\item	TWO BASIC TERMS
+    \begin{nrtc}
+    \item	GATEWAY: GENERIC TO ANY LEVEL, COMPLEX
+
+    \item	BRIDGE: GENERIC TO ANY LEVEL, SIMPLE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERVICE SEMANTICS}
+
+\begin{nrtc}
+\item	STORE-AND-FORWARD
+    \begin{nrtc}
+    \item	SERVICE SEMANTICS CARRIED MULTI-HOP VIA FORWARDERS
+    \end{nrtc}
+
+\item	END-TO-END
+    \begin{nrtc}
+    \item	SERVICE SEMANTICS CARRIED FROM ORIGINATOR TO RECIPIENT
+
+    \item	MAY BE SUPPORTED BY AN UNDERYLING STORE-AND-FORWARD SERVICE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERVICE SEMANTICS (cont.)}
+
+\vskip.5in
+\diagram[p]{figureT-3}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROTOCOL SUITE}
+
+\begin{nrtc}
+\item	A COLLECTION OF SERVICES AND PROTOCOLS RELATED:
+    \begin{nrtc}
+    \item	ADMINISTRATIVELY, BY AN ORGANIZATION\\ (e.g., ISO/IEC); and,
+
+    \item	PHILOSOPHICALLY, BY A REFERENCE MODEL\\ (e.g., the OSIRM)
+    \end{nrtc}
+
+\item	FOR OUR PURPOSES, THERE ARE ONLY TWO:
+    \begin{nrtc}
+    \item	THE OSI SUITE OF PROTOCOLS
+
+    \item	THE INTERNET SUITE OF PROTOCOLS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATIONS}
+
+\begin{nrtc}
+\item	APPLICATION CLASS
+    \begin{nrtc}
+    \item	A SET OF APPLICATIONS RELATED TO A PARTICULAR ACTIVITY,
+		e.g., FILE TRANSFER, IRREGARDLESS OF PROTOCOL SUITE
+    \end{nrtc}
+
+\item	APPLICATION INSTANCE
+    \begin{nrtc}
+    \item	A MEMBER OF AN APPLICATION CLASS SPECIFIC TO A PARTICULAR
+		PROTOCOL SUITE, e.g., FTAM
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{HISTORY}\bf
+
+\begin{nrtc}
+\item	A VERY BRIEF INTRODUCTION TO THE TWO PROTOCOL SUITES
+
+\item	WE'LL ATTEMPT TO TAKE A NON-PARTISAN VIEW (ha!)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INTERNET SUITE}
+
+\begin{nrtc}
+\item	SPONSORED BY THE U.S.~DoD
+    \begin{nrtc}
+    \item	GREW OUT OF EARLY (D)ARPA RESEARCH INTO SURVIVABLE NETWORKS
+    \end{nrtc}
+    BASIS FROM THE DoD INTERNET ARCHITECTURE MODEL
+
+\item	SPECIFIED IN ``REQUEST FOR COMMENTS'' SERIES (RFCs) AND
+	U.S.~MILITARY STANDARDS (MILSTDs)
+
+\item	CURRENT GENERATION PRIMARILY BASED ON
+    \begin{nrtc}
+    \item	CONNECTION-ORIENTED TRANSPORT SERVICE,
+		PROVIDED BY THE TCP; AND,
+
+    \item	CONNECTIONLESS-MODE NETWORK SERVICE,
+		PROVIDED BY THE IP
+    \end{nrtc}
+
+\item	MAJOR EMPHASIS ON CONNECTIVITY OF DIVERSE SUB-NETWORKS
+    \begin{nrtc}
+    \item	EXCELLENT RESEARCH CONTINUES, TO THIS DAY, ON THESE ISSUES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INTERNET SUITE (cont.)}
+
+\begin{nrtc}
+\item	SEVERAL PRODUCTION APPLICATIONS
+    \begin{nrtc}
+    \item	SIMPLE MAIL TRANSFER PROTOCOL (SMTP)
+
+    \item	FILE TRANSFER PROTOCOL (FTP)
+
+    \item	TELNET (VIRTUAL TERMINAL PROTOCOL)
+
+    \item	DOMAIN NAME SYSTEM (DNS)
+
+    \item	SIMPLE NETWORK MANAGEMENT PROTOCOL (SNMP)
+    \end{nrtc}
+    ALL OF WHICH ARE RATHER SIMPLE
+
+\item	APPLICATIONS CONTAIN THEIR OWN IMPLICIT SESSION AND PRESENTATION
+	MECHANISMS
+
+\item	NOT SURPRISING, CONSIDERING THAT THESE APPLICATIONS ARE ALL BASED ON
+	15~YEAR OLD MODELS!
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INTERNET PROTOCOLS}
+
+\vskip.5in
+\diagram[p]{figureT-4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OSI SUITE}
+
+\begin{nrtc}
+\item	SPONSORED BY THE INTERNATIONAL COMMUNITY
+    \begin{nrtc}
+    \item	IN PARTICULAR THE ISO
+    \end{nrtc}
+    BASIS FROM THE OSI REFERENCE MODEL (OSIRM)
+
+\item	SPECIFIED IN ``STANDARDS'' (ISO/IEC)  AND RECOMMENDATIONS (CCITT)
+
+\item	BASED ON
+    \begin{nrtc}
+    \item	CONNECTION-ORIENTED TRANSPORT SERVICE,
+		PROVIDED BY ONE OF FIVE DIFFERENT TPs; DEPENDING ON
+
+    \item	THE NETWORK SERVICE AVAILABLE (CONS or CLNS)
+    \end{nrtc}
+
+\item	DIFFICULT TO IDENTIFY THE ``MAJOR'' EMPHASIS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OSI SUITE (cont.)}
+
+\begin{nrtc}
+\item	SEVERAL INTERESTING APPLICATIONS
+    \begin{nrtc}
+    \item	MESSAGE HANDLING SYSTEMS (MHS)
+
+    \item	FILE TRANSFER, ACCESS AND MANAGEMENT (FTAM)
+
+    \item	VIRTUAL TERMINAL (VT)
+
+    \item	DIRECTORY SERVICES (DS)
+    \end{nrtc}
+
+\item	APPLICATIONS EVOLVING QUITE HEAVILY OVER THE LAST FEW YEARS
+
+\item	MUCH MORE AMBITIOUS THAN THEIR INTERNET COUNTERPARTS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+%%%\ctitle	{OSI PROTOCOLS}
+
+%%%\vskip.25in
+\diagram[p]{figureT-5}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A BRIEF COMPARISON}
+
+\begin{nrtc}
+\item	NOTE THAT CONCERNS DIFFER
+    \begin{nrtc}
+    \item	NETWORK USERS: APPLICATION-LEVEL FUNCTIONALITY
+
+    \item	NETWORK ADMINISTRATORS: NETWORK AND TRANSPORT ISSUES
+    \end{nrtc}
+
+\item	FOR APPLICATIONS, ONCE IMPLEMENTED, THE OSI SUITE IS SUPERIOR
+
+\item	FOR NETWORK/TRANSPORT ISSUES, AT PRESENT,
+	THE INTERNET SUITE IS SUPERIOR
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{METRICS FOR COMPARISON}\bf
+
+\begin{nrtc}
+\item	CAN JUDGE A TRANSITION/COEXISTENCE SCHEME USING DIFFERENT
+	CRITERIA
+
+\item	THE FOUR WE'LL FOCUS ON ARE ALL SUBJECTIVE;
+    \begin{nrtc}
+    \item	TECHNICAL SOLUTIONS DO NOT EXIST IN A VACUUM
+
+    \item	THEY MUST BE EVALUATED IN THE CONTEXT OF A TARGET ENVIRONMENT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{METRICS FOR COMPARISON (cont.)}
+
+\begin{nrtc}
+\item	PERFORMANCE:
+    \begin{nrtc}
+    \item	THROUGHPUT, LATENCY
+
+    \item	EFFECT ON OTHER APPLICATIONS
+    \end{nrtc}
+
+\item	FLEXIBILITY:
+    \begin{nrtc}
+    \item	RANGE OF APPLICABILITY
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{METRICS FOR COMPARISON (cont.)}
+
+\begin{nrtc}
+\item	TRANSPARENCY:
+    \begin{nrtc}
+    \item	USAGE CONTINUITY
+
+    \item	SEAMLESS USER INTERFACE
+    \end{nrtc}
+
+\item	AMENABILITY:
+    \begin{nrtc}
+    \item	MANAGEABILITY
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SEVERAL CANDIDATES}
+
+\begin{nrtc}
+\item	PROTOCOL-BASED APPROACHES
+    \begin{nrtc}
+    \item	DUAL STACK
+
+    \item	APPLICATION GATEWAYS
+
+    \item	TRANSPORT GATEWAYS
+    \end{nrtc}
+
+\item	SERVICE-BASED APPROACHES
+    \begin{nrtc}
+    \item	TRANSPORT-SERVICE BRIDGES
+
+    \item	NETWORK TUNNELS
+    \end{nrtc}
+
+\item	NONE OF THESE TECHNIQUES ARE SPECIFIC TO THE PROBLEM OF
+    \begin{nrtc}
+    \item	INTERNET $\mapsto$ OSI
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{PROTOCOL-BASED APPROACHES}\bf
+
+\begin{nrtc}
+\item	THE ``STANDARD'' METHODS USED TO INTERCONNECT DIFFERENT
+	PROTOCOL STACKS
+
+\item	THESE EMPHASIZE THE PROTOCOLS IN EACH STACK
+
+\item	HENCE THEY REINFORCE THE BOUNDARIES BETWEEN TCP/IP AND OSI
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{DUAL STACK}\bf
+
+\begin{nrtc}
+\item	PUT BOTH PROTOCOL SUITES IN ALL HOSTS
+
+\item	WORKS WELL, IF YOU CAN CHANGE \underline{EVERYTHING} ON THE NETWORK
+\begin{quote}\em
+``Nice work, if you can get it.''\\ \raggedleft
+-- Groucho Marx, Monkey Business, Paramount Pictures (1931)
+\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DUAL STACK (cont.)}
+
+\vskip.5in
+\diagram[p]{figureT-1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TALKING TO UNI-STACK HOSTS}
+
+\begin{nrtc}
+\item	QUESTION: HOW TO DECIDE WHICH APPLICATION INSTANCE,
+    \begin{nrtc}
+    \item	APPL-$\alpha$ OR APPL-$\gamma$,
+    \end{nrtc}
+	TO USE?
+
+\item	TWO ANSWERS:
+    \begin{nrtc}
+    \item	DEPEND ON THE USER TO KNOW AND INVOKE THE RIGHT PROGRAM
+
+    \item	DEVELOP A GENERIC APPLICATION WHICH SUPPORTS BOTH CLASSES
+    \end{nrtc}
+
+\item	IN THE LATTER CASE, NEED AN UP-TO-DATE DIRECTORY TO DO THIS RELIABLY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GENERIC APPLICATION INSTANCE}
+
+\vskip.5in
+\diagram[p]{figureT-6}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN IMPLEMENTATION OF DUAL-STACK}
+
+\begin{nrtc}
+\item	ENVIRONMENT: \unix/~SVR3 (STREAMS)
+
+\item	ACCESS TO LOWER-LAYER PROTOCOLS VIA TRANSPORT LAYER INTERFACE (TLI)
+
+\item	NOTE THAT ALTHOUGH TLI PROVIDES A UNIFORM INTERFACE,
+	IT DOES NOT PROVIDE A UNIFORM SERVICE:
+    \begin{nrtc}
+    \item	PACKET- vs. STREAM-ORIENTATION
+
+    \item	GRACEFUL RELEASE
+
+    \item	EXPEDITED vs. URGENT DATA
+
+    \item	ADDRESSING
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GENERIC APPLICATION INSTANCE}
+
+\vskip.5in
+\diagram[p]{figureT-11}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SCORECARD}
+
+\begin{nrtc}
+\item	PERFORMANCE: NO DEGRADATION
+
+\item	FLEXIBILITY: GOOD
+
+\item	TRANSPARENCY:
+    \begin{nrtc}
+    \item	ASSUMING REMOTE SYSTEM SUPPORTS AT LEAST ONE OF THE PROTOCOL
+		STACKS, THEN HIGH TRANSPARENCY BY USING COMMON SERVICE
+		INTERFACE
+    \end{nrtc}
+
+\item	AMENABILITY:
+    \begin{nrtc}
+    \item	ALL INTERMEDIATE-SYSTEMS MUST RUN BOTH PROTOCOLS
+
+    \item	INTRODUCES ADMINISTRATIVE PROBLEMS AS THERE ARE NOW TWO
+		LOGICAL NETWORKS
+	\begin{nrtc}
+	\item	MANAGEMENT OF BOTH \underline{PLUS} CONTENTION BETWEEN THEM
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{APPLICATION GATEWAYS}\bf
+
+\begin{nrtc}
+\item	A WELL-KNOWN, BUT LITTLE-UNDERSTOOD TECHNOLOGY
+    \begin{nrtc}
+    \item	USED IN MESSAGE HANDLING QUITE A BIT
+    \end{nrtc}
+
+\item	MOST ARE QUITE TERRIBLE
+\begin{quote}\em
+``Sometimes when you try to turn an apple into an orange you get back a
+lemon.''\\ \raggedleft
+-- Michael Padlipsky, The Elements of Networking Style (1985)
+\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION GATEWAYS (cont.)}
+
+\vskip.5in
+\diagram[p]{figureT-2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{IMPERFECT MAPPINGS}
+
+\begin{nrtc}
+\item	BECAUSE THEY ARE AT THE HIGHEST LAYER IN THE STACK,
+	APPLICATION GATEWAYS TEND TO PERFORM SEMANTIC MAPPINGS
+
+\item	THESE ARE ACCOMPANIED BY A LOSS OF INFORMATION
+
+\item	SOMETIMES THE LOSS IS ONLY ANNOYING
+    \begin{nrtc}
+    \item	e.g., ``FUNNY LOOKING'' MAIL ADDRESSES
+    \end{nrtc}
+
+\item	SOMETIMES THE LOSS IS CATASTROPHIC
+    \begin{nrtc}
+    \item	e.g., ROUTING LOOPS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN IMPLEMENATION OF APPLICATION-GATEWAY}
+
+\begin{nrtc}
+\item	TWO KINDS OF IMPLEMENATIONS
+
+\item	STAGING (TRUE STORE-AND-FORWARD):
+    \begin{nrtc}
+    \item	TOP-LEVEL PROTOCOL TRANSACTIONS ARE GROUPED AT THE GATEWAY
+
+    \item	REQUIRES LOCAL STORAGE, BUT MAY PERMIT BETTER MAPPINGS
+    \end{nrtc}
+
+\item	IN-SITU (VIRTUAL END-TO-END):
+    \begin{nrtc}
+    \item	NO PROTOCOL TRANSACTIONS ARE GROUPED
+
+    \item	MAPPINGS ARE ``ON THE FLY''\\ (AND PERHAPS LESS PRECISE)
+
+    \item	END-TO-END RESPONSE IS FASTER
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INVOKING THE GATEWAY}
+
+\vskip1.5in
+\begin{verbatim}
+% ftp file-gateway
+Name (file-gateway:asterix): obelix@sc,psi,us
+Password:
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A STAGING IMPLEMENTATION}
+
+\vskip.5in
+\diagram[p]{figureT-12}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN IN-SITU IMPLEMENTATION}
+
+\vskip.5in
+\diagram[p]{figureT-13}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SCORECARD}
+
+\begin{nrtc}
+\item	PERFORMANCE: USUALLY POOR, BUT ACCEPTABLE FOR STORE-AND-FORWARD
+	APPLICATIONS
+    \begin{nrtc}
+    \item	TYPICALLY ALSO INTRODUCES ADDITIONAL NETWORK TRAFFIC
+    \end{nrtc}
+
+\item	FLEXIBILITY: NONE; EACH A-GWY IS A SPECIAL-PURPOSE SOFTWARE BOX
+
+\item	TRANSPARENCY: 
+    \begin{nrtc}
+    \item	TO SERVICE: OFTEN LOSES SIGNIFICANT FUNCTIONALITY
+
+    \item	TO USERS: POSSIBLE, BUT NOT LIKELY (e.g., IN AN FTAM/FTP A-GWY,
+		USERS EMBED HOSTNAMES IN FILENAMES)
+    \end{nrtc}
+
+\item	AMENABILITY:
+    \begin{nrtc}
+    \item	REQUIRES NO END-SYSTEM MODIFICATION
+
+    \item	MAY INTRODUCE ADMINISTRATIVE PROBLEMS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{TRANSPORT GATEWAYS}\bf
+
+\begin{nrtc}
+\item	IDEA: GATEWAY AT THE TRANSPORT LAYER SO AS TO AVOID NEEDING
+	MULTIPLE APPLICATION GATEWAYS
+\begin{quote}\em
+``We could do it, but it would be wrong.''\\ \raggedleft
+-- Richard Nixon, The Watergate Tapes (1974)
+\end{quote}
+
+\item	ALTHOUGH THE OSI (TP4) AND INTERNET (TCP) TRANSPORT PROTOCOLS DIFFER,
+	THE SERVICE IS QUITE SIMILAR
+
+\item	HENCE, IT IS TECHNICALLY FEASIBLE TO PERFORM THE MAPPINGS
+    \begin{nrtc}
+    \item	(ALTHOUGH IT'S A LOT OF HARD WORK)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRANSPORT GATEWAYS (cont.)}
+
+\vskip.5in
+\diagram[p]{figureT-14}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE OBVIOUS QUESTION}
+
+\begin{nrtc}
+\item	WHAT APPLICATION DO YOU RUN WHEN USING THIS?
+    \begin{nrtc}
+    \item	CAN'T RUN INTERNET APPLICATIONS IN THE OSI NETWORK,
+		SINCE THE TRANSPORT GATEWAY YIELDS OSI TRANSPORT SEMANTICS
+
+    \item	CAN'T RUN OSI APPLICATIONS IN THE INTERNET NETWORK,
+		SINCE THE TRANSPORT GATEWAY YIELDS INTERNET TRANSPORT SEMANTICS
+    \end{nrtc}
+
+\item	THIS APPROACH FAILS BECAUSE IT PRESENTS DIFFERENT SERVICE SEMANTICS
+	IN EACH NETWORK
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{SERVICE-BASED APPROACHES}\bf
+
+\begin{nrtc}
+\item	BY THE TIME OSI-BASED NETWORKS ARE TRULY WIDESPREAD,
+	TCP/IP-BASED NETWORKS WILL ALREADY OFFER A MIX OF SERVICES:
+    \begin{nrtc}
+    \item	SUCH AS FTAM AND MHS, IN ADDITION TO FTP AND SMTP
+    \end{nrtc}
+
+\item	IN OTHER WORDS, PERHAPS THE TRANSITION TO OSI BEGINS WITH NEW
+	APPLICATIONS ON HOSTS AND NO CHANGES TO THE NETWORK
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WOULD THIS REALLY HAPPEN?}
+
+\begin{nrtc}
+\item	RECALL THAT USERS ARE INTERESTED IN \underline{SERVICES} NOT
+	\underline{PROTOCOLS}
+
+\item	THE OSI APPLICATIONS ARE MUCH RICHER THAN THEIR INTERNET COUNTERPARTS
+
+\item	IN CONTRAST, AT THE LOWER-LAYERS THE INTERNET SUITE ``WORKS BETTER''
+    \begin{nrtc}
+    \item	AS SUCH, IT IS UNLIKELY TO BE REPLACED BY THE OSI LOWER-LAYERS
+		FOR QUITE SOME TIME
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBSERVATION}
+
+\begin{nrtc}
+\item	GIVEN THE ABOVE ASSUMPTION, IT SHOULD BE NOTED THAT:
+    \begin{nrtc}
+    \item	WE HAVE TWO COMMUNITIES USING THE SAME APPLICATIONS
+		(OSI), AND
+
+    \item	ONLY THE UNDERLYING ``TS-STACK'' WILL DIFFER BETWEEN THE TWO:
+	\begin{nrtc}
+	\item	IN THE OSI COMMUNITY: TP4/CLNP/$\ldots$
+
+	\item	IN THE TCP COMMUNITY: RFC1006/TCP/IP/$\ldots$
+	\end{nrtc}
+    \end{nrtc}
+
+\item	THIS LEADS US TO POSTULATE AN INTERESTING COEXISTENCE
+	STRATEGY:
+    \begin{nrtc}
+    \item	LET'S RUN OSI APPLICATIONS, END-TO-END, BETWEEN THE TWO
+    \end{nrtc}
+
+\item	IN A SENSE, THIS IS A HYBRID OF THE TWO PREVIOUS APPROACHES,
+	INTENDED TO MINIMIZE THE DISADVANTAGES OF EACH
+    \begin{nrtc}
+	\item	SAME APPLICATION PROTOCOL,\\
+		BUT DIFFERENT UNDERYLING LAYERS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{TRANSPORT-SERVICE BRIDGES}\bf
+
+\begin{nrtc}
+\item	INTRODUCE A TRANSPORT ENTITY CALLED THE ``TS-BRIDGE''
+\begin{quote}\em
+``Users are interested in services, not protocols.''\\ \raggedleft
+-- Marshall Rose, The Open Book (1989)
+\end{quote}
+
+\item	THE TS-BRIDGE ``COPIES'' SERVICE PRIMITIVES FROM ONE TS-STACK TO THE
+	OTHER, e.g.:
+    \begin{nrtc}
+    \item	UPON RECEIVING A T-CONNECT.INDICATION PRIMITIVE FROM ONE
+		TS-STACK,
+
+    \item	IT ISSUES A T-CONNECT.REQUEST PRIMITIVE TO THE OTHER TS-STACK
+    \end{nrtc}
+
+\item	AS DISCUSSED EARLIER, THIS TECHNOLOGY IS USED FOR CONNECTIVITY BETWEEN
+	DIFFERENT OSI COMMUNITIES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRANSPORT-SERVICE BRIDGES (cont.)}
+
+\vskip.5in
+\diagram[p]{figureT-9}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONS vs. CLNS CONNECTIVITY}
+
+\vskip.5in
+\diagram[p]{figureT-19}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE TS-BRIDGE AND THE OSI MODEL\\ (REVIEW)}
+
+\begin{nrtc}
+\item	THE TS-BRIDGE IS A LEVEL-FOUR ROUTER
+
+\item	POTENTIAL PROBLEMS:
+    \begin{nrtc}
+    \item	THE TS-BRIDGE MAINTAINS STATE AS TO THE EXISTING CONNECTIONS
+
+    \item	TWO CHECKSUMS, AND NEITHER REALLY END-TO-END
+
+    \item	\underline{MAY} THWART SOPHISTICATED BACK-PRESSURE TECHNIQUES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN IMPLEMENTATION OF THE TS-BRIDGE}
+
+\begin{nrtc}
+\item	FIRST DEMONSTRATION IN FEBRUARY, 1988
+    \begin{nrtc}
+    \item	TP4/CLNP to RFC1006/TCP
+    \end{nrtc}
+
+\item	ANOTHER IMPLEMENTATION IN EUROPE IS HANDLING
+    \begin{nrtc}
+    \item	TP0/X.25 to RFC1006/TCP
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SCORECARD}
+
+\begin{nrtc}
+\item	PERFORMANCE: FAIR
+
+\item	FLEXIBILITY: HIGH; INDEPENDENT OF ANY APPLICATION
+
+\item	TRANSPARENCY: TOTAL
+
+\item	AMENABILITY:
+    \begin{nrtc}
+    \item	TCP END-SYSTEMS MUST RUN ``NEW'' PROTOCOLS
+	\begin{nrtc}
+	\item	USUALLY NO MODIFICATIONS REQUIRED TO END-SYSTEM KERNELS
+	\end{nrtc}
+
+    \item	MAY INTRODUCE ADMINISTRATIVE PROBLEMS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{NETWORK TUNNELS}\bf
+
+\begin{nrtc}
+\item	IDEA: ENCAPSULATE CLNP INSIDE OF IP, TREATING IP AS SIMPLY A DATA LINK
+	PROTOCOL
+\begin{quote}\em
+``Encapsulation complies with the layering concept, but violates the notion
+of absolute levels.''\\ \raggedleft
+-- Danny Cohen and Jon Postel, ``The ISO Reference Model and Other Protocol
+Architectures'' (1983)
+\end{quote}
+
+\item	NS-TUNNEL PERFORMS AS A ROUTER, REMOVING ONE DATA LINK HEADER AND
+	ADDING ANOTHER
+
+\item	METHOD SPECIFIED IN [RFC1070]
+
+\item	ADDRESS MAPPINGS SPECIFIED IN [RFC1069] 
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TUNNELING}
+
+\vskip.5in
+\diagram[p]{figureT-18}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NETWORK TUNNELS}
+
+\vskip.5in
+\diagram[p]{figureT-10}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INTERESTING FEATURES}
+
+\begin{nrtc}
+\item	NO STATE MAINTAINED BY NS-TUNNEL
+
+\item	A TRUE END-TO-END CHECKSUM
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{POTENTIAL PROBLEMS}
+
+\begin{nrtc}
+\item	REQUIRES COMMON HIGHER-LEVEL PROTOCOLS (TRANSPORT AND ABOVE) ON BOTH
+	END-SYSTEMS, BUT DOES NOT REQUIRE ALL INTERVENING ROUTERS TO USE THE
+	SAME NETWORK PROTOCOL
+
+\item	THE TCP END-SYSTEM IMPLEMENTATION CHOICES ARE SIMILAR TO NETBIOS OVER
+	TCP [RFC1001/1002]
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN IMPLEMENATION OF AN NS-TUNNEL}
+
+\begin{nrtc}
+\item	4.3reno BSD UNIX
+
+\item	NEED A LOT OF CLNP-BASED NETWORKS BEFORE THIS IS OF USE
+
+\item	SO THIS WILL HAPPEN AT THE END OF THE TRANSITION PERIOD
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SCORECARD}
+
+\begin{nrtc}
+\item	PERFORMANCE: NO WORSE THAN TYPICAL CLNP-ROUTER (AND PROBABLY A LOT
+	BETTER TOO!)
+
+\item	FLEXIBILITY: HIGH (INDEPENDENT OF ANY APPLICATION)
+
+\item	TRANSPARENCY: TOTAL
+
+\item	AMENABILITY: TCP END-SYSTEMS MUST RUN BOTH TRANSPORT PROTOCOLS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{EXAMPLES}\bf
+
+\begin{nrtc}
+\item	DoD OSI IMPLEMENTATION PLAN
+
+\item	GENERIC EXAMPLE
+
+\item	CO/CL INTERWORKING
+
+\item	CONCLUSIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{DoD OSI\\ IMPLEMENTATION PLAN}\bf
+
+\begin{nrtc}
+\item	IMPLEMENT CAPABILITY TO USE OSI IN DoD INTERNETWORK ENVIRONMENT
+    \begin{nrtc}
+    \item	OSI-POSIX PROJECT
+    \end{nrtc}
+
+\item	PROVIDE THE CAPABILITY FOR DoD AND OSI PROTOCOLS TO INTEROPERATE
+    \begin{nrtc}
+    \item	FTAM-FTP GATEWAY
+
+    \item	MHS-SMTP GATEWAY
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OSI-POSIX PROJECT}
+
+\begin{nrtc}
+\item	GOAL: ACCELLERATE THE UBIQUITY OF OSI
+
+\item	APPROACH: OPENLY AVAILABLE, COMPLETE OSI IMPLEMENTATION FOR NEXT MAJOR
+	RELEASE OF BERKELEY \unix/
+
+\item	FOR MORE DETAILS:
+\begin{quote}
+OSI PROTOCOLS WITHIN AN OPENLY AVAILABLE, POSIX-CONFORMANT, BERKELEY UNIX
+ENVIRONMENT
+\end{quote}
+APPEARING IN ConneXions, OCTOBER, 1988
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\diagram[p]{figureT-15}
+\end{bwslide}
+
+
+\begin{bwslide}
+\diagram[p]{figureT-16}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{GENERIC EXAMPLE}\bf
+
+\begin{nrtc}
+\item	TWO PRONGS:
+    \begin{nrtc}
+    \item	FAVOR USE OF OSI APPLICATIONS OVER TCP ON LAN MESH
+
+    \item	LOCATE APPLICATION GATEWAYS AND A TS-BRIDGE ON ALL NODES
+		WITH WAN ATTACHMENETS
+    \end{nrtc}
+
+\item	AWAIT OSI LOWER-LAYERS TO BECOME COMPETITIVE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GENERIC EXAMPLE (cont.)}
+
+\begin{nrtc}
+\item	EACH ATTACHMENT LOCUS SHOULD SUPPORT COEXISTENCE SERVICES
+
+\item	IF RESOURCES PERMIT, SELECT ONE OTHER SYSTEM TO SUPPORT THESE
+	SERVICES FOR USE BY LOCAL UNI-STACK HOSTS
+
+\item	THIS ``COVERS ALL BASES'' BY HANDLING ALL POSSIBLE OSI COMBINATIONS
+	WITH A BIT OF EXTRA REDUNDANCY
+
+\item	MIGHT REQUIRE A BIT OF SOPHISTICATED USE FROM THE DIRECTORY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A LAN OF MANY COLORS}
+
+\vskip.5in
+\diagram[p]{figureT-17}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{CO/CL INTERWORKING}\bf
+
+\begin{nrtc}
+\item	RARE/FNC GOAL: MOVE TO OSI APPLICATIONS
+
+\item	HAVE TO DEAL WITH CO/CL INTERWORKING PROBLEMS
+    \begin{nrtc}
+    \item	AND LACK OF ``REAL'' CONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PHASE I: VISIBLE CO/CL-GATEWAYS}
+
+\begin{nrtc}
+\item	END-SYSTENS ``KNOW'' ABOUT TS-BRIDGES
+
+\item	SPECIFY PROCEDURES FOR TS-BRIDGES
+
+\item	MODIFY RFC1006 TO KNOW ABOUT CO-REDIRECTION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PHASE II: TRANSPARENT CO/CL-GATEWAYS}
+
+\begin{nrtc}
+\item	RELY ON RICH OSI NETWORK LAYER TO ROUTE CROSS-TRAFFIC TO TS-BRIDGES
+    \begin{nrtc}
+    \item	SINGLE CL-MODE MESH USING DYNAMIC ROUTING PROTOCOLS
+
+    \item	SEVERAL CONCATENATED CO-MODE NETWORKS USING STATIC TABLES
+    \end{nrtc}
+
+\item	CONNECTION MAINTENANCE
+    \begin{nrtc}
+    \item	STRAIGHT-FORWARD WHEN INITIATOR IS CO-MODE
+
+    \item	PROBLEMATIC WHEN INITIATOR IS CL-MODE
+	\begin{nrtc}
+	\item	1992 EXTENSIONS TO TP4 FIX THIS
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{CONCLUSIONS}\bf
+
+\begin{quote}\em
+``Optimality differs according to context.''\\ \raggedleft
+-- Michael Padlipsky, The Elements of Networking Style (1985)
+\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONCLUSIONS (cont.)}
+
+\begin{nrtc}
+\item	TCP/IP-BASED NETWORKS WILL OFFER OSI APPLICATIONS
+
+\item	COEXISTENCE IN THE SHORT TERM:
+    \begin{nrtc}
+    \item	TS-BRIDGE MINIMIZES SOFTWARE INVESTMENT
+    \end{nrtc}
+
+\item	COEXISTENCE IN THE LONG TERM:
+    \begin{nrtc}
+    \item	NS-TUNNEL MAXIMIZES PERFORMANCE AND ROBUSTNESS
+    \end{nrtc}
+
+\item	IF/WHEN THERE ARE NO MORE TCP/IP-BASED NETWORKS, THEN THE
+	COEXISTENCE PERIOD IS OVER, AND TRANSITION IS A NON-ISSUE!
+\end{nrtc}
+\end{bwslide}

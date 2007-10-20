@@ -1,0 +1,76 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Other Programs of Interest}
+In addition to the \pgm{fred} program,
+there are some other programs which may be available,
+depending on whether your system administrator has installed them.
+
+\section	{Faces}
+When \pgm{fred} and \pgm{dish} display the entry for someone,
+they check to see if there is a photograph associated with the user.
+This is stored in facsimile format in the \verb"photo" attribute for the entry.
+If a photograph is present,
+then a file called \file{/usr/etc/dsaptailor} is consulted for directives
+indicating how the picture should be displayed
+(check with your system administrator for the exact pathname of this file).
+
+If you are running the X windows system,
+then your administrator may have installed a program called \pgm{Xphoto}.
+If your terminal type is \verb"xterm",
+then this program will be automatically invoked whenever \pgm{fred} or
+\pgm{dish} wish to display someone's photo.
+
+If you want your picture to be kept in the OSI directory,
+ask your system administrator if this is possible.
+
+\subsection	{xwho}
+If your system is running the \man rwhod(8c) daemon,
+and you are running the X windows system,
+then you might want to run the \pgm{xwho} program to see who is logged in on
+your local network.
+Consult the \man xwho(1c) manual page for more details.
+
+\subsection	{xface}
+If you use the \MH/ system to read your mail,
+then you might want to run the \pgm{xface} program in the background.
+Whenever \MH/ display a message for you,
+it will ask \pgm{xface} to display the picture of the person who sent the
+message.
+
+\section	{Mail Composition}
+If you use the \MH/ system to send your mail,
+then you can use the White Pages automatically to lookup the electronic mail
+addresses of the people you are sending messages to.
+
+Rather than specifying an address,
+you can specify a name by bracketing a White Pages query between
+``\verb"<<"'' and ``\verb">>"'' using the user-friendly naming syntax,
+ e.g.,
+\begin{quote}\small\begin{verbatim}
+To: << rose, psi, us >>
+\end{verbatim}\end{quote}
+At the \whatnow/ prompt,
+you can say \verb"whom" to have the names expanded into addresses.
+Alternately, the \verb"send" option can be used as well.
+For each query appearing between ``\verb"<<"'' and ``\verb">>"'',
+the DA-server will be asked to perform a White Pages resolution.
+All matches are printed and you are asked to select one.
+If one is not selected,
+you return to \whatnow/ level.
+
+Note that expansion can occur only if \verb"whom" or \verb"send" is invoked
+interactively. 
+If the \verb"push" option is used instead,
+then the expansion will fail because MH will be unable to query 
+you to select/confirm the right entry to use for the substitution.
+
+Finally,
+to enable this feature,
+you must add a line
+\begin{quote}\small\begin{verbatim}
+da-server: hostname
+\end{verbatim}\end{quote}
+to your \profile/,
+where \verb"hostname" is the domain-name or IP-address of the machine running
+\pgm{dad}.
+Your system administrator can tell you what \verb"hostname" to use.

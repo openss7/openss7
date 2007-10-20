@@ -1,0 +1,22 @@
+EVAL { iso isode(17) demo(1) eval(8) abstract-syntax(1) }
+
+DEFINITIONS ::=
+
+BEGIN
+
+IMPORTS
+    APPLICATION-CONTEXT, APPLICATION-SERVICE-ELEMENT, aCSE,
+	    aCSE-abstract-syntax
+	FROM Remote-Operations-Notation-extension {
+	    joint-iso-ccitt remote-operations(4) notation-extension(2)
+	}
+
+    OPERATION, ERROR, BIND, UNBIND
+	FROM Remote-Operations-Notation {
+	    joint-iso-ccitt remote-operations(4) notation(0)
+	}
+
+    rOSE FROM Remote-Operations-APDUs {
+	    joint-iso-ccitt remote-operations(4) apdus(1)
+	};
+...

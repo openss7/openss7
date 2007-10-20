@@ -1,0 +1,1541 @@
+% -*- LaTeX -*-		(really SLiTeX)
+
+\documentstyle[blackandwhite,landscape,oval,pagenumbers,small]{NRslides}
+
+\font\xx=cmbx10
+\font\yy=cmbx7
+
+\raggedright
+
+\input trademark
+\let\tradeNAMfont=\relax
+\let\tradeORGfont=\relax
+
+\begin{document}
+
+\title	{ISODE:\\ Past, Present, and Future\\[0.25in] and\\[0.25in]
+	 Strategies for\\ Transition and Coexistence}
+\author	{Marshall T.~Rose\\ The Wollongong Group, Inc.}
+\date	{March 24, 1988}
+\maketitlepage
+
+
+\begin{bwslide}
+\part*	{AGENDA}\bf
+
+\begin{description}
+\item[PART I:]		MOTIVATION (WHY ISODE?)
+
+\item[PART II:]		STRATEGIES FOR TRANSITION/COEXISTENCE 
+
+\item[PART III:]	CURRENT STATUS OF ISODE
+
+\item[PART IV:]		FUTURE DIRECTIONS FOR ISODE
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHAT IS ISODE?}
+
+\begin{nrtc}
+\item	THE ISO DEVELOPMENT ENVIRONMENT
+
+\item	AN OPENLY AVAILABLE IMPLEMENATION OF THE UPPER LAYERS OF OSI?
+
+\item	A BASIS FOR THE TRANSITION TO OSI?
+
+\item	AN EXERCISE IN MEGA-CODING?
+
+\item	A PLAYGROUND FOR ``THE PIED-PIPER OF OSI''?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{MOTIVATION\\ (WHY ISODE?)}\bf
+
+\begin{nrtc}
+\item	EXPERIMENT WITH OSI UPPER LAYERS
+
+\item	EXPLORE PROTOCOL TRANSITION ISSUES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NORTHROP RESEARCH AND\\ TECHNOLOGY CENTER:\\ JANUARY, 1986}
+
+\begin{nrtc}
+\item	THE AUTOMATION SCIENCES LABORATORY WAS INTERESTED IN SOLVING CERTAIN
+	PROBLEMS IN THE FACTORY AUTOMATION AREA
+
+\item	AN ``AFTER-HOURS'' PROJECT WAS STARTED TO LOOK INTO THE APPLICABILITY
+	OF MIXING OSI AND TCP/IP TECHNOLOGIES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{EXPERIMENT WITH OSI UPPER LAYERS}\bf
+
+\begin{nrtc}
+\item	THE UPPER LAYERS OF OSI APPEARED TO BE A RICH PLAYGROUND
+
+\item	WE WANTED TO SEE HOW USEFUL THE UPPER LAYERS REALLY WERE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{(OBLIGATORY SLIDE SHOWING)\\ THE 7--LAYER STACK}
+
+\vskip.5in
+\diagram[p]{figure1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{THE UPPER-LAYER ARCHITECTURE}\bf
+
+\begin{nrtc}
+\item	BY ``UPPER-LAYER'' WE MEAN EVERYTHING ABOVE TRANSPORT:
+    \begin{nrtc}
+    \item	THE APPLICATION-SPECIFICS OF HOW THE NETWORK IS USED
+    \end{nrtc}
+
+\item	UNLIKE OTHER ARCHITECTURES, THE SAME UPPER-LAYERS ARE USED
+	REGARDLESS OF THE APPLICATION
+
+\item	WHAT DIFFERS IS THE ACTUAL FUNCTIONALITY USED BY THE APPLICATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE UPPER-LAYER ARCHITECTURE (cont.)}
+
+\vskip.15in
+\diagram[p]{figure2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE OSI APPLICATION LAYER}
+
+\begin{nrtc}
+\item	MANY STANDARD SERVICE ELEMENTS
+    \begin{nrtc}
+    \item	ASSOCIATION CONTROL
+
+    \item	REMOTE OPERATIONS
+
+    \item	RELIABLE TRANSFER
+
+    \item	COMMITMENT, CONCURRENCY AND RECOVERY
+
+    \item	DIRECTORY SERVICES
+    \end{nrtc}
+
+\item	ABSTRACT SYNTAX NOTATION ONE (ASN.1)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION USE OF UPPER-LAYER SERVICES}
+
+\vskip.5in
+\diagram[p]{figure3}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION SERVICE ELEMENTS}
+
+\begin{nrtc}
+\item	A USEFUL MECHANISM FOR DIVIDING RESPONSIBILITY OF THE ``TOTAL''
+	APPLICATION PROTOCOL
+
+\item	PROMOTES ``REUSE'' OF APPLICATION LAYER FACILITIES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ABSTRACT SYNTAX NOTATION ONE (ASN.1)}
+
+\begin{nrtc}
+\item	UNIVERSAL LANGUAGE TO DESCRIBE DATA WITH STRONG TYPING
+
+\item	(TOO) RICH, EXTENSIBLE SYNTAX
+
+\item	USEFUL FOR SPECIFICATION OF NEW PROTOCOLS
+    \begin{nrtc}
+    \item	``CLEAR-TO-READ'' SPECIFICATIONS (ha!)
+
+    \item	NOT TIED TO MACHINE-ORIENTED STRUCTURES AND RESTRICTIONS
+    \end{nrtc}
+
+\item	REPRESENTATION CURRENTLY USED BY ALL OSI APPLICATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ FTAM USE OF LOWER-LAYER SERVICES}
+
+\vskip.5in
+\diagram[p]{figure4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ONLY ONE LITTLE PROBLEM$\ldots$}
+
+\begin{nrtc}
+\item	HOW TO RUN THE OSI UPPER-LAYERS IN A TCP/IP-BASED NETWORK?
+
+\item	A SOLUTION IS OFFERED BY LAYERING
+    \begin{nrtc}
+    \item	THE OSI TRANSPORT \underline{SERVICE} IS VERY SIMPLE
+
+    \item	CAN WE PROVIDE AN EMULATION OF THAT SERVICE USING TCP?
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERVICE EMULATOR AT TRANSPORT}
+
+\vskip.5in
+\diagram[p]{figure5}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE OSI TRANSPORT SERVICE}
+
+\begin{nrtc}
+\item	ALTHOUGH THE SERVICE IS VERY SIMPLE, THERE ARE ACTUALLY FIVE DIFFERENT
+	ISO PROTOCOLS WHICH CAN BE USED (TP0$\ldots$TP4)
+
+\item	PROTOCOLS CAN BE DIVIDED INTO TWO CLASSES, BASED ON THE UNDERLYING
+	NETWORK SERVICE
+    \begin{nrtc}
+    \item	A CONNECTION-ORIENTED NETWORK SERVICE (CONS), e.g., X.25
+		
+
+    \item	A CONNECTIONLESS-MODE NETWORK SERVICE (CLNS), e.g., CLNP
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISO TRANSPORT SERVICES\\ ON TOP OF THE DoD TCP}
+
+\begin{nrtc}
+\item	IDEA: TAKE THE SIMPLEST PROTOCOL (TP0) AND DEFINE A MAPPING ONTO
+	THE DoD TCP
+
+\item{}	[RFC983], PUBLISHED IN APRIL OF 1986, WAS OUR FIRST ATTEMPT AT THIS
+
+\item	TWO VERSIONS AND 13 MONTHS LATER, [RFC1006] GOT IT RIGHT, TELLING
+	``HOW TO SPEAK TP0 OVER THE TCP''
+
+\item	NOTE: THIS APPROACH IS NOT UNIQUE TO TCP/IP-BASED NETWORKS!
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISO TRANSPORT SERVICES\\ ON TOP OF THE DoD TCP (cont.)}
+
+\vskip.25in
+\diagram[p]{figure6}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXPLORE PROTOCOL TRANSITION ISSUES}
+
+\begin{nrtc}
+\item	DOES THIS APPROACH MAKE TRANSITION OR COEXISTENCE EASIER?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{STRATEGIES FOR TRANSITION/COEXISTENCE}\bf
+
+\begin{nrtc}
+\item	THERE ARE MANY TCP/IP NETWORKS TODAY; THERE WILL BE MORE TOMORROW
+
+\item	BY THE TIME OSI BECOMES A WORTHWHILE OPERATIONAL ALTERNATIVE,
+	THERE WILL BE MANY MORE TCP/IP NETWORKS THAN THERE ARE TODAY!
+
+\item	PROBLEM: HOW TO PROTECT INSTALLED BASE?
+
+\item	PROBLEM: HOW TO TRANSITION GRACEFULLY?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{METRICS FOR COMPARISON}
+
+\begin{nrtc}
+\item	CAN JUDGE A TRANSITION/COEXISTENCE SCHEME USING DIFFERENT
+	CRITERIA
+
+\item	HERE ARE A FEW
+    \begin{nrtc}
+    \item	PERFORMANCE:
+	\begin{nrtc}
+	\item	THROUGHPUT
+
+	\item	RESPONSE
+	\end{nrtc}
+
+    \item	FLEXIBILITY:
+	\begin{nrtc}
+	\item	RANGE OF APPLICABILITY
+	\end{nrtc}
+
+    \item	TRANSPARENCY:
+	\begin{nrtc}
+	\item	USAGE CONTINUITY
+
+	\item	SEAMLESS USER INTERFACE
+	\end{nrtc}
+
+    \item	PERVASIVENESS:
+	\begin{nrtc}
+	\item	MANAGEABILITY
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FOUR CANDIDATES}
+
+\begin{nrtc}
+\item	DUAL STACK
+
+\item	APPLICATION GATEWAYS
+
+\item	TRANSPORT-SERVICE BRIDGES
+
+\item	NETWORK-SERVICE BRIDGES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{DUAL STACK}\bf
+
+\begin{nrtc}
+\item	PUT BOTH PROTOCOL SUITES IN ALL HOSTS
+
+\item	NICE WORK, IF YOU CAN GET IT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DUAL STACK (cont.)}
+
+\vskip.5in
+\diagram[p]{figure16}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CHARACTERISTICS}
+
+\begin{nrtc}
+\item	PERFORMANCE: NO DEGRADATION
+
+\item	FLEXIBILITY: NOT REALLY; HAVE TO ADD EACH APPLICATION TO EACH HOST
+
+\item	TRANSPARENCY:
+    \begin{nrtc}
+    \item	ASSUMING REMOTE SYSTEM SUPPORTS AT LEAST ONE OF THE PROTOCOL
+		STACKS, THEN HIGH TRANSPARENCY BY USING COMMON SERVICE
+		INTERFACE
+    \end{nrtc}
+
+\item	PERVASIVENESS:
+    \begin{nrtc}
+    \item	BOTH END- AND INTERMEDIATE-SYSTEMS MUST RUN BOTH PROTOCOLS
+
+    \item	INTRODUCES ADMINISTRATIVE PROBLEMS AS THERE ARE NOW TWO
+		LOGICAL NETWORKS
+	\begin{nrtc}
+	\item	MANAGEMENT OF BOTH \underline{PLUS} CONTENTION BETWEEN THEM
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{APPLICATION GATEWAYS}\bf
+
+\begin{nrtc}
+\item	A WELL-KNOWN, BUT LITTLE-UNDERSTOOD TECHNOLOGY
+    \begin{nrtc}
+    \item	USED IN MESSAGE HANDLING QUITE A BIT\\
+		(AND MOST ARE QUITE TERRIBLE) 
+
+    \item	NOT REALLY USED OTHERWISE    
+    \end{nrtc}
+
+\item	THERE ARE TWO TYPES OF A-GWY's:
+    \begin{nrtc}
+    \item	SAME APPLICATION PROTOCOL,\\
+		BUT DIFFERENT UNDERLYING LAYERS
+
+    \item	DIFFERENT APPLICATION PROTOCOLS,\\
+		UNDERLYING LAYERS UNIMPORTANT
+    \end{nrtc}
+
+\item	WE'LL CONSIDER ONLY THE LATTER TYPE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION GATEWAYS (cont.)}
+
+\vskip.5in
+\diagram[p]{figure7}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CHARACTERISTICS}
+
+\begin{nrtc}
+\item	PERFORMANCE: USUALLY POOR, BUT ACCEPTABLE FOR STORE-AND-FORWARD
+	APPLICATIONS
+    \begin{nrtc}
+    \item	TYPICALLY ALSO INTRODUCES ADDITIONAL NETWORK TRAFFIC
+    \end{nrtc}
+
+\item	FLEXIBILITY: NONE; EACH A-GWY IS A SPECIAL-PURPOSE SOFTWARE BOX
+
+
+\item	TRANSPARENCY: 
+    \begin{nrtc}
+    \item	TO SERVICE: OFTEN LOSES SIGNIFICANT FUNCTIONALITY
+
+    \item	TO USERS: POSSIBLE, BUT NOT LIKELY (e.g., IN AN FTAM/FTP A-GWY,
+		USERS EMBED HOSTNAMES IN FILENAMES)
+    \end{nrtc}
+
+\item	PERVASIVENESS:
+    \begin{nrtc}
+    \item	REQUIRES NO END-SYSTEM MODIFICATION
+
+    \item	MAY INTRODUCE ADMINISTRATIVE PROBLEMS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{A NEW APPROACH}\bf
+
+\begin{nrtc}
+\item	PREDICTION: BY THE TIME OSI IS A WORTHWHILE ALTERNATIVE,
+	TCP/IP WILL ALREADY OFFER A MIX OF SERVICES:
+    \begin{nrtc}
+    \item	SUCH AS FTAM AND MHS, IN ADDITION TO FTP AND SMTP
+    \end{nrtc}
+
+\item	OBVIOUSLY, ONE METHOD OF DOING THIS IS TO USE THE [RFC1006] APPROACH
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBSERVATION}
+
+\begin{nrtc}
+\item	GIVEN THE ABOVE ASSUMPTION, IT SHOULD BE NOTED THAT:
+    \begin{nrtc}
+    \item	THE TWO COMMUNITIES WILL BE USING THE SAME APPLICATIONS (OSI),
+		AND
+
+    \item	ONLY THE UNDERLYING ``TS-STACK'' WILL DIFFER BETWEEN THE TWO:
+	\begin{nrtc}
+	\item	IN THE ISO COMMUNITY: TP4/CLNP/$\ldots$
+
+	\item	IN THE TCP COMMUNITY: [RFC1006]/TCP/IP/$\ldots$
+	\end{nrtc}
+    \end{nrtc}
+
+\item	THIS LEADS US TO POSTULATE AN INTERESTING COEXISTENCE
+	STRATEGY:
+    \begin{nrtc}
+    \item	LET'S RUN OSI APPLICATIONS BETWEEN THE TWO COMMUNITIES
+    \end{nrtc}
+
+\item	IN A SENSE, THIS IS A HYBRID OF THE TWO PREVIOUS APPROACHES,
+	INTENDED TO MINIMIZE THE DISADVANTAGES OF EACH
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRANSPORT-SERVICE BRIDGES}
+
+\begin{nrtc}
+\item	IDEA: OFFER THE SAME TRANSPORT SERVICE INTERFACE IN BOTH
+	COMMUNITIES (THE ISO TRANSPORT SERVICE)
+    \begin{nrtc}
+    \item	USE [RFC1006] TO OFFER THE ISO TRANSPORT SERVICE ON TOP OF
+		THE DoD TCP
+    \end{nrtc}
+
+\item	INTRODUCE A TRANSPORT ENTITY CALLED THE ``TS-BRIDGE''
+
+\item	THE TS-BRIDGE ``COPIES'' SERVICE PRIMITIVES FROM ONE COMMUNITY TO THE
+	OTHER, e.g.:
+    \begin{nrtc}
+    \item	UPON RECEIVING A T-CONNECT.INDICATION PRIMITIVE FROM ONE
+		TS-STACK,
+
+    \item	IT ISSUES A T-CONNECT.REQUEST PRIMITIVE TO THE OTHER TS-STACK
+    \end{nrtc}
+
+\item	POTENTIAL PROBLEMS:
+    \begin{nrtc}
+    \item	THE TS-BRIDGE MAINTAINS STATE AS TO THE EXISTING CONNECTIONS
+
+    \item	TWO CHECKSUMS, AND NEITHER REALLY END-TO-END
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRANSPORT-SERVICE BRIDGES (cont.)}
+
+\vskip.5in
+\diagram[p]{figure8}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRANSPARENT USE OF TS-BRIDGES}
+
+\begin{nrtc}
+\item	BY JUDICIOUS USE OF DIRECTORY SERVICES, SELECTION OF THE
+	TS-BRIDGE CAN BE MADE TRANSPARENT ON BOTH ENDPOINTS
+
+\item	CONSIDER A ``TYPICAL'' PRESENTATION ADDRESS:
+\[\begin{tabular}{ll}
+network address:&	CLNP 4700050017000008002000405301\\
+transport selector:&	1\\
+session selector:&	``FTAM''\\
+presentation selector:&	null
+\end{tabular}\]
+
+\item	A SLIGHTLY DIFFERENT ENTRY IS RETURNED FOR HOSTS IN THE
+	OPPOSITE COMMUNITY:
+\[\begin{tabular}{ll}
+network address:&	ts-bridge's network address\\
+transport selector:&	\begin{tabular}[t]{ll}
+			network address:&
+				CLNP 47 $\ldots$\\
+			transport selector:&	 1
+			\end{tabular}\\
+session selector:&	``FTAM''\\
+presentation selector:&	null
+\end{tabular}\]
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ANOTHER PROBLEM SOLVED:\\ ISO CONS versus CLNS}
+
+\begin{nrtc}
+\item	IN GENERAL, THE TS-BRIDGE SHOWS HOW TO PERFORM
+	``IMPEDENCE MATCHING'' BETWEEN TWO PROTOCOLS WHICH OFFER THE
+	SAME SERVICE INTERFACE, e.g., OUR USE IS:
+    \begin{nrtc}
+    \item	PROTOCOLS: TP4/CLNP AND TP0/TCP
+
+    \item	SERVICE: ISO TRANSPORT SERVICE
+    \end{nrtc}
+
+\item	THIS IS SUSPICIOUSLY SIMILAR TO THE ISO TP4/CLNS vs. TP0/CONS PROBLEM:
+    \begin{nrtc}
+    \item	PROTOCOLS: TP4/CLNP AND TP0/X.25
+
+    \item	SERVICE: ISO TRANSPORT SERVICE
+    \end{nrtc}
+
+\item	THE TS-BRIDGE WILL ALSO WORK IN THIS ENVIRONMENT WITHOUT
+	MEANINGFUL LOSS OF GENERALITY:
+    \begin{nrtc}
+    \item	EXPEDITED DATA IS NEGOTIATED AWAY, AND
+
+    \item	INITIAL USER DATA RESULTS IN DISCONNECT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN IMPLEMENTATION OF THE TS-BRIDGE}
+
+\begin{nrtc}
+\item	USING ISODE, WOLLONGONG HAS IMPLEMENTED A TS-BRIDGE
+
+\item	AT UNIFORUM IN FEBRUARY, 1987, THE
+    \begin{nrtc}
+    \item	TP4/CLNP to TP0/TCP
+    \end{nrtc}
+    ``IMPEDENCE MATCHING'' WAS DEMONSTRATED
+
+\item	CURRENTLY, ALL THREE TS-STACKS
+    \begin{nrtc}
+    \item	TP4/CLNP, TP0/X.25, TP0/TCP
+    \end{nrtc}
+    ARE BEING BRIDGED (ON A SINGLE HOST) AT WOLLONGONG
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CHARACTERISTICS}
+
+\begin{nrtc}
+\item	PERFORMANCE: FAIR; WHEN TS-BRIDGE IS MADE INTO A KERNEL-RESIDENT
+	STREAMS MODULE IT SHOULD IMPROVE DRAMATICALLY
+
+\item	FLEXIBILITY: HIGH; INDEPENDENT OF ANY APPLICATION
+
+\item	TRANSPARENCY: TOTAL
+
+\item	PERVASIVENESS:
+    \begin{nrtc}
+    \item	END-SYSTEMS MUST RUN ``NEW'' PROTOCOLS
+
+    \item	MAY INTRODUCE ADMINISTRATIVE PROBLEMS (WHICH SHOULD BE SOLVED
+		DYNAMICALLY BY DIRECTORY SERVICES)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{NETWORK-SERVICE BRIDGES}\bf
+
+\begin{nrtc}
+\item	IDEA: ENCAPSULATE CLNP INSIDE OF IP, TREATING IP AS SIMPLY A DATA LINK
+	PROTOCOL
+
+\item	NS-BRIDGE PERFORMS AS A ROUTER, REMOVING ONE DATA LINK HEADER AND
+	ADDING ANOTHER
+
+\item	REQUIRES COMMON HIGHER-LEVEL PROTOCOLS (TRANSPORT AND ABOVE) ON BOTH
+	END-SYSTEMS, BUT DOES NOT REQUIRE ALL INTERVENTING ROUTERS TO USE THE
+	SAME NETWORK PROTOCOL
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INTERESTING FEATURES}
+
+\begin{nrtc}
+\item	NO STATE MAINTAINED BY NS-BRIDGE
+
+\item	A TRUE END-TO-END CHECKSUM
+
+\item	THE TCP END-SYSTEM IMPLEMENTATION CHOICES ARE SIMILAR TO NETBIOS OVER
+	TCP [RFC1001/1002]
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NETWORK-SERVICE BRIDGES (cont.)}
+
+\vskip.5in
+\diagram[p]{figure17}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CHARACTERISTICS}
+
+\begin{nrtc}
+\item	PERFORMANCE: NO WORSE THAN TYPICAL CLNP-ROUTER (AND PROBABLY A LOT
+	BETTER TOO!)
+
+\item	FLEXIBILITY: HIGH (INDEPENDENT OF ANY APPLICATION)
+
+\item	TRANSPARENCY: TOTAL
+
+\item	PERVASIVENESS: SOME END-SYSTEMS MUST RUN BOTH TRANSPORT PROTOCOLS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{CURRENT STATUS\\ OF ISODE}\bf
+
+\begin{nrtc}
+\item	CURRENT DISTRIBUTION
+
+\item	WHERE IN USE
+
+\item	THE APPLICATIONS COOKBOOK
+
+\item	MHS/DS WORK AT UCL/UNott
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{CURRENT DISTRIBUTION}\bf
+
+\begin{nrtc}
+\item	STATUS: OPENLY AVAILABLE UNDER AN IMPLICIT ``HOLD HARMLESS'' CLAUSE
+
+\item	CURRENT RELEASE: 3.0
+    \begin{nrtc}
+    \item	AVAILABLE OCTOBER 15, 1987
+    \end{nrtc}
+
+\item	CURRENT DISTRIBUTION: 3.5(BETA)
+    \begin{nrtc}
+    \item	AVAILABLE MARCH 15, 1988
+    \end{nrtc}
+
+\item	DISTRIBUTION EITHER VIA POSTAL MAIL OR ARPAnet FTP
+    \begin{nrtc}
+    \item	SOURCE: \~{}6MB
+
+    \item	DOC: 4~VOLUME USER'S MANUAL (\~{}600~PAGES)
+
+    \item	DISTRIBUTION SITES: US, UK, AND AU
+
+    \item	PRICE: \~{}200~US DOLLARS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{LANGUAGES AND OPERATING SYSTEMS}
+
+\begin{nrtc}
+\item	CODED ENTIRELY IN C FOR \unix/
+    \begin{nrtc}
+    \item	REQUIRES NO KERNEL MODIFICATIONS    
+    \end{nrtc}
+
+\item	KNOWN PORTS FOR BERKELEY \unix/ (4.2 and 4.3):
+    \begin{nrtc}
+    \item	VAXen, SUNs, Pyramids, RTs, etc.
+    \end{nrtc}
+
+\item	KNOWN PORTS FOR AT\&T \unix/ (SVR2 and SVR3):
+    \begin{nrtc}
+    \item	SGI, 3Bs, 386s, RT (AIX)
+    \end{nrtc}
+
+\item	MS-DOS (CURRENTLY CLIENT SIDE ONLY)
+    \begin{nrtc}
+    \item	PORT DONE BY HP IN THE UK
+
+    \item	DON'T KNOW STATUS OF CODE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION ARCHITECTURE}
+
+\begin{nrtc}
+\item	A (NEARLY) COMPLETE IMPLEMENTATION OF THE UPPER LAYERS
+
+\item	CURRENTLY DIS LEVEL
+    \begin{nrtc}
+    \item	IN PROCESS OF BEING UPGRADED TO IS
+    \end{nrtc}
+
+\item	ALIGNED WITH THE U.S.~GOSIP
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE APPLICATION ENVIRONMENT}
+
+\vskip.5in
+\diagram[p]{figure9}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN ALTERNATE ENVIRONMENT:\\ MHS ARCHITECTURE (c.~1984)}
+
+\vskip.5in
+\diagram[p]{figure10}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATIONS}
+
+\begin{nrtc}
+\item	FILE TRANSFER, ACCESS AND MANAGEMENT (FTAM)
+
+\item	ISODE MISCELLANY SERVICE
+    \begin{nrtc}
+    \item	e.g., FINGER, QUOTE-OF-THE-DAY, etc.
+    \end{nrtc}
+
+\item	PLUS NUMEROUS ``DEMO'' PROGRAMS
+    \begin{nrtc}
+    \item	e.g., IMAGE SERVICE, PASSWORD LOOKUP, etc.
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STUB DIRECTORY SERVICE}
+
+\begin{nrtc}
+\item	PENDING DEVELOPMENT OF DIRECTORY SERVICES STANDARD AND IMPLEMENTATION,
+	NEEDED A STUB FACILITY TO PROVIDE DIRECTORY SERVICES
+
+\item	IN ESSENCE, DIRECTORY SERVICES PROVIDE TWO MAPPINGS:
+    \begin{nrtc}
+    \item	SERVICE NAME TO AN APPLICATION ENTITY TITLE
+
+    \item	APPLICATION ENTITY TITLE TO PRESENTATION ADDRESS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{LOCAL INTERPRETATIONS}
+
+\begin{nrtc}
+\item	SERVICE NAME: A LOCAL MATTER
+    \begin{nrtc}
+    \item	WE USE ``\verb"<designator>-<qualifier>"'', WHERE
+
+    \item	\verb"<designator>" DENOTES A LOCALE, AND
+
+    \item	\verb"<qualifier>" DENOTES THE TYPE OF ENTITY
+    \end{nrtc}
+
+\item	APPLICATION ENTITY TITLE: OPAQUE
+    \begin{nrtc}
+    \item	USE OBJECT IDENTIFIER (DIS ACSE)
+    \end{nrtc}
+
+\item	PRESENTATION ADDRESS:
+    \begin{nrtc}
+    \item	1 OR MORE NETWORK ADDRESSES
+	\begin{nrtc}
+	\item	EACH ADDRESS IS TAGGED (TCP, X.25, OR NS)
+
+	\item	BASED ON TAG, DIFFERENT INFORMATION IS PRESENT
+	\end{nrtc}
+
+    \item	T-, S-, AND P-SELECTORS
+	\begin{nrtc}
+	\item	ARBITRARY OCTET STRINGS (0..64)
+
+	\item	SUPPORT FOR GOSIP-STYLE IDENTIFIERS (PORT NUMBERS)
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY MAPPINGS}
+
+\vskip.5in
+\diagram[p]{figure15}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE TRANSPORT SWITCH}
+
+\begin{nrtc}
+\item	DECIDES WHICH TS-STACK TO USE FOR A CONNECTION
+
+\item	FOR TP0:
+    \begin{nrtc}
+    \item	TCP (SOCKETS)
+
+    \item	X.25 (SEVERAL INTERFACES, MOSTLY SOCKETS)
+    \end{nrtc}
+
+\item	FOR TP4:
+    \begin{nrtc}
+    \item	TWG's PROPRIETARY WIN/ISO (TLI)
+
+    \item	SunLink OSI (EVENT SOCKETS)
+    \end{nrtc}
+
+\item	EXPERIENCE SHOWS IT IS FAIRLY EASY TO ADD A NEW TS-STACK TO THE SWITCH
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{WHERE IN USE}\bf
+
+\begin{nrtc}
+\item	HARD TO TELL HOW MANY COPIES ARE IN USE (DUE TO AVAILABILITY VIA
+	ARPAnet FTP)
+
+\item	AT LAST COUNT, ABOUT 350~DIFFERENT SITES USING ISODE
+
+\item	IN ADDITION TO SITES IN THE US:
+    \begin{nrtc}
+    \item	WESTERN EUROPE
+
+    \item	MIDDLE EAST (ISRAEL)
+
+    \item	SOUTH PACIFIC (AUSTRALIA)
+
+    \item	ASIA (SOUTH KOREA, JAPAN)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+in fact, at one map/top meeting, it was noted that
+
+\begin{quote}
+``NORTHROP has shipped more OSI software than any OSI vendor''
+\end{quote}
+
+by one of the leading OSI vendors!
+This was before the release of ISODE~3.0 in October, 1987.
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{PROJECTS}
+
+\begin{nrtc}
+\item	THREE PILOT PROJECTS IN OSI INFRASTRUCTURE IN EUROPE
+    \begin{nrtc}
+    \item	A NATIONAL PROJECT IN THE UK
+
+    \item	A NATIONAL PROJECT IN WEST GERMANY (DFN)
+
+    \item	A PROJECT FOR RARE (THE EUROPEAN ACADEMIC COMMUNITY)
+    \end{nrtc}
+
+\item	IN USE BY DIFFERENT CONFORMANCE TESTING ORGANIZATIONS
+    \begin{nrtc}
+    \item	THE CORPORATION FOR OPEN SYSTEMS IN THE US
+
+    \item	THE NATIONAL COMPUTER CENTRE IN THE UK
+    \end{nrtc}
+
+\item	ENDORSED BY THE NSF (DNCRI)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{THE APPLICATIONS COOKBOOK}\bf
+
+\begin{nrtc}
+\item	TOOLS TO FACILITATE DEVELOPMENT OF APPLICATIONS ARE CRITICAL
+
+\item	IDEA IS TO DEVELOP TOOLS TO AUTOMATE USE OF OSI REMOTE OPERATIONS
+	SERVICE AS A GENERAL REMOTE PROCEDURE CALL FACILITY
+
+\item	ECMA TR/31: REMOTE OPERATIONS -- CONCEPTS, NOTATION AND
+	CONNECTION-ORIENTED MAPPINGS (SECTIONS 1--4)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REMOTE OPERATIONS SERVICE (ROS)}
+
+\begin{nrtc}
+\item	STANDARDIZED MECHANISM FOR SPECIFYING TRANSACTIONS
+
+\item	EMPLOYS POWER OF ASN.1
+
+\item	USED IN MANY INTERESTING OSI APPLICATIONS
+    \begin{nrtc}
+    \item	MESSAGE HANDLING SYSTEMS
+
+    \item	DIRECTORY SERVICES
+
+    \item	NETWORK MANAGEMENT
+
+    \item	REMOTE DATABASE ACCESS
+    \end{nrtc}
+
+\item	CURRENTLY CONNECTION-ORIENTED, BUT CONNECTIONLESS-MODE IS UNDER STUDY
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{GENERAL ORGANIZATION}
+
+\begin{nrtc}
+\item	AT COMPILE-TIME:
+    \begin{nrtc}
+    \item	USE RO-SPECIFICATION TO GENERATE SUPPORT FACILITIES
+    \end{nrtc}
+
+\item	AT RUN-TIME:
+    \begin{nrtc}
+    \item	USE DIRECTORY SERVICES TO LOCATE/REGISTER NETWORK SERVICES
+
+    \item	USE ASSOCIATION CONTROL TO BIND/UNBIND APPLICATIONS
+
+    \item	USE REMOTE OPERATIONS TO INVOKE TRANSACTIONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STATIC (COMPILE-TIME) ORGANIZATION}
+
+\vskip.15in
+\diagram[p]{figure11}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DYNAMIC (RUN-TIME) ORGANIZATION}
+
+\vskip.15in
+\diagram[p]{figure12}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CURRENT STATUS}
+
+\begin{nrtc}
+\item	STATIC AND DYNAMIC FACILITIES
+    \begin{nrtc}
+    \item	ALL TOOLS/LIBRARIES ARE DEVELOPED AND MOST RECENT UPGRADES
+		HAVE NEARLY COMPLETED BETA TESTING
+
+    \item	``REAL'' (DYNAMIC) DIRECTORY SERVICES IS CURRENTLY TOO
+		IMMATURE (BUT NOT FOR LONG!)
+    \end{nrtc}
+
+\item	AN ``APPLICATIONS COOKBOOK'' WAS WRITTEN AS VOLUME~4 OF THE USER'S
+	MANUAL
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{MHS/DS WORK\\ AT UCL/UNott}\bf
+
+\begin{nrtc}
+\item	SEVERAL OSI PROJECTS UNDERWAY IN THE COMPUTER SCIENCE DEPARTMENTS
+	AT THE UNIVERSITY COLLEGE LONDON AND THE UNIVERSITY OF NOTTINGHAM
+
+\item	MAJOR EMPHASIS ON MESSAGE HANDLING AND DIRECTORY SERVICES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MESSAGE HANDLING}
+
+\begin{nrtc}
+\item	UCL AND UNott ARE DEVELOPING AN X.400 TRANSPORT SYSTEM (PP)
+
+\item	USE EXPERIENCE GAINED FROM NUMEROUS SOPHISTICATED TEXT-BASED MESSAGE
+	TRANSFER SYSTEMS
+
+\item	OWES MANY OF ITS DESIGN IDEAS TO THE UNIVERSITY OF DELAWARE MESSAGE
+	SYSTEM, MMDF
+
+\item	WILL UTILIZE DIRECTORY SERVICES
+
+\item	WILL BE DISTRIBUTED WITH LATER VERSIONS OF ISODE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INTERESTING FEATURES}
+
+\begin{nrtc}
+\item	SUPPORT FOR A WIDE RANGE OF ENCODED INFORMATION TYPES 
+    \begin{nrtc}
+    \item	AND REFORMATTING BETWEEN THEM
+    \end{nrtc}
+
+\item	SUPPORT FOR DIFFERENT MESSAGE TRANSPORT PROTOCOLS
+    \begin{nrtc}
+    \item	AND CONVERSION BETWEEN THEM
+    \end{nrtc}
+    e.g., INCLUDES RFC987 (X.400 TO 821/822)
+
+\item	ROBUSTNESS FOR USE IN LARGE SCALE SERVICE ENVIRONMENTS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MAJOR GOALS}
+
+\begin{nrtc}
+\item	FULL X.400(84/88) SUPPORT, EXCEPT FOR X.400(88) SECURITY SERVICES
+
+\item	PROVIDES A ``CLEAN'' INTERFACE FOR MESSAGE SUBMISSION AND DELIVERY
+    \begin{nrtc}
+    \item	TO SUPPORT A WIDE RANGE OF USER AGENTS,
+
+    \item	AND APPLICATIONS OTHER THAN INTERPERSONAL MESSAGING
+    \end{nrtc}
+
+\item	QUEUE MANAGEMENT DONE VIA A ROS-BASED PROTOCOL
+    \begin{nrtc}
+    \item	SOPHISTICATED SCHEDULING OF MESSAGE DELIVERY
+
+    \item	LOCAL AND REMOTE MONITORING FOR MANAGERS AND USERS
+
+    \item	ROBUSTNESS REQUIRED TO SUPPORT HIGH LEVELS OF TRAFFIC
+
+    \item	SUPPORT FOR ADMINISTRATIVE POLICIES ON SUBMISSION
+    \end{nrtc}
+
+\item	LIST EXPLODER AND LIST MANAGMENT    
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY SERVICES}
+
+\begin{nrtc}
+\item	TWO DIFFERENT DIRECTORY SERVICE PROJECTS ARE UNDERWAY
+    \begin{nrtc}
+    \item	CURRENTLY INTERWORKING WITH OTHER PILOT IMPLEMENTATIONS
+		IN ESPRIT
+    \end{nrtc}
+
+\item	ONE SYSTEM, IN SOME FORM, WILL BE DISTRIBUTED WITH LATER VERSIONS
+	OF ISODE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{FUTURE DIRECTIONS\\ FOR ISODE}\bf
+
+\begin{nrtc}
+\item	OSI-POSIX PROJECT
+
+\item	HOST-INTERFACE ISSUES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{OSI-POSIX PROJECT}\bf
+
+\begin{nrtc}
+\item	IF WE BELIEVE THAT:
+    \begin{nrtc}
+    \item	OSI/ISO WILL EVENTUALLY DOMINATE COMPUTER COMMUNICATIONS, AND
+
+    \item	THE U.S.~GOVERNMENT OSI PROFILE WILL BE THE INITIAL SET OF
+		GUIDELINES FOR OSI PROCUREMENT
+    \end{nrtc}
+
+\item	WHAT CAN WE DO TO ACCELERATE THE PROCESS?
+
+\item	NOTE: AFTER THE ENTERPRISE EVENT, MAP/TOP MAY DROP FROM 
+	MAINSTREAM OSI
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GOSIP}
+
+\begin{nrtc}
+\item	A (SOON-TO-BE) FEDERAL INFORMATION PROCESSING STANDARD
+
+\item	PROPOSED TO ENABLE USERS TO SPECIFY AND PROCURE
+	\begin{nrtc}
+	\item	INTEROPERABLE
+
+	\item	MULTI-VENDOR
+
+	\item	OFF-THE-SHELF
+	\end{nrtc}
+	COMPUTER COMMUNICATIONS PRODUCTS
+
+\item	THE \dod/:
+    \begin{nrtc}
+    \item	IS ADOPTING GOSIP AS A CO-STANDARD WITH TCP/IP
+
+    \item	INTENDS (IN APPROX.~TWO YEARS) TO SPECIFY GOSIP AS THE 
+		\underline{ONLY} STANDARD FOR NON-PROPRIETARY, INTEROPERABLE
+		COMPUTER COMMUNICATIONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A DIGRESSION:\\ OPERATING SYSTEMS}
+
+\begin{nrtc}
+\item	LET US SUPPOSE THAT THE \unix/ FAMILY WILL DOMINATE OPERATING SYSTEMS
+    \begin{nrtc}
+    \item	JUST SUPPOSE$\ldots$ (YOU DON'T HAVE TO AGREE!)
+    \end{nrtc}
+
+\item	THE EMERGING IEEE \unix/-BASED PORTABLE OPERATING SYSTEM
+	STANDARD (POSIX) WILL PROBABLY BE THE BASELINE FOR THESE SYSTEMS
+
+\item	A FIPS IS UNDER DEVELOPMENT TO BE THE INITIAL SET OF GUIDELINES FOR
+	PROCUREMENT OF OPERATING SYSTEMS FOR USERS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{POSIX}
+
+\begin{nrtc}
+\item	CURRENTLY POSIX SPECIFIES ONLY THE \unix/ KERNEL INTERFACE
+    \begin{nrtc}
+    \item	INFLUENCED MOSTLY BY AT\&T \unix/ (SVID) WITH SOME BERKELEY
+		ENHANCEMENTS
+    \end{nrtc}
+
+\item	WORK IS UNDERWAY ON A SHELL AND TOOLS STANDARD
+
+\item	A STANDARD INTERFACE FOR NETWORKING IS NOTABLY MISSING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A MODEST OBSERVATION}
+
+\begin{nrtc}
+\item	TCP/IP BECAME WIDESPREAD AFTER IT WAS INCLUDED IN BERKELEY \unix/
+
+\item	QUESTIONS:
+    \begin{nrtc}
+    \item	CAN WE PUT A REFERENCE VERSION OF THE OSI PROTOCOLS INTO
+		BERKELEY \unix/?
+
+    \item	CAN WE MAKE BERKELEY \unix/ POSIX COMPLIANT?
+
+    \item	CAN WE EXTEND POSIX TO DEFINE AN INTERFACE TO NETWORK SERVICES?
+
+    \item	CAN WE MAKE THE WORK OPENLY AVAILABLE AND HAVE IT READY FOR
+		4.4\bsd/~\unix/?
+    \end{nrtc}
+
+\item	ANSWER: YES
+
+\item	THIS SHOULD RESULT IN ACCELERATING THE UBIQUITY OF OSI
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXPLANATION}
+
+\begin{nrtc}
+\item	A LARGE NUMBER OF THE PIECES ARE ALREADY OPENLY AVAILABLE
+
+\item	SO, THE WORK CONSISTS MAINLY OF:
+    \begin{nrtc}
+    \item	FILLING IN THE GAPS
+
+    \item	INTEGRATING THE COMPONENTS
+
+    \item	TESTING THE SYSTEM\\ (INTEROPERABILITY AND CONFORMANCE)
+    \end{nrtc}
+
+\item	THIS MODEST AMOUNT OF WORK SHOULD RESULT IN ACCELERATING THE UBIQUITY
+	OF OSI
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH:\\ OSI PROTOCOLS}
+
+\begin{nrtc}
+\item	AN IMPLEMENTATION OF THE OSI UPPER-LAYERS (ISODE) IS ALREADY AVAILABLE
+
+\item	OTHER ORGANIZATIONS HAVE DEVELOPED OR PLAN TO DEVELOP:
+    \begin{nrtc}
+    \item	THE LOWER LAYERS
+
+    \item	SOME OSI APPLICATIONS
+    \end{nrtc}
+
+\item	MOST STANDARDS HAVE PROGRESSED FROM DRAFT (DIS) TO FINAL (IS) STATUS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\diagram[p]{figure13}
+\end{bwslide}
+
+
+\begin{bwslide}
+\diagram[p]{figure14}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE WORK PLAN}
+
+\begin{nrtc}
+\item	UPGRADE ISODE AND OTHER OSI APPLICATIONS TO FINAL (IS) STATUS
+
+\item	INTEGRATE OTHER OSI APPLICATIONS INTO ISODE
+
+\item	PERFORM INTEROPERABILITY TESTING ON OSInet
+
+\item	PERFORM CONFORMANCE TESTING WITH COS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH:\\ POSIX COMPLIANCE}
+
+\begin{nrtc}
+\item	MINOR WORK TO MODIFY THE BERKELEY \unix/ KERNEL TO SUPPORT THE POSIX
+	STANDARD
+
+\item	PERFORM CONFORMANCE TESTING WITH NBS
+
+\item	ISODE AND OSI APPLICATIONS WILL BE CONVERTED TO USE THE POSIX
+	INTERFACE AS APPLICABLE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH:\\ POSIX NETWORK SERVICE}
+
+\begin{nrtc}
+\item	A /usr/group COMMITTEE WAS FORMED OVER A YEAR AGO
+
+\item	U.C.~BERKELEY (AND FRIENDS) WILL EXAMINE THE OUTPUT OF THIS
+	GROUP AND EITHER:
+    \begin{nrtc}
+    \item	ADOPT THIS INTERFACE (IF ACCEPTED BY THE POSIX COMMITTEE), OR
+
+    \item	SUBMIT A NEW DRAFT PROPOSAL TO THE POSIX COMMITTEE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SCHEDULE}
+
+\begin{nrtc}
+\item	WOULD YOU BELIEVE 18~CALENDAR-MONTHS?
+
+\item	ACTUALLY 120~MAN-MONTHS%
+	\footnote{You may have read Brooks' {\em The Mythical Man-Month}.}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{HOST-INTERFACE ISSUES}\bf
+
+\begin{nrtc}
+\item	WHICH IS BETTER SOCKETS OR TLI?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BERKELEY SOCKETS}
+
+\begin{nrtc}
+\item	NOT REALLY A GOOD FIT FOR THE OSI TRANSPORT SERVICE
+    \begin{nrtc}
+    \item	ADDRESSES TOO SMALL
+
+    \item	NO MECHANISM TO PASS INITIAL USER DATA
+
+    \item	NO MECHANISM FOR MARKING TSDU BOUNDARIES
+
+    \item	NO WAY TO DISCONNECT WITHOUT FIRST ACCEPTING
+    \end{nrtc}
+
+\item	THERE ARE TWO APPROACHES TO SOLVE THESE PROBLEMS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH ONE:\\ MINOR SURGERY AND COMPROMISE}
+
+\begin{nrtc}
+\item	BUMP UP ADDRESS SIZE
+
+\item	IGNORE INITIAL USER DATA (SESSION DOESN'T USE IT)
+
+\item	ADD TWO NEW SYSCALLS FOR READ/WRITE OF (PARTIAL) TSDUs
+
+\item	IGNORE DISCONNECT PROBLEM
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH TWO:\\ ADD A NEW SOCKET ABSTRACTION}
+
+\begin{nrtc}
+\item	FOR SunLink OSI, SMI ADDED ``EVENT'' SOCKETS
+
+\item	AFTER THE INITIAL socket AND bind SYSCALLS, ALL FURTHER COMMUNICATIONS
+	ARE DONE BY PASSING MESSAGES (SERVICE REQUESTS) USING SENDMSG/RECVMSG
+    \begin{nrtc}
+    \item	ALL SYSCALL PARAMETERS USED AS BEFORE, EXCEPT
+
+    \item	OLD ADDRESS PARAMETER IS A POINTER TO A SERVICE REQUEST BLOCK
+		CONTAINING, e.g., QOS PARAMETERS
+    \end{nrtc}
+
+\item	THE ACCEPT SYSCALL SIMPLY RETURNS THE ADDRESS OF THE HOST REQUESTING
+	A CONNECTION
+    \begin{nrtc}
+    \item	USE RECVMSG TO FIND OUT ABOUT THE T-CONNECT.INDICATION
+
+    \item	USE SENDMSG TO DO EITHER T-CONNECT.RESPONSE OR
+		T-DISCONNECT.REQUEST
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SOME EXPERIENCE WITH EVENT SOCKETS}
+
+\begin{nrtc}
+\item	THE ISODE INTERFACE TO SunLink OSI IS THE ``REFERENCE'' MODULE
+	FOR OTHER (FUTURE) TP4 INTERFACES FOR ISODE
+
+\item	EVENT SOCKETS ARE GENERAL ENOUGH TO SUPPORT A KERNEL-LEVEL SESSION
+    \begin{nrtc}
+    \item	SMI HAS DONE THIS, BUT ONLY WITH A MINIMAL SESSION
+
+    \item	A REAL KERNEL-RESIDENT SESSION SHOULD SUPPORT ALL FUNCTIONAL
+		UNITS
+    \end{nrtc}
+
+\item	HOWEVER, I WORRY ABOUT LOSING THE FLEXIBILITY OF THE TRANSPORT SWITCH
+    \begin{nrtc}
+    \item	THIS IS AN OPEN QUESTION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHAT ABOUT TLI?}
+
+\begin{nrtc}
+\item	TLI WAS DESIGNED A FEW YEARS AFTER BERKELEY SOCKETS, AND WITH OSI
+	SPECIFICALLY AS THE MODEL
+
+\item	HENCE, TLI DOESN'T SUFFER FROM THE OSI-RELATED LIMITATIONS AFFLICTING
+	BERKELEY SOCKETS
+
+\item	WRITING THE TLI DRIVER FOR ISODE WAS A BIT TRICKY AS
+    \begin{nrtc}
+    \item	TLI HAS ITS OWN SET OF PROBLEMS!
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROBLEMS WITH TLI}
+
+\begin{nrtc}
+\item	NO WAY TO DETERMINE ADDRESSES ASSOCIATED WITH AN ENDPOINT
+    \begin{nrtc}
+    \item	PERHAPS THIS IS JUST COSMETIC
+    \end{nrtc}
+
+\item	NO SCATTER/GATHER ARRAY SUPPORT
+    \begin{nrtc}
+    \item	APPLICATIONS TAKE A \underline{BIG} PERFORMANCE HIT
+    \end{nrtc}
+    (REALLY A SVR3 CRITICISM)
+
+\item	ALTHOUGH INCOMING CONNECTIONS CAN BE DISCONNECTED WITHOUT BEING
+	ACCEPTED, THE WAY TLI HANDLES MULTIPLE INCOMING CONNECTIONS IS BROKEN!
+    \begin{nrtc}
+    \item	DEPENDING ON HOW ONE DISPATCHES INCOMING CONNECTIONS,
+		IT IS POSSIBLE FOR A CHILD PROCESS TO ``LOCK UP'' THE ENDPOINT
+		USED BY THE PARENT FOR LISTENING
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{SUMMARY}\bf
+
+\begin{nrtc}
+\item	ISODE PROVIDES A RICH ENVIRONMENT FOR BUILDING OSI APPLICATIONS
+	(AND STUDYING THE UPPER LAYERS OF OSI)
+
+\item	ISODE IS THE FOUNDATION OF A PROJECT TO MAKE OSI UBIQUITOUS WHICH
+    \begin{nrtc}
+    \item	USES 4.4\bsd/~\unix/ AS A PLATFORM, AND
+
+    \item	OFFERS A COMPLETE REFERENCE IMPLEMENTATION IN THE PUBLIC DOMAIN
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\end{document}

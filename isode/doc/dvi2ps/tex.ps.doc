@@ -1,0 +1,379 @@
+%!              for use by dvi2ps Version 2.00
+% a start (Ha!) at a TeX mode for PostScript.
+% The following defines procedures assumed and used by program "dvi2ps"
+% and must be downloaded or sent as a header file for all TeX jobs.
+
+% By:  Neal Holtz, Carleton University, Ottawa, Canada
+%      <holtz@cascade.carleton.cdn>
+%      <holtz%cascade.carleton.cdn@ubc.csnet>
+%      June, 1985
+%      Last Modified: Aug 25/85
+% oystr@washington 12-Feb-1986
+%   Changed @dc macro to check for a badly formed bits in character
+%   definitions.  Can get a <> bit map if a character is not actually
+%   in the font file.  This is absolutely guaranteed to drive the
+%   printer nuts - it will appear that you can no longer define a
+%   new font, although the built-ins will still be there.
+
+% To convert this file into a downloaded file instead of a header
+% file, uncomment all of the lines beginning with %-%
+
+%-%0000000                      % Server loop exit password
+%-%serverdict begin exitserver
+%-%  systemdict /statusdict known
+%-%  {statusdict begin 9 0 3 setsccinteractive /waittimeout 300 def end}
+%-% if
+
+/TeXDict 200 dict def   % define a working dictionary
+TeXDict begin           % start using it.
+
+                        % units are in "dots" (Resolution/inch)
+/Resolution 300 def
+/Inch  {Resolution mul} def  % converts inches to internal units
+
+/Mtrx 6 array def
+
+%%%%%%%%%%%%%%%%%%%%% Page setup (user) options %%%%%%%%%%%%%%%%%%%%%%%%
+
+% dvi2ps will output coordinates in the TeX system ([0,0] 1" down and in
+% from top left, with y +ive downward).  The default PostScript system
+% is [0,0] at bottom left, y +ive up.  The Many Matrix Machinations in
+% the following code are an attempt to reconcile that. The intent is to
+% specify the scaling as 1 and have only translations in the matrix to
+% properly position the text.  Caution: the default device matrices are
+% *not* the same in all PostScript devices; that should not matter in most 
+% of the code below (except for lanscape mode -- in that, rotations of
+% -90 degrees resulted in the the rotation matrix [ e 1 ]
+%                                                 [ 1 e ]
+% where the "e"s were almost exactly but not quite unlike zeros.
+
+/@letter
+  { letter initmatrix
+    72 Resolution div dup neg scale          % set scaling to 1.
+    1.0333 Inch 10.0166 Inch neg translate   % move origin to top (these are not exactly 1"
+    Mtrx currentmatrix pop   % and -10" because margins aren't set exactly right)
+  } def
+        % note mode is like letter, except it uses less VM
+/@note
+  { note initmatrix
+    72 Resolution div dup neg scale          % set scaling to 1.
+    1.0333 Inch 10.0166 Inch neg translate   % move origin to top
+    Mtrx currentmatrix pop
+  } def
+
+/@landscape
+  { letter initmatrix
+    72 Resolution div dup neg scale          % set scaling to 1.
+%    -90 rotate                              % it would be nice to be able to do this
+    Mtrx currentmatrix 0 0.0 put             % but instead we have to do things like this because what
+    Mtrx 1 -1.0 put                          % should be zero terms aren't (and text comes out wobbly)
+    Mtrx 2 1.0 put                           % Fie!  This likely will not work on QMS printers
+    Mtrx 3 0.0 put                           % (nor on others where the device matrix is not like
+    Mtrx  setmatrix                          %  like it is on the LaserWriter).
+    1 Inch 1.033 Inch  translate             % move origin to top
+    Mtrx currentmatrix pop
+  } def
+
+/@legal
+  { legal initmatrix
+    72 Resolution div dup neg scale          % set scaling to 1.
+    0.9833 Inch 12.933 Inch neg translate    % move origin to top
+    Mtrx currentmatrix pop
+  } def
+
+/@manualfeed
+   { statusdict /manualfeed true put
+   } def
+        % n @copies -   set number of copies
+/@copies
+   { /#copies exch def
+   } def
+
+%%%%%%%%%%%%%%%%%%%% Procedure Defintions %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/@newfont       % id @newfont -         -- initialize a new font dictionary
+  { /newname exch def
+    pop
+    newname 7 dict def          % allocate new font dictionary
+    newname load begin
+        /FontType 3 def
+        /FontMatrix [1 0 0 -1 0 0] def
+        /FontBBox [0 0 1 1] def
+        /BitMaps 128 array def
+        /BuildChar {CharBuilder} def
+        /Encoding 128 array def
+        0 1 127 {Encoding exch /.undef put} for
+        end
+    newname newname load definefont pop
+  } def
+
+
+% the following is the only character builder we need.  it looks up the
+% char data in the BitMaps array, and paints the character if possible.
+% char data  -- a bitmap descriptor -- is an array of length 6, of 
+%          which the various slots are:
+
+/ch-image {ch-data 0 get} def   % the hex string image
+/ch-width {ch-data 1 get} def   % the number of pixels across
+/ch-height {ch-data 2 get} def  % the number of pixels tall
+/ch-xoff  {ch-data 3 get} def   % number of pixels below origin
+/ch-yoff  {ch-data 4 get} def   % number of pixels to left of origin
+/ch-tfmw  {ch-data 5 get} def   % spacing to next character
+
+/CharBuilder    % fontdict ch Charbuilder -     -- image one character
+  { /ch-code exch def           % save the char code
+    /font-dict exch def         % and the font dict.
+    /ch-data font-dict /BitMaps get ch-code get def     % get the bitmap descriptor for char
+    ch-data null eq not
+      { ch-tfmw   0   ch-xoff neg   ch-yoff neg   ch-width ch-xoff sub   ch-height ch-yoff sub
+            setcachedevice
+        ch-width ch-height true [1 0  0 1  ch-xoff ch-yoff]
+            {ch-image} imagemask
+      }
+    if
+  } def
+
+
+/@sf            % fontdict @sf -        -- make that the current font
+  { cvn cvx exec setfont
+  } def
+
+                % in the following, the font-cacheing mechanism requires that
+                % a name unique in the particular font be generated
+
+/@dc            % char-data ch @dc -    -- define a new character bitmap in current font
+  { /ch-code exch def
+% ++oystr 12-Feb-86++
+    dup 0 get
+    length 2 lt
+      { pop [ <00> 1 1 0 0 8.00 ] } % replace <> with null
+    if
+% --oystr 12-Feb-86--
+    /ch-data exch def
+    currentfont /BitMaps get ch-code ch-data put
+    currentfont /Encoding get ch-code 
+       dup (   ) cvs cvn   % generate a unique name simply from the character code
+       put
+  } def
+
+/@bop0           % n @bop0 -              -- begin the char def section of a new page
+  { 
+  } def
+
+/@bop1           % n @bop1 -              -- begin a brand new page
+  { pop
+    erasepage initgraphics 
+    Mtrx setmatrix
+    /SaveImage save def() pop
+    0 0 moveto   % we have to have a current point
+    1 setlinejoin  % a good default for tpic
+  } def
+
+/@eop           % - @eop -              -- end a page
+  { showpage 
+    SaveImage restore() pop
+  } def
+
+/@start         % - @start -            -- start everything
+  { @letter                             % (there is not much to do)
+  } def
+
+/@end           % - @end -              -- done the whole shebang
+  { end
+  } def
+
+/p              % x y p -               -- move to position
+  { moveto
+  } def
+
+/r              % x r -                 -- move right
+  { 0 rmoveto
+  } def
+
+/l              % x y l -               -- draw line to
+  { lineto
+  } def
+
+/rl             % dx dy rl -            -- draw relative line
+  { rlineto
+  } def
+
+/rc             % x0 y0 x1 y1 y2 y2 rc  -- draw bezier curve
+  { rcurveto
+  } def
+
+/np		% np -			-- start a new path and save currenpoint
+  { /SaveX currentpoint /SaveY exch def def   % remember current point
+    newpath
+  } def
+
+/st             % st -                  -- draw the last path and restore currentpoint
+  { stroke
+    SaveX SaveY moveto                  % restore the current point
+  } def
+
+/f              % f                     -- fill the last path and restore currentpoint
+  { fill
+    SaveX SaveY moveto                  % restore the current point
+  } def
+
+/s              % string s -            -- show the string
+  { show
+  } def
+
+/c              % ch c -                -- show the character (code given)
+  { c-string exch 0 exch put
+    c-string show
+  } def
+
+/c-string ( ) def
+
+/ru             % dx dy ru -   -- set a rule (rectangle)
+  { /dy exch neg def    % because dy is height up from bottom
+    /dx exch def
+    /x currentpoint /y exch def def   % remember current point
+    newpath x y moveto
+    dx 0 rlineto
+    0 dy rlineto
+    dx neg 0 rlineto
+    closepath fill
+    x y moveto
+  } def
+
+/ellipse        % xc yc xrad yrad startAngle endAngle ellipse
+    {
+        /endangle exch def
+        /startangle exch def
+        /yrad exch def
+        /xrad exch def
+        /y exch def
+        /x exch def
+
+        /savematrix matrix currentmatrix def
+
+        x y translate
+        xrad yrad scale
+        0 0 1 startangle endangle arc
+        savematrix setmatrix
+    } def
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%     the \special command junk
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   The structure of the PostScript produced by dvi2ps for \special is:
+%         @beginspecial
+%           - any number of @hsize, @hoffset, @hscale, etc., commands
+%         @setspecial
+%           - the users file of PostScript commands
+%         @endspecial
+
+% The @beginspecial command recognizes whether the Macintosh Laserprep
+% has been loaded or not, and redfines some Mac commands if so.
+% The @setspecial handles the users shifting, scaling, clipping commands
+
+
+% The following are user settable options from the \special command.
+
+/@SpecialDefaults
+  { /hs 8.5 Inch def
+    /vs 11 Inch def
+    /ho 0 def
+    /vo 0 def
+    /hsc 1 def
+    /vsc 1 def
+    /CLIP false def
+  } def
+
+%       d @hsize -      specify a horizontal clipping dimension
+%                       these 2 are executed before the MacDraw initializations
+/@hsize {/hs exch def /CLIP true def} def
+/@vsize {/vs exch def /CLIP true def} def
+%       d @hoffset -    specify a shift for the drwgs
+/@hoffset {/ho exch def} def
+/@voffset {/vo excl def} def
+%       s @hscale -     set scale factor
+/@hscale {/hsc exch def} def
+/@vscale {/vsc exch def} def
+
+/@setclipper
+  { hsc vsc scale
+    CLIP
+      { newpath 0 0 moveto hs 0 rlineto 0 vs rlineto hs neg 0 rlineto closepath clip }
+    if
+  } def
+
+% this will be invoked as the result of a \special command (for the
+% inclusion of PostScript graphics).  The basic idea is to change all
+% scaling and graphics back to defaults, but to shift the origin
+% to the current position on the page.  Due to TeXnical difficulties,
+% we only set the y-origin.  The x-origin is set at the left edge of
+% the page.
+
+/@beginspecial          % - @beginspecial -     -- enter special mode
+  { gsave /SpecialSave save def
+          % the following magic incantation establishes the current point as
+          % the users origin, and reverts back to default scalings, rotations
+    currentpoint transform initgraphics itransform translate
+    @SpecialDefaults    % setup default offsets, scales, sizes
+    @MacSetUp           % fix up Mac stuff 
+  } def
+
+/@setspecial    % to setup user specified offsets, scales, sizes (for clipping)
+  {
+    MacDrwgs
+      {md begin /pxt ho def /pyt vo neg def end}
+      {ho vo translate @setclipper}
+    ifelse
+  } def
+
+/@endspecial            % - @endspecial -       -- leave special mode
+  { SpecialSave restore
+    grestore
+  } def
+
+/MacDrwgs false def     % will get set if we think the Mac LaserPrep file has been loaded
+
+        % - @MacSetUp -   turn-off/fix-up all the MacDraw stuff that might hurt us
+                        % we depend on 'psu' being the first procedure executed
+                        % by a Mac document.  We redefine 'psu' to adjust page
+                        % translations, and to do all other the fixups required.
+                        % This stuff will not harm other included PS files
+/@MacSetUp
+  { userdict /md known  % if md is defined
+      { userdict /md get type /dicttype eq      % and if it is a dictionary
+         { /MacDrwgs true def
+           md begin                             % then redefine some stuff
+              /psu                              % redfine psu to set origins, etc.
+                /psu load
+                        % this procedure contains almost all the fixup code
+                { /letter {} def        % it is bad manners to execute the real
+                  /note {} def          %   versions of these (clears page image, etc.)
+                  /legal {} def
+                  statusdict /waittimeout 300 put
+                  /page {pop} def       % no printing of pages
+                  /pyt vo neg def       % x & y pixel translations
+                  /pxt ho def
+                }
+                concatprocs 
+              def
+              /od                               % redefine od to set clipping region
+                /od load
+                { @setclipper }
+                concatprocs
+              def
+           end }
+        if }
+    if    
+  } def
+
+%       p1 p2 concatprocs p       - concatenate procedures
+/concatprocs
+  { /p2 exch cvlit def 
+    /p1 exch cvlit def
+    /p p1 length p2 length add array def
+    p 0 p1 putinterval 
+    p p1 length p2 putinterval
+    p cvx
+  } def
+
+end                     % revert to previous dictionary

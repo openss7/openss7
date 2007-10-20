@@ -1,0 +1,15 @@
+.PS
+.ps 20
+## figure 25
+B1:	box invis "invoke"
+	arrow from B1.se to (B1.se.x+linewid, B1.se.y-lineht)
+	line dashed to (B1.se.x+3*linewid, B1.se.y-3*lineht)
+	arrow to (B1.se.x+4*linewid, B1.se.y-4*lineht)
+B2:	box invis "invoke" with .nw at (B1.se.x+4*linewid, B1.se.y-4*lineht)
+##
+	line from (B1.ne.x+linewid, B1.n.y+lineht/2) \
+	     to   (B1.ne.x+linewid, B2.s.y-lineht/2)
+	line from (B2.sw.x-linewid, B1.n.y+lineht/2) \
+	     to   (B2.sw.x-linewid, B2.s.y-lineht/2)
+##
+.PE

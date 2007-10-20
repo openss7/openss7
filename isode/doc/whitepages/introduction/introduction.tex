@@ -1,0 +1,597 @@
+% -*- LaTeX -*-
+
+\input lcustom
+
+\documentstyle[12pt,titlepage]{article}
+
+\makeatletter
+\let\titlep@ge=\titlepage
+\def\titlepage{\titlep@ge \def\thefootnote{\fnsymbol{footnote}}}
+
+\let\endtitlep@ge=\endtitlepage
+\let\endtitlepage=\relax
+
+\let\m@ketitle=\maketitle
+\def\maketitle{\m@ketitle\let\titlepage=\relax\let\endtitlepage=\endtitlep@ge}
+\makeatother
+
+\advance\textwidth by0.5in
+\advance\oddsidemargin by-0.25in
+\advance\evensidemargin by-0.25in
+
+\begin{document}
+
+\title{An Introduction to a NYSERNet\\ White Pages Pilot Project}
+\author{Marshall T.~Rose\\ Martin L.~Schoffstall\\ NYSERNet, Inc.}
+\maketitle
+
+\begin{abstract}
+The need for a comprehensive white pages service increases in relation to the
+size of the user community.
+The early Internet was served well by a relatively simple facility.
+Today's rapidly expanding Internet has outstripped the capabilities of the
+existing system.
+This paper proposes a new white pages service designed to meet the needs
+of both the current and future Internet.
+A pilot project will be undertaken,
+both to demonstrate the viability of a new service and to provide extended services
+to a widely distributed pilot community.
+
+\footnotetext[0]{\hskip -2\parindent
+This work was partially supported by the
+U.S.~Defense Advanced Research Projects Agency
+and the Rome Air Development Center of the U.S.~Air Force Systems Command
+under contract number F30602--88--C--0016.
+The content of the information contained herein does not necessarily reflect
+the position or the policy of the U.S.~Government,
+and no official endorsement should be inferred.} 
+\end{abstract}
+
+\section	{A White Pages Service}
+A natural function of computer networks is to form the {\em infrastructure\/}
+between the users they interconnect.
+For example,
+the electronic mail service offered by computer networks provides a means for
+users to collaborate towards some common goal.
+In the simplest cases,
+this collaboration may be solely for the dissemination of information.
+In other cases,
+two users may work on a joint research project,
+using electronic mail as their primary means of communication.
+
+Most network services are based on the implicit assumption that each user can
+supply {\em infrastructural information} to 
+facilitate information transfers through the network.
+For example,
+electronic mail services expect that an originator can supply 
+addressing information 
+for all the intended recipients.
+It is not necessarily the task of electronic mail, per se,
+to provide this infrastructural information to the user.
+
+This model works fine in small environments,
+particularly those where infrastructural information is not difficult to 
+obtain and remember.
+However,
+the model does not scale well.
+Consider the case when the membership of a network consists of hundreds of
+thousands of users belonging to thousands of organizations.
+It is no longer reasonable for a single user to provide this information,
+except in very limited circumstances.
+Further,
+it is likely that some of the information changes frequently,
+due to personnel and other resource movement.
+The goal of a {\em white pages\/} service is to 
+provide the necessary information, and to mask the complexity of the
+infrastructural information.
+
+\subsection	{White Pages in the Real World}
+The telephone system
+white pages service provides an excellent model.
+
+In the telephone system,
+the listed user is a person, private enterprise or government organization.
+To find some infrastructural information associated with a listed user
+(e.g., a telephone number),
+the name of the listed user is looked up in the telephone book.
+Upon finding the name,
+the telephone number is listed nearby.
+
+We note that telephone books also include other information
+such as a partial postal address of each user.
+This is an important issue:
+the telephone white pages book contains more than one kind of information.
+In fact,
+if a user of the telephone system had to consult one book for telephone
+numbers
+and a second book for postal addresses,
+the telephone system white pages service would be much less convenient to use.
+Further,
+if there are two entries which are similar
+(e.g., both entries have the same first initial and last name),
+then additional information may help the user to determine which entry is the
+``correct'' listing.
+
+At the next level,
+we see that most telephone books include two parts:
+the white pages,
+and the equally familiar yellow pages.
+The yellow pages contains essentially the same information as the white pages,
+but in an indexed form with additional key information about the listed users.
+Rather than indexing by the name of each user,
+the yellow pages index by the business service offered by each user.
+
+Given the scope of the telephone system
+(both in terms of size and number of autonomous administrations),
+everyone recognizes that it would be impractical to have a single telephone
+book for the entire United States, a region, or even a single very large city.
+Typically,
+there is a telephone book for each local geographical area.
+Since use of the telephone system tends to obey the 90\% rule of locality,
+local telephone books are commonplace.
+Telephone books for remote areas are found only in small quantities.
+Of course,
+there is no reason,
+other than economics,
+why any particular set of users might not be listed together in a specialized
+white pages service.
+
+This naturally leads to the last aspect of the telephone system's white pages
+service, directory assistance.
+If a telephone book isn't available,
+then the user places a phone call to ask for assistance in retrieving the
+desired information.
+In addition to making remote information readily available,
+directory assistance has another interesting feature:
+{\em imprecise matching}.
+It is not uncommon to have partial or even incorrect information about a user,
+when trying to determine that user's telephone number.
+The combination of personnel and computers which provide directory assistance
+usually employ phonetic matching (soundex) and other heuristics to try and
+generate a list of entries, of which is the ``correct'' entry.
+
+\subsection	{White Pages in the Computer World}
+The role of a white pages service in a computer environment is quite similar
+to the one played in the real world.
+To begin,
+information from the telephone book
+(name, postal address and telephone number)
+is available from the white pages service.
+Further,
+the ``local'' white pages information maintained by each organization,
+e.g., an internal telephone directory,
+is typically available.
+
+Because local information is made available through the white pages service,
+this argues for both distribution of information
+(each local organization will wish to maintain their own ``part'' of the
+white pages),
+and access control
+(some information, such as internal telephone numbers,
+may be ``company confidential'').  Every organization has some directory
+information that should not be openly published.
+
+In addition to containing infrastructural information for the
+ network community,
+the white pages service may also contain network information for 
+ listed users of the network.
+Of these,
+the most notable is a user's electronic mail address.
+Of course,
+other information,
+such as passwords and access rights,
+might also be available from the white pages service.
+For example,
+the white pages service might keep track of the network nodes each user is to
+be permitted access for cycles or spooling.
+
+Finally,
+the programs which run in the network make use of the white pages service for
+other purposes.
+For example,
+a sophisticated network management program might use the white pages service
+to obtain information about the computers attached to a particular physical
+network
+(e.g., contact information for the system administrators of those systems)
+in order to perform some task
+(e.g., notify those administrators of problems).
+
+This simple example illustrates the variety of service a white pages offers.
+First,
+the network management program asks the white pages service to identify
+the computers it is interested in.
+This is probably done with a yellow pages query~---~a search on one of the
+attributes of the entries for the computers.
+Second,
+for each computer identified,
+the ``administrator'' attribute must be retrieved.
+The value of this attribute is the name of a person, or the role of a person,
+which in turn is a pointer to another entry in the white pages service.
+Thus,
+the white pages service is again queried for the ``electronic mail address''
+attribute for each administrator.
+
+In order for programs,
+rather than humans,
+to make use of the white pages service,
+it is essential that the information be rigorously structured.
+This makes manipulative operations feasible:
+associated with each attribute is a set of procedures defining how operations
+such as matching, exact or imprecise (as with soundex), are performed.
+
+Ultimately,
+a white pages service might be the unifying facility for both system and
+network administration:
+local databases (password files, configuration files, and so on),
+are generated automatically from the infrastructural information available from
+the white pages service. 
+By providing a common framework, powerful tools, and semi-intelligent
+programs,
+the administrator may be able to configure and maintain all resources in the
+network.
+This scenario is beyond the scope of the current discussion,
+though it is a very probable application in the long term.
+
+To appreciate why a new direction is required for white pages service in the
+Internet,
+it is useful to briefly examine the current service.
+
+\section	{The Existing Facility}
+The Internet community is currently served by the WHOIS facility.
+This is a simple, text-based service originally deployed in {\oldstyle 1982}.
+Although the users are predominantly humans,
+information on some networks, hosts, and so on,
+are also kept in the WHOIS facility.
+Currently,
+it is estimated that there are over 70,000 WHOIS entries.
+
+An entry of a user consists of:
+\begin{itemize}
+\item	a {\em handle},
+	which is a unique key in the database;
+
+\item	a {\em type},
+	which indicates what kind of user is recorded by the entry
+	(e.g., a person);
+	and,
+
+\item	several {\em fields},
+	each containing a textual description.
+\end{itemize}
+For example,
+an entry for a person looks like:
+\begin{quote}\small\begin{verbatim}
+Rose, Marshall T. (MTR)    mrose@nisc.nyser.net
+    NYSERNet, Inc.
+    Western Development Office
+    420 Whisman Court
+    Mountain View, CA  94043-2112
+    (415) 961-3380
+\end{verbatim}\end{quote}
+The first line contains both the handle and all fields available for searching.
+Here,
+the handle is \verb"MTR",
+and there are two fields available for searching:
+a name and a mailbox.
+The remainder of the entry is a textual annotation.
+
+Access to the WHOIS facility is via a server program residing at the SRI
+Network Information Center.
+The interface follows the query/response paradigm,
+and provides both for wildcard matching facilities and ambiguous results.
+
+The program can also be accessed via the network~---~one query/response
+interaction is carried on a single network connection.
+
+\subsection	{Problems with the Existing Facility}
+It must be emphasized that the existing facility has proven useful for many
+years.
+Only recently,
+with the explosive growth of the Internet,
+has the WHOIS mechanism become unworkable.
+
+There are three problems with the existing facility:
+\begin{itemize}
+\item	It is centralized; all entry updates must be inserted by a clerk,
+        after the entry's owner/controller requests a change.
+	As such, much of the information is always out of date.
+	Further, the service is subject to the usual availability and
+	congestion problems.
+
+\item	It contains only limited, unstructured information;
+	while rudimentary postal and electronic mail addresses are useful,
+	the needs of the community have grown much larger.
+	For example,
+	it is often useful to address correspondence to an organizational
+	role (e.g., ``Chair of the Department'').
+	While it is possible for the textual information annotated to each
+	entry to contain such information,
+	given the current informational framework,
+	it is not possible to search for or otherwise mechanically process
+	this attribute.
+
+\item	As a $2^{\underline{\mbox{\scriptsize nd}}}$ order effect of these
+	limitations,
+	most sites maintain their own local white pages service.
+	These local services do not interoperate with the WHOIS facility.
+	This leads to at least two
+        sets of user interfaces, procedures, programs, and so on.
+\end{itemize}
+Of course,
+other Network Information Centers provide similar facilities
+(such as CSNet or NSFNet, etc.).
+These do not interoperate with the WHOIS facility
+and suffer the same general problems.
+
+It should be clear that any replacement facility must not only provide
+(at least) equivalent functionality to WHOIS,
+but must also address all three of these deficiencies.
+This replacement
+should be based on a standard distributed directory service model and
+the OSI Directory Service is the best available candidate.
+
+\section	{The OSI Directory}
+The OSI Directory is designed to provide
+for the management of names and associated attributes.
+
+The OSI Directory is structured in the form of a hierarchical tree.
+Each object in the tree has a {\em distinguished name},
+which uniquely identifies it.
+Associated with each object is one or more {\em attributes}
+and possibly one or more child objects.
+The attributes of an object consist of a name and one or more values.
+One of these values may be marked as a {\em distinguished value} to set it
+apart from the other values.
+Based on the name of the attribute,
+the value(s) are strongly-typed.
+The OSI Directory standard defines several kinds of attributes along with their
+associated data types.
+In addition,
+users of the Directory may define additional attributes of their own.
+
+The Directory itself is distributed,
+being composed of {\em Directory System Agents\/} (DSAs).
+A group of DSAs under a common administration is responsible for a portion of
+the tree,
+termed a {\em Directory Management Domain\/} (DMD).
+When a user wishes to access the Directory,
+a {\em Directory User Agent\/} (DUA) is invoked.
+This DUA contacts a DSA and issues requests.
+The DSA may (or may not) have the information locally available.
+If not,
+a decision has to be made:
+either the DSA can contact another DSA to get the information
+(this is called {\em chaining\/}); or,
+the DSA can tell the DUA to contact another DSA directly
+(this is called {\em referral\/}).
+
+The operations that the DUA can request of a DSA are fairly general:
+\begin{itemize}
+\item	read the attributes of an object;
+
+\item	get a list of the object's children;
+
+\item	recursively search for objects with certain attribute values;
+
+\item	compare a given value to an object's attribute;
+
+\item	add new objects, or attributes to an existing object;
+
+\item	change the name of an object or its attributes; and,
+
+\item	delete an object or its attributes.
+\end{itemize}
+In short,
+the DSAs provide mechanisms for traversing the tree and manipulating the
+information contained therein.
+
+\subsection	{Existing Implementation}
+The Directory is one of OSI's newer standards.
+As such,
+there are few implementations available.
+
+However,
+one implementation is openly available,
+QUIPU,
+as a part of the ISO Development Environment (ISODE).
+QUIPU is a full-functional implementation of an OSI Directory,
+and is the subject of (at least) three ongoing pilot projects in OSI Directory
+services.
+
+These pilot projects,
+while national (U.S., U.K.) and international in scope,
+are not focused:
+there are no explicit services to be offered to the user community.
+Rather,
+the pilot projects are largely intended to bring together currently disjoint
+communities to explore aspects of implementation and operation.
+The scale of these communities is currently quite small.
+
+We propose a different project:
+one which provides useful white pages service to a subset of the Internet
+community to explore the service provision aspects of the OSI Directory.
+
+\section	{A Pilot Project}
+We propose a new white pages service to be offered to members of the NYSERNet
+community.
+Participation is strictly voluntary~---~the pilot project is a ``grass roots''
+effort,
+both to understand the white pages service desired by users along with
+the limitations of the OSI Directory in providing those services.
+
+\subsection	{Goals of the Pilot Project}
+The primary goal of the pilot project is to encourage organizations to use
+the OSI Directory to store infrastructural information about their personnel.
+(Note that this does not require the elimination of existing mechanisms,
+such as internal telephone directories.)
+
+At the next level,
+organizations will be encouraged to maintain their own Directory Management
+Domain.
+However,
+this is not mandatory;
+the sponsors of the pilot project will offer to
+manage a DMD on an organization's behalf~---~either on an interim or
+permanent basis, for the durtation of the pilot project.
+(For the Domain Name System,
+NYSERNet has been offering a similar service for the past three years.)
+
+In addition,
+the sponsor will create and manage a ``dial-up'' DMD for
+individuals from organizations which are not participating in the pilot.
+
+Another goal of the pilot project is to use the same programs and tools to
+access both global and local white pages information.
+As a part of this,
+new applications which might make use of the white pages service,
+such as private mail,
+will be encouraged.
+
+\subsection	{Phases of the Pilot Project}
+The pilot project consists of three phases.
+
+\subsubsection	{Phase 0}
+The first phase, Phase~0, focuses on developing the initial policies and
+programs for the pilot.
+Issues such as the naming architecture (how the Directory tree is structured),
+the kind of information to be stored,
+and so on,
+must be decided by the sponsor of the pilot.
+
+In addition,
+a white pages user interface will be developed.
+Initially,
+a text-based interface will be used,
+although later on an X-windows based interface might be developed.
+The text-based interface will support an interaction mode as close as
+possible to the WHOIS query syntax.
+
+As its primary software,
+the pilot project will use the QUIPU Directory.
+To be sure,
+QUIPU is not a high-performance Directory,
+nor is it a hardened technology.
+Nevertheless,
+it promises to be a solid platform for the development of services which use
+the OSI Directory.
+
+Other Directory implementations may participate in the pilot project,
+but must do so in ``unsupported'' mode.
+(It is beyond the scope of this pilot project to debug other people's Directory
+implementations.)
+
+Finally,
+during Phase~0,
+prospective sites will be approached to solicit participation in the
+pilot project.
+As of this writing,
+the following organizations have received permission,
+and are participating in the pilot:
+\begin{quote}
+\begin{tabular}{l}
+Anterior Technology\\
+Clarkson University\\
+Columbia University\\
+Eastman Kodak\\
+NASA\\
+Navy\\
+New Mexico State University\\
+New York University\\
+NYSERNet, Inc.\\
+Polytechnic University\\
+Rockefeller University\\
+SUNY Albany\\
+SUNY Buffalo\\
+University of Michigan\\
+University of Pittsburgh\\
+University of Rochester\\
+\end{tabular}
+\end{quote}
+
+Phase~0 will complete on June, 30, {\oldstyle 1989}.
+Upon completion,
+the sponsor of the pilot will issue a press release announcing the
+pilot and the participants.
+Work will also begin on a brochure for users at each participating
+organization.
+This brochure will be completed by August 1, {\oldstyle 1989}.
+
+\subsubsection	{Phase I}
+Phase~I focuses on collecting data for the pilot project,
+and determining the responsibilities of a DMD for each organization.
+The duration of Phase~I varies by participant,
+once a participant completes Phase~I,
+it enters Phase~II.
+For some participants,
+Phase~I will be completed in less than a week;
+for others,
+a month or so may be required.
+
+It is the responsibility of each participant to provide data for the
+Directory.
+If the participant plans to run the DSA(s) for their DMD,
+then this is a moot issue.
+Otherwise,
+if the sponsor is to run the DSA for the participant's DMD,
+then the participant must supply the information in an ASCII file
+formatted to the specification of the sponsor.
+
+The sponsor of the pilot project will provide modest management tools
+to aid in the maintenance of the project's DMDs.
+For example:
+a ``tree walker'',
+a ``skulker'',
+a program which keeps track of the last update made to an entry,
+and so on.
+
+The sponsor of the pilot project will provide QUIPU DSAs in source form
+for systems derived from Berkeley \unix/.%
+\footnote{It is beyond the scope of the pilot project to support the Directory
+on non-Berkeley \unix/ systems.
+Considering the widespread penetration of Berkeley \unix/ into every segment
+of the computing market place,
+it is difficult to believe that any site doesn't have at least one system
+running BSD \unix/ available to support white pages.}
+
+\subsubsection	{Phase II}
+Phase~II focuses on offering the service to the pilot user community.
+Each participating organization enters this phase once it has completed its
+``initial load'' of its DMD.
+
+User interfaces will be supplied in source form for systems derived from
+Berkeley \unix/. 
+The user interfaces may be easily exported to other platforms via telnet,
+rlogin, xterm, and as a special network port (ala network WHOIS access).
+In addition,
+a special electronic mail address will be supported,
+which accepts queries in the ``Subject:'' line and body of a message
+and generates a reply to the originator.
+
+The sponsor of the pilot will provide access to the Directory both via
+the network and via dial-up.
+
+It is anticipated that all participants will have entered Phase~II prior
+to the INTEROP$^{\hbox{\tiny TM}}$ 89 conference and exhibition in early
+October.
+As such,
+the NYSERNet booth at Interop will provide access to the pilot for
+demonstration purposes.
+
+Phase~II completes for all participants on June 1, {\oldstyle 1990}.
+At this time, the pilot project will be evaluated.
+If successful,
+the membership to the pilot project may be expanded beyond NYSERNet,
+with Phase~I being re-activated on a larger scale.
+Most likely this will also result in other applications,
+such as a window-based user interface being fielded.
+
+\section	{Conclusions}
+A white pages service has the potential to unify the management of the
+infrastructural information that is vital to networking.
+By sponsoring a pilot project,
+in addition to offering a valuable service to the user community,
+vital administrative and operational experience will be gained.
+
+\showsummary
+
+\end{document}

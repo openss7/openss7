@@ -1,0 +1,29 @@
+\contentsline {section}{\numberline {1}Introduction and Motivation}{1}
+\contentsline {subsection}{\numberline {1.1}Understanding the Problems}{2}
+\contentsline {subsection}{\numberline {1.2}Finding the Solutions}{2}
+\contentsline {subsection}{\numberline {1.3}What's in a Name?}{3}
+\contentsline {section}{\numberline {2}Background}{4}
+\contentsline {subsection}{\numberline {2.1}The DDN Protocol Suite}{4}
+\contentsline {subsection}{\numberline {2.2}The OSI Protocol Suite}{5}
+\contentsline {subsection}{\numberline {2.3}Comparison of Services}{6}
+\contentsline {subsection}{\numberline {2.4}A Digression on the Interoperability of Applications}{6}
+\contentsline {section}{\numberline {3}The Approach}{9}
+\contentsline {subsection}{\numberline {3.1}Summary of the Protocol}{10}
+\contentsline {subsection}{\numberline {3.2}Design Decisions}{13}
+\contentsline {subsubsection}{\numberline {3.2.1}Packet Format}{13}
+\contentsline {subsubsection}{\numberline {3.2.2}Quality of Service}{13}
+\contentsline {subsubsection}{\numberline {3.2.3}Administration of Address Space}{13}
+\contentsline {subsubsection}{\numberline {3.2.4}Expedited Data}{14}
+\contentsline {subsection}{\numberline {3.3}Work To Date}{15}
+\contentsline {subsubsection}{\numberline {3.3.1}RFC983}{15}
+\contentsline {subsubsection}{\numberline {3.3.2}Prototype Implementation}{16}
+\contentsline {subsection}{\numberline {3.4}Comparison to Other Approaches}{16}
+\contentsline {subsubsection}{\numberline {3.4.1}Our Analysis of this Work}{17}
+\contentsline {section}{\numberline {4}Migration Strategies}{19}
+\contentsline {subsection}{\numberline {4.1}Phase One: Development Environment for OSI Applications}{19}
+\contentsline {subsection}{\numberline {4.2}Phase Two: Experiment with Migration Engines}{20}
+\contentsline {subsection}{\numberline {4.3}Phase Three: Deploy Migration Engines}{21}
+\contentsline {subsection}{\numberline {4.4}Work To Date}{21}
+\contentsline {section}{\numberline {5}Conclusions}{22}
+\contentsline {section}{\numberline {A}Distribution Mechanics}{24}
+\contentsline {section}{\numberline {B}Changes to RFC983}{25}

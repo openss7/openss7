@@ -1,0 +1,22 @@
+\File{grind4\-5b.py},{11:13},{Jul  4 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{BEGIN}}}
+\L{\LB{}}
+\L{\LB{\K{SECTIONS} build unbuild none}}
+\L{\LB{}}
+\L{\LB{Salary ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    name}}
+\L{\LB{}\Tab{16}{PrintableString [[s parm \-\> name]]}}
+\L{\LB{}\Tab{16}{\%\{ printf(\S{}\"name \%s \"\SE{}, parm \-\> name); \%\},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    salary}}
+\L{\LB{}\Tab{16}{TheSalary [[i parm \-\> salary]]}}
+\L{\LB{}\Tab{16}{\%\{ printf(\S{}\"salary \%d\!n\"\SE{}, parm \-\> salary); \%\}}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{TheSalary ::=}}
+\L{\LB{}\Tab{8}{\K{INTEGER}}}
+\L{\LB{}}
+\L{\LB{\K{END}}}

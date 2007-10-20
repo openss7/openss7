@@ -1,0 +1,409 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{UNIX Implementation}\label{unixftam}
+The File Transfer, Access, and Management (FTAM) standard is the OSI file
+service.
+Included in the release is a fairly complete FTAM implementation in the
+context of the particular file services it offers.
+It is a minimal implementation in as much as it offers only four core
+services: transfer of binary files,
+transfer of text files,
+directory listings,
+and file management.
+The implementation included has been tested on both Berkeley and AT\&T
+SVR2 and SVR3~\unix/.
+Both the FTAM initiator and responder programs have \unix/ manual entries.
+
+\section	{Implementation}\label{unixftam:code}
+If you have access to the source tree for this release,
+the directory \file{ftam2/} contains the code for the responder and initiator.
+
+\subsection	{The Initiator}
+There is currently one initiator which uses FTAM: \man ftam(1c).
+Supported are:
+the no-recovery FTAM-QoS;
+any of 
+the transfer, management, and transfer and management service classes;
+the kernel, read, write, limited file management, enhanced file management, and
+grouping functional units;
+and, the kernel and storage attribute groups.
+Only three document types are supported as of this writing:
+unstructured text files (FTAM-1),
+unstructured binary files (FTAM-3),
+and filedirectory files (NIST-9).
+
+The \pgm{ftam} program is an interactive FTAM initiator
+which prompts the user for commands.
+Generating an interrupt,
+usually by typing control-C (`\verb"^C"'),
+at the top-level does nothing,
+but generating an interrupt twice in a row at the top-level terminates
+\pgm{ftam};
+generating an interrupt during additional prompting causes \pgm{ftam} to abort
+the command;
+typing generating an interrupt during file transfer causes the transfer to be
+aborted.
+
+\subsubsection	{Commands}
+Here are the commands to \pgm{ftam}:
+\begin{describe}
+\item[append {\tt source destination}]
+Appends to a file in the filestore.
+
+\item[cd {\tt [dir]}]
+Changes the working directory on the virtual filestore.
+This requires the {\bf realstore\/} variable to be set appropriately.
+
+\item[chgrp {\tt group file $\ldots$}]
+Changes the account attribute of the named files.
+
+\item[close]
+Terminates the association with the virtual filestore.
+
+\item[dir {\tt [file]}]
+Prints a long directory listing.
+
+\item[echo {\tt file $\ldots$}]
+Simply echoes any arguments.
+Useful for seeing how glob\-bed expressions will evaluate.
+
+\item[fdir {\tt stream [file]}]
+Prints a long directory listing to a file or program.
+If \verb"stream" starts with a vertical bar (`\verb"|"')
+then the named program is invoked;
+otherwise the named file is written.
+
+\item[fls {\tt stream [file]}]
+Prints a directory listing to a file or program.
+If \verb"stream" starts with a vertical bar (`\verb"|"')
+then the named program is invoked;
+otherwise the named file is written.
+
+\item[get {\tt source destination}]
+Retrieves a file.
+
+\item[help {\tt [command]}]
+Prints help information.
+For detailed information, try ``\verb*"help ?"''.
+
+\item[lcd {\tt [file]}]
+Changes the working directory on the local system.
+
+\item[ls {\tt [file]}]
+Prints a directory listing.
+
+\item[mkdir {\tt dir $\ldots$}]
+Creates a directory.
+
+\item[mv {\tt source destination}]
+Renames a file.
+
+\item[open {\tt host user [account]}]
+Associates with the virtual filestore.
+
+\item[put {\tt source destination}]
+Stores a file.
+
+\item[pwd]
+Prints the working directories.
+
+\item[quit]
+Terminates the association with the virtual filestore and exits.
+
+\item[rm {\tt file $\ldots$}]
+Deletes a file.
+
+\item[set {\tt variable value}]
+Displays or changes variables.
+For detailed information, try ``\verb*"set ?"''.
+
+\item[status]
+Shows the current status.
+\end{describe}
+
+\subsubsection	{Variables}
+Here are the variables which effect \pgm{ftam}'s behavior.
+\begin{describe}
+\item[bell]
+Rings the bell after each command terminates.
+Useful for long file transfers when you want to attend to other matters and
+be notified when you can type another command.
+Boolean (values: {\bf on\/} or {\bf off\/}).
+
+\item[debug]
+This enables voluminous output during file transfers,
+among other things.  Boolean.
+
+\item[glob]
+This enables the expansion of shell meta-characters.
+Operations which perform globbing
+require the {\bf realstore\/} variable to be set appropriately.
+Boolean.
+
+\item[hash]
+This enables the printing of hash marks during file transfers.
+Values:
+\verb"off", \verb"on", \verb"total".
+
+\item[override]
+This sets the creation override mode for files being written to the virtual
+filestore.
+If the file being created already exists,
+then one of four alternatives is taken.
+Values:
+\begin{describe}
+\item[\verb"fail":]
+the creation operation;
+\item[\verb"select":]
+use the existing file with its old contents and attributes;
+\item[\verb"write":]
+zero-truncate if it already exists, and use the existing file with its old
+attributes;
+and,
+\item[\verb"delete":]
+if it already exists, then create a new file with new attributes.
+\end{describe}
+This defaults to \verb"write".
+
+\item[qualifier]
+This sets the ``qualifier'' portion of the srevice which \pgm{ftam} will
+associate with.
+It is needed when using the current implementation of the MITRE FTAM/FTP
+gateway. 
+This defaults to \verb"filestore".
+
+\item[query]
+This determines if \pgm{ftam} should ask the user to confirm operations
+involving globbing that expand to more than one filename.
+Boolean.
+This defaults to \verb"on".
+
+\item[realstore]
+Sets the type of remote realstore associated with the virtual filestore.
+This is used to help \pgm{ftam} act friendlier to the user!
+Values: \verb"unix", \verb"unknown".
+\[\fbox{\begin{tabular}{lp{0.67\textwidth}}
+\bf NOTE:&	The concept of a {\bf realstore\/} is contrary to the notion of
+		open systems as it is an $N*M$ (not $N+M\/$) method.
+\end{tabular}}\]
+
+\item[trace]
+This enables the tracing of FTAM PDUs.  Boolean.
+
+\item[tracefile]
+This defines the file where tracing information is appended.
+
+\item[type]
+This defines the file transfer mode to use.
+Values: \verb"default", \verb"binary", and \verb"text".
+
+\item[verbose]
+This enables printing of informative diagnostics during operation.  Boolean.
+
+\item[watch]
+This enables watch mode,
+something in between debug mode (too voluminous),
+and verbose mode (not informative enough).  Boolean.
+
+\item[userdn]
+This defines the Distinguished Name to be used when binding to the Directory
+for AE-lookup.
+DN-string.
+
+\item[{\em xyz\/}sapfile]
+This defines the file where {\em xyz\/}PDU tracing information is appended.
+Values: any filename, or \verb"-" for the diagnostic output.
+
+\item[{\em xyz\/}saplevel]
+This enables tracing of the {\em xyz\/} module.\\
+Values: \verb"none", \verb"exceptions", \verb"notice", \verb"pdus",
+\verb"trace", and \verb"debug".
+\end{describe}
+
+\subsubsection	{Options}
+Here are the command line options:
+\begin{describe}
+\item[-a {\em acct}]
+Sets the account to be used on the virtual filestore.
+
+\item[-d]
+Sets {\bf debug}.
+
+\item[-f]
+Inhibits reading of the user's \file{\$HOME/.ftamrc} file on startup.
+
+\item[-h]
+Sets {\bf hash}.
+
+\item[-o  {\em mode}]
+Sets {\bf override}.
+
+\item[-t]
+Sets {\bf trace}.
+
+\item[-u  {\em user}]
+Sets the initiator identity to be used on the virtual filestore.
+
+\item[-v]
+Sets {\bf verbose\/} (default for interactive use).
+
+\item[-w]
+Sets {\bf watch}.
+\end{describe}
+
+\subsection	{The Responder}
+The \man ftamd(8c) program implements the file service.
+It implements {\em filestore\/} abstractions directly on the \unix/ filesystem.
+Supported are:
+the no-recovery FTAM-QoS;
+any of
+the transfer, management, and transfer and management service classes;
+the kernel, read, write, limited file management, enhanced file management, and
+grouping functional units;
+and, the kernel and storage attribute groups.
+Only three document types are supported as of this writing:
+unstructured text files (FTAM-1),
+unstructured binary files (FTAM-3),
+and filedirectory files (NIST-9).
+
+\subsubsection	{Authentication}
+An FTAM initiator must be listed in the \man passwd(5) file and have a
+non-empty password.
+Further, as with the \man ftpd(8c) daemon,
+the username must not appear in the \file{ftamusers} file in the ISODE
+\verb"ETCDIR" directory or in the \file{/etc/ftpusers} file.
+(In fact, many of the mechanisms in \pgm{ftamd} are based on the \pgm{ftpd}
+program supplied with Berkeley \unix/.)
+
+If the username \verb"ANON" or \verb"ftp" is given,
+then \pgm{ftamd} treats this as a guest access,
+similar to the ``anonymous'' facility supported by the \pgm{ftpd} daemon.
+An entry in the \file{/etc/passwd} file for user
+\verb"ftp" must be present with a non-zero UID.
+For guest access,
+a \man chroot(2) to the guest home directory
+is executed to restrict access to the system.
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	The anonymous account is inherently dangerous and should be
+		avoided when possible.
+		It is also inherently useful.
+\end{tabular}}\]
+
+The Berkeley UNIX version of this program runs with the effective UID of the
+FTAM initiator,
+but also with the real UID of the super-user.
+This is necessary to change the account attribute on files
+using \man chown(2).
+The possible security holes have been extensively considered,
+but may be incomplete.
+
+The AT\&T UNIX version,
+which lacks kernel support for this technique, acts differently.
+Immediately upon association establishment,
+it changes both the real and effective UID to that of the FTAM initiator.
+To change the account attribute on files,
+it invokes the \man chgrp(1) program.
+Similarly, to create or delete directories,
+it invokes either the \man mkdir(1) program or the \man rmdir(1) program.
+Finally,
+it is unable to change the filesize attribute to a non-zero value
+if this value is smaller than the current filesize.
+
+Finally,
+on Berkeley \unix/ systems,
+the \man wtmp(5) file is updated as appropriate.
+(We couldn't figure out how to update \file{wtmp} under AT\&T \unix/
+using the description in the SVID!)
+
+\subsubsection	{Virtual Filestore}
+Here are the file attribute mappings.
+Most attributes are derived by doing a \man stat(2) on the file and then
+examining the indicated field in the resulting structure.
+\begin{describe}
+\item[filename]
+A single component, relative to the user's \file{\$HOME}.
+Changing this attribute is equivalent to a \man rename(2).
+
+\item[contents-type]
+Based on the \verb"st_mode" field:
+\begin{describe}
+\item[NIST-9]	for directories;
+
+\item[FTAM-1]	for regular files appearing to be textual;
+and,
+
+\item[FTAM-3]	for all other regular files.
+\end{describe}
+Files that are neither regular nor directories are inaccessible via this
+implementation of the VFS (i.e., special files).
+
+\item[account]
+The \verb"st_gid" field according to \man group(5).
+Changing this attribute is equivalent to a \man chgrp(1).
+
+\item[date-and-time-of-creation]
+The \verb"st_mtime" field.
+
+\item[date-and-time-of-last-modification]
+The \verb"st_mtime" field.
+
+\item[date-and-time-of-last-read-access]
+The \verb"st_atime" field.
+
+\item[date-and-time-of-last-attribute-modification]
+\ \\	%%% hack
+The \verb"st_ctime" field.
+
+\item[identity-of-creator]
+The \verb"st_uid" field according to \man passwd(5).
+
+\item[identity-of-last-modifier]
+The \verb"st_uid" field according to \man passwd(5)
+(if the value of the \verb"st_mode" field guarantees uniqueness).
+
+\item[identity-of-last-reader]
+The \verb"st_uid" field according to \man passwd(5)
+(if the value of the \verb"st_mode" field guarantees uniqueness).
+
+\item[identity-of-last-attribute-modifier]
+The \verb"st_uid" field according to \man passwd(5)
+(if the value of the \verb"st_mode" field guarantees uniqueness).
+
+\item[file-availability]
+Immediate.
+
+\item[permitted-actions]
+Depends on the \verb"st_mode" the as interpreted by \man access(2):
+\verb"R_OK" for permission to read;
+\verb"W_OK" for permission to write;
+permission is always granted to read attributes;
+permission is granted to change attributes if the initiator has uid equal to
+the \verb"st_uid" field;
+and,
+permission to delete is based on writability of parent directory.
+
+\item[filesize]
+The \verb"st_size" field.
+
+\item[future-filesize]
+Not available.
+
+\item[access-control]
+Not available.
+
+\item[encryption-name]
+Not available.
+
+\item[legal-qualifications]
+Not available.
+
+\item[private-use]
+Not available.
+\end{describe}
+
+The activity attribute mappings are straight-forward.
+The read action corresponds to reading UNIX files.
+The insert, replace, extend, and erase actions correspond to writing
+UNIX files.
+Concurrency control is supported for reading and writing,
+but not for reading or changing attributes, or for deleting files.

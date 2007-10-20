@@ -1,0 +1,1594 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Association Control}\label{libacsap}
+The \man libacsap(3n) library implements the Association Control Service
+(ACS).
+Logically,
+one views an application to consist of several {\em application service
+elements\/} (ASE's).
+Although these ASEs cooperate,
+each performs a different function for the application.
+The Association Control Service Element (ACSE) is concerned with the task of
+``starting'' and ``stopping'' the network for the application.
+That is,
+an application uses the ACSE to establish a connection,
+termed an {\em association}, between two users.
+The association {\em binds\/} the two users,
+which are referred to as
+the {\em initiator\/} and the {\em responder}.
+This association, once established is used by other ASEs
+(e.g., the remote operations service element).
+Later,
+the ACSE is called upon to release the association,
+either gracefully (perhaps with some negotiation),
+or abruptly (with possible loss of information).
+
+Like most models of OSI services,
+the underlying assumption is one of an asynchronous environment:
+the service provider may generate events for the service user without the
+latter entity triggering the actions which led to the event.
+For example,
+in a synchronous environment,
+an indication that data has arrived usually occurs only when the service user
+asks the service provider to read data;
+in an asynchronous environment,
+the service provider may interrupt the service user at any time to announce
+the arrival of data.
+
+The \verb"acsap" module in this release presents a synchronous interface.
+However once the association is established,
+an asynchronous interface may be selected.
+The \verb"acsap" module itself is naive as to the interface being used:
+the particular application service element which is responsible for
+transferring data will manage the association once the ACSE has established it.
+
+All of the routines in the \man libacsap(3n) library are integer-valued.
+They return the manifest constant \verb"OK" on success,
+or \verb"NOTOK" otherwise.
+In some circumstances,
+failures are fatal and cause (or are caused by) the association being released.
+Section~\ref{acs:errors} describes how such failures may be distinguished.
+
+\section	{An Important Note}\label{acs:note}
+In the current release
+there are several ways to establish an association.
+This is due to recent changes in the OSI application layer,
+and a desire to remain compatible with previous work.
+Users are strongly encouraged to use the new facilities described herein,
+as the older facilities will eventually be removed.
+
+Here are the new facilities available:
+\[\begin{tabular}{|l|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Desired Service}&
+    \multicolumn{1}{c|}{\bf Association Primitives}&
+    \multicolumn{1}{c|}{\bf Section(s)}\\
+\hline
+    Remote Operations&		{\sf A-ASSOCIATE}&  \ref{acs:associations}\\
+    \ (complete discipline)&
+				{\sf A-RELEASE}&    \ref{ros:underlying}\\
+    \ \cite{ISO.ROS.Service,CCITT.ROS.Service}&
+    				{\sf A-ABORT}&	    \\[0.1in]
+\hline
+    Remote Operations&		{\sf RT-OPEN}&	    \ref{rts:associations}\\
+    \ (complete discipline&	{\sf RT-CLOSE}&	    \ref{ros:underlying}\\
+    \ \ with reliable transfer)&&		    \\
+    \ \cite{ISO.ROS.Service,CCITT.ROS.Service}&
+				&		    \\[0.1in]
+\hline
+    Reliable Transfer&		{\sf RT-OPEN}&	    \ref{rts:associations}\\
+    \ \cite{ISO.RTS.Service,CCITT.RTS.Service}&
+				{\sf RT-CLOSE}&	    \\
+\hline
+\end{tabular}\]
+\clearpage	%%% yikes!
+
+Here are the old facilities available:
+\[\begin{tabular}{|l|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Desired Service}&
+    \multicolumn{1}{c|}{\bf Association Primitives}&
+    \multicolumn{1}{c|}{\bf Section}\\
+\hline
+    Remote Operations&		{\sf RO-BEGIN}&	    \ref{ros:old-style}\\
+    \ (basic discipline)&	{\sf RO-END}&	    \\
+    \ \cite{ECMA.ROS}&		&		    \\[0.1in]
+\hline
+    Remote Operations&		{\sf X.410 OPEN}&   \ref{rts:old-style}\\
+    \ (advanced discipline&	{\sf X.410 CLOSE}&  \ref{ros:underlying}\\
+    \ \ with reliable transfer)&&		    \\
+    \ \cite{MHS.RTS}&		&		    \\[0.1in]
+\hline
+    Reliable Transfer&		{\sf X.410 OPEN}&   \ref{rts:old-style}\\
+    \ \cite{MHS.RTS}&		{\sf X.410 CLOSE}&  \\
+\hline
+\end{tabular}\]
+
+In short, depending on whether a Reliable Transfer Service Element (RTSE) is
+desired,
+for the purposes of association control,
+all new applications should use either the library discussed below,
+or the reliable transfer routines discussed in
+Section~\ref{rts:associations} on page~\pageref{rts:associations}.
+
+\section	{Associations}\label{acs:associations}
+There are three aspects of association management:
+{\em association establishment},
+{\em association release},
+and,
+{\em association abort}.
+Each of these are now described in turn.
+
+\subsection	{Association Establishment}
+The \man libacsap(3n) library distinguishes between the user which started an
+association,
+the {\em initiator},
+and the user which was subsequently bound to the association,
+the {\em responder}.
+We sometimes term these two entities the {\em client\/} and the {\em server},
+respectively.
+
+\subsubsection	{Addresses}\label{acs:addresses}\label{acs:aei}
+Addresses for the association control service entity consist of two parts:
+a presentation address (as discussed in Section~\ref{psap:addresses} on
+page~\pageref{psap:addresses} of \voltwo/),
+and application-entity information.
+Internally,
+the \verb"AEInfo" is used to represent this notion:
+\begin{quote}\index{AEInfo}\small\begin{verbatim}
+typedef struct AEInfo {
+    PE      aei_ap_title;
+    PE      aei_ae_qualifier;
+
+    int     aei_ap_id;
+    int     aei_ae_id;
+
+    int     aei_flags;
+#define AEI_NULL        0x00
+#define AEI_AP_ID       0x01
+#define AEI_AE_ID       0x02
+}       AEInfo, *AEI;
+#define NULLAEI         ((AEI) 0)
+\end{verbatim}\end{quote}
+This structure contains several elements:
+\begin{describe}
+\item[\verb"aei\_ap\_title":] the application-process title;
+
+\item[\verb"aei\_ae\_qualifier":] the application-entity qualifier;
+
+\item[\verb"aei\_ap\_id":] the application-process invocation identifier;
+
+\item[\verb"aei\_ae\_id":] the application-entity invocation identifier;
+and,
+
+\item[\verb"aei\_flags":] flags, indicating which, if any,
+of the invocation-identifiers are present.
+\end{describe}
+
+The routing \verb"sprintaei" can be used to return a null-terminated
+string describing the application-entity.
+\begin{quote}\index{sprintaei}\small\begin{verbatim}
+char   *sprintaei (aei)
+AEI     aei;
+\end{verbatim}\end{quote}
+
+Finally,
+the routine \verb"oid2aei" converts object identifiers
+(discussed in Section~\ref{psap:oid} on page~\pageref{psap:oid})
+and converts them to application-entity information.
+This is used by the stub-directory service:
+\begin{quote}\index{oid2aei}\small\begin{verbatim}
+AEI     oid2aei (oid)
+OID     oid;
+\end{verbatim}\end{quote}
+
+In Figure~\ref{getFTAMentity},
+an example of how one constructs the address for the File Transfer, Access
+and Management (FTAM) service on host \verb"RemoteHost" is presented.
+The key routine is \verb"_str2aei":
+\begin{quote}\index{\_str2aei}\small\begin{verbatim}
+AEI     _str2aei (designator, qualifier, context, interactive)
+char   *designator,
+       *qualifier,
+       *context;
+int     interactive;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"designator":] input from the user
+(e.g., ``\verb"hubris, cs, ucl, gb"'' or ``\verb"hubris"'');
+
+\item[\verb"qualifier":] the service qualifier (e.g., \verb"filestore");
+
+\item[\verb"context":] the \verb"supportedApplicationContext" for the desired
+service (e.g., \verb"iso ftam");
+and;
+
+\item[\verb"interactive":] non-zero if the user's terminal can be queried for
+additional information.
+\end{describe}
+The routine \verb"_str2aei" will first attempt to resolution using the
+``user-friendly nameservice'' with the \verb"designator", \verb"context", and
+\verb"interactive" parameters.
+If this fails,
+the ``stub directory service'' will be used,
+with the \verb"designator" and \verb"qualifier" parameters.
+
+For backwards-compatiblity,
+a macro, \verb"str2aei" is provided which is equivalent to:
+\begin{quote}\index{str2aei}\small\begin{verbatim}
+_str2aei (designator, qualifier, NULLCP, 0)
+\end{verbatim}\end{quote}
+
+For future-compability,
+you should start using the \verb"str2aeinfo" routine,
+as both \verb"_str2aei" and its macro-ized counterpart will soon be deprecated:
+\begin{quote}\index{str2aeinfo}\small\begin{verbatim}
+AEI     str2aeinfo (string, context, interactive, userdn, passwd)
+char   *string,
+       *context,
+       *userdn,
+       *passwd;
+int     interactive;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"string":] input from the user
+(e.g., ``\verb"hubris, cs, ucl, gb"'' or ``\verb"hubris"'');
+
+\item[\verb"context":] the \verb"supportedApplicationContext" for the desired
+service (e.g., \verb"iso ftam");
+
+\item[\verb"interactive":] non-zero if the user's terminal can be queried for
+additional information;
+
+\item[\verb"userdn":] the Distinguished Name (DN) when using the Directory
+service;
+and;
+
+\item[\verb"passwd":] authentication information for the Directory service.
+\end{describe}
+This routine attempts resolution solely via the ``user-friendly nameservice''.
+
+The routine \verb"aei2addr" takes application-entity information,
+and returns the appropriate presentation address.
+\begin{quote}\index{aei2addr}\small\begin{verbatim}
+struct PSAPaddr *aei2addr (aei)
+AEI     aei;
+\end{verbatim}\end{quote}
+\tagrind[tp]{grind2a-1}%
+	{Constructing the address for the FTAM entity}{getFTAMentity}
+
+\subsubsection	{Address Encodings}\label{addr:encodings}
+It may be useful to encode a presentation address for viewing.
+Although a consensus for a standard way of doing this has not yet been
+reached,
+the routines \verb"paddr2str" and \verb"str2paddr" may be used in the interim.
+These implement the encodings defined in \cite{String.Addresses}.
+The BNF syntax for this encoding is shown in Figure~\ref{str:format} on
+page~\pageref{str:format}.
+\begin{quote}\index{paddr2str}\small\begin{verbatim}
+char   *paddr2str (pa, na)
+struct PSAPaddr *pa;
+struct NSAPaddr *na;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"pa":] the presentation address;
+and,
+
+\item[\verb"na":] a network address to use instead of the network addresses
+in the \verb"pa" parameter
+(use the manifest constant \verb"NULLNA" otherwise).
+\end{describe}
+If \verb"paddr2str" fails,
+it returns the manifest constant \verb"NULLCP".
+
+The routine \verb"str2paddr" takes an ascii string encoding and
+returns a
+presentation address.
+\begin{quote}\index{str2paddr}\small\begin{verbatim}
+struct PSAPaddr *str2paddr (str)
+char   *str;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"str":] the ascii string.
+\end{describe}
+If \verb"str2paddr" fails,
+it returns the manifest constant \verb"NULLPA".
+\tagrind[tp]{grind2a-2f}{BNF Syntax for paddr2str/str2paddr}{str:format}
+\tagrind[tp]{grind2a-2g}{BNF Syntax for paddr2str/str2paddr (continued)}\empty
+
+\verb"paddr2str" is really a macro which calls the routine \verb"_paddr2str":
+\begin{quote}\index{\_paddr2str}\small\begin{verbatim}
+char  *_paddr2str (pa, na, compact)
+struct PSAPaddr *pa;
+struct NSAPaddr *na;
+int    compact;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"pa":] the presentation address;
+
+\item[\verb"na":] a network address to use instead of the network addresses
+in the \verb"pa" parameter
+(use the manifest constant \verb"NULLNA" otherwise);
+and,
+
+\item[\verb"compact":] indicates the style of encoding.
+\end{describe}
+If \verb"compact" is greater than zero,
+then the encoding reflects a normalized network address.
+This is useful for passing to arbitrary processes in the network.
+If \verb"compact" is less than zero,
+then the encoding reflects the BNF in Figure~\ref{str:format},
+without any macro substitutions.
+If \verb"compact" is equal to zero (which is what \verb"paddr2str" uses),
+then the encoding reflects the above BNF with macro substitutions.
+
+The routine \verb"pa2str" takes a presentation address and returns a
+null-ter\-mi\-na\-ted ascii string suitable for viewing:
+\begin{quote}\index{pa2str}\begin{verbatim}
+char   *pa2str (pa)
+struct PSAPaddr *pa;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"pa"]: the presentation address to be printed.
+\end{describe}
+
+\subsubsection	{Server Initialization}
+The \man tsapd(8c) daemon,
+upon accepting a connection from an initiating host,
+consults the ISO services database to determine which program
+on the local system implements the desired application context.
+
+Once the program has been ascertained,
+the daemon runs the program with any arguments listed in the database.
+In addition,
+it appends some {\em magic arguments\/} to the argument vector.
+Hence,
+the very first action performed by the responder is to re-capture the ACSE
+state contained in the magic arguments.
+This is done by calling the routine \verb"AcInit",
+which on a successful return,
+is equivalent to a {\sf A-ASSOCIATE.INDICATION\/} event from the association
+control service provider.
+\begin{quote}\index{AcInit}\small\begin{verbatim}
+int     AcInit (vecp, vec, acs, aci)
+int     vecp;
+char  **vec;
+struct AcSAPstart *acs;
+struct AcSAPindication *aci;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"vecp":] the length of the argument vector;
+
+\item[\verb"vec":] the argument vector;
+
+\item[\verb"acs":] a pointer to an \verb"AcSAPstart" structure,
+which is updated only if the call succeeds;
+and,
+
+\item[\verb"aci":] a pointer to an \verb"AcSAPindication" structure,
+which is updated only if the call fails.
+\end{describe}
+If \verb"AcInit" is successful,
+it returns information in the \verb"acs" parameter,
+which is a pointer to an \verb"AcSAPstart" structure.
+\begin{quote}\index{AcSAPstart}\small\begin{verbatim}
+struct AcSAPstart {
+    int     acs_sd;
+
+    OID     acs_context;
+
+    AEInfo  acs_callingtitle;
+    AEInfo  acs_calledtitle;
+
+    struct PSAPstart acs_start;
+
+    int     acs_ninfo;
+    PE      acs_info[NACDATA];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:\label{AcSAPstart}
+\begin{describe}
+\item[\verb"acs\_sd":] the association-descriptor to be used to reference
+this association;
+
+\item[\verb"acs\_context":] the application context name;
+
+\item[\verb"acs\_callingtitle":] information on the calling application-entity
+(if any); 
+
+\item[\verb"acs\_calledtitle":] information on the called application-entity
+(if any);
+
+\item[\verb"acs\_start":] an \verb"PSAPstart" structure
+(consult page~\pageref{PSAPstart} of \voltwo/);
+and,
+
+\item[\verb"acs\_info"/\verb"acs\_ninfo":] any initial data
+(and the length of that data).
+\end{describe}
+Note that the proposed contexts list in the \verb"acs_start" element will
+contain a context for the ACSE.
+The routine \verb"AcFindPCI" can be used to determine the PCI being used by
+the ACSE:
+\begin{quote}\index{AcFindPCI}\small\begin{verbatim}
+int     AcFindPCI (sd, pci, aci)
+int     sd;
+int    *pci;
+struct AcSAPindication *aci;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"pci":] a pointer to an integer location,
+which is updated only if the call succeeds;
+and,
+
+\item[\verb"aci":] a pointer to an \verb"AcSAPindication" structure,
+which is updated only if the call fails.
+\end{describe}
+
+Further,
+note that the data contained in the structure was allocated via \man malloc(3),
+and should be released by using the \verb"ACSFREE" macro when no longer
+referenced.
+The \verb"ACSFREE" macro,
+behaves as if it was defined as:\label{ACSFREE}
+\begin{quote}\index{ACSFREE}\small\begin{verbatim}
+void    ACSFREE (acs)
+struct AcSAPstart *acs;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"AcInit",
+and not the \verb"AcSAPstart" structure itself.
+Further,
+\verb"ACSFREE" should be called only if the call to the \verb"AcInit"
+routine returned \verb"OK".
+
+If the call to \verb"AcInit" is not successful,
+then a {\sf A-P-ABORT.INDICATION\/} event is simulated,
+and the relevant information is returned in an encoded
+\verb"AcSAPindication" structure.\label{AcSAPindication}
+\begin{quote}\index{AcSAPindication}\small\begin{verbatim}
+struct AcSAPindication {
+    int     aci_type;
+#define ACI_FINISH      0x00
+#define ACI_ABORT       0x01
+
+    union {
+        struct AcSAPfinish aci_un_finish;
+        struct AcSAPabort aci_un_abort;
+    }   aci_un;
+#define aci_finish      aci_un.aci_un_finish
+#define aci_abort       aci_un.aci_un_abort
+};
+\end{verbatim}\end{quote}
+As shown, this structure is really a discriminated union
+(a structure with a tag element followed by a union).
+Hence, on a failure return,
+one first coerces a pointer to the \verb"AcSAPabort" structure contained
+therein,
+and then consults the elements of that structure.
+\begin{quote}\index{AcSAPabort}\small\begin{verbatim}
+struct AcSAPabort {
+    int     aca_source;
+
+    int     aca_reason;
+
+    int     aca_ninfo;
+    PE      aca_info[NACDATA];
+
+#define ACA_SIZE        512
+    int     aca_cc;
+    char    aca_data[ACA_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of an \verb"AcSAPabort" structure are:
+\begin{describe}
+\item[\verb"aca\_source":] the source of the abort, one of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Source}\\
+\hline
+    \tt ACA\_USER&		service-user (peer)\\
+    \tt ACA\_PROVIDER&		service-provider\\
+    \tt ACA\_LOCAL&		local ACPM\\
+\hline
+\end{tabular}\]
+
+\item[\verb"aca\_reason":] the reason for the provider-initiated abort
+(meaningful only if \verb"aca_source" is not \verb"ACA_REQUESTOR"),
+consult Table~\ref{AcSAPreasons};
+
+\item[\verb"aca\_info"/\verb"aca\_ninfo":] any abort data
+(and the length of that data) from the peer
+(if \verb"aca_source" is \verb"ACA_USER");
+and,
+
+\item[\verb"aca\_data"/\verb"aca\_cc":] a diagnostic string from the provider.
+\end{describe}
+\tagtable[tp]{2a-1}{AcSAP Failure Codes}{AcSAPreasons}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released by using the \verb"ACAFREE" macro when no longer
+referenced.
+The \verb"ACAFREE" macro,
+behaves as if it was defined as:\label{ACAFREE}
+\begin{quote}\index{ACAFREE}\small\begin{verbatim}
+void    ACAFREE (aca)
+struct AcSAPabort *aca;
+\end{verbatim}\end{quote}
+The macro frees only the data contained in the structure,
+and not the \verb"AcSAPabort" structure itself.
+
+After examining the information returned by \verb"AcInit" on a successful call
+(and possibly after examining the argument vector),
+the responder should either accept or reject the association.
+For either response,
+the responder should use the \verb"AcAssocResponse" routine
+(which corresponds to the {\sf A-ASSOCIATE.RESPONSE\/} action).
+\begin{quote}\index{AcAssocResponse}\small\begin{verbatim}
+int     AcAssocResponse (sd, status, reason, context, 
+        respondtitle, respondaddr, ctxlist, defctxresult,
+        prequirements, srequirements, isn, settings, ref,
+        data, ndata, aci)
+int     sd;
+int     status,
+        reason;
+OID     context;
+AEI     respondtitle;
+struct PSAPaddr *respondaddr;
+int     prequirements,
+        srequirements,
+        settings,
+        ndata;
+long    isn;
+struct PSAPctxlist *ctxlist;
+int     defctxresult;
+struct SSAPref *ref;
+PE     *data;
+struct AcSAPindication *aci;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:\label{AcAssocResponse}
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"status":] the acceptance indicator
+(either \verb"ACS_ACCEPT" if the association is to be accepted,
+or one of the user-initiated rejection codes listed in
+Table~\ref{AcSAPreasons} on page~\pageref{AcSAPreasons});
+
+\item[\verb"reason":] the diagnostic
+(either \verb"ACS_USER_NULL" if the association is to be accepted,
+or one of the user-initiated diagnostic codes listed in
+Table~\ref{AcSAPdiagnostics} on page~\pageref{AcSAPdiagnostics});
+
+\item[\verb"context":] the application context to be used over the
+association (defaults to the context proposed);
+
+\item[\verb"respondtitle":] information on the responding application-entity
+(optional);
+
+\item[\verb"data"/\verb"ndata":] an array of user data
+(and the number of elements in that array,
+consult the warning on page~\pageref{AcSAPdata});
+and,
+
+\item[\verb"aci":] a pointer to an \verb"AcSAPindication" structure,
+which is updated only if the call fails.
+\end{describe}
+The remaining parameters are for the presentation service,
+consult the description of the \verb"PConnResponse" routine on
+page~\pageref{PConnResponse} of \voltwo/.
+\tagtable[tp]{2a-2}{AcSAP Diagnostic Codes}{AcSAPdiagnostics}
+
+If the call to \verb"AcAssocResponse" is successful,
+and the \verb"status" parameter is set to \verb"ACS_ACCEPT",
+then association establishment has now been completed.
+If the call is successful,
+but the \verb"status" parameter is not \verb"ACS_ACCEPT",
+then the association has been rejected and the responder may exit.
+Otherwise,
+if the call failed and the reason is ``fatal'',
+then the association is lost.
+
+\subsubsection	{Client Initialization}
+A program wishing to associate itself with another application-level user 
+calls the \verb"AcAssocRequest" routine,
+which corresponds to the user taking the {\sf A-ASSOCIATE.REQUEST\/} action.
+\begin{quote}\index{AcAssocRequest}\small\begin{verbatim}
+int     AcAssocRequest (context, callingtitle, calledtitle,
+        callingaddr, calledaddr, ctxlist, defctxname,
+        prequirements, srequirements, isn, settings, ref,
+        data, ndata, qos, acc, aci)
+OID     context;
+AEI     callingtitle,
+        calledtitle;
+struct PSAPaddr *callingaddr,
+                *calledaddr;
+int     prequirements,
+        srequirements,
+        settings,
+        ndata;
+long    isn;
+struct PSAPctxlist *ctxlist;
+OID     defctxname;
+struct SSAPref *ref;
+PE    *data;
+struct QOStype *qos;
+struct AcSAPconnect *acc;
+struct AcSAPindication *aci;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:\label{AcAssocRequest}
+\begin{describe}
+\item[\verb"context":] the application context to be used over the
+association;
+
+\item[\verb"callingtitle":] information on the calling application-entity
+(use the manifest constant \verb"NULLAEI" if not specified);
+
+\item[\verb"calledtitle":]  information on the called application-entity
+(use the manifest constant \verb"NULLAEI" if not specified);
+
+\item[\verb"data"/\verb"ndata":] an array of initial data
+(and the number of elements in that array,
+consult the warning on page~\pageref{AcSAPdata});
+
+\item[\verb"qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos} in \voltwo/);
+
+\item[\verb"acc":] a pointer to an \verb"AcSAPconnect" structure,
+which is updated only if the call succeeds;
+and,
+
+\item[\verb"aci":] a pointer to an \verb"AcSAPindication" structure,
+which is updated only if the call fails.
+\end{describe}
+The remaining parameters are for the presentation service,
+consult the description of the \verb"PConnRequest" routine on
+page~\pageref{PConnRequest} of \voltwo/ for additional information.
+Note that the \verb"ctxlist" parameter is mandatory:
+the association control service element will look for the ACSE PCI there.
+If not present,
+it will add the PCI to the list.
+
+If the call to \verb"AcAssocRequest" is successful
+(the {\sf A-ASSOCIATE.CON\-FIR\-MA\-TION\/} event occurs),
+it returns information in the \verb"acc" parameter
+which is a pointer to an \verb"AcSAPconnect" structure.
+\begin{quote}\index{AcSAPconnect}\small\begin{verbatim}
+struct AcSAPconnect {
+    int     acc_sd;
+
+    int     acc_result;
+    int     acc_diagnostic;
+
+    OID     acc_context;
+
+    AEInfo  acc_respondtitle;
+
+    struct PSAPconnect acc_connect;
+
+    int     acc_ninfo;
+    PE      acc_info[NACDATA];
+};
+\end{verbatim}\end{quote}
+The elements of an \verb"AcSAPconnect" structure are:\label{AcSAPconnect}
+\begin{describe}
+\item[\verb"acc\_sd":] the association-descriptor to be used to reference
+this association;
+
+\item[\verb"acc\_result"/\verb"acc\_diagnostic":] the association response
+and diagnostic;
+
+\item[\verb"acc\_context":] the application context name;
+
+\item[\verb"acc\_respondtitle":] information on the responding
+application-entity (if any);
+
+\item[\verb"acc\_connect":] an \verb"PSAPconnect" structure
+(consult page~\pageref{PSAPconnect} of \voltwo/);
+and,
+
+\item[\verb"acc\_info"/\verb"acc\_ninfo":] any initial data
+(and the length of that data).
+\end{describe}
+Note that the negotiated contexts list in the \verb"acc_connect" element
+will contain a context for the ACSE.
+To determine the PCI for the ACSE context,
+the routine \verb"AcFindPCI" routine,
+described above can be used.
+
+If the call to \verb"AcAssocRequest" is successful,
+and the \verb"acc_result" element is set to \verb"ACC_ACCEPT",
+then association establishment has completed.
+If the call is successful,
+but the \verb"acc_result" element is not \verb"ACC_ACCEPT",
+then the association attempt has been rejected;
+consult Table~\ref{AcSAPreasons} on page~\pageref{AcSAPreasons} 
+and Table~\ref{AcSAPdiagnostics} on page~\pageref{AcSAPdiagnostics} 
+to determine the reason for the rejection
+(further information can be found in the \verb"aci" parameter).
+Otherwise, if the call fails then the association is not established and
+the \verb"AcSAPabort" structure of the \verb"AsCAPindication" discriminated
+union has been updated.
+
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released by using the \verb"ACCFREE" macro when no longer
+referenced.
+The \verb"ACCFREE" macro,
+behaves as if it was defined as:\label{ACCFREE}
+\begin{quote}\index{ACCFREE}\small\begin{verbatim}
+void    ACCFREE (acc)
+struct AcSAPconnect *acc;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"AcAssocRequest",
+and not the \verb"AcSAPconnect" structure itself.
+Further,
+\verb"ACCFREE" should be called only if the call to the \verb"AcAssocRequest"
+routine returned \verb"OK".
+
+Normally \verb"AcAssocRequest" returns only after an association has succeeded
+or failed.
+This is termed a {\em synchronous\/} association initiation.
+If the user desires, an {\em asynchronous\/} association may be initiated.
+This routine is really a macro which calls the routine
+\verb"AcAsynAssocRequest" with an argument indicating that a association should
+be attempted synchronously.
+\begin{quote}\index{AcAsynAssocRequest}\small\begin{verbatim}
+int     AcAsynAssocRequest (context, callingtitle, calledtitle,
+        callingaddr, calledaddr, ctxlist, defctxname,
+        prequirements, srequirements, isn, settings, ref,
+        data, ndata, qos, acc, aci, async)
+OID     context;
+AEI     callingtitle,
+        calledtitle;
+struct PSAPaddr *callingaddr,
+                *calledaddr;
+int     prequirements,        
+        srequirements,
+        settings,
+        ndata,
+        async;
+long    isn;
+struct PSAPctxlist *ctxlist;
+OID     defctxname;
+struct SSAPref *ref;
+PE    *data;
+struct QOStype *qos;
+struct AcSAPconnect *acc;
+struct AcSAPindication *aci;
+\end{verbatim}\end{quote}
+The additional parameter to this procedure is:
+\begin{describe}
+\item[\verb"async":] whether the association should be initiated
+asynchronously.
+\end{describe}
+If the \verb"async" parameter is non-zero,
+then \verb"AcAsynAssocRequest" returns one of four values:
+\verb"NOTOK", which indicates that the association request failed;
+\verb"DONE", which indicates that the association request succeeded;
+or, either of \verb"CONNECTING_1" or \verb"CONNECTING_2", which indicates that
+the connection request is still in
+progress.
+In the first two cases,
+the usual procedures for handling return values from \verb"AcAssocRequest" are
+employed
+(i.e., a \verb"NOTOK" return from \verb"AcAsynAssocRequest" is equivalent to a
+\verb"NOTOK" return from \verb"AcAssocRequest", and,
+a \verb"DONE" return from \verb"AcAsynAssocRequest" is equivalent to a
+\verb"OK" return from \verb"AcAssocRequest").
+
+In the final case, when either \verb"CONNECTING_1" or
+\verb"CONNECTING_2" is returned,
+only the \verb"acc_sd" element of the \verb"acc" parameter has been updated;
+it reflects the association-descriptor to be used to reference this
+association.
+To determine when the association attempt has been completed,
+the routine \verb"xselect" (consult Section~\ref{acs:select})
+should be used after calling \verb"PSelectMask".
+In order to determine if the association attempt is successful,
+the routine \verb"AcAsynRetryRequest" is called:
+\begin{quote}\index{AcAsynRetryRequest}\small\begin{verbatim}
+int     AcAsynRetryRequest (sd, acc, aci)
+int     sd;
+struct AcSAPconnect *acc;
+struct AcSAPindication  *aci;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"acc":] a pointer to an \verb"AcSAPconnect" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"aci":] a pointer to an \verb"AcSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+Again, one of three values are returned:
+\verb"NOTOK", which indicates that the association request failed;
+\verb"DONE", which indicates that the association request succeeded;
+and, \verb"CONNECTING_1" or \verb"CONNECTING_2" which indicates that
+the connection request is still in progress.
+
+Refer to Section~\ref{tsap:async} on page~\pageref{tsap:async} in \voltwo/
+for information on how to make efficient use of the asynchronous connection
+facility. 
+
+\subsection	{Association Release}
+The \verb"AcRelRequest" routine is used to request the release of an
+association,
+and corresponds to a {\sf A-RELEASE.REQUEST\/} action.
+\begin{quote}\index{AcRelRequest}\small\begin{verbatim}
+int     AcRelRequest (sd, reason, data, ndata, secs, acr, aci)
+int     sd;
+int     reason;
+PE     *data;
+int     ndata;
+int     secs;
+struct AcSAPrelease *acr;
+struct AcSAPindication *aci;
+\end{verbatim}\end{quote}
+The parameters to this procedure:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"reason":] the reason why the association should be released,
+one of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Reason}\\
+\hline
+    \tt ACF\_NORMAL&	normal\\
+    \tt ACF\_URGENT&	urgent\\
+    \tt ACF\_UNDEFINED&	undefined\\
+\hline
+\end{tabular}\]
+
+\item[\verb"data"/\verb"ndata":] an array of final data
+(and the number of elements in that array,
+consult the warning on page~\pageref{AcSAPdata});
+
+\item[\verb"secs":] the maximum number of seconds to wait for a response
+(use the manifest constant \verb"NOTOK" if no time-out is desired);
+
+\item[\verb"acr":] a pointer to an \verb"AcSAPrelease" structure,
+which is updated only if the call succeeds;
+and,
+
+\item[\verb"aci":] a pointer to an \verb"AcSAPindication" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call to \verb"AcRelRequest" is successful,
+then this corresponds to a {\sf A-RELEASE.CONFIRMATION\/} event,
+and it returns information in the \verb"acr" parameter,
+which is a pointer to an \verb"AcSAPrelease" structure.
+\begin{quote}\index{AcSAPrelease}\small\begin{verbatim}
+struct AcSAPrelease {
+    int     acr_affirmative;
+
+    int     acr_reason;
+
+    int     acr_ninfo;
+    PE      acr_info[NACDATA];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:\label{AcSAPrelease}
+\begin{describe}
+\item[\verb"acr\_affirmative":]	the acceptance indicator;
+
+\item[\verb"acr\_reason":]	the reason for the indicator,
+one of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Reason}\\
+\hline
+    \tt ACR\_NORMAL&		normal\\
+    \tt ACR\_NOTFINISHED&	not finished\\
+    \tt ACR\_UNDEFINED&		undefined\\
+\hline
+\end{tabular}\]
+
+\item[\verb"acr\_info"/\verb"acr\_ninfo":]	any final data
+(and the length of that data).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released by using the \verb"ACRFREE" macro when no longer
+referenced.
+The \verb"ACRFREE" macro,
+behaves as if it was defined as:\label{ACRFREE}
+\begin{quote}\index{ACRFREE}\small\begin{verbatim}
+void    ACRFREE (acr)
+struct AcSAPrelease *acr;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"AcRelRequest",
+and not the \verb"AcSAPrelease" structure itself.
+Further,
+\verb"ACRFREE" should be called only if the call to the \verb"AcRelRequest"
+routine returned \verb"OK".
+
+If the call to \verb"AcRelRequest" is successful,
+and the \verb"acr_affirmative" element is set,
+then the association has been released.
+If the call is successful,
+but the \verb"acr_affirmative" element is not set (i.e., zero),
+then the request to release the association has been rejected by the remote
+user,
+and the association is still established.
+Otherwise the \verb"AcSAPabort" element of the \verb"AcSAPindication"
+parameter \verb"aci" contains the reason for failure.
+
+Note that if a non-negative value is given to the \verb"secs" parameter and a
+response is not received within this number of seconds,
+then the value contained in the \verb"aca_reason" element is \verb"ACS_TIMER".
+The user can then call the routine \verb"AcRelRetryRequest" to continue waiting
+for a response:
+\begin{quote}\index{AcRelRetryRequest}\small\begin{verbatim}
+int     AcRelRetryRequest (sd, secs, acr, aci)
+int     sd;
+int     secs;
+struct AcSAPrelease  *acr;
+struct AcSAPindication  *aci;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"secs":] the maximum number of seconds to wait for a response
+(use the manifest constant \verb"NOTOK" if no time-out is desired);
+
+\item[\verb"acr":] a pointer to a \verb"AcSAPrelease" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"aci":] a pointer to a \verb"AcSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"AcRelRetryRequest" is successful,
+and the \verb"acr_affirmative" element is set,
+then the association has been closed.
+If the call is successful,
+but the \verb"acr_affirmative" element is not set (i.e., zero),
+then the request to release the assocation has been rejected by the remote
+user, and the association is still open.
+Otherwise the \verb"AcSAPabort" structure contained in
+the \verb"AcSAPindication" parameter
+\verb"aci" contains the reason for failure.
+As expected,
+the value \verb"ACS_TIMER" indicates that no response was received within the
+time given by the \verb"secs" parameter.
+
+Upon receiving a {\sf A-RELEASE.INDICATION\/} event,
+the user is required to generate a {\sf A-RELEASE.RESPONSE\/} action
+using the \verb"AcRelResponse" routine.
+\begin{quote}\index{AcRelResponse}\small\begin{verbatim}
+int     AcRelResponse (sd, status, reason, data, ndata, aci)
+int     sd;
+int     status,
+        reason;
+PE     *data;
+int     ndata;
+struct AcSAPindication *aci;
+\end{verbatim}\end{quote}
+The parameters to this procedure:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"status":] the acceptance indicator
+(either \verb"ACS_ACCEPT" if the association is to be released,
+or \verb"ACS_REJECT" otherwise);
+
+\item[\verb"reason":] the reason for the indicator,
+one of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Reason}\\
+\hline
+    \tt ACR\_NORMAL&		normal\\
+    \tt ACR\_NOTFINISHED&	not finished\\
+    \tt ACR\_UNDEFINED&		undefined\\
+\hline
+\end{tabular}\]
+
+\item[\verb"data"/\verb"ndata":] an array of final data
+(and the number of elements in that array,
+consult the warning on page~\pageref{AcSAPdata});
+and,
+
+\item[\verb"aci":] a pointer to an \verb"AcSAPindication" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call to \verb"AcRelResponse" is successful,
+and if the \verb"result" parameter is set to \verb"ACS_ACCEPT",
+then the association has been released.
+If the call is successful,
+but the \verb"result" parameter is not \verb"ACS_ACCEPT",
+then the association remains established.
+
+\subsection	{Association Abort}
+To unilaterally abort an association,
+the routine \verb"AcUAbortRequest" routine is used
+which corresponds to the {\sf A-ABORT.REQUEST\/} action.
+\begin{quote}\index{AcUAbortRequest}\small\begin{verbatim}
+int     AcUAbortRequest (sd, data, ndata, aci)
+int     sd;
+PE     *data;
+int     ndata;
+struct AcSAPindication *aci;
+\end{verbatim}\end{quote}
+The parameters to this procedure:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"data"/\verb"ndata":] an array of abort data
+(and the number of elements in that array,
+consult the warning on page~\pageref{AcSAPdata});
+and,
+
+\item[\verb"aci":] a pointer to an \verb"AcSAPindication" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call to \verb"AcUAbortRequest" is successful,
+then the association is immediately released,
+and any data queued for the association may be lost.
+
+\section	{Association Events}
+Typically,
+the presentation service generates events which lead to the
+{\sf A-RELEASE.INDICATION}, {\sf A-ABORT.INDICATION},
+and {\sf A-P-ABORT.IN\-DI\-CA\-TION\/} events being raised.
+For those interested in writing application service elements which interpret
+this information,
+this section describes the necessary mappings.
+
+\subsection	{Release Indication}
+Upon receiving a {\sf P-RELEASE.INDICATION\/} event,
+the routine \verb"AcFINISHser" should be called to map this into a
+{\sf A-RELEASE.INDICATION\/} event.
+\begin{quote}\index{AcFINISHser}\small\begin{verbatim}
+int     AcFINISHser (sd, pf, aci)
+int     sd;
+struct PSAPfinish *pf;
+struct AcSAPindication *aci;
+\end{verbatim}\end{quote}
+The parameters to this procedure:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"pa":] a pointer to an \verb"PSAPfinish" structure,
+containing information on the presentation-level release;
+and,
+
+\item[\verb"aci":] a pointer to an \verb"AcSAPindication" structure.
+\end{describe}
+If the call to \verb"AcFINISHser" is successful,
+then the \verb"aci_type" field of the \verb"aci" parameter contains the value
+\verb"ACI_FINISH",
+and an \verb"AcSAPfinish" structure is contained inside the \verb"aci"
+parameter.
+\begin{quote}\index{AcSAPfinish}\small\begin{verbatim}
+struct AcSAPfinish {
+    int     acf_reason;
+
+    int     acf_ninfo;
+    char    acf_info[NACDATA];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"acf\_reason":]	the reason for the release request,
+one of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Reason}\\
+\hline
+    \tt ACF\_NORMAL&	normal\\
+    \tt ACF\_URGENT&	urgent\\
+    \tt ACF\_UNDEFINED&	undefined\\
+\hline
+\end{tabular}\]
+
+\item[\verb"acf\_info"/\verb"acf\_ninfo":]	any final data
+(and the length of that data).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released by using the \verb"ACFFREE" macro when no longer
+referenced.
+The \verb"ACFFREE" macro,
+behaves as if it was defined as:\label{ACFFREE}
+\begin{quote}\index{ACFFREE}\small\begin{verbatim}
+void    ACFFREE (acf)
+struct AcSAPfinish *acf;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"AcFINISHser",
+and not the \verb"AcSAPfinish" structure itself.
+Further,
+\verb"ACFFREE" should be called only if the call to the \verb"AcFINISHser"
+routine returned \verb"OK".
+
+Otherwise,
+if the call fails,
+the \verb"aci" parameter contains information pertaining to the failure.
+
+\subsection	{Abort Indication}
+Upon receiving a {\sf P-U-ABORT.INDICATION\/} or {\sf P-P-ABORT.INDICATION\/}
+event,
+the routine \verb"AcABORTser" should be called to map this into a
+{\sf A-ABORT.INDICATION\/} or {\sf A-P-ABORT.INDICATION\/} event.
+\begin{quote}\index{AcABORTser}\small\begin{verbatim}
+int     AcABORTser (sd, pa, aci)
+int     sd;
+struct PSAPabort *pa;
+struct AcSAPindication *aci;
+\end{verbatim}\end{quote}
+The parameters to this procedure:
+\begin{describe}
+\item[\verb"sd":] the association-descriptor;
+
+\item[\verb"pa":] a pointer to an \verb"PSAPabort" structure,
+containing information on the presentation-level abort;
+and,
+
+\item[\verb"aci":] a pointer to an \verb"AcSAPindication" structure.
+\end{describe}
+If the call to \verb"AcABORTser" is successful,
+then the \verb"aci" parameter is updated to reflect information on the abort
+indication.
+Otherwise,
+if the call fails,
+the \verb"aci" parameter contains information pertaining to the failure.
+
+\section	{Select Facility}\label{acs:select}
+Ideally,
+the \man select(2) system call should be used on all descriptors,
+regardless of the level of abstraction
+(e.g., association-descriptor, presentation-descriptor, and so on).
+The routines with a \verb"SelectMask" suffix,
+such as \verb"PSelectMask"
+are supplied to determine if there are already queued events.
+These routines should always be called prior to using the select facility
+of the kernel.
+Sadly, some networking subsystems used by the software do not support
+\man select(2).
+To provide a consistent interface,
+the \verb"xselect" routine should be used instead of \man select(2).
+\begin{quote}\index{xselect}\small\begin{verbatim}
+int     xselect (nfds, rfds, wfds, efds, secs)
+int     nfds;
+fd_set *rfds,
+       *wfds,
+       *efds,
+        secs;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"nfds":] the number of descriptors present in the masks
+(actually the \verb"width" of descriptors from zero to the highest meaningful
+descriptor);
+
+\item[\verb"rfds"/\verb"wfds"/\verb"efds":] the locations of
+masks interested in read, write, and exception events;
+and,
+
+\item[\verb"secs":] the maximum number of seconds to wait for an event
+(a value of \verb"NOTOK" indicates that the call should block indefinitely,
+whereas a value of \verb"OK" indicates that the call should not block at all,
+e.g., a polling action).
+\end{describe}
+Unlike most routines,
+the \verb"xselect" routine returns one of several values:
+\verb"NOTOK" (on failure),
+\verb"OK" (if no events occurred within the time limit),
+or,
+the number of descriptors on which events occurred
+(the masks are updated appropriately).
+
+By default,
+unless the application explicitly ignores \verb"SIGINT",
+when the user types a CTRL-C this will interrupt the call to \verb"xselect".
+If you make calls directly to \verb"xselect",
+you can disable this behavior by setting
+\begin{quote}\small\begin{verbatim}
+extern int xselect_blocking_on_intr;
+\end{verbatim}\end{quote}
+to a non-zero value.
+(When reading from an association-descriptor,
+this behavior is automatically disabled.)
+
+\section	{Generic Server Dispatch}\label{acs:server}
+Ideally,
+one should write a server which can operate in one of two modes:
+\begin{itemize}
+\item	Each incoming connection results in \man tsapd(8c) invoking another
+	instance of the server; or,
+
+\item	All incoming connections are given to exactly one instance of the
+	server (the server is invoked without arguments during system
+	initialization).
+\end{itemize}
+The choice as to which mode is used is made by the system administrator.
+By default,
+the first mode, termed the {\em dynamic\/} approach, is used.
+The second mode, termed the {\em static\/} approach,
+is described in Section~\ref{service:static} on
+page~\pageref{service:static}.
+
+There are several ways in which this dual-approach scheme can be realized.
+One such implementation is based on the routine
+\verb"isodeserver".\label{isodeserver}
+\begin{quote}\index{isodeserver}\small\begin{verbatim}
+int     isodeserver (argc, argv, aei, initfnx, workfnx,
+                losefnx, td)
+int     argc;
+char  **argv;
+AEI     aei;
+IFP     initfnx,
+        workfnx,
+        losefnx;
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"argc":] the length of the argument vector which the program was
+invoked with;
+
+\item[\verb"argv":] the argument vector which the program was invoked with;
+
+\item[\verb"aei":] the information on the application-entity offering the
+service;
+
+\item[\verb"initfnx":] the address of an event-handler routine to be invoked
+when a new connection arrives;
+
+\item[\verb"workfnx":] the address of an event-handler routine to be invoked
+when activity occurs on an association;
+
+\item[\verb"losefnx":] the address of an event-handler routine to be invoked
+if \verb"TNetAccept" (described in Section~\ref{tsap:listen}) fails 
+and,
+
+\item[\verb"td":] a pointer to an \verb"TSAPdisconnect" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call is successful,
+then the program may terminate immediately,
+as no work remains to be done
+(in the case of the single instance mode,
+\verb"isodeserver" returns only on error).
+Otherwise,
+the \verb"td" parameter indicates the reason for failure
+(consult Section~\ref{TSAPdisconnect} on page~\pageref{TSAPdisconnect}
+of \voltwo/).
+
+When an event associated with a new connection occurs,
+the event-handler routine is invoked with two parameters:
+\begin{quote}\small\begin{verbatim}
+(*initfnx) (vecp, vec);
+int     vecp;
+char  **vec;
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item[\verb"vecp":] the length of the argument vector;
+and,
+
+\item[\verb"vec":] the argument vector.
+\end{describe}
+The event-handler should then call \verb"AcInit" with these parameters
+to achieve an {\sf A-ASSOCIATION.INDICATION\/} event.
+If \verb"AcInit" is successful,
+the event-handler should decide if it wishes to honor the association
+and then call \verb"AcAssocResponse" with the appropriate parameters.
+The event-handler should return the assocation-descriptor if it accepted the
+association.
+Otherwise (or upon any errors),
+it should return \verb"NOTOK".
+
+When an activity associated with an association occurs,
+the event-handler routine is invoked with one parameter:
+\begin{quote}\small\begin{verbatim}
+(*workfnx) (fd);
+int     fd;
+\end{verbatim}\end{quote}
+The parameter is:
+\begin{describe}
+\item[\verb"fd":] the association-descriptor of the association.
+\end{describe}
+The event-handler should then call the appropriate routine to read the next
+event from the association
+(e.g., \verb"RoWaitRequest" if remote operations are being used).
+The event-handler should return \verb"NOTOK" if the association is terminated
+or aborted,
+or \verb"OK" otherwise.
+
+The \verb"isodeserver" routine uses the \verb"TNetAccept" routine to
+wait for the next event on existing associations and for new connections.
+It is possible, though unlikely for a failure to occur during this operation.
+In this event,
+the event-handler routine is invoked with one parameter:
+\begin{quote}\small\begin{verbatim}
+(*losefnx) (td);
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+The parameter is:
+\begin{describe}
+\item[\verb"td":] a pointer to an \verb"TSAPdisconnect" structure updated
+by \verb"TNetAccept".
+\end{describe}
+The event-handler should handle the error however it deems proper
+(usually by logging it and then returning).
+
+An example of this facility is presented in Section~\ref{acs:example} below.
+
+Another interface to this approach is provided for servers that may be
+engaged in other operations besides answering incoming calls (e.g.,
+initiating outgoing calls too). This interface provides indentical
+functionality to the \verb|isodeserver| interface, but allows access
+to other events.
+
+The interface is provided by two calls. The first is \verb|iserver_init|.
+\begin{quote}\index{iserver\_init}\small\begin{verbatim}
+int     iserver_init (argc, argv, aei, initfnx, td)
+int     argc;
+char  **argv;
+AEI     aei;
+IFP     initfnx;
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+
+The parameters to this procedure are similar in part to the
+\verb|isodeserver| procedure:
+\begin{describe}
+\item[\verb|argc|:] 	the length of the argument vector which the
+program was invoked with;
+
+\item[\verb|argv|:]	the argument vector which the program was
+invoked with;
+
+\item[\verb|aei|:]	the information on the application-entity
+offering the service;
+
+\item[\verb"initfnx":] the address of an event-handler routine to be invoked
+when a new connection arrives, and
+
+\item[\verb|td|:]	a pointer to an \verb"TSAPdisconnect" structure,
+which is updated only if the call fails.
+\end{describe}
+
+This procedure registers a listener for the address and may may call
+the \verb|initfnx| if the server is running in dynamic mode. If the
+call fails the \verb|td| parameter will indicate the reason for
+failure.
+
+One this function has been called, the \verb|iserver_wait| procedure
+should be called at regular intervals to handle incoming events,
+typically in a loop of some kind. It is called as follows:
+\begin{quote}\index{iserver\_wait}\small\begin{verbatim}
+int     iserver_wait (initfnx, workfnx, losefnx, nfds, 
+                nfds, rfds, wfds, efds, secs, td)
+IFP     initfnx,
+        workfnx,
+        losefnx;
+int     nfds;
+fd_set *rfds,
+       *wfds,
+       *efds;
+int     secs;
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+
+\item[\verb"initfnx":] the address of an event-handler routine to be invoked
+when a new connection arrives;
+
+\item[\verb"workfnx":] the address of an event-handler routine to be invoked
+when activity occurs on an association;
+
+\item[\verb"losefnx":] the address of an event-handler routine to be invoked
+if \verb"TNetAccept" (described in Section~\ref{tsap:listen}) fails;
+
+\item[\verb|nfds/rfds/wfds/efds|:]	additional
+association-descriptors/file descriptors to await for activity on;
+
+\item[\verb|secs|:]	the maximum number of seconds to wait for
+activity (a value of \verb|NOTOK| indicates that the call should block
+indefinitely, whereas a value of \verb|OK| indicates that the call
+should not block at all, e.g., a polling action); and
+
+\item[\verb"td":] a pointer to an \verb"TSAPdisconnect" structure,
+which is updated only if the call fails.
+\end{describe}
+
+This routine calls the \verb|TNetAccept| routine to wait for incoming
+calls. It will call the procedures \verb|initfnx|, \verb|workfnx| and
+\verb|losefnx| in an indetical way to the \verb|isodeserver|. The
+routine returns on a number of conditions.
+\begin{itemize}
+\item	If one of the supplied association/file descriptors registers
+activity the procedure returns with the mask updated.
+
+\item	If an incoming association occurs. It should be accepted or
+rejected by the \verb|initfnx| then the procedure will return.
+
+\item	If some activity happens on one of the accepted calls. This is
+handled by the \verb|workfnx| then the procedure will return.
+
+\item	If the time given runs out, the procedure will return.
+\end{itemize}
+
+An outline usage of these procedures might be something like:
+\begin{quote}\small\begin{verbatim}
+if (iserver_init (argc, argv, aei, ros_init, td) == NOTOK)
+    /* error */
+for (;;) {
+    /* set up descriptors */
+    switch (iserver_wait (ros_init, ros_work, ros_lose, nfds,
+                &rfds, &wfds, NULLFD, timeout, td)) {
+        case DONE:
+            exit (0);
+
+        case NOTOK:
+            /* error */
+
+        case OK:
+            /* check fds for activity, do other things */
+}
+\end{verbatim}\end{quote}
+
+Please note that \verb"isodeserver" and \verb|iserver_wait| implement
+one possible discipline for association management.  Many others are
+possible, depending on the needs of the service being provided.
+Further, note that while the text above and the example below are
+expressed in terms of association control (i.e., they make use of
+\verb"AcInit" and \verb"AcAssocResponse"), this facility will provide
+similar support at any other layer in the system (e.g.,
+\verb"isodeserver" can be used for transport or session entities).
+
+Also note that as these routines use the \verb|TNetAccept| routines,
+child process are collected automatically. If you wish to start child
+processes and wait for their exit status, you should take note of the
+warnings associated with the \verb|TNetAccept| procedure (see
+Section~\ref{tsap:accept} on page~\pageref{tsap:accept} of \voltwo/).
+
+\section	{Restrictions on User Data}\label{AcSAPdata}
+To quote the \cite{ISO.ACS.Service} specification:
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	Use of the services $\ldots$ may be subject to some
+		constraints from (the) session services until work on
+		providing unlimited length user data field parameters 
+		on session primitives is completed.
+\end{tabular}}\]
+
+\section	{Error Conventions}\label{acs:errors}
+All of the routines in this library return the manifest constant \verb"NOTOK"
+on error,
+and also update the \verb"aci" parameter given to the routine.
+The \verb"aci_abort" element of the \verb"AcSAPindication" structure encodes
+the reason for the failure.
+One coerces the pointer to an \verb"AcSAPabort" structure,
+and consults the \verb"aca_reason" element of this latter structure.
+This element can be given as a parameter to the routine \verb"AcErrString"
+which returns a null-terminated diagnostic string.
+\begin{quote}\index{AcErrString}\small\begin{verbatim}
+char   *AcErrString (c)
+int     c;
+\end{verbatim}\end{quote}
+The \verb"" macro can be used to determine if the failure is fatal
+(the association has been lost).
+\begin{quote}\index{ACS\_FATAL}\small\begin{verbatim}
+int     ACS_FATAL(r)
+int     r;
+\end{verbatim}\end{quote}
+For protocol purists,
+the \verb"ACS_OFFICIAL" macro can be used to determine if the error is an
+``official'' error as defined by the specification,
+or an ``unofficial'' error used by the implementation.
+\begin{quote}\index{ACS\_OFFICIAL}\small\begin{verbatim}
+int     ACS_OFFICIAL (r)
+int     r;
+\end{verbatim}\end{quote}
+
+\section	{Compiling and Loading}
+Programs using the \man libacsap(3n) library should include
+\verb"<isode/acsap.h>".
+The programs should also be loaded with \verb"-lisode".
+
+\section	{An Example}\label{acs:example}
+One example of the use of the \man libacsap(3n) library is found in
+Section~\ref{ros:example:server} on page~\pageref{ros:example:server}.
+This example is straight-forward in presenting the interaction of association
+control and remote operations.
+Now let's consider how to rewrite the server to use the facilities described
+above in Section~\ref{acs:server}.
+Instead of using an asynchronous interface,
+a synchronous interface will be employed.
+Only Figure~\ref{initROSresponder} from the example in
+Section~\ref{ros:example:server} need be changed.
+
+We assume that there are three exception-logging routines:
+{\em fatal}, which prints a diagnostic and terminates the process;
+{\em error}, which prints a diagnostic and then executes the statement
+\begin{quote}\small\begin{verbatim}
+longjmp (toplevel, NOTOK);
+\end{verbatim}\end{quote}
+and,
+{\em warn}, which simply prints a diagnostic.
+
+In Figure~\ref{doROSserver},
+the replacement routines are shown.
+First, the application-entity title for the service is deteremined.
+The routine \verb"isodeserver" is then called with its requisite arguments.
+If the routine fails, the process terminates after printing a diagnostic.
+Otherwise the process exits.
+In the case where the \man tsapd(8c) daemon invokes a new instance of
+the server each time an incoming connection is received,
+\verb"isodeserver" will return after that assocation has been released.
+In the case where all incoming connections are given to a single
+instance of the server,
+then \verb"isodeserver" returns only if a fatal error is detected.
+
+The routine \verb"ros_init" is called for each incoming connection.
+First, the ACSE state is re-captured by calling \verb"AcInit".
+If this succeeds,
+then any command line arguments are parsed.
+These arguments are present only if the server was invoked by
+the \man tsapd(8c) daemon.
+Assuming that the responder is satisfied with the proposed association,
+the routine then calls \verb"AcAssocResponse" to accept the association.
+Then,
+\verb"RoSetService" is called
+to set the underlying service to be used for remote operations.
+Finally,
+the association-descriptor is returned to \verb"isodeserver".
+
+The routine \verb"ros_work" is called when activity occurs on an association.
+The routine sets a global return vector using \man setjmp (3)
+and then calls \verb"RoWaitRequest" to read the next indication.
+This usually results in the routine \verb"ros_indication"
+(found in Figure~\ref{doROSresponder} on page~\pageref{doROSresponder})
+being called.
+If the association was not released,
+then \verb"ros_work" returns \verb"OK".
+Otherwise if some error occurred,
+use of the routine \verb"error" will cause control to return to the
+\verb"setjmp" call.
+In this case,
+\verb"AcUAbortRequest" is called to make sure that the association is
+(ungracefully) released,
+then \verb"NOTOK" is returned to \verb"isodeserver".
+
+The routine \verb"ros_lose" simply logs the failure of \verb"TNetAccept" when
+called from \verb"isodeserver".
+{\let\small=\scriptsize			%%% yikes!
+\clearpage
+\tagrind[tp]{grind2a-2a}{The generic ROS server}{doROSserver}
+\clearpage
+\tagrind[tp]{grind2a-2b}{The generic ROS server (continued)}\empty
+\clearpage
+\tagrind[tp]{grind2a-2c}{The generic ROS server (continued)}\empty
+\clearpage
+\tagrind[tp]{grind2a-2d}{The generic ROS server (continued)}\empty}
+
+\section	{For Further Reading}
+The ISO specification for association control services is defined in
+\cite{ISO.ACS.Service}.
+The corresponding protocol definition is \cite{ISO.ACS.Protocol}.
+
+%%% \section	{Changes Since the Last Release}\label{acsap:changes}
+%%% A brief summary of the major changes between v~\isodeprevrsn/ and
+%%% v~\isodevrsn/ are now presented.
+%%% These are the user-visible changes only;
+%%% changes of a strictly internal nature are not discussed.
+

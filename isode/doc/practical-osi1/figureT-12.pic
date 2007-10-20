@@ -1,0 +1,18 @@
+.PS
+.ps 20
+## figure T-12
+B1:	box invis
+	move to B1.e; \
+	"\begin{tabular}[b]{r} STOR\\ open\\ send data\\ \ $\ldots$\\ close\end{tabular}\ " rjust
+B2:	box invis height 6*boxht with .w at (B1.e.x+3*linewid, B1.e.y) \
+	    "GATEWAY" width 3*boxwid/2
+B4:	box invis with .s at B2.s "DISK" height 2*boxht
+	arrow from (B2.c.x-boxwid/3, B2.c.y-boxht/2) to (B4.n.x-boxwid/3, B4.c.y+boxht/2)
+	arrow from (B4.n.x+boxwid/3, B4.c.y+boxht/2) to (B2.c.x+boxwid/3, B2.c.y-boxht/2)
+B3:	box invis height 6*boxht with .w at (B2.e.x+3*linewid, B2.e.y)
+	move to B3.w; \
+	"\ \begin{tabular}[t]{l} F-SELECT\\ F-OPEN\\ F-WRITE\\ F-DATA\\ \ $\ldots$\\ F-DATA-END\\ F-TRANSFER-END\\ F-CLOSE\\ F-DESELECT\end{tabular}" ljust
+	arrow from (B1.e.x+linewid/2, B1.e.y) to (B2.w.x-linewid/2, B2.w.y)
+	arrow from (B2.e.x+linewid/2, B2.e.y) to (B3.w.x-linewid/2, B3.w.y)
+##
+.PE

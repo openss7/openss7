@@ -1,0 +1,58 @@
+.PS
+define tick @
+	line from (B1.nw.x-linewid/8, B1.nw.y-$1*boxht) \
+	     to   (B1.nw.x+linewid/8, B1.nw.y-$1*boxht)
+	move to   (B1.nw.x-linewid/8, B1.nw.y-$1*boxht); "\sf $2\ " rjust
+@
+## figure APS-8
+B1:	box invis height 7*boxht
+	line from B1.nw to B1.sw
+	tick(0)
+	tick(1,S-MAJOR)
+	move to (B1.nw.x-linewid/8, B1.nw.y-3*boxht/2); \
+		"\sf S-DATA\ " rjust
+	tick(2,S-MINOR)
+	move to (B1.nw.x-linewid/8, B1.nw.y-5*boxht/2); \
+		"\sf S-DATA\ " rjust
+	tick(3,S-MAJOR)
+	move to (B1.nw.x-linewid/8, B1.nw.y-7*boxht/2); \
+		"\sf S-DATA\ " rjust
+	tick(4,S-MINOR)
+	move to (B1.nw.x-linewid/8, B1.nw.y-9*boxht/2); \
+		"\sf S-DATA\ " rjust
+	tick(5,S-MINOR)
+	move to (B1.nw.x-linewid/8, B1.nw.y-11*boxht/2); \
+		"\sf S-DATA\ " rjust
+	tick(6)
+	tick(7)
+##
+	move to (B1.nw.x-linewid/8, B1.nw.y); "\sf 0\ " rjust
+	move to (B1.sw.x-linewid/8, B1.sw.y); "\sf 999999\ " rjust
+##
+	line from (B1.c.x, B1.n.y-3*boxht) \
+	     to   (B1.c.x, B1.n.y-7*boxht)
+	line from (B1.c.x-linewid/8, B1.n.y-3*boxht) \
+	     to   (B1.c.x+linewid/8, B1.n.y-3*boxht)
+	move to   (B1.c.x+linewid/8, B1.n.y-(3*boxht+11*boxht/2)/2); \
+		"\sf\ restart" ljust
+	line from (B1.c.x-linewid/8, B1.n.y-5*boxht) \
+	     to   (B1.c.x+linewid/8, B1.n.y-5*boxht)
+	move to   (B1.c.x+linewid/8, B1.n.y-6*boxht); \
+		"\sf\ abandon" ljust
+	line from (B1.c.x-linewid/8, B1.n.y-7*boxht) \
+	     to   (B1.c.x+linewid/8, B1.n.y-7*boxht)
+##
+##	line from (B1.ne.x+linewid, B1.ne.y) \
+##	     to   (B1.ne.x+linewid, B1.se.y)
+##	line from (B1.ne.x+linewid-linewid/8, B1.ne.y) \
+##	     to   (B1.ne.x+linewid+linewid/8, B1.ne.y)
+##	line from (B1.ne.x+linewid-linewid/8, B1.se.y) \
+##	     to   (B1.ne.x+linewid+linewid/8, B1.se.y)
+##	move to (B1.ne.x+linewid, B1.e.y); "\sf set\ " rjust
+##
+	arrow from (B1.w.x-boxwid*1.5, B1.n.y-3*boxht) \
+	     to    (B1.w.x-boxwid*1.5, B1.n.y-11*boxht/2)
+	move to (B1.w.x-boxwid*1.5, B1.n.y-17*boxht/4); \
+	    "\sf\begin{tabular}{c}  dialogue\end{tabular}\ " rjust
+##
+.PE

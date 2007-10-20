@@ -1,0 +1,960 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Presentation Services}\label{libpsap2}
+The \man libpsap2(3n) library implements the presentation service.
+The kernel subset of the ISO specification is currently implemented.
+That is,
+the library supports whatever session requirements the user wishes to
+employ,
+negotiates presentation contexts on connection establishments,
+and utilizes abstract transfer notations to transmit data structures in a
+machine-independent manner.
+
+As with most models of OSI services,
+the underlying assumption is one of a symmetric, asynchronous environment.
+That is,
+although peers exist at a given layer,
+one does not necessary view a peer as either a client or a server.
+Further,
+the service provider may generate events for the service user without the
+latter entity triggering the actions which led to the event.
+For example,
+in a synchronous environment,
+an indication that data has arrived usually occurs only when the service user
+asks the service provider to read data;
+in an asynchronous environment,
+the service provider may interrupt the service user at any time to announce
+the arrival of data.
+
+The \verb"psap2" module in this release initially uses a client/server
+paradigm to start communications.
+Once the connection is established,
+a symmetric view is taken.
+In addition,
+initially the interface is synchronous;
+however once the connection is established,
+an asynchronous interface may be selected.
+
+All of the routines in the \man libpsap2(3n) library are integer-valued.
+They return the manifest constant \verb"OK" on success,
+or \verb"NOTOK" otherwise.
+
+\section	{Warning}
+Please read the following important message.
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	Readers of this chapter should have an intimate understanding
+		of the OSI presentation and session services.
+		It is not the intent of this
+		chapter to present a tutorial on these services, so novice
+		users will suffer greatly if they choose to read further.
+\end{tabular}}\]
+
+\section	{Addresses}\label{psap:addresses}
+Addresses at the presentation service access point are represented by the
+\verb"PSAPaddr" structure.
+\begin{quote}\index{PSAPaddr}\small\begin{verbatim}
+struct PSAPaddr {
+    struct SSAPaddr pa_addr;
+
+#define PSSIZE  64
+    int     pa_selectlen;
+    char    pa_selector[PSSIZE];
+};
+#define NULLPA  ((struct PSAPaddr *) 0)
+\end{verbatim}\end{quote}
+This structure contains two elements:
+\begin{describe}
+\item[\verb"pa\_addr":]	the session address,
+as described in Section~\ref{ssap:addresses} on page~\pageref{ssap:addresses};
+and,
+
+\item[\verb"pa\_selector"/\verb"pa\_selectlen":] the presentation selector.
+\end{describe}
+
+In Figure~\ref{getAPprovider},
+an example of how one constructs the PSAP address for the LOOP provider on
+host \verb"RemoteHost" is presented.
+The routine \verb"is2paddr" takes a host and service,
+and then consults the \man isoentities(5) file described in
+Chapter~\ref{isoentities} of \volone/ to construct a presentation
+address.
+\begin{quote}\index{is2paddr}\small\begin{verbatim}
+struct PSAPaddr *is2paddr (host, service, is)
+char   *host,
+       *service;
+struct isoservent *is;
+\end{verbatim}\end{quote}
+\tagrind[tp]{grind5a-1}{Constructing the PSAP address for the LOOP provider}%
+	{getAPprovider}
+
+\subsection	{Calling Address}
+Certain users of the presentation service
+(e.g., the reliable transfer service)
+need to know the name of the local host when they initiate a connection.
+The routine \verb"PLocalHostName" has been provided for this reason.
+\begin{quote}\index{PLocalHostName}\small\begin{verbatim}
+char   *PLocalHostName ()
+\end{verbatim}\end{quote}
+
+\section	{Connection Establishment}
+Until the connection has been fully established,
+the implementation distinguishes between clients and servers,
+which are more properly referred to as {\em initiators\/} and
+{\em responders}, to use OSI terminology.
+
+\subsection	{Connection Negotiation}
+From the user's perspective,
+there are several parameters which are negotiated by the presentation providers
+during connection establishment.
+Suggestions as to the values of some of these parameters are made by the user.
+
+\subsubsection	{Session Parameters}
+Consult Section~\ref{ssap:negotiation} for a list of session parameters which
+are negotiated during connection establishment.
+
+\subsubsection	{Presentation Contexts}\label{psap:context}
+A {\em presentation context\/} is a binding between an abstract syntax
+notation and an abstract transfer notation on a
+presentation connection,
+and is denoted by an integer value termed the context identifier.
+The abstract syntax notation describes,
+to the users of the presentation service,
+the data structures being exchanged;
+the abstract transfer notation describes,
+to the providers of the presentation services,
+the method for encoding those data structures in a machine-independent fashion.
+Hence the abstract syntax notation is negotiated by the users of the
+presentation service,
+while the abstract transfer notation is negotiated by the providers of that
+service.
+
+When a connection is established,
+the initiator suggests zero or more presentation contexts,
+specifying a context identifier (an odd-valued integer),
+and the abstract syntax
+(a pointer to an object identifier, see Section~\ref{psap:oid} of \volone/).
+The provider selects the abstract transfer notation
+(in the current implementation, this is always ASN.1\cite{ISO.PP.Encoding}).
+When the a {\sf P-CONNECT.INDICATION\/} event is given to the responder,
+in addition 
+indicating the context identifier and abstract syntax information,
+the provider also indicates if it is willing to support this presentation
+context.
+If so, the responder decides if it will accept or reject the context.
+This information is then propagated back to the initiator with
+the {\sf P-CONNECT.CONFIRMATION\/} indication.
+
+\subsection	{Server Initialization}
+The \man tsapd(8c) daemon,
+upon accepting a connection from an initiating host,
+consults the ISO services database to determine which program
+on the local system implements the desired SSAP entity.
+In the case of the presentation service,
+the \pgm{tsapd} program contains the bootstrap for the presentation provider.
+The daemon will again consult the ISO services database to determine which
+program on the system implements the desired PSAP entity.
+
+Once the program has been ascertained,
+the daemon runs the program with any arguments listed in the database.
+In addition,
+it appends some {\em magic arguments\/} to the argument vector.
+Hence,
+the very first action performed by the responder is to re-capture the PSAP
+state contained in the magic arguments.
+This is done by calling the routine \verb"PInit",
+which on a successful return,
+is equivalent to a {\sf P-CONNECT.INDICATION\/} from the presentation service
+provider.
+\begin{quote}\index{PInit}\small\begin{verbatim}
+int     PInit (vecp, vec, ps, pi)
+int     vecp;
+char  **vec;
+struct PSAPstart *ps;
+struct PSAPindication *pi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"vecp":] the length of the argument vector;
+
+\item[\verb"vec":] the argument vector;
+
+\item[\verb"ps":] a pointer to a \verb"PSAPstart" structure, which is updated
+only if the call succeeds;
+and,
+
+\item[\verb"pi":] a pointer to a \verb"PSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If \verb"PInit" is successful,
+it returns information in the \verb"ps" parameter,
+which is a pointer to a \verb"PSAPstart" structure.
+\begin{quote}\index{PSAPstart}\small\begin{verbatim}
+struct PSAPstart {
+    int     ps_sd;
+
+    struct PSAPaddr ps_calling;
+    struct PSAPaddr ps_called;
+
+    struct PSAPctxlist ps_ctxlist;
+
+    OID     ps_defctx;
+    int     ps_defctxresult;
+
+    int     ps_prequirements;
+
+    int     ps_srequirements;
+    int     ps_settings;
+    long    ps_isn;
+
+    struct SSAPref  ps_connect;
+
+    int     ps_ssdusize;
+
+    struct QOStype ps_qos;
+
+#define NPDATA         10
+    int     ps_ninfo;
+    PE      ps_info[NPDATA];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:\label{PSAPstart}
+\begin{describe}
+\item[\verb"ps\_sd":] the presentation-descriptor to be used to reference this
+connection;
+
+\item[\verb"ps\_calling":] the address of the peer initiating the connection;
+
+\item[\verb"ps\_called":] the address of the peer being asked to respond;
+
+\item[\verb"ps\_ctxlist":] the proposed list of presentation contexts;
+
+\item[\verb"ps\_defctx"/\verb"ps\_defctxresult":] the default context
+for the presentation connection
+(and the presentation provider's response);
+
+\item[\verb"ps\_prequirements":] the proposed presentation requirements;
+
+\item[\verb"ps\_srequirements":] the proposed session requirements;
+
+\item[\verb"ps\_settings":] the initial token settings;
+
+\item[\verb"ps\_isn":] the initial serial-number;
+
+\item[\verb"ps\_connect":] the connection identifier (a.k.a. SSAP reference)
+used by the initiator;
+
+\item[\verb"ps\_ssdusize":] the largest atomic SSDU size that can be used on
+the connection (see the note on page~\pageref{SSDU:atomic});
+
+\item[\verb"ps\_qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos});
+and,
+
+\item[\verb"ps\_info"/\verb"ps\_ninfo":] an array of initial data
+(and the number of elements in that array).
+\end{describe}
+Note that the \verb"ps_info" element is allocated via \man malloc(3) and
+should be released using the \verb"PSFREE" macro when no longer referenced.
+The \verb"PSFREE" macro behaves as if it was defined as:
+\begin{quote}\index{PSFREE}\small\begin{verbatim}
+void    PSFREE (ps)
+struct PSAPstart *ps;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"PInit",
+and not the \verb"PSAPstart" structure itself.
+Further,
+\verb"PSFREE" should be called only if the call to the \verb"PInit"
+routine returned \verb"OK".
+
+The \verb"ps_connect" element is a \verb"SSAPref" structure,
+which is passed transparently by the presentation service.
+Consult the description on page~\pageref{SSAPref}.
+There are two routines of interest in the \man libpsap2(3n) that deal with
+these structures:
+The \verb"addr2ref" routine takes a string (presumably a hostname),
+determines the current UT time,
+and returns a pointer to a \verb"SSAPref" structure appropriately initialized
+to denote this information.
+\begin{quote}\index{addr2ref}\small\begin{verbatim}
+struct SSAPref *addr2ref (addr)
+char   *addr;
+\end{verbatim}\end{quote}
+This routine might fail if it is unable to allocate a small amount of
+memory.
+In this event, it returns the manifest constant \verb"NULL".
+The routine \verb"sprintref" can be used to return a null-terminated string
+describing the SSAP reference.
+\begin{quote}\index{sprintref}\small\begin{verbatim}
+char   *sprintref (sr)
+struct SSAPref *sr;
+\end{verbatim}\end{quote}
+
+The \verb"ps_ctxlist" element is a \verb"PSAPctxlist" structure,
+which describes the presentation contexts the initiator wishes to use.
+\begin{quote}\index{PSAPctxlist}\small\begin{verbatim}
+struct PSAPctxlist {
+    int     pc_nctx;
+
+#define NPCTX   5
+
+    struct PSAPcontext {
+        int     pc_id;
+        OID     pc_asn;
+        OID     pc_atn;
+        int     pc_result;
+    }       pc_ctx[NPCTX];
+};
+#define NULLPC  ((struct PSAPctxlist *) 0)
+\end{verbatim}\end{quote}
+The elements of this structure are:\label{PSAPctxlist}
+\begin{describe}
+\item[\verb"pc\_ctx"/\verb"pc\_nctx":] the presentation contexts described
+(and the number of contexts which may not exceed \verb"NPCTX" elements).
+For each presentation context:
+    \begin{describe}
+    \item[\verb"pc\_id":] the identifier (or handle) for the context;
+
+    \item[\verb"pc\_asn":] the abstract syntax notation to be used on the
+	context;
+
+    \item[\verb"pc\_atn":] the transfer syntax notation to be used on the
+	context (this field is usually, \verb"NULLOID", only the initiator,
+	when it wishes to inform the presentation service of the transfer
+	syntax to use, is permitted to specify this); and,
+
+    \item[\verb"pc\_result":] the presentation provider's response
+	(codes are listed in Table~\ref{PSAPreasons}).
+    \end{describe}
+\end{describe}
+
+If the call to the \verb"PInit" routine is not successful,
+then a {\sf P-P-ABORT.IN\-DI\-CA\-TION\/} event is simulated,
+and the relevant information is returned in a \verb"PSAPindication"
+structure.\label{PSAPindication}
+\begin{quote}\index{PSAPindication}\small\begin{verbatim}
+struct PSAPindication {
+    int     pi_type;
+#define PI_DATA         0x00
+#define PI_TOKEN        0x01
+#define PI_SYNC         0x02
+#define PI_ACTIVITY     0x03
+#define PI_REPORT       0x04
+#define PI_FINISH       0x05
+#define PI_ABORT        0x06
+
+    union {
+        struct PSAPdata pi_un_data;
+        struct PSAPtoken pi_un_token;
+        struct PSAPsync pi_un_sync;
+        struct PSAPactivity pi_un_activity;
+        struct PSAPreport pi_un_report;
+        struct PSAPfinish pi_un_finish;
+        struct PSAPabort pi_un_abort;
+    }   pi_un;
+#define pi_data         pi_un.pi_un_data
+#define pi_token        pi_un.pi_un_token
+#define pi_sync         pi_un.pi_un_sync
+#define pi_activity     pi_un.pi_un_activity
+#define pi_report       pi_un.pi_un_report
+#define pi_finish       pi_un.pi_un_finish
+#define pi_abort        pi_un.pi_un_abort
+};
+\end{verbatim}\end{quote}
+As shown, this structure is really a discriminated union
+(a structure with a tag element followed by a union).
+Hence, on a failure return,
+one first coerces a pointer to the \verb"PSAPabort" structure contained
+therein,
+and then consults the elements of that structure.
+\begin{quote}\index{PSAPabort}\small\begin{verbatim}
+struct PSAPabort {
+    int     pa_peer;
+
+    int     pa_reason;
+    int     pa_ppdu;
+
+
+    int     pa_ninfo;
+    char    pa_info;
+
+#define PA_SIZE        512
+    int     pa_cc;
+    char    pa_data[PA_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of a \verb"PSAPabort" structure are:
+\begin{describe}
+\item[\verb"pa\_peer":] if set, indicates that a user-initiated abort occurred
+(a {\sf P-U-ABORT.INDICATION\/} event);
+if not set, indicates that a provider-initiated abort occurred
+(a {\sf P-P-ABORT.INDICATION\/} event);
+
+\item[\verb"pa\_reason":] the reason for the provider-initiated
+abort (codes are listed in Table~\ref{PSAPreasons});
+
+\item[\verb"pa\_ppdu":] the type of presentation protocol data unit which
+triggered the provider-initiated abort
+(codes are listed in Table~\ref{PSAPppdus});
+
+\item[\verb"pa\_data"/\verb"pa\_cc":] a provider-generated diagnostic string
+(and the length of that string);
+and,
+
+\item[\verb"pa\_info"/\verb"pa\_ninfo":] an array of user data,
+and the number of elements in that array (if \verb"pa_peer" is set).
+\end{describe}
+\tagtable[tp]{5a-1}{PSAP Failure Codes}{PSAPreasons}
+\tagtable[tp]{5a-2}{PSAP PPDU Codes}{PSAPppdus}
+Note that the \verb"pa_info" element is allocated via \man malloc(3) and
+should be released using the \verb"PAFREE" macro  when no longer referenced.
+The \verb"PAFREE" macro behaves as if it was defined as:
+\begin{quote}\index{PAFREE}\small\begin{verbatim}
+void    PAFREE (pa)
+struct PSAPabort *pa;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated in the \verb"PSAPabort" structure
+and not the structure itself.
+
+After examining the information returned by \verb"PInit" on a successful call
+(and possibly after examining the argument vector),
+the responder should either accept or reject the connection.
+For either response,
+the responder should use
+the \verb"PConnResponse" routine
+(which corresponds to the {\sf P-CONNECT.RESPONSE\/} action).
+\begin{quote}\index{PConnResponse}\small\begin{verbatim}
+int     PConnResponse (sd, status, responding, ctxlist,
+                defctxresult, prequirements, srequirements,
+                isn, settings, ref, data, ndata, pi)
+int     sd;
+struct PSAPaddr *responding;
+int     status,
+        prequirements,
+        srequirements,
+        settings,
+        ndata;
+long	isn;
+struct PSAPctxlist *ctxlist;
+int     defctxresult;
+struct SSAPref *ref;
+PE     *data;
+struct PSAPindication *pi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:\label{PConnResponse}
+\begin{describe}
+\item[\verb"sd":] the presentation-descriptor;
+
+\item[\verb"result":] the acceptance indicator
+(either \verb"PC_ACCEPT" if the connection is to be accepted,
+or \verb"PC_REJECTED" otherwise);
+
+\item[\verb"responding":] the PSAP address of the responder (defaulting to the
+called address, if not present);
+
+\item[\verb"ctxlist":] the responder's decision as to each of the presentation
+contexts suggested
+(for each proposed context,
+if the \verb"pc_result" element supplied by the provider is \verb"PC_ACCEPT",
+which indicates that the provider is willing to support it,
+the user may supply either \verb"PC_ACCEPT" or the value \verb"PC_REJECTED");
+
+\item[\verb"defctxresult":] the response to the default context
+(if the presentation provider responded with \verb"PC_ACCEPT",
+the user may supply either \verb"PC_ACCEPT" or
+\verb"PC_REJECTED");
+
+\item[\verb"prequirements":] the responder's presentation requirements;
+
+\item[\verb"srequirements":] the responder's session requirements;
+
+\item[\verb"isn":] the initial serial-number;
+
+\item[\verb"settings":] the initial token settings;
+
+\item[\verb"ref":]  the connection identifier used by the responder
+(consult page~\pageref{SSAPref} for a description of the \verb"SSAPref"
+structure);
+
+\item[\verb"data"/\verb"ndata":] an array of initial data
+(and the number of elements in that array,
+consult the warning on page~\pageref{PSAPdata});
+and,
+
+\item[\verb"pi":] a pointer to a \verb"PSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"PConnResponse" is successful,
+and if the \verb"result" parameter is set to \verb"PC_ACCEPT",
+then connection establishment has completed
+and the users of the presentation service now operate as symmetric peers.
+If the call is successful,
+but the \verb"result" parameter is \verb"PC_REJECTED" instead,
+then the connection has been rejected and the responder may exit.
+Otherwise, if the call fails and the reason is not an interface error
+(see Table~\ref{PSAPreasons} on page~\pageref{PSAPreasons}),
+then the connection is closed.
+
+Note that when the responder rejects the connection,
+it need only supply meaningful values for the \verb"sd", \verb"status",
+\verb"defctxresult", and \verb"pi" parameters.
+
+\subsection	{Client Initialization}
+A program wishing to connect to another user of presentation services calls the
+\verb"PConnRequest" routine,
+which corresponds to the {\sf P-CONNECT.RE\-QUEST\/} action.
+\begin{quote}\index{PConnRequest}\small\begin{verbatim}
+int     PConnRequest (calling, called, ctxlist, defctxname,
+                prequirements, srequirements, isn, settings,
+                ref, data, ndata, qos, pc, pi)
+struct PSAPaddr *calling,
+                *called;
+int     prequirements,
+        srequirements,
+        settings,
+        ndata;
+long	isn;
+struct PSAPctxlist *ctxlist;
+OID     defctxname;
+struct SSAPref *ref;
+PE    *data;
+struct QOStype *qos;
+struct PSAPconnect *pc;
+struct PSAPindication *pi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:\label{PConnRequest}
+\begin{describe}
+\item[\verb"calling":] the PSAP address of the initiator
+(use the manifest constant verb"NULLPA" if this is not unimportant);
+
+\item[\verb"called":] the PSAP address of the responder;
+
+\item[\verb"ctxlist":] the list of proposed presentation contexts
+(only the \verb"pc_id", \verb"pc_asn", and optionally the \verb"pc_atn"
+elements should be filled in);
+
+\item[\verb"defctxname":] the proposed default contexts;
+
+\item[\verb"prequirements":] the presentation requirements;
+
+\item[\verb"srequirements":] the session requirements;
+
+\item[\verb"isn":] the initial serial-number;
+
+\item[\verb"settings":] the initial token settings;
+
+\item[\verb"ref":] the connection identifier used by the initiator
+(consult page~\pageref{SSAPref} for a description of the \verb"SSAPref"
+structure);
+
+\item[\verb"data"/\verb"ndata":] an array of initial data
+(and the number of elements in that array,
+consult the warning on page~\pageref{PSAPdata});
+
+\item[\verb"qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos});
+
+\item[\verb"pc":] a pointer to a \verb"PSAPconnect" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"pi":] a pointer to a \verb"PSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"PConnRequest" is successful
+(a successful return corresponds to a {\sf P-CONNECT.CONFIRMATION\/} event),
+then information is returned in the \verb"pc" parameter,
+which is a pointer to a \verb"PSAPconnect" structure.
+\begin{quote}\index{PSAPconnect}\small\begin{verbatim}
+struct PSAPconnect {
+    int     pc_sd;
+
+    struct PSAPaddr pc_responding;
+
+    struct PSAPctxlsit pc_ctxlist;
+
+    int     pc_defctxresult;
+
+    int     pc_prequirements;
+
+    int     pc_srequirements;
+    int     pc_settings;
+    int     pc_please;
+    long    pc_isn;
+
+    struct SSAPref pc_connect;
+
+    int     pc_ssdusize;
+
+    struct QOStype pc_qos;
+    int     pc_result;
+
+    struct SSAPref  pc_connect;
+
+#define PC_SIZE         512
+    int     pc_cc;
+    char    pc_data[PC_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:\label{PSAPconnect}
+\begin{describe}
+\item[\verb"pc\_sd":] the presentation-descriptor to be used to reference this
+connection;
+
+\item[\verb"pc\_responding":] the responding peer's address
+(which is the same as the \verb"called" parameter given to
+\verb"SConnRequest");
+
+\item[\verb"pc\_ctxlist":] the (negotiated) list of presentation contexts;
+
+\item[\verb"pc\_defctxresult":] the response to the proposed default context;
+
+\item[\verb"pc\_prequirements":] the (negotiated) presentation requirements;
+
+\item[\verb"pc\_srequirements":] the (negotiated) session requirements;
+
+\item[\verb"pc\_settings":] the (negotiated) initial token settings;
+
+\item[\verb"pc\_please":] the tokens which the responder wants to own
+(if any);
+
+\item[\verb"pc\_isn":] the (negotiated) initial serial-number;
+
+\item[\verb"pc\_connect":] the connection identifier used by the responder
+(consult page~\pageref{SSAPref} for a description of the \verb"SSAPref"
+structure);
+
+\item[\verb"pc\_ssdusize":] the largest atomic SSDU size that can be used on
+the connection (see the note on page~\pageref{SSDU:atomic});
+
+\item[\verb"pc\_qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos});
+and,
+
+\item[\verb"pc\_result":] the connection response;
+
+\item[\verb"pc\_info"/\verb"pc\_ninfo":] an array of initial data,
+and the number of elements in that array.
+\end{describe}
+If the call to \verb"PConnRequest" is successful,
+and the \verb"pc_result" element is set to \verb"PC_ACCEPT",
+then connection establishment has completed and the users of the presentation
+service now operate as symmetric peers.
+If the call is successful,
+but the \verb"pc_result" element is not \verb"PC_ACCEPT",
+then the connection has been rejected;
+consult Table~\ref{PSAPreasons} to determine the reason
+(further information can be found in the \verb"pi" parameter).
+Otherwise, if the call fails then the connection is not established and the
+\verb"PSAPabort" structure of the \verb"PSAPindication" discriminated union
+has been updated.
+
+Note that the \verb"pc_info" element is allocated via \man malloc(3) and
+should be released using the \verb"PCFREE" macro when no longer referenced.
+The \verb"PCFREE" macro behaves as if it was defined as:
+\begin{quote}\index{PCFREE}\small\begin{verbatim}
+void    PCFREE (pc)
+struct PSAPconnect *pc;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"PConnRequest",
+and not the \verb"PSAPconnect" structure itself.
+Further,
+\verb"PCFREE" should be called only if the call to the \verb"PConnRequest"
+routine returned \verb"OK".
+
+Normally \verb"PConnRequest" returns only after a connection has succeeded or
+failed.
+This is termed a {\em synchronous\/} connection initiation.
+If the user desires, an {\em asynchronous\/} connection may be initiated.
+The routine \verb"PConnRequest" is really a macro which calls the routine
+\verb"PAsynConnRequest" with an argument indicating that a connection should
+be attempted synchronously.
+\begin{quote}\index{PAsynConnRequest}\small\begin{verbatim}
+int     PAsynConnRequest (calling, called, ctxlist,
+                defctxname, prequirements, srequirements,
+                isn, settings, ref, data, ndata, qos, pc,
+                pi, async)
+struct PSAPaddr *calling,
+                *called;
+int     prequirements,
+        srequirements,
+        settings,
+        ndata,
+        async;
+long	isn;
+struct PSAPctxlist *ctxlist;
+OID     defctxname;
+struct SSAPref *ref;
+PE    *data;
+struct QOStype *qos;
+struct PSAPconnect *pc;
+struct PSAPindication *pi;
+\end{verbatim}\end{quote}
+The additional parameter to this procedure is:
+\begin{describe}
+\item[\verb"async":] whether the connection should be initiated asynchronously.
+\end{describe}
+If the \verb"async" parameter is non-zero,
+then \verb"PAsynConnRequest" returns one of four values:
+\verb"NOTOK", which indicates that the connection request failed;
+\verb"DONE", which indicates that the connection request succeeded;
+or, either of \verb"CONNECTING_1" or \verb"CONNECTING_2", which indicates that
+the connection request is still in
+progress.
+In the first two cases,
+the usual procedures for handling return values from \verb"PConnRequest" are
+employed
+(i.e., a \verb"NOTOK" return from \verb"PAsynConnRequest" is equivalent to a
+\verb"NOTOK" return from \verb"PConnRequest", and,
+a \verb"DONE" return from \verb"PAsynConnRequest" is equivalent to a
+\verb"OK" return from \verb"PConnRequest").
+
+In the final case, when either \verb"CONNECTING_1" or
+\verb"CONNECTING_2" is returned,
+only the \verb"pc_sd" element of the \verb"pc" parameter has been updated;
+it reflects the presentation-descriptor to be used to reference this
+connection.
+
+To determine when the connection attempt has been completed,
+the routine \verb"xselect" (consult Section~\ref{acs:select} of \volone/)
+should be used after calling \verb"PSelectMask".
+In order to determine if the connection attempt was successful,
+the routine \verb"PAsynRetryRequest" is called:
+\begin{quote}\index{PAsynRetryRequest}\small\begin{verbatim}
+int     PAsynRetryRequest (sd, pc, pi)
+int     sd;
+struct PSAPconnect *pc;
+struct PSAPindication  *pi;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the presentation-descriptor;
+
+\item[\verb"pc":] a pointer to a \verb"PSAPconnect" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"pi":] a pointer to a \verb"PSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+Again, one of three values are returned:
+\verb"NOTOK", which indicates that the connection request failed;
+\verb"DONE", which indicates that the connection request succeeded;
+and, \verb"CONNECTING_1" or \verb"CONNECTING_2" which indicates that
+the connection request is still in progress.
+
+Refer to Section~\ref{tsap:async} on page~\pageref{tsap:async}
+for information on how to make efficient use of the asynchronous connection
+facility. 
+
+\section	{Data Transfer}
+Once the connection has been established,
+a presentation-descriptor is used to reference the connection.
+This is usually the first parameter given to any of the remaining routines in
+the \man libpsap2(3n) library.
+Further,
+the last parameter is usually a pointer to a \verb"PSAPindication" structure
+(as described on page~\pageref{PSAPindication}).
+If a call to one of these routines fails,
+then the structure is updated.
+Consult the \verb"PSAPabort" element of the \verb"PSAPindication" structure.
+If the \verb"pa_reason" element of the \verb"PSAPabort" structure is
+associated with a fatal error,
+then the connection is closed.
+That is, a {\sf P-P-ABORT.INDICATION\/} event has occurred.
+The \verb"PC_FATAL" macro can be used to determine this.
+\begin{quote}\index{PC\_FATAL}\small\begin{verbatim}
+int     PC_FATAL (r)
+int     r;
+\end{verbatim}\end{quote}
+The most common interface error to occur is \verb"PC_OPERATION" which usually
+indicates that either the user is lacking ownership of a session token
+to perform an operation,
+or that a session requirement required by the operation was not negotiated
+during connection establishment.
+For protocol purists,
+the \verb"PC_OFFICIAL" macro can be used to determine if the error is an
+``official'' error as defined by the specification,
+or an ``unofficial'' error used by the implementation.
+\begin{quote}\index{PC\_OFFICIAL}\small\begin{verbatim}
+int     PC_OFFICIAL (r)
+int     r;
+\end{verbatim}\end{quote}
+
+All of the remaining routines in the \man libpsap2(3n) library are identical
+to their counterparts in the \man libssap(3n) library,
+with these exceptions:
+\begin{itemize}
+\item	The final parameter to each routine is a pointer to a
+	\verb"PSAPindication" structure,
+	rather than a \verb"SSAPindication" structure.
+
+\item	Any user data components are specified as an array of presentation
+	elements (and the number of elements in that array),
+	rather than the base of a character array (and the number of octets
+	to be sent).
+	Note that any data to be sent should have the \verb"pe_context"
+	element set to the desired presentation context.
+	By default, presentation elements are initialized with the
+	default context (as represented by the manifest constant
+	\verb"PE_DFLT_CTX").
+
+\item	Asynchronous event handlers are called with pointers to \verb"PSAP"
+	structures, rather tha \verb"SSAP" structures.
+
+\item	With any indication which occurs,
+	it is important to free any data which might have been allocated.
+	The structures and corresponding macros are:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Macro}&
+		\multicolumn{1}{c|}{\bf Structure Pointer}\\
+\hline
+    \tt	PXFREE&		struct PSAPdata *\\
+    \tt	PTFREE&		struct PSAPtoken *\\
+    \tt	PNFREE&		struct PSAPsync *\\
+    \tt	PVFREE&		struct PSAPactivity *\\
+    \tt	PPFREE&		struct PSAPreport *\\
+    \tt	PFFREE&		struct PSAPfinish *\\
+    \tt	PRFREE&		struct PSAPrelease *\\
+    \tt	PAFREE&		struct PSAPabort *\\
+\hline
+\end{tabular}\]
+	Note that these free the user data referenced by the indication
+	structures,
+	and not the structures themselves.\index{PXFREE}\index{PTFREE}
+	\index{PNFREE}\index{PVFREE}\index{PPFREE}\index{PFFREE}\index{PRFREE}
+	\index{PAFREE}
+\end{itemize}
+
+\subsection	{Restrictions on User Data}\label{PSAPdata}
+To quote the \cite{ISO.PP.Service} specification:
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	For all services which carry user data,
+		excluding {\sf P-DATA\/} and {\sf P-TYPED-DATA},
+		it may not be possible to exchange user data,
+		dependent on the user data length limitation supported by
+		the underlying session services.
+\end{tabular}}\]
+
+\section	{Error Conventions}
+All of the routines in this library return the manifest constant \verb"NOTOK"
+on error,
+and also update the \verb"pi" parameter given to the routine.
+The \verb"pi_abort" element of the \verb"PSAPindication" structure contains a
+\verb"PSAPabort" structure detailing the reason for the failure.
+The \verb"pa_reason" element of this latter structure can be given as a
+parameter to the routine \verb"PErrString" which returns a null-terminated
+diagnostic string.
+\begin{quote}\index{PErrString}\small\begin{verbatim}
+char   *PErrString (c)
+int     c;
+\end{verbatim}\end{quote}
+
+\section	{Compiling and Loading}
+Programs using the \man libpsap2(3n) library should include
+\verb"<isode/psap2.h>".
+The programs should also be loaded with \verb"-lpsap2".
+
+\section	{An Example}
+Let's consider how one might construct a source entity that resides on the
+PSAP.
+This entity will use a synchronous interface.
+
+There are two parts to the program:
+initialization and data transfer;
+release will occur when the standard input has been exhausted.
+In our example,
+we assume that the routine \verb"error" results in the process being
+terminated after printing a diagnostic.
+
+In Figure~\ref{initPSsource},
+the initialization steps for the source entity,
+including the outer {\em C\/} wrapper,
+is shown.
+First, a lookup is done in the ISO services database,
+and the \verb"PSAPaddr" is initialized.
+The \verb"SSAPref" is initialized using the routine
+\verb"addr2ref".
+This routine takes a string and returns a pointer to a \verb"SSAPref"
+structure which has been initialized to contain the string and the current
+UTC time.
+Next, for each token associated with the session requirements,
+initial ownership of that token is claimed.
+Finally,
+the call to \verb"PConnRequest" is made.
+If the call is successful,
+a check is made to see if the remote user accepted the connection.
+If so,
+the presentation-descriptor is captured,
+along with the negotiated requirements and initial token settings.
+
+In Figure~\ref{dataPSsource} on page~\pageref{dataPSsource},
+the data transfer loop is realized.
+The source entity reads a line from the standard input,
+and then queues that line for sending to the remote side.
+When an end-of-file occurs on the standard input,
+the source entity requests release and then gracefully terminates.
+Although no checking is done in this example,
+for the calls to \verb"PDataRequest" and \verb"PRelRequest",
+on failure
+a check for the operational error \verb"PC_OPERATION" should be made.
+For \verb"PDataRequest",
+this would occur when the data token was not owned by the user;
+for \verb"PRelRequest",
+this would occur when the release token was not owned by the user.
+\clearpage
+\tagrind[tp]{grind5a-2a}{Initializing the PSAP source entity}{initPSsource}
+\clearpage
+\tagrind[tp]{grind5a-2b}{Initializing the PSAP source entity (continued)}\empty
+\clearpage
+\tagrind[tp]{grind5a-3}{Data Transfer for the PSAP source entity}%
+	{dataPSsource}
+
+\section	{Lightweight Presentation Protocol}
+To run OSI applications using the lighweight presentation protocol
+defined in RFC1085,
+load the program with \verb"-lpsap2-lpp" or \verb"-isode-lpp".
+
+This is a complete implementation of RFC1085.
+The following functions are available:
+\begin{quote}\small\begin{verbatim}
+PInit
+PConnResponse
+PAsynConnRequest
+PAsynRetryRequest
+PDataRequest
+PReadRequest
+PUAbortRequest
+PRelRequest
+PRelResponse
+PSetIndications
+PSelectMask
+PErrSTring
+\end{verbatim}\end{quote}
+Note that when RFC1085 is used as a presentation backing,
+only a subset of the presentation services are available:
+\begin{quote}\small\sf
+P-CONNECT
+P-DATA
+P-U-ABORT
+P-P-ABORT
+\end{quote}
+The \man lppd(8c) daemon is used to listen for incoming connections and
+dispatch the appropriate daemon.
+This daemon will listen only for connections using the TCP backing.
+For connections using the UDP backing,
+the responder program must listen itself.
+This is trivally accomplished using the \verb"isodeserver" routine
+described in Section~\ref{isodeserver} on page~\pageref{isodeserver}.
+
+\section	{For Further Reading}
+The ISO specification for session services is defined in
+\cite{ISO.PP.Service},
+while the corresponding protocol definition is \cite{ISO.PP.Protocol}.
+
+%%% \section	{Changes Since the Last Release}\label{psapX:changes}
+%%% A brief summary of the major changes between v~\isodeprevrsn/ and
+%%% v~\isodevrsn/ are now presented.
+%%% These are the user-visible changes only;
+%%% changes of a strictly internal nature are not discussed.
+

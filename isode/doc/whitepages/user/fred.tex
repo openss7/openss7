@@ -1,0 +1,857 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{The White Pages User Interface}
+The \man fred(1c) program is the ``simple'' interface for the white pages
+service.
+This is actually a small program which talks to the ``complicated'' interface,
+a program called \pgm{dish}.
+The \pgm{fred} program should be able to handle most of the queries you wish
+to make.
+However,
+it is purposefully limited in its power.
+As experienced users will find,
+\pgm{fred} is a great pair of crutches when you need help walking,
+but if you want to sprint, then you need a good pair of sneakers,
+called \pgm{dish},
+instead.
+
+\section	{Invoking Fred}
+When your local \camayoc/ told you about the white pages pilot,
+you should have been given three bits of information:
+\begin{itemize}
+\item	your handle (a Directory Distinguished Name);
+
+\item	a password for the handle (so you can keep your own entry up to date);
+	and,
+
+\item	the location of the \pgm{fred} program.
+\end{itemize}
+
+\subsection	{Fred resides locally}
+In most cases,
+the \pgm{fred} program will reside on a machine which you have a login on.
+This will be a \unix/ machine.
+
+Normally,
+the \unix/ directory containing \pgm{fred} is already in your search path,
+e.g., \file{/usr/local/bin/}.
+Type the command:
+\begin{quote}\small\begin{verbatim}
+% which fred
+\end{verbatim}\end{quote}
+If the \pgm{which} command says something like:
+\begin{quote}\small\begin{verbatim}
+/usr/local/bin/fred
+\end{verbatim}\end{quote}
+then \pgm{fred} is already in your search path:
+simply type
+\begin{quote}\small\begin{verbatim}
+% fred
+\end{verbatim}\end{quote}
+and skip to Section~\ref{fred:commands} on page~\pageref{fred:commands}.
+
+Otherwise,
+if \pgm{which} says
+\begin{quote}\small\begin{verbatim}
+fred not found in path
+\end{verbatim}\end{quote}
+then take a look at the \file{.cshrc} or \file{.profile} file in your home
+directory to see if this is so.
+You should see a line such as:
+\begin{quote}\small\begin{verbatim}
+set path=(. /bin /usr/ucb /usr/bin /usr/local/bin)
+\end{verbatim}\end{quote}
+in your \file{.cshrc} file,
+or some lines similar to
+\begin{quote}\small\begin{verbatim}
+PATH=.:/bin:/usr/ucb:/usr/bin:/usr/local/bin
+export PATH
+\end{verbatim}\end{quote}
+in your \file{.profile} file.
+Verify that the name of the \unix/ directory containing \pgm{fred} is listed.
+If not,
+edit the file to make it so.
+Then,
+tell your shell to re-read the appropriate file,
+e.g.,
+either
+\begin{quote}\small\begin{verbatim}
+% source ~/.cshrc
+\end{verbatim}\end{quote}
+from the {\em C\/} shell,
+or
+\begin{quote}\small\begin{verbatim}
+% . $HOME/.profile
+\end{verbatim}\end{quote}
+from the Bourne shell.
+
+As they say in the trade,
+``you are now ready to rock and roll''.
+Simply type
+\begin{quote}\small\begin{verbatim}
+% fred
+\end{verbatim}\end{quote}
+to name that tune.
+Now skip to Section~\ref{fred:commands} on page~\pageref{fred:commands}.
+
+\subsection	{Fred resides remotely}
+If for some reason you do not have a login on the \unix/ machine where
+\pgm{fred} lives,
+there are three other ways to use the \pgm{fred} program.
+These are described in order of descending preference.
+
+\subsubsection	{via Guest account}
+Your \camayoc/ might provide an anonymous login to a machine where
+\pgm{fred} resides.
+In this case,
+you just use TELNET to the machine,
+using the information provided by the \camayoc/
+who will have already initialized the environment.
+For example:
+\begin{quote}\small\begin{verbatim}
+% telnet wp.psi.net
+login: fred
+
+Welcome to the PSI White Pages Pilot Project
+
+  accessing service, please wait...
+
+fred> 
+\end{verbatim}\end{quote}
+and away you go.
+Now skip to Section~\ref{fred:commands} on page~\pageref{fred:commands}.
+
+If you are accessing the White Pages from an \XW/ display,
+and if your TELNET connection is to a host running \XW/ client software,
+then you might see something like this instead:
+\begin{quote}\small\begin{verbatim}
+% telnet wp.psi.net
+login: fred
+
+Welcome to the PSI White Pages Pilot Project
+
+If you want X window access, please enter your DISPLAY name,
+otherwise, if you do not wish to use X, enter "none"
+
+DISPLAY (default=myhost.psi.com:0.0)=
+\end{verbatim}\end{quote}
+If you intend to use the \xwindows/,
+then you should make sure that the machine you have a TELNET connection to is
+allowed to access your \XW/ display.
+This is usually accomplished by adding a line such as
+\begin{quote}\small\begin{verbatim}
+xhost +wp.psi.net
+\end{verbatim}\end{quote}
+to your \XW/ start-up file.
+
+\subsubsection	{via WHOIS}
+The white pages service might also be available via the WHOIS network port.
+In this case,
+you use the \pgm{whois} program found on your machine,
+usually with a special option,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+% whois -h wp.psi.net "query"
+\end{verbatim}\end{quote}
+Your \camayoc/ will provide the details.
+There may even be a command called \pgm{whitepages} which shortens type-in
+somewhat,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+% whitepages "query"
+\end{verbatim}\end{quote}
+Note that a key disadvantage of this approach is that it provides read-only
+access to the white pages service.
+You can never update your own entry using this technique.
+
+\subsubsection	{via mail}
+Finally,
+the white pages service might also be available via electronic mail.
+In this case,
+you use the \pgm{mail} program found on your machine,
+and send a message to a special address,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+whitepages@wp.psi.net
+\end{verbatim}\end{quote}
+Your query is placed in either the \verb"Subject:" field or the body of the
+message.
+Your \camayoc/ will provide the details.
+
+In addition to providing read-only access to the white pages service,
+this approach has the added disadvantage of not being interactive.
+
+\section	{Giving commands to Fred}\label{fred:commands}
+After invoking \pgm{fred},
+you are prompted with ``\verb"fred> "'' indicating that \pgm{fred} is ready.
+(Actually,
+this is only true if \pgm{fred} is invoked from a \unix/ machine.
+If invoked via WHOIS or mail,
+then no prompts are given.)
+
+If \pgm{fred} is invoked interactively,
+it will look for a file in your home directory called \file{.fredrc}.
+It will execute the commands contained in this file just as if you had typed
+them directly to \pgm{fred}.
+Following this,
+you are given the ``\verb"fred> "'' prompt.
+
+\section	{Let your fingers do the walking}
+Although \pgm{fred} has several commands,
+the most interesting command is \verb"whois",
+which performs a white pages query.
+
+If the value of the \verb"namesearch" variable is \verb"friendly",
+then Kille's user-friendly name notation is used.
+(Setting variables is discussed a little later on in
+Section~\ref{setting:variables} on page~\pageref{setting:variables}.)
+Kille's notation is ordered but untyped,
+with components separated by commas.
+Typical names include:
+\begin{quote}\small\begin{verbatim}
+rose, psi
+kille, cs, ucl, gb
+L. Eagle, "Sue, Grabbit and Runn", GB
+\end{verbatim}\end{quote}
+Note that you don't have to know all the components,
+just list what you know, left-to-right,
+starting with the person's name.
+The user-friendly searching algorithm will usually figure out what you mean.
+
+This is the preferred syntax as it is the most intuitive.
+So,
+you simply issue the \verb"whois" command followed by a name
+and \pgm{fred} will do the rest,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+fred> whois schoffstall, psi
+\end{verbatim}\end{quote}
+In fact,
+if you are only a casual user,
+this is all you need to know.
+You can stop reading now!
+
+Otherwise,
+there is an older searching procedure,
+that is rather mechanical.
+Let's begin with some simple examples and introduce the other commands along
+the way.
+If you already know the handle of the person you're interested in finding out
+about,
+just give the handle:
+\begin{quote}\smaller\begin{verbatim}
+fred> whois @c=US@cn=Manager
+Manager (1)
+
+Name:          Manager, US
+\end{verbatim}\end{quote}
+
+\subsection	{The Alias Command}
+Since handles are long strings,
+\pgm{fred} will automatically maintain a list of aliases of the entries you
+have seen in the current session.
+The alias is always a number.
+When an entry is displayed,
+it appears on the first line in parenthesis after the name of the object.
+In the example above,
+the alias is \verb"1".
+
+To find out what aliases are currently defined,
+use the \verb"alias" command:
+\begin{quote}\smaller\begin{verbatim}
+fred> alias
+1    @c=US@cn=Manager
+\end{verbatim}\end{quote}
+Thus,
+the previous \verb"whois" command could have been shortened to simply:
+\begin{quote}\small\begin{verbatim}
+fred> whois !1
+    ...
+\end{verbatim}\end{quote}
+Each time you invoke \pgm{fred},
+its list of aliases is empty.
+If there are few handles which you use often,
+you might wish to define them in your \file{.fredrc} file,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+alias "@c=US@o=Performance Systems International@cn=Manager"
+\end{verbatim}\end{quote}
+Of course,
+the ordering of aliases is important.
+\pgm{fred} will start numbering from~1 starting with the first \verb"alias"
+command.
+
+\subsection	{Back to Searching}
+Suppose however,
+that you don't know the handle for the person.
+In this case,
+you need to specify some search parameters.
+Logically,
+the first step is to ascertain the organization which the person is likely to
+be associated with, e.g.,
+``Performance Systems International''.
+This is done as:
+\begin{quote}\small\begin{verbatim}
+fred> whois organization psi
+Performance Systems International (1)    +1 800-836-0400 (Operations)
+     aka: PSI
+
+PSI Inc.
+  Reston International Center
+  11800 Sunrise Valley Drive
+  Suite 1100
+  Reston, VA 22091
+  US
+
+PSI Inc.
+  5201 Great American Parkway
+  Suite 3106
+  Santa Clara, CA 95054
+  US
+
+PSI Inc.
+  165 Jordan Road
+  Troy, NY 12180
+  US
+
+Telephone: +1 800-836-0400 (Operations)
+           +1 800-82PSI82 (Sales)
+           +1 703-620-6651 (Corporate/Reston Office)
+           +1 518-283-8860 (Troy Office)
+           +1 408-562-6222 (Santa Clara Office)
+FAX:       +1 703-620-4586
+           +1 518-283-8904
+           +1 408-562-6223
+
+value-added provider of networking services
+
+Locality:    Reston, Virginia
+
+Name:     Performance Systems International, US (1)
+Modified: Mon Jul 30 05:18:24 1990
+      by: Manager, Performance Systems International,
+            US (2)
+\end{verbatim}\end{quote}
+Second,
+to search for a particular person,
+you might use:
+\begin{quote}\small\begin{verbatim}
+fred> whois rose -area 2
+Marshall Rose (111)                                 mrose@psi.com
+     aka: mtr
+     aka: Marshall T. Rose
+
+Principal Scientist
+PSI, Inc.
+  POB 391776
+  Mountain View, CA 94039
+  US
+
+PSI, Inc.
+  5201 Great American Parkway
+  Suite 3106
+  Santa Clara, CA 95054
+  US
+
+Telephone: +1 415-961-3380
+           +1 408-562-6222 x6221
+FAX:       +1 415-961-3282
+           +1 408-562-6223
+
+Mailbox information:
+  internet: mrose@psi.com
+  internet: mrose@cheetah.ca.psi.com
+
+Principal Implementor of the ISO Development Environment
+
+Beleaguered Manager of the PSI/NYSERNet White Pages Pilot Project
+
+A savvyNerd according to noSauce
+
+Locality:    Santa Clara, California
+
+Drinks:       Iced Tea (and lots of it...)
+Picture:      /usr/etc/g3fax/Xphoto invoked
+
+Name:     Marshall Rose, Mountain View,
+            Research and Development,
+            Performance Systems International,
+            US (111)
+Modified: Mon Sep 24 14:43:36 1990
+      by: Manager, US (4)
+\end{verbatim}\end{quote}
+Note the use of the alias \verb"2".
+The command could also have been:
+\begin{quote}\small\begin{verbatim}
+fred> whois rose -area "@c=US@o=Performance Systems International"
+    ...
+\end{verbatim}\end{quote}
+Double-quotes are used so that the DN appears as a single token to \pgm{fred}.
+
+Of course,
+this two-step process,
+whilst logical, is tedious.
+Thus, you can combine them like this:
+\begin{quote}\small\begin{verbatim}
+fred> whois rose -org psi
+    ...
+\end{verbatim}\end{quote}
+which says to look for any organizations with ``psi'' in its name.
+Then, for each of these,
+look for something called ``rose''.
+
+\subsection	{The Area Command}
+Suppose
+you want information on several persons belonging to an organization.
+You can use the \verb"area" command,
+by itself,
+to tell \pgm{fred} where to search for subsequent commands.
+For example,
+\begin{quote}\small\begin{verbatim}
+fred> area "@c=US@o=Performance Systems International"
+\end{verbatim}\end{quote}
+or simply
+\begin{quote}\small\begin{verbatim}
+fred> area 2
+\end{verbatim}\end{quote}
+both tell \pgm{fred} the default area used by the \verb"whois" command.
+Of course,
+you can still use the \switch"area" area with the \verb"whois" command to
+override the default area.
+Thus,
+\begin{quote}\small\begin{verbatim}
+fred> whois alan -area "@c=US@o=Columbia University"
+\end{verbatim}\end{quote}
+will do what you expect.
+
+If you use the \verb"area" command without any arguments,
+\pgm{fred} will tell you what its default area is:
+\begin{quote}\small\begin{verbatim}
+fred> area
+@c=US@o=Yoyodyne
+\end{verbatim}\end{quote}
+This indicates the default area for all commands,
+{\em including\/} any subsequent \verb"area" commands.
+Thus,
+issuing:
+\begin{quote}\small\begin{verbatim}
+fred> area @c=US@o=Yoyodyne
+@c=US@o=Yoyodyne
+
+fred> area ou=Research
+@c=US@o=Yoyodyne@ou=Research
+\end{verbatim}\end{quote}
+is equivalent to
+\begin{quote}\small\begin{verbatim}
+fred> area @c=US@o=Yoyodyne@ou=Research
+@c=US@o=Yoyodyne@ou=Research
+\end{verbatim}\end{quote}
+because a leading \verb"`@'"-sign was not used before \verb"ou=Research".
+
+As you might expect,
+there is a special string ``\verb".."'' which may be used to move up one level:
+\begin{quote}\small\begin{verbatim}
+fred> area ..
+@c=US@o=Yoyodyne
+\end{verbatim}\end{quote}
+Combinations are possible as well,
+such as:
+\begin{quote}\small\begin{verbatim}
+fred> area ..@"o=Performance Systems International"
+@c=US@o=Performance Systems International
+\end{verbatim}\end{quote}
+which moves up a level and then down to
+\verb"o=Performance Systems International".
+
+\subsection	{Getting Help}
+For a brief summary of \pgm{fred} commands,
+type:
+\begin{quote}\small\begin{verbatim}
+fred> help ?
+\end{verbatim}\end{quote}
+This will list the commands that \pgm{fred} knows about
+along with a one-line summary of their function.
+
+For help on a particular command,
+type the name of the command followed by \switch"help",
+e.g.,
+\begin{quote}\small\begin{verbatim}
+fred> alias -help
+\end{verbatim}\end{quote}
+
+If you need more help,
+try
+\begin{quote}\small\begin{verbatim}
+fred> manual
+\end{verbatim}\end{quote}
+which is the same as
+\begin{quote}\small\begin{verbatim}
+% man fred
+\end{verbatim}\end{quote}
+from the shell.
+If that's not enough,
+contact your local \camayoc/.
+
+\subsection	{Reporting problems}
+To report something to your local white pages manager,
+simply use the \verb"report" command.
+You will be prompted for some text,
+which \pgm{fred} will send to the appropriate mailbox.
+
+\subsection	{Quitting}
+To terminate \pgm{fred},
+simply use:
+\begin{quote}\small\begin{verbatim}
+fred> quit
+\end{verbatim}\end{quote}
+
+\subsection	{Setting Variables}\label{setting:variables}
+\pgm{fred} contains a few variables that may be manipulated to modify its
+behavior: 
+\begin{describe}
+\item[debug:]	debug \pgm{fred}
+
+\item[manager:]	mail-address of local white pages manager
+
+\item[namesearch:] type of named use for matching,
+		either \verb"fullname", \verb"surname", or \verb"friendly"
+
+\item[pager:]	program to use for terminal pagination
+
+\item[phone:]	display phone numbers in one-liner
+
+\item[query:]	confirm two-step operations
+
+\item[server:]	IP-address of directory assistance server
+
+\item[soundex:]	use soundex for matching when no wildcards are present
+
+\item[timelimit:]	maximum number of seconds to spend searching
+
+\item[verbose:]	verbose interaction
+
+\item[watch:]	watch dialogue with \pgm{dish}
+\end{describe}
+To view or change settings, use the \verb"set" command:
+\begin{quote}\small\begin{verbatim}
+fred> set query
+\end{verbatim}\end{quote}
+will display the current value of the \verb"query" variable,
+whilst
+\begin{quote}\small\begin{verbatim}
+fred> set query on
+\end{verbatim}\end{quote}
+will change the variable accordingly.
+
+\subsection	{via WHOIS or mail}
+If you are accessing the white pages via WHOIS or mail,
+then only the \verb"whois", \verb"area", \verb"help", and \verb"manual"
+commands are available.
+If your command to \pgm{fred} does not start with one of these keywords,
+then it is assumed that your input is a list of arguments to the
+\verb"whois" command.
+
+Note that it is not possible to use aliases with the \verb"whois" command
+since your \pgm{fred} session is not interactive.
+
+\section	{More on Searching}
+The full syntax to the \verb"whois" command is:
+\begin{quote}\small\begin{verbatim}
+whois input-field [record-type] [area-designator] [output-control]
+\end{verbatim}\end{quote}
+Only the {\em input-field\/} component need be present.
+The components may appear in any order.
+
+\subsection	{Input Field}
+This component tells the white pages who or what to look for.
+\begin{describe}
+\item[name NAME {\rm or} .NAME]
+\item[surname NAME]
+\item[fullname NAME]
+gives the name of the target.
+
+Searching for names follows these rules:
+\begin{enumerate}
+\item	If the ``\verb"*"''-sign appears at the beginning and/or end of the
+name, 
+then wildcard-style matching is used:
+the ``\verb"*"''-sign matches zero or more characters at the beginning
+or end of a name.
+
+\item	Otherwise,
+if soundex has been enabled (set the variable \verb"soundex" to \verb"on"),
+then imprecise matching occurs according to a Soundex algorithm.
+
+\item	Otherwise,
+if searching is to occur for a person's surname
+(either the keyword \verb"surname" is used
+or the value of the variable \verb"namesearch" is \verb"surname"),
+then a case-insensitive match is used.%
+\footnote{For compatibility with the older WHOIS service,
+if \verb"surname" searching is used,
+then a case-insensitive match is also performed on the local-part of the
+entry's electronic-mail address}.
+
+\item	Finally,
+as a last resort,
+\pgm{fred} will force a rather liberal wildcard-style match
+(e.g., ``\verb"NAME"'' is treated as ``\verb"*NAME*"'').
+\end{enumerate}
+For compatibility with the WHOIS service,
+an input field of ``\verb"NAME."'' is equivalent to ``\verb"NAME*"''
+(i.e., a partial match for names having the given prefix).
+Similarly,
+an input field of ``\verb"*NAME"'' is equivalent to ``\verb"NAME expand"''.
+Thus, to have wildcard matching at the beginning of the name,
+use two ``\verb"*"''-signs,
+e.g., ``\verb"**inc"'' matches names ending in ``\verb"inc"''.
+(A terrible hack, but that's the price one pays to be consistent with the
+WHOIS service.)
+
+\item[handle HANDLE {\rm or} !HANDLE]
+gives the Distinguished Name (DN) of the target.
+Instead of a DN,
+an alias for the DN may be used.
+
+\item[mailbox STRING] gives the mailbox of the target.
+(The mailbox search is more properly a Yellow Pages function.
+It is included solely for the backwards compatibility with the WHOIS service.
+As such,
+use of mailbox matching is not recommended.)
+\end{describe}
+If a keyword is not given,
+then \pgm{fred} attempts to intuit which kind of input field is being provided.
+In most cases,
+\pgm{fred} will treat the input field as a name,
+unless it contains the \verb"`@'"-sign,
+which makes it either a handle or a mailbox.
+
+\subsection	{Record Type}
+The {\em record type\/} is a single keyword,
+one of:
+\begin{describe}
+\item[person:]		a person
+
+\item[organization:]	an organization
+
+\item[unit:]		a division under an organization
+
+\item[role:]		a role within an organization
+
+\item[locality:]	a geographic locality
+
+\item[dsa:]		a white pages server
+\end{describe}
+If one of these keywords is not present,
+then \pgm{fred} will not know what kind of entry you are looking for and
+this can result in inefficient searches.
+If you know what kind of entry you're looking for,
+be kind and tell \pgm{fred}.
+
+If you are searching for a person with a particular title,
+then rather than using \verb"person",
+use the \switch"title" switch.
+For example,
+\begin{quote}\small\begin{verbatim}
+whois rose -title scientist
+\end{verbatim}\end{quote}
+looks for someone named \verb"rose" who is a scientist,
+whilst
+\begin{quote}\small\begin{verbatim}
+whois -title operator
+\end{verbatim}\end{quote}
+looks for anyone who is an \verb"operator".
+Naturally,
+these searches are carried out relative to the appropriate area.
+
+\subsubsection	{More on the Area Command}
+If the \verb"area" command is given two arguments then this defines the
+default area for a particular record type.
+For example,
+\begin{quote}\small\begin{verbatim}
+fred> area unit @c=US@o=Yoyodyne
+\end{verbatim}\end{quote}
+indicates that searches for organizational units should,
+by default,
+occur under the indicated area.
+
+It is now time to confess to a little white lie told earlier.
+If the \verb"area" command is invoked without arguments,
+it doesn't just print one line of information,
+it prints several:
+\begin{quote}\small\begin{verbatim}
+fred> area
+                     default area @c=US@o=Yoyodyne
+area for record-type organization @c=US
+area for record-type         unit @c=US@o=Yoyodyne
+area for record-type     locality @c=US@l=NY
+area for record-type       person @c=US@o=Yoyodyne
+area for record-type          dsa @c=US
+area for record-type         role @c=US@o=Yoyodyne
+\end{verbatim}\end{quote}
+The first line tells what the default area is.
+The remaining lines tell what the default area is for particular kinds of
+searches.
+
+These values are normally set by your local \camayoc/ in a system-wide file
+read by \pgm{fred} during initialization.
+The name of this file is probably \file{/usr/etc/fredrc},
+check with your system administrator.
+Since this file is read before your own \file{.fredrc} file,
+you can automatically override these settings if you choose.
+
+So,
+what use does \pgm{fred} make of the record type you supply?
+At the moment,
+\pgm{fred} employs some rather simple heuristics.
+If a default area is declared for a \verb"organization",
+\verb"unit", \verb"locality", or \verb"dsa",
+then searches for objects of this type will look {\em only\/} one-level deep.
+This is an artifact of the rules used by the sponsors of the pilot project
+when they defined the overall structure of the Directory tree.
+In practical terms,
+this severely limits the search to the areas where it is possible for these
+objects to exist.
+This means that searching is faster since parts of the tree,
+believed to never contain entries of this type,
+are never searched.
+
+Note however that in order to take advantage of this heuristic,
+not only must a default area be declared for the record type you are searching
+for,
+but you must also tell the \verb"whois" command what the record type is.
+While this might seem obvious:
+\begin{quote}\small\begin{verbatim}
+fred> whois organization psi
+\end{verbatim}\end{quote}
+will,
+given the default areas defined above,
+invoke the search heuristic and result in a ``lightning fast'' search.
+However,
+\begin{quote}\small\begin{verbatim}
+fred> whois psi
+\end{verbatim}\end{quote}
+will result in a slow search since \pgm{fred} has no way of knowing that
+\verb"psi" isn't someone's name unless {\em you\/} tell it.
+
+\subsection	{Area Designator}
+The {\em area designator\/} takes one of two forms.
+The most common form is one of the switches:
+\begin{quote}\begin{tabular}{l}
+\switch"org" (short for \switch"organization"),\\
+\switch"unit", or,\\
+\switch"locality"
+\end{tabular}\end{quote}
+followed by a name.
+For example,
+\begin{quote}\small\begin{verbatim}
+fred> whois rose -org psi
+\end{verbatim}\end{quote}
+which was introduced earlier,
+says to look for any organization with ``psi'' in its name.
+Then, for each of these,
+look for something called ``rose''.
+
+In the second form,
+the area designator consists of the switch \switch"area" followed by a location
+in the white pages,
+either a Distinguished Name or an alias for a DN.
+If an area designator is not given,
+then the area for the search is chosen as follows:
+\begin{enumerate}
+\item	If a {\em record type\/} was given for the search
+	(always a good idea),
+	and if a default area was declared for that record type,
+	then the appropriate area is used.
+
+	This also allows \pgm{fred} to use the special searching
+	heuristic based on the way the Directory tree is structured
+	under the pilot project.
+
+\item	Otherwise,
+	the default area is used.
+\end{enumerate}
+
+\subsection	{Output Control}
+Any combination of the following keywords may appear in the
+{\em output control\/} component:
+\begin{describe}
+\item[expand:]		give a detailed listing and show children of matched
+			entries.
+
+\item[full:]		give a detailed listing, even on ambiguous matches
+			(the default is to give a detailed listing only
+			if a single match is found.)
+
+\item[summary:]		give a one-line listing, even on unique matches
+			(the default is to give a one-line listing only
+			if a multiple matches are found.)
+
+\item[subdisplay:]	give a one-line listing and show children of matched
+			entries (the default is to not show any children.)
+\end{describe}
+
+\section	{Editing your Entry}
+Finally,
+you should keep your own entry as accurate and current as possible.
+This is your responsibility in order to add value to the white pages service.
+	
+The \verb"edit" command is used to examine and modify your entry in the white
+pages.
+
+\subsection	{Who are You?}
+Of course,
+the first step is to tell \pgm{fred} who you are so that it can find your
+entry.
+Recall that your local \camayoc/ indicated your handle and password earlier.
+You use the \verb"thisis" command to tell the whitepages who you are,
+e.g.,
+\begin{quote}\tiny\begin{verbatim}
+fred> thisis "@c=US@o=Performance Systems International@cn=Manager"
+Enter password for "@c=US@o=Performance Systems International@cn=Manager": secret
+\end{verbatim}\end{quote}
+You can place this command in your \file{.fredrc} file to automatically tell
+\pgm{fred} about your entry in the white pages.
+Note however that if you do so,
+then \pgm{fred} will also prompt you for a password whenever it starts.
+To get around this you might choose to place the password in your
+\file{.fredrc} file.
+e.g.,
+\begin{quote}\small\begin{verbatim}
+thisis "@c=US@o=Performance Systems International@cn=Manager" secret
+\end{verbatim}\end{quote}
+However,
+you must now protect your \file{.fredrc} accordingly.
+Entering:
+\begin{quote}\small\begin{verbatim}
+% chmod 0600 $HOME/.fredrc
+\end{verbatim}\end{quote}
+will do the trick.
+
+\subsection	{Editing the Entry}
+Once the \pgm{fred} knows about your entry in the white pages,
+to edit your entry, use the \verb"edit" command:
+\begin{quote}\small\begin{verbatim}
+fred> edit
+\end{verbatim}\end{quote}
+This will invoke the editor defined by your \verb"$EDITOR" shell variable on a
+template file.
+(If you do not have the shell variable \verb"$EDITOR" set,
+then you will be prompted for the name of an editor to use.)
+Edit the template file accordingly and then exit the editor.
+You will be asked if you want to update your entry with the new template.
+If so,
+the white pages will be informed of the changes.
+
+It is a good idea to take a look at your entry after editing it.
+To simplify type-in,
+there is a special option to the \verb"whois" command which directs it to
+display the entry for you:
+\begin{quote}\small\begin{verbatim}
+fred> whois !me
+\end{verbatim}
+\end{quote}
+which isn't great grammar, but gets the job done.
+
+Appendix~\ref{person:attributes} on page~\pageref{person:attributes} lists the
+syntax and semantics of the attributes that you may have in your entry.

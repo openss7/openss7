@@ -1,0 +1,28 @@
+\File{grindB\-1.c},{15:37},{Mar  5 1990}
+\L{\LB{\K{\#include} \<isode\/rosap.h\>}}
+\L{\LB{\K{\#include} \<isode\/isoservent.h\>}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{register} \K{struct} SSAPaddr *sa;}}
+\L{\LB{\K{struct} RoSAPaddr roas;}}
+\L{\LB{\K{register} \K{struct} RoSAPaddr *roa = \&roas;}}
+\L{\LB{\K{register} \K{struct} isoservent *is;}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{if}\K{if} ((is = getisoserventbyname (\S{}\"directory\"\SE{}, \S{}\"rosap\"\SE{})) == NULL)}}
+\L{\LB{    error (\S{}\"rosap\/directory\"\SE{});}}
+\L{\LB{}}
+\L{\LB{\C{}\/* RemoteHost is the host we\'re interested in,}}
+\L{\LB{   e.g., ``gremlin.nrtc.northrop.com\'\' *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{roa \-\> roa\_port = is \-\> is\_port;}}
+\L{\LB{\Proc{if}\K{if} ((is = getisoserventbyname (\S{}\"ros\"\SE{}, \S{}\"ssap\"\SE{})) == NULL)}}
+\L{\LB{    error (\S{}\"ssap\/ros\"\SE{});}}
+\L{\LB{\Proc{if}\K{if} ((sa = is2saddr (RemoteHost, NULLCP, (\K{struct} isoservent *) is))}}
+\L{\LB{}\Tab{8}{== NULLSA)}}
+\L{\LB{    error (\S{}\"address translation failed\"\SE{});}}
+\L{\LB{roa \-\> roa\_addr = *sa;}}
+\L{\LB{}}
+\L{\LB{...}}

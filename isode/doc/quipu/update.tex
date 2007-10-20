@@ -1,0 +1,152 @@
+\chapter {Replicating Updates}
+\label {des-first}
+\label {dist-update}
+
+
+\section {Basic Update Approach}
+\label {edb-ros}
+
+QUIPU 5.0 supports a simple automatic update
+mechanism.
+This allows for copying of Entry Data Blocks,
+but with a simple check to ensure that only new information is copied.
+Slave copies are obtained by use of a new remote operation.
+The argument to the operation is the name of the Entry, and the
+version number of the copy of the Entry Data Block held
+locally.
+A FULL copy of the Entry Data Block is returned if this version
+is out of date.
+In the DSA's entry, there is a list of Entry Data Blocks for which the DSA
+has master or slave copies, and the DSA which it gets updates from.
+For each Entry Data Block, there is the list of DSAs which pull the Entry
+Data Block, and for slave copies, which DSA the update should come from.
+It is assumed that this operation will be invoked sufficiently
+often for it to be acceptable to consider the slave data as
+``official''.
+For the type of usage being considered, this probably means several
+times per day.
+Within QUIPU, this operation will be added to a new protocol, which will
+also contain the DSP ASEs \footnote{In QUIPU 5.0, getEDB is implemented
+withing the DAP.}.
+The operation is specified in Figure~\ref{getedb-py}.
+
+\tagrind {getedb}{EDB Access Operation}{getedb-py}
+\clearpage
+
+Note that a DSA receiving a GetEDB operation, should check the associated
+EDBInfo, to ensure that the DSA in question is allowed to pull a copy of
+this EDB.
+
+The operation may be used to determine which version of the EDB is currently
+master.  This might be used when a query with dontUseCopy arrives, in order
+to determine whether slave information is accurate.  This would be a big
+performance win for search and list operations, due to potnetila reduction
+in information transferred.
+
+\section  {Reliable ROS}
+
+This mechanism will be implemented in QUIPU 6.0.
+
+
+Before we can explain the more sophisticated update approach, a new service
+is described.  This is
+{\em Reliable ROS}
+Reliable ROS has the following characteristics.
+
+\begin {itemize}
+\item The operation should be expected to succeed (errors will require human
+intervention, and so must be rare)
+\item  The operation may be applied to many systems (multicast)
+\end {itemize}
+
+The argument is defined in Figure~\ref{reliableros-py}
+
+\tagrind [hb]{reliableros}{Reliable ROS}{reliableros-py}
+
+This argument identifies a ROS operation argument.
+
+Reliable ROS is only applicable to operations where the result is not in
+doubt.   
+An operation is applied, and the result discarded.   
+Any error is assumed to be catastrophic, and should be flagged as an
+operator error.
+
+In the QUIPU Directory, Reliable ROS operations will be applied to one or
+more Entry Data Blocks, and the list is made explicit.
+If one or more of the version numbers is wrong, the update is assumed to
+have arrived out of sequence.
+It will therefore be backed off for a temporary period, so that it can
+be applied later when the missing update has been applied.
+After a certain period, catastrophic loss can be assumed, and operator
+intervention summoned.
+
+Reliable ROS is a multicast service.
+Thus it may be used to apply updates to multiple DSAs.
+This is achieved by basing it over the X.400 (1984 or 1988) P1 service 
+\cite{CCITT.MHS.84} \cite{CCITT.X411.84}.
+Every DSA has an associated O/R address, which is naturally managed by
+the QUIPU directory service.
+Local delivery complying to the previous paragraph must be supported.
+This goes beyond the basic X.400 services, as it implies UA ability to
+perform temporary rejects on the basis of content.
+This is straightforward to provide for a co-resident UA.
+Atomic submission of multiple updates is achieved in a straightforward
+manner, as this is a basic X.400 service.
+
+This approach may seem a little strange at first sight.
+However, building a reliable spooling system needed for update is a
+non-trivial exercise.
+It is preferable to utilise other exising systems which can
+already provide this service.
+Modularity is one of the major benefits of OSI.
+
+\section {Incremental Update}
+
+This aspect will be implemented in QUIPU 6.0.
+
+The QUIPU update mechanism is fully general, except that modifyRDN cannot
+be applied to non-leaf entries.  This is because of the difficulty with 
+controlling references in other DSAs.
+That is, all the the OSI Directory restrictions, except the one mentioned, are
+lifted.
+To achieve the effect of modifyRDN, the new tree must be created (as a copy of the
+old one), and then the old one deleted.
+The modfyRDN restriction means that all updates apply to a single Entry Data
+Block.
+
+In basic terms, the update operation is now straightforward.  Navigation to
+the correct DSA occurs as for the QUIPU Name Service.  The only distinction
+is that the Master DSA must be selected, rather than picking a convenient
+copy.  The Master DSA will hold a copy of the Entry Data Block in memory.
+The validity of the update in terms of the Directory Standards and Access
+Control can be checked.  The DSA will then use Reliable ROS to submit this
+update to all of the entries which access it by GetEntryDataBlock.  That is,
+the same distribution hierarchy is used for both forms of update.  Each
+update will include the DSA generating the update (i.e. itself), and thus
+avoid the problems of immediate disk synchronisation.  
+The Message Handling System deals with the reliable multicast.
+
+\section {Subtree Update}
+
+Currently, all EDBs must be dealt with explictly.  It seems useful to extend
+the current model to allow propogation of full subtrees.  This is
+particularly true where an EDB has a relatively small child EDB.   
+This will be added in QUIPU 6.0.
+
+\section {Spot Shadowing}
+
+This mechanism will be implemented in QUIPU 6.0.
+
+The basic QUIPU model assumes that sibling entries are held together.  This
+has been extended to allow for cross references and subordinate references.
+These will lead to skeleton entries, which are pointers to other DSAs (which
+will not be QUIPU).  It seems desirable to automatically pull copies of such
+entries in order to giver reasonable performance for searching.  The
+mechanism of ``spot shadowing'' will be used.  As there is no mechanism for
+supporting this properly, copies of the entry will simply be read across at
+reasonable intervals.  This is likely to be needed only for the first two
+levels of the tree.  Note that only one QUIPU DSA need perform this for a
+given spot shadow.  This can then be propagated to other QUIPU DSAs using
+the superior private mechanisms.
+
+This approach can also be viewed as a system maintained cache.

@@ -1,0 +1,44 @@
+\File{xacl.py},{17:20},{Feb 12 1991}
+\L{\LB{}}
+\L{\LB{\Proc{ACLInfo}ACLInfo ::= \K{SET} \K{OF} \K{SEQUENCE} \{}}
+\L{\LB{        AccessSelector,}}
+\L{\LB{        AccessCategories \}}}
+\L{\LB{}}
+\L{\LB{\Proc{AccessCategories}AccessCategories ::= \K{ENUMERATED} \{}}
+\L{\LB{        none (0),       }}
+\L{\LB{        detect (1),}}
+\L{\LB{        compare (2),}}
+\L{\LB{        read (3),}}
+\L{\LB{        add (4),}}
+\L{\LB{        write (5) \}}}
+\L{\LB{}}
+\L{\LB{\Proc{AccessSelector}AccessSelector ::= \K{CHOICE} \{}}
+\L{\LB{        entry [0] \K{NULL},}}
+\L{\LB{                \C{}\-\- DUA identified by the entry}}
+\CE{}\L{\LB{        other [2] \K{NULL},}}
+\L{\LB{                \C{}\-\- This indicates ``public\'\' rights}}
+\CE{}\L{\LB{        prefix [3] NameList,}}
+\L{\LB{                \C{}\-\- This identifies a prefix name for specified DUAs}}
+\CE{}\L{\LB{                \C{}\-\- e.g., anyone in the UK}}
+\CE{}\L{\LB{        group [4] NameList}}
+\L{\LB{                \C{}\-\- For specifying group rights}}
+\CE{}\L{\LB{        \}}}
+\L{\LB{}}
+\L{\LB{\Proc{NameList}NameList ::= \K{SET} \K{OF} DistinguishedName   }}
+\L{\LB{}}
+\L{\LB{\Proc{ACLSyntax}ACLSyntax ::= \K{SEQUENCE} \{ }}
+\L{\LB{    childACL            [0] ACLInfo \K{DEFAULT} \{\{other, read\}\},}}
+\L{\LB{    entryACL            [1] ACLInfo \K{DEFAULT} \{\{other, read\}\},}}
+\L{\LB{    defaultAttributeACL [2] ACLInfo \K{DEFAULT} \{\{other, read\}\},}}
+\L{\LB{    [3] \K{SET} \K{OF} AttributeACL \}}}
+\L{\LB{                                \C{}\-\- Defaults to a publicly readable}}
+\CE{}\L{\LB{                                \C{}\-\- read only directory}}
+\CE{}\L{\LB{    }}
+\L{\LB{\Proc{AttributeACL}AttributeACL ::= \K{SEQUENCE} \{}}
+\L{\LB{    \K{SET} \K{OF} AttributeType,}}
+\L{\LB{    ACLInfo \}    }}
+\L{\LB{}}
+\L{\LB{ACL \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} ACLSyntax}}
+\L{\LB{    \K{SINGLE} \K{VALUE}}}
+\L{\LB{}}

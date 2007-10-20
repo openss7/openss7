@@ -1,0 +1,700 @@
+.\" smux.rf - SNMP MUX definitions
+.ie \nh \{\
+.ll 66 
+.po 2 \}
+.el \{\
+.ll 62 
+.pl 58
+.nr sf R
+.nr fm 0 \}
+.he 'draft'SMUX'May 1991'
+.fo 'M.T. Rose''[Page %]'
+.de $0
+.(x t
+\\$2 \\$1
+.)x
+..
+.lp
+.na
+.nh
+.ce
+\fBSNMP MUX Protocol and MIB\fR
+.sp 1
+.ce
+Tue May 21 10:30:14 1991
+.sp 3
+.ce 3
+Marshall T. Rose
+Performance Systems International, Inc.
+mrose@psi.com
+.sp 3
+
+.sh 1 "Status of this Memo"
+.lp
+This document defines a mechanism by which multiple UNIX daemons
+may communicate with the local SNMP agent on a host.
+This is a local mechanism.
+
+.bp
+.sh 1 "Introduction"
+.lp
+On kernel/user systems such as BSD UNIX,
+an agent speaking the SNMP [1] is often implemented as a user-process,
+which reads kernel variables in order to realize the Internet-standard
+MIB [2].
+This approach works fine as long as all of the information needed by
+the SNMP agent resides in either the kernel or in stable storage
+(i.e., files).
+However,
+when other user-processes are employed to implement other network
+services,
+such as routing protocols,
+communication between the SNMP agent the and other processes is problematic.
+.lp
+In order to solve this problem,
+a new protocol,
+the SNMP multiplexing (SMUX) protocol is introduced.
+When a user-process,
+termed a SMUX peer,
+wishes to export a MIB module,
+it initiates a SMUX association to the local SNMP agent,
+registers itself, and (later) fields management operations for objects
+in the MIB module.
+.lp
+Carrying this approach to its fullest,
+it is possible to generalize the SNMP agent so that it knows about
+only the SNMP group of the Internet-standard MIB.
+All other portions of the Internet-standard MIB can be implemented by
+another process.
+This is quite useful, for example, when a computer manufacturer wishes
+to provide SNMP access for its operating system in binary form.
+.lp
+In addition to defining the SMUX protocol,
+this document defines a MIB for the SMUX.
+Obviously,
+this MIB module must also be implemented in the local SNMP agent.
+
+.bp
+.sh 1 "Architecture"
+.lp
+There are two approaches that can be taken when trying to integrate
+arbitrary MIB modules with the SNMP agent: request-response and cache-ahead.
+.lp
+The request-response model simply propagates the SNMP requests
+received by the SNMP agent to the user process which exported the MIB
+module.
+The SMUX peer then performs the operation and returns a response.
+In turn,
+the SNMP agent propagates this response back to the network management station.
+The request-response model is said to be agent-driven since,
+after registration,
+the SNMP agent initiates all transactions.
+.lp
+The cache-ahead model requires that the SMUX peer,
+after registration,
+periodically updates the SNMP agent with the subtree for the MIB module
+which has been registered.
+The SNMP agent, upon receiving an SNMP request for information retrieval,
+locally performs the operation,
+and returns a response to the network management station.
+(SNMP set requests are given immediately to the SMUX peer).
+The cache-ahead model is said to be peer-driven since,
+after registration,
+the SMUX peer initiates all transactions.
+.lp
+There are advantages and disadvantages to both approaches.
+As such,
+the architecture envisioned supports both models in the following
+fashion:
+the protocol between the SNMP agent and the SMUX peer is based on the
+request-response model.
+However,
+the SMUX peer,
+may itself be a user-process which employs the cache-ahead model with
+other user-processes.
+.lp
+Obviously,
+the SMUX peer which employs the cache-ahead model acts as a \*(lqfirewall\*(rq
+for those user-processes which actually implement the managed objects
+in the given MIB module.
+.lp
+Note that this document describes only the SMUX protocol,
+for the request-response model.
+Each SMUX peer is free to define a cache-ahead protocol specific for
+the application at hand.
+
+.bp
+.sh 1 "Protocol"
+.lp
+The SMUX protocol is simple:
+the SNMP agent listens for incoming connections.
+Upon establishing a connection,
+the SMUX peer issues an OpenPDU to initialize the SMUX association.
+If the SNMP agent declines the association,
+it issues a closePDU and closes the connection.
+If the SNMP agent accepts the association,
+no response is issued by the SNMP agent.
+.lp
+For each subtree defined in a MIB module that the SMUX peer wishes to
+register (or unregister),
+the SMUX peer issues a RReqPDU.
+When the SNMP agent receives such a PDU,
+it issues a corresponding RRspPDU.
+The SNMP agent returns RRspPDUs in the same order as the RReqPDUs were
+received.
+.lp
+When the SMUX peer wishes to issue a trap,
+it issues an SNMP Trap-PDU.
+When the SNMP agent receives such a PDU,
+it propagates this to the network management stations that it is
+configured to send traps to.
+.lp
+When the SNMP agent receives an SNMP GetRequest-PDU,
+GetNextRequest-PDU, or SetRequest-PDU which includes one or more
+variable-bindings within a subtree registered by a SMUX peer,
+the SNMP agent sends an equivalent SNMP PDU containing only those
+variables within the subtree registered by that SMUX peer.
+When the SMUX peer receives such a PDU,
+it applies the indicated operation and issues a corresponding SNMP
+GetResponse-PDU.
+The SNMP agent then correlates this result and propagates the
+resulting GetResponse-PDU to the network management station.
+.lp
+When either the SNMP agent or the SMUX peer wishes to release the SMUX
+association,
+the ClosePDU is issued,
+the connection is closed,
+and all subtree registrations for that association are released.
+
+.sh 2 "Tricky Things"
+.lp
+Although straight-forward, there are a few nuances.
+
+.sh 3 "Registration"
+.lp
+Associated with each registration is an integer priority,
+from 0 to (2^31)-1.
+The lower the value,
+the higher the priority.
+.lp
+Multiple SMUX peers may register the same subtree.
+However,
+they must do so at different priorities
+(i.e., a subtree and a priority uniquely identifies a SMUX peer).
+As such,
+if a SMUX peer wishes to register a subtree at a priority which is
+already taken,
+the SNMP agent repeatedly increments the integer value until an unused
+priority is found.
+.lp
+When registering a subtree,
+the special priority -1 may be used,
+which selects the highest available priority.
+.lp
+Of course,
+the SNMP agent may select an arbitrarily worse priority for a SMUX
+peer,
+based on local (configuration)  information.
+.lp
+Note that when a subtree is registered,
+the SMUX peer with the highest registration priority is exclusively
+consulted for all operations on that subtree.
+Further note that SNMP agents must enforce the
+\*(lqsubtree mounting effect\*(rq,
+which hides the registrations by other SMUX peers of objects within
+the subtree.
+For example,
+if a SMUX peer registered \*(lqsysDescr\*(rq,
+and later another SMUX peer registered \*(lqsystem\*(rq
+(which scopes \*(lqsysDescr\*(rq),
+then all requests for \*(lqsysDescr\*(rq would be given to the latter
+SMUX peer.
+.lp
+An SNMP agent should disallow any attempt to register above, at, or below,
+the SNMP and SMUX subtrees of the MIB.
+Other subtrees may be disallowed as an implementation-specific option.
+
+.sh 3 "Removing Registration"
+.lp
+A SMUX peer may remove registrations for only those subtrees which it
+has registered.
+If the priority given in the RReq-PDU is -1,
+then the registration of highest priority is selected for deletion.
+Otherwise, only that registration with the precise priority
+is selected.
+
+.sh 3 "Atomic Sets"
+.lp
+A simple two-phase commit protocol is used between the SNMP agent and
+the SMUX peers.
+When an SNMP SetRequest-PDU is received,
+the SNMP agent determines which SMUX peers will participate in the transaction.
+For each of these peers,
+at least one SNMP SetRequest-PDU is sent,
+with only those variables of interest to that peer.
+.lp
+Each SMUX peer must either accept or refuse the set operation,
+without actually performing the operation.
+If the peer opts to accept,
+it sends back an SNMP GetResponse-PDU with an error-status of \fInoError(0)\fR;
+otherwise,
+if the peer refuses to perform the operation,
+then an SNMP GetResponse-PDU is returned with a non-zero error-status.
+.lp
+The SNMP agent examines all of the responses.
+If at least one SMUX peer refused the operation,
+then a SMUX SOutPDU is sent to each SMUX peer,
+with value \fIrollback\fR,
+telling the SMUX peer to discard any knowledge of the requested
+operation.
+.lp
+Otherwise if all SMUX peers accepted the operation,
+then a SMUX SOutPDU is sent to each SMUX peer,
+with value \fIcommit\fR,
+telling the SMUX peer to perform the operation.
+.lp
+In either case,
+the SMUX peer does not generate a response to the SMUX SOutPDU.
+
+.sh 3 "Variables in Requests"
+.lp
+When constructing an SNMP GetRequest-PDU or GetNextRequest-PDU
+for a SMUX peer,
+the SNMP agent may send one, or more than one variable in a single request.
+In all cases,
+the SNMP agent should process each variable sequentially,
+and block accordingly when a SMUX peer is contacted.
+
+.sh 3 "Request-ID"
+.lp
+When the SNMP agent constructs an SNMP GetRequest-PDU,
+GetNextRequest-PDU, or SetRequest-PDU, for a SMUX peer,
+the \fIrequest_id\fR field of the SNMP takes a special meaning:
+if an SNMP agent generates multiple PDUs for a SMUX peer,
+upon receipt of a single PDU from the network management station,
+then the \fIrequest_id\fR field of the PDUs sent to the SMUX peer
+must take the same value
+(which need bear no relationship to the value of the \fIrequest_id\fR
+field of the PDU originally received by the SNMP agent.)
+
+.sh 3 "The powerful get-next operator"
+.lp
+Each SMUX peer acts as though it contains the entire MIB when
+processing a SNMP GetNext-PDU from the SNMP agent.
+This means that the SNMP agent must check each variable returned
+in the SNMP GetResponse-PDU generated by the SMUX peer to ensure 
+that each variable is still within the same registered subtree as caused 
+the SNMP GetNext-PDU to be sent to that peer.  For each variable
+which is not, the SNMP agent must include it in a SNMP GetNext-PDU to the 
+peer for the succeeding registered subtree, until responses are
+available for all variables within their expected registered subtree.
+
+.sh 2 "Protocol Data Units"
+.lp
+The SMUX protocol data units are defined using Abstract Syntax
+Notation One (ASN.1) [3]:
+.sp
+.in +.5i
+.nf
+SMUX DEFINITIONS ::= BEGIN
+
+IMPORTS
+	DisplayString, ObjectName
+		FROM RFC1155-SMI
+
+	PDUs
+		FROM RFC1157-SNMP;
+
+
+-- tags for SMUX-specific PDUs are application-wide to
+-- avoid conflict with tags for current (and future)
+-- SNMP-generic PDUs
+
+SMUX-PDUs ::=
+    CHOICE {
+	open		-- SMUX peer uses
+	    OpenPDU,	-- immediately after TCP open
+
+	close		-- either uses immediately before TCP close
+	    ClosePDU,
+
+	registerRequest	-- SMUX peer uses
+	    RReqPDU,
+
+	registerResponse -- SNMP agent uses
+	    RRspPDU,
+
+	    PDUs,	-- note that roles are reversed:
+			--   SNMP agent does get/get-next/set
+			--   SMUX peer does get-response/trap
+
+        commitOrRollback -- SNMP agent uses
+	    SOutPDU
+    }
+
+
+-- open PDU
+-- currently only simple authentication
+
+OpenPDU ::=
+    CHOICE {
+	simple
+	    SimpleOpen
+    }
+
+SimpleOpen ::=
+    [APPLICATION 0] IMPLICIT
+	SEQUENCE {
+	    version	-- of SMUX protocol
+		INTEGER {
+		    version-1(0)
+		},
+
+	    identity	-- of SMUX peer, authoritative
+		OBJECT IDENTIFIER,
+
+	    description	-- of SMUX peer, implementation-specific
+		DisplayString,
+
+	    password	-- zero length indicates no authentication
+		OCTET STRING
+	}
+
+
+-- close PDU
+
+ClosePDU ::=
+    [APPLICATION 1] IMPLICIT
+	INTEGER {
+	    goingDown(0), 
+	    unsupportedVersion(1),
+	    packetFormat(2),
+	    protocolError(3),
+	    internalError(4),
+	    authenticationFailure(5)
+	}
+
+
+-- insert PDU
+
+RReqPDU ::=
+    [APPLICATION 2] IMPLICIT
+	SEQUENCE {
+	    subtree
+		ObjectName,
+
+	    priority	-- the lower the better, "-1" means default
+		INTEGER (-1..2147483647),
+
+	    operation
+		INTEGER {
+		    delete(0),    -- remove registration
+		    readOnly(1),  -- add registration, objects are RO
+		    readWrite(2)  --   .., objects are RW
+		}
+	}
+
+RRspPDU ::=
+    [APPLICATION 3] IMPLICIT
+	INTEGER {
+	    failure(-1)
+
+	    -- on success the non-negative priority is returned
+	}
+
+SOutPDU ::=
+    [APPLICATION 4] IMPLICIT
+	INTEGER {
+	    commit(0),
+	    rollback(1)
+	}
+
+END
+.fi
+.in -.5i
+.sp
+
+.sh 2 "Mappings on Transport Service"
+.lp
+The SMUX protocol may be mapped onto any CO-mode transport service.
+At present,
+only one such mapping is defined.
+
+.sh 3 "Mapping onto the TCP"
+.lp
+When using the TCP to provide the transport-backing for the SMUX
+protocol,
+the SNMP agent listens on TCP port 199.
+.lp
+Each SMUX PDU is serialized using the Basic Encoding Rules [4] and
+sent on the TCP.
+As ASN.1 objects are self-delimiting when encoding using the BER,
+no packetization protocol is required.
+
+.bp
+.sh 1 "MIB for the SMUX"
+.lp
+The MIB objects for the SMUX are implemented by the local SNMP agent:
+.sp
+.nf
+SMUX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC1212;
+
+unix    OBJECT IDENTIFIER ::= { enterprises 4 }
+
+smux	OBJECT IDENTIFIER ::= { unix 4 }
+
+smuxPeerTable	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SmuxPeerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+.fi
+.in +1.25i
+"The SMUX peer table."
+.in -1.25i
+.nf
+	::= { smux 1 }
+
+smuxPeerEntry	OBJECT-TYPE
+	SYNTAX	SmuxPeerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+.fi
+.in +1.25i
+"An entry in the SMUX peer table."
+.in -1.25i
+.nf
+  	INDEX	{ smuxPindex }
+	::= { smuxPeerTable 1}
+
+SmuxPeerEntry ::=
+    SEQUENCE {
+	smuxPindex
+	    INTEGER,
+	smuxPidentity
+	    OBJECT IDENTIFIER,
+	smuxPdescription
+	    DisplayString,
+	smuxPstatus
+	    INTEGER
+    }
+
+smuxPindex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+.fi
+.in +1.25i
+"An index which uniquely identifies a SMUX peer."
+.in -1.25i
+.nf
+	::= { smuxPeerEntry 1 }
+
+smuxPidentity	OBJECT-TYPE
+	SYNTAX	OBJECT IDENTIFIER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+.fi
+.in +1.25i
+"The authoritative designation for a SMUX peer."
+.in -1.25i
+.nf
+	::= { smuxPeerEntry 2 }
+
+smuxPdescription OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (0..255))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+.fi
+.in +1.25i
+"A human-readable description of a SMUX peer."
+.in -1.25i
+.nf
+	::= { smuxPeerEntry 3 }
+
+smuxPstatus	OBJECT-TYPE
+	SYNTAX	INTEGER { valid(1), invalid(2), connecting(3) }
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+.fi
+.in +1.25i
+"The type of SMUX peer.
+
+Setting this object to the value invalid(2) has the effect of
+invaliding the corresponding entry in the smuxPeerTable.
+It is an implementation-specific matter as to whether the agent
+removes an invalidated entry from the table.
+Accordingly, management stations must be prepared to receive tabular
+information from agents that correspond to entries not currently in use.
+Proper interpretation of such entries requires examination of the
+relative smuxPstatus object."
+.in -1.25i
+.nf
+	::= { smuxPeerEntry 4 }
+
+smuxTreeTable	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SmuxTreeEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+.fi
+.in +1.25i
+"The SMUX tree table."
+.in -1.25i
+.nf
+	::= { smux 2 }
+
+smuxTreeEntry	OBJECT-TYPE
+	SYNTAX	SmuxTreeEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+.fi
+.in +1.25i
+"An entry in the SMUX tree table."
+.in -1.25i
+.nf
+  	INDEX	{ smuxTsubtree, smuxTpriority }
+	::= { smuxTreeTable 1}
+
+SmuxTreeEntry ::=
+    SEQUENCE {
+	smuxTsubtree
+	    OBJECT IDENTIFIER,
+	smuxTpriority
+	    INTEGER,
+	smuxTindex
+	    INTEGER,
+	smuxTstatus
+	    INTEGER
+    }
+
+smuxTsubtree	OBJECT-TYPE
+	SYNTAX	OBJECT IDENTIFIER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+.fi
+.in +1.25i
+"The MIB subtree being exported by a SMUX peer."
+.in -1.25i
+.nf
+	::= { smuxTreeEntry 1 }
+
+smuxTpriority OBJECT-TYPE
+	SYNTAX	INTEGER (0..'07fffffff'h)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+.fi
+.in +1.25i
+"The SMUX peer's priority when exporting the MIB subtree."
+.in -1.25i
+.nf
+	::= { smuxTreeEntry 2 }
+
+smuxTindex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+.fi
+.in +1.25i
+"The SMUX peer's identity."
+.in -1.25i
+.nf
+	::= { smuxTreeEntry 3 }
+
+smuxTstatus	OBJECT-TYPE
+	SYNTAX	INTEGER { valid(1), invalid(2) }
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+.fi
+.in +1.25i
+"The type of SMUX tree.
+
+Setting this object to the value invalid(2) has the effect of
+invaliding the corresponding entry in the smuxTreeTable.
+It is an implementation-specific matter as to whether the agent
+removes an invalidated entry from the table.
+Accordingly, management stations must be prepared to receive tabular
+information from agents that correspond to entries not currently in use.
+Proper interpretation of such entries requires examination of the
+relative smuxTstatus object."
+.in -1.25i
+.nf
+	::= { smuxTreeEntry 4 }
+
+END
+.fi
+
+.bp
+.sh 1 "Acknowledgements"
+.lp
+SMUX was designed one afternoon by these people:
+.sp
+.in +.5i
+.nf
+Jeffrey S. Case, UTK-CS
+James R. Davin, MIT-LCS
+Mark S. Fedor, PSI
+Jeffrey C. Honig, Cornell
+Louie A. Mamakos, UMD
+Michael G. Petry, UMD
+Yakov Rekhter, IBM
+Marshall T. Rose, PSI
+.fi
+.in -.5i
+.sp
+
+.bp
+.sh 1 "References"
+.ip [1]
+J.D.\0Case, M.S.\0Fedor, M.L.\0Schoffstall, and J.R.\0Davin,
+\fISimple Network Management Protocol\fR,
+Internet Working Group Request for Comments 1157.
+Network Information Center, SRI International, Menlo Park, California,
+(May, 1990).
+.ip [2]
+K.\0McCloghrie and M.T.\0Rose,
+\fIManagement Information Base for Network Management of TCP/IP-based
+internets\fR,
+Internet Working Group Request for Comments 1156.
+Network Information Center, SRI International, Menlo Park, California,
+(May, 1990).
+.ip [3]
+\fIInformation processing systems \(em Open Systems Interconnection \(em
+Specification of Abstract Syntax Notation One (ASN.1)\fP, International
+Organization for Standardization.  International Standard 8824,
+(December, 1987).
+.ip [4]
+\fIInformation processing systems \(em Open Systems Interconnection \(em
+Specification of Basic Encoding Rules for Abstract Notation
+One (ASN.1)\fP, International Organization for Standardization.
+International Standard 8825,
+(December, 1987).
+.ip [5]
+M.T.\0Rose and K.\0McCloghrie,
+\fIStructure and Identification of Management Information for
+TCP/IP\-based internets\fR,
+Internet Working Group Request for Comments 1155.
+Network Information Center, SRI International, Menlo Park, California,
+(May, 1990).
+
+.bp
+.lp
+\fBTable of Contents\fR
+.sp 2
+.xp t

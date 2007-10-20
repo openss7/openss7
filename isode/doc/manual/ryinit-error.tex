@@ -1,0 +1,125 @@
+\File{ryinit\-error.c},{22:23},{Jun 12 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{ros\_adios (rop, event)}}
+\L{\LB{\K{register} \K{struct} RoSAPpreject *rop;}}
+\L{\LB{\K{char}   *event;}}
+\L{\LB{\{}}
+\L{\LB{    ros\_advise (rop, event);}}
+\L{\LB{}}
+\L{\LB{    \_exit (1);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{ros\_advise (rop, event)}}
+\L{\LB{\K{register} \K{struct} RoSAPpreject *rop;}}
+\L{\LB{\K{char}   *event;}}
+\L{\LB{\{}}
+\L{\LB{    \K{char}    buffer[BUFSIZ];}}
+\L{\LB{}}
+\L{\LB{    \K{if} (rop \-\> rop\_cc \> 0)}}
+\L{\LB{}\Tab{8}{(\K{void}) sprintf (buffer, \S{}\"[\%s] \%*.*s\"\SE{}, RoErrString (rop \-\> rop\_reason),}}
+\L{\LB{}\Tab{16}{rop \-\> rop\_cc, rop \-\> rop\_cc, rop \-\> rop\_data);}}
+\L{\LB{    \K{else}}}
+\L{\LB{}\Tab{8}{(\K{void}) sprintf (buffer, \S{}\"[\%s]\"\SE{}, RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}}
+\L{\LB{    advise (NULLCP, \S{}\"\%s: \%s\"\SE{}, event, buffer);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{acs\_adios (aca, event)}}
+\L{\LB{\K{register} \K{struct} AcSAPabort *aca;}}
+\L{\LB{\K{char}   *event;}}
+\L{\LB{\{}}
+\L{\LB{    acs\_advise (aca, event);}}
+\L{\LB{}}
+\L{\LB{    \_exit (1);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{acs\_advise (aca, event)}}
+\L{\LB{\K{register} \K{struct} AcSAPabort *aca;}}
+\L{\LB{\K{char}   *event;}}
+\L{\LB{\{}}
+\L{\LB{    \K{char}    buffer[BUFSIZ];}}
+\L{\LB{}}
+\L{\LB{    \K{if} (aca \-\> aca\_cc \> 0)}}
+\L{\LB{}\Tab{8}{(\K{void}) sprintf (buffer, \S{}\"[\%s] \%*.*s\"\SE{},}}
+\L{\LB{}\Tab{16}{AcErrString (aca \-\> aca\_reason),}}
+\L{\LB{}\Tab{16}{aca \-\> aca\_cc, aca \-\> aca\_cc, aca \-\> aca\_data);}}
+\L{\LB{    \K{else}}}
+\L{\LB{}\Tab{8}{(\K{void}) sprintf (buffer, \S{}\"[\%s]\"\SE{}, AcErrString (aca \-\> aca\_reason));}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{advise (NULLCP, \S{}\"\%s: \%s (source \%d)\"\SE{}, event, buffer,}}
+\L{\LB{}\Tab{16}{aca \-\> aca\_source);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{\#ifndef}}\Tab{8}{lint}}
+\L{\LB{\K{void}}\Tab{8}{\_advise ();}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{adios (va\_alist)}}
+\L{\LB{va\_dcl}}
+\L{\LB{\{}}
+\L{\LB{    va\_list ap;}}
+\L{\LB{}}
+\L{\LB{    va\_start (ap);}}
+\L{\LB{}}
+\L{\LB{    \_advise (ap);}}
+\L{\LB{}}
+\L{\LB{    va\_end (ap);}}
+\L{\LB{}}
+\L{\LB{    \_exit (1);}}
+\L{\LB{\}}}
+\L{\LB{\K{\#else}}}
+\L{\LB{\C{}\/* VARARGS *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{adios (what, fmt)}}
+\L{\LB{\K{char}   *what,}}
+\L{\LB{       *fmt;}}
+\L{\LB{\{}}
+\L{\LB{    adios (what, fmt);}}
+\L{\LB{\}}}
+\L{\LB{\K{\#endif}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{\#ifndef}}\Tab{8}{lint}}
+\L{\LB{\K{void}}\Tab{8}{advise (va\_alist)}}
+\L{\LB{va\_dcl}}
+\L{\LB{\{}}
+\L{\LB{    va\_list ap;}}
+\L{\LB{}}
+\L{\LB{    va\_start (ap);}}
+\L{\LB{}}
+\L{\LB{    \_advise (ap);}}
+\L{\LB{}}
+\L{\LB{    va\_end (ap);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{void}  \_advise (ap)}}
+\L{\LB{va\_list}\Tab{8}{ap;}}
+\L{\LB{\{}}
+\L{\LB{    \K{char}    buffer[BUFSIZ];}}
+\L{\LB{}}
+\L{\LB{    asprintf (buffer, ap);}}
+\L{\LB{}}
+\L{\LB{    (\K{void}) fflush (stdout);}}
+\L{\LB{}}
+\L{\LB{    fprintf (stderr, \S{}\"\%s: \"\SE{}, myname);}}
+\L{\LB{    (\K{void}) fputs (buffer, stderr);}}
+\L{\LB{    (\K{void}) fputc (\S{}\'\!n\'\SE{}, stderr);}}
+\L{\LB{}}
+\L{\LB{    (\K{void}) fflush (stderr);}}
+\L{\LB{\}}}
+\L{\LB{\K{\#else}}}
+\L{\LB{\C{}\/* VARARGS *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{advise (what, fmt)}}
+\L{\LB{\K{char}   *what,}}
+\L{\LB{       *fmt;}}
+\L{\LB{\{}}
+\L{\LB{    advise (what, fmt);}}
+\L{\LB{\}}}
+\L{\LB{\K{\#endif}}}

@@ -1,0 +1,357 @@
+\indexentry{\LaTeX {}}{iv}
+\indexentry{tar}{xi}
+\indexentry{tar}{xii}
+\indexentry{tar}{xiii}
+\indexentry{tar}{xiii}
+\indexentry{tar}{xiv}
+\indexentry{tar}{xiv}
+\indexentry{\LaTeX {}}{xiv}
+\indexentry{tar}{xiv}
+\indexentry{tar}{xiv}
+\indexentry{Moore, Christopher W.}{xvi}
+\indexentry{Cass, Dwight E.}{xvi}
+\indexentry{Romine, John L.}{xvi}
+\indexentry{Willson, Stephen H.}{xvi}
+\indexentry{librosap{}}{xvi}
+\indexentry{Michaelson, George}{xvi}
+\indexentry{Kille, Stephen E.}{xvi}
+\indexentry{pepy{}}{xvii}
+\indexentry{libpsap{}}{xvii}
+\indexentry{librosap{}}{xvii}
+\indexentry{Walton, Simon}{xvii}
+\indexentry{Kille, Stephen E.}{xvii}
+\indexentry{Robbins, Colin J.}{xvii}
+\indexentry{Turland, Alan}{xvii}
+\indexentry{Titcombe, Steve}{xvii}
+\indexentry{Roe, Mike}{xvii}
+\indexentry{EEC}{xvii}
+\indexentry{ESPRIT}{xvii}
+\indexentry{Onions, Julian}{xvii}
+\indexentry{pepy{}}{xvii}
+\indexentry{Easterbrook, Stephen}{xvii}
+\indexentry{posy{}}{xvii}
+\indexentry{Pavel, John}{xvii}
+\indexentry{Cowin, Godfrey}{xvii}
+\indexentry{pepy{}}{xvii}
+\indexentry{Ruttle, Keith}{xvii}
+\indexentry{Worsley, Andrew}{xviii}
+\indexentry{pepy}{xviii}
+\indexentry{posy}{xviii}
+\indexentry{pepsy}{xviii}
+\indexentry{Dubous, Olivier}{xviii}
+\indexentry{Finni, Olli}{xviii}
+\indexentry{Horton, Mark R.}{xviii}
+\indexentry{Lavender, Greg}{xviii}
+\indexentry{Miller, Steve D.}{xviii}
+\indexentry{Taylor, Jem}{xviii}
+\indexentry{Braun, Hans-Werner}{xviii}
+\indexentry{NIST}{xviii}
+\indexentry{NBS}{xviii}
+\indexentry{Scott, John A.}{xviii}
+\indexentry{Jelfs, Philip B.}{xix}
+\indexentry{Wilder, Rick}{xix}
+\indexentry{Chirieleison, Don}{xix}
+\indexentry{Rekhter, Jacob}{xix}
+\indexentry{Aziz, Ashar}{xix}
+\indexentry{Vanderbilt, Peter}{xix}
+\indexentry{Prafullchandra, Hemma}{xix}
+\indexentry{Srinivasan, Raj}{xix}
+\indexentry{Weller, Daniel}{xix}
+\indexentry{Nordmark, Erik}{xix}
+\indexentry{Brezak, John}{xix}
+\indexentry{Preuss, Don}{xix}
+\indexentry{Jacobsen, Ole-Jorgen}{xix}
+\indexentry{Horvath, Nandor}{xix}
+\indexentry{Pavlou, George}{xix}
+\indexentry{Knight, Graham}{xix}
+\indexentry{libtsap{}}{xix}
+\indexentry{Hein\"{a}nen, Juha}{xix}
+\indexentry{Keogh, Paul}{xix}
+\indexentry{Wenzel, Oliver}{xix}
+\indexentry{McLoughlin, L.}{xix}
+\indexentry{Jordan, Kevin E.}{xix}
+\indexentry{Reinart, John A.}{xx}
+\indexentry{Pring, Ed}{xx}
+\indexentry{Betzler, Uli}{xx}
+\indexentry{Young, Alan}{xx}
+\indexentry{Gosling, James}{xx}
+\indexentry{Lamport, Leslie}{xx}
+\indexentry{\LaTeX {}}{xx}
+\indexentry{U.C.~Berkeley}{xx}
+\indexentry{Rose, Marshall T.}{xx}
+\indexentry{make}{5}
+\indexentry{make}{5}
+\indexentry{make}{5}
+\indexentry{make}{5}
+\indexentry{make}{5}
+\indexentry{make}{5}
+\indexentry{make}{5}
+\indexentry{libacsap{}}{7}
+\indexentry{librosap{}}{7}
+\indexentry{librtsap{}}{7}
+\indexentry{libpsap{}}{7}
+\indexentry{libpsap2{}}{7}
+\indexentry{libssap{}}{7}
+\indexentry{libtsap{}}{8}
+\indexentry{libpsap2{}}{8}
+\indexentry{libpsap2-lpp{}}{8}
+\indexentry{rosy{}}{8}
+\indexentry{posy{}}{8}
+\indexentry{pepy{}}{9}
+\indexentry{pepsy{}}{9}
+\indexentry{pepy}{9}
+\indexentry{posy}{9}
+\indexentry{librosy{}}{9}
+\indexentry{quipu{}}{9}
+\indexentry{dish{}}{9}
+\indexentry{libdsap{}}{9}
+\indexentry{libpsap{}}{9}
+\indexentry{pepsy}{10}
+\indexentry{pepy}{10}
+\indexentry{posy}{10}
+\indexentry{dsabuild}{10}
+\indexentry{aetbuild}{10}
+\indexentry{lint{}}{10}
+\indexentry{libpsap2{}}{15}
+\indexentry{libpsap2{}}{15}
+\indexentry{PSAPaddr}{16}
+\indexentry{isoentities{}}{16}
+\indexentry{is2paddr}{16}
+\indexentry{PLocalHostName}{18}
+\indexentry{tsapd{}}{19}
+\indexentry{tsapd}{19}
+\indexentry{PInit}{19}
+\indexentry{PSAPstart}{20}
+\indexentry{malloc{}}{21}
+\indexentry{PSFREE}{21}
+\indexentry{libpsap2{}}{21}
+\indexentry{addr2ref}{22}
+\indexentry{sprintref}{22}
+\indexentry{PSAPctxlist}{22}
+\indexentry{PSAPindication}{23}
+\indexentry{PSAPabort}{24}
+\indexentry{malloc{}}{24}
+\indexentry{PAFREE}{24}
+\indexentry{PConnResponse}{27}
+\indexentry{PConnRequest}{28}
+\indexentry{PSAPconnect}{30}
+\indexentry{malloc{}}{32}
+\indexentry{PCFREE}{32}
+\indexentry{PAsynConnRequest}{32}
+\indexentry{PAsynRetryRequest}{33}
+\indexentry{libpsap2{}}{34}
+\indexentry{PC\_FATAL}{34}
+\indexentry{PC\_OFFICIAL}{34}
+\indexentry{libpsap2{}}{34}
+\indexentry{libssap{}}{34}
+\indexentry{PXFREE}{35}
+\indexentry{PTFREE}{35}
+\indexentry{PNFREE}{35}
+\indexentry{PVFREE}{35}
+\indexentry{PPFREE}{35}
+\indexentry{PFFREE}{35}
+\indexentry{PRFREE}{35}
+\indexentry{PAFREE}{35}
+\indexentry{PErrString}{35}
+\indexentry{libpsap2{}}{36}
+\indexentry{lppd{}}{40}
+\indexentry{libssap{}}{41}
+\indexentry{libssap{}}{41}
+\indexentry{SSAPaddr}{42}
+\indexentry{isoentities{}}{42}
+\indexentry{is2saddr}{42}
+\indexentry{SLocalHostName}{44}
+\indexentry{saddr2str}{44}
+\indexentry{str2saddr}{44}
+\indexentry{dotokens}{48}
+\indexentry{dotoken}{48}
+\indexentry{tsapd{}}{49}
+\indexentry{tsapd}{49}
+\indexentry{SInit}{49}
+\indexentry{SSAPstart}{51}
+\indexentry{SSAPref}{52}
+\indexentry{SSAPindication}{53}
+\indexentry{SSAPabort}{53}
+\indexentry{SConnResponse}{54}
+\indexentry{SConnRequest}{57}
+\indexentry{SSAPconnect}{58}
+\indexentry{SAsynConnRequest}{60}
+\indexentry{libssap{}}{61}
+\indexentry{SAsynRetryRequest}{61}
+\indexentry{libssap{}}{61}
+\indexentry{SC\_FATAL}{62}
+\indexentry{SC\_OFFICIAL}{62}
+\indexentry{SDataRequest}{62}
+\indexentry{SExpdRequest}{63}
+\indexentry{STypedRequest}{63}
+\indexentry{SCapdRequest}{64}
+\indexentry{SCapdResponse}{64}
+\indexentry{SWriteRequest}{65}
+\indexentry{SReadRequest}{65}
+\indexentry{libssap{}}{66}
+\indexentry{SSAPdata}{66}
+\indexentry{malloc{}}{67}
+\indexentry{SXFREE}{67}
+\indexentry{libssap{}}{67}
+\indexentry{SSAPtoken}{68}
+\indexentry{SSAPsync}{69}
+\indexentry{SSAPactivity}{71}
+\indexentry{SSAPreport}{72}
+\indexentry{SSAPfinish}{74}
+\indexentry{SGTokenRequest}{74}
+\indexentry{SGControlRequest}{75}
+\indexentry{SPTokenRequest}{75}
+\indexentry{SMajSyncRequest}{76}
+\indexentry{SMajSyncResponse}{77}
+\indexentry{SMinSyncRequest}{77}
+\indexentry{SMinSyncResponse}{78}
+\indexentry{SReSyncRequest}{79}
+\indexentry{SReSyncResponse}{80}
+\indexentry{SActStartRequest}{81}
+\indexentry{SSAPref}{81}
+\indexentry{SActResumeRequest}{82}
+\indexentry{SActIntrRequest}{83}
+\indexentry{SActIntrResponse}{83}
+\indexentry{SActDiscRequest}{84}
+\indexentry{SActDiscResponse}{84}
+\indexentry{SActEndRequest}{85}
+\indexentry{SActEndResponse}{85}
+\indexentry{SUReportRequest}{86}
+\indexentry{SUAbortRequest}{87}
+\indexentry{SSetIndications}{87}
+\indexentry{malloc{}}{89}
+\indexentry{libssap{}}{91}
+\indexentry{SSelectMask}{91}
+\indexentry{SRelRequest}{92}
+\indexentry{SSAPrelease}{93}
+\indexentry{SRelRetryRequest}{93}
+\indexentry{SRelResponse}{94}
+\indexentry{libssap{}}{95}
+\indexentry{libssap{}}{95}
+\indexentry{tsapd{}}{96}
+\indexentry{tsapd{}}{96}
+\indexentry{SErrString}{96}
+\indexentry{libssap{}}{96}
+\indexentry{libtsap{}}{101}
+\indexentry{libtsap{}}{101}
+\indexentry{TSAPaddr}{102}
+\indexentry{isoentities{}}{102}
+\indexentry{is2taddr}{102}
+\indexentry{TLocalHostName}{102}
+\indexentry{taddr2str}{104}
+\indexentry{str2taddr}{104}
+\indexentry{TGetAddresses}{104}
+\indexentry{tsapd{}}{106}
+\indexentry{tsapd}{106}
+\indexentry{TInit}{106}
+\indexentry{TSAPstart}{107}
+\indexentry{TSAPdisconnect}{108}
+\indexentry{TConnResponse}{108}
+\indexentry{TDiscRequest}{110}
+\indexentry{TConnRequest}{111}
+\indexentry{TSAPconnect}{111}
+\indexentry{TAsynConnRequest}{112}
+\indexentry{libtsap{}}{113}
+\indexentry{TAsynRetryRequest}{113}
+\indexentry{libtsap{}}{115}
+\indexentry{DR\_FATAL}{115}
+\indexentry{DR\_OFFICIAL}{115}
+\indexentry{TDataRequest}{116}
+\indexentry{TWriteRequest}{116}
+\indexentry{udvec}{116}
+\indexentry{TExpdRequest}{117}
+\indexentry{TReadRequest}{118}
+\indexentry{TSAPdata}{118}
+\indexentry{qbuf}{118}
+\indexentry{malloc{}}{119}
+\indexentry{TXFREE}{119}
+\indexentry{libtsap{}}{119}
+\indexentry{TSetIndications}{120}
+\indexentry{malloc{}}{121}
+\indexentry{libtsap{}}{121}
+\indexentry{TSelectMask}{121}
+\indexentry{TSelectOctets}{122}
+\indexentry{TDiscRequest}{123}
+\indexentry{execve{}}{123}
+\indexentry{libtsap{}}{123}
+\indexentry{TSaveState}{123}
+\indexentry{execve{}}{123}
+\indexentry{TRestoreState}{124}
+\indexentry{NSAPaddr}{125}
+\indexentry{na2norm}{127}
+\indexentry{na2str}{127}
+\indexentry{QOStype}{128}
+\indexentry{libtsap{}}{129}
+\indexentry{libtsap{}}{129}
+\indexentry{TNetListen}{129}
+\indexentry{TNetUnique}{129}
+\indexentry{TNetAccept}{130}
+\indexentry{TNetAcceptAux}{131}
+\indexentry{TNetClose}{132}
+\indexentry{TSetQueuesOK}{132}
+\indexentry{TErrString}{133}
+\indexentry{libtsap{}}{133}
+\indexentry{isoservices{}}{133}
+\indexentry{libicompat{}}{136}
+\indexentry{execve{}}{142}
+\indexentry{libicompat{}}{142}
+\indexentry{isoservent}{142}
+\indexentry{execve{}}{142}
+\indexentry{getisoservent}{143}
+\indexentry{setisoservent}{143}
+\indexentry{endisoservent}{143}
+\indexentry{getisoserventbyname}{143}
+\indexentry{getisoserventbyselector}{144}
+\indexentry{getisoserventbyport}{144}
+\indexentry{libicompat{}}{147}
+\indexentry{libtsap{}}{147}
+\indexentry{libssap{}}{147}
+\indexentry{libpsap{}}{147}
+\indexentry{libpsap2{}}{147}
+\indexentry{libacsap{}}{147}
+\indexentry{librtsap{}}{147}
+\indexentry{librosap{}}{147}
+\indexentry{libicompat{}}{148}
+\indexentry{libtsap{}}{148}
+\indexentry{libssap{}}{148}
+\indexentry{libpsap{}}{148}
+\indexentry{libpsap2{}}{148}
+\indexentry{libacsap{}}{148}
+\indexentry{librtsap{}}{148}
+\indexentry{librosap{}}{148}
+\indexentry{getpid{}}{148}
+\indexentry{isodetailor}{154}
+\indexentry{isodesetailor}{154}
+\indexentry{isodesetvar}{154}
+\indexentry{isodexport}{155}
+\indexentry{isodefile}{155}
+\indexentry{\_isodefile}{155}
+\indexentry{LLog}{156}
+\indexentry{syslog{}}{158}
+\indexentry{syslog{}}{158}
+\indexentry{ll\_open}{158}
+\indexentry{ll\_close}{159}
+\indexentry{ll\_hdinit}{159}
+\indexentry{ll\_dbinit}{160}
+\indexentry{ll\_log}{160}
+\indexentry{printf{}}{160}
+\indexentry{\_ll\_log}{161}
+\indexentry{varargs{}}{161}
+\indexentry{ll\_printf}{161}
+\indexentry{printf{}}{161}
+\indexentry{ll\_sync}{161}
+\indexentry{SLOG}{162}
+\indexentry{printf{}}{162}
+\indexentry{LLOG}{162}
+\indexentry{DLOG}{162}
+\indexentry{pepy{}}{162}
+\indexentry{PLOG}{163}
+\indexentry{printf{}}{163}
+\indexentry{ll\_preset}{163}
+\indexentry{ll\_check}{163}
+\indexentry{isotailor{}}{167}
+\indexentry{isomacros{}}{170}
+\indexentry{isotailor{}}{170}
+\indexentry{isomacros{}}{171}
+\indexentry{isotailor{}}{171}
+\indexentry{\LaTeX {}}{179}

@@ -1,0 +1,32 @@
+\tt
+.PS 6.5i
+boxwid = 4*boxwid/3
+## figure D-5
+B1:	box invis "root"
+B2:	box with .n at (B1.s.x, B1.s.y-lineht) "c=US"
+	line from B2.n to B1.s
+##
+B3:	box with .ne at (B2.se.x-linewid*5, B2.se.y-lineht) "o=O\_1"
+B4:	box with .nw at (B2.sw.x+linewid*5, B2.sw.y-lineht) "o=O\_n"
+	line from B3.n to (B2.s.x-boxwid/6, B2.s.y)
+	line from B4.n to (B2.s.x+boxwid/6, B2.s.y)
+	move to ((B3.e.x+B4.w.x)/2, B3.e.y); "$\ldots$"
+##
+B6:	box with .ne at (B3.se.x-linewid*2, B3.se.y-lineht) "ou=U\_1"
+B7:	box with .nw at (B3.sw.x+linewid*2, B3.sw.y-lineht) "ou=U\_p"
+	line from B6.n to (B3.s.x-boxwid/6, B3.s.y)
+	line from B7.n to (B3.s.x+boxwid/6, B3.s.y)
+	move to ((B6.e.x+B7.w.x)/2, B6.e.y); "$\ldots$"
+##
+B8:	box with .ne at (B4.se.x-linewid*2, B4.se.y-lineht) "ou=U\_1"
+B9:	box with .nw at (B4.sw.x+linewid*2, B4.sw.y-lineht) "ou=U\_q"
+	line from B8.n to (B4.s.x-boxwid/6, B4.s.y)
+	line from B9.n to (B4.s.x+boxwid/6, B4.s.y)
+	move to ((B8.e.x+B9.w.x)/2, B8.e.y); "$\ldots$"
+##
+B11:	box "$\ldots$" invis with .n at (B6.n.x-linewid, B2.n.y)
+	line from B11.n to (B1.s.x-boxwid/6, B1.s.y)
+B12:	box "$\ldots$" invis with .n at (B9.n.x+linewid, B2.n.y)
+	line from B12.n to (B1.s.x+boxwid/6, B1.s.y)
+##
+.PE

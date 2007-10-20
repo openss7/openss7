@@ -1,0 +1,25 @@
+.PS
+.ps 20
+## figure 1
+E1:	box invis "ANSI" 
+E2:	box invis "ISO/IEC" at (E1.c.x + 1.5i, E1.c.y + 1.5i)
+E3:	box invis "NIST" at (E2.c.x + 1.5i, E2.c.y - 1.5i)
+E4:	box invis "IMPLEMENTORS" at (E3.c.x - 1.5i, E3.c.y - 1.5i)
+##
+M1:	move to (E2.c.x, E1.c.y)
+##
+.ps 30
+A1:	arc -> cw from E1.ne to E2.sw rad (M1.x - E1.ne.x)
+A2:	arc -> cw from E2.se to E3.nw rad (M1.x - E1.ne.x)
+A3:	arc -> cw from E3.sw to E4.ne rad (M1.x - E1.ne.x)
+.ps 20
+
+#E2:	arc from E1.n to E1.s at M1 rad E1.x - M1.x \
+#				"Directory" "User"
+#M2:	move
+#M3:	move
+#E3:	ellipse height 2i width 3i "The" "Directory"
+##
+#L1:     line -> cw from E1.e to E3.w
+##
+.PE

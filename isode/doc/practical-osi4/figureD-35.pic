@@ -1,0 +1,39 @@
+\tt
+.PS 7.0i
+.ps 20
+boxwid = 4*boxwid/3
+##
+define subtree @
+	line from $1.s \
+	     to   ($1.s.x-boxwid, $1.s.y-3*boxht)
+	line from ($1.s.x-boxwid, $1.s.y-3*boxht) \
+	     to   ($1.s.x+boxwid, $1.s.y-3*boxht)
+	line from ($1.s.x+boxwid, $1.s.y-3*boxht) \
+	     to $1.s
+	move to ($1.s.x, $1.s.y-boxht*2); "$\cdots$"
+@
+## figure D-23
+B1:	box invis "root"
+B2:	box with .n at (B1.s.x, B1.s.y-lineht) "c=XX"
+	line from B2.n to B1.s
+##
+B3:	box with .ne at (B2.se.x-linewid*5, B2.se.y-lineht) "o=O$_1$"
+B4:	box with .nw at (B2.sw.x+linewid*5, B2.sw.y-lineht) "o=O$_n$"
+	line from B3.n to (B2.s.x-boxwid/6, B2.s.y)
+	line from B4.n to (B2.s.x+boxwid/6, B2.s.y)
+##
+	subtree(B3)
+	subtree(B4)
+##
+E2:	ellipse dashed with .c at B2.c width 2*boxwid height 3*boxht/2
+E3:	ellipse dashed with .n at (B3.n.x, B3.n.y+lineht/2) \
+		width 5*boxwid/2 height 13*boxht/2
+E4:	ellipse dashed with .n at (B4.n.x, B4.n.y+lineht/2) \
+		width 5*boxwid/2 height 14*boxht/2
+##
+B5:	box invis with .n at ((B3.e.x+B4.w.x)/2, B3.e.y) "naming contexts"
+	arrow from B5.n to E2.s
+	arrow from B5.sw to E3.e
+	arrow from B5.se to E4.w
+##
+.PE

@@ -1,0 +1,242 @@
+% run this through SLiTeX
+
+\documentstyle[blackandwhite,landscape,oval,pagenumbers,plain,small]{NRslides}
+
+\input trademark 
+
+\raggedright
+
+\begin{document}
+
+\title	{OSI PROTOCOLS WITHIN AN\\
+	OPENLY AVAILABLE\\ POSIX CONFORMANT\\ BERKELEY UNIX ENVIRONMENT}
+\author	{Marshall T.~Rose\\The Wollongong Group}
+\date	{December 4, 1987}
+\maketitlepage
+
+
+\begin{note}\em
+if i've left out any 
+\begin{quote}
+buzzwords\\
+jargon\\
+marketing hype\\
+\end{quote}
+please let me know and i'll add them!
+
+also, henceforth ``users'' means ``u.s.~govt. users''
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{STANDARD DISCLAIMER}
+
+\begin{nrtc}
+\item	THE VIEW PRESENTED HERE ARE NOT NECESSARILY THOSE OF:
+\begin{quote}
+DoD, MITRE, NBS, TWG, U.C.~BERKELEY, UCL, THE U.S.~GOVT,
+OR ANY OTHER ACRONYM, AGENCY, OR ORGANIZATION
+\end{quote}
+
+\item	I APPOLOGIZE ONLY TO THOSE TO WHOM I HAVE UNINTENTIONALLY OFFENDED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FUNDAMENTAL PREMISES:\\ NETWORKING}
+
+\begin{nrtc}
+\item	OSI/ISO WILL DOMINATE COMPUTER COMMUNICATIONS
+
+\item	THE U.S. GOVERNMENT OSI PROFILE (GOSIP) WILL BE THE INITIAL SET OF
+	GUIDELINES FOR PROCUREMENT OF OSI FOR USERS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GOSIP}
+
+\begin{nrtc}
+\item	A (SOON-TO-BE) FEDERAL INFORMATION PROCESSING STANDARD
+
+\item	PROPOSED TO ENABLE USERS TO SPECIFY AND PROCURE
+	\begin{nrtc}
+	\item	INTEROPERABLE
+
+	\item	MULTI-VENDOR
+
+	\item	OFF-THE-SHELF
+	\end{nrtc}
+	COMPUTER COMMUNICATIONS PRODUCTS
+
+\item	THE \dod/:
+    \begin{nrtc}
+    \item	IS ADOPTING GOSIP AS A CO-STANDARD WITH TCP/IP
+
+    \item	INTENDS (IN APPROX.~TWO YEARS) TO SPECIFY GOSIP AS THE 
+		\underbar{ONLY} STANDARD FOR NON-PROPRIETARY, INTEROPERABLE
+		COMPUTER COMMUNICATIONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FUNDAMENTAL PREMISES:\\ OPERATING SYSTEMS}
+
+\begin{nrtc}
+\item	THE \unix/ FAMILY WILL DOMINATE OPERATING SYSTEMS
+
+\item	THE EMERGING IEEE \unix/-BASED PORTABLE OPERATING SYSTEM (POSIX)
+	STANDARD WILL BE THE BASELINE FOR THESE SYSTEMS
+
+\item	ANOTHER FIPS IS UNDER DEVELOPMENT TO BE THE INITIAL SET OF
+	GUIDELINES FOR PROCUREMENT OF OPERATING SYSTEMS FOR USERS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{POSIX}
+
+\begin{nrtc}
+\item	CURRENTLY POSIX SPECIFIES ONLY THE \unix/ KERNEL INTERFACE
+    \begin{nrtc}
+    \item	INFLUENCED MOSTLY BY AT\&T \unix/ (SVID) WITH SOME BERKELEY
+		ENHANCEMENTS
+    \end{nrtc}
+
+\item	WORK IS UNDERWAY ON A SHELL AND TOOLS STANDARD
+
+\item	THE LACK OF A STANDARD INTERFACE FOR NETWORKING IS NOTABLY MISSING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A MODEST OBSERVATION}
+
+\begin{nrtc}
+\item	THE WIDESPREAD USE OF TCP/IP WAS DRAMATICALLY ACCELERATED BY INCLUDING
+	THIS PROTOCOL SUITE IN BERKELEY \unix/
+
+\item	QUESTIONS:
+    \begin{nrtc}
+    \item	CAN WE PUT THE OSI PROTOCOLS IN BERKELEY \unix/?
+
+    \item	CAN WE MAKE BERKELEY \unix/ POSIX COMPLIANT?
+
+    \item	CAN WE EXTEND POSIX TO DEFINE AN INTERFACE TO NETWORK SERVICES?
+
+    \item	CAN WE MAKE THE WORK OPENLY AVAILABLE AND HAVE IT READY FOR
+		4.4\bsd/~\unix/?
+    \end{nrtc}
+
+\item	ANSWER: YES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXPLANATION}
+
+\begin{nrtc}
+\item	A LARGE NUMBER OF THE PIECES ARE ALREADY OPENLY AVAILABLE
+
+\item	SO, THE WORK CONSISTS MAINLY OF:
+    \begin{nrtc}
+    \item	FILLING IN THE GAPS
+
+    \item	INTEGRATING THE COMPONENTS
+
+    \item	TESTING THE SYSTEM (INTEROPERABILITY AND CONFORMANCE)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH:\\ OSI PROTOCOLS}
+
+\begin{nrtc}
+\item	AN IMPLEMENTATION OF THE OSI UPPER-LAYERS (ISODE) IS ALREADY AVAILABLE
+
+\item	OTHER ORGANIZATIONS HAVE ALSO DEVELOPED OR ARE PLANNING TO DEVELOP:
+    \begin{nrtc}
+    \item	THE LOWER LAYERS
+
+    \item	SOME OSI APPLICATIONS
+    \end{nrtc}
+
+\item	MOST STANDARDS HAVE PROGRESSED FROM DRAFT (DIS) TO FINAL (IS) STATUS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\diagram[p]{figure1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\diagram[p]{figure2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE WORK PLAN}
+
+\begin{nrtc}
+\item	UPGRADE ISODE AND OTHER OSI APPLICATIONS TO FINAL (IS) STATUS
+
+\item	INTEGRATE OTHER OSI APPLICATIONS INTO ISODE
+
+\item	PERFORM INTEROPERABILITY TESTING ON OSInet
+
+\item	PERFORM CONFORMANCE TESTING WITH COS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH:\\ POSIX COMPLIANCE}
+
+\begin{nrtc}
+\item	MINOR WORK TO MODIFY THE BERKELEY \unix/ KERNEL TO SUPPORT THE POSIX
+	STANDARD
+
+\item	PERFORM CONFORMANCE TESTING WITH NBS
+
+\item	ISODE AND OSI APPLICATIONS WILL BE CONVERTED TO USE THE POSIX
+	INTERFACE AS APPLICABLE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH:\\ NETWORK SERVICE EXTENSIONS}
+
+\begin{nrtc}
+\item	U.C.~BERKELEY (AND FRIENDS) WILL DEFINE A NETWORK SERVICE INTERFACE
+
+\item	THIS DOCUMENT WILL BE SUBMITTED AS A DRAFT PROPOSAL TO THE POSIX
+	COMMITTEE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SCHEDULE}
+
+\begin{nrtc}
+\item	WOULD YOU BELIEVE 18~MONTHS?
+
+\item	ACTUALLY 120~MAN-MONTHS%
+	\footnote{You may have read Brooks' {\em The Mythical Man-Month}.}
+\end{nrtc}
+\end{bwslide}
+
+
+\end{document}
