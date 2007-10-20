@@ -1,0 +1,3 @@
+: run this script through /bin/sh
+: HULA - first copy desired makefile such as Makeadd to Makefile
+exec /bin/make TOPDIR=../ -f ../config/CONFIG.make -f Makefile ${1+"$@"}

@@ -1,0 +1,2 @@
+: run this script through /bin/sh
+exec /bin/make MODULE=acusap TOPDIR=../ -f ../config/CONFIG.make -f Makefile ${1+"$@"}

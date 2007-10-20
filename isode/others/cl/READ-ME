@@ -1,0 +1,39 @@
+This directory contains a Connectionless version of ISODE.  
+
+*** It does not compile ***
+
+It is put here as a place marker.  The work is based on ISODE-4.0, so
+will need some development to get it working with this version of
+ISODE.  However the changes should not be that drastic.
+
+If anybody is interested in doing any work to integrate this, please
+lets us know (bug-isode@xtel.co.uk). 
+If nobody is interested it will be droped from future releases.
+
+
+------------- ORIGINAL README FOLLOWS ------------------
+This directory tree archives an implementation of ISODECL - Iso
+Development Environment ConnectionLess - built from the connection
+oriented ISODE as part of the High Performance Upper Layers (HULA)
+project.
+
+ISODECL supports ROS over a UNIT-DATA protocol stack and uses UDP as a
+network provider for the connectionless ISO transport layer.
+
+ISODECL is not completely independent of ISODE.  It links in the ISODE
+librarieslibrosy.a and libisode.a to get code common to both.  This
+includes directories rosy, pepy, compat, psap and util.
+
+ISODECL directories rousap, acusap, pusap2, susap, and tusap, under
+root directory isodecl, replace ISODE directories rosap, acsap, psap2,
+ssap, and tsapunder root directory isode-4.0.  Directory hulatest
+contains client/server boilerplate and 2 test services and replaces
+ISODE directory imisc.  Directory hholds include files for both ISODE
+and ISODECL.
+
+See ISODE file isode-4.0/READ-ME for the details of making ISODE for
+the machinetype, setting up files config/CONFIG.make and h/config.h.
+These files control the switches used in building the libraries by
+executing "./make here in root directory isodecl.  The code archived
+here was built on Wang PC 380s running under Microport UNIX with
+Excelan cards and used switches SYS5, TCP and EXOS.

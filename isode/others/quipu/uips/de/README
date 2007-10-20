@@ -1,0 +1,57 @@
+The COSINE/PARADISE DUA.  
+------------------------
+
+Use 
+
+    ./make all
+
+to compile the DUA.  
+
+Before installing you might want to configure the local terminal type
+information to match your system.  To do this run
+    
+    ./make termhelp
+
+(NOTE: This may not be portable to some System 5 machines).
+
+You should now edit the detailor file in this directory.  The full
+list of tailor options is described in the manual.  This just
+describes a couple of important ones.
+
+You will probably set this one:
+    
+    dsa_address:   THE ADDRESS OF YOUR DSA.
+
+Optionally, you might include a second dsa_address line, containing
+the address of a backup DSA.
+
+Your are VERY STRONGLY encouraged to set the username.  This is the name
+with which the interface binds to the directory.  Don't forget to
+create an entry in the directory as appropriate:
+
+    username:@c=GB@o=University College London@cn=Public Access Dua
+
+You'll probably want to configure these for your local organisation:
+
+    default_country: GB
+    default_org: University College London
+
+The rest of the settings will probably be OK to start with.  See
+the manual for a full discussion of all the tailoring options.
+
+
+Finally to install, use
+
+    ./make inst-all
+
+To run the interface type
+
+    de
+
+At the ":-" prompt type "?" to read the online help.
+
+
+Please send any comments to
+
+    helpdesk@paradise.ulcc.ac.uk
+

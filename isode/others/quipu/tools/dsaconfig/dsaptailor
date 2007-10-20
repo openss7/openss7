@@ -1,0 +1,65 @@
+###############################################################################
+#
+# dsaptailor - ISODE DSAP Specific Tailoring File
+#
+# 	for PSI White Pages Pilot Project
+#
+# 
+# $Header: /xtel/isode/isode/others/quipu/tools/dsaconfig/RCS/dsaptailor,v 9.0 1992/06/16 12:43:56 isode Rel $
+#
+#
+# $Log: dsaptailor,v $
+# Revision 9.0  1992/06/16  12:43:56  isode
+# Release 8.0
+#
+# Revision 8.4  1992/04/03  08:19:23  isode
+# sync
+#
+# Revision 8.3  1992/02/26  13:40:39  isode
+# rel7_2
+#
+# Revision 8.2  1992/02/05  10:03:41  isode
+# "Release
+#
+# Revision 8.1  1992/02/04  11:33:35  isode
+# update
+#
+# Revision 8.0  91/07/17  13:16:59  isode
+# Release 7.0
+# 
+# 
+###############################################################################
+
+
+# this line must occur first
+oidtable	oidtable
+
+# the ``closest'' level-2 DSA
+#dsa_address "wildlife name"	'0101'H/Internet=aaa.bbb.ccc.ddd+portno
+
+# the level-1 DSA
+#dsa_address "@(dsa)"	'0101'H/Internet=@(ipaddr)+@(port)
+
+# logging
+dsaplog		level=exceptions dflags=tty
+stats		level=none dflags=tty
+
+# local DIT position (where a DUA starts in the DIT)
+#local_DIT	"c=@(country)@o=@(organization)"
+
+# oid format
+oidformat	short
+
+# photograph process routines
+photo		dumb	ttyphoto
+photo		xterm	Xphoto
+
+# automatic quipurc creation
+quipurc		off
+
+# DUA search/list sizelimit
+sizelimit	20
+
+
+# some other DSAs of interest (added automatically)
+

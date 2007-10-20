@@ -1,0 +1,20 @@
+cn= @(dsa)
+objectclass= top & applicationEntity & dSA & quipuDSA & quipuObject
+cn= @(dsa)
+presentationaddress= '0101'H/TELEX+00728722+RFC-1006+03+@(ipaddr)+@(port)
+supportedApplicationContext= X500DSP & X500DAP & InternetDSP & quipuDSP
+userPassword= @(wildlife)
+info= @(firstname) @(lastname) (@(persphone)) <@(mailbox)>
+manager= c=US@cn=Manager
+manager= @(dnprefix)@cn=Manager
+acl= group # @(dnprefix)@cn=Manager # write # entry
+acl= group # @(dnprefix)@cn=Manager # write # default
+acl= others # read # entry
+acl= others # read # default
+eDBinfo= # @(parentdsa) #
+eDBinfo= c=@(country) # @(parentdsa) #
+eDBinfo= c=@(country)@st=@(state) # @(parentdsa) #
+eDBinfo= @(dnprefix) # #
+eDBinfo= @(dnprefix)@ou=@(unit) # #
+quipuVersion= @(quipuversion)
+

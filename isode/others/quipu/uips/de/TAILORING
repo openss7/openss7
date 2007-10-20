@@ -1,0 +1,530 @@
+
+
+
+
+
+
+
+
+
+
+
+       Tailoring the directory user interface DE
+
+                      Paul Barker
+            Department of Computer Science
+
+               University College London
+                    United Kingdom
+
+                     March 3, 1992
+
+
+
+1  Introduction
+
+DE (which stands for Directory Enquiries) is a
+directory user interface primarily intended to serve as
+a public access user interface.  It is a successor to,
+and borrows something of the style of, the dsc
+interface released in a previous version.  It is
+primarily aimed at the novice user, although more
+sophisticated users should find that it is flexible
+enough to answer the majority of queries they wish to
+pose.
+DE has more features than those discussed below.
+However, the program has extensive on-line help as it
+is envisaged that it will often be used in environments
+where neither on-line help nor paper documentation will
+be available.
+
+
+2  Using DE
+
+2.1  Starting up
+
+DE will work quite happily without any knowledge of the
+user's terminal type, assuming a screen size of 80 x 24
+in the absence of terminal type information.  If,
+however, the user's terminal type is not recognised by
+the system, the user will be prompted to try and enter
+an alternative.  The user can examine a list of valid
+
+                           1
+
+
+
+
+
+
+
+terminal types; typing <CR> accepts a terminal type of
+``dumb''.
+It is possible to configure DE to force confirmation of
+screen lengths of greater than 24 lines -- this helps
+with WAN access as some virtual terminal protocols do
+not propagate the screen size.
+
+2.2  Searching for a Person
+
+The interface prompts the user for input with the
+following four questions:
+
+    Person's name, q to quit, * to list people, ? for help
+    :- barker
+    Dept name, * to list depts, <CR> to search all depts, ? for help
+    :- cs
+    Organisation name, <CR> to search `ucl', * to list orgs, ? for help
+    :-
+    Country name, <CR> to search `gb', * to list countries, ? for help
+    :-
+
+Note from the above example that it is possible to
+configure the interface so that local values are
+defaulted:  RETURN accepts ``ucl'' for organisation,
+and ``gb'' for country.  The above query returns a
+single result which is displayed thus:
+
+    United Kingdom
+      University College London
+        Computer Science
+          Paul Barker
+            telephoneNumber       +44 71-380-7366
+            electronic mail       P.Barker@cs.ucl.ac.uk
+            favouriteDrink        guinness
+                                  16 year old lagavulin
+            roomNumber            G21
+
+
+If several results are found for a single query, the
+user is asked to select one from the entries matched.
+For example, searching for ``jones'' in ``physics'' at
+``UCL'' in ``GB'' produces the following output:
+
+    United Kingdom
+
+                           2
+
+
+
+
+
+
+
+      University College London
+
+    Got the following approximate matches.  Please select one from the
+    list by typing the number corresponding to the entry you want.
+
+        1 Faculty of Mathematical and Physical Sciences
+        2 Medical Physics and Bio-Engineering
+        3 Physics and Astronomy
+        4 Psychiatry
+        5 Psychology
+
+Selecting ``Physics and Astronomy'' by simply typing
+the number 3, the search continues, and the following
+is displayed:
+
+    United Kingdom
+      University College London
+        Physics and Astronomy
+
+    Got the following approximate matches.  Please select one from the
+    list by typing the number corresponding to the entry you want.
+
+         1 C L Jones     +44 71-380-7139
+         2 G O Jones     +44 71-387-7050 x3468  geraint.jones@ucl.ac.uk
+         3 P S Jones     +44 71-387-7050 x3483
+         4 T W Jones     +44 71-380-7150
+
+In this condensed format, telephone and email
+information is displayed.
+
+2.3  Searching for other information
+
+Information for organisations can be found by
+specifying null entries for the person and department.
+Information for departments can be found by specifying
+null input for the person field.
+Information about rooms and roles can be found as well
+as for people by, for example, entering ``secretary''
+in the person's name field.
+
+
+
+
+
+
+                           3
+
+
+
+
+
+
+
+2.4  Interrupting
+
+If the user wishes to abandon a query or correct the
+input of a query (maybe the user has mis-typed a name),
+control-C resets the interface so that it is waiting
+for a fresh query.  Typing ``q'' at prompts other than
+the person prompt results in the user being asked to
+confirm if they wish to quit.  If the user replys
+``n'', the interface resets as if control-C had been
+pressed.
+
+2.5  Quitting
+
+Type ``q'' (or optionally ``quit'' --- see below) at
+the prompt for a person's name.  Type ``q'' at other
+prompts, and the user is asked to confirm if they wish
+to quit.  If the use replys ``n'', the interface resets
+to allow a query to be entered afresh.
+
+3  Configuration of DE
+
+As DE is intended as a public access dua, it is only
+configurable on a system-wide basis.  DE installs help
+files and the detailor file into a directory called de/
+under ISODE's ETCDIR.
+
+
+3.1  Highly recommended options
+
+The detailor file contains a number of tailorable
+variables, of which the following are highly
+recommended:
+
+dsa_address: This is the address of the access point
+    DSA. If two or more dsa_address lines are given, the
+    first dsa_address is tried first, the second
+    dsa_address is tried if connecting to the first
+    address fails.  Third and subsequent dsa_address
+    entries are ignored.  If there is no dsa_address
+    entry in the detailor file, the first value in the
+    dsaptailor file is used.
+
+        dsa_address:Internet=128.16.6.8+17003
+        dsa_address:Internet=128.16.6.10+17003
+
+                           4
+
+
+
+
+
+
+
+username: This is the username with which the DUA binds
+    to the Directory.  It is not strictly mandatory,
+    but you are strongly encouraged to set this up.  It
+    will help you to see who is connecting to the DSA.
+
+        username:@c=GB@o=X-Tel Services Ltd@cn=Directory Enquiries
+
+3.2  Variables you will probably want to configure
+
+You will almost certainly want to set at least some of
+these to suit your local system:
+
+welcomeMessage: This is the welcoming banner message.
+    The default is ``Welcome to the Directory
+    Service''.
+
+
+        welcomeMessage:Welcome to DE
+
+byebyeMessage: This enables/disables the display of a
+    message on exiting DE. This variable takes the
+    values ``on'' and ``off''.  The message displayed
+    is the contents of the file debyebye, which should
+    be placed in the same directory as all DE's help
+    files.  The default is not to display an exit
+    message.
+
+        byebyeMessage:on
+
+default_country: This is the name of the country to
+    search by default:  e.g., ``GB''.
+
+        default_country:gb
+
+default_org: This is the name of the organisation to
+    search by default:  e.g., ``University College
+    London''
+
+
+        default_org:University College London
+
+default_dept: This is the name of the department
+    (organisational unit) to search by default:  e.g.,
+
+
+                           5
+
+
+
+
+
+
+
+    ``Computing''.  This will usually be null for
+    public access duas.
+
+        default_dept:
+
+3.3  Attribute tailoring
+
+The following configuration options all concern the
+display of attributes.  The settings in the detailor
+file will probably be OK initially.
+
+commonatt: These attributes are displayed whatever type
+    of object is being searched for, be it an
+    organisation, a department, or a person.
+
+
+        commonatt:telephoneNumber
+        commonatt:facsimileTelephoneNumber
+
+orgatt: These attributes are displayed (as well as the
+    common attributes --- see above) if an entry for an
+    organisation is displayed.
+
+        orgatt:telexNumber
+
+ouatt: These attributes are displayed (as well as the
+    common attributes --- see above) if an entry for an
+    organisational unit (department) is displayed.
+
+        ouatt:telexNumber
+
+prratt: These attributes are displayed (as well as the
+    common attributes --- see above) if an entry for a
+    person, room or role is displayed.
+
+
+        prratt:rfc822Mailbox
+        prratt:roomNumber
+
+mapattname: This attribute allows for meaningful
+    attribute names to be displayed to the user.  The
+    attribute names in the quipu oidtables may be
+    mapped onto more user-friendly names.  This allows
+    for language independence.
+
+                           6
+
+
+
+
+
+
+
+        mapattname:facsimileTelephoneNumber fax
+        mapattname:rfc822Mailbox electronic mail
+
+mapphone: This allows for the mapping of international
+    format phone numbers into a local format.  It is
+    thus possible to display local phone numbers as
+    extension numbers only and phone numbers in the
+    same country correctly prefixed and without the
+    country code.
+
+        mapphone:+44 71-380-:
+        mapphone:+44 71-387- 7050 x:
+        mapphone:+44 :0
+
+greybook: In the UK, big-endian domains are used in
+    mail names.  By setting this variable on, it is
+    possible to display email addresses in this order
+    rather than the default little-endian order.
+
+        greyBook:on
+
+country: This allows for the mapping of the 2 letter
+    ISO country codes (such as GB and FR) onto locally
+    meaningful strings such as, for english speakers,
+    Great Britain and France.
+
+        country:AU Australia
+        country:AT Austria
+        country:BE Belgium
+
+3.4  Miscellaneous tailoring
+
+There are a number of miscellaneous variables which may
+be set.
+
+
+maxPersons: If a lot of matches are found, DE will
+    display the matches in a short form, showing email
+    address and telephone number only.  Otherwise full
+    entry details are displayed.  This variable allows
+    the number of entries which will be displayed in
+    full to be set --- the default is 3.
+
+        maxPersons:2
+
+                           7
+
+
+
+
+
+
+
+inverseVideo: Prompts are by default shown in inverse
+    video.  Unset this variable to turn this off.
+
+        inverseVideo:on
+
+delogfile: Searches are by default are logged to the
+    file de.log in ISODEs LOGDIR. They can be directed
+    elsewhere by using this variable.
+
+        delogfile:/tmp/delogfile
+
+logLevel: The logging can be turned off.  It can also
+    be turned up to give details of which search
+    filters are being successful --- this will
+    hopefully allow some tuning of the interface.
+
+
+     o  Level 0 --- turns the logging off.
+
+     o  Level 1 (the default level) --- logs binds,
+        searches, unbinds
+
+     o  Level 2 --- gives level 1 logs, and logging
+        analysis of which filters have been successful
+        and which failed
+
+        logLevel:2
+
+remoteAlarmTime: A remote search is one where the
+    country and organisation name searched for not the
+    same as the defaults.  If the search has not
+    completed within a configurable number of seconds,
+    a message is displayed warning the user that all
+    may not be well.  The default setting is 30
+    seconds.  The search, however, continues until it
+    returns or is interrupted by the user.
+
+        remoteAlarmTime:30
+
+localAlarmTime: As for remoteAlarmTime, except for
+    local searches.  The default setting is 15 seconds.
+
+        localAlarmTime:15
+
+
+                           8
+
+
+
+
+
+
+
+quitChars: The number of characters of the word
+    ``quit'' which a user must type to exit.  The
+    default setting is 1 character.
+
+        quitChars:1
+
+allowControlCtoQuit: This enables or disables the
+    feature where a user may exit the program by typing
+    control-C at the prompt for a person's name.  The
+    default setting is on.
+
+        allowControlCtoQuit:on
+
+wanAccess: This enables the feature where a user is
+    asked to confirm that the size of their terminal is
+    really greater than 24 lines.  This helps with
+    telnet access if the screen size is not propagated.
+    The default setting is off.
+
+
+        wanAccess:on
+
+4  Dynamic tailoring
+
+It is possible for a user to modify some variables used
+by DE while running the program.  In particular, this
+allows a user to recover from a situation where the
+terminal emulation is not working correctly --- an
+apparently frequent occurrence!
+Dynamic tailoring of variables is offered by use of the
+SETTINGS help screen.  Typing ?settings at any prompt
+will display the current settings of dynamically
+alterable variables.  The user is then offered the
+opportunity of modifying the variables.  Variables
+which may currently be altered in this way are:
+
+termtype The user's terminal type, as set in the UNIX
+    ``TERM'' environment variable.
+
+invvideo Turn inverse video ``on'' (if the terminal
+    supports it) or ``off''
+
+cols Set the width of the screen to a number of columns
+
+
+                           9
+
+
+
+
+
+
+
+lines Set the length of the screen to a number of lines
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                          10

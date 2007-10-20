@@ -1,0 +1,318 @@
+SLAVE
+000000000000Z
+cn=Teiid Lizard
+objectClass= top & applicationEntity & dSA & quipuDSA & quipuObject
+cn= Teiid Lizard
+presentationAddress= '0101'H/TELEX+00728722+RFC-1006+03+aaa.bb.c.dd+ppppq
+supportedApplicationContext= X500DSP & X500DAP & InternetDSP & quipuDSP
+userPassword= secret
+manager= c=US@cn=Manager
+acl= others # read # entry &\
+	group # c=US@cn=Manager # write # entry &\
+	others # read # default &\
+	group # c=US@cn=Manager # write # default
+eDBinfo= #o=DMD DSAs@cn=Giant Tortoise#o=Root DMD@o=US DMD
+eDBinfo= o=Root DMD#o=DMD DSAs@o=US DMD@cn=Komodo Dragon#
+eDBinfo= o=Root DMD@o=US DMD#o=DMD DSAs@o=US DMD@cn=Komodo Dragon#
+eDBinfo= o=DMD DSAs#o=DMD DSAs@o=US DMD@cn=Komodo Dragon#
+eDBinfo= o=DMD DSAs@o=US DMD#o=DMD DSAs@o=US DMD@cn=Komodo Dragon#
+eDBinfo= c=US # #o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Alabama # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Alaska # o=Root DMD@o=US DMD@cn=Surinam Frog #
+eDBinfo= c=US@st=Arizona # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Arkansas # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=California # o=Root DMD@o=US DMD@cn=Surinam Frog #
+eDBinfo= c=US@st=Colorado # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Connecticut # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Delaware # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=District of Columbia # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Florida # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Georgia # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Hawaii # o=Root DMD@o=US DMD@cn=Surinam Frog #
+eDBinfo= c=US@st=Idaho # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Illinois # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Indiana # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Iowa # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Kansas # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Kentucky # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Louisiana # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Maine # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Maryland # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Massachusetts # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Michigan # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Minnesota # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Mississippi # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Missouri # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Montana # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Nebraska # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Nevada # o=Root DMD@o=US DMD@cn=Surinam Frog #
+eDBinfo= c=US@st=New Hampshire # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=New Jersey # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=New Mexico # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=New York # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=North Carolina # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=North Dakota # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Ohio # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Oklahoma # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Oregon # o=Root DMD@o=US DMD@cn=Surinam Frog #
+eDBinfo= c=US@st=Pennsylvania # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Rhode Island # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=South Carolina # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=South Dakota # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Tennessee # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Texas # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Utah # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Vermont # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Virginia # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Washington # o=Root DMD@o=US DMD@cn=Surinam Frog #
+eDBinfo= c=US@st=West Virginia # o=Root DMD@o=US DMD@cn=Marsupial Frog #
+eDBinfo= c=US@st=Wisconsin # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=Wyoming # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=American Samoa # o=Root DMD@o=US DMD@cn=Surinam Frog #
+eDBinfo= c=US@st=Federated States of Micronesia # o=Root DMD@o=US DMD@cn=Surinam Frog #
+eDBinfo= c=US@st=Guam # o=Root DMD@o=US DMD@cn=Surinam Frog #
+eDBinfo= c=US@st=Marshall Islands # o=Root DMD@o=US DMD@cn=Surinam Frog #
+eDBinfo= c=US@st=Northern Mariana Islands # o=Root DMD@o=US DMD@cn=Surinam Frog #
+eDBinfo= c=US@st=Palau # o=Root DMD@o=US DMD@cn=Surinam Frog #
+eDBinfo= c=US@st=Puerto Rico # o=Root DMD@o=US DMD@cn=Horned Frog #
+eDBinfo= c=US@st=U.S. Minor Outlying Islands # o=Root DMD@o=US DMD@cn=Surinam Frog #
+eDBinfo= c=US@st=Virgin Islands of the US # o=Root DMD@o=US DMD@cn=Surinam Frog #
+quipuVersion= 7.0
+
+cn=Marsupial Frog
+objectClass= top & applicationEntity & dSA & quipuDSA & quipuObject
+cn= Marsupial Frog
+presentationAddress= '0101'H/TELEX+00728722+RFC-1006+03+aaa.bb.c.d0+pppq0
+supportedApplicationContext= X500DSP & X500DAP & InternetDSP & quipuDSP
+userPassword= secret
+manager= c=US@cn=Manager
+acl= others # read # entry &\
+	group # c=US@cn=Manager # write # entry &\
+	others # read # default &\
+	group # c=US@cn=Manager # write # default
+eDBinfo= # o=Root DMD@o=US DMD@cn=Teiid Lizard # o=Root DMD@o=US DMD
+eDBinfo= o=Root DMD # o=DMD DSAs@o=US DMD@cn=Hatchet Fish #
+eDBinfo= o=Root DMD@o=US DMD # o=DMD DSAs@o=US DMD@cn=Hatchet Fish #
+eDBinfo= o=DMD DSAs # o=DMD DSAs@o=US DMD@cn=Hatchet Fish #
+eDBinfo= o=DMD DSAs@o=US DMD # o=DMD DSAs@o=US DMD@cn=Hatchet Fish #
+eDBinfo= c=US # o=Root DMD@o=US DMD@cn=Teiid Lizard # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Alabama # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Alaska # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Arizona # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Arkansas # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=California # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Colorado # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Connecticut # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Delaware # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=District of Columbia # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Florida # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Georgia # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Hawaii # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Idaho # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Illinois # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Indiana # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Iowa # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Kansas # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Kentucky # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Louisiana # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Maine # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Maryland # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Massachusetts # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Michigan # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Minnesota # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Mississippi # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Missouri # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Montana # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Nebraska # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Nevada # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=New Hampshire # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=New Jersey # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=New Mexico # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=New York # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=North Carolina # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=North Dakota # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Ohio # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Oklahoma # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Oregon # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Pennsylvania # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Rhode Island # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=South Carolina # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=South Dakota # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Tennessee # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Texas # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Utah # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Vermont # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Virginia # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Washington # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=West Virginia # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Wisconsin # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Wyoming # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=American Samoa # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Federated States of Micronesia # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Guam # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Marshall Islands # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Northern Mariana Islands # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Palau # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Puerto Rico # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=U.S. Minor Outlying Islands # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Virgin Islands of the US # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+quipuVersion= 7.0
+
+cn=Surinam Frog
+objectClass= top & applicationEntity & dSA & quipuDSA & quipuObject
+cn= Surinam Frog
+presentationAddress= '0101'H/TELEX+00728722+RFC-1006+03+aaa.bb.c.d1+pppq1
+supportedApplicationContext= X500DSP & X500DAP & InternetDSP & quipuDSP
+userPassword= secret
+manager= c=US@cn=Manager
+acl= others # read # entry &\
+	group # c=US@cn=Manager # write # entry &\
+	others # read # default &\
+	group # c=US@cn=Manager # write # default
+eDBinfo= # o=Root DMD@o=US DMD@cn=Teiid Lizard # o=Root DMD@o=US DMD
+eDBinfo= o=Root DMD # o=DMD DSAs@o=US DMD@cn=Hillstream Fish #
+eDBinfo= o=Root DMD@o=US DMD # o=DMD DSAs@o=US DMD@cn=Hillstream Fish #
+eDBinfo= o=DMD DSAs # o=DMD DSAs@o=US DMD@cn=Hillstream Fish #
+eDBinfo= o=DMD DSAs@o=US DMD # o=DMD DSAs@o=US DMD@cn=Hillstream Fish #
+eDBinfo= c=US # o=Root DMD@o=US DMD@cn=Teiid Lizard # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Alabama # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Alaska # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Arizona # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Arkansas # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=California # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Colorado # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Connecticut # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Delaware # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=District of Columbia # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Florida # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Georgia # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Hawaii # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Idaho # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Illinois # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Indiana # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Iowa # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Kansas # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Kentucky # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Louisiana # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Maine # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Maryland # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Massachusetts # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Michigan # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Minnesota # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Mississippi # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Missouri # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Montana # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Nebraska # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Nevada # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=New Hampshire # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=New Jersey # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=New Mexico # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=New York # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=North Carolina # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=North Dakota # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Ohio # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Oklahoma # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Oregon # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Pennsylvania # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Rhode Island # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=South Carolina # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=South Dakota # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Tennessee # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Texas # o=Root DMD@o=US DMD@cn=Horned Frog #o=RootDMD@o=US DMD
+eDBinfo= c=US@st=Utah # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Vermont # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Virginia # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Washington # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=West Virginia # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Wisconsin # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Wyoming # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=American Samoa # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Federated States of Micronesia # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Guam # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Marshall Islands # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Northern Mariana Islands # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Palau # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Puerto Rico # o=Root DMD@o=US DMD@cn=Horned Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=U.S. Minor Outlying Islands # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Virgin Islands of the US # # o=Root DMD@o=US DMD
+quipuVersion= 7.0
+
+cn=Horned Frog
+objectClass= top & applicationEntity & dSA & quipuDSA & quipuObject
+cn= Horned Frog
+presentationAddress= '0101'H/TELEX+00728722+RFC-1006+03+aaa.bb.c.d2+pppq2
+supportedApplicationContext= X500DSP & X500DAP & InternetDSP & quipuDSP
+userPassword= secret
+manager= c=US@cn=Manager
+acl= others # read # entry &\
+	group # c=US@cn=Manager # write # entry &\
+	others # read # default &\
+	group # c=US@cn=Manager # write # default
+eDBinfo= # o=Root DMD@o=US DMD@cn=Teiid Lizard # o=Root DMD@o=US DMD
+eDBinfo= o=Root DMD # o=DMD DSAs@o=US DMD@cn=Leaf Fish #
+eDBinfo= o=Root DMD@o=US DMD # o=DMD DSAs@o=US DMD@cn=Leaf Fish #
+eDBinfo= o=DMD DSAs # o=DMD DSAs@o=US DMD@cn=Leaf Fish #
+eDBinfo= o=DMD DSAs@o=US DMD # o=DMD DSAs@o=US DMD@cn=Leaf Fish #
+eDBinfo= c=US # o=Root DMD@o=US DMD@cn=Teiid Lizard # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Alabama # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Alaska # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Arizona # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Arkansas # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=California # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Colorado # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Connecticut # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Delaware # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=District of Columbia # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Florida # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Georgia # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Hawaii # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Idaho # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Illinois # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Indiana # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Iowa # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Kansas # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Kentucky # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Louisiana # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Maine # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Maryland # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Massachusetts # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Michigan # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Minnesota # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Mississippi # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Missouri # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Montana # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Nebraska # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Nevada # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=New Hampshire # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=New Jersey # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=New Mexico # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=New York # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=North Carolina # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=North Dakota # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Ohio # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Oklahoma # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Oregon # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Pennsylvania # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Rhode Island # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=South Carolina # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=South Dakota # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Tennessee # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Texas # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Utah # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Vermont # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Virginia # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Washington # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=West Virginia # o=Root DMD@o=US DMD@cn=Marsupial Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Wisconsin # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Wyoming # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=American Samoa # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Federated States of Micronesia # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Guam # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Marshall Islands # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Northern Mariana Islands # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Palau # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Puerto Rico # # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=U.S. Minor Outlying Islands # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+eDBinfo= c=US@st=Virgin Islands of the US # o=Root DMD@o=US DMD@cn=Surinam Frog # o=Root DMD@o=US DMD
+quipuVersion= 7.0
+

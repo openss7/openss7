@@ -1,0 +1,16 @@
+You can use the interface to get information about organisations and their 
+departments.  The following examples should show how to do this:
+
+person>       -
+department>   -
+organisation> ucl
+country>      england
+
+gives details for University College London, and
+
+person>       -
+department>   computer science
+organisation> ucl
+country>      england
+
+gives details for its Computer Science department.

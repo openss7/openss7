@@ -1,0 +1,43 @@
+###############################################################################
+#
+# $Header: /xtel/isode/isode/others/quipu/uips/doog/RCS/doogrc,v 9.0 1992/06/16 12:45:18 isode Rel $
+#
+#
+# Replace the site specific DNs with local equivalents.
+#
+##############################################################################
+
+###############################################################################
+#
+# Syntax:
+#
+#	"searchpath" ":" <lower-bound> [ "," <upper-bound> ] ":" <DNS>
+#       <lower-bound> ::= A digit 0 - 9
+#       <upper-bound> ::= A digit 0 - 9, or "+"   -- + means 'or more'
+#       <DNS>   ::= "(" <DN> [ <extra> ] ")"
+#       <extra> ::= "," <DN> [ <extra> ]
+#       DN      ::= A *quoted* Quipu style Distinguished name
+#
+###############################################################################
+
+
+searchpath : 1 :
+	("c=gb@o=brunel university@ou=manufacturing and engineering systems",
+	 "c=gb@o=brunel university@ou=computing and media services",
+	 "c=gb@o=university college london@ou=computer science",
+	 "c=gb@o=X-Tel Services Ltd",
+	 "c=gb@o=Edinburgh University@ou=Computing Service",
+	 "c=gb@o=Joint Network Team",
+	 "c=gb@o=brunel university",
+	 "")
+
+searchpath : 2 :
+	("c=gb",
+	 "c=gb@o=brunel university",
+	 "",
+	 "c=us")
+
+searchpath : 3, + :
+	("",
+	 "c=gb",
+	 "c=us")

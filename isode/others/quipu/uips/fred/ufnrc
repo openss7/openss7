@@ -1,0 +1,26 @@
+###############################################################################
+#
+# ufnrc - System-wide UFN tailoring file
+# 
+# $Header: /xtel/isode/isode/others/quipu/uips/fred/RCS/ufnrc,v 9.0 1992/06/16 12:44:30 isode Rel $
+#
+#
+# $Log: ufnrc,v $
+# Revision 9.0  1992/06/16  12:44:30  isode
+# Release 8.0
+#
+# 
+###############################################################################
+
+
+1:	c=@(country)@o=@(organization)
+	c=@(country)
+	-
+
+2:	c=@(country)
+	c=@(country)@o=@(organization)
+	-
+
+3,+:	-
+	c=@(country)
+	c=@(country)@o=@(organization)

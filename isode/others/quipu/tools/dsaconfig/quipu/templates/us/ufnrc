@@ -1,0 +1,27 @@
+###############################################################################
+#
+# ufnrc - US-specific UFN tailoring file
+# 
+# $Header$
+#
+#
+# $Log$
+# 
+# 
+###############################################################################
+
+
+1:	@(dnprefix)
+	c=@(country)@st=@(state)
+	c=@(country)
+	-
+
+2:	c=@(country)@st=@(state)
+	c=@(country)
+	@(dnprefix)
+	-
+
+3,+:	-
+	c=@(country)
+	c=@(country)@st=@(state)
+	@(dnprefix)

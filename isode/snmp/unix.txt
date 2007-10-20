@@ -1,0 +1,1294 @@
+UNIX-MIB DEFINITIONS ::= BEGIN
+
+-- Title:	BSD UNIX MIB
+-- Date:	October 31, 1991
+-- By:		Marshall T. Rose/DBC	<mrose@dbc.mtview.ca.us>
+--		Michael Davidson/UTK	<davidson@cs.utk.edu>
+--		for Keith Sklower/UCB	<sklower@okeeffe.berkeley.edu>
+
+
+IMPORTS
+	enterprises, Counter, IpAddress
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+	DisplayString, tcpConnLocalAddress, tcpConnLocalPort,
+	    tcpConnRemAddress, tcpConnRemPort, udpLocalAddress, udpLocalPort,
+	    ipRouteDest
+		FROM RFC1213-MIB
+	clnpRouteDest
+		FROM CLNS-MIB;
+
+
+unix	      OBJECT IDENTIFIER	::= { enterprises 4 }
+
+
+-- the agents group
+
+agents	OBJECT IDENTIFIER ::=	{ unix 1 }
+
+-- original "4BSD/ISODE SNMP"	{ agents 1 }
+
+-- versions of the "4BSD/ISODE SNMP" agent are now under { agents 2 }
+fourBSD-isode OBJECT IDENTIFIER ::= { agents 2 }
+-- fourBSD-isode.1:	add SMUX
+-- fourBSD-isode.2:	add views
+-- fourBSD-isode.3:	add sets
+-- fourBSD-isode.4:	add mbufs
+-- fourBSD-isode.5:	add more sets
+
+agentAction OBJECT-TYPE
+	SYNTAX	INTEGER {
+		    other(1),
+		    coldStart (2)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"A control variable used to trigger an action by the agent.
+		 When read, this variable always returns the value other(1).
+
+		 When set, this variable causes the agent to undertake the
+		 indicated action:
+
+		 coldStart - initiate a coldStart (restart the agent)"
+	::= { agents 3 }
+
+
+-- the mbuf group
+
+mbuf	OBJECT IDENTIFIER ::=	{ unix 2 }
+
+mbufs		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of mbufs allocated from the page pool."
+	::= { mbuf 1 }
+
+mbufClusters 	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of clusters allocated from the page pool."
+	::= { mbuf 2 }
+
+mbufFreeClusters OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of clusters allocated but not in use."
+	::= { mbuf 3 }
+
+mbufDrops 	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of requests for mbufs which failed due to
+		 lack of space."
+	::= { mbuf 4 }
+
+mbufWaits	 OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of requests for mbufs which resulted in a wait."
+	::= { mbuf 5 }
+
+mbufDrains 	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times protocols were drained for space."
+	::= { mbuf 6 }
+
+mbufFrees 	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of mbufs allocated but not in use."
+	::= { mbuf 7 }
+
+mbufTable 	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF MbufEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The mbuf type table."
+	::= { mbuf 8 }
+
+mbufEntry	OBJECT-TYPE
+	SYNTAX	MbufEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the mbuf type table."
+  	INDEX	{ mbufType }
+	::= { mbufTable 1 }
+
+MbufEntry ::=
+    SEQUENCE {
+	mbufType
+	    INTEGER,
+	mbufAllocates
+	    INTEGER
+    }
+
+mbufType	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of mbuf in use."
+	::= { mbufEntry 1 }
+
+mbufAllocates	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of mbufs of this type in use."
+	::= { mbufEntry 2 }
+
+mbufSpaces	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of interface pages obtained from the page pool."
+	::= { mbuf 9 }
+
+
+-- the SMUX peer group
+
+peers	OBJECT IDENTIFIER ::=	{ unix 3 }
+
+-- versions of the unixd program are under { peers 1 }
+unixd	OBJECT IDENTIFIER ::=	{ peers 1 }
+-- unixd.1:		mbufs
+-- unixd.2:		add print/users, remove mbufs
+-- unixd.3:		add unixFs
+
+
+-- the SMUX protocol group
+
+smux	OBJECT IDENTIFIER ::= { unix 4 }
+
+smuxPeerTable	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SmuxPeerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The SMUX peer table."
+	::= { smux 1 }
+
+smuxPeerEntry	OBJECT-TYPE
+	SYNTAX	SmuxPeerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the SMUX peer table."
+  	INDEX	{ smuxPindex }
+	::= { smuxPeerTable 1}
+
+SmuxPeerEntry ::=
+    SEQUENCE {
+	smuxPindex
+	    INTEGER,
+	smuxPidentity
+	    OBJECT IDENTIFIER,
+	smuxPdescription
+	    DisplayString,
+	smuxPstatus
+	    INTEGER
+    }
+
+smuxPindex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"An index which uniquely identifies a SMUX peer."
+	::= { smuxPeerEntry 1 }
+
+smuxPidentity	OBJECT-TYPE
+	SYNTAX	OBJECT IDENTIFIER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The authoritative designation for a SMUX peer."
+	::= { smuxPeerEntry 2 }
+
+smuxPdescription OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (0..255))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A human-readable description of a SMUX peer."
+	::= { smuxPeerEntry 3 }
+
+smuxPstatus	OBJECT-TYPE
+	SYNTAX	INTEGER { valid(1), invalid(2), connecting(3) }
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of SMUX peer.
+
+		 Setting this object to the value invalid(2) has the effect
+		 of invaliding the corresponding entry in the smuxPeerTable.
+		 It is an implementation-specific matter as to whether
+		 the agent removes an invalidated entry from the table.
+		 Accordingly, management stations must be prepared to
+		 receive tabular information from agents that correspond
+		 to entries not currently in use.  Proper interpretation of
+		 such entries requires examination of the relative smuxPstatus
+		 object."
+	::= { smuxPeerEntry 4 }
+
+smuxTreeTable	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SmuxTreeEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The SMUX tree table."
+	::= { smux 2 }
+
+smuxTreeEntry	OBJECT-TYPE
+	SYNTAX	SmuxTreeEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the SMUX tree table."
+  	INDEX	{ smuxTsubtree, smuxTpriority }
+	::= { smuxTreeTable 1}
+
+SmuxTreeEntry ::=
+    SEQUENCE {
+	smuxTsubtree
+	    OBJECT IDENTIFIER,
+	smuxTpriority
+	    INTEGER,
+	smuxTindex
+	    INTEGER,
+	smuxTstatus
+	    INTEGER
+    }
+
+smuxTsubtree	OBJECT-TYPE
+	SYNTAX	OBJECT IDENTIFIER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The MIB subtree being exported by a SMUX peer."
+	::= { smuxTreeEntry 1 }
+
+smuxTpriority OBJECT-TYPE
+	SYNTAX	INTEGER (0..'07fffffff'h)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The SMUX peer's priority when exporting the MIB subtree."
+	::= { smuxTreeEntry 2 }
+
+smuxTindex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The SMUX peer's identity."
+	::= { smuxTreeEntry 3 }
+
+smuxTstatus	OBJECT-TYPE
+	SYNTAX	INTEGER { valid(1), invalid(2) }
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of SMUX tree.
+
+		 Setting this object to the value invalid(2) has the effect
+		 of invaliding the corresponding entry in the smuxTreeTable.
+		 It is an implementation-specific matter as to whether
+		 the agent removes an invalidated entry from the table.
+		 Accordingly, management stations must be prepared to
+		 receive tabular information from agents that correspond
+		 to entries not currently in use.  Proper interpretation of
+		 such entries requires examination of the relative smuxTstatus
+		 object."
+	::= { smuxTreeEntry 4 }
+
+
+-- the NETSTAT group
+
+netstat	OBJECT IDENTIFIER ::=	{ unix 5 }
+
+unixNetstat	OBJECT-TYPE
+	SYNTAX	INTEGER { enabled(1), disabled(2) }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates whether the agent supports a UNIX-like
+		 network MIB."
+	::= { netstat 1 }
+
+-- the UNIX TCP connections table
+
+unixTcpConnTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF UnixTcpConnEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The TCP socket table."
+	::= { netstat 2 }
+
+unixTcpConnEntry OBJECT-TYPE
+	SYNTAX	UnixTcpConnEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the TCP socket table."
+  	INDEX	{ tcpConnLocalAddress, tcpConnLocalPort,
+		  tcpConnRemAddress, tcpConnRemPort }
+	::= { unixTcpConnTable 1 }
+
+UnixTcpConnEntry ::=
+    SEQUENCE {
+	unixTcpConnSendQ
+	    INTEGER,
+	unixTcpConnRecvQ
+	    INTEGER
+    }
+
+unixTcpConnSendQ OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of octets queued for sending on this TCP socket."
+	::= { unixTcpConnEntry 1 }
+
+unixTcpConnRecvQ OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of octets queued for reading from this TCP socket."
+	::= { unixTcpConnEntry 2 }
+
+
+-- the UNIX UDP listener table
+
+unixUdpTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF UnixUdpEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The UDP socket table."
+	::= { netstat 3 }
+
+unixUdpEntry OBJECT-TYPE
+	SYNTAX	UnixUdpEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the UDP socket table."
+  	INDEX	{ udpLocalAddress, udpLocalPort }
+	::= { unixUdpTable 1 }
+
+UnixUdpEntry ::=
+    SEQUENCE {
+	unixUdpRemAddress
+	    IpAddress,
+	unixUdpRemPort
+	    INTEGER (0..65535),
+	unixUdpSendQ
+	    INTEGER,
+	unixUdpRecvQ
+	    INTEGER
+    }
+
+unixUdpRemAddress OBJECT-TYPE
+	SYNTAX	IpAddress
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The remote IP address bound to this UDP socket.  If no binding
+		 has occurred, the value 0.0.0.0 is used."
+	::= { unixUdpEntry 1 }
+
+unixUdpRemPort OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The remote UDP port bound to this UDP socket.  If no binding
+		 has occurred, the value 0 is used."
+	::= { unixUdpEntry 2 }
+
+unixUdpSendQ OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of octets queued for writing to this UDP socket."
+	::= { unixUdpEntry 3 }
+
+unixUdpRecvQ OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of octets queued for reading from this UDP socket."
+	::= { unixUdpEntry 4 }
+
+-- the UNIX IP Routing table
+
+unixIpRoutingTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF UnixIpRouteEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The additional IP routing table."
+	::= { netstat 4 }
+
+unixIpRouteEntry OBJECT-TYPE
+	SYNTAX	UnixIpRouteEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the additional IP routing table."
+  	INDEX	{ ipRouteDest }
+	::= { unixIpRoutingTable 1 }
+
+UnixIpRouteEntry ::=
+    SEQUENCE {
+	unixIpRouteFlags
+	    INTEGER,
+	unixIpRouteRefCnt
+	    INTEGER,
+	unixIpRouteUses
+	    Counter
+    }
+
+unixIpRouteFlags OBJECT-TYPE
+	SYNTAX	INTEGER (0..'ffff'h)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A value associated with the IP routing entry.
+
+		 The value is a sum.  This sum initial takes the value zero.
+		 Then, for each flag, F, in the range 1 through N, that this
+		 IP routing entry has TRUE, 2 raised to (F - 1) is added to
+		 the sum.
+
+		 flag	status
+		 ----	------
+		   1	route useable
+		   2	destination is a gateway
+		   3	host entry
+		   4	re-instate route after timeout
+		   5	created dynamically (by redirect)
+
+		 Other values of flag are reserved for future definition."
+	::= { unixIpRouteEntry 1 }
+
+unixIpRouteRefCnt OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of sockets using this IP routing entry."
+	::= { unixIpRouteEntry 2 }
+
+unixIpRouteUses OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times this IP routing entry has been used."
+	::= { unixIpRouteEntry 3 }
+
+-- miscellaneous UNIX routing statistics
+
+unixRouteBadRedirects	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of bogus routing redirects."
+	::= { netstat 5 }
+
+unixRouteCreatedByRedirects OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of routing entries created by redirects."
+	::= { netstat 6 }
+
+unixRouteModifiedByRedirects OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of routing entries modified by redirects."
+	::= { netstat 7 }
+
+unixRouteLookupFails	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times a routing entry couldn't be found
+		 for a destination."
+	::= { netstat 8 }
+
+unixRouteWildcardUses	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times the `wildcard' routing entry was used."
+	::= { netstat 9 }
+
+-- the UNIX CLNP Routing table
+
+unixClnpRoutingTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF UnixClnpRouteEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The additional CLNP routing table."
+	::= { netstat 10 }
+
+unixClnpRouteEntry OBJECT-TYPE
+	SYNTAX	UnixClnpRouteEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the additional CLNP routing table."
+  	INDEX	{ clnpRouteDest }
+	::= { unixClnpRoutingTable 1 }
+
+UnixClnpRouteEntry ::=
+    SEQUENCE {
+	unixClnpRouteFlags
+	    INTEGER,
+	unixClnpRouteRefCnt
+	    INTEGER,
+	unixClnpRouteUses
+	    Counter
+    }
+
+unixClnpRouteFlags OBJECT-TYPE
+	SYNTAX	INTEGER (0..'ffff'h)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A value associated with the CLNP routing entry.
+
+		 The value is a sum.  This sum initial takes the value zero.
+		 Then, for each flag, F, in the range 1 through N, that this
+		 CLNP routing entry has TRUE, 2 raised to (F - 1) is added to
+		 the sum.
+
+		 flag	status
+		 ----	------
+		   1	route useable
+		   2	destination is a gateway
+		   3	host entry
+		   4	re-instate route after timeout
+		   5	created dynamically (by redirect)
+
+		 Other values of flag are reserved for future definition."
+	::= { unixClnpRouteEntry 1 }
+
+unixClnpRouteRefCnt OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of sockets using this IP routing entry."
+	::= { unixClnpRouteEntry 2 }
+
+unixClnpRouteUses OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times this IP routing entry has been used."
+
+	::= { unixClnpRouteEntry 3 }
+
+
+-- the print group
+
+print	OBJECT IDENTIFIER ::= { unix 6 }
+
+-- the printer queue table
+
+printQTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF PrintQEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The printer queue table."
+	::= { print 1 }
+
+printQEntry OBJECT-TYPE
+	SYNTAX	PrintQEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry for a queue in the printer table.
+
+		 Instance-identification is taken from
+
+			printQName
+
+		 and consists of `n' sub-identifiers, given that printQName
+		 is `n' octets in length."
+	INDEX	{ printQName }
+	::= { printQTable 1 }
+
+PrintQEntry ::=
+    SEQUENCE {
+	printQName
+	    DisplayString,
+	printQStatus
+	    INTEGER,
+	printQDisplay
+	    DisplayString,
+	printQEntries
+	    INTEGER,
+	printQAction
+	    INTEGER
+    }
+
+printQName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of a queue in the printer table."
+	::= { printQEntry 1 }
+
+printQStatus OBJECT-TYPE
+	SYNTAX	INTEGER (0..'7fffffff'h)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A value which indicates the current status of a queue in the
+		 printer table.
+
+		 The value is a sum.  This sum initially takes the value zero.
+		 Then, for each flag, F, in the range 1 through N, that this
+		 queue has TRUE, 2 raised to (F - 1) is added to the sum.
+
+		 flag	status
+		 ----	------
+		   1	queuing is enabled
+		   2	printing is enabled
+		   3	daemon is present
+
+		 Other values of flag are reserved for future definition."
+	::= { printQEntry 2 }
+
+printQDisplay OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A string indicating the current status of the queue."
+	::= { printQEntry 3 }
+
+printQEntries OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of jobs currently in the queue, including the
+		 current job printing (if any)."
+	::= { printQEntry 4 }
+
+printQAction OBJECT-TYPE
+	SYNTAX	INTEGER {
+		    other(1),
+		    abort(2),
+		    clean(3),
+		    enable(4),
+		    disable(5),
+		    restart(6),
+		    start(7),
+		    stop(8)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"A control variable used to trigger an action on a queue in
+		 the printer table.  When read, this variable always returns
+		 the most recent value that it was previously set to.  If it
+		 has not been set since the last initialization of the network 
+		 management subsystem on the node, it returns a value of
+		 `other'.
+
+		 When set, this variable causes the queue to undertake the
+		 indicated action:
+
+		 abort - terminate the current job printing in the queue
+			 and disable printing other jobs
+
+		 clean - remove incomplete jobs from the queue
+
+		 enable - enable spooling on the queue
+
+		 disable - disable spooling on the queue
+
+		 restart - restart printing from the queue
+
+		 start - start printing from the queue
+
+		 stop - stop printing from the queue after the current job
+			completes printing"
+	::= { printQEntry 5 }
+
+
+-- the printer job table
+
+printJTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF PrintJEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The printer job table."
+	::= { print 2 }
+
+printJEntry OBJECT-TYPE
+	SYNTAX	PrintJEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry for a job in a printer queue.
+
+		 Instance-identification is taken from
+
+			printJName + printJRank
+
+		 and consists of `n+1' sub-identifiers, given that printJName
+		 is `n' octets in length."
+	INDEX	{ printJName, printJRank }
+	::= { printJTable 1 }
+
+PrintJEntry ::=
+    SEQUENCE {
+	printJRank
+	    INTEGER,
+	printJName
+	    DisplayString,
+	printJOwner
+	    DisplayString,
+	printJDescription
+	    DisplayString,
+	printJSize
+	    INTEGER,
+	printJAction
+	    INTEGER
+    }
+
+printJRank OBJECT-TYPE
+	SYNTAX INTEGER (0..'7fffffff'h)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The rank of this job currently in the queue.  A value of zero
+		 indicates that the job is currently printing, a value of
+		 one indicates that it is next to print, etc."
+	::= { printJEntry 1 }
+
+printJName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of a job in the printer queue."
+	::= { printJEntry 2 }
+
+printJOwner OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A string indicating the owner of this job."
+	::= { printJEntry 3 }
+
+printJDescription OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A string describing the contents of this job."
+	::= { printJEntry 4 }
+
+printJSize OBJECT-TYPE
+	SYNTAX INTEGER (0..'7fffffff'h)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The size of job in octets."
+	::= { printJEntry 5 }
+
+printJAction OBJECT-TYPE
+	SYNTAX	INTEGER {
+		    other(1),
+		    topq(2),
+		    remove(3)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"A control variable used to trigger an action on a job in
+		 a printer queue.  When read, this variable always returns
+		 the most recent value that it was previously set to.  If it
+		 has not been set since the last initialization of the network 
+		 management subsystem on the node, it returns a value of
+		 `other'.
+
+		 When set, this variable causes the queue to undertake the
+		 indicated action:
+
+		 topq - place this job at the front of the queue,
+			after any job which is currently printing
+
+		remove - remove this job from the queue"
+	::= { printJEntry 6 }
+
+
+-- the user-admin group
+
+users	OBJECT IDENTIFIER ::= { unix 7 }
+
+-- the users table
+
+userTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF UserEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The users table."
+	::= { users 1 }
+
+userEntry OBJECT-TYPE
+	SYNTAX	UserEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the users table.
+
+		 Instance-identification is taken from
+
+			userName
+
+		 and consists of `n' sub-identifiers, given that userName
+		 is `n' octets in length."
+	INDEX	{ userName }
+	::= { userTable 1 }
+
+UserEntry ::=
+    SEQUENCE {
+	userName
+	    DisplayString,
+	userPasswd
+	    DisplayString,
+	userID
+	    INTEGER,
+	userGroup
+	    DisplayString,
+	userQuota
+	    INTEGER,
+	userComment
+	    DisplayString,
+	userFullName
+	    DisplayString,
+	userHome
+	    DisplayString,
+	userShell
+	    DisplayString,
+	userStatus
+	    INTEGER
+    }
+
+userName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of this user."
+	::= { userEntry 1 }
+
+userPasswd OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The encrypted password string for this user.
+
+		 This variable is usually unavailable for reading."
+	::= { userEntry 2 }
+
+userID OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The user's ID in the system."
+	::= { userEntry 3 }
+
+userGroup OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The user's group ID in the system."
+	::= { userEntry 4 }
+
+userQuota OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The user's quota."
+	::= { userEntry 5 }
+
+userComment OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"A string describing the user."
+	::= { userEntry 6 }
+
+userFullName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"A string giving the user's full name."
+	::= { userEntry 7 }
+
+userHome OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The user's home directory."
+	::= { userEntry 8 }
+
+userShell OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The user's shell."
+	::= { userEntry 9 }
+
+userStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		    other(1),
+		    invalid(2)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of user.
+
+		 Setting this object to the value invalid(2) has the effect
+		 of invaliding the corresponding entry in the userTable.  It
+		 is an implementation-specific matter as to whether the agent
+		 removes an invalidated entry from the table.  Accordingly,
+		 management stations must be prepared to receive tabular
+		 information from agents that correspond to entries not
+		 currently in use.  Proper interpretation of such entries
+		 requires examination of the relative userStatus object."
+	::= { userEntry 10 }
+
+-- the group table
+
+groupTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF GroupEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The group table."
+	::= { users 2 }
+
+groupEntry OBJECT-TYPE
+	SYNTAX	GroupEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the group table.
+
+		 Instance-identification is taken from
+
+			groupName
+
+		 and consists of `n' sub-identifiers, given that groupName
+		 is `n' octets in length."
+	INDEX	{ groupName }
+	::= { groupTable 1 }
+
+GroupEntry ::=
+    SEQUENCE {
+	groupName
+	    DisplayString,
+	groupPasswd
+	    DisplayString,
+	groupID
+	    INTEGER,
+	groupStatus
+	    INTEGER
+    }
+
+groupName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of this group."
+	::= { groupEntry 1 }
+
+groupPasswd OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The encrypted password string for this group.
+
+		 This variable is usually unavailable for reading."
+	::= { groupEntry 2 }
+
+groupID OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The group's ID in the system."
+	::= { groupEntry 3 }
+
+groupStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		    other(1),
+		    invalid(2)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of group.
+
+		 Setting this object to the value invalid(2) has the effect
+		 of invaliding the corresponding entry in the groupTable.  It
+		 is an implementation-specific matter as to whether the agent
+		 removes an invalidated entry from the table.  Accordingly,
+		 management stations must be prepared to receive tabular
+		 information from agents that correspond to entries not
+		 currently in use.  Proper interpretation of such entries
+		 requires examination of the relative groupStatus object."
+	::= { groupEntry 4 }
+
+-- the group/user table
+
+grUserTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF GrUserEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The group/user table."
+	::= { users 3 }
+
+grUserEntry OBJECT-TYPE
+	SYNTAX	GrUserEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the group/user table.
+
+		 Instance-identification is taken from
+
+			groupName + 0 + userName
+
+		 and consists of `n+1+m' sub-identifiers, given that groupName
+		 is `n' octets in length and userName is `m' octets in length."
+	::= { grUserTable 1 }
+
+GrUserEntry ::=
+    SEQUENCE {
+	grUserStatus
+	    INTEGER
+    }
+
+grUserStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		    other(1),
+		    invalid(2)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of relationship between a user and a group.
+
+		 Setting this object to the value invalid(2) has the effect
+		 of invaliding the corresponding entry in the grUserTable.  It
+		 is an implementation-specific matter as to whether the agent
+		 removes an invalidated entry from the table.  Accordingly,
+		 management stations must be prepared to receive tabular
+		 information from agents that correspond to entries not
+		 currently in use.  Proper interpretation of such entries
+		 requires examination of the relative grUserStatus object."
+	::= { grUserEntry 1 }
+
+
+-- unix file-system group
+
+unixFs		OBJECT IDENTIFIER ::= { unix 8 }
+
+-- the file-system table
+
+fsTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF FsTableEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The file system table"
+	::= { unixFs 1 }
+
+fsTableEntry OBJECT-TYPE
+	SYNTAX	FsTableEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A row in the file system table"
+	INDEX { fsIdentifier }
+	::= { fsTable 1 }
+
+FsTableEntry ::=
+    SEQUENCE { 
+	fsIdentifier
+	    INTEGER,
+	fsName
+	    DisplayString,
+	fsMountPoint
+	    DisplayString,
+	fsMountType
+	    DisplayString,
+	fsMountOptions
+	    DisplayString,
+	fsBlockSize
+	    INTEGER,
+	fsBlockCount
+	    INTEGER,
+	fsBlocksFree
+	    INTEGER,
+	fsBlocksAvailable
+	    INTEGER,
+	fsInodeCount
+	    INTEGER,
+	fsInodesAvailable
+	    INTEGER
+    }
+
+fsIdentifier OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A system-dependent unique identifier."
+	::= { fsTableEntry 1 }
+
+fsName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of the file system (device)."
+	::= { fsTableEntry 2 }
+
+fsMountPoint OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Mount point for the file system."
+	::= { fsTableEntry 3 }
+
+fsMountType OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of the mounted file system."
+	::= { fsTableEntry 4 }
+
+fsMountOptions OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"File system specific options."
+	::= { fsTableEntry 5 }
+
+fsBlockSize OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Block size for this file system."
+	::= { fsTableEntry 6 }
+
+fsBlockCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Total number on blocks in file system."
+	::= { fsTableEntry 7 }
+
+fsBlocksFree OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Total number of blocks free in file system."
+	::= { fsTableEntry 8 }
+
+fsBlocksAvailable OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of blocks available to non-priviledged users."
+	::= { fsTableEntry 9 }
+
+fsInodeCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Total number of i-nodes on this file system."
+	::= { fsTableEntry 10 }
+
+fsInodesAvailable OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of i-nodes available on file system."
+	::= { fsTableEntry 11 }
+
+END

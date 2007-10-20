@@ -1,0 +1,110 @@
+###############################################################################
+#
+# snmpd.rc - SNMP configuration information
+#
+# $Header: /xtel/isode/isode/snmp/RCS/snmpd.rc,v 9.0 1992/06/16 12:38:11 isode Rel $
+#
+# Contributed by NYSERNet Inc.  This work was partially supported by the
+# U.S. Defense Advanced Research Projects Agency and the Rome Air Development
+# Center of the U.S. Air Force Systems Command under contract number
+# F30602-88-C-0016.
+#
+#
+# $Log: snmpd.rc,v $
+# Revision 9.0  1992/06/16  12:38:11  isode
+# Release 8.0
+#
+# Revision 8.3  1992/04/03  08:26:06  isode
+# sync
+#
+# Revision 8.2  1992/02/26  13:46:55  isode
+# rel7_2
+#
+# Revision 8.1  1992/02/05  10:10:30  isode
+# "Release
+#
+# Revision 8.0  1991/07/17  13:01:02  isode
+# Release 7.0
+#
+# 
+###############################################################################
+
+###############################################################################
+#
+# How to configure this file for your system:
+#
+# 1. Fill-in the value for "sysContact" and "sysLocation" below, e.g.,
+#
+#	variable	sysContact	"Marshall Rose <mrose@psi.com>"
+#
+#	variable	sysLocation	"upstairs machine room"
+#
+#    All the other objects in the system group are automatically filled-in by
+#    the agent.
+#
+# 2. If your site has a management station that listens for traps, fill-in
+#    the information for the trap sink, e.g.,
+#
+#	trap		traps		a.b.c.d
+#
+#    where "traps" is the community that the traps should be logged under and
+#    a.b.c.d is the IP-address of the host where a trap sink is listening on
+#    UDP port 162.
+#
+# 3. Make sure that all of the network interfaces are listed below.  If you
+#    have a strange interface name, define it accordingly, e.g.,
+#
+#	variable	interface	NAME	ifType=XX	ifSpeed=YY
+#
+#    where "NAME" is the interface name according to ifconfig(8c), "XX" is
+#    the type of interface according to the MIB (look at the definition of
+#    the ifType variable), and "YY" is the speed in bits/second.
+#
+###############################################################################
+
+community	public
+
+community	system		0.0.0.0		readOnly	1.17.2
+view		1.17.2		system unix
+
+logging		file=snmpd.log	size=50
+logging		slevel=fatal	slevel=exceptions	slevel=notice
+logging		sflags=close	sflags=create		sflags=zero
+
+#variable	sysContact	"Marshall Rose <mrose@psi.com>"
+#variable	sysLocation	"northside machine room, PSI Santa Clara Office"
+
+# replace a.b.c.d with real IP-address
+#	trap		traps		a.b.c.d
+
+variable	interface lo0	ifType=24	ifSpeed=0
+
+# here are all the ethernet names I know about...
+variable	interface ace0	ifType=6
+variable	interface de0	ifType=6
+variable	interface ec0	ifType=6
+variable	interface ei0	ifType=6
+variable	interface en0	ifType=6
+variable	interface enp0	ifType=6
+variable	interface ex0	ifType=6
+variable	interface ie0	ifType=6
+variable	interface il0	ifType=6
+variable	interface ix0	ifType=6
+variable	interface le0	ifType=6
+variable	interface qe0	ifType=6
+variable	interface se0	ifType=6
+variable	interface ln0	ifType=6
+
+# and slip...
+variable	interface sl0	ifType=22
+variable	interface sl1	ifType=22
+variable	interface sl2	ifType=22
+variable	interface sl3	ifType=22
+
+# and miscellany...
+variable	interface ddn0	ifType=4
+variable	interface dmc0	ifType=22
+variable	interface dmv0	ifType=22
+variable	interface hy0	ifType=14
+#could be proteon-80MBit
+#variable	interface vv0	ifType=12

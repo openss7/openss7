@@ -1,0 +1,64 @@
+.TH MOSY 1 "15 May 1988"
+.\" $Header: /xtel/isode/isode/others/mosy/RCS/mosy.1,v 9.0 1992/06/16 12:42:35 isode Rel $
+.\" Contributed by NYSERNet Inc.  This work was partially supported by the
+.\" U.S. Defense Advanced Research Projects Agency and the Rome Air Development
+.\" Center of the U.S. Air Force Systems Command under contract number
+.\" F30602-88-C-0016.
+.\"
+.\"
+.\"
+.\" $Log: mosy.1,v $
+.\" Revision 9.0  1992/06/16  12:42:35  isode
+.\" Release 8.0
+.\"
+.\" 
+.SH NAME
+mosy - Managed Object Syntax-compiler (yacc-based)
+.SH SYNOPSIS
+.in +.5i
+.ti -.5i
+.B mosy
+\%[\-o\0module.defs]
+\%[\-s]
+\fImodule.my\fR
+.in -.5i
+.SH DESCRIPTION
+The \fImosy\fR program reads a description of a \fImanaged objects\fR
+module and produces a simple ascii file containing equivalent definitions.
+This file is meant to be read as configuration data by a network
+management program.
+.PP
+The `\-o' switch sets the name of the output file,
+which is normally derived from the name of the input file.
+The distinguished file \*(lq\-\*(rq can be used to force the use of the
+standard output.
+.PP
+Normally, \fImosy\fR prints the name of each object, identifier, or type
+as it works.
+The `\-s' switch disables this behavior.
+.SH "SEE ALSO"
+RFCs 1155 and 1212
+.SH AUTHOR
+Marshall T. Rose,
+Performance Systems International
+.PP
+This work was partially supported by the
+U.S. Defense Advanced Research Projects Agency and the Rome Air Development
+Center of the U.S. Air Force Systems Command under contract number
+F30602-88-C-0016.
+.SH BUGS
+The author spends a fair bit of time trying to have \fImosy\fR
+accurately both check the official and oral policies of the SMI.
+At present,
+there are three known deficiencies.
+.PP
+First,
+\fImosy\fR does not maintain a library,
+so it can't check IMPORT statements for their validity.
+.PP
+Second,
+\fImosy\fR discards the enumerations associationed with INTEGERs
+(though it does range check them).
+.PP
+Third,
+\fImosy\fR doesn't range check size constraints associated with INTEGERs.

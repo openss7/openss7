@@ -1,0 +1,197 @@
+\chapter{Search Access Control}
+\label{disc_sacl}\index{searchACL attribute}
+  
+The access control described above is sufficient to protect individual
+entries from unauthorized access, but it does little to protect the
+directory as a whole from ``trawling'': the disclosure of large amounts
+of organizational data or structure information by repeated searches.
+In the past, the administrative size limit was the only control on such
+access.  The search ACL is designed to allow much more flexible control
+on the types on searches performed and the number of results that can
+be obtained by a directory user.
+
+A search ACL belongs to a single entry and specifies restrictions on
+searches involving that entry and possibly its descendants.  A search
+ACL scope must be specified.  A scope of ``subtree'' means the search
+ACL applies during subtree searches involving the entry and its
+descendants.  Note that the subtree search must be rooted at or above
+the entry containing the search ACL for the ACL to apply.  A
+``singlelevel'' search ACL applies only during a single level search
+rooted at the entry containing the ACL.  Note that the subtree and
+single level scopes are disjoint:  a subtree search ACL has no bearing
+on a single level search and vice versa.
+
+A search ACL with scope ``baseobject'' applies to the entry during any
+type of search, and can thus be used to provide discretionary access
+control for searches in a way similar to normal access control.
+
+The simplest and most restrictive application of a search ACL is to
+prevent searching on certain attribute types.  For example, the following
+search ACL would not allow anyone to perform any type of search by the
+userPassword attribute in the subtree rooted at the entry containing
+the search ACL (or in its children).
+
+\begin{quote}\small\begin{verbatim}
+sacl= others # nosearch # userPassword \ 
+           # subtree $ singlelevel
+\end{verbatim}\end{quote}
+
+The access selector for a search ACL is the same as for a normal QUIPU
+ACL.  Note that a search started at a point in the DIT below the entry
+containing a search ACL is not constrained by that search ACL.
+
+To allow searches by certain attributes, but to limit the number of
+results that can be returned, a search ACL like this may be used:
+
+\begin{quote}\small\begin{verbatim}
+sacl= others # search # commonName $ surname \ 
+           # subtree # 10 # partialresults
+sacl= others # nosearch # default # subtree
+\end{verbatim}\end{quote}
+
+This allows others to search only by the attributes commonName and surname,
+returning at most 10 matches.  If ``trawling'' is a concern, the search
+ACL above can be modified to not return any results if the size limit
+specified is exceeded:
+
+\begin{quote}\small\begin{verbatim}
+sacl= others # search # commonName $ surname \ 
+           # subtree # 10 # nopartialresults
+sacl= others # nosearch # default # subtree
+\end{verbatim}\end{quote}
+
+Note that both of the preceeding examples only restrict subtree searches.
+If single level searches are to be restricted also, the scope should be
+changed to ``subtree \$ singlelevel.''  Note also that the attributes not
+specified in another search ACL may be referred to by using the ``default''
+keyword.  In the example above, this capability is used to disallow
+searches on any attributes but commonName and surname.
+
+An individual entry may protect itself from being found by certain types
+of searches by using the ``baseobject'' search ACL scope.  For example,
+
+\begin{quote}\small\begin{verbatim}
+sacl= others # nosearch # commonName $ surname # baseobject
+\end{verbatim}\end{quote}
+
+Finally, it may be desirable to restrict certain types of searches below
+an entry.  For example, if not checked, an effective dumping technique is
+to do repeated searches of the form cn=a*, cn=b*, etc.  This technique is
+not entirely thwarted by the ``nopartialresults'' capability
+described above, because a clever and determined attacker can construct
+repeated range filters where the range is small enough not to
+exceed the size limit.
+
+As a defense against such attacks, a minimum substring key length may
+be specified in a searchACL.  This minimum length is also used as the
+minumum prefix that must be common to any range queries using the inequality
+operators.  For example, a search acl like this one
+
+\begin{quote}\small\begin{verbatim}
+sacl= others # search # default # subtree # 10 \ 
+           # nopartialresults # 3
+\end{verbatim}\end{quote}
+  
+specifies that others may perform subtree searches by the default
+attribute set, returning at most 10 matches.  No matches will be
+returned if the limit of 10 is exceeded.  Furthermore, any substring
+queries must contain a substring that is at least 3 characters long,
+and any inequality range queries must involve values whose first 3
+characters are the same.  To see how this works, consider the following
+queries and the reason they are either accepted or rejected because
+they violate the above search ACL.
+
+\begin{tabular}{lll}
+Filter              &       Accepted? & Explanation \\\hline
+cn=a*               &       no        & maximum substring length is 1\\
+cn=aa*              &       no        & maximum substring length is 2\\
+cn=*a*              &       no        & maximum substring length is 1\\
+cn=abc*             &       yes       & maximum substring length is 3\\
+cn=a*abcd*          &       yes       & maximum substring length is 4\\
+(cn$>$=a \& cn$<$=b)     &       no        & common prefix length is 0\\
+(cn$>$=aa \& cn$<$=ab)   &       no        & common prefix length is 1 (a)\\
+(cn$>$=abcdef \& cn$<$=abcghi) & yes       & common prefix length is 3 (abc)\\
+\end{tabular}
+
+\section{List ACL}
+\label{disc_lacl}
+\index{listACL attribute}
+
+Just as a search ACL can be used to control access to groups of entries
+during search operations, the list ACL can be used to control access
+during list operations.  A list ACL may apply to an individual node, or
+a node's children.  For example, to prevent everyone except those users
+in the US from listing a particular entry, a user might add the
+following list ACL to the entry:
+
+\begin{quote}\small\begin{verbatim}
+lacl= others # nolist # entry
+lacl= prefix # c=US # list # entry
+\end{verbatim}\end{quote}
+
+The access selector portion of a list ACL is the same as for a normal
+QUIPU ACL.
+
+A list ACL can also be used to control the listing of a node's children.
+In addition to specifying whether a particular user can list the
+children or not, one can specify the maximum number of children that
+will be returned by a single list operation.  For example, to prevent
+everyone except US users from listing the children of an entry,
+that entry should have the following list ACL:
+
+\begin{quote}\small\begin{verbatim}
+lacl= others # nolist # children
+lacl= prefix # c=US # list # children
+\end{verbatim}\end{quote}
+
+A limit on the number of children returned from a list (10 in this
+example) may be imposed by the following:
+
+\begin{quote}\small\begin{verbatim}
+lacl= others # list # children # 10
+\end{verbatim}\end{quote}
+
+\section{Authentication Policy}
+\label{disc_authp}
+\index{authPolicy attribute}
+\index{authentication policy}
+
+With discretionary access control, search access control, and list access
+control, there is a need to authenticate the party requesting access.  It
+should be specifiable on a per entry basis what form this authentication
+should take for it to be believed.  For example, one trusting individual
+might view no authentication as sufficient, allowing access over
+unauthenticated DSP links.  Another user might be satisfied with simple
+authentication.  Still another security conscious individual might not
+be satisfied with anything less than strong authentication.
+In addition, there may be different authentication levels required to
+perform different operations.  The most common example of this is someone
+who will accept no or simple authentication to allow ``read'' access to
+their entry, but requires simple or strong authentication to perform
+any modifications to their entry.
+
+The authPolicy attribute is used on a per entry basis to provide this
+functionality.  It divides access into three categories: modify,
+read and compare, and search and list.  For each category, an authentication
+policy can be specified.  For example
+
+\begin{quote}\small\begin{verbatim}
+authp= strong # simple # trust
+\end{verbatim}\end{quote}
+
+requires strong authentication for modification operations, simple
+authentication for read and compare operations, and no authentication
+for list and search operations on the entry.
+
+The default behavior is as if every entry had the following authPolicy
+attribute:
+
+\begin{quote}\small\begin{verbatim}
+authp= simple # simple # simple
+\end{verbatim}\end{quote}
+
+which requires simple authentication for all operations.
+
+Normally the authPolicy attribute will be inherited throughout an
+entire subtree of entries.
+

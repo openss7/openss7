@@ -1,0 +1,14 @@
+SLAVE
+000000000000Z
+o=US DMD
+objectclass= top & DMD & quipuObject & quipuNonLeafObject & organization
+o=US DMD
+acl= group # c=US@cn=Manager # write # entry
+acl= group # c=US@cn=Manager # write # default
+acl= others # read # entry
+acl= others # read # default
+masterDSA= o=DMD DSAs@o=US DMD@cn=Komodo Dragon
+slaveDSA= o=DMD DSAs@o=US DMD@cn=Hatchet Fish
+slaveDSA= o=DMD DSAs@o=US DMD@cn=Hillstream Fish
+slaveDSA= o=DMD DSAs@o=US DMD@cn=Leaf Fish
+

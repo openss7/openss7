@@ -1,0 +1,343 @@
+###############################################################################
+#
+# oidtable.at - OSI Directory OID Table for Attributes
+#
+# $Header: /xtel/isode/isode/dsap/RCS/oidtable.at,v 9.0 1992/06/16 12:12:26 isode Rel $
+#
+#
+# $Log: oidtable.at,v $
+# Revision 9.0  1992/06/16  12:12:26  isode
+# Release 8.0
+#
+# 
+###############################################################################
+
+
+# format:-
+#
+# name:				oid	       :syntax
+#
+
+# CCITT X.520/ISO 9594-6 defined attribute types
+
+objectClass:			attributeType.0		:ObjectClass
+aliasedObjectName:		attributeType.1		:DN
+knowledgeInformation:		attributeType.2		:CaseIgnoreString
+commonName,cn:			attributeType.3		:CaseIgnoreString
+surname,sn:			attributeType.4		:CaseIgnoreString
+serialNumber:			attributeType.5		:PrintableString
+countryName,c:			attributeType.6		:CountryString
+localityName,l:			attributeType.7		:CaseIgnoreString
+stateOrProvinceName,st:		attributeType.8		:CaseIgnoreString
+streetAddress:			attributeType.9		:CaseIgnoreString
+organizationName,o:		attributeType.10	:CaseIgnoreString
+organizationalUnitName,ou:	attributeType.11	:CaseIgnoreString
+title:				attributeType.12	:CaseIgnoreString
+description:			attributeType.13	:CaseIgnoreString
+searchGuide:			attributeType.14	:Guide
+businessCategory:		attributeType.15	:CaseIgnoreString
+postalAddress:			attributeType.16	:PostalAddress
+postalCode:			attributeType.17	:CaseIgnoreString
+postOfficeBox:			attributeType.18	:CaseIgnoreString
+physicalDeliveryOfficeName:	attributeType.19	:CaseIgnoreString
+telephoneNumber:		attributeType.20	:TelephoneNumber
+telexNumber:			attributeType.21	:TelexNumber
+teletexTerminalIdentifier:	attributeType.22	:TeletexTerminalIdentifier
+facsimileTelephoneNumber:	attributeType.23	:FacsimileTelephoneNumber
+x121Address:			attributeType.24	:NumericString
+internationaliSDNNumber:	attributeType.25	:NumericString
+registeredAddress:		attributeType.26	:PostalAddress
+destinationIndicator:		attributeType.27	:DestinationString
+preferredDeliveryMethod:	attributeType.28	:DeliveryMethod
+presentationAddress:		attributeType.29	:PresentationAddress
+supportedApplicationContext:	attributeType.30	:OID
+member:				attributeType.31	:DN
+owner:				attributeType.32	:DN
+roleOccupant:			attributeType.33	:DN
+seeAlso:			attributeType.34	:DN
+userPassword:			attributeType.35	:Password
+userCertificate:		attributeType.36	:Certificate
+cACertificate:			attributeType.37	:Certificate
+authorityRevocationList:	attributeType.38	:CertificateList
+certificateRevocationList:	attributeType.39	:CertificateList
+crossCertificatePair:		attributeType.40	:CertificatePair
+
+# COSINE and Internet defined attributes
+
+userid,uid:			pilotAttributeType.1	:CaseIgnoreString
+textEncodedORaddress:		pilotAttributeType.2	:CaseIgnoreString
+rfc822Mailbox,mail:		pilotAttributeType.3	:CaseIgnoreIA5String
+info:				pilotAttributeType.4	:CaseIgnoreString
+favouriteDrink,drink:		pilotAttributeType.5	:CaseIgnoreString
+roomNumber:			pilotAttributeType.6	:CaseIgnoreString
+photo:				pilotAttributeType.7	:Photo:file
+userClass:			pilotAttributeType.8	:CaseIgnoreString
+host:				pilotAttributeType.9	:CaseIgnoreString
+manager:			pilotAttributeType.10	:DN
+documentIdentifier:		pilotAttributeType.11	:CaseIgnoreString
+documentTitle:			pilotAttributeType.12	:CaseIgnoreString
+documentVersion:		pilotAttributeType.13	:CaseIgnoreString
+documentAuthor:			pilotAttributeType.14	:DN
+documentLocation:		pilotAttributeType.15	:CaseIgnoreString
+homePhone:			pilotAttributeType.20	:TelephoneNumber
+secretary:			pilotAttributeType.21	:DN
+otherMailbox:			pilotAttributeType.22	:Mailbox
+lastModifiedTime:		pilotAttributeType.23	:UTCTime
+lastModifiedBy:			pilotAttributeType.24	:DN
+domainComponent:		pilotAttributeType.25	:CaseIgnoreIA5String
+dNSRecord:			pilotAttributeType.26	:IA5String
+associatedDomain:		pilotAttributeType.37	:CaseIgnoreIA5String
+associatedName:			pilotAttributeType.38	:DN
+homePostalAddress:		pilotAttributeType.39	:PostalAddress
+personalTitle:			pilotAttributeType.40	:CaseIgnoreString
+mobileTelephoneNumber,mobile:	oldPSIattributeType.1, pilotAttributeType.41 \
+							:TelephoneNumber
+pagerTelephoneNumber,pager:	oldPSIattributeType.2, pilotAttributeType.42 \
+							:TelephoneNumber
+friendlyCountryName,co:		quipuAttributeType.8, pilotAttributeType.43 \
+							:CaseIgnoreString
+uniqueIdentifier:		pilotAttributeType.44	:CaseIgnoreString
+organizationalStatus:		pilotAttributeType.45	:CaseIgnoreString
+janetMailbox:			pilotAttributeType.46	:CaseIgnoreIA5String
+mailPreferenceOption:		pilotAttributeType.47	:MailPreference
+buildingName:			pilotAttributeType.48	:CaseIgnoreString
+dSAQuality:			pilotAttributeType.49	:DSAQualitySyntax
+singleLevelQuality:		pilotAttributeType.50	:DataQualitySyntax
+subtreeMinimumQuality:		pilotAttributeType.51	:DataQualitySyntax
+subtreeMaximumQuality:		pilotAttributeType.52	:DataQualitySyntax
+personalSignature:		pilotAttributeType.53	:Photo:file
+dITRedirect:			pilotAttributeType.54	:DN
+audio:				quipuAttributeType.24, pilotAttributeType.55 \
+							:Audio:file
+documentPublisher:		pilotAttributeType.56	:CaseIgnoreString
+searchACL,sacl:			pilotAttributeType.57	:SearchACLSyntax
+listACL,lacl:			pilotAttributeType.58	:ListACLSyntax
+authPolicy:			pilotAttributeType.59	:AuthenticationPolicySyntax
+jpegPhoto:			pilotAttributeType.60	:jpeg:file
+
+# THORN system attributes
+
+thornACL:			thornSystemAttributeType.1	:ThornACL
+timeStamp:			thornSystemAttributeType.2	:UTCTime
+ruleDescription:		thornSystemAttributeType.3	:RDType
+objectDescription:		thornSystemAttributeType.4	:ODType
+attributeDescription:		thornSystemAttributeType.5	:ADType
+thornRule:			thornSystemAttributeType.6	:OID
+knowledgeReference:		thornSystemAttributeType.7	:KnowledgeReference
+
+# QUIPU defined attributes types
+
+treeStructure:			quipuAttributeType.1	:Schema
+accessControlList,acl:		quipuAttributeType.2	:Acl
+eDBinfo:			quipuAttributeType.3	:Edbinfo
+masterDSA:			quipuAttributeType.4	:DN
+slaveDSA:			quipuAttributeType.5	:DN
+control:			quipuAttributeType.15	:IA5String
+quipuVersion:			quipuAttributeType.16	:IA5String
+protectedPassword:		quipuAttributeType.17	:ProtectedPassword
+entrySecurityPolicy:		quipuAttributeType.18	:SecurityPolicy
+dsaDefaultSecurityPolicy:	quipuAttributeType.19	:SecurityPolicy
+dsaPermittedSecurityPolicy:	quipuAttributeType.20	:SecurityPolicy
+inheritedAttribute,iattr:	quipuAttributeType.21	:InheritedAttribute
+execVector:			quipuAttributeType.22	:PrintableString
+relayDSA:			quipuAttributeType.23	:DN
+subordinateReference:		quipuAttributeType.25	:AccessPoint
+crossReference:			quipuAttributeType.26	:AccessPoint
+nonSpecificSubordinateReference,NSSR:	quipuAttributeType.27 :AccessPoint
+listenAddress:			quipuAttributeType.28	:PresentationAddress
+cachedEDB:			quipuAttributeType.29	:DN
+masterEntries: 			quipuAttributeType.30 	:Integer
+slaveEntries:			quipuAttributeType.31	:Integer
+cacheEntries:			quipuAttributeType.32	:Integer
+DSAControl:			quipuAttributeType.33	:DSAControl
+openCall:			quipuAttributeType.34	:Call
+usageRate: 			quipuAttributeType.35	:Integer
+
+# MHS defined attribute types
+
+mhsDeliverableContentLength:	mhsAttributeType.0	:Integer
+mhsDeliverableContentTypes:	mhsAttributeType.1	:OID
+mhsDeliverableEits:		mhsAttributeType.2	:OID
+mhsDLMembers:			mhsAttributeType.3	:ORName
+mhsDLSubmitPermissions:		mhsAttributeType.4	:DLSubmitPermission
+mhsMessageStoreName:		mhsAttributeType.5	:DN
+mhsORAddresses:			mhsAttributeType.6	:ORAddress
+mhsPreferredDeliveryMethods:	mhsAttributeType.7	:DeliveryMethod
+mhsSupportedAutomaticActions:	mhsAttributeType.8	:OID
+mhsSupportedContentTypes:	mhsAttributeType.9	:OID
+mhsSupportedOptionalAttributes:	mhsAttributeType.10	:OID
+
+# PP defined attribute types
+
+dl-policy:			ppAttributeType.3	:DlPolicy
+
+# PSI defined attribute types
+
+obsoletesDocument:		oldPSIattributeType.3	:DN
+obsoletedByDocument:		oldPSIattributeType.4	:DN
+updatesDocument:		oldPSIattributeType.5	:DN
+updatedByDocument:		oldPSIattributeType.6	:DN
+keywords:			oldPSIattributeType.7	:CaseIgnoreString
+subject:			oldPSIattributeType.8	:CaseIgnoreString
+abstract:			oldPSIattributeType.9	:CaseIgnoreString
+documentStore:			oldPSIattributeType.10	:DocumentStoreSyntax
+documentAuthorCommonName,authorCN: oldPSIattributeType.11 :CaseIgnoreString
+documentAuthorSurName,authorSN:	oldPSIattributeType.12	:CaseIgnoreString
+whoisIdent:			oldPSIattributeType.13	:CaseIgnoreString
+
+# NADF defined attribute types
+
+fipsStateNumericCode:		nadfAttributeType.1	:NumericString
+fipsStateAlphaCode:		nadfAttributeType.2	:PrintableString
+fipsCountyNumericCode:		nadfAttributeType.3	:NumericString
+fipsPlaceNumericCode,fips55:	nadfAttributeType.4	:NumericString
+ansiOrgNumericCode:		nadfAttributeType.5	:Integer
+addmdName,ad:			nadfAttributeType.6	:CaseIgnoreString
+nadfSearchGuide:		nadfAttributeType.7	:NadfGuide
+supplementaryInformation:	nadfAttributeType.8	:CaseIgnoreString
+namingLink:			nadfAttributeType.9	:DN
+reciprocalNamingLink:		nadfAttributeType.10	:DN
+
+
+# MHS routing stuff
+
+# Tables
+textTableKey:			mhs-ds-tables-at.1	:caseIgnoreString
+textTableValue:			mhs-ds-tables-at.2	:caseIgnoreString
+
+distinguishedNameTableKey:mhs-ds-tables-at.3		:DN
+
+#OR address components
+
+mhsNumericCountryName:	mhs-ds-tree-at.5	:NumericString
+aDMDName:	mhs-ds-tree-at.1		:caseIgnoreString
+pRMDName:	mhs-ds-tree-at.10		:caseIgnoreString
+mHS-O:		mhs-ds-tree-at.6		:caseIgnoreString
+mHS-OU:		mhs-ds-tree-at.7		:caseIgnoreString
+mHSX121Address:	mhs-ds-tree-at.8		:caseIgnoreString
+mHS-DDA:	mhs-ds-tree-at.3		:caseIgnoreString
+mHS-DDV:	mhs-ds-tree-at.4		:caseIgnoreString
+mhsCN:		mhs-ds-tree-at.2		:caseIgnoreString
+mhspn:		mhs-ds-tree-at.9		:caseIgnoreString
+
+# UA
+#						SUBTYPE routingMTA
+supportingMTA:	mhs-ds-routing-at.33		:DN
+
+# MTA definitions
+
+mTAName:	mhs-ds-routing-at.19		:caseIgnoreIA5String
+globalDomainID:	mhs-ds-tables-at.10		:GlobalDomainIdentifier
+
+
+# Routing information of a Node
+
+authorativeAddress:mhs-ds-routing-at.3		:AddressAuthority
+routingFilter:	mhs-ds-routing-at.28		:RoutingFilter
+routingAction:	mhs-ds-routing-at.27		:RoutingAction
+mTAInfo:	mhs-ds-routing-at.18		:MTAInfo
+
+# Redirect
+
+filterdRedirect:	mhs-ds-routing-at.9	:FilteredRedirect
+mandatoryRedirect:	mhs-ds-routing-at.16	:DN
+
+# Indirect Access
+
+accessMD:	mhs-ds-routing-at.1		:DN
+
+# Routing Tree use definition
+
+routingTreeList:	mhs-ds-routing-at.29	:RoutingTreeList
+
+# Transport Communities
+
+transportCommunity:	mhs-ds-routing-at.34	:TransportCommunity
+
+# subtree Capability Restriction
+
+#			SUBTYPE mhs-deliverable-content-length
+subtreeDeliverableContentLength:mhs-ds-routing-at.30	:Integer
+#			SUBTYPE mhs-deliverable-content-types
+subtreeDeliverableContentTypes:	mhs-ds-routing-at.31	:OID
+#			SUBTYPE mhs-deliverable-eits
+subtreeDeliverableEITs:	mhs-ds-routing-at.32		:OID
+
+# Pulling Messages
+
+initiatorP1Mode:mhs-ds-routing-at.13		:P1Mode
+responderP1Mode:mhs-ds-routing-at.24		:P1Mode
+polledMTAs:	mhs-ds-routing-at.35		:PolledMTAs
+
+# Authentication Requirements
+
+responderAuthenticationRequirements:\
+	mhs-ds-routing-at.23:AuthenticationRequirements
+initiatorAuthenticationRequirements:\
+	mhs-ds-routing-at.12:AuthenticationRequirements
+responderPullingAuthenticationRequirements:\
+	mhs-ds-routing-at.25:AuthenticationRequirements
+initiatorPullingAuthenticationRequirements:\
+	mhs-ds-routing-at.14:AuthenticationRequirements
+
+
+# MTA Authentication Parameters
+
+respondingRTSCredentials:mhs-ds-routing-at.26	:RTSCredentials
+initiatingRTSCredentials:mhs-ds-routing-at.11	:RTSCredentials
+callingSelectorValidity:mhs-ds-routing-at.7	:CallingSelectorValidity
+callingPresentationAddress:mhs-ds-routing-at.22	:PresentationAddress
+
+# Simple MTA Policy
+
+mTAWillRoute:	mhs-ds-routing-at.21		:MTAWillRoute
+
+# Bad Address pointers
+
+badAddressSearchPoint:	mhs-ds-routing-at.4	:DN
+badAddressSearchAttributes:mhs-ds-routing-at.5	:AttributeType
+
+# Format Conversion
+
+mTAUsedForConversion:mhs-ds-routing-at.20	:DN
+bodyPartConversionService:mhs-ds-routing-at.6	:GeneralExplicitConversion
+contentConversionService:mhs-ds-routing-at.8	:ContentConversion
+
+# Access Units
+
+localAccessUnit:mhs-ds-routing-at.15		:AccessUnitType
+accessUnitsUsed:mhs-ds-routing-at.2		:SelectedAccessUnits
+
+# RFC 822 Node
+
+x400Domain:	mhs-ds-rfc-822-at.1		:X400DomainType
+
+jNTMailSupport:mhs-ds-rfc-822-at.2		:JNTMailSupport
+
+# RFC1148 mapping
+
+#					SUBTYPE mhs-or-address
+associatedORAddress:mhs-ds-mapping-at.1		:ORAddress
+#					SUBTYPE associatedORAddress
+nonAuthorativeAssociatedORAddress:mhs-ds-mapping-at.2:ORAddress
+#					SUBTYPE mhs-or-address
+associatedX400Gateway:mhs-ds-mapping-at.3:ORAddress
+#					SUBTYPE domain
+mhsAssociatedDomain:mhs-ds-mapping-at.4:CaseIgnoreIA5String
+#					SUBTYPE associatedDomain
+nonAuthorativeAssociatedDomain:mhs-ds-mapping-at.5:CaseIgnoreIA5String
+
+# DL stuff
+
+distributionListName:	mhs-ds-list-at.1	:DN
+
+dlErrorsToName:mhs-ds-list-at.2			:mhs-or-name-syntax
+dlPolicy:	mhs-ds-list-at.3		:DlPolicy
+dlDynamicMembers:mhs-ds-list-at.4		:DLDynamicMembers
+
+# PP specific Objects
+
+pPchannel,channel:		ppAttributeType.10	:caseIgnoreString
+pPchannelSpecificInformation,pPChanInfo:ppAttributeType.11	:IA5String
+
+# end of attributes
