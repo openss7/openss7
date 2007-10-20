@@ -1,0 +1,50 @@
+#!/bin/sh
+rm -f modscripout
+edb2dmi < showdraft >tmpdraft
+edb2dmi <tmpedb >tmpedb2
+
+(edb2dmi <tmpedb; echo "/-E/-N/-D/"; edb2dmi < showdraft) | awk '
+BEGIN	{
+	part = 1
+	add[","] = 2
+	del[","] = 1
+}
+
+{
+	x = $0
+	if (x == "/-E/-N/-D/") {
+		part = 2
+		next
+		}
+	if (part == 1) {
+		key = substr(x,1,1)
+		if (key == "!")
+			del[substr(x,2)] = 1
+		else if(key == "+") {
+			n = index(x,"=")
+			del[substr(x,2,n-2)] = 1
+			add[substr(x,2)] = 1
+       		}
+		else
+			add[x] = 1
+	}
+	else {
+		if (del[x] == 1)
+			next
+		n = index(x,"=")
+		if (del[substr(x,1,n-1)] == 1)
+			next
+		if (add[x] == 1)
+			add[x] = 2
+		print x 
+	}
+}
+
+END {
+	for (x in add)
+		if (add[x] == 1)
+			print x
+} ' | dmi2edb > newdraft
+
+#rm -f tmpdraft
+

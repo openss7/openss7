@@ -1,0 +1,199 @@
+ OPTIONS - Thu Dec  7 11:27:40 1989 - compile-time options - /mtr ]
+
+
+    Look at the skeleton files provided to get the flare of things.  In
+    addition, when porting to non-standard UNIX variants, consult the
+    files h/{general,manifest}.h to find other strange #defines
+
+
+1. Operating Systems
+
+    Choose one of BSD42, SYS5, or ROS.  In addition, some of these
+    have suboptions.
+
+#define	BSD42			Berkeley UNIX
+#define	WRITEV			    real Berkeley UNIX (has writev syscall)
+#define	SUNOS4			    with Sun's enhancements (SunOS4.0 or later)
+#define	SUNOS41			        SunOS4.1
+#define	BSD43			    4.3BSD or later
+#define	BSD43_Tahoe		        4.3BSD Tahoe release
+#define	BSD44			        4.4BSD to be precise! (not out yet)
+#define	OSX			    Olivetti's version
+#define aiws			    AIX Workstation
+
+#define	SYS5			AT&T UNIX
+#define SVR4			    System V Release 4
+#define SVR4_UCB		    SVR4 with ucb extensions
+#define SHADOW_PW		    Use shadow password file
+#define	SVR3			    System V Release 3
+#define	HPUX			    SVR2 with HP's enhancements
+#define	AIX			    SVR2 with IBM's enhancements
+#define	AUX			    SVR2 with Apple's enhancements
+
+#define	ROS			Ridge's emulation of UNIX
+
+#define	VSPRINTF		libc includes vsprintf() and vfprintf ()
+
+#define TEMPNAM			libc has tempnam () calls (use of this
+				is much recommended if available)
+
+2.  Network/Transport options 
+
+    Choose any combination of TCP, X25, BRIDGE_X25, or TP4.  For
+    TCP:  SOCKETS, WINTLI and EXOS are mutually exclusive, and WIN and BIND are
+    suboptions to SOCKETS.  For X25:  SUN_X25, CAMTEC, CAMTEC_CCL, UBC_X25
+    and ULTRIX_X25 are mutually exclusive.  
+
+    For TP4: WIN, SUN_TP4 are mutually exclusive.
+
+#define	TCP			support TCP/IP with TP0
+#define	SOCKETS			    provided by SOCKETS
+#define	WIN			        emulated via WIN/TCP for SVR2
+#define	WINTLI			    provided by WIN/TCP STREAMS
+#define	EXOS			    provided by EXOS 8044 card
+#define	BIND			if BIND is used (the gethostent struct
+				    has an h_addrlist field in <netdb.h>)
+				you may need to add "-lresolv" to the LSOCKET
+				definition in CONFIG.make
+
+#define	X25			support X.25 with TP0
+#define	SUN_X25			    using SunLink X.25 version 4.0 or 5.0
+#define	SUN_X25_HACK			to enable local subaddress masking 
+					(see comments in compat/x25addr.c)
+#define	CAMTEC			    using CAMTEC interface
+#define	CAMTEC_CCL		    using CAMTEC interface with sockets
+#define	UBC_X25			    using UBC X.25
+#define UBC_X25_WRITEV		        able to use writev for X.25,
+					not all versions of UBC code
+					support this.
+#define	ULTRIX_X25		    using Ultrix X.25
+#define ULTRIX_X25_DEMSA		X.25 access to DEC DEMSA x25router 2000
+#define HPUX_X25		    using HP-UX X.25
+#define CCUR_X25		    using CCUR X.25
+
+#define	BRIDGE_X25		use a TCP/X.25 gateway (deprecated)
+				    (requires #ifdef TCP)
+				    will not be part of the next release.
+
+#define	TP4			support real TP4
+#define	SUN_TP4			  provided by SunLink OSI
+#define	SUNLINK_5_2		      using SunLink OSI release 5.2 or greater
+#define	SUNLINK_6_0		      using SunLink OSI release 6.0 or greater
+#define	SUNLINK_7_0		      using SunLink OSI release 7.0 or greater
+#define	BSD_TP4			 provided by UCB/UWisc
+#define TLI_TP			 provided by TLI interface
+#define TLI_POLL		      making use of the poll(2) sys call
+#define ICL_TLI			      using the ICL DRS6000 TLI interface
+#define XTI_TP			 provided by XTI interface
+
+#define	NOGOSIP			assume TSEL uniquely distinguishes service
+				    (makes tsapd a LOT smaller and faster)
+
+
+3. Directory Services
+
+    By default, support for both the OSI Directory and the stub DSE is
+    compiled.  However, to enable access to the Directory (via a
+    lightweight access protocol), the isotailor variable ns_enabled
+    must be turned "on".  If the nameservice fails, then the stub DSE
+    will be consulted.
+
+    While not advised at this point you can disable fallback to the stub
+    DSE by also choosing NOSTUB.  Disabling the fallback mode implies
+    that all name to address resolution will depend on the DSE and will
+    fail if it is not operational. 
+
+#define	NOSTUB		do not use stub DSE when resolving names
+
+
+3.1 X.400 Attribute Syntaxes
+
+#define USE_PP		
+
+    If you have PP (5.3 or greater) you can compile X.400 defined
+    attribute syntaxes such as ORAddress into QUIPU.  You will also have
+    to add "libpp.a" and "libdl.a" into the LIBDSAP= rule (before
+    libdsap.a itself) in your CONFIG.make file, for example
+
+    	LIBDSAP= -L/usr/local/src/pp/Chans/lists -ldl \
+		 -L/usr/local/src/pp/Lib -lpp \
+		 libdsap.a
+
+3.2 Security Services
+
+#define OSISEC
+
+    If you have the OSISEC security package you can make certain applications
+    secure.  You will also need to add "libosisec.a" & "libcrypt.a" to the 
+
+    LIBDSAP= rule (before libdsap.a itself) in your CONFIG.make file, for
+    example 
+
+    	LIBDSAP= -L/usr/local/src/osisec-package -losisec -lcrypt  libdsap.a
+   
+    and indicate the whereabouts of the OSISEC header files by adding
+    to the OPTIONS= rule, for example
+
+	OPTIONS= -I. -I$(TOPDIR)h $(PEPYPATH) -I/usr/local/src/osisec-package/h
+
+4. UNIX Directory compatability routines
+
+    If your system supports a getdents() call, then define
+
+#define	GETDENTS
+
+     This will make the directory compatibility library a no-op.
+     Otherwise, define one of:
+
+#define	UFS	original UNIX filesystem (14-character name limit)
+#define	BFS	Berkeley UNIX filesystem (long names)
+#define	NFS	getdirentries() system call
+
+
+5.  imisc options 
+
+These are used by the imisc daemon to exec the rfinger program.
+
+#define	RFINGER	"path"		where rfinger lives
+#define	RFOPT1	"switch"	  switches
+#define	RFOPT2	"switch"	  switches
+
+
+6.  Anonymous login for ftam, etc.
+
+This defaults to
+
+#define	ANON	"ftp"
+
+You can set it to something else if you like.  For example, to have anonymous 
+ftam but not anonymous ftp (due to the numerous security holes in anonymous
+ftp), then just define ANON to be "ftam" and replace the "ftp" username in
+the /etc/passwd file with "ftam" instead.
+
+
+7. Management Instrumentation
+
+DO NOT SET THIS UNLESS YOU KNOW WHAT YOU ARE DOING (i.e., if you had to read
+this file, then you shouldn't set this option!)
+
+#define	MGMT	to enable management instrumentation in libtsap
+
+
+8. PEPSY options
+
+#define	PEPSY_REALS		real support for pepsy
+				    add "-lm" to LSOCKET in CONFIG.make
+
+
+9. KERBEROS options
+
+If you want the FTAM responder to use Kerberos for authentication, you can use
+the option below.  If enabled, Kerberos will be enabled if the pw_passwd field
+is the three-character sequence "*krb*".
+
+#define	KRB_PASSWD		enable Kerberos checking
+
+You must also add these three lines to your CONFIG.make file
+
+KRBOPT	=	-I<location of Kerberos include directory>
+KRBLIB	=	-lkrb -ldes

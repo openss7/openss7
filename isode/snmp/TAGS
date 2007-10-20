@@ -1,0 +1,196 @@
+
+appletalk.my,10
+231,7739
+
+bgp.my,139
+                         lowest bit number in the octet 73,2069
+                         i, is present and set, then the version 75,2213
+
+bsd.my,45
+		 coldStart - initiate a coldStart 80,1860
+
+char.my,0
+
+clns.my,0
+
+dot1d.my,309
+               value might identify an 261,8436
+               contained in the first 617,20183
+   -- differ from the MAC layer 881,28463
+               long) Bridge ID.  The other 341,11047
+   -- the size that the 880,28399
+               "The time 353,11449
+               "For a port which 255,8050
+
+dot3.my,744
+150,3388
+                      51.2 microseconds on a 10 Mbit/s system. A 567,20785
+                      is returned by the MAC service to the LLC 658,24347
+570,20997
+                      observe Ethernet encapsulation conventions 695,26102
+456,16316
+475,17229
+217,6715
+                      the effect of 161,4063
+                      receive operations 212,6369
+278,9601
+                      frames for which the transmission 782,28516
+                      transmission 836,30346
+                      variable 302,10706
+                      variable 312,11303
+                           state variables 170,4488
+                      variables 198,5505
+                      layer management state variables 227,7299
+
+dot4.my,10
+211,7812
+
+dot5.my,0
+
+ds1.my,195
+                      used to replace a sequence of eight zero bits 229,7501
+296,10723
+302,10971
+308,11209
+314,11449
+                      worst case, while the standards call for 244,8462
+
+ds3.my,45
+                         interval 418,15017
+
+etherhub.my,113
+                      "No reference 530,19351
+                      number of field-replaceable units 216,6680
+
+eval.my,0
+
+fddi.my,1671
+                      a Connect Action 632,20414
+                      Numbers Authority 1340,45148
+1290,43237
+                      "Error_Ct 1195,39634
+                      "Frame_Ct 1185,39301
+                      Hold Function 419,11981
+                      "I_Max 2270,77132
+                      "Lost_Ct 1205,39966
+                      "The number of Non Master PORTs 361,9880
+                      evaluation of Connection-Policy 480,14643
+                      "The total number of attachments 2122,71365
+                      "This object identifies the hardware chip(1324,44514
+                      clear 615,19564
+                      Recovery Enable Flag is clear 617,19707
+                      concentrator 589,18649
+                      to rejoin and clear the flag 633,20487
+                      "The number of SMT implementations 198,4477
+                      "The total number of MAC implementations 718,23227
+                      is 1325,44587
+                      machine 571,17957
+                      Management state machine 1271,42770
+                      currently enforced in the node 449,13014
+                      operation 312,8338
+                      SM_CM_Connect.request(664,21465
+                      SM_CM_Connect.request(672,21872
+                      to 30 seconds 531,16595
+                      T-Val(3) in the PC-Signaling sequence 482,14784
+                      Capability flags should  be set 1658,54546
+                      supports 323,8750
+                      supports 334,9160
+                      value 2083,70617
+                      The Path_Test variable 677,22121
+
+frame-relay.my,92
+                tion Management scheme is active 192,3688
+                tries 519,11112
+
+ifx.my,113
+                          or link-layer multicast address 192,6701
+                          address 436,17238
+
+lanmgr.my,0
+
+mib.my,445
+                               7  applications 203,7415
+                      "The number of network interfaces 219,7915
+                               3  internet 201,7289
+                      "The physical location of this node 174,5899
+                               1  physical 199,7158
+                      the 1007,40037
+                      used by the entity on this 1012,40387
+                      for, 2 raised to 189,6572
+
+ospf.my,185
+            rendering it inoperative.  The internal effect 1487,44845
+            link-state database.  This sum excludes external 406,11741
+            "A 32-bit integer 1577,47274
+
+para.my,50
+                    "The number of ports 92,1921
+
+ppp.my,0
+
+rmon.my,1503
+              SYNTAX DisplayString 3016,119789
+              SYNTAX DisplayString 3576,142538
+              SYNTAX DisplayString 3732,148116
+              SYNTAX OCTET STRING 3601,143488
+                  Sequence 316,12332
+                  a bad Frame Check Sequence 367,14209
+          bufferControlDownloadOffset 3226,128307
+          bufferControlDownloadSliceSize 3201,127015
+          bufferControlMaxOctetsGranted 3267,130027
+          bufferControlMaxOctetsRequested 3242,129057
+          channelMatches 3005,119368
+          channelTurnOnEventIndex 2903,114802
+435,16739
+                  "The total number of octets of data 267,10518
+          filterPktData 2554,100105
+          hostTopNDuration 1940,77413
+          hostTopNGrantedSize 1982,78952
+          hostTopNRequestedSize 1961,78352
+402,15372
+                  had a length 312,12077
+                  octets in length 354,13650
+                  less than 64 octets long 325,12637
+453,17205
+413,15827
+424,16282
+                  network 269,10639
+                  longer than 1518 octets 341,13074
+                  "The total number of packets 278,10930
+                  "The total number of packets 384,14784
+                  "The total number of packets 399,15198
+                  "The total number of packets 410,15652
+                  "The total number of packets 421,16107
+                  "The total number of packets 432,16563
+                  "The total number of packets 450,17028
+
+rs232.my,50
+                    "The number of ports 92,1876
+
+sip.my,589
+                      more SEF events.  A Severely Errored Framing 616,17250
+                      more SEF events.  A Severely Errored Framing 770,21247
+                      for the MID 470,14690
+                      "A DS1 Severely Errored Framing Second 614,17107
+                      "A DS3 Severely Errored Framing Second 768,21104
+                      addresses 244,7194
+                      addresses 265,8043
+                      have errors 223,6505
+1172,32283
+                      to 278,8651
+                      "A value which indicates the version(274,8363
+
+smi.my,0
+
+smux.my,184
+		   5	created dynamically 487,10571
+		   5	created dynamically 598,13103
+		 IP routing entry has TRUE, 2 raised to 478,10357
+		 CLNP routing entry has TRUE, 2 raised to 589,12887
+
+unix.my,117
+		 current job printing 163,3463
+		"The name of the file system 663,14121
+		 queue has TRUE, 2 raised to 138,2879
+
+view.my,0

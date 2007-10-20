@@ -1,0 +1,49 @@
+###############################################################################
+#
+# ufnrc - System-wide UFN tailoring file (read if ~/.ufnrc does not exist)
+#
+# $Header: /xtel/isode/isode/dsap/RCS/ufnrc,v 9.0 1992/06/16 12:12:26 isode Rel $
+#
+# $Log: ufnrc,v $
+# Revision 9.0  1992/06/16  12:12:26  isode
+# Release 8.0
+#
+#
+###############################################################################
+
+
+###############################################################################
+#
+# Syntax:
+#
+# 	<lower-bound> [ "," <upper-bound> ] ":" <DNS>
+#	<lower-bound> ::= A digit 0 - 9
+#	<upper-bound> ::= A digit 0 - 9, or "+"   -- + means 'or more'
+#	<DNS>	::= <DN> [ <extra> ]
+#	<extra> ::= "<CR><SPACE or TAB> <DN>
+#	DN	::= A Quipu stye Distinguished name
+#
+###############################################################################
+
+# You should edit this file by hand before running a UFN based interface.
+#
+# Replace "GB" with your country.
+# Replace "University College London" with your organization.
+# Replace "Computer Science" with an organizational unit, if one is dominant
+#     if not, remove the ENTIRE line, and start the line following by
+#     "1:" in column 1
+#
+
+1:	c=GB@o=University College London@ou=Computer Science
+	c=GB@o=University College London
+	c=GB
+	-
+
+2:	c=GB
+	c=GB@o=University College London
+	-
+
+3,+:	-
+	c=GB
+	c=GB@o=University College London
+

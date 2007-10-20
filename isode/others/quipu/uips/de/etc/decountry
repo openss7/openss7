@@ -1,0 +1,12 @@
+Enter the name of the COUNTRY containing the entry you are seeking.  This 
+should either be a long-form name such as "united kingdom" or "great britain",
+or one of the two letter country codes ("gb" for the United Kingdom).  If a 
+long-form name is used, it is only necessary to enter enough of the name
+to unambigiously identify the COUNTRY.  For example, "germ" or "deut" are
+sufficient to identify Germany.
+
+*         will list all countries
+control-C to return to the prompt for a person's NAME
+q         to quit the Directory or (optionally) to return to prompt for a
+          person's NAME.
+	  

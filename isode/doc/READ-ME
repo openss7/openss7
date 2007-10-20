@@ -1,0 +1,249 @@
+[ READ-ME - Thu May 16 14:27:43 1991 - Comments on doc/ - /mtr ]
+
+     Following are the sources to the ISODE Documentation set.
+
+
+cn-isdn/	ISO Transport Services on top of the TCP
+
+    This is a reprint of an article appearing in the Computer Networks and
+    ISDN Systems journal, volume 12, number 3, 1986.
+
+
+comments/	ISODE -- Further Comments
+
+    This is a copy of a presentation given as a follow-on to the isode3/
+    talk described below
+
+
+cookbook/	Building Distributed Applications in an OSI Framework
+
+    This is a copy of a tutorial given at the TCP/IP ISO/OSI Tutorials
+    held in Washington, D.C., on April 25-27, 1988.
+
+ds/		OSI Directory Services
+
+    This is a copy of a presentation given to the U.S. NIST OSInet
+    Technical Committee on December 13, 1988.
+
+
+duug/		Directory Navigation in the QUIPU X.500 System
+
+    This is a copy of a paper on the above topic.
+
+
+ftam/		File Transfer, Access and Management
+
+    This is a copy of a presentation given at the ISO Development
+    Seminar held in Monterey, California, on August 31-September 2, 1987
+
+
+ifip88-quipu/	The QUIPU Directory Service
+
+    This is a copy of a talk given at the 1988 IFIP WG 6.5 Conference.
+
+
+interim/	An interim approach to use of Network Addresses
+		A string encoding of Presentation Address
+
+    This is a copy of two papers written by S.E. Kille which defines the
+    addressing formats used by the ISODE.
+
+
+internals1/	ISODE Internals
+
+    This is a copy of a tutorial given at the 6th TCP/IP Interopability
+    Converence held in San Jose, California, on October 8-9, 1990
+
+
+internals2/	ISODE Internals
+
+    This is a copy of the updated tutorial given at the Interop Tutorial
+    Series in Boston, Massachussettes, on April 24-25, 1991
+
+
+internals3/	ISODE Internals
+
+     The final version of this presentation.
+
+
+islands/	Communications -- An Enabling Technology: Bridging the
+		Islands of Automation
+
+    This is a copy of a presentation given at a factory automation
+    workshop.  
+
+
+iso-migrate/	Recent Developments in ISO Migration
+
+    This is an updated copy of the presentation given at the TCP/IP Vendors'
+    Workshop held in Monterey, California, on August 25-27, 1986 
+
+
+isode1/		ISODE: Past, Present and Future, and Strategies for
+		Transition and Coexistence
+
+     This is a copy of a presentation given at the IBM T.J. Watson
+     Research Center.
+
+
+isode2/		Recent Developments with OSI
+
+     This is a copy of a presentation given at Silicon Graphics.
+
+
+isode3/		ISODE: Openly Available OSI for TCP/IP Networks
+
+     This is a copy of a birds-of-a-feather given at the Third TCP/IP
+     Interoperability Conference held in  Santa Clara, CA, on September
+     26-30, 1988
+
+
+isode4/		ISODE: Openly Available OSI
+
+     This is a copy of a presentation on ISODE 5.0 given to HP on March
+     23, 1989
+
+
+isode5/		ISODE: Openly Available OSI
+
+     This is a slightly updated presentation on ISODE 5.0
+
+
+isode6/		ISODE: Openly Available OSI
+
+     This is the standard presentation on ISODE 6.0
+
+
+issues/		Issues in Transition and Coexistence for TCP/IP to OSI
+
+     This is a copy of a tutorial given at the OSI Product Integration
+     Conference held in McLean, VA, on November 29-December 2, 1988
+
+
+manual/		The ISO Development Environment: User's Manual
+
+    This is an attempt at a user's manual describing the release.  
+
+
+map-migrate/	Migrating to MAP/TOP, Why, How and When?
+
+    This is a copy of the presentation given at the MAP/TOP User's
+    Meeting held in Ann Arbor, Michigan on September 16, 1986
+
+
+memos/		Request for Comments or Informational Notes
+
+    These are always ASCII files with embedded form-feeds:  
+
+	rfc1006.txt	ISO Transport Services on Top of the TCP
+			Version: 3
+
+	rfc1085.txt	ISO Presentation Services on top of TCP/IP-based
+			internets
+
+	rfc1086.txt	ISO-TP0 bridge between TCP and X.25
+
+	smux-api.txt	How to export a MIB module from a BSD UNIX
+			daemon using the 4BSD/ISODE SMUX API
+
+	smux.txt	SNMP MUX Protocol and MIB
+
+
+monterey/	Protocol Advances 3: ISO Development Environment
+
+    This is a copy of the session held at the TCP/IP Interoperability
+    Conference held in Monterey, California, on March 16-19, 1987
+
+
+ncf/		Focus on OSI for Networked Applications
+
+    This is a copy of the presentation given at the Network Computing
+    Forum held in San Jose, CA, on November 18, 1987
+
+
+nordunet/	Some talks given at NORDUNET '89
+
+    This is a copy of some presentations given at the NORDUNET '89
+    Conference in Stockholm, Sweden, on October 25-27, 1989
+
+
+osi-posix/	OSI Protocols within an openly available, POSIX
+		conformant, Berkeley UNIX Environment
+
+    This is a copy of a presentation given at the 2nd TCP/IP
+    Interoperability Conference held in Washington, D.C., on December
+    1-4, 1987
+
+
+osi-update/	Recent Developments with OSI implementations
+
+     This is a copy of a presentation that was to be given at an ICB
+     meeting on January 13th, 1988; unfortunately the speaker was ill
+     that week
+
+
+practical-osi1/	Practical Perspectives on OSI Networking
+
+     This is a copy of a tutorial given at the 5th TCP/IP Interoperability
+     Conference held in San Jose, California, on October 2-6, 1989
+
+
+practical-osi2/	Practical Perspectives on OSI Networking
+
+     This is a copy of the updated tutorial given at UC Extension/Techmart
+     in Santa Clara, California, on July 16-17, 1990
+
+
+practical-osi3/	Practical Perspectives on OSI Networking
+
+     This is a copy of the updated tutorial given at the Interop Tutorial
+     Series in Boston, Massachussettes, on April 22-23, 1991
+
+
+practical-osi4/	Practical Perspectives on OSI Networking
+
+     The final version of this presentation.
+
+
+quipu/		The Design of QUIPU
+
+     This describes the design of the QUIPU Directory.
+
+
+reality/	TCP/IP, MAP/TOP and the Reality of the ISO protocols
+
+    This is a copy of the presentation given at the Uniforum meeting
+    held in Washington, D.C., on January 23, 1987
+
+
+snmp/		4BSD/ISODE SNMP Roadmap
+
+     This is a brief Roadmap describing the facilities in the 4BSD/ISODE
+     SNMP package.
+
+trek/		Trekking to ISO: Beam Us Over, Scotty
+
+    This is a copy of a presentation given at an IRM conference.
+
+
+tsap/		A Modest Proposal
+
+    This is a copy of the presentation given at the MAP/TOP User's
+    Meeting held in Seattle, Washington, on May 15-16, 1986 
+
+
+tsaptalk/	A Modest Proposal
+
+    A transcript of the presentation given at the MAP/TOP User's Meeting
+    held in Seattle, Washington, on May 15-16, 1986 
+
+
+ufn/		Using the OSI Directory to achieve User Friendly Naming
+
+    This describes Kille's user-friendly naming scheme.
+
+
+whitepages/	PSI White Pages Pilot
+
+     This is a directory containing documents for the PSI White Pages
+     Pilot Project.

@@ -1,0 +1,45 @@
+###############################################################################
+#
+# dsaptailor - ISODE DSAP Specific Tailoring File
+#
+# $Header: /xtel/isode/isode/dsap/RCS/dsaptailor,v 9.0 1992/06/16 12:12:26 isode Rel $
+#
+#
+# $Log: dsaptailor,v $
+# Revision 9.0  1992/06/16  12:12:26  isode
+# Release 8.0
+#
+# 
+###############################################################################
+
+
+# this line must occur first
+oidtable	oidtable
+
+# which dsa to call initially
+dsa_address toucan		localHost=17003
+
+# logging
+dsaplog		level=exceptions dflags=tty
+stats		file=dua.log
+
+# local DIT position (where a DUA starts in the DIT)
+# local_DIT	"c=XX"
+
+# oid format
+oidformat	short
+
+# photograph process routines
+photo		dumb	ttyphoto
+#photo		xterm	Xphoto
+#jpeg		xterm	xjpeg
+
+# automatic quipurc creation
+quipurc		off
+
+# DUA search/list sizelimit
+sizelimit	20
+
+
+# some other DSAs of interest (added automatically)
+

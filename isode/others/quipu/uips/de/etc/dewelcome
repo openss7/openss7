@@ -1,0 +1,18 @@
+You can use this directory service to look up telephone numbers and electronic
+mail addresses of people and organisations participating in the Pilot
+Directory Service.  You will be prompted to type in:
+
+:- the NAME of the person for whom you are seeking information
+:- their DEPARTMENT (optional), 
+:- the ORGANISATION they work for, and 
+:- the COUNTRY in which the organisation is based.
+
+On-line HELP is available to explain in more detail how to use the
+Directory Service.  Please type ?INTRO (or ?intro) if you are not familiar 
+with the Directory Service.
+
+?          for HELP with the current question you are being asked
+??         for HELP on HELP
+q          to quit the Directory Service (confirmation asked unless at the
+           request for a person's name)
+Control-C  abandon current query or entry of current query

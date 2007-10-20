@@ -1,0 +1,18 @@
+Simplest usage is to type the NAME you want.  The following forms are 
+suggested:
+          Barker           P Barker          Paul Barker
+
+However, often it is unnecesary to specify complete NAMEs.  Typing `Bark' 
+will first try and find entries exactly matching `Bark'.  If an 
+exact match cannot be found, the program will then match any entries 
+containing the "word" `Bark' - entries for Barker will now be found.  Finally
+some approximate matching is attempted - this often caters for mis-spellings.
+More control over the matching of entries can be achieved by using wildcard 
+characters -  type "? WILDCARDS" for usage.  Summary of special commands:
+
+*         will list all people in the selected DEPARTMENT or ORGANISATION
+<CR>      will accept any default from a previous query.
+-         will clear any existing default.  Entering no NAME allows
+          querying for information about DEPARTMENTs and ORGANISATIONs.
+          Type "? ORGINFO" for more details on how to do this.
+q         to exit the Directory Service

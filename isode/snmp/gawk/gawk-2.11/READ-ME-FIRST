@@ -1,0 +1,53 @@
+[ READ-ME-FIRST - Thu Dec 12 09:55:49 1991 - notes on SNMP+gawk - /mtr ]
+
+
+0.   You should already have installed the 4BSD/ISODE SNMP software.
+
+1.   Get a copy of GNU Awk 2.11.  Extract the gawk-2.11/ hierarchy into
+     this directory, snmp/gawk/gawk-2.11/.
+
+2.   Apply the patches to the sources by
+
+	% patch -p < GAWK-PATCHES
+
+3.   If you're going to be compiling with gcc, also apply a second set
+     of patches:
+
+	% patch -p < gcc-patches
+
+4.   Follow the instructions in the README file to configure gawk.
+
+5.   If your $(INCDIR) is not /usr/include, then add
+
+	-I$(INCDIR)
+
+     to the "FLAGS=" definition in the Makefile.
+
+6.   Type 
+
+	% make
+
+     to generate gawk.
+
+7.   As the super-user copy gawk to $(BINDIR) and create the directory
+     /usr/local/lib/awk.
+
+8.   At this point you should be able to do a trivial test:
+
+	% gawk -f s-gawk/mib.system
+
+     which will contact your local SNMP agent using the default
+     community and ask for information from the system group.  The
+     output looks something like this:
+
+	agent cheetah.ca.psi.com
+	   running: 4BSD/ISODE SNMP
+	            (1.3.6.1.4.1.4.1.2.4)
+	  services: applications, end-to-end
+	  location: upstairs machine room
+	   contact: Marshall Rose <mrose@psi.com>
+	    uptime: 5 days, 17 hours, 24 minutes, 37.69 seconds
+
+9.   Now you can install the primarly application supplied, s-netstat:
+
+	# (cd s-gawk; ./make inst-all)

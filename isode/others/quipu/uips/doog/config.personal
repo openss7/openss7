@@ -1,0 +1,13 @@
+searchpath : 1 :
+	("c=gb@o=brunel university@ou=manufacturing and engineering systems",
+	 "c=gb@o=brunel university",
+	 "c=gb",
+	 "")
+
+searchpath : 2 :
+	("c=gb",
+	 "c=gb@o=brunel university", "")
+
+searchpath : 3, + :
+	("",
+	 "c=gb")

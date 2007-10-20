@@ -1,0 +1,36 @@
+In many cases, the Directory will be able to resolve queries successfully, 
+even if you enter names which do not exactly match the names in the Directory.
+However, you may find that the Directory will fail to find a match, which 
+appears to be almost correct.  The following query provides such an example:
+
+    person>       kille
+    department>   computing science
+    organisation> ucl
+    country>      gb
+
+In this case, the Directory Service returns with the message: "No departments
+match `computing science'", although the correct name of the department,
+"computer science", is very similar.  
+
+The reason for this failure is that too much information has been provided 
+for approximate matching to work.  In general, the less you type, the more 
+matches the system will return.  Thus, entering "comp" at the department
+prompt will obtain the following response:
+
+Got the following approximate matches.  Please select one from the list
+by typing the number corresponding to the entry you want.
+
+      1 Computer Science
+      2 Computerised Tomography
+
+Alternatively, typing "comp sci" will obtain the following matches:
+
+      1 Central Computing Service
+      2 Computer Science
+
+You may find that the system will occasionally return some "matches" which 
+you find hard to understand - the approximate matching uses phonetics if
+more precise matching is not possible.
+	    
+See the help screen on WILDCARDS for details on how to exercise more control
+over the type of matching used by this service.

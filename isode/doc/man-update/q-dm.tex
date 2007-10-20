@@ -1,0 +1,285 @@
+\chapter{DM Tools}
+\label{DUA:dmtools}
+
+\pgm{DM tools} are a set of shell scripts which provide some simple bulk
+data management functions using DAP.  The tools have the following
+characteristics.
+
+\begin {itemize}
+\item They obviate such skulduggery as
+editing EDB files on the DSA machine.
+\item They provide some ability to add, modify and delete entries and
+attributes.
+\item They will play a part in managing data from multiple sources, but
+there are several limitations (see caveats later).
+\item They will not handle large numbers of thousands of entries in one go,
+but have been used with success with a few thousand entries.
+\item Based on DISH commands with lashings of shell and [gn]awk.
+\end{itemize}
+
+\section {How the Tools Work}
+
+The tools are driven by data in a syntax very similar to the EDB files.  A
+special-purpose difference tool is used to work out differences between the
+current version of the data and the previous version.  Another tool
+processes the resultant differences (which may, of course, be the original
+file the first time round) and translates this data into a shell script of
+the DISH commands required to update the directory appropriately.  Run the
+resultant shell script to apply the modifications.
+
+\section {The Bulk Data Format --- dmformat}
+
+This is very similar to the EDB format.  The differences are as follows:\\
+
+%%%\renewcommand{\arraystretch}{2}
+\begin {tabular}{|l|l|}
+\hline
+EDB & DMFORMAT \\
+\hline
+\hline
+DIT hierarchy mapped & Flat file with embedded info \\
+onto UNIX directory & saying where entries should be  \\
+structure & loaded in the DIT \\
+& \\
+Files start with: & File don't start with ... \\
+MASTER & \\
+date in UTC format & \\
+&                                    File contains "rootedAt" info \\
+& \\
+&                                    Syntax includes mechanism for \\
+&                                    specifying deletion of an entry / \\
+&                                    attribute \\
+& \\
+Can only represent one set&          Can represent information \\
+of sibling entries &                 in an entire subtree or \\
+&                                    collection of subtrees \\
+\hline
+\end {tabular}\\
+
+Comments may be interspersed throughout the file.  A comment line begins
+with a ``\#'' character.
+
+rootedAt indicates the parent node in the DIT for subsequent entries in the
+file.  Separate a rootedAt line from entries by one or more blank lines.
+
+A set of entries follows a rootedAt line.  These are formatted in the same
+way as in an EDB file: i.e., an entry is a sequence of attribute type-value
+pairs, where the first pair is the RDN for the entry.
+
+Entries are separated from other entries by blank lines.
+
+In addition to the conventional syntax it is possible to specify deletion of
+entries and attributes.
+\begin{itemize}
+\item Specify entry deletion by prefixing the RDN with the ``!'' character.
+\item Specify attribute value deletion by prefixing the attribute type=value
+line with a ``!'' character.
+\end{itemize}
+
+A file can contain information for many DIT subtrees by including more
+rootedAt lines.
+
+\section{dmformat --- An Example}
+
+\begin{verbatim}
+#subsequent entries are relative to this point
+# in the DIT
+rootedAt= c=gb@o=UCL@ou=CS
+
+# add this entry with these attributes
+#   if it doesn't already exist
+# try to add in these attribute values if
+#   the entry already exists
+cn=Paul Barker
+surname=Barker
+telephoneNumber=+44 71 380 7366
+objectClass=organizationalPerson & quipuObject & ...
+
+# Add the first telephone number attribute
+# value and delete the second
+cn=Steve Kille
+telephoneNumber=+44 71 380 7294
+!telephoneNumber=+44 71 380 1234
+
+# Delete this entry
+!cn=Colin Robbins
+# don't have to supply attributes, but can
+# if you like
+!telephoneNumber=+44 71 387 7050 x3688
+
+#subsequent entries are relative to this point
+# in the DIT
+rootedAt= c=gb@o=UCL@ou=Physics
+
+\end{verbatim}
+
+\section{Using the Tools}
+
+The tools can be used to load the database initially as follows:
+
+\begin{itemize}
+
+\item Produce a file ``newfile'' of entries to be loaded
+\item Make a file of DISH operations to effect the update
+
+\verb|crmods < newfile|
+
+\item Apply the updates
+
+\verb|sh modfile|
+\end{itemize}
+
+It can also be used for subsequent amendments
+
+\begin{itemize}
+\item Create a file of difference data
+
+\verb|dmdiff oldfile newfile > difffile|
+
+\item Create a shell/DISH script to do the update
+
+\verb|crmods < difffile|
+
+\item Apply the updates
+
+\verb|sh modfile|
+\end{itemize}
+
+There are examples of using the tools and sample Makefiles in the README
+file accompanying the software.
+
+\section{Preparing Data for use with DM Tools}
+
+The tools will work more efficiently if the following guidelines are
+followed:
+
+\begin{itemize}
+\item Attribute type strings in DM files should be the same as those
+written out by DISH when using ``showentry -edb''
+
+In practice this means using the abbreviated attribute names as specified in
+\$(ETCDIR)/oidtable.at.  E.g., use ``cn'' rather than ``commonName'', and
+``mail'' rather than ``rfc822Mailbox''.
+
+\item Be consistent with capitalisation and case in general between DM files
+produced from the various sources.
+
+\item Attribute values with DN syntax should have the country name part
+represented in capitals, as in ``c=GB''.  This is because QUIPU always
+writes them out that way.  In all other cases, QUIPU maintains the case
+with which entries' attributes are created.
+
+\end{itemize}
+
+\section{Some Specific Shortcomings of the DM Tools}
+
+\begin{itemize}
+\item Scale --- the shell script, {\tt modfile,} which crmods produces, is
+very large for substantial amounts of data or data differences
+
+It may be more manageable to split data into a set of department files, as
+for EDBs, and apply set of updates.
+
+\item Matching of attribute types and attribute values is case-sensitive,
+whereas almost always it should be case-independent.
+
+In practice this is not too much of a problem
+
+\begin{itemize}
+\item At worst, it means that too many ``differences'' are discovered
+\item QUIPU does the ``right thing'' anyway
+\end{itemize}
+
+\item No explicit mechanism for renaming entries --- achieved by deleting
+entry with old name and creating a new entry.
+
+You may thus discard attribute information which has been loaded from
+another source.
+
+\item Tools have no knowledge that entries may be mastered by more
+than one source.
+
+If an entry is deleted from one source, it will be deleted from the
+Directory even if the entry still exists in another source.  This may, or
+may not, be want you want!
+
+\item No explicit support for maintenance of seeAlso, roleOccupant and other
+attributes which have DN syntax.
+
+All necessary management to avoid ``dangling pointers'' must be
+achieved externally
+
+\item No support for management of aliases
+
+\item Updating over DAP can be rather slow for entries with large numbers of
+siblings (in QUIPU terms, in a large EDB file).
+
+There is a solution --- use the TURBO\_DISK option when compiling
+QUIPU.  This makes use of GNU's gdbm package.  Consider this if you do
+a lot of updating and you have large EDB files.
+
+\item There are some known bugs.  Inherited attributes are not always handled 
+correctly, and problems with eDBInfo have been reported.
+%%% Fixes gratefully received --- send them to \verb+<p.barker@cs.ucl.ac.uk>.+
+
+\end{itemize}
+
+\section {General Data Management Problems Not Catered For}
+
+\begin{itemize}
+\item Management of data from multiple sources is very difficult --- no support
+for merging data from different sources, or for consistent deletion.
+\item No framework for discrimination between quality of data sources --- this
+must be handled manually
+\item Relying on diffs not really satisfactory --- need to rebuild database
+periodically from source data
+\item Naming of entries --- DM tools offer no help with naming to person
+maintaining the Directory
+database.  This administrator should be aware of at least the following
+problems
+\begin{itemize}
+\item Two sources may name an entity differently
+
+\begin{verbatim}
+source one: P Barker
+source two: Paul Barker
+\end{verbatim}
+
+\item Need to be careful that no duplicate RDNs are formed when processing
+the source data into EDBs or DM files.
+\begin{itemize}
+\item If building EDBs, QUIPU will detect multiple RDNs as it loads its
+database.
+\item DM tools will perform multiple updates on a single entry
+\end{itemize}
+
+\item Even in case where one is loading from a single source, the name which
+is systematically derivable may be unsatisfactory. E.g.,
+
+\verb|PHYS & ASTRO|
+
+rather than
+
+\verb|Physics and Astronomy|
+
+\item A source's vies of what constitutes a department may be parochial,
+suiting particular requirements.  For example, the UCL telephone directory
+database has the following two departments
+
+\begin{verbatim}
+BIOLOGY (DARWIN)
+BIOLOGY (MEDAWAR)
+\end{verbatim}
+
+whereas the University view, which must be represented, is that there is
+just a single ``Biology'' department
+
+\item Need to be careful when joining departments in this way that no RDN
+clashes occur.  If they do occur, a solution is to name entries with
+multiple value RDN.
+
+cn=Fred Bloggs\%ou=Biology (Medawar)
+
+\end{itemize}
+
+\end{itemize}

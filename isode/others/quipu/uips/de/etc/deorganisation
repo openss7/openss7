@@ -1,0 +1,19 @@
+Enter the name of the ORGANISATION where the person works.  It will often
+be possible to just enter short forms of the ORGANISATION name.  For example,
+typing "ucl" will suffice to find "University College London" in the United 
+Kingdom.  As for all types of input, WILDCARDS can be used to offer more 
+control over searching (see the help screen for WILDCARDS).
+In particular note that:
+
+*         will list all ORGANISATIONS (if no person's NAME or DEPARTMENT name
+          has been entered)
+*univ*    will list all ORGANISATIONs whose names contain the string "univ"
+          (if no person's NAME or DEPARTNMENT name has been entered)
+*univ*    will search all ORGANISATIONs whose names contain the string "univ"
+          (if a person's NAME or DEPARTMENT name has been entered)
+<CR>      will accept the previous default ORGANISATION.
+
+control-C to return to the prompt for a person's NAME
+q         to quit the Directory or (optionally) to return to prompt for a
+          person's NAME.
+	  

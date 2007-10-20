@@ -1,0 +1,96 @@
+-- 4bsd.my - preface for UNIX-specific MIB
+
+-- $Header: /xtel/isode/isode/snmp/RCS/bsd.my,v 9.0 1992/06/16 12:38:11 isode Rel $
+--
+-- Contributed by NYSERNet Inc.  This work was partially supported by the
+-- U.S. Defense Advanced Research Projects Agency and the Rome Air Development
+-- Center of the U.S. Air Force Systems Command under contract number
+-- F30602-88-C-0016.
+--
+--
+-- $Log: bsd.my,v $
+-- Revision 9.0  1992/06/16  12:38:11  isode
+-- Release 8.0
+--
+--
+
+--
+--				  NOTICE
+--
+--    Acquisition, use, and distribution of this module and related
+--    materials are subject to the restrictions of a license agreement.
+--    Consult the Preface in the User's Manual for the full terms of
+--    this agreement.
+--
+--
+
+
+BSDUNIX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises
+	    FROM RFC1155-SMI;
+
+
+-- BSD UNIX-specific stuff
+
+unix	      OBJECT IDENTIFIER	::= { enterprises 4 }
+
+
+-- the agents group
+
+agents	OBJECT IDENTIFIER ::=	{ unix 1 }
+
+-- original "4BSD/ISODE SNMP"	{ agents 1 }
+
+-- versions of the "4BSD/ISODE SNMP" agent are now under { agents 2 }
+fourBSD-isode OBJECT IDENTIFIER ::= { agents 2 }
+-- fourBSD-isode.1:	add SMUX
+-- fourBSD-isode.2:	add views
+-- fourBSD-isode.3:	add sets
+-- fourBSD-isode.4:	add mbufs
+-- fourBSD-isode.5:	add more sets
+
+agentAction OBJECT-TYPE
+	SYNTAX	INTEGER {
+		    other(1),
+		    coldStart (2)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"A control variable used to trigger an action by the agent.
+		 When read, this variable always returns the value other(1).
+
+		 When set, this variable causes the agent to undertake the
+		 indicated action:
+
+		 coldStart - initiate a coldStart (restart the agent)"
+	::= { agents 3 }
+
+
+-- the mbuf group (defined in smux.my)
+-- mbuf OBJECT IDENTIFIER ::= { unix 2 }
+
+
+-- the SMUX peer group
+
+peers	OBJECT IDENTIFIER ::=	{ unix 3 }
+
+-- versions of the unixd program are under { peers 1 }
+unixd	OBJECT IDENTIFIER ::=	{ peers 1 }
+-- unixd.1:		mbufs
+-- unixd.2:		add print/users, remove mbufs
+
+
+-- the SMUX protocol group (defined in smux.my)
+-- smux OBJECT IDENTIFIER ::=	{ unix 4 }
+
+
+-- the NETSTAT group (defined in smux.my)
+-- netstat OBJECT IDENTIFIER ::= { unix 5 }
+
+
+-- all remaining groups are in unix.my
+
+END
