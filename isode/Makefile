@@ -36,6 +36,7 @@ DIRS	=	$(LIBDIRS) support imisc
 OTHERS	=	dsap ftam ftam2 ftam-ftp ftp-ftam others psap2-lpp quipu \
 		snmp vt
 
+MKDIR	=	mkdirhier
 
 all:;		@for i in $(DIRS); \
 		    do (echo "cd $$i; $(MAKE) all"; \
@@ -49,9 +50,9 @@ inst-all:	make-dirs
 		    done
 
 make-dirs:;	@for i in $(BINDIR) $(SBINDIR) $(ETCDIR) $(LOGDIR) \
-			$(LIBDIR) $(LINTDIR) ; \
+			$(LIBDIR) $(LINTDIR) $(INCDIR); \
 		    do (echo $$i X | \
-			sed -e 's%\(.*\)/ X%if test ! -d \1; then mkdir \1; chmod 755 \1; else true; fi%' | \
+			sed -e 's%\(.*\)/ X%if test ! -d \1; then $(MKDIR) \1; chmod 755 \1; else true; fi%' | \
 			sh -v); \
 		    done
 		@-echo $(LOGDIR) X | \
@@ -105,17 +106,17 @@ inst-partial:;	cd h; $(MAKE) inst-all
 ##################################################################
 
 everything:	all true
-		./make all-ftam all-ftam-ftp all-vt all-quipu all-snmp \
+		$(MAKE) all-ftam all-ftam-ftp all-vt all-quipu all-snmp \
 			all-lpp
 		@echo "a great album by mtr's favorite rock band"
 		@echo "sh \"whois -name mtr -info 'favorite rock band'\""
 
 inst-everything: inst-all true
-		./make inst-ftam inst-ftam-ftp inst-vt inst-quipu inst-snmp \
+		$(MAKE) inst-ftam inst-ftam-ftp inst-vt inst-quipu inst-snmp \
 			inst-lpp
 
 lint-everything: lint true
-		./make lint-ftam lint-ftam-ftp lint-vt lint-quipu lint-snmp \
+		$(MAKE) lint-ftam lint-ftam-ftp lint-vt lint-quipu lint-snmp \
 			lint-lpp 
 
 true:;

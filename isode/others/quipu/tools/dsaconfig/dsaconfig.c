@@ -27,6 +27,7 @@ static char *rcsid = "$Header: /xtel/isode/isode/others/quipu/tools/dsaconfig/RC
 
 #include <ctype.h>
 #include <errno.h>
+#include <sys/types.h>
 #include <grp.h>
 #include <pwd.h>
 #include <stdio.h>
@@ -1329,22 +1330,5 @@ char   *what,
        *fmt;
 {
     advise (what, fmt);
-}
-#endif
-
-/*    MISCELLANY */
-
-#ifndef	lint
-static char *strdup (s)
-char   *s;
-{
-    char    *p;
-
-    if ((p = malloc((unsigned) (strlen (s) + 1))) == NULL)
-	adios (NULLCP, "out of memory");
-
-    (void) strcpy (p, s);
-
-    return p;
 }
 #endif

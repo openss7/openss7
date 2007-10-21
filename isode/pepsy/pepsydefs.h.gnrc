@@ -381,10 +381,14 @@ extern char *yyprfdflt;
 extern int yydebug;
 extern int yylineno;
 
+#ifdef USE_FLEX_SCANNER
+extern char *yytext;
+#else
 #ifndef	HPUX
 extern char yytext[];
 #else
 extern unsigned char yytext[];
+#endif
 #endif
 
 extern char *mymodule;

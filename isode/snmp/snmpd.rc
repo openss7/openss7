@@ -94,6 +94,8 @@ variable	interface le0	ifType=6
 variable	interface qe0	ifType=6
 variable	interface se0	ifType=6
 variable	interface ln0	ifType=6
+variable	interface ne0	ifType=6
+variable	interface we0	ifType=6
 
 # and slip...
 variable	interface sl0	ifType=22

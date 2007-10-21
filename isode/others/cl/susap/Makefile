@@ -42,7 +42,7 @@ $(LIBDIR)libsusap.a:	libsusap.a
 		@$(UTILDIR)make-lib.sh $(SYSTEM) $@ -ranlib
 		-@ls -gls $@
 		-@echo ""
- 
+
 $(LINTDIR)llib-lsusap:	llib-lsusap
 		-cp $@ zllib-lsusap
 		-rm -f $@

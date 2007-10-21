@@ -1,2 +1,7 @@
 : run this script through /bin/sh
-exec /bin/make MODULE=rousap TOPDIR=../ -f ../config/CONFIG.make -f Makefile ${1+"$@"}
+M=/bin/make
+if [ -f /usr/bin/make ]; then
+    M=/usr/bin/make
+fi
+
+exec $M MODULE=rousap TOPDIR=../ -f ../config/CONFIG.make -f Makefile ${1+"$@"}

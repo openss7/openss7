@@ -39,9 +39,14 @@ static char *rcsid = "$Header: /xtel/isode/isode/others/rfa/RCS/tailor.c,v 9.0 1
 #include "rfainfo.h"
 
 extern char *fsBase;
-extern char *user, *host, *passwd, *strdup();
+extern char *user, *host, *passwd
 extern char *realpath();
 extern LLog *pgm_log;
+#ifdef __STDC__
+extern char *strdup (const char *);
+#else
+extern char *strdup();
+#endif
 
 int default_transfer = RI_TR_REQ;
 int doChown = 0;

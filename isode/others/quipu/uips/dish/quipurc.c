@@ -112,7 +112,9 @@ extern	char		*TidyString() ;
 main()
 {
 	struct  passwd  *pw_entry ;
+#ifndef __STDC__
 	struct  passwd  *getpwuid() ;
+#endif
 	struct	stat	buf ;
 
 	int	i = 1 ;

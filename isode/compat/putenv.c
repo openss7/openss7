@@ -31,6 +31,8 @@ static char *rcsid = "$Header: /xtel/isode/isode/compat/RCS/putenv.c,v 9.0 1992/
 #include "general.h"
 #include "manifest.h"
 
+#ifndef BSD44
+
 /*  */
 
 extern  char **environ;
@@ -91,6 +93,8 @@ char   *name;
     *nep = NULL;
     return 0;
 }
+
+#endif /* BSD44 */
 
 /*  */
 
