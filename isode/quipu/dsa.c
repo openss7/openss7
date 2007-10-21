@@ -24,6 +24,8 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/dsa.c,v 9.0 1992/06/1
  *
  */
 
+#include <unistd.h>
+#define getdtablesize() (sysconf (_SC_OPEN_MAX))
 #include <signal.h>
 #include <stdio.h>
 #include <varargs.h>
@@ -283,7 +285,9 @@ no_copy: ;
     (void) signal (SIGILL,  attempt_restart);
     (void) signal (SIGBUS,  attempt_restart);
     (void) signal (SIGSEGV, attempt_restart);
+#ifndef	LINUX
     (void) signal (SIGSYS,  attempt_restart);
+#endif
     (void) signal (SIGPIPE,  attempt_restart);
 #ifdef	SIGUSR1
     (void) signal (SIGUSR1, list_status);
@@ -745,7 +749,9 @@ static int here_again = 0;
 	(void) signal (SIGILL,  attempt_restart);
 	(void) signal (SIGBUS,  attempt_restart);
 	(void) signal (SIGSEGV, attempt_restart);
+#ifndef	LINUX
 	(void) signal (SIGSYS,  attempt_restart);
+#endif
 
 	if (sig >= 0 && debug)
 		(void) fprintf (stderr,"DSA %s has a problem\n",mydsaname);

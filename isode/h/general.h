@@ -136,12 +136,14 @@
 
 #else /* SVR4 */
 
+#ifndef	LINUX
 #if	defined(BSDSTRS) && !defined(BSD44) && (!defined(BSD43) || defined(SUNOS4) || defined(vax) || defined(RT) || (defined(mips) && defined(ultrix))) && !defined(XOS_2)
 #if !(defined(__STDC__) && defined(__GNUC__) && defined(mips) && defined(ultrix))
 char   *sprintf ();
 #endif
 #else
 int     sprintf ();
+#endif
 #endif
 
 char   *getenv ();
@@ -154,7 +156,7 @@ char   *mktemp ();
 #include <malloc.h>
 #endif
 #else
-#if defined(BSD44) || defined(_AIX)
+#if defined(BSD44) || defined(_AIX) || defined(SVR4_UCB)
 void   *calloc (), *malloc (), *realloc ();
 void free();
 #else
@@ -270,6 +272,7 @@ extern time_t time ();
 
 /*  ntohs etc */
 
+#ifndef	LINUX
 #ifndef	ntohs
 unsigned short	ntohs ();
 #endif
@@ -281,6 +284,7 @@ unsigned long	ntohl ();
 #endif
 #ifndef	htonl
 unsigned long	htonl ();
+#endif
 #endif
 
 int	char2bcd ();

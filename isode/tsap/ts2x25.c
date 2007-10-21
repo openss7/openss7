@@ -27,6 +27,8 @@ static char *rcsid = "$Header: /xtel/isode/isode/tsap/RCS/ts2x25.c,v 9.0 1992/06
 
 /* LINTLIBRARY */
 
+#include <unistd.h>
+#define getdtablesize() (sysconf (_SC_OPEN_MAX))
 #include <stdio.h>
 #include "tpkt.h"
 #include "tailor.h"

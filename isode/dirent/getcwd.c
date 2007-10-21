@@ -40,7 +40,7 @@ extern int	errno;			/* normally done by <errno.h> */
 char	*
 getcwd( buf, size )			/* returns pointer to CWD pathname */
 	char		*buf;		/* where to put name (NULL to malloc) */
-	int		size;		/* size of buf[] or malloc()ed memory */
+	size_t		size;		/* size of buf[] or malloc()ed memory */
 	{
 	static char	dotdots[] =
 "../../../../../../../../../../../../../../../../../../../../../../../../../..";

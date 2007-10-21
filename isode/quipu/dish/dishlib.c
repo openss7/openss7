@@ -162,7 +162,9 @@ char          **argv;
 	(void) signal (SIGILL, 	dish_quit);
 	(void) signal (SIGBUS,	dish_quit);
 	(void) signal (SIGSEGV,	dish_quit);
+#ifndef	__linux__
 	(void) signal (SIGSYS,	dish_quit);
+#endif
 	(void) signal (SIGTERM,	dish_quit);
 
 #ifdef TURBO_DISK

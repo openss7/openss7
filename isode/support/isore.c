@@ -61,7 +61,9 @@ char  **argv,
 	if (mask & (1 << fd))
 	    FD_SET (fd, &rfds);
 
+#ifndef	__linux__
     (void) signal (SIGEMT, EMTser);
+#endif
 
     for (;;) {
 	ifds = rfds;
@@ -75,7 +77,9 @@ char  **argv,
 		break;
 
 	    default: 
+#ifndef	__linux__
 		(void) kill (ppid, SIGEMT);
+#endif
 		(void) sigpause (0);
 		break;
 	}

@@ -38,6 +38,8 @@ static char *rcsid = "$Header: /xtel/isode/isode/compat/RCS/ultrix25.c,v 9.0 199
 
 /* LINTLIBRARY */
 
+#include <unistd.h>
+#define getdtablesize() (sysconf (_SC_OPEN_MAX))
 #include <errno.h>
 #include <stdio.h>
 #include "general.h"

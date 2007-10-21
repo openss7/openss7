@@ -25,6 +25,10 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/malloc.c,v 9.0 1992/0
  */
 
 #include <stdio.h>
+#ifdef	__linux__
+#include <values.h>
+#define	_MALLOC_H	1	/* not to include the standard <malloc.h> */
+#endif
 #include "manifest.h"
 #include "quipu/util.h"
 #ifndef MALLOC_TEST
@@ -626,14 +630,19 @@ return_memory:;
 
 FREE_RETURN
 #ifdef lint
-x_free(s)
+x_free(s1)
 #else
-free(s)
+free(s1)
 #endif
-char *s;
+#ifndef SOLARIS
+char *s1;
+#else
+void *s1;
+#endif
 {
 register struct header * ptr;
 register struct header * next;
+char* s = (char*) s1;
 
 	ptr = (struct header *) (s - ALIGN (sizeof (struct header)));
 
@@ -674,14 +683,18 @@ register struct header * next;
 
 MALLOC_RETURN
 #ifdef lint
-x_realloc(s, n)
+x_realloc(s1, n)
 #else
-realloc(s, n)
+realloc(s1, n)
 #endif
-char *s;
+#ifndef SOLARIS
+char *s1;
+#else
+void *s1;
+#endif
 register unsigned n;
 {
-char * mem;
+char *mem, *s = (char*) s1;
 register unsigned realsize;
 struct header * ptr;
 struct header * next;

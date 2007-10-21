@@ -39,6 +39,9 @@ SOFTWARE.
  *
  *****************************************************************/
 
+#include <unistd.h>
+#define getdtablesize() (sysconf (_SC_OPEN_MAX))
+
 #ifdef ISOCONN
 #include <math.h>
 #endif /* ISOCONN */

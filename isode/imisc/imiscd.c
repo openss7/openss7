@@ -30,8 +30,18 @@ static char *rcsid = "$Header: /xtel/isode/isode/imisc/RCS/imiscd.c,v 9.0 1992/0
 #include "IMISC-types.h"	/* IMISC type definitions */
 #include "ryresponder.h"	/* for generic idempotent responders */
 #include "IMISC-ops.h"		/* IMISC operation definitions */
+#ifndef	__linux__
+#include <utmpx.h>
+#else
 #include <utmp.h>
+#endif
 #include <sys/stat.h>
+
+/* SYS5 gets defined and undefined so many times that random and srandom get erroneously chosen instead of the two functions below. The following seems like a better way of ensuring a correct choice */
+
+#ifdef SYS5
+#define USE_RAND_AND_SRAND
+#endif
 
 /*    DATA */
 
@@ -282,8 +292,13 @@ struct RoSAPindication *roi;
 #endif
     register char  *dp;
     char    buffer[BUFSIZ];
+#ifndef __linux__
+    struct utmpx uts;
+    register struct utmpx   *ut = &uts;
+#else
     struct utmp uts;
     register struct utmp   *ut = &uts;
+#endif
     struct type_IMISC_IA5List *ia5;
     register struct type_IMISC_IA5List **ia5p;
 
@@ -319,8 +334,13 @@ struct RoSAPindication *roi;
     while (read (ud, (char *) ut, sizeof *ut) == sizeof *ut) {
 	if (ut -> ut_name[0] == NULL)
 	    continue;
+#ifndef	__linux__
+        if ((dp = ctime (& ( (ut -> ut_tv).tv_sec ) )) == NULL)
+            goto congested;
+#else
 	if ((dp = ctime (&ut -> ut_time)) == NULL)
 	    goto congested;
+#endif
 	(void) sprintf (buffer, "%-*.*s %-*.*s %.12s",
 		NMAX, NMAX, ut -> ut_name, LMAX, LMAX, ut -> ut_line, dp + 4);
 #ifdef	BSD42
@@ -597,7 +617,7 @@ static struct web {
 /*  */
 
 #define	ifix(f)		((int) ((float) (f) + 0.5))
-#ifndef	SYS5
+#ifndef	USE_RAND_AND_SRAND
 #define	nrand()		(((float) (random ()) / (float) 2147483647))
 
 long	random ();
@@ -637,7 +657,7 @@ char   *pw;
 	(void) strcpy (s, Nx);
 	s += strlen (s);
 
-#ifndef	SYS5
+#ifndef	USE_RAND_AND_SRAND
 	(void) srandom ((int) time ((long *) 0));
 #else
 	(void) srand ((unsigned int) time ((long *) 0));

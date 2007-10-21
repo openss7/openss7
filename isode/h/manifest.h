@@ -209,7 +209,7 @@ typedef unsigned long	u_long;
 #endif
 
 
-#ifndef FD_SET
+#if	!defined(FD_SET) && !defined(LINUX)
 #define	FD_SETSIZE	    (sizeof (fd_set) * 8)
 
 #define FD_SET(f,s)	    ((s)->fds_bits[0] |= (1 << (f)))
