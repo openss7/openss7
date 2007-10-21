@@ -56,7 +56,7 @@ T_FILES =	T1_tables.c T2_tables.c T3_tables.c
 # Here it is...
 ##################################################################
 
-all:		pepsy libpepsy # peptest
+all:		xpepsy libpepsy # peptest
 inst-all:	inst-pepsy inst-headers manuals # inst-libpepsy
 install:	inst-all clean
 lint:		l-pepsy l-libpepsy
@@ -314,8 +314,8 @@ manuals:;	@$(UTILDIR)inst-man.sh $(MANOPTS) $(MANUALS)
 # clean
 ################################################################
 
-clean:;		rm -f *.o *.a x* z* _* core pepsydefs.h *yacc.y *yacc.c lex.l \
-			lex.c *.ph UNIV_* UNIV-* _* core $(TOPDIR)h/UNIV*.h \
+clean:;		rm -f *.o *.a x* z* _* core pepsydefs.h \
+			*.ph UNIV_* UNIV-* _* core $(TOPDIR)h/UNIV*.h \
 			pp.c pp pep libpepsy.a pepsy-yacc.y T1* T2* T3* t? \
 			peptest pep.results
 

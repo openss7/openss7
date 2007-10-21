@@ -49,7 +49,7 @@ HFILES	=	$(HDIR)psap.h \
 # Here it is...
 ##################################################################
 
-all:		pepy posy libpepy pepytest pp
+all:		xpepy xposy libpepy # pepytest pp
 inst-all:	inst-pepy inst-posy inst-headers manuals # inst-libpepy
 install:	inst-all clean
 tests:		pepytest pp mpp salary hello_world bigpepytest true
@@ -347,8 +347,8 @@ manuals:;	@$(UTILDIR)inst-man.sh $(MANOPTS) $(MANUALS)
 # clean
 ################################################################
 
-clean:;		rm -f *.o *.a x* z* _* core pepy.h *yacc.y *yacc.c lex.l \
-			lex.c *.ph testdebug.c UNIV-* UPEPY-* VPEPY-* \
+clean:;		rm -f *.o *.a x* z* _* core pepy.h \
+			*.ph testdebug.c UNIV-* UPEPY-* VPEPY-* \
 			pepytest.c pepytest pp.c pp mpp mpp.c P1.c P2.c \
 			P3.c SFD.c T73.c EAN.c pepyvrsn.c salary.c salary \
 			hello_world.c hello_world bigpepytest.c bigpepytest

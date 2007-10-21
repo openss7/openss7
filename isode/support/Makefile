@@ -52,7 +52,7 @@ HFILES	=	$(HDIR)rosap.h $(HDIR)rtsap.h $(HDIR)acsap.h $(HDIR)psap2.h \
 # Here it is...
 ##################################################################
 
-all:		libisode tsapd isore isod isoc \
+all:		libisode xtsapd xisore xisod xisoc \
 		isoaliases isoentities isomacros isobjects isoservices
 inst-all:	inst-tsapd inst-isore inst-isod inst-isoc \
 		inst-libisode aliases entities macros objects services manuals

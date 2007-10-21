@@ -217,8 +217,8 @@ all-quipu:;	cd h/quipu; $(MAKE) all
 		    do (echo "cd $$i; $(MAKE) all"; \
 			      cd $$i; $(MAKE) all); \
 		    done
-		cd acsap; $(MAKE) dased
-		cd support; $(MAKE) iaed
+		cd acsap; $(MAKE) xdased
+		cd support; $(MAKE) xiaed
 
 inst-quipu:;	cd h/quipu; $(MAKE) inst-all
 		@for i in $(QUIPU); \

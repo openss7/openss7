@@ -48,7 +48,7 @@ ROS	=	ros.
 # Here it is...
 ##################################################################
 
-all:		imiscd imisc
+all:		ximiscd ximisc
 inst-all:	inst-imiscd inst-imisc manuals
 install:	inst-all clean
 lint:		l-imiscd l-imisc
@@ -135,11 +135,10 @@ IMISC_tables.o:	IMISC_tables.c IMISC-types.h
 IMISC_tables.c IMISC-types.h: IMISC-asn.py $(TOPDIR)pepsy/xpepsy
 		$(TOPDIR)pepsy/xpepsy -A -f -h -m IMISC-asn.py
 
-IMISC-asn.py:	imisc.ry $(TOPDIR)rosy/xrosy
-		$(TOPDIR)rosy/xrosy -m -pepsy -o $@ imisc.ry
-IMISC-ops.c:	imisc.ry
-IMISC-ops.h:	imisc.ry
-IMISC-stubs.c:	imisc.ry
+IMISC-asn.py:
+IMISC-ops.c:
+IMISC-ops.h:
+IMISC-stubs.c:
 
 
 ################################################################
@@ -156,7 +155,7 @@ manuals:;	@$(UTILDIR)inst-man.sh $(MANOPTS) $(MANUALS)
 # clean
 ################################################################
 
-clean:;		rm -f *.ph *.o *.a IMISC* x* z* _* core
+clean:;		rm -f *.ph *_tables.c *-types.h *.o *.a x* z* _* core
 
 grind:;		iprint Makefile
 		tgrind -lc ryinitiator.h ryresponder.h $(CFILES)

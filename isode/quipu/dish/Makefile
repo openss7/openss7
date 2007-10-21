@@ -58,7 +58,7 @@ LIBDISH= libdish.a
 # Here it is...
 ##############################################################
 
-all:            libdish dish 
+all:            libdish xdish 
 inst-all:       inst-dish inst-editentry inst-libdish manuals
 install:        inst-all clean
 lint:           l-dish

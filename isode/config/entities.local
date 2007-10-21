@@ -21,4 +21,6 @@
 # examples of specific services: 1.17.4.2
 #	this section is empty
 
+default "management"            1.17.4.1.1.15   \"598"/
+default "misode miscellany"     1.17.5.14.0     \"605"/
 
