@@ -66,6 +66,7 @@ HFILES	=	$(HDIR)tsap.h $(HDIR)tusap.h \
 #		-@echo ""
 
 tsapud:		xtsapud
+		@echo $@ made.
 
 xtsapud:	tsapud.o 
 		$(LDCC) $(LDFLAGS) -o $@ tsapud.o $(UDLIBES) $(LSOCKET)

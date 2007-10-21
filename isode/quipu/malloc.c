@@ -35,7 +35,7 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/malloc.c,v 9.0 1992/0
 #include "quipu/malloc.h"
 #endif
 
-#if (defined (SYS5) || defined (__STDC__) || defined (_AIX) || defined(BSD44)) && !defined (HPUX) && !defined (masscomp)
+#if (defined (SYS5) || defined (__STDC__) || defined (_AIX) || defined (BSD44) || defined (sgi)) && !defined (HPUX) && !defined (masscomp)
 #define MALLOC_RETURN void *
 #define FREE_RETURN void 
 #else
@@ -628,6 +628,7 @@ return_memory:;
 	return (mem);
 }
 
+#if !defined (sgi)
 FREE_RETURN
 #ifdef lint
 x_free(s1)
@@ -638,6 +639,9 @@ free(s1)
 char *s1;
 #else
 void *s1;
+#endif
+#else
+void free (void * s)
 #endif
 {
 register struct header * ptr;
@@ -687,7 +691,7 @@ x_realloc(s1, n)
 #else
 realloc(s1, n)
 #endif
-#if !defined SOLARIS && !defined BSD44
+#if !defined SOLARIS && !defined BSD44 && !defined sgi
 char *s1;
 #else
 void *s1;

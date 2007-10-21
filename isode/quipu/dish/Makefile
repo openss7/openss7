@@ -46,8 +46,8 @@ CJRtest= -L/xtel/users/cjr/src/readline
 # if using GNU Readline uncomment the following two macros
 # If using shared libs you'll need to add a -PIC to LIBCFLAGS as well
 
-#LGNUREADLINE=  -lreadline -ltermcap
-#LIBCFLAGS=     $(CFLAGS) -DGNUREADLINE
+LGNUREADLINE=  -lreadline -ltermcap
+LIBCFLAGS=     $(CFLAGS) -DGNUREADLINE $(SHAREDCCFLAGS)
 
 # Static libdish
 LIBDISH= libdish.a
@@ -78,6 +78,7 @@ $(BINDIR)dish:	xdish
 		-@echo ""
 
 dish:		xdish
+		@echo $@ made.
 
 xdish:		libdish.a dish.o $(LIBES)
 		$(LDCC) $(LDFLAGS) -o $@ dish.o $(LIBDISH) \

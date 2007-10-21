@@ -83,6 +83,7 @@ $(SBINDIR)tsapd:	xtsapd
 		-@echo ""
 
 tsapd:		xtsapd
+		@echo $@ made.
 
 xtsapd:		tsapd.o $(TOPDIR)libisode.a
 		$(LDCC) $(LDFLAGS) -o $@ tsapd.o $(LIBISODE) $(LSOCKET)
@@ -103,6 +104,7 @@ $(SBINDIR)iaed:	xiaed
 		-@echo ""
 
 iaed:		xiaed
+		@echo $@ made.
 
 xiaed:		iaed.o $(TOPDIR)libdsap.a $(TOPDIR)libisode.a
 		$(LDCC) $(LDFLAGS) -o $@ iaed.o \
@@ -116,7 +118,7 @@ iaed.o:		$(HFILES) $(HDIR)x25.h $(HDIR)logger.h $(HDIR)tailor.h \
 				$(HDIR)quipu/ds_error.h $(HDIR)quipu/dap.h \
 			$(HDIR)quipu/ds_search.h tsapd.c
 		-@rm -f iaed.c
-		ln tsapd.c iaed.c
+		$(LN) tsapd.c iaed.c
 		$(CC) $(CFLAGS) -DIAE -c iaed.c
 		-@rm -f iaed.c
 
@@ -140,6 +142,7 @@ $(SBINDIR)isore:	xisore
 		-@echo ""
 
 isore:		xisore
+		@echo $@ made.
 
 xisore:		isore.o
 		$(LDCC) $(LDFLAGS) -o $@ isore.o $(TOPDIR)libcompat.a \
@@ -173,6 +176,7 @@ $(SBINDIR)isod.tsap:	xisod
 		-@echo ""
 
 isod:		xisod
+		@echo $@ made.
 
 xisod:		isod.o $(TOPDIR)libisode.a
 		$(LDCC) $(LDFLAGS) -o $@ isod.o $(LIBISODE) $(LSOCKET)
@@ -197,6 +201,7 @@ $(BINDIR)isoc:	xisoc
 		-@echo ""
 
 isoc:		xisoc
+		@echo $@ made.
 
 xisoc:		isoc.o $(TOPDIR)libisode.a
 		$(LDCC) $(LDFLAGS) -o $@ isoc.o $(LIBISODE) $(LSOCKET)
@@ -385,6 +390,7 @@ $(SBINDIR)lppd:	xlppd
 		-@echo ""
 
 lppd:		xlppd
+		@echo $@ made.
 
 xlppd:		lppd.o $(LPP-LIBES)
 		$(LDCC) $(LDFLAGS) -o $@ lppd.o $(LPP-LIBES) $(LSOCKET)

@@ -72,6 +72,7 @@ $(SBINDIR)iso.ftam:	xftamd
 		-@echo ""
 
 ftamd:		xftamd
+		@echo $@ made.
 
 xftamd:		ftamd.o ftamsystem.o ftamd-manage.o ftamd-select.o \
 			ftamd-trans.o ftamsbr.o DOCS_tables.o $(LIBD)
@@ -107,6 +108,7 @@ $(BINDIR)ftam:	xftam
 		-@echo ""
 
 ftam:		xftam
+		@echo $@ made.
 
 xftam:		ftam.o ftamuser.o ftam-assoc.o ftam-dir.o ftam-get.o \
 			ftam-glob.o ftam-ls.o ftam-mgmt.o ftam-put.o \

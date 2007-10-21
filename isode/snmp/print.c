@@ -47,6 +47,10 @@ void	advise ();
 
 #include "pathnames.h"
 #include "sys.file.h"
+#ifdef sgi
+#include <sys/file.h>
+#include <sys/time.h>
+#endif
 #include "usr.dirent.h"
 #include <sys/stat.h>
 

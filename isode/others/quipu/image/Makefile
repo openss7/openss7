@@ -70,7 +70,7 @@ $(BINDIR)xface:	xface
 xface:		xface.o imagesbr.o \
 			$(TOPDIR)libisode.a $(TOPDIR)libdsap.a
 		$(LDCC) $(LDFLAGS) -o $@ xface.o imagesbr.o \
-			$(LIBDSAP) $(LIBISODE) $(LSOCKET) -lX11 $(LIBGDBM)
+			$(LIBDSAP) $(LIBISODE) $(LSOCKET) $(LIBX11) $(LIBGDBM)
 
 l-xface:;	$(LINT) $(LFLAGS) xface.c imagesbr.c $(LLIBS) \
 			| grep -v "warning: possible pointer alignment problem"
@@ -95,7 +95,7 @@ $(BINDIR)xwho:	xwho
 xwho:		xwho.o imagesbr.o \
 			$(TOPDIR)libisode.a $(TOPDIR)libdsap.a
 		$(LDCC) $(LDFLAGS) -o $@ xwho.o imagesbr.o \
-			$(LIBDSAP) $(LIBISODE) $(LSOCKET) -lX11 $(LIBGDBM)
+			$(LIBDSAP) $(LIBISODE) $(LSOCKET) $(LIBX11) $(LIBGDBM)
 
 l-xwho:;	$(LINT) $(LFLAGS) xwho.c imagesbr.c $(LLIBS) \
 			| grep -v "warning: possible pointer alignment problem"

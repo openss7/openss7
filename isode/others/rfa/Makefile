@@ -89,6 +89,7 @@ $(BINDIR)llock:	xllock
 		-@echo ""
 
 llock:		xllock
+		@echo $@ made.
 
 xllock:		$(LLOCKO)
 		$(LDCC) $(LDFLAGS) -o $@ $(LLOCKO) 
@@ -113,6 +114,7 @@ $(SBINDIR)rfatime:	xrfatime
 		-@echo ""
 
 rfatime:	xrfatime
+		@echo $@ made.
 
 xrfatime:	rfatime.o 
 		$(LDCC) $(LDFLAGS) -o $@ rfatime.o $(LIBISODE) $(LSOCKET)
@@ -144,6 +146,7 @@ $(SBINDIR)ros.rfa:	xrfad
 		-@echo ""
 
 rfad:		xrfad
+		@echo $@ made.
 
 xrfad:		$(RFADO) $(LIBES) $(HFILES)
 		$(LDCC) $(LDFLAGS) -o $@ $(RFADO) $(LIBISODE) $(LSOCKET)
@@ -184,6 +187,7 @@ $(BINDIR)rfa:	xrfa
 		-@echo ""
 
 rfa:		xrfa
+		@echo $@ made.
 
 xrfa:		$(RFAO) $(LIBES)
 		$(LDCC) $(LDFLAGS) -o $@ $(RFAO) $(LIBISODE) $(LSOCKET)

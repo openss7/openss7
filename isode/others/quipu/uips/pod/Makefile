@@ -24,7 +24,7 @@ YFLAGS  =	-d
 
 ISOLIBS =	$(TOPDIR)libdsap.a $(TOPDIR)libisode.a 
 
-XLIBS   =	-lXaw -lXmu -lXt -lX11 -lXext
+XLIBS   =	$(XAWCLIENTLIBS)
 
 LIBES   =       $(ISOLIBS) $(XLIBS)
 LLIBS   =       $(TOPDIR)llib-ldsap $(TOPDIR)llib-lisode

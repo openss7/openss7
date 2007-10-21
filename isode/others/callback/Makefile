@@ -80,6 +80,7 @@ $(BINDIR)callback:	xinitiator
 		-@echo ""
 
 initiator:	xinitiator
+		@echo $@ made.
 
 xinitiator:	initiator.o report.o
 		$(LDCC) $(LDFLAGS) -o $@ initiator.o report.o $(LIBES) \
@@ -105,6 +106,7 @@ $(SBINDIR)iso.callback:	xresponder
 		-@echo ""
 
 responder:	xresponder
+		@echo $@ made.
 
 xresponder:	responder.o report.o
 		$(LDCC) $(LDFLAGS)  -o $@ responder.o report.o $(LIBES) \

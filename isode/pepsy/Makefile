@@ -81,6 +81,7 @@ $(BINDIR)pepsy:	xpepsy
 		-@echo ""
 
 pepsy:		xpepsy
+		@echo $@ made.
 
 xpepsy:		pepsyvrsn.o $(PEPSYLIBES)
 		$(LDCC) $(LDFLAGS) -o $@ $(PEPSY-O) \

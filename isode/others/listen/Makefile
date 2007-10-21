@@ -56,6 +56,7 @@ $(BINDIR)listen:	xlisten
 		-@echo ""
 
 listen:		xlisten
+		@echo $@ made.
 
 xlisten:	listen.o report.o
 		$(LDCC) $(LDFLAGS) -o $@ listen.o report.o $(LIBES) \
@@ -84,6 +85,7 @@ $(BINDIR)initiate:	xinitiate
 		-@echo ""
 
 initiate:	xinitiate
+		@echo $@ made.
 
 xinitiate:	initiate.o report.o
 		$(LDCC) $(LDFLAGS)  -o $@ initiate.o report.o $(LIBES) \

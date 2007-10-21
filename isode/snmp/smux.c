@@ -42,6 +42,10 @@ static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/smux.c,v 9.0 1992/06/1
 #include "internet.h"
 #include "sys.file.h"
 
+#ifdef sgi
+#include <sys/time.h>
+#endif
+
 /*    DATA */
 
 integer	smux_errno;

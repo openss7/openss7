@@ -28,7 +28,9 @@
 /*  */
 
 #ifndef	BSD44
+#ifndef sgi
 #define	AF_ISO	AF_NBS		/* any value will do */
+#endif
 
 
 struct iso_addr {

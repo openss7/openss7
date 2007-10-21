@@ -48,6 +48,9 @@ void	advise ();
 #include <pwd.h>
 #include <grp.h>
 #include "sys.file.h"
+#ifdef sgi
+#include <sys/file.h>
+#endif
 #include <sys/stat.h>
 
 

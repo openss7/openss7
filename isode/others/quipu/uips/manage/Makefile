@@ -64,6 +64,7 @@ $(BINDIR)dish_manage:	xdish
 		-@echo ""
 
 dish:		xdish
+		@echo $@ made.
 
 xdish:		dish.o libmanage.a
 		$(LDCC) $(LDFLAGS) -o $@ dish.o $(LIBES) 

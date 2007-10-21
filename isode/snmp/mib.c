@@ -39,6 +39,12 @@ static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/mib.c,v 9.0 1992/06/16
 #ifndef L_SET
 #define L_SET SEEK_SET
 #endif
+#ifdef sgi
+#include <sys/sbd.h>
+#define KmemSeek(fd, addr) lseek(fd, (addr) & ~K0BASE, SEEK_SET)
+#else
+#define KmemSeek(fd, addr) lseek(fd, addr, L_SET)
+#endif
 #endif
 
 /*    DATA */
@@ -53,6 +59,23 @@ static	int	wd;
 #endif
 
 struct nlist nl[] = {
+#ifdef sgi
+    nlist_item("arptab"),
+    nlist_item("arptab_size"),
+    nlist_item("icmpstat"),
+    nlist_item("ifnet"),
+    nlist_item("ipforwarding"),
+    nlist_item("ipstat"),
+    nlist_item("rthashsize"),
+    nlist_item("rthost"),
+    nlist_item("rtnet"),
+    nlist_item("tcb"),
+    nlist_item("tcpstat"),
+    nlist_item("udb"),
+    nlist_item("udpstat"),
+    nlist_item("rtstat"),
+    nlist_item("mbstat"),
+#else
     nlist_item("_arptab"),
     nlist_item("_arptab_size"),
     nlist_item("_icmpstat"),
@@ -78,6 +101,7 @@ struct nlist nl[] = {
     nlist_item("_clnp_stat"),
     nlist_item("_esis_stat"),
 #endif
+#endif
     nlist_item(NULL)
 };
 
@@ -90,6 +114,8 @@ OID	nullSpecific = NULLOID;
 
 #ifdef __NeXT__
 #define	VMUNIX	"/mach"
+#elif defined(sgi) || defined(__sgi__)
+#define VMUNIX "/unix"
 #else
 #define	VMUNIX	"/vmunix"
 #endif
@@ -185,7 +211,7 @@ int	cc;
 	return NOTOK;
     }
 
-    if (lseek (kd, (long) n -> n_value, L_SET) == NOTOK) {
+    if (KmemSeek (kd, (long) n -> n_value) == NOTOK) {
 	advise (LLOG_EXCEPTIONS, "failed", "lseek of 0x%x for \"%s\" in kmem",
 		(long) n -> n_value, n -> n_name);
 	return NOTOK;
@@ -238,7 +264,7 @@ struct nlist *n;
     if (wd == NOTOK && (wd = open ("/dev/kmem", O_RDWR)) == NOTOK)
 	advise (LLOG_EXCEPTIONS, "/dev/kmem", "unable to read");
 
-    if (lseek (wd, (long) n -> n_value, L_SET) == NOTOK) {
+    if (KmemSeek (wd, (long) n -> n_value) == NOTOK) {
 	advise (LLOG_EXCEPTIONS, "failed", "lseek of 0x%x for \"%s\" in kmem",
 		(long) n -> n_value, n -> n_name);
 	return NOTOK;

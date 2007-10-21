@@ -37,6 +37,7 @@ install:
 lint:		l-pingpong
 
 pingpong:	xpingpong
+		@echo $@ made.
 
 xpingpong:	pingpong.o
 		$(LDCC) -o $@ pingpong.o $(LIBES) $(LSOCKET)
