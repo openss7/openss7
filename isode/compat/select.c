@@ -27,12 +27,13 @@ static char *rcsid = "$Header: /xtel/isode/isode/compat/RCS/select.c,v 9.0 1992/
 
 /* LINTLIBRARY */
 
+#include <unistd.h>
+#define getdtablesize() (sysconf (_SC_OPEN_MAX))
 #include <errno.h>
 #include <stdio.h>
 #include "manifest.h"
 #include "tailor.h"
 #include <sys/stat.h>
-
 
 extern int errno;
 
@@ -410,9 +411,15 @@ int	secs;
 	    xfds;
     static int nsysfds = NOTOK;
 
+/* BSD
     if (nsysfds == NOTOK)
 	nsysfds = getdtablesize ();
-    if (nfds > FD_SETSIZE)
+*/
+    
+    if (nsysfds == NOTOK)
+	nsysfds = sysconf(_SC_OPEN_MAX);
+
+  if (nfds > FD_SETSIZE)
 	nfds = FD_SETSIZE;
     if (nfds > nsysfds + 1)
 	nfds = nsysfds + 1;

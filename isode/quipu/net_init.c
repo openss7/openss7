@@ -27,6 +27,8 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/net_init.c,v 9.0 1992
 
 /* LINTLIBRARY */
 
+#include <unistd.h>
+#define getdtablesize() (sysconf (_SC_OPEN_MAX))
 #include "rosap.h"
 #include "tsap.h"
 #include "quipu/util.h"

@@ -50,7 +50,7 @@ char *prompt;
 	    isopen;
     register char  *bp,
 		   *ep;
-#if	!defined(SYS5) && !defined(XOS_2)
+#if	!defined(SYS5) && !defined(XOS_2) && !defined(LINUX)
     struct sgttyb   sg;
 #else
     struct termio   sg;
@@ -74,7 +74,7 @@ char *prompt;
 
     istat = signal (SIGINT, SIG_IGN);
 
-#if	!defined(SYS5) && !defined(XOS_2)
+#if	!defined(SYS5) && !defined(XOS_2) && !defined(LINUX)
     (void) gtty (fileno (fp), &sg);
     flags = sg.sg_flags;
     sg.sg_flags &= ~ECHO;
@@ -114,7 +114,7 @@ char *prompt;
     (void) fflush (stderr);
 #endif
 
-#if	!defined(SYS5) && !defined(XOS_2)
+#if	!defined(SYS5) && !defined(XOS_2) && !defined(LINUX)
     sg.sg_flags = flags;
     (void) stty (fileno (fp), &sg);
 #else

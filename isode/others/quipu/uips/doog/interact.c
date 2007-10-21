@@ -11,6 +11,8 @@ static char *rcsid = "$Header: /xtel/isode/isode/others/quipu/uips/doog/RCS/inte
  *
  */
 
+#include <unistd.h>
+#define getdtablesize() (sysconf (_SC_OPEN_MAX))
 #include "general.h"
 #include <ctype.h>
 #include <stdio.h>

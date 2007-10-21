@@ -27,6 +27,8 @@ static char *rcsid = "$Header: /xtel/isode/isode/compat/RCS/logger.c,v 9.0 1992/
 
 /* LINTLIBRARY */
 
+#include <unistd.h>
+#define getdtablesize() (sysconf (_SC_OPEN_MAX))
 #include <stdio.h>
 #include <varargs.h>
 #include "general.h"
@@ -77,9 +79,17 @@ register LLog *lp;
     char   *bp,
 	    buffer[BUFSIZ];
 
+/* BSD code
     if (llp == NULL
 	    && (llp = (struct ll_private *)
 			calloc ((unsigned int) getdtablesize (),
+				sizeof *llp)) == NULL)
+	goto you_lose;
+*/
+
+    if (llp == NULL
+	    && (llp = (struct ll_private *)
+			calloc ((unsigned int) sysconf (_SC_OPEN_MAX),
 				sizeof *llp)) == NULL)
 	goto you_lose;
 

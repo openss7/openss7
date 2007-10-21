@@ -70,7 +70,7 @@
 #ifndef MAX
 #define MAX(a,b) (( (b) > (a) ) ? (b) : (a) )
 #endif
-#ifndef	MAXINT
+#if	!defined(MAXINT) && !defined(__linux__)
 #define MAXINT (~(1 << ((sizeof(int) * 8) - 1)))
 #endif
 

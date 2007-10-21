@@ -30,6 +30,7 @@
 #endif
 #endif
 
+#ifndef	LINUX
 struct dirent				/* data from getdents()/readdir() */
 	{
 #ifdef apollo
@@ -45,6 +46,7 @@ struct dirent				/* data from getdents()/readdir() */
 	char		d_name[1];	/* name of file */	/* non-POSIX */
 #endif
 	};
+#endif
 
 #ifdef XOS_2				
 #define	S_ISDIR( mode )		(((mode) & S_IFMT) == S_IFDIR)

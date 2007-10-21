@@ -2,6 +2,8 @@
 M=/bin/make
 if [ -f /usr/bin/make ]; then
     M=/usr/bin/make
+elif [ -f /usr/ccs/bin/make ]; then
+    M=/usr/ccs/bin/make
 fi
 
 exec $M MODULE=compat TOPDIR=../ -f ../config/CONFIG.make -f Makefile ${1+"$@"}
