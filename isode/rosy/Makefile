@@ -49,7 +49,7 @@ RYHFILES=	rosy-defs.h $(HDIR)psap.h \
 # Here it is...
 ##################################################################
 
-all:		rosy librosy
+all:		xrosy librosy
 inst-all:	inst-rosy manuals # inst-librosy
 install:	inst-all clean
 lint:		l-rosy l-librosy
@@ -283,8 +283,8 @@ manuals:;	@$(UTILDIR)inst-man.sh $(MANOPTS) $(MANUALS)
 # clean
 ################################################################
 
-clean:;		rm -f *.o *.a x* z* _* core rosy-defs.h yacc.y yacc.c lex.l \
-			lex.c p-ry*.c rosyvrsn.c
+clean:;		rm -f *.o *.a x* z* _* core rosy-defs.h yacc.y yacc.c \
+			p-ry*.c rosyvrsn.c
 
 grind:;		iprint Makefile
 		tgrind -lc rosy-defs.h rosy.c rosyvrsn.c
