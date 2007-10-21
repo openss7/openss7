@@ -4,4 +4,5 @@ if [ -f /usr/bin/make ]; then
     M=/usr/bin/make
 fi
 
-exec $M ARCH=`arch` TOPDIR=../../ -f ../../config/CONFIG.make -f Makefile ${1+"$@"}
+ARCH=`arch 2>/dev/null || true`
+exec $M ARCH="$ARCH" TOPDIR=../../ -f ../../config/CONFIG.make -f Makefile ${1+"$@"}

@@ -133,6 +133,11 @@ static struct table reserved[] = {
 %END(MOSY)%
     NULL, 0
 };
+
+#ifdef FLEX_SCANNER
+int     yylineno = 1;
+#endif
+
 %}
 
 %%
@@ -142,12 +147,18 @@ static struct table reserved[] = {
 			    for (d = 0; c = input (); d = c == '-')
 				if (c == '\n' || (d && c == '-'))
 				    break;
+#ifdef FLEX_SCANNER
+			    if (c == '\n') ++yylineno;
+#endif
 			}
 [ \t]*			{
 			    if (yydebug)
 				fprintf (stderr, "WT\n");
 			}
 \n			{
+#ifdef FLEX_SCANNER
+			    ++yylineno;
+#endif
 			    if (yydebug)
 				fprintf (stderr, "NL\n");
 			}
@@ -242,12 +253,18 @@ static struct table reserved[] = {
 						  break;
 					case 'P': tok = PARAMETERTYPE;
 					    	  break;
+#ifdef FLEX_SCANNER
+					case '\n': ++yylineno;
+#endif
 					default : myyerror ("unknown token: \"%s\"", yytext);
 						  break;
 				    }
 				    if ((c = input()) != ' ' && c != '\t'
 					&& c != '\n')
 					yyerror ("syntax error in [[ ... ]]");
+#ifdef FLEX_SCANNER
+				    if (c == '\n') ++yylineno;
+#endif
 				}
  
 			    if ((pp = malloc ((unsigned) (len = BUFSIZ)))
@@ -257,6 +274,9 @@ static struct table reserved[] = {
 			    for (ep = (cp = pp) + len - 1, d = NULL;; d = c) {
 				if ((c = input ()) == NULL)
 				    yyerror ("end-of-file while reading value");
+#ifdef FLEX_SCANNER
+				if (c == '\n') ++yylineno;
+#endif
 				if ((d == ']' && c == ']' && tok !=CONTROL) ||
 				    (c == '$' && (tok ==VALX || tok ==VALO)) ||
 				    (d == '>' && c == '>' && tok ==CONTROL)) {
@@ -324,6 +344,10 @@ static struct table reserved[] = {
 			}
 '[^'$]*'[BbHh]		{   register char *cp; register int i;
 
+#ifdef FLEX_SCANNER
+			    for (i=0; yytext[i]; ++i)
+			        if (yytext[i] == '\n') ++yylineno;
+#endif
 			    switch (*(cp = yytext + strlen (yytext) - 1)) {
 				case 'H':
 				case 'h':
@@ -357,6 +381,9 @@ static struct table reserved[] = {
 			    for (ep = (cp = pp) + len - 1;;) {
 				if ((c = input ()) == NULL)
 				    yyerror ("end-of-file while reading string");
+#ifdef FLEX_SCANNER
+				if (c == '\n') ++yylineno;
+#endif
 				if (c == '"')
 				    break;
 
@@ -411,6 +438,9 @@ static struct table reserved[] = {
 			    for (ep = (cp = pp) + len - 1, d = NULL;; d = c) {
 				if ((c = input ()) == NULL)
 				    yyerror ("end-of-file while reading value");
+#ifdef FLEX_SCANNER
+				if (c == '\n') ++yylineno;
+#endif
 				if (d == '%' && c == ']' ) {
 				    *--cp = NULL;
 				    yylval.yy_string = pp;
@@ -447,6 +477,9 @@ static struct table reserved[] = {
 			    for (ep = (cp = pp) + len - 1, d = NULL;; d = c) {
 				if ((c = input ()) == NULL)
 				    yyerror ("end-of-file while reading action");
+#ifdef FLEX_SCANNER
+				if (c == '\n') ++yylineno;
+#endif
 				if (d == '%' && c == '}') {
 				    *--cp = NULL;
 				    yylval.yy_action = new_action (pp, mylineno);;

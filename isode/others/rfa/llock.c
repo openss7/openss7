@@ -47,7 +47,11 @@ extern char *getRfaContext();
 extern char *isodetcpath;
 extern int commandMode;
 extern char *sys_errname();
+#ifdef __STDC__
+extern char *strdup (const char *);
+#else
 extern char *strdup();
+#endif
 
 char *myname;
 int connected = 0;

@@ -915,7 +915,7 @@ int	i;
 
 /*    MISCELLANY */
 
-#ifndef SVR4
+#if !defined(SVR4) && !defined(BSD44)
 
 char   *strdup (s)
 char   *s;

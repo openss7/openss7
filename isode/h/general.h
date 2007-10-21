@@ -130,7 +130,7 @@
 
 /*    STRINGS */
 
-#if defined(SVR4) || defined (__NeXT__)
+#if defined(SVR4) || defined (__NeXT__) || defined(__bsdi__)
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -152,7 +152,7 @@ char   *mktemp ();
 #endif /* SVR4 */
 
 #ifdef __STDC__
-#ifndef __NeXT__
+#if !defined(__NeXT__) && !defined(__bsdi__)
 #include <malloc.h>
 #endif
 #else
@@ -272,6 +272,7 @@ extern time_t time ();
 
 /*  ntohs etc */
 
+#ifndef __bsdi__
 #ifndef	LINUX
 #ifndef	ntohs
 unsigned short	ntohs ();
@@ -286,6 +287,7 @@ unsigned long	ntohl ();
 unsigned long	htonl ();
 #endif
 #endif
+#endif /* __bsdi__ */
 
 int	char2bcd ();
 int	bcd2char ();

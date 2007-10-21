@@ -34,8 +34,8 @@
 PEPYPATH=	-DPEPYPATH
 
 # If using gcc, define the following...
-# GCCFLAGS=	-fwritable-strings
-GCCFLAGS=
+GCCFLAGS=	-fwritable-strings
+# GCCFLAGS=
 
 .SUFFIXES:	.py .c .o
 
