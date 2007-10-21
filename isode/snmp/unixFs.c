@@ -46,8 +46,11 @@ static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/unixFs.c,v 9.0 1992/06
 #include <sys/mount.h>
 #endif
 #include <sys/stat.h>
-#if !(defined(ultrix) && defined(mips))
+#if !(defined(ultrix) && defined(mips)) && !defined(sgi)
 #include <sys/vfs.h>
+#elif defined(sgi)
+#include <sys/statfs.h>
+#include <sys/fs/efs.h>
 #else
 /* 
  * forge setmntent() and getmntent() calls by use of the
@@ -520,7 +523,11 @@ struct fs *fsp;
 		fsp->fs_BlockSize	= fss.f_bsize;
 		fsp->fs_BlockCount	= fss.f_blocks;
 		fsp->fs_BlocksFree	= fss.f_bfree;
+#ifdef sgi
+		fsp->fs_BlocksAvailable	= fss.f_bfree;
+#else
 		fsp->fs_BlocksAvailable	= fss.f_bavail;
+#endif
 		fsp->fs_InodeCount	= fss.f_files;
 		fsp->fs_InodesAvailable	= fss.f_ffree;
 	}

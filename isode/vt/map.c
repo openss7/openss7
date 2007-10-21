@@ -37,7 +37,12 @@ static char *rcsid = "$Header: /xtel/isode/isode/vt/RCS/map.c,v 9.0 1992/06/16 1
 #include <sys/ioctl.h>
 #endif
 #ifdef TERMIOS
+#ifdef sgi
+#include <unistd.h>
+#include <termios.h>
+#else
 #include <sys/termios.h>
+#endif
 #endif
 #include <fcntl.h>
 

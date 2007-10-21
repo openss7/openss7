@@ -73,6 +73,7 @@ $(SBINDIR)$(ROS)imisc:	ximiscd$(LPP)
 		-@echo ""
 
 imiscd:		ximiscd$(LPP)
+		@echo $@ made.
 
 ximiscd$(LPP):	imiscd.o IMISC-Rops.o ryresponder.o IMISC_tables.o $(LIBES)
 		$(LDCC) $(LDFLAGS) -o $@ imiscd.o IMISC-Rops.o ryresponder.o \
@@ -107,6 +108,7 @@ $(BINDIR)imisc$(LPP):	ximisc$(LPP)
 		-@echo ""
 
 imisc:		ximisc$(LPP)
+		@echo $@ made.
 
 ximisc$(LPP):	imisc.o IMISC-Iops.o ryinitiator.o IMISC_tables.o $(LIBES)
 		$(LDCC) $(LDFLAGS) -o $@ imisc.o IMISC-Iops.o ryinitiator.o \

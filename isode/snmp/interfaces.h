@@ -95,7 +95,7 @@ extern struct address *afs_iso;
 struct address *find_address (), *get_addrent ();
 
 
-#if	defined(BSD44) || defined(BSD43_Tahoe) || defined(RT) || defined(MIPS) || defined(ultrix) || defined(__NeXT__)
+#if	defined(BSD44) || defined(BSD43_Tahoe) || defined(RT) || defined(MIPS) || defined(ultrix) || defined(__NeXT__) || defined(sgi)
 #define	NEW_AT
 #else
 #undef	NEW_AT

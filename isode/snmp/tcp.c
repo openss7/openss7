@@ -190,7 +190,7 @@ int	offset;
 
 #ifdef	tcpInErrs
 	case tcpInErrs:
-#if	!defined(BSD44) && !(defined(BSD43) && defined(ultrix)) && !defined(SVR4) && !defined(__NeXT__) && !defined(SUNOS41)
+#if	!defined(BSD44) && !(defined(BSD43) && defined(ultrix)) && !defined(SVR4) && !defined(__NeXT__) && !defined(SUNOS41) && !defined(sgi)
 	    return o_integer (oi, v, tcps -> tcps_badsegs);
 #else
 	    return o_integer (oi, v, tcps -> tcps_rcvbadsum
@@ -527,7 +527,7 @@ static	struct mbstat mbstat;
 #define	mbufWaits	4
 #define	mbufDrains	5
 #endif
-#ifndef	BSD43
+#if !defined(BSD43) && !defined(sgi)
 #define	mbufFrees	6
 #endif
 #ifdef	SUNOS41

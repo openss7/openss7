@@ -140,6 +140,9 @@ static struct dispatch dispatches[] = {
 static	int	helpwidth;
 
 
+#ifdef sgi
+#include <sys/time.h>
+#endif
 #ifndef	SYS5
 long	random ();
 #endif

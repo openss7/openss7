@@ -76,6 +76,7 @@ $(SBINDIR)iso.rtf:	xrtfd
 		-@echo ""
 
 rtfd:		xrtfd
+		@echo $@ made.
 
 xrtfd:		rtfd.o rtfsbr.o RTF_tables.o
 		$(LDCC) $(LDFLAGS)  -o $@ rtfd.o rtfsbr.o RTF_tables.o \
@@ -102,6 +103,7 @@ $(BINDIR)rtf:	xrtf
 		-@echo ""
 
 rtf:		xrtf
+		@echo $@ made.
 
 xrtf:		rtf.o rtfsbr.o RTF_tables.o
 		$(LDCC) $(LDFLAGS) -o $@ rtf.o rtfsbr.o RTF_tables.o \

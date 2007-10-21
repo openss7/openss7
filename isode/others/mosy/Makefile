@@ -75,6 +75,7 @@ $(BINDIR)mosy:	xmosy
 		-@echo ""
 
 mosy:		xmosy
+		@echo $@ made.
 
 xmosy:		mosyvrsn.o
 		$(LDCC) $(LDFLAGS) -o $@ mosy.o yacc.o pepy_misc.o mosyvrsn.o \

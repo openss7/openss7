@@ -34,7 +34,12 @@ static char *rcsid = "$Header: /xtel/isode/isode/vt/RCS/vt.c,v 9.0 1992/06/16 12
 #include <sys/ioctl.h>
 #endif
 #ifdef TERMIOS
+#ifdef sgi
+#include <unistd.h>
+#include <termios.h>
+#else
 #include <sys/termios.h>
+#endif
 #endif
 #include <ctype.h>
 #include <setjmp.h>

@@ -88,6 +88,7 @@ $(SBINDIR)snmpd: xsnmpd
 		-@echo ""
 
 snmpd:		xsnmpd
+		@echo $@ made.
 
 xsnmpd:		snmpd.o $(MIB-O) $(LIBD)
 		$(LDCC) $(LDFLAGS) -o $@ snmpd.o $(MIB-O) $(LIBES) \
@@ -132,6 +133,7 @@ $(SBINDIR)snmpc: xsnmpc
 		-@echo ""
 
 snmpc:		xsnmpc
+		@echo $@ made.
 
 xsnmpc:		snmpc.o $(AE-O) $(LIBD)
 		$(LDCC) $(LDFLAGS) -o $@ snmpc.o $(AE-O) $(LIBES) \
@@ -164,6 +166,7 @@ $(SBINDIR)snmpt: xsnmpt
 		-@echo ""
 
 snmpt:		xsnmpt
+		@echo $@ made.
 
 xsnmpt:		snmpt.o $(LIBD)
 		$(LDCC) $(LDFLAGS) -o $@ snmpt.o $(LIBES) $(LSOCKET)
@@ -197,6 +200,7 @@ it:		xunixd
 		xunixd
 
 unixd:		xunixd
+		@echo $@ made.
 
 xunixd:		unixd.o users.o print.o printcap.o unixFs.o $(LIBD)
 		$(LDCC) $(LDFLAGS) -o $@ unixd.o users.o print.o printcap.o \
@@ -231,6 +235,7 @@ $(BINDIR)snmpi:	xsnmpi
 		-@echo ""
 
 snmpi:		xsnmpi
+		@echo $@ made.
 
 xsnmpi:		snmpi.o snmpb.o $(LIBD)
 		$(LDCC) $(LDFLAGS) -o $@ snmpi.o snmpb.o $(LIBES) $(LSOCKET)
@@ -396,6 +401,7 @@ $(INCDIR)snmp/$(TARGET2):	$(TARGET2)
 		-@echo ""
 
 objects:	$(DEFS)
+		@echo $@ made.
 
 objects.defs:	$(DEFS2)
 		cat $(DEFS2) > $@

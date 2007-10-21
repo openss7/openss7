@@ -36,7 +36,15 @@ static char *rcsid = "$Header: /xtel/isode/isode/vt/RCS/vtd.c,v 9.0 1992/06/16 1
 #include <sys/ioctl.h>
 #endif
 #ifdef	TERMIOS
+#ifdef sgi
+#include <unistd.h>
+#include <termios.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+static int forkpty(int*,char*,char*,char*);
+#else
 #include <sys/termios.h>
+#endif
 #ifdef BSD44
 #include <sys/ttydefaults.h>
 #include <sys/stat.h>
@@ -67,7 +75,7 @@ static char *rcsid = "$Header: /xtel/isode/isode/vt/RCS/vtd.c,v 9.0 1992/06/16 1
 #define BANNER	"\r\n\r\nSunOS UNIX (%s)\r\n\r\n\r%s"
 #endif
 
-#if !defined(SYS5) && !defined(BSD44) && !defined(_AIX)
+#if !(defined(SYS5) && !defined(sgi)) && !defined(BSD44) && !defined(_AIX)
 void	vhangup();
 #endif
 
@@ -287,7 +295,11 @@ gotpty:
 #endif
 	environ = envinit;
 
+#ifdef sgi
+	execl(_PATH_LOGIN,"login",NULLCP);
+#else
 	execl(_PATH_LOGIN,"login","-h",peerhost,NULLCP);
+#endif
 	fatalperror(f, _PATH_LOGIN, errno);
 	/*NOTREACHED*/
 }
@@ -672,7 +684,7 @@ SFD	cleanup()
 				  in Session Release. */
 	rmut();
 
-#if !defined(SYS5) && !defined(BSD44) && !defined(_AIX)
+#if !(defined(SYS5) && !defined(sgi)) && !defined(BSD44) && !defined(_AIX)
 	vhangup();
 #endif
 
@@ -884,3 +896,38 @@ setmode(on, off)
 	}
 }
 #endif
+
+
+#ifdef sgi
+static int forkpty(fildes, ptyname, ignore1, ignore2)
+     int * fildes;
+     char * ptyname, * ignore1, * ignore2;
+{
+  char * slaveptyname;
+  int t;
+  int p;
+  int pid;
+
+  if ((pid = fork()) == -1) {
+    perror("vtd -- fork");
+    vrelreq();
+  }
+
+  strcpy (ptyname, slaveptyname);
+  if (pid == 0)
+    {
+    }
+  else
+    {
+      slaveptyname = _getpty(&p, O_RDWR, (mode_t) 0666, 0);
+      if (slaveptyname == NULL) {
+	perror("vtd -- getpty");
+	vrelreq();
+	/*NOTREACHED*/
+      }
+      printf ("Slave PTY: \"%s\"", slaveptyname);
+      * fildes = p;
+    }
+  return pid;
+}
+#endif /* sgi */

@@ -64,6 +64,12 @@ static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/snmpd.c,v 9.0 1992/06/
 #endif
 #endif
 
+#ifdef sgi
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/time.h>
+#endif
+
 #if	defined(SNMPT) || defined(SNMPC)
 #undef	SMUX
 #endif
@@ -282,6 +288,10 @@ char  **argv,
     register struct TSAPaddr  *ta;
     struct TSAPdisconnect   tds;
     register struct TSAPdisconnect  *td = &tds;
+#ifdef SMUX
+    int smux_port;
+    register struct servent *sp;
+#endif
 
     arginit (argv);
     envinit ();
@@ -289,6 +299,12 @@ char  **argv,
     failed = listening = 0;
     nfds = 0;
     FD_ZERO (&ifds);
+
+#ifdef SMUX
+    smux_port = (sp = getservbyname ("smux", "tcp"))
+      ? sp -> s_port
+	: htons ((u_short) 199);
+#endif
 
     for (ta = tas; ta < tz; ta++) {
 	if (ta -> ta_naddr == 0) {
@@ -321,7 +337,12 @@ char  **argv,
 			    failed++;
 			    continue;
 			}
+#ifdef sgi
+			if (fcntl (udp, F_SETFD, FD_CLOEXEC) == NOTOK)
+			  advise (LLOG_EXCEPTIONS, NULLCP, "setting close-on-exec");
+#else
 			(void) ioctl (udp, FIOCLEX, NULLCP);
+#endif
 			if (udp >= nfds)
 			    nfds = udp + 1;
 			FD_SET (udp, &ifds);
@@ -363,7 +384,12 @@ do_clts: ;
 			    failed++;
 			    continue;
 			}
+#ifdef sgi
+			if (fcntl (clts, F_SETFD, FD_CLOEXEC) == NOTOK)
+			  advise (LLOG_EXCEPTIONS, NULLCP, "setting close-on-exec");
+#else
 			(void) ioctl (clts, FIOCLEX, NULLCP);
+#endif
 			if (clts >= nfds)
 			    nfds = clts + 1;
 			FD_SET (clts, &ifds);
@@ -408,7 +434,6 @@ do_clts: ;
     {
 	struct sockaddr_in lo_socket;
 	register struct sockaddr_in *lsock = &lo_socket;
-	register struct servent *sp;
 	register struct smuxReserved *sr;
 	OT	ot;
 
@@ -420,14 +445,16 @@ do_clts: ;
 
 	bzero ((char *) lsock, sizeof *lsock);
 	lsock -> sin_family = AF_INET;
-	lsock -> sin_port = (sp = getservbyname ("smux", "tcp"))
-						    ? sp -> s_port
-						    : htons ((u_short) 199);
-
+	lsock -> sin_port = smux_port;
 	if (smux_enabled) {
 	    if ((smux = start_tcp_server (lsock, SOMAXCONN, 0, 0)) == NOTOK)
 		adios ("failed", "start_tcp_server for SMUX");
+#ifdef sgi
+	    if (fcntl (smux, F_SETFD, FD_CLOEXEC) == NOTOK)
+	      advise (LLOG_EXCEPTIONS, NULLCP, "setting close-on-exec");
+#else
 	    (void) ioctl (smux, FIOCLEX, NULLCP);
+#endif
 	    if (smux >= nfds)
 		nfds = smux + 1;
 	    FD_SET (smux, &ifds);
@@ -469,7 +496,7 @@ do_clts: ;
 	}
 
 #ifdef	TCP
-	if (udp != NOTOK && FD_ISSET (udp, &rfds))
+	if (udp != NOTOK && (FD_ISSET (udp, &rfds)))
 	    doit_udp (udp);
 #endif
 
@@ -477,7 +504,12 @@ do_clts: ;
 	if (smux != NOTOK
 		&& FD_ISSET (smux, &rfds)
 	        && (fd = start_smux ()) != NOTOK) {
-	    (void) ioctl (fd, FIOCLEX, NULLCP);
+#ifdef sgi
+	  if (fcntl (fd, F_SETFD, FD_CLOEXEC) == NOTOK)
+	    advise (LLOG_EXCEPTIONS, NULLCP, "setting close-on-exec");
+#else
+	  (void) ioctl (fd, FIOCLEX, NULLCP);
+#endif
 	    if (fd >= nfds)
 		nfds = fd + 1;
 	    FD_SET (fd, &ifds);
@@ -496,7 +528,12 @@ do_clts: ;
 
 #ifdef	COTS
 	if (vecp > 0 && (fd = start_tsap (vecp, vec)) != NOTOK) {
-	    (void) ioctl (fd, FIOCLEX, NULLCP);
+#ifdef sgi
+	  if (fcntl (fd, F_SETFD, FD_CLOEXEC) == NOTOK)
+	    advise (LLOG_EXCEPTIONS, NULLCP, "setting close-on-exec");
+#else
+	  (void) ioctl (fd, FIOCLEX, NULLCP);
+#endif
 	    if (fd >= nfds)
 		nfds = fd + 1;
 	    FD_SET (fd, &ifds);

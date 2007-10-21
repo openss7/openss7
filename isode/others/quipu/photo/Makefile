@@ -27,11 +27,11 @@
 
 # Select you display type(s)...
 # should really go in config/CONFIG.make
-DISPLAY = ttyphoto fax2ps
+DISPLAY = ttyphoto fax2ps Xphoto xfax jpeg
 # DISPLAY = sunphoto Xphoto xfax ttyphoto hexphoto t4014 fax2ps jpeg
 
 # UNIX path for the xv binary
-XV_LOCATION = /usr/local/bin/
+XV_LOCATION = /logiciels/public/X.V11R5/bin/contrib/
 
 #######################################################################
 #    Here we go...
@@ -62,11 +62,11 @@ sunphoto: $(TOPDIR)libdsap.a d_main.o sunview.o
 
 Xphoto: $(TOPDIR)libdsap.a d_main.o winx.o
 	$(LDCC) $(LDFLAGS) -o Xphoto \
-		d_main.o winx.o -lX11 $(LIBDSAP) $(LIBISODE) $(LSOCKET)
+		d_main.o winx.o $(LIBX11) $(LIBDSAP) $(LIBISODE) $(LSOCKET)
 
 xfax: $(TOPDIR)libdsap.a d_main.o faxx.o
 	$(LDCC) $(LDFLAGS) -o xfax \
-		d_main.o faxx.o -lX11 $(LIBDSAP) $(LIBISODE) $(LSOCKET)
+		d_main.o faxx.o $(LIBX11) $(LIBDSAP) $(LIBISODE) $(LSOCKET)
 
 fax2ps: $(TOPDIR)libdsap.a d_main.o ps.o
 	$(LDCC) $(LDFLAGS) -o fax2ps \
@@ -84,6 +84,7 @@ hexphoto: hexphoto.o d_main.o
 	$(LDCC) $(LDFLAGS) -o hexphoto hexphoto.o d_main.o $(LIBISODE) $(LSOCKET)
 
 jpeg:	xjpeg jpeg2asn
+		@echo $@ made.
 
 xjpeg:	jpegphoto.o
 	$(LDCC) $(LDFLAGS) -o xjpeg jpegphoto.o $(LIBISODE) $(LSOCKET)

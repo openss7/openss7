@@ -625,7 +625,9 @@ long	random ();
 #define	nrand()		(((float) (rand ()) / (float) 2147483647))
 
 #ifndef SVR4	/* defined in <stdlib.h> - comes from general.h */
+#ifndef sgi
 int	rand (), srand ();
+#endif
 #endif
 #endif
 #define	rng(a,b)	if (((i = ifix (a * nrand ()) * b) ? i -= b : i) < 0 \

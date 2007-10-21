@@ -54,12 +54,12 @@ static struct ipstat ipstat;
 
 #define	ipForwarding	0
 #define	ipDefaultTTL	1
-#ifdef	BSD43
+#if defined(BSD43) || defined(sgi)
 #define	ipInReceives	2
 #endif
 #define	ipInHdrErrors	3
 #undef	ipInAddrErrors	/* 4		/* NOT IMPLEMENTED */
-#ifdef	BSD43
+#if defined(BSD43) || defined(sgi)
 #define	ipForwDatagrams	5
 #endif
 #ifdef	BSD44
@@ -71,17 +71,17 @@ static struct ipstat ipstat;
 #define	ipOutRequests	9
 #define	ipOutDiscards	10
 #endif
-#ifdef	BSD43
+#if defined(BSD43) || defined(sgi)
 #define	ipOutNoRoutes	11
 #endif	
 #define	ipReasmTimeout	12
-#ifdef	BSD43
+#if defined(BSD43) || defined(sgi)
 #define	ipReasmReqds	13
 #endif
 #ifdef	BSD44
 #define	ipReasmOKs	14
 #endif
-#ifdef	BSD43
+#if defined(BSD43) || defined(sgi)
 #define	ipReasmFails	15
 #endif
 #ifdef	BSD44

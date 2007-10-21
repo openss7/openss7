@@ -34,7 +34,7 @@ static char *rcsid = "$Header: /xtel/isode/isode/others/quipu/uips/fred/RCS/pipe
 #include "sys.file.h"
 #include <sys/stat.h>
 #include "usr.dirent.h"
-#ifdef	BSD42
+#if defined(BSD42) || defined(sgi)
 #include <sys/wait.h>
 #endif
 

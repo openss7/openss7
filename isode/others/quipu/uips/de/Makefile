@@ -80,6 +80,7 @@ $(BINDIR)de:	xde
 		-@echo ""
 
 de:		xde
+		@echo $@ made.
 
 xde:		$(OFILES) $(LIBES)
 		$(LDCC) $(LDFLAGS) -o $@ $(OFILES) \

@@ -82,6 +82,7 @@ $(BINDIR)fred:	xfred
 		-@echo ""
 
 fred:		xfred
+		@echo $@ made.
 
 xfred:		fred.o dispatch.o miscellany.o pipe.o socket.o whois.o
 		$(LDCC) $(LDFLAGS) -o $@ fred.o dispatch.o miscellany.o \
@@ -156,6 +157,7 @@ $(SBINDIR)fredsh:	xfredsh Makefile
 		-@echo ""
 
 fredsh:		xfredsh
+		@echo $@ made.
 
 xfredsh:	fredsh.sh
 		cp fredsh.sh $@
@@ -193,6 +195,7 @@ $(SBINDIR)dad:	xdad
 		-@echo ""
 
 dad:		xdad
+		@echo $@ made.
 
 xdad:		dad.o socket.o
 		$(LDCC) $(LDFLAGS) -o $@ dad.o socket.o $(LIBES) $(LSOCKET)
@@ -215,6 +218,7 @@ $(BINDIR)whitepages:	xwhitepages
 		-@echo ""
 
 whitepages:	xwhitepages
+		@echo $@ made.
 
 xwhitepages:	whitepages.sh
 		cp whitepages.sh $@

@@ -688,7 +688,7 @@ int	offset;
     for (is = ifs; is; is = is -> ifn_next) {
 	struct arpcom ifns;
 	register struct ifnet *ifn = &ifns.ac_if;
-#ifdef	BSD43
+#if defined(BSD43) || defined(sgi)
 	struct ifaddr ifaddr;
 	register struct ifaddr *ifa;
 #ifdef	BSD44
@@ -710,7 +710,7 @@ int	offset;
 	if (getkmem (nz, (caddr_t) ifn, sizeof ifns) == NOTOK)
 	    return NOTOK;
 
-#ifndef	BSD43
+#if !defined(BSD43) && !defined(sgi)
 	if (ifn -> if_addr.sa_family == AF_UNSPEC)
 	    continue;
 
