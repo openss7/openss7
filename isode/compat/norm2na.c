@@ -85,11 +85,15 @@ static char *rcsid =
 
 /* LINTLIBRARY */
 
+#include <sys/types.h>
 #include <stdio.h>
 #include "psap.h"
 #include "isoaddrs.h"
 #include "tailor.h"
 #include "internet.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 /* Encoding on "unrealNS" addresses based on
 
@@ -133,7 +137,7 @@ norm2na(p, len, na)
 		na->na_dtelen = xlen;
 		for (cp2 = na->na_dte; xlen-- > 0;)
 			*cp2++ = *cp++;
-		*cp2 = NULL;
+		*cp2 = '\0';
 		na->na_stack = NA_X25;
 		na->na_community = SUBNET_INT_X25;
 	} else {
@@ -169,7 +173,7 @@ norm2na(p, len, na)
 				} else
 					*dp++ = j + '0';
 			}
-			*dp = NULL;
+			*dp = '\0';
 
 			cp = nsap;
 		      lock_and_load:;
@@ -267,7 +271,7 @@ norm2na(p, len, na)
 					}
 					(void) sscanf(cp, "%5d", &i);
 					cp += 5;
-					na->na_port = htons((u_short) i);
+					na->na_port = htons((unsigned short) i);
 
 					if (*cp) {
 						if ((int) strlen(cp) < 5) {
@@ -277,11 +281,12 @@ norm2na(p, len, na)
 						}
 						(void) sscanf(cp, "%5d", &i);
 						cp += 5;
-						na->na_tset = (u_short) i;
+						na->na_tset = (unsigned short) i;
 
-						if (*cp)
+						if (*cp) {
 							LLOG(addr_log, LLOG_EXCEPTIONS,
 							     ("extra TCP information: %s", nsap));
+						}
 					}
 				}
 				break;
@@ -306,4 +311,10 @@ norm2na(p, len, na)
 	}
 
 	return OK;
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

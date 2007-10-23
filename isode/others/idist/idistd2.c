@@ -688,8 +688,7 @@ chog(file, owner, group, imode)
 	return (0);
 }
 
-SFD
-cleanup()
+RETSIGTYPE cleanup ()
 {
 	char *p, *temp;
 

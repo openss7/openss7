@@ -89,8 +89,9 @@ static char *rcsid =
 #include "general.h"
 #include "manifest.h"
 #include "tailor.h"
-
-/*  */
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 int
 baduser(file, user)
@@ -101,6 +102,7 @@ baduser(file, user)
 	char buffer[BUFSIZ];
 	FILE *fp;
 
+	(void) rcsid;
 	hit = 0;
 	for (tries = 0; tries < 2 && !hit; tries++) {
 		switch (tries) {
@@ -119,8 +121,8 @@ baduser(file, user)
 			continue;
 
 		while (fgets(buffer, sizeof buffer, fp)) {
-			if (bp = index(buffer, '\n'))
-				*bp = NULL;
+			if ((bp = index(buffer, '\n')))
+				*bp = '\0';
 			if (strcmp(buffer, user) == 0) {
 				hit++;
 				break;

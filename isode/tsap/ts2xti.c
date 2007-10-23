@@ -58,11 +58,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* ts2xli.c - XTI OSI TP interface */
 
-#ifndef	lint
-static char *rcsid =
-    "Header: /xtel/isode/isode/tsap/RCS/ts2xti.c,v 9.0 1992/06/16 12:40:39 isode Rel";
-#endif
-
 /* 
  * Header: /xtel/isode/isode/tsap/RCS/ts2xti.c,v 9.0 1992/06/16 12:40:39 isode Rel
  *
@@ -1588,6 +1583,7 @@ close_tp4_socket(fd)
 #else
 int
 _ts2xti_stub()
-{;
+{
+	return (0);
 }
 #endif

@@ -89,7 +89,7 @@ static char *rcsid =
 #include "quipu/dsap.h"
 #include "tsap.h"
 
-extern LLog *log_dsap;
+sighandler_t	abort_vector = NULL;
 
 SFP abort_vector = NULL;
 

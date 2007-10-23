@@ -58,11 +58,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* tsaplisten.c - "network" listening */
 
-#ifndef	lint
-static char *rcsid =
-    "Header: /xtel/isode/isode/tsap/RCS/tsaplisten.c,v 9.0 1992/06/16 12:40:39 isode Rel";
-#endif
-
 /* 
  * Header: /xtel/isode/isode/tsap/RCS/tsaplisten.c,v 9.0 1992/06/16 12:40:39 isode Rel
  *
@@ -87,6 +82,12 @@ static char *rcsid =
 
 /* LINTLIBRARY */
 
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 #include <errno.h>
 #include <stdio.h>
 #include <signal.h>
@@ -94,6 +95,12 @@ static char *rcsid =
 #include "tpkt.h"
 #include "mpkt.h"
 #include "sys.file.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
+#ifdef HAVE_SEARCH_H
+#include <search.h>
+#endif
 
 #ifdef	LPP
 #undef	X25
@@ -151,7 +158,7 @@ struct listenblk {
 #define	LB_QUEUED	5
 #endif
 
-	IFP lb_magic;
+	int (*lb_magic) ();
 
 	struct TSAPaddr lb_addr;	/* transport address */
 
@@ -168,10 +175,10 @@ struct listenblk {
 #define	lb_rem_nsock	lb_un3.lb_un_nsock
 #define	lb_rem_tsock	lb_un3.lb_un_tsock
 
-	IFP lb_accept1;			/* accept 1 function */
-	IFP lb_accept2;			/* accept 2 function */
+	int (*lb_accept1) ();		/* accept 1 function */
+	int (*lb_accept2) ();		/* accept 2 function */
 
-	IFP lb_close;			/* close function */
+	int (*lb_close) ();		/* close function */
 };
 
 #define	NULLLBP		((struct listenblk *) 0)
@@ -230,28 +237,28 @@ static struct nsapent {
 	int ns_type;
 	int ns_stack;
 
-	IFP ns_listen;
-	IFP ns_accept1;
-	IFP ns_accept2;
-	IFP ns_unique;
-	IFP ns_close;
+	int (*ns_listen) ();
+	int (*ns_accept1) ();
+	int (*ns_accept2) ();
+	int (*ns_unique) ();
+	int (*ns_close) ();
 } nsaps[] = {
 #ifdef	TCP
-	NA_TCP, TS_TCP, tcplisten, tcpaccept1, tcpaccept2, tcpunique, close_tcp_socket,
+	{NA_TCP, TS_TCP, tcplisten, tcpaccept1, tcpaccept2, tcpunique, close_tcp_socket},
 #endif
 #ifdef	X25
-	    NA_X25, TS_X25, x25listen, x25accept1, x25accept2, x25unique, close_x25_socket,
+	{NA_X25, TS_X25, x25listen, x25accept1, x25accept2, x25unique, close_x25_socket},
 #if defined(SUN_X25) && defined(AEF_NSAP)
-	    NA_NSAP, TS_X2584, x25listen, x25accept1, x25accept2, x25unique, close_x25_socket,
+	{NA_NSAP, TS_X2584, x25listen, x25accept1, x25accept2, x25unique, close_x25_socket},
 #endif
 #endif
 #ifdef	TP4
-	    NA_NSAP, TS_TP4, tp4listen, tp4accept1, tp4accept2, tp4unique, close_tp4_socket,
+	{NA_NSAP, TS_TP4, tp4listen, tp4accept1, tp4accept2, tp4unique, close_tp4_socket},
 #endif
 #ifdef	XTI_TP
-	    NA_X25, TS_TP4, tp4listen, tp4accept1, tp4accept2, tp4unique, close_tp4_socket,
+	{NA_X25, TS_TP4, tp4listen, tp4accept1, tp4accept2, tp4unique, close_tp4_socket},
 #endif
-NULL};
+	{0}};
 
 #ifdef	LPP
 static int _lpp_fd = NOTOK;
@@ -266,7 +273,7 @@ int _listen_opts = 0;			/* .. */
 #if defined(BSD42) || defined(HPUX)
 static int chldhit;
 
-static SFD chldser();
+static RETSIGTYPE chldser();
 #endif
 
 extern int errno;
@@ -278,13 +285,13 @@ TNetListen(ta, td)
 	register struct TSAPaddr *ta;
 	struct TSAPdisconnect *td;
 {
-	return TNetWork(ta, td, startlb, NULLIFP);
+	return TNetWork(ta, td, startlb, NULL);
 }
 
 int
 TNetListenAux(ta, magic, td)
 	register struct TSAPaddr *ta;
-	IFP magic;
+	int (*magic) ();
 	struct TSAPdisconnect *td;
 {
 	return TNetWork(ta, td, startlb, magic);
@@ -295,7 +302,7 @@ TNetUnique(ta, td)
 	register struct TSAPaddr *ta;
 	struct TSAPdisconnect *td;
 {
-	return TNetWork(ta, td, uniqlb, NULLIFP);
+	return TNetWork(ta, td, uniqlb, NULL);
 }
 
 /*  */
@@ -304,8 +311,8 @@ static int
 TNetWork(ta, td, fnx, magic)
 	register struct TSAPaddr *ta;
 	struct TSAPdisconnect *td;
-	IFP fnx;
-	IFP magic;
+	int (*fnx) ();
+	int (*magic) ();
 {
 	register int n;
 	int lstn = NOTOK;
@@ -416,7 +423,7 @@ startlb(ta, na, ns, magic, td)
 	register struct TSAPaddr *ta;
 	register struct NSAPaddr *na;
 	register struct nsapent *ns;
-	IFP magic;
+	int (*magic) ();
 	struct TSAPdisconnect *td;
 {
 	struct TSAPaddr tas;
@@ -431,7 +438,7 @@ startlb(ta, na, ns, magic, td)
 
 	ta = &tas;
 
-	if (lb = findlblk(ta, LB_LISTEN))
+	if ((lb = findlblk(ta, LB_LISTEN)))
 		return tsaplose(td, DR_OPERATION, NULLCP, "already listening on %s", taddr2str(ta));
 
 	if ((lb = newlblk(LB_LISTEN, ta)) == NULLLBP)
@@ -459,7 +466,7 @@ uniqlb(ta, na, ns, magic, td)
 	register struct TSAPaddr *ta;
 	register struct NSAPaddr *na;
 	register struct nsapent *ns;
-	IFP magic;
+	int (*magic) ();
 	struct TSAPdisconnect *td;
 {
 	int fd;
@@ -493,6 +500,8 @@ uniqlb(ta, na, ns, magic, td)
 }
 
 /*  */
+
+int xselect(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, int secs);
 
 int
 TNetAcceptAux(vecp, vec, newfd, ta, nfds, rfds, wfds, efds, secs, td)
@@ -652,8 +661,8 @@ TNetAcceptAux(vecp, vec, newfd, ta, nfds, rfds, wfds, efds, secs, td)
 					case LB_ACCEPT:
 					{
 						/* take care - lb2 is free'd by accept2 */
-						IFP closefnx = lb2->lb_close,
-						    magicfnx = lb2->lb_magic;
+						int (*closefnx) () = lb2->lb_close,
+						    (*magicfnx) () = lb2->lb_magic;
 
 						if (accepted)	/* only 1 accept at a time */
 							break;	/* we'll get it next time */
@@ -792,7 +801,7 @@ TNetCheck(vecp, vec, ifds, ofds, nfds, td)
 				FD_CLR(fd, ofds);
 			}
 		} else
-#endif	/* LPP */
+#endif				/* LPP */
 		if (ifds && FD_ISSET(fd, ifds)) {
 			FD_CLR(fd, ifds);
 			switch (lb2->lb_type) {
@@ -813,7 +822,7 @@ TNetCheck(vecp, vec, ifds, ofds, nfds, td)
 			case LB_ACCEPT:
 			{
 				/* take care - lb2 is free'd by accept2 */
-				IFP closefnx = lb2->lb_close, magicfnx = lb2->lb_magic;
+				int (*closefnx) () = lb2->lb_close, (*magicfnx)() = lb2->lb_magic;
 
 				if (accepted)	/* only 1 accept at a time */
 					break;	/* we'll get it next time */
@@ -864,7 +873,7 @@ TNetClose(ta, td)
 			gotone = 0;
 			for (na = ta->ta_addrs, n = ta->ta_naddr; n > 0; na++, n--) {
 				tas.ta_addrs[0] = *na;	/* struct copy */
-				if (lb = findlblk(&tas, LB_LISTEN)) {
+				if ((lb = findlblk(&tas, LB_LISTEN))) {
 					freelblk(lb);
 					gotone = 1;
 				}
@@ -892,7 +901,7 @@ TNetClose(ta, td)
 
 /* ARGSUSED */
 
-static SFD
+static RETSIGTYPE
 chldser(sig, code, sc)
 	int sig;
 	long code;
@@ -910,7 +919,7 @@ chldser(sig, code, sc)
 
 /* ARGSUSED */
 
-static SFD
+static RETSIGTYPE
 chldser(sig, code, sc)
 	int sig;
 	long code;
@@ -1248,6 +1257,8 @@ tcplisten(lb, ta, td)
 char *udpsave();
 #endif
 
+int TTService(struct tsapblk *);
+
 static int
 tcpaccept1(lb, td)
 	register struct listenblk *lb;
@@ -1356,7 +1367,7 @@ tcpaccept2(lb, vecp, vec, td)
 #ifdef	SOCKETS
 	struct sockaddr_in in_socket;
 	struct sockaddr_in *isock = &in_socket;
-	int len;
+	socklen_t len;
 #endif
 #ifndef	LPP
 	register struct tsapblk *tb = lb->lb_tb;
@@ -2302,6 +2313,7 @@ TFreeQueues(lb)
 	lb->lb_fd = NOTOK;
 
 	freelblk(lb);
+	return (0);
 }
 
 /*  */
@@ -2324,7 +2336,7 @@ TSetQueuesOK(sd, onoff, td)
 
 	result = OK;
 	if (onoff) {
-		if (tb->tb_drainPfnx == NULLIFP)
+		if (tb->tb_drainPfnx == NULL)
 			result = tsaplose(td, DR_OPERATION, NULLCP,
 					  "queued writes not supported by TS-stack");
 		else {
@@ -2335,7 +2347,7 @@ TSetQueuesOK(sd, onoff, td)
 		result = tsaplose(td, DR_WAITING, NULLCP, "queued writes still waiting to drain");
 	else {
 		tb->tb_flags &= ~TB_QWRITES;
-		tb->tb_queuePfnx = NULLIFP;
+		tb->tb_queuePfnx = NULL;
 	}
 
 	(void) sigiomask(smask);

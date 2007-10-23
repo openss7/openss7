@@ -90,7 +90,9 @@ static char *rcsid =
 #include "manifest.h"
 #include "tailor.h"
 
-/*  */
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 char *
 _isodefile(path, file)
@@ -98,6 +100,7 @@ _isodefile(path, file)
 {
 	static char buffer[BUFSIZ];
 
+	(void) rcsid;
 	isodetailor(NULLCP, 0);	/* not really recursive */
 
 	if (*file == '/'

@@ -205,6 +205,9 @@ static struct dispatch dispatches[] = {
 SFD intr(), deadpeer();
 char *control(), *strdup();
 
+sighandler_t	intr, deadpeer;
+char	*control(), *strdup ();
+
 #ifdef TERMIOS
 struct termios oterm;
 #else
@@ -1382,15 +1385,13 @@ control(c)
 	return (buf);
 }
 
-SFD
-deadpeer()
+RETSIGTYPE	deadpeer()
 {
 	(void) tmode(0);
 	longjmp(peerdied, -1);
 }
 
-SFD
-intr()
+RETSIGTYPE	intr()
 {
 	(void) tmode(0);
 	longjmp(toplevel, -1);
@@ -1622,7 +1623,7 @@ advise(va_alist)
 
 	code = va_arg(ap, int);
 
-	asprintf(buffer, ap);
+	xsprintf (buffer, ap);
 
 	flags = vt_log->ll_stat;
 

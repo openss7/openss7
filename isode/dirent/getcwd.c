@@ -77,6 +77,8 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 	utility, combined with the dotdots[] array trick from the SVR2 shell.
 */
 
+#ifndef HAVE_GETCWD
+
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	"usr.dirent.h"
@@ -240,3 +242,5 @@ getcwd(buf, size)			/* returns pointer to CWD pathname */
 
 	return NULL;
 }
+
+#endif				/* HAVE_GETCWD */

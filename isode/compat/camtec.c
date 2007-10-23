@@ -102,11 +102,9 @@ static char *rcsid =
 #include "tailor.h"
 #include "tpkt.h"
 
-/*    4.[23] UNIX: CCL X25 */
+/* 4.[23] UNIX: CCL X25 */
 
 static char calling_dte[NSAP_DTELEN + 1];
-
-/*  */
 
 int
 start_x25_client(local)
@@ -133,8 +131,6 @@ start_x25_client(local)
 
 	return sd;
 }
-
-/*  */
 
 int
 start_x25_server(local, backlog, opt1, opt2)
@@ -183,8 +179,6 @@ start_x25_server(local, backlog, opt1, opt2)
 	(void) close(sd);
 	return NOTOK;
 }
-
-/*  */
 
 int
 join_x25_client(fd, remote)
@@ -254,7 +248,7 @@ read_x25_socket(fd, buffer, len)
 	int fd, len;
 	char *buffer;
 {
-	static u_char mode;
+	static unsigned char mode;
 	int cc, count = 0, total = len;
 	char *p = buffer;
 
@@ -310,11 +304,19 @@ write_x25_socket(fd, buffer, len)
 int
 _camtec_sunlink_stub2()
 {
+	return (0);
 }
 #endif				/* CAMTEC_CCL */
 #else				/* X25 */
 int
 _camtec_sunlink_stub()
 {
+	return (0);
 }
 #endif				/* X25 */
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
+}

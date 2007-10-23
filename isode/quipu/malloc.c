@@ -115,8 +115,8 @@ int mem_heap = 0;
 #ifdef QUIPU_MALLOC
 
 #ifndef MALLOC_TEST
-extern LLog *log_dsap;
-extern SFD attempt_restart();
+extern LLog * log_dsap;
+extern sighandler_t attempt_restart;
 #endif
 
 #ifdef MALLOCDEBUG

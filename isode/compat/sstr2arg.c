@@ -91,8 +91,6 @@ static char *rcsid =
 #include <errno.h>
 extern int errno;
 
-/*  */
-
 /*
    stash a pointer to each field into the passed array. any common seperators
    split the words.  extra white-space between fields is ignored.
@@ -106,6 +104,7 @@ extern int errno;
 
 */
 
+int
 sstr2arg(srcptr, maxpf, argv, dlmstr)
 	register char *srcptr;		/* source data */
 	int maxpf;			/* maximum number of permitted fields */
@@ -122,7 +121,7 @@ sstr2arg(srcptr, maxpf, argv, dlmstr)
 
 	bzero(idex, sizeof idex);
 	for (destptr = dlmstr; *destptr; destptr++)
-		idex[*destptr] = 1;
+		idex[(int) *destptr] = 1;
 
 	for (ind = 0, maxpf -= 2;; ind++) {
 		if (ind >= maxpf)
@@ -136,7 +135,7 @@ sstr2arg(srcptr, maxpf, argv, dlmstr)
 
 		for (gotquote = 0;;) {
 
-			if (idex[*srcptr]) {
+			if (idex[(int) *srcptr]) {
 				if (gotquote) {	/* don't interpret the char */
 					*destptr++ = *srcptr++;
 					continue;
@@ -210,4 +209,10 @@ sstr2arg(srcptr, maxpf, argv, dlmstr)
 	      nextarg:
 		continue;
 	}
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

@@ -101,18 +101,19 @@ static char nib2hex[0x10] = {
 int
 explode(a, b, n)
 	register char *a;
-	register u_char *b;
+	register unsigned char *b;
 	register int n;
 {
 	register int i;
-	register u_char c;
+	register unsigned char c;
 
+	(void) rcsid;
 	for (i = 0; i < n; i++) {
 		c = *b++;
-		*a++ = nib2hex[(u_char) (c & 0xf0) >> 4];
+		*a++ = nib2hex[(unsigned char) (c & 0xf0) >> 4];
 		*a++ = nib2hex[(c & 0x0f)];
 	}
-	*a = NULL;
+	*a = '\0';
 
 	return (n * 2);
 }

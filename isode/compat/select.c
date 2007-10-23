@@ -92,12 +92,15 @@ static char *rcsid =
 #include "manifest.h"
 #include "tailor.h"
 #include <sys/stat.h>
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif				/* HAVE_SYS_SELECT_H */
 
 extern int errno;
 
 int xselect_blocking_on_intr = 0;
 
-/*  */
+#if (defined SOCKETS && !defined TLI_POLL) || defined HAVE_SELECT
 
 #if	defined(SOCKETS) && !defined(TLI_POLL)
 
@@ -151,8 +154,8 @@ xhandler(fd)
 	}
 }
 
-#endif
-#endif
+#endif				/* ULTRIX_X25_DEMSA */
+#endif				/* ULTRIX_X25 */
 
 int
 selsocket(nfds, rfds, wfds, efds, secs)
@@ -164,9 +167,7 @@ selsocket(nfds, rfds, wfds, efds, secs)
 	fd_set ifds, ofds, xfds;
 
 #ifdef ULTRIX_X25_DEMSA
-
 /* X25SelectCall uses timeval struct */
-
 	int error;
 	struct timeval tvs;
 	register struct timeval *tv = &tvs;
@@ -175,16 +176,13 @@ selsocket(nfds, rfds, wfds, efds, secs)
 		tv->tv_sec = secs, tv->tv_usec = 0;
 	else
 		tv = NULL;
-
 #else
-
 #if defined(masscomp) && defined(_ATT)
 	int msecs;
 #else
 	struct timeval tvs;
 	register struct timeval *tv = &tvs;
 #endif
-
 #if defined(masscomp) && defined(_ATT)
 	if (secs != NOTOK)
 		msecs = secs * 1000;
@@ -196,23 +194,28 @@ selsocket(nfds, rfds, wfds, efds, secs)
 	else
 		tv = NULL;
 #endif
-
 #endif
-
+#ifdef linux
+	(void) rcsid;
+#endif
 	if (rfds)
 		ifds = *rfds;
+	else
+		FD_ZERO(&ifds);
 	if (wfds)
 		ofds = *wfds;
+	else
+		FD_ZERO(&ofds);
 	if (efds)
 		xfds = *efds;
+	else
+		FD_ZERO(&xfds);
 #if defined(masscomp) && defined(_ATT)
 	if (efds)
 		FD_ZERO(efds);
 #endif
-
 	for (;;) {
 #ifdef ULTRIX_X25_DEMSA
-
 		if (rfds)
 			in_rfds = *rfds;
 		else
@@ -229,12 +232,9 @@ selsocket(nfds, rfds, wfds, efds, secs)
 		FD_ZERO(&out_wfds);
 		FD_ZERO(&out_efds);
 		out_n = 0;
-
 		/* handlers rhandler whandler xhandler are being called */
 		/* by the X25SelectCall routine */
-
 		error = X25SelectCall(tv);
-
 		if (error < NULL) {
 			n = NOTOK;
 			switch (error) {
@@ -256,7 +256,6 @@ selsocket(nfds, rfds, wfds, efds, secs)
 			}
 		} else
 			n = out_n;
-
 		if (rfds)
 			*rfds = out_rfds;
 		if (wfds)
@@ -264,7 +263,6 @@ selsocket(nfds, rfds, wfds, efds, secs)
 		if (efds)
 			*efds = out_efds;
 		switch (n) {
-
 #else
 #if  defined(masscomp) && defined(_ATT)
 		switch (n = select(nfds, rfds, wfds, msecs)) {
@@ -276,16 +274,13 @@ selsocket(nfds, rfds, wfds, efds, secs)
 			if (secs == NOTOK)
 				break;
 			return OK;
-
 		case NOTOK:
 			if (xselect_blocking_on_intr && errno == EINTR && secs == NOTOK)
 				continue;
 			/* else fall... */
-
 		default:
 			return n;
 		}
-
 		if (rfds)
 			*rfds = ifds;
 		if (wfds)
@@ -294,12 +289,9 @@ selsocket(nfds, rfds, wfds, efds, secs)
 			*efds = xfds;
 	}
 }
-#endif
-
-/*  */
+#endif				/* (defined SOCKETS && !defined TLI_POLL) || defined HAVE_SELECT */
 
 #ifdef	EXOS
-
 #ifdef	SYS5
 
 /* There seems to be a bug in the SYS5 EXOS select() routine when a socket can
@@ -325,14 +317,12 @@ selsocket(nfds, rfds, wfds, efds, secs)
 		usecs = secs * 1000;
 	else
 		usecs = 0xffff;	/* used to be ~(1L << (8 * sizeof usecs - 1)) */
-
 	if (rfds)
 		ifds = *rfds;
 	if (wfds)
 		ofds = *wfds;
 	if (efds)
 		FD_ZERO(efds);
-
 	for (;;) {
 		switch (n = select(nfds + 1, rfds, wfds, usecs)) {	/* +1 for UNISYS */
 		case OK:
@@ -347,12 +337,10 @@ selsocket(nfds, rfds, wfds, efds, secs)
 			if (n == 0 && secs == NOTOK)
 				break;
 			return n;
-
 		case NOTOK:
 		default:
 			return n;
 		}
-
 		if (rfds)
 			*rfds = ifds;
 		if (wfds)
@@ -391,19 +379,15 @@ selsocket(nfds, rfds, wfds, efds, secs)
 		}
 		if (pollfds[j].fd == i)
 			j++;
-
 	}
-
 	if (rfds)
 		FD_ZERO(rfds);
 	if (wfds)
 		FD_ZERO(wfds);
 	if (efds)
 		FD_ZERO(efds);
-
 	if (secs != 0 && secs != NOTOK)
 		secs *= 1000;
-
       again:
 	n = poll(pollfds, (unsigned long) j, secs);
 	if (n == NOTOK) {
@@ -413,7 +397,6 @@ selsocket(nfds, rfds, wfds, efds, secs)
 			SLOG(compat_log, LLOG_EXCEPTIONS, "failed", ("poll"));
 		return NOTOK;
 	}
-
 	for (i = 0; i < j; i++) {
 		if (rfds && (pollfds[i].revents & (POLLIN | POLLPRI)))
 			FD_SET(pollfds[i].fd, rfds);
@@ -424,10 +407,7 @@ selsocket(nfds, rfds, wfds, efds, secs)
 	}
 	return n;
 }
-
 #endif
-
-/*  */
 
 /* This routine used to be used for devices that didn't support real select.
    Those devices are no longer supported.
@@ -436,30 +416,25 @@ selsocket(nfds, rfds, wfds, efds, secs)
    buffered in user-space for reading...
  */
 
-static IFP sfnx[FD_SETSIZE] = { NULL };
+static int (*sfnx[FD_SETSIZE])() = { NULL };
 static caddr_t sdata[FD_SETSIZE] = { NULL };
 
-IFP
-set_check_fd(fd, fnx, data)
+int (*set_check_fd(fd, fnx, data))()
 	int fd;
-	IFP fnx;
+	int (*fnx)();
 	caddr_t data;
 {
-	IFP ofnx;
+	int (*ofnx)();
 
 	if (fd < 0 || fd >= FD_SETSIZE)
-		return NULLIFP;
-
+		return NULL;
 	ofnx = sfnx[fd];
 	sfnx[fd] = fnx, sdata[fd] = data;
-
 	return ofnx;
 }
 
-/*  */
 #if !(defined(_AIX) && defined(X25))
 		/* We have an AIX specific version if X25 is defined */
-
 int
 xselect(nfds, rfds, wfds, efds, secs)
 	int nfds;
@@ -475,52 +450,42 @@ xselect(nfds, rfds, wfds, efds, secs)
     if (nsysfds == NOTOK)
 	nsysfds = getdtablesize ();
 */
-
 	if (nsysfds == NOTOK)
 		nsysfds = sysconf(_SC_OPEN_MAX);
-
 	if (nfds > FD_SETSIZE)
 		nfds = FD_SETSIZE;
 	if (nfds > nsysfds + 1)
 		nfds = nsysfds + 1;
-
 	FD_ZERO(&ifds);
 	n = 0;
-
 	for (fd = 0; fd < nfds; fd++)
-		if (sfnx[fd] != NULLIFP && rfds && FD_ISSET(fd, rfds)
+		if (sfnx[fd] != NULL && rfds && FD_ISSET(fd, rfds)
 		    && (*sfnx[fd]) (fd, sdata[fd]) == DONE) {
 			FD_SET(fd, &ifds);
 			n++;
 		}
-
 	if (n > 0) {
 		*rfds = ifds;	/* struct copy */
 		if (wfds)
 			FD_ZERO(wfds);
 		if (efds)
 			FD_ZERO(efds);
-
 		return n;
 	}
-
 	if (rfds)
 		ifds = *rfds;	/* struct copy */
 	if (wfds)
 		ofds = *wfds;	/* struct copy */
 	if (efds)
 		xfds = *efds;	/* struct copy */
-
 	if ((n = selsocket(nfds, rfds, wfds, efds, secs)) != NOTOK)
 		return n;
-
 	if (rfds)
 		FD_ZERO(rfds);
 	if (wfds)
 		FD_ZERO(wfds);
 	if (efds)
 		FD_ZERO(efds);
-
 	if (errno == EBADF) {
 		struct stat st;
 
@@ -536,18 +501,13 @@ xselect(nfds, rfds, wfds, efds, secs)
 					FD_SET(fd, wfds);
 				if (efds && FD_ISSET(fd, &xfds))
 					FD_SET(fd, efds);
-
 				SLOG(compat_log, LLOG_EXCEPTIONS, "", ("fd %d has gone bad", fd));
 				n++;
 			}
-
 		if (n)
 			return n;
-
 		errno = EBADF;
 	}
-
 	return NOTOK;
 }
-
 #endif

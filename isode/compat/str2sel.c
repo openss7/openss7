@@ -90,10 +90,13 @@ static char *rcsid =
 #include "general.h"
 #include "manifest.h"
 #include "tailor.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 #define	QUOTE	'\\'
 
-/*    STR2SEL */
+/* STR2SEL */
 
 int
 str2sel(s, quoted, sel, n)
@@ -103,20 +106,30 @@ str2sel(s, quoted, sel, n)
 	int i, r;
 	register char *cp;
 
-	if (*s == NULL)
+	(void) rcsid;
+	if (*s == '\0')
 		return 0;
 
 	if (quoted <= 0) {
 		for (cp = s; *cp; cp++)
-			if (!isxdigit((u_char) *cp))
+			if (!isxdigit((unsigned char) *cp))
 				break;
 
-		if (*cp == NULL && (i = (cp - s)) >= 2 && (i & 0x01) == 0) {
+		if (*cp == '\0' && (i = (cp - s)) >= 2 && (i & 0x01) == 0) {
 			if (i > (r = n * 2))
 				i = r;
-			i = implode((u_char *) sel, s, i);
-			if ((r = (n - i)) > 0)
+			i = implode((unsigned char *) sel, s, i);
+			if ((r = (n - i)) > 0) {
+#ifdef HAVE_MEMSET
+				memset(sel + i, 0, r);
+#else				/* HAVE_MEMSET */
+#ifdef HAVE_BZERO
 				bzero(sel + i, r);
+#else				/* HAVE_BZERO */
+#error need memset or bzero
+#endif				/* HAVE_BZERO */
+#endif				/* HAVE_MEMSET */
+			}
 			return i;
 		}
 		if (*s == '#') {	/* gosip style, network byte-order */
@@ -158,20 +171,20 @@ str2sel(s, quoted, sel, n)
 				break;
 
 			default:
-				if (!isdigit((u_char) *s)) {
+				if (!isdigit((unsigned char) *s)) {
 					*cp++ = QUOTE;
 					*cp = *s;
 					break;
 				}
 				r = *s != '0' ? 10 : 8;
-				for (i = 0; isdigit((u_char) *s); s++)
+				for (i = 0; isdigit((unsigned char) *s); s++)
 					i = i * r + *s - '0';
 				s--;
 				*cp = toascii(i);
 				break;
 			}
 	if (n > 0)
-		*cp = NULL;
+		*cp = '\0';
 
 	return (cp - sel);
 }

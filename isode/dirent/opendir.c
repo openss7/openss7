@@ -56,11 +56,16 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
+#ifndef HAVE_OPENDIR
 /*
 	opendir -- open a directory stream
 
 	last edit:	16-Jun-1987	D A Gwyn
 */
+
+#ifdef HAVE_CONFIG
+#include <config.h>
+#endif
 
 #include	<sys/errno.h>
 #include	<sys/types.h>
@@ -134,3 +139,4 @@ _opendir_stub()
 {;
 }
 #endif
+#endif				/* HAVE_OPENDIR */

@@ -85,6 +85,7 @@ static char *rcsid =
 
 /* LINTLIBRARY */
 
+#include <unistd.h>
 #include <stdio.h>
 #include "general.h"
 #include "manifest.h"
@@ -95,8 +96,9 @@ static char *rcsid =
 #ifdef	SYS5
 #include <sys/utsname.h>
 #endif
-
-/*  */
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 char *
 getlocalhost()
@@ -111,6 +113,7 @@ getlocalhost()
 #endif
 	static char buffer[BUFSIZ];
 
+	(void) rcsid;
 	if (buffer[0])
 		return buffer;
 
@@ -130,14 +133,14 @@ getlocalhost()
 #endif
 
 #ifdef	TCP
-		if (hp = gethostbyname(buffer))
+		if ((hp = gethostbyname(buffer)))
 			(void) strcpy(buffer, hp->h_name);
 		else
 			SLOG(addr_log, LLOG_EXCEPTIONS, NULLCP, ("%s: unknown host", buffer));
 #endif
 
-		if (cp = index(buffer, '.'))
-			*cp = NULL;
+		if ((cp = index(buffer, '.')))
+			*cp = '\0';
 	}
 
 	return buffer;

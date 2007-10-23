@@ -90,8 +90,9 @@ static char *rcsid =
 #include "manifest.h"
 #include "isoservent.h"
 #include "tailor.h"
-
-/*  */
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 struct isoservent *
 getisoserventbyname(entity, provider)
@@ -99,11 +100,12 @@ getisoserventbyname(entity, provider)
 {
 	register struct isoservent *is;
 
+	(void) rcsid;
 	isodetailor(NULLCP, 0);
 	DLOG(addr_log, LLOG_TRACE, ("getisoserventbyname \"%s\" \"%s\"", entity, provider));
 
 	(void) setisoservent(0);
-	while (is = getisoservent())
+	while ((is = getisoservent()))
 		if (strcmp(entity, is->is_entity) == 0 && strcmp(provider, is->is_provider) == 0)
 			break;
 	(void) endisoservent();

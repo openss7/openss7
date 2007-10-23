@@ -56,6 +56,8 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
+#ifndef HAVE_REWINDDIR
+
 /*
 	rewinddir -- rewind a directory stream
 
@@ -101,3 +103,4 @@ _rewinddir_stub()
 {;
 }
 #endif
+#endif				/* HAVE_REWINDDIR */

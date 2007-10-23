@@ -117,7 +117,7 @@ int interrupted;
 void adios(), advise();
 
 #ifndef	BRIDGE
-SFD intrser();
+sighandler_t intrser;
 #endif
 
 extern char *command_prompt;
@@ -521,7 +521,7 @@ getline(prompt, buffer)
 
 /* ARGSUSED */
 
-static SFD
+static RETSIGTYPE
 intrser(sig)
 	int sig;
 {
@@ -676,7 +676,7 @@ _advise(ap)
 {
 	char buffer[BUFSIZ];
 
-	asprintf(buffer, ap);
+	xsprintf(buffer, ap);
 
 #ifndef	BRIDGE
 	if (hash && marks >= BUFSIZ) {

@@ -85,11 +85,14 @@ static char *rcsid =
 
 /* LINTLIBRARY */
 
+#ifdef linux
+#include <unistd.h>
+#endif
 #include <stdio.h>
 #include "general.h"
 #include "manifest.h"
 
-/*    Berkeley UNIX: 4.2 */
+/* Berkeley UNIX: 4.2 */
 
 #ifdef	BSD42
 
@@ -98,22 +101,23 @@ static char *rcsid =
 int
 _general_stub()
 {
+	return (0);
 };
 
 #endif
 
-/*    non-Berkeley UNIX */
+/* non-Berkeley UNIX */
 
-#if	!defined(BSDLIBC) || defined(BSD44)
-
-#ifndef	lint
-
+#if !defined HAVE_INSQUE || !defined HAVE_REMQUE
 struct qelem {
 	struct qelem *q_forw;
 	struct qelem *q_back;
 	char q_data[1];			/* extensible */
 };
+#endif				/* !defined HAVE_INSQUE || !defined HAVE_REMQUE */
 
+#ifndef HAVE_INSQUE
+void
 insque(elem, pred)
 	struct qelem *elem, *pred;
 {
@@ -123,7 +127,10 @@ insque(elem, pred)
 	elem->q_back = pred;
 	pred->q_forw = elem;
 }
+#endif				/* HAVE_INSQUE */
 
+#ifndef HAVE_REMQUE
+void
 remque(elem)
 	struct qelem *elem;
 {
@@ -131,11 +138,9 @@ remque(elem)
 		elem->q_forw->q_back = elem->q_back;
 	elem->q_back->q_forw = elem->q_forw;
 }
+#endif				/* HAVE_REMQUE */
 
-#endif
-#endif
-
-/*    DUP2 */
+/* DUP2 */
 
 #ifndef	BSD42
 #ifdef	SYS5
@@ -143,6 +148,29 @@ remque(elem)
 #endif
 
 extern int errno;
+
+#ifndef	F_DUPFD
+#ifdef linux
+int
+#endif
+dup2_aux(d1, d2)
+	int d1, d2;
+{
+	int fd, result;
+
+#ifdef linux
+	(void) rcsid;
+#endif
+	if ((fd = dup(d1)) == NOTOK || fd == d2)
+		return fd;
+
+	result = dup2_aux(d1, d2);
+
+	(void) close(fd);
+
+	return result;
+}
+#endif
 
 int
 dup2(d1, d2)
@@ -168,26 +196,12 @@ dup2(d1, d2)
 	return NOTOK;
 }
 
-#ifndef	F_DUPFD
-dup2_aux(d1, d2)
-	int d1, d2;
-{
-	int fd, result;
-
-	if ((fd = dup(d1)) == NOTOK || fd == d2)
-		return fd;
-
-	result = dup2_aux(d1, d2);
-
-	(void) close(fd);
-
-	return result;
-}
 #endif
 #endif
 
-/*     BYTEORDER */
+/* BYTEORDER */
 
+#ifndef linux
 #ifndef	SWABLIB
 
 /* ROS and HP-UX don't seem to have these in libc.a */
@@ -225,3 +239,10 @@ htonl(hostlong)
 }
 
 #endif
+#endif
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
+}

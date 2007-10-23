@@ -90,7 +90,7 @@ static char *rcsid =
 #include "manifest.h"
 #include "isoaddrs.h"
 
-/*    Network Address to String */
+/* Network Address to String */
 
 char *
 na2str(na)
@@ -107,4 +107,10 @@ na2str(na)
 	default:
 		return sel2str(na->na_address, na->na_addrlen, 0);
 	}
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

@@ -87,7 +87,7 @@ static char *rcsid =
 
 int
 bcd2char(s, d, len)
-	register u_char *s;
+	register unsigned char *s;
 	register char *d;
 	int len;
 {
@@ -108,4 +108,10 @@ bcd2char(s, d, len)
 	*d = 0;
 
 	return len;
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

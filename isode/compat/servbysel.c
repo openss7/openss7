@@ -90,8 +90,9 @@ static char *rcsid =
 #include "manifest.h"
 #include "isoservent.h"
 #include "tailor.h"
-
-/*  */
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 struct isoservent *
 getisoserventbyselector(provider, selector, selectlen)
@@ -100,12 +101,13 @@ getisoserventbyselector(provider, selector, selectlen)
 {
 	register struct isoservent *is;
 
+	(void) rcsid;
 	isodetailor(NULLCP, 0);
 	DLOG(addr_log, LLOG_TRACE,
 	     ("getisoserventbyselector \"%s\" %s", provider, sel2str(selector, selectlen, 1)));
 
 	(void) setisoservent(0);
-	while (is = getisoservent())
+	while ((is = getisoservent()))
 		if (selectlen == is->is_selectlen
 		    && bcmp(selector, is->is_selector, is->is_selectlen) == 0
 		    && strcmp(provider, is->is_provider) == 0)

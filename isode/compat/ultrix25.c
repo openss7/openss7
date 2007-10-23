@@ -104,7 +104,7 @@ static char *rcsid =
 #include "tailor.h"
 #include "tpkt.h"
 
-/*    Ultrix: X25 */
+/* Ultrix: X25 */
 
 #ifdef  X25
 #ifdef  ULTRIX_X25
@@ -151,8 +151,6 @@ extern int X25Encode();
 static char enc_buf[1024];
 static int enc_buf_len;
 
-/*  */
-
 int
 start_x25_client(local)
 	struct NSAPaddr *local;
@@ -181,8 +179,6 @@ start_x25_client(local)
 
 	return sd;
 }
-
-/*  */
 
 int
 start_x25_server(local, backlog, opt1, opt2)
@@ -256,8 +252,6 @@ start_x25_server(local, backlog, opt1, opt2)
 	}
 	return sd;
 }
-
-/*  */
 
 int
 join_x25_client(fd, remote)
@@ -448,7 +442,7 @@ log_call_status(fd)
 		SLOG(compat_log, LLOG_DEBUG, NULLCP,
 		     ("X25S_RUNNING: The connection is still open."));
 		log_call_clear(fd, 0);
-#endif	/* DEBUG */
+#endif				/* DEBUG */
 		break;
 
 	case X25S_CALLING:	/* Connection in progress */
@@ -610,8 +604,6 @@ log_x25_facilities(fd, coc, caption)
 
 	return OK;
 }
-
-/*  */
 
 void *
 epl_prtstr(fmt, val, vallen)
@@ -806,7 +798,7 @@ CONN_DB x25_interface;
 CONN_DB *p_x25_interface = &x25_interface;
 #endif
 
-/*    4.[23] UNIX: DEC X25 */
+/* 4.[23] UNIX: DEC X25 */
 
 #include <sys/uio.h>
 
@@ -1110,8 +1102,6 @@ start_x25_client(local)
 
 }
 
-/*  */
-
 int
 start_x25_server(local, backlog, opt1, opt2)
 	struct NSAPaddr *local;
@@ -1153,7 +1143,6 @@ start_x25_server(local, backlog, opt1, opt2)
 				    str2sel(x25_local_pid, -1, local->na_pid, NPSIZE);
 		}
 	}
-
 #ifdef DEBUG
 	DLOG(compat_log, LLOG_DEBUG, ("start_x25_server: X25TakeCall"));
 #endif
@@ -1337,8 +1326,6 @@ start_x25_server(local, backlog, opt1, opt2)
 
 }
 
-/*  */
-
 int
 join_x25_client(sd, rremote)
 	int sd;
@@ -1519,8 +1506,6 @@ start_x25_client(local)
 
 }
 
-/*  */
-
 int
 start_x25_server(local, backlog, opt1, opt2)
 	struct NSAPaddr *local;
@@ -1563,7 +1548,6 @@ start_x25_server(local, backlog, opt1, opt2)
 				    str2sel(x25_local_pid, -1, local->na_pid, NPSIZE);
 		}
 	}
-
 #ifdef DEBUG
 	DLOG(compat_log, LLOG_DEBUG, ("start_x25_server: X25TakeCall"));
 #endif
@@ -1630,8 +1614,6 @@ start_x25_server(local, backlog, opt1, opt2)
 	return our_sd;
 
 }
-
-/*  */
 
 int
 join_x25_client(sd, rremote)
@@ -2051,12 +2033,20 @@ close_x25_socket(sd)
 #else				/* ULTRIX_X25 */
 int
 _ultrix25_stub2()
-{;
+{
+	return (0);
 }
 #endif				/* ULTRIX_X25 */
 #else				/* X25 */
 int
 _ultrix25_stub()
-{;
+{
+	return (0);
 }
 #endif				/* X25 */
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
+}

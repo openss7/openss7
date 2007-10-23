@@ -89,10 +89,11 @@ static char *rcsid =
 #include <stdio.h>
 #include "general.h"
 #include "manifest.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 #define	QUOTE	'\\'
-
-/*  */
 
 int
 str2vecX(s, vec, nmask, mask, brk, docomma)
@@ -102,31 +103,32 @@ str2vecX(s, vec, nmask, mask, brk, docomma)
 	register int i;
 	char comma = docomma ? ',' : ' ';
 
+	(void) rcsid;
 	if (mask)
 		*mask = 0;
 
 	for (i = 0; i <= NVEC;) {
-		vec[i] = NULL;
+		vec[i] = '\0';
 		if (brk > 0) {
 			if (i > 0 && *s == brk)
-				*s++ = NULL;
+				*s++ = '\0';
 		} else
-			while (isspace((u_char) *s) || *s == comma)
-				*s++ = NULL;
-		if (*s == NULL)
+			while (isspace((unsigned char) *s) || *s == comma)
+				*s++ = '\0';
+		if (*s == '\0')
 			break;
 
 		if (*s == '"') {
 			if (i < nmask)
 				*mask |= 1 << i;
-			for (vec[i++] = ++s; *s != NULL && *s != '"'; s++)
+			for (vec[i++] = ++s; *s != '\0' && *s != '"'; s++)
 				if (*s == QUOTE) {
 					if (*++s == '"')
 						(void) strcpy(s - 1, s);
 					s--;
 				}
 			if (*s == '"')
-				*s++ = NULL;
+				*s++ = '\0';
 			continue;
 		}
 		if (*s == QUOTE && *++s != '"')
@@ -135,13 +137,13 @@ str2vecX(s, vec, nmask, mask, brk, docomma)
 
 		if (brk > 0) {
 			if (*s != brk)
-				for (s++; *s != NULL && *s != brk; s++)
+				for (s++; *s != '\0' && *s != brk; s++)
 					continue;
 		} else
-			for (s++; *s != NULL && !isspace((u_char) *s) && *s != comma; s++)
+			for (s++; *s != '\0' && !isspace((unsigned char) *s) && *s != comma; s++)
 				continue;
 	}
-	vec[i] = NULL;
+	vec[i] = '\0';
 
 	return i;
 }

@@ -58,11 +58,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* putenv.c - generic putenv() */
 
-#ifndef	lint
-static char *rcsid =
-    "Header: /xtel/isode/isode/compat/RCS/putenv.c,v 9.0 1992/06/16 12:07:00 isode Rel";
-#endif
-
 /* 
  * Header: /xtel/isode/isode/compat/RCS/putenv.c,v 9.0 1992/06/16 12:07:00 isode Rel
  *
@@ -88,25 +83,35 @@ static char *rcsid =
 #include <stdio.h>
 #include "general.h"
 #include "manifest.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
-#ifndef BSD44
-
-/*  */
-
+#if !defined HAVE_SETENV || !defined HAVE_UNSETENV
 extern char **environ;
-static nvmatch();
 
-/*  */
+static int
+nvmatch(s1, s2)
+	register char *s1, *s2;
+{
+	while (*s1 == *s2++)
+		if (*s1++ == '=')
+			return 1;
 
+	return (*s1 == '\0' && *--s2 == '=');
+}
+#endif				/* !defined HAVE_SETENV || !defined HAVE_UNSETENV */
+
+#if !defined HAVE_SETENV
 int
 setenv(name, value)
-	register char *name, *value;
+	const char *name;
+	const char *value;
 {
 	register int i;
 	register char **ep, **nep, *cp;
 
-	if ((cp = malloc((unsigned) (strlen(name) + strlen(value) + 2)))
-	    == NULL)
+	if ((cp = malloc((unsigned) (strlen(name) + strlen(value) + 2))) == NULL)
 		return 1;
 	(void) sprintf(cp, "%s=%s", name, value);
 
@@ -128,9 +133,9 @@ setenv(name, value)
 	environ = nep;
 	return 0;
 }
+#endif				/* !defined HAVE_SETENV */
 
-/*  */
-
+#if !defined HAVE_UNSETENV
 int
 unsetenv(name)
 	char *name;
@@ -149,18 +154,4 @@ unsetenv(name)
 	*nep = NULL;
 	return 0;
 }
-
-#endif				/* BSD44 */
-
-/*  */
-
-static
-nvmatch(s1, s2)
-	register char *s1, *s2;
-{
-	while (*s1 == *s2++)
-		if (*s1++ == '=')
-			return 1;
-
-	return (*s1 == '\0' && *--s2 == '=');
-}
+#endif				/* !defined HAVE_UNSETENV */

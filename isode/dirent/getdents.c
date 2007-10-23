@@ -89,11 +89,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 	to always work, you shouldn't be using this source file at all.
 */
 
-#ifndef	lint			/* for strings... */
-static char *rcsid =
-    "Header: /xtel/isode/isode/dirent/RCS/getdents.c,v 9.0 1992/06/16 12:12:04 isode Rel";
-#endif
-
 #include "config.h"
 
 #if	!defined(SVR3) && !defined(apollo) && !defined(GETDENTS)
@@ -153,7 +148,15 @@ static char *rcsid =
 #ifdef BSD_SYSV
 #define	getdirentries	_getdirentries	/* package hides this system call */
 #endif
+#ifdef HAVE_GETDIRENTRIES
+#ifdef HAVE_DIRENT_H
+#include <dirent.h>
+#else
 extern int getdirentries();
+#endif
+#else
+extern int getdirentries();
+#endif
 static long dummy;			/* getdirentries() needs basep */
 
 #define	GetBlock( fd, buf, n )	getdirentries( fd, buf, (int)n, &dummy )
@@ -216,7 +219,11 @@ NameLen(name)				/* return # chars in embedded name */
 
 #else				/* BFS || NFS */
 
+#ifdef HAVE_STRING_H
+#include <string.h>
+#else
 extern int strlen();
+#endif
 
 #define	NameLen( name )	strlen( name )	/* names are always NUL-terminated */
 
@@ -271,7 +278,7 @@ getdents(fildes, buf, nbyte)		/* returns # bytes read; 0 on EOF, -1 on error */
 		}
 		/* else fall through into emulation */
 
-/*	case no:	/* fall through into emulation */
+/*	case no:	* fall through into emulation */
 	}
 #endif
 

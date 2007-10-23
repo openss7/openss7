@@ -60,7 +60,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #ifndef lint
 static char *rcsid =
-    "Header: /xtel/isode/isode/compat/RCS/ccurx25.c,v 9.0 1992/06/16 12:07:00 isode Rel";
+    "$Header: /xtel/isode/isode/compat/RCS/ccurx25.c,v 9.0 1992/06/16 12:07:00 isode Rel $";
 #endif
 
 /*
@@ -763,3 +763,9 @@ _ccurx25_stub2()
 {
 }
 #endif				/* X25 */
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
+}

@@ -56,6 +56,8 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
+#ifndef HAVE_READDIR
+
 /*
 	readdir -- read next entry from a directory stream
 
@@ -108,3 +110,4 @@ _readdir_stub()
 {;
 }
 #endif
+#endif				/* HAVE_READDIR */

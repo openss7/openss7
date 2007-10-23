@@ -245,13 +245,13 @@ main(argc, argv, envp)
 /* ARGSUSED */
 
 #ifdef	BSD42
-static SFD
+static RETSIGTYPE
 dishser(sig, code, sc)
 	int sig;
 	long code;
 	struct sigcontext *sc;
 #else
-static SFD
+static RETSIGTYPE
 dishser(i)
 	int i;
 #endif
@@ -449,7 +449,7 @@ _da_response(ap)
 
 	fd = va_arg(ap, int);
 
-	_asprintf(buffer, NULLCP, ap);
+	_xsprintf(buffer, NULLCP, ap);
 	if (debug)
 		(void) fprintf(stderr, "<--- %s\n", buffer);
 
@@ -657,7 +657,7 @@ rcpipe(command)
 #ifdef	BSD42
 /* ARGSUSED */
 
-static SFD
+static RETSIGTYPE
 chldser(sig, code, sc)
 	int sig;
 	long code;

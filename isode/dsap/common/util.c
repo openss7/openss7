@@ -304,9 +304,9 @@ ps_printf(va_alist)
 #endif
 
 	{
-		char buffer[8192];	/* How big should this go !!! */
-
-		_asprintf(buffer, NULLCP, ap);
+		char buffer [8192]; 	/* How big should this go !!! */
+		
+		_xsprintf (buffer,NULLCP,ap);
 
 		ps_print(ps, buffer);
 	}

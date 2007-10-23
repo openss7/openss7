@@ -85,10 +85,9 @@ static char *rcsid =
 
 /* LINTLIBRARY */
 
+#include <unistd.h>
 #include "general.h"
 #include "manifest.h"
-
-/*  */
 
 static void
 default_smalloc_handler()
@@ -96,13 +95,12 @@ default_smalloc_handler()
 	abort();
 }
 
-static VFP smalloc_handler = default_smalloc_handler;
+static void (*smalloc_handler) () = default_smalloc_handler;
 
-VFP
-set_smalloc_handler(fnx)
-	VFP fnx;
+void (*set_smalloc_handler(fnx)) ()
+	void (*fnx) ();
 {
-	VFP savefnx = smalloc_handler;
+	void (*savefnx) () = smalloc_handler;
 
 	if (fnx)
 		smalloc_handler = fnx;
@@ -123,4 +121,10 @@ smalloc(size)
 	}
 
 	return (ptr);
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

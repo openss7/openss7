@@ -537,6 +537,7 @@ XTService(tb)
 #else
 int
 _ts2x25_stub()
-{;
+{
+	return (0);
 }
 #endif

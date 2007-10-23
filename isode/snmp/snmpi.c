@@ -129,10 +129,8 @@ static int ontty;
 static int armed;
 static jmp_buf intrenv;
 static int interrupted;
-
-static SFP istat;
-
-SFD intrser();
+static sighandler_t istat;
+sighander_t intrser;
 
 static char *defs = NULLCP;
 
@@ -1822,7 +1820,7 @@ getline(prompt, buffer)
 
 /* ARGSUSED */
 
-static SFD
+static RETSIGTYPE
 intrser(sig)
 	int sig;
 {
@@ -1907,7 +1905,7 @@ _advise(ap)
 {
 	char buffer[BUFSIZ];
 
-	asprintf(buffer, ap);
+	xsprintf(buffer, ap);
 
 	(void) fflush(stdout);
 

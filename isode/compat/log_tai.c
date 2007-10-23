@@ -90,6 +90,9 @@ static char *rcsid =
 #include "general.h"
 #include "manifest.h"
 #include "logger.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 /*  */
 
@@ -103,41 +106,40 @@ static char *rcsid =
 #define LG_DSLEVEL	8
 
 static CMD_TABLE log_tbl[] = {
-	"FILE", LG_FILE,
-	"SFLAGS", LG_SFLAGS,
-	"DFLAGS", LG_DFLAGS,
-	"LEVEL", LG_LEVEL,
-	"SLEVEL", LG_LEVEL,
-	"DLEVEL", LG_DLEVEL,
-	"SSLEVEL", LG_SSLEVEL,
-	"DSLEVEL", LG_DSLEVEL,
-	"SIZE", LG_SIZE,
-	0, -1,
+	{"FILE", LG_FILE},
+	{"SFLAGS", LG_SFLAGS},
+	{"DFLAGS", LG_DFLAGS},
+	{"LEVEL", LG_LEVEL},
+	{"SLEVEL", LG_LEVEL},
+	{"DLEVEL", LG_DLEVEL},
+	{"SSLEVEL", LG_SSLEVEL},
+	{"DSLEVEL", LG_DSLEVEL},
+	{"SIZE", LG_SIZE},
+	{0, -1}
 };
 
 static CMD_TABLE log_lvltbl[] = {
-	"NONE", LLOG_NONE,
-	"FATAL", LLOG_FATAL,
-	"EXCEPTIONS", LLOG_EXCEPTIONS,
-	"NOTICE", LLOG_NOTICE,
-	"TRACE", LLOG_TRACE,
-	"DEBUG", LLOG_DEBUG,
-	"PDUS", LLOG_PDUS,
-	"ALL", LLOG_ALL,
-	0, -1
+	{"NONE", LLOG_NONE},
+	{"FATAL", LLOG_FATAL},
+	{"EXCEPTIONS", LLOG_EXCEPTIONS},
+	{"NOTICE", LLOG_NOTICE},
+	{"TRACE", LLOG_TRACE},
+	{"DEBUG", LLOG_DEBUG},
+	{"PDUS", LLOG_PDUS},
+	{"ALL", LLOG_ALL},
+	{0, -1}
 };
 
 static CMD_TABLE log_flgtbl[] = {
-	"CLOSE", LLOGCLS,
-	"CREATE", LLOGCRT,
-	"ZERO", LLOGZER,
-	"TTY", LLOGTTY,
-	0, -1
+	{"CLOSE", LLOGCLS},
+	{"CREATE", LLOGCRT},
+	{"ZERO", LLOGZER},
+	{"TTY", LLOGTTY},
+	{0, -1}
 };
 
-/*  */
-
-log_tai(lgptr, av, ac)		/* for now only alter the level - files etc later */
+int
+log_tai(lgptr, av, ac)			/* for now only alter the level - files etc later */
 	LLog *lgptr;
 	char **av;
 	int ac;
@@ -149,7 +151,7 @@ log_tai(lgptr, av, ac)		/* for now only alter the level - files etc later */
 	for (i = 0; i < ac; i++) {
 		if ((p = index(av[i], '=')) == NULLCP)
 			continue;
-		*p++ = NULL;
+		*p++ = '\0';
 		switch (cmd_srch(av[i], log_tbl)) {
 		case LG_LEVEL:
 			val = cmd_srch(p, log_lvltbl);
@@ -189,4 +191,11 @@ log_tai(lgptr, av, ac)		/* for now only alter the level - files etc later */
 			break;
 		}
 	}
+	return (0);
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

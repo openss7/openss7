@@ -104,6 +104,7 @@ sel2str(sel, len, quoted)
 	    buf2[NASIZE * 2 + 1], buf3[NASIZE * 2 + 1], buf4[NASIZE * 2 + 1];
 	static char *bufs[] = { buf1, buf2, buf3, buf4 };
 
+	(void) rcsid;
 	cp = bufs[i++];
 	i = i % 4;
 
@@ -118,7 +119,7 @@ sel2str(sel, len, quoted)
 #endif
 
 		for (ep = (dp = sel) + len; dp < ep; dp++)
-			if (!isprint((u_char) *dp))
+			if (!isprint((unsigned char) *dp))
 				goto ugly;
 
 		if (len > NASIZE * 2)
@@ -130,7 +131,7 @@ sel2str(sel, len, quoted)
 		if (len > NASIZE)	/* XXX */
 			len = NASIZE;
 
-		cp[explode(cp, (u_char *) sel, len)] = NULL;
+		cp[explode(cp, (unsigned char *) sel, len)] = '\0';
 	}
 #ifndef	NOGOSIP
       out:;

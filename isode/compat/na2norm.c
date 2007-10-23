@@ -86,11 +86,17 @@ static char *rcsid =
 /* LINTLIBRARY */
 
 #include <stdio.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
 #include "general.h"
 #include "manifest.h"
 #include "isoaddrs.h"
 #include "internet.h"
 #include "tailor.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 /* Encoding based on
 
@@ -98,8 +104,6 @@ static char *rcsid =
 	S.E. Kille, January 16, 1989
 
  */
-
-/*  */
 
 struct NSAPaddr *
 na2norm(na)
@@ -163,14 +167,14 @@ na2norm(na)
 																   form 
 																 */
 			/* should be more general */
-			(void) sprintf(nsap, "36%014s", na->na_dte);
+			(void) sprintf(nsap, "36%14s", na->na_dte);
 			ts = NULL;
 			break;
 		}
 
-		if (ilen = na->na_pidlen & 0xff)
+		if ((ilen = na->na_pidlen & 0xff))
 			*cp++ = '1', dp = na->na_pid;
-		else if (ilen = na->na_cudflen & 0xff)
+		else if ((ilen = na->na_cudflen & 0xff))
 			*cp++ = '2', dp = na->na_cudf;
 		else
 			*cp++ = '0';
@@ -205,4 +209,10 @@ na2norm(na)
 	ca->na_addrlen = dp - ca->na_address;
 
 	return ca;
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

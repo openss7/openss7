@@ -90,7 +90,7 @@ int
 char2bcd(s, n, d)
 	register char *s;
 	int n;
-	register u_char *d;
+	register unsigned char *d;
 {
 	register int c, i;
 
@@ -111,4 +111,10 @@ char2bcd(s, n, d)
 	}
 
 	return i;
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

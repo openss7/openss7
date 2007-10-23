@@ -92,8 +92,11 @@ static char *rcsid =
 #include "isoaddrs.h"
 #include "tailor.h"
 #include "cmd_srch.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
-/*    DATA */
+/* DATA */
 
 static char *isonsapsnpa = "isonsapsnpa";
 
@@ -101,12 +104,10 @@ static FILE *servf = NULL;
 static int stayopen = 0;
 
 static CMD_TABLE tbl_communities[] = {
-	"cons", NAS_CONS,
-	"clns", NAS_CLNS,
-	NULLCP, NOTOK
+	{"cons", NAS_CONS},
+	{"clns", NAS_CLNS},
+	{NULLCP, NOTOK}
 };
-
-/*  */
 
 int
 setisonsapsnpa(f)
@@ -132,8 +133,6 @@ endisonsapsnpa()
 	return 1;
 }
 
-/*  */
-
 struct NSAPinfo *
 getisonsapsnpa()
 {
@@ -153,8 +152,8 @@ getisonsapsnpa()
 	while (fgets(buffer, sizeof buffer, servf) != NULL) {
 		if (*buffer == '#')
 			continue;
-		if (cp = index(buffer, '\n'))
-			*cp = NULL;
+		if ((cp = index(buffer, '\n')))
+			*cp = '\0';
 		if ((vecp = str2vecX(buffer, vec, 1 + 1, &mask, NULL, 1)) < 1)
 			continue;
 
@@ -210,7 +209,7 @@ getisosnpa(nsap)
 
 	(void) setisonsapsnpa(0);
 
-	while (is = getisonsapsnpa()) {
+	while ((is = getisonsapsnpa())) {
 		if (is->is_nsap.na_stack == NOTOK || is->is_plen < best)
 			continue;
 		if (bcmp(nsap->na_address, is->is_prefix, is->is_plen) == 0) {
@@ -239,7 +238,7 @@ getnsapinfo(nsap)
 
 	(void) setisonsapsnpa(0);
 
-	while (is = getisonsapsnpa()) {
+	while ((is = getisonsapsnpa())) {
 		if (is->is_plen < best)
 			continue;
 		if (bcmp(nsap->na_address, is->is_prefix, is->is_plen) == 0) {
@@ -253,4 +252,10 @@ getnsapinfo(nsap)
 	if (best >= 0)
 		return ns;
 	return NULLNI;
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

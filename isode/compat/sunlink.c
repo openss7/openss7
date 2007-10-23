@@ -94,7 +94,7 @@ static char *rcsid =
 #include "manifest.h"
 #include "tailor.h"
 
-/*    SUN UNIX: SunLink X25 */
+/* SUN UNIX: SunLink X25 */
 
 #ifdef  X25
 
@@ -107,14 +107,10 @@ static char *rcsid =
 #define CALLED  1
 #define	PROBE	(-1)
 
-/*  */
-
 #ifdef  DEBUG
 void print_x25_facilities();
 static int log_x25_facilities();
 #endif
-
-/*  */
 
 /* ARGSUSED */
 
@@ -144,8 +140,6 @@ start_x25_client(local, priv)
 #endif
 	return sd;
 }
-
-/*  */
 
 int
 start_x25_server(local, backlog, opt1, opt2)
@@ -245,8 +239,6 @@ start_x25_server(local, backlog, opt1, opt2)
 	return sd;
 }
 
-/*  */
-
 int
 join_x25_server(fd, remote)
 	register int fd;
@@ -296,8 +288,6 @@ join_x25_server(fd, remote)
 	return nfd;
 }
 
-/*  */
-
 int
 join_x25_client(fd, remote)
 	int fd;
@@ -326,7 +316,7 @@ join_x25_client(fd, remote)
 		return nfd;
 
 	/* May also need to send call accept packet if using FAST_ACPT_CLR, or
-	   X25_CALL_ACPT_APPROVAL there was a SUNLINK bug in this area May as well try it -- if it 
+	   X25_CALL_ACPT_APPROVAL there was a SUNLINK bug in this area May as well try it -- if it
 	   fails, so what ?? */
 	if (ioctl(nfd, X25_SEND_CALL_ACPT, NULLCP) < 0)
 		SLOG(compat_log, LLOG_EXCEPTIONS, "failed", ("X25_SEND_CALL_ACPT"));
@@ -439,8 +429,6 @@ set_x25_facilities(sd, coc, caption)
 	return OK;
 }
 
-/*  */
-
 int
 log_cause_and_diag(fd)
 	int fd;
@@ -455,8 +443,6 @@ log_cause_and_diag(fd)
 	return elucidate_x25_err((int) diag.flags, diag.data);
 
 }
-
-/*  */
 
 #ifdef  DEBUG
 
@@ -477,8 +463,6 @@ log_x25_facilities(fd, coc, caption)
 
 	return OK;
 }
-
-/*  */
 
 static void
 print_x25_facilities(f, coc, caption)
@@ -712,11 +696,15 @@ print_x25_facilities(f, coc, caption)
 int
 _sunlink_stub2()
 {
+	return (0);
 }
 #endif
 #else
 int
 _sunlink_stub()
 {
+	return (0);
 }
 #endif
+
+static inline void dummy(void) { (void) rcsid; }

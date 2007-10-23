@@ -89,8 +89,9 @@ static char *rcsid =
 #include "general.h"
 #include "manifest.h"
 #include "isoaddrs.h"
-
-/*  */
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 int
 nsap_addr_cmp(na1, na2)
@@ -162,4 +163,10 @@ psap_addr_cmp(pa, pb)
 	    bcmp(pa->pa_selector, pb->pa_selector, pa->pa_selectlen) != 0)
 		return NOTOK;
 	return ssap_addr_cmp(&pa->pa_addr, &pb->pa_addr);
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

@@ -162,7 +162,7 @@ char origDefaultCo[LINESIZE], origDefaultOrg[LINESIZE],
 char *username, *backup_dsa_address;
 jmp_buf sjbuf;
 
-SFD cleanupok();
+sighandler_t cleanupok;
 
 int
 main(argc, argv)
@@ -980,8 +980,7 @@ onint1()
 	longjmp(sjbuf, 0);
 }
 
-SFD
-cleanupok()
+RETSIGTYPE cleanupok()
 {
 	cleanup(0);
 }

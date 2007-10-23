@@ -56,6 +56,8 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
+#ifndef HAVE_SCANDIR
+
 /* used by permission */
 
 /*
@@ -179,3 +181,4 @@ alphasort(d1, d2)
 {
 	return (strcmp((*(struct dirent **) d1)->d_name, (*(struct dirent **) d2)->d_name));
 }
+#endif				/* HAVE_SCANDIR */

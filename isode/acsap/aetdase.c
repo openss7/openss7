@@ -95,7 +95,7 @@ static char *rcsid =
 #include "dgram.h"
 #include "tailor.h"
 
-/*    DATA */
+/* DATA */
 
 static int stayopen = 0;
 
@@ -106,7 +106,7 @@ static int armed = 0;
 static int interrupted;
 static jmp_buf intrenv;
 
-static SFD intrser();
+static sighandler_t intrser;
 
 static int dase_init();
 static int dase_callback();
@@ -115,7 +115,7 @@ static print_qb();
 
 static struct element_DASE_1 *read_el();
 
-/*    LOOKUP */
+/* LOOKUP */
 
 /* ARGSUSED */
 
@@ -129,7 +129,7 @@ name2value_dase(name, context, ontty, userdn, passwd, real_name)
 	fd_set ifds;
 	char *vec[NVEC + 1];
 	PE pe = NULLPE, result = NULLPE;
-	SFP istat;
+	sighandler_t istat;
 	register struct type_DASE_Query__REQ *parm = NULL;
 
 	*real_name = NULLPE;
@@ -301,8 +301,6 @@ name2value_dase(name, context, ontty, userdn, passwd, real_name)
 	return result;
 }
 
-/*  */
-
 static int
 dase_init()
 {
@@ -379,8 +377,6 @@ dase_init()
 
 	return OK;
 }
-
-/*  */
 
 static int
 dase_callback(arg)
@@ -468,8 +464,6 @@ dase_callback(arg)
 	return result;
 }
 
-/*  */
-
 static int
 yesno()
 {
@@ -531,8 +525,6 @@ print_qb(q)
 	for (p = q->qb_forw; p != q; p = p->qb_forw)
 		(void) printf("%*.*s", p->qb_len, p->qb_len, p->qb_data);
 }
-
-/*  */
 
 static struct element_DASE_1 *
 read_el()
@@ -654,7 +646,7 @@ read_el()
 
 /* ARGSUSED */
 
-static SFD
+static RETSIGTYPE
 intrser(sig)
 	int sig;
 {
@@ -667,8 +659,6 @@ intrser(sig)
 
 	interrupted++;
 }
-
-/*  */
 
 set_lookup_dase(flag)
 	char flag;

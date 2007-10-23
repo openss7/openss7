@@ -128,26 +128,26 @@ static int nbits = FD_SETSIZE;
 extern LLog *log_dsap;
 
 #ifdef QUIPU_CONSOLE
-#include "quipu/IF-types.h"
-extern AV_Sequence open_call_avs;	/* SPT: This holds a sequence of all the open call values. 
-					 */
-void open_call_avs_clearup();
-void Remove_openCall_attribute();
-#endif				/* QUIPU_CONSOLE */
+#include "quipu/IF-types.h"   
+extern AV_Sequence open_call_avs ;    /* SPT: This holds a sequence of 
+					 all the open call values. */
+void   open_call_avs_clearup() ;
+void   Remove_openCall_attribute() ;
+#endif /* QUIPU_CONSOLE */
 
-static char *myname;
+static  char *myname;
 
-void adios(), advise();
-void mk_dsa_tmp_dir();
-static envinit(), setdsauid();
-SFD attempt_restart();
+void    adios (), advise ();
+void    mk_dsa_tmp_dir();
+static  envinit (), setdsauid();
+sighandler_t attempt_restart;
 extern int print_parse_errors;
 extern int parse_line;
 struct task_act *task_select();
 
 char quipu_shutdown = FALSE;
 
-extern SFP abort_vector;
+extern sighandler_t abort_vector;
 
 #ifndef NO_STATS
 extern LLog *log_stat;
@@ -208,10 +208,10 @@ main(argc, argv)
 	SFD stop_dsa();
 
 #ifdef	SIGUSR1
-	SFD list_status();
+    sighander_t		 list_status;
 #endif
 #ifdef	SIGUSR2
-	SFD list_status2();
+    sighander_t		 list_status2;
 #endif
 
 	{
@@ -395,9 +395,8 @@ main(argc, argv)
 static int restart = 0;
 
 /* ARGSUSED */
-SFD
-clean_exit(x)
-	int x;
+RETSIGTYPE clean_exit(x)
+int x;
 {
 	if (restart)
 		do_restart(x);
@@ -523,10 +522,9 @@ check_conns(secs)
 #ifdef	SIGUSR1
 /* ARGSUSED */
 
-	SFD list_status(sig)
-	int sig;
-
-	{
+RETSIGTYPE	list_status (sig)
+int	sig;
+{
 #ifdef SBRK_DEBUG
 		unsigned proc_size;
 #endif
@@ -594,10 +592,9 @@ check_conns(secs)
 #ifdef	SIGUSR2
 /* ARGSUSED */
 
-	SFD list_status2(sig)
-	int sig;
-
-	{
+RETSIGTYPE	list_status2 (sig)
+int	sig;
+{
 #ifdef SBRK_DEBUG
 		unsigned proc_size;
 #endif
@@ -768,10 +765,9 @@ check_conns(secs)
 #define	CLEAR_TIME	300	/* .. */
 #endif
 
-	SFD attempt_restart(sig)
-	int sig;
-
-	{
+RETSIGTYPE attempt_restart (sig)
+int sig;
+{
 		int sd;
 		static int here_again = 0;
 

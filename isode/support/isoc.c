@@ -3106,7 +3106,7 @@ _advise(ap)
 {
 	char buffer[BUFSIZ];
 
-	asprintf(buffer, ap);
+	xsprintf (buffer, ap);
 
 	(void) fflush(stdout);
 

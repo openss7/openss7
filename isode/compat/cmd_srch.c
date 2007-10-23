@@ -88,10 +88,11 @@ static char *rcsid =
 #include "manifest.h"
 #include "cmd_srch.h"
 
-/*  */
-
 /* map a string onto a value */
 
+int lexequ(register char *str1, register char *str2);
+
+int
 cmd_srch(str, cmd)
 	register char *str;
 	register CMD_TABLE *cmd;
@@ -99,7 +100,14 @@ cmd_srch(str, cmd)
 	extern char chrcnv[];
 
 	for (; cmd->cmd_key != NULLCP; cmd++)
-		if (chrcnv[*str] == chrcnv[*cmd->cmd_key] && lexequ(str, cmd->cmd_key) == 0)
+		if (chrcnv[(int) *str] == chrcnv[(int) *cmd->cmd_key]
+		    && lexequ(str, cmd->cmd_key) == 0)
 			return (cmd->cmd_value);
 	return (cmd->cmd_value);
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

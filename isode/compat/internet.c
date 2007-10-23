@@ -93,6 +93,9 @@ static char *rcsid =
 #include "general.h"
 #include "manifest.h"
 #include "tailor.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 #ifdef ULTRIX_X25_DEMSA
 #include "/usr/include/x25.h"
@@ -100,14 +103,15 @@ static char *rcsid =
 #include <demsb.h>
 #endif
 
-/*  */
-
 #ifdef	TCP
 #include "internet.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 extern int errno;
 
-/*    Berkeley UNIX: 4.2 */
+/* Berkeley UNIX: 4.2 */
 
 #if 	defined(SOCKETS) && !defined(TLI_TCP)
 
@@ -134,7 +138,7 @@ start_tcp_client(sock, priv)
 		goto got_socket;
 
 	for (port = IPPORT_RESERVED - priv;; priv ? port-- : port++) {
-		sock->sin_port = htons((u_short) port);
+		sock->sin_port = htons((unsigned short) port);
 
 		if (bind(sd, (struct sockaddr *) sock, sizeof *sock) != NOTOK)
 			break;
@@ -156,18 +160,18 @@ start_tcp_client(sock, priv)
 
       got_socket:;
 #if	!defined(BSD43) && !defined(SVR4)
-	if (setsockopt(sd, SOL_SOCKET, SO_KEEPALIVE, NULLCP, 0) == NOTOK)
+	if (setsockopt(sd, SOL_SOCKET, SO_KEEPALIVE, NULLCP, 0) == NOTOK) {
 		SLOG(compat_log, LLOG_EXCEPTIONS, "failed", ("set SO_KEEPALIVE"));
+	}
 #else
 	onoff = 1;
-	if (setsockopt(sd, SOL_SOCKET, SO_KEEPALIVE, (char *) &onoff, sizeof onoff) == NOTOK)
+	if (setsockopt(sd, SOL_SOCKET, SO_KEEPALIVE, (char *) &onoff, sizeof onoff) == NOTOK) {
 		SLOG(compat_log, LLOG_EXCEPTIONS, "failed", ("set SO_KEEPALIVE"));
+	}
 #endif
 
 	return sd;
 }
-
-/*  */
 
 int
 start_tcp_server(sock, backlog, opt1, opt2)
@@ -214,7 +218,7 @@ start_tcp_server(sock, backlog, opt1, opt2)
 	}
 
 	for (port = IPPORT_RESERVED;; port++) {
-		sock->sin_port = htons((u_short) port);
+		sock->sin_port = htons((unsigned short) port);
 
 		if (bind(sd, (struct sockaddr *) sock, sizeof *sock) != NOTOK)
 			break;
@@ -243,14 +247,15 @@ start_tcp_server(sock, backlog, opt1, opt2)
 		SLOG(compat_log, LLOG_EXCEPTIONS, "failed", ("set socket option 0x%x", opt2));
 #else
 	onoff = 1;
-	if (setsockopt(sd, SOL_SOCKET, SO_KEEPALIVE, (char *) &onoff, sizeof onoff) == NOTOK)
+	if (setsockopt(sd, SOL_SOCKET, SO_KEEPALIVE, (char *) &onoff, sizeof onoff) == NOTOK) {
 		SLOG(compat_log, LLOG_EXCEPTIONS, "failed", ("set SO_KEEPALIVE"));
-	if (opt1 && setsockopt(sd, SOL_SOCKET, opt1, (char *) &onoff, sizeof onoff)
-	    == NOTOK)
+	}
+	if (opt1 && setsockopt(sd, SOL_SOCKET, opt1, (char *) &onoff, sizeof onoff) == NOTOK) {
 		SLOG(compat_log, LLOG_EXCEPTIONS, "failed", ("set socket option 0x%x", opt1));
-	if (opt2 && setsockopt(sd, SOL_SOCKET, opt2, (char *) &onoff, sizeof onoff)
-	    == NOTOK)
+	}
+	if (opt2 && setsockopt(sd, SOL_SOCKET, opt2, (char *) &onoff, sizeof onoff) == NOTOK) {
 		SLOG(compat_log, LLOG_EXCEPTIONS, "failed", ("set socket option 0x%x", opt2));
+	}
 #endif
 
 	(void) listen(sd, backlog);
@@ -258,14 +263,13 @@ start_tcp_server(sock, backlog, opt1, opt2)
 	return sd;
 }
 
-/*  */
-
 int
 join_tcp_client(fd, sock)
 	int fd;
 	struct sockaddr_in *sock;
 {
-	int eindex, len = sizeof *sock, result;
+	int eindex, result;
+	socklen_t len = sizeof(*sock);
 
 #ifdef ULTRIX_X25_DEMSA
 	int our_count;
@@ -297,8 +301,6 @@ join_tcp_client(fd, sock)
 	return result;
 }
 
-/*  */
-
 int
 join_tcp_server(fd, sock)
 	int fd;
@@ -316,7 +318,9 @@ join_tcp_server(fd, sock)
 #ifdef EINPROGRESS
 		if (errno != EINPROGRESS)
 #endif
+		{
 			SLOG(compat_log, LLOG_EXCEPTIONS, "failed", ("connect"));
+		}
 		errno = eindex;
 	}
 #ifdef ULTRIX_X25_DEMSA
@@ -342,8 +346,7 @@ join_tcp_server(fd, sock)
 	return result;
 }
 
-/*  */
-
+int
 close_tcp_socket(fd)
 	int fd;
 {
@@ -374,9 +377,9 @@ close_tcp_socket(fd)
 
 #endif
 
-/*    AT&T UNIX: 5r3 using TLI */
+/* AT&T UNIX: 5r3 using TLI */
 
-/*    AT&T UNIX: 5 with EXOS 8044 TCP/IP card */
+/* AT&T UNIX: 5 with EXOS 8044 TCP/IP card */
 
 #ifdef	EXOS
 
@@ -405,7 +408,7 @@ start_tcp_client(sock, priv)
 	}
 
 	for (port = IPPORT_RESERVED - priv;; priv ? port-- : port++) {
-		sock->sin_port = htons((u_short) port);
+		sock->sin_port = htons((unsigned short) port);
 
 		if ((sd = socket(SOCK_STREAM, 0, (struct sockaddr *) sock, SO_KEEPALIVE)) != NOTOK)
 			return sd;
@@ -421,8 +424,6 @@ start_tcp_client(sock, priv)
 		}
 	}
 }
-
-/*  */
 
 int
 start_tcp_server(sock, backlog, opt1, opt2)
@@ -447,7 +448,7 @@ start_tcp_server(sock, backlog, opt1, opt2)
 	}
 
 	for (port = IPPORT_RESERVED;; port++) {
-		sock->sin_port = htons((u_short) port);
+		sock->sin_port = htons((unsigned short) port);
 
 		if ((sd = socket(SOCK_STREAM, 0, (struct sockaddr *) sock,
 				 SO_ACCEPTCONN | SO_KEEPALIVE | opt1 | opt2)) != NOTOK)
@@ -466,8 +467,6 @@ start_tcp_server(sock, backlog, opt1, opt2)
 
 #endif
 
-/*    GETHOSTENT PLUS */
-
 static char *empty = NULL;
 
 #ifdef	h_addr
@@ -481,7 +480,7 @@ gethostbystring(s)
 	register struct hostent *h;
 
 #ifndef	DG
-	static u_long iaddr;
+	static unsigned long iaddr;
 #else
 	static struct in_addr iaddr;
 #endif
@@ -509,7 +508,7 @@ gethostbystring(s)
 	return h;
 }
 
-/*    AT&T UNIX: 5 with EXOS 8044 TCP/IP card */
+/* AT&T UNIX: 5 with EXOS 8044 TCP/IP card */
 
 #ifdef	EXOS
 
@@ -569,8 +568,6 @@ gethostbyname(name)
 	return h;
 
 }
-
-/*  */
 
 /* really only need the "tsap" entry in this table... but why not? */
 
@@ -648,7 +645,7 @@ getservbyname(name, proto)
 		if (strcmp(name, s->s_name) == 0 && strcmp(proto, s->s_proto) == 0) {
 			if (s->s_aliases == NULL) {
 				s->s_aliases = &empty;
-				s->s_port = htons((u_short) s->s_port);
+				s->s_port = htons((unsigned short) s->s_port);
 			}
 
 			return s;
@@ -656,8 +653,6 @@ getservbyname(name, proto)
 
 	return NULL;
 }
-
-/*  */
 
 #define	s2a(b)	(((int) (b)) & 0xff)
 
@@ -673,15 +668,15 @@ inet_ntoa(in)
 	return addr;
 }
 
-u_long
+unsigned long
 inet_addr(cp)
 	char *cp;
 {
 	register int base;
 	register char c;
-	register u_long val;
-	u_long parts[4];
-	register u_long *pp = parts;
+	register unsigned long val;
+	unsigned long parts[4];
+	register unsigned long *pp = parts;
 
 	for (;;) {
 		val = 0, base = 10;
@@ -690,10 +685,12 @@ inet_addr(cp)
 		if (*cp == 'x' || *cp == 'X')
 			base = 16, cp++;
 
-		for (; isxdigit((u_char) (c = *cp)); cp++)
+		for (; isxdigit((unsigned char) (c = *cp)); cp++)
 			if (base == 16)
-				val = (val << 4) + (c + 10 - (islower((u_char) c) ? 'a' : 'A'));
-			else if (isdigit((u_char) c))
+				val =
+				    (val << 4) + (c + 10 -
+						  (islower((unsigned char) c) ? 'a' : 'A'));
+			else if (isdigit((unsigned char) c))
 				val = (val * base) + (c - '0');
 			else
 				break;
@@ -706,7 +703,7 @@ inet_addr(cp)
 			continue;
 
 		default:
-			if (*cp && !isspace((u_char) *cp))
+			if (*cp && !isspace((unsigned char) *cp))
 				return NOTOK;
 			*pp++ = val;
 			break;
@@ -745,15 +742,15 @@ inet_addr(cp)
 	return htonl(val);
 }
 
-u_long
+unsigned long
 inet_network(cp)
 	char *cp;
 {
 	register int base;
 	register char c;
-	register u_long val;
-	u_long parts[4];
-	register u_long *pp = parts;
+	register unsigned long val;
+	unsigned long parts[4];
+	register unsigned long *pp = parts;
 
 	for (;;) {
 		val = 0, base = 10;
@@ -762,10 +759,12 @@ inet_network(cp)
 		if (*cp == 'x' || *cp == 'X')
 			base = 16, cp++;
 
-		for (; isxdigit((u_char) (c = *cp)); cp++)
+		for (; isxdigit((unsigned char) (c = *cp)); cp++)
 			if (base == 16)
-				val = (val << 4) + (c + 10 - (islower((u_char) c) ? 'a' : 'A'));
-			else if (isdigit((u_char) c))
+				val =
+				    (val << 4) + (c + 10 -
+						  (islower((unsigned char) c) ? 'a' : 'A'));
+			else if (isdigit((unsigned char) c))
 				val = (val * base) + (c - '0');
 			else
 				break;
@@ -778,7 +777,7 @@ inet_network(cp)
 			continue;
 
 		default:
-			if (*cp && !isspace((u_char) *cp))
+			if (*cp && !isspace((unsigned char) *cp))
 				return NOTOK;
 			*pp++ = val;
 			break;
@@ -818,3 +817,9 @@ inet_network(cp)
 }
 #endif
 #endif
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
+}

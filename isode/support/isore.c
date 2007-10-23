@@ -90,7 +90,7 @@ static char *rcsid =
 
 /*    MAIN */
 
-static SFD EMTser();
+static sighandler_t	EMTser;
 
 /* ARGSUSED */
 
@@ -141,15 +141,13 @@ main(argc, argv, envp)
 
 /* ARGSUSED */
 #ifdef SVR4
-static SFD
-EMTser(sig)
-	int sig;
+static  RETSIGTYPE EMTser (sig)
+int	sig;
 #else
-static SFD
-EMTser(sig, code, sc)
-	int sig;
-	long code;
-	struct sigcontext *sc;
+static  RETSIGTYPE EMTser (sig, code, sc)
+int	sig;
+long	code;
+struct sigcontext *sc;
 #endif
 {
 #ifndef	BSDSIGS

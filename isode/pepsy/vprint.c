@@ -223,7 +223,7 @@ vprint(va_alist)
 
 	va_start(ap);
 
-	_asprintf(buffer, NULLCP, ap);
+	_xsprintf(buffer, NULLCP, ap);
 
 	va_end(ap);
 
