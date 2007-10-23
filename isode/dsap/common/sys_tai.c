@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* sys_tai.c - System tailoring routines */
 
 #ifndef lint
-static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/sys_tai.c,v 9.0 1992/06/16 12:12:39 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/dsap/common/RCS/sys_tai.c,v 9.0 1992/06/16 12:12:39 isode Rel";
 #endif
 
 /*
- * $Header: /xtel/isode/isode/dsap/common/RCS/sys_tai.c,v 9.0 1992/06/16 12:12:39 isode Rel $
+ * Header: /xtel/isode/isode/dsap/common/RCS/sys_tai.c,v 9.0 1992/06/16 12:12:39 isode Rel
  *
  *
- * $Log: sys_tai.c,v $
+ * Log: sys_tai.c,v
  * Revision 9.0  1992/06/16  12:12:39  isode
  * Release 8.0
  *
@@ -23,25 +82,21 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/sys_tai.c,v 9.0
  *
  */
 
-
 /* LINTLIBRARY */
 
 #include "quipu/util.h"
 #include "cmd_srch.h"
 #include "tailor.h"
 
-extern char *oidtable,
-	    *dsa_address,
-	    *local_dit,
-	    dishinit,
-	    *myname;
+extern char *oidtable, *dsa_address, *local_dit, dishinit, *myname;
 
 extern LLog *log_dsap;
+
 #ifndef NO_STATS
-extern LLog * log_stat;
+extern LLog *log_stat;
 #endif
 
-extern int  oidformat,sizelimit,timelimit;
+extern int oidformat, sizelimit, timelimit;
 
 extern int ch_set;
 
@@ -59,36 +114,33 @@ extern int ch_set;
 #define JPEG		 23
 #define ISODE_TAILOR	 24
 
-static  CMD_TABLE  cmdtab[] =
-{
-	"DSAPLOG",      SYSLOG,
-	"OIDTABLE",     OIDTAB,
-	"OIDFORMAT",    OIDFMT,
-	"SIZELIMIT",    SIZELIMIT,
-	"TIMELIMIT",    TIMELIMIT,
-	"DSA_ADDRESS",  DSAADDR,
-	"PHOTO",	PHOTO,
-	"JPEG",		JPEG,
-	"ISODE",	ISODE_TAILOR,
-	"LOCAL_DIT",	LOCAL_DIT,
-	"QUIPURC",	DISH_INIT,
-	"CH_SET",	CH_SET,
+static CMD_TABLE cmdtab[] = {
+	"DSAPLOG", SYSLOG,
+	"OIDTABLE", OIDTAB,
+	"OIDFORMAT", OIDFMT,
+	"SIZELIMIT", SIZELIMIT,
+	"TIMELIMIT", TIMELIMIT,
+	"DSA_ADDRESS", DSAADDR,
+	"PHOTO", PHOTO,
+	"JPEG", JPEG,
+	"ISODE", ISODE_TAILOR,
+	"LOCAL_DIT", LOCAL_DIT,
+	"QUIPURC", DISH_INIT,
+	"CH_SET", CH_SET,
 #ifndef NO_STATS
-	"STATS",	STATS,
+	"STATS", STATS,
 #endif
-	0,              -1,
+	0, -1,
 };
 
-static  CMD_TABLE  oidtab[] =
-{
-	"SHORT",        1,
-	"LONG",         2,
-	"NUMERIC",      3,
-	0,              1,      /* default short */
+static CMD_TABLE oidtab[] = {
+	"SHORT", 1,
+	"LONG", 2,
+	"NUMERIC", 3,
+	0, 1,			/* default short */
 };
 
-static CMD_TABLE chtab[] =
-{
+static CMD_TABLE chtab[] = {
 	"ASCII", 0,
 	"US-ASCII", 0,
 	"ISO8859", 1,
@@ -100,112 +152,112 @@ static CMD_TABLE chtab[] =
  * do system wide initialisations
  */
 
-dsap_tai (argc, argv)
-char    **argv;
+dsap_tai(argc, argv)
+	char **argv;
 {
-	char    *arg, *term;
-	extern char * getenv ();
-	short str2syntax ();
+	char *arg, *term;
+	extern char *getenv();
+	short str2syntax();
 
-	if(argc < 2)
-		return(NOTOK);
+	if (argc < 2)
+		return (NOTOK);
 
 	arg = argv[1];
 
-	switch(cmd_srch(argv[0], cmdtab))
-	{
+	switch (cmd_srch(argv[0], cmdtab)) {
 	case SYSLOG:
-		DLOG (log_dsap,LLOG_DEBUG,( "Tailor SYSLOG %s", arg));
-		log_tai(log_dsap, &argv[1], argc-1);
+		DLOG(log_dsap, LLOG_DEBUG, ("Tailor SYSLOG %s", arg));
+		log_tai(log_dsap, &argv[1], argc - 1);
 		break;
 #ifndef NO_STATS
 	case STATS:
-		DLOG (log_dsap,LLOG_DEBUG,( "Tailor STATS %s", arg));
-		log_tai(log_stat, &argv[1], argc-1);
+		DLOG(log_dsap, LLOG_DEBUG, ("Tailor STATS %s", arg));
+		log_tai(log_stat, &argv[1], argc - 1);
 		break;
 #endif
 	case OIDTAB:
-		DLOG (log_dsap,LLOG_DEBUG,( "Tailor OIDTable=%s", arg));
-		oidtable = strdup (arg);
+		DLOG(log_dsap, LLOG_DEBUG, ("Tailor OIDTable=%s", arg));
+		oidtable = strdup(arg);
 		break;
 	case LOCAL_DIT:
-		DLOG (log_dsap,LLOG_DEBUG,( "Tailor local_DIT=%s", arg));
-		local_dit = strdup (arg);
+		DLOG(log_dsap, LLOG_DEBUG, ("Tailor local_DIT=%s", arg));
+		local_dit = strdup(arg);
 		break;
 	case OIDFMT:
-		DLOG (log_dsap,LLOG_DEBUG,( "Tailor OIDFMT=%s", arg));
-		oidformat = cmd_srch (arg,oidtab);
+		DLOG(log_dsap, LLOG_DEBUG, ("Tailor OIDFMT=%s", arg));
+		oidformat = cmd_srch(arg, oidtab);
 		break;
 	case SIZELIMIT:
-		sizelimit = atoi (arg);
+		sizelimit = atoi(arg);
 		break;
 	case TIMELIMIT:
-		timelimit = atoi (arg);
+		timelimit = atoi(arg);
 		break;
 	case DISH_INIT:
-		if (lexequ (arg,"on") == 0)
+		if (lexequ(arg, "on") == 0)
 			dishinit = TRUE;
 		break;
 	case PHOTO:
-		DLOG (log_dsap,LLOG_DEBUG,( "Tailor photo=%s", arg));
-		if ((term = getenv ("TERM")) && strcmp (term, arg) == 0) {
+		DLOG(log_dsap, LLOG_DEBUG, ("Tailor photo=%s", arg));
+		if ((term = getenv("TERM")) && strcmp(term, arg) == 0) {
 			if (*argv[2] == '/')
-				set_av_pe_print (str2syntax("photo"),strdup(argv[2]));
+				set_av_pe_print(str2syntax("photo"), strdup(argv[2]));
 			else {
-				char proc [LINESIZE];
-				(void) strcpy (proc,isodefile("g3fax/", 1));
-				(void) strcat (proc,argv[2]);
-				set_av_pe_print (str2syntax("photo"),strdup(proc));
+				char proc[LINESIZE];
+
+				(void) strcpy(proc, isodefile("g3fax/", 1));
+				(void) strcat(proc, argv[2]);
+				set_av_pe_print(str2syntax("photo"), strdup(proc));
 			}
 		}
-		break;	
+		break;
 	case JPEG:
-		DLOG (log_dsap,LLOG_DEBUG,( "Tailor jpeg=%s", arg));
-		if ((term = getenv ("TERM")) && strcmp (term, arg) == 0) {
+		DLOG(log_dsap, LLOG_DEBUG, ("Tailor jpeg=%s", arg));
+		if ((term = getenv("TERM")) && strcmp(term, arg) == 0) {
 			if (*argv[2] == '/')
-				set_av_pe_print (str2syntax("jpeg"),strdup(argv[2]));
+				set_av_pe_print(str2syntax("jpeg"), strdup(argv[2]));
 			else {
-				char proc [LINESIZE];
-				(void) strcpy (proc,isodefile("g3fax/", 1));
-				(void) strcat (proc,argv[2]);
-				set_av_pe_print (str2syntax("jpeg"),strdup(proc));
+				char proc[LINESIZE];
+
+				(void) strcpy(proc, isodefile("g3fax/", 1));
+				(void) strcat(proc, argv[2]);
+				set_av_pe_print(str2syntax("jpeg"), strdup(proc));
 			}
 		}
-		break;	
+		break;
 	case DSAADDR:
 		if (myname == NULLCP) {
 			/* use first 'dsa_address' in tailor file */
-			DLOG (log_dsap,LLOG_DEBUG,( "Tailor DSA_ADDRESS=%s", argv[2]));
-			dsa_address = strdup (argv[2]);
-			myname = strdup (argv[1]);
+			DLOG(log_dsap, LLOG_DEBUG, ("Tailor DSA_ADDRESS=%s", argv[2]));
+			dsa_address = strdup(argv[2]);
+			myname = strdup(argv[1]);
 		} else if (dsa_address == NULLCP) {
 			/* User has given a '-c flag' */
 			/* look for entry in address list */
-			if (lexequ (arg,myname) == 0) {
-				DLOG (log_dsap,LLOG_DEBUG,( "Tailor DSA_ADDRESS (USER) =%s", argv[2]));
-				myname = strdup (arg);
-				dsa_address = strdup (argv[2]);
+			if (lexequ(arg, myname) == 0) {
+				DLOG(log_dsap, LLOG_DEBUG,
+				     ("Tailor DSA_ADDRESS (USER) =%s", argv[2]));
+				myname = strdup(arg);
+				dsa_address = strdup(argv[2]);
 			}
 		}
 		break;
 	case ISODE_TAILOR:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor Isode %s%s",arg,argv[2]));
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor Isode %s%s", arg, argv[2]));
 		if (argc != 3)
-			LLOG (log_dsap,LLOG_EXCEPTIONS,( 
-			      "Invalid isode option in quiputailor"));
+			LLOG(log_dsap, LLOG_EXCEPTIONS, ("Invalid isode option in quiputailor"));
 		else
-			(void) isodesetvar(arg,strdup(argv[2]),0);
+			(void) isodesetvar(arg, strdup(argv[2]), 0);
 		break;
 	case CH_SET:
-		DLOG (log_dsap,LLOG_DEBUG,( "ch_set =%s", arg));
-		ch_set = cmd_srch (arg,chtab);
+		DLOG(log_dsap, LLOG_DEBUG, ("ch_set =%s", arg));
+		ch_set = cmd_srch(arg, chtab);
 		break;
 	default:
-		LLOG (log_dsap,LLOG_EXCEPTIONS, ("Unknown tailor option %s",arg));
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("Unknown tailor option %s", arg));
 		return (NOTOK);
 	}
 	if ((arg = getenv("CH_SET")) != NULLCP)
 		ch_set = cmd_srch(arg, chtab);
 	return (OK);
 }
-

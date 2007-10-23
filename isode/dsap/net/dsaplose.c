@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* dsaplose.c - DSAP: Support for directory protocol mappings */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/dsap/net/RCS/dsaplose.c,v 9.0 1992/06/16 12:14:05 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/dsap/net/RCS/dsaplose.c,v 9.0 1992/06/16 12:14:05 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/dsap/net/RCS/dsaplose.c,v 9.0 1992/06/16 12:14:05 isode Rel $
+ * Header: /xtel/isode/isode/dsap/net/RCS/dsaplose.c,v 9.0 1992/06/16 12:14:05 isode Rel
  *
  *
- * $Log: dsaplose.c,v $
+ * Log: dsaplose.c,v
  * Revision 9.0  1992/06/16  12:14:05  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/net/RCS/dsaplose.c,v 9.0 1
  *
  */
 
-
 /* LINTLIBRARY */
 
 #include <stdio.h>
@@ -33,135 +91,136 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/net/RCS/dsaplose.c,v 9.0 1
 #include "quipu/dsap.h"
 
 #ifndef	lint
-static int  _dsaplose ();
-static int  _dsapreject ();
+static int _dsaplose();
+static int _dsapreject();
 #endif
 
 /*  */
 
 #ifndef	lint
-int	dsaplose (va_alist)
-va_dcl
+int
+dsaplose(va_alist)
+	va_dcl
 {
-    int	    reason,
-	    result;
-    struct DSAPindication *di;
-    va_list ap;
+	int reason, result;
+	struct DSAPindication *di;
+	va_list ap;
 
-    va_start (ap);
+	va_start(ap);
 
-    di = va_arg (ap, struct DSAPindication *);
-    reason = va_arg (ap, int);
+	di = va_arg(ap, struct DSAPindication *);
+	reason = va_arg(ap, int);
 
-    result = _dsaplose (di, reason, ap);
+	result = _dsaplose(di, reason, ap);
 
-    va_end (ap);
+	va_end(ap);
 
-    return result;
+	return result;
 }
 #else
 /* VARARGS4 */
 
-int	dsaplose (di, reason, what, fmt)
-struct DSAPindication *di;
-int	reason;
-char   *what,
-       *fmt;
+int
+dsaplose(di, reason, what, fmt)
+	struct DSAPindication *di;
+	int reason;
+	char *what, *fmt;
 {
-    return dsaplose (di, reason, what, fmt);
+	return dsaplose(di, reason, what, fmt);
 }
 #endif
 
 /*  */
 
 #ifndef	lint
-static int  _dsaplose (di, reason, ap)  /* what, fmt, args ... */
-register struct DSAPindication *di;
-int     reason;
-va_list	ap;
+static int
+_dsaplose(di, reason, ap)		/* what, fmt, args ... */
+	register struct DSAPindication *di;
+	int reason;
+	va_list ap;
 {
-    register char  *bp;
-    char    buffer[BUFSIZ];
-    struct DSAPabort	* da;
+	register char *bp;
+	char buffer[BUFSIZ];
+	struct DSAPabort *da;
 
-    if (di) {
-	bzero ((char *) di, sizeof *di);
-	di->di_type = DI_ABORT;
-	da = &(di->di_abort);
-	da->da_reason = reason;
+	if (di) {
+		bzero((char *) di, sizeof *di);
+		di->di_type = DI_ABORT;
+		da = &(di->di_abort);
+		da->da_reason = reason;
 
-	asprintf (bp = buffer, ap);
-	bp += strlen (bp);
+		asprintf(bp = buffer, ap);
+		bp += strlen(bp);
 
-	copyDSAPdata (buffer, bp - buffer, da);
-    }
+		copyDSAPdata(buffer, bp - buffer, da);
+	}
 
-    return NOTOK;
+	return NOTOK;
 }
 #endif
 
 #ifndef	lint
-int	dsapreject (va_alist)
-va_dcl
+int
+dsapreject(va_alist)
+	va_dcl
 {
-    int	    reason,
-	    id,
-	    result;
-    struct DSAPindication *di;
-    va_list ap;
+	int reason, id, result;
+	struct DSAPindication *di;
+	va_list ap;
 
-    va_start (ap);
+	va_start(ap);
 
-    di = va_arg (ap, struct DSAPindication *);
-    reason = va_arg (ap, int);
-    id = va_arg (ap, int);
+	di = va_arg(ap, struct DSAPindication *);
+	reason = va_arg(ap, int);
+	id = va_arg(ap, int);
 
-    result = _dsapreject (di, reason, id, ap);
+	result = _dsapreject(di, reason, id, ap);
 
-    va_end (ap);
+	va_end(ap);
 
-    return result;
+	return result;
 }
 #else
 /* VARARGS4 */
 
-int	dsapreject (di, reason, id, what, fmt)
-struct DSAPindication *di;
-int	reason;
-int	id;
-char   *what,
-       *fmt;
+int
+dsapreject(di, reason, id, what, fmt)
+	struct DSAPindication *di;
+	int reason;
+	int id;
+	char *what, *fmt;
 {
-    return dsapreject (di, reason, id, what, fmt);
+	return dsapreject(di, reason, id, what, fmt);
 }
 #endif
 
 /*  */
 
 #ifndef	lint
-static int  _dsapreject (di, reason, id, ap)  /* what, fmt, args ... */
-register struct DSAPindication *di;
-int     reason;
-int	id;
-va_list	ap;
+static int
+_dsapreject(di, reason, id, ap)		/* what, fmt, args ... */
+	register struct DSAPindication *di;
+	int reason;
+	int id;
+	va_list ap;
 {
-    register char  *bp;
-    char    buffer[BUFSIZ];
-    struct DSAPpreject	* dp;
+	register char *bp;
+	char buffer[BUFSIZ];
+	struct DSAPpreject *dp;
 
-    if (di) {
-	bzero ((char *) di, sizeof *di);
-	di->di_type = DI_PREJECT;
-	dp = &(di->di_preject);
-	dp->dp_id = id;
-	dp->dp_reason = reason;
+	if (di) {
+		bzero((char *) di, sizeof *di);
+		di->di_type = DI_PREJECT;
+		dp = &(di->di_preject);
+		dp->dp_id = id;
+		dp->dp_reason = reason;
 
-	asprintf (bp = buffer, ap);
-	bp += strlen (bp);
+		asprintf(bp = buffer, ap);
+		bp += strlen(bp);
 
-	copyDSAPdata (buffer, bp - buffer, dp);
-    }
+		copyDSAPdata(buffer, bp - buffer, dp);
+	}
 
-    return (NOTOK);
+	return (NOTOK);
 }
 #endif

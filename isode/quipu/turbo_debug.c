@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* turbo_debug.c */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/turbo_debug.c,v 9.0 1992/06/16 12:34:01 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/quipu/RCS/turbo_debug.c,v 9.0 1992/06/16 12:34:01 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/quipu/RCS/turbo_debug.c,v 9.0 1992/06/16 12:34:01 isode Rel $
+ * Header: /xtel/isode/isode/quipu/RCS/turbo_debug.c,v 9.0 1992/06/16 12:34:01 isode Rel
  *
  *
- * $Log: turbo_debug.c,v $
+ * Log: turbo_debug.c,v
  * Revision 9.0  1992/06/16  12:34:01  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/turbo_debug.c,v 9.0 1
  *
  */
 
-
 #include <sys/types.h>
 #include <stdio.h>
 
@@ -35,141 +93,144 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/turbo_debug.c,v 9.0 1
 #include "quipu/entry.h"
 #include "quipu/turbo.h"
 
-extern LLog 		*log_dsap;
-int		turbo_index_num;
-AttributeType	*turbo_index;
+extern LLog *log_dsap;
+int turbo_index_num;
+AttributeType *turbo_index;
 
-PS	ps;
+PS ps;
 
-static rsavl_print( root, fn, fps, depth )
-Avlnode	*root;
-IFP	fn;
-FILE	*fps;
-int	depth;
+static
+rsavl_print(root, fn, fps, depth)
+	Avlnode *root;
+	IFP fn;
+	FILE *fps;
+	int depth;
 {
-	int	i;
+	int i;
 
-	if ( root == 0 )
+	if (root == 0)
 		return;
 
-	rsavl_print( root->avl_right, fn, fps, depth+1 );
+	rsavl_print(root->avl_right, fn, fps, depth + 1);
 
-	for ( i = 0; i < depth; i++ )
-		(*fn)( fps, "  " );
-	(*fn)( fps, ((Index_node *)root->avl_data)->in_value );
-	(*fn)( fps, " %d\n", root->avl_bf );
+	for (i = 0; i < depth; i++)
+		(*fn) (fps, "  ");
+	(*fn) (fps, ((Index_node *) root->avl_data)->in_value);
+	(*fn) (fps, " %d\n", root->avl_bf);
 
-	rsavl_print( root->avl_left, fn, fps, depth+1 );
+	rsavl_print(root->avl_left, fn, fps, depth + 1);
 }
 
-savl_print( root )
-Avlnode	*root;
+savl_print(root)
+	Avlnode *root;
 {
 #ifndef __STDC__
-	int	fprintf ();
+	int fprintf();
 #else
 #ifdef  __GNUC__
-#ifdef  SUNOS4		/* And probaby a few more - what a mess! */
-int	fprintf ();	
+#ifdef  SUNOS4			/* And probaby a few more - what a mess! */
+	int fprintf();
 #endif
 #endif
 #endif
 
-	(void) printf( "**** soundex avl_print ****\n" );
+	(void) printf("**** soundex avl_print ****\n");
 
-	if ( root == 0 ) {
-		(void) printf( "NULL\n" );
+	if (root == 0) {
+		(void) printf("NULL\n");
 		return;
 	}
 
-	( void ) rsavl_print( root, fprintf, (FILE *)stdout, 0 );
+	(void) rsavl_print(root, fprintf, (FILE *) stdout, 0);
 
-	(void) printf( "**** soundex avl_print end ****\n" );
+	(void) printf("**** soundex avl_print end ****\n");
 }
 
-static ravl_print( root, fn, fps, format, depth )
-Avlnode	*root;
-IFP	fn;
-PS	fps;
-int	format;
+static
+ravl_print(root, fn, fps, format, depth)
+	Avlnode *root;
+	IFP fn;
+	PS fps;
+	int format;
 {
-	int	i;
+	int i;
 
-	if ( root == 0 )
+	if (root == 0)
 		return;
 
-	ravl_print( root->avl_right, fn, fps, format, depth+1 );
+	ravl_print(root->avl_right, fn, fps, format, depth + 1);
 
-	for ( i = 0; i < depth; i++ )
-		ps_print( fps, "  " );
-	(*fn)( fps, (( Entry )(root->avl_data))->e_name, format );
-	ps_printf( fps, " %d\n", root->avl_bf );
+	for (i = 0; i < depth; i++)
+		ps_print(fps, "  ");
+	(*fn) (fps, ((Entry) (root->avl_data))->e_name, format);
+	ps_printf(fps, " %d\n", root->avl_bf);
 
-	ravl_print( root->avl_left, fn, fps, format, depth+1 );
+	ravl_print(root->avl_left, fn, fps, format, depth + 1);
 }
 
-avl_print( root )
-Avlnode	*root;
+avl_print(root)
+	Avlnode *root;
 {
-	PS	fps;
-	int	rdn_print();
+	PS fps;
+	int rdn_print();
 
-	(void) printf( "**** avl_print ****\n" );
+	(void) printf("**** avl_print ****\n");
 
-	if ( root == 0 ) {
-		(void) printf( "NULL\n" );
+	if (root == 0) {
+		(void) printf("NULL\n");
 		return;
 	}
 
-	if ( (fps = ps_alloc( std_open )) == NULLPS ) {
-                (void) printf( "avl_print: ps_alloc failed\n" );
-                return;
-        }
-        if ( std_setup( fps, stdout ) == NOTOK ) {
-                (void) printf( "avl_print: std_setup failed\n" );
-                return;
-        }
+	if ((fps = ps_alloc(std_open)) == NULLPS) {
+		(void) printf("avl_print: ps_alloc failed\n");
+		return;
+	}
+	if (std_setup(fps, stdout) == NOTOK) {
+		(void) printf("avl_print: std_setup failed\n");
+		return;
+	}
 
-	( void ) ravl_print( root, rdn_print, fps, EDBOUT, 0 );
+	(void) ravl_print(root, rdn_print, fps, EDBOUT, 0);
 
-	(void) printf( "**** avl_print end ****\n" );
+	(void) printf("**** avl_print end ****\n");
 
-	ps_free( fps );
+	ps_free(fps);
 }
 
-static rprint_directory( node, depth )
-Entry	node;
-int	depth;
+static
+rprint_directory(node, depth)
+	Entry node;
+	int depth;
 {
-	int	i;
+	int i;
 
-	for ( i = 0; i < depth; i++ )
-		ps_print( ps, "\t" );
+	for (i = 0; i < depth; i++)
+		ps_print(ps, "\t");
 
-	rdn_print( ps, node->e_name, EDBOUT );
-	ps_print( ps, "\n" );
+	rdn_print(ps, node->e_name, EDBOUT);
+	ps_print(ps, "\n");
 
-	if ( node->e_children != NULLAVL )
-		(void) avl_apply( node->e_children, rprint_directory, (caddr_t) (depth + 1),
-		    NOTOK, AVL_INORDER );
+	if (node->e_children != NULLAVL)
+		(void) avl_apply(node->e_children, rprint_directory, (caddr_t) (depth + 1),
+				 NOTOK, AVL_INORDER);
 }
 
-print_directory( node )
-Entry	node;
+print_directory(node)
+	Entry node;
 {
-	if ( (ps = ps_alloc( std_open )) == NULLPS ) {
-                (void) printf( "avl_print: ps_alloc failed\n" );
-                return;
-        }
-        if ( std_setup( ps, stdout ) == NOTOK ) {
-                (void) printf( "avl_print: std_setup failed\n" );
-                return;
-        }
+	if ((ps = ps_alloc(std_open)) == NULLPS) {
+		(void) printf("avl_print: ps_alloc failed\n");
+		return;
+	}
+	if (std_setup(ps, stdout) == NOTOK) {
+		(void) printf("avl_print: std_setup failed\n");
+		return;
+	}
 
-	rprint_directory( node, 0 );
+	rprint_directory(node, 0);
 
-	ps_free( ps );
-	(void) fflush( stdout );
+	ps_free(ps);
+	(void) fflush(stdout);
 }
 
 /*
@@ -179,128 +240,126 @@ Entry	node;
 
 print_optimized_attrs()
 {
-	int	i;
-	PS	fps;
+	int i;
+	PS fps;
 
-        if ( (fps = ps_alloc( std_open )) == NULLPS ) {
-                (void) printf( "turbo_index_print: ps_alloc failed\n" );
-                return;
-        }
-        if ( std_setup( fps, stdout ) == NOTOK ) {
-                (void) printf( "turbo_index_print: std_setup failed\n" );
-                return;
-        }
-
-	ps_print( fps, "Optimized attributes:\n" );
-	for ( i = 0; i < turbo_index_num; i++ ) {
-		ps_printf( fps, "\t" );
-		AttrT_print( fps, turbo_index[ i ], EDBOUT );
-		ps_printf( fps, "\n" );
+	if ((fps = ps_alloc(std_open)) == NULLPS) {
+		(void) printf("turbo_index_print: ps_alloc failed\n");
+		return;
 	}
-	ps_printf( fps, "End of Optimized Attributes:\n" );
+	if (std_setup(fps, stdout) == NOTOK) {
+		(void) printf("turbo_index_print: std_setup failed\n");
+		return;
+	}
 
-	ps_free( fps );
+	ps_print(fps, "Optimized attributes:\n");
+	for (i = 0; i < turbo_index_num; i++) {
+		ps_printf(fps, "\t");
+		AttrT_print(fps, turbo_index[i], EDBOUT);
+		ps_printf(fps, "\n");
+	}
+	ps_printf(fps, "End of Optimized Attributes:\n");
+
+	ps_free(fps);
 }
 
-static print_index_node( node, fps )
-Index_node	*node;
-PS		fps;
+static
+print_index_node(node, fps)
+	Index_node *node;
+	PS fps;
 {
-	int	i;
+	int i;
 
-	ps_print( fps, "\t" );
-	AttrV_print( fps, (AttributeValue)node->in_value, EDBOUT );
-	ps_print( fps, "\n" );
+	ps_print(fps, "\t");
+	AttrV_print(fps, (AttributeValue) node->in_value, EDBOUT);
+	ps_print(fps, "\n");
 
-	for ( i = 0; i < node->in_num; i++ ) {
-		ps_print( fps, "\t\t" );
-		rdn_print( fps, node->in_entries[ i ]->e_name,
-		    EDBOUT );
-		ps_print( fps, "\n" );
+	for (i = 0; i < node->in_num; i++) {
+		ps_print(fps, "\t\t");
+		rdn_print(fps, node->in_entries[i]->e_name, EDBOUT);
+		ps_print(fps, "\n");
 	}
 
-	return( OK );
+	return (OK);
 }
 
-static print_soundex_node( node, fps )
-Index_node	*node;
-PS		fps;
+static
+print_soundex_node(node, fps)
+	Index_node *node;
+	PS fps;
 {
-	int	i;
+	int i;
 
-	ps_print( fps, "\t" );
-	ps_print( fps, node->in_value );
-	ps_print( fps, "\n" );
+	ps_print(fps, "\t");
+	ps_print(fps, node->in_value);
+	ps_print(fps, "\n");
 
-	for ( i = 0; i < node->in_num; i++ ) {
-		ps_print( fps, "\t\t" );
-		rdn_print( fps, node->in_entries[ i ]->e_name,
-		    EDBOUT );
-		ps_print( fps, "\n" );
+	for (i = 0; i < node->in_num; i++) {
+		ps_print(fps, "\t\t");
+		rdn_print(fps, node->in_entries[i]->e_name, EDBOUT);
+		ps_print(fps, "\n");
 	}
 
-	return( OK );
+	return (OK);
 }
 
 /*
  * print_index -- print the given attribute index.
  */
 
-print_index( pindex )
-Index	*pindex;
+print_index(pindex)
+	Index *pindex;
 {
-	PS	fps;
-	int	i;
+	PS fps;
+	int i;
 
-	if ( pindex == (Index *) 0 ) {
+	if (pindex == (Index *) 0) {
 		(void) printf("NULLINDEX\n");
 		return;
 	}
 
-        if ( (fps = ps_alloc( std_open )) == NULLPS ) {
-                (void) printf( "turbo_index_print: ps_alloc failed\n" );
-                return;
-        }
-        if ( std_setup( fps, stdout ) == NOTOK ) {
-                (void) printf( "turbo_index_print: std_setup failed\n" );
-                return;
-        }
-
-	ps_print( fps, "*******\n" );
-	for ( i = 0; i < turbo_index_num; i++ ) {
-		ps_printf( fps, "  Index for attribute (%s)\n", 
-		    pindex[i].i_attr->oa_ot.ot_name );
-
-		(void) avl_apply( pindex[i].i_root, print_index_node, (caddr_t) fps, 
-		    NOTOK, AVL_INORDER );
-
-		ps_printf( fps, "  Soundex index for attribute (%s)\n", 
-		    pindex[i].i_attr->oa_ot.ot_name );
-
-		(void) avl_apply( pindex[i].i_sroot, print_soundex_node, (caddr_t) fps, 
-		    NOTOK, AVL_INORDER );
-
-		ps_print( fps, "  Endof index\n" );
+	if ((fps = ps_alloc(std_open)) == NULLPS) {
+		(void) printf("turbo_index_print: ps_alloc failed\n");
+		return;
 	}
-	ps_print( fps, "*******\n" );
+	if (std_setup(fps, stdout) == NOTOK) {
+		(void) printf("turbo_index_print: std_setup failed\n");
+		return;
+	}
 
-	ps_free( fps );
+	ps_print(fps, "*******\n");
+	for (i = 0; i < turbo_index_num; i++) {
+		ps_printf(fps, "  Index for attribute (%s)\n", pindex[i].i_attr->oa_ot.ot_name);
+
+		(void) avl_apply(pindex[i].i_root, print_index_node, (caddr_t) fps,
+				 NOTOK, AVL_INORDER);
+
+		ps_printf(fps, "  Soundex index for attribute (%s)\n",
+			  pindex[i].i_attr->oa_ot.ot_name);
+
+		(void) avl_apply(pindex[i].i_sroot, print_soundex_node, (caddr_t) fps,
+				 NOTOK, AVL_INORDER);
+
+		ps_print(fps, "  Endof index\n");
+	}
+	ps_print(fps, "*******\n");
+
+	ps_free(fps);
 }
 
-print_eis_list( e )
-EntryInfo	*e;
+print_eis_list(e)
+	EntryInfo *e;
 {
-	DN	dnend;
+	DN dnend;
 
-	if ( e == NULLENTRYINFO ) {
+	if (e == NULLENTRYINFO) {
 		(void) printf("\tNULL\n");
 		return;
 	}
 
-	while ( e != NULLENTRYINFO ) {
-		for ( dnend = e->ent_dn; dnend->dn_parent != NULLDN;
-		    dnend = dnend->dn_parent )
-			;	/* NULL */
+	while (e != NULLENTRYINFO) {
+		for (dnend = e->ent_dn; dnend->dn_parent != NULLDN; dnend = dnend->dn_parent) ;	/* NULL 
+												 */
 
 		(void) printf("\t(%s)\n", dnend->dn_rdn->rdn_av.av_struct);
 
@@ -309,24 +368,24 @@ EntryInfo	*e;
 	(void) printf("(end)\n");
 }
 
-print_dn( dn )
-DN	dn;
+print_dn(dn)
+	DN dn;
 {
-	PS	fps;
+	PS fps;
 
-        if ( (fps = ps_alloc( std_open )) == NULLPS ) {
-                (void) printf( "turbo_index_print: ps_alloc failed\n" );
-                return;
-        }
-        if ( std_setup( fps, stdout ) == NOTOK ) {
-                (void) printf( "turbo_index_print: std_setup failed\n" );
-                return;
-        }
+	if ((fps = ps_alloc(std_open)) == NULLPS) {
+		(void) printf("turbo_index_print: ps_alloc failed\n");
+		return;
+	}
+	if (std_setup(fps, stdout) == NOTOK) {
+		(void) printf("turbo_index_print: std_setup failed\n");
+		return;
+	}
 
-	ps_print( fps, "\tDN= " );
-	dn_print( fps, dn, EDBOUT );
-	ps_print( fps, "\n" );
-	(void) ps_flush( fps );
+	ps_print(fps, "\tDN= ");
+	dn_print(fps, dn, EDBOUT);
+	ps_print(fps, "\n");
+	(void) ps_flush(fps);
 
-	ps_free( fps );
+	ps_free(fps);
 }

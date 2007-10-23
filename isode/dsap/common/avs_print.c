@@ -1,12 +1,71 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 #ifndef lint
-static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/avs_print.c,v 9.0 1992/06/16 12:12:39 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/dsap/common/RCS/avs_print.c,v 9.0 1992/06/16 12:12:39 isode Rel";
 #endif
 
 /*
- * $Header: /xtel/isode/isode/dsap/common/RCS/avs_print.c,v 9.0 1992/06/16 12:12:39 isode Rel $
+ * Header: /xtel/isode/isode/dsap/common/RCS/avs_print.c,v 9.0 1992/06/16 12:12:39 isode Rel
  *
  *
- * $Log: avs_print.c,v $
+ * Log: avs_print.c,v
  * Revision 9.0  1992/06/16  12:12:39  isode
  * Release 8.0
  *
@@ -22,7 +81,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/avs_print.c,v 9
  *
  */
 
-
 #include "quipu/util.h"
 #include "quipu/attrvalue.h"
 
@@ -31,50 +89,49 @@ extern short oc_sntx;
 extern int avs_count;
 
 #ifndef avs_comp_print
-avs_comp_print (ps,avs,format)
-AV_Sequence  avs;
-PS   ps;
-int  format;
+avs_comp_print(ps, avs, format)
+	AV_Sequence avs;
+	PS ps;
+	int format;
 {
-	AttrV_print (ps,&avs->avseq_av,format);
+	AttrV_print(ps, &avs->avseq_av, format);
 }
 #endif
 
-avs_print (ps,avs,format)
-AV_Sequence  avs;
-PS   ps;
-int  format;
+avs_print(ps, avs, format)
+	AV_Sequence avs;
+	PS ps;
+	int format;
 {
 	if (avs == NULLAV) {
-		ps_print (ps,"\n");
+		ps_print(ps, "\n");
 		return;
 	}
 
 	if ((format == READOUT) && (avs->avseq_av.av_syntax == oc_sntx))
-		(*oc_avsprint)(ps,avs,format);
-	else 
-		avs_print_aux (ps,avs,format," & ");
-	ps_print (ps,"\n");
+		(*oc_avsprint) (ps, avs, format);
+	else
+		avs_print_aux(ps, avs, format, " & ");
+	ps_print(ps, "\n");
 }
 
-avs_print_aux (ps,avs,format,sep)
-AV_Sequence  avs;
-PS   ps;
-int  format;
-char *sep;
+avs_print_aux(ps, avs, format, sep)
+	AV_Sequence avs;
+	PS ps;
+	int format;
+	char *sep;
 {
-register AV_Sequence eptr;
+	register AV_Sequence eptr;
 
 	if (avs == NULLAV)
 		return;
 
 	avs_count = 1;
-	avs_comp_print (ps,avs,format);
+	avs_comp_print(ps, avs, format);
 	avs_count++;
 
-		for(eptr = avs->avseq_next; eptr != NULLAV; eptr = eptr->avseq_next, avs_count++) {
-			ps_print (ps,sep);
-			AttrV_print (ps,&eptr->avseq_av,format);
-			}
+	for (eptr = avs->avseq_next; eptr != NULLAV; eptr = eptr->avseq_next, avs_count++) {
+		ps_print(ps, sep);
+		AttrV_print(ps, &eptr->avseq_av, format);
+	}
 }
-

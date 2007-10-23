@@ -1,3 +1,61 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /*
  * RFA - Remote File Access
  *
@@ -8,16 +66,17 @@
  *
  * Contributed by Oliver Wenzel, GMD Berlin, 1990
  *
- * $Header: /xtel/isode/isode/others/rfa/RCS/ryresponder.c,v 9.0 1992/06/16 12:47:25 isode Rel $
+ * Header: /xtel/isode/isode/others/rfa/RCS/ryresponder.c,v 9.0 1992/06/16 12:47:25 isode Rel
  *
- * $Log: ryresponder.c,v $
+ * Log: ryresponder.c,v
  * Revision 9.0  1992/06/16  12:47:25  isode
  * Release 8.0
  *
  */
 
 #ifndef       lint
-static char *rcsid = "$Header: /xtel/isode/isode/others/rfa/RCS/ryresponder.c,v 9.0 1992/06/16 12:47:25 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/others/rfa/RCS/ryresponder.c,v 9.0 1992/06/16 12:47:25 isode Rel";
 #endif
 
 /*
@@ -39,255 +98,241 @@ static char *rcsid = "$Header: /xtel/isode/isode/others/rfa/RCS/ryresponder.c,v 
 #include "tsap.h"		/* for listening */
 #include "rfa.h"
 
-
-int	debug = 0;
-IFP	startfnx;
-IFP	stopfnx;
+int debug = 0;
+IFP startfnx;
+IFP stopfnx;
 
 static jmp_buf toplevel;
 
-extern int  errno;
+extern int errno;
 
-
-int  ros_init (vecp, vec)
-int	vecp;
-char  **vec;
+int
+ros_init(vecp, vec)
+	int vecp;
+	char **vec;
 {
-    int	    reply,
-	    result,
-	    sd;
-    struct AcSAPstart   acss;
-    register struct AcSAPstart *acs = &acss;
-    struct AcSAPindication  acis;
-    register struct AcSAPindication *aci = &acis;
-    register struct AcSAPabort   *aca = &aci -> aci_abort;
-    register struct PSAPstart *ps = &acs -> acs_start;
-    struct RoSAPindication  rois;
-    register struct RoSAPindication *roi = &rois;
-    register struct RoSAPpreject   *rop = &roi -> roi_preject;
-    PE pe[1];
+	int reply, result, sd;
+	struct AcSAPstart acss;
+	register struct AcSAPstart *acs = &acss;
+	struct AcSAPindication acis;
+	register struct AcSAPindication *aci = &acis;
+	register struct AcSAPabort *aca = &aci->aci_abort;
+	register struct PSAPstart *ps = &acs->acs_start;
+	struct RoSAPindication rois;
+	register struct RoSAPindication *roi = &rois;
+	register struct RoSAPpreject *rop = &roi->roi_preject;
+	PE pe[1];
 
-    if (AcInit (vecp, vec, acs, aci) == NOTOK) {
-	acs_advise (aca, "initialization fails");
-	return NOTOK;
-    }
-    advise (LLOG_NOTICE, NULLCP,
-		"A-ASSOCIATE.INDICATION: <%d, %s, %s, %s, %d>",
-		acs -> acs_sd, oid2ode (acs -> acs_context),
-		sprintaei (&acs -> acs_callingtitle),
-		sprintaei (&acs -> acs_calledtitle), acs -> acs_ninfo);
+	if (AcInit(vecp, vec, acs, aci) == NOTOK) {
+		acs_advise(aca, "initialization fails");
+		return NOTOK;
+	}
+	advise(LLOG_NOTICE, NULLCP,
+	       "A-ASSOCIATE.INDICATION: <%d, %s, %s, %s, %d>",
+	       acs->acs_sd, oid2ode(acs->acs_context),
+	       sprintaei(&acs->acs_callingtitle), sprintaei(&acs->acs_calledtitle), acs->acs_ninfo);
 
-    sd = acs -> acs_sd;
+	sd = acs->acs_sd;
 
-    for (vec++; *vec; vec++)
-	advise (LLOG_EXCEPTIONS, NULLCP, "unknown argument \"%s\"", *vec);
+	for (vec++; *vec; vec++)
+		advise(LLOG_EXCEPTIONS, NULLCP, "unknown argument \"%s\"", *vec);
 
-    reply = startfnx ? (*startfnx) (sd, acs, &pe[0]) : ACS_ACCEPT;
+	reply = startfnx ? (*startfnx) (sd, acs, &pe[0]) : ACS_ACCEPT;
 
-    result = AcAssocResponse (sd, reply, 
-		reply != ACS_ACCEPT ? ACS_USER_NOREASON : ACS_USER_NULL,
-		NULLOID, NULLAEI, NULLPA, NULLPC, ps -> ps_defctxresult,
-		ps -> ps_prequirements, ps -> ps_srequirements, SERIAL_NONE,
-		ps -> ps_settings, &ps -> ps_connect, pe,
-		reply != ACS_ACCEPT ? 1 : 0, aci);
+	result = AcAssocResponse(sd, reply,
+				 reply != ACS_ACCEPT ? ACS_USER_NOREASON : ACS_USER_NULL,
+				 NULLOID, NULLAEI, NULLPA, NULLPC, ps->ps_defctxresult,
+				 ps->ps_prequirements, ps->ps_srequirements, SERIAL_NONE,
+				 ps->ps_settings, &ps->ps_connect, pe,
+				 reply != ACS_ACCEPT ? 1 : 0, aci);
 
-    ACSFREE (acs);
+	ACSFREE(acs);
 
-    if (result == NOTOK) {
-	acs_advise (aca, "A-ASSOCIATE.RESPONSE");
-	return NOTOK;
-    }
-    if (reply != ACS_ACCEPT)
-	return NOTOK;
+	if (result == NOTOK) {
+		acs_advise(aca, "A-ASSOCIATE.RESPONSE");
+		return NOTOK;
+	}
+	if (reply != ACS_ACCEPT)
+		return NOTOK;
 
-    if (RoSetService (sd, RoPService, roi) == NOTOK)
-	ros_adios (rop, "set RO/PS fails");
+	if (RoSetService(sd, RoPService, roi) == NOTOK)
+		ros_adios(rop, "set RO/PS fails");
 
-    return sd;
+	return sd;
 }
 
-
-int  ros_work (fd)
-int	fd;
+int
+ros_work(fd)
+	int fd;
 {
-    int	    result;
-    caddr_t out;
-    struct AcSAPindication  acis;
-    struct RoSAPindication  rois;
-    register struct RoSAPindication *roi = &rois;
-    register struct RoSAPpreject   *rop = &roi -> roi_preject;
+	int result;
+	caddr_t out;
+	struct AcSAPindication acis;
+	struct RoSAPindication rois;
+	register struct RoSAPindication *roi = &rois;
+	register struct RoSAPpreject *rop = &roi->roi_preject;
 
-    switch (setjmp (toplevel)) {
-	case OK: 
-	    break;
-
-	default: 
-	    if (stopfnx)
-		(*stopfnx) (fd, (struct AcSAPfinish *) 0);
-	case DONE:
-	    (void) AcUAbortRequest (fd, NULLPEP, 0, &acis);
-	    (void) RyLose (fd, roi);
-	    return NOTOK;
-    }
-
-    switch (result = RyWait (fd, NULLIP, &out, OK, roi)) {
-	case NOTOK: 
-	    if (rop -> rop_reason == ROS_TIMER)
+	switch (setjmp(toplevel)) {
+	case OK:
 		break;
-	case OK: 
-	case DONE: 
-	    ros_indication (fd, roi);
-	    break;
 
-	default: 
-	    adios (NULLCP, "unknown return from RoWaitRequest=%d", result);
-    }
+	default:
+		if (stopfnx)
+			(*stopfnx) (fd, (struct AcSAPfinish *) 0);
+	case DONE:
+		(void) AcUAbortRequest(fd, NULLPEP, 0, &acis);
+		(void) RyLose(fd, roi);
+		return NOTOK;
+	}
 
-    return OK;
+	switch (result = RyWait(fd, NULLIP, &out, OK, roi)) {
+	case NOTOK:
+		if (rop->rop_reason == ROS_TIMER)
+			break;
+	case OK:
+	case DONE:
+		ros_indication(fd, roi);
+		break;
+
+	default:
+		adios(NULLCP, "unknown return from RoWaitRequest=%d", result);
+	}
+
+	return OK;
 }
 
-
-int ros_indication (sd, roi)
-int	sd;
-register struct RoSAPindication *roi;
+int
+ros_indication(sd, roi)
+	int sd;
+	register struct RoSAPindication *roi;
 {
-    int	    reply,
-	    result;
+	int reply, result;
 
-    switch (roi -> roi_type) {
-	case ROI_INVOKE: 
-	case ROI_RESULT: 
-	case ROI_ERROR: 
-	    adios (NULLCP, "unexpected indication type=%d", roi -> roi_type);
-	    break;
+	switch (roi->roi_type) {
+	case ROI_INVOKE:
+	case ROI_RESULT:
+	case ROI_ERROR:
+		adios(NULLCP, "unexpected indication type=%d", roi->roi_type);
+		break;
 
-	case ROI_UREJECT: 
-	    {
-		register struct RoSAPureject   *rou = &roi -> roi_ureject;
+	case ROI_UREJECT:
+	{
+		register struct RoSAPureject *rou = &roi->roi_ureject;
 
-		if (rou -> rou_noid)
-		    advise (LLOG_EXCEPTIONS, NULLCP, "RO-REJECT-U.INDICATION/%d: %s",
-			    sd, RoErrString (rou -> rou_reason));
+		if (rou->rou_noid)
+			advise(LLOG_EXCEPTIONS, NULLCP, "RO-REJECT-U.INDICATION/%d: %s",
+			       sd, RoErrString(rou->rou_reason));
 		else
-		    advise (LLOG_EXCEPTIONS, NULLCP,
-			    "RO-REJECT-U.INDICATION/%d: %s (id=%d)",
-			    sd, RoErrString (rou -> rou_reason),
-			    rou -> rou_id);
-	    }
-	    break;
+			advise(LLOG_EXCEPTIONS, NULLCP,
+			       "RO-REJECT-U.INDICATION/%d: %s (id=%d)",
+			       sd, RoErrString(rou->rou_reason), rou->rou_id);
+	}
+		break;
 
-	case ROI_PREJECT: 
-	    {
-		register struct RoSAPpreject   *rop = &roi -> roi_preject;
+	case ROI_PREJECT:
+	{
+		register struct RoSAPpreject *rop = &roi->roi_preject;
 
-		if (ROS_FATAL (rop -> rop_reason))
-		    ros_adios (rop, "RO-REJECT-P.INDICATION");
-		ros_advise (rop, "RO-REJECT-P.INDICATION");
-	    }
-	    break;
+		if (ROS_FATAL(rop->rop_reason))
+			ros_adios(rop, "RO-REJECT-P.INDICATION");
+		ros_advise(rop, "RO-REJECT-P.INDICATION");
+	}
+		break;
 
-	case ROI_FINISH: 
-	    {
-		register struct AcSAPfinish *acf = &roi -> roi_finish;
-		struct AcSAPindication  acis;
+	case ROI_FINISH:
+	{
+		register struct AcSAPfinish *acf = &roi->roi_finish;
+		struct AcSAPindication acis;
 		register struct AcSAPabort *aca = &acis.aci_abort;
 
-		advise (LLOG_NOTICE, NULLCP, "A-RELEASE.INDICATION/%d: %d",
-			sd, acf -> acf_reason);
+		advise(LLOG_NOTICE, NULLCP, "A-RELEASE.INDICATION/%d: %d", sd, acf->acf_reason);
 
 		reply = stopfnx ? (*stopfnx) (sd, acf) : ACS_ACCEPT;
 
-		result = AcRelResponse (sd, reply, ACR_NORMAL, NULLPEP, 0,
-			    &acis);
+		result = AcRelResponse(sd, reply, ACR_NORMAL, NULLPEP, 0, &acis);
 
-		ACFFREE (acf);
+		ACFFREE(acf);
 
 		if (result == NOTOK)
-		    acs_advise (aca, "A-RELEASE.RESPONSE");
-		else
-		    if (reply != ACS_ACCEPT)
+			acs_advise(aca, "A-RELEASE.RESPONSE");
+		else if (reply != ACS_ACCEPT)
 			break;
-		longjmp (toplevel, DONE);
-	    }
-	/* NOTREACHED */
+		longjmp(toplevel, DONE);
+	}
+		/* NOTREACHED */
 
-	default: 
-	    adios (NULLCP, "unknown indication type=%d", roi -> roi_type);
-    }
+	default:
+		adios(NULLCP, "unknown indication type=%d", roi->roi_type);
+	}
 }
 
-
-int  ros_lose (td)
-struct TSAPdisconnect *td;
+int
+ros_lose(td)
+	struct TSAPdisconnect *td;
 {
-    if (td -> td_cc > 0)
-	adios (NULLCP, "TNetAccept: [%s] %*.*s",
-		TErrString (td -> td_reason), td -> td_cc, td -> td_cc,
-		td -> td_data);
-    else
-	adios (NULLCP, "TNetAccept: [%s]", TErrString (td -> td_reason));
+	if (td->td_cc > 0)
+		adios(NULLCP, "TNetAccept: [%s] %*.*s",
+		      TErrString(td->td_reason), td->td_cc, td->td_cc, td->td_data);
+	else
+		adios(NULLCP, "TNetAccept: [%s]", TErrString(td->td_reason));
 }
 
-
-void	ros_adios (rop, event)
-register struct RoSAPpreject *rop;
-char   *event;
+void
+ros_adios(rop, event)
+	register struct RoSAPpreject *rop;
+	char *event;
 {
-    ros_advise (rop, event);
+	ros_advise(rop, event);
 
-    cleanup ();
+	cleanup();
 
-    longjmp (toplevel, NOTOK);
+	longjmp(toplevel, NOTOK);
 }
 
-
-void	ros_advise (rop, event)
-register struct RoSAPpreject *rop;
-char   *event;
+void
+ros_advise(rop, event)
+	register struct RoSAPpreject *rop;
+	char *event;
 {
-    char    buffer[BUFSIZ];
+	char buffer[BUFSIZ];
 
-    if (rop -> rop_cc > 0)
-	(void) sprintf (buffer, "[%s] %*.*s", RoErrString (rop -> rop_reason),
-		rop -> rop_cc, rop -> rop_cc, rop -> rop_data);
-    else
-	(void) sprintf (buffer, "[%s]", RoErrString (rop -> rop_reason));
+	if (rop->rop_cc > 0)
+		(void) sprintf(buffer, "[%s] %*.*s", RoErrString(rop->rop_reason),
+			       rop->rop_cc, rop->rop_cc, rop->rop_data);
+	else
+		(void) sprintf(buffer, "[%s]", RoErrString(rop->rop_reason));
 
-    advise (LLOG_EXCEPTIONS, NULLCP, "%s: %s", event, buffer);
+	advise(LLOG_EXCEPTIONS, NULLCP, "%s: %s", event, buffer);
 }
 
-
-void	acs_advise (aca, event)
-register struct AcSAPabort *aca;
-char   *event;
+void
+acs_advise(aca, event)
+	register struct AcSAPabort *aca;
+	char *event;
 {
-    char    buffer[BUFSIZ];
+	char buffer[BUFSIZ];
 
-    if (aca -> aca_cc > 0)
-	(void) sprintf (buffer, "[%s] %*.*s",
-		AcErrString (aca -> aca_reason),
-		aca -> aca_cc, aca -> aca_cc, aca -> aca_data);
-    else
-	(void) sprintf (buffer, "[%s]", AcErrString (aca -> aca_reason));
+	if (aca->aca_cc > 0)
+		(void) sprintf(buffer, "[%s] %*.*s",
+			       AcErrString(aca->aca_reason),
+			       aca->aca_cc, aca->aca_cc, aca->aca_data);
+	else
+		(void) sprintf(buffer, "[%s]", AcErrString(aca->aca_reason));
 
-    advise (LLOG_EXCEPTIONS, NULLCP, "%s: %s (source %d)", event, buffer,
-		aca -> aca_source);
+	advise(LLOG_EXCEPTIONS, NULLCP, "%s: %s (source %d)", event, buffer, aca->aca_source);
 }
-
-
 
 /*--------------------------------------------------------------*/
 /*  ureject							*/
 /*--------------------------------------------------------------*/
-int  ureject (sd, reason, rox, roi)
-int sd,
-    reason;
-struct RoSAPinvoke *rox;
-struct RoSAPindication *roi;
+int
+ureject(sd, reason, rox, roi)
+	int sd, reason;
+	struct RoSAPinvoke *rox;
+	struct RoSAPindication *roi;
 {
-    if (RyDsUReject (sd, rox -> rox_id, reason, ROS_NOPRIO, roi) == NOTOK)
-	ros_adios (&roi -> roi_preject, "U-REJECT");
+	if (RyDsUReject(sd, rox->rox_id, reason, ROS_NOPRIO, roi) == NOTOK)
+		ros_adios(&roi->roi_preject, "U-REJECT");
 
-    return OK;
+	return OK;
 }
-

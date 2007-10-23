@@ -1,9 +1,67 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /*
  *			D R A W P S . C 
  *
  * $Revision: 1.4 $
  *
- * $Log:	drawPS.c,v $
+ * Log:	drawPS.c,v
  * Revision 1.4  87/05/07  15:06:24  dorab
  * relinked back hh to h and vv to v undoing a previous change.
  * this was causing subtle quantization problems. the main change
@@ -23,7 +81,7 @@
  * 
  */
 #ifndef lint
-static char RCSid[] = "@(#)$Header: drawPS.c,v 1.4 87/05/07 15:06:24 dorab Exp $ (UCLA)";
+static char RCSid[] = "@(#)Header: drawPS.c,v 1.4 87/05/07 15:06:24 dorab Exp (UCLA)";
 #endif
 
 /*
@@ -63,16 +121,16 @@ static char RCSid[] = "@(#)$Header: drawPS.c,v 1.4 87/05/07 15:06:24 dorab Exp $
   */
 
 #include <stdio.h>		/* only for outfp!! */
-#include "dvi2ps.h"             /* for EMIT convRESOLUTION TRUE FALSE */
+#include "dvi2ps.h"		/* for EMIT convRESOLUTION TRUE FALSE */
 
 #define tpicRESOLUTION 1000	/* number of tpic units per inch */
 
 /* convert from tpic units to dvi2ps units */
 #ifdef USEGLOBALMAG
 #define convPS(x) PixRound((int)((x)*convRESOLUTION*ActualFactor(mag)),tpicRESOLUTION)
-#else ~USEGLOBALMAG
+#else	/* ~USEGLOBALMAG */
 #define convPS(x) PixRound((x)*convRESOLUTION,tpicRESOLUTION)
-#endif ~USEGLOBALMAG
+#endif	/* ~USEGLOBALMAG */
 
 /* the following have to be kludgey to avoid overflow problems */
 
@@ -82,7 +140,7 @@ static char RCSid[] = "@(#)$Header: drawPS.c,v 1.4 87/05/07 15:06:24 dorab Exp $
 /* convert from tpic locn to abs vert PS locn */
 #define vconvPS(x) \
 	(PixRound(PixRound(10*vv,vconv)+(10*convPS(x)),10))
-#define convDeg(x) (int)(360*(x)/(2*3.14159265358)+0.5) /* convert to degs */
+#define convDeg(x) (int)(360*(x)/(2*3.14159265358)+0.5)	/* convert to degs */
 
 /* if PostScript had splines, i wouldnt need to store the path */
 #define MAXPATHS 300		/* maximum number of path segments */
@@ -108,229 +166,211 @@ static char RCSid[] = "@(#)$Header: drawPS.c,v 1.4 87/05/07 15:06:24 dorab Exp $
 
 extern void Warning();
 extern void Fatal();
-extern int PixRound();		/* (int)(x/y)PixRound((int)x,(int)y) */
-extern int hh,vv;		/* the current x,y position in dvi units */
-extern int hconv, vconv;	/* conversion from dvi to dvi2ps units */
-extern FILE *outfp;		/* the output file pointer */
+extern int PixRound();			/* (int)(x/y)PixRound((int)x,(int)y) */
+extern int hh, vv;			/* the current x,y position in dvi units */
+extern int hconv, vconv;		/* conversion from dvi to dvi2ps units */
+extern FILE *outfp;			/* the output file pointer */
 
 #ifdef DEBUG
-extern int Debug;		/* for debugging */
-#endif DEBUG
+extern int Debug;			/* for debugging */
+#endif	/* DEBUG */
 
 #ifdef USEGLOBALMAG
 extern int mag;
 extern float ActualFactor();
-#endif USEGLOBALMAG
+#endif	/* USEGLOBALMAG */
 
-static int xx[MAXPATHS], yy[MAXPATHS]; /* the current path in milli-inches */
-static int pathLen = 0;		/* the current path length */
-static int shading = NONE;	/* what to shade the last figure */
-static int penSize = 2;		/* pen size in PS units */
+static int xx[MAXPATHS], yy[MAXPATHS];	/* the current path in milli-inches */
+static int pathLen = 0;			/* the current path length */
+static int shading = NONE;		/* what to shade the last figure */
+static int penSize = 2;			/* pen size in PS units */
 
-static void doShading();	/* just a forward declaration */
+static void doShading();		/* just a forward declaration */
 
 void
 setPenSize(cp)
-     char *cp;
+	char *cp;
 {
-  int ps;
+	int ps;
 
-  if (sscanf(cp, " %d ", &ps) != 1) 
-    {
-      Warning("Illegal .ps command format: %s", cp);
-      return;
-    }
+	if (sscanf(cp, " %d ", &ps) != 1) {
+		Warning("Illegal .ps command format: %s", cp);
+		return;
+	}
 
-  penSize = convPS(ps);
-  EMIT(outfp,"%d setlinewidth\n", penSize);
+	penSize = convPS(ps);
+	EMIT(outfp, "%d setlinewidth\n", penSize);
 }				/* end setPenSize */
 
 void
 addPath(cp)
-     char *cp;
+	char *cp;
 {
-  int x,y;
+	int x, y;
 
-  if (++pathLen >= MAXPATHS) Fatal("Too many points");
-  if (sscanf(cp, " %d %d ", &x, &y) != 2)
-    Fatal("Malformed path expression");
-  xx[pathLen] = x;
-  yy[pathLen] = y;
+	if (++pathLen >= MAXPATHS)
+		Fatal("Too many points");
+	if (sscanf(cp, " %d %d ", &x, &y) != 2)
+		Fatal("Malformed path expression");
+	xx[pathLen] = x;
+	yy[pathLen] = y;
 }				/* end of addPath */
 
 void
 arc(cp)
-     char *cp;
+	char *cp;
 {
-  int xc, yc, xrad, yrad;
-  float startAngle, endAngle;
+	int xc, yc, xrad, yrad;
+	float startAngle, endAngle;
 
-  if (sscanf(cp, " %d %d %d %d %f %f ", &xc, &yc, &xrad, &yrad,
-	     &startAngle, &endAngle) != 6)
-    {
-      Warning("Illegal arc specification: %s", cp);
-      return;
-    }
+	if (sscanf(cp, " %d %d %d %d %f %f ", &xc, &yc, &xrad, &yrad, &startAngle, &endAngle) != 6) {
+		Warning("Illegal arc specification: %s", cp);
+		return;
+	}
 
 /* we need the newpath since STROKE doesnt do a newpath */
 
-  if (xrad == yrad)		/* for arcs and circles */
-    EMIT(outfp, "%s %d %d %d %d %d arc ",
-	 NEWPATH,
-	 hconvPS(xc), vconvPS(yc), convPS(xrad),
-	 convDeg(startAngle), convDeg(endAngle));
-  else
-      EMIT(outfp, "%s %d %d %d %d %d %d ellipse ",
-	   NEWPATH,
-	   hconvPS(xc), vconvPS(yc), convPS(xrad), convPS(yrad),
-	   convDeg(startAngle), convDeg(endAngle));
+	if (xrad == yrad)	/* for arcs and circles */
+		EMIT(outfp, "%s %d %d %d %d %d arc ",
+		     NEWPATH,
+		     hconvPS(xc), vconvPS(yc), convPS(xrad),
+		     convDeg(startAngle), convDeg(endAngle));
+	else
+		EMIT(outfp, "%s %d %d %d %d %d %d ellipse ",
+		     NEWPATH,
+		     hconvPS(xc), vconvPS(yc), convPS(xrad), convPS(yrad),
+		     convDeg(startAngle), convDeg(endAngle));
 
-  doShading();
+	doShading();
 }				/* end of arc */
 
 void
 flushPath()
 {
-  register int i;
+	register int i;
 
-  if (pathLen < 2) 
-    {
-      Warning("Path less than 2 points - ignored\n");
-      return;
-    }
-  
+	if (pathLen < 2) {
+		Warning("Path less than 2 points - ignored\n");
+		return;
+	}
 #ifdef DEBUG
-    if (Debug)
-	fprintf(stderr,
-		    "flushpath(1): hh=%d, vv=%d, x=%d, y=%d, xPS=%d, yPS=%d\n",
-		    hh, vv, xx[1], yy[1], hconvPS(xx[1]), vconvPS(yy[1]));
-#endif DEBUG
-  EMIT(outfp, "%s ", NEWPATH);  /* to save the current point */
-  EMIT(outfp, "%d %d %s ", hconvPS(xx[1]), vconvPS(yy[1]), MOVETO);
-  for (i=2; i < pathLen; i++) {
+	if (Debug)
+		fprintf(stderr,
+			"flushpath(1): hh=%d, vv=%d, x=%d, y=%d, xPS=%d, yPS=%d\n",
+			hh, vv, xx[1], yy[1], hconvPS(xx[1]), vconvPS(yy[1]));
+#endif	/* DEBUG */
+	EMIT(outfp, "%s ", NEWPATH);	/* to save the current point */
+	EMIT(outfp, "%d %d %s ", hconvPS(xx[1]), vconvPS(yy[1]), MOVETO);
+	for (i = 2; i < pathLen; i++) {
 #ifdef DEBUG
-    if (Debug)
-	fprintf(stderr,
-		    "flushpath(%d): hh=%d, vv=%d, x=%d, y=%d, xPS=%d, yPS=%d\n",
-		    i, hh, vv, xx[i], yy[i], hconvPS(xx[i]), vconvPS(yy[i]));
-#endif DEBUG
-    EMIT(outfp, "%d %d %s\n", hconvPS(xx[i]), vconvPS(yy[i]), LINETO);
-    }
-  if (xx[1] == xx[pathLen] && yy[1] == yy[pathLen])
-    EMIT(outfp, "%s ", CLOSEPATH);
-  else
-    EMIT(outfp, "%d %d %s ",
-	 hconvPS(xx[pathLen]),
-	 vconvPS(yy[pathLen]),
-	 LINETO);
-  doShading();
-  pathLen = 0;
+		if (Debug)
+			fprintf(stderr,
+				"flushpath(%d): hh=%d, vv=%d, x=%d, y=%d, xPS=%d, yPS=%d\n",
+				i, hh, vv, xx[i], yy[i], hconvPS(xx[i]), vconvPS(yy[i]));
+#endif	/* DEBUG */
+		EMIT(outfp, "%d %d %s\n", hconvPS(xx[i]), vconvPS(yy[i]), LINETO);
+	}
+	if (xx[1] == xx[pathLen] && yy[1] == yy[pathLen])
+		EMIT(outfp, "%s ", CLOSEPATH);
+	else
+		EMIT(outfp, "%d %d %s ", hconvPS(xx[pathLen]), vconvPS(yy[pathLen]), LINETO);
+	doShading();
+	pathLen = 0;
 }				/* end of flushPath */
 
 void
 flushDashed(cp, dotted)
-     char *cp;
-     int dotted;
+	char *cp;
+	int dotted;
 {
-  float inchesPerDash;
+	float inchesPerDash;
 
-  if (sscanf(cp, " %f ", &inchesPerDash) != 1) 
-    {
-      Warning ("Illegal format for dotted/dashed line: %s", cp);
-      return;
-    }
-  
-  if (inchesPerDash <= 0.0)
-    {
-      Warning ("Length of dash/dot cannot be negative");
-      return;
-    }
+	if (sscanf(cp, " %f ", &inchesPerDash) != 1) {
+		Warning("Illegal format for dotted/dashed line: %s", cp);
+		return;
+	}
 
-  inchesPerDash = 1000 * inchesPerDash;	/* to get milli-inches */
-  
-  if (dotted)
-    EMIT(outfp, "[%d %d] 0 setdash\n",
-	 penSize,
-	 convPS(inchesPerDash) - penSize);
-  else				/* if dashed */
-    EMIT(outfp, "[%d] 0 setdash\n", convPS(inchesPerDash));
+	if (inchesPerDash <= 0.0) {
+		Warning("Length of dash/dot cannot be negative");
+		return;
+	}
 
-  flushPath();
+	inchesPerDash = 1000 * inchesPerDash;	/* to get milli-inches */
 
-  EMIT(outfp, "[] 0 setdash\n");
+	if (dotted)
+		EMIT(outfp, "[%d %d] 0 setdash\n", penSize, convPS(inchesPerDash) - penSize);
+	else			/* if dashed */
+		EMIT(outfp, "[%d] 0 setdash\n", convPS(inchesPerDash));
+
+	flushPath();
+
+	EMIT(outfp, "[] 0 setdash\n");
 }				/* end of flushDashed */
 
 void
 flushSpline()
 {				/* as exact as psdit!!! */
-  register int i, dxi, dyi, dxi1, dyi1;
+	register int i, dxi, dyi, dxi1, dyi1;
 
-  if (pathLen < 2)
-    {
-      Warning("Spline less than two points - ignored\n");
-      return;
-    }
-  
-  EMIT(outfp, "%s ", NEWPATH);	/* to save the current point */
-  EMIT(outfp, "%d %d %s %d %d rl\n",
-       hconvPS(xx[1]), vconvPS(yy[1]),
-       MOVETO,
-       convPS((xx[2]-xx[1])/2), convPS((yy[2]-yy[1])/2),
-       RLINETO);
+	if (pathLen < 2) {
+		Warning("Spline less than two points - ignored\n");
+		return;
+	}
 
-  for (i=2; i < pathLen; i++)
-    {
-      dxi = convPS(xx[i] - xx[i-1]);
-      dyi = convPS(yy[i] - yy[i-1]);
-      dxi1 = convPS(xx[i+1] - xx[i]);
-      dyi1 = convPS(yy[i+1] - yy[i]);
+	EMIT(outfp, "%s ", NEWPATH);	/* to save the current point */
+	EMIT(outfp, "%d %d %s %d %d rl\n",
+	     hconvPS(xx[1]), vconvPS(yy[1]),
+	     MOVETO, convPS((xx[2] - xx[1]) / 2), convPS((yy[2] - yy[1]) / 2), RLINETO);
 
-      EMIT(outfp, "%d %d %d %d %d %d %s\n",
-	   dxi/3, dyi/3,
-	   (3*dxi+dxi1)/6, (3*dyi+dyi1)/6,
-	   (dxi+dxi1)/2, (dyi+dyi1)/2,
-	   RCURVETO);
-    }
+	for (i = 2; i < pathLen; i++) {
+		dxi = convPS(xx[i] - xx[i - 1]);
+		dyi = convPS(yy[i] - yy[i - 1]);
+		dxi1 = convPS(xx[i + 1] - xx[i]);
+		dyi1 = convPS(yy[i + 1] - yy[i]);
 
-  EMIT(outfp, "%d %d %s ", hconvPS(xx[pathLen]), vconvPS(yy[pathLen]), LINETO);
+		EMIT(outfp, "%d %d %d %d %d %d %s\n",
+		     dxi / 3, dyi / 3,
+		     (3 * dxi + dxi1) / 6, (3 * dyi + dyi1) / 6,
+		     (dxi + dxi1) / 2, (dyi + dyi1) / 2, RCURVETO);
+	}
 
-  doShading();
-  pathLen = 0;
-	 
+	EMIT(outfp, "%d %d %s ", hconvPS(xx[pathLen]), vconvPS(yy[pathLen]), LINETO);
+
+	doShading();
+	pathLen = 0;
+
 }				/* end of flushSpline */
 
 void
 shadeLast()
 {
-  shading = GREY;
-  EMIT(outfp, "0.75 setgray\n");
+	shading = GREY;
+	EMIT(outfp, "0.75 setgray\n");
 }				/* end of shadeLast */
 
 void
 whitenLast()
 {
-  shading = WHITE;
-  EMIT(outfp, "1 setgray\n");
+	shading = WHITE;
+	EMIT(outfp, "1 setgray\n");
 }				/* end of whitenLast */
 
 void
 blackenLast()
 {
-  shading = BLACK;
-  EMIT(outfp, "0 setgray\n");	/* actually this aint needed */
+	shading = BLACK;
+	EMIT(outfp, "0 setgray\n");	/* actually this aint needed */
 }				/* end of whitenLast */
 
 static void
 doShading()
 {
-  if (shading) 
-    {
-      EMIT(outfp, "%s\n", FILL);
-      shading = NONE;
-      EMIT(outfp, "0 setgray\n");	/* default of black */
-    }
-  else
-    EMIT(outfp, "%s\n", STROKE);
+	if (shading) {
+		EMIT(outfp, "%s\n", FILL);
+		shading = NONE;
+		EMIT(outfp, "0 setgray\n");	/* default of black */
+	} else
+		EMIT(outfp, "%s\n", STROKE);
 }				/* end of doShading */
 
 #ifdef	TWG
@@ -338,54 +378,51 @@ extern int h, v;
 
 #define	SCREEN_DPI	72
 
-FILE   *popen ();
+FILE *popen();
 
 void
 pbm(cp)
-     char *cp;
+	char *cp;
 {
-    register int n;
-    int    width, height, hres, vres;
-    double ratio;
-    char   command[BUFSIZ],
-	   file[BUFSIZ];
-    FILE  *fp;
+	register int n;
+	int width, height, hres, vres;
+	double ratio;
+	char command[BUFSIZ], file[BUFSIZ];
+	FILE *fp;
 
-    if (sscanf (cp, "%d %d %d %d %s", &width, &height, &hres, &vres, file)
-		!= 5
-	    || width <= 0 || height <= 0 || hres <= 0 || vres <= 0) {
-	Warning ("\\special pbm command invalid: \"pbm %s\"\n",cp);
-	return;
-    }
+	if (sscanf(cp, "%d %d %d %d %s", &width, &height, &hres, &vres, file)
+	    != 5 || width <= 0 || height <= 0 || hres <= 0 || vres <= 0) {
+		Warning("\\special pbm command invalid: \"pbm %s\"\n", cp);
+		return;
+	}
 
-    if (access (file, 0x04) == -1) {
-	Warning ("\\special X Windows bitmap: unable to read file \"%s\"",
-		  file);
-	return;
-    }
+	if (access(file, 0x04) == -1) {
+		Warning("\\special X Windows bitmap: unable to read file \"%s\"", file);
+		return;
+	}
 
-    ratio = (double) ((hres + vres) / 2) / SCREEN_DPI;
-    ratio = ratio * ratio;
-    (void) sprintf (command, "pgmtops -scale %f < %s", ratio, file);
-    if ((fp = popen (command, "r"))== NULL) {
-	Warning("\\special X Windows bitmap command: unable to create pipe\n");
-	return;
-    }
+	ratio = (double) ((hres + vres) / 2) / SCREEN_DPI;
+	ratio = ratio * ratio;
+	(void) sprintf(command, "pgmtops -scale %f < %s", ratio, file);
+	if ((fp = popen(command, "r")) == NULL) {
+		Warning("\\special X Windows bitmap command: unable to create pipe\n");
+		return;
+	}
 
-    EMIT (outfp, "\ngsave %%%% %s\n%d %d translate 180 rotate\n", file,
-	  PixRound (h, hconv) + (int) (width * ratio + 0.5),
-	  PixRound (v, vconv) + (int) (height * ratio + 0.5));
-    while (fgets (command, sizeof command, fp)) {
-	if (strcmp (command, "showpage\n") == 0)
-	    EMIT (outfp, "%%%%");
+	EMIT(outfp, "\ngsave %%%% %s\n%d %d translate 180 rotate\n", file,
+	     PixRound(h, hconv) + (int) (width * ratio + 0.5),
+	     PixRound(v, vconv) + (int) (height * ratio + 0.5));
+	while (fgets(command, sizeof command, fp)) {
+		if (strcmp(command, "showpage\n") == 0)
+			EMIT(outfp, "%%%%");
 
-	EMIT (outfp, "%s", command);
-	if (strcmp (command, "gsave\n") == 0)
-	    EMIT (outfp, "%%%%");
-    }
+		EMIT(outfp, "%s", command);
+		if (strcmp(command, "gsave\n") == 0)
+			EMIT(outfp, "%%%%");
+	}
 
-    (void) pclose (fp);
+	(void) pclose(fp);
 
-    EMIT (outfp, "grestore %%%%\n");
+	EMIT(outfp, "grestore %%%%\n");
 }
 #endif

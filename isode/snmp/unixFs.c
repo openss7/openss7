@@ -1,16 +1,75 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* unixFs.c - MIB realization of the filesystem group
 
  	donated by Michael Davidson/UTK  <davidson@cs.utk.edu> */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/unixFs.c,v 9.0 1992/06/16 12:38:11 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/snmp/RCS/unixFs.c,v 9.0 1992/06/16 12:38:11 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/snmp/RCS/unixFs.c,v 9.0 1992/06/16 12:38:11 isode Rel $
+ * Header: /xtel/isode/isode/snmp/RCS/unixFs.c,v 9.0 1992/06/16 12:38:11 isode Rel
  *
  *
- * $Log: unixFs.c,v $
+ * Log: unixFs.c,v
  * Revision 9.0  1992/06/16  12:38:11  isode
  * Release 8.0
  *
@@ -25,7 +84,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/unixFs.c,v 9.0 1992/06
  *    this agreement.
  *
  */
-
 
 /*    PRINT */
 
@@ -58,22 +116,22 @@ static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/unixFs.c,v 9.0 1992/06
  * see man (3) getmountent() on Ultrix for details.
  */
 
-static	int mnt_cnt = 0;	/* global count of offset in getmountent() */
+static int mnt_cnt = 0;			/* global count of offset in getmountent() */
 
- /*
+ /* 
   * mntent struct snarfed from *nix elsewhere
   */
-static struct mntent{
-                 char  *mnt_fsname;  /* name of mounted file system */
-                 char  *mnt_dir;     /* file system path prefix */
-                 char  *mnt_type;    /* MNTTYPE_* */
-                 char  *mnt_opts;    /* MNTOPT* */
-                 int   mnt_freq;     /* dump frequency, in days */
-                 int   mnt_passno;   /* pass number on parallel fsck */
-       };
-FILE 		*setmntent();
-FILE 		*endmntent();
-struct mntent	*getmntent();
+static struct mntent {
+	char *mnt_fsname;		/* name of mounted file system */
+	char *mnt_dir;			/* file system path prefix */
+	char *mnt_type;			/* MNTTYPE_* */
+	char *mnt_opts;			/* MNTOPT* */
+	int mnt_freq;			/* dump frequency, in days */
+	int mnt_passno;			/* pass number on parallel fsck */
+};
+FILE *setmntent();
+FILE *endmntent();
+struct mntent *getmntent();
 #endif
 
 #ifdef HPUX
@@ -106,219 +164,202 @@ struct mntent	*getmntent();
 #define INST_PTR(oid,ot)	(oid->oid_elements + ot->ot_name->oid_nelem)
 #define INST_SZ(oid,ot)		(oid->oid_nelem - ot->ot_name->oid_nelem)
 
-
 #define MAX_INST	3
 struct fs {
 	unsigned fs_instance[MAX_INST];
-	int	fs_insize;
+	int fs_insize;
 
 	struct fs *next;
 
-	int	fs_Identifier;
-	char	*fs_Name;
-	char	*fs_MountPoint;
-	char	*fs_MountType;
-	char	*fs_MountOptions;
-	int	fs_BlockSize;	
-	int	fs_BlockCount;
-	int	fs_BlocksFree;
-	int	fs_BlocksAvailable;
-	int	fs_InodeCount;
-	int	fs_InodesAvailable;
+	int fs_Identifier;
+	char *fs_Name;
+	char *fs_MountPoint;
+	char *fs_MountType;
+	char *fs_MountOptions;
+	int fs_BlockSize;
+	int fs_BlockCount;
+	int fs_BlocksFree;
+	int fs_BlocksAvailable;
+	int fs_InodeCount;
+	int fs_InodesAvailable;
 };
-struct fs *fs_tbl = NULL ;
-
+struct fs *fs_tbl = NULL;
 
 extern int quantum;
 
-int init_unix_fs(); 
+int init_unix_fs();
 int sync_unix_fs();
 
 static struct fs *get_fsent();
-static int  get_fs_table();
+static int get_fs_table();
 static void free_fs_table();
-static int  o_unix_fs();
+static int o_unix_fs();
 static void refresh_entry();
-
 
 /*-----------------------------------------------------------------
  * Come here to retreive any variable from this mib group
  *-----------------------------------------------------------------*/
-static int o_unix_fs(oi, v, offset)
-OI  oi;
-struct type_SNMP_VarBind *v;
-int offset;
+static int
+o_unix_fs(oi, v, offset)
+	OI oi;
+	struct type_SNMP_VarBind *v;
+	int offset;
 {
-	OID  new;
-	OID  oid   = oi->oi_name;
-	OT   ot    = oi->oi_type;
-	int  i;
+	OID new;
+	OID oid = oi->oi_name;
+	OT ot = oi->oi_type;
+	int i;
 	unsigned *ip, *jp;
 	struct fs *fs;
 
 	/*** fetch the correct row.  ***/
 
-	switch( offset ){
-		case type_SNMP_SMUX__PDUs_get__request:
-			fs = get_fsent(INST_PTR(oid,ot),INST_SZ(oid,ot), 0);
-			if( fs == NULL )
-				return(NONAME);
+	switch (offset) {
+	case type_SNMP_SMUX__PDUs_get__request:
+		fs = get_fsent(INST_PTR(oid, ot), INST_SZ(oid, ot), 0);
+		if (fs == NULL)
+			return (NONAME);
 
-			break;
+		break;
 
-		case type_SNMP_SMUX__PDUs_get__next__request:
-try_again:
-			fs = get_fsent(INST_PTR(oid,ot),INST_SZ(oid,ot), 1);
-			if( fs == NULL ){
-				if( ((int)ot->ot_info + 1) > fsMAX )
-					return(NONAME);
+	case type_SNMP_SMUX__PDUs_get__next__request:
+	      try_again:
+		fs = get_fsent(INST_PTR(oid, ot), INST_SZ(oid, ot), 1);
+		if (fs == NULL) {
+			if (((int) ot->ot_info + 1) > fsMAX)
+				return (NONAME);
 
-				oid->oid_nelem -= INST_SZ(oid,ot);	
-				oid->oid_elements[(oid->oid_nelem - 1)]++;
+			oid->oid_nelem -= INST_SZ(oid, ot);
+			oid->oid_elements[(oid->oid_nelem - 1)]++;
 
-				if( (ot = name2obj(oid)) == NULLOT )
-					return(GENERR);
+			if ((ot = name2obj(oid)) == NULLOT)
+				return (GENERR);
 
-				goto try_again;
-			}
+			goto try_again;
+		}
 
 			/** change instance suffix of oid **/
-	
-			new = oid_extend(oid, fs->fs_insize - INST_SZ(oid,ot) );
-			if( new == NULLOID)
-				return( NOTOK );
 
-			ip = new->oid_elements + new->oid_nelem - fs->fs_insize;
-			jp = fs->fs_instance;
-			for( i = fs->fs_insize; i > 0; i-- )
-				*ip++ = *jp++;
+		new = oid_extend(oid, fs->fs_insize - INST_SZ(oid, ot));
+		if (new == NULLOID)
+			return (NOTOK);
 
-			if( v->name )
-				free_SNMP_ObjectName( v->name );
-			v->name = new;
+		ip = new->oid_elements + new->oid_nelem - fs->fs_insize;
+		jp = fs->fs_instance;
+		for (i = fs->fs_insize; i > 0; i--)
+			*ip++ = *jp++;
 
-			oid = new;
-			oi->oi_type = ot;
-			break;
+		if (v->name)
+			free_SNMP_ObjectName(v->name);
+		v->name = new;
 
-		default:
-			return( int_SNMP_error__status_genErr );
+		oid = new;
+		oi->oi_type = ot;
+		break;
+
+	default:
+		return (int_SNMP_error__status_genErr);
 	}
 
 	/*** Now, return the particular variable. ***/
 
-	switch( (int)ot->ot_info ){
-		case fsIdentifier:
-			return( o_integer(oi, v, fs->fs_Identifier) );
-		case fsName:
-			return( o_string(oi, v, fs->fs_Name, 
-			    strlen(fs->fs_Name)) );
-		case fsMountPoint:
-			return( o_string(oi, v, fs->fs_MountPoint,
-			    strlen(fs->fs_MountPoint)) );
-		case fsMountType:
-			return( o_string(oi, v, fs->fs_MountType,
-			    strlen(fs->fs_MountType)) );
-		case fsMountOptions:
-			return( o_string(oi, v, fs->fs_MountOptions, 
-			    strlen(fs->fs_MountOptions)) );
-		case fsBlockSize:
-			return( o_integer(oi, v, fs->fs_BlockSize) );
-		case fsBlockCount:
-			return( o_integer(oi, v, fs->fs_BlockCount) );
-		case fsBlocksFree:
-			return( o_integer(oi, v, fs->fs_BlocksFree) );
-		case fsBlocksAvailable:
-			return( o_integer(oi, v, fs->fs_BlocksAvailable) );
-		case fsInodeCount:
-			return( o_integer(oi, v, fs->fs_InodeCount) );
-		case fsInodesAvailable:
-			return( o_integer(oi, v, fs->fs_InodesAvailable) );
-		default:
-			return( int_SNMP_error__status_noSuchName );
+	switch ((int) ot->ot_info) {
+	case fsIdentifier:
+		return (o_integer(oi, v, fs->fs_Identifier));
+	case fsName:
+		return (o_string(oi, v, fs->fs_Name, strlen(fs->fs_Name)));
+	case fsMountPoint:
+		return (o_string(oi, v, fs->fs_MountPoint, strlen(fs->fs_MountPoint)));
+	case fsMountType:
+		return (o_string(oi, v, fs->fs_MountType, strlen(fs->fs_MountType)));
+	case fsMountOptions:
+		return (o_string(oi, v, fs->fs_MountOptions, strlen(fs->fs_MountOptions)));
+	case fsBlockSize:
+		return (o_integer(oi, v, fs->fs_BlockSize));
+	case fsBlockCount:
+		return (o_integer(oi, v, fs->fs_BlockCount));
+	case fsBlocksFree:
+		return (o_integer(oi, v, fs->fs_BlocksFree));
+	case fsBlocksAvailable:
+		return (o_integer(oi, v, fs->fs_BlocksAvailable));
+	case fsInodeCount:
+		return (o_integer(oi, v, fs->fs_InodeCount));
+	case fsInodesAvailable:
+		return (o_integer(oi, v, fs->fs_InodesAvailable));
+	default:
+		return (int_SNMP_error__status_noSuchName);
 	}
 }
-
 
 /*-----------------------------------------------------------------
  * Initialize each node in the object identifier tree.
  *-----------------------------------------------------------------*/
-int init_unix_fs() 
+int
+init_unix_fs()
 {
 	OT ot;
 
 	if (ot = text2obj("fsIdentifier"))
-		ot->ot_getfnx = o_unix_fs,
-		ot->ot_info   = (caddr_t)fsIdentifier;
+		ot->ot_getfnx = o_unix_fs, ot->ot_info = (caddr_t) fsIdentifier;
 
 	if (ot = text2obj("fsName"))
-		ot->ot_getfnx = o_unix_fs,
-		ot->ot_info   = (caddr_t)fsName;
+		ot->ot_getfnx = o_unix_fs, ot->ot_info = (caddr_t) fsName;
 
 	if (ot = text2obj("fsMountPoint"))
-		ot->ot_getfnx = o_unix_fs,
-		ot->ot_info   = (caddr_t)fsMountPoint;
+		ot->ot_getfnx = o_unix_fs, ot->ot_info = (caddr_t) fsMountPoint;
 
 	if (ot = text2obj("fsMountType"))
-		ot->ot_getfnx = o_unix_fs,
-		ot->ot_info   = (caddr_t)fsMountType;
+		ot->ot_getfnx = o_unix_fs, ot->ot_info = (caddr_t) fsMountType;
 
 	if (ot = text2obj("fsMountOptions"))
-		ot->ot_getfnx = o_unix_fs,
-		ot->ot_info   = (caddr_t)fsMountOptions;
+		ot->ot_getfnx = o_unix_fs, ot->ot_info = (caddr_t) fsMountOptions;
 
 	if (ot = text2obj("fsBlockSize"))
-		ot->ot_getfnx = o_unix_fs,
-		ot->ot_info   = (caddr_t)fsBlockSize;
+		ot->ot_getfnx = o_unix_fs, ot->ot_info = (caddr_t) fsBlockSize;
 
 	if (ot = text2obj("fsBlockCount"))
-		ot->ot_getfnx = o_unix_fs,
-		ot->ot_info = (caddr_t)fsBlockCount;
+		ot->ot_getfnx = o_unix_fs, ot->ot_info = (caddr_t) fsBlockCount;
 
 	if (ot = text2obj("fsBlocksFree"))
-		ot->ot_getfnx = o_unix_fs,
-		ot->ot_info   = (caddr_t)fsBlocksFree;
+		ot->ot_getfnx = o_unix_fs, ot->ot_info = (caddr_t) fsBlocksFree;
 
 	if (ot = text2obj("fsBlocksAvailable"))
-		ot->ot_getfnx = o_unix_fs,
-		ot->ot_info   = (caddr_t)fsBlocksAvailable;
+		ot->ot_getfnx = o_unix_fs, ot->ot_info = (caddr_t) fsBlocksAvailable;
 
 	if (ot = text2obj("fsInodeCount"))
-		ot->ot_getfnx = o_unix_fs,
-		ot->ot_info   = (caddr_t)fsInodeCount;
+		ot->ot_getfnx = o_unix_fs, ot->ot_info = (caddr_t) fsInodeCount;
 
 	if (ot = text2obj("fsInodesAvailable"))
-		ot->ot_getfnx = o_unix_fs,
-		ot->ot_info   = (caddr_t)fsInodesAvailable;
+		ot->ot_getfnx = o_unix_fs, ot->ot_info = (caddr_t) fsInodesAvailable;
 
-	return(1);
+	return (1);
 }
-
 
 /*-----------------------------------------------------------------
  * Perform commit/rollback operations. (this mib group has no 
  * set operations so there are not commit/rollback operations)
  *-----------------------------------------------------------------*/
-int sync_unix_fs( cor )
-integer	cor;
+int
+sync_unix_fs(cor)
+	integer cor;
 {
 	switch (cor) {
-		case int_SNMP_SOutPDU_commit:
-			return(1);
+	case int_SNMP_SOutPDU_commit:
+		return (1);
 
-		case int_SNMP_SOutPDU_rollback:
-			return(1);
+	case int_SNMP_SOutPDU_rollback:
+		return (1);
 	}
 }
-
 
 /*-----------------------------------------------------------------
  * Find an entry in the file system table.
  *-----------------------------------------------------------------*/
-static struct fs *get_fsent( ip, len, isnext )
-unsigned *ip;
-int len;
-int isnext;
+static struct fs *
+get_fsent(ip, len, isnext)
+	unsigned *ip;
+	int len;
+	int isnext;
 {
 	static long last = 0;
 	static int lastq = -1;
@@ -326,11 +367,10 @@ int isnext;
 	struct fs *fsp;
 	struct stat st;
 
-	if( lastq == quantum ){
+	if (lastq == quantum) {
 		refresh = 0;
-	}
-	else {
-		if( stat( MNT_FILE, &st) == -1 || last != st.st_mtime ){
+	} else {
+		if (stat(MNT_FILE, &st) == -1 || last != st.st_mtime) {
 			last = st.st_mtime;
 			refresh = 0;
 			free_fs_table();
@@ -339,78 +379,78 @@ int isnext;
 	}
 	lastq = quantum;
 
-	for(fsp = fs_tbl; fsp != NULL; fsp = fsp->next ){
-		switch(elem_cmp(fsp->fs_instance, fsp->fs_insize, ip, len) ){
-			case 0:
-				if( !isnext ){
-					if( refresh ) 
-						refresh_entry(fsp);
-					return(fsp);
-				}
+	for (fsp = fs_tbl; fsp != NULL; fsp = fsp->next) {
+		switch (elem_cmp(fsp->fs_instance, fsp->fs_insize, ip, len)) {
+		case 0:
+			if (!isnext) {
+				if (refresh)
+					refresh_entry(fsp);
+				return (fsp);
+			}
 
-				fsp = fsp->next;
-				if( fsp == NULL )
-					return(NULL);
+			fsp = fsp->next;
+			if (fsp == NULL)
+				return (NULL);
 
-				/* else fall */
-			case 1:
-				if( isnext ){
-					if( refresh )
-						refresh_entry(fsp);
-					return(fsp);
-				}
+			/* else fall */
+		case 1:
+			if (isnext) {
+				if (refresh)
+					refresh_entry(fsp);
+				return (fsp);
+			}
 
-				return(NULL);
+			return (NULL);
 		}
 	}
 
-	return(NULL);
+	return (NULL);
 }
-
 
 /*-----------------------------------------------------------------
  * Simple insertion sort of file system table.
  *-----------------------------------------------------------------*/
-static void insert_entry(fsp)
-struct fs *fsp;
+static void
+insert_entry(fsp)
+	struct fs *fsp;
 {
-	struct fs *cur   = fs_tbl;
+	struct fs *cur = fs_tbl;
 	struct fs **last = &fs_tbl;
 
-	for(;;){
-		if( cur == NULL ){
+	for (;;) {
+		if (cur == NULL) {
 			*last = fsp;
 			fsp->next = NULL;
 			return;
 		}
 
-		switch( elem_cmp(cur->fs_instance, cur->fs_insize, 
-				 fsp->fs_instance, fsp->fs_insize) ){
-			case 0:
-				/* WARNING: duplicate entry */
-				fsp->fs_instance[fsp->fs_insize - 1] += 100;
-				insert_entry(fsp);
-				return;
-			case 1:
-				*last = fsp;
-				fsp->next = cur;
-				return;
+		switch (elem_cmp(cur->fs_instance, cur->fs_insize,
+				 fsp->fs_instance, fsp->fs_insize)) {
+		case 0:
+			/* WARNING: duplicate entry */
+			fsp->fs_instance[fsp->fs_insize - 1] += 100;
+			insert_entry(fsp);
+			return;
+		case 1:
+			*last = fsp;
+			fsp->next = cur;
+			return;
 		}
 
 		last = &(cur->next);
-		cur  = cur->next;
+		cur = cur->next;
 	}
 }
-
 
 #ifdef BSDSTRS
 /*-----------------------------------------------------------------
  * some systems (sun386) do not have this funtion 
  *-----------------------------------------------------------------*/
-char * strstr(s1, s2)
-register char *s1, *s2;
+char *
+strstr(s1, s2)
+	register char *s1, *s2;
 {
-	int s2len = strlen(s2); /* length of the second string */
+	int s2len = strlen(s2);		/* length of the second string */
 
 	if (s2len == 0)
 		return (s1);
@@ -424,61 +464,60 @@ register char *s1, *s2;
 }
 #endif
 
-
 /*-----------------------------------------------------------------
  * Fill the entire file system table. (call with fs_tbl == NULL)
  *-----------------------------------------------------------------*/
-static int get_fs_table()
+static int
+get_fs_table()
 {
-	static int fake_dev  = 0;
+	static int fake_dev = 0;
 	FILE *mfile;
 	struct mntent *mp;
-	struct fs *fsp, *lfsp=NULL;
+	struct fs *fsp, *lfsp = NULL;
 	char *p;
 
+	if ((mfile = setmntent(MNT_FILE, "r")) == NULL)
+		return (0);
 
-	if( (mfile = setmntent(MNT_FILE, "r")) == NULL )
-		return(0);
-
-	while( (mp = getmntent(mfile)) != NULL ){
-		fsp = (struct fs *)malloc( sizeof(struct fs) );
-		if( fsp == NULL ){
+	while ((mp = getmntent(mfile)) != NULL) {
+		fsp = (struct fs *) malloc(sizeof(struct fs));
+		if (fsp == NULL) {
 			endmntent(mfile);
-			return(0);
+			return (0);
 		}
 
-		fsp->fs_Name = (char *)malloc( strlen(mp->mnt_fsname)+1 );
-		if( fsp->fs_Name == NULL ){
+		fsp->fs_Name = (char *) malloc(strlen(mp->mnt_fsname) + 1);
+		if (fsp->fs_Name == NULL) {
 			endmntent(mfile);
 			free(fsp);
-			return(0);
+			return (0);
 		}
 
-		fsp->fs_MountPoint = (char *)malloc( strlen(mp->mnt_dir)+1 );
-		if( fsp->fs_MountPoint == NULL ){
+		fsp->fs_MountPoint = (char *) malloc(strlen(mp->mnt_dir) + 1);
+		if (fsp->fs_MountPoint == NULL) {
 			endmntent(mfile);
 			free(fsp->fs_Name);
 			free(fsp);
-			return(0);
+			return (0);
 		}
 
-		fsp->fs_MountType = (char *)malloc( strlen(mp->mnt_type)+1 );
-		if( fsp->fs_MountType == NULL ){
+		fsp->fs_MountType = (char *) malloc(strlen(mp->mnt_type) + 1);
+		if (fsp->fs_MountType == NULL) {
 			endmntent(mfile);
 			free(fsp->fs_Name);
 			free(fsp->fs_MountPoint);
 			free(fsp);
-			return(0);
+			return (0);
 		}
 
-		fsp->fs_MountOptions = (char *)malloc( strlen(mp->mnt_opts)+1 );
-		if( fsp->fs_MountOptions == NULL ){
+		fsp->fs_MountOptions = (char *) malloc(strlen(mp->mnt_opts) + 1);
+		if (fsp->fs_MountOptions == NULL) {
 			endmntent(mfile);
 			free(fsp->fs_Name);
 			free(fsp->fs_MountPoint);
 			free(fsp->fs_MountType);
 			free(fsp);
-			return(0);
+			return (0);
 		}
 
 		strcpy(fsp->fs_Name, mp->mnt_fsname);
@@ -487,81 +526,79 @@ static int get_fs_table()
 		strcpy(fsp->fs_MountOptions, mp->mnt_opts);
 
 		p = strstr(mp->mnt_opts, "dev=");
-		fsp->fs_Identifier = (p == NULL) ? ++fake_dev%100 : atoi(p+4);
+		fsp->fs_Identifier = (p == NULL) ? ++fake_dev % 100 : atoi(p + 4);
 
 		fsp->fs_instance[0] = fsp->fs_Identifier;
-		fsp->fs_insize =  1;
+		fsp->fs_insize = 1;
 
 		refresh_entry(fsp);
 		insert_entry(fsp);
 	}
 
 	endmntent(mfile);
-	return(1);
+	return (1);
 }
-
 
 /*-----------------------------------------------------------------
  * Get current statistics for this filesystem.
  *-----------------------------------------------------------------*/
-static void refresh_entry(fsp)
-struct fs *fsp;
+static void
+refresh_entry(fsp)
+	struct fs *fsp;
 {
 
 #if	!(defined(ultrix) && defined(mips))
-	struct statfs  fss;
+	struct statfs fss;
 
-	if( statfs(fsp->fs_MountPoint, &fss) == -1 ){
-		fsp->fs_BlockSize	= -1;
-		fsp->fs_BlockCount	= -1;
-		fsp->fs_BlocksFree	= -1;
-		fsp->fs_BlocksAvailable	= -1;
-		fsp->fs_InodeCount	= -1;
-		fsp->fs_InodesAvailable	= -1;
-	}
-	else {
-		fsp->fs_BlockSize	= fss.f_bsize;
-		fsp->fs_BlockCount	= fss.f_blocks;
-		fsp->fs_BlocksFree	= fss.f_bfree;
+	if (statfs(fsp->fs_MountPoint, &fss) == -1) {
+		fsp->fs_BlockSize = -1;
+		fsp->fs_BlockCount = -1;
+		fsp->fs_BlocksFree = -1;
+		fsp->fs_BlocksAvailable = -1;
+		fsp->fs_InodeCount = -1;
+		fsp->fs_InodesAvailable = -1;
+	} else {
+		fsp->fs_BlockSize = fss.f_bsize;
+		fsp->fs_BlockCount = fss.f_blocks;
+		fsp->fs_BlocksFree = fss.f_bfree;
 #ifdef sgi
-		fsp->fs_BlocksAvailable	= fss.f_bfree;
+		fsp->fs_BlocksAvailable = fss.f_bfree;
 #else
-		fsp->fs_BlocksAvailable	= fss.f_bavail;
+		fsp->fs_BlocksAvailable = fss.f_bavail;
 #endif
-		fsp->fs_InodeCount	= fss.f_files;
-		fsp->fs_InodesAvailable	= fss.f_ffree;
+		fsp->fs_InodeCount = fss.f_files;
+		fsp->fs_InodesAvailable = fss.f_ffree;
 	}
 #else
-	struct fs_data  fss;
+	struct fs_data fss;
 
-	if( statfs(fsp->fs_MountPoint, &fss) == -1 ){
-		fsp->fs_BlockSize	= -1;
-		fsp->fs_BlockCount	= -1;
-		fsp->fs_BlocksFree	= -1;
-		fsp->fs_BlocksAvailable	= -1;
-		fsp->fs_InodeCount	= -1;
-		fsp->fs_InodesAvailable	= -1;
-	}
-	else {
-		fsp->fs_BlockSize	= fss.fd_req.bsize;
-		fsp->fs_BlockCount	= fss.fd_req.btot;
-		fsp->fs_BlocksFree	= fss.fd_req.bfree;
-		fsp->fs_BlocksAvailable	= fss.fd_req.bfreen;
-		fsp->fs_InodeCount	= fss.fd_req.gtot;
-		fsp->fs_InodesAvailable	= fss.fd_req.gfree;
+	if (statfs(fsp->fs_MountPoint, &fss) == -1) {
+		fsp->fs_BlockSize = -1;
+		fsp->fs_BlockCount = -1;
+		fsp->fs_BlocksFree = -1;
+		fsp->fs_BlocksAvailable = -1;
+		fsp->fs_InodeCount = -1;
+		fsp->fs_InodesAvailable = -1;
+	} else {
+		fsp->fs_BlockSize = fss.fd_req.bsize;
+		fsp->fs_BlockCount = fss.fd_req.btot;
+		fsp->fs_BlocksFree = fss.fd_req.bfree;
+		fsp->fs_BlocksAvailable = fss.fd_req.bfreen;
+		fsp->fs_InodeCount = fss.fd_req.gtot;
+		fsp->fs_InodesAvailable = fss.fd_req.gfree;
 	}
 #endif
 }
 
-
 /*-----------------------------------------------------------------
  * Delete the file system table.
  *-----------------------------------------------------------------*/
-static void free_fs_table()
+static void
+free_fs_table()
 {
 	struct fs *fs = fs_tbl, *bye;
 
-	while( fs != NULL ){
+	while (fs != NULL) {
 		bye = fs;
 		fs = bye->next;
 
@@ -579,42 +616,42 @@ static void free_fs_table()
 
 FILE *
 setmntent(mntfile, mode)
-char	*mntfile;
-char	*mode;
+	char *mntfile;
+	char *mode;
 {
-	/*
+	/* 
 	 * initialize global static counter to zero
 	 */
 	mnt_cnt = 0;
-	return (FILE *)1;
+	return (FILE *) 1;
 }
 
 struct mntent *
 getmntent(mfile)
-FILE	*mfile;
+	FILE *mfile;
 {
-	static struct fs_data	mnt_buf;
-	static struct mntent	fake;
-	int	stat;
+	static struct fs_data mnt_buf;
+	static struct mntent fake;
+	int stat;
 
 	switch (stat = getmountent(mnt_cnt, &mnt_buf, 1)) {
-		case 1:
-                 	fake.mnt_fsname	= mnt_buf.fd_req.devname;	
-                 	fake.mnt_dir	= mnt_buf.fd_req.path;     
-                 	fake.mnt_type	= gt_names[mnt_buf.fd_req.fstype];    
-                 	fake.mnt_opts	= NULL;    
-                 	fake.mnt_freq	= -1;    
-                 	fake.mnt_passno	= -1;  
+	case 1:
+		fake.mnt_fsname = mnt_buf.fd_req.devname;
+		fake.mnt_dir = mnt_buf.fd_req.path;
+		fake.mnt_type = gt_names[mnt_buf.fd_req.fstype];
+		fake.mnt_opts = NULL;
+		fake.mnt_freq = -1;
+		fake.mnt_passno = -1;
 
-		case 0:		/* end of list */
-		default:	/* uh-oh... */
-			return	(struct mntent *)0;
+	case 0:		/* end of list */
+	default:		/* uh-oh... */
+		return (struct mntent *) 0;
 	}
 }
 
 FILE *
 endmntent(mntfile)
-FILE	*mntfile;
+	FILE *mntfile;
 {
 	/* nullop */
 }

@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* sys_tai.c - System tailoring routines */
 
 #ifndef lint
-static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/sys_tai.c,v 9.0 1992/06/16 12:34:01 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/quipu/RCS/sys_tai.c,v 9.0 1992/06/16 12:34:01 isode Rel";
 #endif
 
 /*
- * $Header: /xtel/isode/isode/quipu/RCS/sys_tai.c,v 9.0 1992/06/16 12:34:01 isode Rel $
+ * Header: /xtel/isode/isode/quipu/RCS/sys_tai.c,v 9.0 1992/06/16 12:34:01 isode Rel
  *
  *
- * $Log: sys_tai.c,v $
+ * Log: sys_tai.c,v
  * Revision 9.0  1992/06/16  12:34:01  isode
  * Release 8.0
  *
@@ -24,21 +83,17 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/sys_tai.c,v 9.0 1992/
  *
  */
 
-
 #include "quipu/util.h"
 #include "quipu/policy.h"
 #include "cmd_srch.h"
 
-extern char *isodelogpath,
-	    *treedir,
-	    *dsaoidtable,
-	    *mydsaname;
+extern char *isodelogpath, *treedir, *dsaoidtable, *mydsaname;
 
-char	    *authfile = NULLCP;
+char *authfile = NULLCP;
 
 extern char startup_update;
 extern char quipu_faststart;
-extern int  oidformat;
+extern int oidformat;
 extern int dspchaining;
 extern int no_last_mod;
 extern int search_level;
@@ -54,9 +109,10 @@ extern time_t nsap_timeout;
 extern int bind_window;
 extern unsigned watchdog_time;
 extern unsigned watchdog_delta;
-extern LLog * log_dsap;
+extern LLog *log_dsap;
+
 #ifndef NO_STATS
-extern LLog * log_stat;
+extern LLog *log_stat;
 #endif
 #ifdef TURBO_INDEX
 extern int optimized_only;
@@ -110,295 +166,290 @@ extern unsigned str2permission();
 #define AUTHFILE	 50
 #define FASTSTART	 51
 
-static  CMD_TABLE  cmdtab[] =
-{
-	"LOGDIR",       MLOGDIR,
-	"DSAPLOG",      SYSLOG,
-	"OIDTABLE",     OIDTAB,
-	"OIDFORMAT",    OIDFMT,
-	"TREEDIR",      ROOTDIR,
-	"MYDSANAME",    MYDSANAME,
-	"PARENT",       PARENT,
-	"UPDATE",	START_UPDATE,
-	"DSPCHAINING",	DSP_CHAIN,
-	"LASTMODIFIED",	LAST_MOD,
-	"SEARCHLEVEL",	SEARCH_LEVEL,
-	"ISODE",	ISODE_TAILOR,
-	"ADMINSIZE",	ADMIN_SIZE,
-	"ADMINTIME",	ADMIN_TIME,
-	"CACHETIME",	CACHE_TIME,
-	"SLAVETIME",	SLAVE_TIME,
-	"RETRYTIME",	RETRY_TIME,
-	"CONNTIME",	CONN_TIME,
-	"NSAPTIME",	NSAP_TIME,
-	"CAINFO",	CA_INFO,
-	"SECRETKEY",	SECRET_KEY,
-	"PREFERDSA",	PREFER_DSA,
-	"READONLY",	READ_ONLY,
-	"BINDWINDOW",	BIND_WINDOW,
-	"DSACERTIFICATE",	DSA_CERTIFICATE,
-	"WATCHDOG_TIME",	WATCHDOG_TIME,
-	"WATCHDOG_DELTA",	WATCHDOG_DELTA,
-	"BIND_POLICY",		BIND_POLICY,
-	"STRONG_POLICY",	STRONG_POLICY,
-	"AUTHENTICATION",	AUTH,
-	"SHADOW",		SHADOW,
-	"REJECT_PREFIX",	REJECT_PREFIX,
-	"ACCEPT_PREFIX",	ACCEPT_PREFIX,
-	"REJECT_LENGTH",	REJECT_LENGTH,
-	"RELAY_FOR",		RELAY_FOR,
-	"GETEDB_SIZE",		GETEDB_SIZE,
-	"AUTHFILE",		AUTHFILE,
-	"FAST_START",		FASTSTART,
+static CMD_TABLE cmdtab[] = {
+	"LOGDIR", MLOGDIR,
+	"DSAPLOG", SYSLOG,
+	"OIDTABLE", OIDTAB,
+	"OIDFORMAT", OIDFMT,
+	"TREEDIR", ROOTDIR,
+	"MYDSANAME", MYDSANAME,
+	"PARENT", PARENT,
+	"UPDATE", START_UPDATE,
+	"DSPCHAINING", DSP_CHAIN,
+	"LASTMODIFIED", LAST_MOD,
+	"SEARCHLEVEL", SEARCH_LEVEL,
+	"ISODE", ISODE_TAILOR,
+	"ADMINSIZE", ADMIN_SIZE,
+	"ADMINTIME", ADMIN_TIME,
+	"CACHETIME", CACHE_TIME,
+	"SLAVETIME", SLAVE_TIME,
+	"RETRYTIME", RETRY_TIME,
+	"CONNTIME", CONN_TIME,
+	"NSAPTIME", NSAP_TIME,
+	"CAINFO", CA_INFO,
+	"SECRETKEY", SECRET_KEY,
+	"PREFERDSA", PREFER_DSA,
+	"READONLY", READ_ONLY,
+	"BINDWINDOW", BIND_WINDOW,
+	"DSACERTIFICATE", DSA_CERTIFICATE,
+	"WATCHDOG_TIME", WATCHDOG_TIME,
+	"WATCHDOG_DELTA", WATCHDOG_DELTA,
+	"BIND_POLICY", BIND_POLICY,
+	"STRONG_POLICY", STRONG_POLICY,
+	"AUTHENTICATION", AUTH,
+	"SHADOW", SHADOW,
+	"REJECT_PREFIX", REJECT_PREFIX,
+	"ACCEPT_PREFIX", ACCEPT_PREFIX,
+	"REJECT_LENGTH", REJECT_LENGTH,
+	"RELAY_FOR", RELAY_FOR,
+	"GETEDB_SIZE", GETEDB_SIZE,
+	"AUTHFILE", AUTHFILE,
+	"FAST_START", FASTSTART,
 #ifdef TURBO_INDEX
-	"OPTIMIZE_ATTR",	OPTIMIZE_ATTR,
-	"OPTIMIZED_ONLY",	OPTIMIZED_ONLY,
-	"INDEX_SUBTREE",	INDEX_SUBTREE,
-	"INDEX_SIBLINGS",	INDEX_SIBLINGS,
+	"OPTIMIZE_ATTR", OPTIMIZE_ATTR,
+	"OPTIMIZED_ONLY", OPTIMIZED_ONLY,
+	"INDEX_SUBTREE", INDEX_SUBTREE,
+	"INDEX_SIBLINGS", INDEX_SIBLINGS,
 #endif
 #ifndef NO_STATS
-	"STATS",	STATS,
+	"STATS", STATS,
 #endif
-	0,              -1,
+	0, -1,
 };
 
-static  CMD_TABLE  authtab[] =
-{
-	"NONE",		0,
-	"DN",		1,
-	"SIMPLE",	2,
-	"PROTECTED",	3,
-	"STRONG",	4,
-	0,              0,
+static CMD_TABLE authtab[] = {
+	"NONE", 0,
+	"DN", 1,
+	"SIMPLE", 2,
+	"PROTECTED", 3,
+	"STRONG", 4,
+	0, 0,
 };
-
 
 /*
  * do system wide initialisations
  */
 
-dsa_sys_tai (argc, argv)
-char    **argv;
+dsa_sys_tai(argc, argv)
+	char **argv;
 {
-	char    *arg;
+	char *arg;
 
-	if(argc < 2)
-		return(NOTOK);
+	if (argc < 2)
+		return (NOTOK);
 	arg = argv[1];
 
-	switch(cmd_srch(argv[0], cmdtab))
-	{
+	switch (cmd_srch(argv[0], cmdtab)) {
 	case MLOGDIR:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor LOGDIR %s", arg));
-		isodelogpath = strdup (arg);
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor LOGDIR %s", arg));
+		isodelogpath = strdup(arg);
 		break;
 #ifndef NO_STATS
 	case STATS:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor STATS %s", arg));
-		log_tai(log_stat, &argv[1], argc-1);
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor STATS %s", arg));
+		log_tai(log_stat, &argv[1], argc - 1);
 		break;
 #endif
 	case SYSLOG:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor SYSLOG %s", arg));
-		log_tai(log_dsap, &argv[1], argc-1);
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor SYSLOG %s", arg));
+		log_tai(log_dsap, &argv[1], argc - 1);
 		break;
 	case OIDTAB:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor OIDTable=%s", arg));
-		dsaoidtable = strdup (arg);
-		if (load_oid_table (dsaoidtable) == NOTOK)
-			fatal (-1, "Can't load oid tables");
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor OIDTable=%s", arg));
+		dsaoidtable = strdup(arg);
+		if (load_oid_table(dsaoidtable) == NOTOK)
+			fatal(-1, "Can't load oid tables");
 		break;
 	case OIDFMT:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor OIDFMT=%s", arg));
-		oidformat = atoi (arg);
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor OIDFMT=%s", arg));
+		oidformat = atoi(arg);
 		break;
 	case ROOTDIR:
-	    { 
+	{
 		unsigned int i;
+
 		treedir = strdup(arg);
-		i = strlen(treedir);	
-		if ( treedir[i - 1] != '/' ) {
-		    treedir = realloc (treedir, i + 1);	
-		    treedir[i] = '/';
-		    treedir[i + 1] = 0;
+		i = strlen(treedir);
+		if (treedir[i - 1] != '/') {
+			treedir = realloc(treedir, i + 1);
+			treedir[i] = '/';
+			treedir[i + 1] = 0;
 		}
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor Rootdir %s", treedir));
-	    }
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor Rootdir %s", treedir));
+	}
 		break;
 	case MYDSANAME:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor Myname %s", arg));
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor Myname %s", arg));
 		mydsaname = strdup(arg);
 		break;
 	case DSP_CHAIN:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor DSPChaining %s", arg));
-		if (lexequ (arg,"whenNeeded") == 0)
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor DSPChaining %s", arg));
+		if (lexequ(arg, "whenNeeded") == 0)
 			dspchaining = 2;
-		else if (lexequ (arg,"off") == 0)
+		else if (lexequ(arg, "off") == 0)
 			dspchaining = 1;
 		else
 			dspchaining = 0;
 		break;
 	case LAST_MOD:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor last modified %s", arg));
-		if (lexequ (arg,"on") == 0)
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor last modified %s", arg));
+		if (lexequ(arg, "on") == 0)
 			no_last_mod = FALSE;
 		else
 			no_last_mod = TRUE;
 		break;
 	case START_UPDATE:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor Update %s", arg));
-		if (lexequ (arg,"on") == 0)
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor Update %s", arg));
+		if (lexequ(arg, "on") == 0)
 			startup_update = TRUE;
 		else
 			startup_update = FALSE;
 		break;
 	case READ_ONLY:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor read only", arg));
-		if (lexequ (arg,"on") == 0)
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor read only", arg));
+		if (lexequ(arg, "on") == 0)
 			read_only = TRUE;
 		else
 			read_only = FALSE;
 		break;
 	case SEARCH_LEVEL:
-		search_level = atoi (arg);
-		DLOG (log_dsap,LLOG_TRACE,(" Tailor search level %d", search_level));
+		search_level = atoi(arg);
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor search level %d", search_level));
 		break;
 	case ADMIN_SIZE:
-		admin_size = atoi (arg);
-		DLOG (log_dsap,LLOG_TRACE,(" Tailor admin size %d", admin_size));
+		admin_size = atoi(arg);
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor admin size %d", admin_size));
 		break;
 	case ADMIN_TIME:
-		(void) sscanf (arg, "%ld", &admin_time);
-		DLOG (log_dsap,LLOG_TRACE,(" Tailor admin time %ld", admin_time));
+		(void) sscanf(arg, "%ld", &admin_time);
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor admin time %ld", admin_time));
 		break;
 	case CACHE_TIME:
-		(void) sscanf (arg, "%ld", &cache_timeout);
-		DLOG (log_dsap,LLOG_TRACE,(" Tailor cache time %ld", cache_timeout));
+		(void) sscanf(arg, "%ld", &cache_timeout);
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor cache time %ld", cache_timeout));
 		break;
 	case RETRY_TIME:
-		(void) sscanf (arg, "%ld", &retry_timeout);
-		DLOG (log_dsap,LLOG_TRACE,(" Tailor retry time %ld", retry_timeout));
+		(void) sscanf(arg, "%ld", &retry_timeout);
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor retry time %ld", retry_timeout));
 		break;
 	case SLAVE_TIME:
-		(void) sscanf (arg, "%ld", &slave_timeout);
-		DLOG (log_dsap,LLOG_TRACE,(" Tailor slave time %ld", slave_timeout));
+		(void) sscanf(arg, "%ld", &slave_timeout);
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor slave time %ld", slave_timeout));
 		break;
 	case CONN_TIME:
-		(void) sscanf (arg, "%ld", &conn_timeout);
-		DLOG (log_dsap,LLOG_TRACE,(" Tailor conn time %ld", conn_timeout));
+		(void) sscanf(arg, "%ld", &conn_timeout);
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor conn time %ld", conn_timeout));
 		break;
 	case NSAP_TIME:
-		(void) sscanf (arg, "%ld", &nsap_timeout);
-		DLOG (log_dsap,LLOG_TRACE,(" Tailor nsap time %ld", nsap_timeout));
+		(void) sscanf(arg, "%ld", &nsap_timeout);
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor nsap time %ld", nsap_timeout));
 		break;
 	case SECRET_KEY:
-		DLOG (log_dsap,LLOG_TRACE,(" Tailor dsa secret key ignored - obsolete feature"));
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor dsa secret key ignored - obsolete feature"));
 		break;
 	case DSA_CERTIFICATE:
-		DLOG (log_dsap,LLOG_TRACE,(" Tailor dsa certificate ignored - obsolete feature"));
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor dsa certificate ignored - obsolete feature"));
 		break;
 	case WATCHDOG_TIME:
-		(void) sscanf (arg, "%d", &watchdog_time);
-		DLOG (log_dsap,LLOG_TRACE,(" Tailor watchdog time %d", watchdog_time));
+		(void) sscanf(arg, "%d", &watchdog_time);
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor watchdog time %d", watchdog_time));
 		break;
 	case WATCHDOG_DELTA:
-		(void) sscanf (arg, "%d", &watchdog_delta);
-		DLOG (log_dsap,LLOG_TRACE,(" Tailor watchdog delta %d", watchdog_delta));
+		(void) sscanf(arg, "%d", &watchdog_delta);
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor watchdog delta %d", watchdog_delta));
 		break;
 	case BIND_POLICY:
 		bind_policy = str2permission(arg);
-		DLOG(log_dsap,LLOG_TRACE,("Bind policy %d", bind_policy));
+		DLOG(log_dsap, LLOG_TRACE, ("Bind policy %d", bind_policy));
 		break;
 	case STRONG_POLICY:
 		strong_policy = str2permission(arg);
-		DLOG(log_dsap,LLOG_TRACE,("Strong auth. policy %d", strong_policy));
+		DLOG(log_dsap, LLOG_TRACE, ("Strong auth. policy %d", strong_policy));
 		break;
 	case BIND_WINDOW:
 		bind_window = atoi(arg);
 		if (bind_window <= 0)
-			LLOG(log_dsap,LLOG_EXCEPTIONS,("Invalid bind window %s", arg));
+			LLOG(log_dsap, LLOG_EXCEPTIONS, ("Invalid bind window %s", arg));
 		else
-			DLOG (log_dsap, LLOG_TRACE,("Bind window %d", bind_window));
+			DLOG(log_dsap, LLOG_TRACE, ("Bind window %d", bind_window));
 		break;
 	case PREFER_DSA:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor prefer dsa %s", arg));
-		prefer_dsa (arg);
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor prefer dsa %s", arg));
+		prefer_dsa(arg);
 		break;
 	case REJECT_PREFIX:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor reject prefix %s", arg));
-		reject_prefix (arg);
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor reject prefix %s", arg));
+		reject_prefix(arg);
 		break;
 	case ACCEPT_PREFIX:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor accept prefix %s", arg));
-		accept_prefix (arg);
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor accept prefix %s", arg));
+		accept_prefix(arg);
 		break;
 	case REJECT_LENGTH:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor reject length %s", arg));
-		reject_length (arg);
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor reject length %s", arg));
+		reject_length(arg);
 		break;
 	case RELAY_FOR:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor relay for %s", arg));
-		allowrelay (arg);
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor relay for %s", arg));
+		allowrelay(arg);
 		break;
 	case PARENT:
- 		DLOG (log_dsap,LLOG_TRACE,( "Tailor parent name %s, address %s", arg,argv[2]));
- 		add_str_parent (arg,argv[2]);
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor parent name %s, address %s", arg, argv[2]));
+		add_str_parent(arg, argv[2]);
 		break;
 	case ISODE_TAILOR:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor Isode %s%s",arg,argv[2]));
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor Isode %s%s", arg, argv[2]));
 		if (argc != 3)
-			LLOG (log_dsap,LLOG_EXCEPTIONS,( 
-			      "Invalid isode option in quiputailor"));
+			LLOG(log_dsap, LLOG_EXCEPTIONS, ("Invalid isode option in quiputailor"));
 		else
-			(void) isodesetvar(arg,strdup(argv[2]),0);
+			(void) isodesetvar(arg, strdup(argv[2]), 0);
 		break;
 	case AUTH:
 		auth_bind = cmd_srch(arg, authtab);
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor authentication", arg));
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor authentication", arg));
 		break;
 	case SHADOW:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor shadow %s", arg));
-		shadow_attribute (arg);
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor shadow %s", arg));
+		shadow_attribute(arg);
 		break;
 	case GETEDB_SIZE:
-		getedb_size (atoi (arg));
-		DLOG (log_dsap,LLOG_TRACE,(" Tailor getedb size %d", atoi(arg)));
+		getedb_size(atoi(arg));
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor getedb size %d", atoi(arg)));
 		break;
 	case AUTHFILE:
-		DLOG (log_dsap,LLOG_TRACE,( "Tailor authfile %s", arg));
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor authfile %s", arg));
 		authfile = strdup(arg);
 		break;
 	case FASTSTART:
-                if (lexequ(arg, "on") == 0)
-                        quipu_faststart = TRUE;
-                else
-                        quipu_faststart = FALSE;
-                DLOG(log_dsap, LLOG_TRACE, ("Tailor fast_start %s", arg));
-                break;
+		if (lexequ(arg, "on") == 0)
+			quipu_faststart = TRUE;
+		else
+			quipu_faststart = FALSE;
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor fast_start %s", arg));
+		break;
 #ifdef TURBO_INDEX
-        case OPTIMIZED_ONLY:
-                if (lexequ(arg, "on") == 0)
-                        optimized_only = TRUE;
-                else
-                        optimized_only = FALSE;
-                DLOG(log_dsap, LLOG_TRACE, ("Tailor optimized only %s", arg));
-                break;
+	case OPTIMIZED_ONLY:
+		if (lexequ(arg, "on") == 0)
+			optimized_only = TRUE;
+		else
+			optimized_only = FALSE;
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor optimized only %s", arg));
+		break;
 	case OPTIMIZE_ATTR:
 		turbo_optimize(arg);
-                DLOG(log_dsap, LLOG_TRACE, (" Tailor optimize (%s)", arg));
-                break;
-        case INDEX_SUBTREE:
-                index_subtree(arg);
-                DLOG(log_dsap, LLOG_TRACE, ("Tailor index subtree %s", arg));
-                break;
-        case INDEX_SIBLINGS:
+		DLOG(log_dsap, LLOG_TRACE, (" Tailor optimize (%s)", arg));
+		break;
+	case INDEX_SUBTREE:
+		index_subtree(arg);
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor index subtree %s", arg));
+		break;
+	case INDEX_SIBLINGS:
 		index_siblings(arg);
-                DLOG(log_dsap, LLOG_TRACE, ("Tailor index siblings %s", arg));
-                break;
+		DLOG(log_dsap, LLOG_TRACE, ("Tailor index siblings %s", arg));
+		break;
 #endif
-	    default:
+	default:
 		return NOTOK;
 	}
 	return (OK);
 }
-

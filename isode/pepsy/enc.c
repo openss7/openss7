@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* enc.c */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/pepsy/RCS/enc.c,v 9.0 1992/06/16 12:24:03 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/pepsy/RCS/enc.c,v 9.0 1992/06/16 12:24:03 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/pepsy/RCS/enc.c,v 9.0 1992/06/16 12:24:03 isode Rel $
+ * Header: /xtel/isode/isode/pepsy/RCS/enc.c,v 9.0 1992/06/16 12:24:03 isode Rel
  *
  *
- * $Log: enc.c,v $
+ * Log: enc.c,v
  * Revision 9.0  1992/06/16  12:24:03  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/pepsy/RCS/enc.c,v 9.0 1992/06/1
  *
  */
 
-
 /* LINTLIBRARY */
 
 #include	<stdio.h>
@@ -38,20 +96,20 @@ static char *rcsid = "$Header: /xtel/isode/isode/pepsy/RCS/enc.c,v 9.0 1992/06/1
 #define PEPYPARM	char *
 #endif
 
-
 extern ptpe *next_tpe(), *fdflt_f();
 extern char *pr_petype();
-char   *idname(), *clname();
+char *idname(), *clname();
 
 #define NEXT_TPE(p) (p = next_tpe(p))
 #define CHKTAG(mod, p, pe)	ismatch(p, mod, pe->pe_class, pe->pe_id)
 
 static char oomsg[] = "Out of memory";
+
 #define oom(a,b)	pepsylose ((a), (b), NULLPE, oomsg);
 #define RET_OK(rpe, pe)		*(rpe) = (pe), (OK)
 #define pname(t)	((t)->pe_typename ? *(t)->pe_typename : "???")
 
-static int en_obj ();
+static int en_obj();
 static int en_type();
 static int en_seq();
 static int en_set();
@@ -66,38 +124,35 @@ static int en_etype();
  */
 enc_f(typ, mod, pe, explicit, len, buf, parm)
 /* ARGSUSED */
-int     typ;			/* which type it is */
-modtyp *mod;			/* Module it is from */
-register PE *pe;
-int     explicit;
-int     len;
-char   *buf;
-char	*parm;
+	int typ;			/* which type it is */
+	modtyp *mod;			/* Module it is from */
+	register PE *pe;
+	int explicit;
+	int len;
+	char *buf;
+	char *parm;
 {
-    register ptpe *p;
+	register ptpe *p;
 
-    if (typ < 0 || typ >= mod->md_nentries) {
-	(void) pepsylose (mod, NULLTPE, NULLPE, "enc_f:Illegal typ %d", typ);
-	return NOTOK;
-    }
+	if (typ < 0 || typ >= mod->md_nentries) {
+		(void) pepsylose(mod, NULLTPE, NULLPE, "enc_f:Illegal typ %d", typ);
+		return NOTOK;
+	}
 
-    p = mod->md_etab[typ];
-    if (p->pe_type != PE_START) {
-	return (pepsylose (mod, NULLTPE, NULLPE, "enc_f: missing PE_START"));
-    }
-    DLOG (psap_log, LLOG_DEBUG, ("Encoding %s.%s",
-				 mod -> md_name, pname(p)));
+	p = mod->md_etab[typ];
+	if (p->pe_type != PE_START) {
+		return (pepsylose(mod, NULLTPE, NULLPE, "enc_f: missing PE_START"));
+	}
+	DLOG(psap_log, LLOG_DEBUG, ("Encoding %s.%s", mod->md_name, pname(p)));
 
-    p++;
+	p++;
 
-    if (en_obj(parm, p, mod, pe) == NOTOK) {
-	    DLOG (psap_log, LLOG_DEBUG, ("Encoding %s.%s failed",
-					 mod -> md_name, pname(p)));
-	    return NOTOK;
-    }
-    DLOG (psap_log, LLOG_DEBUG, ("Encoding %s.%s suceeded",
-				 mod -> md_name, pname(p)));
-    return OK;
+	if (en_obj(parm, p, mod, pe) == NOTOK) {
+		DLOG(psap_log, LLOG_DEBUG, ("Encoding %s.%s failed", mod->md_name, pname(p)));
+		return NOTOK;
+	}
+	DLOG(psap_log, LLOG_DEBUG, ("Encoding %s.%s suceeded", mod->md_name, pname(p)));
+	return OK;
 }
 
 /*
@@ -109,63 +164,58 @@ char	*parm;
  */
 static int
 en_obj(parm, p, mod, rpe)
-PEPYPARM parm;
-ptpe    *p;
-modtyp *mod;			/* Module it is from */
-PE	*rpe;		/* Return value PE */
+	PEPYPARM parm;
+	ptpe *p;
+	modtyp *mod;			/* Module it is from */
+	PE *rpe;			/* Return value PE */
 {
-    PE      pe = NULLPE;	/* for pepsylose calls */
-    int     cnt = 0;
+	PE pe = NULLPE;			/* for pepsylose calls */
+	int cnt = 0;
 
-    DLOG (psap_log, LLOG_DEBUG, ("Encode object %s.%s type %s",
-				 mod -> md_name, pname(p),
-				 pr_petype(p->pe_type)));
+	DLOG(psap_log, LLOG_DEBUG, ("Encode object %s.%s type %s",
+				    mod->md_name, pname(p), pr_petype(p->pe_type)));
 
-    *rpe = NULLPE;	/* default case */
+	*rpe = NULLPE;		/* default case */
 
-    while (p->pe_type != PE_END) {
+	while (p->pe_type != PE_END) {
 
-	switch (p->pe_type) {
-	case PE_END:
-	case PE_START:
-	    return (pepsylose (mod, p, pe, "en_obj:END/START type"));
+		switch (p->pe_type) {
+		case PE_END:
+		case PE_START:
+			return (pepsylose(mod, p, pe, "en_obj:END/START type"));
 
-	/*
-	 * This allows Functions to be called at the very end of the 
-	 * encoding -- With the encoded data - very messy
-	 */
-	case UCODE:
-	    if (mod->md_eucode == NULLIFP
-	    || (*mod->md_eucode) (parm, &pe, p) == NOTOK)
-		goto bad;
-	    break;
+			/* 
+			 * This allows Functions to be called at the very end of the 
+			 * encoding -- With the encoded data - very messy
+			 */
+		case UCODE:
+			if (mod->md_eucode == NULLIFP || (*mod->md_eucode) (parm, &pe, p) == NOTOK)
+				goto bad;
+			break;
 
-	default:
-	    if (en_type(parm, p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
+		default:
+			if (en_type(parm, p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+		}
+		if (ISDTYPE(p) && cnt++ > 0)
+			return pepsylose(mod, p, NULLPE, "en_obj:compound type found");
+
+		if (ISDTYPE(p)) {
+			if (pe == NULLPE)
+				return pepsylose(mod, p, NULLPE, "en_obj: missing mandatory value");
+		}
+		/* make sure any final UCODEs get run if (ISDTYPE(p) && pe != NULLPE) return
+		   (RET_OK(rpe, pe)); */
+
+		if (NEXT_TPE(p) == NULLTPE)
+			goto bad;
 	}
-	if (ISDTYPE(p) && cnt++ > 0)
-	    return pepsylose (mod, p, NULLPE, "en_obj:compound type found");
 
-	if (ISDTYPE(p)) {
-	    if (pe == NULLPE)
-		return pepsylose (mod, p, NULLPE,
-				  "en_obj: missing mandatory value");
-	}
-	/* make sure any final UCODEs get run
-	if (ISDTYPE(p) && pe != NULLPE)
-	    return (RET_OK(rpe, pe));
-	 */
+	return (RET_OK(rpe, pe));
 
-	if (NEXT_TPE(p) == NULLTPE)
-	    goto bad;
-    }
-
-    return (RET_OK(rpe, pe));
-
-bad:
-    return (NOTOK);
+      bad:
+	return (NOTOK);
 }
 
 /*
@@ -174,360 +224,350 @@ bad:
  */
 static int
 en_type(parm, p, mod, rpe)
-register PEPYPARM parm;
-register ptpe    *p;
-register modtyp *mod;			/* Module it is from */
-PE	*rpe;		/* Return value PE */
+	register PEPYPARM parm;
+	register ptpe *p;
+	register modtyp *mod;		/* Module it is from */
+	PE *rpe;			/* Return value PE */
 {
-    PE      pe = NULLPE;
-    int     cnt = 0;
-    int     i;			/* Integer for encoding type */
-    ptpe    *tmp;
-    char   *cp;
+	PE pe = NULLPE;
+	int cnt = 0;
+	int i;				/* Integer for encoding type */
+	ptpe *tmp;
+	char *cp;
 
-    DLOG (psap_log, LLOG_DEBUG, ("Encode type %s.%s type %s",
-				 mod -> md_name, pname(p),
-				 pr_petype(p->pe_type)));
+	DLOG(psap_log, LLOG_DEBUG, ("Encode type %s.%s type %s",
+				    mod->md_name, pname(p), pr_petype(p->pe_type)));
 
-    *rpe = NULLPE;
-    while (p->pe_type != PE_END) {
+	*rpe = NULLPE;
+	while (p->pe_type != PE_END) {
 
-	switch (p->pe_type) {
-	case PE_END:
-	case PE_START:
-	    return (pepsylose (mod, p, pe, "en_type:END/START type"));
+		switch (p->pe_type) {
+		case PE_END:
+		case PE_START:
+			return (pepsylose(mod, p, pe, "en_type:END/START type"));
 
-	case DFLT_F:
-	    tmp = p;
-	    p = FDFLT_F(p);
-	    if ((i = same(p, tmp, parm, mod)) == NOTOK)
-		return (NOTOK); /* Error */
-	    if (i)
-		return (RET_OK(rpe, NULLPE));/* don't encode it */
-	    p = tmp + 1;
-	    continue;
+		case DFLT_F:
+			tmp = p;
+			p = FDFLT_F(p);
+			if ((i = same(p, tmp, parm, mod)) == NOTOK)
+				return (NOTOK);	/* Error */
+			if (i)
+				return (RET_OK(rpe, NULLPE));	/* don't encode it */
+			p = tmp + 1;
+			continue;
 
-	case BOPTIONAL:
-	    if (IF_USELECT(p)) {
-		if (mod -> md_eucode == NULLIFP)
-		    goto bad;
-		if ((*mod->md_eucode) (parm, &pe, p) == 0)
-		    return (RET_OK(rpe,NULLPE)); /* don't encode it */
-	    } else if (!OPT_PRESENT(p, parm))
-		return (RET_OK(rpe, NULLPE));/* don't encode it */
-	    p++; /* encode it */
-	    continue;
+		case BOPTIONAL:
+			if (IF_USELECT(p)) {
+				if (mod->md_eucode == NULLIFP)
+					goto bad;
+				if ((*mod->md_eucode) (parm, &pe, p) == 0)
+					return (RET_OK(rpe, NULLPE));	/* don't encode it */
+			} else if (!OPT_PRESENT(p, parm))
+				return (RET_OK(rpe, NULLPE));	/* don't encode it */
+			p++;	/* encode it */
+			continue;
 
-	case UCODE:
-	    if (mod->md_eucode == NULLIFP
-	    || (*mod->md_eucode) (parm, &pe, p) == NOTOK)
-		goto bad;
-	    break;
+		case UCODE:
+			if (mod->md_eucode == NULLIFP || (*mod->md_eucode) (parm, &pe, p) == NOTOK)
+				goto bad;
+			break;
 
-	case ETAG:
-	    if ((pe = pe_alloc(CLASS(p), PE_FORM_CONS, TAG(p))) == NULLPE)
-		return oom (mod, p);
+		case ETAG:
+			if ((pe = pe_alloc(CLASS(p), PE_FORM_CONS, TAG(p))) == NULLPE)
+				return oom(mod, p);
 
-	    switch (p->pe_ucode) {
+			switch (p->pe_ucode) {
 
-	    default:
-		p++;
-		if (en_etype(parm, p, mod, &pe->pe_cons) == NOTOK)
-		    goto bad;
-	    }
-	    break;
+			default:
+				p++;
+				if (en_etype(parm, p, mod, &pe->pe_cons) == NOTOK)
+					goto bad;
+			}
+			break;
 
-	case SEQ_START:
-	    if (en_seq(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
+		case SEQ_START:
+			if (en_seq(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
 
-	case SEQOF_START:
-	    if (en_seqof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
+		case SEQOF_START:
+			if (en_seqof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
 
-	case SET_START:
-	    if (en_set(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
+		case SET_START:
+			if (en_set(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
 
-	case SETOF_START:
-	    if (en_setof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
+		case SETOF_START:
+			if (en_setof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
 
-	case SSEQ_START:
-	    if (en_seq(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
+		case SSEQ_START:
+			if (en_seq(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
 
-	case SSEQOF_START:
-	    if (en_seqof(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
+		case SSEQOF_START:
+			if (en_seqof(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
 
-	case SSET_START:
-	    if (en_set(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
+		case SSET_START:
+			if (en_set(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
 
-	case SSETOF_START:
-	    if (en_setof(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
+		case SSETOF_START:
+			if (en_setof(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
 
-	case IMP_OBJ:
-	    tmp = p++;
-	    if (p->pe_type == EXTOBJ) {
-		if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
-		      0, (char *)0, *(char **) (parm + p->pe_ucode)) == NOTOK)
-		      return (NOTOK);
-	    } else if (p->pe_type == SEXTOBJ) {
-		if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
-		      0, (char *)0, (parm + p->pe_ucode)) == NOTOK)
-		      return (NOTOK);
-	    } else if (p->pe_type == SOBJECT) {
-		if (en_obj((char *) (parm + p->pe_ucode), mod->md_etab[p->pe_tag] + 1, mod, &pe)
-		  == NOTOK)
-		     goto bad;;
-	    } else
-		if (en_obj(*(char **) (parm + p->pe_ucode),
-			mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-		    goto bad;
+		case IMP_OBJ:
+			tmp = p++;
+			if (p->pe_type == EXTOBJ) {
+				if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
+					  0, (char *) 0, *(char **) (parm + p->pe_ucode)) == NOTOK)
+					return (NOTOK);
+			} else if (p->pe_type == SEXTOBJ) {
+				if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
+					  0, (char *) 0, (parm + p->pe_ucode)) == NOTOK)
+					return (NOTOK);
+			} else if (p->pe_type == SOBJECT) {
+				if (en_obj
+				    ((char *) (parm + p->pe_ucode), mod->md_etab[p->pe_tag] + 1,
+				     mod, &pe)
+				    == NOTOK)
+					goto bad;;
+			} else
+			    if (en_obj(*(char **) (parm + p->pe_ucode),
+				       mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+				goto bad;
 
-	    pe->pe_class = CLASS(tmp);
-	    pe->pe_id = TAG(tmp);
-	    break;
+			pe->pe_class = CLASS(tmp);
+			pe->pe_id = TAG(tmp);
+			break;
 
-	case SOBJECT:
-	    if (en_obj((char *) (parm + p->pe_ucode), mod->md_etab[p->pe_tag] + 1, mod, &pe)
-	      == NOTOK)
-		goto bad;
-	    break;
+		case SOBJECT:
+			if (en_obj
+			    ((char *) (parm + p->pe_ucode), mod->md_etab[p->pe_tag] + 1, mod, &pe)
+			    == NOTOK)
+				goto bad;
+			break;
 
-	case OBJECT:
-	    if (en_obj(*(char **) (parm + p->pe_ucode),
-	      mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
+		case OBJECT:
+			if (en_obj(*(char **) (parm + p->pe_ucode),
+				   mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+				goto bad;
+			break;
 
-	case CHOICE_START:
-	    if (en_choice(*(char **) (parm + p->pe_ucode), p, mod, &pe) ==NOTOK)
-		goto bad;
-	    break;
+		case CHOICE_START:
+			if (en_choice(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
 
-	case SCHOICE_START:
-	    if (en_choice(parm + p->pe_ucode, p, mod, &pe) ==NOTOK)
-		goto bad;
-	    break;
+		case SCHOICE_START:
+			if (en_choice(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
 
-	case SEXTOBJ:
-	    if (p[1].pe_type != EXTMOD)
-		return pepsylose (mod, &p[1], NULLPE,
-				  "en_seq: missing EXTMOD");
-	    if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *)0,
-		  (char *) (parm + p->pe_ucode)) == NOTOK)
-		  return (NOTOK);
-	    break;
+		case SEXTOBJ:
+			if (p[1].pe_type != EXTMOD)
+				return pepsylose(mod, &p[1], NULLPE, "en_seq: missing EXTMOD");
+			if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *) 0,
+				  (char *) (parm + p->pe_ucode)) == NOTOK)
+				return (NOTOK);
+			break;
 
-	case EXTOBJ:
-	    if (p[1].pe_type != EXTMOD)
-		return pepsylose (mod, &p[1], NULLPE,
-				  "en_seq: missing EXTMOD");
-	    if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *)0,
-		  *(char **) (parm + p->pe_ucode)) == NOTOK)
-		  return (NOTOK);
-	    break;
+		case EXTOBJ:
+			if (p[1].pe_type != EXTMOD)
+				return pepsylose(mod, &p[1], NULLPE, "en_seq: missing EXTMOD");
+			if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *) 0,
+				  *(char **) (parm + p->pe_ucode)) == NOTOK)
+				return (NOTOK);
+			break;
 
-	case INTEGER:
-	    DLOG (psap_log, LLOG_DEBUG,
-		  ("Encode INTEGER %s.%s value %d",
-		   mod -> md_name, pname(p),
-		   *(integer *)(parm + p->pe_ucode)));
+		case INTEGER:
+			DLOG(psap_log, LLOG_DEBUG,
+			     ("Encode INTEGER %s.%s value %d",
+			      mod->md_name, pname(p), *(integer *) (parm + p->pe_ucode)));
 
-	    if ((pe = num2prim(*(integer *) (parm + p->pe_ucode),
-			       CLASS(p), TAG(p))) == NULLPE)
-		return oom(mod, p);
-	    break;
+			if ((pe = num2prim(*(integer *) (parm + p->pe_ucode),
+					   CLASS(p), TAG(p))) == NULLPE)
+				return oom(mod, p);
+			break;
 
 #ifdef	PEPSY_REALS
-	case REALTYPE:
-	    DLOG (psap_log, LLOG_DEBUG, ("Encode REAL %s.%s value %g",
-					 mod -> md_name, pname(p),
-					 *(double *) (parm + p->pe_ucode)));
+		case REALTYPE:
+			DLOG(psap_log, LLOG_DEBUG, ("Encode REAL %s.%s value %g",
+						    mod->md_name, pname(p),
+						    *(double *) (parm + p->pe_ucode)));
 
-	    if ((pe = real2prim(*(double *) (parm + p->pe_ucode),
-			       CLASS(p), TAG(p))) == NULLPE)
-		return oom(mod, p);
-	    break;
+			if ((pe = real2prim(*(double *) (parm + p->pe_ucode),
+					    CLASS(p), TAG(p))) == NULLPE)
+				return oom(mod, p);
+			break;
 
 #endif
-	case BOOLEAN:
-	    DLOG (psap_log, LLOG_DEBUG,
-		  ("Encode BOOLEAN %s.%s value %d",
-		   mod -> md_name, pname(p),
-		   *(char *) (parm + p->pe_ucode)));
+		case BOOLEAN:
+			DLOG(psap_log, LLOG_DEBUG,
+			     ("Encode BOOLEAN %s.%s value %d",
+			      mod->md_name, pname(p), *(char *) (parm + p->pe_ucode)));
 
-	    if ((pe = flag2prim(*(char *) (parm + p->pe_ucode),
-				CLASS(p), TAG(p))) == NULLPE)
-		return oom(mod, p);
-	    break;
+			if ((pe = flag2prim(*(char *) (parm + p->pe_ucode),
+					    CLASS(p), TAG(p))) == NULLPE)
+				return oom(mod, p);
+			break;
 
-	case T_NULL:
-	    DLOG (psap_log, LLOG_DEBUG,
-		  ("Encode NULL %S.%S",
-		   mod -> md_name, pname(p)));
+		case T_NULL:
+			DLOG(psap_log, LLOG_DEBUG, ("Encode NULL %S.%S", mod->md_name, pname(p)));
 
+			if ((pe = pe_alloc(CLASS(p), PE_FORM_PRIM, TAG(p))) == NULLPE)
+				return oom(mod, p);
 
-	    if ((pe = pe_alloc(CLASS(p), PE_FORM_PRIM,
-			       TAG(p))) == NULLPE)
-		return oom(mod,p);
+			break;
 
-	    break;
+		case SANY:
+			(pe = (PE) (parm + p->pe_ucode))->pe_refcnt++;
+			break;
 
-	case SANY:
-	    (pe = (PE) (parm + p->pe_ucode))->pe_refcnt++;
-	    break;
-
-	case ANY:
-	    if ((parm + p->pe_ucode) == 0 || *(PE *) (parm + p->pe_ucode) == 0)
+		case ANY:
+			if ((parm + p->pe_ucode) == 0 || *(PE *) (parm + p->pe_ucode) == 0)
 #if ROSAP_HACK
-		/* hack for ROSAP. expects this strangeness */
-		pe = pe_alloc(PE_CLASS_UNIV, PE_FORM_PRIM, PE_PRIM_NULL);
+				/* hack for ROSAP. expects this strangeness */
+				pe = pe_alloc(PE_CLASS_UNIV, PE_FORM_PRIM, PE_PRIM_NULL);
 #else
-		pe = NULLPE;
+				pe = NULLPE;
 #endif
-	    else
-		(pe = *(PE *) (parm + p->pe_ucode))->pe_refcnt++;
-	    break;
+			else
+				(pe = *(PE *) (parm + p->pe_ucode))->pe_refcnt++;
+			break;
 
-	case SOCTETSTRING:
-	    if ((pe = qb2prim((struct qbuf *) (parm + p->pe_ucode), CLASS(p), TAG(p)))
-		== NULLPE)
-		return oom(mod, p)
-	    break;
+		case SOCTETSTRING:
+			if ((pe = qb2prim((struct qbuf *) (parm + p->pe_ucode), CLASS(p), TAG(p)))
+			    == NULLPE)
+				return oom(mod, p)
+				    break;
 
-	case OCTETSTRING:
-	    if ((pe = qb2prim(*(struct qbuf **) (parm + p->pe_ucode),
-			      CLASS(p), TAG(p))) == NULLPE)
-		return oom(mod, p);
-	    break;
+		case OCTETSTRING:
+			if ((pe = qb2prim(*(struct qbuf **) (parm + p->pe_ucode),
+					  CLASS(p), TAG(p))) == NULLPE)
+				return oom(mod, p);
+			break;
 
-	case T_STRING:
-	    if (*(char **) (parm + p->pe_ucode) == NULLCP)
-		return pepsylose (mod, &p[1], NULLPE,
-				  "en_type:T_STRING missing pointer");
-	    if ((pe = str2prim(*(char **) (parm + p->pe_ucode),
-			      strlen(*(char **) (parm + p->pe_ucode)),
-			      CLASS(p), TAG(p))) == NULLPE)
-		return oom(mod, p);
-	    break;
+		case T_STRING:
+			if (*(char **) (parm + p->pe_ucode) == NULLCP)
+				return pepsylose(mod, &p[1], NULLPE,
+						 "en_type:T_STRING missing pointer");
+			if ((pe = str2prim(*(char **) (parm + p->pe_ucode),
+					   strlen(*(char **) (parm + p->pe_ucode)),
+					   CLASS(p), TAG(p))) == NULLPE)
+				return oom(mod, p);
+			break;
 
-	case OCTET_PTR:
-	    if (p[1].pe_type != OCTET_LEN)
-		return pepsylose (mod, &p[1], NULLPE,
-				  "en_type:missing OCTET_LEN");
+		case OCTET_PTR:
+			if (p[1].pe_type != OCTET_LEN)
+				return pepsylose(mod, &p[1], NULLPE, "en_type:missing OCTET_LEN");
 
-	    if (*(char **) (parm + p->pe_ucode) == NULLCP)
-		return pepsylose (mod, &p[1], NULLPE,
-				  "en_type:OCTET_PTR  missing pointer");
+			if (*(char **) (parm + p->pe_ucode) == NULLCP)
+				return pepsylose(mod, &p[1], NULLPE,
+						 "en_type:OCTET_PTR  missing pointer");
 
-	    if (*(int *) (parm + (p + 1)->pe_ucode) < 0)
-		return pepsylose (mod, &p[1], NULLPE,
-				  "en_type:OCTET_LEN negative length");
+			if (*(int *) (parm + (p + 1)->pe_ucode) < 0)
+				return pepsylose(mod, &p[1], NULLPE,
+						 "en_type:OCTET_LEN negative length");
 
-	    if ((pe = str2prim(*(char **) (parm + p->pe_ucode),
-			      *(int *) (parm + (p + 1)->pe_ucode),
-			      CLASS(p), TAG(p))) == NULLPE)
-		return oom(mod, p);
-	    break;
+			if ((pe = str2prim(*(char **) (parm + p->pe_ucode),
+					   *(int *) (parm + (p + 1)->pe_ucode),
+					   CLASS(p), TAG(p))) == NULLPE)
+				return oom(mod, p);
+			break;
 
-	case BITSTR_PTR:
-	    if (p[1].pe_type != BITSTR_LEN)
-		return pepsylose (mod, &p[1], NULLPE,
-				  "en_type:missing BITSTR_LEN");
+		case BITSTR_PTR:
+			if (p[1].pe_type != BITSTR_LEN)
+				return pepsylose(mod, &p[1], NULLPE, "en_type:missing BITSTR_LEN");
 
-	    if (*(char **) (parm + p->pe_ucode) == NULLCP)
-		return pepsylose (mod, &p[1], NULLPE,
-				  "en_type:BITSTR_PTR  missing pointer");
+			if (*(char **) (parm + p->pe_ucode) == NULLCP)
+				return pepsylose(mod, &p[1], NULLPE,
+						 "en_type:BITSTR_PTR  missing pointer");
 
-	    if (*(int *) (parm + (p + 1)->pe_ucode) < 0)
-		return pepsylose (mod, &p[1], NULLPE,
-				  "en_type:BITSTR_LEN negative length");
+			if (*(int *) (parm + (p + 1)->pe_ucode) < 0)
+				return pepsylose(mod, &p[1], NULLPE,
+						 "en_type:BITSTR_LEN negative length");
 
-	    if ((pe = strb2bitstr(*(char **) (parm + p->pe_ucode),
-			      *(int *) (parm + (p + 1)->pe_ucode),
-			      CLASS(p), TAG(p))) == NULLPE
-		|| (pe = bit2prim(pe)) == NULLPE)
-		return oom(mod, p);
-	    break;
+			if ((pe = strb2bitstr(*(char **) (parm + p->pe_ucode),
+					      *(int *) (parm + (p + 1)->pe_ucode),
+					      CLASS(p), TAG(p))) == NULLPE
+			    || (pe = bit2prim(pe)) == NULLPE)
+				return oom(mod, p);
+			break;
 
-	case SBITSTRING:
-	    if ((cp = bitstr2strb((PE) (parm + p->pe_ucode), &i)) == NULL)
-		return oom(mod, p);
-	    if ((pe = strb2bitstr(cp, i, CLASS(p), TAG(p))) == NULLPE)
-		return oom(mod, p);
-	    free(cp);
-	    if ((pe = bit2prim(pe)) == NULLPE)
-		return oom(mod, p);
-	    break;
+		case SBITSTRING:
+			if ((cp = bitstr2strb((PE) (parm + p->pe_ucode), &i)) == NULL)
+				return oom(mod, p);
+			if ((pe = strb2bitstr(cp, i, CLASS(p), TAG(p))) == NULLPE)
+				return oom(mod, p);
+			free(cp);
+			if ((pe = bit2prim(pe)) == NULLPE)
+				return oom(mod, p);
+			break;
 
-	case BITSTRING:
-	    if ((cp = bitstr2strb(*(PE *) (parm + p->pe_ucode), &i))
-		== NULL)
-		return oom(mod, p);
+		case BITSTRING:
+			if ((cp = bitstr2strb(*(PE *) (parm + p->pe_ucode), &i))
+			    == NULL)
+				return oom(mod, p);
 
-	    if ((pe = strb2bitstr(cp, i, CLASS(p), TAG(p))) == NULLPE)
-		return oom(mod, p);
+			if ((pe = strb2bitstr(cp, i, CLASS(p), TAG(p))) == NULLPE)
+				return oom(mod, p);
 
-	    free(cp);
-	    if ((pe = bit2prim(pe)) == NULLPE)
-		return oom(mod, p);
-	    break;
+			free(cp);
+			if ((pe = bit2prim(pe)) == NULLPE)
+				return oom(mod, p);
+			break;
 
-	case SOBJID:
-	    if ((pe = obj2prim((OID) (parm + p->pe_ucode), CLASS(p), TAG(p))) == NULLPE)
-		return oom(mod, p);
-	    break;
+		case SOBJID:
+			if ((pe = obj2prim((OID) (parm + p->pe_ucode), CLASS(p), TAG(p))) == NULLPE)
+				return oom(mod, p);
+			break;
 
-	case OBJID:
-	    if ((pe = obj2prim(*(OID *) (parm + p->pe_ucode), CLASS(p), TAG(p)))
-		== NULLPE)
-		return oom(mod, p);
-	    break;
+		case OBJID:
+			if ((pe = obj2prim(*(OID *) (parm + p->pe_ucode), CLASS(p), TAG(p)))
+			    == NULLPE)
+				return oom(mod, p);
+			break;
 
-	case FN_CALL:
-	    if ((FN_PTR(mod, p))(parm, &pe) == NOTOK)
-		return pepsylose (mod, p, NULLPE,
-				  "en_type:FN_CALL:call failed");
-	    if (STAG(p) >= 0) {
-		pe->pe_class = CLASS(p);
-		pe->pe_id = TAG(p);
-	    }
-	    break;
+		case FN_CALL:
+			if ((FN_PTR(mod, p)) (parm, &pe) == NOTOK)
+				return pepsylose(mod, p, NULLPE, "en_type:FN_CALL:call failed");
+			if (STAG(p) >= 0) {
+				pe->pe_class = CLASS(p);
+				pe->pe_id = TAG(p);
+			}
+			break;
 
-	default:
-	    return pepsylose (mod, p, NULLPE, "en_type: type not implemented");
+		default:
+			return pepsylose(mod, p, NULLPE, "en_type: type not implemented");
+		}
+		if (ISDTYPE(p) && cnt++ > 0)
+			return pepsylose(mod, p, NULLPE, "en_type:compound type found");
+
+		if (ISDTYPE(p)) {
+			if (pe == NULLPE)
+				return pepsylose(mod, p, NULLPE,
+						 "en_type: missing mandatory value");
+		}
+		if (ISDTYPE(p) && pe != NULLPE)
+			return (RET_OK(rpe, pe));
+		if (NEXT_TPE(p) == NULLTPE)
+			goto bad;
 	}
-	if (ISDTYPE(p) && cnt++ > 0)
-	    return pepsylose (mod, p, NULLPE, "en_type:compound type found");
 
-	if (ISDTYPE(p)) {
-	    if (pe == NULLPE)
-		return pepsylose (mod, p, NULLPE,
-				  "en_type: missing mandatory value");
-	}
-	if (ISDTYPE(p) && pe != NULLPE)
-	    return (RET_OK(rpe, pe));
-	if (NEXT_TPE(p) == NULLTPE)
-	    goto bad;
-    }
+	return (RET_OK(rpe, pe));
 
-    return (RET_OK(rpe, pe));
-
-bad:
-    return (NOTOK);
+      bad:
+	return (NOTOK);
 }
 
 /*
@@ -536,382 +576,377 @@ bad:
  */
 static int
 en_seq(parm, p, mod, rpe)
-PEPYPARM parm;
-ptpe    *p;
-modtyp *mod;			/* Module it is from */
-PE	*rpe;		/* Return value PE */
+	PEPYPARM parm;
+	ptpe *p;
+	modtyp *mod;			/* Module it is from */
+	PE *rpe;			/* Return value PE */
 {
-    PE      head;
-    PE      pe = NULLPE;
-    ptpe    *tmp;		/* first entry in list */
-    int    *popt = NULL;	/* Pointer to optional field */
-    int     optcnt = 0;		/* Number of optionals bits so far */
-    int	    val;
+	PE head;
+	PE pe = NULLPE;
+	ptpe *tmp;			/* first entry in list */
+	int *popt = NULL;		/* Pointer to optional field */
+	int optcnt = 0;			/* Number of optionals bits so far */
+	int val;
 
-    DLOG (psap_log, LLOG_DEBUG, ("Encode SEQUENCE %s.%s type %s",
-				 mod -> md_name, pname(p),
-				 pr_petype(p->pe_type)));
+	DLOG(psap_log, LLOG_DEBUG, ("Encode SEQUENCE %s.%s type %s",
+				    mod->md_name, pname(p), pr_petype(p->pe_type)));
 
-    if (p->pe_type != SEQ_START && p->pe_type != SSEQ_START)
-	    return (pepsylose (mod, p, pe, "en_seq: missing SEQ_START\n"));
+	if (p->pe_type != SEQ_START && p->pe_type != SSEQ_START)
+		return (pepsylose(mod, p, pe, "en_seq: missing SEQ_START\n"));
 
-    if ((head = pe_alloc(CLASS(p), PE_FORM_CONS, TAG(p))) == NULLPE)
-	return oom (mod, p);
-    p++;
+	if ((head = pe_alloc(CLASS(p), PE_FORM_CONS, TAG(p))) == NULLPE)
+		return oom(mod, p);
+	p++;
 
-    while (p->pe_type != PE_END) {
+	while (p->pe_type != PE_END) {
 
-	DLOG (psap_log, LLOG_DEBUG, ("Encode SEQUENCE member %s.%s type %s",
-				     mod -> md_name, pname(p),
-				     pr_petype(p->pe_type)));
+		DLOG(psap_log, LLOG_DEBUG, ("Encode SEQUENCE member %s.%s type %s",
+					    mod->md_name, pname(p), pr_petype(p->pe_type)));
 
-	if (ISDTYPE(p) && OPTIONAL(p)) {
-	    switch (p->pe_type) {
-	    case INTEGER:
-	    case REALTYPE:
-	    case BOOLEAN:
-	    case T_NULL:
-		if (!TESTBIT(*popt, optcnt++))
-		    goto next;	/* Missing so skip */
-		break;
+		if (ISDTYPE(p) && OPTIONAL(p)) {
+			switch (p->pe_type) {
+			case INTEGER:
+			case REALTYPE:
+			case BOOLEAN:
+			case T_NULL:
+				if (!TESTBIT(*popt, optcnt++))
+					goto next;	/* Missing so skip */
+				break;
 
-	    case FN_CALL:
-		if ((val = hasdata(parm, p, mod, popt, &optcnt)) == NOTOK)
-		    goto bad;
-		if (val == 0)
-		    goto next;
-		break;
+			case FN_CALL:
+				if ((val = hasdata(parm, p, mod, popt, &optcnt)) == NOTOK)
+					goto bad;
+				if (val == 0)
+					goto next;
+				break;
 
-	    case ETAG:
-		if ((val = hasdata(parm, p + 1, mod, popt, &optcnt)) == NOTOK)
-		    goto bad;
-		if (val == 0)
-		    goto next;
-		break;
+			case ETAG:
+				if ((val = hasdata(parm, p + 1, mod, popt, &optcnt)) == NOTOK)
+					goto bad;
+				if (val == 0)
+					goto next;
+				break;
 
-	    case IMP_OBJ:
-		if ((p[1].pe_type == SOBJECT && parm == NULL)
-		    || *((char **) (parm + p[1].pe_ucode)) == NULL)
-		    goto next;
-		break;
+			case IMP_OBJ:
+				if ((p[1].pe_type == SOBJECT && parm == NULL)
+				    || *((char **) (parm + p[1].pe_ucode)) == NULL)
+					goto next;
+				break;
 
-	    case SOBJECT:
-		if (((char *) parm) == NULL)
-		    goto next;
-		break;
+			case SOBJECT:
+				if (((char *) parm) == NULL)
+					goto next;
+				break;
 
-	    default:
-		if (*((char **) (parm + p->pe_ucode)) == NULL)
-		    goto next;
-		break;
-	    }
+			default:
+				if (*((char **) (parm + p->pe_ucode)) == NULL)
+					goto next;
+				break;
+			}
+		}
+		switch (p->pe_type) {
+		case OPTL:
+			popt = (int *) (parm + p->pe_ucode);
+			break;
+
+		case UCODE:
+			if (mod->md_eucode == NULLIFP || (*mod->md_eucode) (parm, &pe, p) == NOTOK)
+				goto bad;
+			break;
+
+		case ETAG:
+			if (en_type(parm, p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case SEQ_START:
+			if (en_seq(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case SEQOF_START:
+			if (en_seqof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case SET_START:
+			if (en_set(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case SETOF_START:
+			if (en_setof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case IMP_OBJ:
+			tmp = p++;
+			if (p->pe_type == EXTOBJ || p->pe_type == SEXTOBJ) {
+				if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
+					  0, (char *) 0, *(char **) (parm + p->pe_ucode)) == NOTOK)
+					return (NOTOK);
+			} else if (p->pe_type == SOBJECT) {
+				if (en_obj
+				    ((char *) (parm + p->pe_ucode), mod->md_etab[p->pe_tag] + 1,
+				     mod, &pe) == NOTOK)
+					goto bad;
+			} else
+			    if (en_obj(*(char **) (parm + p->pe_ucode),
+				       mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+				goto bad;
+			pe->pe_class = CLASS(tmp);
+			pe->pe_id = TAG(tmp);
+			break;
+
+		case SOBJECT:
+			if (en_obj
+			    ((char *) (parm + p->pe_ucode), mod->md_etab[p->pe_tag] + 1, mod, &pe)
+			    == NOTOK)
+				goto bad;
+			break;
+
+		case OBJECT:
+			if (en_obj(*(char **) (parm + p->pe_ucode),
+				   mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case CHOICE_START:
+			if (en_choice(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case SCHOICE_START:
+			if (en_choice((char *) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case SEXTOBJ:
+			if (p[1].pe_type != EXTMOD)
+				return pepsylose(mod, &p[1], NULLPE, "en_seq: missing EXTMOD");
+			if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *) 0,
+				  (char *) (parm + p->pe_ucode)) == NOTOK)
+				return (NOTOK);
+			break;
+
+		case EXTOBJ:
+			if (p[1].pe_type != EXTMOD)
+				return pepsylose(mod, &p[1], NULLPE, "en_seq: missing EXTMOD");
+
+			if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *) 0,
+				  *(char **) (parm + p->pe_ucode)) == NOTOK)
+				return (NOTOK);
+			break;
+
+		default:
+			if (en_type(parm, p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+		}
+
+		if ((ISDTYPE(p) || p->pe_type == BOPTIONAL) && pe != NULLPE) {
+			if (seq_add(head, pe, -1) == NOTOK)
+				return pepsylose(mod, p, NULLPE, "en_seq bad sequence: %s",
+						 pe_error(pe->pe_errno));
+		}
+	      next:
+		if (NEXT_TPE(p) == NULLTPE)
+			return (NOTOK);
 	}
-	switch (p->pe_type) {
-	case OPTL:
-	    popt = (int *) (parm + p->pe_ucode);
-	    break;
 
-	case UCODE:
-	    if (mod->md_eucode == NULLIFP
-	    || (*mod->md_eucode) (parm, &pe, p) == NOTOK)
-		goto bad;
-	    break;
+	return (RET_OK(rpe, head));
 
-	case ETAG:
-	    if (en_type(parm, p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case SEQ_START:
-	    if (en_seq(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case SEQOF_START:
-	    if (en_seqof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case SET_START:
-	    if (en_set(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case SETOF_START:
-	    if (en_setof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case IMP_OBJ:
-	    tmp = p++;
-	    if (p->pe_type == EXTOBJ || p->pe_type == SEXTOBJ) {
-		if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
-		      0, (char *)0, *(char **) (parm + p->pe_ucode)) == NOTOK)
-		      return (NOTOK);
-	    } else if (p->pe_type == SOBJECT) {
-		if (en_obj((char *) (parm + p->pe_ucode), mod->md_etab[p->pe_tag] + 1, mod,
-		      &pe) == NOTOK)
-		    goto bad;
-	    } else
-		if (en_obj(*(char **) (parm + p->pe_ucode),
-			mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-		    goto bad;
-	    pe->pe_class = CLASS(tmp);
-	    pe->pe_id = TAG(tmp);
-	    break;
-
-	case SOBJECT:
-	    if (en_obj((char *) (parm + p->pe_ucode), mod->md_etab[p->pe_tag] + 1, mod, &pe)
-		    == NOTOK)
-		goto bad;
-	    break;
-
-	case OBJECT:
-	    if (en_obj(*(char **) (parm + p->pe_ucode),
-		    mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case CHOICE_START:
-	    if (en_choice(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case SCHOICE_START:
-	    if (en_choice((char *) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case SEXTOBJ:
-	    if (p[1].pe_type != EXTMOD)
-		return pepsylose (mod, &p[1], NULLPE, "en_seq: missing EXTMOD");
-	    if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *)0,
-		  (char *) (parm + p->pe_ucode)) == NOTOK)
-		  return (NOTOK);
-	    break;
-
-	case EXTOBJ:
-	    if (p[1].pe_type != EXTMOD)
-		return pepsylose (mod, &p[1], NULLPE, "en_seq: missing EXTMOD");
-
-	    if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *)0,
-		  *(char **) (parm + p->pe_ucode)) == NOTOK)
-		  return (NOTOK);
-	    break;
-
-	default:
-	    if (en_type(parm, p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-	}
-
-	if ((ISDTYPE(p) || p->pe_type == BOPTIONAL) && pe != NULLPE) {
-	    if (seq_add(head, pe, -1) == NOTOK)
-		return pepsylose (mod, p, NULLPE, "en_seq bad sequence: %s",
-		       pe_error(pe->pe_errno));
-	}
-next:
-	if (NEXT_TPE(p) == NULLTPE)
-	    return (NOTOK);
-    }
-
-    return (RET_OK(rpe, head));
-
-bad:
-    return (NOTOK);
+      bad:
+	return (NOTOK);
 }
-
 
 /*
  * Parse a set, calling appropriate routines to parse each sub type
  */
 static int
 en_set(parm, p, mod, rpe)
-PEPYPARM parm;
-ptpe    *p;
-modtyp *mod;			/* Module it is from */
-PE	*rpe;		/* Return value PE */
+	PEPYPARM parm;
+	ptpe *p;
+	modtyp *mod;			/* Module it is from */
+	PE *rpe;			/* Return value PE */
 {
-    PE      head;
-    PE      pe = NULLPE;
-    ptpe    *tmp;
-    int    *popt = NULL;	/* Pointer to optional field */
-    int     optcnt = 0;		/* Number of optionals bits so far */
-    int	    val;
+	PE head;
+	PE pe = NULLPE;
+	ptpe *tmp;
+	int *popt = NULL;		/* Pointer to optional field */
+	int optcnt = 0;			/* Number of optionals bits so far */
+	int val;
 
-    if (p->pe_type != SET_START && p->pe_type != SSET_START)
-	return pepsylose (mod, p, pe, "en_set: missing SET_START");
+	if (p->pe_type != SET_START && p->pe_type != SSET_START)
+		return pepsylose(mod, p, pe, "en_set: missing SET_START");
 
-    DLOG (psap_log, LLOG_DEBUG, ("Encode SET %s.%s type %s",
-				 mod -> md_name, pname(p),
-				 pr_petype(p->pe_type)));
+	DLOG(psap_log, LLOG_DEBUG, ("Encode SET %s.%s type %s",
+				    mod->md_name, pname(p), pr_petype(p->pe_type)));
 
-    if ((head = pe_alloc(CLASS(p), PE_FORM_CONS, TAG(p))) == NULLPE)
-	return oom(mod, p);
+	if ((head = pe_alloc(CLASS(p), PE_FORM_CONS, TAG(p))) == NULLPE)
+		return oom(mod, p);
 
-    p++;
-    while (p->pe_type != PE_END) {
+	p++;
+	while (p->pe_type != PE_END) {
 
-	DLOG (psap_log, LLOG_DEBUG, ("Encode SET member %s.%s",
-				     mod -> md_name, pname(p),
-				     pr_petype(p->pe_type)));
+		DLOG(psap_log, LLOG_DEBUG, ("Encode SET member %s.%s",
+					    mod->md_name, pname(p), pr_petype(p->pe_type)));
 
-	if (ISDTYPE(p) && OPTIONAL(p)) {
-	    switch (p->pe_type) {
-	    case INTEGER:
-	    case REALTYPE:
-	    case BOOLEAN:
-	    case T_NULL:
-		if (!TESTBIT(*popt, optcnt++))
-		    goto next;	/* Missing so skip */
-		break;
+		if (ISDTYPE(p) && OPTIONAL(p)) {
+			switch (p->pe_type) {
+			case INTEGER:
+			case REALTYPE:
+			case BOOLEAN:
+			case T_NULL:
+				if (!TESTBIT(*popt, optcnt++))
+					goto next;	/* Missing so skip */
+				break;
 
-	    case FN_CALL:
-		if ((val = hasdata(parm, p, mod, popt, &optcnt)) == NOTOK)
-		    goto bad;
-		if (val == 0)
-		    goto next;
-		break;
+			case FN_CALL:
+				if ((val = hasdata(parm, p, mod, popt, &optcnt)) == NOTOK)
+					goto bad;
+				if (val == 0)
+					goto next;
+				break;
 
-	    case ETAG:
-		if ((val = hasdata(parm, p + 1, mod, popt, &optcnt)) == NOTOK)
-		    goto bad;
-		if (val == 0)
-		    goto next;
-		break;
+			case ETAG:
+				if ((val = hasdata(parm, p + 1, mod, popt, &optcnt)) == NOTOK)
+					goto bad;
+				if (val == 0)
+					goto next;
+				break;
 
-	    case IMP_OBJ:
-		if ((p[1].pe_type == SOBJECT && parm == NULL)
-		    || *((char **) (parm + p[1].pe_ucode)) == NULL)
-		    goto next;
-		break;
+			case IMP_OBJ:
+				if ((p[1].pe_type == SOBJECT && parm == NULL)
+				    || *((char **) (parm + p[1].pe_ucode)) == NULL)
+					goto next;
+				break;
 
-	    case SOBJECT:
-		if (((char *) (parm + p->pe_ucode)) == NULL)
-		    goto next;
-		break;
+			case SOBJECT:
+				if (((char *) (parm + p->pe_ucode)) == NULL)
+					goto next;
+				break;
 
-	    default:
-		if (*((char **) (parm + p->pe_ucode)) == NULL)
-		    goto next;
-		break;
-	    }
+			default:
+				if (*((char **) (parm + p->pe_ucode)) == NULL)
+					goto next;
+				break;
+			}
+		}
+		switch (p->pe_type) {
+		case OPTL:
+			popt = (int *) (parm + p->pe_ucode);
+			break;
+
+		case UCODE:
+			if (mod->md_eucode == NULLIFP || (*mod->md_eucode) (parm, &pe, p) == NOTOK)
+				goto bad;
+			break;
+
+		case ETAG:
+			if (en_type(parm, p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case SEQ_START:
+			if (en_seq(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case SEQOF_START:
+			if (en_seqof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case SET_START:
+			if (en_set(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case SETOF_START:
+			if (en_setof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case IMP_OBJ:
+			tmp = p++;
+			if (p->pe_type == EXTOBJ || p->pe_type == SEXTOBJ) {
+				if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
+					  0, (char *) 0, *(char **) (parm + p->pe_ucode)) == NOTOK)
+					return (NOTOK);
+			} else if (p->pe_type == SOBJECT) {
+				if (en_obj
+				    ((char *) parm + p->pe_ucode, mod->md_etab[p->pe_tag] + 1, mod,
+				     &pe) == NOTOK)
+					goto bad;
+			} else
+			    if (en_obj(*(char **) (parm + p->pe_ucode),
+				       mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+				goto bad;
+			pe->pe_class = CLASS(tmp);
+			pe->pe_id = TAG(tmp);
+			break;
+
+		case SOBJECT:
+			if (en_obj(parm + p->pe_ucode, mod->md_etab[p->pe_tag] + 1, mod, &pe) ==
+			    NOTOK)
+				goto bad;
+			break;
+
+		case OBJECT:
+			if (en_obj(*(char **) (parm + p->pe_ucode),
+				   mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case CHOICE_START:
+			if (en_choice(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case SCHOICE_START:
+			if (en_choice((char *) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+
+		case SEXTOBJ:
+			if (p[1].pe_type != EXTMOD)
+				return pepsylose(mod, p, NULLPE, "en_set: missing EXTMOD");
+
+			if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *) 0,
+				  parm + p->pe_ucode) == NOTOK)
+				return (NOTOK);
+			break;
+
+		case EXTOBJ:
+			if (p[1].pe_type != EXTMOD)
+				return pepsylose(mod, p, NULLPE, "en_set: missing EXTMOD");
+
+			if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *) 0,
+				  *(char **) (parm + p->pe_ucode)) == NOTOK)
+				return (NOTOK);
+			break;
+
+		default:
+			if (en_type(parm, p, mod, &pe) == NOTOK)
+				goto bad;
+			break;
+		}
+
+		if ((ISDTYPE(p) || p->pe_type == BOPTIONAL) && pe != NULLPE) {
+			if (set_add(head, pe) == NOTOK)
+				return pepsylose(mod, p, NULLPE, "en_set bad set: %s",
+						 pe_error(pe->pe_errno));
+		}
+	      next:
+		NEXT_TPE(p);
 	}
-	switch (p->pe_type) {
-	case OPTL:
-	    popt = (int *) (parm + p->pe_ucode);
-	    break;
 
-	case UCODE:
-	    if (mod->md_eucode == NULLIFP
-	    || (*mod->md_eucode) (parm, &pe, p) == NOTOK)
-		goto bad;
-	    break;
+	return (RET_OK(rpe, head));
 
-	case ETAG:
-	    if (en_type(parm, p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case SEQ_START:
-	    if (en_seq(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case SEQOF_START:
-	    if (en_seqof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case SET_START:
-	    if (en_set(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case SETOF_START:
-	    if (en_setof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case IMP_OBJ:
-	    tmp = p++;
-	    if (p->pe_type == EXTOBJ || p->pe_type == SEXTOBJ) {
-		if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
-		      0, (char *)0, *(char **) (parm + p->pe_ucode)) == NOTOK)
-		      return (NOTOK);
-	    } else if (p->pe_type == SOBJECT) {
-		if (en_obj((char *) parm + p->pe_ucode, mod->md_etab[p->pe_tag] + 1, mod,
-			&pe) == NOTOK)
-		    goto bad;
-	    } else
-		if (en_obj(*(char **) (parm + p->pe_ucode),
-			mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-		    goto bad;
-	    pe->pe_class = CLASS(tmp);
-	    pe->pe_id = TAG(tmp);
-	    break;
-
-	case SOBJECT:
-	    if (en_obj(parm + p->pe_ucode, mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case OBJECT:
-	    if (en_obj(*(char **) (parm + p->pe_ucode),
-		    mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case CHOICE_START:
-	    if (en_choice(*(char **) (parm + p->pe_ucode), p, mod, &pe) ==NOTOK)
-		goto bad;
-	    break;
-
-
-	case SCHOICE_START:
-	    if (en_choice((char *) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-
-	case SEXTOBJ:
-	    if (p[1].pe_type != EXTMOD)
-		return pepsylose (mod, p, NULLPE, "en_set: missing EXTMOD");
-
-	    if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *)0,
-		  parm + p->pe_ucode) == NOTOK)
-		  return (NOTOK);
-	    break;
-
-	case EXTOBJ:
-	    if (p[1].pe_type != EXTMOD) 
-		return pepsylose (mod, p, NULLPE, "en_set: missing EXTMOD");
-
-	    if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *)0,
-		  *(char **) (parm + p->pe_ucode)) == NOTOK)
-		  return (NOTOK);
-	    break;
-
-	default:
-	    if (en_type(parm, p, mod, &pe) == NOTOK)
-		goto bad;
-	    break;
-	}
-
-	if ((ISDTYPE(p) || p->pe_type == BOPTIONAL) && pe != NULLPE) {
-	    if (set_add(head, pe) == NOTOK)
-		return pepsylose (mod, p, NULLPE, "en_set bad set: %s",
-				  pe_error(pe->pe_errno));
-	}
-next:
-	NEXT_TPE(p);
-    }
-
-    return (RET_OK(rpe, head));
-
-bad:
-    return (NOTOK);
+      bad:
+	return (NOTOK);
 }
-
 
 /*
  * Parse a sequence of calling appropriate routines to parse each sub
@@ -919,151 +954,152 @@ bad:
  */
 static int
 en_seqof(parm, p, mod, rpe)
-PEPYPARM parm;
-ptpe    *p;
-modtyp *mod;			/* Module it is from */
-PE	*rpe;		/* Return value PE */
+	PEPYPARM parm;
+	ptpe *p;
+	modtyp *mod;			/* Module it is from */
+	PE *rpe;			/* Return value PE */
 {
-    PE      head;
-    PE      pe = NULLPE;
-    ptpe    *start;		/* first entry in list */
-    ptpe    *tmp;
+	PE head;
+	PE pe = NULLPE;
+	ptpe *start;			/* first entry in list */
+	ptpe *tmp;
 
-    if (p->pe_type != SEQOF_START && p->pe_type != SSEQOF_START)
-	return pepsylose (mod, p, NULLPE, "en_seqof: missing SEQOF_START");
+	if (p->pe_type != SEQOF_START && p->pe_type != SSEQOF_START)
+		return pepsylose(mod, p, NULLPE, "en_seqof: missing SEQOF_START");
 
-    DLOG (psap_log, LLOG_DEBUG, ("Encode SEQUENCE of %s.%s type %s",
-				 mod -> md_name, pname(p),
-				 pr_petype(p->pe_type)));
+	DLOG(psap_log, LLOG_DEBUG, ("Encode SEQUENCE of %s.%s type %s",
+				    mod->md_name, pname(p), pr_petype(p->pe_type)));
 
-    if ((head = pe_alloc(CLASS(p), PE_FORM_CONS, TAG(p))) == NULLPE)
-	return oom(mod, p);
+	if ((head = pe_alloc(CLASS(p), PE_FORM_CONS, TAG(p))) == NULLPE)
+		return oom(mod, p);
 
-    start = p;
-    while ((char *) parm != NULL) {
-	p++;
-	while (p->pe_type != PE_END) {
+	start = p;
+	while ((char *) parm != NULL) {
+		p++;
+		while (p->pe_type != PE_END) {
 
-	    DLOG (psap_log, LLOG_DEBUG,
-		  ("Encode SEQUENCE OF member %s.%s type %s",
-		   mod -> md_name, pname(p),
-		   pr_petype(p->pe_type)));
+			DLOG(psap_log, LLOG_DEBUG,
+			     ("Encode SEQUENCE OF member %s.%s type %s",
+			      mod->md_name, pname(p), pr_petype(p->pe_type)));
 
-	    switch (p->pe_type) {
-	    case UCODE:
-		if (mod->md_eucode == NULLIFP
-		|| (*mod->md_eucode) (parm, &pe, p) == NOTOK)
-		    goto bad;
-		break;
+			switch (p->pe_type) {
+			case UCODE:
+				if (mod->md_eucode == NULLIFP
+				    || (*mod->md_eucode) (parm, &pe, p) == NOTOK)
+					goto bad;
+				break;
 
-	    case ETAG:
-		if (en_type(parm, p, mod, &pe) == NOTOK)
-		    goto bad;
-		break;
+			case ETAG:
+				if (en_type(parm, p, mod, &pe) == NOTOK)
+					goto bad;
+				break;
 
-	    case SEQ_START:
-		if (en_seq(*(char **) (parm + p->pe_ucode), p, mod, &pe)==NOTOK)
-		    goto bad;
-		break;
+			case SEQ_START:
+				if (en_seq(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+					goto bad;
+				break;
 
-	    case SEQOF_START:
-		if (en_seqof(*(char **) (parm + p->pe_ucode), p, mod, &pe)
-			== NOTOK)
-		    goto bad;
-		break;
+			case SEQOF_START:
+				if (en_seqof(*(char **) (parm + p->pe_ucode), p, mod, &pe)
+				    == NOTOK)
+					goto bad;
+				break;
 
-	    case SET_START:
-		if (en_set(*(char **) (parm + p->pe_ucode), p, mod, &pe)==NOTOK)
-		    goto bad;
-		break;
+			case SET_START:
+				if (en_set(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+					goto bad;
+				break;
 
-	    case SETOF_START:
-		if (en_setof(*(char **) (parm + p->pe_ucode), p, mod, &pe)
-			== NOTOK)
-		    goto bad;
-		break;
+			case SETOF_START:
+				if (en_setof(*(char **) (parm + p->pe_ucode), p, mod, &pe)
+				    == NOTOK)
+					goto bad;
+				break;
 
-	    case IMP_OBJ:
-		tmp = p++;
-		if (p->pe_type == EXTOBJ || p->pe_type == SEXTOBJ) {
-		    if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
-		       0, (char *)0, *(char **) (parm + p->pe_ucode)) == NOTOK)
-		       return (NOTOK);
-		} else if (p->pe_type == SOBJECT) {
-		    if (en_obj((char *) (parm + p->pe_ucode), mod->md_etab[p->pe_tag] + 1,
-			    mod, &pe) == NOTOK)
-			goto bad;
-		} else if (en_obj(*(char **) (parm + p->pe_ucode),
-			    mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-			goto bad;
-		pe->pe_class = CLASS(tmp);
-		pe->pe_id = TAG(tmp);
-		break;
+			case IMP_OBJ:
+				tmp = p++;
+				if (p->pe_type == EXTOBJ || p->pe_type == SEXTOBJ) {
+					if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
+						  0, (char *) 0,
+						  *(char **) (parm + p->pe_ucode)) == NOTOK)
+						return (NOTOK);
+				} else if (p->pe_type == SOBJECT) {
+					if (en_obj
+					    ((char *) (parm + p->pe_ucode),
+					     mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+						goto bad;
+				} else if (en_obj(*(char **) (parm + p->pe_ucode),
+						  mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+					goto bad;
+				pe->pe_class = CLASS(tmp);
+				pe->pe_id = TAG(tmp);
+				break;
 
-	    case SOBJECT:
-		if (en_obj(parm + p->pe_ucode, mod->md_etab[p->pe_tag] + 1, mod, &pe) ==NOTOK)
-		    goto bad;
-		break;
+			case SOBJECT:
+				if (en_obj
+				    (parm + p->pe_ucode, mod->md_etab[p->pe_tag] + 1, mod,
+				     &pe) == NOTOK)
+					goto bad;
+				break;
 
-	    case OBJECT:
-		if (en_obj(*(char **) (parm + p->pe_ucode),
-			mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-		    goto bad;
-		break;
+			case OBJECT:
+				if (en_obj(*(char **) (parm + p->pe_ucode),
+					   mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+					goto bad;
+				break;
 
-	    case CHOICE_START:
-		if (en_choice(*(char **) (parm + p->pe_ucode), p, mod, &pe)
-			== NOTOK)
-		    goto bad;
-		break;
+			case CHOICE_START:
+				if (en_choice(*(char **) (parm + p->pe_ucode), p, mod, &pe)
+				    == NOTOK)
+					goto bad;
+				break;
 
+			case SCHOICE_START:
+				if (en_choice((char *) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+					goto bad;
+				break;
 
-	    case SCHOICE_START:
-		if (en_choice((char *) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		    goto bad;
-		break;
+			case SEXTOBJ:
+				if (p[1].pe_type != EXTMOD)
+					return pepsylose(mod, p + 1, NULLPE,
+							 "en_seqof: missing EXTMOD");
+				if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *) 0,
+					  parm + p->pe_ucode) == NOTOK)
+					return (NOTOK);
+				break;
 
-	    case SEXTOBJ:
-		if (p[1].pe_type != EXTMOD)
-		    return pepsylose (mod, p+1, NULLPE,
-				      "en_seqof: missing EXTMOD");
-		if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *)0,
-		      parm + p->pe_ucode) == NOTOK)
-		      return (NOTOK);
-		break;
+			case EXTOBJ:
+				if (p[1].pe_type != EXTMOD)
+					return pepsylose(mod, p + 1, NULLPE,
+							 "en_seqof: missing EXTMOD");
 
-	    case EXTOBJ:
-		if (p[1].pe_type != EXTMOD) 
-		    return pepsylose (mod, p+1, NULLPE,
-				      "en_seqof: missing EXTMOD");
+				if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *) 0,
+					  *(char **) (parm + p->pe_ucode)) == NOTOK)
+					return (NOTOK);
+				break;
 
-		if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *)0,
-		      *(char **) (parm + p->pe_ucode)) == NOTOK)
-		      return (NOTOK);
-		break;
-
-	    default:
-		if (en_type(parm, p, mod, &pe) == NOTOK)
-		    goto bad;
-		break;
-	    }
-	    if (ISDTYPE(p) && pe != NULLPE) {
-		if (seq_add(head, pe, -1) == NOTOK)
-		    return pepsylose (mod, p, NULLPE,
-				      "en_seqof bad sequence: %s",
-				      pe_error(pe->pe_errno));
-	    }
-	    if (NEXT_TPE(p) == NULLTPE)
-		goto bad;
+			default:
+				if (en_type(parm, p, mod, &pe) == NOTOK)
+					goto bad;
+				break;
+			}
+			if (ISDTYPE(p) && pe != NULLPE) {
+				if (seq_add(head, pe, -1) == NOTOK)
+					return pepsylose(mod, p, NULLPE,
+							 "en_seqof bad sequence: %s",
+							 pe_error(pe->pe_errno));
+			}
+			if (NEXT_TPE(p) == NULLTPE)
+				goto bad;
+		}
+		parm = *(char **) (parm + p->pe_ucode);	/* Any more ? */
+		p = start;
 	}
-	parm = *(char **) (parm + p->pe_ucode);	/* Any more ? */
-	p = start;
-    }
 
-    return (RET_OK(rpe, head));
+	return (RET_OK(rpe, head));
 
-bad:
-    return (NOTOK);
+      bad:
+	return (NOTOK);
 }
 
 /*
@@ -1071,153 +1107,153 @@ bad:
  */
 static int
 en_setof(parm, p, mod, rpe)
-PEPYPARM parm;
-ptpe    *p;
-modtyp *mod;			/* Module it is from */
-PE	*rpe;		/* Return value PE */
+	PEPYPARM parm;
+	ptpe *p;
+	modtyp *mod;			/* Module it is from */
+	PE *rpe;			/* Return value PE */
 {
-    PE      head;
-    PE      pe = NULLPE, last = NULLPE;
-    ptpe    *start;
-    ptpe    *tmp;
+	PE head;
+	PE pe = NULLPE, last = NULLPE;
+	ptpe *start;
+	ptpe *tmp;
 
-    if (p->pe_type != SETOF_START && p->pe_type != SSETOF_START)
-	return pepsylose (mod, p, NULLPE, "en_setof: missing SETOF_START");
+	if (p->pe_type != SETOF_START && p->pe_type != SSETOF_START)
+		return pepsylose(mod, p, NULLPE, "en_setof: missing SETOF_START");
 
-    DLOG (psap_log, LLOG_DEBUG, ("Encode SET OF %s.%s type %s",
-				 mod -> md_name, pname(p),
-				 pr_petype(p->pe_type)));
-    if ((head = pe_alloc(CLASS(p), PE_FORM_CONS, TAG(p))) == NULLPE)
-	return oom(mod,p);
+	DLOG(psap_log, LLOG_DEBUG, ("Encode SET OF %s.%s type %s",
+				    mod->md_name, pname(p), pr_petype(p->pe_type)));
+	if ((head = pe_alloc(CLASS(p), PE_FORM_CONS, TAG(p))) == NULLPE)
+		return oom(mod, p);
 
-    start = p;
-    while ((char *) parm != NULL) {
-	p++;
-	while (p->pe_type != PE_END) {
-	    DLOG (psap_log, LLOG_DEBUG, ("Encode SET OF memeber %s.%s type %s",
-					 mod -> md_name, pname(p),
-					 pr_petype(p->pe_type)));
+	start = p;
+	while ((char *) parm != NULL) {
+		p++;
+		while (p->pe_type != PE_END) {
+			DLOG(psap_log, LLOG_DEBUG, ("Encode SET OF memeber %s.%s type %s",
+						    mod->md_name, pname(p), pr_petype(p->pe_type)));
 
-	    switch (p->pe_type) {
-	    case UCODE:
-		if (mod->md_eucode == NULLIFP
-		|| (*mod->md_eucode) (parm, &pe, p) == NOTOK)
-		    goto bad;
-		break;
+			switch (p->pe_type) {
+			case UCODE:
+				if (mod->md_eucode == NULLIFP
+				    || (*mod->md_eucode) (parm, &pe, p) == NOTOK)
+					goto bad;
+				break;
 
-	    case ETAG:
-		if (en_type(parm, p, mod, &pe) == NOTOK)
-		    goto bad;
-		break;
+			case ETAG:
+				if (en_type(parm, p, mod, &pe) == NOTOK)
+					goto bad;
+				break;
 
-	    case SEQ_START:
-		if (en_seq(*(char **) (parm + p->pe_ucode), p, mod, &pe)==NOTOK)
-		    goto bad;
-		break;
+			case SEQ_START:
+				if (en_seq(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+					goto bad;
+				break;
 
-	    case SEQOF_START:
-		if (en_seqof(*(char **) (parm + p->pe_ucode), p, mod, &pe)
-			== NOTOK)
-		    goto bad;
-		break;
+			case SEQOF_START:
+				if (en_seqof(*(char **) (parm + p->pe_ucode), p, mod, &pe)
+				    == NOTOK)
+					goto bad;
+				break;
 
-	    case SET_START:
-		if (en_set(*(char **) (parm + p->pe_ucode), p, mod, &pe)==NOTOK)
-		    goto bad;
-		break;
+			case SET_START:
+				if (en_set(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+					goto bad;
+				break;
 
-	    case SETOF_START:
-		if (en_setof(*(char **) (parm + p->pe_ucode), p, mod, &pe)
-			== NOTOK)
-		    goto bad;
-		break;
+			case SETOF_START:
+				if (en_setof(*(char **) (parm + p->pe_ucode), p, mod, &pe)
+				    == NOTOK)
+					goto bad;
+				break;
 
-	    case IMP_OBJ:
-		tmp = p++;
-		if (p->pe_type == EXTOBJ || p->pe_type == SEXTOBJ) {
-		    if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
-		       0, (char *)0, *(char **) (parm + p->pe_ucode)) == NOTOK)
-		       return (NOTOK);
-		} else if (p->pe_type == SOBJECT) {
-		    if (en_obj((char *) parm + p->pe_ucode, mod->md_etab[p->pe_tag] + 1,
-			    mod, &pe) == NOTOK)
-			goto bad;
-		} else
-		    if (en_obj(*(char **) (parm + p->pe_ucode),
-			    mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-			goto bad;
-		pe->pe_class = CLASS(tmp);
-		pe->pe_id = TAG(tmp);
-		break;
+			case IMP_OBJ:
+				tmp = p++;
+				if (p->pe_type == EXTOBJ || p->pe_type == SEXTOBJ) {
+					if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
+						  0, (char *) 0,
+						  *(char **) (parm + p->pe_ucode)) == NOTOK)
+						return (NOTOK);
+				} else if (p->pe_type == SOBJECT) {
+					if (en_obj
+					    ((char *) parm + p->pe_ucode,
+					     mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+						goto bad;
+				} else
+				    if (en_obj(*(char **) (parm + p->pe_ucode),
+					       mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+					goto bad;
+				pe->pe_class = CLASS(tmp);
+				pe->pe_id = TAG(tmp);
+				break;
 
-	    case SOBJECT:
-		if (en_obj(parm + p->pe_ucode, mod->md_etab[p->pe_tag] + 1, mod, &pe) ==NOTOK)
-		    goto bad;
-		break;
+			case SOBJECT:
+				if (en_obj
+				    (parm + p->pe_ucode, mod->md_etab[p->pe_tag] + 1, mod,
+				     &pe) == NOTOK)
+					goto bad;
+				break;
 
-	    case OBJECT:
-		if (en_obj(*(char **) (parm + p->pe_ucode),
-			mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-		    goto bad;
-		break;
+			case OBJECT:
+				if (en_obj(*(char **) (parm + p->pe_ucode),
+					   mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+					goto bad;
+				break;
 
-	    case CHOICE_START:
-		if (en_choice(*(char **) (parm + p->pe_ucode), p, mod, &pe)
-			== NOTOK)
-		    goto bad;
-		break;
+			case CHOICE_START:
+				if (en_choice(*(char **) (parm + p->pe_ucode), p, mod, &pe)
+				    == NOTOK)
+					goto bad;
+				break;
 
+			case SCHOICE_START:
+				if (en_choice((char *) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+					goto bad;
+				break;
 
-	    case SCHOICE_START:
-		if (en_choice((char *) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-		    goto bad;
-		break;
+			case SEXTOBJ:
+				if (p[1].pe_type != EXTMOD)
+					return pepsylose(mod, p + 1, NULLPE,
+							 "en_setof: missing EXTMOD");
+				if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *) 0,
+					  parm + p->pe_ucode) == NOTOK)
+					return (NOTOK);
+				break;
 
-	    case SEXTOBJ:
-		if (p[1].pe_type != EXTMOD)
-		    return pepsylose (mod, p + 1, NULLPE,
-				      "en_setof: missing EXTMOD");
-		if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *)0,
-		      parm + p->pe_ucode) == NOTOK)
-		      return (NOTOK);
-		break;
+			case EXTOBJ:
+				if (p[1].pe_type != EXTMOD)
+					return pepsylose(mod, p + 1, NULLPE,
+							 "en_setof: missing EXTMOD");
 
-	    case EXTOBJ:
-		if (p[1].pe_type != EXTMOD)
-		    return pepsylose (mod, p + 1, NULLPE,
-				      "en_setof: missing EXTMOD");
+				if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *) 0,
+					  *(char **) (parm + p->pe_ucode)) == NOTOK)
+					return (NOTOK);
+				break;
 
-		if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *)0,
-		      *(char **) (parm + p->pe_ucode)) == NOTOK)
-		      return (NOTOK);
-		break;
+			default:
+				if (en_type(parm, p, mod, &pe) == NOTOK)
+					goto bad;
+				break;
+			}
 
-	    default:
-		if (en_type(parm, p, mod, &pe) == NOTOK)
-		    goto bad;
-		break;
-	    }
+			if (ISDTYPE(p) && pe != NULLPE) {
+				if (set_addon(head, last, pe) == NOTOK)
+					return pepsylose(mod, p, NULLPE, "en_setof bad set: %s",
+							 pe_error(pe->pe_errno));
+				else
+					last = pe;
+			}
 
-	    if (ISDTYPE(p) && pe != NULLPE) {
-		if (set_addon(head, last, pe) == NOTOK)
-		    return pepsylose (mod, p, NULLPE, "en_setof bad set: %s",
-				      pe_error(pe->pe_errno));
-		else
-		    last = pe;
-	    }
-
-	    if (NEXT_TPE(p) == NULLTPE)
-		goto bad;;
+			if (NEXT_TPE(p) == NULLTPE)
+				goto bad;;
+		}
+		parm = *(char **) (parm + p->pe_ucode);	/* Any more ? */
+		p = start;
 	}
-	parm = *(char **) (parm + p->pe_ucode);	/* Any more ? */
-	p = start;
-    }
 
-    return (RET_OK(rpe, head));
+	return (RET_OK(rpe, head));
 
-
-bad:
-    return (NOTOK);
+      bad:
+	return (NOTOK);
 }
 
 /*
@@ -1226,86 +1262,80 @@ bad:
  */
 static int
 en_choice(parm, p, mod, rpe)
-PEPYPARM parm;
-ptpe    *p;
-modtyp *mod;			/* Module it is from */
-PE	*rpe;		/* Return value PE */
+	PEPYPARM parm;
+	ptpe *p;
+	modtyp *mod;			/* Module it is from */
+	PE *rpe;			/* Return value PE */
 {
-    int     cnt;
-    ptpe *p2;
-    
-    if (p->pe_type != CHOICE_START && p->pe_type != SCHOICE_START)
-	return pepsylose (mod, p, NULLPE, "en_choice:missing CHOICE_START");
+	int cnt;
+	ptpe *p2;
 
-    p2 = p++;
+	if (p->pe_type != CHOICE_START && p->pe_type != SCHOICE_START)
+		return pepsylose(mod, p, NULLPE, "en_choice:missing CHOICE_START");
 
-    if (p->pe_type != SCTRL)
-	return pepsylose (mod, p, NULLPE, "en_choice:missing SCTRL");
+	p2 = p++;
 
-    if (IF_USELECT(p)) {
-	if (mod->md_eucode == NULLIFP ||
-	    (cnt = (*mod -> md_eucode) (parm, &rpe, p)) == NOTOK)
-	    return pepsylose (mod, p, NULLPE, "choice selection failed");
-    }
-    else
-	cnt = *(int *) (parm + p->pe_ucode);
+	if (p->pe_type != SCTRL)
+		return pepsylose(mod, p, NULLPE, "en_choice:missing SCTRL");
 
-    DLOG (psap_log, LLOG_DEBUG, ("Encode CHOICE %s.%s member %d type %s",
-				 mod -> md_name, pname(p2),
-				 cnt,
-				 pr_petype(p2->pe_type)));
+	if (IF_USELECT(p)) {
+		if (mod->md_eucode == NULLIFP || (cnt = (*mod->md_eucode) (parm, &rpe, p)) == NOTOK)
+			return pepsylose(mod, p, NULLPE, "choice selection failed");
+	} else
+		cnt = *(int *) (parm + p->pe_ucode);
 
-    if (cnt != 0)
-	cnt--;
-    if (cnt < 0)
-	return pepsylose (mod, p, NULLPE, "en_choice:offset %d negative", cnt);
+	DLOG(psap_log, LLOG_DEBUG, ("Encode CHOICE %s.%s member %d type %s",
+				    mod->md_name, pname(p2), cnt, pr_petype(p2->pe_type)));
 
-    for (p++; p->pe_type != PE_END; NEXT_TPE(p)) {
-	if (cnt == 0 && p->pe_type == UCODE) {
-		if (mod->md_eucode == NULLIFP
-		|| (*mod->md_eucode) (parm, &rpe, p) == NOTOK)
-		    return (NOTOK);
+	if (cnt != 0)
+		cnt--;
+	if (cnt < 0)
+		return pepsylose(mod, p, NULLPE, "en_choice:offset %d negative", cnt);
+
+	for (p++; p->pe_type != PE_END; NEXT_TPE(p)) {
+		if (cnt == 0 && p->pe_type == UCODE) {
+			if (mod->md_eucode == NULLIFP || (*mod->md_eucode) (parm, &rpe, p) == NOTOK)
+				return (NOTOK);
+		}
+		if (ISDTYPE(p)) {
+			if (cnt == 0) {
+				if (en_etype(parm, p, mod, rpe) == NOTOK)
+					return (NOTOK);
+				return (OK);
+			}
+			cnt--;
+		}
 	}
-	if (ISDTYPE(p)) {
-	    if (cnt == 0) {
-		if (en_etype(parm, p, mod, rpe) == NOTOK)
-		    return (NOTOK);
-		return (OK);
-	    }
-	    cnt--;
-	}
-    }
 
-    return pepsylose (mod, p, NULLPE, "en_choice: no choice taken");
+	return pepsylose(mod, p, NULLPE, "en_choice: no choice taken");
 }
-
 
 /*
  * check to see if the object is present or not
  */
 static int
 chkobj(mod, p, head)
-modtyp *mod;
-ptpe    *p;
-PE      head;
+	modtyp *mod;
+	ptpe *p;
+	PE head;
 {
 
-    for (; p->pe_type != PE_END; NEXT_TPE(p)) {
-	if (!ISDTYPE(p))
-	    continue;
+	for (; p->pe_type != PE_END; NEXT_TPE(p)) {
+		if (!ISDTYPE(p))
+			continue;
 
-	if (p->pe_type == OBJECT) {
-	    if (chkobj(mod, p, head))
-		return (1);
-	} else if (CHKTAG(mod, p, head))
-	    return (1);
+		if (p->pe_type == OBJECT) {
+			if (chkobj(mod, p, head))
+				return (1);
+		} else if (CHKTAG(mod, p, head))
+			return (1);
 
-	if (OPTIONAL(p) || DEFAULT(p))
-	    continue;
+		if (OPTIONAL(p) || DEFAULT(p))
+			continue;
 
+		return (0);
+	}
 	return (0);
-    }
-    return (0);
 }
 
 /*
@@ -1316,304 +1346,295 @@ PE      head;
  */
 static int
 en_etype(parm, p, mod, rpe)
-PEPYPARM parm;
-ptpe    *p;
-modtyp *mod;			/* Module it is from */
-PE	*rpe;		/* Return value PE */
+	PEPYPARM parm;
+	ptpe *p;
+	modtyp *mod;			/* Module it is from */
+	PE *rpe;			/* Return value PE */
 {
-    ptpe    *tmp;
-    PE      pe = NULLPE;
+	ptpe *tmp;
+	PE pe = NULLPE;
 
-    DLOG (psap_log, LLOG_DEBUG, ("Encode EXPLICIT TAG %s.%s type %s",
-				 mod -> md_name, pname(p),
-				 pr_petype(p->pe_type)));
+	DLOG(psap_log, LLOG_DEBUG, ("Encode EXPLICIT TAG %s.%s type %s",
+				    mod->md_name, pname(p), pr_petype(p->pe_type)));
 
-    switch (p->pe_type) {
-    case PE_END:
-    case PE_START:
-	return (pepsylose (mod, p, pe, "en_etype:END/START type"));
+	switch (p->pe_type) {
+	case PE_END:
+	case PE_START:
+		return (pepsylose(mod, p, pe, "en_etype:END/START type"));
 
-    case UCODE:
-	if (mod->md_eucode == NULLIFP
-	|| (*mod->md_eucode) (parm, &pe, p) == NOTOK)
-	    goto bad;
-	break;
+	case UCODE:
+		if (mod->md_eucode == NULLIFP || (*mod->md_eucode) (parm, &pe, p) == NOTOK)
+			goto bad;
+		break;
 
-    case ETAG:
-	if ((pe = pe_alloc(CLASS(p), PE_FORM_CONS, TAG(p))) == NULLPE)
-	    return oom(mod, p);
-	switch (p->pe_ucode) {
-	default:
-	    p++;
-	    if (en_etype(parm, p, mod, &pe->pe_cons) == NOTOK)
-		goto bad;
-	}
-	break;
+	case ETAG:
+		if ((pe = pe_alloc(CLASS(p), PE_FORM_CONS, TAG(p))) == NULLPE)
+			return oom(mod, p);
+		switch (p->pe_ucode) {
+		default:
+			p++;
+			if (en_etype(parm, p, mod, &pe->pe_cons) == NOTOK)
+				goto bad;
+		}
+		break;
 
-    case SEQ_START:
-	if (en_seq(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-	    goto bad;
-	break;
+	case SEQ_START:
+		if (en_seq(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+			goto bad;
+		break;
 
-    case SEQOF_START:
-	if (en_seqof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-	    goto bad;
-	break;
+	case SEQOF_START:
+		if (en_seqof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+			goto bad;
+		break;
 
-    case SET_START:
-	if (en_set(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-	    goto bad;
-	break;
+	case SET_START:
+		if (en_set(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+			goto bad;
+		break;
 
-    case SETOF_START:
-	if (en_setof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-	    goto bad;
-	break;
+	case SETOF_START:
+		if (en_setof(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+			goto bad;
+		break;
 
-    case SSEQ_START:
-	if (en_seq(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
-	    goto bad;
-	break;
+	case SSEQ_START:
+		if (en_seq(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
+			goto bad;
+		break;
 
-    case SSEQOF_START:
-	if (en_seqof(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
-	    goto bad;
-	break;
+	case SSEQOF_START:
+		if (en_seqof(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
+			goto bad;
+		break;
 
-    case SSET_START:
-	if (en_set(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
-	    goto bad;
-	break;
+	case SSET_START:
+		if (en_set(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
+			goto bad;
+		break;
 
-    case SSETOF_START:
-	if (en_setof(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
-	    goto bad;
-	break;
+	case SSETOF_START:
+		if (en_setof(parm + p->pe_ucode, p, mod, &pe) == NOTOK)
+			goto bad;
+		break;
 
-    case IMP_OBJ:
-	tmp = p++;
-	if (p->pe_type == EXTOBJ || p->pe_type == SEXTOBJ) {
-	    if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
-		  0, (char *)0, *(char **) (parm + p->pe_ucode)) == NOTOK)
-		  return (NOTOK);
-	} else if (p->pe_type == SOBJECT) {
-	    if (en_obj((char *) parm + p->pe_ucode, mod->md_etab[p->pe_tag] + 1, mod, &pe)
-		    == NOTOK)
-		goto bad;
-	} else
-	    if (en_obj(*(char **) (parm + p->pe_ucode),
-		    mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-		goto bad;
-	pe->pe_class = CLASS(tmp);
-	pe->pe_id = TAG(tmp);
-	break;
+	case IMP_OBJ:
+		tmp = p++;
+		if (p->pe_type == EXTOBJ || p->pe_type == SEXTOBJ) {
+			if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1,
+				  0, (char *) 0, *(char **) (parm + p->pe_ucode)) == NOTOK)
+				return (NOTOK);
+		} else if (p->pe_type == SOBJECT) {
+			if (en_obj
+			    ((char *) parm + p->pe_ucode, mod->md_etab[p->pe_tag] + 1, mod, &pe)
+			    == NOTOK)
+				goto bad;
+		} else
+		    if (en_obj(*(char **) (parm + p->pe_ucode),
+			       mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+			goto bad;
+		pe->pe_class = CLASS(tmp);
+		pe->pe_id = TAG(tmp);
+		break;
 
-    case SOBJECT:
-	if (en_obj(parm + p->pe_ucode, mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-	    goto bad;
-	break;
+	case SOBJECT:
+		if (en_obj(parm + p->pe_ucode, mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+			goto bad;
+		break;
 
-    case OBJECT:
-	if (en_obj(*(char **) (parm + p->pe_ucode),
-		mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
-	    goto bad;
-	break;
+	case OBJECT:
+		if (en_obj(*(char **) (parm + p->pe_ucode),
+			   mod->md_etab[p->pe_tag] + 1, mod, &pe) == NOTOK)
+			goto bad;
+		break;
 
-    case CHOICE_START:
-	if (en_choice(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-	    goto bad;
-	break;
+	case CHOICE_START:
+		if (en_choice(*(char **) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+			goto bad;
+		break;
 
-    case SCHOICE_START:
-        if (en_choice((char *) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
-          goto bad;
-      break;
+	case SCHOICE_START:
+		if (en_choice((char *) (parm + p->pe_ucode), p, mod, &pe) == NOTOK)
+			goto bad;
+		break;
 
-    case INTEGER:
-	DLOG (psap_log, LLOG_DEBUG, ("Encode INTEGER %s.%s value %d",
-				     mod -> md_name, pname(p),
-				     *(integer *) (parm + p->pe_ucode)));
-	if ((pe = num2prim(*(integer *) (parm + p->pe_ucode), CLASS(p), TAG(p))) == NULLPE)
-	    return oom (mod, p);
+	case INTEGER:
+		DLOG(psap_log, LLOG_DEBUG, ("Encode INTEGER %s.%s value %d",
+					    mod->md_name, pname(p),
+					    *(integer *) (parm + p->pe_ucode)));
+		if ((pe = num2prim(*(integer *) (parm + p->pe_ucode), CLASS(p), TAG(p))) == NULLPE)
+			return oom(mod, p);
 
-	break;
+		break;
 
 #ifdef	PEPSY_REALS
-    case REALTYPE:
-	DLOG (psap_log,  LLOG_DEBUG, ("Encode REAL %s.%s value %g",
-				      mod -> md_name, pname(p),
-				      *(double *) (parm + p->pe_ucode)));
-	    if ((pe = real2prim(*(double *) (parm + p->pe_ucode),
-			       CLASS(p), TAG(p))) == NULLPE)
-		return oom(mod, p);
-	    break;
+	case REALTYPE:
+		DLOG(psap_log, LLOG_DEBUG, ("Encode REAL %s.%s value %g",
+					    mod->md_name, pname(p),
+					    *(double *) (parm + p->pe_ucode)));
+		if ((pe = real2prim(*(double *) (parm + p->pe_ucode), CLASS(p), TAG(p))) == NULLPE)
+			return oom(mod, p);
+		break;
 
 #endif
-    case BOOLEAN:
-	DLOG (psap_log, LLOG_DEBUG, ("Encode BOOLEAN %s.%s value %d",
-				     mod -> md_name, pname(p),
-				     *(char *) (parm + p->pe_ucode)));
+	case BOOLEAN:
+		DLOG(psap_log, LLOG_DEBUG, ("Encode BOOLEAN %s.%s value %d",
+					    mod->md_name, pname(p),
+					    *(char *) (parm + p->pe_ucode)));
 
-	if ((pe = flag2prim(*(char *) (parm + p->pe_ucode), CLASS(p), TAG(p))) == NULLPE)
-	    return oom(mod, p);
-	break;
+		if ((pe = flag2prim(*(char *) (parm + p->pe_ucode), CLASS(p), TAG(p))) == NULLPE)
+			return oom(mod, p);
+		break;
 
-    case T_NULL:
-	DLOG (psap_log, LLOG_DEBUG, ("Encode NULL %s.%s",
-				     mod -> md_name, pname(p)));
+	case T_NULL:
+		DLOG(psap_log, LLOG_DEBUG, ("Encode NULL %s.%s", mod->md_name, pname(p)));
 
-	if ((pe = pe_alloc(CLASS(p), PE_FORM_PRIM, TAG(p))) == NULLPE)
-	    return oom(mod, p);
-	break;
+		if ((pe = pe_alloc(CLASS(p), PE_FORM_PRIM, TAG(p))) == NULLPE)
+			return oom(mod, p);
+		break;
 
-    case SANY:
-	(pe = (PE) (parm + p->pe_ucode))->pe_refcnt++;
-	break;
+	case SANY:
+		(pe = (PE) (parm + p->pe_ucode))->pe_refcnt++;
+		break;
 
-    case ANY:
-	if ((parm + p->pe_ucode) == 0 || *(PE *) (parm + p->pe_ucode) == 0)
+	case ANY:
+		if ((parm + p->pe_ucode) == 0 || *(PE *) (parm + p->pe_ucode) == 0)
 #if ROSAP_HACK
-	    /* hack for ROSAP. expects this strangeness */
-	    pe = pe_alloc(PE_CLASS_UNIV, PE_FORM_PRIM, PE_PRIM_NULL);
+			/* hack for ROSAP. expects this strangeness */
+			pe = pe_alloc(PE_CLASS_UNIV, PE_FORM_PRIM, PE_PRIM_NULL);
 #else
-	    pe = NULLPE;
+			pe = NULLPE;
 #endif
-	else
-	    (pe = *(PE *) (parm + p->pe_ucode))->pe_refcnt++;
-	break;
+		else
+			(pe = *(PE *) (parm + p->pe_ucode))->pe_refcnt++;
+		break;
 
-    case SEXTOBJ:
-	if (p[1].pe_type != EXTMOD)
-	    return pepsylose (mod, p+1, NULLPE, "en_etype: missing EXTMOD");
-	if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *)0,
-	    parm + p->pe_ucode) == NOTOK)
-	    return (NOTOK);
-	break;
+	case SEXTOBJ:
+		if (p[1].pe_type != EXTMOD)
+			return pepsylose(mod, p + 1, NULLPE, "en_etype: missing EXTMOD");
+		if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *) 0,
+			  parm + p->pe_ucode) == NOTOK)
+			return (NOTOK);
+		break;
 
-    case EXTOBJ:
-	if (p[1].pe_type != EXTMOD)
-	    return pepsylose (mod, p+1, NULLPE, "en_etype: missing EXTMOD");
-	if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *)0,
-	      *(char **) (parm + p->pe_ucode)) == NOTOK)
-	      return (NOTOK);
-	break;
+	case EXTOBJ:
+		if (p[1].pe_type != EXTMOD)
+			return pepsylose(mod, p + 1, NULLPE, "en_etype: missing EXTMOD");
+		if (enc_f(p->pe_tag, EXT2MOD(mod, (p + 1)), &pe, 1, 0, (char *) 0,
+			  *(char **) (parm + p->pe_ucode)) == NOTOK)
+			return (NOTOK);
+		break;
 
-    case SOCTETSTRING:
-	if ((pe = qb2prim((struct qbuf *) (parm + p->pe_ucode), CLASS(p), TAG(p))) == NULLPE)
-	    return oom(mod, p);
-	break;
+	case SOCTETSTRING:
+		if ((pe =
+		     qb2prim((struct qbuf *) (parm + p->pe_ucode), CLASS(p), TAG(p))) == NULLPE)
+			return oom(mod, p);
+		break;
 
-    case SBITSTRING:
+	case SBITSTRING:
 	{
-	    char   *cp;
-	    int     i;
+		char *cp;
+		int i;
 
-	    if ((cp = bitstr2strb((PE) (parm + p->pe_ucode), &i)) == NULL)
-		return oom(mod, p);
-	    if ((pe = strb2bitstr(cp, i, CLASS(p), TAG(p))) == NULLPE)
-		return oom(mod, p);
-	    free(cp);
-	    if ((pe = bit2prim (pe)) == NULLPE)
-		return oom(mod, p);
+		if ((cp = bitstr2strb((PE) (parm + p->pe_ucode), &i)) == NULL)
+			return oom(mod, p);
+		if ((pe = strb2bitstr(cp, i, CLASS(p), TAG(p))) == NULLPE)
+			return oom(mod, p);
+		free(cp);
+		if ((pe = bit2prim(pe)) == NULLPE)
+			return oom(mod, p);
 	}
-	break;
+		break;
 
-    case OCTETSTRING:
-	if ((pe = qb2prim(*(struct qbuf **) (parm + p->pe_ucode), CLASS(p), TAG(p))) == NULLPE)
-	    return oom(mod, p);
-	break;
+	case OCTETSTRING:
+		if ((pe =
+		     qb2prim(*(struct qbuf **) (parm + p->pe_ucode), CLASS(p), TAG(p))) == NULLPE)
+			return oom(mod, p);
+		break;
 
-    case T_STRING:
-	if (*(char **) (parm + p->pe_ucode) == NULLCP)
-	    return pepsylose (mod, &p[1], NULLPE,
-			      "en_etype:T_STRING missing pointer");
+	case T_STRING:
+		if (*(char **) (parm + p->pe_ucode) == NULLCP)
+			return pepsylose(mod, &p[1], NULLPE, "en_etype:T_STRING missing pointer");
 
-	if ((pe = str2prim(*(char **) (parm + p->pe_ucode),
-			  strlen(*(char **) (parm + p->pe_ucode)),
-			  CLASS(p), TAG(p))) == NULLPE)
-	    return oom(mod, p);
-	break;
+		if ((pe = str2prim(*(char **) (parm + p->pe_ucode),
+				   strlen(*(char **) (parm + p->pe_ucode)),
+				   CLASS(p), TAG(p))) == NULLPE)
+			return oom(mod, p);
+		break;
 
-    case OCTET_PTR:
-	if (p[1].pe_type != OCTET_LEN)
-	    return pepsylose (mod, &p[1], NULLPE,
-			      "en_etype: missing OCTET_LEN");
+	case OCTET_PTR:
+		if (p[1].pe_type != OCTET_LEN)
+			return pepsylose(mod, &p[1], NULLPE, "en_etype: missing OCTET_LEN");
 
-	if (*(char **) (parm + p->pe_ucode) == NULLCP)
-	    return pepsylose (mod, &p[1], NULLPE,
-			      "en_etype:OCTET_PTR missing pointer");
+		if (*(char **) (parm + p->pe_ucode) == NULLCP)
+			return pepsylose(mod, &p[1], NULLPE, "en_etype:OCTET_PTR missing pointer");
 
-	if (*(int *) (parm + (p + 1)->pe_ucode) < 0)
-	    return pepsylose (mod, &p[1], NULLPE,
-			      "en_etype:OCTET_LEN negative length");
+		if (*(int *) (parm + (p + 1)->pe_ucode) < 0)
+			return pepsylose(mod, &p[1], NULLPE, "en_etype:OCTET_LEN negative length");
 
-	if ((pe = str2prim(*(char **) (parm + p->pe_ucode),
-			  *(int *) (parm + (p + 1)->pe_ucode),
-			  CLASS(p), TAG(p))) == NULLPE)
-	    return oom(mod, p);
-	break;
+		if ((pe = str2prim(*(char **) (parm + p->pe_ucode),
+				   *(int *) (parm + (p + 1)->pe_ucode),
+				   CLASS(p), TAG(p))) == NULLPE)
+			return oom(mod, p);
+		break;
 
-    case BITSTR_PTR:
-	if (p[1].pe_type != BITSTR_LEN)
-	    return pepsylose (mod, &p[1], NULLPE,
-			      "en_etype:missing BITSTR_LEN");
+	case BITSTR_PTR:
+		if (p[1].pe_type != BITSTR_LEN)
+			return pepsylose(mod, &p[1], NULLPE, "en_etype:missing BITSTR_LEN");
 
-	if (*(char **) (parm + p->pe_ucode) == NULLCP)
-	    return pepsylose (mod, &p[1], NULLPE,
-			      "en_etype:BITSTR_PTR  missing pointer");
+		if (*(char **) (parm + p->pe_ucode) == NULLCP)
+			return pepsylose(mod, &p[1], NULLPE,
+					 "en_etype:BITSTR_PTR  missing pointer");
 
-	if (*(int *) (parm + (p + 1)->pe_ucode) < 0)
-	    return pepsylose (mod, &p[1], NULLPE,
-			      "en_etype:BITSTR_LEN negative length");
+		if (*(int *) (parm + (p + 1)->pe_ucode) < 0)
+			return pepsylose(mod, &p[1], NULLPE, "en_etype:BITSTR_LEN negative length");
 
-	if ((pe = strb2bitstr(*(char **) (parm + p->pe_ucode),
-			  *(int *) (parm + (p + 1)->pe_ucode),
-			  CLASS(p), TAG(p))) == NULLPE
-	    || (pe = bit2prim(pe)) == NULLPE)
-	    return oom(mod, p);
-	break;
+		if ((pe = strb2bitstr(*(char **) (parm + p->pe_ucode),
+				      *(int *) (parm + (p + 1)->pe_ucode),
+				      CLASS(p), TAG(p))) == NULLPE || (pe = bit2prim(pe)) == NULLPE)
+			return oom(mod, p);
+		break;
 
-    case BITSTRING:
+	case BITSTRING:
 	{
-	    char   *cp;
-	    int     i;
+		char *cp;
+		int i;
 
-	    if ((cp = bitstr2strb(*(PE *) (parm + p->pe_ucode), &i)) == NULL)
-		return oom(mod, p);
-	    if ((pe = strb2bitstr(cp, i, CLASS(p), TAG(p))) == NULLPE)
-		return oom(mod, p);
-	    free(cp);
-	    if ((pe = bit2prim(pe)) == NULLPE)
-		return oom(mod, p);
+		if ((cp = bitstr2strb(*(PE *) (parm + p->pe_ucode), &i)) == NULL)
+			return oom(mod, p);
+		if ((pe = strb2bitstr(cp, i, CLASS(p), TAG(p))) == NULLPE)
+			return oom(mod, p);
+		free(cp);
+		if ((pe = bit2prim(pe)) == NULLPE)
+			return oom(mod, p);
 	}
-	break;
+		break;
 
-    case SOBJID:
-	if ((pe = obj2prim((OID) (parm + p->pe_ucode), CLASS(p), TAG(p))) == NULLPE)
-	    return oom(mod, p);
-	break;
+	case SOBJID:
+		if ((pe = obj2prim((OID) (parm + p->pe_ucode), CLASS(p), TAG(p))) == NULLPE)
+			return oom(mod, p);
+		break;
 
-    case OBJID:
-	if ((pe = obj2prim(*(OID *) (parm + p->pe_ucode), CLASS(p), TAG(p)))
-	    == NULLPE)
-	    return oom(mod, p);
-	break;
+	case OBJID:
+		if ((pe = obj2prim(*(OID *) (parm + p->pe_ucode), CLASS(p), TAG(p)))
+		    == NULLPE)
+			return oom(mod, p);
+		break;
 
-    case FN_CALL:
-	if ((FN_PTR(mod, p))(parm, &pe) == NOTOK)
-	    return pepsylose (mod, p, NULLPE,
-			      "en_etype:FN_CALL:call failed");
-	if (STAG(p) >= 0) {
-	    pe->pe_class = CLASS(p);
-	    pe->pe_id = TAG(p);
+	case FN_CALL:
+		if ((FN_PTR(mod, p)) (parm, &pe) == NOTOK)
+			return pepsylose(mod, p, NULLPE, "en_etype:FN_CALL:call failed");
+		if (STAG(p) >= 0) {
+			pe->pe_class = CLASS(p);
+			pe->pe_id = TAG(p);
+		}
+		break;
+
+	default:
+		return pepsylose(mod, p, NULLPE, "en_etype: type not implemented");
 	}
-	break;
+	return (RET_OK(rpe, pe));
 
-    default:
-	return pepsylose (mod, p, NULLPE, "en_etype: type not implemented");
-    }
-    return (RET_OK(rpe, pe));
-
-bad:
-    return (NOTOK);
+      bad:
+	return (NOTOK);
 }

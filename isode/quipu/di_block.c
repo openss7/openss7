@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* di_block.c - routines to handle operation activity blocks */
 
 #ifndef lint
-static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/di_block.c,v 9.0 1992/06/16 12:34:01 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/quipu/RCS/di_block.c,v 9.0 1992/06/16 12:34:01 isode Rel";
 #endif
 
 /*
- * $Header: /xtel/isode/isode/quipu/RCS/di_block.c,v 9.0 1992/06/16 12:34:01 isode Rel $
+ * Header: /xtel/isode/isode/quipu/RCS/di_block.c,v 9.0 1992/06/16 12:34:01 isode Rel
  *
  *
- * $Log: di_block.c,v $
+ * Log: di_block.c,v
  * Revision 9.0  1992/06/16  12:34:01  isode
  * Release 8.0
  *
@@ -24,48 +83,49 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/di_block.c,v 9.0 1992
  *
  */
 
-
 #include "quipu/util.h"
 #include "quipu/connection.h"
 #include "tsap.h"
 #include "tailor.h"
 
-extern LLog * log_dsap;
+extern LLog *log_dsap;
 
 extern time_t timenow;
 extern struct TSAPaddr *ta2norm();
 
-struct di_block *di_alloc()
+struct di_block *
+di_alloc()
 {
-    struct di_block	* di_ret;
+	struct di_block *di_ret;
 
-    di_ret = (struct di_block *) calloc(1,sizeof(struct di_block));
+	di_ret = (struct di_block *) calloc(1, sizeof(struct di_block));
 
-    return(di_ret);
+	return (di_ret);
 }
 
 di_free(di)
-struct di_block *di;
+	struct di_block *di;
 {
 	DLOG(log_dsap, LLOG_TRACE, ("di_free()"));
 
 	if (di->di_state == -1) {
-		LLOG (log_dsap,LLOG_EXCEPTIONS, ("duplicate di_free"));
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("duplicate di_free"));
 		return;
 	}
 
 	switch (di->di_type) {
-	  case DI_GLOBAL: 	break;
-	  case DI_TASK:
-	      if (di->di_entry)
-		      entry_free (di->di_entry);
-	      break;
-	  case DI_OPERATION:
-	      if (di->di_entry)
-		      entry_free (di->di_entry);
-	      break;
-	  default:
-		DLOG(log_dsap, LLOG_TRACE, ("di_free() of unknown type %d",di->di_state));
+	case DI_GLOBAL:
+		break;
+	case DI_TASK:
+		if (di->di_entry)
+			entry_free(di->di_entry);
+		break;
+	case DI_OPERATION:
+		if (di->di_entry)
+			entry_free(di->di_entry);
+		break;
+	default:
+		DLOG(log_dsap, LLOG_TRACE, ("di_free() of unknown type %d", di->di_state));
 		return;
 	}
 
@@ -73,220 +133,210 @@ struct di_block *di;
 
 	dn_free(di->di_target);
 
-	if(di->di_accesspoints != NULLACCESSPOINT)
-	    aps_free(di->di_accesspoints);
-
+	if (di->di_accesspoints != NULLACCESSPOINT)
+		aps_free(di->di_accesspoints);
 
 	di->di_state = -1;
 
-	free((char *)di);
+	free((char *) di);
 }
 
 di_extract(old_di)
-struct di_block	* old_di;
+	struct di_block *old_di;
 {
-    struct di_block	* di;
-    struct di_block	**next_di;
+	struct di_block *di;
+	struct di_block **next_di;
 
-    LLOG(log_dsap, LLOG_TRACE, ("di_extract"));
+	LLOG(log_dsap, LLOG_TRACE, ("di_extract"));
 #ifdef DEBUG
-    di_log(old_di);
+	di_log(old_di);
 #endif
 
-    switch(old_di->di_type)
-    {
-    case DI_GLOBAL:
-        next_di = &(deferred_dis);
-	for(di=deferred_dis; di!=NULL_DI_BLOCK; di=di->di_next)
-	{
-	    if(di == old_di)
+	switch (old_di->di_type) {
+	case DI_GLOBAL:
+		next_di = &(deferred_dis);
+		for (di = deferred_dis; di != NULL_DI_BLOCK; di = di->di_next) {
+			if (di == old_di)
+				break;
+
+			next_di = &(di->di_next);
+		}
+		if (di == NULL_DI_BLOCK) {
+			LLOG(log_dsap, LLOG_EXCEPTIONS, ("di_block has escaped from global list"));
+		} else {
+			(*next_di) = di->di_next;
+		}
 		break;
+	case DI_OPERATION:
+		break;
+	case DI_TASK:
+		break;
+	default:
+		break;
+	}
 
-	    next_di = &(di->di_next);
-	}
-	if(di == NULL_DI_BLOCK)
-	{
-	    LLOG(log_dsap, LLOG_EXCEPTIONS, ("di_block has escaped from global list"));
-	}
-	else
-	{
-	    (*next_di) = di->di_next;
-	}
-	break;
-    case DI_OPERATION:
-	break;
-    case DI_TASK:
-	break;
-    default:
-	break;
-    }
-
-    di_free(old_di);
+	di_free(old_di);
 }
 
 di_desist(di)
-struct di_block	* di;
+	struct di_block *di;
 {
-    struct di_block	* di_tmp1;
-    struct di_block	* di_tmp1_next;
-    struct di_block	* di_tmp2;
-    struct di_block	**di_p2;
+	struct di_block *di_tmp1;
+	struct di_block *di_tmp1_next;
+	struct di_block *di_tmp2;
+	struct di_block **di_p2;
 
 	DLOG(log_dsap, LLOG_TRACE, ("di_desist()"));
 
-    for(di_tmp1=di; di_tmp1 != NULL_DI_BLOCK; di_tmp1 = di_tmp1_next)
-    {
-	di_tmp1_next = di_tmp1->di_next;
+	for (di_tmp1 = di; di_tmp1 != NULL_DI_BLOCK; di_tmp1 = di_tmp1_next) {
+		di_tmp1_next = di_tmp1->di_next;
 
-	switch(di_tmp1->di_state)
-	{
-	case DI_ACCESSPOINT:
-	case DI_COMPLETE:
-		break;
-	case DI_DEFERRED:
-	    di_p2 = &(di_tmp1->di_perform->on_wake_list);
-	    for(di_tmp2=di_tmp1->di_perform->on_wake_list; di_tmp2!=NULL_DI_BLOCK; di_tmp2=di_tmp2->di_wake_next)
-	    {
-		if(di_tmp2 == di_tmp1)
-		    break;
+		switch (di_tmp1->di_state) {
+		case DI_ACCESSPOINT:
+		case DI_COMPLETE:
+			break;
+		case DI_DEFERRED:
+			di_p2 = &(di_tmp1->di_perform->on_wake_list);
+			for (di_tmp2 = di_tmp1->di_perform->on_wake_list; di_tmp2 != NULL_DI_BLOCK;
+			     di_tmp2 = di_tmp2->di_wake_next) {
+				if (di_tmp2 == di_tmp1)
+					break;
 
-		di_p2 = &(di_tmp2->di_wake_next);
-	    }
-	    if(di_tmp2 == NULL_DI_BLOCK)
-	    {
-		LLOG(log_dsap, LLOG_EXCEPTIONS, ("di_desist - di_block lost from performing operations wake up list"));
-	    }
-	    else
-	    {
-		(*di_p2) = di_tmp2->di_wake_next;
-	    }
-	    break;
+				di_p2 = &(di_tmp2->di_wake_next);
+			}
+			if (di_tmp2 == NULL_DI_BLOCK) {
+				LLOG(log_dsap, LLOG_EXCEPTIONS,
+				     ("di_desist - di_block lost from performing operations wake up list"));
+			} else {
+				(*di_p2) = di_tmp2->di_wake_next;
+			}
+			break;
+		}
+		di_free(di_tmp1);
 	}
-	di_free(di_tmp1);
-    }
 }
 
 di_log(di)
-struct di_block	* di;
+	struct di_block *di;
 {
-    DLOG (log_dsap,LLOG_DEBUG, ("di_block [%x] , state = %d, type = %d",
-	di, di->di_state, di->di_type));
+	DLOG(log_dsap, LLOG_DEBUG, ("di_block [%x] , state = %d, type = %d",
+				    di, di->di_state, di->di_type));
 }
 
 di_list_log(di)
-struct di_block *di;
+	struct di_block *di;
 {
-    struct di_block	* di_tmp;
+	struct di_block *di_tmp;
 
-    DLOG(log_dsap, LLOG_DEBUG, ("di_list:"));
+	DLOG(log_dsap, LLOG_DEBUG, ("di_list:"));
 #ifdef DEBUG
-    for(di_tmp = di; di_tmp!=NULL_DI_BLOCK; di_tmp=di_tmp->di_next)
-    {
-	di_log(di_tmp);
-    }
+	for (di_tmp = di; di_tmp != NULL_DI_BLOCK; di_tmp = di_tmp->di_next) {
+		di_log(di_tmp);
+	}
 #endif
-    DLOG(log_dsap, LLOG_DEBUG, ("di_list ends."));
+	DLOG(log_dsap, LLOG_DEBUG, ("di_list ends."));
 }
 
+static struct dn_seq *prefer_dsa_list = NULLDNSEQ;
 
-
-static struct dn_seq * prefer_dsa_list = NULLDNSEQ;
-
-prefer_dsa (str)
-char * str;
+prefer_dsa(str)
+	char *str;
 {
-struct dn_seq * dsa, *loop;
+	struct dn_seq *dsa, *loop;
 
-	if (( dsa=str2dnseq(str)) == NULLDNSEQ) {
-		LLOG (log_dsap,LLOG_EXCEPTIONS,("Invalid prefered DSA name %s",str));	
+	if ((dsa = str2dnseq(str)) == NULLDNSEQ) {
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("Invalid prefered DSA name %s", str));
 		return;
 	}
-	
-	if (prefer_dsa_list == NULLDNSEQ) 
+
+	if (prefer_dsa_list == NULLDNSEQ)
 		prefer_dsa_list = dsa;
 	else {
-		for (loop = prefer_dsa_list; loop->dns_next != NULLDNSEQ; loop=loop->dns_next)
-			;
+		for (loop = prefer_dsa_list; loop->dns_next != NULLDNSEQ; loop = loop->dns_next) ;
 		loop->dns_next = dsa;
 	}
 }
 
-static di_prefer_dsa (a,b)
-DN a,b;
+static
+di_prefer_dsa(a, b)
+	DN a, b;
 {
-int x,y;
+	int x, y;
 
 	if (prefer_dsa_list == NULLDNSEQ) {
-		DLOG (log_dsap,LLOG_TRACE,("NO DSAs to chose from"));
+		DLOG(log_dsap, LLOG_TRACE, ("NO DSAs to chose from"));
 		return 0;	/* not fussy !!! */
 	}
 
 	if ((b == NULLDN) || (a == NULLDN)) {
-		DLOG (log_dsap,LLOG_TRACE,("di_pref DNs NULL"));
+		DLOG(log_dsap, LLOG_TRACE, ("di_pref DNs NULL"));
 		return 0;	/* safty catch - don't think it can happen */
 	}
 
-	if ((x = dn_in_dnseq (a,prefer_dsa_list)) == 0)
-		if ((y = dn_in_dnseq (b,prefer_dsa_list)) == 0)
+	if ((x = dn_in_dnseq(a, prefer_dsa_list)) == 0)
+		if ((y = dn_in_dnseq(b, prefer_dsa_list)) == 0)
 			return 0;
 		else {
-			DLOG (log_dsap,LLOG_TRACE,("DSA selected on preference"));
+			DLOG(log_dsap, LLOG_TRACE, ("DSA selected on preference"));
 			return -1;
 		}
 
-	if ((y = dn_in_dnseq (b,prefer_dsa_list)) == 0) {
-		DLOG (log_dsap,LLOG_TRACE,("DSA selected on preference"));
+	if ((y = dn_in_dnseq(b, prefer_dsa_list)) == 0) {
+		DLOG(log_dsap, LLOG_TRACE, ("DSA selected on preference"));
 		return 1;
 	}
 
-	if ( x != y ) {
-		DLOG (log_dsap,LLOG_TRACE,("DSA selected on preference"));
-		return ( x > y ? -1 : 1 );
+	if (x != y) {
+		DLOG(log_dsap, LLOG_TRACE, ("DSA selected on preference"));
+		return (x > y ? -1 : 1);
 	}
 
 	return 0;
-	
+
 }
 
-static di_ap2comp (di)
-struct di_block	**di;
+static
+di_ap2comp(di)
+	struct di_block **di;
 {
-struct di_block *loop;
-Entry eptr;
+	struct di_block *loop;
+	Entry eptr;
 
 	/* replace DI_ACCESSPOINT with DI_COMPLETE if possible... */
-	/*	(data may have been cached since creating DI_ACCESSPOINT) */
+	/* (data may have been cached since creating DI_ACCESSPOINT) */
 
-	for (loop= *di; loop!=NULL_DI_BLOCK; loop=loop->di_next) {
+	for (loop = *di; loop != NULL_DI_BLOCK; loop = loop->di_next) {
 		if (loop->di_state != DI_ACCESSPOINT)
 			continue;
 
-		if (loop->di_reftype == RT_NONSPECIFICSUBORDINATE) 
+		if (loop->di_reftype == RT_NONSPECIFICSUBORDINATE)
 			continue;	/* can't split these - all must be followed... */
 
 		if (loop->di_accesspoints->ap_next == NULLACCESSPOINT) {
-			if ((eptr=local_find_entry (loop->di_accesspoints->ap_name,FALSE)) != NULLENTRY)
+			if ((eptr =
+			     local_find_entry(loop->di_accesspoints->ap_name, FALSE)) != NULLENTRY)
 				if (eptr->e_dsainfo != NULLDSA) {
 					loop->di_entry = eptr;
 					eptr->e_refcount++;
-					loop->di_state = DI_COMPLETE;	
-					aps_free (loop->di_accesspoints);
+					loop->di_state = DI_COMPLETE;
+					aps_free(loop->di_accesspoints);
 					loop->di_accesspoints = NULLACCESSPOINT;
 				}
-		} else 
-			LLOG (log_dsap,LLOG_EXCEPTIONS,("Many access points, but not a RT_NONSPECIFICSUBORDINATE"));
+		} else
+			LLOG(log_dsap, LLOG_EXCEPTIONS,
+			     ("Many access points, but not a RT_NONSPECIFICSUBORDINATE"));
 	}
 
 }
 
-dsa_reliable (cn,good,when)
-struct connection * cn;
-char good;
-time_t when;
+dsa_reliable(cn, good, when)
+	struct connection *cn;
+	char good;
+	time_t when;
 {
-Entry ptr;
+	Entry ptr;
 
-	if ( (ptr=local_find_entry(cn->cn_dn,FALSE)) == NULLENTRY)
+	if ((ptr = local_find_entry(cn->cn_dn, FALSE)) == NULLENTRY)
 		return;
 
 	if (ptr->e_dsainfo == NULLDSA)
@@ -296,15 +346,16 @@ Entry ptr;
 	if (good) {
 		ptr->e_dsainfo->dsa_last_success = when;
 		ptr->e_dsainfo->dsa_failures = 0;
-	} else 
+	} else
 		ptr->e_dsainfo->dsa_failures++;
 }
 
-static di_cmp_reliability (a,b)
-struct di_block *a, *b;
+static
+di_cmp_reliability(a, b)
+	struct di_block *a, *b;
 {
-extern time_t retry_timeout;
-struct dsa_info *da, *db;
+	extern time_t retry_timeout;
+	struct dsa_info *da, *db;
 
 	/* If we have used a DSA recently, with no failures - use it again */
 
@@ -313,28 +364,28 @@ struct dsa_info *da, *db;
 	if ((db = b->di_entry->e_dsainfo) == NULLDSA)
 		return 0;
 
-	if (da->dsa_last_attempt == (time_t)0) {
+	if (da->dsa_last_attempt == (time_t) 0) {
 		if (db->dsa_failures == 0) {
-			if ((db->dsa_last_success != (time_t)0)
-				&& (timenow - db->dsa_last_attempt < retry_timeout))
+			if ((db->dsa_last_success != (time_t) 0)
+			    && (timenow - db->dsa_last_attempt < retry_timeout))
 				return -1;	/* b worked recently */
 		} else if (timenow - db->dsa_last_attempt < retry_timeout)
-			return 1;		/* b failed recently */
-		return 0;	/* have not tried either recently  */
+			return 1;	/* b failed recently */
+		return 0;	/* have not tried either recently */
 
-	} else if (db->dsa_last_attempt == (time_t)0) {
+	} else if (db->dsa_last_attempt == (time_t) 0) {
 		if (da->dsa_failures == 0) {
-			if ((da->dsa_last_success != (time_t)0)
-				&& (timenow - da->dsa_last_attempt < retry_timeout))
+			if ((da->dsa_last_success != (time_t) 0)
+			    && (timenow - da->dsa_last_attempt < retry_timeout))
 				return 1;	/* a worked recentdlry */
 		} else if (timenow - da->dsa_last_attempt < retry_timeout)
-			return -1; 		/* a failed recently */
-		return 0;	/* have not tried either recently  */
+			return -1;	/* a failed recently */
+		return 0;	/* have not tried either recently */
 	}
 
 	if (da->dsa_failures == 0) {
 		if (db->dsa_failures == 0)
-			return 0;       /* both OK */
+			return 0;	/* both OK */
 		return 1;	/* a worked last time, b failed - use a */
 	}
 
@@ -343,10 +394,10 @@ struct dsa_info *da, *db;
 
 	/* both failed last time - see if either have suceeded recently */
 
-	if ((timenow - da->dsa_last_success) > retry_timeout ) {
+	if ((timenow - da->dsa_last_success) > retry_timeout) {
 		if ((timenow - db->dsa_last_success) > retry_timeout)
 			return 0;	/* too long ago to tell */
-		return -1; 	/* use b it worked not that long ago... */
+		return -1;	/* use b it worked not that long ago... */
 	}
 	if ((timenow - db->dsa_last_success) > retry_timeout)
 		return 1;	/* use a it worked not that long ago... */
@@ -355,18 +406,19 @@ struct dsa_info *da, *db;
 	return 0;
 }
 
-static di_cmp_address (a,b)
-struct di_block *a, *b;
+static
+di_cmp_address(a, b)
+	struct di_block *a, *b;
 {
-struct NSAPaddr *na;
-struct NSAPaddr *nb;
-struct NSAPaddr nas;
-struct TSAPaddr *ta;
-struct TSAPaddr *tb;
-int *ip;
-extern DN mydsadn;
-DN dnptr, mydnptr, dna,dnb;
-int ma,mb;
+	struct NSAPaddr *na;
+	struct NSAPaddr *nb;
+	struct NSAPaddr nas;
+	struct TSAPaddr *ta;
+	struct TSAPaddr *tb;
+	int *ip;
+	extern DN mydsadn;
+	DN dnptr, mydnptr, dna, dnb;
+	int ma, mb;
 
 	/* select DSA with best looking address !!! */
 
@@ -384,37 +436,37 @@ int ma,mb;
 	}
 
 	/* ta2norm return a static buffer */
-	ta = ta2norm (ta);
+	ta = ta2norm(ta);
 	nas = *(ta->ta_addrs);	/* struct copy */
 	na = &nas;
-	tb = ta2norm (tb);
+	tb = ta2norm(tb);
 	nb = tb->ta_addrs;
 
 	/* normalised, so look for first "na" match with ts_communities */
 	for (ip = ts_communities; *ip; ip++) {
 		if (*ip == na->na_community) {
 			if (*ip == nb->na_community)
-				break;		/* same primary community */
-			return 1;	  	/* 'a' preferred */
+				break;	/* same primary community */
+			return 1;	/* 'a' preferred */
 		}
 		if (*ip == nb->na_community)
-			return -1;		/* 'b' preferred */
+			return -1;	/* 'b' preferred */
 	}
 
 	/* Look at the DSA name to detect locality */
-	ma=0;
-	for (dnptr=dna, mydnptr=mydsadn ;
-		(dnptr!=NULLDN) && (mydnptr!=NULLDN) ;
-		dnptr=dnptr->dn_parent, mydnptr=mydnptr->dn_parent) {
-		if (rdn_cmp(dnptr->dn_rdn,mydnptr->dn_rdn) == 0)
+	ma = 0;
+	for (dnptr = dna, mydnptr = mydsadn;
+	     (dnptr != NULLDN) && (mydnptr != NULLDN);
+	     dnptr = dnptr->dn_parent, mydnptr = mydnptr->dn_parent) {
+		if (rdn_cmp(dnptr->dn_rdn, mydnptr->dn_rdn) == 0)
 			ma++;
 	}
 
-	mb=0;
-	for (dnptr=dnb, mydnptr=mydsadn ;
-		(dnptr!=NULLDN) && (mydnptr!=NULLDN) ;
-		dnptr=dnptr->dn_parent, mydnptr=mydnptr->dn_parent) {
-		if (rdn_cmp(dnptr->dn_rdn,mydnptr->dn_rdn) == 0)
+	mb = 0;
+	for (dnptr = dnb, mydnptr = mydsadn;
+	     (dnptr != NULLDN) && (mydnptr != NULLDN);
+	     dnptr = dnptr->dn_parent, mydnptr = mydnptr->dn_parent) {
+		if (rdn_cmp(dnptr->dn_rdn, mydnptr->dn_rdn) == 0)
 			mb++;
 	}
 
@@ -422,56 +474,60 @@ int ma,mb;
 		return (ma > mb ? 1 : -1);
 
 	/* check the DMD - NYI */
-	return 0;	
+	return 0;
 }
 
-static di_cmp (a,b)
-struct di_block *a, *b;
-    /*
-    *  Select best di_block
-    *    rule 1: deferred dsa infos have lowest preference, 
-    *		 complete have highest.
-    *
-    *  If two block have same state, select using
-    *    preference 1: quipu DSAs with quipu context
-    *    preference 2: quipu DSAs
-    *    preference 3: reliable DSAs
-    *    preference 4: local DSAs
-    */
+static
+di_cmp(a, b)
+	struct di_block *a, *b;
+
+    /* 
+     *  Select best di_block
+     *    rule 1: deferred dsa infos have lowest preference, 
+     *           complete have highest.
+     *
+     *  If two block have same state, select using
+     *    preference 1: quipu DSAs with quipu context
+     *    preference 2: quipu DSAs
+     *    preference 3: reliable DSAs
+     *    preference 4: local DSAs
+     */
 {
-int x,y;
+	int x, y;
 
 	if (a->di_state != b->di_state)
 		return (a->di_state > b->di_state ? -1 : 1);	/* rule 1 */
 
 	switch (a->di_state) {
 	case DI_DEFERRED:
-		break;	
+		break;
 	case DI_ACCESSPOINT:
-		if ((x = di_cmp_address(a,b)) != 0) {
-			DLOG (log_dsap,LLOG_TRACE,("AP selected on address"));
+		if ((x = di_cmp_address(a, b)) != 0) {
+			DLOG(log_dsap, LLOG_TRACE, ("AP selected on address"));
 			return x;	/* preference 4 - no info to asses 1,2 or 3 */
 		}
 		break;
 	case DI_COMPLETE:
-		x = quipu_ctx_supported (a->di_entry);
-		if ( x > 3) x = 3;	/* ISP & QSP == QSP here */
-		y = quipu_ctx_supported (b->di_entry);
-		if ( y > 3) y = 3;	/* ISP & QSP == QSP here */
+		x = quipu_ctx_supported(a->di_entry);
+		if (x > 3)
+			x = 3;	/* ISP & QSP == QSP here */
+		y = quipu_ctx_supported(b->di_entry);
+		if (y > 3)
+			y = 3;	/* ISP & QSP == QSP here */
 
-		if ( x != y ) {
-			DLOG (log_dsap,LLOG_TRACE,("DSA selected on context"));
-			return ( x > y ? 1 : -1);	/* preference 1 or 2 */
+		if (x != y) {
+			DLOG(log_dsap, LLOG_TRACE, ("DSA selected on context"));
+			return (x > y ? 1 : -1);	/* preference 1 or 2 */
 		}
 
-		if ((x=di_cmp_reliability (a,b)) != 0) {
-			DLOG (log_dsap,LLOG_TRACE,("DSA selected on relibility"));
-			return x;			/* preference 3 */
+		if ((x = di_cmp_reliability(a, b)) != 0) {
+			DLOG(log_dsap, LLOG_TRACE, ("DSA selected on relibility"));
+			return x;	/* preference 3 */
 		}
 
-		if ((x=di_cmp_address(a,b)) != 0) {
-			DLOG (log_dsap,LLOG_TRACE,("DSA selected on address"));
-			return x;		/* preference 4 */
+		if ((x = di_cmp_address(a, b)) != 0) {
+			DLOG(log_dsap, LLOG_TRACE, ("DSA selected on address"));
+			return x;	/* preference 4 */
 		}
 
 		break;
@@ -480,20 +536,19 @@ int x,y;
 	return (di_prefer_dsa(a->di_dn, b->di_dn));
 }
 
-
-sort_dsa_list (dsas)
-struct di_block	**dsas;
+sort_dsa_list(dsas)
+	struct di_block **dsas;
 {
-struct di_block	*trail;
-struct di_block	*old_di, *new_di;
-struct di_block *result;
-char changed = FALSE;
+	struct di_block *trail;
+	struct di_block *old_di, *new_di;
+	struct di_block *result;
+	char changed = FALSE;
 
 	if (dsas == NULL)
 		return;
 
 	/* turn access point into complete references if possible */
-	di_ap2comp (dsas);
+	di_ap2comp(dsas);
 
 	if (*dsas == NULL_DI_BLOCK)
 		return;
@@ -504,10 +559,10 @@ char changed = FALSE;
 
 	result->di_next = NULL_DI_BLOCK;
 
-	for(; old_di != NULL_DI_BLOCK; ) {
+	for (; old_di != NULL_DI_BLOCK;) {
 		trail = NULL_DI_BLOCK;
-		for(new_di = result; new_di != NULL_DI_BLOCK; new_di= new_di->di_next) {
-			if ( di_cmp (old_di,new_di) > 0 ) {
+		for (new_di = result; new_di != NULL_DI_BLOCK; new_di = new_di->di_next) {
+			if (di_cmp(old_di, new_di) > 0) {
 				if (trail == NULL_DI_BLOCK) {
 					result = old_di;
 					old_di = old_di->di_next;
@@ -521,35 +576,36 @@ char changed = FALSE;
 				break;
 			}
 			trail = new_di;
-		} 
+		}
 		if (new_di == NULL_DI_BLOCK) {
 			trail->di_next = old_di;
 			if (old_di) {
 				old_di = old_di->di_next;
 				trail->di_next->di_next = NULL_DI_BLOCK;
 			}
-		} 
+		}
 	}
 	*dsas = result;
 
 	if (changed) {
-		LLOG (log_dsap,LLOG_TRACE,("DSA order changed"));
+		LLOG(log_dsap, LLOG_TRACE, ("DSA order changed"));
 #ifdef DEBUG
-		di_list_log (result);
+		di_list_log(result);
 #endif
 	} else
-		DLOG (log_dsap,LLOG_TRACE,("DSA order not changed"));
+		DLOG(log_dsap, LLOG_TRACE, ("DSA order not changed"));
 
 }
 
-static int	  common_address (a,tb)
-struct di_block *a;
-struct TSAPaddr *tb;
+static int
+common_address(a, tb)
+	struct di_block *a;
+	struct TSAPaddr *tb;
 {
-struct TSAPaddr *ta;
-struct NSAPaddr *na;
-struct NSAPaddr *nb;
-int x,y;
+	struct TSAPaddr *ta;
+	struct NSAPaddr *na;
+	struct NSAPaddr *nb;
+	int x, y;
 
 	/* select DSA with best looking address !!! */
 
@@ -563,34 +619,28 @@ int x,y;
 		ta = &(a->di_accesspoints->ap_address->pa_addr.sa_addr);
 
 	/* compare ta and tb to see if they have a network in common */
-	for (na=ta->ta_addrs , x = ta->ta_naddr - 1 ;
-			x >= 0;
-			na++, x-- ) {
-		for (nb=tb->ta_addrs , y = tb->ta_naddr - 1 ;
-				y >= 0;
-				nb++, y-- ) {
+	for (na = ta->ta_addrs, x = ta->ta_naddr - 1; x >= 0; na++, x--) {
+		for (nb = tb->ta_addrs, y = tb->ta_naddr - 1; y >= 0; nb++, y--) {
 			if (na->na_community == nb->na_community)
 				return TRUE;
-				}
-			}
+		}
+	}
 	return FALSE;
 }
 
-
-struct di_block * select_refer_dsa(di,tk)
-struct di_block *di;
-struct task_act *tk;
+struct di_block *
+select_refer_dsa(di, tk)
+	struct di_block *di;
+	struct task_act *tk;
 {
-struct di_block *best;
-struct di_block *loop;
-Entry eptr;
-struct TSAPaddr *ta;
-DN rdsa;
+	struct di_block *best;
+	struct di_block *loop;
+	Entry eptr;
+	struct TSAPaddr *ta;
+	DN rdsa;
 
-	/* return the di block of the best DSA the other end should be
-	   to contact...
-	   If it can't contact any - return NULL
-        */
+	/* return the di block of the best DSA the other end should be to contact... If it can't
+	   contact any - return NULL */
 
 	if (di != NULL_DI_BLOCK)
 		best = di;
@@ -602,39 +652,37 @@ DN rdsa;
 		return best;	/* we will chain anyway - unless prevented by service control... */
 
 	rdsa = tk->tk_conn->cn_dn;
-	if ((eptr=local_find_entry (rdsa,FALSE)) == NULLENTRY)
+	if ((eptr = local_find_entry(rdsa, FALSE)) == NULLENTRY)
 		return best;	/* no way of knowing */
 
-	if (eptr->e_dsainfo == NULLDSA) 
+	if (eptr->e_dsainfo == NULLDSA)
 		return best;	/* no way of knowing */
 
 	ta = &(eptr->e_dsainfo->dsa_addr->pa_addr.sa_addr);
-	ta = ta2norm (ta);	/* calculate subnets... */
+	ta = ta2norm(ta);	/* calculate subnets... */
 
-	for (loop=di; loop!=NULL_DI_BLOCK; loop=loop->di_next)
-		if (common_address (loop,ta))
+	for (loop = di; loop != NULL_DI_BLOCK; loop = loop->di_next)
+		if (common_address(loop, ta))
 			return loop;
 
 	/* nothing on the same network - chain if possible !!! */
-	return NULL_DI_BLOCK;	
+	return NULL_DI_BLOCK;
 }
 
-di_rdns (di,rdns,aliases,object)
-struct di_block * di;
-int rdns, aliases;
-DN object;
+di_rdns(di, rdns, aliases, object)
+	struct di_block *di;
+	int rdns, aliases;
+	DN object;
 {
-register struct di_block *loop;
+	register struct di_block *loop;
 
-	for (loop=di; loop!=NULL_DI_BLOCK; loop=loop->di_next) {
+	for (loop = di; loop != NULL_DI_BLOCK; loop = loop->di_next) {
 		di->di_aliasedRDNs = aliases;
 		if (object) {
 			if (di->di_target)
-				dn_free (di->di_target);	
-			di->di_target = dn_cpy (object);
+				dn_free(di->di_target);
+			di->di_target = dn_cpy(object);
 		} else
 			di->di_rdn_resolved = rdns;
 	}
 }
-
-

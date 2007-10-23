@@ -1,3 +1,61 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /*
  * RFA - Remote File Access
  *
@@ -8,16 +66,17 @@
  *
  * Contributed by Oliver Wenzel, GMD Berlin, 1990
  *
- * $Header: /xtel/isode/isode/others/rfa/RCS/printerr.c,v 9.0 1992/06/16 12:47:25 isode Rel $
+ * Header: /xtel/isode/isode/others/rfa/RCS/printerr.c,v 9.0 1992/06/16 12:47:25 isode Rel
  *
- * $Log: printerr.c,v $
+ * Log: printerr.c,v
  * Revision 9.0  1992/06/16  12:47:25  isode
  * Release 8.0
  *
  */
 
 #ifndef       lint
-static char *rcsid = "$Header: /xtel/isode/isode/others/rfa/RCS/printerr.c,v 9.0 1992/06/16 12:47:25 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/others/rfa/RCS/printerr.c,v 9.0 1992/06/16 12:47:25 isode Rel";
 #endif
 
 /*
@@ -32,77 +91,74 @@ static char *rcsid = "$Header: /xtel/isode/isode/others/rfa/RCS/printerr.c,v 9.0
 
 #include <stdio.h>
 #include <sys/types.h>
-#include "RFA-ops.h"        /* operation definitions */
-#include "RFA-types.h"  /* type definitions */
+#include "RFA-ops.h"		/* operation definitions */
+#include "RFA-types.h"		/* type definitions */
 #include "rfa.h"
 
 extern FILE *err;
 extern char *shortTime();
 
-
 /*--------------------------------------------------------------*/
 /*  Print Error							*/
 /*--------------------------------------------------------------*/
 printError(error, param, rc)
-    int error;
-    caddr_t param;
-    int *rc;
+	int error;
+	caddr_t param;
+	int *rc;
 {
-    time_t t;
-    struct type_RFA_StatusErrorParm *se = 
-			(struct type_RFA_StatusErrorParm *)param;
+	time_t t;
+	struct type_RFA_StatusErrorParm *se = (struct type_RFA_StatusErrorParm *) param;
 
-    switch(error) {
+	switch (error) {
 	case error_RFA_miscError:
-		printf("*** remote error : %s ***\n", 
-			qb2str((struct qbuf *)param));
+		printf("*** remote error : %s ***\n", qb2str((struct qbuf *) param));
 		*rc = 3;
 		break;
 	case error_RFA_fileAccessError:
-		printf("*** remote file access error : %s ***\n", 
-			qb2str((struct qbuf *)param));
+		printf("*** remote file access error : %s ***\n", qb2str((struct qbuf *) param));
 		*rc = 4;
 		break;
 	case error_RFA_statusError:
 		switch (se->reason) {
-		    case int_RFA_reason_notMaster:
-			fprintf(err,"*** status error : remote site is not master ***\n");
+		case int_RFA_reason_notMaster:
+			fprintf(err, "*** status error : remote site is not master ***\n");
 			*rc = 10;
 			break;
-		    case int_RFA_reason_locked:
-		       t = se->since;
-		       fprintf(err,"*** status error : locked at remote site by %s since %s ***\n",	qb2str(se->user), shortTime(&t));
+		case int_RFA_reason_locked:
+			t = se->since;
+			fprintf(err,
+				"*** status error : locked at remote site by %s since %s ***\n",
+				qb2str(se->user), shortTime(&t));
 			*rc = 11;
-		       break;
-		    case int_RFA_reason_notRegistered:
+			break;
+		case int_RFA_reason_notRegistered:
 			fprintf(err, "*** status error : file not registered at remote site ***\n");
 			*rc = 12;
-		        break;
-		    case int_RFA_reason_notWritable:
-			fprintf(err,"*** status error : file not writable at remote site ***\n");
+			break;
+		case int_RFA_reason_notWritable:
+			fprintf(err, "*** status error : file not writable at remote site ***\n");
 			*rc = 13;
 			break;
-		    case int_RFA_reason_wrongVersion:
+		case int_RFA_reason_wrongVersion:
 			fprintf(err, "*** status error : wrong version ***\n");
 			*rc = 14;
-		    	break;
-		    case int_RFA_reason_notRegularFile:
-			fprintf(err,"*** status error : not a regular file ***\n");
+			break;
+		case int_RFA_reason_notRegularFile:
+			fprintf(err, "*** status error : not a regular file ***\n");
 			*rc = 16;
-		    	break;
-		    case int_RFA_reason_slaveNewer:
-			fprintf(err,"*** status error : local slave version is newer than remote master ***\n");
+			break;
+		case int_RFA_reason_slaveNewer:
+			fprintf(err,
+				"*** status error : local slave version is newer than remote master ***\n");
 			*rc = 17;
-		    	break;
-		    default:
-			fprintf(err,"*** status error : unknown error (%d) ***\n",
-				se->reason);
-			*rc = 19; 
+			break;
+		default:
+			fprintf(err, "*** status error : unknown error (%d) ***\n", se->reason);
+			*rc = 19;
 		}
 		break;
 	default:
-	    fprintf(err, "*** unknown error (%d) ***\n", error);
-	    *rc = 2;
-    }
+		fprintf(err, "*** unknown error (%d) ***\n", error);
+		*rc = 2;
+	}
 }
-

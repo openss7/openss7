@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* turbo_avl.c */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/turbo_avl.c,v 9.0 1992/06/16 12:12:39 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/dsap/common/RCS/turbo_avl.c,v 9.0 1992/06/16 12:12:39 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/dsap/common/RCS/turbo_avl.c,v 9.0 1992/06/16 12:12:39 isode Rel $
+ * Header: /xtel/isode/isode/dsap/common/RCS/turbo_avl.c,v 9.0 1992/06/16 12:12:39 isode Rel
  *
  *
- * $Log: turbo_avl.c,v $
+ * Log: turbo_avl.c,v
  * Revision 9.0  1992/06/16  12:12:39  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/turbo_avl.c,v 9
  *
  */
 
-
 #include <sys/types.h>
 
 #include "manifest.h"
@@ -33,8 +91,7 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/turbo_avl.c,v 9
 #include "quipu/entry.h"
 #include "quipu/turbo.h"
 
-extern LLog * log_dsap;
-
+extern LLog *log_dsap;
 
 #define ROTATERIGHT(x)	{ \
 	Avlnode *tmp;\
@@ -57,139 +114,141 @@ extern LLog * log_dsap;
 	*x = tmp;\
 }
 
-
-static ravl_insert( iroot, data, taller, fcmp, fdup, depth )
-Avlnode 	**iroot;
-caddr_t		data;
-int		*taller;
-IFP		fcmp;		/* comparison function */
-IFP		fdup;		/* function to call for duplicates */
-int		depth;
+static
+ravl_insert(iroot, data, taller, fcmp, fdup, depth)
+	Avlnode **iroot;
+	caddr_t data;
+	int *taller;
+	IFP fcmp;			/* comparison function */
+	IFP fdup;			/* function to call for duplicates */
+	int depth;
 {
-	int	rc, cmp, tallersub;
-	Avlnode	*l, *r;
+	int rc, cmp, tallersub;
+	Avlnode *l, *r;
 
-	if ( *iroot == 0 ) {
-		*iroot = ( Avlnode * ) malloc( sizeof( Avlnode ) );
+	if (*iroot == 0) {
+		*iroot = (Avlnode *) malloc(sizeof(Avlnode));
 		(*iroot)->avl_left = 0;
 		(*iroot)->avl_right = 0;
 		(*iroot)->avl_bf = 0;
 		(*iroot)->avl_data = data;
 		*taller = 1;
-		return( OK );
+		return (OK);
 	}
 
-	cmp = (*fcmp)( data, (*iroot)->avl_data );
+	cmp = (*fcmp) (data, (*iroot)->avl_data);
 
 	/* equal - duplicate name */
-	if ( cmp == 0 ) {
+	if (cmp == 0) {
 		*taller = 0;
-		return( (*fdup)( (*iroot)->avl_data, data ) );
+		return ((*fdup) ((*iroot)->avl_data, data));
 	}
 
 	/* go right */
-	else if ( cmp > 0 ) {
-		rc = ravl_insert( &((*iroot)->avl_right), data, &tallersub,
-		   fcmp, fdup, depth );
-		if ( tallersub )
-			switch ( (*iroot)->avl_bf ) {
-			case LH	: /* left high - balance is restored */
+	else if (cmp > 0) {
+		rc = ravl_insert(&((*iroot)->avl_right), data, &tallersub, fcmp, fdup, depth);
+		if (tallersub)
+			switch ((*iroot)->avl_bf) {
+			case LH:	/* left high - balance is restored */
 				(*iroot)->avl_bf = EH;
 				*taller = 0;
 				break;
-			case EH	: /* equal height - now right heavy */
+			case EH:	/* equal height - now right heavy */
 				(*iroot)->avl_bf = RH;
 				*taller = 1;
 				break;
-			case RH	: /* right heavy to start - right balance */
+			case RH:	/* right heavy to start - right balance */
 				r = (*iroot)->avl_right;
-				switch ( r->avl_bf ) {
-				case LH	: /* double rotation left */
+				switch (r->avl_bf) {
+				case LH:	/* double rotation left */
 					l = r->avl_left;
-					switch ( l->avl_bf ) {
-					case LH	: (*iroot)->avl_bf = EH;
-						  r->avl_bf = RH;
-						  break;
-					case EH	: (*iroot)->avl_bf = EH;
-						  r->avl_bf = EH;
-						  break;
-					case RH	: (*iroot)->avl_bf = LH;
-						  r->avl_bf = EH;
-						  break;
+					switch (l->avl_bf) {
+					case LH:
+						(*iroot)->avl_bf = EH;
+						r->avl_bf = RH;
+						break;
+					case EH:
+						(*iroot)->avl_bf = EH;
+						r->avl_bf = EH;
+						break;
+					case RH:
+						(*iroot)->avl_bf = LH;
+						r->avl_bf = EH;
+						break;
 					}
 					l->avl_bf = EH;
-					ROTATERIGHT( (&r) )
-					(*iroot)->avl_right = r;
-					ROTATELEFT( iroot )
-					*taller = 0;
+					ROTATERIGHT((&r))
+					    (*iroot)->avl_right = r;
+					ROTATELEFT(iroot)
+					    * taller = 0;
 					break;
-				case EH	: /* This should never happen */
+				case EH:	/* This should never happen */
 					break;
-				case RH	: /* single rotation left */
+				case RH:	/* single rotation left */
 					(*iroot)->avl_bf = EH;
 					r->avl_bf = EH;
-					ROTATELEFT( iroot )
-					*taller = 0;
+					ROTATELEFT(iroot)
+					    * taller = 0;
 					break;
 				}
 				break;
-			}
-		else
+		} else
 			*taller = 0;
 	}
 
 	/* go left */
 	else {
-		rc = ravl_insert( &((*iroot)->avl_left), data, &tallersub,
-		   fcmp, fdup, depth );
-		if ( tallersub )
-			switch ( (*iroot)->avl_bf ) {
-			case LH	: /* left high to start - left balance */
+		rc = ravl_insert(&((*iroot)->avl_left), data, &tallersub, fcmp, fdup, depth);
+		if (tallersub)
+			switch ((*iroot)->avl_bf) {
+			case LH:	/* left high to start - left balance */
 				l = (*iroot)->avl_left;
-				switch ( l->avl_bf ) {
-				case LH	: /* single rotation right */
+				switch (l->avl_bf) {
+				case LH:	/* single rotation right */
 					(*iroot)->avl_bf = EH;
 					l->avl_bf = EH;
-					ROTATERIGHT( iroot )
-					*taller = 0;
+					ROTATERIGHT(iroot)
+					    * taller = 0;
 					break;
-				case EH	: /* this should never happen */
+				case EH:	/* this should never happen */
 					break;
-				case RH	: /* double rotation right */
+				case RH:	/* double rotation right */
 					r = l->avl_right;
-					switch ( r->avl_bf ) {
-					case LH	: (*iroot)->avl_bf = RH;
-						  l->avl_bf = EH;
-						  break;
-					case EH	: (*iroot)->avl_bf = EH;
-						  l->avl_bf = EH;
-						  break;
-					case RH	: (*iroot)->avl_bf = EH;
-						  l->avl_bf = LH;
-						  break;
+					switch (r->avl_bf) {
+					case LH:
+						(*iroot)->avl_bf = RH;
+						l->avl_bf = EH;
+						break;
+					case EH:
+						(*iroot)->avl_bf = EH;
+						l->avl_bf = EH;
+						break;
+					case RH:
+						(*iroot)->avl_bf = EH;
+						l->avl_bf = LH;
+						break;
 					}
 					r->avl_bf = EH;
-					ROTATELEFT( (&l) )
-					(*iroot)->avl_left = l;
-					ROTATERIGHT( iroot )
-					*taller = 0;
+					ROTATELEFT((&l))
+					    (*iroot)->avl_left = l;
+					ROTATERIGHT(iroot)
+					    * taller = 0;
 					break;
 				}
 				break;
-			case EH	: /* equal height - now left heavy */
+			case EH:	/* equal height - now left heavy */
 				(*iroot)->avl_bf = LH;
 				*taller = 1;
 				break;
-			case RH	: /* right high - balance is restored */
+			case RH:	/* right high - balance is restored */
 				(*iroot)->avl_bf = EH;
 				*taller = 0;
 				break;
-			}
-		else
+		} else
 			*taller = 0;
 	}
 
-	return( rc );
+	return (rc);
 }
 
 /*
@@ -208,170 +267,173 @@ int		depth;
  * NOTE: this routine may malloc memory
  */
 
-avl_insert( root, data, fcmp, fdup )
-Avlnode	**root;
-caddr_t	data;
-IFP	fcmp;
-IFP	fdup;
+avl_insert(root, data, fcmp, fdup)
+	Avlnode **root;
+	caddr_t data;
+	IFP fcmp;
+	IFP fdup;
 {
-	int	taller;
+	int taller;
 
-	return( ravl_insert( root, data, &taller, fcmp, fdup, 0 ) );
+	return (ravl_insert(root, data, &taller, fcmp, fdup, 0));
 }
 
 /* called from delete when root's right subtree has been shortened */
-static right_balance( root )
-Avlnode	**root;
+static
+right_balance(root)
+	Avlnode **root;
 {
-	int	shorter;
-	Avlnode	*r, *l;
+	int shorter;
+	Avlnode *r, *l;
 
-	switch( (*root)->avl_bf ) {
-	case RH:	/* was right high - equal now */
+	switch ((*root)->avl_bf) {
+	case RH:		/* was right high - equal now */
 		(*root)->avl_bf = EH;
 		shorter = 1;
 		break;
-	case EH:	/* was equal - left high now */
+	case EH:		/* was equal - left high now */
 		(*root)->avl_bf = LH;
 		shorter = 0;
 		break;
-	case LH:	/* was right high - balance */
+	case LH:		/* was right high - balance */
 		l = (*root)->avl_left;
-		switch ( l->avl_bf ) {
-		case RH	: /* double rotation left */
+		switch (l->avl_bf) {
+		case RH:	/* double rotation left */
 			r = l->avl_right;
-			switch ( r->avl_bf ) {
-			case RH	:
+			switch (r->avl_bf) {
+			case RH:
 				(*root)->avl_bf = EH;
 				l->avl_bf = LH;
 				break;
-			case EH	:
+			case EH:
 				(*root)->avl_bf = EH;
 				l->avl_bf = EH;
 				break;
-			case LH	:
+			case LH:
 				(*root)->avl_bf = RH;
 				l->avl_bf = EH;
 				break;
 			}
 			r->avl_bf = EH;
-			ROTATELEFT( (&l) )
-			(*root)->avl_left = l;
-			ROTATERIGHT( root )
-			shorter = 1;
+			ROTATELEFT((&l))
+			    (*root)->avl_left = l;
+			ROTATERIGHT(root)
+			    shorter = 1;
 			break;
-		case EH	: /* right rotation */
+		case EH:	/* right rotation */
 			(*root)->avl_bf = LH;
 			l->avl_bf = RH;
-			ROTATERIGHT( root );
+			ROTATERIGHT(root);
 			shorter = 0;
 			break;
-		case LH	: /* single rotation right */
+		case LH:	/* single rotation right */
 			(*root)->avl_bf = EH;
 			l->avl_bf = EH;
-			ROTATERIGHT( root )
-			shorter = 1;
+			ROTATERIGHT(root)
+			    shorter = 1;
 			break;
 		}
 		break;
 	}
 
-	return( shorter );
+	return (shorter);
 }
 
 /* called from delete when root's left subtree has gotten shorter */
-static left_balance( root )
-Avlnode	**root;
+static
+left_balance(root)
+	Avlnode **root;
 {
-	int	shorter;
-	Avlnode	*r, *l;
+	int shorter;
+	Avlnode *r, *l;
 
-	switch( (*root)->avl_bf ) {
-	case LH:	/* was left high - equal now */
+	switch ((*root)->avl_bf) {
+	case LH:		/* was left high - equal now */
 		(*root)->avl_bf = EH;
 		shorter = 1;
 		break;
-	case EH:	/* was equal - right high now */
+	case EH:		/* was equal - right high now */
 		(*root)->avl_bf = RH;
 		shorter = 0;
 		break;
-	case RH:	/* was right high - balance */
+	case RH:		/* was right high - balance */
 		r = (*root)->avl_right;
-		switch ( r->avl_bf ) {
-		case LH	: /* double rotation left */
+		switch (r->avl_bf) {
+		case LH:	/* double rotation left */
 			l = r->avl_left;
-			switch ( l->avl_bf ) {
-			case LH	:
+			switch (l->avl_bf) {
+			case LH:
 				(*root)->avl_bf = EH;
 				r->avl_bf = RH;
 				break;
-			case EH	:
+			case EH:
 				(*root)->avl_bf = EH;
 				r->avl_bf = EH;
 				break;
-			case RH	:
+			case RH:
 				(*root)->avl_bf = LH;
 				r->avl_bf = EH;
 				break;
 			}
 			l->avl_bf = EH;
-			ROTATERIGHT( (&r) )
-			(*root)->avl_right = r;
-			ROTATELEFT( root )
-			shorter = 1;
+			ROTATERIGHT((&r))
+			    (*root)->avl_right = r;
+			ROTATELEFT(root)
+			    shorter = 1;
 			break;
-		case EH	: /* single rotation left */
+		case EH:	/* single rotation left */
 			(*root)->avl_bf = RH;
 			r->avl_bf = LH;
-			ROTATELEFT( root );
+			ROTATELEFT(root);
 			shorter = 0;
 			break;
-		case RH	: /* single rotation left */
+		case RH:	/* single rotation left */
 			(*root)->avl_bf = EH;
 			r->avl_bf = EH;
-			ROTATELEFT( root )
-			shorter = 1;
+			ROTATELEFT(root)
+			    shorter = 1;
 			break;
 		}
 		break;
 	}
 
-	return( shorter );
+	return (shorter);
 }
 
-static caddr_t ravl_delete( root, data, fcmp, shorter )
-Avlnode	**root;
-caddr_t	data;
-IFP	fcmp;
-int	*shorter;
+static caddr_t
+ravl_delete(root, data, fcmp, shorter)
+	Avlnode **root;
+	caddr_t data;
+	IFP fcmp;
+	int *shorter;
 {
-	int	shortersubtree = 0;
-	int	cmp;
-	caddr_t	savedata;
-	Avlnode	*minnode, *savenode;
+	int shortersubtree = 0;
+	int cmp;
+	caddr_t savedata;
+	Avlnode *minnode, *savenode;
 
-	if ( *root == NULLAVL )
-		return( 0 );
+	if (*root == NULLAVL)
+		return (0);
 
-	cmp = (*fcmp)( data, (*root)->avl_data );
+	cmp = (*fcmp) (data, (*root)->avl_data);
 
 	/* found it! */
-	if ( cmp == 0 ) {
+	if (cmp == 0) {
 		savenode = *root;
 		savedata = savenode->avl_data;
 
 		/* simple cases: no left child */
-		if ( (*root)->avl_left == 0 ) {
+		if ((*root)->avl_left == 0) {
 			*root = (*root)->avl_right;
 			*shorter = 1;
-			free( (char *) savenode );
-			return( savedata );
-		/* no right child */
-		} else if ( (*root)->avl_right == 0 ) {
+			free((char *) savenode);
+			return (savedata);
+			/* no right child */
+		} else if ((*root)->avl_right == 0) {
 			*root = (*root)->avl_left;
 			*shorter = 1;
-			free( (char *) savenode );
-			return( savedata );
+			free((char *) savenode);
+			return (savedata);
 		}
 
 		/* 
@@ -382,126 +444,124 @@ int	*shorter;
 		 */
 
 		minnode = (*root)->avl_right;
-		while ( minnode->avl_left != NULLAVL )
+		while (minnode->avl_left != NULLAVL)
 			minnode = minnode->avl_left;
 
 		/* swap the data */
 		(*root)->avl_data = minnode->avl_data;
 		minnode->avl_data = savedata;
 
-		savedata = ravl_delete( &(*root)->avl_right, data, fcmp,
-		    &shortersubtree );
+		savedata = ravl_delete(&(*root)->avl_right, data, fcmp, &shortersubtree);
 
-		if ( shortersubtree )
-			*shorter = right_balance( root );
+		if (shortersubtree)
+			*shorter = right_balance(root);
 		else
 			*shorter = 0;
-	/* go left */
-	} else if ( cmp < 0 ) {
-		if ( (savedata = ravl_delete( &(*root)->avl_left, data, fcmp,
-		    &shortersubtree )) == 0 ) {
+		/* go left */
+	} else if (cmp < 0) {
+		if ((savedata = ravl_delete(&(*root)->avl_left, data, fcmp, &shortersubtree)) == 0) {
 			*shorter = 0;
-			return( 0 );
+			return (0);
 		}
 
 		/* left subtree shorter? */
-		if ( shortersubtree )
-			*shorter = left_balance( root );
+		if (shortersubtree)
+			*shorter = left_balance(root);
 		else
 			*shorter = 0;
-	/* go right */
+		/* go right */
 	} else {
-		if ( (savedata = ravl_delete( &(*root)->avl_right, data, fcmp,
-		    &shortersubtree )) == 0 ) {
+		if ((savedata = ravl_delete(&(*root)->avl_right, data, fcmp, &shortersubtree)) == 0) {
 			*shorter = 0;
-			return( 0 );
+			return (0);
 		}
 
-		if ( shortersubtree ) 
-			*shorter = right_balance( root );
+		if (shortersubtree)
+			*shorter = right_balance(root);
 		else
 			*shorter = 0;
 	}
 
-	return( savedata );
+	return (savedata);
 }
 
-caddr_t avl_delete( root, data, fcmp )
-Avlnode	**root;
-caddr_t	data;
-IFP	fcmp;
+caddr_t
+avl_delete(root, data, fcmp)
+	Avlnode **root;
+	caddr_t data;
+	IFP fcmp;
 {
-	int	shorter;
+	int shorter;
 
-	return( ravl_delete( root, data, fcmp, &shorter ) );
+	return (ravl_delete(root, data, fcmp, &shorter));
 }
 
-avl_inapply( root, fn, arg, stopflag )
-Avlnode	*root;
-IFP	fn;
-caddr_t	arg;
-int	stopflag;
+avl_inapply(root, fn, arg, stopflag)
+	Avlnode *root;
+	IFP fn;
+	caddr_t arg;
+	int stopflag;
 {
-	if ( root == 0 )
-		return( AVL_NOMORE );
+	if (root == 0)
+		return (AVL_NOMORE);
 
-	if ( root->avl_left != 0 )
-		if ( avl_inapply( root->avl_left, fn, arg, stopflag ) 
-		    == stopflag )
-			return( stopflag );
+	if (root->avl_left != 0)
+		if (avl_inapply(root->avl_left, fn, arg, stopflag)
+		    == stopflag)
+			return (stopflag);
 
-	if ( (*fn)( root->avl_data, arg ) == stopflag )
-		return( stopflag );
+	if ((*fn) (root->avl_data, arg) == stopflag)
+		return (stopflag);
 
-	if ( root->avl_right == 0 )
-		return( AVL_NOMORE );
+	if (root->avl_right == 0)
+		return (AVL_NOMORE);
 	else
-		return( avl_inapply( root->avl_right, fn, arg, stopflag ) );
+		return (avl_inapply(root->avl_right, fn, arg, stopflag));
 }
 
-avl_postapply( root, fn, arg, stopflag )
-Avlnode	*root;
-IFP	fn;
-caddr_t	arg;
-int	stopflag;
+avl_postapply(root, fn, arg, stopflag)
+	Avlnode *root;
+	IFP fn;
+	caddr_t arg;
+	int stopflag;
 {
-	if ( root == 0 )
-		return( AVL_NOMORE );
+	if (root == 0)
+		return (AVL_NOMORE);
 
-	if ( root->avl_left != 0 )
-		if ( avl_postapply( root->avl_left, fn, arg, stopflag ) 
-		    == stopflag )
-			return( stopflag );
+	if (root->avl_left != 0)
+		if (avl_postapply(root->avl_left, fn, arg, stopflag)
+		    == stopflag)
+			return (stopflag);
 
-	if ( root->avl_right != 0 )
-		if ( avl_postapply( root->avl_right, fn, arg, stopflag ) 
-		    == stopflag )
-			return( stopflag );
+	if (root->avl_right != 0)
+		if (avl_postapply(root->avl_right, fn, arg, stopflag)
+		    == stopflag)
+			return (stopflag);
 
-	return( (*fn)( root->avl_data, arg ) );
+	return ((*fn) (root->avl_data, arg));
 }
 
-avl_preapply( root, fn, arg, stopflag )
-Avlnode	*root;
-IFP	fn;
-caddr_t	arg;
-int	stopflag;
+avl_preapply(root, fn, arg, stopflag)
+	Avlnode *root;
+	IFP fn;
+	caddr_t arg;
+	int stopflag;
 {
-	if ( root == 0 )
-		return( AVL_NOMORE );
+	if (root == 0)
+		return (AVL_NOMORE);
 
-	if ( (*fn)( root->avl_data, arg ) == stopflag )
-		return( stopflag );
+	if ((*fn) (root->avl_data, arg) == stopflag)
+		return (stopflag);
 
-	if ( root->avl_left != 0 )
-		if ( avl_preapply( root->avl_left, fn, arg, stopflag ) 
-		    == stopflag )
-			return( stopflag );
+	if (root->avl_left != 0)
+		if (avl_preapply(root->avl_left, fn, arg, stopflag)
+		    == stopflag)
+			return (stopflag);
 
-	if ( root->avl_right == 0 )
-		return( AVL_NOMORE );
+	if (root->avl_right == 0)
+		return (AVL_NOMORE);
 	else
-		return( avl_preapply( root->avl_right, fn, arg, stopflag ) );
+		return (avl_preapply(root->avl_right, fn, arg, stopflag));
 }
 
 /*
@@ -511,24 +571,23 @@ int	stopflag;
  * a stopflag.
  */
 
-avl_apply( root, fn, arg, stopflag, type )
-Avlnode	*root;
-IFP	fn;
-caddr_t	arg;
-int	stopflag;
-int	type;
+avl_apply(root, fn, arg, stopflag, type)
+	Avlnode *root;
+	IFP fn;
+	caddr_t arg;
+	int stopflag;
+	int type;
 {
-	switch ( type ) {
+	switch (type) {
 	case AVL_INORDER:
-		return( avl_inapply( root, fn, arg, stopflag ) );
+		return (avl_inapply(root, fn, arg, stopflag));
 	case AVL_PREORDER:
-		return( avl_preapply( root, fn, arg, stopflag ) );
+		return (avl_preapply(root, fn, arg, stopflag));
 	case AVL_POSTORDER:
-		return( avl_postapply( root, fn, arg, stopflag ) );
+		return (avl_postapply(root, fn, arg, stopflag));
 	default:
-		DLOG( log_dsap, LLOG_EXCEPTIONS, ("Invalid traversal type %d",
-		    type) );
-		return( NOTOK );
+		DLOG(log_dsap, LLOG_EXCEPTIONS, ("Invalid traversal type %d", type));
+		return (NOTOK);
 	}
 
 	/* NOTREACHED */
@@ -545,47 +604,47 @@ int	type;
  * AVL_NOMORE is returned.
  */
 
-avl_prefixapply( root, data, fmatch, marg, fcmp, carg, stopflag )
-Avlnode	*root;
-caddr_t	data;
-IFP	fmatch;
-caddr_t	marg;
-IFP	fcmp;
-caddr_t	carg;
-int	stopflag;
+avl_prefixapply(root, data, fmatch, marg, fcmp, carg, stopflag)
+	Avlnode *root;
+	caddr_t data;
+	IFP fmatch;
+	caddr_t marg;
+	IFP fcmp;
+	caddr_t carg;
+	int stopflag;
 {
-	int	cmp;
+	int cmp;
 
-	if ( root == 0 )
-		return( AVL_NOMORE );
+	if (root == 0)
+		return (AVL_NOMORE);
 
-	cmp = (*fcmp)( data, root->avl_data, carg );
-	if ( cmp == 0 ) {
-		if ( (*fmatch)( root->avl_data, marg ) == stopflag )
-			return( stopflag );
+	cmp = (*fcmp) (data, root->avl_data, carg);
+	if (cmp == 0) {
+		if ((*fmatch) (root->avl_data, marg) == stopflag)
+			return (stopflag);
 
-		if ( root->avl_left != 0 )
-			if ( avl_prefixapply( root->avl_left, data, fmatch,
-			    marg, fcmp, carg, stopflag ) == stopflag )
-				return( stopflag );
+		if (root->avl_left != 0)
+			if (avl_prefixapply(root->avl_left, data, fmatch,
+					    marg, fcmp, carg, stopflag) == stopflag)
+				return (stopflag);
 
-		if ( root->avl_right != 0 )
-			return( avl_prefixapply( root->avl_right, data, fmatch,
-			    marg, fcmp, carg, stopflag ) );
+		if (root->avl_right != 0)
+			return (avl_prefixapply(root->avl_right, data, fmatch,
+						marg, fcmp, carg, stopflag));
 		else
-			return( AVL_NOMORE );
+			return (AVL_NOMORE);
 
-	} else if ( cmp < 0 ) {
-		if ( root->avl_left != 0 )
-			return( avl_prefixapply( root->avl_left, data, fmatch,
-			    marg, fcmp, carg, stopflag ) );
+	} else if (cmp < 0) {
+		if (root->avl_left != 0)
+			return (avl_prefixapply(root->avl_left, data, fmatch,
+						marg, fcmp, carg, stopflag));
 	} else {
-		if ( root->avl_right != 0 )
-			return( avl_prefixapply( root->avl_right, data, fmatch,
-			    marg, fcmp, carg, stopflag ) );
+		if (root->avl_right != 0)
+			return (avl_prefixapply(root->avl_right, data, fmatch,
+						marg, fcmp, carg, stopflag));
 	}
 
-	return( AVL_NOMORE );
+	return (AVL_NOMORE);
 }
 
 /*
@@ -594,28 +653,28 @@ int	stopflag;
  * number of items actually freed is returned.
  */
 
-avl_free( root, dfree )
-Avlnode	*root;
-IFP	dfree;
+avl_free(root, dfree)
+	Avlnode *root;
+	IFP dfree;
 {
-	int	nleft, nright;
+	int nleft, nright;
 
-	if ( root == 0 )
-		return( 0 );
+	if (root == 0)
+		return (0);
 
 	nleft = nright = 0;
-	if ( root->avl_left != 0 )
-		nleft = avl_free( root->avl_left, dfree );
+	if (root->avl_left != 0)
+		nleft = avl_free(root->avl_left, dfree);
 
-	if ( root->avl_right != 0 )
-		nright = avl_free( root->avl_right, dfree );
+	if (root->avl_right != 0)
+		nright = avl_free(root->avl_right, dfree);
 
-	if ( dfree )
-		(*dfree)( root->avl_data );
+	if (dfree)
+		(*dfree) (root->avl_data);
 
-	free( (char *) root );
+	free((char *) root);
 
-	return( nleft + nright + 1 );
+	return (nleft + nright + 1);
 }
 
 /*
@@ -625,85 +684,88 @@ IFP	dfree;
  * < 0 if arg1 is less than arg2 and > 0 if arg1 is greater than arg2.
  */
 
-caddr_t avl_find( root, data, fcmp )
-Avlnode	*root;
-caddr_t	data;
-IFP	fcmp;
+caddr_t
+avl_find(root, data, fcmp)
+	Avlnode *root;
+	caddr_t data;
+	IFP fcmp;
 {
-	int	cmp;
+	int cmp;
 
-	while ( root != 0 && (cmp = (*fcmp)( data, root->avl_data )) != 0 ) {
-		if ( cmp < 0 )
+	while (root != 0 && (cmp = (*fcmp) (data, root->avl_data)) != 0) {
+		if (cmp < 0)
 			root = root->avl_left;
 		else
 			root = root->avl_right;
 	}
 
-	return( root ? root->avl_data : 0 );
+	return (root ? root->avl_data : 0);
 }
 
-static caddr_t	*avl_list;
-static int	avl_maxlist;
-static int	avl_nextlist;
+static caddr_t *avl_list;
+static int avl_maxlist;
+static int avl_nextlist;
 
 #define AVL_GRABSIZE	100
 
 /* ARGSUSED 1 */
-static avl_buildlist( data, arg )
-caddr_t	data;
-int	arg;
+static
+avl_buildlist(data, arg)
+	caddr_t data;
+	int arg;
 {
-	static int	slots;
+	static int slots;
 
-	if ( avl_list == (caddr_t *) 0 ) {
+	if (avl_list == (caddr_t *) 0) {
 		avl_list = (caddr_t *) malloc(AVL_GRABSIZE * sizeof(caddr_t));
 		slots = AVL_GRABSIZE;
 		avl_maxlist = 0;
-	} else if ( avl_maxlist == slots ) {
+	} else if (avl_maxlist == slots) {
 		slots += AVL_GRABSIZE;
-		avl_list = (caddr_t *) realloc( (char *) avl_list,
-		    (unsigned) slots * sizeof(caddr_t));
+		avl_list = (caddr_t *) realloc((char *) avl_list,
+					       (unsigned) slots * sizeof(caddr_t));
 	}
 
-	avl_list[ avl_maxlist++ ] = data;
+	avl_list[avl_maxlist++] = data;
 
-	return( 0 );
+	return (0);
 }
 
-caddr_t avl_getfirst( root )
-Avlnode	*root;
+caddr_t
+avl_getfirst(root)
+	Avlnode *root;
 {
-	if ( avl_list ) {
-		free( (char *) avl_list);
+	if (avl_list) {
+		free((char *) avl_list);
 		avl_list = (caddr_t *) 0;
 	}
 	avl_maxlist = 0;
 	avl_nextlist = 0;
 
-	if ( root == 0 )
-		return( 0 );
+	if (root == 0)
+		return (0);
 
-	(void) avl_apply( root, avl_buildlist, (caddr_t) 0, -1, AVL_INORDER );
+	(void) avl_apply(root, avl_buildlist, (caddr_t) 0, -1, AVL_INORDER);
 
-	return( avl_list[ avl_nextlist++ ] );
+	return (avl_list[avl_nextlist++]);
 }
 
-caddr_t avl_getnext()
+caddr_t
+avl_getnext()
 {
-	if ( avl_list == 0 )
-		return( 0 );
+	if (avl_list == 0)
+		return (0);
 
-	if ( avl_nextlist == avl_maxlist ) {
-		free( (caddr_t) avl_list);
+	if (avl_nextlist == avl_maxlist) {
+		free((caddr_t) avl_list);
 		avl_list = (caddr_t *) 0;
-		return( 0 );
+		return (0);
 	}
 
-	return( avl_list[ avl_nextlist++ ] );
+	return (avl_list[avl_nextlist++]);
 }
-
 
 avl_dup_error()
 {
-	return( NOTOK );
+	return (NOTOK);
 }

@@ -1,11 +1,70 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* ftpd.c - FTAM/FTP gateway */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/ftp-ftam/RCS/ftpd.c,v 9.0 1992/06/16 12:17:24 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/ftp-ftam/RCS/ftpd.c,v 9.0 1992/06/16 12:17:24 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/ftp-ftam/RCS/ftpd.c,v 9.0 1992/06/16 12:17:24 isode Rel $
+ * Header: /xtel/isode/isode/ftp-ftam/RCS/ftpd.c,v 9.0 1992/06/16 12:17:24 isode Rel
  *
  * Author:	John A. Scott		<Scott@GATEWAY.MITRE.ORG>
  *		The MITRE Corporation
@@ -14,7 +73,7 @@ static char *rcsid = "$Header: /xtel/isode/isode/ftp-ftam/RCS/ftpd.c,v 9.0 1992/
  *		Mclean, Virginia 22102
  *		+1-703-883-5915
  *
- * $Log: ftpd.c,v $
+ * Log: ftpd.c,v
  * Revision 9.0  1992/06/16  12:17:24  isode
  * Release 8.0
  *
@@ -63,10 +122,11 @@ static char *rcsid = "$Header: /xtel/isode/isode/ftp-ftam/RCS/ftpd.c,v 9.0 1992/
 #include "manifest.h"
 #include "logger.h"
 extern LLog _ftam_log, *ftam_log;
+
 #include <varargs.h>
 
 char *ctime();
-void adios (), advise ();
+void adios(), advise();
 
 /*
  * File containing login names
@@ -78,35 +138,36 @@ void adios (), advise ();
  */
 #define	FTPUSERS	"/usr/etc/ftpusers"
 
-extern	int errno;
-extern	char *sys_errlist[];
-extern  char ftam_error[];
-extern	char version[];
+extern int errno;
+extern char *sys_errlist[];
+extern char ftam_error[];
+extern char version[];
 
-struct	sockaddr_in ctrl_addr;
-struct	sockaddr_in data_source;
-struct	sockaddr_in data_dest;
-struct	sockaddr_in his_addr;
+struct sockaddr_in ctrl_addr;
+struct sockaddr_in data_source;
+struct sockaddr_in data_dest;
+struct sockaddr_in his_addr;
 
-int	data;
-jmp_buf	errcatch;
-int	logged_in;
-int	debug = 0;
-int	watch = 1;
-int	timeout;
-int	logging = 0;
-int	type;
-int	form;
-int	stru;			/* avoid C keyword */
-int	mode;
-int	usedefault = 1;		/* for data transfers */
-char	hostname[32];
-char	remotehost[32];
-char	*osi_host = NULL;
-char	*ftp_user;
-char	*ftp_account;
-char	*ftp_passwd;
-int	verbose = 0;
+int data;
+jmp_buf errcatch;
+int logged_in;
+int debug = 0;
+int watch = 1;
+int timeout;
+int logging = 0;
+int type;
+int form;
+int stru;				/* avoid C keyword */
+int mode;
+int usedefault = 1;			/* for data transfers */
+char hostname[32];
+char remotehost[32];
+char *osi_host = NULL;
+char *ftp_user;
+char *ftp_account;
+char *ftp_passwd;
+int verbose = 0;
+
 #define NVEC 100
 char *vec[NVEC];
 
@@ -118,49 +179,49 @@ char *vec[NVEC];
 #define	SWAITMAX	90	/* wait at most 90 seconds */
 #define	SWAITINT	5	/* interval between retries */
 
-int	swaitmax = SWAITMAX;
-int	swaitint = SWAITINT;
+int swaitmax = SWAITMAX;
+int swaitint = SWAITINT;
 
-SFD	lostconn();
+SFD lostconn();
 
 main(argc, argv)
 	int argc;
 	char *argv[];
 {
-	int	addrlen;
+	int addrlen;
 	char *ptr;
 	struct servent *sp;
 
-	isodetailor (ptr = argv[0], 0);
+	isodetailor(ptr = argv[0], 0);
 	argc--, argv++;
-	if (verbose = isatty (fileno (stderr)))
-	    ll_dbinit (ftam_log, ptr);
+	if (verbose = isatty(fileno(stderr)))
+		ll_dbinit(ftam_log, ptr);
 	else {
-	    ftam_log -> ll_stat &= ~LLOGCLS;
-	    ll_hdinit (ftam_log, ptr);
+		ftam_log->ll_stat &= ~LLOGCLS;
+		ll_hdinit(ftam_log, ptr);
 	}
 
-	advise (NULLCP, "starting");
+	advise(NULLCP, "starting");
 
 	addrlen = sizeof his_addr;
-	if (getpeername (0, (struct sockaddr *) &his_addr, &addrlen) == NOTOK)
-	    adios ("failed", "getpeername");
+	if (getpeername(0, (struct sockaddr *) &his_addr, &addrlen) == NOTOK)
+		adios("failed", "getpeername");
 	sp = getservbyname("ftp", "tcp");
 	if (sp == 0) {
 		advise(NULLCP, "ftp/tcp: unknown service");
-abort();
+		abort();
 		exit(1);
 	}
 	ctrl_addr.sin_port = sp->s_port;
 	data_source.sin_port = htons(ntohs((u_short) sp->s_port) - 1);
-	(void)signal(SIGPIPE, lostconn);
-	(void)signal(SIGCHLD, SIG_IGN);
-	(void)dup2(0, 1);
+	(void) signal(SIGPIPE, lostconn);
+	(void) signal(SIGCHLD, SIG_IGN);
+	(void) dup2(0, 1);
 	/* do telnet option negotiation here */
-	/*
+	/* 
 	 * Set up default state
 	 */
-	rcinit(); /* FTAM state initialize */
+	rcinit();		/* FTAM state initialize */
 	logged_in = 0;
 	data = -1;
 	type = TYPE_A;
@@ -169,15 +230,15 @@ abort();
 	mode = MODE_S;
 	addrlen = sizeof ctrl_addr;
 	if (getsockname(0, (struct sockaddr *) &ctrl_addr, &addrlen) == NOTOK)
-	    adios ("failed", "getsockname");
-	(void)gethostname(hostname, sizeof (hostname));
-	ptr = index(hostname,'.'); /* strip off domain name */
-	if (ptr) *ptr = '\0';
-	reply(220, "%s FTP/FTAM gateway (%s) ready.",
-		hostname, version);
+		adios("failed", "getsockname");
+	(void) gethostname(hostname, sizeof(hostname));
+	ptr = index(hostname, '.');	/* strip off domain name */
+	if (ptr)
+		*ptr = '\0';
+	reply(220, "%s FTP/FTAM gateway (%s) ready.", hostname, version);
 	for (;;) {
-		(void)setjmp(errcatch);
-		(void)yyparse();
+		(void) setjmp(errcatch);
+		(void) yyparse();
 	}
 }
 
@@ -185,7 +246,7 @@ SFD
 lostconn()
 {
 
-	advise (NULLCP,"lost connection");
+	advise(NULLCP, "lost connection");
 	dologout(-1);
 }
 
@@ -194,9 +255,9 @@ savestr(s)
 	char *s;
 {
 	char *new = malloc((unsigned) (strlen(s) + 1));
-	
+
 	if (new != NULL)
-		(void)strcpy(new, s);
+		(void) strcpy(new, s);
 	return (new);
 }
 
@@ -205,17 +266,14 @@ retrieve(name)
 {
 	int result;
 
- /* FTAM file retrieval block function.  Return values:
-  * OK    -- file transfered without error
-  * NOTOK -- file transfer error
-  * DONE  -- Problem opening TCP connection for transfer
-  *          Error response made by dataconn routine.
-  */
+	/* FTAM file retrieval block function.  Return values: OK -- file transfered without error
+	   NOTOK -- file transfer error DONE -- Problem opening TCP connection for transfer Error
+	   response made by dataconn routine. */
 	vec[0] = "f_get";
 	vec[1] = name;
 	vec[2] = NULL;
 
-	if ((result = f_get(vec)) == NOTOK){
+	if ((result = f_get(vec)) == NOTOK) {
 		reply(550, "%s: %s.", name, ftam_error);
 	} else if (result == OK)
 		reply(226, "Transfer complete.");
@@ -228,6 +286,7 @@ ftp_store(name, modeX)
 	char *name, *modeX;
 {
 	int result;
+
 /*
  * f_put is FTAM file storage block function.  First arguement
  * controls file overwrite or append selection.
@@ -237,7 +296,7 @@ ftp_store(name, modeX)
  *          Error response made by dataconn routine.
  */
 
-	vec[0] = strcmp(modeX,"a") ? "put" : "append";
+	vec[0] = strcmp(modeX, "a") ? "put" : "append";
 	vec[1] = name;
 	vec[2] = NULL;
 	if ((result = f_put(vec)) == NOTOK)
@@ -252,6 +311,7 @@ getdatasock()
 {
 /* UCB data socket creation routine */
 	int s;
+
 #ifdef	BSD43
 	int on = 1;
 #endif
@@ -270,11 +330,11 @@ getdatasock()
 	/* anchor socket to avoid multi-homing problems */
 	data_source.sin_family = AF_INET;
 	data_source.sin_addr = ctrl_addr.sin_addr;
-	if (bind(s, (struct sockaddr *) &data_source, sizeof (data_source)) < 0)
+	if (bind(s, (struct sockaddr *) &data_source, sizeof(data_source)) < 0)
 		goto bad;
 	return (s);
-bad:
-	(void)close(s);
+      bad:
+	(void) close(s);
 	return (NOTOK);
 }
 
@@ -286,8 +346,7 @@ dataconn(name)
 	int retry = 0;
 
 	if (data >= 0) {
-		reply(125, "Using existing data connection for %s.",
-		    name);
+		reply(125, "Using existing data connection for %s.", name);
 		usedefault = 1;
 		return (data);
 	}
@@ -295,24 +354,21 @@ dataconn(name)
 		data_dest = his_addr;
 	usedefault = 1;
 	data = getdatasock();
-	if (data == NOTOK){
+	if (data == NOTOK) {
 		reply(425, "Can't create data socket (%s,%d): %s.",
-		    inet_ntoa(data_source.sin_addr),
-		    ntohs(data_source.sin_port),
-		    sys_errlist[errno]);
+		      inet_ntoa(data_source.sin_addr),
+		      ntohs(data_source.sin_port), sys_errlist[errno]);
 		return (NOTOK);
 	}
 	reply(150, "Opening data connection for %s (%s,%d).",
-	    name, inet_ntoa(data_dest.sin_addr),
-	    ntohs(data_dest.sin_port));
-	while (connect(data, (struct sockaddr *)&data_dest, sizeof (data_dest)) < 0) {
+	      name, inet_ntoa(data_dest.sin_addr), ntohs(data_dest.sin_port));
+	while (connect(data, (struct sockaddr *) &data_dest, sizeof(data_dest)) < 0) {
 		if (errno == EADDRINUSE && retry < swaitmax) {
 			sleep((unsigned) swaitint);
 			retry += swaitint;
 			continue;
 		}
-		reply(425, "Can't build data connection: %s.",
-		    sys_errlist[errno]);
+		reply(425, "Can't build data connection: %s.", sys_errlist[errno]);
 		(void) close(data);
 		data = -1;
 		return (NOTOK);
@@ -324,82 +380,84 @@ fatal(s)
 	char *s;
 {
 	reply(451, "Error in server: %s\n", s);
-	/* reply(221, "Closing connection due to server error.");*/
+	/* reply(221, "Closing connection due to server error."); */
 	dologout(0);
 }
 
 #ifndef	lint
 reply(va_alist)
-va_dcl
+	va_dcl
 {
-    int	n;
-    va_list ap;
+	int n;
+	va_list ap;
 
-    va_start (ap);
+	va_start(ap);
 
-    n = va_arg (ap, int);
+	n = va_arg(ap, int);
 
-    _reply (n, ' ', ap);
+	_reply(n, ' ', ap);
 
-    va_end (ap);
+	va_end(ap);
 }
 
 lreply(va_alist)
-va_dcl
+	va_dcl
 {
-    int	n;
-    va_list ap;
+	int n;
+	va_list ap;
 
-    va_start (ap);
+	va_start(ap);
 
-    n = va_arg (ap, int);
+	n = va_arg(ap, int);
 
-    _reply (n, '-', ap);
+	_reply(n, '-', ap);
 
-    va_end (ap);
+	va_end(ap);
 }
 
-static _reply (n, c, ap)
-int	n;
-char    c;
-va_list ap;
+static
+_reply(n, c, ap)
+	int n;
+	char c;
+	va_list ap;
 {
-    char    buffer[BUFSIZ];
+	char buffer[BUFSIZ];
 
-    _asprintf (buffer, NULLCP, ap);
+	_asprintf(buffer, NULLCP, ap);
 
-    (void)printf ("%d%c%s\r\n", n, c, buffer);
-    (void)fflush (stdout);
+	(void) printf("%d%c%s\r\n", n, c, buffer);
+	(void) fflush(stdout);
 
-    if (verbose)
-	advise (NULLCP,"<--- %d%c%s", n, c, buffer);
+	if (verbose)
+		advise(NULLCP, "<--- %d%c%s", n, c, buffer);
 }
 #else
 /* VARARGS2 */
 
-reply(n,fmt)
-int	n;
-char   *fmt;
+reply(n, fmt)
+	int n;
+	char *fmt;
 {
-    reply(n,fmt);
+	reply(n, fmt);
 }
+
 /* VARARGS2 */
 
-lreply(n,fmt)
-int	n;
-char   *fmt;
+lreply(n, fmt)
+	int n;
+	char *fmt;
 {
-    lreply(n,fmt);
+	lreply(n, fmt);
 }
 #endif
 
 replystr(s)
 	char *s;
 {
-	(void)printf("%s\r\n", s);
-	(void)fflush(stdout);
+	(void) printf("%s\r\n", s);
+	(void) fflush(stdout);
 	if (verbose)
-	    advise(NULLCP,"<--- %s", s);
+		advise(NULLCP, "<--- %s", s);
 }
 
 ack(s)
@@ -414,9 +472,9 @@ nack(s)
 	reply(502, "%s command not implemented.", s);
 }
 
-/*ARGSUSED*/
+ /*ARGSUSED*/
 yyerror(s)
-char *s;
+	char *s;
 {
 	reply(500, "Command not understood.");
 }
@@ -431,7 +489,7 @@ ftp_delete(name)
 	vec[1] = name;
 	vec[2] = NULL;
 
-	if (f_rm(vec) == NOTOK){
+	if (f_rm(vec) == NOTOK) {
 		reply(550, "%s: %s.", name, ftam_error);
 		return;
 	}
@@ -441,14 +499,14 @@ ftp_delete(name)
 makedir(name)
 	char *name;
 {
-	
+
 /* f_mkdir is the FTAM directory creation routine */
 
 	vec[0] = "f_mkdir";
 	vec[1] = name;
 	vec[2] = NULL;
-	
-	if (f_mkdir(vec) == NOTOK){
+
+	if (f_mkdir(vec) == NOTOK) {
 		reply(550, "%s: %s.", name, ftam_error);
 		return;
 	}
@@ -465,7 +523,7 @@ removedir(name)
 	vec[1] = name;
 	vec[2] = NULL;
 
-	if (f_rm(vec) == NOTOK){
+	if (f_rm(vec) == NOTOK) {
 		reply(550, "%s: %s.", name, ftam_error);
 		return;
 	}
@@ -487,12 +545,12 @@ renamecmd(from, to)
 /* f_mv is FTAM block function to select and change attributes 
  * (i.e. file name)
  */
-	vec[0] ="f_mv";
+	vec[0] = "f_mv";
 	vec[1] = from;
 	vec[2] = to;
 	vec[3] = NULL;
 
-	if (f_mv(vec) == NOTOK){
+	if (f_mv(vec) == NOTOK) {
 		reply(550, "rename: %s.", ftam_error);
 		return;
 	}
@@ -503,29 +561,30 @@ dolog(sin)
 	struct sockaddr_in *sin;
 {
 #ifdef	notanymore
-	struct hostent *hp = gethostbyaddr((char*)&sin->sin_addr,
-		sizeof (struct in_addr), AF_INET);
+	struct hostent *hp = gethostbyaddr((char *) &sin->sin_addr,
+					   sizeof(struct in_addr), AF_INET);
 #endif
 	time_t t;
 
 #ifdef	notanymore
 	if (hp) {
-		(void)strncpy(remotehost, hp->h_name, sizeof (remotehost));
+		(void) strncpy(remotehost, hp->h_name, sizeof(remotehost));
 		endhostent();
 	} else
 #endif
-		(void)strncpy(remotehost, inet_ntoa(sin->sin_addr),
-		    sizeof (remotehost));
-	t = time((time_t*)0);
+		(void) strncpy(remotehost, inet_ntoa(sin->sin_addr), sizeof(remotehost));
+	t = time((time_t *) 0);
 	if (!logging)
 		return;
-	advise(NULLCP,"connection from %s at %s", remotehost, ctime(&t));
+	advise(NULLCP, "connection from %s at %s", remotehost, ctime(&t));
 }
-directory(how,name)
-char *how, *name;
+
+directory(how, name)
+	char *how, *name;
 {
 
 	int result;
+
 /* f_ls does a directory contents transfer.  The first arguement
  * determines whether a name list (NLST) or long list (LIST) is returned.
  * Results:
@@ -535,7 +594,7 @@ char *how, *name;
  *          Error response made by dataconn routine.
  */
 
-	vec[0] = strcmp(how,"NLST") ? "dir" : "ls";
+	vec[0] = strcmp(how, "NLST") ? "dir" : "ls";
 	vec[1] = name;
 	vec[2] = NULL;
 
@@ -546,6 +605,7 @@ char *how, *name;
 	data = -1;
 
 }
+
 /*
  * Execute FTAM login if all necessary arguements present
  */
@@ -553,24 +613,21 @@ dologin()
 {
 
 	if (!ftp_user) {
-		reply(500,"Send USER command first");
-		return(0);
+		reply(500, "Send USER command first");
+		return (0);
 	}
 	if (!ftp_passwd) {
-		reply(330,"Send PASS command");
-		return(0);
+		reply(330, "Send PASS command");
+		return (0);
 	}
-	if (!osi_host){
-	/* Success is returned since most user FTP response scanners
-         * are not prepared for a continue at this point.  The osi
-         * host may be specified by encoding it with the user name
-         * (i.e. user@osihost) or using the SITE command (SITE osihost).
-	 * Gateway users are expected to know if the remote site
-	 * requires account charging information.  The bridge makes
-         * ACCT optional.
-         */
-		reply(200,"Specify OSI filestore with SITE command");
-		return(0);
+	if (!osi_host) {
+		/* Success is returned since most user FTP response scanners are not prepared for a 
+		   continue at this point.  The osi host may be specified by encoding it with the
+		   user name (i.e. user@osihost) or using the SITE command (SITE osihost). Gateway
+		   users are expected to know if the remote site requires account charging
+		   information.  The bridge makes ACCT optional. */
+		reply(200, "Specify OSI filestore with SITE command");
+		return (0);
 	}
 	vec[0] = "f_open";
 	vec[1] = osi_host;
@@ -578,18 +635,18 @@ dologin()
 	vec[3] = (ftp_account) ? "" : ftp_account;
 	vec[4] = ftp_passwd;
 
-	advise (NULLCP,
-		"attempting association with OSI filestore \"%s\" as initiator \"%s\"",
+	advise(NULLCP,
+	       "attempting association with OSI filestore \"%s\" as initiator \"%s\"",
 	       osi_host, ftp_user);
 
 	/* f_open performs the FTAM initialization (including login) */
-	if (f_open(vec) == NOTOK){
-		reply(500,"Login failed");
-		return(0);
+	if (f_open(vec) == NOTOK) {
+		reply(500, "Login failed");
+		return (0);
 	}
 
-	reply(200,"Associated with OSI filestore %s", osi_host);
-	return(1);
+	reply(200, "Associated with OSI filestore %s", osi_host);
+	return (1);
 
 }
 
@@ -602,16 +659,13 @@ dologout(status)
 
 	vec[0] = "f_close";
 	vec[1] = NULL;
-	/* f_close performs the logout sequence and receives charging
-         * information 
-         */
+	/* f_close performs the logout sequence and receives charging information */
 	(void) f_close(vec);
-	if (status>=0)
-		reply(221,"Logged off. %s",ftam_error);
+	if (status >= 0)
+		reply(221, "Logged off. %s", ftam_error);
 	/* beware of flushing buffers after a SIGPIPE */
 	_exit(status);
 }
-
 
 /*
  * Check user requesting login priviledges.
@@ -628,7 +682,7 @@ checkuser(name)
 	fd = fopen(FTPUSERS, "r");
 	if (fd == NULL)
 		return (1);
-	while (fgets(line, sizeof (line), fd) != NULL) {
+	while (fgets(line, sizeof(line), fd) != NULL) {
 		register char *cp = index(line, '\n');
 
 		if (cp)
@@ -638,7 +692,6 @@ checkuser(name)
 			break;
 		}
 	}
-	(void)fclose(fd);
+	(void) fclose(fd);
 	return (!found);
 }
-

@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* ou.c - search for an org unit */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/others/quipu/uips/de/RCS/ou.c,v 9.0 1992/06/16 12:45:59 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/others/quipu/uips/de/RCS/ou.c,v 9.0 1992/06/16 12:45:59 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/others/quipu/uips/de/RCS/ou.c,v 9.0 1992/06/16 12:45:59 isode Rel $
+ * Header: /xtel/isode/isode/others/quipu/uips/de/RCS/ou.c,v 9.0 1992/06/16 12:45:59 isode Rel
  *
  *
- * $Log: ou.c,v $
+ * Log: ou.c,v
  * Revision 9.0  1992/06/16  12:45:59  isode
  * Release 8.0
  *
@@ -23,7 +82,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/others/quipu/uips/de/RCS/ou.c,v
  *    this agreement.
  *
  */
-
 
 #include <signal.h>
 #include "quipu/util.h"
@@ -43,46 +101,46 @@ extern int highNumber;
 extern int exactMatch;
 extern char exactString[];
 
-struct namelist * ouatts;
+struct namelist *ouatts;
 
 struct ds_search_arg *fillMostOUSearchArgs();
 
 void makeExplicitOUFilter();
 void ouFilter1(), ouFilter2(), ouFilter3(), ouFilter4();
 
-VFP explicitOU[] = {makeExplicitOUFilter, NULLVFP};
-VFP normalOU[] = {ouFilter1, ouFilter2, ouFilter3, ouFilter4, NULLVFP};
+VFP explicitOU[] = { makeExplicitOUFilter, NULLVFP };
+VFP normalOU[] = { ouFilter1, ouFilter2, ouFilter3, ouFilter4, NULLVFP };
 
 int
 listOUs(parentstr, thisstr, listp)
-char * parentstr, * thisstr;
-struct namelist ** listp;
+	char *parentstr, *thisstr;
+	struct namelist **listp;
 {
 	clearProblemFlags();
 	initAlarm();
 	if (exactMatch == ORGUNIT)
-	  return (listExactOUs(exactString, listp));
-        if (strcmp(thisstr, "*") == 0)
-          return (listAllOUs(parentstr, listp));
-        else
-          return (listMatchingOUs(parentstr, thisstr, listp));
+		return (listExactOUs(exactString, listp));
+	if (strcmp(thisstr, "*") == 0)
+		return (listAllOUs(parentstr, listp));
+	else
+		return (listMatchingOUs(parentstr, thisstr, listp));
 }
 
 void
 printListOUs(str, listp)
-char * str;
-struct namelist * listp;
+	char *str;
+	struct namelist *listp;
 {
-struct namelist * x;
-int i;
+	struct namelist *x;
+	int i;
+
 	if (listp == NULLLIST)
 		if (strcmp(str, "*") == 0)
 			pageprint("    No organisational units found\n");
 		else
 			pageprint("    No organisational units match entered string\n");
-	else
-	{
-		for (i =1, x = listp; x != NULLLIST; i++, x = x->next)
+	else {
+		for (i = 1, x = listp; x != NULLLIST; i++, x = x->next)
 			printLastComponent(INDENTON, x->name, ORGUNIT, i);
 		showAnyProblems(str);
 	}
@@ -90,18 +148,17 @@ int i;
 
 void
 freeOUs(listpp)
-struct namelist ** listpp;
+	struct namelist **listpp;
 {
-struct namelist * x, * y;
+	struct namelist *x, *y;
 
 	x = *listpp;
-	while (x != NULLLIST)
-	{
+	while (x != NULLLIST) {
 		if (x->name != NULLCP)
 			free(x->name);
 		as_free(x->ats);
 		y = x->next;
-		free((char *)x);
+		free((char *) x);
 		x = y;
 	}
 	*listpp = NULLLIST;
@@ -117,17 +174,17 @@ freeOUSearchArgs()
 
 int
 listAllOUs(parentstr, listp)
-char * parentstr;
-struct namelist ** listp;
+	char *parentstr;
+	struct namelist **listp;
 {
-int ret;
-	
-        sarg = * fillMostOUSearchArgs(parentstr, SRA_ONELEVEL);
-        makeAllOUFilter(&sarg.sra_filter);
-        ret = makeListOUs(listp);
-        if (ret != OK)
+	int ret;
+
+	sarg = *fillMostOUSearchArgs(parentstr, SRA_ONELEVEL);
+	makeAllOUFilter(&sarg.sra_filter);
+	ret = makeListOUs(listp);
+	if (ret != OK)
 		logListSuccess(LIST_ERROR, "ou", 0);
-        else
+	else
 		logListSuccess(LIST_OK, "ou", listlen(*listp));
 	freeOUSearchArgs();
 	alarmCleanUp();
@@ -136,73 +193,61 @@ int ret;
 
 int
 listMatchingOUs(parentstr, thisstr, listp)
-char * parentstr, * thisstr;
-struct namelist ** listp;
+	char *parentstr, *thisstr;
+	struct namelist **listp;
 {
-VFP * filtarray;
-VFP filterfunc;
-int filtnumber;
+	VFP *filtarray;
+	VFP filterfunc;
+	int filtnumber;
 
-        if (index(thisstr, '*') != NULLCP) /* contains at least one asterisk */
-	{
-                filtarray = explicitOU;
+	if (index(thisstr, '*') != NULLCP) {	/* contains at least one asterisk */
+		filtarray = explicitOU;
 		filtnumber = -1;
-	}
-        else
-	{
-                filtarray = normalOU;
+	} else {
+		filtarray = normalOU;
 		filtnumber = 0;
 	}
-	sarg = * fillMostOUSearchArgs(parentstr, SRA_ONELEVEL);
-        while ((filterfunc = *filtarray++) != NULLVFP)
-	{
+	sarg = *fillMostOUSearchArgs(parentstr, SRA_ONELEVEL);
+	while ((filterfunc = *filtarray++) != NULLVFP) {
 		filtnumber++;
-                filterfunc(thisstr, &sarg.sra_filter);
-                if (makeListOUs(listp) != OK)
-		{
+		filterfunc(thisstr, &sarg.sra_filter);
+		if (makeListOUs(listp) != OK) {
 			freeOUSearchArgs();
 			logSearchSuccess(SEARCH_ERROR, "ou", thisstr, filtnumber, 0);
 			alarmCleanUp();
 			return NOTOK;
 		}
-                if (*listp != NULLLIST)
-		{
+		if (*listp != NULLLIST) {
 			freeOUSearchArgs();
 			logSearchSuccess(SEARCH_OK, "ou", thisstr, filtnumber, listlen(*listp));
 			alarmCleanUp();
-                        return OK;
+			return OK;
 		}
 	}
 	logSearchSuccess(SEARCH_FAIL, "ou", thisstr, filtnumber, 0);
 
 	/* nothing found by single level searches - let's try subtree searching */
-        if (index(thisstr, '*') != NULLCP) /* contains at least one asterisk */
-	{
-                filtarray = explicitOU;
+	if (index(thisstr, '*') != NULLCP) {	/* contains at least one asterisk */
+		filtarray = explicitOU;
 		filtnumber = -1;
-	}
-        else
-	{
-                filtarray = normalOU;
+	} else {
+		filtarray = normalOU;
 		filtnumber = 0;
 	}
-	sarg = * fillMostOUSearchArgs(parentstr, SRA_WHOLESUBTREE);
-        while ((filterfunc = *filtarray++) != NULLVFP)
-	{
+	sarg = *fillMostOUSearchArgs(parentstr, SRA_WHOLESUBTREE);
+	while ((filterfunc = *filtarray++) != NULLVFP) {
 		filtnumber++;
-                filterfunc(thisstr, &sarg.sra_filter);
-                if (makeListOUs(listp) != OK)
-		{
+		filterfunc(thisstr, &sarg.sra_filter);
+		if (makeListOUs(listp) != OK) {
 			freeOUSearchArgs();
 			alarmCleanUp();
 			return NOTOK;
 		}
-                if (*listp != NULLLIST)
-		{
+		if (*listp != NULLLIST) {
 			freeOUSearchArgs();
 			logSearchSuccess(SEARCH_OK, "ou", thisstr, filtnumber, listlen(*listp));
 			alarmCleanUp();
-                        return OK;
+			return OK;
 		}
 	}
 	logSearchSuccess(SEARCH_FAIL, "ou", thisstr, filtnumber, 0);
@@ -213,14 +258,14 @@ int filtnumber;
 
 int
 listExactOUs(objectstr, listp)
-char * objectstr;
-struct namelist ** listp;
+	char *objectstr;
+	struct namelist **listp;
 {
-int ret;
+	int ret;
 
-        sarg = * fillMostOUSearchArgs(objectstr, SRA_BASEOBJECT);
-        makeAllOUFilter(&sarg.sra_filter);
-        ret = makeListOUs(listp);
+	sarg = *fillMostOUSearchArgs(objectstr, SRA_BASEOBJECT);
+	makeAllOUFilter(&sarg.sra_filter);
+	ret = makeListOUs(listp);
 	freeOUSearchArgs();
 	alarmCleanUp();
 	return ret;
@@ -228,20 +273,19 @@ int ret;
 
 int
 makeListOUs(listp)
-struct namelist ** listp;
+	struct namelist **listp;
 {
-entrystruct * x;
-int retval;
+	entrystruct *x;
+	int retval;
 
 	if (rebind() != OK)
 		return NOTOK;
 	retval = ds_search(&sarg, &serror, &sresult);
-        if ((retval == DSE_INTR_ABANDONED) &&
-	    (serror.dse_type == DSE_ABANDONED))
+	if ((retval == DSE_INTR_ABANDONED) && (serror.dse_type == DSE_ABANDONED))
 		abandoned = TRUE;
 	if (retval != OK)
 		return NOTOK;
-	correlate_search_results (&sresult);
+	correlate_search_results(&sresult);
 
 	setProblemFlags(sresult);
 
@@ -249,32 +293,32 @@ int retval;
 	for (x = sresult.CSR_entries; x != NULLENTRYINFO; x = x->ent_next) {
 		*listp = list_alloc();
 		(*listp)->name = dn2pstr(x->ent_dn);
-                (*listp)->ats = as_cpy(x->ent_attr);
+		(*listp)->ats = as_cpy(x->ent_attr);
 		listp = &(*listp)->next;
 		highNumber++;
 	}
 	*listp = NULLLIST;
-	entryinfo_free(sresult.CSR_entries,0);
-	dn_free (sresult.CSR_object);
-	crefs_free (sresult.CSR_cr);
+	entryinfo_free(sresult.CSR_entries, 0);
+	dn_free(sresult.CSR_object);
+	crefs_free(sresult.CSR_cr);
 	filter_free(sarg.sra_filter);
 	return OK;
 }
 
 struct ds_search_arg *
 fillMostOUSearchArgs(parentstr, searchdepth)
-char * parentstr;
-int searchdepth;
+	char *parentstr;
+	int searchdepth;
 {
-static struct ds_search_arg arg;
-Attr_Sequence * atl;
-AttributeType at;
-struct namelist * x;
-static CommonArgs sca = default_common_args;
+	static struct ds_search_arg arg;
+	Attr_Sequence *atl;
+	AttributeType at;
+	struct namelist *x;
+	static CommonArgs sca = default_common_args;
 
-	arg.sra_common = sca; /* struct copy */
-        arg.sra_common.ca_servicecontrol.svc_timelimit = SVC_NOTIMELIMIT;
-        arg.sra_common.ca_servicecontrol.svc_sizelimit= SVC_NOSIZELIMIT;
+	arg.sra_common = sca;	/* struct copy */
+	arg.sra_common.ca_servicecontrol.svc_timelimit = SVC_NOTIMELIMIT;
+	arg.sra_common.ca_servicecontrol.svc_sizelimit = SVC_NOSIZELIMIT;
 
 	arg.sra_subset = searchdepth;
 	arg.sra_baseobject = str2dn(parentstr);
@@ -282,104 +326,104 @@ static CommonArgs sca = default_common_args;
 	/* specify attributes of interest */
 	arg.sra_eis.eis_allattributes = FALSE;
 	atl = &(arg.sra_eis.eis_select);
-        for (x = ouatts; x != NULLLIST; x = x->next)
-        {
+	for (x = ouatts; x != NULLLIST; x = x->next) {
 		if ((at = str2AttrT(x->name)) == NULLAttrT)
 			continue;
-                *atl = as_comp_alloc();
-                (*atl)->attr_type = at;
+		*atl = as_comp_alloc();
+		(*atl)->attr_type = at;
 		(*atl)->attr_value = NULLAV;
-                atl = &(*atl)->attr_link;
-        }
-        *atl = NULLATTR;
+		atl = &(*atl)->attr_link;
+	}
+	*atl = NULLATTR;
 	arg.sra_eis.eis_infotypes = EIS_ATTRIBUTESANDVALUES;
 	return (&arg);
 }
 
 makeAllOUFilter(fpp)
-struct s_filter ** fpp;
+	struct s_filter **fpp;
 {
 	*fpp = eqfilter(FILTERITEM_EQUALITY, DE_OBJECT_CLASS, DE_ORGANISATIONAL_UNIT);
 }
 
 void
 makeExplicitOUFilter(oustr, fpp)
-char * oustr;
-struct s_filter ** fpp;
+	char *oustr;
+	struct s_filter **fpp;
 {
-struct s_filter * fp;
-int wildcardtype;
-char * ostr1, * ostr2;
+	struct s_filter *fp;
+	int wildcardtype;
+	char *ostr1, *ostr2;
 
 	wildcardtype = starstring(oustr, &ostr1, &ostr2);
 	*fpp = andfilter();
-	fp = (*fpp)->FUFILT = eqfilter(FILTERITEM_EQUALITY, DE_OBJECT_CLASS, DE_ORGANISATIONAL_UNIT);
+	fp = (*fpp)->FUFILT =
+	    eqfilter(FILTERITEM_EQUALITY, DE_OBJECT_CLASS, DE_ORGANISATIONAL_UNIT);
 	switch (wildcardtype) {
-		case LEADSUBSTR: /* fall through */
-		case TRAILSUBSTR: /* fall through */
-		case ANYSUBSTR:
-			fp = fp->flt_next = subsfilter(wildcardtype, 
-					DE_ORGANISATIONAL_UNIT_NAME, ostr1);
-			break;
-		case LEADANDTRAIL:
-			fp = fp->flt_next = subsfilter(LEADSUBSTR, 
-					DE_ORGANISATIONAL_UNIT_NAME, ostr1);
-			fp = fp->flt_next = subsfilter(TRAILSUBSTR,
-					DE_ORGANISATIONAL_UNIT_NAME, ostr2);
-                        break;
+	case LEADSUBSTR:	/* fall through */
+	case TRAILSUBSTR:	/* fall through */
+	case ANYSUBSTR:
+		fp = fp->flt_next = subsfilter(wildcardtype, DE_ORGANISATIONAL_UNIT_NAME, ostr1);
+		break;
+	case LEADANDTRAIL:
+		fp = fp->flt_next = subsfilter(LEADSUBSTR, DE_ORGANISATIONAL_UNIT_NAME, ostr1);
+		fp = fp->flt_next = subsfilter(TRAILSUBSTR, DE_ORGANISATIONAL_UNIT_NAME, ostr2);
+		break;
 	}
 	fp->flt_next = NULLFILTER;
 }
 
 void
 ouFilter1(oustr, fpp)
-char * oustr;
-struct s_filter ** fpp;
+	char *oustr;
+	struct s_filter **fpp;
 {
-struct s_filter * fp;
+	struct s_filter *fp;
 
 	*fpp = andfilter();
-	fp = (*fpp)->FUFILT = eqfilter(FILTERITEM_EQUALITY, DE_OBJECT_CLASS, DE_ORGANISATIONAL_UNIT);
+	fp = (*fpp)->FUFILT =
+	    eqfilter(FILTERITEM_EQUALITY, DE_OBJECT_CLASS, DE_ORGANISATIONAL_UNIT);
 	fp = fp->flt_next = eqfilter(FILTERITEM_EQUALITY, DE_ORGANISATIONAL_UNIT_NAME, oustr);
 	fp->flt_next = NULLFILTER;
 }
 
 void
 ouFilter2(oustr, fpp)
-char * oustr;
-struct s_filter ** fpp;
+	char *oustr;
+	struct s_filter **fpp;
 {
-struct s_filter * fp;
+	struct s_filter *fp;
 
 	*fpp = andfilter();
-	fp = (*fpp)->FUFILT = eqfilter(FILTERITEM_EQUALITY, DE_OBJECT_CLASS, DE_ORGANISATIONAL_UNIT);
+	fp = (*fpp)->FUFILT =
+	    eqfilter(FILTERITEM_EQUALITY, DE_OBJECT_CLASS, DE_ORGANISATIONAL_UNIT);
 	fp = fp->flt_next = subsfilter(LEADSUBSTR, DE_ORGANISATIONAL_UNIT_NAME, oustr);
 	fp->flt_next = NULLFILTER;
 }
 
 void
 ouFilter3(oustr, fpp)
-char * oustr;
-struct s_filter ** fpp;
+	char *oustr;
+	struct s_filter **fpp;
 {
-struct s_filter * fp;
+	struct s_filter *fp;
 
 	*fpp = andfilter();
-	fp = (*fpp)->FUFILT = eqfilter(FILTERITEM_EQUALITY, DE_OBJECT_CLASS, DE_ORGANISATIONAL_UNIT);
+	fp = (*fpp)->FUFILT =
+	    eqfilter(FILTERITEM_EQUALITY, DE_OBJECT_CLASS, DE_ORGANISATIONAL_UNIT);
 	fp = fp->flt_next = subsfilter(ANYSUBSTR, DE_ORGANISATIONAL_UNIT_NAME, oustr);
 	fp->flt_next = NULLFILTER;
 }
 
 void
 ouFilter4(oustr, fpp)
-char * oustr;
-struct s_filter ** fpp;
+	char *oustr;
+	struct s_filter **fpp;
 {
-struct s_filter * fp;
+	struct s_filter *fp;
 
 	*fpp = andfilter();
-	fp = (*fpp)->FUFILT = eqfilter(FILTERITEM_EQUALITY, DE_OBJECT_CLASS, DE_ORGANISATIONAL_UNIT);
+	fp = (*fpp)->FUFILT =
+	    eqfilter(FILTERITEM_EQUALITY, DE_OBJECT_CLASS, DE_ORGANISATIONAL_UNIT);
 	fp = fp->flt_next = eqfilter(FILTERITEM_APPROX, DE_ORGANISATIONAL_UNIT_NAME, oustr);
 	fp->flt_next = NULLFILTER;
 }
-

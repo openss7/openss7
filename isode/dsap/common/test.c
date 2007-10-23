@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* test.c - */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/test.c,v 9.0 1992/06/16 12:12:39 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/dsap/common/RCS/test.c,v 9.0 1992/06/16 12:12:39 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/dsap/common/RCS/test.c,v 9.0 1992/06/16 12:12:39 isode Rel $
+ * Header: /xtel/isode/isode/dsap/common/RCS/test.c,v 9.0 1992/06/16 12:12:39 isode Rel
  *
  *
- * $Log: test.c,v $
+ * Log: test.c,v
  * Revision 9.0  1992/06/16  12:12:39  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/test.c,v 9.0 19
  *
  */
 
-
 #include "quipu/util.h"
 #include "quipu/entry.h"
 #include "quipu/syntaxes.h"
@@ -33,55 +91,51 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/test.c,v 9.0 19
 extern int parse_line;
 extern int parse_status;
 
-main (argc, argv)
-int argc;
-char **argv;
+main(argc, argv)
+	int argc;
+	char **argv;
 {
-	char * buffer;
-	char * getline();
+	char *buffer;
+	char *getline();
 	int opt;
 	extern int optind;
 	extern char *optarg;
 	char *myname;
 	char *oidtable = "oidtable";
 
-	isodetailor (myname = *argv, 1);
+	isodetailor(myname = *argv, 1);
 
-	while((opt = getopt(argc, argv, "o:d")) != EOF)
+	while ((opt = getopt(argc, argv, "o:d")) != EOF)
 		switch (opt) {
-		    case 'o':
+		case 'o':
 			oidtable = optarg;
 			break;
-		    case 'd':
-			psap_log -> ll_events = LLOG_ALL;
-			psap_log -> ll_stat |= LLOGTTY;
+		case 'd':
+			psap_log->ll_events = LLOG_ALL;
+			psap_log->ll_stat |= LLOGTTY;
 			break;
-		    default:
-			fprintf (stderr, 
-				 "Usage: %s [-o oidtable] [-d] [type=value]\n",
-				 myname);
-			exit (1);
+		default:
+			fprintf(stderr, "Usage: %s [-o oidtable] [-d] [type=value]\n", myname);
+			exit(1);
 		}
 	argc -= optind;
 	argv += optind;
 
-	quipu_syntaxes ();
-	if (load_oid_table (oidtable) == NOTOK) {
-		fprintf (stderr, "%s: can't load oidtable %s\n",
-			 myname, oidtable);
-		exit (1);
+	quipu_syntaxes();
+	if (load_oid_table(oidtable) == NOTOK) {
+		fprintf(stderr, "%s: can't load oidtable %s\n", myname, oidtable);
+		exit(1);
 	}
 
 	parse_line = 0;
-	parse_error ("Attribute parser testing tool");
+	parse_error("Attribute parser testing tool");
 
 	if (argc > 0) {
 		while (argc-- > 0)
-			do_parse (*argv++);
-	}
-	else
+			do_parse(*argv++);
+	} else
 		for (;;) {
-			(void) fprintf (stderr,"-> ");
+			(void) fprintf(stderr, "-> ");
 
 			if ((buffer = getline(stdin)) == NULLCP)
 				break;
@@ -89,7 +143,7 @@ char **argv;
 			if (*buffer == 'q' && strlen(buffer) == 1)
 				break;
 
-			do_parse (buffer);
+			do_parse(buffer);
 		}
 
 #ifdef DEBUG
@@ -98,12 +152,12 @@ char **argv;
 	free_isode_alias();
 #endif
 
-	exit (0);
+	exit(0);
 
 }
 
-do_parse (str)
-char *str;
+do_parse(str)
+	char *str;
 {
 	Attr_Sequence as;
 	Attr_Sequence as2;
@@ -114,77 +168,76 @@ char *str;
 
 	parse_status = 0;
 
-	as2 = as_combine (NULLATTR,TidyString(str),FALSE);
+	as2 = as_combine(NULLATTR, TidyString(str), FALSE);
 
-	as = as_cpy (as2);
+	as = as_cpy(as2);
 
 	if (as == NULLATTR) {
-		(void) fprintf (stderr,"NULL value\n");
+		(void) fprintf(stderr, "NULL value\n");
 		return;
 	}
 	if (parse_status != 0) {
-		(void) fprintf (stderr,"parse error - non null as\n");
+		(void) fprintf(stderr, "parse error - non null as\n");
 		return;
 	}
 
-	if (encode_IF_Attribute (&pe, 0, 0, NULLCP, as) == NOTOK) {
-		fprintf (stderr,"encode problem [%s]\n", PY_pepy);
+	if (encode_IF_Attribute(&pe, 0, 0, NULLCP, as) == NOTOK) {
+		fprintf(stderr, "encode problem [%s]\n", PY_pepy);
 		return;
 	}
 
-	pe2pl (opt,pe);
+	pe2pl(opt, pe);
 
-	as_free (as);	
+	as_free(as);
 
-	if (decode_IF_Attribute (pe, 1, NULLIP, NULLVP, &as) == NOTOK) {
-		fprintf (stderr,"decode problem [%s]\n", PY_pepy);
+	if (decode_IF_Attribute(pe, 1, NULLIP, NULLVP, &as) == NOTOK) {
+		fprintf(stderr, "decode problem [%s]\n", PY_pepy);
 		return;
 	}
 
-	ps_print (opt,"READOUT:\n");
-	as_print (opt,as,READOUT);
+	ps_print(opt, "READOUT:\n");
+	as_print(opt, as, READOUT);
 
-	if (as_cmp (as,as2) != 0)
-		fprintf (stderr,"*** Compare/Copy problem ***\n");
+	if (as_cmp(as, as2) != 0)
+		fprintf(stderr, "*** Compare/Copy problem ***\n");
 
-	ps_print (opt,"EDBOUT:\n");
-	as_print (opt,as2,EDBOUT);
+	ps_print(opt, "EDBOUT:\n");
+	as_print(opt, as2, EDBOUT);
 
-	if (ps == NULL
-	    && ((ps = ps_alloc (str_open)) == NULLPS)
-	    || str_setup (ps, NULLCP, BUFSIZ, 0) == NOTOK) {
+	if (ps == NULL && ((ps = ps_alloc(str_open)) == NULLPS)
+	    || str_setup(ps, NULLCP, BUFSIZ, 0) == NOTOK) {
 		if (ps)
-			ps_free (ps), ps = NULLPS;
+			ps_free(ps), ps = NULLPS;
 
-		fprintf (stderr,"*** test Internal error ***\n");
+		fprintf(stderr, "*** test Internal error ***\n");
 		return;
 	}
 
-	as_print (ps,as2,EDBOUT);
+	as_print(ps, as2, EDBOUT);
 
-	as_free (as2);
+	as_free(as2);
 	pe = NULLPE;
 
 	/* remove \n */
-	*--ps -> ps_ptr = NULL, ps -> ps_cnt++;
+	*--ps->ps_ptr = NULL, ps->ps_cnt++;
 
 	parse_status = 0;
 
 	quipu_faststart = TRUE;
 
-	as2 = as_combine (NULLATTR,ps->ps_base,FALSE);
+	as2 = as_combine(NULLATTR, ps->ps_base, FALSE);
 
 	quipu_faststart = FALSE;
 
 	if (as2 == NULLATTR) {
-		(void) fprintf (stderr,"NULL value from 2nd parse\n");
+		(void) fprintf(stderr, "NULL value from 2nd parse\n");
 		return;
 	}
 	if (parse_status != 0) {
-		(void) fprintf (stderr,"parse error 2nd time - non null as\n");
+		(void) fprintf(stderr, "parse error 2nd time - non null as\n");
 		return;
 	}
 
-	ps -> ps_base = NULL, ps -> ps_cnt = 0;
-	ps -> ps_ptr = NULL, ps -> ps_bufsiz = 0;
+	ps->ps_base = NULL, ps->ps_cnt = 0;
+	ps->ps_ptr = NULL, ps->ps_bufsiz = 0;
 }

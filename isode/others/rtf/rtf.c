@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* rtf.c - RT-file transfer utility -- initiator */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/others/rtf/RCS/rtf.c,v 9.0 1992/06/16 12:48:07 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/others/rtf/RCS/rtf.c,v 9.0 1992/06/16 12:48:07 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/others/rtf/RCS/rtf.c,v 9.0 1992/06/16 12:48:07 isode Rel $
+ * Header: /xtel/isode/isode/others/rtf/RCS/rtf.c,v 9.0 1992/06/16 12:48:07 isode Rel
  *
  *
- * $Log: rtf.c,v $
+ * Log: rtf.c,v
  * Revision 9.0  1992/06/16  12:48:07  isode
  * Release 8.0
  *
@@ -23,7 +82,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/others/rtf/RCS/rtf.c,v 9.0 1992
  *    this agreement.
  *
  */
-
 
 #include "RTF-types.h"
 #include "rtf.h"
@@ -41,439 +99,406 @@ static char *user = NULL;
 static char *password = NULL;
 static char *source = NULL;
 static char *destination = NULL;
-static int   turn = NOTOK;
+static int turn = NOTOK;
 
-static int   fd;
-static int   nbytes;
+static int fd;
+static int nbytes;
 
-int	downtrans (), uptrans ();
+int downtrans(), uptrans();
 
-
-char   *getenv ();
+char *getenv();
 
 /*    MAIN */
 
 /* ARGSUSED */
 
-main (argc, argv, envp)
-int	argc;
-char  **argv,
-      **envp;
+main(argc, argv, envp)
+	int argc;
+	char **argv, **envp;
 {
-    int	    result,
-	    sd;
-    char   *file;
-    register struct isoservent *is;
-    struct SSAPaddr *sa;
-    struct RtSAPaddr rtzs;
-    register struct RtSAPaddr *rtz = &rtzs;
-    struct RtSAPconnect rtcs;
-    register struct RtSAPconnect   *rtc = &rtcs;
-    struct RtSAPindication  rtis;
-    register struct RtSAPindication *rti = &rtis;
-    register struct RtSAPabort   *rta = &rti -> rti_abort;
-    PE	    pe;
-    struct type_RTF_Request reqs;
-    register struct type_RTF_Request *req = &reqs;
+	int result, sd;
+	char *file;
+	register struct isoservent *is;
+	struct SSAPaddr *sa;
+	struct RtSAPaddr rtzs;
+	register struct RtSAPaddr *rtz = &rtzs;
+	struct RtSAPconnect rtcs;
+	register struct RtSAPconnect *rtc = &rtcs;
+	struct RtSAPindication rtis;
+	register struct RtSAPindication *rti = &rtis;
+	register struct RtSAPabort *rta = &rti->rti_abort;
+	PE pe;
+	struct type_RTF_Request reqs;
+	register struct type_RTF_Request *req = &reqs;
 
-    arginit (argv);
-    
-    if (turn == RTS_INITIATOR) {
-	if ((fd = open (source, O_RDONLY, 0x00)) == NOTOK)
-	    adios (source, "unable to open");
-	file = destination;
-    }
-    else
-	file = source;
+	arginit(argv);
 
-    if ((req -> user = str2qb (user, strlen (user), 1)) == NULL
-	    || (req -> password = str2qb (password, strlen (password), 1))
-		    == NULL
-	    || (req -> file = str2qb (file, strlen (file), 1)) == NULL)
-	adios (NULLCP, "out of memory");
-    pe = NULLPE;
-    if (encode_RTF_Request (&pe, 1, 0, NULLCP, req) == NOTOK)
-	adios (NULLCP, "error encoding request: %s", PY_pepy);
-    PLOGP (pgm_log,RTF_Request, pe, "Request", 0);
+	if (turn == RTS_INITIATOR) {
+		if ((fd = open(source, O_RDONLY, 0x00)) == NOTOK)
+			adios(source, "unable to open");
+		file = destination;
+	} else
+		file = source;
 
-    if ((is = getisoserventbyname (myentity, myprovider)) == NULL)
-	adios (NULLCP, "%s/%s: unknown provider/entity pair",
-	       myentity, myprovider);
-    rtz -> rta_port = is -> is_port;		/* yikes! */
-    if ((is = getisoserventbyname ("rts", "ssap")) == NULL)
-	adios (NULLCP, "ssap/rts: unknown entity");
-    if ((sa = is2saddr (host, NULLCP, is)) == NULLSA)
-	adios (NULLCP, "address translation failed");
-    rtz -> rta_addr = *sa;	/* struct copy */
+	if ((req->user = str2qb(user, strlen(user), 1)) == NULL
+	    || (req->password = str2qb(password, strlen(password), 1))
+	    == NULL || (req->file = str2qb(file, strlen(file), 1)) == NULL)
+		adios(NULLCP, "out of memory");
+	pe = NULLPE;
+	if (encode_RTF_Request(&pe, 1, 0, NULLCP, req) == NOTOK)
+		adios(NULLCP, "error encoding request: %s", PY_pepy);
+	PLOGP(pgm_log, RTF_Request, pe, "Request", 0);
 
-    fprintf (stderr, "%s...", host);
-    (void) fflush (stderr);
-    if (RtBeginRequest (rtz, RTS_TWA, turn, pe, rtc, rti) == NOTOK) {
-	fprintf (stderr, "failed\n");
-	rts_adios (rta, "RT-BEGIN.REQUEST");
-    }
+	if ((is = getisoserventbyname(myentity, myprovider)) == NULL)
+		adios(NULLCP, "%s/%s: unknown provider/entity pair", myentity, myprovider);
+	rtz->rta_port = is->is_port;	/* yikes! */
+	if ((is = getisoserventbyname("rts", "ssap")) == NULL)
+		adios(NULLCP, "ssap/rts: unknown entity");
+	if ((sa = is2saddr(host, NULLCP, is)) == NULLSA)
+		adios(NULLCP, "address translation failed");
+	rtz->rta_addr = *sa;	/* struct copy */
 
-    pe_free (pe);
-    qb_free (req -> user);
-    qb_free (req -> password);
-    qb_free (req -> file);
+	fprintf(stderr, "%s...", host);
+	(void) fflush(stderr);
+	if (RtBeginRequest(rtz, RTS_TWA, turn, pe, rtc, rti) == NOTOK) {
+		fprintf(stderr, "failed\n");
+		rts_adios(rta, "RT-BEGIN.REQUEST");
+	}
 
-    if (rtc -> rtc_result != RTS_ACCEPT) {
-	fprintf (stderr, "failed\n");
-	adios (NULLCP, "association rejected: [%s]",
-	       RtErrString (rtc -> rtc_result));
-    }
-    fprintf (stderr, "connected\n");
+	pe_free(pe);
+	qb_free(req->user);
+	qb_free(req->password);
+	qb_free(req->file);
 
-    sd = rtc -> rtc_sd;
+	if (rtc->rtc_result != RTS_ACCEPT) {
+		fprintf(stderr, "failed\n");
+		adios(NULLCP, "association rejected: [%s]", RtErrString(rtc->rtc_result));
+	}
+	fprintf(stderr, "connected\n");
 
-    RTCFREE (rtc);
+	sd = rtc->rtc_sd;
 
-    if (turn == RTS_INITIATOR) {
-	if (RtSetDownTrans (sd, downtrans, rti) == NOTOK)
-	    rts_adios (rta, "set DownTrans upcall");
+	RTCFREE(rtc);
 
-	if (RtTransferRequest (sd, NULLPE, NOTOK, rti) == NOTOK)
-	    rts_adios (rta, "RT-TRANSFER.REQUEST");
+	if (turn == RTS_INITIATOR) {
+		if (RtSetDownTrans(sd, downtrans, rti) == NOTOK)
+			rts_adios(rta, "set DownTrans upcall");
 
-	if (nbytes == 0)
-	    advise (LLOG_NOTICE, NULLCP, "transfer complete");
-	else
-	    timer (nbytes);
+		if (RtTransferRequest(sd, NULLPE, NOTOK, rti) == NOTOK)
+			rts_adios(rta, "RT-TRANSFER.REQUEST");
 
-	(void) close (fd);
-    }
-    else {
-	if (RtSetUpTrans (sd, uptrans, rti) == NOTOK)
-	    rts_adios (rta, "set UpTrans upcall");
+		if (nbytes == 0)
+			advise(LLOG_NOTICE, NULLCP, "transfer complete");
+		else
+			timer(nbytes);
 
-	for (;;) {
-	    switch (result = RtWaitRequest (sd, NOTOK, rti)) {
-		case NOTOK:
-		case OK:
-		case DONE:
-		    break;
+		(void) close(fd);
+	} else {
+		if (RtSetUpTrans(sd, uptrans, rti) == NOTOK)
+			rts_adios(rta, "set UpTrans upcall");
 
-		default:
-		    adios (NULLCP, "unknown return from RtWaitRequest=%d",
-			   result);
-	    }
+		for (;;) {
+			switch (result = RtWaitRequest(sd, NOTOK, rti)) {
+			case NOTOK:
+			case OK:
+			case DONE:
+				break;
 
-	    switch (rti -> rti_type) {
-		case RTI_TURN:
-		    {
-			register struct RtSAPturn *rtu = &rti -> rti_turn;
-
-			if (rtu -> rtu_please) {
-			    if (RtGTurnRequest (sd, rti) == NOTOK)
-				rts_adios (rta, "RT-TURN-GIVE.REQUEST");
+			default:
+				adios(NULLCP, "unknown return from RtWaitRequest=%d", result);
 			}
-			else
-			    break;
-		    }
-		    continue;
-		    
-		case RTI_TRANSFER:
-		    {
+
+			switch (rti->rti_type) {
+			case RTI_TURN:
+			{
+				register struct RtSAPturn *rtu = &rti->rti_turn;
+
+				if (rtu->rtu_please) {
+					if (RtGTurnRequest(sd, rti) == NOTOK)
+						rts_adios(rta, "RT-TURN-GIVE.REQUEST");
+				} else
+					break;
+			}
+				continue;
+
+			case RTI_TRANSFER:
+			{
 #ifndef	lint
-			register struct RtSAPtransfer *rtt =
-							&rti -> rti_transfer;
+				register struct RtSAPtransfer *rtt = &rti->rti_transfer;
 #endif
 
-			if (nbytes == 0)
-			    advise (LLOG_NOTICE, NULLCP, "transfer complete");
-			else
-			    timer (nbytes);
-			if (RtPTurnRequest (sd, 1, rti) == NOTOK)
-			    rts_adios (rta, "RT-TURN-PLEASE.REQUEST");
-		    }
-		    continue;
+				if (nbytes == 0)
+					advise(LLOG_NOTICE, NULLCP, "transfer complete");
+				else
+					timer(nbytes);
+				if (RtPTurnRequest(sd, 1, rti) == NOTOK)
+					rts_adios(rta, "RT-TURN-PLEASE.REQUEST");
+			}
+				continue;
 
-		case RTI_ABORT:
-		    {
-			register struct RtSAPabort *rtb = &rti -> rti_abort;
+			case RTI_ABORT:
+			{
+				register struct RtSAPabort *rtb = &rti->rti_abort;
 
-			if (rtb -> rta_peer)
-			    rts_adios (rtb, "RT-U-ABORT.INDICATION");
-			if (RTS_FATAL (rtb -> rta_reason))
-			    rts_adios (rtb, "RT-P-ABORT.INDICATION");
-			rts_advise (rtb, "RT-P-ABORT.INDICATION");
-		    }
-		    break;
+				if (rtb->rta_peer)
+					rts_adios(rtb, "RT-U-ABORT.INDICATION");
+				if (RTS_FATAL(rtb->rta_reason))
+					rts_adios(rtb, "RT-P-ABORT.INDICATION");
+				rts_advise(rtb, "RT-P-ABORT.INDICATION");
+			}
+				break;
 
-		case RTI_CLOSE:
-		case RTI_FINISH:
-		    adios (NULLCP, "unexpected indication type=%d",
-			   rti -> rti_type);
+			case RTI_CLOSE:
+			case RTI_FINISH:
+				adios(NULLCP, "unexpected indication type=%d", rti->rti_type);
 
-		default:
-		    adios (NULLCP, "unknown indication type=%d",
-			   rti -> rti_type);
-	    }
-	    break;
+			default:
+				adios(NULLCP, "unknown indication type=%d", rti->rti_type);
+			}
+			break;
+		}
 	}
-    }
 
-    if (RtEndRequest (sd, rti) == NOTOK)
-	rts_adios (rta, "RT-END.REQUEST");
+	if (RtEndRequest(sd, rti) == NOTOK)
+		rts_adios(rta, "RT-END.REQUEST");
 
-    exit (0);
+	exit(0);
 }
- 
+
 /*     TRANSFER */
 
 /* ARGSUSED */
 
-static int  downtrans (sd, base, len, size, ssn, ack, rti)
-int	sd;
-char  **base;
-int    *len,
-	size;
-long	ssn,
-	ack;
-struct RtSAPindication *rti;
+static int
+downtrans(sd, base, len, size, ssn, ack, rti)
+	int sd;
+	char **base;
+	int *len, size;
+	long ssn, ack;
+	struct RtSAPindication *rti;
 {
-    register int    cc;
-    int	    n;
-    register char *dp,
-		  *ep;
-    static int bsize;
-    static char *bp = NULL;
+	register int cc;
+	int n;
+	register char *dp, *ep;
+	static int bsize;
+	static char *bp = NULL;
 
-    if (base == NULLVP) {
+	if (base == NULLVP) {
 #ifdef	DEBUG
-	advise (LLOG_DEBUG, NULLCP, "RT-PLEASE.INDICATION: %d", size);
+		advise(LLOG_DEBUG, NULLCP, "RT-PLEASE.INDICATION: %d", size);
 #endif
-	return OK;
-    }
+		return OK;
+	}
 
-    if (bp == NULL) {
-	struct stat st;
+	if (bp == NULL) {
+		struct stat st;
 
-	if (fstat (fd, &st) == NOTOK)
-	    return rtsaplose (rti, RTS_TRANSFER, source, "unable to fstat");
+		if (fstat(fd, &st) == NOTOK)
+			return rtsaplose(rti, RTS_TRANSFER, source, "unable to fstat");
 #ifdef	MAXBSIZE
-	bsize = st.st_blksize > 0 ? st.st_blksize : BUFSIZ;
+		bsize = st.st_blksize > 0 ? st.st_blksize : BUFSIZ;
 #else
-	bsize = BUFSIZ;
+		bsize = BUFSIZ;
 #endif
-	if (size == 0)	/* no checkpointing... */
-	    n = st.st_size;
-	else
-	    if ((n = bsize) > size)
-		n = size;
-	if ((bp = malloc ((unsigned) n)) == NULL)
-	    return rtsaplose (rti, RTS_CONGEST, NULLCP, "out of memory");
+		if (size == 0)	/* no checkpointing... */
+			n = st.st_size;
+		else if ((n = bsize) > size)
+			n = size;
+		if ((bp = malloc((unsigned) n)) == NULL)
+			return rtsaplose(rti, RTS_CONGEST, NULLCP, "out of memory");
 #ifdef	DEBUG
-	advise (LLOG_DEBUG, NULLCP, "Selecting block size of %d", n);
-	advise (LLOG_DEBUG, NULLCP,
-		"  based on blksize of %d and RTTR size of %d",
-		bsize, size);
+		advise(LLOG_DEBUG, NULLCP, "Selecting block size of %d", n);
+		advise(LLOG_DEBUG, NULLCP,
+		       "  based on blksize of %d and RTTR size of %d", bsize, size);
 #endif
-	bsize = n;
-	timer (nbytes = 0);
-    }
+		bsize = n;
+		timer(nbytes = 0);
+	}
 
-    *base = NULLCP, *len = 0;
-    for (ep = (dp = bp) + (cc = bsize); dp < ep; dp += n, cc -= n) {
-	switch (n = read (fd, dp, cc)) {
-	    case NOTOK:
-	        return rtsaplose (rti, RTS_TRANSFER, "failed", "read");
+	*base = NULLCP, *len = 0;
+	for (ep = (dp = bp) + (cc = bsize); dp < ep; dp += n, cc -= n) {
+		switch (n = read(fd, dp, cc)) {
+		case NOTOK:
+			return rtsaplose(rti, RTS_TRANSFER, "failed", "read");
 
-	    default:
-		continue;
+		default:
+			continue;
 
-	    case OK:
+		case OK:
+			break;
+		}
 		break;
 	}
-	break;
-    }
-    if ((cc = dp - bp) > 0) {
-	*base = bp, *len = cc;
-	nbytes += cc;
-    }
+	if ((cc = dp - bp) > 0) {
+		*base = bp, *len = cc;
+		nbytes += cc;
+	}
 
-    return OK;
+	return OK;
 }
 
 /*  */
 
 /* ARGSUSED */
 
-static int  uptrans (sd, type, addr, rti)
-int	sd;
-int	type;
-caddr_t	addr;
-struct RtSAPindication *rti;
+static int
+uptrans(sd, type, addr, rti)
+	int sd;
+	int type;
+	caddr_t addr;
+	struct RtSAPindication *rti;
 {
-    switch (type) {
+	switch (type) {
 	case SI_DATA:
-	    {
+	{
 		register struct qbuf *qb = (struct qbuf *) addr;
 		register struct qbuf *qp;
 
-		for (qp = qb -> qb_forw; qp != qb; qp = qp -> qb_forw)
-		    if (write (fd, qp -> qb_data, qp -> qb_len) !=qp -> qb_len)
-			return rtsaplose (rti, RTS_TRANSFER, "failed","write");
-		    else
-			nbytes += qp -> qb_len;
-	    }
-	    break;
+		for (qp = qb->qb_forw; qp != qb; qp = qp->qb_forw)
+			if (write(fd, qp->qb_data, qp->qb_len) != qp->qb_len)
+				return rtsaplose(rti, RTS_TRANSFER, "failed", "write");
+			else
+				nbytes += qp->qb_len;
+	}
+		break;
 
 	case SI_SYNC:
-	    {
+	{
 #ifdef	DEBUG
 		register struct SSAPsync *sn = (struct SSAPsync *) addr;
 
-		advise (LLOG_DEBUG, NULLCP, "S-MINOR-SYNC.INDICATION: %ld",
-			sn -> sn_ssn);
+		advise(LLOG_DEBUG, NULLCP, "S-MINOR-SYNC.INDICATION: %ld", sn->sn_ssn);
 #endif
-	    }
-	    break;
+	}
+		break;
 
 	case SI_ACTIVITY:
-	    {
-		register struct SSAPactivity *sv = (struct SSAPactivity *)addr;
+	{
+		register struct SSAPactivity *sv = (struct SSAPactivity *) addr;
 
-		switch (sv -> sv_type) {
-		    case SV_START:
+		switch (sv->sv_type) {
+		case SV_START:
 #ifdef	DEBUG
-			advise (LLOG_DEBUG, NULLCP,
-				"S-ACTIVITY-START.INDICATION");
+			advise(LLOG_DEBUG, NULLCP, "S-ACTIVITY-START.INDICATION");
 #endif
-		        if ((fd = creat (destination, 0666)) == NOTOK) {
-			    advise (LLOG_EXCEPTIONS, destination,
-				    "unable to create");
-			    return rtsaplose (rti, RTS_TRANSFER, destination,
-					      "unable to create");
+			if ((fd = creat(destination, 0666)) == NOTOK) {
+				advise(LLOG_EXCEPTIONS, destination, "unable to create");
+				return rtsaplose(rti, RTS_TRANSFER, destination,
+						 "unable to create");
 			}
-			timer (nbytes = 0);
-		        break;
-
-		    case SV_INTRIND:
-		    case SV_DISCIND:
-			advise (LLOG_EXCEPTIONS, NULLCP,
-				"activity %s: %s",
-				sv -> sv_type == SV_INTRIND ? "interrupted"
-							    : "discarded",
-				SReportString (sv -> sv_reason));
-			if (unlink (destination) == NOTOK)
-			    advise (LLOG_EXCEPTIONS, destination,
-				    "unable to unlink");
+			timer(nbytes = 0);
 			break;
 
-		    case SV_ENDIND:
+		case SV_INTRIND:
+		case SV_DISCIND:
+			advise(LLOG_EXCEPTIONS, NULLCP,
+			       "activity %s: %s",
+			       sv->sv_type == SV_INTRIND ? "interrupted"
+			       : "discarded", SReportString(sv->sv_reason));
+			if (unlink(destination) == NOTOK)
+				advise(LLOG_EXCEPTIONS, destination, "unable to unlink");
+			break;
+
+		case SV_ENDIND:
 #ifdef	DEBUG
-			advise (LLOG_DEBUG, NULLCP,
-				"S-ACTIVITY-END.INDICATION");
+			advise(LLOG_DEBUG, NULLCP, "S-ACTIVITY-END.INDICATION");
 #endif
-			if (close (fd) == NOTOK)
-			    return rtsaplose (rti, RTS_TRANSFER, destination,
-					      "close failed on");
+			if (close(fd) == NOTOK)
+				return rtsaplose(rti, RTS_TRANSFER, destination, "close failed on");
 			break;
 
-		    default:
-			return rtsaplose (rti, RTS_TRANSFER, NULLCP,
-				       "unexpected activity indication=0x%x",
-				       sv -> sv_type);
+		default:
+			return rtsaplose(rti, RTS_TRANSFER, NULLCP,
+					 "unexpected activity indication=0x%x", sv->sv_type);
 		}
-	    }
-	    break;
+	}
+		break;
 
 	case SI_REPORT:
-	    {
+	{
 		register struct SSAPreport *sp = (struct SSAPreport *) addr;
 
-		if (!sp -> sp_peer)
-		    return rtsaplose (rti, RTS_TRANSFER, NULLCP,
-			     "unexpected provider-initiated exception report");
-		advise (LLOG_EXCEPTIONS, NULLCP,
-			"exception: %s", SReportString (sp -> sp_reason));
-		if (unlink (destination) == NOTOK)
-		    advise (LLOG_EXCEPTIONS, destination, "unable to unlink");
-	    }
-	    break;
+		if (!sp->sp_peer)
+			return rtsaplose(rti, RTS_TRANSFER, NULLCP,
+					 "unexpected provider-initiated exception report");
+		advise(LLOG_EXCEPTIONS, NULLCP, "exception: %s", SReportString(sp->sp_reason));
+		if (unlink(destination) == NOTOK)
+			advise(LLOG_EXCEPTIONS, destination, "unable to unlink");
+	}
+		break;
 
 	default:
-	    return rtsaplose (rti, RTS_TRANSFER, NULLCP,
-			      "unknown uptrans type=0x%x", type);
-    }
+		return rtsaplose(rti, RTS_TRANSFER, NULLCP, "unknown uptrans type=0x%x", type);
+	}
 
-    return OK;
+	return OK;
 }
 
 /*  */
 
-static	arginit (vec)
-char  **vec;
+static
+arginit(vec)
+	char **vec;
 {
-    register char *ap;
-    char    prompt[BUFSIZ];
+	register char *ap;
+	char prompt[BUFSIZ];
 
-    if (myname = rindex (*vec, '/'))
-	myname++;
-    if (myname == NULL || *myname == NULL)
-	myname = *vec;
-    if (strcmp (myname, "rtf") && strcmp (myname, "xrtf"))
-	host = myname, myname = "rtf";
+	if (myname = rindex(*vec, '/'))
+		myname++;
+	if (myname == NULL || *myname == NULL)
+		myname = *vec;
+	if (strcmp(myname, "rtf") && strcmp(myname, "xrtf"))
+		host = myname, myname = "rtf";
 
-    isodetailor (myname, 1);
+	isodetailor(myname, 1);
 
-    ll_hdinit (pgm_log, myname);
-    pgm_log -> ll_stat |= LLOGTTY;
+	ll_hdinit(pgm_log, myname);
+	pgm_log->ll_stat |= LLOGTTY;
 
-    for (vec++; ap = *vec; vec++) {
-	if (*ap == '-')
-	    switch (*++ap) {
-		case 'l':
-		    if ((user = *++vec) == NULL || *user == '-')
-			adios (NULLCP, "usage: %s -l username", myname);
-		    continue;
+	for (vec++; ap = *vec; vec++) {
+		if (*ap == '-')
+			switch (*++ap) {
+			case 'l':
+				if ((user = *++vec) == NULL || *user == '-')
+					adios(NULLCP, "usage: %s -l username", myname);
+				continue;
 
-		default:
-		    adios (NULLCP, "-%s: unknown switch", ap);
-	    }
+			default:
+				adios(NULLCP, "-%s: unknown switch", ap);
+			}
 
-	if (host == NULL)
-	    host = ap;
-	else
-	    if (turn == NOTOK) {
-		if (strcmp (ap, "get") == 0)
-		    turn = RTS_RESPONDER;
-		else
-		    if (strcmp (ap, "put") == 0)
-			turn = RTS_INITIATOR;
-		    else
-			goto usage;
-	    }
-	    else
-		if (source == NULL)
-		    source = ap;
-		else
-		    if (destination == NULL)
+		if (host == NULL)
+			host = ap;
+		else if (turn == NOTOK) {
+			if (strcmp(ap, "get") == 0)
+				turn = RTS_RESPONDER;
+			else if (strcmp(ap, "put") == 0)
+				turn = RTS_INITIATOR;
+			else
+				goto usage;
+		} else if (source == NULL)
+			source = ap;
+		else if (destination == NULL)
 			destination = ap;
 		else {
-usage: ;
-		    adios (NULLCP,
-			   "usage: %s host [get|put] source destination",
-			   myname);
+		      usage:;
+			adios(NULLCP, "usage: %s host [get|put] source destination", myname);
 		}
-    }
-
-    if (destination == NULL)
-	goto usage;
-
-    if (user == NULL && (user = getenv ("USER")) == NULL)
-	user = getenv ("LOGNAME");
-    if (strcmp (user, "anon") == 0)
-	user = "ANON";
-	
-    if (password == NULL) {
-	if (strcmp (user, "ANON")) {
-	    (void) sprintf (prompt, "password (%s:%s): ", host, user);
-	    password = getpassword (prompt);
 	}
-	else
-	    password = user ? user : "";
-    }
+
+	if (destination == NULL)
+		goto usage;
+
+	if (user == NULL && (user = getenv("USER")) == NULL)
+		user = getenv("LOGNAME");
+	if (strcmp(user, "anon") == 0)
+		user = "ANON";
+
+	if (password == NULL) {
+		if (strcmp(user, "ANON")) {
+			(void) sprintf(prompt, "password (%s:%s): ", host, user);
+			password = getpassword(prompt);
+		} else
+			password = user ? user : "";
+	}
 }

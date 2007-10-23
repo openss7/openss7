@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* find_entry.c - */
 
 #ifndef lint
-static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/find_entry.c,v 9.0 1992/06/16 12:34:01 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/quipu/RCS/find_entry.c,v 9.0 1992/06/16 12:34:01 isode Rel";
 #endif
 
 /*
- * $Header: /xtel/isode/isode/quipu/RCS/find_entry.c,v 9.0 1992/06/16 12:34:01 isode Rel $
+ * Header: /xtel/isode/isode/quipu/RCS/find_entry.c,v 9.0 1992/06/16 12:34:01 isode Rel
  *
  *
- * $Log: find_entry.c,v $
+ * Log: find_entry.c,v
  * Revision 9.0  1992/06/16  12:34:01  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/find_entry.c,v 9.0 19
  *
  */
 
-
 #include "quipu/util.h"
 #include "quipu/commonarg.h"
 #include "quipu/entry.h"
@@ -33,70 +91,70 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/find_entry.c,v 9.0 19
 #include "quipu/turbo.h"
 
 extern Entry database_root;
-extern LLog * log_dsap;
+extern LLog *log_dsap;
 extern time_t timenow;
 extern time_t cache_timeout;
-extern DN  mydsadn;
-extern struct di_block * di_alloc();
+extern DN mydsadn;
+extern struct di_block *di_alloc();
 
-int	  find_entry (object,ca,acl_who,dn_stack,master,ent_p,err,di_p,optype)
-DN		  object;
-common_args	* ca;
-DN		  acl_who;
-struct dn_seq	* dn_stack;
-int		  master;
-Entry		* ent_p;
-struct DSError	* err;
-struct di_block	**di_p;
-int optype;
+int
+find_entry(object, ca, acl_who, dn_stack, master, ent_p, err, di_p, optype)
+	DN object;
+	common_args *ca;
+	DN acl_who;
+	struct dn_seq *dn_stack;
+	int master;
+	Entry *ent_p;
+	struct DSError *err;
+	struct di_block **di_p;
+	int optype;
 {
-int deref = FALSE;
-extern time_t cache_timeout;
-DN dn_found;
-int res;
+	int deref = FALSE;
+	extern time_t cache_timeout;
+	DN dn_found;
+	int res;
 
-	DLOG (log_dsap,LLOG_TRACE,("find_entry"));
+	DLOG(log_dsap, LLOG_TRACE, ("find_entry"));
 	err->dse_type = DSE_NOERROR;
 
-	if ((ca->ca_servicecontrol.svc_options & SVC_OPT_DONTDEREFERENCEALIAS) == 0) 
+	if ((ca->ca_servicecontrol.svc_options & SVC_OPT_DONTDEREFERENCEALIAS) == 0)
 		deref = TRUE;
 
 	if ((ca->ca_servicecontrol.svc_options & SVC_OPT_DONTUSECOPY) != 0)
 		master = TRUE;
 
-	switch(really_find_entry(object,deref,dn_stack,master,ent_p,err,di_p))
-	{
+	switch (really_find_entry(object, deref, dn_stack, master, ent_p, err, di_p)) {
 	case DS_OK:
-	    DLOG(log_dsap, LLOG_DEBUG, ("find_entry - rfe: OK"));
-	    /* Have set up ent_p continue processing */
-	    break;
+		DLOG(log_dsap, LLOG_DEBUG, ("find_entry - rfe: OK"));
+		/* Have set up ent_p continue processing */
+		break;
 
 	case DS_CONTINUE:
-	    DLOG(log_dsap, LLOG_DEBUG, ("find_entry - rfe: CONT"));
+		DLOG(log_dsap, LLOG_DEBUG, ("find_entry - rfe: CONT"));
 #ifdef DEBUG
-	    di_list_log((*di_p));
+		di_list_log((*di_p));
 #endif
-	    /* Have set up di_blocks of DSAs to be questioned */
-	    return(DS_CONTINUE);
+		/* Have set up di_blocks of DSAs to be questioned */
+		return (DS_CONTINUE);
 
 	case DS_X500_ERROR:
-	    DLOG(log_dsap, LLOG_DEBUG, ("find_entry - rfe: X500_ERROR"));
-	    /* Have set up an error */
-	    return(DS_X500_ERROR);
+		DLOG(log_dsap, LLOG_DEBUG, ("find_entry - rfe: X500_ERROR"));
+		/* Have set up an error */
+		return (DS_X500_ERROR);
 
 	default:
-	    /* Scream */
-	    LLOG(log_dsap, LLOG_EXCEPTIONS, ("really_find_entry failed in find_entry 1"));
-	    return(DS_ERROR_LOCAL);
+		/* Scream */
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("really_find_entry failed in find_entry 1"));
+		return (DS_ERROR_LOCAL);
 	}
 
-	dn_found = get_copy_dn (*ent_p);
+	dn_found = get_copy_dn(*ent_p);
 
 	/* if the returned entry is a CONSTRUCTOR, return a referral */
 	if ((*ent_p)->e_data == E_TYPE_CONSTRUCTOR) {
-	        DLOG(log_dsap, LLOG_DEBUG, ("find_entry - constructor"));
-		res = constructor_dsa_info(dn_found,dn_stack,FALSE,(*ent_p),err,di_p);
-		dn_free (dn_found);
+		DLOG(log_dsap, LLOG_DEBUG, ("find_entry - constructor"));
+		res = constructor_dsa_info(dn_found, dn_stack, FALSE, (*ent_p), err, di_p);
+		dn_free(dn_found);
 		return (res);
 	}
 
@@ -104,13 +162,11 @@ int res;
 	if (((*ent_p)->e_data != E_DATA_MASTER) && (master)) {
 
 		/* DSAs are special for read/modify */
-		if ((optype == OP_READ) || 
-		    (optype == OP_MODIFYRDN) ||
-		    (optype == OP_MODIFYENTRY)) {
-			if ((quipu_ctx_supported (*ent_p) > 2) && (quipu_version_7 (*ent_p))) {
-				if (dn_cmp (dn_found, mydsadn) == 0) 
+		if ((optype == OP_READ) || (optype == OP_MODIFYRDN) || (optype == OP_MODIFYENTRY)) {
+			if ((quipu_ctx_supported(*ent_p) > 2) && (quipu_version_7(*ent_p))) {
+				if (dn_cmp(dn_found, mydsadn) == 0)
 					goto out;
-mk_ref:;
+			      mk_ref:;
 				(*di_p) = di_alloc();
 				(*di_p)->di_type = DI_TASK;
 				(*di_p)->di_dn = dn_found;
@@ -125,55 +181,52 @@ mk_ref:;
 			}
 		}
 
-	        DLOG(log_dsap, LLOG_DEBUG, ("find_entry - slave master needed"));
-		res = constructor_dsa_info(dn_found,dn_stack,TRUE,(*ent_p),err,di_p);
-		dn_free (dn_found);
+		DLOG(log_dsap, LLOG_DEBUG, ("find_entry - slave master needed"));
+		res = constructor_dsa_info(dn_found, dn_stack, TRUE, (*ent_p), err, di_p);
+		dn_free(dn_found);
 		return (res);
 
-	} else if ( ((optype == OP_MODIFYRDN) || (optype == OP_MODIFYENTRY)) &&
-		  (quipu_ctx_supported (*ent_p) > 2) && 
-		   quipu_version_7 (*ent_p) &&
-		  (dn_cmp (dn_found, mydsadn) != 0))
-			goto mk_ref;
+	} else if (((optype == OP_MODIFYRDN) || (optype == OP_MODIFYENTRY)) &&
+		   (quipu_ctx_supported(*ent_p) > 2) &&
+		   quipu_version_7(*ent_p) && (dn_cmp(dn_found, mydsadn) != 0))
+		goto mk_ref;
 
 #ifdef WRONG_BEHAVIOUR
 
 	/* if this is right, we need to make sure that dsa_info */
 	/* pick ups the correct external reference */
 
-	if ((*ent_p)->e_external && 
-	    ((*ent_p)->e_reftype != RT_NONSPECIFICSUBORDINATE)) {
-		res = constructor_dsa_info(dn_found,dn_stack,TRUE,(*ent_p),err,di_p);
-		dn_free (dn_found);
+	if ((*ent_p)->e_external && ((*ent_p)->e_reftype != RT_NONSPECIFICSUBORDINATE)) {
+		res = constructor_dsa_info(dn_found, dn_stack, TRUE, (*ent_p), err, di_p);
+		dn_free(dn_found);
 		return (res);
 	}
 #endif
 
-	if (((*ent_p)->e_data == E_TYPE_CACHE_FROM_MASTER) && 
-	        (timenow - (*ent_p)->e_age > cache_timeout)) {
-	        DLOG(log_dsap, LLOG_DEBUG, ("find_entry - cache timed out"));
-		res = constructor_dsa_info(dn_found,dn_stack,TRUE,(*ent_p),err,di_p);
-		delete_cache (dn_found);
-		dn_free (dn_found);
+	if (((*ent_p)->e_data == E_TYPE_CACHE_FROM_MASTER) &&
+	    (timenow - (*ent_p)->e_age > cache_timeout)) {
+		DLOG(log_dsap, LLOG_DEBUG, ("find_entry - cache timed out"));
+		res = constructor_dsa_info(dn_found, dn_stack, TRUE, (*ent_p), err, di_p);
+		delete_cache(dn_found);
+		dn_free(dn_found);
 		return (res);
 	}
 
-out:;
-	dn_free (dn_found);
+      out:;
+	dn_free(dn_found);
 
-	if ((*ent_p)->e_parent == NULLENTRY)
-	{
+	if ((*ent_p)->e_parent == NULLENTRY) {
 		DLOG(log_dsap, LLOG_DEBUG, ("find_entry: (*ent_p)->e_parent is NULLENTRY"));
-		return (DS_OK);     /* no acl for root entry */
+		return (DS_OK);	/* no acl for root entry */
 	}
 
-	if (check_acl (acl_who,ACL_DETECT, (*ent_p)->e_parent->e_acl->ac_child, object) == NOTOK) {
+	if (check_acl(acl_who, ACL_DETECT, (*ent_p)->e_parent->e_acl->ac_child, object) == NOTOK) {
 		err->dse_type = DSE_SECURITYERROR;
 		err->ERR_SECURITY.DSE_sc_problem = DSE_SC_ACCESSRIGHTS;
 		return (DS_X500_ERROR);
 	}
 
-	if (check_acl (acl_who,ACL_DETECT, (*ent_p)->e_acl->ac_entry, object) == NOTOK) {
+	if (check_acl(acl_who, ACL_DETECT, (*ent_p)->e_acl->ac_entry, object) == NOTOK) {
 		err->dse_type = DSE_SECURITYERROR;
 		err->ERR_SECURITY.DSE_sc_problem = DSE_SC_ACCESSRIGHTS;
 		return (DS_X500_ERROR);
@@ -182,24 +235,25 @@ out:;
 	return (DS_OK);
 }
 
-int	  find_child_entry (object,ca,acl_who,dn_stack,master,ent_p,err,di_p)
-DN                        object;
-common_args             * ca;
-DN    			  acl_who;
-struct dn_seq		* dn_stack;
-int			  master;
-Entry			* ent_p;
-struct DSError          * err;
-struct di_block		**di_p;
+int
+find_child_entry(object, ca, acl_who, dn_stack, master, ent_p, err, di_p)
+	DN object;
+	common_args *ca;
+	DN acl_who;
+	struct dn_seq *dn_stack;
+	int master;
+	Entry *ent_p;
+	struct DSError *err;
+	struct di_block **di_p;
 {
 /* this is very similar to find_entry(), except a top level */
 /* constructor is allowed */
-int deref = FALSE;
-int res;
-DN dn_found;
-Entry	akid;
+	int deref = FALSE;
+	int res;
+	DN dn_found;
+	Entry akid;
 
-	DLOG (log_dsap,LLOG_DEBUG,("find_child_entry"));
+	DLOG(log_dsap, LLOG_DEBUG, ("find_child_entry"));
 	err->dse_type = DSE_NOERROR;
 
 	if ((ca->ca_servicecontrol.svc_options & SVC_OPT_DONTDEREFERENCEALIAS) == 0)
@@ -208,36 +262,34 @@ Entry	akid;
 	if ((ca->ca_servicecontrol.svc_options & SVC_OPT_DONTUSECOPY) != 0)
 		master = TRUE;
 
-	switch(really_find_entry(object,deref,dn_stack,master,ent_p,err,di_p))
-	{
+	switch (really_find_entry(object, deref, dn_stack, master, ent_p, err, di_p)) {
 	case DS_OK:
-	    DLOG(log_dsap, LLOG_DEBUG, ("find_child_entry - rfe: OK"));
-	    /* Have set up ent_p continue processing */
-	    break;
+		DLOG(log_dsap, LLOG_DEBUG, ("find_child_entry - rfe: OK"));
+		/* Have set up ent_p continue processing */
+		break;
 
 	case DS_CONTINUE:
-	    DLOG(log_dsap, LLOG_DEBUG, ("find_child_entry - rfe: CONTINUE"));
+		DLOG(log_dsap, LLOG_DEBUG, ("find_child_entry - rfe: CONTINUE"));
 #ifdef DEBUG
-	    di_list_log((*di_p));
+		di_list_log((*di_p));
 #endif
-	    /* Have set up di_blocks of DSAs to be questioned */
-	    return(DS_CONTINUE);
+		/* Have set up di_blocks of DSAs to be questioned */
+		return (DS_CONTINUE);
 
 	case DS_X500_ERROR:
-	    /* Have set up an error */
-	    DLOG(log_dsap, LLOG_DEBUG, ("find_child_entry - rfe: X500_ERROR"));
-	    return(DS_X500_ERROR);
+		/* Have set up an error */
+		DLOG(log_dsap, LLOG_DEBUG, ("find_child_entry - rfe: X500_ERROR"));
+		return (DS_X500_ERROR);
 
 	default:
-	    /* Scream */
-	    LLOG(log_dsap, LLOG_EXCEPTIONS, ("really_find_entry failed in find_entry 1"));
-	    return(DS_ERROR_LOCAL);
+		/* Scream */
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("really_find_entry failed in find_entry 1"));
+		return (DS_ERROR_LOCAL);
 	}
 
 	/* check to see if children OK */
-	if ((*ent_p)->e_children != NULLAVL && (*ent_p)->e_allchildrenpresent
-	    != FALSE) {
-	    	DLOG(log_dsap, LLOG_DEBUG, ("find_child_entry - children OK"));
+	if ((*ent_p)->e_children != NULLAVL && (*ent_p)->e_allchildrenpresent != FALSE) {
+		DLOG(log_dsap, LLOG_DEBUG, ("find_child_entry - children OK"));
 		akid = (Entry) avl_getone((*ent_p)->e_children);
 		switch (akid->e_data) {
 		case E_DATA_MASTER:
@@ -246,56 +298,61 @@ Entry	akid;
 		case E_TYPE_SLAVE:
 			/* see if we can use a copy ... */
 			DLOG(log_dsap, LLOG_DEBUG, ("find_child_entry - children slaves"));
-		    	if (master) {
-				dn_found = get_copy_dn (*ent_p);
-				res = constructor_dsa_info_aux(dn_found,dn_stack,master,(*ent_p),err,di_p);
-				dn_free (dn_found);
+			if (master) {
+				dn_found = get_copy_dn(*ent_p);
+				res =
+				    constructor_dsa_info_aux(dn_found, dn_stack, master, (*ent_p),
+							     err, di_p);
+				dn_free(dn_found);
 				return (res);
-		    	}
+			}
 			break;
 		default:
 			DLOG(log_dsap, LLOG_DEBUG, ("find_child_entry - default"));
-			dn_found = get_copy_dn (*ent_p);
-			res = constructor_dsa_info_aux(dn_found,dn_stack,master,(*ent_p),err,di_p);
-			dn_free (dn_found);
+			dn_found = get_copy_dn(*ent_p);
+			res =
+			    constructor_dsa_info_aux(dn_found, dn_stack, master, (*ent_p), err,
+						     di_p);
+			dn_free(dn_found);
 			return (res);
 		}
-	} else if ( (! isleaf(*ent_p)) || (*ent_p)->e_external) {
+	} else if ((!isleaf(*ent_p)) || (*ent_p)->e_external) {
 		DLOG(log_dsap, LLOG_DEBUG, ("find_child_entry - children NOTOK"));
-		dn_found = get_copy_dn (*ent_p);
-		res = constructor_dsa_info_aux(dn_found,dn_stack,master,(*ent_p),err,di_p);
-		dn_free (dn_found);
+		dn_found = get_copy_dn(*ent_p);
+		res = constructor_dsa_info_aux(dn_found, dn_stack, master, (*ent_p), err, di_p);
+		dn_free(dn_found);
 		return (res);
 	}
 
-	if (check_acl (acl_who,ACL_DETECT, (*ent_p)->e_acl->ac_child, object) == NOTOK) {
+	if (check_acl(acl_who, ACL_DETECT, (*ent_p)->e_acl->ac_child, object) == NOTOK) {
 		err->dse_type = DSE_SECURITYERROR;
 		err->ERR_SECURITY.DSE_sc_problem = DSE_SC_ACCESSRIGHTS;
 		return (DS_X500_ERROR);
-		}
+	}
 
 	return (DS_OK);
 }
 
-int	  really_find_entry (object, deref, dn_stack, master, ent_p, err, di_p)
-DN		  object;
-int		  deref;
-struct dn_seq	* dn_stack;
-int		  master;	/* Generate only master references - NB
-				   does not imply returned entry is master */
-Entry		* ent_p;
-struct DSError	* err;
-struct di_block	**di_p;
+int
+really_find_entry(object, deref, dn_stack, master, ent_p, err, di_p)
+	DN object;
+	int deref;
+	struct dn_seq *dn_stack;
+	int master;			/* Generate only master references - NB does not imply
+					   returned entry is master */
+	Entry *ent_p;
+	struct DSError *err;
+	struct di_block **di_p;
 {
-Entry parent;
-Avlnode *kids;
-int entryrdn_cmp ();
-register RDN b_rdn;
-DN     tdn, dn, dn_trail = NULLDN;
-DN     aliasdn = NULLDN;
-int rdns, aliases;
+	Entry parent;
+	Avlnode *kids;
+	int entryrdn_cmp();
+	register RDN b_rdn;
+	DN tdn, dn, dn_trail = NULLDN;
+	DN aliasdn = NULLDN;
+	int rdns, aliases;
 
-	DLOG (log_dsap,LLOG_TRACE,("really find entry"));
+	DLOG(log_dsap, LLOG_TRACE, ("really find entry"));
 
 	if (deref == -2) {
 		/* alias loop */
@@ -306,169 +363,177 @@ int rdns, aliases;
 	}
 
 	if (database_root == NULLENTRY) {
-		LLOG (log_dsap,LLOG_NOTICE,("null root !!!"));
-		return(dsa_info_parent(object, err, di_p, master));
+		LLOG(log_dsap, LLOG_NOTICE, ("null root !!!"));
+		return (dsa_info_parent(object, err, di_p, master));
 	}
 
 	if ((dn = object) == NULLDN) {
-		DLOG(log_dsap,LLOG_DEBUG,("really_fe - DS_OK: database_root"));
+		DLOG(log_dsap, LLOG_DEBUG, ("really_fe - DS_OK: database_root"));
 		(*ent_p) = database_root;
 		return (DS_OK);
 	}
 
 	b_rdn = dn->dn_rdn;
- 	if ((kids = database_root->e_children) == NULLAVL) {
+	if ((kids = database_root->e_children) == NULLAVL) {
 		DLOG(log_dsap, LLOG_DEBUG, ("database->e_child == NULLENTRY"));
-		return (no_reply_child (object,dn,dn_stack,master,database_root,err,di_p));
+		return (no_reply_child(object, dn, dn_stack, master, database_root, err, di_p));
 	}
 
- 	parent = database_root;
+	parent = database_root;
 
-	for(rdns = 1, aliases = 0 ; ; rdns++ ) { /* break or return out */
- 		*ent_p = (Entry) avl_find(kids, (caddr_t) b_rdn, entryrdn_cmp);
- 		if ( *ent_p == NULLENTRY ) {
- 			int res = no_reply_edb(object, dn_trail, dn_stack,
- 			    master, parent, err, di_p);
-			if (res == DS_CONTINUE) 
-				di_rdns (*di_p,rdns,aliases,NULLDN);
+	for (rdns = 1, aliases = 0;; rdns++) {	/* break or return out */
+		*ent_p = (Entry) avl_find(kids, (caddr_t) b_rdn, entryrdn_cmp);
+		if (*ent_p == NULLENTRY) {
+			int res = no_reply_edb(object, dn_trail, dn_stack,
+					       master, parent, err, di_p);
+
+			if (res == DS_CONTINUE)
+				di_rdns(*di_p, rdns, aliases, NULLDN);
 			if (aliasdn)
-				dn_free (aliasdn);
+				dn_free(aliasdn);
 			return res;
 		}
 
-		if ( (*ent_p)->e_alias != NULLDN )
+		if ((*ent_p)->e_alias != NULLDN)
 			/* got an alias entry */
 			if (deref != FALSE) {
-				Entry	  new_entry;
-				int	  new_deref;
-				DN 	  t_aliasdn;
+				Entry new_entry;
+				int new_deref;
+				DN t_aliasdn;
 
 				err->dse_type = DSE_NAMEERROR;
 				new_deref = (deref == -1) ? -2 : -1;
-				switch(really_find_entry ((*ent_p)->e_alias,new_deref,dn_stack,master,&(new_entry),err,di_p))
-				{
+				switch (really_find_entry
+					((*ent_p)->e_alias, new_deref, dn_stack, master,
+					 &(new_entry), err, di_p)) {
 				case DS_OK:
-				    DLOG(log_dsap, LLOG_DEBUG, ("rfe:rfe:OK"));
-				    (*ent_p) = new_entry;
-				    t_aliasdn = aliasdn;
-				    aliasdn = get_copy_dn(new_entry);
-				    aliases = 0;
-				    for (tdn=aliasdn; tdn != NULLDN; tdn=tdn->dn_parent) 
-					    aliases++;
-
-				    tdn = dn->dn_parent;
-				    if (aliasdn == NULLDN)
-					    dn = aliasdn = dn_cpy(tdn);
-				    else {
-					    for (dn = aliasdn; 
-						 dn->dn_parent != NULLDN;
-						 dn = dn->dn_parent)
-						    ;
-					    dn->dn_parent = dn_cpy(tdn);
-				    }
-				    if (t_aliasdn)
-					dn_free (t_aliasdn);
-
-				    object = aliasdn;
-				    break;
-				case DS_CONTINUE:
-				    DLOG(log_dsap, LLOG_DEBUG, ("rfe:rfe:CONT"));
-#ifdef DEBUG
-	        			di_list_log((*di_p));
-#endif
+					DLOG(log_dsap, LLOG_DEBUG, ("rfe:rfe:OK"));
+					(*ent_p) = new_entry;
 					t_aliasdn = aliasdn;
-					aliasdn = dn_cpy ((*ent_p)->e_alias);
+					aliasdn = get_copy_dn(new_entry);
 					aliases = 0;
-					for (tdn=aliasdn; tdn != NULLDN; tdn=tdn->dn_parent) 
+					for (tdn = aliasdn; tdn != NULLDN; tdn = tdn->dn_parent)
 						aliases++;
 
 					tdn = dn->dn_parent;
 					if (aliasdn == NULLDN)
 						dn = aliasdn = dn_cpy(tdn);
 					else {
-						for (dn = aliasdn; 
-						     dn->dn_parent != NULLDN;
-						     dn = dn->dn_parent)
-							;
+						for (dn = aliasdn;
+						     dn->dn_parent != NULLDN; dn = dn->dn_parent) ;
 						dn->dn_parent = dn_cpy(tdn);
 					}
 					if (t_aliasdn)
-					    dn_free (t_aliasdn);
+						dn_free(t_aliasdn);
 
-					di_rdns (*di_p,rdns,aliases,aliasdn);
+					object = aliasdn;
+					break;
+				case DS_CONTINUE:
+					DLOG(log_dsap, LLOG_DEBUG, ("rfe:rfe:CONT"));
+#ifdef DEBUG
+					di_list_log((*di_p));
+#endif
+					t_aliasdn = aliasdn;
+					aliasdn = dn_cpy((*ent_p)->e_alias);
+					aliases = 0;
+					for (tdn = aliasdn; tdn != NULLDN; tdn = tdn->dn_parent)
+						aliases++;
 
-				        if (aliasdn)
-						dn_free (aliasdn);
-					return(DS_CONTINUE);
+					tdn = dn->dn_parent;
+					if (aliasdn == NULLDN)
+						dn = aliasdn = dn_cpy(tdn);
+					else {
+						for (dn = aliasdn;
+						     dn->dn_parent != NULLDN; dn = dn->dn_parent) ;
+						dn->dn_parent = dn_cpy(tdn);
+					}
+					if (t_aliasdn)
+						dn_free(t_aliasdn);
+
+					di_rdns(*di_p, rdns, aliases, aliasdn);
+
+					if (aliasdn)
+						dn_free(aliasdn);
+					return (DS_CONTINUE);
 				case DS_X500_ERROR:
-				    DLOG(log_dsap, LLOG_DEBUG, ("rfe:rfe:X500ERR"));
-					if ((err->dse_type == DSE_NAMEERROR) && 
-						( err->ERR_NAME.DSE_na_problem == DSE_NA_ALIASDEREFERENCE)) {
+					DLOG(log_dsap, LLOG_DEBUG, ("rfe:rfe:X500ERR"));
+					if ((err->dse_type == DSE_NAMEERROR) &&
+					    (err->ERR_NAME.DSE_na_problem ==
+					     DSE_NA_ALIASDEREFERENCE)) {
 						if (err->ERR_NAME.DSE_na_matched == NULLDN) {
 							DN tmp_dn;
+
 							tmp_dn = dn->dn_parent;
 							dn->dn_parent = NULLDN;
-							err->ERR_NAME.DSE_na_matched = dn_cpy(object);
+							err->ERR_NAME.DSE_na_matched =
+							    dn_cpy(object);
 							dn->dn_parent = tmp_dn;
-							pslog (log_dsap,LLOG_EXCEPTIONS,"Alias deref Problem",(IFP)dn_print,(caddr_t)err->ERR_NAME.DSE_na_matched);
+							pslog(log_dsap, LLOG_EXCEPTIONS,
+							      "Alias deref Problem", (IFP) dn_print,
+							      (caddr_t) err->ERR_NAME.
+							      DSE_na_matched);
 						}
 						if (aliasdn)
-							dn_free (aliasdn);
+							dn_free(aliasdn);
 						return (DS_X500_ERROR);
 					} else {
-						ds_error_free (err);
+						ds_error_free(err);
 						err->dse_type = DSE_NAMEERROR;
 						err->ERR_NAME.DSE_na_problem = DSE_NA_ALIASPROBLEM;
-						err->ERR_NAME.DSE_na_matched = dn_cpy((*ent_p)->e_alias);
-						pslog (log_dsap,LLOG_EXCEPTIONS,"Alias Problem",(IFP)dn_print,(caddr_t)err->ERR_NAME.DSE_na_matched);
+						err->ERR_NAME.DSE_na_matched =
+						    dn_cpy((*ent_p)->e_alias);
+						pslog(log_dsap, LLOG_EXCEPTIONS, "Alias Problem",
+						      (IFP) dn_print,
+						      (caddr_t) err->ERR_NAME.DSE_na_matched);
 						if (aliasdn)
-							dn_free (aliasdn);
+							dn_free(aliasdn);
 						return (DS_X500_ERROR);
 					}
 				default:
-				    if (aliasdn)
-					dn_free (aliasdn);
-				    DLOG(log_dsap, LLOG_DEBUG, ("rfe:rfe:localerror"));
-					return(DS_ERROR_LOCAL);
+					if (aliasdn)
+						dn_free(aliasdn);
+					DLOG(log_dsap, LLOG_DEBUG, ("rfe:rfe:localerror"));
+					return (DS_ERROR_LOCAL);
 				}
-				
 
-			} else if ( dn->dn_parent == NULLDN) {
-				DLOG(log_dsap,LLOG_DEBUG,("really_fe - DS_OK: ?1"));
+			} else if (dn->dn_parent == NULLDN) {
+				DLOG(log_dsap, LLOG_DEBUG, ("really_fe - DS_OK: ?1"));
 				if (aliasdn)
-					dn_free (aliasdn);
-				return(DS_OK);
+					dn_free(aliasdn);
+				return (DS_OK);
 			} else {
 				/* alias on route - error in this case */
 				DN tmp_dn;
+
 				err->dse_type = DSE_NAMEERROR;
 				err->ERR_NAME.DSE_na_problem = DSE_NA_ALIASDEREFERENCE;
 				tmp_dn = dn->dn_parent;
 				dn->dn_parent = NULLDN;
 				err->ERR_NAME.DSE_na_matched = dn_cpy(object);
 				dn->dn_parent = tmp_dn;
-				pslog (log_dsap,LLOG_EXCEPTIONS,"Alias deref(2) Problem",(IFP)dn_print,(caddr_t)err->ERR_NAME.DSE_na_matched);
+				pslog(log_dsap, LLOG_EXCEPTIONS, "Alias deref(2) Problem",
+				      (IFP) dn_print, (caddr_t) err->ERR_NAME.DSE_na_matched);
 				if (aliasdn)
-					dn_free (aliasdn);
+					dn_free(aliasdn);
 				return (DS_X500_ERROR);
 			}
 
-
 		if (dn->dn_parent == NULLDN) {
-			DLOG(log_dsap,LLOG_DEBUG,("really_fe - DS_OK: ?2"));
+			DLOG(log_dsap, LLOG_DEBUG, ("really_fe - DS_OK: ?2"));
 			if (aliasdn)
-				dn_free (aliasdn);
+				dn_free(aliasdn);
 			return (DS_OK);
 		}
 
 		if ((*ent_p)->e_children == NULLAVL) {
-			int res = no_reply_child (object,dn,dn_stack,master,(*ent_p),err,di_p);
-		        if (res == DS_CONTINUE) 
-				di_rdns (*di_p,rdns,aliases,NULLDN);
+			int res = no_reply_child(object, dn, dn_stack, master, (*ent_p), err, di_p);
+
+			if (res == DS_CONTINUE)
+				di_rdns(*di_p, rdns, aliases, NULLDN);
 
 			if (aliasdn)
-				dn_free (aliasdn);
-			return res;						
+				dn_free(aliasdn);
+			return res;
 		}
 
 		dn_trail = dn;
@@ -481,138 +546,107 @@ int rdns, aliases;
 	/* NOTREACHED */
 }
 
-
-int	  referral_dsa_info (object,dn_stack,master,ptr,err,di_p,chain)
-DN		  object;
-struct dn_seq	* dn_stack;
-int		  master;
-Entry		  ptr;
-struct DSError	* err;
-struct di_block	**di_p;
-char chain;
+int
+referral_dsa_info(object, dn_stack, master, ptr, err, di_p, chain)
+	DN object;
+	struct dn_seq *dn_stack;
+	int master;
+	Entry ptr;
+	struct DSError *err;
+	struct di_block **di_p;
+	char chain;
 {
-int ret;
-struct di_block     * di_tmp;
+	int ret;
+	struct di_block *di_tmp;
 
-	DLOG (log_dsap,LLOG_TRACE,("referral dsa_info"));
+	DLOG(log_dsap, LLOG_TRACE, ("referral dsa_info"));
 	/* generate a referral to a DUA if possible */
 
 	if (ptr != NULLENTRY)
-		ptr=ptr->e_parent;
+		ptr = ptr->e_parent;
 
-	if ((ret = constructor_dsa_info_aux(object,dn_stack,master,ptr,err,di_p)) != DS_CONTINUE)
+	if ((ret =
+	     constructor_dsa_info_aux(object, dn_stack, master, ptr, err, di_p)) != DS_CONTINUE)
 		return ret;
 
 	/* Try to make a referral - if not schedule a chain !!! */
 	if (chain)
 		return DS_CONTINUE;
 
-	/* PROBLEM: The following will get the best referral from our point 
-	 * of view.  This may not be the same from the DUAs point of view !!!
-         */
-	sort_dsa_list (di_p);
-        for(di_tmp= *di_p; di_tmp!=NULL_DI_BLOCK; di_tmp=di_tmp->di_next)
-        {
-                if(di_tmp->di_state == DI_DEFERRED)
-                        continue;
+	/* PROBLEM: The following will get the best referral from our point of view.  This may not 
+	   be the same from the DUAs point of view !!! */
+	sort_dsa_list(di_p);
+	for (di_tmp = *di_p; di_tmp != NULL_DI_BLOCK; di_tmp = di_tmp->di_next) {
+		if (di_tmp->di_state == DI_DEFERRED)
+			continue;
 
-                if(di2cref(di_tmp, err, DS_CTX_X500_DAP) == OK)
-                    return (DS_X500_ERROR);	/* return the referral !! */
-        }
+		if (di2cref(di_tmp, err, DS_CTX_X500_DAP) == OK)
+			return (DS_X500_ERROR);	/* return the referral !! */
+	}
 	return DS_CONTINUE;
 
 }
 
-int	  constructor_dsa_info (object,dn_stack,master,ptr,err,di_p)
-DN		  object;
-struct dn_seq	* dn_stack;
-int		  master;
-Entry		  ptr;
-struct DSError	* err;
-struct di_block	**di_p;
+int
+constructor_dsa_info(object, dn_stack, master, ptr, err, di_p)
+	DN object;
+	struct dn_seq *dn_stack;
+	int master;
+	Entry ptr;
+	struct DSError *err;
+	struct di_block **di_p;
 {
-	DLOG (log_dsap,LLOG_TRACE,("constructor dsa_info"));
+	DLOG(log_dsap, LLOG_TRACE, ("constructor dsa_info"));
 
 	if (ptr != NULLENTRY)
-		ptr=ptr->e_parent;
-		
-	return(constructor_dsa_info_aux(object,dn_stack,master,ptr,err,di_p));
+		ptr = ptr->e_parent;
+
+	return (constructor_dsa_info_aux(object, dn_stack, master, ptr, err, di_p));
 }
 
-int	  constructor_dsa_info_aux(object,dn_stack,master,ptr,err,di_p)
-DN		  object;
-struct dn_seq	* dn_stack;
-int		  master;
-Entry		  ptr;
-struct DSError	* err;
-struct di_block	**di_p;
+int
+constructor_dsa_info_aux(object, dn_stack, master, ptr, err, di_p)
+	DN object;
+	struct dn_seq *dn_stack;
+	int master;
+	Entry ptr;
+	struct DSError *err;
+	struct di_block **di_p;
 {
-	DLOG (log_dsap,LLOG_TRACE,("construct dsa_info aux"));
+	DLOG(log_dsap, LLOG_TRACE, ("construct dsa_info aux"));
 
 	/* follow entry back, until something that is not a CONSTRUCTOR */
 
-	for (; ptr!= NULLENTRY; ptr=ptr->e_parent)
+	for (; ptr != NULLENTRY; ptr = ptr->e_parent)
 		if ((ptr->e_data == E_DATA_MASTER) ||
 		    (ptr->e_data == E_TYPE_SLAVE) ||
-	    	    ((ptr->e_data == E_TYPE_CACHE_FROM_MASTER) &&
+		    ((ptr->e_data == E_TYPE_CACHE_FROM_MASTER) &&
 		     (timenow - ptr->e_age < cache_timeout))) {
-			if ( (!ptr->e_external) && (ptr->e_master == NULLAV) && (ptr->e_slave == NULLAV))
-				continue ;
-			return(dsa_info_new(object,dn_stack,master,ptr,err,di_p));
+			if ((!ptr->e_external) && (ptr->e_master == NULLAV)
+			    && (ptr->e_slave == NULLAV))
+				continue;
+			return (dsa_info_new(object, dn_stack, master, ptr, err, di_p));
 		}
 
-	return(dsa_info_parent(object,err,di_p,master));
+	return (dsa_info_parent(object, err, di_p, master));
 }
 
-int	  no_reply_child (object,dn,dn_stack,master,entryptr,err,di_p)
-DN		  object;
-DN		  dn; 	/* tail - not matched */
-struct dn_seq	* dn_stack;
-int		  master;
-Entry		  entryptr;
-struct DSError	* err;
-struct di_block	**di_p;
+int
+no_reply_child(object, dn, dn_stack, master, entryptr, err, di_p)
+	DN object;
+	DN dn;				/* tail - not matched */
+	struct dn_seq *dn_stack;
+	int master;
+	Entry entryptr;
+	struct DSError *err;
+	struct di_block **di_p;
 {
-DN dn_tmp;
-	
-	DLOG (log_dsap,LLOG_TRACE,("no reply child"));
+	DN dn_tmp;
 
-	if (isleaf(entryptr))
-	{
-		DLOG (log_dsap,LLOG_DEBUG,("definate NO"));
-		if (dn != NULLDN) {
-			dn_tmp = dn->dn_parent;
-			dn->dn_parent = NULLDN;
-		} else
-			object = NULLDN;
-		err->dse_type = DSE_NAMEERROR;
-		err->ERR_NAME.DSE_na_problem = DSE_NA_NOSUCHOBJECT;
-		err->ERR_NAME.DSE_na_matched = dn_cpy (object);
-		if (dn != NULLDN)
-			dn->dn_parent = dn_tmp;
-
-		return(DS_X500_ERROR);
-	}
-	
-	return(constructor_dsa_info_aux (object, dn_stack, master, entryptr, err, di_p));
-}
-
-int	  no_reply_edb (object,dn,dn_stack,master,entryptr,err,di_p)
-DN		  object;
-DN		  dn; 	/* tail - not matched */
-struct dn_seq	* dn_stack;
-int		  master;
-Entry		  entryptr;
-struct DSError	* err;
-struct di_block	**di_p;
-{
-DN dn_tmp;
-Entry akid;
-
-	DLOG (log_dsap,LLOG_TRACE,("no reply edb"));
+	DLOG(log_dsap, LLOG_TRACE, ("no reply child"));
 
 	if (isleaf(entryptr)) {
-		DLOG (log_dsap,LLOG_DEBUG,("definate NO"));
+		DLOG(log_dsap, LLOG_DEBUG, ("definate NO"));
 		if (dn != NULLDN) {
 			dn_tmp = dn->dn_parent;
 			dn->dn_parent = NULLDN;
@@ -620,21 +654,55 @@ Entry akid;
 			object = NULLDN;
 		err->dse_type = DSE_NAMEERROR;
 		err->ERR_NAME.DSE_na_problem = DSE_NA_NOSUCHOBJECT;
-		err->ERR_NAME.DSE_na_matched = dn_cpy (object);
+		err->ERR_NAME.DSE_na_matched = dn_cpy(object);
 		if (dn != NULLDN)
 			dn->dn_parent = dn_tmp;
 
-		return(DS_X500_ERROR);
+		return (DS_X500_ERROR);
+	}
+
+	return (constructor_dsa_info_aux(object, dn_stack, master, entryptr, err, di_p));
+}
+
+int
+no_reply_edb(object, dn, dn_stack, master, entryptr, err, di_p)
+	DN object;
+	DN dn;				/* tail - not matched */
+	struct dn_seq *dn_stack;
+	int master;
+	Entry entryptr;
+	struct DSError *err;
+	struct di_block **di_p;
+{
+	DN dn_tmp;
+	Entry akid;
+
+	DLOG(log_dsap, LLOG_TRACE, ("no reply edb"));
+
+	if (isleaf(entryptr)) {
+		DLOG(log_dsap, LLOG_DEBUG, ("definate NO"));
+		if (dn != NULLDN) {
+			dn_tmp = dn->dn_parent;
+			dn->dn_parent = NULLDN;
+		} else
+			object = NULLDN;
+		err->dse_type = DSE_NAMEERROR;
+		err->ERR_NAME.DSE_na_problem = DSE_NA_NOSUCHOBJECT;
+		err->ERR_NAME.DSE_na_matched = dn_cpy(object);
+		if (dn != NULLDN)
+			dn->dn_parent = dn_tmp;
+
+		return (DS_X500_ERROR);
 	}
 
 	if (entryptr->e_children == NULLAVL) {
-		return(constructor_dsa_info(object,dn_stack,master,entryptr,err,di_p));
+		return (constructor_dsa_info(object, dn_stack, master, entryptr, err, di_p));
 	}
 
 	akid = (Entry) avl_getone(entryptr->e_children);
 	if ((akid->e_data == E_DATA_MASTER)
-	    || ((! master) && (akid->e_data == E_TYPE_SLAVE)) ) {
-		DLOG (log_dsap,LLOG_DEBUG,("definate NO"));
+	    || ((!master) && (akid->e_data == E_TYPE_SLAVE))) {
+		DLOG(log_dsap, LLOG_DEBUG, ("definate NO"));
 		if (dn != NULLDN) {
 			dn_tmp = dn->dn_parent;
 			dn->dn_parent = NULLDN;
@@ -642,12 +710,12 @@ Entry akid;
 			object = NULLDN;
 		err->dse_type = DSE_NAMEERROR;
 		err->ERR_NAME.DSE_na_problem = DSE_NA_NOSUCHOBJECT;
-		err->ERR_NAME.DSE_na_matched = dn_cpy (object);
+		err->ERR_NAME.DSE_na_matched = dn_cpy(object);
 		if (dn != NULLDN)
 			dn->dn_parent = dn_tmp;
-		return(DS_X500_ERROR);
+		return (DS_X500_ERROR);
 	}
 
 	/* build a referral */
-	return(constructor_dsa_info_aux(object,dn_stack,master,entryptr,err,di_p));
+	return (constructor_dsa_info_aux(object, dn_stack, master, entryptr, err, di_p));
 }

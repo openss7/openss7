@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* rt2ssinitiat.c - RTPM: initiator */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/rtsap/RCS/rt2ssinitiat.c,v 9.0 1992/06/16 12:37:45 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/rtsap/RCS/rt2ssinitiat.c,v 9.0 1992/06/16 12:37:45 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/rtsap/RCS/rt2ssinitiat.c,v 9.0 1992/06/16 12:37:45 isode Rel $
+ * Header: /xtel/isode/isode/rtsap/RCS/rt2ssinitiat.c,v 9.0 1992/06/16 12:37:45 isode Rel
  *
  *
- * $Log: rt2ssinitiat.c,v $
+ * Log: rt2ssinitiat.c,v
  * Revision 9.0  1992/06/16  12:37:45  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/rtsap/RCS/rt2ssinitiat.c,v 9.0 
  *
  */
 
-
 /* LINTLIBRARY */
 
 #include <stdio.h>
@@ -36,156 +94,146 @@ static char *rcsid = "$Header: /xtel/isode/isode/rtsap/RCS/rt2ssinitiat.c,v 9.0 
 #include "tailor.h"
 #include "internet.h"
 
-static int  RtBeginRequestAux ();
+static int RtBeginRequestAux();
 
 /*    RT-BEGIN.REQUEST (X.410 OPEN.REQUEST) */
 
-int	RtBeginRequest2 (called, calling, mode, turn, data, rtc, rti)
-struct RtSAPaddr *called, *calling;
-int	mode,
-	turn;
-PE	data;
-struct RtSAPconnect *rtc;
-struct RtSAPindication *rti;
+int
+RtBeginRequest2(called, calling, mode, turn, data, rtc, rti)
+	struct RtSAPaddr *called, *calling;
+	int mode, turn;
+	PE data;
+	struct RtSAPconnect *rtc;
+	struct RtSAPindication *rti;
 {
-    SBV     smask;
-    int     result;
+	SBV smask;
+	int result;
 
-    isodetailor (NULLCP, 0);
+	isodetailor(NULLCP, 0);
 
-    missingP (called);
-    switch (mode) {
+	missingP(called);
+	switch (mode) {
 	case RTS_MONOLOGUE:
 	case RTS_TWA:
-	    break;
+		break;
 
 	default:
-	    return rtsaplose (rti, RTS_PARAMETER, NULLCP,
-		    "bad value for mode parameter");
-    }
-    switch (turn) {
+		return rtsaplose(rti, RTS_PARAMETER, NULLCP, "bad value for mode parameter");
+	}
+	switch (turn) {
 	case RTS_INITIATOR:
 	case RTS_RESPONDER:
-	    break;
+		break;
 
 	default:
-	    return rtsaplose (rti, RTS_PARAMETER, NULLCP,
-		    "bad value for turn parameter");
-    }
-    missingP (rtc);
-    bzero ((char *) rtc, sizeof *rtc);
-    missingP (rti);
+		return rtsaplose(rti, RTS_PARAMETER, NULLCP, "bad value for turn parameter");
+	}
+	missingP(rtc);
+	bzero((char *) rtc, sizeof *rtc);
+	missingP(rti);
 
-    smask = sigioblock ();
+	smask = sigioblock();
 
-    result = RtBeginRequestAux (called, calling, mode, turn, data, rtc, rti);
+	result = RtBeginRequestAux(called, calling, mode, turn, data, rtc, rti);
 
-    (void) sigiomask (smask);
+	(void) sigiomask(smask);
 
-    return result;
+	return result;
 }
 
 /*  */
 
-static int  RtBeginRequestAux (called, calling, mode, turn, data, rtc, rti)
-struct RtSAPaddr *called, *calling;
-int	mode,
-	turn;
-PE	data;
-struct RtSAPconnect *rtc;
-struct RtSAPindication *rti;
+static int
+RtBeginRequestAux(called, calling, mode, turn, data, rtc, rti)
+	struct RtSAPaddr *called, *calling;
+	int mode, turn;
+	PE data;
+	struct RtSAPconnect *rtc;
+	struct RtSAPindication *rti;
 {
-    int	    len,
-	    result,
-	    settings;
-    char   *base;
-#ifdef	notdef
-    register struct isoservent *is;
-#endif
-    register PE	pe,
-		p,
-		q,
-		r;
-    register struct assocblk *acb;
-    struct SSAPref srs;
-    register struct SSAPref *sr = &srs;
-    struct SSAPconnect scs;
-    register struct SSAPconnect *sc = &scs;
-    struct SSAPindication sis;
-    register struct SSAPindication *si = &sis;
-    register struct SSAPabort *sa = &si -> si_abort;
-    struct type_OACS_PAccept *paccpt = (struct type_OACS_PAccept *)0;
+	int len, result, settings;
+	char *base;
 
-    if ((acb = newacblk ()) == NULL)
-	return rtsaplose (rti, RTS_CONGEST, NULLCP, "out of memory");
+#ifdef	notdef
+	register struct isoservent *is;
+#endif
+	register PE pe, p, q, r;
+	register struct assocblk *acb;
+	struct SSAPref srs;
+	register struct SSAPref *sr = &srs;
+	struct SSAPconnect scs;
+	register struct SSAPconnect *sc = &scs;
+	struct SSAPindication sis;
+	register struct SSAPindication *si = &sis;
+	register struct SSAPabort *sa = &si->si_abort;
+	struct type_OACS_PAccept *paccpt = (struct type_OACS_PAccept *) 0;
+
+	if ((acb = newacblk()) == NULL)
+		return rtsaplose(rti, RTS_CONGEST, NULLCP, "out of memory");
 
 /* begin PConnect PSDU */
-    if ((pe = pe_alloc (PE_CLASS_UNIV, PE_FORM_CONS, PE_CONS_SET)) == NULLPE) {
-no_mem: ;
-	result = rtsaplose (rti, RTS_CONGEST, NULLCP, "out of memory");
-	goto out1;
-    }
+	if ((pe = pe_alloc(PE_CLASS_UNIV, PE_FORM_CONS, PE_CONS_SET)) == NULLPE) {
+	      no_mem:;
+		result = rtsaplose(rti, RTS_CONGEST, NULLCP, "out of memory");
+		goto out1;
+	}
 
-    /* Have extra if's here incase DEFAULT_CKPOINT changes. */
-    /* Some compilers give a warning - ignore for now! */
+	/* Have extra if's here incase DEFAULT_CKPOINT changes. */
+	/* Some compilers give a warning - ignore for now! */
 
-    if (set_add (pe, p = pe_alloc (PE_CLASS_CONT, PE_FORM_CONS, PCONN_DTS))
-		== NOTOK
-	    || set_add (p, num2prim ((integer) SYN_X409, PE_CLASS_CONT,
-				     DTS_SYNTAX)) == NOTOK
-	    || set_add (pe, p = pe_alloc (PE_CLASS_CONT, PE_FORM_CONS,
-		    PCONN_DATA)) == NOTOK
+	if (set_add(pe, p = pe_alloc(PE_CLASS_CONT, PE_FORM_CONS, PCONN_DTS))
+	    == NOTOK
+	    || set_add(p, num2prim((integer) SYN_X409, PE_CLASS_CONT,
+				   DTS_SYNTAX)) == NOTOK
+	    || set_add(pe, p = pe_alloc(PE_CLASS_CONT, PE_FORM_CONS,
+					PCONN_DATA)) == NOTOK
 	    || (DEFAULT_CKPOINT != PCONN_CK_DFLT
-		    && set_add (p, num2prim ((integer) DEFAULT_CKPOINT,
-					     PE_CLASS_CONT,
-					     PCONN_DATA_CK)) == NOTOK)
+		&& set_add(p, num2prim((integer) DEFAULT_CKPOINT,
+				       PE_CLASS_CONT, PCONN_DATA_CK)) == NOTOK)
 	    || (DEFAULT_WINDOW != PCONN_WD_DFLT
-		    && set_add (p, num2prim ((integer) DEFAULT_WINDOW,
-					     PE_CLASS_CONT,
-					     PCONN_DATA_WD)) == NOTOK)
-	    || set_add (p, num2prim ((integer) (mode == RTS_TWA ? PCONN_DM_TWA
-		    : PCONN_DM_MONO), PE_CLASS_CONT, PCONN_DATA_DM)) == NOTOK
-	    || set_add (p, q = pe_alloc (PE_CLASS_CONT, PE_FORM_CONS,
-		    PCONN_DATA_CN)) == NOTOK
-	    || set_add (q, r = pe_alloc (PE_CLASS_CONT, PE_FORM_CONS,
-		    CN_OPEN)) == NOTOK
-	    || set_add (r, data ? data : pe_alloc (PE_CLASS_CONT,
-		    PE_FORM_PRIM, 0)) == NOTOK
-	    || set_add (p, num2prim ((integer) ntohs (called -> rta_port),
-		    PE_CLASS_CONT, PCONN_DATA_AP)) == NOTOK)
-	goto no_mem;
+		&& set_add(p, num2prim((integer) DEFAULT_WINDOW,
+				       PE_CLASS_CONT, PCONN_DATA_WD)) == NOTOK)
+	    || set_add(p, num2prim((integer) (mode == RTS_TWA ? PCONN_DM_TWA
+					      : PCONN_DM_MONO), PE_CLASS_CONT,
+				   PCONN_DATA_DM)) == NOTOK
+	    || set_add(p, q = pe_alloc(PE_CLASS_CONT, PE_FORM_CONS, PCONN_DATA_CN)) == NOTOK
+	    || set_add(q, r = pe_alloc(PE_CLASS_CONT, PE_FORM_CONS, CN_OPEN)) == NOTOK
+	    || set_add(r, data ? data : pe_alloc(PE_CLASS_CONT, PE_FORM_PRIM, 0)) == NOTOK
+	    || set_add(p,
+		       num2prim((integer) ntohs(called->rta_port), PE_CLASS_CONT,
+				PCONN_DATA_AP)) == NOTOK)
+		goto no_mem;
 /* end PConnect PSDU */
 
-    PLOGP (rtsap_log,OACS_PConnect, pe, "PConnect", 0);
+	PLOGP(rtsap_log, OACS_PConnect, pe, "PConnect", 0);
 
-    if (pe2ssdu (pe, &base, &len) == NOTOK)
-	goto no_mem;
+	if (pe2ssdu(pe, &base, &len) == NOTOK)
+		goto no_mem;
 
-    if (data)
-	(void) pe_extract (pe, data), data = NULLPE;
-    pe_free (pe);
-    pe = NULLPE;
+	if (data)
+		(void) pe_extract(pe, data), data = NULLPE;
+	pe_free(pe);
+	pe = NULLPE;
 
-#ifdef	notdef		/* SEK doesn't like this */
-    if (called -> rta_addr.sa_selectlen == 0) {
-	if ((is = getisoserventbyname ("rts", "ssap")) == NULL) {
-	    result = rtsaplose (rti, RTS_ADDRESS, NULLCP,
-			    "ssap/rts: unknown entity");
-	    goto out2;
+#ifdef	notdef			/* SEK doesn't like this */
+	if (called->rta_addr.sa_selectlen == 0) {
+		if ((is = getisoserventbyname("rts", "ssap")) == NULL) {
+			result = rtsaplose(rti, RTS_ADDRESS, NULLCP, "ssap/rts: unknown entity");
+			goto out2;
+		}
+		if (is->is_selectlen > SSSIZE) {	/* XXX */
+			result = rosaplose(rti, RTS_ADDRESS, NULLCP,
+					   "ssap/rts: selector too long (%d octets)",
+					   is->is_selectlen);
+			goto out2;
+		}
+		bcopy(is->is_selector, called->rta_addr.sa_selector,
+		      called->rta_addr.sa_selectlen = is->is_selectlen);
 	}
-	if (is -> is_selectlen > SSSIZE) {	/* XXX */
-	    result = rosaplose (rti, RTS_ADDRESS, NULLCP,
-			"ssap/rts: selector too long (%d octets)",
-			is -> is_selectlen);
-	    goto out2;
-	}
-	bcopy (is -> is_selector, called -> rta_addr.sa_selector,
-	    called -> rta_addr.sa_selectlen = is -> is_selectlen);
-    }
 #endif
 
-    acb -> acb_requirements = RTS_MYREQUIRE;
-    settings = 0;
+	acb->acb_requirements = RTS_MYREQUIRE;
+	settings = 0;
 #define dotoken(requires,shift,bit,type) \
 { \
     if (acb -> acb_requirements & requires) \
@@ -194,109 +242,105 @@ no_mem: ;
 	else \
 	    settings |= ST_RESP_VALUE << shift; \
 }
-    dotokens ();
+	dotokens();
 #undef	dotoken
 
-    if ((sr = addr2ref (SLocalHostName ())) == NULL) {
-	result = rtsaplose (rti, RTS_CONGEST, NULLCP, "out of memory");
-	goto out2;
-    }
-    acb -> acb_connect = *sr;	/* struct copy */
+	if ((sr = addr2ref(SLocalHostName())) == NULL) {
+		result = rtsaplose(rti, RTS_CONGEST, NULLCP, "out of memory");
+		goto out2;
+	}
+	acb->acb_connect = *sr;	/* struct copy */
 
-    if (SConnRequest (sr, calling ? &calling -> rta_addr : NULLSA,
-		      &called -> rta_addr, acb -> acb_requirements,
-	    settings, SERIAL_NONE, base, len, NULLQOS, sc, si) == NOTOK) {
-	result = ss2rtslose (NULLACB, rti, "SConnRequest", sa);
-	goto out2;
-    }
-    free (base);
+	if (SConnRequest(sr, calling ? &calling->rta_addr : NULLSA,
+			 &called->rta_addr, acb->acb_requirements,
+			 settings, SERIAL_NONE, base, len, NULLQOS, sc, si) == NOTOK) {
+		result = ss2rtslose(NULLACB, rti, "SConnRequest", sa);
+		goto out2;
+	}
+	free(base);
 
-    if (sc -> sc_result == SC_ACCEPT) {
-	acb -> acb_fd = sc -> sc_sd;
-	acb -> acb_uabort = SUAbortRequest;
-    }
-    else
-        if (sc -> sc_result == SC_ABORT) {
-	    acb -> acb_fd = NOTOK;
+	if (sc->sc_result == SC_ACCEPT) {
+		acb->acb_fd = sc->sc_sd;
+		acb->acb_uabort = SUAbortRequest;
+	} else if (sc->sc_result == SC_ABORT) {
+		acb->acb_fd = NOTOK;
 
-	    (void) ss2rtsabort (acb, sa, rti);
+		(void) ss2rtsabort(acb, sa, rti);
 
-	    rtc -> rtc_sd = NOTOK;
-	    rtc -> rtc_result = RTS_ABORTED;
+		rtc->rtc_sd = NOTOK;
+		rtc->rtc_result = RTS_ABORTED;
 
-	    return OK;
+		return OK;
 	}
 
-    if ((pe = ssdu2pe (sc -> sc_data, sc -> sc_cc, NULLCP, &result))
+	if ((pe = ssdu2pe(sc->sc_data, sc->sc_cc, NULLCP, &result))
 	    == NULLPE) {
-	if (sc -> sc_result != SC_ACCEPT) {
-	    bzero ((char *) sa, sizeof *sa);
-	    sa -> sa_reason = sc -> sc_result;
-	    acb -> acb_fd = NOTOK;
-	    (void) ss2rtslose (acb, rti, "SConnRequest(pseudo)", sa);
+		if (sc->sc_result != SC_ACCEPT) {
+			bzero((char *) sa, sizeof *sa);
+			sa->sa_reason = sc->sc_result;
+			acb->acb_fd = NOTOK;
+			(void) ss2rtslose(acb, rti, "SConnRequest(pseudo)", sa);
 
-	    rtc -> rtc_sd = NOTOK;
-	    rtc -> rtc_result = rti -> rti_abort.rta_reason;
+			rtc->rtc_sd = NOTOK;
+			rtc->rtc_result = rti->rti_abort.rta_reason;
 
-	    result = OK;
-	}
-	else
-	    result = rtpktlose (acb, rti, result != PS_ERR_NMEM ? RTS_PROTOCOL
-		    : RTS_CONGEST, NULLCP, "%s", ps_error (result));
-	goto out1;
-    }
-
-    SCFREE (sc);
-
-    if (sc -> sc_result != SC_ACCEPT) {
-	struct type_OACS_PRefuse *pref;
-
-	if (parse_OACS_PRefuse (pe, 1, NULLIP, NULLVP, &pref) == NOTOK) {
-	    result = pylose ();
-	    goto out1;
+			result = OK;
+		} else
+			result = rtpktlose(acb, rti, result != PS_ERR_NMEM ? RTS_PROTOCOL
+					   : RTS_CONGEST, NULLCP, "%s", ps_error(result));
+		goto out1;
 	}
 
-	PLOGP (rtsap_log,OACS_PRefuse, pe, "PRefuse", 1);
+	SCFREE(sc);
 
-	pe_free (pe);
-	
-	freeacblk (acb);
+	if (sc->sc_result != SC_ACCEPT) {
+		struct type_OACS_PRefuse *pref;
 
-	rtc -> rtc_sd = NOTOK;
-	switch (pref->parm) {
-	    case REFUSE_BUSY: 
-		rtc -> rtc_result = RTS_BUSY;
-		break;
+		if (parse_OACS_PRefuse(pe, 1, NULLIP, NULLVP, &pref) == NOTOK) {
+			result = pylose();
+			goto out1;
+		}
 
-	    case REFUSE_VALIDATE: 
-		rtc -> rtc_result = RTS_VALIDATE;
-		break;
+		PLOGP(rtsap_log, OACS_PRefuse, pe, "PRefuse", 1);
 
-	    case REFUSE_MODE:
-		rtc -> rtc_result = RTS_MODE;
-		break;
+		pe_free(pe);
 
-	    default: 
-		rtc -> rtc_result = RTS_PROTOCOL;
-		break;
+		freeacblk(acb);
+
+		rtc->rtc_sd = NOTOK;
+		switch (pref->parm) {
+		case REFUSE_BUSY:
+			rtc->rtc_result = RTS_BUSY;
+			break;
+
+		case REFUSE_VALIDATE:
+			rtc->rtc_result = RTS_VALIDATE;
+			break;
+
+		case REFUSE_MODE:
+			rtc->rtc_result = RTS_MODE;
+			break;
+
+		default:
+			rtc->rtc_result = RTS_PROTOCOL;
+			break;
+		}
+
+		free_OACS_RefuseReason(pref);
+		return OK;
 	}
 
-	free_OACS_RefuseReason(pref);
-	return OK;
-    }
-
-    acb -> acb_flags = ACB_CONN | ACB_RTS | ACB_INIT;
-    SetSS2RtService (acb);
-    if (turn == RTS_INITIATOR)
-	acb -> acb_flags |= ACB_TURN;
-    if (mode == RTS_TWA)
-	acb -> acb_flags |= ACB_TWA;
-    if ((acb -> acb_requirements = sc -> sc_requirements) != RTS_MYREQUIRE) {
-	result = rtpktlose (acb, rti, RTS_PROTOCOL, NULLCP,
-		    "desired session requirements denied");
-	goto out1;
-    }
-
+	acb->acb_flags = ACB_CONN | ACB_RTS | ACB_INIT;
+	SetSS2RtService(acb);
+	if (turn == RTS_INITIATOR)
+		acb->acb_flags |= ACB_TURN;
+	if (mode == RTS_TWA)
+		acb->acb_flags |= ACB_TWA;
+	if ((acb->acb_requirements = sc->sc_requirements) != RTS_MYREQUIRE) {
+		result = rtpktlose(acb, rti, RTS_PROTOCOL, NULLCP,
+				   "desired session requirements denied");
+		goto out1;
+	}
 #define dotoken(requires,shift,bit,type) \
 { \
     if (acb -> acb_requirements & requires) \
@@ -316,63 +360,61 @@ no_mem: ;
 		goto out1; \
 	} \
 }
-	dotokens ();
+	dotokens();
 #undef	dotoken
-    switch (turn) {
+	switch (turn) {
 	case RTS_INITIATOR:
-	    if (acb -> acb_owned == acb -> acb_avail)
-		break;
-	    result = rtsaplose (rti, RTS_PROTOCOL, NULLCP,
-		    "token management botched");
-	    goto out1;
+		if (acb->acb_owned == acb->acb_avail)
+			break;
+		result = rtsaplose(rti, RTS_PROTOCOL, NULLCP, "token management botched");
+		goto out1;
 
 	case RTS_RESPONDER:
-	    if (acb -> acb_owned == 0)
-		break;
-	    result = rtsaplose (rti, RTS_PROTOCOL, NULLCP,
-		    "token management botched");
-	    goto out1;
-    }
-    acb -> acb_ssdusize = sc -> sc_ssdusize;
+		if (acb->acb_owned == 0)
+			break;
+		result = rtsaplose(rti, RTS_PROTOCOL, NULLCP, "token management botched");
+		goto out1;
+	}
+	acb->acb_ssdusize = sc->sc_ssdusize;
 
-    PLOGP (rtsap_log,OACS_PAccept, pe, "PAccept", 1);
+	PLOGP(rtsap_log, OACS_PAccept, pe, "PAccept", 1);
 
-    if (parse_OACS_PAccept (pe, 1, NULLIP, NULLVP, &paccpt) == NOTOK) {
-	result = pylose ();
-	goto out1;
-    }
+	if (parse_OACS_PAccept(pe, 1, NULLIP, NULLVP, &paccpt) == NOTOK) {
+		result = pylose();
+		goto out1;
+	}
 
-    acb -> acb_ckpoint = paccpt -> pUserData -> checkpointSize;
-    acb -> acb_window = paccpt -> pUserData -> windowsize;
+	acb->acb_ckpoint = paccpt->pUserData->checkpointSize;
+	acb->acb_window = paccpt->pUserData->windowsize;
 
-    rtc -> rtc_sd = acb -> acb_fd;
-    rtc -> rtc_result = RTS_ACCEPT;
-    {
-	struct type_OACS_ConnectionData *pdat = paccpt -> pUserData -> member_OACS_5;
+	rtc->rtc_sd = acb->acb_fd;
+	rtc->rtc_result = RTS_ACCEPT;
+	{
+		struct type_OACS_ConnectionData *pdat = paccpt->pUserData->member_OACS_5;
 
-	if (pdat -> offset == type_OACS_ConnectionData_open)
-	    rtc -> rtc_data = pe_expunge (pe, pdat -> un.open);
-	else
-	    rtc -> rtc_data = NULLPE;
-    }
+		if (pdat->offset == type_OACS_ConnectionData_open)
+			rtc->rtc_data = pe_expunge(pe, pdat->un.open);
+		else
+			rtc->rtc_data = NULLPE;
+	}
 
-    if (paccpt)
-	free_OACS_PAccept (paccpt);
-    return OK;
+	if (paccpt)
+		free_OACS_PAccept(paccpt);
+	return OK;
 
-out2: ;
-    free (base);
+      out2:;
+	free(base);
 
-out1: ;
-    SCFREE (sc);
-    if (pe) {
-	if (data)
-	    (void) pe_extract (pe, data);
-	pe_free (pe);
-    }
-    freeacblk (acb);
-    if (paccpt)
-	free_OACS_PAccept (paccpt);
+      out1:;
+	SCFREE(sc);
+	if (pe) {
+		if (data)
+			(void) pe_extract(pe, data);
+		pe_free(pe);
+	}
+	freeacblk(acb);
+	if (paccpt)
+		free_OACS_PAccept(paccpt);
 
-    return result;
+	return result;
 }

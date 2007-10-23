@@ -1,3 +1,61 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /***********************************************************
 Copyright 1987 by Digital Equipment Corporation, Maynard, Massachusetts,
 and the Massachusetts Institute of Technology, Cambridge, Massachusetts.
@@ -46,7 +104,7 @@ SOFTWARE.
 
 #ifdef ISOCONN
 #include <isode/tsap.h>
-#endif /* ISOCONN */
+#endif				/* ISOCONN */
 
 extern long ClientsWithInput[];
 extern long ClientsWriteBlocked[];
@@ -69,97 +127,97 @@ extern int errno;
  * Convenience Routines
  */
 TWriteToClient(sd, buf, len)
-int sd, len;
-char *buf;
+	int sd, len;
+	char *buf;
 {
-    struct TSAPdisconnect tds;
-    struct TSAPdisconnect *td = &tds;
+	struct TSAPdisconnect tds;
+	struct TSAPdisconnect *td = &tds;
 
-    if (TDataRequest(sd, buf, len, td) == NOTOK){	
-	if (errno != EWOULDBLOCK)
-		fprintf(stderr, "TWriteToClient: %s\n", td->td_reason);
-    }
+	if (TDataRequest(sd, buf, len, td) == NOTOK) {
+		if (errno != EWOULDBLOCK)
+			fprintf(stderr, "TWriteToClient: %s\n", td->td_reason);
+	}
 }
+
 /*
  * sd = transport descriptor
  * iov is iovec of iovcnt buffers
  */
 TWritevToClient(sd, iov, iovcnt)
-int sd, iovcnt;
-struct iovec *iov;
+	int sd, iovcnt;
+	struct iovec *iov;
 {
-    int i, ret, tot = 0;
-    struct udvec uv[64], *uvp = uv;
-    struct TSAPdisconnect tds;
-    struct TSAPdisconnect *td = &tds;
+	int i, ret, tot = 0;
+	struct udvec uv[64], *uvp = uv;
+	struct TSAPdisconnect tds;
+	struct TSAPdisconnect *td = &tds;
 
 /*
  * Grotty hack
  */
-    if (iovcnt >= 64) {
-	fprintf(stderr, "Oh Spaghettio\n");
-	return -1;
-    }
-    for(i=0; i<iovcnt; i++, uvp++, iov++) {
-	uvp->uv_base = iov->iov_base;
-	uvp->uv_len = iov->iov_len;
-	tot += iov->iov_len;
-    }
-    uvp->uv_base = NULL;
-    uvp->uv_len = 0;
-	
-    ret = TWriteRequest (sd, uv, td);
-    if (ret == NOTOK) {
+	if (iovcnt >= 64) {
+		fprintf(stderr, "Oh Spaghettio\n");
+		return -1;
+	}
+	for (i = 0; i < iovcnt; i++, uvp++, iov++) {
+		uvp->uv_base = iov->iov_base;
+		uvp->uv_len = iov->iov_len;
+		tot += iov->iov_len;
+	}
+	uvp->uv_base = NULL;
+	uvp->uv_len = 0;
+
+	ret = TWriteRequest(sd, uv, td);
+	if (ret == NOTOK) {
 #ifdef ISODEBUG
-	if (errno != EWOULDBLOCK) 
+		if (errno != EWOULDBLOCK)
+			if (isodexbug)
+				fprintf(stderr, "TWritevToCl: %s\n", TErrString(td->td_reason));
+#endif				/* ISODEBUG */
+		return ret;
+	} else {
+#ifdef ISODEBUG
 		if (isodexbug)
-			fprintf(stderr, "TWritevToCl: %s\n", TErrString(td->td_reason));
-#endif /* ISODEBUG */
-	return ret;
-    } else {
-#ifdef ISODEBUG
-	if  (isodexbug)
-		fprintf(stderr, "TWritevToCl to %d: %d\n", sd, tot);
-#endif /* ISODEBUG */
-	return tot;
-    }
+			fprintf(stderr, "TWritevToCl to %d: %d\n", sd, tot);
+#endif				/* ISODEBUG */
+		return tot;
+	}
 }
 
 TAcceptFromClient(fd, vecp, vec)
-int fd;
-int vecp;
-char **vec;
+	int fd;
+	int vecp;
+	char **vec;
 {
 	struct TSAPdisconnect tds;
 	struct TSAPdisconnect *td = &tds;
 	struct TSAPstart tsts;
 	struct TSAPstart *tst = &tsts;
 
-	if (TInit(vecp, vec, tst,  td) == NOTOK) {
-                Error(TErrString(td->td_reason));
-                Error("TInit");
+	if (TInit(vecp, vec, tst, td) == NOTOK) {
+		Error(TErrString(td->td_reason));
+		Error("TInit");
 		return -1;
 	}
 
 	if (TConnResponse(tst->ts_sd, NULLTA, tst->ts_expedited, NULL, 0,
-                        &(tst->ts_qos), td) == NOTOK) {
-                Error(TErrString(td->td_reason));
-                Error("TConnResponse");
+			  &(tst->ts_qos), td) == NOTOK) {
+		Error(TErrString(td->td_reason));
+		Error("TConnResponse");
 		return -1;
 	}
 	return tst->ts_sd;
 }
 
 TDiscFromClient(fd)
-int fd;
+	int fd;
 {
 	struct TSAPdisconnect tds;
 
-	if (TDiscRequest(fd, NULLCP, 0, &tds)==NOTOK)
-                    fprintf(stderr, "TDisc Failed %s\n",
-                        TErrString(tds.td_reason));
+	if (TDiscRequest(fd, NULLCP, 0, &tds) == NOTOK)
+		fprintf(stderr, "TDisc Failed %s\n", TErrString(tds.td_reason));
 }
-#endif /* ISOCONN */
+#endif				/* ISOCONN */
 
 /*****************************************************************
  * ReadRequestFromClient
@@ -197,14 +255,13 @@ int fd;
  *    a partial request) because others clients need to be scheduled.
  *****************************************************************/
 
-ConnectionInput inputBuffers[MAXSOCKS];    /* buffers for clients */
+ConnectionInput inputBuffers[MAXSOCKS];	/* buffers for clients */
 
-/*ARGSUSED*/
-char *
+ /*ARGSUSED*/ char *
 ReadRequestFromClient(who, status, oldbuf)
-    ClientPtr who;
-    int *status;          /* read at least n from client */
-    char *oldbuf;
+	ClientPtr who;
+	int *status;			/* read at least n from client */
+	char *oldbuf;
 {
 #define YieldControl()				\
         { isItTimeToYield = TRUE;		\
@@ -216,203 +273,174 @@ ReadRequestFromClient(who, status, oldbuf)
         { YieldControlNoInput();		\
 	  return((char *) NULL ); }
 
-    OsCommPtr oc = (OsCommPtr)who->osPrivate;
-    int client = oc->fd;
-    int result, gotnow, needed;
-    register ConnectionInput *pBuff;
-    register xReq *request;
+	OsCommPtr oc = (OsCommPtr) who->osPrivate;
+	int client = oc->fd;
+	int result, gotnow, needed;
+	register ConnectionInput *pBuff;
+	register xReq *request;
 
-        /* ignore oldbuf, just assume we're done with prev. buffer */
+	/* ignore oldbuf, just assume we're done with prev. buffer */
 
-    if (client == -1) 
-    {
-	ErrorF( "OH NO, %d translates to -1\n", who);
-	return((char *)NULL);
-    }
+	if (client == -1) {
+		ErrorF("OH NO, %d translates to -1\n", who);
+		return ((char *) NULL);
+	}
 
-    pBuff = &inputBuffers[client];
-    pBuff->bufptr += pBuff->lenLastReq;
-    pBuff->lenLastReq = 0;
+	pBuff = &inputBuffers[client];
+	pBuff->bufptr += pBuff->lenLastReq;
+	pBuff->lenLastReq = 0;
 
-            /* handle buffer empty or full case first */
+	/* handle buffer empty or full case first */
 
-    if ((pBuff->bufptr - pBuff->buffer) >= pBuff->bufcnt)
-    {
+	if ((pBuff->bufptr - pBuff->buffer) >= pBuff->bufcnt) {
 #ifdef ISOCONN
-	result = SRead(client, pBuff->buffer, pBuff->size, OK);
-#else /* ISOCONN */
-        result = read(client, pBuff->buffer, pBuff->size);
-#endif /* ISOCONN */
-	if (result < 0) 
-	{
-	    if (errno == EWOULDBLOCK)
-	        *status = 0;
-	    else
-	        *status = -1;
-	    YieldControlAndReturnNull();
+		result = SRead(client, pBuff->buffer, pBuff->size, OK);
+#else				/* ISOCONN */
+		result = read(client, pBuff->buffer, pBuff->size);
+#endif				/* ISOCONN */
+		if (result < 0) {
+			if (errno == EWOULDBLOCK)
+				*status = 0;
+			else
+				*status = -1;
+			YieldControlAndReturnNull();
+		} else if (result == 0) {
+			*status = -1;
+			YieldControlAndReturnNull();
+		} else {
+			pBuff->bufcnt = result;
+			/* free up some space after huge requests */
+			if ((pBuff->size > BUFWATERMARK) && (result < BUFSIZE)) {
+				pBuff->size = BUFSIZE;
+				pBuff->buffer = (char *) xrealloc(pBuff->buffer, pBuff->size);
+			}
+			pBuff->bufptr = pBuff->buffer;
+		}
 	}
-	else if (result == 0)
-        {
-	    *status = -1;
-	    YieldControlAndReturnNull();
-	}
-	else 
-	{
-	    pBuff->bufcnt = result; 
-	    /* free up some space after huge requests */
-	    if ((pBuff->size > BUFWATERMARK) && (result < BUFSIZE))
-	    {
-		pBuff->size = BUFSIZE;
-		pBuff->buffer = (char *)xrealloc(pBuff->buffer, pBuff->size);
-	    }
-	    pBuff->bufptr = pBuff->buffer;
-	}
-    }
-              /* now look if there is enough in the buffer */
+	/* now look if there is enough in the buffer */
 
-    request = (xReq *)pBuff->bufptr;
-    gotnow = pBuff->bufcnt + pBuff->buffer - pBuff->bufptr;
+	request = (xReq *) pBuff->bufptr;
+	gotnow = pBuff->bufcnt + pBuff->buffer - pBuff->bufptr;
 
-    if (gotnow < sizeof(xReq))
-       needed = sizeof(xReq) - gotnow;
-    else
-    {
-        needed = request_length(request, who);
-        if (needed > MAXBUFSIZE)
-        {
-    	    *status = -1;
-	    YieldControlAndReturnNull();
-        }
-	if (needed <= 0)
-            needed = sizeof(xReq);
-    }
-        /* if the needed amount won't fit in what's remaining,
-	   move everything to the front of the buffer.  If the
-	   entire header isn't available, move what's there too */
-    if ((pBuff->bufptr + needed - pBuff->buffer > pBuff->size) ||
-		(gotnow < sizeof(xReq)))
-    {
-        bcopy(pBuff->bufptr, pBuff->buffer, gotnow);
-	pBuff->bufcnt = gotnow;
-        if (needed > pBuff->size)
-        {
-	    pBuff->size = needed;
-    	    pBuff->buffer = (char *)xrealloc(pBuff->buffer, needed);
-        }
-        pBuff->bufptr = pBuff->buffer;
-    }
-               /* don't have a full header */
-    if (gotnow < sizeof(xReq))
-    {
-        while (pBuff->bufcnt + pBuff->buffer - pBuff->bufptr < sizeof(xReq))
-	{
+	if (gotnow < sizeof(xReq))
+		needed = sizeof(xReq) - gotnow;
+	else {
+		needed = request_length(request, who);
+		if (needed > MAXBUFSIZE) {
+			*status = -1;
+			YieldControlAndReturnNull();
+		}
+		if (needed <= 0)
+			needed = sizeof(xReq);
+	}
+	/* if the needed amount won't fit in what's remaining, move everything to the front of the
+	   buffer.  If the entire header isn't available, move what's there too */
+	if ((pBuff->bufptr + needed - pBuff->buffer > pBuff->size) || (gotnow < sizeof(xReq))) {
+		bcopy(pBuff->bufptr, pBuff->buffer, gotnow);
+		pBuff->bufcnt = gotnow;
+		if (needed > pBuff->size) {
+			pBuff->size = needed;
+			pBuff->buffer = (char *) xrealloc(pBuff->buffer, needed);
+		}
+		pBuff->bufptr = pBuff->buffer;
+	}
+	/* don't have a full header */
+	if (gotnow < sizeof(xReq)) {
+		while (pBuff->bufcnt + pBuff->buffer - pBuff->bufptr < sizeof(xReq)) {
 #ifdef ISOCONN
-	    result = SRead(client, 
-			pBuff->buffer + pBuff->bufcnt, 
-			pBuff->size - pBuff->bufcnt, 
-			OK);
-#else /* ISOCONN */
-	    result = read(client, pBuff->buffer + pBuff->bufcnt, 
-		      pBuff->size - pBuff->bufcnt); 
-#endif /* ISOCONN */
-	    if (result < 0)
-	    {
-		if (errno == EWOULDBLOCK)
-		    *status = 0;
+			result = SRead(client,
+				       pBuff->buffer + pBuff->bufcnt,
+				       pBuff->size - pBuff->bufcnt, OK);
+#else				/* ISOCONN */
+			result = read(client, pBuff->buffer + pBuff->bufcnt,
+				      pBuff->size - pBuff->bufcnt);
+#endif				/* ISOCONN */
+			if (result < 0) {
+				if (errno == EWOULDBLOCK)
+					*status = 0;
+				else
+					*status = -1;
+				YieldControlAndReturnNull();
+			}
+			if (result == 0) {
+				*status = -1;
+				YieldControlAndReturnNull();
+			}
+			pBuff->bufcnt += result;
+		}
+		request = (xReq *) pBuff->bufptr;
+		gotnow = pBuff->bufcnt + pBuff->buffer - pBuff->bufptr;
+		needed = request_length(request, who);
+		if (needed <= 0)
+			needed = sizeof(xReq);
+		if (needed > pBuff->size) {
+			pBuff->size = needed;
+			pBuff->buffer = (char *) xrealloc(pBuff->buffer, needed);
+		}
+		pBuff->bufptr = pBuff->buffer;
+	}
+
+	if (gotnow < needed) {
+		int i, wanted;
+
+		wanted = needed - gotnow;
+		i = 0;
+		while (i < wanted) {
+#ifdef ISOCONN
+			result = SRead(client,
+				       pBuff->buffer + pBuff->bufcnt,
+				       pBuff->size - pBuff->bufcnt, OK);
+#else				/* ISOCONN */
+			result = read(client, pBuff->buffer + pBuff->bufcnt,
+				      pBuff->size - pBuff->bufcnt);
+#endif				/* ISOCONN */
+			if (result < 0) {
+				if (errno == EWOULDBLOCK)
+					*status = 0;
+				else
+					*status = -1;
+				YieldControlAndReturnNull();
+			} else if (result == 0) {
+				*status = -1;
+				YieldControlAndReturnNull();
+			}
+			i += result;
+			pBuff->bufcnt += result;
+		}
+	}
+	*status = needed;
+	pBuff->lenLastReq = needed;
+
+	/* 
+	 *  Check to see if client has at least one whole request in the
+	 *  buffer.  If there is only a partial request, treat like buffer
+	 *  is empty so that select() will be called again and other clients
+	 *  can get into the queue.   
+	 */
+
+	timesThisConnection++;
+	if (pBuff->bufcnt + pBuff->buffer >= pBuff->bufptr + needed + sizeof(xReq)) {
+		request = (xReq *) (pBuff->bufptr + needed);
+		if ((pBuff->bufcnt + pBuff->buffer) >=
+		    ((char *) request + request_length(request, who)))
+			BITSET(ClientsWithInput, client);
 		else
-		    *status = -1;
-		YieldControlAndReturnNull();
-	    }
-	    if (result == 0)
-	    {
-		*status = -1;
-		YieldControlAndReturnNull();
-	    }
-            pBuff->bufcnt += result;        
-	}
-        request = (xReq *)pBuff->bufptr;
-        gotnow = pBuff->bufcnt + pBuff->buffer - pBuff->bufptr;
-        needed = request_length(request, who);
-	if (needed <= 0)
-            needed = sizeof(xReq);
-        if (needed > pBuff->size)
-        {
-	    pBuff->size = needed;
-    	    pBuff->buffer = (char *)xrealloc(pBuff->buffer, needed);
-        }
-        pBuff->bufptr = pBuff->buffer;
-    }	
+			YieldControlNoInput();
+	} else
+		YieldControlNoInput();
+	if (timesThisConnection == MAX_TIMES_PER)
+		YieldControl();
 
-    if (gotnow < needed )   
-    {
-	int i, wanted;
-
-	wanted = needed - gotnow;
-	i = 0;
-	while (i < wanted) 
-	{
-#ifdef ISOCONN
-	    result = SRead(client, 
-			    pBuff->buffer + pBuff->bufcnt, 
-			    pBuff->size - pBuff->bufcnt,
-			    OK); 
-#else /* ISOCONN */
-	    result = read(client, pBuff->buffer + pBuff->bufcnt, 
-			  pBuff->size - pBuff->bufcnt); 
-#endif /* ISOCONN */
-	    if (result < 0) 
-	    {
-		if (errno == EWOULDBLOCK)
-		    *status = 0;
-		else
-		    *status = -1;
-		YieldControlAndReturnNull();
-	    }
-	    else if (result == 0)
-	    {
-		*status = -1;
-		YieldControlAndReturnNull();
-	    }
-	    i += result;
-    	    pBuff->bufcnt += result;
-	}
-    }
-    *status = needed;
-    pBuff->lenLastReq = needed;
-
-    /*
-     *  Check to see if client has at least one whole request in the
-     *  buffer.  If there is only a partial request, treat like buffer
-     *  is empty so that select() will be called again and other clients
-     *  can get into the queue.   
-     */
-
-    timesThisConnection++;
-    if (pBuff->bufcnt + pBuff->buffer >= pBuff->bufptr + needed + sizeof(xReq)) 
-    {
-	request = (xReq *)(pBuff->bufptr + needed);
-        if ((pBuff->bufcnt + pBuff->buffer) >= 
-            ((char *)request + request_length(request, who)))
-	    BITSET(ClientsWithInput, client);
-        else
-	    YieldControlNoInput();
-    }
-    else
-	YieldControlNoInput();
-    if (timesThisConnection == MAX_TIMES_PER)
-	YieldControl();
-
-    return((char *)pBuff->bufptr);
+	return ((char *) pBuff->bufptr);
 
 #undef YieldControlAndReturnNull
 #undef YieldControlNoInput
 #undef YieldControl
 }
 
-
-    /* lookup table for adding padding bytes to data that is read from
-    	or written to the X socket.  */
-static int padlength[4] = {0, 3, 2, 1};
+    /* lookup table for adding padding bytes to data that is read from or written to the X socket.
+       */
+static int padlength[4] = { 0, 3, 2, 1 };
 
  /********************
  * FlushClient()
@@ -426,167 +454,143 @@ static int padlength[4] = {0, 3, 2, 1};
 
 static int
 FlushClient(who, oc, extraBuf, extraCount)
-    ClientPtr who;
-    OsCommPtr oc;
-    char *extraBuf;
-    int extraCount; /* do not modify... returned below */
+	ClientPtr who;
+	OsCommPtr oc;
+	char *extraBuf;
+	int extraCount;			/* do not modify... returned below */
 {
-    int connection = oc->fd,
-    	total, n, i, notWritten, written,
-	iovCnt = 0;
-    struct iovec iov[3];
-    char padBuffer[3];
-#ifdef ISOCONN
-    struct TSAPdisconnect tds;
-#endif /* ISOCONN */
+	int connection = oc->fd, total, n, i, notWritten, written, iovCnt = 0;
+	struct iovec iov[3];
+	char padBuffer[3];
 
-    total = 0;
-    if (oc->count)
-    {
-	total += iov[iovCnt].iov_len = oc->count;
-	iov[iovCnt++].iov_base = (caddr_t)oc->buf;
-        /* Notice that padding isn't needed for oc->buf since
-           it is alreay padded by WriteToClient */
-    }
-    if (extraCount)
-    {
-	total += iov[iovCnt].iov_len = extraCount;
-	iov[iovCnt++].iov_base = extraBuf;
-	if (extraCount & 3)
-	{
-	    total += iov[iovCnt].iov_len = padlength[extraCount & 3];
-	    iov[iovCnt++].iov_base = padBuffer;
+#ifdef ISOCONN
+	struct TSAPdisconnect tds;
+#endif				/* ISOCONN */
+
+	total = 0;
+	if (oc->count) {
+		total += iov[iovCnt].iov_len = oc->count;
+		iov[iovCnt++].iov_base = (caddr_t) oc->buf;
+		/* Notice that padding isn't needed for oc->buf since it is alreay padded by
+		   WriteToClient */
 	}
-    }
+	if (extraCount) {
+		total += iov[iovCnt].iov_len = extraCount;
+		iov[iovCnt++].iov_base = extraBuf;
+		if (extraCount & 3) {
+			total += iov[iovCnt].iov_len = padlength[extraCount & 3];
+			iov[iovCnt++].iov_base = padBuffer;
+		}
+	}
 
-    notWritten = total;
-	
+	notWritten = total;
+
 #ifdef ISOCONN
-    while ((n = SWritev (connection, iov, iovCnt)) != notWritten)
-#else /* ISOCONN */
-    while ((n = writev (connection, iov, iovCnt)) != notWritten)
-#endif /* ISOCONN */
-    {
+	while ((n = SWritev(connection, iov, iovCnt)) != notWritten)
+#else				/* ISOCONN */
+	while ((n = writev(connection, iov, iovCnt)) != notWritten)
+#endif				/* ISOCONN */
+	{
 #ifdef hpux
-	if (n == -1 && errno == EMSGSIZE)
-	    n = swWritev (connection, iov, 2);
+		if (n == -1 && errno == EMSGSIZE)
+			n = swWritev(connection, iov, 2);
 #endif
-        if (n > 0) 
-        {
-	    notWritten -= n;
-	    for (i = 0; i < iovCnt; i++)
-            {
-		if (n > iov[i].iov_len)
-		{
-		    n -= iov[i].iov_len;
-		    iov[i].iov_len = 0;
-		}
-		else
-		{
-		    iov[i].iov_len -= n;
-		    iov[i].iov_base += n;
-		    break;
-		}
-	    }
-	    continue;
-	}
-	else if (errno != EWOULDBLOCK)
-        {
-#ifdef notdef  
-	    if (errno != EBADF)
-		ErrorF("Closing connection %d because write failed\n",
-			connection);
-		/* this close will cause the select in WaitForSomething
-		   to return that the connection is dead, so we can actually
-		   clean up after the client.  We can't clean up here,
-		   because the we're in the middle of doing something
-		   and will probably screw up some data strucutres */
+		if (n > 0) {
+			notWritten -= n;
+			for (i = 0; i < iovCnt; i++) {
+				if (n > iov[i].iov_len) {
+					n -= iov[i].iov_len;
+					iov[i].iov_len = 0;
+				} else {
+					iov[i].iov_len -= n;
+					iov[i].iov_base += n;
+					break;
+				}
+			}
+			continue;
+		} else if (errno != EWOULDBLOCK) {
+#ifdef notdef
+			if (errno != EBADF)
+				ErrorF("Closing connection %d because write failed\n", connection);
+			/* this close will cause the select in WaitForSomething to return that the
+			   connection is dead, so we can actually clean up after the client.  We
+			   can't clean up here, because the we're in the middle of doing something
+			   and will probably screw up some data strucutres */
 #endif
 #ifdef ISOCONN
-	    SClose(connection);
-#else /* ISOCONN */
-	    close(connection);
-#endif /* ISOCONN */
-            MarkClientException(who);
-	    return(-1);
-	}
+			SClose(connection);
+#else				/* ISOCONN */
+			close(connection);
+#endif				/* ISOCONN */
+			MarkClientException(who);
+			return (-1);
+		}
 
-	/* If we've arrived here, then the client is stuffed to the gills
-	   and not ready to accept more.  Make a note of it and buffer
-	   the rest. */
-	BITSET(ClientsWriteBlocked, connection);
-	AnyClientsWriteBlocked = TRUE;
+		/* If we've arrived here, then the client is stuffed to the gills and not ready to
+		   accept more.  Make a note of it and buffer the rest. */
+		BITSET(ClientsWriteBlocked, connection);
+		AnyClientsWriteBlocked = TRUE;
 
-	written = total - notWritten;
-	if (written < oc->count)
-	{
-	    if (written > 0)
-	    {
-		oc->count -= written;
-		bcopy((char *)oc->buf + written, (char *)oc->buf, oc->count);
-		written = 0;
-	    }
-	}
-	else
-	{
-	    written -= oc->count;
-	    oc->count = 0;
-	}
+		written = total - notWritten;
+		if (written < oc->count) {
+			if (written > 0) {
+				oc->count -= written;
+				bcopy((char *) oc->buf + written, (char *) oc->buf, oc->count);
+				written = 0;
+			}
+		} else {
+			written -= oc->count;
+			oc->count = 0;
+		}
 
-	if (notWritten > oc->bufsize)
-	{
-	    /* allocate at least enough to contain it plus one
-	       OutputBufferSize */
-	    oc->bufsize = notWritten + OutputBufferSize;
-	    oc->buf = (unsigned char *)xrealloc(oc->buf, oc->bufsize);
-	    if (oc->buf == NULL)
-	    {
-	outOfMem:
+		if (notWritten > oc->bufsize) {
+			/* allocate at least enough to contain it plus one OutputBufferSize */
+			oc->bufsize = notWritten + OutputBufferSize;
+			oc->buf = (unsigned char *) xrealloc(oc->buf, oc->bufsize);
+			if (oc->buf == NULL) {
+			      outOfMem:
 #ifdef notdef
-		ErrorF("Closing connection %d because out of memory\n",
-			connection);
-		/* this close will cause the select in WaitForSomething
-		   to return that the connection is dead, so we can actually
-		   clean up after the client.  We can't clean up here,
-		   because the we're in the middle of doing something
-		   and will probably screw up some data strucutres */
+				ErrorF("Closing connection %d because out of memory\n", connection);
+				/* this close will cause the select in WaitForSomething to return
+				   that the connection is dead, so we can actually clean up after
+				   the client.  We can't clean up here, because the we're in the
+				   middle of doing something and will probably screw up some data
+				   strucutres */
 #endif
 #ifdef ISOCONN
 #ifdef ISODEBUG
-		fprintf(stderr, "out of mem: closing connection %d\n", 
-			connection);
-#endif /* ISODEBUG */
-		SClose(connection);
-#else /* ISOCONN */
-		close(connection);
-#endif /* ISOCONN */
-		MarkClientException(who);
-		oc->count = 0;
-		oc->bufsize = 0;
-		return(-1);
-	    }
+				fprintf(stderr, "out of mem: closing connection %d\n", connection);
+#endif				/* ISODEBUG */
+				SClose(connection);
+#else				/* ISOCONN */
+				close(connection);
+#endif				/* ISOCONN */
+				MarkClientException(who);
+				oc->count = 0;
+				oc->bufsize = 0;
+				return (-1);
+			}
+		}
+
+		/* If the amount written extended into the padBuffer, then the difference
+		   "extraCount - written" may be less than 0 */
+		if ((n = extraCount - written) > 0)
+			bcopy(extraBuf + written, (char *) oc->buf + oc->count, n);
+
+		oc->count = notWritten;	/* this will include the pad */
+
+		return extraCount;	/* return only the amount explicitly requested */
 	}
 
-	/* If the amount written extended into the padBuffer, then the
-	   difference "extraCount - written" may be less than 0 */
-	if ((n = extraCount - written) > 0)
-	    bcopy (extraBuf + written, (char *)oc->buf + oc->count, n);
-
-	oc->count = notWritten; /* this will include the pad */
-
-	return extraCount; /* return only the amount explicitly requested */
-    }
-
-    /* everything was flushed out */
-    oc->count = 0;
-    if (oc->bufsize > OutputBufferSize)
-    {
-	oc->bufsize = OutputBufferSize;
-	oc->buf = (unsigned char *)xrealloc(oc->buf, OutputBufferSize);
-	if (oc->buf == NULL) /* nearly impossible */
-	    goto outOfMem;
-    }
-    return extraCount; /* return only the amount explicitly requested */
+	/* everything was flushed out */
+	oc->count = 0;
+	if (oc->bufsize > OutputBufferSize) {
+		oc->bufsize = OutputBufferSize;
+		oc->buf = (unsigned char *) xrealloc(oc->buf, OutputBufferSize);
+		if (oc->buf == NULL)	/* nearly impossible */
+			goto outOfMem;
+	}
+	return extraCount;	/* return only the amount explicitly requested */
 }
 
  /********************
@@ -602,57 +606,53 @@ FlushClient(who, oc, extraBuf, extraCount)
 void
 FlushAllOutput()
 {
-    register int index, base, mask;
-    OsCommPtr oc;
-    register ClientPtr client;
+	register int index, base, mask;
+	OsCommPtr oc;
+	register ClientPtr client;
 
-    if (! NewOutputPending)
-	return;
+	if (!NewOutputPending)
+		return;
 
-    /*
-     * It may be that some client still has critical output pending,
-     * but he is not yet ready to receive it anyway, so we will
-     * simply wait for the select to tell us when he's ready to receive.
-     */
-    CriticalOutputPending = FALSE;
-    NewOutputPending = FALSE;
+	/* 
+	 * It may be that some client still has critical output pending,
+	 * but he is not yet ready to receive it anyway, so we will
+	 * simply wait for the select to tell us when he's ready to receive.
+	 */
+	CriticalOutputPending = FALSE;
+	NewOutputPending = FALSE;
 
-    for (base = 0; base < mskcnt; base++)
-    {
-	mask = OutputPending[ base ];
-	OutputPending[ base ] = 0;
-	while (mask)
-	{
-	    index = ffs(mask) - 1;
-	    mask &= ~lowbit(mask);
-	    if ((client = ConnectionTranslation[(32 * base) + index ]) == NULL)
-		continue;
-	    if (client->clientGone)
-		continue;
-	    oc = (OsCommPtr)client->osPrivate;
-	    if (GETBIT(ClientsWithInput, client->index))
-	    {
-		BITSET(OutputPending, oc->fd); /* set the bit again */
-		NewOutputPending = TRUE;
-	    }
-	    else
-		FlushClient(client, oc, (char *)NULL, 0);
+	for (base = 0; base < mskcnt; base++) {
+		mask = OutputPending[base];
+		OutputPending[base] = 0;
+		while (mask) {
+			index = ffs(mask) - 1;
+			mask &= ~lowbit(mask);
+			if ((client = ConnectionTranslation[(32 * base) + index]) == NULL)
+				continue;
+			if (client->clientGone)
+				continue;
+			oc = (OsCommPtr) client->osPrivate;
+			if (GETBIT(ClientsWithInput, client->index)) {
+				BITSET(OutputPending, oc->fd);	/* set the bit again */
+				NewOutputPending = TRUE;
+			} else
+				FlushClient(client, oc, (char *) NULL, 0);
+		}
 	}
-    }
 
 }
 
 void
 FlushIfCriticalOutputPending()
 {
-    if (CriticalOutputPending)
-	FlushAllOutput();
+	if (CriticalOutputPending)
+		FlushAllOutput();
 }
 
 void
 SetCriticalOutputPending()
 {
-    CriticalOutputPending = TRUE;
+	CriticalOutputPending = TRUE;
 }
 
 /*****************
@@ -667,43 +667,39 @@ SetCriticalOutputPending()
  *****************/
 
 int
-WriteToClient (who, count, buf)
-    ClientPtr who;
-    char *buf;
-    int count;
+WriteToClient(who, count, buf)
+	ClientPtr who;
+	char *buf;
+	int count;
 {
-    OsCommPtr oc = (OsCommPtr)who->osPrivate;
-    int padBytes;
+	OsCommPtr oc = (OsCommPtr) who->osPrivate;
+	int padBytes;
 
-    if (oc->fd == -1) 
-    {
-	ErrorF( "OH NO, %d translates to -1\n", oc->fd);
-	return(-1);
-    }
+	if (oc->fd == -1) {
+		ErrorF("OH NO, %d translates to -1\n", oc->fd);
+		return (-1);
+	}
 
-    if (oc->fd == -2) 
-    {
+	if (oc->fd == -2) {
 #ifdef notdef
-	ErrorF( "CONNECTION %d ON ITS WAY OUT\n", oc->fd);
+		ErrorF("CONNECTION %d ON ITS WAY OUT\n", oc->fd);
 #endif
-	return(-1);
-    }
+		return (-1);
+	}
 
-    padBytes =  padlength[count & 3];
+	padBytes = padlength[count & 3];
 
-    if (oc->count + count + padBytes > oc->bufsize)
-    {
-	BITCLEAR(OutputPending, oc->fd);
-	CriticalOutputPending = FALSE;
-	NewOutputPending = FALSE;
-	return FlushClient(who, oc, buf, count);
-    }
+	if (oc->count + count + padBytes > oc->bufsize) {
+		BITCLEAR(OutputPending, oc->fd);
+		CriticalOutputPending = FALSE;
+		NewOutputPending = FALSE;
+		return FlushClient(who, oc, buf, count);
+	}
 
-    NewOutputPending = TRUE;
-    BITSET(OutputPending, oc->fd);
-    bcopy(buf, (char *)oc->buf + oc->count, count);
-    oc->count += count + padBytes;
-    
-    return(count);
+	NewOutputPending = TRUE;
+	BITSET(OutputPending, oc->fd);
+	bcopy(buf, (char *) oc->buf + oc->count, count);
+	oc->count += count + padBytes;
+
+	return (count);
 }
-

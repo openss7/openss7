@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* ds_modifyrdn.c - */
 
 #ifndef lint
-static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/ds_modifyrdn.c,v 9.0 1992/06/16 12:34:01 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/quipu/RCS/ds_modifyrdn.c,v 9.0 1992/06/16 12:34:01 isode Rel";
 #endif
 
 /*
- * $Header: /xtel/isode/isode/quipu/RCS/ds_modifyrdn.c,v 9.0 1992/06/16 12:34:01 isode Rel $
+ * Header: /xtel/isode/isode/quipu/RCS/ds_modifyrdn.c,v 9.0 1992/06/16 12:34:01 isode Rel
  *
  *
- * $Log: ds_modifyrdn.c,v $
+ * Log: ds_modifyrdn.c,v
  * Revision 9.0  1992/06/16  12:34:01  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/ds_modifyrdn.c,v 9.0 
  *
  */
 
-
 #include "quipu/config.h"
 #include "quipu/util.h"
 #include "quipu/entry.h"
@@ -32,33 +90,34 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/ds_modifyrdn.c,v 9.0 
 #include "quipu/malloc.h"
 #include "quipu/turbo.h"
 extern int entry_cmp(), entryrdn_cmp();
+
 #include "pepsy.h"
 #include "quipu/DAS-types.h"
 #include "quipu/connection.h"
 
-extern LLog * log_dsap;
+extern LLog *log_dsap;
 extern DN mydsadn;
 
-do_ds_modifyrdn (arg, error, binddn, target, di_p, dsp, authtype)
-    register struct ds_modifyrdn_arg     *arg;
-    struct DSError              *error;
-    DN                          binddn;
-    DN                          target;
-    struct di_block		**di_p;
-    char 			dsp;
-    char			authtype;
+do_ds_modifyrdn(arg, error, binddn, target, di_p, dsp, authtype)
+	register struct ds_modifyrdn_arg *arg;
+	struct DSError *error;
+	DN binddn;
+	DN target;
+	struct di_block **di_p;
+	char dsp;
+	char authtype;
 {
-Entry  entryptr;
-register RDN rdn;
-Attr_Sequence as;
-AV_Sequence avs;
-RDN modrdn;
-char * new_version ();
-int retval;
-int authp, pauthp;
-extern int read_only;
+	Entry entryptr;
+	register RDN rdn;
+	Attr_Sequence as;
+	AV_Sequence avs;
+	RDN modrdn;
+	char *new_version();
+	int retval;
+	int authp, pauthp;
+	extern int read_only;
 
-	DLOG (log_dsap,LLOG_TRACE,("ds_modifyrdn"));
+	DLOG(log_dsap, LLOG_TRACE, ("ds_modifyrdn"));
 
 	if (!dsp)
 		target = arg->mra_object;
@@ -73,22 +132,23 @@ extern int read_only;
 		return (DS_ERROR_REMOTE);
 	}
 
-	switch(find_entry(target,&(arg->mra_common),binddn,NULLDNSEQ,TRUE,&(entryptr), error, di_p, OP_MODIFYRDN))
-	{
+	switch (find_entry
+		(target, &(arg->mra_common), binddn, NULLDNSEQ, TRUE, &(entryptr), error, di_p,
+		 OP_MODIFYRDN)) {
 	case DS_OK:
-	    /* Filled out entryptr - carry on */
-	    break;
+		/* Filled out entryptr - carry on */
+		break;
 	case DS_CONTINUE:
-	    /* Filled out di_p - what do we do with it ?? */
-	    return(DS_CONTINUE);
+		/* Filled out di_p - what do we do with it ?? */
+		return (DS_CONTINUE);
 
 	case DS_X500_ERROR:
-	    /* Filled out error - what do we do with it ?? */
-	    return(DS_X500_ERROR);
+		/* Filled out error - what do we do with it ?? */
+		return (DS_X500_ERROR);
 	default:
-	    /* SCREAM */
-	    LLOG(log_dsap, LLOG_EXCEPTIONS, ("do_ds_modifyrdn() - find_entry failed"));
-	    return(DS_ERROR_LOCAL);
+		/* SCREAM */
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("do_ds_modifyrdn() - find_entry failed"));
+		return (DS_ERROR_LOCAL);
 	}
 
 	if (read_only || entryptr->e_parent->e_lock) {
@@ -97,20 +157,19 @@ extern int read_only;
 		return (DS_ERROR_REMOTE);
 	}
 
-	if (dn_cmp(mydsadn,target) == 0) {
-		LLOG(log_dsap,LLOG_EXCEPTIONS,("ModifyRDN not allowed on my DSA entry"));
+	if (dn_cmp(mydsadn, target) == 0) {
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("ModifyRDN not allowed on my DSA entry"));
 		error->dse_type = DSE_SERVICEERROR;
 		error->ERR_SERVICE.DSE_sv_problem = DSE_SV_UNWILLINGTOPERFORM;
 		return (DS_ERROR_REMOTE);
 	}
 
-	/* Strong authentication  */
+	/* Strong authentication */
 	if ((retval = check_security_parms((caddr_t) arg,
-			_ZModifyRDNArgumentDataDAS,
-			&_ZDAS_mod,
-			arg->mra_common.ca_security,
-			arg->mra_common.ca_sig, &binddn)) != 0)
-	{
+					   _ZModifyRDNArgumentDataDAS,
+					   &_ZDAS_mod,
+					   arg->mra_common.ca_security,
+					   arg->mra_common.ca_sig, &binddn)) != 0) {
 		error->dse_type = DSE_SECURITYERROR;
 		error->ERR_SECURITY.DSE_sc_problem = retval;
 		return (DS_ERROR_REMOTE);
@@ -125,59 +184,56 @@ extern int read_only;
 
 	if (!manager(binddn)) {
 		pauthp = entryptr->e_parent->e_authp ?
-		    entryptr->e_parent->e_authp->ap_modification :
-		    AP_SIMPLE;
-		authp = entryptr->e_authp ? entryptr->e_authp->ap_modification :
-		    AP_SIMPLE;
+		    entryptr->e_parent->e_authp->ap_modification : AP_SIMPLE;
+		authp = entryptr->e_authp ? entryptr->e_authp->ap_modification : AP_SIMPLE;
 	} else {
 		/* manager -- fool us into accepting the name */
 		pauthp = authp = AP_SIMPLE;
 	}
 
-	if ((check_acl ((authtype % 3) >= authp ? binddn : NULLDN, ACL_WRITE,
-	    entryptr->e_acl->ac_entry, target) == NOTOK)
+	if ((check_acl((authtype % 3) >= authp ? binddn : NULLDN, ACL_WRITE,
+		       entryptr->e_acl->ac_entry, target) == NOTOK)
 	    || ((entryptr->e_parent->e_data != E_TYPE_CONSTRUCTOR)
-	    && (check_acl ((authtype % 3) >= pauthp ? binddn : NULLDN,
-	    ACL_WRITE,entryptr->e_parent->e_acl->ac_child, target)
-	    == NOTOK)) ) {
+		&& (check_acl((authtype % 3) >= pauthp ? binddn : NULLDN,
+			      ACL_WRITE, entryptr->e_parent->e_acl->ac_child, target)
+		    == NOTOK))) {
 		error->dse_type = DSE_SECURITYERROR;
 		error->ERR_SECURITY.DSE_sc_problem = DSE_SC_ACCESSRIGHTS;
 		return (DS_ERROR_REMOTE);
 	}
-	if ( ! (isleaf(entryptr))) {
+	if (!(isleaf(entryptr))) {
 		error->dse_type = DSE_UPDATEERROR;
 		error->ERR_UPDATE.DSE_up_problem = DSE_UP_NOTONNONLEAF;
 		return (DS_ERROR_REMOTE);
 	}
 
 	/* make sure the new name doesn't already exist */
-	if ( (Entry) avl_find( entryptr->e_parent->e_children,
-	    (caddr_t) arg->mra_newrdn, entryrdn_cmp ) != NULLENTRY ) {
+	if ((Entry) avl_find(entryptr->e_parent->e_children,
+			     (caddr_t) arg->mra_newrdn, entryrdn_cmp) != NULLENTRY) {
 		error->dse_type = DSE_UPDATEERROR;
 		error->ERR_UPDATE.DSE_up_problem = DSE_UP_ALREADYEXISTS;
-		return( DS_ERROR_REMOTE );
+		return (DS_ERROR_REMOTE);
 	}
 
 	/* first check that it is an allowed type */
-	for (rdn=arg->mra_newrdn; rdn!=NULLRDN; rdn=rdn->rdn_next)
-		if (check_schema_type (entryptr, rdn->rdn_at, error) == NOTOK)
+	for (rdn = arg->mra_newrdn; rdn != NULLRDN; rdn = rdn->rdn_next)
+		if (check_schema_type(entryptr, rdn->rdn_at, error) == NOTOK)
 			return (DS_ERROR_REMOTE);
 
 	if (arg->deleterdn)
-		for (rdn=entryptr->e_name; rdn!=NULLRDN; rdn=rdn->rdn_next)
-			if (remove_attribute (entryptr, rdn->rdn_at, error, binddn, target, entryptr) != OK)
+		for (rdn = entryptr->e_name; rdn != NULLRDN; rdn = rdn->rdn_next)
+			if (remove_attribute(entryptr, rdn->rdn_at, error, binddn, target, entryptr)
+			    != OK)
 				return (DS_ERROR_REMOTE);
 
-
 	/* must now add rdn as attribute */
-	for (rdn=arg->mra_newrdn; rdn!=NULLRDN; rdn=rdn->rdn_next) {
-		avs = avs_comp_new (AttrV_cpy(&rdn->rdn_av));
-		as = as_comp_new (AttrT_cpy(rdn->rdn_at),avs, NULLACL_INFO);
-		if (addrdn_attribute (entryptr,as,error,binddn,target) != OK)
+	for (rdn = arg->mra_newrdn; rdn != NULLRDN; rdn = rdn->rdn_next) {
+		avs = avs_comp_new(AttrV_cpy(&rdn->rdn_av));
+		as = as_comp_new(AttrT_cpy(rdn->rdn_at), avs, NULLACL_INFO);
+		if (addrdn_attribute(entryptr, as, error, binddn, target) != OK)
 			return (DS_ERROR_REMOTE);
 
 	}
-
 
 #ifdef TURBO_INDEX
 	/* delete the old one from the index */
@@ -185,87 +241,84 @@ extern int read_only;
 #endif
 
 	/* delete the old one from core */
-        if ((entryptr = (Entry) avl_delete( &entryptr->e_parent->e_children,
-            (caddr_t) entryptr->e_name, entryrdn_cmp )) == NULLENTRY ) {
-                LLOG(log_dsap, LLOG_EXCEPTIONS, ("modrdn: entry has disappeared!"));
-                return( DS_ERROR_REMOTE );
-        }
-
+	if ((entryptr = (Entry) avl_delete(&entryptr->e_parent->e_children,
+					   (caddr_t) entryptr->e_name,
+					   entryrdn_cmp)) == NULLENTRY) {
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("modrdn: entry has disappeared!"));
+		return (DS_ERROR_REMOTE);
+	}
 #ifdef TURBO_DISK
 	/* delete the old one from disk */
 	if (turbo_delete(entryptr) != OK)
-		fatal (-34,"mod rdn delete failed - check database");
+		fatal(-34, "mod rdn delete failed - check database");
 #endif
 
 	modrdn = entryptr->e_name;
 	DATABASE_HEAP;
 	entryptr->e_name = rdn_cpy(arg->mra_newrdn);
 
-	modify_attr (entryptr,binddn);
-	if (unravel_attribute (entryptr,error) != OK) {
+	modify_attr(entryptr, binddn);
+	if (unravel_attribute(entryptr, error) != OK) {
 		GENERAL_HEAP;
-		LLOG (log_dsap,LLOG_EXCEPTIONS,("modify rdn protocol error"));
-		rdn_free (modrdn);
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("modify rdn protocol error"));
+		rdn_free(modrdn);
 		return (DS_ERROR_REMOTE);
 	} else {
 		GENERAL_HEAP;
 		if (entryptr->e_parent != NULLENTRY) {
 			if (entryptr->e_parent->e_edbversion)
-				free (entryptr->e_parent->e_edbversion);
+				free(entryptr->e_parent->e_edbversion);
 			entryptr->e_parent->e_edbversion = new_version();
 		}
 
 		/* add the new one to core */
-                if (avl_insert(&entryptr->e_parent->e_children, (caddr_t) entryptr,
-                    entry_cmp, avl_dup_error) != OK) {
-                        LLOG(log_dsap, LLOG_EXCEPTIONS, ("modrdn: can't add new entry!"));
-                        return(DS_ERROR_REMOTE);
-                }
-
+		if (avl_insert(&entryptr->e_parent->e_children, (caddr_t) entryptr,
+			       entry_cmp, avl_dup_error) != OK) {
+			LLOG(log_dsap, LLOG_EXCEPTIONS, ("modrdn: can't add new entry!"));
+			return (DS_ERROR_REMOTE);
+		}
 #ifdef TURBO_INDEX
-                turbo_add2index(entryptr);
+		turbo_add2index(entryptr);
 #endif
-
 
 #ifdef TURBO_DISK
 		/* add the new one to disk */
 		if (turbo_write(entryptr) != OK)
-			fatal (-34,"mod rdn failed - check database");
+			fatal(-34, "mod rdn failed - check database");
 #else
-		if ((journal (entryptr)) != OK)
-			fatal (-34,"mod rdn failed - check database");
+		if ((journal(entryptr)) != OK)
+			fatal(-34, "mod rdn failed - check database");
 #endif
 
-		rdn_free (modrdn);
+		rdn_free(modrdn);
 		return (DS_OK);
 	}
 
 }
 
-
-addrdn_attribute (eptr,newas,error,requestor,dn)
-Entry eptr;
-Attr_Sequence newas;
-struct DSError *error;
-DN requestor,dn;
+addrdn_attribute(eptr, newas, error, requestor, dn)
+	Entry eptr;
+	Attr_Sequence newas;
+	struct DSError *error;
+	DN requestor, dn;
 {
-register Attr_Sequence as;
-struct acl_info * acl;
+	register Attr_Sequence as;
+	struct acl_info *acl;
 
-	DLOG (log_dsap,LLOG_DEBUG,("add attribute"));
+	DLOG(log_dsap, LLOG_DEBUG, ("add attribute"));
 
-	if ( (as = as_find_type (eptr->e_attributes,newas->attr_type)) == NULLATTR)
+	if ((as = as_find_type(eptr->e_attributes, newas->attr_type)) == NULLATTR)
 		acl = eptr->e_acl->ac_default;
 	else
 		acl = as->attr_acl;
 
-	if (check_acl(requestor,ACL_WRITE,acl,dn) == NOTOK) {
+	if (check_acl(requestor, ACL_WRITE, acl, dn) == NOTOK) {
 		error->dse_type = DSE_SECURITYERROR;
 		error->ERR_SECURITY.DSE_sc_problem = DSE_SC_ACCESSRIGHTS;
-		DLOG (log_dsap,LLOG_DEBUG,("add acl failed"));
+		DLOG(log_dsap, LLOG_DEBUG, ("add acl failed"));
 		return (NOTOK);
 	}
 
-	eptr->e_attributes = as_merge (newas,eptr->e_attributes);
+	eptr->e_attributes = as_merge(newas, eptr->e_attributes);
 	return (OK);
 }

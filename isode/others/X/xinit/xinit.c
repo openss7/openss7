@@ -1,6 +1,64 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 #ifndef lint
 static char *rcsid_xinit_c = "$XConsortium: xinit.c,v 11.32 88/10/05 09:27:45 jim Exp $";
-#endif /* lint */
+#endif				/* lint */
 #include <X11/copyright.h>
 
 /* Copyright    Massachusetts Institute of Technology    1986	*/
@@ -16,6 +74,7 @@ static char *rcsid_xinit_c = "$XConsortium: xinit.c,v 11.32 88/10/05 09:27:45 ji
 #endif
 #include <errno.h>
 extern int sys_nerr;
+
 #ifdef hpux
 #include <sys/utsname.h>
 #endif
@@ -31,40 +90,41 @@ char **newenviron = NULL;
 
 #ifdef macII
 #define vfork() fork()
-#endif /* macII */
+#endif				/* macII */
 
 #if defined(SYSV) && !defined(hpux)
 #define vfork() fork()
-#endif /* SYSV and not hpux */
+#endif				/* SYSV and not hpux */
 
 char *bindir = BINDIR;
 char *server_names[] = {
-#ifdef vax				/* Digital */
-    "Xqvss       Digital monochrome display on Microvax II or III series",
-    "Xqdss       Digital color display on Microvax II or III series",
+#ifdef vax			/* Digital */
+	"Xqvss       Digital monochrome display on Microvax II or III series",
+	"Xqdss       Digital color display on Microvax II or III series",
 #endif
-#ifdef sun				/* Sun */
-    "Xsun        Sun monochrome and color displays on Sun 2, 3, or 4 series",
+#ifdef sun			/* Sun */
+	"Xsun        Sun monochrome and color displays on Sun 2, 3, or 4 series",
 #endif
-#ifdef hpux				/* HP */
-    "Xhp         HP monochrome and colors displays on 9000/300 series",
+#ifdef hpux			/* HP */
+	"Xhp         HP monochrome and colors displays on 9000/300 series",
 #endif
-#ifdef apollo				/* Apollo */
-    "Xapollo     Apollo monochrome and color displays",
+#ifdef apollo			/* Apollo */
+	"Xapollo     Apollo monochrome and color displays",
 #endif
-#ifdef ibm				/* IBM */
-    "Xibm        IBM AED, APA, 8514a, megapel, VGA displays on PC/RT",
+#ifdef ibm			/* IBM */
+	"Xibm        IBM AED, APA, 8514a, megapel, VGA displays on PC/RT",
 #endif
-#ifdef macII				/* MacII */
-    "XmacII      Apple monochrome display on Macintosh II",
+#ifdef macII			/* MacII */
+	"XmacII      Apple monochrome display on Macintosh II",
 #endif
-#ifdef M4310				/* Tektronix Pegasus */
-    "Xpeg        Tektronix Pegasus display on 4310",
+#ifdef M4310			/* Tektronix Pegasus */
+	"Xpeg        Tektronix Pegasus display on 4310",
 #endif
 #if defined(vax) || defined(sun)	/* Parallax */
-    "Xplx        Parallax color and video graphics controller",
+	"Xplx        Parallax color and video graphics controller",
 #endif
-    NULL};
+	NULL
+};
 
 #ifndef XINITRC
 #define XINITRC ".xinitrc"
@@ -82,36 +142,37 @@ char xserverrcbuf[256];
 #define	ERR_EXIT	1
 #ifdef ISOCONN
 char displayname[100] = ":X0";
-#else /* ISOCONN */
+#else				/* ISOCONN */
 char displayname[100] = "unix";
-#endif /* ISOCONN */
+#endif				/* ISOCONN */
 char client_display[100];
 
 #ifdef ISOCONN
 char *default_server = "Xsun";
 char *default_display = ":X0";		/* choose most efficient */
-char *default_client[] = {"xt", NULL};
-#else /* ISOCONN */
+char *default_client[] = { "xt", NULL };
+#else				/* ISOCONN */
 char *default_server = "X";
 char *default_display = ":0";		/* choose most efficient */
-char *default_client[] = {"xterm", "-geometry", "+1+1", "-n", "login", "-display perky:X0", NULL};
-#endif /* ISOCONN */
+char *default_client[] = { "xterm", "-geometry", "+1+1", "-n", "login", "-display perky:X0", NULL };
+#endif				/* ISOCONN */
 char *serverargv[100];
 char *clientargv[100];
 char **server = serverargv + 2;		/* make sure room for sh .xserverrc args */
 char **client = clientargv + 2;		/* make sure room for sh .xinitrc args */
 char *displayNum;
 char *program;
-Display *xd;			/* server connection */
+Display *xd;				/* server connection */
+
 #ifndef SYSV
-union wait	status;
-#endif /* SYSV */
+union wait status;
+#endif				/* SYSV */
 int serverpid = -1;
 int clientpid = -1;
-extern int	errno;
+extern int errno;
 
 sigCatch(sig)
-	int	sig;
+	int sig;
 {
 	signal(SIGQUIT, SIG_IGN);
 	signal(SIGINT, SIG_IGN);
@@ -124,25 +185,26 @@ sigCatch(sig)
 sigAlarm(sig)
 	int sig;
 {
-	signal (sig, sigAlarm);
+	signal(sig, sigAlarm);
 }
-#endif /* SYSV */
+#endif				/* SYSV */
 
-static Execute (vec)
-    char **vec;				/* has room from up above */
+static
+Execute(vec)
+	char **vec;			/* has room from up above */
 {
-    execvp (vec[0], vec);
-    if (access (vec[0], R_OK) == 0) {
-	vec--;				/* back it up to stuff shell in */
-	vec[0] = SHELL;
-	execvp (vec[0], vec);
-    }
-    return;
+	execvp(vec[0], vec);
+	if (access(vec[0], R_OK) == 0) {
+		vec--;		/* back it up to stuff shell in */
+		vec[0] = SHELL;
+		execvp(vec[0], vec);
+	}
+	return;
 }
 
 main(argc, argv)
-int argc;
-register char **argv;
+	int argc;
+	register char **argv;
 {
 	register char **sptr = server;
 	register char **cptr = client;
@@ -151,41 +213,39 @@ register char **argv;
 	int client_given = 0, server_given = 0;
 	int client_args_given = 0, server_args_given = 0;
 	int start_of_client_args, start_of_server_args;
+
 #ifdef ISOCONN
 	extern char *index();
 	char *cd;
-#endif /* ISOCONN */
+#endif				/* ISOCONN */
 
 	program = *argv++;
 	argc--;
 
 #ifndef UNIXCONN
 #ifdef hpux
-	/* Why not use gethostname()?  Well, at least on my system, I've had to
-	 * make an ugly kernel patch to get a name longer than 8 characters, and
-	 * uname() lets me access to the whole string (it smashes release, you
-	 * see), whereas gethostname() kindly truncates it for me.
-	 */
+	/* Why not use gethostname()? Well, at least on my system, I've had to make an ugly kernel
+	   patch to get a name longer than 8 characters, and uname() lets me access to the whole
+	   string (it smashes release, you see), whereas gethostname() kindly truncates it for me. */
 	{
-	struct utsname name;
+		struct utsname name;
 
-	uname(&name);
-	strcpy(displayname, name.nodename);
+		uname(&name);
+		strcpy(displayname, name.nodename);
 	}
 #else
 	gethostname(displayname, sizeof(displayname));
 #ifdef ISOCONN
 	if ((cd = index(displayname, '.')) != NULL)
 		*cd = '\0';
-#endif /* ISOCONN */
+#endif				/* ISOCONN */
 #endif
-#endif /* UNIXCONN */
-	/*
+#endif				/* UNIXCONN */
+	/* 
 	 * copy the client args.
 	 */
-	if (argc == 0 ||
-	    (**argv != '/' && **argv != '.' && !isalpha(**argv))) {
-		for (ptr = default_client; *ptr; )
+	if (argc == 0 || (**argv != '/' && **argv != '.' && !isalpha(**argv))) {
+		for (ptr = default_client; *ptr;)
 			*cptr++ = *ptr++;
 		strcpy(client_display, displayname);
 		strcat(client_display, default_display);
@@ -196,9 +256,9 @@ register char **argv;
 		 * that means SunWindows isn't running, so we should pass 
 		 * the -C flag to xterm so that it sets up a console.
 		 */
-		if ( getenv("WINDOW_PARENT") == NULL )
-		    *cptr++ = "-C";
-#endif /* sun */
+		if (getenv("WINDOW_PARENT") == NULL)
+			*cptr++ = "-C";
+#endif				/* sun */
 	} else {
 		client_given = 1;
 	}
@@ -214,11 +274,10 @@ register char **argv;
 		argc--;
 	}
 
-	/*
+	/* 
 	 * Copy the server args.
 	 */
-	if (argc == 0 ||
-	    (**argv != '/' && **argv != '.' && !isalpha(**argv))) {
+	if (argc == 0 || (**argv != '/' && **argv != '.' && !isalpha(**argv))) {
 		*sptr++ = default_server;
 	} else {
 		server_given = 1;
@@ -237,79 +296,76 @@ register char **argv;
 	}
 	*sptr = NULL;
 
-
 	strcat(displayname, displayNum);
 
-	/*
+	/* 
 	 * if no client arguments given, check for a startup file and copy
 	 * that into the argument list
 	 */
 	if (!client_given) {
-	    char *cp;
-	    Bool required = False;
+		char *cp;
+		Bool required = False;
 
-	    xinitrcbuf[0] = '\0';
-	    if ((cp = getenv ("XINITRC")) != NULL) {
-		strcpy (xinitrcbuf, cp);
-		required = True;
-	    } else if ((cp = getenv ("HOME")) != NULL) {
-		(void) sprintf (xinitrcbuf, "%s/%s", cp, XINITRC);
-	    }
-	    if (xinitrcbuf[0]) {
-		if (access (xinitrcbuf, F_OK) == 0) {
-		    client += start_of_client_args - 1;
-		    client[0] = xinitrcbuf;
-		} else if (required) {
-		    fprintf (stderr,
-			     "%s:  warning, no client init file \"%s\"\n",
-			     program, xinitrcbuf);
+		xinitrcbuf[0] = '\0';
+		if ((cp = getenv("XINITRC")) != NULL) {
+			strcpy(xinitrcbuf, cp);
+			required = True;
+		} else if ((cp = getenv("HOME")) != NULL) {
+			(void) sprintf(xinitrcbuf, "%s/%s", cp, XINITRC);
 		}
-	    }
+		if (xinitrcbuf[0]) {
+			if (access(xinitrcbuf, F_OK) == 0) {
+				client += start_of_client_args - 1;
+				client[0] = xinitrcbuf;
+			} else if (required) {
+				fprintf(stderr,
+					"%s:  warning, no client init file \"%s\"\n",
+					program, xinitrcbuf);
+			}
+		}
 	}
 
-	/*
+	/* 
 	 * if no server arguments given, check for a startup file and copy
 	 * that into the argument list
 	 */
 	if (!server_given) {
-	    char *cp;
-	    Bool required = False;
+		char *cp;
+		Bool required = False;
 
-	    xserverrcbuf[0] = '\0';
-	    if ((cp = getenv ("XSERVERRC")) != NULL) {
-		strcpy (xserverrcbuf, cp);
-		required = True;
-	    } else if ((cp = getenv ("HOME")) != NULL) {
-		(void) sprintf (xserverrcbuf, "%s/%s", cp, XSERVERRC);
-	    }
-	    if (xserverrcbuf[0]) {
-		if (access (xserverrcbuf, F_OK) == 0) {
-		    server += start_of_server_args - 1;
-		    server[0] = xserverrcbuf;
-		} else if (required) {
-		    fprintf (stderr,
-			     "%s:  warning, no server init file \"%s\"\n",
-			     program, xserverrcbuf);
+		xserverrcbuf[0] = '\0';
+		if ((cp = getenv("XSERVERRC")) != NULL) {
+			strcpy(xserverrcbuf, cp);
+			required = True;
+		} else if ((cp = getenv("HOME")) != NULL) {
+			(void) sprintf(xserverrcbuf, "%s/%s", cp, XSERVERRC);
 		}
-	    }
+		if (xserverrcbuf[0]) {
+			if (access(xserverrcbuf, F_OK) == 0) {
+				server += start_of_server_args - 1;
+				server[0] = xserverrcbuf;
+			} else if (required) {
+				fprintf(stderr,
+					"%s:  warning, no server init file \"%s\"\n",
+					program, xserverrcbuf);
+			}
+		}
 	}
 
-
-	/*
+	/* 
 	 * put the display name into the environment
 	 */
-	set_environment ();
+	set_environment();
 
-	/*
+	/* 
 	 * Start the server and client.
 	 */
 	signal(SIGQUIT, sigCatch);
 	signal(SIGINT, sigCatch);
 #ifdef SYSV
 	signal(SIGALRM, sigAlarm);
-#endif /* SYSV */
-	if ((serverpid = startServer(server)) > 0
-	 && (clientpid = startClient(client)) > 0) {
+#endif				/* SYSV */
+	if ((serverpid = startServer(server)) > 0 && (clientpid = startClient(client)) > 0) {
 		pid = -1;
 		while (pid != clientpid && pid != serverpid)
 			pid = wait(NULL);
@@ -324,45 +380,43 @@ register char **argv;
 	exit(OK_EXIT);
 }
 
-
 /*
  *	waitforserver - wait for X server to start up
  */
 
 waitforserver(serverpid)
-	int	serverpid;
+	int serverpid;
 {
-	int	ncycles	 = 120;		/* # of cycles to wait */
-	int	cycles;			/* Wait cycle count */
+	int ncycles = 120;		/* # of cycles to wait */
+	int cycles;			/* Wait cycle count */
 
 #ifdef ISOCONN
-sleep(2);
+	sleep(2);
 #endif
 	for (cycles = 0; cycles < ncycles; cycles++) {
 		if (xd = XOpenDisplay(displayname)) {
-			return(TRUE);
-		}
-		else {
+			return (TRUE);
+		} else {
 #define MSG "X server to begin accepting connections"
-		    if (!processTimeout (serverpid, 1, MSG)) 
-		      break;
+			if (!processTimeout(serverpid, 1, MSG))
+				break;
 #undef MSG
 		}
 	}
 
-	fprintf (stderr, "giving up.\r\n");
-	return(FALSE);
+	fprintf(stderr, "giving up.\r\n");
+	return (FALSE);
 }
 
 /*
  * return TRUE if we timeout waiting for pid to exit, FALSE otherwise.
  */
 processTimeout(pid, timeout, string)
-	int	pid, timeout;
-	char	*string;
+	int pid, timeout;
+	char *string;
 {
-	int	i = 0, pidfound = -1;
-	static char	*laststring;
+	int i = 0, pidfound = -1;
+	static char *laststring;
 
 	for (;;) {
 #ifdef SYSV
@@ -370,10 +424,10 @@ processTimeout(pid, timeout, string)
 		if ((pidfound = wait(NULL)) == pid)
 			break;
 		alarm(0);
-#else /* SYSV */
+#else				/* SYSV */
 		if ((pidfound = wait3(&status, WNOHANG, NULL)) == pid)
 			break;
-#endif /* SYSV */
+#endif				/* SYSV */
 		if (timeout) {
 			if (i == 0 && string != laststring)
 				fprintf(stderr, "\r\nwaiting for %s ", string);
@@ -382,44 +436,44 @@ processTimeout(pid, timeout, string)
 			fflush(stderr);
 		}
 		if (timeout)
-			sleep (1);
+			sleep(1);
 		if (++i > timeout)
 			break;
 	}
 	laststring = string;
-	return( pid != pidfound );
+	return (pid != pidfound);
 }
 
-Error(fmt, x0,x1,x2,x3,x4,x5,x6,x7,x8,x9)
-	char	*fmt;
+Error(fmt, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9)
+	char *fmt;
 {
-	extern char	*sys_errlist[];
+	extern char *sys_errlist[];
 
 	fprintf(stderr, "%s:  ", program);
 	if (errno > 0 && errno < sys_nerr)
-	  fprintf (stderr, "%s (errno %d):  ", sys_errlist[errno], errno);
-	fprintf(stderr, fmt, x0,x1,x2,x3,x4,x5,x6,x7,x8,x9);
+		fprintf(stderr, "%s (errno %d):  ", sys_errlist[errno], errno);
+	fprintf(stderr, fmt, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9);
 }
 
-Fatal(fmt, x0,x1,x2,x3,x4,x5,x6,x7,x8,x9)
-	char	*fmt;
+Fatal(fmt, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9)
+	char *fmt;
 {
-	Error(fmt, x0,x1,x2,x3,x4,x5,x6,x7,x8,x9);
+	Error(fmt, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9);
 	exit(ERR_EXIT);
 }
 
 startServer(server)
 	char *server[];
 {
-	int	serverpid;
+	int serverpid;
 
 	serverpid = vfork();
-	switch(serverpid) {
+	switch (serverpid) {
 	case 0:
 		close(0);
 		close(1);
 
-		/*
+		/* 
 		 * don't hang on read/write to control tty
 		 */
 #ifdef SIGTTIN
@@ -429,49 +483,48 @@ startServer(server)
 		(void) signal(SIGTTOU, SIG_IGN);
 #endif
 
-		/*
+		/* 
 		 * prevent server from getting sighup from vhangup()
 		 * if client is xterm -L
 		 */
-		setpgrp(0,getpid());
+		setpgrp(0, getpid());
 
-		Execute (server);
-		Error ("no server \"%s\" in PATH\n", server[0]);
+		Execute(server);
+		Error("no server \"%s\" in PATH\n", server[0]);
 		{
-		    char **cpp;
+			char **cpp;
 
-		    fprintf (stderr,
-"\nUse the -- option, or make sure that %s is in your path and\n",
-			     bindir);
-		    fprintf (stderr,
-"that \"%s\" is a program or a link to the right type of server\n",
-			     server[0]);
-		    fprintf (stderr,
-"for your display.  Possible server names include:\n\n");
-		    for (cpp = server_names; *cpp; cpp++) {
-			fprintf (stderr, "    %s\n", *cpp);
-		    }
-		    fprintf (stderr, "\n");
+			fprintf(stderr,
+				"\nUse the -- option, or make sure that %s is in your path and\n",
+				bindir);
+			fprintf(stderr,
+				"that \"%s\" is a program or a link to the right type of server\n",
+				server[0]);
+			fprintf(stderr, "for your display.  Possible server names include:\n\n");
+			for (cpp = server_names; *cpp; cpp++) {
+				fprintf(stderr, "    %s\n", *cpp);
+			}
+			fprintf(stderr, "\n");
 		}
-		exit (ERR_EXIT);
+		exit(ERR_EXIT);
 
 		break;
 	case -1:
 		break;
 	default:
-		/*
+		/* 
 		 * don't nice server
 		 */
 #ifdef PRIO_PROCESS
-		setpriority( PRIO_PROCESS, serverpid, -1 );
+		setpriority(PRIO_PROCESS, serverpid, -1);
 #endif
 
 		errno = 0;
-		if (! processTimeout(serverpid, 0, "")) {
+		if (!processTimeout(serverpid, 0, "")) {
 			serverpid = -1;
 			break;
 		}
-		/*
+		/* 
 		 * kludge to avoid race with TCP, giving server time to
 		 * set his socket options before we try to open it
 		 */
@@ -485,61 +538,59 @@ startServer(server)
 		break;
 	}
 
-	return(serverpid);
+	return (serverpid);
 }
 
 startClient(client)
 	char *client[];
 {
-	int	clientpid;
+	int clientpid;
 
 	if ((clientpid = vfork()) == 0) {
 		setuid(getuid());
 		setpgrp(0, getpid());
 		environ = newenviron;
-		Execute (client);
-		Error ("no program named \"%s\" in PATH\r\n", client[0]);
-		fprintf (stderr,
-"\nSpecify a program on the command line or make sure that %s\r\n", bindir);
-		fprintf (stderr,
-"is in your path.\r\n");
-		fprintf (stderr, "\n");
-		exit (ERR_EXIT);
+		Execute(client);
+		Error("no program named \"%s\" in PATH\r\n", client[0]);
+		fprintf(stderr,
+			"\nSpecify a program on the command line or make sure that %s\r\n", bindir);
+		fprintf(stderr, "is in your path.\r\n");
+		fprintf(stderr, "\n");
+		exit(ERR_EXIT);
 	}
 	return (clientpid);
 }
 
 #ifdef SYSV
 #define killpg(pgrp, sig) kill(-(pgrp), sig)
-#endif /* SYSV */
+#endif				/* SYSV */
 
 static jmp_buf close_env;
 
-static int ignorexio (dpy)
-    Display *dpy;
+static int
+ignorexio(dpy)
+	Display *dpy;
 {
-    fprintf (stderr, "%s:  connection to X server lost.\r\n", program);
-    longjmp (close_env, 1);
-    return;
+	fprintf(stderr, "%s:  connection to X server lost.\r\n", program);
+	longjmp(close_env, 1);
+	return;
 }
 
 static
 shutdown(serverpid, clientpid)
-	int	serverpid, clientpid;
+	int serverpid, clientpid;
 {
 	/* have kept display opened, so close it now */
 	if (clientpid > 0) {
-		XSetIOErrorHandler (ignorexio);
-		if (! setjmp(close_env)) {
-		    XCloseDisplay(xd);
+		XSetIOErrorHandler(ignorexio);
+		if (!setjmp(close_env)) {
+			XCloseDisplay(xd);
 		}
 
 		/* HUP all local clients to allow them to clean up */
 		errno = 0;
-		if ((killpg(clientpid, SIGHUP) != 0) &&
-		    (errno != ESRCH))
-			Error("can't send HUP to process group %d\r\n",
-				clientpid);
+		if ((killpg(clientpid, SIGHUP) != 0) && (errno != ESRCH))
+			Error("can't send HUP to process group %d\r\n", clientpid);
 	}
 
 	if (serverpid < 0)
@@ -551,14 +602,12 @@ shutdown(serverpid, clientpid)
 		if (errno == ESRCH)
 			return;
 	}
-	if (! processTimeout(serverpid, 10, "X server to shut down")) {
-	    fprintf (stderr, "\r\n");
-	    return;
+	if (!processTimeout(serverpid, 10, "X server to shut down")) {
+		fprintf(stderr, "\r\n");
+		return;
 	}
 
-	fprintf(stderr, 
-	"\r\n%s:  X server slow to shut down, sending KILL signal.\r\n",
-		program);
+	fprintf(stderr, "\r\n%s:  X server slow to shut down, sending KILL signal.\r\n", program);
 	fflush(stderr);
 	errno = 0;
 	if (killpg(serverpid, SIGKILL) < 0) {
@@ -566,48 +615,47 @@ shutdown(serverpid, clientpid)
 			return;
 	}
 	if (processTimeout(serverpid, 3, "server to die")) {
-		fprintf (stderr, "\r\n");
+		fprintf(stderr, "\r\n");
 		Fatal("Can't kill server\r\n");
 	}
-	fprintf (stderr, "\r\n");
+	fprintf(stderr, "\r\n");
 	return;
 }
-
 
 /*
  * make a new copy of environment that has room for DISPLAY
  */
 
-set_environment ()
+set_environment()
 {
-    int nenvvars;
-    char **newPtr, **oldPtr;
-    static char displaybuf[256];
+	int nenvvars;
+	char **newPtr, **oldPtr;
+	static char displaybuf[256];
 
-    /* count number of environment variables */
-    for (oldPtr = environ; *oldPtr; oldPtr++) ;
+	/* count number of environment variables */
+	for (oldPtr = environ; *oldPtr; oldPtr++) ;
 
-    nenvvars = (oldPtr - environ);
-    newenviron = (char **) malloc ((nenvvars + 2) * sizeof(char **));
-    if (!newenviron) {
-	fprintf (stderr,
-		 "%s:  unable to allocate %d pointers for environment\n",
-		 program, nenvvars + 2);
-	exit (1);
-    }
-
-    /* put DISPLAY=displayname as first element */
-    strcpy (displaybuf, "DISPLAY=");
-    strcpy (displaybuf + 8, displayname);
-    newPtr = newenviron;
-    *newPtr++ = displaybuf;
-
-    /* copy pointers to other variables */
-    for (oldPtr = environ; *oldPtr; oldPtr++) {
-	if (strncmp (*oldPtr, "DISPLAY=", 8) != 0) {
-	    *newPtr++ = *oldPtr;
+	nenvvars = (oldPtr - environ);
+	newenviron = (char **) malloc((nenvvars + 2) * sizeof(char **));
+	if (!newenviron) {
+		fprintf(stderr,
+			"%s:  unable to allocate %d pointers for environment\n",
+			program, nenvvars + 2);
+		exit(1);
 	}
-    }
-    *newPtr = NULL;
-    return;
+
+	/* put DISPLAY=displayname as first element */
+	strcpy(displaybuf, "DISPLAY=");
+	strcpy(displaybuf + 8, displayname);
+	newPtr = newenviron;
+	*newPtr++ = displaybuf;
+
+	/* copy pointers to other variables */
+	for (oldPtr = environ; *oldPtr; oldPtr++) {
+		if (strncmp(*oldPtr, "DISPLAY=", 8) != 0) {
+			*newPtr++ = *oldPtr;
+		}
+	}
+	*newPtr = NULL;
+	return;
 }

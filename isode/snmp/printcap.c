@@ -1,3 +1,61 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /*
  * Copyright (c) 1983 Regents of the University of California.
  * All rights reserved.
@@ -33,7 +91,7 @@
 
 #ifndef lint
 static char sccsid[] = "@(#)printcap.c	5.7 (Berkeley) 3/4/91";
-#endif /* not lint */
+#endif				/* not lint */
 
 #include <ctype.h>
 #include <stdio.h>
@@ -42,7 +100,7 @@ static char sccsid[] = "@(#)printcap.c	5.7 (Berkeley) 3/4/91";
 #ifndef BUFSIZ
 #define	BUFSIZ	1024
 #endif
-#define MAXHOP	32	/* max number of tc= indirections */
+#define MAXHOP	32		/* max number of tc= indirections */
 
 /*
  * termcap - routines for dealing with the terminal capability data base
@@ -58,7 +116,7 @@ static char sccsid[] = "@(#)printcap.c	5.7 (Berkeley) 3/4/91";
  * doesn't, and because living w/o it is not hard.
  */
 
-char   *strcpy ();
+char *strcpy();
 
 #define PRINTCAP
 
@@ -75,13 +133,13 @@ char   *strcpy ();
 #define V6
 #endif
 
-static	FILE *pfp = NULL;	/* printcap data base file pointer */
-static	char *tbuf;
-static	int hopcount;		/* detect infinite loops in termcap, init 0 */
-char	*tskip();
-char	*tgetstr();
-char	*tdecode();
-char	*getenv();
+static FILE *pfp = NULL;		/* printcap data base file pointer */
+static char *tbuf;
+static int hopcount;			/* detect infinite loops in termcap, init 0 */
+char *tskip();
+char *tgetstr();
+char *tdecode();
+char *getenv();
 
 /*
  * Similar to tgetent except it returns the next enrty instead of
@@ -93,14 +151,14 @@ getprent(bp)
 	register int c, skip = 0;
 
 	if (pfp == NULL && (pfp = fopen(_PATH_PRINTCAP, "r")) == NULL)
-		return(-1);
+		return (-1);
 	tbuf = bp;
 	for (;;) {
 		switch (c = getc(pfp)) {
 		case EOF:
 			(void) fclose(pfp);
 			pfp = NULL;
-			return(0);
+			return (0);
 		case '\n':
 			if (bp == tbuf) {
 				skip = 0;
@@ -111,17 +169,17 @@ getprent(bp)
 				continue;
 			}
 			*bp = '\0';
-			return(1);
+			return (1);
 		case '#':
 			if (bp == tbuf)
 				skip++;
 		default:
 			if (skip)
 				continue;
-			if (bp >= tbuf+BUFSIZ) {
+			if (bp >= tbuf + BUFSIZ) {
 				(void) write(2, "Termcap entry too long\n", 23);
 				*bp = '\0';
-				return(1);
+				return (1);
 			}
 			*bp++ = c;
 		}
@@ -146,6 +204,7 @@ tgetent(bp, name)
 	register int c;
 	register int i = 0, cnt = 0;
 	char ibuf[BUFSIZ];
+
 /*
 	char *cp2;
  */
@@ -155,7 +214,7 @@ tgetent(bp, name)
 	tf = 0;
 #ifndef V6
 	cp = getenv("TERMCAP");
-	/*
+	/* 
 	 * TERMCAP can have one of two things in it. It can be the
 	 * name of a file to use instead of /etc/termcap. In this
 	 * case it better start with a "/". Or it can be an entry to
@@ -163,18 +222,18 @@ tgetent(bp, name)
 	 * has to already have the newlines crunched out.
 	 */
 	if (cp && *cp) {
-		if (*cp!='/') {
+		if (*cp != '/') {
 			cp2 = getenv("TERM");
-			if (cp2==(char *) 0 || strcmp(name,cp2)==0) {
-				(void) strcpy(bp,cp);
-				return(tnchktc());
+			if (cp2 == (char *) 0 || strcmp(name, cp2) == 0) {
+				(void) strcpy(bp, cp);
+				return (tnchktc());
 			} else {
 				tf = open(_PATH_PRINTCAP, 0);
 			}
 		} else
 			tf = open(cp, 0);
 	}
-	if (tf==0)
+	if (tf == 0)
 		tf = open(_PATH_PRINTCAP, 0);
 #else
 	tf = open(_PATH_PRINTCAP, 0);
@@ -194,26 +253,26 @@ tgetent(bp, name)
 			}
 			c = ibuf[i++];
 			if (c == '\n') {
-				if (cp > bp && cp[-1] == '\\'){
+				if (cp > bp && cp[-1] == '\\') {
 					cp--;
 					continue;
 				}
 				break;
 			}
-			if (cp >= bp+BUFSIZ) {
-				(void) write(2,"Termcap entry too long\n", 23);
+			if (cp >= bp + BUFSIZ) {
+				(void) write(2, "Termcap entry too long\n", 23);
 				break;
 			} else
 				*cp++ = c;
 		}
 		*cp = 0;
 
-		/*
+		/* 
 		 * The real work for the match.
 		 */
 		if (tnamatch(name)) {
 			(void) close(tf);
-			return(tnchktc());
+			return (tnchktc());
 		}
 	}
 }
@@ -228,22 +287,22 @@ tgetent(bp, name)
 tnchktc()
 {
 	register char *p, *q;
-	char tcname[16];	/* name of similar terminal */
+	char tcname[16];		/* name of similar terminal */
 	char tcbuf[BUFSIZ];
 	char *holdtbuf = tbuf;
 	int l;
 
 	p = tbuf + strlen(tbuf) - 2;	/* before the last colon */
 	while (*--p != ':')
-		if (p<tbuf) {
+		if (p < tbuf) {
 			(void) write(2, "Bad termcap entry\n", 18);
 			return (0);
 		}
 	p++;
 	/* p now points to beginning of last field */
 	if (p[0] != 't' || p[1] != 'c')
-		return(1);
-	(void) strcpy(tcname,p+3);
+		return (1);
+	(void) strcpy(tcname, p + 3);
 	q = tcname;
 	while (q && *q != ':')
 		q++;
@@ -253,17 +312,16 @@ tnchktc()
 		return (0);
 	}
 	if (tgetent(tcbuf, tcname) != 1)
-		return(0);
-	for (q=tcbuf; *q != ':'; q++)
-		;
+		return (0);
+	for (q = tcbuf; *q != ':'; q++) ;
 	l = p - holdtbuf + strlen(q);
 	if (l > BUFSIZ) {
 		(void) write(2, "Termcap entry too long\n", 23);
-		q[BUFSIZ - (p-tbuf)] = 0;
+		q[BUFSIZ - (p - tbuf)] = 0;
 	}
-	(void) strcpy(p, q+1);
+	(void) strcpy(p, q + 1);
 	tbuf = holdtbuf;
-	return(1);
+	return (1);
 }
 
 /*
@@ -279,7 +337,7 @@ tnamatch(np)
 
 	Bp = tbuf;
 	if (*Bp == '#')
-		return(0);
+		return (0);
 	for (;;) {
 		for (Np = np; *Np && *Bp == *Np; Bp++, Np++)
 			continue;
@@ -331,7 +389,7 @@ tgetnum(id)
 		if (*bp++ != id[0] || *bp == 0 || *bp++ != id[1])
 			continue;
 		if (*bp == '@')
-			return(-1);
+			return (-1);
 		if (*bp != '#')
 			continue;
 		bp++;
@@ -364,7 +422,7 @@ tgetflag(id)
 			if (!*bp || *bp == ':')
 				return (1);
 			else if (*bp == '@')
-				return(0);
+				return (0);
 		}
 	}
 }
@@ -390,7 +448,7 @@ tgetstr(id, area)
 		if (*bp++ != id[0] || *bp == 0 || *bp++ != id[1])
 			continue;
 		if (*bp == '@')
-			return(0);
+			return (0);
 		if (*bp != '=')
 			continue;
 		bp++;
@@ -423,7 +481,7 @@ tdecode(str, area)
 		case '\\':
 			dp = "E\033^^\\\\::n\nr\rt\tb\bf\f";
 			c = *str++;
-nextc:
+		      nextc:
 			if (*dp++ == c) {
 				c = *dp++;
 				break;

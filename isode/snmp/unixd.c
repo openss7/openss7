@@ -1,11 +1,70 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* unixd.c - daemon for UNIX MIB */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/unixd.c,v 9.0 1992/06/16 12:38:11 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/snmp/RCS/unixd.c,v 9.0 1992/06/16 12:38:11 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/snmp/RCS/unixd.c,v 9.0 1992/06/16 12:38:11 isode Rel $
+ * Header: /xtel/isode/isode/snmp/RCS/unixd.c,v 9.0 1992/06/16 12:38:11 isode Rel
  *
  * Contributed by NYSERNet Inc.  This work was partially supported by the
  * U.S. Defense Advanced Research Projects Agency and the Rome Air Development
@@ -13,7 +72,7 @@ static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/unixd.c,v 9.0 1992/06/
  * F30602-88-C-0016.
  *
  *
- * $Log: unixd.c,v $
+ * Log: unixd.c,v
  * Revision 9.0  1992/06/16  12:38:11  isode
  * Release 8.0
  *
@@ -29,7 +88,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/unixd.c,v 9.0 1992/06/
  *
  */
 
-
 #include <unistd.h>
 #define getdtablesize() (sysconf (_SC_OPEN_MAX))
 #include <signal.h>
@@ -42,538 +100,517 @@ static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/unixd.c,v 9.0 1992/06/
 
 /*    DATA */
 
-int	debug = 0;
-static	int	nbits = FD_SETSIZE;
+int debug = 0;
+static int nbits = FD_SETSIZE;
 
-static LLog	_pgm_log = {
-    "unixd.log", NULLCP, NULLCP, LLOG_FATAL | LLOG_EXCEPTIONS | LLOG_NOTICE,
-    LLOG_FATAL, -1, LLOGCLS | LLOGCRT | LLOGZER, NOTOK
+static LLog _pgm_log = {
+	"unixd.log", NULLCP, NULLCP, LLOG_FATAL | LLOG_EXCEPTIONS | LLOG_NOTICE,
+	LLOG_FATAL, -1, LLOGCLS | LLOGCRT | LLOGZER, NOTOK
 };
-static	LLog   *pgm_log = &_pgm_log;
+static LLog *pgm_log = &_pgm_log;
 
-static	char   *myname = "unixd";
+static char *myname = "unixd";
 
+static int smux_fd = NOTOK;
+static int rock_and_roll = 0;
+static int got_at_least_one = 0;
+static int dont_bother_anymore = 0;
 
-static	int	smux_fd = NOTOK;
-static	int	rock_and_roll = 0;
-static	int	got_at_least_one = 0;
-static	int	dont_bother_anymore = 0;
-
-
-int	init_users (), sync_users ();	/* users group */
-int	init_print (), sync_print ();	/* print group */
+int init_users(), sync_users();		/* users group */
+int init_print(), sync_print();		/* print group */
 
 static struct triple {
-    char   *t_tree;
-    OID	    t_name;
-    int	    t_access;
-    IFP	    t_init;
-    IFP	    t_sync;
-}	triples[] = {
-    "users", NULL, readWrite, init_users, sync_users,
-    "print", NULL, readWrite, init_print, sync_print,
-
-    NULL
-};
+	char *t_tree;
+	OID t_name;
+	int t_access;
+	IFP t_init;
+	IFP t_sync;
+} triples[] = {
+"users", NULL, readWrite, init_users, sync_users,
+	    "print", NULL, readWrite, init_print, sync_print, NULL};
 
 static struct triple *tc;
 
+static struct smuxEntry *se = NULL;
 
-static	struct smuxEntry *se = NULL;
+static fd_set ifds;
+static fd_set ofds;
 
-
-static	fd_set	ifds;
-static	fd_set	ofds;
-
-
-void	adios (), advise ();
+void adios(), advise();
 
 /*    MAIN */
 
 /* ARGSUSED */
 
-main (argc, argv, envp)
-int	argc;
-char  **argv,
-      **envp;
+main(argc, argv, envp)
+	int argc;
+	char **argv, **envp;
 {
-    int	    nfds;
+	int nfds;
 
-    arginit (argv);
-    envinit ();
+	arginit(argv);
+	envinit();
 
-    FD_ZERO (&ifds);
-    FD_ZERO (&ofds);
-    nfds = 0;
+	FD_ZERO(&ifds);
+	FD_ZERO(&ofds);
+	nfds = 0;
 
 /* set fd's for other purposes here... */
 
-    for (;;) {
-	int	n,
-		secs;
-	fd_set	rfds,
-		wfds;
+	for (;;) {
+		int n, secs;
+		fd_set rfds, wfds;
 
-	secs = NOTOK;
+		secs = NOTOK;
 
-	rfds = ifds;	/* struct copy */
-	wfds = ofds;	/*   .. */
+		rfds = ifds;	/* struct copy */
+		wfds = ofds;	/* .. */
 
-	if (smux_fd == NOTOK && !dont_bother_anymore)
-	    secs = 5 * 60L;
-	else
-	    if (rock_and_roll)
-		FD_SET (smux_fd, &rfds);
-	    else
-		FD_SET (smux_fd, &wfds);
-	if (smux_fd >= nfds)
-	    nfds = smux_fd + 1;
+		if (smux_fd == NOTOK && !dont_bother_anymore)
+			secs = 5 * 60L;
+		else if (rock_and_roll)
+			FD_SET(smux_fd, &rfds);
+		else
+			FD_SET(smux_fd, &wfds);
+		if (smux_fd >= nfds)
+			nfds = smux_fd + 1;
 
-	if ((n = xselect (nfds, &rfds, &wfds, NULLFD, secs)) == NOTOK)
-	    adios ("failed", "xselect");
+		if ((n = xselect(nfds, &rfds, &wfds, NULLFD, secs)) == NOTOK)
+			adios("failed", "xselect");
 
 /* check fd's for other purposes here... */
 
-	if (smux_fd == NOTOK && !dont_bother_anymore) {
-	    if (n == 0) {
-		if ((smux_fd = smux_init (debug)) == NOTOK)
-		    advise (LLOG_EXCEPTIONS, NULLCP, "smux_init: %s [%s]",
-			    smux_error (smux_errno), smux_info);
-		else
-		    rock_and_roll = 0;
-	    }
+		if (smux_fd == NOTOK && !dont_bother_anymore) {
+			if (n == 0) {
+				if ((smux_fd = smux_init(debug)) == NOTOK)
+					advise(LLOG_EXCEPTIONS, NULLCP, "smux_init: %s [%s]",
+					       smux_error(smux_errno), smux_info);
+				else
+					rock_and_roll = 0;
+			}
+		} else if (rock_and_roll) {
+			if (FD_ISSET(smux_fd, &rfds))
+				doit_smux();
+		} else if (FD_ISSET(smux_fd, &wfds))
+			start_smux();
 	}
-	else
-	    if (rock_and_roll) {
-		if (FD_ISSET (smux_fd, &rfds))
-		    doit_smux ();
-	    }
-	    else
-		if (FD_ISSET (smux_fd, &wfds))
-		    start_smux ();
-    }
 }
 
 /*    MISCELLANY */
 
-static	arginit (vec)
-char	**vec;
+static
+arginit(vec)
+	char **vec;
 {
-    register char  *ap;
+	register char *ap;
 
-    if (myname = rindex (*vec, '/'))
-	myname++;
-    if (myname == NULL || *myname == NULL)
-	myname = *vec;
-    if (strncmp (myname, "smux.", 5) == 0 && myname[5] != NULL)
-	myname += 5;
+	if (myname = rindex(*vec, '/'))
+		myname++;
+	if (myname == NULL || *myname == NULL)
+		myname = *vec;
+	if (strncmp(myname, "smux.", 5) == 0 && myname[5] != NULL)
+		myname += 5;
 
-    isodetailor (myname, 0);
-    ll_hdinit (pgm_log, myname);
+	isodetailor(myname, 0);
+	ll_hdinit(pgm_log, myname);
 
-    for (vec++; ap = *vec; vec++) {
-	if (*ap == '-')
-	    switch (*++ap) {
-		case 'd':
-		    debug++;
-		    continue;
+	for (vec++; ap = *vec; vec++) {
+		if (*ap == '-')
+			switch (*++ap) {
+			case 'd':
+				debug++;
+				continue;
 
-		default: 
-		    adios (NULLCP, "-%s: unknown switch", ap);
-	    }
+			default:
+				adios(NULLCP, "-%s: unknown switch", ap);
+			}
 
-	adios (NULLCP, "usage: %s [switches]", myname);
-    }
+		adios(NULLCP, "usage: %s [switches]", myname);
+	}
 }
 
 /*  */
 
-static  envinit () {
-    int     i,
-            sd;
-    char    file[BUFSIZ];
-    FILE   *fp;
+static
+envinit()
+{
+	int i, sd;
+	char file[BUFSIZ];
+	FILE *fp;
 
-    nbits = getdtablesize ();
+	nbits = getdtablesize();
 
-    if (debug == 0 && !(debug = isatty (2))) {
-	for (i = 0; i < 5; i++) {
-	    switch (fork ()) {
-		case NOTOK: 
-		    sleep (5);
-		    continue;
+	if (debug == 0 && !(debug = isatty(2))) {
+		for (i = 0; i < 5; i++) {
+			switch (fork()) {
+			case NOTOK:
+				sleep(5);
+				continue;
 
-		case OK: 
-		    break;
+			case OK:
+				break;
 
-		default: 
-		    _exit (0);
-	    }
-	    break;
-	}
+			default:
+				_exit(0);
+			}
+			break;
+		}
 
-	(void) chdir ("/");
+		(void) chdir("/");
 
-	if ((sd = open ("/dev/null", O_RDWR)) == NOTOK)
-	    adios ("/dev/null", "unable to read");
-	if (sd != 0)
-	    (void) dup2 (sd, 0), (void) close (sd);
-	(void) dup2 (0, 1);
-	(void) dup2 (0, 2);
+		if ((sd = open("/dev/null", O_RDWR)) == NOTOK)
+			adios("/dev/null", "unable to read");
+		if (sd != 0)
+			(void) dup2(sd, 0), (void) close(sd);
+		(void) dup2(0, 1);
+		(void) dup2(0, 2);
 
 #ifdef	SETSID
-	if (setsid () == NOTOK)
-	    advise (LLOG_EXCEPTIONS, "failed", "setsid");
+		if (setsid() == NOTOK)
+			advise(LLOG_EXCEPTIONS, "failed", "setsid");
 #endif
 #ifdef	TIOCNOTTY
-	if ((sd = open ("/dev/tty", O_RDWR)) != NOTOK) {
-	    (void) ioctl (sd, TIOCNOTTY, NULLCP);
-	    (void) close (sd);
-	}
+		if ((sd = open("/dev/tty", O_RDWR)) != NOTOK) {
+			(void) ioctl(sd, TIOCNOTTY, NULLCP);
+			(void) close(sd);
+		}
 #else
 #ifdef	SYS5
-	(void) setpgrp ();
-	(void) signal (SIGINT, SIG_IGN);
-	(void) signal (SIGQUIT, SIG_IGN);
+		(void) setpgrp();
+		(void) signal(SIGINT, SIG_IGN);
+		(void) signal(SIGQUIT, SIG_IGN);
 #endif
 #endif
-    }
-    else
-	ll_dbinit (pgm_log, myname);
+	} else
+		ll_dbinit(pgm_log, myname);
 
-#ifndef	sun		/* damn YP... */
-    for (sd = 3; sd < nbits; sd++)
-	if (pgm_log -> ll_fd != sd)
-	    (void) close (sd);
+#ifndef	sun			/* damn YP... */
+	for (sd = 3; sd < nbits; sd++)
+		if (pgm_log->ll_fd != sd)
+			(void) close(sd);
 #endif
 
-    (void) signal (SIGPIPE, SIG_IGN);
+	(void) signal(SIGPIPE, SIG_IGN);
 
-    ll_hdinit (pgm_log, myname);
+	ll_hdinit(pgm_log, myname);
 
-    mibinit ();
+	mibinit();
 
-    (void) sprintf (file, "/etc/%s.pid", myname);
-    if (fp = fopen (file, "w")) {
-	(void) fprintf (fp, "%d\n", getpid ());
-	(void) fclose (fp);
-    }
-    
-    advise (LLOG_NOTICE, NULLCP, "starting");
+	(void) sprintf(file, "/etc/%s.pid", myname);
+	if (fp = fopen(file, "w")) {
+		(void) fprintf(fp, "%d\n", getpid());
+		(void) fclose(fp);
+	}
+
+	advise(LLOG_NOTICE, NULLCP, "starting");
 }
 
 /*    MIB */
 
-int	quantum = 0;
+int quantum = 0;
 
+static
+mibinit()
+{
+	OT ot;
 
-static  mibinit () {
-    OT	    ot;
+	if ((se = getsmuxEntrybyname("unixd")) == NULL)
+		adios(NULLCP, "no SMUX entry for \"%s\"", "unixd");
 
-    if ((se = getsmuxEntrybyname ("unixd")) == NULL)
-	adios (NULLCP, "no SMUX entry for \"%s\"", "unixd");
+	if (readobjects("unixd.defs") == NOTOK)
+		adios(NULLCP, "readobjects: %s", PY_pepy);
 
-    if (readobjects ("unixd.defs") == NOTOK)
-	adios (NULLCP, "readobjects: %s", PY_pepy);
+	for (tc = triples; tc->t_tree; tc++)
+		if (ot = text2obj(tc->t_tree)) {
+			tc->t_name = ot->ot_name;
+			(void) (*tc->t_init) ();
+		} else
+			advise(LLOG_EXCEPTIONS, NULLCP, "text2obj (\"%s\") fails", tc->t_tree);
 
-    for (tc = triples; tc -> t_tree; tc++)
-	if (ot = text2obj (tc -> t_tree)) {
-	    tc -> t_name = ot -> ot_name;
-	    (void) (*tc -> t_init) ();
-	}
+	if ((smux_fd = smux_init(debug)) == NOTOK)
+		advise(LLOG_EXCEPTIONS, NULLCP, "smux_init: %s [%s]",
+		       smux_error(smux_errno), smux_info);
 	else
-	    advise (LLOG_EXCEPTIONS, NULLCP, "text2obj (\"%s\") fails",
-		    tc -> t_tree);
-
-    if ((smux_fd = smux_init (debug)) == NOTOK)
-	advise (LLOG_EXCEPTIONS, NULLCP, "smux_init: %s [%s]",
-		smux_error (smux_errno), smux_info);
-    else
-	rock_and_roll = 0;
+		rock_and_roll = 0;
 }
 
 /*  */
 
-static	start_smux () {
-    if (smux_simple_open (&se -> se_identity, "SMUX UNIX daemon",
-			  se -> se_password, strlen (se -> se_password))
+static
+start_smux()
+{
+	if (smux_simple_open(&se->se_identity, "SMUX UNIX daemon",
+			     se->se_password, strlen(se->se_password))
 	    == NOTOK) {
-	if (smux_errno == inProgress)
-	    return;
+		if (smux_errno == inProgress)
+			return;
 
-	advise (LLOG_EXCEPTIONS, NULLCP, "smux_simple_open: %s [%s]",
-		smux_error (smux_errno), smux_info);
-losing: ;
-	smux_fd = NOTOK;
-	return;
-    }
-    advise (LLOG_NOTICE, NULLCP, "SMUX open: %s \"%s\"",
-	    oid2ode (&se -> se_identity), se -> se_name);
-    rock_and_roll = 1;
-
-    for (tc = triples; tc -> t_tree; tc++)
-	if (tc -> t_name) {
-	    if (smux_register (tc -> t_name, -1, tc -> t_access) == NOTOK) {
-		advise (LLOG_EXCEPTIONS, NULLCP, "smux_register: %s [%s]",
-			smux_error (smux_errno), smux_info);
-		goto losing;
-	    }
-	    advise (LLOG_NOTICE, NULLCP, "SMUX register: %s in=%d",
-		    tc -> t_tree, -1);
-	    break;
+		advise(LLOG_EXCEPTIONS, NULLCP, "smux_simple_open: %s [%s]",
+		       smux_error(smux_errno), smux_info);
+	      losing:;
+		smux_fd = NOTOK;
+		return;
 	}
+	advise(LLOG_NOTICE, NULLCP, "SMUX open: %s \"%s\"", oid2ode(&se->se_identity), se->se_name);
+	rock_and_roll = 1;
+
+	for (tc = triples; tc->t_tree; tc++)
+		if (tc->t_name) {
+			if (smux_register(tc->t_name, -1, tc->t_access) == NOTOK) {
+				advise(LLOG_EXCEPTIONS, NULLCP, "smux_register: %s [%s]",
+				       smux_error(smux_errno), smux_info);
+				goto losing;
+			}
+			advise(LLOG_NOTICE, NULLCP, "SMUX register: %s in=%d", tc->t_tree, -1);
+			break;
+		}
 }
 
 /*  */
 
-static	doit_smux () {
-    struct type_SNMP_SMUX__PDUs *event;
+static
+doit_smux()
+{
+	struct type_SNMP_SMUX__PDUs *event;
 
-    if (smux_wait (&event, NOTOK) == NOTOK) {
-	if (smux_errno == inProgress)
-	    return;
+	if (smux_wait(&event, NOTOK) == NOTOK) {
+		if (smux_errno == inProgress)
+			return;
 
-	advise (LLOG_EXCEPTIONS, NULLCP, "smux_wait: %s [%s]",
-		smux_error (smux_errno), smux_info);
-losing: ;
-	smux_fd = NOTOK;
-	return;
-    }
+		advise(LLOG_EXCEPTIONS, NULLCP, "smux_wait: %s [%s]",
+		       smux_error(smux_errno), smux_info);
+	      losing:;
+		smux_fd = NOTOK;
+		return;
+	}
 
-    switch (event -> offset) {
+	switch (event->offset) {
 	case type_SNMP_SMUX__PDUs_registerResponse:
-	    if (!tc -> t_name)
-		goto unexpected;
-	    {
-		struct type_SNMP_RRspPDU *rsp = event -> un.registerResponse;
+		if (!tc->t_name)
+			goto unexpected;
+		{
+			struct type_SNMP_RRspPDU *rsp = event->un.registerResponse;
 
-		if (rsp -> parm == int_SNMP_RRspPDU_failure)
-		    advise (LLOG_NOTICE, NULLCP,
-			    "SMUX registration of %s failed",
-			    tc -> t_tree);
-		else {
-		    advise (LLOG_NOTICE, NULLCP,
-			    "SMUX register: %s out=%d",
-			    tc -> t_tree, rsp -> parm);
-		    got_at_least_one = 1;
+			if (rsp->parm == int_SNMP_RRspPDU_failure)
+				advise(LLOG_NOTICE, NULLCP,
+				       "SMUX registration of %s failed", tc->t_tree);
+			else {
+				advise(LLOG_NOTICE, NULLCP,
+				       "SMUX register: %s out=%d", tc->t_tree, rsp->parm);
+				got_at_least_one = 1;
+			}
 		}
-	    }
-	    for (tc++; tc -> t_tree; tc++)
-		if (tc -> t_name) {
-		    if (smux_register (tc -> t_name, -1, tc -> t_access)
-			    == NOTOK) {
-			advise (LLOG_EXCEPTIONS, NULLCP,
-				"smux_register: %s [%s]",
-				smux_error (smux_errno), smux_info);
-			goto losing;
-		    }
-		    advise (LLOG_NOTICE, NULLCP, "SMUX register: %s in=%d",
-			    tc -> t_tree, -1);
-		    break;
+		for (tc++; tc->t_tree; tc++)
+			if (tc->t_name) {
+				if (smux_register(tc->t_name, -1, tc->t_access)
+				    == NOTOK) {
+					advise(LLOG_EXCEPTIONS, NULLCP,
+					       "smux_register: %s [%s]",
+					       smux_error(smux_errno), smux_info);
+					goto losing;
+				}
+				advise(LLOG_NOTICE, NULLCP, "SMUX register: %s in=%d",
+				       tc->t_tree, -1);
+				break;
+			}
+		if (!tc->t_tree) {
+			if (!got_at_least_one) {
+				dont_bother_anymore = 1;
+				(void) smux_close(goingDown);
+				goto losing;
+			}
+			if (smux_trap(int_SNMP_generic__trap_coldStart, 0,
+				      (struct type_SNMP_VarBindList *) 0) == NOTOK) {
+				advise(LLOG_EXCEPTIONS, NULLCP, "smux_trap: %s [%s]",
+				       smux_error(smux_errno), smux_info);
+				goto losing;
+			}
 		}
-	    if (!tc -> t_tree) {
-		if (!got_at_least_one) {
-		    dont_bother_anymore = 1;
-		    (void) smux_close (goingDown);
-		    goto losing;
-		}
-		if (smux_trap (int_SNMP_generic__trap_coldStart, 0,
-			       (struct type_SNMP_VarBindList *) 0) == NOTOK) {
-		    advise (LLOG_EXCEPTIONS, NULLCP, "smux_trap: %s [%s]",
-			    smux_error (smux_errno), smux_info);
-		    goto losing;
-		}
-	    }
-	    break;
+		break;
 
 	case type_SNMP_SMUX__PDUs_get__request:
 	case type_SNMP_SMUX__PDUs_get__next__request:
 	case type_SNMP_SMUX__PDUs_set__request:
-	    do_smux (event -> un.get__request, event -> offset);
-	    break;
+		do_smux(event->un.get__request, event->offset);
+		break;
 
 	case type_SNMP_SMUX__PDUs_commitOrRollback:
-	    {
+	{
 		register struct triple *tz;
 
-		for (tz = triples; tz -> t_tree; tz++)
-		    if (tz -> t_name)
-			(void) (*tz -> t_sync) (event -> un.commitOrRollback
-								    -> parm);
-	    }
-	    break;
+		for (tz = triples; tz->t_tree; tz++)
+			if (tz->t_name)
+				(void) (*tz->t_sync) (event->un.commitOrRollback->parm);
+	}
+		break;
 
 	case type_SNMP_SMUX__PDUs_close:
-	    advise (LLOG_NOTICE, NULLCP, "SMUX close: %s",
-		    smux_error (event -> un.close -> parm));
-	    goto losing;
+		advise(LLOG_NOTICE, NULLCP, "SMUX close: %s", smux_error(event->un.close->parm));
+		goto losing;
 
 	case type_SNMP_SMUX__PDUs_simple:
 	case type_SNMP_SMUX__PDUs_registerRequest:
 	case type_SNMP_SMUX__PDUs_get__response:
 	case type_SNMP_SMUX__PDUs_trap:
-unexpected: ;
-	    advise (LLOG_EXCEPTIONS, NULLCP, "unexpectedOperation: %d",
-		    event -> offset);
-	    (void) smux_close (protocolError);
-	    goto losing;
+	      unexpected:;
+		advise(LLOG_EXCEPTIONS, NULLCP, "unexpectedOperation: %d", event->offset);
+		(void) smux_close(protocolError);
+		goto losing;
 
 	default:
-	    advise (LLOG_EXCEPTIONS, NULLCP, "badOperation: %d",
-		    event -> offset);
-	    (void) smux_close (protocolError);
-	    goto losing;
-    }
+		advise(LLOG_EXCEPTIONS, NULLCP, "badOperation: %d", event->offset);
+		(void) smux_close(protocolError);
+		goto losing;
+	}
 }
 
 /*  */
 
-static	do_smux (pdu, offset)
-register struct type_SNMP_GetRequest__PDU *pdu;
-int	offset;
+static
+do_smux(pdu, offset)
+	register struct type_SNMP_GetRequest__PDU *pdu;
+	int offset;
 {
-    int	    idx,
-	    status;
-    object_instance ois;
-    register struct type_SNMP_VarBindList *vp;
-    IFP	    method;
+	int idx, status;
+	object_instance ois;
+	register struct type_SNMP_VarBindList *vp;
+	IFP method;
 
-    quantum = pdu -> request__id;
-    idx = 0;
-    for (vp = pdu -> variable__bindings; vp; vp = vp -> next) {
-	register OI	oi;
-	register OT	ot;
-	register struct type_SNMP_VarBind *v = vp -> VarBind;
+	quantum = pdu->request__id;
+	idx = 0;
+	for (vp = pdu->variable__bindings; vp; vp = vp->next) {
+		register OI oi;
+		register OT ot;
+		register struct type_SNMP_VarBind *v = vp->VarBind;
 
-	idx++;
+		idx++;
 
-	if (offset == type_SNMP_SMUX__PDUs_get__next__request) {
-	    if ((oi = name2inst (v -> name)) == NULLOI
-		    && (oi = next2inst (v -> name)) == NULLOI)
-		goto no_name;
+		if (offset == type_SNMP_SMUX__PDUs_get__next__request) {
+			if ((oi = name2inst(v->name)) == NULLOI
+			    && (oi = next2inst(v->name)) == NULLOI)
+				goto no_name;
 
-	    if ((ot = oi -> oi_type) -> ot_getfnx == NULLIFP)
-		goto get_next;
-	}
-	else {
-	    if ((oi = name2inst (v -> name)) == NULLOI)
-		goto no_name;
-	    ot = oi -> oi_type;
-	    if ((offset == type_SNMP_SMUX__PDUs_get__request
-			    ? ot -> ot_getfnx : ot -> ot_setfnx) == NULLIFP) {
-no_name: ;
-		pdu -> error__status = int_SNMP_error__status_noSuchName;
-		goto out;
-	    }
-	}
-
-try_again: ;
-	switch (offset) {
-	    case type_SNMP_SMUX__PDUs_get__request:
-		if (!(method = ot -> ot_getfnx))
-		    goto no_name;
-		break;
-		
-	    case type_SNMP_SMUX__PDUs_get__next__request:
-		if (!(method = ot -> ot_getfnx))
-		    goto get_next;
-		break;
-		
-	    case type_SNMP_SMUX__PDUs_set__request:
-		if (!(method = ot -> ot_setfnx))
-		    goto no_name;
-		break;
-
-	    default:
-		goto no_name;
-	}
-		
-	switch (status = (method) (oi, v, offset)) {
-	    case NOTOK:	    /* get-next wants a bump */
-get_next: ;
-		oi = &ois;
-		for (;;) {
-		    if ((ot = ot -> ot_next) == NULLOT) {
-			pdu -> error__status =
-					    int_SNMP_error__status_noSuchName;
-			goto out;
-		    }
-		    oi -> oi_name = (oi -> oi_type = ot) -> ot_name;
-		    if (ot -> ot_getfnx)
-			goto try_again;
+			if ((ot = oi->oi_type)->ot_getfnx == NULLIFP)
+				goto get_next;
+		} else {
+			if ((oi = name2inst(v->name)) == NULLOI)
+				goto no_name;
+			ot = oi->oi_type;
+			if ((offset == type_SNMP_SMUX__PDUs_get__request
+			     ? ot->ot_getfnx : ot->ot_setfnx) == NULLIFP) {
+			      no_name:;
+				pdu->error__status = int_SNMP_error__status_noSuchName;
+				goto out;
+			}
 		}
 
-	    case int_SNMP_error__status_noError:
-		break;
+	      try_again:;
+		switch (offset) {
+		case type_SNMP_SMUX__PDUs_get__request:
+			if (!(method = ot->ot_getfnx))
+				goto no_name;
+			break;
 
-	    default:
-		pdu -> error__status = status;
-		goto out;
+		case type_SNMP_SMUX__PDUs_get__next__request:
+			if (!(method = ot->ot_getfnx))
+				goto get_next;
+			break;
+
+		case type_SNMP_SMUX__PDUs_set__request:
+			if (!(method = ot->ot_setfnx))
+				goto no_name;
+			break;
+
+		default:
+			goto no_name;
+		}
+
+		switch (status = (method) (oi, v, offset)) {
+		case NOTOK:	/* get-next wants a bump */
+		      get_next:;
+			oi = &ois;
+			for (;;) {
+				if ((ot = ot->ot_next) == NULLOT) {
+					pdu->error__status = int_SNMP_error__status_noSuchName;
+					goto out;
+				}
+				oi->oi_name = (oi->oi_type = ot)->ot_name;
+				if (ot->ot_getfnx)
+					goto try_again;
+			}
+
+		case int_SNMP_error__status_noError:
+			break;
+
+		default:
+			pdu->error__status = status;
+			goto out;
+		}
 	}
-    }
-    idx = 0;
+	idx = 0;
 
-out: ;
-    pdu -> error__index = idx;
+      out:;
+	pdu->error__index = idx;
 
-    if (smux_response (pdu) == NOTOK) {
-	advise (LLOG_EXCEPTIONS, NULLCP, "smux_response: %s [%s]",
-		smux_error (smux_errno), smux_info);
-	smux_fd = NOTOK;
-    }
+	if (smux_response(pdu) == NOTOK) {
+		advise(LLOG_EXCEPTIONS, NULLCP, "smux_response: %s [%s]",
+		       smux_error(smux_errno), smux_info);
+		smux_fd = NOTOK;
+	}
 }
 
 /*    ERRORS */
 
 #ifndef	lint
-void	adios (va_alist)
-va_dcl
+void
+adios(va_alist)
+	va_dcl
 {
-    va_list ap;
+	va_list ap;
 
-    va_start (ap);
-    
-    _ll_log (pgm_log, LLOG_FATAL, ap);
+	va_start(ap);
 
-    va_end (ap);
+	_ll_log(pgm_log, LLOG_FATAL, ap);
 
-    _exit (1);
+	va_end(ap);
+
+	_exit(1);
 }
 #else
 /* VARARGS */
 
-void	adios (what, fmt)
-char   *what,
-       *fmt;
+void
+adios(what, fmt)
+	char *what, *fmt;
 {
-    adios (what, fmt);
+	adios(what, fmt);
 }
 #endif
 
-
 #ifndef	lint
-void	advise (va_alist)
-va_dcl
+void
+advise(va_alist)
+	va_dcl
 {
-    int	    code;
-    va_list ap;
+	int code;
+	va_list ap;
 
-    va_start (ap);
-    
-    code = va_arg (ap, int);
+	va_start(ap);
 
-    _ll_log (pgm_log, code, ap);
+	code = va_arg(ap, int);
 
-    va_end (ap);
+	_ll_log(pgm_log, code, ap);
+
+	va_end(ap);
 }
 #else
 /* VARARGS */
 
-void	advise (code, what, fmt)
-char   *what,
-       *fmt;
-int	code;
+void
+advise(code, what, fmt)
+	char *what, *fmt;
+	int code;
 {
-    advise (code, what, fmt);
+	advise(code, what, fmt);
 }
 #endif

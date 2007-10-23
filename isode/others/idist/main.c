@@ -1,7 +1,65 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* main.c -- driver for the client program */
 
 /*
- * $Header: /xtel/isode/isode/others/idist/RCS/main.c,v 9.0 1992/06/16 12:42:00 isode Rel $
+ * Header: /xtel/isode/isode/others/idist/RCS/main.c,v 9.0 1992/06/16 12:42:00 isode Rel
  *
  * Major changes to this file have been the ripping out of the server
  * code. This is entirely the client part now. Also changed are the
@@ -11,13 +69,11 @@
  * Nottingham University Computer Science.
  *
  *
- * $Log: main.c,v $
+ * Log: main.c,v
  * Revision 9.0  1992/06/16  12:42:00  isode
  * Release 8.0
  *
  */
-
-
 
 /*
  * Copyright (c) 1983 Regents of the University of California.
@@ -39,14 +95,14 @@
  */
 
 #ifndef lint
-char copyright[] =
-"@(#) Copyright (c) 1983 Regents of the University of California.\n\
+char copyright[] = "@(#) Copyright (c) 1983 Regents of the University of California.\n\
  All rights reserved.\n";
 #endif
 
 #ifndef lint
 static char sccsid[] = "@(#)main.c      5.5 (Berkeley) 6/1/90";
-static char *rcsid = "$Header: /xtel/isode/isode/others/idist/RCS/main.c,v 9.0 1992/06/16 12:42:00 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/others/idist/RCS/main.c,v 9.0 1992/06/16 12:42:00 isode Rel";
 #endif
 
 #include "defs.h"
@@ -60,27 +116,27 @@ static char *rcsid = "$Header: /xtel/isode/isode/others/idist/RCS/main.c,v 9.0 1
  *     the file, assuming the workstation owner doesn't want that file)
  */
 
-char	*distfile = NULL;
-char	utmpfile[] = "/tmp/idistXXXXXX";
-char	*tmpname = &utmpfile[5];
+char *distfile = NULL;
+char utmpfile[] = "/tmp/idistXXXXXX";
+char *tmpname = &utmpfile[5];
 
-int	debug;		/* debugging flag */
-int	nflag;		/* NOP flag, just print commands without executing */
-int	qflag;		/* Quiet. Don't print messages */
-int	options;	/* global options */
-int	iamremote;	/* act as remote server for transfering files */
+int debug;				/* debugging flag */
+int nflag;				/* NOP flag, just print commands without executing */
+int qflag;				/* Quiet. Don't print messages */
+int options;				/* global options */
+int iamremote;				/* act as remote server for transfering files */
 
-FILE	*fin = NULL;	/* input file pointer */
-char	*host;		/* host name */
-int	nerrs;		/* number of errors while sending/receiving */
-char	user[10];	/* user's name */
-char	homedir[128];	/* user's home directory */
-int	userid;		/* user's user ID */
-int	groupid;	/* user's group ID */
+FILE *fin = NULL;			/* input file pointer */
+char *host;				/* host name */
+int nerrs;				/* number of errors while sending/receiving */
+char user[10];				/* user's name */
+char homedir[128];			/* user's home directory */
+int userid;				/* user's user ID */
+int groupid;				/* user's group ID */
 
-struct	passwd *pw;	/* pointer to static area used by getpwent */
-struct	group *gr;	/* pointer to static area used by getgrent */
-char	*myname = "idist";
+struct passwd *pw;			/* pointer to static area used by getpwent */
+struct group *gr;			/* pointer to static area used by getgrent */
+char *myname = "idist";
 
 main(argc, argv)
 	int argc;
@@ -88,105 +144,105 @@ main(argc, argv)
 {
 	int cmdargs = 0;
 	char *dhosts[NHOSTS], **hp = dhosts;
-	extern	int optind;
-	extern	char *optarg;
-	int	opt;
+	extern int optind;
+	extern char *optarg;
+	int opt;
 
-	if (myname = rindex (argv[0], '/'))
+	if (myname = rindex(argv[0], '/'))
 		myname++;
 	if (myname == NULL || *myname == NULL)
 		myname = argv[0];
 
-	isodetailor (myname, 1);
+	isodetailor(myname, 1);
 
 	pw = getpwuid(userid = getuid());
 	if (pw == NULL)
-		adios (NULLCP, "Who are you?");
+		adios(NULLCP, "Who are you?");
 
 	(void) strcpy(user, pw->pw_name);
 	(void) strcpy(homedir, pw->pw_dir);
 	groupid = pw->pw_gid;
-	host = getlocalhost ();
+	host = getlocalhost();
 
-	while ((opt = getopt (argc, argv, "f:m:d:DcnqbuRvwyhiQ")) != EOF)
+	while ((opt = getopt(argc, argv, "f:m:d:DcnqbuRvwyhiQ")) != EOF)
 		switch (opt) {
-		    case 'f':
+		case 'f':
 			distfile = optarg;
 			if (distfile[0] == '-' && distfile[1] == '\0')
 				fin = stdin;
 			break;
 
-		    case 'm':
-			if (hp >= &dhosts[NHOSTS-2])
-				adios (NULLCP, "too many destination hosts");
+		case 'm':
+			if (hp >= &dhosts[NHOSTS - 2])
+				adios(NULLCP, "too many destination hosts");
 			*hp++ = optarg;
 			break;
 
-		    case 'd':
+		case 'd':
 			define(optarg);
 			break;
 
-		    case 'D':
+		case 'D':
 			debug++;
 			break;
 
-		    case 'c':
+		case 'c':
 			cmdargs++;
 			break;
 
-		    case 'n':
+		case 'n':
 			if (options & VERIFY) {
-				advise (NULLCP, "-n overrides -v");
+				advise(NULLCP, "-n overrides -v");
 				options &= ~VERIFY;
 			}
 			nflag++;
 			break;
 
-		    case 'q':
+		case 'q':
 			qflag++;
 			break;
 
-		    case 'b':
+		case 'b':
 			options |= COMPARE;
 			break;
 #ifdef UW
-		    case 'u':
+		case 'u':
 			options |= NOINSTALL;
 			break;
-#endif UW
-		    case 'R':
+#endif	/* UW */
+		case 'R':
 			options |= REMOVE;
 			break;
 
-		    case 'v':
+		case 'v':
 			if (nflag) {
-				advise (NULLCP, "-n overrides -v");
+				advise(NULLCP, "-n overrides -v");
 				break;
 			}
 			options |= VERIFY;
 			break;
 
-		    case 'w':
+		case 'w':
 			options |= WHOLE;
 			break;
 
-		    case 'y':
+		case 'y':
 			options |= YOUNGER;
 			break;
 
-		    case 'h':
+		case 'h':
 			options |= FOLLOW;
 			break;
 
-		    case 'i':
+		case 'i':
 			options |= IGNLNKS;
 			break;
 
-		    case 'Q':
+		case 'Q':
 			options |= QUERYM;
 			break;
 
-		    default:
+		default:
 			usage();
 			break;
 		}
@@ -200,13 +256,13 @@ main(argc, argv)
 		docmdargs(argc, argv);
 	else {
 		if (fin == NULL) {
-			if(distfile == NULL) {
-				if((fin = fopen("distfile","r")) == NULL)
+			if (distfile == NULL) {
+				if ((fin = fopen("distfile", "r")) == NULL)
 					fin = fopen("Distfile", "r");
 			} else
 				fin = fopen(distfile, "r");
-			if(fin == NULL) {
-				adios (distfile, "Can't open file");
+			if (fin == NULL) {
+				adios(distfile, "Can't open file");
 			}
 		}
 		(void) yyparse();
@@ -214,16 +270,15 @@ main(argc, argv)
 			docmds(dhosts, argc, argv);
 	}
 
-	return(nerrs != 0);
+	return (nerrs != 0);
 }
 
 usage()
 {
-	advise (NULLCP,
-		"Usage: %s [-nqbhirvwyD] [-f distfile] [-d var=value] [-m host] [file ...]\n",
-		myname);
-	adios(NULLCP, "or: %s [-nqbhirvwyD] -c source [...] machine[:dest]\n",
-	      myname);
+	advise(NULLCP,
+	       "Usage: %s [-nqbhirvwyD] [-f distfile] [-d var=value] [-m host] [file ...]\n",
+	       myname);
+	adios(NULLCP, "or: %s [-nqbhirvwyD] -c source [...] machine[:dest]\n", myname);
 }
 
 /*
@@ -277,8 +332,8 @@ docmdargs(nargs, args)
 		(void) printf("hosts = ");
 		prnames(hosts);
 	}
-	insert((char *)NULL, files, hosts, cmds);
-	docmds((char **)NULL, 0, (char **)NULL);
+	insert((char *) NULL, files, hosts, cmds);
+	docmds((char **) NULL, 0, (char **) NULL);
 }
 
 /*

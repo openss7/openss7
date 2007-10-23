@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* ftamsbr.c - FTAM subroutines */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/ftam2/RCS/ftamsbr.c,v 9.0 1992/06/16 12:15:43 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/ftam2/RCS/ftamsbr.c,v 9.0 1992/06/16 12:15:43 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/ftam2/RCS/ftamsbr.c,v 9.0 1992/06/16 12:15:43 isode Rel $
+ * Header: /xtel/isode/isode/ftam2/RCS/ftamsbr.c,v 9.0 1992/06/16 12:15:43 isode Rel
  *
  *
- * $Log: ftamsbr.c,v $
+ * Log: ftamsbr.c,v
  * Revision 9.0  1992/06/16  12:15:43  isode
  * Release 8.0
  *
@@ -24,11 +83,9 @@ static char *rcsid = "$Header: /xtel/isode/isode/ftam2/RCS/ftamsbr.c,v 9.0 1992/
  *
  */
 
-
 #include <ctype.h>
 #include <stdio.h>
 #include "ftamsbr.h"
-
 
 #ifdef	BRIDGE
 extern int vfs_fdf;
@@ -42,207 +99,194 @@ extern struct vfsmap vfs[];
 /* ARGSUSED */
 #endif
 
-long	lseek ();
+long lseek();
 
-struct vfsmap *st2vfs (fd, file, st, proposed, ftamfd)
-int	fd;
-char   *file;
-struct stat *st;
-OID	proposed;
-int	ftamfd;
+struct vfsmap *
+st2vfs(fd, file, st, proposed, ftamfd)
+	int fd;
+	char *file;
+	struct stat *st;
+	OID proposed;
+	int ftamfd;
 {
 #ifndef	BRIDGE
-    register int    fmt;
-    register struct vfsmap *lf;
+	register int fmt;
+	register struct vfsmap *lf;
 #endif
-    register struct vfsmap *vf;
+	register struct vfsmap *vf;
 
 #ifndef	BRIDGE
-    fmt = st -> st_mode & S_IFMT;
+	fmt = st->st_mode & S_IFMT;
 #else
 /* Return the suggested TYPE or Unstructured Text type for FTP bridge */
 /* if during ftp_exist got multiple listing, return directory type */
-    if (ftp_directory)
-	return &vfs[vfs_fdf];
+	if (ftp_directory)
+		return &vfs[vfs_fdf];
 #endif
 
-    if (proposed) {
-	for (vf = vfs; vf -> vf_entry; vf++)
-	    if (vf -> vf_oid && oid_cmp (vf -> vf_oid, proposed) == 0) {
+	if (proposed) {
+		for (vf = vfs; vf->vf_entry; vf++)
+			if (vf->vf_oid && oid_cmp(vf->vf_oid, proposed) == 0) {
 #ifdef	BRIDGE
-		return vf;
-	    }
+				return vf;
+			}
 #else
-		if ((vf -> vf_flags & VF_OK) && vf -> vf_mode == fmt) {
-		    if (vf -> vf_peek
-			    && (*vf -> vf_peek) (vf, fd, file, st, ftamfd)
-					== NOTOK)
-			break;
+				if ((vf->vf_flags & VF_OK) && vf->vf_mode == fmt) {
+					if (vf->vf_peek && (*vf->vf_peek) (vf, fd, file, st, ftamfd)
+					    == NOTOK)
+						break;
 
-		    return vf;
-		}
+					return vf;
+				}
 
-		break;
-	    }
+				break;
+			}
 
-	if (!vf -> vf_entry)
-	    return NULL;
+		if (!vf->vf_entry)
+			return NULL;
 #endif
-    }
+	}
 #ifndef	BRIDGE
-    else {
-	for (lf = vfs; lf -> vf_entry; lf++)
-	    continue;
-	lf--;
+	else {
+		for (lf = vfs; lf->vf_entry; lf++)
+			continue;
+		lf--;
 
-	for (vf = lf; vf >= vfs; vf--)
-	    if ((vf -> vf_flags & VF_OK) && vf -> vf_mode == fmt) {
-		if (vf -> vf_peek
-			&& (*vf -> vf_peek) (vf, fd, file, st, ftamfd) != DONE)
-		    continue;
+		for (vf = lf; vf >= vfs; vf--)
+			if ((vf->vf_flags & VF_OK) && vf->vf_mode == fmt) {
+				if (vf->vf_peek
+				    && (*vf->vf_peek) (vf, fd, file, st, ftamfd) != DONE)
+					continue;
 
-		return vf;
-	    }
+				return vf;
+			}
 
-	for (vf = lf; vf >= vfs; vf--)
-	    if ((vf -> vf_flags & VF_OK)
-		    && vf -> vf_mode == fmt
-		    && vf -> vf_simplify != VFS_XXX)
-		break;
-	if (vf < vfs)
-	    return NULL;
-    }
+		for (vf = lf; vf >= vfs; vf--)
+			if ((vf->vf_flags & VF_OK)
+			    && vf->vf_mode == fmt && vf->vf_simplify != VFS_XXX)
+				break;
+		if (vf < vfs)
+			return NULL;
+	}
 
 /* let's hope there aren't any simplification loops! */
 
-    while (vf -> vf_simplify != VFS_XXX) {
-	vf = &vfs[vf -> vf_simplify];
+	while (vf->vf_simplify != VFS_XXX) {
+		vf = &vfs[vf->vf_simplify];
 
-	if (vf -> vf_flags & VF_OK) {
-	    if (vf -> vf_peek)
-		(void) (*vf -> vf_peek) (vf, fd, file, st, ftamfd);
-	    return vf;
+		if (vf->vf_flags & VF_OK) {
+			if (vf->vf_peek)
+				(void) (*vf->vf_peek) (vf, fd, file, st, ftamfd);
+			return vf;
+		}
 	}
-    }
 
-    return NULL;
+	return NULL;
 #else
-    return &vfs[ftp_default];
+	return &vfs[ftp_default];
 #endif
 }
 
 /*  */
 
-int	binarycheck (param, data)
-caddr_t param;
-char   *data;
+int
+binarycheck(param, data)
+	caddr_t param;
+	char *data;
 {
-    register struct type_DOCS_FTAM__3__Parameters *p3 =
-			(struct type_DOCS_FTAM__3__Parameters *) param;
+	register struct type_DOCS_FTAM__3__Parameters *p3 =
+	    (struct type_DOCS_FTAM__3__Parameters *) param;
 
-    if (p3 -> optionals
-	      & opt_DOCS_FTAM__3__Parameters_maximum__string__length) {
-	if (getenv ("UNISYS-FTAM"))
-	    p3 -> maximum__string__length = 0;
-	else
-	    p3 -> optionals &=
-			~opt_DOCS_FTAM__3__Parameters_maximum__string__length;
-    }
+	if (p3->optionals & opt_DOCS_FTAM__3__Parameters_maximum__string__length) {
+		if (getenv("UNISYS-FTAM"))
+			p3->maximum__string__length = 0;
+		else
+			p3->optionals &= ~opt_DOCS_FTAM__3__Parameters_maximum__string__length;
+	}
 
-    if ((p3 -> optionals
-		& opt_DOCS_FTAM__3__Parameters_string__significanz)
-	    && p3 -> string__significanz
-		    == int_DOCS_string__significanz_fixed) {
-	(void) strcpy (data,
-		       "filestore does not support fixed-length strings");
-	return NOTOK;
-    }
-    
+	if ((p3->optionals & opt_DOCS_FTAM__3__Parameters_string__significanz)
+	    && p3->string__significanz == int_DOCS_string__significanz_fixed) {
+		(void) strcpy(data, "filestore does not support fixed-length strings");
+		return NOTOK;
+	}
 
-    return OK;
+	return OK;
 }
 
 /*  */
 
-int	textcheck (param, data)
-caddr_t param;
-char   *data;
+int
+textcheck(param, data)
+	caddr_t param;
+	char *data;
 {
-    register struct type_DOCS_FTAM__1__Parameters *p1 =
-			(struct type_DOCS_FTAM__1__Parameters *) param;
+	register struct type_DOCS_FTAM__1__Parameters *p1 =
+	    (struct type_DOCS_FTAM__1__Parameters *) param;
 
-    if (!(p1 -> optionals
-	      & opt_DOCS_FTAM__1__Parameters_universal__class__number)) {
-	p1 -> optionals |= opt_DOCS_FTAM__1__Parameters_universal__class__number;
-	p1 -> universal__class__number = PE_DEFN_GENS;
-    }
-    switch (p1 -> universal__class__number) {
+	if (!(p1->optionals & opt_DOCS_FTAM__1__Parameters_universal__class__number)) {
+		p1->optionals |= opt_DOCS_FTAM__1__Parameters_universal__class__number;
+		p1->universal__class__number = PE_DEFN_GENS;
+	}
+	switch (p1->universal__class__number) {
 	case PE_DEFN_GFXS:
 	case PE_DEFN_IA5S:
 	case PE_DEFN_GENS:
-	    break;
+		break;
 
-       default:
-	    (void) sprintf (data,
-			    "filestore does not support strings of universal class number %d",
-			    p1 -> universal__class__number);
-	    return NOTOK;
-    }
-
-    if (p1 -> optionals
-	      & opt_DOCS_FTAM__1__Parameters_maximum__string__length) {
-	if (getenv ("UNISYS-FTAM")) {
-	    p1 -> maximum__string__length = 0;
+	default:
+		(void) sprintf(data,
+			       "filestore does not support strings of universal class number %d",
+			       p1->universal__class__number);
+		return NOTOK;
 	}
-	else
-	    p1 -> optionals &=
-			~opt_DOCS_FTAM__1__Parameters_maximum__string__length;
-    }
 
-    if ((p1 -> optionals
-		& opt_DOCS_FTAM__1__Parameters_string__significance)
-	    && p1 -> string__significance
-		    == int_DOCS_string__significance_fixed) {
-	(void) strcpy (data,
-		       "filestore does not support fixed-length strings");
-	return NOTOK;
-    }
-    
+	if (p1->optionals & opt_DOCS_FTAM__1__Parameters_maximum__string__length) {
+		if (getenv("UNISYS-FTAM")) {
+			p1->maximum__string__length = 0;
+		} else
+			p1->optionals &= ~opt_DOCS_FTAM__1__Parameters_maximum__string__length;
+	}
 
-    return OK;
+	if ((p1->optionals & opt_DOCS_FTAM__1__Parameters_string__significance)
+	    && p1->string__significance == int_DOCS_string__significance_fixed) {
+		(void) strcpy(data, "filestore does not support fixed-length strings");
+		return NOTOK;
+	}
+
+	return OK;
 }
 
 /*  */
 
 /* ARGSUSED */
 
-int	binarypeek (vf, fd, file, st, ftamfd)
-register struct vfsmap *vf;
-int	fd;
-char   *file;
-struct stat *st;
-int	ftamfd;
+int
+binarypeek(vf, fd, file, st, ftamfd)
+	register struct vfsmap *vf;
+	int fd;
+	char *file;
+	struct stat *st;
+	int ftamfd;
 {
-    static struct type_DOCS_FTAM__3__Parameters p3s;
-    register struct type_DOCS_FTAM__3__Parameters *p3 = &p3s;
+	static struct type_DOCS_FTAM__3__Parameters p3s;
+	register struct type_DOCS_FTAM__3__Parameters *p3 = &p3s;
 
-    if (vf -> vf_parameter && (vf -> vf_flags & VF_PARM))
-	(void) fre_obj (vf -> vf_parameter,
-			_ZDOCS_mod.md_dtab[vf -> vf_number], &_ZDOCS_mod, 1);
+	if (vf->vf_parameter && (vf->vf_flags & VF_PARM))
+		(void) fre_obj(vf->vf_parameter, _ZDOCS_mod.md_dtab[vf->vf_number], &_ZDOCS_mod, 1);
 
-    vf -> vf_parameter = (caddr_t) p3, vf -> vf_flags &= ~VF_PARM;
+	vf->vf_parameter = (caddr_t) p3, vf->vf_flags &= ~VF_PARM;
 
-    p3 -> optionals = 0;
+	p3->optionals = 0;
 
-    if (getenv ("UNISYS-FTAM")) {
-	p3 -> optionals |=opt_DOCS_FTAM__3__Parameters_maximum__string__length;
-	p3 -> maximum__string__length = 0;
-    }
+	if (getenv("UNISYS-FTAM")) {
+		p3->optionals |= opt_DOCS_FTAM__3__Parameters_maximum__string__length;
+		p3->maximum__string__length = 0;
+	}
 
-    p3 -> optionals |= opt_DOCS_FTAM__3__Parameters_string__significanz;
-    p3 -> string__significanz = int_DOCS_string__significanz_not__significant;
+	p3->optionals |= opt_DOCS_FTAM__3__Parameters_string__significanz;
+	p3->string__significanz = int_DOCS_string__significanz_not__significant;
 
-    return DONE;
+	return DONE;
 }
 
 /*  */
@@ -262,96 +306,88 @@ int	ftamfd;
 
 */
 
-
 #define	isIA5(c) (isprint ((u_char) c) || (isspace ((u_char)c) && (c) != '\r'))
-
 
 /* ARGSUSED */
 
-int	textpeek (vf, fd, file, st, ftamfd)
-register struct vfsmap *vf;
-int	fd;
-char   *file;
-struct stat *st;
-int	ftamfd;
+int
+textpeek(vf, fd, file, st, ftamfd)
+	register struct vfsmap *vf;
+	int fd;
+	char *file;
+	struct stat *st;
+	int ftamfd;
 {
 #ifndef	BRIDGE
-    int     gd,
-	    n;
-    register char *cp;
-    char    buffer[BLKSIZE];
-    long    pos;
+	int gd, n;
+	register char *cp;
+	char buffer[BLKSIZE];
+	long pos;
 #endif
-    static struct type_DOCS_FTAM__1__Parameters p1s;
-    register struct type_DOCS_FTAM__1__Parameters *p1 = &p1s;
+	static struct type_DOCS_FTAM__1__Parameters p1s;
+	register struct type_DOCS_FTAM__1__Parameters *p1 = &p1s;
 
-    if (vf -> vf_parameter && (vf -> vf_flags & VF_PARM))
-	(void) fre_obj (vf -> vf_parameter,
-			_ZDOCS_mod.md_dtab[vf -> vf_number], &_ZDOCS_mod, 1);
+	if (vf->vf_parameter && (vf->vf_flags & VF_PARM))
+		(void) fre_obj(vf->vf_parameter, _ZDOCS_mod.md_dtab[vf->vf_number], &_ZDOCS_mod, 1);
 
-    vf -> vf_parameter = (caddr_t) p1, vf -> vf_flags &= ~VF_PARM;
+	vf->vf_parameter = (caddr_t) p1, vf->vf_flags &= ~VF_PARM;
 
-    p1 -> optionals = 0;
+	p1->optionals = 0;
 
-    p1 -> optionals |= opt_DOCS_FTAM__1__Parameters_universal__class__number;
-    p1 -> universal__class__number = PE_DEFN_GENS;
+	p1->optionals |= opt_DOCS_FTAM__1__Parameters_universal__class__number;
+	p1->universal__class__number = PE_DEFN_GENS;
 
-    if (getenv ("UNISYS-FTAM")) {
-	p1 -> optionals |=opt_DOCS_FTAM__1__Parameters_maximum__string__length;
-	p1 -> maximum__string__length = 0;
-    }
+	if (getenv("UNISYS-FTAM")) {
+		p1->optionals |= opt_DOCS_FTAM__1__Parameters_maximum__string__length;
+		p1->maximum__string__length = 0;
+	}
 
-    p1 -> optionals |= opt_DOCS_FTAM__1__Parameters_string__significance;
-    switch (p1 -> universal__class__number) {
+	p1->optionals |= opt_DOCS_FTAM__1__Parameters_string__significance;
+	switch (p1->universal__class__number) {
 	case PE_DEFN_GFXS:
-	    if (getenv ("HP-FTAM")) {
-		p1 -> string__significance =
-				int_DOCS_string__significance_not__significant;
-		break;
-	    }	/* else fall... */
+		if (getenv("HP-FTAM")) {
+			p1->string__significance = int_DOCS_string__significance_not__significant;
+			break;
+		}		/* else fall... */
 	case PE_DEFN_PRTS:
 	case PE_DEFN_VISS:
-	    p1 -> string__significance =
-				int_DOCS_string__significance_variable;
-	    break;
+		p1->string__significance = int_DOCS_string__significance_variable;
+		break;
 
 	case PE_DEFN_T61S:
 	case PE_DEFN_VTXS:
 	case PE_DEFN_IA5S:
 	case PE_DEFN_GENS:
-	    p1 -> string__significance =
-				int_DOCS_string__significance_not__significant;
-	    break;
-    }
+		p1->string__significance = int_DOCS_string__significance_not__significant;
+		break;
+	}
 
 #ifndef	BRIDGE
-    if ((gd = fd) == NOTOK
-	    && (file == NULLCP || (gd = open (file, O_RDONLY)) == NOTOK))
-	return OK;
+	if ((gd = fd) == NOTOK && (file == NULLCP || (gd = open(file, O_RDONLY)) == NOTOK))
+		return OK;
 
-    if (fd != NOTOK) {
-	pos = lseek (gd, 0L, L_INCR);
-	(void) lseek (gd, 0L, L_SET);
-    }
+	if (fd != NOTOK) {
+		pos = lseek(gd, 0L, L_INCR);
+		(void) lseek(gd, 0L, L_SET);
+	}
 #ifndef	MAXBSIZE
-    n = read (gd, buffer, sizeof buffer);
+	n = read(gd, buffer, sizeof buffer);
 #else
-    n = 0 < st -> st_blksize && st -> st_blksize <= sizeof buffer 
-		? st -> st_blksize : sizeof buffer;
-    n = read (gd, buffer, n);
+	n = 0 < st->st_blksize && st->st_blksize <= sizeof buffer ? st->st_blksize : sizeof buffer;
+	n = read(gd, buffer, n);
 #endif
-    if (fd != NOTOK && pos != -1L)
-	(void) lseek (gd, pos, L_SET);
+	if (fd != NOTOK && pos != -1L)
+		(void) lseek(gd, pos, L_SET);
 
-    if (fd == NOTOK)
-	(void) close (gd);
+	if (fd == NOTOK)
+		(void) close(gd);
 
-    for (cp = buffer + n - 1; cp >= buffer; cp--)
-	if (!isIA5 (*cp))
-	    return NOTOK;
-    return DONE;
+	for (cp = buffer + n - 1; cp >= buffer; cp--)
+		if (!isIA5(*cp))
+			return NOTOK;
+	return DONE;
 #else
-    return OK;
+	return OK;
 #endif
 }
 
@@ -359,28 +395,28 @@ int	ftamfd;
 
 /* ARGSUSED */
 
-int	fdfpeek (vf, fd, file, st, ftamfd)
-register struct vfsmap *vf;
-int	fd;
-char   *file;
-struct stat *st;
-int	ftamfd;
+int
+fdfpeek(vf, fd, file, st, ftamfd)
+	register struct vfsmap *vf;
+	int fd;
+	char *file;
+	struct stat *st;
+	int ftamfd;
 {
-    struct type_DOCS_NBS__9__Parameters *p9;
-    struct FTAMindication ftis;
+	struct type_DOCS_NBS__9__Parameters *p9;
+	struct FTAMindication ftis;
 
-    if (vf -> vf_parameter && (vf -> vf_flags & VF_PARM))
-	(void) fre_obj (vf -> vf_parameter,
-			_ZDOCS_mod.md_dtab[vf -> vf_number], &_ZDOCS_mod, 1);
+	if (vf->vf_parameter && (vf->vf_flags & VF_PARM))
+		(void) fre_obj(vf->vf_parameter, _ZDOCS_mod.md_dtab[vf->vf_number], &_ZDOCS_mod, 1);
 
-    vf -> vf_parameter = NULLCP, vf -> vf_flags &= ~VF_PARM;
+	vf->vf_parameter = NULLCP, vf->vf_flags &= ~VF_PARM;
 
-    if (fdf_names2p (ftamfd, FA_RDATTR, &p9, &ftis) == NOTOK)
-	return NOTOK;
+	if (fdf_names2p(ftamfd, FA_RDATTR, &p9, &ftis) == NOTOK)
+		return NOTOK;
 
-    vf -> vf_parameter = (caddr_t) p9;
+	vf->vf_parameter = (caddr_t) p9;
 
-    return DONE;
+	return DONE;
 }
 
 /*  */
@@ -391,104 +427,98 @@ int	ftamfd;
    generate escape sequences...
  */
 
-
-int	de2fd (fd, pe, text, effector)
-int	fd;
-PE	pe;
-int	text,
-	effector;
+int
+de2fd(fd, pe, text, effector)
+	int fd;
+	PE pe;
+	int text, effector;
 {
-    register int    i,
-		    n;
-		register char  *bp,
-			       *cp,
-			       *ep;
-    register PE	    p;
+	register int i, n;
+	register char *bp, *cp, *ep;
+	register PE p;
 
-    if (pe -> pe_form == PE_FORM_CONS) {
-	    for (p = pe -> pe_cons, n = 0; p; p = p -> pe_next, n += i)
-		if ((i = de2fd (fd, p, text, 1)) == NOTOK)
-		    return NOTOK;
-	goto outside;
-    }
-
-    if (!text) {
-	n = pe -> pe_len;
-	if (write (fd, (char *) pe -> pe_prim, n) != n)
-	    return NOTOK;
-	goto outside;
-    }
-
-    n = 0;
-    cp = (char *) pe -> pe_prim;
-    for (ep = (bp = cp) + pe -> pe_len; bp < ep;)
-	switch (*bp) {
-#ifndef	BRIDGE
-	     case '\r':
-		if (!effector) {
-		    bp++;
-		    break;
-		}
-		*bp++ = '\n';
-		i = bp - cp;
-		if (write (fd, cp, i) != i)
-		    return NOTOK;
-		cp = ++bp, n += i;
-		break;
-#endif
-
-	    case 033:
-		switch (*++bp) {
-		    case 0x28:	/* G0: 02/08 04/02 */
-			if (*++bp == 0x42) {
-			    register char *dp;
-
-write_it: ;
-			    dp = bp - 2;
-			    if ((i = (dp - cp)) > 0
-				    && write (fd, cp, i) != i)
+	if (pe->pe_form == PE_FORM_CONS) {
+		for (p = pe->pe_cons, n = 0; p; p = p->pe_next, n += i)
+			if ((i = de2fd(fd, p, text, 1)) == NOTOK)
 				return NOTOK;
-			    cp = ++bp, n += i;
-			}
-			else
-			    bp--;
-			break;
-
-		    case 0x2d:	/* G1: 02/13 04/01 */
-			if (*++bp == 0x41)
-			    goto write_it;
-			else
-			    bp--;
-			break;
-
-		    default:	/* unknown, pass it on... */
-			break;
-		}
-		break;
-
-	    default:
-		bp++;
-		break;
+		goto outside;
 	}
 
-    if (i = bp - cp) {
-	if (write (fd, cp, i) != i)
-	    return NOTOK;
+	if (!text) {
+		n = pe->pe_len;
+		if (write(fd, (char *) pe->pe_prim, n) != n)
+			return NOTOK;
+		goto outside;
+	}
 
-	n += i;
-    }
-
-outside: ;
-    if (text && !effector) {
+	n = 0;
+	cp = (char *) pe->pe_prim;
+	for (ep = (bp = cp) + pe->pe_len; bp < ep;)
+		switch (*bp) {
 #ifndef	BRIDGE
-	if (write (fd, "\n", 1) != 1)
-#else
-	if (write (fd, "\r\n", 2) != 2)
+		case '\r':
+			if (!effector) {
+				bp++;
+				break;
+			}
+			*bp++ = '\n';
+			i = bp - cp;
+			if (write(fd, cp, i) != i)
+				return NOTOK;
+			cp = ++bp, n += i;
+			break;
 #endif
-	    return NOTOK;
-    }
 
-    return n;
+		case 033:
+			switch (*++bp) {
+			case 0x28:	/* G0: 02/08 04/02 */
+				if (*++bp == 0x42) {
+					register char *dp;
+
+				      write_it:;
+					dp = bp - 2;
+					if ((i = (dp - cp)) > 0 && write(fd, cp, i) != i)
+						return NOTOK;
+					cp = ++bp, n += i;
+				} else
+					bp--;
+				break;
+
+			case 0x2d:	/* G1: 02/13 04/01 */
+				if (*++bp == 0x41)
+					goto write_it;
+				else
+					bp--;
+				break;
+
+			default:	/* unknown, pass it on... */
+				break;
+			}
+			break;
+
+		default:
+			bp++;
+			break;
+		}
+
+	if (i = bp - cp) {
+		if (write(fd, cp, i) != i)
+			return NOTOK;
+
+		n += i;
+	}
+
+      outside:;
+	if (text && !effector) {
+#ifndef	BRIDGE
+		if (write(fd, "\n", 1) != 1)
+#else
+		if (write(fd, "\r\n", 2) != 2)
+#endif
+			return NOTOK;
+	}
+
+	return n;
 }
 
 /*  */
@@ -502,75 +532,73 @@ outside: ;
 #define	PWD	"../"
 #define	NPWD	(sizeof PWD - 1)
 
-
-int	compath (f)
-register char  *f;
+int
+compath(f)
+	register char *f;
 {
-    register char  *cp,
-                   *dp;
+	register char *cp, *dp;
 
-    if (*f != '/')
-	return;
+	if (*f != '/')
+		return;
 
-    for (cp = f; *cp;)
-	if (*cp == '/') {
-	    switch (*++cp) {
-		case 0: 
-		    if (--cp > f)
-			*cp = NULL;
-		    break;
+	for (cp = f; *cp;)
+		if (*cp == '/') {
+			switch (*++cp) {
+			case 0:
+				if (--cp > f)
+					*cp = NULL;
+				break;
 
-		case '/': 
+			case '/':
 #ifdef apollo
-                    if ((f+1) == cp) {
+				if ((f + 1) == cp) {
+					cp++;
+					continue;
+				}
+#endif
+				for (dp = cp; *dp == '/'; dp++)
+					continue;
+				(void) strcpy(cp--, dp);
+				continue;
+
+			case '.':
+				if (strcmp(cp, DOT) == 0) {
+					if (cp > f + 1)
+						cp--;
+					*cp = NULL;
+					break;
+				}
+				if (strcmp(cp, DOTDOT) == 0) {
+					for (cp -= 2; cp > f; cp--)
+						if (*cp == '/')
+							break;
+					if (cp <= f)
+						cp = f + 1;
+					*cp = NULL;
+					break;
+				}
+				if (strncmp(cp, PWD, NPWD) == 0) {
+					for (dp = cp - 2; dp > f; dp--)
+						if (*dp == '/')
+							break;
+					if (dp <= f)
+						dp = f;
+					(void) strcpy(dp, cp + NPWD - 1);
+					cp = dp;
+					continue;
+				}
+				if (strncmp(cp, CWD, NCWD) == 0) {
+					(void) strcpy(cp - 1, cp + NCWD - 1);
+					cp--;
+					continue;
+				}
+				continue;
+
+			default:
+				cp++;
+				continue;
+			}
+			break;
+		} else
 			cp++;
-			continue;
-                    }
-#endif                    
-		    for (dp = cp; *dp == '/'; dp++)
-			continue;
-		    (void) strcpy (cp--, dp);
-		    continue;
-
-		case '.': 
-		    if (strcmp (cp, DOT) == 0) {
-			if (cp > f + 1)
-			    cp--;
-			*cp = NULL;
-			break;
-		    }
-		    if (strcmp (cp, DOTDOT) == 0) {
-			for (cp -= 2; cp > f; cp--)
-			    if (*cp == '/')
-				break;
-			if (cp <= f)
-			    cp = f + 1;
-			*cp = NULL;
-			break;
-		    }
-		    if (strncmp (cp, PWD, NPWD) == 0) {
-			for (dp = cp - 2; dp > f; dp--)
-			    if (*dp == '/')
-				break;
-			if (dp <= f)
-			    dp = f;
-			(void) strcpy (dp, cp + NPWD - 1);
-			cp = dp;
-			continue;
-		    }
-		    if (strncmp (cp, CWD, NCWD) == 0) {
-			(void) strcpy (cp - 1, cp + NCWD - 1);
-			cp--;
-			continue;
-		    }
-		    continue;
-
-		default: 
-		    cp++;
-		    continue;
-	    }
-	    break;
-	}
-	else
-	    cp++;
 }

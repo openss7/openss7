@@ -1,7 +1,65 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* install.c - installation of files on remote host */
 
 /*
- * $Header: /xtel/isode/isode/others/idist/RCS/install.c,v 9.0 1992/06/16 12:42:00 isode Rel $
+ * Header: /xtel/isode/isode/others/idist/RCS/install.c,v 9.0 1992/06/16 12:42:00 isode Rel
  *
  * Installation of files on remote host - the routines here drive the
  * protocol for installation, comparision and deletion etc. The
@@ -15,7 +73,7 @@
  * Nottingham University Computer Science
  * 
  *
- * $Log: install.c,v $
+ * Log: install.c,v
  * Revision 9.0  1992/06/16  12:42:00  isode
  * Release 8.0
  *
@@ -42,27 +100,28 @@
 
 #ifndef lint
 static char sccsid[] = "@(#)server.c    5.12 (Berkeley) 6/1/90";
-static char rcsid[] = "$Header: /xtel/isode/isode/others/idist/RCS/install.c,v 9.0 1992/06/16 12:42:00 isode Rel $";
+static char rcsid[] =
+    "Header: /xtel/isode/isode/others/idist/RCS/install.c,v 9.0 1992/06/16 12:42:00 isode Rel";
 #endif
 
 #include "defs.h"
 #include "sys.file.h"
 
-struct	linkbuf *ihead;		/* list of files with more than one link */
-char	target[BUFSIZ];		/* target/source directory name */
-char	basename[BUFSIZ];	/* base of directory operations */
-char	*tp;			/* pointer to end of target name */
-char	*Tdest;			/* pointer to last T dest*/
-int	catname;		/* cat name to target name */
-char	*stp[128];		/* stack of saved tp's for directories */
-int	oumask;			/* old umask for creating files */
-char	tranbuf[1024*8];	/* 8K at a time... */
+struct linkbuf *ihead;			/* list of files with more than one link */
+char target[BUFSIZ];			/* target/source directory name */
+char basename[BUFSIZ];			/* base of directory operations */
+char *tp;				/* pointer to end of target name */
+char *Tdest;				/* pointer to last T dest */
+int catname;				/* cat name to target name */
+char *stp[128];				/* stack of saved tp's for directories */
+int oumask;				/* old umask for creating files */
+char tranbuf[1024 * 8];			/* 8K at a time... */
 
-extern	FILE *lfp;		/* log file for mailing changes */
+extern FILE *lfp;			/* log file for mailing changes */
 
-SFD	cleanup();
-struct	linkbuf *savelink();
-extern char *getstring ();
+SFD cleanup();
+struct linkbuf *savelink();
+extern char *getstring();
 
 /*
  * Update the file(s) if they are different.
@@ -77,18 +136,17 @@ install(src, dest, destdir, opts)
 	char destcopy[BUFSIZ];
 
 	if (dest == NULL) {
-		opts &= ~WHOLE; /* WHOLE mode only useful if renaming */
+		opts &= ~WHOLE;	/* WHOLE mode only useful if renaming */
 		dest = src;
 	}
 
 	if (nflag || debug) {
 		(void) printf("%s%s%s%s%s%s %s %s\n",
-		       opts & VERIFY ? "verify":"install",
-		       opts & WHOLE ? " -w" : "",
-		       opts & YOUNGER ? " -y" : "",
-		       opts & COMPARE ? " -b" : "",
-		       opts & REMOVE ? " -R" : "",
-		       opts & QUERYM ? " -Q" : "", src, dest);
+			      opts & VERIFY ? "verify" : "install",
+			      opts & WHOLE ? " -w" : "",
+			      opts & YOUNGER ? " -y" : "",
+			      opts & COMPARE ? " -b" : "",
+			      opts & REMOVE ? " -R" : "", opts & QUERYM ? " -Q" : "", src, dest);
 		if (nflag)
 			return;
 	}
@@ -97,10 +155,10 @@ install(src, dest, destdir, opts)
 	if (rname == NULL)
 		return;
 	tp = target;
-	(void) strcpy (basename, target);
+	(void) strcpy(basename, target);
 	while (*tp)
 		tp++;
-	/*
+	/* 
 	 * If we are renaming a directory and we want to preserve
 	 * the directory heirarchy (-w), we must strip off the leading
 	 * directory name and preserve the rest.
@@ -119,10 +177,10 @@ install(src, dest, destdir, opts)
 	}
 	if (debug)
 		(void) printf("target = %s, rname = %s\n", target, rname);
-	/*
+	/* 
 	 * Pass the destination file/directory name to remote.
 	 */
-	if (initdir (destdir, dest) < 0)
+	if (initdir(destdir, dest) < 0)
 		return;
 
 	(void) strcpy(destcopy, dest);
@@ -150,7 +208,7 @@ sendf(rname, opts)
 	struct dirent *dp;
 	char *otp, *cp;
 	extern struct subcmd *subcmds;
-	char	buf[BUFSIZ];
+	char buf[BUFSIZ];
 	static char uname[15], group[15];
 
 	if (debug)
@@ -159,7 +217,7 @@ sendf(rname, opts)
 	if (except(target))
 		return;
 	if ((opts & FOLLOW ? stat(target, &stb) : lstat(target, &stb)) < 0) {
-		advise (target, "Can't stat");
+		advise(target, "Can't stat");
 		return;
 	}
 	if ((u = update(rname, opts, &stb)) == 0) {
@@ -186,26 +244,25 @@ sendf(rname, opts)
 			log(lfp, "does not exist, did not install: %s\n", target);
 			goto dospecial;
 		}
-#endif UW
+#endif	/* UW */
 		if (opts & VERIFY) {
 			log(lfp, "need to install: %s\n", target);
 			goto dospecial;
 		}
 		log(lfp, "installing: %s\n", target);
-		opts &= ~(COMPARE|REMOVE);
+		opts &= ~(COMPARE | REMOVE);
 	}
 
 	switch (stb.st_mode & S_IFMT) {
 	case S_IFDIR:
 		if ((d = opendir(target)) == NULL) {
-			advise (target, "Can't open directory");
+			advise(target, "Can't open directory");
 			return;
 		}
-		if (transfer (stb.st_mode & S_IFMT, opts,
-			      stb.st_mode & 07777, (off_t)0, (time_t)0,
-			      protoname (), protogroup (),
-			      rname, "") < 0) {
-			(void) closedir (d);
+		if (transfer(stb.st_mode & S_IFMT, opts,
+			     stb.st_mode & 07777, (off_t) 0, (time_t) 0,
+			     protoname(), protogroup(), rname, "") < 0) {
+			(void) closedir(d);
 			return;
 		}
 
@@ -215,24 +272,21 @@ sendf(rname, opts)
 		otp = tp;
 		len = tp - target;
 		while (dp = readdir(d)) {
-			if (!strcmp(dp->d_name, ".") ||
-			    !strcmp(dp->d_name, ".."))
+			if (!strcmp(dp->d_name, ".") || !strcmp(dp->d_name, ".."))
 				continue;
-			if (len + 1 + (int)strlen(dp->d_name) >= BUFSIZ - 1) {
-				advise (NULLCP, "%s/%s name too long",
-					target, dp->d_name);
+			if (len + 1 + (int) strlen(dp->d_name) >= BUFSIZ - 1) {
+				advise(NULLCP, "%s/%s name too long", target, dp->d_name);
 				continue;
 			}
 			tp = otp;
 			*tp++ = '/';
 			cp = dp->d_name;
-			while (*tp++ = *cp++)
-				;
+			while (*tp++ = *cp++) ;
 			tp--;
 			sendf(dp->d_name, opts);
 		}
 		(void) closedir(d);
-		(void) terminate (S_IFDIR, OK);
+		(void) terminate(S_IFDIR, OK);
 		tp = otp;
 		*tp = '\0';
 		return;
@@ -244,25 +298,21 @@ sendf(rname, opts)
 			struct linkbuf *lp;
 
 			if ((lp = savelink(&stb, opts)) != NULL) {
-				if (*lp -> target == 0)
-					(void) strcpy (buf, lp -> pathname);
-				else	(void) sprintf (buf, "%s/%s",
-							lp -> target,
-							lp -> pathname);
-				(void) transfer ((unsigned short)0, opts,
-						 (unsigned short)0, (off_t)0,
-						 (time_t)0, "", "",
-						 rname, buf);
+				if (*lp->target == 0)
+					(void) strcpy(buf, lp->pathname);
+				else
+					(void) sprintf(buf, "%s/%s", lp->target, lp->pathname);
+				(void) transfer((unsigned short) 0, opts,
+						(unsigned short) 0, (off_t) 0,
+						(time_t) 0, "", "", rname, buf);
 				return;
 			}
 		}
 		sizerr = (readlink(target, buf, BUFSIZ) != stb.st_size);
 		if (debug)
 			(void) printf("readlink = %.*s\n", stb.st_size, buf);
-		if (transfer (stb.st_mode & S_IFMT, opts, stb.st_mode & 07777,
-			      stb.st_size, stb.st_mtime,
-			      protoname (), protogroup (), rname,
-			      buf) < 0)
+		if (transfer(stb.st_mode & S_IFMT, opts, stb.st_mode & 07777,
+			     stb.st_size, stb.st_mtime, protoname(), protogroup(), rname, buf) < 0)
 			return;
 		goto done;
 
@@ -270,7 +320,7 @@ sendf(rname, opts)
 		break;
 
 	default:
-		advise (NULLCP, "%s: not a file or directory", target);
+		advise(NULLCP, "%s: not a file or directory", target);
 		return;
 	}
 
@@ -286,85 +336,81 @@ sendf(rname, opts)
 		struct linkbuf *lp;
 
 		if ((lp = savelink(&stb, opts)) != NULL) {
-			if (*lp -> target == 0)
-				(void) strcpy (buf, lp -> pathname);
-			else	(void) sprintf (buf, "%s/%s",
-						lp -> target,
-						lp -> pathname);
-			(void) transfer ((unsigned short)0, opts,
-					 (unsigned short)0, (off_t)0,
-					 (time_t)0, "", "",
-					 rname, buf);
+			if (*lp->target == 0)
+				(void) strcpy(buf, lp->pathname);
+			else
+				(void) sprintf(buf, "%s/%s", lp->target, lp->pathname);
+			(void) transfer((unsigned short) 0, opts,
+					(unsigned short) 0, (off_t) 0,
+					(time_t) 0, "", "", rname, buf);
 			return;
 		}
 	}
 
 	if ((f = open(target, O_RDONLY, 0)) < 0) {
-		advise (target, "Can't open file");
+		advise(target, "Can't open file");
 		return;
 	}
-	if ( transfer ((unsigned short)S_IFREG, opts, stb.st_mode & 07777,
-		       stb.st_size,
-		       stb.st_mtime, protoname (), protogroup (),
-		       rname, "") < 0) {
-		(void) close (f);
+	if (transfer((unsigned short) S_IFREG, opts, stb.st_mode & 07777,
+		     stb.st_size, stb.st_mtime, protoname(), protogroup(), rname, "") < 0) {
+		(void) close(f);
 		return;
 	}
 	sizerr = 0;
 	for (i = 0; i < stb.st_size; i += sizeof tranbuf) {
 		int amt = sizeof tranbuf;
+
 		if (i + amt > stb.st_size)
 			amt = stb.st_size - i;
 		if (sizerr == 0 && read(f, tranbuf, amt) != amt)
 			sizerr = 1;
-		if (tran_data (tranbuf, amt) == NOTOK)
+		if (tran_data(tranbuf, amt) == NOTOK)
 			break;
 	}
 	(void) close(f);
 	if (sizerr) {
-		advise (NULLCP, "%s: file changed size", target);
-		if (terminate (S_IFREG, NOTOK) < 0)
+		advise(NULLCP, "%s: file changed size", target);
+		if (terminate(S_IFREG, NOTOK) < 0)
 			return;
 	} else {
-		if (terminate (S_IFREG, OK) < 0)
+		if (terminate(S_IFREG, OK) < 0)
 			return;
 	}
-done:
+      done:
 	if (opts & COMPARE)
 		return;
-dospecial:
+      dospecial:
 	for (sc = subcmds; sc != NULL; sc = sc->sc_next) {
 		if (sc->sc_type != SPECIAL)
 			continue;
 #ifdef UW
-		if (opts & NOINSTALL)  /* don't do specials associated with
-					  non-installation notices */
+		if (opts & NOINSTALL)	/* don't do specials associated with non-installation
+					   notices */
 			continue;
-#endif UW
+#endif	/* UW */
 		if (sc->sc_args != NULL && !inlist(sc->sc_args, target))
 			continue;
 		log(lfp, "special \"%s\"\n", sc->sc_name);
 		if (opts & VERIFY)
 			continue;
-		(void) sprintf(buf, "FILE=%s;export FILE;%s",
-			       target, sc->sc_name);
-		(void) runspecial (buf);
-		
+		(void) sprintf(buf, "FILE=%s;export FILE;%s", target, sc->sc_name);
+		(void) runspecial(buf);
+
 	}
 }
 
 struct linkbuf *
 savelink(sp, opts)
-struct stat *sp;
-int	opts;
+	struct stat *sp;
+	int opts;
 {
 	struct linkbuf *lp;
-	extern	char *makestr ();
+	extern char *makestr();
 
 	for (lp = ihead; lp != NULL; lp = lp->nextp)
 		if (lp->inum == sp->st_ino && lp->devnum == sp->st_dev) {
 			lp->count--;
-			return(lp);
+			return (lp);
 		}
 	lp = (struct linkbuf *) malloc(sizeof(*lp));
 	if (lp == NULL)
@@ -376,21 +422,20 @@ int	opts;
 		lp->devnum = sp->st_dev;
 		lp->count = sp->st_nlink - 1;
 		if (opts & WHOLE)
-			lp->pathname = makestr (target);
+			lp->pathname = makestr(target);
 		else {
-			if (strncmp (target, basename, strlen(basename)) == 0)
-				lp -> pathname = makestr (target +
-							  strlen(basename) + 1);
+			if (strncmp(target, basename, strlen(basename)) == 0)
+				lp->pathname = makestr(target + strlen(basename) + 1);
 			else
-				lp -> pathname = makestr (target);
+				lp->pathname = makestr(target);
 		}
-				
+
 		if (Tdest)
-			lp->target = makestr (Tdest);
+			lp->target = makestr(Tdest);
 		else
 			*lp->target = 0;
 	}
-	return(NULL);
+	return (NULL);
 }
 
 update(rname, opts, sp)
@@ -401,63 +446,57 @@ update(rname, opts, sp)
 	off_t size;
 	time_t mtime;
 	unsigned short mode;
-	int	retval;
+	int retval;
 
-	if (debug) 
+	if (debug)
 		(void) printf("update(%s, %x, %x)\n", rname, opts, sp);
 
-	/*
+	/* 
 	 * Check to see if the file exists on the remote machine.
 	 */
-	switch (retval = rquery (rname, &mtime, &size, &mode)) {
-	    case DONE:  /* file doesn't exist so install it */
-		if ((opts & QUERYM) && !query ("Install",
-					       (int)(sp ->st_mode & S_IFMT),
-					       NULLCP))
+	switch (retval = rquery(rname, &mtime, &size, &mode)) {
+	case DONE:		/* file doesn't exist so install it */
+		if ((opts & QUERYM) && !query("Install", (int) (sp->st_mode & S_IFMT), NULLCP))
 			return 0;
-		return(1);
+		return (1);
 
-	    case NOTOK:	/* something went wrong! */
+	case NOTOK:		/* something went wrong! */
 		nerrs++;
-		return(0);
+		return (0);
 
-	    case OK:
+	case OK:
 		break;
 
-	    default:
-		advise (NULLCP, "update: unexpected response %d", retval);
-		return(0);
+	default:
+		advise(NULLCP, "update: unexpected response %d", retval);
+		return (0);
 	}
 
 	if (mode == S_IFDIR)
 		return (2);
 
 	if (opts & COMPARE) {
-		if ((opts & QUERYM) && !query ("Compare and update", 
-					       (int) mode, NULLCP))
+		if ((opts & QUERYM) && !query("Compare and update", (int) mode, NULLCP))
 			return 0;
-		return(3);
+		return (3);
 	}
 
-	/*
+	/* 
 	 * File needs to be updated?
 	 */
 	if (opts & YOUNGER) {
 		if (sp->st_mtime == mtime)
-			return(0);
+			return (0);
 		if (sp->st_mtime < mtime) {
 			log(lfp, "Warning: %s: remote copy is newer\n", target);
-			return(0);
+			return (0);
 		}
 	} else if (sp->st_mtime == mtime && sp->st_size == size)
-		return(0);
-	if ((opts & QUERYM) && !query ("Update",
-				       (int)(sp -> st_mode & S_IFMT), NULLCP))
+		return (0);
+	if ((opts & QUERYM) && !query("Update", (int) (sp->st_mode & S_IFMT), NULLCP))
 		return 0;
-	return(2);
+	return (2);
 }
-
-
 
 /*VARARGS2*/
 log(fp, fmt, a1, a2, a3)
@@ -477,45 +516,45 @@ log(fp, fmt, a1, a2, a3)
 /*
  * Remove temporary files and do any cleanup operations before exiting.
  */
-SFD cleanup()
+SFD
+cleanup()
 {
 	(void) unlink(utmpfile);
 	exit(1);
 }
 
-query (mess, mode, name)
-int	mode;
-char	*mess, *name;
+query(mess, mode, name)
+	int mode;
+	char *mess, *name;
 {
-	char	buf[BUFSIZ];
-	char	*cp;
+	char buf[BUFSIZ];
+	char *cp;
 
 	switch (mode) {
-	    case S_IFDIR:
+	case S_IFDIR:
 		cp = "directory";
 		break;
-	    case 0:
-	    case S_IFREG:
+	case 0:
+	case S_IFREG:
 		cp = "file";
 		break;
-	    case S_IFLNK:
+	case S_IFLNK:
 		cp = "symbolic link";
 		break;
-	    default:
+	default:
 		cp = "unknown file type";
 		break;
 	}
 
-	(void) sprintf (buf, "%s %s %s? ", mess, cp,
-			name == NULLCP ? target : name);
+	(void) sprintf(buf, "%s %s %s? ", mess, cp, name == NULLCP ? target : name);
 	for (;;) {
-		cp = getstring (buf);
+		cp = getstring(buf);
 		if (cp == NULLCP)
 			continue;
 		if (*cp == 'y' || *cp == 'Y' || *cp == 'n' || *cp == 'N')
 			break;
 	}
-	
+
 	if (*cp == 'y' || *cp == 'Y')
 		return 1;
 	return 0;

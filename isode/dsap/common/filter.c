@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* filter.c - Directory Operation Filters */
 
 #ifndef lint
-static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/filter.c,v 9.0 1992/06/16 12:12:39 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/dsap/common/RCS/filter.c,v 9.0 1992/06/16 12:12:39 isode Rel";
 #endif
 
 /*
- * $Header: /xtel/isode/isode/dsap/common/RCS/filter.c,v 9.0 1992/06/16 12:12:39 isode Rel $
+ * Header: /xtel/isode/isode/dsap/common/RCS/filter.c,v 9.0 1992/06/16 12:12:39 isode Rel
  *
  *
- * $Log: filter.c,v $
+ * Log: filter.c,v
  * Revision 9.0  1992/06/16  12:12:39  isode
  * Release 8.0
  *
@@ -24,195 +83,188 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/filter.c,v 9.0 
  *
  */
 
-
 /* LINTLIBRARY */
 
 #include "quipu/util.h"
 #include "quipu/ds_search.h"
 
-extern LLog * log_dsap;
+extern LLog *log_dsap;
 
-filter_free (filt)
-Filter filt;
+filter_free(filt)
+	Filter filt;
 {
-register Filter ptr;
-register Filter next;
+	register Filter ptr;
+	register Filter next;
 
-	for (ptr = filt; ptr != NULLFILTER; ptr=next) {
-		if (ptr->flt_type  == FILTER_ITEM) {
+	for (ptr = filt; ptr != NULLFILTER; ptr = next) {
+		if (ptr->flt_type == FILTER_ITEM) {
 			switch (ptr->FUITEM.fi_type) {
 			case FILTERITEM_EQUALITY:
 			case FILTERITEM_GREATEROREQUAL:
 			case FILTERITEM_LESSOREQUAL:
 			case FILTERITEM_APPROX:
-				AttrT_free (ptr->FUITEM.UNAVA.ava_type);
-				AttrV_free (ptr->FUITEM.UNAVA.ava_value);
+				AttrT_free(ptr->FUITEM.UNAVA.ava_type);
+				AttrV_free(ptr->FUITEM.UNAVA.ava_value);
 				break;
 			case FILTERITEM_PRESENT:
-				AttrT_free (ptr->FUITEM.UNTYPE);
+				AttrT_free(ptr->FUITEM.UNTYPE);
 				break;
 			case FILTERITEM_SUBSTRINGS:
-				AttrT_free (ptr->FUITEM.UNSUB.fi_sub_type);
-				avs_free (ptr->FUITEM.UNSUB.fi_sub_initial);
-				avs_free (ptr->FUITEM.UNSUB.fi_sub_any);
-				avs_free (ptr->FUITEM.UNSUB.fi_sub_final);
+				AttrT_free(ptr->FUITEM.UNSUB.fi_sub_type);
+				avs_free(ptr->FUITEM.UNSUB.fi_sub_initial);
+				avs_free(ptr->FUITEM.UNSUB.fi_sub_any);
+				avs_free(ptr->FUITEM.UNSUB.fi_sub_final);
 				break;
 			}
-		}  else
-			filter_free (ptr->flt_un.flt_un_filter);
+		} else
+			filter_free(ptr->flt_un.flt_un_filter);
 
 		next = ptr->flt_next;
-		free ((char *) ptr);
+		free((char *) ptr);
 	}
 }
 
-filter_append (a,b)
-Filter a,b;
+filter_append(a, b)
+	Filter a, b;
 {
-register Filter ptr,trail;
+	register Filter ptr, trail;
 
-	if ( a == NULLFILTER)
-		DLOG (log_dsap,LLOG_DEBUG,("appending to null filter !"));
+	if (a == NULLFILTER)
+		DLOG(log_dsap, LLOG_DEBUG, ("appending to null filter !"));
 
-	for (ptr=a; ptr!= NULLFILTER; ptr=ptr->flt_next)
+	for (ptr = a; ptr != NULLFILTER; ptr = ptr->flt_next)
 		trail = ptr;
 
 	trail->flt_next = b;
 }
 
-
-Filter strfilter (at,s,type)
-AttributeType at;
-char * s;
-char type;
+Filter
+strfilter(at, s, type)
+	AttributeType at;
+	char *s;
+	char type;
 {
-    Filter filt;
+	Filter filt;
 
-    at = AttrT_cpy (at);
-    filt = filter_alloc ();
-    filt -> flt_next = NULLFILTER;
-    filt -> flt_type = FILTER_ITEM;
+	at = AttrT_cpy(at);
+	filt = filter_alloc();
+	filt->flt_next = NULLFILTER;
+	filt->flt_type = FILTER_ITEM;
 
-    if (type == FILTERITEM_SUBSTRINGS || type == -FILTERITEM_SUBSTRINGS) {
-	char   *dp;
+	if (type == FILTERITEM_SUBSTRINGS || type == -FILTERITEM_SUBSTRINGS) {
+		char *dp;
 
-	if (*s == '*' && !s[1]) {
-	    filt -> FUITEM.fi_type = FILTERITEM_PRESENT;
-	    filt -> FUITEM.UNTYPE = at;
-	    goto all_done;
-	}
+		if (*s == '*' && !s[1]) {
+			filt->FUITEM.fi_type = FILTERITEM_PRESENT;
+			filt->FUITEM.UNTYPE = at;
+			goto all_done;
+		}
 
-	filt -> FUITEM.fi_type = FILTERITEM_SUBSTRINGS;
-	filt -> FUITEM.UNSUB.fi_sub_type = at;
-	filt -> FUITEM.UNSUB.fi_sub_initial = NULLAV;
-	filt -> FUITEM.UNSUB.fi_sub_any = NULLAV;
-	filt -> FUITEM.UNSUB.fi_sub_final = NULLAV;
-	if (dp = index (s, '*')) {
-	    char    buffer[BUFSIZ];
+		filt->FUITEM.fi_type = FILTERITEM_SUBSTRINGS;
+		filt->FUITEM.UNSUB.fi_sub_type = at;
+		filt->FUITEM.UNSUB.fi_sub_initial = NULLAV;
+		filt->FUITEM.UNSUB.fi_sub_any = NULLAV;
+		filt->FUITEM.UNSUB.fi_sub_final = NULLAV;
+		if (dp = index(s, '*')) {
+			char buffer[BUFSIZ];
 
-	    (void) strcpy (buffer, s);
-	    dp = buffer + (dp - s);
-	    s = buffer;
+			(void) strcpy(buffer, s);
+			dp = buffer + (dp - s);
+			s = buffer;
 
-	    *dp++ = NULL;
-	    if (*s)
-		if ((filt -> FUITEM.UNSUB.fi_sub_initial =
-		    str2avs (s, filt -> FUITEM.UNSUB.fi_sub_type)) == NULLAV)
-		    	return NULLFILTER;
-	    s = dp;
-
-	    if (dp = rindex (s, '*')) {
-		AV_Sequence any_end = NULL;
-
-		*dp++ = NULL;
-		if (*dp)
-		    if ((filt -> FUITEM.UNSUB.fi_sub_final =
-			str2avs (dp, filt -> FUITEM.UNSUB.fi_sub_type)) == NULLAV)
-		    		return NULLFILTER;
-
-
-		do {
-		    if (dp = index (s, '*'))
 			*dp++ = NULL;
-		    if (*s) {
-			AV_Sequence any;
+			if (*s)
+				if ((filt->FUITEM.UNSUB.fi_sub_initial =
+				     str2avs(s, filt->FUITEM.UNSUB.fi_sub_type)) == NULLAV)
+					return NULLFILTER;
+			s = dp;
 
-			if ((any = str2avs (s,
-				     filt -> FUITEM.UNSUB.fi_sub_type)) == NULLAV)
-		    		return NULLFILTER;
+			if (dp = rindex(s, '*')) {
+				AV_Sequence any_end = NULL;
 
+				*dp++ = NULL;
+				if (*dp)
+					if ((filt->FUITEM.UNSUB.fi_sub_final =
+					     str2avs(dp, filt->FUITEM.UNSUB.fi_sub_type)) == NULLAV)
+						return NULLFILTER;
 
-			if (any_end) {
-			    any_end -> avseq_next = any;
-			    any_end = any_end -> avseq_next;
-			}
-			else
-			    filt -> FUITEM.UNSUB.fi_sub_any = any_end = any;
-		    }
-		} while (s = dp);
-	    }
-	    else
-		if (*s)
-		    if ((filt -> FUITEM.UNSUB.fi_sub_final =
-			str2avs (s, filt -> FUITEM.UNSUB.fi_sub_type)) == NULLAV)
-		    		return NULLFILTER;
+				do {
+					if (dp = index(s, '*'))
+						*dp++ = NULL;
+					if (*s) {
+						AV_Sequence any;
+
+						if ((any = str2avs(s,
+								   filt->FUITEM.UNSUB.
+								   fi_sub_type)) == NULLAV)
+							return NULLFILTER;
+
+						if (any_end) {
+							any_end->avseq_next = any;
+							any_end = any_end->avseq_next;
+						} else
+							filt->FUITEM.UNSUB.fi_sub_any = any_end =
+							    any;
+					}
+				} while (s = dp);
+			} else if (*s)
+				if ((filt->FUITEM.UNSUB.fi_sub_final =
+				     str2avs(s, filt->FUITEM.UNSUB.fi_sub_type)) == NULLAV)
+					return NULLFILTER;
+
+		} else if (type == FILTERITEM_SUBSTRINGS)
+			if ((filt->FUITEM.UNSUB.fi_sub_any =
+			     str2avs(s, filt->FUITEM.UNSUB.fi_sub_type)) == NULLAV)
+				return NULLFILTER;
+
+			else if ((filt->FUITEM.UNSUB.fi_sub_initial =
+				  str2avs(s, filt->FUITEM.UNSUB.fi_sub_type)) == NULLAV)
+				return NULLFILTER;
+
+	} else {
+		filt->FUITEM.fi_type = type;
+		filt->FUITEM.UNAVA.ava_type = at;
+		if ((filt->FUITEM.UNAVA.ava_value =
+		     str2AttrV(s, filt->FUITEM.UNAVA.ava_type->oa_syntax)) == NULLAttrV)
+			return NULLFILTER;
 
 	}
-	else
-	    if (type == FILTERITEM_SUBSTRINGS)
-		if ((filt -> FUITEM.UNSUB.fi_sub_any =
-		    str2avs (s, filt -> FUITEM.UNSUB.fi_sub_type)) == NULLAV)
-		    	return NULLFILTER;
+      all_done:;
 
-	    else
-		if ((filt -> FUITEM.UNSUB.fi_sub_initial =
-		    str2avs (s, filt -> FUITEM.UNSUB.fi_sub_type)) == NULLAV)
-		    	return NULLFILTER;
-		    
-    }
-    else {
-	filt -> FUITEM.fi_type = type;
-	filt -> FUITEM.UNAVA.ava_type = at;
-	if ((filt -> FUITEM.UNAVA.ava_value =
-	    str2AttrV (s, filt -> FUITEM.UNAVA.ava_type -> oa_syntax)) == NULLAttrV)
-		    	return NULLFILTER;
-
-    }
-all_done: ;
-
-    return filt;
+	return filt;
 }
 
-Filter ocfilter (s)
-char * s;
+Filter
+ocfilter(s)
+	char *s;
 {
-Filter filt;
+	Filter filt;
 
-	filt = filter_alloc ();
+	filt = filter_alloc();
 	filt->flt_next = NULLFILTER;
 	filt->flt_type = FILTER_ITEM;
 	filt->FUITEM.fi_type = FILTERITEM_EQUALITY;
-	if ((filt->FUITEM.UNAVA.ava_type = AttrT_new ("ObjectClass")) == NULLAttrT) {
-		LLOG (log_dsap,LLOG_EXCEPTIONS,("ObjectClass attribute unknown"))
-		return NULLFILTER;
+	if ((filt->FUITEM.UNAVA.ava_type = AttrT_new("ObjectClass")) == NULLAttrT) {
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("ObjectClass attribute unknown"))
+		    return NULLFILTER;
 	}
-	filt->FUITEM.UNAVA.ava_value = str2AttrV(s,
-		filt->FUITEM.UNAVA.ava_type->oa_syntax);
+	filt->FUITEM.UNAVA.ava_value = str2AttrV(s, filt->FUITEM.UNAVA.ava_type->oa_syntax);
 	if (filt->FUITEM.UNAVA.ava_value == NULLAttrV) {
-		LLOG (log_dsap,LLOG_EXCEPTIONS,("'%s' unknown",s));
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("'%s' unknown", s));
 		return NULLFILTER;
 	}
 
 	return filt;
 }
 
-Filter joinfilter (f, type)
-Filter f;
-char type;
+Filter
+joinfilter(f, type)
+	Filter f;
+	char type;
 {
-Filter filt;
+	Filter filt;
 
-	filt = filter_alloc ();
+	filt = filter_alloc();
 	filt->flt_next = NULLFILTER;
 	filt->flt_type = type;
 	filt->FUFILT = f;
@@ -222,96 +274,95 @@ Filter filt;
 
 /* ARGSUSED */
 
-int	fi_print (ps, fi, format)
-PS	ps;
-Filter	fi;
-int	format;
+int
+fi_print(ps, fi, format)
+	PS ps;
+	Filter fi;
+	int format;
 {
-    print_filter (ps, fi, 0);
+	print_filter(ps, fi, 0);
 }
 
-
-print_filter (nps, fi, level)
-PS nps;
-register Filter	fi;
-int	level;
+print_filter(nps, fi, level)
+	PS nps;
+	register Filter fi;
+	int level;
 {
-    char   *cp;
-    register Filter    fi2;
-    register struct filter_item *fi3;
+	char *cp;
+	register Filter fi2;
+	register struct filter_item *fi3;
 
-    switch (fi -> flt_type) {
+	switch (fi->flt_type) {
 	case FILTER_ITEM:
-	    fi3 = &fi -> FUITEM;
-	    if (level)
-		ps_print (nps, "(");
-	    switch (fi3 -> fi_type) {
-	        case FILTERITEM_APPROX:
-		    cp = "~=";
-		    goto item;
+		fi3 = &fi->FUITEM;
+		if (level)
+			ps_print(nps, "(");
+		switch (fi3->fi_type) {
+		case FILTERITEM_APPROX:
+			cp = "~=";
+			goto item;
 
-	        case FILTERITEM_EQUALITY:
-		    cp = "=";
-		    goto item;
+		case FILTERITEM_EQUALITY:
+			cp = "=";
+			goto item;
 
-	        case FILTERITEM_GREATEROREQUAL:
-		    cp = ">=";
-		    goto item;
+		case FILTERITEM_GREATEROREQUAL:
+			cp = ">=";
+			goto item;
 
-	        case FILTERITEM_LESSOREQUAL:
-		    cp = ">=";
-item: ;
-		    AttrT_print (nps, fi3 -> UNAVA.ava_type, EDBOUT);
-		    ps_print (nps, cp);
-		    AttrV_print (nps, fi3 -> UNAVA.ava_value, EDBOUT);
-		    break;
+		case FILTERITEM_LESSOREQUAL:
+			cp = ">=";
+		      item:;
+			AttrT_print(nps, fi3->UNAVA.ava_type, EDBOUT);
+			ps_print(nps, cp);
+			AttrV_print(nps, fi3->UNAVA.ava_value, EDBOUT);
+			break;
 
-	        case FILTERITEM_SUBSTRINGS:
-		    AttrT_print (nps, fi3 -> UNSUB.fi_sub_type, EDBOUT);
-		    ps_print (nps, "=");
-		    avs_print_aux (nps, fi3 -> UNSUB.fi_sub_initial,EDBOUT,"*");
-		    ps_print (nps, "*");
-		    avs_print_aux (nps, fi3 -> UNSUB.fi_sub_any, EDBOUT, "*");
-		    ps_print (nps, "*");
-		    avs_print_aux (nps, fi3 -> UNSUB.fi_sub_final, EDBOUT, "*");
-		    break;
+		case FILTERITEM_SUBSTRINGS:
+			AttrT_print(nps, fi3->UNSUB.fi_sub_type, EDBOUT);
+			ps_print(nps, "=");
+			avs_print_aux(nps, fi3->UNSUB.fi_sub_initial, EDBOUT, "*");
+			ps_print(nps, "*");
+			avs_print_aux(nps, fi3->UNSUB.fi_sub_any, EDBOUT, "*");
+			ps_print(nps, "*");
+			avs_print_aux(nps, fi3->UNSUB.fi_sub_final, EDBOUT, "*");
+			break;
 
-	        case FILTERITEM_PRESENT:
-		    AttrT_print (nps, fi3 -> UNTYPE, EDBOUT);
-		    ps_print (nps, "=*");
-		    break;
+		case FILTERITEM_PRESENT:
+			AttrT_print(nps, fi3->UNTYPE, EDBOUT);
+			ps_print(nps, "=*");
+			break;
 
 		default:
-		    ps_printf (nps,
-			       "[internal error--malformed filter item type 0x%x]",
-			       fi3 -> fi_type);
-		    break;
-	    }
-	    if (level)
-		ps_print (nps, ")");
-	    break;
-	
+			ps_printf(nps,
+				  "[internal error--malformed filter item type 0x%x]",
+				  fi3->fi_type);
+			break;
+		}
+		if (level)
+			ps_print(nps, ")");
+		break;
+
 	case FILTER_AND:
-	    cp = "&";
-	    goto op;
+		cp = "&";
+		goto op;
 	case FILTER_OR:
-	    cp = "|";
-	    goto op;
+		cp = "|";
+		goto op;
 
 	case FILTER_NOT:
-	    cp = "!";
-op: ;
-	    ps_printf (nps, "(%s", cp);
-	    level++;
-	    for (fi2 = fi -> FUFILT; fi2; fi2 = fi2 -> flt_next) {
-		ps_print (nps, " ");
-		print_filter (nps, fi2, level);
-	    }
-	    ps_print (nps, ")");
-	    break;
+		cp = "!";
+	      op:;
+		ps_printf(nps, "(%s", cp);
+		level++;
+		for (fi2 = fi->FUFILT; fi2; fi2 = fi2->flt_next) {
+			ps_print(nps, " ");
+			print_filter(nps, fi2, level);
+		}
+		ps_print(nps, ")");
+		break;
 
 	default:
-	    ps_printf (nps, "[internal error--malformed filter type 0x%x]",
-		       fi -> flt_type);
-    }
+		ps_printf(nps, "[internal error--malformed filter type 0x%x]", fi->flt_type);
+	}
 }
