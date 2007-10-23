@@ -1,7 +1,66 @@
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __IDIST_DEFS_H__
+#define __IDIST_DEFS_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
 /* defs.h - general definitions for idist stuff */
 
 /*
- * $Header: /xtel/isode/isode/others/idist/RCS/defs.h,v 9.0 1992/06/16 12:42:00 isode Rel $
+ * Header: /xtel/isode/isode/others/idist/RCS/defs.h,v 9.0 1992/06/16 12:42:00 isode Rel
  *
  * General definitions used in the server & client parts of the idist
  * updating tools. This file not changed much from the original UCB rdist one.
@@ -10,7 +69,7 @@
  * Nottingham University Computer Science.
  * 
  *
- * $Log: defs.h,v $
+ * Log: defs.h,v 
  * Revision 9.0  1992/06/16  12:42:00  isode
  * Release 8.0
  *
@@ -101,7 +160,7 @@
 #define IGNLNKS	0x40
 #ifdef UW
 #define NOINSTALL	0x80
-#endif UW
+#endif				/* UW */
 #define QUERYM	0x100
 
 	/* expand type definitions */
@@ -128,52 +187,52 @@
 #undef n_name
 #endif
 
-struct namelist {	/* for making lists of strings */
-	char	*n_name;
-	struct	namelist *n_next;
+struct namelist {			/* for making lists of strings */
+	char *n_name;
+	struct namelist *n_next;
 };
 
 struct subcmd {
-	short	sc_type;	/* type - INSTALL,NOTIFY,EXCEPT,SPECIAL */
-	short	sc_options;
-	char	*sc_name;
-	struct	namelist *sc_args;
-	struct	subcmd *sc_next;
+	short sc_type;			/* type - INSTALL,NOTIFY,EXCEPT,SPECIAL */
+	short sc_options;
+	char *sc_name;
+	struct namelist *sc_args;
+	struct subcmd *sc_next;
 };
 
 struct cmd {
-	int	c_type;		/* type - ARROW,DCOLON */
-	char	*c_name;	/* hostname or time stamp file name */
-	char	*c_label;	/* label for partial update */
-	struct	namelist *c_files;
-	struct	subcmd *c_cmds;
-	struct	cmd *c_next;
+	int c_type;			/* type - ARROW,DCOLON */
+	char *c_name;			/* hostname or time stamp file name */
+	char *c_label;			/* label for partial update */
+	struct namelist *c_files;
+	struct subcmd *c_cmds;
+	struct cmd *c_next;
 };
 
 struct linkbuf {
-	ino_t	inum;
-	dev_t	devnum;
-	int	count;
-	char	*pathname;
-	char	*target;
-	struct	linkbuf *nextp;
+	ino_t inum;
+	dev_t devnum;
+	int count;
+	char *pathname;
+	char *target;
+	struct linkbuf *nextp;
 };
 
-extern int debug;		/* debugging flag */
-extern int nflag;		/* NOP flag, don't execute commands */
-extern int qflag;		/* Quiet. don't print messages */
-extern int options;		/* global options */
+extern int debug;			/* debugging flag */
+extern int nflag;			/* NOP flag, don't execute commands */
+extern int qflag;			/* Quiet. don't print messages */
+extern int options;			/* global options */
 
-extern int nerrs;		/* number of errors seen */
-extern int iamremote;		/* acting as remote server */
-extern char utmpfile[];		/* file name for logging changes */
-extern struct linkbuf *ihead;	/* list of files with more than one link */
-extern struct passwd *pw;	/* pointer to static area used by getpwent */
-extern struct group *gr;	/* pointer to static area used by getgrent */
-extern char *host;		/* host name of master copy */
-extern char homedir[];		/* home directory of current user */
-extern char user[];		/* the users name */
-extern int errno;		/* system error number */
+extern int nerrs;			/* number of errors seen */
+extern int iamremote;			/* acting as remote server */
+extern char utmpfile[];			/* file name for logging changes */
+extern struct linkbuf *ihead;		/* list of files with more than one link */
+extern struct passwd *pw;		/* pointer to static area used by getpwent */
+extern struct group *gr;		/* pointer to static area used by getgrent */
+extern char *host;			/* host name of master copy */
+extern char homedir[];			/* home directory of current user */
+extern char user[];			/* the users name */
+extern int errno;			/* system error number */
 extern char *sys_errlist[];
 extern char *myname;
 
@@ -184,4 +243,6 @@ struct namelist *lookup();
 struct namelist *expand();
 char *exptilde();
 
-void	adios (), advise ();
+void adios(), advise();
+
+#endif				/* __IDIST_DEFS_H__ */

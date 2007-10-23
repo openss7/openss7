@@ -1,10 +1,69 @@
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __CL_H_ISOSERVENT_H__
+#define __CL_H_ISOSERVENT_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
 /* isoservent.h - ISO services database access routines */
 
 /* 
- * $Header: /f/iso/h/RCS/isoservent.h,v 5.0 88/07/21 14:39:02 mrose Rel $
+ * Header: /f/iso/h/RCS/isoservent.h,v 5.0 88/07/21 14:39:02 mrose Rel
  *
  *
- * $Log$
+ * Log
  */
 
 /*
@@ -17,36 +76,34 @@
  *
  */
 
-/*  */
-
 #ifndef	_ISOSERVENT_
 #define	_ISOSERVENT_
 
-
 struct isoservent {
-    char         *is_entity;	/* name of entity */
-    char         *is_provider;	/* name of service provider */
+	char *is_entity;		/* name of entity */
+	char *is_provider;		/* name of service provider */
 
-#define	ISSIZE	64		/* xSAP selector/ID */
-    int		  is_selectlen;
-    union {
-	char		is_un_selector[ISSIZE];
-	unsigned short  is_un_port;
-    }		un_is;
+#define	ISSIZE	64			/* xSAP selector/ID */
+	int is_selectlen;
+	union {
+		char is_un_selector[ISSIZE];
+		unsigned short is_un_port;
+	} un_is;
 #define	is_selector	un_is.is_un_selector
 #define	is_port		un_is.is_un_port
 
-    char        **is_vec;	/* exec vector */
-    char        **is_tail;	/* next free slot in vector */
+	char **is_vec;			/* exec vector */
+	char **is_tail;			/* next free slot in vector */
 };
 
+int setisoservent(), endisoservent();
 
-int	setisoservent (), endisoservent ();
+struct isoservent *getisoservent();
 
-struct isoservent *getisoservent ();
-
-struct isoservent *getisoserventbyname ();
-struct isoservent *getisoserventbyselector ();
-struct isoservent *getisoserventbyport ();
+struct isoservent *getisoserventbyname();
+struct isoservent *getisoserventbyselector();
+struct isoservent *getisoserventbyport();
 
 #endif
+
+#endif				/* __CL_H_ISOSERVENT_H__ */

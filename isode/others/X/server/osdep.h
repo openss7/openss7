@@ -1,3 +1,62 @@
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __X_SERVER_OSDEP_H__
+#define __X_SERVER_OSDEP_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
 /***********************************************************
 Copyright 1987 by Digital Equipment Corporation, Maynard, Massachusetts,
 and the Massachusetts Institute of Technology, Cambridge, Massachusetts.
@@ -21,7 +80,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************/
-/* $XConsortium: osdep.h,v 1.15 88/09/06 15:50:47 jim Exp $ */
+/* XConsortium: osdep.h,v 1.15 88/09/06 15:50:47 jim Exp */
 
 #ifndef NULL
 #define NULL 0
@@ -30,7 +89,7 @@ SOFTWARE.
 #define BUFSIZE 4096
 #define BUFWATERMARK 8192
 #define MAXBUFSIZE (1 << 18)
-#if (NOFILE <= 128) /* 128 is value of MAXCLIENTS in dix layer */
+#if (NOFILE <= 128)		/* 128 is value of MAXCLIENTS in dix layer */
 #define MAXSOCKS (NOFILE - 1)
 #else
 #define MAXSOCKS 128
@@ -136,19 +195,19 @@ SOFTWARE.
 #endif
 
 typedef struct _connectionInput {
-    int used;                  /* is this client connected */
-    char *buffer;               /* contains current client input */
-    char *bufptr;               /* pointer to current start of data */
-    int  bufcnt;                /* count of bytes in buffer */
-    int lenLastReq;
-    int size;
+	int used;			/* is this client connected */
+	char *buffer;			/* contains current client input */
+	char *bufptr;			/* pointer to current start of data */
+	int bufcnt;			/* count of bytes in buffer */
+	int lenLastReq;
+	int size;
 } ConnectionInput;
 
 typedef struct _osComm {
-    int fd;
-    unsigned char *buf;
-    int bufsize;
-    int count;
+	int fd;
+	unsigned char *buf;
+	int bufsize;
+	int count;
 } OsCommRec, *OsCommPtr;
 
 void Notice();
@@ -156,7 +215,7 @@ void Notice();
 #ifdef ISOCONN
 #ifdef ISODEBUG
 extern int isodexbug;
-#endif /* ISODEBUG */
+#endif				/* ISODEBUG */
 /*
  * For want of a better place to put these for the moment...
  * 
@@ -164,7 +223,6 @@ extern int isodexbug;
  */
 
 #define FamilyIso 3
-
 
 #define UNIX_IO 0
 #define ISODE_IO 1
@@ -178,14 +236,13 @@ extern int isodexbug;
  */
 extern int fd2family[];
 
-extern int (*acceptfn[])(); 
-extern int (*getpeerfn[])(); 
-extern int (*readfn[])(); 
-extern int (*writefn[])(); 
-extern int (*readvfn[])(); 
-extern int (*writevfn[])(); 
-extern int (*closefn[])(); 
-
+extern int (*acceptfn[]) ();
+extern int (*getpeerfn[]) ();
+extern int (*readfn[]) ();
+extern int (*writefn[]) ();
+extern int (*readvfn[]) ();
+extern int (*writevfn[]) ();
+extern int (*closefn[]) ();
 
 #define SAccept(fd, a, b) \
 acceptfn[fd2family[fd]]((fd), (a), (b))
@@ -205,4 +262,6 @@ writevfn[fd2family[(fd)]]((fd), (iov), (iovcnt))
 #define SClose(fd) \
 closefn[fd2family[(fd)]]((fd))
 
-#endif /* ISOCONN */
+#endif				/* ISOCONN */
+
+#endif				/* __X_SERVER_OSDEP_H__ */

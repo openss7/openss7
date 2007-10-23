@@ -1,12 +1,71 @@
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __ISODE_PPKT_H__
+#define __ISODE_PPKT_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
 /* ppkt.h - include file for presentation providers (PS-PROVIDER) */
 
 /* 
- * $Header: /xtel/isode/isode/h/RCS/ppkt.h,v 9.0 1992/06/16 12:17:57 isode Rel $
+ * Header: /xtel/isode/isode/h/RCS/ppkt.h,v 9.0 1992/06/16 12:17:57 isode Rel
  *
  * RFC1085 (LPP) support contributed by the Wollongong Group, Inc.
  *
  *
- * $Log: ppkt.h,v $
+ * Log: ppkt.h,v
  * Revision 9.0  1992/06/16  12:17:57  isode
  * Release 8.0
  *
@@ -22,14 +81,11 @@
  *
  */
 
-
 #ifndef	_PSAP2_
 #include "psap2.h"		/* definitions for PS-USERs */
 #endif
 
 #include "ssap.h"		/* definitinos for SS-USERs */
-
-/*  */
 
 #define	psapPsig(pb, sd) \
 { \
@@ -125,14 +181,10 @@
 #define	copyPSAPdata(base,len,d)	bcopy (base, (char *) d, len)
 #endif
 
-
 #define	pylose(p) \
 	ppktlose (pb, pi, PC_UNRECOGNIZED, (p), NULLCP, "%s", PY_pepy)
 
-
-int	ppktlose (), psaplose ();
-
-/*  */
+int ppktlose(), psaplose();
 
 #define	DFLT_ASN	"iso asn.1 abstract syntax"
 #define	DFLT_ATN	BER
@@ -148,82 +200,82 @@ int	ppktlose (), psaplose ();
 #define	atn_is_ok(pb,atn)	atn_is_ber ((pb), (atn))
 #define	atn_is_ber(pb,atn)	(!oid_cmp (pb -> pb_ber, atn))
 
-
 struct psapblk {
-    struct psapblk *pb_forw;	/* doubly-linked list */
-    struct psapblk *pb_back;	/*   .. */
+	struct psapblk *pb_forw;	/* doubly-linked list */
+	struct psapblk *pb_back;	/* .. */
 
-    int	    pb_fd;		/* session descriptor */
+	int pb_fd;			/* session descriptor */
 
-    short   pb_flags;		/* our state */
+	short pb_flags;			/* our state */
 #define	PB_NULL		0x00
-#define	PB_CONN		0x01	/* connected */
-#define	PB_FINN		0x02	/* other side wants to finish */
-#define	PB_ASYN		0x04	/* asynchronous */
-#define	PB_DFLT		0x10	/* respond with default context result */
-#define	PB_RELEASE	0x20	/* release in progress */
-#define PB_MAGIC	0x40	/* backwards compat hack */
+#define	PB_CONN		0x01		/* connected */
+#define	PB_FINN		0x02		/* other side wants to finish */
+#define	PB_ASYN		0x04		/* asynchronous */
+#define	PB_DFLT		0x10		/* respond with default context result */
+#define	PB_RELEASE	0x20		/* release in progress */
+#define PB_MAGIC	0x40		/* backwards compat hack */
 
 #ifndef	LPP
-    char   *pb_retry;		/* initial/final ppkt */
-    char   *pb_realbase;
-    int	    pb_len;
+	char *pb_retry;			/* initial/final ppkt */
+	char *pb_realbase;
+	int pb_len;
 #else
-    PE      pb_retry;
-    PE	    pb_response;
+	PE pb_retry;
+	PE pb_response;
 
-    struct type_PS_SessionConnectionIdentifier *pb_reference;
+	struct type_PS_SessionConnectionIdentifier *pb_reference;
 
-    PS	    pb_stream;
+	PS pb_stream;
 
-    int	    pb_reliability;
+	int pb_reliability;
 
-    int	    pb_maxtries;
-    int	    pb_tries;
+	int pb_maxtries;
+	int pb_tries;
 #endif
 
-    int	    pb_ncontext;	/* presentation context set */
-    struct PSAPcontext pb_contexts[NPCTX];
+	int pb_ncontext;		/* presentation context set */
+	struct PSAPcontext pb_contexts[NPCTX];
 
-    OID	    pb_asn;		/* default: abstract syntax name */
-    OID	    pb_atn;		/*   ..     abstract transfer name */
-    int	    pb_dctxid;		/*   ..	    id */
-    int	    pb_result;		/* 	    response */
-    
-    OID	    pb_ber;		/* BER */
+	OID pb_asn;			/* default: abstract syntax name */
+	OID pb_atn;			/* ..  abstract transfer name */
+	int pb_dctxid;			/* ..  id */
+	int pb_result;			/* response */
 
-    int	    pb_prequirements;	/* presentation requirements */
+	OID pb_ber;			/* BER */
 
-    int	    pb_srequirements;	/* our session requirements */
-    int	    pb_urequirements;	/* user's session requirements */
-    int	    pb_owned;		/* session tokens we own */
-    int	    pb_avail;		/* session tokens available */
-    int	    pb_ssdusize;	/* largest atomic SSDU */
+	int pb_prequirements;		/* presentation requirements */
+
+	int pb_srequirements;		/* our session requirements */
+	int pb_urequirements;		/* user's session requirements */
+	int pb_owned;			/* session tokens we own */
+	int pb_avail;			/* session tokens available */
+	int pb_ssdusize;		/* largest atomic SSDU */
 
 #ifdef	LPP
-    struct NSAPaddr pb_initiating;	/* initiator */
+	struct NSAPaddr pb_initiating;	/* initiator */
 #endif
-    struct PSAPaddr pb_responding;	/* responder */
+	struct PSAPaddr pb_responding;	/* responder */
 
-    IFP	    pb_DataIndication;		/* INDICATION handlers */
-    IFP	    pb_TokenIndication;		/*   .. */
-    IFP	    pb_SyncIndication;		/*   .. */
-    IFP	    pb_ActivityIndication;	/*   .. */
-    IFP	    pb_ReportIndication;	/*   .. */
-    IFP	    pb_ReleaseIndication;	/*   .. */
-    IFP	    pb_AbortIndication;		/*   .. */
+	IFP pb_DataIndication;		/* INDICATION handlers */
+	IFP pb_TokenIndication;		/* .. */
+	IFP pb_SyncIndication;		/* .. */
+	IFP pb_ActivityIndication;	/* .. */
+	IFP pb_ReportIndication;	/* .. */
+	IFP pb_ReleaseIndication;	/* .. */
+	IFP pb_AbortIndication;		/* .. */
 
 #ifdef	LPP
-    IFP	    pb_retryfnx;
-    IFP     pb_closefnx;
-    IFP	    pb_selectfnx;
-    IFP	    pb_checkfnx;
+	IFP pb_retryfnx;
+	IFP pb_closefnx;
+	IFP pb_selectfnx;
+	IFP pb_checkfnx;
 #endif
 };
+
 #define	NULLPB		((struct psapblk *) 0)
 
-int	freepblk ();
-struct psapblk *newpblk (), *findpblk ();
+int freepblk();
+struct psapblk *newpblk(), *findpblk();
 
 #ifndef	LPP
 #define	PC_PROV_BASE		PC_NOTSPECIFIED
@@ -232,29 +284,25 @@ struct psapblk *newpblk (), *findpblk ();
 #define	PC_REASON_BASE \
 	(PC_ABSTRACT - int_PS_provider__reason_abstract__syntax__not__supported)
 
+struct type_PS_User__data *info2ppdu();
+int ppdu2info();
 
-struct type_PS_User__data *info2ppdu ();
-int	ppdu2info ();
+int info2ssdu(), ssdu2info(), qbuf2info();
 
-int	info2ssdu (), ssdu2info (), qbuf2info ();
+struct qbuf *info2qb();
+int qb2info();
 
-struct qbuf *info2qb ();
-int	qb2info ();
+struct type_PS_Identifier__list *silly_list();
 
-struct type_PS_Identifier__list *silly_list ();
-
-int	ss2pslose (), ss2psabort ();
-
+int ss2pslose(), ss2psabort();
 
 struct pair {
-    int	    p_mask;
-    int	    p_bitno;
+	int p_mask;
+	int p_bitno;
 };
 
 extern struct pair preq_pairs[], sreq_pairs[];
 #endif
-
-/*  */
 
 #define	REASON_BASE	PC_NOTSPECIFIED
 
@@ -281,13 +329,13 @@ extern struct pair preq_pairs[], sreq_pairs[];
 
 #define	NULLRF	((struct type_PS_SessionConnectionIdentifier *) 0)
 
-
 #define	pslose(pi,reason) \
     (reason != PS_ERR_NONE && reason != PS_ERR_IO \
 	? psaplose ((pi), PC_CONGEST, NULLCP, "%s", ps_error (reason)) \
 	: psaplose ((pi), PC_SESSION, NULLCP, NULLCP))
 
-
-int	pdu2sel (), refcmp ();
-struct SSAPref *pdu2ref ();
+int pdu2sel(), refcmp();
+struct SSAPref *pdu2ref();
 #endif
+
+#endif				/* __ISODE_PPKT_H__ */

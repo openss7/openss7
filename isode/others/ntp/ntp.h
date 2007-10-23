@@ -1,7 +1,66 @@
-/* $Header: /xtel/isode/isode/others/ntp/RCS/ntp.h,v 9.0 1992/06/16 12:42:48 isode Rel $ */
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __NTP_NTP_H__
+#define __NTP_NTP_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
+/* Header: /xtel/isode/isode/others/ntp/RCS/ntp.h,v 9.0 1992/06/16 12:42:48 isode Rel */
 
 /*
- *  $Log: ntp.h,v $
+ *  Log: ntp.h,v
  * Revision 9.0  1992/06/16  12:42:48  isode
  * Release 8.0
  *
@@ -52,7 +111,7 @@
 #endif
 
 #ifndef	NBBY
-#define	NBBY	8	/* number of bits per byte */
+#define	NBBY	8		/* number of bits per byte */
 #endif
 
 #ifdef DEBUG
@@ -74,7 +133,7 @@ struct Naddr {
 };
 
 typedef struct Refid {
-	char	rid_type;
+	char rid_type;
 #define RID_STRING 1
 #define RID_INET 2
 #define RID_PSAP 3
@@ -104,13 +163,13 @@ struct intf {
 #define INTF_ACCEPTING	010
 #define INTF_SELECT	(INTF_ACCEPTING|INTF_PENDING|INTF_VALID)
 	int if_flags;
-	char	*vec[4];
-	int	vecp;
-	int	inum;
+	char *vec[4];
+	int vecp;
+	int inum;
 };
 extern struct intf *addrs;
 extern int nintf;
-extern struct intf *getintf ();
+extern struct intf *getintf();
 
 #define	ACT_ERROR	1
 #define	ACT_RECV	2
@@ -139,7 +198,6 @@ struct list {
 	(((a) == UNSPECIFIED ? NTP_INFIN+1 : a) cond \
 	 ((b) == UNSPECIFIED ? NTP_INFIN+1 : (b)))
 
-
 /*
  *  Definitions outlined in the NTP spec
  */
@@ -159,11 +217,10 @@ struct list {
 #define	NTP_MAXWGT	8	/* maximum allowable dispersion */
 #define	NTP_MAXLIST	5	/* max size of selection list */
 #define	NTP_MAXSTRA	2	/* max number of strata in selection list */
-#define	X_NTP_CANDIDATES 64	/* number of peers to consider when doing
-				   clock selection */
+#define	X_NTP_CANDIDATES 64	/* number of peers to consider when doing clock selection */
 #define NTP_SELECT	0.75	/* weight used to compute dispersion */
 
-#define	PEER_MAXDISP	64.0	/* Maximum dispersion  */
+#define	PEER_MAXDISP	64.0	/* Maximum dispersion */
 #define	PEER_THRESHOLD	0.5	/* dispersion threshold */
 #define	PEER_FILTER	0.5	/* filter weight */
 
@@ -175,7 +232,6 @@ struct list {
 #define	PEER_SHIFT	8
 #define	NTP_WINDOW_SHIFT_MASK 0xff
 #endif
-
 
 /*
  *  5.1 Uniform Phase Adjustments
@@ -195,7 +251,7 @@ struct list {
 #define	CLOCK_TRACK	8
 #define	CLOCK_COMP	4
 #define	CLOCK_FACTOR	18
-
+
 /*
  * Structure definitions for NTP fixed point values
  *
@@ -254,9 +310,9 @@ struct s_fixedpt {
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
 struct ntpdata {
-	u_char status;		/* status of local clock and leap info */
-	u_char stratum;		/* Stratum level */
-	u_char ppoll;		/* poll value */
+	u_char status;			/* status of local clock and leap info */
+	u_char stratum;			/* Stratum level */
+	u_char ppoll;			/* poll value */
 	int precision:8;
 	struct s_fixedpt distance;
 	struct s_fixedpt dispersion;
@@ -271,6 +327,7 @@ struct ntpdata {
 	struct l_fixedpt mac;
 #endif
 };
+
 #define MAC_LEN         (sizeof(l_fp) + sizeof(u_long))
 #define LEN_PKT_MAC     (sizeof(struct pkt))
 #define LEN_PKT_NOMAC   (sizeof(struct pkt) - MAC_LEN)
@@ -291,7 +348,7 @@ struct ntpdata {
 #define	NTPVERSION_1	0x08
 #define	VERSIONMASK	0x38
 #define LEAPMASK	0xc0
-#ifdef  MODEMASK	/* SYS5 vnode.h again ! */
+#ifdef  MODEMASK		/* SYS5 vnode.h again ! */
 #undef  MODEMASK
 #endif
 #define	MODEMASK	0x07
@@ -316,13 +373,11 @@ struct ntpdata {
 #define	INFO_QUERY	62	/* **** THIS implementation dependent **** */
 #define	INFO_REPLY	63	/* **** THIS implementation dependent **** */
 
-
 /* =================  table 3.2 Peer Variables	================= */
 struct ntp_peer {
 	struct ntp_peer *next, *prev;
-	struct Naddr src;		/* both peer.srcadr and 
-					   peer.srcport */
-	int	flags;			/* local flags */
+	struct Naddr src;		/* both peer.srcadr and peer.srcport */
+	int flags;			/* local flags */
 #define	PEER_FL_CONFIG		0x0001
 #define	PEER_FL_AUTHENABLE	0x0002
 #define PEER_FL_SNOOZE		0x0004
@@ -334,49 +389,49 @@ struct ntp_peer {
 #define	PEER_FL_SELECTED	0x8000	/* actually used by query routine */
 #define PEER_FL_CONREQ		0x10000
 #define PEER_FL_CONNECTED	0x20000	/* connected */
-#define PEER_FL_CONINP1		0x40000 /* connection in progress - stage1 */
-#define PEER_FL_CONINP2		0x80000 /* connection in progress - stage2 */
+#define PEER_FL_CONINP1		0x40000	/* connection in progress - stage1 */
+#define PEER_FL_CONINP2		0x80000	/* connection in progress - stage2 */
 #define PEER_FL_CONNSTATE	(PEER_FL_CONINP2|PEER_FL_CONINP1|PEER_FL_CONNECTED)
-	int	sock;			/* index into sockets to derive
-					   peer.dstadr and peer.dstport */
-	u_char	leap;			/* receive */
-	u_char	hmode;			/* receive */
-	u_char	stratum;		/* receive */
-	u_char	ppoll;			/* receive */
-	u_char	hpoll;			/* poll update */
-	u_char	vers;			/* version */
+	int sock;			/* index into sockets to derive peer.dstadr and
+					   peer.dstport */
+	u_char leap;			/* receive */
+	u_char hmode;			/* receive */
+	u_char stratum;			/* receive */
+	u_char ppoll;			/* receive */
+	u_char hpoll;			/* poll update */
+	u_char vers;			/* version */
 #define PEERMODE_NORMAL	1
 #define PEERMODE_QUERY  2
-	u_char  mode;			/* mode */
-	short	precision;		/* receive */
-	struct	s_fixedpt distance;	/* receive */
-	struct	s_fixedpt dispersion;	/* receive */
-	Refid	refid;			/* receive */
-	struct	l_fixedpt reftime;	/* receive */
-	struct	l_fixedpt org;		/* receive, clear */
-	struct	l_fixedpt rec;		/* receive, clear */
-	struct	l_fixedpt xmt;		/* transmit, clear */
-	u_long	reach;			/* receive, transmit, clear */
-	u_long	valid;			/* packet, transmit, clear */
-	u_long	timer;			/* receive, transmit, poll update */
-	long	stopwatch;		/* <<local>> for timing */
-	/*
+	u_char mode;			/* mode */
+	short precision;		/* receive */
+	struct s_fixedpt distance;	/* receive */
+	struct s_fixedpt dispersion;	/* receive */
+	Refid refid;			/* receive */
+	struct l_fixedpt reftime;	/* receive */
+	struct l_fixedpt org;		/* receive, clear */
+	struct l_fixedpt rec;		/* receive, clear */
+	struct l_fixedpt xmt;		/* transmit, clear */
+	u_long reach;			/* receive, transmit, clear */
+	u_long valid;			/* packet, transmit, clear */
+	u_long timer;			/* receive, transmit, poll update */
+	long stopwatch;			/* <<local>> for timing */
+	/* 
 	 * first order offsets
 	 */
-	struct	filter {
+	struct filter {
 		short samples;		/* <<local>> */
 		double offset[PEER_SHIFT];
 		double delay[PEER_SHIFT];
 	} filter;			/* filter, clear */
 
-	double	estdelay;		/* filter */
-	double	estoffset;		/* filter */
-	double	estdisp;		/* filter */
+	double estdelay;		/* filter */
+	double estoffset;		/* filter */
+	double estdisp;			/* filter */
 
-	u_long	pkt_sent;		/* <<local>> */
-	u_long 	pkt_rcvd;		/* <<local>> */
-	u_long	pkt_dropped;		/* <<local>> */
-	int	backoff;		/* <<local>> */
+	u_long pkt_sent;		/* <<local>> */
+	u_long pkt_rcvd;		/* <<local>> */
+	u_long pkt_dropped;		/* <<local>> */
+	int backoff;			/* <<local>> */
 };
 
 /* ================= table 3.1:  System Variables ================= */
@@ -392,9 +447,9 @@ struct sysdata {			/* procedure */
 	int hold;			/* clock update */
 	struct ntp_peer *peer;		/* selection */
 	int maxpeers;			/* <<local>> */
-	u_char filler;		/* put here for %&*%$$ SUNs */
+	u_char filler;			/* put here for %&*%$$ SUNs */
 };
-
+
 #define	NTPDC_VERSION	2
 
 /*
@@ -420,26 +475,26 @@ struct clockinfo {
 	u_char filler1;
 	u_short reach;
 
-	long	estdisp;			/* scaled by 1000 */
-	long	estdelay;			/* in milliseconds */
-	long	estoffset;			/* in milliseconds */
+	long estdisp;			/* scaled by 1000 */
+	long estdelay;			/* in milliseconds */
+	long estoffset;			/* in milliseconds */
 	u_long refid;
 	struct l_fixedpt reftime;
 	struct info_filter {
 		short index;
 		short filler;
 		long offset[PEER_SHIFT];	/* in milliseconds */
-		long delay[PEER_SHIFT];		/* in milliseconds */
+		long delay[PEER_SHIFT];	/* in milliseconds */
 	} info_filter;
 };
 
 struct ntpinfo {
 	u_char version;
-	u_char type;		/* request type (stratum in ntp packets) */
-	u_char count;		/* number of entries in this packet */
-	u_char seq;		/* sequence number of this packet */
+	u_char type;			/* request type (stratum in ntp packets) */
+	u_char count;			/* number of entries in this packet */
+	u_char seq;			/* sequence number of this packet */
 
-	u_char npkts;		/* total number of packets */
+	u_char npkts;			/* total number of packets */
 	u_char peers;
 	u_char fill3;
 	u_char fill4;
@@ -449,17 +504,19 @@ extern int selfds;
 
 extern fd_set globmask, globwmask;
 
-extern char *paddr (), *ntoa ();
+extern char *paddr(), *ntoa();
 
-extern long lseek ();
-extern long random ();
+extern long lseek();
+extern long random();
 
-extern void advise (), avoid ();
+extern void advise(), avoid();
 
 extern double s_fixed_to_double(), ul_fixed_to_double();
-extern double	atof();
+extern double atof();
 
 #ifdef DEBUG
-extern void	dump_pkt ();
+extern void dump_pkt();
 extern int debug;
 #endif
+
+#endif				/* __NTP_NTP_H__ */
