@@ -88,6 +88,9 @@
 #ifndef	_GENERAL_
 #include "general.h"
 #endif
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif				/* HAVE_SYS_SELECT_H */
 
 #ifdef	NULLPE
 typedef struct AEInfo {			/* "real" directory services! */

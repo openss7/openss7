@@ -219,40 +219,51 @@ struct tsapblk {
 	struct tsapADDR tb_initiating;	/* initiator */
 	struct tsapADDR tb_responding;	/* responder */
 
-	IFP tb_retryfnx;		/* resume async connection */
+	int (*tb_retryfnx) ();		/* resume async connection */
 
-	IFP tb_connPfnx;		/* TP connect */
-	IFP tb_retryPfnx;		/* TP retry connect */
-	IFP tb_startPfnx;		/* TP start accept */
-	IFP tb_acceptPfnx;		/* TP accept */
-	IFP tb_writePfnx;		/* TP write data */
-	IFP tb_readPfnx;		/* TP read data */
-	IFP tb_discPfnx;		/* TP disconnect */
-	IFP tb_losePfnx;		/* TP loses */
+	int (*tb_connPfnx) ();		/* TP connect */
+	int (*tb_retryPfnx) ();		/* TP retry connect */
+	int (*tb_startPfnx) ();		/* TP start accept */
+	int (*tb_acceptPfnx) ();	/* TP accept */
+	int (*tb_writePfnx) ();		/* TP write data */
+	int (*tb_readPfnx) ();		/* TP read data */
+	int (*tb_discPfnx) ();		/* TP disconnect */
+	int (*tb_losePfnx) ();		/* TP loses */
 
-	IFP tb_drainPfnx;		/* TP drain queued writes */
-	IFP tb_queuePfnx;		/* TP note queued writes */
+	int (*tb_drainPfnx) ();		/* TP drain queued writes */
+	int (*tb_queuePfnx) ();		/* TP note queued writes */
 	struct qbuf tb_qwrites;		/* queue of writes to retry */
 
-	IFP tb_initfnx;			/* init for read from network */
-	IFP tb_readfnx;			/* read from network */
-	IFP tb_writefnx;		/* write to network */
-	IFP tb_closefnx;		/* close network */
-	IFP tb_selectfnx;		/* select network */
-	IFP tb_checkfnx;		/* check network prior to select */
-	IFP tb_nreadfnx;		/* estimate of octets waiting to be read */
+	int (*tb_initfnx) ();		/* init for read from network */
+	int (*tb_readfnx) ();		/* read from network */
+	int (*tb_writefnx) ();		/* write to network */
+	int (*tb_closefnx) ();		/* close network */
+	int (*tb_selectfnx) ();		/* select network */
+	int (*tb_checkfnx) ();		/* check network prior to select */
+	int (*tb_nreadfnx) ();		/* estimate of octets waiting to be read */
 
-	IFP tb_DataIndication;		/* INDICATION handlers */
-	IFP tb_DiscIndication;		/* .. */
+	int (*tb_DataIndication) ();	/* INDICATION handlers */
+	int (*tb_DiscIndication) ();	/* .. */
 
 #ifdef  MGMT
-	IFP tb_manfnx;			/* for management reports */
+	int (*tb_manfnx) ();		/* for management reports */
 	int tb_pdus;			/* PDUs sent */
 	int tb_pdur;			/* PDUs recv */
 	int tb_bytes;			/* bytes sent since last report */
 	int tb_byter;			/* bytes recv ..  */
 #endif
 };
+
+#ifdef HAVE_VARAGS_H
+int tpktlose(), tsaplose();
+#else				/* HAVE_VARAGS_H */
+int tpktlose(struct tsapblk *tb, struct TSAPdisconnect *td, int reason, const char *what,
+	     const char *fmt, ...);
+int tsaplose(struct TSAPdisconnect *td, int reason, const char *what, const char *fmt, ...);
+#endif				/* HAVE_VARAGS_H */
+
+int copyTSAPaddrX(struct tsapADDR *in, struct TSAPaddr *out);
+int copyTSAPaddrY(struct TSAPaddr *in, struct tsapADDR *out);
 
 #define	NULLBP		((struct tsapblk *) 0)
 

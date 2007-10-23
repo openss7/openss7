@@ -164,7 +164,7 @@ typedef int SBV;
 #define	sigioblock()	sigblock (sigmask (_SIGIO))
 #define	sigiomask(s)	sigsetmask (s)
 #else
-#define	SBV	SFP
+#define	SBV	sighandler_t
 #define	sigioblock()	sigset (_SIGIO, SIG_HOLD)
 #define	sigiomask(s)	sigset (_SIGIO, s)
 

@@ -57,6 +57,11 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
+/*
+ * This header file does not serve any purpose and should be removed.  FIXME:
+ * do that!  --bb (2007-10-21)
+ */
+
 /* 
  * Header: /xtel/isode/isode/h/quipu/RCS/das-cdefs.h,v 9.0 1992/06/16 12:23:11 isode Rel
  *

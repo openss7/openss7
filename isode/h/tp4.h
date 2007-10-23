@@ -57,6 +57,11 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
+/*
+ * Autoconf should make a bunch of this go away and most of these things should be driven by
+ * autoconf test results rather than system type.  FIXME: do that.  --bb (2007-10-21)
+ */
+
 /* tp4.h - TP4 abstractions */
 
 /* 

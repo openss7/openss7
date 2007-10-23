@@ -57,6 +57,10 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
+/*
+ *  Autoconf should make this file disappear.  FIXME: do that.  -bb (2007-10-21)
+ */
+
 /* sys.file.h - system independent sys/file.h */
 
 /* 

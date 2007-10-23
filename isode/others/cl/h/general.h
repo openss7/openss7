@@ -218,8 +218,8 @@ char *sys_errname();
 #define	remque(e)	REMQUE ((char *) (e))
 #endif
 
-void asprintf(), _asprintf();
-
 #endif
+
+void xsprintf (), _xsprintf ();
 
 #endif				/* __CL_H_GENERAL_H__ */

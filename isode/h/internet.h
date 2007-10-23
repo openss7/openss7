@@ -57,6 +57,12 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
+/*
+ * This is another file that should be out and out removed.  Again, autoconf configuration tests
+ * should be relied upon to perform the replacement and adaptation between POSIX and whatever.  The
+ * code file should only use POSIX facilities where possible. -bb (2007-10-21)
+ */
+
 /* internet.h - TCP/IP abstractions */
 
 /* 
@@ -88,7 +94,7 @@
 
 /* SOCKETS */
 
-#include "sys/socket.h"
+#include <sys/socket.h>
 
 #ifndef	SOMAXCONN
 #define	SOMAXCONN	5
@@ -103,7 +109,10 @@
 #undef NULLVP
 #endif
 #endif				/* SVR4 */
-#include "netinet/in.h"
+
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #ifdef SVR4			/* Put back the ISODE defn */
 #ifdef NULLVP
 #undef NULLVP
@@ -143,7 +152,6 @@ int join_tcp_server();
 #endif
 
 #ifdef	EXOS
-
 #ifdef	SYS5
 #define	join_tcp_client(s,f) \
 	(accept ((s), (struct sockaddr *) (f)) != NOTOK ? (s) : NOTOK)
@@ -156,9 +164,15 @@ int join_tcp_server();
 #endif
 #endif
 
+#ifndef read_tcp_socket
 int read_tcp_socket();
+#endif
+#ifndef write_tcp_socket
 int write_tcp_socket();
+#endif
+#ifndef close_tcp_socket
 int close_tcp_socket();
+#endif
 
 int select_tcp_socket();
 
@@ -210,7 +224,7 @@ struct hostent {
 	char *h_name;			/* official name */
 	char **h_aliases;		/* alias list */
 	int h_addrtype;			/* address type: AF_INET */
-	int h_length;			/* address length: sizeof (u_long) == 4 */
+	int h_length;			/* address length: sizeof (unsigned long) == 4 */
 	char *h_addr;			/* address value: (struct in_addr *) */
 };
 
@@ -233,18 +247,20 @@ struct hostent *gethostbystring();
    the definition of inet_addr contained therein causes problems with some
    compilers. */
 
+#ifndef linux
 char *inet_ntoa();
 
 #ifndef	DG
-u_long inet_addr();
+unsigned long inet_addr();
 
 #ifndef	HPUX
-u_long inet_network();
+unsigned long inet_network();
 #else
 int inet_network();
 #endif
 #else
 struct in_addr inet_addr(), inet_network();
+#endif
 #endif
 #endif
 

@@ -52,8 +52,8 @@
  $Log$
  *****************************************************************************/
 
-#ifndef __ISODE_MPKG_H__
-#define __ISODE_MPKG_H__
+#ifndef __ISODE_MPKT_H__
+#define __ISODE_MPKT_H__
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
 

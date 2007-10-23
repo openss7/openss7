@@ -265,7 +265,7 @@ typedef struct ccliovec CONN_DB;
 
 #ifdef UBC_X25
 #include <netccitt/x25_sockaddr.h>
-#ifdef BSD44
+#ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
 
