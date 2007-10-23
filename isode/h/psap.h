@@ -500,11 +500,11 @@ typedef struct {
 
 	int ps_byteno;			/* byte position */
 
-	IFP ps_primeP;
-	IFP ps_readP;
-	IFP ps_writeP;
-	IFP ps_flushP;
-	IFP ps_closeP;
+	int (* ps_primeP)();
+	int (* ps_readP)();
+	int (* ps_writeP)();
+	int (* ps_flushP)();
+	int (* ps_closeP)();
 } PStream, *PS;
 
 #define	NULLPS	((PS) 0)

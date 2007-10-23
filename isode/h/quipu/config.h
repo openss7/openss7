@@ -52,8 +52,8 @@
  $Log$
  *****************************************************************************/
 
-#ifndef __ISODE_QUIPU_CONFIG_H__
-#define __ISODE_QUIPU_CONFIG_H__
+#ifndef __ISODE_QUIPPU_CONFIG_H__
+#define __ISODE_QUIPPU_CONFIG_H__
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
@@ -144,4 +144,4 @@
 
 # endif
 
-#endif				/* __ISODE_QUIPU_CONFIG_H__ */
+#endif				/* __ISODE_QUIPPU_CONFIG_H__ */

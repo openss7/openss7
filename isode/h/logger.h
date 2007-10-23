@@ -202,21 +202,35 @@ else
 #endif
 
 int ll_open();
+#ifndef HAVE_VARARGS_H
+#include <stdarg.h>
+int ll_log(LLog *lp, int event, const char *what, const char *fmt, ...);
+int _ll_log(LLog *lp, int event, const char *what, const char *fmt, va_list args);
+#else				/* HAVE_VARARGS_H */
 int ll_log(), _ll_log();
+#endif				/* HAVE_VARARGS_H */
 int ll_close();
 
 void ll_hdinit();
 void ll_dbinit();
 
+#ifndef HAVE_VARARGS_H
+int ll_printf(LLog * lp, const char *fmt, ...);
+#else				/* HAVE_VARARGS_H */
 int ll_printf();
+#endif				/* HAVE_VARARGS_H */
 int ll_sync();
 
+#ifndef HAVE_VARARGS_H
+char *ll_preset(const char *fmt, ...);
+#else				/* HAVE_VARARGS_H */
 char *ll_preset();
+#endif				/* HAVE_VARARGS_H */
 
 int ll_check();
 
 int ll_defmhdr();
-IFP ll_setmhdr();
+int (*ll_setmhdr())();
 #endif
 
 /******************************/

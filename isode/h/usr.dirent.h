@@ -57,6 +57,10 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
+/*
+ *  Autoconf should make most of this go away.  FIXME: do that. --bb (2007-10-21)
+ */
+
 /* usr.dirent.h - ISODE's version of DAG's SVR3 directory access routines */
 
 /*

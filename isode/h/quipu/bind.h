@@ -117,8 +117,9 @@ struct ds_bind_error {
 	int dbe_type;
 #define DBE_TYPE_SERVICE 1
 #define DBE_TYPE_SECURITY 2
-	int dbe_value;			/* takes on values as define in DSE_service or DSE_security
-					   according to dbe_type */
+	int dbe_value;			/* takes on values as define in */
+	/* DSE_service or DSE_security */
+	/* according to dbe_type */
 	char *dbe_vtmp;			/* pepsy */
 	int dbe_vlen;			/* pepsy */
 

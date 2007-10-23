@@ -57,6 +57,13 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
+/*
+ *  This is a bad way to do this.  This is where autoconf steps in.  Each of the things in this file
+ *  that are determined by target OS specific include or make file should be replaced with the
+ *  equivalent autoconf tests and appropriate replacements.  The code should be modified to use only
+ *  POSIX conventions and let autoconf do the work between POSIX and whatever. --bb (2007-10-21)
+ */
+
 /* general.h - general compatibility */
 
 /* 
@@ -186,7 +193,7 @@
 
 /* STRINGS */
 
-#if defined(SVR4) || defined (__NeXT__) || defined(__bsdi__)
+#if defined(SVR4) || defined (__NeXT__) || defined(__bsdi__) || defined(linux)
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -276,14 +283,18 @@ int baduser();
 
 extern char chrcnv[], nochrcnv[];
 
-int lexequ(), lexnequ();
+int lexequ();
+int lexnequ();
 
 int log_tai();
 
 int sstr2arg();
 
 void (*set_smalloc_handler()) ();
-char *smalloc(), *strdup();
+char *smalloc();
+#ifndef linux
+char *strdup();
+#endif
 
 /* MISC */
 
@@ -294,7 +305,14 @@ char *sys_errname();
 #define	remque(e)	REMQUE ((char *) (e))
 #endif
 
-void asprintf(), _asprintf();
+#ifdef HAVE_VARARGS_H
+void xsprintf();
+void _xsprintf();
+#else				/* HAVE_VARARGS_H */
+#include <stdarg.h>
+void xsprintf(register char *bp, const char *what, const char *fmt, ...);
+void _xsprintf(char *bp, const char *what, const char *fmt, va_list ap);
+#endif				/* HAVE_VARARGS_H */
 
 void isodetailor();			/* also in tailor.h */
 
@@ -322,6 +340,7 @@ extern time_t time();
 
 /* ntohs etc */
 
+#ifndef linux
 #ifndef __bsdi__
 #ifndef	LINUX
 #ifndef	ntohs
@@ -338,6 +357,7 @@ unsigned long htonl();
 #endif
 #endif
 #endif				/* __bsdi__ */
+#endif
 
 int char2bcd();
 int bcd2char();

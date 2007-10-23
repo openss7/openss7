@@ -57,6 +57,11 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
+/*
+ * Again, most of this one should be replaced or removed by autoconf techiniques.
+ * FIXME: do that.  -bb (2007-10-21)
+ */
+
 /* manifest.h - manifest constants */
 
 /* 
@@ -195,6 +200,7 @@ int (*_signal()) ();
 #endif
 #endif
 
+#if 0
 typedef int SBV;
 
 #ifndef	lint
@@ -208,6 +214,20 @@ extern int _iosignals_set;
 
 #define	siginblock()	sigblock (sigmask (SIGINT))
 #define	siginmask(s)	sigsetmask (s)
+#else
+
+#ifdef HAVE_SIGPROCMASK
+typedef sigset_t SBV;
+#else
+typedef int SBV;
+#endif
+
+extern SBV sigioblock(void);		/* see compat/sigioblock.c */
+extern void sigiomask(SBV mask);	/* see compat/sigiomask.c */
+extern SBV siginblock(void);		/* see compat/siginblock.c */
+extern void siginmask(SBV mask);	/* see compat/siginmask.c */
+
+#endif
 
 #endif
 
@@ -257,6 +277,7 @@ typedef struct fd_set {
 #if defined (_AIX) && defined (SYS5)
 #include <sys/select.h>
 #endif
+int xselect(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, int secs);
 
 #ifdef	SYS5NLY
 typedef unsigned char u_char;
@@ -282,6 +303,7 @@ typedef int *IP;
 
 #define	NULLIP		((IP) 0)
 
+#if 0
 typedef int (*IFP) ();
 
 #define	NULLIFP		((IFP) 0)
@@ -298,6 +320,11 @@ typedef void (*VFP) ();
 #define	SFD	void
 #define	SFP	VFP
 #endif
+#endif
+#endif
+
+#ifndef HAVE_SIGHANDLER_T
+typedef RETSIGTYPE(*sighandler_t) (int);
 #endif
 
 struct udvec {				/* looks like a BSD iovec... */
