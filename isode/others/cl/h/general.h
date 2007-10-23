@@ -164,6 +164,6 @@ char   *sys_errname ();
 #endif
 
 
-void	asprintf (), _asprintf ();
+void	xsprintf (), _xsprintf ();
 
 #endif

@@ -1,10 +1,69 @@
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __ISODE_PSAP2_H__
+#define __ISODE_PSAP2_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
 /* psap2.h - include file for presentation users (PS-USER) continued  */
 
 /* 
- * $Header: /xtel/isode/isode/h/RCS/psap2.h,v 9.0 1992/06/16 12:17:57 isode Rel $
+ * Header: /xtel/isode/isode/h/RCS/psap2.h,v 9.0 1992/06/16 12:17:57 isode Rel
  *
  *
- * $Log: psap2.h,v $
+ * Log: psap2.h,v
  * Revision 9.0  1992/06/16  12:17:57  isode
  * Release 8.0
  *
@@ -19,7 +78,6 @@
  *    this agreement.
  *
  */
-
 
 #ifndef	_PSAP2_
 #define	_PSAP2_
@@ -38,26 +96,25 @@
 
 #define	NPDATA		125	/* arbitrary */
 
+struct PSAPcontext {			/* presentation context */
+	int pc_id;			/* identifier */
 
-struct PSAPcontext {		/* presentation context */
-    int	    pc_id;		/* identifier */
+	OID pc_asn;			/* abstract syntax name */
 
-    OID	    pc_asn;		/* abstract syntax name */
+	OID pc_atn;			/* abstract transfer name */
+	/* NULLOID if provider should handle it */
 
-    OID	    pc_atn;		/* abstract transfer name */
-				/*   NULLOID if provider should handle it */
-    
-    int	    pc_result;		/* same codes as pc_result below */
+	int pc_result;			/* same codes as pc_result below */
 };
 
-struct PSAPctxlist {		/* list of presentation contexts */
-    int	    pc_nctx;		/* number of contexts */
+struct PSAPctxlist {			/* list of presentation contexts */
+	int pc_nctx;			/* number of contexts */
 
-#define	NPCTX	10		/* arbitrary */
-    struct PSAPcontext pc_ctx[NPCTX];
+#define	NPCTX	10			/* arbitrary */
+	struct PSAPcontext pc_ctx[NPCTX];
 };
+
 #define	NULLPC	((struct PSAPctxlist *) 0)
-
 
 #define	BER		"basic encoding of a single asn.1 type"
 
@@ -67,41 +124,40 @@ struct PSAPctxlist {		/* list of presentation contexts */
 #define BER_OID		ode2oid (BER)
 #endif
 
+struct SSAPref *addr2ref();		/* address to session reference */
 
-struct SSAPref *addr2ref ();	/* address to session reference */
-
-char   *sprintref ();		/* return session reference in string form */
+char *sprintref();			/* return session reference in string form */
 
 /*  */
 
-struct PSAPstart {		/* P-CONNECT.INDICATION */
-    int	    ps_sd;		/* PRESENTATION descriptor */
+struct PSAPstart {			/* P-CONNECT.INDICATION */
+	int ps_sd;			/* PRESENTATION descriptor */
 
+	struct PSAPaddr ps_calling;	/* address of peer calling */
+	struct PSAPaddr ps_called;	/* address of peer called */
 
-    struct PSAPaddr ps_calling;	/* address of peer calling */
-    struct PSAPaddr ps_called;	/* address of peer called */
+	struct PSAPctxlist ps_ctxlist;	/* list of proposed contexts */
 
-    struct PSAPctxlist ps_ctxlist;/* list of proposed contexts */
+	OID ps_defctx;			/* name of proposed default context */
+	int ps_defctxresult;		/* what the provider thinks about it */
 
-    OID	    ps_defctx;		/* name of proposed default context */
-    int	    ps_defctxresult;	/* what the provider thinks about it */
-    
-    int	    ps_prequirements;	/* presentation requirements */
+	int ps_prequirements;		/* presentation requirements */
 
-    int	    ps_srequirements;	/* session requirements */
-    int	    ps_settings;	/* initial settings of tokens */
-    long    ps_isn;		/* initial serial number */
-    
-    struct SSAPref  ps_connect;	/* session connection identifier */
+	int ps_srequirements;		/* session requirements */
+	int ps_settings;		/* initial settings of tokens */
+	long ps_isn;			/* initial serial number */
 
-    int	    ps_ssdusize;	/* largest atomic SSDU */
-    
-    struct QOStype ps_qos;	/* quality of service */
-    
-				/* initial data from peer */
-    int	    ps_ninfo;		/*   number of elements */
-    PE	    ps_info[NPDATA];	/*   data */
+	struct SSAPref ps_connect;	/* session connection identifier */
+
+	int ps_ssdusize;		/* largest atomic SSDU */
+
+	struct QOStype ps_qos;		/* quality of service */
+
+	/* initial data from peer */
+	int ps_ninfo;			/* number of elements */
+	PE ps_info[NPDATA];		/* data */
 };
+
 #define	PSFREE(ps) \
 { \
     register int PSI; \
@@ -121,72 +177,71 @@ struct PSAPstart {		/* P-CONNECT.INDICATION */
     (ps) -> ps_ninfo = 0; \
 }
 
+struct PSAPconnect {			/* P-CONNECT.CONFIRMATION */
+	int pc_sd;			/* PRESENTATION descriptor */
 
-struct PSAPconnect {		/* P-CONNECT.CONFIRMATION */
-    int	    pc_sd;		/* PRESENTATION descriptor */
+	struct PSAPaddr pc_responding;	/* address of peer responding */
 
-    struct PSAPaddr pc_responding;/* address of peer responding */
+	struct PSAPctxlist pc_ctxlist;	/* the list of negotiated contexts */
 
-    struct PSAPctxlist pc_ctxlist;/* the list of negotiated contexts */
+	int pc_defctxresult;		/* result for proposed default context name */
 
-    int	    pc_defctxresult;	/* result for proposed default context name */
-    
-    int	    pc_prequirements;	/* presentation requirements */
+	int pc_prequirements;		/* presentation requirements */
 
-    int	    pc_srequirements;	/* session requirements */
-    int	    pc_settings;	/* initial settings of tokens */
-    int	    pc_please;		/* tokens requested by PS-user */
-    long    pc_isn;		/* initial serial number */
+	int pc_srequirements;		/* session requirements */
+	int pc_settings;		/* initial settings of tokens */
+	int pc_please;			/* tokens requested by PS-user */
+	long pc_isn;			/* initial serial number */
 
-    struct SSAPref pc_connect;	/* session connection identifier */
+	struct SSAPref pc_connect;	/* session connection identifier */
 
-    int	    pc_ssdusize;	/* largest atomic SSDU */
+	int pc_ssdusize;		/* largest atomic SSDU */
 
-    struct QOStype pc_qos;	/* quality of service */
-    
-    int	    pc_result;		/* result */
+	struct QOStype pc_qos;		/* quality of service */
+
+	int pc_result;			/* result */
 #define	PC_ACCEPT	(-1)
 
-#define	PC_REJECTED	0	/* Rejected by peer */
-				/* Provider-reason */
-#define	PC_NOTSPECIFIED	1	/* Reason not specified */
-#define	PC_CONGEST	2	/* Temporary congestion */
-#define	PC_EXCEEDED	3	/* Local limit exceeded */
-#define	PC_ADDRESS	4	/* Called presentation address unknown */
-#define	PC_VERSION	5	/* Protocol version not supported */
-#define	PC_DEFAULT	6	/* Default context not supported */
-#define	PC_READABLE	7	/* User-data not readable */
-#define	PC_AVAILABLE	8	/* No PSAP available */
-				/* Abort-reason */
-#define	PC_UNRECOGNIZED	9	/* Unrecognized PPDU */
-#define	PC_UNEXPECTED	10	/* Unexpected PPDU */
-#define	PC_SSPRIMITIVE	11	/* Unexpected session service primitive */
-#define	PC_PPPARAM1	12	/* Unrecognized PPDU parameter */
-#define	PC_PPPARAM2	13	/* Unexpected PPDU parameter */
-#define	PC_INVALID	14	/* Invalid PPDU parameter value */
-				/* Provider-reason */
-#define	PC_ABSTRACT	15	/* Abstract syntax not supported */
-#define	PC_TRANSFER	16	/* Proposed transfer syntaxes not supported */
-#define	PC_DCSLIMIT	17	/* Local limit on DCS exceeded */
-				/* begin UNOFFICIAL */
-#define	PC_REFUSED	18	/* Connect request refused on this network
-				   connection */
-#define	PC_SESSION	19	/* Session disconnect */
-#define	PC_PROTOCOL	20	/* Protocol error */
-#define	PC_ABORTED	21	/* Peer aborted connection */
-#define	PC_PARAMETER	22	/* Invalid parameter */
-#define	PC_OPERATION	23	/* Invalid operation */
-#define	PC_TIMER	24	/* Timer expired */
-#define	PC_WAITING	25	/* Indications waiting */
-				/* end UNOFFICIAL */
+#define	PC_REJECTED	0		/* Rejected by peer */
+	/* Provider-reason */
+#define	PC_NOTSPECIFIED	1		/* Reason not specified */
+#define	PC_CONGEST	2		/* Temporary congestion */
+#define	PC_EXCEEDED	3		/* Local limit exceeded */
+#define	PC_ADDRESS	4		/* Called presentation address unknown */
+#define	PC_VERSION	5		/* Protocol version not supported */
+#define	PC_DEFAULT	6		/* Default context not supported */
+#define	PC_READABLE	7		/* User-data not readable */
+#define	PC_AVAILABLE	8		/* No PSAP available */
+	/* Abort-reason */
+#define	PC_UNRECOGNIZED	9		/* Unrecognized PPDU */
+#define	PC_UNEXPECTED	10		/* Unexpected PPDU */
+#define	PC_SSPRIMITIVE	11		/* Unexpected session service primitive */
+#define	PC_PPPARAM1	12		/* Unrecognized PPDU parameter */
+#define	PC_PPPARAM2	13		/* Unexpected PPDU parameter */
+#define	PC_INVALID	14		/* Invalid PPDU parameter value */
+	/* Provider-reason */
+#define	PC_ABSTRACT	15		/* Abstract syntax not supported */
+#define	PC_TRANSFER	16		/* Proposed transfer syntaxes not supported */
+#define	PC_DCSLIMIT	17		/* Local limit on DCS exceeded */
+	/* begin UNOFFICIAL */
+#define	PC_REFUSED	18		/* Connect request refused on this network connection */
+#define	PC_SESSION	19		/* Session disconnect */
+#define	PC_PROTOCOL	20		/* Protocol error */
+#define	PC_ABORTED	21		/* Peer aborted connection */
+#define	PC_PARAMETER	22		/* Invalid parameter */
+#define	PC_OPERATION	23		/* Invalid operation */
+#define	PC_TIMER	24		/* Timer expired */
+#define	PC_WAITING	25		/* Indications waiting */
+	/* end UNOFFICIAL */
 
 #define	PC_FATAL(r)	((r) < PC_PARAMETER)
 #define	PC_OFFICIAL(r)	((r) < PC_REFUSED)
-    
-				/* initial data from peer */
-    int	    pc_ninfo;		/*   number of elements */
-    PE	    pc_info[NPDATA];	/*   data */
+
+	/* initial data from peer */
+	int pc_ninfo;			/* number of elements */
+	PE pc_info[NPDATA];		/* data */
 };
+
 #define	PCFREE(pc) \
 { \
     register int PCI; \
@@ -203,7 +258,6 @@ struct PSAPconnect {		/* P-CONNECT.CONFIRMATION */
 	    pe_free ((pc) -> pc_info[PCI]), (pc) -> pc_info[PCI] = NULLPE; \
     (pc) -> pc_ninfo = 0; \
 }
-    
 
 					/* PRESENTATION requirements */
 #define	PR_MANAGEMENT	0x0001	/* context management */
@@ -211,14 +265,14 @@ struct PSAPconnect {		/* P-CONNECT.CONFIRMATION */
 
 #define	PR_MYREQUIRE	0x0000
 
+struct PSAPdata {			/* P-READ.INDICATION */
+	int px_type;			/* type of indication */
+	/* same values as sx_type */
 
-struct PSAPdata {		/* P-READ.INDICATION */
-    int	    px_type;		/* type of indication */
-				/* same values as sx_type */
-
-    int	    px_ninfo;		/* number of elements */
-    PE	    px_info[NPDATA];	/* data */
+	int px_ninfo;			/* number of elements */
+	PE px_info[NPDATA];		/* data */
 };
+
 #define	PXFREE(px) \
 { \
     register int PXI; \
@@ -229,21 +283,20 @@ struct PSAPdata {		/* P-READ.INDICATION */
     (px) -> px_ninfo = 0; \
 }
 
+struct PSAPtoken {			/* P-{TOKEN-*,GIVE-CONTROL}.INDICATION */
+	int pt_type;			/* type of indication */
+	/* same values as st_type */
 
-struct PSAPtoken {		/* P-{TOKEN-*,GIVE-CONTROL}.INDICATION */
-    int	    pt_type;		/* type of indication */
-				/* same values as st_type */
+	u_char pt_tokens;		/* tokens offered/wanted */
+	/* same values as st_tokens */
 
-    u_char  pt_tokens;		/* tokens offered/wanted */
-				/* same values as st_tokens */
+	u_char pt_owned;		/* tokens owned by user */
 
-    u_char  pt_owned;		/* tokens owned by user */
-
-
-				/* PLEASE TOKEN only */
-    int	    pt_ninfo;		/*   number of elements */
-    PE	    pt_info[NPDATA];	/*   data */
+	/* PLEASE TOKEN only */
+	int pt_ninfo;			/* number of elements */
+	PE pt_info[NPDATA];		/* data */
 };
+
 #define	PTFREE(pt) \
 { \
     register int PTI; \
@@ -254,23 +307,23 @@ struct PSAPtoken {		/* P-{TOKEN-*,GIVE-CONTROL}.INDICATION */
     (pt) -> pt_ninfo = 0; \
 }
 
+struct PSAPsync {			/* P-*-SYNC.{INDICATION,CONFIRMATION} */
+	int pn_type;			/* type of indication/confirmation */
+	/* same values as sn_type */
 
-struct PSAPsync {		/* P-*-SYNC.{INDICATION,CONFIRMATION} */
-    int	    pn_type;		/* type of indication/confirmation */
-				/* same values as sn_type */
+	int pn_options;			/* options (!!) */
+	/* same values as sn_options */
 
-    int	    pn_options;		/* options (!!) */
-				/* same values as sn_options */
+	long pn_ssn;			/* serial number */
+	/* same values as sn_ssn */
 
-    long    pn_ssn;		/* serial number */
-				/* same values as sn_ssn */
+	int pn_settings;		/* new token settings (RESYNC only) */
 
-    int	    pn_settings;	/* new token settings (RESYNC only) */
-
-				/* sync data from peer */
-    int	    pn_ninfo;		/*   number of elements */
-    PE	    pn_info[NPDATA];	/*   data */
+	/* sync data from peer */
+	int pn_ninfo;			/* number of elements */
+	PE pn_info[NPDATA];		/* data */
 };
+
 #define	PNFREE(pn) \
 { \
     register int PNI; \
@@ -281,25 +334,25 @@ struct PSAPsync {		/* P-*-SYNC.{INDICATION,CONFIRMATION} */
     (pn) -> pn_ninfo = 0; \
 }
 
+struct PSAPactivity {			/* P-ACTIVITY-*.{INDICATION,CONFIRMATION} */
+	int pv_type;			/* type of indication/confirmation */
+	/* same values as sv_type */
 
-struct PSAPactivity {		/* P-ACTIVITY-*.{INDICATION,CONFIRMATION} */
-    int	    pv_type;		/* type of indication/confirmation */
-				/* same values as sv_type */
+	struct SSAPactid pv_id;		/* START/RESUME activity identifier */
 
-    struct SSAPactid pv_id;	/* START/RESUME activity identifier */
+	struct SSAPactid pv_oid;	/* RESUME old activity identifier */
+	struct SSAPref pv_connect;	/* old connection identifier */
 
-    struct SSAPactid pv_oid;	/* RESUME old activity identifier */
-    struct SSAPref   pv_connect;/* 	  old connection identifier */
+	long pv_ssn;			/* RESUME/END Serial number */
 
-    long    pv_ssn;		/* RESUME/END Serial number */
+	int pv_reason;			/* INTERRUPT/DISCARD */
+	/* same values as sp_reason */
 
-    int	    pv_reason;		/* INTERRUPT/DISCARD */
-				/* same values as sp_reason */
-        
-				/* activity DATA from peer */
-    int	    pv_ninfo;		/*   number of elements */
-    PE	    pv_info[NPDATA];	/*   data */
+	/* activity DATA from peer */
+	int pv_ninfo;			/* number of elements */
+	PE pv_info[NPDATA];		/* data */
 };
+
 #define	PVFREE(pv) \
 { \
     register int PVI; \
@@ -310,19 +363,17 @@ struct PSAPactivity {		/* P-ACTIVITY-*.{INDICATION,CONFIRMATION} */
     (pv) -> pv_ninfo = 0; \
 }
 
+struct PSAPreport {			/* P-{U,P}-EXCEPTION-REPORT.INDICATION */
+	int pp_peer;			/* T = P-U-EXCEPTION-REPORT.INDICATION: pp_reason/pp_info
+					   both meaningful NIL = P-P-EXCEPTION-REPORT.INDICATION:
+					   pp_reason == SP_NOREASON, or pp_reason == SP_PROTOCOL */
+	int pp_reason;			/* same values as sp_reason */
 
-struct PSAPreport {		/* P-{U,P}-EXCEPTION-REPORT.INDICATION */
-    int	    pp_peer;		/* T   = P-U-EXCEPTION-REPORT.INDICATION:
-					pp_reason/pp_info both meaningful
-				   NIL = P-P-EXCEPTION-REPORT.INDICATION:
-					pp_reason == SP_NOREASON, or
-					pp_reason == SP_PROTOCOL */
-    int	    pp_reason;		/* same values as sp_reason */
-
-				/* report DATA from peer */
-    int	    pp_ninfo;		/*   number of elements */
-    PE	    pp_info[NPDATA];	/*   data */
+	/* report DATA from peer */
+	int pp_ninfo;			/* number of elements */
+	PE pp_info[NPDATA];		/* data */
 };
+
 #define	PPFREE(pp) \
 { \
     register int PPI; \
@@ -333,12 +384,12 @@ struct PSAPreport {		/* P-{U,P}-EXCEPTION-REPORT.INDICATION */
     (pp) -> pp_ninfo = 0; \
 }
 
-
-struct PSAPfinish {		/* P-RELEASE.INDICATION */
-				/* release DATA from peer */
-    int	    pf_ninfo;		/*   number of elements */
-    PE	    pf_info[NPDATA];	/*   data */
+struct PSAPfinish {			/* P-RELEASE.INDICATION */
+	/* release DATA from peer */
+	int pf_ninfo;			/* number of elements */
+	PE pf_info[NPDATA];		/* data */
 };
+
 #define	PFFREE(pf) \
 { \
     register int PFI; \
@@ -349,15 +400,14 @@ struct PSAPfinish {		/* P-RELEASE.INDICATION */
     (pf) -> pf_ninfo = 0; \
 }
 
+struct PSAPrelease {			/* P-RELEASE.CONFIRMATION */
+	int pr_affirmative;		/* T = connection released NIL = request refused */
 
-struct PSAPrelease {		/* P-RELEASE.CONFIRMATION */
-    int	    pr_affirmative;	/* T   = connection released
-				   NIL = request refused */
-
-				/* release DATA from peer */
-    int	    pr_ninfo;		/*   number of elements */
-    PE	    pr_info[NPDATA];	/*   data */
+	/* release DATA from peer */
+	int pr_ninfo;			/* number of elements */
+	PE pr_info[NPDATA];		/* data */
 };
+
 #define	PRFREE(pr) \
 { \
     register int PRI; \
@@ -368,25 +418,23 @@ struct PSAPrelease {		/* P-RELEASE.CONFIRMATION */
     (pr) -> pr_ninfo = 0; \
 }
 
+struct PSAPabort {			/* P-{U,P}-ABORT.INDICATION */
+	int pa_peer;			/* T = P-U-ABORT.INDICATION: pa_info/pa_ninfo is meaningful
+					   NIL = P-P-ABORT.INDICATION: pa_reason/pa_ppdu is
+					   meaningful, pa_data contains diagnostics */
 
-struct PSAPabort {		/* P-{U,P}-ABORT.INDICATION */
-    int	    pa_peer;		/* T   = P-U-ABORT.INDICATION:
-					    pa_info/pa_ninfo is meaningful
-				   NIL = P-P-ABORT.INDICATION:
-					    pa_reason/pa_ppdu is meaningful,
-					    pa_data contains diagnostics */
+	int pa_reason;			/* same codes as pc_result */
 
-    int	    pa_reason;		/* same codes as pc_result */
+	/* abort information from peer */
+	int pa_ninfo;			/* number of elements */
+	PE pa_info[NPDATA];		/* data */
 
-				/* abort information from peer */
-    int	    pa_ninfo;		/*   number of elements */
-    PE	    pa_info[NPDATA];	/*   data */
-
-				/* diagnostics from provider */
+	/* diagnostics from provider */
 #define	PA_SIZE		512
-    int	    pa_cc;		/*   length */
-    char    pa_data[PA_SIZE];	/*   data */
+	int pa_cc;			/* length */
+	char pa_data[PA_SIZE];		/* data */
 };
+
 #define	PAFREE(pa) \
 { \
     register int PAI; \
@@ -397,9 +445,8 @@ struct PSAPabort {		/* P-{U,P}-ABORT.INDICATION */
     (pa) -> pa_ninfo = 0; \
 }
 
-
 struct PSAPindication {
-    int	    pi_type;		/* the union element present */
+	int pi_type;			/* the union element present */
 #define	PI_DATA		0x00
 #define	PI_TOKEN	0x01
 #define	PI_SYNC		0x02
@@ -408,15 +455,15 @@ struct PSAPindication {
 #define	PI_FINISH	0x05
 #define	PI_ABORT	0x06
 
-    union {
-	struct PSAPdata pi_un_data;
-	struct PSAPtoken pi_un_token;
-	struct PSAPsync pi_un_sync;
-	struct PSAPactivity pi_un_activity;
-	struct PSAPreport pi_un_report;
-	struct PSAPfinish pi_un_finish;
-	struct PSAPabort pi_un_abort;
-    }	pi_un;
+	union {
+		struct PSAPdata pi_un_data;
+		struct PSAPtoken pi_un_token;
+		struct PSAPsync pi_un_sync;
+		struct PSAPactivity pi_un_activity;
+		struct PSAPreport pi_un_report;
+		struct PSAPfinish pi_un_finish;
+		struct PSAPabort pi_un_abort;
+	} pi_un;
 #define	pi_data		pi_un.pi_un_data
 #define	pi_token	pi_un.pi_un_token
 #define	pi_sync		pi_un.pi_un_sync
@@ -430,18 +477,19 @@ struct PSAPindication {
 
 extern char *psap2version;
 
+int PExec();				/* SERVER only */
+int PInit();				/* P-CONNECT.INDICATION */
 
-int	PExec ();		/* SERVER only */
-int	PInit ();		/* P-CONNECT.INDICATION */
+int PConnResponse();			/* P-CONNECT.RESPONSE */
 
-int	PConnResponse ();	/* P-CONNECT.RESPONSE */
 				/* P-CONNECT.REQUEST (backwards-compatible) */
 #define	PConnRequest(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14) \
 	PAsynConnRequest (a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,0)
-int	PAsynConnRequest ();	/* P-(ASYN-)CONNECT.REQUEST */
-int	PAsynRetryRequest ();	/* P-ASYN-RETRY.REQUEST (pseudo) */
-int	PDataRequest ();	/* P-DATA.REQUEST */
-int	PDataRequestAux ();	/* P-[*-]DATA.REQUEST */
+int PAsynConnRequest();			/* P-(ASYN-)CONNECT.REQUEST */
+int PAsynRetryRequest();		/* P-ASYN-RETRY.REQUEST (pseudo) */
+int PDataRequest();			/* P-DATA.REQUEST */
+int PDataRequestAux();			/* P-[*-]DATA.REQUEST */
+
 #define	PPDU_TTD	8
 #define	PPDU_TE		9
 #define	PPDU_TC	       10
@@ -463,11 +511,11 @@ int	PDataRequestAux ();	/* P-[*-]DATA.REQUEST */
 	PDataRequestAux ((s), (d), (n), (p), "capability", SCapdResponse, \
 			"SCapdResponse","P-CAPABILITY-DATA user-data",PPDU_TCC)
 
-int	PReadRequest ();	/* P-READ.REQUEST (pseudo) */
-int	PGTokenRequest ();	/* P-TOKEN-GIVE.REQUEST */
-int	PPTokenRequest ();	/* P-TOKEN-PLEASE.REQUEST */
-int	PGControlRequest ();	/* P-CONTROL-GIVE.REQUEST */
-int	PMajSyncRequestAux ();	/* P-{MAJOR-SYNC,ACTIVITY-END}.REQUEST */
+int PReadRequest();			/* P-READ.REQUEST (pseudo) */
+int PGTokenRequest();			/* P-TOKEN-GIVE.REQUEST */
+int PPTokenRequest();			/* P-TOKEN-PLEASE.REQUEST */
+int PGControlRequest();			/* P-CONTROL-GIVE.REQUEST */
+int PMajSyncRequestAux();		/* P-{MAJOR-SYNC,ACTIVITY-END}.REQUEST */
 
 #define	PMajSyncRequest(s,i,d,n,p) \
 	PMajSyncRequestAux ((s), (i), (d), (n), (p), "majorsync", \
@@ -477,7 +525,7 @@ int	PMajSyncRequestAux ();	/* P-{MAJOR-SYNC,ACTIVITY-END}.REQUEST */
 	PMajSyncRequestAux ((s), (i), (d), (n), (p), "activity end", \
 			SActEndRequest, "SActEndRequest")
 
-int	PMajSyncResponseAux ();	/* P-{MAJOR-SYNC,ACTIVITY-END}.RESPONSE */
+int PMajSyncResponseAux();		/* P-{MAJOR-SYNC,ACTIVITY-END}.RESPONSE */
 
 #define	PMajSyncResponse(s,d,n,p) \
 	PMajSyncResponseAux ((s), (d), (n), (p), "majorsync", \
@@ -487,13 +535,13 @@ int	PMajSyncResponseAux ();	/* P-{MAJOR-SYNC,ACTIVITY-END}.RESPONSE */
 	PMajSyncResponseAux ((s), (d), (n), (p), "activity end", \
 			SActEndResponse, "SActEndResponse")
 
-int	PMinSyncRequest ();	/* P-MINOR-SYNC.REQUEST */
-int	PMinSyncResponse ();	/* P-MINOR-SYNC.RESPONSE */
-int	PReSyncRequest ();	/* P-RESYNCHRONIZE.REQUEST */
-int	PReSyncResponse ();	/* P-RESYNCHRONIZE.RESPONSE */
-int	PActStartRequest ();	/* P-ACTIVITY-START.REQUEST */
-int	PActResumeRequest ();	/* P-ACTIVITY-RESUME.REQUEST */
-int	PActIntrRequestAux ();	/* P-ACTIVITY-{INTERRUPT,DISCARD}.REQUEST */
+int PMinSyncRequest();			/* P-MINOR-SYNC.REQUEST */
+int PMinSyncResponse();			/* P-MINOR-SYNC.RESPONSE */
+int PReSyncRequest();			/* P-RESYNCHRONIZE.REQUEST */
+int PReSyncResponse();			/* P-RESYNCHRONIZE.RESPONSE */
+int PActStartRequest();			/* P-ACTIVITY-START.REQUEST */
+int PActResumeRequest();		/* P-ACTIVITY-RESUME.REQUEST */
+int PActIntrRequestAux();		/* P-ACTIVITY-{INTERRUPT,DISCARD}.REQUEST */
 
 #define	PActIntrRequest(s,r,p) \
 	PActIntrRequestAux ((s), (r), (p), \
@@ -503,7 +551,7 @@ int	PActIntrRequestAux ();	/* P-ACTIVITY-{INTERRUPT,DISCARD}.REQUEST */
 	PActIntrRequestAux ((s), (r), (p), \
 			SActDiscRequest, "SActDiscRequest")
 
-int	PActIntrResponseAux ();	/* P-ACTIVITY-{INTERRUPT,DISCARD}.RESPONSE */
+int PActIntrResponseAux();		/* P-ACTIVITY-{INTERRUPT,DISCARD}.RESPONSE */
 
 #define	PActIntrResponse(s,p) \
 	PActIntrResponseAux ((s), (p), \
@@ -513,17 +561,19 @@ int	PActIntrResponseAux ();	/* P-ACTIVITY-{INTERRUPT,DISCARD}.RESPONSE */
 	PActIntrResponseAux ((s), (p), \
 			SActDiscResponse, "SActDiscResponse")
 
-int	PUAbortRequest ();	/* P-U-ABORT.REQUEST */
-int	PUReportRequest ();	/* P-U-EXCEPTION-REPORT.REQUEST */
-int	PRelRequest ();		/* P-RELEASE.REQUEST */
-int	PRelRetryRequest ();	/* P-RELEASE-RETRY.REQUEST (pseudo) */
-int	PRelResponse ();	/* P-RELEASE.RESPONSE */
+int PUAbortRequest();			/* P-U-ABORT.REQUEST */
+int PUReportRequest();			/* P-U-EXCEPTION-REPORT.REQUEST */
+int PRelRequest();			/* P-RELEASE.REQUEST */
+int PRelRetryRequest();			/* P-RELEASE-RETRY.REQUEST (pseudo) */
+int PRelResponse();			/* P-RELEASE.RESPONSE */
 
-int	PSetIndications ();	/* define vectors for INDICATION events */
-int	PSelectMask ();		/* map presentation descriptors for select() */
+int PSetIndications();			/* define vectors for INDICATION events */
+int PSelectMask();			/* map presentation descriptors for select() */
 
-char   *PErrString ();		/* return PSAP error code in string form */
+char *PErrString();			/* return PSAP error code in string form */
 
 #define	PLocalHostName	getlocalhost
-char   *PLocalHostName ();	/* return name of local host (sigh) */
+char *PLocalHostName();			/* return name of local host (sigh) */
 #endif
+
+#endif				/* __ISODE_PSAP2_H__ */

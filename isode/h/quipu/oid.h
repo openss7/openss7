@@ -1,10 +1,69 @@
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __ISODE_QUIPU_OID_H__
+#define __ISODE_QUIPU_OID_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
 /* oid.h - object identifier stuff */
 
 /*
- * $Header: /xtel/isode/isode/h/quipu/RCS/oid.h,v 9.0 1992/06/16 12:23:11 isode Rel $
+ * Header: /xtel/isode/isode/h/quipu/RCS/oid.h,v 9.0 1992/06/16 12:23:11 isode Rel
  *
  *
- * $Log: oid.h,v $
+ * Log: oid.h,v
  * Revision 9.0  1992/06/16  12:23:11  isode
  * Release 8.0
  *
@@ -19,7 +78,6 @@
  *    this agreement.
  *
  */
-
 
 #ifndef QUIPUOID
 #define QUIPUOID
@@ -37,7 +95,7 @@
 #define CERTIFICATE_OID	"2.5.4.36"
 
 	/* QUIPU defined attributes */
-#define SCHEMA_OID	"0.9.2342.19200300.99.1.1"	
+#define SCHEMA_OID	"0.9.2342.19200300.99.1.1"
 #define ACL_OID		"0.9.2342.19200300.99.1.2"
 #define EDBINFO_OID	"0.9.2342.19200300.99.1.3"
 #define MASTERDSA_OID	"0.9.2342.19200300.99.1.4"
@@ -94,7 +152,7 @@
 #define DIR_QUIPU_AS	str2oid("0.9.2342.19200300.99.5")
 #define DIR_INTERNET_AS	str2oid("0.9.2342.19200300.100.9")
 #define DIR_ACSE	str2oid("2.2.1.0.1")
-#else 	/* use isobjects */
+#else				/* use isobjects */
 #define DIR_ACCESS_AC	ode2oid("directory directoryAccessAC")
 #define DIR_SYSTEM_AC	ode2oid("directory directorySystemAC")
 #define DIR_QUIPU_AC	str2oid("0.9.2342.19200300.99.4")
@@ -127,55 +185,62 @@
 #define OIDNUM          3
 
 typedef struct {
-	char            *ot_name;
-	char            *ot_stroid;
-	OID             ot_oid;
-	OID             ot_aliasoid;
+	char *ot_name;
+	char *ot_stroid;
+	OID ot_oid;
+	OID ot_aliasoid;
 } oid_table;
+
 #define NULLTABLE ((oid_table * )0)
 
 typedef struct {
-	oid_table       oa_ot;
-	short		oa_syntax;
+	oid_table oa_ot;
+	short oa_syntax;
 } oid_table_attr;
+
 #define NULLTABLE_ATTR ((oid_table_attr *)0)
 
-
 typedef struct seq_tab {
-	oid_table_attr * ts_oa;
-	struct seq_tab * ts_next;
-} * table_seq;
+	oid_table_attr *ts_oa;
+	struct seq_tab *ts_next;
+} *table_seq;
+
 #define NULLTABLE_SEQ ((table_seq)0)
 
 struct oc_seq {
-   struct _objclass *os_oc;
-   struct oc_seq    *os_next;
+	struct _objclass *os_oc;
+	struct oc_seq *os_next;
 };
+
 #define NULLOCSEQ ((struct oc_seq*) 0)
 
 typedef struct _objclass {
-	oid_table        oc_ot;
-	struct oc_seq *  oc_hierachy;
-	table_seq        oc_must;
-	table_seq        oc_may;
+	oid_table oc_ot;
+	struct oc_seq *oc_hierachy;
+	table_seq oc_must;
+	table_seq oc_may;
 } objectclass;
+
 #define NULLOBJECTCLASS ((objectclass * )0)
 
 #define objclass_cmp(x,y)	( x == y ? 0 : ( x > y ? -1 : 1 ))
 
-oid_table_attr * oid2attr();
-oid_table_attr * name2attr();
-char * attr2name();
+oid_table_attr *oid2attr();
+oid_table_attr *name2attr();
+char *attr2name();
+
 #define attr2name_aux(x)	((x) ? (x)->oa_ot.ot_name : NULLCP)
 
-objectclass * oid2oc();
-objectclass * name2oc();
-char * oc2name();
+objectclass *oid2oc();
+objectclass *name2oc();
+char *oc2name();
 
-char * oid2name();      /* find oid wherever it is hiding !!! */
-OID    name2oid();
+char *oid2name();			/* find oid wherever it is hiding !!! */
+OID name2oid();
 
-char * SkipSpace ();
-void   StripSpace ();
+char *SkipSpace();
+void StripSpace();
 
 #endif
+
+#endif				/* __ISODE_QUIPU_OID_H__ */
