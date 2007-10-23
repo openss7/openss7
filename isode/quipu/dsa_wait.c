@@ -71,7 +71,7 @@ int	  secs;
     char			*ibp;
     char			wbuffer[BUFSIZ];
     char			*wbp;
-    SFD 			attempt_restart();
+    sighandler_t 		attempt_restart;
     int				newfd;
     int				result = NOTOK;
 

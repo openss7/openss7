@@ -687,7 +687,7 @@ va_list	ap;
 {
     char    buffer[BUFSIZ];
 
-    asprintf (buffer, ap);
+    xsprintf (buffer, ap);
 
     (void) fflush (stdout);
 

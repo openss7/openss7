@@ -206,7 +206,7 @@ va_list	ap;
 	roi -> roi_type = ROI_PREJECT;
 	rop = &roi -> roi_preject;
 
-	asprintf (bp = buffer, ap);
+	xsprintf (bp = buffer, ap);
 	bp += strlen (bp);
 
 	rop -> rop_reason = reason;

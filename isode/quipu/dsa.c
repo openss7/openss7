@@ -81,14 +81,14 @@ static  char *myname;
 void    adios (), advise ();
 void    mk_dsa_tmp_dir();
 static  envinit (), setdsauid();
-SFD attempt_restart();
+sighandler_t attempt_restart;
 extern int print_parse_errors;
 extern int parse_line;
 struct task_act	* task_select();
 
 char quipu_shutdown = FALSE;
 
-extern SFP abort_vector;
+extern sighandler_t abort_vector;
 
 #ifndef NO_STATS
 extern LLog    *log_stat;
@@ -147,12 +147,12 @@ char    **argv;
     /*
     * Function to stop DSA server.
     */
-    SFD          stop_dsa();
+    sighander_t          stop_dsa;
 #ifdef	SIGUSR1
-    SFD		 list_status ();
+    sighander_t		 list_status;
 #endif
 #ifdef	SIGUSR2
-    SFD		 list_status2 ();
+    sighander_t		 list_status2;
 #endif
 
     {
@@ -348,7 +348,7 @@ no_copy: ;
 static int restart = 0;
 
 /* ARGSUSED */
-SFD clean_exit(x)
+RETSIGTYPE clean_exit(x)
 int x;
 {
     if (restart)
@@ -440,7 +440,7 @@ int		  secs;
 #endif
 }
 
-SFD stop_dsa (sig)
+RETSIGTYPE stop_dsa (sig)
 int sig;
 {
 
@@ -476,7 +476,7 @@ int sig;
 #ifdef	SIGUSR1
 /* ARGSUSED */
 
-SFD	list_status (sig)
+RETSIGTYPE	list_status (sig)
 int	sig;
 {
 #ifdef SBRK_DEBUG
@@ -544,7 +544,7 @@ int	sig;
 #ifdef	SIGUSR2
 /* ARGSUSED */
 
-SFD	list_status2 (sig)
+RETSIGTYPE	list_status2 (sig)
 int	sig;
 {
 #ifdef SBRK_DEBUG
@@ -724,7 +724,7 @@ extern char * treedir;
 #define	CLEAR_TIME	300	/*   .. */
 #endif
 
-SFD attempt_restart (sig)
+RETSIGTYPE attempt_restart (sig)
 int sig;
 {
 int sd;

@@ -170,7 +170,7 @@ va_list	ap;
 	fti -> fti_type = FTI_ABORT;
 	fta = &fti -> fti_abort;
 
-	asprintf (bp = buffer, ap);
+	xsprintf (bp = buffer, ap);
 	bp += strlen (bp);
 
 	fta -> fta_peer = 0;

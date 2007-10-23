@@ -89,7 +89,7 @@ va_list ap;
 char buf[BUFSIZ];
 
   va_start (ap);
-  _asprintf (buf, NULLCP, ap);
+  _xsprintf (buf, NULLCP, ap);
   (void) fputs(buf, stdout);
   pagerOn(numOK);
   redisplay = TRUE;
@@ -108,7 +108,7 @@ static int charsInLine = 0;
   redisplay = FALSE;
   if (discardInput == TRUE)
     return;
-  _asprintf (buf, NULLCP, ap);
+  _xsprintf (buf, NULLCP, ap);
   for (i = 0; buf[i] != '\0'; i++)
   {
     if (buf[i] == '\n')

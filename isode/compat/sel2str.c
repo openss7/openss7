@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* sel2str.c - selector to string */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/compat/RCS/sel2str.c,v 9.0 1992/06/16 12:07:00 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/compat/RCS/sel2str.c,v 9.0 1992/06/16 12:07:00 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/compat/RCS/sel2str.c,v 9.0 1992/06/16 12:07:00 isode Rel $
+ * Header: /xtel/isode/isode/compat/RCS/sel2str.c,v 9.0 1992/06/16 12:07:00 isode Rel
  *
  *
- * $Log: sel2str.c,v $
+ * Log: sel2str.c,v
  * Revision 9.0  1992/06/16  12:07:00  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/compat/RCS/sel2str.c,v 9.0 1992
  *
  */
 
-
 /* LINTLIBRARY */
 
 #include <ctype.h>
@@ -35,54 +93,49 @@ static char *rcsid = "$Header: /xtel/isode/isode/compat/RCS/sel2str.c,v 9.0 1992
 
 /*  */
 
-char   *sel2str (sel, len, quoted)
-char   *sel;
-int	len,
-	quoted;
+char *
+sel2str(sel, len, quoted)
+	char *sel;
+	int len, quoted;
 {
-    register char *cp,
-		  *dp,
-    		  *ep;
-    static int    i = 0;
-    static char buf1[NASIZE * 2 + 1],
-		buf2[NASIZE * 2 + 1],
-    		buf3[NASIZE * 2 + 1],
-    		buf4[NASIZE * 2 + 1];
-    static char *bufs[] = { buf1, buf2, buf3, buf4 };
+	register char *cp, *dp, *ep;
+	static int i = 0;
+	static char buf1[NASIZE * 2 + 1],
+	    buf2[NASIZE * 2 + 1], buf3[NASIZE * 2 + 1], buf4[NASIZE * 2 + 1];
+	static char *bufs[] = { buf1, buf2, buf3, buf4 };
 
-    cp = bufs[i++];
-    i = i % 4;
+	(void) rcsid;
+	cp = bufs[i++];
+	i = i % 4;
 
-    if (quoted) {
+	if (quoted) {
 #ifndef	NOGOSIP
-	if (len == 2) {
-	    if (quoted < 0)
-		goto ugly;
-	    (void) sprintf (cp, "#%d",
-			    (sel[0] & 0xff) << 8 | (sel[1] & 0xff));
-	    goto out;
+		if (len == 2) {
+			if (quoted < 0)
+				goto ugly;
+			(void) sprintf(cp, "#%d", (sel[0] & 0xff) << 8 | (sel[1] & 0xff));
+			goto out;
+		}
+#endif
+
+		for (ep = (dp = sel) + len; dp < ep; dp++)
+			if (!isprint((unsigned char) *dp))
+				goto ugly;
+
+		if (len > NASIZE * 2)
+			len = NASIZE * 2;
+
+		(void) sprintf(cp, len ? "\"%*.*s\"" : "\"\"", len, len, sel);
+	} else {
+	      ugly:;
+		if (len > NASIZE)	/* XXX */
+			len = NASIZE;
+
+		cp[explode(cp, (unsigned char *) sel, len)] = '\0';
 	}
-#endif
-
-	for (ep = (dp = sel) + len; dp < ep; dp++)
-	    if (!isprint ((u_char) *dp))
-		goto ugly;
-
-	if (len > NASIZE * 2)
-	    len = NASIZE * 2;
-
-	(void) sprintf (cp, len ? "\"%*.*s\"" : "\"\"", len, len, sel);
-    }
-    else {
-ugly: ;
-	if (len > NASIZE)	/* XXX */
-	    len = NASIZE;
-
-	cp[explode (cp, (u_char *) sel, len)] = NULL;
-    }
 #ifndef	NOGOSIP
-out: ;
+      out:;
 #endif
-	
-    return cp;
+
+	return cp;
 }

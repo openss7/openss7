@@ -72,9 +72,9 @@ static	int	armed;
 static	jmp_buf	intrenv;
 static	int	interrupted;
 
-static	SFP	istat;
+static	sighandler_t	istat;
 
-SFD	intrser ();
+sighander_t	intrser;
 
 
 static	char   *defs = NULLCP;
@@ -1849,7 +1849,7 @@ char   *prompt,
 
 /* ARGSUSED */
 
-static	SFD intrser (sig)
+static	RETSIGTYPE intrser (sig)
 int	sig;
 {
 #ifndef	BSDSIGS
@@ -1933,7 +1933,7 @@ va_list	ap;
 {
     char    buffer[BUFSIZ];
 
-    asprintf (buffer, ap);
+    xsprintf (buffer, ap);
 
     (void) fflush (stdout);
 

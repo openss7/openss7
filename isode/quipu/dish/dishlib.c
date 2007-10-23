@@ -55,8 +55,8 @@ PS	opt, rps;
 
 DN              savename = NULLDN;
 
-SFD             dish_quit ();
-SFD             dish_intr ();
+sighandler_t             dish_quit;
+sighandler_t             dish_intr;
 char		dad_flag = FALSE;
 unsigned	cache_time = 3600;	/* time to keep process alive */
 unsigned	connect_time = 120;     /* time to keep connection open */
@@ -624,7 +624,7 @@ int x;
 }
 
 /* ARGSUSED */
-SFD dish_intr (sd)
+RETSIGTYPE dish_intr (sd)
 int sd;
 {
 #ifndef BSDSIGS

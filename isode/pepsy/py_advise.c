@@ -43,7 +43,7 @@ va_dcl
 
     va_start (ap);
 
-    asprintf (PY_pepy, ap);
+    xsprintf (PY_pepy, ap);
 
     va_end (ap);
 }

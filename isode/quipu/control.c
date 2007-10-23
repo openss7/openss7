@@ -52,7 +52,7 @@ char * str;
 DN dn2;
 Entry theentry;
 extern Entry database_root;
-SFD attempt_restart();
+sighandler_t attempt_restart;
 
 	if ( ! manager(dn) ) {
 		error->dse_type = DSE_SECURITYERROR;
@@ -192,7 +192,7 @@ DN dn;
   DN dn2;
   Entry theentry;
   extern Entry database_root;
-  SFD attempt_restart();
+  sighandler_t attempt_restart;
 
   /* Return some silly error to distinguish it from the other dsa_control */
   if ( ! manager(dn) ) 

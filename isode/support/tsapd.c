@@ -159,7 +159,7 @@ extern	int	as_print (), de_print (), fi_print ();
 void	adios (), advise ();
 static void	ts_advise ();
 #ifdef SYS5
-static  SFD cldser();
+static  sighandler_t cldser;
 #endif
 
 #ifdef	NOGOSIP
@@ -1556,7 +1556,7 @@ DN     *dn;
 /* ARGSUSED */
 #endif
 
-static SFD  hupser (sig)
+static RETSIGTYPE  hupser (sig)
 int	sig;
 {
 #ifndef	BSD42
@@ -1568,7 +1568,7 @@ int	sig;
 #endif
 
 #ifdef SYS5
-static SFD  cldser (sig)
+static RETSIGTYPE  cldser (sig)
 int   sig;
 {
       int status;

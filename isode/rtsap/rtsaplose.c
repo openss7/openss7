@@ -158,7 +158,7 @@ va_list	ap;
 	rti -> rti_type = RTI_ABORT;
 	rta = &rti -> rti_abort;
 
-	asprintf (bp = buffer, ap);
+	xsprintf (bp = buffer, ap);
 	bp += strlen (bp);
 
 	rta -> rta_peer = 0;

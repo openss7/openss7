@@ -366,7 +366,7 @@ IFP	writefnx;
 	   *vptr,
            *outptr;
     register struct udvec  *uv;
-    SFP	    pstat;
+    sighandler_t	    pstat;
 
     if (t -> t_errno != OK)
 	return t -> t_errno;

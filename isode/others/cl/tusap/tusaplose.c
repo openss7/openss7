@@ -67,7 +67,7 @@ va_list	ap;
     if (td) {
 	bzero ((char *) td, sizeof *td);
 
-	asprintf (bp = buffer, ap);
+	xsprintf (bp = buffer, ap);
 	bp += strlen (bp);
 
 	td -> td_reason = reason;

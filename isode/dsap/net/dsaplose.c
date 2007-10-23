@@ -90,7 +90,7 @@ va_list	ap;
 	da = &(di->di_abort);
 	da->da_reason = reason;
 
-	asprintf (bp = buffer, ap);
+	xsprintf (bp = buffer, ap);
 	bp += strlen (bp);
 
 	copyDSAPdata (buffer, bp - buffer, da);
@@ -156,7 +156,7 @@ va_list	ap;
 	dp->dp_id = id;
 	dp->dp_reason = reason;
 
-	asprintf (bp = buffer, ap);
+	xsprintf (bp = buffer, ap);
 	bp += strlen (bp);
 
 	copyDSAPdata (buffer, bp - buffer, dp);
