@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* dapwait.c - DAP: Deal with incoming activity */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/dsap/net/RCS/dapwait.c,v 9.0 1992/06/16 12:14:05 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/dsap/net/RCS/dapwait.c,v 9.0 1992/06/16 12:14:05 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/dsap/net/RCS/dapwait.c,v 9.0 1992/06/16 12:14:05 isode Rel $
+ * Header: /xtel/isode/isode/dsap/net/RCS/dapwait.c,v 9.0 1992/06/16 12:14:05 isode Rel
  *
  *
- * $Log: dapwait.c,v $
+ * Log: dapwait.c,v
  * Revision 9.0  1992/06/16  12:14:05  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/net/RCS/dapwait.c,v 9.0 19
  *
  */
 
-
 /* LINTLIBRARY */
 
 #include "logger.h"
@@ -32,8 +90,7 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/net/RCS/dapwait.c,v 9.0 19
 #include "quipu/dap2.h"
 #include "../x500as/DAS-types.h"
 
-
-extern LLog	* log_dsap;
+extern LLog *log_dsap;
 
 #ifdef PDU_DUMP
 #define DUMP_ARG 	"arg"
@@ -47,244 +104,257 @@ extern LLog	* log_dsap;
 
 /* ARGSUSED */
 
-int	  DapInitWaitRequest (sd, secs, di)
-int			  sd;
-int			  secs;
-struct DAPindication	* di;
+int
+DapInitWaitRequest(sd, secs, di)
+	int sd;
+	int secs;
+	struct DAPindication *di;
 {
-    int	  result;
-    struct RoSAPindication	  roi_s;
-    struct RoSAPindication	* roi = &(roi_s);
+	int result;
+	struct RoSAPindication roi_s;
+	struct RoSAPindication *roi = &(roi_s);
 
-    DLOG (log_dsap,LLOG_TRACE,( "DapInitWaitRequest()"));
+	DLOG(log_dsap, LLOG_TRACE, ("DapInitWaitRequest()"));
 
-    result = RoWaitRequest(sd, secs, roi);
+	result = RoWaitRequest(sd, secs, roi);
 
-    if (result == NOTOK)
-    {
-	return (ros2daplose (di, "RoBindWaitRequest", &(roi->roi_preject)));
-    }
+	if (result == NOTOK) {
+		return (ros2daplose(di, "RoBindWaitRequest", &(roi->roi_preject)));
+	}
 
-    switch(roi->roi_type)
-    {
+	switch (roi->roi_type) {
 	case ROI_INVOKE:
-	    LLOG (log_dsap, LLOG_EXCEPTIONS, ("DapInitWaitRequest: Invocation received"));
-	    DRejectRequest (sd, ROS_IP_UNRECOG, roi->roi_invoke.rox_id);
-	    return (daplose (di, DP_ROS, NULLCP, "DAP initiator cannot accept invokes"));
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("DapInitWaitRequest: Invocation received"));
+		DRejectRequest(sd, ROS_IP_UNRECOG, roi->roi_invoke.rox_id);
+		return (daplose(di, DP_ROS, NULLCP, "DAP initiator cannot accept invokes"));
 
 	case ROI_RESULT:
-	    return (DapDecodeResult (sd, &(roi->roi_result), di));
+		return (DapDecodeResult(sd, &(roi->roi_result), di));
 
 	case ROI_ERROR:
-	    return (DapDecodeError (sd, &(roi->roi_error), di));
+		return (DapDecodeError(sd, &(roi->roi_error), di));
 
 	case ROI_UREJECT:
-	    LLOG (log_dsap, LLOG_EXCEPTIONS, ("DapInitWaitRequest: Operation (%d) user rejected (%d)", roi->roi_ureject.rou_id, roi->roi_ureject.rou_reason));
+		LLOG(log_dsap, LLOG_EXCEPTIONS,
+		     ("DapInitWaitRequest: Operation (%d) user rejected (%d)",
+		      roi->roi_ureject.rou_id, roi->roi_ureject.rou_reason));
 		return (ros2dapreject(di, "ROI_UREJECT", &(roi->roi_ureject)));
 
 	case ROI_PREJECT:
-		LLOG (log_dsap, LLOG_EXCEPTIONS, ("DapInitWaitRequest: Operation (%d) provider rejected", roi->roi_preject.rop_id));
-		return (ros2daplose (di, "ROI_PREJECT", &(roi->roi_preject)));
+		LLOG(log_dsap, LLOG_EXCEPTIONS,
+		     ("DapInitWaitRequest: Operation (%d) provider rejected",
+		      roi->roi_preject.rop_id));
+		return (ros2daplose(di, "ROI_PREJECT", &(roi->roi_preject)));
 
 	case ROI_FINISH:
-	    LLOG (log_dsap, LLOG_EXCEPTIONS, ("DapInitWaitRequest: Unbind request received"));
-	    return (daplose (di, DP_ROS, NULLCP, "DAP initiator cannot accept unbind requests"));
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("DapInitWaitRequest: Unbind request received"));
+		return (daplose(di, DP_ROS, NULLCP, "DAP initiator cannot accept unbind requests"));
 
 	default:
-	    LLOG (log_dsap,LLOG_EXCEPTIONS,( "Unknown indication type : %d", roi->roi_type));
-	    return (daplose (di, DP_ROS, NULLCP, "DapInitWaitRequest(): RoWaitRequest error"));
-        }
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("Unknown indication type : %d", roi->roi_type));
+		return (daplose(di, DP_ROS, NULLCP, "DapInitWaitRequest(): RoWaitRequest error"));
+	}
 	/* NOT REACHED */
 }
 
-int	  DapDecodeResult (sd, ror, di)
-int			  sd;
-struct RoSAPresult	* ror;
-struct DAPindication	* di;
+int
+DapDecodeResult(sd, ror, di)
+	int sd;
+	struct RoSAPresult *ror;
+	struct DAPindication *di;
 {
-    int			  success = NOTOK;
-    PE			  pe = ror->ror_result;
-    struct DSResult	* res = &(di->di_result.dr_res);
+	int success = NOTOK;
+	PE pe = ror->ror_result;
+	struct DSResult *res = &(di->di_result.dr_res);
 
-    di->di_type = DI_RESULT;
-    di->di_result.dr_id = ror->ror_id;
+	di->di_type = DI_RESULT;
+	di->di_result.dr_id = ror->ror_id;
 
 #ifdef PDU_DUMP
-	    pdu_dump (pe,DUMP_RES,ror->ror_op);
+	pdu_dump(pe, DUMP_RES, ror->ror_op);
 #endif
 
 #ifdef	HEAVY_DEBUG
-	    pdu_res_log (pe, ror->ror_op);
+	pdu_res_log(pe, ror->ror_op);
 #endif
 
-    switch(res->result_type = ror->ror_op)
-    {
-    case    OP_READ :
-    {
-	struct ds_read_result * rr;
-	success = decode_DAS_ReadResult(pe,1,NULLIP,NULLVP,&rr);
-	res->res_rd = *rr;	/* struct copy */
-	free ( (char *) rr);
-    }
-	break;
-    case    OP_COMPARE :
-    {
-	struct ds_compare_result * cr;
-	success = decode_DAS_CompareResult(pe,1,NULLIP,NULLVP,&cr);
-	res->res_cm = *cr;	/* struct copy */
-	free ( (char *) cr);
-    }
-	break;
-    case    OP_LIST :
-    {
-	struct ds_list_result * lr;
-	success = decode_DAS_ListResult(pe,1,NULLIP,NULLVP,&lr);
-	res->res_ls = *lr;	/* struct copy */
-	free ( (char *) lr);
-    }
-	break;
-    case    OP_SEARCH :
-    {
-	struct ds_search_result * sr;
-	success = decode_DAS_SearchResult(pe,1,NULLIP,NULLVP,&sr);
-	res->res_sr = *sr;	/* struct copy */
-	free ( (char *) sr);
-    }
-	break;
+	switch (res->result_type = ror->ror_op) {
+	case OP_READ:
+	{
+		struct ds_read_result *rr;
 
-    case    OP_ADDENTRY :
-    case    OP_REMOVEENTRY :
-    case    OP_MODIFYENTRY :
-    case    OP_MODIFYRDN :
-    case    OP_ABANDON :
+		success = decode_DAS_ReadResult(pe, 1, NULLIP, NULLVP, &rr);
+		res->res_rd = *rr;	/* struct copy */
+		free((char *) rr);
+	}
+		break;
+	case OP_COMPARE:
+	{
+		struct ds_compare_result *cr;
 
-	if ( pe && 
-	    (pe -> pe_form == PE_FORM_PRIM) &&
-	    ( PE_ID (pe -> pe_class, pe -> pe_id) == 
-	      PE_ID (PE_CLASS_UNIV, PE_PRIM_NULL)
-	    ))
-		success = OK;
-	break;
+		success = decode_DAS_CompareResult(pe, 1, NULLIP, NULLVP, &cr);
+		res->res_cm = *cr;	/* struct copy */
+		free((char *) cr);
+	}
+		break;
+	case OP_LIST:
+	{
+		struct ds_list_result *lr;
 
-    default:
-	LLOG(log_dsap, LLOG_EXCEPTIONS, ("DapDecodeResult: op id %d unknown!", ror->ror_op));
-	DRejectRequest (sd, ROS_RRP_UNRECOG, ror->ror_id);
-	return (daplose (di, DP_RESULT, NULLCP, "Unknown operation identifier"));
-    }
+		success = decode_DAS_ListResult(pe, 1, NULLIP, NULLVP, &lr);
+		res->res_ls = *lr;	/* struct copy */
+		free((char *) lr);
+	}
+		break;
+	case OP_SEARCH:
+	{
+		struct ds_search_result *sr;
 
-    if (success == NOTOK)
-    {
-	LLOG (log_dsap, LLOG_EXCEPTIONS, ("DapDecodeResult: Unable to parse argument"));
-	DRejectRequest (sd, ROS_RRP_MISTYPED, ror->ror_id);
-	return (daplose (di, DP_RESULT, NULLCP, "Undecodable argument"));
-    }
+		success = decode_DAS_SearchResult(pe, 1, NULLIP, NULLVP, &sr);
+		res->res_sr = *sr;	/* struct copy */
+		free((char *) sr);
+	}
+		break;
 
-    RORFREE (ror);
+	case OP_ADDENTRY:
+	case OP_REMOVEENTRY:
+	case OP_MODIFYENTRY:
+	case OP_MODIFYRDN:
+	case OP_ABANDON:
 
-    return(success);
+		if (pe &&
+		    (pe->pe_form == PE_FORM_PRIM) &&
+		    (PE_ID(pe->pe_class, pe->pe_id) == PE_ID(PE_CLASS_UNIV, PE_PRIM_NULL)
+		    ))
+			success = OK;
+		break;
+
+	default:
+		LLOG(log_dsap, LLOG_EXCEPTIONS,
+		     ("DapDecodeResult: op id %d unknown!", ror->ror_op));
+		DRejectRequest(sd, ROS_RRP_UNRECOG, ror->ror_id);
+		return (daplose(di, DP_RESULT, NULLCP, "Unknown operation identifier"));
+	}
+
+	if (success == NOTOK) {
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("DapDecodeResult: Unable to parse argument"));
+		DRejectRequest(sd, ROS_RRP_MISTYPED, ror->ror_id);
+		return (daplose(di, DP_RESULT, NULLCP, "Undecodable argument"));
+	}
+
+	RORFREE(ror);
+
+	return (success);
 }
 
-int	  DapDecodeError (sd, roe, di)
-int			  sd;
-struct RoSAPerror	* roe;
-struct DAPindication	* di;
+int
+DapDecodeError(sd, roe, di)
+	int sd;
+	struct RoSAPerror *roe;
+	struct DAPindication *di;
 {
-    int			  success;
-    PE			  pe = roe->roe_param;
-    struct DSError	* err = &(di->di_error.de_err);
+	int success;
+	PE pe = roe->roe_param;
+	struct DSError *err = &(di->di_error.de_err);
 
 #ifdef PDU_DUMP
-	    pdu_dump (pe,DUMP_ERR,roe->roe_id);
+	pdu_dump(pe, DUMP_ERR, roe->roe_id);
 #endif
 
-    di->di_type = DI_ERROR;
-    di->di_error.de_id = roe->roe_id;
+	di->di_type = DI_ERROR;
+	di->di_error.de_id = roe->roe_id;
 
-    switch(err->dse_type = roe->roe_error)
-    {
-    case    DSE_ABANDON_FAILED :
-    {
-	struct DSE_abandon_fail * af;
-	success = decode_DAS_AbandonFailedParm(pe,1,NULLIP,NULLVP,&af);
-	err->dse_un.dse_un_abandon_fail = *af; /* struct copy */
-	free ((char *)af);
-    }
-	break;
-    case    DSE_ATTRIBUTEERROR :
-    {
-	struct DSE_attribute * at;
-	success = decode_DAS_AttributeErrorParm(pe,1,NULLIP,NULLVP,&at);
-	err->dse_un.dse_un_attribute = *at; /* struct copy */
-	free ((char *) at);
-    }
-	break;
-    case    DSE_NAMEERROR : 
-    {
-	struct DSE_name * at;
-	success = decode_DAS_NameErrorParm(pe,1,NULLIP,NULLVP,&at);
-	err->dse_un.dse_un_name = *at; /* struct copy */
-	free ((char *) at);
-    }
-	break;
-    case    DSE_REFERRAL :
-    {
-	struct DSE_referral * at;
-	success = decode_DAS_ReferralParm(pe,1,NULLIP,NULLVP,&at);
-	err->dse_un.dse_un_referral = *at; /* struct copy */
-	free ((char *) at);
-    }
-	break;
-    case    DSE_SECURITYERROR :
-    {
-	struct DSE_security * at;
-	success = decode_DAS_SecurityErrorParm(pe,1,NULLIP,NULLVP,&at);
-	err->dse_un.dse_un_security = *at; /* struct copy */
-	free ((char *) at);
-    }
-	break;
-    case    DSE_SERVICEERROR :
-    {
-	struct DSE_service * at;
-	success = decode_DAS_ServiceErrorParm(pe,1,NULLIP,NULLVP,&at);
-	err->dse_un.dse_un_service = *at; /* struct copy */
-	free ((char *) at);
-    }
-	break;
-    case    DSE_UPDATEERROR :
-    {
-	struct DSE_update * at;
-	success = decode_DAS_UpdateErrorParm(pe,1,NULLIP,NULLVP,&at);
-	err->dse_un.dse_un_update = *at; /* struct copy */
-	free ((char *) at);
-    }
-	break;
-    case    DSE_ABANDONED :
-	success = ((pe == NULLPE) ? OK : NOTOK);
-	break;
-    case	DSE_DSAREFERRAL :
-    {
-	struct DSE_referral * at;
-	success = decode_DO_DSAReferralParm(pe, 1, NULLIP, NULLVP, &at);
-	err->dse_un.dse_un_referral = *at; /* struct copy */
-	free ((char *) at);
-    }
-	break;
+	switch (err->dse_type = roe->roe_error) {
+	case DSE_ABANDON_FAILED:
+	{
+		struct DSE_abandon_fail *af;
 
-    default:
-	LLOG(log_dsap, LLOG_EXCEPTIONS, ("DapDecodeError: op id %d unknown!", roe->roe_error));
-	DRejectRequest (sd, ROS_REP_UNRECOG, roe->roe_id);
-	return (daplose (di, DP_ERROR, NULLCP, "Unknown operation identifier"));
-    }
+		success = decode_DAS_AbandonFailedParm(pe, 1, NULLIP, NULLVP, &af);
+		err->dse_un.dse_un_abandon_fail = *af;	/* struct copy */
+		free((char *) af);
+	}
+		break;
+	case DSE_ATTRIBUTEERROR:
+	{
+		struct DSE_attribute *at;
 
-    if (success == NOTOK)
-    {
-	LLOG (log_dsap, LLOG_EXCEPTIONS, ("DapDecodeError: Unable to parse argument"));
-	DRejectRequest (sd, ROS_RRP_MISTYPED, roe->roe_id);
-	return (daplose (di, DP_ERROR, NULLCP, "Undecodable argument"));
-    }
+		success = decode_DAS_AttributeErrorParm(pe, 1, NULLIP, NULLVP, &at);
+		err->dse_un.dse_un_attribute = *at;	/* struct copy */
+		free((char *) at);
+	}
+		break;
+	case DSE_NAMEERROR:
+	{
+		struct DSE_name *at;
 
-    ROEFREE (roe);
+		success = decode_DAS_NameErrorParm(pe, 1, NULLIP, NULLVP, &at);
+		err->dse_un.dse_un_name = *at;	/* struct copy */
+		free((char *) at);
+	}
+		break;
+	case DSE_REFERRAL:
+	{
+		struct DSE_referral *at;
 
-    return(success);
+		success = decode_DAS_ReferralParm(pe, 1, NULLIP, NULLVP, &at);
+		err->dse_un.dse_un_referral = *at;	/* struct copy */
+		free((char *) at);
+	}
+		break;
+	case DSE_SECURITYERROR:
+	{
+		struct DSE_security *at;
+
+		success = decode_DAS_SecurityErrorParm(pe, 1, NULLIP, NULLVP, &at);
+		err->dse_un.dse_un_security = *at;	/* struct copy */
+		free((char *) at);
+	}
+		break;
+	case DSE_SERVICEERROR:
+	{
+		struct DSE_service *at;
+
+		success = decode_DAS_ServiceErrorParm(pe, 1, NULLIP, NULLVP, &at);
+		err->dse_un.dse_un_service = *at;	/* struct copy */
+		free((char *) at);
+	}
+		break;
+	case DSE_UPDATEERROR:
+	{
+		struct DSE_update *at;
+
+		success = decode_DAS_UpdateErrorParm(pe, 1, NULLIP, NULLVP, &at);
+		err->dse_un.dse_un_update = *at;	/* struct copy */
+		free((char *) at);
+	}
+		break;
+	case DSE_ABANDONED:
+		success = ((pe == NULLPE) ? OK : NOTOK);
+		break;
+	case DSE_DSAREFERRAL:
+	{
+		struct DSE_referral *at;
+
+		success = decode_DO_DSAReferralParm(pe, 1, NULLIP, NULLVP, &at);
+		err->dse_un.dse_un_referral = *at;	/* struct copy */
+		free((char *) at);
+	}
+		break;
+
+	default:
+		LLOG(log_dsap, LLOG_EXCEPTIONS,
+		     ("DapDecodeError: op id %d unknown!", roe->roe_error));
+		DRejectRequest(sd, ROS_REP_UNRECOG, roe->roe_id);
+		return (daplose(di, DP_ERROR, NULLCP, "Unknown operation identifier"));
+	}
+
+	if (success == NOTOK) {
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("DapDecodeError: Unable to parse argument"));
+		DRejectRequest(sd, ROS_RRP_MISTYPED, roe->roe_id);
+		return (daplose(di, DP_ERROR, NULLCP, "Undecodable argument"));
+	}
+
+	ROEFREE(roe);
+
+	return (success);
 }
-

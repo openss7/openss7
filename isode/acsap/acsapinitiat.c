@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* acsapinitiat.c - ACPM: initiator */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/acsap/RCS/acsapinitiat.c,v 9.0 1992/06/16 12:05:59 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/acsap/RCS/acsapinitiat.c,v 9.0 1992/06/16 12:05:59 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/acsap/RCS/acsapinitiat.c,v 9.0 1992/06/16 12:05:59 isode Rel $
+ * Header: /xtel/isode/isode/acsap/RCS/acsapinitiat.c,v 9.0 1992/06/16 12:05:59 isode Rel
  *
  *
- * $Log: acsapinitiat.c,v $
+ * Log: acsapinitiat.c,v
  * Revision 9.0  1992/06/16  12:05:59  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/acsap/RCS/acsapinitiat.c,v 9.0 
  *
  */
 
-
 /* LINTLIBRARY */
 
 #include <stdio.h>
@@ -35,571 +93,535 @@ static char *rcsid = "$Header: /xtel/isode/isode/acsap/RCS/acsapinitiat.c,v 9.0 
 #include "isoservent.h"
 #include "tailor.h"
 
-static int AcAssocRequestAux ();
-static int  AcAsynRetryAux ();
+static int AcAssocRequestAux();
+static int AcAsynRetryAux();
 
 /*    A-(ASYN-)ASSOCIATE.REQUEST */
 
-int	AcAsynAssocRequest (context, callingtitle, calledtitle, callingaddr,
-	calledaddr, ctxlist, defctxname, prequirements, srequirements, isn,
-	settings, ref, data, ndata, qos, acc, aci, async)
-OID	context;
-AEI	callingtitle,
-	calledtitle;
-struct PSAPaddr *callingaddr,
-		*calledaddr;
-int	prequirements,
-	srequirements,
-	settings,
-	ndata,
-	async;
-long	isn;
-struct PSAPctxlist *ctxlist;
-OID	defctxname;
-struct SSAPref *ref;
-PE    *data;
-struct QOStype *qos;
-struct AcSAPconnect *acc;
-struct AcSAPindication *aci;
+int
+AcAsynAssocRequest(context, callingtitle, calledtitle, callingaddr,
+		   calledaddr, ctxlist, defctxname, prequirements, srequirements, isn,
+		   settings, ref, data, ndata, qos, acc, aci, async)
+	OID context;
+	AEI callingtitle, calledtitle;
+	struct PSAPaddr *callingaddr, *calledaddr;
+	int prequirements, srequirements, settings, ndata, async;
+	long isn;
+	struct PSAPctxlist *ctxlist;
+	OID defctxname;
+	struct SSAPref *ref;
+	PE *data;
+	struct QOStype *qos;
+	struct AcSAPconnect *acc;
+	struct AcSAPindication *aci;
 {
-    SBV     smask;
-    int     result;
+	SBV smask;
+	int result;
 
-    isodetailor (NULLCP, 0);
+	isodetailor(NULLCP, 0);
 
-    missingP (context);
+	missingP(context);
 #ifdef	notdef
-    missingP (callingtitle);
-    missingP (calledtitle);
+	missingP(callingtitle);
+	missingP(calledtitle);
 #endif
 
 /* let presentation provider catch errors in presentation parameters */
 /* except this one... */
-    missingP (ctxlist);
+	missingP(ctxlist);
 
-    toomuchP (data, ndata, NACDATA, "initial");
-    if (data) {	    /* XXX: probably should have a more intensive check... */
-	register int    i;
-	register PE    *pep;
+	toomuchP(data, ndata, NACDATA, "initial");
+	if (data) {		/* XXX: probably should have a more intensive check... */
+		register int i;
+		register PE *pep;
 
-	for (pep = data, i = ndata; i > 0; pep++, i--)
-	    if ((*pep) -> pe_context == PE_DFLT_CTX)
-		return acsaplose (aci, ACS_PARAMETER, NULLCP,
-			"default context not allowed for user-data at slot %d",
-				  pep - data);
-    }
-    missingP (acc);
-    missingP (aci);
+		for (pep = data, i = ndata; i > 0; pep++, i--)
+			if ((*pep)->pe_context == PE_DFLT_CTX)
+				return acsaplose(aci, ACS_PARAMETER, NULLCP,
+						 "default context not allowed for user-data at slot %d",
+						 pep - data);
+	}
+	missingP(acc);
+	missingP(aci);
 
-    smask = sigioblock ();
+	smask = sigioblock();
 
-    result = AcAssocRequestAux (context, callingtitle, calledtitle,
-	    callingaddr, calledaddr, ctxlist, defctxname, prequirements,
-	    srequirements, isn, settings, ref, data, ndata, qos, acc, aci,
-	    async);
+	result = AcAssocRequestAux(context, callingtitle, calledtitle,
+				   callingaddr, calledaddr, ctxlist, defctxname, prequirements,
+				   srequirements, isn, settings, ref, data, ndata, qos, acc, aci,
+				   async);
 
-    (void) sigiomask (smask);
+	(void) sigiomask(smask);
 
-    return result;
+	return result;
 }
 
 /*  */
 
-static int AcAssocRequestAux (context, callingtitle, calledtitle, callingaddr,
-	calledaddr, ctxlist, defctxname, prequirements, srequirements, isn,
-	settings, ref, data, ndata, qos, acc, aci, async)
-OID	context;
-AEI	callingtitle,
-	calledtitle;
-struct PSAPaddr *callingaddr,
-		*calledaddr;
-int	prequirements,
-	srequirements,
-	settings,
-	ndata,	
-	async;
-long	isn;
-struct PSAPctxlist *ctxlist;
-OID	defctxname;
-struct SSAPref *ref;
-PE    *data;
-struct QOStype *qos;
-struct AcSAPconnect *acc;
-struct AcSAPindication *aci;
+static int
+AcAssocRequestAux(context, callingtitle, calledtitle, callingaddr,
+		  calledaddr, ctxlist, defctxname, prequirements, srequirements, isn,
+		  settings, ref, data, ndata, qos, acc, aci, async)
+	OID context;
+	AEI callingtitle, calledtitle;
+	struct PSAPaddr *callingaddr, *calledaddr;
+	int prequirements, srequirements, settings, ndata, async;
+	long isn;
+	struct PSAPctxlist *ctxlist;
+	OID defctxname;
+	struct SSAPref *ref;
+	PE *data;
+	struct QOStype *qos;
+	struct AcSAPconnect *acc;
+	struct AcSAPindication *aci;
 {
-    register int    i;
-    int	    result;
-    PE	    pe;
-    register struct assocblk *acb;
-    register struct PSAPcontext *pp;
-    register struct PSAPconnect *pc = &acc -> acc_connect;
-    struct PSAPindication pis;
-    register struct PSAPindication *pi = &pis;
-    register struct PSAPabort *pa = &pi -> pi_abort;
-    register struct type_ACS_AARQ__apdu *pdu;
+	register int i;
+	int result;
+	PE pe;
+	register struct assocblk *acb;
+	register struct PSAPcontext *pp;
+	register struct PSAPconnect *pc = &acc->acc_connect;
+	struct PSAPindication pis;
+	register struct PSAPindication *pi = &pis;
+	register struct PSAPabort *pa = &pi->pi_abort;
+	register struct type_ACS_AARQ__apdu *pdu;
 
-    if ((acb = newacblk ()) == NULL)
-	return acsaplose (aci, ACS_CONGEST, NULLCP, "out of memory");
+	if ((acb = newacblk()) == NULL)
+		return acsaplose(aci, ACS_CONGEST, NULLCP, "out of memory");
 
-    pe = NULLPE;
-    if ((pdu = (struct type_ACS_AARQ__apdu *) calloc (1, sizeof *pdu))
+	pe = NULLPE;
+	if ((pdu = (struct type_ACS_AARQ__apdu *) calloc(1, sizeof *pdu))
 	    == NULL) {
-no_mem: ;
-	result = acsaplose (aci, ACS_CONGEST, NULLCP, "out of memory");
-	goto out;
-    }
-    pdu -> application__context__name = context;
-    if (calledtitle) {
-	pdu -> called__AP__title = calledtitle -> aei_ap_title;
-	pdu -> called__AE__qualifier = calledtitle -> aei_ae_qualifier;
-	if (calledtitle -> aei_flags & AEI_AP_ID)
-	    pdu -> called__AP__invocation__id =
-		(struct type_ACS_AP__invocation__id *)
-		    &calledtitle -> aei_ap_id;
-	if (calledtitle -> aei_flags & AEI_AE_ID)
-	    pdu -> called__AE__invocation__id =
-	    	(struct type_ACS_AE__invocation__id *)
-	    	    &calledtitle -> aei_ae_id;
-    }
-    if (callingtitle) {
-	pdu -> calling__AP__title = callingtitle -> aei_ap_title;
-	pdu -> calling__AE__qualifier = callingtitle -> aei_ae_qualifier;
-	if (callingtitle -> aei_flags & AEI_AP_ID)
-	    pdu -> calling__AP__invocation__id =
-		(struct type_ACS_AP__invocation__id *)
-		    &callingtitle -> aei_ap_id;
-	if (callingtitle -> aei_flags & AEI_AE_ID)
-	    pdu -> calling__AE__invocation__id =
-	    	(struct type_ACS_AE__invocation__id *)
-	    	    &callingtitle -> aei_ae_id;
-    }
-    if (data
-	    && ndata > 0
-	    && (pdu -> user__information = info2apdu (acb, aci, data, ndata))
-			== NULL)
-	goto out;
+	      no_mem:;
+		result = acsaplose(aci, ACS_CONGEST, NULLCP, "out of memory");
+		goto out;
+	}
+	pdu->application__context__name = context;
+	if (calledtitle) {
+		pdu->called__AP__title = calledtitle->aei_ap_title;
+		pdu->called__AE__qualifier = calledtitle->aei_ae_qualifier;
+		if (calledtitle->aei_flags & AEI_AP_ID)
+			pdu->called__AP__invocation__id = (struct type_ACS_AP__invocation__id *)
+			    &calledtitle->aei_ap_id;
+		if (calledtitle->aei_flags & AEI_AE_ID)
+			pdu->called__AE__invocation__id = (struct type_ACS_AE__invocation__id *)
+			    &calledtitle->aei_ae_id;
+	}
+	if (callingtitle) {
+		pdu->calling__AP__title = callingtitle->aei_ap_title;
+		pdu->calling__AE__qualifier = callingtitle->aei_ae_qualifier;
+		if (callingtitle->aei_flags & AEI_AP_ID)
+			pdu->calling__AP__invocation__id = (struct type_ACS_AP__invocation__id *)
+			    &callingtitle->aei_ap_id;
+		if (callingtitle->aei_flags & AEI_AE_ID)
+			pdu->calling__AE__invocation__id = (struct type_ACS_AE__invocation__id *)
+			    &callingtitle->aei_ae_id;
+	}
+	if (data && ndata > 0 && (pdu->user__information = info2apdu(acb, aci, data, ndata))
+	    == NULL)
+		goto out;
 
-    result = encode_ACS_AARQ__apdu (&pe, 1, 0, NULLCP, pdu);
+	result = encode_ACS_AARQ__apdu(&pe, 1, 0, NULLCP, pdu);
 
-    if (pdu -> user__information)
-	free_ACS_Association__information (pdu -> user__information);
-    free ((char *) pdu);
-    pdu = NULL;
+	if (pdu->user__information)
+		free_ACS_Association__information(pdu->user__information);
+	free((char *) pdu);
+	pdu = NULL;
 
-    if (result == NOTOK) {
-	(void) acsaplose (aci, ACS_CONGEST, NULLCP, "error encoding PDU: %s",
-			  PY_pepy);
-	goto out;
-    }
-
-    if (ctxlist -> pc_nctx >= NPCTX) {
-	result = acsaplose (aci, ACS_PARAMETER, NULLCP,
-			    "too many contexts");
-	goto out;
-    }
-
-    {
-	register int ctx;
-	register OID oid;
-
-	if ((oid = AC_ASN_OID) == NULLOID) {
-	    result = acsaplose (aci, ACS_PARAMETER, NULLCP,
-				"%s: unknown", AC_ASN);
-	    goto out;
+	if (result == NOTOK) {
+		(void) acsaplose(aci, ACS_CONGEST, NULLCP, "error encoding PDU: %s", PY_pepy);
+		goto out;
 	}
 
-	for (pp = ctxlist -> pc_ctx, i = ctxlist -> pc_nctx - 1;
-		i >= 0;
-		pp++, i--)
-	    if (oid_cmp (pp -> pc_asn, oid)) {
-		if (acb -> acb_rosid == PE_DFLT_CTX)
-		    acb -> acb_rosid = pp -> pc_id;
-		break;
-	    }
-
-	ctx = 1;
-	for (pp = ctxlist -> pc_ctx, i = ctxlist -> pc_nctx - 1;
-	         i >= 0;
-	         i--, pp++) {
-	    if (oid_cmp (pp -> pc_asn, oid) == 0) {
-		acb -> acb_id = pp -> pc_id;
-		acb -> acb_offset = pp - ctxlist -> pc_ctx;
-
-		pp = NULL;
-		goto ready;
-	    }
-
-	    if (ctx <= pp -> pc_id)
-		ctx = pp -> pc_id + 2;
+	if (ctxlist->pc_nctx >= NPCTX) {
+		result = acsaplose(aci, ACS_PARAMETER, NULLCP, "too many contexts");
+		goto out;
 	}
-	pp -> pc_id = ctx;
-	if ((pp -> pc_asn = oid_cpy (oid)) == NULLOID)
-	    goto no_mem;
-	if (pp -> pc_atn = BER_OID)
-	    pp -> pc_atn = oid_cpy (pp -> pc_atn);
 
-	acb -> acb_id = pp -> pc_id;
-	acb -> acb_offset = -1;
+	{
+		register int ctx;
+		register OID oid;
 
-	ctxlist -> pc_nctx++;
-    }
-ready: ;
-    pe -> pe_context = acb -> acb_id;
+		if ((oid = AC_ASN_OID) == NULLOID) {
+			result = acsaplose(aci, ACS_PARAMETER, NULLCP, "%s: unknown", AC_ASN);
+			goto out;
+		}
 
-    PLOGP (acsap_log,ACS_ACSE__apdu, pe, "AARQ-apdu", 0);
+		for (pp = ctxlist->pc_ctx, i = ctxlist->pc_nctx - 1; i >= 0; pp++, i--)
+			if (oid_cmp(pp->pc_asn, oid)) {
+				if (acb->acb_rosid == PE_DFLT_CTX)
+					acb->acb_rosid = pp->pc_id;
+				break;
+			}
 
-    bzero ((char *) acc, sizeof *acc);
-    bzero ((char *) pa, sizeof *pa);
+		ctx = 1;
+		for (pp = ctxlist->pc_ctx, i = ctxlist->pc_nctx - 1; i >= 0; i--, pp++) {
+			if (oid_cmp(pp->pc_asn, oid) == 0) {
+				acb->acb_id = pp->pc_id;
+				acb->acb_offset = pp - ctxlist->pc_ctx;
 
-    result = PAsynConnRequest (callingaddr, calledaddr,
-	    ctxlist, defctxname, prequirements, srequirements, isn,
-	    settings, ref, &pe, 1, qos, pc, pi, async);
-    
-    if (pp) {
-	oid_free (pp -> pc_asn);
-	if (pp -> pc_atn)
-	    oid_free (pp -> pc_atn);
-	pp -> pc_asn = pp -> pc_atn = NULLOID;
-	ctxlist -> pc_nctx--;
-    }
+				pp = NULL;
+				goto ready;
+			}
 
-    pe_free (pe);
-    pe = NULLPE;
+			if (ctx <= pp->pc_id)
+				ctx = pp->pc_id + 2;
+		}
+		pp->pc_id = ctx;
+		if ((pp->pc_asn = oid_cpy(oid)) == NULLOID)
+			goto no_mem;
+		if (pp->pc_atn = BER_OID)
+			pp->pc_atn = oid_cpy(pp->pc_atn);
 
-    if (result == NOTOK) {
-	(void) ps2acslose (NULLACB, aci, "PAsynConnRequest", pa);
-	goto out;
-    }
+		acb->acb_id = pp->pc_id;
+		acb->acb_offset = -1;
 
-    acb -> acb_fd = pc -> pc_sd;
-    acb -> acb_flags |= ACB_ACS;
-    acb -> acb_uabort = PUAbortRequest;
-
-    if (async) {
-	switch (result) {
-	case CONNECTING_1:
-	case CONNECTING_2:
-	    acc -> acc_sd = acb -> acb_fd;
-	    return result;
+		ctxlist->pc_nctx++;
 	}
-    }
-    if ((result = AcAsynRetryAux (acb, pc, pi, acc, aci)) == DONE && !async)
-	result = OK;
-    return result;
-    
-out: ;
-    if (pdu) {
-	if (pdu -> user__information)
-	    free_ACS_Association__information (pdu -> user__information);
-	free ((char *) pdu);
-    }
-    if (pe)
-	pe_free (pe);
+      ready:;
+	pe->pe_context = acb->acb_id;
 
-    freeacblk (acb);
+	PLOGP(acsap_log, ACS_ACSE__apdu, pe, "AARQ-apdu", 0);
 
-    return result;
+	bzero((char *) acc, sizeof *acc);
+	bzero((char *) pa, sizeof *pa);
+
+	result = PAsynConnRequest(callingaddr, calledaddr,
+				  ctxlist, defctxname, prequirements, srequirements, isn,
+				  settings, ref, &pe, 1, qos, pc, pi, async);
+
+	if (pp) {
+		oid_free(pp->pc_asn);
+		if (pp->pc_atn)
+			oid_free(pp->pc_atn);
+		pp->pc_asn = pp->pc_atn = NULLOID;
+		ctxlist->pc_nctx--;
+	}
+
+	pe_free(pe);
+	pe = NULLPE;
+
+	if (result == NOTOK) {
+		(void) ps2acslose(NULLACB, aci, "PAsynConnRequest", pa);
+		goto out;
+	}
+
+	acb->acb_fd = pc->pc_sd;
+	acb->acb_flags |= ACB_ACS;
+	acb->acb_uabort = PUAbortRequest;
+
+	if (async) {
+		switch (result) {
+		case CONNECTING_1:
+		case CONNECTING_2:
+			acc->acc_sd = acb->acb_fd;
+			return result;
+		}
+	}
+	if ((result = AcAsynRetryAux(acb, pc, pi, acc, aci)) == DONE && !async)
+		result = OK;
+	return result;
+
+      out:;
+	if (pdu) {
+		if (pdu->user__information)
+			free_ACS_Association__information(pdu->user__information);
+		free((char *) pdu);
+	}
+	if (pe)
+		pe_free(pe);
+
+	freeacblk(acb);
+
+	return result;
 }
 
 /*    A-ASYN-RETRY.REQUEST (pseudo) */
 
-int	AcAsynRetryRequest (sd, acc, aci)
-int	sd;
-struct AcSAPconnect *acc;
-struct AcSAPindication *aci;
+int
+AcAsynRetryRequest(sd, acc, aci)
+	int sd;
+	struct AcSAPconnect *acc;
+	struct AcSAPindication *aci;
 {
-    SBV     smask;
-    int     result;
-    register struct assocblk *acb;
-    register struct PSAPconnect *pc;
-    struct PSAPindication pis;
-    register struct PSAPindication *pi = &pis;
-    register struct PSAPabort *pa = &pi -> pi_abort;
+	SBV smask;
+	int result;
+	register struct assocblk *acb;
+	register struct PSAPconnect *pc;
+	struct PSAPindication pis;
+	register struct PSAPindication *pi = &pis;
+	register struct PSAPabort *pa = &pi->pi_abort;
 
-    missingP (acc);
-    missingP (aci);
+	missingP(acc);
+	missingP(aci);
 
-    smask = sigioblock ();
+	smask = sigioblock();
 
-    if ((acb = findacblk (sd)) == NULL) {
-	(void) sigiomask (smask);
-	return acsaplose (aci, ACS_PARAMETER, NULLCP,
-		"invalid association descriptor");
-    }
-    if (acb -> acb_flags & ACB_CONN) {
-	(void) sigiomask (smask);
-	return acsaplose (aci, ACS_OPERATION, NULLCP,
-		"association descriptor connected");
-    }
+	if ((acb = findacblk(sd)) == NULL) {
+		(void) sigiomask(smask);
+		return acsaplose(aci, ACS_PARAMETER, NULLCP, "invalid association descriptor");
+	}
+	if (acb->acb_flags & ACB_CONN) {
+		(void) sigiomask(smask);
+		return acsaplose(aci, ACS_OPERATION, NULLCP, "association descriptor connected");
+	}
 
-    pc = &acc -> acc_connect;
-    bzero ((char *) acc, sizeof *acc);
-    bzero ((char *) pa, sizeof *pa);
+	pc = &acc->acc_connect;
+	bzero((char *) acc, sizeof *acc);
+	bzero((char *) pa, sizeof *pa);
 
-    switch (result = PAsynRetryRequest (acb -> acb_fd, pc, pi)) {
-	case NOTOK: 
-	    acb -> acb_fd = NOTOK;
-	    (void) ps2acslose (acb, aci, "PAsynRetryRequest", pa);
-	    freeacblk (acb);
-	    break;
+	switch (result = PAsynRetryRequest(acb->acb_fd, pc, pi)) {
+	case NOTOK:
+		acb->acb_fd = NOTOK;
+		(void) ps2acslose(acb, aci, "PAsynRetryRequest", pa);
+		freeacblk(acb);
+		break;
 
 	case CONNECTING_1:
 	case CONNECTING_2:
-	    break;
+		break;
 
-	case DONE: 
-	    result = AcAsynRetryAux (acb, pc, pi, acc, aci);
-	    break;
-    }
+	case DONE:
+		result = AcAsynRetryAux(acb, pc, pi, acc, aci);
+		break;
+	}
 
-    (void) sigiomask (smask);
+	(void) sigiomask(smask);
 
-    return result;
+	return result;
 }
 
 /*  */
 
-static int  AcAsynRetryAux (acb, pc, pi, acc, aci)
-register struct assocblk *acb;
-struct PSAPconnect *pc;
-struct PSAPindication *pi;
-struct AcSAPconnect *acc;
-struct AcSAPindication *aci;
+static int
+AcAsynRetryAux(acb, pc, pi, acc, aci)
+	register struct assocblk *acb;
+	struct PSAPconnect *pc;
+	struct PSAPindication *pi;
+	struct AcSAPconnect *acc;
+	struct AcSAPindication *aci;
 {
-    register int    i;
-    int	    result;
-    PE	    pe;
-    register struct PSAPcontext *pp;
-    register struct PSAPabort *pa = &pi -> pi_abort;
-    struct type_ACS_ACSE__apdu *pdu;
-    register struct type_ACS_AARE__apdu *aare;
+	register int i;
+	int result;
+	PE pe;
+	register struct PSAPcontext *pp;
+	register struct PSAPabort *pa = &pi->pi_abort;
+	struct type_ACS_ACSE__apdu *pdu;
+	register struct type_ACS_AARE__apdu *aare;
 
-    if (pc -> pc_result == PC_ABORTED) {
-	(void) ps2acsabort (acb, pa, aci);
+	if (pc->pc_result == PC_ABORTED) {
+		(void) ps2acsabort(acb, pa, aci);
 
-	acc -> acc_sd = NOTOK;
-	acc -> acc_result = ACS_ABORTED;
+		acc->acc_sd = NOTOK;
+		acc->acc_result = ACS_ABORTED;
 
-	return DONE;
-    }
-
-    pe = NULLPE;
-    pdu = NULL;
-
-    if (pc -> pc_ninfo < 1) {
-	if (pc -> pc_result != PC_ACCEPT) {
-	    pa -> pa_reason = pc -> pc_result;
-	    acb -> acb_fd = NOTOK;
-	    (void) ps2acslose (acb, aci, "PAsynConnRequest(pseudo)", pa);
-
-	    acc -> acc_sd = NOTOK;
-	    acc -> acc_result = aci -> aci_abort.aca_reason;
-
-	    result = DONE;
+		return DONE;
 	}
-	else
-	    result = acpktlose (acb, aci, ACS_PROTOCOL, NULLCP, NULLCP);
-	goto out;
-    }
 
-    acb -> acb_fd = pc -> pc_sd;
-    acb -> acb_sversion = pc -> pc_qos.qos_sversion;
-    
-    result = decode_ACS_ACSE__apdu (pe = pc -> pc_info[0], 1, NULLIP, NULLVP,
-				    &pdu);
+	pe = NULLPE;
+	pdu = NULL;
+
+	if (pc->pc_ninfo < 1) {
+		if (pc->pc_result != PC_ACCEPT) {
+			pa->pa_reason = pc->pc_result;
+			acb->acb_fd = NOTOK;
+			(void) ps2acslose(acb, aci, "PAsynConnRequest(pseudo)", pa);
+
+			acc->acc_sd = NOTOK;
+			acc->acc_result = aci->aci_abort.aca_reason;
+
+			result = DONE;
+		} else
+			result = acpktlose(acb, aci, ACS_PROTOCOL, NULLCP, NULLCP);
+		goto out;
+	}
+
+	acb->acb_fd = pc->pc_sd;
+	acb->acb_sversion = pc->pc_qos.qos_sversion;
+
+	result = decode_ACS_ACSE__apdu(pe = pc->pc_info[0], 1, NULLIP, NULLVP, &pdu);
 
 #ifdef	DEBUG
-    if (result == OK && (acsap_log -> ll_events & LLOG_PDUS))
-	pvpdu (acsap_log, print_ACS_ACSE__apdu_P, pe, "ACSE-apdu", 1);
+	if (result == OK && (acsap_log->ll_events & LLOG_PDUS))
+		pvpdu(acsap_log, print_ACS_ACSE__apdu_P, pe, "ACSE-apdu", 1);
 #endif
 
-    pe_free (pe);
-    pe = pc -> pc_info[0] = NULLPE;
+	pe_free(pe);
+	pe = pc->pc_info[0] = NULLPE;
 
-    if (result == NOTOK) {
-	(void) acpktlose (acb, aci, ACS_PROTOCOL, NULLCP, "%s", PY_pepy);
-	goto out;
-    }
+	if (result == NOTOK) {
+		(void) acpktlose(acb, aci, ACS_PROTOCOL, NULLCP, "%s", PY_pepy);
+		goto out;
+	}
 
-    if (pdu -> offset != type_ACS_ACSE__apdu_aare) {
-	result = acpktlose (acb, aci, ACS_PROTOCOL, NULLCP,
-			    "unexpected PDU %d on P-CONNECT", pdu -> offset);
-	goto out;
-    }
+	if (pdu->offset != type_ACS_ACSE__apdu_aare) {
+		result = acpktlose(acb, aci, ACS_PROTOCOL, NULLCP,
+				   "unexpected PDU %d on P-CONNECT", pdu->offset);
+		goto out;
+	}
 
-    aare = pdu -> un.aare;
-    switch (aare -> result) {
+	aare = pdu->un.aare;
+	switch (aare->result) {
 	case int_ACS_result_accepted:
-	    if (pc -> pc_result != PC_ACCEPT) {
-		result = acpktlose (acb, aci, ACS_PROTOCOL, NULLCP,
-				    "not accepted [%s]",
-				    PErrString (pc -> pc_result));
-		goto out;
-	    }
-
-	    acb -> acb_flags |= ACB_CONN;
-
-	    acc -> acc_sd = acb -> acb_fd;
-	    acc -> acc_result = ACS_ACCEPT;
-
-	    if ((i = acb -> acb_offset) < 0)
-		i = pc -> pc_ctxlist.pc_nctx - 1;
-	    pp = pc -> pc_ctxlist.pc_ctx + i;
-	    if (pp -> pc_id != acb -> acb_id) {
-		result = acpktlose (acb, aci, ACS_PROTOCOL, NULLCP,
-				    "ACSE PCI not found");
-		goto out;
-	    }
-	    if (pp -> pc_result != PC_ACCEPT) {
-		result = acpktlose (acb, aci, ACS_PROTOCOL, NULLCP,
-				    "ACSE PCI rejected");
-		goto out;
-	    }
-
-	    if (acb -> acb_offset < 0)
-		pc -> pc_ctxlist.pc_nctx--;
-
-	    for (pp = pc -> pc_ctxlist.pc_ctx; i >= 0; i--, pp++)
-		if (pp -> pc_id != acb -> acb_id
-			&& pp -> pc_result == PC_ACCEPT) {
-		    acb -> acb_rosid = pp -> pc_id;
-		    break;
+		if (pc->pc_result != PC_ACCEPT) {
+			result = acpktlose(acb, aci, ACS_PROTOCOL, NULLCP,
+					   "not accepted [%s]", PErrString(pc->pc_result));
+			goto out;
 		}
-	    break;
-				  
+
+		acb->acb_flags |= ACB_CONN;
+
+		acc->acc_sd = acb->acb_fd;
+		acc->acc_result = ACS_ACCEPT;
+
+		if ((i = acb->acb_offset) < 0)
+			i = pc->pc_ctxlist.pc_nctx - 1;
+		pp = pc->pc_ctxlist.pc_ctx + i;
+		if (pp->pc_id != acb->acb_id) {
+			result = acpktlose(acb, aci, ACS_PROTOCOL, NULLCP, "ACSE PCI not found");
+			goto out;
+		}
+		if (pp->pc_result != PC_ACCEPT) {
+			result = acpktlose(acb, aci, ACS_PROTOCOL, NULLCP, "ACSE PCI rejected");
+			goto out;
+		}
+
+		if (acb->acb_offset < 0)
+			pc->pc_ctxlist.pc_nctx--;
+
+		for (pp = pc->pc_ctxlist.pc_ctx; i >= 0; i--, pp++)
+			if (pp->pc_id != acb->acb_id && pp->pc_result == PC_ACCEPT) {
+				acb->acb_rosid = pp->pc_id;
+				break;
+			}
+		break;
+
 	case int_ACS_result_rejected__permanent:
-	    acc -> acc_result = ACS_PERMANENT;
-	    goto rejected;
+		acc->acc_result = ACS_PERMANENT;
+		goto rejected;
 
 	case int_ACS_result_rejected__transient:
-	    acc -> acc_result = ACS_TRANSIENT;
-rejected: ;
-	    if (pc -> pc_result != PC_ACCEPT)
-		acb -> acb_fd = NOTOK;
-	    acc -> acc_sd = NOTOK;
-	    if (acb -> acb_offset < 0
-		    && (i = pc -> pc_ctxlist.pc_nctx - 1) >= 0)
-		pc -> pc_ctxlist.pc_nctx = i;
-	    break;
-    }
+		acc->acc_result = ACS_TRANSIENT;
+	      rejected:;
+		if (pc->pc_result != PC_ACCEPT)
+			acb->acb_fd = NOTOK;
+		acc->acc_sd = NOTOK;
+		if (acb->acb_offset < 0 && (i = pc->pc_ctxlist.pc_nctx - 1) >= 0)
+			pc->pc_ctxlist.pc_nctx = i;
+		break;
+	}
 
-    switch (aare -> result__source__diagnostic -> offset) {
+	switch (aare->result__source__diagnostic->offset) {
 	case type_ACS_Associate__source__diagnostic_acse__service__user:
-	    acc -> acc_diagnostic =
-		aare -> result__source__diagnostic -> un.acse__service__user
-		    + ACS_USER_BASE;
-	    break;
+		acc->acc_diagnostic =
+		    aare->result__source__diagnostic->un.acse__service__user + ACS_USER_BASE;
+		break;
 
 	case type_ACS_Associate__source__diagnostic_acse__service__provider:
 	default:
-	    acc -> acc_diagnostic =
-		aare -> result__source__diagnostic -> un.acse__service__provider
-		    + ACS_PROV_BASE;
-	    break;
-    }
-
-    if ((result = apdu2info (acb, aci, aare -> user__information,
-			     acc -> acc_info, &acc -> acc_ninfo)) == NOTOK)
-	goto out;
-
-    acc -> acc_context = aare -> application__context__name;
-    aare -> application__context__name = NULLOID;
-    acc -> acc_respondtitle.aei_ap_title = aare -> responding__AP__title;
-    aare -> responding__AP__title = NULLPE;
-    acc -> acc_respondtitle.aei_ae_qualifier =
-	aare -> responding__AE__qualifier;
-    aare -> responding__AE__qualifier = NULLPE;
-    if (aare -> responding__AP__invocation__id) {
-	acc -> acc_respondtitle.aei_ap_id =
-	    aare -> responding__AP__invocation__id -> parm;
-	acc -> acc_respondtitle.aei_flags |= AEI_AP_ID;
-    }
-    if (aare -> responding__AE__invocation__id) {
-	acc -> acc_respondtitle.aei_ae_id =
-	    aare -> responding__AE__invocation__id -> parm;
-	acc -> acc_respondtitle.aei_flags |= AEI_AE_ID;
-    }
-
-    for (i = pc -> pc_ninfo - 1; i >= 0; i--)
-	if (pc -> pc_info[i]) {
-	    pe_free (pc -> pc_info[i]);
-	    pc -> pc_info[i] = NULL;
+		acc->acc_diagnostic =
+		    aare->result__source__diagnostic->un.acse__service__provider + ACS_PROV_BASE;
+		break;
 	}
-    pc -> pc_ninfo = 0;
 
-    free_ACS_ACSE__apdu (pdu);
+	if ((result = apdu2info(acb, aci, aare->user__information,
+				acc->acc_info, &acc->acc_ninfo)) == NOTOK)
+		goto out;
 
-    if (pc -> pc_result != PC_ACCEPT)
-	freeacblk (acb);
+	acc->acc_context = aare->application__context__name;
+	aare->application__context__name = NULLOID;
+	acc->acc_respondtitle.aei_ap_title = aare->responding__AP__title;
+	aare->responding__AP__title = NULLPE;
+	acc->acc_respondtitle.aei_ae_qualifier = aare->responding__AE__qualifier;
+	aare->responding__AE__qualifier = NULLPE;
+	if (aare->responding__AP__invocation__id) {
+		acc->acc_respondtitle.aei_ap_id = aare->responding__AP__invocation__id->parm;
+		acc->acc_respondtitle.aei_flags |= AEI_AP_ID;
+	}
+	if (aare->responding__AE__invocation__id) {
+		acc->acc_respondtitle.aei_ae_id = aare->responding__AE__invocation__id->parm;
+		acc->acc_respondtitle.aei_flags |= AEI_AE_ID;
+	}
 
-    return DONE;
-    
-out: ;
-    if (pc -> pc_ninfo > 0 && pe == pc -> pc_info[0])
-	pe = NULLPE;
-    PCFREE (pc);
-    if (pe)
-	pe_free (pe);
-    if (pdu)
-	free_ACS_ACSE__apdu (pdu);
+	for (i = pc->pc_ninfo - 1; i >= 0; i--)
+		if (pc->pc_info[i]) {
+			pe_free(pc->pc_info[i]);
+			pc->pc_info[i] = NULL;
+		}
+	pc->pc_ninfo = 0;
 
-    freeacblk (acb);
+	free_ACS_ACSE__apdu(pdu);
 
-    return result;
+	if (pc->pc_result != PC_ACCEPT)
+		freeacblk(acb);
+
+	return DONE;
+
+      out:;
+	if (pc->pc_ninfo > 0 && pe == pc->pc_info[0])
+		pe = NULLPE;
+	PCFREE(pc);
+	if (pe)
+		pe_free(pe);
+	if (pdu)
+		free_ACS_ACSE__apdu(pdu);
+
+	freeacblk(acb);
+
+	return result;
 }
 
 /*    A-ASYN-NEXT.REQUEST (pseudo) */
 
-int	AcAsynNextRequest (sd, acc, aci)
-int	sd;
-struct AcSAPconnect *acc;
-struct AcSAPindication *aci;
+int
+AcAsynNextRequest(sd, acc, aci)
+	int sd;
+	struct AcSAPconnect *acc;
+	struct AcSAPindication *aci;
 {
-    SBV     smask;
-    int     result;
-    register struct assocblk *acb;
-    register struct PSAPconnect *pc;
-    struct PSAPindication pis;
-    register struct PSAPindication *pi = &pis;
-    register struct PSAPabort *pa = &pi -> pi_abort;
+	SBV smask;
+	int result;
+	register struct assocblk *acb;
+	register struct PSAPconnect *pc;
+	struct PSAPindication pis;
+	register struct PSAPindication *pi = &pis;
+	register struct PSAPabort *pa = &pi->pi_abort;
 
-    missingP (acc);
-    missingP (aci);
+	missingP(acc);
+	missingP(aci);
 
-    smask = sigioblock ();
+	smask = sigioblock();
 
-    if ((acb = findacblk (sd)) == NULL) {
-	(void) sigiomask (smask);
-	return acsaplose (aci, ACS_PARAMETER, NULLCP,
-		"invalid association descriptor");
-    }
-    if (acb -> acb_flags & ACB_CONN) {
-	(void) sigiomask (smask);
-	return acsaplose (aci, ACS_OPERATION, NULLCP,
-		"association descriptor connected");
-    }
+	if ((acb = findacblk(sd)) == NULL) {
+		(void) sigiomask(smask);
+		return acsaplose(aci, ACS_PARAMETER, NULLCP, "invalid association descriptor");
+	}
+	if (acb->acb_flags & ACB_CONN) {
+		(void) sigiomask(smask);
+		return acsaplose(aci, ACS_OPERATION, NULLCP, "association descriptor connected");
+	}
 
-    pc = &acc -> acc_connect;
-    bzero ((char *) acc, sizeof *acc);
-    bzero ((char *) pa, sizeof *pa);
+	pc = &acc->acc_connect;
+	bzero((char *) acc, sizeof *acc);
+	bzero((char *) pa, sizeof *pa);
 
-    switch (result = PAsynNextRequest (acb -> acb_fd, pc, pi)) {
-	case NOTOK: 
-	    acb -> acb_fd = NOTOK;
-	    (void) ps2acslose (acb, aci, "PAsynRetryRequest", pa);
-	    freeacblk (acb);
-	    break;
+	switch (result = PAsynNextRequest(acb->acb_fd, pc, pi)) {
+	case NOTOK:
+		acb->acb_fd = NOTOK;
+		(void) ps2acslose(acb, aci, "PAsynRetryRequest", pa);
+		freeacblk(acb);
+		break;
 
 	case CONNECTING_1:
 	case CONNECTING_2:
-	    break;
+		break;
 
-	case DONE: 
-	    result = AcAsynRetryAux (acb, pc, pi, acc, aci);
-	    break;
-    }
+	case DONE:
+		result = AcAsynRetryAux(acb, pc, pi, acc, aci);
+		break;
+	}
 
-    (void) sigiomask (smask);
+	(void) sigiomask(smask);
 
-    return result;
+	return result;
 }

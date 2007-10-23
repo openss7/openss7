@@ -1,7 +1,65 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* docmd.c -- driver for the whole thing */
 
 /*
- * $Header: /xtel/isode/isode/others/idist/RCS/docmd.c,v 9.0 1992/06/16 14:38:53 isode Rel $
+ * Header: /xtel/isode/isode/others/idist/RCS/docmd.c,v 9.0 1992/06/16 14:38:53 isode Rel
  *
  * The major alterations to this file are the replacing of the
  * connection stuff with the ISODE functions necessary. These new
@@ -11,7 +69,7 @@
  * Nottingham University, Computer Science.
  * 
  *
- * $Log: docmd.c,v $
+ * Log: docmd.c,v
  * Revision 9.0  1992/06/16  14:38:53  isode
  * Release 8.0
  *
@@ -37,9 +95,9 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-
 #ifndef lint
-static char *rcsid = "$Header: /xtel/isode/isode/others/idist/RCS/docmd.c,v 9.0 1992/06/16 14:38:53 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/others/idist/RCS/docmd.c,v 9.0 1992/06/16 14:38:53 isode Rel";
 static char sccsid[] = "@(#)docmd.c	5.6 (Berkeley) 6/1/90";
 #endif
 
@@ -48,12 +106,12 @@ static char sccsid[] = "@(#)docmd.c	5.6 (Berkeley) 6/1/90";
 #include "sys.file.h"
 #include <signal.h>
 
-FILE	*lfp;			/* log file for recording files updated */
-struct	subcmd *subcmds;	/* list of sub-commands for current cmd */
-jmp_buf	env;
+FILE *lfp;				/* log file for recording files updated */
+struct subcmd *subcmds;			/* list of sub-commands for current cmd */
+jmp_buf env;
 
-SFD	cleanup();
-SFD	lostconn();
+SFD cleanup();
+SFD lostconn();
 
 /*
  * Do the commands in cmds (initialized by yyparse).
@@ -80,11 +138,10 @@ docmds(dhosts, argc, argv)
 					goto fndhost;
 			continue;
 		}
-	fndhost:
+	      fndhost:
 		if (argc) {
 			for (cpp = argv; *cpp; cpp++) {
-				if (c->c_label != NULL &&
-				    strcmp(c->c_label, *cpp) == 0) {
+				if (c->c_label != NULL && strcmp(c->c_label, *cpp) == 0) {
 					cpp = NULL;
 					goto found;
 				}
@@ -95,7 +152,7 @@ docmds(dhosts, argc, argv)
 			continue;
 		} else
 			cpp = NULL;
-	found:
+	      found:
 		switch (c->c_type) {
 		case ARROW:
 			doarrow(cpp, c->c_files, c->c_name, c->c_cmds);
@@ -104,7 +161,7 @@ docmds(dhosts, argc, argv)
 			dodcolon(cpp, c->c_files, c->c_name, c->c_cmds);
 			break;
 		default:
-			adios (NULLCP, "illegal command type %d\n", c->c_type);
+			adios(NULLCP, "illegal command type %d\n", c->c_type);
 		}
 	}
 	closeconn();
@@ -143,7 +200,7 @@ doarrow(filev, files, rhost, scmds)
 		if (!makeconn(rhost))
 			return;
 		if ((lfp = fopen(utmpfile, "w")) == NULL)
-			adios (utmpfile, "cannot open file");
+			adios(utmpfile, "cannot open file");
 	}
 	for (f = files; f != NULL; f = f->n_next) {
 		if (filev) {
@@ -154,7 +211,7 @@ doarrow(filev, files, rhost, scmds)
 				(void) fclose(lfp);
 			continue;
 		}
-	found:
+	      found:
 		n = 0;
 		for (sc = scmds; sc != NULL; sc = sc->sc_next) {
 			if (sc->sc_type != INSTALL)
@@ -165,9 +222,9 @@ doarrow(filev, files, rhost, scmds)
 			opts = sc->sc_options;
 		}
 		if (n == 0)
-			install(f->n_name, (char *)NULL, 0, options);
+			install(f->n_name, (char *) NULL, 0, options);
 	}
-done:
+      done:
 	if (!nflag) {
 		(void) signal(SIGPIPE, cleanup);
 		(void) fclose(lfp);
@@ -179,28 +236,26 @@ done:
 	if (!nflag) {
 		(void) unlink(utmpfile);
 		for (; ihead != NULL; ihead = ihead->nextp) {
-			free((char *)ihead);
+			free((char *) ihead);
 			if ((opts & IGNLNKS) || ihead->count == 0)
 				continue;
-			log(lfp, "%s: Warning: missing links\n",
-				ihead->pathname);
+			log(lfp, "%s: Warning: missing links\n", ihead->pathname);
 		}
 	}
 }
 
-
 /* ARGSUSED */
-SFD lostconn(sig)
-int sig;
+SFD
+lostconn(sig)
+	int sig;
 {
 	log(lfp, "idist: lost connection\n");
 	longjmp(env, 1);
 }
 
-
-time_t	lastmod;
-FILE	*tfp;
-extern	char target[], *tp;
+time_t lastmod;
+FILE *tfp;
+extern char target[], *tp;
 
 /*
  * Process commands for comparing files to time stamp files.
@@ -222,7 +277,7 @@ dodcolon(filev, files, stamp, scmds)
 		(void) printf("dodcolon()\n");
 
 	if (files == NULL) {
-		advise (NULLCP, "no files to be updated");
+		advise(NULLCP, "no files to be updated");
 		return;
 	}
 	if (stat(stamp, &stb) < 0) {
@@ -238,7 +293,7 @@ dodcolon(filev, files, stamp, scmds)
 		tfp = NULL;
 	else {
 		if ((tfp = fopen(utmpfile, "w")) == NULL) {
-			advise (utmpfile, "Can't open file");
+			advise(utmpfile, "Can't open file");
 			return;
 		}
 		(void) gettimeofday(&tv[0], &tz);
@@ -253,7 +308,7 @@ dodcolon(filev, files, stamp, scmds)
 					goto found;
 			continue;
 		}
-	found:
+	      found:
 		tp = NULL;
 		cmptime(f->n_name);
 	}
@@ -262,7 +317,7 @@ dodcolon(filev, files, stamp, scmds)
 		(void) fclose(tfp);
 	for (sc = scmds; sc != NULL; sc = sc->sc_next)
 		if (sc->sc_type == NOTIFY)
-			notify(utmpfile, (char *)NULL, sc->sc_args, lastmod);
+			notify(utmpfile, (char *) NULL, sc->sc_args, lastmod);
 	if (!nflag && !(options & VERIFY))
 		(void) unlink(utmpfile);
 }
@@ -286,7 +341,7 @@ cmptime(name)
 		return;
 	}
 
-	/*
+	/* 
 	 * first time cmptime() is called?
 	 */
 	if (tp == NULL) {
@@ -297,7 +352,7 @@ cmptime(name)
 			tp++;
 	}
 	if (access(name, 4) < 0 || stat(name, &stb) < 0) {
-		advise (name, "Can't access");
+		advise(name, "Can't access");
 		return;
 	}
 
@@ -331,7 +386,7 @@ rcmptime(st)
 		(void) printf("rcmptime(%x)\n", st);
 
 	if ((d = opendir(target)) == NULL) {
-		advise (target, "can't open directory");
+		advise(target, "can't open directory");
 		return;
 	}
 	otp = tp;
@@ -339,16 +394,14 @@ rcmptime(st)
 	while (dp = readdir(d)) {
 		if (!strcmp(dp->d_name, ".") || !strcmp(dp->d_name, ".."))
 			continue;
-		if (len + 1 + (int)strlen(dp->d_name) >= BUFSIZ - 1) {
-			advise (NULLCP, "%s/%s name too long",
-				target, dp->d_name);
+		if (len + 1 + (int) strlen(dp->d_name) >= BUFSIZ - 1) {
+			advise(NULLCP, "%s/%s name too long", target, dp->d_name);
 			continue;
 		}
 		tp = otp;
 		*tp++ = '/';
 		cp = dp->d_name;
-		while (*tp++ = *cp++)
-			;
+		while (*tp++ = *cp++) ;
 		tp--;
 		cmptime(target);
 	}
@@ -370,7 +423,7 @@ notify(file, rhost, to, lmod)
 	register int fd, len;
 	FILE *pf, *popen();
 	struct stat stb;
-	char	buf[BUFSIZ];
+	char buf[BUFSIZ];
 
 	if ((options & VERIFY) || to == NULL)
 		return;
@@ -384,11 +437,11 @@ notify(file, rhost, to, lmod)
 		return;
 
 	if ((fd = open(file, O_RDONLY, 0)) < 0) {
-		advise (file, "Can't open file");
+		advise(file, "Can't open file");
 		return;
 	}
 	if (fstat(fd, &stb) < 0) {
-		advise (file, "Can't stat");
+		advise(file, "Can't stat");
 		(void) close(fd);
 		return;
 	}
@@ -396,16 +449,16 @@ notify(file, rhost, to, lmod)
 		(void) close(fd);
 		return;
 	}
-	/*
+	/* 
 	 * Create a pipe to mailling program.
 	 */
 	pf = popen(MAILCMD, "w");
 	if (pf == NULL) {
-		advise (NULLCP, "notify: \"%s\" failed", MAILCMD);
+		advise(NULLCP, "notify: \"%s\" failed", MAILCMD);
 		(void) close(fd);
 		return;
 	}
-	/*
+	/* 
 	 * Output the proper header information.
 	 */
 	(void) fprintf(pf, "From: idist (Remote ISO distribution program)\n");
@@ -424,8 +477,7 @@ notify(file, rhost, to, lmod)
 	}
 	(void) putc('\n', pf);
 	if (rhost != NULL)
-		(void) fprintf(pf, "Subject: files updated by idist from %s to %s\n",
-			host, rhost);
+		(void) fprintf(pf, "Subject: files updated by idist from %s to %s\n", host, rhost);
 	else
 		(void) fprintf(pf, "Subject: files updated after %s\n", ctime(&lmod));
 	(void) putc('\n', pf);
@@ -447,8 +499,8 @@ inlist(list, file)
 
 	for (nl = list; nl != NULL; nl = nl->n_next)
 		if (!strcmp(file, nl->n_name))
-			return(1);
-	return(0);
+			return (1);
+	return (0);
 }
 
 /*
@@ -457,9 +509,9 @@ inlist(list, file)
 except(file)
 	char *file;
 {
-	register struct	subcmd *sc;
-	register struct	namelist *nl;
-	char	*p, *re_comp ();
+	register struct subcmd *sc;
+	register struct namelist *nl;
+	char *p, *re_comp();
 
 	if (debug)
 		(void) printf("except(%s)\n", file);
@@ -470,18 +522,18 @@ except(file)
 		for (nl = sc->sc_args; nl != NULL; nl = nl->n_next) {
 			if (sc->sc_type == EXCEPT) {
 				if (!strcmp(file, nl->n_name))
-					return(1);
+					return (1);
 				continue;
 			}
 			if (p = re_comp(nl->n_name)) {
-				advise (NULLCP, "'%s' - %s", nl -> n_name, p);
+				advise(NULLCP, "'%s' - %s", nl->n_name, p);
 				continue;
 			}
 			if (re_exec(file) > 0)
-				return(1);
+				return (1);
 		}
 	}
-	return(0);
+	return (0);
 }
 
 char *
@@ -491,10 +543,10 @@ colon(cp)
 
 	while (*cp) {
 		if (*cp == ':')
-			return(cp);
+			return (cp);
 		if (*cp == '/')
-			return(0);
+			return (0);
 		cp++;
 	}
-	return(0);
+	return (0);
 }

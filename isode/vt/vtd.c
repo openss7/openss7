@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* vtd.c - VT responder */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/vt/RCS/vtd.c,v 9.0 1992/06/16 12:41:08 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/vt/RCS/vtd.c,v 9.0 1992/06/16 12:41:08 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/vt/RCS/vtd.c,v 9.0 1992/06/16 12:41:08 isode Rel $
+ * Header: /xtel/isode/isode/vt/RCS/vtd.c,v 9.0 1992/06/16 12:41:08 isode Rel
  *
  *
- * $Log: vtd.c,v $
+ * Log: vtd.c,v
  * Revision 9.0  1992/06/16  12:41:08  isode
  * Release 8.0
  *
@@ -24,8 +83,7 @@ static char *rcsid = "$Header: /xtel/isode/isode/vt/RCS/vtd.c,v 9.0 1992/06/16 1
  *
  */
 
-
-#undef MAP_BACKSPACE	/*Map backspace character to VT ERASE CHAR*/
+#undef MAP_BACKSPACE		/* Map backspace character to VT ERASE CHAR */
 
 #include <signal.h>
 #include "vtpm.h"
@@ -41,7 +99,7 @@ static char *rcsid = "$Header: /xtel/isode/isode/vt/RCS/vtd.c,v 9.0 1992/06/16 1
 #include <termios.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-static int forkpty(int*,char*,char*,char*);
+static int forkpty(int *, char *, char *, char *);
 #else
 #include <sys/termios.h>
 #endif
@@ -76,18 +134,17 @@ static int forkpty(int*,char*,char*,char*);
 #endif
 
 #if !(defined(SYS5) && !defined(sgi)) && !defined(BSD44) && !defined(_AIX)
-void	vhangup();
+void vhangup();
 #endif
 
-int	connected = FALSE;
-char	command[256];
-
+int connected = FALSE;
+char command[256];
 
 /*
  * I/O data buffers, pointers, and counters.
  */
-char	ptyobuf[BUFSIZ], *pfrontp = ptyobuf, *pbackp = ptyobuf;
-char	netobuf[BUFSIZ], *nfrontp = netobuf, *nbackp = netobuf;
+char ptyobuf[BUFSIZ], *pfrontp = ptyobuf, *pbackp = ptyobuf;
+char netobuf[BUFSIZ], *nfrontp = netobuf, *nbackp = netobuf;
 int pcc;
 
 VT_PROFILE vtp_profile;
@@ -96,22 +153,22 @@ char erase_char;
 char erase_line;
 char intr_char;
 char *crp = "\r";
-char *my_displayobj = "D";	/*Acceptor's Display Object Name*/
-char *my_echo_obj = "NA";	/*Acceptor's Negotiation Control Object Name*/
-char *my_signal_obj = "DI";	/*Acceptor's Signal Control Object*/
-char *his_echo_obj = "NI";	/*Initiator's Negotiation Control Object*/
-char *his_signal_obj = "KB";	/*Initiator/s Signal control Object*/
+char *my_displayobj = "D";		/* Acceptor's Display Object Name */
+char *my_echo_obj = "NA";		/* Acceptor's Negotiation Control Object Name */
+char *my_signal_obj = "DI";		/* Acceptor's Signal Control Object */
+char *his_echo_obj = "NI";		/* Initiator's Negotiation Control Object */
+char *his_signal_obj = "KB";		/* Initiator/s Signal control Object */
 int my_right = ACCEPTOR;
-char kb_image;			/*KB Control Object image*/
-char di_image;			/*DI Control Object Image*/
-char ni_image;			/*NI Control Object image*/
-char na_image;			/*NA Control Object image*/
-char nego_state;		/*Current state of NA affected options*/
-char sync_image;		/*SY Control Object image*/
+char kb_image;				/* KB Control Object image */
+char di_image;				/* DI Control Object Image */
+char ni_image;				/* NI Control Object image */
+char na_image;				/* NA Control Object image */
+char nego_state;			/* Current state of NA affected options */
+char sync_image;			/* SY Control Object image */
 char ga_image;
-int transparent = 0;		/*Flag for Transparent repertoire*/
-int telnet_profile =1;
-int do_break = 1;		/*If VT-BREAK agreed to*/
+int transparent = 0;			/* Flag for Transparent repertoire */
+int telnet_profile = 1;
+int do_break = 1;			/* If VT-BREAK agreed to */
 int showoptions = 0;
 int debug = 0;
 
@@ -127,116 +184,106 @@ char peerhost[BUFSIZ];
 struct PSAPaddr ts_bound;
 struct passwd *pwd;
 
-int	pty, net;
-int	inter;
-extern	char **environ;
-extern	int errno;
-char	line[] = "/dev/ptyp0";
-char	*envinit[] = { "TERM=network", 0 };
-SFD	cleanup();
+int pty, net;
+int inter;
+extern char **environ;
+extern int errno;
+char line[] = "/dev/ptyp0";
+char *envinit[] = { "TERM=network", 0 };
+SFD cleanup();
 static int do_cleaning = 0;
 
-char   *myname;
-LLog    _vt_log = {
-    "vt.log", NULLCP, NULLCP,
-    LLOG_FATAL | LLOG_EXCEPTIONS | LLOG_NOTICE, LLOG_FATAL, -1,
-    LLOGCLS | LLOGCRT | LLOGZER, NOTOK
- 
+char *myname;
+LLog _vt_log = {
+	"vt.log", NULLCP, NULLCP,
+	LLOG_FATAL | LLOG_EXCEPTIONS | LLOG_NOTICE, LLOG_FATAL, -1,
+	LLOGCLS | LLOGCRT | LLOGZER, NOTOK
 };
-LLog   *vt_log = &_vt_log;
+LLog *vt_log = &_vt_log;
 
 main(argc, argv)
-	int	argc;
+	int argc;
 	char *argv[];
 {
 	int f = 0;
 	char *cp = line;
 	char *logname = NULLCP;
 	int i, p, t;
-	char   j;
+	char j;
+
 #ifndef TERMIOS
 	struct sgttyb b;
 #endif
 
-    if (myname = rindex (*argv, '/'))
-	myname++;
-    if (myname == NULL || *myname == NULL)
-	myname = *argv;
+	if (myname = rindex(*argv, '/'))
+		myname++;
+	if (myname == NULL || *myname == NULL)
+		myname = *argv;
 
-    isodetailor (myname, 0);
-    if (debug = isatty (fileno (stderr)))
-	ll_dbinit (vt_log, myname);
-    else
-	ll_hdinit (vt_log, myname);
+	isodetailor(myname, 0);
+	if (debug = isatty(fileno(stderr)))
+		ll_dbinit(vt_log, myname);
+	else
+		ll_hdinit(vt_log, myname);
 
-	for(i=1; i<(argc - 2); i++)
-	{
-		if (!strcmp(argv[i], "-d"))
-		{
+	for (i = 1; i < (argc - 2); i++) {
+		if (!strcmp(argv[i], "-d")) {
 			if (!isdigit(argv[++i][0])
-			        || sscanf(argv[i], "%d", &debug) != 1)
-			    adios (NULLCP, "usage: %s -d 0-7", myname);
-						advise(LLOG_DEBUG,NULLCP, "setting debug level to %d", debug);
+			    || sscanf(argv[i], "%d", &debug) != 1)
+				adios(NULLCP, "usage: %s -d 0-7", myname);
+			advise(LLOG_DEBUG, NULLCP, "setting debug level to %d", debug);
 			if (debug)
-			    ll_dbinit (vt_log, myname);
-		}
-		else if(!strcmp(argv[i], "-F"))
-		{
+				ll_dbinit(vt_log, myname);
+		} else if (!strcmp(argv[i], "-F")) {
 			if ((logname = argv[++i]) == NULL || *logname == '-')
-			    adios (NULLCP, "usage: %s -F logfile", myname);
-			vt_log -> ll_file = logname;
-			(void) ll_close (vt_log);
-			advise(LLOG_DEBUG,NULLCP, "logging to %s",logname);
-		}
-		else
-		    adios(NULLCP, "usage: %s [-F logfile] [-d N]",
-			  myname);
+				adios(NULLCP, "usage: %s -F logfile", myname);
+			vt_log->ll_file = logname;
+			(void) ll_close(vt_log);
+			advise(LLOG_DEBUG, NULLCP, "logging to %s", logname);
+		} else
+			adios(NULLCP, "usage: %s [-F logfile] [-d N]", myname);
 	}
 
-    advise (LLOG_NOTICE,NULLCP,  "starting");
+	advise(LLOG_NOTICE, NULLCP, "starting");
 
 	acc = &accs;
 	acr = &acrs;
 	aci = &acis;
 	acs = &acss;
 
-	if (ass_ind(argc,argv) == OK) {
+	if (ass_ind(argc, argv) == OK) {
 		connected = TRUE;
-		if( !strcmp(vtp_profile.profile_name,"default") )
+		if (!strcmp(vtp_profile.profile_name, "default"))
 			telnet_profile = 0;
-	}
-	else
+	} else
 		exit(1);
 #ifdef TERMIOS
 	na_image = 0;
-	nego_state = 0;			/*Start off in Local echo*/
+	nego_state = 0;		/* Start off in Local echo */
 	i = forkpty(&p, line, NULL, NULL);
 	if (i == -1) {
 		perror("vtd -- forkpty");
 		vrelreq();
-		/*NOTREACHED*/
-	}
+	 /*NOTREACHED*/}
 	if (i) {
-		 vtd(sd, p);
-		 /*NOTREACHED*/
-	}
+		vtd(sd, p);
+	 /*NOTREACHED*/}
 #else
 /*
  * Get a pty, scan input lines.
  */
-        for (j = 'p' ; j <= 't'; j++) {
-	    cp[strlen ("/dev/pty")] = j;
-	    for (i = 0; i < 16; i++) {
-		cp[strlen("/dev/ptyp")] = "0123456789abcdef"[i];
-		p = open(cp, 2);
-		if (p >= 0)
-		    goto gotpty;
-	    }
+	for (j = 'p'; j <= 't'; j++) {
+		cp[strlen("/dev/pty")] = j;
+		for (i = 0; i < 16; i++) {
+			cp[strlen("/dev/ptyp")] = "0123456789abcdef"[i];
+			p = open(cp, 2);
+			if (p >= 0)
+				goto gotpty;
+		}
 	}
 	perror("All network ports in use");
 	vrelreq();
-	/*NOTREACHED*/
-gotpty:
+       /*NOTREACHED*/ gotpty:
 
 	cp[strlen("/dev/")] = 't';
 	t = open("/dev/tty", 2);
@@ -244,41 +291,41 @@ gotpty:
 		if (ioctl(t, TIOCNOTTY, 0) == -1) {
 			perror("ioctl (TIOCNOTTY)");
 		}
-		(void)close(t);
+		(void) close(t);
 	}
 	t = open(cp, 2);
 	if (t < 0)
 		fatalperror(f, cp, errno);
-	if (ioctl(t, TIOCGETP, (char*)&b) == -1) {
+	if (ioctl(t, TIOCGETP, (char *) &b) == -1) {
 		perror("ioctl (TIOCGETP)");
 		adios(NULLCP, "ioctl failed (TIOCGETP)");
 	}
-	b.sg_flags = CRMOD|XTABS|ANYP;
-	if (ioctl(t, TIOCSETP, (char*)&b) == -1) {
+	b.sg_flags = CRMOD | XTABS | ANYP;
+	if (ioctl(t, TIOCSETP, (char *) &b) == -1) {
 		perror("ioctl (TIOCSETP)");
 		adios(NULLCP, "ioctl failed (TIOCSETP)");
 	}
-	if (ioctl(p, TIOCGETP, (char*)&b) == -1) {	/* XXX why is this done on the controller */
+	if (ioctl(p, TIOCGETP, (char *) &b) == -1) {	/* XXX why is this done on the controller */
 		perror("ioctl (TIOCGETP)");
 		adios(NULLCP, "ioctl failed (TIOCGETP)");
 	}
 	if (telnet_profile)
 		b.sg_flags &= ~ECHO;
 	else
-		b.sg_flags |= ECHO;	/*Remote echo for Default*/
-	if (ioctl(p, TIOCSETP, (char*)&b) == -1) {
+		b.sg_flags |= ECHO;	/* Remote echo for Default */
+	if (ioctl(p, TIOCSETP, (char *) &b) == -1) {
 		perror("ioctl (TIOCSETP)");
 		adios(NULLCP, "ioctl failed (TIOCSETP)");
 	}
 	na_image = 0;
-	nego_state = 0;			/*Start off in Local echo*/
+	nego_state = 0;		/* Start off in Local echo */
 
 	if ((i = fork()) < 0)
 		fatalperror(f, "fork", errno);
 	if (i)
-		 vtd(sd, p);
-	(void)close(sd);
-	(void)close(p);
+		vtd(sd, p);
+	(void) close(sd);
+	(void) close(p);
 	if (dup2(t, 0) == -1) {
 		perror("dup2");
 		adios(NULLCP, "dup2 failed");
@@ -291,18 +338,17 @@ gotpty:
 		perror("dup2");
 		adios(NULLCP, "dup2 failed");
 	}
-	(void)close(t);
+	(void) close(t);
 #endif
 	environ = envinit;
 
 #ifdef sgi
-	execl(_PATH_LOGIN,"login",NULLCP);
+	execl(_PATH_LOGIN, "login", NULLCP);
 #else
-	execl(_PATH_LOGIN,"login","-h",peerhost,NULLCP);
+	execl(_PATH_LOGIN, "login", "-h", peerhost, NULLCP);
 #endif
 	fatalperror(f, _PATH_LOGIN, errno);
-	/*NOTREACHED*/
-}
+ /*NOTREACHED*/}
 
 fatal(f, msg)
 	int f;
@@ -312,7 +358,7 @@ fatal(f, msg)
 
 	(void) sprintf(buf, "%s: %s.\n", myname, msg);
 	(void) write(f, buf, strlen(buf));
-	adios (NULLCP, msg);
+	adios(NULLCP, msg);
 }
 
 fatalperror(f, msg, errnum)
@@ -334,26 +380,26 @@ fatalperror(f, msg, errnum)
 vtd(f, p)
 {
 	int on = 1;
-	int	nfds, result;
+	int nfds, result;
 
 	do_cleaning = 1;
 	net = f, pty = p;
 	nfds = (f > p ? f : p) + 1;
 
 #ifdef SVR4
-	if ((on = fcntl (p, F_GETFL, 0)) == -1) {
-		perror ("fcntl");	
-		adios (NULLCP, "fcntl failed");
+	if ((on = fcntl(p, F_GETFL, 0)) == -1) {
+		perror("fcntl");
+		adios(NULLCP, "fcntl failed");
 	}
 #ifndef O_NONBLOCK
 #define O_NONBLOCK ONDELAY
 #endif
-	if (fcntl (p, F_SETFL, on | O_NONBLOCK) == -1) {
-		perror ("fcntl");
-		adios (NULLCP, "fcntl failed");
+	if (fcntl(p, F_SETFL, on | O_NONBLOCK) == -1) {
+		perror("fcntl");
+		adios(NULLCP, "fcntl failed");
 	}
 #else
-	if (ioctl(p, FIONBIO, (char*)&on) == -1) {
+	if (ioctl(p, FIONBIO, (char *) &on) == -1) {
 		perror("ioctl");
 		adios(NULLCP, "ioctl failed (FIONBIO)");
 	}
@@ -364,10 +410,10 @@ vtd(f, p)
 #ifdef	SIGCHLD
 	(void) signal(SIGCHLD, cleanup);
 #endif
-	/*
+	/* 
 	 * Show banner that getty never gave.
 	 */
-	myhostname = PLocalHostName ();
+	myhostname = PLocalHostName();
 	(void) sprintf(nfrontp, BANNER, myhostname, "");
 	nfrontp += strlen(nfrontp);
 
@@ -387,15 +433,15 @@ vtd(f, p)
 	erase_line = oterm.c_cc[VKILL];
 	intr_char = oterm.c_cc[VINTR];
 #else
-	if (ioctl(pty,TIOCGETP,(char*)&ottyb) == -1) {
+	if (ioctl(pty, TIOCGETP, (char *) &ottyb) == -1) {
 		perror("ioctl");
 		adios(NULLCP, "ioctl failed (TIOCGETP)");
 	}
-	if (ioctl(pty,TIOCGETC,(char*)&otc) == -1) {
+	if (ioctl(pty, TIOCGETC, (char *) &otc) == -1) {
 		perror("ioctl");
 		adios(NULLCP, "ioctl failed (TIOCGETC)");
 	}
-	if (ioctl(pty,TIOCGLTC,(char*)&oltc) == -1) {
+	if (ioctl(pty, TIOCGLTC, (char *) &oltc) == -1) {
 		perror("ioctl");
 		adios(NULLCP, "ioctl failed (TIOCGLTC)");
 	}
@@ -404,67 +450,61 @@ vtd(f, p)
 	intr_char = otc.t_intrc;
 #endif
 
-
 	for (;;) {
-	    	fd_set    ibits, obits;
+		fd_set ibits, obits;
 		register int c;
 
-		FD_ZERO (&ibits);
-		FD_ZERO (&obits);
-		/*
+		FD_ZERO(&ibits);
+		FD_ZERO(&obits);
+		/* 
 		 * Never look for input if there's still
 		 * stuff in the corresponding output buffer
 		 */
 		if (nfrontp - nbackp) {
-		    FD_SET (f, &obits);
-		}
-		else {
-		    FD_SET (p, &ibits);
+			FD_SET(f, &obits);
+		} else {
+			FD_SET(p, &ibits);
 		}
 		if (pfrontp - pbackp) {
-		    FD_SET (p, &obits);
+			FD_SET(p, &obits);
+		} else {
+			FD_SET(f, &ibits);
 		}
-		else {
-		    FD_SET (f, &ibits);
-		}
-		if (FD_ISSET (f, &ibits) && data_pending()) {
-		        FD_CLR (f, &ibits);
+		if (FD_ISSET(f, &ibits) && data_pending()) {
+			FD_CLR(f, &ibits);
 
-			result = xselect(nfds, &ibits, &obits,
-					 (fd_set *)NULL, OK);
+			result = xselect(nfds, &ibits, &obits, (fd_set *) NULL, OK);
 
 			if (result < 0)
 				adios("failed", "xselect");
-			FD_SET (f, &ibits);
+			FD_SET(f, &ibits);
+		} else {
+			if (xselect(nfds, &ibits, &obits, (fd_set *) NULL, NOTOK) == -1)
+				adios("failed", "xselect");
 		}
-		else {
-			if (xselect(nfds, &ibits, &obits, (fd_set *)NULL,
-				    NOTOK) == -1)
-			    adios("failed", "xselect");
-		}
-		if (!FD_ISSET (f, &ibits)
-		        && !FD_ISSET (p, &ibits)
-		        && !FD_ISSET (f, &obits)
-		        && !FD_ISSET (p, &obits)) {
+		if (!FD_ISSET(f, &ibits)
+		    && !FD_ISSET(p, &ibits)
+		    && !FD_ISSET(f, &obits)
+		    && !FD_ISSET(p, &obits)) {
 			sleep(5);
 			continue;
 		}
 
-		/*
+		/* 
 		 * Something to read from the network...
 		 */
-		if (FD_ISSET (f, &ibits)) {
-			while ((c = getch()) > 0) 
+		if (FD_ISSET(f, &ibits)) {
+			while ((c = getch()) > 0)
 				*pfrontp++ = c;
 		}
 		if (c == E_EOF) {
 			break;
 		}
 
-		/*
+		/* 
 		 * Something to read from the pty...
 		 */
-		if (FD_ISSET (p, &ibits)) {
+		if (FD_ISSET(p, &ibits)) {
 			pcc = read(p, nfrontp, (&netobuf[BUFSIZ] - nfrontp));
 
 			if (pcc < 0 && errno == EWOULDBLOCK)
@@ -472,22 +512,22 @@ vtd(f, p)
 			else {
 				if (pcc <= 0) {
 					if (debug)
-					    advise(LLOG_EXCEPTIONS,NULLCP,
-						   "problem reading from pty");
+						advise(LLOG_EXCEPTIONS, NULLCP,
+						       "problem reading from pty");
 					break;
 				}
 			}
 			nfrontp += pcc;
 		}
 
-		if (FD_ISSET (f, &obits) && (nfrontp - nbackp) > 0)
+		if (FD_ISSET(f, &obits) && (nfrontp - nbackp) > 0)
 			netflush();
 
-		if (FD_ISSET (p, &obits) && (pfrontp - pbackp) > 0)
+		if (FD_ISSET(p, &obits) && (pfrontp - pbackp) > 0)
 			ptyflush();
 	}
 	if (debug)
-		advise(LLOG_DEBUG,NULLCP,  "finished loop in vtp");
+		advise(LLOG_DEBUG, NULLCP, "finished loop in vtp");
 	cleanup();
 }
 
@@ -506,7 +546,7 @@ interrupt()
 		perror("tcgetattr");
 		return;
 	}
-	if ((term.c_lflag&ISIG) && term.c_cc[VINTR] != _POSIX_VDISABLE)
+	if ((term.c_lflag & ISIG) && term.c_cc[VINTR] != _POSIX_VDISABLE)
 		*pfrontp++ = term.c_cc[VINTR];
 	else
 		*pfrontp++ = '\0';
@@ -514,8 +554,8 @@ interrupt()
 	struct sgttyb b;
 	struct tchars tchars;
 
-	ptyflush();	/* half-hearted */
-	if (ioctl(pty, TIOCGETP, (char*)&b) == -1) {
+	ptyflush();		/* half-hearted */
+	if (ioctl(pty, TIOCGETP, (char *) &b) == -1) {
 		perror("ioctl");
 		adios(NULLCP, "ioctl failed");
 	}
@@ -523,8 +563,7 @@ interrupt()
 		*pfrontp++ = '\0';
 		return;
 	}
-	*pfrontp++ = ioctl(pty, TIOCGETC, (char*)&tchars) < 0 ?
-		'\177' : tchars.t_intrc;
+	*pfrontp++ = ioctl(pty, TIOCGETC, (char *) &tchars) < 0 ? '\177' : tchars.t_intrc;
 #endif
 }
 
@@ -533,155 +572,135 @@ netflush()
 	register char *cp;
 	int n;
 	int i, j;
-	int nl_flag;	/*Records if Newline is included in current PDU to
-			  decide if Deliver Request should follow it.  Should
-			  not be required but some implementations may wait
-			  for it before delivering NDQ to application*/
+	int nl_flag;			/* Records if Newline is included in current PDU to decide
+					   if Deliver Request should follow it.  Should not be
+					   required but some implementations may wait for it before 
+					   delivering NDQ to application */
 
 	nl_flag = 0;
 	if ((n = nfrontp - nbackp) > 0) {
 
 		if (debug) {
-			(void) ll_log (vt_log, LLOG_DEBUG, NULLCP,
-				("writing to the net"));
-			(void) ll_printf (vt_log, "<<");
-			for(i=0; i<(nfrontp-nbackp); i++)
-			    (void)ll_printf (vt_log, "%02x ",*(nbackp+i));
-			(void)ll_printf (vt_log,  ">>\n");
-			(void)ll_sync (vt_log);
+			(void) ll_log(vt_log, LLOG_DEBUG, NULLCP, ("writing to the net"));
+			(void) ll_printf(vt_log, "<<");
+			for (i = 0; i < (nfrontp - nbackp); i++)
+				(void) ll_printf(vt_log, "%02x ", *(nbackp + i));
+			(void) ll_printf(vt_log, ">>\n");
+			(void) ll_sync(vt_log);
 		}
-		if(transparent)
-		{
-			(void)vt_text(nbackp,n);
+		if (transparent) {
+			(void) vt_text(nbackp, n);
 			vtsend();
 			cp = nbackp;
-			for(i=0; i<n; i++)
-			{
-				if((*cp == '\r') ||
-				   (*cp == '\n'))
-				{
+			for (i = 0; i < n; i++) {
+				if ((*cp == '\r') || (*cp == '\n')) {
 					vdelreq(FALSE);
 					break;
 				}
 				++cp;
 			}
 			nbackp += n;
-		}
-		else
-		{
-		    cp = nbackp;
-		    for(i=0,j=0; i<n; i++)
-		    {
-			if(*cp == '\r')
-			{
-			    if(rflag) (void)vt_text(crp,1);
-				/*Previous char was CR so put one in NDQ*/
-			    if(j) 
-					(void)vt_text(nbackp,j);
-			    nbackp += (j+1); /*Skip over current CR*/
-			    cp = nbackp;
-			    j = 0;
-			    if(i == (n-1) ) (void)vt_text(crp,1);
-				/*If CR is last char in buffer, send it*/
-			    else rflag = 1;
-				/*If not last char in buffer, read next one*/
-			    continue;
-			}
-			else if(rflag) /*If previous character was CR*/
-			{
-			    if(*cp == '\n') /*Got CR-LF -- map to Next X-Array*/
-			    {
-				nbackp += (j+1);
-				cp = nbackp;
-				rflag = 0;
-				vt_newline();
-				++nl_flag;
-				continue;
-			    }
-			    else /*Preceeding char was CR but not followed by
-				   LF.  Put CR in buffer*/
-			        (void) vt_text(crp,1);
-			    rflag = 0;
-			} 
-			if(telnet_profile)
-			{
-			    rflag = 0;
+		} else {
+			cp = nbackp;
+			for (i = 0, j = 0; i < n; i++) {
+				if (*cp == '\r') {
+					if (rflag)
+						(void) vt_text(crp, 1);
+					/* Previous char was CR so put one in NDQ */
+					if (j)
+						(void) vt_text(nbackp, j);
+					nbackp += (j + 1);	/* Skip over current CR */
+					cp = nbackp;
+					j = 0;
+					if (i == (n - 1))
+						(void) vt_text(crp, 1);
+					/* If CR is last char in buffer, send it */
+					else
+						rflag = 1;
+					/* If not last char in buffer, read next one */
+					continue;
+				} else if (rflag) {	/* If previous character was CR */
+					if (*cp == '\n') {	/* Got CR-LF -- map to Next X-Array */
+						nbackp += (j + 1);
+						cp = nbackp;
+						rflag = 0;
+						vt_newline();
+						++nl_flag;
+						continue;
+					} else	/* Preceeding char was CR but not followed by LF.
+						   Put CR in buffer */
+						(void) vt_text(crp, 1);
+					rflag = 0;
+				}
+				if (telnet_profile) {
+					rflag = 0;
 #ifdef MAP_BACKSPACE
-			    if(*cp == 0x08) /*If believed to be erase*/
-			    {
-				    if(j) 
-						(void)vt_text(nbackp,j);
-				    nbackp += (j+1);
-				    cp = nbackp;
-				    j = 0;
-			 	    vt_char_erase();
-				    continue;
-			    }
+					if (*cp == 0x08) {	/* If believed to be erase */
+						if (j)
+							(void) vt_text(nbackp, j);
+						nbackp += (j + 1);
+						cp = nbackp;
+						j = 0;
+						vt_char_erase();
+						continue;
+					}
 #endif
-			    if(!vtp_profile.arg_val.tel_arg_list.full_ascii)
-					/*If ASCII GO, dump ctrl chars*/
-			    {
-				if((*cp < 0x20) || (*cp > 0x7e))
-				{
-				    if(j) 
-						(void)vt_text(nbackp,j);
-				    nbackp += (j+1);
-				    cp = nbackp;
-				    j = 0;
+					if (!vtp_profile.arg_val.tel_arg_list.full_ascii)
+						/* If ASCII GO, dump ctrl chars */
+					{
+						if ((*cp < 0x20) || (*cp > 0x7e)) {
+							if (j)
+								(void) vt_text(nbackp, j);
+							nbackp += (j + 1);
+							cp = nbackp;
+							j = 0;
+						} else {
+							++j;
+							++cp;
+						}
+					} else {
+						++j;
+						++cp;
+					}
+				} else {	/* Else Default Profile */
+
+					if ((*cp < 0x20) || (*cp > 0x7e)) {
+						if (j)
+							(void) vt_text(nbackp, j);
+						nbackp += (j + 1);
+						cp = nbackp;
+						j = 0;
+					} else {
+						++j;
+						++cp;
+					}
 				}
-				else
-				{
-				    ++j; ++cp;
-				}
-			    }
-			    else 
-			    {
-				++j;
-				++cp;
-			    }
-			}
-			else		/*Else Default Profile*/
-			{
-			    if((*cp < 0x20) || (*cp > 0x7e))
-			    {
-				if(j) 
-					(void)vt_text(nbackp,j);
-				nbackp += (j+1);
-				cp = nbackp;
-				j = 0;
-			    }
-			    else 
-			    {
-				++j;
-				++cp;
-			    }
-			}
-		    }		/*End for loop*/
-		    if(j) 
-				(void)vt_text(nbackp,j); /*Load anything left if CR or LF
-						wasn't last char in buffer*/
-		    nbackp += j;
-		    vtsend();	/*Send the whole NDQ*/
-		    if(nl_flag && telnet_profile) vdelreq(FALSE);
+			}	/* End for loop */
+			if (j)
+				(void) vt_text(nbackp, j);	/* Load anything left if CR or LF
+								   wasn't last char in buffer */
+			nbackp += j;
+			vtsend();	/* Send the whole NDQ */
+			if (nl_flag && telnet_profile)
+				vdelreq(FALSE);
 		}
 	}
 	if (n < 0) {
 		if (errno != ENOBUFS && errno != EWOULDBLOCK) {
 			adios("closed", "association");
-			/*NOTREACHED*/
-		}
+		 /*NOTREACHED*/}
 		n = 0;
 	}
 	if (nbackp == nfrontp)
 		nbackp = nfrontp = netobuf;
 }
 
-SFD	cleanup()
+SFD
+cleanup()
 {
 	sleep(1);
-	while(getch() > 0);	/*Clean out unread VT-DATA PDU's still held
-				  in network.  Kludge to overcome deficiency
-				  in Session Release. */
+	while (getch() > 0) ;	/* Clean out unread VT-DATA PDU's still held in network.  Kludge to 
+				   overcome deficiency in Session Release. */
 	rmut();
 
 #if !(defined(SYS5) && !defined(sgi)) && !defined(BSD44) && !defined(_AIX)
@@ -689,20 +708,21 @@ SFD	cleanup()
 #endif
 
 	vrelreq();
-	(void)kill(0, SIGKILL);
+	(void) kill(0, SIGKILL);
 	exit(1);
 }
 
 #ifndef BSD44
 #include <utmp.h>
 
-struct	utmp wtmp;
-char	wtmpf[]	= "/usr/adm/wtmp";
-char	utmp[] = "/etc/utmp";
+struct utmp wtmp;
+char wtmpf[] = "/usr/adm/wtmp";
+char utmp[] = "/etc/utmp";
+
 #define SCPYN(a, b)	strncpy(a, b, sizeof (a))
 #define SCMPN(a, b)	strncmp(a, b, sizeof (a))
 
-long	lseek ();
+long lseek();
 
 rmut()
 {
@@ -711,39 +731,39 @@ rmut()
 
 	f = open(utmp, 2);
 	if (f >= 0) {
-		while(read(f, (char *)&wtmp, sizeof (wtmp)) == sizeof (wtmp)) {
-			if (SCMPN(wtmp.ut_line, line+5) || wtmp.ut_name[0]==0)
+		while (read(f, (char *) &wtmp, sizeof(wtmp)) == sizeof(wtmp)) {
+			if (SCMPN(wtmp.ut_line, line + 5) || wtmp.ut_name[0] == 0)
 				continue;
-			(void)lseek(f, -(long)sizeof (wtmp), 1);
-			(void)SCPYN(wtmp.ut_name, "");
+			(void) lseek(f, -(long) sizeof(wtmp), 1);
+			(void) SCPYN(wtmp.ut_name, "");
 #if	!defined(SYS5) && !defined(bsd43_ut_host)
-			(void)SCPYN(wtmp.ut_host, "");
+			(void) SCPYN(wtmp.ut_host, "");
 #endif
-			(void)time(&wtmp.ut_time);
-			(void) write(f, (char *)&wtmp, sizeof (wtmp));
+			(void) time(&wtmp.ut_time);
+			(void) write(f, (char *) &wtmp, sizeof(wtmp));
 			found++;
 		}
-		(void)close(f);
+		(void) close(f);
 	}
 	if (found) {
 		f = open(wtmpf, 1);
 		if (f >= 0) {
-			(void)SCPYN(wtmp.ut_line, line+5);
-			(void)SCPYN(wtmp.ut_name, "");
+			(void) SCPYN(wtmp.ut_line, line + 5);
+			(void) SCPYN(wtmp.ut_name, "");
 #if	!defined(SYS5) && !defined(bsd43_ut_host)
-			(void)SCPYN(wtmp.ut_host, "");
+			(void) SCPYN(wtmp.ut_host, "");
 #endif
-			(void)time(&wtmp.ut_time);
-			(void)lseek(f, (long)0, 2);
-			(void) write(f, (char *)&wtmp, sizeof (wtmp));
-			(void)close(f);
+			(void) time(&wtmp.ut_time);
+			(void) lseek(f, (long) 0, 2);
+			(void) write(f, (char *) &wtmp, sizeof(wtmp));
+			(void) close(f);
 		}
 	}
-	(void)chmod(line, 0666);
-	(void)chown(line, 0, 0);
+	(void) chmod(line, 0666);
+	(void) chown(line, 0, 0);
 	line[strlen("/dev/")] = 'p';
-	(void)chmod(line, 0666);
-	(void)chown(line, 0, 0);
+	(void) chmod(line, 0666);
+	(void) chown(line, 0, 0);
 }
 
 #else
@@ -754,92 +774,93 @@ rmut()
 	p = line + sizeof(_PATH_DEV) - 1;
 	if (logout(p))
 		logwtmp(p, "", "");
-	(void)chmod(line, DEFFILEMODE);
-	(void)chown(line, 0, 0);
+	(void) chmod(line, DEFFILEMODE);
+	(void) chown(line, 0, 0);
 	*p = 'p';
-	(void)chmod(line, DEFFILEMODE);
-	(void)chown(line, 0, 0);
+	(void) chmod(line, DEFFILEMODE);
+	(void) chown(line, 0, 0);
 }
 #endif
 
 bye()
 {
-    if(do_cleaning) {
-	rmut();
-	(void)kill(0, SIGKILL);
-    }
-    exit(0);
+	if (do_cleaning) {
+		rmut();
+		(void) kill(0, SIGKILL);
+	}
+	exit(0);
 }
-	
+
 flushbufs()
 {
 	pcc = 0;
 	pfrontp = pbackp = ptyobuf;
 	nfrontp = nbackp = netobuf;
 	while (getch() > 0)
-	    continue;
+		continue;
 }
 
 /*    ERRORS */
 
-void	finalbye ()
+void
+finalbye()
 {
-    bye ();
+	bye();
 }
 
-
 #ifndef	lint
-void	adios (va_alist)
-va_dcl
+void
+adios(va_alist)
+	va_dcl
 {
-    va_list ap;
+	va_list ap;
 
-    va_start (ap);
+	va_start(ap);
 
-    (void) _ll_log (vt_log, LLOG_FATAL, ap);
+	(void) _ll_log(vt_log, LLOG_FATAL, ap);
 
-    va_end (ap);
+	va_end(ap);
 
-    bye ();
+	bye();
 
-    _exit (1);
+	_exit(1);
 }
 #else
 /* VARARGS2 */
 
-void	adios (what, fmt)
-char   *what,
-       *fmt;
+void
+adios(what, fmt)
+	char *what, *fmt;
 {
-    adios (what, fmt);
+	adios(what, fmt);
 }
 #endif
 
-
 #ifndef	lint
-void	advise (va_alist)
-va_dcl
+void
+advise(va_alist)
+	va_dcl
 {
-    int	    code;
-    va_list ap;
+	int code;
+	va_list ap;
 
-    va_start (ap);
+	va_start(ap);
 
-    code = va_arg (ap, int);
+	code = va_arg(ap, int);
 
-    (void) _ll_log (vt_log, code, ap);
+	(void) _ll_log(vt_log, code, ap);
 
-    va_end (ap);
+	va_end(ap);
 }
 #else
 /* VARARGS3 */
 
-void	advise (code, what, fmt)
-int	code;
-char   *what,
-       *fmt;
+void
+advise(code, what, fmt)
+	int code;
+	char *what, *fmt;
 {
-    advise (code, what, fmt);
+	advise(code, what, fmt);
 }
 #endif
 
@@ -847,8 +868,7 @@ ptyflush()
 {
 	int n;
 
-	if ((n = pfrontp - pbackp) > 0)
-	{
+	if ((n = pfrontp - pbackp) > 0) {
 		n = write(pty, pbackp, n);
 	}
 	if (n < 0)
@@ -884,50 +904,46 @@ setmode(on, off)
 	struct sgttyb b;
 
 	ptyflush();
-	if(ioctl(pty, TIOCGETP, (char*)&b) < 0) {
+	if (ioctl(pty, TIOCGETP, (char *) &b) < 0) {
 		perror("ioctl");
 		adios(NULLCP, "ioctl failed");
 	}
 	b.sg_flags |= on;
 	b.sg_flags &= ~off;
-	if (ioctl(pty, TIOCSETP, (char*)&b) == -1) {
+	if (ioctl(pty, TIOCSETP, (char *) &b) == -1) {
 		perror("ioctl");
 		adios(NULLCP, "ioctl failed");
 	}
 }
 #endif
 
-
 #ifdef sgi
-static int forkpty(fildes, ptyname, ignore1, ignore2)
-     int * fildes;
-     char * ptyname, * ignore1, * ignore2;
+static int
+forkpty(fildes, ptyname, ignore1, ignore2)
+	int *fildes;
+	char *ptyname, *ignore1, *ignore2;
 {
-  char * slaveptyname;
-  int t;
-  int p;
-  int pid;
+	char *slaveptyname;
+	int t;
+	int p;
+	int pid;
 
-  if ((pid = fork()) == -1) {
-    perror("vtd -- fork");
-    vrelreq();
-  }
+	if ((pid = fork()) == -1) {
+		perror("vtd -- fork");
+		vrelreq();
+	}
 
-  strcpy (ptyname, slaveptyname);
-  if (pid == 0)
-    {
-    }
-  else
-    {
-      slaveptyname = _getpty(&p, O_RDWR, (mode_t) 0666, 0);
-      if (slaveptyname == NULL) {
-	perror("vtd -- getpty");
-	vrelreq();
-	/*NOTREACHED*/
-      }
-      printf ("Slave PTY: \"%s\"", slaveptyname);
-      * fildes = p;
-    }
-  return pid;
+	strcpy(ptyname, slaveptyname);
+	if (pid == 0) {
+	} else {
+		slaveptyname = _getpty(&p, O_RDWR, (mode_t) 0666, 0);
+		if (slaveptyname == NULL) {
+			perror("vtd -- getpty");
+			vrelreq();
+		 /*NOTREACHED*/}
+		printf("Slave PTY: \"%s\"", slaveptyname);
+		*fildes = p;
+	}
+	return pid;
 }
-#endif /* sgi */
+#endif				/* sgi */

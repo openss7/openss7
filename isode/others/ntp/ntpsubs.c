@@ -1,11 +1,70 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 #ifndef	lint
-static char *RCSid = "$Header: /xtel/isode/isode/others/ntp/RCS/ntpsubs.c,v 9.0 1992/06/16 12:42:48 isode Rel $";
-#endif	lint
+static char *RCSid =
+    "Header: /xtel/isode/isode/others/ntp/RCS/ntpsubs.c,v 9.0 1992/06/16 12:42:48 isode Rel";
+#endif	/* lint */
 
 /*
- * $Header: /xtel/isode/isode/others/ntp/RCS/ntpsubs.c,v 9.0 1992/06/16 12:42:48 isode Rel $
+ * Header: /xtel/isode/isode/others/ntp/RCS/ntpsubs.c,v 9.0 1992/06/16 12:42:48 isode Rel
  * subroutines for ntp - based on 3.4 ntp code.
- * $Log: ntpsubs.c,v $
+ * Log: ntpsubs.c,v
  * Revision 9.0  1992/06/16  12:42:48  isode
  * Release 8.0
  *
@@ -26,31 +85,34 @@ ul_fixed_to_double(t)
 	struct l_fixedpt *t;
 {
 	double a, b;
+
 #ifdef	GENERIC_UNS_BUG
 	register int i;
 
 	i = ntohl(t->fraction);
-	a = (long)((i >> 1) & 0x7fffffff);
+	a = (long) ((i >> 1) & 0x7fffffff);
 	a *= 2.0;
 	if (i & 1)
 		a += 1.0;
 	a = a / (4.294967296e9);	/* shift dec point over by 32 bits */
 	i = ntohl(t->int_part);
-	b = (long)((i >> 1) & 0x7fffffff);
+	b = (long) ((i >> 1) & 0x7fffffff);
 	b *= 2.0;
 	if (i & 1)
 		b += 1.0;
-#else	/* GENERIC_UNS_BUG */
+#else				/* GENERIC_UNS_BUG */
 	a = (unsigned long) ntohl(t->fraction);
 #ifdef	VAX_COMPILER_FLT_BUG
-	if (a < 0.0) a += 4.294967296e9;
+	if (a < 0.0)
+		a += 4.294967296e9;
 #endif
-	a = a / (4.294967296e9);/* shift dec point over by 32 bits */
+	a = a / (4.294967296e9);	/* shift dec point over by 32 bits */
 	b = (unsigned long) ntohl(t->int_part);
 #ifdef	VAX_COMPILER_FLT_BUG
-	if (b < 0.0) b += 4.294967296e9;
+	if (b < 0.0)
+		b += 4.294967296e9;
 #endif
-#endif	/* GENERIC_UNS_BUG */
+#endif				/* GENERIC_UNS_BUG */
 	return (a + b);
 }
 
@@ -63,29 +125,33 @@ double
 l_fixed_to_double(t)
 	struct l_fixedpt *t;
 {
-	double a,b;
+	double a, b;
 
 	if (ntohl(t->int_part) & 0x80000000) {
 		a = ntohl(~t->fraction);
 #ifdef	VAX_COMPILER_FLT_BUG
-		if (a < 0.0) a += 4.294967296e9;
+		if (a < 0.0)
+			a += 4.294967296e9;
 #endif
 		a = a / (4.294967296e9);
 		b = ntohl(~t->int_part);
 #ifdef	VAX_COMPILER_FLT_BUG
-		if (b < 0.0) b += 4.294967296e9;
+		if (b < 0.0)
+			b += 4.294967296e9;
 #endif
 		a += b;
 		a = -a;
 	} else {
 		a = ntohl(t->fraction);
 #ifdef	VAX_COMPILER_FLT_BUG
-		if (a < 0.0) a += 4.294967296e9;
+		if (a < 0.0)
+			a += 4.294967296e9;
 #endif
 		a = a / (4.294967296e9);
 		b = ntohl(t->int_part);
 #ifdef	VAX_COMPILER_FLT_BUG
-		if (b < 0.0) b += 4.294967296e9;
+		if (b < 0.0)
+			b += 4.294967296e9;
 #endif
 		a += b;
 	}
@@ -103,9 +169,9 @@ s_fixed_to_double(t)
 	double a;
 
 	if (ntohs(t->int_part) & 0x8000) {
-		a = (int)ntohs(~t->fraction & 0xFFFF);
+		a = (int) ntohs(~t->fraction & 0xFFFF);
 		a = a / 65536.0;	/* shift dec point over by 16 bits */
-		a +=  (int)ntohs(~t->int_part & 0xFFFF);
+		a += (int) ntohs(~t->int_part & 0xFFFF);
 		a = -a;
 	} else {
 		a = ntohs(t->fraction);
@@ -164,6 +230,7 @@ double_to_s_fixed(t, value)
 		t->fraction = htons(~t->fraction);
 	}
 }
+
 /*
 	in the sun, trying to assign a float between 2^31 and 2^32
 	results in the value 2^31.  Neither 4.2bsd nor VMS have this
@@ -200,15 +267,13 @@ tstamp(stampp, tvp)
  */
 
 char *
-ntoa (nsin)
-struct sockaddr_in *nsin;
+ntoa(nsin)
+	struct sockaddr_in *nsin;
 {
 	static int i = 0;
 	static char bufs[8][64];
 
-	(void) sprintf (bufs[i], ntohs (nsin->sin_port) ?
-			"INET %s/%d" : "INET %s", inet_ntoa (nsin->sin_addr),
-			ntohs(nsin->sin_port));
+	(void) sprintf(bufs[i], ntohs(nsin->sin_port) ?
+		       "INET %s/%d" : "INET %s", inet_ntoa(nsin->sin_addr), ntohs(nsin->sin_port));
 	return bufs[i];
 }
-

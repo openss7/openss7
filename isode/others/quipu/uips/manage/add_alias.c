@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* add_alias.c -  a mutilated add.c*/
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/others/quipu/uips/manage/RCS/add_alias.c,v 9.0 1992/06/16 12:44:45 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/others/quipu/uips/manage/RCS/add_alias.c,v 9.0 1992/06/16 12:44:45 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/others/quipu/uips/manage/RCS/add_alias.c,v 9.0 1992/06/16 12:44:45 isode Rel $
+ * Header: /xtel/isode/isode/others/quipu/uips/manage/RCS/add_alias.c,v 9.0 1992/06/16 12:44:45 isode Rel
  *
  *
- * $Log: add_alias.c,v $
+ * Log: add_alias.c,v
  * Revision 9.0  1992/06/16  12:44:45  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/others/quipu/uips/manage/RCS/ad
  *
  */
 
-
 #include "quipu/util.h"
 #include "quipu/dua.h"
 #include "quipu/add.h"
@@ -35,451 +93,385 @@ static char *rcsid = "$Header: /xtel/isode/isode/others/quipu/uips/manage/RCS/ad
 #define ORG_PERSON "newPilotPerson & quipuObject"
 	/* this should probably go elsewhere !!! */
 
-extern	DN	dn;
+extern DN dn;
+
 #define OPT     (!frompipe || rps -> ps_byteno == 0 ? opt : rps)
 #define RPS     (!frompipe || opt -> ps_byteno == 0 ? rps : opt)
-extern	char	frompipe;
-extern	PS	opt;
-extern	PS	rps;
-extern	Entry	current_entry;
-static	char	new_draft;
+extern char frompipe;
+extern PS opt;
+extern PS rps;
+extern Entry current_entry;
+static char new_draft;
 
-call_add_alias (argc, argv)
-int             argc;
-char          **argv;
+call_add_alias(argc, argv)
+	int argc;
+	char **argv;
 {
-	DN		oj_dn, aoj_dn ;
-	DN		save_dn, dnptr, trail ;
-	DN		moddn;
-extern	DN		str2dn_aux() ;
-extern	DN		sequence_dn() ;
-	Entry		entry_ptr;
-	FILE           *fd;
-	PS		tmp ;
-	PS		str_ps;
-	char		str_buffer[1000];
-	char		fname[128];
-	char		alias = FALSE ;
+	DN oj_dn, aoj_dn;
+	DN save_dn, dnptr, trail;
+	DN moddn;
+	extern DN str2dn_aux();
+	extern DN sequence_dn();
+	Entry entry_ptr;
+	FILE *fd;
+	PS tmp;
+	PS str_ps;
+	char str_buffer[1000];
+	char fname[128];
+	char alias = FALSE;
 
-	struct		ds_addentry_arg		add_arg;
-	struct		DSError			error;
-	struct		DSError			compare_error;
-	struct		ds_compare_result	compare_result;
-	struct		ds_compare_arg		compare_arg;
-	struct		ds_modifyentry_arg	mod_arg;
-	struct		DSError			mod_error;
-	struct		entrymod	       *emnew ;
+	struct ds_addentry_arg add_arg;
+	struct DSError error;
+	struct DSError compare_error;
+	struct ds_compare_result compare_result;
+	struct ds_compare_arg compare_arg;
+	struct ds_modifyentry_arg mod_arg;
+	struct DSError mod_error;
+	struct entrymod *emnew;
 
-	AV_Sequence	objClassAVS ;
-	AV_Sequence	treeStrAVS = NULLAV;
-	Attr_Sequence   get_attributes();
+	AV_Sequence objClassAVS;
+	AV_Sequence treeStrAVS = NULLAV;
+	Attr_Sequence get_attributes();
 
-	extern int	parse_status;
+	extern int parse_status;
 
-	int		draft_flag = 0;
-	char	       *home;
-	char		objectname[80] ;
-	char		aliasobjectname[160] ;
-	char	       *contact_compare[6] ;
-	char	       *contact_showentry[6] ;
-	char	       *contact_modify[1] ;
+	int draft_flag = 0;
+	char *home;
+	char objectname[80];
+	char aliasobjectname[160];
+	char *contact_compare[6];
+	char *contact_showentry[6];
+	char *contact_modify[1];
 
-	contact_compare[0] = "compare" ;
+	contact_compare[0] = "compare";
 	contact_compare[1] = "";
 	contact_compare[2] = "-attribute";
 	contact_compare[4] = "-noprint";
-	contact_compare[5] = "-dontdereferencealias" ;
+	contact_compare[5] = "-dontdereferencealias";
 	contact_showentry[0] = "showentry";
-	contact_showentry[1] = "-noshow" ;
-	contact_showentry[2] = "-all" ;
-	contact_showentry[3] = "-nokey" ;
+	contact_showentry[1] = "-noshow";
+	contact_showentry[2] = "-all";
+	contact_showentry[3] = "-nokey";
 	contact_showentry[4] = "-dontdereferencealias";
-	contact_modify[0] = "modify" ;
+	contact_modify[0] = "modify";
 
-	emnew = em_alloc() ;
-	if (argc < 3)
-	{
-		ps_printf(OPT, "Not enough arguments.\n") ;
-		Usage (argv[0]) ;
-		return ;
+	emnew = em_alloc();
+	if (argc < 3) {
+		ps_printf(OPT, "Not enough arguments.\n");
+		Usage(argv[0]);
+		return;
 	}
-	contact_showentry[5] = (char *) malloc ((unsigned)strlen(argv[2])+1) ;
-	(void)strcpy(contact_showentry[5], argv[2]) ;
+	contact_showentry[5] = (char *) malloc((unsigned) strlen(argv[2]) + 1);
+	(void) strcpy(contact_showentry[5], argv[2]);
 
-	contact_compare[3] = (char *) malloc ((unsigned)strlen("objectClass=alias.")) ;
-	(void)strcpy(contact_compare[3], "objectClass=alias") ;
+	contact_compare[3] = (char *) malloc((unsigned) strlen("objectClass=alias."));
+	(void) strcpy(contact_compare[3], "objectClass=alias");
 
-	if (service_control (OPT, 6, contact_compare, &compare_arg.cma_common) == -1)
-	{
-		ps_print(OPT, "Problems with compare service control flags.\n") ;
-		return ;
+	if (service_control(OPT, 6, contact_compare, &compare_arg.cma_common) == -1) {
+		ps_print(OPT, "Problems with compare service control flags.\n");
+		return;
 	}
 
-	if (home = getenv ("HOME"))
-	    (void) sprintf (fname, "%s/.dishdraft", home);
+	if (home = getenv("HOME"))
+		(void) sprintf(fname, "%s/.dishdraft", home);
 	else
-	    (void) strcpy (fname, "./.dishdraft");
+		(void) strcpy(fname, "./.dishdraft");
 	new_draft = FALSE;
 
-	if ((argc = service_control (OPT, argc, argv, &add_arg.ada_common)) == -1)
-		return ;
+	if ((argc = service_control(OPT, argc, argv, &add_arg.ada_common)) == -1)
+		return;
 
-	(void)strcpy(objectname, argv[1]) ;
-	(void)strcpy(aliasobjectname, argv[2]) ;
+	(void) strcpy(objectname, argv[1]);
+	(void) strcpy(aliasobjectname, argv[2]);
 
 	/* Turn a sequence number back into a DN */
-	if (*aliasobjectname >= '0' && *aliasobjectname <= '9')
-	{
+	if (*aliasobjectname >= '0' && *aliasobjectname <= '9') {
 		/* First convert the number into a dn */
-		aoj_dn = dn_cpy(sequence_dn(atoi(aliasobjectname))) ;
-	}
-	else
-	{
-		if (*aliasobjectname == '.')
-		{
-			ps_print(OPT, "..@ gives me a headache. Ambiguous. Abort... \n") ;
-			return ;
+		aoj_dn = dn_cpy(sequence_dn(atoi(aliasobjectname)));
+	} else {
+		if (*aliasobjectname == '.') {
+			ps_print(OPT, "..@ gives me a headache. Ambiguous. Abort... \n");
+			return;
 		}
 
-		if (*aliasobjectname == '@')
-		{	
-			aoj_dn = dn_cpy(str2dn(aliasobjectname + 1)) ;
-		}
-		else
-		{
-			/*aoj_dn = dn_cpy(dn) ;
-			 *dn_append(aoj_dn, dn_cpy(str2dn(aliasobjectname))) ;
-			 */
-			save_dn = str2dn_aux(aliasobjectname,&alias) ;
-			if (save_dn != NULLDN)
-			{
-				if (alias)
-				{
+		if (*aliasobjectname == '@') {
+			aoj_dn = dn_cpy(str2dn(aliasobjectname + 1));
+		} else {
+			/* aoj_dn = dn_cpy(dn) ; dn_append(aoj_dn, dn_cpy(str2dn(aliasobjectname))) 
+			   ; */
+			save_dn = str2dn_aux(aliasobjectname, &alias);
+			if (save_dn != NULLDN) {
+				if (alias) {
 					aoj_dn = dn_cpy(save_dn);
-				} 
-				else
-				{
-					if (dn == NULLDN)
-					{
-						aoj_dn = dn_cpy(save_dn) ;
-					}
-					else
-					{
-						aoj_dn = dn_cpy(dn) ;
-						dn_append (aoj_dn,dn_cpy(save_dn));
+				} else {
+					if (dn == NULLDN) {
+						aoj_dn = dn_cpy(save_dn);
+					} else {
+						aoj_dn = dn_cpy(dn);
+						dn_append(aoj_dn, dn_cpy(save_dn));
 					}
 				}
 			}
-			dn_free(save_dn) ;
+			dn_free(save_dn);
 		}
- 	}
-
-	if (*objectname >= '0' && *objectname <= '9')
-	{
-		/* First convert the number into a dn */
-		oj_dn = dn_cpy(sequence_dn(atoi(objectname))) ;
 	}
-	else
-	{
-		if (*objectname == '.')
-		{
-			ps_print(OPT, "..@ gives me a headache. Ambiguous. Abort... \n") ;
-			return ;
+
+	if (*objectname >= '0' && *objectname <= '9') {
+		/* First convert the number into a dn */
+		oj_dn = dn_cpy(sequence_dn(atoi(objectname)));
+	} else {
+		if (*objectname == '.') {
+			ps_print(OPT, "..@ gives me a headache. Ambiguous. Abort... \n");
+			return;
 		}
 
-		if (*objectname == '@')
-		{	
-			oj_dn = dn_cpy(str2dn(objectname + 1)) ;
+		if (*objectname == '@') {
+			oj_dn = dn_cpy(str2dn(objectname + 1));
+		} else {
+			oj_dn = dn_cpy(dn);
+			dn_append(oj_dn, dn_cpy(str2dn(objectname)));
 		}
-		else
-		{
-			oj_dn = dn_cpy(dn) ;
-			dn_append(oj_dn, dn_cpy(str2dn(objectname))) ;
-		}
- 	}
+	}
 
-	save_dn = dn_cpy(dn) ;
-	dn_free(dn) ;
-	dn = dn_cpy(aoj_dn) ;
-	ps_print(OPT, "Trying to move to ") ;
-	dn_print(OPT, dn, EDBOUT) ;
-	ps_print(OPT, ".\n") ;
-	if (test_move_dn() != TRUE)
-	{
-		ps_print(OPT, "Can't move to ") ;
-		dn_print(OPT, dn, EDBOUT) ;
-		ps_print(OPT, ".\nAborting.\n") ;
-		return ;
+	save_dn = dn_cpy(dn);
+	dn_free(dn);
+	dn = dn_cpy(aoj_dn);
+	ps_print(OPT, "Trying to move to ");
+	dn_print(OPT, dn, EDBOUT);
+	ps_print(OPT, ".\n");
+	if (test_move_dn() != TRUE) {
+		ps_print(OPT, "Can't move to ");
+		dn_print(OPT, dn, EDBOUT);
+		ps_print(OPT, ".\nAborting.\n");
+		return;
 	}
 	compare_arg.cma_object = aoj_dn;
-	if (get_ava (&compare_arg.cma_purported, "objectClass", "alias") != OK)
-	{
-		ps_print(OPT, "Oops, 'objectClass=alias' is a bad attribute!\n") ;
-		ps_print(OPT, "This is very bad...\n") ;
-		return ;
+	if (get_ava(&compare_arg.cma_purported, "objectClass", "alias") != OK) {
+		ps_print(OPT, "Oops, 'objectClass=alias' is a bad attribute!\n");
+		ps_print(OPT, "This is very bad...\n");
+		return;
 	}
 
-	if (rebind () != OK)
-		return ;
+	if (rebind() != OK)
+		return;
 
-	while (ds_compare (&compare_arg, &compare_error, &compare_result) != DS_OK) 
-	{
-		if (dish_error (OPT, &compare_error) == 0)
-		{
-			return ;
+	while (ds_compare(&compare_arg, &compare_error, &compare_result) != DS_OK) {
+		if (dish_error(OPT, &compare_error) == 0) {
+			return;
 		}
 		compare_arg.cma_object = compare_error.ERR_REFERRAL.DSE_ref_candidates->cr_name;
 	}
 
-	if ( compare_result.cmr_matched == 1 )	/* if <AOJ> is an alias, abort. */
-	{
-		ps_printf(OPT, "Sorry, %s is an alias.\nAliasing to aliases is illegal.\n", aliasobjectname) ;
-		return ;
+	if (compare_result.cmr_matched == 1) {	/* if <AOJ> is an alias, abort. */
+		ps_printf(OPT, "Sorry, %s is an alias.\nAliasing to aliases is illegal.\n",
+			  aliasobjectname);
+		return;
 	}
 
-	/* Now we want to discover the objectClass of our object, and make
-	 * sure that this will be OK when we add in the alias. (ie fitting
-	 * in with the treeStructure.) 
-	 */
+	/* Now we want to discover the objectClass of our object, and make sure that this will be
+	   OK when we add in the alias. (ie fitting in with the treeStructure.) */
 
-	/* stick the aliasobjectname into the cache so we can read 
-	 * bits of information from it.
-	 */
+	/* stick the aliasobjectname into the cache so we can read bits of information from it. */
 
-	call_showentry(6, contact_showentry) ;
-	contact_showentry[5] = (char *) malloc ((unsigned)strlen(argv[2])+1) ;
-	(void)strcpy(contact_showentry[5], argv[2]) ;
+	call_showentry(6, contact_showentry);
+	contact_showentry[5] = (char *) malloc((unsigned) strlen(argv[2]) + 1);
+	(void) strcpy(contact_showentry[5], argv[2]);
 
-	if (current_entry == NULLENTRY)
-	{
-		ps_print(OPT, "Can't read ") ;
-		dn_print(OPT, dn, EDBOUT) ;
-		ps_print(OPT, " for objectClass attribute. Aborting.\n") ;
-		return ;
-	}
-	else
-	{
-		/* Find the objectClass attribute to compare with the tree
-		 * structure of the node we are going to dangle the alias
-		 * from. 
-		 * While we are at it, find out how many seeAlso attributes
-		 * are present, so we can decide whether we need to add
-		 * the entire attribute or just another value.
-		 */
+	if (current_entry == NULLENTRY) {
+		ps_print(OPT, "Can't read ");
+		dn_print(OPT, dn, EDBOUT);
+		ps_print(OPT, " for objectClass attribute. Aborting.\n");
+		return;
+	} else {
+		/* Find the objectClass attribute to compare with the tree structure of the node we 
+		   are going to dangle the alias from. While we are at it, find out how many
+		   seeAlso attributes are present, so we can decide whether we need to add the
+		   entire attribute or just another value. */
 
-		Attr_Sequence eptr ;
-		AttributeType a_t = AttrT_new("objectClass") ;
-		AttributeType a_t2 = AttrT_new("seeAlso") ;
+		Attr_Sequence eptr;
+		AttributeType a_t = AttrT_new("objectClass");
+		AttributeType a_t2 = AttrT_new("seeAlso");
 
-		emnew->em_type = EM_ADDATTRIBUTE ;
-		for (eptr = current_entry->e_attributes; eptr != NULLATTR; eptr = eptr->attr_link) 
-		{
-			if ( AttrT_cmp (eptr->attr_type, a_t) == 0 )
-			{
+		emnew->em_type = EM_ADDATTRIBUTE;
+		for (eptr = current_entry->e_attributes; eptr != NULLATTR; eptr = eptr->attr_link) {
+			if (AttrT_cmp(eptr->attr_type, a_t) == 0) {
 				objClassAVS = avs_cpy(eptr->attr_value);
 			}
-			if ( AttrT_cmp (eptr->attr_type, a_t2) == 0 )
-			{
-				emnew->em_type = EM_ADDVALUES ;
+			if (AttrT_cmp(eptr->attr_type, a_t2) == 0) {
+				emnew->em_type = EM_ADDVALUES;
 			}
 		}
 	}
-	if (objClassAVS == NULLAV)
-	{
-		ps_print(OPT, "We can't find Object Class.... Aborting.\n") ;
-		return ;
+	if (objClassAVS == NULLAV) {
+		ps_print(OPT, "We can't find Object Class.... Aborting.\n");
+		return;
 	}
-	/* We should have got the ObjectClass now, so return to where we were
-	 * and move up a level to grab the tree structure */
+	/* We should have got the ObjectClass now, so return to where we were and move up a level
+	   to grab the tree structure */
 
-	dn_free(dn) ;
-	dn = dn_cpy(oj_dn) ;
+	dn_free(dn);
+	dn = dn_cpy(oj_dn);
 
 	for (dnptr = dn; dnptr->dn_parent != NULLDN; dnptr = dnptr->dn_parent)
 		trail = dnptr;
-	dn_comp_free (dnptr);
+	dn_comp_free(dnptr);
 	trail->dn_parent = NULLDN;
 
-	contact_showentry[1] = ( char *) malloc ((unsigned)strlen("-noshow") + 1) ;
-	(void)strcpy(contact_showentry[1], "-noshow") ;
-	contact_showentry[2] = ( char *) malloc ((unsigned)strlen("-all") + 1) ;
-	(void)strcpy(contact_showentry[2], "-all") ;
-	contact_showentry[3] = ( char *) malloc ((unsigned)strlen("-nokey") + 1) ;
-	(void)strcpy(contact_showentry[3], "-nokey") ;
-	contact_showentry[4] = ( char *) malloc ((unsigned)strlen("-dontdereferencealias") + 1) ;
-	(void)strcpy(contact_showentry[4], "-dontdereferencealias") ;
+	contact_showentry[1] = (char *) malloc((unsigned) strlen("-noshow") + 1);
+	(void) strcpy(contact_showentry[1], "-noshow");
+	contact_showentry[2] = (char *) malloc((unsigned) strlen("-all") + 1);
+	(void) strcpy(contact_showentry[2], "-all");
+	contact_showentry[3] = (char *) malloc((unsigned) strlen("-nokey") + 1);
+	(void) strcpy(contact_showentry[3], "-nokey");
+	contact_showentry[4] = (char *) malloc((unsigned) strlen("-dontdereferencealias") + 1);
+	(void) strcpy(contact_showentry[4], "-dontdereferencealias");
 
-	call_showentry(5, contact_showentry) ;
+	call_showentry(5, contact_showentry);
 
-	if (current_entry == NULLENTRY)
-	{
-		ps_print(OPT, "Can't read ") ;
-		dn_print(OPT, dn, EDBOUT) ;
-		ps_print(OPT, " for the treeStructure. Aborting.\n") ;
-		return ;
-	}
-	else
-	{
-		Attr_Sequence eptr ;
-		AttributeType a_t = AttrT_new("treeStructure") ;
+	if (current_entry == NULLENTRY) {
+		ps_print(OPT, "Can't read ");
+		dn_print(OPT, dn, EDBOUT);
+		ps_print(OPT, " for the treeStructure. Aborting.\n");
+		return;
+	} else {
+		Attr_Sequence eptr;
+		AttributeType a_t = AttrT_new("treeStructure");
 
-		for (eptr = current_entry->e_attributes; eptr != NULLATTR; eptr = eptr->attr_link)
-		{
-			if ( AttrT_cmp (eptr->attr_type, a_t) == 0 )
-			{
-				treeStrAVS = avs_cpy (eptr->attr_value) ;
+		for (eptr = current_entry->e_attributes; eptr != NULLATTR; eptr = eptr->attr_link) {
+			if (AttrT_cmp(eptr->attr_type, a_t) == 0) {
+				treeStrAVS = avs_cpy(eptr->attr_value);
 			}
 		}
 	}
 
-	if (treeStrAVS == NULLAV)
-	{
-		ps_print(OPT, "Tree Structure Missing in ") ;
-		dn_print(OPT, dn, EDBOUT) ;
-		ps_print(OPT, ".\nAssuming that the add will be valid.\n") ;
-	}
-	else
-	{
-		if (test_schema(treeStrAVS, objClassAVS) != OK)
-		{
-			ps_print(OPT, "Not allowed to add this alias here.\n") ;
-			ps_print(OPT, "It would break the directory schema to add this alias here.\n") ;
-			return ;
+	if (treeStrAVS == NULLAV) {
+		ps_print(OPT, "Tree Structure Missing in ");
+		dn_print(OPT, dn, EDBOUT);
+		ps_print(OPT, ".\nAssuming that the add will be valid.\n");
+	} else {
+		if (test_schema(treeStrAVS, objClassAVS) != OK) {
+			ps_print(OPT, "Not allowed to add this alias here.\n");
+			ps_print(OPT,
+				 "It would break the directory schema to add this alias here.\n");
+			return;
 		}
 	}
 
-	/* This is where we have to start being rather careful, previously
-	 * we have just being reading and checking, but now we start to add
-	 * things in, changing in several places. Mistakes => inconsistencies
-	 * ie BAD...
-	 */
+	/* This is where we have to start being rather careful, previously we have just being
+	   reading and checking, but now we start to add things in, changing in several places.
+	   Mistakes => inconsistencies ie BAD... */
 
-	/* If we reach here, we should have the appropriate arguments,
-	 * one is the new object,
-	 * the other is an existing non-alias-entry object.
-	 * We now write the information to a draft file, and 'whongo'
-	 * the alias into the database.
-	 */
+	/* If we reach here, we should have the appropriate arguments, one is the new object, the
+	   other is an existing non-alias-entry object. We now write the information to a draft
+	   file, and 'whongo' the alias into the database. */
 
 	/* open the draft file for writing... */
 
-	if ((fd = fopen (fname, "w")) == (FILE *) NULL) 
-	{
-		ps_printf (OPT, "Can't open draft entry %s\n", fname);
-		return ;
+	if ((fd = fopen(fname, "w")) == (FILE *) NULL) {
+		ps_printf(OPT, "Can't open draft entry %s\n", fname);
+		return;
 	}
-	
-	(void)fprintf(fd, "aliasedObjectName= ") ;
-	if ( ((tmp = ps_alloc (std_open)) != NULLPS) &&
-	     (std_setup (tmp, fd) != NOTOK) )
-	{
-		dn_print(tmp, aoj_dn, EDBOUT) ;
-	}
-	else
-	{
-		ps_print(OPT, "Unable to open appropriate ps. Aborting..\n") ;
-		return ;
-	}
-	(void)fprintf(fd, "\nobjectClass= quipuObject & alias & top\n") ;
-	(void) fclose(fd) ;
 
-	if (move (objectname) != OK)
-	{
-		ps_printf (OPT,"Unknown option %s\n",objectname);
-		return ;
+	(void) fprintf(fd, "aliasedObjectName= ");
+	if (((tmp = ps_alloc(std_open)) != NULLPS) && (std_setup(tmp, fd) != NOTOK)) {
+		dn_print(tmp, aoj_dn, EDBOUT);
+	} else {
+		ps_print(OPT, "Unable to open appropriate ps. Aborting..\n");
+		return;
+	}
+	(void) fprintf(fd, "\nobjectClass= quipuObject & alias & top\n");
+	(void) fclose(fd);
+
+	if (move(objectname) != OK) {
+		ps_printf(OPT, "Unknown option %s\n", objectname);
+		return;
 	}
 
 	/* now parse the files */
-	if ((fd = fopen (fname, "r")) == (FILE *) NULL) {
-		ps_printf (OPT, "Can't open draft entry %s\n", fname);
-		return ;
+	if ((fd = fopen(fname, "r")) == (FILE *) NULL) {
+		ps_printf(OPT, "Can't open draft entry %s\n", fname);
+		return;
 	}
-	entry_ptr = get_default_entry (NULLENTRY);
-	entry_ptr->e_attributes = get_attributes (fd);
-	(void) fclose (fd);
+	entry_ptr = get_default_entry(NULLENTRY);
+	entry_ptr->e_attributes = get_attributes(fd);
+	(void) fclose(fd);
 	if (parse_status != 0)
-		return ;
-		
+		return;
+
 	add_arg.ada_object = dn;
-	for (moddn = dn ; moddn->dn_parent != NULLDN; moddn=moddn->dn_parent)
-		;
-	entry_ptr->e_name = rdn_cpy (moddn->dn_rdn);
+	for (moddn = dn; moddn->dn_parent != NULLDN; moddn = moddn->dn_parent) ;
+	entry_ptr->e_name = rdn_cpy(moddn->dn_rdn);
 	add_arg.ada_entry = entry_ptr->e_attributes;
 
-	if (rebind () != OK) {
-		entry_free (entry_ptr);
-		return ;
+	if (rebind() != OK) {
+		entry_free(entry_ptr);
+		return;
 	}
 
-	while (ds_addentry (&add_arg, &error) != DS_OK) {
-		if (dish_error (OPT, &error) == 0) {
-			entry_free (entry_ptr);
-			return ;
+	while (ds_addentry(&add_arg, &error) != DS_OK) {
+		if (dish_error(OPT, &error) == 0) {
+			entry_free(entry_ptr);
+			return;
 		}
 		add_arg.ada_object = error.ERR_REFERRAL.DSE_ref_candidates->cr_name;
-	} 
-	ps_print (RPS, "Added ");
-	dn_print (RPS, dn, EDBOUT);
-	ps_print (RPS, "\n");
-	entry_free (entry_ptr);
-	make_old (fname,draft_flag);	
+	}
+	ps_print(RPS, "Added ");
+	dn_print(RPS, dn, EDBOUT);
+	ps_print(RPS, "\n");
+	entry_free(entry_ptr);
+	make_old(fname, draft_flag);
 
 	/* Now we have to add a "seeAlso=<DN>" attribute to the <AOJ> */
 
-	if (service_control(OPT, 1, contact_modify, &mod_arg.mea_common) == -1)
-	{
-		ps_printf(OPT, "Add_alias: Badly wrong. Service controls for modify in error...\n") ;
-		return ;
+	if (service_control(OPT, 1, contact_modify, &mod_arg.mea_common) == -1) {
+		ps_printf(OPT, "Add_alias: Badly wrong. Service controls for modify in error...\n");
+		return;
 	}
 
-	dn_free(dn) ;
-	dn = dn_cpy(save_dn) ;
+	dn_free(dn);
+	dn = dn_cpy(save_dn);
 	{
-		AV_Sequence	new_avs = avs_comp_alloc() ;
-		AttributeValue	new_AV = AttrV_alloc() ;
-		
-		if ((str_ps = ps_alloc(str_open)) == NULLPS)
-		{
-			ps_printf(OPT, "Ps alloc for your string failed.\n") ;
-			return ;
-		}
-		if (str_setup (str_ps, str_buffer, 998, 1) == NOTOK)
-		{
-			ps_printf (OPT, "str_setup: %s", ps_error (str_ps -> ps_errno));
-			ps_free (str_ps);
-			return ;
-		}
-		dn_print(str_ps, oj_dn, EDBOUT) ;
-		*str_ps->ps_ptr = 0 ;
-		ps_free(str_ps) ;
+		AV_Sequence new_avs = avs_comp_alloc();
+		AttributeValue new_AV = AttrV_alloc();
 
-		new_AV = AttrV_cpy(str2AttrV(str_buffer, str2syntax("DN"))) ;
-		new_avs = avs_comp_new(AttrV_cpy(new_AV)) ;
-		emnew->em_what = as_comp_new(AttrT_new("seeAlso"), new_avs, NULLACL_INFO) ;
+		if ((str_ps = ps_alloc(str_open)) == NULLPS) {
+			ps_printf(OPT, "Ps alloc for your string failed.\n");
+			return;
+		}
+		if (str_setup(str_ps, str_buffer, 998, 1) == NOTOK) {
+			ps_printf(OPT, "str_setup: %s", ps_error(str_ps->ps_errno));
+			ps_free(str_ps);
+			return;
+		}
+		dn_print(str_ps, oj_dn, EDBOUT);
+		*str_ps->ps_ptr = 0;
+		ps_free(str_ps);
+
+		new_AV = AttrV_cpy(str2AttrV(str_buffer, str2syntax("DN")));
+		new_avs = avs_comp_new(AttrV_cpy(new_AV));
+		emnew->em_what = as_comp_new(AttrT_new("seeAlso"), new_avs, NULLACL_INFO);
 	}
-	emnew->em_next = NULLMOD ;
+	emnew->em_next = NULLMOD;
 	mod_arg.mea_object = aoj_dn;
-	mod_arg.mea_changes = emnew ;
+	mod_arg.mea_changes = emnew;
 
-	if (rebind () != OK)
-		return ;
-			
-	while (ds_modifyentry (&mod_arg, &mod_error) != DS_OK)
-	{
-		if (dish_error (OPT, &mod_error) == 0)
-		{
-			ps_print(OPT, "Unable to modify ") ;
-			dn_print(OPT, aoj_dn, EDBOUT) ;
-			ps_print(OPT, "\n") ;
-			return ;
+	if (rebind() != OK)
+		return;
+
+	while (ds_modifyentry(&mod_arg, &mod_error) != DS_OK) {
+		if (dish_error(OPT, &mod_error) == 0) {
+			ps_print(OPT, "Unable to modify ");
+			dn_print(OPT, aoj_dn, EDBOUT);
+			ps_print(OPT, "\n");
+			return;
 		}
 		mod_arg.mea_object = mod_error.ERR_REFERRAL.DSE_ref_candidates->cr_name;
 	}
-	ps_print (RPS, "Modified ");
-	dn_print (RPS, aoj_dn, EDBOUT);
-	ps_print (RPS, "\n");
-	delete_cache (aoj_dn);	/* re-cache when next read */
+	ps_print(RPS, "Modified ");
+	dn_print(RPS, aoj_dn, EDBOUT);
+	ps_print(RPS, "\n");
+	delete_cache(aoj_dn);	/* re-cache when next read */
 
-	dn_free(dn) ;
-	dn = dn_cpy(save_dn) ;
+	dn_free(dn);
+	dn = dn_cpy(save_dn);
 }

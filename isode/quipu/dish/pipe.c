@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* pipe.c - */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/quipu/dish/RCS/pipe.c,v 9.0 1992/06/16 12:35:39 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/quipu/dish/RCS/pipe.c,v 9.0 1992/06/16 12:35:39 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/quipu/dish/RCS/pipe.c,v 9.0 1992/06/16 12:35:39 isode Rel $
+ * Header: /xtel/isode/isode/quipu/dish/RCS/pipe.c,v 9.0 1992/06/16 12:35:39 isode Rel
  *
  *
- * $Log: pipe.c,v $
+ * Log: pipe.c,v
  * Revision 9.0  1992/06/16  12:35:39  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/dish/RCS/pipe.c,v 9.0 199
  *
  */
 
-
 #include <signal.h>
 #include <stdio.h>
 #include <errno.h>
@@ -38,10 +96,10 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/dish/RCS/pipe.c,v 9.0 199
 #include "tailor.h"
 
 #ifdef SOCKETS
-int             sd, sd_current;
+int sd, sd_current;
 #else
-char 		retpipe[LINESIZE];
-int             fd, wfd;
+char retpipe[LINESIZE];
+int fd, wfd;
 #endif
 
 #ifndef MIN
@@ -49,162 +107,159 @@ int             fd, wfd;
 #endif
 
 int parent_pid;
-extern int	errno;		
+extern int errno;
 
-init_pipe ()
+init_pipe()
 {
-	char parent [BUFSIZ];
-	char   *cp;
+	char parent[BUFSIZ];
+	char *cp;
 
 #ifdef SOCKETS
-	struct sockaddr_in      sin_buf;
-	struct sockaddr_in      *sin = &sin_buf;
+	struct sockaddr_in sin_buf;
+	struct sockaddr_in *sin = &sin_buf;
 #else
 #endif
 
-	if ((cp = getenv ("DISHPARENT")) == NULLCP) {
-		(void) sprintf (parent, "%d", getppid ());
-		(void) setenv ("DISHPARENT", cp = parent);
+	if ((cp = getenv("DISHPARENT")) == NULLCP) {
+		(void) sprintf(parent, "%d", getppid());
+		(void) setenv("DISHPARENT", cp = parent);
 	}
 
-
-	if (sscanf (cp, "%d", &parent_pid) != 1) {
-		(void) fprintf (stderr,"DISHPARENT malformed");
+	if (sscanf(cp, "%d", &parent_pid) != 1) {
+		(void) fprintf(stderr, "DISHPARENT malformed");
 		return (NOTOK);
 	}
-
 #ifdef SOCKETS
-	if (get_dish_sock (sin) != 0)
+	if (get_dish_sock(sin) != 0)
 		return (NOTOK);
 
-	if ((sd = start_tcp_server (sin, SOMAXCONN, 0, 0)) == NOTOK) {
-	    perror ("start_tcp_server");
-	    return NOTOK;
-        }
+	if ((sd = start_tcp_server(sin, SOMAXCONN, 0, 0)) == NOTOK) {
+		perror("start_tcp_server");
+		return NOTOK;
+	}
 #ifdef	FIOCLEX
-	(void) ioctl (sd, FIOCLEX, NULLCP);
+	(void) ioctl(sd, FIOCLEX, NULLCP);
 #endif
-#else		
+#else
 
-	if ((cp = getenv ("DISHPROC")) == NULL) {
-		(void) fprintf (stderr, "no DISHPROC in environment\n");
+	if ((cp = getenv("DISHPROC")) == NULL) {
+		(void) fprintf(stderr, "no DISHPROC in environment\n");
 		return (NOTOK);
 	}
 
-	(void) strcpy (retpipe, cp);
-	(void) umask (0);
+	(void) strcpy(retpipe, cp);
+	(void) umask(0);
 
-	if ((fd = open (retpipe, O_RDONLY)) < 0) {
-		(void) mknod (retpipe, S_IFIFO | 0600, 0);
-		if ((fd = open (retpipe, O_RDONLY)) < 0) {
-			(void) fprintf (stderr, "ropen failed\n");
-			(void) unlink (retpipe);
+	if ((fd = open(retpipe, O_RDONLY)) < 0) {
+		(void) mknod(retpipe, S_IFIFO | 0600, 0);
+		if ((fd = open(retpipe, O_RDONLY)) < 0) {
+			(void) fprintf(stderr, "ropen failed\n");
+			(void) unlink(retpipe);
 			return (NOTOK);
 		}
 	}
 
-	if ((wfd = open (retpipe, O_WRONLY)) < 0) {
-		(void) fprintf (stderr, "wr open failed\n");
-		(void) unlink (retpipe);
-		(void) close (fd);
+	if ((wfd = open(retpipe, O_WRONLY)) < 0) {
+		(void) fprintf(stderr, "wr open failed\n");
+		(void) unlink(retpipe);
+		(void) close(fd);
 		return (NOTOK);
 	}
 #endif
 
 #ifdef	SETSID
-	(void) setsid ();
+	(void) setsid();
 #endif
 #ifdef	TIOCNOTTY
 	{
-	    int	    xsd;
+		int xsd;
 
-	    if ((xsd = open ("/dev/tty", O_RDWR)) != NOTOK) {
-		(void) ioctl (xsd, TIOCNOTTY, NULLCP);
-		(void) close (xsd);
-	    }
+		if ((xsd = open("/dev/tty", O_RDWR)) != NOTOK) {
+			(void) ioctl(xsd, TIOCNOTTY, NULLCP);
+			(void) close(xsd);
+		}
 	}
 #else
 #ifdef	SYS5
-	(void) setpgrp ();
-	(void) signal (SIGINT, SIG_IGN);
-	(void) signal (SIGQUIT, SIG_IGN);
+	(void) setpgrp();
+	(void) signal(SIGINT, SIG_IGN);
+	(void) signal(SIGQUIT, SIG_IGN);
 #endif
 #endif
 	return (OK);
 }
 
-exit_pipe ()
+exit_pipe()
 {
 #ifdef SOCKETS
-	(void) close_tcp_socket (sd);
+	(void) close_tcp_socket(sd);
 #else
-	(void) close (fd);
-	(void) close (wfd);
-	(void) unlink (retpipe);
+	(void) close(fd);
+	(void) close(wfd);
+	(void) unlink(retpipe);
 #endif
 }
 
-read_pipe (buf,len)
-char * buf;
-int len;
+read_pipe(buf, len)
+	char *buf;
+	int len;
 {
 #ifdef SOCKETS
 	struct sockaddr_in sock;
 
-	while ((sd_current = join_tcp_client (sd, &sock)) == NOTOK) {
+	while ((sd_current = join_tcp_client(sd, &sock)) == NOTOK) {
 		if (errno != EINTR) {
 			perror("join_tcp_client");
 			return (-1);
 		}
 	}
 #ifdef	FIOCLEX
-	(void) ioctl (sd_current, FIOCLEX, NULLCP);
+	(void) ioctl(sd_current, FIOCLEX, NULLCP);
 #endif
 #endif
-	return (read_pipe_aux(buf,len));
+	return (read_pipe_aux(buf, len));
 }
 
-
-read_pipe_aux (buf,len)
-char * buf;
-int len;
+read_pipe_aux(buf, len)
+	char *buf;
+	int len;
 {
 	int res;
+
 #ifdef	SOCKETS
-	register char *cp,
-		      *ep;
+	register char *cp, *ep;
 #endif
 
 	*buf = '\0';
 #ifdef SOCKETS
 	ep = (cp = buf) + len - 1;
 	for (;;) {
-	    switch (res = recv (sd_current, cp, ep - cp, 0)) {
+		switch (res = recv(sd_current, cp, ep - cp, 0)) {
 		case NOTOK:
-		    perror ("recv");
-		    (void) close (sd_current);
-		    return NOTOK;
+			perror("recv");
+			(void) close(sd_current);
+			return NOTOK;
 
 		case OK:
-		    break;
+			break;
 
 		default:
-		    cp += res - 1;
-		    if (*cp == '\n')
+			cp += res - 1;
+			if (*cp == '\n')
+				break;
+			if (++cp < ep)
+				continue;
 			break;
-		    if (++cp < ep)
-			continue;
-		    break;
-	    }
-	    break;
+		}
+		break;
 	}
 	*cp = NULL;
 
 	return (cp - buf);
 #else
-	if ((res = read (fd, buf, len)) <= 0) {
-		perror ("read error");
-		reopen_ret ();
+	if ((res = read(fd, buf, len)) <= 0) {
+		perror("read error");
+		reopen_ret();
 		return (-1);
 	}
 	*(buf + res) = 0;
@@ -213,118 +268,112 @@ int len;
 #endif
 }
 
-
 #ifdef	SOCKETS
-int	read_pipe_aux2 (buf, len)
-char  **buf;
-int    *len;
+int
+read_pipe_aux2(buf, len)
+	char **buf;
+	int *len;
 {
-    int	    cc,
-	    i,
-	    j,
-	    res;
-    register char   *cp,
-		    *dp,
-		    *ep;
-    char    buffer[BUFSIZ];
+	int cc, i, j, res;
+	register char *cp, *dp, *ep;
+	char buffer[BUFSIZ];
 
-    *buf = NULL, *len = 0;
+	*buf = NULL, *len = 0;
 
-    switch (res = read_pipe_aux (buffer, sizeof buffer)) {
-        case NOTOK:
-        case OK:
-	    return res;
+	switch (res = read_pipe_aux(buffer, sizeof buffer)) {
+	case NOTOK:
+	case OK:
+		return res;
 
 	case 1:
-	    *buf = buffer, *len = res;
-	    return res;
-		
+		*buf = buffer, *len = res;
+		return res;
+
 	default:
-	    if (sscanf (buffer + 1, "%d", &cc) != 1 || cc < 0) {
-		(void) fprintf (stderr, "protocol botch\n");
-		return NOTOK;
-	    }
-	    if ((cp = malloc ((unsigned) cc + 1)) == NULL) {
-		perror ("malloc");
-		return NOTOK;
-	    }
-	    *buf = cp, *len = cc;
+		if (sscanf(buffer + 1, "%d", &cc) != 1 || cc < 0) {
+			(void) fprintf(stderr, "protocol botch\n");
+			return NOTOK;
+		}
+		if ((cp = malloc((unsigned) cc + 1)) == NULL) {
+			perror("malloc");
+			return NOTOK;
+		}
+		*buf = cp, *len = cc;
 
-	    dp = cp, j = cc;
-	    if (ep = index (buffer + 1, '\n')) {
-		(void) strcpy (dp, ++ep);
-		i = strlen (ep);
-		dp += i, j -= i;
-	    }
-	    break;
-    }
-	
-    for (; j > 0; dp += i, j -= i)
-	switch (i = recv (sd_current, dp, j, 0)) {
-	    case NOTOK:
-	        perror ("recv");
-out: ;
-		free (cp);
-		*buf = NULL, *len = 0;
-		(void) close (sd_current);
-		return NOTOK;
-
-	    case OK:
-		(void) fprintf (stderr, "premature eof from peer\n");
-		goto out;
-
-	    default:
+		dp = cp, j = cc;
+		if (ep = index(buffer + 1, '\n')) {
+			(void) strcpy(dp, ++ep);
+			i = strlen(ep);
+			dp += i, j -= i;
+		}
 		break;
 	}
+
+	for (; j > 0; dp += i, j -= i)
+		switch (i = recv(sd_current, dp, j, 0)) {
+		case NOTOK:
+			perror("recv");
+		      out:;
+			free(cp);
+			*buf = NULL, *len = 0;
+			(void) close(sd_current);
+			return NOTOK;
+
+		case OK:
+			(void) fprintf(stderr, "premature eof from peer\n");
+			goto out;
+
+		default:
+			break;
+		}
 	*dp = NULL;
 
 	return res;
 }
 #endif
 
-
 #ifndef	SOCKETS
-send_pipe (buf)
-char * buf;
+send_pipe(buf)
+	char *buf;
 {
-	send_pipe_aux (buf);
+	send_pipe_aux(buf);
 
-	(void) close (file);
-	reopen_ret ();
+	(void) close(file);
+	reopen_ret();
 }
 #endif
 
-send_pipe_aux (buf)
-char * buf;
+send_pipe_aux(buf)
+	char *buf;
 {
-    send_pipe_aux2 (buf, strlen (buf));
+	send_pipe_aux2(buf, strlen(buf));
 }
 
-send_pipe_aux2 (buf, i)
-char   *buf;
-int	i;
+send_pipe_aux2(buf, i)
+	char *buf;
+	int i;
 {
-int res;
+	int res;
 
 #ifndef	SOCKETS
-	if ((file = open (inbuf, O_WRONLY)) <= 0) {
-		(void) fprintf (stderr, "error %s on %s\n",sys_errname (errno), inbuf);
-		reopen_ret ();
+	if ((file = open(inbuf, O_WRONLY)) <= 0) {
+		(void) fprintf(stderr, "error %s on %s\n", sys_errname(errno), inbuf);
+		reopen_ret();
 		return;
 	}
 #endif
 
 	while (i > 0) {
 #ifdef	SOCKETS
-		if ( (res= send(sd_current, buf, i, 0)) == -1) {
+		if ((res = send(sd_current, buf, i, 0)) == -1) {
 			perror("send");
-			(void) close (sd_current);
+			(void) close(sd_current);
 			return;
 		}
 #else
-		if ((res = write (file, buf, MIN (BUFSIZ,i))) == -1 ) {
-			(void) fprintf (stderr,"result write error (2)\n");
-			reopen_ret ();
+		if ((res = write(file, buf, MIN(BUFSIZ, i))) == -1) {
+			(void) fprintf(stderr, "result write error (2)\n");
+			reopen_ret();
 			return;
 		}
 #endif
@@ -332,53 +381,51 @@ int res;
 	}
 }
 
-
 #ifdef SOCKETS
-get_dish_sock (isock)
-struct sockaddr_in *isock;
+get_dish_sock(isock)
+	struct sockaddr_in *isock;
 {
-	char * getenv ();
-	char * ptr;
-	char buffer [BUFSIZ];
-	int     portno;
-	char   *dp;
+	char *getenv();
+	char *ptr;
+	char buffer[BUFSIZ];
+	int portno;
+	char *dp;
 	register struct hostent *hp;
 
-	if ((ptr = getenv ("DISHPROC")) == NULLCP) {
+	if ((ptr = getenv("DISHPROC")) == NULLCP) {
 #ifdef	notanymore
-	        char   *cp,
+		char *cp,
 #endif
-		portno = (getppid () & 0xffff) | 0x8000;
+		 portno = (getppid() & 0xffff) | 0x8000;
+
 #ifdef	notanymore
-		if ((hp = gethostbystring (cp = getlocalhost ())) == NULL) {
-			(void) fprintf (stderr,"%s: unknown host", cp);
+		if ((hp = gethostbystring(cp = getlocalhost())) == NULL) {
+			(void) fprintf(stderr, "%s: unknown host", cp);
 			return (-1);
 		}
-		(void) sprintf (buffer, "%s %d",
-				inet_ntoa (*(struct in_addr *) hp -> h_addr),
-				portno);
+		(void) sprintf(buffer, "%s %d", inet_ntoa(*(struct in_addr *) hp->h_addr), portno);
 #else
-		(void) sprintf (buffer, "127.0.0.1 %d", portno);
+		(void) sprintf(buffer, "127.0.0.1 %d", portno);
 #endif
-		(void) setenv ("DISHPROC", ptr = buffer);
+		(void) setenv("DISHPROC", ptr = buffer);
 	}
 
-	if ((dp = index (ptr, ' ')) == NULLCP || sscanf (dp + 1, "%d", &portno) != 1) {
-		(void) fprintf (stderr,"DISHPROC malformed");
+	if ((dp = index(ptr, ' ')) == NULLCP || sscanf(dp + 1, "%d", &portno) != 1) {
+		(void) fprintf(stderr, "DISHPROC malformed");
 		return (-1);
 	}
 	*dp = NULL;
 
-	if ((hp = gethostbystring (ptr)) == NULL) {
-		(void) fprintf (stderr,"%s: unknown host in DISHPROC", ptr);
+	if ((hp = gethostbystring(ptr)) == NULL) {
+		(void) fprintf(stderr, "%s: unknown host in DISHPROC", ptr);
 		return (-1);
 	}
 	*dp = ' ';
 
-	bzero ((char *) isock, sizeof *isock);
-	isock -> sin_family = hp -> h_addrtype;
-	isock -> sin_port = htons ((u_short) portno);
-	inaddr_copy (hp, isock);
+	bzero((char *) isock, sizeof *isock);
+	isock->sin_family = hp->h_addrtype;
+	isock->sin_port = htons((u_short) portno);
+	inaddr_copy(hp, isock);
 
 	return (0);
 
@@ -386,25 +433,25 @@ struct sockaddr_in *isock;
 
 #else
 
-reopen_ret ()
+reopen_ret()
 {
-	(void) close (fd);
-	(void) close (wfd);
+	(void) close(fd);
+	(void) close(wfd);
 
-	if ((fd = open (retpipe, O_RDONLY)) < 0) {
-		if ( errno == EINTR ) {
-			reopen_ret ();
+	if ((fd = open(retpipe, O_RDONLY)) < 0) {
+		if (errno == EINTR) {
+			reopen_ret();
 			return;
 		}
-		(void) fprintf (stderr, "re-ropen failed\n");
-		(void) unlink (retpipe);
-		exit (-72);
+		(void) fprintf(stderr, "re-ropen failed\n");
+		(void) unlink(retpipe);
+		exit(-72);
 	}
-	if ((wfd = open (retpipe, O_WRONLY)) < 0) {
-		(void) fprintf (stderr, "re-wr open failed\n");
-		(void) unlink (retpipe);
-		(void) close (fd);
-		exit (-73);
+	if ((wfd = open(retpipe, O_WRONLY)) < 0) {
+		(void) fprintf(stderr, "re-wr open failed\n");
+		(void) unlink(retpipe);
+		(void) close(fd);
+		exit(-73);
 	}
 }
 #endif

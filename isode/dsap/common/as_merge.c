@@ -1,12 +1,71 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 #ifndef lint
-static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/as_merge.c,v 9.0 1992/06/16 12:12:39 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/dsap/common/RCS/as_merge.c,v 9.0 1992/06/16 12:12:39 isode Rel";
 #endif
 
 /*
- * $Header: /xtel/isode/isode/dsap/common/RCS/as_merge.c,v 9.0 1992/06/16 12:12:39 isode Rel $
+ * Header: /xtel/isode/isode/dsap/common/RCS/as_merge.c,v 9.0 1992/06/16 12:12:39 isode Rel
  *
  *
- * $Log: as_merge.c,v $
+ * Log: as_merge.c,v
  * Revision 9.0  1992/06/16  12:12:39  isode
  * Release 8.0
  *
@@ -22,49 +81,49 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/as_merge.c,v 9.
  *
  */
 
-
 #include "quipu/util.h"
 #include "quipu/attrvalue.h"
 
-Attr_Sequence as_merge (a,b)
-Attr_Sequence a,b;
+Attr_Sequence
+as_merge(a, b)
+	Attr_Sequence a, b;
 {
-register Attr_Sequence aptr, bptr, result, trail, tmp;
+	register Attr_Sequence aptr, bptr, result, trail, tmp;
 
-	if ( a == NULLATTR )
+	if (a == NULLATTR)
 		return (b);
-	if ( b == NULLATTR )
+	if (b == NULLATTR)
 		return (a);
 
 	/* start sequence off, make sure 'a' is the first */
-	switch (AttrT_cmp (a->attr_type,b->attr_type)) {
-		case 0: /* equal */
-			result = a;
-			a->attr_value = avs_merge (a->attr_value, b->attr_value);
-			aptr = a->attr_link;
-			bptr = b->attr_link;
-			free ((char *) b);
-			break;
-		case -1:
-			result = b;
-			aptr = a;
-			bptr = b->attr_link;
-			break;
-		case 1:
-			result = a;
-			aptr = a->attr_link;
-			bptr = b;
-			break;
-		}
+	switch (AttrT_cmp(a->attr_type, b->attr_type)) {
+	case 0:		/* equal */
+		result = a;
+		a->attr_value = avs_merge(a->attr_value, b->attr_value);
+		aptr = a->attr_link;
+		bptr = b->attr_link;
+		free((char *) b);
+		break;
+	case -1:
+		result = b;
+		aptr = a;
+		bptr = b->attr_link;
+		break;
+	case 1:
+		result = a;
+		aptr = a->attr_link;
+		bptr = b;
+		break;
+	}
 
 	trail = result;
-	while (  (aptr != NULLATTR) && (bptr != NULLATTR) ) {
+	while ((aptr != NULLATTR) && (bptr != NULLATTR)) {
 
-	   switch (AttrT_cmp (aptr->attr_type,bptr->attr_type)) {
-		case 0: /* equal */
-			aptr->attr_value = avs_merge (aptr->attr_value, bptr->attr_value);
+		switch (AttrT_cmp(aptr->attr_type, bptr->attr_type)) {
+		case 0:	/* equal */
+			aptr->attr_value = avs_merge(aptr->attr_value, bptr->attr_value);
 			tmp = bptr->attr_link;
-			free ((char *) bptr);
+			free((char *) bptr);
 			trail->attr_link = aptr;
 			trail = aptr;
 			aptr = aptr->attr_link;
@@ -80,7 +139,7 @@ register Attr_Sequence aptr, bptr, result, trail, tmp;
 			trail = aptr;
 			aptr = aptr->attr_link;
 			break;
-	    }
+		}
 	}
 	if (aptr == NULLATTR)
 		trail->attr_link = bptr;
@@ -90,47 +149,48 @@ register Attr_Sequence aptr, bptr, result, trail, tmp;
 	return (result);
 }
 
-Attr_Sequence as_merge_aux (a,b)
-Attr_Sequence a,b;
+Attr_Sequence
+as_merge_aux(a, b)
+	Attr_Sequence a, b;
 {
-register Attr_Sequence aptr, bptr, result, trail, tmp;
+	register Attr_Sequence aptr, bptr, result, trail, tmp;
 
-	if ( a == NULLATTR )
+	if (a == NULLATTR)
 		return (b);
-	if ( b == NULLATTR )
+	if (b == NULLATTR)
 		return (a);
 
 	/* start sequence off, make sure 'a' is the first */
-	switch (AttrT_cmp (a->attr_type,b->attr_type)) {
-		case 0: /* equal */
-			result = a;
-			avs_free (a->attr_value);
-			a->attr_value = b->attr_value;
-			aptr = a->attr_link;
-			bptr = b->attr_link;
-			free ((char *) b);
-			break;
-		case -1:
-			result = b;
-			aptr = a;
-			bptr = b->attr_link;
-			break;
-		case 1:
-			result = a;
-			aptr = a->attr_link;
-			bptr = b;
-			break;
-		}
+	switch (AttrT_cmp(a->attr_type, b->attr_type)) {
+	case 0:		/* equal */
+		result = a;
+		avs_free(a->attr_value);
+		a->attr_value = b->attr_value;
+		aptr = a->attr_link;
+		bptr = b->attr_link;
+		free((char *) b);
+		break;
+	case -1:
+		result = b;
+		aptr = a;
+		bptr = b->attr_link;
+		break;
+	case 1:
+		result = a;
+		aptr = a->attr_link;
+		bptr = b;
+		break;
+	}
 
 	trail = result;
-	while (  (aptr != NULLATTR) && (bptr != NULLATTR) ) {
+	while ((aptr != NULLATTR) && (bptr != NULLATTR)) {
 
-	   switch (AttrT_cmp (aptr->attr_type,bptr->attr_type)) {
-		case 0: /* equal */
-			avs_free (aptr->attr_value);
+		switch (AttrT_cmp(aptr->attr_type, bptr->attr_type)) {
+		case 0:	/* equal */
+			avs_free(aptr->attr_value);
 			aptr->attr_value = bptr->attr_value;
 			tmp = bptr->attr_link;
-			free ((char *) bptr);
+			free((char *) bptr);
 			trail->attr_link = aptr;
 			trail = aptr;
 			aptr = aptr->attr_link;
@@ -146,7 +206,7 @@ register Attr_Sequence aptr, bptr, result, trail, tmp;
 			trail = aptr;
 			aptr = aptr->attr_link;
 			break;
-	    }
+		}
 	}
 	if (aptr == NULLATTR)
 		trail->attr_link = bptr;
@@ -156,60 +216,60 @@ register Attr_Sequence aptr, bptr, result, trail, tmp;
 	return (result);
 }
 
-Attr_Sequence as_fast_merge (a,b,c,d)
-Attr_Sequence a,b,c,d;
+Attr_Sequence
+as_fast_merge(a, b, c, d)
+	Attr_Sequence a, b, c, d;
 {
-register Attr_Sequence aptr, bptr, result, trail, tmp;
-static AV_Sequence fast_avs = NULLAV;
-static AV_Sequence fast_tail = NULLAV;
-extern AV_Sequence avs_fast_merge ();
+	register Attr_Sequence aptr, bptr, result, trail, tmp;
+	static AV_Sequence fast_avs = NULLAV;
+	static AV_Sequence fast_tail = NULLAV;
+	extern AV_Sequence avs_fast_merge();
 
-	if ( a == NULLATTR )
+	if (a == NULLATTR)
 		return (b);
-	if ( b == NULLATTR )
+	if (b == NULLATTR)
 		return (a);
 
 	if (quipu_faststart && (a == c) && d->attr_link == NULLATTR)
-		if (AttrT_cmp (d->attr_type,b->attr_type) == 1) {
+		if (AttrT_cmp(d->attr_type, b->attr_type) == 1) {
 			d->attr_link = b;
 			return a;
 		}
 
 	/* start sequence off, make sure 'a' is the first */
-	switch (AttrT_cmp (a->attr_type,b->attr_type)) {
-		case 0: /* equal */
-			result = a;
-			a->attr_value = avs_fast_merge (a->attr_value,
-				 b->attr_value, fast_avs, fast_tail);
-			fast_avs = a->attr_value;
-			fast_tail = b->attr_value;
-			aptr = a->attr_link;
-			bptr = b->attr_link;
-			free ((char *) b);
-			break;
-		case -1:
-			result = b;
-			aptr = a;
-			bptr = b->attr_link;
-			break;
-		case 1:
-			result = a;
-			aptr = a->attr_link;
-			bptr = b;
-			break;
-		}
+	switch (AttrT_cmp(a->attr_type, b->attr_type)) {
+	case 0:		/* equal */
+		result = a;
+		a->attr_value = avs_fast_merge(a->attr_value, b->attr_value, fast_avs, fast_tail);
+		fast_avs = a->attr_value;
+		fast_tail = b->attr_value;
+		aptr = a->attr_link;
+		bptr = b->attr_link;
+		free((char *) b);
+		break;
+	case -1:
+		result = b;
+		aptr = a;
+		bptr = b->attr_link;
+		break;
+	case 1:
+		result = a;
+		aptr = a->attr_link;
+		bptr = b;
+		break;
+	}
 
 	trail = result;
-	while (  (aptr != NULLATTR) && (bptr != NULLATTR) ) {
+	while ((aptr != NULLATTR) && (bptr != NULLATTR)) {
 
-	   switch (AttrT_cmp (aptr->attr_type,bptr->attr_type)) {
-		case 0: /* equal */
-			aptr->attr_value = avs_fast_merge (aptr->attr_value,
-				 bptr->attr_value, fast_avs, fast_tail);
+		switch (AttrT_cmp(aptr->attr_type, bptr->attr_type)) {
+		case 0:	/* equal */
+			aptr->attr_value = avs_fast_merge(aptr->attr_value,
+							  bptr->attr_value, fast_avs, fast_tail);
 			fast_avs = aptr->attr_value;
 			fast_tail = bptr->attr_value;
 			tmp = bptr->attr_link;
-			free ((char *) bptr);
+			free((char *) bptr);
 			trail->attr_link = aptr;
 			trail = aptr;
 			aptr = aptr->attr_link;
@@ -225,7 +285,7 @@ extern AV_Sequence avs_fast_merge ();
 			trail = aptr;
 			aptr = aptr->attr_link;
 			break;
-	    }
+		}
 	}
 	if (aptr == NULLATTR)
 		trail->attr_link = bptr;
@@ -234,4 +294,3 @@ extern AV_Sequence avs_fast_merge ();
 
 	return (result);
 }
-

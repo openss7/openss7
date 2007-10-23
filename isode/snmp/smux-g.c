@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* smux-g.c - SMUX group */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/smux-g.c,v 9.0 1992/06/16 12:38:11 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/snmp/RCS/smux-g.c,v 9.0 1992/06/16 12:38:11 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/snmp/RCS/smux-g.c,v 9.0 1992/06/16 12:38:11 isode Rel $
+ * Header: /xtel/isode/isode/snmp/RCS/smux-g.c,v 9.0 1992/06/16 12:38:11 isode Rel
  *
  *
- * $Log: smux-g.c,v $
+ * Log: smux-g.c,v
  * Revision 9.0  1992/06/16  12:38:11  isode
  * Release 8.0
  *
@@ -23,7 +82,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/smux-g.c,v 9.0 1992/06
  *    this agreement.
  *
  */
-
 
 #include <stdio.h>
 #include "mib.h"
@@ -40,172 +98,164 @@ static char *rcsid = "$Header: /xtel/isode/isode/snmp/RCS/smux-g.c,v 9.0 1992/06
 #define	smuxPdescription 2
 #define	smuxPstatus	3
 
-#define	PB_VALID	1		/* smuxPstatus */
-#define	PB_INVALID	2		/*   .. */
-#define	PB_CONNECTING	3		/*   .. */
+#define	PB_VALID	1	/* smuxPstatus */
+#define	PB_INVALID	2	/* .. */
+#define	PB_CONNECTING	3	/* .. */
 
-
-static int  o_smuxPeer (oi, v, offset)
-OI	oi;
-register struct type_SNMP_VarBind *v;
-int	offset;
+static int
+o_smuxPeer(oi, v, offset)
+	OI oi;
+	register struct type_SNMP_VarBind *v;
+	int offset;
 {
-    int	    ifnum,
-	    ifvar;
-    register struct smuxPeer *pb;
-    register OID    oid = oi -> oi_name;
-    register OT	    ot = oi -> oi_type;
+	int ifnum, ifvar;
+	register struct smuxPeer *pb;
+	register OID oid = oi->oi_name;
+	register OT ot = oi->oi_type;
 
-    ifvar = (int) ot -> ot_info;
-    switch (offset) {
+	ifvar = (int) ot->ot_info;
+	switch (offset) {
 	case type_SNMP_PDUs_get__request:
-	    if (oid -> oid_nelem != ot -> ot_name -> oid_nelem + 1)
-		return int_SNMP_error__status_noSuchName;
-	    ifnum = oid -> oid_elements[oid -> oid_nelem - 1];
-	    for (pb = PHead -> pb_forw; pb != PHead; pb = pb -> pb_forw)
-		if (pb -> pb_index == ifnum)
-		    break;
-	    if (pb == PHead
-		    || ((ifvar == smuxPidentity || ifvar == smuxPdescription)
-			    && pb -> pb_identity == NULL))
-		return int_SNMP_error__status_noSuchName;
-	    break;
+		if (oid->oid_nelem != ot->ot_name->oid_nelem + 1)
+			return int_SNMP_error__status_noSuchName;
+		ifnum = oid->oid_elements[oid->oid_nelem - 1];
+		for (pb = PHead->pb_forw; pb != PHead; pb = pb->pb_forw)
+			if (pb->pb_index == ifnum)
+				break;
+		if (pb == PHead || ((ifvar == smuxPidentity || ifvar == smuxPdescription)
+				    && pb->pb_identity == NULL))
+			return int_SNMP_error__status_noSuchName;
+		break;
 
 	case type_SNMP_PDUs_get__next__request:
-again: ;
-	    if (oid -> oid_nelem == ot -> ot_name -> oid_nelem) {
-		OID	new;
+	      again:;
+		if (oid->oid_nelem == ot->ot_name->oid_nelem) {
+			OID new;
 
-		if ((pb = PHead -> pb_forw) == PHead)
-		    return NOTOK;
-		ifnum = pb -> pb_index;
+			if ((pb = PHead->pb_forw) == PHead)
+				return NOTOK;
+			ifnum = pb->pb_index;
 
-		if ((new = oid_extend (oid, 1)) == NULLOID)
-		    return NOTOK;
-		new -> oid_elements[new -> oid_nelem - 1] = ifnum;
+			if ((new = oid_extend(oid, 1)) == NULLOID)
+				return NOTOK;
+			new->oid_elements[new->oid_nelem - 1] = ifnum;
 
-		if (v -> name)
-		    free_SNMP_ObjectName (v -> name);
-		v -> name = new;
-	    }
-	    else {
-		int	i = ot -> ot_name -> oid_nelem;
+			if (v->name)
+				free_SNMP_ObjectName(v->name);
+			v->name = new;
+		} else {
+			int i = ot->ot_name->oid_nelem;
 
-		ifnum = oid -> oid_elements[i];
-		for (pb = PHead -> pb_forw; pb != PHead; pb = pb -> pb_forw)
-		    if (pb -> pb_index >= ifnum)
-			break;
-		if (pb == PHead
-		        || ((pb -> pb_index == ifnum)
-			        && (pb = pb -> pb_forw) == PHead))
-		    return NOTOK;
-		ifnum = pb -> pb_index;
+			ifnum = oid->oid_elements[i];
+			for (pb = PHead->pb_forw; pb != PHead; pb = pb->pb_forw)
+				if (pb->pb_index >= ifnum)
+					break;
+			if (pb == PHead || ((pb->pb_index == ifnum)
+					    && (pb = pb->pb_forw) == PHead))
+				return NOTOK;
+			ifnum = pb->pb_index;
 
-		oid -> oid_elements[i] = ifnum;
-		oid -> oid_nelem = i + 1;
-	    }
-	    if ((ifvar == smuxPidentity || ifvar == smuxPdescription)
-		    && pb -> pb_identity == NULL)
-		goto again;
-	    break;
+			oid->oid_elements[i] = ifnum;
+			oid->oid_nelem = i + 1;
+		}
+		if ((ifvar == smuxPidentity || ifvar == smuxPdescription)
+		    && pb->pb_identity == NULL)
+			goto again;
+		break;
 
 	default:
-	    return int_SNMP_error__status_genErr;
-    }
+		return int_SNMP_error__status_genErr;
+	}
 
-    switch (ifvar) {
+	switch (ifvar) {
 	case smuxPindex:
-	    return o_integer (oi, v, pb -> pb_index);
+		return o_integer(oi, v, pb->pb_index);
 
 	case smuxPidentity:
-	    return o_specific (oi, v, (caddr_t) pb -> pb_identity);
+		return o_specific(oi, v, (caddr_t) pb->pb_identity);
 
 	case smuxPdescription:
-	    return o_string (oi, v, pb -> pb_description,
-			     strlen (pb -> pb_description));
+		return o_string(oi, v, pb->pb_description, strlen(pb->pb_description));
 
 	case smuxPstatus:
-	    return o_integer (oi, v, pb -> pb_identity ? PB_VALID
-						       : PB_CONNECTING);
+		return o_integer(oi, v, pb->pb_identity ? PB_VALID : PB_CONNECTING);
 
 	default:
-	    return int_SNMP_error__status_noSuchName;
-    }
+		return int_SNMP_error__status_noSuchName;
+	}
 }
 
 /*  */
 
-static int  s_smuxPeer (oi, v, offset)
-OI	oi;
-register struct type_SNMP_VarBind *v;
-int	offset;
+static int
+s_smuxPeer(oi, v, offset)
+	OI oi;
+	register struct type_SNMP_VarBind *v;
+	int offset;
 {
-    int	    ifnum,
-	    ifvar;
-    register struct smuxPeer *pb;
-    register OID    oid = oi -> oi_name;
-    register OT	    ot = oi -> oi_type;
-    register OS	    os = ot -> ot_syntax;
-    caddr_t value;
+	int ifnum, ifvar;
+	register struct smuxPeer *pb;
+	register OID oid = oi->oi_name;
+	register OT ot = oi->oi_type;
+	register OS os = ot->ot_syntax;
+	caddr_t value;
 
-    ifvar = (int) ot -> ot_info;
-    switch (offset) {
+	ifvar = (int) ot->ot_info;
+	switch (offset) {
 	case type_SNMP_PDUs_set__request:
 	case type_SNMP_PDUs_commit:
 	case type_SNMP_PDUs_rollback:
-	    if (oid -> oid_nelem != ot -> ot_name -> oid_nelem + 1)
-		return int_SNMP_error__status_noSuchName;
-	    ifnum = oid -> oid_elements[oid -> oid_nelem - 1];
-	    for (pb = PHead -> pb_forw; pb != PHead; pb = pb -> pb_forw)
-		if (pb -> pb_index == ifnum)
-		    break;
-	    if (pb == PHead
-		    || ((ifvar == smuxPidentity || ifvar == smuxPdescription)
-			    && pb -> pb_identity == NULL))
-		return int_SNMP_error__status_noSuchName;
-	    break;
+		if (oid->oid_nelem != ot->ot_name->oid_nelem + 1)
+			return int_SNMP_error__status_noSuchName;
+		ifnum = oid->oid_elements[oid->oid_nelem - 1];
+		for (pb = PHead->pb_forw; pb != PHead; pb = pb->pb_forw)
+			if (pb->pb_index == ifnum)
+				break;
+		if (pb == PHead || ((ifvar == smuxPidentity || ifvar == smuxPdescription)
+				    && pb->pb_identity == NULL))
+			return int_SNMP_error__status_noSuchName;
+		break;
 
 	default:
-	    return int_SNMP_error__status_genErr;
-    }
+		return int_SNMP_error__status_genErr;
+	}
 
-    if (os == NULLOS) {
-	advise (LLOG_EXCEPTIONS, NULLCP,
-		"no syntax defined for object \"%s\"", ot -> ot_text);
+	if (os == NULLOS) {
+		advise(LLOG_EXCEPTIONS, NULLCP, "no syntax defined for object \"%s\"", ot->ot_text);
 
-	return int_SNMP_error__status_genErr;
-    }
+		return int_SNMP_error__status_genErr;
+	}
 
-    switch (offset) {
+	switch (offset) {
 	case type_SNMP_PDUs_set__request:
-	    if ((*os -> os_decode) (&value, v -> value) == NOTOK)
-		return int_SNMP_error__status_badValue;
-	    pb -> pb_newstatus = *((int *) value);
-	    (*os -> os_free) (value);
-	    switch (pb -> pb_newstatus) {
-		case PB_VALID:
-		    if (!pb -> pb_identity)
+		if ((*os->os_decode) (&value, v->value) == NOTOK)
 			return int_SNMP_error__status_badValue;
-		    break;
+		pb->pb_newstatus = *((int *) value);
+		(*os->os_free) (value);
+		switch (pb->pb_newstatus) {
+		case PB_VALID:
+			if (!pb->pb_identity)
+				return int_SNMP_error__status_badValue;
+			break;
 
 		case PB_INVALID:
-		    break;
+			break;
 
 		default:
-		    return int_SNMP_error__status_badValue;
-	    }
-	    break;
+			return int_SNMP_error__status_badValue;
+		}
+		break;
 
 	case type_SNMP_PDUs_commit:
-	    if (pb -> pb_newstatus == PB_INVALID)
-		pb -> pb_invalid = 1;
-	    break;
+		if (pb->pb_newstatus == PB_INVALID)
+			pb->pb_invalid = 1;
+		break;
 
 	case type_SNMP_PDUs_rollback:
-	    break;
-    }
+		break;
+	}
 
-    return int_SNMP_error__status_noError;
+	return int_SNMP_error__status_noError;
 }
 
 /*  */
@@ -215,240 +265,229 @@ int	offset;
 #define	smuxTindex	2
 #define	smuxTstatus	3
 
-#define	TB_VALID	1		/* smuxTstatus */
-#define	TB_INVALID	2		/*   .. */
+#define	TB_VALID	1	/* smuxTstatus */
+#define	TB_INVALID	2	/* .. */
 
-struct smuxTree *get_tbent ();
+struct smuxTree *get_tbent();
 
-
-static int  o_smuxTree (oi, v, offset)
-OI	oi;
-register struct type_SNMP_VarBind *v;
-int	offset;
+static int
+o_smuxTree(oi, v, offset)
+	OI oi;
+	register struct type_SNMP_VarBind *v;
+	int offset;
 {
-    int	    ifvar;
-    register int    i;
-    register unsigned int *ip,
-			  *jp;
-    register struct smuxTree *tb;
-    register OID    oid = oi -> oi_name;
-    register OT	    ot = oi -> oi_type;
+	int ifvar;
+	register int i;
+	register unsigned int *ip, *jp;
+	register struct smuxTree *tb;
+	register OID oid = oi->oi_name;
+	register OT ot = oi->oi_type;
 
-    ifvar = (int) ot -> ot_info;
-    switch (offset) {
+	ifvar = (int) ot->ot_info;
+	switch (offset) {
 	case type_SNMP_PDUs_get__request:
-	    if (oid -> oid_nelem <= ot -> ot_name -> oid_nelem)
-		return int_SNMP_error__status_noSuchName;
-	    if ((tb = get_tbent (oid -> oid_elements
-				     + ot -> ot_name -> oid_nelem,
-				 oid -> oid_nelem
-				     - ot -> ot_name -> oid_nelem, 0)) == NULL)
-		return int_SNMP_error__status_noSuchName;
-	    break;
+		if (oid->oid_nelem <= ot->ot_name->oid_nelem)
+			return int_SNMP_error__status_noSuchName;
+		if ((tb = get_tbent(oid->oid_elements
+				    + ot->ot_name->oid_nelem,
+				    oid->oid_nelem - ot->ot_name->oid_nelem, 0)) == NULL)
+			return int_SNMP_error__status_noSuchName;
+		break;
 
 	case type_SNMP_PDUs_get__next__request:
-	    if (oid -> oid_nelem == ot -> ot_name -> oid_nelem) {
-		OID	new;
+		if (oid->oid_nelem == ot->ot_name->oid_nelem) {
+			OID new;
 
-		if ((tb = THead -> tb_forw) == THead)
-		    return NOTOK;
+			if ((tb = THead->tb_forw) == THead)
+				return NOTOK;
 
-		if ((new = oid_extend (oid, tb -> tb_insize)) == NULLOID)
-		    return NOTOK;
-		ip = new -> oid_elements + new -> oid_nelem - tb -> tb_insize;
-		jp = tb -> tb_instance;
-		for (i = tb -> tb_insize; i > 0; i--)
-		    *ip++ = *jp++;
+			if ((new = oid_extend(oid, tb->tb_insize)) == NULLOID)
+				return NOTOK;
+			ip = new->oid_elements + new->oid_nelem - tb->tb_insize;
+			jp = tb->tb_instance;
+			for (i = tb->tb_insize; i > 0; i--)
+				*ip++ = *jp++;
 
-		if (v -> name)
-		    free_SNMP_ObjectName (v -> name);
-		v -> name = new;
-	    }
-	    else {
-		int	j;
+			if (v->name)
+				free_SNMP_ObjectName(v->name);
+			v->name = new;
+		} else {
+			int j;
 
-		if ((tb = get_tbent (oid -> oid_elements
-				         + ot -> ot_name -> oid_nelem,
-				     j = oid -> oid_nelem
-				     	     - ot -> ot_name -> oid_nelem, 1))
-		         == NULL)
-		    return NOTOK;
+			if ((tb = get_tbent(oid->oid_elements
+					    + ot->ot_name->oid_nelem,
+					    j = oid->oid_nelem - ot->ot_name->oid_nelem, 1))
+			    == NULL)
+				return NOTOK;
 
-		if ((i = j - tb -> tb_insize) < 0) {
-		    OID	    new;
+			if ((i = j - tb->tb_insize) < 0) {
+				OID new;
 
-		    if ((new = oid_extend (oid, -i)) == NULLOID)
-			return NOTOK;
-		    if (v -> name)
-			free_SNMP_ObjectName (v -> name);
-		    v -> name = new;
+				if ((new = oid_extend(oid, -i)) == NULLOID)
+					return NOTOK;
+				if (v->name)
+					free_SNMP_ObjectName(v->name);
+				v->name = new;
 
-		    oid = new;
+				oid = new;
+			} else if (i > 0)
+				oid->oid_nelem -= i;
+
+			ip = oid->oid_elements + ot->ot_name->oid_nelem;
+			jp = tb->tb_instance;
+			for (i = tb->tb_insize; i > 0; i--)
+				*ip++ = *jp++;
 		}
-		else
-		    if (i > 0)
-			oid -> oid_nelem -= i;
-
-		ip = oid -> oid_elements + ot -> ot_name -> oid_nelem;
-		jp = tb -> tb_instance;
-		for (i = tb -> tb_insize; i > 0; i--)
-		    *ip++ = *jp++;
-	    }
-	    break;
+		break;
 
 	default:
-	    return int_SNMP_error__status_genErr;
-    }
-
-    switch (ifvar) {
-	case smuxTsubtree:
-	    return o_specific (oi, v, (caddr_t) tb -> tb_subtree -> ot_name);
-
-	case smuxTpriority:
-	    return o_integer (oi, v, tb -> tb_priority);
-
-	case smuxTindex:
-	    return o_integer (oi, v, tb -> tb_peer -> pb_index);
-
-	case smuxTstatus:
-	    return o_integer (oi, v, TB_VALID);
-
-	default:
-	    return int_SNMP_error__status_noSuchName;
-    }
-}
-
-/*  */
-
-static int  s_smuxTree (oi, v, offset)
-OI	oi;
-register struct type_SNMP_VarBind *v;
-int	offset;
-{
-#ifndef	lint
-    int	    ifvar;
-#endif
-    register struct smuxTree *tb;
-    register OID    oid = oi -> oi_name;
-    register OT	    ot = oi -> oi_type;
-    register OS	    os = ot -> ot_syntax;
-    caddr_t value;
-
-#ifndef	lint
-    ifvar = (int) ot -> ot_info;
-#endif
-    switch (offset) {
-	case type_SNMP_PDUs_set__request:
-	case type_SNMP_PDUs_commit:
-	case type_SNMP_PDUs_rollback:
-	    if (oid -> oid_nelem <= ot -> ot_name -> oid_nelem)
-		return int_SNMP_error__status_noSuchName;
-	    if ((tb = get_tbent (oid -> oid_elements
-				     + ot -> ot_name -> oid_nelem,
-				 oid -> oid_nelem
-				     - ot -> ot_name -> oid_nelem, 0)) == NULL)
-		return int_SNMP_error__status_noSuchName;
-	    break;
-
-	default:
-	    return int_SNMP_error__status_genErr;
-    }
-
-    if (os == NULLOS) {
-	advise (LLOG_EXCEPTIONS, NULLCP,
-		"no syntax defined for object \"%s\"", ot -> ot_text);
-
-	return int_SNMP_error__status_genErr;
-    }
-
-    switch (offset) {
-	case type_SNMP_PDUs_set__request:
-	    if ((*os -> os_decode) (&value, v -> value) == NOTOK)
-		return int_SNMP_error__status_badValue;
-	    tb -> tb_newstatus = *((int *) value);
-	    (*os -> os_free) (value);
-	    switch (tb -> tb_newstatus) {
-		case TB_VALID:
-		case TB_INVALID:
-		    break;
-
-		default:
-		    return int_SNMP_error__status_badValue;
-	    }
-	    break;
-
-	case type_SNMP_PDUs_commit:
-	    if (tb -> tb_newstatus == TB_INVALID)
-		tb -> tb_invalid = 1;
-	    break;
-
-	case type_SNMP_PDUs_rollback:
-	    break;
-    }
-
-    return int_SNMP_error__status_noError;
-}
-
-/*  */
-
-static struct smuxTree *get_tbent (ip, len, isnext)
-register unsigned int *ip;
-int	len;
-int	isnext;
-{
-    register struct smuxTree *tb;
-
-    for (tb = THead -> tb_forw; tb != THead; tb = tb -> tb_forw)
-	switch (elem_cmp (tb -> tb_instance, tb -> tb_insize, ip, len)) {
-	    case 0:
-	        if (!isnext)
-		    return tb;
-		if ((tb = tb -> tb_forw) == THead)
-		    return NULL;
-		/* else fall... */
-
-	    case 1:
-		return (isnext ? tb : NULL);
+		return int_SNMP_error__status_genErr;
 	}
 
-    return NULL;
+	switch (ifvar) {
+	case smuxTsubtree:
+		return o_specific(oi, v, (caddr_t) tb->tb_subtree->ot_name);
+
+	case smuxTpriority:
+		return o_integer(oi, v, tb->tb_priority);
+
+	case smuxTindex:
+		return o_integer(oi, v, tb->tb_peer->pb_index);
+
+	case smuxTstatus:
+		return o_integer(oi, v, TB_VALID);
+
+	default:
+		return int_SNMP_error__status_noSuchName;
+	}
 }
 
 /*  */
 
-init_smux () {
-    register OT	    ot;
+static int
+s_smuxTree(oi, v, offset)
+	OI oi;
+	register struct type_SNMP_VarBind *v;
+	int offset;
+{
+#ifndef	lint
+	int ifvar;
+#endif
+	register struct smuxTree *tb;
+	register OID oid = oi->oi_name;
+	register OT ot = oi->oi_type;
+	register OS os = ot->ot_syntax;
+	caddr_t value;
 
-    if (ot = text2obj ("smuxPindex"))
-	ot -> ot_getfnx = o_smuxPeer,
-	ot -> ot_info = (caddr_t) smuxPindex;
-    if (ot = text2obj ("smuxPidentity"))
-	ot -> ot_getfnx = o_smuxPeer,
-	ot -> ot_info = (caddr_t) smuxPidentity;
-    if (ot = text2obj ("smuxPdescription"))
-	ot -> ot_getfnx = o_smuxPeer,
-	ot -> ot_info = (caddr_t) smuxPdescription;
-    if (ot = text2obj ("smuxPstatus"))
-	ot -> ot_getfnx = o_smuxPeer,
-	ot -> ot_setfnx = s_smuxPeer,
-	ot -> ot_info = (caddr_t) smuxPstatus;
+#ifndef	lint
+	ifvar = (int) ot->ot_info;
+#endif
+	switch (offset) {
+	case type_SNMP_PDUs_set__request:
+	case type_SNMP_PDUs_commit:
+	case type_SNMP_PDUs_rollback:
+		if (oid->oid_nelem <= ot->ot_name->oid_nelem)
+			return int_SNMP_error__status_noSuchName;
+		if ((tb = get_tbent(oid->oid_elements
+				    + ot->ot_name->oid_nelem,
+				    oid->oid_nelem - ot->ot_name->oid_nelem, 0)) == NULL)
+			return int_SNMP_error__status_noSuchName;
+		break;
 
-    if (ot = text2obj ("smuxTsubtree"))
-	ot -> ot_getfnx = o_smuxTree,
-	ot -> ot_info = (caddr_t) smuxTsubtree;
-    if (ot = text2obj ("smuxTpriority"))
-	ot -> ot_getfnx = o_smuxTree,
-	ot -> ot_info = (caddr_t) smuxTpriority;
-    if (ot = text2obj ("smuxTindex"))
-	ot -> ot_getfnx = o_smuxTree,
-	ot -> ot_info = (caddr_t) smuxTindex;
-    if (ot = text2obj ("smuxTstatus"))
-	ot -> ot_getfnx = o_smuxTree,
-	ot -> ot_setfnx = s_smuxTree,
-	ot -> ot_info = (caddr_t) smuxTstatus;
+	default:
+		return int_SNMP_error__status_genErr;
+	}
+
+	if (os == NULLOS) {
+		advise(LLOG_EXCEPTIONS, NULLCP, "no syntax defined for object \"%s\"", ot->ot_text);
+
+		return int_SNMP_error__status_genErr;
+	}
+
+	switch (offset) {
+	case type_SNMP_PDUs_set__request:
+		if ((*os->os_decode) (&value, v->value) == NOTOK)
+			return int_SNMP_error__status_badValue;
+		tb->tb_newstatus = *((int *) value);
+		(*os->os_free) (value);
+		switch (tb->tb_newstatus) {
+		case TB_VALID:
+		case TB_INVALID:
+			break;
+
+		default:
+			return int_SNMP_error__status_badValue;
+		}
+		break;
+
+	case type_SNMP_PDUs_commit:
+		if (tb->tb_newstatus == TB_INVALID)
+			tb->tb_invalid = 1;
+		break;
+
+	case type_SNMP_PDUs_rollback:
+		break;
+	}
+
+	return int_SNMP_error__status_noError;
+}
+
+/*  */
+
+static struct smuxTree *
+get_tbent(ip, len, isnext)
+	register unsigned int *ip;
+	int len;
+	int isnext;
+{
+	register struct smuxTree *tb;
+
+	for (tb = THead->tb_forw; tb != THead; tb = tb->tb_forw)
+		switch (elem_cmp(tb->tb_instance, tb->tb_insize, ip, len)) {
+		case 0:
+			if (!isnext)
+				return tb;
+			if ((tb = tb->tb_forw) == THead)
+				return NULL;
+			/* else fall... */
+
+		case 1:
+			return (isnext ? tb : NULL);
+		}
+
+	return NULL;
+}
+
+/*  */
+
+init_smux()
+{
+	register OT ot;
+
+	if (ot = text2obj("smuxPindex"))
+		ot->ot_getfnx = o_smuxPeer, ot->ot_info = (caddr_t) smuxPindex;
+	if (ot = text2obj("smuxPidentity"))
+		ot->ot_getfnx = o_smuxPeer, ot->ot_info = (caddr_t) smuxPidentity;
+	if (ot = text2obj("smuxPdescription"))
+		ot->ot_getfnx = o_smuxPeer, ot->ot_info = (caddr_t) smuxPdescription;
+	if (ot = text2obj("smuxPstatus"))
+		ot->ot_getfnx = o_smuxPeer,
+		    ot->ot_setfnx = s_smuxPeer, ot->ot_info = (caddr_t) smuxPstatus;
+
+	if (ot = text2obj("smuxTsubtree"))
+		ot->ot_getfnx = o_smuxTree, ot->ot_info = (caddr_t) smuxTsubtree;
+	if (ot = text2obj("smuxTpriority"))
+		ot->ot_getfnx = o_smuxTree, ot->ot_info = (caddr_t) smuxTpriority;
+	if (ot = text2obj("smuxTindex"))
+		ot->ot_getfnx = o_smuxTree, ot->ot_info = (caddr_t) smuxTindex;
+	if (ot = text2obj("smuxTstatus"))
+		ot->ot_getfnx = o_smuxTree,
+		    ot->ot_setfnx = s_smuxTree, ot->ot_info = (caddr_t) smuxTstatus;
 }
 #else
 
-init_smux () {}
+init_smux()
+{
+}
 
 #endif

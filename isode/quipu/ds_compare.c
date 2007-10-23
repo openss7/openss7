@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* ds_compare.c - */
 
 #ifndef lint
-static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/ds_compare.c,v 9.0 1992/06/16 12:34:01 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/quipu/RCS/ds_compare.c,v 9.0 1992/06/16 12:34:01 isode Rel";
 #endif
 
 /*
- * $Header: /xtel/isode/isode/quipu/RCS/ds_compare.c,v 9.0 1992/06/16 12:34:01 isode Rel $
+ * Header: /xtel/isode/isode/quipu/RCS/ds_compare.c,v 9.0 1992/06/16 12:34:01 isode Rel
  *
  *
- * $Log: ds_compare.c,v $
+ * Log: ds_compare.c,v
  * Revision 9.0  1992/06/16  12:34:01  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/ds_compare.c,v 9.0 19
  *
  */
 
-
 #include "quipu/util.h"
 #include "quipu/entry.h"
 #include "quipu/compare.h"
@@ -32,32 +90,32 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/ds_compare.c,v 9.0 19
 #include "quipu/DAS-types.h"
 #include "quipu/connection.h"
 
-extern LLog * log_dsap;
+extern LLog *log_dsap;
 extern Attr_Sequence entry_find_type();
 
-static attribute_not_cached ();
+static attribute_not_cached();
 
-do_ds_compare (arg, error, result, binddn, target, di_p, dsp, authtype)
-    struct ds_compare_arg       *arg;
-    struct ds_compare_result    *result;
-    struct DSError              *error;
-    DN                          binddn;
-    DN                          target;
-    struct di_block		**di_p;	
-    char			dsp;
-    char			authtype;
+do_ds_compare(arg, error, result, binddn, target, di_p, dsp, authtype)
+	struct ds_compare_arg *arg;
+	struct ds_compare_result *result;
+	struct DSError *error;
+	DN binddn;
+	DN target;
+	struct di_block **di_p;
+	char dsp;
+	char authtype;
 {
-Entry  entryptr;
-register Attr_Sequence  as;
-Attr_Sequence ias = NULLATTR;
-register AV_Sequence tmp;
-struct acl_info  * acl;
-register int i;
-int retval;
-DN realtarget;
-int authp;
+	Entry entryptr;
+	register Attr_Sequence as;
+	Attr_Sequence ias = NULLATTR;
+	register AV_Sequence tmp;
+	struct acl_info *acl;
+	register int i;
+	int retval;
+	DN realtarget;
+	int authp;
 
-	DLOG (log_dsap,LLOG_TRACE,("ds_compare"));
+	DLOG(log_dsap, LLOG_TRACE, ("ds_compare"));
 
 	if (!dsp)
 		target = arg->cma_object;
@@ -69,31 +127,31 @@ int authp;
 		return (DS_ERROR_REMOTE);
 	}
 
-	switch(find_entry(target, &(arg->cma_common), binddn, NULLDNSEQ, FALSE, &(entryptr), error, di_p, OP_COMPARE))
-	{
+	switch (find_entry
+		(target, &(arg->cma_common), binddn, NULLDNSEQ, FALSE, &(entryptr), error, di_p,
+		 OP_COMPARE)) {
 	case DS_OK:
-	    /* Filled out entryptr - carry on */
-	    break;
+		/* Filled out entryptr - carry on */
+		break;
 	case DS_CONTINUE:
-	    /* Filled out di_p - what do we do with it ?? */
-	    return(DS_CONTINUE);
+		/* Filled out di_p - what do we do with it ?? */
+		return (DS_CONTINUE);
 
 	case DS_X500_ERROR:
-	    /* Filled out error - what do we do with it ?? */
-	    return(DS_X500_ERROR);
+		/* Filled out error - what do we do with it ?? */
+		return (DS_X500_ERROR);
 	default:
-	    /* SCREAM */
-	    LLOG(log_dsap, LLOG_EXCEPTIONS, ("do_ds_compare() - find_entry failed"));
-	    return(DS_ERROR_LOCAL);
+		/* SCREAM */
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("do_ds_compare() - find_entry failed"));
+		return (DS_ERROR_LOCAL);
 	}
 
-	/* Strong authentication  */
+	/* Strong authentication */
 	if ((retval = check_security_parms((caddr_t) arg,
-			_ZCompareArgumentDataDAS,
-			&_ZDAS_mod,
-			arg->cma_common.ca_security,
-			arg->cma_common.ca_sig, &binddn)) != 0)
-	{
+					   _ZCompareArgumentDataDAS,
+					   &_ZDAS_mod,
+					   arg->cma_common.ca_security,
+					   arg->cma_common.ca_sig, &binddn)) != 0) {
 		error->dse_type = DSE_SECURITYERROR;
 		error->ERR_SECURITY.DSE_sc_problem = retval;
 		return (DS_ERROR_REMOTE);
@@ -102,79 +160,90 @@ int authp;
 	realtarget = get_copy_dn(entryptr);
 
 	if (arg->cma_purported.ava_type == NULLTABLE_ATTR) {
-		int res = invalid_matching (arg->cma_purported.ava_type,error,realtarget);
-		dn_free (realtarget);
+		int res = invalid_matching(arg->cma_purported.ava_type, error, realtarget);
+
+		dn_free(realtarget);
 		return res;
 	}
 
-	authp = entryptr->e_authp ? entryptr->e_authp->ap_readandcompare :
-	    AP_SIMPLE;
+	authp = entryptr->e_authp ? entryptr->e_authp->ap_readandcompare : AP_SIMPLE;
 
-	if (check_acl ((authtype % 3) >= authp ? binddn : NULLDN, ACL_COMPARE,
-	    entryptr->e_acl->ac_entry, realtarget) == NOTOK) {
-		if (dsp && (check_acl (binddn,ACL_COMPARE,entryptr->e_acl->ac_entry, realtarget) == OK)) {
+	if (check_acl((authtype % 3) >= authp ? binddn : NULLDN, ACL_COMPARE,
+		      entryptr->e_acl->ac_entry, realtarget) == NOTOK) {
+		if (dsp
+		    && (check_acl(binddn, ACL_COMPARE, entryptr->e_acl->ac_entry, realtarget) ==
+			OK)) {
 			error->dse_type = DSE_SECURITYERROR;
 			error->ERR_SECURITY.DSE_sc_problem = DSE_SC_AUTHENTICATION;
-			dn_free (realtarget);
+			dn_free(realtarget);
 			return (DS_ERROR_REMOTE);
 		} else {
 			error->dse_type = DSE_SECURITYERROR;
 			error->ERR_SECURITY.DSE_sc_problem = DSE_SC_ACCESSRIGHTS;
-			dn_free (realtarget);
+			dn_free(realtarget);
 			return (DS_ERROR_REMOTE);
 		}
 	}
 
-	if ((as = as_find_type (entryptr->e_attributes,arg->cma_purported.ava_type)) == NULLATTR) {
-	    if ((as = entry_find_type (entryptr, arg->cma_purported.ava_type)) == NULLATTR) {
-		if (attribute_not_cached (entryptr,binddn,grab_oid(arg->cma_purported.ava_type),realtarget,ACL_COMPARE)) {
-			int res = referral_dsa_info(realtarget,NULLDNSEQ,FALSE,entryptr,error,di_p,
-					arg->cma_common.ca_servicecontrol.svc_options & SVC_OPT_PREFERCHAIN);
-			dn_free (realtarget);
-			return res;
-		}
+	if ((as = as_find_type(entryptr->e_attributes, arg->cma_purported.ava_type)) == NULLATTR) {
+		if ((as = entry_find_type(entryptr, arg->cma_purported.ava_type)) == NULLATTR) {
+			if (attribute_not_cached
+			    (entryptr, binddn, grab_oid(arg->cma_purported.ava_type), realtarget,
+			     ACL_COMPARE)) {
+				int res =
+				    referral_dsa_info(realtarget, NULLDNSEQ, FALSE, entryptr, error,
+						      di_p,
+						      arg->cma_common.ca_servicecontrol.
+						      svc_options & SVC_OPT_PREFERCHAIN);
+				dn_free(realtarget);
+				return res;
+			}
 
-		dn_free (realtarget);
-		error->dse_type = DSE_ATTRIBUTEERROR;
-		error->ERR_ATTRIBUTE.DSE_at_name = get_copy_dn(entryptr);
-		error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_what = DSE_AT_NOSUCHATTRIBUTE;
-		error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_type = AttrT_cpy(arg->cma_purported.ava_type);
-		error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_value = NULLAttrV;
-		error->ERR_ATTRIBUTE.DSE_at_plist.dse_at_next = DSE_AT_NOPROBLEM;
-		return (DS_ERROR_REMOTE);
-	    }
+			dn_free(realtarget);
+			error->dse_type = DSE_ATTRIBUTEERROR;
+			error->ERR_ATTRIBUTE.DSE_at_name = get_copy_dn(entryptr);
+			error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_what = DSE_AT_NOSUCHATTRIBUTE;
+			error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_type =
+			    AttrT_cpy(arg->cma_purported.ava_type);
+			error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_value = NULLAttrV;
+			error->ERR_ATTRIBUTE.DSE_at_plist.dse_at_next = DSE_AT_NOPROBLEM;
+			return (DS_ERROR_REMOTE);
+		}
 	} else {
 		/* see if there is an 'always' attribute */
 		Attr_Sequence ptr;
+
 		if (entryptr->e_iattr) {
-			for(ptr = entryptr->e_iattr->i_always; ptr != NULLATTR; ptr=ptr->attr_link) {
-				if (  (i = AttrT_cmp (ptr->attr_type,arg->cma_purported.ava_type)) <= 0) {
-					if ( i == 0 ) 
+			for (ptr = entryptr->e_iattr->i_always; ptr != NULLATTR;
+			     ptr = ptr->attr_link) {
+				if ((i =
+				     AttrT_cmp(ptr->attr_type, arg->cma_purported.ava_type)) <= 0) {
+					if (i == 0)
 						ias = ptr;
 					break;
 				}
 			}
 		}
-		   
+
 	}
 
 	result->cmr_object = NULLDN;
 
-again:;
+      again:;
 
-	acl =  as->attr_acl;
+	acl = as->attr_acl;
 
-	if (check_acl ((authtype % 3) >= authtype ? binddn : NULLDN,
-	    ACL_COMPARE, acl,realtarget) == NOTOK) {
-		if (dsp && (check_acl (binddn,ACL_COMPARE, acl, realtarget) == OK)) {
+	if (check_acl((authtype % 3) >= authtype ? binddn : NULLDN,
+		      ACL_COMPARE, acl, realtarget) == NOTOK) {
+		if (dsp && (check_acl(binddn, ACL_COMPARE, acl, realtarget) == OK)) {
 			error->dse_type = DSE_SECURITYERROR;
 			error->ERR_SECURITY.DSE_sc_problem = DSE_SC_AUTHENTICATION;
-			dn_free (realtarget);
+			dn_free(realtarget);
 			return (DS_ERROR_REMOTE);
 		} else {
 			error->dse_type = DSE_SECURITYERROR;
 			error->ERR_SECURITY.DSE_sc_problem = DSE_SC_ACCESSRIGHTS;
-			dn_free (realtarget);
+			dn_free(realtarget);
 			return (DS_ERROR_REMOTE);
 		}
 	}
@@ -183,37 +252,39 @@ again:;
 	result->cmr_common.cr_requestor = NULLDN;
 
 	/* if no error and NOT SVC_OPT_DONTDEREFERENCEALIASES then */
-	/* the alias will have been derefeferenced -signified by   */
+	/* the alias will have been derefeferenced -signified by */
 	/* NO_ERROR !!! */
 	if (error->dse_type == DSE_NOERROR) {
-		result->cmr_common.cr_aliasdereferenced =  FALSE;
+		result->cmr_common.cr_aliasdereferenced = FALSE;
 	} else {
-		result->cmr_common.cr_aliasdereferenced =  TRUE;
+		result->cmr_common.cr_aliasdereferenced = TRUE;
 		if (result->cmr_object == NULLDN)
-			result->cmr_object = get_copy_dn (entryptr);
+			result->cmr_object = get_copy_dn(entryptr);
 	}
-		
+
 	for (tmp = as->attr_value; tmp != NULLAV; tmp = tmp->avseq_next) {
-	  i = AttrV_cmp (&tmp->avseq_av, arg->cma_purported.ava_value);
-	  switch (i) {
-	    case 0 :
-		result->cmr_matched= TRUE;
-		dn_free (realtarget);
-		return (DS_OK);
-	    case 1:
-	    case -1:
-	    case 2:
-		break;
-	    default:
-		error->dse_type = DSE_ATTRIBUTEERROR;
-		error->ERR_ATTRIBUTE.DSE_at_name = get_copy_dn (entryptr);
-		error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_what = DSE_AT_INAPPROPRIATEMATCHING;
-		error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_type = AttrT_cpy(as->attr_type);
-		error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_value = AttrV_cpy(arg->cma_purported.ava_value);
-		error->ERR_ATTRIBUTE.DSE_at_plist.dse_at_next = DSE_AT_NOPROBLEM;
-		dn_free (realtarget);
-		return (NOTOK);
-	  }
+		i = AttrV_cmp(&tmp->avseq_av, arg->cma_purported.ava_value);
+		switch (i) {
+		case 0:
+			result->cmr_matched = TRUE;
+			dn_free(realtarget);
+			return (DS_OK);
+		case 1:
+		case -1:
+		case 2:
+			break;
+		default:
+			error->dse_type = DSE_ATTRIBUTEERROR;
+			error->ERR_ATTRIBUTE.DSE_at_name = get_copy_dn(entryptr);
+			error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_what =
+			    DSE_AT_INAPPROPRIATEMATCHING;
+			error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_type = AttrT_cpy(as->attr_type);
+			error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_value =
+			    AttrV_cpy(arg->cma_purported.ava_value);
+			error->ERR_ATTRIBUTE.DSE_at_plist.dse_at_next = DSE_AT_NOPROBLEM;
+			dn_free(realtarget);
+			return (NOTOK);
+		}
 	}
 
 	if (ias) {
@@ -223,43 +294,41 @@ again:;
 		goto again;
 	}
 
-	dn_free (realtarget);
-	result->cmr_matched= FALSE;
+	dn_free(realtarget);
+	result->cmr_matched = FALSE;
 	return (DS_OK);
 
 }
 
-invalid_matching (at,error,dn)
-AttributeType at;
-struct DSError *error;
-DN dn;
+invalid_matching(at, error, dn)
+	AttributeType at;
+	struct DSError *error;
+	DN dn;
 {
 	error->dse_type = DSE_ATTRIBUTEERROR;
-	error->ERR_ATTRIBUTE.DSE_at_name = dn_cpy (dn);
+	error->ERR_ATTRIBUTE.DSE_at_name = dn_cpy(dn);
 	error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_what = DSE_AT_INAPPROPRIATEMATCHING;
-	error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_type = AttrT_cpy (at);
+	error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_type = AttrT_cpy(at);
 	error->ERR_ATTRIBUTE.DSE_at_plist.DSE_at_value = NULLAttrV;
 	error->ERR_ATTRIBUTE.DSE_at_plist.dse_at_next = DSE_AT_NOPROBLEM;
 	return (DS_ERROR_REMOTE);
 }
 
-
-static attribute_not_cached (ptr,dn,at,target,level)
-Entry ptr;
-DN dn;
-OID at;
-DN target;
-int level;
+static
+attribute_not_cached(ptr, dn, at, target, level)
+	Entry ptr;
+	DN dn;
+	OID at;
+	DN target;
+	int level;
 {
-register struct acl_attr * aa;
-register struct oid_seq * oidptr;
+	register struct acl_attr *aa;
+	register struct oid_seq *oidptr;
 
-	/* FACT: the attribute is not present in the entry.
-	 * PROBLEM: should it be ?
-	 * 	Return TRUE if yes.
-         */
+	/* FACT: the attribute is not present in the entry. PROBLEM: should it be ? Return TRUE if
+	   yes. */
 
-#ifdef notanymore 	/* Not readable, but may be comparable ! */
+#ifdef notanymore		/* Not readable, but may be comparable ! */
 	if (dn == NULLDN)
 		return FALSE;	/* Not in cache implies not publicly readable... */
 #endif
@@ -267,23 +336,23 @@ register struct oid_seq * oidptr;
 	if ((ptr->e_data == E_DATA_MASTER) || (ptr->e_data == E_TYPE_SLAVE))
 		return FALSE;
 
-	/* see if more than cached data is required */	
+	/* see if more than cached data is required */
 	if (ptr->e_acl->ac_attributes == NULLACL_ATTR)
 		return FALSE;
 
-	for ( aa = ptr->e_acl->ac_attributes; aa!=NULLACL_ATTR; aa=aa->aa_next)
-		for ( oidptr=aa->aa_types;oidptr != NULLOIDSEQ; oidptr=oidptr->oid_next)
-			if (oid_cmp (oidptr->oid_oid,at) == 0) {
+	for (aa = ptr->e_acl->ac_attributes; aa != NULLACL_ATTR; aa = aa->aa_next)
+		for (oidptr = aa->aa_types; oidptr != NULLOIDSEQ; oidptr = oidptr->oid_next)
+			if (oid_cmp(oidptr->oid_oid, at) == 0) {
 				/* The attribute is in the attribute ACL list */
 				/* Would a referral help the DUA ? */
-				if (check_acl (dn,level,aa->aa_acl,target) == NOTOK) 
+				if (check_acl(dn, level, aa->aa_acl, target) == NOTOK)
 					return FALSE;
-				else 
+				else
 					return TRUE;
-			}	
+			}
 
-	if (check_acl (NULLDN,ACL_READ,ptr->e_acl->ac_default,target) == NOTOK) 
-		if (check_acl (dn,ACL_READ,ptr->e_acl->ac_default,target) == NOTOK) 
+	if (check_acl(NULLDN, ACL_READ, ptr->e_acl->ac_default, target) == NOTOK)
+		if (check_acl(dn, ACL_READ, ptr->e_acl->ac_default, target) == NOTOK)
 			return TRUE;
 
 	return FALSE;

@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* service.c - */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/service.c,v 9.0 1992/06/16 12:12:39 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/dsap/common/RCS/service.c,v 9.0 1992/06/16 12:12:39 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/dsap/common/RCS/service.c,v 9.0 1992/06/16 12:12:39 isode Rel $
+ * Header: /xtel/isode/isode/dsap/common/RCS/service.c,v 9.0 1992/06/16 12:12:39 isode Rel
  *
  *
- * $Log: service.c,v $
+ * Log: service.c,v
  * Revision 9.0  1992/06/16  12:12:39  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/service.c,v 9.0
  *
  */
 
-
 #include "quipu/util.h"
 #include "quipu/commonarg.h"
 #include "quipu/dua.h"
@@ -33,29 +91,29 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/common/RCS/service.c,v 9.0
 #include "osisec-stub.h"
 
 #define MAXSERV 20
-static char default_service [BUFSIZ] = { 0 };
-static char * serv_vec [MAXSERV];
-static int  serv_argc;
+static char default_service[BUFSIZ] = { 0 };
+static char *serv_vec[MAXSERV];
+static int serv_argc;
 static int default_serv_set = 0;
 extern DN user_name;
 extern int chase_flag;
 static char do_shuffle;
-int    copy_flag;
-char * result_sequence = NULLCP;
-struct dua_sequence * current_sequence = NULL_DS;
-struct dua_sequence * top_sequence = NULL_DS;
+int copy_flag;
+char *result_sequence = NULLCP;
+struct dua_sequence *current_sequence = NULL_DS;
+struct dua_sequence *top_sequence = NULL_DS;
 extern struct SecurityServices *dsap_security;
 
-set_default_service (opt)
-PS opt;
+set_default_service(opt)
+	PS opt;
 {
-	if (default_service [0] == 0) {
+	if (default_service[0] == 0) {
 		serv_argc = 0;
 		return (OK);
 	}
 
-	if ((serv_argc = sstr2arg (default_service, MAXSERV, serv_vec, " \t")) == -1) {
-		ps_print (opt,"Invalid default service controls");
+	if ((serv_argc = sstr2arg(default_service, MAXSERV, serv_vec, " \t")) == -1) {
+		ps_print(opt, "Invalid default service controls");
 		return (NOTOK);
 	} else {
 		default_serv_set = 1;
@@ -63,157 +121,162 @@ PS opt;
 	}
 }
 
-int get_default_service (ca)
-CommonArgs * ca;
+int
+get_default_service(ca)
+	CommonArgs *ca;
 {
-PS opt;
-char buffer [LINESIZE];
-extern int sizelimit;
-extern int timelimit;
-static CommonArgs sca = default_common_args;
+	PS opt;
+	char buffer[LINESIZE];
+	extern int sizelimit;
+	extern int timelimit;
+	static CommonArgs sca = default_common_args;
 
-	*ca = sca;  /* struct copy */
+	*ca = sca;		/* struct copy */
 	ca->ca_servicecontrol.svc_sizelimit = sizelimit;
 	ca->ca_servicecontrol.svc_timelimit = timelimit;
-	
-	if ((opt = ps_alloc (str_open)) == NULLPS) {
-		(void) fprintf (stderr,"ps_alloc error\n");
-		return (NOTOK);
-	}
-		
-	if (str_setup (opt, buffer, LINESIZE, 1) == NOTOK) {
-		(void) fprintf (stderr,"ps_setup error\n");
+
+	if ((opt = ps_alloc(str_open)) == NULLPS) {
+		(void) fprintf(stderr, "ps_alloc error\n");
 		return (NOTOK);
 	}
 
-	if (! default_serv_set)
-		if (set_default_service (opt) != OK) {
-			(void) fprintf (stderr,"error (1) - %s\n",buffer);
-			ps_free (opt);
+	if (str_setup(opt, buffer, LINESIZE, 1) == NOTOK) {
+		(void) fprintf(stderr, "ps_setup error\n");
+		return (NOTOK);
+	}
+
+	if (!default_serv_set)
+		if (set_default_service(opt) != OK) {
+			(void) fprintf(stderr, "error (1) - %s\n", buffer);
+			ps_free(opt);
 			return (NOTOK);
 
 		}
 
 	do_shuffle = FALSE;
 
-	if (do_service_control (opt,serv_argc, serv_vec, ca) < 0) {
-		(void) fprintf (stderr,"error (2) - %s\n",buffer);
-		ps_free (opt);
+	if (do_service_control(opt, serv_argc, serv_vec, ca) < 0) {
+		(void) fprintf(stderr, "error (2) - %s\n", buffer);
+		ps_free(opt);
 		return (NOTOK);
 	}
 
-	ps_free (opt);
+	ps_free(opt);
 	return (OK);
-	
+
 }
 
-int service_control (opt,argc, argv, ca)
-PS 		opt;
-int             argc;
-char          **argv;
-CommonArgs     *ca;
+int
+service_control(opt, argc, argv, ca)
+	PS opt;
+	int argc;
+	char **argv;
+	CommonArgs *ca;
 {
 
-	if (get_default_service (ca) != OK) {
-		ps_print (opt,"default service error - check quipurc\n");
+	if (get_default_service(ca) != OK) {
+		ps_print(opt, "default service error - check quipurc\n");
 		return (-1);
 	}
 	do_shuffle = TRUE;
-	return (do_service_control (opt,argc, argv, ca));
+	return (do_service_control(opt, argc, argv, ca));
 }
 
-int do_service_control (opt,argc, argv, ca)
-PS 		opt;
-int             argc;
-char          **argv;
-CommonArgs     *ca;
+int
+do_service_control(opt, argc, argv, ca)
+	PS opt;
+	int argc;
+	char **argv;
+	CommonArgs *ca;
 {
 
-	ServiceControl  *sc;
-	int             shuffle_up ();
-	int             x;
-	char            shuffle;
+	ServiceControl *sc;
+	int shuffle_up();
+	int x;
+	char shuffle;
 
 	sc = &(ca->ca_servicecontrol);
 	copy_flag = TRUE;
 
 	for (x = 0; x < argc; x++) {
 		shuffle = do_shuffle;
-		
-		if (test_arg (argv[x], "-preferchain",3)) 
+
+		if (test_arg(argv[x], "-preferchain", 3))
 			sc->svc_options |= SVC_OPT_PREFERCHAIN;
-		else if (test_arg (argv[x], "-nopreferchain",5)) 
+		else if (test_arg(argv[x], "-nopreferchain", 5))
 			sc->svc_options &= ~SVC_OPT_PREFERCHAIN;
-			
-		else if (test_arg (argv[x], "-localscope",3)) 
+
+		else if (test_arg(argv[x], "-localscope", 3))
 			sc->svc_options |= SVC_OPT_LOCALSCOPE;
-		else if (test_arg (argv[x], "-nolocalscope",3)) 
+		else if (test_arg(argv[x], "-nolocalscope", 3))
 			sc->svc_options &= (~SVC_OPT_LOCALSCOPE);
-			
-		else if (test_arg (argv[x], "-dontusecopy",5)) {
+
+		else if (test_arg(argv[x], "-dontusecopy", 5)) {
 			copy_flag = FALSE;
 			sc->svc_options |= SVC_OPT_DONTUSECOPY;
-		} else if (test_arg (argv[x], "-usecopy",1)) {
+		} else if (test_arg(argv[x], "-usecopy", 1)) {
 			copy_flag = TRUE;
 			sc->svc_options &= (~SVC_OPT_DONTUSECOPY);
 		}
 
-		else if (test_arg (argv[x], "-dontdereferencealias",5)) 
+		else if (test_arg(argv[x], "-dontdereferencealias", 5))
 			sc->svc_options |= SVC_OPT_DONTDEREFERENCEALIAS;
-		else if (test_arg (argv[x], "-dereferencealias",3)) 
+		else if (test_arg(argv[x], "-dereferencealias", 3))
 			sc->svc_options &= (~SVC_OPT_DONTDEREFERENCEALIAS);
 
-		else if (test_arg (argv[x], "-low",3)) 
+		else if (test_arg(argv[x], "-low", 3))
 			sc->svc_prio = SVC_PRIO_LOW;
-		else if (test_arg (argv[x], "-medium",2)) 
+		else if (test_arg(argv[x], "-medium", 2))
 			sc->svc_prio = SVC_PRIO_MED;
-		else if (test_arg (argv[x], "-high",1)) 
+		else if (test_arg(argv[x], "-high", 1))
 			sc->svc_prio = SVC_PRIO_HIGH;
-			
-		else if (test_arg (argv[x], "-timelimit",2)) {
-			if (x + 1 == argc) {	
-				ps_printf (opt, "We need a number for timelimit.\n");
-				return (-1);
-			} else {
-				if (shuffle)
-					shuffle_up (argc--, argv, x);
-				else
-				        x++;
 
-				if ((sc->svc_timelimit = atoi (argv[x])) < -1) {
-					ps_printf (opt, "We need a posative number for timelimit.\n");
-					return (-1);
-				}
-			}
-		} else if (test_arg (argv[x], "-notimelimit",4)) 
-			sc->svc_timelimit = -1;
-			
-		else if (test_arg (argv[x], "-sizelimit",3)) {
+		else if (test_arg(argv[x], "-timelimit", 2)) {
 			if (x + 1 == argc) {
-				ps_printf (opt, "We need a number for sizelimit.\n");
+				ps_printf(opt, "We need a number for timelimit.\n");
 				return (-1);
 			} else {
 				if (shuffle)
-					shuffle_up (argc--, argv, x);
+					shuffle_up(argc--, argv, x);
 				else
 					x++;
 
-				if ((sc->svc_sizelimit = atoi (argv[x])) < -1) {
-					ps_printf (opt, "We need a posative number for sizelimit.\n");
+				if ((sc->svc_timelimit = atoi(argv[x])) < -1) {
+					ps_printf(opt,
+						  "We need a posative number for timelimit.\n");
 					return (-1);
 				}
 			}
-		} else if (test_arg (argv[x], "-nosizelimit",4)) 
+		} else if (test_arg(argv[x], "-notimelimit", 4))
+			sc->svc_timelimit = -1;
+
+		else if (test_arg(argv[x], "-sizelimit", 3)) {
+			if (x + 1 == argc) {
+				ps_printf(opt, "We need a number for sizelimit.\n");
+				return (-1);
+			} else {
+				if (shuffle)
+					shuffle_up(argc--, argv, x);
+				else
+					x++;
+
+				if ((sc->svc_sizelimit = atoi(argv[x])) < -1) {
+					ps_printf(opt,
+						  "We need a posative number for sizelimit.\n");
+					return (-1);
+				}
+			}
+		} else if (test_arg(argv[x], "-nosizelimit", 4))
 			sc->svc_sizelimit = -1;
-			
-		else if (test_arg (argv[x], "-nochaining",4)) 
+
+		else if (test_arg(argv[x], "-nochaining", 4))
 			sc->svc_options |= SVC_OPT_CHAININGPROHIBIT;
-		else if (test_arg (argv[x], "-chaining",3)) 
+		else if (test_arg(argv[x], "-chaining", 3))
 			sc->svc_options &= (~SVC_OPT_CHAININGPROHIBIT);
-			
-		else if (test_arg (argv[x], "-norefer",5)) 
+
+		else if (test_arg(argv[x], "-norefer", 5))
 			chase_flag = 1;
-		else if (test_arg (argv[x], "-refer",3)) 
+		else if (test_arg(argv[x], "-refer", 3))
 			chase_flag = 2;
 
 		else if (test_arg(argv[x], "-strong", 3)) {
@@ -221,101 +284,99 @@ CommonArgs     *ca;
 			struct certificate *cert_cpy();
 
 			ca->ca_security = (struct security_parms *)
-				calloc(1, sizeof(struct security_parms));
+			    calloc(1, sizeof(struct security_parms));
 			ca->ca_security->sp_name = NULLDN;
 			ca->ca_security->sp_time = new_version();
 			ca->ca_security->sp_target = '\0';
-			if (dsap_security->serv_mkpath) 
-			  ca->ca_security->sp_path = 
-				(dsap_security->serv_mkpath)();
-			}
+			if (dsap_security->serv_mkpath)
+				ca->ca_security->sp_path = (dsap_security->serv_mkpath) ();
+		}
 
-		else if (test_arg (argv[x], "-sequence",3)) {
-			if (x + 1 == argc) {	
-				ps_printf (opt, "We need a sequence name.\n");
+		else if (test_arg(argv[x], "-sequence", 3)) {
+			if (x + 1 == argc) {
+				ps_printf(opt, "We need a sequence name.\n");
 				return (-1);
 			} else {
 				if (shuffle)
-					shuffle_up (argc--, argv, x);
+					shuffle_up(argc--, argv, x);
 				else
 					x++;
-				if (lexequ (argv[x],"result") == 0) {
-					if (x + 1 == argc) {	
-						ps_printf (opt, "We need a result sequence name.\n");
+				if (lexequ(argv[x], "result") == 0) {
+					if (x + 1 == argc) {
+						ps_printf(opt, "We need a result sequence name.\n");
 						return (-1);
 					}
 					if (shuffle)
-						shuffle_up (argc--, argv, x);
+						shuffle_up(argc--, argv, x);
 					else
 						x++;
-					result_sequence = strdup (argv[x]);
+					result_sequence = strdup(argv[x]);
 				} else
-					set_sequence (argv[x]);
+					set_sequence(argv[x]);
 			}
-		} else if (test_arg (argv[x], "-nosequence",5)) 
+		} else if (test_arg(argv[x], "-nosequence", 5))
 			unset_sequence();
 
 		else if (do_shuffle)
 			shuffle = FALSE;
 		else {
-			ps_printf (opt,"unknown service option %s\n",argv[x]);
+			ps_printf(opt, "unknown service option %s\n", argv[x]);
 			return (-1);
 		}
 
-		if (shuffle) 
-			shuffle_up (argc--, argv, x--);
+		if (shuffle)
+			shuffle_up(argc--, argv, x--);
 	}
 
 	return (argc);
 }
 
-shuffle_up (argc, argv, start)
-register int    argc;
-char          **argv;
-register int    start;
+shuffle_up(argc, argv, start)
+	register int argc;
+	char **argv;
+	register int start;
 {
-	register int    x;
+	register int x;
 
 	for (x = start; x < argc; x++)
-		if (x == argc - 1)	/* if it is the last one, then stick
-					 * a 0 in */
+		if (x == argc - 1)	/* if it is the last one, then stick * a 0 in */
 			argv[x] = 0;
 		else		/* oterwise put the next one in it's place. */
 			argv[x] = argv[x + 1];
 }
 
-new_service (ptr)
-char * ptr;
+new_service(ptr)
+	char *ptr;
 {
 
 	if (ptr != 0) {
 		if (*default_service != 0)
-			(void) strcat (default_service," ");
-		(void) strcat (default_service,ptr);
+			(void) strcat(default_service, " ");
+		(void) strcat(default_service, ptr);
 	}
 }
 
-set_sequence (str)
-char * str;
+set_sequence(str)
+	char *str;
 {
-struct dua_sequence *ptr;
+	struct dua_sequence *ptr;
 
-	if (lexequ (str,"reset") == 0) {
-                if (current_sequence == NULL_DS)
-                        return;
-                current_sequence->ds_data = NULL_DE;
-                current_sequence->ds_last = NULL_DE;
+	if (lexequ(str, "reset") == 0) {
+		if (current_sequence == NULL_DS)
+			return;
+		current_sequence->ds_data = NULL_DE;
+		current_sequence->ds_last = NULL_DE;
 		return;
 	}
 
-	for (ptr = top_sequence; ptr != NULL_DS; ptr=ptr->ds_next)
-		if (lexequ (ptr->ds_name,str) == 0) {
+	for (ptr = top_sequence; ptr != NULL_DS; ptr = ptr->ds_next)
+		if (lexequ(ptr->ds_name, str) == 0) {
 			current_sequence = ptr;
 			return;
 		}
 
 	ptr = ds_alloc();
-	ptr->ds_name = strdup (str);
+	ptr->ds_name = strdup(str);
 	ptr->ds_data = NULL_DE;
 	ptr->ds_last = NULL_DE;
 	ptr->ds_next = top_sequence;
@@ -323,86 +384,82 @@ struct dua_sequence *ptr;
 	current_sequence = ptr;
 }
 
-unset_sequence ()
+unset_sequence()
 {
 	current_sequence = NULL_DS;
 }
 
-add_sequence (adn)
-DN adn;
+add_sequence(adn)
+	DN adn;
 {
-struct dua_seq_entry * ptr;
-register int x=1;
+	struct dua_seq_entry *ptr;
+	register int x = 1;
 
 	if (current_sequence == NULL_DS)
 		return (0);
-	
-	for (ptr=current_sequence->ds_data; ptr != NULL_DE; ptr=ptr->de_next,x++) 
-		if (dn_cmp (adn,ptr->de_name) == 0)
+
+	for (ptr = current_sequence->ds_data; ptr != NULL_DE; ptr = ptr->de_next, x++)
+		if (dn_cmp(adn, ptr->de_name) == 0)
 			return (x);
 
 	ptr = de_alloc();
-	ptr->de_name = dn_cpy (adn);
+	ptr->de_name = dn_cpy(adn);
 	ptr->de_next = NULL_DE;
-	if (current_sequence->ds_data == NULL_DE) 
+	if (current_sequence->ds_data == NULL_DE)
 		current_sequence->ds_data = ptr;
 	else
 		current_sequence->ds_last->de_next = ptr;
 	current_sequence->ds_last = ptr;
-		
+
 	return (x);
 }
 
-DN sequence_dn(y)
-int y;
+DN
+sequence_dn(y)
+	int y;
 {
-struct dua_seq_entry * ptr;
-register int x = 1;
+	struct dua_seq_entry *ptr;
+	register int x = 1;
 
 	if (current_sequence == NULL_DS)
 		return (NULLDN);
 
-	for (ptr=current_sequence->ds_data; 
-		(ptr != NULL_DE) && (x<y); 
-		ptr=ptr->de_next,x++) 
-			;		
+	for (ptr = current_sequence->ds_data;
+	     (ptr != NULL_DE) && (x < y); ptr = ptr->de_next, x++) ;
 
 	if (ptr == NULL_DE)
 		return (NULLDN);
-	if ( x == y )
+	if (x == y)
 		return (ptr->de_name);
 	return (NULLDN);
-			
+
 }
 
-
-show_sequence (RPS,str,ufn)
-PS RPS;
-char * str;
-char	ufn;
+show_sequence(RPS, str, ufn)
+	PS RPS;
+	char *str;
+	char ufn;
 {
-struct dua_seq_entry * ptr;
-register int x = 1;
+	struct dua_seq_entry *ptr;
+	register int x = 1;
 
 	if (str != NULLCP)
-		set_sequence (str);
+		set_sequence(str);
 
 	if (current_sequence == NULL_DS) {
-		ps_print (RPS,"No sequence set!\n");
+		ps_print(RPS, "No sequence set!\n");
 		return;
 	}
 
-	if (strcmp (current_sequence -> ds_name, "default"))
-	    ps_printf (RPS,"Sequence %s contains:-\n",
-		       current_sequence->ds_name);
+	if (strcmp(current_sequence->ds_name, "default"))
+		ps_printf(RPS, "Sequence %s contains:-\n", current_sequence->ds_name);
 
-	for (ptr=current_sequence->ds_data; ptr != NULL_DE; ptr=ptr->de_next, x++) {
-		ps_printf (RPS,"%-3d%s",x,ufn ? " " : " @");
+	for (ptr = current_sequence->ds_data; ptr != NULL_DE; ptr = ptr->de_next, x++) {
+		ps_printf(RPS, "%-3d%s", x, ufn ? " " : " @");
 		if (ufn)
-		    (void) ufn_dn_print_aux (RPS, ptr -> de_name, NULLDN, 0);
+			(void) ufn_dn_print_aux(RPS, ptr->de_name, NULLDN, 0);
 		else
-		    dn_print (RPS,ptr->de_name,EDBOUT);
-		ps_print (RPS,"\n");
+			dn_print(RPS, ptr->de_name, EDBOUT);
+		ps_print(RPS, "\n");
 	}
 }
-

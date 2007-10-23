@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* dsapinvoke.c - DSAP : Invoke DAP operations */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/dsap/net/RCS/dsapinvoke.c,v 9.0 1992/06/16 12:14:05 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/dsap/net/RCS/dsapinvoke.c,v 9.0 1992/06/16 12:14:05 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/dsap/net/RCS/dsapinvoke.c,v 9.0 1992/06/16 12:14:05 isode Rel $
+ * Header: /xtel/isode/isode/dsap/net/RCS/dsapinvoke.c,v 9.0 1992/06/16 12:14:05 isode Rel
  *
  *
- * $Log: dsapinvoke.c,v $
+ * Log: dsapinvoke.c,v
  * Revision 9.0  1992/06/16  12:14:05  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/net/RCS/dsapinvoke.c,v 9.0
  *
  */
 
-
 /* LINTLIBRARY */
 
 #include <stdio.h>
@@ -33,282 +91,279 @@ static char *rcsid = "$Header: /xtel/isode/isode/dsap/net/RCS/dsapinvoke.c,v 9.0
 #include "../x500as/DAS-types.h"
 #include "../x500as/Quipu-types.h"
 
-extern  LLog    * log_dsap;
+extern LLog *log_dsap;
 
-int	  DapInvokeRequest (sd, id, arg, di)
-int			  sd;
-int			  id;
-struct DSArgument	* arg;
-struct DSAPindication	* di;
+int
+DapInvokeRequest(sd, id, arg, di)
+	int sd;
+	int id;
+	struct DSArgument *arg;
+	struct DSAPindication *di;
 {
-    int				  result;
-    PE				  arg_pe;
-    struct RoSAPindication	  roi_s;
-    struct RoSAPindication	* roi = &(roi_s);
-    struct RoSAPpreject		* rop = &(roi->roi_preject);
+	int result;
+	PE arg_pe;
+	struct RoSAPindication roi_s;
+	struct RoSAPindication *roi = &(roi_s);
+	struct RoSAPpreject *rop = &(roi->roi_preject);
 
-    if (DapEncodeInvoke (&(arg_pe), arg) != OK)
-    {
-	LLOG (log_dsap, LLOG_EXCEPTIONS, ("DapInvokeRequest: Encoding failed"));
-	return (dsapreject (di, DP_INVOKE, id, NULLCP, "Failed to encode operation argument"));
-    }
-
-    result = RoInvokeRequest (sd, arg->arg_type, ROS_ASYNC, arg_pe,
-		id, NULLIP, ROS_NOPRIO, roi);
-
-    if (result != OK)
-    {
-	if (ROS_FATAL (rop->rop_reason) || (rop->rop_reason == ROS_PARAMETER))
-	{
-	    LLOG (log_dsap, LLOG_EXCEPTIONS, ("DapInvokeRequest(): Fatal rejection"));
-	    return (dsaplose (di, DP_INVOKE, NULLCP, "RoInvokeRequest failed"));
+	if (DapEncodeInvoke(&(arg_pe), arg) != OK) {
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("DapInvokeRequest: Encoding failed"));
+		return (dsapreject
+			(di, DP_INVOKE, id, NULLCP, "Failed to encode operation argument"));
 	}
-	else
-	{
-	    LLOG (log_dsap, LLOG_EXCEPTIONS, ("DapInvokeRequest(): Non-Fatal rejection"));
-	    return (dsapreject (di, DP_INVOKE, id, NULLCP, "RoInvokeRequest failed"));
+
+	result = RoInvokeRequest(sd, arg->arg_type, ROS_ASYNC, arg_pe, id, NULLIP, ROS_NOPRIO, roi);
+
+	if (result != OK) {
+		if (ROS_FATAL(rop->rop_reason) || (rop->rop_reason == ROS_PARAMETER)) {
+			LLOG(log_dsap, LLOG_EXCEPTIONS, ("DapInvokeRequest(): Fatal rejection"));
+			return (dsaplose(di, DP_INVOKE, NULLCP, "RoInvokeRequest failed"));
+		} else {
+			LLOG(log_dsap, LLOG_EXCEPTIONS,
+			     ("DapInvokeRequest(): Non-Fatal rejection"));
+			return (dsapreject(di, DP_INVOKE, id, NULLCP, "RoInvokeRequest failed"));
+		}
 	}
-    }
 
-    if (arg_pe != NULLPE)
-	pe_free (arg_pe);
-    return (OK);
+	if (arg_pe != NULLPE)
+		pe_free(arg_pe);
+	return (OK);
 }
 
-int	  DapEncodeInvoke (pep, arg)
-PE			* pep;
-struct DSArgument	* arg;
+int
+DapEncodeInvoke(pep, arg)
+	PE *pep;
+	struct DSArgument *arg;
 {
-    int		success;
+	int success;
 
-    switch(arg->arg_type)
-    {
-    case    OP_READ :
-	success = encode_DAS_ReadArgument(pep,1,0,NULLCP,&(arg->arg_rd));
-	break;
-    case    OP_COMPARE :
-	success = encode_DAS_CompareArgument(pep,1,0,NULLCP,&(arg->arg_cm));
-	break;
-    case    OP_ABANDON :
-	success = encode_DAS_AbandonArgument(pep,1,0,NULLCP,&(arg->arg_ab));
-	break;
-    case    OP_LIST :
-	success = encode_DAS_ListArgument(pep,1,0,NULLCP,&(arg->arg_ls));
-	break;
-    case    OP_SEARCH :
-	success = encode_DAS_SearchArgument(pep,1,0,NULLCP,&(arg->arg_sr));
-	break;
-    case    OP_ADDENTRY :
-	success = encode_DAS_AddEntryArgument(pep,1,0,NULLCP,&(arg->arg_ad));
-	break;
-    case    OP_REMOVEENTRY :
-	success = encode_DAS_RemoveEntryArgument(pep,1,0,NULLCP,&(arg->arg_rm));
-	break;
-    case    OP_MODIFYENTRY :
-	success = encode_DAS_ModifyEntryArgument(pep,1,0,NULLCP,&(arg->arg_me));
-	break;
-    case    OP_MODIFYRDN :
-	success = encode_DAS_ModifyRDNArgument(pep,1,0,NULLCP,&(arg->arg_mr));
-	break;
-    default :
-	success = NOTOK;
-	LLOG(log_dsap, LLOG_EXCEPTIONS, ("DapEncodeInvoke(): unknown op type %d", arg->arg_type));
-	break;
-    }
-
-    return(success);
-}
-
-int	  DspInvokeRequest (sd, id, arg, di)
-int	  sd;
-int	  id;
-struct ds_op_arg	* arg;
-struct DSAPindication	* di;
-{
-    int				  result;
-    PE				  arg_pe;
-    struct RoSAPindication	  roi_s;
-    struct RoSAPindication	* roi = &(roi_s);
-    struct RoSAPpreject		* rop = &(roi->roi_preject);
-
-    if (DspEncodeInvoke (&(arg_pe), arg) != OK)
-    {
-	LLOG (log_dsap, LLOG_EXCEPTIONS, ("DspInvokeRequest: Encoding failed"));
-	return (dsapreject (di, DP_INVOKE, id, NULLCP, "Failed to encode operation argument"));
-    }
-
-    watch_dog("RoInvokeRequest (DSP)");
-    result = RoInvokeRequest (sd, arg->dca_dsarg.arg_type, ROS_ASYNC, arg_pe,
-		id, NULLIP, ROS_NOPRIO, roi);
-    watch_dog_reset();
-
-    if (result != OK)
-    {
-	if (ROS_FATAL (rop->rop_reason) || (rop->rop_reason == ROS_PARAMETER))
-	{
-	    LLOG (log_dsap, LLOG_EXCEPTIONS, ("DspInvokeRequest(): Fatal rejection"));
-	    return (dsaplose (di, DP_INVOKE, NULLCP, "RoInvokeRequest failed"));
+	switch (arg->arg_type) {
+	case OP_READ:
+		success = encode_DAS_ReadArgument(pep, 1, 0, NULLCP, &(arg->arg_rd));
+		break;
+	case OP_COMPARE:
+		success = encode_DAS_CompareArgument(pep, 1, 0, NULLCP, &(arg->arg_cm));
+		break;
+	case OP_ABANDON:
+		success = encode_DAS_AbandonArgument(pep, 1, 0, NULLCP, &(arg->arg_ab));
+		break;
+	case OP_LIST:
+		success = encode_DAS_ListArgument(pep, 1, 0, NULLCP, &(arg->arg_ls));
+		break;
+	case OP_SEARCH:
+		success = encode_DAS_SearchArgument(pep, 1, 0, NULLCP, &(arg->arg_sr));
+		break;
+	case OP_ADDENTRY:
+		success = encode_DAS_AddEntryArgument(pep, 1, 0, NULLCP, &(arg->arg_ad));
+		break;
+	case OP_REMOVEENTRY:
+		success = encode_DAS_RemoveEntryArgument(pep, 1, 0, NULLCP, &(arg->arg_rm));
+		break;
+	case OP_MODIFYENTRY:
+		success = encode_DAS_ModifyEntryArgument(pep, 1, 0, NULLCP, &(arg->arg_me));
+		break;
+	case OP_MODIFYRDN:
+		success = encode_DAS_ModifyRDNArgument(pep, 1, 0, NULLCP, &(arg->arg_mr));
+		break;
+	default:
+		success = NOTOK;
+		LLOG(log_dsap, LLOG_EXCEPTIONS,
+		     ("DapEncodeInvoke(): unknown op type %d", arg->arg_type));
+		break;
 	}
-	else
-	{
-	    LLOG (log_dsap, LLOG_EXCEPTIONS, ("DspInvokeRequest(): Non-Fatal rejection"));
-	    return (dsapreject (di, DP_INVOKE, id, NULLCP, "RoInvokeRequest failed"));
+
+	return (success);
+}
+
+int
+DspInvokeRequest(sd, id, arg, di)
+	int sd;
+	int id;
+	struct ds_op_arg *arg;
+	struct DSAPindication *di;
+{
+	int result;
+	PE arg_pe;
+	struct RoSAPindication roi_s;
+	struct RoSAPindication *roi = &(roi_s);
+	struct RoSAPpreject *rop = &(roi->roi_preject);
+
+	if (DspEncodeInvoke(&(arg_pe), arg) != OK) {
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("DspInvokeRequest: Encoding failed"));
+		return (dsapreject
+			(di, DP_INVOKE, id, NULLCP, "Failed to encode operation argument"));
 	}
-    }
 
-    if (arg_pe != NULLPE)
-	pe_free (arg_pe);
-    return (OK);
-}
+	watch_dog("RoInvokeRequest (DSP)");
+	result = RoInvokeRequest(sd, arg->dca_dsarg.arg_type, ROS_ASYNC, arg_pe,
+				 id, NULLIP, ROS_NOPRIO, roi);
+	watch_dog_reset();
 
-int	  DspEncodeInvoke (pep, arg)
-PE			* pep;
-struct ds_op_arg	* arg;
-{
-    int		success;
-
-    switch(arg->dca_dsarg.arg_type)
-    {
-    case    OP_READ :
-	success = encode_DO_ChainedReadArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_COMPARE :
-	success = encode_DO_ChainedCompareArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_ABANDON :
-	success = encode_DAS_AbandonArgument(pep,1,0,NULLCP,&(arg->dca_dsarg.arg_ab));
-	break;
-    case    OP_LIST :
-	success = encode_DO_ChainedListArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_SEARCH :
-	success = encode_DO_ChainedSearchArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_ADDENTRY :
-	success = encode_DO_ChainedAddEntryArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_REMOVEENTRY :
-	success = encode_DO_ChainedRemoveEntryArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_MODIFYENTRY :
-	success = encode_DO_ChainedModifyEntryArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_MODIFYRDN :
-	success = encode_DO_ChainedModifyRDNArgument(pep,1,0,NULLCP,arg);
-	break;
-    default :
-	success = NOTOK;
-	LLOG(log_dsap, LLOG_EXCEPTIONS, ("DspEncodeInvoke(): unknown op type %d", arg->dca_dsarg.arg_type));
-	break;
-    }
-
-    return(success);
-}
-
-int	  QspInvokeRequest (sd, id, arg, di)
-int	  sd;
-int	  id;
-struct ds_op_arg	* arg;
-struct DSAPindication	* di;
-{
-    int				  result;
-    PE				  arg_pe;
-    struct RoSAPindication	  roi_s;
-    struct RoSAPindication	* roi = &(roi_s);
-    struct RoSAPpreject		* rop = &(roi->roi_preject);
-
-    if (QspEncodeInvoke (&(arg_pe), arg) != OK)
-    {
-	LLOG (log_dsap, LLOG_EXCEPTIONS, ("QspInvokeRequest: Encoding failed"));
-	return (dsapreject (di, DP_INVOKE, id, NULLCP, "Failed to encode operation argument"));
-    }
-
-    watch_dog("RoInvokeRequest (QSP)");
-    result = RoInvokeRequest (sd, arg->dca_dsarg.arg_type, ROS_ASYNC, arg_pe,
-		id, NULLIP, ROS_NOPRIO, roi);
-    watch_dog_reset();
-
-    if (result != OK)
-    {
-	if (ROS_FATAL (rop->rop_reason) || (rop->rop_reason == ROS_PARAMETER))
-	{
-	    LLOG (log_dsap, LLOG_EXCEPTIONS, ("QspInvokeRequest(): Fatal rejection"));
-	    return (dsaplose (di, DP_INVOKE, NULLCP, "RoInvokeRequest failed"));
+	if (result != OK) {
+		if (ROS_FATAL(rop->rop_reason) || (rop->rop_reason == ROS_PARAMETER)) {
+			LLOG(log_dsap, LLOG_EXCEPTIONS, ("DspInvokeRequest(): Fatal rejection"));
+			return (dsaplose(di, DP_INVOKE, NULLCP, "RoInvokeRequest failed"));
+		} else {
+			LLOG(log_dsap, LLOG_EXCEPTIONS,
+			     ("DspInvokeRequest(): Non-Fatal rejection"));
+			return (dsapreject(di, DP_INVOKE, id, NULLCP, "RoInvokeRequest failed"));
+		}
 	}
-	else
-	{
-	    LLOG (log_dsap, LLOG_EXCEPTIONS, ("QspInvokeRequest(): Non-Fatal rejection"));
-	    return (dsapreject (di, DP_INVOKE, id, NULLCP, "RoInvokeRequest failed"));
+
+	if (arg_pe != NULLPE)
+		pe_free(arg_pe);
+	return (OK);
+}
+
+int
+DspEncodeInvoke(pep, arg)
+	PE *pep;
+	struct ds_op_arg *arg;
+{
+	int success;
+
+	switch (arg->dca_dsarg.arg_type) {
+	case OP_READ:
+		success = encode_DO_ChainedReadArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_COMPARE:
+		success = encode_DO_ChainedCompareArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_ABANDON:
+		success = encode_DAS_AbandonArgument(pep, 1, 0, NULLCP, &(arg->dca_dsarg.arg_ab));
+		break;
+	case OP_LIST:
+		success = encode_DO_ChainedListArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_SEARCH:
+		success = encode_DO_ChainedSearchArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_ADDENTRY:
+		success = encode_DO_ChainedAddEntryArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_REMOVEENTRY:
+		success = encode_DO_ChainedRemoveEntryArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_MODIFYENTRY:
+		success = encode_DO_ChainedModifyEntryArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_MODIFYRDN:
+		success = encode_DO_ChainedModifyRDNArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	default:
+		success = NOTOK;
+		LLOG(log_dsap, LLOG_EXCEPTIONS,
+		     ("DspEncodeInvoke(): unknown op type %d", arg->dca_dsarg.arg_type));
+		break;
 	}
-    }
 
-    if (arg_pe != NULLPE)
-	pe_free (arg_pe);
-    return (OK);
+	return (success);
 }
 
-int	  QspEncodeInvoke (pep, arg)
-PE			* pep;
-struct ds_op_arg	* arg;
+int
+QspInvokeRequest(sd, id, arg, di)
+	int sd;
+	int id;
+	struct ds_op_arg *arg;
+	struct DSAPindication *di;
 {
-    int		success;
+	int result;
+	PE arg_pe;
+	struct RoSAPindication roi_s;
+	struct RoSAPindication *roi = &(roi_s);
+	struct RoSAPpreject *rop = &(roi->roi_preject);
 
-    switch(arg->dca_dsarg.arg_type)
-    {
-    case    OP_READ :
-	success = encode_DO_ChainedReadArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_COMPARE :
-	success = encode_DO_ChainedCompareArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_ABANDON :
-	success = encode_DAS_AbandonArgument(pep,1,0,NULLCP,&(arg->dca_dsarg.arg_ab));
-	break;
-    case    OP_LIST :
-	success = encode_DO_ChainedListArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_SEARCH :
-	success = encode_DO_ChainedSearchArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_ADDENTRY :
-	success = encode_DO_ChainedAddEntryArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_REMOVEENTRY :
-	success = encode_DO_ChainedRemoveEntryArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_MODIFYENTRY :
-	success = encode_DO_ChainedModifyEntryArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_MODIFYRDN :
-	success = encode_DO_ChainedModifyRDNArgument(pep,1,0,NULLCP,arg);
-	break;
-    case    OP_GETEDB :
-        success = encode_Quipu_GetEntryDataBlockArgument(pep,1,0,NULLCP,&(arg->dca_dsarg.arg_ge));
-        break;
-    default :
-	success = NOTOK;
-	LLOG(log_dsap, LLOG_EXCEPTIONS, ("QspEncodeInvoke(): unknown op type %d", arg->dca_dsarg.arg_type));
-	break;
-    }
+	if (QspEncodeInvoke(&(arg_pe), arg) != OK) {
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("QspInvokeRequest: Encoding failed"));
+		return (dsapreject
+			(di, DP_INVOKE, id, NULLCP, "Failed to encode operation argument"));
+	}
 
-    return(success);
+	watch_dog("RoInvokeRequest (QSP)");
+	result = RoInvokeRequest(sd, arg->dca_dsarg.arg_type, ROS_ASYNC, arg_pe,
+				 id, NULLIP, ROS_NOPRIO, roi);
+	watch_dog_reset();
+
+	if (result != OK) {
+		if (ROS_FATAL(rop->rop_reason) || (rop->rop_reason == ROS_PARAMETER)) {
+			LLOG(log_dsap, LLOG_EXCEPTIONS, ("QspInvokeRequest(): Fatal rejection"));
+			return (dsaplose(di, DP_INVOKE, NULLCP, "RoInvokeRequest failed"));
+		} else {
+			LLOG(log_dsap, LLOG_EXCEPTIONS,
+			     ("QspInvokeRequest(): Non-Fatal rejection"));
+			return (dsapreject(di, DP_INVOKE, id, NULLCP, "RoInvokeRequest failed"));
+		}
+	}
+
+	if (arg_pe != NULLPE)
+		pe_free(arg_pe);
+	return (OK);
 }
 
-
-int	  IspInvokeRequest (sd, id, arg, di)
-int	  sd;
-int	  id;
-struct ds_op_arg	* arg;
-struct DSAPindication	* di;
+int
+QspEncodeInvoke(pep, arg)
+	PE *pep;
+	struct ds_op_arg *arg;
 {
-	return QspInvokeRequest (sd, id, arg, di);
+	int success;
+
+	switch (arg->dca_dsarg.arg_type) {
+	case OP_READ:
+		success = encode_DO_ChainedReadArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_COMPARE:
+		success = encode_DO_ChainedCompareArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_ABANDON:
+		success = encode_DAS_AbandonArgument(pep, 1, 0, NULLCP, &(arg->dca_dsarg.arg_ab));
+		break;
+	case OP_LIST:
+		success = encode_DO_ChainedListArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_SEARCH:
+		success = encode_DO_ChainedSearchArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_ADDENTRY:
+		success = encode_DO_ChainedAddEntryArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_REMOVEENTRY:
+		success = encode_DO_ChainedRemoveEntryArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_MODIFYENTRY:
+		success = encode_DO_ChainedModifyEntryArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_MODIFYRDN:
+		success = encode_DO_ChainedModifyRDNArgument(pep, 1, 0, NULLCP, arg);
+		break;
+	case OP_GETEDB:
+		success =
+		    encode_Quipu_GetEntryDataBlockArgument(pep, 1, 0, NULLCP,
+							   &(arg->dca_dsarg.arg_ge));
+		break;
+	default:
+		success = NOTOK;
+		LLOG(log_dsap, LLOG_EXCEPTIONS,
+		     ("QspEncodeInvoke(): unknown op type %d", arg->dca_dsarg.arg_type));
+		break;
+	}
+
+	return (success);
 }
 
-int	  IspEncodeInvoke (pep, arg)
-PE			* pep;
-struct ds_op_arg	* arg;
+int
+IspInvokeRequest(sd, id, arg, di)
+	int sd;
+	int id;
+	struct ds_op_arg *arg;
+	struct DSAPindication *di;
 {
-	return QspEncodeInvoke (pep, arg);
+	return QspInvokeRequest(sd, id, arg, di);
 }
 
-
+int
+IspEncodeInvoke(pep, arg)
+	PE *pep;
+	struct ds_op_arg *arg;
+{
+	return QspEncodeInvoke(pep, arg);
+}

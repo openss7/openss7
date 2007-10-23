@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* referral.c - create referral notices */
 
 #ifndef lint
-static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/referral.c,v 9.0 1992/06/16 12:34:01 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/quipu/RCS/referral.c,v 9.0 1992/06/16 12:34:01 isode Rel";
 #endif
 
 /*
- * $Header: /xtel/isode/isode/quipu/RCS/referral.c,v 9.0 1992/06/16 12:34:01 isode Rel $
+ * Header: /xtel/isode/isode/quipu/RCS/referral.c,v 9.0 1992/06/16 12:34:01 isode Rel
  *
  *
- * $Log: referral.c,v $
+ * Log: referral.c,v
  * Revision 9.0  1992/06/16  12:34:01  isode
  * Release 8.0
  *
@@ -24,57 +83,55 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/RCS/referral.c,v 9.0 1992
  *
  */
 
-
 #include "quipu/util.h"
 #include "quipu/connection.h"
 
-extern LLog * log_dsap;
+extern LLog *log_dsap;
 char remote_lookup = TRUE;
-struct PSAPaddr	*	psap_cpy();
-struct dn_seq	* dn_seq_push();
-struct dn_seq	* dn_seq_pop();
-struct di_block	* di_alloc();
+struct PSAPaddr *psap_cpy();
+struct dn_seq *dn_seq_push();
+struct dn_seq *dn_seq_pop();
+struct di_block *di_alloc();
 
-static struct access_point * top_ap = NULLACCESSPOINT;
+static struct access_point *top_ap = NULLACCESSPOINT;
 
-struct access_point	* ap_cpy(ap)
-struct access_point	* ap;
+struct access_point *
+ap_cpy(ap)
+	struct access_point *ap;
 {
-    struct access_point	* ret_ap;
-    struct access_point	**tmp_ap;
+	struct access_point *ret_ap;
+	struct access_point **tmp_ap;
 
-    if(ap == NULLACCESSPOINT)
-	return(NULLACCESSPOINT);
+	if (ap == NULLACCESSPOINT)
+		return (NULLACCESSPOINT);
 
+	for (tmp_ap = &ret_ap; ap != NULLACCESSPOINT; ap = ap->ap_next) {
+		(*tmp_ap) = (struct access_point *) calloc(1, sizeof(struct access_point));
+		(*tmp_ap)->ap_name = dn_cpy(ap->ap_name);
+		if (ap->ap_address)
+			(*tmp_ap)->ap_address = psap_cpy(ap->ap_address);
+		tmp_ap = &((*tmp_ap)->ap_next);
+	}
 
-    for(tmp_ap = &ret_ap; ap != NULLACCESSPOINT; ap=ap->ap_next)
-    {
-	(*tmp_ap) = (struct access_point *) calloc(1, sizeof(struct access_point));
-	(*tmp_ap)->ap_name = dn_cpy(ap->ap_name);
-	if (ap->ap_address)
-		(*tmp_ap)->ap_address = psap_cpy(ap->ap_address);
-	tmp_ap = &((*tmp_ap)->ap_next);
-    }
+	(*tmp_ap) = NULLACCESSPOINT;
 
-    (*tmp_ap) = NULLACCESSPOINT;
-
-    return(ret_ap);
+	return (ret_ap);
 }
 
-
-static ContinuationRef new_ref (name,rt,ap)
-DN name;
-int rt;
-struct access_point * ap;
+static ContinuationRef
+new_ref(name, rt, ap)
+	DN name;
+	int rt;
+	struct access_point *ap;
 {
-ContinuationRef ptr;
+	ContinuationRef ptr;
 
 	if (ap == NULLACCESSPOINT)
 		return (NULLCONTINUATIONREF);
 
-	ptr = (ContinuationRef) smalloc (sizeof(continuation_ref));
+	ptr = (ContinuationRef) smalloc(sizeof(continuation_ref));
 	ptr->cr_aliasedRDNs = CR_NOALIASEDRDNS;
-	ptr->cr_name = dn_cpy (name);
+	ptr->cr_name = dn_cpy(name);
 	ptr->cr_rdn_resolved = CR_RDNRESOLVED_NOTDEFINED;
 	ptr->cr_reftype = rt;
 	ptr->cr_accesspoints = ap_cpy(ap);
@@ -82,72 +139,75 @@ ContinuationRef ptr;
 	return (ptr);
 }
 
-struct access_point * ap_append (a,b)
-struct access_point * a;
-struct access_point * b;
+struct access_point *
+ap_append(a, b)
+	struct access_point *a;
+	struct access_point *b;
 {
-struct access_point * trail;
-struct access_point * top;
+	struct access_point *trail;
+	struct access_point *top;
 
 	if (a == NULLACCESSPOINT)
 		return (b);
-	if ( b == NULLACCESSPOINT)
+	if (b == NULLACCESSPOINT)
 		return (a);
 
-	for (top = a ; a != NULLACCESSPOINT; a = a->ap_next)
+	for (top = a; a != NULLACCESSPOINT; a = a->ap_next)
 		trail = a;
 
 	trail->ap_next = b;
 	return (top);
 }
 
-ContinuationRef cont_ref_parent (name)
-DN name;
+ContinuationRef
+cont_ref_parent(name)
+	DN name;
 {
-	return (new_ref(name,RT_SUPERIOR,top_ap));
+	return (new_ref(name, RT_SUPERIOR, top_ap));
 }
 
-add_str_parent (sdn,spsap)
-char * sdn, *spsap;
+add_str_parent(sdn, spsap)
+	char *sdn, *spsap;
 {
-DN dn,str2dn();
-struct PSAPaddr *psap, * str2paddr();
-struct access_point * next_ap;
+	DN dn, str2dn();
+	struct PSAPaddr *psap, *str2paddr();
+	struct access_point *next_ap;
 
 /* add string DN and string PSAP to list of parents */
 
-	if ((psap = str2paddr (spsap)) == NULLPA) {
-		LLOG (log_dsap,LLOG_EXCEPTIONS,("Invalid parent address %s",spsap));
+	if ((psap = str2paddr(spsap)) == NULLPA) {
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("Invalid parent address %s", spsap));
 		return;
 	}
-	if (( dn = str2dn (sdn)) == NULLDN ) {
-		LLOG (log_dsap,LLOG_EXCEPTIONS,("Invalid parent dn %s",sdn));
+	if ((dn = str2dn(sdn)) == NULLDN) {
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("Invalid parent dn %s", sdn));
 		return;
 	}
 
-	next_ap = (struct access_point *) smalloc (sizeof(struct access_point));
+	next_ap = (struct access_point *) smalloc(sizeof(struct access_point));
 	next_ap->ap_name = dn;
 	next_ap->ap_address = psap_cpy(psap);
 	next_ap->ap_next = NULLACCESSPOINT;
-	top_ap = ap_append (top_ap,next_ap);
+	top_ap = ap_append(top_ap, next_ap);
 
 }
 
 #ifdef DEBUG
 free_parents()
 {
-struct access_point * ap, *ap_next;
+	struct access_point *ap, *ap_next;
 
 	for (ap = top_ap; ap != NULLACCESSPOINT; ap = ap_next) {
-		ap_next = ap->ap_next;	
-		dn_free (ap->ap_name);	
-		free ((char *)ap->ap_address);
-		free ((char *)ap);
+		ap_next = ap->ap_next;
+		dn_free(ap->ap_name);
+		free((char *) ap->ap_address);
+		free((char *) ap);
 	}
 }
 #endif
 
-struct PSAPaddr *parent_psap()
+struct PSAPaddr *
+parent_psap()
 {
 	if (top_ap == NULLACCESSPOINT)
 		return (NULLPA);
@@ -168,176 +228,182 @@ struct PSAPaddr *parent_psap()
 *  NB - As with get_dsa_info, the blocks generated need to be further
 *  processed by the calling routine.
 */
-int	  dsa_info_new (name,dn_stack,master,entry_ptr,err,di_p)
-DN name;
-struct dn_seq	* dn_stack;
-int		  master;
-Entry entry_ptr;
-struct DSError	* err;
-struct di_block	**di_p;
+int
+dsa_info_new(name, dn_stack, master, entry_ptr, err, di_p)
+	DN name;
+	struct dn_seq *dn_stack;
+	int master;
+	Entry entry_ptr;
+	struct DSError *err;
+	struct di_block **di_p;
 {
-AV_Sequence		  avs;
-int			  ret_val;
-struct DSError		  err_tmp;
-struct di_block		**di_trail;
-struct dn_seq		* new_dn_stack;
-struct access_point * aps;
+	AV_Sequence avs;
+	int ret_val;
+	struct DSError err_tmp;
+	struct di_block **di_trail;
+	struct dn_seq *new_dn_stack;
+	struct access_point *aps;
 
-	DLOG (log_dsap,LLOG_TRACE,("in dsa_info_new"));
+	DLOG(log_dsap, LLOG_TRACE, ("in dsa_info_new"));
 
 	ret_val = DS_ERROR_LOCAL;
 	di_trail = di_p;
 
-	new_dn_stack = dn_seq_push(name,dn_stack);
+	new_dn_stack = dn_seq_push(name, dn_stack);
 
 	if (entry_ptr->e_external) {
-	    aps = (struct access_point *) entry_ptr->e_reference->avseq_av.av_struct;
-	    (*di_p) = di_alloc();
-	    (*di_p)->di_type = DI_TASK;
-	    (*di_p)->di_dn = dn_cpy(aps->ap_name);
-	    (*di_p)->di_target = dn_cpy (name);
-	    (*di_p)->di_state = DI_ACCESSPOINT;
-	    (*di_p)->di_rdn_resolved = CR_RDNRESOLVED_NOTDEFINED;
-	    (*di_p)->di_aliasedRDNs = CR_NOALIASEDRDNS;
-	    if (((*di_p)->di_reftype = entry_ptr->e_reftype) == RT_NONSPECIFICSUBORDINATE) {
-		for (avs = entry_ptr->e_reference; avs != NULLAV; avs = avs->avseq_next) {
-		    if (((struct access_point *) avs->avseq_av.av_struct)->ap_address == NULLPA) {
-			    pslog (log_dsap,LLOG_EXCEPTIONS,"No address in NSSR",(IFP)dn_print,(caddr_t)name);
-			    continue;
-		    }
-		    aps = ap_cpy ((struct access_point *) avs->avseq_av.av_struct);
-		    aps->ap_next = (*di_p)->di_accesspoints;
-		    (*di_p)->di_accesspoints = aps;
-	        }
-		if ((*di_p)->di_accesspoints == NULLACCESSPOINT) {
-			err->dse_type = DSE_SERVICEERROR;
-			err->ERR_SERVICE.DSE_sv_problem = DSE_SV_INVALIDREFERENCE;
-			new_dn_stack = dn_seq_pop(new_dn_stack);
-			return DS_X500_ERROR;
-		}
-	    } else {
+		aps = (struct access_point *) entry_ptr->e_reference->avseq_av.av_struct;
+		(*di_p) = di_alloc();
+		(*di_p)->di_type = DI_TASK;
+		(*di_p)->di_dn = dn_cpy(aps->ap_name);
+		(*di_p)->di_target = dn_cpy(name);
+		(*di_p)->di_state = DI_ACCESSPOINT;
+		(*di_p)->di_rdn_resolved = CR_RDNRESOLVED_NOTDEFINED;
+		(*di_p)->di_aliasedRDNs = CR_NOALIASEDRDNS;
+		if (((*di_p)->di_reftype = entry_ptr->e_reftype) == RT_NONSPECIFICSUBORDINATE) {
+			for (avs = entry_ptr->e_reference; avs != NULLAV; avs = avs->avseq_next) {
+				if (((struct access_point *) avs->avseq_av.av_struct)->ap_address ==
+				    NULLPA) {
+					pslog(log_dsap, LLOG_EXCEPTIONS, "No address in NSSR",
+					      (IFP) dn_print, (caddr_t) name);
+					continue;
+				}
+				aps = ap_cpy((struct access_point *) avs->avseq_av.av_struct);
+				aps->ap_next = (*di_p)->di_accesspoints;
+				(*di_p)->di_accesspoints = aps;
+			}
+			if ((*di_p)->di_accesspoints == NULLACCESSPOINT) {
+				err->dse_type = DSE_SERVICEERROR;
+				err->ERR_SERVICE.DSE_sv_problem = DSE_SV_INVALIDREFERENCE;
+				new_dn_stack = dn_seq_pop(new_dn_stack);
+				return DS_X500_ERROR;
+			}
+		} else {
 
-		    if (aps->ap_address != NULLPA) {
-		        (*di_p)->di_accesspoints = ap_cpy (aps);
-		    } else {
-			di_free (*di_p);
-			switch(get_dsa_info(aps->ap_name, new_dn_stack,
-			       &(err_tmp), di_p)) {
+			if (aps->ap_address != NULLPA) {
+				(*di_p)->di_accesspoints = ap_cpy(aps);
+			} else {
+				di_free(*di_p);
+				switch (get_dsa_info(aps->ap_name, new_dn_stack, &(err_tmp), di_p)) {
+				case DS_OK:
+				case DS_CONTINUE:
+					(*di_p)->di_target = dn_cpy(name);
+					break;
+
+				case DS_X500_ERROR:
+					/* Error encountered generating di_block */
+					DLOG(log_dsap, LLOG_TRACE,
+					     ("dsa_info_new - get_dsa_info (external) returned X500 ERROR"));
+					if ((err_tmp.dse_type == DSE_SERVICEERROR)
+					    && (err_tmp.ERR_SERVICE.DSE_sv_problem ==
+						DSE_SV_DITERROR)) {
+						*err = err_tmp;
+						new_dn_stack = dn_seq_pop(new_dn_stack);
+						return DS_X500_ERROR;
+					}
+					ds_error_free(&err_tmp);
+					goto out;
+				}
+			}
+		}
+
+		return DS_CONTINUE;
+	}
+
+	for (avs = entry_ptr->e_master; avs != NULLAV; avs = avs->avseq_next) {
+		if (avs->avseq_av.av_struct == NULL)
+			continue;
+
+		switch (get_dsa_info((DN) avs->avseq_av.av_struct, new_dn_stack,
+				     (&err_tmp), di_trail)) {
+		case DS_OK:
+		case DS_CONTINUE:
+			(*di_trail)->di_target = dn_cpy(name);
+			di_trail = &((*di_trail)->di_next);
+			ret_val = DS_CONTINUE;
+			break;
+
+		case DS_X500_ERROR:
+			/* Error encountered generating di_block */
+			DLOG(log_dsap, LLOG_TRACE,
+			     ("dsa_info_new - get_dsa_info (master) returned X500 ERROR"));
+			if ((err_tmp.dse_type == DSE_SERVICEERROR)
+			    && (err_tmp.ERR_SERVICE.DSE_sv_problem == DSE_SV_DITERROR)) {
+				*err = err_tmp;
+				new_dn_stack = dn_seq_pop(new_dn_stack);
+				return DS_X500_ERROR;
+			}
+			ds_error_free(&err_tmp);
+			break;
+		}
+	}
+
+	if (!master) {
+		/* repeat for slaves */
+		for (avs = entry_ptr->e_slave; avs != NULLAV; avs = avs->avseq_next) {
+			if (avs->avseq_av.av_struct == NULL)
+				continue;
+
+			switch (get_dsa_info((DN) avs->avseq_av.av_struct, new_dn_stack,
+					     &(err_tmp), di_trail)) {
 			case DS_OK:
 			case DS_CONTINUE:
-			    (*di_p)->di_target = dn_cpy(name);
-			    break;
+				(*di_trail)->di_target = dn_cpy(name);
+				di_trail = &((*di_trail)->di_next);
+				ret_val = DS_CONTINUE;
+				break;
 
 			case DS_X500_ERROR:
-			    /* Error encountered generating di_block */
-			    DLOG(log_dsap, LLOG_TRACE, ("dsa_info_new - get_dsa_info (external) returned X500 ERROR"));
-			    if ((err_tmp.dse_type == DSE_SERVICEERROR )
-				&& (err_tmp.ERR_SERVICE.DSE_sv_problem == DSE_SV_DITERROR)) {
+				/* Error encountered generating di_block */
+				DLOG(log_dsap, LLOG_TRACE,
+				     ("dsa_info_new - get_dsa_info slave returned X500 ERROR"));
+				if ((err_tmp.dse_type == DSE_SERVICEERROR)
+				    && (err_tmp.ERR_SERVICE.DSE_sv_problem == DSE_SV_DITERROR)) {
 					*err = err_tmp;
 					new_dn_stack = dn_seq_pop(new_dn_stack);
 					return DS_X500_ERROR;
 				}
-			    ds_error_free(&err_tmp);
-			    goto out;
+				ds_error_free(&err_tmp);
+				break;
 			}
-		     }
-	    }
-	    
-	    return DS_CONTINUE;
-    }
-
-	for (avs = entry_ptr->e_master; avs != NULLAV; avs=avs->avseq_next) {
-		if (avs->avseq_av.av_struct == NULL)
-			continue;
-
-		switch(get_dsa_info((DN)avs->avseq_av.av_struct, new_dn_stack,
-		       (&err_tmp), di_trail)) {
-		case DS_OK:
-		case DS_CONTINUE:
-		    (*di_trail)->di_target = dn_cpy(name);
-		    di_trail = &((*di_trail)->di_next);
-		    ret_val = DS_CONTINUE;
-		    break;
-
-		case DS_X500_ERROR:
-		    /* Error encountered generating di_block */
-		    DLOG(log_dsap, LLOG_TRACE, ("dsa_info_new - get_dsa_info (master) returned X500 ERROR"));
-		    if ((err_tmp.dse_type == DSE_SERVICEERROR )
-			&& (err_tmp.ERR_SERVICE.DSE_sv_problem == DSE_SV_DITERROR)) {
-				*err = err_tmp;
-				new_dn_stack = dn_seq_pop(new_dn_stack);
-				return DS_X500_ERROR;
-			}
-		    ds_error_free(&err_tmp);
-		    break;
 		}
 	}
 
-	if(!master) {
-	    /* repeat for slaves */
-	     for (avs = entry_ptr->e_slave; avs != NULLAV; avs=avs->avseq_next) {
-		if (avs->avseq_av.av_struct == NULL)
-			continue;
-
-		switch(get_dsa_info((DN)avs->avseq_av.av_struct, new_dn_stack,
-		       &(err_tmp), di_trail)) {
-		case DS_OK:
-		case DS_CONTINUE:
-		    (*di_trail)->di_target = dn_cpy(name);
-		    di_trail = &((*di_trail)->di_next);
-		    ret_val = DS_CONTINUE;
-		    break;
-
-		case DS_X500_ERROR:
-		    /* Error encountered generating di_block */
-		    DLOG(log_dsap, LLOG_TRACE, ("dsa_info_new - get_dsa_info slave returned X500 ERROR"));
-		    if ((err_tmp.dse_type == DSE_SERVICEERROR )
-			&& (err_tmp.ERR_SERVICE.DSE_sv_problem == DSE_SV_DITERROR)) {
-				*err = err_tmp;
-				new_dn_stack = dn_seq_pop(new_dn_stack);
-				return DS_X500_ERROR;
-			}
-		    ds_error_free(&err_tmp);
-		    break;
-	        }
-	     }
-     }
-
-out:;
+      out:;
 
 	new_dn_stack = dn_seq_pop(new_dn_stack);
 
-	if((ret_val == DS_ERROR_LOCAL) || (ret_val == DS_X500_ERROR))
-	{
-	    err->dse_type = DSE_SERVICEERROR;
-	    err->ERR_SERVICE.DSE_sv_problem = DSE_SV_INVALIDREFERENCE;
-	    ret_val = DS_X500_ERROR;
-	    pslog (log_dsap,LLOG_EXCEPTIONS,"Invalid reference in entry",(IFP)dn_print,(caddr_t)name);
+	if ((ret_val == DS_ERROR_LOCAL) || (ret_val == DS_X500_ERROR)) {
+		err->dse_type = DSE_SERVICEERROR;
+		err->ERR_SERVICE.DSE_sv_problem = DSE_SV_INVALIDREFERENCE;
+		ret_val = DS_X500_ERROR;
+		pslog(log_dsap, LLOG_EXCEPTIONS, "Invalid reference in entry", (IFP) dn_print,
+		      (caddr_t) name);
 	}
 
 	return (ret_val);
 }
 
-struct di_block * ap2di (ap,name,master,di_type,oper,cr_type)
-struct access_point *ap;
-DN name;
-char master;
-char di_type;
-struct oper_act *oper;
-int cr_type;
+struct di_block *
+ap2di(ap, name, master, di_type, oper, cr_type)
+	struct access_point *ap;
+	DN name;
+	char master;
+	char di_type;
+	struct oper_act *oper;
+	int cr_type;
 {
-struct access_point *loop;
-struct di_block	*res = NULL_DI_BLOCK;
-struct di_block	*ptr;
-struct di_block	*trail;
+	struct access_point *loop;
+	struct di_block *res = NULL_DI_BLOCK;
+	struct di_block *ptr;
+	struct di_block *trail;
 
-	if(ap == NULLACCESSPOINT)
-	{
-	    LLOG(log_dsap, LLOG_EXCEPTIONS, ("No acces point to make into a di"));
-	    return NULL_DI_BLOCK;
+	if (ap == NULLACCESSPOINT) {
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("No acces point to make into a di"));
+		return NULL_DI_BLOCK;
 	}
 
-	for (loop=ap; loop!=NULLACCESSPOINT; loop=loop->ap_next) {
+	for (loop = ap; loop != NULLACCESSPOINT; loop = loop->ap_next) {
 		ptr = di_alloc();
 		ptr->di_dn = dn_cpy(loop->ap_name);
 		ptr->di_target = dn_cpy(name);
@@ -345,42 +411,41 @@ struct di_block	*trail;
 		ptr->di_state = DI_ACCESSPOINT;
 		ptr->di_type = di_type;
 		ptr->di_oper = oper;
-		ptr->di_accesspoints = (struct access_point *) calloc(1, sizeof(struct access_point));
+		ptr->di_accesspoints =
+		    (struct access_point *) calloc(1, sizeof(struct access_point));
 		ptr->di_accesspoints->ap_name = dn_cpy(loop->ap_name);
 		ptr->di_accesspoints->ap_address = psap_cpy(loop->ap_address);
 		if (res == NULL_DI_BLOCK)
 			trail = res = ptr;
-		else 
+		else
 			trail = (trail->di_next = ptr);
 
-		if (master) 
+		if (master)
 			break;	/* Only want to use first AP */
 	}
 
-	sort_dsa_list (&res);
+	sort_dsa_list(&res);
 
 	return res;
 }
 
-
-int	  dsa_info_parent (name,err,di_p,master)
-DN		  name;
-struct DSError	* err;
-struct di_block	**di_p;
-char master;
+int
+dsa_info_parent(name, err, di_p, master)
+	DN name;
+	struct DSError *err;
+	struct di_block **di_p;
+	char master;
 {
 	DLOG(log_dsap, LLOG_TRACE, ("dsa_info_parent"));
 
-	if(top_ap == NULLACCESSPOINT)
-	{
-	    LLOG(log_dsap, LLOG_EXCEPTIONS, ("No parents!"));
-	    err->dse_type = DSE_SERVICEERROR;
-	    err->ERR_SERVICE.DSE_sv_problem = DSE_SV_INVALIDREFERENCE;
-	    return(DS_X500_ERROR);
+	if (top_ap == NULLACCESSPOINT) {
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("No parents!"));
+		err->dse_type = DSE_SERVICEERROR;
+		err->ERR_SERVICE.DSE_sv_problem = DSE_SV_INVALIDREFERENCE;
+		return (DS_X500_ERROR);
 	}
 
-	*di_p = ap2di (top_ap,name,master,DI_TASK,NULLOPER,RT_SUPERIOR);
+	*di_p = ap2di(top_ap, name, master, DI_TASK, NULLOPER, RT_SUPERIOR);
 
-	return(DS_CONTINUE);
+	return (DS_CONTINUE);
 }
-

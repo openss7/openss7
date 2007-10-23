@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* qb_pullup.c - "pullup" a list of qbufs */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/psap/RCS/qb_pullup.c,v 9.0 1992/06/16 12:25:44 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/psap/RCS/qb_pullup.c,v 9.0 1992/06/16 12:25:44 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/psap/RCS/qb_pullup.c,v 9.0 1992/06/16 12:25:44 isode Rel $
+ * Header: /xtel/isode/isode/psap/RCS/qb_pullup.c,v 9.0 1992/06/16 12:25:44 isode Rel
  *
  *
- * $Log: qb_pullup.c,v $
+ * Log: qb_pullup.c,v
  * Revision 9.0  1992/06/16  12:25:44  isode
  * Release 8.0
  *
@@ -24,7 +83,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/psap/RCS/qb_pullup.c,v 9.0 1992
  *
  */
 
-
 /* LINTLIBRARY */
 
 #include <stdio.h>
@@ -32,42 +90,41 @@ static char *rcsid = "$Header: /xtel/isode/isode/psap/RCS/qb_pullup.c,v 9.0 1992
 
 /*  */
 
-int	qb_pullup (qb)
-register struct qbuf *qb;
+int
+qb_pullup(qb)
+	register struct qbuf *qb;
 {
-    register int    len;
-    register char  *d;
-    register struct qbuf  *p,
-			  *qp,
-    			  *qpp;
+	register int len;
+	register char *d;
+	register struct qbuf *p, *qp, *qpp;
 
-    len = 0;
-#ifdef	notdef		/* want null-termination... */
-    if ((p = qb -> qb_forw) -> qb_forw == qb)
-	return OK;
+	len = 0;
+#ifdef	notdef			/* want null-termination... */
+	if ((p = qb->qb_forw)->qb_forw == qb)
+		return OK;
 #endif
-    for (p = qb -> qb_forw; p != qb; p = p -> qb_forw)
-	len += p -> qb_len;
+	for (p = qb->qb_forw; p != qb; p = p->qb_forw)
+		len += p->qb_len;
 
-    if ((p = (struct qbuf *) malloc ((unsigned) (sizeof *p + len + 1)))
+	if ((p = (struct qbuf *) malloc((unsigned) (sizeof *p + len + 1)))
 	    == NULL)
-	return NOTOK;
-    d = p -> qb_data = p -> qb_base;
-    p -> qb_len = len;
+		return NOTOK;
+	d = p->qb_data = p->qb_base;
+	p->qb_len = len;
 
-    for (qp = qb -> qb_forw; qp != qb; qp = qpp) {
-	qpp = qp -> qb_forw;
+	for (qp = qb->qb_forw; qp != qb; qp = qpp) {
+		qpp = qp->qb_forw;
 
-	remque (qp);
+		remque(qp);
 
-	bcopy (qp -> qb_data, d, qp -> qb_len);
-	d += qp -> qb_len;
+		bcopy(qp->qb_data, d, qp->qb_len);
+		d += qp->qb_len;
 
-	free ((char *) qp);
-    }
-    *d = NULL;
+		free((char *) qp);
+	}
+	*d = NULL;
 
-    insque (p, qb);
+	insque(p, qb);
 
-    return OK;
+	return OK;
 }

@@ -1,14 +1,73 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* bind.c - */
 
 #ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/quipu/dish/RCS/bind.c,v 9.0 1992/06/16 12:35:39 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/quipu/dish/RCS/bind.c,v 9.0 1992/06/16 12:35:39 isode Rel";
 #endif
 
 /* 
- * $Header: /xtel/isode/isode/quipu/dish/RCS/bind.c,v 9.0 1992/06/16 12:35:39 isode Rel $
+ * Header: /xtel/isode/isode/quipu/dish/RCS/bind.c,v 9.0 1992/06/16 12:35:39 isode Rel
  *
  *
- * $Log: bind.c,v $
+ * Log: bind.c,v
  * Revision 9.0  1992/06/16  12:35:39  isode
  * Release 8.0
  *
@@ -23,7 +82,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/dish/RCS/bind.c,v 9.0 199
  *    this agreement.
  *
  */
-
 
 #include <signal.h>
 #include "manifest.h"
@@ -43,44 +101,41 @@ static char *rcsid = "$Header: /xtel/isode/isode/quipu/dish/RCS/bind.c,v 9.0 199
 
 #include "osisec-stub.h"
 
-extern DN       fixed_pos;
-DN	        user_name;
+extern DN fixed_pos;
+DN user_name;
 
 #define	OPT	(!frompipe || rps -> ps_byteno == 0 ? opt : rps)
 #define	RPS	(!frompipe || opt -> ps_byteno == 0 ? rps : opt)
-extern	char	frompipe;
-extern	PS	opt, rps;
+extern char frompipe;
+extern PS opt, rps;
 
-extern char	retpipe[],
-		inbuf [],
-		bound;
+extern char retpipe[], inbuf[], bound;
 
-extern char	dad_flag;
+extern char dad_flag;
 
-extern int	dsap_ad;
-extern unsigned	connect_time,
-		cache_time;
+extern int dsap_ad;
+extern unsigned connect_time, cache_time;
 
 extern Entry database_root;
 
-static char	username [LINESIZE];
-static char	password [LINESIZE];
-static int	auth_type = DBA_AUTH_SIMPLE; 
-static char	first_bind = TRUE;
+static char username[LINESIZE];
+static char password[LINESIZE];
+static int auth_type = DBA_AUTH_SIMPLE;
+static char first_bind = TRUE;
 
-char		neverefer = FALSE;
+char neverefer = FALSE;
 
 static struct ds_bind_arg bindarg;
 static struct ds_bind_arg bindresult;
 static struct ds_bind_error binderr;
 
-static int 	main_dsa_id;
-static int	referral_dsa;
+static int main_dsa_id;
+static int referral_dsa;
 
 #ifndef NO_STATS
-extern LLog * log_stat;
-#endif 
-extern LLog * log_dsap;
+extern LLog *log_stat;
+#endif
+extern LLog *log_dsap;
 
 extern int parent_pid;
 static unsigned waiting = 0;
@@ -94,224 +149,223 @@ static int protect_password();
 static int sign_bindarg();
 
 /* ARGSUSED */
-SFD alarm_sig (sd)
-int sd;
+SFD
+alarm_sig(sd)
+	int sd;
 {
-SFD dish_quit ();
+	SFD dish_quit();
 
 	if (frompipe && (parent_pid != 0))
-		if (kill (parent_pid,0) == -1) {
+		if (kill(parent_pid, 0) == -1) {
 			/* invoking shell gone - exit */
-			dish_quit (SIGHUP);
+			dish_quit(SIGHUP);
 		}
-		
 
 	if (bound) {
-		(void) dap_unbind (main_dsa_id);
+		(void) dap_unbind(main_dsa_id);
 #ifndef NO_STATS
-	LLOG (log_stat,LLOG_NOTICE,("Connection closed"));
+		LLOG(log_stat, LLOG_NOTICE, ("Connection closed"));
 #endif
 		bound = FALSE;
 		if (referral_dsa != 0) {
-			(void) dap_unbind (referral_dsa);
+			(void) dap_unbind(referral_dsa);
 			referral_dsa = 0;
 		}
 	}
 
 	waiting += connect_time;
 	if (frompipe && (waiting >= cache_time))
-		dish_quit (SIGHUP);
-		
-	(void) signal (SIGALRM, alarm_sig);
-	(void) alarm (connect_time);
+		dish_quit(SIGHUP);
+
+	(void) signal(SIGALRM, alarm_sig);
+	(void) alarm(connect_time);
 }
 
-set_alarm ()
+set_alarm()
 {
 	waiting = 0;
-	(void) signal (SIGALRM, alarm_sig);
-	(void) alarm (connect_time);
+	(void) signal(SIGALRM, alarm_sig);
+	(void) alarm(connect_time);
 }
 
 /* ARGSUSED */
-SFD bind_sig (sd)
-int sd;
+SFD
+bind_sig(sd)
+	int sd;
 {
-extern jmp_buf  dish_env;
+	extern jmp_buf dish_env;
 
-	ps_print (OPT,"Bind timeout\n");
+	ps_print(OPT, "Bind timeout\n");
 	if (referral_dsa != 0) {
 		referral_dsa = 0;
 		dsap_ad = main_dsa_id;
 	}
-	longjmp (dish_env,1);
+	longjmp(dish_env, 1);
 }
 
-bind_alarm ()
+bind_alarm()
 {
-	(void) signal (SIGALRM, bind_sig);
-	(void) alarm (connect_time);
+	(void) signal(SIGALRM, bind_sig);
+	(void) alarm(connect_time);
 }
 
-isnumeric (ptr)
-char * ptr;
+isnumeric(ptr)
+	char *ptr;
 {
 	if ((ptr == NULLCP) || (*ptr == 0))
 		return FALSE;
 
 	while (*ptr)
-		if (! isdigit (*ptr++) )
+		if (!isdigit(*ptr++))
 			return FALSE;
 
 	return TRUE;
 }
 
-call_bind (argc,argv)
-int argc;
-char ** argv;
+call_bind(argc, argv)
+	int argc;
+	char **argv;
 {
-int 	x;
-char    noconnect = FALSE;
-static  char    bdsa  [LINESIZE], save_bdsa[LINESIZE];
-char   *save_address;
-char   *save_name;
-extern  char * dsa_address,
-	     * myname;
-FILE    *fp;
-char    buf[BUFSIZ];
-DN	newdn, dsadn;
-extern  char * tailfile;
-extern DN sequence_dn ();
-char got_name = FALSE;
-char got_pass = FALSE;
+	int x;
+	char noconnect = FALSE;
+	static char bdsa[LINESIZE], save_bdsa[LINESIZE];
+	char *save_address;
+	char *save_name;
+	extern char *dsa_address, *myname;
+	FILE *fp;
+	char buf[BUFSIZ];
+	DN newdn, dsadn;
+	extern char *tailfile;
+	extern DN sequence_dn();
+	char got_name = FALSE;
+	char got_pass = FALSE;
 
 	bdsa[0] = 0;
 	save_address = dsa_address;
 	save_name = myname;
 
-	for (x=1; x<argc; x++) {
-		if (test_arg (argv[x], "-noconnect",3))
+	for (x = 1; x < argc; x++) {
+		if (test_arg(argv[x], "-noconnect", 3))
 			noconnect = TRUE;
 #ifdef PDU_DUMP
-		else if (test_arg (argv[x], "-pdus",2)) {
+		else if (test_arg(argv[x], "-pdus", 2)) {
 			if (++x == argc) {
-				ps_print (OPT,"PDU file name missing\n");
-				Usage (argv[0]);
+				ps_print(OPT, "PDU file name missing\n");
+				Usage(argv[0]);
 				return (NOTOK);
 			}
-			ps_printf (RPS,"Dumping PDUs in directory %s\n",argv[x]);
-			pdu_dump_init (argv[x]);
+			ps_printf(RPS, "Dumping PDUs in directory %s\n", argv[x]);
+			pdu_dump_init(argv[x]);
 		}
-#endif		
- 		else if (test_arg (argv[x], "-user",1)) {
+#endif
+		else if (test_arg(argv[x], "-user", 1)) {
 			got_name = TRUE;
 			if ((++x == argc) || (*argv[x] == '-')) {
 				x--;
 				*username = 0;
 			} else
-				(void) strcpy (username,argv[x]);
-		} else if (test_arg (argv[x], "-pipe",2)) {
-			if (strcmp (argv[0],"dish") == 0)
-				ps_print (OPT,"Sorry... '-pipe' must be the first argument to dish.\n");
-			else 
-				Usage (argv[0]);
+				(void) strcpy(username, argv[x]);
+		} else if (test_arg(argv[x], "-pipe", 2)) {
+			if (strcmp(argv[0], "dish") == 0)
+				ps_print(OPT,
+					 "Sorry... '-pipe' must be the first argument to dish.\n");
+			else
+				Usage(argv[0]);
 			return (NOTOK);
-		} else if (test_arg (argv[x], "-norefer",3))
+		} else if (test_arg(argv[x], "-norefer", 3))
 			neverefer = TRUE;
-		else if (test_arg (argv[x], "-refer",1))
+		else if (test_arg(argv[x], "-refer", 1))
 			neverefer = FALSE;
 		/* these flags select the mode of authentication only */
-		else if (test_arg (argv[x],"-noauthentication",3)) 
+		else if (test_arg(argv[x], "-noauthentication", 3))
 			auth_type = DBA_AUTH_NONE;
-		else if (test_arg (argv[x], "-protected", 3))
+		else if (test_arg(argv[x], "-protected", 3))
 			auth_type = DBA_AUTH_PROTECTED;
-		else if (test_arg (argv[x], "-simple", 3))
+		else if (test_arg(argv[x], "-simple", 3))
 			auth_type = DBA_AUTH_SIMPLE;
-		else if (test_arg (argv[x], "-strong", 3))
+		else if (test_arg(argv[x], "-strong", 3))
 			auth_type = DBA_AUTH_STRONG;
-		/* -password sets the `key', whatever the mode  */
-		else if (test_arg (argv[x], "-password",2)) {
+		/* -password sets the `key', whatever the mode */
+		else if (test_arg(argv[x], "-password", 2)) {
 			got_pass = TRUE;
-			if ((++x == argc)  || (*argv[x] == '-')) {
+			if ((++x == argc) || (*argv[x] == '-')) {
 				x--;
 				*password = 0;
 			} else {
 				int i;
-				(void) strcpy (password,argv[x]);
-				for (i=0; i< (int)strlen(password) ; i++)
-					if ( i < 4 )
+
+				(void) strcpy(password, argv[x]);
+				for (i = 0; i < (int) strlen(password); i++)
+					if (i < 4)
 						argv[x][i] = 'X';
 					else
 						argv[x][i] = 0;
 
 			}
-		} else if (test_arg (argv[x], "-call",1)) {
+		} else if (test_arg(argv[x], "-call", 1)) {
 			if (++x == argc) {
-				ps_print (OPT,"dsa name missing\n");
-				Usage (argv[0]);
+				ps_print(OPT, "dsa name missing\n");
+				Usage(argv[0]);
 				return (NOTOK);
 			}
-			(void) strcpy (bdsa,argv[x]);
+			(void) strcpy(bdsa, argv[x]);
 		} else {
 			/* assume its the user name */
 			if (got_name) {
-				ps_print (OPT,"One user name only please!\n");
-				Usage (argv[0]);
+				ps_print(OPT, "One user name only please!\n");
+				Usage(argv[0]);
 				return (NOTOK);
-			} 
+			}
 			got_name = TRUE;
-			(void) strcpy (username,argv[x]);
+			(void) strcpy(username, argv[x]);
 			if (*username == '-') {
-				ps_printf (OPT,"Unknown option %s\n",username);
+				ps_printf(OPT, "Unknown option %s\n", username);
 				username[0] = 0;
-				Usage (argv[0]);
+				Usage(argv[0]);
 				return (NOTOK);
 			}
 		}
 	}
-
 
 	if (noconnect)
 		return (OK);
 
-	if (isnumeric (username)) {
-	    PS	    ps;
+	if (isnumeric(username)) {
+		PS ps;
 
-	    if ((newdn = sequence_dn (atoi (username))) == NULLDN) {
-		ps_printf (OPT,"Invalid sequence in username %s\n",username);
-		Usage (argv[0]);
-		return (NOTOK);
-	    }
-	    if ((ps = ps_alloc (str_open)) == NULLPS) {
-		ps_printf (OPT, "Unable to expand sequence: out of memory\n");
-		return NOTOK;
-	    }
-	    if (str_setup (ps, username, sizeof username - 2, 1) == NOTOK) {
-		ps_printf (OPT, "Unable to expand sequence: %s\n",
-			   ps_error (ps -> ps_errno));
-		ps_free (ps);
-		return NOTOK;
-	    }
-	    dn_print (ps, newdn, EDBOUT);
-	    ps_print (ps, " ");
-	    *--ps -> ps_ptr = NULL, ps -> ps_cnt++;
+		if ((newdn = sequence_dn(atoi(username))) == NULLDN) {
+			ps_printf(OPT, "Invalid sequence in username %s\n", username);
+			Usage(argv[0]);
+			return (NOTOK);
+		}
+		if ((ps = ps_alloc(str_open)) == NULLPS) {
+			ps_printf(OPT, "Unable to expand sequence: out of memory\n");
+			return NOTOK;
+		}
+		if (str_setup(ps, username, sizeof username - 2, 1) == NOTOK) {
+			ps_printf(OPT, "Unable to expand sequence: %s\n", ps_error(ps->ps_errno));
+			ps_free(ps);
+			return NOTOK;
+		}
+		dn_print(ps, newdn, EDBOUT);
+		ps_print(ps, " ");
+		*--ps->ps_ptr = NULL, ps->ps_cnt++;
 
-	    ps_free (ps);
-	}
-	else
-	    newdn = NULLDN;
+		ps_free(ps);
+	} else
+		newdn = NULLDN;
 
-	if ((got_name && ! got_pass) || (*password == 0)) {
+	if ((got_name && !got_pass) || (*password == 0)) {
 		bindarg.dba_passwd_len = 0;
-		bindarg.dba_passwd[0]  = 0;
+		bindarg.dba_passwd[0] = 0;
 		if ((*username != 0) && (auth_type != DBA_AUTH_NONE)) {
-			get_password (username, password);
+			get_password(username, password);
 			(void) strcpy(&bindarg.dba_passwd[0], password);
-			bindarg.dba_passwd_len = strlen	(&bindarg.dba_passwd[0]);
+			bindarg.dba_passwd_len = strlen(&bindarg.dba_passwd[0]);
 		}
 	} else {
-		bindarg.dba_passwd_len = strlen (password);
-		(void) strcpy (bindarg.dba_passwd, password);
+		bindarg.dba_passwd_len = strlen(password);
+		(void) strcpy(bindarg.dba_passwd, password);
 	}
 
 	if ((bindarg.dba_passwd_len == 0) && (auth_type != DBA_AUTH_STRONG))
@@ -321,19 +375,16 @@ char got_pass = FALSE;
 		bindarg.dba_dn = NULLDN;
 		/* Don't need credentials to bind as NULLDN! */
 		auth_type = DBA_AUTH_NONE;
-	}
-	else
-		if (newdn)
-		    bindarg.dba_dn = dn_cpy (newdn);
-	    	else {
-		    if ((bindarg.dba_dn = str2dn (username[0] != '@' ? username
-								  : username + 1))
-			    == NULLDN) {
-			ps_printf (OPT,"Invalid DN for username: %s\n",username);
-			Usage (argv[0]);
+	} else if (newdn)
+		bindarg.dba_dn = dn_cpy(newdn);
+	else {
+		if ((bindarg.dba_dn = str2dn(username[0] != '@' ? username : username + 1))
+		    == NULLDN) {
+			ps_printf(OPT, "Invalid DN for username: %s\n", username);
+			Usage(argv[0]);
 			return (NOTOK);
-		    }
 		}
+	}
 
 	/* prepare credentials */
 	bindarg.dba_auth_type = auth_type;
@@ -341,7 +392,7 @@ char got_pass = FALSE;
 	case DBA_AUTH_NONE:
 	case DBA_AUTH_SIMPLE:
 		break;
-	case DBA_AUTH_PROTECTED: 
+	case DBA_AUTH_PROTECTED:
 		protect_password();
 		break;
 	case DBA_AUTH_STRONG:
@@ -350,186 +401,181 @@ char got_pass = FALSE;
 		break;
 	}
 
-	if (isnumeric (bdsa) && (dsadn = sequence_dn (atoi (bdsa)))) {
-	    PS	ps;
+	if (isnumeric(bdsa) && (dsadn = sequence_dn(atoi(bdsa)))) {
+		PS ps;
 
-	    dsadn = dn_cpy (dsadn);
-	    if ((ps = ps_alloc (str_open)) == NULLPS) {
-		ps_printf (OPT, "Unable to expand sequence: out of memory\n");
-		return NOTOK;
-	    }
-	    if (str_setup (ps, bdsa, sizeof bdsa - 2, 1) == NOTOK) {
-		ps_printf (OPT, "Unable to expand sequence: %s\n",
-			   ps_error (ps -> ps_errno));
-		ps_free (ps);
-		return NOTOK;
-	    }
-	    dn_print (ps, dsadn, EDBOUT);
-	    ps_print (ps, " ");
-	    *--ps -> ps_ptr = NULL, ps -> ps_cnt++;
+		dsadn = dn_cpy(dsadn);
+		if ((ps = ps_alloc(str_open)) == NULLPS) {
+			ps_printf(OPT, "Unable to expand sequence: out of memory\n");
+			return NOTOK;
+		}
+		if (str_setup(ps, bdsa, sizeof bdsa - 2, 1) == NOTOK) {
+			ps_printf(OPT, "Unable to expand sequence: %s\n", ps_error(ps->ps_errno));
+			ps_free(ps);
+			return NOTOK;
+		}
+		dn_print(ps, dsadn, EDBOUT);
+		ps_print(ps, " ");
+		*--ps->ps_ptr = NULL, ps->ps_cnt++;
 
-	    ps_free (ps);
-	}
-	else {
-	    int	    old_ppe;
-	    extern int print_parse_errors;
+		ps_free(ps);
+	} else {
+		int old_ppe;
+		extern int print_parse_errors;
 
-	    old_ppe = print_parse_errors, print_parse_errors = FALSE;
-	    dsadn = *bdsa == '@' && index (bdsa + 1, '=') ? str2dn (bdsa + 1)
-							  : NULLDN;
-	    print_parse_errors = old_ppe;
+		old_ppe = print_parse_errors, print_parse_errors = FALSE;
+		dsadn = *bdsa == '@' && index(bdsa + 1, '=') ? str2dn(bdsa + 1)
+		    : NULLDN;
+		print_parse_errors = old_ppe;
 	}
 
 	if (dsadn) {
-	    int	    gotit = 0;
-	    Entry   e;
-	    static AttributeType t_addr = NULL;
+		int gotit = 0;
+		Entry e;
+		static AttributeType t_addr = NULL;
 
-	    if (!t_addr && !(t_addr = str2AttrT ("presentationAddress")))
-		fatal (-100, "presentationAddress: invalid attribute type");
+		if (!t_addr && !(t_addr = str2AttrT("presentationAddress")))
+			fatal(-100, "presentationAddress: invalid attribute type");
 
-	    if ((!(e = local_find_entry (dsadn, FALSE)) || !e -> e_lock)
-		    && bound
-		    && rebind () == OK) {
-		struct ds_read_arg read_arg;
-		struct ds_read_result read_result;
-		struct DSError read_error;
+		if ((!(e = local_find_entry(dsadn, FALSE)) || !e->e_lock)
+		    && bound && rebind() == OK) {
+			struct ds_read_arg read_arg;
+			struct ds_read_result read_result;
+			struct DSError read_error;
 
-		bzero ((char *) &read_arg, sizeof read_arg);
+			bzero((char *) &read_arg, sizeof read_arg);
 
-		read_arg.rda_object = dsadn;
+			read_arg.rda_object = dsadn;
 
-		(void) service_control (OPT, 0, NULLVP, &read_arg.rda_common);
+			(void) service_control(OPT, 0, NULLVP, &read_arg.rda_common);
 
-		read_arg.rda_eis.eis_allattributes = FALSE;
-		read_arg.rda_eis.eis_select = as_comp_new (AttrT_cpy (t_addr),
-							   NULLAV,
-							   NULLACL_INFO);
-		read_arg.rda_eis.eis_infotypes = EIS_ATTRIBUTESANDVALUES;
+			read_arg.rda_eis.eis_allattributes = FALSE;
+			read_arg.rda_eis.eis_select = as_comp_new(AttrT_cpy(t_addr),
+								  NULLAV, NULLACL_INFO);
+			read_arg.rda_eis.eis_infotypes = EIS_ATTRIBUTESANDVALUES;
 
-		if (ds_read (&read_arg, &read_error, &read_result) == DS_OK) {
-		    cache_entry (&read_result.rdr_entry,
-				 read_arg.rda_eis.eis_allattributes,
-				 read_arg.rda_eis.eis_infotypes);
-		    entryinfo_comp_free (&read_result.rdr_entry, 0);
-		    e = local_find_entry (dsadn, FALSE);
+			if (ds_read(&read_arg, &read_error, &read_result) == DS_OK) {
+				cache_entry(&read_result.rdr_entry,
+					    read_arg.rda_eis.eis_allattributes,
+					    read_arg.rda_eis.eis_infotypes);
+				entryinfo_comp_free(&read_result.rdr_entry, 0);
+				e = local_find_entry(dsadn, FALSE);
+			}
 		}
-	    }
 
-	    if (e) {
-		Attr_Sequence attr;
-		AV_Sequence avseq;
+		if (e) {
+			Attr_Sequence attr;
+			AV_Sequence avseq;
 
-		for (attr = e -> e_attributes; attr; attr = attr -> attr_link)
-		    if (AttrT_cmp (attr -> attr_type, t_addr) == 0)
-			break;
-		if (attr && (avseq = attr -> attr_value)) {
-		    static char dsaddr[BUFSIZ];
+			for (attr = e->e_attributes; attr; attr = attr->attr_link)
+				if (AttrT_cmp(attr->attr_type, t_addr) == 0)
+					break;
+			if (attr && (avseq = attr->attr_value)) {
+				static char dsaddr[BUFSIZ];
 
-		    (void) strcpy (myname = save_bdsa, bdsa);
-		    (void) strcpy (dsa_address = dsaddr,
-				   paddr2str ((struct PSAPaddr *)
-					          avseq -> avseq_av.av_struct,
-					      NULLNA));
-		    gotit++;
+				(void) strcpy(myname = save_bdsa, bdsa);
+				(void) strcpy(dsa_address = dsaddr, paddr2str((struct PSAPaddr *)
+									      avseq->avseq_av.
+									      av_struct, NULLNA));
+				gotit++;
+			}
 		}
-	    }
-	    if (!gotit) {
-		ps_printf (OPT,
-			   "Unable to determine presentation address for @");
-		dn_print (OPT, dsadn, EDBOUT);
-		ps_printf (OPT, "\n");
-		return NOTOK;
-	    }
-	    
-	    dn_free (dsadn), dsadn = NULL;
-	}
-	else
-	/* now set dsa_address */
+		if (!gotit) {
+			ps_printf(OPT, "Unable to determine presentation address for @");
+			dn_print(OPT, dsadn, EDBOUT);
+			ps_printf(OPT, "\n");
+			return NOTOK;
+		}
+
+		dn_free(dsadn), dsadn = NULL;
+	} else
+		/* now set dsa_address */
 	if (bdsa[0] != 0) {
-	        (void) strcpy (myname = save_bdsa, bdsa);
+		(void) strcpy(myname = save_bdsa, bdsa);
 		dsa_address = NULLCP;
 
 		/* read tailor file to get address */
-		
-		if( (fp = fopen(isodefile(tailfile, 0), "r")) == (FILE *)NULL) {
-			LLOG (log_dsap,LLOG_FATAL,("can't open %s",tailfile));
-			fatal (-72, "Cannot open tailor file");
+
+		if ((fp = fopen(isodefile(tailfile, 0), "r")) == (FILE *) NULL) {
+			LLOG(log_dsap, LLOG_FATAL, ("can't open %s", tailfile));
+			fatal(-72, "Cannot open tailor file");
 		}
 
-		while(fgets(buf, sizeof(buf), fp) != NULLCP)
-			if ( (*buf != '#') && (*buf != '\n') )
+		while (fgets(buf, sizeof(buf), fp) != NULLCP)
+			if ((*buf != '#') && (*buf != '\n'))
 				/* not a comment or blank */
-				if (tai_string (buf) == NOTOK)
-					DLOG (log_dsap,LLOG_DEBUG,("tai_string failed %s",buf));
+				if (tai_string(buf) == NOTOK)
+					DLOG(log_dsap, LLOG_DEBUG, ("tai_string failed %s", buf));
 
 		(void) fclose(fp);
-		
+
 		if (dsa_address == NULLCP)
 			dsa_address = myname;
 	}
 
-	if (bound) 
-		(void) ds_unbind ();
-		
+	if (bound)
+		(void) ds_unbind();
+
 	bound = FALSE;
 	first_bind = FALSE;
 
 	binderr.dbe_value = 0;
-	bind_alarm ();
-	if (secure_ds_bind (&bindarg, &binderr, &bindresult) != OK) {
-		(void) signal (SIGALRM, SIG_IGN);
+	bind_alarm();
+	if (secure_ds_bind(&bindarg, &binderr, &bindresult) != OK) {
+		(void) signal(SIGALRM, SIG_IGN);
 		if (binderr.dbe_value == 0)
-			ps_print (OPT, "*** Service error : Unable to contact DSA ***\n");
+			ps_print(OPT, "*** Service error : Unable to contact DSA ***\n");
 		else
 			ds_bind_error(OPT, &binderr);
 
 #ifdef DEBUG
 		if (binderr.dbe_cc)
-			ps_printf (OPT, "%s\n", binderr.dbe_data);
-#endif			
+			ps_printf(OPT, "%s\n", binderr.dbe_data);
+#endif
 
 		dsa_address = save_address;
 		myname = save_name;
 		return (NOTOK);
-	} 
-	(void) signal (SIGALRM, SIG_IGN);
+	}
+	(void) signal(SIGALRM, SIG_IGN);
 	main_dsa_id = dsap_ad;
 
 #ifndef NO_STATS
-	LLOG (log_stat,LLOG_NOTICE,("Bound '%s' to '%s'",username,myname));
+	LLOG(log_stat, LLOG_NOTICE, ("Bound '%s' to '%s'", username, myname));
 #endif
 
 	bound = TRUE;
 	user_name = bindarg.dba_dn;
 
- 	return (OK);
-	
+	return (OK);
+
 }
 
-rebind () {
+rebind()
+{
 
 	if (referral_dsa != 0) {
-		(void) dap_unbind (referral_dsa);
+		(void) dap_unbind(referral_dsa);
 		referral_dsa = 0;
 		dsap_ad = main_dsa_id;
 	}
 
 	if (first_bind) {
-		char * buff = "bind";
-		return (call_bind (1,&buff));
+		char *buff = "bind";
+
+		return (call_bind(1, &buff));
 	}
 
 	if (bound)
 		return (OK);
-		
+
 	/* prepare credentials */
 	bindarg.dba_auth_type = auth_type;
 	switch (auth_type) {
 	case DBA_AUTH_NONE:
 	case DBA_AUTH_SIMPLE:
 		break;
-	case DBA_AUTH_PROTECTED: 
+	case DBA_AUTH_PROTECTED:
 		protect_password();
 		break;
 	case DBA_AUTH_STRONG:
@@ -539,24 +585,24 @@ rebind () {
 	}
 
 	binderr.dbe_value = 0;
-	bind_alarm ();
-	if (secure_ds_bind (&bindarg, &binderr, &bindresult) != OK) {
-		(void) signal (SIGALRM, SIG_IGN);
+	bind_alarm();
+	if (secure_ds_bind(&bindarg, &binderr, &bindresult) != OK) {
+		(void) signal(SIGALRM, SIG_IGN);
 		if (binderr.dbe_value == 0)
-			ps_print (OPT, "*** Service error: Unable to contact DSA ***\n");
+			ps_print(OPT, "*** Service error: Unable to contact DSA ***\n");
 		else
 			ds_bind_error(OPT, &binderr);
 
 #ifdef DEBUG
 		if (binderr.dbe_cc)
-			ps_printf (OPT, "%s\n", binderr.dbe_data);
-#endif			
+			ps_printf(OPT, "%s\n", binderr.dbe_data);
+#endif
 		return (NOTOK);
-	} 
-	(void) signal (SIGALRM, SIG_IGN);
+	}
+	(void) signal(SIGALRM, SIG_IGN);
 	main_dsa_id = dsap_ad;
 #ifndef NO_STATS
-	LLOG (log_stat,LLOG_NOTICE,("re-connect"));
+	LLOG(log_stat, LLOG_NOTICE, ("re-connect"));
 #endif
 
 	bound = TRUE;
@@ -564,11 +610,11 @@ rebind () {
 	return (OK);
 }
 
-referral_bind (addr) 
-struct PSAPaddr * addr;
+referral_bind(addr)
+	struct PSAPaddr *addr;
 {
-	if (referral_dsa != 0) 
-		(void) dap_unbind (referral_dsa++);
+	if (referral_dsa != 0)
+		(void) dap_unbind(referral_dsa++);
 	else
 		referral_dsa = dsap_ad + 1;
 
@@ -580,7 +626,7 @@ struct PSAPaddr * addr;
 	case DBA_AUTH_NONE:
 	case DBA_AUTH_SIMPLE:
 		break;
-	case DBA_AUTH_PROTECTED: 
+	case DBA_AUTH_PROTECTED:
 		protect_password();
 		break;
 	case DBA_AUTH_STRONG:
@@ -589,88 +635,86 @@ struct PSAPaddr * addr;
 	}
 
 	binderr.dbe_value = 0;
-	bind_alarm ();
-	if (dap_bind (&dsap_ad, &bindarg, &binderr, &bindresult, addr) != OK) {
-		(void) signal (SIGALRM, SIG_IGN);
-		if (binderr.dbe_value == 0) 
-			ps_print (OPT, "*** Service error : Unable to contact DSA ***\n");
+	bind_alarm();
+	if (dap_bind(&dsap_ad, &bindarg, &binderr, &bindresult, addr) != OK) {
+		(void) signal(SIGALRM, SIG_IGN);
+		if (binderr.dbe_value == 0)
+			ps_print(OPT, "*** Service error : Unable to contact DSA ***\n");
 		else
 			ds_bind_error(OPT, &binderr);
 
 #ifdef DEBUG
 		if (binderr.dbe_cc)
-			ps_printf (OPT, "%s\n", binderr.dbe_data);
-#endif			
+			ps_printf(OPT, "%s\n", binderr.dbe_data);
+#endif
 
 		referral_dsa = 0;
 		dsap_ad = main_dsa_id;
 		return (0);
 	}
-	(void) signal (SIGALRM, SIG_IGN);
+	(void) signal(SIGALRM, SIG_IGN);
 	referral_dsa = dsap_ad;
 
 #ifndef NO_STATS
-	LLOG (log_stat,LLOG_NOTICE,("referral connect"));
+	LLOG(log_stat, LLOG_NOTICE, ("referral connect"));
 #endif
 
 	return (1);
 }
 
-call_unbind (argc,argv)
-int argc;
-char ** argv;
+call_unbind(argc, argv)
+	int argc;
+	char **argv;
 {
-	int		x;
-	char		noquit = FALSE;
-	extern char	resbuf [];
+	int x;
+	char noquit = FALSE;
+	extern char resbuf[];
 	static int very_first_time = 1;
 
-	for (x=1; x<argc; x++) {
-		if (test_arg (argv[x], "-noquit",3))
+	for (x = 1; x < argc; x++) {
+		if (test_arg(argv[x], "-noquit", 3))
 			noquit = TRUE;
 		else {
-			Usage (argv[0]);
+			Usage(argv[0]);
 			return;
 		}
 	}
-	if (!noquit) 
-		(void) signal (SIGINT, SIG_DFL);
+	if (!noquit)
+		(void) signal(SIGINT, SIG_DFL);
 
 	if (bound) {
-		(void) dap_unbind (main_dsa_id);
+		(void) dap_unbind(main_dsa_id);
 		if (referral_dsa != 0) {
-			(void) dap_unbind (referral_dsa);
+			(void) dap_unbind(referral_dsa);
 			referral_dsa = 0;
 		}
 	}
-		
+
 	bound = FALSE;
-		
-	if (! noquit) {
+
+	if (!noquit) {
 		if (frompipe)
-			exit_pipe ();
-		ps_free (opt);
-		ps_free (rps);
-		directory_free (database_root);	   /* clean /tmp files */
-		exit (0);
-	}
-	else
-	    if (dad_flag && very_first_time) {
+			exit_pipe();
+		ps_free(opt);
+		ps_free(rps);
+		directory_free(database_root);	/* clean /tmp files */
+		exit(0);
+	} else if (dad_flag && very_first_time) {
 		very_first_time = 0;
 		cache_time = 24 * 60 * 60;
-	    }
+	}
 }
 
-unbind_from_dsa ()
+unbind_from_dsa()
 {
 	if (bound) {
-		(void) dap_unbind (main_dsa_id);
+		(void) dap_unbind(main_dsa_id);
 		if (referral_dsa != 0) {
-			(void) dap_unbind (referral_dsa);
+			(void) dap_unbind(referral_dsa);
 			referral_dsa = 0;
 		}
 	}
-		
+
 	bound = FALSE;
 }
 
@@ -678,228 +722,227 @@ extern char no_rcfile;
 static time_t rc_mod_time;
 static char Dish_Home[LINESIZE];
 
-user_tailor ()
+user_tailor()
 {
-	int		isenv;
-	char           *part1;
-	char           *part2;
-	char           *getenv ();
-	char           *home;
+	int isenv;
+	char *part1;
+	char *part2;
+	char *getenv();
+	char *home;
 
-	FILE           *file;
-	char            Read_in_Stuff[BUFSIZ];
-	char           *p, 
-		       *TidyString();
-	extern char    *local_dit;
-	extern char	dishinit;
-	struct	 stat	sbuf;
+	FILE *file;
+	char Read_in_Stuff[BUFSIZ];
+	char *p, *TidyString();
+	extern char *local_dit;
+	extern char dishinit;
+	struct stat sbuf;
 
 	*password = 0;
 	*username = 0;
 
-	set_sequence ("default");
+	set_sequence("default");
 
-	(void) set_cmd_default ("modify","-dontusecopy");	
-		/* we dont want to make templates with copies */
+	(void) set_cmd_default("modify", "-dontusecopy");
+	/* we dont want to make templates with copies */
 
-
-	bzero ((char *)&bindarg, sizeof bindarg);
+	bzero((char *) &bindarg, sizeof bindarg);
 	bindarg.dba_version = DBA_VERSION_V1988;
 
 	isenv = 0;
-	if (home = getenv ("QUIPURC"))
-	    (void) strcpy (Dish_Home, home), isenv = 1;
+	if (home = getenv("QUIPURC"))
+		(void) strcpy(Dish_Home, home), isenv = 1;
+	else if (home = getenv("HOME"))
+		(void) sprintf(Dish_Home, "%s/.quipurc", home);
 	else
-	    if (home = getenv ("HOME"))
-		(void) sprintf (Dish_Home, "%s/.quipurc", home);
-	    else
-		(void) strcpy (Dish_Home, "./.quipurc");
+		(void) strcpy(Dish_Home, "./.quipurc");
 
 	if (no_rcfile)
-	    goto out;
+		goto out;
 
-	if (stat (Dish_Home,&sbuf) != 0) {
-	        if (isenv)
-		    goto no_dice;
+	if (stat(Dish_Home, &sbuf) != 0) {
+		if (isenv)
+			goto no_dice;
 
 		if (dishinit && !frompipe) {
-			char cmd_buf [LINESIZE];
+			char cmd_buf[LINESIZE];
 			int msk;
 
-			ps_print (OPT,"Please wait whilst I initialise everything...\n");
-			msk = umask (0111);
-			(void) strcpy (cmd_buf, isodefile ("new_quipurc", 1));
-			if ((file = fopen (Dish_Home, "w")) == 0) 
+			ps_print(OPT, "Please wait whilst I initialise everything...\n");
+			msk = umask(0111);
+			(void) strcpy(cmd_buf, isodefile("new_quipurc", 1));
+			if ((file = fopen(Dish_Home, "w")) == 0)
 				return (OK);	/* cant make one */
-			(void) umask (msk);
-			(void) fclose (file);
-			if (system (cmd_buf) == 0) {
-				(void) chmod (Dish_Home,0600);
-				if ((file = fopen (Dish_Home, "r")) == 0) {
-					(void) fprintf (stderr,"Cant open %s - BUT I just created it!!!\n", Dish_Home);
+			(void) umask(msk);
+			(void) fclose(file);
+			if (system(cmd_buf) == 0) {
+				(void) chmod(Dish_Home, 0600);
+				if ((file = fopen(Dish_Home, "r")) == 0) {
+					(void) fprintf(stderr,
+						       "Cant open %s - BUT I just created it!!!\n",
+						       Dish_Home);
 					return (NOTOK);
 				}
 			} else {
-				(void) unlink (Dish_Home);
+				(void) unlink(Dish_Home);
 				return (NOTOK);
 			}
-			rc_mod_time = time ((time_t *)0);
+			rc_mod_time = time((time_t *) 0);
 		} else {
-			rc_mod_time = time ((time_t *)0);
+			rc_mod_time = time((time_t *) 0);
 			goto out;
 		}
-	} else 
+	} else
 		rc_mod_time = sbuf.st_mtime;
 
-	if ((file = fopen (Dish_Home, "r")) == 0) {
-no_dice: ;
-		(void) fprintf (stderr,"Cant open ");
-		perror (Dish_Home);
+	if ((file = fopen(Dish_Home, "r")) == 0) {
+	      no_dice:;
+		(void) fprintf(stderr, "Cant open ");
+		perror(Dish_Home);
 		return NOTOK;
 	}
 
-	while (fgets (Read_in_Stuff, BUFSIZ, file) != 0) {
-		p = SkipSpace (Read_in_Stuff);
-		if (( *p == '#') || (*p == '\0'))
-			continue;  /* ignore comments and blanks */
-			
-		part1 = p;
-		if ((part2 = index (p,':')) == NULLCP) {
-			ps_printf (OPT,"Seperator missing '%s'\n",p);
-			return (NOTOK);
-		} 
-		
-		*part2++ = '\0';
-		part2 = TidyString (part2);
+	while (fgets(Read_in_Stuff, BUFSIZ, file) != 0) {
+		p = SkipSpace(Read_in_Stuff);
+		if ((*p == '#') || (*p == '\0'))
+			continue;	/* ignore comments and blanks */
 
-		if (lexequ (part1, "username") == 0) {
-			if ((user_name = str2dn (*part2 != '@' ? part2
-						 	       : part2 + 1))
+		part1 = p;
+		if ((part2 = index(p, ':')) == NULLCP) {
+			ps_printf(OPT, "Seperator missing '%s'\n", p);
+			return (NOTOK);
+		}
+
+		*part2++ = '\0';
+		part2 = TidyString(part2);
+
+		if (lexequ(part1, "username") == 0) {
+			if ((user_name = str2dn(*part2 != '@' ? part2 : part2 + 1))
 			    == NULLDN) {
-				ps_printf (OPT,"Invalid DN for username: %s\n",part2);
+				ps_printf(OPT, "Invalid DN for username: %s\n", part2);
 				return (NOTOK);
 			}
-			(void) strcpy (username, part2);
+			(void) strcpy(username, part2);
 			bindarg.dba_dn = user_name;
-		}
-		else if (lexequ (part1, "password") == 0) {
-			(void) strcpy (bindarg.dba_passwd,part2);
-			(void) strcpy (password, part2);
-			bindarg.dba_passwd_len = strlen (part2);
-		} 
-		else if (lexequ (part1, "cache_time") == 0) 
-			cache_time = MIN (atoi(part2) * 60, 5 * 60 * 60);
-					/* enforce 5 hour maximum */
-		else if (lexequ (part1, "connect_time") == 0) 
-			connect_time = MIN (atoi(part2) * 60, 5 * 60);
-					/* enforce 5 minute maximum */
-		else if (lexequ (part1, "service") == 0) 
-			new_service (part2);
-		else if (lexequ (part1, "type") == 0) {
-			if (lexequ (part2,"unknown") == 0)
+		} else if (lexequ(part1, "password") == 0) {
+			(void) strcpy(bindarg.dba_passwd, part2);
+			(void) strcpy(password, part2);
+			bindarg.dba_passwd_len = strlen(part2);
+		} else if (lexequ(part1, "cache_time") == 0)
+			cache_time = MIN(atoi(part2) * 60, 5 * 60 * 60);
+		/* enforce 5 hour maximum */
+		else if (lexequ(part1, "connect_time") == 0)
+			connect_time = MIN(atoi(part2) * 60, 5 * 60);
+		/* enforce 5 minute maximum */
+		else if (lexequ(part1, "service") == 0)
+			new_service(part2);
+		else if (lexequ(part1, "type") == 0) {
+			if (lexequ(part2, "unknown") == 0)
 				show_unknown();
-		} else if (lexequ (part1, "notype") == 0)
-			new_ignore (part2);
-		else if (lexequ (part1, "sequence") == 0) {
+		} else if (lexequ(part1, "notype") == 0)
+			new_ignore(part2);
+		else if (lexequ(part1, "sequence") == 0) {
 			DN sdn;
-			if ( (sdn = str2dn (*part2 != '@' ? part2 : part2 + 1))
+
+			if ((sdn = str2dn(*part2 != '@' ? part2 : part2 + 1))
 			    == NULLDN) {
-                                ps_printf (OPT,"Invalid DN for sequence: %s\n",part2);
-                                return (NOTOK);
+				ps_printf(OPT, "Invalid DN for sequence: %s\n", part2);
+				return (NOTOK);
 			}
-			(void) add_sequence (sdn);
-		} else if (lexequ (part1, "dsap") == 0)
-			(void) tai_string (part2);
-		else if (lexequ (part1, "isode") == 0) {
-			char * split;
-			if ((split = index (part2,' ')) != NULLCP) {
+			(void) add_sequence(sdn);
+		} else if (lexequ(part1, "dsap") == 0)
+			(void) tai_string(part2);
+		else if (lexequ(part1, "isode") == 0) {
+			char *split;
+
+			if ((split = index(part2, ' ')) != NULLCP) {
 				*split++ = 0;
-				(void)isodesetvar (part2,strdup(split),0);
+				(void) isodesetvar(part2, strdup(split), 0);
 			}
-		} else if (set_cmd_default (part1,part2) != OK) {
+		} else if (set_cmd_default(part1, part2) != OK) {
 			if (*part2 == '@')
 				part2++;
-			if (add_alias (part1,part2) != OK) {
-				ps_printf (OPT,"Unknown parameter %s\n",part1);
+			if (add_alias(part1, part2) != OK) {
+				ps_printf(OPT, "Unknown parameter %s\n", part1);
 				return (NOTOK);
 			}
 		}
 	}
-	(void) fclose (file);
+	(void) fclose(file);
 
-out:;
-	if ((local_dit != NULLCP) && (strcmp ("@", TidyString(local_dit)) != 0))
-		if ((fixed_pos = str2dn (*local_dit != '@' ? local_dit
-					 		   : local_dit + 1))
+      out:;
+	if ((local_dit != NULLCP) && (strcmp("@", TidyString(local_dit)) != 0))
+		if ((fixed_pos = str2dn(*local_dit != '@' ? local_dit : local_dit + 1))
 		    == NULLDN) {
-			ps_printf (OPT,"Invalid DN for dsaptailor default position: %s\n",local_dit);
+			ps_printf(OPT, "Invalid DN for dsaptailor default position: %s\n",
+				  local_dit);
 			return (NOTOK);
 		}
 
-	(void) strcpy (bindarg.dba_passwd,password);
-	bindarg.dba_passwd_len = strlen (password);
+	(void) strcpy(bindarg.dba_passwd, password);
+	bindarg.dba_passwd_len = strlen(password);
 
-	isodexport (NULLCP);
-	
+	isodexport(NULLCP);
+
 	return (OK);
 }
 
-test_rc_file (ps)
-PS  ps;
+test_rc_file(ps)
+	PS ps;
 {
-	struct	 stat	sbuf;
+	struct stat sbuf;
 
-	if (stat (Dish_Home,&sbuf) != 0)
+	if (stat(Dish_Home, &sbuf) != 0)
 		return;
 
 	if (rc_mod_time < sbuf.st_mtime) {
-		ps_printf (ps,"WARNING: %s has changed - but not re-read!!!\n",
-			  Dish_Home);
+		ps_printf(ps, "WARNING: %s has changed - but not re-read!!!\n", Dish_Home);
 		rc_mod_time = sbuf.st_mtime;
 	}
 
 }
 
-SFD dish_quit (sig)
-int sig;
+SFD
+dish_quit(sig)
+	int sig;
 {
 	if (bound) {
-		(void) dap_unbind (main_dsa_id);
+		(void) dap_unbind(main_dsa_id);
 		if (referral_dsa != 0) {
-			(void) dap_unbind (referral_dsa);
+			(void) dap_unbind(referral_dsa);
 			referral_dsa = 0;
 		}
 	}
 
 	if (frompipe)
-		exit_pipe ();
+		exit_pipe();
 	else
-		(void) fprintf (stderr,"Dish Problem\n");
+		(void) fprintf(stderr, "Dish Problem\n");
 
 	hide_picture();
 
 	switch (sig) {
-		case SIGALRM:
-			LLOG (log_dsap, LLOG_EXCEPTIONS, ("Timer expired :- Dish quitting"));
-			exit (0);
-		case SIGHUP:
-		case SIGINT:
-		case SIGTERM:
-			LLOG (log_dsap, LLOG_EXCEPTIONS, ("Dish quitting - signal %d",sig));
-			exit (0);
-		default:
-			LLOG (log_dsap, LLOG_FATAL, ("Dish problem - signal %d",sig));
-			(void) signal (sig, SIG_DFL); /* to stop recursion */
-			abort ();
+	case SIGALRM:
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("Timer expired :- Dish quitting"));
+		exit(0);
+	case SIGHUP:
+	case SIGINT:
+	case SIGTERM:
+		LLOG(log_dsap, LLOG_EXCEPTIONS, ("Dish quitting - signal %d", sig));
+		exit(0);
+	default:
+		LLOG(log_dsap, LLOG_FATAL, ("Dish problem - signal %d", sig));
+		(void) signal(sig, SIG_DFL);	/* to stop recursion */
+		abort();
 	}
-			
+
 }
 
-static int protect_password()
+static int
+protect_password()
 {
-long hash;
-char *cp;
-int len;
+	long hash;
+	char *cp;
+	int len;
 
 	bindarg.dba_time1 = new_version();
 	bindarg.dba_time2 = NULLCP;
@@ -915,18 +958,18 @@ int len;
 	bindarg.dba_passwd_len = len;
 }
 
-
-static int sign_bindarg()
+static int
+sign_bindarg()
 {
-struct Nonce *nonce;
+	struct Nonce *nonce;
 
 	if (dsap_security == (struct SecurityServices *) 0)
 		return (NOTOK);
- 
-	if (! dsap_security->serv_mknonce)
+
+	if (!dsap_security->serv_mknonce)
 		return (NOTOK);
 
-	nonce = (dsap_security->serv_mknonce)((struct Nonce *) 0);
+	nonce = (dsap_security->serv_mknonce) ((struct Nonce *) 0);
 	if (nonce == (struct Nonce *) 0)
 		return (NOTOK);
 
@@ -940,8 +983,8 @@ struct Nonce *nonce;
 	bindarg.dba_alg.asn = nonce->non_alg.asn;
 	free((char *) nonce);
 	if (dsap_security->serv_sign)
-		bindarg.dba_sig = (dsap_security->serv_sign)((char*)&bindarg,
-			_ZTokenToSignDAS, &_ZDAS_mod);
+		bindarg.dba_sig = (dsap_security->serv_sign) ((char *) &bindarg,
+							      _ZTokenToSignDAS, &_ZDAS_mod);
 	else
 		return (NOTOK);
 
@@ -949,9 +992,9 @@ struct Nonce *nonce;
 		return (NOTOK);
 
 	if (dsap_security->serv_mkpath)
- 		bindarg.dba_cpath = (dsap_security->serv_mkpath)();
+		bindarg.dba_cpath = (dsap_security->serv_mkpath) ();
 	else
- 		bindarg.dba_cpath = (struct certificate_list *)0;
+		bindarg.dba_cpath = (struct certificate_list *) 0;
 
 	return (OK);
 }

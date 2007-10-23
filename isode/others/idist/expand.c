@@ -1,7 +1,65 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* expand.c -- various expanisions of shell type patterns */
 
 /*
- * $Header: /xtel/isode/isode/others/idist/RCS/expand.c,v 9.0 1992/06/16 14:38:53 isode Rel $
+ * Header: /xtel/isode/isode/others/idist/RCS/expand.c,v 9.0 1992/06/16 14:38:53 isode Rel
  *
  * Expansion primitives for wild card names. The tilde expansion stuff
  * has been moved out as both sides require that whilst only the
@@ -11,13 +69,12 @@
  * Nottingham University Computer Science
  *
  *
- * $Log: expand.c,v $
+ * Log: expand.c,v
  * Revision 9.0  1992/06/16  14:38:53  isode
  * Release 8.0
  *
  * 
  */
-
 
 /*
  * Copyright (c) 1983 Regents of the University of California.
@@ -40,7 +97,8 @@
 
 #ifndef lint
 static char sccsid[] = "@(#)expand.c    5.6 (Berkeley) 6/1/90";
-static char *rcsid = "$Header: /xtel/isode/isode/others/idist/RCS/expand.c,v 9.0 1992/06/16 14:38:53 isode Rel $";
+static char *rcsid =
+    "Header: /xtel/isode/isode/others/idist/RCS/expand.c,v 9.0 1992/06/16 14:38:53 isode Rel";
 #endif
 
 #include "defs.h"
@@ -49,23 +107,23 @@ static char *rcsid = "$Header: /xtel/isode/isode/others/idist/RCS/expand.c,v 9.0
 #define LC '{'
 #define RC '}'
 
-static char	shchars[] = "${[*?";
+static char shchars[] = "${[*?";
 
-int	which;		/* bit mask of types to expand */
-int	eargc;		/* expanded arg count */
-char	**eargv;	/* expanded arg vectors */
-char	*path;
-char	*pathp;
-char	*lastpathp;
-char	*tilde;		/* "~user" if not expanding tilde, else "" */
-char	*tpathp;
-int	nleft;
+int which;				/* bit mask of types to expand */
+int eargc;				/* expanded arg count */
+char **eargv;				/* expanded arg vectors */
+char *path;
+char *pathp;
+char *lastpathp;
+char *tilde;				/* "~user" if not expanding tilde, else "" */
+char *tpathp;
+int nleft;
 
-int	expany;		/* any expansions done? */
-char	*entp;
-char	**sortbase;
+int expany;				/* any expansions done? */
+char *entp;
+char **sortbase;
 
-int	argcmp();
+int argcmp();
 
 #define sort()	qsort((char *)sortbase, &eargv[eargc] - sortbase, \
 		      sizeof(*sortbase), (IFP)argcmp), sortbase = &eargv[eargc]
@@ -100,7 +158,7 @@ expand(list, wh)
 		for (nl = list; nl != NULL; nl = nl->n_next)
 			for (cp = nl->n_name; *cp; cp++)
 				*cp = *cp & TRIM;
-		return(list);
+		return (list);
 	}
 
 	which = wh;
@@ -112,17 +170,17 @@ expand(list, wh)
 	eargv = sortbase = argvbuf;
 	*eargv = 0;
 	nleft = NCARGS - 4;
-	/*
+	/* 
 	 * Walk the name list and expand names into eargv[];
 	 */
 	for (nl = list; nl != NULL; nl = nl->n_next)
 		expstr(nl->n_name);
-	/*
+	/* 
 	 * Take expanded list of names from eargv[] and build a new list.
 	 */
 	list = prev = NULL;
 	for (n = 0; n < eargc; n++) {
-		nl = makenl((char *)NULL);
+		nl = makenl((char *) NULL);
 		nl->n_name = eargv[n];
 		if (prev == NULL)
 			list = prev = nl;
@@ -135,7 +193,7 @@ expand(list, wh)
 		(void) printf("expanded list = ");
 		prnames(list);
 	}
-	return(list);
+	return (list);
 }
 
 expstr(s)
@@ -173,13 +231,12 @@ expstr(s)
 			savec = *tail;
 			*tail = '\0';
 		}
-		tp = lookup(cp, NULL, (struct namelist *)0);
+		tp = lookup(cp, NULL, (struct namelist *) 0);
 		if (savec != '\0')
 			*tail = savec;
 		if (tp != NULL) {
 			for (; tp != NULL; tp = tp->n_next) {
-				(void) sprintf(buf, "%s%s%s",
-					       s, tp->n_name, tail);
+				(void) sprintf(buf, "%s%s%s", s, tp->n_name, tail);
 				expstr(buf);
 			}
 			return;
@@ -205,18 +262,17 @@ expstr(s)
 				*cp1++ = *cp++;
 			while (*cp && *cp != '/');
 			*cp1 = '\0';
-			if (pw == NULL || strcmp(pw->pw_name, buf+1) != 0) {
-				if ((pw = getpwnam(buf+1)) == NULL) {
+			if (pw == NULL || strcmp(pw->pw_name, buf + 1) != 0) {
+				if ((pw = getpwnam(buf + 1)) == NULL) {
 					(void) strcat(buf, ": unknown user name");
-					yyerror(buf+1);
+					yyerror(buf + 1);
 					return;
 				}
 			}
 			cp1 = pw->pw_dir;
 			s = cp;
 		}
-		for (cp = path; *cp++ = *cp1++; )
-			;
+		for (cp = path; *cp++ = *cp1++;) ;
 		tpathp = pathp = cp - 1;
 	} else {
 		tpathp = pathp = path;
@@ -235,7 +291,7 @@ expstr(s)
 	expany = 0;
 	expsh(s);
 	if (eargc == oeargc)
-		Cat(s, "");		/* "nonomatch" is set */
+		Cat(s, "");	/* "nonomatch" is set */
 	sort();
 }
 
@@ -279,11 +335,11 @@ expsh(s)
 		cp++, pathp++;
 	*pathp = '\0';
 	if (*oldcp == '{') {
-		(void) execbrc(cp, (char *)NULL);
+		(void) execbrc(cp, (char *) NULL);
 		return;
 	}
 	matchdir(cp);
-endit:
+      endit:
 	pathp = spathp;
 	*pathp = '\0';
 }
@@ -320,9 +376,9 @@ matchdir(pattern)
 	(void) closedir(dirp);
 	return;
 
-patherr1:
+      patherr1:
 	(void) closedir(dirp);
-patherr2:
+      patherr2:
 	(void) strcat(path, ": ");
 	(void) strcat(path, sys_errlist[errno]);
 	yyerror(path);
@@ -358,13 +414,13 @@ execbrc(p, s)
 				yyerror("Missing ']'");
 			continue;
 		}
-pend:
+      pend:
 	if (brclev || !*pe) {
 		yyerror("Missing '}'");
 		return (0);
 	}
 	for (pl = pm = p; pm <= pe; pm++)
-		switch (*pm & (QUOTE|TRIM)) {
+		switch (*pm & (QUOTE | TRIM)) {
 
 		case '{':
 			brclev++;
@@ -380,7 +436,7 @@ pend:
 		case ',':
 			if (brclev)
 				continue;
-doit:
+		      doit:
 			savec = *pm;
 			*pm = 0;
 			(void) strcpy(lm, pl);
@@ -453,9 +509,8 @@ amatch(s, p)
 				if (cc == '-') {
 					if (lc <= scc && scc <= *p++)
 						ok++;
-				} else
-					if (scc == (lc = cc))
-						ok++;
+				} else if (scc == (lc = cc))
+					ok++;
 			}
 			if (cc == 0) {
 				yyerror("Missing ']'");
@@ -491,7 +546,7 @@ amatch(s, p)
 		case '/':
 			if (scc)
 				return (0);
-slash:
+		      slash:
 			s = entp;
 			spathp = pathp;
 			while (*s)
@@ -535,9 +590,8 @@ smatch(s, p)
 				if (cc == '-') {
 					if (lc <= scc && scc <= *p++)
 						ok++;
-				} else
-					if (scc == (lc = cc))
-						ok++;
+				} else if (scc == (lc = cc))
+					ok++;
 			}
 			if (cc == 0) {
 				yyerror("Missing ']'");
@@ -580,14 +634,12 @@ Cat(s1, s2)
 	if (nleft <= 0 || ++eargc >= GAVSIZ)
 		yyerror("Arguments too long");
 	eargv[eargc] = 0;
-	eargv[eargc - 1] = s = malloc((unsigned)len);
+	eargv[eargc - 1] = s = malloc((unsigned) len);
 	if (s == NULL)
-		adios (NULLCP, "ran out of memory");
-	while (*s++ = *s1++ & TRIM)
-		;
+		adios(NULLCP, "ran out of memory");
+	while (*s++ = *s1++ & TRIM) ;
 	s--;
-	while (*s++ = *s2++ & TRIM)
-		;
+	while (*s++ = *s2++ & TRIM) ;
 }
 
 addpath(c)
@@ -601,4 +653,3 @@ addpath(c)
 		*pathp = '\0';
 	}
 }
-
