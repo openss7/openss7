@@ -299,7 +299,7 @@ invoke(op, arg, mod, ind, rfx, efx)
 
 /*  */
 
-SFD cleanup();
+sighandler_t cleanup;
 
 void
 ros_adios(rop, event)
@@ -411,7 +411,7 @@ _advise(ap)
 {
 	char buffer[BUFSIZ];
 
-	asprintf(buffer, ap);
+	xsprintf(buffer, ap);
 
 	(void) fflush(stdout);
 

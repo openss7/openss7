@@ -112,12 +112,12 @@ int interrupted;
 
 int oneshot;
 
-SFP astat;
-SFP istat;
-SFP qstat;
+sighandler_t astat;
+sighandler_t istat;
+sighandler_t qstat;
 
-SFD alrmser();
-SFD intrser();
+sighandler_t alrmser;
+sighandler_t intrser;
 
 LLog _fred_log = {
 	"fred.log", NULLCP, NULLCP, LLOG_FATAL | LLOG_EXCEPTIONS | LLOG_NOTICE,
@@ -641,7 +641,7 @@ fetchline(s, n, iop)
 
 /* ARGSUSED */
 
-static SFD
+static RETSIGTYPE
 alrmser(sig)
 	int sig;
 {
@@ -656,7 +656,7 @@ alrmser(sig)
 
 /* ARGSUSED */
 
-static SFD
+static RETSIGTYPE
 intrser(sig)
 	int sig;
 {
@@ -908,7 +908,7 @@ _advise(ap)
 	char buffer[BUFSIZ];
 	FILE *fp = network ? stdfp : stderr;
 
-	asprintf(buffer, ap);
+	xsprintf(buffer, ap);
 
 	(void) fflush(stdfp);
 

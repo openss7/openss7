@@ -516,8 +516,7 @@ log(fp, fmt, a1, a2, a3)
 /*
  * Remove temporary files and do any cleanup operations before exiting.
  */
-SFD
-cleanup()
+RETSIGTYPE cleanup()
 {
 	(void) unlink(utmpfile);
 	exit(1);

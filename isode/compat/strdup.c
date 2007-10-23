@@ -90,8 +90,7 @@ static char *rcsid =
 #include "manifest.h"
 #include "tailor.h"
 
-/*  */
-#if (!defined(SVR4) || defined(BSD44) || defined(_AIX)) && !defined(LINUX)
+#if (!defined(SVR4) || defined(BSD44) || defined(_AIX)) && !defined(LINUX) && !defined(linux)
 		      /* strdup in AIX does not seem to use QUIPUs malloc! */
 
 char *
@@ -100,6 +99,7 @@ strdup(str)
 {
 	register char *ptr;
 
+	(void) rcsid;
 	if ((ptr = malloc((unsigned) (strlen(str) + 1))) == NULL) {
 		LLOG(compat_log, LLOG_FATAL, ("strdup malloc() failure"));
 		abort();
@@ -113,8 +113,11 @@ strdup(str)
 
 #else
 
+char *
 strdup_stub()
-{;
+{
+	(void) rcsid;
+	return (NULL);
 }
 
 #endif

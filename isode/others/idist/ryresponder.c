@@ -104,7 +104,7 @@ int ros_init(), ros_work(), ros_indication(), ros_lose();
 
 SFD cleanup();
 
-extern int errno;
+sighandler_t cleanup;
 
 /*    RESPONDER */
 
@@ -499,7 +499,7 @@ note(va_alist)
 
 	va_start(ap);
 
-	_asprintf(buffer, NULLCP, ap);
+	_xsprintf (buffer, NULLCP, ap);
 
 	addtoia5(buffer, strlen(buffer));
 
@@ -527,7 +527,7 @@ nadvise(va_alist)
 	(void) sprintf(buf, "%s (%s): ", myname, host);
 	cp = buf + strlen(buf);
 
-	asprintf(cp, ap);
+	xsprintf (cp, ap);
 
 	addtoia5(buf, strlen(buf));
 

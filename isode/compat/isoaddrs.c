@@ -87,24 +87,31 @@ static char *rcsid =
 
 #include <ctype.h>
 #include <stdio.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 #include "general.h"
 #include "manifest.h"
 #include "isoaddrs.h"
 #include "internet.h"
 #include "tailor.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
-/*    DATA */
+/* DATA */
 
-static int read_macros();
-static int read_file();
+static void read_macros();
+static void read_file();
 static int add_macro();
 static char *isomacros = "isomacros";
 
 #define	MBUCKETS	128
 #define	MHASH(nm) \
-    (((nm)[1]) ? (((chrcnv[((nm)[0])] - chrcnv[((nm)[1])]) & 0x1f) \
-		  	+ ((chrcnv[(nm)[2]]) & 0x5f)) \
-	       : (chrcnv[(nm)[0]]) & 0x7f)
+    (((nm)[1]) ? (((chrcnv[(int)((nm)[0])] - chrcnv[(int)((nm)[1])]) & 0x1f) \
+		  	+ ((chrcnv[(int)(nm)[2]]) & 0x5f)) \
+	       : (chrcnv[(int)(nm)[0]]) & 0x7f)
 
 #ifdef ULTRIX_X25_DEMSA
 
@@ -178,7 +185,7 @@ struct macro {
 static int inited = 0;
 static struct macro *Mbuckets[MBUCKETS];
 
-/*    MACROS */
+/* MACROS */
 
 static struct macro *
 name2macro(name)
@@ -188,7 +195,7 @@ name2macro(name)
 
 	read_macros();
 
-	for (m = Mbuckets[MHASH(name)]; m && lexequ(m->m_name, name); m = m->m_chain)
+	for (m = Mbuckets[(int) MHASH(name)]; m && lexequ(m->m_name, name); m = m->m_chain)
 		continue;
 
 	if (m)
@@ -198,8 +205,6 @@ name2macro(name)
 
 	return m;
 }
-
-/*  */
 
 static struct macro *
 value2macro(value)
@@ -228,9 +233,7 @@ value2macro(value)
 	return p;
 }
 
-/*  */
-
-static int
+static void
 read_macros()
 {
 	register char *hp;
@@ -250,9 +253,7 @@ read_macros()
 	read_file(buffer);
 }
 
-/*  */
-
-static int
+static void
 read_file(file)
 	char *file;
 {
@@ -266,8 +267,8 @@ read_file(file)
 	while (fgets(buffer, sizeof buffer, fp)) {
 		if (*buffer == '#')
 			continue;
-		if (cp = index(buffer, '\n'))
-			*cp = NULL;
+		if ((cp = index(buffer, '\n')))
+			*cp = '\0';
 		if (str2vec(buffer, vec) < 2)
 			continue;
 
@@ -278,8 +279,6 @@ read_file(file)
 	(void) fclose(fp);
 }
 
-/*  */
-
 static int
 add_macro(name, value)
 	char *name, *value;
@@ -289,8 +288,8 @@ add_macro(name, value)
 	char buffer[BUFSIZ];
 	register struct macro *m, *p;
 
-	if (cp = index(value, '=')) {
-		*cp++ = NULL;
+	if ((cp = index(value, '='))) {
+		*cp++ = '\0';
 		if ((p = name2macro(value)) == NULL) {
 			SLOG(addr_log, LLOG_EXCEPTIONS, NULLCP,
 			     ("macro \"%s\" references non-existant macro \"%s\"", name, value));
@@ -322,8 +321,6 @@ add_macro(name, value)
 	return OK;
 }
 
-/*  */
-
 char *
 macro2str(name)
 	char *name;
@@ -333,7 +330,7 @@ macro2str(name)
 	return (m ? m->m_value : NULLCP);
 }
 
-/*    STR2PADDR */
+/* STR2PADDR */
 
 #define	PS_INIT	0		/* <selector> or <network-address> */
 #define	PS_SEL1	1		/* .. got one selector already */
@@ -345,13 +342,16 @@ static struct afi_info {
 	char *p_dec0, *p_hex0, *p_dec1, *p_hex1, *p_ia5;
 	int p_idi_len, p_dec_dsp_len, p_hex_dsp_len;
 } afi_entries[] = {
-"X121", "36", "37", "52", "53", NULL, 14, 24, 9,
-	    "DCC", "38", "39", NULL, NULL, NULL, 3, 35, 14,
-	    "TELEX", "40", "41", "54", "55", NULL, 8, 30, 12,
-	    "PSTN", "42", "43", "56", "57", NULL, 12, 26, 10,
-	    "ISDN", "44", "45", "58", "59", NULL, 15, 23, 9,
-	    "ICD", "46", "47", NULL, NULL, NULL, 4, 34, 13,
-	    "LOCAL", "48", "49", NULL, NULL, "50", 0, 38, 19, NULL};
+	{
+	"X121", "36", "37", "52", "53", NULL, 14, 24, 9}, {
+	"DCC", "38", "39", NULL, NULL, NULL, 3, 35, 14}, {
+	"TELEX", "40", "41", "54", "55", NULL, 8, 30, 12}, {
+	"PSTN", "42", "43", "56", "57", NULL, 12, 26, 10}, {
+	"ISDN", "44", "45", "58", "59", NULL, 15, 23, 9}, {
+	"ICD", "46", "47", NULL, NULL, NULL, 4, 34, 13}, {
+	"LOCAL", "48", "49", NULL, NULL, "50", 0, 38, 19}, {
+NULL}};
+
 #define p_ia5_dsp_len(pp) \
 	(pp -> p_ia5 == NULL ? NOTOK : (pp -> p_dec_dsp_len >> 1))
 
@@ -369,7 +369,7 @@ static char *sels[3] = {
     register char *zp = y + z; \
  \
     while (zp-- > y) \
-	if (!isxdigit ((u_char) *zp)) { \
+	if (!isxdigit ((unsigned char) *zp)) { \
 loslab: ; \
 	    SLOG (addr_log, LLOG_EXCEPTIONS, NULLCP, \
 		  ("invalid hexstring: \"%*.*s\"", \
@@ -378,10 +378,8 @@ loslab: ; \
 	} \
     if (z % 2) \
 	goto loslab; \
-    (intres) = implode ((u_char *) (octres), y, z); \
+    (intres) = implode ((unsigned char *) (octres), y, z); \
 }
-
-/*  */
 
 struct PSAPaddr *
 str2paddr(str)
@@ -425,14 +423,14 @@ str2paddr(str)
 					     ("missing double-quote in selector: %s", str));
 					return NULLPA;
 				}
-				*cp++ = NULL;
+				*cp++ = '\0';
 				(void) strcpy(*sp, dp);
 				*lp = strlen(dp);
 				break;
 
 			case '#':	/* '#' <digitstring> */
 				j = 0;
-				for (cp++; isdigit((u_char) *cp); cp++)
+				for (cp++; isdigit((unsigned char) *cp); cp++)
 					j = j * 10 + *cp - '0';
 				if (j > 0xffff) {
 					SLOG(addr_log, LLOG_EXCEPTIONS, NULLCP,
@@ -445,13 +443,13 @@ str2paddr(str)
 				break;
 
 			case '\'':	/* "'" <hexstring> "'H" */
-				if ((cp = index(dp = cp + 1, '\'')) == NULL) {
+				if ((cp = index(dp = cp + 1, '\'')) == '\0') {
 				      missing_quoteH:;
 					SLOG(addr_log, LLOG_EXCEPTIONS, NULLCP,
 					     ("missing 'H in selector: %s", str));
 					return NULLPA;
 				}
-				*cp++ = NULL;
+				*cp++ = '\0';
 				if (*cp++ != 'H')
 					goto missing_quoteH;
 				IMPLODE(*lp, *sp, dp, strlen(dp), NULLPA, L1);
@@ -479,14 +477,14 @@ str2paddr(str)
 			/* and fall */
 
 		case PS_SEL3:
-			if ((cp = index(ep = cp, '|')) == NULL)
+			if ((cp = index(ep = cp, '|')) == '\0')
 				cp = ep + strlen(ep);
 			else
-				*cp++ = NULL;
+				*cp++ = '\0';
 
-			if (dp = index(ep, '=')) {
-				*dp++ = NULL;
-				if ((m = name2macro(ep)) == NULL) {
+			if ((dp = index(ep, '='))) {
+				*dp++ = '\0';
+				if ((m = name2macro(ep)) == '\0') {
 					SLOG(addr_log, LLOG_EXCEPTIONS, NULLCP,
 					     ("non-existant macro \"%s\"", ep));
 					return NULLPA;
@@ -498,7 +496,7 @@ str2paddr(str)
 				register int k, l, n;
 				register struct ts_interim *ts, *tp;
 
-				tp = NULL, n = 0;
+				tp = '\0', n = 0;
 				k = strlen(ep);
 				for (ts = ts_interim; ts->ts_name; ts++)
 					if (ts->ts_value
@@ -525,13 +523,13 @@ str2paddr(str)
 				}
 			}
 
-			if ((ep = index(dp = ep, '+')) == NULL) {
+			if ((ep = index(dp = ep, '+')) == '\0') {
 			      missing_seperator:;
 				SLOG(addr_log, LLOG_EXCEPTIONS, NULLCP,
 				     ("missing network-address seperator: %s", str));
 				return NULLPA;
 			}
-			*ep++ = NULL;
+			*ep++ = '\0';
 			if (ta->ta_naddr >= NTADDR) {
 #ifdef	h_addr
 			      too_many:;
@@ -559,21 +557,21 @@ str2paddr(str)
 					     ("unknown AFI \"%s\": %s", dp, str));
 					return NULLPA;
 				}
-				if ((ep = index(dp = ep, '+')) == NULL)
+				if ((ep = index(dp = ep, '+')) == '\0')
 					ep = dp + strlen(dp);
 				else
-					*ep++ = NULL;
+					*ep++ = '\0';
 				for (fp = dp; *fp; fp++)
-					if (!isdigit((u_char) *fp))
+					if (!isdigit((unsigned char) *fp))
 						break;
 				if (*fp) {
 					SLOG(addr_log, LLOG_EXCEPTIONS, NULLCP,
 					     ("invalid IDI \"%s\": %s", dp, cp));
 					return NULLPA;
 				}
-				if (lexequ(pp->p_name, "X121") == 0 && *ep == NULL) {
+				if (lexequ(pp->p_name, "X121") == 0 && *ep == '\0') {
 					/* X121 form -- should be more general Only applies if the
-					   DSP is NULL */
+					   DSP is '\0' */
 					(void) strcpy(nsap, dp);
 					if ((na->na_dtelen = strlen(nsap)) > NSAP_DTELEN) {
 						dp = nsap;
@@ -587,7 +585,7 @@ str2paddr(str)
 				switch (*ep) {
 				case 'd':
 				case 0:
-					if (*dp == '0' && pp->p_dec1 != NULL)
+					if (*dp == '0' && pp->p_dec1 != '\0')
 						fp = pp->p_dec1, padchar = '1';
 					else
 						fp = pp->p_dec0, padchar = '0';
@@ -597,12 +595,12 @@ str2paddr(str)
 						*fp++ = padchar;
 					(void) strcpy(fp, dp);
 					fp += strlen(fp);
-					if (*ep != NULL)
+					if (*ep != '\0')
 						(void) strcpy(fp, ep + 1);
 					goto handle_dsp;
 
 				case 'x':
-					if (*dp == '0' && pp->p_hex1 != NULL)
+					if (*dp == '0' && pp->p_hex1 != '\0')
 						fp = pp->p_hex1, padchar = '1';
 					else
 						fp = pp->p_hex0, padchar = '0';
@@ -615,7 +613,7 @@ str2paddr(str)
 					goto handle_dsp;
 
 				case 'l':
-					if (pp->p_ia5 == NULL) {
+					if (pp->p_ia5 == '\0') {
 						SLOG(addr_log, LLOG_EXCEPTIONS, NULLCP,
 						     ("No IA5 syntax for AFI \"%s\"", pp->p_name));
 						return NULLPA;
@@ -643,7 +641,7 @@ str2paddr(str)
 					break;
 
 				default:
-					if (*dp == '0' && pp->p_dec1 != NULL)
+					if (*dp == '0' && pp->p_dec1 != '\0')
 						fp = pp->p_dec1, padchar = '1';
 					else
 						fp = pp->p_dec0, padchar = '0';
@@ -660,15 +658,15 @@ str2paddr(str)
 
 						na->na_stack = NA_TCP;
 						ep += sizeof "RFC-1006+" - 1;
-						if ((ep = index(dp = ep, '+')) == NULL)
+						if ((ep = index(dp = ep, '+')) == '\0')
 							goto missing_seperator;
-						*ep++ = NULL;
-						if ((ep = index(dp = ep, '+')) == NULL)
+						*ep++ = '\0';
+						if ((ep = index(dp = ep, '+')) == '\0')
 							ep = dp + strlen(dp);
 						else
-							*ep++ = NULL;
+							*ep++ = '\0';
 
-						if ((hp = gethostbystring(dp)) == NULL) {
+						if ((hp = gethostbystring(dp)) == '\0') {
 							SLOG(addr_log, LLOG_EXCEPTIONS, NULLCP,
 							     ("%s: unknown host", dp));
 							return NULLPA;
@@ -677,11 +675,11 @@ str2paddr(str)
 							      inet_ntoa(*(struct in_addr *)
 									hp->h_addr));
 						if (*ep) {
-							if ((ep = index(dp = ep, '+')) == NULL)
+							if ((ep = index(dp = ep, '+')) == '\0')
 								ep = dp + strlen(dp);
 							else
-								*ep++ = NULL;
-							na->na_port = htons((u_short) atoi(dp));
+								*ep++ = '\0';
+							na->na_port = htons((unsigned short) atoi(dp));
 
 							if (*ep)
 								na->na_tset = atoi(ep);
@@ -704,13 +702,13 @@ str2paddr(str)
 					if (strncmp("X.25(80)+", ep, sizeof "X.25(80)+" - 1) == 0) {
 						na->na_stack = NA_X25;
 						ep += sizeof "X.25(80)+" - 1;
-						if ((ep = index(dp = ep, '+')) == NULL)
+						if ((ep = index(dp = ep, '+')) == '\0')
 							goto missing_seperator;
-						*ep++ = NULL;
-						if ((ep = index(dp = ep, '+')) == NULL)
+						*ep++ = '\0';
+						if ((ep = index(dp = ep, '+')) == '\0')
 							ep = dp + strlen(dp);
 						else
-							*ep++ = NULL;
+							*ep++ = '\0';
 #ifdef ULTRIX_X25_DEMSA
 						n_colon = 0;
 						if (dec_x25_demsa_invalid_dte(dp, &n_colon)) {
@@ -724,7 +722,7 @@ str2paddr(str)
 							goto invalid_dte;
 #else
 						for (np = dp; *np; np++)
-							if (!isdigit((u_char) *np)) {
+							if (!isdigit((unsigned char) *np)) {
 							      invalid_dte:;
 								SLOG(addr_log, LLOG_EXCEPTIONS,
 								     NULLCP,
@@ -740,9 +738,9 @@ str2paddr(str)
 						if (*ep) {
 							char *cudf, *clen;
 
-							if ((ep = index(dp = ep, '+')) == NULL)
+							if ((ep = index(dp = ep, '+')) == '\0')
 								goto missing_seperator;
-							*ep++ = NULL;
+							*ep++ = '\0';
 
 							if (lexequ(dp, "CUDF") == 0) {
 								cudf = na->na_cudf;
@@ -788,7 +786,7 @@ str2paddr(str)
 				register int n = 0;
 				register struct ts_interim *ts, *tp;
 
-				tp = NULL;
+				tp = '\0';
 				for (ts = ts_interim; ts->ts_name; ts++)
 					if (ts->ts_length > n &&
 					    bcmp(na->na_address, ts->ts_prefix, ts->ts_length) == 0)
@@ -823,8 +821,6 @@ str2paddr(str)
 	return pa;
 }
 
-/*  */
-
 int
 macro2comm(name, ts)
 	char *name;
@@ -845,7 +841,7 @@ macro2comm(name, ts)
 	if ((ep = index(dp = buffer, '+')) == NULL)
 		ep = dp + strlen(dp);
 	else
-		*ep++ = NULL;
+		*ep++ = '\0';
 
 	if (lexequ(dp, "NS") == 0) {
 		IMPLODE(ts->ts_length, ts->ts_prefix, ep, strlen(ep), NOTOK, L5);
@@ -871,17 +867,17 @@ macro2comm(name, ts)
 	if ((ep = index(dp = ep, '+')) == NULL)
 		ep = dp + strlen(dp);
 	else
-		*ep++ = NULL;
+		*ep++ = '\0';
 
 	for (fp = dp; *fp; fp++)
-		if (!isdigit((u_char) *fp))
+		if (!isdigit((unsigned char) *fp))
 			break;
 	if (*fp) {
 		SLOG(addr_log, LLOG_EXCEPTIONS, NULLCP, ("invalid IDI \"%s\": %s", dp, cp));
 		return NOTOK;
 	}
 
-	if (lexequ(pp->p_name, "X121") == 0 && *ep == NULL) {
+	if (lexequ(pp->p_name, "X121") == 0 && *ep == '\0') {
 		/* Only used if there is no DSP */
 		(void) strcpy(ap, dp);
 		ap += strlen(ap);
@@ -904,7 +900,7 @@ macro2comm(name, ts)
 			*ap++ = padchar;
 		(void) strcpy(ap, dp);
 		ap += strlen(ap);
-		if (*ep != NULL)
+		if (*ep != '\0')
 			(void) strcpy(ap, ep + 1);
 		break;
 
@@ -945,7 +941,7 @@ macro2comm(name, ts)
 		if ((ep = index(dp = ep, '+')) == NULL)
 			ep = dp + strlen(dp);
 		else
-			*ep++ = NULL;
+			*ep++ = '\0';
 		if (lexequ(dp, "RFC-1006") == 0)
 			ts->ts_syntax = NA_TCP;
 		else if (lexequ(dp, "X.25(80)") == 0)
@@ -957,7 +953,7 @@ macro2comm(name, ts)
 		if ((ep = index(dp = ep, '+')) == NULL)
 			ep = dp + strlen(dp);
 		else
-			*ep++ = NULL;
+			*ep++ = '\0';
 
 		(void) strcpy(ap, dp);
 
@@ -997,7 +993,7 @@ macro2comm(name, ts)
 	return OK;
 }
 
-/*    PADDR2STR */
+/* PADDR2STR */
 
 static char *
 SEL2STR(sel, len)
@@ -1020,10 +1016,10 @@ SEL2STR(sel, len)
 			break;
 
 		default:
-			if (!isalnum((u_char) *dp)) {
+			if (!isalnum((unsigned char) *dp)) {
 				cp = buffer;
 				*cp++ = '\'';
-				cp += explode(cp, (u_char *) sel, len);
+				cp += explode(cp, (unsigned char *) sel, len);
 				(void) strcpy(cp, "'H");
 				return buffer;
 			}
@@ -1033,12 +1029,10 @@ SEL2STR(sel, len)
 		*cp++ = *dp;
 	}
 	*cp++ = '"';
-	*cp = NULL;
+	*cp = '\0';
 
 	return buffer;
 }
-
-/*  */
 
 char *
 _paddr2str(pa, na, compact)
@@ -1113,8 +1107,8 @@ _paddr2str(pa, na, compact)
 			(void) strcpy(cp, "NS+");
 			cp += strlen(cp);
 
-			cp += explode(cp, (u_char *) ca->na_address, ca->na_addrlen);
-			*cp = NULL;
+			cp += explode(cp, (unsigned char *) ca->na_address, ca->na_addrlen);
+			*cp = '\0';
 			continue;
 		}
 
@@ -1135,7 +1129,7 @@ _paddr2str(pa, na, compact)
 		(void) strcpy(dp = cp, ts->ts_value);
 		cp += strlen(cp) - 1;
 		if (*cp != '+')
-			*++cp = '+', *++cp = NULL;
+			*++cp = '+', *++cp = '\0';
 		else
 			cp++;
 
@@ -1146,8 +1140,8 @@ _paddr2str(pa, na, compact)
 			(void) strcpy(cp = dp, "NS+");
 			cp += strlen(cp);
 
-			cp += explode(cp, (u_char *) na->na_address, na->na_addrlen);
-			*cp = NULL;
+			cp += explode(cp, (unsigned char *) na->na_address, na->na_addrlen);
+			*cp = '\0';
 
 			/* Use afi_info to pretty print as AFI+IDI+DSP */
 			for (cp = dp + 3, a = afi_entries; a->p_name; a++) {
@@ -1171,7 +1165,7 @@ _paddr2str(pa, na, compact)
 				dsp = cp + a->p_idi_len;	/* find DSP */
 				while (cp < dsp && *cp == pad)
 					cp++;	/* skip pad chars */
-				(void) sprintf(buf, "%s+%.*s", a->p_name, dsp - cp, cp);
+				(void) sprintf(buf, "%s+%.*s", a->p_name, (int) (dsp - cp), cp);
 
 				/* 
 				 * If we have an odd number of characters in IDI &
@@ -1219,16 +1213,16 @@ _paddr2str(pa, na, compact)
 					(void) strcpy(cp, "+PID+");
 					cp += strlen(cp);
 
-					cp += explode(cp, (u_char *) na->na_pid,
+					cp += explode(cp, (unsigned char *) na->na_pid,
 						      (int) na->na_pidlen);
 				} else if (na->na_cudflen > 0) {
 					(void) strcpy(cp, "+CUDF+");
 					cp += strlen(cp);
 
-					cp += explode(cp, (u_char *) na->na_cudf,
+					cp += explode(cp, (unsigned char *) na->na_cudf,
 						      (int) na->na_cudflen);
 				}
-				*cp = NULL;
+				*cp = '\0';
 			}
 			break;
 
@@ -1248,12 +1242,10 @@ _paddr2str(pa, na, compact)
 			cp = dp + strlen(dp);
 		}
 	}
-	*cp = NULL;
+	*cp = '\0';
 
 	return bp;
 }
-
-/*  */
 
 #ifdef DEBUG
 free_macros()
@@ -1274,3 +1266,9 @@ free_macros()
 		}
 }
 #endif
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
+}

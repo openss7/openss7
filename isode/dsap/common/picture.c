@@ -115,7 +115,7 @@ show_picture(picture, picture_process, len)
 	static char *buffer = NULLCP;
 	char *cp;
 	char *argv[NVEC];
-	SFP pstat;
+	sighandler_t pstat;
 	ChildList *cl;
 
 	if (buffer == NULLCP)

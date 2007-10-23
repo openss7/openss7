@@ -131,6 +131,8 @@ audio_print(ps, qb, format)
 	union wait status;
 #endif
 
+sighandler_t	pstat;
+
 	SFP pstat;
 
 	if (format != READOUT) {

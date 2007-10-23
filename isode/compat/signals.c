@@ -85,20 +85,20 @@ static char *rcsid =
 
 /* LINTLIBRARY */
 
+#include <sys/types.h>
+#include <unistd.h>
 #include <signal.h>
 #ifndef	BADSIG
-#define	BADSIG	((SFP) -1)
+#define	BADSIG	((void *) -1)
 #endif
 #include "manifest.h"
 
-/*  */
-
 int _iosignals_set = 0;
 
-/*    Berkeley UNIX: 4.2 */
+/* Berkeley UNIX: 4.2 */
 
-#ifndef	XOS_2
-#ifdef	BSDSIGS
+#if !defined XOS_2
+#if defined BSDSIGS
 
 /* Simply including <signal.h> is sufficient for everything but AIX */
 
@@ -114,20 +114,20 @@ signal(sig, func)
 	sv1.sv_mask = sv1.sv_onstack = 0;
 	return (sigvec(sig, &sv1, &sv2) != NOTOK ? sv2.sv_handler : BADSIG);
 }
-#endif
+#endif				/* AIX */
 
-#else
+#else				/* defined BSDSIGS */
 
-/*    AT&T UNIX: 5 */
+/* AT&T UNIX: 5 */
 
 /* Probably a race condition or two in this code */
 
 static int blocked = 0;
 static int pending = 0;
 
-static SFP handler[NSIG];
+static void *handler[NSIG];
 
-static SFD
+static RETSIGTYPE
 sigser(sig)
 	int sig;
 {
@@ -136,8 +136,7 @@ sigser(sig)
 	pending |= sigmask(sig);
 }
 
-/*  */
-#ifndef SVR4_UCB
+#if !defined SVR4_UCB
 
 int
 sigblock(mask)
@@ -146,6 +145,7 @@ sigblock(mask)
 	register int sig, smask;
 	long omask = blocked;
 
+	(void) rcsid;
 	if (mask == 0)
 		return blocked;
 
@@ -176,8 +176,7 @@ sigsetmask(mask)
 			blocked |= smask;
 		} else if (smask & blocked) {
 			blocked &= ~smask;
-			(void) signal(sig, handler[sig] != BADSIG ? handler[sig]
-				      : SIG_DFL);
+			(void) signal(sig, handler[sig] != BADSIG ? handler[sig] : SIG_DFL);
 			if (smask & pending) {
 				pending &= ~smask;
 				(void) kill(getpid(), sig);
@@ -187,6 +186,12 @@ sigsetmask(mask)
 	return omask;
 }
 
-#endif
-#endif
-#endif
+#endif				/* !defined SVR4_UCB */
+#endif				/* defined BSDSIGS */
+#endif				/* !defined XOS_2 */
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
+}

@@ -85,13 +85,20 @@ static char *rcsid =
 
 /* LINTLIBRARY */
 
+#include <sys/types.h>
 #include <ctype.h>
+#include <stdint.h>
 #include <stdio.h>
 #include "general.h"
 #include "manifest.h"
 #include "isoaddrs.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
-/*    Presentation Address to String */
+/* Presentation Address to String */
+
+int norm2na(char *p, int len, struct NSAPaddr *na);
 
 char *
 pa2str(px)
@@ -127,8 +134,8 @@ pa2str(px)
 			ta->ta_naddr = 1;
 			goto bridge;
 		}
-		for (ep = (dp = ta->ta_selector) + ta->ta_selectlen, *ep = NULL; dp < ep; dp++)
-			if (!isprint((u_char) *dp) && *dp != ' ')
+		for (ep = (dp = ta->ta_selector) + ta->ta_selectlen, *ep = '\0'; dp < ep; dp++)
+			if (!isprint((unsigned char) *dp) && *dp != ' ')
 				break;
 		if (dp >= ep && (tz = str2taddr(ta->ta_selector))) {
 			pa->pa_addr.sa_addr = *tz;	/* struct copy */
@@ -145,4 +152,10 @@ pa2str(px)
 	(void) strcpy(bp, paddr2str(pa, NULLNA));
 
 	return buffer;
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

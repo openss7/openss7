@@ -1871,7 +1871,7 @@ snmp_diag(va_alist)
 
 	what = va_arg(ap, char *);
 
-	_asprintf(buffer, what, ap);
+	_xsprintf (buffer, what, ap);
 
 	va_end(ap);
 

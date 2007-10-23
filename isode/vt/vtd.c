@@ -184,13 +184,13 @@ char peerhost[BUFSIZ];
 struct PSAPaddr ts_bound;
 struct passwd *pwd;
 
-int pty, net;
-int inter;
-extern char **environ;
-extern int errno;
-char line[] = "/dev/ptyp0";
-char *envinit[] = { "TERM=network", 0 };
-SFD cleanup();
+int	pty, net;
+int	inter;
+extern	char **environ;
+extern	int errno;
+char	line[] = "/dev/ptyp0";
+char	*envinit[] = { "TERM=network", 0 };
+sighandler_t	cleanup;
 static int do_cleaning = 0;
 
 char *myname;
@@ -695,8 +695,7 @@ netflush()
 		nbackp = nfrontp = netobuf;
 }
 
-SFD
-cleanup()
+RETSIGTYPE	cleanup()
 {
 	sleep(1);
 	while (getch() > 0) ;	/* Clean out unread VT-DATA PDU's still held in network.  Kludge to 

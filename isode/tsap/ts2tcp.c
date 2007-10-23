@@ -58,11 +58,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* ts2tcp.c - TPM: TCP interface */
 
-#ifndef	lint
-static char *rcsid =
-    "Header: /xtel/isode/isode/tsap/RCS/ts2tcp.c,v 9.0 1992/06/16 12:40:39 isode Rel";
-#endif
-
 /* 
  * Header: /xtel/isode/isode/tsap/RCS/ts2tcp.c,v 9.0 1992/06/16 12:40:39 isode Rel
  *
@@ -90,6 +85,9 @@ static char *rcsid =
 #include <stdio.h>
 #include "tpkt.h"
 #include "tailor.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
 
 #ifdef	TCP
 #include "internet.h"
@@ -103,7 +101,7 @@ static char *rcsid =
 
 #define	MAX1006		2048	/* could be as high as TPKT_MAXLEN */
 
-/*    DATA */
+/* DATA */
 
 #if	defined(FIONBIO) || defined(O_NDELAY)
 #define	NODELAY
@@ -121,7 +119,9 @@ extern t_list_of_conn_desc list_of_conn_desc[our_TABLE_SIZE];
 
 extern int errno;
 
-/*    N-CONNECT.REQUEST */
+/* N-CONNECT.REQUEST */
+
+int TTService(struct tsapblk *tb);
 
 int
 tcpopen(tb, local, remote, td, async)
@@ -243,12 +243,10 @@ tcpopen(tb, local, remote, td, async)
 #endif
 #endif
 
-	tb->tb_retryfnx = NULLIFP;	/* No need... */
+	tb->tb_retryfnx = NULL;	/* No need... */
 
 	return DONE;
 }
-
-/*  */
 
 #ifndef	NODELAY
 /* ARGSUSED */
@@ -314,7 +312,7 @@ tcpretry(tb, td)
 #endif
 }
 
-/*    init for read from network */
+/* init for read from network */
 
 static int
 tcpinit(fd, t)
@@ -343,8 +341,6 @@ tcpinit(fd, t)
 	return OK;
 }
 
-/*  */
-
 /* ARGSUSED */
 
 char *
@@ -359,8 +355,6 @@ tcpsave(fd, cp1, cp2, td)
 
 	return buffer;
 }
-
-/*  */
 
 int
 tcprestore(tb, buffer, td)
@@ -399,8 +393,8 @@ tcprestore(tb, buffer, td)
 	list_of_conn_desc[fd].descriptor = fd;
 #endif
 
-	if (cp = index(domain1, '+')) {
-		*cp++ = NULL;
+	if ((cp = index(domain1, '+'))) {
+		*cp++ = '\0';
 		na->na_port = htons((u_short) atoi(cp));
 	}
 	(void) strncpy(na->na_domain, domain1, sizeof na->na_domain);
@@ -414,16 +408,14 @@ tcprestore(tb, buffer, td)
 	na->na_stack = NA_TCP;
 	na->na_community = ts_comm_tcp_default;
 
-	if (cp = index(domain2, '+')) {
-		*cp++ = NULL;
+	if ((cp = index(domain2, '+'))) {
+		*cp++ = '\0';
 		na->na_port = htons((u_short) atoi(cp));
 	}
 	(void) strncpy(na->na_domain, domain2, sizeof na->na_domain);
 
 	return OK;
 }
-
-/*  */
 
 int
 TTService(tb)
@@ -439,11 +431,12 @@ TTService(tb)
 	tb->tb_retryfnx = tcpretry;
 
 	tb->tb_initfnx = tcpinit;
-	tb->tb_readfnx = read_tcp_socket;
+	tb->tb_readfnx = (void *)read_tcp_socket;
 	tb->tb_writefnx = tp0write;
 	tb->tb_closefnx = close_tcp_socket;
 	tb->tb_selectfnx = select_tcp_socket;
 
 	tp0init(tb);
+	return (0);
 }
 #endif

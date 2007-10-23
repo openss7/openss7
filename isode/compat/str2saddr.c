@@ -90,16 +90,20 @@ static char *rcsid =
 #include "manifest.h"
 #include "isoaddrs.h"
 
-/*  */
-
 struct SSAPaddr *
 str2saddr(str)
 	char *str;
 {
 	register struct PSAPaddr *pa;
 
-	if (pa = str2paddr(str))
+	if ((pa = str2paddr(str)))
 		return (&pa->pa_addr);
 
 	return NULLSA;
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

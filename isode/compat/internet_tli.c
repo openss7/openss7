@@ -98,8 +98,6 @@ static char *rcsid =
 #include "manifest.h"
 #include "tailor.h"
 
-/*  */
-
 #ifdef	TCP
 #include "internet.h"
 
@@ -192,7 +190,7 @@ start_tcp_client(sock, priv)
 		bcopy((char *) sock, bind->addr.buf, bind->addr.len = sizeof(*sock));
 
 		for (port = IPPORT_RESERVED - priv;; priv ? port-- : port++) {
-			((struct sockaddr_in *) bind->addr.buf)->sin_port = htons((u_short) port);
+			((struct sockaddr_in *) bind->addr.buf)->sin_port = htons((unsigned short) port);
 
 			if (t_bind(sd, bind, bound) == OK) {
 
@@ -244,8 +242,6 @@ start_tcp_client(sock, priv)
 
 	return sd;
 }
-
-/*  */
 
 int
 start_tcp_server(sock, backlog, opt1, opt2)
@@ -328,8 +324,6 @@ start_tcp_server(sock, backlog, opt1, opt2)
 	return sd;
 }
 
-/*  */
-
 int
 join_tcp_client(fd, sock)
 	int fd;
@@ -380,8 +374,6 @@ join_tcp_client(fd, sock)
 	t_snddis(fd, call);
 	goto out;
 }
-
-/*  */
 
 int
 join_tcp_server(fd, sock)
@@ -437,7 +429,6 @@ join_tcp_server(fd, sock)
 	return OK;
 }
 
-/*  */
 int
 read_tcp_socket(fd, buffer, len)
 	int fd;
@@ -474,3 +465,9 @@ close_tcp_socket(fd)
 #endif				/* TLI_TCP */
 
 #endif				/* TCP */
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
+}

@@ -56,6 +56,14 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
+#ifndef HAVE_CLOSEDIR
+
+#ifdef HAVE_CONFIG
+#include <config.h>
+#endif
+
+#undef closedir
+
 /*
 	closedir -- close a directory stream
 
@@ -79,7 +87,7 @@ extern int errno;
 #endif
 
 int
-closedir(dirp)
+rpl_closedir(dirp)
 	register DIR *dirp;		/* stream from opendir() */
 {
 	register int fd;
@@ -97,6 +105,8 @@ closedir(dirp)
 #else
 int
 _closedir_stub()
-{;
+{
+	return (0);
 }
 #endif
+#endif				/* HAVE_CLOSEDIR */

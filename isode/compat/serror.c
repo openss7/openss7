@@ -89,12 +89,11 @@ static char *rcsid =
 #include "general.h"
 #include "manifest.h"
 
-/*    DATA */
+/* DATA */
 
+#ifndef HAVE_STRERROR
 extern int sys_nerr;
 extern char *sys_errlist[];
-
-/*  */
 
 char *
 sys_errname(i)
@@ -102,9 +101,20 @@ sys_errname(i)
 {
 	static char buffer[30];
 
+	(void) rcsid;
 	if (0 < i && i < sys_nerr)
 		return sys_errlist[i];
 	(void) sprintf(buffer, "Error %d", i);
 
 	return buffer;
 }
+#else				/* HAVE_STRERROR */
+#include <errno.h>
+#include <string.h>
+char *
+sys_errname(int i)
+{
+	(void) rcsid;
+	return strerror(i);
+}
+#endif				/* HAVE_STRERROR */

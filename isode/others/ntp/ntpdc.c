@@ -81,7 +81,7 @@ extern int errno;
 int debug;
 int s;
 int timedout;
-SFD timeout();
+sighandler_t timeout;
 int nflag, vflag;
 
 struct sockaddr_in isock = { AF_INET };
@@ -272,8 +272,7 @@ query(host)
 	return 1;
 }
 
-SFD
-timeout()
+RETSIGTYPE timeout()
 {
 	timedout = 1;
 }

@@ -90,8 +90,6 @@ static char *rcsid =
 #include "manifest.h"
 #include "isoaddrs.h"
 
-/*  */
-
 char *
 saddr2str(sa)
 	register struct SSAPaddr *sa;
@@ -105,4 +103,10 @@ saddr2str(sa)
 	pa->pa_addr = *sa;	/* struct copy */
 
 	return paddr2str(pa, NULLNA);
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

@@ -88,6 +88,9 @@ static char *rcsid =
 #include <stdio.h>
 #include "general.h"
 #include "manifest.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 char *crypt();
 
@@ -142,5 +145,6 @@ chkpassword(usrname, pwpass, usrpass)
 	/* 
 	 * use passwd file password
 	 */
+	(void) rcsid;
 	return (strcmp(crypt(usrpass, pwpass), pwpass) == 0);
 }

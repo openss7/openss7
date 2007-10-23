@@ -85,11 +85,19 @@ static char *rcsid =
 
 /* LINTLIBRARY */
 
+#include <unistd.h>
 #include <signal.h>
 #include <stdio.h>
 #include "general.h"
 #include "manifest.h"
 #include "sys.file.h"
+#ifdef linux
+#include <termios.h>
+#include <sys/ttydefaults.h>
+#endif
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 #ifdef	BSD44
 char *getpass();
@@ -108,15 +116,16 @@ getpassword(prompt)
 	int flags, isopen;
 	register char *bp, *ep;
 
-#if	!defined(SYS5) && !defined(XOS_2) && !defined(LINUX)
+#if	!defined(SYS5) && !defined(XOS_2) && !defined(LINUX) && !defined(linux)
 	struct sgttyb sg;
 #else
 	struct termio sg;
 #endif
-	SFP istat;
+	void *istat;
 	FILE *fp;
 	static char buffer[BUFSIZ];
 
+	(void) rcsid;
 #ifdef SUNLINK_7_0
 	fp = stdin, isopen = 0;	/* will help greatly to work off a script */
 #else
@@ -132,7 +141,7 @@ getpassword(prompt)
 
 	istat = signal(SIGINT, SIG_IGN);
 
-#if	!defined(SYS5) && !defined(XOS_2) && !defined(LINUX)
+#if	!defined(SYS5) && !defined(XOS_2) && !defined(LINUX) && !defined(linux)
 	(void) gtty(fileno(fp), &sg);
 	flags = sg.sg_flags;
 	sg.sg_flags &= ~ECHO;
@@ -161,7 +170,7 @@ getpassword(prompt)
 			break;
 		else if (bp < ep)
 			*bp++ = c;
-	*bp = NULL;
+	*bp = '\0';
 
 #ifdef SUNLINK_7_0
 	(void) fprintf(stdout, "\n");
@@ -171,7 +180,7 @@ getpassword(prompt)
 	(void) fflush(stderr);
 #endif
 
-#if	!defined(SYS5) && !defined(XOS_2) && !defined(LINUX)
+#if	!defined(SYS5) && !defined(XOS_2) && !defined(LINUX) && !defined(linux)
 	sg.sg_flags = flags;
 	(void) stty(fileno(fp), &sg);
 #else
@@ -188,4 +197,10 @@ getpassword(prompt)
 #else
 	return getpass(prompt);
 #endif
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

@@ -58,11 +58,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* tsapstate.c - TPM: hack state */
 
-#ifndef	lint
-static char *rcsid =
-    "Header: /xtel/isode/isode/tsap/RCS/tsapstate.c,v 9.0 1992/06/16 12:40:39 isode Rel";
-#endif
-
 /* 
  * Header: /xtel/isode/isode/tsap/RCS/tsapstate.c,v 9.0 1992/06/16 12:40:39 isode Rel
  *
@@ -88,6 +83,9 @@ static char *rcsid =
 #include <stdio.h>
 #include <signal.h>
 #include "tpkt.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
 
 /*  */
 
@@ -113,7 +111,7 @@ TSaveState(sd, vec, td)
 		return tsaplose(td, DR_WAITING, NULLCP, NULLCP);
 	}
 
-	buffer[explode(buffer, (u_char *) tb, sizeof *tb)] = NULL;
+	buffer[explode(buffer, (u_char *) tb, sizeof *tb)] = '\0';
 	*vec++ = buffer;
 	*vec = NULL;
 
@@ -127,6 +125,8 @@ TSaveState(sd, vec, td)
 }
 
 /*  */
+
+int TTService(struct tsapblk *tb);
 
 int
 TRestoreState(buffer, ts, td)

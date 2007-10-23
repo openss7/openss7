@@ -56,6 +56,14 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
+#ifndef HAVE_SEEKDIR
+
+#ifdef HAVE_CONFIG
+#include <config.h>
+#endif
+
+#undef seekdir
+
 /*
 	seekdir -- reposition a directory stream
 
@@ -91,7 +99,7 @@ typedef int bool;			/* Boolean data type */
 #define	true	1
 
 void
-seekdir(dirp, loc)
+rpl_seekdir(dirp, loc)
 	register DIR *dirp;		/* stream from opendir() */
 	register off_t loc;		/* position from telldir() */
 {
@@ -128,12 +136,8 @@ seekdir(dirp, loc)
 		     || readdir(dirp) != NULL	/* next buffer read */
 		     && (dirp->dd_loc = 0, true)	/* beginning of buffer set */
 		    )
-		    && (dp = (struct dirent *) &dirp->dd_buf[dirp->dd_loc])->d_off <= loc	/* match 
-												   possible 
-												   in 
-												   this 
-												   buffer 
-												 */
+		    && (dp = (struct dirent *) &dirp->dd_buf[dirp->dd_loc])->d_off <= loc
+		    /* match possible in this buffer */
 		    ) {
 			for ( /* dp initialized above */ ;
 			     (char *) dp < &dirp->dd_buf[dirp->dd_size];
@@ -146,9 +150,8 @@ seekdir(dirp, loc)
 
 			rewind = false;	/* no point in backing up later */
 			dirp->dd_loc = dirp->dd_size;	/* set end of buffer */
-		} else /* whole buffer past matching entry */ if (!rewind) {	/* no point in
-										   searching
-										   further */
+		} else /* whole buffer past matching entry */ if (!rewind) {
+			/* no point in searching further */
 			errno = EINVAL;
 			return;	/* no entry at specified loc */
 		} else {	/* rewind directory and start over */
@@ -171,3 +174,4 @@ _seekdir_stub()
 {;
 }
 #endif
+#endif				/* HAVE_SEEKDIR */

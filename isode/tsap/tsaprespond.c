@@ -58,11 +58,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* tsaprespond.c - TPM: responder */
 
-#ifndef	lint
-static char *rcsid =
-    "Header: /xtel/isode/isode/tsap/RCS/tsaprespond.c,v 9.0 1992/06/16 12:40:39 isode Rel";
-#endif
-
 /* 
  * Header: /xtel/isode/isode/tsap/RCS/tsaprespond.c,v 9.0 1992/06/16 12:40:39 isode Rel
  *
@@ -88,6 +83,12 @@ static char *rcsid =
 #include <stdio.h>
 #include "tpkt.h"
 #include "tailor.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
+#ifdef HAVE_STRINGS_H
+#include <strings.h>
+#endif
 
 #ifdef X25
 #include "x25.h"

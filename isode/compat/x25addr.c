@@ -110,8 +110,6 @@ static char *rcsid =
 extern char *aix_x25_linkname;
 #endif
 
-/*  */
-
 /*
  * convert from the generic X25 structure to interface specific
  */
@@ -475,8 +473,6 @@ gen2if(generic, specific, context)
 
 	return (specific);
 }
-
-/*  */
 
 /*
  * convert from interface specific format to generic X.25 structure
@@ -1548,8 +1544,6 @@ elucidate_x25_err(flags, pkt)
 	return OK;
 };
 
-/*  */
-
 #if defined(SUN_X25) || defined(CCUR_X25)
 #ifdef AEF_NSAP
 int
@@ -1563,13 +1557,12 @@ nsap2if(nsap, aef)
 	if (nsap->na_stack != NA_NSAP)
 		return NOTOK;
 	aef->aef_type = AEF_NSAP;
-	len = explode(buf, (u_char *) nsap->na_address, nsap->na_addrlen);
+	len = explode(buf, (unsigned char *) nsap->na_address, nsap->na_addrlen);
 	aef->aef_len = char2bcd(buf, len, aef->aef);
 	return OK;
 }
 #endif
 
-/*  */
 #ifdef AEF_NSAP
 int
 if2nsap(aef, nsap)
@@ -1584,7 +1577,7 @@ if2nsap(aef, nsap)
 
 	nsap->na_stack = NA_NSAP;
 	len = bcd2char(aef->aef, buf, (int) aef->aef_len);
-	nsap->na_addrlen = implode((u_char *) nsap->na_address, buf, len);
+	nsap->na_addrlen = implode((unsigned char *) nsap->na_address, buf, len);
 	return OK;
 }
 #endif
@@ -1593,5 +1586,12 @@ if2nsap(aef, nsap)
 int
 _x25addr_stub()
 {
+	return (0);
 }
 #endif
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
+}

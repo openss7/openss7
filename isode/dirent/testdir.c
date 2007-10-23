@@ -65,10 +65,17 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include	<sys/types.h>
 #include	<stdio.h>
 #include	"usr.dirent.h"
+#ifdef HAVE_UNISTD_H
+#include	<unistd.h>
+#endif
+#ifdef HAVE_STDLIB_H
+#include	<stdlib.h>
+#endif
+#ifdef HAVE_STRING_H
+#include	<string.h>
+#endif
 
-extern void exit();
-extern int strcmp();
-
+int
 main(argc, argv)
 	int argc;
 	register char **argv;
@@ -83,9 +90,9 @@ main(argc, argv)
 	}
 
 	if (argc == 1) {
-		while (dp = readdir(dirp))
+		while ((dp = readdir(dirp)))
 			(void) printf("ino=%d len=%d name=\"%s\"\n",
-				      dp->d_ino, strlen(dp->d_name), dp->d_name);
+				      (int)dp->d_ino, (int)strlen(dp->d_name), dp->d_name);
 		(void) closedir(dirp);
 		exit(0);
 	}

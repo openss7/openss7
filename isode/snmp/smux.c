@@ -587,7 +587,7 @@ smuxlose(va_alist)
 
 	smux_errno = va_arg(ap, int);
 
-	asprintf(smux_info, ap);
+	xsprintf (smux_info, ap);
 
 	va_end(ap);
 

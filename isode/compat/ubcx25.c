@@ -94,7 +94,7 @@ static char *rcsid =
 #include "tailor.h"
 #include "tpkt.h"
 
-/*    4.[23] UNIX: UBC X25 */
+/* 4.[23] UNIX: UBC X25 */
 
 #ifdef  X25
 #ifdef  UBC_X25
@@ -104,8 +104,6 @@ static char *rcsid =
 
 #define         X25_MBIT        0x40
 #define         X25_QBIT        0x80
-
-/*  */
 
 int
 start_x25_client(local)
@@ -128,8 +126,6 @@ start_x25_client(local)
 
 	return sd;
 }
-
-/*  */
 
 int
 start_x25_server(local, backlog, opt1, opt2)
@@ -174,7 +170,6 @@ start_x25_server(local, backlog, opt1, opt2)
 		(void) close_x25_socket(sd);
 		return NOTOK;
 	}
-
 #ifdef	notyet			/* not sure if these are supported... */
 #ifndef	BSD43
 	if (opt1)
@@ -194,8 +189,6 @@ start_x25_server(local, backlog, opt1, opt2)
 
 	return sd;
 }
-
-/*  */
 
 int
 join_x25_client(fd, remote)
@@ -233,7 +226,7 @@ read_x25_socket(fd, buffer, len)
 	int fd, len;
 	char *buffer;
 {
-	static u_char mode;
+	static unsigned char mode;
 	static struct iovec iov[2] = {
 		(char *) &mode, 1,
 		"", 0
@@ -290,7 +283,7 @@ write_x25_socket(fd, buffer, len)
 	int fd, len;
 	char *buffer;
 {
-	static u_char mode;
+	static unsigned char mode;
 	static struct iovec iov[2] = {
 		(char *) &mode, 1,
 		"", 0
@@ -365,11 +358,19 @@ write_x25_socket(fd, buffer, len)
 int
 _ubcx25_stub2()
 {
+	return (0);
 }
 #endif				/* UBC_X25 */
 #else				/* X25 */
 int
 _ubcx25_stub()
 {
+	return (0);
 }
 #endif				/* X25 */
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
+}

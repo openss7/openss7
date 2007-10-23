@@ -88,8 +88,6 @@ static char *rcsid =
 #include "manifest.h"
 #include "cmd_srch.h"
 
-/*  */
-
 char *
 rcmd_srch(val, cmd)
 	register int val;
@@ -99,4 +97,10 @@ rcmd_srch(val, cmd)
 		if (val == cmd->cmd_value)
 			return (cmd->cmd_key);
 	return (NULLCP);
+}
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
 }

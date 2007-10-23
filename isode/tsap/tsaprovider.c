@@ -58,11 +58,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* tsaprovider.c - implement the transport service */
 
-#ifndef	lint
-static char *rcsid =
-    "Header: /xtel/isode/isode/tsap/RCS/tsaprovider.c,v 9.0 1992/06/16 12:40:39 isode Rel";
-#endif
-
 /* 
  * Header: /xtel/isode/isode/tsap/RCS/tsaprovider.c,v 9.0 1992/06/16 12:40:39 isode Rel
  *
@@ -85,6 +80,12 @@ static char *rcsid =
 
 /* LINTLIBRARY */
 
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 #include <stdio.h>
 #include <signal.h>
 #include "tpkt.h"
@@ -93,6 +94,9 @@ static char *rcsid =
 #include "tailor.h"
 #include "sys.file.h"
 #include <sys/stat.h>
+#ifdef HAVE_SEARCH_H
+#include <search.h>
+#endif
 
 #define	selmask(fd,m,n) \
 { \
@@ -124,7 +128,7 @@ TDataRequest(sd, data, cc, td)
 	struct TSAPdisconnect *td;
 {
 	SBV smask, imask;
-	SFP istat;
+	sighandler_t istat;
 	int result;
 	struct udvec uvs[2];
 	register struct udvec *uv = uvs;
@@ -167,7 +171,7 @@ TExpdRequest(sd, data, cc, td)
 	struct TSAPdisconnect *td;
 {
 	SBV smask, imask;
-	SFP istat;
+	sighandler_t istat;
 	int result;
 	struct udvec uvs[2];
 	register struct udvec *uv = uvs;
@@ -214,7 +218,7 @@ TWriteRequest(sd, uv, td)
 {
 	register int n;
 	SBV smask, imask;
-	SFP istat;
+	sighandler_t istat;
 	int result;
 	register struct tsapblk *tb;
 	register struct udvec *vv;
@@ -256,7 +260,7 @@ TReadRequest(sd, tx, secs, td)
 	register struct TSAPdisconnect *td;
 {
 	SBV smask, imask;
-	SFP istat;
+	sighandler_t istat;
 	int nfds, oob, result;
 	fd_set ifds, efds, mask;
 	register struct tsapblk *tb;
@@ -280,7 +284,7 @@ TReadRequest(sd, tx, secs, td)
 	for (;;) {
 		ifds = efds = mask;	/* struct copy */
 
-		if (tb->tb_checkfnx == NULLIFP || (*tb->tb_checkfnx) (tb) != OK)
+		if (tb->tb_checkfnx == NULL || (*tb->tb_checkfnx) (tb) != OK)
 			switch ((*tb->tb_selectfnx) (nfds, &ifds, NULLFD, &efds, secs)) {
 			case NOTOK:	/* let read function find error... */
 				ifds = mask;
@@ -349,12 +353,14 @@ TDiscRequest(sd, data, cc, td)
 
 /*    set asynchronous event indications */
 
-static SFD DATAser();
+static RETSIGTYPE DATAser();
+
+extern int _iosignals_set;
 
 int
 TSetIndications(sd, data, disc, td)
 	int sd;
-	IFP data, disc;
+	int (*data) (), (*disc)();
 	struct TSAPdisconnect *td;
 {
 	SBV smask;
@@ -371,7 +377,6 @@ TSetIndications(sd, data, disc, td)
 
 	tsapPsig(tb, sd);
 
-	if (tb->tb_DataIndication = data) {
 		tb->tb_flags |= TB_ASYN;
 		xselect_blocking_on_intr = 1;
 	} else {
@@ -385,7 +390,11 @@ TSetIndications(sd, data, disc, td)
 	/* Kick the signal handling routine once to make it hand up the indications that were
 	   queued in the kernel when TSetIndications was called. TBD: We could be more efficient by 
 	   only doing this for only one file descriptor. */
+#if defined SVR4 || defined LINUX
+	(void) DATAser(0);
+#else
 	(void) DATAser(0, 0L, ((struct sigcontext *) NULL));
+#endif
 
 	(void) sigiomask(smask);
 
@@ -428,16 +437,16 @@ TSelectMask(sd, mask, nfds, td)
 
 /*    NSAP interface: N-DATA.INDICATION */
 
-#ifdef SVR4
+#if defined SVR4 || defined LINUX
 
-static SFD
+static RETSIGTYPE
 DATAser(sig)
 	int sig;
 
 #else
 
 /* ARGSUSED */
-static SFD
+static RETSIGTYPE
 DATAser(sig, code, sc)
 	int sig;
 	long code;
@@ -451,7 +460,7 @@ DATAser(sig, code, sc)
 #ifndef	BSDSIGS
 	SBV smask;
 #endif
-	IFP disc;
+	int (*disc) ();
 	register struct tsapblk *tb, *tb2;
 	struct TSAPdata txs;
 	register struct TSAPdata *tx = &txs;
@@ -685,6 +694,7 @@ newtblk()
 	return tb;
 }
 
+int
 freetblk(tb)
 	register struct tsapblk *tb;
 {
@@ -695,7 +705,7 @@ freetblk(tb)
 #endif
 
 	if (tb == NULL)
-		return;
+		return (0);
 
 	smask = sigioblock();
 
@@ -743,6 +753,7 @@ freetblk(tb)
 #endif
 
 	(void) sigiomask(smask);
+	return (0);
 }
 
 /*  */
@@ -778,6 +789,7 @@ copyTSAPaddrX(in, out)
 		out->ta_addrs[0] = in->ta_addr;	/* struct copy */
 		out->ta_naddr = 1;
 	}
+	return (0);
 }
 
 int
@@ -789,6 +801,7 @@ copyTSAPaddrY(in, out)
 
 	bcopy(in->ta_selector, out->ta_selector, out->ta_selectlen = in->ta_selectlen);
 
-	if (out->ta_present = (in->ta_naddr >= 1) ? 1 : 0)
+	if ((out->ta_present = (in->ta_naddr >= 1) ? 1 : 0))
 		out->ta_addr = in->ta_addrs[0];	/* struct copy */
+	return (0);
 }

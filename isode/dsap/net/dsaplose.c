@@ -149,7 +149,7 @@ _dsaplose(di, reason, ap)		/* what, fmt, args ... */
 		da = &(di->di_abort);
 		da->da_reason = reason;
 
-		asprintf(bp = buffer, ap);
+		xsprintf(bp = buffer, ap);
 		bp += strlen(bp);
 
 		copyDSAPdata(buffer, bp - buffer, da);
@@ -215,7 +215,7 @@ _dsapreject(di, reason, id, ap)		/* what, fmt, args ... */
 		dp->dp_id = id;
 		dp->dp_reason = reason;
 
-		asprintf(bp = buffer, ap);
+		xsprintf(bp = buffer, ap);
 		bp += strlen(bp);
 
 		copyDSAPdata(buffer, bp - buffer, dp);

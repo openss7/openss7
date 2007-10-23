@@ -92,7 +92,7 @@ static char *rcsid =
 /*  */
 
 static int interrupted;
-static SFD intrser();
+static sighandler_t	intrser;
 
 /*    RO-INVOKE.REQUEST (interruptable) */
 
@@ -140,9 +140,8 @@ RoIntrRequest(sd, op, args, invokeID, linkedID, priority, roi)
 
 /* ARGSUSED */
 
-static SFD
-intrser(sig)
-	int sig;
+static  REGSIGTYPE intrser (sig)
+int	sig;
 {
 #ifndef	BSDSIGS
 	(void) signal(SIGINT, intrser);

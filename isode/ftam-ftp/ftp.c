@@ -273,8 +273,8 @@ _command(ap)
 		return (NOTOK);
 	}
 
-	_asprintf(buffer, NULLCP, ap);
-	fprintf(cout, "%s\r\n", buffer);
+	_xsprintf (buffer, NULLCP, ap);
+	fprintf (cout, "%s\r\n", buffer);
 	(void) fflush(cout);
 	if (verbose)
 		advise(LLOG_DEBUG, NULLCP, "<--- %s", buffer);

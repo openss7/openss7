@@ -214,7 +214,7 @@ void adios(), advise();
 static void ts_advise();
 
 #ifdef SYS5
-static SFD cldser();
+static  sighandler_t cldser;
 #endif
 
 #ifdef	NOGOSIP
@@ -1569,9 +1569,8 @@ str2dnY(str, dn)
 /* ARGSUSED */
 #endif
 
-static SFD
-hupser(sig)
-	int sig;
+static RETSIGTYPE  hupser (sig)
+int	sig;
 {
 #ifndef	BSD42
 	(void) signal(sig, hupser);
@@ -1582,9 +1581,8 @@ hupser(sig)
 #endif
 
 #ifdef SYS5
-static SFD
-cldser(sig)
-	int sig;
+static RETSIGTYPE  cldser (sig)
+int   sig;
 {
 	int status;
 	int pid;

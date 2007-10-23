@@ -126,3 +126,9 @@ char					/* character conversion table */
 	'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
 	'X', 'Y', 'Z', '{', '|', '}', '~', '\177'
 };
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
+}

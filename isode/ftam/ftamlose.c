@@ -201,6 +201,31 @@ ftamoops(va_alist)
 	return result;
 }
 
+
+static int  _ftamoops (fti, reason, fatal, observer, source, ap)
+register struct FTAMindication *fti;
+int	reason,
+	fatal,
+	observer,
+	source;
+va_list	ap;
+{
+    register char  *bp;
+    char    buffer[BUFSIZ];
+    register struct FTAMabort  *fta;
+    register struct FTAMdiagnostic *ftd;
+
+    if (fti) {
+	bzero ((char *) fti, sizeof *fti);
+	fti -> fti_type = FTI_ABORT;
+	fta = &fti -> fti_abort;
+
+	xsprintf (bp = buffer, ap);
+	bp += strlen (bp);
+
+	fta -> fta_peer = 0;
+	fta -> fta_action = fatal ? FACTION_PERM : FACTION_TRANS;
+
 static int
 _ftamoops(fti, reason, fatal, observer, source, ap)
 	register struct FTAMindication *fti;

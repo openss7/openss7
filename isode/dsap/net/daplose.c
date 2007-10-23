@@ -149,7 +149,7 @@ _daplose(di, reason, ap)		/* what, fmt, args ... */
 		da = &(di->di_abort);
 		da->da_reason = reason;
 
-		asprintf(bp = buffer, ap);
+		xsprintf(bp = buffer, ap);
 		bp += strlen(bp);
 
 		copyDAPdata(buffer, bp - buffer, da);
@@ -215,10 +215,11 @@ _dapreject(di, reason, id, ap)		/* what, fmt, args ... */
 		dp->dp_id = id;
 		dp->dp_reason = reason;
 
-		asprintf(bp = buffer, ap);
+		<<<<<<<.merge_file_GRjJwv asprintf(bp = buffer, ap);
 		bp += strlen(bp);
-
-		copyDAPdata(buffer, bp - buffer, dp);
+		== == == = xsprintf(bp = buffer, ap);
+		bp += strlen(bp);
+		>>>>>>>.merge_file_aMhU7s copyDAPdata(buffer, bp - buffer, dp);
 	}
 
 	return (NOTOK);

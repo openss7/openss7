@@ -58,11 +58,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* tsaplose.c - TPM: you lose */
 
-#ifndef	lint
-static char *rcsid =
-    "Header: /xtel/isode/isode/tsap/RCS/tsaplose.c,v 9.0 1992/06/16 12:40:39 isode Rel";
-#endif
-
 /* 
  * Header: /xtel/isode/isode/tsap/RCS/tsaplose.c,v 9.0 1992/06/16 12:40:39 isode Rel
  *
@@ -86,21 +81,27 @@ static char *rcsid =
 /* LINTLIBRARY */
 
 #include <stdio.h>
+#ifdef HAVE_VARARGS_H
 #include <varargs.h>
+#else
+#include <stdarg.h>
+#endif
 #include "tpkt.h"
 #include "mpkt.h"
 #include "tailor.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
 
 #ifdef	LPP
 #undef	MGMT
 #endif
 
-/*  */
-
 #ifndef	lint
 static int _tsaplose();
 #endif
 
+#ifdef HAVE_VARARGS_H
 #ifndef	lint
 int
 tpktlose(va_alist)
@@ -179,9 +180,66 @@ tpktlose(tb, td, reason, what, fmt)
 	return tpktlose(tb, td, reason, what, fmt);
 }
 #endif
+#else				/* HAVE_VARARGS_H */
+int
+tpktlose(struct tsapblk *tb, struct TSAPdisconnect *td, int reason, const char *what,
+	 const char *fmt, ...)
+{
+	int result;
+	struct TSAPdisconnect tds;
+	va_list ap;
 
-/*  */
+	va_start(ap, fmt);
 
+	if (td == NULL)
+		td = &tds;
+
+	result = _tsaplose(td, reason, what, fmt, ap);
+
+	va_end(ap);
+
+	if (td->td_cc > 0) {
+		SLOG(tsap_log, LLOG_EXCEPTIONS, NULLCP,
+		     ("tpktlose [%s] %*.*s", TErrString(td->td_reason), td->td_cc,
+		      td->td_cc, td->td_data));
+	} else
+		SLOG(tsap_log, LLOG_EXCEPTIONS, NULLCP,
+		     ("tpktlose [%s]", TErrString(td->td_reason)));
+
+#ifdef  MGMT
+	if (tb->tb_manfnx)
+		switch (reason) {
+		case DR_REMOTE:
+		case DR_CONGEST:
+			(*tb->tb_manfnx) (CONGEST, tb);
+			break;
+
+		case DR_PROTOCOL:
+		case DR_MISMATCH:
+			(*tb->tb_manfnx) (PROTERR, tb);
+			break;
+
+		case DR_SESSION:
+		case DR_ADDRESS:
+		case DR_CONNECT:
+		case DR_DUPLICATE:
+		case DR_OVERFLOW:
+		case DR_REFUSED:
+			(*tb->tb_manfnx) (CONFIGBAD, tb);
+			break;
+
+		default:
+			(*tb->tb_manfnx) (OPREQINBAD, tb);
+		}
+#endif
+
+	(*tb->tb_losePfnx) (tb, reason, td);
+
+	return result;
+}
+#endif				/* HAVE_VARARGS_H */
+
+#ifdef HAVE_VARARGS_H
 #ifndef	lint
 int
 tsaplose(va_alist)
@@ -216,8 +274,6 @@ tsaplose(td, reason, what, fmt)
 }
 #endif
 
-/*  */
-
 #ifndef	lint
 static int
 _tsaplose(td, reason, ap)		/* what, fmt, args ... */
@@ -231,7 +287,7 @@ _tsaplose(td, reason, ap)		/* what, fmt, args ... */
 	if (td) {
 		bzero((char *) td, sizeof *td);
 
-		asprintf(bp = buffer, ap);
+		xsprintf(bp = buffer, ap);
 		bp += strlen(bp);
 
 		td->td_reason = reason;
@@ -241,3 +297,34 @@ _tsaplose(td, reason, ap)		/* what, fmt, args ... */
 	return NOTOK;
 }
 #endif
+#else				/* HAVE_VARARGS_H */
+static int
+_tsaplose(struct TSAPdisconnect *td, int reason, const char *what, const char *fmt, va_list ap)
+{
+	register char *bp;
+	char buffer[BUFSIZ];
+
+	if (td) {
+		bzero((char *) td, sizeof *td);
+
+		xsprintf((bp = buffer), what, fmt, ap);
+		bp += strlen(bp);
+
+		td->td_reason = reason;
+		copyTSAPdata(buffer, bp - buffer, td);
+	}
+	return NOTOK;
+}
+
+int
+tsaplose(struct TSAPdisconnect *td, int reason, const char *what, const char *fmt, ...)
+{
+	va_list ap;
+	int result;
+
+	va_start(ap, fmt);
+	result = _tsaplose(td, reason, what, fmt, ap);
+	va_end(ap);
+	return (result);
+}
+#endif				/* HAVE_VARARGS_H */

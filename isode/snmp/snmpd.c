@@ -197,7 +197,7 @@ static char source[BUFSIZ];
 #ifdef	DEBUG
 static int didhup = OK;
 
-SFD hupser();
+sighandler_t hupser;
 #endif
 
 void adios(), advise();
@@ -2897,7 +2897,7 @@ envinit()
 /*  */
 
 #ifdef	DEBUG
-static SFD
+static RETSIGTYPE
 hupser(sig)
 	int sig;
 {

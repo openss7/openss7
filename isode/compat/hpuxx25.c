@@ -94,7 +94,7 @@ static char *rcsid =
 #include "manifest.h"
 #include "tailor.h"
 
-/*    HP UNIX: X25/9000 */
+/* HP UNIX: X25/9000 */
 
 #ifdef  X25
 
@@ -121,8 +121,6 @@ static void clear_sigurg();
 void print_x25_facilities();
 #endif
 
-/*  */
-
 /* ARGSUSED */
 
 int
@@ -145,8 +143,6 @@ start_x25_client(local, priv)
 
 	return sd;
 }
-
-/*  */
 
 int
 start_x25_server(local, backlog, opt1, opt2)
@@ -235,8 +231,6 @@ start_x25_server(local, backlog, opt1, opt2)
 	return sd;
 }
 
-/*  */
-
 int
 join_x25_server(fd, remote)
 	register int fd;
@@ -273,8 +267,6 @@ join_x25_server(fd, remote)
 	return nfd;
 }
 
-/*  */
-
 int
 join_x25_client(fd, remote)
 	int fd;
@@ -303,8 +295,6 @@ join_x25_client(fd, remote)
 
 	return nfd;
 }
-
-/*  */
 
 int
 fac_ccitt2hp(ccitt, hp)
@@ -556,8 +546,6 @@ set_x25_facilities(sd, coc, caption)
 	return OK;
 }
 
-/*  */
-
 int
 log_cause_and_diag(fd)
 	int fd;
@@ -682,8 +670,6 @@ close_x25_socket(fd)
 	return (close(fd));
 };
 
-/*  */
-
 #ifdef  DEBUG
 
 static int
@@ -705,8 +691,6 @@ log_x25_facilities(fd, coc, caption)
 
 	return OK;
 }
-
-/*  */
 
 static void
 print_x25_facilities(hp, coc, caption)
@@ -958,12 +942,20 @@ print_x25_facilities(hp, coc, caption)
 #else
 int
 _hpuxx25_stub2()
-{;
+{
+	return (0);
 }
 #endif
 #else
 int
 _hpuxx25_stub()
-{;
+{
+	return (0);
 }
 #endif
+
+static inline void
+dummy(void)
+{
+	(void) rcsid;
+}

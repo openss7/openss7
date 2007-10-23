@@ -91,8 +91,9 @@ static char *rcsid =
 #include "isoservent.h"
 #include "tailor.h"
 #include "internet.h"
-
-/*  */
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
 struct isoservent *
 getisoserventbyport(provider, port)
@@ -101,11 +102,12 @@ getisoserventbyport(provider, port)
 {
 	register struct isoservent *is;
 
+	(void) rcsid;
 	isodetailor(NULLCP, 0);
 	DLOG(addr_log, LLOG_TRACE, ("getisoserventbyport \"%s\" %d", provider, (int) ntohs(port)));
 
 	(void) setisoservent(0);
-	while (is = getisoservent())
+	while ((is = getisoservent()))
 		if (sizeof(port) == is->is_selectlen
 		    && port == is->is_port && strcmp(provider, is->is_provider) == 0)
 			break;

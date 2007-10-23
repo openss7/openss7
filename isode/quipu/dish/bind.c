@@ -149,11 +149,11 @@ static int protect_password();
 static int sign_bindarg();
 
 /* ARGSUSED */
-SFD
+RETSIGTYPE
 alarm_sig(sd)
 	int sd;
 {
-	SFD dish_quit();
+	sighandler_t dish_quit;
 
 	if (frompipe && (parent_pid != 0))
 		if (kill(parent_pid, 0) == -1) {
@@ -189,7 +189,7 @@ set_alarm()
 }
 
 /* ARGSUSED */
-SFD
+RETSIGTYPE
 bind_sig(sd)
 	int sd;
 {
@@ -901,7 +901,7 @@ test_rc_file(ps)
 
 }
 
-SFD
+RETSIGTYPE
 dish_quit(sig)
 	int sig;
 {

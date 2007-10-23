@@ -108,7 +108,7 @@ static char *rcsid =
 /*  */
 
 static int interrupted;
-static SFD intrser();
+static sighandler_t intrser;
 
 /*    stub */
 
@@ -122,7 +122,7 @@ RyStub(sd, ryo, op, id, linked, in, rfx, efx, class, roi)
 	struct RoSAPindication *roi;
 {
 	int firstime, opclass, result;
-	SFP istat;
+	sighandler_t istat;
 
 #ifdef	notdef			/* let RyOpInvoke check these as necessary */
 	missingP(ryo);
@@ -219,7 +219,7 @@ RyStub(sd, ryo, op, id, linked, in, rfx, efx, class, roi)
 
 /* ARGSUSED */
 
-static SFD
+static RETSIGTYPE
 intrser(sig)
 	int sig;
 {

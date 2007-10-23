@@ -58,11 +58,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* tsapinitiate.c - TPM: initiator */
 
-#ifndef	lint
-static char *rcsid =
-    "Header: /xtel/isode/isode/tsap/RCS/tsapinitiate.c,v 9.0 1992/06/16 12:40:39 isode Rel";
-#endif
-
 /* 
  * Header: /xtel/isode/isode/tsap/RCS/tsapinitiate.c,v 9.0 1992/06/16 12:40:39 isode Rel
  *
@@ -85,6 +80,9 @@ static char *rcsid =
 
 /* LINTLIBRARY */
 
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 #include <stdio.h>
 #include <signal.h>
 #include "tpkt.h"
@@ -99,24 +97,30 @@ static struct nsapent {
 	int ns_type;
 	int ns_stack;
 
-	IFP ns_open;
+	int (*ns_open) ();
 } nsaps[] = {
 #ifdef	TCP
-	NA_TCP, TS_TCP, tcpopen,
+	{
+	NA_TCP, TS_TCP, tcpopen},
 #endif
 #ifdef	X25
-	    NA_X25, TS_X25, x25open,
+	{
+	NA_X25, TS_X25, x25open},
 #if defined(SUN_X25) && defined(AEF_NSAP)
-	    NA_NSAP, TS_X2584, x25open,
+	{
+	NA_NSAP, TS_X2584, x25open},
 #endif
 #endif
 #ifdef	TP4
-	    NA_NSAP, TS_TP4, tp4open,
+	{
+	NA_NSAP, TS_TP4, tp4open},
 #if defined(ICL_TLI) || defined(XTI_TP)
-	    NA_X25, TS_TP4, tp4open,
+	{
+	NA_X25, TS_TP4, tp4open},
 #endif
 #endif
-NOTOK, TS_NONE, NULL};
+	{
+NOTOK, TS_NONE, NULL}};
 
 #ifdef X25
 extern char isode_x25_errflag;
@@ -264,9 +268,9 @@ TConnAttempt(tb, td, async)
 	register int n;
 	int didone, l, result;
 	register struct TSAPaddr *called, *calling;
-	struct TSAPaddr *realcalled;
-	register struct NSAPaddr *na, *la;
-	struct NSAPaddr *realna;
+	struct TSAPaddr *realcalled = NULL;
+	register struct NSAPaddr *na, *la = NULL;
+	struct NSAPaddr *realna = NULL;
 	register struct TSAPdisconnect *te = td;
 	struct TSAPdisconnect tds;
 
@@ -531,7 +535,7 @@ TAsynNextRequest(sd, tc, td)
 
 /*  */
 
-static struct TSAPaddr *
+struct TSAPaddr *
 newtaddr(ta, na, n)
 	register struct TSAPaddr *ta;
 	register struct NSAPaddr *na;
@@ -543,7 +547,7 @@ newtaddr(ta, na, n)
 
 	bzero((char *) tz, sizeof *tz);
 
-	if (tz->ta_selectlen = ta->ta_selectlen)
+	if ((tz->ta_selectlen = ta->ta_selectlen))
 		bcopy(ta->ta_selector, tz->ta_selector, ta->ta_selectlen);
 	if (na)
 		for (tz->ta_naddr = n; n > 0; n--)
@@ -601,7 +605,7 @@ ta2norm(ta)
 
 /*  */
 
-static struct TSAPaddr *
+struct TSAPaddr *
 maketsbaddr(cp, na, ta)
 	char *cp;
 	struct NSAPaddr *na;

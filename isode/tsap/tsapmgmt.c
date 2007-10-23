@@ -58,11 +58,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* tsapmgmt.c - management info reporting routines */
 
-#ifndef	lint
-static char *rcsid =
-    "Header: /xtel/isode/isode/tsap/RCS/tsapmgmt.c,v 9.0 1992/06/16 12:40:39 isode Rel";
-#endif
-
 /* 
  * Header: /xtel/isode/isode/tsap/RCS/tsapmgmt.c,v 9.0 1992/06/16 12:40:39 isode Rel
  *
@@ -86,7 +81,11 @@ static char *rcsid =
 /* LINTLIBRARY */
 
 #include <stdio.h>
+#ifdef HAVE_VARARGS_H
 #include <varargs.h>
+#else				/* HAVE_VARARGS_H */
+#include <stdarg.h>
+#endif				/* HAVE_VARARGS_H */
 #include "tpkt.h"
 #include "mpkt.h"
 
@@ -104,6 +103,7 @@ static struct qbuf data;
 
 /*  */
 
+#ifdef HAVE_VARARGS_H
 /* VARARGS2 */
 
 int
@@ -145,6 +145,41 @@ TManGen(va_alist)
 
 	return result;
 }
+#else				/* HAVE_VARARGS_H */
+int
+TManGen(unsigned int type, struct tsapblk *tb, ...)
+{
+	int a, result;
+	struct TSAPaddr *b;
+	va_list ap;
+
+	va_start(ap, tb);
+
+	a = 0, b = NULLTA;
+	switch (type) {
+	case USERDT:
+	case USERDR:
+		a = va_arg(ap, int);
+
+		break;
+
+	case STARTLISTEN:
+	case ENDLISTEN:
+		b = va_arg(ap, struct TSAPaddr *);
+
+		break;
+
+	default:
+		break;
+	}
+
+	result = TManGenAux(type, tb, a, b);
+
+	va_end(ap);
+
+	return result;
+}
+#endif				/* HAVE_VARARGS_H */
 
 /*  */
 
@@ -266,5 +301,6 @@ ManInit()
 int
 _tsapmgmt_stub()
 {
+	return (0);
 }
 #endif

@@ -56,6 +56,14 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
+#ifndef HAVE_TELLDIR
+
+#ifdef HAVE_CONFIG
+#include <config.h>
+#endif
+
+#undef telldir
+
 /*
 	telldir -- report directory stream position
 
@@ -79,7 +87,7 @@ extern int errno;
 #endif
 
 off_t
-telldir(dirp)				/* return offset of next entry */
+rpl_telldir(dirp)			/* return offset of next entry */
 	DIR *dirp;			/* stream from opendir() */
 {
 	if (dirp == NULL || dirp->dd_buf == NULL) {
@@ -98,3 +106,4 @@ _telldir_stub()
 {;
 }
 #endif
+#endif				/* HAVE_TELLDIR */

@@ -91,8 +91,11 @@ static char *rcsid =
 #include "manifest.h"
 #include "isoservent.h"
 #include "tailor.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif				/* HAVE_STRING_H */
 
-/*    DATA */
+/* DATA */
 
 static char *isoservices = "isoservices";
 
@@ -101,12 +104,11 @@ static int stayopen = 0;
 
 static struct isoservent iss;
 
-/*  */
-
 int
 setisoservent(f)
 	int f;
 {
+	(void) rcsid;
 	if (servf == NULL)
 		servf = fopen(isodefile(isoservices, 0), "r");
 	else
@@ -127,8 +129,6 @@ endisoservent()
 	return 1;
 }
 
-/*  */
-
 struct isoservent *
 getisoservent()
 {
@@ -146,14 +146,14 @@ getisoservent()
 	while (fgets(buffer, sizeof buffer, servf) != NULL) {
 		if (*buffer == '#')
 			continue;
-		if (cp = index(buffer, '\n'))
-			*cp = NULL;
+		if ((cp = index(buffer, '\n')))
+			*cp = '\0';
 		if ((vecp = str2vecX(buffer, vec, 1 + 1, &mask, NULL, 1)) < 3)
 			continue;
 
 		if ((cp = index(vec[0], '/')) == NULL)
 			continue;
-		*cp++ = NULL;
+		*cp++ = '\0';
 
 		is->is_provider = vec[0];
 		is->is_entity = cp;
@@ -171,8 +171,6 @@ getisoservent()
 
 	return NULL;
 }
-
-/*  */
 
 #ifdef	DEBUG
 _printsrv(is)

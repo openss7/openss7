@@ -58,11 +58,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* tp0ts.c - TPM: TP0 engine */
 
-#ifndef	lint
-static char *rcsid =
-    "Header: /xtel/isode/isode/tsap/RCS/tp0ts.c,v 9.0 1992/06/16 12:40:39 isode Rel";
-#endif
-
 /* 
  * Header: /xtel/isode/isode/tsap/RCS/tp0ts.c,v 9.0 1992/06/16 12:40:39 isode Rel
  *
@@ -85,20 +80,27 @@ static char *rcsid =
 
 /* LINTLIBRARY */
 
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 #include <stdio.h>
 #include <signal.h>
 #include "tpkt.h"
 #include "mpkt.h"
 #include "tailor.h"
 #include "internet.h"
+#ifdef HAVE_SEARCH_H
+#include <search.h>
+#endif
 
 #ifdef SUN_X25
 #include <netx25/x25_ioctl.h>
 #endif
 
 #if	defined(TCP) || defined(X25)
-
-/*  */
 
 static int
 TConnect(tb, expedited, data, cc, td)
@@ -115,13 +117,11 @@ TConnect(tb, expedited, data, cc, td)
 			return tsaplose(td, DR_PARAMETER, NULLCP,
 					"initial user data not allowed with class 0");
 	}
-
 	tb->tb_srcref = htons((u_short) (getpid() & 0xffff));
-	tb->tb_dstref = htons((u_short) 0);
 
+	tb->tb_dstref = htons((u_short) 0);
 	if ((t = newtpkt(TPDU_CR)) == NULL)
 		return tsaplose(td, DR_CONGEST, NULLCP, "out of memory");
-
 	t->t_cr.cr_dstref = tb->tb_dstref;
 	t->t_cr.cr_srcref = tb->tb_srcref;
 	t->t_cr.cr_class = CR_CLASS_TP0;
@@ -148,22 +148,18 @@ TConnect(tb, expedited, data, cc, td)
 	}
 	bcopy(tb->tb_initiating.ta_selector, t->t_calling,
 	      t->t_callinglen = tb->tb_initiating.ta_selectlen);
-
 	bcopy(tb->tb_responding.ta_selector, t->t_called,
 	      t->t_calledlen = tb->tb_responding.ta_selectlen);
 	if (expedited) {
 		tb->tb_flags |= TB_EXPD;
 		t->t_options |= OPT_TEXPEDITE;
 	}
-
 	copyTPKTdata(t, data, cc);	/* XXX: user musn't touch! */
-
 	tb->tb_retry = t;
-
 	return OK;
 }
 
-/*  */
+int xselect(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, int secs);
 
 static int
 TRetry(tb, async, tc, td)
@@ -175,45 +171,36 @@ TRetry(tb, async, tc, td)
 	int len;
 	register struct tsapkt *t;
 
-	if (t = tb->tb_retry) {
+	if ((t = tb->tb_retry)) {
 		tb->tb_retry = NULL;
-
 		if (async && tb->tb_retryfnx)
 			switch ((*tb->tb_retryfnx) (tb, td)) {
 			case NOTOK:
 				goto out;
-
 			case OK:
 				tb->tb_retry = t;
 				return CONNECTING_1;
-
 			case DONE:
 				break;
 			}
-
 		if (tpkt2fd(tb, t, tb->tb_writefnx) == NOTOK) {
 			(void) tsaplose(td, t->t_errno, NULLCP, NULLCP);
 			goto out;
 		}
-
 		freetpkt(t), t = NULL;
 	}
-
 	if (async) {
 		fd_set mask;
 
 		FD_ZERO(&mask);
 		FD_SET(tb->tb_fd, &mask);
-
 		if (xselect(tb->tb_fd + 1, &mask, NULLFD, NULLFD, 0) == OK)
 			return CONNECTING_2;
 	}
-
 	if ((t = fd2tpkt(tb->tb_fd, tb->tb_initfnx, tb->tb_readfnx)) == NULL || t->t_errno != OK) {
 		(void) tsaplose(td, t ? t->t_errno : DR_CONGEST, NULLCP, NULLCP);
 		goto out;
 	}
-
 	switch (TPDU_CODE(t)) {
 	case TPDU_CC:
 		tc->tc_sd = tb->tb_fd;
@@ -254,7 +241,6 @@ TRetry(tb, async, tc, td)
 			copyTSAPdata(t->t_qbuf->qb_data, t->t_qbuf->qb_len, tc);
 		} else
 			tc->tc_cc = 0;
-
 		freetpkt(t);
 		tb->tb_flags |= TB_CONN;
 #ifdef  MGMT
@@ -265,15 +251,12 @@ TRetry(tb, async, tc, td)
 		     ("Connection established fd=%d flags=0x%x tpdusize=%d, tsdusize=%d",
 		      tb->tb_fd, tb->tb_flags, tb->tb_tpdusize, tb->tb_tsdusize));
 #ifdef notanymore		/* Will get done in freetblk */
-
 		if (tb->tb_calling)
 			free((char *) tb->tb_calling), tb->tb_calling = NULL;
 		if (tb->tb_called)
 			free((char *) tb->tb_called), tb->tb_called = NULL;
 #endif
-
 		return DONE;
-
 	case TPDU_DR:
 		td->td_reason = t->t_dr.dr_reason;
 		if (t->t_qbuf) {
@@ -281,14 +264,12 @@ TRetry(tb, async, tc, td)
 		} else
 			td->td_cc = 0;
 		goto out;
-
 	case TPDU_ER:
 		switch (t->t_er.er_reject) {
 		case ER_REJ_NOTSPECIFIED:
 		default:
 			td->td_reason = DR_CONNECT;
 			break;
-
 		case ER_REJ_CODE:
 		case ER_REJ_TPDU:
 		case ER_REJ_VALUE:
@@ -297,22 +278,17 @@ TRetry(tb, async, tc, td)
 		}
 		td->td_cc = 0;
 		goto out;
-
 	default:
 		(void) tpktlose(tb, td, DR_PROTOCOL, NULLCP,
 				"transport protocol mangled: expecting 0x%x, got 0x%x",
 				TPDU_CC, TPDU_CODE(t));
 		goto out;
 	}
-
       out:;
 	freetpkt(t);
 /*    freetblk (tb); */
-
 	return NOTOK;
 }
-
-/*  */
 
 static int
 TStart(tb, cp, ts, td)
@@ -328,7 +304,6 @@ TStart(tb, cp, ts, td)
 		result = tsaplose(td, DR_PARAMETER, NULLCP, "bad initialization vector");
 		goto out;
 	}
-
 	if (CR_CLASS(t) != CR_CLASS_TP0) {
 		if (t->t_cr.cr_alternate & (ALT_TP0 | ALT_TP1))
 			t->t_cr.cr_class = CR_CLASS_TP0;
@@ -338,7 +313,6 @@ TStart(tb, cp, ts, td)
 			goto out;
 		}
 	}
-
 	tb->tb_srcref = htons((u_short) (getpid() & 0xffff));
 	tb->tb_dstref = t->t_cr.cr_srcref;
 	if (!(tb->tb_flags & TB_TCP) || t->t_tpdusize) {
@@ -363,28 +337,21 @@ TStart(tb, cp, ts, td)
 	}
 	if ((t->t_options & OPT_TEXPEDITE) && (tb->tb_flags & TB_TCP))
 		tb->tb_flags |= TB_EXPD;
-
 	ts->ts_sd = tb->tb_fd;
 	copyTSAPaddrX(&tb->tb_initiating, &ts->ts_calling);
 	copyTSAPaddrX(&tb->tb_responding, &ts->ts_called);
 	ts->ts_expedited = (tb->tb_flags & TB_EXPD) ? 1 : 0;
 	ts->ts_tsdusize = tb->tb_tsdusize;
 	ts->ts_qos = tb->tb_qos;	/* struct copy */
-
 	if (t->t_qbuf) {
 		copyTSAPdata(t->t_qbuf->qb_data, t->t_qbuf->qb_len, ts);
 	} else
 		ts->ts_cc = 0;
-
 	result = OK;
-
       out:;
 	freetpkt(t);
-
 	return result;
 }
-
-/*  */
 
 /* ARGSUSED */
 
@@ -402,10 +369,8 @@ TAccept(tb, responding, data, cc, qos, td)
 	if (!(tb->tb_flags & TB_TCP) && cc > 0)
 		return tsaplose(td, DR_PARAMETER, NULLCP,
 				"initial user data not allowed with class 0");
-
 	if ((t = newtpkt(TPDU_CC)) == NULL)
 		return tsaplose(td, DR_CONGEST, NULLCP, "out of memory");
-
 	t->t_cc.cc_dstref = tb->tb_dstref;
 	t->t_cc.cc_srcref = tb->tb_srcref;
 	t->t_cc.cc_class = CR_CLASS_TP0;
@@ -436,7 +401,6 @@ TAccept(tb, responding, data, cc, qos, td)
 	if (tb->tb_flags & TB_EXPD)
 		t->t_options |= OPT_TEXPEDITE;
 	copyTPKTdata(t, data, cc);
-
 	if ((result = tpkt2fd(tb, t, tb->tb_writefnx)) == NOTOK)
 		(void) tsaplose(td, t->t_errno, NULLCP, NULLCP);
 	else {
@@ -446,13 +410,9 @@ TAccept(tb, responding, data, cc, qos, td)
 			(*tb->tb_manfnx) (OPREQIN, tb);
 #endif
 	}
-
 	freetpkt(t);
-
 	return result;
 }
-
-/*  */
 
 static int
 TWrite(tb, uv, expedited, td)
@@ -473,12 +433,10 @@ TWrite(tb, uv, expedited, td)
 #if	defined(X25) || defined(MGMT)
 	dlen = 0;
 #endif
-
 	ep = (bp = uv->uv_base) + (cc = uv->uv_len);
 	while (uv->uv_base) {
 		if ((t = newtpkt(expedited ? TPDU_ED : TPDU_DT)) == NULL)
 			return tsaplose(td, DR_CONGEST, NULLCP, "out of memory");
-
 		wv = (vv = t->t_udvec) + NTPUV - 1;
 		len = tb->tb_tpdusize ? (tb->tb_tpdusize - tb->tb_tpduslop)
 		    : tb->tb_tsdusize;
@@ -489,17 +447,14 @@ TWrite(tb, uv, expedited, td)
 #endif
 			vv->uv_base = bp, vv->uv_len = j, vv++;
 			bp += j, cc -= j;
-
 			if (bp >= ep) {
 				if ((bp = (++uv)->uv_base) == NULL)
 					break;
 				ep = bp + (cc = uv->uv_len);
 			}
 		}
-
 		if (uv->uv_base == NULL)
 			t->t_dt.dt_nr |= DT_EOT;
-
 		if ((result = tpkt2fd(tb, t, tb->tb_writefnx)) == NOTOK) {
 			(void) tsaplose(td, t->t_errno, NULLCP, NULLCP);
 #ifdef	X25
@@ -510,12 +465,10 @@ TWrite(tb, uv, expedited, td)
 #endif
 			freetblk(tb);
 		}
-
 		freetpkt(t);
 		if (result == NOTOK)
 			return NOTOK;
 	}
-
 #ifdef	X25
 	tb->tb_sent += dlen;
 #endif
@@ -523,11 +476,8 @@ TWrite(tb, uv, expedited, td)
 	if (tb->tb_manfnx)
 		(*tb->tb_manfnx) (USERDT, tb, dlen);
 #endif
-
 	return OK;
 }
-
-/*  */
 
 /* ARGSUSED */
 
@@ -543,7 +493,6 @@ TRead(tb, tx, td, async, oob)
 
 	bzero((char *) tx, sizeof *tx);
 	tx->tx_qbuf.qb_forw = tx->tx_qbuf.qb_back = &tx->tx_qbuf;
-
 	for (;;) {
 		if (oob) {	/* out of band data should not be present! */
 			(void) tsaplose(td, DR_NETWORK, NULLCP, "Out of band data received");
@@ -555,7 +504,6 @@ TRead(tb, tx, td, async, oob)
 #endif
 			break;
 		}
-
 		if ((t = fd2tpkt(tb->tb_fd, tb->tb_initfnx, tb->tb_readfnx))
 		    == NULL || t->t_errno != OK) {
 			(void) tsaplose(td, t ? t->t_errno : DR_CONGEST, NULLCP, NULLCP);
@@ -567,7 +515,6 @@ TRead(tb, tx, td, async, oob)
 #endif
 			break;
 		}
-
 		switch (TPDU_CODE(t)) {
 		case TPDU_DT:
 			eot = t->t_dt.dt_nr & DT_EOT;
@@ -587,7 +534,6 @@ TRead(tb, tx, td, async, oob)
 			if (!eot) {
 				if (async)
 					return DONE;
-
 				continue;
 			}
 			tx->tx_expedited = 0;
@@ -600,7 +546,6 @@ TRead(tb, tx, td, async, oob)
 				tb->tb_len = 0;
 			}
 			return OK;
-
 		case TPDU_ED:
 			if (t->t_qbuf) {
 				insque(t->t_qbuf, tx->tx_qbuf.qb_back);
@@ -610,7 +555,6 @@ TRead(tb, tx, td, async, oob)
 			freetpkt(t);
 			tx->tx_expedited = 1;
 			return OK;
-
 		case TPDU_DR:
 			td->td_reason = t->t_dr.dr_reason;
 			if (t->t_qbuf) {
@@ -618,14 +562,12 @@ TRead(tb, tx, td, async, oob)
 			} else
 				td->td_cc = 0;
 			break;
-
 		case TPDU_ER:
 			switch (t->t_er.er_reject) {
 			case ER_REJ_NOTSPECIFIED:
 			default:
 				td->td_reason = DR_UNKNOWN;
 				break;
-
 			case ER_REJ_CODE:
 			case ER_REJ_TPDU:
 			case ER_REJ_VALUE:
@@ -634,7 +576,6 @@ TRead(tb, tx, td, async, oob)
 			}
 			td->td_cc = 0;
 			break;
-
 		default:
 			(void) tpktlose(tb, td, DR_PROTOCOL, NULLCP,
 					"transport protocol mangled: not expecting 0x%x",
@@ -643,15 +584,11 @@ TRead(tb, tx, td, async, oob)
 		}
 		break;
 	}
-
 	if (t)
 		freetpkt(t);
 	freetblk(tb);
-
 	return NOTOK;
 }
-
-/*  */
 
 static int
 TDisconnect(tb, data, cc, td)
@@ -665,19 +602,16 @@ TDisconnect(tb, data, cc, td)
 #ifdef	TCP
 	register struct tsapkt *t;
 #endif
-
 	result = OK;
 #ifdef	TCP
 	if (tb->tb_flags & TB_TCP) {
-		if (t = newtpkt(TPDU_DR)) {
+		if ((t = newtpkt(TPDU_DR))) {
 			t->t_dr.dr_srcref = tb->tb_srcref;
 			t->t_dr.dr_dstref = tb->tb_dstref;
 			t->t_dr.dr_reason = DR_NORMAL;
 			copyTPKTdata(t, data, cc);
-
 			if ((result = tpkt2fd(tb, t, tb->tb_writefnx)) == NOTOK)
 				(void) tsaplose(td, t->t_errno, NULLCP, NULLCP);
-
 			freetpkt(t);
 		} else
 			result = tsaplose(td, DR_CONGEST, NULLCP, "out of memory");
@@ -690,13 +624,10 @@ TDisconnect(tb, data, cc, td)
 		      tb->tb_fd, tb->tb_sent, tb->tb_recv));
 #endif
 	freetblk(tb);
-
 	return result;
 }
 
-/*  */
-
-static
+static int
 TLose(tb, reason, td)
 	register struct tsapblk *tb;
 	int reason;
@@ -711,23 +642,19 @@ TLose(tb, reason, td)
 	case DR_ADDRESS:
 		if ((t = newtpkt(TPDU_DR)) == NULLPKT)
 			break;
-
 		t->t_dr.dr_srcref = tb->tb_srcref;
 		t->t_dr.dr_dstref = tb->tb_dstref;
 		t->t_dr.dr_reason = reason;
 		copyTPKTdata(t, td->td_data, td->td_cc);
 		break;
-
 	default:
 		if ((t = newtpkt(TPDU_ER)) == NULLPKT)
 			break;
-
 		t->t_er.er_dstref = tb->tb_dstref;
 		switch (reason) {
 		case DR_PROTOCOL:
 			t->t_er.er_reject = ER_REJ_TPDU;
 			break;
-
 		default:
 			t->t_er.er_reject = ER_REJ_NOTSPECIFIED;
 			break;
@@ -738,9 +665,8 @@ TLose(tb, reason, td)
 		(void) tpkt2fd(tb, t, tb->tb_writefnx);
 		freetpkt(t);
 	}
+	return (0);
 }
-
-/*  */
 
 /* at present, used by TCP and X.25 back-ends... */
 
@@ -760,12 +686,12 @@ TLose(tb, reason, td)
 #ifdef	TCP
 #include "internet.h"
 #else
-#define	write_tcp_socket	NULLIFP
+#define	write_tcp_socket	NULL
 #endif
 #ifdef	X25
 #include "x25.h"
 #else
-#define	write_x25_socket	NULLIFP
+#define	write_x25_socket	NULL
 #endif
 
 #if	defined(FIONBIO) || defined(O_NDELAY)
@@ -773,8 +699,6 @@ TLose(tb, reason, td)
 #endif
 
 extern int errno;
-
-/*  */
 
 int
 tp0write(tb, t, cp, n)
@@ -785,7 +709,7 @@ tp0write(tb, t, cp, n)
 {
 	register int cc;
 	register char *p, *q;
-	register struct qbuf *qb;
+	register struct qbuf *qb = NULL;
 	register struct udvec *uv;
 
 #if	defined(WRITEV) || defined(SUN_X25) || defined(CAMTEC_CCL)
@@ -797,7 +721,6 @@ tp0write(tb, t, cp, n)
 #endif
 	register struct iovec *iov;
 #endif
-
 #if	defined(WRITEV) || defined(SUN_X25) || defined(CAMTEC_CCL)
 #ifdef	NODELAY
 	if (tb->tb_flags & TB_QWRITES)
@@ -805,7 +728,6 @@ tp0write(tb, t, cp, n)
 #endif
 	iov = iovs;
 	cc = 0;
-
 	if (tb->tb_flags & TB_X25) {
 #ifdef CCUR_X25
 		goto single;
@@ -818,7 +740,6 @@ tp0write(tb, t, cp, n)
 		iov->iov_base = (char *) &t->t_li;
 		cc += (iov->iov_len = sizeof t->t_li);
 		iov++;
-
 		iov->iov_base = (char *) &t->t_code;
 		cc += (iov->iov_len = sizeof t->t_code);
 		iov++;
@@ -828,23 +749,19 @@ tp0write(tb, t, cp, n)
 		cc += (iov->iov_len = TPKT_HDRLEN(t));
 		iov++;
 	}
-
 	iov->iov_base = cp;
 	cc += (iov->iov_len = n);
 	iov++;
-
 	if (t->t_vdata) {
 		iov->iov_base = t->t_vdata;
 		cc += (iov->iov_len = t->t_vlen);
 		iov++;
 	}
-
 	for (uv = t->t_udvec; uv->uv_base; uv++) {
 		iov->iov_base = uv->uv_base;
 		cc += (iov->iov_len = uv->uv_len);
 		iov++;
 	}
-
 	if ((n = writev(tb->tb_fd, iovs, iov - iovs)) != cc) {
 		cc = NOTOK;
 #ifdef	SUN_X25
@@ -855,20 +772,17 @@ tp0write(tb, t, cp, n)
 		DLOG(compat_log, LLOG_DEBUG, ("X.25 write %d bytes", cc));
 	}
 	goto out;
-
       single:;
 #endif
-
 	cc = ((tb->tb_flags & TB_X25) ? sizeof t->t_li + sizeof t->t_code : TPKT_HDRLEN(t))
 	    + n;
 	if (t->t_vdata)
 		cc += t->t_vlen;
 	for (uv = t->t_udvec; uv->uv_base; uv++)
 		cc += uv->uv_len;
-
-	if (p = malloc(sizeof *qb + (unsigned) cc)) {
+	if ((p = malloc(sizeof(*qb) + (unsigned) cc))) {
 		int nc, onoff;
-		IFP wfnx = (tb->tb_flags & TB_X25) ? write_x25_socket : write_tcp_socket;
+		int (*wfnx) () = (void *)((tb->tb_flags & TB_X25) ? write_x25_socket : write_tcp_socket);
 
 #ifdef	NODELAY
 		if (tb->tb_flags & TB_QWRITES) {
@@ -878,37 +792,30 @@ tp0write(tb, t, cp, n)
 			p = qb->qb_data;
 		}
 #endif
-
 		if (tb->tb_flags & TB_X25) {
 			bcopy((char *) &t->t_li, q = p, sizeof t->t_li);
 			q += sizeof t->t_li;
-
 			bcopy((char *) &t->t_code, q, sizeof t->t_code);
 			q += sizeof t->t_code;
 		} else {
 			bcopy((char *) &t->t_pkthdr, q = p, TPKT_HDRLEN(t));
 			q += TPKT_HDRLEN(t);
 		}
-
 		bcopy(cp, q, n);
 		q += n;
-
 		if (t->t_vdata) {
 			bcopy(t->t_vdata, q, t->t_vlen);
 			q += t->t_vlen;
 		}
-
 		for (uv = t->t_udvec; uv->uv_base; uv++) {
 			bcopy(uv->uv_base, q, uv->uv_len);
 			q += uv->uv_len;
 		}
-
 #ifdef	NODELAY
 		if (tb->tb_qwrites.qb_forw != &tb->tb_qwrites) {
 			nc = 0;
 			goto insert;
 		}
-
 		if (tb->tb_flags & TB_QWRITES) {
 #ifdef	FIONBIO
 			(void) ioctl(tb->tb_fd, FIONBIO, (onoff = 1, (char *) &onoff));
@@ -919,9 +826,7 @@ tp0write(tb, t, cp, n)
 #endif
 		}
 #endif
-
 		nc = (*wfnx) (tb->tb_fd, p, cc);
-
 #ifdef	NODELAY
 		if (tb->tb_flags & TB_QWRITES) {
 #ifdef	FIONBIO
@@ -933,19 +838,16 @@ tp0write(tb, t, cp, n)
 #endif
 		}
 #endif
-
 		if (nc != cc) {
 #ifdef	NODELAY
 			if (tb->tb_flags & TB_QWRITES) {
 				if (nc == NOTOK) {
 					if (errno != EWOULDBLOCK)
 						goto losing;
-
 #if defined(SUN_X25) && defined(X25_WRITE_BUFFER_FULL)
 					/* Need SunNet 7.0 patch 100328-09 + full buffer fix */
 					if (tb->tb_flags & TB_X25)
 						(void) ioctl(tb->tb_fd, X25_WRITE_BUFFER_FULL, 0);
-
 #endif
 					nc = 0;
 				}
@@ -960,11 +862,9 @@ tp0write(tb, t, cp, n)
 					goto losing;
 				}
 #endif				/* CCUR_X25 */
-
 				if ((*tb->tb_queuePfnx) (tb, 1, (struct TSAPdisconnect *) 0)
 				    == NOTOK)
 					goto losing;
-
 				qb->qb_data += nc, qb->qb_len -= nc;
 			      insert:;
 				insque(qb, tb->tb_qwrites.qb_back);
@@ -990,30 +890,25 @@ tp0write(tb, t, cp, n)
 	if ((tb->tb_flags & TB_X25) || tb->tb_flags & TB_QWRITES) {
 		SLOG(tsap_log, LLOG_EXCEPTIONS, NULLCP,
 		     ("unable to malloc %d octets for pseudo-writev, failing...", cc));
-
 		cc = NOTOK;
 		goto out;
 	}
 #ifdef	TCP
 	SLOG(tsap_log, LLOG_EXCEPTIONS, NULLCP,
 	     ("unable to malloc %d octets for pseudo-writev, continuing...", cc));
-
 	cc = TPKT_HDRLEN(t);
 	if (write_tcp_socket(tb->tb_fd, (char *) &t->t_pkthdr, cc) != cc) {
 	      err:;
 		cc = NOTOK;
 		goto out;
 	}
-
 	if (write_tcp_socket(tb->tb_fd, cp, n) != n)
 		goto err;
 	cc += n;
-
 	if (t->t_vdata && write_tcp_socket(tb->tb_fd, t->t_vdata, t->t_vlen)
 	    != t->t_vlen)
 		goto err;
 	cc += t->t_vlen;
-
 	for (uv = t->t_udvec; uv->uv_base; uv++) {
 		if (write_tcp_socket(tb->tb_fd, uv->uv_base, uv->uv_len)
 		    != uv->uv_len)
@@ -1021,13 +916,9 @@ tp0write(tb, t, cp, n)
 		cc += uv->uv_len;
 	}
 #endif
-
       out:;
-
 	return cc;
 }
-
-/*  */
 
 #ifdef	NODELAY
 static int
@@ -1037,13 +928,12 @@ TDrain(tb, td)
 {
 	int nc, onoff, result;
 	register struct qbuf *qb;
-	IFP wfnx = (tb->tb_flags & TB_X25) ? write_x25_socket : write_tcp_socket;
-	SFP pstat;
+	int (*wfnx) () = (void *)((tb->tb_flags & TB_X25) ? write_x25_socket : write_tcp_socket);
+	sighandler_t pstat;
 	SBV smask;
 
 	pstat = signal(SIGPIPE, SIG_IGN);
 	smask = sigioblock();
-
 #ifdef	FIONBIO
 	(void) ioctl(tb->tb_fd, FIONBIO, (onoff = 1, (char *) &onoff));
 #else
@@ -1051,7 +941,6 @@ TDrain(tb, td)
 	(void) fcntl(tb->tb_fd, F_SETFL, O_NDELAY);
 #endif
 #endif
-
 	while ((qb = tb->tb_qwrites.qb_forw) != &tb->tb_qwrites) {
 		if ((nc = (*wfnx) (tb->tb_fd, qb->qb_data, qb->qb_len))
 		    != qb->qb_len) {
@@ -1060,14 +949,12 @@ TDrain(tb, td)
 					(void) tpktlose(tb, td, DR_NETWORK, "failed",
 							"write to network");
 					result = NOTOK;
-
 					goto out;
 				}
 #if defined(SUN_X25) && defined(X25_WRITE_BUFFER_FULL)
 				/* Need SunNet 7.0 patch 100328-09 + full buffer fix */
 				if (tb->tb_flags & TB_X25)
 					(void) ioctl(tb->tb_fd, X25_WRITE_BUFFER_FULL, 0);
-
 #endif
 				nc = 0;
 			} else if (nc > 0 && (tb->tb_flags & TB_X25)) {
@@ -1078,21 +965,17 @@ TDrain(tb, td)
 						  nc, qb->qb_len);
 				goto out;
 			}
-
 			DLOG(tsap_log, LLOG_TRACE,
 			     ("wrote %d of %d octets from blocked write", nc, qb->qb_len));
 			qb->qb_data += nc, qb->qb_len -= nc;
-
 			result = OK;
 			goto out;
 		}
-
 		DLOG(tsap_log, LLOG_TRACE, ("finished blocked write of %d octets", qb->qb_len));
 		remque(qb);
 		free((char *) qb);
 	}
 	result = DONE;
-
       out:;
 #ifdef	FIONBIO
 	(void) ioctl(tb->tb_fd, FIONBIO, (onoff = 0, (char *) &onoff));
@@ -1101,15 +984,11 @@ TDrain(tb, td)
 	(void) fcntl(tb->tb_fd, F_SETFL, 0x00);
 #endif
 #endif
-
 	(void) sigiomask(smask);
 	(void) signal(SIGPIPE, pstat);
-
 	return result;
 }
 #endif
-
-/*  */
 
 int
 tp0init(tb)
@@ -1117,21 +996,18 @@ tp0init(tb)
 {
 	tb->tb_connPfnx = TConnect;
 	tb->tb_retryPfnx = TRetry;
-
 	tb->tb_startPfnx = TStart;
 	tb->tb_acceptPfnx = TAccept;
-
 	tb->tb_writePfnx = TWrite;
 	tb->tb_readPfnx = TRead;
 	tb->tb_discPfnx = TDisconnect;
 	tb->tb_losePfnx = TLose;
-
 #ifdef	NODELAY
 	tb->tb_drainPfnx = TDrain;
 #endif
-
 #ifdef  MGMT
 	tb->tb_manfnx = TManGen;
 #endif
+	return (0);
 }
 #endif

@@ -58,11 +58,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* ts2sunlink.c - TPM: SunLink OSI TP4 interface */
 
-#ifndef	lint
-static char *rcsid =
-    "Header: /xtel/isode/isode/tsap/RCS/ts2sunlink.c,v 9.0 1992/06/16 12:40:39 isode Rel";
-#endif
-
 /* 
  * Header: /xtel/isode/isode/tsap/RCS/ts2sunlink.c,v 9.0 1992/06/16 12:40:39 isode Rel
  *
@@ -131,7 +126,7 @@ static char *rcsid =
  *
  * TODO:
  *
- * 1. Figure out how to implement tsaplisten.c$tp4unique()
+ * 1. Figure out how to implement tsaplisten.c tp4unique()
  *
  * 2. On failure of sendto, sendmsg, or recvfrom, try to figure out if a
  *    disconnect happened and return the right DR_ reason.
@@ -145,11 +140,11 @@ static char *rcsid =
  *
  */
 
-/*    DATA */
+/* DATA */
 
 extern int errno;
 
-/*    UPPER HALF */
+/* UPPER HALF */
 
 static int
 TConnect(tb, expedited, data, cc, td)
@@ -208,8 +203,6 @@ TConnect(tb, expedited, data, cc, td)
 
 	return result;
 }
-
-/*  */
 
 static int
 TRetry(tb, async, tc, td)
@@ -302,8 +295,6 @@ TRetry(tb, async, tc, td)
 	return NOTOK;
 }
 
-/*  */
-
 static int
 TStart(tb, cp, ts, td)
 	register struct tsapblk *tb;
@@ -356,8 +347,6 @@ TStart(tb, cp, ts, td)
 	return result;
 }
 
-/*  */
-
 /* ARGSUSED */
 
 static int
@@ -370,7 +359,7 @@ TAccept(tb, responding, data, cc, qos, td)
 {
 	int result;
 	register struct tp4pkt *tp;
-	SFP pstat;
+	sighandler_t pstat;
 
 	if ((tp = newtp4pkt(TP_CONNECT_RESP)) == NULL)
 		return tsaplose(td, DR_CONGEST, NULLCP, NULLCP);
@@ -404,8 +393,6 @@ TAccept(tb, responding, data, cc, qos, td)
 	return result;
 }
 
-/*  */
-
 /* life would be nice if we didn't have to worry about the maximum number of
    bytes that can be written in a single syscall() */
 
@@ -436,7 +423,7 @@ TWrite(tb, uv, expedited, td)
 	register struct tp4pkt *tp;
 	struct iovec iovs[MSG_MAXIOVLEN];
 	register struct iovec *vv, *wv;
-	SFP pstat;
+	sighandler_t pstat;
 
 	if ((tp = newtp4pkt(expedited ? TP_X_DATA_REQ : TP_DATA_REQ)) == NULL) {
 		(void) tsaplose(td, DR_CONGEST, NULLCP, NULLCP);
@@ -614,8 +601,6 @@ TWrite(tb, uv, expedited, td)
 	return NOTOK;
 }
 
-/*  */
-
 static int
 TDrain(tb, td)
 	register struct tsapblk *tb;
@@ -628,7 +613,7 @@ TDrain(tb, td)
 	register struct tp4pkt *tp;
 	struct iovec vvs;
 	register struct iovec *vv = &vvs;
-	SFP pstat;
+	sighandler_t pstat;
 	SBV smask;
 
 	if ((tp = newtp4pkt(TP_DATA_REQ)) == NULL)
@@ -687,8 +672,6 @@ TDrain(tb, td)
 	freetp4pkt(tp);
 	return result;
 }
-
-/*  */
 
 static int
 TRead(tb, tx, td, async, oob)
@@ -783,8 +766,6 @@ TRead(tb, tx, td, async, oob)
 	return NOTOK;
 }
 
-/*  */
-
 static int
 ReadDisc(tb, td)
 	register struct tsapblk *tb;
@@ -807,8 +788,6 @@ ReadDisc(tb, td)
 	return (NOTOK);
 }
 
-/*  */
-
 static int
 TDisconnect(tb, data, cc, td)
 	register struct tsapblk *tb;
@@ -818,7 +797,7 @@ TDisconnect(tb, data, cc, td)
 {
 	int result;
 	register struct tp4pkt *tp;
-	SFP pstat;
+	sighandler_t pstat;
 
 	if (tp = newtp4pkt(TP_DISCONNECT_REQ)) {
 		tp->tp4_reason = (TP_DR_REASON) DR_NORMAL;
@@ -844,8 +823,6 @@ TDisconnect(tb, data, cc, td)
 	return result;
 }
 
-/*  */
-
 /* ARGSUSED */
 
 static int
@@ -868,7 +845,7 @@ TLose(tb, reason, td)
 	}
 }
 
-/*    LOWER HALF */
+/* LOWER HALF */
 
 /* ARGSUSED */
 
@@ -914,8 +891,6 @@ tp4open(tb, local_ta, local_na, remote_ta, remote_na, td, async)
 	return (async ? OK : DONE);
 }
 
-/*  */
-
 /* ARGSUSED */
 
 static int
@@ -933,8 +908,6 @@ retry_tp4_socket(tb, td)
 	return DONE;
 }
 
-/*  */
-
 /* ARGSUSED */
 
 char *
@@ -947,8 +920,6 @@ tp4save(fd, td)
 	(void) sprintf(buffer, "%c%d", NT_SUN, fd);
 	return buffer;
 }
-
-/*  */
 
 int
 tp4restore(tb, buffer, td)
@@ -967,8 +938,6 @@ tp4restore(tb, buffer, td)
 
 	return OK;
 }
-
-/*  */
 
 int
 tp4init(tb)
@@ -1002,8 +971,6 @@ tp4init(tb)
 	tb->tb_selectfnx = select_tp4_socket;
 }
 
-/*  */
-
 /* ARGSUSED */
 
 int
@@ -1034,8 +1001,6 @@ start_tp4_server(sock, backlog, opt1, opt2, td)
 
 	return sd;
 }
-
-/*  */
 
 #ifndef	notdef
 /* ARGSUSED */
@@ -1164,8 +1129,6 @@ gen2tp4X(generic, specific, template)
 	return gen2tp4(&tas, specific, template);
 }
 
-/*  */
-
 int
 tp42gen(generic, specific)
 	struct TSAPaddr *generic;
@@ -1223,8 +1186,6 @@ tp42genX(generic, specific)
 	return result;
 }
 
-/*  */
-
 struct tp4pkt *
 newtp4pkt(code)
 	TP_EVENT code;
@@ -1241,5 +1202,6 @@ newtp4pkt(code)
 int
 _ts2sunlink_stub()
 {
+	return (0);
 }
 #endif
