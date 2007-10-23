@@ -1,10 +1,69 @@
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __ISODE_FPKT_H__
+#define __ISODE_FPKT_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
 /* fpkt.h - include file for FTAM provider (FS-PROVIDER) */
 
 /* 
- * $Header: /xtel/isode/isode/h/RCS/fpkt.h,v 9.0 1992/06/16 12:17:57 isode Rel $
+ * Header: /xtel/isode/isode/h/RCS/fpkt.h,v 9.0 1992/06/16 12:17:57 isode Rel
  *
  *
- * $Log: fpkt.h,v $
+ * Log: fpkt.h,v
  * Revision 9.0  1992/06/16  12:17:57  isode
  * Release 8.0
  *
@@ -20,7 +79,6 @@
  *
  */
 
-
 #include "FTAM-types.h"
 
 #ifndef	_FTAM_
@@ -29,8 +87,6 @@
 #ifndef	_AcSAP_
 #include "acsap.h"		/* definitions for AcS-USERs */
 #endif
-
-/*  */
 
 #define	FS_GEN(fsb) \
 	((fsb -> fsb_flags & FSB_INIT) ? FS_GEN_INITIATOR : FS_GEN_RESPONDER)
@@ -118,85 +174,83 @@
 #define	copyFTAMdata(base,len,d)	bcopy (base, (char *) d, len)
 #endif
 
-
-int	ftamlose (), fpktlose (), ftamoops ();
-
-/*  */
+int ftamlose(), fpktlose(), ftamoops();
 
 struct ftamblk {
-    struct ftamblk *fsb_forw;	/* doubly-linked list */
-    struct ftamblk *fsb_back;	/*   .. */
+	struct ftamblk *fsb_forw;	/* doubly-linked list */
+	struct ftamblk *fsb_back;	/* .. */
 
-    int	    fsb_fd;		/* association descriptor */
+	int fsb_fd;			/* association descriptor */
 
-    short   fsb_flags;		/* our state */
+	short fsb_flags;		/* our state */
 #define	FSB_NULL	0x0000
-#define	FSB_CONN	0x0001	/* connected */
-#define	FSB_FINN	0x0002	/* other side wants to finish */
-#define	FSB_INIT	0x0004	/* this side initiated the association */
-#define	FSB_ASYN	0x0008	/* asynchronous */
-#define	FSB_DECHARGE	0x0010	/* responder can using charging on deselect */
-#define	FSB_CANCEL	0x0020	/* this side started F-CANCEL */
-#define	FSB_COLLIDE	0x0040	/* collision */
+#define	FSB_CONN	0x0001		/* connected */
+#define	FSB_FINN	0x0002		/* other side wants to finish */
+#define	FSB_INIT	0x0004		/* this side initiated the association */
+#define	FSB_ASYN	0x0008		/* asynchronous */
+#define	FSB_DECHARGE	0x0010		/* responder can using charging on deselect */
+#define	FSB_CANCEL	0x0020		/* this side started F-CANCEL */
+#define	FSB_COLLIDE	0x0040		/* collision */
 
-    short   fsb_state;		/* more state */
-#define	FSB_INITIALIZED	0	/*   initialized */
-#define	FSB_MANAGEMENT	1	/*   management */
-#define	FSB_BULKBEGIN	2	/*   bulk data begin */
-#define	FSB_BULKEND	3	/*   bulk data end */
-#define	FSB_DATAIDLE	4	/*   data transfer idle */
-#define	FSB_LOCATE	5	/*   locate in progress */
-#define	FSB_ERASE	6	/*   erase in progress */
-#define	FSB_DATAREAD	7	/*   data transfer read */
-#define	FSB_DATAWRITE	8	/*   data transfer write */
-#define	FSB_DATAFIN1	9	/*   data transfer done */
-#define	FSB_DATAFIN2	10	/*     .. */
-#define	FSB_DATACANCEL	11	/*   cancel in progress */
-    
-    int	    fsb_group;		/* group flags */
+	short fsb_state;		/* more state */
+#define	FSB_INITIALIZED	0		/* initialized */
+#define	FSB_MANAGEMENT	1		/* management */
+#define	FSB_BULKBEGIN	2		/* bulk data begin */
+#define	FSB_BULKEND	3		/* bulk data end */
+#define	FSB_DATAIDLE	4		/* data transfer idle */
+#define	FSB_LOCATE	5		/* locate in progress */
+#define	FSB_ERASE	6		/* erase in progress */
+#define	FSB_DATAREAD	7		/* data transfer read */
+#define	FSB_DATAWRITE	8		/* data transfer write */
+#define	FSB_DATAFIN1	9		/* data transfer done */
+#define	FSB_DATAFIN2	10		/* .. */
+#define	FSB_DATACANCEL	11		/* cancel in progress */
 
-    int	    fsb_srequirements;	/* session requirements */
-    int	    fsb_owned;		/* session tokens we own */
-    int	    fsb_avail;		/* session tokens available */
-    int	    fsb_settings;	/* initial and resync settings */
-    long    fsb_ssn;		/* serial number */
-    struct SSAPref fsb_connect;	/* session connection reference */
-    int	    fsb_ssdusize;	/* largest atomic SSDU */
+	int fsb_group;			/* group flags */
 
-    int	    fsb_id;		/* FTAM context id */
-    int	    fsb_prequirements;	/* presentation requirements */
-    struct PSAPctxlist fsb_contexts;/* presentation contexts */
-    struct FTAMcontentlist fsb_contents; /* FTAM document types */
+	int fsb_srequirements;		/* session requirements */
+	int fsb_owned;			/* session tokens we own */
+	int fsb_avail;			/* session tokens available */
+	int fsb_settings;		/* initial and resync settings */
+	long fsb_ssn;			/* serial number */
+	struct SSAPref fsb_connect;	/* session connection reference */
+	int fsb_ssdusize;		/* largest atomic SSDU */
 
-    OID	    fsb_context;	/* application context */
+	int fsb_id;			/* FTAM context id */
+	int fsb_prequirements;		/* presentation requirements */
+	struct PSAPctxlist fsb_contexts;	/* presentation contexts */
+	struct FTAMcontentlist fsb_contents;	/* FTAM document types */
 
-    int	    fsb_fqos;		/* ftam-QoS */
-    int	    fsb_class;		/* service-class */
-    int	    fsb_units;		/* functional-units */
-				/* mandatory functional-units */
+	OID fsb_context;		/* application context */
+
+	int fsb_fqos;			/* ftam-QoS */
+	int fsb_class;			/* service-class */
+	int fsb_units;			/* functional-units */
+	/* mandatory functional-units */
 #define	FUNITS_TRANSFER	(FUNIT_GROUPING)
 #define	FUNITS_ACCESS	(FUNIT_READ | FUNIT_WRITE | FUNIT_ACCESS)
 #define	FUNITS_MANAGE	(FUNIT_LIMITED | FUNIT_GROUPING)
 #define	FUNITS_TM	(FUNIT_LIMITED | FUNIT_GROUPING)
 #define	FUNITS_UNCONS	(0)
 
-    int	    fsb_attrs;		/* attribute-groups */
+	int fsb_attrs;			/* attribute-groups */
 
-    IFP	    fsb_indication;	/* event handler */
-    
-    struct PSAPdata fsb_data;	/* for screwy BDT stuff */
+	IFP fsb_indication;		/* event handler */
 
-    int	    fsb_cancelaction;	/* handle CANCEL collisions */
-    PE	    fsb_cancelshared;
-    struct FTAMdiagnostic *fsb_canceldiags;
-    int	    fsb_cancelndiag;
-    
-    IFP	    fsb_trace;		/* user-defined tracing function */
+	struct PSAPdata fsb_data;	/* for screwy BDT stuff */
+
+	int fsb_cancelaction;		/* handle CANCEL collisions */
+	PE fsb_cancelshared;
+	struct FTAMdiagnostic *fsb_canceldiags;
+	int fsb_cancelndiag;
+
+	IFP fsb_trace;			/* user-defined tracing function */
 };
+
 #define	NULLFSB		((struct ftamblk *) 0)
 
-int	freefsblk ();
-struct ftamblk *newfsblk (), *findfsblk ();
+int freefsblk();
+struct ftamblk *newfsblk(), *findfsblk();
 
 #ifndef	lint
 #define	fsbtrace(fsb,a)	if ((fsb) -> fsb_trace) (*((fsb) -> fsb_trace)) a
@@ -204,39 +258,33 @@ struct ftamblk *newfsblk (), *findfsblk ();
 #define	fsbtrace(fsb,a)	FTraceHook a
 #endif
 
-/*  */
-
 struct pair {
-    int	    p_mask;
-    int	    p_bitno;
+	int p_mask;
+	int p_bitno;
 };
 
 extern struct pair fclass_pairs[],
-		   funit_pairs[],
-		   fattr_pairs[],
-		   fname_pairs[],
-		   fmode_pairs[],
-		   frequested_pairs[],
-		   fpermitted_pairs[];
-/*  */
+    funit_pairs[],
+    fattr_pairs[], fname_pairs[], fmode_pairs[], frequested_pairs[], fpermitted_pairs[];
 
-struct type_FTAM_Access__Control__List *acl2fpm ();
-int	fpm2acl ();
+struct type_FTAM_Access__Control__List *acl2fpm();
+int fpm2acl();
 
-struct type_FTAM_Read__Attributes *attr2fpm ();
-int	fpm2attr ();
+struct type_FTAM_Read__Attributes *attr2fpm();
+int fpm2attr();
 
-PE	bits2fpm ();
-int	fpm2bits ();
+PE bits2fpm();
+int fpm2bits();
 
-struct type_FTAM_Charging *chrg2fpm ();
-int	fpm2chrg ();
+struct type_FTAM_Charging *chrg2fpm();
+int fpm2chrg();
 
-struct type_FTAM_Concurrency__Access *conacc2fpm ();
-int	fpm2conacc ();
+struct type_FTAM_Concurrency__Access *conacc2fpm();
+int fpm2conacc();
 
-struct type_FTAM_Concurrency__Control *conctl2fpm ();
-int	fpm2conctl ();
+struct type_FTAM_Concurrency__Control *conctl2fpm();
+int fpm2conctl();
+
 #define	conctl_present(fc) \
     ((fc) -> fc_readlock != FLOCK_NOTREQD \
 	|| (fc) -> fc_insertlock != FLOCK_NOTREQD \
@@ -248,23 +296,24 @@ int	fpm2conctl ();
 	|| (fc) -> fc_deletelock != FLOCK_NOTREQD) \
 
 
-struct type_FTAM_Diagnostic *diag2fpm ();
-int	fpm2diag ();
+struct type_FTAM_Diagnostic *diag2fpm();
+int fpm2diag();
 
-struct type_FTAM_FADU__Identity *faduid2fpm ();
-int	fpm2faduid ();
+struct type_FTAM_FADU__Identity *faduid2fpm();
+int fpm2faduid();
 
-struct type_FTAM_Access__Passwords *pass2fpm ();
-int	fpm2pass ();
+struct type_FTAM_Access__Passwords *pass2fpm();
+int fpm2pass();
+
 #define	passes_present(fp) \
     ((fp) -> fp_read || (fp) -> fp_insert || (fp) -> fp_replace \
 	|| (fp) -> fp_extend || (fp) -> fp_erase || (fp) -> fp_readattr \
 	|| (fp) -> fp_chngattr || (fp) -> fp_delete) \
 
-struct type_FTAM_Shared__ASE__Information *shared2fpm ();
-int	fpm2shared ();
+struct type_FTAM_Shared__ASE__Information *shared2fpm();
+int fpm2shared();
 
-/*  */
+int acs2ftamlose(), acs2ftamabort();
+int ps2ftamlose();
 
-int	acs2ftamlose (), acs2ftamabort ();
-int	ps2ftamlose ();
+#endif				/* __ISODE_FPKT_H__ */

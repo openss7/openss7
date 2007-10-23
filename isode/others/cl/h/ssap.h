@@ -1,10 +1,69 @@
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __CL_H_SSAP_H__
+#define __CL_H_SSAP_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
 /* ssap.h - include file for session users (SS-USER) */
 
 /* 
- * $Header: /f/iso/h/RCS/ssap.h,v 5.0 88/07/21 14:39:34 mrose Rel $
+ * Header: /f/iso/h/RCS/ssap.h,v 5.0 88/07/21 14:39:34 mrose Rel
  *
  *
- * $Log$
+ * Log
  */
 
 /*
@@ -16,7 +75,6 @@
  *    this agreement.
  *
  */
-
 
 #ifndef	_SSAP_
 #define	_SSAP_
@@ -31,33 +89,31 @@
 #include "isoaddrs.h"
 #endif
 
-/*  */
-
-struct SSAPactid {		/* Activity Identifier */
+struct SSAPactid {			/* Activity Identifier */
 #define	SID_DATA_SIZE	6
-    u_char  sd_len;
-    char    sd_data[SID_DATA_SIZE];
+	u_char sd_len;
+	char sd_data[SID_DATA_SIZE];
 };
 
-struct SSAPref {		/* SSAP reference */
-				/* USER reference */
+struct SSAPref {			/* SSAP reference */
+	/* USER reference */
 #define	SREF_USER_SIZE		64
-    u_char  sr_ulen;
-    char    sr_udata[SREF_USER_SIZE];
+	u_char sr_ulen;
+	char sr_udata[SREF_USER_SIZE];
 
-				/* COMMON reference */
+	/* COMMON reference */
 #define	SREF_COMM_SIZE		64
-    u_char  sr_clen;
-    char    sr_cdata[SREF_COMM_SIZE];
+	u_char sr_clen;
+	char sr_cdata[SREF_COMM_SIZE];
 
-				/* ADDITIONAL reference */
+	/* ADDITIONAL reference */
 #define	SREF_ADDT_SIZE	4
-    u_char  sr_alen;
-    char    sr_adata[SREF_ADDT_SIZE];
+	u_char sr_alen;
+	char sr_adata[SREF_ADDT_SIZE];
 
-				/* for S-ACTIVITY-RESUME */
-    u_char  sr_vlen;
-    char    sr_vdata[SREF_USER_SIZE];
+	/* for S-ACTIVITY-RESUME */
+	u_char sr_vlen;
+	char sr_vdata[SREF_USER_SIZE];
 
 #define	sr_calling	sr_udata
 #define	sr_calling_len	sr_ulen
@@ -65,58 +121,54 @@ struct SSAPref {		/* SSAP reference */
 #define	sr_called_len	sr_vlen
 };
 
-/*  */
+struct SSAPstart {			/* S-CONNECT.INDICATION */
+	int ss_sd;			/* SESSION descriptor */
 
-struct SSAPstart {		/* S-CONNECT.INDICATION */
-    int	    ss_sd;		/* SESSION descriptor */
+	struct SSAPref ss_connect;	/* session connection identifier */
 
-    struct SSAPref  ss_connect;	/* session connection identifier */
-    
-    struct SSAPaddr ss_calling;	/* address of peer calling */
-    struct SSAPaddr ss_called;	/* address of peer called */
+	struct SSAPaddr ss_calling;	/* address of peer calling */
+	struct SSAPaddr ss_called;	/* address of peer called */
 
-    int	    ss_requirements;	/* session requirements */
-    int	    ss_settings;	/* initial settings of tokens */
-    long    ss_isn;		/* initial serial number */
+	int ss_requirements;		/* session requirements */
+	int ss_settings;		/* initial settings of tokens */
+	long ss_isn;			/* initial serial number */
 
-    int	    ss_ssdusize;	/* largest atomic SSDU */
-    int	    ss_version;	    	/* session service version number */
+	int ss_ssdusize;		/* largest atomic SSDU */
+	int ss_version;			/* session service version number */
 
-    struct QOStype ss_qos;	/* quality of service */
+	struct QOStype ss_qos;		/* quality of service */
 
-				/* initial DATA from peer */
+	/* initial DATA from peer */
 #define	SS_SIZE		512
-    int	    ss_cc;		/*   length */
-    char   *ss_data;		/*   data */
+	int ss_cc;			/* length */
+	char *ss_data;			/* data */
 };
+
 #define	SSFREE(ss) \
 { \
     if ((ss) -> ss_data) \
 	free ((ss) -> ss_data), (ss) -> ss_data = NULL; \
 }
 
-    
-struct SSAPconnect {		/* S-CONNECT.CONFIRMATION */
-    int	    sc_sd;		/* SESSION descriptor */
+struct SSAPconnect {			/* S-CONNECT.CONFIRMATION */
+	int sc_sd;			/* SESSION descriptor */
 
-    struct SSAPref  sc_connect;	/* session connection identifier */
-    
-    struct SSAPaddr sc_responding;/* address of peer responding */
+	struct SSAPref sc_connect;	/* session connection identifier */
 
-    int	    sc_result;		/* result */
+	struct SSAPaddr sc_responding;	/* address of peer responding */
+
+	int sc_result;			/* result */
 #define	SC_ACCEPT	(-1)
 
 #define	SC_BASE		0x80		/* reject by SSAP-provider */
 #define	SC_SSAPID	(SC_BASE + 1)	/* SSAP identifier unknown */
 #define	SC_SSUSER	(SC_BASE + 2)	/* SS-user not attached to SSAP */
 #define	SC_CONGEST	(SC_BASE + 3)	/* Congestion at SSAP */
-#define	SC_VERSION	(SC_BASE + 4)	/* Proposed protocol versions not
-					   supported */
+#define	SC_VERSION	(SC_BASE + 4)	/* Proposed protocol versions not supported */
 
-					/* begin UNOFFICIAL */
+	/* begin UNOFFICIAL */
 #define	SC_ADDRESS	(SC_BASE + 5)	/* Address unknown */
-#define	SC_REFUSED	(SC_BASE + 6)   /* Connect request refused on this
-				           network connection */
+#define	SC_REFUSED	(SC_BASE + 6)	/* Connect request refused on this network connection */
 #define	SC_TRANSPORT	(SC_BASE + 7)	/* Transport disconnect */
 #define	SC_ABORT	(SC_BASE + 8)	/* Provider-initiated abort */
 #define	SC_PROTOCOL	(SC_BASE + 9)	/* Protocol error */
@@ -124,9 +176,9 @@ struct SSAPconnect {		/* S-CONNECT.CONFIRMATION */
 #define	SC_OPERATION	(SC_BASE + 11)	/* Invalid operation */
 #define	SC_TIMER	(SC_BASE + 12)	/* Timer expired */
 #define	SC_WAITING	(SC_BASE + 13)	/* Indications waiting */
-					/* end UNOFFICIAL */
+	/* end UNOFFICIAL */
 
-					/* reject by SSAP-user */
+	/* reject by SSAP-user */
 #define	SC_NOTSPECIFIED	0		/* Reason not specified */
 #define	SC_CONGESTION	1		/* Temporary congestion */
 #define	SC_REJECTED	2		/* Rejected */
@@ -139,26 +191,26 @@ struct SSAPconnect {		/* S-CONNECT.CONFIRMATION */
 #define	SC_OFFICIAL(r)	((r) < SC_ADDRESS)
 #endif
 
-    int	    sc_requirements;	/* session requirements */
-    int	    sc_settings;	/* initial assignment of tokens */
-    int	    sc_please;		/* tokens requested by SS-user
-				   (S-TOKEN-PLEASE.INDICATION) */
-    long    sc_isn;		/* initial serial number */
+	int sc_requirements;		/* session requirements */
+	int sc_settings;		/* initial assignment of tokens */
+	int sc_please;			/* tokens requested by SS-user (S-TOKEN-PLEASE.INDICATION) */
+	long sc_isn;			/* initial serial number */
 
-    int	    sc_ssdusize;	/* largest atomic SSDU */
-    int	    sc_version;	    	/* session service version number */
+	int sc_ssdusize;		/* largest atomic SSDU */
+	int sc_version;			/* session service version number */
 
-    struct QOStype sc_qos;	/* quality of service */
+	struct QOStype sc_qos;		/* quality of service */
 
-				/* initial DATA from peer */
+	/* initial DATA from peer */
 #ifdef	HPUX
 #undef	SC_SIZE
 #endif
 #define	SC_SIZE		512
-    int	    sc_cc;		/*   length */
-    char   *sc_data;		/*   data */
-    char   *sc_realdata;	/*   real head of data */
+	int sc_cc;			/* length */
+	char *sc_data;			/* data */
+	char *sc_realdata;		/* real head of data */
 };
+
 #define	SCFREE(sc) \
 { \
     if ((sc) -> sc_realdata) \
@@ -168,7 +220,6 @@ struct SSAPconnect {		/* S-CONNECT.CONFIRMATION */
 	if ((sc) -> sc_data) \
 	    free ((sc) -> sc_data), (sc) -> sc_data = NULL; \
 }
-
 
 					/* SESSION requirements */
 #define	SR_HALFDUPLEX	0x0001	/* half-duplex */
@@ -226,206 +277,199 @@ struct SSAPconnect {		/* S-CONNECT.CONFIRMATION */
     dotoken (SR_DAT_EXISTS, ST_DAT_SHIFT, ST_DAT_TOKEN, "data"); \
 }
 
+struct SSAPdata {			/* S-READ.INDICATION */
+	int sx_type;			/* type of indication */
+#define	SX_NORMAL	0x00		/* S-DATA.INDICATION */
+#define	SX_EXPEDITED	0x01		/* S-EXPEDITED-DATA.INDICATION */
+#define	SX_TYPED	0x02		/* S-TYPED-DATA.INDICATION */
+#define	SX_CAPDIND	0x03		/* S-CAPABILITY-DATA.INDICATION */
+#define	SX_CAPDCNF	0x04		/* S-CAPABILITY-DATA.CONFIRMATION */
 
-struct SSAPdata {		/* S-READ.INDICATION */
-    int	    sx_type;		/* type of indication */
-#define	SX_NORMAL	0x00	/* S-DATA.INDICATION */
-#define	SX_EXPEDITED	0x01	/* S-EXPEDITED-DATA.INDICATION */
-#define	SX_TYPED	0x02	/* S-TYPED-DATA.INDICATION */
-#define	SX_CAPDIND	0x03	/* S-CAPABILITY-DATA.INDICATION */
-#define	SX_CAPDCNF	0x04	/* S-CAPABILITY-DATA.CONFIRMATION */
-
-#define	SX_EXSIZE	14	/* EXPEDITED DATA (XSSDU) only */
-#define	SX_CDSIZE	512	/* CAPABILITY DATA only */
-#define	SX_CDASIZE	512	/* CAPABILITY DATA ACK only */
-    int	    sx_cc;		/*   total length */
-    struct qbuf sx_qbuf;	/*   chained data */
+#define	SX_EXSIZE	14		/* EXPEDITED DATA (XSSDU) only */
+#define	SX_CDSIZE	512		/* CAPABILITY DATA only */
+#define	SX_CDASIZE	512		/* CAPABILITY DATA ACK only */
+	int sx_cc;			/* total length */
+	struct qbuf sx_qbuf;		/* chained data */
 };
+
 #define	SXFREE(sx)	QBFREE (&((sx) -> sx_qbuf))
 
+struct SSAPtoken {			/* S-{TOKEN-*,GIVE-CONTROL}.INDICATION */
+	int st_type;			/* type of indication */
+#define	ST_GIVE		0x00		/* S-TOKEN-GIVE.INDICATION */
+#define	ST_PLEASE	0x01		/* S-TOKEN-PLEASE.INDICATION */
+#define	ST_CONTROL	0x02		/* S-GIVE-CONTROL.INDICATION */
 
-struct SSAPtoken {		/* S-{TOKEN-*,GIVE-CONTROL}.INDICATION */
-    int	    st_type;		/* type of indication */
-#define	ST_GIVE		0x00	/* S-TOKEN-GIVE.INDICATION */
-#define	ST_PLEASE	0x01	/* S-TOKEN-PLEASE.INDICATION */
-#define	ST_CONTROL	0x02	/* S-GIVE-CONTROL.INDICATION */
-
-    u_char  st_tokens;		/* tokens offered/wanted */
+	u_char st_tokens;		/* tokens offered/wanted */
 #define	ST_RLS_TOKEN	(0x01 << ST_RLS_SHIFT)
 #define	ST_MAJ_TOKEN	(0x01 << ST_MAJ_SHIFT)
 #define	ST_ACT_TOKEN	(0x01 << ST_ACT_SHIFT)
 #define	ST_MIN_TOKEN	(0x01 << ST_MIN_SHIFT)
 #define	ST_DAT_TOKEN	(0x01 << ST_DAT_SHIFT)
 
-    u_char  st_owned;		/* tokens owned by user */
+	u_char st_owned;		/* tokens owned by user */
 
-#define	ST_SIZE		512	/* PLEASE TOKEN only */
-    int	    st_cc;		/*   length */
-    char   *st_data;		/*   data */
+#define	ST_SIZE		512		/* PLEASE TOKEN only */
+	int st_cc;			/* length */
+	char *st_data;			/* data */
 };
+
 #define	STFREE(st) \
 { \
     if ((st) -> st_data) \
 	free ((st) -> st_data), (st) -> st_data = NULL; \
 }
 
+struct SSAPsync {			/* S-*-SYNC.{INDICATION,CONFIRMATION} */
+	int sn_type;			/* type of indication/confirmation */
+#define	SN_MAJORIND	0x00		/* S-MAJOR-SYNC.INDICATION */
+#define	SN_MAJORCNF	0x01		/* S-MAJOR-SYNC.CONFIRMATION */
+#define	SN_MINORIND	0x02		/* S-MINOR-SYNC.INDICATION */
+#define	SN_MINORCNF	0x03		/* S-MINOR-SYNC.CONFIRMATION */
+#define	SN_RESETIND	0x04		/* S-RESYNCHRONIZE.INDICATION */
+#define	SN_RESETCNF	0x05		/* S-RESYNCHRONIZE.CONFIRMATION */
 
-struct SSAPsync {		/* S-*-SYNC.{INDICATION,CONFIRMATION} */
-    int	    sn_type;		/* type of indication/confirmation */
-#define	SN_MAJORIND	0x00	/* S-MAJOR-SYNC.INDICATION */
-#define	SN_MAJORCNF	0x01	/* S-MAJOR-SYNC.CONFIRMATION */
-#define	SN_MINORIND	0x02	/* S-MINOR-SYNC.INDICATION */
-#define	SN_MINORCNF	0x03	/* S-MINOR-SYNC.CONFIRMATION */
-#define	SN_RESETIND	0x04	/* S-RESYNCHRONIZE.INDICATION */
-#define	SN_RESETCNF	0x05	/* S-RESYNCHRONIZE.CONFIRMATION */
+	int sn_options;			/* options (!!) */
+	/* for S-MINOR-SYNC.INDICATION */
+#define	SYNC_CONFIRM	1		/* wants confirmation */
+#define	SYNC_NOCONFIRM	0		/* .. nope */
+	/* for S-RESYNCHRONIZE.INDICATION */
+#define	SYNC_RESTART	0		/* restart */
+#define	SYNC_ABANDON	1		/* abandon */
+#define	SYNC_SET	2		/* set */
 
-    int	    sn_options;		/* options (!!) */
-				/* for S-MINOR-SYNC.INDICATION */
-#define	SYNC_CONFIRM	1	/* wants confirmation */
-#define	SYNC_NOCONFIRM	0	/*   .. nope */
-				/* for S-RESYNCHRONIZE.INDICATION */
-#define	SYNC_RESTART	0	/* restart */
-#define	SYNC_ABANDON	1	/* abandon */
-#define	SYNC_SET	2	/* set */
+	long sn_ssn;			/* serial number */
+#define	SERIAL_NONE	(-1L)		/* No SSN */
+#define	SERIAL_MIN	000000L		/* the min SSN */
+#define	SERIAL_MAX	999998L		/* the max SSN */
 
-    long    sn_ssn;		/* serial number */
-#define	SERIAL_NONE	(-1L)	/* No SSN */
-#define	SERIAL_MIN	000000L	/* the min SSN */
-#define	SERIAL_MAX	999998L	/* the max SSN */
+	int sn_settings;		/* new token settings (RESYNC only) */
 
-    int	    sn_settings;	/* new token settings (RESYNC only) */
-
-				/* sync data from peer */
+	/* sync data from peer */
 #define	SN_SIZE		512
-    int	    sn_cc;		/*   length */
-    char   *sn_data;		/*   data */
+	int sn_cc;			/* length */
+	char *sn_data;			/* data */
 };
+
 #define	SNFREE(sn) \
 { \
     if ((sn) -> sn_data) \
 	free ((sn) -> sn_data), (sn) -> sn_data = NULL; \
 }
 
+struct SSAPactivity {			/* S-ACTIVITY-*.{INDICATION,CONFIRMATION} */
+	int sv_type;			/* type of indication/confirmation */
+#define	SV_START	0x00		/* S-ACTIVITY-START.INDICATION */
+#define	SV_RESUME	0x01		/* S-ACTIVITY-RESUME.INDICATION */
+#define	SV_INTRIND	0x02		/* S-ACTIVITY-INTERRUPT.INDICATION */
+#define	SV_INTRCNF	0x03		/* S-ACTIVITY-INTERRUPT.CONFIRMATION */
+#define	SV_DISCIND	0x04		/* S-ACTIVITY-DISCARD.INDICATION */
+#define	SV_DISCCNF	0x05		/* S-ACTIVITY-DISCARD.CONFIRMATION */
+#define	SV_ENDIND	0x06		/* S-ACTIVITY-END.INDICATION */
+#define	SV_ENDCNF	0x07		/* S-ACTIVITY-END.CONFIRMATION */
 
-struct SSAPactivity {		/* S-ACTIVITY-*.{INDICATION,CONFIRMATION} */
-    int	    sv_type;		/* type of indication/confirmation */
-#define	SV_START	0x00	/* S-ACTIVITY-START.INDICATION */
-#define	SV_RESUME	0x01	/* S-ACTIVITY-RESUME.INDICATION */
-#define	SV_INTRIND	0x02	/* S-ACTIVITY-INTERRUPT.INDICATION */
-#define	SV_INTRCNF	0x03	/* S-ACTIVITY-INTERRUPT.CONFIRMATION */
-#define	SV_DISCIND	0x04	/* S-ACTIVITY-DISCARD.INDICATION */
-#define	SV_DISCCNF	0x05	/* S-ACTIVITY-DISCARD.CONFIRMATION */
-#define	SV_ENDIND	0x06	/* S-ACTIVITY-END.INDICATION */
-#define	SV_ENDCNF	0x07	/* S-ACTIVITY-END.CONFIRMATION */
+	struct SSAPactid sv_id;		/* START/RESUME activity identifier */
 
-    struct SSAPactid sv_id;	/* START/RESUME activity identifier */
+	struct SSAPactid sv_oid;	/* RESUME old activity identifier */
+	struct SSAPref sv_connect;	/* old connection identifier */
 
-    struct SSAPactid sv_oid;	/* RESUME old activity identifier */
-    struct SSAPref   sv_connect;/* 	  old connection identifier */
+	long sv_ssn;			/* RESUME/END Serial number */
 
-    long    sv_ssn;		/* RESUME/END Serial number */
+	int sv_reason;			/* INTERRUPT/DISCARD */
+	/* same values as sp_reason */
 
-    int	    sv_reason;		/* INTERRUPT/DISCARD */
-				/* same values as sp_reason */
-        
-				/* activity DATA from peer */
+	/* activity DATA from peer */
 #define	SV_SIZE		512
-    int	    sv_cc;		/*   length */
-    char   *sv_data;		/*   data */
+	int sv_cc;			/* length */
+	char *sv_data;			/* data */
 };
+
 #define	SVFREE(sv) \
 { \
     if ((sv) -> sv_data) \
 	free ((sv) -> sv_data), (sv) -> sv_data = NULL; \
 }
 
+struct SSAPreport {			/* S-{U,P}-EXCEPTION-REPORT.INDICATION */
+	int sp_peer;			/* T = S-U-EXCEPTION-REPORT.INDICATION: sp_reason/sp_data
+					   both meaningful NIL = S-P-EXCEPTION-REPORT.INDICATION:
+					   sp_reason == SP_NOREASON, or sp_reason == SP_PROTOCOL */
+	int sp_reason;
+#define	SP_NOREASON	0		/* No specific reason stated */
+#define	SP_JEOPARDY	1		/* User receiving ability jeopardized */
+#define	SP_RSVD1	2		/* reserved */
+#define	SP_SEQUENCE	3		/* User sequence error */
+#define	SP_RSVD2	4		/* reserved */
+#define	SP_LOCAL	5		/* Local SS-user error */
+#define	SP_PROCEDURAL	6		/* Unrecoverable procedural error */
+#define	SP_DEMAND	128		/* Demand data token */
 
-struct SSAPreport {		/* S-{U,P}-EXCEPTION-REPORT.INDICATION */
-    int	    sp_peer;		/* T   = S-U-EXCEPTION-REPORT.INDICATION:
-					sp_reason/sp_data both meaningful
-				   NIL = S-P-EXCEPTION-REPORT.INDICATION:
-					sp_reason == SP_NOREASON, or
-					sp_reason == SP_PROTOCOL */
-    int	    sp_reason;
-#define	SP_NOREASON	0	/* No specific reason stated */
-#define	SP_JEOPARDY	1	/* User receiving ability jeopardized */
-#define	SP_RSVD1	2	/* reserved */
-#define	SP_SEQUENCE	3	/* User sequence error */
-#define	SP_RSVD2	4	/* reserved */
-#define	SP_LOCAL	5	/* Local SS-user error */
-#define	SP_PROCEDURAL	6	/* Unrecoverable procedural error */
-#define	SP_DEMAND	128	/* Demand data token */
+#define	SP_PROTOCOL	(-1)		/* SS-provider protocol error */
 
-#define	SP_PROTOCOL	(-1)	/* SS-provider protocol error */
-
-				/* report DATA from peer */
+	/* report DATA from peer */
 #define	SP_SIZE		512
-    int	    sp_cc;		/*   length */
-    char   *sp_data;		/*   data */
+	int sp_cc;			/* length */
+	char *sp_data;			/* data */
 };
+
 #define	SPFREE(sp) \
 { \
     if ((sp) -> sp_data) \
 	free ((sp) -> sp_data), (sp) -> sp_data = NULL; \
 }
 
-
-struct SSAPfinish {		/* S-RELEASE.INDICATION */
-				/* release DATA from peer */
+struct SSAPfinish {			/* S-RELEASE.INDICATION */
+	/* release DATA from peer */
 #define	SF_SIZE		512
-    int	    sf_cc;		/*   length */
-    char   *sf_data;		/*   data */
+	int sf_cc;			/* length */
+	char *sf_data;			/* data */
 };
+
 #define	SFFREE(sf) \
 { \
     if ((sf) -> sf_data) \
 	free ((sf) -> sf_data), (sf) -> sf_data = NULL; \
 }
 
+struct SSAPrelease {			/* S-RELEASE.CONFIRMATION */
+	int sr_affirmative;		/* T = connection released NIL = request refused */
 
-struct SSAPrelease {		/* S-RELEASE.CONFIRMATION */
-    int	    sr_affirmative;	/* T   = connection released
-				   NIL = request refused */
-
-				/* release DATA from peer */
+	/* release DATA from peer */
 #define	SR_SIZE		512
-    int	    sr_cc;		/*   length */
-    char   *sr_data;		/*   data */
+	int sr_cc;			/* length */
+	char *sr_data;			/* data */
 };
+
 #define	SRFREE(sr) \
 { \
     if ((sr) -> sr_data) \
 	free ((sr) -> sr_data), (sr) -> sr_data = NULL; \
 }
 
+struct SSAPabort {			/* S-{U,P}-ABORT.INDICATION */
+	int sa_peer;			/* T = S-U-ABORT.INDICATION: sa_info/sa_cc is meaningful
+					   NIL = S-P-ABORT.INDICATION: sa_reason is meaningful,
+					   sa_data/sa_cc contains diagnostics */
 
-struct SSAPabort {		/* S-{U,P}-ABORT.INDICATION */
-    int	    sa_peer;		/* T   = S-U-ABORT.INDICATION:
-					     sa_info/sa_cc is meaningful
-				   NIL = S-P-ABORT.INDICATION:
-					     sa_reason is meaningful,
-					     sa_data/sa_cc contains diagnostics */
+	int sa_reason;			/* same codes as sc_result */
 
-    int	    sa_reason;		/* same codes as sc_result */
-
-				/* abort DATA from peer */
-#define	SA_SIZE		512	/* N.B.: the ISO DIS says 9, but we use
-				   512 instead so ASE-level aborts will work
-				   reasonably */
-    int	    sa_cc;		/*   length */
-    char   *sa_info;		/*   data (from the peer) */
-    char   *sa_realinfo;	/*   real head of data */
-    char    sa_data[512];	/*   data (for messages from provider) */
+	/* abort DATA from peer */
+#define	SA_SIZE		512		/* N.B.: the ISO DIS says 9, but we use 512 instead so
+					   ASE-level aborts will work reasonably */
+	int sa_cc;			/* length */
+	char *sa_info;			/* data (from the peer) */
+	char *sa_realinfo;		/* real head of data */
+	char sa_data[512];		/* data (for messages from provider) */
 };
+
 #define	SAFREE(sa) \
 { \
     if ((sa) -> sa_realinfo) \
 	free ((sa) -> sa_realinfo), (sa) -> sa_realinfo = NULL; \
 }
 
-
 struct SSAPindication {
-    int	    si_type;		/* the union element present */
+	int si_type;			/* the union element present */
 #define	SI_DATA		0x00
 #define	SI_TOKEN	0x01
 #define	SI_SYNC		0x02
@@ -435,19 +479,19 @@ struct SSAPindication {
 #define	SI_ABORT	0x06
 
 #ifdef HULA
-#define SI_UNITDATA	0xFF	/* unit data indication */
-#define SI_UDERROR      0xF0 	/* unit data error indication */
+#define SI_UNITDATA	0xFF		/* unit data indication */
+#define SI_UDERROR      0xF0		/* unit data error indication */
 #endif
 
-    union {
-	struct SSAPdata si_un_data;
-	struct SSAPtoken si_un_token;
-	struct SSAPsync si_un_sync;
-	struct SSAPactivity si_un_activity;
-	struct SSAPreport si_un_report;
-	struct SSAPfinish si_un_finish;
-	struct SSAPabort si_un_abort;
-    }	si_un;
+	union {
+		struct SSAPdata si_un_data;
+		struct SSAPtoken si_un_token;
+		struct SSAPsync si_un_sync;
+		struct SSAPactivity si_un_activity;
+		struct SSAPreport si_un_report;
+		struct SSAPfinish si_un_finish;
+		struct SSAPabort si_un_abort;
+	} si_un;
 
 #define	si_data		si_un.si_un_data
 #define	si_token	si_un.si_un_token
@@ -459,65 +503,65 @@ struct SSAPindication {
 
 };
 
-/*  */
-
 extern char *ssapversion;
 
+int SExec();				/* SERVER only */
+int SInit();				/* S-CONNECT.INDICATION */
 
-int	SExec ();		/* SERVER only */
-int	SInit ();		/* S-CONNECT.INDICATION */
+int SConnResponse();			/* S-CONNECT.RESPONSE */
+int SConnRequest();			/* S-CONNECT.REQUEST (backwards-compatible) */
 
-int	SConnResponse ();	/* S-CONNECT.RESPONSE */
-int	SConnRequest ();	/* S-CONNECT.REQUEST (backwards-compatible) */
 #define	SConnRequest(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11) \
 	SAsynConnRequest (a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,0)
-int	SAsynConnRequest ();	/* S-(ASYN-)CONNECT.REQUEST */
-int	SAsynRetryRequest ();	/* S-ASYN-RETRY.REQUEST (pseudo) */
-int	SDataRequest ();	/* S-DATA.REQUEST */
-int	SWriteRequest ();	/* S-WRITE.REQUEST (pseudo) */
-int	SExpdRequest ();	/* S-EXPEDITED-DATA.REQUEST */
-int	STypedRequest ();	/* S-TYPED-DATA.REQUEST */
-int	SCapdRequest ();	/* S-CAPABILITY-DATA.REQUEST */
-int	SCapdResponse ();	/* S-CAPABILITY-DATA.RESPONSE */
-int	SReadRequest ();	/* S-READ.REQUEST (pseudo) */
-int	SGTokenRequest ();	/* S-TOKEN-GIVE.REQUEST */
-int	SPTokenRequest ();	/* S-TOKEN-PLEASE.REQUEST */
-int	SGControlRequest ();	/* S-CONTROL-GIVE.REQUEST */
-int	SMajSyncRequest ();	/* S-MAJOR-SYNC.REQUEST */
-int	SMajSyncResponse ();	/* S-MAJOR-SYNC.RESPONSE */
-int	SMinSyncRequest ();	/* S-MINOR-SYNC.REQUEST */
-int	SMinSyncResponse ();	/* S-MINOR-SYNC.RESPONSE */
-int	SReSyncRequest ();	/* S-RESYNCHRONIZE.REQUEST */
-int	SReSyncResponse ();	/* S-RESYNCHRONIZE.RESPONSE */
-int	SActStartRequest ();	/* S-ACTIVITY-START.REQUEST */
-int	SActResumeRequest ();	/* S-ACTIVITY-RESUME.REQUEST */
-int	SActIntrRequest ();	/* S-ACTIVITY-INTERRUPT.REQUEST */
-int	SActIntrResponse ();	/* S-ACTIVITY-INTERRUPT.RESPONSE */
-int	SActDiscRequest ();	/* S-ACTIVITY-DISCARD.REQUEST */
-int	SActDiscResponse ();	/* S-ACTIVITY-DISCARD.RESPONSE */
-int	SActEndRequest ();	/* S-ACTIVITY-END.REQUEST */
-int	SActEndResponse ();	/* S-ACTIVITY-END.RESPONSE */
-int	SUAbortRequest ();	/* S-U-ABORT.REQUEST */
-int	SUReportRequest ();	/* S-U-EXCEPTION-REPORT.REQUEST */
-int	SRelRequest ();		/* S-RELEASE.REQUEST */
-int	SRelResponse ();	/* S-RELEASE.RESPONSE */
+int SAsynConnRequest();			/* S-(ASYN-)CONNECT.REQUEST */
+int SAsynRetryRequest();		/* S-ASYN-RETRY.REQUEST (pseudo) */
+int SDataRequest();			/* S-DATA.REQUEST */
+int SWriteRequest();			/* S-WRITE.REQUEST (pseudo) */
+int SExpdRequest();			/* S-EXPEDITED-DATA.REQUEST */
+int STypedRequest();			/* S-TYPED-DATA.REQUEST */
+int SCapdRequest();			/* S-CAPABILITY-DATA.REQUEST */
+int SCapdResponse();			/* S-CAPABILITY-DATA.RESPONSE */
+int SReadRequest();			/* S-READ.REQUEST (pseudo) */
+int SGTokenRequest();			/* S-TOKEN-GIVE.REQUEST */
+int SPTokenRequest();			/* S-TOKEN-PLEASE.REQUEST */
+int SGControlRequest();			/* S-CONTROL-GIVE.REQUEST */
+int SMajSyncRequest();			/* S-MAJOR-SYNC.REQUEST */
+int SMajSyncResponse();			/* S-MAJOR-SYNC.RESPONSE */
+int SMinSyncRequest();			/* S-MINOR-SYNC.REQUEST */
+int SMinSyncResponse();			/* S-MINOR-SYNC.RESPONSE */
+int SReSyncRequest();			/* S-RESYNCHRONIZE.REQUEST */
+int SReSyncResponse();			/* S-RESYNCHRONIZE.RESPONSE */
+int SActStartRequest();			/* S-ACTIVITY-START.REQUEST */
+int SActResumeRequest();		/* S-ACTIVITY-RESUME.REQUEST */
+int SActIntrRequest();			/* S-ACTIVITY-INTERRUPT.REQUEST */
+int SActIntrResponse();			/* S-ACTIVITY-INTERRUPT.RESPONSE */
+int SActDiscRequest();			/* S-ACTIVITY-DISCARD.REQUEST */
+int SActDiscResponse();			/* S-ACTIVITY-DISCARD.RESPONSE */
+int SActEndRequest();			/* S-ACTIVITY-END.REQUEST */
+int SActEndResponse();			/* S-ACTIVITY-END.RESPONSE */
+int SUAbortRequest();			/* S-U-ABORT.REQUEST */
+int SUReportRequest();			/* S-U-EXCEPTION-REPORT.REQUEST */
+int SRelRequest();			/* S-RELEASE.REQUEST */
+int SRelResponse();			/* S-RELEASE.RESPONSE */
 
 #ifdef HULA
-int	SUnitDataBind();	/* bind local to a remote address */
-int	SUnitDataUnbind();	/* unbind local from a remote address */
-int	SUnitDataSetupRead();	/* set up read data for server */
-int	SUnitDataWrite();	/* UNITDATA.request (with handle) */
-int	SUnitDataRead();	/* UNITDATA.indication (with handle) */
-int	SUnitDataRequest();	/* UNITDATA.request (without handle) */
-int	SUnitDataSelectMask();	/* set the select mask for async */
+int SUnitDataBind();			/* bind local to a remote address */
+int SUnitDataUnbind();			/* unbind local from a remote address */
+int SUnitDataSetupRead();		/* set up read data for server */
+int SUnitDataWrite();			/* UNITDATA.request (with handle) */
+int SUnitDataRead();			/* UNITDATA.indication (with handle) */
+int SUnitDataRequest();			/* UNITDATA.request (without handle) */
+int SUnitDataSelectMask();		/* set the select mask for async */
 #endif
 
-int	SSetIndications ();	/* define vectors for INDICATION events */
-int	SSelectMask ();		/* map session descriptors for select() */
+int SSetIndications();			/* define vectors for INDICATION events */
+int SSelectMask();			/* map session descriptors for select() */
 
-char   *SErrString ();		/* return SSAP error code in string form */
+char *SErrString();			/* return SSAP error code in string form */
 
 #define	SLocalHostName	getlocalhost
-char   *SLocalHostName ();	/* return name of local host (sigh) */
+char *SLocalHostName();			/* return name of local host (sigh) */
 
 #endif
+
+#endif				/* __CL_H_SSAP_H__ */

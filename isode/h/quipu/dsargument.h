@@ -1,10 +1,69 @@
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __ISODE_QUIPU_DSARGUMENT_H__
+#define __ISODE_QUIPU_DSARGUMENT_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
 /* dsargument.h - structures for argument and result */
 
 /*
- * $Header: /xtel/isode/isode/h/quipu/RCS/dsargument.h,v 9.0 1992/06/16 12:23:11 isode Rel $
+ * Header: /xtel/isode/isode/h/quipu/RCS/dsargument.h,v 9.0 1992/06/16 12:23:11 isode Rel
  *
  *
- * $Log: dsargument.h,v $
+ * Log: dsargument.h,v
  * Revision 9.0  1992/06/16  12:23:11  isode
  * Release 8.0
  *
@@ -19,7 +78,6 @@
  *    this agreement.
  *
  */
-
 
 #ifndef QUIPUDSARG
 #define QUIPUDSARG
@@ -36,21 +94,21 @@
 #define EXTENDED_DSP(x) (((x)==CN_CTX_QUIPU_DSP)||((x)==CN_CTX_INTERNET_DS))
 
 struct DSArgument {
-   int arg_type;
+	int arg_type;
 #define ds_recog_op(a) ((a >= OP_READ) && (a <= OP_MODIFYRDN))
 #define qu_recog_op(a) ((a >= OP_READ) && (a <= OP_GETEDB))
-   union {
-       struct ds_read_arg arg_un_read;
-       struct ds_compare_arg arg_un_compare;
-       struct ds_abandon_arg arg_un_abandon;
-       struct ds_list_arg arg_un_list;
-       struct ds_search_arg arg_un_search;
-       struct ds_addentry_arg arg_un_addentry;
-       struct ds_removeentry_arg arg_un_removeentry;
-       struct ds_modifyentry_arg arg_un_modifyentry;
-       struct ds_modifyrdn_arg arg_un_modifyrdn;
-       struct getedb_arg arg_un_getedb;
-   } arg_un;
+	union {
+		struct ds_read_arg arg_un_read;
+		struct ds_compare_arg arg_un_compare;
+		struct ds_abandon_arg arg_un_abandon;
+		struct ds_list_arg arg_un_list;
+		struct ds_search_arg arg_un_search;
+		struct ds_addentry_arg arg_un_addentry;
+		struct ds_removeentry_arg arg_un_removeentry;
+		struct ds_modifyentry_arg arg_un_modifyentry;
+		struct ds_modifyrdn_arg arg_un_modifyrdn;
+		struct getedb_arg arg_un_getedb;
+	} arg_un;
 #define arg_rd arg_un.arg_un_read
 #define arg_cm arg_un.arg_un_compare
 #define arg_ab arg_un.arg_un_abandon
@@ -64,14 +122,14 @@ struct DSArgument {
 };
 
 struct DSResult {
-    int result_type;    /* same values as for DSArgument                */
-    union {
-       struct ds_read_result result_un_read;
-       struct ds_compare_result result_un_compare;
-       struct ds_list_result result_un_list;
-       struct ds_search_result result_un_search;
-       struct getedb_result result_un_getedb;
-    } result_un;
+	int result_type;		/* same values as for DSArgument */
+	union {
+		struct ds_read_result result_un_read;
+		struct ds_compare_result result_un_compare;
+		struct ds_list_result result_un_list;
+		struct ds_search_result result_un_search;
+		struct getedb_result result_un_getedb;
+	} result_un;
 #define res_rd result_un.result_un_read
 #define res_cm result_un.result_un_compare
 #define res_ls result_un.result_un_list
@@ -79,55 +137,53 @@ struct DSResult {
 #define res_ge result_un.result_un_getedb
 };
 
-typedef struct cross_ref
-    {
-	DN			  xref_dn;
-	struct access_point	* xref_ap;
-	struct cross_ref	* xref_next;
-    } CrossRefs;
+typedef struct cross_ref {
+	DN xref_dn;
+	struct access_point *xref_ap;
+	struct cross_ref *xref_next;
+} CrossRefs;
+
 #define NULLXREF ((struct cross_ref *) NULL)
 
-typedef struct chain_arg
-    {
-	DN				  cha_originator;
-	DN				  cha_target;
-	struct op_progress		  cha_progress;
-	struct trace_info		* cha_trace;
-	char				  cha_aliasderef;
-	int				  cha_aliasedrdns;
-	char				  cha_entryonly;
-	int				  cha_returnrefs;
-	int				  cha_reftype;
-	PE				  cha_domaininfo;
-	char				* cha_timelimit;
-	struct security_parms 		* cha_security;
-    } * ChainingArg;
+typedef struct chain_arg {
+	DN cha_originator;
+	DN cha_target;
+	struct op_progress cha_progress;
+	struct trace_info *cha_trace;
+	char cha_aliasderef;
+	int cha_aliasedrdns;
+	char cha_entryonly;
+	int cha_returnrefs;
+	int cha_reftype;
+	PE cha_domaininfo;
+	char *cha_timelimit;
+	struct security_parms *cha_security;
+} *ChainingArg;
 
-typedef struct chain_res
-    {
-	PE				  chr_domaininfo;
-	struct cross_ref		* chr_crossrefs;
-	struct security_parms 		* chr_security;
-    } * ChainingRes;
+typedef struct chain_res {
+	PE chr_domaininfo;
+	struct cross_ref *chr_crossrefs;
+	struct security_parms *chr_security;
+} *ChainingRes;
 
-typedef struct ds_op_arg
-    {
-	struct chain_arg	dca_charg;
-	struct DSArgument	dca_dsarg;
-	int			dca_choice;
-	struct alg_id *		dca_alg;
-	int			dca_len;
-	char *			dca_bit;
-    } OPArgument;
+typedef struct ds_op_arg {
+	struct chain_arg dca_charg;
+	struct DSArgument dca_dsarg;
+	int dca_choice;
+	struct alg_id *dca_alg;
+	int dca_len;
+	char *dca_bit;
+} OPArgument;
 
-typedef struct ds_op_res
-    {
-	struct chain_res	dcr_chres;
-	struct DSResult		dcr_dsres;
-	int			dcr_choice;
-	struct alg_id *		dcr_alg;
-	int			dcr_len;
-	char *			dcr_bit;
-    } OPResult;
+typedef struct ds_op_res {
+	struct chain_res dcr_chres;
+	struct DSResult dcr_dsres;
+	int dcr_choice;
+	struct alg_id *dcr_alg;
+	int dcr_len;
+	char *dcr_bit;
+} OPResult;
 
 #endif
+
+#endif				/* __ISODE_QUIPU_DSARGUMENT_H__ */

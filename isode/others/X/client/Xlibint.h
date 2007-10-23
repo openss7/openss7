@@ -1,6 +1,65 @@
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __X_CLIENT_XLIBINIT_H__
+#define __X_CLIENT_XLIBINIT_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
 #include <X11/copyright.h>
 
-/* $XConsortium: Xlibint.h,v 11.61 88/09/06 16:09:16 jim Exp $ */
+/* XConsortium: Xlibint.h,v 11.61 88/09/06 16:09:16 jim Exp */
 /* Copyright 1984, 1985, 1987  Massachusetts Institute of Technology */
 
 /*
@@ -17,18 +76,18 @@
 #ifdef CRAY
 #ifndef __TYPES__
 #define __TYPES__
-#include <sys/types.h>			/* forgot to protect it... */
-#endif /* __TYPES__ */
+#include <sys/types.h>		/* forgot to protect it... */
+#endif				/* __TYPES__ */
 #else
 #include <sys/types.h>
-#endif /* CRAY */
+#endif				/* CRAY */
 
 /*
  * define the following if you want the Data macro to be a procedure instead
  */
 #if defined(CRAY)
 #define DataRoutineIsProcedure
-#endif /* CRAY */
+#endif				/* CRAY */
 
 #include "Xlib.h"
 #include <X11/Xproto.h>
@@ -44,19 +103,19 @@
 extern int errno;			/* Internal system error number. */
 extern void bcopy();
 
-extern (*_XIOErrorFunction)();		/* X system error reporting routine. */
-extern (*_XErrorFunction)();		/* X_Error event reporting routine. */
+extern (*_XIOErrorFunction) ();		/* X system error reporting routine. */
+extern (*_XErrorFunction) ();		/* X_Error event reporting routine. */
 extern char *_XAllocScratch();		/* fast memory allocator */
 extern Visual *_XVIDtoVisual();		/* given visual id, find structure */
 
 #ifndef BUFSIZE
-#define BUFSIZE 2048			/* X output buffer size. */
+#define BUFSIZE 2048		/* X output buffer size. */
 #endif
 #ifndef EPERBATCH
-#define EPERBATCH 8			/* when batching, how many elements */
+#define EPERBATCH 8		/* when batching, how many elements */
 #endif
 #ifndef CURSORFONT
-#define CURSORFONT "cursor"		/* standard cursor fonts */
+#define CURSORFONT "cursor"	/* standard cursor fonts */
 #endif
 
 /*
@@ -79,10 +138,9 @@ extern Visual *_XVIDtoVisual();		/* given visual id, find structure */
              dpy->request += 1;\
              dpy->bufptr += 4;\
          }
-#else /* else does not require alignment on 64-bit boundaries */
+#else				/* else does not require alignment on 64-bit boundaries */
 #define WORD64ALIGN
-#endif /* WORD64 */
-
+#endif				/* WORD64 */
 
 /*
  * GetReq - Get the next avilable X request packet in the buffer and
@@ -104,7 +162,8 @@ extern Visual *_XVIDtoVisual();		/* given visual id, find structure */
 	dpy->bufptr += SIZEOF(x##name##Req);\
 	dpy->request++
 
-#else  /* non-ANSI C uses empty comment instead of "##" for token concatenation */
+#else				/* non-ANSI C uses empty comment instead of "##" for token
+				   concatenation */
 #define GetReq(name, req) \
         WORD64ALIGN\
 	if ((dpy->bufptr + SIZEOF(x/**/name/**/Req)) > dpy->bufmax)\
@@ -140,7 +199,6 @@ extern Visual *_XVIDtoVisual();		/* given visual id, find structure */
 	dpy->bufptr += SIZEOF(x/**/name/**/Req) + n;\
 	dpy->request++
 #endif
-
 
 /*
  * GetResReq is for those requests that have a resource ID 
@@ -198,7 +256,6 @@ extern Visual *_XVIDtoVisual();		/* given visual id, find structure */
 	dpy->request++
 #endif
 
-
 #define SyncHandle() \
 	if (dpy->synchandler) (*dpy->synchandler)(dpy)
 
@@ -222,8 +279,7 @@ extern void Data();
 		dpy->bufptr += ((len) + 3) & ~3;\
 	} else\
 		_XSend(dpy, data, len)
-#endif /* DataRoutineIsProcedure */
-
+#endif				/* DataRoutineIsProcedure */
 
 /* Allocate bytes from the buffer.  No padding is done, so if
  * the length is not a multiple of 4, the caller must be
@@ -254,7 +310,7 @@ extern void Data();
 #define _XRead16Pad(dpy, data, len) _XReadPad((dpy), (char *)(data), (len))
 #define _XRead16(dpy, data, len) _XRead((dpy), (char *)(data), (len))
 #define _XRead32(dpy, data, len) _XRead((dpy), (char *)(data), (len))
-#endif /* not WORD64 */
+#endif				/* not WORD64 */
 
 #define PackData16(dpy,data,len) Data16 (dpy, data, len)
 #define PackData32(dpy,data,len) Data32 (dpy, data, len)
@@ -265,11 +321,9 @@ extern void Data();
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 
-#define	CI_NONEXISTCHAR	0x4000	/* required because QueryFont represents
-				   a non-existant character with zero-value
-				   metrics, but requires drivers to output
-				   the default char in their place. */
-
+#define	CI_NONEXISTCHAR	0x4000	/* required because QueryFont represents a non-existant character
+				   with zero-value metrics, but requires drivers to output the
+				   default char in their place. */
 
 #ifdef MUSTCOPY
 
@@ -294,15 +348,18 @@ extern void Data();
   for (tpvar = (type *) start; endcond; tpvar++, decr) {
 #define ENDITERATE }
 
-#endif /* MUSTCOPY - used machines whose C structs don't line up with proto */
+#endif				/* MUSTCOPY - used machines whose C structs don't line up with
+				   proto */
 
 #ifdef ISOCONN
 extern int fd2family[MAXSOCKS];
 
-extern int (*readfn[])(); 
-extern int (*writefn[])(); 
-extern int (*readvfn[])();
-extern int (*writevfn[])();
-extern int (*ioctlfn[])();
-extern int (*closefn[])();
-#endif /* ISOCONN */
+extern int (*readfn[]) ();
+extern int (*writefn[]) ();
+extern int (*readvfn[]) ();
+extern int (*writevfn[]) ();
+extern int (*ioctlfn[]) ();
+extern int (*closefn[]) ();
+#endif				/* ISOCONN */
+
+#endif				/* __X_CLIENT_XLIBINIT_H__ */

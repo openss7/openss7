@@ -1,10 +1,69 @@
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __ISODE_QUIPU_CONNECTION_H__
+#define __ISODE_QUIPU_CONNECTION_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
 /* connection.h - directory internal structures */
 
 /*
- * $Header: /xtel/isode/isode/h/quipu/RCS/connection.h,v 9.0 1992/06/16 12:23:11 isode Rel $
+ * Header: /xtel/isode/isode/h/quipu/RCS/connection.h,v 9.0 1992/06/16 12:23:11 isode Rel
  *
  *
- * $Log: connection.h,v $
+ * Log: connection.h,v
  * Revision 9.0  1992/06/16  12:23:11  isode
  * Release 8.0
  *
@@ -20,7 +79,6 @@
  *
  */
 
-
 #ifndef QUIPUCON
 #define QUIPUCON
 
@@ -34,6 +92,7 @@
 #define DSA_MAX_PRIO            3
 
 extern int max_conns;
+
 #define MAX_CONNS		max_conns	/* Maximum concurrent connections */
 #define CONNS_RESERVED_DI	2	/* Reserved for Get DSA Info ops */
 #define CONNS_RESERVED_X500	10	/* Reserved for normal operations */
@@ -71,42 +130,42 @@ extern int max_conns;
 *  di_oper points to the operation to be alerted from type DI_OPERATION
 *  di_perform points to the operation performing the get dsa info operation
 */
-struct di_block
-{
-	DN	  di_dn;	/* Name of dsa this block refers to */
+struct di_block {
+	DN di_dn;			/* Name of dsa this block refers to */
 
-	char	  di_type;	/* Global list, operation list or task list */
-#define DI_GLOBAL	1	/* deferred_dis lists this block */
-#define DI_OPERATION	2	/* di_oper lists this block */
-#define DI_TASK		3	/* di_task lists this block */
+	char di_type;			/* Global list, operation list or task list */
+#define DI_GLOBAL	1		/* deferred_dis lists this block */
+#define DI_OPERATION	2		/* di_oper lists this block */
+#define DI_TASK		3		/* di_task lists this block */
 
-	char	  di_state;	/* How the dsa information is formed */
-#define DI_COMPLETE	1	/* di_entry filled out */
-#define DI_ACCESSPOINT	2	/* di_accesspoints filled out */
-#define DI_DEFERRED	3	/* di_perform still generating di_entry */
+	char di_state;			/* How the dsa information is formed */
+#define DI_COMPLETE	1		/* di_entry filled out */
+#define DI_ACCESSPOINT	2		/* di_accesspoints filled out */
+#define DI_DEFERRED	3		/* di_perform still generating di_entry */
 
-	struct task_act		* di_task;
-	struct oper_act		* di_oper;
+	struct task_act *di_task;
+	struct oper_act *di_oper;
 
 /*
 *  The following are needed to generate chaining arguments from DSAInformation
 *  in the case of chaining (DI_OPERATION); and to generate continuation
 *  references in the case of referring (DI_TASK). Not present for DI_GLOBAL
 */
-	DN			  di_target;
-	int			  di_reftype;
-	int			  di_rdn_resolved;
-	int			  di_aliasedRDNs;
+	DN di_target;
+	int di_reftype;
+	int di_rdn_resolved;
+	int di_aliasedRDNs;
 
-	struct access_point	* di_accesspoints;
+	struct access_point *di_accesspoints;
 
-	Entry			  di_entry;
+	Entry di_entry;
 
-	struct oper_act		* di_perform;
+	struct oper_act *di_perform;
 
-	struct di_block		* di_wake_next;	/* List of blocks to wake */
-	struct di_block		* di_next;	/* List of blocks */
+	struct di_block *di_wake_next;	/* List of blocks to wake */
+	struct di_block *di_next;	/* List of blocks */
 };
+
 #define NULL_DI_BLOCK	((struct di_block *) NULL)
 
 /*
@@ -116,46 +175,45 @@ struct di_block
 * representations of the progress of the task and fields to be
 * used for generating the response.
 */
-struct task_act
-{
-	int			  tk_prio;
-	char			  tk_state;
+struct task_act {
+	int tk_prio;
+	char tk_state;
 #define TK_ACTIVE		  1	/* Task ready to have work done */
 #define TK_PASSIVE		  2	/* Task waiting for operation */
 #define TK_SUSPEND		  3	/* Giving the network a chance */
 
-	char			  tk_timed;
-	time_t			  tk_timeout;
+	char tk_timed;
+	time_t tk_timeout;
 
-	struct DSAPinvoke	  tk_dx;
-	struct di_block		* tk_dsas;	/* di_blocks for referral */
+	struct DSAPinvoke tk_dx;
+	struct di_block *tk_dsas;	/* di_blocks for referral */
 
-	struct DSAPindication	  tk_resp;
-	struct ds_op_res	* tk_result;
-	struct DSError		* tk_error;
+	struct DSAPindication tk_resp;
+	struct ds_op_res *tk_result;
+	struct DSError *tk_error;
 
 	/* Specific additions to provide multi-subtask search implementation */
-	struct ds_search_task	* local_st;
-	struct ds_search_task	* refer_st;
-	struct ds_search_task	* referred_st;
+	struct ds_search_task *local_st;
+	struct ds_search_task *refer_st;
+	struct ds_search_task *referred_st;
 
-	struct oper_act		* tk_operlist;
-	struct task_act		* tk_next;
+	struct oper_act *tk_operlist;
+	struct task_act *tk_next;
 
-	struct connection	* tk_conn;
+	struct connection *tk_conn;
 };
+
 #define NULLTASK ((struct task_act *) NULL)
 
-struct oper_act
-{
-	int                       on_id;
-	char                      on_state;
+struct oper_act {
+	int on_id;
+	char on_state;
 #define ON_DEFERRED		  1	/* Waiting for DSA INFO */
 #define ON_CHAINED		  2	/* Waiting for a response */
 #define ON_COMPLETE		  3	/* Waiting to be used by task */
 #define ON_ABANDONED		  4	/* Waiting for response - no task */
 
-	char                      on_type;
+	char on_type;
 #define ON_TYPE_X500		  1
 #define ON_TYPE_BIND_COMPARE	  2
 #define ON_TYPE_GET_DSA_INFO	  3
@@ -164,68 +222,66 @@ struct oper_act
 #define ON_TYPE_SHADOW		  6
 
 /* Specific to ON_TYPE_X500 */
-	struct task_act         *on_task;		/* Task to wake */
+	struct task_act *on_task;	/* Task to wake */
 
 /* Specific to ON_TYPE_BIND_COMPARE */
-	struct connection	*on_bind_compare;	/* Bind to wake */
+	struct connection *on_bind_compare;	/* Bind to wake */
 
 /* Specific to ON_TYPE_GET_DSA_INFO */
-	struct di_block		* on_wake_list;		/* di_blocks to wake */
+	struct di_block *on_wake_list;	/* di_blocks to wake */
 
 /* Specific to ON_TYPE_GET_EDB */
-	Entry			  on_getedb_eptr;	/* previous entry */
-	char			* on_getedb_ver;	/* previous version */
-	char                    on_relay;       /* if TRUE try Relay DSA */
+	Entry on_getedb_eptr;		/* previous entry */
+	char *on_getedb_ver;		/* previous version */
+	char on_relay;			/* if TRUE try Relay DSA */
 
 /* Specific to ON_TYPE_SUBTASK */
-	struct ds_search_task	* on_subtask;
+	struct ds_search_task *on_subtask;
 
-	struct di_block		* on_dsas;	/* DSAInfos for chaining */
+	struct di_block *on_dsas;	/* DSAInfos for chaining */
 
-	struct ds_op_arg        on_req;		/* Argument stuff */
-	struct ds_op_arg	*on_arg;
+	struct ds_op_arg on_req;	/* Argument stuff */
+	struct ds_op_arg *on_arg;
 
-	struct DSAPindication	  on_resp;	/* Response stuff */
+	struct DSAPindication on_resp;	/* Response stuff */
 
-	struct oper_act         *on_next_conn;
-	struct oper_act         *on_next_task;
+	struct oper_act *on_next_conn;
+	struct oper_act *on_next_task;
 
-	struct connection       *on_conn;
+	struct connection *on_conn;
 };
+
 #define NULLOPER ((struct oper_act *) NULL)
 
-struct conn_start
-{
+struct conn_start {
 	/* Values stored after call to TNetAccept */
-	int			  cs_vecp;
-	char 			* cs_vec[4];
-	char			* cs_svec[4];
+	int cs_vecp;
+	char *cs_vec[4];
+	char *cs_svec[4];
 
 	/* Value extracted from above by conn_init() */
-	struct DSAPstart          cs_ds;
+	struct DSAPstart cs_ds;
 
 	/* Operation carrying out compare for binding */
-	struct oper_act 	* cs_bind_compare;
+	struct oper_act *cs_bind_compare;
 
 	/* Result or error generated for response */
-	struct ds_bind_arg	  cs_res;
-	struct ds_bind_error	  cs_err;
+	struct ds_bind_arg cs_res;
+	struct ds_bind_error cs_err;
 };
 
-struct conn_connect
-{
+struct conn_connect {
 	/* Bind argument used in conn_request() */
-	struct ds_bind_arg              cc_req;
+	struct ds_bind_arg cc_req;
 
-	struct DSAPconnect		cc_dc;
+	struct DSAPconnect cc_dc;
 };
 
 /*
 * Conn is the structure used to represent external connections
 */
-struct connection
-{
-	char			  cn_state;
+struct connection {
+	char cn_state;
 /* State of the connection */
 #define CN_INDICATED		  1
 #define CN_WAITING		  2
@@ -237,17 +293,16 @@ struct connection
 #define CN_OPENING		  8
 #define CN_PRE_OPENING		  9
 
-	char			  cn_ctx; 
+	char cn_ctx;
 /* DS_CTX_* values defined in dsap.h for use by decoders */
 
-	char			  cn_initiator;
+	char cn_initiator;
 	/* TRUE: this DSA is initiator, FALSE: this DSA is responder */
 
 	/* Information used during initialisation of the connection */
-        union
-        {
-		struct conn_start	cn_start_un_start;	/* responder */
-		struct conn_connect	cn_start_un_connect;	/* initiator */
+	union {
+		struct conn_start cn_start_un_start;	/* responder */
+		struct conn_connect cn_start_un_connect;	/* initiator */
 	} cn_start_un;
 #define cn_start	cn_start_un.cn_start_un_start
 #define cn_connect	cn_start_un.cn_start_un_connect
@@ -260,19 +315,19 @@ struct connection
 	struct oper_act 	* cn_bind_compare;
 */
 
-        time_t			  cn_last_used;
+	time_t cn_last_used;
 /* Time at which this connection was last used */
 
-        time_t			  cn_last_release;
+	time_t cn_last_release;
 /* Time at which this connection release was last attempted */
 
-	DN			  cn_dn;
+	DN cn_dn;
 /* Name of the entity at the far end of the connection */
 
-	struct PSAPaddr           cn_addr;
+	struct PSAPaddr cn_addr;
 /* Address of the entity at the far end of the connection */
 
-	int                       cn_ad;
+	int cn_ad;
 /* Descriptor identifying the association on which the connection is based */
 
 /*
@@ -280,22 +335,23 @@ struct connection
 */
 /* Context identifier of context to be used for user-data. */
 
-	int                       cn_op_id;
+	int cn_op_id;
 /* Used to ensure unique invoke id's are used when invoking operations. */
 
-	struct task_act		* cn_tasklist;
+	struct task_act *cn_tasklist;
 /* List of tasks received over this connection. */
 
-	struct oper_act		* cn_operlist;
+	struct oper_act *cn_operlist;
 /* List of operations sent over this connection. */
 
-	struct connection       * cn_next;
+	struct connection *cn_next;
 /* Rest of list of connections. */
 
-	int 			cn_authen;
+	int cn_authen;
 /* Takes a value from bind.h -> level to which the association is authenticated */
 
 };
+
 #define NULLCONN ((struct connection *) NULL)
 
 /*
@@ -306,11 +362,13 @@ struct connection
 *	a handle on current deferred get dsa info operations
 *	a handle on current get_edb operations
 */
-extern struct connection	* connlist;     /* Connection blocks */
-extern int			  conns_used;	/* No. conns in connlist */
-extern struct connection	* connwaitlist; /* Connection blocks to be */
-extern struct di_block		* deferred_dis;	/* deferred di_blocks */
-extern struct oper_act		* get_edb_ops;	/* GET_EDB operations */
-extern struct PSAPaddr		* mydsaaddr;	/* PSAP of this DSA */
+extern struct connection *connlist;	/* Connection blocks */
+extern int conns_used;			/* No. conns in connlist */
+extern struct connection *connwaitlist;	/* Connection blocks to be */
+extern struct di_block *deferred_dis;	/* deferred di_blocks */
+extern struct oper_act *get_edb_ops;	/* GET_EDB operations */
+extern struct PSAPaddr *mydsaaddr;	/* PSAP of this DSA */
 
 #endif
+
+#endif				/* __ISODE_QUIPU_CONNECTION_H__ */

@@ -1,10 +1,69 @@
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __CL_H_ACPKT_H__
+#define __CL_H_ACPKT_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
 /* acpkt.h - include file for association control providers (AcS-PROVIDER) */
 
 /* 
- * $Header: /f/iso/h/RCS/acpkt.h,v 5.0 88/07/21 14:38:44 mrose Rel $
+ * Header: /f/iso/h/RCS/acpkt.h,v 5.0 88/07/21 14:38:44 mrose Rel
  *
  *
- * $Log$
+ * Log
  */
 
 /*
@@ -17,7 +76,6 @@
  *
  */
 
-
 #ifndef	_AcSAP_
 #include "acsap.h"		/* definitions for AcS-USERs */
 #endif
@@ -25,8 +83,6 @@
 #ifndef	_PSAP_
 #include "psap2.h"		/* definitions for PS-USERs */
 #endif
-
-/*  */
 
 #ifdef	ACSE
 
@@ -107,123 +163,119 @@
 #define	copyAcSAPdata(base,len,d)	bcopy (base, (char *) d, len)
 #endif
 
-
 #define	ACS_USER_BASE	ACS_USER_NULL
 #define	ACS_PROV_BASE	ACS_PROV_NULL
 
+int acpktlose(), acsaplose();
 
-int	acpktlose (), acsaplose ();
 #ifdef  HULA
-int     acusaplose ();
+int acusaplose();
 #endif
 
-/*  */
+int ps2acslose();
 
-int	ps2acslose ();
 #ifdef  HULA
-int     ps2aculose ();
+int ps2aculose();
 #endif
 
-struct type_ACS_Association__information *info2apdu ();
-int	apdu2info ();
+struct type_ACS_Association__information *info2apdu();
+int apdu2info();
 #endif
-
-/*  */
 
 struct assocblk {
-    struct assocblk *acb_forw;	/* doubly-linked list */
-    struct assocblk *acb_back;	/*   .. */
+	struct assocblk *acb_forw;	/* doubly-linked list */
+	struct assocblk *acb_back;	/* .. */
 
-    int	    acb_fd;		/* session/presentation descriptor */
+	int acb_fd;			/* session/presentation descriptor */
 
-    short   acb_flags;		/* our state */
+	short acb_flags;		/* our state */
 #define	ACB_NULL	0x0000
-#define	ACB_CONN	0x0001	/* connected */
-#define	ACB_FINN	0x0002	/* other side wants to finish */
-#define	ACB_INIT	0x0004	/* this side initiated the association */
-#define	ACB_ASYN	0x0008	/* asynchronous */
-#define	ACB_TURN	0x0010	/* we have the turn */
-#define	ACB_TWA		0x0020	/* two-way alternate */
-#define	ACB_ACT		0x0040	/* activity in progress */
-#define	ACB_PLEASE	0x0080	/* RTS: RT-TURN-PLEASE received
-				   ROS on Session: sent S-PLEASE-TOKENS */
-#define	ACB_TIMER	0x0100	/* ACTIVITY discarded due to timing
-				   constraint */
-#define	ACB_ROS		0x0200	/* ROS started association */
-#define	ACB_RTS		0x0400	/* RTS   .. */
-#define	ACB_ACS		0x0800	/* ACS   .. */
-#define	ACB_CLOSING	0x1000	/* waiting to close */
-#define	ACB_FINISH	0x2000	/*   .. */
-#define	ACB_STICKY	0x4000	/* ROS using RTS (ugh!) */
+#define	ACB_CONN	0x0001		/* connected */
+#define	ACB_FINN	0x0002		/* other side wants to finish */
+#define	ACB_INIT	0x0004		/* this side initiated the association */
+#define	ACB_ASYN	0x0008		/* asynchronous */
+#define	ACB_TURN	0x0010		/* we have the turn */
+#define	ACB_TWA		0x0020		/* two-way alternate */
+#define	ACB_ACT		0x0040		/* activity in progress */
+#define	ACB_PLEASE	0x0080		/* RTS: RT-TURN-PLEASE received ROS on Session: sent
+					   S-PLEASE-TOKENS */
+#define	ACB_TIMER	0x0100		/* ACTIVITY discarded due to timing constraint */
+#define	ACB_ROS		0x0200		/* ROS started association */
+#define	ACB_RTS		0x0400		/* RTS .. */
+#define	ACB_ACS		0x0800		/* ACS .. */
+#define	ACB_CLOSING	0x1000		/* waiting to close */
+#define	ACB_FINISH	0x2000		/* .. */
+#define	ACB_STICKY	0x4000		/* ROS using RTS (ugh!) */
 
-#ifdef HULA 
-#define ACB_AUDT	0x8000  /* ROS maps to A.UNIT.DATA */
-#endif 
+#ifdef HULA
+#define ACB_AUDT	0x8000		/* ROS maps to A.UNIT.DATA */
+#endif
 
-    struct SSAPref acb_connect;	/* session connection reference */
+	struct SSAPref acb_connect;	/* session connection reference */
 
-    int	    acb_requirements;	/* session requirements */
-    int	    acb_owned;		/* session tokens we own */
-    int	    acb_avail;		/* session tokens available */
-    int	    acb_settings;	/* initial settings */
-    int	    acb_ssdusize;	/* largest atomic SSDU */
+	int acb_requirements;		/* session requirements */
+	int acb_owned;			/* session tokens we own */
+	int acb_avail;			/* session tokens available */
+	int acb_settings;		/* initial settings */
+	int acb_ssdusize;		/* largest atomic SSDU */
 
-    IFP	    acb_uabort;		/* disconnect underlying service */
+	IFP acb_uabort;			/* disconnect underlying service */
 
 /* ACSE */
-    int	    acb_sversion;	/* session service version number */
-    int	    acb_id;		/* ACSE context id */
-    OID	    acb_context;	/* application context name */
-    int	    acb_offset;		/* offset to ACSE PCI */
-				/* negative means at END */
-#ifdef HULA 
-    OID	    acb_audtpci;	/* identifier for AUDT PCI */ 		
-    AEI     acb_callingtitle;	/* local user title */
-    AEI     acb_calledtitle;    /* remote user title */
-    int     acb_binding;	/* static bind vs dynamic reconnect */
-#define BIND_STATIC    0        /* fixed called addr */
-#define BIND_DYNAMIC   1        /* reconnect called to last calling addr */
-#endif 
-    
+	int acb_sversion;		/* session service version number */
+	int acb_id;			/* ACSE context id */
+	OID acb_context;		/* application context name */
+	int acb_offset;			/* offset to ACSE PCI */
+	/* negative means at END */
+#ifdef HULA
+	OID acb_audtpci;		/* identifier for AUDT PCI */
+	AEI acb_callingtitle;		/* local user title */
+	AEI acb_calledtitle;		/* remote user title */
+	int acb_binding;		/* static bind vs dynamic reconnect */
+#define BIND_STATIC    0		/* fixed called addr */
+#define BIND_DYNAMIC   1		/* reconnect called to last calling addr */
+#endif
+
 /* RTSE */
-    int	    acb_rtsid;		/* RTSE context id */
-    int	    acb_ckpoint;	/* checkpoint size */
-    int	    acb_window;		/* window size */
-    int	    acb_actno;		/* sending activity serial number */
-    long    acb_ssn;		/* highest serial number sent */
-    int	    acb_ack;		/* highest serial number acknowledged */
+	int acb_rtsid;			/* RTSE context id */
+	int acb_ckpoint;		/* checkpoint size */
+	int acb_window;			/* window size */
+	int acb_actno;			/* sending activity serial number */
+	long acb_ssn;			/* highest serial number sent */
+	int acb_ack;			/* highest serial number acknowledged */
 
-    IFP	    acb_pturnrequest;	/* RT-TURN-PLEASE.REQUEST */
-    IFP	    acb_gturnrequest;	/* RT-TURN-GIVE.REQUEST */
-    IFP	    acb_transferequest;	/* RT-TRANSER.REQUEST */
-    IFP	    acb_rtwaitrequest;	/* RT-WAIT.REQUEST */
-    IFP	    acb_rtsetindications;/* define vectors for INDICATION events */
-    IFP	    acb_rtselectmask;	/* map association descriptors for select () */
-    IFP	    acb_rtpktlose;	/* protocol-level abort */
+	IFP acb_pturnrequest;		/* RT-TURN-PLEASE.REQUEST */
+	IFP acb_gturnrequest;		/* RT-TURN-GIVE.REQUEST */
+	IFP acb_transferequest;		/* RT-TRANSER.REQUEST */
+	IFP acb_rtwaitrequest;		/* RT-WAIT.REQUEST */
+	IFP acb_rtsetindications;	/* define vectors for INDICATION events */
+	IFP acb_rtselectmask;		/* map association descriptors for select () */
+	IFP acb_rtpktlose;		/* protocol-level abort */
 
-    int	    acb_priority;	/* priority of please turn */
-    struct AcSAPfinish acb_finish;
+	int acb_priority;		/* priority of please turn */
+	struct AcSAPfinish acb_finish;
 
-    char   *acb_realbase;	/* APDU in transit */
-    char   *acb_base;		/*   .. */
-    int	    acb_len;		/*   .. */
-    
-    IFP	    acb_rtsindication;	/* rts event handler */
+	char *acb_realbase;		/* APDU in transit */
+	char *acb_base;			/* .. */
+	int acb_len;			/* .. */
+
+	IFP acb_rtsindication;		/* rts event handler */
 
 /* ROSE */
-    int	    acb_rosid;		/* ROSE (SASE) context id */
-    IFP	    acb_putosdu;	/* osdu2acb */
-    IFP	    acb_rowaitrequest;	/* RO-WAIT.REQUEST */
-    IFP	    acb_ready;		/* get HDX permission */
-    IFP	    acb_rosetindications;/* define vectors for INDICATION events */
-    IFP	    acb_roselectmask;	/* map association descriptors for select () */
-    IFP	    acb_ropktlose;	/* protocol-level abort */
-    PE	    (*acb_getosdu) ();	/* for users of THORN... */
+	int acb_rosid;			/* ROSE (SASE) context id */
+	IFP acb_putosdu;		/* osdu2acb */
+	IFP acb_rowaitrequest;		/* RO-WAIT.REQUEST */
+	IFP acb_ready;			/* get HDX permission */
+	IFP acb_rosetindications;	/* define vectors for INDICATION events */
+	IFP acb_roselectmask;		/* map association descriptors for select () */
+	IFP acb_ropktlose;		/* protocol-level abort */
+	 PE(*acb_getosdu) ();		/* for users of THORN... */
 
-    PE	    acb_apdu;		/* APDU buffered */
-    
-    IFP	    acb_rosindication;	/* ros event handler */
+	PE acb_apdu;			/* APDU buffered */
+
+	IFP acb_rosindication;		/* ros event handler */
 };
+
 #define	NULLACB		((struct assocblk *) 0)
 
 #define	FREEACB(acb) \
@@ -236,63 +288,55 @@ struct assocblk {
     (acb) -> acb_realbase = (acb) -> acb_base = NULL, (acb) -> acb_len = 0; \
 }
 
+int freeacblk();
+struct assocblk *newacblk(), *findacblk();
 
-int	freeacblk ();
-struct assocblk *newacblk (), *findacblk ();
 #ifdef  HULA
-int     freeacublk ();
-struct assocblk *newacublk (), *findacublk ();
+int freeacublk();
+struct assocblk *newacublk(), *findacublk();
 #endif
-
-/*  */
 
 #ifndef	ACSE
 
 				/* PConnect Types */
 #define	PCONN_DTS	0	/* Data Transfer Syntax */
 #define	PCONN_DATA	1	/* User Data */
-#define	  PCONN_DATA_CK	0	/*   Checkpoint Size */
+#define	  PCONN_DATA_CK	0	/* Checkpoint Size */
 #define	    PCONN_CK_DFLT 0
-#define	  PCONN_DATA_WD	1	/*   Window Size */
+#define	  PCONN_DATA_WD	1	/* Window Size */
 #define	    PCONN_WD_DFLT 3
-#define	  PCONN_DATA_DM	2	/*   Dialogue-mode */
-#define	    PCONN_DM_MONO 0	/*     monologue */
-#define	    PCONN_DM_TWA  1	/*     two-way alternate */
+#define	  PCONN_DATA_DM	2	/* Dialogue-mode */
+#define	    PCONN_DM_MONO 0	/* monologue */
+#define	    PCONN_DM_TWA  1	/* two-way alternate */
 #define	    PCONN_DM_DFLT PCONN_DM_MONO
-#define	  PCONN_DATA_CN	3	/*   Connection Data */
-#define	  PCONN_DATA_AP	4	/*   Application Protocol */
-
+#define	  PCONN_DATA_CN	3	/* Connection Data */
+#define	  PCONN_DATA_AP	4	/* Application Protocol */
 
 				/* PAccept Types */
 #define	PACC_DTS	0	/* Data Transfer Syntax */
 #define	PACC_DATA	1	/* User Data */
-#define   PACC_DATA_CK  0	/*   Checkpoint Size */
+#define   PACC_DATA_CK  0	/* Checkpoint Size */
 #define	    PACC_CK_DFLT 0
-#define   PACC_DATA_WD  1	/*   Window Size */
+#define   PACC_DATA_WD  1	/* Window Size */
 #define	    PACC_WD_DFLT 3
-#define   PACC_DATA_CN  2	/*   Connection Data */
-
+#define   PACC_DATA_CN  2	/* Connection Data */
 
 				/* PRefuse Types */
 #define	PREF_REASON	0	/* Refuse Reason */
-
 
 				/* Data Transfer Syntax Types */
 #define	DTS_SYNTAX	0	/* IMPLICIT INTEGER */
 #define SYN_X409	0	/* x.409 */
 
-
 				/* Connection Data Types */
 #define CN_OPEN		0	/* Open */
 #define	CN_RECOVER	1	/* Recover */
-
 
 				/* Refuse codes */
 #define	REFUSE_BUSY	0	/* Busy */
 #define	REFUSE_RECOVER	1	/* Cannot recover */
 #define	REFUSE_VALIDATE	2	/* Validation failure */
 #define	REFUSE_MODE	3	/* Unacceptable dialogue mode */
-
 
 				/* Abort codes */
 #define	ABORT_LSP	0	/* Local system problem */
@@ -304,14 +348,15 @@ struct assocblk *newacublk (), *findacublk ();
 #define	ABORT_USER	6	/* User abort */
 #define	ABORT_TRANS	7	/* Transfer completed */
 
-
 extern int acsap_application;
 extern int acsap_ckpoint;
 extern int acsap_window;
 extern int acsap_mode;
 extern int acsap_refuse;
 extern int acsap_conntype;
-extern PE  acsap_data;
+extern PE acsap_data;
 extern int acsap_abort;
-extern int acsap_priority;	/* to keep old-style RTS images smaller */
+extern int acsap_priority;		/* to keep old-style RTS images smaller */
 #endif
+
+#endif				/* __CL_H_ACPKT_H__ */
