@@ -157,7 +157,7 @@ va_list	ap;
 	aci -> aci_type = ACI_ABORT;
 	aca = &aci -> aci_abort;
 
-	asprintf (bp = buffer, ap);
+	xsprintf (bp = buffer, ap);
 	bp += strlen (bp);
 
 	aca -> aca_source = ACA_LOCAL;

@@ -77,7 +77,7 @@ void initialize();
 static void init_kern_vars();
 static void hourly();
 static void do_peer ();
-static SFD finish ();
+static sighandler_t finish;
 
 extern void make_new_peer();
 extern void transmit();
@@ -94,7 +94,7 @@ extern void iso_init ();
 extern void poll_update();
 
 #if	defined(DEBUG) && defined(SIGUSR1) && defined(SIGUSR2)
-static	SFD incdebug(), decdebug();
+static	sighandler_t incdebug, decdebug;
 #endif
 
 struct ntp_peer *find_peer ();
@@ -1256,7 +1256,7 @@ hourly() {
 /* Debugging stuff */
 /* ARGSUSED */
 #if	defined(DEBUG) && defined(SIGUSR1) && defined(SIGUSR2)
-static SFD incdebug(sig)
+static RETSIGTYPE incdebug(sig)
 int sig;
 {
 	if (debug == 255)
@@ -1266,7 +1266,7 @@ int sig;
 }
 
 /* ARGSUSED */
-static SFD
+static RETSIGTYPE
 decdebug(sig)
 int sig;
 {
@@ -1278,7 +1278,7 @@ int sig;
 #endif
 
 /* ARGSUSED */
-static SFD
+static RETSIGTYPE
 finish(sig)
 	int sig;
 {

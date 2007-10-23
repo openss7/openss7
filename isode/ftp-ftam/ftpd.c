@@ -121,7 +121,7 @@ char *vec[NVEC];
 int	swaitmax = SWAITMAX;
 int	swaitint = SWAITINT;
 
-SFD	lostconn();
+sighandler_t	lostconn;
 
 main(argc, argv)
 	int argc;
@@ -181,7 +181,7 @@ abort();
 	}
 }
 
-SFD
+RETSIGTYPE
 lostconn()
 {
 
@@ -366,7 +366,7 @@ va_list ap;
 {
     char    buffer[BUFSIZ];
 
-    _asprintf (buffer, NULLCP, ap);
+    _xsprintf (buffer, NULLCP, ap);
 
     (void)printf ("%d%c%s\r\n", n, c, buffer);
     (void)fflush (stdout);

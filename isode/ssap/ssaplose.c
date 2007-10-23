@@ -210,7 +210,7 @@ va_list	ap;
 	si -> si_type = SI_ABORT;
 	sa = &si -> si_abort;
 
-	asprintf (bp = buffer, ap);
+	xsprintf (bp = buffer, ap);
 	bp += strlen (bp);
 
 	sa -> sa_peer = 0;

@@ -163,7 +163,7 @@ static struct {
 displayHelp(helpstr)
 char * helpstr;
 {
-SFD cleanupok();
+sighandler_t cleanupok;
 void onint1();
 int i, n, found;
 char * cp, * cp1;

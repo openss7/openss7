@@ -642,7 +642,7 @@ va_list	ap;
 {
     char    buffer[BUFSIZ];
 
-    asprintf (buffer, ap);
+    xsprintf (buffer, ap);
     (void) fflush (stdout);
     fprintf (stderr, "%s: ", myservice);
     (void) fputs (buffer, stderr);

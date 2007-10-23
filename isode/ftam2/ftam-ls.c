@@ -67,7 +67,7 @@ char  **vec;
 {
     int	    doingpipe,
 	    result;
-    SFP	    pstat;    
+    sighandler_t	    pstat;    
     char   *cp,
 	   *pp,
 	    buffer[BUFSIZ];

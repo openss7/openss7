@@ -51,7 +51,7 @@ static char *rcsid = "$Header: /xtel/isode/isode/rosy/RCS/rystub.c,v 9.0 1992/06
 /*  */
 
 static int interrupted;
-static SFD	intrser ();
+static sighandler_t	intrser;
 
 /*    stub */
 
@@ -70,7 +70,7 @@ struct RoSAPindication *roi;
     int     firstime,
 	    opclass,
 	    result;
-    SFP	    istat;
+    sighandler_t	    istat;
 
 #ifdef	notdef			/* let RyOpInvoke check these as necessary */
     missingP (ryo);
@@ -169,7 +169,7 @@ again: ;
 
 /* ARGSUSED */
 
-static  SFD intrser (sig)
+static  RETSIGTYPE intrser (sig)
 int	sig;
 {
 #ifndef	BSDSIGS

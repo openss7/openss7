@@ -1893,7 +1893,7 @@ va_dcl
 
     what = va_arg (ap, char *);
 
-    _asprintf (buffer, what, ap);
+    _xsprintf (buffer, what, ap);
 
     va_end (ap);
 

@@ -34,7 +34,7 @@ static char *rcsid = "$Header: /xtel/isode/isode/rosap/RCS/rosapintr.c,v 9.0 199
 /*  */
 
 static int interrupted;
-static SFD	intrser ();
+static sighandler_t	intrser;
 
 /*    RO-INVOKE.REQUEST (interruptable) */
 
@@ -50,7 +50,7 @@ struct RoSAPindication *roi;
     int	    nfds,
 	    result;
     fd_set  rfds;
-    SFP    istat;
+    sighandler_t    istat;
 
     if (RoInvokeRequest (sd, op, ROS_ASYNC, args, invokeID, linkedID, priority,
 			 roi) == NOTOK)
@@ -86,7 +86,7 @@ struct RoSAPindication *roi;
 
 /* ARGSUSED */
 
-static  SFD intrser (sig)
+static  REGSIGTYPE intrser (sig)
 int	sig;
 {
 #ifndef	BSDSIGS

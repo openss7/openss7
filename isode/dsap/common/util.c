@@ -241,7 +241,7 @@ va_dcl
 	{
 		char buffer [8192]; 	/* How big should this go !!! */
 		
-		_asprintf (buffer,NULLCP,ap);
+		_xsprintf (buffer,NULLCP,ap);
 
 		ps_print (ps,buffer);
 	}

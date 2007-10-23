@@ -215,7 +215,7 @@ va_list ap;
 		return (NOTOK);
 	}
 
-	_asprintf (buffer, NULLCP, ap);
+	_xsprintf (buffer, NULLCP, ap);
 	fprintf (cout, "%s\r\n", buffer);
 	(void) fflush(cout);
 	if (verbose)

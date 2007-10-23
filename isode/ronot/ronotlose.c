@@ -87,7 +87,7 @@ va_list	ap;
 	bzero ((char *) rni, sizeof *rni);
 	rni -> rni_reason = reason;
 
-	asprintf (bp = buffer, ap);
+	xsprintf (bp = buffer, ap);
 	bp += strlen (bp);
 
 	copyRoNOTdata (buffer, bp - buffer, rni);

@@ -496,7 +496,7 @@ va_list	ap;
 {
     char    buffer[BUFSIZ];
 
-    _asprintf (buffer, what, ap);
+    _xsprintf (buffer, what, ap);
 
     syslog (code, "%s", buffer);
 

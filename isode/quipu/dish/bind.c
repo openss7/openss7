@@ -94,10 +94,10 @@ static int protect_password();
 static int sign_bindarg();
 
 /* ARGSUSED */
-SFD alarm_sig (sd)
+RETSIGTYPE alarm_sig (sd)
 int sd;
 {
-SFD dish_quit ();
+sighandler_t dish_quit;
 
 	if (frompipe && (parent_pid != 0))
 		if (kill (parent_pid,0) == -1) {
@@ -134,7 +134,7 @@ set_alarm ()
 }
 
 /* ARGSUSED */
-SFD bind_sig (sd)
+RETSIGTYPE bind_sig (sd)
 int sd;
 {
 extern jmp_buf  dish_env;
@@ -860,7 +860,7 @@ PS  ps;
 
 }
 
-SFD dish_quit (sig)
+RETSIGTYPE dish_quit (sig)
 int sig;
 {
 	if (bound) {

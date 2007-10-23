@@ -44,7 +44,7 @@ static IFP	stopfnx;
 
 int	ros_init (), ros_work (), ros_indication (), ros_lose ();
 
-SFD cleanup ();
+sighandler_t cleanup;
 
 extern int  errno;
 
@@ -452,7 +452,7 @@ va_dcl
 
 	va_start (ap);
 
-	_asprintf (buffer, NULLCP, ap);
+	_xsprintf (buffer, NULLCP, ap);
 
 	addtoia5 (buffer, strlen (buffer));
 
@@ -480,7 +480,7 @@ va_dcl
 	(void) sprintf (buf, "%s (%s): ", myname, host);
 	cp = buf + strlen (buf);
 
-	asprintf (cp, ap);
+	xsprintf (cp, ap);
 
 	addtoia5 (buf, strlen (buf));
 

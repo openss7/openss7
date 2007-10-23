@@ -251,7 +251,7 @@ IFP	rfx, efx;
 
 /*  */
 
-SFD cleanup ();
+sighandler_t cleanup;
 
 void	ros_adios (rop, event)
 register struct RoSAPpreject *rop;
@@ -362,7 +362,7 @@ va_list	ap;
 {
     char    buffer[BUFSIZ];
 
-    asprintf (buffer, ap);
+    xsprintf (buffer, ap);
 
     (void) fflush (stdout);
 

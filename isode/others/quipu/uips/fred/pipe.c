@@ -638,7 +638,7 @@ int	cc;
     static int doing_pager = 0;
     static int pid = NOTOK;
     static int sd = NOTOK;
-    static SFP Istat, Qstat;
+    static sighandler_t Istat, Qstat;
 
     if (cc == 0) {
 #ifdef SVR4
@@ -764,7 +764,7 @@ static  foreground () {
 #ifdef	TIOCGPGRP
     int     pgrp,
             tpgrp;
-    SFP	    tstat;
+    sighandler_t	    tstat;
 
     if ((pgrp = getpgrp (0)) == NOTOK)
 	return;
@@ -937,7 +937,7 @@ va_list ap;
     if (dafd == NOTOK)
 	return NOTOK;
 
-    _asprintf (buffer, NULLCP, ap);
+    _xsprintf (buffer, NULLCP, ap);
     if (watch) {
 	(void) fprintf (stderr, "<--- %s\n", buffer);
 	(void) fflush (stderr);

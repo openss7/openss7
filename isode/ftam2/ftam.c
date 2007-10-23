@@ -60,7 +60,7 @@ int	interrupted;
 
 void	adios (), advise ();
 #ifndef	BRIDGE
-SFD	intrser ();
+sighandler_t	intrser;
 #endif
 
 extern char* command_prompt;
@@ -79,7 +79,7 @@ char  **argv,
     int     eof,
 	    status,
             vecp;
-    SFP	    istat;
+    sighandler_t	    istat;
     char   *bp,
 	    buffer[BUFSIZ],
            *vec[NVEC + 1];
@@ -476,7 +476,7 @@ char   *prompt,
 
 /* ARGSUSED */
 
-static	SFD intrser (sig)
+static	RETSIGTYPE intrser (sig)
 int	sig;
 {
 #ifndef	BSDSIGS
@@ -527,7 +527,7 @@ va_dcl
 
     va_start (ap);
 
-    _asprintf (buffer, NULLCP, ap);
+    _xsprintf (buffer, NULLCP, ap);
 
     va_end (ap);
     
@@ -631,7 +631,7 @@ va_list	ap;
 {
     char    buffer[BUFSIZ];
 
-    asprintf (buffer, ap);
+    xsprintf (buffer, ap);
 
 #ifndef	BRIDGE
     if (hash && marks >= BUFSIZ) {

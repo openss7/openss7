@@ -60,7 +60,7 @@ char	tranbuf[1024*8];	/* 8K at a time... */
 
 extern	FILE *lfp;		/* log file for mailing changes */
 
-SFD	cleanup();
+sighandler_t	cleanup;
 struct	linkbuf *savelink();
 extern char *getstring ();
 
@@ -477,7 +477,7 @@ log(fp, fmt, a1, a2, a3)
 /*
  * Remove temporary files and do any cleanup operations before exiting.
  */
-SFD cleanup()
+RETSIGTYPE cleanup()
 {
 	(void) unlink(utmpfile);
 	exit(1);

@@ -72,7 +72,7 @@ int	status;
 union wait status;
 #endif
 
-SFP	pstat;
+sighandler_t	pstat;
 
 
 	if (format != READOUT) {

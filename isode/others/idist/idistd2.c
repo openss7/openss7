@@ -640,7 +640,7 @@ ok:
 	return(0);
 }
 
-SFD cleanup ()
+RETSIGTYPE cleanup ()
 {
 	char	*p, *temp;
 

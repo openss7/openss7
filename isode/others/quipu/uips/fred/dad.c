@@ -192,12 +192,12 @@ char  **argv,
 /* ARGSUSED */
 
 #ifdef	BSD42
-static SFD  dishser (sig, code, sc)
+static RETSIGTYPE  dishser (sig, code, sc)
 int	sig;
 long	code;
 struct sigcontext *sc;
 #else
-static SFD  dishser (i)
+static RETSIGTYPE  dishser (i)
 int	i;
 #endif
 {
@@ -402,7 +402,7 @@ va_list ap;
 
     fd = va_arg (ap, int);
 
-    _asprintf (buffer, NULLCP, ap);
+    _xsprintf (buffer, NULLCP, ap);
     if (debug)
 	(void) fprintf (stderr, "<--- %s\n", buffer);
 
@@ -615,7 +615,7 @@ done: ;
 #ifdef	BSD42
 /* ARGSUSED */
 
-static SFD  chldser (sig, code, sc)
+static RETSIGTYPE  chldser (sig, code, sc)
 int	sig;
 long	code;
 struct sigcontext *sc;

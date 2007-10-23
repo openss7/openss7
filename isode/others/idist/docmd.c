@@ -52,8 +52,8 @@ FILE	*lfp;			/* log file for recording files updated */
 struct	subcmd *subcmds;	/* list of sub-commands for current cmd */
 jmp_buf	env;
 
-SFD	cleanup();
-SFD	lostconn();
+sighandler_t	cleanup;
+sighandler_t	lostconn;
 
 /*
  * Do the commands in cmds (initialized by yyparse).
@@ -190,7 +190,7 @@ done:
 
 
 /* ARGSUSED */
-SFD lostconn(sig)
+RETSIGTYPE lostconn(sig)
 int sig;
 {
 	log(lfp, "idist: lost connection\n");

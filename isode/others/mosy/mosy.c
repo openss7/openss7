@@ -290,7 +290,7 @@ va_dcl
 
     va_start (ap);
 
-    _asprintf (buffer, NULLCP, ap);
+    _xsprintf (buffer, NULLCP, ap);
 
     va_end (ap);
 
@@ -334,7 +334,7 @@ va_dcl
 
     va_start (ap);
 
-    _asprintf (buffer, NULLCP, ap);
+    _xsprintf (buffer, NULLCP, ap);
 
     va_end (ap);
 

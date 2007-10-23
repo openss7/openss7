@@ -203,7 +203,7 @@ void freeRfaInfoList (rfa)
  * lock_timeout - handler for lock timeout
  *------------------------------------------------------*/
 /* ARGSUSED */
-SFD lock_timeout(sig) 
+RETSIGTYPE lock_timeout(sig) 
 int sig;
 {
     timedout++;

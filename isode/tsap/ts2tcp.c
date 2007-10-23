@@ -1,14 +1,68 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 /* ts2tcp.c - TPM: TCP interface */
 
-#ifndef	lint
-static char *rcsid = "$Header: /xtel/isode/isode/tsap/RCS/ts2tcp.c,v 9.0 1992/06/16 12:40:39 isode Rel $";
-#endif
-
 /* 
- * $Header: /xtel/isode/isode/tsap/RCS/ts2tcp.c,v 9.0 1992/06/16 12:40:39 isode Rel $
+ * Header: /xtel/isode/isode/tsap/RCS/ts2tcp.c,v 9.0 1992/06/16 12:40:39 isode Rel
  *
  *
- * $Log: ts2tcp.c,v $
+ * Log: ts2tcp.c,v
  * Revision 9.0  1992/06/16  12:40:39  isode
  * Release 8.0
  *
@@ -24,7 +78,6 @@ static char *rcsid = "$Header: /xtel/isode/isode/tsap/RCS/ts2tcp.c,v 9.0 1992/06
  *
  */
 
-
 /* LINTLIBRARY */
 
 #include <unistd.h>
@@ -32,6 +85,9 @@ static char *rcsid = "$Header: /xtel/isode/isode/tsap/RCS/ts2tcp.c,v 9.0 1992/06
 #include <stdio.h>
 #include "tpkt.h"
 #include "tailor.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
 
 #ifdef	TCP
 #include "internet.h"
@@ -43,17 +99,16 @@ static char *rcsid = "$Header: /xtel/isode/isode/tsap/RCS/ts2tcp.c,v 9.0 1992/06
 #include <fcntl.h>
 #endif
 
+#define	MAX1006		2048	/* could be as high as TPKT_MAXLEN */
 
-#define	MAX1006		2048		/* could be as high as TPKT_MAXLEN */
-
-/*    DATA */
+/* DATA */
 
 #if	defined(FIONBIO) || defined(O_NDELAY)
 #define	NODELAY
 #endif
 
 #ifdef	NODELAY
-static  fd_set  inprogress;
+static fd_set inprogress;
 static struct sockaddr_in *peers = NULL;
 #endif
 
@@ -62,341 +117,326 @@ static struct sockaddr_in *peers = NULL;
 extern t_list_of_conn_desc list_of_conn_desc[our_TABLE_SIZE];
 #endif
 
-extern int  errno;
+extern int errno;
 
-/*    N-CONNECT.REQUEST */
+/* N-CONNECT.REQUEST */
 
-int	tcpopen (tb, local, remote, td, async)
-register struct tsapblk *tb;
-struct NSAPaddr *local,
-		*remote;
-struct TSAPdisconnect *td;
-int	async;
+int TTService(struct tsapblk *tb);
+
+int
+tcpopen(tb, local, remote, td, async)
+	register struct tsapblk *tb;
+	struct NSAPaddr *local, *remote;
+	struct TSAPdisconnect *td;
+	int async;
 {
-    int     fd;
+	int fd;
+
 #ifdef	FIONBIO
-    int	    onoff;
+	int onoff;
 #endif
-    struct sockaddr_in  lo_socket,
-                        in_socket;
-    register struct sockaddr_in *lsock = &lo_socket,
-                               *isock = &in_socket;
-    register struct hostent *hp;
-    register struct servent *sp;
+	struct sockaddr_in lo_socket, in_socket;
+	register struct sockaddr_in *lsock = &lo_socket, *isock = &in_socket;
+	register struct hostent *hp;
+	register struct servent *sp;
 
 #ifndef	NODELAY
-    if (async)
-	return tsaplose (td, DR_PARAMETER, NULLCP,
-			 "asynchronous not supported");
+	if (async)
+		return tsaplose(td, DR_PARAMETER, NULLCP, "asynchronous not supported");
 #endif
 
-    bzero ((char *) isock, sizeof *isock);
+	bzero((char *) isock, sizeof *isock);
 
-    if (remote -> na_port == 0) {
-	if ((sp = getservbyname ("tsap", "tcp")) == NULL)
-	    sp = getservbyname ("iso-tsap", "tcp");
-	isock -> sin_port = sp ? sp -> s_port : htons ((u_short) 102);
-    }
-    else
-	isock -> sin_port = remote -> na_port;
+	if (remote->na_port == 0) {
+		if ((sp = getservbyname("tsap", "tcp")) == NULL)
+			sp = getservbyname("iso-tsap", "tcp");
+		isock->sin_port = sp ? sp->s_port : htons((u_short) 102);
+	} else
+		isock->sin_port = remote->na_port;
 
-    if ((hp = gethostbystring (remote -> na_domain)) == NULL)
-	return tsaplose (td, DR_ADDRESS, NULLCP, "%s: unknown host",
-		    remote -> na_domain);
+	if ((hp = gethostbystring(remote->na_domain)) == NULL)
+		return tsaplose(td, DR_ADDRESS, NULLCP, "%s: unknown host", remote->na_domain);
 #ifdef	notanymore
-    (void) strncpy (remote -> na_domain, hp -> h_name,
-		    sizeof remote -> na_domain);
+	(void) strncpy(remote->na_domain, hp->h_name, sizeof remote->na_domain);
 #endif
 
-    isock -> sin_family = hp -> h_addrtype;
-    inaddr_copy (hp, isock);
+	isock->sin_family = hp->h_addrtype;
+	inaddr_copy(hp, isock);
 
 #ifndef	notanymore
-    (void) strcpy (remote -> na_domain, inet_ntoa (isock -> sin_addr));
+	(void) strcpy(remote->na_domain, inet_ntoa(isock->sin_addr));
 #endif
 
-    if (local && local -> na_domain[0]) {
-	bzero ((char *) lsock, sizeof *lsock);
+	if (local && local->na_domain[0]) {
+		bzero((char *) lsock, sizeof *lsock);
 
-	if ((hp = gethostbystring (local -> na_domain)) == NULL)
-	    return tsaplose (td, DR_ADDRESS, NULLCP, "%s: unknown host",
-		    local -> na_domain);
+		if ((hp = gethostbystring(local->na_domain)) == NULL)
+			return tsaplose(td, DR_ADDRESS, NULLCP, "%s: unknown host",
+					local->na_domain);
 
-	if ((lsock -> sin_family = hp -> h_addrtype) != isock -> sin_family)
-	    return tsaplose (td, DR_ADDRESS, NULLCP,
-		    "address family mismatch");
+		if ((lsock->sin_family = hp->h_addrtype) != isock->sin_family)
+			return tsaplose(td, DR_ADDRESS, NULLCP, "address family mismatch");
 
-	inaddr_copy (hp, lsock);
-    }
-    else
-	lsock = NULL;
+		inaddr_copy(hp, lsock);
+	} else
+		lsock = NULL;
 
-    if ((fd = start_tcp_client (lsock, 0)) == NOTOK)
-	return tsaplose (td, DR_CONGEST, "socket", "unable to start");
+	if ((fd = start_tcp_client(lsock, 0)) == NOTOK)
+		return tsaplose(td, DR_CONGEST, "socket", "unable to start");
 
 #ifdef	FIONBIO
-    if (async)
-	(void) ioctl (fd, FIONBIO, (onoff = 1, (char *) &onoff));
-#else
-#ifdef	O_NDELAY
-    if (async)
-	(void) fcntl (fd, F_SETFL, O_NDELAY);
-#endif
-#endif
-    tb -> tb_fd = fd;
-    (void) TTService (tb);
-
-    if (join_tcp_server (fd, isock) == NOTOK) {
-#ifdef	NODELAY
 	if (async)
-	    switch (errno) {
-		case EINPROGRESS: 
-		    if (peers == NULL) {
-			peers = (struct sockaddr_in *)
-					calloc ((unsigned) getdtablesize (),
-						sizeof *peers);
-			if (peers == NULL) {
-			    (void) tsaplose (td, DR_CONGEST, NULLCP,
-					     "out of memory");
-			    (void) close_tcp_socket (fd);
-			    return (tb -> tb_fd = NOTOK);
+		(void) ioctl(fd, FIONBIO, (onoff = 1, (char *) &onoff));
+#else
+#ifdef	O_NDELAY
+	if (async)
+		(void) fcntl(fd, F_SETFL, O_NDELAY);
+#endif
+#endif
+	tb->tb_fd = fd;
+	(void) TTService(tb);
+
+	if (join_tcp_server(fd, isock) == NOTOK) {
+#ifdef	NODELAY
+		if (async)
+			switch (errno) {
+			case EINPROGRESS:
+				if (peers == NULL) {
+					peers = (struct sockaddr_in *)
+					    calloc((unsigned) getdtablesize(), sizeof *peers);
+					if (peers == NULL) {
+						(void) tsaplose(td, DR_CONGEST, NULLCP,
+								"out of memory");
+						(void) close_tcp_socket(fd);
+						return (tb->tb_fd = NOTOK);
+					}
+
+					FD_ZERO(&inprogress);
+				}
+				FD_SET(fd, &inprogress);
+				peers[fd] = *isock;	/* struct copy */
+				return OK;
+
+			case EISCONN:
+				goto done;
+
+			default:
+				break;
 			}
-
-			FD_ZERO (&inprogress);
-		    }
-		    FD_SET (fd, &inprogress);
-		    peers[fd] = *isock;/* struct copy */
-		    return OK;
-
-		case EISCONN: 
-		    goto done;
-
-		default: 
-		    break;
-	    }
 #endif
 
-	(void) tsaplose (td, DR_REFUSED, "connection", "unable to establish");
-	(void) close_tcp_socket (fd);
-	return (tb -> tb_fd = NOTOK);
-    }
+		(void) tsaplose(td, DR_REFUSED, "connection", "unable to establish");
+		(void) close_tcp_socket(fd);
+		return (tb->tb_fd = NOTOK);
+	}
 #ifdef	NODELAY
-done: ;
+      done:;
 #endif
 
 #ifdef	FIONBIO
-    if (async)
-	(void) ioctl (fd, FIONBIO, (onoff = 0, (char *) &onoff));
+	if (async)
+		(void) ioctl(fd, FIONBIO, (onoff = 0, (char *) &onoff));
 #else
 #ifdef	O_NDELAY
-    if (async)
-	(void) fcntl (fd, F_SETFL, 0x00);
+	if (async)
+		(void) fcntl(fd, F_SETFL, 0x00);
 #endif
 #endif
 
-    tb -> tb_retryfnx = NULLIFP;	/* No need... */
+	tb->tb_retryfnx = NULL;	/* No need... */
 
-    return DONE;
+	return DONE;
 }
-
-/*  */
 
 #ifndef	NODELAY
 /* ARGSUSED */
 #endif
 
-static int  tcpretry (tb, td)
-struct tsapblk *tb;
-struct TSAPdisconnect *td;
+static int
+tcpretry(tb, td)
+	struct tsapblk *tb;
+	struct TSAPdisconnect *td;
 {
 #ifdef	NODELAY
 #ifdef	FIONBIO
-    int	    onoff;
+	int onoff;
 #endif
-    int	    fd = tb -> tb_fd;
-    fd_set  mask;
-    struct sockaddr_in *isock = &peers[fd];
+	int fd = tb->tb_fd;
+	fd_set mask;
+	struct sockaddr_in *isock = &peers[fd];
 
-    FD_ZERO (&mask);
-    FD_SET (fd, &mask);
-    if (xselect (fd + 1, NULLFD, &mask, NULLFD, 0) < 1)
-	return OK;
-
-    if (!FD_ISSET (fd, &inprogress))
-	return DONE;
-
-    isock = &peers[fd];
-    if (join_tcp_server (fd, isock) == NOTOK) {
-	switch (errno) {
-	    case EINPROGRESS:
+	FD_ZERO(&mask);
+	FD_SET(fd, &mask);
+	if (xselect(fd + 1, NULLFD, &mask, NULLFD, 0) < 1)
 		return OK;
 
-	    case EISCONN:
-		goto done;
+	if (!FD_ISSET(fd, &inprogress))
+		return DONE;
 
-	    case EINVAL:	/* UNIX bug: could be any socket errno, e.g.,
-				   ETIMEDOUT */
-		errno = ECONNREFUSED;
-		/* and fall */
-	    default:
-		break;
+	isock = &peers[fd];
+	if (join_tcp_server(fd, isock) == NOTOK) {
+		switch (errno) {
+		case EINPROGRESS:
+			return OK;
+
+		case EISCONN:
+			goto done;
+
+		case EINVAL:	/* UNIX bug: could be any socket errno, e.g., ETIMEDOUT */
+			errno = ECONNREFUSED;
+			/* and fall */
+		default:
+			break;
+		}
+
+		(void) tsaplose(td, DR_REFUSED, "connection", "unable to establish");
+		FD_CLR(fd, &inprogress);
+		(void) close_tcp_socket(fd);
+		return (tb->tb_fd = NOTOK);
 	}
-
-	(void) tsaplose (td, DR_REFUSED, "connection", "unable to establish");
-	FD_CLR (fd, &inprogress);
-	(void) close_tcp_socket (fd);
-	return (tb -> tb_fd = NOTOK);
-    }
-done: ;
+      done:;
 
 #ifdef	FIONBIO
-    (void) ioctl (fd, FIONBIO, (onoff = 0, (char *) &onoff));
+	(void) ioctl(fd, FIONBIO, (onoff = 0, (char *) &onoff));
 #else
 #ifdef	O_NDELAY
-    (void) fcntl (fd, F_SETFL, 0x00);
+	(void) fcntl(fd, F_SETFL, 0x00);
 #endif
 #endif
 
-    FD_CLR (fd, &inprogress);
+	FD_CLR(fd, &inprogress);
 
-    return DONE;
+	return DONE;
 #else
-    return tsaplose (td, DR_OPERATION, NULLCP, "connection not in progress");
+	return tsaplose(td, DR_OPERATION, NULLCP, "connection not in progress");
 #endif
 }
 
-/*    init for read from network */
+/* init for read from network */
 
-static  int	tcpinit (fd, t)
-int	fd;
-register struct tsapkt *t;
+static int
+tcpinit(fd, t)
+	int fd;
+	register struct tsapkt *t;
 {
-    register int    cc,
-                    i;
-    register char  *bp;
+	register int cc, i;
+	register char *bp;
 
-    for (bp = (char *) &t -> t_pkthdr, i = TPKT_HDRLEN (t);
-	    i > 0;
-	    bp += cc, i -= cc)
-	switch (cc = read_tcp_socket (fd, bp, i)) {
-	    case NOTOK: 
-	    case OK: 
-		return DR_NETWORK;
+	for (bp = (char *) &t->t_pkthdr, i = TPKT_HDRLEN(t); i > 0; bp += cc, i -= cc)
+		switch (cc = read_tcp_socket(fd, bp, i)) {
+		case NOTOK:
+		case OK:
+			return DR_NETWORK;
 
-	    default: 
-		break;
-	}
+		default:
+			break;
+		}
 
-    if (t -> t_vrsn != TPKT_VRSN)
-	return DR_PROTOCOL;
+	if (t->t_vrsn != TPKT_VRSN)
+		return DR_PROTOCOL;
 
-    if ((t -> t_length = ntohs (t -> t_length)) < TPKT_HDRLEN (t))
-	return DR_LENGTH;
+	if ((t->t_length = ntohs(t->t_length)) < TPKT_HDRLEN(t))
+		return DR_LENGTH;
 
-    return OK;
+	return OK;
 }
-
-/*  */
 
 /* ARGSUSED */
 
-char   *tcpsave (fd, cp1, cp2, td)
-int	fd;
-char   *cp1,
-       *cp2;
-struct TSAPdisconnect *td;
+char *
+tcpsave(fd, cp1, cp2, td)
+	int fd;
+	char *cp1, *cp2;
+	struct TSAPdisconnect *td;
 {
-    static char buffer[BUFSIZ];
+	static char buffer[BUFSIZ];
 
-    (void) sprintf (buffer, "%c%d %s %s", NT_TCP, fd, cp1, cp2);
+	(void) sprintf(buffer, "%c%d %s %s", NT_TCP, fd, cp1, cp2);
 
-    return buffer;
+	return buffer;
 }
 
-/*  */
-
-int	tcprestore (tb, buffer, td)
-register struct tsapblk *tb;
-char   *buffer;
-struct TSAPdisconnect *td;
+int
+tcprestore(tb, buffer, td)
+	register struct tsapblk *tb;
+	char *buffer;
+	struct TSAPdisconnect *td;
 {
-    int     fd;
-    register char *cp;
-    char    domain1[NSAP_DOMAINLEN + 1 + 5 + 1],
-	    domain2[NSAP_DOMAINLEN + 1 + 5 + 1];
-    register struct NSAPaddr *na;
-    register struct tsapADDR *ta;
-    
-    ta = &tb -> tb_initiating;
-    ta -> ta_present = 1;
-    na = &ta -> ta_addr;
-    na -> na_stack = NA_TCP;
-    na -> na_community = ts_comm_tcp_default;
+	int fd;
+	register char *cp;
+	char domain1[NSAP_DOMAINLEN + 1 + 5 + 1], domain2[NSAP_DOMAINLEN + 1 + 5 + 1];
+	register struct NSAPaddr *na;
+	register struct tsapADDR *ta;
 
-    if (sscanf (buffer, "%d %s %s", &fd, domain1, domain2) != 3 || fd < 0)
-	return tsaplose (td, DR_PARAMETER, NULLCP,
-			 "bad initialization vector \"%s\"", buffer);
+	ta = &tb->tb_initiating;
+	ta->ta_present = 1;
+	na = &ta->ta_addr;
+	na->na_stack = NA_TCP;
+	na->na_community = ts_comm_tcp_default;
+
+	if (sscanf(buffer, "%d %s %s", &fd, domain1, domain2) != 3 || fd < 0)
+		return tsaplose(td, DR_PARAMETER, NULLCP,
+				"bad initialization vector \"%s\"", buffer);
 
 #ifdef ULTRIX_X25_DEMSA
-   if ( X25RegisterFD(fd,rhandler,whandler,xhandler,fd) < NULL ) {
-	SLOG (compat_log, LLOG_EXCEPTIONS, "failed", ("X25RegisterFD"));
-	return NOTOK;
-   }
-   if( fd >= our_TABLE_SIZE){
-       SLOG (compat_log, LLOG_EXCEPTIONS, "invalid",
-             ("tcprestore:increase our_TABLE_SIZE in demsb.h"));
-      return NOTOK;
-    }
+	if (X25RegisterFD(fd, rhandler, whandler, xhandler, fd) < NULL) {
+		SLOG(compat_log, LLOG_EXCEPTIONS, "failed", ("X25RegisterFD"));
+		return NOTOK;
+	}
+	if (fd >= our_TABLE_SIZE) {
+		SLOG(compat_log, LLOG_EXCEPTIONS, "invalid",
+		     ("tcprestore:increase our_TABLE_SIZE in demsb.h"));
+		return NOTOK;
+	}
 
-    list_of_conn_desc[fd].TCP_IP_OR_X25_SOCKET = our_TCP_IP_SOCKET;
-    list_of_conn_desc[fd].descriptor           = fd;
+	list_of_conn_desc[fd].TCP_IP_OR_X25_SOCKET = our_TCP_IP_SOCKET;
+	list_of_conn_desc[fd].descriptor = fd;
 #endif
 
-    if (cp = index (domain1, '+')) {
-	*cp++ = NULL;
-	na -> na_port = htons ((u_short) atoi (cp));
-    }
-    (void) strncpy (na -> na_domain, domain1, sizeof na -> na_domain);
+	if ((cp = index(domain1, '+'))) {
+		*cp++ = '\0';
+		na->na_port = htons((u_short) atoi(cp));
+	}
+	(void) strncpy(na->na_domain, domain1, sizeof na->na_domain);
 
-    tb -> tb_fd = fd;
-    (void) TTService (tb);
-    
-    ta = &tb -> tb_responding;
-    ta -> ta_present = 1;
-    na = &ta -> ta_addr;
-    na -> na_stack = NA_TCP;
-    na -> na_community = ts_comm_tcp_default;
-    
-    if (cp = index (domain2, '+')) {
-	*cp++ = NULL;
-	na -> na_port = htons ((u_short) atoi (cp));
-    }
-    (void) strncpy (na -> na_domain, domain2, sizeof na -> na_domain);
+	tb->tb_fd = fd;
+	(void) TTService(tb);
 
-    return OK;
+	ta = &tb->tb_responding;
+	ta->ta_present = 1;
+	na = &ta->ta_addr;
+	na->na_stack = NA_TCP;
+	na->na_community = ts_comm_tcp_default;
+
+	if ((cp = index(domain2, '+'))) {
+		*cp++ = '\0';
+		na->na_port = htons((u_short) atoi(cp));
+	}
+	(void) strncpy(na->na_domain, domain2, sizeof na->na_domain);
+
+	return OK;
 }
 
-/*  */
-
-int	TTService (tb)
-register struct tsapblk *tb;
+int
+TTService(tb)
+	register struct tsapblk *tb;
 {
-    struct tsapkt *t;
+	struct tsapkt *t;
 
-    tb -> tb_flags &= ~TB_STACKS;
-    tb -> tb_flags |= TB_TCP;
+	tb->tb_flags &= ~TB_STACKS;
+	tb->tb_flags |= TB_TCP;
 
-    tb -> tb_tsdusize = MAX1006
-		    - (tb -> tb_tpduslop = sizeof t -> t_pkthdr + DT_MAGIC);
+	tb->tb_tsdusize = MAX1006 - (tb->tb_tpduslop = sizeof t->t_pkthdr + DT_MAGIC);
 
-    tb -> tb_retryfnx = tcpretry;
+	tb->tb_retryfnx = tcpretry;
 
-    tb -> tb_initfnx = tcpinit;
-    tb -> tb_readfnx = read_tcp_socket;
-    tb -> tb_writefnx = tp0write;
-    tb -> tb_closefnx = close_tcp_socket;
-    tb -> tb_selectfnx = select_tcp_socket;
+	tb->tb_initfnx = tcpinit;
+	tb->tb_readfnx = (void *)read_tcp_socket;
+	tb->tb_writefnx = tp0write;
+	tb->tb_closefnx = close_tcp_socket;
+	tb->tb_selectfnx = select_tcp_socket;
 
-    tp0init (tb);
+	tp0init(tb);
+	return (0);
 }
 #endif

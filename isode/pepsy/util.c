@@ -73,7 +73,7 @@ va_dcl
 	p = va_arg (ap, ptpe *);
 	pe = va_arg (ap, PE);
 
-	_asprintf (buffer, NULLCP, ap);
+	_xsprintf (buffer, NULLCP, ap);
 	(void) sprintf (PY_pepy, "%s: module %s",
 			buffer, module ? module -> md_name : "<none>");
 	if (p) {

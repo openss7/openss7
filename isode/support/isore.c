@@ -32,7 +32,7 @@ static char *rcsid = "$Header: /xtel/isode/isode/support/RCS/isore.c,v 9.0 1992/
 
 /*    MAIN */
 
-static SFD	EMTser ();
+static sighandler_t	EMTser;
 
 
 /* ARGSUSED */
@@ -90,10 +90,10 @@ char  **argv,
 
 /* ARGSUSED */
 #ifdef SVR4
-static  SFD EMTser (sig)
+static  RETSIGTYPE EMTser (sig)
 int	sig;
 #else
-static  SFD EMTser (sig, code, sc)
+static  RETSIGTYPE EMTser (sig, code, sc)
 int	sig;
 long	code;
 struct sigcontext *sc;

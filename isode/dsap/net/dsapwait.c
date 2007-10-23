@@ -1110,7 +1110,7 @@ static char * watch_dog_where;
 static watchdogfinal = FALSE;
 
 watch_dog_final(fn)
-SFP fn;
+sighandler_t fn;
 {
 	watchdogfinal = TRUE;
 
@@ -1122,7 +1122,7 @@ SFP fn;
 }
 
 /* ARGSUSED */
-static SFD watch_dog_activate (sd)
+static RETSIGTYPE watch_dog_activate (sd)
 int sd;
 {
 static char called = FALSE;
@@ -1142,7 +1142,7 @@ static char called = FALSE;
 }
 
 /* ARGSUSED */
-static SFD slack_watch_dog_activate (sd)
+static RETSIGTYPE slack_watch_dog_activate (sd)
 int sd;
 {
 	LLOG (log_dsap, LLOG_EXCEPTIONS, 

@@ -133,7 +133,7 @@ extern	char **environ;
 extern	int errno;
 char	line[] = "/dev/ptyp0";
 char	*envinit[] = { "TERM=network", 0 };
-SFD	cleanup();
+sighandler_t	cleanup;
 static int do_cleaning = 0;
 
 char   *myname;
@@ -676,7 +676,7 @@ netflush()
 		nbackp = nfrontp = netobuf;
 }
 
-SFD	cleanup()
+RETSIGTYPE	cleanup()
 {
 	sleep(1);
 	while(getch() > 0);	/*Clean out unread VT-DATA PDU's still held
