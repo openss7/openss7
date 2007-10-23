@@ -31,8 +31,8 @@
 extern int  interrupted;
 extern int  oneshot;
 
-extern	SFP	istat;
-extern	SFP	qstat;
+extern	sighandler_t	istat;
+extern	sighandler_t	qstat;
 
 extern LLog _fred_log, *fred_log;
 

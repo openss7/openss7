@@ -1,10 +1,69 @@
+/*****************************************************************************
+
+ @(#) $Id$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ifndef __ISODE_QUIPU_DS_ERROR_H__
+#define __ISODE_QUIPU_DS_ERROR_H__
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
 /* ds_error.h - directory service errors */
 
 /*
- * $Header: /xtel/isode/isode/h/quipu/RCS/ds_error.h,v 9.0 1992/06/16 12:23:11 isode Rel $
+ * Header: /xtel/isode/isode/h/quipu/RCS/ds_error.h,v 9.0 1992/06/16 12:23:11 isode Rel
  *
  *
- * $Log: ds_error.h,v $
+ * Log: ds_error.h,v
  * Revision 9.0  1992/06/16  12:23:11  isode
  * Release 8.0
  *
@@ -20,58 +79,56 @@
  *
  */
 
-
 #ifndef DSERRORH
 #define DSERRORH
 
 #include "quipu/dsp.h"
 
 struct DSE_abandon_fail {
-    int DSE_ab_problem;
+	int DSE_ab_problem;
 #define DSE_AB_NOSUCHOPERATION  1
 #define DSE_AB_TOOLATE          2
 #define DSE_AB_CANNOTABANDON    3
-    int DSE_ab_invokeid;
+	int DSE_ab_invokeid;
 };
 
 struct DSE_at_problem {
-    int         DSE_at_what;
+	int DSE_at_what;
 #define DSE_AT_NOSUCHATTRIBUTE          1
 #define DSE_AT_INVALIDATTRIBUTESYNTAX   2
 #define DSE_AT_UNDEFINEDATTRIBUTETYPE   3
 #define DSE_AT_INAPPROPRIATEMATCHING    4
 #define DSE_AT_CONSTRAINTVIOLATION      5
 #define DSE_AT_TYPEORVALUEEXISTS        6
-    AttributeType DSE_at_type;
-    AttributeValue DSE_at_value;
-    struct DSE_at_problem *dse_at_next;
+	AttributeType DSE_at_type;
+	AttributeValue DSE_at_value;
+	struct DSE_at_problem *dse_at_next;
 };
+
 #define DSE_AT_NOPROBLEM ((struct DSE_at_problem*)0)
 
 struct DSE_attribute {
-    DN DSE_at_name;
-    struct DSE_at_problem DSE_at_plist;
-} ;
-
+	DN DSE_at_name;
+	struct DSE_at_problem DSE_at_plist;
+};
 
 struct DSE_name {
-    int DSE_na_problem;
+	int DSE_na_problem;
 #define DSE_NA_NOSUCHOBJECT             1
 #define DSE_NA_ALIASPROBLEM             2
 #define DSE_NA_INVALIDATTRIBUTESYNTAX   3
 #define DSE_NA_ALIASDEREFERENCE         4
-    DN DSE_na_matched;
+	DN DSE_na_matched;
 };
 
-
 struct DSE_referral {
-    ContinuationRef DSE_ref_candidates;
-    DN                  DSE_ref_prefix;
-			/* Context prefix only in DSP           */
+	ContinuationRef DSE_ref_candidates;
+	DN DSE_ref_prefix;
+	/* Context prefix only in DSP */
 };
 
 struct DSE_security {
-    int DSE_sc_problem;
+	int DSE_sc_problem;
 #define DSE_SC_AUTHENTICATION           1
 #define DSE_SC_INVALIDCREDENTIALS       2
 #define DSE_SC_ACCESSRIGHTS             3
@@ -81,13 +138,13 @@ struct DSE_security {
 };
 
 struct DSE_service {
-    int DSE_sv_problem;
+	int DSE_sv_problem;
 #define DSE_SV_BUSY                     1
 #define DSE_SV_UNAVAILABLE              2
 #define DSE_SV_UNWILLINGTOPERFORM       3
 #define DSE_SV_CHAININGREQUIRED         4
 #define DSE_SV_UNABLETOPROCEED          5
-#define DSE_SV_INVALIDREFERENCE         6       /* DSP ONLY */
+#define DSE_SV_INVALIDREFERENCE         6	/* DSP ONLY */
 #define DSE_SV_TIMELIMITEXCEEDED        7
 #define DSE_SV_ADMINLIMITEXCEEDED	8
 #define DSE_SV_LOOPDETECT               9
@@ -97,7 +154,7 @@ struct DSE_service {
 };
 
 struct DSE_update {
-    int DSE_up_problem;
+	int DSE_up_problem;
 #define DSE_UP_NAMINGVIOLATION          1
 #define DSE_UP_OBJECTCLASSVIOLATION     2
 #define DSE_UP_NOTONNONLEAF             3
@@ -108,7 +165,7 @@ struct DSE_update {
 };
 
 struct DSError {
-    int dse_type;
+	int dse_type;
 #define DSE_INTR_ABANDON_FAILED	-5	/* Call interrupted - abandon failed */
 #define DSE_INTR_ABANDONED	-4	/* Call interrupted - abandoned */
 #define DSE_INTRERROR		-3	/* Call interrupted */
@@ -120,25 +177,23 @@ struct DSError {
 #define DSE_SERVICEERROR        3
 #define DSE_REFERRAL            4
 #define DSE_ABANDONED           5
-			/* Abandoned does not have any parameter and    */
-			/* so there is no struct for this value         */
+	/* Abandoned does not have any parameter and */
+	/* so there is no struct for this value */
 #define DSE_SECURITYERROR       6
 #define DSE_ABANDON_FAILED      7
 #define DSE_UPDATEERROR         8
 #define DSE_DSAREFERRAL		9
 #define ds_recog_err(a) ((a >= DSE_ATTRIBUTEERROR) && (a <= DSE_DSAREFERRAL))
-    union {
-       struct DSE_attribute dse_un_attribute;
-       struct DSE_name dse_un_name;
-       struct DSE_service dse_un_service;
-       struct DSE_referral dse_un_referral;
-       struct DSE_security dse_un_security;
-       struct DSE_abandon_fail dse_un_abandon_fail;
-       struct DSE_update dse_un_update;
-    }   dse_un;
+	union {
+		struct DSE_attribute dse_un_attribute;
+		struct DSE_name dse_un_name;
+		struct DSE_service dse_un_service;
+		struct DSE_referral dse_un_referral;
+		struct DSE_security dse_un_security;
+		struct DSE_abandon_fail dse_un_abandon_fail;
+		struct DSE_update dse_un_update;
+	} dse_un;
 };
-
-
 
 	/* THIS SECTION DEFINES THE PROCEDURE CALLS */
 
@@ -151,14 +206,14 @@ All routines return integer values with the following
 possible values
 */
 
-#define DS_OK  0                /* Success                              */
-#define DS_ERROR_LOCAL -1       /* Error within the DUA module          */
+#define DS_OK  0		/* Success */
+#define DS_ERROR_LOCAL -1	/* Error within the DUA module */
 
-#define DS_ERROR_CONNECT -2     /* Failed to connect to a remote DSA    */
-#define DS_ERROR_PROVIDER -3    /* Other OSI provider error             */
+#define DS_ERROR_CONNECT -2	/* Failed to connect to a remote DSA */
+#define DS_ERROR_PROVIDER -3	/* Other OSI provider error */
 #define DS_X500_ERROR	-4	/* Synonym for remote error */
-#define DS_ERROR_REMOTE -4      /* Remote error.  Further details will  */
-				/* be in the error parameter            */
+#define DS_ERROR_REMOTE -4	/* Remote error.  Further details will */
+				/* be in the error parameter */
 
 #define DS_CONTINUE -5		/* operation not finished... continuing */
 #define DS_SUSPEND -6		/* operation has deliberately suspended */
@@ -175,3 +230,5 @@ possible values
 #define ERR_ALIAS        dse_un.dse_un_alias
 
 #endif
+
+#endif				/* __ISODE_QUIPU_DS_ERROR_H__ */
