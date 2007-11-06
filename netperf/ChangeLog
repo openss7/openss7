@@ -3,6 +3,7 @@
 	* acinclude.m4: corrected check
 	* manual/descrip.texi: typo
 	* netperf.macros: better grefer macros
+	* netperf.refs: more better references
 
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 

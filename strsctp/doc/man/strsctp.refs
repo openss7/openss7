@@ -1,11 +1,132 @@
-%L XNS
+%K XNS99 XNS
+%L XNS99
 %A Open\ Group
-%R XNS Issue 5.2 Draft 2.0
+%R XNS
+%J Issue 5.2, Draft 2
+%S Open Group CAE Specification
 %T Technical Standard: Network Services (XNS)
 %D 1999
+%C Berkshire, UK
 %I Open Group Publication
 %G ISBN 1-85912-241-8
 %U http://www.opengroup.org/onlinepubs/
+
+%K XNS98
+%L XNS98
+%A Open\ Group
+%R C523 (XNS)
+%S CAE Specification
+%T Networking Services (XNS)
+%J Issue 5
+%D February 1997
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-165-9
+%U http://www.opengroup.org/onlinepubs/
+
+%L XMP
+%A X/Open
+%R C306 (XMP)
+%T Systems Management: Management Protocols API (XMP)
+%D March 1994
+%C Berkshire, UK
+%I X/Open Company Limited
+%G ISBN: 1-85912-027-X
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XAP
+%A X/Open
+%R C303 (XAP)
+%T ACSE/Presentation Services API (XAP)
+%D September 1993
+%C Berkshire, UK
+%I X/Open Company Limited
+%G ISBN: 1-872630-91-X
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XAP-TP
+%A X/Open
+%R C409 (XAP-TP)
+%T ACSE/Presentation: Transaction Procesing API (XAP-TP)
+%D March 1995
+%C Berkshire, UK
+%I X/Open Company Limited
+%G ISBN: 1-85912-091-1
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XAP-ROSE
+%A X/Open
+%R C408 (XAP-ROSE)
+%T Remote Operations Service Element (XAP-ROSE) API
+%D January 1995
+%C Berkshire, UK
+%I X/Open Company Limited
+%G ISBN: 1-85912-060-1
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XOM
+%A X/Open
+%R C607 (XOM)
+%T OSI-Abstract-Data Manipulation API (XOM)
+%J Issue 3
+%D May 1996
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-175-6
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XDS
+%A X/Open
+%R C608 (XDS)
+%T API to Directory Services (XDS)
+%J Issue 3
+%D May 1996
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-180-2
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%K XMHS
+%L X400
+%A X/Open
+%R C609 (X400)
+%T API to Electronic Mail (X.400)
+%J Issue 3
+%D May 1996
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-185-3
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XMS
+%A X/Open
+%R C305 (XMS)
+%T Message Store API (XMS)
+%D June 1993
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-872630-83-9
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XFTAM
+%A X/Open
+%R C415 (XFTAM)
+%T FTAM High-Level API (XFTAM)
+%J Version 2
+%D October 1995
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-092-X
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
 
 %L XTI
 %A XPG
@@ -13,14 +134,28 @@
 %D n.d.
 %R XTI/TLI Revision 1.0
 %T XOpen Transport Interface
+%C Berkshire, UK
 %I X Programmer's Group
 %U http://www.opengroup.org/onlinepubs/
+%S Open Group CAE Specification
+%J Revision 1
+
+%L XX25
+%A X/Open
+%R C411 (XX25)
+%T X.25 Programming Interface using XTI (XX25)
+%D November 1995
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-136-5
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
 
 %L TCI
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
-%R TCI Revision 0.9.2
-%N Draft 2
+%R TCI
+%J Revision 0.9.2, Draft 2
 %T Transaction Component Interface (TCI) Specification
 %D July 15, 2007
 %C Edmonton, Alberta
@@ -31,8 +166,8 @@
 %L TRI
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
-%R TRI Revision 0.9.2
-%N Draft 2
+%R TRI
+%J Revision 0.9.2, Draft 2
 %T Transaction Interface (TRI) Specification
 %D July 15, 2007
 %C Edmonton, Alberta
@@ -44,29 +179,31 @@
 %A Open\ Group
 %Q Open\ Group
 %R TPI Revision 2.0.0
-%N Draft 2
+%J Revision 2.0.0, Draft 2
 %T Transport Provider Interface (TPI) Specification
 %D 1999
-%C Parsippany, New Jersey
+%C Berkshire, UK
 %I Open Group Publication
 %U http://www.opengroup.org/onlinepubs/
+%S Open Group CAE Specification
 
 %L NPI
 %A UNIX\ International,\ Inc.
 %Q UNIX\ International,\ Inc.
-%R NPI Revision 2.0.0
-%N Draft 2
+%R NPI
+%J Revision 2.0.0, Draft 2
 %T Network Provider Interface (NPI) Specification
 %D August 17, 1992
 %C Parsippany, New Jersey
 %I UNIX International Press
 %U http://www.openss7.org/docs/npi.pdf
+%S Open Group CAE Specification
 
 %L DLPI
 %A UNIX International,\ Inc.
 %Q UNIX International,\ Inc.
-%R DLPI Revision 2.0.0
-%N Draft 2
+%R DLPI
+%J Revision 2.0.0, Draft 2
 %T Data Link Provider Interface (DLPI) Specification
 %D August 20, 1991
 %C Parsippany, New Jersey
@@ -76,13 +213,23 @@
 %L TLI
 %A UNIX\ International,\ Inc.
 %Q UNIX\ International,\ Inc.
-%R TLI Revision 1.5
-%N Draft 2
+%R TLI
+%J Revision 1.5, Draft 2
 %T Transport Provider Interface Specification
 %D December 10, 1992
 %C Parsippany, New Jersey
 %I Unix International Press
 %U http://www.openss7.org/doc/tpi.pdf
+
+%L APLI
+%A UNIX\ International,\ Inc.
+%Q UNIX\ International,\ Inc.
+%R APLI
+%J Draft
+%T ACSE/Presentation Library Interface (APLI) Specification
+%D October 25, 1990
+%C Parsippany, New Jersey
+%I Unix International Press
 
 %L CDI
 %A Geoffrey Gerrien
@@ -93,8 +240,8 @@
 %L CDI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R CDI Revision 0.9.2
-%N Draft 2
+%R CDI
+%J Revision 0.9.2, Draft 2
 %T Communications Device Interface (CDI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -105,8 +252,8 @@
 %L LMI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R LMI Revision 0.9.2
-%N Draft 2
+%R LMI
+%J Revision 0.9.2, Draft 2
 %T Local Management Interface (LMI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -117,8 +264,8 @@
 %L SLI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R SLI Revision 0.9.2
-%N Draft 2
+%R SLI
+%J Revision 0.9.2, Draft 2
 %T Signalling Link Interface (SLI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -129,8 +276,8 @@
 %L SDTI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R SDTI Revision 0.9.2
-%N Draft 2
+%R SDTI
+%J Revision 0.9.2, Draft 2
 %T Signalling Data Terminal Interface (SDTI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -141,8 +288,8 @@
 %L SDLI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R SDLI Revision 0.9.2
-%N Draft 2
+%R SDLI
+%J Revision 0.9.2, Draft 2
 %T Signalling Data Link Interface (SDLI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -153,8 +300,8 @@
 %L MTPI
 %A Brian Bidulock
 %Q OpenSS7\ Corporation
-%R MTPI Revision 0.9.2
-%N Draft 1
+%R MTPI
+%J Revision 0.9.2, Draft 1
 %T Message Transfer Provider Interface (MTPI)  Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -165,8 +312,8 @@
 %L CHI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R CHI Revision 0.9.2
-%N Draft 2
+%R CHI
+%J Revision 0.9.2, Draft 2
 %T Channel Interface (CHI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -176,8 +323,8 @@
 %L MXI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R MXI Revision 0.9.2
-%N Draft 2
+%R MXI
+%J Revision 0.9.2, Draft 2
 %T Multiplex Interface (MXI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -274,7 +421,7 @@
 %R ETSI TS 100 939-V7.3.0 (1999-12)
 %T Digial cellular telecommunications system (Phase 2+) \(em Mobile radio interface signalling layer 3 \(em General aspects
 %D December 1999
-%N GSM 04.07 Version 7.3.0 Release 1998
+%J GSM 04.07 Version 7.3.0 Release 1998
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -286,7 +433,7 @@
 %R ETSI ETS 300 557-1999
 %T Digial cellular telecommunications system (Phase 2) \(em Mobile radio interface \(em Layer 3 specification
 %D December 1999
-%N GSM 04.08 Version 4.23.1 Release 1999
+%J GSM 04.08 Version 4.23.1 Release 1999
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -298,7 +445,7 @@
 %R ETSI TS 100 940-V7.10.0 (2000-12)
 %T Digial cellular telecommunications system (Phase 2+) \(em Mobile radio interface layer 3 specification
 %D December 2000
-%N 3GPP TS 04.08 Version 7.10.0 Release 1998
+%J 3GPP TS 04.08 Version 7.10.0 Release 1998
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -310,7 +457,7 @@
 %R ETSI TS 100 940-V7.8.0 (2000-10)
 %T Digial cellular telecommunications system (Phase 2+) \(em Mobile radio interface layer 3 specification
 %D October 2000
-%N 3GPP TS 04.08 Version 7.8.0 Release 1998
+%J 3GPP TS 04.08 Version 7.8.0 Release 1998
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -322,7 +469,7 @@
 %R ETSI TS 101 642-V8.0.0 (2000-06)
 %T Digial cellular telecommunications system (Phase 2+) \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface \(em Interface principles
 %D June 2000
-%N GSM 08.02 Version 8.0.0 Release 1999
+%J GSM 08.02 Version 8.0.0 Release 1999
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -334,7 +481,7 @@
 %R ETSI TS 100 589-V8.0.0 (2000-06)
 %T Digial cellular telecommunications system (Phase 2+) \(em Signalling transport mechanism specification for the \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface
 %D June 2000
-%N GSM 08.06 Version 8.0.0 Release 1999
+%J GSM 08.06 Version 8.0.0 Release 1999
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -346,7 +493,7 @@
 %R ETSI TS 100 589-V8.0.1 (2002-05)
 %T Digial cellular telecommunications system (Phase 2+) \(em Signalling transport mechanism specification for the \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface
 %D May 2000
-%N 3GPP TS 08.06 Version 8.0.1 Release 1999
+%J 3GPP TS 08.06 Version 8.0.1 Release 1999
 %C Sophia Antipolis, Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -358,7 +505,7 @@
 %R ETSI ETS 300 590-1998
 %T Digial cellular telecommunications system (Phase 2) \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface \(em Layer 3 specification
 %D 1998
-%N GSM 08.08 Version 4.12.1
+%J GSM 08.08 Version 4.12.1
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -370,7 +517,7 @@
 %R ETSI TS 100 590-V8.5.0 (2000-08)
 %T Digial cellular telecommunications system (Phase 2) \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface \(em Layer 3 specification
 %D August 2000
-%N GSM 08.08 Version 8.5.0 Release 1999
+%J GSM 08.08 Version 8.5.0 Release 1999
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -418,7 +565,7 @@ Part 1: Protocol Specification
 %L ETS 300 009-1
 %A ETSI
 %R ETSI ETS 300 009-1
-%N Third Edition
+%J Third Edition
 %D September 1996
 %T Intergrated Services Digital Network (ISDN); Signalling System No. 7; Signalling Connection Control Part (SCCP); [Connectionless and Connection-Oriented] to Support International Interconnection; Part 1: Protocol Specification
 %O (ITU-T Recommendations Q.711 to Q.714 and Q.716 (1993) modified)
@@ -432,7 +579,7 @@ Part 1: Protocol Specification
 %L ETS 300 009
 %A ETSI
 %R ETSI ETS 300 009
-%N Second Edition
+%J Second Edition
 %D January 1995
 %T Intergrated Services Digital Network (ISDN); Signalling System No. 7; Signalling Connection Control Part (SCCP); [Connectionless and Connection-Oriented] to Support International Interconnection
 %C Sophia Antipolis, Valbonne
@@ -447,7 +594,7 @@ Part 1: Protocol Specification
 %R ETSI EN 300 356-1-V4.2.1 (2001-07)
 %T Integrated Serivces Digital Network (ISDN); Signalling System No. 7 (SS7); ISDN User Part (ISUP) Version 4 for the International Interface; Part 1: Basic Services
 %D July 2001
-%N ISUP Version 4
+%J ISUP Version 4
 %C Sophia Antipolis, Valbonne
 %I European Telecommunications Standards Institute
 %O (ITU-T Rcommendations Q.761 to Q.764 (1999) modified)
@@ -459,7 +606,7 @@ Part 1: Protocol Specification
 %R ETSI ETS 300 134
 %T Integrated Services Digital Network (ISDN); CCITT Signalling System No. 7; Transaction Capabilities Application Part (TCAP)
 %D December 1992
-%N TCAP Version 1
+%J TCAP Version 1
 %C Sophia Antipolis, Valbonne
 %G T/S 43-05
 %Q ETSI Secretariat
@@ -473,7 +620,7 @@ Part 1: Protocol Specification
 %R ETSI ETS 300 287
 %T Integrated Services Digital Network (ISDN); Signalling System No. 7 (SS7); Transaction Capabilities Application Part (TCAP)
 %D 1993
-%N TCAP Version 2
+%J TCAP Version 2
 %C Sophia Antipolis, Valbonne
 %G RE/SPS-02003
 %Q ETSI Secretariat
@@ -487,7 +634,7 @@ Part 1: Protocol Specification
 %R ETSI ETS 300 344
 %T Integrated Services Digital Network (ISDN); Signalling System No. 7; Transaction Capabilities Application Part (TCAP); Test Specification
 %D August 1994
-%N TCAP Version 1
+%J TCAP Version 1
 %C Sophia Antipolis, Valbonne
 %G DE/SPS-6005
 %Q ETSI Secretariat
@@ -669,6 +816,19 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2ua-09.txt
+
+%L M3UABIS05
+%K m3ua-bis-05
+%A Javier Pastor
+%A Ken Morneault
+%E Javier Pastor
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Signaling System 7 (SS7) Message Transfer Part 3 (MTP3)-User Adaptation Layer (M3UA)
+%R draft-ietf-sigtran-rfc3332bis-05.txt
+%D October 2005
+%O Work In Progress
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-rfc3332bis-05.txt
 
 %K m3uaig04
 %L M3UAIG04
@@ -2402,7 +2562,7 @@ Part 1: Protocol Specification
 %A TTC
 %R TTC Standard JT-Q\)711
 %T Functional Description of the Signalling Connection Control Part (SCCP)
-%N Version 2
+%J Version 2
 %D April 23, 1997
 %C Japan
 %I Telecommunication Technology Comittee (TTC)
@@ -2424,7 +2584,7 @@ Part 1: Protocol Specification
 %A TTC
 %R TTC Standard JT-Q\)712
 %T Definition and Functions of SCCP Messages
-%N Version 3
+%J Version 3
 %D April 23, 1997
 %C Japan
 %I Telecommunication Technology Comittee (TTC)
@@ -2446,7 +2606,7 @@ Part 1: Protocol Specification
 %A TTC
 %R TTC Standard JT-Q\)713
 %T SCCP Formats and Codes
-%N Version 8
+%J Version 8
 %D April 20, 2000
 %C Japan
 %I Telecommunication Technology Comittee (TTC)
@@ -2468,7 +2628,7 @@ Part 1: Protocol Specification
 %A TTC
 %R TTC Standard JT-Q\)714
 %T Signalling Connection Control Part Procedures
-%N Version 3
+%J Version 3
 %D April 23, 1997
 %C Japan
 %I Telecommunication Technology Comittee (TTC)
@@ -3261,16 +3421,19 @@ Part 1: Protocol Specification
 %R ISO/IEC 8208 : 1995
 %T Information Technology \- Data Communications \- X.25 Packet Layer Protocol For Data Terminal Equipment
 %D 1995
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso8881
 %L ISO 8881
 %R ISO/IEC 8881:1989
 %A ISO/IEC
-%Q International Organization for Standardization
 %T Information Processing Systems \(em Data Communications \(em Use of the X.25 Packet Level Protocol in Local Area Networks
 %D 1989
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso9542
 %L ISO/IEC 9542
@@ -3278,7 +3441,9 @@ Part 1: Protocol Specification
 %R ISO/IEC 9542 : 1988
 %T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- End System to Intermediate System Routeing Exchange Protocol for use in Conjunction with the Protocol Routeing for Providing the Connectionless-Mode Network Service (ISO 8473)
 %D 1988
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso10030
 %L ISO/IEC 10030
@@ -3286,7 +3451,9 @@ Part 1: Protocol Specification
 %R ISO/IEC 10030 : 1995
 %T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- End System Routeing Information Exchange Protocol for use in conjunction with ISO/IEC 8878
 %D 1995
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso10589
 %L ISO/IEC 10589
@@ -3294,7 +3461,9 @@ Part 1: Protocol Specification
 %R ISO/IEC 10589 : 1992
 %T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- Intermediate System to Intermediate System Intra-Domain Routeing Routine Information Exchange Protocol for use in conjunction wht the Protocol for Providing the Connectionless-Mode Network Service (ISO 8473)
 %D 1992
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso10747
 %L ISO/IEC 10747
@@ -3302,7 +3471,9 @@ Part 1: Protocol Specification
 %R ISO/IEC 10747 : 1992
 %T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- Protocol for Exchange of Inter-Domain Routeing Information Amoung Intermediate Systems to Support Forwarding of ISO 8473 PDUs
 %D 1992
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K x680
 %L X.680
@@ -3628,6 +3799,16 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
 
+%K iso8473_2
+%L ISO 8473-2
+%R ISO/IEC 8473-2 : 1994
+%A ISO/IEC
+%T Information Technology \(em Open Systems Interconnect \(em Protocol for Providing the Connectionless-mode Network Service: Provision of the underlying service by an ISO/IEC 8802 Subnetwork
+%D 1994
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
 %K x622
 %L X.622
 %A ITU
@@ -3711,6 +3892,31 @@ Part 1: Protocol Specification
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
+
+%K x710
+%L X.710
+%A ITU
+%R ITU-T Recommendation X.710
+%C Geneva
+%D October 1997
+%T Information Technology \(em Open Systems Interconnection \(em Common Management Information Service
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K x711
+%L X.711
+%A ITU
+%R ITU-T Recommendation X.711
+%C Geneva
+%D October 1997
+%T Information Technology \(em Open Systems Interconnection \(em Common Management Information Protocol: Specification
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
 
 %K h225.0
 %L H.225.0
@@ -3854,13 +4060,55 @@ Part 1: Protocol Specification
 %D 1988
 %I International Organization for Standardization
 
-%L ISO 8881
-%R ISO/IEC 8881:1989
+%K iso8571_1
+%L ISO 8571-1
+%R ISO 8571-1:1988
 %A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 1: General Introduction
+%D 1988
 %Q International Organization for Standardization
-%T Information Processing Systems \(em Data Communications \(em Use of the X.25 Packet Level Protocol in Local Area Networks
-%D 1989
 %I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso8571_2
+%L ISO 8571-2
+%R ISO 8571-2:1988
+%A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 2: Vitual Filestore Definition
+%D 1988
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso8571_2a1
+%L ISO 8571-2|Amd.1
+%R ISO 8571-2:1988|Amd.1:1992
+%A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 2: Vitual Filestore Definition \(em Amendment 1: Filestore Management
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso8571_4
+%L ISO 8571-4
+%R ISO 8571-4:1988
+%A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 4: File Protocol Specification
+%D 1988
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso8571_4a1
+%L ISO 8571-4|Amd.1
+%R ISO 8571-4:1988|Amd.1:1992
+%A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 4: File Protocol Specification \(em Amendment 1: Filestore Management
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
 
 %L MINSHALL
 %A Greg Minshall
@@ -3876,14 +4124,14 @@ Part 1: Protocol Specification
 %R SVID
 %K svid
 %T System V, Interface Definition
-%N Fourth Edition
+%J Fourth Edition
 
 %L XBD5
 %K xbd5
 %R XBD Issue 5
 %A Open\ Group
 %T X/Open System Interface Definitions
-%N Issue 5
+%J Issue 5
 %I Open Group Publication
 %U http://www.opengroup.org/onlinepubs/
 
@@ -3918,7 +4166,7 @@ Part 1: Protocol Specification
 %L AdvProg
 %A W. Richard Stevens
 %T Advanced Programming in the UNIX\(rg\ Environment
-%N 15th edition
+%J 15th edition
 %D December 1997
 %C Reading, Massachusetts
 %I Addison Wesley
@@ -4208,11 +4456,24 @@ Part 1: Protocol Specification
 %C Santa Clara, California
 %U http://docs.sun.com/
 
-%L SUNLINK
+%L SUNLINK-TLI
 %R Solaris\(rg SunLink OSI
 %K sunlink
 %T SunLink OSI 8.1 TLI Programmer's Reference
+%J Revision A
 %D March 1995
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Mountain View, California
+%U http://docs.sun.com/
+
+%L SUNLINK-APLI
+%R Solaris\(rg SunLink OSI
+%K sunlink
+%T Sunlink OSI 8.1 APLI Programmer's Reference
+%J Revision A
+%D March 1995
+%G Part No.: 802-2040-11
 %Q Sun Microsystems, Inc.
 %I Sun
 %C Mountain View, California
@@ -4470,7 +4731,7 @@ Part 1: Protocol Specification
 %Q OpenSS7 Corporation
 %T Call Control Interface (CCI) Specification
 %R CCI Revision 1.0.0
-%N Draft 1
+%J Draft 1
 %C Edmonton
 %D April 2003
 %I OpenSS7 Corporation
@@ -4482,7 +4743,7 @@ Part 1: Protocol Specification
 %Q OpenSS7 Corporation
 %T Channel Interface (CHI) Specification
 %R CHI Revision 1.0.0
-%N Draft 1
+%J Draft 1
 %C Edmonton
 %D May 2003
 %I OpenSS7 Corporation
@@ -4494,7 +4755,7 @@ Part 1: Protocol Specification
 %Q OpenSS7 Corporation
 %T Media Gateway Interface (MGI) Specification
 %R MGI Revision 1.0.0
-%N Draft 1
+%J Draft 1
 %C Edmonton
 %D May 2003
 %I OpenSS7 Corporation
@@ -4506,7 +4767,7 @@ Part 1: Protocol Specification
 %Q OpenSS7 Corporation
 %T Messages Transfer Part Interface (MTPI) Specification
 %R MTPI Revision 1.0.0
-%N Draft 1
+%J Draft 1
 %C Edmonton
 %D January 2003
 %I OpenSS7 Corporation
@@ -4518,7 +4779,7 @@ Part 1: Protocol Specification
 %Q OpenSS7 Corporation
 %T Multiplex Interface (MXI) Specification
 %R MXI Revision 1.0.0
-%N Draft 1
+%J Draft 1
 %C Edmonton
 %D May 2003
 %I OpenSS7 Corporation
@@ -6557,9 +6818,22 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3554.txt
 
+%K rfc3629
+%K std63
+%L STD63
+%R STD 63/RFC 3629
+%T UTF-8, a transformation of ISO 10646
+%A Francois Yergeau
+%E Francois Yergeau
+%D November 2003
+%O (Obsoletes RFC 2279) (Status: STANDARD) (Also STD 63)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3629.txt
+
 %K rfc3666
 %K bcp76
-%L BCP 76
+%L BCP76
 %R BCP 76/RFC 3666
 %A Alan Johnston
 %A Steve Donovan
@@ -6694,3 +6968,12 @@ Part 1: Protocol Specification
 %I AT&T
 %C New Jersey
 
+%K isode
+%L ISODE-8.0
+%R ISODE-8.0
+%Q University College London
+%A Marshall T. Rose
+%T The ISO Development Environment: User Manual
+%D 1992
+%O (Released with the ISODE-8.0 software.)
+%I ISODE

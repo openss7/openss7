@@ -4060,6 +4060,56 @@ Part 1: Protocol Specification
 %D 1988
 %I International Organization for Standardization
 
+%K iso8571_1
+%L ISO 8571-1
+%R ISO 8571-1:1988
+%A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 1: General Introduction
+%D 1988
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso8571_2
+%L ISO 8571-2
+%R ISO 8571-2:1988
+%A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 2: Vitual Filestore Definition
+%D 1988
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso8571_2a1
+%L ISO 8571-2|Amd.1
+%R ISO 8571-2:1988|Amd.1:1992
+%A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 2: Vitual Filestore Definition \(em Amendment 1: Filestore Management
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso8571_4
+%L ISO 8571-4
+%R ISO 8571-4:1988
+%A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 4: File Protocol Specification
+%D 1988
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso8571_4a1
+%L ISO 8571-4|Amd.1
+%R ISO 8571-4:1988|Amd.1:1992
+%A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 4: File Protocol Specification \(em Amendment 1: Filestore Management
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
 %L MINSHALL
 %A Greg Minshall
 %Q Internet Engineering Task Force \(em Transport Area Working Group
@@ -6918,3 +6968,12 @@ Part 1: Protocol Specification
 %I AT&T
 %C New Jersey
 
+%K isode
+%L ISODE-8.0
+%R ISODE-8.0
+%Q University College London
+%A Marshall T. Rose
+%T The ISO Development Environment: User Manual
+%D 1992
+%O (Released with the ISODE-8.0 software.)
+%I ISODE

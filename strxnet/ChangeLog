@@ -3,6 +3,7 @@
 	* doc/man/man3/t_accept.3.man: format correction
 
 	* doc/man/strxnet.macros: better grefer macros
+	* doc/man/strxnet.refs: more better references
 
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 
