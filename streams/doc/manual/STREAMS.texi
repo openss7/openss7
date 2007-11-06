@@ -252,11 +252,6 @@ Introduction
 Objective
 
 * Background::
-* What is STREAMS?::
-* Why STREAMS?::
-* Why STREAMS for Linux?::
-* History of STREAMS for Linux::
-* Why Fast?::
 
 Reference
 
@@ -270,7 +265,6 @@ Development
 
 * Development Header Files::	Header Files in the package
 * Static and Shared Libraries::	Libraries in the package
-* Kernel Module Development::	Kernel development with the package
 * Manual Pages::		Manual Pages in the package
 
 Porting

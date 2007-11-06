@@ -197,7 +197,6 @@ dup2(d1, d2)
 }
 
 #endif
-#endif
 
 /* BYTEORDER */
 

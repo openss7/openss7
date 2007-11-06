@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2007/08/13 22:46:17 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2007/10/18 06:53:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:17 $ by $Author: brian $
+ Last Modified $Date: 2007/10/18 06:53:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strreg.c,v $
+ Revision 0.9.2.76  2007/10/18 06:53:56  brian
+ - added streams notification registration
+
  Revision 0.9.2.75  2007/08/13 22:46:17  brian
  - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2007/08/13 22:46:17 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2007/10/18 06:53:56 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2007/08/13 22:46:17 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2007/10/18 06:53:56 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -110,6 +113,95 @@ static char const ident[] =
  *
  *  -------------------------------------------------------------------------
  */
+
+rwlock_t strreg_lock = RW_LOCK_UNLOCKED;
+struct list_head strreg_list = LIST_HEAD_INIT(strreg_list);
+
+/**
+ * streams_notify: - notify a notifier call chain of a STREAMS event
+ * @event: the STREAMS event which has occurred
+ * @type: the type of module: %STR_IS_MODULE or %STR_IS_DEVICE
+ * @modid: the Module Id Number for the STREAMS module.
+ *
+ * STREAMS notifiers are used to notify clients that an event has occurred.  Current notifications
+ * are:
+ *
+ * %STREAMS_NTFY_REG (a STREAMS module or device has registered),
+ * %STREAMS_NTFY_DEREG (a STREAMS module or device has deregistered),
+ * %STREAMS_NTFY_APUSH_ADD (a STREAMS autopush definition has been added),
+ * %STREAMS_NTFY_APUSH_DEL (a STREAMS autopush defintiion has been removed).
+ *
+ * The major purpose of this notifier is to permit the sc(4) module and the sad(4) driver with the
+ * ability to provide indications to control STREAMS that a configuration change has occured.  This
+ * mechanism is used by user-space processes holding open sc(4) or sad(4) Streams to know when to
+ * reread cached configuration data.  The mechanism is used by the strmib(8) STREAMS SNMP sub-agent.
+ *
+ * Notifier callbacks are called with the notifier chain read locked.  The callback must not attempt
+ * to register or deregister the notifier or single-party deadlock will occur.
+ */
+streams_fastcall int
+streams_notify(int event, int type, modID_t modid)
+{
+	struct list_head *pos, *slot = &strreg_list;
+	int count = 0;
+
+	read_lock(&strreg_lock);
+	list_for_each(pos, slot) {
+		struct streams_notify *sn;
+		
+		sn = list_entry(pos, struct streams_notify, sn_list);
+		(*sn->sn_notify)(event, type, modid, sn);
+		count++;
+	}
+	read_unlock(&strreg_lock);
+	return (count);
+}
+
+EXPORT_SYMBOL_GPL(streams_notify);
+
+/**
+ * streams_register_notifier: - register a STREAMS notifier
+ * @sn: pointer to a struct streams_notify structure
+ *
+ * Registers a STREAMS notifier. @sn is a pointer to a caller-allocated structure that has the
+ * sn_notify member completed.  Returns zero (0) on success and -EINVAL on failure.
+ */
+streamscall int
+streams_register_notifier(struct streams_notify *sn)
+{
+	if (sn == NULL)
+		return (-EINVAL);
+	INIT_LIST_HEAD(&sn->sn_list);
+	if (sn->sn_notify == NULL)
+		return (-EINVAL);
+	write_lock(&strreg_lock);
+	list_add(&sn->sn_list, &strreg_list);
+	write_unlock(&strreg_lock);
+	return (0);
+}
+
+EXPORT_SYMBOL_GPL(streams_register_notifier);
+
+/**
+ * streams_unregister_notifier: - unregister a STREAMS notifier
+ * @sn: pointer to a struct streams_notify structure
+ *
+ * Deregisters a STREAMS notifier.  @sn is a pointer to a caller-allocated structure that was
+ * previously registered with streams_register_notifier().  Returns zero (0) on success and -EINVAL
+ * on failure.
+ */
+streamscall int
+streams_unregister_notifier(struct streams_notify *sn)
+{
+	if (sn == NULL)
+		return (-EINVAL);
+	write_lock(&strreg_lock);
+	list_del_init(&sn->sn_list);
+	write_unlock(&strreg_lock);
+	return (0);
+}
+
+EXPORT_SYMBOL_GPL(streams_unregister_notifier);
 
 /**
  * register_strsync: - register syncrhonization queueso
@@ -341,8 +433,11 @@ register_strmod(struct fmodsw *fmod)
 		}
 		_ptrace(("Assigned module id %hu\n", modid));
 		fmod_add(fmod, modid);
-		err = modid;
-		goto unlock_exit;
+		write_unlock(&fmodsw_lock);
+		/* At this point we notify any STREAMS registration notifier
+		 * chain that a STREAMS module has registered. */
+		streams_notify(STREAMS_NTFY_REG, STR_IS_MODULE, modid);
+		return (modid);
 	}
       eperm:
 	err = -EPERM;
@@ -355,7 +450,6 @@ register_strmod(struct fmodsw *fmod)
 	goto unregister_exit;
       unregister_exit:
 	unregister_strsync(fmod);
-      unlock_exit:
 	write_unlock(&fmodsw_lock);
 	return (err);
 }
@@ -369,24 +463,31 @@ EXPORT_SYMBOL(register_strmod);
 streams_fastcall int
 unregister_strmod(struct fmodsw *fmod)
 {
-	int err = 0;
+	int err;
+	modID_t modid;
 
 	write_lock(&fmodsw_lock);
 	if (!fmod || !fmod->f_name || !fmod->f_name[0])
 		goto einval;
 	if (!fmod->f_list.next || list_empty(&fmod->f_list))
 		goto enxio;
+	modid = fmod->f_modid;
 	fmod_del(fmod);
 	unregister_strsync(fmod);
-      unlock_exit:
 	write_unlock(&fmodsw_lock);
-	return (err);
+	/* At this point we notify any STREAMS regsitration notifier chain
+	 * that a STREAMS module has deregistered. */
+	streams_notify(STREAMS_NTFY_DEREG, STR_IS_MODULE, modid);
+	return (0);
       einval:
 	err = -EINVAL;
 	goto unlock_exit;
       enxio:
 	err = -ENXIO;
 	goto unlock_exit;
+      unlock_exit:
+	write_unlock(&fmodsw_lock);
+	return (err);
 }
 
 EXPORT_SYMBOL(unregister_strmod);
@@ -477,6 +578,9 @@ register_strdrv(struct cdevsw *cdev)
 			goto unlock_release_exit;
 		}
 		write_unlock(&cdevsw_lock);
+		/* At this point we notify any STREAMS registration notifier
+		 * chain that a STREAMS driver has registered. */
+		streams_notify(STREAMS_NTFY_REG, STR_IS_DEVICE, modid);
 		return (modid);
 	}
       eperm:
@@ -518,6 +622,7 @@ streams_fastcall int
 unregister_strdrv(struct cdevsw *cdev)
 {
 	int err = 0;
+	modID_t modid;
 
 	write_lock(&cdevsw_lock);
 	if (!cdev || !cdev->d_name || !cdev->d_name[0]) {
@@ -545,10 +650,14 @@ unregister_strdrv(struct cdevsw *cdev)
 		_ptrace(("Error path taken!\n"));
 		goto ebusy;
 	}
+	modid = cdev->d_modid;
 	unregister_strsync((struct fmodsw *) cdev);
 	sdev_del(cdev);
 	write_unlock(&cdevsw_lock);
 	sdev_rel(cdev);
+	/* At this point we notify any STREAMS registration notifier chain
+	 * that a STREAMS driver has de-registered. */
+	streams_notify(STREAMS_NTFY_DEREG, STR_IS_DEVICE, modid);
 	return (0);
       unlock_exit:
 	write_unlock(&cdevsw_lock);

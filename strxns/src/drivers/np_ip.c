@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/10/15 17:26:10 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/10/18 06:54:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/10/15 17:26:10 $ by $Author: brian $
+ Last Modified $Date: 2007/10/18 06:54:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.47  2007/10/18 06:54:49  brian
+ - corrected new socket buffer support
+
  Revision 0.9.2.46  2007/10/15 17:26:10  brian
  - updates for 2.6.22.5-49.fc6 kernel
 
@@ -208,10 +211,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/10/15 17:26:10 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/10/18 06:54:49 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/10/15 17:26:10 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/10/18 06:54:49 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -272,7 +275,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.46 $) $Date: 2007/10/15 17:26:10 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.47 $) $Date: 2007/10/18 06:54:49 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -404,15 +407,6 @@ static inline unsigned char *skb_end_pointer(const struct sk_buff *skb)
 {
 	return skb->end;
 }
-static inline void skb_reset_tail_pointer(struct sk_buff *skb)
-{
-	skb->tail = skb->data;
-}
-static inline void skb_set_tail_pointer(struct sk_buff *skb, const int offset)
-{
-	skb_reset_tail_pointer(skb);
-	skb->tail += offset;
-}
 static inline unsigned char *skb_transport_header(const struct sk_buff *skb)
 {
 	return skb->h.raw;
@@ -444,6 +438,11 @@ static inline void skb_reset_network_header(struct sk_buff *skb)
 static inline void skb_reset_mac_header(struct sk_buff *skb)
 {
 	skb->mac.raw = skb->data;
+}
+static inline void skb_set_tail_pointer(struct sk_buff *skb, const int offset)
+{
+	skb_reset_tail_pointer(skb);
+	skb->tail += offset;
 }
 static inline void skb_set_transport_header(struct sk_buff *skb, const int offset)
 {

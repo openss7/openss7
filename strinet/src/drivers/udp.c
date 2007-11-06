@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/10/15 17:22:57 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2007/10/18 06:54:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/10/15 17:22:57 $ by $Author: brian $
+ Last Modified $Date: 2007/10/18 06:54:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.67  2007/10/18 06:54:13  brian
+ - corrected new socket buffer support
+
  Revision 0.9.2.66  2007/10/15 17:22:57  brian
  - updates for 2.6.22.5-49.fc6 kernel
 
@@ -269,10 +272,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/10/15 17:22:57 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2007/10/18 06:54:13 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/10/15 17:22:57 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2007/10/18 06:54:13 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -354,7 +357,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/10/15 17:22:57 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2007/10/18 06:54:13 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -485,15 +488,6 @@ static inline unsigned char *skb_end_pointer(const struct sk_buff *skb)
 {
 	return skb->end;
 }
-static inline void skb_reset_tail_pointer(struct sk_buff *skb)
-{
-	skb->tail = skb->data;
-}
-static inline void skb_set_tail_pointer(struct sk_buff *skb, const int offset)
-{
-	skb_reset_tail_pointer(skb);
-	skb->tail += offset;
-}
 static inline unsigned char *skb_transport_header(const struct sk_buff *skb)
 {
 	return skb->h.raw;
@@ -525,6 +519,11 @@ static inline void skb_reset_network_header(struct sk_buff *skb)
 static inline void skb_reset_mac_header(struct sk_buff *skb)
 {
 	skb->mac.raw = skb->data;
+}
+static inline void skb_set_tail_pointer(struct sk_buff *skb, const int offset)
+{
+	skb_reset_tail_pointer(skb);
+	skb->tail += offset;
 }
 static inline void skb_set_transport_header(struct sk_buff *skb, const int offset)
 {

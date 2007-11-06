@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/12 19:05:30 $
+# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/10/17 20:00:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/12 19:05:30 $ by $Author: brian $
+# Last Modified $Date: 2007/10/17 20:00:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -132,11 +132,13 @@ AC_DEFUN([_DOXY_CONFIG_INPUT], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DOXY_SETUP], [dnl
     AC_ARG_VAR([DOXYGEN], [doxygen command])
-    AC_PATH_PROG([DOXYGEN], [doxygen], [], [$PATH:/usr/local/bin:/usr/bin])
+    AC_PATH_PROG([DOXYGEN], [doxygen], [],
+		 [$PATH:/usr/local/bin:/usr/bin])
     if test :"${DOXYGEN:-no}" = :no ; then
 	AC_MSG_WARN([Could not find doxygen program in PATH.])
+	DOXYGEN="${am_missing2_run}doxygen"
     fi
-    AM_CONDITIONAL([HAVE_DOXYGEN], [test ":${DOXYGEN:-no}" != :no])dnl
+    AM_CONDITIONAL([HAVE_DOXYGEN], [test ":${ac_cv_path_DOXYGEN:-no}" != :no])dnl
 ])# _DOXY_SETUP
 # =============================================================================
 
@@ -188,6 +190,9 @@ AC_DEFUN([_DOXY_], [dnl
 # =============================================================================
 #
 # $Log: doxy.m4,v $
+# Revision 0.9.2.16  2007/10/17 20:00:27  brian
+# - slightly different path checks
+#
 # Revision 0.9.2.15  2007/08/12 19:05:30  brian
 # - rearrange and update headers
 #

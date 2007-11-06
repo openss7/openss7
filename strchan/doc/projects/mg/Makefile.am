@@ -76,7 +76,19 @@ EXTRA_info_TEXINFOS	= \
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-FIG_FIGS		=
+FIG_FIGS		= \
+			osimap.fig \
+			platarch.fig \
+			platarch2.fig \
+			protconf.fig \
+			rack.fig \
+			stack.fig \
+			sysarch.fig \
+			netarch.fig \
+			netarch2.fig \
+			tiphon.fig \
+			iface.fig \
+			manarch.fig
 
 PNG_PNGS		=
 

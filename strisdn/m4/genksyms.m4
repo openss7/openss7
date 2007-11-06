@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/12 19:05:30 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/10/17 20:00:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/12 19:05:30 $ by $Author: brian $
+# Last Modified $Date: 2007/10/17 20:00:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -92,7 +92,8 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
 	GENKSYMS_SMP_PREFIX="${GENKSYMS_SMP_PREFIX}${GENKSYMS_SMP_PREFIX:--p }regparm_"
     fi
     AC_ARG_VAR([GENKSYMS], [Generate kernel symbols command])
-    AC_PATH_PROG([GENKSYMS], [genksyms], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_PROG([GENKSYMS], [genksyms], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${GENKSYMS:-no}" = :no ; then
 	if test :"$linux_cv_k_ko_modules" != :yes
 	then
@@ -106,7 +107,8 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
     for ksyms_tmp in $ksyms_dirs ; do
 	ksyms_path="${ksyms_path:+$ksyms_path:}${ksyms_tmp}/scripts/genksyms"
     done
-    AC_PATH_PROG([KGENKSYMS], [genksyms], [], [$ksyms_path])
+    AC_PATH_PROG([KGENKSYMS], [genksyms], [],
+		 [$ksyms_path])
     if test :"${KGENKSYMS:-no}" = :no ; then
 	if test :"$linux_cv_k_ko_modules" = :yes
 	then
@@ -115,7 +117,8 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
 	KGENKSYMS='${kbuilddir}/scripts/genksyms/genksyms'
     fi
 dnl AC_ARG_VAR([MODPOST], [Kernel module post processing command])
-dnl AC_PATH_PROG([MODPOST], [modpost], [], [${kbuilddir}/scripts:${kbuilddir}/scripts/mod])
+dnl AC_PATH_PROG([MODPOST], [modpost], [],
+dnl	         [${kbuilddir}/scripts:${kbuilddir}/scripts/mod])
 dnl if test :"${MODPOST:-no}" = :no ; then
 dnl	AC_MSG_WARN([Could not find executable kernel modpost program in $kbuilddir/scripts.])
 dnl	MODPOST='${kbuilddir}/scripts/mod/modpost'
@@ -326,6 +329,9 @@ AC_DEFUN([_KSYMS_], [dnl
 # =============================================================================
 #
 # $Log: genksyms.m4,v $
+# Revision 0.9.2.26  2007/10/17 20:00:27  brian
+# - slightly different path checks
+#
 # Revision 0.9.2.25  2007/08/12 19:05:30  brian
 # - rearrange and update headers
 #

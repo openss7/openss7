@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Network Services Library -- history of user visible changes.  2007-10-15
+OpenSS7 STREAMS Network Services Library -- history of user visible changes.  2007-10-18
 $Id: NEWS,v 0.9.2.25 2007/10/15 19:04:11 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -25,11 +25,18 @@ Major features since the last public release are as follows:
 
    - License upgrade to GPL Version 3.
 
+   - Ability to strap out major documentation build and installation
+     primarily for embedded targets.
+
+   - Improvements to common build process for embedded and
+     cross-compile targets.
+
+   - Support for flex 2.5.33  in maintainer mode.
+
 
 _This is a public alpha release of the package: it deprecates previous
 releases.  Please upgrade to the current release before reporting bugs.
-Please see `README-alpha' in the release, or `Maturity', in the
-manual._
+Please see `README-alpha' in the release, or `Maturity', in the manual._
 
 As with other OpenSS7 releases, this release configures, compiles,
 installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6

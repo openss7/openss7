@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.160 $) $Date: 2007/08/13 22:45:52 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.161 $) $Date: 2007/10/18 06:53:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 22:45:52 $ by $Author: brian $
+# Last Modified $Date: 2007/10/18 06:53:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -656,6 +656,8 @@ fi
     %{?_without_streams_fifos:   '%disable %_without_streams_fifos'} \
     %{?_with_streams_bcm:        '%enable %_with_streams_bcm'} \
     %{?_without_streams_bcm:     '%disable %_without_streams_bcm'} \
+    %{?_with_snmp_agent:         '%_with_snmp_agent'} \
+    %{?_without_snmp_agent:      '%_without_snmp_agent'} \
     || { rm -f %{cache_file} ; exit 1 ; }
 
 make
@@ -1963,6 +1965,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
+# Revision 0.9.2.161  2007/10/18 06:53:51  brian
+# - STREAMS MIB updates
+#
 # Revision 0.9.2.160  2007/08/13 22:45:52  brian
 # - GPLv3 header updates
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/12 19:05:30 $
+# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/10/17 23:38:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/12 19:05:30 $ by $Author: brian $
+# Last Modified $Date: 2007/10/17 23:38:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -96,11 +96,8 @@ AC_DEFUN([_AUTOTEST_SETUP], [dnl
 # ---------------------------------------------------------------------------
 AC_DEFUN([_AUTOTEST_SETUP_AUTOM4TE], [dnl
     AC_ARG_VAR([AUTOM4TE], [Autom4te command])
-    AC_PATH_PROG([AUTOM4TE], [autom4te], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${AUTOM4TE:-no}" = :no ; then
-	AC_MSG_WARN([Could not find autom4te program in PATH.])
-	AUTOM4TE=/usr/bin/autom4te
-    fi
+    AC_PATH_PROG([AUTOM4TE], [autom4te], [${am_missing_run}autom4te],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
 ])# _AUTOTEST_SETUP_AUTOM4TE
 # ===========================================================================
 
@@ -109,11 +106,8 @@ AC_DEFUN([_AUTOTEST_SETUP_AUTOM4TE], [dnl
 # ---------------------------------------------------------------------------
 AC_DEFUN([_AUTOTEST_SETUP_AUTOTEST], [dnl
     AC_ARG_VAR([AUTOTEST], [Autotest macro build command])
-    AC_PATH_PROG([AUTOTEST], [autotest], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${AUTOTEST:-no}" = :no ; then
-dnl	AC_MSG_WARN([Could not find autotest program in PATH.])
-	AUTOTEST="$AUTOM4TE --language=autotest"
-    fi
+    AC_PATH_PROG([AUTOTEST], [autotest], [$AUTOM4TE --language=autotest],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
 ])# _AUTOTEST_SETUP_AUTOTEST
 # ===========================================================================
 
@@ -212,6 +206,12 @@ AC_DEFUN([_AUTOTEST_], [dnl
 # =============================================================================
 #
 # $Log: autotest.m4,v $
+# Revision 0.9.2.15  2007/10/17 23:38:08  brian
+# - correction
+#
+# Revision 0.9.2.14  2007/10/17 20:00:26  brian
+# - slightly different path checks
+#
 # Revision 0.9.2.13  2007/08/12 19:05:30  brian
 # - rearrange and update headers
 #

@@ -105,7 +105,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 	(n) = (fd) + 1; \
 }
 
-/*    DATA */
+/* DATA */
 
 static int once_only = 0;
 static struct tsapblk tsapque;
@@ -118,7 +118,7 @@ static int TPid = NOTOK;
 
 extern int xselect_blocking_on_intr;
 
-/*    T-DATA.REQUEST */
+/* T-DATA.REQUEST */
 
 int
 TDataRequest(sd, data, cc, td)
@@ -161,7 +161,7 @@ TDataRequest(sd, data, cc, td)
 	return result;
 }
 
-/*    T-EXPEDITED-DATA.REQUEST */
+/* T-EXPEDITED-DATA.REQUEST */
 
 int
 TExpdRequest(sd, data, cc, td)
@@ -208,7 +208,7 @@ TExpdRequest(sd, data, cc, td)
 	return result;
 }
 
-/*    T-WRITE.REQUEST (pseudo; write user data vectors) */
+/* T-WRITE.REQUEST (pseudo; write user data vectors) */
 
 int
 TWriteRequest(sd, uv, td)
@@ -250,7 +250,7 @@ TWriteRequest(sd, uv, td)
 	return result;
 }
 
-/*    T-READ.REQUEST (pseudo; synchronous read) */
+/* T-READ.REQUEST (pseudo; synchronous read) */
 
 int
 TReadRequest(sd, tx, secs, td)
@@ -322,7 +322,7 @@ TReadRequest(sd, tx, secs, td)
 	return result;
 }
 
-/*    T-DISCONNECT.REQUEST */
+/* T-DISCONNECT.REQUEST */
 
 int
 TDiscRequest(sd, data, cc, td)
@@ -351,7 +351,7 @@ TDiscRequest(sd, data, cc, td)
 	return result;
 }
 
-/*    set asynchronous event indications */
+/* set asynchronous event indications */
 
 static RETSIGTYPE DATAser();
 
@@ -377,6 +377,7 @@ TSetIndications(sd, data, disc, td)
 
 	tsapPsig(tb, sd);
 
+	if ((tb->tb_DataIndication = data)) {
 		tb->tb_flags |= TB_ASYN;
 		xselect_blocking_on_intr = 1;
 	} else {
@@ -401,7 +402,7 @@ TSetIndications(sd, data, disc, td)
 	return result;
 }
 
-/*    map transport descriptors for select() */
+/* map transport descriptors for select() */
 
 int
 TSelectMask(sd, mask, nfds, td)
@@ -435,7 +436,7 @@ TSelectMask(sd, mask, nfds, td)
 	return OK;
 }
 
-/*    NSAP interface: N-DATA.INDICATION */
+/* NSAP interface: N-DATA.INDICATION */
 
 #if defined SVR4 || defined LINUX
 
@@ -526,8 +527,6 @@ DATAser(sig, code, sc)
 	(void) sigiomask(smask);
 #endif
 }
-
-/*  */
 
 #ifndef	SIGPOLL
 static int
@@ -668,7 +667,7 @@ TWakeUp(tb, td)
 }
 #endif
 
-/*    INTERNAL */
+/* INTERNAL */
 
 struct tsapblk *
 newtblk()
@@ -756,7 +755,6 @@ freetblk(tb)
 	return (0);
 }
 
-/*  */
 
 struct tsapblk *
 findtblk(sd)
@@ -774,7 +772,6 @@ findtblk(sd)
 	return NULL;
 }
 
-/*  */
 
 int
 copyTSAPaddrX(in, out)

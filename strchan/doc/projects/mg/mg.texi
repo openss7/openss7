@@ -67,22 +67,22 @@
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
-@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c vim: ft=texinfo nosi nocin noai tw=100
 @c %**start of header
 @setfilename mg.info
 @include texi/args.texi
-@set MANUAL_TITLE OpenSS7 Media Gateway
+@set MANUAL_TITLE OpenSS7 Media Gateway Platform
 @set MANUAL_TYPE High-Level Design
 @settitle @value{MANUAL_TITLE}
 @c %**end of header
 
 @dircategory OpenSS7
 @direntry
-* Open MG: (openmg).			OpenSS7 Media Gateway
+* Open MG: (openmg).			OpenSS7 Media Gateway Platform
 @end direntry
 
 @include texi/args.texi
-@set MANUAL_TITLE OpenSS7 Media Gateway
+@set MANUAL_TITLE OpenSS7 Media Gateway Platform
 @set MANUAL_TYPE High-Level Design
 
 @comment The following copyright information goes at the head of each .info file.
@@ -128,7 +128,7 @@ no obligation to provide any feature listed herein.
 @end ifinfo
 
 @include texi/args.texi
-@set MANUAL_TITLE OpenSS7 Media Gateway
+@set MANUAL_TITLE OpenSS7 Media Gateway Platform
 @set MANUAL_TYPE High-Level Design
 
 @ignore
@@ -189,7 +189,7 @@ implied warranties of merchantability, fitness for a particular purpose, non-inf
 that the contents of the document are suitable for any purpose, or that the implementation of such
 contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
 no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
-damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+damages, or any damages whatsoever resulting from loss of use, data or profits, whether in an action
 of contract, negligence or other tortious action, arising out of or in connection with any use of
 this document or the performance or implementation of the contents thereof.}
 
@@ -204,13 +204,17 @@ no obligation to provide any feature listed herein.
 
 @vskip 0pt
 @end titlepage
+
+@c An index of manual pages.
+@defcodeindex mp
+
 @iftex
 @headings off
 @everyheading @thistitle @| @thisfile @| @thischaptername
 @evenheading @thischapter @| @| @thisfile
 @oddheading @thistitle @| @| @thischaptername
 @everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
-@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
 @page
@@ -220,7 +224,7 @@ no obligation to provide any feature listed herein.
 
 @ifnottex
 @node Top
-@top OpenSS7 Media Gateway
+@top OpenSS7 Media Gateway Platform
 @end ifnottex
 
 @menu
@@ -233,12 +237,12 @@ no obligation to provide any feature listed herein.
 @node Executive Overview
 @unnumbered Executive Overview
 
-This document provides a @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.  The initial and primary
-purposes of this equipment is to provide a scalable, carrier-grade platform for terminating TDM
-voice circuits from the PSTN and providing Media Gatway capabilities for those terminated circuits.
-The purpose is both one of @dfn{hard switching}, where circuits are directly connected, as well as
-@dfn{soft switching}, where circuits are converted to RTP sessions and passed to another Media
-Gateway.
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
+The initial and primary purpose of this equipment is to provide a scalable, carrier-grade platform
+for terminating TDM voice circuits from the PSTN and providing Media Gatway capabilities for those
+terminated circuits.  The purpose is both one of @dfn{hard switching}, where circuits are directly
+connected, as well as @dfn{soft switching}, where circuits are converted to RTP sessions and passed
+to another Media Gateway.
 
 @subsubheading The OpenSS7 Project
 
@@ -246,10 +250,10 @@ The @uref{http://www.openss7.org/, OpenSS7 Project} is an open source software p
 developed many protocol components within the SS7, SIGTRAN, ISDN and VoIP protocol stacks.
 Intellectual property rights for the OpenSS7 Project are held by @uref{http://www.openss7.com/,
 OpenSS7 Corporation}.  All OpenSS7 Project software is eventually licensed under the GNU Public
-License Version 3.  OpenSS7 Corporation also provide commercial licensing of OpenSS7 Project
+License Version 3.  OpenSS7 Corporation also provides commercial licensing of OpenSS7 Project
 software under terms less restrictive than the GPL.
 
-@subsubheading The OpenSS7 Media Gateway
+@subsubheading OpenSS7 Media Gateway (MG) Platform
 
 OpenSS7 can provide VoIP gateway capabilities in a high-performance, low-cost, small-footprint
 platform leaveraging the GNU/Linux operating system distributions and tools, and utilizing low-cost
@@ -285,6 +289,15 @@ but more reliable alternative.
 
 For details on hardware solutions, see @ref{Platform Architecture}, @ref{Hardware Architecture},
 and @ref{Optional Hardware Support}.
+
+@subsubheading Integrated Management
+
+Utilizing open source management tools, such as @command{net-snmp} and @command{OSIMIS}, OpenSS7
+protocol stacks provide integrated management support for SNMPv2c, SNMPv3, or CMISE/CMIP.  The
+entire platform, from alarms to provisioning, can be provided using integrated SNMP agents.
+
+For details on management solutions, see @ref{Platform Architecture}, @ref{Management Architecture},
+and @ref{Optional Management Support}.
 
 @subsubheading Rapid Development
 
@@ -325,29 +338,29 @@ The OpenSS7 Project
 @subsection Abstract
 @cindex Document abstract
 
-This document provides @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
 
 @subsection Objective
 @cindex Document objective
 
-The objective of this document is to provide Application Notes for the development of a low cost,
-high-performance, @value{MANUAL_TITLE} using OpenSS7 protocol components, software, and compatible
-systems and hardware.
+The objective of this document is to provide a @value{MANUAL_TYPE} for the development of a low
+cost, high-performance, @value{MANUAL_TITLE} using OpenSS7 protocol components, software, and
+compatible systems and hardware.
 
 @subsection Intent
 @cindex Document intent
 
-The intent of this document is to act as a @value{MANUAL_TYPE} for an project for an @value{MANUAL_TYPE}.
-As a @value{MANUAL_TYPE}, this document discusses components and systems which are not necessarily
-complete.  @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any
-software, system or feature listed herein.
+The intent of this document is to act as a @value{MANUAL_TYPE} for a project for an
+@value{MANUAL_TYPE}.  As a @value{MANUAL_TYPE}, this document discusses components and systems which
+are not necessarily complete.  @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no
+obligation to provide any software, system or feature listed herein.
 
 @subsection Audience
 @cindex Document audience
 
-This document is intended for a technical audience.  The reaser should be familiar with most most
-ETSI, ITU-T and ANSI, Signalling System No. 7 recommendations, H.323, H.225, H.245, as well as IETF
-drafts and RFCS for RTP, SIP, SIP-T, MEGACO, MGCP, and SIGTRAN protocols.
+This document is intended for a technical audience.  The reader should be familiar with most ETSI,
+ITU-T and ANSI, Signalling System No. 7 recommendations, H.323, H.225, H.245, as well as IETF drafts
+and RFCS for RTP, SIP, SIP-T, MEGACO, MGCP, and SIGTRAN protocols.
 
 @subsection Revisions
 @cindex Document revisions
@@ -411,15 +424,17 @@ This document is organized as follows:
 * Protocol Architecture::
 * Software Architecture::
 * Hardware Architecture::
+* Management Architecture::
 * Logistics::
 * Optional Application Support::
 * Optional Network Support::
 * Optional Protocol Support::
 * Optional Software Support::
 * Optional Hardware Support::
+* Optional Management Support::
 * Programmatic Interfaces::
 * Platform Sizing::
-* Index::
+* Indices::
 @end menu
 @end ifnottex
 @iftex
@@ -442,8 +457,10 @@ The protocol architecture supporting the application.
 The software architecture supporting the protocol stack and application.
 @item @ref{Hardware Architecture}
 The hardware architecture supporting the protocol stack and application.
+@item @ref{Management Architecture}
+The management architecture supporting the system and application.
 @item @ref{Logistics}
-Project logistics for completion of the VoIP GW application.
+Project logistics for completion of the @value{MANUAL_TITLE} application.
 @item @ref{Optional Application Support}
 Additional application support not directly contributing to the current objective.
 @item @ref{Optional Network Support}
@@ -454,12 +471,14 @@ Additional protocol component support not directly contributing to the current o
 Additional software support not directly contributing to the current objective.
 @item @ref{Optional Hardware Support}
 Additional hardware support not directly contributing to the current objective.
+@item @ref{Optional Management Support}
+Additional managment component support not directly contributing to the current objective.
 @item @ref{Programmatic Interfaces}
 Programmatic interfaces to selected protocol components.
 @item @ref{Platform Sizing}
 Detailed platform sizing considerations.
-@item @ref{Index}
-Index of concepts.
+@item @ref{Indices}
+Index of concepts, manual pages, etc.
 @end table
 @end iftex
 
@@ -468,7 +487,7 @@ Index of concepts.
 @chapter Introduction
 @cindex Introduction
 
-This document provides a @value{MANUAL_TYPE} for a  patform to provide scalable @value{MANUAL_TITLE}
+This document provides a @value{MANUAL_TYPE} for a platform to provide the @value{MANUAL_TITLE}
 capabilities.  The primary driver for the @value{MANUAL_TITLE} is to provide a system capable of
 interconnecting a VoIP backbone to the PSTN using SS7.  This document provide a high-level design
 and proposal for a production system to provide this capability at a number of scale points.
@@ -481,7 +500,7 @@ production system, the platform configuration for the production system, and a n
 for deployment.  Also discussed is an overview of the project management logistics for successful
 completion over the course of this development project.
 
-It is intended that the document be a ``living'' document, that is updated over the course of this
+It is intended that this document be a ``living'' document, that is updated over the course of this
 development project.
 
 @menu
@@ -494,9 +513,9 @@ development project.
 @section The OpenSS7 Media Gateway
 @cindex The OpenSS7 Media Gateway
 
-This project provides an @value{MANUAL_TITLE} platform that provides interconnection to the PSTN
-using TDM circuits and is capable of routng call to and from the PSTN and a VoIP backbone network
-using @dfn{hard switching}, physical circuit switching, or @dfn{soft switching}, RTP transport.
+This project provides an @value{MANUAL_TITLE} that provides interconnection to the PSTN using TDM
+circuits and is capable of routng call to and from the PSTN and a VoIP backbone network using
+@dfn{hard switching}, physical circuit switching, or @dfn{soft switching}, RTP transport.
 
 @node Project Drivers
 @section Project Drivers
@@ -508,6 +527,11 @@ backbone deployment infrastructure that lacks same.
 @node Scope
 @section Scope
 @cindex Scope
+
+Because the focus on low cost, high performance, and production stability, the @value{MANUAL_TITLE}
+is constructed using commodity computing platforms and PCI based hardware cards, but using hardenned
+NEBS-3/ETSI compliant chasses in an active/standby failover configuration.  This will result in a
+cost-effective carrier grade system for mid- to low deployment cost.
 
 Because of early deployment drivers yet requirements for scale, the @value{MANUAL_TITLE} platform is
 constructed using standardized PICMG 2.16 telephony hardware in a NEBS 3/ETSI compliant chassis
@@ -527,14 +551,21 @@ The longer term project is broken into the following phases:
 
 @table @dfn
 @item Phase 1
+The initial phase of the project is intended to provide the capabilities of the
+@value{MANUAL_TITLE} operation for the deployment platform.
 @item Phase 2
+The second phase of the project is intended on performing SS7 signalling interoperability testing
+for live deployment of the signalling gateway production platform.
 @item Phase 3
+The third phase of the project is to integrate the deployment platform with the OpenSS7 VoIP Switch
+using the Internet Protocol suite.
 @item Phase 4
+The fourth phase of the project is to perform interoperability testing and a field trial of the
+deployment platform.
 @item Phase 5
+The fifth phase of the project is to complete management system integration for remote monitoring
+and provisioning for production service.
 @end table
-
-Although some reference is made to capabilities supporting other phases, @dfn{Phase 1} and
-@dfn{Phase 2} are the focus of this document.
 
 @node Gates
 @subsection Gates
@@ -546,7 +577,6 @@ Each phase of the project consists of seven gates.  The seven gates are defined 
 
 @item Gate 0 --- Concept
 
-@noindent
 @dfn{Gate 0} is passed when the initial concept has been elucidated and work is begun on a
 High-Level Design.  This is an internal OpenSS7 gate.
 
@@ -554,23 +584,22 @@ High-Level Design.  This is an internal OpenSS7 gate.
 
 @dfn{Gate 1} is passed when the high-level design has been reviewed to the satisfaction of the
 consumers of the project.  This is an external review gate.  OpenSS7 internally passes this gate
-once the High-Level Design has been published and work is begun on a detailed design.
-@footnote{This document is a High-Level Design an Proposal document and it meets the internal
-requirements for passing Gate 1 of Phase 1 and Phase 2 of the VoIP GW project.  An external review of
-this document by a Beta or Gamma client or sponsor is pending.}
+once the High-Level Design has been published and work is begun on a detailed design.@footnote{This
+document is a @value{MANUAL_TYPE} document and it meets the internal requirements for passing Gate 1
+of Phase 1 and Phase 2 of the project.  An external review of this document by a Beta or Gamma
+client or sponsor is pending.}
 
 @item Gate 2 --- Detailed Design
 
 @dfn{Gate 2} is passed when the detailed design has been reviewed to the satisfaction of the
 consumers of the project and the developers on the project.  This is an external as well as an
 internal review gate.  OpenSS7 passes this gate once the Detailed Design has been published and work
-base begin on development and implementation of the design.
-@footnote{OpenSS7 requires a contractual commitment for purchase from a Beta or Gamma client, or
-funding from a Sponsor of the OpenSS7 Project, before this gate can be passed and development
-started.}
-Passing this gate moves from the design stage to the development stage of the project.
+has begun on development and implementation of the design.@footnote{OpenSS7 requires a contractual
+commitment for purchase from a Beta or Gamma client, or funding from a Sponsor of the OpenSS7
+Project, before this gate can be passed and development started.} Passing this gate moves from the
+design stage to the development stage of the project.
 
-@item Gate 3 --- Development and Implementation
+@item Gate 3 --- Deployment and Implementation
 
 @dfn{Gate 3} is passed when the software and systems development and implementation to the detailed
 design is complete and testing has begun.  This is an internal review gate.  OpenSS7 internally
@@ -597,23 +626,41 @@ terminated.
 
 @end table
 
-For more details on Gate scheduling for Phase 1 and Phase 2 of the project, @pxref{Schedule}.
+For more details on Gate scheduling for Phase 1, 2 and 3 of the project, @pxref{Schedule}.
 
 @node Application Architecture
 @chapter Application Architecture
 @cindex Application architecture
 
-The @value{MANUAL_TITLE} is intendend to provide high-performance and high-density PSTN to VoIP
+@menu
+* Application Background::
+* Application Objectives::
+* Application Requirements::
+* Solution Architecture::
+* Message Flows::
+@end menu
+
+The @value{MANUAL_TITLE} is intended to provide high performance and high-density PSTN to VoIP
 backbone gateway.
 
+@node Application Background
+@section Application Background
+@cindex Application background
+
+@node Application Objectives
+@section Application Objectives
+@cindex Application objectives
+
+@node Application Requirements
 @section Application Requirements
+@cindex Application requirements
 
 Application requirements have been broken into 5 phases using the timeboxing approach.
 
 @subsection Phase 1 Requirements
 
-Phase 1 requirements provide a VoIP gateway capability that will connect an existing H.323 VoIP
-network to the PSTN using SS7 ISUP trunks.
+Phase 1 requirements provide an @value{MANUAL_TITLE} capability that will connect an existing H.323
+VoIP network to the PSTN using SS7 ISUP trunks.
 
 @itemize ---
 @end itemize
@@ -649,21 +696,23 @@ Phase 5 requirements complete full VoIP (NGN) switching.
 @itemize ---
 @end itemize
 
+@node Solution Architecture
 @section Solution Architecture
+@cindex Solution architecture
 
 Although the functions of @dfn{Media Gateway Controller}, @dfn{Media Gateway} and @dfn{Signalling
 Gateway} have been decomposed, and in the past these functional groups have been implemented on
 separate physical platforms, modern compute capacity and densities permit these functions to be
 integrated into a single physical platform without limitation.  Open standard interfaces are
 utilized internal to the platform to permit a decomposed model to be split out and to permit ETSI
-Tiphon Version 4 compatiblity as well as Multi-Services Forum Version 2 compatibility.
+Tiphon Version 4 compatibility as well as Multi-Services Forum Version 2 compatibility.
 
-@subsection OpenSS7 Media Gateway for Deployment
+@subsection @value{MANUAL_TITLE} for Deployment
 
 In light of the foregoing, the solution architecture takes the form of an integrated media gateway
-capable of providing a number of functional groups in the traditional models.  The OpenSS7 Media
-Gateway integrates the following functional groups while still permitting standard interfaces to be
-exposed for maximum deployment flexibility:
+capable of providing a number of functional groups in the traditional models.  The
+@value{MANUAL_TITLE} integrates the following functional groups while still permitting standard
+interfaces to be exposed for maximum deployment flexibility:
 
 @itemize ---
 @item
@@ -672,7 +721,9 @@ exposed for maximum deployment flexibility:
 @item
 @end itemize
 
-@section Call Flows
+@node Message Flows
+@section Message Flows
+@cindex Message flows
 
 This section provides some illustrative application call flows:@footnote{This section is not
 intended as a @dfn{Detailed Design}, but provides illustration only for these
@@ -682,7 +733,664 @@ intended as a @dfn{Detailed Design}, but provides illustration only for these
 @chapter Network Architecture
 @cindex Network architecture
 
+@figref{3.1} illustrates the call path for various calls within the softswitching complex.
 
+@enumerate
+@item Intra-MG calls originate on a network SSP and terminate on a network SSP, both attached to
+the same MG.  This is an intra-MG call in that the call never traverses more than one MG.
+
+@item Inter-MG calls originate on a network SSP and terminate on a network SSP, each attached to a
+different MG.  This is an inter-MG call within the same switching complex as the call traverses two
+MGs.
+
+@item Trans-MG calls originate on a network SSP and terminate on a network VoIP gateway.
+@end enumerate
+
+@figuresized{netarch,3.1,Network Architecture,5.5in}
+
+Signalling is via a path typically separate from the MG.  In the illustration in @figref{3.1}, the
+signalling is via external STPs that are attached to switching complex Signalling Gateways (SGs)
+that communicate with the Media Gateway Controller.  In some arrangements, the MG is possibly
+also a Signalling Gateway.
+
+@figuresized{netarch2,3.2,Network Architecture,5.5in}
+
+@figref{3.2} illustrates the placement of the Media Gateway (MG) within the decomposed Service
+Switching Point and its connection to Media Gateway Controllers within the switching complex as well
+as to Service Switching Points (SSPs) in the external network.  As illustrated, the MG terminates
+media gateway control messaging from the Media Gateway Controller (MGC) and attaches to external
+network SSPs using TDM voice trunks.
+
+@node Reference Architecture
+@chapter Reference Architecture
+@cindex Reference architecture
+
+@section ETSI TIPHON
+
+@figref{2.1} illustrates the ETSI TIPHON reference architecture.
+
+@figure{tiphon,2.1,Reference Architecture}
+
+@subsection ETSI TIPHON Entities
+
+The ETSI TIPHON model illustrated in @figref{2.1} contains the following reference entities:
+
+@table @dfn
+@item Terminal:
+The H.323, SIP or MEGACO @dfn{Terminal} support the @var{A} or @var{B} interface.  The @var{A}
+interface is used for communicating with an H.323 @dfn{Gatekeeper}; SIP Forwarding Server, Proxy
+Server or User Agent.
+
+@dfn{Terminal} devices are external to the NG switching complex.  In initial phases, @dfn{Terminal}
+device interface @var{A} (@pxref{Reference Interface A}) will only be supported via external H.323
+Gatekeepers; SIP Forwarding Server or SIP Proxy Server.  Direct @dfn{Terminal} device attachment for
+H.323, SIP and H.248 @dfn{Terminals} will be supported in later phases.
+
+@item Gatekeeper:
+The H.323 @dfn{Gatekeeper}, SIP Forwarding Server, or SIP Proxy Server, supports the @var{A},
+@var{C}, @var{D} and @var{G} interfaces.
+
+The NG switching complex will support an internal @dfn{Gatekeeper} function that will intially
+support the @var{D} and @var{C} interfaces, and will support the @var{A} interface in later phases.
+Intitially the @var{G} interface will be internal to the platform, and will be exposed in later phases.
+
+In the NG switching complex, the @dfn{Gatekeeper} performs the role of a call-by-call server (and is
+termed the CBC) which performance access authorization, routing and other functions on a call by
+call basis, for FGD, H.323 and SIP calls.
+
+@item Media Gateway Controller:
+The H.323 or SIP @dfn{Media Gateway Controller} supports the @var{C}, @var{F}, @var{J} and @var{N}
+interfaces.  The NG swtiching complex will incorporate an integral @dfn{Media Gateway Controller}
+function.  In the field deployment the @var{C}, @var{F}, @var{J} and @var{N} interfaces will be
+exposed.
+
+The SIP @dfn{Media Gateway Controller} is primarily responsible for conversion of SCN signalling
+from the PSTN on the @var{J} interface to VoIP signalling tot he SIP Redirect/Proxy server on the
+@var{C} interface.  Also, the SIP MGC must coordinate this conversion with the control of media
+conversion from G.703/704 G.711 A- and mu-law circtuis from the PSTN to RTP/RTCP channels within
+the VoIP network.
+
+@item Media Gateway:
+
+@item Signalling Gateway:
+
+@item Back End:
+
+@item Session Border Controller:
+The @dfn{Session Border Controller} is not illustrated in the ETSI TIPHON illustration, @figref{2.1}.
+
+In essesnce a @dfn{Session Border Controller} is a security devices but may also be a protocol
+conversion device.  The @dfn{Session Border Controller} sits on the @var{A}, @var{B} or @var{D}
+interfaces, when those interfaces span an administrative, security or protocol domain.
+
+@end table
+
+@subsection ETSI TIPHON Reference Points
+
+The ETSI TIPHON model illustrated in @figref{2.1} contains the following reference interfaces:
+
+@table @dfn
+@item Interface A
+
+@item Interface B
+
+@item Interface C
+
+@item Interface D
+
+@item Interface E.a
+
+@item Interface E.b
+
+@item Interface F
+
+@item Interface G
+
+@item Interface J
+
+@item Interface N
+
+@end table
+
+@section Interfaces
+
+@figuresized{iface,2.3,Interfaces,3.5in}
+
+The interfaces suppored by the @value{MANUAL_TITLE} are illustrated in @figref{2.3}.  The interfaces
+are enumerated as follows:
+
+@enumerate
+
+@item Primary Media Gateway Controller (MGC) Interface
+
+This interface provides primary MGC circuit switching control.  Typical protocols include an
+H.248/MEGACO and Q.1950 profile.
+The profile should include an Intra-MG and Inter-MG switching package in the profile.
+
+@item Secondary Media Gateway Controller (MGC) Interface
+
+This inteface provides secondary (backup) MGC circuit switching control.  Typical protocols include
+an H.248/MEGACO and Q.1950 profile.
+The profile should include an Intra-MG and Inter-MG switching package in the profile.
+
+@item Service Switching Point (SSP) Interface Type I
+
+This interface is an Inter-Machine or PABX Trunk based on CAS signalling, with Type I signalling
+(customer).  The physical interface is T1, E1, J1, T3, E2, OC3, OC12 or OC48.
+
+@item Service Switching Point (SSP) Interface Type II
+
+This interface is an FGD Inter-Machine Trunk on SS7 or CAS signalling, with Type II signalling
+(local or toll tandem).  The physical interface is T1, E1, J1, T3, E2, OC3, OC12 or OC48.
+
+@item Data Session Border Gateway (D-SBG) Interface
+
+This interface is RTP/RTCP over UDP over Internet Protocol (IP).  The D-SBG provides pinhole
+firewall control over RTP/RTCP sessions under control of the S-SBG.
+
+@item Media Gateway (MG) Interface
+
+This interface is an MG to MG interface.  This interface multiplexes TDM signals over an IP network
+connection using a profile of ITU-T and IETF NGN protocols.  Switching to and from these interfaces
+are controlled via an Inter-MG switching package on the MG.  Multiple MG can be ganged together in
+this fashion to appear as a signle switching fabric to the MGC.
+
+@item Signalling Session Border Gateway (S-SBG) Interface
+
+This interface is unused.
+
+@item Operations Support System (OSS) Interface
+
+This interface provids OAM&P for the MG platform.  The protocol is a management profile that can
+include SNMPv2c, SNMPv3, CMISE/CMIP, CMOT, IPMI, CIM, DTMF, WS-MAN, etc.
+
+@end enumerate
+
+These interfaces and the protocol profile requirements are detailed in the sub-sections that follow:
+
+@subsection Primary MGC Interface
+
+@subsection Secondary MGC Interface
+
+@subsection SSP Type I Interface
+
+@subsection SSP Type II Interface
+
+@subsection D-SBG Interface
+
+@subsection MG Interface
+
+@subsection S-SBG Interface
+
+@subsection OSS Interface
+
+@node System Architecture
+@chapter System Architecture
+@cindex System architecture
+
+This section details the solution system architecture.  The solution system architecture consists of
+the computing platform and it placement within the locale installation environment.
+
+The solution system has the following requirements:
+
+@itemize ---
+
+@item 19" rack.
+
+@item -48 VDC electrical power.
+
+@item CO cooling.
+
+@item Bantam to RJ-48c patch pannel.
+
+@end itemize
+
+@figuresized{sysarch,4.1,System Architecture,5.0in}
+
+@node Platform Architecture
+@chapter Platform Architecture
+@cindex Platform architecture
+
+@menu
+* Platform Capacity::
+@end menu
+
+This section details the platform architecture.  The solution platform architecture consists of the
+computing platform and associated hardware, interfaces and peripherals.
+
+@figref{5.1} illustrates the solution platform rack configuration.
+
+@figure{rack,5.1,Rack Mount Components}
+
+The solution platform consists of the following:
+
+@itemize ---
+
+@item Two hardened PC (2U) chassis per system.
+
+@item Two GigE (1000baseT) RJ-48c Layer 2 Ethernet Switches.
+
+@item Two 1-1 DSX 14 T1 patch pannels.
+
+@end itemize
+
+@node Platform Capacity
+@section Platform Capacity
+@cindex Platform capacity
+
+The PC chasses is equipped with the following:@footnote{For detailing sizing considrations,
+@pxref{Platform Sizing}.}
+
+@itemize --
+@item 2 x 3.2GHz Xeon class E7520 based Motherboard.
+@item 2 x 100MHz PCI-X 2.1 bus.
+@item 4G DDR memory.
+@item 2 x Ultra320 SCSI hard drives.
+@item 2 X GigE Ethernet NICs.
+@item 3 x V401PT Quad T1 interface cards.
+@end itemize
+
+@node Protocol Architecture
+@chapter Protocol Architecture
+@cindex Protocol Architecture
+
+@figref{6.1} illustrates the protocol configuration of the @value{MANUAL_TITLE} system.  The
+protocol stack uses the following OpenSS7 stack components:
+
+@figuresized{protconf,6.1,Protocol Architecture,6in}
+
+@menu
+* Protocol Components::
+@end menu
+
+@node Protocol Components
+@section Protocol Components
+@cindex Protocol components
+
+The following Protocol Components are provided as part of the OpenSS7 MG stack:
+
+@menu
+* Media Gateway (MG) Stack Manager::
+* Media Gateway (MG) Switching Application::
+* Media Gateway (MG) Driver::
+* MEGACO/H.248 (H248) Driver::
+* Multiplex/Channel (MX/CH) Driver::
+* PCI 532 DE Multiplex (MX) Driver::
+* V401P Multiplex (MX) Driver::
+* Voice Trunking over IP (VToIP) Driver::
+* Real-Time Transport (Control) Protocol (RTP/RTCP) Driver::
+* User Datagram Protocol (UDP) Driver::
+* Stream Control Transmission Protocol (SCTP) Driver::
+* Transmission Control Protocol (TCP) Driver::
+* Internet Protocol (IP) Driver::
+@end menu
+
+@node Media Gateway (MG) Stack Manager
+@subsection Media Gateway (MG) Stack Manager
+@cindex Media Gateway (MG) stack manager
+
+The @dfn{Media Gateway (MG) Stack Manager} provides management of the MG stack components.  It is
+discussed in more detail in @ref{Management Architecture}.
+
+@node Media Gateway (MG) Switching Application
+@subsection Media Gateway (MG) Switching Application
+@cindex Media Gateway (MG) switching application
+
+@node Media Gateway (MG) Driver
+@subsection Media Gateway (MG) Driver
+@cindex Media Gateway (MG) driver
+
+The @dfn{Media Gateway (MG) Driver} provides a unified interface to local switching functions,
+remote switching functions, and media gateway server functions.  The driver controls a local MX
+driver to perform local switching functions and accesses the client version of the MEGACO/H.248
+driver to perform remote switching functions.  The server version of the MEGACO/H.248 driver is
+accessed by the MG driver to provide control of MG functions to a remote MGC.
+
+@node MEGACO/H.248 (H248) Driver
+@subsection MEGACO/H.248 (H248) Driver
+@cindex MEGACO/H.248 (H248) driver
+
+The @dfn{MEGACO/H.248 (H248) Driver} provides a media gateway interface to local or remote switching
+functions using the MEGACO/H.248 protocol and packages.  A client version of the driver is located
+at the Media Gateway Controller and a server version of the driver is located at the Media Gateway.
+This project uses the server version of the driver.
+
+@node Multiplex/Channel (MX/CH) Driver
+@subsection Multiplex/Channel (MX/CH) Driver
+@cindex Multiplex/Channel (MX/CH) driver
+
+The @dfn{Multiplex/Channel (MX/CH) Driver} performs soft-switching of multiplex Streams as well as
+channel access to channels within multiplex Streams.  This driver links multiplex interfaces beneath
+it and presents both multiplex and channel interfaces to it users.  For this project, the MX/CH
+driver is used to link PCI 532 DE, V401P, VToIP or RTP/RTCP MX Streams beneath the driver and
+provide channel access to DS0, DS1 or full DS3 channels within the multiplex for use by the Media
+Gateway.  Multiplex streams present an MX interface to its users.  Channel streams present a CH
+interface to its users.  The CH interfaces are converted to appropriate Streams using additional
+modules.
+
+The MX/CH drivers supports T1, E1 and J1 operation, as well as T3 and E2 operation, both for locally
+attached TDM trunks, locally terminated VToIP trunks, and RTP/RTCP streams.  The driver provides a
+specialized MX and CH interface to its users.
+
+This is an existing OpenSS7 channel stack component; for documentation see @manref{mx(4)} and
+@manref{ch(4)}.
+
+The Multiplex/Channel (MX/CH) driver is responsible for providing CH services to its users.
+
+@node PCI 532 DE Multiplex (MX) Driver
+@subsection PCI 532 DE Multiplex (MX) Driver
+@cindex PCI 532 DE Multiplex (MX) driver
+
+The @dfn{PCI 532 DE Multiplex (MX) Driver} provides MX services for locally attached DSX-3 or E3
+facilities.  This driver provides hardware interface to TDM facilities and allows the MX driver to
+provide transparent switching capabilities for DSX-3 or E3 TDM facilities.
+
+The PCI 532 DE MX driver supports DSX-3 and E3 oepration for locally attached TDM trunks.  The
+driver provides a specialized MX interface at the DS3 rate to its users.  Neither a DS1 rate MX
+interface nor a NxDS0 CH interface is provided.  A DS1 rate MX interface and NxDS0 CH interface can
+be acessed by linking this driver under the generic MX/CH driver.
+
+This is an existing OpenSS7 channel stack component; for documentation see @manref{pci532(4)} and
+@manref{mx(4)}.
+
+@node V401P Multiplex (MX) Driver
+@subsection V401P Multiplex (MX) Driver
+@cindex V401P Multiplex (MX) driver
+
+The @dfn{V401P Multiplex (MX) Driver} provides MX services for locally attached DSX-1 or E1
+facilities.  This driver provides hardware interface to TDM facilities and allows the MX driver to
+provide transparent switching capabilities for DSX-1 or E1 TDM facilities.
+
+The V401P MX driver supports DSX-1, E2 and J2 operation for locally attached TDM trunks.  The driver
+provides a specialized MX interface to its users.  A CH interface is not provided but can be
+accessed by linking this driver under the generic MX/CH driver.
+
+This is an existing OpenSS7 channel stack component; for documentation see @manref{v401p(4)} and
+@manref{mx(4)}.
+
+@node Voice Trunking over IP (VToIP) Driver
+@subsection Voice Trunking over IP (VToIP) Driver
+@cindex Voice Trunking over IP (VToIP) driver
+
+The @dfn{Voice Trunking over IP (VToIP) Driver} provides MX services for virtual trunks using
+ITU-T Recommendation Y.1452, or transparent unstructured DSX-1, E1, DSX-3, E3 MX services using
+ITU-T Recommendation Y.1453.  This driver uses ATM AAL1 or AAL2 CPS PDUs encapsulated in RTP or UDP
+packets.  The primary purpose of this driver for the @value{MANUAL_TITLE} is to provide Inter-MG
+switching capabilities utilizing distributed matrix control.
+
+The VToIP MX driver supports unstructured DSX-3 and E3 operation, structured and unstructured DSX-1
+and E1 operation, and structure NxDS0 operation.  The driver provides a specialized MX or CH
+interface to its users.  The driver can be linked under the generic MX/CH driver for transpartent
+matrix switching operation.
+
+This is an existing OpenSS7 channel stack component; for documentation see @manref{vtoip(4)},
+@manref{mx(4)} and @manref{ch(4)}.
+
+@node Real-Time Transport (Control) Protocol (RTP/RTCP) Driver
+@subsection Real-Time Transport (Control) Protocol (RTP/RTCP) Driver
+@cindex Real-Time Transport (Control) Protocol (RTP/RTCP) driver
+
+The @dfn{Real-Time Transport (Control) Protocol (RTP/RTCP) Driver} provides MX services for RTP/RTCP
+voice channels.  This driver maps individual RTP/RTCP streams into an MX group for use with the
+Generic MX/CH driver.  The driver provides codec conversion to and from G.711 mu- or A-law, jitter
+buffering, digital padding, echo cancellation and other VoIP mechanisms including out-of-band DTMF.
+
+The RTP/RTCP drivers supports audio profile streams.  The driver provides a specialized MX or CH
+interface to its users.  The driver can be linked under the generic MX/CH driver for transparent
+matrix switching operation.
+
+This is an existing OpenSS7 channel stack component; for documentation see @manref{rtp(4)},
+@manref{mx(4)} and @manref{ch(4)}.
+
+@node User Datagram Protocol (UDP) Driver
+@subsection User Datagram Protocol (UDP) Driver
+@cindex User Datagram Protocol (UDP) driver
+
+The @dfn{User Datagram Protocol (UDP) Driver} is a @dfn{STREAMS} based driver providing access to
+the underlying UDP layer in the Linux kernel.  The primary use of this component in the
+@value{MANUAL_TITLE} is to provide UDP services to the RTP/RTCP driver, the VToIP driver, and the
+MEGACO/H.248 driver.  This is an existing OpenSS7 XNS stack component; for documentation, see
+@manref{udp(4)}.
+
+@node Stream Control Transmission Protocol (SCTP) Driver
+@subsection Stream Control Transmission Protocol (SCTP) Driver
+@cindex Stream Control Transmission Protocol (SCTP) Driver
+@cindex SCTP
+
+OpenSS7 has two implementations (@dfn{STREAMS} and Linux Sockets) that provide support for this new
+transport protocol and that provide transport for SIGTRAN and other protocols.  The @dfn{STREAMS}
+SCTP implementation provides an NPI Revision 2.0 and TPI Revision 2.0 interface to its users.  Alos
+supported is an X/Open XNS 5.2 XTI Library and ITOS (ISO over SCTP).  The Linux Native SCTP
+implementation provides a Sockets interface.
+
+This is an existing OpenSS7 SIGTRAN stack component; for documentation, see:
+@manref{sctp(4)}.  @dfn{Phase 1} activities for SCTP include integration testing with the SG
+components.
+
+@node Transmission Control Protocol (TCP) Driver
+@subsection Transmission Control Protocol (TCP) Driver
+@cindex Transmission Control Protocol (TCP) driver
+
+@node Internet Protocol (IP) Driver
+@subsection Internet Protocol (IP) Driver
+@cindex Internet Protocol (IP) driver
+
+The @dfn{Internet Protocol (IP) Driver} is a @dfn{STREAMS} based driver providing access to the
+underlying IP layer in the Linux kernel.  The primary use of this component in the
+@value{MANUAL_TITLE} is to provide IP services to the UDP, RTP/RTCP, and VToIP drivers.  This is an
+existing OpenSS7 XNS stack component; for documentation, see @manref{ip(4)}.
+
+@node Software Architecture
+@chapter Software Architecture
+@cindex Software Architecture
+
+This chapter details the software configuration of the OpenSS7 solutions.  OpenSS7 stack software is
+based on the @dfn{STREAMS} facility running on the Linux Operating System.  This provides for use of
+the Linux Operating System while maintaining portability and consistency with major UNIX operating
+systems that provide an @dfn{SVR 4.2 ES/MP STREAMS} facility.
+
+@menu
+* Linux Operating System::
+* STREAMS Facility::
+* OpenSS7 SS7 and SIGTRAN Stacks::
+@end menu
+
+@node Linux Operating System
+@section Linux Operating System
+@cindex Linux Operating System
+
+The OpenSS7 @dfn{STREAMS} releases and stacks currently support the 2.4 and 2.6 Linux Kernel.  A
+Linux kernel version greater than or equal to 2.4.18 is recommended for 2.4 kernels.  The Linux 2.5
+series kernels are not supported.  A Linux kernel version greater than or equal to 2.6.9 is
+recommended for 2.6 kernels.  Linux 2.4 and 2.6 kernels released by popular distributions are
+supported.  These include kernel.org releases, RedHat (7.2, 9, EL3, AS/EL4, AS/EL5), WhiteBox (EL3,
+EL4), Fedora Core (FC1-FC7), Debian (Woody-Etch), Ubuntu (6.10-7.10), SuSE (8.2-10.2 OSS), CentOS(4
+and 5), Lineox (4 and 5).  Currently our preferred distribution is CentOS 5 with all updates
+applied.
+
+Although OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks are tested primarily on ix86 hardware, the
+stacks compile and install on PPC (MPC 8260, Freescale 440), HPPA, and other processor architectures
+supported by the Linux 2.4 and 2.6 kernels.
+
+For the current project, RedHat AS/EL5 or CentOS 5 is recommended.
+
+@node STREAMS Facility
+@section STREAMS Facility
+@cindex STREAMS Facility
+
+OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks utilize a @dfn{SVR 4.2 ES/MP STREAMS} facility.  Two
+such facilities are available for Linux:
+
+@enumerate
+@item @dfn{Linux STREAMS} (referred to as LiS), and
+@item @dfn{Linux Fast-STREAMS} (referred to as LfS).
+For additional information on @dfn{Linux Fast-STREAMS}, @xref{Linux Fast-STREAMS (LfS)}.
+@end enumerate
+
+@menu
+* Linux STREAMS (LiS)::
+* Linux Fast-STREAMS (LfS)::
+@end menu
+
+@node Linux STREAMS (LiS)
+@subsection Linux STREAMS (LiS)
+@cindex Linux STREAMS (LiS)
+@cindex LiS
+
+@node Linux Fast-STREAMS (LfS)
+@subsection Linux Fast-STREAMS (LfS)
+@cindex Linux Fast-STREAMS (LfS)
+@cindex LfS
+
+
+@node OpenSS7 SS7 and SIGTRAN Stacks
+@section OpenSS7 SS7 and SIGTRAN Stacks
+@cindex OpenSS7 SS7 and SIGTRAN Stacks
+
+The OpenSS7 SS7 and SIGTRAN stacks are implemented using the @dfn{STREAMS} facility.  Protocol
+moduels within the stack are implemented as @dfn{STREAMS} modules, device drivers, multiplexing
+drivers and pseudo-device drivers.  The @dfn{STREAMS} facility has the ability to stack modules and
+multiplexing drivers above read or pseudo-device drivers using the @dfn{STREAMS} @manref{I_PUSH(7)}
+an @manref{I_LINK(7)} facilities.  Since @dfn{STREAMS} modules and drivers run within the context of
+the Operating System Kernel using message-based scheduling, greatly increased performance is
+experienced over equivalent user-space applications.  @dfn{STREAMS} modules and drivers communicate
+by passing priority.  In addition, @dfn{STREAMS} provides memory management, timer, locking,
+syncrhonization, flow control and other facilities commonly used by protocol modules.
+
+@figure{osimap,7.1,SS7 to ISO/OSI Mapping}
+
+Each OpenSS7 protocol module provides standardized X/Open ISO/OSI interfaces as well as more SS7
+specialized interfaces.  Many of the OpenSS7 protocol modules provide TPI Revision 2.0 interfaces
+with support fot he OpenSS7 XTI/TLI Library.
+
+@figuresized{stack,7.2,STREAMS SS7/SIGTRAN Stack Architecture,3.8in}
+
+@figref{7.2} illustrates the organization of @dfn{STREAMS} modules, multiplexing drivers,
+pseudo-device drivers and real device drivers in the OpenSS7 SS7 stack.  At each interface, the
+equivalent SIGTRAN User Adaptation Layer (UA) can be used.  So, for example, between MTP Level 3 and
+its Users, the M3UA
+@cindex M3UA
+protocol can be employed.  Each UA provides the same lower layer interface and upper layer
+interface.  So, M3UA
+@cindex M3UA
+provides an MTP/MTP-User interface at its lower layer interface as well as at it supper layer
+interface.
+
+@node Hardware Architecture
+@chapter Hardware Architecture
+@cindex Hardware Architecture
+
+@figref{8.1} illustrates the hardware configuration for the @value{MANUAL_TITLE}.
+
+@figuresized{platarch,8.1,Platform Architecture,6.0in}
+
+@figuresized{platarch2,8.2,Platform Architecture,6.0in}
+
+The configuration show in @figref{8.1} shows:
+
+@itemize @bullet
+@item Two compute nodes attached in a fully redundant configuration.
+@item Each compute node has 3 x V401P-SS7 cards proding quad DSX-1 connectivity per card, for a
+total of 12 DSX-1's per compute node.
+@item Each compute node is attached via cross-connect over 12 DSX-1's (each) to a DACS which has
+drop-down capability on each pair of DSX-1's consisting of one DSX-1 from each compute node.
+@item On the IP network side, each compute node supports 2 GigE NIC ports.
+@item Each NIC port on each compute node is attached to a GigE rail or swtich which subsequently
+attacheds to two Routers, one for Network A and one for Network B.
+@item The configuration shown supports up to 288 low-speed (56 or 64 kbps) signalling links or up to
+12 high-speed (1.544 Mpbs) signalling links.
+@item Compute nodes communicate with each other over the IP network, either via local switch or
+remote router, using M2UA.  This SIGTRAN protocol permits the compute node to logically share their
+V401P-SS7 hardware interfaces. 
+@item Compute nodes communicate with the associated STP pair via TDM links as well as using the M2PA
+protocol.  The M2PA SIGTRAN protocol provides an IP-based high-speed SS7 link and is used to augment
+TDM links to implement C-Links on the platform.
+@item Compont nodes act as SGP within the SG and provide MTP Level 3 and above connectivity to
+remote application servers using the M3UA SIGTRAN protocol.  The M3UA SIGTRAN protocol exports the
+MTP to MTP-User interface and effectivley transports the interface to the application server from
+the signalling gateway.
+@end itemize
+
+@node Management Architecture
+@chapter Management Architecture
+@cindex Management Architecture
+
+Characteristics of the management architecture are as follows:
+
+@enumerate
+
+@item The MG is a portion of a managed switching element.  As such, the MG is a managed element that
+is only part of a managed switching element.  Management Stations may correlate similar managed
+data that occurs both on the MGC and the MG, or the MGC might be capable of providing a single
+managed switching element view.
+
+@end enumerate
+
+@figuresized{manarch,9.1,Management Architecture,4in}
+
+The management facilities provided by the hardware platform, operating system and associated
+subsystems are illustrated in @figref{9.1}.  They are summarized as follows:
+
+@itemize @bullet
+
+@item @dfn{Platform Hardware}
+
+The platform hardware provides for physical management of hardware resources.  Platform hardware is
+configured for rack-mount operation in a Telco environment.  It provides for field replacable units.
+A number of hardware features provide for local physical managements, such as sliding rack mounts,
+cable management, chassis LEDS, unit identification, chassis LEDS, KVM, auxillary DCS panels,
+monitoring ports, front-panel management controls and ports.
+
+@item @dfn{Linux Kernel}
+
+@item @dfn{ACPI}
+
+@item @dfn{IPMI}
+
+@item @dfn{Linux Fast-STREAMS}
+
+@item @dfn{SNMP}
+
+@item @dfn{TMN}
+
+@end itemize
+
+
+@node Logistics
+@chapter Logistics
+@cindex Logistics
+
+@node Optional Application Support
+@appendix Optional Application Support
+@cindex Optional Application Support
+
+@node Optional Network Support
+@appendix Optional Network Support
+@cindex Optional Network Support
+
+@node Optional System Support
+@appendix Optional System Support
+@cindex Optional System Support
+
+@node Optional Platform Support
+@appendix Optional Platform Support
+@cindex Optional Platform Support
+
+@node Optional Protocol Support
+@appendix Optional Protocol Support
+@cindex Optional Protocol Support
+
+@node Optional Software Support
+@appendix Optional Software Support
+@cindex Optional Software Support
+
+@node Optional Hardware Support
+@appendix Optional Hardware Support
+@cindex Optional Hardware Support
+
+@node Optional Management Support
+@appendix Optional Management Support
+@cindex Optional Management Support
 
 @node Programmatic Interfaces
 @appendix Programmatic Interfaces
@@ -692,9 +1400,23 @@ intended as a @dfn{Detailed Design}, but provides illustration only for these
 @appendix Platform Sizing
 @cindex Platform sizing
 
-@node Index
-@unnumbered Index
+@node Indices
+@unnumbered Indices
+@cindex indices
+
+@menu
+* Concept Index::		    Index of Concepts
+* Manual Page Index::		    Index of Manual Pages Referenced
+@end menu
+
+@node Concept Index
+@unnumberedsec Index of Concepts
 @printindex cp
+
+@page 
+@node Manual Page Index
+@unnumberedsec Index of Manual Pages Referenced
+@printindex mp
 
 @page
 @shortcontents

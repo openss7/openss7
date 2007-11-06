@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/10/15 06:47:49 $
+# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/10/18 05:33:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/15 06:47:49 $ by $Author: brian $
+# Last Modified $Date: 2007/10/18 05:33:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -117,7 +117,87 @@ AC_DEFUN([_SNMP_SETUP], [dnl
 # =============================================================================
 # _SNMP_CHECK_HEADERS
 # -----------------------------------------------------------------------------
+# Our agents use the older UCD-SNMP 4.2.6 interface including header_complex.
+# The NET-SNMP releases of UCD-SNMP are missing some essential headers (used
+# inside the package but not installed).  Recent versions of NET-SNMP such as
+# 5.2.1 provide compatibility headers, but mangles some of them.  Certinaly
+# nobody uses these or never took the time to fix them.  So we do a bunch of
+# checks here, and signal the agent code to include fixed headers shipped with
+# the package.
+# -----------------------------------------------------------------------------
 AC_DEFUN([_SNMP_CHECK_HEADERS], [dnl
+    AC_CACHE_CHECK([for snmp UCD compatibility headers], [snmp_cv_headers], [dnl
+	AC_MSG_RESULT([checking])
+	snmp_cv_headers=yes
+	if test :${snmp_cv_headers:-yes} = :yes ; then :;
+	    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-config.h], [], [
+		snmp_cv_headers=no
+		AC_MSG_WARN([cannot find <ucd-snmp/ucd-snmp-config.h>
+*** 
+*** Cannot find the UCD-SNMP compatibility header:
+***
+***     <ucd-snmp/ucd-snmp-config.h>
+***
+*** Perhaps you forgot to load the NET-SNMP development package
+*** (e.g.  net-snmp-devel or libsnmp9-dev).  SNMP agents cannot
+*** be built.  If this is not what you want, load the
+*** development package and rerun configure.  Otherwise, pass
+*** --without-snmp-agent or --without-snmp to configure.
+*** ]) ], [
+])
+	fi
+	if test :${snmp_cv_headers:-yes} = :yes ; then :;
+	    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-includes.h], [], [
+		snmp_cv_headers=no
+		AC_MSG_FAILURE([cannot find <ucd-snmp/ucd-snmp-includes.h>
+*** 
+*** Cannot find the UCD-SNMP compatibility header:
+***
+***	<ucd-snmp/ucd-snmp-includes.h>
+***
+*** This is peculiar as the <ucd-snmp/ucd-snmp-config.h> header
+*** was found.  Your UCD compatibility headers appear completely
+*** mangled: cannot proceed.
+*** ]) ], [
+#include <ucd-snmp/ucd-snmp-config.h>
+])
+	fi
+	if test :${snmp_cv_headers:-yes} = :yes ; then :;
+	    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-agent-includes.h], [], [
+		snmp_cv_headers=no
+		AC_MSG_FAILURE([cannot find <ucd-snmp/ucd-snmp-agent-includes.h
+*** 
+*** Cannot find the UCD-SNMP compatibility header:
+***
+***	<ucd-snmp/ucd-snmp-agent-includes.h>
+***
+*** This is peculiar as the <ucd-snmp/ucd-snmp-config.h> header
+*** and <ucd-snmp/ucd-snmp-includes.h> header were found.  Your
+*** UCD compatibility headers appear completely mangled: cannot
+*** proceed.
+*** ]) ], [
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+])
+	fi
+	AC_MSG_CHECKING([for snmp UCD compatibility headers])
+    ])
+    AC_CHECK_HEADERS([ucd-snmp/callback.h ucd-snmp/snmp-tc.h ucd-snmp/default_store.h ucd-snmp/snmp_alarm.h],
+	[], [], [
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+#include <ucd-snmp/ucd-snmp-agent-includes.h>
+])
+    AC_CHECK_HEADERS([ucd-snmp/ds_agent.h ucd-snmp/util_funcs.h ucd-snmp/header-complex.h ucd-snmp/mib_modules.h net-snmp/agent/mib_modules.h],
+	[], [], [
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+#include <ucd-snmp/ucd-snmp-agent-includes.h>
+#include <ucd-snmp/callback.h>
+#include <ucd-snmp/snmp-tc.h>
+#include <ucd-snmp/default_store.h>
+#include <ucd-snmp/snmp_alarm.h>
+])
 ])# _SNMP_CHECK_HEADERS
 # =============================================================================
 
@@ -165,21 +245,24 @@ AC_DEFUN([_SNMP_CHECK_LIBS], [dnl
 ***
 *** Compiling native SNMP agents requires the native library
 *** libnetsnmphelpers.  Most likely you need to install the
-*** net-snmp or ucd-snmp runtime package.
+*** net-snmp or ucd-snmp runtime package.  Otherwise, pass
+*** --without-snmp-agent or --without-snmp to configure.
 *** ]) ], [-lnetsnmpagent -lnetsnmpmibs])
 	    AC_CHECK_LIB([netsnmpagent], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Compiling native SNMP agents requires the native library
 *** libnetsnmpagent.  Most likely you need to install the
-*** net-snmp or ucd-snmp runtime package.
+*** net-snmp or ucd-snmp runtime package.  Otherwise, pass
+*** --without-snmp-agent or --without-snmp to configure.
 *** ]) ], [-lnetsnmpmibs])
 	    AC_CHECK_LIB([netsnmpmibs], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Compiling native SNMP agents requires the native library
 *** libnetsnmpmibs.  Most likely you need to install the
-*** net-snmp or ucd-snmp runtime package.
+*** net-snmp or ucd-snmp runtime package.  Otherwise, pass
+*** --without-snmp-agent or --without-snmp to configure.
 *** ]) ])
 	else
 	    AC_CHECK_LIB([snmp], [main], [], [dnl
@@ -187,14 +270,16 @@ AC_DEFUN([_SNMP_CHECK_LIBS], [dnl
 *** 
 *** Compiling native SNMP agents requires the native library
 *** libsnmp.  Most likely you need to install the net-snmp
-*** or ucd-snmp runtime package.
+*** or ucd-snmp runtime package.  Otherwise, pass
+*** --without-snmp-agent or --without-snmp to configure.
 *** ]) ])
 	    AC_CHECK_LIB([ucdagent], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Compiling native SNMP agents requires the native library
 *** libucdagent.  Most likely you need to install the net-snmp
-*** or ucd-snmp runtime package.
+*** or ucd-snmp runtime package.  Otherwise, pass
+*** --without-snmp-agent or --without-snmp to configure.
 *** ]) ], [-lucdmibs], [
 int allow_severity = 0;
 int deny_severity = 0;
@@ -204,7 +289,8 @@ int deny_severity = 0;
 *** 
 *** Compiling native SNMP agents requires the native library
 *** libucdmibs.  Most likely you need to install the net-snmp or
-*** ucd-snmp runtime package.
+*** ucd-snmp runtime package.  Otherwise, pass
+*** --without-snmp-agent or --without-snmp to configure.
 *** ]) ], [], [
 int allow_severity = 0;
 int deny_severity = 0;
@@ -270,21 +356,24 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 ***
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libnetsnmphelpers.  Most likely you need to install the
-*** net-snmp or ucd-snmp runtime package.
+*** net-snmp or ucd-snmp runtime package.  Otherwise, pass
+*** --without-snmp-agent or --without-snmp to configure.
 *** ]) ], [-lnetsnmpagent -lnetsnmpmibs])
 	    AC_CHECK_LIB32([netsnmpagent], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libnetsnmpagent.  Most likely you need to install the
-*** net-snmp or ucd-snmp runtime package.
+*** net-snmp or ucd-snmp runtime package.  Otherwise, pass
+*** --without-snmp-agent or --without-snmp to configure.
 *** ]) ], [-lnetsnmpmibs])
 	    AC_CHECK_LIB32([netsnmpmibs], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libnetsnmpmibs.  Most likely you need to install the
-*** net-snmp or ucd-snmp runtime package.
+*** net-snmp or ucd-snmp runtime package.  Otherwise, pass
+*** --without-snmp-agent or --without-snmp to configure.
 *** ]) ])
 	else
 	    AC_CHECK_LIB32([snmp], [main], [], [dnl
@@ -292,14 +381,16 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libsnmp.  Most likely you need to install the net-snmp
-*** or ucd-snmp runtime package.
+*** or ucd-snmp runtime package.  Otherwise, pass
+*** --without-snmp-agent or --without-snmp to configure.
 *** ]) ])
 	    AC_CHECK_LIB32([ucdagent], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libucdagent.  Most likely you need to install the net-snmp
-*** or ucd-snmp runtime package.
+*** or ucd-snmp runtime package.  Otherwise, pass
+*** --without-snmp-agent or --without-snmp to configure.
 *** ]) ], [-lucdmibs], [
 int allow_severity = 0;
 int deny_severity = 0;
@@ -309,7 +400,8 @@ int deny_severity = 0;
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libucdmibs.  Most likely you need to install the net-snmp or
-*** ucd-snmp runtime package.
+*** ucd-snmp runtime package.  Otherwise, pass
+*** --without-snmp-agent or --without-snmp to configure.
 *** ]) ], [], [
 int allow_severity = 0;
 int deny_severity = 0;
@@ -365,6 +457,9 @@ AC_DEFUN([_SNMP_], [dnl
 # =============================================================================
 #
 # $Log: snmp.m4,v $
+# Revision 0.9.2.5  2007/10/18 05:33:30  brian
+# - better checking of NET-SNMP
+#
 # Revision 0.9.2.4  2007/10/15 06:47:49  brian
 # - update to SNMP agent build
 #

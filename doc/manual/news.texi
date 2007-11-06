@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.30 2007/10/16 06:04:19 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.31 2007/10/18 18:23:15 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/10/16 06:04:19 $ by $Author: brian $
+@c Last Modified $Date: 2007/10/18 18:23:15 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -113,6 +113,16 @@ License upgrade to GPL v3.
 
 @item
 Cross-compile fixes (strap out AC_FUNC_REALLOC macro when cross-compiling).
+
+@item
+Ability to strap out major documentation build and installation primarily for
+embedded targets.
+
+@item
+Improvements to common build process for embedded and cross-compile targets.
+
+@item
+Support for flex 2.5.33  in maintainer mode.
 
 @end itemize
 

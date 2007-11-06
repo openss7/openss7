@@ -105,7 +105,7 @@ paragraph (this paragraph not being relevant to the printed manual).
 OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
 warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
 the contents of the document are suitable for any purpose, or that the implementation of such
-contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
 no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
 damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
 of contract, negligence or other tortious action, arising out of or in connection with any use of
@@ -353,7 +353,7 @@ obligation to provide any software, system or feature listed herein.
 
 This document is intended for a technical audience.  The reader should be familiar with most
 ETSI, ITU-T and ANSI, Signalling System No. 7 recommendations, as well as IETF drafts and RFCs for
-SIGTRAN protocols.  ETSI Because much of the focus of a CNAM Query Platform is on SS7 signalling,
+SIGTRAN protocols.  Because much of the focus of a CNAM Query Platform is on SS7 signalling,
 the reader should be familiar with ITU-T, ETSI and ANSI standards regarding Signalling System No. 7
 as applied to Calling Name Delivery.
 
@@ -2207,7 +2207,7 @@ components.
 @cindex Software architecture
 
 This chapter details the software configuration of OpenSS7 solutions.  Open SS7 stack software is
-based on the @dfn{STREAMS} facility running on the Linux Operating System.  The provides for use of
+based on the @dfn{STREAMS} facility running on the Linux Operating System.  This provides for use of
 the Linux Operating System while maintaining portability and consistency with major UNIX operating
 systems that provide an @dfn{SVR 4.2 ES/MP STREAMS} facility.
 
@@ -2282,12 +2282,12 @@ The OpenSS7 SS7 and SIGTRAN stacks are implemented using the @dfn{STREAMS} facil
 modules within the stack are implemented as @dfn{STREAMS} modules, device drivers, multiplexing
 drivers and pseudo-device drivers.  The @dfn{STREAMS} facility has the ability to stack modules and
 multiplexing drivers above a real or pseudo-device driver using @dfn{STREAMS} I_PUSH and I_LINK
-facilities.  As STEAMS modules (and drivers) run within the context of the Operating System Kernel
-using message-based scheduling, greatly increased performance is experienced over equivalent
-user-space applications.  @dfn{STREAMS} modules and drivers communicate by passing @dfn{STREAMS}
-message blocks upstream and downstream with bidirectional queueing and 256 levels of priority.  In
-addition, @dfn{STREAMS} provides memory management, timer, locking, synchronization, flow control
-and other facilities commonly used by protocol modules.
+facilities.  Since @dfn{STREAMS} modules (and drivers) run within the context of the Operating
+System Kernel using message-based scheduling, greatly increased performance is experienced over
+equivalent user-space applications.  @dfn{STREAMS} modules and drivers communicate by passing
+@dfn{STREAMS} message blocks upstream and downstream with bidirectional queueing and 256 levels of
+priority.  In addition, @dfn{STREAMS} provides memory management, timer, locking, synchronization,
+flow control and other facilities commonly used by protocol modules.
 
 @figure{osimap,21,SS7 to ISO/OSI Mapping}
 

@@ -158,6 +158,368 @@ must be set to point to a location which will be used to carry an error code
 back to the user.
 .\"
 .\"
+.SH ENVIRONMENT
+.PP
+.\"
+.SS Calling Endpoint Attributes
+.TP
+.B AP_CLG_AEID
+.TP
+.B AP_CLG_AEQ
+.TP
+.B AP_CLG_APID
+.TP
+.B AP_CLG_APT
+.\"
+.SS Called Endpoint Attributes
+.TP
+.B AP_CLD_AEID
+.TP
+.B AP_CLD_AEQ
+.TP
+.B AP_CLD_APID
+.TP
+.B AP_CLD_APT
+.\"
+.SS Responding Endpoint Attributes
+.TP
+.B AP_RSP_AEID
+.TP
+.B AP_RSP_AEQ
+.TP
+.B AP_RSP_APID
+.TP
+.B AP_RSP_APT
+.\"
+.SS ACSE Attributes
+.PP
+The ACSE Attributes are attributes associated with the Association Control Service Element (ACSE)
+portion of the OSI protocol stack.
+.[
+x217
+.]
+.[
+x227
+.]
+.[
+x237
+.]
+.TP
+.B AP_ACSE_AVAIL
+The AP_ACSE_AVAIL attribute indicates which versions of the ACSE protocol are currently available
+for the association.  The attribute is an \fBunsigned long\fP with bit values \fIAP_ACSEVER1\fP.
+It is readable always and writable never, except when the AP_MODE_SEL attribute is set to
+AP_X410_MODE, in which case the version "X.410-1984" is implied by the mode.
+.TP
+.B AP_ACSE_SEL
+The AP_ACSE_SEL attribute indicates which version of the ACSE protocol is currently selected for the
+association.  The attribute is an \fBunsigned long\fP with bit values \fIAP_ACSEVER1\fP and default
+value \fIAP_ACSEVER1\fP.  It is readable always and writable in states \fBAP_UNBOUND\fP and
+\fBAP_IDLE\fP.  In all other states, the value represents the ACSE version for the current
+association.  This attribute is not applicable when AP_MODE_SEL is set to AP_X410_MODE, in which
+case the version "X.410-1984" is implied by the mode.
+.TP
+.B AP_AFU_AVAIL
+The AP_AFU_AVAIL attribute indicates which optional ACSE functional units are currently available for
+use on the association.  The attribute is an \fBunsigned long\fP with bit values \fINULL\fP.  It is
+readable always and writable never, except when the AP_MODE_SEL attribute is set to AP_X410_MODE, in
+which case the functional units of "X.410-1984" are implied by the mode.
+.TP
+.B AP_AFU_SEL
+The AP_AFU_SEL attribute indicates which optional ACSE functional units have been requested for use
+over the current association.  The attribute is an \fBunsigned long\fP with bit values \fINULL\fP.
+It is readable always and writable in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and
+\fBAP_WASSOCrsp_ASSOCind\fP.  In all other states, the value represents the selected optional ACSE
+functional units for the association.  This attribute is not applicable when AP_MODE_SEL is set to
+AP_X410_MODE, in which case the functional units available to "X.410-1984" is implied by the mode.
+.TP
+.B AP_CNTX_NAME
+The AP_CNTX_NAME attribute is the application-context-name parameter of the AARQ and AARE APDUs.
+.[
+x227
+.]
+.TP
+.B AP_ROLE_ALLOWED
+.TP
+.B AP_ROLE_CURRENT
+.TP
+.B AP_STATE
+.\"
+.SS Presentation Attributes
+.PP
+The Presentation Attributes are attributes associated with the Presentation portion of the OSI
+protocol stack.
+.[
+x216
+.]
+.[
+x226
+.]
+.[
+x236
+.]
+.TP
+.B AP_BIND_PADDR
+.TP
+.B AP_LCL_PADDR
+.TP
+.B AP_REM_PADDR
+.TP
+.B AP_PRES_AVAIL
+.TP
+.B AP_PRES_SEL
+.TP
+.B AP_PFU_AVAIL
+.TP
+.B AP_PFU_SEL
+.TP
+.B AP_MODE_AVAIL
+.TP
+.B AP_MODE_SEL
+.TP
+.B AP_DCS
+The AP_DCS attribute is the defined context set. The defined context set contains the abstract
+syntax/transfer syntax pairs that were negotiated when the association was established, together
+with the presentation context identifier that identifies the pair.  The value of AP_DCS shall be
+empty (size field of 0) in the states AP_IDLE and AP_WASSOCcnf_ASSOCreq, it shall contain the ACSE
+context negotiated by XAP in the state AP_WASSOCrsp_ASSOCind, and it shall contain the fully
+negotiated defined context set in all other states. Note that the defined context set contains both
+the presentation contexts that were negotiated by the user (using AP_PCDL and AP_PCDRL) and any
+additional presentation contexts that were negotiated by XAP or provider. For example, the ACSE
+context (i.e., {joint-iso-ccitt 2 1 0 1}) will be negotiated automatically and will appear in the
+defined context set after negotiation is complete. This attribute is not used in the X.410-1984
+mode. Refer to the description of the AP_MODE_SEL attribute.
+.TP
+.B AP_PCDL
+The AP_PCDL attribute is used to propose the list of presentation contexts to be used on the
+connection. The association-initiator sets this list to indicate the contexts it wishes to use for
+encoding user data on the association. Since the user is responsible for all encoding and decoding
+of user data, the proposed transfer syntaxes for each proposed abstract syntax must be included in
+the list proposed by the association-initiator user. For the association-responder, the list
+indicates which presentation contexts are being requested by the association-initiator for use on
+the association. The association-initiator may specify the ACSE context in AP_PCDL, although it is
+not required to do so. If the association-initiator does not supply the ACSE context in AP_PCDL, XAP
+supplies it automatically for the association. Regardless of whether or not the
+association-initiator supplies the ACSE context, it is not provided to the associationresponder in
+AP_PCDL (the responding user may obtain it from AP_DCS if required). This attribute is not used in
+the X.410-1984t mode. Refer to the description of the AP_MODE_SEL attribute.
+.TP
+.B AP_PCDRL
+The AP_PCDRL attribute is used to indicate whether the presentation contexts proposed in the
+presentation context definition list have been accepted or rejected. The associationresponder uses
+this attribute to indicate which of the proposed presentation contexts are acceptable before issuing
+the A_ASSOC_RSP primitive. For the association-initiator, this attribute indicates the remote userOs
+response to the proposed presentation contexts, received in the A_ASSOC_CNF primitive. Each entry in
+AP_PCDRL corresponds one-to-one with an entry in AP_PCDL which, in the case of the responder, never
+contains the proposed ACSE context. The associationresponder has an opportunity to accept or reject
+each of the proposed contexts that are indicated in AP_PCDL. The ACSE context is automatically
+accepted by XAP, and appears in the value of AP_DCS. This attribute is not used in the X.410-1984
+mode. Refer to the description of the AP_MODE_SEL attribute.
+.TP
+.B AP_DPCN
+The AP_DPCN attribute is the default-context-name parameter of the CP PPDU. This attribute is not
+used in the \*(lqX.410-1984\*(rq mode. Refer to the description of the AP_MODE_SEL attribute.
+.TP
+.B AP_DPCR
+The AP_DPCR attribute is the default-context-result parameter of the CPR PPDU. Since the user is
+responsible for encoding and decoding of user-data, it is the user's responsibility to accept or
+reject any proposed default-presentation-context. The value, AP_DPCR_NOVAL, indicates that it is not
+present. This attribute is not used in the \*(lqX.410-1984\*(rq mode.  Refer to the description of
+the AP_MODE_SEL attribute.
+.\"
+.SS Session Attributes
+.PP
+The Session Attributes are attributes associated with the Session portion of the OSI protocol stack.
+.[
+x215
+.]
+.[
+x225
+.]
+.[
+x235
+.]
+.TP
+.B AP_SESS_AVAIL
+The AP_SESS_AVAIL attribute indicates which versions of the Session Layer protocol are currently
+available.
+The following bit values are defined:
+.RS
+.TP \w'\fIAP_SESSVER2\fP\(em'u
+.I AP_SESSVER1
+Session Protocol Version 1.
+.PD 0
+.TP
+.I AP_SESSVER2
+Session Protocol Version 2.
+.PD
+.RE
+.TP
+.B AP_SESS_SEL
+The AP_SESS_SEL attribute indicates which version of the Session Layer protocol has been selected
+for use with the current association.
+.TP
+.B AP_SESS_OPT_AVAIL
+The AP_SESS_OPT_AVAIL attribute is used to indicate which optional session capabilities are
+available through the XAP interface. If the AP_UCBC flag is set, the underlying provider supports
+user control of basic concatenation. If the AP_UCEC flag is set, the underlying provider supports
+user control of extended concatenation. For further information, refer to ap_snd( ) and the Session
+Layer protocol specification.
+The following bit values are defined:
+.RS
+.TP \w'\fIAP_UCBC\fP\(em'u
+.I AP_UCBC
+User control of basic concatentation.
+.PD 0
+.TP
+.I AP_UCEC
+User control of extended concatentation.
+.PD
+.RE
+.TP
+.B AP_SFU_AVAIL
+The AP_SFU_AVAIL attribute indicates which Session Layer functional units are currently available.
+The value of this attribute may affect the value of AP_TOKENS_AVAIL.
+.[
+x215
+.]
+The following bit values are defined:
+.RS
+.TP \w'\fIAP_SESS_HALFDUPLEX\fR\(em'u
+.I AP_SESS_HALFDUPLEX
+Session Half Duplex Functional Unit.
+.PD 0
+.TP
+.I AP_SESS_DUPLEX
+Session Duplex Functional Unit.
+.TP
+.I AP_SESS_XDATA
+Session Expedited Data Functional Unit.
+.TP
+.I AP_SESS_MINORSYNC
+Session Minor Syncrhonization Functional Unit.
+.TP
+.I AP_SESS_MAJORSYNC
+Session Major Syncrhonization Functional Unit.
+.TP
+.I AP_SESS_RESYNC
+Session Symmetric Resynchronization Functional Unit.
+.TP
+.I AP_SESS_ACTMGMT
+Session Actvitiy Management Functional Unit.
+.TP
+.I AP_SESS_NEGREL
+Session Negotiated Release Functional Unit.
+.TP
+.I AP_SESS_CDATA
+Session Capability Data Functional Unit.
+.TP
+.I AP_SESS_EXCEPT
+Session Exceptions Functional Unit.
+.TP
+.I AP_SESS_TDATA
+Session Typed Data Functional Unit.
+.TP
+.I AP_SESS_DATASEP
+Session Data Separation Functional Unit.
+.TP
+.I AP_SESS_NOORDREL
+Session No Orderly Release Functional Unit.
+.TP
+.I AP_SESS_NESTCON
+Session Nested Connections Functional Unit.
+.PD
+.RE
+.TP
+.B AP_SFU_SEL
+The AP_SFU_SEL attribute indicates which Session Layer functional units have been requested for use
+over the current association.
+See \fBAP_SFU_AVAIL\fP for bit value definitions.
+The default value is \fIAP_SESS_DUPLEX\fP.
+.TP
+.B AP_QOS
+The AP_QOS attribute is used to specify the quality of service requirements for the association. It
+holds the ranges of QOS values that the XAP user is willing to accept.
+.TP
+.B AP_CLG_CONN_ID
+The AP_CLG_CONN_ID attribute conveys the value of the session connection identifier that was
+proposed by the association-initiator.
+.TP
+.B AP_CLD_CONN_ID
+The AP_CLD_CONN_ID attribute conveys the value of the session connection identifier that was
+proposed by the association-responder.
+.TP
+.B AP_OLD_CONN_ID
+The AP_OLD_CONN_ID attribute conveys the values of the session connection identifiers from a
+previous session.
+.TP
+.B AP_TOKENS_AVAIL
+Type \fBunsigned long\fP with bit values \fIAP_DATA_TOK\fP, \fIAP_SYNCMINOR_TOK\fP, \fIAP_MAJACT_TOK\fP, \fIAP_RELEASE_TOK\fP.
+This attribute is readable in any states except \fBAP_UNBOUND\fP, \fBAP_IDLE\fP, \fBAP_WASSOCcnf_ASSOCreq\fP, \fBAP_WASSOCrsp_ASSOCind\fP and writable never.
+The tokens available are affected by the settings of the \fBAP_SFU_SEL\fP attribute (see X.215).
+.[
+x215
+.]
+.sp
+A token is an attribute of an association which is dynamically assigned to one user at a time. The
+user that possesses a token has exclusive rights to initiate the service which that token
+represents. The AP_TOKENS_AVAIL attribute indicates which tokens are available for assignment on
+this association. The value of this attribute is dependent on AP_SFU_SEL.
+.TP
+.B AP_TOKENS_OWNED
+Type \fBunsigned long\fP with bit values \fIAP_DATA_TOK\fP, \fIAP_SYNCMINOR_TOK\fP, \fIAP_MAJACT_TOK\fP, \fIAP_RELEASE_TOK\fP.
+This attribute is readable in any states except \fBAP_UNBOUND\fP, \fBAP_IDLE\fP, \fBAP_WASSOCcnf_ASSOCreq\fP, \fBAP_WASSOCrsp_ASSOCind\fP and writable never.
+The owned tokens are affected using the \fBP_TOKENGIVE_REQ\fP(7), \fBP_TOKENGIVE_IND\fP(7), \fBP_TOKENPLEASE_REQ\fP(7) and \fBP_TOKENPLEASE_IND\fP(7) primitives.
+.sp
+The AP_TOKENS_OWNED attribute indicates which available tokens (see AP_TOKENS_AVAIL) are currently
+assigned to the user. The user has exclusive rights to initiate the service represented by each of
+the tokens owned. The value of this attribute is affected by AP_INIT_TOKENS.
+.TP
+.B AP_MSTATE
+If the XAP instance is awaiting additional data from the user (the last ap_snd( ) call had the
+AP_MORE bit set), the AP_SNDMORE bit in AP_MSTATE is set. If there is more user data for the current
+service (the last call to ap_rcv( ) returned with the AP_MORE bit set) then AP_RCVMORE bit is set.
+(Note that it is possible for both bits to be set.)
+.\"
+.SS Library Attributes
+.TP
+.B AP_LIB_AVAIL
+The AP_LIB_AVAIL attribute indicates which versions of XAP are available to the user.
+.TP
+.B AP_LIB_SEL
+The AP_LIB_SEL attribute is used to indicate which version of XAP is used. This attribute must be
+set before any other attributes are set or any primitives are issued.
+.TP
+.B AP_OPT_AVAIL
+The AP_OPT_AVAIL attribute is used to indicate what optional functionality is supported in the
+underlying protocol implementation. AP_XXXX_WILD indicates whether address wildcarding is supported
+at the specified level. (XXXX can be NSAP, TSEL, SSEL or PSEL.) 
+.TP
+.B AP_QLEN
+The \fBAP_QLEN\fP attribute is used to indicate the number of connection indications that will be
+held by the provider when all of the connection endpoints bound for listening at \fBAP_BIND_PADDR\fP
+are in use.  The user can set this attribute to request a specific queue size. The provider may
+change the value if it cannot support the requested queue size or if another process bound to the
+same address has already requested a larger queue. The user can determine the current queue size by
+examining the value of \fBAP_QLEN\fI using \fBap_get_env\fP(3).
+.TP
+.B AP_COPYENV
+The AP_COPYENV attribute is used to indicate whether certain environment attributes that correspond
+to parameters on the A-ASSOCIATE indication and confirmation services should be returned to the user
+in the cdata argument of the ap_rcv( ) function. When the value of this attribute is TRUE, these
+attributes are returned via the cdata argument.  .\"
+.TP
+.B AP_DIAGNOSTIC
+The AP_DIAGNOSTIC attribute is used to pass diagnostic details on error conditions reported by ACSE,
+Presentation, Session and Transport providers, in addition to that conveyed with the A_PABORT_IND
+primitive. This mechanism is used to provide descriptive text for all errors reported by XAP, and
+may be used to provide additional diagnostic information (for example, errors in incoming APDUs
+reported by the local ACPM, or the reason for a transport layer disconnect). It should be noted that
+the information provided by this attribute is implementation dependent - that is, an implementation
+may not report all of the source/reason/event combinations defined for this attribute.  However, if
+an implementation does use the attribute to report diagnostic information, it must use the
+classifications defined in this specification.
+.\"
 .SH "RETURN VALUE"
 .PP
 Upon successful completion, a value of zero
@@ -196,6 +558,16 @@ XAP could not allocate sufficient memory to copy the value of the specified attr
 The specified attribute is not readable.
 .PP
 In addition, operating system class errors are reported.
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The OpenSS7 XAP Library and cooperating modules and drivers implement XAP environment attributes as
+XTI options and using input-output controls.
 .\"
 .\"
 .SH "SEE ALSO"

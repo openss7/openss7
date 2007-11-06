@@ -531,18 +531,12 @@ maketa(ta, type, ctp)
 			return nta;
 		}
 	}
-	/* 
-	 * This requires an explanation:
-	 * If NOMUNGE && FORCEMUNGE  we have a semi-transparent bridge
-	 * and since [at least on my machine] the recipient of a "transparent"
-	 * call sees it as coming from the bridge host, ie the effect is that
-	 * of a strict call, the structure that is now in nta, viz:
-	 * "calling address"/calling address
-	 * is going to get clobbered and appear at the final host as originating
-	 * "calling address"/bridge host
-	 * anyway.  This is what I want.
-	 * => return nta
-	 */
+	/* This requires an explanation: If NOMUNGE && FORCEMUNGE we have a semi-transparent bridge
+	   and since [at least on my machine] the recipient of a "transparent" call sees it as
+	   coming from the bridge host, ie the effect is that of a strict call, the structure that
+	   is now in nta, viz: "calling address"/calling address is going to get clobbered and
+	   appear at the final host as originating "calling address"/bridge host anyway.  This is
+	   what I want. => return nta */
 	if ((ctp->flags & CONN_NOMUNGE)
 	    && (ctp->flags & CONN_FORCEMUNGE)
 	    && !(ctp->flags & CONN_STRICT)) {

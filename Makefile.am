@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/10/16 07:46:31 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/10/18 06:52:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/16 07:46:31 $ by $Author: brian $
+# Last Modified $Date: 2007/10/18 06:52:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -110,7 +110,9 @@ all-distcheck: ALL_EXPORT_OPTS=\
 SUBDIRS	= @subdirs@
 
 if DEVELOPMENT
+if DOCUMENTATION
 SUBDIRS += doc
+endif
 endif
 
 dist_noinst_SCRIPTS		+= scripts/cflagcheck $(top_srcdir)/scripts/modpost.sh
@@ -126,8 +128,8 @@ EXTRA_TEX			+= \
 				scripts/texi/testsuite.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= configure.nexusware
-EXTRA_SCRIPTS			+= configure.nexusware
+dist_noinst_SCRIPTS		+= configure.nexusware scripts/missing2
+EXTRA_SCRIPTS			+= configure.nexusware scripts/missing2
 
 ##
 ## Rules for lsms
@@ -181,6 +183,9 @@ DISTCLEANFILES			+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.35  2007/10/18 06:52:32  brian
+# - new build support
+#
 # Revision 0.9.2.34  2007/10/16 07:46:31  brian
 # - makefile corrections and additions
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/10/17 17:43:02 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/10/18 06:12:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/17 17:43:02 $ by $Author: brian $
+# Last Modified $Date: 2007/10/18 06:12:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -431,9 +431,10 @@ AC_DEFUN([_OPENSS7_DEBUG], [dnl
     then
 	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wall,,g'`
 	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Werror,,g'`
-	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wundef,,g'`
-	CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[0-9]*%%g'`
-	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wundef -Wp,-D_FORTIFY_SOURCE=2 -Werror"
+dnl	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wundef,,g'`  dnl this frags out flex 2.5.33
+	CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wundef -Wp,-D_FORTIFY_SOURCE=2 -Werror"
+	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wp,-D_FORTIFY_SOURCE=2 -Werror"
     fi
 ])# _OPENSS7_DEBUG
 # =============================================================================
@@ -724,8 +725,8 @@ AC_DEFUN([_OPENSS7_OPTIONS_CFLAGS], [dnl
     if test :"${USE_MAINTAINER_MODE:-no}" != :no
     then
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wno-system-headers"
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
-	    CFLAGS="${CFLAGS:+$CFLAGS }-Wundef"
+dnl	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wundef"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wno-endif-labels"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wbad-function-cast"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wcast-qual"
@@ -749,7 +750,7 @@ dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Winline"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wdisabled-optimization"
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wall,,g'`
 	    CFLAGS="${CFLAGS:+$CFLAGS }-Wall"
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[0-9]*%%g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
 	    CFLAGS="${CFLAGS:+$CFLAGS }-Wp,-D_FORTIFY_SOURCE=2"
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
 	    CFLAGS="${CFLAGS:+$CFLAGS }-Werror"
@@ -770,28 +771,47 @@ AC_DEFUN([_OPENSS7_MISSING], [dnl
 	am_missing2_run=
 	AC_MSG_WARN(['missing2' script is too old or missing])
     fi
-    LATEX=${LATEX-"${am_missing2_run}latex"}
-    AC_SUBST([LATEX])dnl
-    PSLATEX=${PSLATEX-"${am_missing2_run}pslatex"}
-    AC_SUBST([PSLATEX])dnl
-    PDFLATEX=${PDFLATEX-"${am_missing2_run}pdflatex"}
-    AC_SUBST([PDFLATEX])dnl
-    BIBTEX=${BIBTEX-"${am_missing2_run}bibtex"}
-    AC_SUBST([BIBTEX])dnl
-    DVIPS=${DVIPS-"${am_missing2_run}dvips"}
-    AC_SUBST([DVIPS])dnl
-    DVIPDF=${DVIPDF-"${am_missing2_run}dvipdf"}
-    AC_SUBST([DVIPDF])dnl
-    GNUPLOT=${GNUPLOT-"${am_missing2_run}gnuplot"}
-    AC_SUBST([GNUPLOT])dnl
-    FIG2DEV=${FIG2DEV-"${am_missing2_run}fig2dev"}
-    AC_SUBST([FIG2DEV])dnl
-    CONVERT=${CONVERT-"${am_missing2_run}convert"}
-    AC_SUBST([CONVERT])dnl
-    PS2EPSI=${PS2EPSI-"${am_missing2_run}ps2epsi"}
-    AC_SUBST([PS2EPSI])dnl
-    EPSTOPDF=${EPSTOPDF-"${am_missing2_run}epstopdf"}
-    AC_SUBST([EPSTOPDF])dnl
+    AC_ARG_VAR([LATEX], [Latex command.])
+    AC_PATH_PROG([LATEX], [latex], [${am_missing2_run}latex],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([PSLATEX], [PS Latex command.])
+    AC_PATH_PROG([PSLATEX], [pslatex], [${am_missing2_run}pslatex],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([PDFLATEX], [PDF Latex command.])
+    AC_PATH_PROG([PDFLATEX], [pdflatex], [${am_missing2_run}pdflatex],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([BIBTEX], [BibTeX command.])
+    AC_PATH_PROG([BIBTEX], [bibtex], [${am_missing2_run}bibtex],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([LATEX2HTML], [LaTeX to HTML command.])
+    AC_PATH_PROG([LATEX2HTML], [latex2html], [${am_missing2_run}latex2html],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+dnl
+dnl
+dnl frags out automake
+dnl
+dnl    AC_ARG_VAR([DVIPS], [DVI to PS command.])
+dnl    AC_PATH_PROG([DVIPS], [dvips], [${am_missing2_run}dvips],
+dnl		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+
+    AC_ARG_VAR([DVIPDF], [DVI to PDF command.])
+    AC_PATH_PROG([DVIPDF], [dvipdf], [${am_missing2_run}dvipdf],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([GNUPLOT], [GNU plot command.])
+    AC_PATH_PROG([GNUPLOT], [gnuplot], [${am_missing2_run}gnuplot],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([FIG2DEV], [Fig to graphics format command.])
+    AC_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([CONVERT], [Graphics format conversion command.])
+    AC_PATH_PROG([CONVERT], [convert], [${am_missing2_run}convert],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([PS2EPSI], [PS to EPSI conversion command.])
+    AC_PATH_PROG([PS2EPSI], [ps2epsi], [${am_missing2_run}ps2epsi],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([EPSTOPDF], [EPS to PDF conversion command.])
+    AC_PATH_PROG([EPSTOPDF], [epstopdf], [${am_missing2_run}epstopdf],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
 ])# _OPENSS7_MISSING
 # =============================================================================
 
@@ -805,6 +825,27 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.57  2007/10/18 06:12:53  brian
+# - more -Wundef to remove
+#
+# Revision 0.9.2.56  2007/10/18 05:27:52  brian
+# - remove DVIPS warning
+#
+# Revision 0.9.2.55  2007/10/18 05:03:03  brian
+# - more laxity for flex
+#
+# Revision 0.9.2.54  2007/10/18 04:23:31  brian
+# - -Wundef frags out flex, and missing quotes
+#
+# Revision 0.9.2.53  2007/10/17 20:00:28  brian
+# - slightly different path checks
+#
+# Revision 0.9.2.52  2007/10/17 19:22:32  brian
+# - better tool detection
+#
+# Revision 0.9.2.51  2007/10/17 18:00:13  brian
+# - added latex2html
+#
 # Revision 0.9.2.50  2007/10/17 17:43:02  brian
 # - build updates
 #

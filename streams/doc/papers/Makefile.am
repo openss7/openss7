@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/17 17:43:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/10/18 06:52:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/17 17:43:00 $ by $Author: brian $
+# Last Modified $Date: 2007/10/18 06:52:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -120,6 +120,10 @@ FIGFIGS = \
 	socketpipe.fig
 
 PLOTFIGS = $(PLOTS:.plot=.fig)
+PLOTEPSS = $(PLOTS:.plot=.eps)
+PLOTPDFS = $(PLOTS:.plot=.pdf)
+PLOTGIFS = $(PLOTS:.plot=.gif)
+PLOTPNGS = $(PLOTS:.plot=.png)
 
 NAME = piperesults
 
@@ -136,19 +140,19 @@ $(PLOTFIGS): %.fig: %.plot
 $(EPSFIGS): %.eps: %.fig
 	$(FIG2DEV) -L eps -e -g '#ffffff' -b 0 $< $@
 
-$(PLOTS:.plot=.eps): %.eps: %.fig
+$(PLOTEPSS): %.eps: %.fig
 	$(FIG2DEV) -L eps -e -g '#f7f7f7' -b 0 $< $@
 
 $(PDFFIGS): %.pdf: %.fig
 	$(FIG2DEV) -L pdf -e -p dummy -g '#ffffff' -b 0 $< $@
 
-$(PLOTS:.plot=.pdf): %.pdf: %.fig
+$(PLOTPDFS): %.pdf: %.fig
 	$(FIG2DEV) -L pdf -e -p dummy -g '#f7f7f7' -b 0 $< $@
 
 $(GIFFIGS): %.gif: %.fig
 	$(FIG2DEV) -L gif -g '#c0d0f0' -t '#c0d0f0' -b 0 -S 2 $< $@
 
-$(PLOTS:.plot=.gif): %.gif: %.fig
+$(PLOTGIFS): %.gif: %.fig
 	$(FIG2DEV) -L gif -g 'white' -b 15 -S 2 $< $@
 
 #$(PNGFIGS): %.png: %.fig
@@ -157,15 +161,15 @@ $(PLOTS:.plot=.gif): %.gif: %.fig
 $(PNGFIGS): %.png: %.gif
 	$(CONVERT) -background '#c0d0f0' -transparent '#ffffff' -interlace Line $< $@
 
-$(PLOTS:.plot=.png): %.png: %.gif
+$(PLOTPNGS): %.png: %.gif
 	$(CONVERT) -background 'white' -interlace Line $< $@
 
 MY_PHONY += gif png eps pdf
 
-gif: $(GIFFIGS) $(PLOTS:.plot=.gif)
-png: $(PNGFIGS) $(PLOTS:.plot=.png)
-eps: $(EPSFIGS) $(PLOTS:.plot=.eps)
-pdf: $(PDFFIGS) $(PLOTS:.plot=.pdf)
+gif: $(GIFFIGS) $(PLOTGIFS)
+png: $(PNGFIGS) $(PLOTPNGS)
+eps: $(EPSFIGS) $(PLOTEPSS)
+pdf: $(PDFFIGS) $(PLOTPDFS)
 
 $(PAPER_PREFIX)_centos_comp.fig $(PAPER_PREFIX)_centos_delay.fig $(PAPER_PREFIX)_centos_perf.fig $(PAPER_PREFIX)_centos_thrput.fig: $(PAPER_PREFIX)_centos.dat
 $(PAPER_PREFIX)_fc6_comp.fig $(PAPER_PREFIX)_fc6_delay.fig $(PAPER_PREFIX)_fc6_perf.fig $(PAPER_PREFIX)_fc6_thrput.fig: $(PAPER_PREFIX)_fc6.dat
@@ -218,51 +222,51 @@ clean-dat:
 		fi ; \
 	done
 
-$(NAME).aux: $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
+$(NAME).aux: $(NAME).tex $(EPSFIGS) $(PLOTEPSS)
 	$(LATEX) $(NAME).tex
 	$(LATEX) $(NAME).tex
 
-$(NAME).bbl: $(NAME).bib $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
+$(NAME).bbl: $(NAME).bib $(NAME).tex $(EPSFIGS) $(PLOTFIGS)
 	if test -f $(NAME).aux ; then :; else make $(NAME).aux ; fi
 	$(BIBTEX) $(NAME)
 
-$(NAME).dvi: $(NAME).tex $(NAME).bbl $(EPSFIGS) $(PLOTS:.plot=.eps)
-	rm -f $(GIFFIGS) $(PLOTS:.plot=.gif)
-	rm -f $(PNGFIGS) $(PLOTS:.plot=.png)
+$(NAME).dvi: $(NAME).tex $(NAME).bbl $(EPSFIGS) $(PLOTEPSS)
+	rm -f $(GIFFIGS) $(PLOTGIFS)
+	rm -f $(PNGFIGS) $(PLOTPNGS)
 	$(LATEX) $(NAME).tex
 	$(LATEX) $(NAME).tex
 
-$(NAME).ps: $(NAME).tex $(NAME).bbl $(EPSFIGS) $(PLOTS:.plot=.eps)
-	rm -f $(GIFFIGS) $(PLOTS:.plot=.gif)
-	rm -f $(PNGFIGS) $(PLOTS:.plot=.png)
+$(NAME).ps: $(NAME).tex $(NAME).bbl $(EPSFIGS) $(PLOTEPSS)
+	rm -f $(GIFFIGS) $(PLOTGIFS)
+	rm -f $(PNGFIGS) $(PLOTPNGS)
 	$(PSLATEX) $(NAME).tex
 	$(PSLATEX) $(NAME).tex
 	$(DVIPS) -t letter -f -o $@ $(NAME).dvi
 
-$(NAME).pdf: $(NAME).tex $(NAME).bbl $(PDFFIGS) $(PLOTS:.plot=.pdf)
-	rm -f $(GIFFIGS) $(PLOTS:.plot=.gif)
-	rm -f $(PNGFIGS) $(PLOTS:.plot=.png)
+$(NAME).pdf: $(NAME).tex $(NAME).bbl $(PDFFIGS) $(PLOTPDFS)
+	rm -f $(GIFFIGS) $(PLOTGIFS)
+	rm -f $(PNGFIGS) $(PLOTPNGS)
 	$(PDFLATEX) $(NAME).tex
 	$(PDFLATEX) $(NAME).tex
 
-$(NAME).html: $(NAME).tex $(NAME).bbl $(PNGFIGS) $(PLOTS:.plot=.png)
-	/usr/bin/latex2html -split 0 -noexternal_images -noascii_mode -font_size 12pt \
+$(NAME).html: $(NAME).tex $(NAME).bbl $(PNGFIGS) $(PLOTPNGS)
+	$(LATEX2HTML) -split 0 -noexternal_images -noascii_mode -font_size 12pt \
 		-nonavigation -numbered_footnotes -nosubdir -rooted -noinfo \
 		-norooted -antialias_text -antialias -white -image_type png \
 		-scalable_fonts $(NAME).tex
 	cat org.css >> $(NAME).css
 
 clean-gif:
-	rm -f $(GIFFIGS) $(PLOTS:.plot=.gif)
+	rm -f $(GIFFIGS) $(PLOTGIFS)
 
 clean-png:
-	rm -f $(PNGFIGS) $(PLOTS:.plot=.png)
+	rm -f $(PNGFIGS) $(PLOTPNGS)
 
 clean-eps:
-	rm -f $(EPSFIGS) $(PLOTS:.plot=.eps)
+	rm -f $(EPSFIGS) $(PLOTEPSS)
 
 clean-pdf:
-	rm -f $(PDFFIGS) $(PLOTS:.plot=.pdf)
+	rm -f $(PDFFIGS) $(PLOTPDFS)
 
 clean-fig: clean-gif clean-png clean-eps clean-pdf
 	rm -f $(PLOTFIGS)
@@ -281,11 +285,11 @@ MY_PHONY += clean-papers clean-fig clean-gif clean-png clean-eps clean-pdf clean
 EXTRA_DIST += $(NAME).pdf $(NAME).tex $(NAME).bib $(FIGFIGS) $(PLOT_DATS) $(PLOTS) org.css
 
 .INTERMEDIATE: \
-	$(PNGFIGS) $(PLOTS:.plot=.png) \
-	$(EPSFIGS) $(PLOTS:.plot=.eps) \
-	$(PDFFIGS) $(PLOTS:.plot=.pdf) \
-	$(GIFFIGS) $(PLOTS:.plot=.gif) \
-	$(PLOTS:.plot=.fig)
+	$(PLOTPNGS) $(PNGFIGS) \
+	$(PLOTEPSS) $(EPSFIGS) \
+	$(PLOTPDFS) $(PDFFIGS) \
+	$(PLOTGIFS) $(GIFFIGS) \
+	$(PLOTFIGS)
 
 ## DEVELOPMENT
 endif
@@ -293,6 +297,9 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2007/10/18 06:52:51  brian
+# - new build support
+#
 # Revision 0.9.2.6  2007/10/17 17:43:00  brian
 # - build updates
 #

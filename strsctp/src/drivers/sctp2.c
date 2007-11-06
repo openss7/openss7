@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2007/10/15 17:24:24 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2007/10/18 06:54:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/10/15 17:24:24 $ by $Author: brian $
+ Last Modified $Date: 2007/10/18 06:54:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.75  2007/10/18 06:54:16  brian
+ - corrected new socket buffer support
+
  Revision 0.9.2.74  2007/10/15 17:24:24  brian
  - updates for 2.6.22.5-49.fc6 kernel
 
@@ -157,10 +160,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2007/10/15 17:24:24 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2007/10/18 06:54:16 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2007/10/15 17:24:24 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2007/10/18 06:54:16 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -178,7 +181,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2007/10/15 17:24:24 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2007/10/18 06:54:16 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -243,15 +246,6 @@ static inline unsigned char *skb_end_pointer(const struct sk_buff *skb)
 {
 	return skb->end;
 }
-static inline void skb_reset_tail_pointer(struct sk_buff *skb)
-{
-	skb->tail = skb->data;
-}
-static inline void skb_set_tail_pointer(struct sk_buff *skb, const int offset)
-{
-	skb_reset_tail_pointer(skb);
-	skb->tail += offset;
-}
 static inline unsigned char *skb_transport_header(const struct sk_buff *skb)
 {
 	return skb->h.raw;
@@ -283,6 +277,11 @@ static inline void skb_reset_network_header(struct sk_buff *skb)
 static inline void skb_reset_mac_header(struct sk_buff *skb)
 {
 	skb->mac.raw = skb->data;
+}
+static inline void skb_set_tail_pointer(struct sk_buff *skb, const int offset)
+{
+	skb_reset_tail_pointer(skb);
+	skb->tail += offset;
 }
 static inline void skb_set_transport_header(struct sk_buff *skb, const int offset)
 {
