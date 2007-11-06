@@ -1,5 +1,5 @@
-OpenSS7 Linux Native SCTP -- read me first file.  2007-06-24
-$Id: README,v 0.9.2.33 2007/06/24 09:21:19 brian Exp $
+OpenSS7 Linux Native SCTP -- read me first file.  2007-11-05
+$Id: README,v 0.9.2.34 2007/11/06 09:55:08 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,16 +7,16 @@ See the end for copying conditions (for this file).
  OpenSS7 Linux Native SCTP
 ==========================
 
-Package sctp-0.2.26 was released under GPLv2 2007-06-24.
+Package sctp-0.2.27 was released under GPLv2 2007-11-05.
 
 The OpenSS7 Linux Native SCTP package is the OpenSS7 Linux Native
 (Sockets) Kernel implementation of `Stream Control Transmission
 Protocol (SCTP)'.
 
-sctp-0.2.26 is the 0.2.26 version of a Linux Kernel native
+sctp-0.2.27 is the 0.2.27 version of a Linux Kernel native
 implementation of `RFC 2960' Stream Control Transmission Protocol.  For
 information on using the implementation see the `man/sctp.7' Linux
-manual page and look at the test programs in `sctp-0.2.26/test/'.
+manual page and look at the test programs in `sctp-0.2.27/test/'.
 
 _Warning_: This is pre-release code.  It is Beta but rather stable.
 Nevertheless, it is possible it will crash or lock your machine in some
@@ -30,12 +30,12 @@ but should build and install for other architectures as well.
  Release
 --------
 
-This is the `sctp-0.2.26' package, released 2007-06-24.  This `0.2.26'
+This is the `sctp-0.2.27' package, released 2007-11-05.  This `0.2.27'
 release, and the latest version, can be obtained from the download area
 (http://www.openss7.org/download.html) of The OpenSS7 Project website
 using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/sctp-0.2.26.tar.bz2
+     $> wget http://www.openss7.org/tarballs/sctp-0.2.27.tar.bz2
 
 The release is available as an `autoconf(1)' tarball, `src.rpm' or
 `dsc', or as a set of binary `rpm's or `deb's.  See the download page
@@ -56,7 +56,7 @@ When working from `cvs(1)' or `git(1)', please see the `README-cvs',
 file (or see `Downloading from CVS', in the manual).  An abbreviated
 installation procedure that works for most applications appears below.
 
-This release of the package is published strictly under Version 2 of
+This release of the package is published strictly under Version 3 of
 the `GNU Public License' which can be found in the file `COPYING'.
 Package specific licensing terms (if any) can be found in the file
 `LICENSES'.  Please respect these licensing arrangements.  If you are
@@ -70,7 +70,7 @@ See `README-alpha' (if it exists) for alpha release information.
 
 The quickest and easiest way to ensure that all prerequisites are met
 is to download and install this package from within the `OpenSS7 Master
-Package', `openss7-0.9.2.F', instead of separately.
+Package', `openss7-0.9.2.G', instead of separately.
 
 Prerequisites for the OpenSS7 Linux Native SCTP package are as follows:
 
@@ -84,8 +84,8 @@ Prerequisites for the OpenSS7 Linux Native SCTP package are as follows:
          - A fairly LSB compliant GNU/Linux distribution.(1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27).
          - glibc2 or better.
-         - GNU info (for info files).
          - GNU groff (for man pages).(2)
+         - GNU texinfo (for info files).
 
 When configuring and building multiple `OpenSS7 Project' release
 packages, place all of the source packages (unpacked tarballs) at the
@@ -104,7 +104,7 @@ You also need the same version of `gcc(1)' compiler with which the
 kernel was built.  If it is not the default, add `CC=kgcc' on the line
 after `./configure', for example:
 
-     $> ../sctp-0.2.26/configure CC='gcc-3.4'
+     $> ../sctp-0.2.27/configure CC='gcc-3.4'
 
  Installation
 -------------
@@ -112,11 +112,11 @@ after `./configure', for example:
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-     $> wget http://www.openss7.org/tarballs/sctp-0.2.26.tar.bz2
-     $> tar -xjvf sctp-0.2.26.tar.bz2
+     $> wget http://www.openss7.org/tarballs/sctp-0.2.27.tar.bz2
+     $> tar -xjvf sctp-0.2.27.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../sctp-0.2.26/configure --enable-autotest
+     $> ../sctp-0.2.27/configure --enable-autotest
      $> make
      $> make check
      $> sudo make install
@@ -124,8 +124,8 @@ validate, uninstall and remove the package:
      $> sudo make uninstall
      $> popd
      $> sudo rm -rf build
-     $> rm -rf sctp-0.2.26
-     $> rm -f sctp-0.2.26.tar.bz2
+     $> rm -rf sctp-0.2.27
+     $> rm -f sctp-0.2.27.tar.bz2
 
 If you have problems, try building with the logging targets instead.
 If the make of a logging target fails, an automatic problem report will
@@ -133,11 +133,11 @@ be generated that can be mailed to The OpenSS7 Project
 <bugs@openss7.org>.(3) Installation steps using the logging targets
 proceed as follows:
 
-     $> wget http://www.openss7.org/tarballs/sctp-0.2.26.tar.bz2
-     $> tar -xjvf sctp-0.2.26.tar.bz2
+     $> wget http://www.openss7.org/tarballs/sctp-0.2.27.tar.bz2
+     $> tar -xjvf sctp-0.2.27.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../sctp-0.2.26/configure --enable-autotest
+     $> ../sctp-0.2.27/configure --enable-autotest
      $> make compile.log
      $> make check.log
      $> sudo make install.log
@@ -145,8 +145,8 @@ proceed as follows:
      $> sudo make uninstall.log
      $> popd
      $> sudo rm -rf build
-     $> rm -rf sctp-0.2.26
-     $> rm -f sctp-0.2.26.tar.bz2
+     $> rm -rf sctp-0.2.27
+     $> rm -f sctp-0.2.27.tar.bz2
 
 See `README-make' for additional specialized make targets.
 
@@ -162,14 +162,14 @@ The OpenSS7 Linux Native SCTP package is available from the downloads
 area of The OpenSS7 Project website
 (http://www.openss7.org/download.html) using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/sctp-0.2.26.tar.bz2
+     $> wget http://www.openss7.org/tarballs/sctp-0.2.27.tar.bz2
 
 Unpack the tarball using a command such as:
 
-     $> tar -xjvf sctp-0.2.26.tar.bz2
+     $> tar -xjvf sctp-0.2.27.tar.bz2
 
 The tarball will unpack into the relative subdirectory named after the
-package name: sctp-0.2.26.
+package name: sctp-0.2.27.
 
 The package builds using the GNU `autoconf' utilities and the
 `configure' script.  To build the package, we recommend using a
@@ -177,19 +177,19 @@ separate `build' directory as follows:
 
      $> mkdir build
      $> cd build
-     $> ../sctp-0.2.26/configure
+     $> ../sctp-0.2.27/configure
 
 In general, the package configures and builds without adding any
 special options to the `configure' script.  For general options to the
 `configure' script, see the GNU `INSTALL' file in the distribution:
 
-     $> less ../sctp-0.2.26/INSTALL
+     $> less ../sctp-0.2.27/INSTALL
 
 For specific options to the `configure' script, see the `INSTALL-sctp'
 file in the distribution, or simply execute the configure script with
 the `--help' option like so:
 
-     $> ../sctp-0.2.26/configure --help
+     $> ../sctp-0.2.27/configure --help
 
 After configuring the package, the package can be compiled simply by
 issuing the `make' command:
@@ -229,8 +229,8 @@ Then the build directory and tarball can be simply removed:
 
      $> cd ..
      $> rm -rf build
-     $> rm -rf sctp-0.2.26
-     $> rm -f sctp-0.2.26.tar.bz2
+     $> rm -rf sctp-0.2.27
+     $> rm -f sctp-0.2.27.tar.bz2
 
  Detailed Installation Instructions
 -----------------------------------
@@ -239,7 +239,7 @@ More detailed installation instructions can be found in the
 `Installation', in the manual, contained in the distribution in `text',
 `info', `html' and `pdf' formats:
 
-     $> cd ../sctp-0.2.26
+     $> cd ../sctp-0.2.27
      $> less doc/manual/sctp.txt
      $> lynx doc/manual/sctp.html
      $> info doc/manual/sctp.info

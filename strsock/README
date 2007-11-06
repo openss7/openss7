@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Sockets -- read me first file.  2007-10-18
-$Id: README,v 0.9.2.30 2007/10/15 19:04:13 brian Exp $
+OpenSS7 STREAMS Sockets -- read me first file.  2007-11-05
+$Id: README,v 0.9.2.31 2007/11/06 09:55:20 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS Sockets
 ========================
 
-Package strsock-0.9.2.4 was released under GPLv2 2007-10-18.
+Package strsock-0.9.2.4 was released under GPLv2 2007-11-05.
 
 The `OpenSS7 STREAMS Sockets' package provides "STREAMS" modules and
 drivers, libraries, programs, initialization scripts, and daemons.
@@ -87,7 +87,7 @@ well.
  Release
 --------
 
-This is the `strsock-0.9.2.4' package, released 2007-10-18.  This
+This is the `strsock-0.9.2.4' package, released 2007-11-05.  This
 `0.9.2.4' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
