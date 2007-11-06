@@ -1,0 +1,282 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: om_xxx.3.man,v 0.9.2.1 2007/09/29 14:08:31 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:31 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: om_xxx.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:31  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH OM_OBJECT 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B OM_object
+\- Object \- XOM type definition for a handle to either a private or a public object.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xom.h>
+.HP
+.B typedef OM_descriptor *OM_object;
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+A data value of this data type represents an object, public or private.  It is
+an ordered sequence of one or more instances of the
+.I Descriptor
+data type.  See the
+.IR Private\0Object ,
+.BR OM_private_object (3),
+and
+.IR Public\0Object ,
+.BR OM_public_object (3),
+data types for constraints upon that sequence.
+.PP
+In the C interface, an object is represented by a pointer to (or into) and
+array of
+.BR OM_descriptor (3)
+elements.
+.PP
+There are three types of objects, from a service implementation's point of
+view:
+.IP \(bu \w'\(bu\(em'u
+.BR private\0objects \%\0(PRI)
+.br
+These are represented in an unspecified, private way in storage allocated by
+the service.  The client is only ablet oa ccess these objects by calling OM
+functions.
+.IP \(bu
+.BR service\-generated\0public\0objects \%\0(SPUB)
+These are represented as arrays of (OM_descriptor), in storage allocated by
+the service.  String values are also allocated in this way.  The client may
+not modify any of this store.  For example, it must not make assignments to
+any of the fields of the descriptors.
+.IP \(bu
+.BR client\-generated\0public\0objects \%\0(CPUB)
+These are represented as arrays of (OM_descriptor), in storage allocated by
+the client.  The client is responsible for management of this store and may
+freely modify it.
+.PP
+Implementations also need to discover whether a PRI or SPUB belongs to their
+workspace, or to some other.  These objects are allocated by a particular
+service implementation, in a workspace assocaitedw with that service.  Note
+that:
+.IP \(bu \w'\(bu\(em'u
+the internal representation (service view) and external representation (client
+view) of a CPUB are completely identical,
+.IP \(bu
+the external representaiton of a CPUB and a SPUB are identical,
+.IP \(bu
+the internal representation of a SPUB and a PRI must provide additional
+information in order to be able to call the OM function implementation
+associated with each SPUB and PRI.
+.PP
+The third statement is acheived by basing the internal representation of all
+service-generated objects on a two-element descriptor array.  These are
+referred to as the
+.IR -1st " and " 0th
+elements.
+The external representation (that is, the pointer to the client by
+.BR om_create (3),
+etc.) points to the second,
+.IR 0th ,
+descriptor.  The client is not aware of the existence of the first,
+.IR -1st ,
+descriptor.
+Note: In the case of CPUBs and SPUBs there will usually be additional
+descriptors following the
+.IR 0th ,
+which are visible to the client.
+Then a service implementation can distinguish the type of object using the
+.B type
+and
+.B syntax
+components of the
+.I 0th
+descriptor, as follows:
+.IP 1. \w'0.\(em'u
+Inspect the
+.B type
+component.  If it is
+.RB ( OM_PRIVATE_OBJECT ),
+the object is a PRI.  Otherwise, it is a SPUB or CPUB.
+.IP 2.
+Inspect the
+.RB ( OM_S_SERVICE_GENERATED )
+bit.  If this is set, the object is a SPUB.  Otherwise, it is a CPUB.
+.PP
+If it is a PRI or a SPUB, the associated workspace pointer is stored in the
+.B value.string.elements
+component of the
+.I -1st
+descriptor, and the correct function implementation can be called using this.
+.PP
+This means the storage for the workspace structure, and the function jump
+table, must remain allocated after the workspace has been shut down.  In order
+to eventually reclaim this storage, implementations may use a reference count
+of the number of service-generated descriptor arrays which have been allocated
+by
+.BR om_get (3)
+and not subsequently free by
+.BR om_delete (3).
+.PP
+Implementations need not, but may, allocate storage for the other components
+of the
+.I -1st
+descriptor (that is,
+.BR type ", " syntax " and " value.string.length )
+of PRIs and SPUBs.  THey may, but need not, allocate storage for the
+.B value
+component of the
+.I 0th
+descriptor of a PRI.  They must allocate the whole of the
+.I 0th
+descriptor of a SPUB, since this forms part of the data returned to the
+client.  Clients do not allocate the
+.I -1st
+descriptor of a CPUB, and the service must not refer to it.
+.PP
+Implementations may attach arbitrary private data in storage before or after
+the defined region of a PRI, and before the defined region of a SPUB.  They
+may use this as they wish.
+.PP
+Notes:
+.PP
+.IP 1. \w'0.\(em'u
+A service-generated public object might reference private subobjects, the
+handles of which are no longer valid, for example, when the corresponding
+parent private object has been deleted.  In order to determine whether a
+subobject in a service-generated public object is private, for example, when
+the service deletes a service-generated public object, the
+.RB ( OM_S_PRIVATE )
+bit in the public object's descriptor having the reference might be inspected.
+.IP 2.
+If a service-generated public object has public subobjects (for example, due
+to an
+.BR om_get (3)
+with no exclusions), the
+.I -1st
+descriptor will exist and the
+.B OM_S_SERVICE_GENERATED
+bit will be set on all public subobjects.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR OM_descriptor (3),
+.BR OM_public_object (3),
+.BR OM_private_object (3),
+.BR XOM (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR OM_object
+is compatible with XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR OM_object
+first appeared in XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XOM Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

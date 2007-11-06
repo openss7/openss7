@@ -1,0 +1,243 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_bind.3.man,v 0.9.2.1 2007/09/29 14:08:30 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:30 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_bind.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:30  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH DS_COMPARE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ds_compare
+\- compare an attribute value with that stored in a directory entry
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xds.h>
+.HP
+.BI "DS_status ds_compare(OM_private_object " session ", OM_private_object " context ", OM_object " name ", OM_Object " ava ", OM_private_object *" result_return ", OM_sint *" invoke_id_return );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Compares the value supplied in the given AVA with the value(s) of the same attribute type in the
+named entry.  The result of this operation can be abandonned.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I session
+.BR Session "(Object (Session))
+The directory session agains which this operation is performed.  This must be a private object.
+.TP
+.I context
+.BR Context "(Object (Context))
+The directory context to be used for this operation.  Note that the
+.B size-Limit
+does not apply to this operation.  This argument must be a private object or the constant
+.B Default-Context
+.RB [ DS_DEFAULT_CONTEXT ].
+.TP
+.I name
+.BR Name "(Object (Name))
+The name of the target object entry.  Any aliases in the name will be dereferenced unless prohibited
+by the relevant service control.
+.TP
+.I ava
+.BR AVA "(Object (AVA))
+The Attribute Value Assertion which specifies the attribute type and value to be compared with that
+in the entry.
+.\"
+.\"
+.SH RESULTS
+.PP
+.TP
+.I retval
+.BR Status (Status)
+Whether the comparison was completed or not, if used syncrhonously, or whether the operation was
+initiated, if used asynchronously.  Note that the operation fails and an error is returned either if
+the target object is not found or if it does not have an attribute of the required type.
+.TP
+.I return_result
+.BR Result "(Object (Compare-Result))
+Upon successful completion of a synchronous call, the result contains flags indicating whether the
+values matched and whether the comparison was made against the original entry.  It also contains the
+distinguished name of the target object if an alias was dereferenced.
+.TP
+.I invoke_id_return
+.BR Invoke-ID (Integer)
+The
+.B Invoke-ID
+of an asyncrhonous directory operation.
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a
+.B System-Error
+or one of the following
+.B Library-Errors:
+bad-argument, bad-class, bad-context, bad-name, bad-session, bad-workspace, miscellaneous,
+missing-type, too-many-operations.
+.PP
+The following
+.B Directory-Errors
+may be returned by the function (or by
+.BR ds_receive_result (3)
+when used asynchronously); Attribute-Error, Name-Error, Referral, Security-Error, Service-Error.
+.PP
+This function can return a
+.BR Communications-Error .
+.PP
+This function can return the error constant
+.RB [ DS_NO_WORKSPACE ].
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR ds_compare ()
+is implemented on top of the more complicated OSMIS 3.0 interface.
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ds_compare ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XDS (3),
+.BR XOM (3),
+.BR ds_abandon (3),
+.BR ds_receive_result (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This implementation is compatible with other implementations of the XDS.
+.[
+XDS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XDS.
+.[
+XDS
+.]
+Conformance is validated using an
+.BR autotest (1)
+script and the
+.BR test-xds (8)
+test suite executable.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ds_compare ()
+was first part of the
+.BR XDS .
+.[
+XDS
+.]
+.\"
+.\"
+.XX
+.[
+XOM
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

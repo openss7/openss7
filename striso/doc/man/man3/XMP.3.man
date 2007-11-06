@@ -1,0 +1,593 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_bind.3.man,v 0.9.2.1 2007/09/29 14:08:30 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:30 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_bind.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:30  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH XMP 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B XMP
+\- X/Open Management Protocol API (XMP)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.TP
+.BR mp_abandon (3)
+abandon locally the result of a pending asynchronous operation.
+.TP
+.BR mp_abort_req (3)
+abort a management association.
+.TP
+.BR mp_action_req (3)
+request an action on managed objects to be performed.
+.TP
+.BR mp_action_rsp (3)
+response to an Action request.
+.TP
+.BR mp_assoc_req (3)
+build a management association.
+.TP
+.BR mp_assoc_rsp (3)
+response to an association request.
+.TP
+.BR mp_bind (3)
+open a managemen session with the Agent(s) or the Manager(s).
+.TP
+.BR mp_cancel_get_req (3)
+cancel an outstanding asynchronous Get operation.
+.TP
+.BR mp_cancel_get_rsp (3)
+response to a Cancel-Get request.
+.TP
+.BR mp_create_req (3)
+request to create an object in the MIB.
+.TP
+.BR mp_create_rsp (3)
+response to a Create request.
+.TP
+.BR mp_delete_req (3)
+request to delete an object in the MIB.
+.TP
+.BR mp_delete_rsp (3)
+response to a Delete request.
+.TP
+.BR mp_error_message (3)
+return an error message describing a particular error.
+.TP
+.BR mp_event_report_req (3)
+request to forward a managment notification.
+.TP
+.BR mp_event_report_rsp (3)
+response to an Event Report request.
+.TP
+.BR mp_get_assoc_info (3)
+return negotiated connection values.
+.TP
+.BR mp_get_last_error (3)
+retrieve secondary error code.
+.TP
+.BR mp_get_next (3)
+request to get the next SNMP management information.
+.TP
+.BR mp_get_req (3)
+request to get management information.
+.TP
+.BR mp_get_rsp (3)
+response to Get request.
+.TP
+.BR mp_initialize (3)
+initialize the interface and create a workspace.
+.TP
+.BR mp_negotiate (3)
+negotiate features of the interface and service.
+.TP
+.BR mp_receive (3)
+retrieve the result of an asynchronously executed management operation or the content of a received
+management notification/indication.
+.TP
+.BR mp_release_req (3)
+release a management association.
+.TP
+.BR mp_release_rsp (3)
+response to a Release request.
+.TP
+.BR mp_set_req (3)
+request to modify (replace, add, remove) attribute value(s) of a managed object with the specified
+attribute value(s).
+.TP
+.BR mp_set_rsp (3)
+response to a Set request.
+.TP
+.BR mp_shutdown (3)
+discard a workspace.
+.TP
+.BR mp_unbind (3)
+close a management session.
+.TP
+.BR mp_validate_object (3)
+analyze an OM object.
+.TP
+.BR mp_wait (3)
+wait for the availability of management message(s) from one or more bound Sessions.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.SS Negotiation Sequence
+.PP
+The interface has an initialize and shutdown sequence that permits the
+negotiation of optional features.  This involves the functions
+.BR mp_initialize (3), 
+.BR mp_negotiate (3),
+and
+.BR mp_shutdown (3).
+Every application program must first call
+.BR mp_initialize (3),
+which returns a workspace.  This workspace supports only the standard Common
+Management Service Package.  The workspace can be extended to support either
+the CMIS package or the SNMP package or both, packages, or any vendor
+extensions.  Vendor extensions may include additional packages, and may also
+include additional or modified functionality.  All such packages or other
+extensions are identified by means of OSI Object Identifiers, and these Object
+Identifiers are supplied to the
+.BR mp_negotiate (3)
+function to incorporate the extensions into the workspace.  Features defined
+by the XMP
+.[
+XMP
+.]
+specification are described and assigned object identifiers by that package.
+A feature represents any package or any additional or modified functionality
+that is subject to negotiation.  The
+.BR mp_negotiate (3)
+function allows some particular features to be made available.
+.PP
+After a workspace with the required features has been negotiated in this way,
+the applications can use the workspace as required.  It can create and
+manipulate OM objects using the OM functions,
+.[
+XOM
+.]
+and can start one or more
+managemend sessions using
+.BR mp_bind (3).
+All the sessions on a given workspace share the same features.
+.PP
+Eventually, when it has completed its tasks, terminating all its management
+sessions using
+.BR mp_unbind (3),
+and released all its OM objects using
+.BR OM_delete (3),
+.[
+XOM
+.]
+the application should ensure that resources associated with the interface are
+freed by calling
+.BR mp_shutdown (3).
+.PP
+A miscellaneous error arises if an attempt is made to use an unavailable
+feature.  If an instance of a class that is not in an available package is
+supplied as a function argument, the bad-class error arises.
+.\"
+.\"
+.SS Names, Addresses and Titles
+.PP
+To address a wide variety of management and transport protocols, the interface
+is capable of accepting various forms of object names, system addresses and
+program or system titles.
+.IP \(bu \w'\(bu\(em'u
+.B Name
+is an \*(lqabstract class\*(rq that contains various subclass types used to
+define managed object instances.  For example, the DS-DN subclass is typically
+used for ISO mangaed obejct instance naming.
+.IP \(nu
+.B Address
+is an \*(lqabstract class\*(rq that contains varioius subclass types used to
+define the specific location to contact a particular agent or manager.  For
+example, the Network-Address subclass is typically used to define the location
+of an SNMP agent or manager.
+.IP \(nu
+.B Title
+is an \*(lqabstract class\*(rq that contains various subclass types used to
+define the specific program or system name responsible for a managed object
+instance.
+.PP
+All three abstract clases participate in an implementation-specific name
+resolution scheme.  It is assumed that if given a \fBName\fP, and
+implementation can determine the \fBTitle\fP responsible for that \fBName\fP.
+It is also assumed that given a \fBTitle\fP, an implementation can determine
+the \fBAddress\fP of that \fBTitle\fP.
+.PP
+Note: The way in which these relationships are resolved is implementation
+dependent, but use of the X/Open Directory Services, XDS,
+.[
+XDS
+.]
+should play a significant role.
+.PP
+The performer of an invoked operation or a reported notification may be
+explicitly designated at the interface boundary using the following precedence
+rules:
+.IP 1. \w'0.\(em'u
+A default Title and/or Address may be supplied as paramters to a bound
+session.  If both are provided, the implementation will verify that the Title
+resolves to the Address.
+.IP 2.
+If automated connection management is used, a performer Title and/or Address
+may be supplied as parameters within the context of a specific operation or
+notification request.  If both are provided, the implementation will verify
+that the Title resolves to the Address.  The context Title and/or Address
+takes precedence over the session's Title and/or Address for unconnected
+session objects.
+.IP 3.
+In the case of SNMP, a responder Address may be supplied as a parameter within
+the argument of a specific operation or notification request.  The argument
+Address takes precedence over either the session Title and/or Address or the
+context Title and/or Address.
+.IP 4.
+If the performer of an invoked operation or a reported notification is not
+explicitly designated at the interface boundary, the implementation will
+resolve the managed object Name to the appropriate Title and/or Address.
+.\"
+.\"
+.SS Session
+.PP
+A session identifies to which agent or to which manager a particular
+management operation or notification will be sent.  It contains some bind
+arguments, such as the name of the requestor.  The session is passed as the
+first argument to most interface functions.
+.PP
+A session is described by an OM object of OM class \fBSession\fP.  It is
+created, and appropriate parameter values may be set, using the
+OSI-Abstract-Data Manipulation
+.[
+XOM
+.]
+functions.  A management session is then started with
+.BR mp_bind (3)
+and later is terminated with
+.BR mp_unbind (3).
+A session with default parameters can be started by passing the constant
+\fBOM_DEFAULT_SESSION\fP as the \fBSession\fP argument to
+.BR mp_bind (3).
+.PP
+.BR mp_bind (3)
+must be called before the \fBSession\fP can be used as an argument to any
+other functions in this instance.  After
+.BR mp_unbind (3)
+has been called,
+.BR mp_bind (3)
+must be called again if another session is to be started.
+.PP
+The interface supports concurrent sessions, so that an application implemented
+as a single process, such as a server in a client-server model, can interact
+with the Management Information Services using several identities; and so that
+a process can interact directly and concurrently with different parts of the
+MIB.
+.PP
+A session can be used either acting as a manager, that is, invoker of
+management operations and performer of management notifications, or acting as
+an agent, that is, performer of management operations and invoker of
+management notifications, or both.
+.PP
+A session can be restricted for use only with a designated program called the
+responder.  When the responder is omitted and automated connection management
+is used, the session can be used to exchange management information with all
+processes.
+.PP
+The responder (title and address) parameters of an opened session, if present,
+specifies the performer of the requested operation or reported notification.
+The precedence reuls on address and title of the responder are described
+above.
+.PP
+Other OM attributes (vendors' implementation extensions) may be included to
+specify characteristics of the underlying protocol used.
+.PP
+There are three types of Session objects:
+.IP 1. \w'0.\(em'u
+.B ACM Enabled Session
+.RS
+.PP
+The \fBSession\fP collects together all the information which describes a
+particular management interaction.  The parameters which are to control such a
+session are set up in an instance of this OM class, which is then passed as an
+argument to
+.BR mp_bind (3).
+This sets the OM attributes which describe the actual characteristics of this
+session, and starts the session.  Such a strated session can be passed as the
+first argument ot management interface functions.
+.PP
+No attributes of a bound or connected session can be changed.  The result of
+modifying a started session is unspecified.
+.PP
+Finally,
+.BR mp_unbind (3)
+is used to terminate the sesssion, after which the parameters can be modified
+and a new session started using the same instance, if required.  Multiple
+concurrent sessions can be run, by using multiple instances of this OM class.
+.PP
+A session allows a requesting program (the requestor) to exchange management
+information with another program designated (the responder) or by default to
+all programs.
+.PP
+An ACM enable session thus allows:
+.IP \(bu \w'\(bu\(em'u
+a manager to access either a part of the MIB (that is, that accessible via the
+designated responding agent) or the whole MIB \(em in the later, the
+performing agent resolution is performed by the Management Information Service
+provider, according to the managed objects accessed;
+.IP \(bu
+an agent to report notifications either to a particular manager or
+independently of the possible recipient managers \(em in the latter, the
+destinations of the event fowarding are determined by the Management
+Information Service provider.
+.PP
+This type of session object can not be used to receive or sent ACSE related
+primitives or operations explicitly.  To use ACSE explicitly, see the next
+section on ACM being disabled.
+.RE
+.IP 2. \w'0.\(em'u
+.B ACM Disabled Session
+.RS
+.PP
+A session object can have Automatic Connection Management disabled via
+.BR mp_negotiate (3),
+which allows the user to explicity send and receive ACSE operations to build
+and tear down associations.  It gives explicit control over associations to
+the user.  The Management System Service provider does no ACSE operations on
+behalf of the user.
+.PP
+When the user creates and binds a session object, with ACM disabled, only the
+following attribtues within the session object can be specified:
+.IP \(bu \w'\(bu\(em'u
+requestor-Address
+.IP \(bu
+requestor-Title
+.IP \(bu
+role
+.PP
+This session object is then passed as an argumnet to
+.BR mp_bind (3),
+which binds the session.  This bound session can only be used to send ACSE
+related operations and to receive ACSE related primitives.  The following can
+be sent or received using this type of bound session:
+.IP \(bu \w'\(bu\(em'u
+\fBmp_receive\fP(3)/\fBMP_ASSOC_IND\fP
+.IP \(bu
+\fBmp_receive\fP(3)/\fBMP_ASSOC_CNF\fP
+.IP \(bu
+\fBmp_assoc_req\fP(3)
+.IP \(bu
+\fBmp_assoc_rsp\fP(3)
+.PP
+The other attribtues that relate to ACSE are specified within an
+Assoc-Argument object or Assoc-Result object which is pased to or returned
+from
+.BR mp_assoc_req (3),
+.BR mp_assoc_rsp (3)
+or
+.BR mp_receive (3).
+.RE
+.IP 3. \w'0.\(em'u
+.B Connected Session
+.RS
+.PP
+Once a user has created a bound session that has ACM disabled, an association
+can be created.  An association is represented by a connected session object.
+A connected session is returned as the result of building a new association.
+THe connected session is used, like a bound session, but sending and receiving
+management operations.  The major difference is that a connected session
+object can only be used to send and receive operations to or from a single
+remote entity.  After a session is connected, the user can release the
+association or abort the association, which implicitly unbinds the connected
+session.
+.PP
+Only CMISE operations can be send/received with a connected session.
+.PP
+The precedence rules for common parameters within the session and the context
+objects are different for connected session objects.   Once a session is in
+the connected state, the responder address and responder title can not be
+overridden by the context object.
+.PP
+To terminate this type of session, the user should either abort or release the
+session, which implicitly unbinds the session.  If the user unbinds the
+connected session prior to either releasing or aborting the session, the
+service provider will first attempt to release the association and if that is
+rejected, will abort the association.
+.RE
+.\"
+.\"
+.SS Context
+.PP
+The context defines the characteristics of the management interaction that are
+specific to a particular maangement operation or notification, but are often
+used unchanged for many operations or notifications.  Since these parameters
+are presumed to be relatively static for a gvien user during a particular
+management interaction, these arguments are collected into an OM object, of OM
+class \fBContext\fP, which is supplied as the second argument of each
+management service request.  This serves to reduce the number of arguments
+passed to each function.
+.PP
+The context includes various administrative details, such as the \fImode\fP
+defined in the Abstract Service, which affect the processing of each
+management operation.  These include a number of \fBService-Controls\fP and
+\fBLocal-Controls\fP, which allow control over some aspects of the service.
+The \fBService-Controls\fP include \fBaccess-Control\fP, \fBmode\fP,
+\fBpriority\fP, \fBresponder-Address\fP, and \fBresponder-Title\fP.  The
+\fBLocal-Controls\fP include \fBasynchronous\fP, \fBreply-Limite\fP, and
+\fBtime-Limit\fP.  Each of these is mapped onto an OM attribute in the
+context.
+.PP
+The effect is as if they were passed as a group of additional arguments on
+every function call.  The value of each component of the context is determined
+when the interface function is called, and remains fixed throughout the
+operatoin.
+.PP
+The precedence rules on address and title fo the responder are described
+above.
+.PP
+In the case of SNMP \fBGet\P and \fBSet\fP operations, if the parameter
+access-Control is supplied within the argument of the requested operation,
+this SNMP value takes precedence over the access-Control attribute of the
+context.
+.PP
+Some of the OM attributes of the \fBContext\fP have default values, some of
+which are locally administered.  The constant \fBMP_DEFAULT_CONTEXT\fP can be
+passed as the value of the \fBContext\fP argument to the interface functions,
+and has the same effect as a context OM object created with default values.
+The context must be a private object, unless it is \fBDefault-Context\fP.
+.\"
+.\"
+.SH USAGE
+.PP
+General rules are as follows:
+.IP 1. \w'0.\(em'u
+Initialize the workspace using
+.BR mp_initialize (3).
+.IP 2.
+Negotiate features of the interface using
+.BR mp_negotiate (3).
+.IP 3.
+Open one or several sessions using
+.BR mp_bind (3).
+.IP 4.
+Perform management interactions (operations or notifications) using the
+offered interface functions.  An interaction is identified by its
+\fBInvoke-Id\fP.
+.IP 5.
+Close the opened sessions using
+.BR mp_unbind (3).
+.IP 6.
+Discard the workspace using
+.BR mp_shutdown (3).
+.PP
+Nine states are defined in the interface to cover both interface service
+operations and management interactions:
+.PP
+.TS
+box center tab(:);
+cb|cbw(4.5i)
+li|l.
+State:Description
+_
+UNINIT:T{
+Workspace uninitialized.
+T}
+INIT:T{
+Workspace initialized.
+T}
+UNBND:T{
+Session closed.
+T}
+BND:T{
+Session opened.
+T}
+IDLE:T{
+No interaction initiated.
+T}
+OUTOP:T{
+Outstanding operation requested in a management interaction.
+T}
+OPIND:T{
+Operation indication received in a management interactoin.
+T}
+OUTNOT:T{
+Outstanding notification requested in a management interaction.
+T}
+NOTIND:T{
+Notificatoin indication received in a management interaction.
+T}
+.TE
+.\"
+.\"
+.XX
+.[
+XMP
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

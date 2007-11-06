@@ -1,0 +1,181 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH XMS 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B XMS
+\- Message Store API (XMS)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xms.h>
+.ad l
+.hy 0
+.HP
+.BI "MS_status ms_bind(OM_object " bind_argument ", OM_private_object *" bind_result_return ", OM_private_object *" bound_session_return );
+.HP
+.BI "MS_status ms_cancel_submission(OM_private_object " session ", OM_object " mts_identifier ", MS_invoke_id *" invoke_id_return );
+.HP
+.BI "MS_status ms_check_alert(OM_private_object " session ", OM_private_object *" check_alert_result_return );
+.HP
+.BI "MS_status ms_delete(OM_private_object " session ", OM_object " delete_argument ", MS_invoke_id *" invoke_id_return );
+.HP
+.BI "MS_status ms_fetch(OM_private_object " session ", OM_object " fetch_argument ", OM_private_object *" fetch_result_return ", MS_invoke_id *" invoke_id_return );
+.HP
+.BI "MS_status ms_initialize(MS_feature " feature_list[] ", OM_sint *" max_sessions ", OM_sint *" max_outstanding_operations ", OM_workspace *" workspace_return );
+.HP
+.BI "MS_status ms_list(OM_private_object " session ", OM_object " list_argument ", OM_private_object *" list_result_return ", MS_invoke_id *" invoke_id_return );
+.HP
+.BI "MS_status ms_receive_result(OM_private_object " session ", OM_uint *" completion_flag_return ", MS_status *" operation_status_return ", OM_private_object *" result_return ", MS_invoke_id *" invoke_id_return );
+.HP
+.BI "MS_status ms_register(OM_private_object " session ", OM_object " register_argument ", MS_invoke_id *" invoke_id_return );
+.HP
+.BI "MS_status ms_register_ms(OM_private_object " session ", OM_object " register_ms_argument ", MS_invoke_id *" invoke_id_return );
+.HP
+.BI "void ms_shutdown(void);
+.HP
+.BI "MS_status ms_submit(OM_private_object " session ", OM_object " communique ", OM_private_object *" submission_results_return ", MS_invoke_id *" invoke_id_return );
+.HP
+.BI "MS_status ms_summarize(OM_private_object " session ", OM_object " summarize_argument ", OM_private_object *" summarize_result_return ", MS_invoke_id *" invoke_id_return );
+.HP
+.BI "MS_status ms_unbind(OM_private_object " session );
+.HP
+.BI "MS_status ms_wait(OM_private_object " session ", OM_uint32 " interval ", OM_private_object *" wait_result_return ", MS_invoke_id *" invoke_id_return );
+.ad b
+.hy 6
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.B #include <xms.h>
+.TP
+.BR ms_bind (3)
+.TP
+.BR ms_cancel_submission (3)
+.TP
+.BR ms_check_alert (3)
+.TP
+.BR ms_delete (3)
+.TP
+.BR ms_fetch (3)
+.TP
+.BR ms_initialize (3)
+.TP
+.BR ms_list (3)
+.TP
+.BR ms_receive_result (3)
+.TP
+.BR ms_register (3)
+.TP
+.BR ms_register_ms (3)
+.TP
+.BR ms_shutdown (3)
+.TP
+.BR ms_submit (3)
+.TP
+.BR ms_summarize (3)
+.TP
+.BR ms_unbind (3)
+.TP
+.BR ms_wait (3)
+.\"
+.\"
+.XX
+.[
+XMS
+.]
+.[
+XAP
+.]
+.[
+XX25
+.]
+.[
+XOM
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

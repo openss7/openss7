@@ -1,0 +1,305 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_RO_BIND_IND 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Provider Interface (NPI)"
+.SH NAME
+.B AP_RO_BIND_IND
+\- show a request to establish an association.
+.\"
+.\"
+.SH INTERFACE
+.PP
+XAP,
+.[
+XAP ACSE
+.]
+XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap_rose.h>
+.HP
+.BI "int ap_rcv(int " fd ", unsigned long *" sptype ", ap_ro_cdata_t *" cdata ", ap_osi_vbuf_t **" ubuf ", int *" flags ", unsigned long *" aperrno_p ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+a file descriptor associated with the XAP-ROSE instance as returned from
+.BR ap_open (3)
+and initialized with
+.BR ap_ro_init (3).
+.TP
+.I sptype
+always
+.B AP_RO_BIND_IND
+for this primitive.
+.TP
+.I cdata
+a pointer to the control data structure for the primitive.
+.TP
+.I ubuf
+a pointer to a pointer to the user information returned for the primtive.
+.TP
+.I flags
+a pointer to flags returned for the primitive.
+.TP
+.I aperrno_p
+a pointer to a memory exent into which to received the diagnostic error code.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B AP_RO_BIND_IND
+primitive is used with
+.BR ap_rcv (3)
+and the XAP-ROSE environment to show a request to establish an association
+between two application entities wishing to use ROSE
+.[
+x219
+.]
+services.
+.PP
+The ROPM maps the
+.B AP_RO_BIND_IND
+primitive from the
+.BR A_ASSOC_IND (7)
+service
+directly.  The effects and restrictions of receiving the
+.B AP_RO_BIND_IND
+primitive are identical to the
+.BR A_ASSOC_IND (7)
+primitive.
+.PP
+Refer to the table on the
+.BR ap_rcv (3)
+manual page, under the
+.BR A_ASSOC_IND (7)
+section, for these effects and restrictions.
+.PP
+When issuing
+.BR ap_rcv (3),
+the arguments must be set as described on the
+.BR ap_rcv (3)
+manual page.  On return, the
+.BR ap_rcv (3)
+arguments will be set as
+described below.
+.TP
+.I fd:
+This integer value refers to the descriptor returned from a previous
+.BR ap_open (3)
+call.  It identifies the library instance that supports the
+association.
+.TP
+.I sptype:
+The value pointed to by this argument will be set to
+.BR AP_RO_BIND_IND .
+.TP
+.I cdata:
+The following members of the cdata structure are used for this primitive:
+.RS
+.TP
+.I cdata->udata_length
+The
+.I cdata->udata_length
+argument will be set to show the total number of octets of encoded
+user-information received with this primitive.
+.TP
+.I cdata->pci
+The
+.I cdata->pci
+argument will be set to the value of the presentation context id encoded
+within the presentation data value which contained the ROSE PDU.
+.TP
+.I cdata->env
+The
+.I cdata->env
+argument can be used to retrieve the values of the XAP environment
+attributes that correspond to parameters of the A-ASSOCIATE indication which
+carries the RO-BIND indication service. If the
+.B AP_COPYENV
+attribute in the XAP environment is false, these values will not be returned
+in the
+.I cdata
+argument and
+.I cdata->env
+will be set to NULL when
+.BR ap_rcv (3)
+returns. If
+.B AP_COPYENV
+is true, the XAP library will allocate an
+.B ap_a_assoc_env_t
+structure and any
+necessary substructures and return a pointer to it in
+.IR cdata->env .
+The caller
+can release the storage allocated for the
+.B ap_a_assoc_env_t
+structure and
+substructures by passing a pointer to
+.I cdata
+to
+.BR ap_free (3).
+The
+.BR A_ASSOC_IND (7)
+manual page in the XAP specification details the the elements of the
+.B ap_a_assoc_env_t
+structure used for this primitive.
+.RE
+.TP
+.I ubuf:
+Use of the ubuf argument is described on the
+.BR ap_rcv (3)
+manual page.
+.TP
+.I flags:
+This argument is used to control certain aspects of primitive processing as
+described in the manual page for
+.BR ap_rcv (3)
+in the referenced XAP
+specification.
+.TP
+.I aperrno_p:
+The location pointed to by the
+.I aperrno_p
+argument is set to an error code if a failure has occurred.
+.\"
+.\"
+.SH STATE
+.PP
+.SS Valid States
+.PP
+.SS New State
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+Refer to the manual page for
+.BR ap_rcv (3)
+in the referenced XAP specification.
+.\"
+.\"
+.SH ERRORS
+.PP
+Refer to the manual page for
+.BR ap_rcv (3).
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XAP-ROSE (3),
+.BR XAP (3),
+.BR ap_env (3),
+.BR ap_open (3),
+.BR ap_rcv (3),
+.BR A_ASSOC_IND (7).
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XAP Library under the OpenSS7 Project.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T4

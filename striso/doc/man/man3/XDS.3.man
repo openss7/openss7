@@ -1,0 +1,153 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_bind.3.man,v 0.9.2.1 2007/09/29 14:08:30 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:30 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_bind.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:30  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH XDS 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B XDS
+\- API to Directory Services (XDS)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP
+.BI "DS_status ds_abandon(OM_private_object " session ", OM_sint " invoke_id );
+.HP
+.BI "DS_status ds_add_entry(OM_private_object " session ", OM_private_object " context ", OM_object " name ", OM_object " entry ", OM_sint *" invoke_id_return ); 
+.HP
+.BI "DS_status ds_bind(OM_object " session ", OM_workspace " workspace ", OM_private_object *" bound_session_return );
+.HP
+.BI "DS_status ds_compare(OM_private_object " session ", OM_private_object " context ", OM_object " name ", OM_object " ava ", OM_private_object " result_return ", OM_sint *" invoke_id_return );
+.HP
+.BI "OM_workspace ds_initialize(void);
+.HP
+.BI "DS_status ds_list(OM_private_object " session ", OM_private_object " context ", OM_object " name ", OM_private_object *" result_return ", OM_sint *" invoke_id_return );
+.HP
+.BI "DS_status ds_modify_entry(OM_private_object " session ", OM_private_object " context ", OM_object " name ", OM_object " changes ", OM_sint *" invoke_id_return );
+.HP
+.BI "DS_status ds_modify_rdn(OM_private_object " session ", OM_private_object " context ", OM_object " name ", OM_object " new_RDN ", OM_boolean " delete_old_RDN ", OM_sint *" invoke_id_return );
+.HP
+.BI "DS_status ds_read(OM_private_object " session ", OM_private_object " context ", OM_object " name ", OM_object " selection ", OM_private_object *" result_return ", OM_sint *" invoke_id_return );
+.HP
+.BI "DS_status ds_receive_result(OM_private_object " session ", OM_sint " invoke_id ", OM_uint *" completion_flag_return ", DS_status *" operation_status_return ", OM_private_object *" result_return ", OM_sint *" invoke_id_return );
+.HP
+.BI "DS_status ds_remove_entry(OM_private_object " session ", OM_private_object " context ", OM_object " name ", OM_sint *" invoke_id_return );
+.HP
+.BI "DS_status ds_search(OM_private_object " session ", OM_private_object " context ", OM_object " name ", OM_sint " subset ", OM_object " filter ", OM_boolean " search_aliases ", OM_object " selection ", OM_private_object *" result_return ", OM_sint *" invoke_id_return );
+.HP
+.BI "DS_status ds_shutdown(OM_workspace " workspace );
+.HP
+.BI "DS_status ds_unbind(OM_private_object " session );
+.HP
+.BI "DS_status ds_version(DS_feature " feature_list[] ", OM_workspace " workspace );
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.TP
+.BR ds_abandon (3)
+.TP
+.BR ds_add_entry (3)
+.TP
+.BR ds_bind (3)
+.TP
+.BR ds_compare (3)
+.TP
+.BR ds_initialize (3)
+.TP
+.BR ds_list (3)
+.TP
+.BR ds_modify_entry (3)
+.TP
+.BR ds_modify_rdn (3)
+.TP
+.BR ds_read (3)
+.TP
+.BR ds_receive_result (3)
+.TP
+.BR ds_remove_entry (3)
+.TP
+.BR ds_search (3)
+.TP
+.BR ds_shutdown (3)
+.TP
+.BR ds_unbind (3)
+.TP
+.BR ds_version (3)

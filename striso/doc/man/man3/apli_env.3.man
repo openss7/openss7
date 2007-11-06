@@ -1,0 +1,892 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_ENV 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B ap_env
+\- APLI environment attributes.
+.\"
+.\"
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface (APLI).
+.[
+APLI UNIX International
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ap_lib.h>
+.br
+.B #include <osi_lib.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+THe APLI environment is made up of a set of attributes that are used to keep state information and
+to hold the various pieces of data required to establish and maintain an association with another
+application entity.  This manual page describes the environment attributes that are supported by the
+OpenSS7 APLI Library.
+.PP
+The current value assigned to a given attribute is returned by calling the function,
+.BR ap_get_env (3);
+the value assigned to a given attribute is modified by calling the function,
+.BR ap_set_env (3).
+All of the attributes in the environment can be save to a file with by calling the function,
+.BR ap_save (3);
+and attribtues can be read from a file with the
+.BR ap_init_env (3)
+and
+.BR ap_restore (3)
+functions.
+.PP
+Most of the APLI attributes have defualt values which are set when the APLI instance is intialized
+by calling the function
+.BR ap_init_env (3)
+(with no
+.IR env_file )
+and in many cases these default values will be sufficient to allow a service user to access ACSE and
+presentation layer services.  However, there are a minimum number of environment attributes that
+must be modified before an association can be established.
+.PP
+Before initiating an association request, the service user must ensure that the following
+environment attributes are set correctly:
+.PP
+.BR AP_BIND_PADDR ", " AP_CNTX_NAME ", " AP_REM_PADDR ", " AP_LIB_SEL .
+.PP
+Before responding to an association request, the service user must ensure that the following
+environment attributes are set correctly:
+.PP
+.BR AP_BIND_PADDR ", " AP_LIB_SEL .
+.PP
+Note that there are no default values for
+.BR AP_BIND_PADDR " and " AP_REM_PADDR .
+.\"
+.SS ATTRIBUTES
+.PP
+The environment variables supported by the OpenSS7 APLI Library implementation of APLI are as
+follows:
+.PP
+.TS
+tab(:);
+lblbw(5.5i)
+lbl.
+Attribute:Description
+_
+AP_ACSE_AVAIL:T{
+Indicates the available versions of the ACSE protocol.
+T}
+AP_ACSE_SEL:T{
+Indicates the selected version of the ACSE protocol.
+T}
+AP_BIND_PADDR:T{
+Binds the local presentation address to an APLI instance.
+T}
+AP_CLD_AEID:T{
+Conveys the called \fIAE-invocation-id\fP of the AARQ APDU.
+T}
+AP_CLD_AEQ:T{
+Conveys the called \fIAE-qualifier\fP of the AARQ APDU.
+T}
+AP_CLD_APID:T{
+Conveys the called \fIAP-invocation-id\fP of the AARQ APDU.
+T}
+AP_CLD_APT:T{
+Conveys the called \fIAP-title\fP of the AARQ APDU.
+T}
+AP_CLD_CONN_ID:T{
+Conveys the \fIsession-connection-id\fP proposed by the responder.
+T}
+AP_CLG_AEID:T{
+Conveys the calling \fIAE-invocation-id\fP of the AARQ APDU.
+T}
+AP_CLG_AEQ:T{
+Conveys the calling \fIAE-qualifier\fP of the AARQ APDU.
+T}
+AP_CLG_APID:T{
+Conveys the calling \fIAP-invocation-id\fP of the AARQ APDU.
+T}
+AP_CLG_APT:T{
+Conveys the calling \fIAP-title\fP of the AARQ APDU.
+T}
+AP_CLG_CONN_ID:T{
+Conveys the \fIsession-connection-id\fP proposed by the initiator.
+T}
+AP_CNTX_NAME:T{
+Conveys the \fIapplication-contex-name\fP of AARQ and AARE APDUs.
+T}
+AP_DCS:T{
+Specifies the \fIdefined-context-set\fP of abstract/transfer syntaxes.
+T}
+AP_DCN:T{
+Indicates the \fIdefault-context-name\fP of the CP PPDU.
+T}
+AP_DPCR:T{
+Indicates the \fIdefulat-context-result\fP of the CPR PPDU.
+T}
+AP_STREAM_FLAGS:T{
+Indicates the execution mode of the APLI instance.
+T}
+AP_INIT_SYNC_PT:T{
+Conveys the initial session synchronization point serial number.
+T}
+AP_LCL_PADDR:T{
+Indicates the local presentation address.
+T}
+AP_LIB_AVAIL:T{
+Indicates the available vesion of the APLI libraries.
+T}
+AP_LIB_SEL:T{
+Indicates the selected version of the APLI libraries.
+T}
+AP_MODE_AVAIL:T{
+INdicates the avialable modes of operation.
+T}
+AP_MODE_SEL:T{
+INdicates the selected mode of operation.
+T}
+AP_MSTATE:T{
+Indicates what data is pending.
+T}
+AP_PCDL:T{
+Lists the \fIpresentation-contexts\fP proposed by the initiator.
+T}
+AP_PCDRL:T{
+Lists the \fIpresentation-contexts\fP accepted or rejected by the responder.
+T}
+AP_PFU_AVAIL:T{
+Indicates which \fIpresentation-functional-units\fP are available.
+T}
+AP_PFU_SEL:T{
+Indicates which \fIpresentation-functional-units\fP are selected.
+T}
+AP_PRES_AVAIL:T{
+Indicates the available versions of the presentation layer.
+T}
+AP_PRES_SEL:T{
+Indicates the selected version of the presentation layer protocol.
+T}
+AP_REM_PADDR:T{
+Indicates the remote presentation address.
+T}
+AP_ROLE_ALLOWED:T{
+Indicates if the APLI instance can act as an initiator or responder.
+T}
+AP_ROLE_CURRENT:T{
+Indicates if the APLI instance is acting as an initiator or responder.
+T}
+AP_RSP_AEID:T{
+Conveys the responding \fIAE-invocation-id\fP of the AARQ APDU.
+T}
+AP_RSP_AEQ:T{
+Conveys the responding \fIAE-qualifier\fP of the AARQ APDU.
+T}
+AP_RSP_APID:T{
+Conveys the responding \fIAP-invocation-id\fP of the AARQ APDU.
+T}
+AP_RSP_APT:T{
+Conveys the responding \fIAP-title\fP of the AARQ APDU.
+T}
+AP_SESS_AVAIL:T{
+Indicates the available versions of the session layer protocol.
+T}
+AP_SESS_SEL:T{
+Indicates the selected the session layer protocol.
+T}
+AP_SESS_OPT_AVAIL:T{
+Indicates which optional session capabilities are available.
+T}
+AP_SFU_AVAIL:T{
+Indicates which optional \fIsession-functional-units\fP are available.
+T}
+AP_SFU_SEL:T{
+Indicates which optional \fIsession-functional-units\fP are selected.
+T}
+AP_STATE:T{
+Indicates the current state of the APLI instance.
+T}
+AP_TOKENS_AVAIL:T{
+Indicates which tokens are available for assignment.
+T}
+AP_TOKENS_OWNED:T{
+Indicates tokens currently assigned to the service user.
+T}
+_
+.TE
+
+.SS AP_ACSE_AVAIL
+.PP
+Indicates the available versions of the ACSE protocol.  For the OpenSS7 APLI Library implementation
+of APLI, this attribute always has the
+.BR AP_ASCEVER1
+bit set.
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:;unsigned long
+Values:;AP_ACSERVER1 (default)
+Readable:;always
+Writable:;never
+_
+.TE
+.SS AP_ACSE_SEL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_BIND_PADDR
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_CLD_AEID
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_CLD_AEQ
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_CLD_APID
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_CLD_APT
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_CLD_CONN_ID
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_CLG_AEID
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_CLG_AEQ
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_CLG_APID
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_CLG_APT
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_CLG_CONN_ID
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_CNTX_NAME
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_DCS
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_DCN
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_DPCR
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_STREAM_FLAGS
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_INIT_SYNC_PT
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_LCL_PADDR
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_LIB_AVAIL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_LIB_SEL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_MODE_AVAIL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_MODE_SEL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_MSTATE
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_PCDL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_PCDRL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_PFU_AVAIL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_PFU_SEL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_PRES_AVAIL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_PRES_SEL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_REM_PADDR
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_ROLE_ALLOWED
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_ROLE_CURRENT
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_RSP_AEID
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_RSP_AEQ
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_RSP_APID
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_RSP_APT
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_SESS_AVAIL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_SESS_SEL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_SESS_OPT_AVAIL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_SFU_AVAIL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_SFU_SEL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_STATE
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_TOKENS_AVAIL
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE
+.SS AP_TOKENS_OWNED
+.PP
+.PP
+.TS
+tab(;);
+lblw(5.5i).
+_
+Type:
+Values:
+Readable:
+Writable:
+_
+.TE

@@ -1,0 +1,219 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.TH AP_RO_RELEASE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B ap_ro_release
+\- release the ROSE user environment.
+.\"
+.\"
+.SH INTERFACE
+.PP
+XAP,
+.[
+XAP ACSE
+.]
+XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap_rose.h>
+.HP
+.BI "ap_ro_release(int " fd ", unsigned long *" aperrno_p ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+This integer value refers to the descriptor returned from a previous
+.BR ap_open (3)
+call.  It identifies the liberary instance that supports the association.
+.TP
+.I aperrno_p
+In case of failure,
+.I aperrno_p
+must be set to point to a location that will be used to carry an error code back to the user.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.BR ap_ro_release ()
+function releases an instance of the XAP-ROSE user environment from an established application
+association.
+.PP
+If this function returns success, the ROSE service provider has been disabled, and will no longer be
+active when an application association is esablished.
+.\"
+.\"
+.SH RETURN
+.PP
+On success,
+.BR ap_ro_release ()
+returns zero (0).  When an error occurs, minus one (-1) is returned and the location pointed to by
+.I aperrno_p
+is set to indicate the error.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR ap_ro_release ()
+fails, it returns minus one (-1) and sets the location pointed to by
+.I aperrno_p
+to one of the following error codes:
+.TP
+.RB [ AP_NOT_SUPPORTED ]
+The identified instance is not an XAP-ROSE instance - that is, the service provider selected in the
+call to
+.BR ap_open (3)
+does not support a ROSE service provider, or the AP_ROSE_MODE flag has not been set in the
+AP_MODE_SEL environment attribute.
+.PP
+In addition to these errors, any of the errors returned from the XAP Library may also be returned.
+See
+.BR aperrno (3).
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR aperrno (3),
+.BR ap_error (3),
+.BR ap_init (3),
+.BR ap_close (3),
+.BR ap_ro_init (3),
+.BR XAP (3),
+.BR XAP-ROSE (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ap_ro_release ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ap_ro_release ()
+is compatible with implementations based on XAP and XAP-ROSE with the following compatibility
+considerations:
+.IP \(em \w'\(em\(em'u
+.BR ap_ro_release ()
+may also return standard XAP errors.  See
+.BR ap_error (3).
+.IP \(em
+OpenSS7 XAP libraries also take environment attributes defaults and clues from the environment.
+.PP
+See
+.BR XAP-ROSE (3)
+for additional compatiblity considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP,
+.[
+XAP ACSE
+.]
+XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_ro_release ()
+first appeared in XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XAP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+

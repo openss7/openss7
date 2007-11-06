@@ -1,0 +1,233 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: strxns.5.man,v 0.9.2.4 2007/01/08 16:24:48 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/08 16:24:48 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: strxns.5.man,v $
+.\" Revision 0.9.2.4  2007/01/08 16:24:48  brian
+.\" - final updates for release
+.\"
+.\" Revision 0.9.2.3  2007/01/05 06:14:50  brian
+.\" - added GCOM api files, doc updates
+.\"
+.\" Revision 0.9.2.2  2007/01/03 14:50:44  brian
+.\" - documentation updates for release
+.\"
+.\" Revision 0.9.2.1  2006/12/31 13:56:11  brian
+.\" - added package manual page
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH HOSTENT 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Formats"
+.\"
+.\"
+.SH NAME
+.B hostent
+\- the HOST entity structure
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <netx25/xnetdb.h>
+.PP
+.nf
+\fC\s-1\
+struct hostent {
+        char *h_name;           /* official name of host */
+        char **h_aliases;       /* alias list */
+        int h_addrtype;         /* host address type */
+        int h_length;           /* length of address */
+        char **h_addr_list;     /* list of addresses */
+};\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The members of the
+.B hostent
+structure include:
+.TP \w'\fIh_addr_list\fR\(em'u
+.I h_name
+A pointer to the name of the X.25 host, as defined by the
+.I @sysconfdir@/x25/xhosts
+file.
+.TP
+.I h_aliases
+A pointer to an array of character pointers that point to aliases for the X.25 host.
+.TP
+.I h_addrtype
+The type of address being returned, this is always
+.BR CCITT_X25 .
+.TP
+.I h_length
+The length, in bytes, of the structure that contains the X.25 address.
+.TP
+.I h_addr_list
+A pointer to an
+.B xaddrf
+structure containing the network address of the
+X.25 host.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B hostent
+structure is defined int he
+.I @includedir@/netx25/xnetdb.h
+file.  It has the format shown under
+.IR \*(lq SYNOPSIS ,\*(rq
+above.
+.PP
+The
+.B hostent
+structure contains a single entry from the
+.I @sysconfdir@/x25/xhosts
+file.  This contains information about facilities and options to be used when making PAD calls to a
+particular address.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/netx25/xnetdb.h
+Defines the
+.B hostent
+structure.
+.TP
+.B @sysconfdir@/x25/xhosts
+Provides the
+.B hostent
+database.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR endxhostent (3),
+.BR getxhostbyaddr (3),
+.BR getxhostbyname (3),
+.BR getxhostent (3),
+.BR setxhostent (3).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B hostent
+structure has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B hostent
+structure is compatible with
+SunLink\(rg and products based on SunLink\(rg,
+.[
+sunlink9
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.B hostent
+is a Solaris\*(rg
+specific structure.  It may be necessary to define
+.B _SUN_SOURCE
+before including any header files to expose these symbols.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SunLink 8.1,
+.[
+sunlink8
+.]
+SunLink 9.0.
+.[
+sunlink9
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B hostent
+structure first appears in SunLink\(rg X.25.
+.[
+sunlink9
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

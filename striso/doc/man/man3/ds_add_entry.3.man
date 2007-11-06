@@ -1,0 +1,276 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_bind.3.man,v 0.9.2.1 2007/09/29 14:08:30 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:30 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_bind.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:30  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH DS_ADD_ENTRY 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ds_add_entry
+\- add a leaf entry to the directory information tree
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xds.h>
+.HP
+.BI "DS_status ds_add_entry(OM_private_object " session ", OM_private_object " context ", OM_object " name ", OM_object " entry ", OM_sint *" invoke_id_return );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Adds a leaf etnry to the directory.  The entry may be either an object or an alias.  The entry is
+only added if it conforms to the directory schema.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.BR ds_add_entry ()
+takes the following arguments:
+.TP
+.I session
+.BR Session (Object(Session))
+The directory session through which to submit the request.  This must be a private object.
+.TP
+.I context
+.BR Context (Object(Context))
+The directory user context to use for this operation.  Note that the
+.B size-Limit
+and
+.B dont-Dereference-Aliases
+do not apply to this operation.  This argument must be a private object or the constant
+.BR DS_DEFAULT_CONTEXT .
+.TP
+.I name
+.BR Name (Object(Name))
+The name of the entry to be added.  The immediate superior of the new entry is determined by
+removing the last RDN component (which belongs to the new entry).  The immediate superior should
+exist in the same DSA, otherwise, the function may fail with an Update-Error
+(affects-multiple-DSAs).  Any aliases in the name will
+.I not
+be dereferenced.
+.TP
+.I entry
+.BR Entry (Object(Attribute-List))
+The attribute information which, together with that from the RDN, constitutes the entry to be
+created.  Note that an instance of OM class
+.B Entry-Information
+can be suppied as the value of this argument, since
+.B Entry-Information
+is a subclass of
+.BR Attribute-List ,
+and so can be used as the value of this argument.
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.I invoke_id_return
+.BR Invoke-ID (Integer)
+The
+.B Invoke-ID
+of an asyncrhonous directory operation.  If the pointer,
+.IR invoke_id_return ,
+was passed as
+.BR NULL ,
+then the operation is a syncrhonous operation and will block pending a result.  When
+.RB non- NULL ,
+the operation is an asynchronous operation whose result can be retrieved with
+.BR ds_receive_result (3)
+or abandonned with
+.BR ds_abandon (3).
+.TP
+.I retval
+.BR Status (Status)
+Whether the entry was added or not, if used synchronously, or whether the operation was initiated,
+if used asyncrhonously. 
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a
+.B System-Error
+or on of the following
+.B Librar-Errors:
+bad-argument, bad-class, bad-context, bad-name, bad-session, bad-workspace, miscellaneous,
+missing-type, too-many-operations.
+.PP
+The following
+.B Directory-Errors
+may be returned by the function (or by
+.BR ds_receive_result (3))
+when used asynchronously); Attribute-Error, Name-Error, Security-Error, Service-Error, Update-Error.
+.PP
+The Update-Error (affects-multiple-DSAs), which is referred to in the argument descriptions, need
+not be returned if there is local agreement between the DSAs to allow the entry to be added.
+.PP
+This function can return a Communications-Error.
+.PP
+This function can return the error constant
+.RB [ DS_NO_WORKSPACE ],
+.RB [ DS_INVALID_WORKSPACE ]
+or
+.RB [ DS_SUCCESS ].
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR ds_add_entry ()
+is implemented on top of the more complicated OSMIS 3.0 interface.
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ds_add_entry ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XDS (3),
+.BR XOM (3),
+.BR ds_abandon (3),
+.\".BR ds_add_entry (3),
+.\".BR ds_bind (3),
+.\".BR ds_compare (3),
+.\".BR ds_initialize (3),
+.\".BR ds_list (3),
+.\".BR ds_modify_entry (3),
+.\".BR ds_modify_rdn (3),
+.\".BR ds_read (3),
+.BR ds_receive_result (3).
+.\".BR ds_remove_entry (3),
+.\".BR ds_search (3).
+.\".BR ds_shutdown (3),
+.\".BR ds_unbind (3),
+.\".BR ds_version (3),
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This implementation is compatible with other implementations of the XDS.
+.[
+XDS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XDS.
+.[
+XDS
+.]
+Conformance is validated using an
+.BR autotest (1)
+script and the
+.BR test-xds (8)
+test suite executable.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ds_add_entry ()
+was first part of the
+.BR XDS .
+.[
+XDS
+.]
+.\"
+.\"
+.XX
+.[
+XOM
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

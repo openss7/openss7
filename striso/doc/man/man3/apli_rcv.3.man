@@ -1,0 +1,402 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_RCV 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B ap_rcv
+\- recive an APLI ACSE/Presentation service primitive.
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface (APLI).
+.[
+APLI UNIX International
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ap_lib.h>
+.br
+.B #include <osi_lib.h>
+.HP
+.BI "int ap_rcv(
+.PD 0
+.RS
+.HP
+.BI "int " fd ,
+.HP
+.BI "unsigned long *" sptype ,
+.HP
+.BI "ap_cdata_t *" cdata ,
+.HP
+.BI "struct osi_buf *" ubuf ,
+.HP
+.BI "int *" flags
+.RE
+.HP
+.BI );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fIsptype\fP\(em'u
+.I fd
+file descriptor of APLI provider.
+.PD 0
+.TP
+.I sptype
+pointer to returned primitive name.
+.TP
+.I cdata
+pointer to union to return protocol information.
+.TP
+.I ubuf
+buffer into which to received user data.
+.TP
+.I flags
+pointer to returned continuation flags.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function is used to receive indication or configuration primtiives.  The file descriptor,
+.IR fd ,
+specifies the service provider.
+.PP
+When
+.BR ap_rcv ()
+is called,
+.I sptype
+must point to an
+.BR "unsigned long" ,
+and
+.I cdata
+must point to the
+.B ap_cdata_t
+union defined in the header
+.RB < ap_lib.h >.
+.PP
+Upon return, the value of the
+.B unsigned long
+pointed to by
+.I sptype
+will contain the value of a symbolic constant that identifies the received primitive.  The valid
+symbolic constants are derived from the primitive names by prefixing the name with
+'\fBAP_\fP' and are defined below:
+.PP
+.TS
+tab(:);
+lblblb
+lblil.
+Constant:Primitive:Description
+_
+AP_A_ASSOC_IND:A_ASSOC_IND:A-ASSOCIATE indication
+AP_A_ASSOC_CNF:A_ASSOC_CNF:A-ASSOCIATE confirmation
+AP_A_RELEASE_IND:A_RELEASE_IND:A-RELEASE indication
+AP_A_RELEASE_CNF:A_RELEASE_CNF:A-RELEASE confirmation
+AP_A_ABORT_IND:A_ABORT_IND:A-ABORT indication
+AP_A_PABORT_IND:A_PABORT_IND:A-P-ABORT indication
+AP_P_DATA_IND:P_DATA_IND:P-DATA indication
+AP_P_TOKENGIVE_IND:P_TOKENGIVE_IND:P-TOKEN-GIVE indication
+AP_P_TOKENPLEASE_IND:P_TOKENPLEASE_IND:P-TOKEN-PLEASE indication
+_
+.TE
+.PP
+Any additional protocol information received with a primitive is conveyed by the union of structures
+.B ap_cdata_t
+pointed to by
+.IR cdata .
+The value returned in
+.I sptype
+defines which members of the union
+.B ap_cdata_t
+are affected.
+.PP
+Any encoded
+.[
+x227
+.]
+.[
+x237
+.]
+user data associated with the received primitive will be returned to the user in the
+.B osi_buf
+structure pointed to by
+.IR ubuf .
+The
+.B osi_buf
+structure has the following members:
+.sp
+.nf
+\fC\s-1\
+struct osi_buf {
+    unsigned int maxlen;
+    unsigned int len;
+    char *buf;
+}
+\s+1\fP
+.fi
+.sp
+which are the same as a
+.BR netbuf (3)
+structure.
+.PP
+Before issuing the
+.BR ap_rcv ()
+call,
+.I ubuf->buf
+must point to the buffer where the data is to be placed and
+.I ubuf->maxlen
+must be set to the size of the buffer.  APLI will copy data to the buffer beginning at the location
+.IR "(ubuf->buf) + (ubuf->len)" .
+On return,
+.I ubuf->len
+will be incremented by the amout of data written to the
+buffer.
+.PP
+The
+.I flags
+argument must point to an
+.B integer
+when
+.BR ap_rcv ()
+is called.  On return, and if all of the data has not been received, the
+.B AP_MORE
+bit of
+.I flags
+will be set.  This indicates that repeated
+.BR ap_rcv ()
+calls are required to complete the data transfer.
+.PP
+The
+.I sptype argument must be checked after each
+.BR ap_rcv ()
+call because a new primitive (for example,
+.BR A_PABORT_IND )
+may arrive before all of the data is received and the remaining data will be lost.
+.PP
+If APLI is
+operating in syncrhonous mode,
+.BR ap_rcv ()
+blocks until an entire primitive is received, or the buffer is filled.  If APLI is operating in
+asynchronous mode,
+.BR ap_rcv ()
+returns an
+.BR AP_AGAIN
+error, which signals that the operation should be repeated.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon successful completion, a value of zero (0) is returned; otherwise, minus one (-1) is returned
+and
+.BR ap_errno (3)
+is set to indicate the error.  The corresponding error message is returned by calling the
+.BR ap_error (3)
+function.
+.\"
+.\"
+.SH ERRORS
+.PP
+.TP
+.RB [ AP_AGAIN ]
+\- request not completed.
+.TP
+.RB [ AP_LOOK ]
+\- a pending event requires attention.
+.TP
+.RB [ AP_PDUREJ ]
+\- invalid PDU rejected.
+.TP
+.RB [ AP_BADLSTATE ]
+\- instance in bad state for that command.
+.TP
+.RB [ AP_NOBUF ]
+.PP
+Also, operating system and asn.1 class errors may be reported.
+.\"
+.\"
+.SH EXAMPLE
+.PP
+The following example shows how
+.BR ap_rcv ()
+can be used to receive an assocation indication.
+.sp
+.RS
+.nf
+\fC\s-1\
+#include <ap_lib.h>
+#include <osi_lib.h>
+
+int
+RcvApliInd(int fd)
+{
+    ap_cdata_t cdata;
+    struct osi_buf ubuf;
+    unsigned long sptype;
+    int flags;
+    int rc;
+    char msg[128];
+
+    ubuf.maxlen = 128;
+    ubuf.len = 0;
+    ubuf.buf = msg;
+    rc = ap_rcv(fd, &sptype, &cdata, &ubuf, &flags);
+    if (rc != 0 || (sptype != A_ASSOC_IND)) {
+        printf("Error in ap_rcv A_ASSOC_IND %\n", ap_error());
+        return (FAIL);
+    }
+    return (SUCCESS);
+}
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH DRIVERS
+.PP
+.TP
+.BR /dev/oopi ", " /dev/streams/clone/oopi
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ap_rcv ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ap_set_env (3),
+.BR ap_get_env (3),
+.BR APLI (3).
+.\"
+.\"
+.SH COMPATIBLITY
+.PP
+.BR ap_rcv ()
+is compatible with APLI,
+.[
+APLI UNIX International October 25, 1990
+.]
+and implementation based on APLI such as
+.IR "Solaris\(rg SunLink OSI" ,
+.IR "Solaris\(rg Solstice OSI" ,
+.IR "HP OSI Transport Services/9000 (OTS/9000)" ,
+.IR "SVR 4.2 Open Network Services (ONS)" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR APLI (3)
+and
+.BR STREAMS (4)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_rcv ()
+first appeared in APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T2
+
+
