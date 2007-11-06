@@ -1,3 +1,37 @@
+2007-11-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strxns.refs: added SunLink X.25 9.0 reference
+
+	* doc/man/man3/endpadent.3.man: added manual page
+	* doc/man/man3/endxhostent.3.man: added manual page
+	* doc/man/man3/equalx25.3.man: added manual page
+	* doc/man/man3/getnettype.3.man: added manual page
+	* doc/man/man3/getpadbyaddr.3.man: added manual page
+	* doc/man/man3/getpadent.3.man: added manual page
+	* doc/man/man3/getxhostbyaddr.3.man: added manual page
+	* doc/man/man3/getxhostbyname.3.man: added manual page
+	* doc/man/man3/getxhostent.3.man: added manual page
+	* doc/man/man3/linkidtox25.3.man: added manual page
+	* doc/man/man3/padent.3.man: added manual page
+	* doc/man/man3/padtos.3.man: added manual page
+	* doc/man/man3/setpadent.3.man: added manual page
+	* doc/man/man3/setxhostent.3.man: added manual page
+	* doc/man/man3/stox25.3.man: added manual page
+	* doc/man/man3/x25_find_link_parameters.3.man: added manual page
+	* doc/man/man3/x25_read_config_parameters.3.man: added manual page
+	* doc/man/man3/x25_read_config_parameters_file.3.man: added manual page
+	* doc/man/man3/x25_save_link_parameters.3.man: added manual page
+	* doc/man/man3/x25_set_parse_error_function.3.man: added manual page
+	* doc/man/man3/x25_write_config_parameters.3.man: added manual page
+	* doc/man/man3/x25_write_config_parameters_file.3.man: added manual page
+	* doc/man/man3/x25tolinkid.3.man: added manual page
+	* doc/man/man3/x25tos.3.man: added manual page
+	* doc/man/man3/xhostent.3.man: added manual page
+	* doc/man/man3/xxx.3.man: added manual page
+	* doc/man/man5/hostent.5.man: added manual page
+	* doc/man/man5/padent.5.man: added manual page
+	* doc/man/man5/xhosts.5.man: added manual page
+
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
