@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: osi_lib.h,v 0.9.2.1 2007/11/06 12:16:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/11/06 12:16:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: osi_lib.h,v $
+ Revision 0.9.2.1  2007/11/06 12:16:50  brian
+ - added library and header files
+
  *****************************************************************************/
 
 #ifndef __OSI_LIB_H__
 #define __OSI_LIB_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: osi_lib.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 struct osi_buf {
 	unsigned int maxlen;

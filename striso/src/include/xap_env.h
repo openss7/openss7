@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: xap_env.h,v 0.9.2.1 2007/11/06 12:16:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/11/06 12:16:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xap_env.h,v $
+ Revision 0.9.2.1  2007/11/06 12:16:50  brian
+ - added library and header files
+
  *****************************************************************************/
 
 #ifndef __XAP_ENV_H__
 #define __XAP_ENV_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xap_env.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 enum {
 	AP_UNBOUND = 0,
