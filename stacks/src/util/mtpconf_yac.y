@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtpconf_yac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:40 $
+ @(#) $RCSfile: mtpconf_yac.y,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/11/06 09:40:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 11:57:40 $ by $Author: brian $
+ Last Modified $Date: 2007/11/06 09:40:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtpconf_yac.y,v $
+ Revision 0.9.2.3  2007/11/06 09:40:23  brian
+ - miscellaneous corrections
+
  Revision 0.9.2.2  2007/08/19 11:57:40  brian
  - move stdbool.h, obviate need for YFLAGS, general workup
 
@@ -62,9 +65,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: mtpconf_yac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:40 $"
+#ident "@(#) $RCSfile: mtpconf_yac.y,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/11/06 09:40:23 $"
 
-static char const ident[] = "$RCSfile: mtpconf_yac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:40 $";
+static char const ident[] = "$RCSfile: mtpconf_yac.y,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/11/06 09:40:23 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -405,15 +408,15 @@ command:
     ;
 
 usage:
-    TOK_USAGE { help(1, (char *[]){ prompt }); } TOK_EOL
+    TOK_USAGE { help(1, &prompt); } TOK_EOL
     ;
 
 copying:
-    TOK_COPYING { copying(1, (char *[]){ prompt }); } TOK_EOL
+    TOK_COPYING { copying(1, &prompt); } TOK_EOL
     ;
 
 version:
-    TOK_VERSION { version(1, (char *[]){ prompt }); } TOK_EOL
+    TOK_VERSION { version(1, &prompt); } TOK_EOL
     ;
 
 clear: TOK_CLEAR TOK_EOL { fprintf(stdout, "\f"); } ;
@@ -498,17 +501,17 @@ helpon(YYSTYPE what)
 {
 	switch (what) {
 	case TOK_USAGE:
-		usage(1, (char *[]) {prompt});
+		usage(1, &prompt);
 		break;
 	case TOK_COPYING:
-		copying(1, (char *[]) {prompt});
+		copying(1, &prompt);
 		break;
 	case TOK_VERSION:
-		version(1, (char *[]) {prompt});
+		version(1, &prompt);
 		break;
 	default:
 	case TOK_HELP:
-		help(1, (char *[]) {prompt});
+		help(1, &prompt);
 		break;
 	}
 	return;
@@ -585,7 +588,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permission.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.2 $ $Date: 2007/08/19 11:57:40 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.3 $ $Date: 2007/11/06 09:40:23 $");
 }
 
 void

@@ -8,6 +8,12 @@
 	* doc/projects/sg_platarch.fig: added sg document
 	* doc/projects/sg_sysarch.fig: added sg document
 
+	* doc/man/man3/t_accept.3.man: formatting correction
+	* doc/manual/x400p.texi: corrected vim directive
+	* src/util/mtpconf_yac.y: corrections for old bison/compiler
+	* src/util/sdlyac.y: corrections for old bison/compiler
+	* src/util/x400yac.y: corrections for old bison/compiler
+
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
