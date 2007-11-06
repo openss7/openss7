@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/10/16 06:04:18 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/11/06 12:54:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/16 06:04:18 $ by $Author: brian $
+# Last Modified $Date: 2007/11/06 12:54:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([OpenSS7],[0.9.2],[bugs@openss7.org],[openss7])
-AC_REVISION([$Name:  $($Revision: 0.9.2.32 $) $Date: 2007/10/16 06:04:18 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.33 $) $Date: 2007/11/06 12:54:55 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -187,6 +187,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.33  2007/11/06 12:54:55  brian
+# - added more top-level documentation
+#
 # Revision 0.9.2.32  2007/10/16 06:04:18  brian
 # - fix cross-compile bug
 #
