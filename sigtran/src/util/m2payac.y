@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2payac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:48:38 $
+ @(#) $RCSfile: m2payac.y,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/11/06 09:14:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 11:48:38 $ by $Author: brian $
+ Last Modified $Date: 2007/11/06 09:14:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2payac.y,v $
+ Revision 0.9.2.3  2007/11/06 09:14:38  brian
+ - corrections for old compilers
+
  Revision 0.9.2.2  2007/08/19 11:48:38  brian
  - move stdbool.h, bison changes
 
@@ -62,9 +65,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: m2payac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:48:38 $"
+#ident "@(#) $RCSfile: m2payac.y,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/11/06 09:14:38 $"
 
-static char const ident[] = "$RCSfile: m2payac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:48:38 $";
+static char const ident[] = "$RCSfile: m2payac.y,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/11/06 09:14:38 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -455,15 +458,15 @@ command:
     ;
 
 usage:
-    TOK_USAGE { help(1, (char *[]){ prompt }); } TOK_EOL
+    TOK_USAGE { help(1, &prompt); } TOK_EOL
     ;
 
 copying:
-    TOK_COPYING { copying(1, (char *[]){ prompt }); } TOK_EOL
+    TOK_COPYING { copying(1, &prompt); } TOK_EOL
     ;
 
 version:
-    TOK_VERSION { version(1, (char *[]){ prompt }); } TOK_EOL
+    TOK_VERSION { version(1, &prompt); } TOK_EOL
     ;
 
 clear: TOK_CLEAR TOK_EOL { fprintf(stdout, "\f"); } ;
@@ -746,16 +749,16 @@ helpon(int what)
 		", prompt);
 		return;
 	case TOK_USAGE:
-		usage(1, (char *[]) {prompt});
+		usage(1, &prompt);
 		break;
 	case TOK_COPYING:
-		copying(1, (char *[]) {prompt});
+		copying(1, &prompt);
 		break;
 	case TOK_VERSION:
-		version(1, (char *[]) {prompt});
+		version(1, &prompt);
 		break;
 	default:
-		help(1, (char *[]) {prompt});
+		help(1, &prompt);
 		break;
 	case TOK_HELP:
 		fprintf(stdout, "\
