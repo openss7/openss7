@@ -1,0 +1,210 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_bind.3.man,v 0.9.2.1 2007/09/29 14:08:30 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:30 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_bind.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:30  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH MP_SHUTDOWN 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B mp_shutdown
+\- Shutdown \- delete a workspace and the associated resources.
+.\"
+.\"
+.SH INTERFACE
+.PP
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xom.h>
+.br
+.B #include <xmp.h>
+.HP
+.BI "MP_status mp_shutdown(
+.PD 0
+.RS
+.HP
+.BI OM_workspace " workspace
+.RE
+.HP
+.BI );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I workspace
+Specifies the workspace (obtained from a call to
+.BR mp_initialize (3))
+that is to be deleted.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function deletes a workspace,
+.IR workspace ,
+established by
+.BR mp_initialize (3)
+and all the associated resources.  It may enable the service to release
+resources.
+.PP
+All the remaining opened sessions are closed, all the remaining OM objects are
+deleted, and the workspace is deleted.
+.PP
+No other functions may reference the specified workspace after it has been
+deleted.
+.\"
+.\"
+.SH RETURN
+.PP
+Returns \fBMP_status\fP reflecting the success or failure of the call.  When
+successful,
+.BR mp_shutdown ()
+returns
+.RB [ MP_SUCCESS ].
+When unsuccessful, a diagnostic error code is returned.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR mp_shutdown ()
+fails, the specified workspace is not deleted and an error code is returned as
+follows:
+.TP
+.RB [ MP_NO_WORKSPACE ]
+The specified workspace,
+.IR workspace ,
+does not exist or is invalid.
+.TP
+.RB [ MP_INSUFFICIENT_RESOURCES ]
+There were insufficient resources available to shut down the workspace.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+When
+.BR mp_initialize (3)
+is called, a new XMP instance is created by allocating an overloaded XOM workspace structure and
+initializing the values in the structure.  When
+.BR mp_shutdown (3)
+is called for the same workspace, the state of the session, context and other objects within the
+workspace can be used to determine what actions are necessary to terminate the objects.  All objects
+are freed and finally the overloaded XOM workspace structure is freed.
+.\"
+.\"
+.SH SEE ALSO
+.BR mp_initialize (3),
+.BR om_delete (3),
+.BR xmp (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM,
+.[
+xom
+.]
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XMP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.TI

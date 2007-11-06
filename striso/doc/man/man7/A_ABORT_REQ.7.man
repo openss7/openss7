@@ -1,0 +1,219 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH A_ABORT_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "X/Open ASCE/Presentation (XAP)"
+.SH NAME
+.B A_ABORT_REQ
+\- used to abort an association
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.B int ap_snd(
+.br
+.BI "int " fd ,
+.br
+.BI "unsigned long " sptype ,
+.br
+.BI "ap_cdata_t *" cdata ,
+.br
+.BI "ap_osi_vbuf_t *" ubuf ,
+.br
+.BI "int " flags ,
+.br
+.BI "unsigned long *" aperrno_p );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B A_ABORT_REQ
+primitive is used in conjunction with
+.BR ap_snd (3)
+and the XAP Library environment to request the abnormal release of an
+assocation.
+.PP
+See
+.BR ap_snd (3)
+for information concerning the effects of sending the
+.B A_ABORT_REQ
+primitive and restrictions on its use.
+.PP
+To send an
+.B A_ABORT_REQ
+primitive, the arguments to
+.BR ap_snd (3)
+must be set as described below:
+.\"
+.\"
+.SH ARGMENTS
+.TP
+.I fd
+This argument identifies the XAP Library instance being used.
+.TP
+.I sptype
+This argumnet must be set to
+.BR AP_A_ABORT_REQ .
+.TP
+.I cdata
+The following members of
+.I cdata
+are used for this primitive:
+.RS
+.TP
+.I udata_length
+The length of user-information field of the APDU.
+.RE
+.sp
+Where this primitive is to be sent using a series of calls to
+.BR ap_snd (3)
+with the
+.B AP_MORE
+flag set,
+.I cdata->udata_length
+should be set to the total number of octets of encoded user data that will be
+sent with this primtimive.  If the total number of octets of encoded user data
+is not known this filed may be set to -1.  However, in some XAP
+implementations setting this field to -1 may significantly degrade performance
+as it requires the implementation to buffer data until a complete SPDU can be
+transmitted.
+.sp
+The total number of octets of encoded user data that can be sent with this
+primtiive may be subject to an implementation dependent restriction.  Any such
+restriction will be stated in the CSQ for an implementation.
+.TP
+.I ubuf
+Use of the
+.I ubuf
+argument is described in the manual page for
+.BR ap_snd (3).
+.TP
+.I flags
+The
+.I flags
+arguemnt is used to control certain aspects of primitive processing as defined
+in the manual page for
+.BR ap_snd (3).
+.TP
+.I aperrno_p
+This must point to a location which iwill be set to an error code if a failure
+occurs.
+.\"
+.\"
+.SH RULES
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+Refer to the manual page for
+.BR ap_snd (3).
+.\"
+.\"
+.SH ERRORS
+.PP
+Refer to the manual page for
+.BR ap_snd (3).
+.\"
+.\"
+.SH MODES
+.PP
+.\"
+.\"
+.SH ORIGINATOR
+.PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

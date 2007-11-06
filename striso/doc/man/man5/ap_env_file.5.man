@@ -1,0 +1,764 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: striso.5.man,v 0.9.2.2 2007/01/05 06:26:19 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/05 06:26:19 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: striso.5.man,v $
+.\" Revision 0.9.2.2  2007/01/05 06:26:19  brian
+.\" - doc updates for release
+.\"
+.\" Revision 0.9.2.1  2006/10/12 13:06:23  brian
+.\" - added package manual page
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_ENV_FILE 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B ap_env_file
+\- XAP Environment File
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This manual page defines the format of an ACSE/Presentation Library
+initalizationa file.
+.PP
+An
+.B ap_env_file
+is an ASCII file contianing a list of XAP environment variable assignments.
+It is used as input to the
+.BR ap_osic (1)
+command, which generates a compiled version of the assignments for use as an
+environment initialization file by the
+.BR ap_init_env (3)
+function.  Support of the
+.BR ap_osic (1)
+command and the initialization of the XAP environment from an input file is
+optional, so this mechanism may not be available in all implementations of
+XAP.
+.PP
+Each
+.B ap_env_file
+file consists of the following types:
+.IP \(bu \w'\(by\(em'u
+Assignment paris of the form:
+.RS
+.PP
+.nf
+\fC\s-1\
+<attribute-name> = <value>\s+1\fP
+.fi
+.RE
+.sp
+where
+.B <attribute-name>
+is the name of an XAP library environment attribute and
+.B <value>
+is a legal value for the attribute.
+.IP \(bu
+C-style comments (/* ... */) with the syntax and semantifcs defined by ISO C.
+.IP \(bu
+.B #include
+lines with the syntax and semantics defined by the ISO C
+preprocessor.
+.IP \(bu
+.B #define
+lines with the syntax and semantics defined by the ISO c preprocessor for
+the '#define identifier token-sequence' form.
+.PP
+An entry may be split across multiple lines by terminating intermediate lines
+with a backslash character (\\).  Otherwise each entry must occupy a signle
+line.
+.PP
+An
+.B ap_env_file
+file may contain assignments for any of the settable XAP Library environment
+attribtutes.  The assignment pair may appear in any order provided each pair
+begins on a new line.
+.PP
+As not all attributes are of the same type, the format of
+.B <value>
+depends upon the particular attribute being initialized.  The table that
+follows lists all of the attributes that may be initialized in an
+.B ap_env_file
+file and the format each requires for the
+.B <value>
+component of its initialization pair.
+.PP
+.TS
+tab(:);
+lblblb
+lll.
+Attribute\0Name:Type:Value\0Format
+_
+AP_ACSE_SEL:unsigned\0long:bitmask
+AP_AFU_SEL:unsigned\0long:bitmask
+AP_BIND_PADDR:ap_paddr_t:address
+AP_CLD_AEID:ap_aei_api_id_t:encoded\0string
+AP_CLD_AEQ:ap_aeq_t:encoded\0string
+AP_CLD_APID:ap_aei_api_id_t:encoded\0string
+AP_CLD_APT:ap_apt_t:encoded\0string
+AP_CLD_CONN_ID:ap_conn_id_t:connection\0identifier
+AP_CLG_AEID:ap_aei_api_id_t:encoded\0string
+AP_CLG_AEQ:ap_aeq_t:encoded\0string
+AP_CLG_APID:ap_aei_api_id_t:encoded\0string
+AP_CLG_APT:ap_apt_t:encoded\0string
+AP_CLG_CONN_ID:ap_conn_id_t:connection\0identifier
+AP_CNTX_NAME:ap_objid_t:object\0identifier
+AP_COPYENV:long:integer\0constant
+AP_DPCN:ap_dcn_t:default\0context\0name
+AP_FLAGS:unsigned\0long:bitmask
+AP_INIT_SYNC_PT:unsigned\0long:integer\0constant
+AP_INIT_TOKENS:unsigned\0long:bitmask
+AP_LIB_SEL:unsigned\0long:bitmask
+AP_MODE_SEL:long\0integer:constant
+AP_PCDL:ap_cdl_t:context\0definition\0list
+AP_PFU_SEL:unsigned\0long:bitmask
+AP_PRES_SEL:unsigned\0long:bitmask
+AP_QLEN:long\0integer:constant
+AP_QOS:ap_qos_t:quality\0of\0service
+AP_REM_PADDR:ap_paddr_t:address
+AP_ROLE_ALLOWED:unsigned\0long:bitmask
+AP_RSP_AEID:ap_aei_api_id_t:encoded\0string
+AP_RSP_AEQ:ap_aeq_t:encoded\0string
+AP_RSP_APID:ap_aei_api_id_t:encoded\0string
+AP_RSP_APT:ap_apt_t:encoded\0string
+AP_SESS_SEL:unsigned\0long:bitmask
+AP_SFU_SEL:unsigned\0long:bitmask
+_
+.TE
+.PP
+Below is a description of the
+.B <value>
+formats specified in the preceding table.  Note that blanks, newlines,
+horizontal and vertical tabs and form feeds in the
+.B ap_env_file
+file are considered
+.I white space
+and are ignored except as token separators.
+.TP
+.B Address
+Values in this format must be given as
+.sp
+.RS
+.nf
+\fC\s-1\
+{ [p_selector], [s_selector], [t_selector], {{n_address}, [,{n_address}]*}}
+\s+1\fP
+.fi
+.sp
+where the components are defined as follows:
+.sp
+.TP
+.I p_selector
+A value in the octet string format of any length.
+.TP
+.I s_selector
+A value in the octet string format whose length cannot exceed 16 octets.
+.TP
+.I t_selector
+A value in the octet string format whose length cannot exceed 32 octets.
+.TP
+.I n_address
+One or more network addresses may be specified here in a comma separated list.
+Each network address is represented by a value in the octet string format
+whose length is less than or equal to 20, followed by an integer constant
+declaring the associated network type. When multiple network address
+components are included in a presentation address, the specific network
+address(es) chosen by the provider and the manner by which it is selected for
+initiating or listening to connections is not specified by XAP and is a local
+implementation issue.
+.RE
+.TP
+.B Bitmask
+Values in this format must be given as one or more items in the integer
+constant format OR'ed together (C-style).
+.TP
+.B Connection\0Identifier
+Values in this format must be given as a sequence of 3 values in the octet
+string format enclosed in braces and separated by commas.  The 3 elements of
+this sequence correspond, in order, to the Calling (or Called) SS-user
+reference, Common reference, and Additional reference information components
+of the session connecion identifier parameter.
+.TP
+.B Context\0Definition\0List
+Values in this format must eb given as a sequence of comma-separated 3-tuples
+enclosed in braces.  Each 3-tuple comprises the following comma-separated
+elements:
+.sp
+.RS
+.IP 1. \w'0.\(em'u
+a presentation context identifier in integer constant format,
+.IP 2.
+an abstract syntax name in object identifier format,
+.IP 3.
+a braced, comma separated sequence of transfer syntax names where each
+transfer syntax name is in object identifier format.
+.RE
+.TP
+.B Default\0Context\0Name
+Values in this format must be given as a 2-tuple enclosed in braces.  The
+first element of the 2-tupe is an abstract syntax name; the second is a
+transfer syntax name.  Both elements must be in the object identifier format
+and the two elements are separated by a comma.
+.TP
+.B Integer\0Constant
+Values in this format must be given as one of the following:
+.RS
+.IP \(bu \w'\(bu\(em'u
+a decimal integer,
+.IP \(bu
+an octal integer (prefixed by 0),
+.IP \(bu
+a hexadecimal integer (prefixed by 0x or 0X),
+.IP \(bu
+a sybolic constant that is either defined by the user in the
+.B ap_env_file
+file (using
+.BR #define ),
+or defined in a file included in the
+.B ap_env_file
+file (using
+.BR #include ).
+.PP
+Note that the constants in the
+.B <xap.h>
+file are included automatically.  Users are cautioned against redefining any
+of the constants in that file.
+.RE
+.TP
+.B Object\0Identifier
+Values in this format must be given as a sequence of values in the integer
+constant format that are separated by blanks and enclosed in braces.  The
+following identifiers of OBJECT IDENTIFIER component values have been assiged
+by ISO and CCITT and are recognized by
+.BR ap_osic (1):
+.sp
+.RS
+.RS
+.BR iso ,
+.BR standard ,
+.BR registration_authority ,
+.BR member_body ,
+.BR identified_organization ,
+.BR ccitt ,
+.BR recommendation ,
+.BR question ,
+.BR administration ,
+.BR network_operator ,
+.BR joint_iso_ccitt ,
+.BR asn1 ,
+.BR basic_encoding
+.RE
+.PP
+Note that the above identifiers use a "_" (underscore) character as a
+separated instead of a "-" (hyphen).  For example, joint-iso-ccitt is defined
+as joint_iso_ccitt.  Since the environment file format is "C" structure based,
+using a "-" as a separator would constitute an expression and not a
+definition.
+Also, the user may define other identifier values by using the
+.B #define
+preprocessor construct.
+.RE
+.TP
+.B Octet\0String
+Values in this format must be given as either an even number of hexadecimal
+digits or a legal C language string constant enclosed in braces.  Characters
+in string constants will be treated as 8-bit values where bit 8 (MSB) is 0 and
+the low order 7 bits correspond to the character's ASCII encoding.
+.TP
+.B Encoded\0String
+Values in this format must be given as a single value in the octet string
+format.  This octet string must correspond to a valid encoding of an ASN.1
+type value.
+.TP
+.B Quality\0of\0Service
+Values in this format must be given as
+.sp
+.RS
+.RS
+.nf
+\fC\s-1\
+{ {throughput}, {transdel}, {reserrorrate},
+  {transfailprob}, {estfailprob}, {relfailprob},
+  {estdelay}, {reldelay}, {connresil},
+  protection, priority, optimisedtrans, extcntl
+}\s+1\fP
+.fi
+.RE
+.sp
+where
+.I throughput
+and
+.I transdel
+must each be given as a pair
+{maximum}, {average};
+.I maximum
+and
+.I average
+must each be given as a pair
+{called}, {calling};
+.I called
+and
+.I calling
+must each be given as a pari of numeric values:
+target, minimumacceptable
+(see examples).
+.PP
+.IR reserrorrate ", " trasnffailprob ", " estfailprob ", " relfailprob ", " estdelay " and  " connresil
+each consisting of a pair of numeric values, the first being the target value
+and the second being the minum acceptable value.
+.PP
+.IR protection ", " priority ", " optimisedtrans " and " extcntl
+are integer constants.
+.RE
+.\"
+.\"
+.SH ENVIRONMENT
+.PP
+.TP
+.B AP_ACSE_AVAIL
+The available ACSE versions.
+Type \fBunsigned long\fP with bit values \fIAP_ACSEVER1\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_ACSE_SEL The selected ACSE version.
+Type \fBunsigned long\fP with bit values \fIAP_ASCEVER1\fP and default \fIAP_ACSEVER1\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_AFU_AVAIL
+The available ACSE optional functional units.
+Type \fBunsigned long\fP with bit values \fINULL\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_AFU_SEL
+The selected ACSE optional functional units.
+Type \fBunsigned long\fP with bit values \fINULL\fP and default \fINULL\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOC_ind\fP.
+.TP
+.B AP_BIND_PADDR
+The bind presentation address.
+Type \fBap_paddr_t\fP with default \fINULL\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_CLD_AEID
+The called application entity invocation-identifier (AE-invocation-identifier).
+Type \fBap_aei_api_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLD_AEQ
+The called application entity qualifier (AE-qualifier).
+(Note that combined with the AP-Title, this parameter forms the ASO-Title.)
+Type \fBap_aeq_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLD_APID
+The called application process invocation-identifier (AP-invocation-identifier).
+Type \fBap_aei_api_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLD_APT
+The called application application presentation title (AP-title).
+Type \fBap_apt_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLD_CONN_ID
+The called session connection identifier.
+Type \fBap_conn_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_CLG_AEID
+The calling application entity invocation-identifier (AE-invocation-identifier).
+Type \fBap_aei_api_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLG_AEQ
+The calling application entity qualifier (AE-qualifier).
+(Note that combined with the AP-Title, this parameter forms the ASO-Title.)
+Type \fBap_aeq_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLG_APID
+The calling application process invocation-identifier (AP-invocation-identifier).
+Type \fBap_aei_api_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLG_APT
+The calling application application presentation title (AP-title).
+Type \fBap_apt_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLG_CONN_ID
+The calling session connection identifier.
+Type \fBap_conn_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_COPYENV
+Type \fBlong\fP with choice of \fITRUE\fP or \fIFALSE\fP and default \fIFALSE\fP.
+This attribute is readable always and writable always.
+.TP
+.B AP_CNTX_NAME
+The application context name.
+Type \fBap_objid_t\fP with default none.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_DCS
+The Defined Context Set.
+.[
+x216
+.]
+This environment attribute represents the Defined-Context-Set (DCS) for the presentation connection
+as communicated to the PS-User.
+Type \fBap_dcs_t\fP.
+This attribute is readable in states other than \fBAP_UNBOUND\fP and writable never.
+.TP
+.B AP_DIAGNOSTIC
+The additional diagnostic information.
+Type \fBap_diag_t\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_DPCN
+The Default Presentation Context Name (Default-context-name).
+.[
+x216
+.]
+Type \fBap_dcn_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP. 
+In the initiator role, Defining an \fBAP_DPCN\fP prior to \fBA_ASSOC_REQ\fP will cause the
+Default-context-name parameter to be included in the \fIP-CONNECT request\fP.  In the responder
+role, \fbAP_DPCN\fP in conjunction with the \fBAP_DPCR\fP attribute will reflect the initiator's
+proposed Default-context-name.
+.TP
+.B AP_DPCR
+The Default Presentation Context Result (Default-context-result).
+.[
+x216
+.]
+Type \fBlong\fP with choice of \fIAP_DPCR_NOVAL\fP, \fIAP_ACCEPT\fP, \fIAP_USER_REJ\fP or \fIAP_PROV_REJ\fP and default \fIAP_DPCR_NOVAL\fP.
+This attribute is readable only in state \fBAP_WASSOCrsp_ASSOCind\fP and writable only in state \fBAP_WASSOCrsp_ASSOC_ind\fP.
+When an A_ASSOC_IND event is received, the value of this attribute represents the state of the
+default presentation context.  If the peer did not propose a Default-context-name, the value of this
+attribute will be \fIAP_DPCR_NOVAL\fP, and writing the value is not permitted.  If the peer proposed
+a Default-context-name that will be rejected by the provider, the value will be \fIAP_PROV_REJ\fP
+and writing the value is not permitted.  The \fBAP_DPCN\fP attribute will contain the rejected
+proposed default.  If the peer proposed a Default-context-name that is acceptable to the provider,
+the value will be \fIAP_ACCEPT\fP and the user may override this by writing \fIAP_USER_REJ\fP to the
+attribute before issuing an \fBA_ASSOC_RSP\fP.  The \fBAP_DPCN\fP attribute will contain the
+acceptable Default-context-name.
+.TP
+.B AP_FLAGS
+Type \fBunsigned long\fP with bit values \fIAP_NDELAY\fP.
+This attribute is readable always and writable always.
+.TP
+.B AP_INIT_SYNC_PT
+Type \fBunsigned long\fP with a range of values from \fIAP_MIN_SYNCP\fP(0) through \fIAP_MAX_SYNCP\fP(999999) and default value \fIAP_MIN_SYNCP\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_INIT_TOKENS
+Type \fBunsigned long\fP with bit values \fIAP_DATA_TOK_REQ\fP, \fIAP_DATA_TOK_ACPT\fP, \fIAP_DATA_TOK_CHOICE\fP, \fIAP_SYNCMINOR_TOK_REQ\fP, \fIAP_SYNCMINOR_TOK_ACPT\fP, \fIAP_SYNCMINOR_TOK_CHOICE\fP, \fIAP_MAJACT_TOK_REQ\fP, \fIAP_MAJACT_TOK_ACPT\fP, \fIAP_MAJACT_TOK_CHOICE\fP, \fIAP_RELEASE_TOK_REQ\fP, \fIAP_RELEASE_TOK_ACPT\fP, \fIAP_RELEASE_TOK_CHOICE\fP, and default values \fIAP_DATA_TOK_REQ\fP, \fIAP_SYNCMINOR_TOK_REQ\fP, \fIAP_MAJACT_TOK_REQ\fP, \fIAP_RELEASE_TOK_REQ\fP.
+This attribute is readable in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP, \fBAP_WASSOCcnf_ASSOCreq\fP and \fBAP_WASSOCrsp_ASSOCind\fP, and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_LCL_PADDR
+The local presentation address.
+Type \fBap_paddr_t\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_LIB_AVAIL
+The available library versions.
+Type \fBunsigned long\fP with bit values \fIAP_LIBVER1\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_LIB_SEL
+The selected library version.
+Type \fBunsigned long\fP with bit values \fIAP_LIBVER1\fP and default none.
+This attribute is readable always and writable only in state \fBAP_UNBOUND\fP.
+.TP
+.B AP_MODE_AVAIL
+The available modes.  This attribute represents the Presentation Mode selections supported by the
+local presentaiton-entity.
+Type \fBunsigned long\fP with bit values \fIAP_NORMAL_MODE\fP and \fIAP_X410_MODE\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_MODE_SEL
+The selected mode.  This attribute represents the value of the Presentation \fIMode\fP parameter.
+.[
+x216
+.]
+Type \fBunsigned long\fP with bit values \fIAP_NORMAL_MODE\fP and \fIAP_X410_MODE\fP and default \fIAP_NORMAL_MODE\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+This attribute indicates the mode of operation of the Presentation Layer.  It takes the value either
+\*(lqnormal\*(rq or \*(lqX.410-1984\*(rq.  If the value is \*(lqnormal\*(rq, the mode of operation
+of the Presentation Layer is the normal mode.  If the value is \*(lqX.410-1984\*(rq, the mode of
+operation of the Presentation Layer is the X.410-1984 mode.  In this mode of operation, the
+following restrictions apply:
+.RS
+.IP a) 4n
+the following parameter shall be absent in the P-CONNECT request service primitive:
+Presentation-context-definition-list, Default-context-name, and Presentatoin-requirements;
+.IP b)
+restrictions apply to the User-data parameters of certain presentation-service primitives; these are
+listed in X.216 Annex A.
+.[
+x216
+.]
+.RE
+.TP
+.B AP_MSTATE
+The segmentation state.
+Type \fBunsigned long\fP with bit values \fIAP_SNDMORE\fP and \fIAP_RCVMORE\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_OLD_CONN_ID
+The old connection identifier.
+Type \fBap_old_conn_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_OPT_AVAIL
+The available options.
+Type \fBunsigned long\fP with bit values \fIAP_NSAP_WILD\fP, \fIAP_TSEL_WILD\fP, \fIAP_SSEL_WILD\fP and \fIAP_PSEL_WILD\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_PCDL
+The presentation context definition list.
+Type \fBap_cdl_t\fP with default not present.
+This attribute is readable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_PFU_AVAIL
+The available optional presentation functional units.
+Type \fBunsigned long\fP with bit values \fINULL\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_PFU_SEL
+The selected optional presentation functional units.
+Type \fBunsigned long\fP with bit values \fINULL\fP and default \fINULL\fP.
+This attribute is readable always and writable only in stats \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_PRES_AVAIL
+The available presentation versions.
+Type \fBunsigned long\fP with bit values \fIAP_PRESVER1\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_PRES_SEL
+The selected presentation version.
+Type \fBunsigned long\fP with bit values \fIAP_PRESVER1\fP and default \fIAP_PRESVER1\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_QLEN
+The association indication queue length.
+Type \fBlong\fP with default zero (0).
+This attribute is readable always and writable only in state \fBAP_UNBOUND\fP.
+.TP
+.B AP_QOS
+The association quality of service.
+Type \fBap_qos_t\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_REM_PADDR
+The remote presentation address.
+Type \fBap_paddr_t\fP with default none.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_ROLE_ALLOWED
+The allowed roles.
+Type \fBunsigned long\fP with bit values \fIAP_INITIATOR\fP and \fIAP_RESPONDER\fP with default values \fIAP_INITIATOR\fP and \fIAP_RESPONDER\fP.
+This attribute is readable always and writable always.
+.TP
+.B AP_ROLE_CURRENT
+The current role.
+Type \fBunsigned long\fP with bit values \fIAP_INITIATOR\fP and \fIAP_RESPONDER\fP.
+This attribute is readable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP and is writable never.
+.TP
+.B AP_RSP_AEID
+The responding application entity invocation-identifier (AE-invocation-identifier).
+Type \fBap_aei_api_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_RSP_AEQ
+The responding application qualifier (AE-qualifier).
+(Note that combined with the AP-Title, this parameter forms the ASO-Title.)
+Type \fBap_aeq_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_RSP_APID
+The responding application process invocation-identifier (AP-invocation-identifier).
+Type \fBap_aei_api_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_RSP_APT
+The responding application application presentation title (AP-title).
+Type \fBap_apt_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_SESS_AVAIL
+The availale session versions.
+Type \fBunsigned long\fP with bit values \fIAP_SESSVER1\fP and \fIAP_SESSVER2\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_SESS_SEL
+The selected session version.
+Type \fBunsigned long\fP with bit values \fIAP_SESSVER1\fP and \fIAP_SESSVER2\fP and default \fIAP_SESSVER2\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_SESS_OPT_AVAIL
+The available session options.
+Type \fBunsigned long\fP with bit values \fIAP_UCBC\fP and \fIAP_UCEC\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_SFU_AVAIL
+The available session functional units.
+Type \fBunsigned long \fP with bit values \fIAP_SESS_HALFDUPLEX\fP, \fIAP_SESS_DUPLEX\fP, \fIAP_SESS_XDATA\fP, \fIAP_SESS_MINORSYNC\fP, \fIAP_SESS_MAJORSYNC\fP, \fIAP_SESS_RESYNC\fP, \fIAP_SESS_ACTMGMT\fP, \fIAP_SESS_NEGREL\fP, \fIAP_SESS_CDATA\fP, \fIAP_SESS_EXCEPT\fP, \fIAP_SESS_TDATA\fP, \fIAP_SESS_DATASEP\fP.
+This attribute is readable always and writable never.
+An additional value should be added, \fIAP_SESS_NOORDREL\fP, for avialability and selection of the No-orderly-release functional unit of \*(lqITU-T Rec. X.215 (1995)/Amd.1 (1997)\*(rq.
+An additional value should be added, \fIAP_SESS_NESTCON\fP, for availability and selection of the Nested-connections functional unit of \*(lqITU-T Rec. X.215 (1995)/Amd.2 (1997)\*(rq.
+.TP
+.B AP_SFU_SEL
+The selected session functional units.
+Type \fBunsigned long \fP with bit values \fIAP_SESS_HALFDUPLEX\fP, \fIAP_SESS_DUPLEX\fP, \fIAP_SESS_XDATA\fP, \fIAP_SESS_MINORSYNC\fP, \fIAP_SESS_MAJORSYNC\fP, \fIAP_SESS_RESYNC\fP, \fIAP_SESS_ACTMGMT\fP, \fIAP_SESS_NEGREL\fP, \fIAP_SESS_CDATA\fP, \fIAP_SESS_EXCEPT\fP, \fIAP_SESS_TDATA\fP, \fIAP_SESS_DATASEP\fP and default \fIAP_SESS_DUPLEX\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+An additional value should be added, \fIAP_SESS_NOORDREL\fP, for avialability and selection of the No-orderly-release functional unit of \*(lqITU-T Rec. X.215 (1995)/Amd.1 (1997)\*(rq.
+An additional value should be added, \fIAP_SESS_NESTCON\fP, for availability and selection of the Nested-connections functional unit of \*(lqITU-T Rec. X.215 (1995)/Amd.2 (1997)\*(rq.
+.TP
+.B AP_STATE
+The XAP state.
+Type \fBlong\fP with values \fIAP_UNBOUND\fP, \fIAP_IDLE\fP, \fIAP_DATA_XFER\fP, \fIAP_WASSOCrsp_ASSOCind\fP, \fIAP_WASSOCcnf_ASSOCreq\fP, \fIAP_WRELrsp_RELind\fP, \fIAP_WRELcnf_RELreq\fP, \fIAP_WRESYNrsp_RESYNind\fP, \fIAP_WRESYNcnf_RESYNreq\fP, \fIAP_WRELrsp_RELind_init\fP, \fIAP_WRELcnf_RELreq_rsp\fP, \fIAP_WACTDrsp_ACTDind\fP, \fIAP_WACTDcnf_ACTDreq\fP, \fIAP_WACTErsp_ACTEind\fP, \fIAP_WACTEcnf_ACTEreq\fP, \fIAP_WACTIrsp_ACTIind\fP, \fIAP_WACTIcnf_ACTIreq\fP, \fIAP_WSYNCMArsp_SYNCMAind\fP, \fIAP_WSYNCMAcnf_SYNCMAreq\fP, \fIAP_WCDATArsp_CDATAind\fP, \fIAP_WCDATAcnf_CDATAreq\fP, \fIAP_WRECOVERYind\fP, \fIAP_WRECOVERYreq\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_TOKENS_AVAIL
+The available presentation tokens.
+Type \fBunsigned long\fP with bit values \fIAP_DATA_TOK\fP, \fIAP_SYNCMINOR_TOK\fP, \fIAP_MAJACT_TOK\fP, \fIAP_RELEASE_TOK\fP.
+This attribute is readable in any states except \fBAP_UNBOUND\fP, \fBAP_IDLE\fP, \fBAP_WASSOCcnf_ASSOCreq\fP, \fBAP_WASSOCrsp_ASSOCind\fP and writable never.
+.TP
+.B AP_TOKENS_OWNED
+The owned presentation tokens.
+Type \fBunsigned long\fP with bit values \fIAP_DATA_TOK\fP, \fIAP_SYNCMINOR_TOK\fP, \fIAP_MAJACT_TOK\fP, \fIAP_RELEASE_TOK\fP.
+This attribute is readable in any states except \fBAP_UNBOUND\fP, \fBAP_IDLE\fP, \fBAP_WASSOCcnf_ASSOCreq\fP, \fBAP_WASSOCrsp_ASSOCind\fP and writable never.
+.\"
+.\"
+.SH "PACKAGE CONTENTS"
+.PP
+.\"
+.\"
+.SH MODULES
+.PP
+.\"
+.\"
+.SH DRIVERS
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.\"
+.\"
+.SH PREREQUISITES
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.IR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.SH STATUS
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

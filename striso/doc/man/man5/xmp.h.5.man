@@ -1,0 +1,349 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH XMP.H 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.SH NAME
+.B xmp.h
+\- XMP Header File
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xmp.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.RB < xmp.h >
+header file contains common definitions for the access to the Management Communication Service.
+.PP
+The interface uses part of the C public namespace for its facilities.  All identifiers start with
+the letters '\fImp\fP', '\fIMP\fP' or '\fIOMP\fP', and more detail of the conventions used are given
+in the following table.  Note that the interface reserves \fIall\fP identifiers starting with the
+letters '\fImpP\fP' for Private (i.e\&. internal) use by implementations of the interface.  It also
+reserves \fIall\fP identifiers starting with the letters '\fImpX\fP' or '\fIMPX\fP' for
+vendor-specific extensions of the interface.  Application programmers should not use any identifier
+staring with these letters.
+.PP
+The OSI-Abstract-Data Manipulation API uses similar, though not identical, naming conventions which
+are described in XOM.
+.[
+XOM
+.]
+All its identifiers are prefixed by the letters '\fIOM\fP' or '\fIom\fP'.
+.PP
+.TS
+box center tab(:);
+cb|cb
+l|li.
+Item:Prefix
+_
+reserved for implementors:mpP
+reserved for interface extensions:mpX
+reserved for interface extensions:MPX
+reserved for impleemntors:OMP
+_
+functions:mp_
+error \*(lqproblem\*(rq values:MP_E_
+enumeration tags (except errors):MP_T_
+OM class names:MP_C_
+OM value length limits:MP_VL_
+OM value number limits:MP_VN_
+other constants:MP_
+.TE
+.PP
+All application programs that use this interface must include the
+.RB < xom.h >
+and
+.RB < xmp.h >
+headers in that order, and at least one of the
+.RB < xmp_cmis.h >
+and
+.RB < xmp_snmp.h >
+headers.
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.TP
+.BR mp_abandon (3)
+Abandon locally the result of a pending asyncrhonous operation.
+.br
+This is a local function.
+.TP
+.BR mp_abort_req (3)
+Abort a management association.
+.br
+This is an ACSE service function.
+.TP
+.BR mp_action_req (3)
+Request an action on managed objects to be performed.
+.br
+This is an asyncrhonous CMIS service function.
+.TP
+.BR mp_action_rsp (3)
+Response to an action request on managed objects.
+.br
+This is a CMIS service function.
+.TP
+.BR mp_assoc_rsp (3)
+Response to an association request.
+.br
+This is an ACSE service function.
+.TP
+.BR mp_assoc_req (3)
+Build a management association.
+.br
+This is an asynchronous ACSE service function.
+.TP
+.BR mp_bind (3)
+Open a management session with the agent(s) or the manager(s).
+.br
+This is a local function.
+.TP
+.BR mp_cancel_get_req (3)
+Cancel an outstanding asyncrhonous get operation.
+.br
+This is an asynchronous CMIS service function.
+.TP
+.BR mp_cancel_get_rsp (3)
+Response to a cancel get request.
+.br
+This is a CMIS service function.
+.TP
+.BR mp_create_req (3)
+Request to create an object in the MIB.
+.br
+This is an asynchronous CMIS service function.
+.TP
+.BR mp_create_rsp (3)
+Response to a create request.
+.br
+This is a CMIS service function.
+.TP
+.BR mp_delete_req (3)
+Request to delete an object in the MIB.
+.br
+This is an asynchronous CMIS service function.
+.TP
+.BR mp_delete_rsp (3)
+Response to a delete request.
+.br
+This is a CMIS service function.
+.TP
+.BR mp_error_message (3)
+Return an error message describing a particular error.
+.br
+This is a local function.
+.TP
+.BR mp_event_report_req (3)
+Request to forware a management notification.
+.br
+This is an asynchronous CMIS service function.
+.TP
+.BR mp_event_report_rsp (3)
+Response to an event report request.
+.br
+This is a CMIS service function.
+.TP
+.BR mp_get_assoc_info (3)
+Return negotiated connection values.
+.br
+This is a local function.
+.TP
+.BR mp_get_last_error (3)
+Retrieve secondary error code.
+.br
+This is a local function.
+.TP
+.BR mp_get_next_req (3)
+Request to get the next SNMP management information.
+.br
+This is an asynchronous SNMP service function.
+.TP
+.BR mp_get_req (3)
+Request to get management information.
+.br
+This is an asynchronous CMIS or SNMP service function.
+.TP
+.BR mp_get_rsp (3)
+Response to get request.
+.br
+This is a CMIS or SNMP service function.
+.TP
+.BR mp_initialize (3)
+Initialize the interface and create a workspace.
+.br
+This is a local function.
+.TP
+.BR mp_negotiate (3)
+Negotiate features fo the interface and service.
+.br
+This is a local function.
+.TP
+.BR mp_receive (3)
+Retrieve the result of an asyncrhonously executed management operation or the content of a received
+management notification or indication.
+.br
+This is a local function.
+.TP
+.BR mp_release_rsp (3)
+Response to a release request.
+.br
+This is an ACSE service function.
+.TP
+.BR mp_release_req (3)
+Response to a release request.
+.br
+This is an ACSE service function.
+.TP
+.BR mp_set_req (3)
+Request to modify (replace, add, remove) attribute value(s) of a managed object with the specified
+attribute value(s).
+.br
+This is an asynchronous CMIS or SNMP service function.
+.TP
+.BR mp_set_rsp (3)
+Reponse to a set request.
+.br
+This is a CMIS or SNMP service function.
+.TP
+.BR mp_shutdown (3)
+Discard a workspace.
+.br
+This is a local function.
+.TP
+.BR mp_unbind (3)
+Close a management session.
+.br
+This is a local function.
+.TP
+.BR mp_validate_object (3)
+Analyze an OM object.
+.br
+This is a local function.
+.TP
+.BR mp_wait (3)
+Wait for the availability of management message(s) from one or more bound sessions.
+.br
+This is a local function.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.RB < xmp.h >
+.TP
+.RB < xom.h >
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR xmp (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XMP,
+.[
+XMP
+.]
+XOM.
+.[
+XOM
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XMP Library implementation.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.TI

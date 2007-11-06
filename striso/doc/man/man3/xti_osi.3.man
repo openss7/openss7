@@ -1,0 +1,241 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH XTI_OSI 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B xti_osi
+\- OSI Transport
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH ADDRESSING
+.PP
+Addressing varies according to whether one is using the XTI/TLI above OSI
+Transport,
+.[
+x214
+.]
+.[
+x224
+.]
+.[
+x234
+.]
+above RFC 1006,
+.[
+rfc1006
+.]
+or above CLNS.
+.[
+x233
+.]
+.\"
+.\"
+.SS Transport Layer Addressing
+.PP
+The TSAP, which identifies the transport provider, can be coded in hexadecimal
+or as a character string.  A TSAP is formed from the TSEL followed by the NSAP.
+The TSEL in the address is preceded by a 1 octet TSEL length, and the NSAP in
+the address is preceded by a 1 octet NSAP length.
+.\"
+.\"
+.SS RFC1006 Addressing
+.PP
+Addessing for RFC 1006
+.[
+rfc1006
+.]
+applications is formatted in the same way as that for transport layer
+applications, described above.  When using the
+.BR t_connect (3)
+function, the NSAP is replaced by a 4 octet IP address.  When using the
+.BR t_bind (3)
+function, the NSAP takes the value \*(lq\fBrk6\fP\*(rq.
+.\"
+.\"
+.SS CLNS Addressing
+.PP
+The NSAP, which identifies the network provider, can be coded in hexadecimal
+or as a characeter stirng.  An NSAP is formed from the NSAP preceved by a 1
+octet NSAP length.
+.\"
+.\"
+.SH FUNCTIONS
+.\"
+.SS t_bind\fR(3)
+.PP
+.I req->addr
+specifies the TSAP address.  The format of the TSAP address is described above
+under
+.RI \*(lq ADDRESSING .\*(rq
+Note that hwne interfacing to RFC1006,
+.[
+rfc1006
+.]
+the value for the NSAP field is \*(lq\fBrk6\fP\*(rq.
+.PP
+OSI supports both connection-oriented and connectionless mode protocols.
+As each uses a different NSAP, the TSAP address for connection and
+connectionless networks are different.  Therefore, the trasnport class (TC 0,
+1, 2, 3 and 4 over CONS, and TC 4 over CLNS) is selected after the endpoint
+has been bound.
+.SS t_close\fR(3)
+.PP
+No OSI provider-specific considerations.
+.SS t_connect\fR(3)
+.PP
+.I sndcall->addr
+specifies the TSAP address of the destination transport user.  Note that if
+you are interfacing to RFC1006,
+.[
+rfc1006
+.]
+the NSAP is replaced by a 4 octet IP address.  Refer to
+.RI \*(lq ADDRESSING ,\*(rq
+above.
+.SS t_error\fR(3)
+.PP
+No OSI provider-specific considerations.
+.SS t_free\fR(3)
+.PP
+No OSI provider-specific considerations.
+.SS t_getinfo\fR(3)
+.PP
+No OSI provider-specific considerations.
+.SS t_getstate\fR(3)
+.PP
+No OSI provider-specific considerations.
+.SS t_listen\fR(3)
+.PP
+.I call->addr
+returns the TSAP of the calling transport user.
+.SS t_look\fR(3)
+.PP
+No OSI provider-specific considerations.
+.SS t_open\fR(3)
+.PP
+.I path
+can be one of the following:
+.sp
+.TS
+tab(:);
+lblbss
+lblss.
+Pseudo-Device Driver:Transport Provider
+_
+/dev/otpi:T{
+OSI connection-oriented mode transport layer protocol.
+See
+.BR otpi (4).
+T}
+/dev/oclt:T{
+OSI connectionless mode transport layer protocol.
+See
+.BR oclt (4).
+T}
+/dev/otk6:T{
+RFC1006.
+See
+.BR otk6 (4).
+T}
+/dev/clnp:T{
+CLNS.
+See
+.BR clnp (4).
+T}
+.TE
+.PP
+Note that the
+.BR clnp (4)
+device,
+.BR /dev/clnp ,
+is really the CLNS device,
+.BR /dev/clns
+with an autopush specification for the
+.BR clnstpi (4)
+module, which converts between the native NPI interface of the OSI CLNS
+.[
+x213
+.]
+and the TPI interface.  This is for providing for XTI/TLI applications that
+run directly over CLNP.
+.[
+x233
+.]
+

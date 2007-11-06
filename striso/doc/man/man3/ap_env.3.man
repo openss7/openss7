@@ -1,0 +1,1451 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_ENV 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B ap_env
+\- XAP environment attributes
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.BI "int ap_init_env(int " fd ", const char *" env_file ", int " flags ", unsigned long *" aperrno_p );
+.HP
+.BI "int ap_get_env(int " fd ", unsigned long " attr ", void *" val ", unsigned long *" aperrno_p );
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+.TP
+.I env_file
+.TP
+.I flags
+.TP
+.I attr
+.TP
+.I val
+.TP
+.I aperrno_p
+.SH DESCRIPTION
+.PP
+.SH STRUCTURES
+.PP
+.SS ap_apt_t
+.PP
+The \fBap_apt_t\fP structure is used to represent AP-title parameters.  AP-titles can be coded in
+one of three forms:
+1) X.500 distinguished Name,
+2) OBJECT IDENTIFIER,
+3) PrintableString.
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	int size;
+	unsigned char *udata;
+} ap_apt_t;
+\s+1\fP
+.fi
+.SS ap_aeq_t
+.PP
+The \fBap_aeq_t\fP structure is used to represent AE-qualifier parameters.  AE-qualifiers can be
+coded in one of three forms:
+1) X.500 RelativeDistinguishedName,
+2) INTEGER,
+3) PrintableString.
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	int size;
+	unsigned char *udata;
+} ap_aeq_t;
+\s+1\fP
+.fi
+.SS ap_aei_api_id_t
+.PP
+The \fBap_aei_api_id_t\fP structure is used to represent AP-invocation-identifiers and
+AE-invocation-identifiers.  These identifiers are INTEGER.
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	int size;
+	unsigned char *udata;
+} ap_aei_api_id_t;
+\s+1\fP
+.fi
+.SS ap_ro_pci_list_t
+.PP
+The \fBap_ro_pci_list_t\fP structure is used to specify a list of abstract syntaxes that the ROPM is
+to examine to identify incoming ROSE PDUs.  It is defined as:
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	int size_pcil;
+	int *pci_list;
+} ap_ro_pci_list_t;
+\s+1\fP
+.fi
+.SS ap_aaid_t
+.PP
+\fBap_aaid_t\fP is used to convey objects specified as ASN.1 type
+ATOMIC-ACTION-IDENTIFIER
+and is defined as:
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	int size;
+	unsigned char *udata;
+} ap_aaid_t;
+\s+1\fP
+.fi
+.PP
+\fIudata\fP is a pointer to a buffer of user encoded
+ATOMIC-ACTION-IDENTIFIER;
+\fIsize\fP is the length of that buffer in octets.
+.SS ap_brid_t
+.PP
+\fBap_brid_t\fP is used to convey objects specified as ASN.1 type
+BRANCH-IDENTIFIER
+and is defined as:
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	int size;
+	unsigned char *udata;
+} ap_brid_t;
+\s+1\fP
+.fi
+.PP
+\fIudata\fP is a pointer to a buffer of user encoded
+BRANCH-IDENTIFIER;
+\fIsize\fP is the length of that buffer in octets.
+.SS ap_cid_t
+.PP
+\fBap_cid_t\fP is used to convey
+control identifier values,
+and is defined as:
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	int size;
+	unsigned char *udata;
+} ap_cid_t;
+\s+1\fP
+.fi
+.PP
+\fIudata\fP is a pointer to a buffer containg the
+control identifier;
+\fIsize\fP is the length of that buffer in octets.
+.SS ap_dtnid_t
+.PP
+\fBap_dtnid_t\fP is used to convey
+Dialog Tree Node Identifiers
+and is defined as:
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	int size;
+	unsigned char *udata;
+} ap_dtnid_t;
+\s+1\fP
+.fi
+.PP
+\fIudata\fP is a pointer to a buffer containing
+a Dialog Tree Node Idnetifier;
+\fIsize\fP is the length of that buffer in octets.
+.SS ap_urch_t
+.PP
+\fBap_urch_t\fP is used to convey the user-assigned recovery context handle to which an instance is
+bound,
+and is defined as:
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	int size;
+	unsigned char *udata;
+} ap_urch_t;
+\s+1\fP
+.fi
+.PP
+\fIudata\fP is a pointer to a buffer containing
+the user-assigned recovery context handle;
+\fIsize\fP is the length of that buffer in octets, in the range 0 to 32.
+.SS ap_tpaddr_t
+.PP
+\fBap_tpaddr_t\fP is used to convey the address to which an instance is bound and to declare the
+allowable set of TPSUTs for a responder.  It is defined as:
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	ap_apt_t apt;
+	ap_aei_api_id_t apid;
+	ap_aeq_t aeq;
+	ap_aei_api_id_t aeid;
+	long n_tpsuts;
+	ap_tpsut_t *tpsuts;
+} ap_tpaddr_t;
+\s+1\fP
+.fi
+.PP
+\fIapt\fP and \fIaeq\fP give the application entity title.  \fIapid\fP and \fIaeid\fP give the
+application process invocation identifier and application entity invocation identifiers,
+respectively.  The \fIn_tpsuts\fP element is used to specify the number of \fItpsut\fP comtponents
+in the array \fItpsuts\fP.  Each element in the array \fItpsuts\fP holds a TP service user title.
+.PP
+When used to represet a wildcard TP service user title, the value of \fIn_tpsuts\fP shall be zero.
+In this case, all locally-defined TP service user titles are implied.  In all other cases,
+\fIn_tputs\fP must be positive.
+.SS ap_tpsut_t
+.PP
+\fBap_tpsut_t\fP is used to convey objects specified as ASN.1 type
+TPSU-title
+and is defined as:
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	int size;
+	unsigned char *udata;
+} ap_tpsut_t;
+\s+1\fP
+.fi
+.PP
+\fIudata\fP is a pointer to a buffer of user encoded
+TPSU-title;
+\fIsize\fP is the length of that buffer in octets.
+TPSU-title values are stored in their encoded form, including tag and length.
+.PP
+For optional PDU parameters of type TPSU-title, setting size to -1 indicates that the parameter is
+not present.  IN an \fBap_tpaddr_t\fP structure, an element in the \fItpsuts\fP array having a
+\fIsize\fP of -1 indicates an omitted TPSU-title.  Also, an optional parameter that corresponds to
+an environment attribute may be specified to be absent by invoking ap_set_env(3) with a NULL pointer
+as the \fIval\fP argument.
+.SS ap_ttnid_t
+.PP
+\fBap_ttnid_t\fP is used to convey
+locally-defined Transaction Tree Node Identifiers
+and is defined as:
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	int size;
+	unsigned char *udata;
+} ap_ttnid_t;
+\s+1\fP
+.fi
+.PP
+\fIudata\fP is a pointer to a buffer of user-defined local transaction tree node identifier;
+\fIsize\fP is the length of that buffer in octets.
+.\"
+.\" =====================================================================================
+.\"
+.\"
+.SH ENVIRONMENT
+.PP
+.SS XAP Attributes
+.PP
+.TP
+.B AP_LIB_AVAIL
+The AP_LIB_AVAIL attribute indicates which versions of XAP are available to the user.
+The available library versions.
+Type \fBunsigned long\fP with bit values \fIAP_LIBVER1\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_LIB_SEL
+The AP_LIB_SEL attribute is used to indicate which version of XAP is used. This attribute must be
+set before any other attributes are set or any primitives are issued.
+The selected library version.
+Type \fBunsigned long\fP with bit values \fIAP_LIBVER1\fP and default none.
+This attribute is readable always and writable only in state \fBAP_UNBOUND\fP.
+.TP
+.B AP_OPT_AVAIL
+The AP_OPT_AVAIL attribute is used to indicate what optional functionality is supported in the
+underlying protocol implementation. AP_XXXX_WILD indicates whether address wildcarding is supported
+at the specified level. (XXXX can be NSAP, TSEL, SSEL or PSEL.) 
+.RS
+.TP \w'\fIAP_NSAP_WILD\fP\(em'u
+.I AP_NSAP_WILD
+NSAP can be wildcarded.
+.PD 0
+.TP
+.I AP_TSEL_WILD
+TSEL can be wildcarded.
+.TP
+.I AP_SSEL_WILD
+SSEL can be wildcarded.
+.TP
+.I AP_PSEL_WILD
+PSEL can be wildcarded.
+.PD
+.PP
+The available options.
+Type \fBunsigned long\fP with bit values \fIAP_NSAP_WILD\fP, \fIAP_TSEL_WILD\fP, \fIAP_SSEL_WILD\fP and \fIAP_PSEL_WILD\fP.
+This attribute is readable always and writable never.
+.RE
+.TP
+.B AP_MODE_AVAIL
+The AP_MODE_AVAIL attribute indicates the available modes of operation for XAP and Provider. The
+modes that may be supported are normal (AP_NORMAL_MODE) and X.410-1984 (AP_X410_MODE).
+The available modes.  This attribute represents the Presentation Mode selections supported by the
+local presentaiton-entity.
+Type \fBunsigned long\fP with bit values \fIAP_NORMAL_MODE\fP, \fIAP_X410_MODE\fP,
+\fIAP_ROSE_MODE\fP and \fIAP_TP_MODE\fP.
+This attribute is readable always and writable never.
+.sp
+The AP_MODE_AVAIL attribute indicates the available modes of operation for XAP and provider.  The
+modes that may be supported are those of XAP plus TP mode (AP_TP_MODE).  See also the XAP definition
+of AP_MODE_AVAIL.
+.sp
+An additional flag, AP_ROSE_MODE is defined for this environment attribute.  If set, the service
+provider specified in the call to ap_open(3) is capable of providing the ROSE service.  If this flag
+is set, the equivalent flag in AP_MODE_SEL may be set to use the XAP-ROSE features of the service
+provider.
+.TP
+.B AP_MODE_SEL
+The AP_MODE_SEL attribute indicates the mode (normal or X.410-1984) in which XAP and Provider are to
+be used. This value is used as the mode parameter of the CP PPDU. When this attribute is set to
+AP_X410_MODE (indicating the X.410-1984 mode is in effect), certain other attributes are not used.
+The readability and writability of these attributes is not affected; but their values will not be
+used or updated by XAP. A list of the attributes that are not used in the X.410-1984il mode is
+provided below.
+.sp
+Attributes Not Used in X.410-1984 Mode: AP_ACSE_AVAIL AP_CLD_APT AP_DPCN AP_PRES_SEL AP_ACSE_SEL
+AP_CLG_AEID AP_DPCR AP_RSP_AEID AP_AFU_AVAIL AP_CLG_AEQ AP_PCDL AP_RSP_AEQ AP_AFU_SEL AP_CLG_APID
+AP_PCDRL AP_RSP_APID AP_CLD_AEID AP_CLG_APT AP_PFU_AVAIL AP_RSP_APT AP_CLD_AEQ AP_CNTX_NAME
+AP_PFU_SEL AP_CLD_APID AP_DCS AP_PRES_AVAIL
+.sp
+The AP_MODE_SEL attribute indicates the mode in which XAP and provider are to be used.  Only one
+mode can be selected at a time.  A provide which supports only TP mode will have this attribute sete
+to AP_TP_MODE as default.
+.sp
+An additional flag, AP_ROSE_MODE is defined for this environment attribute.  Setting this flag
+cuases the functions, environment attributes and primitives defined by this specification are
+initialized to their default state and become available to the service user.
+.sp
+Clearing the AP_ROSE_MODE flag in AP_MODE_SEL causes the XAP-ROSE functions, environment attributes
+and primitives to become unavailable, and, if enabled, disables the ROSE protocol machine (ROPM).
+.sp
+This attribute is type \fBunsigned long\fP with bit values \fIAP_NORMAL_MODE\fP, \fIAP_X410_MODE\fP,
+\fIAP_ROSE_MODE\fP and \fIAP_TP_MODE\fP.  The attribute is readable always and writable only in
+states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP, \fBAP_TP_UNBOUND\fP and \fBAP_TP_IDLE\fP.
+.TP
+.B AP_QLEN
+The AP_QLEN attribute is used to indicate the number of connection indications that will be held by
+the provider when all of the connection endpoints bound for listening at AP_BIND_PADDR are in use.
+The user can set this attribute to request a specific queue size. The provider may change the value
+if it cannot support the requested queue size or if another process bound to the same address has
+already requested a larger queue. The user can determine the current queue size by examining the
+value of AP_QLEN using ap_get_env( ).
+.sp
+The association indication queue length.
+Type \fBlong\fP with default zero (0).
+This attribute is readable always and writable only in state \fBAP_UNBOUND\fP.
+.TP
+.B AP_COPYENV
+The AP_COPYENV attribute is used to indicate whether certain environment attributes that correspond
+to parameters on the A-ASSOCIATE indication and confirmation services should be returned to the user
+in the cdata argument of the ap_rcv( ) function. When the value of this attribute is TRUE, these
+attributes are returned via the cdata argument.
+.sp
+Type \fBlong\fP with choice of \fITRUE\fP or \fIFALSE\fP and default \fIFALSE\fP.
+This attribute is readable always and writable always.
+.TP
+.B AP_DIAGNOSTIC
+The AP_DIAGNOSTIC attribute is used to pass diagnostic details on error conditions reported by ACSE,
+Presentation, Session and Transport providers, in addition to that conveyed with the A_PABORT_IND
+primitive. This mechanism is used to provide descriptive text for all errors reported by XAP, and
+may be used to provide additional diagnostic information (for example, errors in incoming APDUs
+reported by the local ACPM, or the reason for a transport layer disconnect). It should be noted that
+the information provided by this attribute is implementationdependent - that is, an implementation
+may not report all of the source/reason/event combinations defined for this attribute.  However, if
+an implementation does use the attribute to report diagnostic information, it must use the
+classifications defined in this specification.
+.sp
+The additional diagnostic information.
+Type \fBap_diag_t\fP.
+This attribute is readable always and writable never.
+.\"
+.\"
+.SS TP Attributes
+.PP
+In XAP-TP, there are a set of attributes that apply to the node in the dialogue or transaction tree
+rather than to a specific dialogue.  These are referred to as global attributes, and are accessible
+through the environment of each instance tied to the node.
+.PP
+Setting the value of a global attribute through the environment of one instance changes the value
+for all instances tied to the node.
+.PP
+The additional global TP attributes in the XAP-TP environment are:
+.\"
+.TP
+.B AP_AAID
+The AP_AAID attribute holds the Atomic Action Identifier of the transaction on the TPSUIs node in
+the transaction tree.  If none of the dialogues of the TPSUI are in transaction mode, the attribute
+holds the Atomic Action Identifier to be used for the next transaction to be commenced by the TPSUI.
+.sp
+The typeof this attribute is an \fBap_aaid_t\fP with default not present.
+The attribute is readable always and writable in any state that the node is not in a transaction.
+.\"
+.TP
+.B AP_NEXT_AAID
+The AP_NEXT_AAID attribute holds the Atomic Action Identifier to be used for the next transaction on
+the TPSUIs node in the transaction tree when chained transactions are in use.  If unset, a new AAID
+will be generated by the TP service provider.
+.sp
+When the next transaction in a chain starts at a root node, the value in this attribute is used as
+the Atomic Action Identifier for the transaction.  It is copied to the AP_AAID attribute and this
+attribute is unset.  If the attribute is not set, the OSI TP implementation will generate a new
+Atomic Activity Identifier and place it in the AP_AAID attribute.
+.sp
+This atribute is type \fBap_aaid_t\fP with default not present.
+It is readable always and writable only in states AP_TP_WCOMMITind, AP_TP_COMMIT_WDONEreq,
+AP_TP_WCOMMIT_COMPind, AP_TP_WROLL_COMPind, AP_TP_ZOMBIE, AP_TP_WRESUMEreq, AP_TP_RESUME,
+AP_TP_WRESTARTreq, AP_TP_RESTART, AP_TP_W_RESTART_COMPLETEind.
+.\"
+.TP
+.B AP_NEXT_TTNID
+The AP_NEXT_TTNID holds the next Transaction Tree Node Identifier to be used to identify the next
+transaction in a chain when chained transactions are in use.
+.sp
+When the next transaction in a chain commences at a node, the value of this attribute is copied to
+the AP_TTNID attribute and this attribute is unset.  If chained transactions are in use, this
+attribute must be set prior to issuing a TP_COMMIT_REQ primitive for commitment and prior to issuing
+a TP_DONE_REQ primitive during rollback.
+.sp
+This atribute is type \fBap_ttnid_t\fP with default not present.
+It is readable always and writable only in states AP_TP_WCOMMITind, AP_TP_COMMIT_WDONEreq,
+AP_TP_WCOMMIT_COMPind, AP_TP_WROLL_COMPind, AP_TP_ZOMBIE, AP_TP_WRESUMEreq, AP_TP_RESUME,
+AP_TP_WRESTARTreq, AP_TP_RESTART, AP_TP_W_RESTART_COMPLETEind.
+.\"
+.TP
+.B AP_TP_STATE
+The AP_TP_STATE attribute is used to convey state information about the single transaction node
+identified by the AP_TTNID or AP_DTNID attribute.  It is used to determine which control category
+primitives are legal.
+.sp
+Note: If the AP_TTNID or AP_DTNID does not identify a transaction node, its value is undefined.
+This attribute only exists in the environment of XAP-TP instances with the AP_TP_CONTROL category
+selected.
+.sp
+This attribute is of type \fBunsigned long\fP and is one of:
+AP_TP_DATA_XFER,
+AP_TP_RECV,
+AP_TP_ERROR_RECV,
+AP_TP_ERROR,
+AP_TP_WHANDcnf,
+AP_TP_WHANDrsp,
+AP_TP_WHANDrsp_WHANDcnf,
+AP_TP_WHANDcnf_WENDrsp,
+AP_TP_WHANDrsp_WENDcnf,
+AP_TP_WENDcnf,
+AP_TP_WENDrsp,
+AP_TP_WHAND_GCcnf,
+AP_TP_WHAND_GCrsp,
+AP_TP_WREADYind,
+AP_TP_WREADYind_DATAP,
+AP_TP_READY,
+AP_TP_WPREP_ALLreq,
+AP_TP_WPREP_ALLreq_DATAP,
+AP_TP_PREPARING,
+AP_TP_LOGGING_READY,
+AP_TP_WCOMMITind,
+AP_TP_COMMIT_WDONEreq,
+AP_TP_WCOMMIT_COMPind,
+AP_TP_ROLL_WDONEreq,
+AP_TP_WROLL_COMPind,
+AP_TP_ZOMBIE,
+AP_TP_HEURISTIC_LOG.
+It is readable always and writable never.
+.\"
+.TP
+.B AP_TTNID
+The AP_TTNID attribute holds the Transaction Tree Node Identifier of the TPSUI.  Setting the value
+of the AP_TTNID attribute on an endpoint that does not have AP_TP_DIALOGUE set in AP_TP_CATEGORY
+will have the effect of setting the value of the AP_DTNID attribute to not present.
+.\"
+.PP
+The additional local TP attribtues in the XAP-TP environment are:
+.\"
+.TP
+.B AP_BIND_TPADDR
+The AP_BIND_TPADDR is used to indicate the address to which this instance of XAP is bound.
+.sp
+Setting this attribute and calling ap_bind(3) will result in the attributes AP_LCL_APT, AP_LCL_AEQ,
+AP_LCL_APID and AP_LCL_AEID being set, and the set of allowable local TPSUIs being declared for a
+RESPONDER.  A listener application may use a wildcard for the set of local TPSUIs and use the called
+TPSUT (conveyed in AP_LCL_TPSUI) to dispatch dialogues.
+.sp
+The type of this attribute is a \fBap_tpaddr_t\fP with the default none.
+The attribute is readable always and writable only in states \fBAP_TP_UNBOUND\fP and \fBAP_TP_IDLE\fP.
+.\"
+.TP
+.B AP_BRID
+The AP_BRID attribute holds the Branch Identifier of the transaction branch on the instance.  If the
+instance is not supporting a transaction branch, ti holds the branch identifier to be used for the
+next transaction branch on the instance.
+.sp
+The type of this attribute is a \fBap_brid_t\fP with default not present.
+The attribute is readable always and writable when the dialogue is not in a transaction.
+.\"
+.TP
+.B AP_CONTROL_ID
+The AP_CONTROL_ID attribute uniquely identifies a control isntance within a recovery context group
+within an AET.
+.sp
+The type of this attribute is a \fBap_cid_t\fP with default not present.
+The attribute is readable always and writable only in states \fBAP_TP_UNBOUND\fP and \fBAP_TP_IDLE\fP.
+.\"
+.TP
+.B AP_DTNID
+The AP_DTNID attribute indicates to which node of the dialogue tree a dialogue on this instance
+belongs.  Setting the value of AP_DTNID attribute on an endpoint that does not have AP_TP_DIALOGUE
+set in AP_TP_CATEGORY will have the effect of setting the value of the AP_TINID attribute to not
+present.
+.sp
+The type of this attribute is a \fBap_dtnid_t\fP with default not present.
+This attribute is readable always and writable only in state \fBAP_TP_IDLE\fP.
+.\"
+.TP
+.B AP_LCL_AEID
+The AP_LCL_AEID attribute holds the Application Entity Invocation Identifier of the TPSUI.
+.sp
+This attribute is not directly settable by the user.  However, setting the AP_BIND_TPADDR attribute
+will result in this attribute being set to the AEID portion of that attribute.
+.sp
+This attribute is type \fBap_aei_apt_id_t\fP and is readable always and writable never.
+.\"
+.TP
+.B AP_LCL_AEQ
+The AP_LCL_AEQ attribute holds the Application Entity Qualifier of the TPSUI.
+.sp
+This attribute is not directly settable by the user.  However, setting the AP_BIND_TPADDR attribute
+will result in this attribute being set to the AEQ portion of that attribute.
+.sp
+This attribute is type \fBap_aeq_t\fP and is readable always and writable never.
+.\"
+.TP
+.B AP_LCL_APID
+The AP_LCL_APID attribute holds the Application Process Invocation Identifier of the TPSUI.
+.sp
+This attribute is not directly settable by the user.  However, setting the AP_BIND_TPADDR attribute
+will result in this attribute being set to the APID portion of that attribute.
+.sp
+This attribute is type \fBap_aei_apt_id_t\fP and is readable always and writable never.
+.\"
+.TP
+.B AP_LCL_APT
+The AP_LCL_APT attribute holds the Application Process Title of the TPSUI.
+.sp
+This attribute is not directly settable by the user.  However, setting the AP_BIND_TPADDR attribute
+will result in this attribute being set to the APT portion of that attribute.
+.sp
+This attribute is type \fBap_apt_t\fP and is readable always and writable never.
+.\"
+.TP
+.B AP_LCL_TPSUT
+The AP_LCL_TPSUT attribute holds the TP service User Title of the TPSUI.
+.sp
+This attribute is type \fBap_tpsut_t\fP and is readable always and writable only in states
+\fBAP_TP_UNBOUND\fP and \fBAP_TP_IDLE\fP.
+.\"
+.TP
+.B AP_NEXT_BRID
+The AP_NEXT_BRID attribute holds the Branch Identifier to be used for the next transaction branch of
+the dialogue when chained transactions are in use.  If unset, the existing Branch Identifier is
+reused for the next transaction branch.
+.sp
+WHen the next transaction branch in a chain starts on a dialogue, the value in this attribute is
+used as the Branch Identifier.  It is copied to the AP_BRID attribute and this attribute is unset.
+If the attribute is not set, the existing Branch Identifier in AP_BRID will be reused for the new
+transaction branch.
+.sp
+This atribute is type \fBap_brid_t\fP with default not present.
+It is readable always and writable only in states AP_TP_WCOMMITind, AP_TP_COMMIT_WDONEreq,
+AP_TP_WCOMMIT_COMPind, AP_TP_WROLL_COMPind, AP_TP_ZOMBIE, AP_TP_WRESUMEreq, AP_TP_RESUME,
+AP_TP_WRESTARTreq, AP_TP_RESTART, AP_TP_W_RESTART_COMPLETEind.
+.\"
+.TP
+.B AP_REM_AEID
+The AP_REM_AEID attribute holds the Application Entity Invocation Identifier of the remote TPSUI.
+This attribute is type \fBap_aei_apt_id_t\fP with default not present and is readable always and
+writable only in states \fBAP_TP_UNBOUND\fP and \fBAP_TP_IDLE\fP.
+.\"
+.TP
+.B AP_REM_AEQ
+The AP_REM_AEQ attribute holds the Application Entity Qualifier of the remote TPSUI.
+This attribute is type \fBap_aeq_t\fP with default not present and is readable always and
+writable only in states \fBAP_TP_UNBOUND\fP and \fBAP_TP_IDLE\fP.
+.\"
+.TP
+.B AP_REM_APID
+The AP_REM_APID attribute holds the Application Process Invocation Identifier of the remote TPSUI.
+This attribute is type \fBap_aei_apt_id_t\fP with default not present and is readable always and
+writable only in states \fBAP_TP_UNBOUND\fP and \fBAP_TP_IDLE\fP.
+.\"
+.TP
+.B AP_REM_APT
+The AP_REM_APT attreibute holds the Application Process Title of the remote TPSUI.
+This attribute is type \fBap_apt_t\fP with default not present and is readable always and
+writable only in states \fBAP_TP_UNBOUND\fP and \fBAP_TP_IDLE\fP.
+.\"
+.TP
+.B AP_REM_TPSUT
+The AP_REM_TPSUT attribute holds the TP service User Title of the remote TPSUI.
+This attribute is type \fBap_tpsut_t\fP with default not present and is readable always and
+writable only in states \fBAP_TP_UNBOUND\fP and \fBAP_TP_IDLE\fP.
+.\"
+.TP
+.B AP_TPFU_AVAIL
+The AP_TPFU_AVAIL attribute indicates which TP functional units are currently available.
+This attribute is of type \fBunsigned long\fP and has bit values:
+.RS
+.TP
+.I AP_TP_POLARIZED_CONTROL
+.PD 0
+.TP
+.I AP_TP_SHARED_CONTROL
+.TP
+.I AP_TP_COMMIT_AND_CHAINED
+.TP
+.I AP_TP_COMMIT_AND_UNCHAINED
+.TP
+.I AP_TP_HANDSHAKE
+.PD
+.PP
+It is readable always and writable never.
+.RE
+.\"
+.TP
+.B AP_TPFU_SEL
+The AP_TPFU_SEL attribute indicates which TP functional units have been requested for use on the
+current instance.
+This attribute is of type \fBunsigned long\fP and has bit values:
+.RS
+.TP
+.I AP_TP_POLARIZED_CONTROL
+.PD 0
+.TP
+.I AP_TP_SHARED_CONTROL
+.TP
+.I AP_TP_COMMIT_AND_CHAINED
+.TP
+.I AP_TP_COMMIT_AND_UNCHAINED
+.TP
+.I AP_TP_HANDSHAKE
+.PD
+.PP
+The default value is NULL.
+It is readable always and writable only in states \fBAP_TP_UNBOUND\fP
+and \fBAP_TP_IDLE\fP.
+.RE
+.\"
+.TP
+.B AP_TP_AVAIL
+The AP_TP_AVAIL attribute indicate which version of the TP protocol are currently available.
+This attribute is of type \fBunsigned long\fP and has bit values: \fIAP_TPVER1\fP.  It is readable
+always and writable never.
+.\"
+.TP
+.B AP_TP_CATEGORY
+The AP_TP_CATEGORY attribute holds the categories of TP primitives that are usable on the instance.
+This attribute is of type \fBunsigned long\fP and has bit values: \fIAP_TP_DIALOGUE\fP and
+\fIAP_TP_CONTROL\fP.  It is readable always and writable only in state \fBAP_TP_UNBOUND\fP.
+.\"
+.TP
+.B AP_TP_COPYENV
+The AP_TP_COPYENV attribute is used to indicate whether certain environment attributes that
+corresponds to parameters on the TP-BEGIN-DIALOGUE and TP-BEGIN-TRANSACTION indications, or to
+parameters on commit or log category indications, should be returned to the user in the \fIcdata\fP
+argument of the ap_rcv(3) function.  When the value fot he attribute is \fITRUE\fP, these attributes
+are returned via the \fIcdata\fP argument.
+.sp
+This attribute is of type \fBlong\fP and has values \fITRUE\fP or \fIFALSE\fP with default
+\fPFALSE\fP.  It is readable always and writable only in states \fBAP_TP_UNBOUND\fP and
+\fBAP_TP_IDLE\fP.
+.\"
+.TP
+.B AP_TP_SEL
+The AP_TP_SEL attribute indicate which version of the TP protocol has been selected for use on the
+current instance.
+This attribute is of type \fBunsigned long\fP and has bit values: \fIAP_TPVER1\fP with default
+\fIAP_TPVER1\fP.  It is readable always and writable only in states \fBAP_TP_UNBOUND\fP and
+\fBAP_TP_IDLE\fP.
+.\"
+.TP
+.B AP_URCH
+The AP_URCH uniquely identifies a group of transction nodes within an AET for recovery purposes.
+This attribute is of type \fBap_urch_t\fP with default not present.  It is readable always and
+writable only in states \fBAP_TP_UNBOUND\fP or \fBAP_TP_IDLE\fP.
+.\"
+.\"
+.SS ROSE Attributes
+.PP
+.TP
+.B AP_RO_FAC_AVAIL
+The AP_RO_FAC_AVAIL attribute is used to indicate the availablity of facilities in the XAP-ROSE
+provider.  The attribute is bit significant, and the following bit values are defined:
+.RS
+.TP
+.I AP_RO_BIND
+BIND/UNBIND primitives.
+.PP
+When a bit value is set in the attribute value the corresponding facility is available in the
+XAP-ROSE provider, otherwise the facility is unavailable.
+.RE
+.TP
+.B AP_RO_PCI_LIST
+The AP_RO_PCI_LIST attribute is used to define those abstract syntaxes that the ROSE service
+provider should examine for the presence of ROSE PDUs.  The attribute consists of a list of
+presentation context identifiers (PCIs) for abstract syntaxes.  These PCIs are used to reference the
+abstract syntaxes defined in the XAP environment variables AP_DCS, AP_PCDL or AP_PCDRL (depending on
+the current state of the XAP-ROSE instance).
+.sp
+A value assigned to the AP_RO_PCI_LIST environment attribute is validated only when the ap_ro_init(3)
+function is called.  At this piont, if the content of the list represents valid abstract syntaxes
+for the association, the lsit will be used by the ROSE service provider to send and receive ROSE
+PDUs.  Subsequent changes to the value of the AP_RO_PCI_LIST attribute will not take effect until
+the ap_ro_init(3) function is called again.
+.\"
+.\"
+.SS ACSE Attributes
+.PP
+.TP
+.B AP_ACSE_AVAIL
+The available ACSE protocol versions.
+Indicates which version of the ACSE protocol are currently available.  Not
+used in \*(lqX.410-1984\*(rq mode, see AP_MODE_SEL.
+Defined bit values are as follows:
+.RS
+.TP \w'\fIAP_ACSEVER1\fP\(em'u
+.I AP_ACSEVER1
+ACSE protocol version 1.
+.PP
+When set to the \fINULL\fP bit-string (zero (0)), it indicates that the XAP provider cannot provide
+an ACSE Layer at all.  In this case, the default value for \fBAP_ACSE_SEL\fP is \fINULL\fP.
+.PP
+Type \fBunsigned long\fP with bit values \fIAP_ACSEVER1\fP.
+This attribute is readable always and writable never.
+.RE
+.TP
+.B AP_ACSE_SEL
+Indicates which version of the ACSE protocol has been selected for use with the current association.
+Not use in "X.410-1984" mode, see \fBAP_MODE_SEL\fP.  For defined bit values, see
+\fBAP_ACSE_AVAIL\fP.  The default value is \fIAP_ACSEVER1\fP, provided that \fBAP_ACSE_AVAIL\fP
+includes \fIAP_ACSEVER1\fP, otherwise \fINULL\fP.
+.sp
+When this value is set to \fINULL\fP (zero (0)), it indicates that the ACSE layer is to be set to
+NULL.  This means that ACSE Layer primitives such as \*(lq\fIA-ASSOCIATE request\fP\*(rq map
+directly onto Presentation Layer primitives such as \*(lq\fIP-CONNECT request\fP\*(rq.
+.sp
+Type \fBunsigned long\fP with bit values \fIAP_ASCEVER1\fP and default \fIAP_ACSEVER1\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_AFU_AVAIL
+The available ACSE optional functional units.
+Indicates which optional ACSE functional units are currently available.  Not used in
+\*(lqX.410-1984\*(rq mode.
+Defined bit values are:
+.RS
+.TP \w'\fIAP_ACSE_NESTASSOC\fP\(em'u
+.I AP_ACSE_AUTH
+Authentication functional unit.
+.PD 0
+.TP
+.I AP_ACSE_CNTXNEG
+Application/ASO Context Negotiation functional unit.
+.TP
+.I AP_ACSE_HLASSOC
+Higher Level Association functional unit.
+.TP
+.I AP_ACSE_NESTASSOC
+Nested Association functional unit.
+.PD
+.PP
+Type \fBunsigned long\fP with bit values \fINULL\fP.
+This attribute is readable always and writable never.
+.RE
+.TP
+.B AP_AFU_SEL
+The selected ACSE optional functional units.
+Indicates which optional ACSE functional units have been requested for use over the current
+association. Not used in \*(lqX.410-1984\*(rq mode.
+Defined bit values are listed under \fBAP_AFU_AVAIL\fP.  The default value is the \fINULL\fP
+bit-string indicating that only the non-negotiable kernel functional unit is present.
+.sp
+Type \fBunsigned long\fP with bit values \fINULL\fP and default \fINULL\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOC_ind\fP.
+.TP
+.B AP_CNTX_NAME
+The AP_CNTX_NAME attribute is the application-context-name parameter of the AARQ and AARE APDUs. See
+the discussion of the ap_objid_t data type for information about how the absence of this parameter
+is indicated. This attribute is not used in the X.410-1984 mode. Refer to the description of the
+AP_MODE_SEL attribute.
+.sp
+The application/ASO context name.
+Type \fBap_objid_t\fP with default none.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+The Application/ASO context name may only be written in the \fBAP_WASSOCrsp_ASSOCind\fP state when
+the XAP instance selects the Application/ASO context name negotiation functional unit.
+Changing this value in any other state requires use of the P_ALTERCNTX_REQ, P_ALTERCNTX_IND,
+P_ALTERCNTX_RSP and P_ALTERCNTX_CNF primitives, which are only available when the Application/ASO
+Context Negotiation functional unit is selected.
+.\"
+.\"
+.TP
+.B AP_ROLE_ALLOWED
+The \fBAP_ROLE_ALLOWED\fP parameter is used to specify how an instance of XAP may be used.
+Specifically, the value of this attribute indicates whether the XAP instance may be used to send an
+\fBA_ASSOC_REQ\fP primitive, receive an \fBA_ASSOC_IND\fP primitive, or both. Note that this
+attribute only affects the roles that an instance of XAP may play with respect to association
+establishment.  Changing the value of this attribute will not affect the way in which XAP
+participates in an association that has already been established. It should be noted that an
+\fBA_ASSOC_IND\fP primitive may be received even after this attribute has been set to prohibit
+receipt of association indications if \fBAP_ROLE_ALLOWED\fP is set to \fIAP_INITIATOR\fP while the
+XAP instance is in the \fIAP_IDLE\fP state. This situation occurs when the \fBA_ASSOC_IND\fP
+primitive has been queued prior to setting \fBAP_ROLE_ALLOWED\fP to \fIAP_INITIATOR\fP. To avoid
+this situation, the \fBAP_ROLE_ALLOWED\fP attribute should be set before the XAP instance is bound
+to a presentation address if it will only be used to initiate associations.
+.RS
+.TP \w'\fIAP_INITIATOR\fP\(em'u
+.I AP_INITIATOR
+XAP instance may act in the association-initiator role.
+.PD 0
+.TP
+.I AP_REPSONDER
+XAP instance may act in the association-responder role.
+.PD
+.PP
+The allowed roles.
+Type \fBunsigned long\fP with bit values \fIAP_INITIATOR\fP and \fIAP_RESPONDER\fP with default values \fIAP_INITIATOR\fP and \fIAP_RESPONDER\fP.
+This attribute is readable always and writable always.
+.PP
+The AP_ROLE_ALLOWED attribute is used to specify how an XAP-TP instance may be used.  Specifically,
+the value to this attribute indicates whether the XAP-TP instance may be used to send a
+TP_BEGIN_DIALOGUE_REQ primitive, receive a TP_BEING_DIALOGUE_IND primitive, or both.
+.PP
+Notes:
+.IP 1. \w'0.\(em'u
+This attribute only affects the roles that an XAP-TP instance may plat with respect to dialogue
+establishment.  Changing the value of this attribute will not affect the way in which XAP-TP
+participates in a dialogue that has already been established.
+.IP 2.
+A TP_BEGIN_DIALOGUE_IND primitive may be received even after this attribute has been set to
+AP_INITIATOR in the AP_TP_IDLE state.  This situation occurs when AP_ROLE_ALLOWED included the value
+AP_RESPONDER and a TP_BEGIN_DIALOGUE_IND has been queued prior to setting AP_ROLE_ALLOWED to
+AP_INITIATOR.  To avoid this situation, the AP_ROLE_ALLOWED attribute should be set before the
+XAP-TP instance is bound to an address if it will only be used to initiate dialogues.
+.RE
+.\"
+.\"
+.TP
+.B AP_ROLE_CURRENT
+The \fBAP_ROLE_CURRENT\fP attribute indicates the role of the local user in the current association.
+The attribute is set to \fIAP_INITIATOR\fP as soon as an \fBA_ASSOC_REQ\fP primitive is sent and
+remains unchanged until the association is rejected or subsequently terminated.  Similarly, the
+attribute is set to \fIAP_RESPONDER\fP upon receipt of an \fBA_ASSOC_IND\fP and left unchanged until
+the association is terminated.
+Bit values are as defined for \fBAP_ROLE_ALLOWED\fP.
+.sp
+The current role.
+Type \fBunsigned long\fP with bit values \fIAP_INITIATOR\fP and \fIAP_RESPONDER\fP.
+This attribute is readable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP and is writable never.
+.sp
+The AP_ROLE_CURRENT attribute indicates the role of the user in the current dialogue.  The attribute
+is set to AP_INITIATOR as soon as a TP_BEGIN_DIALOGUE_REQ is sent, and remains unchanged until the
+dialogue is rejected or terminated.  SImilarly, the attribute is set to AP_RESPONDER upon receipt of
+a TP_BEGIN_DIALOGUE_IND and remains unchanged until the dialogue is terminated.
+.TP
+.B AP_CLG_APT
+The calling application process title (AP-title).
+This is either a distinguished name (form1), object identifier (form2) or printable string (form3).
+Note that an AE-title may be formed by combining the AP-title and AE-qualifier.
+.sp
+The AP_CLG_APT is the calling AP-title parameter of the AARQ APDU. See the description of the
+ap_apt_t data type for information about how its absence is indicated. This attribute is not used in
+the X.410-1984 mode.
+.sp
+Type \fBap_apt_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLG_AEQ
+The calling application entity qualifier (AE-qualifier).
+This is either a relative distinguished name (form1), an integer (form2) or printable string (form3).
+Note that an AE-title may be formed by combining the AP-title and AE-qualifier.
+.sp
+The AP_CLG_AEQ is the calling AE-qualifier parameter of the AARQ APDU. See the description of the
+ap_aeq_t data type for information about how its absence is indicated. This attribute is not used in
+the X.410-1984 mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+Type \fBap_aeq_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLG_APID
+The calling application process invocation-identifier (AP-invocation-identifier).
+The AP_CLG_APID is the calling AP-invocation-identifier parameter of the AARQ APDU. This attribute
+is not used in the X.410-1984 mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+Type \fBap_aei_api_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLG_AEID
+The calling application entity invocation-identifier (AE-invocation-identifier).
+The AP_CLG_AEID is the calling AE-invocation-identifier parameter of the AARQ APDU. This attribute
+is not used in the X.410-1984 mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+Type \fBap_aei_api_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLD_APT
+The called application process title (AP-title).
+This is either a distinguished name (form1), object identifier (form2) or printable string (form3).
+Note that an AE-title may be formed by combining the AP-title and AE-qualifier.
+.sp
+The AP_CLD_APT is the called AP-title parameter of the AARQ APDU. This attribute is not used in the
+X.410-1984te mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+Type \fBap_apt_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLD_AEQ
+The called application entity qualifier (AE-qualifier).
+This is either a relative distinguished name (form1), an integer (form2) or printable string (form3).
+Note that an AE-title may be formed by combining the AP-title and AE-qualifier.
+.sp
+The AP_CLD_AEQ is the called AE-qualifier parameter of the AARQ APDU. This attribute is not used in
+the X.410-1984if mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+Type \fBap_aeq_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLD_APID
+The called application process invocation-identifier (AP-invocation-identifier).
+The AP_CLD_APID is the called AP invocation identifier parameter of the AARQ APDU. This attribute is
+not used in the X.410-1984 mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+Type \fBap_aei_api_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLD_AEID
+The called application entity invocation-identifier (AE-invocation-identifier).
+The AP_CLD_AEID is the called AE invocation identifier parameter of the AARQ APDU. This attribute is
+not used in the X.410-1984 mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+Type \fBap_aei_api_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_RSP_APT
+The responding application process title (AP-title).
+This is either a distinguished name (form1), object identifier (form2) or printable string (form3).
+Note that an AE-title may be formed by combining the AP-title and AE-qualifier.
+.sp
+The AP_RSP_APT is the responding AP-title parameter of the AARE APDU. This attribute is not used in
+the X.410-1984ar mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+Type \fBap_apt_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_RSP_AEQ
+The responding application entity qualifier (AE-qualifier).
+This is either a relative distinguished name (form1), an integer (form2) or printable string (form3).
+Note that an AE-title may be formed by combining the AP-title and AE-qualifier.
+.sp
+The AP_RSP_AEQ is the responding AE-qualifier parameter of the AARE APDU. See the description of the
+ap_aeq_t data type for information about how its absence is indicated. This attribute is not used in
+the X.410-1984 mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+Type \fBap_aeq_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_RSP_APID
+The responding application process invocation-identifier (AP-invocation-identifier).
+The AP_RSP_APID is the responding AP invocation identifier parameter of the AARE APDU.  This
+attribute is not used in the X.410-1984 mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+Type \fBap_aei_api_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_RSP_AEID
+The responding application entity invocation-identifier (AE-invocation-identifier).
+The AP_RSP_AEID is the responding AE invocation identifier parameter of the AARE APDU.  This
+attribute is not used in the X.410-1984 mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+Type \fBap_aei_api_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_STATE
+.sp
+The AP_STATE attribute is used to convey state information about the XAP-TP interface.  It is used
+to determine which primitives are legal and which attributes can be read/written.
+.sp
+For XAP-TP, the state is of type \fBlong\fP and is one of:
+AP_TP_UNBOUND,
+AP_TP_IDLE,
+AP_TP_WALLOCcnf,
+AP_TP_ALLOCATED,
+AP_TP_DATA_XFER,
+AP_TP_RECV,
+AP_TP_ERROR_RECV,
+AP_TP_ERROR,
+AP_TP_WHANDcnf,
+AP_TP_WHANDrsp,
+AP_TP_WHANDrsp_WHANDcnf,
+AP_TP_WHANDcnf_WENDrsp,
+AP_TP_WHANDrsp_WENDcnf,
+AP_TP_WENDcnf,
+AP_TP_WENDrsp,
+AP_TP_WHAND_GCcnf,
+AP_TP_WHAND_CGrsp,
+AP_TP_WREADYind,
+AP_TP_WREADYind_DATAP,
+AP_TP_READY,
+AP_TP_WPREP_ALLreq,
+AP_TP_WPREP_ALLreq_DATAP,
+AP_TP_PREPARING,
+AP_TP_LOGGING_READY,
+AP_TP_WCOMMITind,
+AP_TP_COMMIT_WDONEreq,
+AP_TP_WCOMMIT_COMPind,
+AP_TP_ROLL_WDONEreq,
+AP_TP_WROLL_COMPind,
+AP_TP_ZOMBIE,
+AP_TP_WRESUMEreq,
+AP_TP_RESUME,
+AP_TP_WRESTARTreq,
+AP_TP_RESTART,
+AP_TP_WRESTART_COMPLETEind.
+.\"
+.\"
+.SS Presentation Attributes
+.PP
+.TP
+.B AP_PRES_AVAIL
+The AP_PRES_AVAIL attribute indicates which versions of the Presentation Layer protocol are
+currently available. This attribute is not used in the X.410-1984ti mode.
+.sp
+The available presentation versions.
+Type \fBunsigned long\fP with bit values \fIAP_PRESVER1\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_PRES_SEL
+The AP_PRES_SEL attribute indicates which version of the Presentation Layer protocol has been
+selected for use with the current association. This attribute is not used in the X.410-1984ia mode.
+Refer to the description of the AP_MODE_SEL attribute.
+.sp
+The selected presentation version.
+Type \fBunsigned long\fP with bit values \fIAP_PRESVER1\fP and default \fIAP_PRESVER1\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_PFU_AVAIL
+The AP_PFU_AVAIL attribute indicates which optional Presentation functional units are currently
+available. This attribute is not used in the X.410-1984 mode. Refer to the description of the
+AP_MODE_SEL attribute.
+.sp
+The available optional presentation functional units.
+Type \fBunsigned long\fP with bit values \fINULL\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_PFU_SEL
+The AP_PFU_SEL attribute indicates which optional Presentation Layer functional units have been
+requested for use over the current association. This attribute is not used in the X.410-1984 a mode.
+Refer to the description of the AP_MODE_SEL attribute.
+.sp
+The selected optional presentation functional units.
+Type \fBunsigned long\fP with bit values \fINULL\fP and default \fINULL\fP.
+This attribute is readable always and writable only in stats \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_BIND_PADDR
+The AP_BIND_PADDR attribute is used to indicate the address to which this isntance of XAP will be
+bound when ap_bind(3) is called.  Setting this attribute will result in the attribute AP_LCL_PADDR
+being set to the same value.  Nevertheless, the attributes AP_BIND_PADDR and AP_LCL_PADDR do not
+always have the same value.  For example, a listener application might set thte AP_BIND_PADDR to a
+wildcard address and use the called address (conveyed by the AP_LCL_PADDR attribute) specified in
+each indication primtive to dispatach associations.
+.sp
+The bind presentation address.
+Type \fBap_paddr_t\fP with default \fINULL\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_LCL_PADDR
+The AP_LCL_PADDR attribute holds the value used as the presentation address of the local entity. If
+the local entity is the initiator of an association, this value will be used as the calling
+presentation address. If the local entity is the association-responder, this value will be used as
+the called presentation address when the A_ASSOC_IND primitive is received and as the responding
+presentation address when the A_ASSOC_RSP primitive is issued. This attribute is not directly
+settable by the user. However, setting the AP_BIND_PADDR attribute will result in the AP_LCL_PADDR
+attribute being set to the same value. Nevertheless, the attributes AP_BIND_PADDR and AP_LCL_PADDR
+do not always have the same value. For example, a listener application might set the AP_BIND_PADDR
+to a wildcard address and use the called address (conveyed by the AP_LCL_PADDR attribute) specified
+in each indication primitive to dispatch associations. 
+.sp
+The local presentation address.
+Type \fBap_paddr_t\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_REM_PADDR
+The AP_REM_PADDR attribute holds the value used as the presentation address of the remote entity. If
+the local entity is the initiator of an association, this value is the called presentation address.
+If the local entity is the association-responder, this value is the calling presentation address.
+.sp
+The remote presentation address.
+Type \fBap_paddr_t\fP with default none.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_DCS
+The AP_DCS attribute is the defined context set. The defined context set contains the abstract
+syntax/transfer syntax pairs that were negotiated when the association was established, together
+with the presentation context identifier that identifies the pair.  The value of AP_DCS shall be
+empty (size field of 0) in the states AP_IDLE and AP_WASSOCcnf_ASSOCreq, it shall contain the ACSE
+context negotiated by XAP in the state AP_WASSOCrsp_ASSOCind, and it shall contain the fully
+negotiated defined context set in all other states. Note that the defined context set contains both
+the presentation contexts that were negotiated by the user (using AP_PCDL and AP_PCDRL) and any
+additional presentation contexts that were negotiated by XAP or provider. For example, the ACSE
+context (i.e., {joint-iso-ccitt 2 1 0 1}) will be negotiated automatically and will appear in the
+defined context set after negotiation is complete. This attribute is not used in the X.410-1984
+mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+The Defined Context Set.
+.[
+x216
+.]
+This environment attribute represents the Defined-Context-Set (DCS) for the presentation connection
+as communicated to the PS-User.
+Type \fBap_dcs_t\fP.
+This attribute is readable in states other than \fBAP_UNBOUND\fP and writable never.
+.TP
+.B AP_DPCN
+The AP_DPCN attribute is the default-context-name parameter of the CP PPDU. This attribute is not
+used in the X.410-1984t- mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+The Default Presentation Context Name (Default-context-name).
+.[
+x216
+.]
+Type \fBap_dcn_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP. 
+In the initiator role, Defining an \fBAP_DPCN\fP prior to \fBA_ASSOC_REQ\fP will cause the
+Default-context-name parameter to be included in the \fIP-CONNECT request\fP.  In the responder
+role, \fbAP_DPCN\fP in conjunction with the \fBAP_DPCR\fP attribute will reflect the initiator's
+proposed Default-context-name.
+.TP
+.B AP_DPCR
+The AP_DPCR attribute is the default-context-result parameter of the CPR PPDU. Since the user is
+responsible for encoding and decoding of user-data, it is the user s responsibility to accept or
+reject any proposed default-presentation-context. The value, AP_DPCR_NOVAL, indicates that it is not
+present. This attribute is not used in the X.410-1984se mode. Refer to the description of the
+AP_MODE_SEL attribute.
+.RS
+.TP \w'\fIAC_DPCR_PROV_REJ\fP\(em'u
+.I AC_DPCR_NOVAL
+No value was proposed as a AC_DPCN (Default-context-name).
+.PD 0
+.TP
+.I AC_DPCR_ACCEPT
+The proposed value of Default-context-name is accepted by both provider and user.
+.TP
+.I AC_DPCR_USER_REJ
+The proposed value of Default-context-name was rejected by the user.
+.TP
+.I AC_DPCR_PROV_REJ
+The proposed value of Default-context-name was rejected by the provider.
+.PD
+.PP
+The Default Presentation Context Result (Default-context-result).
+.[
+x216
+.]
+Type \fBlong\fP with choice of \fIAP_DPCR_NOVAL\fP, \fIAP_ACCEPT\fP, \fIAP_USER_REJ\fP or \fIAP_PROV_REJ\fP and default \fIAP_DPCR_NOVAL\fP.
+This attribute is readable only in state \fBAP_WASSOCrsp_ASSOCind\fP and writable only in state \fBAP_WASSOCrsp_ASSOC_ind\fP.
+When an A_ASSOC_IND event is received, the value of this attribute represents the state of the
+default presentation context.  If the peer did not propose a Default-context-name, the value of this
+attribute will be \fIAP_DPCR_NOVAL\fP, and writing the value is not permitted.  If the peer proposed
+a Default-context-name that will be rejected by the provider, the value will be \fIAP_PROV_REJ\fP
+and writing the value is not permitted.  The \fBAP_DPCN\fP attribute will contain the rejected
+proposed default.  If the peer proposed a Default-context-name that is acceptable to the provider,
+the value will be \fIAP_ACCEPT\fP and the user may override this by writing \fIAP_USER_REJ\fP to the
+attribute before issuing an \fBA_ASSOC_RSP\fP.  The \fBAP_DPCN\fP attribute will contain the
+acceptable Default-context-name.
+.RE
+.TP
+.B AP_PCDL
+The AP_PCDL attribute is used to propose the list of presentation contexts to be used on the
+connection. The association-initiator sets this list to indicate the contexts it wishes to use for
+encoding user data on the association. Since the user is responsible for all encoding and decoding
+of user data, the proposed transfer syntaxes for each proposed abstract syntax must be included in
+the list proposed by the association-initiator user. For the association-responder, the list
+indicates which presentation contexts are being requested by the association-initiator for use on
+the association. The association-initiator may specify the ACSE context in AP_PCDL, although it is
+not required to do so. If the association-initiator does not supply the ACSE context in AP_PCDL, XAP
+supplies it automatically for the association. Regardless of whether or not the
+association-initiator supplies the ACSE context, it is not provided to the associationresponder in
+AP_PCDL (the responding user may obtain it from AP_DCS if required). This attribute is not used in
+the X.410-1984t mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+The presentation context definition list.
+Type \fBap_cdl_t\fP with default not present.
+This attribute is readable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_PCDRL
+The AP_PCDRL attribute is used to indicate whether the presentation contexts proposed in the
+presentation context definition list have been accepted or rejected. The associationresponder uses
+this attribute to indicate which of the proposed presentation contexts are acceptable before issuing
+the A_ASSOC_RSP primitive. For the association-initiator, this attribute indicates the remote userOs
+response to the proposed presentation contexts, received in the A_ASSOC_CNF primitive. Each entry in
+AP_PCDRL corresponds one-to-one with an entry in AP_PCDL which, in the case of the responder, never
+contains the proposed ACSE context. The associationresponder has an opportunity to accept or reject
+each of the proposed contexts that are indicated in AP_PCDL. The ACSE context is automatically
+accepted by XAP, and appears in the value of AP_DCS. This attribute is not used in the X.410-1984
+mode. Refer to the description of the AP_MODE_SEL attribute.
+.sp
+.SS Session Attributes
+.PP
+.TP
+.B AP_SESS_AVAIL
+The AP_SESS_AVAIL attribute indicates which versions of the Session Layer protocol are currently
+available.
+.RS
+.TP
+.I AP_SESSVER1
+Session Protocol Version 1.
+.PD 0
+.TP
+.I AP_SESSVER2
+Session Protocol Version 2.
+.PD
+.PP
+The availale session versions.
+Type \fBunsigned long\fP with bit values \fIAP_SESSVER1\fP and \fIAP_SESSVER2\fP.
+This attribute is readable always and writable never.
+.RE
+.TP
+.B AP_SESS_SEL
+The AP_SESS_SEL attribute indicates which version of the Session Layer protocol has been selected
+for use with the current association.
+.sp
+The selected session version.
+Type \fBunsigned long\fP with bit values \fIAP_SESSVER1\fP and \fIAP_SESSVER2\fP and default \fIAP_SESSVER2\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_SESS_OPT_AVAIL
+The AP_SESS_OPT_AVAIL attribute is used to indicate which optional session capabilities are
+available through the XAP interface. If the AP_UCBC flag is set, the underlying provider supports
+user control of basic concatenation. If the AP_UCEC flag is set, the underlying provider supports
+user control of extended concatenation. For further information, refer to ap_snd( ) and the Session
+Layer protocol specification.
+.sp
+The available session options.
+Type \fBunsigned long\fP with bit values \fIAP_UCBC\fP and \fIAP_UCEC\fP.
+This attribute is readable always and writable never.
+.TP
+.B AP_SFU_AVAIL
+The AP_SFU_AVAIL attribute indicates which Session Layer functional units are currently available.
+The value of this attribute may affect the value of AP_TOKENS_AVAIL.
+.sp
+The available session functional units.
+Type \fBunsigned long \fP with bit values \fIAP_SESS_HALFDUPLEX\fP, \fIAP_SESS_DUPLEX\fP, \fIAP_SESS_XDATA\fP, \fIAP_SESS_MINORSYNC\fP, \fIAP_SESS_MAJORSYNC\fP, \fIAP_SESS_RESYNC\fP, \fIAP_SESS_ACTMGMT\fP, \fIAP_SESS_NEGREL\fP, \fIAP_SESS_CDATA\fP, \fIAP_SESS_EXCEPT\fP, \fIAP_SESS_TDATA\fP, \fIAP_SESS_DATASEP\fP.
+This attribute is readable always and writable never.
+An additional value should be added, \fIAP_SESS_NOORDREL\fP, for avialability and selection of the No-orderly-release functional unit of \*(lqITU-T Rec. X.215 (1995)/Amd.1 (1997)\*(rq.
+An additional value should be added, \fIAP_SESS_NESTCON\fP, for availability and selection of the Nested-connections functional unit of \*(lqITU-T Rec. X.215 (1995)/Amd.2 (1997)\*(rq.
+.TP
+.B AP_SFU_SEL
+The AP_SFU_SEL attribute indicates which Session Layer functional units have been requested for use
+over the current association.
+.sp
+The selected session functional units.
+Type \fBunsigned long \fP with bit values \fIAP_SESS_HALFDUPLEX\fP, \fIAP_SESS_DUPLEX\fP, \fIAP_SESS_XDATA\fP, \fIAP_SESS_MINORSYNC\fP, \fIAP_SESS_MAJORSYNC\fP, \fIAP_SESS_RESYNC\fP, \fIAP_SESS_ACTMGMT\fP, \fIAP_SESS_NEGREL\fP, \fIAP_SESS_CDATA\fP, \fIAP_SESS_EXCEPT\fP, \fIAP_SESS_TDATA\fP, \fIAP_SESS_DATASEP\fP and default \fIAP_SESS_DUPLEX\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+An additional value should be added, \fIAP_SESS_NOORDREL\fP, for avialability and selection of the No-orderly-release functional unit of \*(lqITU-T Rec. X.215 (1995)/Amd.1 (1997)\*(rq.
+An additional value should be added, \fIAP_SESS_NESTCON\fP, for availability and selection of the Nested-connections functional unit of \*(lqITU-T Rec. X.215 (1995)/Amd.2 (1997)\*(rq.
+.TP
+.B AP_QOS
+The AP_QOS attribute is used to specify the quality of service requirements for the association. It
+holds the ranges of QOS values that the XAP user is willing to accept.
+.sp
+The association quality of service.
+Type \fBap_qos_t\fP.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_CLG_CONN_ID
+The AP_CLG_CONN_ID attribute conveys the value of the session connection identifier that was
+proposed by the association-initiator.
+.sp
+The calling session connection identifier.
+Type \fBap_conn_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_CLD_CONN_ID
+The AP_CLD_CONN_ID attribute conveys the value of the session connection identifier that was
+proposed by the association-responder.
+.sp
+The called session connection identifier.
+Type \fBap_conn_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+.TP
+.B AP_OLD_CONN_ID
+The AP_OLD_CONN_ID attribute conveys the values of the session connection identifiers from a
+previous session.
+.sp
+The old connection identifier.
+Type \fBap_old_conn_id_t\fP with default not present.
+This attribute is readable always and writable only in states \fBAP_UNBOUND\fP and \fBAP_IDLE\fP.
+.TP
+.B AP_TOKENS_AVAIL
+A token is an attribute of an association which is dynamically assigned to one user at a time. The
+user that possesses a token has exclusive rights to initiate the service which that token
+represents. The AP_TOKENS_AVAIL attribute indicates which tokens are available for assignment on
+this association. The value of this attribute is dependent on AP_SFU_SEL.
+.RS
+.TP
+.I AP_DATA_TOK
+Data Token
+.PD 0
+.TP
+.I AP_SYNCMINOR_TOK
+Minor Synchronization Token
+.TP
+.I AP_MAJACT_TOK
+Major Activity Token
+.TP
+.I AP_RELEASE_TOK
+Release Token
+.PD
+.PP
+The available presentation tokens.
+Type \fBunsigned long\fP with bit values \fIAP_DATA_TOK\fP, \fIAP_SYNCMINOR_TOK\fP, \fIAP_MAJACT_TOK\fP, \fIAP_RELEASE_TOK\fP.
+This attribute is readable in any states except \fBAP_UNBOUND\fP, \fBAP_IDLE\fP, \fBAP_WASSOCcnf_ASSOCreq\fP, \fBAP_WASSOCrsp_ASSOCind\fP and writable never.
+.RE
+.TP
+.B AP_TOKENS_OWNED
+The AP_TOKENS_OWNED attribute indicates which available tokens (see AP_TOKENS_AVAIL) are currently
+assigned to the user. The user has exclusive rights to initiate the service represented by each of
+the tokens owned. The value of this attribute is affected by AP_INIT_TOKENS.
+.sp
+The owned presentation tokens.
+Type \fBunsigned long\fP with bit values \fIAP_DATA_TOK\fP, \fIAP_SYNCMINOR_TOK\fP, \fIAP_MAJACT_TOK\fP, \fIAP_RELEASE_TOK\fP.
+This attribute is readable in any states except \fBAP_UNBOUND\fP, \fBAP_IDLE\fP, \fBAP_WASSOCcnf_ASSOCreq\fP, \fBAP_WASSOCrsp_ASSOCind\fP and writable never.
+.TP
+.B AP_MSTATE
+If the XAP instance is awaiting additional data from the user (the last ap_snd( ) call had the AP_MORE
+bit set), the AP_SNDMORE bit in AP_MSTATE is set. If there is more user data for the current service
+(the last call to ap_rcv( ) returned with the AP_MORE bit set) then AP_RCVMORE bit is set. (Note
+that it is possible for both bits to be set.)
+.sp
+The segmentation state.
+Type \fBunsigned long\fP with bit values \fIAP_SNDMORE\fP and \fIAP_RCVMORE\fP.
+This attribute is readable always and writable never.
+
+
+.SH COMPATIBILITY
+.PP
+The OpenSS7 XAP Library is compatible with other XAP
+.[
+XAP ACSE C306
+.]
+implementaions, with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The OpenSS7 XAP Library supports \fINULL\fP bit-strings for the AP_ACSE_AVAIL, AP_ACSE_SEL,
+AP_PRES_AVAIL, AP_PRES_SEL, AP_SESS_AVAIL and AP_SESS_SEL environment attributes.  When the
+corresponding bit-string is \fINULL\fP, it indicates that either the entire layer is unavailable, or
+the entire layer is removed (\fINULL\fP) and service primitives for the layer are mapped directly
+onto service primitives for the lower layer.
+.sp
+This is not specified in XAP,
+.[
+XAP ACSE C306
+.]
+and is inherently non-portable.  Portable XAP programs will not reply upon this capability.
+.IP \(em
+Four additional bit values are defined for the \fBAP_AFU_AVAIL\fP and \fBAP_AFU_SEL\fP environment
+attributes: \fIAP_ACSE_AUTH\fP, \fIAP_ACSE_CNTXNEG\fP, \fIAP_ACSE_HLASSOC\fP,
+\fIAP_ACSE_NESTASSOC\fP.
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+See
+.BR XAP (3)
+for additional information.

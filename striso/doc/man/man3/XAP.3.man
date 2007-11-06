@@ -1,0 +1,1055 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH XAP 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B XAP
+\- ACSE/Presentation Services API (XAP)
+.SH SYNOPSIS
+.PP
+.SH INTERFACE
+.PP
+XAP.
+.[
+XAP
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.SS Establishing and Releasing an XAP Instance
+.PP
+To use XAP, the service user must first create an XAP instance.  This is
+accomplished by using the
+.BR ap_open (3)
+function.  It is possible that an instance may also be obtained through some
+other mechanism as well.  However, such mechanisms depend upon the details of
+a specific implementation and are thus outside the scope of this interface
+specification.  As part of the
+.BR ap_open (3)
+call, the service user identifies the particular service provider that is to
+support this XAP instance.  XAP defines the provider identifier as an
+ininterpreted string.  Individual implementations may assign additional
+semantics to this string according to local conventions.  For example, a
+CAE-conformant operating system may require this string to be a
+.I pathname
+identifying a
+.I special file
+that is associated with the service provider.  The function returns an integer
+that is used to identify this instance in subsequent interactions with the XAP
+Library.  (Note: The most direct implementation approach to the returned
+.I session
+integer argument is to use the file descriptor of the associated
+.IR special\0file .)
+.PP
+The
+.BR ap_close (3)
+function is used to indicate that the indicated instance is no longer needed
+and that the resources required to support it can be returned to the system.
+.SS Resue of an XAP Instance
+.PP
+After an association is terminated (normally or abnormally) the state of the
+XAP instance is set to
+.BR AP_IDLE .
+The instance can either be closed or used to establish another association.
+Prior to establishing another association, the service user may reset any of
+the environment variables.
+.SS Managing the XAP Environment
+.PP
+Three functions are provided to perform operations on the XAP environment:
+.IP 1. \w'0.\(em'u
+.BR ap_init_env (3)
+\- allocates space for the XAP environment, if required, and initializes the
+attributes;
+.IP 2.
+.BR ap_set_env (3)
+\- sets a particular (writable) attribute to a specified value; and
+.IP 3.
+.BR ap_get_env (3)
+\- retrieves the value of a particular (readable) attribute.
+.PP
+In some cases, the
+.BR ap_set_env "(3) and " ap_get_env (3)
+XAP environment functions pass or return multi-level structures (for example,
+the
+.B ap_cdl_t
+structure, used to pass the value of the context-definition-list environment
+variable). To assist service users in handling such structures, XAP provides
+the
+.BR ap_free (3)
+function which will free the memory allocated to dependent structures and
+character strings. The
+.BR ap_free (3)
+is passed the attribute type as specified in the environment call that
+allocated the structures.
+.SS Sending and Receiving XAP Service Primitives
+.PP
+The services offered by the ACSE Presentation Layer service provider are made
+available to the service user through a collection of XAP service primitives
+that are sent and received using the
+.BR ap_snd "(3) and " ap_rcv (3)
+functions. The ACSE and Presentation Layer services available through this
+version of the XAP Interface are shown below, together with the related XAP
+service primitives.
+.PP
+.TS
+center tab(:);
+lbw(2.0i)lbw(1.5i)lbw(1.5i)
+lbw(2.0i)lbw(1.5i)lbw(1.5i)
+lll.
+ACSE:Generic:Specific
+Service:Primitive:Primitive
+_
+A-ASSOCIATE:Request:A_ASSOC_REQ
+:Response:A_ASSOC_RSP
+:Indication:A_ASSOC_IND
+:Confirmation:A_ASSOC_CNF
+
+A-RELEASE:Request:A_RELEASE_REQ
+:Response:A_RELEASE_RSP
+:Indication:A_RELEASE_IND
+:Confirmation:A_RELEASE_CNF
+
+A-ABORT:Request:A_ABORT_REQ
+:Indication:A_ABORT_IND
+
+A-P-ABORT:Request:A_PABORT_REQ
+:Indication:A_PABORT_IND
+_
+.TE
+.PP
+.TS
+center tab(:);
+lbw(2.0i)lbw(1.5i)lbw(1.5i)
+lbw(2.0i)lbw(1.5i)lbw(1.5i)
+lll.
+Presentation:Generic:Specific
+Service:Primitive:Primitive
+_
+P-DATA:Request:P_DATA_REQ
+:Indication:P_DATA_IND
+
+P-CAPABILITY-DATA:Request:P_CDATA_REQ
+:Response:P_CDATA_RSP
+:Indication:P_CDATA_IND
+:Confirmation:P_CDATA_CNF
+
+P-TYPED-DATA:Request:P_TDATA_REQ
+:Indication:P_TDATA_IND
+
+P-EXPEDITED-DATA:Request:P_XDATA_REQ
+:Indication:P_XDATA_IND
+
+P-TOKEN-GIVE:Request:P_TOKENGIVE_REQ
+:Indication:P_TOKENGIVE_IND
+
+P-TOKEN-PLEASE:Request:P_TOKENPLEASE_REQ
+:Indication:P_TOKENPLEASE_IND
+
+P-CONTROL-GIVE:Request:P_CTRLGIVE_REQ
+:Indication:P_CTRLGIVE_IND
+
+P-SYNC-MINOR:Request:P_SYNCMINOR_REQ
+:Response:P_SYNCMINOR_RSP
+:Indication:P_SYNCMINOR_IND
+:Confirmation:P_SYNCMINOR_CNF
+
+P-SYNC-MAJOR:Request:P_SYNCMAJOR_REQ
+:Response:P_SYNCMAJOR_RSP
+:Indication:P_SYNCMAJOR_IND
+:Confirmation:P_SYNCMAJOR_CNF
+
+P-RESYNCHRONIZE:Request:P_RESYNC_REQ
+:Response:P_RESYNC_RSP
+:Indication:P_RESYNC_IND
+:Confirmation:P_RESYNC_CNF
+
+P-U-EXCEPTION-REPORT:Request:P_UXREPORT_REQ
+:Indication:P_UXREPORT_IND
+
+P-P-EXCEPTION-REPORT:Indication:P_PXREPORT_IND
+
+P-ACTIVITY-START:Request:P_ACTSTART_REQ
+:Indication:P_ACTSTART_IND
+
+P-ACTIVITY-RESUME:Request:P_ACTRESUME_REQ
+:Indication:P_ACTRESUME_IND
+
+P-ACTIVITY-END:Request:P_ACTEND_REQ
+:Response:P_ACTEND_RSP
+:Indication:P_ACTEND_IND
+:Confirmation:P_ACTEND_CNF
+
+P-ACTIVITY-INTERRUPT:Request:P_ACTINTR_REQ
+:Response:P_ACTINTR_RSP
+:Indication:P_ACTINTR_IND
+:Confirmation:P_ACTINTR_CNF
+
+P-ACTIVITY-DISCARD:Request:P_ACTDISCARD_REQ
+:Response:P_ACTDISCARD_RSP
+:Indication:P_ACTDISCARD_IND
+:Confirmation:P_ACTDISCARD_CNF
+_
+.TE
+.PP
+Complete information about the effects on the XAP interface of sending and
+receiving the various services primitives is provided in the manual page
+descriptions for
+.BR ap_snd "(3) and " ap_rcv (3)
+in Section 3, and in the manual page descriptions for the individual
+primitives in Section 7.  Services that can be initiated by the service user
+may be associated with either two or four service primitives, depending on
+whether or not the service is confirmed.
+.SS Sharing an XAP Instance
+.PP
+The
+.BR ap_save "(3) and " ap_restore (3)
+functions are provided to facilitate sharing an XAP instance among cooperating
+processes. In some implementations, the memory allocated for storing XAP
+environment and state information is located in the data space of the process
+which created the instance. Should this process wish to pass the instance to
+another process, data from the address space of the first process must be
+copied to the address space of the second.
+The
+.BR ap_save "(3) and " ap_restore (3)
+functions work together to accomplish this.  A common use of
+.BR ap_save "(3) and " ap_restore (3)
+is to support passing of an XAP instance from a process to another, such as
+from a process to one of its children.  Another possible use is to save
+default settings for a group of applications or a particular network
+environment, the resulting file can be used to initialise the XAP environment
+prior to setting attributes specific to the association being created.
+.PP
+The
+.BR ap_save (3)
+function writes a snapshot of the storage associated with an XAP instance to a
+file that was opened by the XAP user. The file permission and file and record
+locking capabilities of the operating system can be used to control access to
+this file.
+.PP
+The
+.BR ap_restore (3)
+function reloads the contents of an XAP snapshot into an XAP instance. This
+recreates for the referenced instance, the XAP environment and state as it was
+when the snapshot was created by the call to
+.BR ap_save (3).
+The XAP instance into which the snapshot is restored may have been created
+directly by the calling user or may have been transferred from another process
+(the mechanism by which this transfer is achieved is outside the scope of
+XAP).  Once the restore has been performed the XAP user can resume operations
+using the XAP Instance from the point where the saving process left off.
+.PP
+If
+.BR ap_restore (3)
+is called for a transferred instance, the instance must be in the same state
+as it was when the snapshot was saved. No events may be sent or received in
+the intervening period. It should be noted that this means that
+.BR ap_save "(3) and " ap_restore (3)
+cannot be used to \*(lqroll back\*(rq the state of the ACSE and Presentation
+protocol machines. Events that were processed after an XAP instance was saved
+cannot be replayed by restoring the XAP instance to its former state.
+.PP
+On the
+other hand, if
+.BR ap_save "(3) and " ap_restore (3)
+are used to initialise XAP instances, the instance must be in either the
+.BR AP_IDLE " or " AP_UNBOUND
+state both when the snapshot is saved and when it is restored.
+.SS Presentation Context Negotiation
+.PP
+An important aspect of association establishment is negotiation of the
+presentation contexts to be used during the association. When an association
+is to be initiated, the service user must set the AP_PCDL and AP_DPCN
+attributes to propose any presentation contexts that are to be used for
+exchanging user data (the XAP Library ensures that the presentation context
+used for exchange of ACSE protocol information between peer entities is
+available; however, the user may include it if required).
+.PP
+Similarly, in responding to an association request, the service user must
+indicate which proposed presentation contexts are acceptable by setting the
+AP_PCDRL and AP_DPCR attribute before issuing an A_ASSOC_RSP primitive.
+.PP
+It should be noted that for XAP, where all encoding and decoding of user data
+is performed by the XAP user, the receiving presentation service does not
+accept or reject any requested context.  It is up to the API user to do so.
+.\"
+.SS Presentation Addresses
+.PP
+As specified in the OSI Basic Reference Model (reference ISO 7498),
+.[
+x200
+.]
+an Application Entity must be addressable via a single, globally unique,
+Presentation Address. Thus, each XAP user has a unique Presentation Address.
+Multiple XAP instances created by the same XAP user may share the same
+Presentation Address.
+.PP
+An XAP user declares its Presentation Address by setting the
+.B AP_BIND_PADDR
+attribute and calling the
+.BR ap_bind (3)
+function. This attribute must be set before any service primitives can be sent
+or received by the XAP user. If the XAP user is the association-initiator, it
+must also specify the Presentation Address of the association-responder - by
+setting the
+.B AP_REM_PADDR
+attribute - prior to issuing an
+.BR A_ASSOC_REQ (7)
+primitive.
+.PP
+An XAP library capable of simultaneously supporting more than one XAP user is
+capable of routing an incoming
+.BR A_ASSOC_IND (7)
+primitive to the particular XAP instance bound to the called Presentation
+Address.
+.PP
+XAP supports applications that are capable of receiving
+.BR A_ASSOC_IND (7)
+primitives addressed to any XAP user within a range of Presentation Addresses
+by means of wildcard Presentation Addresses. Two classes of wildcard addresses
+are recognised by an XAP implementation, NSAP wildcard addresses and Selector
+wildcard addresses. The two classes are discussed separately below; however
+XAP supports the use of both Selector wildcards and NSAP wildcards within a
+single presentation address. Aspects of wildcard addresses relevant to both
+classes are discussed in
+.RI \*(lq General\0Comments ,\*(rq
+while the manual pages Section 3 includes description of how Presentation
+Addresses are specified.
+.SS Selector Wildcard Addresses
+.PP
+Different XAP users within a single computer system will likely share the same
+Network Address(es). Consequently, an XAP library is capable of
+differentiating between two unique Presentation Addresses based upon their
+distinct T-selector, S-selector or P-selector values, or any combination of
+the three. This specification does not impose any constraints on the strategy
+followed by an XAP implementation to achieve unambiguous Presentation
+Addresses.
+.PP
+A Selector wildcard Presentation Address is defined as a Presentation Address
+where one or more of the T-selector, S-selector and P-selector components have
+not been specified. The unspecified component(s) are thus allowed to match any
+corresponding selector value(s) specified on the called Presentation Address
+field of an
+.BR A_ASSOC_IND (7)
+primitive. It should be noted that an unspecified selector value is distinct
+from a null selector value.
+.PP
+The unspecified components of a Selector wildcard Presentation Address must
+follow a bottomto- top structure. Thus, if the T-selector component is not
+specified, both the S-selector and the P-selector cannot be specified.
+Likewise, if the S-selector is not specified, the P-selector cannot be
+specified.
+.PP
+The use of Selector wildcard Presentation Addresses is restricted to
+applications which only support a responder role. They can only be used as
+values for the
+.B AP_BIND_PADDR
+attribute and can only be set when the XAP library is in the states
+.BR AP_UNBOUND " or " AP_IDLE .
+.PP
+This specification does not impose any other constraints on the strategy
+followed by an XAP implementation to provide Selector wildcard Presentation
+Addresses. Some implementations may provide Selector wildcarding capabilities
+at multiple layers, while others may not provide them at any layer.
+.PP
+An XAP user bound to a Selector wildcard Presentation Address is effectively
+bound to the lowest level SAP(s) for which an address has been specified. For
+example, an XAP user bound to a wildcard address for which a T-selector value
+has been specified and the S- and P-selectors have been omitted is in fact
+bound to the Transport Layer SAP(s) identified by the specified Transport
+Address (consisting of the T-selector value and Network Address(es)).
+.PP
+The semantics of this Selector wildcard Presentation Address are that any
+incoming A_ASSOC_IND primitive which specifies that Transport Address will be
+sent to the XAP user bound to the wildcard address irrespective of the called
+S- and P-selector values. The XAP user is then responsible for validating the
+called S- and P-selector values and determining whether or not to accept the
+application association.
+.PP
+Note that multiple Selector wildcard addresses can freely coexist with each
+other and with fully specified addresses. XAP will always pass an incoming
+.BR A_ASSOC_IND (7)
+to the XAP user bound to the more specific Presentation Address that matches
+the called Presentation Address.
+.SS NSAP Wildcard Addresses
+.PP
+Where a single computer system supports multiple network addresses, XAP allows
+an application to listen for connection indications on one or more of these
+addresses by specifying a list of NSAPs as part of the Presentation Address
+assigned to
+.BR AP_BIND_PADDR .
+Some implementations of XAP may allow an application to specify an empty list
+to accept connections on any of the local NSAPs; this is termed an NSAP
+wildcard address.
+.PP
+NSAP wildcard addresses may be used by XAP instances supporting an initiator
+role, a responder role, or both. In the case where an XAP instance which is
+bound to an NSAP wildcard address issues an
+.BR A_ASSOC_REQ (7)
+primitive, the service provider determines which local NSAP to use to connect
+to the presentation address specified in
+.BR AP_REM_PADDR .
+.SS General Comments
+.PP
+When an indication is received by an XAP Instance which is bound to a wildcard
+address, the environment variable AP_LCL_PADDR is set to the specific
+presentation address to which the association is directed (the called
+presentation address from the A_ASSOC_REQ primitive). The address in
+AP_LCL_PADDR is always used as the responding presentation address when
+sending an A_ASSOC_RSP primitive. The XAP user may respond to an incoming
+A_ASSOC_IND on an address other that the called presentation address by
+supplying a fully specified address in AP_BIND_PADDR and calling the
+.BR ap_bind (3)
+function, which in turn sets the value of AP_LCL_PADDR. It should be noted
+that new values may be specified for the Pselector and S-selector only. An
+attempt to specify values for the T-selector or NSAP that differ from those
+received in AP_LCL_PADDR results in the primitive being rejected by XAP with
+an error code of AP_ACCESS.
+.SS Memory Management Mechanisms
+.PP
+The service user may elect to handle all allocation and deallocation of memory
+for use by XAP (this includes memory for XAP environment attributes returned
+from
+.BR ap_get_env (3),
+and buffers for receiving incoming data). This mechanism
+enables the service user to control the amount of buffer space used by XAP for
+receiving incoming data.
+.PP
+To do this, the service user specifies the entry points for allocation and
+deallocation routines when
+.BR ap_open (3)
+is called. The service user provides two
+functions,
+.BR ap_user_alloc (3)
+and
+.BR ap_user_dealloc (3).
+The XAP implementation
+will call the user supplied allocation routine in the following circumstances:
+.IP \(bu \w'\(bu\(em'u
+If the user has not set the AP_BUFFERS_ONLY flag on
+.BR ap_open (3)
+then, when data
+structures are to be returned to the user by
+.BR ap_get_env "(3) or " ap_rcv (3),
+when cdata®env is returned or cdata®old_conn_id is returned, the allocation
+function will be called with the type argument set to AP_MEMORY.
+.IP \(bu
+When user data is to be returned from
+.BR ap_rcv (3)
+and the user has not provided sufficient buffers and the AP_ALLOC flag was set
+on the call, then the allocation function will be called with the type
+argument set to AP_BUFFERS.
+.PP
+The XAP library will call the user supplied deallocation function from the
+.BR ap_free (3)
+function when the user passes any structures which were allocated in the above
+circumstances.
+.PP
+XAP is responsible for freeing memory that it allocated when it is no longer
+required.  Exceptions to this are:
+.IP \(bu \w'\(bu\(em'u
+memory allocations passed to the service user as part of the cdata structure
+are described in Section 2.2.9
+.IP \(bu
+buffers passed to the user containing received data
+.IP \(bu
+memory allocations passed to the user on return from
+.BR ap_get_env (3).
+.SS Control Data Structure
+.PP
+The control data structure, cdata, is used to pass the parameters associated
+with individual primitives between XAP and the service user in the
+.BR ap_snd "(3) and " ap_rcv (3)
+functions. XAP maintains the parameters associated with the A_ASSOCIATE
+service primitives in the XAP environment. cdata allows the environment values
+to be overridden when
+.BR ap_snd (3)
+is used to send an
+.B A_ASSOCIATE
+primitive. For
+.BR ap_rcv (3),
+the structure can be used to return some environment values directly, rather
+than requesting them using the
+.BR ap_get_env (3)
+function.
+.PP
+The cdata structure is a collation of all possible parameters to all the
+primitives supported by XAP. The use of cdata depends upon the parameters
+defined for the specific service primitive being sent or received.
+Consequently, a description of how the cdata parameter is used for each of the
+service primitives is included in the manual pages in Section 7.
+.PP
+When a cdata structure is returned by
+.BR ap_rcv (3),
+XAP may have allocated data for sub-structures that are present. Once the
+service user has processed the data in the structure, the sub-structures may
+be freed by passing the cdata structure to
+.BR ap_free (3).
+.\"
+.SS Association Listeners
+.PP
+An Association Listener is an application which examines incoming A_ASSOC_IND
+primitives and passes the XAP instance to a receiving application which is to
+handle the incoming association.
+.PP
+The support for association listeners is optional; depending on the
+application requirements and the optional XAP functions available, the
+association listeners may be implemented in various ways. Implementations
+which support association listening are encouraged to support it in one of the
+following ways.
+.IP \(bu \w'\(bu\(em'u
+A simple listener mechanism using no XAP optional functions:
+.IP ""
+A listener application creates an XAP instance using
+.BR ap_open (3),
+binds to an address and waits for an incoming A_ASSOC_IND. After receiving
+A_ASSOC_IND, the listener brings out an appropriate responding application to
+proceed with the association establishment. The responding application may be
+made available by spawning a child process or, on those systems where this is
+not possible, by selecting one of a pool of established reponding processes.
+The responding application receives the fd and inherits the listenerss XAP
+environment and A_ASSOC_IND primitive and possibly data in a system dependent
+manner. The listener can then close the XAP instance by calling
+.BR ap_close (3)
+to release local resources.
+.IP \(bu
+A listener mechanism making use of the optional XAP functions ap_look and
+ap_restore:
+.IP ""
+A listening application creates an XAP instance using
+.BR ap_open (3),
+binds to an address and waits for an incoming A_ASSOC_IND. It calls
+.BR ap_look (3)
+to obtain the A_ASSOC_IND details which it uses to select a receiving
+application. The listener passes the fd in a system dependent manner, with the
+pending A_ASSOC_IND primitive, to the receiving application, and closes the
+XAP instance by calling
+.BR ap_close (3)
+to release local resources.
+.PP
+A receiving application calls
+.BR ap_restore (3),
+with a NULL file argument to:
+.IP \(bu \w'\(bu\(em'u
+create an XAP environment
+.IP \(bu
+retrieve the local Presentation address to which the A_ASSOC_IND primitive was
+addressed
+.IP \(bu
+set the XAP instance state to AP_IDLE.
+.PP
+The receiving application is now in a state where it can invoke
+.BR ap_rcv (3)
+to receive the pending A_ASSOC_IND primitive.
+.\"
+.\"
+.SH ERRORS
+.PP
+XAP functions return a result code as the function value. This code is zero if
+the function was completely successful, and -1 if any sort of error or warning
+condition occurred. In addition, each XAP function includes a pointer to an
+error code return location, aperrno_p, as its final argument. The service user
+must pass a pointer to a location into which an error code is returned if the
+result of the function is -1. The value in this location is unchanged if the
+function result is zero (that is SUCCESS).
+.PP
+Through aperrno_p, XAP reports internal error conditions caused, for example,
+by an invalid argument or a primitive issued out of state. System errors which
+occur outside the scope of the XAP interface result in the location pointed to
+by aperrno_p being set to the value of the system error. In addition, several
+error classes have been identified to allow errors reported by an underlying
+service provider to be passed to the service user. To facilitate application
+portability, all implementations of XAP should adhere to this scheme for
+reporting errors.  However, only the errors belonging to the XAP class must be
+supported. Specific errors belonging to the other error classes are dependent
+upon the underlying service providers utilised in a specific implementation. A
+detailed list of errors reported through aperrno_p is included in the
+introduction to the XAP interface functions, in Section 4.1 on page 56.
+.PP
+An
+.BR ap_error (3)
+function (see
+.BR ap_error (3)
+on page 63) is provided in XAP which returns a pointer to the location of a
+message that describes the error code passed to it.
+.\"
+.\"
+.SH CAVEATS
+.PP
+The XAP
+.BR ap_snd "(3) and " ap_rcv (3)
+functions may be used in either blocking or non-blocking execution mode.
+.PP
+In blocking mode,
+.BR ap_snd (3)
+blocks until resources are available to send the specified primitive in its
+entirety. Thus, if
+.BR ap_snd (3)
+is invoked when the communication path is flow controlled, the call blocks
+until the entire message has been sent. Similarly, in blocking mode,
+.BR ap_rcv (3)
+blocks until either an entire primitive is received, or XAP fills the buffer
+supplied as the ubuf argument.  In the latter case, the AP_MORE bit of the
+flags argument is set when
+.BR ap_rcv (3)
+returns. To receive the remainder of the primitive, the service user must
+continue calling
+.BR ap_rcv (3)
+until the function returns with the AP_MORE bit reset.
+.PP
+When XAP is used in non-blocking mode,
+.BR ap_snd "(3) and " ap_rcv (3)
+never block.  Hence, if
+.BR ap_snd (3)
+is called when insufficient resources are available to send the specified
+primitive in its entirety, XAP sends as much of the primitive as possible
+before returning with the [AP_AGAIN] error.  To complete sending the
+primitive, the service user calls
+.BR ap_snd (3)
+again with the same set of buffers as arguments until it returns successfully.
+A function,
+.BR ap_poll (3),
+is provided which can be used to wait until resources are available to send
+data on a particular XAP Instance.
+.PP
+In the non-blocking mode,
+.BR ap_rcv (3)
+reads data from the instance until an entire primitive is received, or the
+buffer supplied as the ubuf argument is full, or no more data is available to
+be read. Once one of these three events occurs,
+.BR ap_rcv (3)
+returns. If the call returns because no more data is available, the [AP_AGAIN]
+error is signalled. When this error is indicated, the service user may examine
+the flags argument to determine whether a primitive was partially received. If
+the AP_MORE bit of the flags argument is set, a primitive has been partially
+received. The
+.BR ap_poll (3)
+function can be used to wait until more data is available to be read from the
+instance.
+.PP
+The service user can request either blocking or non-blocking execution through
+the oflags argument to the
+.BR ap_open (3)
+function, or by setting or resetting the AP_NDELAY bit of the AP_FLAGS
+environment attribute.
+.\"
+.\"
+.SH NOTICES
+.PP
+All user data passed between XAP and the XAP user is in encoded form, using an
+appropriate transfer syntax (see Section 2.2.6 on page 21 ). Thus the service
+user is responsible for all user data encoding and decoding.
+.PP
+In addition, the XAP user is responsible for generating the encoding which the
+ACSE and Presentation protocols require for including the user data in their
+PDUs.  (Conceptually, this is the task of the service provider; however, XAP
+requires the service user to do it for the sake of efficiency.) The manual
+pages for the
+.BR ap_snd "(3) and " ap_rcv (3)
+functions in Section 3, along with the manual pages for individual primitives
+in Section 7, describe how the user data is to be encoded for inclusion in a
+particular primitives protocol data unit (PDU).
+.PP
+The application is required to encode/decode all ACSE and Presentation PDUs
+whenever it directly uses ACSE/Presentation primitives. When the application
+uses a primitive provided by a service element which maps the primitive onto
+ACSE/Presentation primitives, that service element shall encode/decode ACSE
+and Presentation PDUs. Refer to the appropriate service element API for
+specific information.
+.PP
+Two examples are given here of how information to be passed to the API must be
+encoded. The examples make some assumptions about how the transfer syntax for
+the encoding is identified and about the choices which must be made when
+information is passed to the ASCE and Presentation layers. The user is
+referred to the referenced specifications for the ACSE (ISO 8649 and ISO 8650)
+and Presentation (ISO 8822 and ISO 8823) protocols and for ASN.1 (ISO/IEC 8824
+and ISO/IEC 8825) for precise information on this subject.
+.PP
+The examples use the value syntax defined by the ASN.1 specification with the
+addition (for the purposes of this discussion only) of explicit tag
+information included within square brackets (for example: [INTEGER] - a
+universal tag, [0] - a context-specific tag, and so on).
+.SS More Data Flag
+.PP
+The service user may choose not to send all of the encoded data associated
+with a particular primitive in a singler
+.BR ap_snd (3)
+call. If that is the case, the XAP Library must be informed that the primitive
+will be issued as a series of
+.BR ap_snd (3)
+calls. This is accomplished by setting the AP_MORE bit in the flags parameter
+of the
+.BR ap_snd (3)
+function. The user may continue sending data associated with the current
+primitive by repeatedly calling
+.BR ap_snd (3)
+with the AP_MORE bit set. The sptype argument must remain the same for each of
+these calls. When the last buffer of data associated with the primitive is
+sent,
+.BR ap_snd (3)
+must be invoked with the AP_MORE bit reset.
+.PP
+The cdata argument also should not change when a sequence of
+.BR ap_snd (3)
+invocations is used to issue a single XAP primitive. However, since this
+argument is only examined on the first
+.BR ap_snd (3)
+call in such a sequence, no error is reported if its value is subsequently
+modified.
+.PP
+Primitives that are not associated with either an ACSE or Presentation Layer
+PDU (for example, P_DATA_REQ, P_SYNCMINOR_REQ, P_SYNCMINOR_RSP,
+P_TOKENGIVE_REQ, P_TOKENPLEASE_REQ, etc.) cannot be terminated by a final
+.BR ap_snd (3)
+invocation that does not carry any user data. Thus the final
+.BR ap_snd (3)
+invocation always carries 1 or more octets of user data for these primitives.
+.PP
+If all data associated with the primitive is present on the
+.BR ap_snd (3)
+call, the function must be issued with the AP_MORE bit not set.
+.PP
+In a similar fashion, if XAP elects to return data associated with a service
+primitive via multiple
+.BR ap_rcv (3)
+invocations, it sets the AP_MORE bit of the flags argument when
+.BR ap_rcv (3)
+returns. The
+.BR ap_rcv (3)
+function returns with the AP_MORE bit reset when the received primitive is
+complete.  Note that it is possible that XAP may receive a zero-length final
+fragment.
+.PP
+It should be noted that the value of the sptype argument must be checked after
+each
+.BR ap_rcv (3)
+call.  This is because another primitive (for example, A_PABORT_IND) could
+arrive before all data associated with the first primitive is processed.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.SS Example 1:
+.PP
+An FTAM initiator implementation wishes to use the ACSE protocol to set up an
+application association and transfer the F-CONNECT request primitive. It must
+encode the following data and tags into an ap_osi_vbuf_t structure and pass it
+to
+.BR ap_snd (3)
+for inclusion in an A-ASSOCIATE request primitive.
+.PP
+.RS
+.nf
+\fC\s-1\
+user-information [30] {
+    [EXTERNAL] { -- Association-information
+        direct-reference [OBJECT IDENTIFIER] { ... ftam-pci(1) }
+                        -- object id for the FTAM PDU abstract syntax
+        single-ASN1-type [0] {
+            f-initialise-request [0] {
+                protocol-version     [0] { version-1 } ,
+                implementation-info  [1] "ACME FTAM Initiator" ,
+                    .
+                    .
+                    .
+} } } }\s+1\fP
+.fi
+.RE
+.SS Example 2:
+.PP
+The FTAM initiator subsequently wishes to transfer a series of strings from an
+unstructured text file. It must encode the following data and tags into an
+ap_osi_vbuf_t structure and pass it to
+.BR ap_snd (3)
+for inclusion in a P-DATA request primitive.
+.PP
+.RS
+.nf
+\fC\s-1\
+[APPLICATION 1] { -- fully encoded user data
+        [SEQUENCE] { -- first PDV-List
+            [INTEGER] <n> , -- Identifies the abstract syntax
+                            -- "FTAM unstructured text"
+                            -- in the defined context set
+            single-ASN1-type [0] {
+                [GraphicString] "To begin at the beginning:"
+                                        -- first string from file
+        } } ,
+        [SEQUENCE] { -- second PDV-List
+            [INTEGER] <n> , -- Identifies the abstract syntax
+                            -- "FTAM unstructured text"
+                            -- in the defined context set
+            single-ASN1-type [0] {
+                [GraphicString] "It is spring, moonless night in the
+                                    small town, starless and Bible-black. .."
+                                        -- second string from file
+        } } ,
+                .
+                .
+}\s+1\fP
+.fi
+.RE
+.SS Example 3:
+.PP
+The following encoding is an alternative to that shown in example 2.
+.PP
+.RS
+.nf
+\fC\s-1\
+[APPLICATION 1] { -- fully encoded user data
+        [SEQUENCE] { -- first PDV-List
+            [INTEGER] <n> , -- Identifies the abstract syntax
+                            -- "FTAM unstructured text"
+                            -- in the defined context set
+            octet-aligned [1] {
+                [GraphicString] "To begin at the beginning:"
+                                        -- first string from file
+                [GraphicString] "It is spring, moonless night in the
+                                    small town, starless and bible-black. .."
+                                        -- second string from file
+                    .
+                    .
+} } }\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH USAGE
+.PP
+Below is a summary of the steps required to establish an association with a
+remote application entity using XAP. The procedure presented is intended
+solely as a general description of how the interface might be used. It should
+not be construed as an attempt to provide a template for constructing any
+particular application. Moreover, it is assumed that the service user is
+familiar with the ACSE and Presentation Layer protocols and understands the
+role of the ACSE-serviceuser in establishing, using and terminating an
+association between two application entities.
+.SS Obtain an XAP Instance.
+.PP
+First, a XAP Instance is created. This is accomplished either by using
+.BR ap_open (3),
+or by acquiring an already established instance through some other
+implementation-specific mechanism.
+.SS Initialise the XAP Environment.
+.PP
+Next, the XAP Environment is initialised (or restored) using the
+.BR ap_init_env (3)
+.RB ( ap_restore (3))
+function.
+.PP
+After the environment is initialised, the user may examine or alter the
+environment attributes, subject to the readability and writability
+restrictions discussed in Section 3.
+.SS Bind the XAP Instance to a Presentation Address.
+.PP
+Before any service primitives can be sent or received, the XAP instance must
+be bound to a presentation address. This is accomplished by setting the
+AP_BIND_PADDR attribute to a value which the service user is authorised to
+use. The AP_BIND_PADDR attribute can be set using either the
+.BR ap_set_env (3)
+function or the
+.BR ap_init_env (3)
+function. Then the service provider is
+signalled to activate the XAP instance by using the
+.BR ap_bind (3)
+function.
+.SS Set Other Environment Attributes.
+.PP
+In addition to AP_BIND_PADDR, other environment variables must be set before
+an association is established - particularly if the service user is the
+association-initiator. For example, before issuing an A_ASSOC_REQ primitive,
+the service user must specify the address of the remote entity by setting the
+AP_REM_PADDR attribute and set the AP_PCDL attribute to propose a list of
+presentation contexts that are to be used for transferring user data.
+.PP
+Refer to the manual pages in Section 3, and primitives descriptions in Section
+7, for further information about the XAP environment attributes and how they
+relate to sending and receiving individual primitives.
+.SS Send or Receive A_ASSOC Service Primitives.
+.PP
+Once the XAP environment has been properly initialised, the service user may
+attempt to establish an association with a remote application entity by using
+the A_ASSOC service primitives in conjunction with the
+.BR ap_snd "(3) and " ap_rcv (3)
+functions. Each of the A_ASSOC primitives is described in detail in Section 7.
+.SS Transfer Data.
+.PP
+Once the association is established, information may be exchanged with the
+remote application entity by sending and receiving the appropriate XAP
+primitives (using
+.BR ap_snd "(3) and " ap_rcv (3)).
+.SS Releasing the Association.
+.PP
+An association may be released either normally (using the A_RELEASE
+primitives), or abnormally (by using either the A-ABORT or the A-PABORT
+primitives).
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.TP
+.BR ap_bind (3)
+\- associate a presentation address with an instance of XAP.
+.TP
+.BR ap_close (3)
+\- close an instance of XAP.
+.TP
+.BR ap_error (3)
+\- return an error message.
+.TP
+.BR ap_free (3)
+\- free memory for XAP data structures.
+.TP
+.BR ap_get_env (3)
+\- get the value of an XAP environment attribute.
+.TP
+.BR ap_init_env (3)
+\- initialize an instance of XAP.
+.TP
+.BR ap_ioctl (3)
+\- control the generation of software interrupts.
+.TP
+.BR ap_look (3)
+\- examine the next ACSE/Presentation primitive from the association/connection.
+.TP
+.BR ap_open (3)
+\- create an instance of XAP.
+.TP
+.BR ap_poll (3)
+\- input/output multiplexing.
+.TP
+.BR ap_save (3)
+\- save and instance of XAP.
+.TP
+.BR ap_set_env (3)
+\- set the value of an XAP environment attribute.
+.TP
+.BR ap_snd (3)
+\- send an ACSE/Presentation primitive over the association/connection.
+.TP
+.BR ap_rcv (3)
+\- receive an ACSE/Presentation primitive from the association/connection.
+.TP
+.BR ap_restore (3)
+\- restore an instance of XAP environment.
+.\"
+.\"
+.SH NOTICES
+.PP
+Note that, unlike other OSI-based application interfaces, the XAP
+.[
+xap
+.]
+does not require abstract data manipulation using the XOM
+.[
+xom
+.]
+model or interfaces.
+It is, therefore, fairly easy to implement the A- and P- primitives directly
+using a
+.I STREAMS
+based driver.  Note that a
+.I STREAMS
+pushable module that translates between an XTI-mOSI interface and an XAP
+interface is possible.  Because a Stream provides an XAP compatible service
+interface, does not mean that all classes services or primitives are supported.
+For example, it is possible to use XAP
+.[
+xap
+.]
+as an inteface for TCAP.
+.[
+q771
+.]
+.\"
+.\"
+.XX
+.[
+xns99
+.]
+.[
+xap
+.]
+.[
+xti/tli revision 1
+.]
+
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

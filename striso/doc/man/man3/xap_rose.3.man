@@ -1,0 +1,1 @@
+.so man3/XAP-ROSE.3.man

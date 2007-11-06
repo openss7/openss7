@@ -1,0 +1,216 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH ACSE 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Provider Interface (NPI)"
+
+
+.SH ACSE Functional Units
+.PP
+.TS
+box tab(:);
+lb|lb|lb
+lb|lb|lb
+l|l|l.
+Functional:Service:Paramters
+Unit::
+_
+Kernel:A-ASSOCIATE:ASO-Context-Name
+::Calling AP Title
+::Calling AP Invocation-Identifier
+::Calling ASO Invocation Tag
+::Called AP Title
+::Called AP Invocation-Identifier
+::Called ASO Invocation Tag
+::Responding AP Title
+::Responding AP Invocation-Identifier
+::Responding ASO Invocation Tag
+::User Information
+::User Summary
+::Result
+::Result Source
+::Diagnostic
+::Calling Presentation Address
+::Called Presentation Address
+::Responding Presentation Address
+::Presentation Context Definition List
+::Presentation Context Definition Result List
+::Default Presentation Context Name
+::Default Presentation Context Result
+::Quality of Service
+::Session Requirements
+::Initial Synchronization Point Serial Number
+::Initial Assignment of Tokens
+::Session Connection Identifier
+:_:_
+:A-RELEASE:Reason
+::User Information
+::Result
+:_:_
+:A-ABORT:Abort Source
+::User Information
+:_:_
+:A-P-ABORT:Provider Reason
+:_:_
+:A-UNIT-DATA:ASO-Context-Name
+::Calling AP Title
+::Calling AP Invocation-Identifier
+::Calling ASO Invocation Tag
+::Called AP Title
+::Called AP Invocation-Identifier
+::Called ASO Invocation Tag
+::User Information
+::Calling Presentation Address
+::Called Presentation Address
+::Presentation Context Definition List
+::Quality of Service
+_
+Authentication:A-ASSOCIATE:Authentication-mechanism-name
+::Authentication-value
+::ACSE Requirements
+:_:_
+:A-ABORT:Diagnostic
+:_:_
+:A-UNIT-DATA:Authentication-mechanism Name
+::Authentication-value
+::ACSE Requirements
+_
+ASO-context-:A-ASSOCIATE:ASO-Context-Name List
+negotiation::ACSE Requirements
+_
+Higher-Level-:A-DATA:User-Data
+Association::
+:_:_
+:A-ALTER-CONTEXT:ASO-context-name
+::ASO-context-name-list
+::P-context-definition-result
+::P-context-definition-result-list
+::User-Information
+_
+Nested:None:None
+Association::
+.TE
+
+.SH SERVICE DEFINITION
+.PP
+.SS A-ASSOCIATE
+.PP
+The A-ASSOCIATE service establishes an association; it is a confirmed service.
+Groups of parameters are defined as follows:
+.IP 1. \w'0.\(em'u
+Calling ASO-Title is the composite of the Calling AP Title and the Calling
+ASO-Name parameters.
+.IP 2.
+Called ASO-Title is the composite of the Called AP Title and the Called
+ASO-Name parameters.
+.IP 3.
+Responding ASO-Title is the composite of the Responding AP Title and the
+Responding ASO-Name paramters.
+.PP
+The two components of the ASO-title (AP title and ASO-Name) are defined in
+X.650
+.[
+x650
+.]
+and X.207.
+.[
+x207
+.]
+
+.PP
+.TS
+box center tab(:);
+cb|cb|cb|cb|cb
+l|l|l|l|l.
+Parameter Name:Req:Ind:Rsp:Cnf
+_
+ASO-Context-Name:C:C(=):C:C
+ASO-Context-Name List:C:C(=):C:C(=)
+Calling AP Title:C(=):::
+Calling AP Invocation-Identifier:U:C(=)::
+Calling ASO Invocation Tag:U:C(=)::
+Called AP Title:U:C(=)::
+Called AP Invocation-Identifier:U:C(=)::
+Called AP ASO-Name:U:C(=)::
+Called AP Invocation-Identifier:U:C(=)::
+Called ASO Invocation Tag:U:C(=)::
+Responding AP Title:::U:C(=)
+Responding AP Invocation-Identifier:::U:C(=)
+Responding AP ASO Invocation Tag:::U:C(=)
+ACSE Requirements:U:C:U:C(=)
+Authentication-mechanism Name:U:C(=):U:C(=)
+Authentication-value:U:C(=):U:C(=)
+User Information:U:C:U:C(=)
+.TE

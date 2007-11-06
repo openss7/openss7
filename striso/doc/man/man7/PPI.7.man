@@ -1,0 +1,232 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH PPI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Presentation Provider Interface (PPI)"
+
+
+.PP
+Mapping of PPI primitives to X.216 Service Primitives:
+
+.TS
+box center tab(:);
+cb|cb|cb
+li|lb|lb.
+X.216 Service Primitive:PPI Primitive Type:XAP Primitive
+_
+P-CONNECT request:P_CONNECT_REQ:A_ASSOC_REQ
+P-CONNECT indication:P_CONNECT_IND:A_ASSOC_IND
+P-CONNECT response:P_CONNECT_RSP:A_ASSOC_RSP
+P-CONNECT confirmation:P_CONNECT_CNF:A_ASSOC_CNF
+P-RELEASE request:P_RELEASE_REQ:A_RELEASE_REQ
+P-RELEASE indication:P_RELEASE_IND:A_RELEASE_IND
+P-RELEASE response:P_RELEASE_RSP:A_RELEASE_RSP
+P-RELEASE confirmation:P_RELEASE_CNF:A_RELEASE_CNF
+P-U-ABORT request:P_ABORT_REQ:A_ABORT_REQ
+P-U-ABORT indication:P_ABORT_IND:A_ABORT_IND
+:P_PABORT_REQ:A_PABORT_REQ
+P-P-ABORT indication:P_PABORT_IND:A_PABORT_IND
+P-ALTER-CONTEXT request:P_ALTCNTX_REQ:\-
+P-ALTER-CONTEXT indication:P_ALTCNTX_IND:\-
+P-ALTER-CONTEXT response:P_ALTCNTX_RSP:\-
+P-ALTER-CONTEXT confirm:P_ALTCNTX_CNF:\-
+P-DATA request:\(dq:P_DATA_REQ
+P-DATA indication:\(dq:P_DATA_IND
+P-TYPED-DATA request:\(dq:P_TDATA_REQ
+P-TYPED-DATA indication:\(dq:P_TDATA_IND
+P-EXPEDITED-DATA request:\(dq:P_XDATA_REQ
+P-EXPEDITED-DATA indication:\(dq:P_XDATA_IND
+P-CAPABILITY-DATA request:\(dq:P_CDATA_REQ
+P-CAPABILITY-DATA indication:\(dq:P_CDATA_IND
+P-CAPABILITY-DATA response:\(dq:P_CDATA_RSP
+P-CAPABILITY-DATA confirm:\(dq:P_CDATA_CNF
+P-TOKEN-GIVE request:\(dq:P_TOKENGIVE_REQ
+P-TOKEN-GIVE indication:\(dq:P_TOKENGIVE_IND
+P-TOKEN-PLEASE request:\(dq:P_TOKENPLEASE_IND
+P-TOKEN-PLEASE indication:\(dq:P_TOKENPLEASE_REQ
+P-CONTROL-GIVE request:\(dq:P_CTRLGIVE_REQ
+P-CONTROL-GIVE indication:\(dq:P_CTRLGIVE_IND
+P-SYNC-MINOR request:\(dq:P_SYNCMINOR_REQ
+P-SYNC-MINOR indication:\(dq:P_SYNCMINOR_IND
+P-SYNC-MINOR response:\(dq:P_SYNCMINOR_RSP
+P-SYNC-MINOR confirm:\(dq:P_SYNCMINOR_CNF
+P-SYNC-MAJOR request:\(dq:P_SYNCMAJOR_REQ
+P-SYNC-MAJOR indication:\(dq:P_SYNCMAJOR_IND
+P-SYNC-MAJOR response:\(dq:P_SYNCMAJOR_RSP
+P-SYNC-MAJOR confirm:\(dq:P_SYNCMAJOR_CNF
+P-RESYNCHRONIZATION request:\(dq:P_RESYNC_REQ
+P-RESYNCHRONIZATION indication:\(dq:P_RESYNC_IND
+P-RESYNCHRONIZATION response:\(dq:P_RESYNC_RSP
+P-RESYNCHRONIZATION confirm:\(dq:P_RESYNC_CNF
+P-U-EXCEPTION-REPORT request:\(dq:P_UXREPORT_REQ
+P-U-EXCEPTION-REPORT indication:\(dq:P_UXREPORT_IND
+P-P-EXCEPTION-REPORT indication:\(dq:P_PXREPORT_IND
+P-ACTIVITY-START request:\(dq:P_ACTSTART_REQ
+P-ACTIVITY-START indication:\(dq:P_ACTSTART_IND
+P-ACTIVITY-RESUME request:\(dq:P_ACTRESUME_REQ
+P-ACTIVITY-RESUME indication:\(dq:P_ACTRESUME_IND
+P-ACTIVITY-END request:\(dq:P_ACTEND_REQ
+P-ACTIVITY-END indication:\(dq:P_ACTEND_IND
+P-ACTIVITY-END response:\(dq:P_ACTEND_RSP
+P-ACTIVITY-END confirm:\(dq:P_ACTEND_CNF
+P-ACTIVITY-INTERRUPT request:\(dq:P_ACTINTR_REQ
+P-ACTIVITY-INTERRUPT indication:\(dq:P_ACTINTR_IND
+P-ACTIVITY-INTERRUPT response:\(dq:P_ACTINTR_RSP
+P-ACTIVITY-INTERRUPT confirm:\(dq:P_ACTINTR_CNF
+P-ACTIVITY-DISCARD request:\(dq:P_ACTDISCARD_REQ
+P-ACTIVITY-DISCARD indication:\(dq:P_ACTDISCARD_IND
+P-ACTIVITY-DISCARD response:\(dq:P_ACTDISCARD_RSP
+P-ACTIVITY-DISCARD confirm:\(dq:P_ACTDISCARD_CNF
+P-UNIT-DATA request:P_UNITDATA_REQ:\-
+P-UNIT-DATA indication:P_UNITDATA_IND:\-
+.TE
+
+.SS P-CONNECT
+.PP
+.TS
+box tab(:);
+c|c|c|c|c
+l|c|c|c|c.
+Parameter name:Req:Ind:Rsp:Cnf
+_
+Calling-presentation-address:M:M::
+Called-presentation-address:M:M::
+Responding-presentation-address:::M:M
+Presentation context definition list:U:C(=)::
+Presentation context definition result list::C:C:C(=)
+Default context name:U:C(=)::
+Default context result:::C:C(=)
+Quality of service:S:S:S:S
+Presentation requirements:U:C:U:C(=)
+Mode:M:M(=)::
+Session requirements:S:S:S:S
+Initial syncrhonization point serial number:S:S:S:S
+Initial assignment of tokens:S:S:S:S
+Session connection identifier:S:S:S:S
+User data:U:C(=):U:C(=)
+Result:::M:M(=)
+.TE
+.sp
+.TS
+tab(:);
+lw(0.5i)lssw(4.5i).
+M:T{
+Presence of the parameter is mandatory.
+T}
+U:T{
+Presence of the parameter is a user option.
+T}
+C:T{
+Presence of the parameter is conditional.
+T}
+(=):T{
+.ad l
+.hy 0
+When appended to one of the above, the value of the parameter is equal to the
+value of the parameter indicated in the column to the left.
+T}
+Blank:T{
+The parameter is not present.
+T}
+
+NOTE \(em:T{
+.ad l
+.hy 0
+When the presentation-connection establishment request is rejected by the
+presentation-service-provider, the value of this parameter is
+provider-generated.
+T}
+.TE
+.TP
+.I Presentation context definition list
+This parameter is present when the PS-user requires to place one or more
+presentations contexts in the DCS at the timer of presentation-connection
+establishment.  It consists of a list containing one or more items; each item
+contains two components, a presentation context identification and an abstract
+sytnax name.
+.sp
+The presentation context identification components of this parameter exist to
+distinguish presentation contexts in communication between the PS-user and the
+local presentation-entity.  The unambiguous identification of the presentation
+context to be established is required.  The way this is achieved in a real
+open system is an implementation matter. 
+.sp
+NOTE \(em A separate presentation context is associated with each abstract
+syntax name in the list of names in the Presentation context definition list
+parameter.  If the same name occurs more than once, a separate and distinctly
+identified presentation context is generated for each occurrence.
+.TP
+.I Presentaiton context definition result list
+This parameter indicates the acceptance

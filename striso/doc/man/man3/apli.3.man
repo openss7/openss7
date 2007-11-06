@@ -1,0 +1,476 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH APLI 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B APLI, apli
+\- ACSE/Presentation Layer Interface
+.SH SYNOPSIS
+.PP
+.B #include <ap_lib.h>
+.br
+.B #include <osi_lib.h>
+.br
+.B #include <ap_poll.h>
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B APLI
+is an ACSE/Presentation Layer Interface originally developed by UNIX Systems Laboratories and later
+standardized by X/Open, IEEE and ISO.
+The ACSE/Presentation Layer Interface (APLI) provides a standard interface between an application
+entity (as defined by the OSI reference model) and the services provided by ACSE
+.[
+x217
+.]
+and the
+Presentation Layer
+.[
+x216
+.]
+of the OSI protocol stack.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.TS
+tab(:);
+lblbw(4.0i)lb
+lbllb.
+Function:Description:Reference
+_
+ap_open\fR():T{
+Open APLI instance.
+T}:apli_open\fR(3)
+ap_init_env\fR():T{
+Initialize APLI environment.
+T}:apli_init_env\fR(3)
+ap_restore\fR():T{
+Restore an APLI environment.
+T}:apli_restore\fR(3)
+ap_get_env\fR():T{
+Get APLI environment attribute.
+T}:apli_get_env\fR(3)
+ap_set_env\fR():T{
+Set APLI environment attribute.
+T}:apli_set_env\fR(3)
+ap_save\fR():T{
+Save an APLI environment.
+T}:apli_save\fR(3)
+ap_snd\fR():T{
+Send APLI service primitive.
+T}:apli_snd\fR(3)
+ap_rcv\fR():T{
+Receive APLI service primitive.
+T}:apli_rcv\fR(3)
+ap_free\fR():T{
+Free memory from APLI data structures.
+T}:apli_free\fR(3)
+ap_poll\fR():T{
+Poll APLI resources.
+T}:apli_poll\fR(3)
+ap_error\fR():T{
+Return an error message.
+T}:apli_error\fR(3)
+ap_close\fR():T{
+Close APLI instance.
+T}:apli_close\fR(3)
+_
+.TE
+.TP
+.BR ap_open "(3), " ap_close (3)
+\- functions used to establish and release APLI instances
+.TP
+.BR ap_init_env "(3), " ap_set_env "(3), " ap_get_env (3)
+\- function used to manage the APLI environment.
+.TP
+.BR ap_snd "(3), " ap_rcv (3)
+\- functions used to send or receive APLI primitives.
+.TP
+.BR ap_free (3)
+\- functions used to manage memory allocated to the APLI environment.
+.TP
+.BR ap_poll (3)
+\- function use to retrieve status information.
+.TP
+.BR ap_error (3)
+\- function use to retrieve error messages corresponding to specific error return codes.
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+Each APLI service primitive corresponds to an ACSE
+.[
+x217
+.]
+or Presentation Layer
+.[
+x216
+.]
+service.  Primitives that correspond to an ACSE service are prefixed with '\fBA_\fP' and primitives
+that correspond to presentation layer services are prefixed with '\fBP_\fP'.  With the exception of
+\fIuser data\fP, the parameters passed to the service provider by APLI when sending a particular
+primitive are deerived from attributes held in the APLI environment and from \fIprotocol
+information\fP passed to APLI by the service user.  Protocol information allows the service user to
+pass parameters specific to each primitive and to override some of the values held in the
+environment.
+.PP
+When receiving primitives from the service provider, APLI updates the values fo some environment
+attributes and passes specific parameters to the service user along with the primitive itself.
+.PP
+The service primitives supported by APLI are as follows:
+.TP
+.BR A_ASSOC_REQ "(7), " A_ASSOC_IND "(7), " A_ASSOC_RSP "(7), " A_ASSOC_CNF (7)
+\- primtives used to establish an association (A-ASSOCIATE).
+.TP
+.BR A_RELEASE_REQ "(7), " A_RELEASE_IND "(7), " A_RELEASE_RSP "(7), " A_RELEASE_CNF (7)
+\- primitives used to release an association (A-RELEASE).
+.TP
+.BR A_ABORT_REQ "(7), " A_ABORT_IND (7)
+\- primitives used to abrot an association (A-ABORT).
+.TP
+.BR A_PABORT_REQ "(7), " A_PABORT_IND (7)
+\- primtiives used to provider abort the association (A-P-ABORT).
+.TP
+.BR P_DATA_REQ "(7), " P_DATA_IND (7)
+\- primitives used to transfer user data.
+.TP
+.BR P_TOKENGIVE_REQ "(7), " P_TOKENGIVE_IND (7)
+\- primitives used to release tokens (P-TOKEN-GIVE).
+.TP
+.BR P_TOKENPLEASE_REQ "(7), " P_TOKEPLEASE_IND (7)
+\- primitives used to acquire tokens (P-TOKEN-PLEASE).
+.\"
+.\"
+.SH ENVIRONMENT
+.PP
+The APLI environment stores all of the information necessary to establish and maintain an
+association with another application entity in the form of \fIattribtutes\fP.  APLI environment
+attribtues are divided into two types:
+.IP \(bu \w'\(bu\(em'u
+\fIRead-only\fP attribtues store information that reflect the current status of the association, OSI
+protocol stack, or APLI instance.
+.IP \(bu
+\fIRead-write\fP attribtues can be modified by the service user and are used to specify the
+characteristics of an association or the APLI instance.
+.PP
+Certain attributes are only accessible (for either reading or writing) when the APLI instance is in
+a given state.  The current state of the APLI instance is returned in the attribute \fBAP_STATE\fP.
+.PP
+The attributes supported by the OpenSS7 APLI Library are as follows:
+.TP \w'\fBAP_INIT_SYNC_PT\fP\(em'u
+.B AP_ACSE_AVAIL
+\- available ACSE protocol versions.
+.PD 0
+.TP
+.B AP_ACSE_SEL
+\- selected ACSE protocol versions.
+.TP
+.B AP_BIND_PADDR
+\- bind Presentation Address.
+.TP
+.B AP_CLD_AEID
+\- called AE-invocation-identifier.
+.TP
+.B AP_CLD_AEQ
+\- called AE-qualifier.
+.TP
+.B AP_CLD_APID
+\- called AP-invocation-identifier.
+.TP
+.B AP_CLD_APT
+\- called AP-title.
+.TP
+.B AP_CLD_CONN_ID
+\- called Session connection identifier.
+.TP
+.B AP_CLG_AEID
+\- calling AE-invocation-identifier.
+.TP
+.B AP_CLG_AEQ
+\- calling AE-qualifier.
+.TP
+.B AP_CLG_APID
+\- calling AP-invocation-identifier.
+.TP
+.B AP_CLG_APT
+\- calling AP-title.
+.TP
+.B AP_CLG_CONN_ID
+\- calling Session connection identifier.
+.TP
+.B AP_CNTX_NAME
+\- Application/ASO-context-name.
+.TP
+.B AP_DCS
+\- Defined-context-set.
+.TP
+.B AP_DPCN
+\- Default-context-name.
+.TP
+.B AP_DPCR
+\- Default-context-result.
+.TP
+.B AP_INIT_SYNC_PT
+\- Session initial synchronization point.
+.TP
+.B AP_LCL_PADDR
+\- local presentation address.
+.TP
+.B AP_LIB_AVAIL
+\- available library versions.
+.TP
+.B AP_LIB_SEL
+\- selected library versions.
+.TP
+.B AP_MODE_AVAIL
+\- available modes.
+.TP
+.B AP_MODE_SEL
+\- selected mode.
+.TP
+.B AP_MSTATE
+\- segmentation state.
+.TP
+.B AP_PCDL
+\- Presentation-context-definition list.
+.TP
+.B AP_PCDRL
+\- Presentation-context-definition-result list.
+.TP
+.B AP_PFU_AVAIL
+\- available Presentation layer functional units.
+.TP
+.B AP_PFU_SEL
+\- selected Prestnation layer functional units.
+.TP
+.B AP_PRES_AVAIL
+\- available Presentation layer protocol versions.
+.TP
+.B AP_PRES_SEL
+\- selected Presentation layer protocol versions.
+.TP
+.B AP_REM_PADDR
+\- remote Presentation address.
+.TP
+.B AP_ROLE_ALLOWED
+\- allowed initiator or responder roles.
+.TP
+.B AP_ROLE_CURRENT
+\- current intiiator or responder role.
+.TP
+.B AP_RSP_AEID
+\- responding AE-invocation-identifier.
+.TP
+.B AP_RSP_APID
+\- responding AP-invocation-identifier.
+.TP
+.B AP_SESS_AVAIL
+\- available Session layer protocol versions.
+.TP
+.B AP_SESS_SEL
+\- selected Session layer protocol versions.
+.TP
+.B AP_SFU_AVAIL
+\- available Session layer functional units.
+.TP
+.B AP_SFU_SEL
+\- selected Session layer functional units.
+.TP
+.B AP_STATE
+\- APLI instance state.
+.TP
+.B AP_STREAM_FLAGS
+\- device Stream delay flag.
+.TP
+.B AP_TOKENS_AVAIL
+\- Session tokens available.
+.TP
+.B AP_TOKENS_OWNED
+\- Session tokens held.
+.PD
+.PP
+See
+.BR ap_env (3)
+and
+.BR ap_env_file (5)
+for more information on environment attributes.
+.\"
+.\"
+.SH STRUCTURES
+.PP
+.TP
+.BR ap_cdata_t (5)
+.TP
+.BR ap_cdl_t (5)
+.TP
+.BR ap_cdrl_t (5)
+.TP
+.BR ap_conn_id_t (5)
+.TP
+.BR ap_dcn_t (5)
+.TP
+.BR ap_dcs_t (5)
+.TP
+.BR ap_paddr_t (5)
+.TP
+.BR any_t (5)
+.TP
+.BR objid_t (5)
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+OpenSS7 implements both the older-style APLI Library and the newer XAP Library.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH DRIVERS
+.PP
+.\"
+.\"
+.SH MODULES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+The OpenSS7 APLI Library has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.IP \(em \w'\(em\(em'u
+.IP \(em
+Note that
+.IR "Solaris\(rg SunLink" ,
+.[
+sunlink-apli
+.]
+.IR "Solaris\(rg Solstice" ,
+and
+.IR "HP-UX\(rg OTS/9000"
+do not support the
+.BR ap_save ()
+and
+.BR ap_restore ()
+functions.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+The APLI interface was developed by UNIX Systems Laboratories and later standardized by the
+OpenGroup (then X/Open), the IEEE and ISO as the X/Open ACSE/Presentation API (XAP).
+.[
+XAP ACSE C303
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T2

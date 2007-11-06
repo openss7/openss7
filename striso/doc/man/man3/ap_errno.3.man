@@ -1,0 +1,806 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_ERRNO 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B ap_errno
+\- APLI error codes.
+.\"
+.\"
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface,
+APLI,
+.[
+APLI UNIX International
+.]
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ap_lib.h>
+.br
+.B #include <osi_lib.h>
+.PP
+.nf
+#define AP_ACCES                 1      /* Request to bind specified address denied. */
+#define AP_AGAIN                 2      /* Request not completed. */
+#define AP_BADATTRVAL            3      /* Bad value for environment attribute. */
+#define AP_BADCD_ACT_ID          4      /* Cdata field value invalid: act_id. */
+#define AP_BADCD_DIAG            5      /* Cdata field value invalid: diag. */
+#define AP_BADCD_EVT             6      /* Cdata field value invalid: env. */
+#define AP_BADCD_OLD_ACT_ID      7      /* Cdata field value invalid: old_act_id. */
+#define AP_BADCD_OLD_CONN_ID     8      /* Cdata field value invalid: old_conn_id. */
+#define AP_BADCD_RES            10      /* Cdata field value invalid: res. */
+#define AP_BADCD_RESYNC_TYPE    12      /* Cdata field value invalid: resync_type. */
+#define AP_BADCD_RSN            13      /* Cdata field value invalid: rsn. */
+#define AP_BADCD_SYNC_P_SN      15      /* Cdata field value invalid: sync_p_sn. */
+#define AP_BADCD_SYNC_TYPE      16      /* Cdata field value invalid: sync_type. */
+#define AP_BADCD_TOKENS         17      /* Cdata field value invalid: tokens. */
+#define AP_BADENV               19      /* A mandatory attriute is not set. */
+#define AP_BADF                 20      /* Not a presentation service endpoint. */
+#define AP_BADFLAGS             21      /* The specified combination of flags is invalid.  */
+#define AP_BADFREE              22      /* Could not free structure members. */
+#define AP_BADKIND              23      /* Unknown structure type. */
+#define AP_BADLSTATE            24      /* Instance in bad state for that command. */
+#define AP_BADPARSE             25      /* Attribute parse failed. */
+#define AP_BADPRIM              26      /* Unrecognized primitive from user. */
+#define AP_BADRESTR             27      /* Attributes not restored due to more bit on. */
+#define AP_BADROLE              28      /* Request invalid due to value of AP_ROLE. */
+#define AP_BADSAVE              29      /* Attributes not save due to more bit on. */
+#define AP_BADSAVEF             30      /* Invalid FILE pointer. */
+#define AP_HANGUP               32      /* Assocation closed or aborted. */
+#define AP_LOOK                 34      /* A pending event requires attention. */
+#define AP_NOATTR               35      /* No such attribute. */
+#define AP_NOENV                36      /* No environment for that fd. */
+#define AP_NOMEM                37      /* Could not allocate enough memory. */
+#define AP_NOREAD               38      /* Attribute is not readable. */
+#define AP_NOWRITE              40      /* Attribute is not writable. */
+#define AP_PDUREJ               41      /* Invalid PDU rejected. */
+
+#define AP_NOERROR               0      /* No error. (Not XAP.) */
+#define AP_BADCD_PABORT_IND      9      /* Cdata field value invalid: pabort_ind. (Not XAP.) */
+#define AP_BADCD_RES_SRC        11      /* Cdata field value invalid: res_src. (Not XAP.) */
+#define AP_BADCD_SRC            14      /* Cdata field value invalid: src. (Not XAP.) */
+#define AP_BADENC               18      /* Bad encoding chosen in enveloping function.  (Not XAP.) */
+#define AP_BADUBUF              31      /* Bad length for user data. (Not XAP.) */
+#define AP_INTERNAL             33      /* Internal error. (Not XAP.) */
+#define AP_NOSET                39      /* Attribute is not setable. (Not XAP.) */
+.fi
+.PP
+or
+.PP
+.B
+#include <xap.h>
+.PP
+.nf
+#define AP_AGAIN_DATA_PENDING   42      /* XAP was unable to complete the requested
+                                           action.  Try again.  There is an event
+                                           available for the user to receive. (XAP only.) */
+#define AP_BADALLOC             43      /* The ap_user_alloc/ap_user_dealloc argument
+                                           combination was invalid. (XAP only.) */
+#define AP_BADASLSYN            44      /* The transfer syntaxes proposed for the ACSE
+                                           syntax are not supported. (XAP only.) */
+#define AP_BADDATA              45      /* user data not allowed on this service (XAP only.) */
+#define AP_BADNSAP              46      /* The format of the NSAP portion of the
+                                           Presetnation Address is not supported. (XAP
+                                           only.) */
+#define AP_DATA_OVERFLOW        47      /* User data and presentation services pci
+                                           exceeds 512 bytes on session VI or the length
+                                           of user data exceeds a locally defined limit, 
+                                           as stated in the CSQ. (XAP only.) */
+#define AP_NOBUF                48      /* could not allocate enough buffers (XAP only.) */
+#define AP_NODATA               49      /* an attempt ws made to send a primitive with no 
+                                           user data (XAP onlyl.) */
+#define AP_NO_PRECEDENCE        50      /* The resyncrhonization requested by the local
+                                           user does not have precedence over the one
+                                           requested by the remote user. (XAP only.) */
+#define AP_NOT_SUPPORTED        51      /* THe action requested is not supported by this
+                                           implementation of XAP. (XAP only.) */
+#define AP_SUCCESS_DATA_PENDING 52      /* The requested action was completed
+                                           successfully. There is an event available for
+                                           the user to receive. (XAP only.) */
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B ap_errno
+provides a thread-safe global error code for use with the ACSE/Presentation
+Library Interface, APLI,
+.[
+apli UNIX International
+.]
+.BR apli (3).
+.PP
+Error codes and their associated English error message strings defined by APLI
+.[
+apli UNIX International
+.]
+and
+XAP
+.[
+xap c303
+.]
+are as follows:
+.sp
+.TS
+tab(:);
+lb1lb1lb1lb0s0s0s0s
+lb1c1c1li0s0s0s0s.
+Error Code:APLI:XAP:English Error Message String
+_
+AP_ACCES:X:X:T{
+Request to bind specified address denied.
+T}
+AP_AGAIN:X:X:T{
+Request not completed.
+T}
+AP_AGAIN_DATA_PENDING:\-:X:T{
+XAP was unable to complete the requested action.  Try again.  There is an event available for the user to receive.
+T}
+AP_BADALLOC:\-:X:T{
+The ap_user_alloc/ap_user_dealloc argument combination was invalid.
+T}
+AP_BADASLSYN:\-:X:T{
+The transfer syntaxes proposed for the ACSE syntax are not supported.
+T}
+AP_BADATTRVAL:X:X:T{
+Bad value for environment attribute.
+T}
+AP_BADCD_ACT_ID:X:X:T{
+Cdata field value invalid: act_id.
+T}
+AP_BADCD_DIAG:X:X:T{
+Cdata field value invalid: diag.
+T}
+AP_BADCD_EVT:X:X:T{
+Cdata field value invalid: evt.
+T}
+AP_BADCD_OLD_ACT_ID:X:X:T{
+Cdata field value invalid: old_act_id.
+T}
+AP_BADCD_OLD_CONN_ID:X:X:T{
+Cdata field value invalid: old_conn_id.
+T}
+AP_BADCD_PABORT_IND:X:\-:T{
+Cdata field value invalid: pabort_ind.
+T}
+AP_BADCD_RES_SRC:X:\-:T{
+Cdata field value invalid: res_src.
+T}
+AP_BADCD_RES:X:X:T{
+Cdata field value invalid: res.
+T}
+AP_BADCD_RESYNC_TYPE:X:X:T{
+Cdata field value invalid: resync_type.
+T}
+AP_BADCD_RSN:X:X:T{
+Cdata field value invalid: rsn.
+T}
+AP_BADCD_SRC:X:\-:T{
+Cdata field value invalid: src.
+T}
+AP_BADCD_SYNC_P_SN:X:X:T{
+Cdata field value invalid: sync_p_syn.
+T}
+AP_BADCD_SYNC_TYPE:X:X:T{
+Cdata field value invalid: sync_type.
+T}
+AP_BADCD_TOKENS:X:X:T{
+Cdata field value invalid: tokens.
+T}
+AP_BADDATA:\-:X:T{
+user data not allowed on this service
+T}
+AP_BADENC:X:\-:T{
+Bad encoding chosen in enveloping function.
+T}
+AP_BADENV:X:X:T{
+A mandatory aattribute is not set.
+T}
+AP_BADFLAGS:X:X:T{
+The specified combination of flags is invalid.
+T}
+AP_BADFREE:X:X:T{
+Could not free structure members.
+T}
+AP_BADF:X:X:T{
+Not a presentation service endpoint.
+T}
+AP_BADKIND:X:X:T{
+Unknown structure type.
+T}
+AP_BADLSTATE:X:X:T{
+Instance in bad state for that command.
+T}
+AP_BADNSAP:\-:X:T{
+The format of the NSAP portion of the Presetnation Address is not supported.
+T}
+AP_BADPARSE:X:X:T{
+Attribute parse failed.
+T}
+AP_BADPRIM:X:X:T{
+Unrecognized primitive from user.
+T}
+AP_BADRESTR:X:X:T{
+Attributes not restored due to more bit on.
+T}
+AP_BADROLE:X:X:T{
+Request invalid due to value of AP_ROLE.
+T}
+AP_BADSAVEF:X:X:T{
+Invalid FILE pointer.
+T}
+AP_BADSAVE:X:X:T{
+Attribtues not saved due to more bit on.
+T}
+AP_BADUBUF:X:\-:T{
+Bad length for user data.
+T}
+AP_DATA_OVERFLOW:\-:X:T{
+User data and presentation services pci exceeds 512 bytes on session VI or the length of user data exceeds a locally defined limit, as stated in the CSQ.
+T}
+AP_HANGUP:X:X:T{
+Association close or aborted.
+T}
+AP_INTERNAL:X:\-:T{
+Internal error.
+T}
+AP_LOOK:X:X:T{
+A pending event requires attention.
+T}
+AP_NOATTR:X:X:T{
+No such attribute.
+T}
+AP_NOBUF:\-:X:T{
+could not allocate enough buffers
+T}
+AP_NODATA:\-:X:T{
+an attempt ws made to send a primitive with no user data
+T}
+AP_NOENV:X:X:T{
+No environment for that fd.
+T}
+AP_NOERROR:X:X:T{
+No error.
+T}
+AP_NOMEM:X:X:T{
+Could not allocate enough memory.
+T}
+AP_NO_PRECEDENCE:\-:X:T{
+The resyncrhonization requested by the local user does not have precedence over the one requested by the remote user.
+T}
+AP_NOREAD:X:X:T{
+Attribute is not readable.
+T}
+AP_NOSET:X:\-:T{
+Attribute is not setable.
+T}
+AP_NOT_SUPPORTED:\-:X:T{
+The action requested is not supported by this implementation of XAP.
+T}
+AP_NOWRITE:X:X:T{
+Attribute is not writable.
+T}
+AP_PDUREJ:X:X:T{
+Invalid PDU rejected.
+T}
+AP_SUCCESS_DATA_PENDING:\-:X:T{
+The requested action was completed successfully. There is an event available for the user to receive.
+T}
+_
+.TE
+.PP
+Detailed description of some error codes follow:
+.TP
+.B AP_NOERROR\ -
+No error is indicated in the
+.B ap_errno
+variable.  The last operation was a success.
+.B ap_errno
+will not be set to this value (zero) by the library, the user must set
+.B ap_errno
+to zero before the APLI library call and when the call is successful, the
+.B ap_errno
+value will be unaffected.  There is no requirement that this value be set after a successful call,
+and calls are event permitted to change
+.B ap_errno
+to some other value, when the call is actually successful.
+.TP
+.B AP_ACCES\ -
+When an APLI or XAP instance is bound to a presentation address using the
+.BR ap_set_env (3)
+or
+.BR ap_bind (3)
+library functions, and a network address (NSAP), transport selector (TSEL),
+session selector (SSEL) or presentation selector (PSEL) requires privilege,
+and the caller does not have sufficient privilege, this error will be issued
+indicating that the request to bind the specified address was denied.
+.TP
+.B AP_AGAIN\ -
+A request (library function call) was interrupted before it could start or the call would block and
+the APLI or XAP instance is set for non-blocking operation, this error is issued indicating that the
+request was not completed and to try again.
+.TP
+.B AP_AGAIN_DATA_PENDING\ -
+Same as \fBAP_AGAIN\fP, except that there is also an event available for the user to receive (which
+may have been what interrupted the current call).
+.sp
+This is an XAP-only extension to the APLI library.
+.TP
+.B AP_BADALLOC\ -
+This error is generated by calls to the
+.B ap_init_env (3)
+function when the user allocation and deallocation function argument combination is invalid.  These
+arguments must either both be non-NULL or both be NULL.  Any other combination will generate this
+error.
+.sp
+This is an XAP-only extension to the APLI library.
+.TP
+.B AP_BADASLSYN\ -
+When forming a presentation connection, the user can provide a proposes presentation context list
+which contains abstract and transfer syntaxes.  All of the proposed transfer syntaxes must be
+supported by the service provider and the ACSE/Presentation Library Interface implementation.  When
+one of the transfer syntaxes in the proposed list (see environment attributes
+.BR AC_PCDL
+and
+.BR AC_PCDRL ),
+is not supported by the provider or library, this error is returned indicating that the transfer
+syntaxes proposed for the ACSE syntax are not supported.
+.sp
+This is an XAP-only extension to the APLI library.
+.TP
+.B AP_BADATTRVAL\ -
+When setting an environment attribute with
+.BR ap_set_env (3),
+the user supplies the attribute value.  In some cases, the attribute value may be NULL.  I some case
+it may not.  Some attribute have constraints on the range of values that they accept.  Some
+attributes are constrained by the setting of other attributes witin the environment.  Whenever a
+user specifies an illegal, invalid or otherwise unusable value for an environment attribute, this
+error is returned indicating that there was a bad value for an environment attribute.
+.TP
+.B AP_BADCD_ACT_ID\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIact_id\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_DIAG\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIdiag\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_EVT\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIevt\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_OLD_ACT_ID\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIold_act_id\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_OLD_CONN_ID\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIold_conn_id\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_PABORT_IND\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIpabort_ind\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.sp
+This is an APLI-only error code for the APLI library.
+.TP
+.B AP_BADCD_RES\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIres\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_RES_SRC\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIres_src\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.sp
+This is an APLI-only error code for the APLI library.
+.TP
+.B AP_BADCD_RESYNC_TYPE\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIresync_type\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_RSN\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIrsn\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_SRC\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIsrc\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.sp
+This is an APLI-only error code for the APLI library.
+.TP
+.B AP_BADCD_SYNC_P_SN\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIsync_p_sn\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_SYNC_TYPE\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIsync_type\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_TOKENS\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fItokens\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADDATA\ -
+APLI provides specialized structure for control data for each service primitive.  XAP does not, it
+provides one single control data type.  Therefore, it is possible under XAP (but not possible under
+APLI) that a positive, non-zero amount of user data is specified with primitives that do not accept
+user data.  Therefore, in the event that an XAP
+.BR ap_snd (3)
+function is called with control data that contains a positive, non-zero user data length and the
+service primitive sptype does not support user data, this error is generated indicating that user
+data is not applied on this service.
+.sp
+This is an XAP-only extension to the APLI library.
+.TP
+.B AP_BADENC\ -
+When the user passes data to the \fBap_snd\fP(3) function, it must be encoded in the appropriate
+encoding for the abstract/transfer syntax negotiated for the presentation layer.  The
+\fBap_snd\fP(3) function has determined that the choice of encoding for the envelope of the user
+data was incorrect.
+.sp
+This is an APLI-only error code for the APLI library.
+.TP
+.B AP_BADENV\ -
+A mandatory ALPI environment attribute, settable with the \fBap_set_env\fP(3) and gettable with the
+\fBap_get_env\fP(3) functions, was not set at the time of the call to \fBap_snd\fP(3), but the
+service primitive invoked by the function requires that the attribute be set by the caller to a
+specific value.  Therefore, the call to \fBap_snd\fP(3) has failed because a mandatory attribute is
+not set.
+.TP
+.B AP_BADF\ -
+Most APLI library functions have a file descriptor, \fIfd\fP, passed as the first argument of the
+function.  This file descriptor is both a handle to the APLI instance that the user wishes to
+control as well as being a character special file, pipe or named FIFO, representing a presentation
+service provider.  The APLI library tracks which of the process' file descriptors are associated
+with presentation service providers, and thus represent APLI instances.  Those that do not, such as
+standard input, standard output or standard error, cannot have their file descriptors passed to APLI
+library functions without generating this error.  This error indicates that the passed in file
+descriptor, \fIfd\fP, did not correspond to a presentation service endpoint, and so does not
+correspond to an APLI instances and therefore cannot be acted upon by the APLI library function.
+.TP
+.B AP_BADFLAGS\ -
+For some combinations of flags passed to APLI library functions as arguments, the combinations do
+not follow a strict choice of unrestricted logical OR combination.  Some flag combinations are not
+permitted or are invalid or are unspecified or unsupported.  This error indicates that a combination
+of flags passed by the user was invalid per the specification of the flags.
+.TP
+.B AP_BADFREE\ -
+When the \fBap_free\fP(3) function is called, it attempts to free, using the \fBfree\fP(3) C library
+call, all of the allocated structures internal to the passed in structure pointer.  The only
+internal structures that may be freed with \fBap_free\fP(3) are the structures that were allocated
+by the APLI library and passed to the user in response to a command.  As such, when these same
+internal structures are passed to the \fBap_free\fP(3) function, the APLI library may be able to
+verify whether the structures were indeed allocated by the library.  If this can be detected and it
+is determined that an internal structure was not allocated by the APLI library, the \fBap_free\fP(3)
+function will not free the structure with the \fBfree\fP(3) C library call, and will, instead,
+return this error indicating that it could not free structure members.
+.TP
+.B AP_BADKIND\ -
+The \fBap_free\fP(3) function is called with a \fIkind\fP argument that indicates to which type of
+structure the call applies.  The value of this argument may correspond to a struct type (in all
+capitals) symbolic constant, or a service primitive type symbolic constant, or an environment
+attribute symbolic constant.  When the \fIkind\fP argument value passed does not correspond to any
+of these symbolic constants, then the structure type is unknown and this error generated.
+.TP
+.B AP_BADLSTATE\ -
+.TP
+.B AP_BADNSAP\ -
+.sp
+This is an XAP-only extension to the APLI library.
+.TP
+.B AP_BADPARSE\ -
+.TP
+.B AP_BADPRIM\ -
+When calling the \fBap_snd\fP(3) function, an \fIsptype\fP argument is passed which specifies the
+\*(lqService Primitive TYPE\*(rq for the call.  The service primitive type identifies the protocol
+service primitive to be passed to the presentation service provider.  When this error is generated,
+it means that the user has passed a service primitive type, sptype, does not correspond to a
+symbolic constant know to the APLI library.
+.TP
+.B AP_BADRESTR\ -
+The \fBap_restore\fP(3) function can be used to set APLI environment attributes associated with an
+APLI instance.  When data is sent in multiple segments, the \fBAP_MORE\fP bit is used in the flags
+argument to \fBap_snd\fP(3) for all calls except the last.  Attributes are not permitted to change
+after calls to \fBap_snd\fP(3) in which the \fBAP_MORE\fP bit has been set, until a call to
+\fBap_snd\fP(3) has been made with the \fBAP_MORE\fP bit clear.  This error indicates that
+\fBap_restore\fP(3) was called while the \fBAP_MORE\fP bit was set (i.e. a call has been made to
+\fBap_snd\fP(3) with the \fBAP_MORE\fP bit set in the flags argument and no subsequent call to
+\fBap_snd\fP(3) without the \fBAP_MORE\fP bit set has been sent).
+.TP
+.B AP_BADROLE\ -
+The APLI library user has attempted to call a function, typically \fBap_snd\fP(3) for an environment
+attribute or service primitive type which is not applicable to the roles (intiiator or responder)
+for which the APLI instance is allowed (as per environment attribute \fBROLE_ALLOWED\fP).
+.TP
+.B AP_BADSAVE -
+The \fBap_save\fP(3) function can be used to store APLI environment attribtues associated with an
+APLI instance in a file.  When data is sent in multiple segments, the \fBAP_MORE\fP bit is used in
+the flags argument to \fBap_snd\fP(3) for all calls except the last.  Attributes are not permitted
+to change after calls to \fBap_snd\fP(3) in which the \fBAP_MORE\fP bit has been set, untila call to
+\fBap_snd\fP(3) has been made with the \fBAP_MORE\fP bit clear.  The \fBAP_MORE\fP bit is set in the
+environment during this period.  Because an attribute value including the \fBAP_MORE\fP bit should
+not be saved, the \fBap_save\fP(3) function will fail while the \fBAP_MORE\fP bit is set, with this
+error code.
+.TP
+.B AP_BADSAVEF\ -
+The FILE pointer argument, savef, passed to \fBap_save\fP(3) and \fBap_restore\fP(3) is not a valid
+file pointer.  It may be NULL or does not represent a valid file stream open for writing.
+.TP
+.B AP_BADUBUF\ -
+.sp
+This is an APLI-only error code for the APLI library.
+.TP
+.B AP_DATA_OVERFLOW\ -
+.sp
+This is an XAP-only extension to the APLI library.
+.TP
+.B AP_HANGUP\ -
+.TP
+.B AP_INTERNAL\ -
+.sp
+This is an APLI-only error code for the APLI library.
+.TP
+.B AP_LOOK\ -
+.TP
+.B AP_NOATTR\ -
+.TP
+.B AP_NOBUF\ -
+.sp
+This is an XAP-only extension to the APLI library.
+.TP
+.B AP_NODATA\ -
+.sp
+This is an XAP-only extension to the APLI library.
+.TP
+.B AP_NOENV\ -
+.TP
+.B AP_NOERROR\ -
+.TP
+.B AP_NOMEM\ -
+.TP
+.B AP_NO_PRECEDENCE\ -
+.sp
+This is an XAP-only extension to the APLI library.
+.TP
+.B AP_NOREAD\ -
+Some environment attributes are readable always, readable never, or readable only in specific states
+for the APLI or XAP instance.  WHen this error is generated, an attempt was made to read an
+environment attribute which is never readable, or is not readable in the current state of the APLI
+or XAP instance.  This error is generated to indicate that the attribute is not readable.  (Note
+that in practice, all APLI and XAP environment attributes are readable always and this error code is
+generic and never generated.)
+.TP
+.B AP_NOSET\ -
+The APLI library seems to have distinguished between setabliity of an environment attribute and
+writability of an evironment attribute, perhaps where setability is construed as the ability to
+initialize an uninitialized attribute, and writability is perhaps construed as the ability to alter
+the value of an exising environment attribute.  Nevertheless this is rather conjecture as the error
+value AP_NOSET is nowhere described in the APLI documentation.
+.[
+sunlink-apli
+.]
+(However, I do not have access to the original UI draft.)
+.[
+apli UNIX International
+.]
+.sp
+This is an APLI-only error code for the APLI library.
+.TP
+.B AP_NOT_SUPPORTED\ -
+.sp
+This is an XAP-only extension to the APLI library.
+.TP
+.B AP_NOWRITE\ -
+Some environment attributes are writable always, writable never, or writable only in specific states
+of the APLI or XAP instance.  When this error is generated, an attempt was made to write to an
+environment attribute which is never writable, or is not writable in the current state of the APLI
+or XAP instance.  This error is generated to indicate that the attribute is not writable.
+.TP
+.B AP_PDUREJ\ -
+.TP
+.B AP_SUCCESS_DATA_PENDING\ -
+.sp
+This is an XAP-only extension to the APLI library.
+.\"
+.\"
+.SH NOTICES
+.PP
+Although many of the same symbolic constants and associated values are defined
+both for APLI
+.[
+apli UNIX International
+.]
+and
+XAP,
+.[
+xap c303
+.]
+there is no defined global error number under XAP.  Instead, the function in
+APLI which would set the
+.BR ap_errno
+global on failure, set the error code, instead, using a pointer passed in by the caller (often called
+.IR ap_errnop ).
+.\"
+.\"
+.SH BUGS
+.PP
+.B ap_errno
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ap_error (3),
+.BR APLI (3),
+.BR XAP (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B ap_errno
+is compatible with APLI,
+.[
+apli UNIX International
+.]
+XAP,
+.[
+xap c303
+.]
+and implementations based on APLI and XAP wuch as
+.IR Solaris \(rg " SunLink OSI" ,
+.IR Solaris \(rg " Solstice OSI",
+.IR HP \(rg " OSI Transport Services (OTS/9000)" ,
+.IR "SVR 4.2 Open Network Services (ONS)" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+There are situations in which the error code produced by the APLI or XAP
+library is open to interpretation.  Therefore, portable APLI and XAP programs
+will not rely on the value of a specific error code in specific circumstances,
+but will, rather, rely only upon the success or failure of the library call.
+.IP \(em
+Implementations vary in the capitalization and terminal punctuation of error
+strings.  Portable APLI and XAP programs will compose error string printouts
+in such a format as to not rely on the capitalization of the first word of the
+error string, nor the existence of punctuation (period) at the end of the
+message.
+.IP \(em
+.IP \(em
+.IP \(em
+.PP
+See
+.BR APLI (3),
+.BR XAP (3)
+and
+.IR STREAMS (4)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+APLI,
+.[
+apli UNIX International
+.]
+.[
+sunlink-apli
+.]
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B ap_errno
+first appeared in APLI.
+.[
+apli UNIX International
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI Library,
+.BR libapli (3),
+and the OpenSS7 XAP Library,
+.BR libxap (3).
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
