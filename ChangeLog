@@ -4,6 +4,13 @@
 	* openss7.macros: better grefer macros
 	* openss7.refs: more better references
 
+	* configure.ac: added more top-level documentation
+	* doc/projects/Makefile.am: added more top-level documentation
+	* doc/projects/.cvsignore: added more top-level documentation
+	* doc/projects/ss/.cvsignore: added more top-level documentation
+	* doc/projects/ss/Makefile.am: added more top-level documentation
+	* doc/projects/ss/ss.texi: added more top-level documentation
+
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
