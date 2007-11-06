@@ -1,0 +1,19 @@
+EventReportArgument ::=
+	SEQUENCE {
+	    managedObjectClass
+		ObjectClass,
+
+	    managedObjectInstance
+		ObjectInstance,
+
+	    eventType[5]		-- DEFINED BY managedObjectClass 
+		EventTypeID,
+
+	    eventTime[6]
+		IMPLICIT GeneralizedTime
+		OPTIONAL,
+
+	    eventInfo[7]
+		EventInfo
+		OPTIONAL
+	}

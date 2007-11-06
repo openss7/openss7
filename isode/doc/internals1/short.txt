@@ -1,0 +1,65 @@
+ISODE INTERNALS
+
+Marshall T. Rose
+Principal Scientist
+Performance Systems International, Inc.
+
+Overview
+
+In the 80's, some wag asked "OSI sells, but who's buying?"  Well, before
+you can use OSI, you have to implement it.  This course focuses on the
+de facto reference implementation of the core aspects of OSI,
+the ISO Development Environment.
+
+What You Will Learn
+
+Attendees will gain a thorough understanding of what the ISODE is and
+how to put the ISODE to good use.  In particular, emphasis is placed on putting
+the ISODE to work: bringing it up, running it, and modifying it for
+particular environments. 
+
+Syllabus
+
+  o History and Introduction -- why the ISODE project was undertaken,
+    the design and implementation policy, "portability" philosophy,
+    underlying abstractions
+
+  o Lower Layer Infrastructure -- the transport service, the transport-switch,
+    adding a transport-stack, "typical" site configurations
+
+  o Upper Layer Infrastructure -- application service elements, presentation
+    abstractions, defining a new service
+
+  o Implementing new services -- a model for distributed applications,
+    the RO-notation, static facilities, dynamic facilities
+
+  o Network Management (SNMP) -- core routines, agent implementation,
+    exporting MIB modules, prototyping NOC applications
+
+  o Directory Services -- introduction to the Directory, introduction
+    to QUIPU, the QUIPU DSA, a White Pages Service
+
+  o Future Directions -- the ISODE consortium
+
+Who Should Attend
+
+This course is targeted to applications programmers and system managers
+who need to better understand how to install, configure, and modify the
+ISODE.  Attendees must have a good understanding of the C programming
+language, user-level programming for UNIX, and the rudiments of OSI.
+Please note that this is not an introductory course to any of these
+topics!
+
+Instructor
+
+Marshall T.~Rose is Principal Scientist at Performance Systems
+International, Inc., where he works on OSI protocols and network
+management.  He is the "champion" of the ISO Development Environment
+(ISODE), an openly available implementation of the upper layers of the
+OSI protocol suite.  He is the author of both **The Open Book**
+and **The Simple Book**, professional texts providing a practical
+perspective on both OSI and network management of internets, both
+published by Prentice-Hall.  Rose received the Ph.D. degree in
+Information and Computer Science from the University of California,
+Irvine, in 1984.  His subscriptions to **The Atlantic** and **Rolling
+Stone Magazine** are in good standing.

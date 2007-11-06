@@ -1,0 +1,20 @@
+You may be unable to find the entry you are looking for with a 
+straight-forward query.  This may be because the entry is named differently 
+to what you imagined, or may be an indication that the entry is not in the 
+directory.  Browsing the directory may be useful in these circumstances.
+The following example gives an example of how to BROWSE.
+    person>       kille
+    department>   computing science
+    organisation> ucl
+    country>      gb
+
+The Directory Service returns with the message: "No departments match string 
+`computing science'" and prompts for a DEPARTMENT name to be entered.
+Entering "*" will list all the DEPARTMENTs within gb, ucl thus:
+      1 A.U.T. Office
+      2 American Institute for Foreign Study
+     27 Computer Science                         etc.
+
+The user can now select one from the list by entering the tag number thus:
+    department> 27
+and the query should now proceed further.

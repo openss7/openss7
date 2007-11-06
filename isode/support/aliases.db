@@ -1,0 +1,20 @@
+###############################################################################
+#
+# $Header: /xtel/isode/isode/support/RCS/aliases.db,v 9.0 1992/06/16 12:40:09 isode Rel $
+#
+#
+# $Log: aliases.db,v $
+# Revision 9.0  1992/06/16  12:40:09  isode
+# Release 8.0
+#
+# 
+###############################################################################
+
+
+# Performance Systems International
+psi		"performance systems international, us"
+
+# University College London
+ucl		"university college london, gb"
+hubris		"hubris, cs, university college london, gb"
+dir		"c=GB@o=University College London@cn=Dir"

@@ -1,0 +1,500 @@
+\File{cmip\-rosy.ry},{16:34},{Mar  6 1988}
+\L{\LB{\C{}\-\- this is NOT an official specification, it is a touched\-up version of the}}
+\CE{}\L{\LB{\C{}\-\- CMIP RO spec:}}
+\CE{}\L{\LB{\C{}\-\-}\Tab{8}{operations, errors, and types have been group together}}
+\CE{}\L{\LB{\C{}\-\-}\Tab{8}{a few typos in the specification have been cleaned up}}
+\CE{}\L{\LB{}}
+\L{\LB{\C{}\-\- ISO\-9596\-2\-CMIP\-1}}
+\CE{}\L{\LB{CMIP \{iso standard(0) ips\-osi\-mips(9596) cmip(2) version(1) protocol(1)\}}}
+\L{\LB{}}
+\L{\LB{\Proc{DEFINITIONS}\K{DEFINITIONS} ::=}}
+\L{\LB{}}
+\L{\LB{\K{BEGIN}}}
+\L{\LB{}}
+\L{\LB{\C{}\-\-    IMPORTS OPERATION, ERROR }}
+\CE{}\L{\LB{\C{}\-\-        FROM Remote\-Operation\-Notation}}
+\CE{}\L{\LB{\C{}\-\-        \{joint\-iso\-ccitt remoteOperations(4) notation(0)\};}}
+\CE{}\L{\LB{}}
+\L{\LB{   \K{IMPORTS} DistinguishedName, RelativeDistinguishedName}}
+\L{\LB{       \K{FROM} Information\-Framework}}
+\L{\LB{       \{joint\-iso\-ccitt ds(5) modules(1) information\-framework(1)\};}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- operations}}
+\CE{}\L{\LB{}}
+\L{\LB{m\-EventReport \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT} EventReportArgument}}
+\L{\LB{}\Tab{8}{::= 0}}
+\L{\LB{}}
+\L{\LB{m\-ConfirmedEventReport \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT} EventReportArgument}}
+\L{\LB{}\Tab{8}{\K{RESULT}   EventReportResult}}
+\L{\LB{}\Tab{8}{\K{ERRORS} \{ noSuchObject, noSuchEventType, accessDenied,}}
+\L{\LB{}\Tab{16}{ noSuchMgmtInfoId, invalidMgmtInfoValue\}}}
+\L{\LB{}\Tab{8}{::= 1}}
+\L{\LB{}}
+\L{\LB{m\-LinkedReply \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT} LinkedReplyArgument}}
+\L{\LB{}\Tab{8}{::= 2}}
+\L{\LB{}}
+\L{\LB{m\-Confirmed\-Get \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT} GetArgument}}
+\L{\LB{}\Tab{8}{\K{RESULT}   GetResult}}
+\L{\LB{}\Tab{8}{\K{ERRORS} \{ noSuchObject, accessDenied, syncNotSupported,}}
+\L{\LB{}\Tab{16}{ invalidFilter, noSuchMgmtInfoId, getListError \}}}
+\L{\LB{}\Tab{8}{LINKED \{ m\-Linked\-Reply \}}}
+\L{\LB{}\Tab{8}{::= 3}}
+\L{\LB{}}
+\L{\LB{m\-Set \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT} SetArgument}}
+\L{\LB{}\Tab{8}{::= 4}}
+\L{\LB{}}
+\L{\LB{m\-ConfirmedSet \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT} SetArgument}}
+\L{\LB{}\Tab{8}{\K{RESULT}   SetResult}}
+\L{\LB{}\Tab{8}{\K{ERRORS} \{ noSuchObject, accessDenied, syncNotSupported,}}
+\L{\LB{}\Tab{16}{ invalidFilter, noSuchMgmtInfoId, invalidMgmtInfoValue,}}
+\L{\LB{}\Tab{16}{ setListError \}}}
+\L{\LB{}\Tab{8}{LINKED \{ m\-Linked\-Reply \}}}
+\L{\LB{}\Tab{8}{::= 5}}
+\L{\LB{}}
+\L{\LB{m\-Action \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT} ActionArgument}}
+\L{\LB{}\Tab{8}{::= 6}}
+\L{\LB{}}
+\L{\LB{m\-ConfirmedAction \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT} ActionArgument}}
+\L{\LB{}\Tab{8}{\K{RESULT}   ActionResult}}
+\L{\LB{}\Tab{8}{\K{ERRORS} \{ noSuchObject, accessDenied, invalidFilter,}}
+\L{\LB{}\Tab{16}{ noSuchAction, noSuchMgmtInfoId, invalidMgmtInfoValue,}}
+\L{\LB{}\Tab{16}{ processingFailure \}}}
+\L{\LB{}\Tab{8}{LINKED \{ m\-Linked\-Reply \}}}
+\L{\LB{}\Tab{8}{::= 7}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- errors}}
+\CE{}\L{\LB{}}
+\L{\LB{noSuchObject \K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER} NoSuchObject}}
+\L{\LB{}\Tab{8}{::= 1}}
+\L{\LB{}}
+\L{\LB{accessDenied \K{ERROR}}}
+\L{\LB{}\Tab{8}{::= 2}}
+\L{\LB{}}
+\L{\LB{syncNotSupported \K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER} SyncNotSupported}}
+\L{\LB{}\Tab{8}{::= 3}}
+\L{\LB{}}
+\L{\LB{invalidFilter \K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER} InvalidFilter}}
+\L{\LB{}\Tab{8}{::= 4}}
+\L{\LB{}}
+\L{\LB{noSuchMgmtInfoId \K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER} NoSuchMgmtInfoId}}
+\L{\LB{}\Tab{8}{::= 5}}
+\L{\LB{}}
+\L{\LB{invalidMgmtInfoValue \K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER} InvalidMgmtInfoValue}}
+\L{\LB{}\Tab{8}{::= 6}}
+\L{\LB{}}
+\L{\LB{getListError \K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER} GetListError}}
+\L{\LB{}\Tab{8}{::= 7}}
+\L{\LB{}}
+\L{\LB{setListError \K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER} SetListError}}
+\L{\LB{}\Tab{8}{::= 8}}
+\L{\LB{}}
+\L{\LB{noSuchAction \K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER} NoSuchAction}}
+\L{\LB{}\Tab{8}{::= 9}}
+\L{\LB{}}
+\L{\LB{processingFailure \K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER} ProcessingFailure}}
+\L{\LB{}\Tab{8}{::= 10}}
+\L{\LB{}}
+\L{\LB{noSuchEventType \K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER} NoSuchEventType}}
+\L{\LB{}\Tab{8}{::= 11}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- types}}
+\CE{}\L{\LB{    }}
+\L{\LB{EventReportArgument ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    managedObjectClass}}
+\L{\LB{}\Tab{16}{ObjectClass,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    managedObjectInstance}}
+\L{\LB{}\Tab{16}{ObjectInstance,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    eventType[5]}\Tab{40}{\C{}\-\- DEFINED BY managedObjectClass }}
+\CE{}\L{\LB{}\Tab{16}{EventTypeID,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    eventTime[6]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} GeneralizedTime}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    eventInfo[7]}}
+\L{\LB{}\Tab{16}{EventInfo}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{EventReportResult ::=}}
+\L{\LB{}\Tab{8}{\K{NULL}}\Tab{40}{\C{}\-\- event acknowledgement indication}}
+\CE{}\L{\LB{}}
+\L{\LB{LinkedReplyArgument ::=}}
+\L{\LB{}\Tab{8}{\K{CHOICE} \{}}
+\L{\LB{}\Tab{8}{    getResult[0]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} GetResult,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    getError[1]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} GetListError,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    setResult[2]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} SetResult,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    setError[3]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} SetListError,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    actionResult[4]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} ActionResult}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{GetArgument ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    managedObjectClass}}
+\L{\LB{}\Tab{16}{ObjectClass,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    managedObjectInstance}}
+\L{\LB{}\Tab{16}{ObjectInstance,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    accessControl[5]}}
+\L{\LB{}\Tab{16}{AccessControl}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    synchronization[6]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} CMISSync}}
+\L{\LB{}\Tab{16}{\K{DEFAULT} bestEffort,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    filter}}
+\L{\LB{}\Tab{16}{CMISFilter}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    mgmtInfoIdList[11]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{SEQUENCE} \K{OF}}}
+\L{\LB{}\Tab{16}{    MgmtInfoId}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{GetResult ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    managedObjectClass}}
+\L{\LB{}\Tab{16}{ObjectClass}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    managedObjectInstance}}
+\L{\LB{}\Tab{16}{ObjectInstance}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    currentTime[5]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} GeneralizedTime}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    mgmtInfoList[6]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{SEQUENCE} \K{OF}}}
+\L{\LB{}\Tab{16}{    MgmtInfo}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{SetArgument ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    managedObjectClass}}
+\L{\LB{}\Tab{16}{ObjectClass,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    managedObjectInstance}}
+\L{\LB{}\Tab{16}{ObjectInstance,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    accessControl[5]}}
+\L{\LB{}\Tab{16}{AccessControl}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    synchronization[6]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} CMISSync}}
+\L{\LB{}\Tab{16}{\K{DEFAULT} bestEffort,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    filter}}
+\L{\LB{}\Tab{16}{CMISFilter}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    mgmtInfoList[11]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{SEQUENCE} \K{OF}}}
+\L{\LB{}\Tab{16}{    MgmtInfo}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{SetResult ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    managedObjectClass}}
+\L{\LB{}\Tab{16}{ObjectClass}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    managedObjectInstance}}
+\L{\LB{}\Tab{16}{ObjectInstance}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    currentTime[5]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} GeneralizedTime}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    mgmtInfoList[6]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{SEQUENCE} \K{OF}}}
+\L{\LB{}\Tab{16}{    MgmtInfo}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{ActionArgument ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    managedObjectClass}}
+\L{\LB{}\Tab{16}{ObjectClass,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    managedObjectInstance}}
+\L{\LB{}\Tab{16}{ObjectInstance,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    accessControl[5]}}
+\L{\LB{}\Tab{16}{AccessControl}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    filter}}
+\L{\LB{}\Tab{16}{CMISFilter}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    actionType[11]}\Tab{40}{\C{}\-\- DEFINED BY managedObjectClass}}
+\CE{}\L{\LB{}\Tab{16}{ActionTypeId,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    actionInfo[12]}}
+\L{\LB{}\Tab{16}{ActionInfo}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{ActionResult ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    managedObjectClass}}
+\L{\LB{}\Tab{16}{ObjectClass}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    managedObjectInstance}}
+\L{\LB{}\Tab{16}{ObjectInstance}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    currentTime[5]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} GeneralizedTime}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    actionResult[6]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} MgmtInfo}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{NoSuchObject ::=}}
+\L{\LB{}\Tab{8}{\K{OBJECT} \K{IDENTIFIER}}}
+\L{\LB{}}
+\L{\LB{SyncNotSupported ::=}}
+\L{\LB{}\Tab{8}{CMISSync}}
+\L{\LB{}}
+\L{\LB{InvalidFilter ::=}}
+\L{\LB{}\Tab{8}{CMISFilter}}
+\L{\LB{}}
+\L{\LB{NoSuchMgmtInfoId ::=}}
+\L{\LB{}\Tab{8}{MgmtInfoId}}
+\L{\LB{}}
+\L{\LB{InvalidMgmtInfoValue ::=}}
+\L{\LB{}\Tab{8}{MgmtInfo}}
+\L{\LB{}}
+\L{\LB{GetListError ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    managedObjectClass}}
+\L{\LB{}\Tab{16}{ObjectClass}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    managedObjectInstance}}
+\L{\LB{}\Tab{16}{ObjectInstance}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    currentTime[5]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} GeneralizedTime}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    mgmtInfoList[6]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{SEQUENCE} \K{OF}}}
+\L{\LB{}\Tab{16}{    MISGetInfoStatus}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{MISGetInfoStatus ::=}}
+\L{\LB{}\Tab{8}{\K{CHOICE} \{}}
+\L{\LB{}\Tab{8}{    mgmtInfoIdError[0]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} MgmtInfoIdError,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    mgmtInfo[1]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} MgmtInfo}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{MgmtInfoIdError ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    errorStatus[0]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} ErrorStatus,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    mgmtInfoId[1]}}
+\L{\LB{}\Tab{16}{MgmtInfoId}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{SetListError ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    managedObjectClass}}
+\L{\LB{}\Tab{16}{ObjectClass}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    managedObjectInstance}}
+\L{\LB{}\Tab{16}{ObjectInstance}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    currentTime[5]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} GeneralizedTime}}
+\L{\LB{}\Tab{16}{\K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    mgmtInfoList[6]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{SEQUENCE} \K{OF}}}
+\L{\LB{}\Tab{16}{    MISSetInfoStatus}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{MISSetInfoStatus ::=}}
+\L{\LB{}\Tab{8}{\K{CHOICE} \{}}
+\L{\LB{}\Tab{8}{    mgmtInfoError[0]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} MgmtInfoError,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    mgmtInfo[1]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} MgmtInfo}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{MgmtInfoError ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    errorStatus[0]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} ErrorStatus,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    mgmtInfo[1]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} MgmtInfo}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{ErrorStatus ::=}}
+\L{\LB{}\Tab{8}{\K{INTEGER} \{}}
+\L{\LB{}\Tab{8}{    accessDenied(2),}}
+\L{\LB{}\Tab{8}{    noSuchMgmtInfoId(5),}}
+\L{\LB{}\Tab{8}{    invalidMgmtInfoValue(7)}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{NoSuchAction ::=}}
+\L{\LB{}\Tab{8}{ActionTypeId}}
+\L{\LB{}}
+\L{\LB{ProcessingFailure ::=}}
+\L{\LB{    \K{CHOICE} \{}}
+\L{\LB{}\Tab{8}{actual[0]}}
+\L{\LB{}\Tab{8}{    SpecificErrorInfo,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{none[1]}}
+\L{\LB{}\Tab{8}{    \K{IMPLICIT} \K{NULL}}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{NoSuchEventType ::=}}
+\L{\LB{}\Tab{8}{EventTypeID}}
+\L{\LB{}}
+\L{\LB{ObjectClass ::=}}
+\L{\LB{}\Tab{8}{\K{CHOICE} \{}}
+\L{\LB{}\Tab{8}{    globalForm[0]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{OBJECT} \K{IDENTIFIER},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    nonSpecificForm[1]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{OCTET} \K{STRING}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{ObjectInstance ::=}}
+\L{\LB{}\Tab{8}{\K{CHOICE} \{}}
+\L{\LB{}\Tab{8}{    distinguishedName[2]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} DistinguishedName,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    nonSpecificForm[3]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{OCTET} \K{STRING},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    enumeratedForm[4]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{INTEGER}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{CMISSync ::=}}
+\L{\LB{}\Tab{8}{\K{INTEGER} \{}}
+\L{\LB{}\Tab{8}{    bestEffort(0),}}
+\L{\LB{}\Tab{8}{    ordered(1),}}
+\L{\LB{}\Tab{8}{    stopOnError(2),}}
+\L{\LB{}\Tab{8}{    atomic(3)}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{CMISFilter ::=}}
+\L{\LB{}\Tab{8}{\K{CHOICE} \{}}
+\L{\LB{}\Tab{8}{    item[7]}}
+\L{\LB{}\Tab{16}{FilterItem,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    and[8]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{SET} \K{OF}}}
+\L{\LB{}\Tab{16}{    CMISFilter,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    or[9]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{SET} \K{OF}}}
+\L{\LB{}\Tab{16}{    CMISFilter,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    not[10]}}
+\L{\LB{}\Tab{16}{CMISFilter}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{FilterItem ::=}}
+\L{\LB{}\Tab{8}{\K{CHOICE} \{}}
+\L{\LB{}\Tab{8}{    equality[0]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} MgmtInfo,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    greaterOrEqual[1]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} MgmtInfo,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    lessOrEqual[2]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} MgmtInfo,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    present[3]}}
+\L{\LB{}\Tab{16}{MgmtInfoID}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- parameters defined in the specification of the Managed Object}}
+\CE{}\L{\LB{}}
+\L{\LB{AccessControl ::=}}
+\L{\LB{}\Tab{8}{\K{ANY}}\Tab{40}{\C{}\-\- DEFINED BY managedObjectClass }}
+\CE{}\L{\LB{}}
+\L{\LB{EventTypeId ::=}}
+\L{\LB{}\Tab{8}{\K{ANY}}\Tab{40}{\C{}\-\- DEFINED BY managedObjectClass}}
+\CE{}\L{\LB{}}
+\L{\LB{EventInfo ::=}}
+\L{\LB{}\Tab{8}{\K{ANY}}\Tab{40}{\C{}\-\- DEFINED BY eventType}}
+\CE{}\L{\LB{}}
+\L{\LB{MgmtInfo ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{16}{MgmtInfoId,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{MgmtInfoValue}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{MgmtInfoId ::=}}
+\L{\LB{}\Tab{8}{\K{ANY}}\Tab{40}{\C{}\-\- DEFINED BY managedObjectClass }}
+\CE{}\L{\LB{}}
+\L{\LB{MgmtInfoValue ::=}}
+\L{\LB{}\Tab{8}{\K{ANY}}\Tab{40}{\C{}\-\- DEFINED BY managedObjectClass }}
+\CE{}\L{\LB{}}
+\L{\LB{ActionTypeId ::=}}
+\L{\LB{}\Tab{8}{\K{ANY}}\Tab{40}{\C{}\-\- DEFINED BY managedObjectClass}}
+\CE{}\L{\LB{}}
+\L{\LB{ActionInfo ::=}}
+\L{\LB{}\Tab{8}{\K{ANY}}\Tab{40}{\C{}\-\- DEFINED BY actionType}}
+\CE{}\L{\LB{}}
+\L{\LB{SpecificErrorInfo ::=}}
+\L{\LB{}\Tab{8}{\K{ANY}}\Tab{40}{\C{}\-\- DEFINED BY actionType}}
+\CE{}\L{\LB{}}
+\L{\LB{\K{END}}}

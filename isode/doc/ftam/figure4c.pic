@@ -1,0 +1,81 @@
+.PS 8.0i
+.ps 20
+circlerad=circlerad/4
+define boxright @
+B$1:	box invis with .nw at B$2.ne
+@
+define boxdown @
+B$1:	box invis with .nw at B$2.sw
+@
+define	node @
+C$1:	circle shaded with .w at B$1.w; move to (C$1.w.x, C$1.s.y-lineht/10) $2
+@
+define	data @
+B$1:	box width boxwid/4 height boxht/4 with .w at (C$1.e.x+linewid/4, C$1.e.y) "DU"
+	line from C$1.e to B$1.w
+@
+define	linefrom @
+	line from C$1.s to C$2.n
+@
+## figure 4c
+## EXAMPLE: GENERAL HIERARCHICAL CONSTRAINT SET
+B0:	box invis
+	boxright(1,0)
+	boxright(2,1)
+B12:	box invis with .c at B1.e
+	boxright(3,2)
+	boxdown(4,0)
+B13:	box invis with .c at B4.e
+	boxright(5,4)
+	boxright(6,5)
+	boxright(7,6)
+	boxdown(8,4)
+	boxright(9,8)
+	boxright(10,9)
+	boxright(11,10)
+##
+	node(12,)
+	data(12)
+	node(13,)
+	node(8,"\ fred" ljust)
+	data(8)
+	node(9,"\ wilma" ljust)
+	data(9)
+	node(10,"\ pebbles" ljust)
+	node(7,)
+	data(7)
+	node(11,"\ dino" ljust)
+	data(11)
+##
+	linefrom(12,13)
+	linefrom(12,10)
+	linefrom(12,7)
+	linefrom(13,8)
+	linefrom(13,9)
+	linefrom(7,11)
+##
+define fadu @
+F$1:	box invis with .w at (C$1.w.x-linewid/10, C$1.w.y) \
+		width 3*boxwid/4 height boxht
+@
+	fadu(8)
+	fadu(9)
+	fadu(10)
+	fadu(11)
+##
+F13:	box invis with .sw at F8.sw \
+		width (F9.e.x-F8.w.x) \
+		height (C13.w.y-F8.s.y)+boxht/2
+##
+F7:	box invis with .sw at F11.sw \
+		width (F11.e.x-F11.w.x) \
+		height (C7.w.y-F11.s.y)+boxht/2
+##
+F12:	box dashed with .sw at F8.sw \
+		width (F11.e.x-F8.w.x) \
+		height (C12.w.y-F8.s.y)+boxht/2
+##
+##	line from (F12.sw.x, F12.sw.y-lineht/4) \
+##	     to   (F12.se.x, F12.se.y-lineht/4)
+##
+.PE

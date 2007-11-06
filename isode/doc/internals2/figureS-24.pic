@@ -1,0 +1,15 @@
+.PS 6.5i
+.ps 20
+## figure S-24
+B1:	box "SNMP" "agent"
+B2:	box "firewall" with .w at (B1.e.x+linewid, B1.e.y)
+B3:	box "daemon" with .w at (B2.e.x+linewid, B2.e.y)
+##
+	arrow from B1.w to (B1.w.x-linewid, B1.w.y) "\ \ SNMP" ""
+	arrow from (B1.e.x, B1.e.y+boxht/4) \
+	      to   (B2.w.x, B2.w.y+boxht/4) "req" ""
+	arrow from (B2.w.x, B2.w.y-boxht/4) \
+	      to   (B1.e.x, B1.e.y-boxht/4) "" "rsp"
+	arrow from B3.w to B2.e "\ \ cache" ""
+##
+.PE

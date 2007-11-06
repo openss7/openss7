@@ -1,0 +1,24 @@
+\File{figureD\-19.py},{08:28},{Mar 12 1991}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{    \K{IF} (kind == person) \K{THEN}}}
+\L{\LB{        qlist = \{ title \};}}
+\L{\LB{    \K{ELSE}}}
+\L{\LB{        \K{IF} (kind == organization) \K{THEN}}}
+\L{\LB{            qlist = \{ businessCategory \};}}
+\L{\LB{        \K{ELSE}}}
+\L{\LB{            \K{IF} (kind == organizationalUnit) \K{THEN}}}
+\L{\LB{                qlist = \{ businessCategory \};}}
+\L{\LB{            \K{ELSE}}}
+\L{\LB{                \K{IF} (kind == organizationalRole) \K{THEN}}}
+\L{\LB{                    qlist = \{ title \};}}
+\L{\LB{                \K{ELSE}}}
+\L{\LB{                    \K{IF} (kind != locality) \K{THEN}}}
+\L{\LB{                        qlist = \{ title \};}}
+\L{\LB{}}
+\L{\LB{    \K{IF} (kind == organization OR kind == locality) \K{THEN}}}
+\L{\LB{        subsettype = oneLevel;}}
+\L{\LB{    \K{ELSE}}}
+\L{\LB{        subsettype = wholeSubtree;}}
+\L{\LB{}}
+\L{\LB{...}}

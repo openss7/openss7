@@ -1,0 +1,39 @@
+.PS
+.ps 20
+## figure 18
+B1:	box "IP" "" "Ether" height 3*boxht/2
+B2:	box "CLNP" with .s at B1.n
+B3:	box "TP4" with .s at B2.n
+B4:	box "PURE" "OSI" with .s at B3.n height 5*boxht 
+B5:	box "IP" "" "" with .w at (B1.e.x+2*linewid, B1.e.y) width 2*boxwid  height 3*boxht/2
+B5a:	box invis with .sw at B5.sw "" "Ether"
+	line from B5.s to B5.c; line from B5.w to B5.e
+B5b:	box invis with .se at B5.se "" "X.25"
+B6:	box "IP" "" "X.25" with .w at (B5.e.x+2*linewid, B5.e.y) height 3*boxht/2
+B7:	box "CLNP" with .sw at B6.nw width 2*boxwid
+B11:	box "8803" with .ne at B7.se height 3*boxht/2
+B8:	box "CLNP" with .w at (B7.e.x+2*linewid, B7.e.y)
+B12:	box "8803" with .n at B8.s height 3*boxht/2
+B9:	box "TP4" with .s at B8.n
+B10:	box "PURE" "OSI" with .s at B9.n height 5*boxht 
+##
+	line from B1.s to (B1.s.x, B1.s.y-lineht) \
+		       to (B5.s.x-boxwid/2, B1.s.y-lineht) \
+		       to (B5.s.x-boxwid/2, B5.s.y)
+	line from (B5.s.x+boxwid/2, B5.s.y) \
+		       to (B5.s.x+boxwid/2, B5.s.y-lineht) \
+		       to (B6.s.x, B5.s.y-lineht) \
+		       to (B6.s.x, B6.s.y)
+	line from (B11.s.x, B11.s.y) \
+		       to (B11.s.x, B6.s.y-lineht) \
+		       to (B12.s.x, B6.s.y-lineht) to B12.s
+##
+	line <- -> from (B1.n.x,  B1.s.y-2*lineht) \
+		   to   (B6.n.x,  B1.s.y-2*lineht)
+	line <- -> from (B11.n.x, B1.s.y-2*lineht) \
+		   to   (B12.n.x, B1.s.y-2*lineht)
+#	line <- -> from (B1.n.x,  B1.s.y-3*lineht/2) \
+#		   to   (B5a.n.x, B1.s.y-3*lineht/2)
+#	line <- -> from (B5b.n.x, B1.s.y-3*lineht/2) \
+#		   to   (B6.n.x,  B1.s.y-3*lineht/2)
+.PE

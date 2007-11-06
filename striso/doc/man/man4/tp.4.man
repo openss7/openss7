@@ -197,7 +197,7 @@ rfc1070
 .]
 or directly over LLC1 on ISO/IEC 8802
 .[
-iso/iec 8802
+ieee iso/iec 8802
 .]
 based LANs.
 See

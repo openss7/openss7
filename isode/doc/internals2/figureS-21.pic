@@ -1,0 +1,15 @@
+\def\foo{\begin{tabular}{c}M\\ A\\ N\\ A\\ G\\ E\\ M\\ E\\ N\\ T\end{tabular}\ \begin{tabular}{c}I\\ N\\ S\\ T\\ R\\ U\\ M\\ E\\ N\\ T\\ A\\ T\\ I\\ O\\ N\end{tabular}}
+.PS 5.0i
+.ps 20
+## figure S-21
+B1:	box width 4*boxwid height 6*boxht
+B2:	box "``USEFUL''" "" "PROTOCOLS" width 3*boxwid height 5*boxht \
+		with .sw at B1.sw
+B3:	box "MANAGEMENT PROTOCOL" width 4*boxwid with .nw at B1.nw
+B4:	box "\foo" height 5*boxht with .se at B1.se
+	line from B1.s to (B1.s.x, B1.s.y-lineht)
+	line from (B1.sw.x-linewid, B1.s.y-lineht) \
+	     to (B1.se.x+linewid, B1.s.y-lineht)
+	move to (B1.s.x, B1.s.y-3*lineht/4); "\ \ NETWORK" ljust
+##
+.PE

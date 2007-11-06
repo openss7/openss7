@@ -1,0 +1,11 @@
+\File{grind\-decfn.c},{14:51},{Jul 12 1991}
+\L{\LB{\Proc{put\_int}put\_int(parm, pe)}}
+\L{\LB{struct codedata **parm;}}
+\L{\LB{PE      pe;}}
+\L{\LB{\{}}
+\L{\LB{    if (pe)}}
+\L{\LB{        (*parm)\-\>cd\_int = prim2num(pe);}}
+\L{\LB{    else}}
+\L{\LB{        (*parm)\-\>cd\_int = 1;    \C{}\/* Default *\/\CE{}}}
+\L{\LB{    return (OK);}}
+\L{\LB{\}}}

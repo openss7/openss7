@@ -1,0 +1,1393 @@
+% -*- texinfo -*- vim: ft=texinfo nosi nocin noai tw=100
+% =========================================================================
+%
+% @(#) $Id$
+%
+% =========================================================================
+%
+% Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date$ by $Author$
+%
+% =========================================================================
+%
+% $Log$
+% =========================================================================
+\input texinfo @c -*-texinfo-*-
+@c vim: ft=texinfo nosi nocin noai tw=100
+@c %**start of header
+@setfilename sg.info
+@include texi/args.texi
+@set MANUAL_TITLE OpenSS7 Signalling Gateway Platform
+@set MANUAL_TYPE High-Level Design
+@settitle @value{MANUAL_TITLE}
+@c %**end of header
+
+@dircategory OpenSS7
+@direntry
+* SG: (sg).			OpenSS7 Signalling Gateway Platform
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE OpenSS7 Signalling Gateway Platform
+@set MANUAL_TYPE High-Level Design
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file documents the @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+All Rights Reserved.
+
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries a copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
+
+@end ignore
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
+
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE OpenSS7 Signalling Gateway Platform
+@set MANUAL_TYPE High-Level Design
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2007  OpenSS7 Corporation
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+@subsubheading Published by:
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages, or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
+
+@sp 1
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+
+@vskip 0pt
+@end titlepage
+
+@c An index of manual pages.
+@defcodeindex mp
+
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@ifnottex
+@node Top
+@top OpenSS7 Signalling Gateway Platform
+@end ifnottex
+
+@menu
+* Executive Overview::
+* Preface::
+* Introduction::
+* Application Architecture::
+* Network Architecture::
+* System Architecture::
+* Platform Architecture::
+* Protocol Architecture::
+* Software Architecture::
+* Hardware Architecture::
+* Management Architecture::
+* Logistics::
+* Optional Application Support::
+* Optional Network Support::
+* Optional System Support::
+* Optional Platform Support::
+* Optional Protocol Support::
+* Optional Software Support::
+* Optional Hardware Support::
+* Optional Management Support::
+* Programmatic Interfaces::
+* Platform Sizing::
+* Indices::
+@end menu
+
+@node Executive Overview
+@unnumbered Executive Overview
+
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
+The initial and primary purpose of this equipment is to provide connectivity between a legacy SS7
+network and a SIGTRAN network.  Because the solution attempts to avoid excessive costs associated
+with long- and short-haul SS7 TDM circuits, the platform benefits from using low cost commodity
+hardware and open source software.
+
+@subsubheading The OpenSS7 Project
+
+The @uref{http://www.openss7.org/, OpenSS7 Project} is an open source software project that has
+developed many protocol components within the SS7, SIGTRAN, ISDN and VoIP protocol stacks.
+Intellectual property rights for the OpenSS7 Project are held by @uref{http://www.openss7.com/,
+OpenSS7 Corporation}.  All OpenSS7 Project software is eventually licensed under the GNU Public
+License Version 3.  OpenSS7 Corporation also provides commercial licensing of OpenSS7 Project
+software under terms less restrictive than the GPL.
+
+@subsubheading Signalling Gateway (SG) Platform
+
+OpenSS7 can provide Signalling Gateway Platform capabilities in a high-performance, low-cost,
+small-footprint platform leveraging the GNU/Linux operating system distributions and tools, and
+utilizing low-cost commodity hardware.
+
+For detail on platform applications, see @ref{Application Architecture}, @ref{Network Architecture},
+@ref{Optional Application Support}, and @ref{Optional Network Support}.
+
+@subsubheading Open Source Software
+
+The OpenSS7 Project leverages the widespread use of GNU/Linux operation systems, distributions, and
+FSF tools such as @samp{autoconf} and open source software such as @dfn{RPM}.  For example, this
+document was formatted for PDF, HTML, info and plain text using the GNU @dfn{texinfo} system,
+@samp{autoconf}, and the @TeX{} formatting system.
+
+The open source model avoids proprietary lock-in and permits in-house or outsourced development.
+All source code is available for use and modification by the end customer.  All build tools,
+documentation and associated resources are generally available.  The availability of the source code
+and complete documentation eases problem resolution and can offer upgrades and fixes even in advance
+of client problem reports.  
+
+For details on software solutions, see @ref{Protocol Architecture}, @ref{Software Architecture},
+@ref{Optional Protocol Support}, and @ref{Optional Software Support}.
+
+@subsubheading Commodity Hardware
+
+By best utilizing commodity PC or standardized CompactPCI and AdvancedTCA hardware, OpenSS7 makes
+available the highest performance platforms available on the market at back-to-school prices.  When
+carrier-grade is not essential, 3GHz Pentium or Xeon class servers in hardened rack mount chassis
+can be used at a fraction of the cost, and yet outperform, other solutions.  Where carrier-grade is
+necessary, embedded Linux on standardized CompactPCI and AdvanceTCA NEBS compliant chassis make for
+a higher cost, but more reliable alternative.
+
+For details on hardware solutions, see @ref{Platform Architecture}, @ref{Hardware Architecture},
+and @ref{Optional Hardware Support}.
+
+@subsubheading Integrated Management
+
+Utilizing open source management tools, such as @command{net-snmp} and @command{OSIMIS}, OpenSS7
+protocol stacks provide integrated management support for SNMPv2c, SNMPv3, or CMISE/CMIP.  The
+entire platform, from alarms to provisioning, can be provided using integrated SNMP agents.
+
+For details on management solutions, see @ref{Platform Architecture}, @ref{Management Architecture},
+and @ref{Optional Management Support}.
+
+@subsubheading Rapid Development
+
+The OpenSS7 Project has already developed protocol components completing the SS7 and SIGTRAN
+signalling stacks including MTP Level 2 and Level 3, ISUP, SCCP, TCAP; and SCTP, M2PA, M2UA, M3UA,
+SUA and TUA.  Development of a Signalling Gateway Platform to meet small to large scale deployment
+requirement needs only customization of the platform for specific needs.
+
+For details on scheduling, see @ref{Logistics}.
+
+@subsubheading An Evolving Solution
+
+The OpenSS7 Project is evolving to support more protocol stacks including ISDN and VoIP.  Support
+for an ever expanding capability is demonstrated by the additional options available as described in
+@ref{Optional Application Support}, @ref{Optional Network Support},
+@ref{Optional Protocol Support}, @ref{Optional Software Support},
+and @ref{Optional Hardware Support}.
+
+@subsubheading Conclusions
+
+In summary, a Signalling Gateway Platform for small and large scale deployments is an excellent
+application of the OpenSS7 SS7 and SIGTRAN stacks and can be provided at an affordable price on
+short time-lines, while offering an evolution path for future deployment applications.
+
+@sp 4
+
+@flushright
+@email{bidulock@@openss7.org, Brian Bidulock}
+The OpenSS7 Project
+@end flushright
+
+@node Preface
+@unnumbered Preface
+
+@section Document Information
+@cindex Document information
+
+@subsection Abstract
+@cindex Document abstract
+
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
+
+@subsection Objective
+@cindex Document objective
+
+The objective of this document is to provide a @value{MANUAL_TYPE} for the development of a low
+cost, high-performance, @value{MANUAL_TITLE} using OpenSS7 protocol components, software, and
+compatible systems and hardware.
+
+@subsection Intent
+@cindex Document intent
+
+The intent of this document is to act as a @value{MANUAL_TYPE} for a project for an
+@value{MANUAL_TYPE}.  As a @value{MANUAL_TYPE}, this document discusses components and systems which
+are not necessarily complete.  @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no
+obligation to provide any software, system or feature listed herein.
+
+@subsection Audience
+@cindex Document audience
+
+This document is intended for a technical audience.  The reader should be familiar with most ETSI,
+ITU-T and ANSI, Signalling System No. 7 recommendations, as well as IETF drafts and RFCs for SIGTRAN
+protocols.  Because much of the focus of a Signalling Gateway Platform is on SS7 signalling, the
+reader should be familiar with ITU-T, ETSI and ANSI standards regarding Signalling System No. 7 as
+applied to Signalling Transfer Points.
+
+@subsection Revisions
+@cindex Document revisions
+
+Take care that you are working with a current version of this document: you will not be notified of
+updates.  To ensure that you are working with a current version, contact the
+@uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
+Project} website for a current version.
+
+@subsubsection Version Control
+
+@smallexample
+
+$Log$
+@end smallexample
+
+@subsubsection ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed or
+postscript) version of this document is an @strong{UNCONTROLLED VERSION}.
+
+@subsection Disclaimer
+@cindex Document disclaimer
+
+@noindent
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+
+@section Document Organization
+@cindex Document organization
+
+This document is organized as follows:
+
+@ifnottex
+@menu
+* Introduction::
+* Application Architecture::
+* Network Architecture::
+* Reference Architecture::
+* System Architecture::
+* Platform Architecture::
+* Protocol Architecture::
+* Software Architecture::
+* Hardware Architecture::
+* Management Architecture::
+* Logistics::
+* Optional Application Support::
+* Optional Network Support::
+* Optional Protocol Support::
+* Optional Software Support::
+* Optional Hardware Support::
+* Optional Management Support::
+* Programmatic Interfaces::
+* Platform Sizing::
+* Indices::
+@end menu
+@end ifnottex
+@iftex
+@table @emph
+@item @ref{Introduction}
+Introduction to the @value{MANUAL_TITLE} application.
+@item @ref{Application Architecture}
+The application requirements and architecture.
+@item @ref{Network Architecture}
+The network architecture for the application.
+@item @ref{Reference Architecture}
+The reference architecture for the application.
+@item @ref{System Architecture}
+The architecture of the @value{MANUAL_TITLE} system.
+@item @ref{Platform Architecture}
+The architecture of the @value{MANUAL_TITLE} platform.
+@item @ref{Protocol Architecture}
+The protocol architecture supporting the application.
+@item @ref{Software Architecture}
+The software architecture supporting the protocol stack and application.
+@item @ref{Hardware Architecture}
+The hardware architecture supporting the protocol stack and application.
+@item @ref{Management Architecture}
+The management architecture supporting the system and application.
+@item @ref{Logistics}
+Project logistics for completion of the @value{MANUAL_TITLE} application.
+@item @ref{Optional Application Support}
+Additional application support not directly contributing to the current objective.
+@item @ref{Optional Network Support}
+Additional network interface support not directly contributing to the current objective.
+@item @ref{Optional Protocol Support}
+Additional protocol component support not directly contributing to the current objective.
+@item @ref{Optional Software Support}
+Additional software support not directly contributing to the current objective.
+@item @ref{Optional Hardware Support}
+Additional hardware support not directly contributing to the current objective.
+@item @ref{Optional Management Support}
+Additional managment component support not directly contributing to the current objective.
+@item @ref{Programmatic Interfaces}
+Programmatic interfaces to selected protocol components.
+@item @ref{Platform Sizing}
+Detailed platform sizing considerations.
+@item @ref{Indices}
+Index of concepts, manual pages, etc.
+@end table
+@end iftex
+
+
+@node Introduction
+@chapter Introduction
+@cindex Introduction
+
+This document provides a @value{MANUAL_TYPE} for a platform to provide the @value{MANUAL_TITLE}
+capabilities.  The primary driver for the @value{MANUAL_TITLE} is to provide a system that avoids
+the use of expensive graded long haul SS7 facilities.  The document provides a high-level design and
+proposal for a production system to provide this capability.
+
+The proposal utilizes, where possible, existing OpenSS7 SS7 and SIGTRAN stack components and
+provides a develoment plan for components that are specific to the @value{MANUAL_TITLE}
+requirements.
+
+This document discusses the resulting software configuration that will be put in place on the
+production system, the platform configuration for the production system, and a network configuration
+for deployment.  Also discussed is an overview of the project management logistics for successful
+completion over the course of this development project.
+
+It is intended that this document be a ``living'' document, that is updated over the course of this
+development project.
+
+@menu
+* The OpenSS7 Signalling Gateway::
+* Project Drivers::
+* Scope::
+@end menu
+
+@node The OpenSS7 Signalling Gateway
+@section The OpenSS7 Signalling Gateway
+@cindex The OpenSS7 Signalling Gateway
+
+This project provides an @value{MANUAL_TITLE} that translates signalling traffic between the
+traditional SS7 signalling network and a SIGTRAN signalling network.  The gateway also provides a
+basis for geographic and functional redundancy of systems within the SIGTRAN signalling network.
+
+@node Project Drivers
+@section Project Drivers
+@cindex Project drivers
+
+The lead purpose of the @value{MANUAL_TITLE} is to provide a flexible and redundant Signalling
+Gateway front-end solution for the OpenSS7 VoIP Switch.
+
+@node Scope
+@section Scope
+@cindex Scope
+
+Because the focus on low cost, high performance, and production stability, the @value{MANUAL_TITLE}
+is constructed using commodity computing platforms and PCI based hardware cards, but using hardenned
+NEBS-3/ETSI compliant chasses in an active/standby failover configuration.  This will result in a
+cost-effective carrier grade system for mid- to low deployment cost.
+
+@menu
+* Phases::
+* Gates::
+@end menu
+
+@node Phases
+@subsection Phases
+@cindex Project phases
+
+The longer term project is broken into the following phases:
+
+@table @dfn
+@item Phase 1
+The initial phase of the project is intended to provide the capabilities of the
+@value{MANUAL_TITLE} operation for the deployment platform.
+@item Phase 2
+The second phase of the project is intended on performing SS7 signalling interoperability testing
+for live deployment of the signalling gateway production platform.
+@item Phase 3
+The third phase of the project is to integrate the deployment platform with the OpenSS7 VoIP Switch
+using the Internet Protocol suite.
+@item Phase 4
+The fourth phase of the project is to perform interoperability testing and a field trial of the
+deployment platform.
+@item Phase 5
+The fifth phase of the project is to complete management system integration for remote monitoring
+and provisioning for production service.
+@end table
+
+@node Gates
+@subsection Gates
+@cindex Project gates
+
+Each phase of the project consists of seven gates.  The seven gates are defined as follows:
+
+@table @dfn
+
+@item Gate 0 --- Concept
+
+@dfn{Gate 0} is passed when the initial concept has been elucidated and work is begun on a
+High-Level Design.  This is an internal OpenSS7 gate.
+
+@item Gate 1 --- High Level Design
+
+@dfn{Gate 1} is passed when the high-level design has been reviewed to the satisfaction of the
+consumers of the project.  This is an external review gate.  OpenSS7 internally passes this gate
+once the High-Level Design has been published and work is begun on a detailed design.@footnote{This
+document is a @value{MANUAL_TYPE} document and it meets the internal requirements for passing Gate 1
+of Phase 1 and Phase 2 of the project.  An external review of this document by a Beta or Gamma
+client or sponsor is pending.}
+
+@item Gate 2 --- Detailed Design
+
+@dfn{Gate 2} is passed when the detailed design has been reviewed to the satisfaction of the
+consumers of the project and the developers on the project.  This is an external as well as an
+internal review gate.  OpenSS7 passes this gate once the Detailed Design has been published and work
+has begun on development and implementation of the design.@footnote{OpenSS7 requires a contractual
+commitment for purchase from a Beta or Gamma client, or funding from a Sponsor of the OpenSS7
+Project, before this gate can be passed and development started.} Passing this gate moves from the
+design stage to the development stage of the project.
+
+@item Gate 3 --- Deployment and Implementation
+
+@dfn{Gate 3} is passed when the software and systems development and implementation to the detailed
+design is complete and testing has begun.  This is an internal review gate.  OpenSS7 internally
+passes this gate when software is code complete and hardware has been installed for testing.
+
+@item Gate 4 --- System Test
+
+@dfn{Gate 4} is passed once the product implementation meets all internal ad hoc and formal
+conformance test suites and internal testing is complete.  This is an internal review gate.  OpenSS7
+passes this gate internally once conformance testing is complete.  Passing this gate moves from the
+development stage to the support stage of the project.
+
+@item Gate 5 --- Acceptance Test
+
+@dfn{Gate 5} is passed once the product implementation has passed external Gamma client acceptance
+testing.  This is an external review gate.  OpenSS7 passes this gate internally once participation
+in external acceptance testing is complete.
+
+@item Gate 6 --- Project Complete
+
+@dfn{Gate 6} is passed once all support obligations for the product implementation have been
+discharged.  This is an internal review gate.  OpenSS7 passes this gate once support agreements have
+terminated.
+
+@end table
+
+For more details on Gate scheduling for Phase 1, 2 and 3 of the project, @pxref{Schedule}.
+
+@node Application Architecture
+@chapter Application Architecture
+@cindex Application architecture
+
+@menu
+* Application Background::
+* Application Objectives::
+* Application Requirements::
+* Solution Architecture::
+* Message Flows::
+@end menu
+
+The @value{MANUAL_TITLE} is intended to provide high performance, low cost Signalling Gateway
+services between traditional SS7 and SIGTRAN networks.
+
+@node Application Background
+@section Application Background
+@cindex Application background
+
+@node Application Objectives
+@section Application Objectives
+@cindex Application objectives
+
+@node Application Requirements
+@section Application Requirements
+@cindex Application requirements
+
+Application requirements have been broken into 5 phases using the timeboxing approach.
+
+@subsection Phase 1 Requirements
+
+Phase 1 requirements provide an @value{MANUAL_TITLE} capability that will connect an existing SS7
+network to application servers using M3UA.
+
+@itemize ---
+@end itemize
+
+@itemize ---
+@end itemize
+
+@subsection Phase 2 Requirements
+
+Phase 2 requirements provide
+
+@itemize ---
+@end itemize
+
+@subsection Phase 3 Requirements
+
+Phase 3 requirements provide
+
+@itemize ---
+@end itemize
+
+@subsection Phase 4 Requirements
+
+Phase 4 requirements provide
+
+@itemize ---
+@end itemize
+
+@subsection Phase 5 Requirements
+
+Phase 5 requirements provide
+
+@itemize ---
+@end itemize
+
+@node Solution Architecture
+@section Solution Architecture
+@cindex Solution architecture
+
+Although the functions of @dfn{Media Gateway Controller}, @dfn{Media Gateway} and @dfn{Signalling
+Gateway} have been decomposed, and in the past these functional groups have been implemented on
+separate physical platforms, modern compute capacity and densities permit these functions to be
+integrated into a single physical platform without limitation.  Open standard interfaces are
+utilized internal to the platform to permit a decomposed model to be split out and to permit ETSI
+Tiphon Version 4 compatibility as well as Multi-Services Forum Version 2 compatibility.
+
+@subsection @value{MANUAL_TITLE} for Deployment
+
+In light of the foregoing, the solution architecture takes the form of an integrated signalling gateway
+capable of providing a number of functional groups in the traditional models.  The
+@value{MANUAL_TITLE} integrates the following functional groups while still permitting standard
+interfaces to be exposed for maximum deployment flexibility:
+
+@itemize ---
+@item
+@item
+@item
+@item
+@end itemize
+
+@node Message Flows
+@section Message Flows
+@cindex Message flows
+
+This section provides some illustrative application call flows:@footnote{This section is not
+intended as a @dfn{Detailed Design}, but provides illustration only for these
+@dfn{@value{MANUAL_TYPE}}.}
+
+@node Network Architecture
+@chapter Network Architecture
+@cindex Network architecture
+
+@figref{3.1} illustrates the network configuration of the @value{MANUAL_TITLE} in a typical
+deployment scenario.  The SG platform is positioned and attached to switching equipment with
+A-Links, STPs with B/D-Links and Softswitches with M3UA.
+
+@figure{sg_netarch,3.1,Network Architecture}
+
+The device is attached to STPs (Signalling Transfer Points) in the SS7 network via V401P-SS7
+@cindex V401P-SS7
+or other OpenSS7 SS7 link cards@footnote{For other hardware alternatives, @pxref{Hardware
+Architecture}} terminating SS7 B/D-Links, either 24 channels per span (T1), 56kbps or 64kbps ANSI
+T1.111.3 links, or 31 channels per span (E1), 64kbps Q.703 links, or full span
+@cindex Q.703 Annex B
+@cindex ANSI T1.111.3 Annex B
+ANSI T1.111.3 Annex B 1.544Mbps or Q.703 Annex B 2.048Mbps high-speed links, or via a signalling
+gateway device terminating SS7 level 2, 3 or 4 and transporting M3UA back-haul signalling to the
+load device over
+@cindex SCTP
+SCTP (Stream Control Transmission Protocol).
+@cindex M3UA
+
+On the IP network side of the device, the platform is connected on an internal LAN with multiple
+Ethernet segments and IP subnetworks.  ISUP signalling originating at a Service Switching Point
+(SSP) within the SS7 network are accepted and responded to by MGC within the IP network.  Signalling
+lis converted from traditional TDM SS7 to SIGTRAN over the IP network via the Signalling Gateway.
+
+From the viewpoint of the SS7 or SIGTRAN network, the platform acts as a Signalling Gateway for the
+purposes of passing ISUP and LNP messages between the MGC and the remotely attached SSPs and SCPs.
+
+From the SS7 network, the SG platforms appear to be STPs and are connected with B/D-Links to an
+adjacent STP pair.@footnote{The SG platforms also support full STP operation and can locally attach
+SSP and SCP nodes with A-, E-, or F-links.}
+
+From the IP network, the SG platforms appear in the SG as STP configuration for SIGTRAN.
+Although MGC's are shown within the IP network as being provided SS7 connectivity by the SG
+platforms, any SIGTRAN equipped SS7 user application may also be supported by this configuration.
+
+@node System Architecture
+@chapter System Architecture
+@cindex System architecture
+
+This section details the solution system architecture.  The solution system architecture consists of
+the computing platform and it placement within the locale installation environment.
+
+The solution system has the following requirements:
+
+@itemize ---
+
+@item 19" rack.
+
+@item -48 VDC electrical power.
+
+@item CO cooling.
+
+@item Bantam to RJ-48c patch pannel.
+
+@end itemize
+
+@figuresized{sg_sysarch,4.1,System Architecture,5.5in}
+
+@node Platform Architecture
+@chapter Platform Architecture
+@cindex Platform architecture
+
+@menu
+* Platform Capacity::
+@end menu
+
+This section details the platform architecture.  The solution platform architecture consists of the
+computing platform and associated hardware, interfaces and peripherals.
+
+@figref{5.1} illustrates the solution platform rack configuration.
+
+@figure{rack,5.1,Rack Mount Components}
+
+The solution platform consists of the following:
+
+@itemize ---
+
+@item Two hardened PC (2U) chassis per system.
+
+@item Two GigE (1000baseT) RJ-48c Layer 2 Ethernet Switches.
+
+@item Two 1-1 DSX 14 T1 patch pannels.
+
+@end itemize
+
+@node Platform Capacity
+@section Platform Capacity
+@cindex Platform capacity
+
+The PC chasses is equipped with the following:@footnote{For detailing sizing considrations,
+@pxref{Platform Sizing}.}
+
+@itemize --
+@item 2 x 3.2GHz Xeon class E7520 based Motherboard.
+@item 2 x 100MHz PCI-X 2.1 bus.
+@item 4G DDR memory.
+@item 2 x Ultra320 SCSI hard drives.
+@item 2 X GigE Ethernet NICs.
+@item 3 x V401PT Quad T1 interface cards.
+@end itemize
+
+@node Protocol Architecture
+@chapter Protocol Architecture
+@cindex Protocol Architecture
+
+@figref{6.1} illustrates the protocol configuration of the @value{MANUAL_TITLE} system.  The
+protocol stack uses the following OpenSS7 stack components:
+
+@figuresized{cnam_protconf,6.1,Protocol Architecture,4in}
+
+@menu
+* Protocol Components::
+@end menu
+
+@node Protocol Components
+@section Protocol Components
+@cindex Protocol components
+
+The following Protocol Components are provided as part of the OpenSS7 SS7 and SIGTRAN stacks:
+
+@menu
+* SS7/SIGTRAN Stack Manager::
+* SCCP User Adaptation Layer (SUA) Driver::
+* Signalling Connection Control Part (SCCP) Driver::
+* MTP Level 3 User Adaptation Layer (M3UA) Driver::
+* Message Transfer Part (MTP) Driver::
+* MTP Level 2 User Adaptation Layer (M2UA) Driver::
+* Signalling Link Multiplexing (SL-MUX) Driver::
+* MTP Level 2 Peer-to-Peer User Adaptation Layer (M2PA) Module::
+* Signalling Link (SL) Module::
+* Signalling Data Terminal (SDT) Module::
+* Signalling Data Link (SDL) Module::
+* Multiplex/Channel (MX/CH) Driver::
+* V401P-MX (X400-MX) Driver::
+* Stream Control Transmission Protocol (SCTP) Driver::
+@end menu
+
+@node SS7/SIGTRAN Stack Manager
+@subsection SS7/SIGTRAN Stack Manager
+@cindex SS7/SIGTRAN stack manager
+
+@node SCCP User Adaptation Layer (SUA) Driver
+@subsection SCCP User Adaptation Layer (SUA) Driver
+@cindex SCCP User Adaptation Layer (SUA) driver
+
+The SUA driver provides the SG with the ability to act as an SUA SG (Signalling Gateway) in
+conjunction with an SUA AS (Application Server).  In this project, the SG function is performed by
+the @value{MANUAL_TITLE}.  The SUA driver accepts the trasnport of SCCP to SCCP-User interface form
+the SG to the AS.  The SUA driver links
+@cindex SCTP
+SCTP driver streams underneath it to provide the transport services for exporting the MTP-User
+interface.  The SUA driver provides the same interface to its users as the OpenSS7 SCCP.
+
+The SUA driver is a @dfn{STREAMS} driver that runs int he Linux kernel for maximum performance.
+
+This is an existing OpenSS7 SIGTRAN stack component: for documentation, see: @manref{sua(4)}.
+@dfn{Phase 1} activities for SUA include integration testing with the SG components.
+
+@node Signalling Connection Control Part (SCCP) Driver
+@subsection Signalling Connection Control Part (SCCP) Driver
+@cindex Signalling Connection Control Part (SCCP) driver
+
+The Signalling Connection Control Part driver performs the essential transport functions of the SS7
+signalling stack.  Message Transfer Part or MTP3 User Adaptation Layer streams are linked under the
+driver and the driver provides the functions of a SCCP endpoint or relay with full global title
+translations.  Signalling Connection Control Part streams bound to TCAP SCCP-SAPs are linked under
+the TCAP driver to form a complete SS7 stack in support of call transactions.
+
+@figuresized{sccp,6.1,Signalling Connection Control Part (SCCP) Module,3in}
+
+The SCCP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
+forward), including both connectionless and connection-oriented protocol classes 0 through 3.  The
+SCCP driver provides an extended NPI Revision 2.0 interface to its users and accepts an NPI Version
+2.0 (Connectionless) MTP interface from beneath or a specialized OpenSS7 MTPI interface.  In
+addition, a TPI Revision 2.0 user interface supporting an X/Open XNS 5.2 XTI library interface is
+provided.
+
+The SCCP driver also provide GTT streams for servicing Global Title Translations requests.  These
+streams can be used by a user-space program for servicing GTT requests from a local or remote
+database, or can have specialized @dfn{STREAMS} modules pushed to perform rule-based GTT in the
+operating system kernel.
+
+The SCCP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+
+The Signalling Connection Control Part (SCCP) @dfn{STREAMS} module is responsible for providing SCCP
+services on top of a Message Transfer Part (MTP) Level 3 (MTP3) or MTP3-User Adaptation Layer (M3UA)
+@cindex M3UA
+stream.  In addition, it is possible to use an ISO/OSI connectionless Network Service Provider to
+provide the network services to SCCP.
+
+The OpenSS7 SCCP component has message encoding and decoding for ITU-T/ETSI and ANSI SCCP.
+Interfaces provided to SCCP users include an XTI/OSI capable TPI Revision 2.0 interface, an NPI
+Revision 2.0 interface, and an SCCP-specific interface.
+
+The OpenSS7 SCCP module supports all Protocol Classes.
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see: @manref{sccp(4)}.
+@dfn{Phase 1} activities for SCCP include integration testing with the SG components.
+
+@menu
+* Global Title Translations (GTT)::
+@end menu
+
+@node Global Title Translations (GTT)
+@subsubsection Global Title Translations (GTT)
+
+The Signalling Connection Control Part (SCCP) Global Title Translations (GTT) module is responsible
+for responding to SCCP-GTT translations originating from the SCCP module beneath and is responsible
+for generating outgoing SCCP-GTT translations to the SCCP module beneath.  To perform its function,
+the SCCP-GTT indexes all information based on the SCCP Address, including dynamic (state) and
+provisioned (result) information.  For performance in both a testing and production environment, the
+module provides three levels of database partitioning and caching:
+
+@table @emph
+@item Rules
+Rules can be provided that are used to determine provisioned information based on components of
+the index (GT).  These rules can be used to generate a rather large simulated database without
+maintaining or accessing large database record areas.  The rule base provides a simulated
+partitioned database.  Each rule refers to a template or partial template of provisioned data.
+@item Templates
+Templates can be provided that specify a profile of provisioned information for a class of
+indexes (GT).  Templates provide a compact local in-kernel cache of templates.  Indexes reference
+templates rather than complete records.
+@item Records
+Records can be provided that specify the provisioned information for the specific index (GT).
+Records provide a local in-kernel cache of specified records.  Records are unique for each index.
+@item Translations
+The application can be queried by indicating the index (GT) and the module awaits a response
+containing the provisioned information.  Translations provide access to an external database or
+algorithm.
+
+For the High Performance GSM/UMTS GPRS HLR application, messages can be routed on Translation Type
+or on the basis of the Subsystem Number alone, resulting in a simple rule provided to the SCCP-GTT.
+If the High Performance GSM/UMTS GPRS HLR application is not expected to perform in any other role,
+the High Performance GSM/UMTS GPRS HLR application can bind as the "Default Destination" for all
+SCCP Unitdata messages, obviating the need for GTT.
+@end table
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see: @manref{sccp(4)}.
+@dfn{Phase 1} activities for SCCP include integration testing with the SG components.
+
+@node MTP Level 3 User Adaptation Layer (M3UA) Driver
+@subsection MTP Level 3 User Adaptation Layer (M3UA) Driver
+@cindex MTP Level 3 User Adaptation Layer (M3UA) driver
+
+The M3UA driver provides the SG with the ability to act as an M3UA SG (Signalling Gateway) in
+conjunction with an M3UA AS (Application Server).  In this project, the SG function is performed by
+the @value{MANUAL_TITLE}.  The M3UA driver accepts the transport of the MTP to MTP-User interface
+from the SG to the AS.  The M3UA driver links
+@cindex SCTP
+SCTP driver streams underneath it to provide the transport services for exporting the MTP-User
+interface.  The M3UA driver provides the same interface to its users as the OpenSS7 MTP.
+
+The M3UA driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+
+This is an existing OpenSS7 SIGTRAN stack component; for documentation, see: @manref{m3ua(4)}.
+@dfn{Phase 1} activities for M3UA include integration testing with the SG components.
+
+@node Message Transfer Part (MTP) Driver
+@subsection Message Transfer Part (MTP) Driver
+@cindex Message Transfer Part (MTP) driver
+
+The message transfer part driver performs the essential network functions of the SS7 signalling
+stack.  M2UA streams (see below) may be linked under the driver and the driver provides the
+functions of a Signalling End Point (SEP) or Signalling Transfer Point (STP).@footnote{Message
+Transfer Part streams bound to ISUP MTP-SAPs are linked under the ISUP driver above to form a
+complete SS7 stack in support of call switching.  Message Transfer Part streams bound to SCCP
+MTP-SAPs are linked under the SCCP driver above to form a complete SS7 stack in support of
+transaction services.}
+
+@figuresized{mtp3,6.2,Message Transfer Part (MTP) Level 3 (MTP3) Module,3in}
+
+The MTP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
+forward), including full transfer function.  The MTP driver provides a specialized MTP interface to
+its users, in addition to an NPI Revision 2.0 connectionless interface.  A TPI Revision 2.0
+(connectionless) user interface support X/Open XNS 5.2 XTI library functions is also provided.
+
+The MTP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+
+The Message Transfer Part (MTP) Level 3 (MTP3) module is responsible for providing MTP services to
+its users.
+
+The Message Transfer Part (MTP) Level 2 (MTP2) module is responsible for providing MTP services to
+its users.
+
+@figuresized{mtp2,6.3,Message Transfer Part (MTP) Level 2 (MTP2) Module,3in}
+
+These are an existing OpenSS7 SS7 stack components; for documentation, see: @manref{mtp(4)}.
+@dfn{Phase 1} activities for MTP3 and MTP2 include integration testing with the SG components.
+
+@node MTP Level 2 User Adaptation Layer (M2UA) Driver
+@subsection MTP Level 2 User Adaptation Layer (M2UA) Driver
+@cindex MTP Level 2 User Adaptation Layer (M2UA) driver
+
+The M2UA driver provides the SG with the ability to act as both an M2UA SG (Signalling Gateway) and
+an M2UA AS (Application Server).  In this project, the both the SG and AS functions are performed by
+the @value{MANUAL_TITLE}.  M2UA is used primarily for redundancy between internal nodes of the SG.
+The M2UA driver accepts the transport of SL to SL-User interface from the SG to the AS.@footnote{Or,
+in this case, between SG's.}  The M2UA driver links
+@cindex SCTP
+SCTP driver streams underneath it to provide the transport services for exporting the SL-User
+interface.  The M2UA driver provides the same interface to its users as the OpenSS7 SL.
+
+The M2UA driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+
+This is an existing OpenSS7 SIGTRAN stack component: for documentation, see @manref{m2ua(4)}.
+@dfn{Phase 1} activities for M2UA include integration testing with the SG components.
+
+@node Signalling Link Multiplexing (SL-MUX) Driver
+@subsection Signalling Link Multiplexing (SL-MUX) Driver
+@cindex Signalling Link Multiplexing (SL-MUX) driver
+
+The SL-MUX is a Signalling Link Multiplexing (SL-MUX) driver for the OpenSS7 stack.  It provides a
+convenient mechanism for the management of signalling links of a wide variety of types.  The SL-MUX
+driver links signalling links conforming to the SL to SL-User interface and provides a global naming
+and Physical Point of Attachment scheme for all signalling links.  V401P-SS7 signalling links,
+channel driver signalling links, M2PA signalling links and M2UA accessible signalling links can all
+be linked beneath the SL-MUX driver.
+
+The SL-MUX driver is a @dfn{STREAMS} multiplexing driver that runs in the kernel for maximum
+performance.
+
+This is an existing OpenSS7 SS7 stack component: for documentation, see @manref{sl-mux(4)}.
+@dfn{Phase 1} activities for the SL-MUX include integration testing with the SG components.
+
+@node MTP Level 2 Peer-to-Peer User Adaptation Layer (M2PA) Module
+@subsection MTP Level 2 Peer-to-Peer User Adaptation Layer (M2PA) Module
+@cindex MTP Level 2 Peer-to-Peer User Adaptation Layer (M2PA) module
+
+The M2PA module provides the SG with the ability to utilize SCTP-based high-speed signalling links.
+In this project, M2PA signalling links are used primiarily for backup C-Links between SG nodes
+acting as Signalling Transfer Points (STPs).  The M2PA module pushes over an SCTP driver transport
+Stream to form a complete Signalling Link (SL).  The M2PA module provides the same interface to its
+users as the OpenSS7 Signalling Link (SL).
+
+The M2PA module is a @dfn{STREAMS} module that runs in the Linux kernel for maximum performance.
+
+This is an existing OpenSS7 SIGTRAN stack component: for documentation, see @manref{m2pa(4)}.
+@dfn{Phase 1} activities for M2PA include integration testing with the SG components.
+
+@node Signalling Link (SL) Module
+@subsection Signalling Link (SL) Module
+@cindex Signalling Link (SL) module
+
+The signalling link module performs HDLC and SS7 Message Transfer Part Level 2 (Link) functions on a
+raw communications channel, such as that provided by the X400P-SS7 driver and the V401P-SS7 card.
+@cindex V401P-SS7
+This module converts between the channel media stream (raw octet stream) and an SS7 signalling link
+signalling Stream.  These Streams comprise SS7 signalling links and are linked under the SL-MUX or
+MTP driver.
+
+The SL module supports CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
+forward), including Q.703 and
+@cindex Q.703 Annex B
+Q.703 Annex B (HSL) operation.  TTC JQ.703 (1994) is also supported.
+The SL module provides a specialized SL interface to its users, in addition to an NCR Comten CDI
+Revision 2.0 Style 2 connectionless interface.
+
+The SL module is a @dfn{STREAMS} module that runs in the Linux kernel for maximum performance.
+
+The Signalling Link (SL) module is responsible for providing SL services to its users.
+
+@figuresized{sl,6.4,Signalling Link (SL) Module,3in}
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see: @manref{sl(4)}.
+@dfn{Phase 1} activities for MTP2 include integration testing with the SG components.
+
+@node Signalling Data Terminal (SDT) Module
+@subsection Signalling Data Terminal (SDT) Module
+@cindex Signalling Data Terminal (SDT) module
+
+The signalling data terminal module performs HDLC and lower level SS7 Message Transfer Part Level 2
+(Link) functions including DAEDR, DAEDT, AERM, SUERM or EIM and SU Compression/Repetition on a raw
+communications channel or span, such as that provided by OpenSS7 Channel Drivers.  This module
+converts between the raw channel media stream (raw octet stream) and an SS7 signalling data terminal
+Stream.  These Streams comprise SS7 signalling data terminals and are pushed beneath the SL module.
+
+The SDT module supports CCITT/ITU-T version (Blue Book forward), ETSI and ANSI versions (1992
+forward), including Q.703 and
+@cindex Q.703 Annex B
+Q.703 Annex B (HSL) operation.  TTC JQ.703 (1994) is also supported.
+The SDT module provides a specialized SDT interface to it users, in addition to an NCR Comtem CDI
+Revision 2.0 Style 2 connectionless interface.
+
+The Signalling Data Terminal (SDT) module is responsible for providing SDT services to its users.
+
+@figuresized{sdt,6.5,Signalling Data Terminal (SDT) Module,3in}
+
+This is an existing OpenSS7 SS7 stack component; for documentation see: @manref{sdt(4)}.
+@dfn{Phase 1} activities for SDT include integration testing with the SG components.
+
+@node Signalling Data Link (SDL) Module
+@subsection Signalling Data Link (SDL) Module
+@cindex Signalling Data Link (SDL) module
+
+The signalling data link module performs conversion between OpenSS7 channel drivers and the
+Signalling Data Link interface used by other SS7 modules and drivers.  This module converts between
+the Channel primitives and the Signalling Data Link primitives.  Streams with this module pushed
+comprise SS7 signalling data links and are pushed beneath the SDT module.
+
+The SDL module supports CCITT/ITU-T version (Blue Book forward), ETSI and ASNI version (1992
+forward), including Q.703 and
+@cindex Q.703 Annex B
+Q.703 Annex B (HSL) operation.  TTC JQ.703 (1994) is also supported.
+The SDL module provides a specialized SDL interface to its users, in addition to an NCR Comten CDI
+Revision 2.0 Style 2 connectionless interface.
+
+The Signalling Data Link (SDL) module is responsible for providing SDL services to its users.
+
+@figuresized{sdt,6.5b,Signalling Data Link (SDL) Module,3in}
+
+This is an existing OpenSS7 SS7 stack component; for documentation see: @manref{sdl(4)}.
+@dfn{Phase 1} activities for SDL include integration testing with the SG components.
+
+@node Multiplex/Channel (MX/CH) Driver
+@subsection Multiplex/Channel (MX/CH) Driver
+@cindex Multiplex/Channel (MX/CH) driver
+
+The Multiplex/Channel (MX/CH) Driver performs soft-switching of multiplex Streams as well as channel
+access to channels within multiplex Streams.  This driver links multiplex interfaces beneath it and
+presents both multiplex and channel interfaces to its users.  For this project, the MX/CH driver is
+used to link V401P-MX Streams beneath the driver and provide channel access to DS0 or full DS1
+channels within the multiplex for use by SS7 signalling links.  Multiplex streams present an MX
+interface to its users.  Channel streams present a CH interface to its users.  The CH interfaces are
+converted to SDL Streams using the SDL module and then have SDT and SL modules pushed to form a
+complete Signalling Link stream.
+
+The MX/CH drivers supports T1, E1 and J1 operation, as well as T3 and E2 operation.  The driver
+provides a specialized MX and CH interface to its users.
+
+This is an existing OpenSS7 channel stack component; for documentation see @manref{mx(4)} and
+@manref{ch(4)}.
+
+The Multiplex/Channel (MX/CH) driver is responsible for providing CH services to its users.
+
+@node V401P-MX (X400-MX) Driver
+@subsection V401P-MX (X400-MX) Driver
+@cindex V401P-MX (X400-MX) driver
+
+@node Stream Control Transmission Protocol (SCTP) Driver
+@subsection Stream Control Transmission Protocol (SCTP) Driver
+@cindex Stream Control Transmission Protocol (SCTP) Driver
+@cindex SCTP
+
+OpenSS7 has two implementations (@dfn{STREAMS} and Linux Sockets) that provide support for this new
+transport protocol and that provide transport for SIGTRAN and other protocols.  The @dfn{STREAMS}
+SCTP implementation provides an NPI Revision 2.0 and TPI Revision 2.0 interface to its users.  Alos
+supported is an X/Open XNS 5.2 XTI Library and ITOS (ISO over SCTP).  The Linux Native SCTP
+implementation provides a Sockets interface.
+
+This is an existing OpenSS7 SIGTRAN stack component; for documentation, see:
+@manref{sctp(4)}.  @dfn{Phase 1} activities for SCTP include integration testing with the SG
+components.
+
+@node Software Architecture
+@chapter Software Architecture
+@cindex Software Architecture
+
+This chapter details the software configuration of the OpenSS7 solutions.  OpenSS7 stack software is
+based on the @dfn{STREAMS} facility running on the Linux Operating System.  This provides for use of
+the Linux Operating System while maintaining portability and consistency with major UNIX operating
+systems that provide an @dfn{SVR 4.2 ES/MP STREAMS} facility.
+
+@menu
+* Linux Operating System::
+* STREAMS Facility::
+* OpenSS7 SS7 and SIGTRAN Stacks::
+@end menu
+
+@node Linux Operating System
+@section Linux Operating System
+@cindex Linux Operating System
+
+The OpenSS7 @dfn{STREAMS} releases and stacks currently support the 2.4 and 2.6 Linux Kernel.  A
+Linux kernel version greater than or equal to 2.4.18 is recommended for 2.4 kernels.  The Linux 2.5
+series kernels are not supported.  A Linux kernel version greater than or equal to 2.6.9 is
+recommended for 2.6 kernels.  Linux 2.4 and 2.6 kernels released by popular distributions are
+supported.  These include kernel.org releases, RedHat (7.2, 9, EL3, AS/EL4, AS/EL5), WhiteBox (EL3,
+EL4), Fedora Core (FC1-FC7), Debian (Woody-Etch), Ubuntu (6.10-7.10), SuSE (8.2-10.2 OSS), CentOS(4
+and 5), Lineox (4 and 5).  Currently our preferred distribution is CentOS 5 with all updates
+applied.
+
+Although OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks are tested primarily on ix86 hardware, the
+stacks compile and install on PPC (MPC 8260, Freescale 440), HPPA, and other processor architectures
+supported by the Linux 2.4 and 2.6 kernels.
+
+For the current project, RedHat AS/EL5 or CentOS 5 is recommended.
+
+@node STREAMS Facility
+@section STREAMS Facility
+@cindex STREAMS Facility
+
+OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks utilize a @dfn{SVR 4.2 ES/MP STREAMS} facility.  Two
+such facilities are available for Linux:
+
+@enumerate
+@item @dfn{Linux STREAMS} (referred to as LiS), and
+@item @dfn{Linux Fast-STREAMS} (referred to as LfS).
+For additional information on @dfn{Linux Fast-STREAMS}, @xref{Linux Fast-STREAMS (LfS)}.
+@end enumerate
+
+@menu
+* Linux STREAMS (LiS)::
+* Linux Fast-STREAMS (LfS)::
+@end menu
+
+@node Linux STREAMS (LiS)
+@subsection Linux STREAMS (LiS)
+@cindex Linux STREAMS (LiS)
+@cindex LiS
+
+@node Linux Fast-STREAMS (LfS)
+@subsection Linux Fast-STREAMS (LfS)
+@cindex Linux Fast-STREAMS (LfS)
+@cindex LfS
+
+
+@node OpenSS7 SS7 and SIGTRAN Stacks
+@section OpenSS7 SS7 and SIGTRAN Stacks
+@cindex OpenSS7 SS7 and SIGTRAN Stacks
+
+The OpenSS7 SS7 and SIGTRAN stacks are implemented using the @dfn{STREAMS} facility.  Protocol
+moduels within the stack are implemented as @dfn{STREAMS} modules, device drivers, multiplexing
+drivers and pseudo-device drivers.  The @dfn{STREAMS} facility has the ability to stack modules and
+multiplexing drivers above read or pseudo-device drivers using the @dfn{STREAMS} @manref{I_PUSH(7)}
+an @manref{I_LINK(7)} facilities.  Since @dfn{STREAMS} modules and drivers run within the context of
+the Operating System Kernel using message-based scheduling, greatly increased performance is
+experienced over equivalent user-space applications.  @dfn{STREAMS} modules and drivers communicate
+by passing priority.  In addition, @dfn{STREAMS} provides memory management, timer, locking,
+syncrhonization, flow control and other facilities commonly used by protocol modules.
+
+@figure{osimap,7.1,SS7 to ISO/OSI Mapping}
+
+Each OpenSS7 protocol module provides standardized X/Open ISO/OSI interfaces as well as more SS7
+specialized interfaces.  Many of the OpenSS7 protocol modules provide TPI Revision 2.0 interfaces
+with support fot he OpenSS7 XTI/TLI Library.
+
+@figuresized{stack,7.2,STREAMS SS7/SIGTRAN Stack Architecture,3in}
+
+@figref{7.2} illustrates the organization of @dfn{STREAMS} modules, multiplexing drivers,
+pseudo-device drivers and real device drivers in the OpenSS7 SS7 stack.  At each interface, the
+equivalent SIGTRAN User Adaptation Layer (UA) can be used.  So, for example, between MTP Level 3 and
+its Users, the M3UA
+@cindex M3UA
+protocol can be employed.  Each UA provides the same lower layer interface and upper layer
+interface.  So, M3UA
+@cindex M3UA
+provides an MTP/MTP-User interface at its lower layer interface as well as at it supper layer
+interface.
+
+@node Hardware Architecture
+@chapter Hardware Architecture
+@cindex Hardware Architecture
+
+@figref{8.1} illustrates the hardware configuration for the @value{MANUAL_TITLE}.
+
+@figuresized{sg_platarch,8.1,Platform Architecture,6.0in}
+
+The configuration show in @figref{8.1} shows:
+
+@itemize @bullet
+@item Two compute nodes attached in a fully redundant configuration.
+@item Each compute node has 3 x V401P-SS7 cards proding quad DSX-1 connectivity per card, for a
+total of 12 DSX-1's per compute node.
+@item Each compute node is attached via cross-connect over 12 DSX-1's (each) to a DACS which has
+drop-down capability on each pair of DSX-1's consisting of one DSX-1 from each compute node.
+@item On the IP network side, each compute node supports 2 GigE NIC ports.
+@item Each NIC port on each compute node is attached to a GigE rail or swtich which subsequently
+attacheds to two Routers, one for Network A and one for Network B.
+@item The configuration shown supports up to 288 low-speed (56 or 64 kbps) signalling links or up to
+12 high-speed (1.544 Mpbs) signalling links.
+@item Compute nodes communicate with each other over the IP network, either via local switch or
+remote router, using M2UA.  This SIGTRAN protocol permits the compute node to logically share their
+V401P-SS7 hardware interfaces. 
+@item Compute nodes communicate with the associated STP pair via TDM links as well as using the M2PA
+protocol.  The M2PA SIGTRAN protocol provides an IP-based high-speed SS7 link and is used to augment
+TDM links to implement C-Links on the platform.
+@item Compont nodes act as SGP within the SG and provide MTP Level 3 and above connectivity to
+remote application servers using the M3UA SIGTRAN protocol.  The M3UA SIGTRAN protocol exports the
+MTP to MTP-User interface and effectivley transports the interface to the application server from
+the signalling gateway.
+@end itemize
+
+@node Management Architecture
+@chapter Management Architecture
+@cindex Management Architecture
+
+@node Logistics
+@chapter Logistics
+@cindex Logistics
+
+@node Optional Application Support
+@appendix Optional Application Support
+@cindex Optional Application Support
+
+@node Optional Network Support
+@appendix Optional Network Support
+@cindex Optional Network Support
+
+@node Optional System Support
+@appendix Optional System Support
+@cindex Optional System Support
+
+@node Optional Platform Support
+@appendix Optional Platform Support
+@cindex Optional Platform Support
+
+@node Optional Protocol Support
+@appendix Optional Protocol Support
+@cindex Optional Protocol Support
+
+@node Optional Software Support
+@appendix Optional Software Support
+@cindex Optional Software Support
+
+@node Optional Hardware Support
+@appendix Optional Hardware Support
+@cindex Optional Hardware Support
+
+@node Optional Management Support
+@appendix Optional Management Support
+@cindex Optional Management Support
+
+@node Programmatic Interfaces
+@appendix Programmatic Interfaces
+@cindex Programmatic interfaces
+
+@node Platform Sizing
+@appendix Platform Sizing
+@cindex Platform sizing
+
+@node Indices
+@unnumbered Indices
+@cindex indices
+
+@menu
+* Concept Index::		    Index of Concepts
+* Manual Page Index::		    Index of Manual Pages Referenced
+@end menu
+
+@node Concept Index
+@unnumberedsec Index of Concepts
+@printindex cp
+
+@page 
+@node Manual Page Index
+@unnumberedsec Index of Manual Pages Referenced
+@printindex mp
+
+@page
+@shortcontents
+@page
+@contents
+@bye

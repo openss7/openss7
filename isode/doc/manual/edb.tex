@@ -1,0 +1,7 @@
+\File{edb.bnf},{08:45},{Jan 27 1989}
+\L{\LB{\<entrydatablock\> ::= \<type\> \<CRLF\> \<version\> \<CRLF\> \<data\>}}
+\L{\LB{\<type\>}\Tab{16}{ ::= \S{}\"MASTER\"\SE{} \| \S{}\"SLAVE\"\SE{} \|  \S{}\"CACHE\"\SE{}}}
+\L{\LB{\<version\>}\Tab{16}{ ::= \<printablestring\>}}
+\L{\LB{\<data\> }\Tab{16}{ ::= \<entry\> \| \<entry\> \<CRLF\> \<data\>}}
+\L{\LB{\<entry\> }\Tab{16}{ ::= \<rdn\> \<CRLF\> \<attributelist\> \<CRLF\>}}
+\L{\LB{\<attributelist\>}\Tab{16}{ ::= \<attribute\> \| \<attributelist\> \<CRLF\> \<attribute\>}}

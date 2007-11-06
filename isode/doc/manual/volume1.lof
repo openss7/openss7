@@ -1,0 +1,28 @@
+\addvspace {10pt}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Constructing the address for the FTAM entity}}{21}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces BNF Syntax for paddr2str/str2paddr}}{23}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces The generic ROS server}}{52}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Initializing the generic ROS responder}}{76}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces The request/reply loop for the generic ROS responder}}{77}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Initializing the generic ROS initiator}}{83}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Initializing the generic RTS responder}}{110}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Finalizing the generic RTS responder}}{111}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Stepping through a Sequence}}{142}
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Stepping through a Set}}{143}
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Stepping through a Presentation Stream}}{146}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Constructing the RoSAP address for the Directory Services entity}}{169}
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Initializing the generic ROS responder}}{176}
+\contentsline {figure}{\numberline {A.3}{\ignorespaces Finalizing the generic ROS responder}}{177}
+\contentsline {figure}{\numberline {A.4}{\ignorespaces Constructing the RtSAP address for the Message Transfer entity}}{178}
+\contentsline {figure}{\numberline {A.5}{\ignorespaces Initializing the generic RTS responder}}{185}
+\contentsline {figure}{\numberline {A.6}{\ignorespaces Finalizing the generic RTS responder}}{186}

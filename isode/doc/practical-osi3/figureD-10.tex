@@ -1,0 +1,26 @@
+\File{figureD\-10.py},{14:11},{Mar  4 1991}
+\L{\LB{intermediateSearch (base: DN; s: String): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    \K{IF} (present (base, organizationalUnitName)) \K{THEN}}}
+\L{\LB{        \K{RETURN} search (base, oneLevel, s,}}
+\L{\LB{                       \{ organizationalUnitName \},}}
+\L{\LB{                       \{ substrings, approximateMatch \},}}
+\L{\LB{                       \{ organizationalUnit \});}}
+\L{\LB{    \K{ELSE}}}
+\L{\LB{        \K{IF} (present (base, OrganizationName)) \K{THEN}}}
+\L{\LB{            \K{RETURN} search (base, oneLevel, s,}}
+\L{\LB{                           \{ organizationalUnitName, localityName \},}}
+\L{\LB{                           \{ substrings, approximateMatch \},}}
+\L{\LB{                           \{ organizationalUnit, locality \});}}
+\L{\LB{        \K{ELSE}}}
+\L{\LB{            \K{IF} (present (base, localityName)) \K{THEN}}}
+\L{\LB{                \K{RETURN} search (base, oneLevel, s,}}
+\L{\LB{                               \{ organizationName \},}}
+\L{\LB{                               \{ substrings, approximateMatch \},}}
+\L{\LB{                               \{ organization \});}}
+\L{\LB{            \K{ELSE}}}
+\L{\LB{                \K{RETURN} search (base, oneLevel, s,}}
+\L{\LB{                               \{ organizationName, localityName \},}}
+\L{\LB{                               \{ substrings, approximateMatch \},}}
+\L{\LB{                               \{ organization, locality \});}}
+\L{\LB{\}}}

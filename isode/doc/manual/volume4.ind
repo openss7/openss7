@@ -1,0 +1,165 @@
+\begin{theindex}\makeatletter
+\raggedright
+\def\newindex#1{{\huge\hspace{-.5in}\parbox[t]{.5in}{\makebox[.35in][c]{\uppercase{#1}}}\vspace{-1.5ex}}}
+\newindex{a}
+\item aetbuild, 10
+\item Aziz, Ashar, xx
+\indexspace
+\newindex{b}
+\item Betzler, Uli, xxi
+\item Braun, Hans-Werner, xix
+\item Brezak, John, xx
+\indexspace
+\newindex{c}
+\item Cass, Dwight E., xvii
+\item Chirieleison, Don, xx
+\item Cowin, Godfrey, xviii
+\item cpp, 77
+\indexspace
+\newindex{d}
+\item dish, 9
+\item dsabuild, 10
+\item Dubous, Olivier, xix
+\indexspace
+\newindex{e}
+\item Easterbrook, Stephen, xviii
+\item EEC, xviii
+\item ESPRIT, xviii
+\indexspace
+\newindex{f}
+\item finderrbyerr, 120
+\item finderrbyname, 121
+\item findopbyname, 120
+\item findopbyop, 120
+\item Finni, Olli, xix
+\indexspace
+\newindex{g}
+\item Gosling, James, xxi
+\indexspace
+\newindex{h}
+\item Hein\"{a}nen, Juha, xx
+\item Horton, Mark R., xix
+\item Horvath, Nandor, xx
+\indexspace
+\newindex{i}
+\item isobjects, 22, 169
+\item isoentities, 23
+\item isoservices, 23
+\indexspace
+\newindex{j}
+\item Jacobsen, Ole-Jorgen, xx
+\item Jelfs, Philip B., xx
+\item Jordan, Kevin E., xx
+\indexspace
+\newindex{k}
+\item Keogh, Paul, xx
+\item Kille, Stephen E., xviii
+\item Knight, Graham, xx
+\indexspace
+\newindex{l}
+\item Lamport, Leslie, xxi
+\item \LaTeX {}, v, 192
+\item Lavender, Greg, xix
+\item libacsap, 7, 108, 114
+\item libdsap, 9
+\item libpepy, 75
+\item libpsap, xviii, 7, 9
+\item libpsap2, 7, 8
+\item libpsap2-lpp, 8
+\item librosap, xvii, 7, 105, 110
+\item librosy, 9, 29, 36, 37, 105, 106, 113, 115, 118, 119, 121, 136, 150, 165
+\item librtsap, 7
+\item libssap, 7
+\item libtsap, xx, 8
+\item lint, 10, 36, 37
+\indexspace
+\newindex{m}
+\item make, 5, 25, 37, 53, 54, 77, 90
+\item McLoughlin, L., xx
+\item Michaelson, George, xvii
+\item Miller, Steve D., xix
+\item Moore, Christopher W., xvii
+\indexspace
+\newindex{n}
+\item NBS, xix
+\item NIST, xix
+\item Nordmark, Erik, xx
+\indexspace
+\newindex{o}
+\item Onions, Julian, xviii
+\indexspace
+\newindex{p}
+\item Pavel, John, xviii
+\item Pavlou, George, xx
+\item pepsy, xix, 9, 10, 37, 88, 89, 90, 91, 93, 94, 97, 98
+\item pepy, xviii, 9, 10, 24, 36, 39, 48, 52, 59, 60, 62, 63, 67, 72, 73, 74, 75, 76, 77, 78, 88, 89, 90, 91, 94, 97, 101, 165
+\item perror, 74
+\item posy, xviii, 8, 9, 10, 24, 37, 39, 43, 45, 46, 48, 52, 53, 59, 88, 89, 90, 93, 94, 97, 98
+\item Prafullchandra, Hemma, xx
+\item Preuss, Don, xx
+\item Pring, Ed, xxi
+\item printf, 74
+\item PY\_advise, 74, 165
+\item PY\_pepy, 75
+\indexspace
+\newindex{q}
+\item quipu, 9
+\indexspace
+\newindex{r}
+\item Reinart, John A., xxi
+\item Rekhter, Jacob, xx
+\item Robbins, Colin J., xviii
+\item Roe, Mike, xviii
+\item RoErrString, 121
+\item Romine, John L., xvii
+\item Rose, Marshall T., xxi
+\item ros.image, 23
+\item rosy, 8, 23, 29, 35, 36, 37, 39, 47, 75, 88, 105, 106, 120, 121
+\item Ruttle, Keith, xviii
+\item RyDiscard, 113
+\item RyDispatch, 114
+\item RyDsError, 116
+\item RyDsResult, 116
+\item RyDsUReject, 117
+\item RyError, 107
+\item ryinitiator, 137
+\item RyLose, 119
+\item RyOperation, 106, 108
+\item RyOpInvoke, 109
+\item ryresponder, 151
+\item RyStub, 111
+\item RyWait, 118
+\indexspace
+\newindex{s}
+\item Scott, John A., xix
+\item setjmp, 153
+\item Srinivasan, Raj, xx
+\indexspace
+\newindex{t}
+\item tar, xii
+\item Taylor, Jem, xix
+\item testdebug, 75
+\item tgrind, 38, 78
+\item Titcombe, Steve, xviii
+\item Turland, Alan, xviii
+\indexspace
+\newindex{u}
+\item U.C.~Berkeley, xxi
+\indexspace
+\newindex{v}
+\item Vanderbilt, Peter, xx
+\item vgrind, 38, 78
+\item vgrindefs, 38, 78
+\indexspace
+\newindex{w}
+\item Walton, Simon, xviii
+\item Weller, Daniel, xx
+\item Wenzel, Oliver, xx
+\item Wilder, Rick, xx
+\item Willson, Stephen H., xvii
+\item Worsley, Andrew, xix
+\indexspace
+\newindex{y}
+\item yacc, 29, 39, 59
+\item Young, Alan, xxi
+\end{theindex}

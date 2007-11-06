@@ -1,0 +1,21 @@
+\File{grind5a\-1.c},{22:23},{Jun 12 1988}
+\L{\LB{\K{\#include} \<isode\/psap2.h\>}}
+\L{\LB{\K{\#include} \<isode\/isoservent.h\>}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{register} \K{struct} PSAPaddr *pa;}}
+\L{\LB{\K{register} \K{struct} isoservent *is;}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{if}\K{if} ((is = getisoserventbyname (\S{}\"loop\"\SE{}, \S{}\"psap\"\SE{})) == NULL)}}
+\L{\LB{    error (\S{}\"psap\/loop\"\SE{});}}
+\L{\LB{    }}
+\L{\LB{\C{}\/* RemoteHost is the host we\'re interested in,}}
+\L{\LB{   e.g., ``gremlin.nrtc.northrop.com\'\' *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\Proc{if}\K{if} ((pa = is2paddr (RemoteHost, NULLCP, is)) == NULLPA)}}
+\L{\LB{    error (\S{}\"address translation failed\"\SE{});}}
+\L{\LB{}}
+\L{\LB{...}}

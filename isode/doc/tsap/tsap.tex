@@ -1,0 +1,224 @@
+% run this through SLiTeX
+
+
+\documentstyle[blackandwhite,landscape,oval,pagenumbers]{NRslides}
+
+\raggedright
+
+\begin{document}
+
+\title	{A MODEST PROPOSAL}
+\author	{Dwight E.~Cass\\
+	Automation Sciences Laboratory\\
+	Northrop Research and Technology Center}
+\date	{May 15, 1986}
+\maketitlepage
+
+
+\begin{bwslide}
+\ctitle	{THE PROBLEM}
+
+\begin{nrtc}
+\item	IMMEDIATE VACUUM IN THE DEVELOPMENT OF
+	APPLICATION PROTOCOLS
+    \begin{nrtc}
+    \item	EXPERIENCE SHOWS THAT APPLICATION
+		PROTOCOL DEVELOPMENT TAKES AT LEAST AS MUCH TIME AS
+		DEVELOPMENT OF LOWER-LEVEL PROTOCOLS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE PROBLEM (CONT.)}
+
+\begin{nrtc}
+\item	LACK OF NEAR-TERM AVAILABILITY OF MAP/TOP ON ALL %
+	MACHINES
+    \begin{nrtc}
+    \item	NORTHROP HAS A STRONG COMMITTMENT
+		TO COMMUNICATE WITH THE CUSTOMER (DoD) ELECTRONICALLY
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE CAUSE}
+
+\begin{nrtc}
+\item	MAP/TOP, WHILE AGRESSIVE, IS STILL YOUNG
+    \begin{nrtc}
+    \item	FANTASTIC PROGRESS HAS BEEN MADE TO DATE,
+		BUT REALISTICALLY, A LOT MORE WORK IS REQUIRED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE CAUSE (CONT.)}
+
+\begin{nrtc}
+\item	NORTHROP HAS REQUIREMENTS NOW
+    \begin{nrtc}
+    \item	FACTORY- AND DIVISION-WIDE NETWORKING
+		REQUIRED IN THE 88--89 TIMEFRAME
+    \item	SINCE MAP/TOP SOLUTIONS AREN'T AVAILABLE ON EXISTING
+		FACILITIES,
+		INTERIM SOLUTIONS MUST BE PUT INTO PLACE QUICKLY
+    \item	SOLUTIONS MUST BE CONSISTENT WITH THE
+		DIRECTION OF THE MAP/TOP COMMUNITY
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBSERVATIONS}
+
+\begin{nrtc}
+\item	MANY OF THESE PROBLEMS HAVE PREVIOUSLY BEEN SOLVED, IN DIFFERENT
+	SETTINGS, WITHOUT LOSS OF GENERALITY
+    \begin{nrtc}
+    \item	SOME OF THESE SOLUTIONS ARE QUITE MATURE (STABLE, ROBUST,
+		AND ENJOY A HIGH DEGREE OF VENDOR SUPPORT)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBSERVATIONS (CONT.)}
+
+\begin{nrtc}
+\item	MAP/TOP, BASED ON THE OSI MODEL, IS A STRONGLY LAYERED ARCHITECTURE,
+	WHICH FACILITATES
+	APPLICATION-INDEPENDENCE OF UNDERLYING PROTOCOLS
+    \begin{nrtc}
+    \item	SERVICES ARE IMPORTANT,\\ IMPLEMENTATIONS ARE NOT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TCP/IP AS THE INTERIM SOLUTION}
+
+\begin{nrtc}
+\item	MILSTD PROTOCOL SUITE MANDATED FOR ALL DoD NETWORKING
+    \begin{nrtc}
+    \item	MATURE SET OF PROTOCOLS SINCE 1980\\ (DATING FROM c.1970)
+    \item	EMPHASIS ON RELIABILITY AND SECURITY
+    \item	WIDE VENDOR SUPPORT AND USER POPULATION
+    \item	VENDOR SUPPORT TO OTHER TECHNOLOGIES (e.g., SNA)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TCP/IP (CONT.)}
+
+\begin{nrtc}
+\item	TCP/IP PROVIDES ROBUST TRANSPORT SERVICES
+    \begin{nrtc}
+    \item	FUNCTIONALITY EQUIVALENT TO TP4\\ (AS PER NRC REPORT)
+    \item	MANY VENDORS OFFER BOARD-LEVEL IMPLEMENTATIONS AT THE
+		TRANSPORT LAYER
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONSTRUCTING THE SOLUTION}
+
+\begin{nrtc}
+\item	BEST OF ALL SOLUTIONS REQUIRE COMPLEMENTARY CO-EXISTANCE:
+    \begin{nrtc}
+    \item	UTILIZE TCP/IP FUNCTIONALITY NOT CURRENTLY PRESENT IN MAP
+    \item	UTILIZE MAP/TOP FUNCTIONALITY AS IT BECOMES AVAILABLE
+    \item	DEVELOP APPLICATIONS IN AN EVOLUTIONARY,
+		NOT REVOLUTIONARY FASHION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHERE TO JOIN THEM?}
+
+\begin{nrtc}
+\item	NETWORK LAYER (OR BELOW):\\
+	RE-INVENTS TCP\\ PREVENTS USE OF BOARD-LEVEL PRODUCTS
+\item	SESSION LAYER (OR ABOVE):\\
+	TOO MUCH DEPENDENCY ON TCP AND THE ARPANET CLIENT/SERVICE MODEL
+\item	TRANSPORT SERVICE ACCESS POINT:\\
+	TAKES ADVANTAGE OF TCP's STRENGTHS,\\
+	WHILE GIVING MAP/TOP A FREE HAND ABOVE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WORK TO DATE}
+
+\begin{nrtc}
+\item	REQUEST FOR COMMENTS (RFC) 983:\\
+	ISO TRANSPORT SERVICES ON TOP OF THE TCP
+\item	PROTOTYPE IMPLEMENTATION FOR 4.2BSD UNIX
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISO TSAP ON TOP OF THE TCP}
+
+\begin{nrtc}
+\item	SPECIFIES A FULL TP4 IMPLEMENTATION (ISO-8072)\\
+	EXCEPT FOR QUALITY OF SERVICE PARAMETERS
+\item	ADDRESSING IS TCP-BASED
+\item	IMPLICIT MAXIMUM TSDU SIZE\\
+	(TO BE RELAXED IN VERSION 2)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE NEXT STEP}
+
+\begin{nrtc}
+\item	ACQUISITION OF PUBLIC-DOMAIN SESSION, FTAM, AND CASE IMPLEMENTATIONS
+	FOR TESTING PURPOSES
+\item	IMPLEMENTATION OF RFC983 ON THE WIDE RANGE OF MACHINES CURRENTLY
+	IN USE AT NORTHROP
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MIGRATION STRATEGY}
+
+\begin{nrtc}
+\item	RFC983 NOT INTENDED AS A MIGRATION STRATEGY,
+	BUT COULD FORM THE BACKBONE FOR AN OVERALL TRANSITION PLAN
+\item	FUTURE VERSIONS OF RFC983 WILL TRACK DoD PLANNED EVOLUTION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MAXIMIZE BENEFITS}
+
+\begin{nrtc}
+\item	RFC983 PERMITS US TO UTILIZE THE NEW WORK
+	BEING DONE BY THE MAP/TOP COMMUNITY,
+	WHILE TAKING ADVANTAGE OF YEARS OF RESEARCH AND EXPERIENCE IN THE
+	TCP/IP COMMUNITY
+\end{nrtc}
+\end{bwslide}
+
+
+\end{document}

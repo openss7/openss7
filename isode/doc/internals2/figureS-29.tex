@@ -1,0 +1,27 @@
+\File{figureS\-29.c},{14:33},{Oct 13 1990}
+\L{\LB{}\Tab{16}{\K{if} ((rt = get\_rtent (ip = oid \-\> oid\_elements}}
+\L{\LB{}\Tab{40}{    + ot \-\> ot\_name \-\> oid\_nelem,}}
+\L{\LB{}\Tab{32}{     j = oid \-\> oid\_nelem}}
+\L{\LB{}\Tab{40}{     \- ot \-\> ot\_name \-\> oid\_nelem,}}
+\L{\LB{}\Tab{32}{     rts\_inet, 1)) == NULL)}}
+\L{\LB{}\Tab{16}{    \K{return} NOTOK;}}
+\L{\LB{}}
+\L{\LB{\Proc{if}}\Tab{16}{\K{if} ((i = j \- rt \-\> rt\_insize) \< 0) \{}}
+\L{\LB{}\Tab{16}{    \K{if} ((new = oid\_extend (oid, \-i)) == NULLOID)}}
+\L{\LB{}\Tab{24}{\K{return} int\_SNMP\_error\_\_status\_genErr;}}
+\L{\LB{}\Tab{16}{    \K{if} (v \-\> name)}}
+\L{\LB{}\Tab{24}{free\_SNMP\_ObjectName (v \-\> name);}}
+\L{\LB{}\Tab{16}{    v \-\> name = new;}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{    oid = new;}}
+\L{\LB{}\Tab{16}{\}}}
+\L{\LB{}\Tab{16}{\K{else}}}
+\L{\LB{\Proc{if}}\Tab{16}{    \K{if} (i \> 0)}}
+\L{\LB{}\Tab{24}{oid \-\> oid\_nelem \-= i;}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{ip = oid \-\> oid\_elements + ot \-\> ot\_name \-\> oid\_nelem;}}
+\L{\LB{}\Tab{16}{jp = rt \-\> rt\_instance;}}
+\L{\LB{\Proc{for}}\Tab{16}{\K{for} (i = rt \-\> rt\_insize; i \> 0; i\-\-)}}
+\L{\LB{}\Tab{16}{    *ip++ = *jp++;}}
+\L{\LB{}\Tab{8}{    \}}}
+\ProcCont{if}\L{\LB{}\Tab{8}{    \K{break};}}

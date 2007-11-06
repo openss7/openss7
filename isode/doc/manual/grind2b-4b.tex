@@ -1,0 +1,39 @@
+\File{grind2b\-4b.c},{19:46},{Oct 14 1989}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} ((sf = addr2ref (PLocalHostName ())) == NULL) \{}}
+\L{\LB{}\Tab{8}{sf = \&sfs;}}
+\L{\LB{}\Tab{8}{(\K{void}) bzero ((\K{char} *) sf, \K{sizeof} *sf);}}
+\L{\LB{    \}}}
+\L{\LB{    }}
+\L{\LB{\C{}\/* read command line arguments here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{    \K{if} (AcAssocRequest (ctx, NULLAEI, NULLAEI, NULLPA, pa, pc, NULLOID,}}
+\L{\LB{}\Tab{16}{0, ROS\_MYREQUIRE, SERIAL\_NONE, 0, sf, NULLPEP, 0, NULLQOS,}}
+\L{\LB{}\Tab{16}{acc, aci)}}
+\L{\LB{}\Tab{8}{    == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"A\-ASSOCIATE.REQUEST: \%s\"\SE{}, AcErrString (aca \-\> aca\_reason));}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} (acc \-\> acc\_result != ACS\_ACCEPT)}}
+\L{\LB{}\Tab{8}{error (\S{}\"association rejected: \%s\"\SE{}, AcErrString (aca \-\> aca\_reason));}}
+\L{\LB{}}
+\L{\LB{    sd = acc \-\> acc\_sd;}}
+\L{\LB{    ACCFREE (acc);}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} (RoSetService (sd, RoPService, \&rois) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"RoSetService: \%s\"\SE{}, RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}}
+\L{\LB{    invoke (sd);}\Tab{32}{\C{}\/* invoke the operations, etc. *\/\CE{}}}
+\L{\LB{    }}
+\L{\LB{\Proc{if}    \K{if} (AcRelRequest (sd, ACF\_NORMAL, NULLPEP, 0, NOTOK, acr, aci) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"A\-RELEASE.REQUEST: \%s\"\SE{}, AcErrString (aca \-\> aca\_reason));}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} (!acr \-\> acr\_affirmative) \{}}
+\L{\LB{}\Tab{8}{(\K{void}) AcUAbortRequest (sd, NULLPEP, 0, aci);}}
+\L{\LB{}\Tab{8}{error (\S{}\"release rejected by peer: \%d\"\SE{}, acr \-\> acr\_reason);}}
+\L{\LB{    \}}}
+\ProcCont{if}\L{\LB{}}
+\L{\LB{    ACRFREE (acr);}}
+\L{\LB{}}
+\L{\LB{    exit (0);}}
+\L{\LB{\}}}

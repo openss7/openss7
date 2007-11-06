@@ -1,0 +1,19 @@
+\File{figureS\-10.c},{09:42},{May 23 1990}
+\L{\LB{\K{static} \K{int}  o\_ip\_route (oi, v, offset)}}
+\L{\LB{OI}\Tab{8}{oi;}}
+\L{\LB{\K{register} \K{struct} type\_SNMP\_VarBind *v;}}
+\L{\LB{\K{int}}\Tab{8}{offset;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}}\Tab{8}{    ifvar;}}
+\L{\LB{    \K{register} \K{int}    i;}}
+\L{\LB{    \K{register} \K{unsigned} \K{int} *ip,}}
+\L{\LB{}\Tab{24}{  *jp;}}
+\L{\LB{    \K{register} \K{struct} rtetab *rt;}}
+\L{\LB{    \K{register} OID    oid = oi \-\> oi\_name;}}
+\L{\LB{    OID}\Tab{8}{    new;}}
+\L{\LB{    \K{register} OT}\Tab{16}{    ot = oi \-\> oi\_type;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (get\_routes (offset) == NOTOK)}}
+\L{\LB{}\Tab{8}{\K{return} int\_SNMP\_error\_\_status\_genErr;}}
+\L{\LB{}}
+\L{\LB{    ifvar = (\K{int}) ot \-\> ot\_info;}}

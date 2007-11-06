@@ -1,0 +1,21 @@
+The Directory is essentially a large scale distributed database, which is 
+maintained by administrators within participating organisations.  This 
+distribution of the Directory means that it requires an infrastructure of
+highly reliable networks and Directory servers.  If components become
+unavailable, the service may fail in a variety of ways.
+
+A message which you may see from time to time is:
+
+  This operation is taking some time.
+  Control-C, if you wish to abandon the operation.
+
+If the networks and/or computers running the Directory are heavily loaded,
+it may take some time for queries to be resolved.  If a query has still not
+been answered after 30 seconds, the above message will be displayed.  If you 
+are content to wait further, simply do nothing - the query will continue.
+If you do not wish to wait any longer, type control-C as instructed and that
+query will be abandoned.
+
+Other messages should be self-explanatory: if they are not, consult the 
+PARADISE helpdesk - email <helpdesk@paradise.ulcc.ac.uk> - and we will do 
+our best to clarify the messages.

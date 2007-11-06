@@ -1,0 +1,23 @@
+\File{ryresponder\-h.h},{16:19},{May 30 1989}
+\L{\LB{\C{}\/* ryresponder.h \- include file for the generic idempotent responder *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{\#include} \<isode\/rosy.h\>}}
+\L{\LB{\K{\#include} \<isode\/logger.h\>}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{struct} dispatch \{}}
+\L{\LB{    \K{char}   *ds\_name;}}
+\L{\LB{    \K{int}     ds\_operation;}}
+\L{\LB{}}
+\L{\LB{    IFP     ds\_vector;}}
+\L{\LB{\};}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{extern} \K{int}  debug;}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{void}    adios (), advise ();}}
+\L{\LB{\K{void}    acs\_advise ();}}
+\L{\LB{\K{void}    ros\_adios (), ros\_advise ();}}
+\L{\LB{}}
+\L{\LB{\K{int}     ryresponder ();}}

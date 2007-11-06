@@ -1,0 +1,270 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: om_xxx.3.man,v 0.9.2.1 2007/09/29 14:08:31 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:31 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: om_xxx.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:31  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH OM_DESCRIPTOR 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B OM_descriptor
+\- Descriptor \- type definition for describing an attribute type and value.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xom.h>
+.PP
+.nf
+\fC\s-1\
+typedef struct OM_descriptor_struct {
+        OM_type type;
+        OM_syntax syntax;
+        union OM_value value;
+} OM_descriptor;\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.TP
+.I type
+identifies the type of the attribute value.
+.TP
+.I syntax
+identifies the syntax of the attribute value.  Note that boolean
+conditions of the attribute value are coded into the high bits of this member.
+.TP
+.I value
+identifies the attribute value.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+A data value of this type is a descriptor, which embodies an attribute value.
+A sequence of descriptors (an array in C) can represent all the values of all
+the attributes of an object, and is the representation called a Public Object.
+A descriptor has the following components:
+.TP
+.IR Type \%\0(Type)
+Identifies the type of the attribute value.
+.TP
+.IR Syntax \%\0(Syntax)
+Identifies the syntax of the attribute value.
+.sp
+In the C interface,
+.I Long-String
+to
+.IR Private ,
+below,
+are encoded in the high-order bits of this structure member.  The syntax should
+always be masked with the constant,
+.RB ( OM_S_SYNTAX ),
+because of this.  The macros
+.BR OM_SYNTAX ()
+and
+.BR OM_SYNTAX_ASSIGN ()
+are provided for this purpose.
+.TP
+.IR Long-String \%\0(Boolean)
+True, if, and only if, the descriptor is service-generated and the length of
+the value is greater than an implementation-defined limit.
+.sp
+In the C interface, this component occupies bit 15 (0x8000) of the
+.I syntax
+member and is represented by the constant
+.RB ( OM_S_LONG_STRING ).
+.sp
+The macro,
+.BR OM_IS_LONG_STRING (),
+may be used to test this flag.
+.TP
+.IR No-Value \%\0(Boolean)
+Only true if the descriptor is service-generated and the value is not present
+(because
+.B exclude-values
+or
+.B exclude-multiples
+was set in the call to
+.IR Get ()).
+.sp
+In the C interface, this component occupies bit 14 (0x4000) of the
+.I syntax
+member and is represented by the constant
+.RB ( OM_S_NO_VALUE ).
+.sp
+The macro,
+.BR OM_HAS_VALUE (),
+may be used to test this flag.
+.TP
+.IR Local-String \%\0(Boolean)
+Only significant if the
+.IR Syntax " is " String(*) .
+True if, and only if, the string is represented by an implementation-defined
+local character set.  The local character set may be more amenable for use as
+keyboard inut or display output than the non-local character set, and may
+include specific treatment of line terminal sequences.  Certain interface
+functions may convert information in string syntaxes to or from the local
+representation, which may result in a loss of information.
+.sp
+In the C interface, this component occupies bit 13 (0x2000) of the
+.I syntax
+member and is represented by the constant
+.RB ( OM_S_LOCAL_STRING ).
+.sp
+The macro,
+.BR OM_IS_LOCAL_STRING (),
+may be used to test this flag, and,
+.BR OM_SET_LONG_STRING (),
+to set it.
+.TP
+.IR Service-Generated \%\0(Boolean)
+True, if, and only if, the descriptor is service-generated and the first
+descriptor of a public object, or the defined part of a private object.
+.sp
+In the C interface, this component occupies bit 12 (0x1000) of the
+.I syntax
+member and is represented by the constant
+.RB ( OM_S_SERVICE_GENERATED ).
+.sp
+The macro,
+.BR OM_IS_SERVICE_GENERATED (),
+may be used to test this flag.
+.TP
+.IR Private \%\0(Boolean)
+True if, and only if, the descriptor in the service-generated public object
+contains a reference to the handle of a private subobject, or in the defined
+part of a private object.
+.sp
+(Note: This applies only when the descriptor is service-generated.  The client
+need not set this bit in a client-generated descriptor containing a reference
+to a private object.)
+.sp
+In the C interface, this component occupies bit 11 (0x0800) of the
+.I syntax
+member and is represented by the constant
+.RB ( OM_S_PRIVATE ).
+.TP
+.IR Value \%\0(Value)
+The attribute value.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR OM_type (3),
+.BR OM_syntax (3),
+.BR OM_value (3),
+.BR XOM (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR OM_descriptor
+is compatible with XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR OM_descriptor
+first appeared in XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XOM Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

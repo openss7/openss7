@@ -1,0 +1,294 @@
+if [ ! $# = "2" ]; then
+	echo "usage: $0 old_file new_file"
+	exit 1
+fi
+
+#sed 's/ *= */=/' $1 >/tmp/dmdiff$$1
+#sed 's/ *= */=/' $2 >/tmp/dmdiff$$2
+
+edb2dmi < $1 > /tmp/dmdiff$$1
+edb2dmi < $2 > /tmp/dmdiff$$2
+
+nawk ' BEGIN {
+	FS = "="
+	NOTCHAR = "!"
+	gotRDN = "FALSE"
+	SOURCE = "source"
+	ROOTEDAT = "rootedAt"
+	pass = "1"
+}
+$1 ~ /^#/ { next}
+
+{
+	if (NF == 0)
+	{
+		gotRDN = "FALSE"
+		next
+	}
+	thisAttType = $1
+	attValue = getValue()
+	if ($1 == SOURCE)
+	{
+		source = attValue		
+		next
+	}
+	if ($1 == ROOTEDAT)
+	{
+		rootedAt = attValue
+		rooteds[rootedAt] = 1
+		next
+	}
+	if (gotRDN == "FALSE")
+	{
+		thisname = rootedAt "@" $0
+		name[thisname] = $0
+		delname[thisname] = thisname
+		lastAttType = ""
+		gotRDN = "TRUE"
+		next
+	}
+	attType[thisAttType] = thisAttType
+	if (thisAttType != lastAttType)
+	{
+		j = 1
+		lastAttType = thisAttType
+	}
+	attrib[thisname,thisAttType,j++] = attValue
+}
+
+END {
+	pass = "2"
+	FILENAME = '\"/tmp/dmdiff$$2\"'
+	gotRDN = "FALSE"
+	lastRootedAt = ""
+	printedRootedAt = "FALSE"
+	printedSource = "FALSE"
+	while (getline < FILENAME >0)
+	{
+		if (substr($0,1,1) == "#")
+			continue
+		if (length($0) == 0)
+		{
+			# end of entry processing
+			doEndOfEntry()
+			continue
+		}
+		thisAttType = $1
+		attValue = getValue()
+		if (thisAttType == SOURCE)
+			if (source != attValue)
+			{
+				print "Sources differ!! - gasp, puke  etc" | "cat 1>&2"
+				exit 1
+			}
+			else
+				continue
+		if (thisAttType == ROOTEDAT)
+		{
+			doEndRootedAt()
+			delete rooteds[attValue]
+			continue
+		}
+		if (gotRDN == "FALSE")
+		{
+			thisname = rootedAt "@" $0
+			delete delname[thisname]
+			if (name[thisname] == "")
+				newEntry()
+			else
+			{
+				gotRDN = "TRUE"
+				saveRDN = $0
+				printedRDN = "FALSE"
+			}
+			continue
+		}
+		else
+		{
+			if (gotmatch() == "FALSE")
+			{
+				printRDN()
+				print $0
+			}
+		}
+	}	
+	doEndOfEntry()
+	doEndRootedAt()
+	doEndOfRun()
+} 
+
+function getValue(       thisValue) {
+	thisValue = getRestOfString($0, FS)
+	while (substr(thisValue, length(thisValue), 1) == "\\")
+	{
+		if (pass == "1")
+			retval = getline 
+		else
+			retval = getline < FILENAME
+		if (retval > 0)
+		{
+			thisValue = thisValue "\n" $0
+		}
+		else
+		{
+			print "Unexpected end of data file!! - gasp" | "cat 1>&2"
+			exit 1
+		}
+	}
+	return thisValue
+}
+
+function getRestOfString(string, sep,      n) {
+	n = index(string, sep)
+	return substr(string, n+1)
+}
+
+function doEndOfEntry() {
+	if (gotRDN == "FALSE")
+		return
+	gotRDN = "FALSE"
+	# mark for deletion attributes not found in "new" file
+	for (j in attType)
+	{
+		for (k=1;;k++)
+			if (attrib[thisname,j,k] != "")
+			{
+			    if (attrib[thisname,j,k] != "XXX")
+			    {
+				printRDN()
+				print NOTCHAR j FS attrib[thisname,j,k]
+			    }
+			}
+			else
+				break
+	}
+	if (printedRDN == "TRUE")
+	{
+		print ""
+		printedRDN = "FALSE"
+	}
+}
+
+function printRDN() {
+	if (printedRDN == "FALSE")
+	{
+		printRooted()
+		print "# ATTRIB CHANGES FOR THIS ENTRY"
+		print saveRDN
+		printedRDN = "TRUE"
+	}
+}
+
+function printRooted() {
+	printSource()
+	if (printedRootedAt == "FALSE")
+	{
+		print ROOTEDAT FS lastRootedAt
+		print ""
+		printedRootedAt = "TRUE"
+	}
+}
+
+function printSource() {
+	if (printedSource == "FALSE")
+	{
+#		print SOURCE FS source
+#		print ""
+		printedSource = "TRUE"
+	}
+}
+
+function newEntry() {
+	printRooted()
+	print "# THIS IS A NEW ENTRY"
+	print $0
+	while (getline < FILENAME >0)
+	{
+		if (length($0) == 0)
+		{
+			gotRDN = "FALSE"
+			break
+		}
+        else
+           print $0
+	}
+    print ""
+}
+
+function gotmatch() {
+	for (k=1;;k++)
+	{
+		if (attrib[thisname,thisAttType,k] != "")
+		{
+			if (attrib[thisname,thisAttType,k] ==\
+				attValue)
+			{
+				attrib[thisname,thisAttType,k] = "XXX"
+				return "TRUE"
+			}
+		}
+		else
+			return "FALSE"
+	}
+}
+
+function doEndRootedAt() {
+	rootedAt = attValue
+	if (lastRootedAt != "")
+	{
+		# delete those entries in the original file not found in the 
+		# new data
+		for (i in delname)
+		{
+			m = split(delname[i], np, "@")
+			tmp = np[1]
+			for (k = 2; k <= m-1; k++)
+				tmp = tmp "@" np[k]
+			if (tmp == lastRootedAt)
+			{
+				printRooted()
+				print "# THIS ENTRY NO LONGER EXTANT "
+				print NOTCHAR name[i]
+				print ""
+				delete delname[i]
+			}
+		}
+	}
+	lastRootedAt = rootedAt
+	printedRootedAt = "FALSE"
+}
+
+function doEndOfRun() {
+	# mark for deletion any entries in subtrees which have disappeared
+	printedMessage = "FALSE"
+	for (lastRootedAt in rooteds)
+	{
+		if (printedMessage == "FALSE")
+		{
+			print "# FOLLOWING ENTRIES ARE FOR DELETION"
+			print "# THE PARENT NODE IS IN THE OLD VERSION OF THE FILE"
+			print "# BUT NOT IN THE LATEST VERSION"
+			print ""
+			printedMessage = "TRUE"
+		}
+		printRooted()
+		for (i in delname)
+		{
+			m = split(delname[i], np, "@")
+			tmp = np[1]
+			for (k = 2; k <= m-1; k++)
+				tmp = tmp "@" np[k]
+			if (tmp == lastRootedAt)
+			{
+				print "# THIS ENTRY NO LONGER EXTANT "
+				print NOTCHAR name[i]
+				print ""
+				delete delname[i]
+			}
+		}
+		lastRootedAt = rootedAt
+	        printedRootedAt = "FALSE"
+	}
+
+} ' < /tmp/dmdiff$$1 | dmi2edb
+rm -f /tmp/dmdiff$$1 /tmp/dmdiff$$2

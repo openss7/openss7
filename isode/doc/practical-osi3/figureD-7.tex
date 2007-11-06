@@ -1,0 +1,23 @@
+\File{figureD\-7.py},{08:27},{Mar 12 1991}
+\L{\LB{friendlyMatch (p: PurportedName; el: EnvironmentList): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    e: EnvironmentItem;}}
+\L{\LB{}}
+\L{\LB{    \K{FOR} (e = head (el); e; e = head (el = tail (el)))}}
+\L{\LB{        \K{IF} (length (p) \<= e.upper\-bound}}
+\L{\LB{                \&\& length (p) \>= e.lower\-bound) \K{THEN}}}
+\L{\LB{            \K{RETURN} envMatch (p, e.environment);}}
+\L{\LB{}}
+\L{\LB{    \K{RETURN} \K{NULL};}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{envMatch (p: PurportedName; e: Environment): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    x: DN;}}
+\L{\LB{    matches: \K{SET} \K{OF} DN;}}
+\L{\LB{}}
+\L{\LB{    \K{FOR} (x = head (e); x; x = head (e = tail (e)))}}
+\L{\LB{        \K{IF} (matches = purportedMatch (x, p)) \K{THEN}}}
+\L{\LB{            \K{RETURN} matches;}}
+\L{\LB{\}}}

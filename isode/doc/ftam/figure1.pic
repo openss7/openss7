@@ -1,0 +1,16 @@
+.PS 5.0i
+.ps 20
+boxht	= boxht/2
+lineht	= lineht/2
+## figure 1
+## RELATIONSHIP OF THE VIRTUAL FILESTORE AND REALSTORE
+B1:	box "RESPONDER"
+B2:	box "NATIVE" "" "FILESYSTEM" with .n at (B1.s.x, B1.s.y-lineht)
+	line from B1.s to B2.n
+	line up from B1.n to (B1.n.x, B1.n.y+ 3*lineht/2)
+B3:	box dashed width 2*boxwid height 3*boxht+lineht \
+		with .n at (B1.n.x, B1.n.y+lineht/2)
+	move to (B3.ne.x, B3.ne.y+lineht/2); "OSI ENVIRONMENT\ " rjust
+	move to (B3.sw.x, B3.sw.y+lineht/6); "\ LOCAL ENVIRONMENT" ljust
+##
+.PE

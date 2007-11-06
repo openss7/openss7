@@ -496,5 +496,4 @@ const char *omp_strerrors[] = {
 	"An object has, or would have, an attribute whose type is not permitted."
 };
 
-:w
 #endif				/* __XOM_H__ */

@@ -1,0 +1,280 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter {Overview of QUIPU}
+
+\section {Summary}
+
+QUIPU is a Public Domain implementation of the OSI directory as 
+specified in CCITT X.500 Recommendations /
+ISO 9594 for directory services 
+\cite{ISO.Directory,CCITT.Directory}.
+It is intended to provide an environment for experimentation and for 
+pilots using standardised directory services.  QUIPU is currently aligned to
+the ISO IS.  
+QUIPU is also aligned to the NIST directory Implementors Guide Version 1, with 
+the following exceptions:
+\begin{itemize}
+\item
+QUIPU does not enforce the bounds constraints on attributes, filters or
+APDU size.
+\item 
+T.61 string formatting characters are not rejected.
+\item 
+If a DN is supplied with no password in an unprotected simple bind,
+QUIPU does not always check to see if the DN exists.
+If the DSA connected to can
+say authoritatively the DN does not exist, the association is rejected.
+However, if a chain operation is required to check the DN, the bind is allowed.
+\item 
+When comparing attributes of UTCtime syntax, if the seconds field is
+omitted, QUIPU does not perform the match
+correctly (i.e., the seconds field in the attribute values should be ignored,
+but is not).
+\item 
+QUIPU always supplies the optional chaining argument ``originator'' even if
+the CommonArgument ``requestor'' is used.
+\item
+QUIPU always supplies the optional chaining argument ``target'' even if
+the base object in the DAP arguments is the same.
+\item 
+The object class ``without an assigned object identifier'' is not recognised 
+unless the ``alias'' object class is also present.
+%%% This is what the standard meant to say !
+
+\item
+Non Specific Subordinate References are never followed by a QUIPU DSA,
+but they are passed on correctly to the client if generated.
+
+\end{itemize}
+
+QUIPU is intended to provide an environment
+for experimentation with standardized directory services.
+It is used by the ISODE for identification of the location of OSI
+applications (including QUIPU) and for provision of white and yellow
+page services.
+The directory abstract service and DSA abstract service
+defined in \cite{CCITT.Directory,ISO.Directory} and their associated 
+protocols are supported.
+For replication the Internet DSP protocol is used.
+
+Major aspects of the QUIPU implementation are:
+\begin{itemize}
+\item
+Use of  memory structures to provide fast access.
+\item
+Activity scheduling within the DSA to allow for multiple accesses.
+\item
+General and flexible searching capabilities.
+\item
+Extensions to provide access control.
+\item
+External schema management
+\item
+Use of the directory to control distributed operations.
+\end{itemize}
+
+The current implementation provides a DSA, and a procedural interface to the
+directory abstract service, which will enable other applications to use the
+directory.
+There is also a directory shell interface --- DISH.  This provides full
+access to the directory abstract service, using the procedural interface.
+standard distributed operations are used with both referrals and chaining
+(using the directory system protocol) provided.
+
+A full discussion of the design issues relating to QUIPU can be
+found in \cite{QUIPU.Design}.
+
+\section {Pronouncing QUIPU}
+
+The name of the INCA directory is QUIPU.
+The official pronunciation of QUIPU takes two syllables:
+{\em kwip-ooo}.
+
+\section {Why QUIPU}
+
+QUIPU was originally developed as a part of the INCA project.
+The Incas of Peru did not have writing.  Instead, they stored information on
+strings, carefully knotted in a specific manner and with coloured thread, and
+attached to a larger rope.
+These devices were known as {\em Quipus}.
+The encoding was obscure, and could only be read by selected trained people:
+the {\em Quipucamayocs}.
+The Quipu was a key component of Inca society, as it contained information
+about property and locations throughout the extensive Inca empire.
+
+
+\section {Objectives}
+
+\subsection {General Aims}
+
+QUIPU has a number of general aims:
+
+\begin{itemize}
+\item To produce an implementation which follows the
+emerging OSI directory standards.  
+
+\item Flexibility to enable the system to be used
+for experimentation and research into problems relating to directory service.
+
+\item Investigation of distribution and replication.
+
+\item Pilot experimental usage.
+\end{itemize}
+
+\subsection {Technical Goals}
+
+The major goals of the QUIPU directory service are:
+
+\begin{itemize}
+\item
+Full support of the directory access protocol,
+directory system protocol, and distributed operations, as 
+defined in \cite{CCITT.Directory}.
+\item
+Support of the majority of the service elements specified in
+\cite{CCITT.Directory}.
+\item
+Ability for interworking with other directory implementations, including
+use of
+referrals and chaining.
+\item
+Very full searching and matching capabilities, beyond the minimum
+required by \cite{CCITT.Directory}.
+\end{itemize}
+
+The following are not goals:
+
+\begin{itemize}
+\item
+In practice, the memory based approach has led to a quite fast lookup and
+searching.
+\item
+The ability to handle very large volumes of data (e.g., greater than 100~MB
+or 1 Million entries per DSA) is not a requirement.
+\item
+Substantial data robustness is not required: there is no need to employ
+complex data backup techniques.
+\item
+Use (as opposed to provision) of authentication services.
+
+\end{itemize}
+
+\section {Roadmap}
+
+This manual is split into 6 parts.  
+You are reading Part I, which is a general introduction.
+Part II describes a set of user interfaces (DUAs) developed as part of
+QUIPU.
+Part III, an administrators guide, describes how to set up both the
+DUAs introduced in Part II, and how the install and manage a QUIPU directory
+system agent (DSA).
+Part IV is a programmers guide which discusses a procedural interface to the
+directory for those of you who want to write your own DUAs.
+Finally, Part V contains Appendices.
+
+\section {QUIPU Support Address}\label{quipu:support}
+
+If you have any problem installing QUIPU,
+following the documentation
+or any other QUIPU-related problems, then there are two 
+discussion lists.
+
+Comments concerning the operation of 
+QUIPU should be addressed to the QUIPU support address:
+\[\begin{tabular}{ll}
+Internet Mailbox:&      \tt quipu-support@cs.ucl.ac.uk \\
+Janet Mailbox:&    \tt quipu-support@uk.ac.ucl.cs \\
+X.400 Mailbox:&	   \tt surname = quipu-support \\
+& \tt ou = cs \\
+& \tt Org = UCL \\
+& \tt PRMD = UK.AC \\
+& \tt ADMD = Gold 400 \\
+& \tt C = GB
+\end{tabular}\]
+Or, you could look up the mailbox attribute of
+\[\begin{tabular}{l}
+\tt c=GB \\
+\tt o=University College London \\
+\tt ou=Computer Science \\
+\tt cn=QUIPU-Support
+\end{tabular}\]
+in the directory.
+
+There is also a discussion list for a general discussion of topics
+related to QUIPU; the address is as above, but with ``quipu-support''
+replaced by just ``quipu'' (e.g., quipu@cs.ucl.ac.uk).
+We suggest that everybody who is intending to run QUIPU should be on this
+list, as this will be used to keep you informed of what is happening.
+Details of updates will also be sent to this list.
+
+If you would like to be added to the \verb"quipu" discussion 
+list, send a message to 
+``quipu-request'' (e.g., quipu-request@cs.ucl.ac.uk).
+
+\section {Acknowledgements}
+
+QUIPU was developed at the Department of Computer Science at University
+College London, under the {\ae}gis of the INCA\index{INCA} (Integrated Network
+Communication Architecture) project, which is project~395
+of ESPRIT\index{ESPRIT} (European Strategic Programme for Research into
+Information Technology).   The partners of INCA (GEC plc\index{GEC plc},
+Olivetti\index{Olivetti}, Nixdorf AG\index{Nixdorf AG},
+and Modcomp GmbH\index{Modcomp GmbH}) are acknowledged for releasing this
+software into the public domain.
+
+Continued funding of QUIPU as openly available software is provided by the
+Joint Network Team (JNT)\index{JNT}.
+
+QUIPU 6.0 was implemented
+primarily by Colin Robbins\index{Robbins, Colin J.}
+and Alan Turland\index{Turland, Alan},
+with considerable help from Marshall Rose\index{Rose, Marshall T.} of
+Performance Systems International.
+Mike Roe \index{Roe, Mike} implemented the authentication code, and the 
+T.61 string handling code.
+
+After QUIPU 6.0, the core development has been from Colin Robbins.
+Tim Howes\index{Howes, Tim} of University of Michigan has kindly 
+donated the very valuable ``TURBO'' options to QUIPU.
+Alan Turland has added the asynchronous DUA interface.
+
+Chris Moore\index{Moore, Christopher W.} of 
+the Wollongong Group helped considerably in the early development
+of QUIPU, and integration with ISODE.
+Simon Walton\index{Walton, Simon} of University College London,
+also provided much help in integrating the software with ISODE.
+
+Steve Titcombe\index{Titcombe, Steve} of
+University College London did much 
+of the early work on DISH, and is now working on the management 
+tools.
+
+Paul Sharpe\index{Sharpe, Paul}, of GEC Hirst Research Laboratories
+put considerable effort into the early development of SD.
+This work was continued at Brunel University by
+Andrew Findlay\index{Findlay, Andrew} and Damanjit Mahl\index{Mahl, Damanjit},
+who have also developed the POD interface.
+
+Paul Barker\index{Barker, Paul} of
+University College London has designed and developed the DE directory
+interface, funded by the COSINE project.
+Paul also developed the DSA log processing scripts and has provided 
+very valuable feedback throughout the project.
+
+Whilst at UCL on secondment from CSIRO, 
+Andrew Worsley\index{Worsley, Andrew} put considerable effort into 
+enhancing Pepsy to provide all the extra features the QUIPU needed to be able
+utilise the tool.
+
+George Michaelson\index{Michaelson, George} of the University of Queensland,
+Julian P.~Onions\index{Onions, Julian} of X-Tel Services Ltd,
+Andrew Findlay of Brunel University,
+Gier Pederson\index{Pederson, Gier} from the University of Oslo,
+Petri Jokela\index{Jokela, Petri} of Telecom in Finland,
+Juha Hein\"{a}nen\index{Hein\"{a}nen, Juha} of the Tampere University of Technology,
+Peter Yee\index{Yee, Peter} from NASA and
+Piete Brooks\index{Brooks, Piete} of Cambridge University,
+have all run various test
+versions of the system, and provided much useful feedback.
+
+

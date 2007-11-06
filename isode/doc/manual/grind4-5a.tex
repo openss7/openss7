@@ -1,0 +1,37 @@
+\File{grind4\-5a.py},{11:13},{Jul  4 1988}
+\L{\LB{SalaryDefs \K{DEFINITIONS} ::=}}
+\L{\LB{}}
+\L{\LB{\%\{}}
+\L{\LB{\#include \<stdio.h\>}}
+\L{\LB{}}
+\L{\LB{char   *myname;}}
+\L{\LB{}}
+\L{\LB{static struct salary\_record \{}}
+\L{\LB{    char   *name;}}
+\L{\LB{    int     salary;}}
+\L{\LB{\}}\Tab{8}{salary;}}
+\L{\LB{}}
+\L{\LB{\#define PEPYPARM struct salary\_record *}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{main (argc, argv)}}
+\L{\LB{int     argc;}}
+\L{\LB{char  **argv;}}
+\L{\LB{\{}}
+\L{\LB{    PE}\Tab{8}{    pe;}}
+\L{\LB{}}
+\L{\LB{    myname = argv[0];}}
+\L{\LB{}}
+\L{\LB{    salary.name = argv[1];}}
+\L{\LB{    salary.salary = atoi (argv[2]);}}
+\L{\LB{    build\_SalaryDefs\_Salary (\&pe, 1, 0, NULLCP, \&salary);}}
+\L{\LB{}}
+\L{\LB{    salary.name = \K{NULL};}}
+\L{\LB{    salary.salary = 0;}}
+\L{\LB{    unbuild\_SalaryDefs\_Salary (pe, 1, NULLIP, NULLVP, \&salary);}}
+\L{\LB{}}
+\L{\LB{    exit (0);}}
+\L{\LB{\}}}
+\L{\LB{\%\}}}
+\L{\LB{}}
+\L{\LB{...}}

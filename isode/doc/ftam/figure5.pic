@@ -1,0 +1,27 @@
+.PS 5.0i
+.ps 20
+## figure 5
+## SERVICE PRIMITIVES (cont.)
+B1a:	box invis
+B1b:	box invis with .n at B1a.c
+B1c:	box invis with .n at B1b.s
+B1d:	box invis with .n at B1c.s
+B15:	box invis with .n at B1d.c
+	line from B1a.nw to B15.sw; line from B1a.ne to B15.se
+##
+REQ:	box invis with .e at (B1b.nw.x-linewid, B1b.nw.y)
+	move to REQ.e; "F-xxx.REQUEST\ " rjust
+	arrow from REQ.e to B1b.nw
+	arrow from B1b.nw to B1b.se dashed
+IND:	box invis with .w at (B1b.se.x+linewid, B1b.se.y)
+	move to IND.w; "\ F-xxx.INDICATION" ljust
+	arrow from B1b.se to IND.w
+RSP:	box invis with .w at (B1d.ne.x+linewid, B1d.ne.y)
+	move to RSP.w; "\ F-xxx.RESPONSE" ljust
+	arrow from RSP.w to B1d.ne
+	arrow from B1d.ne to B1d.sw dashed
+CNF:	box invis with .e at (B1d.sw.x-linewid, B1d.sw.y)
+	move to CNF.e; "F-xxx.CONFIRMATION\ " rjust
+	arrow from B1d.sw to CNF.e
+##
+.PE

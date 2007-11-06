@@ -1,0 +1,75 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{FTAM-FTP gateway}\label{ftamftp}
+The FTAM/FTP gateway is an application-gateway for file service.
+The gateway is actually two programs:
+one which acts as an FTAM responder and an FTP client,
+and the other which acts as an FTP server and an FTAM initiator.
+Note that the gateway currently resides on a different location than the
+standard FTAM responder and FTP server.
+
+The implementation included runs only on Berkeley \unix/.
+
+\section	{Implementation}\label{ftamftp:code}
+If you have access to the source tree for this release,
+the directories \file{ftam-ftp/} and \file{ftp-ftam/}
+contains the code for the two programs.
+
+\subsection	{The FTAM/FTP side}
+The FTAM/FTP side of the gateway appears to implement the responder side of
+the FTAM service,
+but actually acts as an FTP client in order to provide this service.
+
+The true destination is encoded in the user name (i.e., \verb"user@tcphost").
+
+Note that the FTAM/FTP side is available on a different presentation address
+than the FTAM service on the gateway host.
+To select the FTAM/FTP side,
+tell your FTAM initiator to associate with the service having ``qualifier''
+\verb"ftpstore" on the gateway host.
+For example, using \man ftam(1c):
+\begin{quote}\small\begin{verbatim}
+% ftam
+ftam> set qualifier ftpstore
+ftam> open gateway
+user (gateway:user): user@tcphost
+password (gateway:user@tcphost): 
+\end{verbatim}\end{quote}
+
+\subsubsection	{Limitations}
+File information is limited to file names.
+All file access rights are assumed until access is attempted;
+the FTP server of the utlimate destination grants or denies action permission
+at the time of file access.
+
+Empty directories may not be recognized depending on the FTP server of the
+destination machine.
+This bug manifests itself when trying to remove an empty directory.
+
+\subsection	{The FTP/FTAM side}
+The FTP/FTAM side of the gateways appears to be an FTP server,
+but actually acts as an FTAM initiator in order to provide this service.
+
+The true destination is encoded in the user name (i.e., \verb"user@osihost"),
+or by using the FTP SITE command.
+If further accounting information is required by the true destnation,
+the FTP ACCT command is used seperately and the SITE command must be used to
+specify the destination.
+
+Note that the FTP/FTAM side is available on a different port than the FTP
+server on the gateway host.
+To select the FTP/FTAM side,
+tell your FTP client to connect to port 531 on the gateway host.
+For example, using \man ftp(1c):
+\begin{quote}\small\begin{verbatim}
+% ftp
+ftp> open gateway 531
+ftp> open gateway
+Name (gateway:user): user@osihost
+Password:
+\end{verbatim}\end{quote}
+
+\subsubsection	{Limitations}
+The FTP CD and PWD commands are not supported by the gateway
+(there is no equivalent in the FTAM service and it is too difficult to emulate
+at the gateway).

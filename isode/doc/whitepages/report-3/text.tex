@@ -1,0 +1,354 @@
+% -*- LaTeX -*-
+
+\newpage
+\section	{Activity}
+The focus on the pilot during the first-half of {\oldstyle 1990\/} has been
+three-fold:
+user-interface development;
+bringing new sites online;
+and,
+routine maintenance of the software.
+
+\subsection	{User-Interface Development}
+There have been two advances in user-interface technology for the pilot:
+a new search query language,
+and a window-based interface to the White Pages.
+
+\subsubsection	{User-Friendly Naming Scheme}
+The original search syntax used by \pgm{fred} is based on the well-known WHOIS
+service.
+Although this has proven useful,
+there has been a need for a syntax which is both more natural for human users
+and has more expressive power.
+A user-friendly naming scheme has been defined to meet these needs.
+
+Names appear as ordered components,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+marshall rose, psi
+kille, cs, ucl, gb
+L. Eagle, "Sue, Grabbit, and Runn", Oxford
+\end{verbatim}\end{quote}
+However,
+components may be missing,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+kille, ucl, gb
+kille, cs, ucl, gb
+\end{verbatim}\end{quote}
+and still yield the same distinguished name.
+
+The algorithm,
+developed by Steve Kille,
+and implemented by Colin Robbins
+(both of University College London),
+uses imprecise matching and assigns ``goodness'' levels to matches.
+Users are queried for assistance on questionable matches in order to focus the
+search.
+
+The \pgm{fred} interface program has been modified to use this new algorithm,
+as an optional user facility.
+In the future,
+use of the algorithm will become the default.
+
+\subsubsection	{An Interface from X}
+Although the \pgm{fred} interface appears adequate for dumb-terminal
+applications,
+a window-based interface to the white pages has much appeal.
+PSI has developed a proprietary (yet easily licensable) interface between the
+\xwindows/ and the OSI Directory.
+The interface, \pgm{xwp}, implements the White Pages abstraction using a
+windowing paradigm for user-interaction.
+
+When \pgm{xwp} starts,
+it's top-level window appears as:
+% xwd | xwdtopbm | pnmflip -lr | pnminvert > figure1.pbm
+\[\begin{minipage}\columnwidth
+    \input figure1
+    \centerline{\box\graph}
+    \vskip\baselineskip
+\end{minipage}\]
+To search,
+click on the \boxit{whois} button,
+fill-in a name,
+e.g.,
+\[\begin{minipage}\columnwidth
+    \input figure2
+    \centerline{\box\graph}
+    \vskip\baselineskip
+\end{minipage}\]
+and hit return.
+
+Depending on the number of matches found,
+the user may be presented with a list of possibilities,
+e.g.,
+\[\begin{minipage}\columnwidth
+    \input figure3
+    \centerline{\box\graph}
+    \vskip\baselineskip
+\end{minipage}\]
+
+\newpage	%%%
+Clicking on any of them will yield additional information,
+e.g.,
+\[\begin{minipage}\columnwidth
+    \input figure4
+    \centerline{\box\graph}
+    \vskip\baselineskip
+\end{minipage}\]
+
+\newpage	%%%
+To browse,
+simply click on a line in the top-level window,
+which \pgm{xwp} maintains as it learns about things in the White Pages,
+e.g.,
+\[\begin{minipage}\columnwidth
+    \input figure5
+    \centerline{\box\graph}
+    \vskip\baselineskip
+\end{minipage}\]
+
+\subsection	{Maintenance}
+There is little to report in regards to maintenance.
+The QUIPU 6.0 release,
+the baseline for the pilot participants is relatively stable.
+The heavier usage encountered by the Level-0 DSAs has uncovered other problems.
+These DSAs run a later revision of the software.
+
+\newpage	
+\subsection	{Numbers}
+As a part of the pilot project,
+PSI maintains the DIT for:
+\begin{quote}\small\begin{verbatim}
+countryName=US
+organizationName=Internet
+localityName=North America
+\end{verbatim}\end{quote}
+
+\subsubsection	{US}
+The allocation of participating sites in the US portion of the pilot is:
+\[\begin{tabular}{|r|rl|}
+\hline
+\multicolumn{1}{|c|}{\bf Type}&
+			\multicolumn{2}{c|}{\bf Number}\\
+\hline
+University&		23&	\\
+Corporate&		13&	\\
+Government&		 7&	\\
+Non-profit&		 6&	\\
+Remote&			 5&	\\
+\cline{2-3}
+&			\bf 54&	\bf total\\
+\hline
+\end{tabular}\]
+All organizations run their own DSAs with the exception of ``remote''
+organizations;
+PSI maintains the DMD for these organizations as a courtesy.
+
+In addition,
+three of the participating organizations run their own Level-2 DSAs:
+\[\begin{tabular}{|c|c|}
+\hline
+\multicolumn{1}{|c|}{\bf \# of DSAs}&
+			\multicolumn{1}{|c|}{\bf \# of DMDs}\\
+\hline
+3&		1\\
+5&		2\\
+\hline
+\end{tabular}\]
+As of this writing,
+there were 224186 entries mastered and available under the \verb"c=US" subtree.
+However,
+15 (30\%) of the DSAs were either IP-unreachable or unavailable
+(a disturbingly high figure, discussed in greater detail in
+Section~\ref{uniformity}).
+
+\newpage	%%%
+\subsubsection	{Internet}
+Two subtrees were maintained under the experimental \verb"o=Internet" subtree
+of the DIT,
+one for RFC documents,
+the other for FYI documents.
+A typical entry might appear as:
+\begin{quote}\small\begin{verbatim}
+RFC1160 (1)
+
+The Internet Activities Board
+
+Author: Vinton Cerf, Corporation for National Research Initiatives,
+          US (2)
+
+Version of: May 90
+
+Information: Cerf, V.
+
+Name:     RFC1160, RFC Documents,
+            Internet (1)
+Modified: Fri May 25 18:36:38 1990
+      by: Manager, US (3)
+\end{verbatim}\end{quote}
+Note that if the author of a document has an associated distinguished name
+then this is present in the entry.
+
+As of this writing,
+all RFCs and FYIs were present under this experimental portion of the DIT.
+
+\subsubsection	{North America}
+The portion of the DIT is automatically maintained,
+containing organizational entries under both \verb"c=CA" and \verb"c=US".
+This allows a user to search for a top-level organization in either country.
+As the user-friendly naming scheme can accomplish this without this subtree,
+it is likely to be discontinued in the future.
+
+\subsection	{North American Directory Forum}
+In early {\oldstyle 1990},
+a group of electronic mail carriers formed an informal organization
+with the purpose of realizing a public North American Directory Service.
+PSI has been providing expert participation in the Forum,
+as an organizational member,
+in order to leverage the experiences of the pilot towards this goal.
+
+\newpage
+\section	{Problems thus far}
+As of this writing,
+the pilot has now been underway for over a year.
+Not surprisingly,
+several defects have been uncovered.
+
+\subsection	{Uniformity of Service}\label{uniformity}
+The largest problem is uniformity of service.
+As noted earlier,
+Not all DSAs are consistently available,
+and of those which are available,
+some are sparsely populated
+(of the~54 participating organizations,
+18~are sparse).
+Thus,
+even if a DSA is available,
+it is quite possible that it does not contain the information it should.
+
+This problem is one which is inherent in the approach taken by the
+pilot,
+and is administrative,
+not technical, in nature.
+Fundamentally,
+the problem with an X.500 Directory is that it requires the construction of a
+{\em new\/} infrastructure: data must be loaded into the Directory.
+
+In contrast,
+consider other work, e.g., \pgm{netaddress} (Droms at Bucknell)
+or \pgm{netfind} (Schwartz at UC/Boulder):
+\begin{itemize}
+\item	The \pgm{netaddress} program knows about the various white pages
+services in the Internet
+(e.g., whois, finger, profile, etc.),
+and simply contacts those services,
+issues domain-specific queries and then filters the output into a uniform
+presentation for the user. 
+
+\item	The \pgm{netfind} program maintains a database,
+incrementally built by scanning the ``Organization:'' fields in public netnews
+messages,
+and maintain relationships between domain and organization names.
+When \pgm{netfind} is invoked,
+it consults the database and issues \pgm{finger} commands as appropriate.
+\end{itemize}
+Both of these approaches {\em leverage\/} existing infrastructure and do not
+require explicit site administrator action~---~at the target site~---~in order 
+to provide the service.
+Although such services are generally limited to persons with computer accounts,
+they cleverly avoid the problem of building new infrastructure.
+
+Although some steps have been taken by the pilot sponsors
+(e.g., a script is run each evening to find DSAs which are unavailable),
+the administrators of unavailable DSAs seem little motivated to fix the
+problems.%
+\footnote{This suggests that the pilot administrators should consider removing
+DMDs which are largely sparse or unavailable.}
+
+The solution to these problems is one of demand:
+if applications can be provided which use the White Pages,
+then the White Pages service will be in larger demand,
+and site administrators will be more likely to populate and maintain their
+DSAs.
+In brief,
+one must rely on the superior quality-of-service of the X.500 approach to
+motivate the community to take-on the added expenses of building a new
+infrastructure.
+
+Unfortunately,
+this may very well be the proverbial chicken-and-egg problem:
+coarse statistics monitoring shows little use of the White Pages service,
+presumably because little information is stored there!
+
+\subsection	{Speed of Search}
+There is an impression that search speed is too slow.  Steve Kille
+has suggested that a DSA can search 2K-entries/sec on a Sun-4/330 for a
+typical filter.
+
+Presumably this is a ``simple matter of coding''
+UCL has begun working on this,
+but it will probably take additional programmer resources to tune the code
+appropriately.
+
+\subsection	{User-Interfaces}
+Many sites have expressed a wish for interfaces for the PC and the MAC.
+A PC interface should probably run over both IP and Novell.
+Similarly,
+a MAC interface should probably run over both IP and Appletalk.
+
+This is also a simple matter of coding,
+although the architecture for such a system should be a split-DUA model:
+the code on the PC or MAC should be talk to a real DUA on a UNIX box,
+so the PC and MAC code would not require the ISODE.
+
+It has also been suggested that even \pgm{fred} is too slow and that perhaps
+it too could benefit from a split-DUA model,
+using a lightweight protocol based on fast-IPC or shared-memory.
+
+\subsection	{Access Control}
+Administrative limits severely hinder browsing capability,
+but are needed to (crudely) address external security concerns.
+The proper solution is to devise a means of differentiating between local and
+remote users so as have differing administrative limits.
+
+\subsection	{Attribute Inheritance}
+EDB files, for real institutions, are huge, owing to the repeated presence of
+the same attributes in each entry.
+Attribute inheritance is needed.
+This should also help for ACLs.
+
+UCL has added attribute inheritance,
+and this will likely go into extensive use later this year.
+
+\newpage
+\section	{Documents}
+Since the publication of the previous status report,
+these have been produced:
+\begin{itemize}
+\item	{\em Realizing the White Pages using the OSI Directory Service},
+	by Rose,
+	33~pages.
+
+This describes the refinements made to the X.500 standards in order to achieve
+a working system.
+
+\item	{\em An X Window System Interface to the White Pages},
+	by Rose,
+	36~pages.
+
+This presents a PSI-proprietary user-interface to the Directory.
+\end{itemize}
+In addition,
+independent of the work on the pilot,
+one other documents have been produced by the ISODE/QUIPU effort which
+is germane to white pages:
+\begin{itemize}
+\item	{\em Using the OSI Directory to achieve User Friendly Naming},
+	by Kille,
+	24~pages.
+
+This introduces the notion of simple, user-oriented naming strings,
+and how the OSI Directory Service may be used to map these into distinguished
+names.
+\end{itemize}

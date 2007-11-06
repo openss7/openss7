@@ -1,0 +1,43 @@
+.PS
+## figure A-30
+boxwid	=	3*boxwid/2
+boxht	=	2*boxht/3
+##
+#	FIRST ROW
+##
+B1:	box "\sf 00" width 2*boxwid/8
+B2:	box "\sf 1" with .w at B1.e width boxwid/8
+B3:	box "\sf 23" with .w at B2.e width 5*boxwid/8
+B4:	box "\sf n" with .w at (B3.e.x+linewid/4, B3.e.y)
+##
+L1:	box "\sf class" invis width 2*boxwid/8  height boxht/3\
+		with .nw at (B1.sw.x, B1.sw.y-lineht/4)
+	line from L1.nw to L1.sw
+	line from L1.ne to L1.se
+L2:	box "\sf c" invis width boxwid/8 \
+		with .w at L1.e height boxht/3
+	line from L2.nw to L2.sw
+	line from L2.ne to L2.se
+L3:	box "\sf number" invis width 5*boxwid/8 \
+		with .w at L2.e height boxht/3
+	line from L3.nw to L3.sw
+	line from L3.ne to L3.se
+L4:	box "\sf length" invis with .nw at (B4.sw.x, B4.sw.y-lineht/4) height boxht/3
+	line from L4.nw to L4.sw
+	line from L4.ne to L4.se
+##
+#	SECOND ROW
+##
+B1:	box "\sf Name" "\sf tag" with .nw at (B1.sw.x+boxwid/2, B1.sw.y-3*boxht/2)
+B2:	box "\sf Name" "\sf length" with .w at (B1.e.x+linewid/4, B1.e.y)
+B3:	box "\sf Name" "\sf contents" with .w at (B2.e.x+linewid/4, B2.e.y)
+	move to (B3.e.x+linewid/2, B3.e.y); "\sf $\cdots$"
+##
+#	THIRD ROW
+##
+B1:	box "\sf Value" "\sf tag" with .nw at (B1.sw.x, B1.sw.y-boxht/2)
+B2:	box "\sf Value" "\sf length" with .w at (B1.e.x+linewid/4, B1.e.y)
+B3:	box "\sf Value" "\sf contents" with .w at (B2.e.x+linewid/4, B2.e.y)
+	move to (B3.e.x+linewid/2, B3.e.y); "\sf $\cdots$"
+##
+.PE

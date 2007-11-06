@@ -1,0 +1,1174 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter {Attribute Syntaxes}
+\label{syntaxes}
+
+All attributes recognised by QUIPU have an associated ``string''
+representation which is used to store the data in the DSA.
+This chapter describes all the currently recognised syntaxes.
+
+For most of the syntaxes, a BNF description is given, using the following
+base description:
+
+\begin{quote}\small\begin{verbatim}
+<a> ::= any of the 52 upper and lower case IA5 letters
+<d> ::= any IA5 digit 0-9
+<k> ::= any of the 52 upper and lower case IA5 letters,
+               IA5 digits, and "-" (hyphen)
+<p> ::= any IA5 character in ASN.1 PrintableSting
+<CRLF> ::= IA5 Newline
+<letterstring> ::= <a> | <a> <letterstring>
+<numericstring> ::= <d> | <d> <numericstring>
+<keystring> ::= <k> | <k> <keystring>
+<printablestring> ::= <p> | <p> <printablestring>
+\end{verbatim}\end{quote}
+
+The BNF description of attributes can be found in
+Appendix~\ref{bnf}, but this does not repeat the BNF used for syntaxes
+given below.
+
+\section{Standard Syntaxes}
+
+This section describes the Attribute Syntaxes defined by X.500.
+
+There are many attributes that are represented by a sequence of
+printable characters.  There are various ways in which the contents of the
+string is restricted, each is represented by a different syntax, which are
+described below.
+
+\subsection{PrintableString}
+\index{PrintableString}
+
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	serialNumber\\
+\hline
+\end{tabular}
+\begin{tabular}{|l|}\hline
+QUIPU Attributes \\ \hline
+	execVector\\
+\hline
+\end{tabular}
+\end{center}
+
+
+The printable string characters are:
+\begin{quote}\begin{tabular}{l}
+\verb"A" through \verb"Z"\\
+\verb"a" through \verb"z"\\
+\verb"0" through \verb"9"\\
+\verb"'" \hspace{2ex}(apostrophe)\\
+\verb"(" \hspace{2ex}(left parenthesis)\\
+\verb")" \hspace{2ex}(right parenthesis)\\
+\verb"+" \hspace{2ex}(plus-sign)\\
+\verb"," \hspace{2ex}(comma)\\
+\verb"-" \hspace{2ex}(hyphen)\\
+\verb"." \hspace{2ex}(period)\\
+\verb"/" \hspace{2ex}(solidus)\\
+\verb":" \hspace{2ex}(colon)\\
+\verb"?" \hspace{2ex}(question-mark)\\
+space
+\end{tabular}\end{quote}
+
+The value can be any character listed above, with matching as for
+CaseExactString.
+
+When matching, multiple white spaces and tabs are treated as a single space
+character.
+
+Approximate matching is supported for this syntax.
+
+The only standard attribute of this type 
+is \verb+serialNumber+, this is used in the
+\verb+device+ objectClass, and represents the serial number of the
+device.
+QUIPU defines an \verb+execVector+ attribute which is used by the
+\pgm{iaed} program as the vector to pass to a program when starting it.
+
+\subsection{CaseExactString}
+\index{CaseExactString}\index{T.61 Strings}
+
+No attributes currently use this syntax.
+Matching is as for PrintableString.
+
+\label{T61String}
+The value for this syntax can be one of two types, either a printable
+string, or a T.61 string represented as follows:
+\begin{quote}\begin{verbatim}
+<StringValue> ::= "{T.61}" <T61String> | <printablestring>
+<T61String>   ::= Any character defined to be in 
+                  T.61 String.
+\end{verbatim}\end{quote}
+
+If a T.61 string is used, where possible the character is displayed
+using the equivalent ASCII character.
+Characters in T.61 string that cannot be represented by an
+equivalent ASCII character are quoted, using ``\verb+\xx+'' where
+``\verb+xx+'' is the hexadecimal value of the character.
+
+\begin{table}[tp]
+\small
+\[\begin{tabular}{|c|l|c|}
+\hline 
+Hex code & Description & Character \\
+\hline 
+c1 & grave accent      	& \`{o} \\
+c2 & acute accent	& \'{o} \\
+c3 & circumflex		& \^{o} \\
+c4 & tilde		& \~{o} \\
+c5 & macron		& \={o} \\
+c7 & single dot		& \.{o} \\
+ca & ring		& \aa \\
+cb & cedilla		& \c{c} \\
+cc & underscore		& \b{o} \\
+cd & umlaut		& \"{o} \\
+cf & caron		& \v{o} \\
+a1 & inverted exclamation mark	 & !` \\
+a3 & pound sign			 & \pounds \\
+a4 & dollar sign		 & \$ \\
+a6 & hash			 & \# \\
+a7 & paragraph sign		 & \S \\
+ab & left quotation mark	 & `` \\
+b0 & ring			 & \aa \\
+b1 & plus/minus			 & $\pm$ \\
+b5 & greek letter mu		 & $\mu$\\
+b6 & pilcrow			 & \P \\
+b8 & division sign		 & $\div$ \\
+bb & right quotation mark	 & '' \\
+bc & quarter sign		 & $\frac{1}{4}$ \\
+bd & half sign			 & $\frac{1}{2}$ \\
+be & three-quarters sign	 & $\frac{3}{4}$ \\
+bf & inverted question mark	 & ?` \\
+e0 & greek letter omega		 & $\Omega$ \\
+e1 & AE				 & \AE \\
+e8 & L stroke			 & \L \\
+e9 & O stroke			 & \O \\
+ea & OE				 & \OE \\
+\hline 
+\end{tabular}
+\]
+\caption{T.61 Character Codes}
+\label{T61fig}
+\end{table}
+
+However, if your terminal has the ability to display characters 
+using an ISO 8859-1 font 
+(for example some of the \xwindows/\index{X Windows} fonts)
+then a large
+number of the T.61 characters can be displayed (and so are not quoted in hex!).
+You will need to tell the DUA that you have the ability to display the
+ISO 8859-1 characters.  This can be achieved in one of three ways:
+\begin{itemize}
+\item In the system-wide dsaptailor file, you can add
+\begin{quote}\begin{verbatim}
+     ch_set ISO8859
+\end{verbatim}\end{quote}
+or
+\item in your .quipurc file you can add
+\begin{quote}\begin{verbatim}
+     dsap: ch_set ISO8859
+\end{verbatim}\end{quote}
+However not all the DUA interfaces read this files (DISH does!) or
+\item set the environment variable CH\_SET to ``ISO8859'', e.g., using ``csh''
+\begin{quote}\begin{verbatim}
+     setenv CH_SET ISO8859
+\end{verbatim}\end{quote}
+\end{itemize}
+
+To enter T.61 characters is a little more tricky.
+In T.61 
+accented characters are represented by two octets, the first indicating the
+accent and the second the base character to be accented. Note that some
+combinations of accent and character do not have an equivalent in ISO 8859-1,
+and hence cannot be displayed on an ISO 8859-1 device.
+Table~\ref{T61fig} shows some of the characters that can be represented,
+for
+the accented characters only the first octect is shown, the second
+octect can typically be any character, ``o'' is used in most of the
+examples.
+
+For instance,  to enter the T.61 string ``Gal\'{a}pagos Penguin,'' you
+should use
+\begin{quote}\begin{verbatim}
+	{T.61}Gal\c2apagos Penguin
+\end{verbatim}\end{quote}
+The acute accent is represented by the ``\verb+\c2+'' and appears
+over the following character --- ``\verb+a+'' in this case.
+
+\subsection{CaseIgnoreString}
+\index{CaseIgnoreString}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	knowledgeInformation\\
+	commonName\\
+	surname\\
+	localityName\\
+	stateOrProvinceName\\
+	streetAddress\\
+	organizationName\\
+	organizationalUnitName\\
+	title\\
+	description\\
+	businessCategory\\
+	postalCode\\
+	postOfficeBox\\
+	physicalDeliveryOfficeName\\
+	\hline
+\end{tabular}
+\begin{tabular}{|l|}\hline
+COSINE/Internet Attributes \\ \hline
+	userid\\
+	textEncodedORaddress\\
+	info\\
+	favouriteDrink\\
+	roomNumber\\
+	userClass\\
+	host\\
+	documentIdentifier\\
+	documentTitle\\
+	documentVersion\\
+	documentLocation\\
+	durName\\
+	wkdName\\
+	protocolProfile\\
+	objectID\\
+	friendlyCountryName\\
+	buildingName\\
+\hline
+\end{tabular}
+\end{center}
+
+
+The syntax is the same as CaseExactString, except that when matching 
+``characters that differ only in their case are considered identical''.
+
+Approximate matching is supported for this syntax.
+
+The use of some of the attributes is now described, the more obvious ones
+are omitted.
+
+\begin{describe}
+\item [\verb+knowledgeInformation+:] A description of knowledge mastered by a DSA.
+\item [\verb+localityName+:] Used to identify the geographical area or locality in
+which the object is physically located e.g., 
+\small\begin{quote}\begin{verbatim}
+London
+\end{verbatim}\end{quote}
+\item [\verb+stateOrProvinceName+:]
+			describes the state in which
+			the \verb"locality" is found; e.g., 
+\small\begin{quote}\begin{verbatim}
+New York
+\end{verbatim}\end{quote}
+\item [\verb+title+:]
+An objects job title, e.g.,
+\small\begin{quote}\begin{verbatim}
+Technical Manager
+\end{verbatim}\end{quote}
+
+\item [\verb+businessCategory+:]
+describes the business of the object, e.g.,
+\small\begin{quote}\begin{verbatim}
+networking
+\end{verbatim}\end{quote}
+
+This is used to find people sharing the same occupation.
+
+\item [\verb+physicalDeliveryOfficeName+:]
+			describes the geographical location
+			of the physical delivery office which services the
+			postal address of this object; e.g.,
+\small\begin{quote}\begin{verbatim}
+Troy
+\end{verbatim}\end{quote}
+
+\item [\verb+friendlyCountryName+:]
+A ``nice'' name for countries, as opposed to the two letter codes enforced by
+use of \verb+CountryName+, for example
+\small\begin{quote}\begin{verbatim}
+Great Britain
+\end{verbatim}\end{quote}
+
+\end{describe}
+
+
+
+\subsection{CaseIgnoreList}
+\index{CaseIgnoreList}
+
+No standard attributes currently use this syntax.
+ 
+The CaseIgnoreList syntax consists of a sequence of CaseIgnoreString
+values as shown by the BNF below.
+\begin{quote}\begin{verbatim}
+list = <list_component> | <list_component> "$" <list>
+list_component = [ "{T61}" ] <string>
+\end{verbatim}\end{quote}
+When the list is displayed to a user, the ``\verb+$+'' is replaced
+with a newline.  Ordering is preserved.  For example, the entry in an
+EDB file
+\begin{quote}\begin{verbatim}
+caseIgnoreAttribute= this is a $ multi line $\
+	attribute definition
+\end{verbatim}\end{quote}
+would be shown to a user as
+\begin{quote}\begin{verbatim}
+caseIgnoreAttribute= this is a 
+                     multi line
+                     attribute definition
+\end{verbatim}\end{quote}
+
+QUIPU only allows equality matching for this syntax.
+
+\subsection{CountryString}
+\index{CountryString}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	countryName\\
+\hline
+\end{tabular}
+\end{center}
+This syntax is treated as a PrintableString, with matching rules as for
+CaseIgnoreString, and the restriction that the string must 
+be one of the codes defined by ISO~3166.
+
+
+
+
+\subsection{IA5String}
+\index{IA5String}\index{quipuVersion attribute}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+QUIPU Attributes \\ \hline
+	control\\
+	quipuVersion\\
+\hline
+\end{tabular}
+\begin{tabular}{|l|}\hline
+COSINE/Internet Attributes \\ \hline
+	aRecord\\
+	mDRecord\\
+	mXRecord\\
+	nSRecord\\
+	sOARecord\\
+	cNAMERecord\\
+\hline
+\end{tabular}
+\end{center}
+
+This syntax is handled as PrintableString, except a wider range of
+characters are recognised (i.e., any character in IA5 string, characters such
+as NewLine are quoted using the same mechanism as described for T.61 string
+in Section~\ref{T61String}), with matching rules as for CaseExactString.
+
+
+
+\subsection{OctetString}
+\index{OctetString}
+
+No attributes use this syntax directly.
+
+Characters that cannot be printed as an ASCII are represented using the
+quoting mechanism described in Section~\ref{T61String}.
+
+\subsection{NumericString}
+\index{NumericString}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	x121Address\\
+	internationaliSDNNumber\\
+\hline
+\end{tabular}
+\end{center}
+The value is simply a numeric string (digits 0 through 9 only)
+\begin{quote}\begin{verbatim}
+<NumericValue>	::= <numericstring>
+\end{verbatim}\end{quote}
+
+The two attributes are used thus:
+\begin{describe}
+\item[\verb+x121Address+:] defines the X.121 Address of an object as defined by the
+CCITT Recommendation X.121.
+\item[\verb+internationaliSDNNumber+:]
+An International ISDN Number as defined by CCITT Recommendation E.164.
+\end{describe}
+
+\subsection{DestinationString}
+\index{DestinationString}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	destinationIndicator\\
+\hline
+\end{tabular}
+\end{center}
+Behaves as a \verb+<printablestring>+, with CaseIgnoreString matching rules.
+
+The only attribute of the type \verb+destinationIndicator+ is used to define
+the addressee as required by the Public Telegram Service.
+
+\subsection{TelephoneNumber}
+\index{TelephoneNumber}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	telephoneNumber\\ 
+\hline
+\end{tabular}
+\begin{tabular}{|l|}\hline
+COSINE/Internet Attributes \\ \hline
+	homePhone\\
+\hline
+\end{tabular}
+\end{center}
+\begin{center}\small\begin{tabular}{|l|}\hline
+PSI Attributes \\ \hline
+	mobileTelephoneNumber\\
+	pagerTelephoneNumber\\
+\hline
+\end{tabular}
+\end{center}
+
+The value should be a string describing the phone number of the object
+using the international notation; e.g.,
+\begin{quote}\begin{verbatim}
++1 518-283-8860
+\end{verbatim}\end{quote}
+or
+\begin{quote}\begin{verbatim}
++1 518-283-8860 x1234
+\end{verbatim}\end{quote}
+In general, the syntax is:
+\begin{quote}\begin{verbatim}
+"+" <country code> <national number> [ "x" <extension> ]
+\end{verbatim}\end{quote}
+
+Matching is as defined for CaseExactString, except that all space and ``--''
+characters are skipped during the comparison.
+
+\subsection{PostalAddress}
+\index{PostalAddress}
+
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	postalAddress\\
+	registeredAddress\\
+	homePostalAddress\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<PostalAddressValue> ::= <address_component> | 
+                         <address_component> "$" <address>
+<address_component> = <StringValue>
+\end{verbatim}\end{quote}
+For example \verb+UCL $ Gower Street $ London+.
+You are limited to a maximum of 6 \verb+<address_component>+'s, each with a 
+maximum of 30 characters.
+(Note each \verb+<address_component>+ can include T.61 strings; see
+Section~\ref{T61String} for details of this).
+
+Note: substring matching is not supported by QUIPU for this syntax.
+
+\subsection{DN}
+\index{DN}\index{masterDSA attribute}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	aliasedObjectName\\
+	member\\
+	owner\\
+	roleOccupant\\
+	seeAlso\\
+\hline
+\end{tabular}
+\begin{tabular}{|l|}\hline
+QUIPU Attributes \\ \hline
+	masterDSA\\
+	slaveDSA\\
+	relayDSA\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{center}\small\begin{tabular}{|l|}\hline
+MHS Attributes \\ \hline
+	mhsMessageStoreName\\
+\hline
+\end{tabular}
+\begin{tabular}{|l|}\hline
+COSINE/Internet Attributes \\ \hline
+	manager\\ 
+	documentAuthor\\
+	secretary\\
+	lastModifiedBy\\
+	associatedName\\
+	dITRedirect\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<DNValue> ::= <name>
+\end{verbatim}\end{quote}
+Distinguished names are discussed in Section~\ref{quipu_name}, the BNF is
+repeated for completeness:
+\begin{quote}\begin{verbatim}
+<DNValue>	::= <rdn> | <rdn> "@" <DNValue>
+<rdn>		::= <attribute> | <attribute> "%" <rdn>
+\end{verbatim}\end{quote}
+
+The DNs held by the attribute have the following meanings:
+\begin{describe}
+\item[\verb+aliasedObjectName+:] The name of an aliased object.
+\item[\verb+member+:] Specifies a member of a \verb+groupOfNames+.
+\item[\verb+owner+:] The name of the person responsible for the associated object.
+\item[\verb+roleOccupant+:] The person who fills an organisational role.
+\item[\verb+seeAlso+:] Other objects that may be of interest.
+\item[\verb+masterDSA+:] The DSA holding the master EDB file.
+\item[\verb+slaveDSA+:] DSAs holding slave EDB files.
+\item[\verb+relayDSA+:] A DSA to relay operations to if your DSA is not
+connected to a needed network community. Section~\ref{dsarelay}
+describes this in more detail.
+\item[\verb+manager+:] The manager of a DSA.
+\item[\verb+documentAuthor+:] Author of a document.
+\item[\verb+secretary+:] The name of a personal Secretary.
+\item[\verb+lastModifiedBy+:] The object that last modified the referenced
+object.
+\item[\verb+associatedName+:] The DN associated with a DNS domain.
+\end{describe}
+
+\subsection{OID}
+\index{OID}
+
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	supportedApplicationContext\\
+\hline
+\end{tabular}
+\begin{tabular}{|l|}\hline
+MHS Attributes \\ \hline
+	mhsDeliverableContentTypes\\
+	mhsDeliverableEits\\
+	mhsSupportedAutomaticActions\\
+	mhsSupportedContentTypes\\
+	mhsSupportedOptionalAttributes\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<OIDValue> ::= <oid>
+\end{verbatim}\end{quote}
+
+All the syntaxes in this section are represented by OIDs as follows:
+\begin{quote}\begin{verbatim}
+<oid> ::= <keystring> "." <numericoid> | 
+          <keystring> | 
+          <numericoid>
+<numericoid> ::= <numericstring> | 
+                 <numericstring> "." <numericoid>
+\end{verbatim}\end{quote}
+For example \verb+2.3.4.2+ or \verb+attribute.6+.
+
+In general, the value will be a string using oidtable mappings.
+
+\subsection{ObjectClass}
+\index{objectClass attribute}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	objectClass\\
+\hline
+\end{tabular}
+\end{center}
+Although essentially an OID, a separate syntax is provided as an OID has
+additional semantics when used as an object class.
+
+\subsection{TelexNumber}
+\index{TelexNumber}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	telexNumber\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<TelexNumberValue> ::= <printablestring> "$" 
+                       <printablestring> "$"
+                       <printablestring>
+\end{verbatim}\end{quote}
+This is used to represent \verb+number $ country $ answerback+, for example
+\verb+007 28722 $ G $ UCLPHYS+.
+
+\subsection{TeletexTerminalIdentifier}
+\index{TeletexTerminalIdentifier}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	teletexTerminalIdentifier\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<TeletexTerminalIdentifierValue> ::= <printablestring> 
+              "$" <optstr> "$"  <optstr> "$" <optstr> 
+              "$" <optstr> "$" <optstr>
+<optstr> ::= <printablestring> | (null)
+\end{verbatim}\end{quote}
+Used to represent
+\begin{quote}\begin{verbatim}
+terminal $ graphic $ control $ page $ misc $ private
+\end{verbatim}\end{quote}
+
+\subsection{FacsimileTelephoneNumber}
+\index{FacsimileTelephoneNumber}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	facsimileTelephoneNumber\\
+\hline
+\end{tabular}
+\end{center}
+\begin{quote}\begin{verbatim}
+<FacsimileTelephoneNumberValue> ::= <printablestring> 
+                                [ "$" <faxparameters> ]
+<faxparameters> ::= <faxparm> | <faxparm> 
+                    "$" <faxparameters>
+<faxparm> ::= "twoDimensional" | "fineResolution" | 
+              "unlimitedLength" | "b4Length" | 
+              "a3Width" | "b4Width" | "uncompressed"
+\end{verbatim}\end{quote}
+For example \verb"+44 602 123-4567 $ twoDimensional"
+
+
+\subsection{DeliveryMethod}
+\index{DeliveryMethod}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	preferredDeliveryMethod\\
+\hline
+\end{tabular}
+\begin{tabular}{|l|}\hline
+MHS Attributes \\ \hline
+	mhsPreferredDeliveryMethods\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<DeliveryValue> = <pdm_component> | 
+                  <pdm_component> "$" <pdm>
+pdm_component = "any" | "mhs" | "physical" | "telex" | 
+                "teletex" | "g3fax" | "g4fax" | "ia5" | 
+                "videotex" | "telephone"
+\end{verbatim}\end{quote}
+For example \verb+mhs $ telephone+.
+
+\subsection{PresentationAddress}
+\index{presentation addresses}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	presentationAddress\\
+\hline
+\end{tabular}
+\end{center}
+For more details see Section~\ref{DSA:address}, \volone/ of this manual and \cite{String.Addresses}.
+
+\subsection{Password}
+\index{Password}\index{user password attribute}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	userPassword\\
+\hline
+\end{tabular}
+\end{center}
+See Section~\ref{Passwords} for a discussion of this attribute.
+
+\subsection{Certificate}
+\index{Certificate}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	userCertificate\\
+	cACertificate\\
+\hline
+\end{tabular}
+\end{center}
+
+
+\begin{quote}\begin{verbatim}
+<CertificateValue> ::= <Algorithm> "#" 
+           <EncryptedValue> "#" <Issuer> "#" 
+           <Subject> "#" <Algorithm> "#"
+           <ProtocolVersion> "#" <Serial> "#" 
+           <Validity> "#" <Algorithm> "#" 
+           <EncryptedValue>
+\end{verbatim}\end{quote}
+% Give LaTeX a sporting chance of pagebreaking sensibly.
+\begin{quote}\begin{verbatim}
+<Algorithm> ::= <OID> "#" <AlgorithmParameters>
+<AlgorithmParameters> ::= | <IntegerValue> | 
+                            "{ASN}" <HexString>
+<Issuer> ::= <DN>
+<Subject> ::= <DN>
+<ProtocolVersion> ::= <IntegerValue>
+<Serial> ::= <IntegerValue>
+<Validity> ::= <UTCTime> "#" <UTCTime>
+<EncryptedValue> ::= <HexString> | <HexString> "-" <Digit>
+\end{verbatim}\end{quote}
+
+\subsection{CertificatePair}
+\index{CertificatePair}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	crossCertificatePair\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<CertificatePairValue> ::= [<CertificateValue>] "|" 
+                           [<CertificateValue>]
+\end{verbatim}\end{quote}
+At least one certificate should be present, although QUIPU will not enforce
+this.
+
+\subsection{CertificateList}
+\index{CertificateList}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	authorityRevocationList\\
+	certificateRevocationList\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<CertificateListValue> ::= <AlgorithmValue> "#" 
+                <Issuer> "#" 
+                <AlgorithmValue> "#" <EncryptedValue> "#"
+                <UTCTime> ["#" <RevokedCertificates>]
+
+<RevokedCertificates> ::= <AlgorithmValue> "#"
+                 <EncryptedValue> 
+                 [ "#" *(<RevokedCertificate> "#") ]
+
+<RevokedCertificate> ::= <Subject> "#" 
+                 <AlgorithmValue> "#"
+                 <SerialNumber> "#" <UTCTime>
+
+\end{verbatim}\end{quote}
+
+\subsection{Guide}
+\index{Guide}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	searchGuide\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<GuideValue>   ::= [<objectClass> "#"] <Criteria>
+<Criteria>     ::= <CriteriaItem> | <CriteriaSet> | 
+                   "!" <Criteria>
+<CrtieriaSet>  ::= ["("] Criteria "@" CriteriaSet [")"] | 
+                   ["("] Criteria "|" CriteriaSet [")"]
+<CriteriaItem> ::= ["("] <attributetype> "$" 
+                   <matchType> [")"]
+<matchType>    ::= "EQ" | "SUBSTR" | "GE" | 
+                   "LE" | "APPROX"
+\end{verbatim}\end{quote}
+
+Note the use of \verb+@+ for ``and'', as the \verb+&+ symbol has other meaning
+here.
+
+Some examples of Search Guide are:
+\begin{quote}\begin{verbatim}
+Person # commonName $ APPROX
+( organization $ EQ ) @ (commonName $ SUBSTR)
+( organization $ EQ ) @ ((commonName $ SUBSTR) | \
+                        (commonName $ EQ))
+\end{verbatim}\end{quote}
+
+\subsection{UTCTime}
+\index{UTCTime}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+Standard Attributes \\ \hline
+	lastModifiedTime\\
+\hline
+\end{tabular}
+\end{center}
+\begin{quote}\begin{verbatim}
+<UTCTimeValue> ::= <printablestring>
+\end{verbatim}\end{quote}
+The string should be formatted using the template \verb+yymmddhhmmssz+
+where 
+\verb+yy+ represents the year; 
+\verb+mm+ represents the month; 
+\verb+dd+ represents the day; 
+\verb+hh+ represents hours; 
+\verb+mm+ represents minutes; 
+\verb+ss+ represents seconds; 
+\verb+z+  represents the timezone.
+
+For example the string \verb+890602093221Z+ is used to represent
+09:32:21 at GMT, on June~$2^{\underline{\mbox{\scriptsize nd}}}$,
+{\oldstyle 1989}.
+
+\subsection{Boolean}
+\index{Boolean}
+
+No attributes use this syntax.
+
+\begin{quote}\begin{verbatim}
+<BooleanValue> ::= <boolean>
+<boolean>      ::= "TRUE" | "FALSE"
+\end{verbatim}\end{quote}
+
+\subsection{Integer}
+\index{Integer}
+
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+MHS Attributes \\ \hline
+	mhsDeliverableContentLength\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<IntegerValue> ::= <d>
+\end{verbatim}\end{quote}
+
+\subsection{AccessPoint}
+\index{AccessPoint}
+
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+QUIPU Attributes \\ \hline
+	subordinateReference\\
+	crossReference\\
+	nonSpecificSubordinateReference\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<AccessPointValue> ::= <DN> "#" <PresentationAddress>
+\end{verbatim}\end{quote}
+
+These attribute are used to give references to non-QUIPU DSAs and are
+discussed in Section~\ref{DSA:nonquipu}.
+
+
+\section{QUIPU Attribute Syntaxes}
+
+\subsection{ACL}
+\label{acl_syntax}
+\index{acl attribute}\
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+QUIPU Attributes \\ \hline
+	accessControlList\\
+\hline
+\end{tabular}
+\end{center}
+\begin{quote}\begin{verbatim}
+<aclvalue>	::= <aclwho> "#" <aclwhat> "#" <acltype> ["#"]
+<aclwho>	::= "self" | "others" | "group #" <namelist> | 
+			"prefix #" <namelist>
+<aclwhat>	::= "none" | "detect" | "compare" | 
+                    "read" | "add" | "write"
+<acltype>	::= "child" | "entry" | "default" | 
+                    "attributes #" <oidlist>
+<oidlist>	::= <oid> | <oidlist> "$" <oid>
+\end{verbatim}\end{quote}
+The use of ACL is discussed in Section~\ref{disc_acl}.
+
+\subsection{Schema}
+\label{tree_struct}
+\index{Schema}\index{treeStructure attribute}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+QUIPU Attributes \\ \hline
+	treeStructure\\
+\hline
+\end{tabular}
+\end{center}
+Schema is currently represented by a single OID, and discussed fully in
+Section~\ref{adding_data}.
+
+\subsection{ProtectedPassword}
+\index{ProtectedPassword}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+QUIPU Attributes \\ \hline
+	protectedPassword\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<ProtectedPasswordValue> ::= <StringValue>
+\end{verbatim}\end{quote}
+
+The password encryption mechanism is encapsulated within the matching rules
+for this attribute; two values are ``equal'' if they are identically equal or
+if one is an encrypted representation of the other. 
+
+Note that ``equals'' is not transitive for this attribute:
+If $a = b$ and $b = c$, testing $a = c$ may give ``incomparable'' rather than
+``true'' as the result. The reason for this is that in some circumstances 
+properly testing
+this attribute for equality would consume an unacceptable amount of time. The
+security of the encryption mechanism depends on this!
+
+\subsection{SecurityPolicy}
+\index{SecurityPolicy}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+QUIPU Attributes \\ \hline
+	entrySecurityPolicy\\
+	dsaDefaultSecurityPolicy\\
+	dsaPermittedSecurityPolicy\\
+\hline
+\end{tabular}
+\end{center}
+
+This attribute is currently handled as ``ASN.1'', see Section~\ref{ASN_syntax}.
+
+\subsection{EdbInfo}
+\index{edbInfo attribute}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+QUIPU Attributes \\ \hline
+	eDBinfo\\
+\hline
+\end{tabular}
+\end{center}
+\begin{quote}\begin{verbatim}
+<EdbInfoValue> ::= <name> "#" <name> "#" <namelist> ["#"]
+\end{verbatim}\end{quote}
+This attribute is discussed in Section~\ref{slave_update}.
+
+\subsection{InheritedAttribute}
+\index{inherited attribute}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+QUIPU Attributes \\ \hline
+	InheritedAttribute\\
+\hline
+\end{tabular}
+\end{center}
+\begin{quote}\begin{verbatim}
+<InheritedAttributeValue> ::= [ <oid> "$" ] 
+                    [ "always" <InheritedList> ]
+                    [ "default" <InheritedList> ]
+<InheritedList> ::= "(" NEWLINE <AttributeSequence> 
+                    NEWLINE ")"
+\end{verbatim}\end{quote}
+This attribute is discussed in Section~\ref{attr_inherit}.
+
+
+
+\section{COSINE/Internet Attribute Syntaxes}
+
+As well the attribute syntaxes defined by X.500, QUIPU recognises and
+uses those defined by the COSINE/Internet schema document
+\cite{Cosine.NA}.
+This document is a sucessor to the Thorn syntaxes 
+\cite{thorn-na} used in previous version of QUIPU.
+
+\subsection{Mailbox}
+\index{Mailbox}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+COSINE/Internet Attributes \\ \hline
+	otherMailbox\\
+\hline
+\end{tabular}
+\end{center}
+\begin{quote}\begin{verbatim}
+<MailboxValue> ::= <printablestring> "$" <IA5String>
+\end{verbatim}\end{quote}
+For example \verb+internet $ quipu-support@cs.ucl.ac.uk+.
+
+\subsection{CaseIgnoreIA5String}
+\index{CaseIgnoreIA5String}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+COSINE/Internet Attributes \\ \hline
+	rfc822Mailbox\\
+	domainComponent\\
+	nRSTextualDescription\\
+	associatedDomain\\
+\hline
+\end{tabular}
+\end{center}
+
+These attributes are handled as IA5Strings, but use the matching rules
+for the CaseIgnoreString syntax.
+
+
+\subsection{Photo}
+\index{Photo}\index{ASN.1}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+COSINE/Internet Attributes \\ \hline
+	photo\\
+	personalSignature\\
+\hline
+\end{tabular}
+\end{center}
+Photos are a special case of ``ASN.1'' (see Section~\ref{ASN_syntax}), but the 
+output format is different.
+Your attention is drawn to Section~\ref{file_attr} which discusses storing
+large attributes in a separate file.
+
+With this version of QUIPU, the attribute should be encoded as a bitstring, in a two-dimensional
+G3FacsimilePage encoding
+(as per recommendation T.4).
+However, in the future this will migrate to an X.400 bodypart,
+containing a G3FacsimilePage, with the advantage this can then be one-
+or two-dimensional.
+The current photo decoders will recognise the new format.
+
+\subsection{Audio}
+\index{Audio}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+COSINE/Internet Attributes \\ \hline
+	audio\\
+\hline
+\end{tabular}
+\end{center}
+The data is in the form of a u-law encoded sound file.  If you have a Sun
+Microsystems Sun 4 workstation, the demonstration ``play'' utility 
+can be used to play the attributes. (A modified version of ``play''
+that ignores the file header is better --- such as that made available
+by J.~Michael Bauer of the University of Calgary.  QUIPU-support can supply
+details if required.)
+
+This is an interim demonstration attribute; the format is
+temporary and may be replaced when a suitable standard 
+audio encoding mechanism is found.
+
+\subsection{Data Quality}
+\index{Data Quality syntax}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+COSINE/Internet Attributes \\ \hline
+	singleLevelQuality\\
+	subtreeMinimumQuality\\
+	subtreeMaximumQuality\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<dataQuality>   ::=  <compKeyword> "#" <attrQuality>
+                     "#" <listQuality>
+                     ["#" <description> ]
+<attrQuality>   ::= <levelKeyword> "+" <compKeyword>
+<listQuality>   ::= <list> "$" <list> <listQuality>
+<list>          ::= <attribute> "+" <attrQuality>
+<compKeyword>   ::= "NONE" | "SAMPLE" |
+                    "SELECTED" | "SUBSTANTIAL" |
+                    "FULL" 
+<levelKeyword>  ::= "UNKNOWN" | "EXTERNAL" | 
+                    "SYSTEM-MAINTAINED" | "USER-SUPPLIED" 
+\end{verbatim}\end{quote}
+
+These attributes are used to define the quality of data at a single
+level of the DIT, or even the whole subtree.
+
+\subsection{DSA Quality}
+\index{DSA Quality syntax}
+\begin{center}\small
+\begin{tabular}{|l|}\hline
+COSINE/Internet Attributes \\ \hline
+	dSAQuality\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{quote}\begin{verbatim}
+<dsaQuality> ::=  <DSAkeyword> ["#" <description>]
+<DSAkeyword> ::=  "DEFUNCT" | "EXPERIMENTAL" |
+                  "BEST-EFFORT" | "PILOT-SERVICE" |
+                  "FULL-SERVICE"
+\end{verbatim}\end{quote}
+
+Used to define the quality of a DSA.
+
+\section{MHS Attribute Syntaxes}
+
+\begin{center}\small
+\begin{tabular}{|l|l|}
+\hline
+Attribute & Syntax \\ 
+\hline
+mhsORaddresses & ORAddress \\
+mhsDLMembers & ORName \\
+mhsDLSubmitPermissions & DLSubmitPermissions \\
+\hline
+\end{tabular}
+\end{center}
+
+The Syntaxes shown above are not currently recognised by QUIPU,
+and are thus handled as raw ASN.1 (see Section~\ref{ASN_syntax}).
+However, the PP\index{PP} MHS System has QUIPU compatible syntax
+handlers that can be easily added to the DISH program, and
+provides a tool for handling entries of the ``distribution list''
+object class.
+PP is available under conditions similar to the ISODE; for details 
+you should contact ``PP-Support@cs.ucl.ac.uk''.
+
+
+
+\section{ASN.1}
+\label{ASN_syntax}
+As the preceding sections in this chapter have mentioned, not all syntaxes
+have a string representation defined by QUIPU, so are represented by the raw
+ASN.1.
+
+An example would be:
+\begin{quote}\begin{verbatim}
+photo= {ASN}0308207b4001488001fd...
+\end{verbatim}\end{quote}
+where \verb+0308+\ldots is a hexadecimal representation (encoded using the
+``Basic Encoding Rules'') of the ASN.1 defined attribute.
+
+Attributes stored as ASN.1, will usually be matched correctly, with
+the following exceptions:
+
+\begin{itemize}
+\item
+There is an IMPLICIT Set in the ASN.1.  The DSA will not detect the
+set, and so will not know to match components in arbitrary order.
+
+\item
+If special matching rules apply, for example, special rules to
+determine equivalence of telephone numbers.  Such rules would need
+to be represented by code in the DSA.
+\end{itemize}
+

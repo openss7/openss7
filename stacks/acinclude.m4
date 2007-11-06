@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/08/14 12:16:53 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2007/10/15 17:17:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 12:16:53 $ by $Author: brian $
+# Last Modified $Date: 2007/10/15 17:17:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -562,17 +562,52 @@ AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
 #include <net/tcp.h>
     ])
     _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu nf_reset ip_dst_output \
-			ip_route_output_key __in_dev_get_rcu synchronize_net], [], [], [
+			ip_route_output_key __in_dev_get_rcu synchronize_net pci_module_init], [], [], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#ifdef HAVE_KINC_LINUX_CPUMASK_H
+#include <linux/cpumask.h>
+#endif
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif
+#include <linux/interrupt.h>	/* for cpu_raise_softirq */
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
+#include <linux/ioport.h>	/* for check_region */
+#include <linux/pci.h>		/* for pci checks */
+#ifdef HAVE_KINC_ASM_UACCESS_H
+#include <asm/uaccess.h>
+#endif
+#ifdef HAVE_KINC_LINUX_COMPAT_H
+#include <linux/compat.h>
+#endif
 #include <linux/socket.h>
 #include <net/sock.h>
 #include <net/protocol.h>
@@ -1589,6 +1624,9 @@ AC_DEFUN([_SS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.70  2007/10/15 17:17:00  brian
+# - updates for 2.6.22.5-49.fc6 kernel
+#
 # Revision 0.9.2.69  2007/08/14 12:16:53  brian
 # - GPLv3 header updates
 #

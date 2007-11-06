@@ -1,0 +1,183 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
+/* susaplose.c - SPM: UNITDATA you lose */
+
+/*
+ *				  NOTICE
+ *
+ *    Acquisition, use, and distribution of this module and related
+ *    materials are subject to the restrictions of a license agreement.
+ *    Consult the Preface in the User's Manual for the full terms of
+ *    this agreement.
+ *
+ */
+
+/* LINTLIBRARY */
+
+#include <stdio.h>
+#include <varargs.h>
+#include "spkt.h"
+#include "tailor.h"
+
+/*  */
+
+#ifndef	lint
+int
+susaplose(va_alist)
+	va_dcl
+{
+	int reason, result;
+	struct SSAPindication *si;
+	va_list ap;
+
+	va_start(ap);
+
+	si = va_arg(ap, struct SSAPindication *);
+	reason = va_arg(ap, int);
+
+	result = _susaplose(si, reason, ap);
+
+	va_end(ap);
+
+	return result;
+}
+#else
+/* VARARGS */
+
+int
+susaplose(si, reason, what, fmt)
+	struct SSAPindication *si;
+	int reason;
+	char *what, *fmt;
+{
+	return susaplose(si, reason, what, fmt);
+}
+#endif
+
+/*  */
+
+#ifndef	lint
+static int
+_susaplose(si, reason, ap)		/* what, fmt, args ... */
+	register struct SSAPindication *si;
+	int reason;
+	va_list ap;
+{
+	register char *bp;
+	char buffer[BUFSIZ];
+	register struct SSAPabort *sa;
+
+	if (si) {
+		bzero((char *) si, sizeof *si);
+		si->si_type = SI_ABORT;
+		sa = &si->si_abort;
+
+		asprintf(bp = buffer, ap);
+		bp += strlen(bp);
+
+		sa->sa_peer = 0;
+		sa->sa_reason = reason;
+		copySSAPdata(buffer, bp - buffer, sa);
+	}
+
+	return NOTOK;
+}
+#endif
+
+/*  */
+
+int
+ts2suslose(si, event, td)
+	register struct SSAPindication *si;
+	char *event;
+	register struct TSAPdisconnect *td;
+{
+	int reason;
+	char *cp, buffer[BUFSIZ];
+
+	if ((ssaplevel & ISODELOG_EXCEPTIONS) && event)
+		xsprintf(NULLCP, NULLCP,
+			 td->td_cc > 0 ? "%s: %s\n\t%*.*s" : "%s: %s", event,
+			 TuErrString(td->td_reason), td->td_cc, td->td_cc, td->td_data);
+
+	cp = "";
+	switch (td->td_reason) {
+	case DR_REMOTE:
+	case DR_CONGEST:
+		reason = SC_CONGEST;
+		break;
+
+	case DR_SESSION:
+	case DR_ADDRESS:
+		reason = SC_ADDRESS;
+		break;
+
+	case DR_REFUSED:
+		reason = SC_REFUSED;
+		break;
+
+	default:
+		(void) sprintf(cp = buffer, " (%s at transport)", TuErrString(td->td_reason));
+	case DR_NETWORK:
+		reason = SC_TRANSPORT;
+		break;
+	}
+
+	return susaplose(si, reason, NULLCP, "%s", *cp ? cp + 1 : cp);
+}

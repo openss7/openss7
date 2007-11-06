@@ -1,0 +1,236 @@
+% -*- LaTeX -*-		(really SLiTeX)
+
+\begin{bwslide}
+\part	{REVIEW OF\\ BACKGROUND MATERIAL}\bf
+
+\begin{nrtc}
+\item	THE OSI MODEL
+
+\item	THE UPPER-LAYER ARCHITECTURE
+
+\item	SERVICES AND SERVICE PRIMITIVES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+everyone in the audience should be comfortable the material in this modest
+review (and perhaps even bored, which is fine)
+\end{note}
+
+
+\begin{bwslide}
+\part*	{THE OSI MODEL}\bf
+
+\begin{nrtc}
+\item	A LAYERED ARCHITECTURE FOR COMPUTER COMMUNICATIONS
+
+\item	STANDARDIZED IN THE INTERNATIONAL COMMUNITY
+
+\item	NON-PROPRIETARY IN NATURE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE MODEL FROM A COMMUNICATIONS VIEWPOINT}
+
+\vskip.5in
+\diagram[p]{figure1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE MODEL FROM A COMPUTER VIEWPOINT}
+
+\vskip.5in
+\diagram[p]{figure2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{(OBLIGATORY SLIDE SHOWING)\\ THE 7--LAYER STACK}
+
+\vskip.5in
+\diagram[p]{figure3}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{THE UPPER-LAYER ARCHITECTURE}\bf
+
+\begin{nrtc}
+\item	BY ``UPPER-LAYER'' WE MEAN EVERYTHING ABOVE TRANSPORT:
+    \begin{nrtc}
+    \item	THE APPLICATION-SPECIFICS OF HOW THE NETWORK IS USED
+    \end{nrtc}
+
+\item	UNLIKE OTHER ARCHITECTURES THE SAME UPPER-LAYERS ARE USED
+	REGARDLESS OF THE APPLICATION
+
+\item	WHAT DIFFERS IS THE ACTUAL FUNCTIONALITY USED BY THE APPLICATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+it's not clear at this point the effect of connectionless-mode operation on
+the upper-layer architecture
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{THE UPPER-LAYER ARCHITECTURE (cont.)}
+
+\vskip.15in
+\diagram[p]{figure4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE OSI APPLICATION LAYER}
+
+\begin{nrtc}
+\item	MANY STANDARD SERVICE ELEMENTS
+    \begin{nrtc}
+    \item	ASSOCIATION CONTROL
+
+    \item	REMOTE OPERATIONS
+
+    \item	RELIABLE TRANSFER
+
+    \item	COMMITMENT, CONCURRENCY AND RECOVERY
+
+    \item	DIRECTORY SERVICES
+    \end{nrtc}
+
+\item	ABSTRACT SYNTAX NOTATION ONE (ASN.1)\\
+	(really a concept not an element, per se)
+
+\item	THE DISTINCTION WILL BE DISCUSSED LATER ON
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION USE OF UPPER-LAYER SERVICES}
+
+\vskip.5in
+\diagram[p]{figure5}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION SERVICE ELEMENTS}
+
+\begin{nrtc}
+\item	A USEFUL MECHANISM FOR DIVIDING RESPONSIBILITY OF THE ``TOTAL''
+	APPLICATION PROTOCOL
+
+\item	PROMOTES ``REUSE'' OF APPLICATION LAYER FACILITIES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ FTAM USE OF LOWER-LAYER SERVICES}
+
+\vskip.5in
+\diagram[p]{figure24}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{SERVICES AND\\ SERVICE PRIMITIVES}\bf
+
+\begin{nrtc}
+\item	PEERS COMMUNICATE VIA \emph{SERVICE PRIMITIVES}
+
+\item	A PRIMITIVE IS AN ABSTRACTION
+    \begin{nrtc}
+    \item	NOT AN INTERFACE
+    \end{nrtc}
+
+\item	SERVICE PRIMITIVES, LIKE PROCEDURE CALLS, HAVE TYPED PARAMETERS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERVICES vs. PROTOCOLS}
+
+\vskip.5in
+\diagram[p]{figure23}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERVICE}
+
+\begin{nrtc}
+\item	IN GENERAL, THERE ARE THREE KINDS OF SERVICES
+    \begin{nrtc}
+    \item	\emph{CONFIRMED}
+	\begin{nrtc}
+	\item	IN WHICH A REQUEST ALWAYS RESULTS IN A RESPONSE
+	\end{nrtc}
+
+    \item	\emph{UNCONFIRMED}
+	\begin{nrtc}
+	\item	IN WHICH NO RESPONSE IS RETURNED
+	\end{nrtc}
+
+    \item	\emph{PROVIDER-INITIATED}
+	\begin{nrtc}
+	\item	IN WHICH THE SERVICE PROVIDER INDICATES SOME SITUATION
+	\end{nrtc}
+    \end{nrtc}
+
+\item	CONFIRMATION IS UNRELATED TO RELIABILITY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERVICE PRIMITIVES}
+
+\begin{nrtc}
+\item	EACH LAYER (OR ELEMENT) OFFERS ONE OR MORE SERVICES
+    \begin{nrtc}
+    \item	e.g., A-ASSOCIATE
+    \end{nrtc}
+
+\item	A SERVICE CONSISTS OF ONE OR MORE PRIMITIVES
+
+\item	A CONFIRMED SERVICE HAS FOUR PRIMITIVES
+    \begin{nrtc}
+    \item	.REQUEST, .INDICATION, .RESPONSE, and .CONFIRMATION
+    \end{nrtc}
+
+\item	AN UNCONFIRMED SERVICE HAS TWO PRIMITIVES:
+    \begin{nrtc}
+    \item	.REQUEST,  and .INDICATION
+    \end{nrtc}
+
+\item	A PROVIDER-INITIATED SERVICE HAS ONE PRIMITIVE:
+    \begin{nrtc}
+    \item	.INDICATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: CONFIRMED SERVICE}
+
+\vskip.5in
+\diagram[p]{figure6}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: CONFIRMED SERVICE (cont.)}
+
+\vskip.5in
+\diagram[p]{figure30}
+\end{bwslide}

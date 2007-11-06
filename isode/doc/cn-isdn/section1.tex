@@ -1,0 +1,191 @@
+% run this through LaTeX with the appropriate wrapper
+
+\section	{Introduction and Motivation}
+To promote the use of open systems environments in the office,
+technical, and manufacturing environments,
+two influential user groups were formed,
+the Manufacturing Automation Protocol group (MAP),
+sponsored by General Motors Corporation,
+and, the Technical and Office Protocols group (TOP),
+sponsored by Boeing Computer Services.
+In order to act more effectively,
+the Society of Manufacturing Engineers (SME)
+consolidated the two user groups into MAP/TOP under SME sponsorship.
+MAP/TOP is championing the use of open systems interconnection (OSI),
+primarily in the United States.
+The widespread adoption of open standards is not a new idea,
+for example,
+the Department of the Defense has,
+since the mid-{\oldstyle 70\/}'s been mandating the use of what is now called
+the Defense Data Network (DDN) protocol suite for its computer-communication
+applications.
+
+MAP/TOP has received support from both the public and private sectors,
+particularly from users who have suffered for years with myriads of
+computer-based systems which simply do not talk to each other
+(even if all those systems are purchased from a single vendor).
+This has influenced the Department of Defense to clearly state,
+through a number of recent programs and proposals,
+that successful contractors must be able to communicate electronically,
+not only internally, but also with the customer (\dod/),
+preferably using the OSI protocols.
+
+This leaves most defense contractors and many others in the following
+situation:
+With the use of open standards, many benefits can be achieved.
+For example,
+the use of open standards makes it possible to solve the so-called
+{\em islands of automation\/} problem as described above.
+However,
+although the work currently being done in the MAP/TOP community promises a
+major breakthrough in electronic communications,
+MAP/TOP is generally not expected to achieve widespread use for at least
+five years.%
+\footnote{This problem can not be understated:
+for example,
+in the international committees,
+there is no consensus to the routing issues at the network layer.
+Some insiders suggest that three years of work will be required before
+the non-trivial routing problems are resolved (at the committee level).}
+Contractors planning to do business with the Department of Defense cannot
+afford the luxury of waiting five years before starting to solve their
+communications problems.
+Nor can they simply ``scrap'' everything and start from ``scratch'' when
+MAP/TOP has materialized.
+Hence, we find ourselves in a dilemma.
+
+\subsection	{Understanding the Problems}
+Thus far,
+we have isolated two problems:
+first, we want to be running MAP/TOP applications now;
+and,
+second, if we are using other computer-communication technologies now,
+it would be advantageous to migrate from our current approaches to the
+MAP/TOP approach.
+
+A key point in understanding the thrust of MAP/TOP,
+is that MAP/TOP bases itself on the OSI protocol suite.
+In many senses,
+MAP/TOP represents an effort to ``prune the OSI tree'' in order to provide
+vendors with a subset of the protocols which can be implemented in a timely
+manner.
+For example,
+MAP/TOP currently limits itself to local area networking.
+Further,
+as new needs arise,
+MAP/TOP influences the OSI community towards the development of protocols to
+meet those needs.
+Hence,
+for the remainder of this paper,
+we will use the term ``OSI protocol suite'',
+understanding that it includes MAP/TOP,
+without any loss in generality.
+
+While the last several years of work in OSI have resulted in a
+consensus regarding the transport layer and below,
+application protocols have not enjoyed this degree of attention
+(with perhaps the notable exception of MHS\cite{MHS}).
+Further,
+experience in the field repeatedly demonstrates that the development of
+standard application protocols takes as long, or {\em much longer},
+than protocols at other layers.
+Finally,
+considering that there is still a great deal of basic research to be
+done in a number of application protocols areas,
+such as distributed information bases and distributed robotic control,
+it becomes apparent that the problem of application protocol development
+is significant.
+
+\subsection	{Finding the Solutions}
+To solve these problems,
+we begin by considering two observations.
+First,
+many of these problems have been solved in the past by others.
+There are several other proprietary and open protocol suites,
+which address many of these problems.
+Indeed,
+the last 15~years of the literature describe several successful attempts
+at application (and other) protocols.
+Second,
+we note that MAP/TOP is based on the OSI protocol suite,
+which in turn is based on a layered architecture.
+The key here is that layered architectures allow us to
+``mix and match'' modules with similar requirements at a given layer as
+necessary to achieve an optimal solution.
+In all cases,
+the layered approach emphasizes the {\em services\/} provided at a layer,
+not the {\em implementation\/} of those services.
+
+Let us now continue with the problem at hand:
+how can we achieve a communications strategy consistent with the
+direction of MAP/TOP,
+{\em and\/} allow us to communicate electronically with the Department of
+Defense?
+In this paper,
+we suggest using the Defense Data Network (DDN) protocol suite,
+commonly referred to as TCP/IP,
+as the solution of choice.
+
+During the course of this paper,
+it will become clear that the approach we suggest is not limited to
+defense contractors only.
+Quite the contrary,
+we present several arguments which suggest that the
+immediate adoption of the DDN protocol suite as a migration path
+towards MAP/TOP and OSI is an optimal strategy.
+We base these arguments in part on the maturity and stability of the DDN
+protocols;
+on the multi-vendor support that TCP/IP enjoys;
+and on
+the widespread use of TCP/IP as an interconnection method among various
+proprietary solutions.
+
+In using the notion of layering to solve the problems,
+we observe that there are two fundamental approaches which can be used:
+\begin{itemize}
+\item	A {\em protocol translation\/} approach, as suggested by
+	Groenbaek\cite{TCP.convert.ISO} and others;
+	and,
+
+\item	an {\em interface translation\/} approach, which we suggest in this
+	paper.
+\end{itemize}
+We argue that our approach is superior since it accomplishes the same
+end-results as the protocol translation approach,
+but is much simpler and less expensive to implement.
+Further,
+our approach has two important advantages:
+it allows us to develop OSI standard applications directly on hosts using the
+DDN protocols,
+and any such applications will be able to ``run'' in either environment.
+
+\subsection	{What's in a Name?}
+Before proceeding,
+the authors feel it important to clarify some terminology used in this paper.
+Throughout this work,
+we refer to both ``DDN'' and ``OSI'' as different protocol suites.
+Although this is currently the dominant interpretation,
+there is an alternate perspective, which the authors and others subscribe to.
+
+This alternate view considers OSI as a technique for describing a
+com\-put\-er-com\-mun\-i\-cat\-ions architecture in terms of abstractions
+(e.g., layering, entities, services, protocols, access points, and so on).
+As such, it follows that there are varying interpretations of OSI,
+each with a reference model described in terms of these abstractions.
+For example,
+the Defense Data Network (DDN) protocol suite can be thought of as one
+interpretation of OSI;
+similarly,
+the protocols developed by the International Standards Organization (ISO),
+can be thought of as an alternate interpretation of OSI.
+That is,
+it is sensible for one to discuss
+the difference between the DDN and ISO protocol suites,
+even though the two suites are based on different reference models.
+The commonality the two protocol suites share is derived from the abstraction
+technique used to construct their respective models.
+
+In order to maximize the readability of this work,
+we have used the consensus interpretation throughout the paper.
+It is the opinion of the authors however that the alternate perspective is
+more powerful.

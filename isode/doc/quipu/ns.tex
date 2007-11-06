@@ -1,0 +1,18 @@
+\File{ns.py},{15:44},{Feb 16 1989}
+\L{\LB{\Proc{Query}Query ::= [0] \K{IMPLICIT} \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{16}{request\-id[0] \K{IMPLICIT} \K{INTEGER},}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{name[1] \K{IMPLICIT} IA5String,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{attribute[2] \K{IMPLICIT} IA5String,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{cache\-ok[3] \K{IMPLICIT} \K{BOOLEAN} \K{DEFAULT} \K{TRUE} \}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\Proc{Response}Response ::= [1] \K{IMPLICIT} \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{16}{request\-id[0] \K{IMPLICIT} \K{INTEGER},}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{name[1] \K{IMPLICIT} \K{ANY} \K{OPTIONAL}, }}
+\L{\LB{}\Tab{16}{}}
+\L{\LB{}\Tab{16}{value[2] \K{IMPLICIT}  \K{ANY} \K{OPTIONAL} \}}}
+\L{\LB{}}

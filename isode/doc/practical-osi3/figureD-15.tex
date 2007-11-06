@@ -1,0 +1,17 @@
+\File{figureD\-15.py},{14:11},{Mar  4 1991}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{    \K{IF} (containsType (s)) \K{THEN}}}
+\L{\LB{        dlist = keyedSearch (base, lhs (s), rhs (s));}}
+\L{\LB{    \K{ELSE}}}
+\L{\LB{        \K{IF} (length (base) == 0) \K{THEN}}}
+\L{\LB{            dlist = rootSearch (s);}}
+\L{\LB{        \K{ELSE}}}
+\L{\LB{            dlist = intermediateSearch (base, s);}}
+\L{\LB{}}
+\L{\LB{    matches = \K{NULL};}}
+\L{\LB{    \K{FOR} x \K{IN} dlist \K{DO}}}
+\L{\LB{        matches += purportedMatch (x, tail (p));}}
+\L{\LB{}}
+\L{\LB{    \K{RETURN} matches;}}
+\L{\LB{\}}}

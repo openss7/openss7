@@ -1,0 +1,37 @@
+\File{grind3\-3.c},{22:23},{Jun 12 1988}
+\L{\LB{\K{\#include} \<stdio.h\>}}
+\L{\LB{\K{\#include} \<isode\/ppkt.h\>}}
+\L{\LB{}}
+\L{\LB{\C{}\/* ARGSUSED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\Proc{main}main (argc, argv, envp)}}
+\L{\LB{\K{int}}\Tab{8}{argc;}}
+\L{\LB{\K{char}  **argv,}}
+\L{\LB{      **envp;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}     len;}}
+\L{\LB{    \K{char}   *cp;}}
+\L{\LB{    \K{register} PS}\Tab{16}{    ps;}}
+\L{\LB{    \K{register} PE}\Tab{16}{    pe;}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((ps = ps\_alloc (std\_open)) == NULLPS)}}
+\L{\LB{}\Tab{8}{error (\S{}\"ps\_alloc\"\SE{});}}
+\L{\LB{    \K{if} (std\_setup (ps, stdin) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"std\_setup: \%s\"\SE{}, ps\_errno (ps \-\> ps\_errno));}}
+\L{\LB{}}
+\L{\LB{    \K{for} (;;) \{}}
+\L{\LB{}\Tab{8}{\K{if} ((pe = ps2pe (ps)) == NULLPE)}}
+\L{\LB{}\Tab{8}{    \K{if} (ps \-\> ps\_errno)}}
+\L{\LB{}\Tab{16}{error (\S{}\"ps2pe: \%s\"\SE{}, ps\_errno (ps \-\> ps\_errno));}}
+\L{\LB{}\Tab{8}{    \K{else}}}
+\L{\LB{}\Tab{16}{\K{break};}\Tab{32}{\C{}\/* end\-of\-file *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* process ``pe\'\' here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    pe\_free (pe);}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    ps\_free (ps);}}
+\L{\LB{}}
+\L{\LB{    exit (0);}}
+\L{\LB{\}}}

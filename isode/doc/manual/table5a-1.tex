@@ -1,0 +1,31 @@
+% run this through LaTeX with the appropriate wrapper
+%	PSAP Failure Codes
+
+\normalsize
+\[\begin{tabular}{rp{3.0in}}
+	\multicolumn{2}{c}{\bf Provider-initiated Abort (fatal)}\\
+\tt PC\_ADDRESS&	Called presentation address unknown\\
+\tt PC\_AVAILABLE&	No PSAP available from those identified
+			presentation address\\
+\tt PC\_CONGEST&	Local limit exceeded\\
+\tt PC\_VERSION&	Protocol version not supported\\
+\tt PC\_UNSPECIFIED&	Unspecified\\
+\tt PC\_UNRECOGNIZED&	Unrecognized PPDU\\
+\tt PC\_UNEXPECTED&	Unexpected PPDU\\
+\tt PC\_SSPARAM&	Unexpected session service parameter\\
+\tt PC\_PPPARAM&	Unrecognized PPDU parameter\\
+\tt PC\_INVALID&	Invalid PPDU parameter\\
+\tt PC\_ABSTRACT&	Abstract syntax not supported\\
+\tt PC\_TRANSFER&	Proposed transfer syntaxes not supported\\
+\tt PC\_REFUSED&	Connect request refused on this network connection\\
+\tt PC\_SESSION&	Session disconnect\\
+\tt PC\_PROTOCOL&	Protocol error\\
+\tt PC\_ABORTED&	Peer aborted connection\\[0.2in]
+	\multicolumn{2}{c}{\bf User-initiated Abort (fatal)}\\
+\tt PC\_REJECTED&	Rejected by peer\\[0.2in]
+	\multicolumn{2}{c}{\bf Interface Errors (non-fatal)}\\
+\tt PC\_PARAMETER&	Invalid parameter\\
+\tt PC\_OPERATION&	Invalid operation\\
+\tt PC\_TIMER&		Timer expired\\
+\tt PC\_WAITING&	Indications waiting
+\end{tabular}\]

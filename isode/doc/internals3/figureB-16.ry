@@ -1,0 +1,11 @@
+evalContext APPLICATION-CONTEXT
+    APPLICATION SERVICE ELEMENTS	{ aCSE }
+    BIND				EvalBind
+    UNBIND				EvalUnbind
+    REMOTE OPERATIONS			{ rOSE }
+    INITIATOR CONSUMER OF		{ userElement }
+    ABSTRACT SYNTAXES			{ aCSE-abstract-syntax,
+					  eval-abstract-syntax }
+	::= { iso isode(17) demo(1) eval(8) application-context(2) }
+
+...

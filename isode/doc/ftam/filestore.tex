@@ -1,0 +1,691 @@
+% run this through SLiTeX with the appropriate wrapper
+
+\begin{bwslide}
+\part	{THE VIRTUAL FILESTORE}
+
+\begin{nrtc}\bf
+\item	PHILOSOPHY
+
+\item	FILE ATTRIBUTES
+
+\item	ACTIVITY ATTRIBUTES
+
+\item	DOCUMENT TYPES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+this section corresponds roughly to iso/dis 8571/2,
+but the concepts are explained in almost an entirely different way
+
+this description is done via successive refinement:
+concepts are introduced and continuously expanded
+
+hopefully,
+this is less intimidating than the way the standard presents things$\ldots$
+\end{note}
+
+
+\begin{bwslide}
+\part*	{PHILOSOPHY}\bf
+
+\begin{nrtc}
+\item	AS WITH ALL ``OPEN SYSTEM'' SERVICES
+    \begin{nrtc}
+    \item	DESCRIBES A CONCEPTUAL MODEL OF THE VIRTUAL SERVICE
+
+    \item	SPECIFIES THE SERVICE AND THE PROTOCOL\\
+		INDEPENDENT OF ACTUAL LOCAL SYSTEMS
+	\begin{nrtc}
+	\item	PROGRAMATIC INTERFACES ARE NOT SPECIFIED
+	\end{nrtc}
+    \end{nrtc}
+
+\item	THE FUNDAMENTAL ABSTRACTION: THE VIRTUAL FILESTORE
+
+\item	A CONCEPTUAL MODEL OF A FILE SERVICE ON A LOCAL SYSTEM (LOCALSTORE)
+
+\item	DIFFICULT TASK~---~EXISTING FILE SERVICES ARE QUITE DIFFERENT
+
+\item	POTENTIALLY VERY REWARDING!
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RELATIONSHIP OF THE VIRTUAL FILESTORE\\ AND LOCALSTORE}
+
+\vskip.5in
+\diagram[p]{figure1}
+\end{bwslide}
+
+
+\begin{note}\em
+why a virtual filestore?
+
+it is unacceptable to choose any existing real filestore as the basis
+for the file service (all lack one thing or another)
+
+hence, it is desirable to devise a model which can reasonably express any
+existing real filestore.
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{ELEMENTS}\bf
+
+\begin{nrtc}
+\item	A (VIRTUAL) FILESTORE IS A COLLECTION OF FILES
+
+\item	A FILENAME IDENTIFIES EXACTLY ONE FILE IN THE FILESTORE
+
+\item	THERE IS NO EXPLICIT RELATIONSHIP BETWEEN DIFFERENT FILES IN THE
+	FILESTORE
+    \begin{nrtc}
+    \item	i.e., NO DIRECTORY STRUCTURE (A {\bf BIG} MISTAKE)
+    \end{nrtc}
+
+\item	FILES HAVE
+    \begin{nrtc}
+    \item	ATTRIBUTES (e.g., OWNERSHIP INFORMATION)
+
+    \item	CONTENTS (e.g., RANDOM-ACCESS RECORDS)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ELEMENTS -- ATTRIBUTES}
+
+\begin{nrtc}
+\item	TWO KINDS OF ATTRIBUTES ARE DEFINED
+
+\item	FILE ATTRIBUTES, WHICH EXIST ON A PER-FILE BASIS
+    \begin{nrtc}
+        \item	SIMULTANEOUS CLIENTS OF THE FILESTORE SEE THE SAME INFORMATION
+
+	\item	e.g., THE NAME OF THE FILE
+    \end{nrtc}
+
+\item	ACTIVITY ATTRIBUTES, WHICH EXIST ON A PER-CLIENT BASIS
+    \begin{nrtc}
+    \item	INTERACTIONS BY A CLIENT ARE NOT DIRECTLY VISIBLE TO OTHER
+		CLIENTS
+
+    \item	e.g., HOW THE FILE IS BEING TRAVERSED
+    \end{nrtc}
+
+\item	THE CLIENT INTERACTS ON AT MOST ONE FILE
+    \begin{nrtc}
+    \item	THE ``SELECTED'' FILE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ELEMENTS -- CONTENTS}
+
+\begin{nrtc}
+\item	TYPICALLY, FILES ARE DEFINED IN TERMS OF A ``DOCUMENT TYPE''
+
+\item	STATIC CHARACTERISTICS
+    \begin{nrtc}
+    \item	THE COMPOSITION OF THE FILE IN TERMS OF FILE ACCESS DATA
+		UNITS (FADUs)\\
+		e.g., A SEQUENTIAL COLLECTION OF RECORDS
+
+    \item	THE STRUCTURE OF EACH DATA UNIT (DUs)\\
+		e.g., EACH RECORD CONTAINS A PERSONNEL RECORD
+    \end{nrtc}
+
+\item	DYNAMIC CHARACTERISTICS
+    \begin{nrtc}
+    \item	HOW DATA UNITS ARE ENCODED ON THE NETWORK
+
+    \item	HOW DATA UNITS ARE REFERENCED (e.g., CURRENT POSITION)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{FILE ATTRIBUTES}\bf
+
+\begin{nrtc}
+\item	FOUR GROUPS OF FILE ATTRIBUTES
+
+\item	KERNEL GROUP (REQUIRED)
+    \begin{nrtc}
+    \item	NECESSARY FOR FILE SELECTION AND BASIC FILE TRANSFER
+    \end{nrtc}
+
+\item	STORAGE GROUP (OPTIONAL)
+    \begin{nrtc}
+    \item	DESCRIBES THE STORAGE CHARACTERISTICS FOR THE FILE
+    \end{nrtc}
+
+\item	SECURITY GROUP (OPTIONAL)
+    \begin{nrtc}
+    \item	DESCRIBES THE ACCESS CONTROL MECHANISMS FOR THE FILE
+    \end{nrtc}
+
+\item	PRIVATE GROUP (OPTIONAL)
+    \begin{nrtc}
+    \item	A MECHANISM TO CAPTURE NON-STANDARD (PROPRIETARY)
+		MECHANISMS THAT CAN NOT BE OTHERWISE REPRESENTED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+definitions of types is rather loose at this point in the presentation;
+e.g., ``string'' is usually an asn.1 graphicstring
+
+the emphasis at the moment is on the concept,
+not on the actual abstract data type
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{KERNEL GROUP}
+
+\begin{nrtc}
+\item	FILENAME: A SEQUENCE OF STRINGS
+    \begin{nrtc}
+    \item	MAPPING TO THE LOCALSTORE NAMING CONVENTIONS IS A
+		``LOCAL IMPLEMENTATION CHOICE''
+    \end{nrtc}
+
+\item	CONTENTS TYPE: STRUCTURING INFORMATION
+    \begin{nrtc}
+    \item	THE FILE STRUCTURE (A {\bf LOT} MORE LATER)
+    \end{nrtc}
+	
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STORAGE GROUP}
+
+\begin{nrtc}
+\item	STORAGE ACCOUNT: A STRING
+    \begin{nrtc}
+    \item	ENTITY ACCRUING FILE STORAGE CHARGES
+    \end{nrtc}	
+
+\item	IDENTITY OF USER AND THE DATE/TIME OF
+    \begin{nrtc}
+    \item	FILE CREATION
+
+    \item	LAST READ AND LAST MODIFICATION OF FILE CONTENTS
+
+    \item	LAST MODIFICATION OF FILE ATTRIBUTES
+    \end{nrtc}
+
+\item	FILE AVAILABILITY
+    \begin{nrtc}
+    \item	IMMEDIATE (FILE IS ``ON-LINE'')
+
+    \item	DEFFERRED (ACCESS TO FILE MAY ENCOUNTER DELAY,
+		e.g., AWAITING ARCHIVE RETRIEVAL)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STORAGE GROUP (cont.)}
+
+\begin{nrtc}
+\item	PERMITTED ACTIONS
+    \begin{nrtc}
+    \item	DESCRIBES THE TYPES OF DATA ACCESS THAT CAN BE PERFORMED ON
+		THE FILE
+
+    \item	HOW DATA UNITS MAY BE ACCESSED
+		(READ, WRITE, EXTEND, etc.)
+
+    \item	HOW THE FILE MAY BE TRAVERSED
+		(MOVING FROM ONE DATA UNIT TO ANOTHER)
+    \end{nrtc}
+
+\item	FILESIZE (IN OCTETS)
+    \begin{nrtc}
+    \item	AN ESTIMATE OF THE TOTAL SIZE OF THE FILE'S CONTENTS
+    \end{nrtc}
+	
+
+\item	FUTURE FILESIZE (IN OCTETS)
+    \begin{nrtc}
+    \item	A SOFT LIMIT ON THE TOTAL SIZE OF THE FILE'S CONTENTS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SECURITY GROUP}
+
+\begin{nrtc}
+\item	ACCESS CONTROL (AN ACCESS CONTROL LIST)\\
+	FOR EACH ELEMENT OF THE LIST:
+    \begin{nrtc}
+    \item	FILE ACTIONS PERMITTED
+
+    \item	ENTITY PERMITTED TO REQUEST ACTION (OPTIONAL)
+
+    \item	PASSWORD REQUIRED TO VALIDATE ACTION
+    \end{nrtc}
+
+\item	ENCRYPTION NAME
+    \begin{nrtc}
+    \item	DEFINES HOW FILE WAS ENCRYPTED
+
+    \item	FILES ARE TRANSFERRED IN ENCRYPTED FORM
+
+    \item	REQUIRES A REGISTRATION AUTHORITY TO BE ESTABLISHED
+    \end{nrtc}
+
+\item	LEGAL QUALIFICATIONS
+    \begin{nrtc}
+    \item	DEFINES THE ``LEGAL STATUS'' OF THE FILE
+
+    \item	MEANT TO BE USED WITH A NATIONAL PRIVACY LEGISLATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PRIVATE GROUP}
+
+\begin{nrtc}
+\item	A ``CATCH-ALL''
+
+\item	USE IS STRONGLY DISCOURAGED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{ACTIVITY ATTRIBUTES}\bf
+
+\begin{nrtc}
+\item	ACTIVITY ATTRIBUTES ARE ALSO DEFINED IN TERMS OF GROUPS\\
+	KERNEL, STORAGE, AND SECURITY (NO PRIVATE GROUP, OBVIOUSLY)
+
+\item	THESE ARE USUALLY INITIALIZED WHEN A FILE IS EITHER
+    \begin{nrtc}
+    \item	SELECTED
+
+    \item	OPENED FOR TRANSFER/ACCESS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+relationship of actions is rather loose at this point in the presentation;
+selection, open, transfer/access
+
+the next section will formalize these terms
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{KERNEL GROUP ACTIVITY ATTRIBUTES}
+
+\begin{nrtc}
+\item	ACTIVE CONTENTS TYPE
+    \begin{nrtc}
+    \item	THE CONTENTS TYPE
+    \end{nrtc}
+
+\item	CURRENT ACCESS REQUEST
+    \begin{nrtc}
+    \item	THOSE PERMITTED ACTIONS WHICH ARE REQUESTED BY THE CLIENT
+
+    \item	CONTENTS: READ, INSERT, REPLACE, EXTEND, ERASE
+
+    \item	ATTRIBUTES: READ, CHANGE, AND DELETE FILE
+    \end{nrtc}
+
+\item	CURRENT LOCATION
+
+\item	CURRENT PROCESSING MODE
+    \begin{nrtc}
+    \item	ACTIONS ON THE CONTENTS WHICH THE CLIENT WISHES TO PERFORM
+		(READ, INSERT, REPLACE, EXTEND, ERASE, LOCATE)
+    \end{nrtc}
+	
+\item	CURRENT APPLICATION ENTITY TITLE
+    \begin{nrtc}
+    \item	A GLOBAL IDENTIFIER FOR THE ENTITY PROVIDING THE FILE SERVICE
+		(A FILESTORE OR FILESERVER)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STORAGE GROUP ACTIVITY ATTRIBUTES}
+
+\begin{nrtc}
+\item	CURRENT ACCOUNT
+    \begin{nrtc}
+    \item	THE CLIENT'S ACCOUNT WHEN THE FILE SERVICE WAS INITIATED
+		(MAY BE CHANGED WHEN A FILE IS SELECTED)
+    \end{nrtc}
+
+\item	CURRENT ACCESS CONTEXT
+    \begin{nrtc}
+    \item	HOW THE FILE STRUCTURE IS COMMUNICATED ON THE NETWORK
+		(MUCH MORE ON THIS LATER)
+    \end{nrtc}
+
+\item	CURRENT CONCURRENCY CONTROL
+    \begin{nrtc}
+    \item	HOW SIMULTANEOUS CLIENTS INTERACT WHEN ACCESSING THE FILE
+
+    \item	FOR EACH ACTION: SHARED, EXCLUSIVE, NOT REQUIRED, NO ACCESS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SECURITY GROUP ACTIVITY ATTRIBUTES}
+
+\begin{nrtc}
+\item	ACTIVE LEGAL QUALIFICATION
+
+\item	CURRENT INITIATOR IDENTITY
+    \begin{nrtc}
+    \item	THE CLIENT'S IDENTITY WHEN THE FILE SERVICE WAS INITIATED
+    \end{nrtc}
+
+\item	CURRENT ACCESS PASSWORDS
+    \begin{nrtc}
+    \item	THE ACCESS LIST WHICH APPLIES TO THE CLIENT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{DOCUMENT TYPES}\bf
+
+\begin{nrtc}
+\item	STATIC CHARACTERISTICS
+    \begin{nrtc}
+    \item	THE FILE ACCESS STRUCTURE (CONSTRAINT SET NAME)
+
+    \item	THE PRESENTATION STRUCTURE (ABSTRACT SYNTAX NAME)
+    \end{nrtc}
+
+\item	DYNAMIC CHARACTERISTICS
+    \begin{nrtc}
+    \item	THE TRANSFER STRUCTURE (TRANSFER SYNTAX NAME)
+
+    \item	A IDENTIFICATION STRUCTURE (ACCESS CONTEXTS)
+    \end{nrtc}
+
+\item	``REGISTERED'' AND REFERENCED VIA A UNIQUE IDENTIFIER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FILE ACCESS STRUCTURE}
+
+\begin{nrtc}
+\item	ANY FILE'S CONTENT CAN BE DESCRIBED AS A TREE
+
+\item	EACH NODE IN THE TREE CONTAINS
+    \begin{nrtc}
+    \item	A DESCRIPTOR (A NAME AND DISTANCE TO PARENT)
+
+    \item	OPTIONALLY, A DATA UNIT (DEFINED BY THE PRESENTATION STRUCTURE)
+
+    \item	OPTIONALLY, CHILDREN (OTHER NODES)
+    \end{nrtc}
+
+\item	THE ROOT NODE DEFINES THE ``STARTING'' POINT FOR THE FILE
+
+\item	NEED A WAY TO LIMIT THE COMPLEXITY OF THE TREE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONSTRAINT SETS}
+
+\begin{nrtc}
+\item	DEFINES THE STRUCTURE OF THE TREE AND HOW ACTIONS ON THE FILE
+	(e.g., WRITE, ERASE) CHANGE THE STRUCTURE AND POSITION
+
+\item	SEVERAL KINDS
+    \begin{nrtc}
+    \item	UNSTRUCTURED
+
+    \item	SEQUENTIAL FLAT
+
+    \item	ORDERED FLAT
+
+    \item	ORDERED FLAT WITH UNIQUE NAMES
+
+    \item	ORDERED HIERARCHICAL
+
+    \item	GENERAL HIERARCHICAL
+
+    \item	GENERAL HIERARCHICAL WITH UNIQUE NAMES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: UNSTRUCTURED CONSTRAINT SET}
+
+\vskip.5in
+\diagram[p]{figure2}
+\end{bwslide}
+
+
+\begin{note}\em
+a unnamed root node with a data unit but no children
+
+file can be transferred as a whole, or extended
+
+access to a part is not permitted
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: SEQUENTIAL FLAT CONSTRAINT SET}
+
+\vskip.5in
+\diagram[p]{figure3}
+\end{bwslide}
+
+
+\begin{note}\em
+a two-level tree:\\
+a root with no data unit but with zero or more children;
+and,
+each child has a data unit but no children
+
+data unit is identified based on position in the file (relation to siblings)
+
+insertions occur at end of file
+
+erase at root node to empty file
+
+ordered-flat differs by naming each child and identifying data units based
+on the name
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: GENERAL HIERARCHICAL CONSTRAINT SET}
+
+\vskip.5in
+\diagram[p]{figure4}
+\end{bwslide}
+
+
+\begin{note}\em
+hierarchical: a tree of arbitrary structure
+
+at a given level, nodes have the same ``type'' of name
+
+insert as sister (sibling):\\
+the data unit becomes the next child visited when using preorder traversal
+(not valid for the root node, obviously)
+
+insert as child:\\
+the data unit becomes the first child visited when using preorder traversal
+
+note difference between fadu and data(du)
+\end{note}
+
+
+\begin{bwoverlay}
+\ctitle	{EXAMPLE: GENERAL HIERARCHICAL CONSTRAINT SET}
+
+\vskip.5in
+\diagram[p]{figure4a}
+\end{bwoverlay}
+
+
+\begin{bwoverlay}
+\ctitle	{EXAMPLE: GENERAL HIERARCHICAL CONSTRAINT SET}
+
+\vskip.5in
+\diagram[p]{figure4b}
+\end{bwoverlay}
+
+
+\begin{bwoverlay}
+\ctitle	{EXAMPLE: GENERAL HIERARCHICAL CONSTRAINT SET}
+
+\vskip.5in
+\diagram[p]{figure4c}
+\end{bwoverlay}
+
+
+\begin{bwslide}
+\ctitle	{PRESENTATION STRUCTURE}
+
+\begin{nrtc}
+\item	STRUCTURE OF EACH DATA UNIT IS DEFINED USING ABSTRACT SYNTAX NOTATION
+	ONE (ASN.1)
+
+\item	SPECIFICATION CAN BE SIMPLE, e.g., A STRING OF OCTETS
+
+\item	OR COMPLEX, e.g., A PERSONNEL RECORD
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRANSFER STRUCTURE}
+
+\begin{nrtc}
+\item	DATA UNITS ARE COMPOSED OF ``DATA ELEMENTS''
+
+\item	EACH DATA ELEMENT MAPS DIRECTLY TO A ``WRITE'' TO THE NETWORK
+
+\item	A TRANSFER STRUCTURE IS SAID TO BE ``SELF-DELIMITING'' IF EACH
+	DATA UNIT MAPS TO EXACTLY ONE DATA ELEMENT
+
+\item	OTHERWISE, A 1:n RATIO IS USED AS AN EFFICIENCY ``HACK''
+    \begin{nrtc}
+    \item	DATA ELEMENTS ARE CONCATENATED TO FORM A SINGLE DATA UNIT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{IDENTIFICATION STRUCTURE}
+
+\begin{nrtc}
+\item	ACCESS CONTEXT:
+	AN ALGORITHM FOR DEFINING A ASPECT OF THE FILE STRUCTURE
+
+\item	ACTIONS TAKEN IN THE CONTEXT OF THE CURRENT POSITION\\ (i.e., NODE)
+
+\item	RECURSIVE ACTIONS PERFORMED IN PREORDER TRAVERSAL
+
+\item	IMPORTANT DISTINCTION
+    \begin{nrtc}
+    \item	ALL DATA UNITS~---~THE NODE'S DATA UNIT AND DATA BELONGING
+		TO ALL CHILDREN OF THE NODE
+
+    \item	SINGLE DATA UNIT~---~THE NODE'S DATA UNIT (IGNORE CHILDREN)
+    \end{nrtc}
+
+\item	SEVERAL DEFINED (OF COURSE)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: ACCESS CONTEXTS}
+
+\vskip.5in
+\diagram[p]{figure4}
+\end{bwslide}
+
+
+\begin{note}\em
+unstructured single data unit (US):\\
+transmit the node's data
+
+unstructured all data units (UA):\\
+transmit all data in the fadu
+
+flat single data unit (FS):\\
+transmit the single node's name and all data in the fadu
+
+flat one level data units (FL):\\
+transmit names/data from all nodes at a given level having data
+
+flat all data units (FA):\\
+transmit names/data from all nodes having data
+
+hierarchical no data units (HN):\\
+transmit name, data, and structure
+
+hierarchical all data units (HA):\\
+transmit name, data, and structure
+\end{note}
+
+
+\begin{bwslide}
+\part*	{SUMMARY}\bf
+
+\begin{nrtc}
+\item	THE VIRTUAL FILESTORE IS THE OPEN SYSTEMS ABSTRACTION OF A LOCALSTORE
+
+\item	FILES CONTAIN ATTRIBUTES AND STRUCTURING INFORMATION IN ADDITION TO
+	``TYPED'' DATA
+
+\item	FILES ARE DISTINGUISHED BY NAME
+
+\item	SOME ATTRIBUTES ARE DYNAMIC, ON A PER-CLIENT BASIS
+
+\item	STRUCTURE IS BASED ON A HIERARCHICAL MODEL
+
+\item	DATA AND STRUCTURE ARE SEPARATE AND DISTINCT
+
+\item	DOCUMENT TYPES PROVIDE AN ABBREVIATED METHOD FOR REFERRING TO THE
+	FILE STRUCTURE
+\end{nrtc}
+\end{bwslide}

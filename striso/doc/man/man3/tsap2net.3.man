@@ -224,7 +224,7 @@ for additional compatibility information.
 .I SunLink OSI
 documentation.
 .[
-sunlink
+sunlink-tli
 .]
 .\"
 .\"
@@ -234,7 +234,7 @@ sunlink
 first appeared in
 .IR "SunLink OSI" .
 .[
-sunlink
+sunlink-tli
 .]
 .\"
 .\"

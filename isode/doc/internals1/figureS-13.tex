@@ -1,0 +1,18 @@
+\File{figureS\-13.c},{11:29},{May  5 1990}
+\L{\LB{\Proc{if}}\Tab{8}{    \K{if} (oid \-\> oid\_nelem == ot \-\> ot\_name \-\> oid\_nelem) \{}}
+\L{\LB{}\Tab{16}{\K{if} ((rt = rts\_inet) == NULL)}}
+\L{\LB{}\Tab{16}{    \K{return} NOTOK;}}
+\L{\LB{}\Tab{16}{\K{if} ((new = oid\_extend (oid, IFN\_SIZE)) == NULLOID)}}
+\L{\LB{}\Tab{16}{    \K{return} int\_SNMP\_error\_\_status\_genErr;}}
+\L{\LB{}\Tab{16}{ip = new \-\> oid\_elements + new \-\> oid\_nelem \- IFN\_SIZE;}}
+\L{\LB{}\Tab{16}{\K{if} (v \-\> name) free\_SNMP\_ObjectName (v \-\> name);}}
+\L{\LB{}\Tab{16}{v \-\> name = new;}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}\Tab{8}{    \K{else}}}
+\L{\LB{}\Tab{16}{\K{if} ((rt = get\_rtent (ip = oid \-\> oid\_elements}}
+\L{\LB{}\Tab{40}{    + oid \-\> oid\_nelem \- IFN\_SIZE,}}
+\L{\LB{}\Tab{32}{     IFN\_SIZE, rts\_inet, 1)) == NULL)}}
+\L{\LB{}\Tab{16}{    \K{return} NOTOK;}}
+\L{\LB{\Proc{for}}\Tab{8}{    \K{for} (i = IFN\_SIZE, jp = rt \-\> rt\_instance; i \> 0; i\-\-)}}
+\L{\LB{}\Tab{16}{*ip++ = *jp++;}}
+\L{\LB{}\Tab{8}{    \K{break};}}

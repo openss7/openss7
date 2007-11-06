@@ -1,0 +1,59 @@
+.PS
+.ps 20
+## figure A-22
+
+boxwid	= 2*boxwid
+
+B0:	box "application"
+B1:	box "local mapping" with .n at (B0.s.x,B0.s.y-boxht/1.5)
+B2:	box with .n at (B1.s.x,B1.s.y-boxht/1.5) width 1.5*boxwid height 5*boxht
+B3:	box "vt" \
+	    with .n at (B2.n.x,B2.n.y-(boxht/3)) width 1.25*boxwid height 1.5*boxht
+B4:	box "presentation" with .sw at B2.sw width 1.5*boxwid
+B5:	box "acse" with .e at (B3.e.x,B3.se.y-(B3.se.y-B4.nw.y)/2) \
+	    width .5*boxwid height .75*boxht
+B6:	box invis "$\ldots$" with .nw at B2.sw width 1.5*boxwid
+##
+L1:	line <-> from (B1.sw.x-(B1.sw.x-B1.s.x)/2,B1.s.y) \
+	          to (B1.sw.x-(B1.sw.x-B1.s.x)/2,B3.n.y)
+L2:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B1.s.y) \
+	          to (B1.se.x-(B1.se.x-B1.s.x)/2,B3.n.y)
+L3:	line <-> from (B1.sw.x-(B1.sw.x-B1.s.x)/2,B3.s.y) \
+	          to (B1.sw.x-(B1.sw.x-B1.s.x)/2,B4.n.y)
+L4:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B3.s.y) \
+	          to (B1.se.x-(B1.se.x-B1.s.x)/2,B5.n.y)
+L5:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B5.s.y) \
+	          to (B1.se.x-(B1.se.x-B1.s.x)/2,B4.n.y)
+L6:	line <-> from (B1.sw.x-(B1.sw.x-B1.s.x)/2,B0.s.y) \
+	          to (B1.sw.x-(B1.sw.x-B1.s.x)/2,B1.n.y)
+L7:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B0.s.y) \
+	          to (B1.se.x-(B1.se.x-B1.s.x)/2,B1.n.y)
+##
+B10:	box "terminal" with .nw at (B0.ne.x+(B2.ne.x-B2.nw.x),B0.nw.y)
+B11:	box "local mapping" with .n at (B10.s.x,B10.s.y-boxht/1.5)
+B12:	box with .n at (B11.s.x,B11.s.y-boxht/1.5) width 1.5*boxwid height 5*boxht
+B13:	box "vt" \
+	    with .n at (B12.n.x,B12.n.y-(boxht/3)) width 1.25*boxwid height 1.5*boxht
+B14:	box "presentation" with .sw at B12.sw width 1.5*boxwid
+B15:	box "acse" with .e at (B13.e.x,B13.se.y-(B13.se.y-B14.nw.y)/2) \
+	    width .5*boxwid height .75*boxht
+B16:	box invis "$\ldots$" with .nw at B12.sw width 1.5*boxwid
+##
+L11:	line <-> from (B11.sw.x-(B11.sw.x-B11.s.x)/2,B11.s.y) \
+	          to (B11.sw.x-(B11.sw.x-B11.s.x)/2,B13.n.y)
+L12:	line <-> from (B11.se.x-(B11.se.x-B11.s.x)/2,B11.s.y) \
+	          to (B11.se.x-(B11.se.x-B11.s.x)/2,B13.n.y)
+L13:	line <-> from (B11.sw.x-(B11.sw.x-B11.s.x)/2,B13.s.y) \
+	          to (B11.sw.x-(B11.sw.x-B11.s.x)/2,B14.n.y)
+L14:	line <-> from (B11.se.x-(B11.se.x-B11.s.x)/2,B13.s.y) \
+	          to (B11.se.x-(B11.se.x-B11.s.x)/2,B15.n.y)
+L15:	line <-> from (B11.se.x-(B11.se.x-B11.s.x)/2,B15.s.y) \
+	          to (B11.se.x-(B11.se.x-B11.s.x)/2,B14.n.y)
+L16:	line <-> from (B11.sw.x-(B11.sw.x-B11.s.x)/2,B10.s.y) \
+	          to (B11.sw.x-(B11.sw.x-B11.s.x)/2,B11.n.y)
+L17:	line <-> from (B11.se.x-(B11.se.x-B11.s.x)/2,B10.s.y) \
+	          to (B11.se.x-(B11.se.x-B11.s.x)/2,B11.n.y)
+##
+L20:	line <-> dashed from B3.e to B13.w "VTP" ""
+##
+.PE

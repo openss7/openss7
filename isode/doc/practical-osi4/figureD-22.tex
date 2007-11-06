@@ -1,0 +1,15 @@
+\File{figureD\-22.py},{16:32},{May  1 1991}
+\L{\LB{aeSearch (base: DN; sac: \K{OBJECT} \K{IDENTIFIER};}}
+\L{\LB{          subtreeType: SubtreeType): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    \C{}\-\- map onto Directory Search}}
+\CE{}\L{\LB{    \C{}\-\- baseObject: `base\'}}
+\CE{}\L{\LB{    \C{}\-\- subset: `subtreeType\'}}
+\CE{}\L{\LB{    \C{}\-\- filter:}}
+\CE{}\L{\LB{    \C{}\-\-     build filter\-item of `sac\' using equality over}}
+\CE{}\L{\LB{    \C{}\-\-         supportedApplicationContext}}
+\CE{}\L{\LB{    \C{}\-\- selection: all attributes and values}}
+\CE{}\L{\LB{}}
+\L{\LB{    \C{}\-\- cache returned entries and associated attributes\/values}}
+\CE{}\L{\LB{    \K{RETURN} search\-results;}}
+\L{\LB{\}}}

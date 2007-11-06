@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $
+ @(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/15 17:18:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:32:59 $ by $Author: brian $
+ Last Modified $Date: 2007/10/15 17:18:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_pmod.c,v $
+ Revision 0.9.2.6  2007/10/15 17:18:50  brian
+ - fix for freezestr on 2.4 kernels
+
  Revision 0.9.2.5  2007/08/15 05:32:59  brian
  - GPLv3 updates
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $"
+#ident "@(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/15 17:18:50 $"
 
 static char const ident[] =
-    "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $";
+    "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/15 17:18:50 $";
 
 /*
  *  This is MX-PMOD.  This is a pushable STREAMS module that can be pushed on one end of a
@@ -89,11 +92,11 @@ static char const ident[] =
 #include <sys/mxi_ioctl.h>
 
 /* don't really want the SUN version of these */
-#undef freezestr
-#undef unfreezestr
+//#undef freezestr
+//#undef unfreezestr
 
 #define MX_DESCRIP	"MX (Multiplex) STREAMS PIPE MODULE."
-#define MX_REVISION	"OpenSS7 $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $"
+#define MX_REVISION	"OpenSS7 $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/15 17:18:50 $"
 #define MX_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_DEVICE	"Provides OpenSS7 MX pipe driver."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1246,16 +1249,15 @@ static void
 mx_block(struct mx *mx, queue_t *q)
 {
 	mblk_t *mp;
-	pl_t pl;
 
 	/* find the first M_DATA block on the queue, or M_PPROTO message block containing an
 	   MX_DATA_REQ primitive. */
-	pl = freezestr(q);
+	freezestr(q);
 	for (mp = q->q_first; mp && DB_TYPE(mp) != M_DATA
 	     && (DB_TYPE(mp) != M_PROTO || *(mx_ulong *) mp->b_rptr != MX_DATA_REQ);
 	     mp = mp->b_next) ;
 	rmvq(q, mp);
-	unfreezestr(q, pl);
+	unfreezestr(q);
 	if (mp) {
 		if (canputnext(q)) {
 			/* If it is an MX_DATA_REQ primitive, alter it to an MX_DATA_IND primitive. 

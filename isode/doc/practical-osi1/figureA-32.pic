@@ -1,0 +1,45 @@
+.PS 5.0i
+lineht	=	3*lineht/2
+## figure A-32
+B1:	box "\sf (N)-service" "\sf user"
+	line down from B1.s
+B3:	box "\sf (N)-service" "\sf entity"
+	line down from B3.s
+B5:	box invis
+##
+B2:	box "\sf (N)-service" "\sf user" with .w at (B1.e.x+3*linewid, B1.e.y)
+	line down from B2.s
+B4:	box "\sf (N)-service" "\sf entity"
+	line down from B4.s
+B6:	box invis
+##
+	line from B3.e to B4.w dashed
+	move to ((B3.e.x+B4.w.x)/2, B3.e.y) \
+	    "\sf \begin{tabular}{c} (N)-service protocol\\ specification\end{tabular}"
+##
+B7:	box "\sf (N-1)-service provider" with .nw at B5.nw width (B6.ne.x-B5.nw.x)
+##
+B10:	box dashed with .nw at (B1.w.x-linewid/2, (B1.s.y+B3.n.y)/2) \
+		height (B1.s.y-B7.s.y) \
+		width  ((B2.e.x+linewid/2)-(B1.w.x-linewid/2))
+	move to B10.ne; \
+	    "\sf \ \begin{tabular}{c}(N)-service\\ definition\end{tabular}" ljust
+##
+B8:	box invis "\sf (N)-service access point" \
+		with .n at ((B1.c.x+B2.c.x)/2, B1.s.y) \
+		height boxht/2 width 3*boxwid/2
+	arrow from (B8.sw.x, B8.sw.y+boxht/10) \
+		to (B3.n.x+linewid/12, (B1.s.y+B3.n.y)/2+lineht/20)
+	arrow from (B8.se.x, B8.se.y+boxht/10) \
+		to (B4.n.x-linewid/12, (B2.s.y+B4.n.y)/2+lineht/20)
+##
+B9:	box invis with .s at B7.n \
+		height lineht/2 \
+		width (B4.c.x-B2.c.x) \
+		"\sf (N-1)-service access point"
+	arrow from (B8.sw.x, B9.c.y-boxht/10) \
+		to (B3.n.x+linewid/12, B7.n.y+lineht/20)
+	arrow from (B8.se.x, B9.c.y-boxht/10) \
+		to (B4.n.x-linewid/12, B7.n.y+lineht/20)
+##
+.PE

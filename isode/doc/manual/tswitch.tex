@@ -1,0 +1,381 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{The Transport Switch}\label{tswitch}
+As of this writing,
+the concept of ubiquitous OSI has not yet been realized.
+In particular,
+there continues to be disagreement on the transport/network protocols to be
+used to provide end-to-end service.
+As a result,
+interworking between sites in many cases is the {\em exception},
+not the rule.
+
+In order to facility communication,
+the ISODE has a powerful abstraction,
+the {\em Transport Switch}.
+The goal of the transport switch is to hide the complex underpinnings of the
+``real world'' of OSI from the user of the transport service.
+In order to make effective use of this abstraction,
+it may be necessary to tailor the ISODE
+(using the \man isotailor(5) file described in Chapter~\ref{isotailor}).
+
+To explain how to use the transport switch effectively,
+it is necessary to introduce some terminology.
+
+\section	{Transport Stacks}
+A {\em TS-stack\/} refers to a combination of transport protocol and network
+service that is used to provide end-to-end transport service.
+The ISODE, depending on how you configure it at compile-time,
+supports any combination of these stacks: 
+\[\begin{tabular}{rl}
+\multicolumn{1}{c}{\bf Mneumoic}&
+		\multicolumn{1}{c}{\bf TS-Stack}\\
+\verb"tcp"&	RFC1006 over TCP/IP\\
+\verb"x25"&	TP0 over X.25\\
+\verb"x25-84"&	TP0 over X.25(1984)\\
+\verb"bridge"&	TP0 over the TP0--bridge\\
+\verb"tp4"&	TP4 over CLNP
+\end{tabular}\]
+Internally,
+the ISODE uses ``typing'' on all network addresses to one of these choices.
+From a practical perspective,
+usually only the \verb"tcp", \verb"x25-84" and \verb"x25" are of interest.
+
+The run-time tailoring variable \verb"ts_stacks" keeps track of the
+TS-stacks available on your host.
+This defaults to the TS-stacks that were configured at compile-time.
+However, if you are sharing executables between machines with different
+network attachments,
+you will want to change this.
+Generally,
+you compile-time configure the ISODE for all stacks available at your site.
+Then,
+for each host you install the executables on,
+you set the variable \verb"ts_stacks" accordingly.
+So, suppose you have a host with both TCP and X.25 services,
+but that all the other hosts at your site have only TCP.
+In this case
+(assuming binary compatibility between the hosts at your site),
+you generate the ISODE on the host with both TCP and X.25 services configured.
+When you move the executables to the TCP only hosts,
+you add the line
+\begin{quote}\small\begin{verbatim}
+ts_stacks: tcp
+\end{verbatim}\end{quote}
+to the \file{isotailor} file on those hosts.
+
+\section	{OSI Communities}
+An OSI {\em community\/} is a collection of hosts which share a common TS-stack
+along with basic connectivity.
+Simply put,
+a community consists of end-systems that all interwork with each other.
+In a perfect world,
+there would be but a single community.
+\verb"realns".
+But it isn't a perfect world,
+my favorite Rock group, {\em Bangles}, broke up in September
+of '{\oldstyle 89}, and I am very upset about this.
+But that is another story.
+
+There are several communities using OSI at present,
+the short list is:
+\[\begin{tabular}{rll}
+\multicolumn{1}{c}{\bf Mneumoic}&
+		\multicolumn{1}{c}{\bf Community}&
+					\multicolumn{1}{c}{\bf TS-stack}\\
+\verb"int-x25"&	the International X.25&	\verb"x25"\\
+\verb"janet"&	the JANET in the UK&	\verb"x25"\\
+\verb"internet"& the capital-I Internet&\verb"tcp"\\
+\verb"localTCP"& the TCP loopback address&
+					\verb"tcp"\\
+\verb"IXI"&	International X.25 Interconnect&
+					\verb"x25"
+\end{tabular}\]
+These are all termed {\em interim\/} communities as they do not use the real
+OSI network service.
+In order to facility communications between these communities
+(and others, e.g., private LANs),
+an Interim addressing scheme has been defined \cite{Interim.Addresses}
+(which is included in the ISODE documentation set,
+look in the directory \file{doc/interim/} in the source tree).
+
+Thus,
+the first task when running the ISODE is to determine which communities
+your site belongs to.
+The \verb"ts_communities" run-time tailoring variable keeps track of the
+communities which your host can (in)directly reach.
+This defaults to the four communities above,
+plus the \verb"realNS" community.
+Whilst this is the most sensible default,
+this choice is probably wrong for most sites.
+So,
+if your host is connected to the International X.25 but not the JANET,
+you add the line
+\begin{quote}\small\begin{verbatim}
+ts_communities: int-x25
+\end{verbatim}\end{quote}
+to the \file{isotailor} file on that host.
+
+Of course,
+if the host in question is connected not only to the International X.25 but
+also belongs to the capital-I Internet, then the line might read
+\begin{quote}\small\begin{verbatim}
+ts_communities: int-x25 internet
+\end{verbatim}\end{quote}
+instead.
+This raises an important question:
+if a host wishes to contact another host,
+and the two have multiple communities in common,
+what preference is given when connections are attempted?
+The answer is that the ordering of the communities in the
+\verb"ts_communities" run-time tailoring variable tells the ISODE what the
+preference is.
+Thus,
+in the example above,
+if there were two hosts connected to both the International X.25 and the
+capital-I Internet,
+and one of the hosts wished to talk to the other,
+the International X.25 community would be tried first.
+If a connection could not be established,
+then the capital-I Internet community would be tried.
+
+There are a few common site configurations.
+If the site has access to the capital-I Internet,
+then usually all hosts belong to the capital-I Internet community,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+ts_communities: internet
+\end{verbatim}\end{quote}
+It is possible that one or more hosts at this site may have access to the
+International X.25,
+and exactly these hosts would have connectivity to this second community:
+\begin{quote}\small\begin{verbatim}
+ts_communities: internet int-x25
+\end{verbatim}\end{quote}
+
+\subsection	{Defining a new OSI community}
+Another common configuration is that a site has a single host that is
+connected to the International X.25.
+In addition,
+there is a private LAN,
+running the TCP/IP protocols,
+that all hosts at the site are connected to.
+In this case,
+you need to define a community name for your site.
+This is done by describing your community name as a macro in the
+\man isomacros(5) file and then enabling use of this community in the
+\man isotailor(5) file.
+
+To describe your community,
+you create a macro of the form:
+\begin{quote}\small\begin{verbatim}
+name    TELEX+value+stack+number+
+\end{verbatim}\end{quote}
+where:
+\begin{describe}
+\item[\verb"name":] is the name of your community;
+
+\item[\verb"value":] corresponds to the TELEX number at your site.
+(This is traditionally a three-digit international code followed by a
+national TELEX number.)
+The combination of \verb"TELEX+value" defines an OSI address prefix which your
+site uniquely administers;
+
+\item[\verb"stack":] is either \verb"RFC-1006" or \verb"X.25(80)" indicating
+the TS-stack used for the addresses;
+and,
+
+\item[\verb"number":] by convention is a two-digit decimal number from~01
+to~99 (this allows you to define up to 99 communities at your site).
+\end{describe}
+Of course,
+there are other methods for generating unique OSI addresses,
+but this is the only method supported in the current implementation of the
+ISODE.
+
+\subsubsection	{Defining a new TCP-based community}
+Consider the the case of an isolated LAN running the TCP/IP protocols.
+
+First,
+edit the file \file{support/macros.local} in the source area and add a line 
+line like this: 
+\begin{quote}\small\begin{verbatim}
+nott-ether	TELEX+00738700+RFC-1006+01+
+\end{verbatim}\end{quote}
+where \verb"00738700" corresponds to your TELEX number.
+Next,
+type
+\begin{quote}\small\begin{verbatim}
+# ./make macros
+\end{verbatim}\end{quote}
+as the super-user.
+This will install a new version of the \man isomacros(5) file.
+
+Second,
+in the \man isotailor(5) file, you would add this line:
+\begin{quote}\small\begin{verbatim}
+ts_interim: nott-ether
+\end{verbatim}\end{quote}
+which tells the ISODE about your new community.
+You would then add \verb"nott-ether" to the beginning of the value for the
+run-time tailoring variable \verb"ts_communities".
+So,
+on the hosts with only TCP, you would have:
+\begin{quote}\small\begin{verbatim}
+ts_interim:     nott-ether
+ts_communities: nott-ether
+\end{verbatim}\end{quote}
+and on the host which also had connectivity to the International X.25,
+you would have:
+\begin{quote}\small\begin{verbatim}
+ts_interim:     nott-ether
+ts_communities: nott-ether int-x25
+\end{verbatim}\end{quote}
+Note that it is {\bf critical\/} that the definition of \verb"ts_interim"
+occur {\bf before\/} the definition of \verb"ts_communities".
+
+\subsubsection	{Defining a new X.25-based community}
+Consider the case of a site which has access to the International X.25 and
+belongs to a private X.25 network.
+
+In this case,
+the macro definition might be:
+\begin{quote}\small\begin{verbatim}
+psi-wan     TELEX+00738700+X.25(80)+02+
+\end{verbatim}\end{quote}
+So,
+the tailoring variables would be
+\begin{quote}\small\begin{verbatim}
+ts_interim: psi-wan
+ts_communities: psi-wan
+\end{verbatim}\end{quote}
+for those hosts which are only on the private X.25 network,
+whilst
+\begin{quote}\small\begin{verbatim}
+ts_interim: psi-wan
+ts_communities: psi-wan int-x25
+\end{verbatim}\end{quote}
+would be used for hosts on both the International X.25 and the private X.25
+network.
+Again, it is critical that the definition of \verb"ts_interim"
+occur {before the definition of \verb"ts_communities".
+
+\subsection	{Heuristic Support}
+Finally,
+there are some cases when the ISODE must look at a simple string and derive an
+address. 
+If the string encoding for presentation address defined in
+\cite{String.Addresses},
+then the macro defined earlier will help.
+But,
+if a simpler string is used,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+% ftam gonzo
+\end{verbatim}\end{quote}
+or
+\begin{quote}\small\begin{verbatim}
+% ftam 00000511160013
+\end{verbatim}\end{quote}
+then it would be nice to have an intelligent default to use for the community
+associated with these.
+There are three run-time tailoring variables provided for this purpose:
+\[\begin{tabular}{ll}
+\multicolumn{1}{c}{\bf if it looks like}&
+		\multicolumn{1}{c}{\bf then use}\\
+an OSI NSAP&	\verb"default_nsap_community"\\
+a X.25 DTE&	\verb"default_x25_community"\\
+a TCP address&	\verb"default_tcp_community"
+\end{tabular}\]
+To continue our two examples of private communities.
+for the private TCP/IP LAN,
+it would make sense to add
+\begin{quote}\small\begin{verbatim}
+default_tcp_community: nott-ether
+\end{verbatim}\end{quote}
+to the \file{isotailor} file on each host.
+For the private X.25--based community,
+it would make sense to add
+\begin{quote}\small\begin{verbatim}
+default_x25_community: psi-wan
+\end{verbatim}\end{quote}
+instead.
+
+\section	{Transport-Service Bridges}
+There is one last question which must be considered:
+how can two hosts communicate if they do not have any communities in common?
+If there is a third host,
+which shares a community with the two other hosts,
+then a {\em TS-bridge\/} can be used to achieve connectivity on
+a per-connection basis.
+
+\subsection	{Client Hosts}
+For each host,
+examine the value of the \verb"ts_communities" run-time variable.
+For those communities which are not listed,
+but which you wish that host to be able to communicate with,
+you must add the definition of the appropriate TS-bridge to the
+\verb"tsb_communities" run-time tailoring variable.
+A definition consists of two tokens,
+the name of the community that the TS-bridge can reach,
+and the transport address of the TS-bridge
+(using the string encoding defined in \cite{String.Addresses}),
+e.g.,
+\begin{quote}\smaller\begin{verbatim}
+tsb_communities: internet Int-X25(80)=31344152401010+PID+03018000
+\end{verbatim}\end{quote}
+This says that the capital-I Internet community can be reached by contacting
+the TS-bridge located on the International X.25 at the specified DTE and PID.
+
+It is {\bf critical\/} to observe that the TS-bridge must share a common
+community with the host containing this definition.
+Thus,
+a more instructive example is:
+\begin{quote}\smaller\begin{verbatim}
+ts_communities: int-x25 internet
+tsb_communities: internet Int-X25(80)=31344152401010+PID+03018000
+\end{verbatim}\end{quote}
+which describes a host connected to the International X.25 that may wish to
+talk to hosts in the capital-I Internet community.
+
+Similarly,
+one could imagine a host belonging to the capital-I Internet community using
+the following definitions:
+\begin{quote}\smaller\begin{verbatim}
+ts_communities: internet int-x25
+tsb_communities: int-x25 Internet=gonzo.twg.com+17004
+\end{verbatim}\end{quote}
+
+\subsection	{Server Hosts}
+Typically,
+the entity responsible for a community also runs a TS-bridge which connects
+that community to the other Interim communities.
+Obviously,
+this host must support each of the Interim communities to be connected to the
+local community.
+The \verb"tsb_default_address" run-time tailoring variable is used to define
+the transport address (usually containing multiple network addresses) where
+the TS-bridge listens.
+
+So, to continue with the nott-ether example,
+the host on which the TS-bridge resides might have these definitions:
+\begin{quote}\tiny\begin{verbatim}
+ts_interim:	     nott-ether
+ts_communities:      nott-ether int-x25
+tsb_default_address: Nott-Ether=sheriff+17004\|Int-X25(80)=23426020017299+PID+03018000
+\end{verbatim}\end{quote}
+The rule is simple,
+for each community named in the \verb"ts_communities" run-time tailoring
+variable,
+a network address is present in the run-time tailoring variable
+\verb"tsb_default_address".
+By convention,
+for TCP-based addresses,
+TCP port 17004 is used, 
+whilst for X.25--based addresses,
+PID 0301800 is used.
+
+\section	{In Retrospect}
+What a mess!  There's a lot to be said for the focused ``one transport
+protocol, one network service'' approach used by the Internet suite of
+protocols.

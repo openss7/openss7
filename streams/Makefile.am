@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2007/08/13 22:45:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2007/10/17 17:42:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 22:45:51 $ by $Author: brian $
+# Last Modified $Date: 2007/10/17 17:42:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -119,6 +119,10 @@ if CONFIG_STREAMS_UTILS
 sbin_PROGRAMS			+= \
 				  insf \
 				  strvf
+endif
+
+if WITH_SNMP_AGENT
+sbin_PROGRAMS			+= strmib
 endif
 
 dist_sbin_SCRIPTS		=
@@ -470,8 +474,8 @@ EXTRA_TEX			+= \
 				scripts/texi/testsuite.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= configure.nexusware
-EXTRA_SCRIPTS			+= configure.nexusware
+dist_noinst_SCRIPTS		+= configure.nexusware scripts/missing2
+EXTRA_SCRIPTS			+= configure.nexusware scripts/missing2
 
 ##
 ## Rules for building kernel objects
@@ -716,6 +720,12 @@ strvf_CFLAGS			= $(USER_CFLAGS)
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
+strmib_SOURCES			= src/snmp/strMIB.c
+strmib_LDFLAGS			= $(SNMP_LDFLAGS)
+strmib_LDADD			= libstreams.la $(SNMP_LDADD)
+strmib_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+strmib_CFLAGS			= $(USER_CFLAGS)
+
 test_clone_SOURCES		= src/test/test-clone.c
 test_clone_LDFLAGS		=
 test_clone_LDADD		= libstreams.la
@@ -922,7 +932,9 @@ endif
 SUBDIRS += tests
 
 if DEVELOPMENT
+if DOCUMENTATION
 SUBDIRS += doc
+endif
 endif
 
 if PKG_BUILD_INDEP
@@ -1057,6 +1069,15 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.150  2007/10/17 17:42:57  brian
+# - build updates
+#
+# Revision 0.9.2.149  2007/10/15 17:21:25  brian
+# - SNMP updates
+#
+# Revision 0.9.2.148  2007/10/13 08:51:35  brian
+# - updates for 2.6.22 FC6 kernel and added MIBs
+#
 # Revision 0.9.2.147  2007/08/13 22:45:51  brian
 # - GPLv3 header updates
 #

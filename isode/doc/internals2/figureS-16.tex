@@ -1,0 +1,23 @@
+\File{figureS\-16.py},{15:21},{Oct 13 1990}
+\L{\LB{\C{}\-\- tags for SMUX\-specific PDUs are application\-wide to}}
+\CE{}\L{\LB{\C{}\-\- avoid conflict with tags for current (and future) SNMP\-generic PDUs}}
+\CE{}\L{\LB{}}
+\L{\LB{SMUX\-PDUs ::=}}
+\L{\LB{    \K{CHOICE} \{}}
+\L{\LB{}\Tab{8}{open            \C{}\-\- SMUX peer uses}}
+\CE{}\L{\LB{}\Tab{8}{    OpenPDU,    \C{}\-\- immediately after TCP open}}
+\CE{}\L{\LB{}}
+\L{\LB{}\Tab{8}{close           \C{}\-\- either uses immediately before TCP close}}
+\CE{}\L{\LB{}\Tab{8}{    ClosePDU,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{registerRequest \C{}\-\- SMUX peer uses}}
+\CE{}\L{\LB{}\Tab{8}{    RReqPDU,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{registerResponse \C{}\-\- SNMP agent uses}}
+\CE{}\L{\LB{}\Tab{8}{    RRspPDU,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{PDUs,            \C{}\-\- note that roles are reversed}}
+\CE{}\L{\LB{}}
+\L{\LB{}\Tab{8}{commitOrRollback \C{}\-\- SNMP agent uses}}
+\CE{}\L{\LB{}\Tab{8}{    SOutPDU}}
+\L{\LB{    \}}}

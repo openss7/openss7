@@ -1,0 +1,36 @@
+.PS
+.ps 20
+## figure 11
+B1:	box "NI"
+##
+B2:	box "8803" with .s at (B1.n.x-(boxwid+linewid), B1.n.y+lineht)
+	line from B2.s to (B1.n.x-boxwid/3, B1.n.y)
+B3:	box "CLNP" with .s at (B2.n.x, B2.n.y+(boxht+lineht))
+B4:	box "8802" with .n at (B3.s.x+3*linewid/2, B3.s.y-lineht/2)
+B5:	box "TP4" with .s at (B3.n.x, B3.n.y+lineht)
+	line from B2.n to B3.s
+	line from B4.n to (B3.s.x+boxwid/3, B3.s.y)
+	line from B4.s to (B2.n.x+boxwid/3, B2.n.y)
+	line from B3.n to B5.s
+##
+B6:	box "ENET" with .s at (B1.n.x+(boxwid+linewid), B1.n.y+lineht)
+	line from B6.s to (B1.n.x+boxwid/3, B1.n.y)
+B7:	box "IP" with .s at (B6.n.x, B6.n.y+(boxht+lineht))
+B8:	box "ARP" with .n at (B7.s.x+3*linewid/2, B7.s.y-lineht/2)
+B9:	box "TCP" with .s at (B7.n.x, B7.n.y+lineht)
+	line from B6.n to B7.s
+	line from B8.n to (B7.s.x+boxwid/3, B7.s.y)
+	line from B8.s to (B6.n.x+boxwid/3, B6.n.y)
+	line from B7.n to B9.s
+##
+	line from (B5.w.x-linewid/2, B5.n.y+lineht/2) \
+	     to   (B9.e.x+linewid/2, B9.n.y+lineht/2) dashed
+	move to (B9.e.x+linewid/2, B5.n.y+lineht/2); "\ TLI" ljust
+##
+B10:	box "FTAM" "" "UL" with .s at (B5.n.x, B5.n.y+lineht) height 3*boxht/2
+	line from B5.n to B10.s
+##
+B11:	box "FTP" with .s at (B9.n.x, B9.n.y+lineht) height 3*boxht/2
+	line from B9.n to B11.s
+##
+.PE

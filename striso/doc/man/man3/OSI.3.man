@@ -1,0 +1,346 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH OSI 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B OSI
+\- Open Systems Interconnect
+.SH OVERVIEW
+.PP
+THe Open Systems Interconnect modules, drivers, libraries and agents provide a
+rich framework for OSI applications and management.  This document provides a
+roadmap to the facilities in the striso package that support this framework.
+.PP
+We begin from the top down.
+.PP
+At the top of the stack are three applications of particular interest: DS,
+MHS, FTAM, VT, TMN.
+Each of these top-level applications has a C-lanaguage programming interface
+defined by the OpenGroup (formerly X/Open) as shown in the following table:
+.PP
+.TS
+tab(:);
+ll.
+T{
+DS
+T}:T{
+XDS
+.[
+XDS
+.]
+T}
+T{
+MS
+T}:T{
+XMS
+.[
+XMS
+.]
+T}
+T{
+MHS
+T}:T{
+XMHS
+.[
+XMHS
+.]
+T}
+T{
+FTAM
+T}:T{
+XFTAM
+.[
+XFTAM
+.]
+T}
+T{
+TMN
+T}:T{
+XMP
+.[
+XMP
+.]
+T}
+.TE
+.PP
+All of these higher level C-language APIs provide interfaces based on the
+manipulation of abstract data types based on ASN.1,
+.[
+x680
+.]
+which is provided programatically using the XOM.
+.[
+XOM
+.]
+.PP
+Underneath these we have ACSE
+.[
+x217
+.]
+and ROSE,
+.[
+x219
+.]
+which provide the application communications protocol support.  These are
+supported by anothe set of X/Open APIs as follows:
+.PP
+.TS
+tab(:);
+ll.
+T{
+ACSE
+.[
+x217
+.]
+.[
+x227
+.]
+.[
+x237
+.]
+T}:T{
+XAP
+.[
+XAP ACSE C303
+.]
+T}
+T{
+ROSE
+.[
+x219
+.]
+.[
+x229
+.]
+T}:T{
+XAP-ROSE
+.[
+XAP-ROSE
+.]
+T}
+T{
+DTP
+T}:T{
+XAP-TP
+.[
+XAP-TP
+.]
+T}
+.TE
+.PP
+Note that XAP-TP
+.[
+XAP-TP
+.]
+is likely sufficient for implementing a user-level API for TCAP.
+.[
+q771
+.]
+which is based on ROSE
+.[
+x219
+.]
+and DTP.
+XAP-ROSE
+.[
+XAP-ROSE
+.]
+is likely sufficient for implementing a user-level API for CMISE/CMIP,
+.[
+x710
+.]
+.[
+x711
+.]
+.PP
+XAP
+.[
+XAP ACSE C303
+.]
+is adequate for providing both interface to kernel-level communications
+facilities as well as  the ability to implement ACSE, Presentation and Session
+layers within a user-level library.
+Some simplified stacks can be provided directly by kernel-level drivers using
+the XTI-mOSI interface.
+.[
+XNS Issue 5.2
+.]
+.PP
+Underneath the Session layer is the Transport layer which is provided by
+XTI
+.[
+XNS Issue 5.2
+.]
+and
+TPI
+.[
+TPI Revision 2.0
+.]
+at the Transport Layer,
+NPI
+.[
+NPI Revision 2.0
+.]
+at the Network Layer,
+DLPI
+.[
+DLPI
+.]
+a the Data Link Layer,
+and
+CDI
+.[
+CDI OpenSS7
+.]
+at the communications device.
+.PP
+Note that NPI
+.[
+NPI Revision 2.0
+.]
+is also sufficient for implementing the SCCP.
+.[
+q711
+.]
+SCCP
+.[
+q711
+.]
+with a null transport layer could also be implemented using XTI
+.[
+XNS Issue 5.2
+.]
+with an OSI profile.
+.PP
+.SH CMISE
+.PP
+A CMISE stack is illustrated as follows:
+.PP
+.nf
+\fC\s-1\
+                                                                               
+                                 XMP Interface                                 
+                           _________________________                           
+                                |             |                                
+                      +---------+             +-------------+                  
+                      |                                     |                  
+               +--------------+                     +--------------+           
+               |              |                     |              |           
+               |    CMISE     |                     |     SNMP     |           
+               |              |                     |              |           
+               +--------------+                     +--------------+           
+                      |                                     |                  
+                   XAP-ROSE                                 |                  
+       +------------+    +-------------+                    |                  
+       |            |    |             |                    |                  
+       |    ACSE    |    |    ROSE     |                    |                  
+       |            |    |             |                    |                  
+       +------------+    +-------------+                    |                  
+              |                 |                           |                  
+              |                 |                           |                  
+              |                 |                           |                  
+              |                 |                           |                  
+              |                 |                           |                  
+              | XTI-OSI         | XTI-mOSI              XTI | XTI-INET         
+   ___________|_________________|____                 ______|_____             
+  |           |                 |                           |                  
+  |           | ???             | TPI                   TPI |                  
+  |    +------------+    +-------------+                    |                  
+  |    |            |    |    LPP      |                    |                  
+  |    |Presentation|    |  RFC 1095   |                    |                  
+  |    |            |    |             |                    |                  
+  |    +------------+    +-------------+                    |                  
+  |                             |                           |                  
+  |    +------------+           | TPI                       |                  
+  |    |            |           |___________________________|_____             
+  |    |  Session   |                                       |                  
+  |    |            |                                       |                  
+  |    +------------+                          _____________|_____             
+  |___________|_________________|_______      |             |                  
+      XTI-OSI | TPI     XTI-OSI | TPI         |             |                  
+       +------------+    +-------------+      |     +--------------+           
+       |            |    |             |      |     |              |           
+       |  Transport |    |  RFC 1006   |      |     |      TCP     |           
+       |            |    |             |      |     |              |           
+       +------------+    +-------------+      |     +--------------+           
+                                |             |                                
+                                |  TPI        |                                
+                                +-------------+                                
+                                                                               
+                                                                               
+\s+1\fP
+.fi
+

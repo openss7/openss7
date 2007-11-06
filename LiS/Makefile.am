@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.49 $) $Date: 2007/08/14 10:46:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.50 $) $Date: 2007/10/18 06:52:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 10:46:52 $ by $Author: brian $
+# Last Modified $Date: 2007/10/18 06:52:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -282,8 +282,8 @@ EXTRA_TEX			+= \
 				scripts/texi/lesser.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= configure.nexusware
-EXTRA_SCRIPTS			+= configure.nexusware
+dist_noinst_SCRIPTS		+= configure.nexusware scripts/missing2
+EXTRA_SCRIPTS			+= configure.nexusware scripts/missing2
 
 ##
 ## Rules for building kernel objects
@@ -526,8 +526,10 @@ SUBDIRS += testsuite
 endif
 
 if DEVELOPMENT
+if DOCUMENTATION
 if PKG_BUILD_INDEP
 SUBDIRS += man manual
+endif
 endif
 endif
 
@@ -631,6 +633,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.6.50  2007/10/18 06:52:33  brian
+# - new build support
+#
 # Revision 1.1.6.49  2007/08/14 10:46:52  brian
 # - GPLv3 header update
 #

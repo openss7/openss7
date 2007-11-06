@@ -1,0 +1,27 @@
+\File{figureD\-12.py},{08:01},{Jan 31 1991}
+\L{\LB{search (base: DN; subsettype: SubsetType; s: string;}}
+\L{\LB{        alist: \K{SET} \K{OF} AttributeType;}}
+\L{\LB{        matchtypes: \K{SET} \K{OF} MatchType;}}
+\L{\LB{        objectClasses: \K{SET} \K{OF} ObjectClass): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    x: DN;}}
+\L{\LB{    dlist, exact, good: \K{SET} \K{OF} DN;}}
+\L{\LB{}}
+\L{\LB{    \C{}\-\- map onto Directory Search}}
+\CE{}\L{\LB{    \C{}\-\- baseObject: `base\'}}
+\CE{}\L{\LB{    \C{}\-\- subset: `subsetType\'}}
+\CE{}\L{\LB{    \C{}\-\- filter:}}
+\CE{}\L{\LB{    \C{}\-\-     build OR\-conjuction of `s\' using `matchtypes\' over `alist\'}}
+\CE{}\L{\LB{    \C{}\-\-     if `objectClasses\' isn\'t empty:}}
+\CE{}\L{\LB{    \C{}\-\-         build OR\-conjuction of `objectClasses\' using equality}}
+\CE{}\L{\LB{    \C{}\-\-             over objectClass}}
+\CE{}\L{\LB{    \C{}\-\-         AND with original filter}}
+\CE{}\L{\LB{    \C{}\-\- selection: attributes and values of}}
+\CE{}\L{\LB{    \C{}\-\-     countryName, friendlyCountryName, organizationName}}
+\CE{}\L{\LB{    \C{}\-\-     organizationalUnitName, localityName,}}
+\CE{}\L{\LB{    \C{}\-\-     commonName, surName, userId}}
+\CE{}\L{\LB{}}
+\L{\LB{    \C{}\-\- cache returned entries and associated attributes\/values}}
+\CE{}\L{\LB{    dlist = search\-results;}}
+\L{\LB{}}
+\L{\LB{...}}

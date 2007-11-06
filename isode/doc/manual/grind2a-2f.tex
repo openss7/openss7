@@ -1,0 +1,43 @@
+\File{grind2a\-2f.bnf},{10:06},{Feb 15 1989}
+\L{\LB{\<presentation\-address\> ::=}}
+\L{\LB{}\Tab{16}{[[[ \<psel\> \S{}\"\/\"\SE{} ] \<ssel\> \S{}\"\/\"\SE{} ] \<tsel\> \S{}\"\/\"\SE{} ]}}
+\L{\LB{}\Tab{16}{\<network\-address\-list\>}}
+\L{\LB{}}
+\L{\LB{\<network\-address\-list\> ::=}}
+\L{\LB{}\Tab{16}{\<network\-address\> \S{}\"\|\"\SE{} \<network\-address\-list\>}}
+\L{\LB{}\Tab{8}{      \| \<network\-address\>}}
+\L{\LB{}}
+\L{\LB{\<psel\> ::=}\Tab{16}{\<selector\>}}
+\L{\LB{\<ssel\> ::= }\Tab{16}{\<selector\>}}
+\L{\LB{\<tsel\> ::= }\Tab{16}{\<selector\>}}
+\L{\LB{}}
+\L{\LB{\<selector\> ::=}}
+\L{\LB{}\Tab{16}{\S{}\'\"\SE{}\S{}\' \<otherstring\> \'\SE{}\S{}\"\'\SE{}}\Tab{48}{\C{}\-\- IA5}}
+\CE{}\L{\LB{}\Tab{48}{\C{}\-\- (for other chars use hex)}}
+\CE{}\L{\LB{}\Tab{8}{      \| \S{}\"\#\"\SE{} \<digitstring\>}\Tab{48}{\C{}\-\- US GOSIP}}
+\CE{}\L{\LB{}\Tab{8}{      \| \S{}\"\'\SE{}\S{}\" \<hexstring\> \"\SE{}\S{}\'H\"\SE{}}\Tab{48}{\C{}\-\- hex}}
+\CE{}\L{\LB{}\Tab{8}{      \| \S{}\"\"\SE{}}\Tab{48}{\C{}\-\- empty but present}}
+\CE{}\L{\LB{}}
+\L{\LB{\<network\-address\> ::=}}
+\L{\LB{}\Tab{16}{\S{}\"NS\"\SE{} \S{}\"+\"\SE{} \<hexstring\>}\Tab{48}{\C{}\-\- concrete binary}}
+\CE{}\L{\LB{}\Tab{48}{\C{}\-\- this is the compact}}
+\CE{}\L{\LB{}\Tab{48}{\C{}\-\-   encoding}}
+\CE{}\L{\LB{}\Tab{8}{      \| \<afi\> \S{}\"+\"\SE{} \<idi\> [ \S{}\"+\"\SE{} \<dsp\> ]}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\<afi\>}\Tab{16}{::= \S{}\"X121\"\SE{} \| \S{}\"DCC\"\SE{} \| \S{}\"TELEX\"\SE{} \| \S{}\"PSTN\"\SE{} \| \S{}\"ISDN\"\SE{}}}
+\L{\LB{}\Tab{24}{\| \S{}\"ICD\"\SE{} \| \S{}\"LOCAL\"\SE{}}}
+\L{\LB{}}
+\L{\LB{\<idi\>}\Tab{16}{::= \<digitstring\>}}
+\L{\LB{}}
+\L{\LB{\<dsp\>  ::=}\Tab{16}{\S{}\"d\"\SE{} \<digitstring\>}\Tab{48}{\C{}\-\- abstract decimal}}
+\CE{}\L{\LB{}\Tab{8}{      \| \S{}\"x\"\SE{} \<hexstring\>}\Tab{48}{\C{}\-\- abstract binary}}
+\CE{}\L{\LB{}\Tab{8}{      \| \S{}\"l\"\SE{} \<otherstring\>}\Tab{48}{\C{}\-\- IA5: local form only}}
+\CE{}\L{\LB{}\Tab{8}{      \| \S{}\"RFC\-1006\"\SE{} \S{}\"+\"\SE{} \<prefix\> \S{}\"+\"\SE{} \<ip\>}}
+\L{\LB{}\Tab{24}{[ \S{}\"+\"\SE{} \<port\> [ \S{}\"+\"\SE{} \<tset\> ]]}}
+\L{\LB{}\Tab{8}{      \| \S{}\"X.25(80)\"\SE{} \S{}\"+\"\SE{} \<prefix\> \S{}\"+\"\SE{} \<dte\>}}
+\L{\LB{}\Tab{24}{[ \S{}\"+\"\SE{} \<cudf\-or\-pid\> \S{}\"+\"\SE{} \<hexstring\> ]}}
+\L{\LB{}\Tab{8}{      \| \S{}\"ECMA\-117\-Binary\"\SE{} \S{}\"+\"\SE{} \<hexstring\> \S{}\"+\"\SE{} \<hexstring\>}}
+\L{\LB{}\Tab{24}{\S{}\"+\"\SE{} \<hexstring\>}}
+\L{\LB{}\Tab{8}{      \| \S{}\"ECMA\-117\-Decimal\"\SE{} \S{}\"+\"\SE{} \<digitstring\> \S{}\"+\"\SE{} \<digitstring\>}}
+\L{\LB{}\Tab{24}{\S{}\"+\"\SE{} \<digitstring\>}}

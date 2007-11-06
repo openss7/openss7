@@ -1,0 +1,245 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_bind.3.man,v 0.9.2.1 2007/09/29 14:08:30 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:30 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_bind.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:30  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH DS_BIND 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ds_bind
+\- open a session with the directory
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xds.h>
+.HP
+.BI "DS_status ds_bind(OM_object " session ", OM_workspace " workspace ", OM_private_object *" bound_session_return );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+To allow automatic connection management,
+.BR ds_bind ()
+may or may not communicat with a DSA when it is called.  The actual formation of a communications
+association may be deferred until the first directory operation is attempted, and then may or may
+not persist for a period of time.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I session
+.BR Session (Object(Session))
+Specifies a particular directory service provider, together with other details of the service
+required.  This argument may be either a public object or a private object.  The constant
+.RB [ DS_DEFAULT_SESSION ]
+may also be used as the value of this argument, causing a new session to be created with default
+values for all its OM attributes.
+.TP
+.I workspace
+.BR Workspace (Workspace)
+Specifies the workspace (obtained from a call to
+.BR ds_initialize (3))
+which is to be associated with the session.  All functions resulting from directory operations using
+this session will be returned as private objects in this workspace.  If the
+.I session
+argument is a private object, it must be a private object in this workspace.
+.\"
+.\"
+.SH RESULTS
+.PP
+.TP
+.I retval
+.BR Status (Status)
+Whether or not the function completed successfully.  This function can return the constant
+.RB [ DS_INVALID_WORKSPACE ]
+or
+.RB [ DS_SUCCESS ].
+.TP
+.I bound_session_return
+.BR Bound-Session (Object(Session))
+Upon successful completion, contains an instance of a directory session that may be used as an
+argument to other functions (for example,
+.BR ds_read (3)).
+This will be a new private object if the value of
+.B Session
+was
+.B Default-Session
+or a public object, otherwise it will be that supplied as an argument.  The function will supply
+default values for any of the OM attributes that were not present in the
+.B Session
+instance supplied as an argument.  It will also set the value of the
+.B File-Descriptor
+OM attribute (the value will be
+.B No-Valid-File-Descriptor
+.RB [ DS_NO_VALID_FILE_DESCRIPTOR]
+fi the functionality is not supported.
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a
+.B System-Error
+or one of the following
+.B Library-Errors:
+bad-session, miscellaneous, too-many-sessions.
+.PP
+The following
+.B Directory-errors
+may be returned by the functions: Security-Error, Service-Error.
+.PP
+This function can return a
+.BR Communications-Error .
+.PP
+This function can return the error constant
+.RB [ DS_INVALID_WORKSPACE ].
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR ds_bind ()
+is implemented on top of the more complicated OSMIS 3.0 interface.
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ds_bind ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XDS (3),
+.BR XOM (3),
+.BR ds_unbind (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This implementation is compatible with other implementations of the XDS.
+.[
+XDS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XDS.
+.[
+XDS
+.]
+Conformance is validated using an
+.BR autotest (1)
+script and the
+.BR test-xds (8)
+test suite executable.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ds_bind ()
+was first part of the
+.BR XDS .
+.[
+XDS
+.]
+.\"
+.\"
+.XX
+.[
+XOM
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

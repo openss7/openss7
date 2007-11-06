@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2007/08/13 22:46:18 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2007/10/13 08:51:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:18 $ by $Author: brian $
+ Last Modified $Date: 2007/10/13 08:51:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.167  2007/10/13 08:51:42  brian
+ - updates for 2.6.22 FC6 kernel and added MIBs
+
  Revision 0.9.2.166  2007/08/13 22:46:18  brian
  - GPLv3 header updates
 
@@ -182,10 +185,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2007/08/13 22:46:18 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2007/10/13 08:51:42 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2007/08/13 22:46:18 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2007/10/13 08:51:42 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -252,11 +255,14 @@ static char const ident[] =
 #endif
 
 BIG_STATIC_STH struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
-BIG_STATIC struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL_GPL(strthreads);
 #endif
+
+struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
+
+EXPORT_SYMBOL_GPL(Strinfo);
 
 #if defined CONFIG_STREAMS_KTHREADS
 
@@ -339,7 +345,10 @@ strblocking(void)
 STATIC __unlikely void
 qbinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 {
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
+#if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
+#endif
+	{
 		struct qbinfo *qbi = obj;
 
 		bzero(qbi, sizeof(*qbi));
@@ -458,7 +467,10 @@ bput(qband_t **bp)
 STATIC __unlikely void
 apinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 {
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
+#if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
+#endif
+	{
 		struct apinfo *api = obj;
 
 		bzero(api, sizeof(*api));
@@ -540,7 +552,10 @@ ap_put(struct apinfo *api)
 STATIC __unlikely void
 devinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 {
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
+#if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
+#endif
+	{
 		struct devinfo *di = obj;
 
 		bzero(di, sizeof(*di));
@@ -640,7 +655,10 @@ EXPORT_SYMBOL_GPL(di_put);	/* include/sys/streams/strsubr.h */
 STATIC __unlikely void
 mdlinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 {
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
+#if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
+#endif
+	{
 		struct mdlinfo *mi = obj;
 
 		bzero(mi, sizeof(*mi));
@@ -744,7 +762,9 @@ queinfo_init(struct queinfo *qu)
 STATIC __unlikely void
 queinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 {
+#if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
+#endif
 		queinfo_init(obj);
 }
 
@@ -915,7 +935,10 @@ qput(queue_t **qp)
 STATIC __hot_out void
 mdbblock_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 {				/* IRQ DISABLED? */
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
+#if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
+#endif
+	{
 		struct mdbblock *md = obj;
 		unsigned char *base;
 
@@ -1455,7 +1478,10 @@ term_freemblks(void)
 STATIC __unlikely void
 linkinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 {
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
+#if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
+#endif
+	{
 		static spinlock_t link_index_lock = SPIN_LOCK_UNLOCKED;
 		struct linkinfo *li = obj;
 		struct linkblk *l = &li->li_linkblk;
@@ -1535,7 +1561,10 @@ EXPORT_SYMBOL_GPL(freelk);	/* include/sys/streams/strsubr.h */
 STATIC __unlikely void
 syncq_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 {
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
+#if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
+#endif
+	{
 		struct syncq *sq = obj;
 
 		bzero(sq, sizeof(*sq));
@@ -1737,7 +1766,10 @@ STATIC int event_id = 1;		/* start odd */
 STATIC void
 seinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 {
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
+#if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
+#endif
+	{
 		struct seinfo *s = obj;
 		struct strevent **sep, *se = obj;
 
@@ -5012,7 +5044,9 @@ clear_shinfo(struct shinfo *sh)
 STATIC __unlikely void
 shinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 {
+#if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
+#endif
 		clear_shinfo(obj);
 }
 
@@ -5185,6 +5219,9 @@ EXPORT_SYMBOL(freestr);		/* include/sys/streams/strsubr.h */
  *  -------------------------------------------------------------------------
  */
 
+#if !defined SLAB_MUST_HWCACHE_ALIGN
+#define SLAB_MUST_HWCACHE_ALIGN 0
+#endif
 #undef STREAMS_CACHE_FLAGS
 #if defined CONFIG_STREAMS_DEBUG
 #if defined CONFIG_SLAB_DEBUG

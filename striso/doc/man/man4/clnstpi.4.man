@@ -1,0 +1,327 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH CLNSTPI 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B clnstpi
+\- CLNS NPI to TPI Conversion Module
+.SH SYNOPSIS
+.PP
+.B #include <stropts.h>
+.HP
+.BI "int " np_stream " = open(" /dev/clns ", " oflag );
+.HP
+.BI "int " retval " = ioctl(" np_stream ", " I_PUSH ", " \*(lqclnstpi\*(rq );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B clnstpi
+is a
+.IR STREAMS (4)
+module that provides conversion between the OSI CLNS NPI interface and the TPI interface for use by
+the XTI/TLI library to provide for applications that run directly over CLNP.
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH INTERFACE
+.PP
+At the lower service interface, the
+.B clnstpi
+module supports the OSI NPI
+.[
+npi revision 2.0.0
+.]
+service primitive interface described in
+.BR npi (7).
+.PP
+At the upper service interface, the
+.B clnstpi
+module supports a modified OSI TPI
+.[
+tpi revision 2.0.0
+.]
+service primitive interface described in
+.BR tpi (7),
+with the following considerations:
+.\"
+.\"
+.SH ADDRESSES
+.PP
+TSAP addresses for use with
+.B clnstpi
+are described in
+.BR xti_osi (3).
+The TSAP address consists of an NSAP with no TSEL which is supplied to and returned from
+.BR t_bind (3),
+.BR t_accept (3),
+and
+.BR t_connect (3)
+XTI/TLI library calls and
+.BR T_BIND_REQ (7),
+.BR T_CONN_IND (7),
+.BR T_CONN_REQ (7)
+service primitives.
+.\"
+.\"
+.SH OPTIONS
+.PP
+If it were not for options and quality of service parameter differences between TPI and NPI, it
+would be possible to write a completely protocol and service interface independent implementation of
+an NPI to TPI conversion module.  That is not, however, possible as option and quality of service
+handling differences between NPI and TPI preclude a completely generic approach.
+.PP
+Most TPI QOS parameters map directly onto NPI QOS parameters: for example,
+TPI protection levels map directly onto NPI protection levels;
+TPI priorities map directly onto NPI priorities;
+TPI throughput values map directly onto NPI throughput values;
+TPI transit delay values map directoy onto TPI transit delay values.
+.PP
+.TS
+tab(:);
+lblblb
+lblilb.
+TPI Option:NPI QoS Parameter:N-Primitive
+_
+T_TCO_THROUGHPUT:N_qos_co_opt_sel_t.src_throughput:N_OPTMGMT_REQ
+:N_qos_co_opt_sel_t.dst_throughput:N_OPTMGMT_REQ
+:N_qos_co_sel_t.src_throughput_sel:N_CONN_REQ, N_CONN_RES
+:N_qos_co_sel_t.dest_throughput_sel:N_CONN_REQ, N_CONN_RES
+T_TCO_TRANSDEL:N_qos_co_opt_sel_t.transit_delay:N_OPTMGMT_REQ
+:N_qos_co_sel_t.transit_delay_sel:N_CONN_REQ, N_CONN_RES
+T_TCO_TRANSFAILPROB:N_qos_co_opt_sel_t.xfer_fail_prob:N_OPTMGMT_REQ
+T_TCO_ESTFAILPROB:N_qos_co_opt_sel_t.nc_estab_fail_prob:N_OPTMGMT_REQ
+T_TCO_RELFAILPROB:N_qos_co_opt_sel_t.nc_rel_fail_prob:N_OPTMGMT_REQ
+T_TCO_ESTDELAY:N_qos_co_opt_sel_t.nc_estab_delay:N_OPTMGMT_REQ
+T_TCO_RELDELAY:N_qos_co_opt_sel_t.nc_rel_delay:N_OPTMGMT_REQ
+T_TCO_CONNRESIL:N_qos_co_opt_sel_t.nc_resilience:N_OPTMGMT_REQ
+T_TCO_PROTECTION:N_qos_co_opt_sel_t.protection_sel:N_OPTMGMT_REQ
+T_TCO_PRIORITY:N_qos_co_opt_sel_t.priority_sel:N_OPTMGMT_REQ
+T_TCO_EXPD:EX_DATA_OPT
+T_TCO_NETEXP:EX_DATA_OPT
+T_TCO_NETRECPTCF:REC_CONF_OPT
+_
+T_TCL_TRANSDEL:N_qos_cl_sel_t.transit_delay_max:N_UNITDATA_REQ
+T_TCL_RESERRORRATE:N_qos_cl_sel_t.residual_error_rate:N_UNITDATA_REQ
+T_TCL_PROTECTION:N_qos_cl_sel_t.protection_sel:N_UNITDATA_REQ
+T_TCL_PRIORITY:N_qos_cl_sel_t.priority_sel:N_UNITDATA_REQ
+T_TCL_CHECKSUM:\-
+_
+.TE
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+T-Primitives from the upper TPI service interface are mapped against N-Primitives on the lower
+service interface as follows:
+.sp
+.TS
+tab(:);
+lbclb.
+T-Primitive::N-Primitive
+_
+T_BIND_REQ\fR(7):->:N_BIND_REQ\fR(7)
+T_BIND_ACK\fR(7):<-:N_BIND_ACK\fR(7)
+T_INFO_REQ\fR(7):->:N_INFO_REQ\fR(7)
+T_INFO_ACK\fR(7):<-:N_INFO_ACK\fR(7)
+T_ADDR_REQ\fR(7):->:\-
+T_ADDR_ACK\fR(7):<-:\-
+T_CAPABILITY_REQ\fR(7):->:\-
+T_CAPABILITY_REQ\fR(7):<-:\-
+T_UNITDATA_REQ\fR(7):->:N_UNITDATA_REQ\fR(7)
+T_UNITDATA_IND\fR(7):<-:N_UNITDATA_IND\fR(7)
+T_CONN_REQ\fR(7):->:N_CONN_REQ\fR(7)
+T_CONN_IND\fR(7):<-:N_CONN_IND\fR(7)
+T_CONN_RSP\fR(7):->:N_CONN_RSP\fR(7)
+T_CONN_CON\fR(7):<-:N_CONN_CON\fR(7)
+T_DATA_REQ\fR(7):->:N_DATA_REQ\fR(7)
+T_DATA_IND\fR(7):<-:N_DATA_IND\fR(7)
+T_EXDATA_REQ\fR(7):->:N_EXDATA_REQ\fR(7)
+T_EXDATA_IND\fR(7):<-:N_EXDATA_IND\fR(7)
+T_OPTDATA_REQ\fR(7):->:N_OPTMGMT_REQ\fR(7)\fP, N_DATA_REQ\fR(7)
+T_OPTDATA_IND\fR(7):<-:N_DATA_IND\fR(7)\fP, N_EXDATA_IND\fR(7)
+T_DISCON_REQ\fR(7):->:N_DISCON_REQ\fR(7)
+T_DISCON_IND\fR(7):<-:N_DISCON_IND\fR(7)
+T_ORDREL_REQ\fR(7):->:\-
+T_ORDREL_IND\fR(7):<-:\-
+T_UNBIND_REQ\fR(7):->:N_UNBIND_REQ\fR(7)
+T_OK_ACK\fR(7):<-:N_OK_ACK\fR(7)
+T_ERROR_ACK\fR(7):<-:N_ERROR_ACK\fR(7)
+_
+.TE
+.\"
+.\"
+.SH IOCTLS
+.PP
+.B clnstpi
+does not provide any module-specific input-output controls: all input-output controls are passed
+toward the driver beneath the module.
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.B clnstpi
+A
+.IR STREAMS (4)
+module named
+.RB \*(lq clnstpi \*(rq.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/clns
+The native OSI NPI interface to CLNS.
+.TP
+.B /dev/clnp
+When the
+.B /dev/clns
+device is conbined with an autopush specification pushes the
+.B clnsnpi
+module, it results in the
+.BR /dev/clnp
+device.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR clns (4),
+.BR npi (7).
+.BR tpi (7),
+.BR xti (3),
+.BR xti_osi (3),
+.BR ISO (4).
+.\"
+.\"
+.SH BUGS
+.PP
+Because the
+.B clnstpi
+module is not yet implemented, it has no bugs.  Or, all of the bugs were in the design.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+NPI,
+.[
+npi revision 2.0.0
+.]
+TPI,
+.[
+tpi revision 2.0.0
+.]
+XNS 5.2,
+.[
+xns 5.2
+.]
+SunLink.
+.[
+sunlink-tli
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B clnstpi
+module first appears in the
+Solaris\(rg SunLink product.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

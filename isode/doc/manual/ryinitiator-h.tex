@@ -1,0 +1,25 @@
+\File{ryinitiator\-h.h},{16:07},{Jul  3 1988}
+\L{\LB{\C{}\/* ryinitiator.h \- include file for the generic interactive initiator *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{\#include} \<isode\/rosy.h\>}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{struct} dispatch \{}}
+\L{\LB{    \K{char}   *ds\_name;}}
+\L{\LB{    \K{int}}\Tab{8}{    ds\_operation;}}
+\L{\LB{}}
+\L{\LB{    IFP}\Tab{8}{    ds\_argument;}}
+\L{\LB{    IFP}\Tab{8}{    ds\_free;}}
+\L{\LB{}}
+\L{\LB{    IFP}\Tab{8}{    ds\_result;}}
+\L{\LB{    IFP}\Tab{8}{    ds\_error;}}
+\L{\LB{}}
+\L{\LB{    \K{char}   *ds\_help;}}
+\L{\LB{\};}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{adios (), advise ();}}
+\L{\LB{\K{void}}\Tab{8}{acs\_adios (), acs\_advise ();}}
+\L{\LB{\K{void}}\Tab{8}{ros\_adios (), ros\_advise ();}}
+\L{\LB{}}
+\L{\LB{\K{int}}\Tab{8}{ryinitiator ();}}

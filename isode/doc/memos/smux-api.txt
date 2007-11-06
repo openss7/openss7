@@ -1,0 +1,2124 @@
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+                            How to export a MIB module
+                              from a BSD UNIX daemon
+                          using the 4BSD/ISODE SMUX API
+
+                             Fri Jan 11 15:09:43 1991
+
+
+
+                                 Marshall T. Rose
+                     Performance Systems International, Inc.
+                                  mrose@psi.com
+
+
+
+
+
+          1.  Status of this Memo
+
+          This document defines an API for UNIX daemons wishing to
+          implement a MIB module on a BSD UNIX system using the
+          4BSD/ISODE SNMP software.  This is a local mechanism.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          M.T. Rose                                             [Page 1]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          2.  The Environment
+
+          This document gives an overview of how one modifies a UNIX
+          program to export a MIB module to the local SNMP agent.
+
+          All of the files necessary to interface to the SNMP agent is
+          contained in the ISODE source tree, in the snmp/ directory.
+          Since this document avoids giving the actual C procedural
+          definitions, you should familiarize yourself with the lint
+          library, llib-lisnmp.
+
+          For the purposes of example, throughout this document we will
+          reference a simple UNIX daemon, unixd, which implements a MIB
+          module for "mbuf statistics".
+
+
+          2.1.  The ISODE
+
+          As you might have guessed, this document assumes that you're
+          running the ISODE on your system.  You should read the READ-ME
+          file at the base of the source tree for instructions on how to
+          configure, generate, and install the ISODE.  In the future, an
+          abbreviated set of instructions, for those interested in
+          running the only 4BSD/ISODE SNMP software, will be written.
+
+          For now, follow the READ-ME, generate the base system and
+          SNMP, e.g.,
+
+               % ./make all all-snmp
+
+          and then install only the 4BSD/ISODE SNMP software:
+
+               # ./make inst-all inst-snmp
+
+          However, be sure to read the entire READ-ME file, as there are
+          other steps involved in installing the SNMP software.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          M.T. Rose                                             [Page 2]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          3.  MIB Modules
+
+          The first thing you need to do is to define the actual managed
+          objects which your program will implement.  This is done by
+          writing a "MIB module".  The syntax of the module is defined
+          in the Internet-standard SMI, RFC1155.  It is not the purpose
+          of this document to describe the rules used for writing a MIB
+          module.  However, here are the basics to speed you on your
+          way.
+
+          The MIB module is defined in a file called module.my, e.g.,
+          unix.my.  In general, there are three kinds of MIB modules:
+
+          (1)  If you are defining a MIB module for something UNIX
+               specific, it should probably go under the BSD UNIX MIB
+               (contact Marshall Rose or Keith Sklower to get a number
+               under the UNIX enterprise tree).  In this case, the
+               definition might start something like this:
+
+                    SendMail-MIB { iso org(3) dod(6) internet(1) private(4)
+                                   enterprises(1) unix (4) sendmail (99) }
+
+                    DEFINITIONS ::= BEGIN
+
+                    IMPORTS
+                            unix --*, OBJECT-TYPE *--
+                                FROM RFC1155-SMI;
+
+                    sendMail OBJECT IDENTIFIER ::= { unix 99 }
+
+
+          (2)  If you are defining a MIB module on a multilateral,
+               experimental basis, e.g., for a protocol like the NTP,
+               then you should contact the Internet Assigned Numbers
+               Authority (jkrey@isi.edu) and ask for an experimental
+               number.  In this case, the definition might start
+               something like this:
+
+                    FIZBIN-MIB DEFINITIONS ::= BEGIN
+
+                    IMPORTS
+                            experimental, OBJECT-TYPE
+                                FROM RFC1155-SMI;
+
+                    fizBin OBJECT IDENTIFIER ::= { experimental 99 }
+
+
+
+
+
+          M.T. Rose                                             [Page 3]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          (3)  Otherwise, if you are defining a MIB module for something
+               specific to your enterprise, then you contact the
+               Internet Assigned Numbers Authority (jkrey@isi.edu) and
+               ask for an enterprise number (assuming you don't already
+               have one).  In this case, the definition might start
+               something like this:
+
+                    FIZZBIN-MIB DEFINITIONS ::= BEGIN
+
+                    IMPORTS
+                            enterprises, OBJECT-TYPE
+                                FROM RFC1155-SMI;
+
+                    cheetah OBJECT IDENTIFIER ::= { enterprises 9999 }
+
+                    fizBin OBJECT IDENTIFIER ::= { cheetah 1 }
+
+
+          Regardless of the kind of MIB module, this last OBJECT
+          IDENTIFIER points to the root of the tree which your agent is
+          going to export.
+
+          Following this start, you have the actual definitions of the
+          MIB objects, followed by
+
+               END
+
+
+
+          3.1.  Compiling MIB modules
+
+          The next step is to compile the MIB module into a form that
+          your program can read.  This is done using the mosy program:
+
+               % others/mosy/xmosy module.my
+
+          which will create the file module.defs.  In most cases you
+          will need to prefix this file with definitions from the root
+          of the OBJECT IDENTIFIER tree, e.g.,
+
+               % cat $(INCDIR)isode/snmp/smi.defs module.defs > daemon.defs
+
+          where the daemon.defs file will be the one which you install
+          with your program binary.
+
+
+
+
+
+
+          M.T. Rose                                             [Page 4]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          3.1.1.  The Syntax of compiled MIB modules
+
+          The syntax is pretty simple:
+
+          (1)  Comments start with "--" or "#" at the beginning of a
+               line.
+
+          (2)  Object identifiers are defined like this:
+
+                    name            value
+
+               e.g.,
+
+                    internet        iso.3.6.1
+
+
+          (3)  Object types are defined like this:
+
+                    name      oid       syntax         access     status
+
+               e.g.,
+
+                    sysDescr  system.1  DisplayString  read-only  mandatory
+
+               where "name" and "oid" are fairly obvious.  For the rest:
+
+                    "syntax" is the name of a defined syntax;
+
+                    "access" is one of read-only, read-write", or none;
+                    and,
+
+                    "status" is one of mandatory, optional,
+                    deprecated, or obsolete.
+
+               Names of objects are always case-sensitive.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          M.T. Rose                                             [Page 5]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          4.  SMUX Peers
+
+          A program which exports a MIB module is termed a "SMUX peer"
+          (SMUX is the name of the protocol used by these programs to
+          communicate with an SNMP agent.)
+
+          There is a textual database, $(ETCDIR)snmpd.peers, which
+          defines the SMUX peers known to the local SNMP agent.  The
+          syntax of this file is pretty simple:
+
+          (1)  Comments start with "#" at the beginning of a line.
+
+          (2)  Each peer is identified in a single line:
+
+                    name        oid         password    [priority]
+
+               where "name" and "oid" are fairly obvious.  For the rest:
+
+                    "password" is a string which the agent will use to
+                    authenticate the SMUX peer;
+                    and,
+
+                    "priority",
+                    if present,
+                    is the highest priority with which the SMUX peer can register subtrees.
+
+               The name/oid pairs are assigned by the authority for the
+               BSD UNIX MIB (contact Marshall Rose or Keith Sklower to
+               register the name of your program and get an for your
+               program).
+
+          Note that this file contains things resembling passwords in
+          the clear.  As such, it should be protected mode 0600 and
+          owned by root.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          M.T. Rose                                             [Page 6]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          5.  Daemon Skeleton
+
+          Now it's time to modify your daemon to export the MIB.  Your
+          source code should include these lines:
+
+               #include <isode/snmp/smux.h>
+               #include <isode/snmp/objects.h>
+               #include <isode/tailor.h>
+
+          which will include the definitions for: talking to the SNMP
+          agent via the SMUX protocol, the object management package,
+          and the ISODE tailoring subsystem.
+
+          When loading your daemon, you should add this to the end of
+          your command to the loader:
+
+               -lisnmp -lisode
+
+          which includes the 4BSD/SNMP and ISODE libraries.
+
+          You should decide if you want to use the ISODE logging
+          subsystem.  This is a convenient mechanism for using a unified
+          logging system.  If you are modifying an already existing
+          daemon, you probably have your own logging package.
+          Otherwise, you should consider using the ISODE subsystem.
+
+
+          5.1.  Declarations
+
+          There are some global variables that your program will have to
+          declare:
+
+               int     debug = 0;
+               static  char   *myname = "unixd";
+
+               static LLog     _pgm_log = {
+                   "unixd.log", NULLCP, NULLCP,
+                   LLOG_FATAL | LLOG_EXCEPTIONS | LLOG_NOTICE,
+                   LLOG_FATAL, -1, LLOGCLS | LLOGCRT | LLOGZER, NOTOK
+               };
+               static  LLog   *pgm_log = &_pgm_log;
+
+               static  OID     subtree = NULLOID;
+               static  struct smuxEntry *se = NULL;
+
+
+
+
+
+
+          M.T. Rose                                             [Page 7]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+               static  int     smux_fd = NOTOK;
+               static  int     rock_and_roll = 0;
+               static  int     dont_bother_anymore = 0;
+
+               static  int     quantum = 0;
+
+          You only need the definition of _pgm_log and pgm_log if you
+          will be using the ISODE logging subsystem.
+
+
+          5.2.  Initialization
+
+          When your program initializes itself, it should contain some
+          code like this:
+
+                   if (myname = rindex (argv[0], '/'))
+                       myname++;
+                   if (myname == NULL || *myname == NULL)
+                       myname = argv[0];
+
+                   isodetailor (myname, 0);
+                   ll_hdinit (pgm_log, myname);
+
+               /* scan argv, set debug if need be... */
+
+                   if (debug)
+                       ll_dbinit (pgm_log, myname);
+
+          Of course, if you're not using the ISODE logging subsystem,
+          you don't have the calls to ll_hdinit or ll_dbinit.
+
+          After cracking argv, your program should do the usual
+          detaching actions.  Usually at this point, your program reads
+          the compiled MIB module definitions and starts talking to the
+          SNMP agent.
+
+
+          5.3.  Reading the compiled MIB module
+
+          You program should call the readobjects routine to read the
+          module, look-up the subtree which it will export to the SNMP
+          agent, and call the getsmuxEntrybyname routine to find its
+          entry in the snmpd.peers database.  Finally, it should call a
+          routine you define, e.g., init_mib, to initialize it's
+          internal MIB structures.  (We'll look at this routine in
+
+
+
+
+
+          M.T. Rose                                             [Page 8]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          greater detail later on.)
+
+                   OT      ot;
+
+                   if (readobjects ("unixd.defs") == NOTOK)
+                       error ("readobjects: %s", PY_pepy);
+
+                   if ((ot = text2obj ("mbuf")) == NULL)
+                       error ("object
+                   subtree = ot -> ot_name;
+
+                   if (se = getsmuxEntrybyname ("unixd")) == NULL)
+                       error ("no SMUX entry for
+
+                   init_mib ();
+
+          If any of these routines fail, then don't bother trying to
+          export the MIB module.
+
+
+          5.4.  Talking to the SNMP agent
+
+          All of the SMUX routines return NOTOK on failure.  Unless
+          otherwise noted, these routines also return OK on success.  On
+          failure, the variable
+
+               extern int  smux_errno;
+
+          is set to a symbolic value defined in smux.h, one of:
+
+               invalidOperation
+               parameterMissing
+               systemError
+               youLoseBig
+               congestion
+               inProgress
+
+          In addition, the variable
+
+               extern char smux_info[BUFSIZ];
+
+          contains a printable explanation of what happened on failure.
+
+          All errors are FATAL except for inProgress.  This means retry
+          your operation later on.
+
+
+
+
+
+          M.T. Rose                                             [Page 9]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          5.4.1.  Initialization
+
+          You program should call the routine smux_init, which
+          initializes a SMUX connection to the local SNMP agent.  This
+          starts a TCP connection, but most likely does not complete it.
+          You program will need to call an open routine (there is only
+          one at present) to finish the connect and establish the SMUX
+          association.
+
+          If successful, the return value is a file-descriptor, suitable
+          for use with select, etc.
+
+          On failure, smux_errno will be set to one of congestion,
+          youLoseBig, or systemError.  In this case, you should probably
+          have your program retry the operation every 5 minutes or so.
+
+               if ((smux_fd = smux_init (debug)) == NOTOK)
+                   error ("smux_init: %s [%s]",
+                          smux_error (smux_errno), smux_info);
+               else
+                   rock_and_roll = 0;
+
+
+
+          5.4.2.  Opening
+
+          Once smux_init returns OK, you should start selecting for
+          writability on the file-descriptor returned.  Once select says
+          your program can write to the fd, your program should call the
+          routine smux_simple_open, which establishes the SMUX
+          association.
+
+          On failure, smux_error will be set to one of parameterMissing,
+          invalidOperation, inProgress, systemError, congestion, or
+          youLoseBig.  If the error code is inProgress, then your
+          program should continue retrying the fd for writability, and
+          then call smux_simple_open again.  Otherwise, your program
+          should take the appropriate action based on the error code
+          returned.
+
+               if (smux_simple_open (&se -> se_identity,
+                                     "SMUX UNIX daemon",
+                                     se -> se_password,
+                                     strlen (se -> se_password))
+                       == NOTOK) {
+
+
+
+
+
+          M.T. Rose                                            [Page 10]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+                   if (smux_errno == inProgress)
+                       return;
+
+                   error ("smux_simple_open: %s [%s]",
+                          smux_error (smux_errno), smux_info);
+                   smux_fd = NOTOK;
+               }
+               else
+                   rock_and_roll = 1;
+
+
+
+          5.4.3.  Closing
+
+          If, for some reason, your program wishes to close the SMUX
+          association.  There are several reasons that are allowed:
+
+               goingDown
+               unsupportedVersion
+               packetFormat
+               protocolError
+               internalError
+               authenticationFailure
+
+          On failure, smux_error will be set to one of invalidOperation,
+          congestion, or youLoseBig.
+
+
+          5.4.4.  Registering Subtrees
+
+          Once smux_simple_open returns OK, your program should register
+          the MIB module that your daemon will export by calling
+          smux_register.  A subtree can be registered in one of three
+          modes:
+
+               readOnly
+               readWrite
+               delete
+
+          which are all fairly obvious.
+
+          Note that a return value of OK from smux_register means only
+          that the registration request was queued for the SNMP agent
+          via the SMUX protocol.  Some time later the SNMP agent's
+          response will be forthcoming.
+
+
+
+
+
+          M.T. Rose                                            [Page 11]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          On failure, smux_error will be set to one of parameterMissing,
+          invalidOperation, congestion, or youLoseBig.  Your program
+          should take the appropriate action based on the error code
+          returned.
+
+               if (smux_register (subtree, -1, readOnly) == NOTOK) {
+                   error ("smux_register: %s [%s]",
+                           smux_error (smux_errno), smux_info);
+                   smux_fd = NOTOK;
+               }
+
+
+
+          5.4.5.  Main Loop
+
+          At this point, your program is more or less in it's main loop
+          (actually, it probably entered the main loop after the very
+          first call to smux_init).
+
+               int     nfds;   /* these are set for other fd's... */
+
+               fd_set  ifds;
+               fd_set  ofds;
+
+                   for (;;) {
+                       int     n,
+                               secs;
+                       fd_set  rfds,
+                               wfds;
+
+                       secs = NOTOK;
+
+                       rfds = ifds;    /* struct copy */
+                       wfds = ofds;    /*   .. */
+
+                       if (smux_fd == NOTOK && !dont_bother_anymore)
+                           secs = 5 * 60L;
+                       else
+                           if (rock_and_roll)
+                               FD_SET (smux_fd, &rfds);
+                           else
+                               FD_SET (smux_fd, &wfds);
+                       if (smux_fd >= nfds)
+                           nfds = smux_fd + 1;
+
+
+
+
+
+
+          M.T. Rose                                            [Page 12]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+                       if ((n = xselect (nfds, &rfds, &wfds, NULLFD, secs))
+                               == NOTOK) {
+                           error ("xselect failed");
+                            ...
+                       }
+
+               /* check fd's for other purposes here... */
+
+                       if (smux_fd == NOTOK && !dont_bother_anymore) {
+                           if (n == 0) {
+                               if ((smux_fd = smux_init (debug)) == NOTOK)
+                                   error ("smux_init: %s [%s]",
+                                          smux_error (smux_errno),
+                                          smux_info);
+                               else
+                                   rock_and_roll = 0;
+                           }
+                       }
+                       else
+                           if (rock_and_roll) {
+                               if (FD_ISSET (smux_fd, &rfds))
+                                   doit_smux ();
+                           }
+                           else
+                               if (FD_ISSET (smux_fd, &wfds)) {
+                                   if (smux_simple_open (&se -> se_identity,
+                                                 "SMUX UNIX daemon",
+                                                 se -> se_password,
+                                                 strlen (se -> se_password))
+                                           == NOTOK) {
+                                       if (smux_errno != inProgress) {
+                                           error ("smux_simple_open: %s [%s]",
+                                                  smux_error (smux_errno),
+                                                  smux_info);
+                                           smux_fd = NOTOK;
+                                       }
+                                   }
+                                   else {
+                                       rock_and_roll = 1;
+
+                                       if (smux_register (subtree, -1,
+                                                   readOnly) == NOTOK) {
+                                           error ("smux_register: %s [%s]",
+                                                  smux_error (smux_errno),
+                                                  smux_info);
+
+
+
+
+
+          M.T. Rose                                            [Page 13]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+                                           smux_fd = NOTOK;
+                                       }
+                               }
+                   }
+
+          So, all that remains is to take a look at the routine
+          doit_smux mentioned above.  This is called when select
+          indicates the SMUX file-descriptor is ready for reading.
+
+
+          5.4.6.  Events
+
+          When select indicates the SMUX file-descriptor is ready for
+          reading, your program calls the routine smux_wait to return
+          the next event from the SNMP agent.
+
+          Note that the event is filled-in from a static area.  On the
+          next call to smux_init, smux_close, or smux_wait, the value
+          will be overwritten.  As such, do not free this structure
+          yourself.
+
+          On failure, smux_error will be set to one of parameterMissing,
+          invalidOperation, inProgress, or youLoseBig.  Your program
+          should take the appropriate action based on the error code
+          returned.
+
+                   struct type_SNMP_SMUX__PDUs *event;
+
+                   if (smux_wait (&event, NOTOK) == NOTOK) {
+                       if (smux_errno == inProgress)
+                           return;
+
+                       error ("smux_wait: %s [%s]",
+                              smux_error (smux_errno), smux_info);
+               losing: ;
+                       smux_fd = NOTOK;
+                       return;
+                   }
+
+          Next, your program should switch based on the actual event
+          returned:
+
+               type_SNMP_SMUX__PDUs_registerResponse
+               type_SNMP_SMUX__PDUs_get__request
+               type_SNMP_SMUX__PDUs_get__next__request
+
+
+
+
+
+          M.T. Rose                                            [Page 14]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+               type_SNMP_SMUX__PDUs_set__request
+               type_SNMP_SMUX__PDUs_commitOrRollback
+               type_SNMP_SMUX__PDUs_close
+
+          The actual code is fairly straight-forward:
+
+               switch (event -> offset) {
+                   case type_SNMP_SMUX__PDUs_registerResponse:
+                       {
+                           struct type_SNMP_RRspPDU *rsp =
+                                       event -> un.registerResponse;
+
+                           if (rsp -> parm == int_SNMP_RRspPDU_failure) {
+                               error ("SMUX registration of %s failed",
+                                      oid2ode (subtree));
+                               dont_bother_anymore = 1;
+                               (void) smux_close (goingDown);
+                               break;
+                           }
+                       }
+                       if (smux_trap (int_SNMP_generic__trap_coldStart,
+                                      0, (struct type_SNMP_VarBindList *) 0)
+                               == NOTOK) {
+                           error ("smux_trap: %s [%s]",
+                                  smux_error (smux_errno), smux_info);
+                           break;
+                       }
+                       return;
+
+                   case type_SNMP_SMUX__PDUs_get_request:
+                   case type_SNMP_SMUX__PDUs_get__next__request:
+                       get_smux (event -> un.get__request, event -> offset);
+                       return;
+
+                   case type_SNMP_SMUX__PDUs_close:
+                       notice ("SMUX close: %s",
+                               smux_error (event -> un.close -> parm));
+                       break;
+
+                   case type_SNMP_SMUX__PDUs_set__request:
+                   case type_SNMP_SMUX__PDUs_commitOrRollback:
+                       set_smux (event);
+                       return;
+
+                   default:
+
+
+
+
+
+          M.T. Rose                                            [Page 15]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+                       error ("bad SMUX operation: %d", event -> offset);
+                       (void) smux_close (protocolError);
+                       break;
+               }
+               smux_fd = NOTOK;
+
+          Note the use of the smux_trap routine to send a coldStart trap
+          once the daemon has successful registered the MIB module it is
+          exporting.  The trap codes are:
+
+               int_SNMP_generic__trap_coldStart
+               int_SNMP_generic__trap_warmStart
+               int_SNMP_generic__trap_linkDown
+               int_SNMP_generic__trap_linkUp
+               int_SNMP_generic__trap_authenticationFailure
+               int_SNMP_generic__trap_egpNeighborLoss
+               int_SNMP_generic__trap_enterpriseSpecific
+
+          If this routine fails, smux_errno will be set to one of
+          invalidOperation, congestion, or youLoseBig.
+
+          This peer doesn't implement sets, so it handles the SNMP set
+          operation thusly:
+
+               static  set_smux (event)
+               struct type_SNMP_SMUX__PDUs *event;
+               {
+                   switch (event -> offset) {
+                       case type_SNMP_SMUX__PDUs_set__request:
+                           {
+                               register struct type_SNMP_GetRequest__PDU *pdu =
+                                                   event -> un.get__response;
+
+                               pdu -> error__status =
+                                           int_SNMP_error__status_noSuchName;
+                               pdu -> error__index =
+                                           pdu -> variable__bindings ? 1 : 0;
+
+                               if (smux_response (pdu) == NOTOK) {
+                                   advise (LLOG_EXCEPTIONS, NULLCP,
+                                           "smux_response: %s [%s]",
+                                           smux_error (smux_errno),
+                                           smux_info);
+                                   smux_fd = NOTOK;
+                               }
+
+
+
+
+
+          M.T. Rose                                            [Page 16]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+                           }
+                           break;
+
+                       case type_SNMP_SMUX__PDUs_commitOrRollback:
+                           {
+                               struct type_SNMP_SOutPDU *cor =
+                                               event -> un.commitOrRollback;
+
+                               if (cor -> parm == int_SNMP_SOutPDU_commit) {
+                                                   /* "should not happen" */
+                                   (void) smux_close (protocolError);
+                                   smux_fd = NOTOK;
+                               }
+                           }
+                           break;
+                   }
+               }
+
+
+
+          So, all that remains is to take a look at the routine get_smux
+          which implements the SNMP get and powerful get-next operators.
+          We will return to this routine once the structures and
+          routines which implement the managed object abstraction are
+          explained.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          M.T. Rose                                            [Page 17]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          6.  Managed Objects
+
+          A managed object is an abstraction with a syntax and a
+          semantics.  The syntax defines what instances of the object
+          look like on the network.  The semantics define what the
+          object actually is.
+
+
+          6.1.  Syntax
+
+          The syntax of MIB objects is modeled by the OS structure:
+
+               typedef struct object_syntax {
+                   char   *os_name;                    /* syntax name */
+
+                   IFP     os_encode;                  /* data -> PE */
+                   IFP     os_decode;                  /* PE -> data */
+                   IFP     os_free;                    /* free data */
+
+                   IFP     os_parse;                   /* str -> data */
+                   IFP     os_print;                   /* data -> tty */
+
+                        ...
+               }               object_syntax, *OS;
+               #define NULLOS  ((OS) 0)
+
+          The syntaxes defined by the Internet-standard MIB are already
+          implemented:
+
+               syntax  structure
+               INTEGER integer
+               OctetString     struct qbuf (OCTET STRING)
+               ObjectID        struct OIDentifier (OBJECT IDENTIFIER)
+               NULL    char
+               DisplayString   struct qbuf
+               IpAddress       struct sockaddr_in
+               NetworkAddress  struct sockaddr_in
+               Counter integer
+               Gauge   integer
+               TimeTicks       integer
+               ClnpAddress     struct sockaddr_iso
+
+          where "syntax" is the name appearing in a compiled MIB module,
+          and "structure" is the C language data type corresponding to
+          the object's syntax.
+
+
+
+
+
+          M.T. Rose                                            [Page 18]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          To take a syntax name and get back the structure, use the
+          routine text2syn.
+
+
+          6.1.1.  Abstractions for Standard Syntaxes
+
+          Here are the structures and routine used to implement the
+          low-level MIB abstractions.
+
+
+          6.1.1.1.  integer
+
+          This is used for the INTEGER, Counter, Gauge, and TimeTicks
+          syntax.
+
+          The definition is:
+
+               typedef int integer;
+
+          which is hardly surprising.
+
+
+          6.1.1.2.  struct qbuf
+
+          This is used for the OctetString (OBJECT IDENTIFIER) and
+          DisplayString syntaxes.
+
+          The definition is:
+
+               struct qbuf {
+                   struct qbuf *qb_forw;   /* doubly-linked list */
+                   struct qbuf *qb_back;   /*   .. */
+
+                   int     qb_len;         /* length of data */
+                   char   *qb_data;        /* current pointer into data */
+                   char    qb_base[1];     /* extensible... */
+               };
+
+          The macro QBFREE is used to traverse qb_forw to free all qbufs
+          in the ring:
+
+               QBFREE (qb)
+               struct qbuf *qb;
+
+          To allocate a new string from the qbuf use:
+
+
+
+
+
+          M.T. Rose                                            [Page 19]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+               char *qb2str (q)
+               struct qbuf *q
+
+          The string is NULL-terminated, but there may be other NULLs in
+          the string to foil things like strlen.
+
+          To allocate a new qbuf of len octets from string s, use:
+
+               struct qbuf str2qb (s, len, head)
+               char    *s;
+               int      len,
+                        head;
+
+          (head should always be 1).
+
+          To free an allocated qbuf, use qb_free which calls QBFREE and
+          then free on its argument.
+
+
+          6.1.1.3.  struct OIDentifier
+
+          This is used for the ObjectID (OBJECT IDENTIFIER) syntax.  The
+          definition is:
+
+               typedef struct OIDentifier {
+                   int     oid_nelem;  /* number of sub-identifiers */
+
+                   unsigned int *oid_elements;
+                       /* the (ordered) list of sub-identifiers */
+               }                       OIDentifier, *OID;
+               #define NULLOID ((OID) 0)
+
+          To compare two OIDs, use
+
+               int     oid_cmp (p, q)
+               OID     p,
+                       q;
+
+          which returns -1 if p<q, 1 if p>q, 0 otherwise.
+
+          To allocate a new OID and copy it from another, use oid_cpy.
+
+          To free an allocated OID, use oid_free.
+
+
+
+
+
+
+
+          M.T. Rose                                            [Page 20]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          To take an OID and produce a string in numeric form use
+
+               char   *sprintoid (oid)
+               OID     oid;
+
+          The result is returned in a static area.  The inverse routine
+          is:
+
+               OID     str2oid (s)
+               char    *s;
+
+          which returns an OID from a static area
+
+
+          6.1.1.4.  struct sockaddr_in
+
+          This is used for the IpAddress and NetworkAddress syntaxes.
+          Presumably you are overly familiar with this structure.
+
+
+          6.1.1.5.  struct sockaddr_iso
+
+          This is used for the ClnpAddress syntax.  If your are not
+          running a BSD/OSI system, don't worry about this.
+
+
+          6.1.2.  Defining a new Syntax
+
+          The routine add_syntax is used to define a new syntax.  (if
+          this routine returns NOTOK, then the internal syntax table has
+          overflowed; adjust the constant MAXSYN in the file syntax.c).
+          The first argument is the name of the syntax.  The other five
+          are pointers to integer-valued routines that are called to
+          operate on an opaque pointer:
+
+               /* returns OK if x is encoded into pe (allocates pe),
+                  NOTOK otherwise */
+
+               f_encode (x, pe)
+               pointer *x;
+               PE      *pe;
+
+
+               /* returns OK if pe is decoded into x (allocates x),
+                  NOTOK otherwise */
+
+
+
+
+
+          M.T. Rose                                            [Page 21]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+               f_decode (x, pe)
+               pointer **x;
+               PE        pe;
+
+
+               /* free's an allocated x (from f_decode or f_parse) */
+
+               f_free (x)
+               pointer *x;
+
+
+               /* returns OK if s is decoded into x (allocates x),
+                  NOTOK otherwise */
+
+               f_parse (x, s)
+               pointer **x;
+               char     *s;
+
+
+               /* prints x on the user's tty */
+
+               f_print (x, os)
+               pointer *x;
+               OS       os;
+
+          Presentation elements (PEs) are discussed later on.
+
+
+          6.2.  Objects
+
+          MIB objects are modeled by the OT structure:
+
+               typedef struct object_type {
+                   char   *ot_text;                /* OBJECT DESCRIPTOR */
+                   char   *ot_id;                  /* OBJECT IDENTIFIER */
+                   OID     ot_name;                /*   .. */
+
+                   OS      ot_syntax;              /* SYNTAX */
+
+                   int     ot_access;              /* ACCESS */
+               #define OT_NONE         0x00
+               #define OT_RDONLY       0x01
+               #define OT_RDWRITE      0x02
+
+                   int     ot_status;              /* STATUS */
+
+
+
+
+
+          M.T. Rose                                            [Page 22]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+               #define OT_OBSOLETE     0x00
+               #define OT_MANDATORY    0x01
+               #define OT_OPTIONAL     0x02
+               #define OT_DEPRECATED   0x03
+
+                    ...
+               }               object_type, *OT;
+               #define NULLOT  ((OT) 0)
+
+          There are lots of routines to manipulate MIB objects.
+
+          The routine name2obj takes an object identifier and returns
+          the object type, either exact or prefix, e.g.,
+
+               name2obj ( OID { ipRouteDest.0.0.0.0 } )
+
+          returns the object type for "ipRouteDest"
+
+          The routine text2obj takes a string and returns the exact
+          object type, e.g.,
+
+               text2obj ("ipRouteDest")
+
+          will succeed, but
+
+               text2obj ("ipRouteDest.0.0.0.0")
+
+          will fail.
+
+          The routine text2oid takes a string and returns the object
+          identifier associated with the corresponding object.  The
+          string can be numeric (e.g., "1.3.6.1"), symbolic (e.g.,
+          "internet"), or symbolic.numeric (e.g., "iso.3.6.1").
+
+          The routine oid2ode takes an OID and returns a string suitable
+          for pretty-printing, in the form symbolic or symbolic.numeric.
+
+
+          6.3.  Instances
+
+          MIB instances are modeled by the OI structure:
+
+               typedef struct object_instance {
+                   OID     oi_name;                /* instance OID */
+
+
+
+
+
+
+          M.T. Rose                                            [Page 23]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+                   OT      oi_type;                /* prototype */
+               }               object_instance, *OI;
+               #define NULLOI  ((OI) 0)
+
+          There are lots of routines to manipulate MIB instances.
+
+          The routine name2inst takes a variable name and returns the
+          corresponding instance, e.g.,
+
+               name2inst ( OID { ipRouteDest.0.0.0.0 } )
+
+          will return an OI with oi_name set to its argument and oi_type
+          set to the object type for "ipRouteDest".
+
+          The routine next2inst finds the closest object type before the
+          variable name and returns an OI corresponding to that object
+          type.
+
+          The routine text2inst first calls text2oid to get the OID
+          corresponding to the argument, then calls name2obj to get the
+          type associated with that OID.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          M.T. Rose                                            [Page 24]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          7.  Linkage
+
+          It is now time to tie up all the loose ends.  When your
+          program starts, it needs to establish some linkage between the
+          objects defined in the compiled MIB module and the data
+          structures in your program.  Further, when the SNMP agent asks
+          to manipulate the object instances in the MIB module your
+          program exported (e.g., using the powerful SNMP get-next
+          operator), you need to have a small protocol engine to field
+          these requests.
+
+          The way the linkage is established is to associate a C routine
+          with each of the leaf objects defined in the compiled MIB
+          module.  When the protocol engine fields a request from the
+          SNMP agent, it will invoke that routine to "do the right
+          thing".  Typically, for each table in the compiled MIB module,
+          you define a C routine to handle requests for the leaf objects
+          of that table.  In addition, there is usually one more routine
+          defined to handle those leaf objects not found under any one
+          table.  For each C routine you define, you define a group of
+          constant integer symbols which identify a leaf object that is
+          handled by that routine (e.g., for each routine, you start
+          numbering the symbols starting at 0 and going up).  By
+          convention, these symbols have the same name as the leaf
+          objects.
+
+
+          7.1.  Initialization
+
+          Earlier it was noted that your program will probably call a
+          routine called init_mib which initializes it's internal MIB
+          structures.  The routine should look something like this:
+
+               register OT     ot;
+
+               if (ot = text2obj ("mbufS"))
+                   ot -> ot_getfnx = o_mbuf,
+                   ot -> ot_info = (caddr_t) mbufS;
+
+                ...
+
+               if (ot = text2obj ("mbufType"))
+                   ot -> ot_getfnx = o_mbufType,
+                   ot -> ot_info = (caddr_t) mbufType;
+
+
+
+
+
+
+          M.T. Rose                                            [Page 25]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          where we can imagine that o_mbuf and o_mbufType are routines
+          that are defined in your program, and mbufS and mbufType are
+          constant symbols defined with those routines.
+
+
+          7.2.  Generic Event Handling
+
+          Earlier it was noted that your program will probably call a
+          routine called get_smux which implements the SNMP get and
+          powerful get-next operators.  The routine should look
+          something like this:
+
+               static  get_smux (pdu, offset)
+               register struct type_SNMP_GetRequest__PDU *pdu;
+               int     offset;
+               {
+                   int     idx,
+                           status;
+                   object_instance ois;
+                   register struct type_SNMP_VarBindList *vp;
+
+                   quantum = pdu -> request__id;
+                   idx = 0;
+                   for (vp = pdu -> variable__bindings; vp; vp = vp -> next) {
+                       register OI     oi;
+                       register OT     ot;
+                       register struct type_SNMP_VarBind *v = vp -> VarBind;
+
+                       idx++;
+
+                       if (offset == type_SNMP_SMUX__PDUs_get__next__request) {
+                           if ((oi = name2inst (v -> name)) == NULLOI
+                                   && (oi = next2inst (v -> name)) == NULLOI)
+                               goto no_name;
+
+                           if ((ot = oi -> oi_type) -> ot_getfnx == NULLIFP)
+                               goto get_next;
+                       }
+                       else
+                           if ((oi = name2inst (v -> name)) == NULLOI
+                                   || (ot = oi -> oi_type) -> ot_getfnx
+                                           == NULLIFP) {
+               no_name: ;
+                               pdu -> error__status =
+                                       int_SNMP_error__status_noSuchName;
+
+
+
+
+
+          M.T. Rose                                            [Page 26]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+                               goto out;
+                           }
+
+               try_again: ;
+                       switch (ot -> ot_access) {
+                           case OT_NONE:
+                               if (offset ==
+                                       type_SNMP_SMUX__PDUs_get__next__request)
+                                   goto get_next;
+                               goto no_name;
+
+                           case OT_RDONLY:
+                               if (offset ==
+                                       type_SNMP_SMUX__PDUs_set__request) {
+                                   pdu -> error__status =
+                                               int_SNMP_error__status_readOnly;
+                                   goto out;
+                               }
+                               break;
+
+                           case OT_RDWRITE:
+                               break;
+                       }
+
+                       switch (status = (*ot -> ot_getfnx) (oi, v, offset)) {
+                           case NOTOK:     /* get-next wants a bump */
+               get_next: ;
+                               oi = &ois;
+                               for (;;) {
+                                   if ((ot = ot -> ot_next) == NULLOT) {
+                                       pdu -> error__status =
+                                             int_SNMP_error__status_noSuchName;
+                                       goto out;
+                                   }
+                                   oi -> oi_name =
+                                               (oi -> oi_type = ot) -> ot_name;
+                                   if (ot -> ot_getfnx)
+                                       goto try_again;
+                               }
+
+                           case int_SNMP_error__status_noError:
+                               break;
+
+                           default:
+                               pdu -> error__status = status;
+
+
+
+
+
+          M.T. Rose                                            [Page 27]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+                               goto out;
+                       }
+                   }
+                   idx = 0;
+
+               out: ;
+                   pdu -> error__index = idx;
+
+                   if (smux_response (pdu) == NOTOK) {
+                       error ("smux_response: %s [%s]",
+                              smux_error (smux_errno), smux_info);
+                       smux_fd = NOTOK;
+                   }
+               }
+
+          The actual code is fairly straight-forward: First, the
+          variable quantum is set to the request ID for this
+          transaction.  The SMUX protocol requires that this number
+          change for each SNMP operation that the SNMP agent fields, so
+          your program can use it as a cookie to see when it should re-
+          read kernel variables.  (A single SNMP operation received by
+          the SNMP agent might result in multiple SMUX protocol
+          transactions with your program.)
+
+          Next, the code loops through the list of variables requested.
+          The object instance is determined and loaded into oin and the
+          corresponding object type is loaded into ot, and the access is
+          checked.
+
+          Finally, the user-defined routine is invoked.  This routine
+          returns one of these values:
+
+               NOTOK
+               int_SNMP_error__status_noError
+               int_SNMP_error__status_tooBig
+               int_SNMP_error__status_noSuchName
+               int_SNMP_error__status_badValue
+               int_SNMP_error__status_readOnly
+               int_SNMP_error__status_genErr
+
+          the first value is returned only if the powerful get-next
+          operator is being invoked and the routine didn't have any more
+          object instances for the object type in question.  The
+          remainder are all self-explanatory.
+
+
+
+
+
+
+          M.T. Rose                                            [Page 28]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          Once an answer is returned, the loop either continues or is
+          broken and a response is written back using the smux_response
+          routine.  On failure, smux_error will be set to one of
+          parameterMissing, invalidOperation, or youLoseBig.
+
+
+          7.3.  Specific Event Handling: Outside a table
+
+          Now let's look at one of these user-defined routines, which
+          handles leaf objects that are not part of a table:
+
+               static  int     lastq = -1;
+               static  struct mbstat mbstat;
+
+
+               #define mbufS           0
+               #define mbufClusters    1
+                ...
+               #define mbufFrees       6
+
+
+               static int  o_mbuf (oi, v, offset)
+               OI      oi;
+               register struct type_SNMP_VarBind *v;
+               int     offset;
+               {
+                   int     ifvar;
+                   register struct mbstat *m = &mbstat;
+                   register OID    oid = oi -> oi_name;
+                   register OT     ot = oi -> oi_type;
+
+                   ifvar = (int) ot -> ot_info;
+                   switch (offset) {
+                       case type_SNMP_SMUX__PDUs_get__request:
+                           if (oid -> oid_nelem !=
+                                       ot -> ot_name -> oid_nelem + 1
+                                   || oid -> oid_elements[oid -> oid_nelem - 1]
+                                           != 0)
+                               return int_SNMP_error__status_noSuchName;
+                           break;
+
+                       case type_SNMP_SMUX__PDUs_get__next__request:
+                           if (oid -> oid_nelem
+                                   == ot -> ot_name -> oid_nelem) {
+                               OID     new;
+
+
+
+
+
+          M.T. Rose                                            [Page 29]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+                               if ((new = oid_extend (oid, 1)) == NULLOID)
+                                   return int_SNMP_error__status_genErr;
+                               new -> oid_elements[new -> oid_nelem - 1] = 0;
+
+                               if (v -> name)
+                                   free_SNMP_ObjectName (v -> name);
+                               v -> name = new;
+                           }
+                           else
+                               return NOTOK;
+                           break;
+
+                       default:
+                           return int_SNMP_error__status_genErr;
+                   }
+
+                   if (quantum != lastq) {
+                       lastq = quantum;
+
+                       if (getkmem (nl + N_MBSTAT, (caddr_t) m, sizeof *m)
+                               == NOTOK)
+                           return int_SNMP_error__status_genErr;
+                   }
+
+                   switch (ifvar) {
+                       case mbufS:
+                           return o_integer (oi, v, m -> m_mbufs);
+
+                       case mbufClusters:
+                           return o_integer (oi, v, m -> m_clusters);
+
+                ...
+
+                       case mbufFrees:
+                           return o_integer (oi, v, m -> m_mbfree);
+
+                       default:
+                           return int_SNMP_error__status_noSuchName;
+                   }
+               }
+
+          The actual code is fairly straight-forward: First, the
+          constant offsets are defined.  Then, the o_mbuf routine is
+          defined.
+
+
+
+
+
+
+          M.T. Rose                                            [Page 30]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          The first action is to determine which leaf object is being
+          referenced.  This corresponding symbolic constant is placed in
+          the variable ifvar.  Then a switch is made based on the
+          operation.
+
+          (1)  For the get operation, all instances are identified by
+               the object type followed by ".0" (e.g., "mbufS.0").  So,
+               the code checks to see if the OID associated with the
+               object instance is exactly one longer than the OID
+               associated with the object type, and that the extra sub-
+               identifier has the value 0.
+
+          (2)  For the powerful get-next operation, there are really two
+               cases, depending on whether some instance identifier is
+               present.  If some instance identifier is present, then
+               for a non-tabular leaf object, the next variable belongs
+               to some other object type, so the routine simply returns
+               the value NOTOK, and the get_smux routine will find the
+               next object accordingly.  Otherwise, if no instance is
+               identified, a new OID is constructed and initialized.
+               The old OID is free'd and the new one inserted in its
+               place.
+
+          Now that the correct instance has been identified, a check is
+          made to see if kmem should be consulted.  (Obviously other
+          programs might consult other data stores.) Finally, the
+          instance value is encoded and the routine returns.
+
+
+          7.3.1.  Instance handling
+
+          Several routines are provided to encode instance values:
+
+          The o_number routine encodes an integer value, such as an
+          INTEGER, Counter, Guage, or TimeTick.  The macro o_integer is
+          simply a synonym for o_number.
+
+          The o_string routine encodes a string value, such as an
+          OctetString or DisplayString, e.g.,
+
+               o_string (oi, v, "lo0", strlen ("lo0"));
+
+          or
+
+               o_string (oi, v, ether_addr, sizeof ether_addr);
+
+
+
+
+
+          M.T. Rose                                            [Page 31]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          The o_specific routine takes a structure corresponding to a
+          syntax, such as an OID for ObjectID, and does the encoding,
+          e.g.,
+
+               OID nullSpecific = ...;
+
+               o_specific (oi, v, nullSpecific);
+
+
+
+          7.3.2.  A special case
+
+          A special user-defined routine is provided for those cases for
+          leaf-objects containing information that is initialized on
+          start-up, o_generic.  For example:
+
+               char    buffer[BUFSIZ];
+
+               if (ot = text2obj ("sysName"))
+                   ot -> ot_getfnx = o_generic,
+                   ot -> ot_info = (caddr_t) sysName;
+
+               (void) gethostname (buffer, sizeof buffer);
+               (void) (*ot -> ot_syntax -> os_parse)
+                               ((struct qbuf **) &ot -> ot_info, buffer);
+
+          The idea is that the ot_info field contains a pointer to a
+          data structure corresponding to the syntax of the object.
+          Since all of the structures are rather strange (except for
+          integers), o_generic probably won't receive a lot of use.
+
+
+          7.4.  Specific Event Handling: Inside a table
+
+          Now let's look at one of these user-defined routines, which
+          handles leaf objects that are part of a table:
+
+               #define mbufType        0
+               #define mbufAllocates   1
+
+
+               static int  o_mbufType (oi, v, offset)
+               OI      oi;
+               register struct type_SNMP_VarBind *v;
+               int     offset;
+
+
+
+
+
+          M.T. Rose                                            [Page 32]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+               {
+                   int     ifnum,
+                           ifvar;
+                   register struct mbstat *m = &mbstat;
+                   register OID    oid = oi -> oi_name;
+                   register OT     ot = oi -> oi_type;
+
+                   ifvar = (int) ot -> ot_info;
+                   switch (offset) {
+                       case type_SNMP_SMUX__PDUs_get__request:
+                           if (oid -> oid_nelem
+                                   != ot -> ot_name -> oid_nelem + 1)
+                               return int_SNMP_error__status_noSuchName;
+                           ifnum =
+                                 oid -> oid_elements[oid -> oid_nelem - 1];
+                           if (ifvar >= sizeof m -> m_mtypes /
+                                           sizeof m -> m_mtypes[0])
+                               return int_SNMP_error__status_noSuchName;
+                           break;
+
+                       case type_SNMP_SMUX__PDUs_get__next__request:
+                           if (oid -> oid_nelem
+                                   == ot -> ot_name -> oid_nelem) {
+                               OID     new;
+
+                               ifnum = 0;
+
+                               if ((new = oid_extend (oid, 1)) == NULLOID)
+                                   return int_SNMP_error__status_genErr;
+                               new -> oid_elements[new -> oid_nelem - 1] =
+                                               ifnum;
+
+                               if (v -> name)
+                                   free_SNMP_ObjectName (v -> name);
+                               v -> name = new;
+                           }
+                           else {
+                               int     i = ot -> ot_name -> oid_nelem;
+
+                               ifnum = oid -> oid_elements[i] + 1;
+                               if (ifnum >= sizeof m -> m_mtypes /
+                                               sizeof m -> m_mtypes[0])
+                                   return NOTOK;
+
+                               oid -> oid_elements[i] = ifnum;
+
+
+
+
+
+          M.T. Rose                                            [Page 33]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+                               oid -> oid_nelem = i + 1;
+                           }
+                           break;
+
+                       default:
+                           return int_SNMP_error__status_genErr;
+                   }
+
+                   if (quantum != lastq) {
+                       lastq = quantum;
+
+                       if (getkmem (nl + N_MBSTAT, (caddr_t) m, sizeof *m)
+                               == NOTOK)
+                           return int_SNMP_error__status_genErr;
+                   }
+
+                   switch (ifvar) {
+                       case mbufType:
+                           return o_integer (oi, v, ifnum);
+
+                       case mbufAllocates:
+                           return o_integer (oi, v,
+                                             m -> m_mtypes[ifnum]);
+
+                       default:
+                           return int_SNMP_error__status_noSuchName;
+                   }
+               }
+
+          The actual code is fairly straight-forward: First, the
+          constant offsets are defined.  Then, the o_mbufType routine is
+          defined.
+
+          The first action is to determine which leaf object is being
+          referenced.  This corresponding symbolic constant is placed in
+          the variable ifvar.  Then a switch is made based on the
+          operation.  Because these are tabular objects, the instance
+          refers to a row in the table (and the leaf object refers to a
+          column in the table, of course).
+
+          (1)  For the get operation, all instances are identified by
+               the object type followed by ".rowno" (e.g.,
+               "mbufAllocates.10") refers to the value in the
+               mbufAllocates column of the thenth row).  So, the code
+               checks to see if the OID associated with the object
+
+
+
+
+
+          M.T. Rose                                            [Page 34]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+               instance is exactly one longer than the OID associated
+               with the object type, and that the extra sub-identifier
+               is within the range 0..rowno-1.
+
+          (2)  For the powerful get-next operation, there are really two
+               cases, depending on whether some instance identifier is
+               present.  If no instance is identified, a new OID is
+               constructed and initialized for the first row (row 0) of
+               the table. The old OID is free'd and the new one inserted
+               in its place.  Otherwise, if some instance identifier is
+               present, then the corresponding row must be identified,
+               the row number incremented, and a check made to see if
+               this is still in range (if not, NOTOK is returned to
+               signal that the next object type should be used).
+               Otherwise, the OID is updated in place.
+
+          Now that the correct instance has been identified, a check is
+          made to see if kmem should be consulted.  (Obviously other
+          programs might consult other data stores.) Finally, the
+          instance value is encoded and the routine returns.
+
+
+          7.4.1.  The general case
+
+          Obviously, this is a simple example of table handling.  In
+          general, the table will be implemented via linked lists,
+          sorted according to object instance.  In this case, there is
+          usually a special routine that is called to get a particular
+          instance or the next instance.  Take a look at the routines
+          get_tbent and o_smuxTree in the file snmpd.c.  These implement
+          the smuxTree table.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          M.T. Rose                                            [Page 35]
+
+
+
+
+
+          draft            Exporting MIBs for BSD UNIX          Jan 1991
+
+
+          Table of Contents
+
+
+          1 Status of this Memo ...................................    1
+          2 The Environment .......................................    2
+          2.1 The ISODE ...........................................    2
+          3 MIB Modules ...........................................    3
+          3.1 Compiling MIB modules ...............................    4
+          3.1.1 The Syntax of compiled MIB modules ................    5
+          4 SMUX Peers ............................................    6
+          5 Daemon Skeleton .......................................    7
+          5.1 Declarations ........................................    7
+          5.2 Initialization ......................................    8
+          5.3 Reading the compiled MIB module .....................    8
+          5.4 Talking to the SNMP agent ...........................    9
+          5.4.1 Initialization ....................................   10
+          5.4.2 Opening ...........................................   10
+          5.4.3 Closing ...........................................   11
+          5.4.4 Registering Subtrees ..............................   11
+          5.4.5 Main Loop .........................................   12
+          5.4.6 Events ............................................   14
+          6 Managed Objects .......................................   18
+          6.1 Syntax ..............................................   18
+          6.1.1 Abstractions for Standard Syntaxes ................   19
+          6.1.1.1 integer .........................................   19
+          6.1.1.2 struct qbuf .....................................   19
+          6.1.1.3 struct OIDentifier ..............................   20
+          6.1.1.4 struct sockaddr_in ..............................   21
+          6.1.1.5 struct sockaddr_iso .............................   21
+          6.1.2 Defining a new Syntax .............................   21
+          6.2 Objects .............................................   22
+          6.3 Instances ...........................................   23
+          7 Linkage ...............................................   25
+          7.1 Initialization ......................................   25
+          7.2 Generic Event Handling ..............................   26
+          7.3 Specific Event Handling: Outside a table ............   29
+          7.3.1 Instance handling .................................   31
+          7.3.2 A special case ....................................   32
+          7.4 Specific Event Handling: Inside a table .............   32
+          7.4.1 The general case ..................................   35
+
+
+
+
+
+
+
+
+
+
+          M.T. Rose                                            [Page 36]
+

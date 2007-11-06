@@ -1,0 +1,76 @@
+.PS
+.ps 20
+	boxht = .754; boxwid = 1.75
+UPRG:	box
+	move from UPRG.w up .015
+	line invisible right 1.75 "{USER}" " "
+	move from UPRG.w down .015
+	line invisible right 1.75 " " "{PROGRAMS}"
+APP:	box with .n at UPRG.s
+	move from APP.w up .015
+	line invisible right 1.75 "{LAYER 7}" " "
+	move from APP.w down .015
+	line invisible right 1.75 " " "{APPLICATION}"
+PRES:	box with .n at APP.s
+	move from PRES.w up .015
+	line invisible right 1.75 "{LAYER 6}" " "
+	move from PRES.w down .015
+	line invisible right 1.75 " " "{PRESENTATION}"
+SESS:	box with .n at PRES.s
+	move from SESS.w up .015
+	line invisible right 1.75 "{LAYER 5}" " "
+	move from SESS.w down .015
+	line invisible right 1.75 " " "{SESSION}"
+TRANS:	box with .n at SESS.s
+	box shaded with .nw at TRANS.nw ht .24 width .875
+	move from TRANS.nw down .225
+	line invisible right .875 "{TSAP}" " "
+	move from TRANS.nw down .48
+	line invisible right 1.75 "{LAYER 4}" " "
+	move from TRANS.nw down .51
+	line invisible right 1.75 " " "TRANSPORT"
+	line from TRANS.nw to TRANS.sw
+	move from TRANS.nw down .005
+	line right .875
+NET:	box with .n at TRANS.s
+	move from NET.w up .015
+	line invisible right 1.75 "{LAYER 3}" " "
+	move from NET.w down .015
+	line invisible right 1.75 " " "{NETWORK}"
+DL:	box with .n at NET.s
+	move from DL.w up .015
+	line invisible right 1.75 "{LAYER 2}" " "
+	move from DL.w down .015
+	line invisible right 1.75 " " "{DATA LINK}"
+PHY:	box with .n at DL.s
+	move from PHY.w up .015
+	line invisible right 1.75 "{LAYER 1}" " "
+	move from PHY.w down .015
+	line invisible right 1.75 " " "{PHYSICAL}"
+#
+#
+	boxwid = 6.0
+	move from PRES.e right .5; move up .3; X1: Here
+	line invis right 6.0 "\hbox to 6.0in{$\circ\ $ NETWORK LAYER (OR BELOW):\hfil}" " "
+	move from X1 down .25; X2: Here
+	line invis right 6.0 "\hbox to 6.0in{\hphantom{$\circ\ \ $\ I} RE--INVENTS TCP\hfil}" " "
+	move from X2 down .25; X4: Here
+	line invis right 6.0 "\hbox to 6.0in{\hphantom{$\circ\ \ $\ I} PREVENTS USE OF BOARD--LEVEL PRODUCTS\hfil}" " "
+	move from X4 down .25; X5: Here
+	move from X5 down .3; X6: Here
+	line invis right 6.0 "\hbox to 6.0in{$\circ\ $ SESSION LAYER (OR ABOVE):\hfil}" " "
+	move from X6 down .25; X7: Here
+	line invis right 6.0 "\hbox to 6.0in{\hphantom{$\circ\ \ $\ I} TOO MUCH DEPENDENCY ON TCP AND THE\hfil}" " "
+	move from X7 down .25; X8: Here
+	line invis right 6.0 "\hbox to 6.0in{\hphantom{$\circ\ \ $\ I} ARPANET CLIENT/SERVICE MODEL\hfil}" " "
+	move from X8 down .25; X9: Here
+	move from X9 down .3; X10: Here
+	line invis right 6.0 "\hbox to 6.0in{$\circ\ $ TRANSPORT SERVICE ACCESS POINT (TSAP):\hfil}" " "
+	move from X10 down .25; X11: Here
+XA:	line invis right 6.0 "\hbox to 6.0in{\hphantom{$\circ\ \ $ I} TAKES ADVANTAGE OF TCP's STRENGTHS,\hfil}" " "
+	move from X11 down .25; X12: Here
+	line invis right 6.0 "\hbox to 6.0in{\hphantom{$\circ\ \ $\ I} WHILE GIVING MAP/TOP A FREE HAND ABOVE\hfil}" " "
+.ps 1
+	move from XA.e left .75; XA1: Here
+	line dotted from XA1 right .001
+.PE

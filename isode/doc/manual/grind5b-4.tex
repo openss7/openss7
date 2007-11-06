@@ -1,0 +1,17 @@
+\File{grind5b\-4.c},{12:26},{Oct 14 1989}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{while}    \K{while} (fgets (buffer, \K{sizeof} buffer, stdin))}}
+\L{\LB{\Proc{if}}\Tab{8}{\K{if} (SDataRequest (sd, buffer, strlen (buffer) + 1, si) == NOTOK)}}
+\L{\LB{}\Tab{8}{    error (\S{}\"S\-DATA.REQUEST: \%s\"\SE{}, SErrString (sa \-\> sa\_reason));}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} (SRelRequest (sd, NULLCP, 0, NOTOK, sr, si) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"S\-RELEASE.REQUEST: \%s\"\SE{}, SErrString (sa \-\> sa\_reason));}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} (!sr \-\> sr\_affirmative) \{}}
+\L{\LB{}\Tab{8}{(\K{void}) SUAbortRequest (sd, NULLCP, 0, si);}}
+\L{\LB{}\Tab{8}{error (\S{}\"release rejected by sink\"\SE{});}}
+\L{\LB{    \}}}
+\ProcCont{if}\L{\LB{}}
+\L{\LB{    exit (0);}}
+\L{\LB{\}}}

@@ -1,0 +1,174 @@
+/*****************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
+/* showname.c - */
+
+#ifndef	lint
+static char *rcsid =
+    "Header: /xtel/isode/isode/quipu/dish/RCS/showname.c,v 9.0 1992/06/16 12:35:39 isode Rel";
+#endif
+
+/* 
+ * Header: /xtel/isode/isode/quipu/dish/RCS/showname.c,v 9.0 1992/06/16 12:35:39 isode Rel
+ *
+ *
+ * Log: showname.c,v
+ * Revision 9.0  1992/06/16  12:35:39  isode
+ * Release 8.0
+ *
+ */
+
+/*
+ *				  NOTICE
+ *
+ *    Acquisition, use, and distribution of this module and related
+ *    materials are subject to the restrictions of a license agreement.
+ *    Consult the Preface in the User's Manual for the full terms of
+ *    this agreement.
+ *
+ */
+
+#include "quipu/util.h"
+#include "quipu/name.h"
+
+extern DN current_dn;
+extern DN dn;
+
+#define	OPT	(!frompipe || rps -> ps_byteno == 0 ? opt : rps)
+#define	RPS	(!frompipe || opt -> ps_byteno == 0 ? rps : opt)
+extern char frompipe;
+extern PS opt, rps;
+
+extern char print_format;
+
+void reverse_print_dn();
+
+call_showname(argc, argv)
+	int argc;
+	char **argv;
+{
+	DN dnptr;
+	int compact = FALSE;
+	int ufn = TRUE;
+	int x;
+	extern DN rel_dn;
+
+	if ((argc = read_cache(argc, argv)) < 0)
+		return;
+
+	for (x = 1; x < argc; x++) {
+		if (test_arg(argv[x], "-compact", 2)) {	/* compact */
+			compact = TRUE;
+			argc--;
+		} else if (test_arg(argv[x], "-nocompact", 3)) {
+			compact = FALSE;
+			argc--;
+		} else if (test_arg(argv[x], "-ufn", 3)) {
+			ufn = TRUE;
+			argc--;
+		} else if (test_arg(argv[x], "-noufn", 5)) {
+			ufn = FALSE;
+			argc--;
+		} else {
+			ps_printf(OPT, "Unknown option %s\n", argv[x]);
+			Usage(argv[0]);
+			return;
+		}
+	}
+
+	if (compact) {
+		if (rel_dn != NULLDN) {
+			DN a, b;
+
+			a = rel_dn;
+			b = current_dn;
+			for (; a != NULLDN && b != NULLDN; a = a->dn_parent, b = b->dn_parent)
+				if (dn_comp_cmp(a, b) == NOTOK)
+					break;
+			if (a == NULLDN)
+				dn_print(RPS, b, RDNOUT);
+			else {
+				ps_print(RPS, "@");
+				dn_print(RPS, current_dn, RDNOUT);
+			}
+			ps_print(RPS, "\n");
+		} else {
+			dn_print(RPS, current_dn, RDNOUT);
+			ps_print(RPS, "\n");
+		}
+	} else {
+		if (current_dn == NULLDN) {
+			ps_print(RPS, "NULL Name\n");
+			return;
+		}
+		if (ufn) {
+			ufn_dn_print_aux(RPS, current_dn, NULLDN, 0);
+			ps_print(RPS, "\n");
+			return;
+		}
+		if (print_format == READOUT) {
+			dn_rfc_print(RPS, current_dn, "\n");
+			ps_print(RPS, "\n");
+			return;
+		}
+		for (dnptr = current_dn; dnptr != NULLDN; dnptr = dnptr->dn_parent) {
+			rdn_print(RPS, dnptr->dn_rdn, print_format);
+			ps_print(RPS, "\n");
+		}
+	}
+}

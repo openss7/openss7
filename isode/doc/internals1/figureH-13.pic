@@ -1,0 +1,43 @@
+.PS 6.5i
+## figure H-13
+.\let\sf=\relax
+B1a:	box invis
+B1b:	box invis with .n at B1a.c
+B1c:	box invis with .n at B1b.s
+B1d:	box invis with .n at B1c.s
+B1e:	box invis with .n at B1d.c
+	line from B1a.nw to B1e.sw; line from B1a.ne to B1e.se
+##
+REQ:	box invis with .e at (B1b.nw.x-linewid, B1b.nw.y)
+	move to REQ.e; \
+	"\sf \begin{tabular}{r}  T-CONNECT.\ \ \\ REQUEST\end{tabular}" rjust
+	arrow from REQ.e to (B1b.nw.x-linewid/10, B1b.nw.y)
+	arrow from B1b.nw to B1b.se dashed
+IND:	box invis with .w at (B1b.se.x+linewid, B1b.se.y)
+	move to IND.w; \
+	"\sf \begin{tabular}{l}  T-CONNECT.\\ \ \ INDICATION\end{tabular}" ljust
+	arrow from (B1b.se.x+linewid/10, B1b.se.y) to IND.w
+RSP:	box invis with .w at (B1d.ne.x+linewid, B1d.ne.y)
+	move to RSP.w; \
+	"\sf \begin{tabular}{r}  T-CONNECT.\ \ \\ RESPONSE\end{tabular}" ljust
+	arrow from RSP.w to (B1d.ne.x+linewid/10, B1d.ne.y)
+	arrow from B1d.ne to B1d.sw dashed
+CNF:	box invis with .e at (B1d.sw.x-linewid, B1d.sw.y)
+	move to CNF.e; \
+	"\sf \begin{tabular}{l}  T-CONNECT.\\ \ \ CONFIRMATION\end{tabular}" rjust
+	arrow from (B1d.sw.x-linewid/10, B1d.sw.y) to CNF.e
+##
+	arrow from (B1a.nw.x-linewid*4, B1a.nw.y) \
+	      to   (B1e.sw.x-linewid*4, B1e.sw.y)
+	move to (B1a.nw.x-linewid*4, (B1a.nw.y+B1e.sw.y)/2); "\ time" ljust
+	box invis with .e at (IND.e.x+linewid, B1a.ne.y) ""
+##
+SP:	box invis with .s at B1a.n
+	move to (B1a.nw.x, B1a.nw.y+lineht/4); "TSAP"
+	move to (B1a.ne.x, B1a.ne.y+lineht/4); "TSAP"
+	move to (REQ.c.x, SP.w.y); \
+		"\begin{tabular}{c}  calling\\ TS-user\end{tabular}\ \ \ "
+	move to (IND.c.x, SP.w.y); \
+		"\ \ \ \begin{tabular}{c}  called\\ TS-user\end{tabular}"
+##
+.PE

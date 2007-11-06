@@ -1,0 +1,82 @@
+% Trademarks...
+
+\def\gobble#1{}
+\def\tradeORGfont{\sc}			% used for organizations (e.g., ACM)
+\def\tradeNAMfont{\sf}			% used for names (e.g., Ada)
+
+\def\tradeorg#1{%
+    \tradeaux{#1}{\expandafter\gobble\string#1}\empty\tradeORGfont
+}
+\def\tradeorgn#1#2{%
+    \tradeaux{#1}{#2}\empty\tradeORGfont
+}
+\def\tradename#1#2#3{\tradeaux{#1}{#2}{#3}\tradeNAMfont}
+\def\trademark#1#2{%
+    \tradeaux{#1}{\expandafter\gobble\string#1}{#2}\tradeNAMfont
+}
+
+\def\tradeaux#1#2#3#4{%
+    \def#1/{\relax}%			% in case #3 references #1
+    \setbox0=\hbox{#3}%			%   when we make the \hbox
+    \ifdim\wd0>0pt
+	\gdef#1/{%
+	    \tradeaux{#1}{#2}\empty{#4}%
+	    #1/\footnote{#1/ is a trademark of #3.}%
+	}%
+    \else
+	\gdef#1/{{#4#2}}%
+    \fi
+}
+
+\tradeorg\acm
+\tradeorg\ansi
+\tradename\Ada{Ada}
+		{the Department of Defense (\Ada/ Joint Program Office)}
+\tradename\balance{Balance}	{Sequent Computer Systems, Incorporated}
+\tradeorg\bsd
+\tradename\butterfly{Butterfly}{Bolt, Beranek, and Newman, Incorporated}
+\tradeorg\ccitt
+\tradename\cms{CMS}		{International Business Machines, Incorporated}
+\tradename\cpm{CP/M}		{Digital Research Corporation}
+\tradename\chrysalis{Chrysalis}{Bolt, Beranek, and Newman, Incorporated}
+\tradename\decnet{DECnet}	{Digital Equipment Corporation}
+\tradeorgn\dod{DoD}
+\tradename\dynix{DYNIX}		{Sequent Computer Systems, Incorporated}
+\tradename\ethernet{Ethernet}	{the Xerox Corporation}
+\tradename\eunice{Eunice}	\empty
+\tradename\exos{EXOS}		{Excelan, Incorporated}
+\tradename\ibmpc{IBM PC}	{International Business Machines, Incorporated}
+\tradename\ibmpcat{IBM PC/AT}	{International Business Machines, Incorporated}
+\tradeorg\ieee
+\tradeorg\ifip
+\tradename\iPSC{iPSC}		{Intel Corporation}
+\tradename\lattice{Lattice}	{Lattice, Incorporated}
+\tradename\locus{Locus}		{Locus Computing Corporation}
+\def\microvax/{$\mu$\vax/}
+\def\microvms/{$\mu$\vms/}
+\tradeorgn\milstd{MIL-STD}
+\tradename\msdos{MS-DOS}	{Microsoft Corporation}
+\tradename\mvs{MVS}		{International Business Machines, Incorporated}
+\tradename\nfs{NFS}		{Sun Microsystems, Incorporated}
+\tradename\pcdos{PC-DOS}	{International Business Machines, Incorporated}
+\tradename\pcinterface{PC-Interface}%
+				{Locus Computing Corporation}
+\tradename\pdp{PDP}		{Digital Equipment Corporation}
+\tradename{\tops20}{Tops20}	{Digital Equipment Corporation}
+\tradename\trustedmail{Trusted\ Mail}%
+				{Trusted Technologies, Incorporated}
+\tradename\tseries{T-Series}	{Floating Point Systems}
+\tradename\ultrix{ULTRIX}	{Digital Equipment Corporation}
+\tradename\unibus{UNIBUS}	{Digital Equipment Corporation}
+\tradename\unix{UNIX}		{AT\&T Bell Laboratories}
+\tradename\vax{VAX}		{Digital Equipment Corporation}
+\tradename\vaxstation{VAXstation}%
+				{Digital Equipment Corporation}
+\tradename\vm{VM}		{International Business Machines, Incorporated}
+\tradename\vms{VMS}		{Digital Equipment Corporation}
+\tradename\xenix{Xenix}		{Microsoft Corporation}
+
+\def\xwindows/{%
+    \def\xwindows/{{\tradeNAMfont X \rm Window System}}%
+    \xwindows/\footnote{The \xwindows/ is a trademark of the Massachusettes Institute of Technology}%
+}

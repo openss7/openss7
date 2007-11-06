@@ -1,0 +1,96 @@
+#!/bin/sh
+rm -f modfile
+sed -f sedstuff |
+nawk ' BEGIN {
+	gotrdn = "FALSE"
+	print "#!/bin/sh" >> "modfile"
+	print "DISHPROC=\"127.0.0.1 `expr '$$' + 10000`\"" >> "modfile"
+	print "export DISHPROC" >> "modfile"
+	print "bind -u me -pa" >> "modfile"
+}
+
+{
+	if (throwaway == "TRUE")
+		if (length($0) != 0)
+			next
+		else
+			throwaway = "FALSE"
+	if (length($0) == 0)
+	{
+		if (gotrdn == "TRUE")
+		{
+			print "echo procesing '\''" mydn "'\''" >> "modfile"
+			print "showentry '\''" dn "'\'' -all -edb -dontusecopy >showdraft 2>/dev/null" >> "modfile"
+			print "if [ $? = 0 ]; then" >> "modfile"
+			print "	modscrip" >> "modfile"
+			print "echo doing modify" >> "modfile"
+			print "	modify '\''" dn "'\'' -draft newdraft -noedit" >> "modfile"
+			print "else" >> "modfile"
+			print "	addscrip" >> "modfile"
+			print "echo doing add" >> "modfile"
+			print "	add '\''" dn "'\'' -draft newdraft -noedit" >> "modfile"
+			print "fi" >> "modfile"
+			print "echo done" >> "modfile"
+		}
+		gotrdn = "FALSE"
+		next
+	}
+	if (substr($0,1,1) == "#")
+		next
+	if (substr($0,1,8) == "rootedAt")
+	{
+		n = index($0, "=")
+		rootedat = substr($0, n + 1)
+		next
+	}
+	
+	if (gotrdn == "FALSE")
+	{
+        if (rootedat == "")
+        {
+            print "data file does not contain a rootedAt line of the form"
+            print "rootedAt= c=gb@o=abc@ou=def"
+            exit
+        }
+		print "rm -f tmpedb newdraft" >> "modfile"
+		if (substr($0,1,1) == "!")
+		{
+			dn = "@" rootedat "@" substr($0, 2, 200)
+			mydn = substr($0, 2)
+			print "echo procesing '\''" mydn "'\''" >> "modfile"
+			print "echo doing delete" >> "modfile"
+			print "delete \"" dn "\" 2>/dev/null" >> "modfile"
+			print "echo done" >> "modfile"
+			throwaway = "TRUE"
+			next
+		}
+		else
+		{
+			dn = "@" rootedat "@" $0
+			mydn = $0
+			gotrdn = "TRUE"
+		}
+	}	
+	printf "echo '\''%s'\'' >> tmpedb\n", $0 >> "modfile"
+
+	gotrdn = "TRUE"
+}
+
+END {
+	if (gotrdn == "TRUE")
+	{
+		print "echo procesing '\''" mydn "'\''" >> "modfile"
+		print "showentry '\''" dn "'\'' -all -edb -dontusecopy >showdraft 2>/dev/null" >> "modfile"
+		print "if [ $? = 0 ]; then" >> "modfile"
+		print "	modscrip" >> "modfile"
+		print "echo doing modify" >> "modfile"
+		print "	modify '\''" dn "'\'' -draft newdraft -noedit" >> "modfile"
+		print "else" >> "modfile"
+		print "	addscrip" >> "modfile"
+		print "echo doing add" >> "modfile"
+		print "	add '\''" dn "'\'' -draft newdraft -noedit" >> "modfile"
+		print "fi" >> "modfile"
+		print "echo done" >> "modfile"
+	}
+    print "rm -f tmpedb newdraft" >> "modfile"
+} '

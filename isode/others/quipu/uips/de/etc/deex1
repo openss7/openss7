@@ -1,0 +1,15 @@
+To find Paul Barker who works in the Computer Science department of UCL 
+in England, you might type the following:
+
+person>       paul barker
+department>   computer science
+organisation> ucl
+country>      england
+
+The program first tries to match the COUNTRY name, then the ORGANISATION 
+name, and so on.  If there is a COUNTRY called England, and within England 
+there is an ORGANISATION with the word "ucl" as part of its name ...
+then the query will be resolved successfully, and details about the person
+displayed.
+
+Type "? ex2" to see a more complicated example of how queries may be resolved.

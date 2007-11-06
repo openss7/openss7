@@ -1,0 +1,83 @@
+PasswordLookup DEFINITIONS ::=
+
+BEGIN
+
+-- operations
+
+			-- given a user name, return a Passwd type
+lookupUser OPERATION
+	ARGUMENT	UserName
+	RESULT		Passwd
+	ERRORS		{ noSuchUser, congested }
+	::=		0
+
+			-- given a user ID, return a Passwd type
+lookupUID OPERATION
+	ARGUMENT	UserID
+	RESULT		Passwd
+	ERRORS		{ noSuchUser, congested }
+	::=		1
+
+-- errors
+
+			-- no matching user in the database
+noSuchUser ERROR
+	::=		0
+
+			-- congestion at responder
+congested ERROR
+	::=		1
+
+-- types
+
+			-- similar to an entry in <pwd.h>
+Passwd ::=
+    [APPLICATION 1]
+	IMPLICIT SEQUENCE {
+	    name[0]
+		IMPLICIT UserName,
+
+	    passwd[1]
+		IMPLICIT IA5String
+		OPTIONAL,
+
+	    uid[2]
+		IMPLICIT UserID,
+
+	    gid[3]
+		IMPLICIT GroupID,
+
+	    quota[4]
+		IMPLICIT INTEGER
+		DEFAULT 0,
+	    
+	    comment[5]
+		IMPLICIT IA5String
+		OPTIONAL,
+
+	    gecos[6]
+		IMPLICIT IA5String
+		OPTIONAL,
+
+	    dir[7]
+		IMPLICIT IA5String
+		OPTIONAL,
+
+	    shell[8]
+		IMPLICIT IA5String
+		OPTIONAL
+	}
+
+UserName ::=
+    [APPLICATION 2]
+	IMPLICIT GraphicString
+
+UserID ::=
+    [APPLICATION 3]
+	IMPLICIT INTEGER
+
+GroupID ::=
+    [APPLICATION 4]
+	IMPLICIT INTEGER
+
+END

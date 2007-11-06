@@ -1,0 +1,85 @@
+\File{oidtable.bnf},{17:20},{Feb 12 1991}
+\L{\LB{\C{}\-\- This specification is in BNF}}
+\CE{}\L{\LB{\C{}\-\- Comments start with two dashes}}
+\CE{}\L{\LB{}}
+\L{\LB{\<a\> ::= any of the 52 upper and lower case IA5 letters}}
+\L{\LB{\<d\> ::= any IA5 digit 0\-9}}
+\L{\LB{\<k\> ::= any of th 52 upper and lower case IA5 letters, IA5 digits,}}
+\L{\LB{                and \S{}\"\-\"\SE{} (hyphen)}}
+\L{\LB{\<p\> ::= any IA5 character in ASN.1 PrintableSting}}
+\L{\LB{\<CRLF\> ::= IA5 Newline}}
+\L{\LB{\<letterstring\> ::= \<a\> \| \<a\> \<letterstring\>}}
+\L{\LB{\<numericstring\> ::= \<d\> \| \<d\> \<numericstring\>}}
+\L{\LB{\<keystring\> ::= \<k\> \| \<k\> \<keystring\>}}
+\L{\LB{\<printablestring\> ::= \<p\> \| \<p\> \<printablestring\>}}
+\L{\LB{\C{}\-\- The first notation is to specify Object Identifiers.}}
+\CE{}\L{\LB{\C{}\-\- These have the basic (BNF):}}
+\CE{}\L{\LB{}}
+\L{\LB{\<numericoid\> ::= \<numericstring\> \| \<numericstring\> \S{}\".\"\SE{} \<numericoid\>}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- We define a table which gives a mapping of generic OIDs to strings:}}
+\CE{}\L{\LB{\C{}\-\- and a possible abbreviated form of the name}}
+\CE{}\L{\LB{}}
+\L{\LB{\<oidkeytable\> ::= \<oidkeyentry\> \| \<oidkeyentry\> \<CRLF\> \<oidkeytable\>}}
+\L{\LB{\<oidkeyentry\> ::= \<abbrstring\> \S{}\":\"\SE{} \<oidnumber\>}}
+\L{\LB{\<abbrstring\>  ::= \<keystring\> \| \<keystring\> \S{}\",\"\SE{} \<keystring\>}}
+\L{\LB{\<oidnumber\>   ::= \<numericoid\> \| \<numericoid\> \S{}\",\"\SE{} \<aliasoid\>}}
+\L{\LB{\<aliasoid\>    ::= \<numericoid\>}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- For example:}}
+\CE{}\L{\LB{\C{}\-\- UCL :0.3.2342.19200149}}
+\CE{}\L{\LB{\C{}\-\- country,c :2.5.4.6}}
+\CE{}\L{\LB{}}
+\L{\LB{\C{}\-\- Tables of this form will be read in by every QUIPU DSA, to give it a set}}
+\CE{}\L{\LB{\C{}\-\- of OID strings forms, and abbreviations}}
+\CE{}\L{\LB{}}
+\L{\LB{\C{}\-\- A general BNF of oid is now given:}}
+\CE{}\L{\LB{}}
+\L{\LB{\<oid\> ::= \<keystring\> \S{}\".\"\SE{} \<numericoid\> \| \<keystring\> \| \<numericoid\>}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- For example, ``UCL.5\'\' gives OID 5 as allocated by UCL, ``C\'\' gives the}}
+\CE{}\L{\LB{\C{}\-\- standard country oid.}}
+\CE{}\L{\LB{}}
+\L{\LB{\- We define a table for attribute values:}}
+\L{\LB{}}
+\L{\LB{\<attrTable\> ::= \<attrEntry\> \| \<attrEntry\> \<CRLF\> \<attrTable\>}}
+\L{\LB{\<attrEntry\> ::= \<oidkeyentry\> \S{}\":\"\SE{} \<attrEncoding\>}}
+\L{\LB{\<attrEncoding\> ::=  \S{}\"ObjectClass\"\SE{} \| \S{}\"DN\"\SE{} \| \S{}\"CaseIgnoreString\"\SE{} \| }}
+\L{\LB{                    \S{}\"CaseExactString\"\SE{} \| \S{}\"PrintableString\"\SE{} \| \S{}\"CountryString\"\SE{} \| }}
+\L{\LB{                    \S{}\"Guide\"\SE{} \| \S{}\"PostalAddress\"\SE{} \| \S{}\"TelephoneNumber\"\SE{} \| }}
+\L{\LB{                    \S{}\"telexNumber\"\SE{} \| \S{}\"TelexTerminalIdentifier\"\SE{} \| }}
+\L{\LB{                    \S{}\"FacsimileTelephoneNumber\"\SE{} \| \S{}\"NumbericString\"\SE{} \| }}
+\L{\LB{                    \S{}\"DestinationString\"\SE{} \| \S{}\"PresentationAddress\"\SE{} \| }}
+\L{\LB{                    \S{}\"OID\"\SE{} \| \S{}\"OctetString\"\SE{} \| \S{}\"IA5String\"\SE{} \| \S{}\"Photo\"\SE{} \| }}
+\L{\LB{                    \S{}\"Mailbox\"\SE{} \| \S{}\"UTCTime\"\SE{} \| \S{}\"DeliveryMethod\"\SE{}  }}
+\L{\LB{                    \S{}\"Integer\"\SE{} \| \S{}\"Boolean\"\SE{} \| \S{}\"Password\"\SE{}}}
+\L{\LB{                    \S{}\"ACL\"\SE{} \| \S{}\"Schema\"\SE{} \| \S{}\"Update\"\SE{} \|}}
+\L{\LB{                    \S{}\"Audio\"\SE{} \| \S{}\"CaseIgnoreList\"\SE{} \| \S{}\"VisibleString\"\SE{} \|}}
+\L{\LB{                    \S{}\"Certificate\"\SE{} \| \S{}\"CerfiticatePair\"\SE{} \| \S{}\"CertificateList\"\SE{} \|}}
+\L{\LB{                    \S{}\"ProtectedPassword\"\SE{} \| \S{}\"AccessPoint\"\SE{} \| \S{}\"Edbinfo\"\SE{} \|}}
+\L{\LB{                    \S{}\"InheritedAttribute\"\SE{} \| \S{}\"NRSInformation\"\SE{} \|}}
+\L{\LB{                    \<attrASN\>}}
+\L{\LB{}}
+\L{\LB{\<attrASN\> ::= \<keystring\>}}
+\L{\LB{       \C{}\-\- defined, but unknown syntax \- treated as ``ASN\'\'}}
+\CE{}\L{\LB{}}
+\L{\LB{\C{}\-\- For example:}}
+\CE{}\L{\LB{\C{}\-\- description: attributetype.13: CASEIGNORESTRING}}
+\CE{}\L{\LB{}}
+\L{\LB{\C{}\-\- Finally we define an object class table:}}
+\CE{}\L{\LB{}}
+\L{\LB{\<ocTable\> ::= \<ocEntry\> \| \<ocEntry\> \<CRLF\> \<ocTable\>}}
+\L{\LB{\<ocEntry\> ::= \<ocData\> \| \<ocMacro\>}}
+\L{\LB{\<ocData\>  ::= \<oidkeyentry\> \S{}\":\"\SE{} \<strList\> \S{}\":\"\SE{} \<strList\> \S{}\":\"\SE{} \<strList\>}}
+\L{\LB{\C{}\-\-                               :(hierarchy):(must contain):(may contain)}}
+\CE{}\L{\LB{\<ocMacro\>    :: = \<keystring\> \S{}\"=\"\SE{} \<strList\>}}
+\L{\LB{}}
+\L{\LB{\<strList\> ::= \<keystring\> \| \<keystring\> \S{}\",\"\SE{} \<strList\> \|}}
+\L{\LB{\C{}\-\- Note the final ``\|\'\' to permit the null string}}
+\CE{}\L{\LB{}}
+\L{\LB{\C{}\-\- For example;}}
+\CE{}\L{\LB{\C{}\-\- localeAttributeSet = facsimileNumber,isdnAddress,telephoneNumber, ...}}
+\CE{}\L{\LB{\C{}\-\- country: objectclass.2 : top: countryname: description,searchguide}}
+\CE{}\L{\LB{\C{}\-\- organisationalPerson: person: : localeAttributeSet,OU,title,...}}
+\CE{}\L{\LB{}}

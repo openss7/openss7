@@ -1,0 +1,6 @@
+\begingroup
+    \catcode`\#=12
+    \gdef\versiontag/{#4.17}%
+    \gdef\versiondate/{Sun Nov 16 10:46:57 PST 1986}%
+\endgroup
+\typeout{Version \versiontag/ of \versiondate/}

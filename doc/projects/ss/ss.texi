@@ -1,0 +1,379 @@
+% -*- texinfo -*-
+% vim: ft=texinfo nosi nocin noai tw=100
+% =========================================================================
+%
+% @(#) $Id$
+%
+% =========================================================================
+%
+% Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date$ by $Author$
+%
+% =========================================================================
+%
+% $Log$
+% =========================================================================
+\input texinfo @c -*- texinfo -*-
+@c vim: ft=texinfo nosi nocin noai tw=100
+@c %**start of header
+@setfilename ss.info
+@include texi/args.texi
+@set MANUAL_TITLE OpenSS7 SoftSwitch Complex
+@set MANUAL_TYPE High-Level Design
+@settitle @value{MANUAL_TITLE}
+@c %**end of header
+
+@dircategory OpenSS7
+@direntry
+* Open SoftSwitch Complex: (openss).		OpenSS7 SoftSwitch Complex
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE OpenSS7 SoftSwitch Complex
+@set MANUAL_TYPE High-Level Design
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file documents the @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+All Rights Reserved.
+
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries a copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
+
+@end ignore
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
+
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE OpenSS7 SoftSwitch Complex
+@set MANUAL_TYPE High-Level Design
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2007  OpenSS7 Corporation
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+@subsubheading Published by:
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages, or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
+
+@sp 1
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@ifnottex
+@node Top
+@top OpenSS7 SoftSwitch Complex
+@end ifnottex
+
+@menu
+* Executive Overview::
+* Preface::
+* Introduction::
+* Application Architecture::
+* Network Architecture::
+* System Architecture::
+* Platform Architecture::
+* Hardware Architecture::
+* Protocol Architecture::
+* Software Architecture::
+* Operations Architecture::
+* Index::
+@end menu
+
+@node Executive Overview
+@unnumbered Executive Overview
+
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.  The initial and primary
+purposes of this equipment is to provide a scalable, carrier-grade platform for providing New
+Generation Voice services for the PSTN and VoIP networks.  The purpose is both one of providing
+traditional PSTN switching capabilities as well as providing VoIP interfaces for new generation
+customers.
+
+@subsubheading The OpenSS7 Project
+
+The @uref{http://www.openss7.org/, OpenSS7 Project} is an open source software project that has
+developed many protocol components within the SS7, SIGTRAN, ISDN and VoIP protocol stacks.
+Intellectual property rights for the OpenSS7 Project are held by @uref{http://www.openss7.com/,
+OpenSS7 Corporation}.  All OpenSS7 Project software is eventually licensed under the GNU Public
+License Version 3.  OpenSS7 Corporation also provide commercial licensing of OpenSS7 Project
+software under terms less restrictive than the GPL.
+
+@subsubheading The OpenSS7 SoftSwitch Complex
+
+OpenSS7 can provide SoftSwitch COmplex capabilities in a collection of high-performance, low-cost,
+small-footprint platforms leveraging the GNU/Linux operating system distributions and tools, and
+utilizing low-cost commodity, or high-quality standardized hardware.
+
+For details on platform applications, see @ref{Application Architecture}, @ref{Network
+Architecture}, @ref{Optional Application Support}, and @ref{Optional Network Support}.
+
+@subsubheading Open Source Software
+
+The OpenSS7 Project leverages the widespread use of GNU/Linux operation systems, distributions, and
+FSF tools such as @samp{autoconf} and @dfn{RPM}.  For example, this document was formatted for PDF,
+HTML, info and plain text using the GNU @dfn{texinfo} system, @samp{autoconf}, and the @TeX{}
+formatting system.
+
+The open source model avoids proprietary lock-in and permits in-house or outsourced development.
+All source code is available for use and modification by the end customer.  All build tools,
+documentation and associated resources are generally available.  The availability of the source code
+and complete documentation eases problem resolution and can offer upgrades and fixes even in advance
+of client problem reports.  
+
+For details on software solutions, see @ref{Protocol Architecture}, @ref{Software Architecture},
+@ref{Optional Protocol Support}, and @ref{Optional Software Support}.
+
+@subsubheading Commodity Hardware
+
+By best utilizing commodity PC, hardenned server, or standardized CompactPCI hardware, OpenSS7 makes
+available the highest performance platforms available on the market at back-to-school prices.  When
+carrier-grade and large scale is not essential, 3GHz Pentium class servers in hardened rack mount
+chassis can be used at a fraction of the cost, and yet outperform, other solutions.  Where
+carrier-grade is necessary, embedded Linux on standardized PICMG 2.16 NEBS compliant chassis make
+for a higher cost, but more reliable alternative.
+
+For details on hardware solutions, see @ref{Platform Architecture}, @ref{Hardware Architecture} and
+@ref{Optional Hardware Support}.
+
+@subsubheading Operations Support
+
+Operational support is provided using the most widespread operational support protocols (SNMP, CMOT,
+TMN) available today.  All systems can be managed, monitored and adminstrated using management
+protocols.  Because OpenSS7 components were engineered with management in mind, no mediation devices
+are necessary and fully native element management system agents are provided.  By leveraging open
+source network management system tools such as OpenNMS, and the provided SNMP applications, complete
+management solutions are easy to adopt and integrate with existing systems.
+
+For details on operational support, see @ref{Operations Support Architecture} and @ref{Optional
+Operations Support Architecture}.
+
+@subsubheading Rapid Development
+
+The OpenSS7 Project has already developed protocol components completing the SS7 and SIGTRAN
+signalling stacks, including MTP Level 2 and Level 3, ISUP, SCCP, TCAP; and SCTP, M2PA, M2UA, M3UA,
+SUA and TUA.  Development of a carrier-grade Softswitch Complex to meed initial deployment
+requirements needs on the development of some intermediate and auxillary modules.
+
+For details on scheduling, see @ref{Logistics}.
+
+@subsubheading An Evolving Solution
+
+The OpenSS7 Project is evolving to support more protocol stacks including ISDN and VoIP.  Support
+for an ever expanding capabilty is demonstrated by the additional options available as described in
+@ref{Optional Application Support}, @ref{Optional Network Support}, @ref{Optional Protocol Support},
+@ref{Optional Operations Support}, @ref{Optional Software Support}, and @ref{Optional Hardware
+Support}.
+
+@subsubheading Conclusions
+
+In summary, an OpenSS7 Softswitch Complex is an excellent application of the OpenSS7 SS7 and VoIP
+stakcs and can be provided at an affodable price on short term time-lines, while offering an
+evolution path for future deployment applications.
+
+@sp 4
+
+@flushright
+@email{bidulock@@openss7.org, Brian Bidulock}
+The OpenSS7 Project
+@end flushright
+
+@node Preface
+@unnumbered Preface
+
+@node Introduction
+@chapter Introduction
+@cindex Introduction
+
+@node Application Architecture
+@chapter Application Architecture
+@cindex Application architecture
+
+@node Network Architecture
+@chapter Network Architecture
+@cindex Network architecture
+
+@node System Architecture
+@chapter System Architecture
+@cindex System architecture
+
+@node Platform Architecture
+@chapter Platform Architecture
+@cindex Platform architecture
+
+@node Hardware Architecture
+@chapter Hardware Architecture
+@cindex Hardware architecture
+
+@node Protocol Architecture
+@chapter Protocol Architecture
+@cindex Protocol architecture
+
+@node Software Architecture
+@chapter Software Architecture
+@cindex Software architecture
+
+@node Operations Architecture
+@chapter Operations Architecture
+@cindex Operations architecture
+
+@node Index
+@unnumbered Index
+@printindex cp
+
+@page
+@shortcontents
+@page
+@contents
+@bye

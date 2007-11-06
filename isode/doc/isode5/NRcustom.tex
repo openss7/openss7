@@ -1,0 +1,129 @@
+% LaTeX customization for NRTC
+%
+% 9/9/86 tpd
+% 4/28/87 tpd
+\makeatletter
+% plain TeX compatibility
+\def\oldstyle{\xdef\@oldstyle{\the\textfont\@ne}\mit\@oldstyle}
+% Compatibility with NR-TeX
+\def\smaller{\footnotesize}		% smaller than small
+\let\nfootnote=\footnote
+\let\tell=\typeout
+\def\implies{\quad\supset\ }
+\def\tdots{\ldots\thinspace}
+\let\bop=\newpage
+\def\hbreak{\hfil\break}
+\def\lp{\par\noindent}
+\def\ifundefined#1{\expandafter\ifx\csname#1\endcsname\relax}
+\def\boxit#1{\fbox{\sc#1}}
+% Draft Stuff
+\newif\ifdraft	\draftfalse
+\def\draftstring{{\ifdraft \tt Draft\fi}}
+\def\ds@DScustom{\ifdraft \@ifundefined{ds@draft}{}{\ds@draft}\fi}
+% Extras
+\newdimen\extra@wid		\extra@wid=\z@
+\def\extra#1#2{%
+    \setbox\z@=\hbox{#2:\quad}
+    \ifnum\extra@wid<\wd\z@	\extra@wid=\wd\z@\fi
+    \def#1##1{%
+	\nobreak
+	\extra@skip
+	\vbox{%
+	    \def\@filler{#2:\hfil\global\let\@filler=\empty}%
+	    \let\\=\cr
+	    \tabskip=\z@
+	    \halign{%
+		\hbox to\extra@wid{\@filler}\ignorespaces####\unskip\hfil\cr
+		##1\cr
+	    }%
+	}%
+	\nobreak
+    }%
+}
+\def\extra@skip{%
+    \vskip 2\baselineskip
+    \def\extra@skip{\vskip .15in}%
+}
+% Miscellany
+\def\bigquote#1\endbigquote{%
+    \begin{quote}
+	\noindent\llap{``}\ignorespaces#1\unskip''
+    \end{quote}
+}
+% Double Spacing Macro
+\def\doublespace{
+	\baselineskip=2\baselinestretch pt
+}
+\def\NRAA{\leavevmode\setbox0\hbox{h}\dimen@\ht0\advance\dimen@-1ex%
+  \rlap{\kern+.45ex\raise.67\dimen@\hbox{\char'27}}A}
+\newcommand{\NRdF}{$^\circ$F}           %degrees fahrenheit
+\newcommand{\NRdC}{$^\circ$C}           %degrees centigrade
+%
+%
+%	Definition for Footnote style
+%
+\def\footnotenumbering#1{%
+	\global\c@footnote \z@%
+	\gdef\thefootnote{\csname @#1\endcsname \c@footnote}%
+}%
+%
+%	Definition for Figure style
+%
+\def\figurenumbering#1{%
+	\global\c@figure \z@%
+	\gdef\thefigure{\csname @#1\endcsname \c@figure}%
+}%
+%
+\def\nextfigure{%
+	\addtocounter{figure}{1}\thefigure\addtocounter{figure}{-1}%
+}%
+%
+\def\NRcaption#1{%
+	\caption{\protect\parbox[t]{4.5in}{#1}}%
+}%
+%
+% figure commands
+%
+\@ifundefined{fps@figure}{}{
+	\setcounter{topnumber}{5}
+	\setcounter{bottomnumber}{5}
+	\setcounter{totalnumber}{10}
+	\renewcommand{\fps@figure}{hbtp}
+	\renewcommand{\topfraction}{.95}
+	\renewcommand{\bottomfraction}{.95}
+	\renewcommand{\textfraction}{.05}
+	\renewcommand{\floatpagefraction}{.95}
+}
+%
+%	Definition for Custom headings style
+%
+\def\NRoddhead#1{%
+	\def\@oddhead{#1}%
+}%
+%
+\def\NRevenhead#1{%
+	\def\@evenhead{#1}%
+}%
+%
+\def\NRhead#1{%
+	\def\@oddhead{#1}\def\@evenhead{#1}%
+}%
+%
+%	Footers
+%
+\def\NRoddfoot#1{%
+	\def\@oddfoot{#1}%
+}%
+%
+\def\NRevenfoot#1{%
+	\def\@evenfoot{#1}%
+}%
+%
+\def\NRfoot#1{%
+	\def\@oddfoot{#1}%
+}%
+%
+%	Modify Part/Chapter/Section/Subsection/SubSubSection/Paragraph/
+%		SubParagraph
+%
+\makeatother

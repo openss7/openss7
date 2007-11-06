@@ -1,0 +1,59 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{The ISO Aliases Database}\label{isoaliases}
+The database \file{isoaliases} in the ISODE \verb"ETCDIR" directory
+(usually \file{/usr/etc/})
+contains a simple mapping between names (terse strings)
+and values (e.g., user-friendly names and distinguished names).
+
+The database itself is an ordinary ASCII text file containing an entry for
+each locally defined alias.
+Each entry contains
+\begin{itemize}
+\item	the alias, a simple string; and,
+
+\item	a user-friendly name or a distinguished name.
+\end{itemize}
+Blanks and/or tab characters are used to seperate items.
+However, double-quotes may be used to prevent separation for items containing
+embedded whitspace.
+The sharp character (`\verb"#"') at the beginning of a line indicates a
+commentary line.
+
+\section	{Accessing the Database}\label{isoalias}
+The \man libacsap(3n) library contains the routines used to access the
+database.
+There is one high-level routine, \verb"alias2name"
+which returns the value which corresponds to an alias in the database.
+\begin{quote}\index{alias2name}\small\begin{verbatim}
+char   *alias2name (name)
+char   *name;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"name":] the alias to lookup.
+\end{describe}
+This returns the manifest constant \verb"NULLCP" if the given alias is
+not in the database.
+
+In order to load specific aliases other than those read in the
+\man isoaliases(5) file, use the routine \verb"add_alias":
+\begin{quote}\index{add\_alias}\small\begin{verbatim}
+int     add_alias (name, value)
+char   *name,
+       *value;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"name":] the alias to enter; and,
+
+\item[\verb"value":] its value.
+\end{describe}
+This returns the manifest constant \verb"NOTOK" if the given alias cannot
+be added.
+
+\section	{User-Specific Aliases}
+By default a user-specific aliases database is consulted before the
+system-wide aliases file.
+The user-specific file is called \file{\$HOME/.isode\_aliases} in the user's
+home directory.

@@ -1,0 +1,22 @@
+\File{figureB\-12.c},{11:21},{May  5 1990}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  op\_name (sd, ryo, rox, arg, roi)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{struct} RyOperation *ryo;}}
+\L{\LB{\K{struct} RoSAPinvoke *rox;}}
+\L{\LB{\K{register} \K{struct} type\_MODULE\_argument *arg;}}
+\L{\LB{\K{struct} RoSAPindication *roi;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}}\Tab{8}{    won;}}
+\L{\LB{}}
+\L{\LB{\C{}\/* this check should *not* be made if linking of operations is expected *\/\CE{}}}
+\L{\LB{    \K{if} (rox \-\> rox\_nolinked == 0) \{}}
+\L{\LB{}\Tab{8}{\K{if} (RyDsUReject (sd, rox \-\> rox\_id, ROS\_IP\_LINKED, ROS\_NOPRIO, roi)}}
+\L{\LB{}\Tab{8}{        == NOTOK)}}
+\L{\LB{}\Tab{8}{    ros\_adios (\&roi \-\> roi\_preject, \S{}\"U\-REJECT\"\SE{});}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{return} OK;}}
+\L{\LB{    \}}}
+\L{\LB{    advise (NULLCP, LOG\_INFO, \S{}\"RO\-INVOKE.INDICATION\/\%d: \%s\"\SE{},}}
+\L{\LB{}\Tab{8}{    sd, ryo \-\> ryo\_name);}}

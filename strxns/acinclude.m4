@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/08/14 03:30:49 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/10/15 17:26:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 03:30:49 $ by $Author: brian $
+# Last Modified $Date: 2007/10/15 17:26:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -483,7 +483,8 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 			   ip_frag_mem,
 			   __xfrm_policy_check,
 			   xfrm_policy_delete,
-			   __xfrm_sk_clone_policy])
+			   __xfrm_sk_clone_policy,
+			   dev_base_head])
     if test :"${linux_cv_have_ip_route_output:-no}" = :yes ; then
 	AC_DEFINE([HAVE_IP_ROUTE_OUTPUT], [1], [Most 2.4 kernels have
 	the function ip_route_output() defined.  Newer RH kernels (EL3) use
@@ -724,7 +725,8 @@ dnl
 			 struct packet_type.next,
 			 struct packet_type.list,
 			 struct inet_protocol.copy,
-			 struct net_protocol.no_policy], [:], [:], [
+			 struct net_protocol.no_policy,
+			 struct sk_buff.transport_header], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -943,6 +945,9 @@ AC_DEFUN([_XNS_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.62  2007/10/15 17:26:08  brian
+# - updates for 2.6.22.5-49.fc6 kernel
+#
 # Revision 0.9.2.61  2007/08/14 03:30:49  brian
 # - GPLv3 header update
 #

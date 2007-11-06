@@ -1,0 +1,9 @@
+#!/bin/sh
+edb2dmi <tmpedb |
+awk ' {
+	if (substr($0, 1, 1) == "!")
+		next
+	else
+		print $0
+} ' > newdraft
+rm -f tmpedb

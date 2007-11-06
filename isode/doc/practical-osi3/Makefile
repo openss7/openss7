@@ -1,0 +1,109 @@
+##########################################################################
+# Instructions to Make, for generation of nice-looking slides using SLiTeX
+##########################################################################
+
+.SUFFIXES:	.b .xb .xwd .c .grf .pct .pic .plt .s .web .tex .dvi .imp .ps .ry .py
+
+.b.tex:;	itbit $<
+
+.xb.tex:;	xtbit $<
+
+.xwd.tex:;	xtwd $<
+
+.c.tex:;	sh -c 'if tgrind -f -lc $< | sed -e 1d -e \$$d > $@; \
+			then exit 0; else rm $@; exit 1; fi'
+
+.grf.tex:;	sh -c 'if graph < $< | plot -TeX > $@; \
+			then exit 0; else rm $@; exit 1; fi'
+
+.pct.pic:;	pct2pic $<
+
+.pic.tex:;	tpic $<
+
+.plt.tex:;	sh -c 'if plot -TeX < $< > $@; \
+			then exit 0; else rm $@; exit 1; fi'
+
+.s.tex:;	sh -c 'if tgrind -f -la68k $< | sed -e 1d -e \$$d > $@; \
+			then exit 0; else rm $@; exit 1; fi'
+
+.web.tex:;	sh -c 'if weave $<; then exit 0; else rm $@; exit 1; fi'
+
+.ry.tex:;	sh -c 'if tgrind -d grindefs -f -lpepy $< \
+				| sed -e 1d -e \$$d > $@; \
+			then exit 0; else rm $@; exit 1; fi'
+
+.py.tex:;	sh -c 'if tgrind -d grindefs -f -lpepy $< \
+				| sed -e 1d -e \$$d > $@; \
+			then exit 0; else rm $@; exit 1; fi'
+
+.tex.dvi:;	sh -c 'if slitex \\nonstopmode\\input $<; \
+			  then exit 0; else rm $@; exit 1; fi'
+
+.dvi.imp:;	dviimp $(DFLAGS) -l -i $@ $<
+
+.dvi.ps:;	sh -c 'if dvi2ps $(DFLAGS) -o landscape -r -b $* -z 20 $<; \
+			  then exit 0; else rm $@; exit 1; fi'
+
+#############################################################
+# Here it is...
+#############################################################
+
+all:		practical-osi3.dvi
+
+inst-all:;
+
+install:	inst-all clean
+
+lint:;
+
+clean:;		rm -f practical-osi3.imp practical-osi3.ps practical-osi3.dvi \
+			practical-osi3.log _*
+
+grind:		practical-osi3.dvi true
+		dvisp $(DFLAGS) -Xl practical-osi3
+
+imp:		practical-osi3.imp
+
+ps:		practical-osi3.ps
+
+preview:	practical-osi3.dvi true
+		xdvi -l practical-osi3.dvi
+
+true:;
+
+practical-osi3.dvi:	practical-osi3.tex \
+		    figureP-1.tex \
+		end-to-end.tex \
+		    figureE-1.tex  figureE-2.tex  figureE-3.tex  \
+		    figureE-4.tex  figureE-5.tex  figureE-6.tex  \
+		    figureE-7.tex  figureE-8.tex  figureE-9.tex  \
+		    figureE-10.tex figureE-11.tex figureE-12.tex \
+ 		    figureE-13.tex figureE-14.tex figureE-15.tex \
+ 		    figureE-16.tex figureE-17.tex figureE-18.tex \
+ 		    figureE-19.tex figureE-20.tex figureE-21.tex \
+		application.tex \
+		    figureA-1.tex  figureA-2.tex  figureA-3.tex  \
+		    figureA-4.tex  figureA-5.tex  figureA-6.tex  \
+		    figureA-7.tex  figureA-8.tex  figureA-9.tex  \
+		directory.tex \
+		    figureD-1.tex  figureD-2.tex  figureD-3.tex  \
+		    figureD-4.tex  figureD-5.tex  figureD-6.tex  \
+		    figureD-7.tex  figureD-8.tex  figureD-9.tex  \
+		    figureD-10.tex figureD-11.tex figureD-12.tex \
+		    figureD-13.tex figureD-14.tex figureD-15.tex \
+		    figureD-16.tex figureD-17.tex figureD-18.tex \
+		    figureD-19.tex figureD-20.tex figureD-21.tex \
+		    figureD-22.tex figureD-23.tex figureD-24.tex \
+		    figureD-25.tex figureD-26.tex figureD-27.tex \
+		    figureD-28.tex figureD-29.tex figureD-30.tex \
+		    figureD-31.tex figureD-32.tex figureD-33.tex \
+		    figureD-34.tex figureD-35.tex figureD-36.tex \
+		transition.tex \
+		    figureT-1.tex  figureT-2.tex  figureT-3.tex  \
+		    figureT-4.tex  figureT-5.tex  figureT-6.tex  \
+						  figureT-9.tex  \
+		    figureT-10.tex figureT-11.tex figureT-12.tex \
+		    figureT-13.tex figureT-14.tex figureT-15.tex \
+		    figureT-16.tex figureT-17.tex figureT-18.tex \
+		    figureT-19.tex \
+		isode.tex

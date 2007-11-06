@@ -1,0 +1,18 @@
+\File{figureB\-8.c},{11:21},{May  5 1990}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{    \K{int}}\Tab{8}{    result;}}
+\L{\LB{    \K{struct} type\_MODULE\_argument *arg;}}
+\L{\LB{    \K{struct} RoSAPindication rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{}}
+\L{\LB{    \C{}\/* allocate and initialize ``arg\'\' here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((result = stub\_MODULE\_operation (sd, RyGenID (sd), arg, do\_result,}}
+\L{\LB{}\Tab{40}{ do\_error, ROS\_SYNC, roi)) != OK)}}
+\L{\LB{}\Tab{8}{ros\_lose (result, roi);}}
+\L{\LB{}}
+\L{\LB{    free\_MODULE\_argument (arg);}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}

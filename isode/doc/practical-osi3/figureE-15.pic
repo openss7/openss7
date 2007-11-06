@@ -1,0 +1,81 @@
+.PS
+.ps 20
+##
+boxht	=	boxht/2
+boxwid	=	boxwid/2
+define boxit @
+$1:	box with .w at last box.e $2
+@
+## figureE-15
+B01:	box "1" invis
+	boxit(B02, "2" invis)
+	boxit(B03, "3" invis)
+	boxit(B04, "4" invis)
+	boxit(B05, "5" invis)
+	boxit(B06, "6" invis)
+	boxit(B07, "7" invis)
+B10:	box "1" invis with .ne at B01.sw
+B20:	box "2" invis with .n at last box.s
+B30:	box "3" invis with .n at last box.s
+B40:	box "4" invis with .n at last box.s
+B50:	box "5" invis with .n at last box.s
+B60:	box "6" invis with .n at last box.s
+B70:	box "7" invis with .n at last box.s
+##
+B11:	box "$\surd$" with .n at B01.s
+	boxit(B12, "$\surd$")
+	boxit(B13, "$\surd$")
+	boxit(B14, "$\surd$")
+	boxit(B15, "$\surd$")
+	boxit(B16, "$\surd$")
+	boxit(B17, "$\surd$")
+##
+B21:	box "$\surd$" with .n at B11.s
+	boxit(B22, "$\surd$")
+	boxit(B23, "$\surd$")
+	boxit(B24, "$\surd$")
+	boxit(B25, "$\surd$")
+	boxit(B26, "$\surd$")
+	boxit(B27, "$\surd$")
+##
+B31:	box "$\surd$" with .n at B21.s
+	boxit(B32, "$\surd$")
+	boxit(B33, "$\surd$")
+	boxit(B34, "$\surd$")
+	boxit(B35, "$\surd$")
+	boxit(B36, "$\surd$")
+	boxit(B37, "$\surd$")
+##
+B41:	box "$\surd$" with .n at B31.s
+	boxit(B42, "$\surd$")
+	boxit(B43, "$\surd$")
+	boxit(B44, "$\surd$")
+	boxit(B45, "$\surd$")
+	boxit(B46, "$\surd$")
+	boxit(B47, "$\surd$")
+##
+B51:	box "$\surd$" with .n at B41.s
+	boxit(B52, "$\surd$")
+	boxit(B53, "$\surd$")
+	boxit(B54, "$\surd$")
+	boxit(B55, "$\surd$")
+	boxit(B56, "$\surd$")
+	boxit(B57, "$\surd$")
+##
+B61:	box "$\surd$" with .n at B51.s
+	boxit(B62, "$\surd$")
+	boxit(B63, "$\surd$")
+	boxit(B64, "$\surd$")
+	boxit(B65, "$\surd$")
+	boxit(B66, "$\surd$")
+	boxit(B67, "$\surd$")
+##
+B71:	box "$\surd$" with .n at B61.s
+	boxit(B72, "$\surd$")
+	boxit(B73, "$\surd$")
+	boxit(B74, "$\surd$")
+	boxit(B75, "$\surd$")
+	boxit(B76, "$\surd$")
+	boxit(B77, "$\surd$")
+##
+.PE

@@ -1,0 +1,74 @@
+Practical Perspectives on OSI Networking
+
+Marshall T. Rose
+Principal Scientist
+Performance Systems International, Inc.
+
+Overview
+
+     This two day course provides a practical perspective on the
+     issues involved in developing and deploying OSI networks:
+     it is concerned with "filling in the gaps" between "what the
+     standards say" and "how a system implements OSI".  The talk does
+     not focus on architecture, nor on vendor offerings or specific
+     implementations, rather it deals with system issues such as
+     explaining how much knowledge the transport layer must have, or why
+     certain OSI protocol combinations do not interwork.
+
+What You Will Learn
+
+     Attendees will gain a thorough understanding of the technology involved
+     in developing OSI applications, building OSI networks, and transiting to
+     (or coexisting with) TCP/IP-based networks.
+
+Syllabus
+
+     o End-to-End Services -- concepts, building blocks, and comparison 
+       with relevant TCP/IP technology.
+
+     o Application Services -- application layer structure, application
+       service elements
+
+     o Directory Services -- information framework, distributed operations,
+       integration into new services
+
+     o Transition and Coexistence with TCP/IP -- motivation and background,
+       protocol-based Approaches, service-based approaches, examples
+
+Who Should Attend
+
+     This tutorial is intended for professionals interested in planning,
+     implementing, or managing OSI networks.  A basic familiarity with
+     networking and OSI is assumed: this course is NOT an introduction
+     to, or a tutorial on, OSI.  Detailed knowledge of the protocols is
+     not required, but experience with implementing networking protocols
+     is very helpful.  Experience with the "C" programming language is also
+     useful.
+
+
+Instructor
+
+     Marshall T. Rose is Principal Scientist at Performance Systems
+     International, Inc., where he works on OSI protocols and network
+     management.  He is the principal implementor of the ISO Development
+     Environment (ISODE), an openly available implementation of the
+     upper layers of the OSI protocol suite.  He is the author of both
+     **The Open Book** and **The Simple Book**, professional texts
+     providing a practical perspective on both OSI and network
+     management of internets, both published by Prentice-Hall.  Rose
+     received the Ph.D. degree in Information and Computer Science from
+     the University of California, Irvine, in 1984.  His subscriptions
+     to **The Atlantic** and **Rolling Stone Magazine** are in good standing.
+///////
+This course fills in the gaps between "what the standards say" and "how
+a system implements OSI".  By attending this course, gy attending this
+course you gain a thorough understanding of the technology involved
+in developing OSI applications, building OSI networks, and transiting to
+(or coexisting with) TCP/IP-based networks.
+
+    Topics: End-to-End Services, Application Services, Directory Services,
+    Transition and Coexistence with TCP/IP
+
+    Attendees: networking professionals with an understanding of the C
+    programming language, user-level programming for UNIX, and the rudiments
+    of OSI. 

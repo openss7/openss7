@@ -1,0 +1,28 @@
+\File{grind4\-4.py},{11:13},{Jul  4 1988}
+\L{\LB{\K{ENCODER} build}}
+\L{\LB{}}
+\L{\LB{\Proc{Example}Example ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    \C{}\-\- select maybe element if present}}
+\CE{}\L{\LB{}\Tab{8}{    Maybe}}
+\L{\LB{}\Tab{8}{    \K{OPTIONAL} \<\<maybe == PRESENT\>\>,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \K{SEQUENCE} \K{OF}}}
+\L{\LB{}\Tab{16}{\C{}\-\- build elements}}
+\CE{}\L{\LB{}\Tab{16}{\%\{ construct\_elements(); \%\}}}
+\L{\LB{}\Tab{16}{\C{}\-\- now produce them}}
+\CE{}\L{\LB{}\Tab{16}{\<\<init\_elements(); more\_elements();\>\> }}
+\L{\LB{}\Tab{16}{BizarreEvents,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \K{CHOICE}}}
+\L{\LB{}\Tab{8}{    \%\{ choose = leap\_year() ? 2 : 1; \%\}}}
+\L{\LB{}\Tab{8}{    \<\<choose\>\>}}
+\L{\LB{}\Tab{8}{    \{}}
+\L{\LB{}\Tab{16}{[0] MyProposal,}}
+\L{\LB{}\Tab{16}{[1] YourProposal}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \K{INTEGER}}}
+\L{\LB{}\Tab{8}{    [[i defvalue]]}}
+\L{\LB{}\Tab{8}{    \K{DEFAULT} 4 \<\<defvalue != 4\>\>}}
+\L{\LB{}\Tab{8}{\}}}

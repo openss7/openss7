@@ -1,0 +1,32 @@
+% run this through LaTeX with the appropriate wrapper
+
+\scriptsize
+\begin{verbatim}
+SLAVE
+19890509120000Z
+cn=Manager
+acl=
+cn= Manager
+aliasedObjectName= c=US@o=Performance Systems International@ou=Development@cn=Wengyik Yeong#
+objectClass= top & quipuObject
+objectClass= alias
+
+objectClass= top & organizationalUnit & quipuObject & quipuNonLeafObject
+l= Reston, Virginia
+streetAddress= 11800 Sunrise Valley Drive, Suite 1100
+ou= Research and Development & Development
+postalAddress= PSI Inc. $ 11800 Sunrise Valley Drive $ Suite 1100 $ Reston, VA 22091 $ US
+postalCode= 22091
+physicalDeliveryOfficeName= Reston
+telephoneNumber= +1 703-620-6651
+facsimileTelephoneNumber= +1 703-620-4586
+lastModifiedTime= 900107205334Z
+lastModifiedBy= c=US@cn=Manager
+masterDSA= c=US@cn=Spectacled Bear
+
+\end{verbatim}
+
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\empty

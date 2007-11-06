@@ -1,0 +1,22 @@
+\File{grind2a\-1.c},{11:48},{Dec 10 1990}
+\L{\LB{\K{\#include} \<isode\/acsap.h\>}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{register} \K{struct} PSAPaddr *pa;}}
+\L{\LB{\K{register} AEI aei;}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{char} *qualifier = \S{}\"filestore\"\SE{};}}
+\L{\LB{\K{char} *context = \S{}\"iso ftam\"\SE{};}}
+\L{\LB{}}
+\L{\LB{\K{if} ((aei = \_str2aei (\S{}\"hubris, cs, ucl, gb\"\SE{}, qualifier,}}
+\L{\LB{}\Tab{16}{     context, isatty (fileno (stdin)),}}
+\L{\LB{}\Tab{16}{     NULLCP, NULLCP))}}
+\L{\LB{}\Tab{8}{== NULLAEI)}}
+\L{\LB{    error (\S{}\"unable to resolve service: \%s\"\SE{}, PY\_pepy);}}
+\L{\LB{\Proc{if}\K{if} ((pa = aei2addr (aei)) == NULLPA)}}
+\L{\LB{    error (\S{}\"address translation failed\"\SE{});}}
+\L{\LB{}}
+\L{\LB{...}}

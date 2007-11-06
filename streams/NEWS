@@ -1,5 +1,5 @@
-Linux Fast-STREAMS -- history of user visible changes.  2007-08-19
-$Id: NEWS,v 0.9.2.58 2007/08/19 12:40:00 brian Exp $
+Linux Fast-STREAMS -- history of user visible changes.  2007-10-18
+$Id: NEWS,v 0.9.2.59 2007/10/15 19:04:08 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -28,6 +28,21 @@ Major features since the last public release are as follows:
      back to "GPL".
 
    - License upgrade to GPL Version 3.
+
+   - Modifications to build under Fedora 2.6.22.5-49 kernel.  These
+     changes also support 2.6.22.9-91.fc7 kernel.
+
+   - Added SNMP MIB and AgentX sub-agent for STREAMS.  This is a rather
+     significant addition to Linux Fast-STREAMS which permits remote
+     management of the entire STREAMS subsystem using SNMP.
+
+   - Ability to strap out major documentation build and installation
+     primarily for embedded targets.
+
+   - Improvements to common build process for embedded and
+     cross-compile targets.
+
+   - Support for flex 2.5.33  in maintainer mode.
 
 
 _This is a public stable production grade release of the package: it

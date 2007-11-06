@@ -1,0 +1,128 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{The ISODE Entities Database}\label{isoentities}
+The database \file{isoentities} in the ISODE \verb"ETCDIR" directory
+(usually \file{/usr/etc/})
+contains a simple mapping between
+appli\-cat\-ion-entity information and presentation addresses.
+This database is used by the stub-directory service.
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	Use of this database is deprecated.
+		Consult Chapter~\ref{services} on page~\pageref{services}
+		for further information.
+\end{tabular}}\]
+
+The database itself is an ordinary ASCII text file containing information
+regarding the known ap\-pli\-ca\-tion-entities on the network.
+Each entry contains:
+\begin{itemize}
+\item	the object descriptor of the application-entity information,
+	realized as a designator-qualifier (host/service) pair
+	(the distinguished designator \verb"default" is used for a template
+	entry);
+
+\item	the object identifier of the application-entity information
+	expressed in dot-notation
+	(if no application-entity information is desired,
+	the string ``NULL'' should be used instead);
+	and,
+
+\item	the presentation address expressed in the string format described
+	in Section~\ref{addr:encodings} on page~\pageref{addr:encodings} in
+	\volone/.
+
+	Note that since double-quotes are often used in the new string format,
+	it is {\bf very\/} important to quote them correctly in the 
+	\man isoentities(5) file.
+	Usually preceeding the first character of the address with backslash
+	(``\verb"\"'') is adequate.
+\end{itemize}
+Blanks and/or tab characters are used to seperate items.
+However, double-quotes may be used to prevent separation for items containing
+embedded whitspace.
+This is useful for defining the presetnation address.
+The sharp character (`\verb"#"') at the beginning of a line indicates a
+commentary line.
+
+It is suggested for readability purposes that a blank line should seperate
+entries. 
+
+\subsection*	{RFC1085 Support}
+Since applications using RFC1085 (the lightweight presentation protocol)
+usually demultiplex on the basis of TCP or UDP port,
+a further definition for the qualifier is placed in
+\file{/etc/services},
+one of:
+\begin{quote}\small\begin{verbatim}
+qualifier    portno/lpp
+qualifier    portno/tcp
+qualifier    portno/udp
+\end{verbatim}\end{quote}
+The first alternative says that the service lives on both TCP and UDP;
+the second alternative says that the service lives on TCP only;
+and,
+the third alternative says that the service lives on UDP only.
+
+\section	{Accessing the Database}\label{isoentity}
+The \man libacsap(3n) library contains the routines used to access the
+database.
+The high-level routines, \verb"_str2aei",
+which returns application-entity information,
+and \verb"aei2addr",
+which maps the ap\-pli\-ca\-tion-entity information into a presentation
+address have
+already been discussed in Section~\ref{acs:aei}.
+Similarly, the ``old-style'' routines,
+\verb"is2paddr", \verb"is2saddr", \verb"is2taddr",
+which maps a host and service directly into a prsentation, session,
+or transport address (respectively) are discussed in
+Sections~\ref{psap:addresses}, \ref{ssap:addresses}, and~\ref{tsap:addresses}
+of \voltwo/ (respectively).
+Hence, for the remainder of this chapter,
+we need only consider the internal form used by the library in querying the
+database.
+
+The \verb"isoentity" structure is the internal form.
+\begin{quote}\index{isoentity}\small\begin{verbatim}
+struct isoentity {
+    OIDentifier ie_identifier;
+    char    *ie_descriptor;
+
+    struct PSAPaddr ie_addr;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ie\_identifier":] an object identifier used to form
+application-entity information;
+
+\item[\verb"ie\_identifier":] the corresponding object descriptor;
+and,
+
+\item[\verb"ie\_addr":] the presentation address.
+\end{describe}
+
+The routine \verb"getisoentity" reads the next entry in the database,
+opening the database if necessary.
+\begin{quote}\index{getisoentity}\small\begin{verbatim}
+struct isoentity *getisoentity ()
+\end{verbatim}\end{quote}
+It returns the manifest constant \verb"NULL" on error or end-of-file.
+
+The routine \verb"setisoentity" opens and rewinds the database.
+\begin{quote}\index{setisoentity}\small\begin{verbatim}
+int     setisoentity (f)
+int     f;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"f":] the ``stayopen'' indicator,
+if non-zero, then the database will remain open over subsequent calls to the
+library.
+\end{describe}
+The routine \verb"endisoentity" closes the database.
+\begin{quote}\index{endisoentity}\small\begin{verbatim}
+int     endisoentity ()
+\end{verbatim}\end{quote}
+Both of these routines return non-zero on success and zero otherwise.

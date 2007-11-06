@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2007/08/14 04:26:52 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2007/10/15 17:22:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 04:26:52 $ by $Author: brian $
+# Last Modified $Date: 2007/10/15 17:22:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -667,6 +667,61 @@ dnl 	fi
 	    AC_DEFINE([HAVE_KFUNC_SKB_LINEARIZE_1_ARG], [1], [Define if
 		       function skb_linearize takes 1 argument.])
 	fi
+	AC_CACHE_CHECK([for kernel tcp_push_pending_frames with 1 argument], [linux_cv_have_tcp_push_pending_frames_1_arg], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <net/sock.h>
+#include <linux/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <net/tcp.h>
+]],
+		[[void (*my_autoconf_function_pointer)(struct sock *sk) = &tcp_push_pending_frames;]]) ],
+		[linux_cv_have_tcp_push_pending_frames_1_arg='yes'],
+		[linux_cv_have_tcp_push_pending_frames_1_arg='no'])
+	])
+	if test :$linux_cv_have_tcp_push_pending_frames_1_arg = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_TCP_PUSH_PENDING_FRAMES_1_ARG], [1], [Define
+		       if function tcp_push_pending_frames takes 1 argument.])
+	fi
+	AC_CACHE_CHECK([for kernel __tcp_push_pending_frames with 3 arguments], [linux_cv_have___tcp_push_pending_frames_3_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <net/sock.h>
+#include <linux/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <net/tcp.h>
+]],
+		[[void (*my_autoconf_function_pointer)(struct sock *, unsigned int, int) = &__tcp_push_pending_frames;]]) ],
+		[linux_cv_have___tcp_push_pending_frames_3_args='yes'],
+		[linux_cv_have___tcp_push_pending_frames_3_args='no'])
+	])
+	if test :$linux_cv_have___tcp_push_pending_frames_3_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS], [1],
+		      [Define if function __tcp_push_pending_frames takes 3
+		       arguments.])
+	fi
     ])
     _LINUX_KERNEL_SYMBOLS([inet_proto_lock, inet_protos])
     if test :"${with_inet:-no}" = :yes ; then
@@ -766,6 +821,7 @@ dnl
 dnl These are INET-only checks
 dnl
     _LINUX_CHECK_MEMBERS([struct sk_buff.h.sh,
+			  struct sk_buff.transport_header,
 			  struct sock.protinfo.af_inet.ttl,
 			  struct sock.protinfo.af_inet.uc_ttl,
 			  struct sock.tp_pinfo.af_sctp], [], [], [
@@ -1066,6 +1122,9 @@ AC_DEFUN([_INET_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.80  2007/10/15 17:22:47  brian
+# - updates for 2.6.22.5-49.fc6 kernel
+#
 # Revision 0.9.2.79  2007/08/14 04:26:52  brian
 # - GPLv3 header update
 #

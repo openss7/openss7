@@ -1,0 +1,492 @@
+% run this through SLiTeX with the appropriate wrapper
+
+\begin{bwslide}
+\part	{THE FILE SERVICE}
+
+\begin{nrtc}\bf
+\item	MODEL OF OPERATION
+
+\item	REGIMES AND SERVICES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{MODEL OF OPERATION}\bf
+
+\begin{nrtc}
+\item	FILE SERVICE INITIATOR AND RESPONDER
+
+\item	REGIMES
+
+\item	SERVICE PRIMITIVES AND COMMON PARAMETERS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FILE SERVICE INITIATOR AND RESPONDER}
+
+\begin{nrtc}
+\item	A CLIENT-SERVER MODEL IS USED
+    \begin{nrtc}
+    \item	THE PROTOCOL EXCHANGE IS ASYMMETRIC
+
+    \item	NOTE: CLIENT COULD BE ANOTHER FILESTORE
+    \end{nrtc}
+
+\item	AN INITIATOR IS A USER ENTITY WHICH REQUESTS THE FILE SERVICE
+
+\item	A RESPONDER IS A USER ENTITY WHICH IMPLEMENTS THE VIRTUAL FILESTORE
+
+\item	THIS PAIRING OF USERS IS TERMED AN FTAM ACTIVITY
+
+\item	THE PROVIDER IS THE FILE SERVICE ABSTRACTION,
+	IT IMPLEMENTS THE FILE SERVICE BY USING THE FILE PROTOCOL
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REGIMES}
+
+\begin{nrtc}
+\item	THE ASSOCIATION BETWEEN THE TWO ENTITIES PROGRESS THROUGH A NUMBER
+	OF STAGES, TERMED ``REGIMES''
+
+\item	A REGIME DETERMINES WHICH COMPONENTS OF THE FILE SERVICE MAY BE
+	REQUESTED
+
+\item	REGIMES NEST IN AN ORDERLY FASHION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+following are a lot of standard osi modeling mechanisms$\ldots$
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{SERVICE PRIMITIVES AND COMMON PARAMETERS}
+
+\begin{nrtc}
+\item	THE INITIATOR AND RESPONDER COMMUNICATE VIA SERVICE PRIMITIVES
+
+\item	A PRIMITIVE IS AN ABSTRACTION (NOT AN INTERFACE)
+
+\item	IN GENERAL, THERE ARE THREE KINDS OF SERVICES
+    \begin{nrtc}
+    \item	CONFIRMED, IN WHICH A REQUEST ALWAYS RESULTS IN A RESPONSE
+
+    \item	UNCONFIRMED, IN WHICH NO RESPONSE IS RETURNED
+
+    \item	PROVIDER-INITIATED,
+		IN WHICH THE SERVICE PROVIDER INDICATES SOME ABNORMAL
+		CONDITION
+    \end{nrtc}
+
+\item	CONFIRMATION IS UNRELATED TO RELIABILITY
+
+\item	SERVICE PRIMITIVES, LIKE PROCEDURE CALLS, HAVE TYPED PARAMETERS
+\end{nrtc}
+\end{bwslide}
+
+
+
+\begin{bwslide}
+\ctitle	{SERVICE PRIMITIVES}
+
+\begin{nrtc}
+\item	A SERVICE CONSISTS OF ONE OR MORE PRIMITIVES
+
+\item	EACH PRIMITIVE IS PREFIXED WITH ``F-''
+
+\item	A CONFIRMED SERVICE HAS FOUR PRIMITIVES
+    \begin{nrtc}
+    \item	.REQUEST, .INDICATION, .RESPONSE, and .CONFIRMATION
+    \end{nrtc}
+
+\item	AN UNCONFIRMED SERVICE HAS TWO PRIMITIVES:
+    \begin{nrtc}
+    \item	.REQUEST,  and .INDICATION
+    \end{nrtc}
+
+\item	A PROVIDER-INITIATED SERVICE HAS ONE PRIMITIVE:
+    \begin{nrtc}
+    \item	.INDICATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: CONFIRMED SERVICE}
+
+\vskip.5in
+\diagram[p]{figure5}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMON PARAMETERS TO SERVICE PRIMITIVES}
+
+\begin{nrtc}
+\item	STATE RESULT: INDICATES IF A REGIME CHANGE IS SUCCESSFUL
+
+\item	ACTION RESULT: INDICATES IF A SERVICE PRIMITIVE IS SUCCESSFUL
+
+\item	DIAGNOSTICS: PROVIDES DETAILED INFORMATION ON THE FAILURE
+	(IF ANY) OF A CONFIRMED SERVICE
+
+\item	CHARGING: A RESOURCE, CHARGING UNIT, and CHARGE VALUE\\
+	(INTERPRETATION IS UNDEFINED BY FTAM)
+
+\item	IDENTITY OF FILE ACCESS DATA UNIT (FADU)
+
+\item	PLUS: FILE ATTRIBUTES, REQUESTED ACCESS, etc.
+\end{nrtc}
+\end{bwslide}
+
+
+
+\begin{bwslide}
+\part*	{REGIMES AND SERVICES}\bf
+
+\begin{nrtc}
+\item	AS NOTED EARLIER,
+	THE INNER-MOST REGIME DETERMINES WHICH SERVICE PRIMITIVES
+	(AND HENCE SERVICES) ARE ACCESSIBLE
+
+\item	THERE ARE FOUR REGIMES
+    \begin{nrtc}
+    \item	APPLICATION ASSOCIATION
+
+    \item	FILE SELECTION
+
+    \item	FILE OPEN
+
+    \item	DATA TRANSFER
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NESTED REGIMES}
+
+\vskip.5in
+\diagram[p]{figure6}
+\end{bwslide}
+
+
+\begin{note}\em
+as regimes and services are so hopelessly interwined,
+we now bounce back-and-forth between the two in this part of the presentation
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION ASSOCIATION REGIME}
+
+\begin{nrtc}
+\item	FTAM REGIME ESTABLISHMENT SERVICE
+    \begin{nrtc}
+    \item	WHEN TWO APPLICATIONS ARE BOUND BY AN ASSOCIATION,
+		AN FTAM REGIME IS ESTABLISHED    
+    \end{nrtc}
+
+\item	FTAM REGIME TERMINATION SERVICE
+
+\item	FTAM REGIME ABORT SERVICE
+
+\item	DURING REGIME ESTABLISHMENT,
+	PARAMETERS REGARDING THE USE OF THE FILE SERVICE ARE MANDATED OR
+	NEGOTIATED
+    \begin{nrtc}
+    \item	SERVICE LEVEL (RELIABLE/USER-CORRECTABLE)
+
+    \item	SERVICE CLASS
+
+    \item	FUNCTIONAL UNITS
+
+    \item	ATTRIBUTE GROUPS (KERNEL, STORAGE, etc.)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+observation: having defined a massive service,
+we now frantically seek ways to delimit what actually gets used!
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{SERVICE CLASS}
+
+\begin{nrtc}
+\item	FTAM SUPPORTS MANY SERVICES\\
+	NEED A WAY TO CHOOSE A SUBSET OF THE SERVICES A INITIATOR DESIRES
+
+\item	FIVE SERVICES CLASSES
+    \begin{nrtc}
+    \item	FILE TRANSFER
+
+    \item	FILE ACCESS
+
+    \item	FILE MANAGEMENT
+
+    \item	FILE TRANSFER AND MANAGEMENT
+
+    \item	UNCONSTRAINED
+    \end{nrtc}
+
+\item	THE SERVICE CLASS IS SELECTED BY THE INITIATOR DURING CONNECTION
+	ESTABLISHMENT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FUNCTIONAL UNITS}
+
+\begin{nrtc}
+\item	FUNCTIONAL UNITS, WHICH ARE NEGOTIABLE, PROVIDE A WAY TO FURTHER
+	DELIMIT THE SERVICES NEEDED BY AN INITIATOR
+
+\item	A FUNCTIONAL UNIT DEFINES WHICH SERVICES ARE AVAILABLE DURING
+	THE LIFETIME OF THE FTAM REGIME
+
+\item	THE SERVICE LEVEL AND CLASS OFTEN MANDATE CERTAIN FUNCTIONAL UNITS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FUNCTIONAL UNITS (cont.)}
+
+\begin{nrtc}
+\item	KERNEL: REGIME ESTABLISHMENT/TERMINATION, FILE SELECTION/DESELECTION
+
+\item	READ: FILE OPEN/CLOSE, READ BULK DATA
+
+\item	WRITE: FILE OPEN/CLOSE, WRITE BULK DATA
+
+\item	FILE ACCESS: LOCATE/ERASE FADU
+
+\item	LIMITED FILE MANAGEMENT: CREATE/DELETE FILES, READ ATTRIBUTES
+
+\item	ENHANCED FILE MANAGEMENT: CHANGE ATTRIBUTES
+
+\item	GROUPING: BEGIN/END A COLLECTION OF REQUESTS
+
+\item	RECOVERY: RECOVER PREVIOUS REGIME, CHECKPOINTING
+
+\item	RESTART: RESTART DATA TRANSFER, CHECKPOINTING
+\end{nrtc}
+\end{bwslide}
+
+
+
+
+\begin{bwslide}
+\ctitle	{FILE SELECTION REGIME}
+
+\begin{nrtc}
+\item	WHEN A FILE IS BOUND TO FTAM REGIME,
+	THE FILE SELECTION REGIME IS ESTABLISHED BY EITHER
+    \begin{nrtc}
+    \item	FILE SELECTION SERVICE:
+		A FILE IS SELECTED, IF IT ALREADY EXISTS
+
+    \item	FILE CREATION SERVICE:
+		A FILE IS (OPTIONALLY) CREATED AND THENCE SELECTED
+    \end{nrtc}
+
+\item	ONCE A FILE IS SELECTED,
+	FILE MANAGEMENT FUNCTIONS MAY BE PERFORMED BY
+    \begin{nrtc}
+    \item	READ ATTRIBUTE SERVICE
+
+    \item	CHANGE ATTRIBUTE SERVICE
+    \end{nrtc}
+
+\item	AFTER ANY FILE MANAGEMENT FUNCTIONS,
+	THE FILE MAY BE OPENED FOR TRANSFER AND/OR ACCESS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FILE SELECTION REGIME (cont.)}
+
+\begin{nrtc}
+\item	THE FILE SELECTION REGIME IS TERMINATED BY EITHER
+    \begin{nrtc}
+    \item	FILE DESELECTION SERVICE:
+		THE FILE IS SIMPLY UNBOUND FROM THE FTAM REGIME
+
+    \item	FILE DELETION SERVICE:
+		THE FILE IS REMOVED FROM THE FILESTORE, AND HENCE UNBOUND
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FILE OPEN REGIME}
+
+\begin{nrtc}
+\item	FILE OPEN SERVICE
+    \begin{nrtc}
+    \item	WHEN A FILE IS TO BE TRANSFERRED OR ACCESSED,
+		THE FILE OPEN REGIME IS ESTABLISHED    
+    \end{nrtc}
+
+\item	THIS BINDS THE STRUCTURE OF THE FILE
+
+\item	ONCE A FILE IS OPENED,
+	FILE ACCESS FUNCTIONS MAY BE PERFORMED
+    \begin{nrtc}
+    \item	LOCATE FADU SERVICE
+
+    \item	ERASE FADU SERVICE
+    \end{nrtc}
+
+\item	AFTER ANY FILE ACCESS FUNCTIONS,
+	DATA TRANSFER MAY OCCUR
+
+\item	THE FILE CLOSE SERVICE TERMINATES THE FILE OPEN REGIME
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DATA TRANSFER REGIME}
+
+\begin{nrtc}
+\item	FINALLY, WHEN DATA IS TO BE ACTUALLY TRANSFERRED,
+	THE DATA TRANSFER REGIME IS ESTABLISHED
+
+\item	THIS INVOKES A ``BULK DATA'' TRANSFER MECHANISM FOR FADUs
+    \begin{nrtc}
+    \item	READ BULK DATA SERVICE
+
+    \item	WRITE BULK DATA SERVICE
+
+    \item	DATA UNIT TRANSFER SERVICE
+
+    \item	END OF DATA TRANSFER SERVICE
+
+    \item	END OF TRANSFER SERVICE
+
+    \item	CANCEL DATA TRANSFER SERVICE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE GROUPING SERVICE}
+
+\begin{nrtc}
+\item	TYPICALLY MANY FILE OPERATIONS HAVE THREE ACTIONS
+    \begin{nrtc}
+    \item	ACQUIRE THE FILE FOR DATA TRANSFER
+
+    \item	PERFORM THE DATA TRANSFER
+
+    \item	RELEASE THE FILE
+    \end{nrtc}
+
+\item	THE FIRST AND LAST ACTIONS CAN EACH BE VIEWED AS BEING INDIVISIBLE
+
+\item	GROUPING PERMITS PRIMITIVES TO BE ``BUNDLED TOGETHER''
+	IN ORDER TO IMPLEMENT ONE OF THESE TWO ACTIONS
+
+\item	GROUPING IS MANDATED BY MOST FILE CLASSES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE GROUPING SERVICE (cont.)}
+
+\begin{nrtc}
+\item	THE TYPICAL ``ACQUIRE THE FILE'' GROUP:
+    \begin{nrtc}
+    \item	F-BEGIN-GROUP
+
+    \item	F-SELECT
+
+    \item	F-OPEN
+
+    \item	F-END-GROUP
+    \end{nrtc}
+
+\item	THE TYPICAL ``RELEASE THE FILE'' GROUP:
+    \begin{nrtc}
+    \item	F-BEGIN-GROUP
+
+    \item	F-CLOSE
+
+    \item	F-DESELECT
+
+    \item	F-END-GROUP
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+more complicated groups will be examined later on
+
+this should pretty much illustrate the distinction between state results and
+actions results:
+\begin{quote}
+if a state-change operation fails, they all fail
+
+otherwise if an operation fails, processing continues
+\end{quote}
+
+grouping is constrained to certain commonly used combinations
+(setup and cleanup)
+\end{note}
+
+
+\begin{note}\em
+not discussed due to time constraints:
+
+service level: reliable, user-correctable
+
+recover service for regime recreation
+
+checkpoint service for mark insertion
+
+restart service for transfer restoration
+
+we're pressed for time,
+so no examples here, later on during the implementation part of the talk,
+different applications will be sketched
+\end{note}
+
+
+\begin{bwslide}
+\part*	{SUMMARY}\bf
+
+\begin{nrtc}
+\item	THE FILE SERVICE EXISTS BETWEEN AN INITIATOR, RESPONDER, AND PROVIDER
+
+\item	THE FILE SERVICE PROGRESSES THROUGH A NUMBER OF NESTED REGIMES,
+	WHICH DETERMINE WHICH PARTS OF THE SERVICE MAY BE INVOKED
+
+\item	THE SERVICE IS FURTHER LIMITED BY NEGOTIATION OF SERVICE ELEMENTS
+
+\item	ALL SERVICES CENTER ON A SELECTED FILE WHICH IS TRANSFERRED,
+	ACCESSED, OR MANAGED
+
+\item	THE SERVICES ARE SUFFICIENTLY GENERAL TO SUPPORT A WIDE RANGE OF
+	FILE ACTIVITIES
+\end{nrtc}
+\end{bwslide}

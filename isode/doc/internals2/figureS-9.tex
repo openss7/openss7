@@ -1,0 +1,21 @@
+\File{figureS\-9.c},{11:21},{May  5 1990}
+\L{\LB{\Proc{if}    \K{if} (quantum != lastq) \{}}
+\L{\LB{}\Tab{8}{lastq = quantum;}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{if} (getkmem (nl + N\_IPFORWARDING, (caddr\_t) \&ipforwarding,}}
+\L{\LB{}\Tab{16}{     \K{sizeof} ipforwarding) == NOTOK}}
+\L{\LB{}\Tab{16}{\|\| getkmem (nl + N\_IPSTAT, (caddr\_t) ips, \K{sizeof} *ips)}}
+\L{\LB{}\Tab{24}{== NOTOK)}}
+\L{\LB{}\Tab{8}{    \K{return} int\_SNMP\_error\_\_status\_genErr;}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{\Proc{switch}    \K{switch} (ifvar) \{}}
+\L{\LB{}\Tab{8}{\K{case} ipForwarding:}}
+\L{\LB{}\Tab{8}{    \K{return} o\_integer (oi, v, ipforwarding ? FORW\_GATEWAY : FORW\_HOST);}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}:}}
+\L{\LB{}\Tab{8}{    \K{return} int\_SNMP\_error\_\_status\_noSuchName;}}
+\L{\LB{    \}}}
+\L{\LB{\}}}

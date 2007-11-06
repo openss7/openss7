@@ -1,0 +1,577 @@
+.TH PARADISE-GEN 8 "19 June 1992"
+.ds VD isode\-8.0/
+.ds VN 8.0
+.\" $Header: /xtel/isode/isode/RCS/paradise-gen.8,v 9.0 1992/06/16 12:05:01 isode Rel $
+.SH NAME
+paradise\-gen \- generating the 
+.I PARADISE
+DSA and DUA.
+.SH "PARADISE"
+.I PARADISE
+is a European project under the
+.I COSINE
+initiative aimed at providing Directory services across Europe.  This
+version of the
+.I PARADISE
+software is the first release of both the DSA and DUA packages for the
+project. 
+.LP
+This documentation describes how to configure, generate, and install the
+.I PARADISE
+DSA and DUA versions of the ISO Development Environment.
+.PP
+You will probably want to read over this entire document first,
+before typing any commands;
+e.g., there are optional components described later on that require
+additional settings in the configuration file.
+.PP
+This document describes how to compile and install the QUIPU DSA and DUA 
+for the
+.I PARADISE
+DSA and DUA services only, for full details on how to install the ISODE
+you should consult isode-gen(8).
+.PP
+Comments concerning this 
+.I PARADISE
+release should be directed to the mailbox
+\*(lqhelpdesk@paradise.ulcc.ac.uk\*(rq. 
+.SH SYNOPSIS
+.sp
+.in +.5i
+.nf
+% cd \*(VD
+% cp config/\fIsystem\fR.h h/config.h
+% cp config/\fIsystem\fR.make config/CONFIG.make
+% cp config/*.local support/
+% ./make paradise
+# ./make inst-paradise
+.fi
+.in -.5i
+.sp
+.SH DESCRIPTION
+This is a description of how one can bring up the 
+.I PARADISE
+DSA
+It is assumed that you have super\-user privileges in order to install
+the software.
+Super\-user privileges are not required to configure or generate this
+software.
+.PP
+The distribution tape contains the hierarchy for the \fB\*(VD\fR directory.
+Bring the sources on\-line by changing to a directory for local sources and
+running tar, e.g.,
+.sp
+.in +.5i
+.nf
+% cd /usr/src/local/
+% tar x
+% cd \*(VD
+.fi
+.in -.5i
+.sp
+.SH CONFIGURATION
+First, go to the \fBconfig/\fR directory.
+.sp
+.in +.5i
+.nf
+% cd config
+.fi
+.in -.5i
+.sp
+.PP
+Select the Makefile and include-file skeletons which most closely match
+your system.
+The current choices are:
+.sp
+.in +.5i
+.nf
+.ta \w'sys52-exos  'u
+.ne 4
+\fIfile\fR	\fIconfiguration\fR
+aix	AIX 3.2
+apollo	Apollo
+aux	A/UX release 2.0.1
+bsd42	generic 4.2BSD UNIX
+bsd43	generic 4.3BSD UNIX
+bsd43\-rt	RT/PC with 4.3BSD
+bsd44	4.4BSD UNIX with OSI
+ccur	Concurrent RTU 6.0
+hpux	HP\-UX
+mips	MIPS RISC/OS
+osx	Olivetti LSX 30xx
+ros	Ridge Operating System
+solbourne Solbourne
+sunlink3	SunOS release 3 with SunLink OSI/X.25 release 5.2
+sunlink4	SunOS release 4 with SunLink OSI/X.25 release 6.0
+sunnet7	SunOS release 4 with SunNet OSI release 7.0
+sunnet7x	SunOS release 4 with SunNet X.25 release 7.0
+sunos3	SunOS release 3
+sunos4	SunOS release 4
+sunos4-1	SunOS release 4.1
+sys52\-exos	SVR2 UNIX with EXOS
+sys52\-rt	RT/PC with AIX
+sys52\-sun	SVR2 UNIX emulation on SunOS release 3
+sys52\-win	SVR2 UNIX with WIN/TCP
+sys53	generic SVR3
+sys54	generic SVR4
+ultrix	Ultrix 3.1
+.re
+.fi
+.in -.5i
+.sp
+The makefile skeleton has the extension \fB.make\fR,
+whereas the include\-file skeleton has the extension \fB.h\fR.
+.SS MAKEFILE
+Copy the makefile skeleton of your choice to \fBpickle.make\fR,
+where \*(lqpickle\*(rq is the name of your system.
+Now edit this file to set the following \fImake\fR variables:
+.sp
+.in +.5i
+.nf
+.ta \w'MANOPTS  'u +\w'/usr/include/isode/  'u
+.ne 8
+\fIvariable\fR	\fIdefault\fR	\fIspecifies\fR
+OPTIONS		options to \fIcc\fR and \fIlint\fR (e.g., -I../h)
+LSOCKET		libraries to link in (e.g., -lcci)
+BINDIR	/usr/local/bin/	where to install user programs
+SBINDIR	/usr/etc/	where to install administrator
+		programs
+ETCDIR	/usr/etc/	where to install administrator files
+LOGDIR	/usr/tmp/	where to install log files
+INCDIR	/usr/include/isode/	where to install include files
+LIBDIR	/usr/lib/	where to install object libraries
+LINTDIR	/usr/lib/lint/	where to install lint libraries
+SYSTEM		directs how to create loader libraries
+MANDIR	/usr/man/	where to install man pages
+MANOPTS		see compat/inst-man.sh for details
+.re
+.fi
+.in -.5i
+.sp
+\fBNOTE THAT ALL THESE DIRECTORIES MUST BE ABSOLUTE PATH NAMES
+(i.e., start and end with a `/')\fR.
+.PP
+Finally, 
+.sp
+.in +.5i
+.nf
+ln pickle.make CONFIG.make
+.fi
+.in -.5i
+.sp
+(yes, that's \*(lqCONFIG\*(rq in uppercase and \*(lqmake\*(rq in lowercase).
+Both of these files are in the \fB\*(VDconfig/\fR directory.
+This latter file is the one which the software uses to configure itself
+during generation.
+.SS INCLUDE\-FILE
+Copy the include\-file skeleton of your choice to \fBpickle.h\fR,
+where \*(lqpickle\*(rq is the name of your system.
+Now add any additional definitions you like (usually none).
+Consult the file \fBconfig/OPTIONS\fR for a list.
+.PP
+Now:
+.sp
+.in +.5i
+.nf
+ln pickle.h ../h/config.h
+.fi
+.in -.5i
+.sp
+This latter file is the one which the software uses to configure itself
+during generation.
+.SS "MACROS and OBJECTS DATABASE"
+Typically, sites run with the default macros and objects databases.
+In this case,
+simply copy the default local configuration files to the \fBsupport/\fR
+directory:
+.sp
+.in +.5i
+.nf
+% cp macros.local ../support/
+% cp objects.local ../support/
+.fi
+.in -.5i
+.sp
+If you have local modifications you wish to make,
+either copy in your own file or edit the files
+\fBsupport/macros.local\fR and
+\fBsupport/objects.local\fR as appropriate.
+.SS "OTHER DATABASES"
+There are other databases used by the ISODE, but these are not needed
+by the 
+.I PARADISE
+DSA.  If you want to install these consult isode-gen(8).
+.SH GENERATION
+Go to the \fB\*(VD\fR directory
+.sp
+.in +.5i
+.nf
+% cd ..
+.fi
+.in -.5i
+.sp
+Now reset the dates of the
+configuration files for the system.
+This is done only once per source-tree:
+.sp
+.in +.5i
+.nf
+% ./make once-only
+.fi
+.in -.5i
+.sp
+Then to make both the DUA and DSA use:
+.sp
+.in +.5i
+.nf
+% ./make paradise
+.fi
+.in -.5i
+.sp
+To make the DSA only use:
+.sp
+.in +.5i
+.nf
+% ./make paradise-dsa
+.fi
+.in -.5i
+.sp
+To make the DUA only use:
+.sp
+.in +.5i
+.nf
+% ./make paradise-dua
+.fi
+.in -.5i
+.sp
+If you are using SunOS,
+do not use the \fImake\fR program supplied with the SunPro package.
+It is not, contrary to any claims, compatible with the standard
+\fImake\fR facility.
+Further,
+note that if you are running a version of SunOS 4.0 prior to release 4.0.3,
+then you may need to use the \fImake\fR program found in \fB/usr/old/\fR,
+if the standard \fImake\fR your are using is the SunPro \fImake\fR.
+In this case,
+you will need to put the old, standard \fImake\fR in \fB/usr/bin/\fR,
+and you can keep the SunPro \fImake\fR in \fB/bin/\fR.
+.PP
+If you are using SVR3,
+then you will probably have to type this command before starting the
+compilation:
+.sp
+.in +.5i
+.nf
+% ulimit 32768
+.fi
+.in -.5i
+.sp
+Similarly,
+you may need to increase the stacksize limitation on other systems.
+For example,
+some users of the RT, report needing to use
+.sp
+.in +.5i
+.nf
+% limit stacksize 16m
+.fi
+.in -.5i
+.sp
+in order to get FTAM to fully compile.
+.PP
+The \fImake\fR command from the top-level directory
+will cause a complete generation of the system.
+If all goes well, proceed with the installation.
+If not, complain, as there \*(lqshould be no problems\*(rq at this step.
+Some files while compiling may produce a
+.sp
+.in +.5i
+.nf
+warning: statement not reached
+.fi
+.in -.5i
+.sp
+or a
+.sp
+.in +.5i
+.nf
+type ObjectDescriptor: Warning: Can't find file DSE.ph failed
+.fi
+.in -.5i
+.sp
+message.
+This is normal.
+Sometimes when building a loader library, you might see several
+.sp
+.in +.5i
+.nf
+ranlib: warning: ../libisode.a(aetdbm.o): no symbol table
+.fi
+.in -.5i
+.sp
+messages.
+This is also normal.
+You might also see a few messages like:
+.sp
+.in +.5i
+.nf
+*** Error code 1 (ignored)
+.fi
+.in -.5i
+.sp
+This is also normal.
+As a rule, unless \fImake\fR says something like
+.sp
+.in +.5i
+.nf
+*** Error code 1
+.fi
+.in -.5i
+.sp
+or perhaps
+.sp
+.in +.5i
+.nf
+Exit
+.fi
+.in -.5i
+.sp
+then everything is going just fine!
+.SH INSTALLATION
+You will need to be the super\-user to install the software.
+Note that installing the software from an NFS-mounted partition
+requires that you perform the installation as the super-user on the
+\fItarget\fR system after changing to the source directory on the
+\fIsource\fR system.
+.PP
+In the directions that follow,
+reference is made to some of the directories defined in the
+\fBCONFIG.make\fR file.
+You should substitute in the correct value,
+for example,
+if the expression
+.sp
+.in +.5i
+.nf
+$(SBINDIR)ros.quipu
+.fi
+.in -.5i
+.sp
+and if SBINDIR is defined as \fB/usr/etc/\fR in the \fBCONFIG.make\fR
+file,
+then you should type
+.sp
+.in +.5i
+.nf
+/usr/etc/ros.quipu
+.fi
+.in -.5i
+.sp
+instead.
+.PP
+To install the software use:
+.sp
+.in +.5i
+.nf
+# ./make inst\-paradise
+.fi
+.in -.5i
+.sp
+which does the installation of both the DUA and DSA.
+To install the DSA only use:
+.sp
+.in +.5i
+.nf
+# ./make inst\-paradise\-DSA
+.fi
+.in -.5i
+.sp
+.PP
+To install the DUA only use:
+.sp
+.in +.5i
+.nf
+# ./make inst\-paradise\-DUA
+.fi
+.in -.5i
+.sp
+.PP
+That's about it.  This will install everything.
+To clean-up the source tree as well, use:
+.sp
+.in +.5i
+.nf
+% ./make clean
+.fi
+.in -.5i
+.sp
+at this point.
+.SH "Running a DSA"
+.PP
+The QUIPU DSA is a \*(lqstatic responder\*(rq.
+This means that it accepts new associations and managing old ones as necessary.
+Hence,
+it is necessary to start the \fIros.quipu\fR daemon when the
+machine goes multi-user.
+On Berkeley UNIX systems, add these lines to the \fB/etc/rc.local\fR file:
+.sp
+.in +.5i
+.nf
+if [ \-f $(SBINDIR)ros.quipu ]; then
+    cd $(ETDDIR)quipu-db; $(SBINDIR)ros.quipu 2>&1 >/dev/null
+    (echo \-n ' quipu') > /dev/console
+fi
+.fi
+.in -.5i
+.sp
+(This assumes your database is in the directory \fB$(ETCDIR)quipu-db\fR - 
+it need not be)
+On other systems, a similar procedure is followed.
+.SS "QUIPU DATABASE"
+If you intend to run a local DSA,
+then you will need to build a Directory database.
+The database directory, by default, lives in the ETCDIR area
+(usually \fB/usr/etc/\fR) under the name of \fBquipu-db/\fR.
+Three prototype databases can be found in the directory
+\fBothers/quipu/quipu-db/\fR.
+These database files should be protected as they contain Directory passwords and
+other sensitive information.  The DSA needs to be able to read this
+information, and so performs a setuid on execution to the UID of the owner
+of the database directory.
+.PP
+Now customize the chosen prototype database under \fB/usr/etc/quipu-db/\fR.  The
+details of this database are explained in Volume 5 of the users manual.
+However you should be able to derive a minimal database by following
+the example structures defined for University College London and X\-Tel
+Services Ltd in
+the GB branch of the Directory tree.
+Then delete the example structures for O=University College London and
+X\-Tel Services Ltd.
+.SS "QUIPU TAILORING"
+If you choose to run a local DSA, you will now need to configure it.
+The DSA tailors itself at runtime by reading the file \fB$(ETCDIR)quiputailor\fR.
+A prototype of this file will be installed during the normal ISODE
+installation process.
+Only one entry in the file usually needs to be changed:
+.sp
+.in +.5i
+.nf
+mydsaname          CN=toucan
+.fi
+.in -.5i
+.sp
+Substitute the name of the DSA as it occurs in the Directory for
+\*(lqCN=toucan\*(rq.
+See the QUIPU manual for a description of the full range of
+tailoring options in the \fB$(ETCDIR)quiputailor\fR file.
+.SS "QUIPU ONCE-ONLY"
+Having tailored QUIPU,
+you can now start the DSA.
+However, if you are already running QUIPU,
+then you will need to kill and restart the QUIPU DSA.
+.PP
+Start the DSA now.
+From the \fICShell\fR, the command might be:
+.sp
+.in +.5i
+.nf
+# $(SBINDIR)ros.quipu >& /dev/null
+.fi
+.in -.5i
+.sp
+The daemon will automatically detach.
+If you do not redirect the daemon's standard\-error,
+then it will not detach, instead printing messages as to what actions it
+is taking.
+.SH "Running the DUA"
+To run a DUA you will need to configure the various DUA programs.
+Most of these tailor themselves at runtime by reading the file
+\fB$(ETCDIR)dsaptailor\fR.
+A prototype of this file will be installed during the normal ISODE
+installation process.
+Only one entry in the file usually needs to be changed:
+.sp
+.in +.5i
+.nf
+dsa_address     toucan  localHost=17003
+.fi
+.in -.5i
+.sp
+Substitute the name of your \*(lqprimary\*(rq DSA for \*(lqtoucan\*(rq
+and its corresponding presentation address for the
+\*(lqlocalHost=17003\*(rq string.
+This information can be found in the Directory on the host which is
+running the DSA.
+.PP
+Do not confuse the \fIdsa_address\fR used in this file with the
+\fIns_address\fR used in the \fB$(ETCDIR)isotailor\fR file.
+These are separate services and must live at different addresses.
+See \fIquiputailor\fR\0(5) for a description of the full range of
+tailoring options in the \fB$(ETCDIR)dsaptailor\fR file.
+.PP
+The
+.I PARADISE
+DUA is called 
+.I de.
+On startup it reads the file \fB$(ETCDIR)de/detailor\fR.  Most of the
+parameters in this file do not need changing, but some do.
+.PP
+The line
+.sp
+.in +.5i
+.nf
+dsa_address: Internet=...
+.fi
+.in -.5i
+.sp
+WILL need changing.  You should substitute the 
+\*(lqInternet=...\*(rq string with the presentation address of the DSA
+you wish to contact.
+.PP
+You are VERY STRONGLY encouraged to set the username.  This is the name
+with which the interface binds to the directory.  Don't forget to
+create an entry in the directory as appropriate:
+.sp
+.in +.5i
+.nf
+username:@c=GB@o=University College London@cn=Public Access Dua
+.fi
+.in -.5i
+.sp
+You'll probably want to configure these for your local organisation:
+.sp
+.in +.5i
+.nf
+default_country: GB
+default_org: University College London
+.fi
+.in -.5i
+.sp
+.PP
+The interface is started using the
+.sp
+.in +.5i
+.nf
+de
+.fi
+.in -.5i
+.sp
+command, online help can be obtained by invoking de and typing 
+\*(lq?\*(rq at the prompt.
+.SH "GENERATING DOCUMENTATION"
+The directory \fBdoc/\fR contains the documentation set for this release.
+Consult the file \fBdoc/READ\-ME\fR for a description of each document.
+Usually it is easier to print the files in this directory than
+generate the documentation from scratch as
+the sources to these documents are in either LaTeX (for papers)
+or SLiTeX (for presentations).
+.SH FILES
+Too numerous to mention.
+Honest.
+.SH "SEE ALSO"
+\fIThe ISO Development Environment: User's Manual\fR
+.br
+isode-gen(8)
+.SH AUTHOR
+Colin Robbins with help from a template by Marshall T. Rose.
+.ZZ

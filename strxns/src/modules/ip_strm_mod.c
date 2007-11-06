@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:35:46 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/10/15 17:26:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:46 $ by $Author: brian $
+ Last Modified $Date: 2007/10/15 17:26:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_strm_mod.c,v $
+ Revision 0.9.2.26  2007/10/15 17:26:11  brian
+ - updates for 2.6.22.5-49.fc6 kernel
+
  Revision 0.9.2.25  2007/08/15 05:35:46  brian
  - GPLv3 updates
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:35:46 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/10/15 17:26:11 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:35:46 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/10/15 17:26:11 $";
 
 #include <sys/os7/compat.h>
 
@@ -107,7 +110,7 @@ static char const ident[] =
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:35:46 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.26 $) $Date: 2007/10/15 17:26:11 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -181,6 +184,64 @@ STATIC struct streamtab ip_to_streams_info = {
 	.st_rdinit = &ip_to_streams_rinit,	/* Upper read queue */
 	.st_wrinit = &ip_to_streams_winit,	/* Upper write queue */
 };
+
+#if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
+{
+	return skb->tail;
+}
+static inline unsigned char *skb_end_pointer(const struct sk_buff *skb)
+{
+	return skb->end;
+}
+static inline unsigned char *skb_transport_header(const struct sk_buff *skb)
+{
+	return skb->h.raw;
+}
+static inline unsigned char *skb_network_header(const struct sk_buff *skb)
+{
+	return skb->nh.raw;
+}
+static inline unsigned char *skb_mac_header(const struct sk_buff *skb)
+{
+	return skb->mac.raw;
+}
+static inline void skb_reset_tail_pointer(struct sk_buff *skb)
+{
+	skb->tail = skb->data;
+}
+static inline void skb_reset_end_pointer(struct sk_buff *skb)
+{
+	skb->end = skb->data;
+}
+static inline void skb_reset_transport_header(struct sk_buff *skb)
+{
+	skb->h.raw = skb->data;
+}
+static inline void skb_reset_network_header(struct sk_buff *skb)
+{
+	skb->nh.raw = skb->data;
+}
+static inline void skb_reset_mac_header(struct sk_buff *skb)
+{
+	skb->mac.raw = skb->data;
+}
+static inline void skb_set_transport_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_transport_header(skb);
+	skb->h.raw += offset;
+}
+static inline void skb_set_network_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_network_header(skb);
+	skb->nh.raw += offset;
+}
+static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_mac_header(skb);
+	skb->mac.raw += offset;
+}
+#endif				/* !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 
 /************************************************************************
 *									*
@@ -1218,10 +1279,10 @@ convert_to_skbuf(ip_to_streams_minor_t * minor_ptr, mblk_t *mp)
 	skb_reserve(skb, 2);
 	skb->protocol = htons(ETH_P_IP);
 	skb->pkt_type = PACKET_HOST;
-	skb->h.raw = skb->data;
-	skb->mac.raw = skb->data;
+	skb_reset_transport_header(skb);
+	skb_reset_mac_header(skb);
 #if defined(KERNEL_2_1)
-	skb->nh.raw = skb->data;
+	skb_reset_network_header(skb);
 #endif
 	skb->ip_summed = CHECKSUM_NONE;
 

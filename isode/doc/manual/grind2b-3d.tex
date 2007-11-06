@@ -1,0 +1,54 @@
+\File{grind2b\-3d.c},{22:23},{Jun 12 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  ros\_result (sd, ror)}}
+\L{\LB{\K{int}     sd;}}
+\L{\LB{\K{register} \K{struct} RoSAPresult *ror;}}
+\L{\LB{\{}}
+\L{\LB{    \K{struct} RoSAPindication  rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject   *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (RoURejectRequest (sd, \&ror \-\> ror\_id, ROS\_RRP\_UNRECOG, ROS\_NOPRIO, roi)}}
+\L{\LB{}\Tab{8}{    == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"RO\-U\-REJECT.REQUEST: \%s\"\SE{}, RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}}
+\L{\LB{    RORFREE (ror);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  ros\_error (sd, roe)}}
+\L{\LB{\K{int}     sd;}}
+\L{\LB{\K{register} \K{struct} RoSAPerror *roe;}}
+\L{\LB{\{}}
+\L{\LB{    \K{struct} RoSAPindication  rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject   *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (RoURejectRequest (sd, \&roe \-\> roe\_id, ROS\_REP\_UNRECOG, ROS\_NOPRIO, roi)}}
+\L{\LB{}\Tab{8}{    == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"RO\-U\-REJECT.REQUEST: \%s\"\SE{}, RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}}
+\L{\LB{    ROEFREE (roe);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  ros\_ureject (sd, rou)}}
+\L{\LB{\K{int}     sd;}}
+\L{\LB{\K{register} \K{struct} RoSAPureject *rou;}}
+\L{\LB{\{}}
+\L{\LB{\C{}\/* handle rejection here... *\/\CE{}}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  ros\_preject (sd, rop)}}
+\L{\LB{\K{int}     sd;}}
+\L{\LB{\K{register} \K{struct} RoSAPpreject *rop;}}
+\L{\LB{\{}}
+\L{\LB{    \K{if} (ROS\_FATAL (rop \-\> rop\_reason))}}
+\L{\LB{}\Tab{8}{error (\S{}\"RO\-REJECT\-P.INDICATION: \%s\"\SE{}, RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}}
+\L{\LB{\C{}\/* handle temporary failure here... *\/\CE{}}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{...}}

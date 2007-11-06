@@ -1,0 +1,105 @@
+.TH DE 1
+.\" $Header: /xtel/isode/isode/others/quipu/uips/de/RCS/de.1,v 9.0 1992/06/16 12:45:59 isode Rel $
+.\"
+.\" $Log: de.1,v $
+.\" Revision 9.0  1992/06/16  12:45:59  isode
+.\" Release 8.0
+.\"
+.\" 
+.SH NAME
+de - Directory Enquiries
+.SH SYNOPSIS
+de
+.SH DESCRIPTION
+\fIDe\fR provides (what is hoped to be) a simple-to-use interface to the
+emerging Directory Service, which is based on the X.500 standard.
+
+Whereas many other directory user interfaces provide lots of features, or
+use fancy graphics, \fIde\fR is rooted firmly in the Stone Age of computing.
+It provides a simple way of accessing the directory service, where the user
+is asked to respond to (verbose) prompts and enter information about the 
+person they are looking for, who they work for, and the country they work in.  
+Note that some of the fields may have default values when the program is
+started - the system administrator will have configured these for your local
+environment.
+
+There is copious on-line help available.
+
+It is still rather early days for the X.500 Directory Service, and so you
+may not be able to find the person you are looking for.  Coverage is
+steadily improving: there are already over half a million entries throughout
+Europe, North America, Australasia, and a few entries in some other
+countries as well.
+
+If, on the other hand, you fail to find the entry you are looking for
+because of deficiencies in the interface, or you find it to be ergonomically
+unpleasant, complain and offer constructive comments to
+<helpdesk@paradise.ulcc.ac.uk>.
+.SH EXAMPLE USAGE
+.sp
+Usage is straightforward.  The following example shows how to search for a
+person.  Note in the example given that an organisation and country are set
+up as an initial defaults, and that the telephone numbers are presented in
+a local format.
+.sp
+\fC
+.nf
+    Person's name, q to quit, * to list people, ? for help
+    :- \fBbarker\fP
+    Dept name, * to list depts, <CR> to search all depts, ? for help
+    :- \fBcs\fP
+    Organisation name, <CR> to search `ucl', * to list orgs, ? for help
+    :-
+    Country name, <CR> to search `gb', * to list countries, ? for help
+    :-
+.fi
+\fR
+.sp
+The response would be:
+.sp
+\fC
+.nf
+    United Kingdom
+      University College London
+        Computer Science
+          Paul Barker
+            telephoneNumber       7366
+            electronic mail       P.Barker@cs.ucl.ac.uk
+            favouriteDrink        guinness
+                                  16 year old lagavulin
+            roomNumber            G21
+.fi
+\fP
+.sp
+You can have a look and see what is in the Directory by listing the entries.
+The following example shows how to list entries within a department.
+.sp
+\fC
+.nf
+    Person's name, q to quit, * to list people, ? for help
+    :- \fB*\fP
+    Dept name, * to list depts, <CR> to search all depts, ? for help
+    :- \fBfrench\fP
+    Organisation name, <CR> to search `ucl', * to list orgs, ? for help
+    :-
+    Country name, <CR> to search `gb', * to list countries, ? for help
+    :-
+.fi
+\fR
+.sp
+The response would be:
+.sp
+\fC
+.nf
+    United Kingdom
+      University College London
+        French
+             1  A Calder            3081
+             2  A L Bergin          3083
+             3  A Lavers            7119
+             4  A Leak              3079
+             5  ADMISSIONS          3084
+.fi
+\fR
+.sp
+Lots more features are described in the on-line help screens.

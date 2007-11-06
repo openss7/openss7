@@ -1,0 +1,602 @@
+% run this through LaTeX with the appropriate wrapper
+
+\dotopic{1}
+\begin{bwslide}
+\part	{APPLICATION SERVICES}\bf
+\end{bwslide}
+\doparts
+
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]		BASIC CONCEPTS 
+\item[PART II:]		SESSION SERVICES
+\item[PART III:]	ABSTRACT SYNTAX
+\item[PART IV:]		PRESENTATION SERVICES
+\item[PART V:]		APPLICATION SERVICE ELEMENTS
+\item[PART VI:]		BUILDING AN APPLICATION
+\end{description}
+\end{bwslide}
+
+%\begin{note}\em
+%\begin{center}
+%\underline{an audience survey}
+%\end{center}
+%
+%who has heard of, is familiar with, or understands:
+%\begin{quote}
+%the osi model?
+%
+%abstract syntax notation one?
+%
+%remote operations in the context of OSI?
+%
+%sun rpc, or apollo ncs/nidl?
+%\end{quote}
+%
+%who knows how to program under unix using:
+%\begin{quote}
+%the C programming language, make, shell, etc.?
+%\end{quote}
+%\end{note}
+
+
+%\begin{note}\em
+%everyone should be comfortable the material review
+%\end{note}
+
+
+
+%\begin{bwslide}
+%\part	{\bf BASIC CONCEPTS}
+%
+%\begin{nrtc}
+%\item	OPEN SYSTEMS INTERCONNECTION
+%
+%\item	OSI ITSELF IS QUITE SIMPLE
+%
+%    \begin{nrtc}
+%    \item	A METHODOLOGY FOR DESCRIBING OPEN SYSTEMS
+%    		WHICH IS USED IN SPECIFICATIONS WHICH DESCRIBE HOW THESE
+%		SYSTEMS COMMUNICATE
+%    \end{nrtc}
+%
+%\end{nrtc}
+%\end{bwslide}
+
+%\begin{bwslide}
+%\ctitle {BASIC CONCEPTS}
+%
+%\begin{nrtc}
+%\item	CONCERNED WITH OPEN INTERCONNECTION OF SYSTEMS
+%\item	DOES NOT IMPLY OPENLY ACCESSIBLE SYSTEMS
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{BASIC CONCEPTS (cont.)}
+%
+%\begin{nrtc}
+%\item	AT FIRST GLANCE, OSI IS DESCRIBED IN A LANGUAGE ALL ITS OWN
+%\item	OSI STANDARDS USUALLY HAVE TWO PARTS:
+%	\begin{nrtc}
+%	\item	A SERVICE DEFINITION
+%	\item	A PROTOCOL SPECIFICATION
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{WHAT WE WILL DISCUSS}
+%
+%\begin{nrtc}
+%\item	A PRACTICAL LOOK
+%	\begin{nrtc}
+%	\item	PIECES OF THE OSI MODEL
+%	\item	ACTUAL SERVICES
+%	\item	REAL WORLD USAGE
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+%\begin{bwslide}
+%\ctitle	{OSI SAYS WHAT TO DO, NOT HOW TO DO IT}
+%
+%\begin{nrtc}
+%\item	IT SPECIFIES THE EXTERNAL BEHAVIOR OCCURRING BETWEEN SYSTEMS
+%\item	IT DOES NOT SPECIFY HOW LOCAL SYSTEMS ARE BUILT
+%\item	DOES SPECIFY
+%    \begin{nrtc}
+%    \item	WHAT GOES ON THE ``WIRE'' AND WHEN
+%    \end{nrtc}
+%
+%\item	IT DOES NOT SPECIFY
+%    \begin{nrtc}
+%    \item	PROGRAMMING LANGUAGE BINDINGS
+%    \item	OPERATING SYSTEMS BINDINGS
+%    \item	APPLICATION INTERFACE ISSUES
+%    \item	USER-INTERFACE ISSUES
+%    \end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {WHO ARE THE PLAYERS}
+%
+%\begin{nrtc}
+%\item	THE INTERNATIONAL ORGANIZATION FOR STANDARDIZATION (ISO)
+%	\begin{nrtc}
+%	\item	NATIONAL STANDARDS BODIES
+%	\end{nrtc}
+%\item	THE INTERNATIONAL TELEGRAPH AND TELEPHONE CONSULTATIVE COMMITTEE (CCITT)
+%	\begin{nrtc}
+%	\item	NATIONAL TELECOM ADMINISTRATIONS
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {WHO ARE THE PLAYERS (cont.)}
+%
+%\begin{nrtc}
+%\item	THE NATIONAL INSTITUTE OF STANDARDS AND TECHNOLOGY (NIST)
+%	\begin{nrtc}
+%	\item	CORRESPONDS TO OTHER REGIONAL BODIES, EWOS, AOWS, etc.
+%	\end{nrtc}
+%\item	THE CORPORATION FOR OPEN SYSTEMS (COS)
+%\item	THE TECHNICAL OFFICE PROTOCOLS USER'S GROUP \& 
+%	THE MANUFACTURING AUTOMATION PROTOCOLS USER'S GROUP 
+%	\begin{nrtc}
+%	\item	(MAP/TOP)
+%	\end{nrtc}
+%\item	THE INTERNATIONAL FEDERATION OF INFORMATION PROCESSING (IFIP)
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {ISO}
+%
+%\begin{nrtc}
+%\item	ISO DOES NOT STAND FOR INTERNATIONAL STANDARDS ORGANIZATION
+%\item	DON'T CONFUSE OSI \& ISO:
+%	\begin{nrtc}
+%	\item	ISO IS AN ORGANIZATION
+%	\item	OSI IS A COMMUNICATIONS MODEL
+%	\end{nrtc}
+%%\item	ONLY ISO PRODUCES ``STANDARDS'', OTHERS PRODUCE OTHER THINGS, e.g.,
+%%	\begin{nrtc}
+%%	\item	RECOMMENDATIONS --- CCITT
+%%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {US STANDARDS PROCESS}
+%
+%\vskip.5in
+%\diagram[p]{figureA-1}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {WHAT ABOUT THE INTERNET COMMUNITY}
+%
+%\begin{nrtc}
+%\item	DARPA/NSF INTERNET RESEARCH COMMUNITY IS NOTICEABLY ABSENT
+%\item	DIFFERENCES IN THE COMMUNITIES
+%	\begin{nrtc}
+%	\item	e.g., FOCUS ON EXPERIMENTATION vs. WRITTEN CONTRIBUTIONS
+%	\end{nrtc}
+%\item	THIS HAS BEEN A STRATEGIC ERROR!
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {STATUS}
+%
+%\begin{nrtc}
+%%\item	OSI STANDARDS AND VENDOR AGREEMENTS ARE REACHING STABLE STATUS
+%%\item	THE U.S. GOSIP WILL PROVIDE THE INITIAL DEMAND FOR OSI IN THE U.S.
+%%	AND OTHER COUNTRIES
+%\item	TECHNOLOGY STILL NEEDS REFINEMENT
+%	\begin{nrtc}
+%	\item	MANY CURRENT OSI OFFERINGS ARE CLOSER TO EXPERIMENTS THAN
+%		TO PRODUCTS
+%	\item	MANY PRODUCTS ARE SPECIFIC TO MAP/TOP
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {U.S. GOSIP}
+%
+%\begin{nrtc}
+%\item	A FEDERAL INFORMATION PROCESSING STANDARD (FIPS~146)
+%\item	PROPOSED TO ENABLE USERS TO SPECIFY AND PROCURE
+%	\begin{nrtc}
+%	\item	INTEROPERABLE
+%	\item	MULTI-VENDOR
+%	\item	OFF-THE-SHELF
+%	\end{nrtc}
+%	COMPUTER COMMUNICATIONS PRODUCTS
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{note}
+%protocols
+%\end{note}
+
+
+%\begin{note}
+%services
+%\end{note}
+
+
+%\begin{note}
+%provider/consumer, initiator/responder,  client/server
+%\end{note}
+
+
+\begin{bwslide}
+\part	{BASIC CONCEPTS\\THE OSI MODEL}\bf
+
+\begin{nrtc}
+\item   A LAYERED ARCHITECTURE FOR COMPUTER COMMUNICATIONS
+
+\item   STANDARDIZED IN THE INTERNATIONAL COMMUNITY
+
+\item   NON-PROPRIETARY IN NATURE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {UPPER-LAYER INFRASTRUCTURE}
+
+\begin{nrtc}
+\item	UPPER-LAYERS ARE EVERYTHING ABOVE TRANSPORT
+\item	THE SAME UPPER-LAYERS ARE USED REGARDLESS OF THE APPLICATION,
+	UNLIKE OTHER ARCHITECTURES (e.g., TCP/IP)
+\item	EACH APPLICATION MAY SELECT DIFFERENT FUNCTIONALITY FROM THE UPPER LAYERS
+\item	THE EMPHASIS IS ON FLEXIBILITY, TO SUPPORT MANY DIVERSE OSI APPLICATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OSI UPPER-LAYER INFRASTRUCTURE}
+
+\vskip.5in
+\diagram[p]{figureA-2}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {CORRESPONDING INTERNET \\ UPPER-LAYER INFRASTRUCTURE}
+%
+%\vskip.5in
+%\diagram[p]{figureA-3}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {BOTTOM LINE}
+
+\begin{nrtc}
+\item	STRENGTHS
+	\begin{nrtc}
+	\item	COMMON INFRASTRUCTURE
+	\item	MORE TECHNICALLY COMPREHENSIVE
+	\end{nrtc}
+\item	WEAKNESSES
+	\begin{nrtc}
+	\item	COMPLEXITY
+	\item	POLITICAL POLARIZATION
+	\item	LACK OF PRACTICAL EXPERIENCE
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {THE MODEL FROM A COMMUNICATIONS VIEWPOINT}
+
+\vskip.5in
+\diagram[p]{figureA-4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {THE MODEL FROM A COMPUTER VIEWPOINT}
+
+\vskip.5in
+\diagram[p]{figureA-5}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {LAYERING}
+
+\vskip.5in
+\diagram[p]{figureA-32}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {TERMINOLOGY}
+%
+%\begin{nrtc}
+%\item	SDU (SERVICE DATA UNIT) --- USER DATA
+%\item	PCI (PROTOCOL CONTROL INFORMATION) --- HEADER
+%\item	PDU (PROTOCOL DATA UNIT) --- PACKET
+%	\begin{nrtc}
+%	\item	PDU = PCI + SDU
+%	\end{nrtc}
+%\item	ICI (INTERFACE CONTROL INFORMATION)~---~PROCEDURE
+%\item	IDU (INTERFACE DATA UNIT)~---~CALL
+%	\begin{nrtc}
+%	\item	IDU = ICI + PDU
+%	\end{nrtc}
+%\item	SAP (SERVICE ACCESS POINT)
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {DATA TRANSIT}
+%
+%\vskip.5in
+%\diagram[p]{figureA-14}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {SERVICES vs. PROTOCOLS}
+
+\vskip.5in
+\diagram[p]{figureA-39}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle  {SERVICES AND\\ SERVICE PRIMITIVES}
+
+\begin{nrtc}
+\item   PEERS COMMUNICATE VIA \emph{SERVICE PRIMITIVES}
+
+\item   A PRIMITIVE IS AN ABSTRACTION
+    \begin{nrtc}
+    \item       NOT AN INTERFACE
+    \end{nrtc}
+
+\item   SERVICE PRIMITIVES, LIKE PROCEDURE CALLS, HAVE TYPED PARAMETERS
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {SERVICE}
+%
+%\begin{nrtc}
+%\item   IN GENERAL, THERE ARE THREE KINDS OF SERVICES
+%    \begin{nrtc}
+%    \item       \emph{CONFIRMED}
+%        \begin{nrtc}
+%        \item   IN WHICH A REQUEST ALWAYS RESULTS IN A RESPONSE
+%        \end{nrtc}
+%
+%    \item       \emph{UNCONFIRMED}
+%        \begin{nrtc}
+%        \item   IN WHICH NO RESPONSE IS RETURNED
+%        \end{nrtc}
+%
+%    \item       \emph{PROVIDER-INITIATED}
+%        \begin{nrtc}
+%        \item   IN WHICH THE SERVICE PROVIDER INDICATES SOME SITUATION
+%        \end{nrtc}
+%    \end{nrtc}
+%
+%\item   CONFIRMATION IS UNRELATED TO RELIABILITY
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {SERVICE PRIMITIVES}
+
+\begin{nrtc}
+\item   EACH LAYER (OR ELEMENT) OFFERS ONE OR MORE SERVICES (VERBS)
+    \begin{nrtc}
+    \item       e.g., A-ASSOCIATE
+    \end{nrtc}
+
+\item   A SERVICE CONSISTS OF ONE OR MORE PRIMITIVES
+
+\item   A CONFIRMED SERVICE HAS FOUR PRIMITIVES
+    \begin{nrtc}
+    \item       .REQUEST, .INDICATION, .RESPONSE, and .CONFIRMATION
+    \end{nrtc}
+
+\item   AN UNCONFIRMED SERVICE HAS TWO PRIMITIVES:
+    \begin{nrtc}
+    \item       .REQUEST,  and .INDICATION
+    \end{nrtc}
+
+\item   A PROVIDER-INITIATED SERVICE HAS ONE PRIMITIVE:
+    \begin{nrtc}
+    \item       .INDICATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {SERVICE PRIMATIVES}
+
+\vskip.5in
+\diagram[p]{figureA-24}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {CONFIRMED SERVICE}
+%
+%\vskip.5in
+%\diagram[p]{figureA-40}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {CONFIRMED SERVICE}
+%
+%\vskip.5in
+%\diagram[p]{figureA-41}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{CONNECTION ORIENTED}
+%
+%\begin{nrtc}
+%\item	AVAILABLE UPPER-LAYERS ASSUME CONNECTION ORIENTED SERVICES
+%\item	CONNECTIONLESS ADDENDA BEING DEVELOPED
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {SESSION LAYER --- OVERVIEW}
+%
+%\begin{nrtc}
+%\item	ESTABLISH, RELEASE, MANAGE TRANSPORT CONNECTIONS
+%\item	NEGOTIATE AND POLICE COMMUNICATION PARAMETERS
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {ABSTRACT SYNTAX --- OVERVIEW}
+%
+%\begin{nrtc}
+%\item	DEFINES ENCODING \& DECODING RULES
+%\item	IN PRACTICE, FACILITIES USED BY
+%	\begin{nrtc}
+%	\item	PRESENTATION
+%	\item	APPLICATION
+%	\end{nrtc}
+%\item	MACHINE INDEPENDENT ENCODINGS
+%\item	FORMAL LANGUAGE
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {PRESENTATION LAYER --- OVERVIEW}
+%
+%\begin{nrtc}
+%\item	ESTABLISHES (NEGOTIATES) ``SYNTACTIC'' CONVENTIONS FOR PEER
+%	APPLICATION ENTITY COMMUNICATION
+%\item	ENCODES \& DECODES APPLICATION AND PRESENTATION
+%	LAYER STRUCTURES AND DATA UNITS
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {THE OSI APPLICATION LAYER}
+%
+%\begin{nrtc}
+%\item   MANY STANDARD ``APPLICATION'' SERVICE ELEMENTS
+%    \begin{nrtc}
+%    \item       ASSOCIATION CONTROL
+%
+%    \item       REMOTE OPERATIONS
+%
+%    \item       RELIABLE TRANSFER
+%
+%    \item       DIRECTORY SERVICES
+%    \end{nrtc}
+%
+%\item   ABSTRACT SYNTAX NOTATION ONE (ASN.1)\\
+%        (not really a layer, more of a concept)
+%
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {APPLICATION SERVICE ELEMENTS --- OVERVIEW}
+%
+%\begin{nrtc}
+%\item	PROVIDES ``COMMON'' SERVICES IN APPLICATION LAYER
+%\item	APPLICATION BUILDING BLOCKS FOR STANDARD FUNCTIONALITY
+%	\begin{nrtc}
+%	\item	ASSOCIATION CONTROL (ACSE)
+%	\item	REMOTE OPERATIONS (ROSE)
+%	\item	etc.
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+%\begin{bwslide}
+%\ctitle {APPLICATION SERVICE ELEMENTS}
+%
+%\begin{nrtc}
+%\item   A USEFUL MECHANISM FOR DIVIDING RESPONSIBILITY OF THE ``TOTAL''
+%        APPLICATION PROTOCOL
+%
+%\item   PROMOTES ``REUSE'' OF APPLICATION LAYER FACILITIES
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {EXAMPLE:\\ FTAM USE OF LOWER-LAYER SERVICES}
+%
+%\vskip.5in
+%\diagram[p]{figureA-42}
+%\end{bwslide}
+
+
+
+%\begin{bwslide}
+%\ctitle {APPLICATIONS --- OVERVIEW}
+%
+%\begin{nrtc}
+%\item	THE REAL WORKER ON TOP OF THE STACK
+%\item	DOES NOT INCLUDE USER INTERFACES
+%\item	EXAMPLES
+%	\begin{nrtc}
+%	\item	MESSAGE HANDLING (X.400)
+%	\item	DIRECTORY (X.500)
+%	\item	FILE TRANSFER (FTAM)
+%	\item	etc.
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {ABOVE THE APPLICATION LAYER}
+%
+%\begin{nrtc}
+%\item	OUTSIDE THE SCOPE OF THE OSI/RM \& STANDARDS
+%\item	ENTITIES (APPLICATION PROCESSES) MAKING USE OF OSI SERVICES
+%\item	EXAMPLES
+%	\begin{nrtc}
+%	\item	USER INTERFACES
+%	\item	DATABASE APPLICATION PROCESSES
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}

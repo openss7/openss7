@@ -1,0 +1,54 @@
+\begin{thebibliography}{ISO87b}
+
+\bibitem[CB87]{RFC-986}
+R. Callon and H. Braun.
+\newblock {\it Guidelines ofr the use of Internet-IP addresses in the ISO
+  Connectionless-Mode Network Protocol}.
+\newblock Request for Comments~986, DDN Network Information Center, SRI
+  International, November 1987.
+
+\bibitem[CCI88]{CCITT.Directory}
+CCITT.
+\newblock The directory - overview of concepts, models and services.
+\newblock November 1988.
+\newblock CCITT X.500 Series Recommendations.
+
+\bibitem[ISO87a]{ISO.Network.Naming}
+Information processing systems - data communications - network services
+  definition: addendum 2 - network layer addressing.
+\newblock March 1987.
+\newblock ISO TC 97/SC 6.
+
+\bibitem[ISO87b]{ISO.Naming}
+{ISO} {DIS} 7498-3 on naming and addressing.
+\newblock May 1987.
+\newblock ISO/IEC/JTC-1/SC~21.
+
+\bibitem[Kil88]{QUIPU.IFIP}
+S.E. Kille.
+\newblock The {QUIPU} directory service.
+\newblock In {\it IFIP WG 6.5 Conference on Message Handling Systems and
+  Distributed Applications}, North Holland Publishing, October 1988.
+
+\bibitem[RC87]{RFC-1006}
+Marshall~T. Rose and Dwight~E. Cass.
+\newblock {\it {ISO Transport Services on top of the TCP}}.
+\newblock Request for Comments~1006, DDN Network Information Center, SRI
+  International, May 1987.
+
+\bibitem[Ros88]{ISODE.Manual}
+M.T. Rose.
+\newblock The {ISO} development environment: user's manual (version 4.0).
+\newblock July 1988.
+
+\bibitem[SA88]{THORN.ECW88}
+F. Sirovich and M. Antonellini.
+\newblock The {THORN} x.500 distributed directory environment.
+\newblock In {\it Esprit Conference Week}, November 1988.
+
+\bibitem[TC386]{ECMA.117}
+ECMA TC32.
+\newblock {\it Domain Specific Part of Network Layer Addresses}.
+\newblock ECMA Standard~117, ECMA, June 1986.
+
+\end{thebibliography}

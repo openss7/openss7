@@ -1,0 +1,35 @@
+\def\foo{\begin{tabular}[t]{|lllr|} \multicolumn{4}{c}{access policy table}\\ \hline 1.17.2& \vb{pub}& \bar& 3\\ 1.17.2& \vb{slate}& a.b.c.d& 11\\ \hline \end{tabular}}
+\def\vb#1{\verb|"#1"|}
+\def\bar{$\emptyset$}
+\def\baz{\begin{tabular}[b]{|llllr|} \multicolumn{5}{c}{primitive view table}\\ \hline 1.17.2& rfc1157Domain& e.f.g.h.i.j& \bar& \vb{secret}\\ \hline\end{tabular}}
+.PS 8.5i
+.ps 20
+##
+boxwid	=	3*boxwid/2
+## figure S-29
+B1:	box \
+		"Enterprise \#1 INOC" "" "(uses \vb{pub})"
+B2:	box with .w at (B1.e.x+linewid, B1.e.y) \
+		"Enterprise \#2 INOC" "" "(uses \vb{pub})"
+B3:	box with .w at (B2.e.x+linewid, B2.e.y) \
+		"mgmt station in" "" "Enterprise \#3" "" "(uses \vb{slate})"
+##
+B4:	box with .n at ((B1.s.x+B2.s.x)/2, B2.s.y-lineht) \
+		"Enterprise \#3 INOC"
+	line <- -> from B1.s to (B4.n.x-boxwid/4, B4.n.y)
+	line <- -> from B2.s to B4.n
+	line <- -> from B3.sw to (B4.n.x+boxwid/4, B4.n.y)
+	move to B4.ne; \
+	"\ \foo" ljust
+	move to B4.se; \
+	"\ \baz" ljust
+##
+B5:	box with .n at (B1.s.x, B4.s.y-lineht) \
+		"router in" "" "Enterprise \#3"
+	line <- -> from B4.s to B5.n
+	move to B5.ne; \
+	"\ \begin{tabular}[t]{|lllr|} \multicolumn{4}{c}{access policy table}\\ \hline 1.17.2& \vb{secret}& k.l.m.n& 11\\ \hline \end{tabular}" ljust
+	move to B5.se; \
+	"\ \begin{tabular}[b]{|llllr|} \multicolumn{5}{c}{primitive view table}\\ \hline 1.17.2& localAgent& \bar& \bar& \bar\\ \hline\end{tabular}" ljust
+##
+.PE

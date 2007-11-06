@@ -1,0 +1,401 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Overview}\label{overview}
+This document describes a non-proprietary implementation of some of the
+protocols defined by the International Organisation for Standardisation
+and International Electrotechnical Commission (ISO/IEC),
+the International Telegraph and Telephone Consultative Committee (CCITT),
+and the European Computer Manufacturer Association (ECMA).%
+\footnote{In the interests of brevity,
+unless otherwise noted,
+the term ``OSI'' is used to denote these parallel protocol suites.}
+
+The purpose of making this software openly available is to
+accelerate the process of the development of applications in the OSI
+protocol suite.
+Experience indicates that the development of application level protocols takes
+as long as or significantly longer than the lower level protocols.
+By producing a non-proprietary implementation of the OSI protocol stack,
+it is hoped that researchers in the academic, public, and commercial arenas
+may begin working on applications immediately.
+Another motivation for this work is to foster the development of OSI protocols
+both in the European RARE and the U.S.~Internet communities.
+The Internet community is widely known as having pioneered
+computer-communications since the early {\oldstyle 1970}'s.
+This community is rich in knowledge in the field,
+but currently is not actively experimenting with the OSI protocols.
+By producing an openly available implementation,
+it is hoped that the OSI protocols will become quickly widespread in the
+Internet,
+and that a productive (and {\em painless\/}) transition in the defense
+data network (DDN) might be promoted.
+The RARE community is the set of corresponding European academic and research
+organisations.
+While they do not have the same long implementation experience as the Internet
+community,
+they have a deep commitment to international standards.
+It is intended that this release gives vital early access to prototype
+facilities.
+
+\section	{Fanatics Need Not Read Further}
+This software can support several different network services below the
+transport service access point (TSAP).
+One of these network services
+is the \dod/ transmission control protocol (TCP)\cite{TCP}.%
+\footnote{Although the TCP corresponds most closely to offering a transport
+service in the OSI model,
+the TCP is used as a connection-oriented network protocol
+(i.e., as coservice to X.25).}
+This permits the development of the higher level protocols in a robust and
+mature internet environment, while providing us the luxury of not having to
+recode anything when moving to a network where the OSI transport protocol (TP)
+is used to provide the TSAP.
+However, the software also operates over pure OSI lower levels of software.
+It is mainly used in that fashion~---~outside of the United States.
+
+Of course,
+there will always be ``zealots of the pure faith'' making claims to the effect
+that:
+\begin{quote}\em
+TCP/IP is dead!
+Any work involving TCP/IP simply dilutes the \mbox{momentum} of OSI.
+\end{quote}
+or, from the opposite end of the spectrum, that
+\begin{quote}\em
+The OSI protocols will never work!
+\end{quote}
+Both of these statements,
+from diametrically opposing protocol camps are, of course, completely
+unfounded and largely inflammatory.
+TCP/IP is here, works well,
+and enjoys a tremendous base of support.
+OSI is coming, and will work well,
+and when it eventually comes of age,
+it will enjoy an even larger base of support.
+
+The role of ISODE,
+in this maelstrom that generates much heat and little light,
+is to provide a useful transition path between the two protocol suites in which
+complementary efforts can occur.
+The ISODE approach is to use the strengths of both the DDN and OSI protocol
+suites in a cooperative and positive manner.
+For a more detailed exposition of these ideas,
+kindly refer to \cite{Open.Book} or the earlier work \cite{ISO.on.DDN}.
+
+\section	{The Name of the Game}\label{name}
+The name of the software is the ISODE.
+The official pronunciation of the ISODE,
+takes four syllables: {\em I-SO-D-E}.
+This choice is mandated by fiat, not by usage,
+in order to avoid undue confusion.
+
+Please, as a courtesy, do not spell ISODE any other way.
+For example, terms such as ISO/DE or ISO-DE do not refer to the software!
+Similarly, do not try to spell out ISODE in such a way as to imply an
+affiliation with the International Organisation for Standardization.
+There is no such relationship.
+The {\em ISO\/} in ISODE is not an acronym for this organisation.
+In fact, the {\em ISO\/} in ISODE doesn't really meaning anything at all.
+It just has a catchy two syllable sound.
+
+\section	{Operating Environments}
+This release is coded entirely in the {\em C\/} programming
+language\cite{C.Language},
+and is known to run under the following operating systems
+(without any kernel modifications):
+\begin{description}
+\item	[Berkeley \unix/]
+The software should run on any faithful port of 4.2\bsd/, 4.3\bsd/,
+or 4.4\bsd/ \unix/.
+Sites have reported the software running:
+on the Sun-3 workstation running Sun \unix/~4.2 release~3.2 and later;
+on the Sun Microsystems workstation (Sun-3, Sun-4, and Sun-386i) running SunOS
+release 4.0 and later;
+on Digital Equipment Corporation \ultrix/ machines (including X.25);
+the Integrated Solutions workstation;
+and
+on the RT/PC running 4.3\bsd/.%
+\footnote{Do not however, attempt to compile the software with the SunPro
+\pgm{make} program!
+It is not, contrary to any claims, compatible with the standard \pgm{make}
+facility.
+Furthermore,
+note that if you are running a version of SunOS 4.0 prior to release 4.0.3,
+then you may need to use the \pgm{make} program found in \file{/usr/old/},
+if the standard \pgm{make} you are using is the SunPro \pgm{make}.
+In this case,
+you will need to put the old,
+standard \pgm{make} in \file{/usr/bin/},
+and you can keep the SunPro \pgm{make} in \file{/bin/}.}
+In addition to using the native TCP facilities of Berkeley \unix/,
+the software has also be interfaced to versions~4.0 through~7.0 
+of the SunLink/SunNet X.25 and OSI packages
+(although Sun may have to supply you with some modified \verb"sgtty" and
+\verb"ioctl" include files if you are using an earlier version of SunLink
+X.25).
+The optional SunLink Communications Processor running DCP 3.0~software has
+also been tested with the software.
+
+\item	[AT\&T \unix/]
+The software should run on any faithful port of System V \unix/.
+The SVR4 port used an ICL DRS6000 as a testbed.
+One of the other systems tested was running with an
+Excelan \exos/ 8044 TCP/IP card.
+The Excelan package implements the networking semantics of the 4.1a\bsd/ \unix/
+kernel.
+As a consequence,
+the software should run on any faithful port of 4.1a\bsd/ \unix/,
+with only a minor amount of difficultly.
+As of this writing, however,
+this speculation has not been verified.
+The particular system used was a Silicon Graphics IRIS workstation.%
+\footnote{This test was made with an earlier release of this software,
+and access to an SGI workstation was not available when the current version of
+the software tested.
+However, the networking interface is still believed to be correct for the
+Excelan package.}
+
+Another system was running the WIN TCP/IP networking package.
+The WIN package implements the networking semantics of the 4.2\bsd/ \unix/
+kernel.
+The particular system used was a 3B2 running System~V release~2.0.4,
+with WIN/3B2 version~1.0.
+
+Another system was also running the WIN TCP/IP networking package
+but under System~V release~3.0.
+The WIN package on SVR3 systems emulates the networking semantics of the
+4.2\bsd/ \unix/ kernel but uses STREAMS and TLI to do so.
+
+{\em Note:} The System V port does not include VT or SNMP.
+
+\item	[AIX]
+The software should run on the IBM AIX Operating System
+which is a \unix/-based derivative of AT\&T's System~V.
+The particular system used was a RT/PC system running version~2.1.2
+of AIX.
+
+\item	[HP-UX]
+The software should run on HP's \unix/-like operating system, HP-UX.
+The particular system used was an Indigo 9000/840 system running version
+A.B1.01 of HP-UX.
+The system was also reported to have run on an HP 9000/350 system under
+version~6.2 of HP-UX.
+Support for HP's X.25 has been included.
+
+\item	[ROS]
+The software should run on the Ridge Operating system, ROS.
+The particular system used was a Ridge-32 running version 3.4.1 of ROS.
+
+\item	[Pyramid OsX]
+The software should run on a Pyramid computer running OsX.
+The particular system used was a Pyramid~98xe running version 4.0 of OsX.
+\end{description}
+
+Since a Berkeley \unix/ system is the primary development platform for ISODE,
+this documentation is somewhat slanted toward that environment.
+
+\section	{Organisation of the Release}
+A strict layering approach has been taken in the organisation of the release.
+The documentation mimics this relationship approximately:
+the first two volumes describe,
+in top-down fashion,
+the services available at each layer along with the databases used by those
+services;
+the third volume describes some applications built using these facilities;
+the fourth volume describes a facility for building applications based on a
+programming language, rather that network-based, model;
+and,
+the fifth volume describes a complete implementation of the OSI directory.
+
+In \volone/,
+the ``raw'' facilities available to applications are described,
+namely four libraries:
+\begin{itemize}
+\item	The \man libacsap(3n) library,
+	which implements the OSI association control service (ACS).
+
+\item	The \man librosap(3n) library,
+	which implements different styles of the OSI remote operations service
+	(ROS).
+
+\item	The \man librtsap(3n) library,
+	which implements the OSI reliable transfer service (RTS).
+	and,
+
+\item	The \man libpsap(3) library,
+	which implements the OSI abstract syntax and transfer mechanisms.
+\end{itemize}
+
+In \voltwo/,
+the services upon which the application facilities are built are described,
+namely three libraries:
+\begin{itemize}
+\item	The \man libpsap2(3n) library,
+	which implements the OSI presentation service.
+
+\item	The \man libssap(3n) library,
+	which implements the OSI session service.
+	and,
+
+\item	The \man libtsap(3n) library,
+	which implements an OSI transport service access point.
+\end{itemize}
+
+In addition,
+there is a replacement for the \man libpsap2(3n) library called the
+\man libpsap2-lpp(3n) library.
+This implements the lightweight presentation protocol for TCP/IP-based
+internets as specified in RFC-1085.
+
+In addition,
+\voltwo/ contains information on how to configure the ISODE for your network.
+
+In \volthree/,
+some application programs written using this release are described,
+including:
+\begin{itemize}
+\item	An implementation of the ISO FTAM
+	which runs on Berkeley or AT\&T \unix/.
+	FTAM (file transfer, access and management),
+	is the OSI file service.
+	The implementation provided is fairly complete in the context
+	of the particular file services it offers.
+	It is a minimal implementation inasmuch as it offers only four core
+	services: transfer of text files, transfer of binary files,
+	directory listings, and file management.
+
+\item	An implementation of an FTAM/FTP gateway,
+	which runs on Berkeley \unix/.
+
+\item	An implementation of the ISO VT
+	which runs on Berkeley \unix/.
+	VT (Virtual Terminal) is the OSI terminal service.
+	The implementation consists of a basic class, TELNET profile
+	implementation.
+
+\item	An implementation of the ``little services'' often used for debugging
+	and amusement.
+
+\item	An implementation of a simple image database service.
+\end{itemize}
+
+In \volfour/,
+a ``cooked'' interface for applications using remote operations is described,
+which consists of three programs and a library:
+\begin{itemize}
+\item	The \man rosy(1) compiler,
+	which is a stub-generator for specifications of remote operations.
+
+\item	The \man posy(1) compiler,
+	which is a structure-generator for ASN.1 specifications.
+
+\item	The \man pepy(1) compiler,
+	which reads a specification for an application and produces a program
+	fragment that builds or recognises the data structures (APDUs in OSI
+	argot) which are communicated by that application.
+
+\item	The new \man pepsy(1) compiler which will replace \pgm{pepy}
+	and \pgm{posy} programs in a future release of the ISODE.
+
+\item	The \man librosy(3n) library,
+	which is a library for applications using this distributed
+	applications paradigm.
+\end{itemize}
+
+In \volfive/,
+the QUIPU directory is described,
+which currently consists of several programs and a library:
+\begin{itemize}
+\item	The \man quipu(8c) program,
+	which is a directory system agent (DSA);
+
+\item	The \man dish(1c) family of programs,
+	which are a set of directory shell commands;
+	and,
+
+\item	The \man libdsap(3n) library,
+	which is a library for applications using the directory.
+\end{itemize}
+
+\section	{A Note on This Implementation}
+Although the implementation described herein might form the basis for a
+production environment in the near future,
+this release is not represented as ``production software''.
+
+However,
+throughout the development of the software,
+every effort has been made to employ good software practices which result in
+efficient code.
+In particular,
+the current implementation avoids excessive copying of bytes as data moves
+between layers.
+Some rough initial timings of echo and sink entities at the transport and
+session layers indicate data transfer rates quite competitive with a raw TCP
+socket (most differences were lost in the noise).
+The work involved to achieve this efficiency was not demanding.
+
+Additional work was required so that programs utilising the \man libpsap(3)
+library could enjoy this level of performance.
+Although data transfer rates at the reliable transfer and remote operations
+layers are not as good as raw TCP,
+they are still quite impressive
+(on the average,
+the use of a ROS interface (over presentation, session, and ultimately the TCP)
+is only 20\% slower than a raw TCP interface).
+
+\section	{Changes Since the Last Release}\label{isode:changes}
+A brief summary of the major changes between v.~\isodeprevrsn/ and v.~\isodevrsn/
+are now presented.
+These are the user-visible changes only;
+changes of a strictly internal nature are not discussed.
+
+\begin{itemize}
+\item	A new program, \pgm{pepsy}, has been developed to replace both
+	\pgm{pepy} and \pgm{posy}.
+	It is described in \volfour/.
+
+\item	The \pgm{dsabuild} program has been removed,
+	in favor of some shell scripts.
+
+\item	The ``higher performance nameservice'' has been discontinued in favor
+	of a ``user-friendly nameservice''.
+	As such,
+	the syntax of the \verb"str2aei" routine has changed.
+	This routine will soon be deprecated,
+	so get in the habit of using the new \verb"str2aeinfo" routine
+	discussed in the ISODE Manual.
+
+\item	The \verb"na_type" and \verb"na_subnet" fields of the network address
+	structure described in the ISODE Manual
+	have been renamed.
+	For compatibility,
+	macros are provided.
+	These macros will be removed after this release.
+
+\item	The stub directory facility is now deprecated in favor of an OSI
+	directory based approach.
+	As a result,
+	the \pgm{aetbuild} program has been removed.
+
+\item	An interworking problem in the presentation layer has been
+	fixed in a backwards compatible manner.  This should not
+	affect interoperability in this release.
+	The backwards compatibility will be removed after this release.
+
+\end{itemize}
+
+As a rule,
+the upgrade procedure is a two-step process:
+first,
+attempt to compile your code, keeping in mind the changes summary relevant to
+the code;
+and,
+second,
+once the code successfully compiles,
+run the code through \man lint(1) with the supplied lint libraries.
+
+Although
+every attempt has been made to avoid making changes which would affect
+previously coded applications,
+in some cases incompatible changes were required in order to
+achieve a better overall structure.

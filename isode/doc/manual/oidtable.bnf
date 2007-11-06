@@ -1,0 +1,84 @@
+-- This specification is in BNF
+-- Comments start with two dashes
+
+<a> ::= any of the 52 upper and lower case IA5 letters
+<d> ::= any IA5 digit 0-9
+<k> ::= any of th 52 upper and lower case IA5 letters, IA5 digits,
+                and "-" (hyphen)
+<p> ::= any IA5 character in ASN.1 PrintableSting
+<CRLF> ::= IA5 Newline
+<letterstring> ::= <a> | <a> <letterstring>
+<numericstring> ::= <d> | <d> <numericstring>
+<keystring> ::= <k> | <k> <keystring>
+<printablestring> ::= <p> | <p> <printablestring>
+-- The first notation is to specify Object Identifiers.
+-- These have the basic (BNF):
+
+<numericoid> ::= <numericstring> | <numericstring> "." <numericoid>
+
+
+-- We define a table which gives a mapping of generic OIDs to strings:
+-- and a possible abbreviated form of the name
+
+<oidkeytable> ::= <oidkeyentry> | <oidkeyentry> <CRLF> <oidkeytable>
+<oidkeyentry> ::= <abbrstring> ":" <oidnumber>
+<abbrstring>  ::= <keystring> | <keystring> "," <keystring>
+<oidnumber>   ::= <numericoid> | <numericoid> "," <aliasoid>
+<aliasoid>    ::= <numericoid>
+
+-- For example:
+-- UCL :0.3.2342.19200149
+-- country,c :2.5.4.6
+
+-- Tables of this form will be read in by every QUIPU DSA, to give it a set
+-- of OID strings forms, and abbreviations
+
+-- A general BNF of oid is now given:
+
+<oid> ::= <keystring> "." <numericoid> | <keystring> | <numericoid>
+
+-- For example, ``UCL.5'' gives OID 5 as allocated by UCL, ``C'' gives the
+-- standard country oid.
+
+- We define a table for attribute values:
+
+<attrTable> ::= <attrEntry> | <attrEntry> <CRLF> <attrTable>
+<attrEntry> ::= <oidkeyentry> ":" <attrEncoding>
+<attrEncoding> ::=  "ObjectClass" | "DN" | "CaseIgnoreString" | 
+                    "CaseExactString" | "PrintableString" | "CountryString" | 
+                    "Guide" | "PostalAddress" | "TelephoneNumber" | 
+                    "telexNumber" | "TelexTerminalIdentifier" | 
+                    "FacsimileTelephoneNumber" | "NumbericString" | 
+                    "DestinationString" | "PresentationAddress" | 
+                    "OID" | "OctetString" | "IA5String" | "Photo" | 
+                    "Mailbox" | "UTCTime" | "DeliveryMethod"  
+                    "Integer" | "Boolean" | "Password"
+                    "ACL" | "Schema" | "Update" |
+                    "Audio" | "CaseIgnoreList" | "VisibleString" |
+                    "Certificate" | "CerfiticatePair" | "CertificateList" |
+                    "ProtectedPassword" | "AccessPoint" | "Edbinfo" |
+                    "InheritedAttribute" | "NRSInformation" |
+                    <attrASN>
+
+<attrASN> ::= <keystring>
+       -- defined, but unknown syntax - treated as ``ASN''
+
+-- For example:
+-- description: attributetype.13: CASEIGNORESTRING
+
+-- Finally we define an object class table:
+
+<ocTable> ::= <ocEntry> | <ocEntry> <CRLF> <ocTable>
+<ocEntry> ::= <ocData> | <ocMacro>
+<ocData>  ::= <oidkeyentry> ":" <strList> ":" <strList> ":" <strList>
+--                               :(hierarchy):(must contain):(may contain)
+<ocMacro>    :: = <keystring> "=" <strList>
+
+<strList> ::= <keystring> | <keystring> "," <strList> |
+-- Note the final ``|'' to permit the null string
+
+-- For example;
+-- localeAttributeSet = facsimileNumber,isdnAddress,telephoneNumber, ...
+-- country: objectclass.2 : top: countryname: description,searchguide
+-- organisationalPerson: person: : localeAttributeSet,OU,title,...
+

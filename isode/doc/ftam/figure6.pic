@@ -1,0 +1,32 @@
+.PS 8.25i
+.ps 20
+define outline @
+	line from B$1.sw to B$1.nw to B$1.ne to B$1.se
+	move to (B$1.n.x, B$1.n.y-lineht/8); $2
+@
+## figure 6
+## NESTED REGIMES
+B1:	box invis width 4*boxwid height 4*boxht
+	outline(1,"APPLICATION ASSOCIATION")
+##
+B2:	box with .n at (B1.n.x, B1.n.y-boxht/2) width 3*boxwid height 3*boxht \
+		invis
+	outline(2,"FILE SELECTION")
+##
+B3:	box with .n at (B2.n.x, B2.n.y-boxht/2) width 2*boxwid height 2*boxht \
+		invis
+	outline(3,"FILE OPEN")
+##
+B4:	box with .n at (B3.n.x, B3.n.y-boxht/2) invis
+	outline(4,"DATA TRANSFER")
+##
+	move to (B2.nw.x+(B3.nw.x-B2.nw.x)/2, B3.nw.y-7*lineht/8); \
+	    "\begin{tabular}{c}M\\A\\N\\A\\G\\E\\M\\E\\N\\T\end{tabular}"
+##
+	move to (B3.nw.x+(B4.nw.x-B3.nw.x)/2, B4.nw.y-9*lineht/16); \
+	    "\begin{tabular}{c}A\\C\\C\\E\\S\\S\end{tabular}"
+##
+	arrow from (B1.sw.x-linewid/2, B1.sw.y-lineht/2) \
+	      to   (B1.se.x+linewid/2, B1.se.y-lineht/2)
+##
+.PE

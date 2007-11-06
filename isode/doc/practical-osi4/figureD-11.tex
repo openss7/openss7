@@ -1,0 +1,19 @@
+\File{figureD\-11.py},{14:11},{Mar  4 1991}
+\L{\LB{leafSearch (base: DN; s: String; subsettype: SubsetType): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    \K{RETURN} search (base, subsettype, s,}}
+\L{\LB{                   \{ commonName, surName, userId\},}}
+\L{\LB{                   \{ substrings, approximateMatch \},}}
+\L{\LB{                   \K{NULL});}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{keyedSearch (base: DN; type, value: String): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    \K{RETURN} search (base,}}
+\L{\LB{                   length (base) \> 1 ? wholeSubtree : oneLevel,}}
+\L{\LB{                   value,}}
+\L{\LB{                   \{ str2Attr (type) \},}}
+\L{\LB{                   \{ substrings, approximateMatch \},}}
+\L{\LB{                   \K{NULL});}}
+\L{\LB{\}}}

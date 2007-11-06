@@ -1,3 +1,15 @@
+2007-10-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
+
+2007-10-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: added check for pci_module_init
+	* src/kernel/liscompat.c: use pci_register_driver instead of
+	  pci_module_init
+	* src/kernel/svr4compat.c: fix for 2.4 kernels without pre-emption
+	  definition
+
 2007-09-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/sun/strsun.h: correction to MBLKIN

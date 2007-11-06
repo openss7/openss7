@@ -1,0 +1,107 @@
+Practical Perspectives on OSI Networking (2 days)
+
+Christopher W. Moore and Marshall T. Rose
+The Wollongong Group, Inc.
+
+Overview
+
+     Based on international cooperative work, it is commonly
+     acknowledged that protocols based on the Open Systems
+     Interconnection (OSI) model and promulgated by the International
+     Organization for Standardization (ISO) and the International
+     Electrotechnical Commission (IEC) will eventually achieve dominance
+     and enjoy even greater success than current networking
+     technologies.
+
+     This two day tutorial provides a practical perspective on the
+     issues involved in developing and deploying OSI networks.
+     Organized for those with a basic familiarity with OSI and with
+     practical networking experience, the presentation will provide a
+     more comprehensive understanding of the OSI Reference Model, OSI
+     application and network services as well as a detailed
+     understanding of various transition strategies which may be
+     utilized in the realization of OSI networks from existing
+     technology, in particular TCP/IP based networks.
+
+
+What You Will Learn
+
+     You will achieve a thorough understanding of the technology
+     involved in developing OSI applications, building OSI networks, and
+     transiting to (or coexisting with) TCP/IP-based networks.
+
+
+Syllabus
+
+     - OSI Application Services
+
+       A discussion of current OSI applications and how they may be used
+       to build new applications.  Of interest to both System
+       Administrators and Application Developers, topics include:
+
+	- The OSI applications environment: concepts, service elements,
+	  and programmer tools
+
+	- Use of standard OSI applications: the Directory, Message
+	  Handling Systems, and File Transfer, Access and Management
+
+     - OSI Network Services
+
+       A discussion of current OSI network and transport technologies
+       and how they may be used to build networks.  Of interest to
+       Network Administrators, topics include:
+
+	- The OSI network environment: concepts, building blocks, and
+	  connectivity
+
+	- Comparison with relevant TCP/IP technology: complexity,
+	  administration, and performance
+
+
+     - Transition from and Coexistence with TCP/IP
+
+       A discussion of how existing, production TCP/IP-based networks
+       may either transition to OSI, or coexist with OSI for maximal
+       functionality.  Of interest to both Network Administrators and
+       Systems Administrators, topics include:
+
+	- Motivation and Background: concepts, terminology, and metrics
+	  of comparison
+
+	- Approaches: both protocol-based and service-based
+
+	- Examples: scenarios for different environments
+
+
+Who Should Attend
+
+     This tutorial is intended for professionals interested in planning,
+     implementing, or managing OSI networks.  A basic familiarity with
+     networking and OSI is assumed.  Detailed knowledge of the protocols
+     is not required.
+
+
+Speakers
+
+     Chris Moore is a Senior Software Engineer with The Wollongong
+     Group, Inc., in Palo Alto, California, where his responsibilities
+     include Directory Services as well as Message Handling Systems.  He
+     is involved with national and international working groups in these
+     areas and presently serves as Vice Chairman of the U.S. National
+     Bureau of Standards Implementors Workshops special interest group
+     on Directory Services.  Prior to joining Wollongong, Moore was a
+     Systems Research Programmer with The University of Michigan
+     Computing Center in Ann Arbor, Michigan.
+
+     Marshall T. Rose is a Principal Software Engineer at The Wollongong
+     Group, Inc., where he works on OSI protocols and transition
+     strategies.  He is the principal implementor of the ISO Development
+     Environment (ISODE), an openly available implementation of the
+     upper layers of the OSI protocol suite.  He was co-author of
+     RFC1006 (ISO Transport Services on top of the TCP), and was a
+     member of the IFIP working group committee whose efforts led to
+     RFC987 (Mapping between X.400 and RFC822). He is currently an
+     advisor to the National Science Foundation, serving on its Network
+     Technical Advisory Group.  Rose received the Ph.D. degree in
+     Information and Computer Science from the University of California,
+     Irvine, in 1984.

@@ -1,0 +1,22 @@
+###############################################################################
+#
+# fredrc - System-wide fred tailoring file
+# 
+# $Header$
+#
+#
+# $Log$
+# 
+# 
+###############################################################################
+
+
+area			"@@(dnprefix)"
+area	organization	"@c=@(country)"
+area	unit		"@@(dnprefix)"
+area	locality	"@"
+area	person		"@@(dnprefix)"
+area	dsa		"@c=@(country)"
+area	role		"@@(dnprefix)"
+
+set	manager		"@(mailbox)"

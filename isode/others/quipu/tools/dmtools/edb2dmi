@@ -1,0 +1,74 @@
+#!/bin/sh
+
+nawk ' {
+	if (substr($0, length($0), 1) == "\\")
+		printf "%s", substr($0, 1, length($0) -1)
+	else
+		print
+} ' |
+sed 's/[ ]*=[ ]*/=/g
+     s/[ ]*&[ ]*/\&/g
+     s/[ ]*#[ ]*/#/g
+     s/[ ]*\$[ ]*/$/g
+     s/[ ]*$//
+     s/[ ]*ALWAYS[ ]*/always/
+     /^!*iattr/s/[ ]*(/(/' |
+nawk ' BEGIN {
+	FS = "="
+}
+/^lastModif/{
+	next
+}
+
+/^!*(iattr|inherited)/{
+	line = $0
+	niatts = 0
+	while (1)
+	{
+		getline tmp
+		if (substr(tmp, length(tmp), 1) != ")")
+			iatts[++niatts] = tmp
+		else
+			break
+	} 
+	if (niatts > 0)
+	{
+		awksort(iatts, niatts)
+		for (i = 1; i <= niatts; i++)
+			line = line "~" iatts[i]
+	}
+	print line "~)"
+	next
+} 
+
+/^objectClass/ {
+	n = index($0, "=")
+	nocs = split(substr($0, n+1), ocs, "&")
+	for (i =1; i <= nocs; i++)
+		print "objectClass=" ocs[i]
+	next
+}
+
+{
+	print $0
+}
+
+
+
+function awksort(arname, n,     i, j, changes) {
+    changes = 1
+    for (i = n; i > 1 && changes != 0; i--) {
+        changes = 0
+        for (j=1; j < i; j++)
+            if (arname[j+1] < arname[j]) {
+                swap(arname, j+1, j)
+                ++changes
+            }
+    }
+}
+
+function swap(x, i, j,     tmp) {
+    tmp = x[i]
+    x[i] = x[j]
+    x[j] = tmp
+} '

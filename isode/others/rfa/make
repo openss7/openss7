@@ -1,0 +1,8 @@
+: run this script through /bin/sh
+M=/bin/make
+if [ -f /usr/bin/make ]; then
+    M=/usr/bin/make
+fi
+
+ARCH=`arch 2>/dev/null || true`
+exec $M ARCH="$ARCH" TOPDIR=../../ -f ../../config/CONFIG.make -f Makefile ${1+"$@"}

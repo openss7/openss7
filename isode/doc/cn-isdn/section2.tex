@@ -1,0 +1,243 @@
+% run this through LaTeX with the appropriate wrapper
+
+\section	{Background}
+Having suggested that the use of TCP/IP is beneficial in the short- and
+medium-term for the development of OSI-based application protocols,
+and further,
+that a strategy utilizing the DDN protocols towards these ends can also prove
+to be a valuable tool during the transition from TCP/IP-based networks to
+OSI-based networks,
+it behooves us to present a terse definition of these terms.
+
+\subsection	{The DDN Protocol Suite}
+The \dod/ Transmission Control Protocol (TCP)\cite{TCP} provides
+end-to-end transport services for \dod/ military standard networking
+applications.
+The TCP presents a full-duplex connection service to two end-peers,
+while addressing the issues of reliability when using a non-reliable datagram
+service.
+The TCP implements a three-way handshake for connection establishment,
+uses a windowing scheme for flow-control purposes,
+and has a graceful termination phase.
+To access the underlying network,
+the TCP utilizes the services of the \dod/ Internet Protocol (IP)\cite{IP}.
+
+The IP is a datagram, or connectionless, service and includes provision for
+service specification, fragmentation/reassembly, and security information.
+The IP makes no assumption regarding the reliability of the communications
+subnet, and uses a simple checksum mechanism.
+This requires the higher layer protocols (e.g., the TCP) to handle end-to-end
+reliability.
+This degree of freedom permits the IP an unprecedented amount of flexibility
+in dealing with different subnetwork technologies,
+and in connecting those subnetworks efficiently.
+
+The DDN protocol suite is based on the ARPAnet Reference Model (ARM).
+Interested readers should consult \cite{Internet.Architecture,ARM} for a
+perspective on this model.
+For our purposes,
+it is instructive to note that there is an underlying {\em client/server\/}
+paradigm for services.
+Speaking in broad generalities:
+a {\em server\/} listens on a well-known {\em port\/}
+(e.g., file transfer activities occur over TCP port~21),
+awaiting a connection.
+At some later time,
+a {\em client\/} will connect to the server.
+After some application-specific negotiations,
+the client begins to make requests of the server,
+which in turn makes various responses.
+These transactions
+continue until either the client or server determine that no further
+transactions remain and the connection should be closed.
+
+Further,
+servers in the ARPAnet Reference Model tend to be stateless in nature.
+That is,
+there is no inherent state information retained between connection sessions.
+As a result,
+connections can and generally do exist in parallel between several clients and
+several servers
+(each of the latter being instantiated when a client connects to the
+well-known port).
+Of course,
+there may be side-effects between different instantiations
+(e.g., when one file server removes a file,
+this usually results in other servers being unable to retrieve that file),
+but there is no state information which ``lives'' between instantiations of a
+given server.
+
+Finally,
+the ARM is not a seven-layer architecture:
+applications reside directly above the TCP
+and have implicit session and presentation mechanisms
+(i.e., they are application-specific).
+
+The DDN protocol suite is quite mature,
+having stabilized about {\oldstyle 1980}
+(the fundamental work leading to TCP/IP having been done since the early
+{\oldstyle 1970\/}'s).
+TCP/IP enjoys a wide vendor support base and user population.
+Typically, vendor support from TCP/IP to other technologies
+(e.g., IBM's SNA\cite{SNA}) is available,
+and many vendors offer board-level implementations at the transport layer.
+As of April, {\oldstyle 1986},
+in the ARPA Internet,
+most probably the largest unclassified TCP/IP internetwork,
+it was estimated that there were 2400~hosts residing on 400~networks
+connected via 120~gateways.
+The same source\cite{IP.Requirements} estimates that the ARPA Internet is
+growing at the rate of approximately 10\% a month.
+
+The services available in the DDN protocol suite are wide and varied,
+supporting everything from cross-network debugging,
+to network measurement and host measurement,
+to voice protocols,
+and so on (consult \cite{Assigned.Numbers} for a full list).
+Perhaps the three most notable services are:
+SMTP\cite{SMTP}, the Simple Mail Transfer Protocol,
+which provides store-and-forward service for text messages;
+FTP\cite{FTP}, the File Transfer Protocol,
+which provides remote file access;
+and,
+TELNET\cite{TELNET}, which provides network virtual terminal access.
+
+\subsection	{The OSI Protocol Suite}
+Offering services similar to the TCP is the OSI Transport
+Service\cite{ISO.TP.Service},
+henceforth called TP,
+which addresses the same general issues.%
+\footnote{This paper references the ISO specifications rather than
+the CCITT recommendations.
+The differences between these parallel standards are quite small,
+and can be ignored, with respect to this paper, without loss of generality.
+To provide the reader with the relationships:
+\[\begin{tabular}{lll}
+	Session protocol&	\cite{ISO.SP.Protocol}&
+						\cite{CCITT.SP.Protocol}\\
+	Transport protocol&	\cite{ISO.TP.Protocol}&
+						\cite{CCITT.TP.Protocol}\\
+	Transport service&	\cite{ISO.TP.Service}&
+						\cite{CCITT.TP.Service}
+\end{tabular}\]}
+In contrast though,
+the reference model for Open Systems Interconnection (OSI)\cite{OSI},
+is based on a {\em user/provider\/} paradigm for services.
+That is,
+instead of viewing an asymmetric horizontal relationship between peers
+(as with the servers and clients in the ARM),
+the peers are viewed as being completely symmetric in behavior.
+Instead of a server listening on a well-known port
+when a connection is established,
+the {\em provider\/} fires an {\sf INDICATION\/} event for the entity at the
+next highest layer.
+This entity, called the {\em user}, catches the event and acts accordingly.
+Although this might be implemented by having a user acting as a server
+``listen'' by hanging on the {\sf INDICATION\/} event,
+from the perspective of the OSI reference model,
+all users remain in the {\sf IDLE\/} state until they generate a
+{\sf REQUEST\/} or accept an {\sf INDICATION}.
+
+The services under consideration and being implemented for the OSI protocol
+suite are also wide and varied.
+Perhaps the most notable services are:
+FTAM\cite{ISO.FTAM}, the File Transfer, Access, and Management Protocol;
+and,
+MHS\cite{MHS}, the suite of protocols for Message Handling Systems,
+originally developed by IFIP in {\oldstyle 1979}.
+
+\subsection	{Comparison of Services}
+Several studies have been performed comparing the DDN and OSI protocol
+suites
+(e.g., \cite{NRC.Report}, which concluded that the TCP and the TP were
+functionally equivalent).
+As discussed by \cite{TCP.convert.ISO},
+the services offered by the two protocols can be divided into three areas:
+connection establishment, data transfer, and connection release.
+Although we disagree with the bias with which the comparison is presented,
+the results are essentially correct:
+the two protocols offer services of functional equivalence with very few
+differences.
+For our purposes,
+it is important to note:
+\begin{itemize}
+\item	Simultaneous connection requests by both ends of the connection
+result in two connections being established in the TP,
+while in the TCP a single connection is established.
+Experience shows this difference to be of little practical value in
+a large number of applications using a connection-oriented transport service.
+
+\item	The TCP does not have an expedited data transfer mechanism,
+although an urgent pointer is available.
+This paper will suggest a method for implementing an expedited data stream on
+top of the TCP so that OSI-based applications can naively utilize this
+mechanism.
+
+\item	The TP does not have a graceful ``drain-and-close'' mechanism for
+connection release.
+Most user profiles of the TP
+(e.g., the National Bureau of Standards profile of TP4\cite{NBS.TP})
+require the inclusion of an orderly release facility in the TP,
+based on the corresponding session-level mechanism.
+As will be made clear later,
+this lack of functionality in TP is unimportant.
+\end{itemize}
+
+\subsection	{A Digression on the Interoperability of Applications}
+Ideally,
+in order to preserve our investment in existing tools
+we would like to do one of two things:
+\begin{enumerate}
+\item	achieve interoperability between similar applications in each protocol
+	suite;
+	or,
+\item	migrate an existing application from one protocol suite to the other.
+\end{enumerate}
+In practice,
+neither of these goals can be realized without a significant investment.
+
+In the first case,
+although both the DDN protocol suite and the OSI protocol suite have,
+for example,
+a``mail'' application,
+they are quite different.
+That is, they provide electronic mail services,
+but the type of services available and the implementation of those services
+is vastly different.
+Hence,
+in order to make mail in the DDN protocol suite interoperate with mail in the
+OSI protocol suite,
+a special-purpose gateway is required.
+(To grasp the complexity of this issue,
+interested readers should consult \cite{ARPA.MHS} which describes the
+operation of such a gateway for mail applications.)
+
+Given that the first alternative is not practical,
+what about the second?
+Unfortunately,
+this too is not straight-forward.
+As a brief review,
+let us compare the two {\em protocol stacks\/} which comprise the
+DDN and OSI protocol suites.
+These are presented in Figure~\ref{stacks}.
+\tagfigure{2-1}{Comparison of the Protocol Stacks}{stacks}
+
+Although there is great similarly until we reach the the transport layer,
+at this point,
+the stacks diverge.
+The figure emphasizes that
+each application in the DDN protocol suite has its own implicit session and
+presentation mechanisms,
+whereas in the OSI protocol suite these exist explicitly as layers.
+In short,
+in the DDN protocol suite,
+the services required by the applications are exactly those which are offered
+by the transport service;
+but,
+in the OSI protocol suite,
+the services required by the applications and those provided by the transport
+service are not the same.
+Hence,
+although the {\em services offered by the transport layer\/} are quite similar
+between the two stacks,
+the {\em services required by the applications\/} are quite different.

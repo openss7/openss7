@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.26 2007/08/13 22:46:09 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.27 2007/10/18 06:53:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:09 $ by $Author: brian $
+ Last Modified $Date: 2007/10/18 06:53:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strconf.h,v $
+ Revision 0.9.2.27  2007/10/18 06:53:55  brian
+ - added streams notification registration
+
  Revision 0.9.2.26  2007/08/13 22:46:09  brian
  - GPLv3 header updates
 
@@ -67,7 +70,7 @@
 #ifndef __SYS_STREAMS_STRCONF_H__
 #define __SYS_STREAMS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.26 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.27 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do no include sys/streams/strconf.h directly, include sys/strconf.h instead."
@@ -110,6 +113,20 @@ typedef enum {
 	SQLVL_PERSTREAM = 7,		/* per-stream synchronization */
 	SQLVL_SPLITMODULE = 8,		/* split module level (MacOT) */
 } sqlvl_t;
+
+#define STREAMS_NTFY_REG	1	/* notification of registration */
+#define STREAMS_NTFY_DEREG	2	/* notification of deregistration */
+#define STREAMS_NTFY_APUSH_ADD	3	/* notification of autopush addition */
+#define STREAMS_NTFY_APUSH_DEL	4	/* notification of autopush deletion */
+
+struct streams_notify {
+	void (*sn_notify)(int, int, modID_t, struct streams_notify *);
+	struct list_head sn_list;
+};
+
+__STREAMS_EXTERN int streams_notify(int event, int type, modID_t modid);
+__STREAMS_EXTERN int streams_register_notifier(struct streams_notify *sn);
+__STREAMS_EXTERN int streams_unregister_notifier(struct streams_notify *sn);
 
 __STREAMS_EXTERN int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor);
 __STREAMS_EXTERN int register_strdev(struct cdevsw *cdev, major_t major);

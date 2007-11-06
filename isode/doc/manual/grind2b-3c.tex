@@ -1,0 +1,59 @@
+\File{grind2b\-3c.c},{22:23},{Jun 12 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  ros\_invoke (sd, rox)}}
+\L{\LB{\K{int}     sd;}}
+\L{\LB{\K{register} \K{struct} RoSAPinvoke *rox;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}     result;}}
+\L{\LB{    \K{register} \K{struct} dispatch   *ds;}}
+\L{\LB{    \K{struct} RoSAPindication  rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject   *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{}}
+\L{\LB{    \K{for} (ds = dispatches; ds \-\> ds\_operation != APDU\_UNKNOWN; ds++)}}
+\L{\LB{}\Tab{8}{\K{if} (ds \-\> ds\_operation == rox \-\> rox\_op)}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{    \K{if} (ds \-\> ds\_operation == APDU\_UNKNOWN) \{}}
+\L{\LB{}\Tab{8}{\K{if} (RoURejectRequest (sd, \&rox \-\> rox\_id, ROS\_IP\_UNRECOG,}}
+\L{\LB{}\Tab{16}{    ROS\_NOPRIO, roi) == NOTOK)}}
+\L{\LB{}\Tab{8}{    error (\S{}\"RO\-U\-REJECT.REQUEST: \%s\"\SE{}, RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}\Tab{8}{\K{goto} out;}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{if} (rox \-\> rox\_nolinked == 0) \{}}
+\L{\LB{}\Tab{8}{\K{if} (RoURejectRequest (sd, \&rox \-\> rox\_id, ROS\_IP\_LINKED,}}
+\L{\LB{}\Tab{16}{    ROS\_NOPRIO, roi) == NOTOK)}}
+\L{\LB{}\Tab{8}{    error (\S{}\"RO\-U\-REJECT.REQUEST: \%s\"\SE{}, RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}\Tab{8}{\K{goto} out;}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{switch} (result = (*ds \-\> ds\_vector) (rox)) \{}}
+\L{\LB{}\Tab{8}{\K{case} ERROR\_UNKNOWN: }}
+\L{\LB{}\Tab{8}{    \K{if} (RoResultRequest (sd, rox \-\> rox\_id, rox \-\> rox\_op,}}
+\L{\LB{}\Tab{24}{rox \-\> rox\_args, ROS\_NOPRIO, roi) == NOTOK)}}
+\L{\LB{}\Tab{16}{error (\S{}\"RO\-RESULT.REQUEST: \%s\"\SE{},}}
+\L{\LB{}\Tab{24}{RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}: }}
+\L{\LB{}\Tab{8}{    \K{if} (RoErrorRequest (sd, rox \-\> rox\_id, result, rox \-\> rox\_args,}}
+\L{\LB{}\Tab{24}{ROS\_NOPRIO, roi) == NOTOK)}}
+\L{\LB{}\Tab{16}{error (\S{}\"RO\-ERROR.REQUEST: \%s\"\SE{},}}
+\L{\LB{}\Tab{24}{RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} ERROR\_MISTYPED: }}
+\L{\LB{}\Tab{8}{    \K{if} (RoURejectRequest (sd, \&rox \-\> rox\_id, ROS\_IP\_MISTYPED,}}
+\L{\LB{}\Tab{24}{ROS\_NOPRIO, roi) == NOTOK)}}
+\L{\LB{}\Tab{16}{error (\S{}\"RO\-U\-REJECT.REQUEST: \%s\"\SE{},}}
+\L{\LB{}\Tab{24}{RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{out: ;}}
+\L{\LB{    ROXFREE (rox);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{...}}

@@ -1,0 +1,252 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Remote Operations Stub-Generator}\label{rosy}
+The \man rosy(1) program is a compiler for specifications of remote operations.
+
+For those interested in trivia,
+\pgm{rosy} stands for
+\underbar{R}emote
+\underbar{O}perations
+\underbar{S}tub-generator
+(\underbar{Y}ACC-based).
+The \man yacc(1) program,
+of course,
+is a compiler-compiler.
+
+\section	{Remote Operations Module}
+The \pgm{rosy} program reads a description of a {\em remote operations
+module\/}
+and produces the corresponding {\em C\/} stubs and definitions for use with
+the run-time environment provided by the \man librosy(3n) library.
+The syntax of the input file corresponds almost exactly to the remote
+operations notation described in any of the references found in
+Section~\ref{ros:reading} on page~\pageref{ros:reading} of \volone/.
+(But see Section~\ref{rosy:deficiencies} on page~\pageref{rosy:deficiencies}
+for the details.)
+In short, three kinds of objects are defined:
+{\em operations}, {\em errors}, and {\em types}.
+
+An example of a complete remote operations module can be found in
+Figure~\ref{ROSexample} starting on page~\pageref{ROSexample}.
+For now,
+let's briefly consider the three individual objects.
+
+\subsection	{Operation Definitions}
+Operations are defined by a name which starts with a lowercase character
+followed by the keyword \verb"OPERATION".
+Following this are optional definitions for the operation:
+\begin{describe}
+\item[\verb"ARGUMENT":]	defines the ASN.1 type which the operation expects
+			as its argument;
+
+\item[\verb"RESULTS":]	defines the ASN.1 type which the operation returns
+			on success;
+			and,
+
+\item[\verb"ERRORS":]	defines the errors which the operation can return on
+			failure.
+\end{describe}
+These optional definitions must occur in the order presented here.
+Following any optional definitions,
+the lexeme ``\verb"::="'' follows with an integer which uniquely identifies the
+operation in the module.
+By convention, the integer,
+termed the {\em operation code},
+should be non-negative.
+
+\subsection	{Error Definitions}
+Errors are defined by a name which starts with a lowercase character
+followed by the keyword \verb"ERROR".
+Following this are optional definitions for the operation:
+\begin{describe}
+\item[\verb"PARAMETER":]defines the ASN.1 type which the error returns
+			when it occurs.
+\end{describe}
+Following any optional definitions,
+the lexeme ``\verb"::="'' follows with an integer which uniquely identifies the
+error in the module.
+By convention, the integer,
+termed the {\em error code},
+should be non-negative.
+
+\subsection	{Type Definitions}
+Types are defined by a name which starts with an uppercase character
+followed by the lexeme ``\verb"::="'' and then an ASN.1 type definition.
+As the ASN.1 language is rich in its notation,
+the rules are not presented herein.
+The reader should consult \cite{ISO.PP.Syntax,CCITT.PP.Syntax} for the full
+details,
+though Section~\ref{asn1:notation} on page~\pageref{asn1:notation} of \volone/
+presents an incomplete treatment of the less substantive aspects of the
+language.
+
+\newpage
+\tagrindfile{grindimage-1}{Example of a Remote Operations Module}{ROSexample}
+\newpage
+
+\section	{ROSY Environment}
+The \pgm{rosy} program will produce several files after reading its remote
+operations module.
+
+\subsection	{Abstract Syntax Module}
+The abstract syntax module produced by \pgm{rosy} is simply a copy of the
+type definitions found in the remote operations module.
+In addition,
+\pgm{rosy} may define a few new types based on the definitions used in the
+operations and errors.
+
+\subsection	{C Language Stubs}
+Three separate stub files are produced by \pgm{rosy}.
+
+The first is a {\em C\/} pre-processor file containing definitions of:
+\begin{itemize}
+\item	each operation code
+\begin{quote}\small\begin{verbatim}
+#define operation_MODULE_OPNAME OPCODE
+\end{verbatim}\end{quote}
+	as in:
+\begin{quote}\small\begin{verbatim}
+#define operation_IMAGE_initialize 1
+\end{verbatim}\end{quote}
+
+\item	each error code
+\begin{quote}\small\begin{verbatim}
+#define error_MODULE_ERNAME ERRCODE
+\end{verbatim}
+\end{quote}
+	as in:
+\begin{quote}\small\begin{verbatim}
+#define error_IMAGE_congested 1
+\end{verbatim}
+\end{quote}
+
+\item	stub routines
+\begin{quote}\small\begin{verbatim}
+#define op_MODULE_OPNAME(sd,in,out,rsp,roi) \
+                                RyOperation ( ... )
+\end{verbatim}\end{quote}
+	as in:
+\begin{quote}\small\begin{verbatim}
+#define op_IMAGE_initialize(sd,in,out,rsp,roi) \
+                                RyOperation ( ... )
+\end{verbatim}\end{quote}
+\end{itemize}
+The stub routines require a lot more explanation.
+Rather than introduce the full details,
+for the moment simply note that the stub routines are actually calls to the
+\verb"RyOperation" routine discussed in Chapter~\ref{librosy} which
+``does all the work''.
+
+The second file produced by \pgm{rosy} defines the {\em C\/} language
+data structures used by the run-time environment which the \man librosy(3n)
+library provides.
+
+The third file produced by \pgm{rosy} is used in conjunction with \man lint(1).
+It defines as routines, rather than macros, the same stub routines found in
+the {\em C\/} pre-processor file.
+These routines permit more stringent argument checking.
+
+\section	{Known Deficiences}\label{rosy:deficiencies}
+The \pgm{rosy} program is a prototype.
+It probably won't undergo substantive change,
+but experience will tell.
+
+In particular,
+\pgm{rosy} uses essentially the same front-end as the \man pepy(1) program,
+so it has some limitations in the ASN.1 syntax it can accept.
+Consult Section~\ref{pepy:syntax} for the details.
+
+The \verb"BIND" and \verb"UNBIND" macros are currently unrecognized,
+along with the newer (\verb"OBJECT" \verb"IDENTIFIER") notation for operation
+codes.
+
+The \verb"LINKED" clause is currently recognized but otherwise ignored
+for the \verb"OPERATION" macro.
+
+\section	{Running ROSY}
+Here are a few things to know when running \pgm{rosy}.
+
+\subsection	{Options}
+The \pgm{rosy} program has a few options to modify its behavior.
+
+The \switch"b" switch sets the prefix used for the output file.
+If this option is not given,
+the ASN.1 module name is used.
+
+The \switch"d" switch directs \pgm{rosy} to ignore any \pgm{pepy}-style
+augmentations.
+
+The \switch"o" switch sets the name of the output file,
+which is normally derived from the name of the input file.
+The distinguished file ``\verb"-"'' can be used to force the use of the
+standard output.
+
+Normally, \pgm{rosy} prints the name of each operation, error, or type
+as it works.
+The \switch"s" switch disables this behavior.
+
+The \switch"pepsy" switch tells \pgm{rosy} that you will be using
+\pgm{pepsy} rather than \pgm{posy}.
+The \pgm{pepsy} program is dscribed in Chapter~\ref{pepsy} starting on 
+page~\pageref{pepsy}.
+
+\subsection	{Makefiles}\label{rosy:make}
+By convention,
+input files to \pgm{rosy} have the extension \verb".ry".
+
+Consider the file \verb"module.ry" which defines the module \verb"MODULE".
+The name of the abstract syntax module produced by \pgm{rosy} is normally
+derived from the name of the input file, using an extension of \verb".py".
+The name of the {\em C\/} language stub files is derived from the name of the
+module defined in the input file.
+Hence
+\begin{quote}\begin{verbatim}
+rosy module.ry
+\end{verbatim}\end{quote}
+will produce:
+\begin{describe}
+\item[\verb"module.py":]	the abstract syntax module;
+
+\item[\verb"MODULE-ops.h":]	operation definitions and stubs;
+
+\item[\verb"MODULE-ops.c":]	data structures for \man librosy(3n);
+				and,
+
+\item[\verb"MODULE-stubs.c":]	stub definitions for \man lint(1)
+\end{describe}
+
+Intuitively, one would suspect that the the rules for \man make(1) should take
+advantage of the \verb".ry" and \verb".py" suffix relationship for a rule
+like:
+\begin{quote}\small\begin{verbatim}
+.ry.py:;          rosy $(RYFLAGS) $<
+\end{verbatim}\end{quote}
+For reasons explained later on
+(in Section~\ref{posy:make} on page~\pageref{posy:make}),
+it is advantageous to use a more complicated set of rules:
+\begin{quote}\small\begin{verbatim}
+MODULE-asn.py:    module.ry
+                  rosy $(RYFLAGS) -o $@ module.ry
+MODULE-ops.c:     module.ry
+MODULE-ops.h:     module.ry
+MODULE-stubs.c:   module.ry
+\end{verbatim}\end{quote}
+Usually \verb"RYFLAGS" is empty.
+
+In our particular discipline,
+we will generate two sets of files:
+one for the invoker and the other for the performer.
+\begin{quote}\small\begin{verbatim}
+MODULE-Rops.o:    MODULE-ops.c MODULE-ops.h
+                  $(CC) $(CFLAGS) -DPERFORMER -c MODULE-ops.c
+                  mv MODULE-ops.o $@
+
+MODULE-Iops.o:    MODULE-ops.c MODULE-ops.h
+                  $(CC) $(CFLAGS) -DINVOKER -c MODULE-ops.c
+                  mv MODULE-ops.o $@
+\end{verbatim}\end{quote}
+
+\subsection	{Grinding}
+Figure~\ref{PepyGrind} on page~\pageref{PepyGrind} of \volone/
+contains an entry for the \man vgrindefs(5) file,
+which may be used by the \man vgrind(1) or \man tgrind(1) facility.

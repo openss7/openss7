@@ -1,0 +1,152 @@
+% Use LaTeX to process this file
+
+\documentstyle[11pt]{article}
+
+\begin{document}
+
+\title{A MODEST PROPOSAL}
+\author{Dwight E. Cass\\
+        Automation Sciences Laboratory\\
+        Northrop Research and Technology Center}
+\date{May 15, 1986}
+\maketitle
+
+\begin{quote}\em
+This is a transcript of the talk presented to the MAP/TOP Users' Group Meeting
+on May 15, 1986 in Seattle, Washington.
+\end{quote}
+
+\bigskip
+
+I am going to limit my comments today to one particular project which is
+going on at the Corporate Research and Technology Center.  That is not to
+say that Northrop is not doing other MAP and TOP related projects.  There
+are a number of other opportunities currently being explored, including
+an RFI which was recently released by our Aircraft Division looking to
+vendor support headed to MAP and TOP.
+
+At the Research Center, we are looking towards long range solutions to
+Northrop, which is an aerospace vendor.  We have a number of unique problems
+which General Motors doesn't directly address.
+
+We have identified two specific problems that we are trying to address.  The
+first problem is a lack of application protocols.  This lack has been
+identified and is being addressed within the MAP and TOP community but is
+not being addressed quickly enough.  The biggest problem that we have seen
+is that history has shown that the application level protocol development
+takes as long or significantly longer than the lower level protocols.
+
+The second problem that we have seen is that currently we do not have MAP
+and TOP for all the machines we have throughout the corporation.  One of
+the biggest problems we have is with IBM right now.  Over 50\% of the
+machines that we have in house are IBM equipment.  It is not adequate
+to put Series Ones talking to SNA.  ({\em Applause\/})  Our customers
+are the Department of Defense.  He wants us to talk electronically, TODAY!
+He is not willing to wait.
+
+The cause of these problems --- first, MAP/TOP, while unbelievably
+successfully is still very very young.  There is quite a bit more work
+to be done.  All the work that is going on right now that the standards
+committees are developing must be embodied.  We have to continue this
+level of effort.  But, Northrop has its requirements NOW!  We need to
+be able to communicate with the participants electronically.  We need to
+have factory and division-wide networking installed and operational in
+the '88 to '89 timeframe.  We cannot consider continuing to make large
+investments in SNA.  And it is simply not acceptable for Northrop to
+shutdown its factory for a large period of time to replace existing
+equipment and throw it out.  Finally, any solution that we take, if we
+choose to do something other than a pure MAP/TOP solution must be
+consistent with the directions of this body.
+
+Two observations to be made at this point.  The first is that many of
+these problems have been solved in the past, though definitely in
+different environments.  There are several other proprietary and research
+based protocol suites, which address many of these problems.  The second
+observation is that MAP/TOP is a highly layered protocol, and indeed is
+a subset of ISO.  As a matter of fact, it is a walk-through the tree
+of the ISO protocols.  The key here is that layered protocols allow mixing
+and matching of layers as necessary.  We are trying to emphasize here
+services provided by each layer, not necessarily the implementation
+of those services at the low level.  So the question that we have to ask is,
+How does Northrop get communications now that would be consistent with
+MAP/TOP and that would communicate electronically with the DoD?
+
+Now, we have to look to the DoD for the solution, and the solution seems
+to be TCP/IP.  This is a protocol suite installed in 1980 on the ARPAnet
+worldwide internet.  It has been mandated for use for all DoD
+internetworking.  It has a high emphasis on reliability and security.
+It supplies currently virtual terminal service, electronic mail, file
+transfer services, and a number of other less advertised capabilities.
+It has wide, wide vendor support.  I can go out today and buy TCP for
+every machine that I have in house, off the shelf, install it easily,
+and specifically, I can buy TCP/IP for every piece of IBM hardware that I
+have.
+
+TCP/IP specifically supports a very robust transport service, as documented
+in the National Research Council report comparing TCP/IP to ISO, the
+functionality of these two protocols are pretty much identical.  The other
+observation here is that TCP/IP, due to it's vendor support and it's
+openness, has been implemented in board level products.  This allows us
+to place TCP/IP in existing pieces of hardware that are fully loaded,
+without making major impacts on the CPU capabilities that we have in house.
+
+So, how do we construct this solution and stay with where MAP/TOP is going?
+The only solution seems to be complementary coexistence.  We need the
+best of both worlds.  This will give us the opportunity to run today,
+to run tomorrow, and by the time that the Department of Defense has met
+ISO, we'll be already there.  It is important to emphasize that Northrop
+is looking for an evolutionary migration path to its communications problems.
+It is not willing to accept throwing away and starting again.
+
+If you are going to talk about coexistence, you are going to have to decide
+where you are going to join the two protocols.  Several places come to
+mind.  One of the earliest proposals was to join at the IP layer.  To do
+this, of course, would require that we implement a full TP4.  It didn't
+seem practical, and it didn't seem to be cost effective, besides the fact
+that it prohibits us from using board level products.  We looked at
+implementing at the Session layer, but the problem is that above Transport,
+we start dealing with the problems of the symmetric ISO model versus the
+client/server ARPA model.  The only obvious point was at the Transport
+Service Access Point.  This gave us the capability of using the robust
+TCP transport service while still allowing MAP freedom to do whatever
+was necessary at the higher layers, isolating the applications from 
+the reality of whatever they were running.
+
+Where are we headed today?  At the Research Center we published a
+proposed Transfer Service Access Point.  We then implemented this proposal
+on a Berkeley 4.2 UNIX system, and have since published this proposal
+within the ARPA internet community as RFC983.  RFC983 fully describes
+a TP4/TSAP implementation on top of TCP.  Everything except for, of course,
+quality of service is supported within the implementation, because as you
+know, quality of service is not defined yet.  For addressing we have to take
+TCP/IP-based addressing, however we would be more than happy to start dealing
+with the addressing issue as the Standards Committees do, and currently
+we have an implicit maximum TSDU size of 65 Kbytes, but that will be
+relaxed in the next version.  I do have with me today, copies of the RFC
+and I can get a hold of the source code for you.  This is all public
+domain work.  You are all welcome to take it and if you need, work with it.
+
+Our next step.  What we need next is to put an implementation of Session, FTAM,
+and CASE on this TSAP.  One of the important things here is we can go
+off and write it, but it would invalidate any hopes of compatibility between
+MAP and what we're doing.  As such, we must find a version of Session, FTAM
+and CASE intended for a functional MAP system --- hopefully public domain,
+so we can distribute it to the ARPA internet community.  The other thing
+that we will be doing is implementing this RFC on the other machines
+currently within Northrop.
+
+As a migration strategy to ISO, RFC983 is not planned solely as a migration,
+but could easily form the backbone for a full migration plan.  What we are
+hoping to do is to fully track what the Department of Defense does over the
+next several years to yet bring us to ISO when our customers have.
+
+In summary, what we think we found is the best of all worlds.  We can talk
+to our customer today with such a capability.  We can install and perform
+research, today.  We can develop MAP/TOP applications, today.  We can migrate
+to ISO as our customer does.  We solved the security problem for our
+communications, and reaped the benefit of all the researchers within the
+Department of Defense internet community.
+
+Thank you very much.  ({\em Applause\/})
+
+\end{document}

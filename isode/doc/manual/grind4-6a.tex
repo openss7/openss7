@@ -1,0 +1,34 @@
+\File{grind4\-6a.py},{11:13},{Jul  4 1988}
+\L{\LB{\C{}\-\- personnel record pretty\-printer}}
+\CE{}\L{\LB{}}
+\L{\LB{PERSONNEL \K{DEFINITIONS}}\Tab{24}{::=}}
+\L{\LB{}}
+\L{\LB{\%\{}}
+\L{\LB{\#define DEBUG}}
+\L{\LB{}}
+\L{\LB{\#include \<stdio.h\>}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\#define ps\_adios(ps, f) \!}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"\%s: \%s\"\SE{}, (f), ps\_error ((ps) \-\> ps\_errno))}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{static char *myname = \S{}\"prpp\"\SE{};}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{void}\Tab{8}{adios ();}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{static char *givenName;}}
+\L{\LB{static char *initial;}}
+\L{\LB{static char *familyName;}}
+\L{\LB{static char *Title;}}
+\L{\LB{static char *Date;}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{static char *months[] = \{}}
+\L{\LB{    \S{}\"January\"\SE{}, \S{}\"February\"\SE{}, \S{}\"March\"\SE{}, \S{}\"April\"\SE{}, \S{}\"May\"\SE{}, \S{}\"June\"\SE{},}}
+\L{\LB{    \S{}\"July\"\SE{}, \S{}\"August\"\SE{}, \S{}\"September\"\SE{}, \S{}\"October\"\SE{}, \S{}\"November\"\SE{}, \S{}\"December\"\SE{}}}
+\L{\LB{\};}}
+\L{\LB{}}
+\L{\LB{...}}

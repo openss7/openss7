@@ -1,0 +1,507 @@
+
+
+
+
+
+
+Network Working Group                                          J. Onions
+Request for Comments: 1086                                    Nottingham
+                                                                 M. Rose
+                                                                     TWG
+                                                           December 1988
+
+                  ISO-TP0 bridge between TCP and X.25
+
+
+
+Status of this Memo
+
+   This memo proposes a standard for the Internet community.  Hosts on
+   the Internet that choose to implement ISO TP0 transport connectivity
+   between TCP and X.25 based hosts are expected to experiment with this
+   proposal.  TCP port 146 is reserved for this proposal.  Distribution
+   of this memo is unlimited and comments are highly encouraged.
+
+Introduction
+
+   This memo specifies a protocol that is used to bridge ISO TP0 packets
+   between X.25 and TCP networks.  This technique is useful when
+   interconnecting a DDN IP internet to an X.25 subnetwork.  This is not
+   a "magic bullet" solution to the DDN/ISO interoperability problem.
+   Rather, if one is running higher-layer ISO protocols in both networks
+   (namely ISO TP0), then a TP0 bridge can be used to achieve
+   connectivity.
+
+   The protocol itself is fairly simple as the method of operation for
+   running TP0 over the TCP and X.25 protocols have previously been
+   defined.  A bridge offering ISO-TP0 gateway services simply applies
+   both methods as appropriate.  The protocol works by TP0/TCP hosts
+   "registering" an X.25 subaddress (and corresponding TCP port/IP
+   address) with the bridge.  TP0/X.25 hosts use the standard method or
+   establishing, maintaining, and releasing connections.  When a TCP
+   connection and simply shuffles TP0 packets between the two.  When a
+   TP0/TCP host initiates a connection, it establishes a TCP connection
+   to the bridge using port number 146 and communicates the desired X.25
+   address.  The bridge establishes a connection to the native X.25 host
+   and simply shuffles TP0 packets between the two.
+
+1.  Introduction and Motivation
+
+   The migratory protocol described in [RFC1006] makes possible the
+   transmission of TP0 packets between hosts on TCP/IP internets.  With
+   the addition of a small protocol converter, a TCP/IP host can be made
+   to appear in the X.25 addressing space and be able to accept and make
+   connections using the TP0 protocol.
+
+
+
+Onions & Rose                                                   [Page 1]
+
+RFC 1086          ISO-TP0 bridge between TCP and X.25      December 1988
+
+
+   This procedure is particularly useful in the following cases:
+
+      1.  A host on an IP based internet can communicate with hosts on
+      X.25 based networks providing the hosts are running ISO protocols.
+      This also assumes a friendly gateway willing to run the actual TP0
+      bridge and make available to the IP host part of its X.25 address
+      space.
+
+      2.  A site having sparse connections to an X.25 network and using
+      a TCP/IP based local area network for local communications.  In
+      this case all hosts on the LAN can have access to hosts on the
+      X.25 network running ISO TP0.
+
+
+   Pictorially, this memo describes interoperation in the following
+   environment:
+
+          +---------------------------------+
+          |                                 |
+          |                   +-----------------------------------+
+          |  +----+           |     +----+  |           +----+    |
+          |  |    |           |     |    |  |           |    |    |
+          |  |    +-----------|-----+    +--------------+    |    |
+          |  |    |     TP0   |     |    |  |  TP0      |    |    |
+          |  +----+           |     +----+  |           +----+    |
+          | TCP Host          |  Bridge Host|         X.25 Host   |
+          |                   |             |                     |
+          |                   |             |                     |
+          |                   |             |                     |
+          +-------------------|-------------+                     |
+            TCP/IP Network    |                                   |
+                              |                                   |
+                              +-----------------------------------+
+                                           X.25 Network
+
+2.  Definitions and Philosophy
+
+   Some modest terminology and philosophy is introduced to aid
+   readability and stir interest.
+
+   The ISO Transport Service (TS) provides a reliable, packet-stream to
+   its users [ISO8072].  The ISO Transport Protocol (TP) implements this
+   service [ISO8073].  There are five classes of this protocol.  The
+   class is selected on the basis of the services offered by the
+   underlying network service.  Transport class 0 (TP0) is used when the
+   network service offered is connection-oriented and error-detecting.
+   As should be expected, TP0 is a rather simple protocol, since the
+   underlying network service actually provides most of the qualities
+
+
+
+Onions & Rose                                                   [Page 2]
+
+RFC 1086          ISO-TP0 bridge between TCP and X.25      December 1988
+
+
+   offered by the transport service.
+
+   CCITT Recommendation X.25 [ISO8208,X.25] offers such a network
+   service.  It is beyond the scope of this memo to describe X.25 in any
+   detail, but two observations are pertinent:  First, X.25 is offered
+   as a wide-area network service by many commercial and (non-U.S.)
+   government carriers.  Second, the TP0/X.25 combination is very
+   popular in Europe and other communities with a strong PTT-oriented
+   market.
+
+   It has been argued that the DoD Transmission Control Protocol (TCP)
+   [MIL1778, RFC793] can also be seen as providing a connection-oriented
+   and error-detecting network service.  This remark is controversial in
+   the sense that the TCP is actually an end-to-end transport protocol
+   and not a network protocol; the DoD Internet Protocol (IP) [MIL1777,
+   RFC791] is the network protocol in the DoD Protocol Suite.  However,
+   one of the advantages of layering is that, when properly architected,
+   it enhances flexibility.  This notion led to the development of
+   [RFC983] and its successor [RFC1006], which described how to provide
+   the ISO transport service on top of TCP/IP internetworks.
+
+3.  The Model
+
+   The model is simple.  The method for transmitting TP0 packets using
+   TCP is defined in [RFC1006].  The method for transmitting TP0 packets
+   using X.25 is defined in [ISO8878].  The TP0 bridge merely has to
+   convert between the two forms.  As with most protocols, there are
+   three well-defined phases of interaction:  connection establishment,
+   data transfer, and connection release.  The method of operation for
+   the data transfer and connection release phases are quite similar
+   when using TP0 over either network service.  Hence the resulting
+   protocol mapping functions are quite simple.
+
+   The difficult part is in managing connection establishment.  A small
+   "registration" protocol is used to aid the protocol mapping function
+   for the connection establishment phase.  The protocol performs one of
+   two operations: an X.25 address is specified for an outgoing call, or
+   an X.25 address is specified to accept incoming calls.
+
+   This memo ignores the problems of authentication and authorization.
+   These areas are presumed to be a local matter.  It is worth pointing
+   out that running such a TP0 bridge with unrestricted access allows
+   any TCP/IP host to lay claim to part of the TP0 bridge host's X.25
+   address space.  This address space is limited and will not support
+   many foreign hosts registering listening addresses.
+
+   The protocol makes no attempt to report errors other than those
+   transmitted by the TP0 protocol.  To attempt such additions would
+
+
+
+Onions & Rose                                                   [Page 3]
+
+RFC 1086          ISO-TP0 bridge between TCP and X.25      December 1988
+
+
+   require other mechanism such as a new protocol layer or equivalent.
+   The chosen model is kept as simple as possible with network errors
+   being ignored if recoverable, and resulting in disconnection
+   otherwise.  This actually enhances the transparency of the gateway,
+   in that the only gateway specific functions are collected together in
+   the connection phase.  The resultant circuit, once established, is
+   indistinguishable from an [RFC1006] implementation.
+
+4.  The Protocol
+
+   The protocol is quite simple.  A successful connection establishment
+   phase results in two network connections being established.  TP0 is
+   used over each network connection, though one network connection is
+   provided by X.25 and the other by the TCP.
+
+   During the data transfer phase, the TP0 bridge reads TPDUs (transport
+   protocol data units) from one network connection and writes them to
+   the other network connection.  During the connection release phase,
+   when one network indicates a disconnect, the bridge disconnects the
+   other network connection; or in the case of simultaneous network
+   disconnects, no action is taken by the bridge.
+
+   As expected, the method of operation for the connection establishment
+   phase is more complex.  Connection establishment is driven by a
+   registration procedure which is initiated by a TCP/IP host initiating
+   a connection with the TP0 bridge.  This procedure takes on one of two
+   "flavors" depending on whether the initiating host wishes to
+   establish a connection to a particular X.25 address or listen for
+   connections on a particular X.25 address.
+
+   The initiating host initiates the registration procedure by
+   establishing a connection to TCP port 146 on the TP0 bridge.  It then
+   sends one octet which indicates the flavor the registration procedure
+   will take:
+
+          0 1 2 3 4 5 6 7
+         +-+-+-+-+-+-+-+-+
+         |   function    |
+         +-+-+-+-+-+-+-+-+
+
+   The value of this octet is a binary-encoded value:
+
+           value   meaning
+           -----   -------
+             0     illegal
+             1     connect to a particular X.25 host
+             2     listen for incoming X.25 connections
+           3-255   reserved
+
+
+
+Onions & Rose                                                   [Page 4]
+
+RFC 1086          ISO-TP0 bridge between TCP and X.25      December 1988
+
+
+   The method of operation for the registration procedure now diverges,
+   based on the function chosen.
+
+   FUNCTION 1: CONNECTION THROUGH THE TP0 BRIDGE
+
+      The X.25 address to call is now sent by the initiating host to the
+      TP0 bridge.  The format of an X.25 address is described in Section
+      5 of this memo.
+
+      The TP0 bridge now attempts to call the specified address.  If
+      this succeeds, the connection establishment phase has succeeded
+      and the data transfer phase is begun.  If the call fails, then the
+      TP0 bridge closes the TCP connection.
+
+   FUNCTION 2: ESTABLISHING A LISTENING ADDRESS
+
+      The X.25 address, which should be a subaddress of the TP0 bridge's
+      X.25 address, on which to listen for incoming X.25 connections is
+      now sent by the initiating host to the TP0 bridge.
+
+      Next, the initiating host sends an IP address and TCP port number
+      which will service incoming calls for the indicated X.25 address.
+      The format of a TCP/IP address is described in Section 6 of this
+      memo.
+
+      The TP0 bridge now listens, on behalf of the initiating host, on
+      the indicated X.25 address.
+
+      If an incoming call is received, a TCP connection is established
+      to the corresponding TCP/IP address.  If this connection is
+      successful, then the connection establishment phase has succeeded
+      and the data transfer phase is begun.  If the connection fails,
+      the incoming call is refused.
+
+      The TCP/IP connection between the initiating host and the TP0
+      bridge is a "heartbeat" connection for the registration function.
+      If this connection closes, the TP0 bridge assumes hat the
+      listening function has been terminated by the initiating host, and
+      consequently, the TP0 bridge no longer listens for incoming calls
+      on the indicated X.25 address.  If such a facility were not
+      present, then the indicated X.25 address could not be recovered
+      for reuse.
+
+5.  Format of X.25 Addresses
+
+   A standardized octet-encoding of X.25 addresses is used by the
+   protocol described in this memo.  The encoding has a fixed-length of
+   68 octets and contains 10 fields:
+
+
+
+Onions & Rose                                                   [Page 5]
+
+RFC 1086          ISO-TP0 bridge between TCP and X.25      December 1988
+
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |        address  type          | X.121 address        ...      |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |      ...      |      ...      |      ...      |      ...      |
+   |      ...      |      ...      |      ...      |      ...      |
+   |      ...      |      ...      |      ...      |      ...      |
+   |      ...      |      ...      | X.121 length  | Protocol ID   |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |      ...      |      ...      |      ...      | PID length    |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Call User Data field          |      ...      |      ...      |
+   |      ...      |      ...      |      ...      |      ...      |
+   |      ...      |      ...      |      ...      |      ...      |
+   |      ...      |      ...      |      ...      |      ...      |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | CUDF length   |  X.25 Facilities     ...      |      ...      |
+   |      ...      |      ...      |      ...      |Facility Length|
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+   The fields are:
+
+   address type (2 octets) - a binary-encoded value in network order
+   indicating the address type. The value 3 is used for X.25 addressing
+   of this format.
+
+   X.121 address (16 octets) - the ascii-encoded value of the X.121
+   address.
+
+   address length (1 octet) - a binary-encoded value in network order
+   indicating how many octets of the X.121 address are meaningful.
+
+   Protocol ID (4 octets) - meaningful at the remote system.
+
+   Protocol ID length (1 octet) - a binary-encoded value indicating the
+   number of protocol ID octets are meaningful.
+
+   User Data (16 octets) - meaningful at the remote system.
+
+   User Data Length (1 octet) - a binary-encoded value indicating the
+   number of User Data octets are meaningful.
+
+   X.25 Facilities (6 octets) - meaningful at the remote system.
+
+   X.25 Facilities length (1 octet) - a binary-encoded value indicating
+   the number of Facility octets are meaningful.
+
+
+
+
+Onions & Rose                                                   [Page 6]
+
+RFC 1086          ISO-TP0 bridge between TCP and X.25      December 1988
+
+
+6.  Format of TCP/IP Addresses
+
+   A standardized octet-encoding of TCP/IP addresses is used by the
+   protocol described in this memo.  The encoding has a fixed-length of
+   16 octets and contains 4 fields:
+
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         address  type         |           TCP  port           |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                           IP address                          |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |    reserved   |      ...      |      ...      |      ...      |
+   |      ...      |      ...      |      ...      |      ...      |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+   The fields are:
+
+   address type (2 octets) - a binary-encoded value in network order.
+   The value 2 is used.
+
+   TCP port (2 octets) - a binary-encoded value in network order.
+
+   IP address (4 octets) - a binary-encoded value in network order.
+
+   reserved (16 octets) - null-value padding.
+
+Comments
+
+   At present, the structure of the X.25 address and the internet
+   address are rather ad-hoc and specific to the UNIX operating system.
+   These structures may change in the future as experience is gained in
+   the use of the TP0 bridge.
+
+References
+
+     [ISO8072]  Information processing systems -- Open systems
+                interconnection, "Transport Service Definition",
+                International Standard, June, 1985.
+
+     [ISO8073]  Information processing systems -- Open systems
+                interconnection, "Transport Protocol Specification",
+                International Standard, July, 1986.
+
+     [ISO8208]  Information processing systems, "X.25 package level
+                protocol for data terminal equipment", Draft
+
+
+
+Onions & Rose                                                   [Page 7]
+
+RFC 1086          ISO-TP0 bridge between TCP and X.25      December 1988
+
+
+                International Standard, July, 1985.
+
+     [ISO8878]  Information processing systems -- Data communications,
+                Use of X.25 to provide the OSI connection-mode network
+                service", Draft International Standard, January, 1987.
+
+     [MIL1777]  Military Standard 1777, "Internet Protocol".
+
+     [MIL1778]  Military Standard 1778, "Transmission Control Protocol".
+
+     [RFC791]  Postel, J., "Internet Protocol - DARPA Internet Program
+               Protocol Specification", RFC 791, USC/ISI,
+               September 1981.
+
+     [RFC793]  Postel, J., "Transmission Control Protocol - DARPA
+               Internet Program Protocol Specification", RFC 793,
+               USC/ISI, September 1981.
+
+     [RFC983]  Cass, D., and M. Rose, "ISO Transport Services on Top
+               of the TCP", RFC 983, NTRC, April 1986.
+
+     [RFC1006]  Rose, M., and D. Cass, "ISO Transport Service on Top
+                of the TCP Version: 3", NTRC, May 1987.
+
+     [X.25]  CCITT Recommendation X.25, "Interface Between Data
+             Terminal Equipment (DTE) and Data Circuit Terminating
+             Equipment (DCE) for Terminals Operating in the Packet
+             Mode on Public Data Networks," International Telegraph
+             and Telephone Consultative Committee Yellow book, Vol.
+             VIII.2, Geneva, 1981.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Onions & Rose                                                   [Page 8]
+
+RFC 1086          ISO-TP0 bridge between TCP and X.25      December 1988
+
+
+Authors' Addresses:
+
+   Julian P. Onions
+   Computer Science Department
+   Nottingham University
+   University Park
+   Nottingham, NG7 2RD
+   United Kingdom
+
+   EMail: JPO@CS.NOTT.AC.UK
+
+   Marshall Rose
+   The Wollongong Group
+   1129 San Antonio Road
+   Palo Alto, CA 94303
+
+   Phone: (415) 962-7100
+
+   EMail: mrose@TWG.COM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Onions & Rose                                                   [Page 9]
+

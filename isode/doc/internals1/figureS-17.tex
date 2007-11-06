@@ -1,0 +1,20 @@
+\File{figureS\-17.py},{11:52},{May  5 1990}
+\L{\LB{\C{}\-\- open PDU (currently only simple authentication)}}
+\CE{}\L{\LB{}}
+\L{\LB{\Proc{SimpleOpen}SimpleOpen ::=}}
+\L{\LB{    [\K{APPLICATION} 0] \K{IMPLICIT}}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{    version     \C{}\-\- of SMUX protocol}}
+\CE{}\L{\LB{}\Tab{16}{\K{INTEGER} \{}}
+\L{\LB{}\Tab{16}{    version\-1(0)}}
+\L{\LB{}\Tab{16}{\},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    identity    \C{}\-\- of SMUX initiator, authoritative}}
+\CE{}\L{\LB{}\Tab{16}{\K{OBJECT} \K{IDENTIFIER},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    description \C{}\-\- of SMUX initiator, implementation\-specific}}
+\CE{}\L{\LB{}\Tab{16}{DisplayString,}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    password    \C{}\-\- zero length indicates no authentication}}
+\CE{}\L{\LB{}\Tab{16}{\K{OCTET} \K{STRING}}}
+\L{\LB{}\Tab{8}{\}}}

@@ -1,0 +1,213 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter       {Boilerplate for Responders}\label{cook:responder}
+Let's consider how to build a responder which is also a performer.
+In Chapter~\ref{cook:discipline},
+two forms for a responder were identified:
+{\em dynamic},
+in which each incoming association caused the instantiation of a new responder,
+and,
+{\em static},
+in which each incoming association was given to a pre-existing single
+instantiation of a responder.
+The dynamic responder can be thought of as simply being a special case of a
+static responder.
+Hence,
+we will describe how one builds a static responder in this chapter.
+
+If you have access to the source tree for this release,
+the directory \file{others/lookup/} contains the boilerplate described herein.
+
+\section	{Static Responder}
+There are three areas for the boilerplate:
+association management, operation response, and, error handling.
+
+Before proceeding however,
+let's consider what an \verb"#include" file, say \verb"ryresponder.h",
+might look like.
+First, the standard \man librosy(3n) definitions are included,
+along with the definitions for the daemon logging package.
+Next, a \verb"dispatch" structure is defined
+along with the boilerplate routines.
+The \verb"dispatch" structure will be used by the boilerplate to invoke a
+user-supplied routine that will respond to an invocation.
+
+\newpage
+\tgrindfile{ryresponder-h}
+
+\subsection	{Association Management}
+Association management is performed precisely the way it is outlined in
+Section~\ref{acs:server} of \volone/.
+This is implemented by the routine \verb"ryresponder":
+\begin{quote}\index{ryresponder}\small\begin{verbatim}
+int     ryresponder (argc, argv, myservice, dispatches, ops,
+                start, stop)
+int     argc;
+char  **argv,
+       *myservice;
+struct dispatch *dispatches;
+struct RyOperation *ops;
+IFP     start,
+        stop;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"argc"/\verb"argv":] the argument vector (and its length)
+that the program was invoked with;
+
+\item[\verb"myservice":] the non-host portion of the application-entity
+information;
+
+\item[\verb"dispatches":] a pointer to a \verb"dispatch" table;
+
+\item[\verb"ops":] a pointer to a \verb"RyOperation" table;
+
+\item[\verb"start":] the address of a routine to decide if incoming
+associations should be accepted
+(use \verb"NULLIFP" if associations should always be accepted);
+and,
+
+\item[\verb"stop":] the address of a routine to note that an association
+requests termination or has been terminated
+(use \verb"NULLIFP" if associations termination is unremarkable).
+\end{describe}
+The function of this routine is straight-forward though tedious.
+First, \verb"myname" is initialized to the name that the program was invoked
+with.
+Next, a debug flag is possibly set and the daemon logging package is
+initialized,
+and the responder's application-entity information is computed.
+Finally,
+each operation is registered with the \verb"RyDispatch" routine,
+and the \verb"start" and \verb"stop" routines are remembered.
+
+The routine \verb"isodeserver" is then called to manage any associations.
+As a result,
+the \verb"ros_init" routine will be informed of new associations,
+the \verb"ros_work" routine will be informed of network activity,
+and the \verb"ros_lose" routine will be advised if network listening fails.
+
+The \verb"ros_init" routine is also straight-forward.
+First, \verb"AcInit" is called to recapture the ACSE-state,
+then the user-defined association acceptance routine is called (if any).
+This routine should return either \verb"ACS_ACCEPT" if the association is to
+be accepted,
+or either 
+\begin{quote}\tt
+ACS\_TRANSIENT, ACS\_PERMANENT,\\
+\end{quote}
+otherwise
+(these latter two codes are discussed in Table~\ref{AcSAPreasons} on
+page~\pageref{AcSAPreasons} of \volone/).
+The routine \verb"AcAssocResponse" is then called to deal with the incoming
+association.
+The arguments are strictly boilerplate:
+they will work unaltered for most applications.
+If the association was accepted,
+then the routine \verb"RoSetService" is used to tell the remote operations
+library to use the presentation service as the underlying service.
+
+The routine \verb"ros_work" is called when activity occurs on an association,
+and is somewhat complex.
+The routine sets a global return vector using \man setjmp (3)
+and then calls \verb"RyWait" to poll for the next operation-related event.
+This usually results in one of the operations registered earlier being
+dispatched immediately,
+and then \verb"RyWait" will return \verb"NOTOK"
+with an error condition of \verb"ROS_TIMER" indicating that there is no
+more network activity pending.
+Otherwise, the routine \verb"ros_indication" is called to handle
+extraordinary conditions on the association.
+If some error occurred during the handling of an invocation,
+use of the routine \verb"ros_adios" will cause control to return to the
+\verb"setjmp" call.
+In this case,
+several things happen.
+First,
+the user-defined association termination routine routine is called (if any).
+This routine should note that the association is now abruptly terminated.
+Next,
+the \verb"AcUAbortRequest" routine is called to make sure that the association
+is (ungracefully) released.
+Following this,
+the \verb"RyLose" routine is called to expunge any information regarding
+queued operations from the run-time environment.
+Finally, \verb"NOTOK" is returned to \verb"isodeserver",
+which causes the association to be removed from the list of current
+associations.
+
+The \verb"ros_indication" routine is used to handle uncommon events for an
+association: user-rejections, provider-rejections, and association termination.
+In all three cases,
+the event is logged.
+In the case of the initiator requesting that the association be terminated,
+several things happen.
+First,
+the user-defined association termination routine is called (if any).
+This routine should return either \verb"ACS_ACCEPT" if the association is to
+be released,
+or \verb"ACS_REJECT" if the termination is to be refused.
+The routine \verb"AcRelResponse" is then called to deal with the request to
+terminate the association.
+If the termination was accepted,
+then control returns to the \verb"setjmp" call in \verb"ros_work",
+which finalizes things.
+
+The \verb"ros_lose" routine is simple:
+the error condition is logged.
+
+\tgrindfile{ryresp-assoc}
+\newpage
+
+\subsection	{Operation Response}
+When an operation is invoked,
+its dispatch routine is called from the routine \verb"RyWait"
+as described in Section~\ref{librosy:register} on
+Page~\pageref{librosy:register}.
+The boilerplate for a dispatch routine is fairly uniform.
+A check is made to see if the invocation is linked to a previous invocation,
+and the invocation is logged.
+Any user-rejections are performed by the routine \verb"ureject" which is a
+simple wrapper for the \verb"RyDsUReject" routine.
+Next, the operation is attempted.
+If it succeeded (as denoted by \verb"won"),
+then a result is allocated, and initialized and returned to the initiator by
+the \verb"RyDsResult" routine.
+Otherwise,
+an error is selected,
+and
+its parameter is allocated, initialized and returned to the initiator by the
+\verb"error" routine which is a simple wrapper for the \verb"RyDsError"
+routine.
+Finally,
+the argument is freed and the handler returns.
+
+\tgrindfile{ryresp-invoke}
+\newpage
+
+\subsection	{Error Handling}
+These routines for the most part are all straight-forward.
+\begin{describe}
+\item[\verb"ros\_adios":] used to report a ROS error and terminate;
+
+\item[\verb"ros\_advise":] used to report a ROS error;
+
+\item[\verb"acs\_advise":] used to report an ACS error;
+
+\item[\verb"adios":] used to report an error and terminate;
+
+\item[\verb"advise":] used to report an error;
+and,
+
+\end{describe}
+\pgm{pepy} generate errors are normally caught by the routine
+\verb"PY_advise"\index{PY\_advise} by using the \verb"-a" switch to
+\pgm{pepy}. The \man librosy(3n) routines use these to build up error
+message when \pgm{pepy} routines fail.
+
+\tgrindfile{ryresp-error}
+\newpage
+
+\subsection	{An Example}
+An example of a responder written using this boilerplate is
+shown in Section~\ref{passwd:responder} on page~\pageref{passwd:responder}.

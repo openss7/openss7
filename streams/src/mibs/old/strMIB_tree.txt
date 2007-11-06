@@ -1,0 +1,169 @@
++--strMIB(1)
+   |
+   +--strNotifications(0)
+   |
+   +--strObjects(1)
+   |  |
+   |  +--strTables(1)
+   |  |  |
+   |  |  +--strMod(1)
+   |  |  |  |
+   |  |  |  +--strModTable(1)
+   |  |  |     |
+   |  |  |     +--strModEntry(1)
+   |  |  |        |  Index: strModIdnum
+   |  |  |        |
+   |  |  |        +-- ---- Unsigned  strModIdnum(1)
+   |  |  |        |        Range: 0..16383
+   |  |  |        +-- -R-- String    strModName(2)
+   |  |  |        |        Textual Convention: StreamsModuleName
+   |  |  |        |        Size: 1..8
+   |  |  |        +-- -R-- EnumVal   strModType(3)
+   |  |  |        |        Values: module(1), driver(2)
+   |  |  |        +-- -R-- Unsigned  strModMajor(4)
+   |  |  |                 Range: 0..16383
+   |  |  |
+   |  |  +--strModInfo(2)
+   |  |  |  |
+   |  |  |  +--strModInfoTable(1)
+   |  |  |     |
+   |  |  |     +--strModInfoEntry(1)
+   |  |  |        |  Index: strModIdnum, strModInfoIndex
+   |  |  |        |
+   |  |  |        +-- ---- Unsigned  strModInfoIndex(1)
+   |  |  |        |        Range: 1..4
+   |  |  |        +-- -R-- BitString strModInfoQueues(2)
+   |  |  |        |        Textual Convention: StreamsModuleQueues
+   |  |  |        |        Values: rq(0), wq(1), muxrq(2), muxwq(3)
+   |  |  |        +-- -RW- INTEGER   strModInfoMinpsz(3)
+   |  |  |        +-- -RW- INTEGER   strModInfoMaxpsz(4)
+   |  |  |        +-- -RW- Unsigned  strModInfoHiwat(5)
+   |  |  |        +-- -RW- Unsigned  strModInfoLowat(6)
+   |  |  |        +-- -RW- Unsigned  strModInfoTraceLevel(7)
+   |  |  |                 Range: 0..255
+   |  |  |
+   |  |  +--strModStat(3)
+   |  |  |  |
+   |  |  |  +--strModStatTable(1)
+   |  |  |     |
+   |  |  |     +--strModStatEntry(1)
+   |  |  |        |  Index: strModIdnum, strModStatIndex
+   |  |  |        |
+   |  |  |        +-- ---- Unsigned  strModStatIndex(1)
+   |  |  |        |        Range: 1..4
+   |  |  |        +-- -R-- BitString strModStatQueues(2)
+   |  |  |        |        Textual Convention: StreamsModuleQueues
+   |  |  |        |        Values: rq(0), wq(1), muxrq(2), muxwq(3)
+   |  |  |        +-- -R-- Counter   strModStatPCnt(3)
+   |  |  |        +-- -R-- Counter   strModStatScnt(4)
+   |  |  |        +-- -R-- Counter   strModStatOcnt(5)
+   |  |  |        +-- -R-- Counter   strModStatCcnt(6)
+   |  |  |        +-- -R-- Counter   strModStatAcnt(7)
+   |  |  |        +-- -R-- String    strModStatPrivate(8)
+   |  |  |        +-- -R-- Unsigned  strModStatFlags(9)
+   |  |  |
+   |  |  +--strApsh(4)
+   |  |  |  |
+   |  |  |  +--strApshTable(1)
+   |  |  |     |
+   |  |  |     +--strApshEntry(1)
+   |  |  |        |  Index: strApshName, strApshMinor
+   |  |  |        |
+   |  |  |        +-- ---- String    strApshName(1)
+   |  |  |        |        Textual Convention: StreamsModuleName
+   |  |  |        |        Size: 1..8
+   |  |  |        +-- -R-- Unsigned  strApshMajor(2)
+   |  |  |        |        Range: 1..16383
+   |  |  |        +-- ---- Unsigned  strApshMinor(3)
+   |  |  |        |        Range: 0..16383 | 0
+   |  |  |        +-- ---- Unsigned  strApshLastMinor(4)
+   |  |  |        |        Range: 0..16383
+   |  |  |        +-- CR-- String    strApshModules(5)
+   |  |  |        |        Textual Convention: StreamsModuleList
+   |  |  |        |        Size: 0..255
+   |  |  |        +-- CR-- EnumVal   strApshStatus(6)
+   |  |  |                 Textual Convention: RowStatus
+   |  |  |                 Values: active(1), notInService(2), notReady(3), createAndGo(4), createAndWait(5), destroy(6)
+   |  |  |
+   |  |  +--strStats(5)
+   |  |     |
+   |  |     +--strStatsTable(1)
+   |  |        |
+   |  |        +--strStatsEntry(1)
+   |  |           |  Index: strStatsStructure
+   |  |           |
+   |  |           +-- -R-- EnumVal   strStatsStructure(1)
+   |  |           |        Values: dyn-stream(1), dyn-queue(2), dyn-msgblock(3), dyn-mdbblock(4), dyn-linkblk(5), dyn-strevent(6), dyn-qband(7), dyn-strapush(8), dyn-devinfo(9), dyn-modinfo(10), dyn-synq(11), dyn-buffers(12)
+   |  |           +-- -R-- Gauge     strStatsCurrentAllocs(2)
+   |  |           +-- -R-- Gauge     strStatsHighWaterMark(3)
+   |  |
+   |  +--strScalars(2)
+   |  |  |
+   |  |  +--strTunables(1)
+   |  |  |  |
+   |  |  |  +-- -RW- INTEGER   strCltime(1)
+   |  |  |  |        Textual Convention: TimeInterval
+   |  |  |  |        Range: 0..2147483647
+   |  |  |  +-- -RW- Unsigned  strMaxApush(2)
+   |  |  |  +-- -RW- Unsigned  strMaxMblk(3)
+   |  |  |  +-- -RW- Unsigned  strMaxStramod(4)
+   |  |  |  +-- -R-- Unsigned  strMaxStrdev(5)
+   |  |  |  |        Range: 0..16384
+   |  |  |  +-- -R-- Unsigned  strMaxStrmod(6)
+   |  |  |  |        Range: 0..16384
+   |  |  |  +-- -RW- EnumVal   strMsgPriority(7)
+   |  |  |  |        Textual Convention: TruthValue
+   |  |  |  |        Values: true(1), false(2)
+   |  |  |  +-- -R-- Unsigned  strNband(8)
+   |  |  |  |        Range: 1..256
+   |  |  |  +-- -RW- Unsigned  strNstrmsgs(9)
+   |  |  |  +-- -RW- Unsigned  strNstrpush(10)
+   |  |  |  +-- -RW- Unsigned  strHiwat(11)
+   |  |  |  +-- -RW- Unsigned  strLowat(12)
+   |  |  |  +-- -RW- INTEGER   strMaxpsz(13)
+   |  |  |  +-- -RW- INTEGER   strMinpsz(14)
+   |  |  |  +-- -RW- EnumVal   strReuseFmodsw(15)
+   |  |  |  |        Textual Convention: TruthValue
+   |  |  |  |        Values: true(1), false(2)
+   |  |  |  +-- -RW- INTEGER   strRtime(16)
+   |  |  |  |        Textual Convention: TimeInterval
+   |  |  |  |        Range: 0..2147483647
+   |  |  |  +-- -RW- EnumVal   strStrhold(17)
+   |  |  |  |        Textual Convention: TruthValue
+   |  |  |  |        Values: true(1), false(2)
+   |  |  |  +-- -RW- Unsigned  strStrctlsz(18)
+   |  |  |  +-- -RW- Unsigned  strStrmsgsz(19)
+   |  |  |  +-- -RW- Unsigned  strStrthresh(20)
+   |  |  |  +-- -RW- Unsigned  strLowthresh(21)
+   |  |  |  +-- -RW- Unsigned  strMedthresh(22)
+   |  |  |  +-- -RW- INTEGER   strIoctime(23)
+   |  |  |           Textual Convention: TimeInterval
+   |  |  |           Range: 0..2147483647
+   |  |  |
+   |  |  +--strStatistics(2)
+   |  |
+   |  +--strNotifs(3)
+   |  |
+   |  +--strOids(4)
+   |
+   +--strConformance(2)
+      |
+      +--strCompliances(1)
+      |  |
+      |  +--strMIBCompliance(1)
+      |
+      +--strGroups(2)
+         |
+         +--strTunablesMandatoryGroup(1)
+         +--strMessagePoolsConditionalGroup(2)
+         +--strHoldConditionalGroup(3)
+         +--strOptionalTunables(4)
+         +--strApshTableMandatoryGroup(5)
+         +--strApshTableConditionalGroup(6)
+         +--strModTableMandatoryGroup(7)
+         +--strModInfoTableMandatoryGroup(8)
+         +--strModInfoTableConditionalGroup(9)
+         +--strModStatTableMandatoryGroup(10)
+         +--strModStatTableConditionalGroup(11)
+         +--strStatsTableMandatoryGroup(12)
+         +--strStatsTableConditionalGroup(13)

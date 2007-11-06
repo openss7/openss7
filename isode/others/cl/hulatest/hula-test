@@ -1,0 +1,45 @@
+: run this script through /bin/sh
+
+# A program to test out the isode connectionless services etc.
+#
+# Pretty simple minded - but gives some indications.
+#
+
+# usage : isode-test [ hostname ]
+error=0 fast=0 imisc=ximisc
+if [ "x$1" = "x-lpp" ]; then
+    fast=1 imisc=ximisc-lpp
+    shift
+fi
+if [ $# -gt 0 ]; then
+    host="$1"
+    echo "Hostname set to $host"
+elif host="`hostname`"; then
+    echo "Hostname set to $host"
+elif host="`uname`"; then
+    echo "Hostname set to $host"
+else
+    echo -n "I give up, what is your host name? "
+    read host
+fi
+
+for i in utctime gentime time users chargen qotd finger pwdgen
+do
+echo "$i:"
+ximisc "$host" $i || error=`expr $error + 1`
+done
+
+for i in ping sink echo
+do
+echo "$i:"
+ximisc -c 100 -l 1020 "$host" $i || error=`expr $error + 1`
+done
+
+if [ $fast = 1 ]; then
+    echo "Test done, Errors: $error"
+    exit $error
+fi
+
+
+echo "Test done, Errors: $error"
+exit $error

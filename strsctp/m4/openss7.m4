@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/08/19 11:17:34 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/10/18 06:12:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/19 11:17:34 $ by $Author: brian $
+# Last Modified $Date: 2007/10/18 06:12:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -144,6 +144,7 @@ Corporation at a fee.  See http://www.openss7.com/
     _OPENSS7_OPTIONS
     _OPENSS7_CACHE
     _OPENSS7_OPTIONS_CFLAGS
+    _OPENSS7_MISSING
     AC_SUBST([cross_compiling])dnl
 ])# _OPENSS7_PACKAGE
 # =============================================================================
@@ -430,9 +431,10 @@ AC_DEFUN([_OPENSS7_DEBUG], [dnl
     then
 	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wall,,g'`
 	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Werror,,g'`
-	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wundef,,g'`
-	CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[0-9]*%%g'`
-	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wundef -Wp,-D_FORTIFY_SOURCE=2 -Werror"
+dnl	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wundef,,g'`  dnl this frags out flex 2.5.33
+	CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wundef -Wp,-D_FORTIFY_SOURCE=2 -Werror"
+	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wp,-D_FORTIFY_SOURCE=2 -Werror"
     fi
 ])# _OPENSS7_DEBUG
 # =============================================================================
@@ -442,6 +444,7 @@ AC_DEFUN([_OPENSS7_DEBUG], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS], [dnl
     _OPENSS7_OPTIONS_CHECK
+    _OPENSS7_OPTIONS_DOCS
     _OPENSS7_OPTIONS_GPG
     _OPENSS7_OPTIONS_PKG_EPOCH
     _OPENSS7_OPTIONS_PKG_RELEASE
@@ -469,6 +472,27 @@ AC_DEFUN([_OPENSS7_OPTIONS_CHECK], [dnl
     AC_MSG_RESULT([$enable_checks])
     AM_CONDITIONAL([PERFORM_CHECKS], [test :"${enable_checks:-yes}" = :yes])dnl
 ])# _OPENSS7_OPTIONS_CHECK
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS_DOCS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_DOCS], [dnl
+    AC_MSG_CHECKING([for documentation included])
+    AC_ARG_ENABLE([docs],
+	AS_HELP_STRING([--disable-docs],
+	    [disable documentation build and install.  @<:@default=enabled@:>@]),
+	[dnl
+	    if test :"${USE_MAINTAINER_MODE:-no}" != :no
+	    then
+		enable_docs='yes'
+	    else
+		enable_docs="$enableval"
+	    fi
+	], [enable_docs='yes'])
+    AC_MSG_RESULT([$enable_docs])
+    AM_CONDITIONAL([DOCUMENTATION], [test :"${enable_docs:-yes}" = :yes])dnl
+])# _OPENSS7_OPTIONS_DOCS
 # =============================================================================
 
 # =============================================================================
@@ -701,8 +725,8 @@ AC_DEFUN([_OPENSS7_OPTIONS_CFLAGS], [dnl
     if test :"${USE_MAINTAINER_MODE:-no}" != :no
     then
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wno-system-headers"
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
-	    CFLAGS="${CFLAGS:+$CFLAGS }-Wundef"
+dnl	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wundef"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wno-endif-labels"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wbad-function-cast"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wcast-qual"
@@ -726,7 +750,7 @@ dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Winline"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wdisabled-optimization"
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wall,,g'`
 	    CFLAGS="${CFLAGS:+$CFLAGS }-Wall"
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[0-9]*%%g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
 	    CFLAGS="${CFLAGS:+$CFLAGS }-Wp,-D_FORTIFY_SOURCE=2"
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
 	    CFLAGS="${CFLAGS:+$CFLAGS }-Werror"
@@ -734,6 +758,61 @@ dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wdisabled-optimization"
     CFLAGS=`echo "$CFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
     AC_MSG_RESULT([${CFLAGS}])
 ])# _OPENSS7_OPTIONS_CFLAGS
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_MISSING
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_MISSING], [dnl
+    test x"${MISSING2+set}" = xset || MISSING2="\${SHELL} $am_aux_dir/missing2"
+    if eval "$MISSING2 --run true" ; then
+	am_missing2_run="$MISSING2 --run "
+    else
+	am_missing2_run=
+	AC_MSG_WARN(['missing2' script is too old or missing])
+    fi
+    AC_ARG_VAR([LATEX], [Latex command.])
+    AC_PATH_PROG([LATEX], [latex], [${am_missing2_run}latex],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([PSLATEX], [PS Latex command.])
+    AC_PATH_PROG([PSLATEX], [pslatex], [${am_missing2_run}pslatex],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([PDFLATEX], [PDF Latex command.])
+    AC_PATH_PROG([PDFLATEX], [pdflatex], [${am_missing2_run}pdflatex],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([BIBTEX], [BibTeX command.])
+    AC_PATH_PROG([BIBTEX], [bibtex], [${am_missing2_run}bibtex],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([LATEX2HTML], [LaTeX to HTML command.])
+    AC_PATH_PROG([LATEX2HTML], [latex2html], [${am_missing2_run}latex2html],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+dnl
+dnl
+dnl frags out automake
+dnl
+dnl    AC_ARG_VAR([DVIPS], [DVI to PS command.])
+dnl    AC_PATH_PROG([DVIPS], [dvips], [${am_missing2_run}dvips],
+dnl		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+
+    AC_ARG_VAR([DVIPDF], [DVI to PDF command.])
+    AC_PATH_PROG([DVIPDF], [dvipdf], [${am_missing2_run}dvipdf],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([GNUPLOT], [GNU plot command.])
+    AC_PATH_PROG([GNUPLOT], [gnuplot], [${am_missing2_run}gnuplot],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([FIG2DEV], [Fig to graphics format command.])
+    AC_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([CONVERT], [Graphics format conversion command.])
+    AC_PATH_PROG([CONVERT], [convert], [${am_missing2_run}convert],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([PS2EPSI], [PS to EPSI conversion command.])
+    AC_PATH_PROG([PS2EPSI], [ps2epsi], [${am_missing2_run}ps2epsi],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([EPSTOPDF], [EPS to PDF conversion command.])
+    AC_PATH_PROG([EPSTOPDF], [epstopdf], [${am_missing2_run}epstopdf],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+])# _OPENSS7_MISSING
 # =============================================================================
 
 # =============================================================================
@@ -746,6 +825,42 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.57  2007/10/18 06:12:53  brian
+# - more -Wundef to remove
+#
+# Revision 0.9.2.56  2007/10/18 05:27:52  brian
+# - remove DVIPS warning
+#
+# Revision 0.9.2.55  2007/10/18 05:03:03  brian
+# - more laxity for flex
+#
+# Revision 0.9.2.54  2007/10/18 04:23:31  brian
+# - -Wundef frags out flex, and missing quotes
+#
+# Revision 0.9.2.53  2007/10/17 20:00:28  brian
+# - slightly different path checks
+#
+# Revision 0.9.2.52  2007/10/17 19:22:32  brian
+# - better tool detection
+#
+# Revision 0.9.2.51  2007/10/17 18:00:13  brian
+# - added latex2html
+#
+# Revision 0.9.2.50  2007/10/17 17:43:02  brian
+# - build updates
+#
+# Revision 0.9.2.49  2007/10/17 13:22:19  brian
+# - correction
+#
+# Revision 0.9.2.48  2007/10/17 08:18:30  brian
+# - corrections
+#
+# Revision 0.9.2.47  2007/10/17 08:07:39  brian
+# - added missing checks
+#
+# Revision 0.9.2.46  2007/10/17 07:36:09  brian
+# - added documentation suppression
+#
 # Revision 0.9.2.45  2007/08/19 11:17:34  brian
 # - spelling correction
 #

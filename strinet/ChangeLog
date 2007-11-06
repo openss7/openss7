@@ -1,3 +1,19 @@
+2007-10-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
+
+2007-10-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: added check for sk_buff.transport_header,
+	  tcp_push_pending_frames with 1 argument and __tcp_push_pending_frames
+	  with 3 arguments
+	* src/drivers/inet.c: handle tcp_push_pending frames with fewer
+	  arguments.
+	* src/drivers/rawip.c: handle new sk_buff format
+	* src/drivers/tcp.c: handle new sk_buff format
+	* src/drivers/udp.c: handle new sk_buff format
+	* doc/manual/news.texi: document support for 2.6.22.5-49.fc6 kernel.
+
 2007-08-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: GPLv3 updates

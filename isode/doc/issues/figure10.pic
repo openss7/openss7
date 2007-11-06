@@ -1,0 +1,53 @@
+.PS
+.ps 20
+## figure 10
+B1:	box "CLNP" "802.3" height 3*boxht/2
+##
+B8:	box "TP4" with .s at (B1.n.x, B1.n.y+lineht)
+	line from B1.n to B8.s
+B8a:	box invis "OSI TS" with .s at (B8.n.x, B8.n.y+lineht)
+	arrow from B8.n to B8a.s
+##
+B2:	box "CLNP" "802.3" \
+	with .w at (B1.e.x+2*linewid, B1.e.y) height 3*boxht/2
+B3:	box "CLNP" "IP" "Ether" \
+	with .nw at (B2.ne.x+linewid, B2.ne.y) height 3*boxht/2
+B5:	box "IP" "Ether" \
+	with .nw at (B3.ne.x+4*linewid, B3.ne.y-boxht-lineht/2)
+B4:	box "TCP" with .s at (B5.n.x-2*linewid, B8.s.y)
+	line from B4.s to (B5.n.x-boxwid/6, B5.n.y)
+B11:	box "CLNP" with .n at (B5.n.x+2*linewid, B1.n.y)
+	line from B11.s to (B5.n.x+boxwid/6, B5.n.y)
+B6:	box "TP4" with .s at (B11.n.x, B11.n.y+lineht)
+	line from B6.s to B11.n
+##
+	line from B1.s \
+	     to   (B1.s.x, B1.s.y-2*lineht) \
+	     to   (B2.s.x, B2.s.y-2*lineht) \
+	     to   B2.s
+	line from B3.s \
+	     to   (B3.s.x, B5.s.y-lineht) \
+	     to   (B5.s.x, B5.s.y-lineht) \
+	     to   B5.s
+##
+B7:	box "NS-TUNNEL"  with .sw at (B2.nw.x, B2.nw.y+lineht) \
+		width (B3.ne.x-B2.nw.x)
+	line up from B2.n
+	line up from B3.n
+	box dashed with .nw at (B7.nw.x-linewid, B7.nw.y+lineht) \
+		width B7.width+linewid*2 \
+		height B7.nw.y-B2.sw.y+2*lineht
+	arc -> from (B3.n.x-boxwid/4, B3.n.y+lineht/4) \
+	       to (B2.n.x+boxwid/4, B2.n.y+lineht/4)
+	move to (B7.s.x, B3.n.y+lineht/2) "\xx route"
+##
+B9:	box invis "OSI TS" with .s at (B6.n.x, B6.n.y+lineht)
+	arrow from B6.n to B9.s
+B9a:	box invis "DDN TS" with .s at (B4.n.x, B4.n.y+lineht)
+	arrow from B4.n to B9a.s
+##
+B10:	box with .nw at (B7.sw.x-linewid, B2.sw.y-3*lineht) \
+	    width B7.width+2*linewid height boxht/6 shaded
+	move to (B10.s.x, B10.s.y-lineht/2); "NS-TUNNEL HOST"
+##
+.PE

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/08/14 07:26:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/10/18 06:52:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 07:26:43 $ by $Author: brian $
+# Last Modified $Date: 2007/10/18 06:52:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -152,7 +152,8 @@ endif
 ## PKG_BUILD_ARCH
 endif
 
-dist_noinst_SCRIPTS		+= configure.nexusware
+dist_noinst_SCRIPTS		+= configure.nexusware scripts/missing2
+EXTRA_SCRIPTS			+= configure.nexusware scripts/missing2
 
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(dist_sbin_SCRIPTS)
 
@@ -230,8 +231,10 @@ dist_noinst_MANS		= \
 
 include am/man.am
 
+if DOCUMENTATION
 if PKG_BUILD_INDEP
 SUBDIRS += manual
+endif
 endif
 
 netperf_hp.ps:
@@ -290,6 +293,12 @@ EXTRA_DIST			+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.50  2007/10/18 06:52:37  brian
+# - new build support
+#
+# Revision 0.9.2.49  2007/10/16 07:46:33  brian
+# - makefile corrections and additions
+#
 # Revision 0.9.2.48  2007/08/14 07:26:43  brian
 # - GPLv3 header update
 #

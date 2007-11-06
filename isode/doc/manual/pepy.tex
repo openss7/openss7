@@ -1,0 +1,716 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Compiling Data-Structures}\label{pepy}
+The \man pepy(1) program is a compiler for the presentation
+elements discussed in Chapter~\ref{libpsap} in \volone/.
+Although experimental in previous releases,
+the \pgm{pepy} program has now stabilized.
+
+For those interested in trivia,
+\pgm{pepy} stands for
+\underbar{P}resentation
+\underbar{E}lement
+\underbar{P}arser
+(\underbar{Y}ACC-based).
+The \man yacc(1) program,
+of course,
+is a compiler-compiler.%
+\footnote{This abbreviation is now strictly incorrect, as the \pgm{pepy}
+program can now generate presentation elements as well as parse them.}
+
+\section	{Warning}
+Please read the following important message.
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	Users of {\em The Cookbook\/} emply the \man posy(1) program
+		program as the front-end to \pgm{pepy}.
+		Hence, this chapter may be safely skipped.
+		It is included only for those misguided individuals who do not
+		\pgm{posy}.
+		This behavior is not recommended.
+\end{tabular}}\]
+
+\section	{Syntax Rules}
+The \pgm{pepy} program reads a description of an {\em abstract syntax
+module\/}
+and produces a {\em C\/} program
+which recognizes the objects described in the module,
+or generates those objects,
+or prints those objects.
+The syntax of the input file corresponds almost exactly to the Abstract
+Syntax Notation (ASN.1) discussed in Section~\ref{pepy:reading} on
+page~\pageref{pepy:reading}.
+
+\subsection	{ASN.1 Notation}\label{asn1:notation}
+To summarize the ASN.1 syntax:
+\begin{itemize}
+\item	Comments start with two adjacent dashes (`\verb"--"') and are
+terminated by either new-line or another two adjacent dashes,
+whichever comes first.
+
+\item	Whitespace between tokens is ignored.
+
+\item	Keywords are entirely in uppercase.
+
+\item	The names of rules (types and values) start with an uppercase
+character and may use either upper- or lowercase characters afterwards.
+
+\item	The names of context-specific tags start with a lowercase character
+and may use either upper- or lowercase characters afterwards.
+
+\item	A name is an alphabetic character followed by zero or more
+alphanumerics or dashes (except `\verb"--"', of course).
+
+\item	Literal strings are surrounded by double-quotes (`\verb|"|').
+
+\item	Numbers take on one of two forms:
+    \begin{itemize}
+    \item	a string of digits, optionally preceded by a minus sign,
+		which is interpreted in decimal;
+		and,
+    \item	a string surrounded by single-quotes (`\verb"'"') and
+		immediately followed by one of \verb"B",  \verb"b",
+		\verb"H", or \verb"h", which is interpreted as either
+		a binary (\verb"B" or \verb"b") or hexadecimal (\verb"H"
+		or \verb"h") number.
+    \end{itemize}
+\end{itemize}
+
+An example of a specification using ASN.1 can be found in
+Figure~\ref{ASNexample}.
+{\let\small=\scriptsize			%%% yikes!
+\tagrind[tp]{grind4-1}{Example of a specification using ASN.1}{ASNexample}}
+
+\subsection	{ASN.1 Extensions}
+The \pgm{pepy} program recognizes several extensions to the ASN.1 syntax:
+{\em compiler directives}, {\em action statements},
+{\em control statements}, and, {\em value passing statements}.
+
+\subsubsection	{Compiler Directives}
+The compiler directives control the type of {\em C\/} routines
+that are produced. The \pgm{pepy} program can generate
+routines to parse, create, and print presentation elements.
+The directives may occur after the \verb"BEGIN" keyword;
+and anywhere an \verb"END" keyword may occur. Each occurrence specifies
+the type of {\em C\/} routine to generate for successive
+type definitions and applies until the next directive.
+
+\newpage	%%% hack
+The directives are:
+\begin{describe}
+\item[\verb"ENCODER" build] --- directs \pgm{pepy} to create
+routines for the construction of presentation elements;
+
+\item[\verb"DECODER" parse] --- directs \pgm{pepy} to create
+routines to parse presentation elements;
+
+\item[\verb"PRINTER" print] --- directs \pgm{pepy} to create
+routines which print the contents of presentation elements;
+or,
+
+\item[\verb"SECTIONS" build parse print] --- directs \pgm{pepy}
+to create multiple forms of above.
+\end{describe}
+The \verb"build", \verb"parse", and \verb"print" strings are used to construct
+the name of the routine and are described later.
+
+With the \verb"SECTIONS" directive,
+the value \verb"none" may be used as a null-valued place-holder.
+For example:
+\begin{quote}\small\begin{verbatim}
+SECTIONS none undo pp
+\end{verbatim}\end{quote}
+indicates that \pgm{pepy} should generate decoding and printing routines
+(using prefixes \verb"undo" and \verb"pp" respectively),
+and that no encoding routines should be generated.
+
+There is also another directive,
+which must occur immediately {\em before\/} the \verb"BEGIN" keyword:
+\begin{describe}
+\item[\verb"PREFIXES" build parse print] --- tells \pgm{pepy}
+what \verb"SECTIONS" were used in other modules.
+\end{describe}
+
+\subsubsection	{Action Statements}
+The lexemes \verb"%{" and \verb"}%" surround {\em C\/} code which the
+resulting program should execute at the appropriate time.
+The code may be of arbitrary length,
+spanning many lines in the input file.
+
+Actions may occur in several places in the input file.
+Depending on the position of the actions,
+slightly different semantics are associated with the code.
+There are four types of actions:
+{\em verbatim actions}, {\em type actions}, {\em tag actions}, and,
+{\em declaration actions}.
+
+The first type of actions are {\em verbatim\/} actions which occur in two
+places in the input file:
+\begin{itemize}
+\item	immediately before the \verb"BEGIN" keyword; and,
+
+\item	after the \verb"END" keyword in the input file.
+\end{itemize}
+These actions are copied strictly verbatim,
+being intended for definitions, subroutines, and the like.
+
+The second type of actions are {\em type\/} actions which are placed after a
+type or sub-type definition, and after each element in a ``named number''.
+In the former case,
+please note that the action must be placed before the \verb"OPTIONAL"
+and \verb"DEFAULT" lexemes.
+During the copy,
+the lexeme \verb"$$" is expanded to represent the object currently being
+examined. The exact expansion depends upon the element being processed
+and what sort of processing is being done. In decoding and printing routines,
+\verb"$$" will expand to a \verb"PE" in actions before the element is
+recognized and to the actual data after the processing. In the case of
+encoding routines, the opposite is true. The precise
+nature of the data is shown below.
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Type}&
+			\multicolumn{1}{|c|}{\bf C declaration}\\
+\hline
+    \verb"BOOLEAN"&		\verb"int"\\
+    \verb"INTEGER"&		\verb"int"\\
+    \verb"BITSTRING"&		\verb"PE" (a bitvector)\\
+    \verb"OCTETSTRING"&		\verb"char *" (length is \verb"$$_len")\\
+    \verb"REAL"&		\verb"double"\\
+    any \verb"SEQUENCE"&	\verb"PE" (a sequence)\\
+    any \verb"SET"&		\verb"PE" (a set)\\
+    \verb*"OBJECT IDENTIFIER"&	\verb"OID"\\
+\hline
+\end{tabular}\]
+
+Consider the type definition in Figure~\ref{PEPYtype}:
+\begin{itemize}
+\item	\verb"action1" will be executed only if the object being recognized
+is a \verb"document";
+
+\item	\verb"action2" will be executed only if the object being recognized is
+a \verb"paragraph";
+and,
+
+\item	\verb"action3" will always be executed afterwards.
+\end{itemize}
+\tagrind[tp]{grind4-2}{Example of a TYPE action}{PEPYtype}
+
+The third type of actions are {\em tag\/} actions which are placed after 
+the tag for a tagged type or after the name for a named type.
+Consider the type definition in Figure~\ref{PEPYtag}:
+\begin{itemize}
+\item	\verb"action1" is executed after \verb"textUnit" has been fully
+processed as a \verb"TextUnit";
+but,
+
+\item	\verb"action2" is executed after \verb"specificLogicalDescriptor"
+has been recognized,
+but before it has been processed as a \verb"LogicalDescriptor".
+This type has both a name (\verb"specificLogicalDescriptor")
+and a tag (\verb"[5]").
+Although two actions are present,
+one only action is honored,
+and this action should be specified after the tag.
+\end{itemize}
+\tagrind[tp]{grind4-3}{Example of a TAG action}{PEPYtag}
+
+A tag action may also be specified for \verb*"SET {", \verb*"SEQUENCE {"
+and \verb*"CHOICE {" -- even when they are not tagged. The action is
+placed before the left brace, and is executed when the 
+\verb"SET", \verb"SEQUENCE", or \verb"CHOICE" is recognized but before any of
+its members are processed.
+
+A tag action may additionally be specified directly after the
+``\verb"::="'' lexeme, even when not tagged. This has the same effect as
+the tagged rule. This is the only way to provide a pre-action for
+untagged single rules.
+
+Finally,
+a tag action may occur after the phrase \verb*"SET OF" or \verb*"SEQUENCE OF".
+This action is executed before processing each instance of the base
+type of the \verb"SEQUENCE" or \verb"SET".
+This is useful for allocating memory for each of the member elements.
+
+The final type of actions are declaration actions.
+These are designed to
+allow the declaration of variables specific to a generated function.
+Such actions occur between the type name and the ``\verb"::="'' lexeme.
+The statements placed here are appended to the declaration section of
+the generated routine.  Only variable definitions should be placed
+here, as in:
+\begin{quote}\small\begin{verbatim}
+X400 %{ char cp[100]; %} ::=
+    SET {
+        X4001984 %{ strcpy(cp, "1984"); %},
+        X4001988 %{ strcat(cp, " 1988"); %} OPTIONAL,
+        X4001992 %{ strcat(cp, " 1992"); %} OPTIONAL
+    }
+    %{ puts(cp); %}
+\end{verbatim}\end{quote}
+
+\subsubsection	{Control Statements}
+When constructing routines for encoding presentation elements,
+additional constructs are required at certain points to control
+the choices available. The control constructs are specified between
+the lexemes
+\verb"<<" and \verb">>". The control itself consists of an appropriate
+{\em C\/} statement which takes a different form for each of the constructs.
+The affected types are listed below.
+\begin{itemize}
+\item	\verb"CHOICE" --- to decide which of the selection to choose.
+The statement consists of an expression of integer value that chooses
+the {\em n\/}'th value.  For example in
+\begin{quote}\small\begin{verbatim}
+NewDef ::=
+    CHOICE << 2 >> {
+        [0] FirstElement,
+        [1] SecondElement,
+        [2] ThirdElement
+    }
+\end{verbatim}\end{quote}
+the control \verb"<< 2 >>" would choose the second
+type in a choice, which is not necessarily the element tagged with
+\verb"[2]", as in this case.
+The statement always precedes the opening brace of the \verb"CHOICE".
+
+\item	\verb*"SEQUENCE OF" and \verb*"SET OF" --- to indicate the
+number of elements require. This construct has the syntax of a for
+loop in C. Elements are added to the \verb"SEQUENCE/SET" while the second
+expression yields \verb"TRUE". The sequence
+\begin{quote}\small\begin{verbatim}
+SeqDef ::=
+    SET OF << count = 0; count < 10; count ++ >>
+        MatchingAccessories
+\end{verbatim}\end{quote}
+would produce ten elements in the set.
+The statement follows the \verb"OF" and any optional actions.
+
+\item	\verb"OPTIONAL" --- to decide whether the optional element
+should be included. This statement follows the \verb"OPTIONAL"
+keyword.
+It is a simple boolean expression.
+If the value returned is \verb"TRUE" then the element is included.
+
+\item	\verb"DEFAULT" --- to decide whether the optional element
+should be included. This statement follows the \verb"DEFAULT"
+keyword/value pair.
+It is a simple boolean expression.
+If the value returned is \verb"TRUE" then the element is included.
+
+Arguably, this should be unnecessary~---~\pgm{pepy} should
+look at the value immediately following \verb"DEFAULT" to decide if the
+element need be encoded.
+
+\end{itemize}
+The example in Figure~\ref{PEPYcontrol} should make this a little
+clearer.
+\tagrind[tp]{grind4-4}{Examples of CONTROL actions}{PEPYcontrol}
+
+\subsubsection	{Value Passing Statements}
+A number of extensions are available to assist in passing values
+between the generated routines.
+The generated routines pass these values between rules as
+parameters to each routine. This can obviate the need for
+much of the {\em C\/} code associated with each type.
+
+To allow values to be passed to and obtained from these parameters,
+value tokens can be associated with the type definitions. These tokens
+are incorporated in the lexemes \verb"[[" and \verb"]]".
+The tokens come in two types. The first is a key letter followed
+by a expression. The second is the same with an additional parameter
+to specify the length of the first parameter. These formats are shown
+below.
+\begin{itemize}
+\item	\verb"[[b expression]]" --- a boolean.
+For encoding,
+this is the value that the presentation element will take.
+For decoding and printing,
+the value of the presentation element is assigned to this variable.
+
+\item	\verb"[[i expression]]" --- an integer.
+For encoding,
+this is the value that the presentation element will take.
+For decoding and printing,
+the value of the presentation element is assigned to this variable.
+
+\item	\verb"[[s expression]]" --- a string.
+For encoding,
+this is the value that the presentation element will take,
+a null-terminated string.
+For decoding and printing,
+the string value of the presentation element is assigned to this variable;
+the user is responsible for freeing the storage assigned with \verb"free".
+
+\item	\verb"[[O expression]]" --- an object identifier.
+For encoding,
+this is the value that the presentation element will take,
+an \verb"OID" value
+(see Section~\ref{psap:oid} on page~\pageref{psap:oid} in \volone/).
+For decoding and printing,
+the \verb"OID" value of the presentation element is assigned to this
+variable;
+the user is responsible for freeing the storage assigned with \verb"oid_free".
+
+\item	\verb"[[p expression]]" --- a user supplied parameter, \verb"parm".
+This parameter is of type \verb"PEPYPARM", which can be \verb"#define"'d by the
+user to a suitable value. If not defined, it defaults to a \verb*"char *".
+Most commonly this type is defined to be a union of all parameter
+types that need to be passed (but see the next item).
+
+\item	\verb"[[P type]]" --- a {\em C} type which defines the type of
+the parameter for this definition. If present, this construct must
+occur directly after the definition name.
+
+\item	\verb"[[o expression1 $ expression2]]" --- a byte pointer/length pair.
+For encoding,
+these indicate the byte value and length of the presentation element,
+which needn't be null-terminated.
+For decoding and printing,
+the byte value and length are assigned to these variables;
+the user is responsible for freeing the storage assigned with \verb"free".
+
+\item	\verb"[[q expression]]" --- a \verb"qbuf".
+For encoding,
+this is a pointer to a \verb"qbuf"
+(described in Section~\ref{psap:qbuf} in \volone/) which is used to build the
+presentation element.
+If the \verb"qbuf" contains only one element in the linked list,
+then a primitive element is built,
+otherwise a constructed type is built.
+which needn't be null-terminated.
+For decoding and printing,
+this value is undefined.
+
+\item	\verb"[[x expression1 $ expression2]]" --- a bit pointer/length pair.
+For encoding,
+the value of the presentation element is derived by supplying
+\verb"expression1" and \verb"expression2" 
+as the first two arguments to \verb"strb2bitstr"
+(described in Section~\ref{psap:bits} in \volone/).
+For decoding and printing,
+the bitstring value and length are assigned to these variables;
+the user is responsible for freeing the storage assigned with \verb"free".
+
+\item	\verb"[[a expression]]" --- a presentation element.
+For encoding,
+this is the value that the presentation element will take.
+For decoding and printing,
+the presentation element is assigned to this variable.
+
+\item	\verb"[[r expression]]" --- a real number. For encoding this
+is a floating point number that will be encoded. For decoding this
+represents a floating point number variable in double format.
+\end{itemize}
+
+The example in Figure~\ref{PEPYparm} should demonstrate these features.
+\clearpage
+\tagrind[tp]{grind4-5a}{Examples of Parameters in Pepy}{PEPYparm}
+\clearpage
+\tagrind[tp]{grind4-5b}{Examples of Parameters in Pepy (continued)}\empty
+
+\section	{Known Deficiencies}
+The \pgm{pepy} program started as a prototype.
+Although the approach is promising, some of the rough edges remain.
+
+\subsection	{ASN.1 Syntax}\label{pepy:syntax}
+The ASN.1 syntax is followed exactly except that:
+\begin{itemize}
+\item	No {\em macro\/} syntax is recognized.
+\end{itemize}
+
+\subsection	{ASN.1 Semantics}
+\verb"COMPONENTS OF" and \verb"CHOICE" types are often ``pulled up'' into the
+type which references them.
+This can cause anomalous behavior when things like value passing statements
+(e.g., \verb"[[p expr]]")
+are present in the definition of a \verb"COMPONENTS OF" or \verb"CHOICE" type
+which is pulled into another type definition.
+
+\section	{PEPY Environment}
+A program generated by \pgm{pepy} expects certain things.
+
+\subsection	{Starting Things Off}
+To invoke a decoding or printing routine:
+\begin{quote}\small\begin{verbatim}
+PREFIX_MODULE_TYPE (pe, 1, len, buffer, parm)
+\end{verbatim}\end{quote}
+where --
+\begin{describe}
+\item[\verb"PREFIX\_MODULE\_TYPE":] indicates that the type
+\verb"TYPE" in module
+\verb"MODULE" should be parsed -- the prefix \verb"PREFIX" is supplied from
+the \verb"DECODER" or \verb"PRINTER" directive
+(or the corresponding prefix in the \verb"SECTIONS" directive).
+
+\item[\verb"pe":] is the presentation-element that is to be examined.
+
+\item[\verb"1":] is a magic argument.
+
+\item[\verb"len":] is the integer parameter supplied for routines that
+decode values into integer parameters, or have a length associated
+with them. The address of an integer can be placed here if the element
+being parsed is a primitive type, otherwise use \verb"NULLIP".
+
+\item[\verb"buffer":] is the string parameter for routines that decode
+values into string objects. The address of a character pointer can be placed
+here if the element being parsed is a primitive type, otherwise use
+\verb"NULLVP".
+
+\item[\verb"parm":] is the user supplied parameter. This should be a variable
+of type \verb"PEPYPARM" if supplied,
+otherwise use \verb"NULLCP".
+\end{describe}
+
+To invoke an encoding routine, the call is similar:
+\begin{quote}\small\begin{verbatim}
+PREFIX_MODULE_TYPE (&pe, 1, len, buffer, parm)
+\end{verbatim}\end{quote}
+the values are the same as above, except that the first parameter
+is a reference higher and the third and fourth parameters are a reference
+lower,
+hence --
+\begin{describe}
+\item[\verb"PREFIX\_MODULE\_TYPE":] indicates that the type
+\verb"TYPE" in module
+\verb"MODULE" should be parsed -- the prefix \verb"PREFIX" is supplied from
+the \verb"ENCODER" directive
+(or the corresponding prefix in the \verb"SECTIONS" directive).
+
+\item[\verb"pe":] is a pointer to the presentation-element that is to be
+constructed.
+
+\item[\verb"1":] is a magic argument.
+
+\item[\verb"len":] is the integer parameter supplied for routines that
+encode booleans or integers, or have a length associated with them.
+If not present, use \verb"NULL".
+
+\item[\verb"buffer":] is the string parameter for routines that encode
+string values.
+If not present, use \verb"NULLCP".
+
+\item[\verb"parm":] is the user supplied parameter. This should be a variable
+of type \verb"PEPYPARM" if supplied,
+otherwise use \verb"NULLCP".
+\end{describe}
+
+These routines return the manifest constant \verb"NOTOK" on error,
+or \verb"OK" on success.
+
+\subsection	{Diagnostic Output}\label{pepy:advise}
+When the program generated by \pgm{pepy} detects an error,
+it calls the routine \verb"advise" with some diagnostic information.
+This routine, which should be declared \verb"void" is defined by the user.
+The routine takes a variable number of arguments,
+similar to a \man printf(3s) routine,
+with the exception that the first argument is a string for \man perror(3),
+the second argument is the format string,
+and any following arguments are referenced by the format string.
+Consult Figure~\ref{PPdone} on page~\pageref{PPdone} for an example of the
+\verb"advise" procedure.
+
+Alternately,
+the standard routine, \verb"PY_advise"\index{PY\_advise} can be used.
+It simply records the information to:
+\begin{quote}\index{PY\_pepy}\small\begin{verbatim}
+char   PY_pepy[BUFSIZ];
+\end{verbatim}\end{quote}
+for easy access.
+Note that the routines in the \man libpepy(3) library are generated to use
+the \verb"PY_advise" routine. This routine is also encouraged for use
+when building \pgm{rosy} encoder/decoder routines.
+
+\subsection	{Debug Output}
+If a program generated by \pgm{pepy} is compiled with the \verb"-DEBUG" option,
+then prior to fiddling with each instance of a type,
+the routine \verb"testdebug" is called.
+\begin{quote}\index{testdebug}\small\begin{verbatim}
+int     testdebug (pe, s)
+PE      pe;
+char   *s;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{itemize}
+\item	the presentation element being examined; and,
+
+\item	a short null-terminated diagnostic string describing the instance
+	of the type.
+\end{itemize}
+
+By convention,
+if the program was compiled with \verb"-DDEBUG",
+then the \verb"testdebug" routine (supplied by the user)
+should examine the \verb"$PEPYDEBUG" environment variable.
+If this variable is set to a non-zero decimal number,
+then it should print out debugging information.
+Consult Figure~\ref{PPdone} on page~\pageref{PPdone} for an example of the
+\verb"testdebug" procedure.
+
+In addition,
+the static character pointer \verb"pepyid" contains
+information on the version of \pgm{pepy} which generated the program.
+
+\section	{Pretty-printers}\label{pepy:pretty}
+To facilitate the automatic generation of pretty-printers,
+the routine \verb"PY_pp" is included in the \man libpepy(3) library.
+Given an invocation from a simple main routine,
+\verb"PY_pp" will parse invocation arguments,
+build presentation elements
+(from either a presentation stream or presentation list),
+and then invoke the pretty-printer routine for each presentation element.
+By simply invoking pepy with the \switch"S PRINT" option.
+the pretty-printer routine can be generated automatically.
+Figure~\ref{PP2init} shows the required initialization code for the
+pretty-printer.
+\tagrind[tp]{grind4-10}{Simpler Pretty-Printer initialization}{PP2init}
+
+\section	{Compiling and Loading}
+Programs generated by \pgm{pepy} automatically include
+\verb"<isode/psap.h>".
+Typically,
+these programs should also be loaded with \verb"-lisode",
+although only the libraries \verb"-lpepy",
+\verb"-lpsap", and \verb"-licompat" are referenced.
+
+\subsection	{External Modules}
+When an external module, \verb"MODULE", is referenced,
+\pgm{pepy} reads a file which is named \verb"MODULE.ph" for various
+information.
+The \pgm{pepy} program will consult the environment variable \verb"$PEPYPATH"
+as a search-list of directories to search to find this file.
+The components in the path are separated by a colon (`\verb":"').
+If this environment variable is not set,
+then \pgm{pepy} consults the user's current directory followed by a
+system-wide area defined at compile-time.
+
+Similarly,
+in addition to producing a \verb".c" file,
+\pgm{pepy} will also generate a \verb".ph" file containing information
+describing the module.
+
+\subsection	{Options}
+The \pgm{pepy} program has many options to modify its behavior:
+
+The \switch"a" switch sets the name of the routine used by the \verb"advise"
+facility (see page~\pageref{pepy:advise}).
+
+The \switch"d" switch directs \pgm{pepy} to ignore any action statements in
+the input.
+
+The \switch"h" switch enables additional heuristics when \pgm{pepy} generates
+a printer.
+
+The \switch"o" switch sets the name of the output file,
+which is normally derived from the name of the input file.
+The distinguished file ``\verb"-"'' can be used to force the use of the
+standard output.
+
+If the \switch"o" switch is not used,
+then \verb*"-b prefix" can be used to direct \pgm{pepy} to produce multiple
+output files, each starting with \verb"prefix".
+
+The \switch"P" switch directs \pgm{pepy} not to include \pgm{cpp}-type line
+number information in the output.
+This is useful for debugging \pgm{pepy} (gasp!).
+
+The \switch"p" switch directs \pgm{pepy} to remove the action states from the
+input file and print the resulting information on the standard output.
+This typically results in a file suitable for pretty-printing.
+
+The \switch"r" switch enables the generation of ``robust'' code.
+If this option is given,
+then the {\em C\/} code generated will not check for unknown or extraneous
+objects.
+This is used for extensibility purposes.
+
+Normally, \pgm{pepy} prints the name of each type as it works.
+The \switch"s" switch disables this behavior.
+
+Finally,
+the \switch"S" switch sets the initial section-processing mode for \pgm{pepy}.
+The default is \verb*"-S DECODE",
+which causes \pgm{pepy} to generate a decoder.
+Other values are \verb*"-S ENCODE" to generate an encoder;
+or,
+\verb*"-S PRINT" to generate a printer.
+The \switch"A" switch is used to set the initial mode to generate encoder,
+decoder, and printer routines.
+
+\subsection	{Makefiles}
+By convention,
+input files to \pgm{pepy} have the extension \verb".py".
+The rules for \man make(1) are:
+\begin{quote}\small\begin{verbatim}
+.SUFFIXES:      .py .c .o
+
+.py.o:;         pepy $(PYFLAGS) $<
+                $(CC) $(CFLAGS) -c $*.c
+                -rm -f $*.c
+
+.py.c:;         pepy $(PYFLAGS) $<
+\end{verbatim}\end{quote}
+
+\subsection	{Grinding}
+Figure~\ref{PepyGrind} contains an entry for the \man vgrindefs(5) file,
+which may be used by the \man vgrind(1) or \man tgrind(1) facility.
+While this entry is not perfect,
+it has proven to be adequate for most purposes;
+e.g.,
+the examples in this chapter were pretty-printed using this entry.
+\tagdiagram[tp]{4-1}{Grind Entry for pretty-printing PEPY programs}{PepyGrind}
+
+In addition,
+if you want to get an ASN.1 specification
+by removing all of the {\em C\/} augmentations from the \pgm{pepy} input file,
+use the \switch"p" switch.
+For example,
+\begin{quote}\small\begin{verbatim}
+pepy -p < myfile.py 
+\end{verbatim}\end{quote}
+can be used to view the ASN.1 specification in the file \verb"myfile.py".
+
+\section	{An Example}
+Let's consider how one might construct a pretty-printer for the personnel
+records described in Figure~\ref{ASNexample} on page~\pageref{ASNexample}.
+(Of course, earlier in Section~\ref{pepy:pretty} the preferred method of
+generating pretty-printers was described.)
+
+First,
+we start the module off by defining the usual prefactory {\em C\/} code
+as verbatim actions.
+This is shown in Figure~\ref{PPinit}.
+Next,
+we define the \verb"PersonnelRecord" types.
+The rest of the types are then defined.
+This is shown in Figures~\ref{PPtop} and~\ref{PPbottom} respectively.
+Finally,
+the usual closing {\em C\/} code is included as verbatim actions,
+as shown in Figure~\ref{PPdone}.
+
+\clearpage
+\tagrind[tp]{grind4-6a}{Pretty-Printer initialization}{PPinit}
+\clearpage
+\tagrind[tp]{grind4-6b}{Pretty-Printer initialization (continued)}\empty
+{\let\small=\smaller
+\clearpage
+\tagrind[tp]{grind4-7}{Pretty-Printer top-level}{PPtop}}
+\clearpage
+\tagrind[tp]{grind4-8a}{Pretty-Printer type definitions}{PPbottom}
+\clearpage
+\tagrind[tp]{grind4-8b}{Pretty-Printer type definitions (continued)}\empty
+\clearpage
+\tagrind[tp]{grind4-9a}{Pretty-Printer finalization}{PPdone}
+\clearpage
+\tagrind[tp]{grind4-9b}{Pretty-Printer finalization (continued)}\empty
+\clearpage
+
+\section	{For Further Reading}\label{pepy:reading}
+The Abstract Syntax Notation One is specified in \cite{ISO.PP.Syntax}.
+The corresponding CCITT recommendation is defined in \cite{CCITT.PP.Syntax}.
+
+%%% \section	{Changes Since the Last Release}\label{pepy:changes}
+%%% A brief summary of the major changes between v~\isodeprevrsn/ and
+%%% v~\isodevrsn/ are now presented.
+%%% These are the user-visible changes only;
+%%% changes of a strictly internal nature are not discussed.
+

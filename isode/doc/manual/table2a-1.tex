@@ -1,0 +1,22 @@
+% run this through LaTeX with the appropriate wrapper
+%	AcSAP Failure Codes
+
+\normalsize
+\[\begin{tabular}{rp{3.0in}}
+    \multicolumn{2}{c}{\bf Provider-Initiated Aborts (fatal)}\\
+\tt ACS\_ADDRESS&	Address unknown\\
+\tt ACS\_REFUSED&	Connect request refused on this network connection\\
+\tt ACS\_CONGEST&	Local limit exceeded\\
+\tt ACS\_PRESENTATION&	Presentation disconnect\\
+\tt ACS\_PROTOCOL&	Protocol error\\
+\tt ACS\_RESPONDING&	Rejected by responding ACPM\\
+\tt ACS\_ABORTED&	Peer aborted association\\[0.1in]
+    \multicolumn{2}{c}{\bf User-Initiated Rejections (fatal)}\\
+\tt ACS\_PERMANENT&	Permanent\\
+\tt ACS\_TRANSIENT&	Transient\\
+    \multicolumn{2}{c}{\bf User-Initiated Rejections (non-fatal)}\\
+\tt ACS\_REJECT&	Release rejected\\[0.1in]
+    \multicolumn{2}{c}{\bf Interface Errors (non-fatal)}\\
+\tt ACS\_PARAMETER&	Invalid parameter\\
+\tt ACS\_OPERATION&	Invalid operation\\
+\end{tabular}\]

@@ -1,0 +1,49 @@
+\def\foo{\begin{tabular}{c}M\\ A\\ N\\ A\\ G\\ E\\ M\\ E\\ N\\ T\end{tabular}\ \begin{tabular}{c}I\\ N\\ S\\ T\\ R\\ U\\ M\\ E\\ N\\ T\\ A\\ T\\ I\\ O\\ N\end{tabular}}
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \special{pa 625 3750}%
+    \special{pa 625 0}%
+    \special{pa 4375 0}%
+    \special{pa 4375 3750}%
+    \special{pa 625 3750}%
+    \special{fp}%
+    \special{pa 625 3750}%
+    \special{pa 625 625}%
+    \special{pa 3438 625}%
+    \special{pa 3438 3750}%
+    \special{pa 625 3750}%
+    \special{fp}%
+    \rlap{\kern  2.031in\lower 2.063in\hbox to 0pt{\hss ``USEFUL''\hss}}%
+    \rlap{\kern  2.031in\lower 2.229in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  2.031in\lower 2.395in\hbox to 0pt{\hss PROTOCOLS\hss}}%
+    \special{pa 625 625}%
+    \special{pa 625 0}%
+    \special{pa 4375 0}%
+    \special{pa 4375 625}%
+    \special{pa 625 625}%
+    \special{fp}%
+    \rlap{\kern  2.500in\lower 0.354in\hbox to 0pt{\hss MANAGEMENT PROTOCOL\hss}}%
+    \special{pa 3438 3750}%
+    \special{pa 3438 625}%
+    \special{pa 4375 625}%
+    \special{pa 4375 3750}%
+    \special{pa 3438 3750}%
+    \special{fp}%
+    \rlap{\kern  3.906in\lower 2.229in\hbox to 0pt{\hss \foo\hss}}%
+    \special{pa 2500 3750}%
+    \special{pa 2500 4375}%
+    \special{fp}%
+    \special{pa 0 4375}%
+    \special{pa 5000 4375}%
+    \special{fp}%
+    \rlap{\kern  2.500in\lower 4.260in\hbox to0pt{\ \ NETWORK\hss}}%
+    \kern  5.001in
+  }\vss}%
+  \kern  4.376in
+}

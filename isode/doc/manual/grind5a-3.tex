@@ -1,0 +1,23 @@
+\File{grind5a\-3.c},{16:46},{Oct 14 1989}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{while}    \K{while} (fgets (buffer, \K{sizeof} buffer, stdin)) \{}}
+\L{\LB{}\Tab{8}{\K{register} PE = oct2prim (buffer, strlen (buffer) + 1);}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{if} (PDataRequest (sd, \&pe, 1, pi) == NOTOK)}}
+\L{\LB{}\Tab{8}{    error (\S{}\"P\-DATA.REQUEST: \%s\"\SE{}, PErrString (pa \-\> pa\_reason));}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{pe\_free (pe);}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} (PRelRequest (sd, NULLPEP, 0, NOTOK, pr, pi) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"P\-RELEASE.REQUEST: \%s\"\SE{}, PErrString (pa \-\> pa\_reason));}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} (!pr \-\> pr\_affirmative) \{}}
+\L{\LB{}\Tab{8}{(\K{void}) PUAbortRequest (sd, NULLPEP, 0, pi);}}
+\L{\LB{}\Tab{8}{error (\S{}\"release rejected by sink\"\SE{});}}
+\L{\LB{    \}}}
+\ProcCont{if}\L{\LB{    PRFREE (pr);}}
+\L{\LB{}}
+\L{\LB{    exit (0);}}
+\L{\LB{\}}}

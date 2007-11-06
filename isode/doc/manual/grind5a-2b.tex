@@ -1,0 +1,39 @@
+\File{grind5a\-2b.c},{08:54},{Jun 29 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{if}    \K{if} ((pz = is2paddr (argv[1], NULLCP, is)) == NULLPA)}}
+\L{\LB{}\Tab{8}{error (\S{}\"address translation failed\"\SE{});}}
+\L{\LB{    sf = addr2ref (PLocalHostName ());}}
+\L{\LB{}}
+\L{\LB{    settings = 0;}}
+\L{\LB{\K{\#define}}\Tab{8}{dotoken(requires,shift,bit,type) \!}}
+\L{\LB{\{ \!}}
+\L{\LB{    \K{if} (requirements \& requires) \!}}
+\L{\LB{}\Tab{8}{settings \|= ST\_INIT\_VALUE \<\< shift; \!}}
+\L{\LB{\}}}
+\L{\LB{    dotokens ();}}
+\L{\LB{\K{\#undef}}\Tab{8}{dotoken}}
+\L{\LB{}}
+\L{\LB{    \K{if} (PConnRequest (NULLSA, pz, NULLPC, NULLOID, 0, requirements,}}
+\L{\LB{}\Tab{8}{    SERIAL\_NONE, settings, sf, NULLPEP, 0, NULLQOS, pc, pi) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"P\-CONNECT.REQUEST: \%s\"\SE{}, PErrString (pa \-\> pa\_reason));}}
+\L{\LB{\Proc{if}    \K{if} (pc \-\> pc\_result != PC\_ACCEPT)}}
+\L{\LB{}\Tab{8}{error (\S{}\"connection rejected by sink: \%s\"\SE{},}}
+\L{\LB{}\Tab{16}{    PErrString (pc \-\> pc\_result));}\Tab{56}{}}
+\L{\LB{}}
+\L{\LB{    sd = pc \-\> pc\_sd;}}
+\L{\LB{    requirements = pc \-\> pc\_requirements;}}
+\L{\LB{}}
+\L{\LB{\K{\#define} dotoken(requires,shift,bit,type) \!}}
+\L{\LB{\{ \!}}
+\L{\LB{    \K{if} (requirements \& requires) \!}}
+\L{\LB{}\Tab{8}{\K{if} ((pc \-\> pc\_settings \& (ST\_MASK \<\< shift)) \!}}
+\L{\LB{}\Tab{16}{== ST\_INIT\_VALUE) \!}}
+\L{\LB{}\Tab{8}{    owned \|= bit; \!}}
+\L{\LB{\}}}
+\L{\LB{}\Tab{8}{dotokens ();}}
+\L{\LB{\K{\#undef}}\Tab{8}{dotoken}}
+\L{\LB{}}
+\L{\LB{    PCFREE (pc);}}
+\L{\LB{}}
+\L{\LB{...}}

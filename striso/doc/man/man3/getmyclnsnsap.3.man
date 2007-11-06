@@ -108,6 +108,16 @@ local host.
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B libosi
+user library provides a mechanism for setting local and remote addresses using
+the host name of the machine.  This avoids the need for users of applications
+to deal with NSAPs and TSAPs.  The library usese the file
+.B /etc/net/oclt/host
+for host name to NSAP conversion, and the fie
+.B /etc/net/oclt/services
+for hostname to TSEL conversion.
+.PP
 .BR getmyclnsnsap ()
 returns the binary coded NSAP of the local host.  The NSAP returned is coded
 in conformance to
@@ -204,7 +214,7 @@ for additional compatibility information.
 .I SunLink OSI
 documentation.
 .[
-sunlink
+sunlink-tli
 .]
 .\"
 .\"
@@ -214,7 +224,7 @@ sunlink
 first appeared in
 .IR "SunLink OSI" .
 .[
-sunlink
+sunlink-tli
 .]
 .\"
 .\"

@@ -1,0 +1,2226 @@
+% run this through LaTeX with the appropriate wrapper
+
+\ifpractical
+    \dotopic{BUILDING AN OSI APPLICATION}
+\else
+    \dotopic{IMPLEMENTING NEW SERVICES}
+\fi
+
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]		A MODEL FOR DISTRIBUTED APPLICATIONS
+
+\item[PART II:]		THE RO-NOTATION
+
+\item[PART III:]	STATIC FACILITIES
+
+\item[PART IV:]		DYNAMIC FACILITIES
+
+\ifpractical
+\item[PART V:]		EXTRA FOR EXPERTS!
+\fi
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A BIG ACKNOWLEDGEMENT}
+
+\begin{nrtc}
+\item	THIS PART OF THE TALK IS BASED ON AN EARLIER PRESENTATION
+\begin{quote}
+BUILDING DISTRIBUTION APPLICATIONS IN AN OSI FRAMEWORK
+\end{quote}
+
+\item	WHICH RECEIVED REVIEW FROM A LOT OF INDIVIDUALS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INTRODUCTION}
+
+\begin{nrtc}
+\item	LOOSELY COUPLED SYSTEMS THAT ARE BUILT USING REMOTE PROCEDURE CALLS
+	(RPC) ARE GAINING POPULARITY, e.g., NFS
+
+\item	THE OSI REMOTE OPERATIONS CONCEPT IS INTENDED TO PROVIDE THIS
+	FUNCTIONALITY FOR:
+    \begin{nrtc}
+    \item	MESSAGING
+
+    \item	DIRECTORY SERVICES
+
+    \item	NETWORK MANAGEMENT
+
+    \item	REMOTE DATABASE ACCESS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MOTIVATION}
+
+\begin{nrtc}
+\item	MANY FEEL THAT THIS CAPABILITY MAY BE A KEY FACTOR IN THE OVERALL
+	SUCCESS OF OSI STANDARDIZATION
+
+\item	BUT, REMOTE OPERATIONS ARE SUFFICIENTLY GENERAL TO REQUIRE
+	ADDITIONAL DISCIPLINE, BEYOND THE OSI STANDARDS,
+	FOR THEIR USE AS AN RPC MECHANISM
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE APPLICATIONS COOKBOOK}
+
+\begin{nrtc}
+\item	THE SET OF RULES AND LOCAL IMPLEMENTATION DECISIONS PLACED ON REMOTE
+	OPERATIONS TO MAKE THE PROBLEM MANAGEABLE:
+    \begin{nrtc}
+    \item	LANGUAGE BINDINGS (``C'')
+
+    \item	TOOLS FOR AUTOMATICALLY GENERATING PARTS OF THE
+		PROGRAMS WHICH USE REMOTE OPERATIONS
+
+    \item	A RUN-TIME ENVIRONMENT AND SOME BOILERPLATE
+
+    \item	CONVENTIONS FOR NAMING AND ADDRESSING SERVICES AND ENTITIES
+    \end{nrtc}
+
+\item	A (SMALL) PART OF THE ISODE
+    \begin{nrtc}
+    \item	VOLUME 4 OF THE USER'S MANUAL
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FOREWORD}
+
+\begin{quote}\em
+``$\ldots$ The term `holistic' refers to my conviction that what we are
+concerned with here is the fundamental interconnectedness of all things.
+I do not concern myself with such petty things as fingerprint powder, telltale
+pieces of pocket fluff and inane footprints.
+I see the solution to each problem as being detectable in the pattern and web
+of the whole.
+The connections between causes and effects are often much more subtle and
+complex than we with our rough and ready understanding of the physical world
+might naturally suppose, Mrs.~Rawlinson.
+
+``Let me give you an example.
+If you go to an acupuncturist with a toothache he sticks a needle instead into
+your thigh.
+Do you know why he does that, Mrs.~Rawlinson?
+
+``No, neither do I, Mrs.~Rawlinson, but we intend to find out$\ldots$''
+\end{quote}
+
+\raggedright
+---DOUGLAS ADAMS, \em Dirk Gently's Holistic Detective Agency (1987)
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{A MODEL FOR DISTRIBUTED APPLICATIONS}\bf
+
+\begin{nrtc}
+\item	ABSTRACT DATA TYPES
+
+\item	OPERATIONS
+
+\item	RELIABILITY CHARACTERISTICS
+
+\item	IN PERSPECTIVE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{USE OF REMOTE OPERATIONS IN OSI}
+
+\begin{nrtc}
+\item	{}[ECMA~TR/31] PRESENTS A METHOD FOR USING REMOTE OPERATIONS TO:
+    \begin{nrtc}
+    \item	SPECIFY THE EXTERNALLY VISIBLE CHARACTERISTICS
+		NEEDED FOR INTERCONNECTION
+
+    \item	WHILE AVOIDING UNNECESSARY CONSTRAINTS UPON THE
+		INTERNAL DESIGN OF THE SYSTEMS TO BE INTERCONNECTED
+    \end{nrtc}
+
+\item	ALTHOUGH THE LATTER HALF OF THIS DOCUMENT (THE PROTOCOL) IS NOW
+	OBSOLETE, THE FIRST FOUR SECTIONS (THE METHOD) ARE QUITE RELEVANT
+
+\item	{}[ECMA~TR/31] IS BASED ON [X.410],
+	WE TERM THIS ``OLD-STYLE'' ROS
+
+\item	{}[ISO~9072] IS THE NEWER JOINT ISO/CCITT WORK,
+	WE TERM THIS ``NEW-STYLE'' ROS
+\end{nrtc}
+\end{bwslide}
+
+
+
+\begin{bwslide}
+\ctitle	{A BIT OF HISTORY}
+
+\begin{nrtc}
+\item	XEROX's COURIER WAS THE FIRST WELL-KNOWN SYSTEM TO USE THIS APPROACH
+
+\item	BUT EVEN IN THE EARLY 70's, SIMILAR IDEAS WERE BEING EXPLORED
+	ELSEWHERE (e.g., MIT)
+
+\item	TODAY, ONC (SUN's RPC) AND DECORUM (APOLLO's NCS) ARE CONTINUING IN
+	THIS VEIN
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{ABSTRACT DATA TYPES}\bf
+
+\begin{nrtc}
+\item	REMOTE OPERATIONS ARE A MECHANISM BY WHICH LOOSELY COUPLED SYSTEMS
+	INTERACT
+
+\item	BUT, REMOTE OPERATIONS ARE ONLY ONE PART OF A LARGER PICTURE HOWEVER
+
+\item	THE FUNDAMENTAL CONCEPT IS THAT OF THE \emph{ABSTRACT DATA TYPE}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ABSTRACT DATA TYPES}
+
+\begin{nrtc}
+\item	PUT SIMPLY, AN ABSTRACT DATA TYPE DEFINES BOTH
+    \begin{nrtc}
+    \item	THE DATA STRUCTURE CONTAINED IN AN OBJECT (SYNTAX), AND
+
+    \item	HOW THAT DATA IS INTERPRETED (SEMANTICS)
+    \end{nrtc}
+
+\item	THIS IS HARDLY A NEW CONCEPT
+    \begin{nrtc}
+    \item	e.g., SMALLTALK, SIMULA, and so on
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROPERTIES OF ABSTRACT DATA TYPES:\\ REPRESENTATION}
+
+\begin{nrtc}
+\item	DATA STRUCTURES IN PROGRAMMING LANGUAGES HAVE A \emph{CONCRETE}
+	REPRESENTATION
+    \begin{nrtc}
+    \item	WHICH IS DEFINED BY THE PROGRAMMING LANGUAGE AND THE
+		UNDERLYING HARDWARE
+
+    \item	e.g., BYTE-ORDERING, WORD SIZE, etc.
+    \end{nrtc}
+
+\item	THE CORRESPONDING ABSTRACT DATA TYPE IS DEFINED IN AN
+	IMPLEMENTATION-INDEPENDENT FASHION
+    \begin{nrtc}
+    \item	TERMED THE \emph{ABSTRACT SYNTAX}
+    \end{nrtc}
+
+\item	AN APPLICATION CAN EXPECT THIS TO BEHAVE CONSISTENTLY REGARDLESS OF THE
+	HARDWARE ON WHICH IT IS RUNNING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REPRESENTATION: EXAMPLE\\ ABSTRACT SYNTAX}
+
+\vskip.15in
+\begin{verbatim}
+Mail-Address ::=
+    SEQUENCE {
+        local
+            GraphicString,
+
+        domain
+            GraphicString,
+
+        options
+            BITSTRING {
+                default-local(0), default-host(1)
+            }
+            DEFAULT { default-local, default-host }
+    }
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REPRESENTATION: EXAMPLE\\ CONCRETE SYNTAX}
+
+\vskip.15in
+\begin{verbatim}
+struct mail_address {
+    char   *local;
+    char   *domain;
+
+    unsigned char options;
+#define default_local 0x01
+#define default_host  0x02
+};
+\end{verbatim}
+\begin{nrtc}
+\item	PLUS HARDWARE, COMPILER, etc.
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROPERTIES OF ABSTRACT DATA TYPES:\\ SERIALIZATION}
+
+\begin{nrtc}
+\item	ABSTRACT TRANSFER NOTATION:
+    \begin{nrtc}
+    \item	A WELL-DEFINED SET OF RULES USED TO DEFINE HOW ABSTRACT DATA
+		TYPES ARE TRANSMITTED THROUGH THE NETWORK
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERIALIZATION (cont.)}
+
+\begin{nrtc}
+\item	CONCEPTUALLY, TWO MAPPINGS OCCUR
+
+\item	FIRST, THE DATA STRUCTURE IS MAPPED TO THE ABSTRACT SYNTAX FOR ITS
+	CORRESPONDING ABSTRACT DATA TYPE
+    \begin{nrtc}
+    \item	THIS IS A LOCAL ISSUE
+    \end{nrtc}
+
+\item	SECOND, THE ABSTRACT SYNTAX IS MAPPED TO THE TRANSFER SYNTAX,
+	A STREAM OF OCTETS
+    \begin{nrtc}
+    \item	THE ABSTRACT TRANSFER NOTATION IS USUALLY THE BASIC ENCODING
+		RULES
+
+    \item	OTHER POSSIBILITIES INCLUDE COMPRESSION, ENCRYPTION, etc.
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROPERTIES OF ABSTRACT DATA TYPES:\\ OPERATIONS}
+
+\begin{nrtc}
+\item	ACCESS TO AN ABSTRACT DATA TYPE IS DEFINED BY A SET OF PRIMITIVE
+	ACTIONS
+
+\item	EACH PRIMITIVE ACTION IS TERMED AN \emph{OPERATION}
+
+\item	THIS SET OF OPERATIONS DEFINES THE COMPLETE BEHAVIOR OF AN ABSTRACT
+	DATA TYPE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBJECT MODEL}
+
+\begin{nrtc}
+\item	SINCE OPERATIONS INTRODUCE A LEVEL OF INDIRECTION,
+	USING ABSTRACT DATA TYPES RATHER THAN CONCRETE DATA STUCTURES
+	PERMITS ACCESS TO DATA STRUCTURES WITHOUT REGARD TO THEIR ACTUAL
+	IMPLEMENTATION
+
+\item	OPERATIONS ARE SAID TO BE \emph{TOTAL}, AS THE NORMAL OUTCOME (RESULT),
+	AND THE EXCEPTION OUTCOMES (THE ERRORS) ARE WELL-DEFINED AND
+	UNAMBIGUOUS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{OPERATIONS}\bf
+
+\begin{nrtc}
+\item	IN ITS PRIMITIVE FORM,
+	AN \emph{OPERATION} IS A SIMPLE REQUEST/REPLY INTERACTION
+
+\item	A \emph{INVOCATION} GENERATES ONE OF THREE OUTCOMES:
+    \begin{nrtc}
+    \item	A \emph{RESULT}, IF THE OPERATION SUCCEEDS;
+
+    \item	AN \emph{ERROR}, IF THE OPERATION FAILED; or,
+
+    \item	A \emph{REJECTION}, IF THE OPERATION WAS NOT PERFORMED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NOTE DIFFERENCE BETWEEN}
+\begin{nrtc}
+\item	SERVICES: 
+    \begin{nrtc}
+    \item	CONSUMER/PROVIDER
+    \end{nrtc}
+
+\item	OPERATIONS: 
+    \begin{nrtc}
+    \item	INVOKER/PERFORMER
+    \end{nrtc}
+
+\item	ASSOCIATIONS: 
+    \begin{nrtc}
+    \item	INITIATOR/RESPONDER
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROPERTIES OF OPERATIONS:\\ INVOCATIONS}
+
+\begin{nrtc}
+\item	THE OPERATION IS \emph{INVOKED} WHEN IT IS REQUESTED
+
+\item	AN INVOCATION CONSISTS OF:
+    \begin{nrtc}
+    \item	AN \emph{OPERATION NUMBER} IDENTIFYING THE OPERATION REQUESTED
+
+    \item	AN ARBITRARILY COMPLEX \emph{ARGUMENT}
+
+    \item	AN \emph{INVOCATION IDENTIFIER} DISTINGUISHING THIS INVOCATION
+		FROM PREVIOUS INVOCATIONS
+
+    \item	(POSSIBLY) A \emph{LINKED-INVOCATION IDENTIFIER}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{LINKED INVOCATIONS}
+
+\begin{nrtc}
+\item	INTRODUCED IN THE NEWER JOINT ISO/CCITT WORK
+
+\item	SOMETIMES REFERRED TO AS A ``CALLBACK'' OR A ``REMOTE UPCALL''
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ONE USE OF LINKED INVOCATIONS}
+
+\begin{nrtc}
+\item	SUPPOSE YOU WANT AN OPERATION THAT RETURNS MULTIPLE RESULTS
+
+\item	DEFINE THE OPERATION TO HAVE A LINKED OPERATION WITH
+    \begin{nrtc}
+    \item	ARGUMENT: A PARTIAL RESULT
+    \end{nrtc}
+
+\item	HERE'S HOW IT WORKS:
+    \begin{nrtc}
+    \item	CONSUMER INVOKES OPERATION
+
+    \item	AS EACH PARTIAL RESULT IS COMPUTED,\\
+		PROVIDER INVOKES LINKED OPERATION
+
+    \item	WHEN LAST PARTIAL RESULT READY,\\
+		PROVIDER RETURNS THIS AS A RESULT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROPERTIES OF OPERATIONS:\\ RESULTS}
+
+\begin{nrtc}
+\item	IF THE OPERATION SUCCEEDS, THEN A RESULT IS RETURNED
+
+\item	A RESULT CONSISTS OF:
+    \begin{nrtc}
+    \item	AN INVOCATION IDENTIFIER CORRESPONDING TO THE OPERATION WHICH
+		SUCCEEDED
+
+    \item	(POSSIBLY) AN ARBITRARILY COMPLEX \emph{RESULT}
+    \end{nrtc}
+
+\item	ACTUALLY, A RESULT MAY BE \emph{OPTIONALLY} RETURNED ON SUCCESS
+    \begin{nrtc}
+    \item	(A BAD IDEA)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROPERTIES OF OPERATIONS:\\ ERRORS}
+
+\begin{nrtc}
+\item	IF THE OPERATION FAILS, THEN AN ERROR IS RETURNED
+
+\item	AN ERROR CONSISTS OF:
+    \begin{nrtc}
+    \item	AN INVOCATION IDENTIFIER CORRESPONDING TO THE OPERATION WHICH
+		FAILED
+
+    \item	AN \emph{ERROR NUMBER} IDENTIFYING THE ERROR ENCOUNTERED
+
+    \item	(POSSIBLY) AN ARBITRARILY COMPLEX \emph{PARAMETER}
+    \end{nrtc}
+
+\item	NOTE THAT ERRORS DO NOT NECESSARILY INDICATE BAD BEHAVIOR!
+    \begin{nrtc}
+    \item	THEY CAN OCCUR AS A PART OF CORRECT AND NORMAL OPERATIONS
+
+	\item	HENCE, THINK OF THEM AS EXCEPTIONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROPERTIES OF OPERATIONS:\\ REJECTIONS}
+
+\begin{nrtc}
+\item	IF THE OPERATION CAN NOT BE PERFORMED, THEN A REJECTION IS RETURNED
+
+\item	A REJECTION CONSISTS OF:
+    \begin{nrtc}
+    \item	AN INVOCATION IDENTIFIER CORRESPONDING TO THE OPERATION WHICH
+		WAS REJECTED
+
+    \item	A \emph{REASON} EXPLAINING WHY THE OPERATION WAS REJECTED
+	\begin{nrtc}
+	\item	e.g., MISTYPED PARAMETERS
+	\end{nrtc}
+    \end{nrtc}
+
+\item	SOME REJECTIONS ARE USER-INITIATED, OTHERS ARE PROVIDER-INITIATED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{RELIABILITY CHARACTERISTICS}\bf
+
+\begin{nrtc}
+\item	UNCERTAINTY DURING EXECUTION OF OPERATIONS IS ALWAYS PRESENT
+
+\item	THIS IS PARTICULARLY TROUBLESOME IF THE NETWORK ``BREAKS''
+	AFTER A REQUEST IS RECEIVED BY THE PERFORMER BUT BEFORE
+	THE INVOKER RECEIVES THE REPLY
+
+\item	ONE SCHEME OF CLASSIFYING THE RELIABILITY REQUIREMENTS OF AN OPERATION
+	IS:
+    \begin{nrtc}
+    \item	EXACTLY ONCE
+
+    \item	AT LEAST ONCE (IDEMPOTENT)
+
+    \item	AT MOST ONCE
+    \end{nrtc}
+
+\item	IMPLEMENTING THESE SEMANTICS IS THE RESPONSBILITY OF THE ROS-USER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RELIABILITY CHARACTERISTIC:\\ EXACTLY ONCE}
+
+\begin{nrtc}
+\item	PERFORMER
+    \begin{nrtc}
+    \item	KEEPS TRACK OF THE INVOCATION IDENTIFIERS OF ALL PERFORMED
+		OPERATIONS
+
+    \item	WHEN PROCESSING AN INVOCATION, IF AN INVOCATION IDENTIFIER IS
+		REPEATED, REJECT THE OPERATION 
+    \end{nrtc}
+
+\item	INVOKER
+    \begin{nrtc}
+    \item	REPEATEDLY INVOKES THE OPERATION USING THE SAME INVOCATION
+		IDENTIFIER UNTIL EITHER
+
+    \item	A CONFIRMATION (RESULT OR ERROR) IS RECEIVED, OR
+
+    \item	A REJECTION (DUPLICATE OPERATION) IS RECEIVED
+    \end{nrtc}
+
+\item	A ROS BUG: REJECTION DOES NOT INCLUDE THE VALUE OF THE PREVIOUS RESULT!
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RELIABILITY CHARACTERISTIC:\\ AT LEAST ONCE}
+
+\begin{nrtc}
+\item	PERFORMER
+    \begin{nrtc}
+    \item	KEEPS NO INFORMATION REGARDING PREVIOUSLY PERFORMED OPERATIONS
+    \end{nrtc}
+
+\item	INVOKER
+    \begin{nrtc}
+    \item	REPEATEDLY INVOKES THE OPERATION
+	\begin{nrtc}
+	\item	(WITH ANY INVOCATION IDENTIFIER)
+	\end{nrtc}
+		UNTIL A CONFIRMATION (RESULT OR ERROR) IS RECEIVED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RELIABILITY CHARACTERISTIC:\\ AT MOST ONCE}
+
+\begin{nrtc}
+\item	PERFORMER
+    \begin{nrtc}
+    \item	KEEPS NO INFORMATION REGARDING PREVIOUSLY PERFORMED OPERATIONS
+    \end{nrtc}
+
+\item	INVOKER
+    \begin{nrtc}
+    \item	INVOKES THE OPERATION
+	\begin{nrtc}
+	\item	(WITH ANY INVOCATION IDENTIFIER)
+	\end{nrtc}
+		EXACTLY ONCE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE (cont.)}
+
+\vskip.15in
+\begin{verbatim}
+int     op_EVAL_evalOperation (sd, in, out, rsp, roi)
+int     sd;
+struct type_EVAL_EvalObject* in;
+caddr_t *out;
+int    *rsp;
+struct RoSAPindication *roi;
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE (cont.)}
+
+\vskip.15in
+\begin{verbatim}
+struct type_EVAL_Service__Requirements {
+    struct type_EVAL_Versions *version;
+
+    struct type_EVAL_Credentials *credentials;
+
+    struct member_EVAL_0 {
+            struct type_EVAL_Extension *Extension;
+
+            struct member_EVAL_0 *next;
+    } *extensions;
+};
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{THE RO-NOTATION}\bf
+
+\begin{nrtc}
+\item	USE ASN.1 MACROS TO DEFINE APPLICATION PROTOCOL
+    \begin{nrtc}
+    \item	APPLICATION CONTEXTS
+
+    \item	PARAMETERS NEEDED FOR BINDING AND INVOCATION
+    \end{nrtc}
+
+\item	A STANDARD SET OF MACROS, THE \emph{RO-NOTATION},
+	IS DEFINED FOR THIS PURPOSE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN ANNOTATED EXAMPLE}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-15\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-16\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-17\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-18\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-19\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-20\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-21\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-22\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{STATIC FACILITIES}\bf
+
+\begin{nrtc}
+\item	STUB GENERATOR
+
+\item	STRUCTURE GENERATOR
+
+\item	ELEMENT PARSER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STATIC FACILITIES\\ OVERVIEW}
+
+\vskip.15in
+\diagram[p]{figureB-1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{STUB GENERATOR}\bf
+
+\begin{nrtc}
+\item	WHAT WE WOULD LIKE: MAGIC!
+
+\item	WHAT WE REALLY GET: HARD WORK.
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONCEPT: STUBS}
+
+\begin{nrtc}
+\item	A PROCEDURE WHICH IS CALLED LOCALLY BUT EXECUTES REMOTELY
+
+\item	IN OUR CONTEXT, A SYNCHRONOUS STUB:
+    \begin{nrtc}
+    \item	INVOKES THE OPERATION
+
+    \item	AWAITS A RESPONSE
+
+    \item	RETURNS A RESULT OR ERROR
+    \end{nrtc}
+
+\item	AN ASYNCHRONOUS STUB:
+    \begin{nrtc}
+    \item	INVOKES THE OPERATION, AND EVENTUALLY
+
+    \item	DISPATCHES A RESULT OR ERROR HANDLER
+    \end{nrtc}
+
+\item	WHAT TO DO ABOUT REJECTIONS, NETWORK PROBLEMS, etc.?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ROSY}
+
+\begin{nrtc}
+\item	REMOTE OPERATIONS STUB-GENERATOR (YACC-BASED)
+
+\item	INPUT:
+    \begin{nrtc}
+    \item	A RO SPEC
+    \end{nrtc}
+
+\item	OUTPUT:
+    \begin{nrtc}
+    \item	AN ASN.1 SPEC
+
+    \item	STUB DEFINITIONS FOR C
+
+    \item	C DATA STRUCTURES FOR RUN-TIME ENVIRONMENT
+
+    \item	STUB DEFINITIONS FOR LINT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ EVAL SERVICE}\small
+
+\vskip.15in
+\begin{verbatim}
+% rosy eval.ry
+EVAL operations: evalOperation read write
+
+EVAL errors: evalError endOfInput
+
+EVAL types: EvalObject Service-Requirements Versions Service-Diagnostic
+     Diagnostic-Reason ServiceProblem SecurityProblem
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ STUB DEFINITIONS FOR C}\small
+
+\vskip.15in
+\begin{verbatim}
+#define operation_EVAL_evalOperation    0
+
+#define stub_EVAL_evalOperation(sd,id,in,rfx,efx,class,roi)\
+RyStub ((sd), table_EVAL_Operations,\
+        operation_EVAL_evalOperation, (id), NULLIP,\
+        (caddr_t) (in), (rfx), (efx), (class), (roi))
+
+#define op_EVAL_evalOperation(sd,in,out,rsp,roi)\
+RyOperation ((sd), table_EVAL_Operations,\
+        operation_EVAL_evalOperation,\
+        (caddr_t) (in), (out), (rsp), (roi))
+
+
+#define error_EVAL_evalError    0
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ C DATA STRUCTURES FOR\\ RUN-TIME ENVIRONMENT}\small
+
+\vskip.15in
+\begin{verbatim}
+struct RyOperation table_EVAL_Operations[] = {
+                                        /* OPERATION evalOperation */
+    "evalOperation", operation_EVAL_evalOperation,
+        encode_EVAL_evalOperation_argument,
+        decode_EVAL_evalOperation_argument,
+        free_EVAL_evalOperation_argument,
+        1, encode_EVAL_evalOperation_result,
+           decode_EVAL_evalOperation_result,
+           free_EVAL_evalOperation_result,
+        errors_EVAL_evalOperation,
+
+    ...
+
+    NULL
+};
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ C DATA STRUCTURES FOR\\ RUN-TIME ENVIRONMENT\\ (cont.)}
+\small
+
+\vskip.15in
+\begin{verbatim}
+static struct RyError *errors_EVAL_evalOperation[] = {
+    &table_EVAL_Errors[0]
+};
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ C DATA STRUCTURES FOR\\ RUN-TIME ENVIRONMENT\\ (cont.)}
+\small
+
+\vskip.15in
+\begin{verbatim}
+struct RyError table_EVAL_Errors[] = {
+                                        /* ERROR evalError */
+    "evalError", error_EVAL_evalError,
+        encode_EVAL_evalError_parameter,
+        decode_EVAL_evalError_parameter,
+        free_EVAL_evalError_parameter,
+
+    ...
+
+    NULL
+};
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ STUB DEFINITIONS FOR LINT}\small
+
+\vskip.15in
+\begin{verbatim}
+int     stub_EVAL_evalOperation (sd, id, in, rfx, efx, class, roi)
+int     sd,
+        id,
+        class;
+struct type_EVAL_EvalObject* in;
+IFP     rfx,
+        efx;
+struct RoSAPindication *roi;
+{
+    return RyStub (sd, table_EVAL_Operations, operation_EVAL_evalOperation, 
+                id, NULLIP, (caddr_t) in, rfx, efx, class, roi);
+}
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ STUB DEFINITIONS FOR LINT (cont.)}\small
+
+\vskip.15in
+\begin{verbatim}
+int     op_EVAL_evalOperation (sd, in, out, rsp, roi)
+int     sd;
+struct type_EVAL_EvalObject* in;
+caddr_t *out;
+int    *rsp;
+struct RoSAPindication *roi;
+{
+    return RyOperation (sd, table_EVAL_Operations, operation_EVAL_evalOperation,
+                (caddr_t) in, out, rsp, roi);
+}
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ROSY LIMITATIONS}
+
+\begin{nrtc}
+\item	SOMEWHAT LIMITED IN THE FRONT-END, CURRENTLY RECOGNIZES ONLY
+    \begin{nrtc}
+    \item	\verb"OPERATION" AND \verb"ERROR" MACROS
+    \end{nrtc}
+
+\item	BUT DOESN'T KNOW ABOUT \verb"OBJECT IDENTIFIER" NOTATION FOR OPERATION
+	CODES
+
+\item	AND IGNORES THE \verb"LINKED" CLAUSE IN OPERATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{STRUCTURE GENERATOR}\bf
+
+\begin{nrtc}
+\item	WHAT WE WOULD LIKE: MAGIC!
+
+\item	WHAT WE REALLY GET: HARD WORK.
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERIALIZING DATA STRUCTURES}
+
+\begin{nrtc}
+\item	THE BASIC ENCODING RULES SAY HOW TO MAP THE ABSTRACT SYNTAX TO THE
+	TRANSFER SYNTAX
+
+\item	HOW TO MAP DATA STRUCTURES (CONCRETE STRUCTURE) TO THE ABSTRACT SYNTAX?
+    \begin{nrtc}
+    \item	\verb"struct { ... }" $\rightarrow$ \verb"ServiceRequirements"
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A SOLUTION}
+
+\begin{nrtc}
+\item	GENERATE C STRUCTURES DIRECTLY FROM ABSTRACT SYNTAX
+
+\item	GENERATE TRANSLATOR TO DO THE MAPPING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SIMPLE TYPES}
+
+\begin{nrtc}
+\item	\verb"BOOLEAN" $\rightarrow$ \verb"char"
+
+\item	\verb"INTEGER" $\rightarrow$ \verb"int", e.g.,
+    \begin{nrtc}
+    \item	\verb"typedef long integer;"
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SIMPLE TYPES (cont.)}
+
+\begin{nrtc}
+\item	FOR RANGE-LIMITED INTEGERs, SYMBOLIC VALUES ARE DEFINED AS WELL
+\small\begin{verbatim}
+SecurityProblem ::=
+    INTEGER {
+        inappropriateAuthentication(1),
+        invalidCredentials(2),
+        ...
+    }
+
+struct type_EVAL_SecurityProblem {
+    integer    parm;
+#define int_EVAL_SecurityProblem_inappropriateAuthentication    1
+#define int_EVAL_SecurityProblem_invalidCredentials     2
+        ...
+};
+\end{verbatim}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SIMPLE TYPES (cont.)}
+
+\begin{nrtc}
+\item	\verb"BIT STRING" $\rightarrow$ \verb"struct PElement"
+\begin{verbatim}
+Versions ::=
+    BIT STRING {
+        version-1(0),
+        ...
+    }
+
+#define type_EVAL_Versions      PElement
+#define bits_EVAL_Versions      "\020\01version-1 ..."
+#define bit_EVAL_Versions_version__1    0
+#define free_EVAL_Versions      pe_free
+\end{verbatim}
+
+\item	\verb"OCTET STRING" $\rightarrow$ \verb"struct qbuf"
+
+\item	\verb"OBJECT IDENTIFIER" $\rightarrow$ \verb"struct OIDentifier"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMPLEX TYPES:\\ SEQUENCE OF}
+
+\begin{nrtc}
+\item	A LINKED LIST WITH SOME GENERATED NAMES
+\begin{verbatim}
+SEQUENCE OF
+    Versions
+
+struct element_EVAL_0 {
+    struct type_EVAL_Versions *Versions;
+
+    struct element_EVAL_0 *next;
+} *versions;
+\end{verbatim}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMPLEX TYPES:\\ SEQUENCE/SET}
+
+\begin{nrtc}
+\item	A ``SIMPLE'' STRUCTURE USING TAGS FOR NAMES,\\ WHENEVER POSSIBLE
+\begin{verbatim}
+Service-Requirements ::=
+    SEQUENCE {
+        version[0]
+            Versions,
+
+        credentials[1]
+            Credentials OPTIONAL,
+
+        ...
+    }
+
+struct type_EVAL_Service__Requirements {
+    struct type_EVAL_Versions *version;
+
+    struct type_EVAL_Credentials *credentials;
+
+    ...
+};
+\end{verbatim}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMPLEX TYPES:\\ CHOICE}
+
+\begin{nrtc}
+\item	A STRUCTURE WITH A TAG AND A UNION
+\small\begin{verbatim}
+Diagnostic-Reason ::=
+    CHOICE {
+        serviceError[1]
+            ServiceProblem,
+
+        securityError[2]
+            SecurityProblem
+    }
+
+struct type_EVAL_Diagnostic__Reason {
+    int     offset;
+#define type_EVAL_Diagnostic__Reason_serviceError       1
+#define type_EVAL_Diagnostic__Reason_securityError      2
+
+    union {
+            struct type_EVAL_ServiceProblem *serviceError;
+
+            struct type_EVAL_SecurityProblem *securityError;
+    }       un;
+};
+\end{verbatim}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DEFAULT/OPTIONAL}
+
+\begin{nrtc}
+\item	A VERY SLICK FACILITY WOULD BE TO SUPPORT THE \verb"DEFAULT" AND
+	\verb"OPTIONAL" CLAUSES FOR COMPLEX TYPES
+
+\item	BUT, IMPLEMENTATION IS PROBLEMATIC:
+    \begin{nrtc}
+    \item	NEED ASN.1 VALUE PARSING IN FRONT-END
+
+    \item	NEED EXTENSIVE SYMBOL TABLE SEMANTICS IN BACK-END
+    \end{nrtc}
+
+\item	SO, A SIMPLE APPROACH IS TAKEN
+    \begin{nrtc}
+    \item	SCALARS ARE HANDLED DIRECTLY:
+	\begin{nrtc}
+	\item	BOOLEANS, INTEGERS
+	\end{nrtc}
+
+    \item	NON-SCALARS ARE EXAMINED FOR INEQUALITY TO \verb"NULL"
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{HEURISTICS}
+
+\begin{nrtc}
+\item	IF ONLY ONE MEMBER IN CONSTRUCTOR, PULL IT UP
+\begin{verbatim}
+ErrorInfo ::=
+        SEQUENCE {
+            errorStatus[0]
+                IMPLICIT ErrorStatus
+        }
+\end{verbatim}
+\verb"ErrorInfo" $\rightarrow$ \verb"struct type_EVAL_ErrorStatus"
+
+\item	TRY TO USE TAGS FOR STRUCTURE NAMES, WHENEVER POSSIBLE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{POSY}
+
+\begin{nrtc}
+\item	PEPY OPTIONAL STRUCTURE-GENERATOR (YACC-BASED)
+
+\item	INPUT:
+    \begin{nrtc}
+    \item	AN ASN.1 SPEC
+    \end{nrtc}
+
+\item	OUTPUT:
+    \begin{nrtc}
+    \item	AN AUGMENTED ASN.1 SPEC
+
+    \item	C STRUCTURE DEFINITIONS
+
+    \item	``FREE'' ROUTINES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ EVAL SERVICE}\small
+
+\vskip.15in
+\begin{verbatim}
+% posy -f -h -o eval-asn.py eval.py
+EVAL types: EvalObject Service-Requirements Versions Service-Diagnostic
+     Diagnostic-Reason ServiceProblem SecurityProblem
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ C STRUCTURE DEFINITIONS}\scriptsize
+
+\vskip.15in
+\begin{verbatim}
+Service-Requirements ::=
+    SEQUENCE {
+        version[0]
+            Versions,
+
+        credentials[1]
+            Credentials OPTIONAL,
+
+        extensions[2]
+            SET OF Extension
+            OPTIONAL
+    }
+
+struct type_EVAL_Service__Requirements {
+    struct type_EVAL_Versions *version;
+
+    struct type_EVAL_Credentials *credentials;
+
+    struct member_EVAL_0 {
+            struct type_EVAL_Extension *Extension;
+
+            struct member_EVAL_0 *next;
+    } *extensions;
+};
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ ``FREE'' ROUTINES}\small
+
+\vskip.15in
+\begin{verbatim}
+free_EVAL_Service__Diagnostic (arg)
+struct type_EVAL_Service__Diagnostic *arg;
+{
+    struct element_EVAL_0 *versions, versions_next;
+
+    if (arg == NULL)
+        return;
+
+    for (versions = arg -> versions; versions; versions = versions_next) {
+        versions_next = versions -> next;
+        free_EVAL_Versions (versions -> Versions);
+        free ((char *) versions);
+    }
+    arg -> versions = NULL;
+
+...
+
+    free ((char *) arg);
+}
+
+#define free_EVAL_Versions      pe_free
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{POSY LIMITATIONS}
+
+\begin{nrtc}
+\item	STEMS FROM A LACK OF INTELLIGENCE WHEN DEALING WITH COMPLEX
+	ASN.1 VALUE NOTATION:
+    \begin{nrtc}
+    \item	USES ``NULL INEQUALITY'' RULE FOR \verb"OPTIONAL"
+
+    \item	HANDLES \verb"DEFAULT" ONLY FOR SCALARS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{ELEMENT PARSER}\bf
+
+\begin{nrtc}
+\item	WE NOW KNOW ABOUT
+    \begin{nrtc}
+    \item	DATA STRUCTURES\ \ \verb"struct { ... }"
+
+    \item	ABSTRACT SYNTAX\ \ \verb"ServiceRequirements"
+
+    \item	TRANSFER SYNTAX\ \ \verb"1f8a ..."
+    \end{nrtc}
+
+\item	THE \emph{PRESENTATION ELEMENT} TIES THESE TOGETHER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PRESENTATION ELEMENTS}
+
+\begin{nrtc}
+\item	AN INTERNAL FORM FOR AN INSTANCE OF A TYPE DESCRIBED BY ABSTRACT
+	SYNTAX
+
+\item	CAN REPRESENT ANY ASN.1 TYPE AS EITHER
+    \begin{nrtc}
+    \item	A STRING OF OCTETS OR BITS
+
+    \item	A LINKED-LIST OF PRESENTATION ELEMENTS
+    \end{nrtc}
+
+\item	THE CONCEPTUAL MAPPING IS:
+    \begin{nrtc}
+    \item	\verb"struct { ... }" $\rightarrow$ \verb"ServiceRequirements"
+    \end{nrtc}
+
+\item	THE ACTUAL MAPPING IS:
+    \begin{nrtc}
+    \item	\verb"struct { ... }" $\rightarrow$ \verb"struct PElement"
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PEPY}
+
+\begin{nrtc}
+\item	PRESENTATION ELEMENT PARSER (YACC-BASED)
+
+\item	INPUT:
+    \begin{nrtc}
+    \item	AN AUGMENTED ASN.1 SPEC
+    \end{nrtc}
+
+\item	OUTPUT:
+    \begin{nrtc}
+    \item	AN ENCODER
+
+    \item	A DECODER
+
+    \item	A PRETTY-PRINTER
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ EVAL SERVICE}\small
+
+\vskip.15in
+\begin{verbatim}
+% pepy eval-asn.py
+EVAL encode none none: EvalObject Service-Requirements Versions
+     Service-Diagnostic Diagnostic-Reason ServiceProblem SecurityProblem
+
+EVAL none decode none: EvalObject Service-Requirements Versions
+     Service-Diagnostic Diagnostic-Reason ServiceProblem SecurityProblem
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STATIC FACILITIES:\\ REVIEW}
+
+\vskip.15in
+\diagram[p]{figureB-1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NEW DEVELOPMENT:\\ PEPSY}
+
+\begin{nrtc}
+\item	PEPY WRITES LL(1) C ROUTINES
+    \begin{nrtc}
+    \item	STRAIGHT-FORWARD TO IMPLEMENT\\
+		BUT LARGE CODE SIZE
+    \end{nrtc}
+
+\item	NEW WORK HAS RESULTED IN A COMPILER THAT PRODUCES
+    \begin{nrtc}
+    \item	C STRUCTURE DEFINITIONS (LIKE POSY)
+
+    \item	COMPILED TABLES
+
+    \item	AN LL(1) INTERPRETER
+    \end{nrtc}
+    CALLED PEPSY
+
+\item	RESULT IS SMALLER CODE AND FASTER COMPILES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: PEPSY}
+
+\vskip.15in
+\begin{quote}\small\begin{verbatim}
+% rosy -pepsy eval.ry
+EVAL operations: evalOperation read write
+
+EVAL errors: evalError endOfInput
+
+EVAL types: EvalObject Service-Requirements Versions Service-Diagnostic
+     Diagnostic-Reason ServiceProblem SecurityProblem
+
+% pepsy -A -f -h eval.py
+EVAL types: EvalObject Service-Requirements Versions Service-Diagnostic
+     Diagnostic-Reason ServiceProblem SecurityProblem
+
+% cc -c EVAL_tables.c
+...
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STATIC FACILITIES:\\ PEPSY}
+
+\vskip.15in
+\diagram[p]{figureB-23}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{DYNAMIC FACILITIES}\bf
+
+\begin{nrtc}
+\item	RUN-TIME ENVIRONMENT
+
+\item	BOILERPLATE FOR INVOKERS
+
+\item	BOILERPLATE FOR PERFORMERS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DYNAMIC FACILITIES\\ OVERVIEW}
+
+\vskip.15in
+\diagram[p]{figureB-2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{RUN-TIME ENVIRONMENT}\bf
+
+\begin{nrtc}
+\item	RUN-TIME ENVIRONMENT RESPONSIBLE FOR ``CIVILIZING'' REMOTE OPERATIONS
+	SERVICE
+
+\item	IMPORTANT TRADE-OFF:
+    \begin{nrtc}
+    \item	FLEXIBILITY FOR SIMPLICITY
+    \end{nrtc}
+
+\item	IN \emph{THE COOKBOOK}, \verb"ROSYLIB" IMPLEMENTS THE RUN-TIME
+	ENVIRONMENT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DATA STRUCTURES}
+
+\begin{nrtc}
+\item	RECALL THAT ROSY GENERATES TABLES IN ADDITION TO STUBS
+
+\item	FOR EACH OPERATION, A TABLE IS DEFINED CONTAINING:
+    \begin{nrtc}
+    \item	NAME AND NUMBER OF OPERATION
+
+    \item	ARGUMENT ENCODE/DECODE/FREE ROUTINES
+
+    \item	RESULT ENCODE/DECODE/FREE ROUTINES
+
+    \item	ERROR TABLE
+    \end{nrtc}
+\end{nrtc}\small
+
+\begin{verbatim}
+    ...
+
+                                        /* OPERATION evalOperation */
+    "evalOperation", operation_EVAL_evalOperation,
+        encode_EVAL_evalOperation_argument,
+        decode_EVAL_evalOperation_argument,
+        free_EVAL_evalOperation_argument,
+        1, encode_EVAL_evalOperation_result,
+           decode_EVAL_evalOperation_result,
+           free_EVAL_evalOperation_result,
+        errors_EVAL_evalOperation,
+
+    ...
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DATA STRUCTURES (cont.)}
+
+\begin{nrtc}
+\item	FOR EACH ERROR, A TABLE IS DEFINED CONTAINING:
+    \begin{nrtc}
+    \item	NAME AND NUMBER OF ERROR
+
+    \item	PARAMETER ENCODE/DECODE/FREE ROUTINES
+    \end{nrtc}
+\end{nrtc}\small
+
+\begin{verbatim}
+    ...
+
+                                        /* ERROR evalError */
+    "evalError", error_EVAL_evalError,
+        encode_EVAL_evalError_parameter,
+        decode_EVAL_evalError_parameter,
+        free_EVAL_evalError_parameter,
+
+    ...
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A TABLE-DRIVEN APPROACH}
+
+\begin{nrtc}
+\item	RUN-TIME ENVIRONMENT SHOULD BE GENERALIZED TO WORK WITH THE LARGEST
+	POSSIBLE SET OF APPLICATIONS USING REMOTE OPERATIONS
+
+\item	A TABLE-DRIVEN APPROACH PERMITS US TO DECOUPLE OPERATION-SPECIFIC
+	INFORMATION
+    \begin{nrtc}
+    \item	WHAT ARGUMENTS REPRESENTED, HOW THEY ARE ENCODED, etc.
+    \end{nrtc}
+	FROM OPERATION-GENERIC INFORMATION
+    \begin{nrtc}
+    \item	THE OPERATION TAKES ARGUMENTS WHICH MUST BE ENCODED, etc.
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STUBS REVISITED}
+
+\begin{nrtc}
+\item	STUBS DEFINED BY ROSY CALL EITHER THE \verb"RyOperation" OR THE
+	\verb"RyStub" ROUTINE
+
+\item	THE \verb"RyOperation" ROUTINE IMPLEMENTS A ``POLICY''
+    \begin{nrtc}
+    \item	OPERATION CLASS: SYNCHRONOUS
+
+    \item	INVOCATION IDENTIFIER: UNIQUE NUMBER
+
+    \item	LINKED-INVOCATION ID: NONE
+
+    \item	PRIORITY: NONE
+    \end{nrtc}
+
+\item	THE \verb"RyStub" ROUTINE IMPLEMENTS A LESS RESTRICTIVE POLICY:
+    \begin{nrtc}
+    \item	USER SELECTS OPERATION CLASS AND INVOCATION IDENTIFIER
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASYNCHRONOUS STUBS}
+
+\begin{nrtc}
+\item	RECALL
+{\small
+\begin{verbatim}
+#define stub_EVAL_evalOperation(sd,id,in,rfx,efx,class,roi)\
+RyStub ((sd), table_EVAL_Operations,\
+        operation_EVAL_evalOperation, (id), NULLIP,\
+        (caddr_t) (in), (rfx), (efx), (class), (roi))
+\end{verbatim}}
+
+\item	THE MEANING OF THE PARAMETERS:
+    \begin{nrtc}
+    \item	\verb"sd": ASSOCIATION-DESCRIPTOR
+
+    \item	\verb"id": INVOCATION IDENTIFIER
+
+    \item	\verb"in": ARGUMENT FOR OPERATION
+
+    \item	\verb"rfx": DISPATCH ROUTINE FOR RESULT
+
+    \item	\verb"efx": DISPATCH ROUTINE FOR ERRORS OR REJECTIONS
+
+    \item	\verb"class": (A)SYNCHRONOUS
+
+    \item	\verb"roi": LOCAL SERVICE INTERFACE INFORMATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INSIDE RYSTUB}
+
+\begin{nrtc}
+\item	RUDIMENTARY PARAMETER CHECK
+
+\item	BUILD PRESENTATION ELEMENT FOR ARGUMENT
+
+\item	BUILD \emph{ACTIVATION BLOCK}
+
+\item	ISSUE RO-INVOKE.REQUEST
+
+\item	IF ASYNCHRONOUS, RETURN
+
+\item	LOOP, WAITING FOR ANY RESPONSE:
+    \begin{nrtc}
+    \item	RO-INVOKE.INDICATION:
+	\begin{nrtc}
+	\item	 PUSH ACTIVATION BLOCK FOR DISPATCHING OPERATION
+	\end{nrtc}
+
+    \item	RO-RESULT, ERROR, OR REJECTION.INDICATION:
+	\begin{nrtc}
+	\item	PARSE OPERATION RESULT OR ERROR PARAMETER AND CALL DISPATCH
+		ROUTINE
+\begin{verbatim}
+result = (*fnx) (sd, id, reason, value, roi);
+\end{verbatim}
+
+	\item	IF RESPONSE WAS FOR US, RETURN
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SYNCHRONOUS STUBS}
+
+\begin{nrtc}
+\item	RECALL
+\begin{verbatim}
+#define op_EVAL_evalOperation(sd,in,out,rsp,roi)\
+RyOperation ((sd), table_EVAL_Operations,\
+        operation_EVAL_evalOperation,\
+        (caddr_t) (in), (out), (rsp), (roi))
+\end{verbatim}
+
+\item	THE MEANING OF THE PARAMETERS:
+    \begin{nrtc}
+    \item	\verb"sd": ASSOCIATION-DESCRIPTOR
+
+    \item	\verb"in": ARGUMENT FOR OPERATION
+
+    \item	\verb"out": RESULT FOR OPERATION OR PARAMETER FOR ERROR
+
+    \item	\verb"rsp": TELLS HOW TO INTERPRET \verb"out"
+
+    \item	\verb"roi": REJECTION INFORMATION FOR OPERATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INSIDE RYOPERATION}
+
+\begin{nrtc}
+\item	RUDIMENTARY PARAMETER CHECK
+
+\item	BUILD PRESENTATION ELEMENT FOR ARGUMENT
+
+\item	BUILD \emph{ACTIVATION BLOCK}
+
+\item	ISSUE RO-INVOKE.REQUEST
+
+\item	LOOP, WAITING FOR SOME RESPONSE:
+    \begin{nrtc}
+    \item	RO-INVOKE.INDICATION:
+	\begin{nrtc}
+	\item	 PUSH ACTIVATION BLOCK FOR DISPATCHING OPERATION
+	\end{nrtc}
+
+    \item	RO-RESULT, ERROR, OR REJECTION.INDICATION:
+	\begin{nrtc}
+	\item	IF FOR US: PARSE OPERATION RESULT OR ERROR PARAMETER AND RETURN
+
+	\item	IF NOT FOR US: STUFF INFORMATION INTO CORRESPONDING ACTIVATION
+		BLOCK
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PERFORMERS}
+
+\begin{nrtc}
+\item	REGISTER A DISPATCH ROUTINE FOR EACH OPERATION USING \verb"RyDispatch"
+\begin{verbatim}
+RyDispatch (sd, ryo, op, fnx, roi)
+\end{verbatim}
+
+\item	THE MEANING OF THE PARAMETERS:
+    \begin{nrtc}
+    \item	\verb"sd": ASSOCIATION-DESCRIPTOR
+
+    \item	\verb"ryo": OPERATION TABLE
+
+    \item	\verb"op": OPERATION NUMBER
+
+    \item	\verb"fnx": DISPATCH ROUTINE
+
+    \item	\verb"roi": FAILURE INDICATOR
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OPERATION DISPATCH}
+
+\begin{nrtc}
+\item	WHILE WAITING FOR ``SOMETHING TO HAPPEN'', A RO-INVOKE.INDICATION
+	CAUSES AN ACTIVATION BLOCK TO BE PUSHED
+
+\item	THE PRESENTATION ELEMENT FOR THE ARGUMENT IS PARSED INTO A STRUCTURE
+	AND THE DISPATCH ROUTINE IS CALLED:
+\begin{verbatim}
+result = (*fnx) (sd, ryo, rox, arg, roi)    
+\end{verbatim}
+
+\item	DISPATCH ROUTINE HAS THREE OPTIONS
+    \begin{nrtc}
+    \item	\verb"RyDsResult": TO RETURN A RESULT
+
+    \item	\verb"RyDsError": TO RETURN AN ERROR
+
+    \item	\verb"RyDsUReject": TO REJECT AN OPERATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CLEAN-UP}
+
+\begin{nrtc}
+\item	WHEN AN ASSOCIATION IS ABORTED (e.g., DUE TO NETWORK FAILURE),
+	SOMETHING MUST BE DONE WITH ACTIVATION BLOCKS
+
+\item	IDEALLY, WOULD LIKE TO:
+    \begin{nrtc}
+    \item	RETAIN THIS STATE,
+
+    \item	RE-ESTABLISH THE ASSOCIATION, AND
+
+    \item	CONTINUE WHERE WE LEFT OFF
+    \end{nrtc}
+
+\item	NO SUCH LUCK, ACTIVATION BLOCKS ARE FLUSHED!
+    \begin{nrtc}
+    \item	A LOT OF HARD ISSUES NEED TO BE RESOLVED IN ORDER TO DO THE
+		``RIGHT THING''
+
+    \item	ACTUALLY, FOR ASYNCHRONOUS INVOCATIONS, A REJECTION IS
+		PASSED UP
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{BOILERPLATE FOR INVOKERS}\bf
+
+\begin{nrtc}
+\item	THE PROBLEM WITH BOILERPLATE IS THAT IT'S BORING
+
+\item	SO, WE'LL CONSIDER ONLY THE HIGHLIGHTS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INVOKING AN OPERATION}
+
+\begin{nrtc}
+\item	ALTHOUGH \emph{THE COOKBOOK} TRIED TO MAKE THINGS SIMPLE,
+	CALLING A STUB IS NOT EASY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASYNCHRONOUS INVOCATION}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-3\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASYNCHRONOUS INVOCATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-4\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASYNCHRONOUS INVOCATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-5\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASYNCHRONOUS INVOCATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-6\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASYNCHRONOUS INVOCATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-7\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SIMPLIFIED ASYNCHRONOUS INVOCATION}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-8\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SYNCHRONOUS INVOCATION}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-9\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SYNCHRONOUS INVOCATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-10\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SYNCHRONOUS INVOCATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-11\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{BOILERPLATE FOR PERFORMERS}\bf
+
+\begin{nrtc}
+\item	THE PROBLEM WITH BOILERPLATE IS THAT IT'S BORING
+
+\item	SO, WE'LL CONSIDER ONLY THE HIGHLIGHTS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PERFORMING AN OPERATION}
+
+\begin{nrtc}
+\item	WHEN AN ACTIVATION BLOCK IS PUSHED,
+	THE DISPATCH ROUTINE IS CALLED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PERFORMING AN OPERATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-12\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PERFORMING AN OPERATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-13\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PERFORMING AN OPERATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureB-14\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DYNAMIC FACILITIES:\\ REVIEW}
+
+\vskip.15in
+\diagram[p]{figureB-2}
+\end{bwslide}
+
+
+\ifpractical
+    \let\foo=\relax
+\else
+\begin{bwslide}
+\ctitle	{FOR FURTHER READING}
+
+\begin{nrtc}
+\item	Volume 4: The Applications Cookbook
+
+\item	The Applications Cookbook\\
+	Julian P.~Onions and Marshall T.~Rose\\
+        Proceedings, Fourth International Symposium on Computer Message
+	Systems, September, 1988
+\end{nrtc}
+\end{bwslide}
+
+    \let\foo=\endinput
+\fi
+\foo
+
+
+\begin{bwslide}
+\part	{EXTRA FOR EXPERTS!}\bf
+
+\begin{nrtc}
+\item	THESE TOOLS CAN BE GENERALIZED FOR OTHER APPLICATION ENVIRONMENTS
+
+\item	NEVER CONFUSE PROGRAMMATIC INTERFACES WITH USER INTERFACES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NETWORK MANAGEMENT}
+
+\begin{nrtc}
+\item	SUPPOSE YOU HAVE A SIMPLE NETWORK MANAGEMENT PROTOCOL WITH OPERATIONS
+	TO
+    \begin{nrtc}
+    \item	GET A VARIABLE
+
+    \item	GET A ROW IN A TABLE
+    \end{nrtc}
+
+\item	AND YOU WANT TO PROTOTYPE MANGEMENT APPLICATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TWO THINGS ARE NEEDED}
+
+\begin{nrtc}
+\item	AN APPLICATIONS FRAMEWORK FOR THE USER
+
+\item	AUTOMATIC GENERATION OF NETWORK MANAGEMENT PDUs
+    \begin{nrtc}
+    \item	AND THE GLUE BETWEEN THEM    
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATIONS FRAMEWORK:\\ AWK}
+
+\begin{nrtc}
+\item	A PATTERN SCANNING AND PROCESSING LANGUAGE
+
+\item	USEFUL FOR PROTOTYPING TEXT-HANDLING APPLICATIONS
+
+\item	INTERPRETIVE LANGUAGE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AUTOMATIC GENERATION OF\\ NETWORK MANAGEMENT PDUs:\\ THE COOKBOOK}
+
+\begin{nrtc}
+\item	USE PEPSY TO DEFINE AND IMPLEMENT API FOR LOW-LEVEL PROTOCOL
+	INTERACTIONS
+    \begin{nrtc}
+    \item	IF MANAGEMENT PROTOCOL WAS CMIP, THEN COULD USE ROSY TOO
+    \end{nrtc}
+
+\item	NOW JUST MODIFY AWK A BIT$\ldots$
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MODIFICATIONS TO AWK:\\ VARIABLES}
+
+\begin{nrtc}
+\item	IN FRONT-END, WHEN VARIABLES ARE USED, SEE IF THEY ARE DEFINED
+	IN THE MANAGEMENT INFORMATION BASE
+
+\item	FOR SIMPLE VARIABLES:
+\begin{verbatim}
+sysDescr
+
+sysDescr[value]
+\end{verbatim}
+
+\item	FOR TABULAR VARIABLES:
+\begin{verbatim}
+ifDescr[value]
+
+for (i in ifDescr)
+    print "%d: %s", ifIndex, ifDescr;
+\end{verbatim}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MODIFICATIONS TO AWK:\\ VARIABLES (cont.)}
+
+\begin{nrtc}
+\item	WHEN VARIABLE APPEARS IN AN ``RVALUE'',
+	USE MANAGEMENT PROTOCOL TO RETRIEVE VALUE
+
+\item	ADD A FEW NEW VARIABLES TO HELP OUT
+    \begin{nrtc}
+    \item	e.g., AGENT ADDRESS
+    \end{nrtc}
+
+\item	ONLY TRICKY PART:
+	WHEN TRAVERSING TABLE, RETRIEVE EACH ROW IN ONE OPERATION
+    \begin{nrtc}
+    \item	REDUCES NETWORK TRAFFIC
+
+    \item	REDUCES CHANCE OF INCONSISTENT VIEWS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MODIFICATIONS TO AWK:\\ DATA TYPING}
+
+\begin{nrtc}
+\item	INTEGER: number
+
+\item	OCTET STRING: string (\verb|"%02x: ... :%02x"|)
+
+\item	OBJECT IDENTIFIER: string (\verb|"%u. ... .%u"|)
+
+\item	and so on$\ldots$
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE}
+
+\vspace{0.5in}
+\smaller
+\begin{verbatim}
+printf "Routing tables\n";
+printf "%-15s %-15s %-8s %-6s %-10s %s\n",
+        "Destination",
+              "Gateway",
+                    hasunix ? "Flags" : "Type",
+                         "Refcnt",
+                              "Use",
+                                   "Interface";
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE (cont.)}
+
+\vspace{0.5in}
+\smaller
+\begin{verbatim}
+didone = 0;
+for (i in ipRouteDest) {
+    didone = 1;
+
+    printf "%-15s %-15s %-8s %-6s %-10s %s (#%d)\n",
+            ipRouteDest == "0.0.0.0" ? "default" : ipRouteDest,
+                  ipRouteNextHop,
+                        hasunix ? rt_flags(unixIpRouteFlags[i]) \
+                                : rt_type(ipRouteType),
+                             hasunix ? unixIpRouteRefCnt[i] : "",
+                                  hasunix ? unixIpRouteUses[i] : "",
+                                        ifDescr[ipRouteIfIndex],
+                                        ipRouteIfIndex;
+}
+if (!didone && DIAGNOSTIC)
+    printf "ipRoutingTable: %s\n", DIAGNOSTIC;
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE (cont.)}
+
+\vspace{0.5in}
+\smaller
+\begin{verbatim}
+% gawk -f mib.routes
+Routing tables
+Destination     Gateway         Flags    Refcnt Use        Interface
+default         192.52.180.3    UG       5      63813      le0 (#1)
+127.0.0.0       127.0.0.1       U        22     31804      lo0 (#2)
+192.52.180.0    192.52.180.1    U        7      167235     le0 (#1)
+\end{verbatim}
+\end{bwslide}

@@ -1,0 +1,23 @@
+\File{figureS\-12.c},{10:03},{Oct  2 1990}
+\L{\LB{}\Tab{8}{\K{case} type\_SNMP\_PDUs\_get\_\_next\_\_request:}}
+\L{\LB{\Proc{if}}\Tab{8}{    \K{if} ((i = oid \-\> oid\_nelem \- ot \-\> ot\_name \-\> oid\_nelem) != 0}}
+\L{\LB{}\Tab{16}{    \&\& i \< IFN\_SIZE) \{}}
+\L{\LB{}\Tab{16}{\K{for} (jp = (ip = oid \-\> oid\_elements}}
+\L{\LB{}\Tab{32}{+ ot \-\> ot\_name \-\> oid\_nelem \- 1) + i;}}
+\L{\LB{}\Tab{16}{         jp \> ip; jp\-\-)}}
+\L{\LB{}\Tab{16}{    \K{if} (*jp != 0)}}
+\L{\LB{}\Tab{24}{\K{break};}}
+\L{\LB{}\Tab{16}{\K{if} (jp == ip)}}
+\L{\LB{}\Tab{16}{    oid \-\> oid\_nelem = ot \-\> ot\_name \-\> oid\_nelem;}}
+\L{\LB{}\Tab{16}{\K{else} \{}}
+\L{\LB{}\Tab{16}{    \K{if} ((new = oid\_normalize (oid, IFN\_SIZE \- i, 255))}}
+\L{\LB{}\Tab{24}{    == NULLOID)}}
+\L{\LB{}\Tab{24}{\K{return} int\_SNMP\_error\_\_status\_genErr;}}
+\L{\LB{}\Tab{16}{    \K{if} (v \-\> name)}}
+\L{\LB{}\Tab{24}{free\_SNMP\_ObjectName (v \-\> name);}}
+\L{\LB{}\Tab{16}{    v \-\> name = oid = new;}}
+\L{\LB{}\Tab{16}{\}}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}\Tab{8}{    \K{else}}}
+\L{\LB{\Proc{if}    }\Tab{16}{\K{if} (i \> IFN\_SIZE)}}
+\L{\LB{}\Tab{16}{    oid \-\> oid\_nelem = ot \-\> ot\_name \-\> oid\_nelem + IFN\_SIZE;}}

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/13 23:51:28 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/10/15 17:20:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 23:51:28 $ by $Author: brian $
+# Last Modified $Date: 2007/10/15 17:20:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -682,7 +682,7 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 			pci_dac_dma_sync_single_for_device pci_dac_set_dma_mask \
 			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
 			pci_dac_page_to_dma pci_dac_dma_to_page \
-			pci_dac_dma_to_offset vmalloc vfree \
+			pci_dac_dma_to_offset pci_module_init vmalloc vfree \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
 			read_trylock write_trylock atomic_add_return path_lookup \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti], [:], [
@@ -1189,6 +1189,9 @@ AC_DEFUN([_COMPAT_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.33  2007/10/15 17:20:14  brian
+# - fix for 2.4 kernels and pci_module_init
+#
 # Revision 0.9.2.32  2007/08/13 23:51:28  brian
 # - updated to GPLv3 headers
 #

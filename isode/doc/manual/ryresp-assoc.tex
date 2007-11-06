@@ -1,0 +1,285 @@
+\File{ryresp\-assoc.c},{11:48},{Dec 10 1990}
+\L{\LB{\C{}\/* ryresponder.c \- generic idempotent responder *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{\#include} \<stdio.h\>}}
+\L{\LB{\K{\#include} \<setjmp.h\>}}
+\L{\LB{\K{\#include} \S{}\"ryresponder.h\"\SE{}}}
+\L{\LB{\K{\#include} \<isode\/tsap.h\>         \C{}\/* for listening *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\C{}\/* DATA *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{int}     debug = 0;}}
+\L{\LB{}}
+\L{\LB{\K{static} LLog \_pgm\_log = \{}}
+\L{\LB{    \S{}\"responder.log\"\SE{}, NULLCP, NULLCP,}}
+\L{\LB{    LLOG\_FATAL \| LLOG\_EXCEPTIONS \| LLOG\_NOTICE, LLOG\_FATAL, \-1,}}
+\L{\LB{    LLOGCLS \| LLOGCRT \| LLOGZER, NOTOK}}
+\L{\LB{\};}}
+\L{\LB{LLog *pgm\_log = \&\_pgm\_log;}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{char} *myname = \S{}\"ryresponder\"\SE{};}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} jmp\_buf toplevel;}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} IFP      startfnx;}}
+\L{\LB{\K{static} IFP      stopfnx;}}
+\L{\LB{}}
+\L{\LB{\K{int}     ros\_init (), ros\_work (), ros\_indication (), ros\_lose ();}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{extern} \K{int}  errno;}}
+\L{\LB{}}
+\L{\LB{\C{}\/* RESPONDER *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{int}}\Tab{8}{ryresponder (argc, argv, host, myservice, mycontext,}}
+\L{\LB{                     dispatches, ops, start, stop)}}
+\L{\LB{\K{int}     argc;}}
+\L{\LB{\K{char}  **argv,}}
+\L{\LB{       *host,}}
+\L{\LB{       *myservice,}}
+\L{\LB{       *mycontext;}}
+\L{\LB{\K{struct} dispatch *dispatches;}}
+\L{\LB{\K{struct} RyOperation *ops;}}
+\L{\LB{IFP     start,}}
+\L{\LB{}\Tab{8}{stop;}}
+\L{\LB{\{}}
+\L{\LB{    \K{register} \K{struct} dispatch   *ds;}}
+\L{\LB{    AEI     aei;}}
+\L{\LB{    \K{struct} TSAPdisconnect   tds;}}
+\L{\LB{    \K{struct} TSAPdisconnect  *td = \&tds;}}
+\L{\LB{    \K{struct} RoSAPindication  rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject   *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (myname = rindex (argv[0], \S{}\'\/\'\SE{}))}}
+\L{\LB{}\Tab{8}{myname++;}}
+\L{\LB{    \K{if} (myname == NULL \|\| *myname == NULL)}}
+\L{\LB{}\Tab{8}{myname = argv[0];}}
+\L{\LB{}}
+\L{\LB{    isodetailor (myname, 0);}}
+\L{\LB{    \K{if} (debug = isatty (fileno (stderr)))}}
+\L{\LB{}\Tab{8}{ll\_dbinit (pgm\_log, myname);}}
+\L{\LB{    \K{else} \{}}
+\L{\LB{}\Tab{8}{\K{static} \K{char}  myfile[BUFSIZ];}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{(\K{void}) sprintf (myfile, \S{}\"\%s.log\"\SE{},}}
+\L{\LB{}\Tab{24}{(strncmp (myname, \S{}\"ros.\"\SE{}, 4)}\Tab{72}{}}
+\L{\LB{}\Tab{32}{    \&\& strncmp (myname, \S{}\"lpp.\"\SE{}, 4))}}
+\L{\LB{}\Tab{32}{\|\| myname[4] == NULL}}
+\L{\LB{}\Tab{24}{    ? myname : myname + 4);}}
+\L{\LB{}\Tab{8}{pgm\_log \-\> ll\_file = myfile;}}
+\L{\LB{}\Tab{8}{ll\_hdinit (pgm\_log, myname);}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    advise (LLOG\_NOTICE, NULLCP, \S{}\"starting\"\SE{});}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((aei = \_str2aei (host, myservice, mycontext, 0, NULLCP, NULLCP))}}
+\L{\LB{}\Tab{8}{    == NULLAEI)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"unable to resolve service: \%s\"\SE{}, PY\_pepy);}}
+\L{\LB{}}
+\L{\LB{    \K{for} (ds = dispatches; ds \-\> ds\_name; ds++)}}
+\L{\LB{}\Tab{8}{\K{if} (RyDispatch (NOTOK, ops, ds \-\> ds\_operation, ds \-\> ds\_vector, roi)}}
+\L{\LB{}\Tab{16}{== NOTOK)}}
+\L{\LB{}\Tab{8}{    ros\_adios (rop, ds \-\> ds\_name);}}
+\L{\LB{}}
+\L{\LB{    startfnx = start;}}
+\L{\LB{    stopfnx = stop;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (isodeserver (argc, argv, aei, ros\_init, ros\_work, ros\_lose, td)}}
+\L{\LB{}\Tab{8}{    == NOTOK) \{}}
+\L{\LB{}\Tab{8}{\K{if} (td \-\> td\_cc \> 0)}}
+\L{\LB{}\Tab{8}{    adios (NULLCP, \S{}\"isodeserver: [\%s] \%*.*s\"\SE{},}}
+\L{\LB{}\Tab{16}{    TErrString (td \-\> td\_reason),}}
+\L{\LB{}\Tab{16}{    td \-\> td\_cc, td \-\> td\_cc, td \-\> td\_data);}}
+\L{\LB{}\Tab{8}{\K{else}}}
+\L{\LB{}\Tab{8}{    adios (NULLCP, \S{}\"isodeserver: [\%s]\"\SE{},}}
+\L{\LB{}\Tab{16}{    TErrString (td \-\> td\_reason));}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{return} 0;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  ros\_init (vecp, vec)}}
+\L{\LB{\K{int}}\Tab{8}{vecp;}}
+\L{\LB{\K{char}  **vec;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}}\Tab{8}{    reply,}}
+\L{\LB{}\Tab{8}{    result,}}
+\L{\LB{}\Tab{8}{    sd;}}
+\L{\LB{    \K{struct} AcSAPstart   acss;}}
+\L{\LB{    \K{register} \K{struct} AcSAPstart *acs = \&acss;}}
+\L{\LB{    \K{struct} AcSAPindication  acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPindication *aci = \&acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPabort   *aca = \&aci \-\> aci\_abort;}}
+\L{\LB{    \K{register} \K{struct} PSAPstart *ps = \&acs \-\> acs\_start;}}
+\L{\LB{    \K{struct} RoSAPindication  rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject   *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (AcInit (vecp, vec, acs, aci) == NOTOK) \{}}
+\L{\LB{}\Tab{8}{acs\_advise (aca, \S{}\"initialization fails\"\SE{});}}
+\L{\LB{}\Tab{8}{\K{return} NOTOK;}}
+\L{\LB{    \}}}
+\L{\LB{    advise (LLOG\_NOTICE, NULLCP,}}
+\L{\LB{}\Tab{16}{\S{}\"A\-ASSOCIATE.INDICATION: \<\%d, \%s, \%s, \%s, \%d\>\"\SE{},}}
+\L{\LB{}\Tab{16}{acs \-\> acs\_sd, oid2ode (acs \-\> acs\_context),}}
+\L{\LB{}\Tab{16}{sprintaei (\&acs \-\> acs\_callingtitle),}}
+\L{\LB{}\Tab{16}{sprintaei (\&acs \-\> acs\_calledtitle), acs \-\> acs\_ninfo);}}
+\L{\LB{}}
+\L{\LB{    sd = acs \-\> acs\_sd;}}
+\L{\LB{}}
+\L{\LB{    \K{for} (vec++; *vec; vec++)}}
+\L{\LB{}\Tab{8}{advise (LLOG\_EXCEPTIONS, NULLCP, \S{}\"unknown argument \!\"\%s\!\"\"\SE{}, *vec);}}
+\L{\LB{}}
+\L{\LB{    reply = startfnx ? (*startfnx) (sd, acs) : ACS\_ACCEPT;}}
+\L{\LB{}}
+\L{\LB{    result = AcAssocResponse (sd, reply, reply != ACS\_ACCEPT}}
+\L{\LB{}\Tab{24}{      ? ACS\_USER\_NOREASON : ACS\_USER\_NULL,}}
+\L{\LB{}\Tab{16}{NULLOID, NULLAEI,}}
+\L{\LB{}\Tab{16}{NULLPA, NULLPC, ps \-\> ps\_defctxresult,}}
+\L{\LB{}\Tab{16}{ps \-\> ps\_prequirements, ps \-\> ps\_srequirements,}}
+\L{\LB{}\Tab{16}{SERIAL\_NONE, ps \-\> ps\_settings, \&ps \-\> ps\_connect,}}
+\L{\LB{}\Tab{16}{NULLPEP, 0, aci);}}
+\L{\LB{}}
+\L{\LB{    ACSFREE (acs);}}
+\L{\LB{}}
+\L{\LB{    \K{if} (result == NOTOK) \{}}
+\L{\LB{}\Tab{8}{acs\_advise (aca, \S{}\"A\-ASSOCIATE.RESPONSE\"\SE{});}}
+\L{\LB{}\Tab{8}{\K{return} NOTOK;}}
+\L{\LB{    \}}}
+\L{\LB{    \K{if} (reply != ACS\_ACCEPT)}}
+\L{\LB{}\Tab{8}{\K{return} NOTOK;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (RoSetService (sd, RoPService, roi) == NOTOK)}}
+\L{\LB{}\Tab{8}{ros\_adios (rop, \S{}\"set RO\/PS fails\"\SE{});}}
+\L{\LB{}}
+\L{\LB{    \K{return} sd;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  ros\_work (fd)}}
+\L{\LB{\K{int}}\Tab{8}{fd;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}}\Tab{8}{    result;}}
+\L{\LB{    caddr\_t out;}}
+\L{\LB{    \K{struct} AcSAPindication  acis;}}
+\L{\LB{    \K{struct} RoSAPindication  rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject   *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{}}
+\L{\LB{    \K{switch} (setjmp (toplevel)) \{}}
+\L{\LB{}\Tab{8}{\K{case} OK: }}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}: }}
+\L{\LB{}\Tab{8}{    \K{if} (stopfnx)}}
+\L{\LB{}\Tab{16}{(*stopfnx) (fd, (\K{struct} AcSAPfinish *) 0);}}
+\L{\LB{}\Tab{8}{\K{case} DONE:}}
+\L{\LB{}\Tab{8}{    (\K{void}) AcUAbortRequest (fd, NULLPEP, 0, \&acis);}}
+\L{\LB{}\Tab{8}{    (\K{void}) RyLose (fd, roi);}}
+\L{\LB{}\Tab{8}{    \K{return} NOTOK;}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{switch} (result = RyWait (fd, NULLIP, \&out, OK, roi)) \{}}
+\L{\LB{}\Tab{8}{\K{case} NOTOK: }}
+\L{\LB{}\Tab{8}{    \K{if} (rop \-\> rop\_reason == ROS\_TIMER)}}
+\L{\LB{}\Tab{16}{\K{break};}}
+\L{\LB{}\Tab{8}{\K{case} OK: }}
+\L{\LB{}\Tab{8}{\K{case} DONE: }}
+\L{\LB{}\Tab{8}{    ros\_indication (fd, roi);}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}: }}
+\L{\LB{}\Tab{8}{    adios (NULLCP, \S{}\"unknown return from RoWaitRequest=\%d\"\SE{}, result);}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int} ros\_indication (sd, roi)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{register} \K{struct} RoSAPindication *roi;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}}\Tab{8}{    reply,}}
+\L{\LB{}\Tab{8}{    result;}}
+\L{\LB{}}
+\L{\LB{    \K{switch} (roi \-\> roi\_type) \{}}
+\L{\LB{}\Tab{8}{\K{case} ROI\_INVOKE: }}
+\L{\LB{}\Tab{8}{\K{case} ROI\_RESULT: }}
+\L{\LB{}\Tab{8}{\K{case} ROI\_ERROR: }}
+\L{\LB{}\Tab{8}{    adios (NULLCP, \S{}\"unexpected indication type=\%d\"\SE{}, roi \-\> roi\_type);}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} ROI\_UREJECT: }}
+\L{\LB{}\Tab{8}{    \{}}
+\L{\LB{}\Tab{16}{\K{register} \K{struct} RoSAPureject   *rou = \&roi \-\> roi\_ureject;}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{\K{if} (rou \-\> rou\_noid)}}
+\L{\LB{}\Tab{16}{    advise (LLOG\_EXCEPTIONS, NULLCP,}}
+\L{\LB{}\Tab{24}{    \S{}\"RO\-REJECT\-U.INDICATION\/\%d: \%s\"\SE{},}}
+\L{\LB{}\Tab{24}{    sd, RoErrString (rou \-\> rou\_reason));}}
+\L{\LB{}\Tab{16}{\K{else}}}
+\L{\LB{}\Tab{16}{    advise (LLOG\_EXCEPTIONS, NULLCP,}}
+\L{\LB{}\Tab{24}{    \S{}\"RO\-REJECT\-U.INDICATION\/\%d: \%s (id=\%d)\"\SE{},}}
+\L{\LB{}\Tab{24}{    sd, RoErrString (rou \-\> rou\_reason),}}
+\L{\LB{}\Tab{24}{    rou \-\> rou\_id);}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} ROI\_PREJECT: }}
+\L{\LB{}\Tab{8}{    \{}}
+\L{\LB{}\Tab{16}{\K{register} \K{struct} RoSAPpreject   *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{\K{if} (ROS\_FATAL (rop \-\> rop\_reason))}}
+\L{\LB{}\Tab{16}{    ros\_adios (rop, \S{}\"RO\-REJECT\-P.INDICATION\"\SE{});}}
+\L{\LB{}\Tab{16}{ros\_advise (rop, \S{}\"RO\-REJECT\-P.INDICATION\"\SE{});}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{case} ROI\_FINISH: }}
+\L{\LB{}\Tab{8}{    \{}}
+\L{\LB{}\Tab{16}{\K{register} \K{struct} AcSAPfinish *acf = \&roi \-\> roi\_finish;}}
+\L{\LB{}\Tab{16}{\K{struct} AcSAPindication  acis;}}
+\L{\LB{}\Tab{16}{\K{register} \K{struct} AcSAPabort *aca = \&acis.aci\_abort;}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{advise (LLOG\_NOTICE, NULLCP, \S{}\"A\-RELEASE.INDICATION\/\%d: \%d\"\SE{},}}
+\L{\LB{}\Tab{24}{sd, acf \-\> acf\_reason);}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{reply = stopfnx ? (*stopfnx) (sd, acf) : ACS\_ACCEPT;}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{result = AcRelResponse (sd, reply, ACR\_NORMAL, NULLPEP,}}
+\L{\LB{}\Tab{24}{    0, \&acis);}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{ACFFREE (acf);}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{\K{if} (result == NOTOK)}}
+\L{\LB{}\Tab{16}{    acs\_advise (aca, \S{}\"A\-RELEASE.RESPONSE\"\SE{});}}
+\L{\LB{}\Tab{16}{\K{else}}}
+\L{\LB{}\Tab{16}{    \K{if} (reply != ACS\_ACCEPT)}}
+\L{\LB{}\Tab{24}{\K{break};}}
+\L{\LB{}\Tab{16}{longjmp (toplevel, DONE);}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}\Tab{8}{\C{}\/* NOTREACHED *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}: }}
+\L{\LB{}\Tab{8}{    adios (NULLCP, \S{}\"unknown indication type=\%d\"\SE{}, roi \-\> roi\_type);}}
+\L{\LB{    \}}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  ros\_lose (td)}}
+\L{\LB{\K{struct} TSAPdisconnect *td;}}
+\L{\LB{\{}}
+\L{\LB{    \K{if} (td \-\> td\_cc \> 0)}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"TNetAccept: [\%s] \%*.*s\"\SE{},}}
+\L{\LB{}\Tab{16}{TErrString (td \-\> td\_reason), td \-\> td\_cc, td \-\> td\_cc,}}
+\L{\LB{}\Tab{16}{td \-\> td\_data);}}
+\L{\LB{    \K{else}}}
+\L{\LB{}\Tab{8}{adios (NULLCP, \S{}\"TNetAccept: [\%s]\"\SE{}, TErrString (td \-\> td\_reason));}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{...}}

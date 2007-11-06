@@ -1,0 +1,101 @@
+\begin{thebibliography}{Ros90b}
+
+\bibitem[BK91]{Cosine.NA}
+P.~Barker and S.E. Kille.
+\newblock The {COSINE} and {Internet} {X.500} schema, March 1991.
+\newblock Internet Draft: draft-ietf-osids-cosinex500-03.txt.
+
+\bibitem[BR89]{QUIPU.Navigate}
+P.~Barker and C.J. Robbins.
+\newblock Directory navigation in the quipu x.500 system.
+\newblock In {\em UNIX \& Connectivity}, pages 235--244. National UNIX Systems
+  User Group The Netherlands, November 1989.
+
+\bibitem[CCI88]{CCITT.Directory}
+{The Directory~---~Overview of Concepts, Models, and Service}.
+\newblock International Telegraph and Telephone Consultative Committee,
+  December 1988.
+\newblock Recommendation X.500.
+
+\bibitem[ISO88]{ISO.Directory}
+{Information Processing Systems~---~Open Systems Interconnection~---~The
+  Directory~---~Overview of Concepts, Models, and Service}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, December 1988.
+\newblock International Standard 9594-1.
+
+\bibitem[IUC82]{IUCN.Mammal}
+{The IUCN Mammal Red Data Book}.
+\newblock International Union for Conservation of Nature and Natural Resources,
+  1982.
+\newblock Unwin Brothers Limited, The Gresham Press, Woking, Surrey, UK. ISBN
+  2--88032--600--1.
+
+\bibitem[Kil89a]{String.Addresses}
+Stephen~E. Kille.
+\newblock {A string encoding of Presentation Address}.
+\newblock Research Note RN/89/14, Department of Computer Science, University
+  College London, February 1989.
+
+\bibitem[Kil89b]{QUIPU.Design}
+Stephen~E. Kille.
+\newblock {The Design of QUIPU}.
+\newblock Research Note RN/89/19, Department of Computer Science, University
+  College London, March 1989.
+
+\bibitem[Kil89c]{thorn-na}
+Stephen~E. Kille.
+\newblock {The THORN X.500 Naming Architecture}.
+\newblock THORN Project Internal Report UCL-45, revision 6.1, University
+  College London, January 1989.
+
+\bibitem[Kil90]{UFN}
+S.E. Kille.
+\newblock Using the osi directory to achieve user friendly naming.
+\newblock Research Note RN/90/29, Department of Computer Science, University
+  College London, February 1990.
+
+\bibitem[KR78]{C.Language}
+Brian~W. Kernighan and Dennis~M. Ritchie.
+\newblock {\em {The C Programming Language}}.
+\newblock Software Series. Prentice-Hall, Inc., Englewood Cliffs, New Jersey,
+  1978.
+
+\bibitem[Pos81]{TCP}
+Jon~B. Postel.
+\newblock {Transmission Control Protocol}.
+\newblock Request for Comments 793, DDN Network Information Center, SRI
+  International, September 1981.
+\newblock See also \milstd/ 1778.
+
+\bibitem[RC86]{ISO.on.DDN}
+Marshall~T. Rose and Dwight~E. Cass.
+\newblock {OSI Transport Services on top of the TCP}.
+\newblock {\em Computer Networks and ISDN Systems}, 12(3), 1986.
+\newblock Also available as NRTC Technical Paper \#700.
+
+\bibitem[Ros90a]{PSI.Fred}
+Marshall~T. Rose.
+\newblock {\em {PSI White Pages Pilot Project: User's Handbook}}, 1990.
+\newblock ISODE documentation set.
+
+\bibitem[Ros90b]{PSI.Admin}
+Marshall~T. Rose.
+\newblock {\em {PSI White Pages Project: Administrator's Guide}}, 1990.
+\newblock ISODE documentation set.
+
+\bibitem[Ros90c]{Open.Book}
+Marshall~T. Rose.
+\newblock {\em {The Open Book: A Practical Perspective on Open Systems
+  Interconnection}}.
+\newblock Prentice-hall, 1990.
+\newblock ISBN 0--13--643016--3.
+
+\bibitem[Ros91]{little.black.book}
+Marshall~T. Rose.
+\newblock {\em {The Little Black Book: Mail Bonding with OSI Directory
+  Services}}.
+\newblock Prentice-hall, 1991.
+\newblock ISBN 0--13--683219--5.
+
+\end{thebibliography}

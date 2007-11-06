@@ -1,0 +1,48 @@
+% run this through LaTeX with the appropriate wrapper
+
+\smaller
+\begin{verbatim}
+###########################################################
+# 1. Information about your DSA
+###########################################################
+
+dsa             "Spectacled Bear"
+
+
+###########################################################
+# 2. Information about your organization
+###########################################################
+
+organization    "Performance Systems International"
+domain          psi.com
+street          "11800 Sunrise Valley Drive"
+town            "Reston"
+state           "Virginia"
+zipcode         "22091"
+telephone       "+1 703-620-6651"
+
+fax             "+1 703-620-4586"
+
+unit            "Development"
+
+description     "value-added provider of networking services"
+
+
+###########################################################
+# 3. Information about you
+###########################################################
+
+firstname       "Wengyik"
+lastname        "Yeong"
+
+mailbox         "yeongw@psi.com"
+title           "Staff Scientist"
+password        "secret"
+
+extension       "x1234"
+\end{verbatim}
+
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\empty

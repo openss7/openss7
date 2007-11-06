@@ -1,0 +1,131 @@
+\File{passwd\-make.make},{14:41},{Oct 27 1990}
+\L{\LB{\#   Instructions to Make, for compilation of ROS\-based password lookup service}}
+\L{\LB{}}
+\L{\LB{BINDIR}\Tab{8}{=}\Tab{16}{\/usr\/new\/}}
+\L{\LB{SBINDIR}\Tab{8}{=}\Tab{16}{\/usr\/etc\/}}
+\L{\LB{ETCDIR}\Tab{8}{=}\Tab{16}{\/usr\/etc\/}}
+\L{\LB{}}
+\L{\LB{CC}\Tab{8}{=}\Tab{16}{\/bin\/cc}}
+\L{\LB{CFLAGS}\Tab{8}{=}\Tab{16}{\-g    \$(OPTIONS)}}
+\L{\LB{LINT}\Tab{8}{=}\Tab{16}{lint}}
+\L{\LB{LFLAGS}\Tab{8}{=}\Tab{16}{\-bhuz \$(OPTIONS)}}
+\L{\LB{LLIBS   =}\Tab{16}{\-lisode}}
+\L{\LB{LD}\Tab{8}{=}\Tab{16}{ld}}
+\L{\LB{LDCC}\Tab{8}{=}\Tab{16}{\/bin\/cc}}
+\L{\LB{LDFLAGS}\Tab{8}{=}\Tab{16}{\-g}}
+\L{\LB{LIBES}\Tab{8}{=}\Tab{16}{\-lisode}}
+\L{\LB{}}
+\L{\LB{HFILES}\Tab{8}{=}\Tab{16}{ryinitiator.h ryresponder.h}}
+\L{\LB{CFILES}\Tab{8}{=}\Tab{16}{lookupd.c lookup.c ryinitiator.c ryresponder.c}}
+\L{\LB{RYFILES}\Tab{8}{=}\Tab{16}{lookup.ry}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\# Here it is...}}
+\L{\LB{}}
+\L{\LB{all:}\Tab{16}{lookupd lookup}}
+\L{\LB{inst\-all:}\Tab{16}{inst\-lookupd inst\-lookup \# manuals}}
+\L{\LB{install:}\Tab{16}{inst\-all clean}}
+\L{\LB{lint:}\Tab{16}{l\-lookupd l\-lookup}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\# lookupd}}
+\L{\LB{}}
+\L{\LB{inst\-lookupd:}\Tab{16}{\$(SBINDIR)ros.lookup}}
+\L{\LB{}}
+\L{\LB{\$(SBINDIR)ros.lookup:}\Tab{24}{lookupd}}
+\L{\LB{}\Tab{16}{\-cp \$@ zros.lookup}}
+\L{\LB{}\Tab{16}{\-rm \-f \$@}}
+\L{\LB{}\Tab{16}{cp lookupd \$@}}
+\L{\LB{}\Tab{16}{\-@ls \-gls \$@}}
+\L{\LB{}\Tab{16}{\-@echo \"\"}}
+\L{\LB{}}
+\L{\LB{lookupd:}\Tab{16}{lookupd.o PasswordLookup\-Rops.o \!}}
+\L{\LB{}\Tab{24}{ryresponder.o PasswordLookup\_tables.o}}
+\L{\LB{}\Tab{16}{\$(LDCC) \$(LDFLAGS) \-o \$@ lookupd.o \!}}
+\L{\LB{}\Tab{24}{PasswordLookup\-Rops.o \!}}
+\L{\LB{}\Tab{24}{ryresponder.o }}
+\L{\LB{}\Tab{24}{PasswordLookup\_tables.o \!}}
+\L{\LB{}\Tab{24}{\$(LIBES)}}
+\L{\LB{}}
+\L{\LB{l\-lookupd:}\Tab{16}{PasswordLookup\-ops.c PasswordLookup\_tables.c true}}
+\L{\LB{}\Tab{16}{\$(LINT) \$(LFLAGS) \-DPERFORMER lookupd.c \!}}
+\L{\LB{}\Tab{24}{PasswordLookup\-ops.c ryresponder.c \!}}
+\L{\LB{}\Tab{24}{PasswordLookup\_tables.c \$(LLIBS)}}
+\L{\LB{}}
+\L{\LB{lookupd.o:}\Tab{16}{ryresponder.h PasswordLookup\-ops.h \!}}
+\L{\LB{}\Tab{24}{PasswordLookup\-types.h}}
+\L{\LB{}}
+\L{\LB{PasswordLookup\-Rops.o:}\Tab{24}{PasswordLookup\-ops.c PasswordLookup\-ops.h}}
+\L{\LB{}\Tab{16}{\$(CC) \$(CFLAGS) \-DPERFORMER \-c PasswordLookup\-ops.c}}
+\L{\LB{}\Tab{16}{mv PasswordLookup\-ops.o \$@}}
+\L{\LB{}}
+\L{\LB{ryresponder.o:}\Tab{16}{ryresponder.h}}
+\L{\LB{}}
+\L{\LB{PasswordLookup\_tables.o: PasswordLookup\_tables.c PasswordLookup\-types.h}}
+\L{\LB{}}
+\L{\LB{PasswordLookup\_tables.c PasswordLookup\-types.h:}\Tab{48}{PasswordLookup\-asn.py}}
+\L{\LB{}\Tab{16}{pepsy \-A \-f \-h \-m PasswordLookup\-asn.py}}
+\L{\LB{}}
+\L{\LB{PasswordLookup\-asn.py:}\Tab{24}{lookup.ry}}
+\L{\LB{}\Tab{16}{rosy \-m \-pepsy \-o \$@ lookup.ry}}
+\L{\LB{PasswordLookup\-ops.c:}\Tab{24}{lookup.ry}}
+\L{\LB{PasswordLookup\-ops.h:}\Tab{24}{lookup.ry}}
+\L{\LB{PasswordLookup\-stubs.c:}\Tab{24}{lookup.ry}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\# lookup}}
+\L{\LB{}}
+\L{\LB{inst\-lookup:}\Tab{16}{\$(BINDIR)lookup}}
+\L{\LB{}}
+\L{\LB{\$(BINDIR)lookup:}\Tab{24}{lookup}}
+\L{\LB{}\Tab{16}{\-cp \$@ zlookup}}
+\L{\LB{}\Tab{16}{\-rm \-f \$@}}
+\L{\LB{}\Tab{16}{cp lookup \$@}}
+\L{\LB{}\Tab{16}{\-@ls \-gls \$@}}
+\L{\LB{}\Tab{16}{\-@echo \"\"}}
+\L{\LB{}}
+\L{\LB{lookup:}\Tab{16}{lookup.o PasswordLookup\-Iops.o \!}}
+\L{\LB{}\Tab{24}{ryinitiator.o PasswordLookup\_tables.o}}
+\L{\LB{}\Tab{16}{\$(LDCC) \$(LDFLAGS) \-o \$@ lookup.o \!}}
+\L{\LB{}\Tab{24}{PasswordLookup\-Iops.o \!}}
+\L{\LB{}\Tab{24}{ryinitiator.o \!}}
+\L{\LB{}\Tab{24}{PasswordLookup\_tables.o \!}}
+\L{\LB{}\Tab{24}{\$(LIBES)}}
+\L{\LB{}}
+\L{\LB{l\-lookup:}\Tab{16}{PasswordLookup\-ops.c PasswordLookup\_tables.c true}}
+\L{\LB{}\Tab{16}{\$(LINT) \$(LFLAGS) \-DINVOKER lookup.c \!}}
+\L{\LB{}\Tab{24}{PasswordLookup\-ops.c ryinitiator.c \!}}
+\L{\LB{}\Tab{24}{PasswordLookup\-stubs.c \!}}
+\L{\LB{}\Tab{24}{PasswordLookup\_tables.c \$(LLIBS)}}
+\L{\LB{}}
+\L{\LB{lookup.o:}\Tab{16}{ryinitiator.h PasswordLookup\-ops.h PasswordLookup\-types.h}}
+\L{\LB{}}
+\L{\LB{PasswordLookup\-Iops.o:}\Tab{24}{PasswordLookup\-ops.c PasswordLookup\-ops.h}}
+\L{\LB{}\Tab{16}{\$(CC) \$(CFLAGS) \-DINVOKER \-c PasswordLookup\-ops.c}}
+\L{\LB{}\Tab{16}{mv PasswordLookup\-ops.o \$@}}
+\L{\LB{}}
+\L{\LB{ryinitiator.o:}\Tab{16}{ryinitiator.h}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\# manual pages}}
+\L{\LB{}}
+\L{\LB{MANUALS}\Tab{8}{=}\Tab{16}{lookupd.8c lookup.1c}}
+\L{\LB{}}
+\L{\LB{manuals:;}\Tab{16}{install \-c \-m 0444 lookupd.8c \!}}
+\L{\LB{}\Tab{24}{\/usr\/man\/man8\/lookupd.8c}}
+\L{\LB{}\Tab{16}{install \-c \-m 0444 lookup.1c \/usr\/man\/mann\/lookup.n}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\# clean}}
+\L{\LB{}}
+\L{\LB{clean:;}\Tab{16}{rm \-f *.o PasswordLookup* lookupd lookup z* \_* core}}
+\L{\LB{}}
+\L{\LB{grind:;}\Tab{16}{iprint READ\-ME Makefile}}
+\L{\LB{}\Tab{16}{tgrind \-lc \$(HFILES) \$(CFILES)}}
+\L{\LB{}\Tab{16}{tgrind \-lpepy \-d ..\/..\/pepy\/grindefs \$(RYFILES)}}
+\L{\LB{}\Tab{16}{@echo \$(MANUALS) \| \!}}
+\L{\LB{}\Tab{24}{tr \" \" \"\!012\" \| \!}}
+\L{\LB{}\Tab{24}{sed \-e \"s\%.*\%itroff \-man \&\%\" \| \!}}
+\L{\LB{}\Tab{24}{sh \-ve}}
+\L{\LB{}}
+\L{\LB{true:;}}

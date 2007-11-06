@@ -1,0 +1,16 @@
+\File{figureS\-4.c},{10:42},{Jan  7 1991}
+\L{\LB{    PE}\Tab{8}{    pe;}}
+\L{\LB{    PS}\Tab{8}{    ps;}}
+\L{\LB{}}
+\L{\LB{    pe = NULLPE;}}
+\L{\LB{\Proc{if}    \K{if} ((ps = ps\_alloc (dg\_open)) == NULLPS}}
+\L{\LB{}\Tab{8}{    \|\| dg\_setup (ps, fd, MAXDGRAM, rfx, wfx, cfx) == NOTOK) \{}}
+\L{\LB{}\Tab{8}{\K{if} (ps == NULLPS)}}
+\L{\LB{}\Tab{8}{    advise (LLOG\_EXCEPTIONS, NULLCP, \S{}\"ps\_alloc: out of memory (\%s)\"\SE{},}}
+\L{\LB{}\Tab{16}{    source);}}
+\L{\LB{}\Tab{8}{\K{else}}}
+\L{\LB{}\Tab{8}{    advise (LLOG\_EXCEPTIONS, NULLCP, \S{}\"dg\_setup: \%s (\%s)\"\SE{},}}
+\L{\LB{}\Tab{16}{    ps\_error (ps \-\> ps\_errno), source);}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{goto} out;}}
+\L{\LB{    \}}}

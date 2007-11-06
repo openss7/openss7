@@ -1,0 +1,27 @@
+-- some of the types
+
+Service-Requirements ::=
+    SEQUENCE {
+	version[0]
+	    Versions,
+
+	credentials[1]
+	    Credentials OPTIONAL,
+
+	extensions[2]
+	    SET OF Extension OPTIONAL
+    }
+
+Versions ::=
+    BIT STRING { version-1 (0) }
+    
+Service-Diagnostic ::=
+    SET {
+	versions[0]
+	    SEQUENCE OF Versions OPTIONAL,
+
+	reason
+	    Diagnostic-Reason
+    }
+
+...

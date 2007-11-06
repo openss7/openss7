@@ -1,5 +1,5 @@
-OpenSS7 NETPERF Utility -- history of user visible changes.  2007-08-19
-$Id: NEWS,v 0.9.2.42 2007/08/19 12:39:50 brian Exp $
+OpenSS7 NETPERF Utility -- history of user visible changes.  2007-10-18
+$Id: NEWS,v 0.9.2.43 2007/10/15 19:04:01 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -269,7 +269,7 @@ SCTP XTI API tests depend upon the availability of the OpenSS7 STREAMS
 implementation of SCTP.  Some binary and source packages for `LiS
 STREAMS', `Linux Fast-STREAMS', the `strxnet' XTI/TLI library and the
 `strsctp' package are available from the OpenSS7 Project download page
-(http://www.openss7.org/download.html).  *Note Introduction:
+(http://www.openss7.org/download.html).  *note Introduction:
 (libxnet)Top.
 
 Under Linux, the TCP and UDP XTI API tests depend upon the availability
@@ -277,7 +277,7 @@ of the OpenSS7 INET driver.  Some binary and source packages for `LiS
 STREAMS', `Linux Fast-STREAMS', the `strxnet' XTI/TLI library and the
 `strinet' package (*note Introduction: (strinet)Top.) are available from
 the OpenSS7 Project download page
-(http://www.openss7.org/download.html).  *Note Introduction:
+(http://www.openss7.org/download.html).  *note Introduction:
 (libxnet)Top.
 
 This release also provides updates to the antiquated `netperf-2.1'

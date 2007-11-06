@@ -1,0 +1,13 @@
+.PS 6i
+.ps 20
+## figure 3c
+B1:	box "TCP/IP-only"
+B2:	box "``HYBRID''" "" "HIGHER-LEVEL ISO" "" "TCP/IP" \
+		with .w at (B1.e.x+linewid, B1.e.y)
+B3:	box "``DUAL''" "" "TCP/IP" "" "FULL ISO" with .n at (B1.s.x, B1.s.y-lineht)
+B4:	box "ISO-only" with .w at (B3.e.x+linewid, B3.e.y)
+##
+	line dashed from (B2.sw.x+boxwid/4, B2.sw.y) \
+		    to (B3.ne.x, B3.ne.y-boxht/3)
+##
+.PE

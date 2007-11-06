@@ -1,0 +1,44 @@
+<attribute-value> ::= <NumericValue>
+                    | <ASNValue>
+                            -- For unknown syntaxes & photos
+                    | <DNValue>
+                    | <OIDValue>
+                            -- OID & ObjectClass
+                    | <PSAPvalue>
+                    | <StringValue>
+                            -- Used for:
+                            --     CaseIgnoreString, CaseExactString,
+                            --     PrintableString, CountryString,
+                            --     OctetString, IA5String, Password
+                            --     TelephoneNumber
+                    | <GuideValue>
+                    | <TelexNumberValue>
+                    | <TeletexTerminalIdentifierValue>
+                    | <FacsimileTelephoneNumberValue>
+                    | <PostalAddressValue>
+                    | <MailboxValue>
+                    | <UTCTimeValue>
+                    | <DeliveryValue>
+                    | <IntegerValue>
+                    | <BooleanValue>
+                    | <ACLValue>
+                    | <SchemaValue>
+                    | <EdbInfoValue>             
+                    | <otherValues>
+
+<otherValues>   ::= ANY -- can be user defined.
+
+<namevalue>     ::= <namelist> ["#"]
+<namelist>      ::= <name> | <namelist> "$" <name>
+
+<attribute>     ::= <oid> "=" <avlist>
+<avlist>        ::= <attribute-value> | <avlist> "&" <attribute-value>
+<rdn>           ::= <attribute> | <attribute> "%" <rdn>
+<name>          ::= <rdn> | <rdn> "@" <name>
+                                -- most significant first
+
+-- An example name might be:
+--        ``c=GB @ o=UCL % locality=London @ ou=CS''
+-- Finally, this can be assembled together to give a format for a textual
+-- representation of an Entry Data Block.
+

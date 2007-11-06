@@ -1,0 +1,25 @@
+.PS
+.ps 20
+boxwid	=	2*boxwid
+define boxit @
+	box "$1" with .n at ($2.s.x, $2.s.y-lineht/2)
+	arrow from last box.n to $2.s
+@
+## figure 4
+B1:	box "APPLICATION"
+B2:	boxit(PRESENTATION,B1)
+B3:	boxit(SESSION,B2)
+B4:	box "TRANSPORT" with .n at (B3.s.x, B3.s.y-lineht)
+	arrow from B4.n to B3.s
+B5:	boxit(NETWORK,B4)
+##
+B8:	box with .n at (B1.n.x+boxwid+linewid, B1.n.y) height (B1.n.y-B3.s.y) \
+	"APPLICATION"
+B9:	box "TRANSPORT" with .n at (B8.s.x, B4.n.y)
+	arrow from B9.n to B8.s
+B10:	boxit(NETWORK,B9)
+##
+	move to (B5.s.x, B5.s.y-lineht); "ISO stack"
+	move to (B10.s.x, B10.s.y-lineht); "DDN stack"
+##
+.PE

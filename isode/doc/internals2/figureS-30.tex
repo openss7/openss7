@@ -1,0 +1,12 @@
+\File{figureS\-30.c},{12:20},{Jan 13 1991}
+\L{\LB{\Proc{if}            \K{if} (idx = do\_pass (msg, offset, vu)) \{}}
+\L{\LB{                \K{int}     status = parm \-\> error\_\_status;}}
+\L{\LB{}}
+\L{\LB{                (\K{void}) do\_pass (msg, type\_SNMP\_PDUs\_rollback, vu);}}
+\L{\LB{}}
+\L{\LB{                parm \-\> error\_\_status = status;}}
+\L{\LB{            \}}}
+\L{\LB{            \K{else} \{}}
+\L{\LB{                (\K{void}) do\_pass (msg, type\_SNMP\_PDUs\_commit, vu);}}
+\L{\LB{                gc\_set ();}}
+\L{\LB{            \}}}

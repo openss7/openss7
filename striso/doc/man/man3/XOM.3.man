@@ -121,19 +121,141 @@ sort-adjacent-labels
 Various.
 .\"
 .\"
+.de #v
+.ad l
+.hy 0
+..
+.\"
+.\"
+.SH TYPES
+.PP
+.TP
+.B OM_sint
+.IR Sint :
+the positive and negative integers representable in 16 bits (2's complement).
+.TP
+.B OM_sint16
+.IR Sint16 :
+the positive and negative integers representable in 16 bits (2's complement).
+.TP
+.B OM_sint32
+.IR Sint32 :
+the positive and negative integers representable in 32 bits (2's complement).
+.TP
+.B OM_uint
+.IR Uint :
+the non-negative integers representable in 16 bits.
+.TP
+.B OM_uint16
+.IR Uint16 :
+the non-negative integers representable in 16 bits.
+.TP
+.B OM_uint32
+.IR Uint32 :
+the non-negative integers representable in 32 bits.
+.TP
+.B OM_double
+.IR Double :
+the positive and negative floating point numbers representable in 64 bits.
+.TP
+.B OM_boolean
+.IR Boolean :
+type definition for a Boolean data value.
+.TP
+.B OM_descriptor
+.IR Descriptor :
+type definition for describing an attribute type and value.
+.TP
+.B OM_enumeration
+.IR Enumeration :
+type definition for an Enumerated data value.
+.TP
+.B OM_exclusions
+.IR Exclusions :
+type definition for 'exclusions' argument for the Get function.
+.TP
+.B OM_integer
+.IR Integer :
+type definition for an Integer data value.
+.TP
+.B OM_modification
+.IR Modifications :
+type definition for 'modifications' argument for the Put function.
+.TP
+.B OM_object
+.IR Object :
+type definition for a handle to either a private or a public object.
+.TP
+.B OM_object_identifier
+.IR Object\0Identifier :
+type definition for an Object Identifier data value.
+.TP
+.B OM_private_object
+.IR Private\0Object :
+type definition for a handle to an object in an implementation-defined, or private, representation.
+.TP
+.B OM_public_object
+.IR Public\0Object :
+type definition for a defined representation of an object that can be directly interrogated by a programmer.
+.TP
+.B OM_real
+.IR Real :
+type definition for a Real data value.
+.TP
+.B OM_return_code
+.IR Return\0Code :
+type definition for a value returned from all OM functions indicating either that the function succeeded or why it failed.
+.TP
+.B OM_string
+.IR String :
+type definition for a data value of 'String' syntax.
+.TP
+.B OM_syntax
+.IR Syntax :
+type definition for identifying a syntax type.
+.TP
+.B OM_type
+.IR Type :
+type definition for an OM attribute type.
+.TP
+.B OM_type_list
+.IR Type\0List :
+type definition for a sequence of OM attribute types.
+.TP
+.B OM_value
+.IR Value :
+type definition for representing a data value.
+.TP
+.B OM_value_length
+.IR Value\0Length :
+type definition for the length of value.
+.TP
+.B OM_value_position
+.IR Value\0Position :
+type definition for designating a particular location within a String data value.
+.TP
+.B OM_workspace
+.IR Workspace :
+type definition for identifying an application-specific API that implements OM, such as directory or message handling.
+.TE
+.\"
+.\"
 .SH FUNCTIONS
 .TP
 .BR om_copy ()
+.IR Copy ():
 This function creates an independent copy of an existing private object, and
 all of its subobjects.  The copy is placed in the workspace specified by the
 client.
 .TP
 .BR om_copy_value ()
+.IR Copy-Value ():
 This function replaces an existing attribute value or inserts a new value in
 one private object with a copy of an existing attribute value found in
 another.  Both values must be strings.
 .TP
 .BR om_create ()
+.IR Create ():
 This function creates a new private object that is an instance of a particular
 calss.  The object may be initalised with the attribute values specified as
 initial in the class' definition.
@@ -143,6 +265,7 @@ classes, but rather only those indicated, by a package's definition, as having
 this property.
 .TP
 .BR om_decode ()
+.IR Decode ():
 This function creates a new private object that is an exact, but independent,
 copy of the object that an existing private object encodes.  The encoding
 identifies the class of the existing object and the rules used to encode it.
@@ -154,10 +277,12 @@ rather only those indicated, by a package's definition, as having this
 property.
 .TP
 .BR om_delete ()
+.IR Delete ():
 This function deletes a service-generated public object, or makes a private
 object inaccessible.
 .TP
 .BR om_encode ()
+.IR Encode ():
 This function creates a new private object that encodes an existing private
 object for conveyance between workspaces, transport via a newtork, or storage
 in a file.  The client identifies the encoding rules that the service is to
@@ -169,6 +294,7 @@ rather only those indicated, by a package's definition, as having this
 property.
 .TP
 .BR om_get ()
+.IR Get ():
 This function creates a new public object that is an exact, but independent,
 copy of an existing private object.  The client may request certain
 exxclusions, each of which reduces the copy to a portion of the original.  The
@@ -181,6 +307,7 @@ attributes, copies of (not handles for) subobjects, or all attribute values
 (revealing only an attribute's presence).
 .TP
 .BR om_instance ()
+.IR Instance ():
 This function determines whether an object is an instance of a particular
 class.  The client can determin an object's class by inspection.  The utility
 of this function is that it reveals that an object is an instance of a
@@ -188,6 +315,7 @@ particular class, even if the object is an instance of a subclass of that
 class.
 .TP
 .BR om_put ()
+.IR Put ():
 This function palces or replaces, in one private object, copies of the
 attribute values of another public or private object.
 .sp
@@ -198,16 +326,19 @@ be substituted for any existing destination values or for the values at
 specified postitions in the destination attribute.
 .TP
 .BR om_read ()
+.IR Read ():
 This function reads a segment of a value of an attribute of a private object.
 The value must be a string.  The value may first be converted from one syntax
 to another.  The function enables the client to read an arbitrarily long value
 without requiring that the service place a copy of the entire value in memory.
 .TP
 .BR om_remove ()
+.IR Remove ():
 This function removes and discards particular values of an attribute of a
 private object.  The attribute itself is removed if no values remain.
 .TP
 .BR om_write ()
+.IR Write ():
 This function writes a segment of a value of an attribute to a private object.
 The value must be a string.  The segment may first be converted from one syntax
 to another.  The written segment is made the value's last, any elements beyond
@@ -217,12 +348,259 @@ long value without having to place a copy of the entire value in memory.
 .\"
 .SH DESCRIPTION
 .PP
-In the C interface, the functions are realized by macros.  The function protocol int he C Synopsis clause of a
-function's specification is only an exposition aid.
+The XOM interface
+.[
+xom
+.]
+is designed to be used with other, application-specific
+APIs, for example, for
+application control,
+.[
+xap
+.]
+management,
+.[
+xmp
+.]
+message transfer,
+.[
+xms
+.]
+directory access,
+.[
+xds
+.]
+or file transfer.
+.[
+xftam
+.]
+Such an API typically defines both a set of functions and a set of structured
+information objects that serve as the functions' arguments and results.  The
+OM interface defines a general information architecture for structuring such
+information objects,
+see
+.RI \*(lq TYPES ,\*(rq
+above,
+as we as general functions for manipulating them,
+see
+.RI \*(lq FUNCTIONS ,\*(rq
+above.  Both the architecture and the functions are independent of the
+application-specific APIs they support.
 .PP
-The intent of the interface definition is that each function is atomic, that is, that it either carries out its
-assigned task in full and reports success, or fails to carry out even a portion of the task and reports an exception.
-However, the service does not guarantee that a task will not occasionally be carried out in part but not in full.
+The OM information architecture is object-oriented and thus enjoys the
+modularity and extensibility inherent in that approach.  Collections of data
+are referred to as objects, objects of like structure are grouped together
+into classes, and classes are related to one another by means of subclassing.
+The information architecture is described in detail in XOM.
+.[
+xom
+.]
+Amoung its important features, however, is that wherever an
+application-specific API requires an instance of a particular class, an
+instance of any of that class' subclasses may be supplied instead.  This
+permits the refinement and extension of objects and the use of the extended
+objects in application-specific APIs.
+.PP
+Note: While OM takes an object-oriented view of structure information, it does
+not incorporate all the characteristics of other object-oriented systems.  In
+particular, the implementations of the functions for manipulating objects are
+separate from the definitions of the objects' classes, and there is no notion
+of encapsulating or hiding the information associated with objects (although
+the interface hides the information's representation).
+.PP
+The XOM interface is specifically designed for use with application-specific
+APIs that provide OSI services.  The objects addressed by the information
+architecture, therefore, are those arising from ASN.1,
+.[
+x680
+.]
+the descriptive tool
+used pervasively in OSI.  By providing tools for manipulating ASN.1 objects,
+the OM interface shields the client from much (but not all) of ASN.1's
+complexity.
+.PP
+While it presents to the client a single model of information, the OM
+interface neither defines not unnecessarily constrains the representation of
+the objects that the service maintains internally.  The interface is designed
+as a general information management facility that can accomodate the varied
+objects required by application-specific OSI APIs.  Therefore, no constaints
+are placed on the structure, size or location of the information objects held
+by the service.  The internal representation of such objects, which may be
+application-specific, is hidden from the client; the objects can be accessed
+only using OM interface functions.
+.PP
+Objects are conveyed between the client and the service, in whole or in part,
+using sequences of descriptors.  Unlike that of the objects themselves, the
+representation of such sequences is part of the OM interface specification.
+.PP
+The extent to which the OM interface is able to hide the internal
+representation of objects is insufficient to fully meet the needs of
+environments supporting several application-specific APIs.  Such APIs may
+impose varied and even conflicting requirements upon the internal
+representations of objects, and may even be implemented by different vendors.
+Therefore, the OM interface is designed to permit any number of OM interface
+impelementations to coexist, each representing objects differently.  This is
+accomplished by means of workspaces.
+.PP
+The various OM interface implementations cannot be completely independent.
+Two different application-specific services using two different OM interface
+implementations may have to exchange information.  A message transfer system,
+for example, may required a name or address obtained from a directory system.
+The OM interface enables such information exchange by providing a single OM
+inteface (used by all application-specific services) to any number of
+implementations of that interface (workspaces).  While it recognises that
+different workspaces handle objects of different kinds, the client need not
+explicitly move information from workspace to workspace in order to
+effectively convey it from one application-specific service to another.
+.\"
+.\"
+.SS OBJECTS
+.PP
+The principal purpose of the service is to create, examine, modify and destory
+complex information objects under the client's direction.  A principal purpose
+of the interface is to enable the client and service to exchange objects in
+whole or in part.  This requirement provides the rationale for the information
+architecture whose specification is contained in XOM.
+.[
+xom
+.]
+.PP
+Objects are of two kinds: public and private.  A public object is represented
+by a data structure whose format is part of the service's specification.  A
+private object, on the other hand, is represented in a fashion that is
+implementation-specific and thus unspecified.  The client therefore accesses
+private objects only indirectly, that is, by means of interface functions.
+.PP
+The interface comprises functions for both examining and modifying private
+objects.  For application-specific reasons, however, the service may deny a
+client request to modify a particular object at a particular time.  The
+specification of each application-specific API shall identify any
+circumstances under which this may occur.
+.PP
+Public objects themselves are of two kinds: client-generated and
+service-generated.  A client-generated public object is fabricated by the
+client in storage it provides.  A service-generated public object is
+fabricated by the service in storage it provides.  The client creates,
+examines, modifies, and destroys client-generated public objects directly,
+that is, by means of programming language constructs.
+.PP
+Note: Client-generated public objects simplify application programs, enabling
+them, where appropriate, to statically define objects, rather than requiring
+them to dynamically construct the object by means of sequences of interface
+function calls.
+.SS OBJECT ATTRIBUTES
+.PP
+Objects have internal structure.  An object comprises zero or more information
+elements called attributes.  An attribute, in turn, comprises an integer
+denoting the attribute's type and one or more information items called values,
+each accompanied by an integer denoting that value's syntax.  A value (for
+example, one) is an information item, possibly complex, which can be viewed as
+a characteristic or property of the object of which it is a part.  A syntax
+(Integer) is a category intow hich a value is placed on the basis of its form.
+A 'type' (for example, 'Priority') is a category into which all of the values
+of an attribute are placed on the basis of their purpose.  The attribute type
+is used as the name of the attribute.
+.PP
+The client and service exchange values by means of descriptors.  A descriptor
+normally comprises a value and the integers that denote the value's syntax and
+type; sometimes the value is absent (see the Get function,
+.BR om_get (3)).
+.PP
+While the syntaxes and types are denoted by integers, the scope of the
+integers differs.  Syntaxes are defined and assigned integers by this
+document.  THe integer's scope is global.  Types are defined and assigned
+integers by OM applications.  The integers' scope is a package.
+.PP
+An object's attributes are unordered, but an attribute's values are ordered.
+The position of the first value is zero.  The positions of successive values
+are successive positive integers.
+.PP
+One object, O-2, may be a value of an attribute of another object, O-1.  O-2
+is called an 'intermediate subobject' of O-1, and O-1 the 'intermeidate
+superobject' of O-2.  The intermediate subobjects of O-1, and all of their
+subobjects, are the 'subobjects' of O-1.  The intermediate superobject of O-2,
+and all of its superobjects, are the 'superobjects' of O-2.  The package that
+contains an object's clas may differ from those containing the classes of its
+intermediate subobjects, which may differ from one another.
+.SS CLASSES
+.PP
+Objects are categorised on the basis of their purpose and internal structure.
+Each category is called a class. An object (for example, a message) is said to
+be an instance of its class (for example, Message). A class is characterised
+by the types of the attributes that may appear in its instances. A class is
+denoted by an ASN.1 object identifier. The object identifier that denotes a
+class is an attribute of every instance of the class. In particular, it is the
+value of the Class attribute, which is specific to the Object class.
+.PP
+An object identifier may (but need not) be assigned to a class in two steps.
+First, a distinct integer is assigned to each class in a package.  Second, the
+integer is appended to the object identifier assigned to the package, becoming
+its final subidentifier.
+.PP
+The types that may appear in an instance of one class, C-2, are often a
+superset of those that may appear in an instance of another class, C-1. When
+this is so, C-2 may (but need not) be designated a subclass of C-1, making C-1
+a superclass of C-2. If C-1 is a superclass of no other superclass of C-2, C-1
+is called the immediate superclass of C-2, and C-2 an immediate subclass of
+C-1.  Every class (except Object) is the immediate subclass of exactly one
+other class; thus the class hierarchy is a tree.
+.PP
+The package containing an objects class may differ from those containing its
+immediate subclasses, which may differ from one another. The specification of
+such a class must ensure that each attribute type in the package-closure is
+allocated a unique integer representation. Specifications produced by X/Open
+and the X.400 API Association achieve this by use of disjoint sets of integers
+for each package in all specifications.  The classes form a hierarchy by
+virtue of the superclass relationships between them. The hierarchys root is a
+special class, Object, of which all other classes are subclasses.  The class
+hierarchy is fixed by the classes' definitions; it cannot be altered
+programatically.
+.PP
+The types that may appear in an instance of a class but not in an instance of
+its immediate superclass are said to be specific to the class. Thus the types
+that may appear in an object are those specific to its class and those
+specific to each of its superclasses.  The set of types that may appear in an
+object is fixed by the definitions of the classes involved; it cannot be
+altered programatically. The fact that an attribute may appear in instances of
+a class does not (itself) imply that it must appear (that is, have a value) in
+every instance of the class.
+.PP
+An instance of a class is also considered an instance of each of its
+superclasses, and thus may appear wherever the interface requires an instance
+of any of those classes.
+.PP
+Note: This is one of the most useful consequences of the subclassing
+mechanism.
+.PP
+Classes are of two kinds, concrete and abstract.  Instances of a concrete
+class are permitted, but instances of an abstract class are forbidden. An
+abstract class may be defined as a superclass in order to share attributes
+between classes, or simply to ensure that the class hierarchy is convenient
+for the interface definition.
+.PP
+The definition of each concrete class may also indicate that the client may
+not create instances; in this case, instances can only be created as a result
+of an application-specific function. It is an error for a client to attempt to
+create an object of such a class (function-declined), or of an abstract class
+(not-concrete).
+.PP
+Note: The OM information architecture has some, but not all, of the important
+characteristics of object-oriented programming systems. The functions by means
+of which objects are manipulated, for example, may vary from workspace to
+workspace (see Section 2.8 on page 12) but not from class to class.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+In the C interface, the functions are realized by macros.  The function
+protocol int he C Synopsis clause of a function's specification is only an
+exposition aid.
+.PP
+The intent of the interface definition is that each function is atomic, that
+is, that it either carries out its assigned task in full and reports success,
+or fails to carry out even a portion of the task and reports an exception.
+However, the service does not guarantee that a task will not occasionally be
+carried out in part but not in full.
 .\"
 .\"
 .SH "RETURN VALUE"

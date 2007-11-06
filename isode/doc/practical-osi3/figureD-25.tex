@@ -1,0 +1,21 @@
+\File{figureD\-25.py},{09:36},{Jan 16 1991}
+\L{\LB{Callback\-REQ ::=}}
+\L{\LB{    [1] \K{IMPLICIT}}}
+\L{\LB{        \K{SEQUENCE} \{}}
+\L{\LB{            string                      \C{}\-\- e.g., \"smith\"}}
+\CE{}\L{\LB{                IA5String,}}
+\L{\LB{}}
+\L{\LB{            choices                     \C{}\-\- list of possible matches}}
+\CE{}\L{\LB{                \K{SEQUENCE} \K{OF}}}
+\L{\LB{                    \K{SEQUENCE} \{}}
+\L{\LB{                        friendly}}
+\L{\LB{                            IA5String,}}
+\L{\LB{                        complete}}
+\L{\LB{                            IA5String}}
+\L{\LB{                        \}}}
+\L{\LB{        \}}}
+\L{\LB{}}
+\L{\LB{Callback\-RSP ::=}}
+\L{\LB{    [2] \K{IMPLICIT}}}
+\L{\LB{        \K{SEQUENCE} \K{OF}}}
+\L{\LB{            IA5String}}

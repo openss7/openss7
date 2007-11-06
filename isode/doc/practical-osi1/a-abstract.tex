@@ -1,0 +1,946 @@
+%\begin{bwslide}
+%\part	{ABSTRACT SYNTAX}\bf
+%\end{bwslide}
+
+
+\begin{bwslide}
+\part	{ABSTRACT SYNTAX}\bf
+
+\vskip.5in
+\diagram[p]{figureA-26}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ABSTRACT SYNTAX}
+
+\begin{nrtc}
+\item	UTILIZED THROUGHOUT THE UPPER LAYERS
+\item	NOT A LAYER ITSELF
+\item	IMPORTANT TO UNDERSTANDING REMAINING UPPER LAYERS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ABSTRACT SYNTAX\\PURPOSE}
+
+\begin{nrtc}
+\item	DEFINES STRUCTURE FOR UNITS OF DATA BEING EXCHANGED
+\item	INSURES EQUIVALENT UNDERSTANDING OF DATA ON BOTH ENDS OF A CONNECTION
+\item	\underline{BOTTOM LINE}: SEPARATES PROTOCOL STRUCTURE FROM 
+			INTERNAL STRUCTURE
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {ABSTRACT DATA TYPES}
+%
+%\begin{nrtc}
+%\item   REMOTE OPERATIONS ARE A MECHANISM BY WHICH LOOSELY COUPLED SYSTEMS
+%        INTERACT
+%
+%\item   BUT, REMOTE OPERATIONS ARE ONLY ONE PART OF A LARGER PICTURE HOWEVER
+%
+%\item   THE FUNDAMENTAL CONCEPT IS THAT OF THE \emph{ABSTRACT DATA TYPE}
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {CHARACTERISTICS}
+
+\begin{nrtc}
+\item	GENERALLY HAVE FORMAL DESCRIPTIONS
+\item	\underline{BIG ADVANTAGE}: CAN BE HANDLED WITH PROTOCOL ``TOOLS''
+\item	THIS WILL BE AN IMPORTANT CONCEPT AS WE PROCEED
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {DATA REPRESENTATIONS}
+%
+%\begin{nrtc}
+%\item	ABSTRACT
+%	\begin{nrtc}
+%	\item	TYPES OF DATA DESCRIBED INDEPENDENT OF INTERNAL REPRESENTATION
+%	\end{nrtc}
+%\item	CONCRETE
+%	\begin{nrtc}
+%	\item	AN ACTUAL \underline{INTERNAL} DATA INSTANCE 
+%			{\em (FORM NOT DEFINED BY OSI)}
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {PROPERTIES OF ABSTRACT DATA TYPES:\\ REPRESENTATION}
+
+\begin{nrtc}
+\item   DATA STRUCTURES IN PROGRAMMING LANGUAGES HAVE A \emph{CONCRETE}
+        REPRESENTATION
+    \begin{nrtc}
+    \item       WHICH IS DEFINED BY THE PROGRAMMING LANGUAGE AND THE
+                UNDERLYING HARDWARE
+
+    \item       e.g., BYTE-ORDERING, WORD SIZE, etc.
+    \end{nrtc}
+
+\item   THE CORRESPONDING ABSTRACT DATA TYPE IS DEFINED IN AN
+        IMPLEMENTATION-INDEPENDENT FASHION
+    \begin{nrtc}
+    \item       TERMED THE \emph{ABSTRACT SYNTAX}
+    \end{nrtc}
+
+\item   AN APPLICATION CAN EXPECT THIS TO BEHAVE CONSISTENLY REGARDLESS OF THE
+        HARDWARE ON WHICH IT IS RUNNING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {TRANSFER SYNTAX}
+
+\begin{nrtc}
+\item	RULES USED TO MAP BETWEEN
+	\begin{nrtc}
+	\item	ABSTRACT SYNTAX, and
+	\item	``BITS ON THE WIRE''
+	\end{nrtc}
+\item	USED TO PRODUCE UNAMBIGUOUS REPRESENTATION OF DATA ON A CONNECTION
+\item	OVERCOMES DIFFERENCES IN MACHINE ARCHITECTURES FOR COMMUNICATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {SCENARIO}
+
+\begin{nrtc}
+\item	CONCRETE DATA VALUES ARE MAPPED TO ABSTRACT SYNTAX FOR DATA TYPES
+\item	TRANSFER SYNTAX IS APPLIED TO THE COMBINED ABSTRACT SYNTAX AND
+	THE DATA VALUES
+\item	RESULTS IN UNAMBIGUOUS DATA STREAM TO BE TRANSMITTED
+	\begin{nrtc}
+	\item	CALLED: {\em SERIALIZING}
+	\end{nrtc}
+\item	{\em REVERSE PROCESS FOR RECEIVED DATA}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {PROPERTIES OF ABSTRACT DATA TYPES:\\ OBJECT MODEL}
+%
+%\begin{nrtc}
+%\item   SINCE OPERATIONS INTRODUCE A LEVEL OF INDIRECTION,
+%        USING ABSTRACT DATA TYPES RATHER THAN CONCRETE DATA STUCTURES
+%        PERMITS ACCESS TO DATA STRUCTURES WITHOUT REGARD TO THEIR ACTUAL
+%        IMPLEMENTATION
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {PROPERTIES OF ABSTRACT DATA TYPES:\\ OPERATIONS}
+%
+%\begin{nrtc}
+%\item   ACCESS TO AN ABSTRACT DATA TYPE IS DEFINED BY A SET OF PRIMITIVE
+%        ACTIONS
+%
+%\item   EACH PRIMITIVE ACTION IS TERMED AN \emph{OPERATION}
+%
+%\item   THIS SET OF OPERATIONS DEFINES THE COMPLETE BEHAVIOR OF AN ABSTRACT
+%        DATA TYPE
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {SYNTAXES}
+
+\begin{nrtc}
+\item	{\em ASN.1} IS THE ONLY ABSTRACT SYNTAX DEFINED TODAY
+	\begin{nrtc}
+	\item	{\em ABSTRACT SYNTAX NOTATION 1}
+	\end{nrtc}
+\item	{\em BER} IS THE ONLY TRANSFER SYNTAX DEFINED TODAY
+	\begin{nrtc}
+	\item	{\em BASIC ENCODING RULES}
+	\end{nrtc}
+%\item	THAT IS, {\em DEFINED IN OSI}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ABSTRACT SYNTAX NOTATION ONE (ASN.1)}
+
+\begin{nrtc}
+\item	DESCRIPTIVE LANGUAGE USED TO DEFINE DATA TYPES
+\item	DEFINES
+	\begin{nrtc}
+	\item	SET OF PRIMITIVE DATA TYPES
+	\item	FACILITY TO CONSTRUCT NEW ELEMENTS
+	\end{nrtc}
+\item	A FORMAL DESCRIPTION LANGUAGE
+	\begin{nrtc}
+	\item	HAS A FORMAL GRAMMER
+	\end{nrtc}
+\item	GRAMMAR IS DYNAMICALLY EXTENTABLE
+\item	USED TO SPECIFY NEW PROTOCOLS
+	\begin{nrtc}
+	\item	INTENDED TO BE ``CLEAR--TO--READ''
+	\item	NOT SPECIFIC TO MACHINE--ORIENTED STRUCTURES AND RESTRICTIONS
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {ASN.1 IS IMPORTANT}
+%
+%\begin{nrtc}
+%\item	UNDERSTANDING ASN.1 IS A PREREQUISITE TO UNDERSTANDING THE 
+%	OSI UPPER LAYERS AND TO BUILDING OSI APPLICATIONS
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {ASPHALT SYNTAX NOTATION ONE}
+%
+%\em{BECAUSE IT IS NOT CONCRETE}
+%
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {BASIC ENCODING RULES (BER)}
+
+\begin{nrtc}
+\item	RULES FOR ENCODING ASN.1 VALUES AS STREAMS OF BITS
+\item	DEFINES
+	\begin{nrtc}
+	\item	SMALL SET OF GENERAL ENCODING RULES
+	\item	RULES CAN BE APPLIED RECURSIVELY TO ENCODE COMPLEX TYPES
+	\end{nrtc}
+\item	TAG, LENGTH, VALUE (TLV) ENCODING SCHEME
+\item	VERY GENERAL
+\item	NOT AS PERFORMANT AS OTHER TECHNOLOGIES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {BER IS NOT AS IMPORTANT}
+
+\begin{nrtc}
+\item	SPECIFICS ARE NOT AS IMPORTANT AS ASN.1
+\item	UNDERSTANDING THE CONCEPTS IS IMPORTANT
+\item	FEW NEED TO UNDERSTAND THE DETAILS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {FUTURE SYNTAXES}
+
+\begin{nrtc}
+\item	MORE SYNTAXES MAY BE DEFINED IN THE FUTURE
+\item	MORE ABSTRACT SYNTAXES:
+	\begin{nrtc}
+	\item	{\em ASN.2, ASN.3, \ldots ?}
+	\end{nrtc}
+\item	OTHER TRANSFER SYNTAXES:
+	\begin{nrtc}
+	\item	COMPRESSION
+	\item	ENCRYPTION
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ASN.1 NOTATION}
+
+\begin{nrtc}
+\item	MODULES GROUP AND NAME RELATED DEFINITIONS:
+\begin{quote}\small\begin{verbatim}
+<<module>> DEFINITIONS ::=
+BEGIN
+
+<<linkage>>
+
+<<declarations>>
+
+END
+\end{verbatim}\end{quote}
+\item	LINKAGE REFERENCES DECLARATIONS IN OTHER MODULES
+\item	DECLARATIONS ARE THE DEFINITIONS FOR THIS MODULE:
+	\begin{nrtc}
+	\item	TYPES --- DATA STRUCTURES
+	\item	VALUES --- INSTANCES OF TYPES
+	\item	MACROS --- LANGUAGE EXTENSIONS
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {EXAMPLE --- MODULE NAME}
+
+\begin{quote}\small\begin{verbatim}
+DirectorySystemProtocol {joint-iso-ccitt ds(5) modules(1) dsp(12)}
+DEFINITIONS ::=
+
+...
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle{EXAMPLE --- LINKAGE}
+
+\begin{quote}\small\begin{verbatim}
+...
+
+EXPORTS
+    directorySystemAC, chainedReadASE, ... ;
+
+IMPORTS
+    distributedOperations, directoryAbstractService
+        FROM UsefulDefinitions {joint-iso-ccitt ds(5) modules(1) 
+                                              usefulDefinitions(0)} ;
+
+...
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {DECLARATION CONVENTIONS}
+
+\begin{nrtc}
+\item	TYPES
+	\begin{nrtc}
+	\item	NAMES START WITH UPPERCASE LETTERS
+	\begin{quote}\small\begin{verbatim}
+	TimeLimit
+	\end{verbatim}\end{quote}
+	\end{nrtc}
+\item	VALUES
+	\begin{nrtc}
+	\item	NAMES START WITH LOWERCASE LETTERS
+	\begin{quote}\small\begin{verbatim}
+	actualTimeLimit
+	\end{verbatim}\end{quote}
+	\end{nrtc}
+\item	MACROS
+	\begin{nrtc}
+	\item	NAMES ARE ALL UPPER CASE
+	\begin{quote}\small\begin{verbatim}
+	SIGNED
+	\end{verbatim}\end{quote}
+	\item	APPEAR LIKE OTHER ASN.1 KEYWORDS
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {NOTE}
+%
+%\begin{nrtc}
+%\item	TYPES
+%	\begin{nrtc}
+%	\item	SIMPLE
+%	\item	OBJECT IDENTIFIERS
+%	\item	CONSTRUCTOR TYPES
+%	\item	TAGGED TYPES
+%	\item	META TYPES
+%	\item	ENCRYPTED
+%	\item	EXTERNAL
+%	\item	SUBTYPES
+%	\end{nrtc}
+%\item	VALUES
+%	\begin{nrtc}
+%	\item	?
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{EXAMPLE --- TYPES \& VALUES}
+
+\begin{quote}\small\begin{verbatim}
+Multiple-defined-contexts ::= BOOLEAN
+
+simple Multiple-defined-contexts ::= FALSE -- or TRUE
+
+ContentLength ::= INTEGER
+
+RegistrationMailType ::= 
+    INTEGER {
+        non-registered-mail (0),
+        registered-mail (1),
+        registered-mail-to-address-in-person (2)
+    }
+
+mymail RegistrationMailType ::=
+        registered-mail  -- or 1
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{EXAMPLES --- TYPES \& VALUES (cont.)}
+\begin{quote}\small\begin{verbatim}
+Attribute-Groups ::=
+        BITSTRING {
+            storage (0), security (1), private (2)
+        }
+
+groups Attribute-Groups ::=
+        { storage, private }	-- or '101'B
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle{EXAMPLES --- TYPES \& VALUES (cont.)}
+%\begin{quote}\small\begin{verbatim}
+%Content ::= 
+%        OCTET STRING
+%
+%BilateralInfo ::=
+%        ANY
+%\end{verbatim}\end{quote}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{EXAMPLES --- TYPES \& VALUES (cont.)}
+\begin{quote}\small\begin{verbatim}
+SecurityContext ::=
+        SET OF SecurityLabel
+
+MessageDeliveryEnvelope ::=
+        SEQUENCE {
+            message-delivery-identifier
+                MessageDeliveryIdentifier,
+
+            message-delivery-time
+                MessageDeliveryTime,
+
+            other-fields
+                OtherMessageDeliveryFields
+}
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle{EXAMPLES --- TYPES \& VALUES (cont.)}
+%\begin{quote}\small\begin{verbatim}
+%MessagesWaiting ::=
+%        SET {
+%                urgent [0]
+%                    DeliveryQueue,
+%                normal [1]
+%                    DeliveryQueue,
+%                nonUrgent [2]
+%                    DeliveryQueue
+%        }
+%
+%queue MessagesWaiting ::= 
+%        {
+%            urgent { ... }, normal { ... }, nonUrgent { ... }
+%        }
+%\end{verbatim}\end{quote}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle{EXAMPLES --- TYPES \& VALUES (cont.)}
+%\begin{quote}\small\begin{verbatim}
+%PerMessageSubmissionFields ::=
+%    SET {
+%...
+%        content-type
+%            ContentType,
+%
+%        content-identifier
+%            ContentIdentifier OPTIONAL,
+%
+%        priority
+%            Priority DEFAULT normal,
+%
+%        per-message-indicators
+%            PerMessageIndicators DEFAULT {},
+%...
+%    }
+%\end{verbatim}\end{quote}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle{EXAMPLES --- TYPES \& VALUES (cont.)}
+%\begin{quote}\small\begin{verbatim}
+%PDU ::= 
+%    CHOICE {
+%        FTAM-Regime-PDU,
+%        File-PDU,
+%        Bulk-Data-PDU
+%    }
+%
+%SecurityPolicyIdentifier ::=
+%        OBJECT IDENTIFIER
+%
+%\end{verbatim}\end{quote}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {CONCRETE REPRESENTATION}
+
+\vskip.15in
+\begin{verbatim}
+struct mail_address {
+    char   *local;
+    char   *domain;
+
+    unsigned char options;
+#define default_local 0x01
+#define default_host  0x02
+};
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ABSTRACT REPRESENTATION}
+
+\vskip.15in
+\begin{verbatim}
+Mail-Address ::=
+        [APPLICATION 2]
+            IMPLICIT SEQUENCE {
+                local[0]
+                    IMPLICIT GraphicString,
+
+                domain[1]
+                    IMPLICIT GraphicString,
+
+                options[2]
+                    IMPLICIT BITSTRING {
+                        default-local(0), default-host(1)
+                    }
+                    DEFAULT { default-local, default-host }
+            }
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{MACROS}
+
+\begin{nrtc}
+\item	ALLOW ASN.1 LANGUAGE TO BE DYNAMICALLY EXTENDED
+\item	INTENDED TO CAPTURE {\em SOME} ADDITIONAL SEMANTICS
+\item	ACTUALLY EXTEND THE ASN.1 GRAMMAR
+\item	VERY POWERFUL
+\item	\underline{VERY PROBLEMATIC}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {MACROS --- EXAMPLE}
+\begin{quote}\small\begin{verbatim}
+<<macro> MACRO ::=
+
+BEGIN
+
+TYPE NOTATION  ::= <<type syntax>>
+
+VALUE NOTATION ::= <<value syntax>>
+
+<<supporting syntax>>
+
+END
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {MACROS --- PROBLEMS}
+
+\begin{nrtc}
+\item	ACTUALLY CHANGE GRAMMAR RULES OF ASN.1
+	\begin{nrtc}
+	\item	``NORMAL'' LANGUAGE MACROS ARE JUST TEXT SUBSTITUTIONS
+	\end{nrtc}
+\item	REQUIRE ASN.1 PARSER TO ACCOMMODATE DYNAMIC GRAMMAR CHANGES
+\item	INTEGRAL PART OF ASN.1
+\item	DIFFICULT TO ``MANUALLY'' EXPAND
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {MACROS --- PROBLEMS (cont.)}
+
+\begin{nrtc}
+\item	MACROS THEMSELVES ARE NOT ENOUGH
+	\begin{nrtc}
+	\item	ENTIRE SEMANTICS NOT CONVEYED IN NOTATION
+	\item	REQUIRES FRONT END TO AUGMENT INPUT BACK END
+	\end{nrtc}
+\item	REQUIRES SELF--MODIFYING FRONT END COMPILER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{EXAMPLES --- MACROS}
+\begin{quote}\small\begin{verbatim}
+OPERATION MACRO ::=
+    BEGIN
+    TYPE NOTATION  ::= "ARGUMENT" NamedType Result Errors | empty
+    VALUE NOTATION ::= value (VALUE INTEGER)
+    Result         ::= "RESULT" NamedType | empty
+    Errors         ::= "ERRORS" { ErrorNames } | empty
+    
+    NamedType      ::= identifier type | type
+    ErrorNames     ::= IdentifierList | empty
+    IdentifierList ::= identifier | IdentifierList "," identifier
+    END
+
+users OPERATION
+    RESULT	IA5List
+    ERRORS	{ congested, unableToOpenFile }
+    ::= 2
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle{EXAMPLES --- MACROS (cont.)}
+%\begin{quote}\small\begin{verbatim}
+%ERROR MACRO ::=
+%    BEGIN
+%    TYPE NOTATION  ::= "PARAMETER" NamedType | empty
+%    VALUE NOTATION ::= value (VALUE INTEGER)
+%    
+%    NamedType      ::= identifier type | type
+%    END
+%
+%unableToOpenFile
+%    ERROR
+%    PARAMETER	IA5List
+%    ::= 2
+%\end{verbatim}\end{quote}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{TRANSFER SYNTAX \\ BASIC ENCODING RULES (BER)}
+
+\begin{nrtc}
+\item	INDEPENDENT OF MACHINE-DEPENDENT STRUCTURES \& RESTRICTIONS
+\item	TAGGED DATA, {\em TAG--LENGTH--VALUE (TLV) APPROACH}
+\item	VARIABLE LENGTH ENCODINGS IN MINIMAL OCTETS
+\item	SOLID TECHNOLOGY
+	\begin{nrtc}
+	\item	NOT A CONCERN FOR MOST IMPLEMENTORS
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {TLV ENCODINGS}
+
+\begin{nrtc}
+\item	USE OF TLV IS CONTROVERSIAL
+\item	LESS EXTENSIBLE SCHEMES ARE MORE PERFORMANT
+\item	EACH FIELD IS VARIABLE LENGTH
+\item	FIELDS MAY BE OF ARBITRARY COMPLEXITY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {TLV}
+
+\vskip.5in
+\diagram[p]{figureA-27}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {COMPLEX ENCODINGS}
+
+\begin{nrtc}
+\item	COMPLEX ASN.1 TYPES COMPOSED OF SEVERAL LESS COMPLEX TYPES
+\item	EVENTUALLY BREAK DOWN TO SIMPLE ASN.1 TYPES
+\item	BER APPLIED TO SIMPLE TYPES RECURSIVELY TO AN ARBITRARY 
+		LEVEL OF COMPLEXITY
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {ENCODING DETAILS}
+%
+%\begin{nrtc}
+%\item	BIT ORDERING
+%	\begin{nrtc}
+%	\item	``BIT 8'' IS HIGH ORDER
+%	\item	``BIT 1'' IS LOW ORDER
+%	\end{nrtc}
+%\item	INTEGERS
+%	\begin{nrtc}
+%	\item	OF ANY VALUE, {\em TWOS--COMPLEMENT}
+%	\item	POSITIVE ONLY, {\em UNSIGNED}
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {TAG FIELD}
+%
+%\begin{nrtc}
+%\item	PAIR
+%	\begin{nrtc}
+%	\item	CLASS OF ASN.1 TYPE
+%		\begin{nrtc}
+%		\item	UNIVERSAL
+%		\item	APPLICATION
+%		\item	CONTEXT-SPECIFIC
+%		\item	PRIVATE
+%		\end{nrtc}
+%	\item	IDENTIFIER OF ASN.1 TYPE
+%		\begin{nrtc}
+%		\item	ARBITRARY LENGTH
+%		\end{nrtc}
+%	\end{nrtc}
+%\item	INDICATION IF VALUE IS PRIMITIVE OR CONSTRUCTED
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {TAG FIELD}
+%
+%\vskip.5in
+%\diagram[p]{figureA-29}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle{PRIMATIVE TYPES}
+%
+%\begin{tabular}{ll}
+%INTEGER		& [UNIVERSAL 2] \\
+%BOOLEAN		& [UNIVERSAL 1] \\
+%NULL		& [UNIVERSAL 5] \\
+%OCTET STRING	& [UNIVERSAL 4] \\
+%BIT STRING	& [UNIVERSAL 3] \\
+%%\\
+%%OBJECT IDENTIFIER \\
+%%EXTERNAL \\
+%%ANY \\
+%\end{tabular}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle{CONSTRUCTOR TYPES}
+%
+%\begin{tabular}{lll}
+%SET & [UNIVERSAL 17] & Fixed size set of items of distinct types \\
+%SET OF & [UNIVERSAL 17] & Variable size set of items of the same type \\
+%SEQUENCE & [UNIVERSAL 16] & Record \\
+%SEQUENCE OF & [UNIVERSAL 16] & Array or list \\
+%%CHOICE & & One out of a set of possible types \\
+%%TAGGED & & For creating a type with a new tag \\
+%\end{tabular}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {LENGTH FIELD}
+%
+%\begin{nrtc}
+%\item	INDICATES LENGTH OF VALUE FIELD
+%	\begin{nrtc}
+%	\item	ACTUAL LENGTH (${2}^{1008}-1$ MAXIMUM)
+%	\item	INDEFINITE LENGTH
+%		\begin{nrtc}
+%		\item	END OF STREAM HAS A SPECIAL MARKER
+%		\end{nrtc}
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {VALUE FIELD}
+%
+%\begin{nrtc}
+%\item	SIMPLE TYPES
+%	\begin{nrtc}
+%	\item	{\em SIMPLE} VALUE
+%	\end{nrtc}
+%\item	CONSTRUCTOR TYPES
+%	\begin{nrtc}
+%	\item	MULTIPLE SIMPLE ENCODINGS AS VALUE
+%	\item	DETERMINING LENGTH IN ADVANCE IS TOUGH PART
+%	\item	INDEFINITE LENGTH USED FOR THIS
+%		\begin{nrtc}
+%		\item	MAKES SENDING EASY
+%		\item	RECEIVING MORE DIFFICULT
+%		\end{nrtc}
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {VALUE FIELD\\SIMPLE EXAMPLE --- INTEGER 26}
+
+\vskip.5in
+\diagram[p]{figureA-28}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {VALUE FIELD\\CONSTRUCTOR EXAMPLE}
+
+\begin{quote}\small\begin{verbatim}
+Constructor ::=
+    SEQUENCE {
+        name
+            Name,
+
+        value
+            Value
+    }
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {CONSTRUCTOR EXAMPLE (cont.)}
+
+\vskip.5in
+\diagram[p]{figureA-30}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {VALUE ``ANY'' FIELDS}
+%
+%\begin{nrtc}
+%\item	OPAQUE FIELD
+%\item	SENDING APPLICATION
+%	\begin{nrtc}
+%	\item	MUST ``KNOW'' WHAT TO SUPPLY
+%	\item	SUPPLIED DATA MUST ALREADY HAVE BER APPLIED
+%	\end{nrtc}
+%\item	RECEIVING APPLICATION
+%	\begin{nrtc}
+%	\item	CAN EASILY DECODE BER
+%	\item	MUST ``KNOW'' WHAT IT IS TO MAKE USE OF DATA
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{ENCRYPTED}
+%
+%\begin{nrtc}
+%\item	MENTIONED FOR CURIOSITY SAKE
+%\item	REQUIRES BILATERAL AGREEMENT ON USE
+%\item	DOESN'T PREVENT APPLICATION FROM PERFORMING ENCRYPTION ITSELF
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {IMPORTANT POINT}
+%
+%\begin{nrtc}
+%\item	BER TRANSFER SYNTAX CAN BE PARSED WITHOUT REFERENCE TO THE ABSTRACT
+%	SYNTAX, ASN.1
+%\end{nrtc}
+%\end{bwslide}
+
+	
+%\begin{bwslide}
+%\ctitle {MAKING ASN.1 WORK}
+%
+%\begin{nrtc}
+%\item	NEED TOOLS TO FACILITATE DEVELOPMENT OF APPLICATIONS
+%\item	GENERATION OF ENCODERS, DECODERS \& PRINTERS FOR ABSTRACT SYNTAX
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {TOOLS}
+%
+%\begin{nrtc}
+%\item	FOR ENCODING \& DECODING
+%	\begin{nrtc}
+%	\item	SEMANTICS OF DATA SUPPLIED BY ASN.1 DESCRIPTION
+%	\item	LOCAL STORAGE STRATEGY
+%		\begin{nrtc}
+%		\item	FIXED
+%		\item	DECLARATIONS
+%		\item	ACTION ROUTINES
+%		\end{nrtc}
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {AN APPROACH\\STRUCTURE GENERATOR}
+%
+%\begin{nrtc}
+%\item	FROM ASN.1 DEFINITION, PRODUCE DATA STRUCTURES FOR
+%	{\em CONCRETE} STORAGE OF VALUES
+%\item	STRUCTURES WILL BE USED BY ENCODERS \& DECODERS
+%\item	APPLICATION WILL MANIPULATE STRUCTURES AS WELL
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {AN APPROACH:\\ENCODER/DECODER GENERATOR}
+%
+%\begin{nrtc}
+%\item	GENERATE MODULES TO ENCODE \& DECODE ABSTRACT SYNTAX TO \& FROM
+%	CONCRETE DATA STRUCTURES GENERATED IN PREVIOUS STEP
+%\item	ALSO GENERATE ``PRETTY PRINTERS'' FOR DISPLAYING PROTOCOL
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {REFERENCES}
+%
+%\begin{description}
+%\item[ISO/IEC 8324:]	Specification of Abstract Syntax Notation One (ASN.1)
+%\item[ISO/IEC 8323:]	Specification of Basic Encoding Rules for Abstract 
+%			Syntax Notation One (ASN.1)
+%\end{description}
+%\end{bwslide}

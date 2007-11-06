@@ -1,3 +1,30 @@
+2007-10-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
+
+2007-10-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: added check for pci_module_init
+	* src/modules/mtp/mtp.c: fixed likely() on a pointer
+	* src/modules/tcap/tr_mod.c: fixed case statement
+	* src/modules/x400p-ss7/sl_x100p.c:
+	  - use IRQF_DISABLED and IRQF_SHARED instead of deprecated SA_INTERRUPT
+	    and SA_SHIRQ.
+	  - use pci_register_driver instead of pci_module_init
+	* src/modules/x400p-ss7/sl_x400p.c:
+	  - use IRQF_DISABLED and IRQF_SHARED instead of deprecated SA_INTERRUPT
+	    and SA_SHIRQ.
+	  - use pci_register_driver instead of pci_module_init
+	* src/modules/x400p-ss7/x100p-ss7.c:
+	  - use IRQF_DISABLED and IRQF_SHARED instead of deprecated SA_INTERRUPT
+	    and SA_SHIRQ.
+	  - use pci_register_driver instead of pci_module_init
+	* src/modules/x400p-ss7/x400p-ss7.c:
+	  - use IRQF_DISABLED and IRQF_SHARED instead of deprecated SA_INTERRUPT
+	    and SA_SHIRQ.
+	  - use pci_register_driver instead of pci_module_init
+	* doc/manual/news.texi: update release notes for 2.6.22.5-49.fc6
+
 2007-09-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/test/sl/test-sl.c: quiet gcc 3.4.3

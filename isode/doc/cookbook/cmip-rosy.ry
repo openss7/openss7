@@ -1,0 +1,499 @@
+-- this is NOT an official specification, it is a touched-up version of the
+-- CMIP RO spec:
+--	operations, errors, and types have been group together
+--	a few typos in the specification have been cleaned up
+
+-- ISO-9596-2-CMIP-1
+CMIP {iso standard(0) ips-osi-mips(9596) cmip(2) version(1) protocol(1)}
+
+DEFINITIONS ::=
+
+BEGIN
+
+--    IMPORTS OPERATION, ERROR 
+--        FROM Remote-Operation-Notation
+--        {joint-iso-ccitt remoteOperations(4) notation(0)};
+
+   IMPORTS DistinguishedName, RelativeDistinguishedName
+       FROM Information-Framework
+       {joint-iso-ccitt ds(5) modules(1) information-framework(1)};
+
+
+-- operations
+
+m-EventReport OPERATION
+	ARGUMENT EventReportArgument
+	::= 0
+
+m-ConfirmedEventReport OPERATION
+	ARGUMENT EventReportArgument
+	RESULT   EventReportResult
+	ERRORS { noSuchObject, noSuchEventType, accessDenied,
+		 noSuchMgmtInfoId, invalidMgmtInfoValue}
+	::= 1
+
+m-LinkedReply OPERATION
+	ARGUMENT LinkedReplyArgument
+	::= 2
+
+m-Confirmed-Get OPERATION
+	ARGUMENT GetArgument
+	RESULT   GetResult
+	ERRORS { noSuchObject, accessDenied, syncNotSupported,
+		 invalidFilter, noSuchMgmtInfoId, getListError }
+	LINKED { m-Linked-Reply }
+	::= 3
+
+m-Set OPERATION
+	ARGUMENT SetArgument
+	::= 4
+
+m-ConfirmedSet OPERATION
+	ARGUMENT SetArgument
+	RESULT   SetResult
+	ERRORS { noSuchObject, accessDenied, syncNotSupported,
+		 invalidFilter, noSuchMgmtInfoId, invalidMgmtInfoValue,
+		 setListError }
+	LINKED { m-Linked-Reply }
+	::= 5
+
+m-Action OPERATION
+	ARGUMENT ActionArgument
+	::= 6
+
+m-ConfirmedAction OPERATION
+	ARGUMENT ActionArgument
+	RESULT   ActionResult
+	ERRORS { noSuchObject, accessDenied, invalidFilter,
+		 noSuchAction, noSuchMgmtInfoId, invalidMgmtInfoValue,
+		 processingFailure }
+	LINKED { m-Linked-Reply }
+	::= 7
+
+
+-- errors
+
+noSuchObject ERROR
+	PARAMETER NoSuchObject
+	::= 1
+
+accessDenied ERROR
+	::= 2
+
+syncNotSupported ERROR
+	PARAMETER SyncNotSupported
+	::= 3
+
+invalidFilter ERROR
+	PARAMETER InvalidFilter
+	::= 4
+
+noSuchMgmtInfoId ERROR
+	PARAMETER NoSuchMgmtInfoId
+	::= 5
+
+invalidMgmtInfoValue ERROR
+	PARAMETER InvalidMgmtInfoValue
+	::= 6
+
+getListError ERROR
+	PARAMETER GetListError
+	::= 7
+
+setListError ERROR
+	PARAMETER SetListError
+	::= 8
+
+noSuchAction ERROR
+	PARAMETER NoSuchAction
+	::= 9
+
+processingFailure ERROR
+	PARAMETER ProcessingFailure
+	::= 10
+
+noSuchEventType ERROR
+	PARAMETER NoSuchEventType
+	::= 11
+
+
+-- types
+    
+EventReportArgument ::=
+	SEQUENCE {
+	    managedObjectClass
+		ObjectClass,
+
+	    managedObjectInstance
+		ObjectInstance,
+
+	    eventType[5]		-- DEFINED BY managedObjectClass 
+		EventTypeID,
+
+	    eventTime[6]
+		IMPLICIT GeneralizedTime
+		OPTIONAL,
+
+	    eventInfo[7]
+		EventInfo
+		OPTIONAL
+	}
+
+EventReportResult ::=
+	NULL				-- event acknowledgement indication
+
+LinkedReplyArgument ::=
+	CHOICE {
+	    getResult[0]
+		IMPLICIT GetResult,
+
+	    getError[1]
+		IMPLICIT GetListError,
+
+	    setResult[2]
+		IMPLICIT SetResult,
+
+	    setError[3]
+		IMPLICIT SetListError,
+
+	    actionResult[4]
+		IMPLICIT ActionResult
+	}
+
+GetArgument ::=
+	SEQUENCE {
+	    managedObjectClass
+		ObjectClass,
+
+	    managedObjectInstance
+		ObjectInstance,
+
+	    accessControl[5]
+		AccessControl
+		OPTIONAL,
+
+	    synchronization[6]
+		IMPLICIT CMISSync
+		DEFAULT bestEffort,
+
+	    filter
+		CMISFilter
+		OPTIONAL,
+
+	    mgmtInfoIdList[11]
+		IMPLICIT SEQUENCE OF
+		    MgmtInfoId
+	}
+
+GetResult ::=
+	SEQUENCE {
+	    managedObjectClass
+		ObjectClass
+		OPTIONAL,
+
+	    managedObjectInstance
+		ObjectInstance
+		OPTIONAL,
+
+	    currentTime[5]
+		IMPLICIT GeneralizedTime
+		OPTIONAL,
+
+	    mgmtInfoList[6]
+		IMPLICIT SEQUENCE OF
+		    MgmtInfo
+	}
+
+SetArgument ::=
+	SEQUENCE {
+	    managedObjectClass
+		ObjectClass,
+
+	    managedObjectInstance
+		ObjectInstance,
+
+	    accessControl[5]
+		AccessControl
+		OPTIONAL,
+
+	    synchronization[6]
+		IMPLICIT CMISSync
+		DEFAULT bestEffort,
+
+	    filter
+		CMISFilter
+		OPTIONAL,
+
+	    mgmtInfoList[11]
+		IMPLICIT SEQUENCE OF
+		    MgmtInfo
+	}
+
+SetResult ::=
+	SEQUENCE {
+	    managedObjectClass
+		ObjectClass
+		OPTIONAL,
+
+	    managedObjectInstance
+		ObjectInstance
+		OPTIONAL,
+
+	    currentTime[5]
+		IMPLICIT GeneralizedTime
+		OPTIONAL,
+
+	    mgmtInfoList[6]
+		IMPLICIT SEQUENCE OF
+		    MgmtInfo
+	}
+
+ActionArgument ::=
+	SEQUENCE {
+	    managedObjectClass
+		ObjectClass,
+
+	    managedObjectInstance
+		ObjectInstance,
+
+	    accessControl[5]
+		AccessControl
+		OPTIONAL,
+
+	    filter
+		CMISFilter
+		OPTIONAL,
+
+	    actionType[11]		-- DEFINED BY managedObjectClass
+		ActionTypeId,
+
+	    actionInfo[12]
+		ActionInfo
+		OPTIONAL
+	}
+
+ActionResult ::=
+	SEQUENCE {
+	    managedObjectClass
+		ObjectClass
+		OPTIONAL,
+
+	    managedObjectInstance
+		ObjectInstance
+		OPTIONAL,
+
+	    currentTime[5]
+		IMPLICIT GeneralizedTime
+		OPTIONAL,
+
+	    actionResult[6]
+		IMPLICIT MgmtInfo
+	}
+
+NoSuchObject ::=
+	OBJECT IDENTIFIER
+
+SyncNotSupported ::=
+	CMISSync
+
+InvalidFilter ::=
+	CMISFilter
+
+NoSuchMgmtInfoId ::=
+	MgmtInfoId
+
+InvalidMgmtInfoValue ::=
+	MgmtInfo
+
+GetListError ::=
+	SEQUENCE {
+	    managedObjectClass
+		ObjectClass
+		OPTIONAL,
+
+	    managedObjectInstance
+		ObjectInstance
+		OPTIONAL,
+
+	    currentTime[5]
+		IMPLICIT GeneralizedTime
+		OPTIONAL,
+
+	    mgmtInfoList[6]
+		IMPLICIT SEQUENCE OF
+		    MISGetInfoStatus
+	}
+
+MISGetInfoStatus ::=
+	CHOICE {
+	    mgmtInfoIdError[0]
+		IMPLICIT MgmtInfoIdError,
+
+	    mgmtInfo[1]
+		IMPLICIT MgmtInfo
+	}
+
+MgmtInfoIdError ::=
+	SEQUENCE {
+	    errorStatus[0]
+		IMPLICIT ErrorStatus,
+
+	    mgmtInfoId[1]
+		MgmtInfoId
+	}
+
+SetListError ::=
+	SEQUENCE {
+	    managedObjectClass
+		ObjectClass
+		OPTIONAL,
+
+	    managedObjectInstance
+		ObjectInstance
+		OPTIONAL,
+
+	    currentTime[5]
+		IMPLICIT GeneralizedTime
+		OPTIONAL,
+
+	    mgmtInfoList[6]
+		IMPLICIT SEQUENCE OF
+		    MISSetInfoStatus
+	}
+
+MISSetInfoStatus ::=
+	CHOICE {
+	    mgmtInfoError[0]
+		IMPLICIT MgmtInfoError,
+
+	    mgmtInfo[1]
+		IMPLICIT MgmtInfo
+	}
+
+MgmtInfoError ::=
+	SEQUENCE {
+	    errorStatus[0]
+		IMPLICIT ErrorStatus,
+
+	    mgmtInfo[1]
+		IMPLICIT MgmtInfo
+	}
+
+ErrorStatus ::=
+	INTEGER {
+	    accessDenied(2),
+	    noSuchMgmtInfoId(5),
+	    invalidMgmtInfoValue(7)
+	}
+
+NoSuchAction ::=
+	ActionTypeId
+
+ProcessingFailure ::=
+    CHOICE {
+	actual[0]
+	    SpecificErrorInfo,
+
+	none[1]
+	    IMPLICIT NULL
+    }
+
+NoSuchEventType ::=
+	EventTypeID
+
+ObjectClass ::=
+	CHOICE {
+	    globalForm[0]
+		IMPLICIT OBJECT IDENTIFIER,
+
+	    nonSpecificForm[1]
+		IMPLICIT OCTET STRING
+	}
+
+ObjectInstance ::=
+	CHOICE {
+	    distinguishedName[2]
+		IMPLICIT DistinguishedName,
+
+	    nonSpecificForm[3]
+		IMPLICIT OCTET STRING,
+
+	    enumeratedForm[4]
+		IMPLICIT INTEGER
+	}
+
+CMISSync ::=
+	INTEGER {
+	    bestEffort(0),
+	    ordered(1),
+	    stopOnError(2),
+	    atomic(3)
+	}
+
+CMISFilter ::=
+	CHOICE {
+	    item[7]
+		FilterItem,
+
+	    and[8]
+		IMPLICIT SET OF
+		    CMISFilter,
+
+	    or[9]
+		IMPLICIT SET OF
+		    CMISFilter,
+
+	    not[10]
+		CMISFilter
+	}
+
+FilterItem ::=
+	CHOICE {
+	    equality[0]
+		IMPLICIT MgmtInfo,
+
+	    greaterOrEqual[1]
+		IMPLICIT MgmtInfo,
+
+	    lessOrEqual[2]
+		IMPLICIT MgmtInfo,
+
+	    present[3]
+		MgmtInfoID
+	}
+
+
+-- parameters defined in the specification of the Managed Object
+
+AccessControl ::=
+	ANY				-- DEFINED BY managedObjectClass 
+
+EventTypeId ::=
+	ANY				-- DEFINED BY managedObjectClass
+
+EventInfo ::=
+	ANY				-- DEFINED BY eventType
+
+MgmtInfo ::=
+	SEQUENCE {
+		MgmtInfoId,
+
+		MgmtInfoValue
+	}
+
+MgmtInfoId ::=
+	ANY				-- DEFINED BY managedObjectClass 
+
+MgmtInfoValue ::=
+	ANY				-- DEFINED BY managedObjectClass 
+
+ActionTypeId ::=
+	ANY				-- DEFINED BY managedObjectClass
+
+ActionInfo ::=
+	ANY				-- DEFINED BY actionType
+
+SpecificErrorInfo ::=
+	ANY				-- DEFINED BY actionType
+
+END

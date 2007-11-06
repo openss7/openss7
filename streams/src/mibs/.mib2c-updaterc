@@ -1,0 +1,4 @@
+
+UPDATE_OID=OPENSS7-STREAMS-MIB::strModTable
+
+UPDATE_CONF=mib2c.mfd.conf

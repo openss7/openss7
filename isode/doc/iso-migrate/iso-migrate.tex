@@ -1,0 +1,701 @@
+% run this through SLiTeX
+
+\documentstyle
+    [blackandwhite,landscape,oval,pagenumbers,small]{NRslides}
+
+\input trademark
+
+\def\tradeORGfont{\rm}
+\def\tradeNAMfont{\rm}
+
+\def\tcptpgw/{TCP $\Longleftrightarrow$ TP MAGIC-BOX}
+
+\raggedright
+
+\begin{document}
+
+\title	{RECENT DEVELOPMENTS IN\\ MIGRATING TOWARD ISO}
+\author	{Marshall T.~Rose\\
+	Computer Science Laboratory\\
+	Northrop Research and Technology Center}
+\date	{October 20, 1986}
+\maketitlepage
+
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{nrtc}
+\item	BACKGROUND
+\item	TOWARD A SOLUTION
+\item	A DIGRESSION ON THE INTEROPERABILITY OF APPLICATIONS
+\item	A MIGRATION STRATEGY
+\item	THE FIRST STEP: ISODE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+i've given a few variants of this talk in the past,
+so may cover it too quickly!
+\end{note}
+
+
+\begin{bwslide}
+\part	{BACKGROUND}\bf
+\begin{nrtc}
+\item	THE ISO INTERPRETATION OF OSI IS GAINING POPULARITY
+    \begin{nrtc}
+    \item	VENDORS (e.g., COS)
+    \item	USER GROUPS (e.g., MAP/TOP)
+    \item	INTERNATIONAL COMMUNITY
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INFORMAL DEFINITION OF TERMS}
+
+\begin{nrtc}
+\item	OSI
+
+\item	DDN, ARPA, ISO
+
+\item	SUITE, STACK, WORLD
+
+\item	BLACK-BOX
+
+\item	GATEWAY, MAGIC-BOX
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{$\ \ \ \ \ \ $ A BIG PROBLEM}
+\vskip-0.5in
+\diagram[p]{figure1}
+\end{bwslide}
+
+
+
+\begin{note}\em
+note that ``development'' means design and implementation
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{MORE PROBLEMS}
+
+\begin{nrtc}
+\item	NEED ISO EXPERTISE AND MATURITY (AT ALL LEVELS)
+    \begin{nrtc}
+    \item	BUT CAN'T WAIT~---~HAVE REQUIREMENTS NOW!
+
+    \item	AS USUAL, DEVELOPMENT OF APPLICATIONS LAG BEHIND OTHER LAYERS
+    \end{nrtc}
+
+\item	MIGRATION PREFERABLE TO STARTING FROM SCRATCH
+    \begin{nrtc}
+    \item	MANY NEW, MAJOR INVESTMENTS BEING MADE IN CURRENT\\
+		TECHNOLOGY (e.g., NSFnet, NASA's PROPOSED INTERNET, etc.)
+
+    \item	MANY EXISTING SYSTEMS WORK ACCEPTABLY AND/OR HAVE A HEAVY
+		RE-IMPLEMENTATION COST
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBSERVATIONS}
+
+\begin{nrtc}
+\item	MANY OF THESE PROBLEMS HAVE PREVIOUSLY BEEN SOLVED, IN\\ DIFFERENT
+	SETTINGS, WITHOUT LOSS OF GENERALITY
+    \begin{nrtc}
+    \item	SOME OF THESE SOLUTIONS ARE QUITE MATURE\\
+		(STABLE, ROBUST, AND ENJOY A HIGH DEGREE OF VENDOR SUPPORT)
+    \end{nrtc}
+
+\item	THE ISO STACK IS A STRONGLY LAYERED ARCHITECTURE, WHICH\\ FACILITATES
+	APPLICATION-INDEPENDENCE OF UNDERLYING\\ PROTOCOLS
+    \begin{nrtc}
+    \item	SERVICES ARE IMPORTANT,\\ IMPLEMENTATIONS ARE NOT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{TOWARD A SOLUTION}\bf
+
+\begin{nrtc}
+\item	USE A VENDOR-PROPRIETARY SOLUTION?
+    \begin{nrtc}
+    \item	HOW MANY TIMES WILL SYSTEMS HAVE TO BE REWRITTEN?
+
+    \item	HOW MANY INTERIM SOLUTIONS WILL THE VENDORS SELL US?
+    \end{nrtc}
+
+\item	DEVELOP A MIGRATION STRATEGY!
+    \begin{nrtc}
+    \item 	ENSURE THAT ANY WORK STARTED TODAY WILL EASILY MIGRATE TO
+		TOTAL ISO SOLUTIONS, AS THEY BECOME AVAILABLE
+
+    \item	ALLOW FOR THE CO-EXISTENCE OF CURRENTLY OPERATIONAL SYSTEMS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A SOLUTION}
+
+\begin{nrtc}
+\item	USE TCP/IP AS THE MIGRATION VEHICLE
+    \begin{nrtc}
+    \item	OFFER ISO SERVICES ON TOP OF THE DDN PROTOCOL SUITE
+
+    \item	DEVELOP ISO APPLICATIONS NOW IN A LARGE ENVIRONMENT
+
+    \item	NO (OR MINIMAL) RECODING LATER
+    \end{nrtc}
+
+\item	A FEW ADVANTAGES OF TCP/IP
+    \begin{nrtc}
+    \item	ROBUST, MATURE, ETC.
+
+    \item	VENDOR SUPPORT
+
+    \item	LARGE BODY OF EXPERTISE
+
+    \item	SIMILAR ARCHITECTURE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+assume everyone already knows about tcp/ip here$\ldots$
+
+if not, we're in big trouble
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{PHILOSOPHY}
+
+\begin{nrtc}
+\item	COMPLEMENTARY CO-EXISTENCE:
+    \begin{nrtc}
+    \item	UTILIZE TCP/IP FUNCTIONALITY NOT CURRENTLY IN ISO\\
+		(ROUTING, ETC.)
+
+    \item	GAIN EXPERIENCE IN THE NUMEROUS EXISTING TCP/IP WORLDS
+
+    \item	UTILIZE ISO FUNCTIONALITY AS IT BECOMES AVAILABLE
+    \end{nrtc}
+
+\item	DEVELOP APPLICATIONS IN AN \underline{EVOLUTIONARY},
+	NOT \underline{REVOLUTIONARY}, FASHION
+
+\item	WANT TO BE CONSISTENT WITH ISO'S DIRECTION,
+	BUT WANT TO GET WORK DONE NOW
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+aside on arpa applications:
+
+\begin{nrtc}
+\item	most are 15+ years old (sans domains)
+\item	each application ``rolls its own'' syntax
+\item	the netascii legacy
+\end{nrtc}  
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{$\ \ \ \ \ \ $ WHERE TO JOIN THEM?}
+\vskip-0.5in
+\diagram[p]{figure2}
+\end	{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMPARISON OF THE TCP AND TP4}
+
+\begin{nrtc}
+\item	THE TCP IS STREAM-ORIENTED, THE TP4 IS PACKET-ORIENTED
+
+\item	THE TCP COALESCES SIMULTANEOUS CONNECTIONS
+
+\item	THE TCP HAS AN ``URGENCY'' CONCEPT, THE TP4 HAS ``EXPEDITED''
+
+\item	THE TCP HAS A GRACEFUL CLOSE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH}
+
+\begin{nrtc}
+\item	USE \underline{INTERFACE TRANSLATION} ABOVE TCP/IP
+    \begin{nrtc}
+    \item	USE A WRAPPER TO MAKE THE NATIVE TCP INTERFACE APPEAR TO BE
+		THE TP4 INTERFACE
+
+    \item	SAME SERVICE OFFERED TO USERS
+
+    \item	ENTIRELY DIFFERENT IMPLEMENTATION OF THOSE SERVICES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISO TRANSPORT SERVICES ON TOP OF THE TCP}
+
+\diagram[p]{figure5}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SUMMARY OF THE MAGIC-BOX PROTOCOL}
+
+\begin{nrtc}
+\item	OBSERVATIONS
+    \begin{nrtc}
+    \item	ALL THE REALLY HARD PARTS ARE ALREADY DONE BY THE\\ TCP
+		(i.e., THE MAJORITY OF THE TRANSPORT PROTOCOL\\ FUNCTIONALITY)
+
+    \item	THE TRANSPORT INTERFACING REMAINS TO BE DONE
+    \end{nrtc}
+
+\item	USES AN EFFICIENT PACKETIZATION PROTOCOL\\
+	(GOING THE OTHER WAY IS A LOT HARDER)
+
+\item	QUALITY OF SERVICE~---~FOR FURTHER STUDY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISSUE: MANAGEMENT OF THE ADDRESS SPACE}
+
+THE CLEVER APPROACH:
+\begin{small}
+\[\begin{tabular}{rlc}
+	$<$NSAP ID$>$&		$\longleftrightarrow$&	$<$IP address$>$\\
+	$<$TSAP selector, SSAP selector, PSAP selector$>$&
+				$\longleftrightarrow$&	$<$TCP port$>$
+\end{tabular}\]
+\end{small}
+
+\begin{nrtc}
+\item	SUGGESTS THAT THE TP CAN BE RUN DIRECTLY ABOVE THE DDN IP PROTOCOL
+\end{nrtc}
+\end{bwslide}
+
+
+
+\begin{bwslide}
+\ctitle	{MANAGEMENT OF THE ADDRESS SPACE (cont.)}
+
+\begin{nrtc}
+\item	THE TCP PORT SPACE IS TOO LIMITED
+
+\item	THE SIMPLE SOLUTION:\\
+	USE A SINGLE HARD-WIRED MAGIC-BOX PORT FOR THE TCP
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISSUE: EXPEDITED DATA}
+
+THREE WAYS TO TRY IT:
+\begin{nrtc}
+\item	ONE TCP CONNECTION\\
+	BORDERLINE COMPLIANCE
+
+\item	ONE TCP CONNECTION WITH URGENCY TO SIGNAL EXPEDITED DATA
+
+\item	TWO TCP CONNECTIONS, ONE WITH BETTER IP QOS\\
+	COMPLICATED PROTOCOL NEEDED TO GUARANTEE COMPLIANCE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXPEDITED DATA (cont.)}
+
+\begin{nrtc}
+\item	NOT ALL TCP IMPLEMENTATIONS CORRECTLY HANDLE URGENCY IN THE
+	DEGENERATE CASES
+
+\item	NOT ALL IP IMPLEMENTATIONS ACTUALLY IMPLEMENT QOS
+
+\item	THE SIMPLE SOLUTION:\\
+	USE A SINGLE CONNECTION SINCE THIS IS THE LEAST COMPLEX CHOICE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMPARISON TO OTHER APPROACHES}
+
+\begin{nrtc}
+\item	THE ARCHIVAL REFERENCE: [PGREE86]
+
+\item	PROTOCOL TRANSLATION: \tcptpgw/ [IGROE86]
+    \begin{nrtc}
+    \item	ANALYZE ESMs FOR EACH
+    \item	IDENTIFY SUBSET OF COMMON SERVICES
+    \item	BUILD ESM FOR MAGIC-BOX
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHAT IS THE PRACTICAL VALUE?}
+
+\begin{nrtc}
+\item	STILL NO COMMONALITY FOR APPLICATIONS
+    \begin{nrtc}
+    \item	DDN APPLICATIONS STILL WANT TCP SERVICES\\
+		SO CAN'T RUN DDN STUFF IN THE ISO WORLD
+
+    \item	ISO APPLICATIONS STILL WANT ISO SERVICES\\
+		SO CAN'T RUN ISO STUFF IN THE DDN WORLD
+    \end{nrtc}
+
+\item	ONE WORLD HAS TO IMPLEMENT THE OTHER WORLD'S STACK
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+but, isn't this criticism also true of our work?
+
+yes.
+\end{note}
+
+
+\begin{bwslide}
+\part	{A DIGRESSION ON THE INTEROPERABILITY OF APPLICATIONS}\bf
+
+CAN WE DO EITHER OF THESE?
+\begin{nrtc}
+\item	ACHIEVE INTEROPERABILITY BETWEEN SIMILAR APPLICATIONS\\ (e.g., MAIL)
+
+\item	MOVE AN APPLICATION FROM ONE PROTOCOL SUITE TO ANOTHER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ABSTRACT VIEW OF AN ENTITY}
+
+\diagram[p]{figure7}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH \#1: BUILD AN APPLICATION MAGIC-BOX}
+
+PROBLEM: SERVICES OFFERED USUALLY VARY DRAMATICALLY
+
+\vspace{0.25in}
+\diagram[p]{figure3}
+\vspace{0.25in}
+
+E.G., MAIL, CONSIDER [SKILL86]
+\end{bwslide}
+
+
+\begin{note}\em
+The acid test is moving data through the magic-box and back again w/o loss
+of information
+
+padlipsky: ``sometimes when you try to turn an apple into an orange you get
+back a lemon''
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH \#2: MIGRATE THE APPLICATION}
+
+PROBLEM: SERVICES REQUIRED USUALLY VARY DRAMATICALLY
+
+\vspace{0.25in}
+\diagram[p]{figure4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE RECURRING THEME}
+
+GENERAL UTILITY REQUIRES THAT PROTOCOL CONVERSION OCCUR AT EVERY LAYER
+IN WHICH THE SUITES CAN BE CONNECTED
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE RECURRING THEME (cont.)}
+
+SO TO INTEROPERATE MAIL (FOR EXAMPLE), WE NEED ONE OF:
+\begin{nrtc}
+\item	SMTP IN BOTH WORLDS
+
+\item	P1 IN BOTH WORLDS
+
+\item	SMTP AND P1 RUNNING IN THE \tcptpgw/\\
+	(REALLY AN APPLICATION RELAY)
+\end{nrtc}
+IN ADDITION TO THE \tcptpgw/
+\end{bwslide}
+
+
+\begin{note}\em
+all three choices are hard from above (services offered)
+
+all three choices are hard from below (services required)
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{DOES INTERFACE TRANSLATION HELP?}
+
+\begin{nrtc}
+\item	BOTH GIVE THE SAME END-RESULT
+
+\item	\underline{INTERFACE} TRANSLATION REQUIRES SIMILAR FUNCTIONALITY
+	BETWEEN THE TWO \underline{SERVICES} IN QUESTION
+
+\item	\underline{PROTOCOL} TRANSLATION REQUIRES SIMILAR FUNCTIONALITY\\
+	BETWEEN THE TWO \underline{PROTOCOLS} IN QUESTION
+
+\item	HENCE, OPTIMALITY DEPENDS ON CONTEXT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+in other words,
+neither approach makes applications interoperate
+
+there is no free lunch!
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{BENEFITS IN OUR CONTEXT}
+
+\begin{nrtc}
+\item	SHORT-TERM: EASY TO IMPLEMENT
+
+\item	MEDIUM-TERM:
+    \begin{nrtc}
+    \item	ANY FUTURE WORK IS DONE IN ONE STACK, BUT WILL RUN IN BOTH
+		WORLDS
+
+    \item	APPLICATION DESIGNERS CAN USE AN ISO-APPLICATIONS\\ FRAMEWORK
+		IN THE NUMEROUS EXISTING TCP/IP WORLDS
+    \end{nrtc}
+
+\item	LONG-TERM: PROVIDES THE BASIS FOR A MIGRATION STRATEGY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{A MIGRATION STRATEGY}\bf
+
+\begin{nrtc}
+\item	THREE PHASES FROM THE DDN SUITE TO THE ISO SUITE
+
+\item	ASSUMES AN EXISTING (AND HOPEFULLY) EXTENSIVE TCP/IP\\
+	INTERNET IN PLACE
+
+\item	REQUIRES ALL NEW HOSTS TO SPEAK TCP/IP UNTIL PHASE THREE
+
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PHASE ONE:\\ BUILD ISO DEVELOPMENT ENVIRONMENT}
+
+\begin{nrtc}
+\item	BEGIN WORKING ON ISO APPLICATIONS
+
+\item	MAGIC-BOX OFFERS TP4 SERVICE
+
+\item	DEVELOP DDN/ISO USER AGENTS
+    \begin{nrtc}
+    \item	COMMON USER-INTERFACE
+
+    \item	USE EITHER DDN OR ISO APPLICATION SERVICE, AS AVAILABLE
+
+    \item	NAME(DIRECTORY) SERVICE DETERMINES CHOICE OF STACK
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+for example, the symbolics filesystem interface
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{PHASE TWO:\\ EXPERIMENT WITH MIGRATION ENGINES}
+
+\begin{nrtc}
+\item	START USING HOSTS WITH BOTH ISO AND DDN STACKS
+
+\item	TEST APPLICATIONS IN A ``PURE'' ISO ENVIRONMENT
+
+\item	DO IP-LEVEL ROUTERS TO FORM TWO LOGICAL INTERNETS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PHASE THREE:\\ DEPLOY MIGRATION ENGINES}
+
+\begin{nrtc}
+\item	RELATIVELY INEXPENSIVE (AT FIRST) TO KEEP SOME DDN-ONLY HOSTS
+
+\item	USER AGENTS BEGIN TO SPEAK ISO ONLY
+
+\item	NEW HOSTS CAN BE ISO ONLY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {LAN--BASED MIGRATION TO NATIVE ISO}
+\vskip-0.5in
+\diagram[p]{figure6}
+\end{bwslide}
+
+
+\begin{note}\em
+so, our plan is to attack things from the top,
+while others attack from the bottom$\ldots$
+\end{note}
+
+
+\begin{bwslide}
+\part	{THE FIRST STEP:\\ ISODE}\bf
+
+\begin{nrtc}
+\item	AN OPENLY AVAILABLE ISO DEVELOPMENT
+	ENVIRONMENT HAS BEEN IMPLEMENTED AT NRTC
+
+\item	CODED ENTIRELY IN C
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OPERATING ENVIRONMENTS}
+
+\begin{nrtc}
+\item	4.2\bsd/ \unix/
+\item	SVR2 AT\&T \unix/ WITH AN EXCELAN \exos/~8044 TCP/IP PACKAGE
+\item	\vax//\vms/ RELEASE 4.4 WITH AN \exos/ CARD (UNDER DEVELOPMENT)
+\item	\pcdos/ WITH THE MIT PC-IP SOFTWARE (UNDER NEGOTIATION)
+\end{nrtc}
+
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SOFTWARE}
+
+\begin{nrtc}
+\item	TRANSPORT: IMPLEMENTS VERSION~2 OF THE MAGIC-BOX PROTOCOL
+
+\item	SESSION: BCS, BAS, BSS, EXPEDITED
+
+\item	PRESENTATION: ASN.1 ENCODING
+
+
+\item	APPLICATION: 
+    \begin{nrtc}
+    \item	ROS (REMOTE OPERATIONS)
+
+    \item	RTS (RELIABLE TRANSFER)
+
+    \item	ASN.1 SPECIFICATION PARSER FOR THE AUTOMATIC GENERATION OF
+		APDU PARSERS
+    \end{nrtc}
+
+\item	PLANNED FOR THE NEXT RELEASE:
+    \begin{nrtc}
+    \item	MAP/TOP VERSION~3.0 COMPATIBILITY\\
+		(WHEN THAT STABILIZES)
+
+    \item	APPLICATION SERVICE ELEMENTS (ASE) SUPPORT
+
+    \item	ISO PRESENTATION PROTOCOL
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PERFORMANCE OBSERVATIONS}
+
+\begin{nrtc}
+\item	ALTHOUGH NOT PRODUCTION SOFTWARE,
+	CODED WITH AN EYE\\ TOWARD EFFICIENCY
+
+\item	INITIAL BENCHMARKING SUGGESTS THROUGHPUT RATES VERY CLOSE TO RAW TCP
+	FOR BOTH TRANSPORT AND SESSION ECHO AND SINK ENTITIES
+
+\item	AT THE APPLICATION INTERFACE,
+	PERFORMANCE IS ONLY 10\%-12\% WORSE THAN RAW TCP
+
+\item	RESULTS PRIMARILY DUE TO MINIMIZED BYTE-COPYING BETWEEN\\
+	LAYERS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FOR FURTHER READING}
+
+\begin{nrtc}
+\item	REQUEST FOR COMMENTS 983 [DCASS86]
+
+\item	ISO TRANSPORT SERVICES ON TOP OF THE TCP\\
+	COMPUTER NETWORKS AND ISDN SYSTEMS JOURNAL (TO APPEAR)
+
+\item	REQUEST FOR COMMENTS 987 [SKILL86]\\
+	MAPPING BETWEEN X.400 AND RFC822
+
+\item	PROTOCOL CONVERSION [PGREE86]\\
+	IEEE TRANSACTIONS ON COMMUNICATION\\
+	VOLUME 34, NUMBER 3, MARCH 1986
+
+\item	CONVERSION BETWEEN THE TCP AND ISO TRANSPORT$\ldots$
+	[IGROE86]\\
+	IEEE JOURNAL ON SELECTED AREAS IN COMMUNICATIONS\\
+	VOLUME 4, NUMBER 2, MARCH 1986
+
+\item	MOVING FROM DOD TO ISO PROTOCOLS: A FIRST STEP [MWITT86]\\
+	ACM COMPUTER COMMUNICATIONS REVIEW\\
+	VOLUME 16, NUMBER 2, APRIL/MAY 1986
+\end{nrtc}
+\end{bwslide}
+
+
+\end{document}

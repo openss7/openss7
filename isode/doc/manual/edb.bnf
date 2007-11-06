@@ -1,0 +1,6 @@
+<entrydatablock> ::= <type> <CRLF> <version> <CRLF> <data>
+<type>		 ::= "MASTER" | "SLAVE" |  "CACHE"
+<version>	 ::= <printablestring>
+<data> 		 ::= <entry> | <entry> <CRLF> <data>
+<entry> 	 ::= <rdn> <CRLF> <attributelist> <CRLF>
+<attributelist>	 ::= <attribute> | <attributelist> <CRLF> <attribute>

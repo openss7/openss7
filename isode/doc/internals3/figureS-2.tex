@@ -1,0 +1,18 @@
+\File{figureS\-2.c},{11:21},{May  5 1990}
+\L{\LB{\Proc{integer\_free}integer\_free (x) integer *x; \{ free ((\K{char} *) x); \}}}
+\L{\LB{}}
+\L{\LB{\Proc{integer\_parse}integer\_parse (x, s)}}
+\L{\LB{integer **x;}}
+\L{\LB{\K{char}     *s;}}
+\L{\LB{\{}}
+\L{\LB{    \K{long}    l;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (scanf (s, \S{}\"\%ld\"\SE{}, \&l) != 1}}
+\L{\LB{}\Tab{8}{    \|\| (*x = (integer *) malloc (\K{sizeof} **x)) == NULL)}}
+\L{\LB{}\Tab{8}{\K{return} NOTOK;}}
+\L{\LB{    **x = (integer) l;}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\Proc{integer\_print}integer\_print (x, os) integer *x; OS os; \{ printf (\S{}\"\%d\"\SE{}, *x); \}}}

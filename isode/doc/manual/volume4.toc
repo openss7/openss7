@@ -1,0 +1,132 @@
+\contentsline {part}{\uppercase {i}\phspace {1em}Introduction}{1}
+\contentsline {chapter}{\numberline {1}Overview}{3}
+\contentsline {section}{\numberline {1.1}Fanatics Need Not Read Further}{4}
+\contentsline {section}{\numberline {1.2}The Name of the Game}{5}
+\contentsline {section}{\numberline {1.3}Operating Environments}{5}
+\contentsline {section}{\numberline {1.4}Organisation of the Release}{7}
+\contentsline {section}{\numberline {1.5}A Note on This Implementation}{9}
+\contentsline {section}{\numberline {1.6}Changes Since the Last Release}{10}
+\contentsline {part}{\uppercase {ii}\phspace {1em}Overview}{13}
+\contentsline {chapter}{\numberline {2}Motivation and Concepts}{15}
+\contentsline {section}{\numberline {2.1}A Model for Distributed Applications}{15}
+\contentsline {subsection}{\numberline {2.1.1}Abstract Data Types}{16}
+\contentsline {subsection}{\numberline {2.1.2}Operations}{17}
+\contentsline {subsection}{\numberline {2.1.3}Associations}{18}
+\contentsline {section}{\numberline {2.2}Design Guidelines}{18}
+\contentsline {subsection}{\numberline {2.2.1}Reliability Characteristics}{19}
+\contentsline {subsection}{\numberline {2.2.2}Keeping Total Operations Total}{19}
+\contentsline {section}{\numberline {2.3}For Further Reading}{20}
+\contentsline {chapter}{\numberline {3}A Discipline for Meal Preparation}{21}
+\contentsline {section}{\numberline {3.1}Defining A New Service}{21}
+\contentsline {section}{\numberline {3.2}Defining A Remote Operations Module}{23}
+\contentsline {section}{\numberline {3.3}Defining Concrete Data Structures}{24}
+\contentsline {section}{\numberline {3.4}Building An Initiator}{24}
+\contentsline {section}{\numberline {3.5}Building A Responder}{24}
+\contentsline {section}{\numberline {3.6}Putting It All Together}{25}
+\contentsline {part}{\uppercase {iii}\phspace {1em}Utensils}{27}
+\contentsline {chapter}{\numberline {4}Remote Operations Stub-Generator}{29}
+\contentsline {section}{\numberline {4.1}Remote Operations Module}{29}
+\contentsline {subsection}{\numberline {4.1.1}Operation Definitions}{30}
+\contentsline {subsection}{\numberline {4.1.2}Error Definitions}{30}
+\contentsline {subsection}{\numberline {4.1.3}Type Definitions}{30}
+\contentsline {section}{\numberline {4.2}ROSY Environment}{35}
+\contentsline {subsection}{\numberline {4.2.1}Abstract Syntax Module}{35}
+\contentsline {subsection}{\numberline {4.2.2}C Language Stubs}{35}
+\contentsline {section}{\numberline {4.3}Known Deficiences}{36}
+\contentsline {section}{\numberline {4.4}Running ROSY}{36}
+\contentsline {subsection}{\numberline {4.4.1}Options}{36}
+\contentsline {subsection}{\numberline {4.4.2}Makefiles}{37}
+\contentsline {subsection}{\numberline {4.4.3}Grinding}{38}
+\contentsline {chapter}{\numberline {5}Pepy Optional Structure-Generator}{39}
+\contentsline {section}{\numberline {5.1}Abstract Syntax Module}{39}
+\contentsline {section}{\numberline {5.2}POSY Environment}{43}
+\contentsline {subsection}{\numberline {5.2.1}C Language Structures}{43}
+\contentsline {subsubsection}{Controlling the names that POSY generates}{46}
+\contentsline {subsection}{\numberline {5.2.2}Augmented Abstract Syntax Module}{48}
+\contentsline {section}{\numberline {5.3}Known Deficiences}{52}
+\contentsline {section}{\numberline {5.4}Running POSY}{52}
+\contentsline {subsection}{\numberline {5.4.1}Options}{52}
+\contentsline {subsection}{\numberline {5.4.2}Makefiles}{53}
+\contentsline {chapter}{\numberline {6}Compiling Data-Structures}{59}
+\contentsline {section}{\numberline {6.1}Warning}{59}
+\contentsline {section}{\numberline {6.2}Syntax Rules}{59}
+\contentsline {subsection}{\numberline {6.2.1}ASN.1 Notation}{60}
+\contentsline {subsection}{\numberline {6.2.2}ASN.1 Extensions}{60}
+\contentsline {subsubsection}{Compiler Directives}{62}
+\contentsline {subsubsection}{Action Statements}{63}
+\contentsline {subsubsection}{Control Statements}{66}
+\contentsline {subsubsection}{Value Passing Statements}{67}
+\contentsline {section}{\numberline {6.3}Known Deficiencies}{72}
+\contentsline {subsection}{\numberline {6.3.1}ASN.1 Syntax}{72}
+\contentsline {subsection}{\numberline {6.3.2}ASN.1 Semantics}{73}
+\contentsline {section}{\numberline {6.4}PEPY Environment}{73}
+\contentsline {subsection}{\numberline {6.4.1}Starting Things Off}{73}
+\contentsline {subsection}{\numberline {6.4.2}Diagnostic Output}{74}
+\contentsline {subsection}{\numberline {6.4.3}Debug Output}{75}
+\contentsline {section}{\numberline {6.5}Pretty-printers}{75}
+\contentsline {section}{\numberline {6.6}Compiling and Loading}{76}
+\contentsline {subsection}{\numberline {6.6.1}External Modules}{76}
+\contentsline {subsection}{\numberline {6.6.2}Options}{76}
+\contentsline {subsection}{\numberline {6.6.3}Makefiles}{77}
+\contentsline {subsection}{\numberline {6.6.4}Grinding}{78}
+\contentsline {section}{\numberline {6.7}An Example}{78}
+\contentsline {section}{\numberline {6.8}For Further Reading}{87}
+\contentsline {chapter}{\numberline {7}Pepsy}{88}
+\contentsline {section}{\numberline {7.1}Abstract Syntax Module}{88}
+\contentsline {section}{\numberline {7.2}PEPSY Environment}{89}
+\contentsline {subsection}{\numberline {7.2.1}C Language Structures}{89}
+\contentsline {subsection}{\numberline {7.2.2}Mapping tables}{89}
+\contentsline {section}{\numberline {7.3}Known Deficiences}{89}
+\contentsline {section}{\numberline {7.4}Running PEPSY}{89}
+\contentsline {subsection}{\numberline {7.4.1}Options}{89}
+\contentsline {subsection}{\numberline {7.4.2}Makefiles}{90}
+\contentsline {section}{\numberline {7.5}Pepy Enhancements to Pepsy}{90}
+\contentsline {subsection}{\numberline {7.5.1}Verbatim Actions}{91}
+\contentsline {subsection}{\numberline {7.5.2}Value Passing Statements}{91}
+\contentsline {subsection}{\numberline {7.5.3}Constructed Types - Sequence and Set}{94}
+\contentsline {subsection}{\numberline {7.5.4}Choice}{97}
+\contentsline {subsection}{\numberline {7.5.5}Default}{97}
+\contentsline {subsection}{\numberline {7.5.6}Optional}{98}
+\contentsline {subsection}{\numberline {7.5.7}Encoding and Decoding Functions}{99}
+\contentsline {subsection}{\numberline {7.5.8}Pepsy C Action Statements}{102}
+\contentsline {subsection}{\numberline {7.5.9}External Type References}{102}
+\contentsline {part}{\uppercase {iv}\phspace {1em}Recipes}{103}
+\contentsline {chapter}{\numberline {8}Run-Time Environment}{105}
+\contentsline {section}{\numberline {8.1}Notice}{105}
+\contentsline {section}{\numberline {8.2}Conventions}{105}
+\contentsline {subsection}{\numberline {8.2.1}Interface from ROSY}{106}
+\contentsline {section}{\numberline {8.3}Routines for Initiators}{108}
+\contentsline {section}{\numberline {8.4}Routines for Invokers}{108}
+\contentsline {section}{\numberline {8.5}Routines for Responders}{114}
+\contentsline {section}{\numberline {8.6}Routines for Performers}{114}
+\contentsline {subsection}{\numberline {8.6.1}Registering Operations}{114}
+\contentsline {subsection}{\numberline {8.6.2}Responding to Operations}{116}
+\contentsline {section}{\numberline {8.7}Waiting for Events}{118}
+\contentsline {section}{\numberline {8.8}Miscellaneous Routines}{119}
+\contentsline {subsection}{\numberline {8.8.1}Association Termination}{119}
+\contentsline {subsection}{\numberline {8.8.2}Utility Routines}{120}
+\contentsline {section}{\numberline {8.9}Error Conventions}{121}
+\contentsline {section}{\numberline {8.10}Compiling and Loading}{121}
+\contentsline {chapter}{\numberline {9}Boilerplate for Initiators}{122}
+\contentsline {section}{\numberline {9.1}Embedded Initiator}{122}
+\contentsline {subsection}{\numberline {9.1.1}Association Establishment}{122}
+\contentsline {subsection}{\numberline {9.1.2}Operation Invocation}{125}
+\contentsline {subsubsection}{Synchronous Invocation}{125}
+\contentsline {subsubsection}{ASynchronous Invocation}{128}
+\contentsline {subsection}{\numberline {9.1.3}Association Release}{131}
+\contentsline {subsection}{\numberline {9.1.4}Error Handling}{132}
+\contentsline {section}{\numberline {9.2}Interactive Initiator}{136}
+\contentsline {subsection}{\numberline {9.2.1}Include File}{136}
+\contentsline {subsection}{\numberline {9.2.2}Worker Routines}{137}
+\contentsline {subsection}{\numberline {9.2.3}An Example}{148}
+\contentsline {chapter}{\numberline {10}Boilerplate for Responders}{150}
+\contentsline {section}{\numberline {10.1}Static Responder}{150}
+\contentsline {subsection}{\numberline {10.1.1}Association Management}{151}
+\contentsline {subsection}{\numberline {10.1.2}Operation Response}{162}
+\contentsline {subsection}{\numberline {10.1.3}Error Handling}{165}
+\contentsline {subsection}{\numberline {10.1.4}An Example}{168}
+\contentsline {chapter}{\numberline {11}A Complete Example}{169}
+\contentsline {section}{\numberline {11.1}Service Definitions}{169}
+\contentsline {section}{\numberline {11.2}Remote Operations Module}{170}
+\contentsline {section}{\numberline {11.3}Interactive Initiator}{178}
+\contentsline {section}{\numberline {11.4}Responder}{184}

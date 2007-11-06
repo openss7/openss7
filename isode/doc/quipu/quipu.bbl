@@ -1,0 +1,69 @@
+\begin{thebibliography}{CCI84b}
+
+\bibitem[CCI84a]{CCITT.MHS.84}
+CCITT~SG~5/VII.
+\newblock Recommendations {X.400}.
+\newblock October 1984.
+\newblock Message Handling Systems: System Model - Service Elements.
+
+\bibitem[CCI84b]{CCITT.X411.84}
+CCITT~SG~5/VII.
+\newblock Recommendations {X.411}.
+\newblock October 1984.
+\newblock Message Handling Systems: Message Transfer Layer.
+
+\bibitem[CCI88]{CCITT.Directory}
+CCITT.
+\newblock The directory - overview of concepts, models and services.
+\newblock December 1988.
+\newblock CCITT X.500 Series Recommendations.
+
+\bibitem[ISO88]{ISO.Directory}
+ISO.
+\newblock The directory - overview of concepts, models and services.
+\newblock April 1988.
+\newblock ISO DIS 9594.
+
+\bibitem[Kil87]{ECW87.INCA}
+S.E. Kille.
+\newblock {INCA} directory services.
+\newblock In {\it Esprit '87: Achievements and Impact}, pages~1472--1476, North
+  Holland Publishing, September 1987.
+
+\bibitem[Kil88a]{QUIPU.Design}
+S.E. Kille.
+\newblock {\it The Design of {QUIPU}}.
+\newblock Research Note~32, Department of Computer Science, University College
+  London, July 1988.
+
+\bibitem[Kil88b]{QUIPU.IFIP}
+S.E. Kille.
+\newblock The {QUIPU} directory service.
+\newblock In {\it IFIP WG 6.5 Conference on Message Handling Systems and
+  Distributed Applications}, North Holland Publishing, October 1988.
+
+\bibitem[Kil89a]{NSAP.Approach}
+S.E. Kille.
+\newblock {\it An interim Approach to use of Network Addresses}.
+\newblock Research Note~RN/89/13, Department of Computer Science, University
+  College London, February 1989.
+
+\bibitem[Kil89b]{PSAP.String}
+S.E. Kille.
+\newblock {\it A string encoding of Presentation Address}.
+\newblock Research Note~RN/89/14, Department of Computer Science, University
+  College London, February 1989.
+
+\bibitem[KR88]{QUIPU.Distributed}
+S.E. Kille and C.J. Robbins.
+\newblock Distributed operations in {QUIPU}.
+\newblock In {\it Esprit Conference Week}, North Holland Publishing, November
+  1988.
+
+\bibitem[RKT89]{QUIPU.Manual}
+C.J. Robbins, S.E. Kille, and A. Turland.
+\newblock The {ISO} development environment: user's manual (version 5.0).
+\newblock March 1989.
+\newblock Volume 5: QUIPU.
+
+\end{thebibliography}

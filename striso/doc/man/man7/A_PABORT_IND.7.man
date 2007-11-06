@@ -1,0 +1,8 @@
+
+.SH VALID STATES
+.PP
+The A_PABORT_IND primitive is issued by the AP provider in any state other than AP_UNBOUND and
+AP_IDLE.
+.SH NEW STATE
+.PP
+The new state is AP_IDLE.

@@ -1,0 +1,45 @@
+.TH USCONFIG 8 "30 September 1991"
+.\" $Header: /xtel/isode/isode/others/quipu/tools/dsaconfig/RCS/usconfig.8,v 9.0 1992/06/16 12:43:56 isode Rel $
+.\"
+.\"
+.\" $Log: usconfig.8,v $
+.\" Revision 9.0  1992/06/16  12:43:56  isode
+.\" Release 8.0
+.\"
+.\" 
+.SH NAME
+usconfig \- build database directory for a new DIT participant in the U.S.
+.SH SYNOPSIS
+.in +.5i
+.ti -.5i
+.B \*(SDusconfig
+\%[\-l]
+\%[\-c]
+\fIwildlife\fR
+.in -.5i
+.SH DESCRIPTION
+The \fIusconfig\fR program reads the file \fIwildlife\fR.dsa and
+creates a new directory, \fIwildlife/\fR, containing the initial
+database for a new participant in the U.S. portion of the DIT. At this
+time, \fIusconfig\fR can only be used within the U.S., as it uses
+some of the rules for naming that make up the North American Directory
+Forum's recommendations on Naming.
+.LP
+The '-l' option to \fIusconfig\fR produces a list of the legal
+names for U.S. states and state equivalents.
+.LP
+The '-c' option should be used to when creating a configuration for
+an organization of national standing that is chartered by the Congress
+of the United States.
+.SH FILES
+.nf
+.ta \w'\*(EDdsaptailor  'u
+\*(EDdsaptailor	QUIPU DUA tailoring file
+\*(EDfredrc	Whitepages tailoring file
+\*(EDwildlife	Configuration file
+.re
+.fi
+.SH "SEE ALSO"
+\fIPSI White Pages Pilot Project: Administrator's Guide\fR
+.SH DIAGNOSTICS
+All obvious.

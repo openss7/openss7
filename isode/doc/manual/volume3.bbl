@@ -1,0 +1,35 @@
+\begin{thebibliography}{ISO88}
+
+\bibitem[ISO88]{ISO.FTAM}
+{Information Processing Systems~---~File Transfer, Access, and Management}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, April 1988.
+\newblock Final Text of Draft International Standard 8571.
+
+\bibitem[KR78]{C.Language}
+Brian~W. Kernighan and Dennis~M. Ritchie.
+\newblock {\em {The C Programming Language}}.
+\newblock Software Series. Prentice-Hall, Inc., Englewood Cliffs, New Jersey,
+  1978.
+
+\bibitem[Pos81]{TCP}
+Jon~B. Postel.
+\newblock {Transmission Control Protocol}.
+\newblock Request for Comments 793, DDN Network Information Center, SRI
+  International, September 1981.
+\newblock See also \milstd/ 1778.
+
+\bibitem[RC86]{ISO.on.DDN}
+Marshall~T. Rose and Dwight~E. Cass.
+\newblock {OSI Transport Services on top of the TCP}.
+\newblock {\em Computer Networks and ISDN Systems}, 12(3), 1986.
+\newblock Also available as NRTC Technical Paper \#700.
+
+\bibitem[Ros90]{Open.Book}
+Marshall~T. Rose.
+\newblock {\em {The Open Book: A Practical Perspective on Open Systems
+  Interconnection}}.
+\newblock Prentice-hall, 1990.
+\newblock ISBN 0--13--643016--3.
+
+\end{thebibliography}

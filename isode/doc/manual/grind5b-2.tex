@@ -1,0 +1,35 @@
+\File{grind5b\-2.c},{22:23},{Jun 12 1988}
+\L{\LB{\K{\#include} \<ssap.h\>}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{int}}\Tab{8}{owned = 0;}}
+\L{\LB{\K{int}}\Tab{8}{required;}\Tab{32}{\C{}\/* initialized from connection negotation *\/\CE{}}}
+\L{\LB{\K{int}}\Tab{8}{settings;}\Tab{32}{\C{}\/*   .. *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{\#define} dotoken(requires,shift,bit,type) \!}}
+\L{\LB{\{ \!}}
+\L{\LB{    \K{if} (requirements \& requires) \!}}
+\L{\LB{}\Tab{8}{\K{switch} (settings \& (ST\_MASK \<\< shift)) \{ \!}}
+\L{\LB{}\Tab{8}{    \K{case} ST\_CALL\_VALUE \<\< shift: \!}}
+\L{\LB{}\Tab{16}{settings \&= \~(ST\_MASK \<\< shift); \!}}
+\L{\LB{}\Tab{16}{settings \|= ST\_INIT\_VALUE \<\< shift; \!}}
+\L{\LB{}\Tab{16}{\K{break}; \!}}
+\L{\LB{ \!}}
+\L{\LB{}\Tab{8}{    \K{case} ST\_INIT\_VALUE: \!}}
+\L{\LB{}\Tab{16}{\K{break}; \!}}
+\L{\LB{ \!}}
+\L{\LB{}\Tab{8}{    \K{case} ST\_RESP\_VALUE: \!}}
+\L{\LB{}\Tab{16}{owned \|= bit; \!}}
+\L{\LB{}\Tab{16}{\K{break}; \!}}
+\L{\LB{ \!}}
+\L{\LB{}\Tab{8}{    \K{default}: \!}}
+\L{\LB{}\Tab{16}{error (\S{}\"initial \%s token setting\"\SE{}, type); \!}}
+\L{\LB{}\Tab{8}{\} \!}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{    dotokens ();}}
+\L{\LB{}}
+\L{\LB{\K{\#undef}  dotoken}}

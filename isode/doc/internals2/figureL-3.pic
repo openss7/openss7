@@ -1,0 +1,25 @@
+.PS
+.ps 20
+## figureE-20/L-3
+B1:	box "``abcd''"
+B2:	box "3623421920030013" with .w at (B1.e.x+linewid/2, B1.e.y) \
+		width 3*boxwid
+B3:	box invis with .n at B1.s "T-SEL"
+B4:	box invis with .n at B2.s width 3*boxwid "network address"
+##
+C1:	box with .nw at (B3.sw.x, B3.sw.y-lineht) \
+	    width B2.e.x-B1.w.x
+	line dashed from B1.sw to C1.nw
+	line dashed from B2.se to C1.ne
+C1a:	box "``abcd''" invis with .w at C1.w
+C1b:	box "3623421920030013" invis with .e at C1.e width 3*boxwid
+C1c:	box "+" invis with .c at ((C1a.e.x+C1b.w.x)/2, C1.c.y)
+C2:	box "TSB address" \
+		with .w at (C1.e.x+linewid/2, C1.e.y) width 2*boxwid
+C3:	box invis with .n at C1.s "transport selector" width B2.e.x-B1.w.x
+C4:	box invis with .n at C2.s width 2*boxwid "network address"
+##
+	move to B1.w; "calling address\ \ " rjust
+	move to C1.w; "actual address used\ \ " rjust
+##
+.PE

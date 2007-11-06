@@ -1,0 +1,168 @@
+.PS
+.ps 20
+	boxht = .754; boxwid = 1.75
+## figure 6
+UPRG:	box
+	move from UPRG.w up .015
+	line invisible right 1.75 "{USER}" " "
+	move from UPRG.w down .015
+	line invisible right 1.75 " " "{PROGRAMS}"
+APP:	box with .n at UPRG.s
+	move from APP.w up .015
+	line invisible right 1.75 "{LAYER 7}" " "
+	move from APP.w down .015
+	line invisible right 1.75 " " "{APPLICATION}"
+PRES:	box with .n at APP.s
+	move from PRES.w up .015
+	line invisible right 1.75 "{LAYER 6}" " "
+	move from PRES.w down .015
+	line invisible right 1.75 " " "{PRESENTATION}"
+SESS:	box with .n at PRES.s
+	move from SESS.w up .015
+	line invisible right 1.75 "{LAYER 5}" " "
+	move from SESS.w down .015
+	line invisible right 1.75 " " "{SESSION}"
+TRANS:	box shaded with .n at SESS.s
+	move from TRANS.nw down .24
+	line right 1.25
+	line up .24
+	move from TRANS.nw down .225
+	line invisible right 1.25 "{\tiny MAGIC-BOX}" " "
+	move from TRANS.nw down .48
+	line invisible right 1.75 "{LAYER 4}" " "
+	move from TRANS.nw down .51
+	line invisible right 1.75 " " "TRANSPORT"
+	line from TRANS.nw to TRANS.ne
+	move from TRANS.sw up .005
+	line right 1.75
+	move from TRANS.sw up .010
+	line right 1.75
+NET:	box shaded with .n at TRANS.s
+	move from NET.w up .015
+	line invisible right 1.75 "{LAYER 3}" " "
+	move from NET.w down .015
+	line invisible right 1.75 " " "{NETWORK}"
+	line from NET.sw to NET.se
+	line from TRANS.nw to NET.sw
+	line from TRANS.ne to NET.se
+DL:	box with .n at NET.s
+	move from DL.w up .015
+	line invisible right 1.75 "{LAYER 2}" " "
+	move from DL.w down .015
+	line invisible right 1.75 " " "{DATA LINK}"
+PHY:	box with .n at DL.s
+	move from PHY.w up .015
+	line invisible right 1.75 "{LAYER 1}" " "
+	move from PHY.w down .015
+	line invisible right 1.75 " " "{PHYSICAL}"
+#
+	move from UPRG.ne right 5.0; XM1: Here
+MUPRG:	box with .nw at XM1
+	move from MUPRG.w up .015
+	line invisible right 1.75 "{USER}" " "
+	move from MUPRG.w down .015
+	line invisible right 1.75 " " "{PROGRAMS}"
+MAPP:	box with .n at MUPRG.s
+	move from MAPP.w up .015
+	line invisible right 1.75 "{LAYER 7}" " "
+	move from MAPP.w down .015
+	line invisible right 1.75 " " "{APPLICATION}"
+MPRES:	box with .n at MAPP.s
+	move from MPRES.w up .015
+	line invisible right 1.75 "{LAYER 6}" " "
+	move from MPRES.w down .015
+	line invisible right 1.75 " " "{PRESENTATION}"
+MSESS:	box with .n at MPRES.s
+	move from MSESS.w up .015
+	line invisible right 1.75 "{LAYER 5}" " "
+	move from MSESS.w down .015
+	line invisible right 1.75 " " "{SESSION}"
+MTRANS:	box with .n at MSESS.s
+	move from MTRANS.w up .015
+	line invisible right 1.75 "{LAYER 4}" " "
+	move from MTRANS.w down .015
+	line invisible right 1.75 " " "{TRANSPORT}"
+MNET:	box with .n at MTRANS.s
+	move from MNET.w up .015
+	line invisible right 1.75 "{LAYER 3}" " "
+	move from MNET.w down .015
+	line invisible right 1.75 " " "{NETWORK}"
+MDL:	box with .n at MNET.s
+	move from MDL.w up .015
+	line invisible right 1.75 "{LAYER 2}" " "
+	move from MDL.w down .015
+	line invisible right 1.75 " " "{DATA LINK}"
+MPHY:	box with .n at MDL.s
+	move from MPHY.w up .015
+	line invisible right 1.75 "{LAYER 1}" " "
+	move from MPHY.w down .015
+	line invisible right 1.75 " " "{PHYSICAL}"
+#
+#
+	boxwid = 4.0
+	move from UPRG.e right .5; XW1: Here
+WPRG:	box invis with .w at XW1
+	move from WPRG.w up .015
+	line invisible right 4.0 "TO BE SPECIFIED BY THE ISO" " "
+	move from WPRG.w down .015
+	line invisible right 4.0 " " "STANDARDS COMMITTEE"
+	move from UPRG.e right .1; Z15: Here
+	arrow from Z15 to WPRG.w
+	move from MUPRG.w left .1; Z16: Here
+	arrow from WPRG.e to Z16
+WAPP:	box invis with .n at WPRG.s
+	move from WAPP.w up .015
+	line invisible right 4.0 "TO BE SPECIFIED BY THE ISO" " "
+	move from WAPP.w down .015
+	line invisible right 4.0 " " "STANDARDS COMMITTEE"
+	move from APP.e right .1; Z13: Here
+	arrow from Z13 to WAPP.w
+	move from MAPP.w left .1; Z14: Here
+	arrow from WAPP.e to Z14
+WPRES:	box invis with .n at WAPP.s
+	move from WPRES.w up .015
+	line invisible right 4.0 "TO BE SPECIFIED BY THE ISO" " "
+	move from WPRES.w down .015
+	line invisible right 4.0 " " "STANDARDS COMMITTEE"
+	move from PRES.e right .1; Z11: Here
+	arrow from Z11 to WPRES.w
+	move from MPRES.w left .1; Z12: Here
+	arrow from WPRES.e to Z12
+WSESS:	box invis with .n at WPRES.s
+	line invis from WSESS.w right 4.0 "[ISO 8326/7] SESSION SERVICE"
+	move from SESS.e right .1; Z9: Here
+	arrow from Z9 to WSESS.w
+	move from MSESS.w left .1; Z10: Here
+	arrow from WSESS.e to Z10
+WTRAN:	box invis with .n at WSESS.s
+	move from WTRAN.w up .015
+	line invisible right 4.0 "[ISO 8072/3] TRANSPORT SERVICE" " "
+	move from WTRAN.w down .015
+	line invisible right 4.0 " " "CLASS 4 (TP4)"
+#	move from TRANS.e right .1; Z7: Here
+#	arrow from Z7 to WTRAN.w
+	move from MTRANS.w left .1; Z8: Here
+	arrow from WTRAN.e to Z8
+WNET:	box invis with .n at WTRAN.s
+	move from WNET.w up .015
+	line invisible right 4.0 "[ISO 8473] CONNECTIONLESS" " "
+	move from WNET.w down .015
+	line invisible right 4.0 " " "INTERNET NETWORK SERVICE"
+#	move from NET.e right .1; Z5: Here
+#	arrow from Z5 to WNET.w
+	move from MNET.w left .1; Z6: Here
+	arrow from WNET.e to Z6
+WDL:	box invis with .n at WNET.s
+	line invis from WDL.w right 4.0 "[ISO 8802/2] LOGICAL LINK CONTROL"
+	move from DL.e right .1; Z3: Here
+	arrow from Z3 to WDL.w
+	move from MDL.w left .1; Z4: Here
+	arrow from WDL.e to Z4
+WPHY:	box invis with .n at WDL.s
+	line invis from WPHY.w right 4.0 "[ISO 8802/3] IEEE 802.3 CSMA/CD"
+	move from PHY.e right .1; Z1: Here
+	arrow from Z1 to WPHY.w
+	move from MPHY.w left .1; Z2: Here
+	arrow from WPHY.e to Z2
+##
+.PE

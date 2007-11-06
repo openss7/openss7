@@ -1,0 +1,42 @@
+.PS 6.25i
+.ps 20
+## figure 13
+B1:	box invis
+	move to B1.e; "\begin{tabular}[b]{r} STOR\\ open\end{tabular}\ " rjust
+B2:	box invis with .w at (B1.e.x+3*linewid, B1.e.y) \
+	    "GATEWAY"
+B3:	box invis with .w at (B2.e.x+3*linewid, B2.e.y)
+	move to B3.w; \
+	"\ \begin{tabular}[t]{l} F-SELECT\\ F-OPEN\\ F-WRITE\end{tabular}" ljust
+	arrow from (B1.e.x+linewid/2, B1.e.y) to (B2.w.x-linewid/2, B2.w.y)
+	arrow from (B2.e.x+linewid/2, B2.e.y) to (B3.w.x-linewid/2, B3.w.y)
+##
+B4:	box invis with .n at (B1.s.x, B1.s.y-lineht)
+	move to B4.e; "\begin{tabular}[b]{r} send data\end{tabular}\ " rjust
+B5:	box invis with .w at (B4.e.x+3*linewid, B4.e.y) \
+	    "GATEWAY"
+B6:	box invis with .w at (B5.e.x+3*linewid, B5.e.y)
+	move to B6.w; \
+	"\ \begin{tabular}[t]{l} F-DATA\end{tabular}" ljust
+	arrow from (B4.e.x+linewid/2, B4.e.y) to (B5.w.x-linewid/2, B5.w.y)
+	arrow from (B5.e.x+linewid/2, B5.e.y) to (B6.w.x-linewid/2, B6.w.y)
+##
+B10:	box invis with .n at (B4.s.x, B4.s.y-lineht) "$\cdots$"
+B11:	box invis with .n at (B5.s.x, B5.s.y-lineht) "$\cdots$"
+B12:	box invis with .n at (B6.s.x, B6.s.y-lineht) "$\cdots$"
+##
+B7:	box invis with .n at (B10.s.x, B10.s.y-lineht)
+	move to B7.e; "\begin{tabular}[b]{r} close\end{tabular}\ " rjust
+B8:	box invis with .w at (B7.e.x+3*linewid, B7.e.y) \
+	    "GATEWAY"
+B9:	box invis with .w at (B8.e.x+3*linewid, B8.e.y)
+	move to B9.w; \
+	"\ \begin{tabular}[t]{l} F-DATA-END\\ F-TRANSFER-END\\ F-CLOSE\\ F-DESELECT\end{tabular}" ljust
+	arrow from (B7.e.x+linewid/2, B7.e.y) to (B8.w.x-linewid/2, B8.w.y)
+	arrow from (B8.e.x+linewid/2, B8.e.y) to (B9.w.x-linewid/2, B9.w.y)
+##
+	arrow from (B1.w.x-3*linewid, B1.n.y+2*lineht) \
+	      to   (B7.w.x-3*linewid, B7.n.y-2*lineht)
+	move to (B4.w.x-3*linewid, B4.c.y); "time\ \ " rjust
+##
+.PE

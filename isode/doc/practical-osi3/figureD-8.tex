@@ -1,0 +1,28 @@
+\File{figureD\-8.py},{14:11},{Mar  4 1991}
+\L{\LB{purportedMatch (base: DN; p: PurportedName): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    s = head (p): String;}}
+\L{\LB{    dlist, matches: \K{SET} \K{OF} DN;}}
+\L{\LB{}}
+\L{\LB{    \K{IF} (length (p) == 1) \K{THEN}}}
+\L{\LB{        \K{IF} (containsType (s)) \K{THEN}}}
+\L{\LB{            \K{RETURN} keyedSearch (base, lhs (s), rhs (s));}}
+\L{\LB{        \K{ELSE}}}
+\L{\LB{            \K{IF} (length (base) == 0) \K{THEN}}}
+\L{\LB{                \K{IF} (matches = rootSearch (s)) \K{THEN}}}
+\L{\LB{                    \K{RETURN} matches;}}
+\L{\LB{                \K{ELSE}}}
+\L{\LB{                    \K{RETURN} leafSearch (base, s, oneLevel);}}
+\L{\LB{            \K{ELSE}}}
+\L{\LB{                \K{IF} (length (base) == 1) \K{THEN}}}
+\L{\LB{                    \K{IF} (matches = intermediateSearch (base, s)) \K{THEN}}}
+\L{\LB{                        \K{RETURN} matches;}}
+\L{\LB{                    \K{ELSE}}}
+\L{\LB{                        \K{RETURN} leafSearch (base, s, oneLevel);}}
+\L{\LB{                \K{ELSE}}}
+\L{\LB{                    \K{IF} (matches = leafSearch (base, s, wholeSubtree)) \K{THEN}}}
+\L{\LB{                        \K{RETURN} matches;}}
+\L{\LB{                    \K{ELSE}}}
+\L{\LB{                        \K{RETURN} intermediateSearch (base, s);}}
+\L{\LB{}}
+\L{\LB{...}}

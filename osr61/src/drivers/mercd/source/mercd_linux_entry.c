@@ -241,7 +241,11 @@ static int __init mercd_init_module(void)
         qDrvMsgPoolAllocate(NATIVE_MAX_POOL_SIZE);	
 #endif
 
+#ifdef HAVE_KFUNC_PCI_MODULE_INIT
         ret = pci_module_init(&mercd_driver);
+#else				/* HAVE_KFUNC_PCI_MODULE_INIT */
+        ret = pci_register_driver(&mercd_driver);
+#endif				/* HAVE_KFUNC_PCI_MODULE_INIT */
 
         if (ret < 0)  {
 #ifndef LFS

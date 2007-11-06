@@ -1,0 +1,383 @@
+% run this through SLiTeX
+
+\documentstyle[blackandwhite,landscape,oval,pagenumbers,plain,small]{NRslides}
+
+\raggedright
+
+\input trademark
+
+\begin{document}
+
+\title	{FOCUS ON OSI FOR\\ NETWORKED APPLICATIONS}
+\author	{Marshall T.~Rose\\ The Wollongong Group}
+\date	{November 18, 1987}
+\maketitlepage
+
+
+\begin{note}\em
+all of the original work reported herein was done at the Northrop Research
+and Technology Center
+\begin{quote}
+in particular, the support of Dr.~Stephen J.~Lukasik,\\
+Vice President~---~Technology is gratefully acknowledged
+\end{quote}
+
+other individuals contributing to this work include:
+\begin{nrtc}\em
+\item	at UCL: Steve Kille
+
+\item	at NPL: John Pavel
+
+\item	at Nott: Julian Onions
+
+\item	at NMA: Einar Stefferud
+\end{nrtc}
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{FUNDAMENTAL PREMISES}
+
+\begin{nrtc}
+\item	OSI/ISO WILL DOMINATE COMPUTER COMMUNICATIONS
+
+\item	EXISTING INVESTMENTS (IN NON-OSI TECHNOLOGY) SHOULD BE PROTECTED
+
+\item	BUT REALISTICALLY, EQUIPMENT HAS A HALF-LIFE OF 5 YEARS, SO$\ldots$
+
+\item	NEW INVESTMENTS SHOULD EITHER BE OSI OR HAVE A HIGH DEGREE OF
+	OSI-COMPATIBILITY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHAT IS OSI/ISO?}
+
+\begin{nrtc}
+\item	A LAYERED ARCHITECTURE FOR COMPUTER COMMUNICATIONS
+
+\item	STANDARDIZED IN THE INTERNATIONAL COMMUNITY
+
+\item	NON-PROPRIETARY IN NATURE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FROM A COMMUNICATIONS VIEWPOINT}
+
+\vskip.5in
+\diagram[p]{figure1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FROM A COMPUTER VIEWPOINT}
+
+\vskip.5in
+\diagram[p]{figure2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{(OBLIGATORY SLIDE SHOWING)\\ THE 7--LAYER STACK}
+
+\vskip.5in
+\diagram[p]{figure3}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE UPPER-LAYER ARCHITECTURE}
+
+\vskip.15in
+\diagram[p]{figure4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE OSI APPLICATION LAYER}
+
+\begin{nrtc}
+\item	MANY STANDARD SERVICE ELEMENTS
+    \begin{nrtc}
+    \item	ASSOCIATION CONTROL
+
+    \item	REMOTE OPERATIONS
+
+    \item	RELIABLE TRANSFER
+
+    \item	COMMITMENT, CONCURRENCY AND RECOVERY
+
+    \item	DIRECTORY SERVICES
+
+    \item	ABSTRACT SYNTAX NOTATION ONE\\
+		(really a concept not an element, per se)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FTAM USE OF UPPER-LAYER SERVICES}
+
+\vskip.5in
+\diagram[p]{figure5}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OSI SERVICES IN NON-OSI ENVIRONMENTS}
+
+\begin{nrtc}
+\item	START BUILDING AN OSI ENVIRONMENT ON TOP OF EXISTING ENVIRONMENTS
+
+\item	BUILD SELECTED NEW APPLICATION SYSTEMS WITH OSI
+
+\item	MIGRATE EXISTING APPLICATIONS TO AN OSI FRAMEWORK AS THE TECHNOLOGY
+	BECOMES AVAILABLE
+
+\item	CONTINUE RUNNING SELECTED SYSTEMS ``AS IS''
+
+\item	PROOF OF CONCEPT: DECnet/ISO, STREAMS/TLI, ISODE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERVICE EMULATOR AT TRANSPORT}
+
+\vskip.5in
+\diagram[p]{figure6}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE:\\ ISO TRANSPORT SERVICES ON TOP OF DoD TCP}
+\vskip-0.1in
+\diagram[p]{figure7}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISODE: THE ISO DEVELOPMENT ENVIROMENT}
+
+\begin{nrtc}
+\item	AN OPENLY AVAILABLE IMPLEMENTATION OF THE OSI UPPER-LAYERS
+
+\item	CODED ENTIRELY IN C
+
+\item	OPERATING SYSTEMS: BERKELEY AND AT\&T \unix/
+    \begin{nrtc}
+    \item	REQUIRES NO KERNEL MODIFICATIONS
+    \end{nrtc}
+
+\item	ALIGNED WITH THE U.S. GOSIP
+
+\item	AT THE APPLICATION INTERFACE (ABOVE ACSE/ROSE),
+	THROUGHPUT IS ONLY 10\%-12\% WORSE THAN RAW TCP FOR DATA TRANSFER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE APPLICATION ENVIRONMENT}
+
+\vskip.15in
+\diagram[p]{figure8}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN ALTERNATE ENVIRONMENT:\\ MHS ARCHITECTURE (c.~1984)}
+
+\vskip.15in
+\diagram[p]{figure9}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRANSPORT SERVICES}
+
+\begin{nrtc}
+\item	CURRENTLY A TP0 TRANSPORT SERVICE IS USED
+    \begin{nrtc}
+    \item	OVER X.25 (FOR EUROPEANS, et. al.)
+
+    \item	OVER TCP (FOR DEFENSE DATA NETWORK)
+    \end{nrtc}
+
+\item	TCP-BASED SERVICE IS INDISTINGUISHABLE FROM A CONNECTION-ORIENTED
+	NETWORK SERVICE
+
+\item	WORK WILL START SOON ON INTEGRATING A NATIVE TP4
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHERE NEXT?}
+
+\begin{nrtc}
+\item	UPGRADE TO FINAL (IS) SPECIFICATIONS
+
+\item	``COOKED'' SUPPORT FOR REMOTE OPERATIONS
+
+\item	INTEGRATION OF:
+    \begin{nrtc}
+    \item	MHS
+
+    \item	DIRECTORY SERVICES
+
+    \item	VIRTUAL TERMINAL
+    \end{nrtc}
+	IMPLEMENTATIONS DONE AT OTHER SITES
+
+\item	INTEROPERABILITY/CONFORMANCE TESTING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AVAILABILITY INFORMATION}
+
+\begin{nrtc}
+\item	VERSION 3 AVAILABLE OCTOBER 14, 1987
+
+\item	USPS: SEND CHECK OR INVOICE FOR \$200 US DOLLARS TO:
+    \[\begin{tabular}{l}
+	ISODE DISTRIBUTION\\
+	DEPARTMENT OF ELECTRICAL ENGINEERING\\
+	UNIVERSITY OF DELAWARE\\
+	NEWARK, DE  19716\\[0.25in]
+	TELCO: 302--451--1163
+    \end{tabular}\]
+
+\item	DISTRIBUTION CONTAINS:
+    \begin{nrtc}
+    \item	1600bpi TAR TAPE
+
+    \item	3 VOLUME DOCUMENTATION SET
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FOCUS ON OSI FOR NETWORKED APPLICATIONS}
+
+\begin{nrtc}
+\item	TOOLS TO FACILITATE DEVELOPMENT OF APPLICATIONS ARE CRITICAL
+
+\item	IDEA IS TO DEVELOP TOOLS TO AUTOMATE USE OF OSI REMOTE OPERATIONS
+	SERVICE AS A GENERAL REMOTE PROCEDURE CALL FACILITY
+
+\item	ECMA TR/31: REMOTE OPERATIONS -- CONCEPTS, NOTATION AND
+	CONNECTION-ORIENTED MAPPINGS (SECTIONS 1--4)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ABSTRACT SYNTAX NOTATION 1 (ASN.1)}
+
+\begin{nrtc}
+\item	UNIVERSAL LANGUAGE TO DESCRIBE INFORMATION OBJECTS WITH STRONG TYPING
+
+\item	RICH, EXTENSIBLE SYNTAX
+
+\item	USEFUL FOR SPECIFICATION OF NEW PROTOCOLS
+    \begin{nrtc}
+    \item	CLEAR TO READ SPECIFICATIONS
+
+    \item	NOT TIED TO MACHINE-ORIENTED STRUCTURES AND RESTRICTIONS
+    \end{nrtc}
+
+\item	REPRESENTATION CURRENTLY USED BY ALL OSI APPLICATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REMOTE OPERATIONS SERVICE (ROS)}
+
+\begin{nrtc}
+\item	STANDARDIZED MECHANISM FOR SPECIFYING TRANSACTIONS
+
+\item	EMPLOYS FULL POWER OF ASN.1
+
+\item	USED IN MANY INTERESTING OSI APPLICATIONS
+    \begin{nrtc}
+    \item	MESSAGING
+
+    \item	DIRECTORY SERVICES
+
+    \item	NETWORK MANAGEMENT
+
+    \item	REMOTE DATABASE ACCESS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{GENERAL ORGANIZATION}
+
+\begin{nrtc}
+\item	AT COMPILE-TIME:
+    \begin{nrtc}
+    \item	USE RO-SPECIFICATION TO GENERATE SUPPORT FACILITIES
+    \end{nrtc}
+
+\item	AT RUN-TIME:
+    \begin{nrtc}
+    \item	USE DIRECTORY SERVICES TO LOCATE/REGISTER NETWORK SERVICES
+
+    \item	USE ASSOCIATION CONTROL TO BIND/UNBIND APPLICATIONS
+
+    \item	USE REMOTE OPERATIONS TO INVOKE TRANSACTIONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STATIC (COMPILE-TIME) ORGANIZATION}
+
+\vskip.15in
+\diagram[p]{figure10}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DYNAMIC (RUN-TIME) ORGANIZATION}
+
+\vskip.15in
+\diagram[p]{figure11}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CURRENT STATUS}
+
+\begin{nrtc}
+\item	STATIC FACILITIES
+    \begin{nrtc}
+    \item	ALL TOOLS/LIBRARIES ARE DEVELOPED AND IN VARYING STAGES OF
+		BETA TESTING
+    \end{nrtc}
+
+\item	DYNAMIC FACILITIES
+    \begin{nrtc}
+    \item	MOST LIBRARIES ARE ALREADY WELL-TESTED
+
+    \item	``REAL'' (DYNAMIC) DIRECTORY SERVICES IS TOO IMMATURE
+		FOR SERIOUS IMPLEMENTATION
+    \end{nrtc}
+
+\item	AN ``APPLICATIONS COOKBOOK'' IS PLANNED BUT NOT YET WRITTEN
+\end{nrtc}
+\end{bwslide}
+
+
+\end{document}

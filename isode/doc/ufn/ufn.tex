@@ -1,0 +1,832 @@
+%\documentstyle [11pt,ucl-rn-pic,tgrind,a4] {article}
+\documentstyle [11pt,ucl-rn,tgrind] {article}
+\author {S.E. Kille}
+\date {June 1990}
+\rnnumber{RN/90/29}
+\title {Using the OSI Directory to achieve \\  User Friendly Naming}
+\begin {document}
+\maketitle
+\begin {abstract}
+The OSI Directory has user friendly naming as a goal.  A simple minded usage
+of the directory does not achieve this.  Two aspects not achieved are:
+
+\begin{itemize}
+\item A user oriented notation
+\item Guessability
+\end{itemize}
+
+This proposal sets out some conventions for representing names in a friendly
+manner, and shows how this can be used to achieve really friendly naming.
+\end {abstract}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\pagebreak
+
+\section {Why a notation is needed}
+
+Many OSI Applications make use of Distinguished Names (DN) as defined in the
+OSI Directory \cite{CCITT.Directory}.
+The main reason for having a notation for
+is for interacting with a user
+interface.  This proposal is coming dangerously close to the sin of
+standardising interfaces.  However, there are aspects of presentation which
+it is desirable to standardise.
+
+In very many cases, a user will be required to
+input a name.  This notation is designed to allow this to happen in a
+uniform manner across many user interfaces.    The intention is that
+the name can just be typed in.  There should not be any need to engage in
+form filling or complex dialogue.
+
+A secondary goal, is to have a common
+format to be able to unambiguously refer to names.
+This notation should {\em not} be needed to write on business cards or in
+the minutes of meetings.  If this is the case, the directory has failed to a
+large extent.  It should be possible to take the ``human'' description given
+at the meeting, and use it directly.  The means in which this happens will
+become clear later.  In practice, it will often be useful to explicitly write
+down directory names, even though it is not strictly needed.
+
+\section {A notation for Distinguished Name}
+
+\subsection {Goals}
+
+The following goals are laid out:
+
+\begin {itemize}
+\item  It should be intuitive for the majority of names encountered
+\item It should be fully general
+\item It should be possible to lay it out in a number of ways
+\end {itemize}
+
+\subsection {Informal definition}
+
+This notation is designed to be convenient for common forms of name.
+Some examples are given. 
+My directory (distinguished) name would be written:
+
+\begin{verbatim}
+Steve Kille, Computer Science, University College London, GB  
+\end{verbatim}
+
+This may be folded, perhaps to display in multi-column format.
+For example:
+
+\begin {verbatim}
+Steve Kille, 
+Computer Science, 
+University College London, 
+GB  
+\end{verbatim}
+
+or 
+
+\begin {verbatim}
+Steve Kille 
+Computer Science 
+University College London, GB  
+\end{verbatim}
+
+Another name might be:
+
+
+\begin {verbatim}
+Christian Huitema, INRIA, FR
+\end{verbatim}
+
+An example, showing how different attribute types are handled:
+
+
+\begin {verbatim}
+James Hacker 
+locality=Basingstoke 
+Widget Inc 
+GB 
+\end{verbatim}
+
+An example showing quoting of a comma in an Organisation name:
+
+\begin {verbatim}
+L. Eagle, "Sue, Grabbit and Runn", GB
+\end{verbatim}
+
+
+\subsection {Formal definition}
+
+
+The structure is specified in a BNF grammar in Figure~\ref{BNF}.
+
+\begin{figure}
+\begin {verbatim}
+<name> ::= <name-component>
+       | <name-component> <spaced-separator> <name>
+
+<spaced-separator> ::= <optional-space>  
+                <separator>
+                <optional-space>
+
+<separator> ::= "," ( <CR> )
+              | <CR> 
+
+<optional-space> ::= *( " " ) 
+
+<name-component> ::= <attribute> 
+        | <attribute> <optional-space> "+" ( <CR> ) 
+          <optional-space> <name-component>
+
+<attribute> ::= <string>
+        | <key> <optional-space> "=" <optional-space> <string>
+
+<key> ::= 1*( <keychar> )
+<keychar> ::= letters, numbers, and space
+
+<string> ::= *( <stringchar> | <pair> )
+         | '"' *( <stringchar> | "," | "+" | "=" | <CR> ) '"'
+         
+<special> ::= "," | "=" | '"' | <CR> | "\" | "+"
+<pair> ::= "\" <special> 
+<stringchar> ::= any char except <special>
+
+\end{verbatim}
+\caption {BNF Grammar for Distinguished and Purported Name}
+\label {BNF}
+\end{figure}
+
+
+The quoting mechanism is used for the following cases:
+
+\begin {itemize}
+\item Strings containing ``,'', ``+'', ``=''or ``\verb|"|''  or \verb|<CR>|
+\item Strings with leading or trailing spaces
+\item Strings containing consecutive spaces
+\end {itemize}
+
+A list of valid keywords for well known attribute types used in naming is
+given in Table~\ref{keywords}.  This is a list of keywords which must be
+supported.  These are chosen because they appear in common forms of name,
+and can do so in a place which does not correspond to the default schema
+used.
+If other attributes are used for naming, this can always be
+extended locally.
+
+\begin{table}
+\begin{center}
+\begin {tabular}{l l}
+Key & Attribute (X.520 keys) \\
+\hline
+Locality & LocalityName \\
+Area & LocalityName \\
+Organisation & OrganizationName \\
+Organization & OrganizationName \\
+\end {tabular}
+\end{center}
+\caption {Standardised Keywords}
+\label {keywords}
+\end{table}
+
+
+Only string type attributes are
+considered, but other attribute syntaxes could be supported locally.
+It is assumed that the interface will translate from the supplied string
+into PrintableString or T.61.
+
+The \verb|"+"| notation is used to specify multi-component RDNs.  In this
+case, the types for attributes in the RDN must be explicit.
+
+The name is presented/input in a little-endian order.  If no type are given,
+a type hierarchy (schema) is assumed as:
+
+\begin {verbatim}
+Common Name, (((Organisational Unit)*,  Organisation,) Country)
+\end{verbatim}
+
+Explicitly typed RDNs may be inserted into this hierarchy.  Two types of
+object are named.  They are distinguished by context in the application:
+
+\begin{description}
+\item[Common Name Object] Typically a leaf object and a person.  In this
+case, the LHS RDN is assumed to be common name, and other RDNs follow the
+hierarchy.
+
+\item[Other Object] Typically a non-leaf object.  
+\end{description}
+
+
+\section {Purported names}
+
+
+A purported name is what a user supplies to an interface for resolution
+into  one or more distinguished names.
+The same
+notation is used as for distinguished name.  
+A purported name may differ from a distinguished name in a number of ways
+which are itemised below.
+
+Typically, an
+interface will display a distinguished name, using the distinguished name
+notation.  However, it may display a purported name, as this will be more
+pleasing to the user.  The most common example of this is where the higher
+components of the distinguished name are not displayed (abbreviation).
+
+The ways in which a purported name may vary from a distinguished name are
+now described:
+
+\begin {description}
+\item[Abbreviation] Some of the more significant components of the DN will
+be omitted, and then defaulted in some way (e.g., relative to a local
+context).  For example:
+
+\begin {verbatim}
+Steve Kille
+\end{verbatim}
+
+\item[Component Omission]
+An intermediate component of the name may be omitted.  Typically this will
+be an organisational unit.   For example:
+
+\begin {verbatim}
+Steve Kille, University College London, GB
+\end{verbatim}
+
+
+In some cases, this can be combined with abbreviation.  For example:
+
+\begin {verbatim}
+Steve Kille, University College London
+\end{verbatim}
+
+\item[Approximation] Approximate renditions or alternate values
+of one or more of the components
+will be supplied. For example:
+
+\begin {verbatim}
+Stephen Kille, CS, UCL, GB   
+\end{verbatim}
+
+or
+
+\begin{verbatim}
+Steve Keill, Comp Sci, Univarstiy College London, GB
+\end{verbatim}
+
+
+\item[Friendly Country] A ``friendly country name'' can be used instead of
+the ISO 3166 two letter code.  For example: UK; USA; France; Deutchland.  
+
+\item[Type Changing] A type may be omitted, even where it does not follow
+the hierarchy.   Type variants can be explored.
+The previous distinguished name:
+\begin {verbatim}
+James Hacker 
+locality=Basingstoke 
+Widget Inc 
+GB 
+\end{verbatim}
+
+Could be represented by the purported name:
+
+\begin {verbatim}
+James Hacker 
+Basingstoke 
+Widget Inc 
+GB 
+\end{verbatim}
+
+
+\end {description}
+
+
+\section {Matching a purported name}
+
+The major utility of the purported name is to provide the important ``user
+friendly'' characteristic of guessability.  A user will supply a purported
+name to a user interface, and this will be resolved onto a distinguished
+name.   
+When a user supplies a purported name there is a need to derive the DN.  In
+most cases, it should be possible to derive a single name from the purported
+name.  In some cases, ambiguities will arise and the user will be prompted
+to select from a multiple matches.  This should also be the case where a
+component of the name did not ``match very well''.   
+
+There is an assumption that the user will simply enter the name correctly.
+The purported name variants are designed to make this happen!  There is no
+need for fancy window based interfaces or form filling for many applications
+of the directory.  Note that the fancy interfaces still have a role for
+browsing, and for more complex matching.  This type of naming is to deal
+with cases where information on a known user is desired and keyed on the
+user's name.
+
+\subsection {Environment}
+
+
+
+
+All matches occur in the context of a local environment.
+The local environment defines a 
+sequence of name of a non-leaf objects in the DIT.   
+This environment effectively defines a list of acceptable name abbreviations
+where the DUA is employed.   It also defines an order in which to operate.
+
+
+This list is defined in the context of the number of name components
+supplied.  This allows varying heuristics, depending on the environment, to
+make the approach have the ``right'' behaviour.
+
+
+In most cases, the environment will start at a local point in the DIT, and
+move upwards.   Examples are given in Tables~\ref{e1} and~\ref{e2}.
+Table~\ref{e1} shows an example for a typical local DUA, which has the
+following characteristics:
+
+\begin{description}
+\item[One component] Assumed first to be a user in the department, then a
+user or department within the university, the a national organisation, and
+finally a country.
+\item[Two components] Most significant component is first assumed to be a
+national organisation, then a department (this might be reversed in some
+organisations), and finally a country.
+\item[Three or more components] The most significant component is first
+assumed to be a country, then a national organisation, and finally a
+department. 
+\end{description}
+
+
+
+\begin{table}
+\begin{center}
+\begin{tabular}{l l}
+Number of & Environment \\
+Components & \\
+\hline
+1 & Physics, University College London, GB  \\
+& University College London, GB \\
+& GB  \\
+& -- \\
+\hline
+2 & GB  \\
+& University College London, GB \\
+& -- \\
+\hline
+3+  & -- \\
+& GB  \\
+& University College London, GB \\
+
+\end{tabular}
+\end{center}
+\caption {Local environment for private DUA}
+\label{e1}
+\end{table}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{l l}
+Number of & Environment \\
+Components & \\
+\hline
+1,2  & US  \\
+& CA \\
+& -- \\
+\hline
+3+ & -- \\
+& US \\
+& CA \\
+\end{tabular}
+\end{center}
+\caption {Local environment for US Public DUA}
+\label{e2}
+\end{table}
+
+
+\subsection {Matching}
+
+
+A purported name will be supplied, usually with a small number of components.
+This will be matched in the context of an environment.
+
+Where there are multiple components to be matched, these should be matched
+sequentially.  If an unambiguous DN is determined, the match continues as if
+the full DN had been supplied.  
+For example if 
+
+\begin{quote}
+\begin{verbatim}
+Stephen Kille, UCL
+\end{verbatim}
+\end{quote}
+
+is being matched in the context of environment \verb|GB|, first \verb|UCL|
+is resolved to the distinguished name:
+
+\begin{quote}
+\begin{verbatim}
+University College London, GB
+\end{verbatim}
+\end{quote}
+
+Then the next component of the purported name is taken to determine the
+final name. 
+If there is an ambiguity (e.g., if \verb|UCL| had made two matches,
+both paths are explored to see if the ambiguity can
+be resolved.  Eventually a set of names will be passed back to the user.
+
+
+Each component of the environment is taken in turn.
+If the purported name has more
+components than the maximum depth, the environment element is skipped.  
+The advantage of this will be seen in the example given later.
+
+
+
+
+
+
+A match of a name is considered to have three levels:
+
+\begin{description}
+\item[Exact]  A DN is specified exactly
+\item[Good]
+Initially, a match should be considered good if
+it is unambiguous, and exactly matches an attribute value in the entry.
+For human names, a looser metric is probably desirable (e.g., \verb|S Kille|
+should be a good match of \verb|S. Kille|, \verb|S.E. Kille| or \verb|Steve
+Kille| even if these are not explicit alternate values).
+\item[Poor] Any other substring or approximate match
+\end{description}
+
+Following a match, the reference can be followed, or the user prompted.
+If there are multiple matches, more than one path may be followed.
+There is also a shift/reduce type of choice: should any partial matches be
+followed or should the next element of the environment be tried.
+The following heuristics are suggested, which may be modified in the light
+of experience.  The overall aim is to resolve cleanly specified names with a
+minimum of fuss, but give sufficient user control to prevent undue searching
+and delay.   
+
+\begin{enumerate}
+\item Always follow an exact match. 
+\item Follow all good matches if there are no exact matches.
+\item If there are only poor matches, prompt the user.  If the user accepts
+one or more match, they can be considered as good.  If all are rejected,
+this can be treated as no matches.
+\item Automatically move to the next element of the environment if no
+matches are found.   
+\end{enumerate}
+
+When the final component is matched, a set of names will be identified.
+If none are identified, proceed to the next environment element.
+If the user rejects all of the names, processing of the next environment
+element should be confirmed.
+
+The exact approach to matching will depend on the level of the tree at which
+matching is being done.  
+We can now consider how attributes are matched at various levels of the DIT.
+
+
+There is an issue of approximate matching.  Sometimes it helps, and
+sometimes just returns many spurious matches.  When a search is requested,
+all relevant attributes should be returned, so that distinguished and
+non-distinguished values can be looked at.  This will allow a distinction to
+be made between good and poor matches.  It is important that where, for
+example, an acronym exactly matches an organisation, that the user is not
+prompted about other organisations where it matches as a substring.
+
+\subsection {Top Level}
+
+In this case, a match is being done at the root of the DIT.   
+Three approaches are suggested, dependent on the length of supplied name.
+All lead to a single level search of the top level of the DIT. 
+
+\begin{description}
+\item[Exactly 2] This is assumed to be a 3166 two letter country code, or an exact
+match on a friendly country or organisation (e.g., UK or UN).  
+Do exact match on country and friendly country.
+\item[Greater than 2] Make 
+an approximate and substring match on friendly country and organisation.
+
+\end{description}
+
+
+
+
+
+
+\subsection {Intermediate Level}
+
+Once the root level has been dealt with, intermediate levels will be looking
+for organisational components (Organisation, Locality, Org Unit). 
+In some cases, private schema control will allow the system to determine
+which is at the next level.  In general this will not be possible.
+In each case, make  a substring  and approximate match search of one level.
+The choice depends on the base object used in the search.
+
+\begin {enumerate}
+\item If DN has no Organisation or Locality, filter on Organisation and
+Locality. 
+\item If DN has Org Unit, filter on Org Unit.
+\item If DN has Organisation, filter on Locality and Org Unit.
+\item If DN has Locality, filter on Organisation.
+\end {enumerate}
+
+These allow some optimisation, based on legal choices of schema.  Keeping
+filters short is usually desirable to improve performance.   
+
+A few examples of this, where a base object has been determined (either by
+being the environment or by partial resolution of a purported name), and the
+next element of a purported name is being considered.  This will generate a
+single level search.  What varies is the types being filtered against.
+If the DN is:
+
+\begin{verbatim}
+University College London, GB
+\end{verbatim}
+
+The search should be for Org Unit or Locality.  If the DN is:
+
+\begin{verbatim}
+Organisation=UN
+\end{verbatim}
+
+the search should be for Org Unit or Locality.
+
+There may be some improvements with respect to very short keys.  Not making
+approximate or substring matches in these cases seems sensible\footnote{It
+might be desirable to allow ``\verb|*|'' as a part of the purported name
+notation}.
+
+\subsection {Bottom level}
+
+The ``Bottom Level'' is to deal with leaf entries in the DIT.  This will
+often be a person, but may also be a role, an application entity or
+something else.  
+
+The last component of a purported name may either reference a leaf or
+non-leaf.  For this reason, {\em both} should be tested for.
+As a heuristic, if the base object for the search  has two or more
+components it should be tested first as a bottom level name and then
+intermediate.  Reverse this for shorter names.  This optimises for the
+(normal) case
+of non-leaves high up the tree and leaves low down the tree.
+
+For bottom level names, make an
+approximate and substring match against Common Name, Surname, and User ID.
+Where common name is looked for, 
+A full subtree search will be used when at
+the second level of the DIT or lower, otherwise a single level search.
+
+For example, if I have resolved a purported name to the distinguished name
+
+\begin{verbatim}
+University College London, GB
+\end{verbatim}
+
+and have a single component \verb|Bloggs|, this will generate a subtree
+search.
+
+\section{Examples}
+
+
+This is all somewhat confusing, and a few examples are given.  These are all
+in the context of the environment shown in Table~\ref{e1} on
+Page~\pageref{e1}.
+
+If ``Joe Bloggs'' is supplied, a subtree search of 
+
+\begin{verbatim}
+Physics, University College London, GB
+\end{verbatim}
+
+will be made, and the user prompted for ``Joseph Z. Bloggs'' as the only
+possible match.
+
+If ``Computer Science'' is supplied, first 
+
+\begin{verbatim}
+Physics, University College London, GB
+\end{verbatim}
+
+will be searched, and the user will reject the approximate match of ``Colin
+Skin''.   Then a subtree search of
+
+\begin{verbatim}
+University College London, GB
+\end{verbatim}
+
+will be made, looking for a person.  Then a single level search will be made
+looking for Org Unit, and 
+
+\begin{verbatim}
+Computer Science, University College London, GB
+\end{verbatim}
+
+will be returned without prompting (exact match).   
+
+
+Supplying ``Steve Kille'' will lead to a failed subtree search of 
+
+\begin{verbatim}
+Physics, University College London, GB
+\end{verbatim}
+
+and lead straight to a subtree search of
+
+\begin{verbatim}
+University College London, GB
+\end{verbatim}
+
+This will lead to an exact value match, and so a single entry returned
+without prompting.
+
+
+If ``Andrew Findlay, Brunel'' is supplied, the first element of the
+environment will be skipped, single level search of ``Brunel'' under ``GB'
+will find:
+
+\begin{verbatim}
+Brunel University, GB
+\end{verbatim}
+
+and a subtree search for ``A Findlay'' initiated.   This will yield
+
+\begin{verbatim}
+Andrew Findlay, Computing and Media Services, Brunel University, GB
+
+Dr A J Findlay, Manufacturing and Engineering Systems, 
+Brunel University, GB
+\end{verbatim}
+
+
+and the user will be prompted with a choice.
+
+
+This approach shows how a simple format of this nature will ``do the right
+thing'' in many cases.   
+
+\section {Support required from the standard}
+
+Fortunately, all that is needed is there!  It would be useful to have
+``friendly country name'' as a standard attribute.
+
+
+\section{Support of OSI Services}
+
+The major focus of this work has been to provide a mechanism for identifying
+Organisations and Users.   A related function is to identify applications.
+Where the Application is identified by an AET (Application Entity Title)
+with an RDN of Common Name, this proposal leads to a natural usage.
+For example, if a filestore in named ``gannet'', then this could easily be
+identified by the name:
+
+\begin{verbatim}
+Gannet, Computer Laboratory, Cambridge University, GB   
+\end{verbatim}
+
+In normal usage, this might lead to access (using a purported name) of:
+
+\begin{verbatim}
+FTAM gannet,cambridge
+\end{verbatim}
+
+A second type of access is where the user identifies an Organisation
+(Organisational Unit), and expects to obtain a default service.   
+The service is implied by the application, and should not require any
+additional naming as far as the user is concerned.  It is proposed that this
+is supported by User Friendly Naming in the following way.  
+
+\begin{enumerate}
+\item Determine that the purported name identifies a non-leaf object, which is
+of object class Organisation or Organistaional Unit or Locality.
+
+\item Perform a {\em single level} search for Application Entities which
+support the required application contexts.  This assumes that all services
+which are supporting default access for the organisation are registred at
+one level below (possibly by the use of aliaes), and that other services
+(specific machines or parts of the organisation) are represented further
+down the tree.  This seems to be a reasonable layout, and its utility can be
+evaluated by experiment.
+
+\end{enumerate}
+
+\section {Experience}
+
+An experimental implementation of this has been written by Colin Robbins.
+The example in Figure~\ref{usage} shows that it can be very effective at
+locating known individuals with a minimum of effort.
+
+\begin{figure}
+\begin{small}
+\begin{verbatim}
+-> t hales, csiro, australia
+Found good match(es) for 'australia'
+Found exact match(es) for 'csiro'
+Please select from the following:
+   Trevor Hales, OC, HPCC, DIT, IICT, CSIRO, AU [y/n] ? y
+The following were matched...
+   Trevor Hales, OC, HPCC, DIT, IICT, CSIRO, AU
+
+-> g michaelson, queensland, au
+Found exact match(es) for 'au'
+Please select from the following:
+   University of Queensland, AU [y/n] ? y
+   Axolotl, AU [y/n] ? n
+Please select from the following:
+   George Michaelson, Prentice Computer Centre, University of Queensland, AU
+[y/n] ? y
+   Manager, University of Queensland, AU [y/n] ? n
+The following were matched...
+   George Michaelson, Prentice Computer Centre, University of Queensland, AU
+
+-> r needham, cambridge
+Found good match(es) for 'cambridge'
+Please select from the following:
+   Roger Needham, Computer Lab, Cambridge University [y/n] ? y
+The following were matched...
+   Roger Needham, Computer Lab, Cambridge University
+
+-> kirstein
+Found good match(es) for 'kirstein'
+The following were matched...
+   Peter Kirstein
+
+
+\end{verbatim}
+\end{small}
+\caption {Example usage of User Friendly Naming}
+\label{usage}
+\end{figure}
+
+
+\section {Relationship to other work}
+
+Colin Robbin's work on the interface ``Tom'' and implementation of a
+distribution list interface strongly influenced this proposal.
+
+Some of the ideas used here originally came from a UK Proposal to the
+ISO/CCITT Directory Group on ``New Name Forms'' \cite{NNF}.  This defined,
+and showed how to implement, four different types of names:
+
+\begin{description}
+\item[Typed and Ordered] The current Distinguished Name is a restricted
+example of this type of name.
+
+\item[Untyped and Ordered] This is the type of name proposed here (with some
+extensions to allow optional typing).  It is seen as meeting the key user
+requirement of disliking typed names, and is efficient to implement.
+
+\item[Typed and Unordered] This sort of name is proposed by others as the
+key basis for user friendly naming.  Neufeld shows how X.500 can be used to
+provide this \cite{Neufeld.Descr}, and Peterson proposes the Profile system
+to provide this \cite{Profile.2}.  The author contends that whilst typed
+naming is interesting for some types of searching (e.g., yellow page
+searching), it is less desirable for
+naming objects.  This is born out by operational experience with OSI
+Directories \cite{THORN.RARE.LSPX}.
+
+\item[Untyped and Unordered] Surprisingly this form of name can be supported
+quite easily.  However, a considerably gain in efficiency can be achieved by
+requiring ordering.  In practice, users can supply this easily.  Therefore,
+this type of name is not proposed.   
+\end{description}
+
+
+\section {Proposal}
+
+This approach should be tested out experimentally, with the QUIPU
+implementation.  This will involve:
+
+\begin{itemize}
+\item An interface to generate strings in this form from DNs, with control over
+\begin{itemize}
+\item Folding (line, column, or max width)
+\item Presence of commas at EOL
+\item A DN to be abbreviated against
+\end{itemize}
+
+\item A routine to resolve a purported name in the context of an environment.
+\end{itemize}
+
+The Distribution List interface seems to be an ideal system to experiment
+with.
+
+A specification should then be progressed, and made widely available.
+Perhaps as a RARE Document or RFC.
+
+\bibliographystyle{alpha}
+\bibliography{../../bib/sek}
+
+\pagebreak
+\appendix
+
+\section{Pseudo-code for the matching algorithm}
+
+The following pseudo-code is intended to clarify the matching algorithm.
+The language uses ASN.1 data types, with flow control `C'-like, but with
+keywords upper--cased.
+
+\tagrindfile{algo}{Matching Algorithm}{algo}
+
+
+
+\end {document}
+

@@ -1,0 +1,27 @@
+\File{figureD\-27.py},{08:33},{Mar 12 1991}
+\L{\LB{\Proc{Domain}Domain ::=              \C{}\-\- e.g., \"xtel\", \"co\", \"uk\"}}
+\CE{}\L{\LB{    \K{SEQUENCE} \K{OF}}}
+\L{\LB{        String}}
+\L{\LB{}}
+\L{\LB{mboxLookup (local: String; domain: Domain): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    x: DN;}}
+\L{\LB{    dlist, matches: \K{SET} \K{OF} DN;}}
+\L{\LB{}}
+\L{\LB{    if ((dlist = dnsLookup (domain)) == \K{NULL}) \K{THEN}}}
+\L{\LB{        \K{RETURN} \K{NULL};}}
+\L{\LB{}}
+\L{\LB{    \K{IF} (length (dlist) \> 1) \K{THEN}}}
+\L{\LB{        \C{}\-\- ask user to prune dlist}}
+\CE{}\L{\LB{        ;}}
+\L{\LB{}}
+\L{\LB{    matches = \K{NULL};}}
+\L{\LB{    \K{FOR} x \K{IN} dlist \K{DO}}}
+\L{\LB{        \K{IF} (length (x) \>= 2) \K{THEN}}}
+\L{\LB{            matches += mboxSearch (x, local, wholeSubtree);}}
+\L{\LB{        \K{ELSE}}}
+\L{\LB{            \C{}\-\- warn user that domain did not resolve below country\-level}}
+\CE{}\L{\LB{            ;}}
+\L{\LB{}}
+\L{\LB{    \K{RETURN} matches;}}
+\L{\LB{\}}}
