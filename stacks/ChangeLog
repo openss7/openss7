@@ -18,6 +18,8 @@
 	* src/mibs/OPENSS7-X400P-MIB.mib: MIB updates
 	* src/mibs/OPENSS7-SL-MUX-MIB.mib: MIB updates
 
+	* doc/man/strss7.macros: better grefer macros
+
 
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 

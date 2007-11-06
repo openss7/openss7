@@ -1,3 +1,7 @@
+2007-11-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strsock.macros: better grefer macros
+
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem

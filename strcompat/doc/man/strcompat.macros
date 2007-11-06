@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strcompat.macros,v 0.9.2.11 2007/08/13 23:51:33 brian Exp $
+.\" @(#) $Id: strcompat.macros,v 0.9.2.12 2007/11/06 10:45:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,11 +52,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/08/13 23:51:33 $ by $Author: brian $
+.\" Last Modified $Date: 2007/11/06 10:45:16 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strcompat.macros,v $
+.\" Revision 0.9.2.12  2007/11/06 10:45:16  brian
+.\" - better grefer macros
+.\"
 .\" Revision 0.9.2.11  2007/08/13 23:51:33  brian
 .\" - updated to GPLv3 headers
 .\"
@@ -83,50 +86,63 @@ Trademarks mentioned are the property of their owners.
 ..
 .de ][
 .if !'\\*([T'' \{\
-.hy 4
+.ad b
+.hy 0
 .if !'\\*([R'' \{\
 \fB\\*([R\fR,
 .rm [R
 .\}
+.if !'\\*([S'' \{\
+\fI\\*([S\fR: \c
+.rm [S
+.\}
 \fI\\*([T\fR\c
 .if !'\\*([J'' \{\
-,\ \fB\\*([J\fR\c
+, \fB\\*([J\fR\c
 .rm [J
-.\}
 .if !'\\*([V'' \{\
-,\ Vol.\ \fB\\*([V\fR\c
+, Vol. \fB\\*([V\fR\c
 .rm [V
 .\}
 .if !'\\*([N'' \{\
-,\ No.\ \fB\\*([N\fR\c
+, No. \fB\\*([N\fR\c
+.rm [N
+.\}
+.\}
+.if !'\\*([V'' \{\
+, \fI\\*([V\fR\c
+.rm [V
+.\}
+.if !'\\*([N'' \{\
+, \fI\\*([N\fR\c
 .rm [N
 .\}
 .if !'\\*([D'' \{\
-,\ \\*([D\c
+, \\*([D\c
 .rm [D
 .\}
 .if !'\\*([C'' \{\
-,\ (\\*([C)\c
+, (\\*([C)\c
 .rm [C
 .\}
 .ie !'\\*([E'' \{\
-,\ \\*([E,\ ed.\c
+, \\*([E, ed.\c
 .rm [E
 .\}
 .el \{\
 .ie !'\\*([A'' \{\
-,\ \\*([A\c
+, \\*([A\c
 .rm [A
 .\}
 .el \{\
 .if !'\\*([Q'' \{\
-,\ \\*([Q\c
+, \\*([Q\c
 .rm [Q
 .\}
 .\}
 .\}
 .if !'\\*([I'' \{\
-,\ \\*([I\c
+, \\*([I\c
 .rm [I
 .\}
 .RI .
@@ -150,6 +166,7 @@ Trademarks mentioned are the property of their owners.
 .rm [F
 .rm [L
 .rm [R
+.rm [S
 .rm [T
 .rm [C
 .rm [N
