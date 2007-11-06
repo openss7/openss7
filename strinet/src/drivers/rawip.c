@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/10/15 17:22:55 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/10/18 06:54:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/10/15 17:22:55 $ by $Author: brian $
+ Last Modified $Date: 2007/10/18 06:54:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.54  2007/10/18 06:54:11  brian
+ - corrected new socket buffer support
+
  Revision 0.9.2.53  2007/10/15 17:22:55  brian
  - updates for 2.6.22.5-49.fc6 kernel
 
@@ -230,10 +233,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/10/15 17:22:55 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/10/18 06:54:11 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/10/15 17:22:55 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/10/18 06:54:11 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -314,7 +317,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/10/15 17:22:55 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/10/18 06:54:11 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -445,15 +448,6 @@ static inline unsigned char *skb_end_pointer(const struct sk_buff *skb)
 {
 	return skb->end;
 }
-static inline void skb_reset_tail_pointer(struct sk_buff *skb)
-{
-	skb->tail = skb->data;
-}
-static inline void skb_set_tail_pointer(struct sk_buff *skb, const int offset)
-{
-	skb_reset_tail_pointer(skb);
-	skb->tail += offset;
-}
 static inline unsigned char *skb_transport_header(const struct sk_buff *skb)
 {
 	return skb->h.raw;
@@ -485,6 +479,11 @@ static inline void skb_reset_network_header(struct sk_buff *skb)
 static inline void skb_reset_mac_header(struct sk_buff *skb)
 {
 	skb->mac.raw = skb->data;
+}
+static inline void skb_set_tail_pointer(struct sk_buff *skb, const int offset)
+{
+	skb_reset_tail_pointer(skb);
+	skb->tail += offset;
 }
 static inline void skb_set_transport_header(struct sk_buff *skb, const int offset)
 {

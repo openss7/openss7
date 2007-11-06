@@ -58,11 +58,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* ts2x25.c - TPM: X.25 interface */
 
-#ifndef lint
-static char *rcsid =
-    "Header: /xtel/isode/isode/tsap/RCS/ts2x25.c,v 9.0 1992/06/16 12:40:39 isode Rel";
-#endif
-
 /*
  * Header: /xtel/isode/isode/tsap/RCS/ts2x25.c,v 9.0 1992/06/16 12:40:39 isode Rel
  *

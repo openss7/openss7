@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Compatibility -- read me first file.  2007-10-15
+OpenSS7 STREAMS Compatibility -- read me first file.  2007-10-18
 $Id: README,v 0.9.2.33 2007/10/15 19:04:07 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS Compatibility
 ==============================
 
-Package strcompat-0.9.2.7.rc1 was released under GPLv2 2007-10-15.
+Package strcompat-0.9.2.7.rc1 was released under GPLv2 2007-10-18.
 
 The `OpenSS7 STREAMS Compatibility' package provides the ability for
 `Linux Fast-STREAMS' to exhibit source level compatibility with a wide
@@ -73,7 +73,7 @@ well.
  Release
 --------
 
-This is the `strcompat-0.9.2.7.rc1' package, released 2007-10-15.  This
+This is the `strcompat-0.9.2.7.rc1' package, released 2007-10-18.  This
 `0.9.2.7.rc1' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -127,17 +127,19 @@ follows:
 
          - A fairly LSB compliant GNU/Linux distribution.(2)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
-         - Linux 2.6 kernel (2.6.3 - 2.6.21);
+         - Linux 2.6 kernel (2.6.3 - 2.6.22);
          - glibc2 or better.
-         - GNU info (for info files).
          - GNU groff (for man pages).(3)
+         - GNU texinfo (for info files).
+         - GNU bison and flex (for config programs).
+         - net-snmp (for SNMP agents).(4)
 
 (Note: If you acquired `strcompat' a part of the `OpenSS7 Master
 Package', then the dependencies listed below will already have been met
 by unpacking the master package.)
 
   2. `OpenSS7 Linux Fast-STREAMS', streams-0.9.2.4
-     (http://www.openss7.org/tarballs/streams-0.9.2.4.tar.bz2).  (4)
+     (http://www.openss7.org/tarballs/streams-0.9.2.4.tar.bz2).  (5)
 
 
 When configuring and building multiple `OpenSS7 Project' release
@@ -183,7 +185,7 @@ validate, uninstall and remove the package:
 If you have problems, try building with the logging targets instead.
 If the make of a logging target fails, an automatic problem report will
 be generated that can be mailed to The OpenSS7 Project
-<bugs@openss7.org>.(5) Installation steps using the logging targets
+<bugs@openss7.org>.(6) Installation steps using the logging targets
 proceed as follows:
 
      $> wget http://www.openss7.org/tarballs/strcompat-0.9.2.7.rc1.tar.bz2
@@ -317,10 +319,13 @@ groff extension package (`groff_ext'), as it contains the `refer' or
 `grefer' commands necessary for including references in the manual
 pages.
 
-(4) Although, at one time, this package supported `LiS', `LiS' is now
+(4) A wide range of net-snmp releases are supported, from UCD-SNMP
+4.2.5 through net-snmp 5.4.
+
+(5) Although, at one time, this package supported `LiS', `LiS' is now
 deprecated and unsupported.
 
-(5) Please see `Problem Reports', in the manual, or the file `PROBLEMS'
+(6) Please see `Problem Reports', in the manual, or the file `PROBLEMS'
 in the release directory for more information on filing a proper
 "Problem Report".
 

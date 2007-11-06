@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/09/06 11:16:29 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/10/18 06:52:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/09/06 11:16:29 $ by $Author: brian $
+# Last Modified $Date: 2007/10/18 06:52:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -283,8 +283,8 @@ EXTRA_TEX			+= \
 				scripts/texi/lesser.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= configure.nexusware
-EXTRA_SCRIPTS			+= configure.nexusware
+dist_noinst_SCRIPTS		+= configure.nexusware scripts/missing2
+EXTRA_SCRIPTS			+= configure.nexusware scripts/missing2
 
 ##
 ## Rules for building kernel objects
@@ -355,7 +355,9 @@ endif
 SUBDIRS += tests
 
 if DEVELOPMENT
+if DOCUMENTATION
 SUBDIRS += doc
+endif
 endif
 
 if PKG_BUILD_INDEP
@@ -460,6 +462,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.16  2007/10/18 06:52:57  brian
+# - new build support
+#
 # Revision 0.9.2.15  2007/09/06 11:16:29  brian
 # - yac/lex updates
 #

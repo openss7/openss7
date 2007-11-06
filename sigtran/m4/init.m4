@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/12 19:05:30 $
+# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/10/17 20:00:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/12 19:05:30 $ by $Author: brian $
+# Last Modified $Date: 2007/10/17 20:00:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -214,13 +214,15 @@ dnl
 dnl I suppose we really don't care about these.
 dnl
     AC_ARG_VAR([CHKCONFIG], [Chkconfig command])
-    AC_PATH_PROG([CHKCONFIG], [chkconfig], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_PROG([CHKCONFIG], [chkconfig], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test "${CHKCONFIG:-no}" = :no ; then
 	AC_MSG_WARN([Could not find chkconfig program in PATH.])
 	CHKCONFIG=''
     fi
     AC_ARG_VAR([INSSERV], [Insserv command])
-    AC_PATH_PROG([INSSERV], [insserv], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_PROG([INSSERV], [insserv], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test "${INSSERV:-no}" = :no ; then
 	AC_MSG_WARN([Could not find insserv program in PATH.])
 	INSSERV=''
@@ -327,6 +329,9 @@ AC_DEFUN([_INIT_], [dnl
 # =============================================================================
 #
 # $Log: init.m4,v $
+# Revision 0.9.2.16  2007/10/17 20:00:27  brian
+# - slightly different path checks
+#
 # Revision 0.9.2.15  2007/08/12 19:05:30  brian
 # - rearrange and update headers
 #

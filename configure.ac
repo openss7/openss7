@@ -175,6 +175,8 @@ AC_OS7
 AC_CONFIG_FILES([Makefile
 		 scripts/texi/args.texi
 		 doc/Makefile
+		 doc/projects/Makefile
+		 doc/projects/ss/Makefile
 		 doc/manual/Makefile
 		 doc/manual/texi/args.texi])
 

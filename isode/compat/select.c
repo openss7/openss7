@@ -102,8 +102,6 @@ int xselect_blocking_on_intr = 0;
 
 #if (defined SOCKETS && !defined TLI_POLL) || defined HAVE_SELECT
 
-#if	defined(SOCKETS) && !defined(TLI_POLL)
-
 #include <sys/time.h>
 
 /* Synchronous multiplexing:
@@ -290,7 +288,6 @@ selsocket(nfds, rfds, wfds, efds, secs)
 	}
 }
 #endif				/* (defined SOCKETS && !defined TLI_POLL) || defined HAVE_SELECT */
-
 #ifdef	EXOS
 #ifdef	SYS5
 
@@ -407,6 +404,7 @@ selsocket(nfds, rfds, wfds, efds, secs)
 	}
 	return n;
 }
+
 #endif
 
 /* This routine used to be used for devices that didn't support real select.
@@ -416,15 +414,16 @@ selsocket(nfds, rfds, wfds, efds, secs)
    buffered in user-space for reading...
  */
 
-static int (*sfnx[FD_SETSIZE])() = { NULL };
+static int (*sfnx[FD_SETSIZE]) () = {
+NULL};
 static caddr_t sdata[FD_SETSIZE] = { NULL };
 
-int (*set_check_fd(fd, fnx, data))()
+int (*set_check_fd(fd, fnx, data)) ()
 	int fd;
-	int (*fnx)();
+	int (*fnx) ();
 	caddr_t data;
 {
-	int (*ofnx)();
+	int (*ofnx) ();
 
 	if (fd < 0 || fd >= FD_SETSIZE)
 		return NULL;
@@ -435,6 +434,7 @@ int (*set_check_fd(fd, fnx, data))()
 
 #if !(defined(_AIX) && defined(X25))
 		/* We have an AIX specific version if X25 is defined */
+
 int
 xselect(nfds, rfds, wfds, efds, secs)
 	int nfds;
@@ -510,4 +510,5 @@ xselect(nfds, rfds, wfds, efds, secs)
 	}
 	return NOTOK;
 }
+
 #endif

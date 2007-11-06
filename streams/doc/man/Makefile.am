@@ -1301,6 +1301,9 @@ man_MANS = \
 	man9/specfs_mount.9 \
 	man9/specfs_umount.9 \
 	man9/streams_schedule.9 \
+	man9/streams_notify.9 \
+	man9/streams_register_notifier.9 \
+	man9/streams_unregister_notifier.9 \
 	man9/streamtab.9 \
 	man9/streamtab_t.9 \
 	man9/strgetpmsg.9 \
@@ -2446,6 +2449,9 @@ dist_noinst_MANS = \
 	man9/specfs_mount.9.man \
 	man9/specfs_umount.9.man \
 	man9/streams_schedule.9.man \
+	man9/streams_notify.9.man \
+	man9/streams_register_notifier.9.man \
+	man9/streams_unregister_notifier.9.man \
 	man9/streamtab.9.man \
 	man9/streamtab_t.9.man \
 	man9/strgetpmsg.9.man \

@@ -149,8 +149,6 @@
 #define	copyTSAPdata(base,len,d)	bcopy (base, (char *) d, len)
 #endif
 
-int tpktlose(), tsaplose();
-
 struct tsapADDR {
 	struct NSAPaddr ta_addr;
 	int ta_present;

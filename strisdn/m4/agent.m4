@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: agent.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/10/15 17:21:26 $
+# @(#) $RCSfile: agent.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/10/18 05:33:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/15 17:21:26 $ by $Author: brian $
+# Last Modified $Date: 2007/10/18 05:33:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -88,16 +88,124 @@ AC_DEFUN([_AGENT_OPTIONS], [dnl
 # _AGENT_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_AGENT_SETUP], [dnl
-    AC_MSG_CHECKING([for perl libraries])
-    AC_MSG_RESULT([$with_snmp_agent])
-    if test :"${with_snmp_agent:-yes}" = :yes ; then :;
+    if test :"${with_snmp_agent:-yes}" = :no ; then
+	agent_cv_snmp_agent=no
+    else
+	agent_cv_snmp_agent=yes
+    fi
+    if test :"${agent_cv_snmp_agent:-yes}" = :yes ; then :;
 	_AGENT_SETUP_PERL
     fi
-    AC_MSG_CHECKING([for snmp libraries])
-    AC_MSG_RESULT([$with_snmp_agent])
-    if test :"${with_snmp_agent:-yes}" = :yes ; then :;
+    # Note that only fedora, redhat and other broken packaging of net-snmp
+    # needs perl libraries.  The Debian 4.0 (Etch) packaging have proper load
+    # dependencies between libraries, so loading the SNMP agent libraries
+    # properly loads dependent libraries.
+    AC_MSG_CHECKING([for agent perl libraries])
+    AC_MSG_RESULT([$agent_cv_snmp_agent])
+    if test :"${agent_cv_snmp_agent:-yes}" = :yes ; then :;
 	_AGENT_SETUP_SNMP
     fi
+    AC_MSG_CHECKING([for agent snmp libraries])
+    AC_MSG_RESULT([$agent_cv_snmp_agent])
+    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-config.h], [], [
+	AC_MSG_WARN([
+*** 
+*** Compiling SNMP agents requires the availability of UCD-SNMP header files
+*** and in particular <ucd-snmp/ucd-snmp-config.h>.  This file could not be
+*** found.  Perhaps you need to load the NET-SNMP development package
+*** (net-snmp-dev or libsnmp9-dev).  Perhaps the file is simply mangled.
+*** Repeat after loading the correct package or setting --without-snmp-agent.
+*** ]) ])
+    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-includes.h], [], [
+	AC_MSG_WARN([
+*** 
+*** Compiling SNMP agents requires the availability of UCD-SNMP header files
+*** and in particular <ucd-snmp/ucd-snmp-includes.h>.  This file could not be
+*** found.  Perhaps you need to load the NET-SNMP development package
+*** (net-snmp-dev or libsnmp9-dev).  Perhaps the file is simply mangled.
+*** Repeat after loading the correct package or setting --without-snmp-agent.
+*** ]) ], [
+#include <ucd-snmp/ucd-snmp-config.h>
+])
+    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-agent-includes.h], [], [
+	AC_MSG_WARN([
+*** 
+*** Compiling SNMP agents requires the availability of UCD-SNMP header files
+*** and in particular <ucd-snmp/ucd-snmp-agent-includes.h>.  This file could
+*** not be found.  Perhaps you need to load the NET-SNMP development package
+*** (net-snmp-dev or libsnmp9-dev).  Perhaps the file is simply mangled.
+*** Repeat after loading the correct package or setting --without-snmp-agent.
+*** ]) ], [
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+])
+    AC_CHECK_HEADERS([ucd-snmp/callback.h], [], [
+	AC_MSG_WARN([
+*** 
+*** Compiling SNMP agents requires the availability of UCD-SNMP header files
+*** and in particular <ucd-snmp/callback.h>.  This file could not be found.
+*** Perhaps you need to load the NET-SNMP development package (net-snmp-dev or
+*** libsnmp9-dev).  Perhaps the file is simply mangled.  Repeat after loading
+*** the correct package or setting --without-snmp-agent.
+*** ]) ], [
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+#include <ucd-snmp/ucd-snmp-agent-includes.h>
+])
+    AC_CHECK_HEADERS([ucd-snmp/snmp-tc.h], [], [
+	AC_MSG_WARN([
+*** 
+*** Compiling SNMP agents requires the availability of UCD-SNMP header files
+*** and in particular <ucd-snmp/snmp-tc.h>.  This file could not be found.
+*** Perhaps you need to load the NET-SNMP development package (net-snmp-dev or
+*** libsnmp9-dev).  Perhaps the file is simply mangled.  Repeat after loading
+*** the correct package or setting --without-snmp-agent.
+*** ]) ], [
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+#include <ucd-snmp/ucd-snmp-agent-includes.h>
+#include <ucd-snmp/callback.h>
+])
+    AC_CHECK_HEADERS([ucd-snmp/default_store.h], [], [
+	AC_MSG_WARN([
+*** 
+*** Compiling SNMP agents requires the availability of UCD-SNMP header files
+*** and in particular <ucd-snmp/default_store.h>.  This file could not be
+*** found.  Perhaps you need to load the NET-SNMP development package
+*** (net-snmp-dev or libsnmp9-dev).  Perhaps the file is simply mangled.
+*** Repeat after loading the correct package or setting --without-snmp-agent.
+*** ]) ], [
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+#include <ucd-snmp/ucd-snmp-agent-includes.h>
+#include <ucd-snmp/callback.h>
+#include <ucd-snmp/snmp-tc.h>
+])
+    AC_CHECK_HEADERS([ucd-snmp/snmp_alarm.h], [], [
+	AC_MSG_WARN([
+*** 
+*** Compiling SNMP agents requires the availability of UCD-SNMP header files
+*** and in particular <ucd-snmp/snmp_alarm.h>.  This file could not be found.
+*** Perhaps you need to load the NET-SNMP development package (net-snmp-dev or
+*** libsnmp9-dev).  Perhaps the file is simply mangled.  Repeat after loading
+*** the correct package or setting --without-snmp-agent.
+*** ]) ], [
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+#include <ucd-snmp/ucd-snmp-agent-includes.h>
+#include <ucd-snmp/callback.h>
+#include <ucd-snmp/snmp-tc.h>
+#include <ucd-snmp/default_store.h>
+])
+    AC_CHECK_HEADERS([ucd-snmp/ds_agent.h ucd-snmp/util_funcs.h ucd-snmp/header-complex.h ucd-snmp/mib_modules.h net-snmp/agent/mib_modules.h], [], [], [
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+#include <ucd-snmp/ucd-snmp-agent-includes.h>
+#include <ucd-snmp/callback.h>
+#include <ucd-snmp/snmp-tc.h>
+#include <ucd-snmp/default_store.h>
+#include <ucd-snmp/snmp_alarm.h>
+])
 ])# _AGENT_SETUP
 # =============================================================================
 
@@ -132,7 +240,7 @@ AC_DEFUN([_AGENT_USER], [dnl
 # _AGENT_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_AGENT_OUTPUT], [dnl
-    AM_CONDITIONAL([WITH_SNMP_AGENT], [test :"${with_snmp_agent:-yes}" = :yes])dnl
+    AM_CONDITIONAL([WITH_SNMP_AGENT], [test :"${agent_cv_snmp_agent:-yes}" = :yes])dnl
 ])# _AGENT_OUTPUT
 # =============================================================================
 
@@ -146,6 +254,9 @@ AC_DEFUN([_AGENT_], [dnl
 # =============================================================================
 #
 # $Log: agent.m4,v $
+# Revision 0.9.2.3  2007/10/18 05:33:30  brian
+# - better checking of NET-SNMP
+#
 # Revision 0.9.2.2  2007/10/15 17:21:26  brian
 # - SNMP updates
 #

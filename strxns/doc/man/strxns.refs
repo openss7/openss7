@@ -4208,11 +4208,22 @@ Part 1: Protocol Specification
 %C Santa Clara, California
 %U http://docs.sun.com/
 
-%L SUNLINK
+%L SUNLINK8
 %R Solaris\(rg SunLink OSI
-%K sunlink
+%K sunlink8
 %T SunLink OSI 8.1 TLI Programmer's Reference
 %D March 1995
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Mountain View, California
+%U http://docs.sun.com/
+
+%L SunLink9
+%R Solaris SunLink\(rg X.25
+%K sunlink9
+%T SunLink\(rg X.25 9.0 \(em Programming Guide
+%D September, 1995
+%J Revision A
 %Q Sun Microsystems, Inc.
 %I Sun
 %C Mountain View, California

@@ -88,12 +88,26 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .B #include <xom.h>
+.\".HP
+.\".BI "OM_return_code om_copy(const OM_private_object " original ", const OM_workspace " workspace ", OM_private_object *" copy );
 .HP
-.BI "OM_return_code om_copy(const OM_private_object " original ", const OM_workspace " workspace ", OM_private_object *" copy );
+.B OM_return_code \fRom_copy(
+.PD 0
+.RS
+.PP
+.BI "const OM_private_object " original \fR,
+.PP
+.BI "const OM_workspace " workspace \fR,
+.PP
+.BI "OM_private_object *" copy
+.PP
+.B \fR);
+.PD
+.RE
 .\"
 .\"
 .SH ARGUMENTS
-.TP
+.TP \w'\fIworkspace\fR\(em'u
 .I original
 The original XOM object, which remains accessible.
 .TP
@@ -132,20 +146,39 @@ is unaffected.
 When
 .BR om_copy ()
 fails, it returns a non-zero error code, as follows:
-.TP
+.TP \w'[\fBOM_FUNCTION_INTERRUPTED\fR]\(em'u
 .RB [ OM_FUNCTION_INTERRUPTED ]
+The function must block to perform its action and the wait was interrupted by
+a signal.
 .TP
 .RB [ OM_MEMORY_INSUFFICIENT ]
+Memory could not immediately be allocated.
 .TP
 .RB [ OM_NETWORK_ERROR ]
+A communications facility is required to effect the copy and an unrecoverable
+communications error occurred on that facility.
 .TP
 .RB [ OM_NO_SUCH_CLASS ]
+The object class of the private object,
+.IR original ,
+does not exist in the workspace,
+.IR workspace .
 .TP
 .RB [ OM_NO_SUCH_OBJECT ]
+The private object,
+.IR original ,
+does not exist.
 .TP
 .RB [ OM_NO_SUCH_WORKSPACE ]
+The workspace,
+.IR workspace ,
+does not exist.
 .TP
 .RB [ OM_NOT_PRIVATE ]
+The passed in object,
+.IR original ,
+is not a private object (i.e\&. it is either a server or client allocated
+public object: SPUB or CPUB; instead of a private object).
 .TP
 .RB [ OM_PERMANENT_ERROR ]
 .TP

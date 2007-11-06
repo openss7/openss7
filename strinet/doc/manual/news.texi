@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.33 2007/10/15 17:23:00 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.34 2007/10/18 06:53:32 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/10/15 17:23:00 $ by $Author: brian $
+@c Last Modified $Date: 2007/10/18 06:53:32 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -107,7 +107,18 @@ License upgrade to GPL Version 3.
 
 @item
 Changes to support 2.6.22.5-49.fc6 kernel: handle tcp_push_pending_frames with fewer arguments and
-new sk_buff format (offsets and transport_header).
+new sk_buff format (offsets and transport_header).  These changes also support 2.6.22.9-91.fc7
+kernel.
+
+@item
+Ability to strap out major documentation build and installation primarily for
+embedded targets.
+
+@item
+Improvements to common build process for embedded and cross-compile targets.
+
+@item
+Support for flex 2.5.33  in maintainer mode.
 
 @end itemize
 

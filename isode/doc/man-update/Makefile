@@ -2,7 +2,7 @@
 # Instructions to Make, for generation of nice-looking papers using LaTeX
 #########################################################################
 
-.SUFFIXES:	.pic .c .h .s .ry .py .bnf .make .web .tex .dvi .imp .ps
+.SUFFIXES:	.pic .c .h .s .ry .py .bnf .make .web .tex .dvi .imp .ps .pdf
 
 .pic.tex:;	tpic $<
 
@@ -32,8 +32,10 @@
 
 .web.tex:;	sh -c 'if weave $<; then exit 0; else rm $@; exit 1; fi'
 
-.tex.dvi:;	sh -c 'if latex \\nonstopmode\\input $<; \
+.tex.dvi:;	sh -c 'if pslatex \\nonstopmode\\input $<; \
 			  then exit 0; else rm $@; exit 1; fi'
+
+.tex.pdf:;	pdflatex $<
 
 .dvi.imp:;	dviimp $(DFLAGS) -i $@ $<
 
@@ -62,6 +64,8 @@ grind:		update.dvi true
 imp:		update.imp
 
 ps:		update.ps
+
+pdf:		update.pdf
 
 split:		all true
 		dvi2ps $(DFLAGS) -r -b update update.dvi

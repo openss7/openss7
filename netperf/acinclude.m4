@@ -108,7 +108,7 @@ AC_DEFUN([AC_NETPERF], [dnl
 		])
 	    fi
 	fi
-	if test :"${with_xns:-auto}" != :no ; then
+	if test :"${with_xti:-auto}" != :no ; then
 	    _XTI
 	fi
 	if test :"${xti_cv_includes:-no}" = :no ; then

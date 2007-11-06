@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 02:46:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/10/18 06:52:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 02:46:14 $ by $Author: brian $
+# Last Modified $Date: 2007/10/18 06:52:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -172,8 +172,8 @@ EXTRA_TEX			+= \
 				scripts/texi/lesser.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= configure.nexusware
-EXTRA_SCRIPTS			+= configure.nexusware
+dist_noinst_SCRIPTS		+= configure.nexusware scripts/missing2
+EXTRA_SCRIPTS			+= configure.nexusware scripts/missing2
 
 include am/packages.am
 
@@ -252,7 +252,9 @@ SUBDIRS += tests
 CLEANFILES += pkg/*_wrapper.c
 
 if DEVELOPMENT
+if DOCUMENTATION
 SUBDIRS += doc
+endif
 endif
 
 if PKG_BUILD_INDEP
@@ -345,6 +347,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.18  2007/10/18 06:52:46  brian
+# - new build support
+#
 # Revision 0.9.2.17  2007/08/14 02:46:14  brian
 # - GPLv3 headers
 #
