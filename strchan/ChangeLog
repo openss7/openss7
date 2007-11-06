@@ -31,6 +31,8 @@
 	* doc/projects/mg/tiphon.fig: added figures
 	* doc/projects/mg/tiphon.txt: added figures
 
+	* doc/man/strchan.macros: better grefer macros
+
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem

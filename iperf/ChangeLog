@@ -1,3 +1,7 @@
+2007-11-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/iperf.macros: better grefer macros
+
 2007-08-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* iperf.xpm: GPLv3 updates
