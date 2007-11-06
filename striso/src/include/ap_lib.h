@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: ap_lib.h,v 0.9.2.1 2007/11/06 12:16:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/11/06 12:16:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ap_lib.h,v $
+ Revision 0.9.2.1  2007/11/06 12:16:49  brian
+ - added library and header files
+
  *****************************************************************************/
 
 #ifndef __AP_LIB_H__
 #define __AP_LIB_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ap_lib.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

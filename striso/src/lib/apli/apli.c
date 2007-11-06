@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/11/06 12:16:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/11/06 12:16:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: apli.c,v $
+ Revision 0.9.2.1  2007/11/06 12:16:51  brian
+ - added library and header files
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/11/06 12:16:51 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/11/06 12:16:51 $";
 
 /* This file can be processed with doxygen(1). */
 

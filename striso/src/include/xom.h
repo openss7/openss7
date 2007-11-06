@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xom.h,v 0.9.2.1 2007/09/29 14:08:34 brian Exp $
+ @(#) $Id: xom.h,v 0.9.2.2 2007/11/06 12:16:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/09/29 14:08:34 $ by $Author: brian $
+ Last Modified $Date: 2007/11/06 12:16:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xom.h,v $
+ Revision 0.9.2.2  2007/11/06 12:16:49  brian
+ - added library and header files
+
  Revision 0.9.2.1  2007/09/29 14:08:34  brian
  - added new files
 
@@ -58,7 +61,7 @@
 #ifndef __XOM_H__
 #define __XOM_H__
 
-#ident "@(#) $RCSfile: xom.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xom.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* BEGIN SERVICE INTERFACE */
 

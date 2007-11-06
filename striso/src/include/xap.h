@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xap.h,v 0.9.2.1 2007/09/29 14:08:34 brian Exp $
+ @(#) $Id: xap.h,v 0.9.2.2 2007/11/06 12:16:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/09/29 14:08:34 $ by $Author: brian $
+ Last Modified $Date: 2007/11/06 12:16:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xap.h,v $
+ Revision 0.9.2.2  2007/11/06 12:16:49  brian
+ - added library and header files
+
  Revision 0.9.2.1  2007/09/29 14:08:34  brian
  - added new files
 
@@ -58,7 +61,7 @@
 #ifndef __XAP_H__
 #define __XAP_H__
 
-#ident "@(#) $RCSfile: xap.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xap.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  * xap.h
