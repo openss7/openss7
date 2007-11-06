@@ -1,0 +1,323 @@
+###############################################################################
+#
+# oidtable.gen - OSI Directory OID Table for Generic Labels
+#
+# $Header: /xtel/isode/isode/dsap/RCS/oidtable.gen,v 9.0 1992/06/16 12:12:26 isode Rel $
+#
+#
+# $Log: oidtable.gen,v $
+# Revision 9.0  1992/06/16  12:12:26  isode
+# Release 8.0
+#
+# 
+###############################################################################
+
+
+# format:-
+#
+# name:				oid
+#
+
+ccitt:				0
+iso:				1
+joint:				2
+
+# ccitt branch
+
+data:				ccitt.9
+pss:				data.2342
+ucl:				pss.19200300
+
+quipu:				ucl.99
+pilot:				ucl.100
+locator:			ucl.101
+oldPSI:				ucl.102
+pp:				ucl.103
+thorn:				ucl.110
+
+# iso branch
+
+memberBody:			iso.2
+
+standardsAustralia:		memberBody.36
+ansi:				memberBody.840
+gb:				memberBody.826
+
+
+psi:				ansi.113552
+rsadsi:                         ansi.113549
+xtel:				gb.0.1004
+
+aVCC:                           standardsAustralia.8502930
+aARNet:                         aVCC.0
+
+identifiedOrganization:		iso.3
+
+gsa:				identifiedOrganization.5
+psinet:				gsa.65532
+
+dod:				identifiedOrganization.6
+internet:			dod.1
+private:			internet.4
+enterprises:			private.1
+
+merit:				enterprises.61.7
+umich:				enterprises.250
+isode-consortium:		enterprises.453
+
+# deprecated
+isode:				iso.17
+
+# joint branch
+
+ds:				joint.5
+motis,mhs:			joint.6
+
+nadf:				mhs.6.5.2
+
+mtr:				mhs.6.200
+
+# categories of information object
+
+module:				ds.1
+serviceEnvironment:		ds.2
+applicationContext:		ds.3
+attributeType:			ds.4
+attributeSyntax:		ds.5
+standardObjectClass:		ds.6
+attributeSet:			ds.7
+algorithm:			ds.8
+abstractSyntax:			ds.9
+
+X500DAP:			2.5.3.1
+X500DSP:			2.5.3.2
+
+quipuAttributeType:		quipu.1
+quipuAttributeSyntax:		quipu.2
+quipuObjectClass:		quipu.3
+quipuDSP:			quipu.4
+quipuAbstractSyntax:		quipu.5
+quipuAlgorithm:			quipu.6
+quipuSecurityPolicy:		quipu.7
+
+pilotAttributeType:		pilot.1
+pilotAttributeSyntax:		pilot.3
+pilotObjectClass:		pilot.4
+
+InternetDSP:			pilot.8
+
+thornAttributeType:		thorn.1
+thornSystemAttributeType:	thorn.2
+thornAttributeSyntax:		thorn.3
+thornObjectClass:		thorn.4
+thornRules:			thorn.5
+thornSystemAttributeSyntax:	thorn.6
+thornSystemObjectClass:		thorn.7
+ThornDSP:			thorn.8
+ThornAbstractSyntax:		thorn.9
+
+ppAttributeType:                pp.1
+ppAttributeSyntax:              pp.2
+ppObjectClass:                  pp.3
+
+mhsArchitecture:		mhs.5
+mhsObjectClass:			mhsArchitecture.1
+mhsAttributeType:		mhsArchitecture.2
+mhsAttributeSyntax:		mhsArchitecture.3
+
+locatorAttributeType:             locator.1
+locatorAttributeSyntax:           locator.2
+locatorObjectClass:               locator.3
+locatorDSP:                       locator.4
+locatorAbstractSyntax:            locator.5
+locatorAlgorithm:                 locator.6
+locatorSecurityPolicy:            locator.7
+
+
+# Attribute Syntaxes
+
+distinguishedNameSyntax:	attributeSyntax.1
+objectIdentifierSyntax:		attributeSyntax.2
+caseExactStringSyntax:		attributeSyntax.3
+caseIgnoreStringSyntax:		attributeSyntax.4
+printableStringSyntax:		attributeSyntax.5
+numericStringSyntax:		attributeSyntax.6
+caseIgnoreListSyntax:		attributeSyntax.7
+booleanSyntax:			attributeSyntax.8
+integerSyntax:			attributeSyntax.9
+octetStringSyntax:		attributeSyntax.10
+uTCTimeSyntax:			attributeSyntax.11
+telephoneNumberSyntax:		attributeSyntax.12
+
+iA5StringSyntax:		pilotAttributeSyntax.4
+caseIgnoreIA5StringSyntax:	pilotAttributeSyntax.5
+
+# The Thorn rules...
+schemaRule:                     thornRules.1
+countryRule:                    thornRules.2
+localityRule:                   thornRules.3
+orgRule:                        thornRules.4
+orgUnitRule:                    thornRules.5
+orgRoleRule:                    thornRules.6
+resPersonRule:                  thornRules.7
+groupLocRule:                   thornRules.8
+orgPersonRule:                  thornRules.9
+groupRule:                      thornRules.10
+orgUnitRoleRule:                thornRules.11
+documentRule:                   thornRules.12
+accountRule:                    thornRules.13
+roomRule:                       thornRules.14
+applicationProcessRule:         thornRules.15
+
+# Algorithms
+encryption:			algorithm.1
+hash:				algorithm.2
+signature:			algorithm.3
+
+rsa:				encryption.1
+sq_mod_n:			hash.1
+sq_mod_n_with_rsa:		signature.1
+
+quipuEncryptionAlgorithm:	quipuAlgorithm.1
+quipuHashAlgorithm:		quipuAlgorithm.2
+quipuSignatureAlgorithm:	quipuAlgorithm.3
+
+# NIST OSI Implementors' Workshop
+oIW:				identifiedOrganization.14
+
+# Security SIG
+oIWSecSig:                      oIW.3
+
+oIWSecAlgorithm:                oIWSecSig.2
+oIWSecMechanism:                oIWSecSig.3
+  
+md4WithRSA:                     oIWSecAlgorithm.2
+md5WithRSA:                     oIWSecAlgorithm.3
+md4WithRSAEncryption:           oIWSecAlgorithm.4
+desECB:                         oIWSecAlgorithm.6
+desCBC:                         oIWSecAlgorithm.7
+desOFB:                         oIWSecAlgorithm.8
+desCFB:                         oIWSecAlgorithm.9
+desMAC:                         oIWSecAlgorithm.10
+
+simple-strong-auth-mechanism: oIWSecMechanism.1
+
+# Directory SIG
+oIWDSSig: 			oIW.7
+
+oIWAlgorithm: 			oIWDSSig.2
+oIWEncryptionAlgorithm: 	oIWAlgorithm.1
+oIWHashAlgorithm: 		oIWAlgorithm.2
+oIWSignatureAlgorithm: 		oIWAlgorithm.3
+
+md2: 				oIWHashAlgorithm.1
+md2WithRsa: 			oIWSignatureAlgorithm.1
+elGamal:			oIWEncryptionAlgorithm.1
+md2WithElGamal:			oIWSignatureAlgorithm.2
+
+# RSA DSI OID for Algorithms
+pkcs:                         rsadsi.1
+digestAlgorithm:              rsadsi.2
+
+pkcs-1:                       pkcs.1
+pkcs-3:                       pkcs.3
+pkcs-5:                       pkcs.5
+pkcs-7:                       pkcs.7
+pkcs-9:                       pkcs.9
+
+rsaEncryption:                pkcs-1.1
+md2WithRSAEncryption:         pkcs-1.2
+md5WithRSAEncryption:         pkcs-1.4
+
+dhKeyAgreement:               pkcs-3.1
+
+pbeWithMD2AndDES-CBC:         pkcs-5.1
+pbeWithMD5AndDES-CBC:         pkcs-5.3
+
+pkcs_data:                    pkcs-7.1
+signedData:                   pkcs-7.2
+envelopedData:                pkcs-7.3
+signedAndEnvelopedData:       pkcs-7.4
+digestedData:                 pkcs-7.5
+
+emailAddress:                 pkcs-9.1
+unstructuredName:             pkcs-9.2
+contentType:                  pkcs-9.3
+messageDigest:                pkcs-9.4
+signingTime:                  pkcs-9.5
+countersignature:             pkcs-9.6
+
+rSADSImd2:                    digestAlgorithm.2               
+rSADSImd4:                    digestAlgorithm.4               
+rSADSImd5:                    digestAlgorithm.5
+
+# PSI OIDs
+oldPSIAttributeType:		oldPSI.1
+oldPSIAttributeSyntax:		oldPSI.2
+oldPSIObjectClass:		oldPSI.3
+
+psiDirectory:			psi.1
+psiModule:			psiDirectory.1
+psiAttributeType:		psiDirectory.4
+psiObjectClass:			psiDirectory.6
+
+# Merit OIDs
+meritAttributeType:             merit.1
+meritAttributeSyntax:           merit.2
+meritAttributeObjectClass:      merit.3
+
+# UMICH OIDs
+umichAttributeType:             umich.1
+umichAttributeSyntax:           umich.2
+umichObjectClass:		umich.3
+
+# NADF OIDs
+nadfModule:			nadf.1
+nadfAttributeType:		nadf.4
+nadfObjectClass:		nadf.6
+
+# MHS-DS Routing information
+
+# Tables
+
+mhs-ds:				isode-consortium.3
+
+mhs-ds-tables:			mhs-ds.1
+mhs-ds-tables-oc:		mhs-ds-tables.1
+mhs-ds-tables-at:		mhs-ds-tables.2
+
+
+# MHS tree stuff
+
+mhs-ds-tree:			mhs-ds.2
+mhs-ds-tree-oc:			mhs-ds-tree.1
+mhs-ds-tree-at:			mhs-ds-tree.2
+
+
+# Routing stuff
+
+mhs-ds-routing:			mhs-ds.3
+mhs-ds-routing-oc:		mhs-ds-routing.1
+mhs-ds-routing-at:		mhs-ds-routing.2
+mhs-ds-routing-id:		mhs-ds-routing.3
+
+# Mapping
+
+mhs-ds-mapping:			mhs-ds.4
+mhs-ds-mapping-oc:		mhs-ds-mapping.1
+mhs-ds-mapping-at:		mhs-ds-mapping.2
+
+# DL stuff
+
+mhs-ds-list:			mhs-ds.5
+mhs-ds-list-oc:			mhs-ds-list.1
+mhs-ds-list-at:			mhs-ds-list.2
+
+# RFC 822 defs
+
+mhs-ds-rfc-822:			mhs-ds.6
+mhs-ds-rfc-822-oc:		mhs-ds-rfc-822.1
+mhs-ds-rfc-822-at:		mhs-ds-rfc-822.2
+
+# end of generic labels
+

@@ -1,0 +1,194 @@
+\File{asn\-summary.py},{10:59},{Mar 13 1989}
+\L{\LB{QuipuDirectoryDefinitions}}
+\L{\LB{\Proc{DEFINITIONS}\K{DEFINITIONS} ::=}}
+\L{\LB{\K{BEGIN}}}
+\L{\LB{}}
+\L{\LB{}\Tab{24}{\C{}\-\- give the module an identifier in QUIPU 6.0}}
+\CE{}\L{\LB{}}
+\L{\LB{\K{IMPORTS}}}
+\L{\LB{EVERYTHING}}
+\L{\LB{    \K{FROM} QuipuNameDefinitions}}
+\L{\LB{    }}
+\L{\LB{mhs\-or\-addresses }}
+\L{\LB{    \K{FROM} MHSDirectoryObjectsAndAttributes }}
+\L{\LB{            \{joint\-iso\-ccitt mhs\-motis(6) arch(5) modules(0) directory(1)\}}}
+\L{\LB{}}
+\L{\LB{\K{ABSTRACT}\-\K{OPERATION}, \K{ABSTRACT}\-\K{ERROR} }}
+\L{\LB{    \K{FROM} AbstractServiceNotation \{joint\-iso\-ccitt mhs\-motis(6) asdc(2) modules(0) notation(1)\}}}
+\L{\LB{}}
+\L{\LB{NameError, ServiceError, SecurityError }}
+\L{\LB{    \K{FROM} DirctoryAbstractService \{joint\-iso\-ccitt ds(5) modules(1) directoryAbstractService(2)\}}}
+\L{\LB{}}
+\L{\LB{DistinguishedName, RelativeDistinguishedName, Attribute, AttributeType, }}
+\L{\LB{\K{ATTRIBUTE}, \K{ATTRIBUTE}\-\K{SYNTAX}, \K{OBJECT}\-\K{CLASS} }}
+\L{\LB{    \K{FROM} InformationFramework \{joint\-iso\-ccitt ds(5) modules(1) informationFramework(1)\}}}
+\L{\LB{}}
+\L{\LB{distinguishedNameSyntax, commonName, description, presentationAddress}}
+\L{\LB{    \K{FROM} SelectedAttributeTypes \{joint\-iso\-ccitt ds(5) modules(1) selectedAttributeTypes(5)\}}}
+\L{\LB{}}
+\L{\LB{top, dsa }}
+\L{\LB{    \K{FROM} SelectedObjectClasses \{joint\-iso\-ccitt ds(5) modules(1) selectedObjectClasses(6)\}}}
+\L{\LB{}}
+\L{\LB{AccessPoint }}
+\L{\LB{    \K{FROM} DistributedOperations \{joint\-iso\-ccitt ds(5) modules(1) distributedOperations(3)\} ;}}
+\L{\LB{}}
+\L{\LB{QuipuObject ::= \K{OBJECT}\-\K{CLASS}}}
+\L{\LB{}\Tab{8}{\K{SUBCLASS} \K{OF} top}}
+\L{\LB{}\Tab{8}{\K{MUST} \K{CONTAIN} \{aCL\}}}
+\L{\LB{}}
+\L{\LB{QuipuNonLeafObject ::= OBJECTCLASS}}
+\L{\LB{}\Tab{8}{\K{SUBCLASS} \K{OF} quipuObject}}
+\L{\LB{}\Tab{8}{\K{MUST} \K{CONTAIN} \{masterDSA\}}}
+\L{\LB{}\Tab{8}{\K{MAY} \K{CONTAIN} \{slaveDSA,treeStructure\}}}
+\L{\LB{}}
+\L{\LB{QuipuDSA ::= \K{OBJECT}\-\K{CLASS} }}
+\L{\LB{    \K{SUBCLASS} \K{OF} dsa}}
+\L{\LB{}\Tab{32}{\C{}\-\- No Attributes, just object class}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- to tell you what it is}}
+\CE{}\L{\LB{}}
+\L{\LB{QuipuDSAInfo ::= \K{OBJECT}\-\K{CLASS}}\Tab{32}{\C{}\-\- always has common name \"Info\"}}
+\CE{}\L{\LB{    \K{SUBCLASS} \K{OF} top}}
+\L{\LB{    \K{MUST} \K{CONTAIN} \{ commonName, edbInfo, quipuVersion, dSAControl \}}}
+\L{\LB{    \K{MAY} \K{CONTAIN} \{ presentationAddress, mhs\-or\-addresses, description \}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{EDBInfoSyntax ::= \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{edb          DistinguishedName,}}
+\L{\LB{}\Tab{8}{getFromDSA   DistinguishedName \K{OPTIONAL},}}
+\L{\LB{}\Tab{32}{\C{}\-\- If omitted DSA is master}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- Determine mode of update from this DSA}}
+\CE{}\L{\LB{}\Tab{8}{sendToDSAs   NameList,}}
+\L{\LB{}\Tab{32}{\C{}\-\- Send these DSAs incremental updates}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- Namelist is defined with the ACLs}}
+\CE{}\L{\LB{}\Tab{8}{getEDBAllowed NameList}}
+\L{\LB{}\Tab{32}{\C{}\-\- List of DSAs allowed to pull EDB}}
+\CE{}\L{\LB{}\Tab{8}{\}}}
+\L{\LB{    }}
+\L{\LB{EdbInfo ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} EDBInfo}}
+\L{\LB{    \K{MULTI} \K{VALUE}}}
+\L{\LB{}}
+\L{\LB{MasterDSA ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} distinguishedNameSyntax}}
+\L{\LB{    }\Tab{24}{\C{}\-\- Master QSR}}
+\CE{}\L{\LB{    }\Tab{24}{\C{}\-\- Usually, but not necessarily single valued}}
+\CE{}\L{\LB{}}
+\L{\LB{SlaveDSA ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} distinguishedNameSyntax}}
+\L{\LB{    }\Tab{24}{\C{}\-\- Slave QSR}}
+\CE{}\L{\LB{}}
+\L{\LB{SubordinateReference ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} AccessPoint}}
+\L{\LB{    \K{SINGLE} \K{VALUE}}}
+\L{\LB{ }}
+\L{\LB{CrossReference ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} AccessPoint}}
+\L{\LB{    \K{SINGLE} \K{VALUE}}}
+\L{\LB{ }}
+\L{\LB{NonSpecificSubordinateReference ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} AccessPoint}}
+\L{\LB{}}
+\L{\LB{QuipuVersion ::= \K{ATTRIBUTE}}}
+\L{\LB{   \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} caseIgnoreStringSyntax}}
+\L{\LB{}}
+\L{\LB{DSAControl ::= \K{ATTRIBUTE}}}
+\L{\LB{   \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} caseIgnoreStringSyntax}}
+\L{\LB{ }}
+\L{\LB{ACLInfo ::= \K{SET} \K{OF} \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{AccessSelector,}}
+\L{\LB{}\Tab{8}{AccessCategories \}}}
+\L{\LB{}}
+\L{\LB{AccessCategories ::= ENUMERATED \{}}
+\L{\LB{}\Tab{8}{none (0),}\Tab{24}{}}
+\L{\LB{}\Tab{8}{detect (1),}}
+\L{\LB{}\Tab{8}{compare (2),}}
+\L{\LB{}\Tab{8}{read (3),}}
+\L{\LB{}\Tab{8}{add (4),}}
+\L{\LB{}\Tab{8}{write (5) \}}}
+\L{\LB{}}
+\L{\LB{AccessSelector ::= \K{CHOICE} \{}}
+\L{\LB{}\Tab{8}{entry [0] \K{NULL},}}
+\L{\LB{}\Tab{16}{\C{}\-\- DUA identified by the entry}}
+\CE{}\L{\LB{}\Tab{8}{other [2] \K{NULL},}}
+\L{\LB{}\Tab{16}{\C{}\-\- This indicates \'public\' rights}}
+\CE{}\L{\LB{}\Tab{8}{prefix [3] NameList,}}
+\L{\LB{}\Tab{16}{\C{}\-\- This identifies a prefix name for specified DUAs}}
+\CE{}\L{\LB{}\Tab{16}{\C{}\-\- e.g. anyone in the UK}}
+\CE{}\L{\LB{}\Tab{8}{group [4] NameList}}
+\L{\LB{}\Tab{16}{\C{}\-\- For specifying group rights}}
+\CE{}\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{NameList ::= \K{SET} \K{OF} DistinguishedName}\Tab{40}{}}
+\L{\LB{}}
+\L{\LB{ACLSyntax ::= \K{SEQUENCE} \{ }}
+\L{\LB{    childACL            [0] ACLInfo \K{DEFAULT} \{\{other, read\}\},}}
+\L{\LB{    entryACL}\Tab{24}{[1] ACLInfo \K{DEFAULT} \{\{other, read\}\},}}
+\L{\LB{    defaultAttributeACL [2] ACLInfo \K{DEFAULT} \{\{other, read\}\},}}
+\L{\LB{    [3] \K{SET} \K{OF} AttributeACL \}}}
+\L{\LB{}\Tab{32}{\C{}\-\- Defaults to a publicly readable}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- read only directory}}
+\CE{}\L{\LB{    }}
+\L{\LB{AttributeACL ::= \K{SEQUENCE} \{}}
+\L{\LB{    \K{SET} \K{OF} AttributeType,}}
+\L{\LB{    ACLInfo \}    }}
+\L{\LB{}}
+\L{\LB{ACL \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} ACLSyntax}}
+\L{\LB{    \K{SINGLE} \K{VALUE}}}
+\L{\LB{}}
+\L{\LB{TreeStructureSyntax ::= \K{SET} \{}}
+\L{\LB{    mandatoryObjectClasses [1] \K{SET} \K{OF} \K{OBJECT} \K{IDENTIFIER},}}
+\L{\LB{    optionalObjectClasses [2] \K{SET} \K{OF} \K{OBJECT} \K{IDENTIFIER} \K{OPTIONAL},}}
+\L{\LB{    permittedRDNs [3] \K{SET} \K{OF} \K{SET} \K{OF} AttributeType \}}}
+\L{\LB{    }}
+\L{\LB{TreeStructure ::= \K{ATTRIBUTE}}}
+\L{\LB{    \K{WITH} \K{ATTRIBUTE}\-\K{SYNTAX} TreeStructureSyntax}}
+\L{\LB{    \K{MULTI} \K{VALUE}}}
+\L{\LB{}}
+\L{\LB{EntryDataBlock ::= \K{SEQUENCE} \K{OF} RelativeEntry}}
+\L{\LB{}}
+\L{\LB{RelativeEntry ::= \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{RelativeDistinguishedName,}}
+\L{\LB{}\Tab{8}{\K{SET} \K{OF} Attribute}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{ReliableROSData ::= \K{SEQUENCE} \{}}
+\L{\LB{    rosOperation \K{INTEGER},}}
+\L{\LB{}\Tab{24}{\C{}\-\- the operation being applied}}
+\CE{}\L{\LB{    data \K{ANY},}}
+\L{\LB{}\Tab{24}{\C{}\-\- the Operation Argument}}
+\CE{}\L{\LB{    oldVersion \K{ANY}}}
+\L{\LB{}\Tab{24}{\C{}\-\- data version to which operation should be applied}}
+\CE{}\L{\LB{}\Tab{24}{\C{}\-\- version syntax will be defined by the}}
+\CE{}\L{\LB{}\Tab{24}{\C{}\-\- Reliable ROS user}}
+\CE{}\L{\LB{    newVersion \K{ANY}}}
+\L{\LB{}\Tab{24}{\C{}\-\- version number which results from operation}}
+\CE{}\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{GetEntryDataBlock \K{ABSTRACT}\-\K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT} GetEntryDataBlockArgument}}
+\L{\LB{}\Tab{8}{\K{RESULT} GetEntryDataBlockResult}}
+\L{\LB{}\Tab{8}{\K{ERRORS} \{NameError,ServiceError,SecurityError\}}}
+\L{\LB{}}
+\L{\LB{getEntryDataBlock GetEntryDataBlock ::= 10}}
+\L{\LB{}}
+\L{\LB{}\Tab{32}{\C{}\-\- will make this an OBJECT IDENTIFER}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- when ISODE can support this form }}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- of operation code}}
+\CE{}\L{\LB{}}
+\L{\LB{GetEntryDataBlockArgument ::= \K{SET} \{}}
+\L{\LB{}\Tab{8}{entry [0] DistinguishedName,}}
+\L{\LB{}\Tab{8}{sendIfMoreRecentThan [1] EDBVersion \K{OPTIONAL}}}
+\L{\LB{}\Tab{24}{\C{}\-\- if omitted, just return version held}}
+\CE{}\L{\LB{}\Tab{24}{\C{}\-\- To force send, specify old version}}
+\CE{}\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{GetEntryDataBlockResult ::= \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{16}{versionHeld [0] EDBVersion}}
+\L{\LB{}\Tab{16}{[1] EntryDataBlock \K{OPTIONAL}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{EDBVersion ::= UTCTime}}
+\L{\LB{\K{END}}}

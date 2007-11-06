@@ -1,0 +1,16 @@
+.PS 6.0i
+.ps 20
+## figure 5
+B1:	box width 2*boxwid
+B1a:	box invis "TCP" with .w at B1.w
+B1b:	box invis "UDP" with .e at B1.e
+B2:	box "PRESENTATION SERVICES" "" "[RFC1085]" width 2*boxwid \
+		with .s at B1.n
+B3:	box "ASN.1" "" "TOOLS" with .se at (B2.ne.x+boxwid, B2.ne.y+boxht/2)
+B4:	box "ASSOCIATION" "" "CONTROL" with .se at B2.ne
+B6:	box "REMOTE" "" "OPERATIONS" with .ne at B4.nw
+##
+#	dvi2ps bug...
+	line from B4.nw to B4.ne to B4.se to B4.sw
+##
+.PE

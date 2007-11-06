@@ -1,0 +1,42 @@
+.TH IDISTD 8C "14 Sep 1988"
+.\" $Header: /xtel/isode/isode/others/idist/RCS/idistd.8c,v 9.0 1992/06/16 12:42:00 isode Rel $
+.\"
+.\"
+.\" $Log: idistd.8c,v $
+.\" Revision 9.0  1992/06/16  12:42:00  isode
+.\" Release 8.0
+.\"
+.\" 
+.SH NAME
+idistd \- isode file distribution service \-\- responder
+.SH SYNOPSIS
+.in +.5i
+.ti -.5i
+.B \*(SDros.idist
+\fImagic\0arguments\fR
+.in -.5i
+(under \fI\*(SDtsapd\fR\0)
+.SH DESCRIPTION
+The \fIidist\fR server implements the ISODE file distribution network
+service using remote operations services.
+.sp
+Formally,
+it is known as the \*(lqisode idist\*(rq,
+responding with the \*(lqisode idist\*(rq application context
+utilizing the \*(lqisode idist pci\*(rq presentation context.
+.SH FILES
+.nf
+.ta \w'\*(EDisoservices  'u
+\*(EDisoentities	ISO entities database
+\*(EDisobjects	ISO objects database
+\*(EDisoservices	ISO services database
+.re
+.fi
+.SH DIAGNOSTICS
+Obvious.
+.SH AUTHOR
+Julian Onions
+Nottingham University
+.SH BUGS
+This isn't a real ISO service.
+

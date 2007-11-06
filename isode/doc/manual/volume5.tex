@@ -1,0 +1,107 @@
+% run this through LaTeX
+
+\input lcustom
+
+\documentstyle[12pt,sfwmac,tgrind,twoside]{report}
+
+\newcount\volnum
+\volnum=5
+\input manual
+
+\pagenumbering{roman}
+
+\begin{document}
+
+\readauxfiles
+
+\title{{\huge The ISO\\ Development Environment:\\
+        User's Manual}\vskip 1.5em
+        \LARGE\sl Volume 5: QUIPU}
+
+\author{
+	Colin~J.~Robbins\\
+	X-Tel Services Ltd\\
+\and 
+	Stephen~E.~Kille\\
+        Department of Computer Science \\
+        University College London
+}
+
+\date{\vskip 2em
+    	\ifdraft \versiondate/\\ \tt Draft Version \versiontag/
+	\else \today\\
+	(Version \isodevrsn/)\fi
+}
+
+\maketitle
+\newpage
+
+\thispagestyle{empty}
+\setcounter{page}{0}
+\mbox{}
+\newpage
+
+\tableofcontents
+\footnotetext[0]{\hskip -\parindent
+This document (version \versiontag/)
+was \LaTeX set \today\ with \fmtname\ v\fmtversion.}
+
+\listoftables
+
+\listoffigures
+
+\include{preface}
+
+\newpage
+\ifodd\value{page} \else
+    \mbox{}
+    \newpage
+\fi
+\pagenumbering{arabic}
+
+\part   {Introduction}
+\include{introduction}
+\include{q-introduction}
+
+\part   {User's Guide}
+\include{q-dish}
+\include{q-de}
+\include{q-fred}
+\include{q-sd}
+\include{q-pod}
+\include{q-syntax}
+\include{q-security}
+
+\part	{Administrator's Guide}
+\include{q-dsa}
+\include{q-secman}
+
+\part   {Programmer's Guide}
+\include{q-dsap}
+\include{q-operations}
+\include{q-async-dap}
+\include{q-quipu}
+
+\part   {Appendices}
+\appendix
+\include{q-appendix-a}
+\include{q-appendix-b}
+%%% appendix c, d and e intentionally swapped
+\include{q-appendix-e}
+\include{q-appendix-c}
+\include{q-appendix-d}
+
+\bibliography{bcustom,sfwdoc,networking,directory}
+\bibliographystyle{alpha}
+
+\input volume5.ind
+
+\clearpage
+\ifodd\value{page} \else
+    \mbox{}
+    \newpage
+\fi
+
+\typeout{you can usually ignore the message about Label(s) may have changed}
+
+\end{document}

@@ -1,0 +1,1116 @@
+\begin{bwslide}
+\part	{APPLICATION SERVICE ELEMENTS}\bf
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {APPLICATION SERVICE ELEMENTS}
+
+\vskip.5in
+\diagram[p]{figureA-31}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {APPLICATION LAYER}
+
+\begin{nrtc}
+\item	APPLICATION ENTITIES (AEs) ARE COMMUNICATION PROCESSES
+\item	AEs ARE COMPOSED OF APPLICATION SERVICE ELEMENTS (ASEs)
+\item	{\em APPLICATION CONTEXT} DEFINED BY HOW AEs INTERACT WITH:
+	\begin{nrtc}
+	\item	OTHER AEs
+	\item	SUPPORTING SERVICES
+	\end{nrtc}
+\item	{\em APPLICATION PROTOCOL = APPLICATION CONTEXT}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {APPLICATION ENTITY COMPONENTS}
+
+\begin{nrtc}
+\item	{\em COMMON} APPLICATION SERVICE ELEMENTS
+	\begin{nrtc}
+	\item	ASSOCIATION CONTROL
+	\item	REMOTE OPERATIONS
+	\item	RELIABLE TRANSFER
+	\item	etc.
+	\end{nrtc}
+\item	{\em SPECIFIC} APPLICATION SERVICE ELEMENT
+	\begin{nrtc}
+	\item	MESSAGE HANDLING (X.400)
+	\item	FILE TRANSFER, ACCESS AND MANAGEMENT (FTAM)
+	\item	etc.
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {COMMON APPLICATION SERVICE ELEMENTS}
+
+\begin{nrtc}
+\item	MECHANISM FOR DIVIDING RESPONSIBILITY OF THE ``TOTAL'' APPLICATION
+\item	PROMOTES ``REUSE'' OF APPLICATION LAYER FACILITIES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ASSOCIATION CONTROL SERVICE ELEMENT (ACSE)}
+
+\vskip.5in
+\diagram[p]{figureA-15}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ASSOCIATION CONTROL SERVICE ELEMENT}
+
+\begin{nrtc}
+\item	PURPOSE
+	\begin{nrtc}
+	\item	PROVIDE A GENERIC INTERFACE TO CONNECTION ORIENTED APPLICATIONS
+	\item	ESTABLISH \& RELEASE APPLICATION LAYER CONNECTIONS
+	\item	PRIMARILY CONCERNED WITH BINDING ONE APPLICATION ENTITY TO ANOTHER
+	\end{nrtc}
+\item	REALLY MORE THAN APPLICATION NAMING ADDED OVER THE PRESENTATION FUNCTIONALITY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ASSOCIATION CONTROL SERVICE ELEMENT}
+
+\begin{nrtc}
+\item	AN ASSOCIATION IS A BINDING BETWEEN TWO ENTITIES, THE INITIATOR AND
+	THE RESPONDER
+\item	ASSOCIATIONS EXIST AT THE APPLICATION LAYER AND RELY ON AN 
+	UNDERLYING CONNECTION
+\item	ASSOCIATIONS MAY BE SYMMETRIC, i.e., THEY NEED NOT FOLLOW A CLIENT/SERVER
+	MODEL
+\item	RESPONDERS DON'T NEED TO BE ``DAEMONS'', i.e.,
+	\begin{nrtc}
+	\item	GENERIC NETWORK LISTENERS MAY START RESPONDER PROCESS FOR
+		NEW INCOMING CONNECTIONS
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ASSOCIATIONS}
+
+\begin{nrtc}
+\item	BINDING OCCURS IN A TWO-STEP PROCESS
+\item	FIRST, THE INITIATOR ASKS THE DIRECTORY FOR ENTITIES AVAILABLE
+	FOR THE SERVICE(S) IT REQUIRES.
+\item	SECOND, BASED ON THE INITIATOR'S COMMUNICATION REQUIREMENTS (QUALITY
+	OF SERVICE) AN ASSOCIATION WILL BE BOUND TO ONE OF THE ENTITIES 
+	WHICH BECOMES THE RESPONDER.
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ASSOCIATE ESTABLISHMENT}
+
+\begin{nrtc}
+\item	NEGOTIATES PRESENTATION CONTEXTS FOR CONNECTION
+	\begin{nrtc}
+	\item	INITIATOR PROPOSES COMPLETE SET
+	\item	RESPONDER MAY ``APPROVE'':
+		\begin{nrtc}
+		\item	ENTIRE SET
+		\item	ONLY A SUBSET
+		\end{nrtc}
+	\item	INITIATOR MAY ABORT IF SUBSET IS NOT SATISFACTORY
+	\end{nrtc}
+\item	EXAMPLE:
+	\begin{nrtc}
+	\item	INITIATOR MAY WANT TO USE RELIABLE TRANSFER BUT 
+		RESPONDER DOES NOT HAVE IT AVAILABLE
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ASSOCIATION ESTABLISHMENT}
+
+\vskip.5in
+\diagram[p]{figureA-34}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ASSOCIATION ESTABLISHMENT (cont.)}
+
+\begin{quote}\small\begin{verbatim}
+{ context-list {
+     { identifier 1,
+          abstract-syntax "directory directoryAccessAS",
+          transfer-syntax-list {
+              "basic encoding of a single asn.1 type" } },
+     { identifier 3,
+          abstract-syntax "acse pci version 1",
+          transfer-syntax-list {
+              "basic encoding of a single asn.1 type" } } },
+  default-context {
+      abstract-syntax "directory directoryAccessAS",
+      transfer-syntax "basic encoding of a single asn.1 type" },
+      user-data { ... }
+}
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {ASSOCIATION CONTROL SERVICE ELEMENT \\ REFERENCES}
+%
+%\begin{description}
+%\item[ISO/IEC 8649:]	Service Definition for the Association Control Service Element
+%\item[ISO/IEC 8650:]	Protocol Specification for the Association Control Service Element
+%\end{description}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {RELIABLE TRANSFER SERVICE ELEMENT (RTSE)}
+
+\vskip.5in
+\diagram[p]{figureA-18}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {RELIABLE TRANSFER SERVICE ELEMENT}
+
+\begin{nrtc}
+\item	PURPOSE
+	\begin{nrtc}
+	\item	RESPONSIBLE FOR BULK-MODE TRANSFERS
+	\item	HIDES THE COMPLEXITY OF THE SESSION AND PRESENTATION SERVICES
+		TO PROVIDE A SIMPLE TRANSFER FACILITY
+	\item	CAN BE USED, e.g., BY REMOTE OPERATIONS
+	\item	USES ASSOCIATION CONTROL
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {RTSE PROVIDES}
+
+\begin{nrtc}
+\item	SESSION ``LIKE'' SERVICES TO APPLICATION
+\item	ASSOCIATION ESTABLISHMENT \& RELEASE
+\item	DATA TRANSFER
+	\begin{nrtc}
+	\item	RECOVERY FOR TRANSFER FAILURES
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {RTSE RELIABILITY}
+
+\begin{nrtc}
+\item	TRANSFERS ARE CONFIRMED BY ACCEPTING \underline{RTSE}
+\item	ACCEPTING APPLICATION IS EXPECTED TO ``SECURE'' TRANSFERRED DATA
+	\begin{nrtc}
+	\item	THIS MAY BE PROBLEMATIC SINCE THE RTSE CONFIRMS THE TRANSFER INSTEAD
+		OF THE APPLICATION ENTITY
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {USING PRESENTATION FUNCTIONALITY}
+%
+%\begin{nrtc}
+%\item	PROBLEMS
+%	\begin{nrtc}
+%	\item	RTSE IS DEALING WITH LARGE INDIVIDUAL PRESENTATION DATA VALUES
+%	\item	PRESENTATION ONLY ALLOWS SYNCHRONIZATION BETWEEN DATA VALUES
+%	\end{nrtc}
+%\item	RTSE SOLUTION
+%	\begin{nrtc}
+%	\item	RTSE DOES SERIALIZATION
+%	\item	BREAKS STREAM INTO FRAGMENTS WITH A WRAPPER
+%	\item	PASSES FRAGMENTS TO PRESENTATION
+%	\end{nrtc}
+%\item	SERIALIZATION SHOULD OCCUR IN PRESENTATION
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {RELIABLE TRANSFER SERVICE ELEMENT \\ REFERENCES}
+%
+%\begin{description}
+%\item[ISO/IEC 9066-1:]	Reliable Transfer:  Model, Notation and Service Definition
+%\item[ISO/IEC 9066-2:]	Reliable Transfer:  Protocol Specification
+%\end{description}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {DIRECTORY SERVICE ELEMENT (DSE)}
+
+\vskip.5in
+\diagram[p]{figureA-35}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {DIRECTORY SERVICE ELEMENT}
+
+\begin{nrtc}
+\item	\underline{NOT} AN OFFICIAL OSI ASE!
+\item	PURPOSE
+	\begin{nrtc}
+	\item	PROVIDE A GENERAL PURPOSE FOR REALIZING APPLICATION 
+		NAMING \& ADDRESSING
+	\item	MAP AN INITIATORS SERVICE REQUIREMENTS ONTO ENTITIES 
+		AVAILABLE IN THE NETWORK
+	\item	ABSTRACT APPLICATION FROM ACTUAL DIRECTORY ACCESS METHOD
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {APPLICATION NAMING}
+
+\begin{nrtc}
+\item	APPLICATION PROCESSES (APs) RUN IN THE NETWORK
+\item	APPLICATION ENTITIES EXIST WITHIN AN APPLICATION PROCESS
+\item	APPLICATION ENTITIES ARE NAMED BY COMBINING AN AP--TITLE
+	AND AN AE-QUALIFIER TO DERIVE AN AE--TITLE
+\item	AE--TITLES ARE DIRECTORY ``DISTINGUISHED'' NAMES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {DIRECTORY ``DISTINGUISHED'' NAMES}
+
+\begin{quote}\small\begin{verbatim}
+country                =    "United States"
+organization           =    "The Wollongong Group"
+organizationalUnit     =    "Software Engineering"
+commonName             =    "boomer"
+commonName             =    "imagestore"
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {NAME TO ADDRESS MAPPING}
+
+\begin{nrtc}
+\item	THE DSE:
+	\begin{enumerate}
+	\item	GIVEN A DIRECTORY NAME
+	\item	READS PRESENTATION ADDRESS FROM DIRECTORY
+	\item	RETURNS THE ADDRESS TO THE APPLICATION (CONCEPTUALLY) 
+	\end{enumerate}
+\item	THE APPLICATION:
+	\begin{nrtc}
+	\item	PASSES THE ADDRESS TO ASSOCIATION CONTROL
+	\end{nrtc}
+\item	IN PRACTICE THE APPLICATION WILL PASS A NAME TO ACSE AND THEN
+	ASSOCIATION CONTROL WILL ACCESS THE DSE DIRECTLY
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {PRESENTATION ADDRESS}
+
+\begin{quote}\smaller\begin{verbatim}
+PSAPaddr ::=
+        SEQUENCE {
+            pSelector[0]
+                OCTET STRING
+                OPTIONAL,
+
+            sSelector[1]
+                OCTET STRING
+                OPTIONAL,
+
+            tSelector[2]
+                OCTET STRING
+                OPTIONAL,
+
+            nAddress[3]
+                SET OF
+                    OCTET STRING
+        }
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {APPLICATION ADDRESSING}
+%
+%\begin{nrtc}
+%\item	ADDITIONAL APPLICATION ENTITY INFORMATION IS POSSIBLE:
+%	\begin{nrtc}
+%	\item	APPLICATION PROCESS INVOCATION IDENTIFIER
+%	\item	APPLICATION ENTITY INVOCATION IDENTIFIER
+%	\end{nrtc}
+%\item	INTENTED TO IDENTIFY ENTITIES OVER A PERIOD OF TIME
+%\item	UNLIKELY TO BE USED FOR SOME TIME
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {``HIGHER--PERFORMANCE'' NAME SERVICE}
+
+\begin{nrtc}
+\item	MOST APPLICATIONS REALLY NEED ONLY NAME TO ADDRESS MAPPING
+\item	A NEW ACCESS POINT IS ATTACHED TO THE DIRECTORY SERVERS
+	\begin{nrtc}
+	\item	SIMPLE, CONNECTIONLESS-MODE ACCESS PROTOCOL 
+	\item	SERVER USES DSP TO COMMUNICATE TO OTHER SERVERS
+	\end{nrtc}
+\item	THIS IS STRICTLY A LOCAL ISSUE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {A FINAL WORD ON APPLICATION NAMING}
+
+\begin{nrtc}
+\item	DIRECTORY DISTINGUISHED NAMES CAN BE \underline{VERY} LONG
+	\begin{nrtc}
+	\item	LENGTH OF NAMES WILL MAKE THEM PROHIBITIVE FOR USERS TO ENTER REGULARLY
+	\end{nrtc}
+\item	A LOCAL ALIASING MECHANISM IS NEEDED
+	\begin{nrtc}
+	\item	LOCAL DIRECTORY ``PREFIX'' IS ALMOST CERTAINLY PREDICTABLE
+	\item	OTHER PREFIXES WILL BE WELL KNOWN
+	\item	DSE PROVIDES AN ALIASING MECHANISM TO SIMPLIFY {\em LOCAL} NAMING
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {FINAL WORD ON APPLICATION NAMING (cont.)}
+
+\begin{quote}\smaller\begin{verbatim}
+boomer:   country                =    "United States"
+          organization           =    "The Wollongong Group"
+          organizationalUnit     =    "Software Engineering"
+          commonName             =    "boomer"
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {DIRECTORY SERVICES \\ REFERENCES}
+%
+%\begin{description}
+%\item[ISO/IEC 9594:]	The Directory (Parts 1-8)
+%			\begin{description}
+%			\item[Part 1:]	Overview of Concepts, Models and Services
+%			\item[Part 2:]	Models					
+%			\item[Part 3:]	Abstract Service Definition	
+%			\item[Part 4:]	Procedures for Distributed Operation
+%			\item[Part 5:]	Protocol Specifications		
+%			\item[Part 6:]	Selected Attribute Types
+%			\item[Part 7:]	Selected Object Classes
+%			\item[Part 8:]	Authentication Framework
+%			\end{description}
+%\end{description}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {REMOTE OPERATIONS SERVICE ELEMENT (ROSE)}
+
+\vskip.5in
+\diagram[p]{figureA-16}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {REMOTE OPERATIONS SERVICE ELEMENT}
+
+\begin{nrtc}
+\item	PURPOSE
+	\begin{nrtc}
+	\item	BUILDING BLOCK FOR DISTRIBUTED APPLICATIONS
+	\item	REMOTE PROCEDURE CALL MECHANISM
+	\item	SPECIFY EXTERNAL BEHAVIOR OF PROCEDURE CALL TYPE INTERACTIONS
+	\item	MANAGE REQUEST/REPLY INTERACTIONS
+	\end{nrtc}
+\item   CURRENTLY ONLY CONNECTION-ORIENTED\\
+        (i.e., ONLY CO-ROS IS DEFINED)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {REMOTE OPERATIONS}
+
+\begin{nrtc}
+\item	INITIATOR
+	\begin{nrtc}
+	\item	REQUESTS CONNECTION ESTABLISHMENT
+	\end{nrtc}
+\item	RESPONDER
+	\begin{nrtc}
+	\item	RESPONDS TO CONNECTION ESTABLISHMENT
+	\end{nrtc}
+\item	INDEPENDENT OF WHO INVOKES \& RESPONDS TO OPERATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle  {OPERATIONS}
+
+\begin{nrtc}
+\item   IN ITS PRIMITIVE FORM,
+        AN \emph{OPERATION} IS A SIMPLE REQUEST/REPLY INTERACTION
+
+\item   A \emph{INVOCATION} GENERATES ONE OF THREE OUTCOMES:
+    \begin{nrtc}
+    \item       A \emph{RESULT}, IF THE OPERATION SUCCEEDS;
+
+    \item       AN \emph{ERROR}, IF THE OPERATION FAILED; or,
+
+    \item       A \emph{REJECTION}, IF THE OPERATION WAS NOT PERFORMED
+    \end{nrtc}
+
+\item   OPERATIONS ARE SAID TO BE \emph{TOTAL}, AS THE NORMAL OUTCOME (RESULT),
+        AND THE EXCEPTION OUTCOMES (THE ERRORS) ARE WELL-DEFINED AND
+        UNAMBIGUOUS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {INVOCATIONS}
+
+\begin{nrtc}
+\item   THE OPERATION IS \emph{INVOKED} WHEN IT IS REQUESTED
+
+\item   AN INVOCATION CONSISTS OF:
+    \begin{nrtc}
+    \item       AN \emph{OPERATION NUMBER} IDENTIFYING THE OPERATION REQUESTED
+
+    \item       AN ARBITRARILY COMPLEX \emph{ARGUMENT}
+
+    \item       AN \emph{INVOCATION IDENTIFIER} DISTINGUISHING THIS INVOCATION
+                FROM PREVIOUS INVOCATIONS
+
+    \item       (POSSIBLY) A \emph{LINKED-INVOCATION IDENTIFIER}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {RO-INVOKE}
+
+
+\begin{nrtc}
+\item   UNCONFIRMED SERVICE:\\ RO-INVOKE.REQUEST, RO-INVOKE.INDICATION
+
+\item   PARAMETERS
+\[\begin{tabular}{ll}
+    OPERATION NUMBER&           integer\\
+    ARGUMENT&                   asn.1 type (APDU)\\
+    INVOCATION IDENTIFIER&      integer\\
+    LINKED-INVOCATION ID&       integer
+\end{tabular}\]
+
+\item   ARGUMENT IS OPTIONAL IN NEW-STYLE ROS
+
+\item   THE LINKED-INVOCATION IDENTIFIER IS NOT PRESENT IN OLD-STYLE ROS
+
+\item   APDU IS THE USER-SUPPLIED DATA STRUCTURE, AN APPLICATION PROTOCOL DATA
+        UNIT
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {INVOKE}
+
+\vskip.5in
+\diagram[p]{figureA-43}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {RO-RESULT}
+
+\begin{nrtc}
+\item   UNCONFIRMED SERVICE:\\ RO-RESULT.REQUEST, RO-RESULT.INDICATION
+
+\item   PARAMETERS
+\[\begin{tabular}{ll}
+    INVOCATION IDENTIFIER&      integer\\
+    RESULT&                     asn.1 type (APDU)
+\end{tabular}\]
+
+\item   RESULT IS OPTIONAL IN NEW-STYLE ROS
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {RESULT}
+
+\vskip.5in
+\diagram[p]{figureA-44}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {RO-ERROR}
+
+\begin{nrtc}
+\item   UNCONFIRMED SERVICE:\\ RO-ERROR.REQUEST, RO-ERROR.INDICATION
+
+\item   PARAMETERS
+\[\begin{tabular}{ll}
+    INVOCATION IDENTIFIER&      integer\\
+    ERROR NUMBER&               integer\\
+    PARAMETER (optional)&       asn.1 type (APDU)
+\end{tabular}\]
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ERROR}
+
+\vskip.5in
+\diagram[p]{figureA-45}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {RO-U-REJECT}
+
+\begin{nrtc}
+\item   UNCONFIRMED SERVICE:\\ RO-U-REJECT.REQUEST, RO-U-REJECT.INDICATION
+
+\item   PARAMETERS
+\[\begin{tabular}{ll}
+    INVOCATION IDENTIFIER&      integer\\
+    REASON&                     integer
+\end{tabular}\]
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {USER REJECTION}
+
+\vskip.5in
+\diagram[p]{figureA-46}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {RO-P-REJECT}
+
+\begin{nrtc}
+\item   PROVIDER-INITIATED SERVICE:\\ RO-P-REJECT.INDICATION
+
+\item   PARAMETERS
+\[\begin{tabular}{ll}
+    INVOCATION IDENTIFIER&      integer\\
+    \ \ \ (optional)&           \\
+    REASON&                     integer\\
+    APDU (optional)&            asn.1 type\\
+\end{tabular}\]
+
+\item   INVOCATION IDENTIFIER MAY NOT BE PRESENT IF:
+    \begin{nrtc}
+    \item       PROBLEM IS NOT RELATED TO A PARTICULAR INVOCATION, OR
+
+    \item       THE INFORMATION IS UNAVAILABLE
+    \end{nrtc}
+
+\item   IF THE LOCAL PROVIDER COULD NOT SEND AN INVOCATION (OR RESULT OR ERROR)
+        THEN APDU IS THE ASSOCIATED USER-SUPPLIED ARGUMENT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {PROVIDER REJECTION}
+
+\vskip.5in
+\diagram[p]{figureA-47}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {REASONS FOR REJECTIONS}
+
+\begin{nrtc}
+\item   FOUR CLASSES OF REJECTIONS
+    \begin{nrtc}
+    \item       GENERAL PROBLEMS
+
+    \item       INVOKE PROBLEMS
+
+    \item       RETURN RESULT PROBLEMS
+
+    \item       RETURN ERROR PROBLEMS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {GENERAL PROBLEMS:\\ DETECTED BY THE ROSE-PROVIDER}
+%
+%\begin{nrtc}
+%\item   UNRECOGNIZED APDU
+%
+%\item   MISTYPED APDU
+%
+%\item   BADLY STRUCTURED APDU
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {INVOKE PROBLEMS:\\ DETECTED BY THE ROSE-USER}
+%
+%\begin{nrtc}
+%\item   DUPLICATE INVOCATION
+%
+%\item   UNRECOGNIZED OPERATION
+%
+%\item   MISTYPED ARGUMENT
+%
+%\item   RESOURCE LIMITATION
+%
+%\item   INITIATOR RELEASING
+%
+%\item   UNRECOGNIZED LINKED ID
+%
+%\item   LINKED RESPONSE UNEXPECTED
+%
+%\item   UNEXPECTED CHILD OPERATION
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {RETURN RESULT PROBLEMS:\\ DETECTED BY THE ROSE-USER}
+%
+%\begin{nrtc}
+%\item   UNRECOGNIZED INVOCATION
+%
+%\item   RESULT RESPONSE UNEXPECTED
+%
+%\item   MISTYPED RESULT
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ROSE --- LINKED INVOCATIONS}
+
+\begin{nrtc}
+\item	INTRODUCED IN THE NEWER STANDARDS WORK
+\item	SOMETIMES REFERRED TO AS A ``CALLBACK'' OR A
+	``REMOTE UPCALL''
+\item	MECHANISM TO INITIATE RO-INVOKE REQUEST ON RESPONDING SYSTEM
+\item	USED BY NETWORK MANAGEMENT (CMISE)
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {LINKED INVOCATIONS --- EXAMPLE}
+%
+%\begin{nrtc}
+%\item	CONSIDER AN OPERATION {\small Traverse}, WITH TWO ARGUMENTS:
+%	\begin{nrtc}
+%	\item	THE NAME OF A REMOTE DIRECTORY IN A FILESYSTEM
+%	\item	THE NUMBER OF AN OPERATION TO INVOKE FOR EACH FILE
+%	\end{nrtc}
+%\item	TO LIST A REMOTE DIRECTORY:
+%	\begin{quote}\small
+%	Traverse (``directory-name'', ListFile)
+%	\end{quote}
+%\item	TO PRINT EACH FILE IN A REMOTE DIRECTORY:
+%	\begin{quote}\small
+%	Traverse (``directory-name'', PrintFile)
+%	\end{quote}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {REMOTE OPERATIONS SERVICE ELEMENT}
+%
+%\begin{nrtc}
+%\item	ASSOCIATION CLASSES
+%	\begin{descrition}
+%	\item[CLASS 1:]	INTIATOR INVOKES OPERATIONS \& RESPONDER PERFORMS
+%	\item[CLASS 2:]	RESPONDER INVOKES OPERATIONS, INITIATOR PERFORMS OPERATIONS
+%	\item[CLASS 3:] BOTH INITIATOR AND RESPONDER INVOKE \& PERFORM OPERATIONS
+%	\end{description}
+%	
+%\item	AN INVOCATION GENERATES ONE OF 3 OUTCOMES
+%	\begin{nrtc}
+%	\item	RESULT, IF THE OPERATION SUCCEEDS
+%	\item	ERROR, IF THE OPERATION FAILED
+%	\item	REJECTION, IF THE OPERATION WAS NOT PERFORMED
+%	\end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+%\begin{bwslide}
+%\ctitle {RESULTS}
+%
+%\begin{nrtc}
+%\item   IF THE OPERATION SUCCEEDS, THEN A RESULT IS RETURNED
+%
+%\item   A RESULT CONSISTS OF:
+%    \begin{nrtc}
+%    \item       AN INVOCATION IDENTIFIER CORRESPONDING TO THE OPERATION WHICH
+%                SUCCEEDED
+%
+%    \item       (POSSIBLY) AN ARBITRARILY COMPLEX \emph{RESULT}
+%    \end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{note}\em
+%actually, on success a result \emph{may optionally} be returned as some
+%operations are defined to not return any result
+%
+%this violates the totality principle, a solution is discussed later on
+%\end{note}
+
+
+%\begin{bwslide}
+%\ctitle {ERRORS}
+%
+%\begin{nrtc}
+%\item   IF THE OPERATION FAILS, THEN AN ERROR IS RETURNED
+%
+%\item   AN ERROR CONSISTS OF:
+%    \begin{nrtc}
+%    \item       AN INVOCATION IDENTIFIER CORRESPONDING TO THE OPERATION WHICH
+%                FAILED
+%
+%    \item       AN \emph{ERROR NUMBER} IDENTIFYING THE ERROR ENCOUNTERED
+%
+%    \item       (POSSIBLY) AN ARBITRARILY COMPLEX \emph{PARAMETER}
+%    \end{nrtc}
+%
+%\item   NOTE THAT ERRORS DO NOT NECESSARILY INDICATE BAD BEHAVIOR!
+%    \begin{nrtc}
+%    \item       THEY CAN OCCUR AS A PART OF CORRECT AND NORMAL OPERATIONS
+%
+%        \item   HENCE, THINK OF THEM AS EXCEPTIONS
+%    \end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {REJECTIONS}
+%
+%\begin{nrtc}
+%\item   IF THE OPERATION CAN NOT BE PERFORMED, THEN A REJECTION IS RETURNED
+%
+%\item   A REJECTION CONSISTS OF:
+%    \begin{nrtc}
+%    \item       AN INVOCATION IDENTIFIER CORRESPONDING TO THE OPERATION WHICH
+%                WAS REJECTED
+%
+%    \item       A \emph{REASON} EXPLAINING WHY THE OPERATION WAS REJECTED
+%        \begin{nrtc}
+%        \item   e.g., MISTYPED PARAMETERS
+%        \end{nrtc}
+%    \end{nrtc}
+%
+%\item   SOME REJECTIONS ARE USER-INITIATED, OTHERS ARE PROVIDER-INITIATED
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {INVOKING OPERATIONS}
+
+\begin{nrtc}
+\item	OPERATIONS MAY BE INVOKED BY EITHER THE ASSOCIATION INITIATOR OR RESPONDER
+	\begin{nrtc}
+	\item	THIS IS REGULATED BY THE ASSOCIATION CLASS
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {DESIGN GUIDELINES}
+
+\begin{nrtc}
+\item   THE CHARACTERISTICS OF OPERATIONS WILL VARY WIDELY BETWEEN APPLICATIONS
+
+\item   HOWEVER, THERE ARE TWO ISSUES OF UNIVERSAL INTEREST TO BE CONSIDERED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {RELIABILITY CHARACTERISTICS}
+
+\begin{nrtc}
+\item   UNCERTAINTY DURING EXECUTION OF OPERATIONS IS ALWAYS PRESENT
+
+\item   THIS IS PARTICULARLY TROUBLESOME IF THE NETWORK ``BREAKS''
+        AFTER A REQUEST IS RECEIVED BY THE RESPONDER BUT BEFORE
+        THE INITIATOR RECEIVES THE REPLY
+
+\item   ONE SCHEME OF CLASSIFYING THE RELIABILITY REQUIREMENTS OF AN OPERATION
+        IS:
+    \begin{nrtc}
+    \item       EXACTLY ONCE
+
+    \item       AT LEAST ONCE (IDEMPOTENT)
+
+    \item       AT MOST ONCE
+    \end{nrtc}
+
+\item   IMPLEMENTING THESE SEMANTICS IS POSSIBLE USING THE INVOCATION
+        IDENTIFIER
+    \begin{nrtc}
+    \item       BUT IS THE RESPONSBILITY OF THE USER OF REMOTE OPERATIONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{note}\em
+%note that ``initiator'' here doesn't necessarily mean the entity which
+%initiated the association
+%
+%i.e., an entity can start an association, and then it's peer could possibly
+%initiate all of the operations
+%\end{note}
+
+
+%\begin{bwslide}
+%\ctitle {RELIABILITY CHARACTERISTIC:\\ EXACTLY ONCE}
+%
+%\begin{nrtc}
+%\item   RESPONDER
+%    \begin{nrtc}
+%    \item       KEEPS TRACK OF THE INVOCATION IDENTIFIERS OF ALL PERFORMED
+%                OPERATIONS
+%
+%    \item       WHEN PROCESSING AN INVOCATION, IF AN INVOCATION IDENTIFIER IS
+%                REPEATED, REJECT THE OPERATION
+%    \end{nrtc}
+%
+%\item   INITIATOR
+%    \begin{nrtc}
+%    \item       REPEATEDLY INVOKES THE OPERATION USING THE SAME INVOCATION
+%                IDENTIFIER UNTIL EITHER
+%
+%    \item       A CONFIRMATION (RESULT OR ERROR) IS RECEIVED, OR
+%
+%    \item       A REJECTION (DUPLICATE OPERATION) IS RECEIVED
+%    \end{nrtc}
+%
+%%\item   A ROS BUG: REJECTION DOES NOT INCLUDE THE VALUE OF THE PREVIOUS RESULT!
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {RELIABILITY CHARACTERISTIC:\\ AT LEAST ONCE}
+%
+%\begin{nrtc}
+%\item   RESPONDER
+%    \begin{nrtc}
+%    \item       KEEPS NO INFORMATION REGARDING PREVIOUSLY PERFORMED OPERATIONS
+%    \end{nrtc}
+%
+%\item   INITIATOR
+%    \begin{nrtc}
+%    \item       REPEATEDLY INVOKES THE OPERATION (WITH ANY INVOCATION
+%                IDENTIFIER) UNTIL
+%
+%    \item       A CONFIRMATION (RESULT OR ERROR) IS RECEIVED
+%    \end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {RELIABILITY CHARACTERISTIC:\\ AT MOST ONCE}
+%
+%\begin{nrtc}
+%\item   RESPONDER
+%    \begin{nrtc}
+%    \item       KEEPS NO INFORMATION REGARDING PREVIOUSLY PERFORMED OPERATIONS
+%    \end{nrtc}
+%
+%\item   INITIATOR
+%    \begin{nrtc}
+%    \item       INVOKES THE OPERATION (WITH ANY INVOCATION IDENTIFIER)
+%                EXACTLY ONCE
+%    \end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {TOTAL OPERATIONS}
+%
+%\begin{nrtc}
+%\item   IT IS POSSIBLE TO DEFINE OPERATIONS WHICH:
+%    \begin{nrtc}
+%    \item       RETURN A RESULT, BUT NO ERRORS
+%
+%    \item       RETURN ONLY ERRORS
+%    \end{nrtc}
+%
+%\item   THIS CAN POTENTIALLY VIOLATE THE TOTALITY PRINCIPLE
+%    \begin{nrtc}
+%    \item       (ALL OUTCOMES ARE WELL-DEFINED AND UNAMBIGUOUS)
+%    \end{nrtc}
+%    AS AN OPERATION WHICH SUCCEEDS BUT RETURNS NO RESULT WILL RETURN NOTHING
+%
+%\item   LEADS TO PROBLEMS WHEN THE INITIATOR TRIES TO DETERMINE
+%        IF THE OPERATION SUCCEEDED OR NOT 
+%
+%\item   SOLUTION: OPERATIONS SHOULD ALWAYS BE ABLE TO RETURN A RESULT,
+%        EVEN IF THAT RESULT IS \verb"NULL"
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{note}\em
+%note that this totality issue is a philosophical one
+%
+%some may argue that it is valid only for a class of applications
+%\end{note}
+
+
+\begin{bwslide}
+\ctitle {DESCRIBING REMOTE OPERATIONS}
+
+\begin{nrtc}
+\item	ROSE BASED APPLICATIONS CAN BE DESCRIBED USING ASN.1
+\item	ASN.1 MACRO FACILITY MAY BE USED TO DEFINE REMOTE OPERATIONS
+	AND THE ASSOCIATED PARAMETERS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {ASN.1 DEFINITION OF A REMOTE OPERATION}
+
+\begin{quote}\small\begin{verbatim}
+search OPERATION
+       ARGUMENT    SearchArgument
+       RESULT      SearchResult
+       ERRORS {
+              attributeError, nameError,
+              serviceError, referral, abandoned,
+              securityError }
+       ::= 5
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {DEFINITIONS (cont.)}
+
+\begin{nrtc}
+\item   USING THE \verb"LINKED" CLAUSE, AN OPERATION CAN DEFINE LINKED
+        OPERATIONS
+
+\item   AN OPERATION OR ERROR VALUE CAN ALSO TAKE A GLOBAL VALUE
+    \begin{nrtc}
+    \item       AN OBJECT IDENTIFIER IS USED IN ADDITION TO THE
+                OPERATION OR ERROR CODE
+    \end{nrtc}
+
+\item   THE \verb"BIND" AND \verb"UNBIND" MACROS ARE USED TO DEFINE BINDING
+        INFORMATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle  {IN PERSPECTIVE}
+
+\begin{nrtc}
+\item   IDEALLY WOULD LIKE TO HIDE OF THIS FORMALISM FROM THE PROGRAMMER
+
+\item   PRESENT A SIMPLE PROCEDURE CALL MODEL IN WHICH WE DEFINE:
+        \begin{nrtc}
+        \item   THE INTERFACE TO EACH OPERATION AS A SUBROUTINE CALL
+
+        \item   WITH KNOWN ARGUMENT TYPES
+        \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {AN EXAMPLE (cont.)}
+
+\vskip.15in
+\begin{verbatim}
+int     op_CMIP_m__ConfirmedEventReport (sd, in, out, roi)
+int     sd;
+struct type_CMIP_EventReportArgument *in;
+struct type_CMIP_EventReportResult *out;
+struct RoSAPindication *roi;
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {AN EXAMPLE (cont.)}
+
+\vskip.15in
+\begin{verbatim}
+struct type_CMIP_EventReportArgument {
+    struct type_CMIP_ObjectClass *managedObjectClass;
+
+    struct type_CMIP_ObjectInstance *managedObjectInstance;
+
+    struct type_CMIP_EventTypeID *eventType;
+
+    struct type_UNIV_GeneralizedTime *eventTime;
+
+    struct type_CMIP_EventInfo *eventInfo;
+};
+\end{verbatim}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle {REMOTE OPERATIONS SERVICE ELEMENT \\ REFERENCES}
+%
+%\begin{description}
+%\item[ISO/IEC 9072-1:]	Remote Operations:  Model, Notation and Service Definition
+%\item[ISO/IEC 9072-2:]	Remote Operations:  Protocol Specification
+%\end{description}
+%\end{bwslide}

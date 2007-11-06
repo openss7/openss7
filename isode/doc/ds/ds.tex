@@ -1,0 +1,689 @@
+% -*- LaTeX -*-		(really SLiTeX)
+
+\def\emph#1{\underline{#1}}
+\font\xx=cmbx10
+\font\yy=cmbx7
+
+\documentstyle[blackandwhite,landscape,oval,pagenumbers,small]{NRslides}
+
+\raggedright
+
+%\input trademark
+\let\tradeNAMfont=\relax
+\let\tradeORGfont=\relax
+
+\begin{document}
+
+\title	{OSI Directory Services}
+\author	{Christopher W.~Moore\\ The Wollongong Group, Inc.}
+\date	{December 13, 1988}
+\maketitlepage
+
+\begin{bwslide}
+\part*	{Agenda}
+
+\begin{description}
+\item[Part I:]		Introduction to Directory Services
+\item[Part II:]		Directory Services in Detail
+\item[Part III:]	Upper Layer Requirements
+\item[Part IV:]		Reference Points
+\item[Part V:]		Conclusions
+\end{description}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Part I: Introduction to Directory Services}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Introduction}
+
+\begin{nrtc}
+\item	Specialized distributed database
+\item	Holds and provides access to information about objects
+\item	OSI application
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Scope \& Field of Application}
+
+\begin{nrtc}
+\item	Provide Directory Capability Required by:
+	\begin{nrtc}
+	\item	OSI Applications
+	\item	OSI Management Processes
+	\item	OSI Layer Entities
+	\end{nrtc}
+\item	``User Friendly'' Naming --- Name to Address Mapping
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Scope \& Field (cont.)}
+
+\begin{nrtc}
+\item	Is NOT a General-Purpose Database itself;  but,
+\item	May be built on a General-Purpose Database
+\item	Transient Conditions
+\item	More Frequent Queries than Updates
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Scope \& Field (cont.)}
+
+\begin{nrtc}
+\item	Query results independent
+	\begin{nrtc}
+	\item	Identity
+	\item	Location
+	\end{nrtc}
+\item	Variances
+	\begin{nrtc}
+	\item	Differing access rights
+	\item	Unpropagated updates
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Directory and Users}
+
+\begin{nrtc}
+\item	Directory user
+	\begin{nrtc}
+	\item	Person
+	\item	Application process
+	\end{nrtc}
+\item	Services obtained by accessing the directory
+\item	Access achieved through directory user agent, {\em DUA}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Directory and Users}
+
+\vskip.5in
+\diagram[p]{figure1}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Directory Information Base\\ (DIB)}
+
+\begin{nrtc}
+\item	Information model
+\item	All information to which the Directory provides access
+\item	Not concerned with distributed or centralized architecture
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Directory Access\\ ( Abstract Service )}
+
+\begin{nrtc}
+\item	Services provided to DUAs through access points
+\item	Access point supports a specific combination of services, {\em Ports}
+\item	Ports define particular types of interaction with the directory
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Objects}
+
+\begin{nrtc}
+\item	Many types of objects will be stored in the directory
+\item	An object may be used by multiple applications
+\item	General set of useful objects and attributes defined by Directory
+\item	Individual applications may define Directory objects and attributes
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Part II: Directory Services in Detail}
+
+\begin{nrtc}
+\item	Informational Model
+\item	Functional Model
+\item	Organizational Model
+\item	Security Model
+\item	Applying The Directory
+\item	The Directory Service
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Information Model\\ Directory Information Base}
+\begin{nrtc}
+\item	Composed of information about objects, {\em entries}.
+\item	Tree structure, {\em Directory Information Tree (DIT)}
+\item	Entries have {\em Distinguished Names}
+\item	Aliases
+\item	Schema
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Information Model\\ DIT Structure}
+
+\vskip.5in
+\diagram[p]{figure2}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Information Model\\ Entries}
+
+\vskip.5in
+\diagram[p]{figure9}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Example Directory Tree}
+
+\vskip.5in
+\diagram[p]{figure3}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Functional Model}
+
+\begin{nrtc}
+\item	The Directory is manifested by one or more DSAs
+\item	Directory System Agent, {\em DSA}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Functional Model}
+
+\vskip.5in
+\diagram[p]{figure4}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Operation of the Functional Model}
+
+\begin{nrtc}
+\item	Interactions
+	\begin{nrtc}
+	\item	DUAs interact with one or more DSAs
+	\item	DSAs interact with other DSAs
+	\end{nrtc}
+\item	Referral
+\item	Chaining
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Operation of the Model\\ Referral}
+
+\vskip.5in
+\diagram[p]{figure5}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Operation of the Model\\ Referral (cont.)}
+
+\vskip.5in
+\diagram[p]{figure6}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Operation of the Model\\ Chaining}
+
+\vskip.5in
+\diagram[p]{figure7}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Operation of the Model\\ Multicasting}
+
+\vskip.5in
+\diagram[p]{figure8}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Organizational Model}
+\begin{nrtc}
+\item	Directory Management Domain, {\em DMD}
+	\begin{nrtc}
+	\item	One or more DSAs
+	\item	Zero or more DUAs
+	\item	External behavior (Multiple DSAs in a DMD)
+	\end{nrtc}
+\item	Administration Directory Management Domain, {\em ADDMD}
+\item	Private Directory Management Domain, {\em PRDMD}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Security Model}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Security Model\\ Security Policy}
+
+\begin{nrtc}
+\item	Various authorities provide access to parts of the DIB
+\item	Authorization Policy
+	\begin{nrtc}
+	\item	Specify access rights
+	\item	Enforce access rights {\em (Access control)}
+	\item	Maintain access rights
+	\end{nrtc}
+\item	Authentication Policy
+	\begin{nrtc}
+	\item	Identity of DSAs and directory users
+	\item	identity of received informations origin
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Security Model\\ Local Matters}
+
+\begin{nrtc}
+\item	Actual definition of a security policy
+\item	Specifying access rights {\em (Guidelines given)}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Applying the Directory}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Applying the Directory \\ Directory Environment}
+
+\begin{nrtc}
+\item	Large scale networks
+	\begin{nrtc}
+	\item	Various objects enter and leave
+	\item	Connectivity of objects changes
+	\item	Characteristic of objects change
+	\end{nrtc}
+\item	Object interrogation is more frequent than object changes
+\item	Object identification methods
+	\begin{nrtc}
+	\item	Chosen for ease of allocation
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Applying the Directory \\ Directory Service Characteristics}
+
+\begin{nrtc}
+\item	Isolate user from frequent changes to network
+\item	Provide ``user friendly'' view of network
+	\begin{nrtc}
+	\item	Aliases
+	\item	``Yellow Pages''
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Applying the Directory \\ Patterns of Usage}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Applying the Directory \\ Look---Up}
+
+\begin{nrtc}
+\item	DUA Supplies
+	\begin{nrtc}
+	\item	Distinguished name of object
+	\item	Attribute type {\em (Optional)}
+	\end{nrtc}
+\item	Directory Returns
+	\begin{nrtc}
+	\item	Value(s) requested
+	\end{nrtc}
+\item	Additionally
+	\begin{nrtc}
+	\item Multiple attribute types may be requested
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Applying the Directory \\ Naming}
+
+\begin{nrtc}
+\item	Names chosen to maximize predictability by humans
+\item	Common among all applications using an object
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Applying the Directory \\ Browsing}
+
+\begin{nrtc}
+\item	Combination of list and search
+\item	Enables user to ``guess'' object name
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Applying the Directory \\ ``Yellow Pages''}
+
+\begin{nrtc}
+\item	Matching objects for a specific category\\
+	(i.e., Business Category = ``Window Washing'')
+\item	Two Approaches
+	\begin{nrtc}
+	\item	Search with filter on attributes
+	\item	Construct special subtrees
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Applying the Directory \\ Groups}
+
+\begin{nrtc}
+\item	Are objects
+\item	Members are objects
+\item	Membership changes over time
+\item	Directory will
+	\begin{nrtc}
+	\item	Indicate if object is member of group
+	\item	List membership of group
+	\end{nrtc}
+\item	{\em Group member may be a group}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Applying the Directory \\ Authentication}
+
+\begin{nrtc}
+\item	Directory supports applications by storing authentication information
+\item	Directory may uses authentication information
+\item	Directory Contains
+	\begin{nrtc}
+	\item	Passwords, {\em Simple Authentication} 
+	\item	Public encryption keys, {\em Strong Authentication}
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Applying the Directory \\ Generic Directory Applications}
+
+\begin{nrtc}
+\item	Inter---Personal Communications
+\item	Inter---System Communications
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Applying the Directory \\ Inter---Personal Communications Directory}
+
+\begin{nrtc}
+\item	Provide humans with communication information for others
+\item	{\em Some} Typical object classes
+	\begin{nrtc}
+	\item	Person
+	\item	Organizational role
+	\item	Group
+	\end{nrtc}
+\item	Typical attributes retrieved
+	\begin{nrtc}
+	\item	Electronic mail address
+	\item	Telephone number
+	\item	Physical delivery information
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Applying the Directory \\ Inter---System Communications Directory}
+
+\begin{nrtc}
+\item	OSI Reference Model \emph{Requires} Two Directory Functions
+	\begin{nrtc}
+	\item	Application Layer: \\ Application Title to Presentation Address
+	\item	Network Layer: \\ NSAP Addresses to SNPA Address
+	\end{nrtc}
+\item	Typical Object Class
+	\begin{nrtc}
+	\item	Application Entity
+	\end{nrtc}
+\item	Typical Attribute Retrieved
+	\begin{nrtc}
+	\item	Presentation Address
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Directory Service}
+\begin{nrtc}
+\item	Provided to user through DUA
+\item	Responds to requests from DUA
+\item	Request Types:
+	\begin{nrtc}
+	\item	Interrogation
+	\item	Modification
+	\end{nrtc}
+\item	Requests may be qualified
+\item	Result / Response
+	\begin{nrtc}
+	\item	Requests always generate a result
+	\item	Normal: Form specific to request
+	\item	Error: Common to other requests
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Directory Service (cont.)}
+\begin{nrtc}
+\item	``Outside'' the Standards
+	\begin{nrtc}
+	\item Addition/Deletion of arbitrary entries
+	\item Management of access Control
+	\item Management of schema
+	\item Management of knowledge information
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Directory Service (cont.)}
+
+\begin{nrtc}
+\item	Connection oriented
+\item	Peer entity authentication performed at association establishment
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Directory Service --- Service Qualification}
+Qualifying Requests:
+\begin{nrtc}
+\item	Service controls
+\item	Security parameters
+\item	Filters
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Directory Service --- Directory Interrogation}
+Types of requests:
+\begin{nrtc}
+\item	Read
+\item	Compare
+\item	List
+\item	Search
+\item	{\em Abandon}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Directory Service --- Directory Modification}
+\begin{nrtc}
+\item	Add entry
+\item	Remove entry
+\item	Modify entry
+\item	Modify relative distinguished name
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {Directory Service --- Outcomes}
+Requests may result in:
+\begin{nrtc}
+\item	Normal response
+\item	Errors
+\item	Referrals
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Directory Protocols}
+
+\begin{nrtc}
+\item	Directory Access Protocol --- $DAP$ --- $(DUA \longleftrightarrow DSA)$
+\item	Directory System Protocol --- $DSP$ --- $(DSA \longleftrightarrow DSA)$
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Directory Protocols}
+
+\vskip .5in
+\diagram[p]{figure21}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Part II: Quick Summary}
+
+\begin{nrtc}
+\item	Information Model --- DIB, DIT, Entries
+\item	Functional Model --- ``The Directory''
+\item	Organizational Model --- Directory Management Domains
+\item	Security Model --- Security Policies
+\item	Applying the Directory --- User approach
+\item	The Directory Service --- An internal approach
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Part  III: Upper Layer Requirements}
+
+\begin{nrtc}
+\item	Association Control
+\item	Remote Operations
+\item	Session {\em --- Version 2}
+\item	Transport
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Lower Layer Requirements}
+
+\begin{nrtc}
+\item	ISO/IEC - No specific Transport Class requirement
+\item	CCITT	- Transport Class 0 over X.25
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Part IV: Reference Points}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Standards \& Status}
+
+\begin{nrtc}
+\item	ISO/IEC 9594 --- {\em The Directory}
+\item	CCITT X.500 --- {\em The Directory}
+\item	CCITT F.500 --- {\em International Public Directory Services}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Directory\\ References}
+
+\begin{nrtc}
+\item {The Directory--Overview of concepts, models and service}  (ISO/IEC 9594-1, CCITT Recommendation X.500)
+\item {The Directory--Models} (ISO/IEC 9594-2, CCITT Recommendation X.501)
+\item {The Directory--Abstract service definition} (ISO/IEC 9594-3, CCITT Recommendation X.511)
+\item {The Directory--Procedures for distributed operations} (ISO/IEC 9594-4, CCITT Recommendation X.518)
+\item {The Directory--Protocol specifications} (ISO/IEC 9594-5, CCITT Recommendation X.519)
+\item {The Directory--Selected attribute types} (ISO/IEC 9594-6, CCITT Recommendation X.520)
+\item {The Directory--Selected object classes} (ISO/IEC 9594-7, CCITT Recommendation X.521)
+\item {The Directory--Authentication framework} (ISO/IEC 9594-8, CCITT Recommendation X.509)
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Remote Operations\\ References}
+
+\begin{nrtc}
+\item {Remote Operations--Part 1: Model, Notation and Service Definition} (ISO/IEC 9072-1, CCITT Recommendation X.219)
+\item {Remote Operations--Part 2: Protocol Specification} (ISO/IEC 9072-2, CCITT Recommendation X.229)
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Association Control\\ References}
+
+\begin{nrtc}
+\item {Association Control--Service Definition} (ISO/IEC 8649-2, CCITT Recommendation X.217)
+\item {Association Control--Protocol Definition} (ISO/IEC 8650-2, CCITT Recommendation X.217)
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Implementation Profiles\\ References \& Status}
+
+\begin{nrtc}
+\item	NIST:  December 1987 {\em (December 1988 to be approved this week)}
+\item	SPAG:  Status unknown, work being combined with EWOS
+\item	EWOS:  No stable profile at this time.
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Demonstrations}
+
+\begin{nrtc}
+\item	Enterprise Networking Event '88 {\em (ENE)}
+\item	CeBIT '89 {\em (Hanover Fair)}
+	\begin{nrtc}
+	\item EurOSInet / OSITOP
+	\item MultiNET
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle {Part V: Conclusions}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Summary}
+\begin{nrtc}
+\item	General introduction to Directory --- Names to Addresses
+\item	Detailed examination of Directory
+\item	Overview of OSI upper layers
+\item	Current activities and references
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{Directory}
+
+\begin{nrtc}
+\item	Simplifies distribution of large networks
+\item	Allows OSI networks to be self configuring
+\item	Hides complex underpinings from users
+\end{nrtc}
+\end{bwslide}
+
+\end{document}

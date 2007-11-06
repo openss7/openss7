@@ -1,0 +1,730 @@
+% -*- LaTeX -*-
+
+\newpage
+\section	{Introduction}
+The need for a comprehensive white pages service increases in relation to the
+size of the user community.
+The early Internet was served well by a relatively simple facility.
+Today's rapidly expanding Internet has outstripped the capabilities of the
+existing system.
+In order to meet new requirements,
+NYSERNet, Inc.~is sponsoring a pilot project to provide white pages
+service based on the OSI Directory.
+
+A natural function of computer networks is to form the {\em infrastructure\/}
+between the users they interconnect.
+For example,
+the electronic mail service offered by computer networks provides a means for
+users to collaborate towards some common goal.
+In the simplest cases,
+this collaboration may be solely for the dissemination of information.
+In other cases,
+two users may work on joint research project,
+using electronic mail as their primary means of communication.
+
+Most network services are based on the implicit assumption that each user can
+supply {\em infrastructural information} to 
+facilitate information transfers through the network.
+For example,
+electronic mail services expect that an originator can supply 
+addressing information 
+for all the intended recipients.
+It is not necessarily the task of electronic mail, per se,
+to provide this infrastructural information to the user.
+
+This model works fine in small environments,
+particularly those where infrastructural information is not difficult to 
+obtain and remember.
+However,
+the model does not scale well.
+Consider the case when the membership of a network consists of hundreds of
+thousands of users belonging to thousands of organizations.
+It is no longer reasonable for a single user to provide this information,
+except in very limited circumstances.
+Further,
+it is likely that some of the information changes frequently,
+due to personnel and other resource movement.
+The goal of a {\em white pages\/} service is to 
+provide the necessary information, and to mask the complexity of the
+infrastructural information.
+
+\newpage
+\section	{Approach}
+The approach taken by the NYSERNet White Pages Pilot Project is
+straight-forward, though somewhat controversial:
+use the emerging OSI Directory standard as the basis for a white pages
+service, and realize that technology on top of the Internet's TCP/IP-based
+infrastructure.
+
+The choice of OSI Directory as the cornerstone technology was not made
+lightly: 
+the richness of the service was evident,
+and early prototype work had demonstrated that the underlying technology could
+be realized.
+Further,
+it has often been noted that:
+\begin{quote}\em
+if one is going to crash and burn,
+then it's probably best to be at the front of the airplane.
+\end{quote}
+Given the magnitude of the white pages problem in the Internet,
+this analogy seems quite apt!
+
+Hence,
+under the approach taken by the NYSERNet White Pages Pilot,
+to implement a white pages service,
+three things are needed:
+\begin{itemize}
+\item	an OSI infrastructure;
+
+\item	an implementation of the OSI Directory;
+	and,
+
+\item	a white pages abstraction,
+	provided by an administrative discipline along with at least one user
+	interface through which the service is accessed.
+\end{itemize}
+It is important to distinguish between the white pages {\em service\/} and the
+OSI Directory {\em technology} as defined by the International Standards.
+The white pages abstraction is provided both by a focused use of the
+underlying OSI Directory technology (the administrative discipline)
+and by special user interfaces.
+
+\subsection	{OSI Infrastructure}
+The OSI infrastructure is provided by the ISODE (pronounced {\em I-SO-D-E\/}),
+or {\em ISO Development Environment}, a collection of library
+routines and programs that implements an extensive set of OSI upper-layer
+services.%
+\footnote{It is an unfortunate historical coincidence that the first three
+letters of the ISODE are ``ISO''.
+This is not an acronym for the International Organization for Standardization,
+but rather three letters which,
+when pronounced in English,
+produce a pleasing sound.}
+In brief,
+the ISODE implementation of the upper-layers of OSI is interesting in four
+respects:
+it provides extensive automatic tools for the development of OSI applications;
+it supports OSI applications on top of both OSI and TCP/IP-based networks;
+it provides a novel approach to the problems of OSI coexistence
+and transition;
+and,
+it is openly available (non-proprietary).
+
+The ISODE has been the subject of much joy and grief in both the Internet and
+OSI communities.
+It would be counter-productive to provide a more exacting description.
+Interested readers might refer to either
+the five-volume
+{\em The ISO Development Environment: User's Manual},
+for a detailed description,
+or the professional reference entitled {\em The Open Book} by Rose and
+published by Prentice-hall.
+
+The one detail worth mentioning is that the ISODE implements
+``the RFC1006 method'',
+which is a {\em transport service convergence protocol} providing a 
+near-perfect emulation of the OSI transport service on top of TCP/IP-based
+networks.
+Thus,
+given an TCP/IP-based internet infrastucture,
+the RFC1006 method makes that infrastructure appear as a ``native'' OSI
+environment,
+in which OSI applications require no modifications in order to execute.
+
+\subsection	{OSI Directory}
+The ISODE implementation of the OSI Directory,
+QUIPU
+was implemented and is currently maintained by the University College London.
+QUIPU is a complete implementation of the OSI Directory,
+based on the {\oldstyle 1988\/} ISO standards and CCITT recommendations.
+
+The QUIPU Directory User Agent (DUA) can be used directly at the programmatic
+level,
+or exported from a interface process called \pgm{dish}~---~the DIrectory SHell.
+The \pgm{dish} process is available available either as a monolithic \unix/
+program containing an input-interpreter with several commands,
+or as several \unix/ programs, each implementing one of those commands.
+
+The QUIPU Directory System Agent (DSA) is memory-based:
+it uses the native \unix/ file-system to provide stable-storage between
+reboots, but otherwise maintains all data in program memory.
+As might be expected,
+providing that the DSA avoids paging,
+execution of the lookup and search facilities of the Directory can be realized
+in a timely fashion.
+Naturally, when an update operation occurs,
+the copy on disk is updated and a journal entry written before the update is
+acknowledged.
+The disk copy is stored in a textual format to facilitate examination.
+As this copy is read only once~---~when the DSA starts,
+typically when \unix/ goes multi-user.
+The cost of such a strategy is believed to be relatively small if properly
+implemented and tuned.
+
+The DSA supports both Directory distributed operations (DSA-DSA) and the
+Directory Abstract Service (DUA-DSA),
+along with the full range of standard Directory attributes.
+Further,
+a large number of other attributes have been defined,
+both to facilitate experimentation and support the white pages service.
+Most notably these attributes were necessary to support automatic use of
+replication of information in the Directory.
+
+\subsection	{White Pages Abstraction}
+The white pages abstraction is the layer of conceptualization which resides
+above the OSI Directory service.
+Its purpose is to hide the complexity of the underlying technology and provide
+a user-friendly service.
+There are two parts to the service:
+an {\em administrative discipline}, and a {\em user interface}.
+
+\subsubsection	{Administrative Discipline}
+The OSI Directory leaves several issues to be decided by the implementor and
+service provider.
+These form the the administrative discipline.
+
+At the highest level, the key issue is that each entry in the white pages
+corresponds to an information object in the OSI Directory.
+Since the OSI Directory uses {\em Distinguished Names\/} to uniquely identify
+information objects,
+the straight-forward approach is to use Directory Distinguished Names as names
+in the white pages.
+This mapping considerly simplifies the complexity of providing the white pages
+service with the OSI Directory.
+However,
+since Distinguished Names are length and unwieldy,
+the user interface must provide effective mechanisms for managing these names
+for the user.
+
+A second issue is to focus the scope of the project on persons and
+organizations.
+Although the underlying Directory implementation is capable of managing the
+entire range of permissible information objects,
+the user interface focuses on:
+\begin{quote}\small\begin{tabular}{l}
+organizations\\ organizational units\\ organizational roles (e.g., ``Chair of
+the Department'')\\ localities (for those individuals not belonging to an
+organization)\\ persons
+\end{tabular}\end{quote}
+However,
+some modest work has been done as a part of the pilot in supporting other
+objects,
+such as networks, hosts, application processes, and document lookup.
+Nonetheless,
+the pilot project is emphasizing providing excellent support for persons and
+organizations,
+e.g., by defining additional attributes which are useful.
+For example, users can store a
+facsimile image of themselves as their \verb"photo" attribute.
+
+The administrative discipline also deals with issues such as caching, and
+replication.
+As these mechanisms were severely enhanced after initial deployment,
+they are discussed later on.
+
+The most significant work in terms of the administrative discipline was the
+writing of a one-hundred page {\em Administration Guide} explaining OSI
+Directory concepts,
+along with installation and maintenance procedures,
+to \unix/ system administrators.
+This document was well-received by the community of pilot administrators.
+In addition,
+a turn-key configuration program,
+\pgm{dsaconfig},
+was written to automatically generate the initial Directory configuration for
+a participating organization.
+This, too, was well-received.
+
+\subsubsection	{User Interface}
+Building the user interface consists of two tasks:
+selecting the appropriate interface paradigm,
+and mapping that paradigm to the Directory service.
+
+The paradigm selected is based on an earlier Internet nameservice called WHOIS.
+This style of interaction was chosen for two reasons:
+\begin{itemize}
+\item	experience with WHOIS since {\oldstyle 1982\/} has shown the syntax to
+be well-liked by the user community;%
+\footnote{It is beyond the scope of this report to speculate if the success of
+the WHOIS syntax is due to a lack of competing nameservices in the Internet.}
+and,
+
+\item	by using a similar syntax in the interface,
+the problem of training the user community is greatly reduced.
+\end{itemize}
+The user interface to the white pages service is called \pgm{fred}.%
+\footnote{In tried-and-true \unix/ style,
+\pgm{fred} stands for FRont-End to Dish.
+The \verb"dish" program was mentioned earlier as the primary means for
+exporting the DUA interface to the \unix/ shell.}
+
+Although the program has several commands,
+only one is used for finding things in the white pages:
+the \verb"whois" command,
+which has syntax analogous to the WHOIS command.
+For each \verb"whois" command,
+\pgm{fred} constructs one or more Directory operations and then has \pgm{dish}
+execute those operations.
+
+The \verb"whois" syntax in \pgm{fred} has been extended from that of the
+earlier WHOIS service,
+in order to provide focused searching at the organizational level.
+For example, the command:
+\begin{quote}\small\begin{verbatim}
+fred> whois rose
+\end{verbatim}\end{quote}
+directs \pgm{fred} to find information about something called \verb"rose" in
+the default searching area.
+Initially,
+this results in a single Directory operation,
+textually described as:
+\begin{quote}\small\begin{verbatim}
+search
+    -nosizelimit -timelimit 300
+    -subtree -filter "o=*rose* | ou=*rose* | l=*rose* | cn=*rose*"
+\end{verbatim}\end{quote}
+which performs an entire subtree search of the default area,
+looking for any entry matching the filter.
+For each match,
+a Directory read operation is performed and the resulting information
+displayed accordingly.
+As might be imagined,
+more efficient searches can be performed if the user tells \pgm{fred} that a
+person is being searched for.
+
+For a second example, the command
+\begin{quote}\small\begin{verbatim}
+fred> whois rose -org nyser
+\end{verbatim}\end{quote}
+directs \pgm{fred} to find information about something called \verb"rose"
+associated with some organization called \verb"nyser".
+Initially this results in this Directory operation:
+\begin{quote}\small\begin{verbatim}
+search
+    -dontdereferencealias
+    -singlelevel -filter "o=*nyser* & objectClass=organization"
+    "@c=US"
+\end{verbatim}\end{quote}
+which performs a single-level search in the United States portion of the
+Directory,
+looking for any entry matching the filter.
+For each matching organization,
+another Directory search operation takes place,
+similar to that of the first example,
+but anchored in that organization.
+
+The \pgm{fred} program also supports a mailbox specification for searching,
+and performs a yellow pages-style search accordingly.%
+\footnote{In general,
+the distinction between white pages and yellow pages is poorly understood.
+A white pages search implies that searching occurs on some part of an object's
+name,
+whilst a yellow pages search implies that searching occurs on any of an
+object's attributes.
+Since, in the OSI Directory,
+an object's name is one of its attributes,
+these definitions are problematic at best.}
+
+In addition to \pgm{fred},
+two simple X~windows programs were written to interface to the white pages and
+the Directory:
+\begin{itemize}
+\item	\pgm{xwho}, an X~windows version of the \pgm{rwho} program that
+	displays the faces of people logged in on the local network,
+	by using the Directory to retrieve their \verb"photo" attribute;
+	and,
+
+\item	\pgm{xface}, an X~windows program that displays the face of the person
+	who sent the mail message being read, by first using the Directory to
+	perform an inverse-mapping on the originator's mailbox address, and
+	then retrieving the \verb"photo" attribute.
+\end{itemize}
+Finally,
+the popular \MH/ message handling system was modified to invoke \pgm{fred} to
+provide name resolution when sending mail messages.
+
+\newpage
+\section	{First Milestone: Numbers}
+Internally,
+work began on the NYSERNet White Pages Pilot Project in
+mid-May, {\oldstyle 1989}.
+After defining and implementing the white pages abstraction,
+the pilot began offering service in July, {\oldstyle 1989}.
+The software supporting the pilot was based on ISODE~5.2(beta),
+a stable, but bug-rich, version of the software.
+By the end of the three-month mark,
+28~Internet sites were participating
+(half of which where NYSERNet members),
+and there were approximately 98K entries in the Directory.
+
+\subsection	{Interop '89}
+At the Interop$^{\mbox{\tiny TM}}$ trade-show and exhibition in
+October, {\oldstyle 1989},
+in the NYSERNet booth,
+the white pages made its first public debut on the show floor.
+This was particularly exciting as the floor network had Internet connectivity.
+
+\subsection	{International Participation}
+Although NYSERNet is running the US~Directory Management Domain (DMD) as a
+part of the pilot,
+one Canadian site wished to participate as well.
+Since a volunteer for running the CA~DMD was not forthcoming,
+this site was temporarily placed under the US~DMD.
+
+\newpage
+\section	{Second Milestone: Software}
+The next three months (October through December, {\oldstyle 1989\/}),
+were spent on two tasks: fixing implementation problems and hardening the code.
+This resulted in ISODE~5.9(frozen).
+
+\subsection	{Reliability}
+Experience with the ISODE~5.2(beta) version of the software led to the motto:
+\begin{quote}\em
+it's nearly as good as bind, but not nearly as fast$\ldots$
+\end{quote}
+which was a fairly accurate assessment.
+The software,
+when running,
+would act correctly.
+However,
+it would frequently crash.
+
+Thus, one major activity was to simply track down the myriad of bugs exercised
+by placing the software in operational use.
+It should be noted that this phenomenon is true of any complex system when
+first fielded.
+In the process of tracking down problems,
+several performance improvements were made.
+For example,
+the program memory storage requirement for each entry was reduced by
+approximately half.
+
+However,
+two major logic problems existed:
+DSAs would occasionally lock-up during synchronous operations,
+and DSAs would not use any intelligence when distributing
+operations to other DSAs.
+
+\subsection	{Asynchrony}
+The asynchrony problem was traced to two areas:
+\begin{itemize}
+\item	the method used by QUIPU for replication of portions of the Directory
+	Information Tree (DIT) was synchronous,
+	resulting in the DSA blocking for potentially long (or infinite)
+	periods of time;
+	and,
+
+\item	the underlying ISODE operations were only partially asynchronous;
+	in particular, whilst connection establishment and data reception were
+	non-blocking, connection release and data transmission were
+	synchronous.%
+	\footnote{Actually,
+	connection establishment would actually lock-up if two DSAs
+	simultaneously tried to associate with each other.}
+\end{itemize}
+Both problems were relative straight-forward to fix,
+once the critical areas of code were identified.
+
+\subsection	{Distribution}
+When an operation cannot be satisfied locally,
+a QUIPU DSA will generate,
+based on knowledge information in the Directory,
+a list of DSAs which either master or shadow the desired information.
+The distribution problem was simple in that the QUIPU DSA did not
+keep track of its previous associations with DSAs in order to judge the
+``responsiveness'' or ``reliability''.
+Its choice was random,
+which almost always led to problematic interactions
+(e.g., ``broken'' DSAs frequently appeared at the front of the list).
+
+The new software now sorts the list based on several heuristics:
+whether an association is currently open to that DSA;
+how long ago the DSA was known to be operating responsively;
+how long ago the DSA was known to be operating reliably;
+and,
+how ``close'' the DSA is.
+Closeness is determined from a tailorable list of preferred DSAs defined by
+the DSA's administrator,
+and by the ``distance'' between the Distinguished Names of the two DSAs in the
+DIT.
+
+In addition,
+all of the key parameters dealing with replication and caching are now
+tailorable.
+At present,
+cached entries are removed after 6~hours,
+and shadow copies of information are checked for refresh every 24~hours.
+
+\subsection	{User Interface}
+The \pgm{fred} program proved spectacularly uncontroversial,
+primarily due to its ease of use.
+In addition to the usual lot of random bug-fixes,
+two small changes were made during this period:
+\begin{itemize}
+\item	In all cases,
+	the old software would issue a Directory read operation for all of an
+	entry's attributes when displaying an entry.
+	Of course,
+	the attributes would be cached in the DUA so that subsequent re-display
+	would not require another Directory read operation.
+
+	However,
+	when searching results in multiple matches,
+	the default action is to display a one-line summary of each matching
+	entry.
+	This one-line summary contains the value of only two or three
+	attributes of the entry.
+	In this circumstance,
+	it is wasteful and slow to issue a Directory read operation for all
+	the attributes,
+	since the user will probably never display all of the entries matched.
+	Hence, when issuing the Directory search operation,
+	\pgm{fred} asks that those three key attributes be returned for each
+	matching entry.
+	Thus,
+	when multiple matches occur,
+	no further Directory operations need be issued.
+
+\item	In any event,
+	the old software would display the one-line summaries in the same
+	order as the entries returned by the Directory,
+	which was essentially unordered.
+	At present,
+	\pgm{fred} name-collates the entries to provide a sorted output.
+\end{itemize}
+
+\subsection	{An Update and Interpolation}
+After three months of intensive work,
+ISODE~5.9(frozen) was released,
+and our motto revised:
+\begin{quote}\em
+it's as good as bind, and nearly as fast$\ldots$
+\end{quote}
+
+On 19 December, {\oldstyle 1989},
+there were at least 84~DSAs in the global Directory pilot,
+79~of those were running the QUIPU software,
+and 31~of those were running something very close to ISODE~5.9(frozen).
+Those 31~DSAs mastered 64462~entries,
+for an average of 2079~entries/DSA.
+If this number is indicative,
+then, on that day,
+the size of the global DIT was on the order of 175K~entries.
+
+In the US portion of the DIT,
+the allocation of sites and DSAs looked like this:
+\[\begin{tabular}{|l|c|c|c|}
+\hline
+\multicolumn{1}{|c|}{\null}&
+		\multicolumn{3}{c|}{\bf Type of DSA}\\
+\cline{2-4}
+\bf Type of Institution&
+		local&	remote&	non-NYSER\\
+\hline
+University&	8&	3&	7\\
+Corporate&	1&	1&	6\\
+Non-profit&	1&	0&	1\\
+Government&	0&	0&	3\\
+\cline{2-4}
+\multicolumn{1}{|r|}{total:}&
+		10&	4&	17\\
+\hline
+\end{tabular}\]
+where
+\[\begin{tabular}{rp{3.0in}}
+local&	refers to a NYSERNet site running its own DSA\\
+remote&	refers to a NYSERNet site with a DSA being run remotely\\
+non-NYSER&
+	refers to an Internet site outside of NYSERNet running its own DSA
+\end{tabular}\]
+
+\newpage
+\section	{Direction}
+Given the initial success of the pilot and the stability and robustness of the
+new software,
+the current direction for the NYSERNet White Pages Pilot is to emphasize
+growth.
+The value of a comprehensive white pages service increases in relation to the
+size of the user community.
+
+\subsection	{Software}
+Work on the software is most likely going to lapse into maintenance mode,
+as no problems remain in the ISODE~5.9(frozen) distribution.
+As new problems arise,
+they will be dealt with.
+
+\subsubsection	{Platforms}
+At present,
+the ISODE and QUIPU are supported only on \unix/-based hosts.
+Although retargeting the entire package for other platforms may be
+prohibitively expensive,
+the interprocess communications mechanism between \pgm{fred} and \pgm{dish} is
+sufficiently general to permit these programs to be distributed across a
+local area network
+(e.g., a TCP connection is used as the IPC,
+even when both processes are resident on the same host).
+
+\subsubsection	{Interfaces}
+The most interesting interface that might be developed is probably one based on
+X~windows which provides a hyper-textual interface to the white pages.
+This paradigm appears to have much promise.
+
+\subsection	{(Teutonic) Discipline}
+In terms of the administrative discipline,
+there are two areas to be addressed for the next milestone.
+
+\subsubsection	{Replication}
+Although individual QUIPU DSAs are now robust and reliable,
+and distributed operations are now sensible,
+transient network outages may still prevent information from being available.
+The solution, of course, is to use more replication in the system.
+As such,
+white pages administrators will be encouraged to team with each other in order
+to provide shadow replication of their organizational DMDs.
+
+\subsubsection	{International Participation}
+In the next milestone,
+NYSERNet will be working with the University of Toronto to provide a tight
+interaction between the US~and CA~DMDs.
+In particular,
+a new locality for North America will be jointly administered.
+This locality contains Directory aliases to organizations in both the US~and
+CA~DMDs.
+With the introduction of this locality,
+users of the white pages will be able to automatically search both DMDs when
+looking for information about organizations.
+
+\subsection	{On the Far Horizon}
+The NYSERNet White Pages Pilot Project is scheduled to finish at the end of
+May, {\oldstyle 1990}.
+At this time,
+a determination must be made as to the viability of the service.
+If the service is judged useful and maintainable,
+then two issues must be addressed:
+the level of supported required to offer the service,
+along with additional hierarchy in the US~DMD.
+
+\subsubsection	{The Need for Support}
+At present,
+implementation, maintenance, and support for the white pages abstraction along
+with the operational pilot is done with 0.75FTE.
+As the number of sites joining the white pages increases,
+even with tools to semi-automate administration procedures,
+the load will be too great.
+A larger infrastructure will be needed.
+
+\subsubsection	{Three-level DMD Scheme}
+The two-level DMD scheme used by the pilot,
+in which all organizations are placed directly under the~US,
+is unscalable.
+A three-level scheme,
+in which organizations operating with a single state,
+are placed under the DMD for that state,
+must be put into effect.
+
+\newpage
+\section	{Documents}
+As of this writing,
+five documents have been produced:
+\begin{itemize}
+\item	{\em An Introduction to a NYSERNet White Pages Pilot Project},
+	by Rose and Schoffstall,
+	12~pages.
+
+This introduces the basic notion of a white pages service and outlines
+the goals and milestones of the project.
+
+\item	{\em NYSERNet White Pages Pilot: Administrator's Guide},
+	by Rose,
+	104~pages.
+
+This is the authoritative tome which introduces the white pages service and
+OSI Directory,
+describes how to configure and install the service,
+and finally discusses maintenance issues.
+
+This is a ``living'' document.
+
+\item	{\em NYSERNet White Pages Pilot: User's Handbook},
+	by Rose,
+	38~pages.
+
+This describes the pilot project from a user's perspective
+and provides operational reference for the use of the white pages service.
+In particular,
+the white pages user interface, \pgm{fred}, is fully described.
+
+There is also a two-page {\em White Pages Quick Reference Sheet},
+which summarizes the basic commands given to \pgm{fred}.
+
+\item	{\em An Implementation of a White Pages Service},
+	by Rose,
+	28~pages.
+
+This describes the technology underlying the NYSERNet White Pages Pilot
+Project.
+
+Submitted to the IEEE {\em Journal on Selected Areas in Communications}.
+
+\item	{\em NYSERNet White Pages Pilot Project},
+	by Rose,
+	39~images.
+
+An accompanying presentation to the JSAC paper.
+\end{itemize}
+In addition,
+independent of the work on the NYSERNet White Pages Pilot Project,
+four other documents have been produced by the ISODE/QUIPU effort which
+are germane to white pages:
+\begin{itemize}
+\item	{\em The ISO Development Environment: User's Manual, Volume 5: QUIPU},
+	by Kille, Robbins, Rose, and Turland,
+	290~pages.
+
+\item	{\em Directory Navigation in the QUIPU X.500 System},
+	by Barker and Robbins,
+	15~pages.
+
+\item	{\em An interim approach to use of Network Addresses},
+	by Kille,
+	10~pages.
+
+\item	{\em A string encoding of Presentation Address},
+	by Kille,
+	5~pages.
+\end{itemize}
+
+\newpage
+\section	{Acknowledgements}
+The NYSERNet White Pages Pilot Project builds on the work of many others:
+\begin{itemize}
+\item	At the core,
+	the ISODE provides the programmatic infrastructure for OSI
+	applications.
+	So many people have contributed to the ISODE that it is presumptuous
+	to attempt to list them.
+
+\item	The QUIPU directory from University College London,
+	designed by Stephen E.~Kille and programmed primarily by
+	Colin J.~Robbins, form the heart of the pilot's functionality.
+
+\item	Although NYSERNet has devoted considerable resources to the hardening
+	of QUIPU,
+	it should be noted that UCL has been responsible for the vast majority
+	of improvements and fixes.
+
+\item	The white pages abstraction was designed primarily at NYSERNet with
+	the help of several experts: Kille, Robbins, and Einar Stefferud.
+
+\item	Geoffrey S.~Goodfellow was kind enough to be the alpha tester for the
+	white pages abstraction.
+
+\item	The white pages administrators have been patient as the software
+	twitches.
+
+\item	Finally,
+	it should be noted that none of this would be possible if it
+	weren't for the excellent end-to-end services provided by the Internet
+	suite of protocols (namely the TCP and the IP).
+\end{itemize}

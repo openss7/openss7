@@ -1,0 +1,42 @@
+.PS
+.ps 20
+## figure T-19
+B1:	box "TP4" "CLNP" height 3*boxht/2
+B2:	box "TP4" "CLNP" with .w at (B1.e.x+2*linewid, B1.e.y) height 3*boxht/2
+B3:	box "TP0" "X.25" with .nw at (B2.ne.x+linewid, B2.ne.y) \
+		height 3*boxht/2
+B4:	box invis with .n at B3.n height 3*boxht/2
+B5:	box "TP0" "X.25" with .nw at (B3.ne.x+2*linewid, B3.ne.y) \
+		height 3*boxht/2
+B6:	box invis with .n at B5.n height 3*boxht/2
+##
+	line from B1.s \
+	     to   (B1.s.x, B1.s.y-2*lineht) \
+	     to   (B2.s.x, B2.s.y-2*lineht) \
+	     to   B2.s
+	line from B4.s \
+	     to   (B4.s.x, B4.s.y-2*lineht) \
+	     to   (B6.s.x, B6.s.y-2*lineht) \
+	     to   B6.s
+##
+B7:	box "TS-BRIDGE"  with .sw at (B2.nw.x, B2.nw.y+lineht) \
+		width (B3.ne.x-B2.nw.x)
+	line up from B2.n
+	line up from B3.n
+	box dashed with .nw at (B7.nw.x-linewid, B7.nw.y+lineht) \
+		width B7.width+linewid*2 \
+		height B7.nw.y-B2.sw.y+2*lineht
+	arc -> from (B3.n.x-boxwid/4, B3.n.y+lineht/4) \
+	       to (B2.n.x+boxwid/4, B2.n.y+lineht/4)
+	move to (B7.s.x, B3.n.y+lineht/2) "copy"
+##
+B8:	box invis "OSI TS" with .s at (B1.n.x, B1.n.y+lineht)
+	arrow from B1.n to B8.s
+B9:	box invis "OSI TS" with .s at (B5.n.x, B5.n.y+lineht)
+	arrow from B5.n to B9.s
+##
+B10:	box with .nw at (B7.sw.x-linewid, B2.sw.y-3*lineht) \
+	    width B7.width+2*linewid height boxht/6 shaded
+	move to (B10.s.x, B10.s.y-lineht/2); "TS-BRIDGE NODE"
+##
+.PE

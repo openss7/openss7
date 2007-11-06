@@ -1,0 +1,201 @@
+% LaTeX tgrind environment
+
+% Based on Van Jacobson's ``tgrindmac'', a macro package for TeX grinding
+% Our job here is to simplify it quite a bit and make it conform to LaTeX
+
+\newif\ifcomment\newif\ifstring
+\newcount\linecount\newcount\linenext
+\newbox\linesofar
+\newdimen\TBwid
+\newdimen\ts
+\newbox\tbox
+
+\def\tgrind{%
+% Stuff we ignore for right now.
+\let\Head=\@gobble
+\def\File##1,##2,##3{}
+\let\Proc=\@gobble
+\let\ProcCont=\@gobble
+%
+% Each formfeed in the input is replaced by a "\NewPage" macro.  If
+% you really want a page break here, define this as "\vfill\eject".
+\def\NewPage{\filbreak\bigskip}
+%
+% Each line of the program text is enclosed by a "\L{...}".  We turn
+% each line into an hbox of size hsize.  If we saw a procedure name somewhere
+% in the line (i.e., "procbox" is not null), we right justify "procbox"
+% on the line.  Every 10 lines we output a small, right justified line number.
+\def\L##1{\par\hbox to\hsize{\CF\strut\global\advance\linecount by1
+##1\hss\linebox}}
+%
+\linecount=0
+\linenext=9
+\def\linebox{\ifnum\linecount>\linenext\global\advance\linenext by10
+\hbox{\sevrm\the\linecount}\fi}
+%
+% The following weirdness is to deal with tabs.  "Pieces" of a line
+% between tabs are output as "\LB{...}".  E.g., a line with a tab at
+% column 16 would be output as "\LB{xxx}\Tab{16}\LB{yyy}".  (Actually, to
+% reduce the number of characters in the .tex file the \Tab macro
+% supplies the 2nd & subsequent \LB's.) We accumulate the LB stuff in an
+% hbox.  When we see a Tab, we grab this hbox (using "\lastbox") and turn
+% it into a box that extends to the tab position.  We stash this box in
+% "\linesofar" & use "\everyhbox" to get \linesofar concatenated onto the
+% front of the next piece of the line.  (There must be a better way of
+% doing tabs [cf., the Plain.tex tab macros] but I'm not not enough of a
+% TeX wizard to come up with it.  Suggestions would be appreciated.)
+\def\LB{\CF\hbox}
+\setbox\linesofar=\null
+\everyhbox={\box\linesofar}
+\def\Tab##1{\setbox\tbox=\lastbox\TBwid=1\wd\tbox\advance\TBwid by 1\ts
+\ifdim\TBwid>##1\ts
+\setbox\linesofar=\hbox{\box\tbox\space}\else
+\setbox\linesofar=\hbox to ##1\ts{\box\tbox\hfil}\fi\LB}
+%
+% A normal space is too thin for code listings.  We make spaces & tabs
+% be in "\ts" units (which are the width of a "0" in the current font).
+\setbox\tbox=\hbox{0} \ts=1\wd\tbox \setbox\tbox=\hbox{\hskip 1\ts}
+\def\space{\hskip 1\ts\relax}
+%
+% Font changing stuff for keywords, comments & strings.  We put keywords
+% in boldface, comments in text-italic & strings in typewriter.  Since
+% we're usually changing the font inside of a \LB macro, we remember the
+% current font in \CF & stick a \CF at the start of each new box.
+% Also, the characters " and ' behave differently in comments than in
+% code, and others behave differently in strings than in code.
+\let\CF=\rm
+\def\K##1{{\bf ##1}}	% Keyword
+\def\C{\it\global\let\CF=\it\global\commenttrue\relax}	% Comment Start
+\def\CE{\rm\global\let\CF=\rm\global\commentfalse\relax}% Comment End
+\def\S{\tt\global\let\CF=\tt\global\stringtrue\relax}	% String Start
+\def\SE{\rm\global\let\CF=\rm\global\stringfalse\relax}	% String End
+%
+% Special characters.
+\def\{{\ifmmode\lbrace\else\ifstring{\char'173}\else$\lbrace$\fi\fi}
+\def\}{\ifmmode\rbrace\else\ifstring{\char'175}\else$\rbrace$\fi\fi}
+\def\!{\ifmmode\backslash\else\ifstring{\char'134}\else$\backslash$\fi\fi}
+\def\|{\ifmmode|\else\ifstring{\char'174}\else$|$\fi\fi}
+\def\<{\ifmmode<\else\ifstring<\else$<$\fi\fi}
+\def\>{\ifmmode>\else\ifstring>\else$>$\fi\fi}
+\def\/{\ifmmode/\else\ifstring/\else$/$\fi\fi}
+\def\-{\ifmmode-\else\ifstring-\else$-$\fi\fi}
+\def\_{\ifstring{\char'137}\else\underbar{\ }\fi}
+\def\&{{\char'046}}
+\def\#{{\char'043}}
+\def\%{{\char'045}}
+\def\~{{\char'176}}
+\def\"{\ifcomment''\else{\tt\char'042}\fi}
+\def\'{\ifcomment'\else{\tt\char'047}\fi}
+\def\^{{\char'136}}
+\def\${{\rm\char'044}}
+%
+\raggedright\obeyspaces%\let =\space%
+}
+
+% \tagrind*[FLOAT]{FILE}{CAPTION}{LABEL}
+%    *		optional
+%    FLOAT	float options
+%    FILE	reads LaTeXgrind input in file FILE
+%    CAPTION	for list of figures
+%    LABEL	for \ref and \pageref
+\def\tagrind{\@ifstar{\@stagrind}{\@tagrind}}
+
+\def\@tagrind{\@ifnextchar[{\@@tagrind}{\@@tagrind[t]}}
+\def\@stagrind{\@ifnextchar[{\@@stagrind}{\@@stagrind[t]}}
+
+\def\@@tagrind[#1]#2#3#4{%
+    \begin{figure}[#1]
+	\hrule
+	\vskip .5\baselineskip
+	\begin{minipage}\columnwidth\small
+	    \begin{tgrind}
+		\input #2\relax
+	    \end{tgrind}
+	\end{minipage}
+	\vskip .5\baselineskip plus .5\baselineskip
+	\begingroup
+	    \setbox\z@=\hbox{#4}%
+	    \ifdim\wd\z@>\z@
+		\caption{#3}%
+		\label{#4}%
+	    \else
+		\captcont{#3}%
+	    \fi
+	\endgroup
+	\vskip 2pt
+	\hrule
+    \end{figure}
+}
+
+\def\@@stagrind[#1]#2#3#4{%
+    \begin{figure*}[#1]
+	\hrule
+	\vskip .5\baselineskip
+	\begin{minipage}\textwidth\small
+	    \begin{tgrind}
+		\input #2\relax
+	    \end{tgrind}
+	\end{minipage}
+	\vskip .5\baselineskip plus .5\baselineskip
+	\begingroup
+	    \setbox\z@=\hbox{#4}%
+	    \ifdim\wd\z@>\z@
+		\caption{#3}%
+		\label{#4}%
+	    \else
+		\captcont{#3}%
+	    \fi
+	\endgroup
+	\vskip 2pt
+	\hrule
+    \end{figure*}
+}
+
+
+\def\tgrindfile#1{%
+    \par\addvspace{0.1in}
+    \hrule
+    \vskip .5\baselineskip
+    \begin{footnotesize}
+	\begin{tgrind}
+	    \input #1\relax
+	\end{tgrind}
+    \end{footnotesize}
+    \vskip .5\baselineskip
+    \hrule
+    \addvspace{0.1in}
+}
+
+
+% \tagrindfile{FILE}{CAPTION}{LABEL}
+
+\def\tagrindfile#1#2#3{%
+    \par\addvspace{0.1in}
+    \begingroup
+	\hrule
+	\vskip .5\baselineskip
+	\def\@captype{figure}
+	\begingroup
+	    \setbox\z@=\hbox{#3}%
+	    \ifdim\wd\z@>\z@
+		\refstepcounter{\@captype}
+		\label{#3}%
+	    \fi
+	\endgroup
+	\begin{tgrind}\footnotesize
+	    \input #1\relax
+	\end{tgrind}
+	\vskip .5\baselineskip plus .5\baselineskip
+	\begingroup
+	    \setbox\z@=\hbox{#3}%
+	    \ifdim\wd\z@>\z@
+		\@dblarg{\@caption\@captype}{#2}%
+	    \else
+		\captcont{#2}%
+	    \fi
+	\endgroup
+	\vskip 2pt
+	\hrule
+    \endgroup
+    \addvspace{0.1in}
+}

@@ -1,0 +1,134 @@
+\begin{thebibliography}{CCI84b}
+
+\bibitem[CCI84a]{CCITT.SP.Protocol}
+{Session Protocol Specification for Open Systems Interconnection (OSI) for
+  CCITT Applications}.
+\newblock International Telegraph and Telephone Consultative Committee, October
+  1984.
+\newblock Recommendation X.225.
+
+\bibitem[CCI84b]{CCITT.SP.Service}
+{Session Service Definition for Open Systems Interconnection (OSI) for CCITT
+  Applications}.
+\newblock International Telegraph and Telephone Consultative Committee, October
+  1984.
+\newblock Recommendation X.224.
+
+\bibitem[CCI84c]{CCITT.TP.Service}
+{Transport Service Definition for Open Systems Interconnection (OSI) for CCITT
+  Applications}.
+\newblock International Telegraph and Telephone Consultative Committee, October
+  1984.
+\newblock Recommendation X.214.
+
+\bibitem[ISO86]{ISO.TP.Service}
+{Information Processing Systems~---~Open Systems Interconnection~---~Transport
+  Service Definition}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, 1986.
+\newblock International Standard 8072.
+
+\bibitem[ISO87a]{ISO.PP.Encoding}
+{Information Processing~---~Open Systems Interconnection~---~Specification of
+  Basic Encoding Rules for Abstract Syntax Notation One (ASN.1)}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, 1987.
+\newblock International Standard 8825.
+
+\bibitem[ISO87b]{ISO.SP.Protocol}
+{Information Processing Systems~---~Open Systems Interconnection~---~Basic
+  Connection Oriented Session Protocol Specification}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, August 1987.
+\newblock International Standard 8327.
+
+\bibitem[ISO87c]{ISO.SS.UserData}
+{Information Processing Systems~---~Open Systems Interconnection~---~Basic
+  Connection Oriented Session Service Definition~---~Addendum 2: Incorporation
+  of Unlimited User Data}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, August 1987.
+\newblock Draft Addendum 8326/DAD 2.
+
+\bibitem[ISO87d]{ISO.SP.UserData}
+{Information Processing Systems~---~Open Systems Interconnection~---~Basic
+  Connection Oriented Session Protocol Specification~---~Addendum 2:
+  Incorporation of Unlimited User Data}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, August 1987.
+\newblock Draft Addendum 8327/DAD 2.
+
+\bibitem[ISO87e]{ISO.SP.Service}
+{Information Processing Systems~---~Open Systems Interconnection~---~Basic
+  Connection Oriented Session Service Definition}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, August 1987.
+\newblock International Standard 8326.
+
+\bibitem[ISO88a]{ISO.PP.Service}
+{Information Processing Systems~---~Open Systems Interconnection~---~Connection
+  Oriented Presentation Service Definition}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, April 1988.
+\newblock Final Text of Draft International Standard 8822.
+
+\bibitem[ISO88b]{ISO.PP.Protocol}
+{Information Processing Systems~---~Open Systems Interconnection~---~Connection
+  Oriented Presentation Protocol Specification}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, April 1988.
+\newblock Final Text of Draft International Standard 8823.
+
+\bibitem[Kil89a]{String.Addresses}
+Stephen~E. Kille.
+\newblock {A string encoding of Presentation Address}.
+\newblock Research Note RN/89/14, Department of Computer Science, University
+  College London, February 1989.
+
+\bibitem[Kil89b]{Interim.Addresses}
+Stephen~E. Kille.
+\newblock {An interim approach to use of Network Addresses}.
+\newblock Research Note RN/89/13, Department of Computer Science, University
+  College London, February 1989.
+
+\bibitem[KR78]{C.Language}
+Brian~W. Kernighan and Dennis~M. Ritchie.
+\newblock {\em {The C Programming Language}}.
+\newblock Software Series. Prentice-Hall, Inc., Englewood Cliffs, New Jersey,
+  1978.
+
+\bibitem[Pad85]{Gateways.Heffalumps}
+Michael~A. Padlipksy.
+\newblock {Gateways, Architectures, and Heffalumps}.
+\newblock In {\em {The Elements of Networking Style and Other Essays and
+  Animadversions on the Art of Intercomputer Networking}}, chapter~10, pages
+  167--176. Prentice-hall, Englewood Cliffs, New Jersey, 1985.
+\newblock Also available as Internet Request for Comments 875.
+
+\bibitem[Pos81]{TCP}
+Jon~B. Postel.
+\newblock {Transmission Control Protocol}.
+\newblock Request for Comments 793, DDN Network Information Center, SRI
+  International, September 1981.
+\newblock See also \milstd/ 1778.
+
+\bibitem[RC86]{ISO.on.DDN}
+Marshall~T. Rose and Dwight~E. Cass.
+\newblock {OSI Transport Services on top of the TCP}.
+\newblock {\em Computer Networks and ISDN Systems}, 12(3), 1986.
+\newblock Also available as NRTC Technical Paper \#700.
+
+\bibitem[RC87]{TSAP.on.TCP}
+Marshall~T. Rose and Dwight~E. Cass.
+\newblock {ISO Transport Services on top of the TCP}.
+\newblock Request for Comments 1006, DDN Network Information Center, SRI
+  International, May 1987.
+
+\bibitem[Ros90]{Open.Book}
+Marshall~T. Rose.
+\newblock {\em {The Open Book: A Practical Perspective on Open Systems
+  Interconnection}}.
+\newblock Prentice-hall, 1990.
+\newblock ISBN 0--13--643016--3.
+
+\end{thebibliography}

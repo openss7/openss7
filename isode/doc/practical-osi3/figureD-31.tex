@@ -1,0 +1,20 @@
+\File{figureD\-31.py},{08:27},{Mar 12 1991}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{        if (dlist = search\-results) \K{THEN}}}
+\L{\LB{            \K{IF} (i \> dnsLevel) \K{THEN}}}
+\L{\LB{                dnsLevel = i, matches = \K{NULL};}}
+\L{\LB{            \K{FOR} x \K{IN} dlist \K{DO}}}
+\L{\LB{                dprev = matches;}}
+\L{\LB{                matches = dnsMatch (dns, x, matches);}}
+\L{\LB{                \K{IF} (dprev == matches) \K{THEN}}}
+\L{\LB{                    matches += x;}}
+\L{\LB{                \K{ELSE}}}
+\L{\LB{                    \K{IF} (i \< dnsLevel) \K{THEN}}}
+\L{\LB{                        \K{BREAK};}}
+\L{\LB{            \K{DONE}}}
+\L{\LB{        \K{ELSE}}}
+\L{\LB{            \K{IF} (!(dp = tail (dp)))}}
+\L{\LB{                \K{RETURN} matches;}}
+\L{\LB{    \K{DONE}}}
+\L{\LB{\}}}

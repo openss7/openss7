@@ -1,0 +1,606 @@
+-- smux.my - SMUX MIB
+
+-- $Header: /xtel/isode/isode/snmp/RCS/smux.my,v 9.0 1992/06/16 12:38:11 isode Rel $
+--
+-- Contributed by NYSERNet Inc.  This work was partially supported by the
+-- U.S. Defense Advanced Research Projects Agency and the Rome Air Development
+-- Center of the U.S. Air Force Systems Command under contract number
+-- F30602-88-C-0016.
+--
+--
+-- $Log: smux.my,v $
+-- Revision 9.0  1992/06/16  12:38:11  isode
+-- Release 8.0
+--
+--
+
+--
+--				  NOTICE
+--
+--    Acquisition, use, and distribution of this module and related
+--    materials are subject to the restrictions of a license agreement.
+--    Consult the Preface in the User's Manual for the full terms of
+--    this agreement.
+--
+--
+
+
+SMUX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	unix
+		FROM UNIX-MIB
+	Counter, ObjectName
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+	tcpConnLocalAddress, tcpConnLocalPort, tcpConnRemAddress,
+	    tcpConnRemPort, udpLocalAddress, udpLocalPort, ipRouteDest
+		FROM RFC1213-MIB
+	clnpRouteDest
+		FROM CLNS-MIB;
+
+
+-- the mbuf group
+
+mbuf	OBJECT IDENTIFIER ::=	{ unix 2 }
+
+mbufs		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of mbufs allocated from the page pool."
+	::= { mbuf 1 }
+
+mbufClusters 	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of clusters allocated from the page pool."
+	::= { mbuf 2 }
+
+mbufFreeClusters OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of clusters allocated but not in use."
+	::= { mbuf 3 }
+
+mbufDrops 	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of requests for mbufs which failed due to
+		 lack of space."
+	::= { mbuf 4 }
+
+mbufWaits	 OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of requests for mbufs which resulted in a wait."
+	::= { mbuf 5 }
+
+mbufDrains 	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times protocols were drained for space."
+	::= { mbuf 6 }
+
+mbufFrees 	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of mbufs allocated but not in use."
+	::= { mbuf 7 }
+
+mbufTable 	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF MbufEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The mbuf type table."
+	::= { mbuf 8 }
+
+mbufEntry	OBJECT-TYPE
+	SYNTAX	MbufEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the mbuf type table."
+  	INDEX	{ mbufType }
+	::= { mbufTable 1 }
+
+MbufEntry ::=
+    SEQUENCE {
+	mbufType
+	    INTEGER,
+	mbufAllocates
+	    INTEGER
+    }
+
+mbufType	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of mbuf in use."
+	::= { mbufEntry 1 }
+
+mbufAllocates	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of mbufs of this type in use."
+	::= { mbufEntry 2 }
+
+mbufSpaces	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of interface pages obtained from the page pool."
+	::= { mbuf 9 }
+
+
+-- the SMUX protocol group
+
+smux	OBJECT IDENTIFIER ::= { unix 4 }
+
+smuxPeerTable	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SmuxPeerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The SMUX peer table."
+	::= { smux 1 }
+
+smuxPeerEntry	OBJECT-TYPE
+	SYNTAX	SmuxPeerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the SMUX peer table."
+  	INDEX	{ smuxPindex }
+	::= { smuxPeerTable 1}
+
+SmuxPeerEntry ::=
+    SEQUENCE {
+	smuxPindex
+	    INTEGER,
+	smuxPidentity
+	    OBJECT IDENTIFIER,
+	smuxPdescription
+	    DisplayString,
+	smuxPstatus
+	    INTEGER
+    }
+
+smuxPindex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"An index which uniquely identifies a SMUX peer."
+	::= { smuxPeerEntry 1 }
+
+smuxPidentity	OBJECT-TYPE
+	SYNTAX	OBJECT IDENTIFIER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The authoritative designation for a SMUX peer."
+	::= { smuxPeerEntry 2 }
+
+smuxPdescription OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (0..255))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A human-readable description of a SMUX peer."
+	::= { smuxPeerEntry 3 }
+
+smuxPstatus	OBJECT-TYPE
+	SYNTAX	INTEGER { valid(1), invalid(2), connecting(3) }
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of SMUX peer.
+
+		 Setting this object to the value invalid(2) has the effect
+		 of invaliding the corresponding entry in the smuxPeerTable.
+		 It is an implementation-specific matter as to whether
+		 the agent removes an invalidated entry from the table.
+		 Accordingly, management stations must be prepared to
+		 receive tabular information from agents that correspond
+		 to entries not currently in use.  Proper interpretation of
+		 such entries requires examination of the relative smuxPstatus
+		 object."
+	::= { smuxPeerEntry 4 }
+
+smuxTreeTable	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SmuxTreeEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The SMUX tree table."
+	::= { smux 2 }
+
+smuxTreeEntry	OBJECT-TYPE
+	SYNTAX	SmuxTreeEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the SMUX tree table."
+  	INDEX	{ smuxTsubtree, smuxTpriority }
+	::= { smuxTreeTable 1}
+
+SmuxTreeEntry ::=
+    SEQUENCE {
+	smuxTsubtree
+	    OBJECT IDENTIFIER,
+	smuxTpriority
+	    INTEGER,
+	smuxTindex
+	    INTEGER,
+	smuxTstatus
+	    INTEGER
+    }
+
+smuxTsubtree	OBJECT-TYPE
+	SYNTAX	OBJECT IDENTIFIER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The MIB subtree being exported by a SMUX peer."
+	::= { smuxTreeEntry 1 }
+
+smuxTpriority OBJECT-TYPE
+	SYNTAX	INTEGER (0..'07fffffff'h)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The SMUX peer's priority when exporting the MIB subtree."
+	::= { smuxTreeEntry 2 }
+
+smuxTindex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The SMUX peer's identity."
+	::= { smuxTreeEntry 3 }
+
+smuxTstatus	OBJECT-TYPE
+	SYNTAX	INTEGER { valid(1), invalid(2) }
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of SMUX tree.
+
+		 Setting this object to the value invalid(2) has the effect
+		 of invaliding the corresponding entry in the smuxTreeTable.
+		 It is an implementation-specific matter as to whether
+		 the agent removes an invalidated entry from the table.
+		 Accordingly, management stations must be prepared to
+		 receive tabular information from agents that correspond
+		 to entries not currently in use.  Proper interpretation of
+		 such entries requires examination of the relative smuxTstatus
+		 object."
+	::= { smuxTreeEntry 4 }
+
+
+-- the NETSTAT group
+
+netstat	OBJECT IDENTIFIER ::=	{ unix 5 }
+
+unixNetstat	OBJECT-TYPE
+	SYNTAX	INTEGER { enabled(1), disabled(2) }
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates whether the agent supports a UNIX-like
+		 network MIB."
+	::= { netstat 1 }
+
+-- the UNIX TCP connections table
+
+unixTcpConnTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF UnixTcpConnEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The TCP socket table."
+	::= { netstat 2 }
+
+unixTcpConnEntry OBJECT-TYPE
+	SYNTAX	UnixTcpConnEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the TCP socket table."
+  	INDEX	{ tcpConnLocalAddress, tcpConnLocalPort,
+		  tcpConnRemAddress, tcpConnRemPort }
+	::= { unixTcpConnTable 1 }
+
+UnixTcpConnEntry ::=
+    SEQUENCE {
+	unixTcpConnSendQ
+	    INTEGER,
+	unixTcpConnRecvQ
+	    INTEGER
+    }
+
+unixTcpConnSendQ OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of octets queued for sending on this TCP socket."
+	::= { unixTcpConnEntry 1 }
+
+unixTcpConnRecvQ OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of octets queued for reading from this TCP socket."
+	::= { unixTcpConnEntry 2 }
+
+
+-- the UNIX UDP listener table
+
+unixUdpTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF UnixUdpEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The UDP socket table."
+	::= { netstat 3 }
+
+unixUdpEntry OBJECT-TYPE
+	SYNTAX	UnixUdpEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the UDP socket table."
+  	INDEX	{ udpLocalAddress, udpLocalPort }
+	::= { unixUdpTable 1 }
+
+UnixUdpEntry ::=
+    SEQUENCE {
+	unixUdpRemAddress
+	    IpAddress,
+	unixUdpRemPort
+	    INTEGER (0..65535),
+	unixUdpSendQ
+	    INTEGER,
+	unixUdpRecvQ
+	    INTEGER
+    }
+
+unixUdpRemAddress OBJECT-TYPE
+	SYNTAX	IpAddress
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The remote IP address bound to this UDP socket.  If no binding
+		 has occurred, the value 0.0.0.0 is used."
+	::= { unixUdpEntry 1 }
+
+unixUdpRemPort OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The remote UDP port bound to this UDP socket.  If no binding
+		 has occurred, the value 0 is used."
+	::= { unixUdpEntry 2 }
+
+unixUdpSendQ OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of octets queued for writing to this UDP socket."
+	::= { unixUdpEntry 3 }
+
+unixUdpRecvQ OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of octets queued for reading from this UDP socket."
+	::= { unixUdpEntry 4 }
+
+-- the UNIX IP Routing table
+
+unixIpRoutingTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF UnixIpRouteEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The additional IP routing table."
+	::= { netstat 4 }
+
+unixIpRouteEntry OBJECT-TYPE
+	SYNTAX	UnixIpRouteEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the additional IP routing table."
+  	INDEX	{ ipRouteDest }
+	::= { unixIpRoutingTable 1 }
+
+UnixIpRouteEntry ::=
+    SEQUENCE {
+	unixIpRouteFlags
+	    INTEGER,
+	unixIpRouteRefCnt
+	    INTEGER,
+	unixIpRouteUses
+	    Counter
+    }
+
+unixIpRouteFlags OBJECT-TYPE
+	SYNTAX	INTEGER (0..'ffff'h)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A value associated with the IP routing entry.
+
+		 The value is a sum.  This sum initial takes the value zero.
+		 Then, for each flag, F, in the range 1 through N, that this
+		 IP routing entry has TRUE, 2 raised to (F - 1) is added to
+		 the sum.
+
+		 flag	status
+		 ----	------
+		   1	route useable
+		   2	destination is a gateway
+		   3	host entry
+		   4	re-instate route after timeout
+		   5	created dynamically (by redirect)
+
+		 Other values of flag are reserved for future definition."
+	::= { unixIpRouteEntry 1 }
+
+unixIpRouteRefCnt OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of sockets using this IP routing entry."
+	::= { unixIpRouteEntry 2 }
+
+unixIpRouteUses OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times this IP routing entry has been used."
+	::= { unixIpRouteEntry 3 }
+
+-- miscellaneous UNIX routing statistics
+
+unixRouteBadRedirects	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of bogus routing redirects."
+	::= { netstat 5 }
+
+unixRouteCreatedByRedirects OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of routing entries created by redirects."
+	::= { netstat 6 }
+
+unixRouteModifiedByRedirects OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of routing entries modified by redirects."
+	::= { netstat 7 }
+
+unixRouteLookupFails	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times a routing entry couldn't be found
+		 for a destination."
+	::= { netstat 8 }
+
+unixRouteWildcardUses	OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times the `wildcard' routing entry was used."
+	::= { netstat 9 }
+
+-- the UNIX CLNP Routing table
+
+unixClnpRoutingTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF UnixClnpRouteEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The additional CLNP routing table."
+	::= { netstat 10 }
+
+unixClnpRouteEntry OBJECT-TYPE
+	SYNTAX	UnixClnpRouteEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the additional CLNP routing table."
+  	INDEX	{ clnpRouteDest }
+	::= { unixClnpRoutingTable 1 }
+
+UnixClnpRouteEntry ::=
+    SEQUENCE {
+	unixClnpRouteFlags
+	    INTEGER,
+	unixClnpRouteRefCnt
+	    INTEGER,
+	unixClnpRouteUses
+	    Counter
+    }
+
+unixClnpRouteFlags OBJECT-TYPE
+	SYNTAX	INTEGER (0..'ffff'h)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A value associated with the CLNP routing entry.
+
+		 The value is a sum.  This sum initial takes the value zero.
+		 Then, for each flag, F, in the range 1 through N, that this
+		 CLNP routing entry has TRUE, 2 raised to (F - 1) is added to
+		 the sum.
+
+		 flag	status
+		 ----	------
+		   1	route useable
+		   2	destination is a gateway
+		   3	host entry
+		   4	re-instate route after timeout
+		   5	created dynamically (by redirect)
+
+		 Other values of flag are reserved for future definition."
+	::= { unixClnpRouteEntry 1 }
+
+unixClnpRouteRefCnt OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of sockets using this IP routing entry."
+	::= { unixClnpRouteEntry 2 }
+
+unixClnpRouteUses OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of times this IP routing entry has been used."
+
+	::= { unixClnpRouteEntry 3 }
+
+
+END

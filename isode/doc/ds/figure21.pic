@@ -1,0 +1,23 @@
+.PS
+## figure 21
+C1:	circle rad 1.75i
+##
+B1:	box with .n at C1.n invis "The" "Directory"
+##
+C2:	circle with .w at C1.w rad .4i		"\xx DSA"
+C3:	circle with .e at C1.e rad .4i		"\xx DSA"
+##
+C4:	circle at (C1.w.x - (C1.c.x - C1.w.x), C2.w.y) \
+					rad .4i "\xx DUA"
+##
+B2:	box at C2.w shaded	height .06i width .18i
+B3:	box at C2.e shaded	height .06i width .18i
+B4:	box at C3.w shaded	height .06i width .18i
+B5:	box at C3.e shaded	height .06i width .18i
+##
+B6:	box at C4.e shaded	height .06i width .18i
+##
+L1:	line from B6.e to B2.w "DAP" above
+L2:	line from B3.w to B4.e "DSP" above
+##
+.PE

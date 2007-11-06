@@ -1,0 +1,1675 @@
+% run this through SLiTeX with the appropriate wrapper
+
+\dotopic	{NETWORK MANAGEMENT (SNMP)}
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]		INTRODUCTION TO NETWORK MANAGEMENT
+
+\item[PART I:]		CORE ROUTINES
+
+\item[PART II:]		AGENT IMPLEMENTATION
+
+\item[PART III:]	EXPORTING MIB MODULES
+
+\item[PART IV:]		PROTOTYPING NOC APPLICATIONS
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHAT? SNMP IN AN OSI PACKAGE!}
+
+\begin{nrtc}
+\item	CONTINUED SURVIVAL OF THE INTERNET HINGES ON ALL NODES
+	BECOMING NETWORK MANAGABLE:
+    \begin{nrtc}
+    \item	4BSD/ISODE SNMP PACKAGE
+
+    \item	FREELY DISTRIBUTED WITH UPCOMING RELEASES OF BERKELEY UNIX
+    \end{nrtc}
+
+\item	ALSO, GOOD EXAMPLE OF USE OF ASN.1 TOOLS
+
+\item	AND CMIP HAS QUITE A FEW PROBLEMS, e.g.,
+    \begin{nrtc}
+    \item	OO-HOOPLAH, FILTERING/SCOPING
+
+    \item	FULL ASN.1
+
+    \item	EVENT-HANDLING
+
+    \item	CO-MODE TRANSPORT
+    \end{nrtc}
+    (BASICALLY, NOT TRACTABLE TECHNOLOGY)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{A WHIRLWIND INTRODUCTION TO\\ NETWORK MANAGEMENT}\bf
+
+\begin{nrtc}
+\item	SEVERAL MANAGED NODES, EACH WITH AN AGENT
+
+\item	AT LEAST ONE MANAGEMENT STATION
+
+\item	A MANAGEMENT PROTOCOL
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FUNCTIONAL COMPOSITION}
+
+\begin{nrtc}
+\item	EXCHANGE OF MANAGEMENT INFORMATION:
+    \begin{nrtc}
+    \item	 PROTOCOL AND OBJECTS
+    \end{nrtc}
+
+\item	ADMINISTRATIVE FRAMEWORK:
+    \begin{nrtc}
+    \item	AUTHENTICATION AND AUTHORIZATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MANAGED NODES}
+
+\vskip.5in
+\diagram[p]{figureS-21}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MANAGEMENT STATIONS}
+
+\begin{nrtc}
+\item	CONTAIN
+    \begin{nrtc}
+    \item	MANAGEMENT PROTOCOL
+
+    \item	MANAGEMENT APPLICATIONS
+    \end{nrtc}
+
+\item	GOOD IDEA: SHIFT BURDEN TO STATIONS FROM NODES
+    \begin{nrtc}
+    \item	SCALABILITY
+
+    \item	MINIMIZE IMPACT ON ``USEFUL'' WORK
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MANAGEMENT PROTOCOL}
+
+\begin{nrtc}
+\item	REMOTE DEBUGGING PARADIGM~---~MANIPULATE ``VARIABLES''
+    \begin{nrtc}
+    \item	MONITORING: READ OPERATION
+
+    \item	CONTROL: WRITE OPERATION
+    \end{nrtc}
+
+\item	TRAVERSAL OPERATION: DETERMINE SUPPORTED OBJECTS
+	(e.g, TABLE EXPLORATION)
+
+\item	TRAP OPERATION: REPORT EXTRAORDINARY EVENTS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SIMPLE NETWORK MANAGEMENT PROTOCOL}
+
+\begin{nrtc}
+\item	OPERATIONS:
+    \begin{nrtc}
+    \item	GET
+
+    \item	POWERFUL GET-NEXT
+
+    \item	SET
+
+    \item	TRAP
+    \end{nrtc}
+
+\item	REQUEST-RESPONSE PROTOCOL
+    \begin{nrtc}
+    \item	EXCEPT THAT TRAPS ARE UNCONFIRMED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MANAGEMENT OBJECTS}
+
+\begin{nrtc}
+\item	DEFINED USING (WELL-DEFINED SUBSET OF) ASN.1
+\begin{quote}\small\begin{verbatim}
+sysDescr OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        ::= { system 1 }
+\end{verbatim}\end{quote}
+
+\item	PROTOCOL CARRIES BOTH
+    \begin{nrtc}
+    \item	 OBJECT TYPE
+
+    \item	 OBJECT INSTANCE
+    \end{nrtc}
+
+\item	IN SNMP, INSTANCE IS APPENDED TO OID OF TYPE
+    \begin{nrtc}
+    \item	NON-TABULAR OBJECTS HAVE \verb".0"
+
+    \item	EACH TABULAR OBJECT DEFINES FORM OF INSTANCE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBJECT TREE}
+
+\vskip.5in
+\diagram[p]{figureS-22}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBJECT ORDERING}
+
+\vskip.5in
+\diagram[p]{figureS-23}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ADMINISTRATIVE FRAMEWORK}
+
+\begin{nrtc}
+\item	AUTHENTICATION: COMMUNITIES
+    \begin{nrtc}
+    \item	USER/COMMUNITY PAIRS
+    \end{nrtc}
+    COMMUNITY DEFINES AUTHENTICATION METHOD
+
+\item	AUTHORIZATION: VIEWS
+    \begin{nrtc}
+    \item	VIEW/OPERATION PAIRS
+    \end{nrtc}
+    VIEW DEFINES ACCESS METHOD
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OVERVIEW}
+
+\vskip.5in
+\diagram[p]{figureS-26}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ ``OUT OF THE BOX'' MANAGEMENT}
+
+\vskip.5in
+\diagram[p]{figureS-27}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE:\\ CROSS-ENTERPRISE MANAGEMENT}
+
+\vskip.5in
+\diagram[p]{figureS-28}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{CORE ROUTINES}\bf
+
+\begin{nrtc}
+\item	MOSY
+
+\item	RUN-TIME LIBRARY
+
+\item	ENCODE/DECODE ROUTINES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{MOSY}\bf
+
+\begin{nrtc}
+\item	MANAGED OBJECT SYNTAX-COMPILER (YACC-based)
+
+\item	READS MIB MODULES DEFINED ACCORDING TO RFC1155
+	AND PRODUCES FLAT FILE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE}
+
+\begin{quote}\small\begin{verbatim}
+% mosy smi.my
+RFC1155-SMI identifiers: internet directory mgmt
+            experimental private enterprises
+
+RFC1155-SMI types: ObjectName ObjectSyntax SimpleSyntax
+            ApplicationSyntax NetworkAddress IpAddress
+            Counter Gauge TimeTicks Opaque
+
+% mosy mib.my
+RFC1156-MIB identifiers: mib system interfaces at ip
+            icmp tcp udp egp
+
+RFC1156-MIB objects: sysDescr sysObjectID sysUpTime
+            ifNumber ifTable ifEntry
+
+    ...
+
+% cat smi.defs mib.defs > objects.defs
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE (cont.)}
+
+\begin{quote}\small\begin{verbatim}
+sysObjectID OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  mandatory
+        ::= { system 2 }
+\end{verbatim}\end{quote}
+BECOMES
+\begin{quote}\small\begin{verbatim}
+sysObjectID   system.2  ObjectID   read-only   mandatory
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NEW DEVELOPMENT:\\ CONCISE MIB MODULES}
+
+\begin{quote}\small\begin{verbatim}
+sysObjectID OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The vendor's authoritative identification
+                 of the network management subsystem
+                 contained in the entity.  This value is
+                 allocated within the SMI enterprises subtree
+                 (1.3.6.1.4.1) and provides an easy and
+                 unambiguous means for determining `what kind
+                 of box' is being managed."
+        ::= { system 2 }
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NEW DEVELOPMENT:\\ COMPILED FLAT FILES}
+
+\begin{nrtc}
+\item	INVOKE \verb"snmpi" PROGRAM:
+\begin{quote}\small\begin{verbatim}
+% snmpi -f objects.defs
+snmpi> compile
+snmpi: 1035 objects written to objects.defs
+\end{verbatim}\end{quote}
+
+\item	ALMOST AN ORDER OF MAGNITUDE FASTER TO READ
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{RUN-TIME LIBRARY}\bf
+
+\begin{nrtc}
+\item	DEAL WITH
+    \begin{nrtc}
+    \item	OBJECT SYNTAXES
+
+    \item	OBJECT TYPES
+
+    \item	OBJECT INSTANCES
+    \end{nrtc}
+
+\item	LOAD WITH \verb"-lisnmp -lisode"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INITIALIZATION}
+
+\begin{quote}\small\begin{verbatim}
+#include <isode/snmp/objects.h>
+
+...
+
+if (readobjects ("objects.defs") == NOTOK)
+    error ("readobjects: %s", PY_pepy);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBJECT SYNTAXES}
+
+\begin{quote}\small\begin{verbatim}
+typedef struct object_syntax {
+    char   *os_name;      /* syntax name */
+
+    IFP     os_encode;    /* data -> PE */
+    IFP     os_decode;    /* PE -> data */
+    IFP     os_free;      /* free data */
+
+    IFP     os_parse;     /* str -> data */
+    IFP     os_print;     /* data -> tty */
+
+    ...
+}               object_syntax, *OS;
+#define NULLOS  ((OS) 0)
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBJECT SYNTAXES (cont.)}
+
+\[\tt\begin{tabular}{|r|l|}
+\hline
+\multicolumn{1}{|c|}{\bf syntax}&
+		\multicolumn{1}{|c|}{\bf C structure}\\
+\hline
+INTEGER&    		integer\\
+OCTET STRING&		struct qbuf *\\
+OBJECT IDENTIFIER&	struct OIDentifier *\\
+NULL&			char *\\
+IpAddress&		struct sockaddr\_in *\\
+NetworkAddress&		struct sockaddr\_in *\\
+Counter&		u\_long\\
+Gauge&			u\_long\\
+TimeTicks&		u\_long\\
+DisplayString&		struct qbuf *\\
+ClnpAddress&		struct sockaddr\_osi *\\
+\hline
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DEFINING A NEW SYNTAX}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-1\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DEFINING A NEW SYNTAX (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-2\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DEFINING A NEW SYNTAX (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-3\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBJECT TYPES}
+
+\begin{quote}\smaller\begin{verbatim}
+typedef struct object_type {
+    char   *ot_text;      /* descriptor */
+    OID     ot_name;      /* identifier */
+
+    OS      ot_syntax;    /* SYNTAX */
+
+    int     ot_access;    /* ACCESS */
+#define OT_NONE         0x00
+#define OT_RDONLY       0x01
+#define OT_WRONLY      0x03
+#define OT_RDWRITE      (OT_RDONLY | OT_WRONLY)
+
+    int     ot_status;    /* STATUS */
+#define OT_OBSOLETE     0x00
+#define OT_MANDATORY    0x01
+#define OT_OPTIONAL     0x02
+#define OT_DEPRECATED   0x03
+
+    IFP     ot_getfnx;    /* get method */
+    caddr_t ot_info;      /*   .. for object */
+
+    IFP     ot_setfnx;    /* set method */
+    caddr_t ot_save;      /*   .. for object */
+     ...
+}               object_type, *OT;
+#define NULLOT  ((OT) 0)
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SUPPORT ROUTINES}
+
+\begin{quote}\small\begin{verbatim}
+OT    name2obj ( text2oid ("ipNextHop.0.0.0.0") );
+
+OT    text2obj ("ipNextHop");
+
+OID   text2oid ("1.3.6.1");
+OID   text2oid ("internet");
+OID   text2oid ("iso.3.6.1");
+
+char *oid2ode (oid);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OBJECT INSTANCES}
+
+\begin{quote}\small\begin{verbatim}
+typedef struct object_instance {
+    OID     oi_name;      /* instance OID */
+    OT      oi_type;      /* prototype */
+}               object_instance, *OI;
+#define NULLOI  ((OI) 0)
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SUPPORT ROUTINES}
+
+\begin{quote}\small\begin{verbatim}
+OI      name2inst ( text2oid ("ipNextHop.0.0.0.0") );
+
+OI      next2inst (oid);
+
+OI      text2inst (text);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{ENCODE/DECODE ROUTINES}\bf
+
+\begin{nrtc}
+\item	ALL GENERATED USING PEPSY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}\small
+\begin{verbatim}
+% pepsy -A -f -h snmp.py
+SNMP types: Message PDUs GetRequest-PDU GetNextRequest-PDU GetResponse-PDU
+     SetRequest-PDU PDU Trap-PDU VarBind VarBindList ObjectName ObjectSyntax
+     NetworkAddress IpAddress TimeTicks ClnpAddress DisplayString
+
+% cc -c SNMP_tables.c
+  ...
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}\small
+\begin{verbatim}
+struct type_SNMP_PDU {
+    integer    request__id;
+
+    integer    error__status;
+#define int_SNMP_error__status_noError  0
+#define int_SNMP_error__status_tooBig   1
+#define int_SNMP_error__status_noSuchName       2
+#define int_SNMP_error__status_badValue 3
+#define int_SNMP_error__status_readOnly 4
+#define int_SNMP_error__status_genErr   5
+
+    integer    error__index;
+
+    struct type_SNMP_VarBindList *variable__bindings;
+};
+int     free_SNMP_PDU ();
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{AGENT IMPLEMENTATION}\bf
+
+\begin{nrtc}
+\item	INITIALIZATION
+
+\item	MAIN LOOP
+
+\item	NON-TABULAR ACCESS
+
+\item	TABULAR ACCESS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AGENT FEATURES}
+
+\begin{nrtc}
+\item	SUPPORT FOR SNMP OVER
+    \begin{nrtc}
+    \item	UDP, CLTS, COTS
+    \end{nrtc}
+
+\item	MIBs: MIB-II, UNIX MIB, SMUX, EVAL
+
+\item	PROXY: SNMP/UDP
+
+\item	TRAPS: SNMP/UDP
+
+\item	VIEWS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NEW DEVELOPMENT:\\ SNMPC, SNMPT}
+
+\begin{nrtc}
+\item	SNMPC: COMPOSITE AGENT
+    \begin{nrtc}
+    \item	NO INTERNET-STANDARD MIB
+
+    \item	USED FOR MANAGING AGENTS(!)
+    \end{nrtc}
+
+\item	SNMPT: TRAP SINK
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{INITIALIZATION}\bf
+
+\begin{nrtc}
+\item	A USER-LEVEL PROCESS, SO DO ALL THE USUAL DAEMON STUFF
+
+\item	READ \verb"snmpd.defs" in \verb"ETCDIR"
+
+\item	INSTANTIATE LINKAGE TO ACCESS ROUTINES
+
+\item	READ CONFIGURATION FILE \verb"snmpd.rc" in \verb"ETCDIR"
+
+\item	START LISTENING ON CONFIGURED STACKS:
+    \begin{nrtc}
+    \item	UDP
+
+    \item	COTS
+
+    \item	CLTS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{LINKAGE}
+
+\begin{nrtc}
+\item	FOR EACH OBJECT SUPPORTED
+\begin{quote}\small\begin{verbatim}
+#define ipForwarding    0
+...
+extern  int    o_ip ();
+
+...
+
+OT    ot;
+
+if (ot = text2obj ("ipForwarding")) {
+    ot -> ot_getfnx = o_ip;
+    ot -> ot_info = (caddr_t) ipForwarding;
+}
+...
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONFIGURATION FILE}
+
+\begin{quote}\small\begin{verbatim}
+community       public
+
+community       system          0.0.0.0         readWrite           1.17.2.1
+view            1.17.2.1        system unix
+
+community       wp2             0.0.0.0         readOnly            1.17.2.2
+proxy           1.17.2.2        rfc1157         Internet=wp2+161    secret
+
+trap            traps           192.33.4.20
+
+logging         file=snmpd.log  size=50
+logging         slevel=fatal    slevel=exceptions  slevel=notice
+logging         sflags=close    sflags=create      sflags=zero
+
+variable        sysContact      "Marshall Rose <mrose@psi.com>"
+variable        sysLocation     "Troy machine room"
+variable        sysServices     72
+
+variable        interface lo0   ifType=24       ifSpeed=0
+variable        interface le0   ifType=6
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{MAIN LOOP}\bf
+
+\begin{nrtc}
+\item	WAIT FOR A MESSAGE
+
+\item	BUMP \verb"quantum" (LOGICAL REQUEST-ID)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DESERIALIZE ASN.1 STRUCTURE}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-4\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DESERIALIZE ASN.1 STRUCTURE (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-5\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRANSLATE TO SNMP MESSAGE}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-6\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{USUAL CHECKS}
+
+\begin{nrtc}
+\item	RIGHT VERSION, COMMUNITY, ACCESS, etc.
+
+\item	LOOP THROUGH LIST OF VARIABLES
+    \begin{nrtc}
+    \item	FIND PROTOTYPE
+
+    \item	INVOKE ACCESS ROUTINE
+    \end{nrtc}
+\end{nrtc}
+\begin{quote}\small\begin{verbatim}
+int     result = (*ot -> ot_getfnx) (oi, v, offset)
+OI      oi;
+struct type_SNMP_VarBind *v;
+int    offset;
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BINDING STRUCTURE}
+
+\begin{quote}\small\begin{verbatim}
+struct type_SNMP_VarBind {
+    OID     name;
+
+    PE      value;
+};
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{NON-TABULAR ACCESS}\bf
+
+\begin{nrtc}
+\item	DETERMINE WHICH LEAF OBJECT IS BEING REFERENCED
+
+\item	DETERMINE INSTANCE, BASED ON OPERATION
+    \begin{nrtc}
+    \item	GET: MUST HAVE ``\verb".0"'' INSTANCE-ID
+
+    \item	POWERFUL GET-NEXT: EITHER
+	\begin{nrtc}
+	\item	INSTANCE-ID ABSENT: APPEND ``\verb".0"''
+
+	\item	INSTANCE-ID PRESENT: FLAG NEXT OBJECT
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: NON-TABULAR ACCESS}
+
+\vskip.5in
+\diagram[p]{figureS-23}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NON-TABULAR ACCESS}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-7\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NON-TABULAR ACCESS (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-8\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NON-TABULAR ACCESS (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-9\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ENCODING INSTANCE VALUES}
+
+\begin{nrtc}
+\item	FIND PROTOTYPE AND OBJECT SYNTAX
+
+\item	CALL \verb"os_encode" ROUTINE
+
+\item	UPDATE \verb"value" in \verb"struct type_SNMP_VarBind"
+
+\item	RETURN \verb"OK" OR SNMP ERROR CODE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{TABULAR ACCESS}\bf
+
+\begin{nrtc}
+\item	BUILD DATA STRUCTURE FROM SOURCE\\ (e.g., KERNEL)
+
+\item	DETERMINE WHICH LEAF OBJECT IS BEING REFERENCED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: TABULAR ACCESS}
+
+\vskip.5in
+\diagram[p]{figureS-23}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GET OPERATION}
+
+\begin{nrtc}
+\item	MUST HAVE CORRECT LENGTH OF INSTANCE-ID
+    \begin{nrtc}
+    \item	EACH TABLE DEFINITION SAYS WHAT INSTANCE-ID LOOKS LIKE
+    \end{nrtc}
+
+\item	LOOKUP DATA STRUCTURE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{POWERFUL GET-NEXT OPERATION}
+
+\begin{nrtc}
+\item	IF INSTANCE-ID PRESENT, BUT WRONG LENGTH, THEN NORMALIZE
+
+\item	IF INSTANCE-ID ABSENT, USE FIRST ENTRY IN DATA STRUCTURE
+
+\item	OTHERWISE, FIND ``NEXT'' ENTRY IN DATA STRUCTURE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TABULAR ACCESS}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-10\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TABULAR ACCESS (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-11\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TABULAR ACCESS (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-12\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TABULAR ACCESS (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-13\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TABULAR ACCESS (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-29\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TABULAR ACCESS (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-14\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NEW DEVELOPMENT:\\ SETs}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-30\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{EXPORTING MIB MODULES}\bf
+
+\begin{nrtc}
+\item	USER-PROCESS WORKS OK (NOT GREAT) WHEN REALIZING THE
+	INTERNET-STANDARD MIB
+
+\item	MAY WANT TO HAVE OTHER PROCESSES MANAGE PARTS OF THE MIB
+	(e.g., MAIL QUEUE)
+
+\item	BUT, COMMUNICATION WITH OTHER PROCESSES IS PROBLEMATIC
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ARCHITECTURE}
+
+\begin{nrtc}
+\item	CHOOSE BETWEEN
+    \begin{nrtc}
+    \item	REQUEST-RESPONSE MODEL
+
+    \item	CACHE-AHEAD MODEL
+    \end{nrtc}
+
+\item	SNMP MULTIPLEXING (SMUX) PROTOCOL USES REQUEST-RESPONSE APPROACH
+    \begin{nrtc}
+    \item	SINCE A SMUX PEER CAN ALWAYS FRONT-END A CACHE-AHEAD APPROACH
+    \end{nrtc}
+
+\item	NOTE THAT USE OF THE SMUX IS \emph{STRICTLY} A LOCAL MATTER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SMUX FIREWALL}
+
+\vskip.5in
+\diagram[p]{figureS-24}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{PROTOCOL}\bf
+
+\begin{nrtc}
+\item	AGENT LISTENS FOR SMUX ASSOCIATIONS
+
+\item	SMUX PEER REGISTERS SUBTREES
+
+\item	SMUX PEER MIGHT ISSUE TRAPS
+
+\item	AGENT ASKS PEERS TO HELP IN PERFORMING
+    \begin{nrtc}
+    \item	GET, POWERFUL GET-NEXT, and SET
+    \end{nrtc}
+    OPERATIONS
+
+\item	USES CO-MODE TRANSPORT SERVICE
+    \begin{nrtc}
+    \item	AT PRESENT, MAPPING ONTO THE TCP IS ONLY DEFINED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SMUX PROTOCOL}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-15\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SMUX PROTOCOL (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-16\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SMUX PROTOCOL (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-17\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SMUX PROTOCOL (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-18\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SMUX PROTOCOL (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-19\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SMUX PROTOCOL (cont.)}
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureS-20\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRICKY THINGS}
+
+\begin{nrtc}
+\item	REGISTRATION
+    \begin{nrtc}
+    \item	SUBTREE/PRIORITY PAIR IS UNIQUE
+
+    \item	SUBTREE MOUNTING EFFECT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: SUBTREE MOUNTING EFFECT}
+
+\vskip.5in
+\diagram[p]{figureS-25}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRICKY THINGS (cont.)}
+
+\begin{nrtc}
+\item	MAPPING SNMP MESSAGES TO SMUX MESSAGES
+    \begin{nrtc}
+    \item	ONE-TO-ONE OR ONE-TO-MANY
+
+    \item	USE OF REQUEST-ID
+    \end{nrtc}
+
+\item	POWERFUL GET-NEXT OPERATOR
+
+\item	SETs
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NEW DEVELOPMENT:\\ SETs}
+
+\begin{nrtc}
+\item	PROTOCOL CHANGED TO SIMPLE TWO-PHASE COMMIT
+
+\item	PHASE I: AGENT SENDS ONE OR MORE \verb"SetRequest-PDU"
+    \begin{nrtc}
+    \item	EACH SMUX PEER SENDS BACK \verb"GetResponse-PDU"
+    \end{nrtc}
+
+\item	PHASE II: AGENT SENDS \verb"SoutPDU"
+    \begin{nrtc}
+    \item	IF COMMIT, PEER PERFORMS OPERATION AND SENDS BACK
+		\verb"GetResponse-PDU" 
+
+    \item	IF ROLLBACK, PEER DE-COMMITS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{PROTOTYPING NOC APPLICATIONS}\bf
+
+\begin{nrtc}
+\item	CODING NOC APPLICATIONS IN C IS TIRESOME
+
+\item	REALLY NEED A RAPID-PROTOTYPING SYSTEM
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TWO THINGS ARE NEEDED}
+
+\begin{nrtc}
+\item	AN APPLICATIONS FRAMEWORK FOR THE USER
+
+\item	AUTOMATIC GENERATION OF NETWORK MANAGEMENT PDUs
+    \begin{nrtc}
+    \item	AND THE GLUE BETWEEN THEM    
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATIONS FRAMEWORK:\\ AWK}
+
+\begin{nrtc}
+\item	A PATTERN SCANNING AND PROCESSING LANGUAGE
+
+\item	USEFUL FOR PROTOTYPING TEXT-HANDLING APPLICATIONS
+
+\item	INTERPRETIVE LANGUAGE
+
+\item	MODIFY GNU AWK FOR
+    \begin{nrtc}
+    \item	SNMP-CAPABLE GAWK
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{MODIFICATIONS TO AWK}\bf
+
+\begin{nrtc}
+\item	READ COMPILED-MIB MODULE
+
+\item	RECOGNIZE LEAF OBJECTS
+    \begin{nrtc}
+    \item	TABULAR AND NOT
+    \end{nrtc}
+	AS SPECIAL VARIABLES
+
+\item	CURRENTLY ASSUME READ-ONLY STATUS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{VARIABLES}
+
+\begin{nrtc}
+\item	FOR SIMPLE VARIABLES:
+\begin{quote}\small\begin{verbatim}
+sysDescr
+
+sysDescr[value]
+\end{verbatim}\end{quote}
+
+\item	FOR TABULAR VARIABLES:
+\begin{quote}\small\begin{verbatim}
+ifDescr[value]
+
+for (i in ifDescr)
+    printf "%d: %s\n", ifIndex, ifDescr;
+
+for (i in ipRouteDest, "130.117")
+    printf "%s: %s\n", ipRouteDest, ipRouteNextHop;
+\end{verbatim}\end{quote}
+	USING POWERFUL GET-NEXT OPERATOR
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{VARIABLES (cont.)}
+
+\begin{nrtc}
+\item	WHEN VARIABLE APPEARS IN AN ``RVALUE'',
+	USE THE SNMP TO RETRIEVE VALUE
+
+\item	ADD A FEW NEW VARIABLES TO HELP OUT
+    \begin{nrtc}
+    \item	\verb"DIAGNOSTIC"
+
+    \item	\verb"ERROR" (IF ANY) IN LAST SNMP OPERATION
+
+    \item	\verb"AGENT" ADDRESS
+
+    \item	\verb"COMMUNITY" NAME
+
+    \item	\verb"RETRIES" FOR EACH SNMP OPERATION
+
+    \item	\verb"TIMEOUT" SECONDS BETWEEN RETRIES
+    \end{nrtc}
+\begin{quote}\small\begin{verbatim}
+% gawk 'BEGIN { print "sysDescr: ", sysDescr, DIAGNOSTIC; }'
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NEW DEVELOPMENT:\\ COMMUNITY DATABASE}
+
+\begin{nrtc}
+\item	USED TO DERIVE COMMUNITY NAME BASED ON AGENT ADDRESS
+
+\item	MAPPING FILE FORMAT
+\begin{quote}\small\begin{verbatim}
+<IP-address> [ <IP-address mask> ] <community>
+\end{verbatim}\end{quote}
+e.g.,
+\begin{quote}\small\begin{verbatim}
+130.117.1    255.255.255.0         "public"
+\end{verbatim}\end{quote}
+
+\item	IF \verb"COMMUNITY" VARIABLE STARTS WITH A SLASH,
+	NAMED MAPPING FILE IS READ
+
+\item	FIRST ENTRY SATIFISYING
+$$\mbox{(AGENT IP-address)} \land \mbox{(IP-address mask)}\ \equiv\ 
+\mbox{(IP-address)}$$
+IS CHOSEN
+
+\item	DEFAULT ENTRY (LAST IN FILE) SHOULD BE:
+\begin{quote}\small\begin{verbatim}
+0.0.0.0      0.0.0.0               "public"
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DATA TYPING}
+
+\begin{nrtc}
+\item	INTEGER: number
+
+\item	OCTET STRING: string (\verb|"%02x: ... :%02x"|)
+
+\item	OBJECT IDENTIFIER: string (\verb|"%u. ... .%u"|)
+
+\item	and so on$\ldots$
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{TWO EXAMPLES}\bf
+
+\begin{nrtc}
+\item	ROUTING TABLE
+
+\item	ROUTE TRACING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ROUTING TABLE}
+
+\vspace{0.5in}
+\smaller
+\begin{verbatim}
+printf "Routing tables\n";
+printf "%-15s %-15s %-8s %-6s %-10s %s\n",
+        "Destination",
+              "Gateway",
+                    hasunix ? "Flags" : "Type",
+                         "Refcnt",
+                              "Use",
+                                   "Interface";
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ROUTING TABLE (cont.)}
+
+\vspace{0.5in}
+\smaller
+\begin{verbatim}
+hasunix = unixNetstat == 1;
+
+didone = 0;
+for (i in ipRouteDest) {
+    didone = 1;
+
+    printf "%-15s %-15s %-8s %-6s %-10s %s (#%d)\n",
+            ipRouteDest == "0.0.0.0" ? "default" : ipRouteDest,
+                  ipRouteNextHop,
+                        hasunix ? rt_flags(unixIpRouteFlags[i]) \
+                                : rt_type(ipRouteType),
+                             hasunix ? unixIpRouteRefCnt[i] : "",
+                                  hasunix ? unixIpRouteUses[i] : "",
+                                        ifDescr[ipRouteIfIndex],
+                                        ipRouteIfIndex;
+}
+if (!didone && DIAGNOSTIC)
+    printf "ipRoutingTable: %s\n", DIAGNOSTIC;
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ROUTING TABLE (cont.)}
+
+\vspace{0.5in}
+\smaller
+\begin{verbatim}
+% gawk -f mib.routes  (actually "s-netstat -r")
+Routing tables
+Destination     Gateway         Flags    Refcnt Use        Interface
+default         192.52.180.3    UG       5      63813      le0 (#1)
+127.0.0.0       127.0.0.1       U        22     31804      lo0 (#2)
+192.52.180.0    192.52.180.1    U        7      167235     le0 (#1)
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ROUTE TRACING}
+
+\vspace{0.5in}
+\smaller
+\begin{verbatim}
+BEGIN {
+        printf "from %s to %s:\n", AGENT, DEST;
+        tried[AGENT] = 1;
+        INVALID = 2; DIRECT = 3;
+
+        split (DEST, dest, ".");
+
+        if (dest[1] < 128)
+            net = dest[1];
+        else
+            if (dest[1] < 192)
+                net = dest[1] "." dest[2];
+            else
+                net = dest[1] "." dest[2] "." dest[3];
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ROUTE TRACING (cont.)}
+
+\vspace{0.5in}
+\smaller
+\begin{verbatim}
+        while (DEST != AGENT) {
+            dr = 0;
+            gotit = 0;
+            for (i in ipRouteMask, net) {
+                if ((type = ipRouteType) == INVALID)
+                    continue;
+
+                split(ipRouteMask, mask, ".");
+                mask = bit_and(dest[1],mask[1]) "." \
+                       bit_and(dest[2],mask[2]) "." \
+                       bit_and(dest[3],mask[3]) "." \
+                       bit_and(dest[4],mask[4]);
+                if (mask == ipRouteDest) {
+                    hop = ipRouteNextHop;
+                    gotit = 1;
+                    break;
+                }
+            }
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ROUTE TRACING (cont.)}
+
+\vspace{0.5in}
+\smaller
+\begin{verbatim}
+            if (!gotit) {
+                if ((hop = ipRouteNextHop[addr = DEST]) \
+                        && (type = ipRouteType[addr]) == INVALID)
+                    hop = 0;
+                if (!hop \
+                        && (hop = ipRouteNextHop[addr = net]) \
+                        && (type = ipRouteType[addr]) == INVALID)
+                    hop = 0;
+                if (!hop && (hop = ipRouteNextHop[addr = "0.0.0.0"])) {
+                    if ((type = ipRouteType[addr]) == INVALID)
+                        hop = 0;
+                    else
+                        dr = 1;
+                }
+            }
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ROUTE TRACING (cont.)}
+
+\vspace{0.5in}
+\smaller
+\begin{verbatim}
+            if (hop) {
+                printf "    via %-15s metric %2d%s\n",
+                        hop, ipRouteMetric1[addr],
+                        dr ? " (default route)" : "";
+            }
+            else {
+                printf "\nno path to %s from %s\n%s\n", 
+                        DEST, AGENT, DIAGNOSTIC;
+                exit(1);
+            }
+
+            if (type == DIRECT) {
+                printf "\tdirect route.\n";
+                exit(0);
+            }
+
+            if (hop in tried)
+                printf "\nrouting loop!\n";
+            else
+                tried[hop] = 1;
+            AGENT = hop;
+        }
+
+        printf "\tdone.\n";
+      }
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{NEW DEVELOPMENT:\\ BULK TABLE RETRIEVAL}\bf
+
+\begin{nrtc}
+\item	IDEA IS TO RETRIEVE BIG TABLES QUICKLY
+
+\item	PARALLEL ALGORITHM DEVELOPED BY:
+    \begin{nrtc}
+    \item	ROSE, McCLOGHRIE, DAVIN
+    \end{nrtc}
+
+\item	PRESENT IN \verb"snmpi" PROGRAM:
+\begin{quote}\small\begin{verbatim}
+% snmpi
+snmpi> bulk -alg2 column1 ... columnN
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE SERIAL ALGORITHM}
+
+\begin{nrtc}
+\item	SIMPLISTIC APPROACH
+\begin{quote}\small\begin{verbatim}
+get-next (ipRouteDest)            -> ipRouteDest.0.0.0.0
+get-next (ipRouteDest.0.0.0.0)    -> ipRouteDest.a.b.c.d
+    ...
+get-next (ipRouteDest.e.f.g.h)    -> ipRouteIfIndex.0.0.0.0
+get-next (ipRouteIfIndex.0.0.0.0) -> ipRouteIfIndex.a.b.c.d
+    ...
+get-next (ipRouteMask.e.f.g.h)    -> ipNetToMediaIfIndex.1.a.b.c.d
+\end{verbatim}\end{quote}
+
+\item	SMARTER MANAGERS ASK FOR SEVERAL COLUMNS IN EACH REQUEST
+\begin{quote}\small\begin{verbatim}
+get-next (ipRouteDest, ipRouteIfIndex, ..., ipRouteMask)
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE PARALLEL ALGORITHM:\\ PHASE I}
+
+\begin{nrtc}
+\item	GOAL: RETRIEVE INSTANCES OF A SINGLE COLUMN:
+
+\item	INVOKE SEVERAL \verb"get-next"s WITH SEVERAL OPERANDS
+
+\item	NAMING SPACE IS DIVIDED UP BY GENERATING SUB-IDENTIFIER SUFFIXES,
+	e.g.,
+\begin{quote}\small\begin{verbatim}
+get-next (ipRouteNextHop, ipRouteNextHop.63, ipRouteNextHop.127,
+          ipRouteNextHop.159, ipRouteNextHop.192)
+\end{verbatim}\end{quote}
+
+\item	USE ADAPTIVE RETRANSMISSION STRATEGY TO
+    \begin{nrtc}
+    \item	MAXIMIZE THROUGHPUT
+
+    \item	AVOID OVERLOADING AGENT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PHASE I (cont.)}
+
+\begin{nrtc}
+\item	ALGORITHM KEEPS TRACK OF
+    \begin{nrtc}
+    \item	INVOCATIONS OUTSTANDING
+
+    \item	OBJECT IDENTIFIERS BOUNDS ACTIVE IN EACH
+    \end{nrtc}
+    (SO INCOMING ORDER OF RESULTS IS UNIMPORTANT!)
+
+\item	FOR EACH RESULT
+    \begin{nrtc}
+    \item	IF RESULT IS OUTSIDE ITS BOUNDS, IT IS REMOVED
+
+    \item	OTHERWISE, NAME AND VALUE ARE STORED
+
+    \item	AND THE BOUNDS IS SPLIT INTO TWO\\
+		(DEPENDING ON OBSERVED PERFORMANCE OF AGENT AND NETWORK)
+    \end{nrtc}
+
+\item	WHEN ALL BOUNDS HAVE BEEN REMOVED, START SECOND PHASE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE PARALLEL ALGORITHM:\\ PHASE II}
+
+\begin{nrtc}
+\item	GOAL: RETRIEVE INSTANCES OF OTHER COLUMNS
+
+\item	INVOKE SEVERAL \verb"get"s WITH SEVERAL OPERANDS
+
+\item	INSTANCE-IDENTIFIERS ARE TAKEN FROM THE PHASE I RESULTS
+
+\item	INITIAL PROTOTYPE IMPLEMENTATION ACHIEVES A SPEED-UP OF ROUGHLY AN
+	ORDER OF MAGNITUDE OVER SERIAL ALGORITHM
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FOR FURTHER READING}
+
+\begin{nrtc}
+\item	4BSD/ISODE SNMP Roadmap
+
+\item	How to export a MIB module from a BSD UNIX daemon using the
+	4BSD/ISODE SMUX API
+
+\item	SNMP MUX Protocol and MIB
+
+\item	The Simple Book: An Introduction to Management of TCP/IP-based
+	internets\\
+	Marshall T.~Rose\\
+	Prentice-Hall, 1990 (ISBN 0--13--812611--9)
+
+\item	Bulk Table Retrieval with the SNMP\\
+	RFC1187
+\end{nrtc}
+\end{bwslide}

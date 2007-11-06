@@ -1,0 +1,117 @@
+\def\foo{\begin{tabular}[t]{|lllr|} \multicolumn{4}{c}{access policy table}\\ \hline 1.17.2& \vb{pub}& \bar& 3\\ 1.17.2& \vb{slate}& a.b.c.d& 11\\ \hline \end{tabular}}
+\def\vb#1{\verb|"#1"|}
+\def\bar{$\emptyset$}
+\def\baz{\begin{tabular}[b]{|llllr|} \multicolumn{5}{c}{primitive view table}\\ \hline 1.17.2& rfc1157Domain& e.f.g.h.i.j& \bar& \vb{secret}\\ \hline\end{tabular}}
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \special{pa 0 971}%
+    \special{pa 0 0}%
+    \special{pa 2186 0}%
+    \special{pa 2186 971}%
+    \special{pa 0 971}%
+    \special{fp}%
+    \rlap{\kern  1.093in\lower 0.361in\hbox to 0pt{\hss Enterprise \#1 INOC\hss}}%
+    \rlap{\kern  1.093in\lower 0.527in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  1.093in\lower 0.693in\hbox to 0pt{\hss (uses \vb{pub})\hss}}%
+    \special{pa 3157 971}%
+    \special{pa 3157 0}%
+    \special{pa 5343 0}%
+    \special{pa 5343 971}%
+    \special{pa 3157 971}%
+    \special{fp}%
+    \rlap{\kern  4.250in\lower 0.361in\hbox to 0pt{\hss Enterprise \#2 INOC\hss}}%
+    \rlap{\kern  4.250in\lower 0.527in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  4.250in\lower 0.693in\hbox to 0pt{\hss (uses \vb{pub})\hss}}%
+    \special{pa 6314 971}%
+    \special{pa 6314 0}%
+    \special{pa 8500 0}%
+    \special{pa 8500 971}%
+    \special{pa 6314 971}%
+    \special{fp}%
+    \rlap{\kern  7.407in\lower 0.195in\hbox to 0pt{\hss mgmt station in\hss}}%
+    \rlap{\kern  7.407in\lower 0.361in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  7.407in\lower 0.527in\hbox to 0pt{\hss Enterprise \#3\hss}}%
+    \rlap{\kern  7.407in\lower 0.693in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  7.407in\lower 0.859in\hbox to 0pt{\hss (uses \vb{slate})\hss}}%
+    \special{pa 1579 2914}%
+    \special{pa 1579 1943}%
+    \special{pa 3764 1943}%
+    \special{pa 3764 2914}%
+    \special{pa 1579 2914}%
+    \special{fp}%
+    \rlap{\kern  2.671in\lower 2.470in\hbox to 0pt{\hss Enterprise \#3 INOC\hss}}%
+    \special{pa 1268 1069}%
+    \special{pa 1093 971}%
+    \special{fp}%
+    \special{pa 1201 1140}%
+    \special{pa 1093 971}%
+    \special{pa 2125 1943}%
+    \special{fp}%
+    \special{pa 1950 1845}%
+    \special{pa 2125 1943}%
+    \special{fp}%
+    \special{pa 2017 1774}%
+    \special{pa 2125 1943}%
+    \special{fp}%
+    \special{pa 4110 1115}%
+    \special{pa 4250 971}%
+    \special{fp}%
+    \special{pa 4059 1032}%
+    \special{pa 4250 971}%
+    \special{pa 2671 1943}%
+    \special{fp}%
+    \special{pa 2811 1800}%
+    \special{pa 2671 1943}%
+    \special{fp}%
+    \special{pa 2862 1882}%
+    \special{pa 2671 1943}%
+    \special{fp}%
+    \special{pa 6143 1076}%
+    \special{pa 6314 971}%
+    \special{fp}%
+    \special{pa 6114 983}%
+    \special{pa 6314 971}%
+    \special{pa 3218 1943}%
+    \special{fp}%
+    \special{pa 3389 1838}%
+    \special{pa 3218 1943}%
+    \special{fp}%
+    \special{pa 3418 1931}%
+    \special{pa 3218 1943}%
+    \special{fp}%
+    \rlap{\kern  3.764in\lower 1.984in\hbox to0pt{\ \foo\hss}}%
+    \rlap{\kern  3.764in\lower 2.955in\hbox to0pt{\ \baz\hss}}%
+    \special{pa 0 4857}%
+    \special{pa 0 3886}%
+    \special{pa 2186 3886}%
+    \special{pa 2186 4857}%
+    \special{pa 0 4857}%
+    \special{fp}%
+    \rlap{\kern  1.093in\lower 4.246in\hbox to 0pt{\hss router in\hss}}%
+    \rlap{\kern  1.093in\lower 4.412in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  1.093in\lower 4.578in\hbox to 0pt{\hss Enterprise \#3\hss}}%
+    \special{pa 2531 3057}%
+    \special{pa 2671 2914}%
+    \special{fp}%
+    \special{pa 2481 2975}%
+    \special{pa 2671 2914}%
+    \special{pa 1093 3886}%
+    \special{fp}%
+    \special{pa 1233 3743}%
+    \special{pa 1093 3886}%
+    \special{fp}%
+    \special{pa 1284 3825}%
+    \special{pa 1093 3886}%
+    \special{fp}%
+    \rlap{\kern  2.186in\lower 3.927in\hbox to0pt{\ \begin{tabular}[t]{|lllr|} \multicolumn{4}{c}{access policy table}\\ \hline 1.17.2& \vb{secret}& k.l.m.n& 11\\ \hline \end{tabular}\hss}}%
+    \rlap{\kern  2.186in\lower 4.898in\hbox to0pt{\ \begin{tabular}[b]{|llllr|} \multicolumn{5}{c}{primitive view table}\\ \hline 1.17.2& localAgent& \bar& \bar& \bar\\ \hline\end{tabular}\hss}}%
+    \kern  8.501in
+  }\vss}%
+  \kern  4.899in
+}

@@ -1,0 +1,1176 @@
+% -*- LaTeX -*-
+
+\newpage
+\section	{Introduction}
+In July of {\oldstyle 1989},
+NYSERNet started a pilot project offering a White Pages service using OSI
+technology.
+Since that time,
+NYSERNet and PSI have been extending and evaluating the service in response to
+experience gained during the operation of the pilot.
+
+The service is interesting in three respects:
+it is a large,
+distributed information service involving administration by multiple
+organizations;
+it is the first production-quality field test of the OSI Directory (X.500);
+and,
+it is the first large scale production application of OSI technology on top of
+the popular Internet (TCP/IP) suite of protocols.
+
+The purpose of this document is to describe the ``refinements'' made to the
+base X.500 Recommendations in order to produce a workable system.
+It must be {\bf stressed\/} that none of these refinements are contrary to
+either the spirit or letter of the X.500 protocols.
+Rather,
+if one begins with the assumption that one has a conformant X.500
+implementation,
+then these refinements consist of fleshing out the ``for further study'' and
+``local matter'' clauses of the X.500 Recommendations.
+Further,
+one should note that a system implementing these refinements will still be
+able to interwork,
+albeit with less functionality,
+with conformant X.500 implementations that do not implement these refinements.
+
+For the remainder of this note,
+the reader is assumed to have a basic understanding of X.500 technology.
+
+The purpose in presenting this information is to advance understanding of
+these grey areas by describing operational experiences in offering a Public
+Directory Service using X.500.
+Having stated what this note is about,
+it is also appropriate to state what this note is not about:
+this note is not meant to provide any implementation-specific information.
+That is,
+this note considers only the externally visible aspects of a Directory Service
+which incorporates these refinements.
+As such,
+these refinements should be applicable to {\bf any\/} conformant X.500
+implementation.
+
+This note begins by reviewing the need for a White Pages Service and presents
+a basic model for offering such a service using the X.500 protocols.
+Next,
+a brief overview of the technology used to realize this service is presented.
+Following this,
+this note is divided into two major sections:
+first,
+issues relating to the Directory System
+(e.g., refinements in the operation of a DSA or use of the DSP)
+are discussed;
+second,
+issues relating to a Directory User
+(e.g., refinements in the operation of a DUA or use of the DAP)
+are considered.
+
+\newpage
+\subsection	{For Further Reading}
+There is very little ``new'' information presented in this note.
+Rather,
+it is a compilation of several sources,
+organized to focus on the refinements necessary to produce a workable system
+using X.500 technology.
+Interested readers might wish to consult:
+\begin{itemize}
+\item	\cite{WPP.Intro},
+	for an introduction to the NYSERNet/PSI White Pages Pilot Project;
+
+\item	\cite{WPP.Report-1},
+	for the latest status report (as of this writing);
+
+\item	\cite{WPP.User,WPP.XWP},
+	for information on user interfaces;
+
+\item	\cite{WPP.Admin},
+	for information on administering a DMD within the pilot
+	(i.e., a PRDMD);
+
+\item	\cite{QUIPU.Manual}
+	for programmatic information on the underlying X.500 implementation.
+\end{itemize}
+All of these documents (and many others) were consulted when this note was
+written.
+
+\newpage
+\subsection	{Managing Infrastructural Information}
+A natural function of computer networks is to form the {\em infrastructure\/}
+between the users they interconnect.
+For example,
+the electronic mail service offered by computer networks provides a means for
+users to collaborate towards some common goal.
+In the simplest cases,
+this collaboration may be solely for the dissemination of information.
+In other cases,
+two users may work on joint research project,
+using electronic mail as their primary means of communication.
+
+Most network services are based on the implicit assumption that each user can
+supply {\em infrastructural information} to 
+facilitate information transfers through the network.
+For example,
+electronic mail services expect that an originator can supply 
+addressing information 
+for all the intended recipients.
+It is not necessarily the task of electronic mail, per se,
+to provide this infrastructural information to the user.
+
+This model works fine in small environments,
+particularly those where infrastructural information is not difficult to 
+obtain and remember.
+However,
+the model does not scale well.
+Consider the case when the membership of a network consists of hundreds of
+thousands of users belonging to thousands of organizations.
+It is no longer reasonable for a single user to provide this information,
+except in very limited circumstances.
+Further,
+it is likely that some of the information changes frequently,
+due to personnel and other resource movement.
+The goal of a {\em white pages\/} service is to 
+provide the necessary information, and to mask the complexity of the
+infrastructural information.
+
+\subsection	{A Public Directory Service}
+In our context,
+a public directory service allows a user to ascertain information
+about a person whose name is (approximately) known.
+In providing such a service using technology based on the X.500
+Recommendations,
+it is necessary to view this somewhat more concretely.
+
+In particular,
+we assume that the information on a person is represented as an entry in the
+OSI Directory.
+As such,
+the ``handle'' associated with each person is a Directory Distinguished Name
+(DN).
+However,
+we further assume that a user need not know the value of this name.
+Rather,
+the user provides commonly known naming information about a person,
+and the user interface to the Directory somehow determines the correct DN,
+and then presents publically readable information from the entry associated
+with that DN.
+
+In the NYSERNet/PSI White Pages Pilot Project,
+this first step is assumed to be an iterative process:
+first,
+``areas'' of the Directory likely to contain the entry are identified,
+usually by searching;
+and,
+second,
+in each of those areas,
+a search for the entry is initiated.
+In a business context,
+the area corresponds to an organizational object in the Directory.
+In contrast,
+for a personal context,
+the area might correspond to a locality.
+In the pilot project,
+only the organizational case has been extensively used.
+Nonetheless,
+experience with the pilot software indicates that the search model is
+sufficiently general to support either context.
+
+\subsection	{An Implementation}
+To implement a White Pages service using the OSI Directory,
+three things are needed:
+\begin{itemize}
+\item	an OSI infrastructure,
+	this is provided by the ISODE,
+	an openly available implementation of the upper-layers of OSI;
+
+\item	an implementation of the OSI Directory,
+	this is provided by the ISODE implementation of the Directory,
+	QUIPU;
+	and,
+
+\item	a White Pages abstraction,
+	provided by an administrative discipline along with at least one user
+	interface through which the service is accessed.
+\end{itemize}
+It is important to distinguish between the White Pages {\em service\/} and the
+OSI Directory {\em technology} as defined in
+\cite{ISO.Directory,CCITT.Directory}.
+The White Pages abstraction is provided both by a focused use of the
+underlying OSI Directory technology
+and by special user interfaces.
+Of course,
+many might view the sole focus of the OSI Directory is to provide a white
+pages service.
+As such,
+the abstraction can be seen simply as the administrative and operational
+agreements necessary to use X.500.
+
+The ISODE (pronounced {\em I-SO-D-E\/}),
+or {\em ISO Development Environment}, is a collection of library
+routines and programs that implements an extensive set of OSI upper-layer
+services\cite{Open.Book}.%
+\footnote{It is an unfortunate historical coincidence that the first three
+letters of the ISODE are ``ISO''.
+This is not an acronym for the International Organization for Standardization,
+but rather three letters which,
+when pronounced in English,
+produce a pleasing sound.}
+In brief,
+the ISODE implementation of the upper-layers of OSI is interesting in four
+respects:
+it provides extensive automatic tools for the development of OSI applications;
+it supports OSI applications on top of both OSI and TCP/IP-based networks;
+it provides a novel approach to the problems of OSI coexistence
+and transition;
+and,
+it is openly available (non-proprietary).
+
+The ISODE implementation of the OSI Directory,
+QUIPU\cite{QUIPU.Directory},
+was donated by University College London.
+QUIPU was originally developed as a part of the INCA
+(Integrated Network Architecture) project
+(under the auspices of the ESPRIT initiative of the EEC).
+The Inca of Peru did not have writing.
+Instead,
+they stored information on strings,
+carefully knotted in a specific manner with colored thread,
+and attached to a larger rope.
+Such a device was known as a {\em Quipu\/}
+(pronounced {\em kwip-ooo}).
+The encoding was obscure,
+and could only be read by selected trained people:
+the {\em Quipucamayocs}.
+The Quipu was a key component of Inca society,
+as it contained information about property and locations throughout
+the extensive Inca empire.
+
+QUIPU is a complete implementation of the OSI Directory,
+based on the {\oldstyle 1988\/} CCITT recommendations\cite{CCITT.Directory}
+and ISO standards\cite{ISO.Directory}.
+As with the entire ISODE,
+QUIPU is coded in the {\em C\/} programming language\cite{C.Language} and runs
+on the \unix/ operating system.
+
+The QUIPU Directory User Agent (DUA) supports a {\em C\/} language procedural
+interface to access the full Directory Access Service.
+The interface is relatively straight-forward,
+mapping ``programmer-friendly'' procedure calls to the formal service.
+Code to manipulate ASN.1 structures is automatically generated using
+facilities provided by the ISODE. 
+
+The DUA interface can be used directly at the programmatic level,
+or exported from a interface process called \verb"dish"~---~the DIrectory
+SHell.
+
+The QUIPU Directory System Agent (DSA) is memory-based:
+it uses the native \unix/ file-system to provide stable-storage between
+reboots, but otherwise maintains all data in program memory.
+As might be expected,
+providing that the DSA avoids paging,
+execution of the lookup and search facilities of the Directory can be realized
+in a timely fashion.
+Naturally, when an update operation occurs,
+the copy on disk is updated and a journal entry written before the update is
+acknowledged.
+The disk copy is stored in a textual format to facilitate examination.
+As this copy is read only once~---~when the DSA starts,
+typically when \unix/ goes multi-user~---~the cost of such a strategy is
+believed to be relatively small if properly implemented and tuned.
+
+The DSA supports both Directory distributed operations (DSA-DSA) and the
+Directory Abstract Service (DUA-DSA),
+along with the full range of standard Directory object classes and attributes
+types.
+Further,
+a large number of other attribute types have been defined,
+both to facilitate experimentation and support the White Pages service.
+Most notably these attribute types were necessary to support automatic use of
+replication of information in the Directory.
+
+Having now briefly introduced the implementation used in the pilot project,
+we now describe the refinements which were necessary to offer a working system.
+
+\newpage
+\section	{Directory System Issues}
+The system-related refinements used in the pilot project are all artifacts of
+the QUIPU design\cite{QUIPU.Design}.
+These are best described in terms of the object classes and associated
+attribute types which are manipulated by a QUIPU DSA.
+However,
+before these are introduced it is necessary to discuss two topics:
+the textual convention used for writing DNs,
+and how the DSAs navigate the DIT.
+
+\subsection	{Writing Distinguished Names}
+Although the textual notation used to write DNs should be unimportant.
+For expository (and local) purposes it is important to have a concise notation.
+
+A Distinguished Name is written as an ordered series of RDNs separated by
+an \verb"`@'"-sign with the most significant RDN appearing at the left;
+e.g.,
+\begin{quote}\small\begin{verbatim}
+c=US@o=NYSERNet Inc.
+\end{verbatim}\end{quote}
+refers to an entry with an RDN of \verb"o=NYSERNet Inc."
+whose parent has an RDN of \verb"c=US".
+In turn,
+this parent entry is an immediate child of the root.
+To avoid any potential ambiguity,
+one usually prefixes a \verb"`@'"-sign to a string when referring to a fully
+qualified Distinguished Name;
+e.g.,
+\begin{quote}\small\begin{verbatim}
+@c=US@o=NYSERNet Inc.
+\end{verbatim}\end{quote}
+always refers to the same entry regardless of context.
+Finally,
+if an RDN consists of multiple attributes,
+then these are separated by a \verb"`%'"-sign;
+e.g.,
+\begin{quote}\small\begin{verbatim}
+@l=North America@o=NYSERNet Inc.%l=US
+\end{verbatim}\end{quote}
+
+Tables~\ref{attribute-std} and~\ref{attribute-new}
+on pages~\pageref{attribute-std} and~\pageref{attribute-new},
+respectively,
+list the attribute types commonly used in the pilot project,
+any abbreviations, and the syntax associated with each attribute's value.
+In the interests of brevity,
+the abbreviated form is used when writing DNs.
+
+\subsection	{DIT Navigation}
+When a DUA requests some action from a DSA
+(e.g., to read an entry),
+the DSA may not have that information resident.
+In this case,
+the DSA has a choice:
+it may either contact another DSA which is ``closer'' to the information and
+propagate the request
+(i.e., {\em chaining\/}),
+or it may return information about this ``closer'' DSA to the DUA,
+and let the DUA re-issue its request (i.e., {\em referral\/}).
+Of course,
+when DSAs communicate between themselves,
+they may also chain or refer requests.
+
+The key issue is to understand what the term ``resident'' means with respect
+to information held by a DSA.
+In order to improve performance,
+DSAs {\em employ\/} both replication and caching of information in the
+Directory.
+Hence,
+to explain residency of information,
+some additional terminology must be introduced.
+
+\subsubsection	{Entry Data Blocks}
+First,
+we think of the entire global Directory tree as consisting of discrete units
+of information termed {\em entry data blocks},
+or simply {\em blocks}.
+A block consists of a small portion of the tree:
+the immediate children of a particular node.
+Thus the phrase ``this DSA holds a copy of the block for \verb"c=US"'' means
+that the DSA in question has information about the {\em attributes\/} of 
+the nodes which exist immediately below the \verb"c=US" entry,
+such as
+\begin{quote}\small\begin{verbatim}
+c=US@o=NYSERNet Inc.
+\end{verbatim}\end{quote}
+The phrase does not imply that the DSA has any information, whatsoever,
+about {\em entries\/} beneath these immediately subordinate nodes,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+c=US@o=NYSERNet Inc.@ou=Research and Development
+\end{verbatim}\end{quote}
+There are three kinds of blocks that a DSA might hold:
+\begin{itemize}
+\item	a {\em slave\/} copy refers to complete, authoritative information of
+a block:
+the DSA knows about all of the entries and all of the children of the node
+corresponding to that particular block.
+Slave copies are regularly updated by contacting an {\em upstream\/} DSA,
+and comparing timestamps associated with the two copies of the block.
+
+\item	a {\em cache\/} copy refers to possibly partial information that a DSA
+has received during its execution lifetime:
+the DSA may know about some of the children and possibly some of their attributes.
+When a DSA chains a request for some information and the information returns
+through the DSA,
+that DSA may decide to cache that information for some short period of time
+(e.g., 30~minutes).
+
+\item	the term {\em master\/} copy is self-evident.
+Only a single DSA may hold the master copy for any portion of the tree.
+\end{itemize}
+
+With these terms now described,
+the {\em residency requirement\/} is simply enumerated as:
+\[\begin{tabular}{|r|l|}
+\hline
+\multicolumn{1}{|c|}{\bf Operation Requested}&
+		\multicolumn{1}{|c|}{\bf Copy Required for Residency}\\
+\hline
+read, compare&	master, slave, or cache\\
+list, search&	master, or slave\\
+update&		master\\
+\hline
+\end{tabular}\]
+(Actually,
+a cached copy might be used to satisfy a list request,
+depending on the service controls used with the operation.)
+
+Hence,
+while the pilot relies primarily on replication (slave blocks) to speed
+queries,
+updates still rely on a centralized entity (containing the master block) being
+available. 
+(This is the best compromise can be taken without making the system
+tremendously more complex,
+e.g.,
+introducing distributed database technology.)
+
+Finally,
+note that the EDB approach is much coarser than a
+``distributed entry'' capability.
+Although distributing across several DSAs the attribute and children
+information for a single entry may be administrative attractive,
+it is felt to be technically intractable at this time.
+
+\subsubsection	{Use of Presentation Address}
+Only within a single OSI community can homogeneous interworking be achieved.
+It is important to realize that the value of a white pages service increases
+as its scope increases.
+As such,
+it is important to appreciate that OSI applications are implemented on a wide
+range of end-to-end protocol combinations.
+Sadly,
+these are largely incompatible (e.g., TP4/CLNP and TP0/X.25).
+In order to provide homogeneous service to the user,
+the DSAs must be able to compare two OSI presentation addresses and determine
+if an association can be established directly between the two.
+This need arises in two cases.
+
+First,
+a DSA wishes to perform an operation and realizes that it must either chain or
+refer.
+The DSA compares the presentation address of the application entity
+on whose behalf it is performing the operation,
+with the presentation address of a DSA which is closer to the information.
+If the two addresses belong to the same ``community''
+(i.e., are compatible),
+then the DSA knows that it is safe to return a referral.
+If not,
+then the DSA realizes that,
+barring service controls to the contrary,
+it should chain.
+
+Second,
+a DSA might wish to contact other DSAs.
+In this case,
+the DSA sees if the presentation address of the other DSA is in one of the
+communities of the local end-system.
+If so,
+the DSA knows that it is possible to chain operations to that DSA.
+Otherwise,
+in the absence of transport-level bridging,
+the DSA knows that it can not reach the other DSA.
+
+To further complicate matters,
+Directory service may be offered by application entities using non-standard
+end-to-end protocol combinations
+(e.g., RFC1006/TCP \cite{TSAP.on.TCP}).
+There must be a means whereby the addresses associated with such entities can
+be stored in the Directory and subsequently interpreted by entities with
+knowledge of these non-standard communities.
+A mechanism for achieving this is defined in \cite{Interim.Addresses}.
+
+Finally,
+the textual notation used to write presentation addresses should be
+unimportant.
+For expository (and local) purposes it is important to have a concise notation.
+\cite{String.Addresses} defines such a notation.
+
+\subsection	{Objects}
+The abstract syntax of the classes and attributes described in this note are
+largely taken from the THORN naming architecture\cite{thorn-na},
+which was developed in the RARE community.
+These are optional extensions to what is defined in the X.500 recommendations.
+
+\subsubsection	{Object Class: friendlyCountry}
+In order to provide more intuitive identification of sovereign nations,
+a new object class,
+subordinate to the \verb"country" class,
+has been added.
+This has but a single mandatory attribute:
+\begin{describe}
+\item[friendlyCountryName:]
+			gives a user-friendly rendition of the
+			country's name (hence the term \verb"friendlyCountry").
+\end{describe}
+
+\subsubsection	{Object Class: domainRelatedObject}
+In order to experiment with mappings from user's Internet mailboxes into DNs,
+a means for inverting the Internet Domain Name System (DNS) is needed.
+A new object class, \verb"domainRelatedObject", is used for this purpose.
+There is one mandatory attribute:
+\begin{describe}
+\item[associatedDomain:]
+			identifies a portion of the DNS which is conceptually
+			located at an entry of this class.
+\end{describe}
+
+\subsubsection	{Object Class: quipuObject}
+In order to provide access control to the Directory,
+an \verb"accessControlList" attribute type,
+consisting of zero or more positive-access rules,
+has been defined.
+This is a attribute type is mandatory of objects within the \verb"quipuObject"
+class.
+Further,
+all entries occuring in an EDB must be of this class.
+
+In addition,
+there are two optional attribute types.
+These are maintained automatically by the DSA:
+\begin{describe}
+\item[lastModifiedBy:]
+			identifies the Directory entity which last modified
+			this entry.
+
+\item[lastModifiedTime:]
+			identifies the time at which this entry was last
+			modified.
+\end{describe}
+
+\subsubsection	{Object Class: quipuNonLeafObject}
+In order to provide navigational information for DSAs,
+all non-leaf objects are within the \verb"quipuNonLeafObject".
+There is one mandatory attribute type:
+\begin{describe}
+\item[masterDSA:]
+			identifies the Directory entity which is responsible
+			for maintaining the MASTER EDB for the children of
+			this entry.
+\end{describe}
+In addition,
+there are two optional attribute types:
+\begin{describe}
+\item[slaveDSA:]
+			identifies DSA(s) which also have authoritative
+			information on the immediate children of a non-leaf
+			entry.
+
+\item[treeStructure:]
+			if present, lists those object classes which the
+			immediate children are allowed to take.
+\end{describe}
+
+\subsubsection	{Object Class: quipuDSA}
+It is necessary to introduce an additional object class,
+\verb"quipuDSA",
+to identify those DSAs
+which implement these refinements.
+There are several mandatory attribute types:
+\begin{describe}
+\item[eDBinfo:]
+			Indicates how the DSA participates when propagating
+			authoritative EDB information.
+			Each attribute lists the DN of a non-leaf entry,
+			along with (optionally) the DN of the upstream DSA
+			which provides the associated EDB to this DSA,
+			and with (optionally) a list of DNs of downstream DSAs
+			to which this DSA provides the associated EDB.
+			(The dual of the \verb"masterDSA" and \verb"slaveDSA"
+			attribute types.)
+
+\item[userPassword:]
+			a string containing a password used by the DSA to
+			authenticate itself to other DSAs.
+			This attribute is not used for DSP authentication
+			as it introduces a livelock problem.
+			(When strong authentication matures,
+			DSP authentication will be used instead.)
+
+\item[manager:]
+			the DN of an entry corresponding to the ``super-user''
+			for this DSA.
+
+\item[quipuVersion:]
+			a simple string relating the version of the software
+			being run by this DSA.
+\end{describe}
+along with the \verb"acl" attribute.
+There is also an optional one:
+\begin{describe}
+\item[description:]
+			a textual description of the DSA.
+\end{describe}
+along with the \verb"lastModifiedBy" and \verb"lastModifiedTime" attribute
+types.
+
+A DSA which implements these refinements also has the value
+\verb"quipuDSP" for its \verb"supportedApplicationContext" attribute.
+In addition to offering all of the DSP services on this application context,
+there is an additional operation,
+\verb"getEDB",
+which is used by a downstream DSA to request EDB information from an upstream
+DSA,
+if that EDB information has changed.
+
+When a \verb"quipuDSA" must contact another DSA,
+and several choices are available,
+it favors those DSAs of the \verb"quipuDSA" class.
+For example,
+ caching can not occur without an understanding of the access control
+policy being applied to an entry.
+
+\subsection	{Naming DSAs}
+If a \verb"quipuDSA" does not have information resident to satisfy a request,
+it identifies,
+to its local knowledge,
+the furthest non-leaf entry along the path to the desired entry.
+The \verb"masterDSA" and \verb"slaveDSA" attributes of this entry are
+consulted to derive the DNs of DSAs which are more likely to be able to
+perform the desired operation.
+
+Obviously,
+in order to resolve the \verb"presentationAddress" attribute of the entries
+corresponding to the closer DSAs,
+additional lookup in the Directory is needed.
+As such,
+a DSA should be at least one level-higher in the DIT than any EDB for which it
+holds authoritative information.
+
+To see why this is so,
+consider a DSA named:
+\begin{quote}\small\begin{verbatim}
+c=US@o=NYSERNet Inc.@cn=losing
+\end{verbatim}\end{quote}
+which,
+according to the entry for
+\begin{quote}\small\begin{verbatim}
+c=US@o=NYSERNet Inc.
+\end{verbatim}\end{quote}
+is a \verb"masterDSA",
+and that there are no \verb"slaveDSA"s for that entry.
+Now suppose another DSA,
+called ``naive'',
+with knowledge only of \verb"c=US",
+wishes to satisfy a request for a (possibly distant) child of this
+organization.
+In order to satisfy the request,
+the ``naive'' DSA must know the address of the ``losing'' DSA,
+which can obviously not be determined.
+
+\subsection	{DSA Management}
+In order to provide a management capability for these refinements,
+a new attribute type, \verb"control", is defined for use over the DAP.
+When a DUA is bound as the DSA's manager,
+it may issue the modify operation to add a value of type \verb"control".
+This is interpreted by the DSA rather than being applied to the DIT.
+
+The operations of interest are:
+\begin{itemize}
+\item	abort DSA;
+
+\item	restart DSA;
+
+\item	refresh EDB from local stable-storage;
+
+\item	rewrite EDB to local stable-storage;
+
+\item	mark EDB as read-only (lock EDB);
+
+\item	unlock EDB;
+
+\item	initiate EDB update procedure from upstream DSA
+	(either for all EDBs or a particular EDB).
+\end{itemize}
+For example,
+if it is necessary to make a substantive change to an EDB for which the DAP is
+unappropriate,
+a DSA manager tells the DSA to lock the EDB,
+edits the EDB on local stable-storage,
+tells the DSA re-read the EDB from local stable-storage,
+and then tells the DSA to unlock the EDB.
+
+Intead,
+if a DUA issues a read for the \verb"control" attribute of an entry,
+then the value returned consists of a string:
+\begin{quote}\scriptsize\begin{verbatim}
+%d Master entries (in %d EDBs), %d Slave entries (in %d EDBs), %d Cached entries
+\end{verbatim}\end{quote}
+giving some very basic information about the EDBs/entries resident in the DSA.
+
+\newpage
+\section	{Directory User Issues}
+An important task in any pilot project is to objectively focus the scope of
+the project:
+projects with ill-defined goals tend to fail.
+In the context of the pilot project,
+an explicit decision was made to focus solely on data relating to persons and
+organizations.
+Thus, although the pilot project software supports the full range of Directory
+objects and attributes, the objects supported in the pilot project are limited
+to:
+\begin{quote}\small\begin{tabular}{l}
+organizations\\ organizational units\\ organizational roles (e.g., ``Chair of
+the Department'')\\ localities (for those individuals not belonging to an
+organization)\\ persons
+\end{tabular}\end{quote}
+In addition to supporting the appropriate attribute types for these objects,
+some additional attributes were defined.  For example, users can store a
+facsimile image of themselves as their \verb"photo" attribute.
+
+The list of standard attribute types supported in the pilot is shown in
+Table~\ref{attribute-std}.
+Table~\ref{attribute-new} shows additional attribute types which have been
+defined for use with the pilot.
+\tagtable[tp]{INT-1}{Supported Standard Attribute Types}{attribute-std}
+\tagtable[tp]{INT-2}{Additional Attribute Types}{attribute-new}
+
+\subsection	{Objects}
+In the pilot project,
+all of the objects described above are modeled by the standard the
+corresponding object class,
+with one exception.
+
+\subsubsection	{Object Class: pilotPerson}
+The \verb"pilotPerson" object class is used to refer to a person in the pilot
+project.
+An entry belonging to this class may have any of several additional attributes:
+\begin{describe}
+\item[favouriteDrink:]
+			which is a string describing the user's favorite drink.
+
+\item[homePhone:]
+		which is a string describing the phone number of the object
+		using the international notation; e.g., ``+1 518-283-8860''.
+
+\item[homePostalAddress:]
+			which describes how physical mail is addressed to the
+			person's home.
+
+\item[info:]
+			which is additional, textual information about the
+			person.
+
+\item[mobileTelephoneNumber:]
+			which is a string describing the user's mobile
+			number (e.g., for a cellular phone).
+
+\item[otherMailbox:]
+			which is the user's computer mail address
+			in various domains.
+			The string syntax of this attribute's value is special:
+\begin{quote}\small\begin{verbatim}
+<domain> $ <mailbox>
+\end{verbatim}\end{quote}
+			e.g., ``internet \$ mrose@psi.com''.
+The current list of mail domains are:
+applelink, bitnet, compuserve, genie, internet, mcimail, nasamail,
+preferred, and uucp.
+
+\item[pagerTelephoneNumber:]
+			which is a string describing the user's pager number.
+
+\item[photo:]
+			which is a facsimile bitmap of the user's face.
+
+\item[rfc822Mailbox:]
+			which is the user's computer mail address in the
+			Internet.
+
+\item[roomNumber:]
+			which is a string describing where the person resides
+			at the location.
+
+\item[secretary:]
+			which is the Distinguished Name of the user's
+			administrative support.
+
+\item[userClass:]
+			which describe's the user's classification; e.g.,
+			``staff''.
+
+\item[userid:]
+			which is the user's login name; e.g., ``mrose''.
+\end{describe}
+Thus,
+Table~\ref{pilot-person} shows all the attributes that might be associated
+with a person.
+\tagtable[tp]{INT-3}{Attribute Types for the pilotPerson Object Class}%
+	{pilot-person}
+
+\subsubsection	{Other Object Classes}
+For completeness sake,
+Tables~\ref{friendlyCountry-attributes}
+through~\ref{organizationalRole-attributes} starting on
+page~\pageref{friendlyCountry-attributes} list the attributes supported for
+the standard object classes in use by the pilot.
+\tagtable[tp]{INT-4}{Attribute Types for the friendlyCountry Object Class}%
+	{friendlyCountry-attributes}
+\tagtable[tp]{INT-5}{Attribute Types for the organization Object Class}%
+	{organization-attributes}
+\tagtable[tp]{INT-6}{Attribute Types for the organizationalUnit Object Class}%
+	{organizationalUnit-attributes}
+\tagtable[tp]{INT-7}{Attribute Types for the locality Object Class}%
+	{locality-attributes}
+\tagtable[tp]{INT-8}{Attribute Types for the alias Object Class}%
+	{alias-attributes}
+\tagtable[tp]{INT-9}{Attribute Types for the organizationalRole Object Class}%
+	{organizationalRole-attributes}
+
+\subsection	{Naming}
+In the pilot project,
+the structure of the DIT is straight-forward:
+at the root,
+countries and country-level DSAs reside;
+in \verb"c=US",
+organizations and organizational-level DSAs reside.
+Beyond this,
+the administrators of the \verb"c=US" DMD are not concerned with how
+individual organizations are internally structured.
+
+In addition to this simple structure,
+to aid searching in North America,
+there is also a top-level locality,
+\verb"l=North America",
+which contains aliases to all organizations in the \verb"c=US" and \verb"c=CA"
+DMDs,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+@l=North America@o=NYSERNet Inc.%l=US
+\end{verbatim}\end{quote}
+which has an \verb"aliasedObjectName" attribute value of
+\begin{quote}\small\begin{verbatim}
+@c=US@o=NYSERNet Inc.
+\end{verbatim}\end{quote}
+
+The tasks of the country-level DSAs
+(there are currently three for \verb"c=US")
+are:
+\begin{itemize}
+\item	provide authoritative information on the root and \verb"c=US"
+	for replication purposes to organizational-level DSAs;
+	and,
+
+\item	act as a conduit for chaining to/from foreign DMDs.
+\end{itemize}
+The former task is to allow high replication of top-level information to speed
+searching.
+The latter task is to permit a means of harmonizing between different
+end-to-end protocol combinations.
+
+The RDN for organizations is the full name.
+However,
+to aid searching,
+other name forms are allowed as attribute values.
+For example,
+the entry 
+\begin{quote}\small\begin{verbatim}
+@c=US@o=Performance Systems International
+\end{verbatim}\end{quote}
+might have an additional attribute value of ``PSI'' which is not used in its
+RDN.
+Because the Directory searches on the basis of attribute values and not RDNs,
+a user supplying a search string of ``PSI'' will find (at least) the right
+entry.
+
+\subsection	{Searching}
+The single most important aspect of the user interface is to relate the naming
+architecture to a search algorithm.
+The interaction model is simple.
+The user provides the interface with:
+\begin{enumerate}
+\item	(optionally) the kind of object being looked for;
+
+\item	naming information about where the object resides;
+	and,
+
+\item	(optionally) qualifying information on the object.
+\end{enumerate}
+Based on the kind of object being looked for,
+the user interface constructs a ``basic'' filter:
+\[\begin{tabular}{|r|l|}
+\hline
+\multicolumn{1}{|c|}{\bf What}&
+		\multicolumn{1}{|c|}{\bf Basic Filter}\\
+\hline
+default&	\tt cn$\approx$X $\lor$ sn$\approx$X $\lor$ mail=X@*\\
+organization&	\tt o$\approx$X\\
+unit&		\tt ou$\approx$X\\
+role&		\tt cn$\approx$X\\
+locality&	\tt l$\approx$X\\
+person&		\tt sn$\approx$X $\lor$ mail=X@*\\
+(or) person&	\tt cn$\approx$X\\
+\hline
+\end{tabular}\]
+where ``$\approx$'' indicates either wildcard, imprecise, or exact matching,
+based on user-preference,
+and ``$=$'' indicates exact matching.
+If wildcarding is desired,
+but the user does not explicitly specify the substrings,
+the string ``\verb"*X*"'' is used.
+
+After the basic filter is constructed,
+if the user supplied qualifying information on the object,
+an ``info'' filter is appended to the basic filter using logical-AND.
+\[\begin{tabular}{|r|l|}
+\hline
+\multicolumn{1}{|c|}{\bf What}&
+		\multicolumn{1}{|c|}{\bf Info Filter}\\
+\hline
+organization&	\tt businessCategory=X\\
+unit&		\tt businessCategory=X\\
+role&		\tt title=X\\
+person&		\tt title=X\\
+\hline
+\end{tabular}\]
+Next the depth of search must be determined:
+\[\begin{tabular}{|r|l|}
+\hline
+\multicolumn{1}{|c|}{\bf What}&
+		\multicolumn{1}{|c|}{\bf Depth}\\
+\hline
+default&	whole-subtree\\
+organization&	single-level\\
+unit&		whole-subtree\\
+role&		whole-subtree\\
+locality&	single-level\\
+person&		whole-subtree\\
+\hline
+\end{tabular}\]
+Finally,
+a search is performed with these service controls:
+\begin{quote}\small\begin{verbatim}
+-preferchaining
+-dontdereferencealias
+-notimelimit
+-nosizelimit
+-nosearchaliases
+-types rfc822Mailbox telephoneNumber aliasedObjectName
+-values
+\end{verbatim}\end{quote}
+The last two lines are probably somewhat cryptic.
+They indicate that for all matched entries,
+the DSA should return any values associated with those three attribute types.
+
+The task of the user interface is simple:
+\begin{itemize}
+\item	if no matches are found,
+	it reports this to the user;
+
+\item	if exactly one match is found,
+	then it reads this entry and displays its to the user;
+	otherwise,
+
+\item	if more than one match is found,
+	the user interface displays each entry in a concise one-line format
+	containing either the mailbox or telephone number.
+	This aids the user in determining which entry might be the one
+	actually desired.
+	The user can then direct the interface to expand that particular entry.
+\end{itemize}
+If an entry is read,
+then the service controls are:
+\begin{quote}\small\begin{verbatim}
+-preferchaining
+-dontdereferencealias
+-notimelimit
+-nosizelimit
+\end{verbatim}\end{quote}
+
+All that need be explained now is how the ``baseobject'' for the search is
+determined.
+Recall that the user might have supplied something called
+\begin{quote}
+``naming information where the user resides''
+\end{quote}
+to the interface.
+For each kind of object,
+the user interface maintains a default area (DN) used for searching.
+These are set by the system administrator,
+e.g.,
+\[\begin{tabular}{|r|l|}
+\hline
+\multicolumn{1}{|c|}{\bf What}&
+		\multicolumn{1}{|c|}{\bf Base}\\
+\hline
+default&	\tt @c=US@o=NYSERNet Inc.\\
+organization&	\tt @l=North America\\
+unit&		\tt @c=US@o=NYSERNet Inc.\\
+role&		\tt @c=US@o=NYSERNet Inc.\\
+locality&	\tt @c=US\\
+person&		\tt @c=US@o=NYSERNet Inc.\\
+\hline
+\end{tabular}\]
+in order to provide sensible searching.
+The user may override this by supplying additional naming information.
+
+So,
+the user interface decides if the additional information was for an
+organization, organizational unit, or locality,
+constructs a basic filter, and performs a search.
+\begin{itemize}
+\item	if no matches are found,
+	it reports this to the user;
+
+\item	if exactly one match is found,
+	then it uses that DN as the baseobject for the search;
+	otherwise,
+
+\item	if more than one match is found,
+	the user interface displays each entry in a concise one-line format
+	containing either the mailbox or telephone number.
+	This aids the user in determining which entry might be the one
+	actually desired.
+	The user can then direct the interface to continue searching in the
+	appropriate areas.
+\end{itemize}
+Note that prior to using one of these area entries as a baseobject,
+the user interface sees if the search returned an \verb"aliasedObjectName"
+attribute for the area.
+If so,
+then the value of this attribute is used for the baseobject.
+This is used,
+for example,
+when the areas being searched are under \verb"l=North America".
+
+\subsection	{Browsing}
+To browse the White Pages,
+a listing capability is needed.
+Rather than use the Directory list operation,
+it is usually more direct to perform a single-level search looking for any
+entry which has
+\begin{quote}\small\tt
+objectClass$\neq$dSA
+\end{quote}
+
+\subsection	{Searching Revisited}
+Actually,
+there are a couple of additional searching capabilities provided by the White
+Pages.
+
+Although its use is discouraged
+interfaces should be able to accept a DN as typed by a user for either naming
+or area information.
+
+If the naming information given by the user appears to be an Internet-style
+mailbox,
+then an entirely different search algorithm is used.
+Suppose the user enters ``\verb"X"'' in the form:
+\begin{quote}\small\begin{verbatim}
+local@domain
+\end{verbatim}\end{quote}
+and either there is wildcarding present in \verb"domain",
+or the user specifies area information.
+In this case,
+a search filter is constructed,
+one of
+\begin{quote}\small\begin{verbatim}
+rfc822Mailbox=*@domain
+\end{verbatim}\end{quote}
+if no \verb"local" portion was given in ``\verb"X"'';
+\begin{quote}\small\begin{verbatim}
+rfc822Mailbox=local@*
+\end{verbatim}\end{quote}
+if no \verb"domain" portion was given in ``\verb"X"'';
+or,
+\begin{quote}\small\tt
+rfc822Mailbox=X $\lor$ otherMailbox="internet \$ X"
+\end{quote}
+otherwise,
+and a whole-subtree search is done.
+
+Otherwise,
+the user does not specify area information and there is no wildcarding present
+in \verb"domain",
+the user interface performs an special search to identify those areas likely
+to contain the mailbox.
+For each DN in the list of areas,
+the interface uses that DN as a base object for a whole-subtree search using
+the filter:
+\begin{quote}\small\tt
+rfc822Mailbox=X $\lor$ otherMailbox="internet \$ X"
+\end{quote}
+So,
+how is this list of areas generated?
+The user-interface repeatedly performs single-level searches looking for
+entries which have an \verb"associatedDomain" value equal to the domain in
+question.
+If a match is not found,
+then a sub-domain is stripped off,
+and the search is tried again.
+If one or matches are found,
+the routine recurses and searching begins anew.
+In this fashion,
+the routine finds the deepest entries in the DIT associated information about
+a (sub-)domain of the DNS.
+
+\newpage
+\section	{Acknowledgements}
+The NYSERNet/PSI White Pages Pilot Project builds on the work of many others:
+\begin{itemize}
+\item	At the core,
+	the ISODE provides the programmatic infrastructure for OSI
+	applications.
+	So many people have contributed to the ISODE that it is presumptuous
+	to attempt to list them.
+
+\item	The QUIPU directory from University College London,
+	designed by Stephen E.~Kille and programmed primarily by
+	Colin J.~Robbins, form the heart of the pilot's functionality.
+
+\item	Although NYSERNet and PSI have devoted considerable resources to the
+	hardening of QUIPU,
+	it should be noted that UCL has been responsible for the vast majority
+	of improvements and fixes.
+
+\item	The white pages abstraction was designed primarily at NYSERNet with
+	the help of several experts: Kille, Robbins, and Einar Stefferud.
+
+\item	Geoffrey S.~Goodfellow was kind enough to be the alpha tester for the
+	white pages abstraction.
+
+\item	The white pages administrators have been patient as the software
+	twitches.
+
+\item	Finally,
+	it should be noted that none of this would be possible if it
+	weren't for the excellent end-to-end services provided by the Internet
+	suite of protocols (namely the TCP and the IP).
+\end{itemize}
+
+\newpage
+\section*	{Appendix: Differences from NIST OIW Agreements}
+Although QUIPU attempts to be faithful to various Directory implementation
+profiles,
+it is not entirely successful.
+QUIPU is believed to be aligned with with the NIST OIW Agreements on the
+Directory,
+with these exceptions:
+\begin{itemize}
+\item	QUIPU doesn't enforce the bounds constraints on attributes, filters or 
+APDU size.
+
+\item	QUIPU does not reject T.61 string formatting characters.
+
+\item	QUIPU does not check to if the value of the \verb"countryName"
+attribute is defined in ISO3166.
+
+\item	If a DN is supplied with no password in an unprotected simple bind,
+then QUIPU does not check to see if the DN exists.
+
+\item	When comparing attribute of UTCtime syntax,
+if the seconds field is omitted,
+then QUIPU does not perform the match correctly.
+(i.e.,
+the seconds field in the attribute values should be ignored, but are not).
+
+\item	QUIPU always supplies the optional Chaining argument \verb"originator"
+even if the CommonArgument \verb"requestor" is used.
+
+\item	QUIPU always supplies the optional Chaining argument \verb"target"
+even if the base object in the DAP arguments is the same.
+\end{itemize}

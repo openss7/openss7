@@ -1,0 +1,20 @@
+% run this through LaTeX with the appropriate wrapper
+
+\scriptsize
+\begin{verbatim}
+cn=Office Manager
+acl= 
+cn= Office manager
+telephoneNumber= +1 518-283-8860
+facsimileTelephoneNumber= +1 518-283-8904
+description= Manager for the Troy Office
+roleOccupant= c=US@o=Yoyodyne@ou=Corporate@cn=Kimberly Brown#
+objectClass= top & quipuObject
+objectClass= organizationalRole
+
+\end{verbatim}
+
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\empty

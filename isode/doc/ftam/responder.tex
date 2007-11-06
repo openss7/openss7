@@ -1,0 +1,576 @@
+% run this through SLiTeX with the appropriate wrapper
+
+\begin{bwslide}
+\part	{ISSUES IN IMPLEMENTING THE VIRTUAL FILESTORE}
+
+\begin{nrtc}\bf
+\item	A VIRTUAL FILESTORE FOR UNIX: TWO APPROACHES
+
+\item	MAPPING THE NATIVE FILESYSTEM TO THE VIRTUAL FILESTORE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+one reason that the file protocol is relatively simple to implement
+is that it is unconcerned with how the virtual filestore maps to the
+realstore
+
+this is the problem of the file service responder, which uses the file
+service to transmit filestore abstractions, but must use the realstore
+to ``emulate'' the virtual filestore
+
+deciding on how to perform these mappings is perhaps the hardest part
+of implementing ftam on a real system:
+\begin{quote}
+very difficult to transfer non-trivial file structures
+
+but, the virtual filestore should make the problem $N$ rather than $N*N$
+\end{quote}
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{DIGRESSION: THE FTAM LIBRARY}
+
+\begin{nrtc}
+\item	APPROXIMATE LINES OF CODE (FOR THOSE WHO CARE)
+    \begin{nrtc}
+    \item	C: 23000
+
+    \item	ASN.1: 2100 (COMPILED TO 11000 LINES OF C)
+    \end{nrtc}
+
+\item	SUPPORTS BOTH INITIATOR AND RESPONDER
+
+\item	SERVICE LEVEL: RELIABLE
+
+\item	SERVICE CLASSES: TRANSFER, ACCESS, MANAGEMENT, TRANSFER AND MANAGEMENT
+
+\item	FUNCTIONAL UNITS: KERNEL, READ, WRITE, ACCESS, LIMITED FILE MANAGEMENT,
+	ENHANCED FILE MANAGEMENT, GROUPING
+    \begin{nrtc}
+    \item	RESTRICTION: GROUPING IS REQUIRED
+    \end{nrtc}
+
+\item	ATTRIBUTE GROUPS: KERNEL, STORAGE AND SECURITY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{IMPLEMENTATION NOTES}
+
+\begin{nrtc}
+\item	PROCEDURE CALLS USED FOR SERVICE INTERFACE
+    \begin{nrtc}
+    \item	CONFIRMED SERVICES BLOCK UNTIL RESPONSE RECEIVED
+
+    \item	F-WAIT (PSEUDO) SERVICE ADDED TO WAIT FOR .INDICATIONs
+    \end{nrtc}
+
+\item	LIBRARY SUPPORTS MULTIPLE ASSOCIATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AUTOMATIC TOOLS IN SUPPORT OF ASN.1}
+
+\begin{nrtc}
+\item	BECAUSE ASN.1 IS A ``FORMAL'' LANGUAGE, IT IS POSSIBLE TO WRITE
+	PROGRAMS WHICH UNDERSTAND ASN.1 DESCRIPTIONS
+
+\item	ONE EXAMPLE OF SUCH A PROGRAM IS ``PEPY'', AN ASN.1--COMPILER THAT
+	PRODUCES ENCODERS, DECODERS, AND PRETTY-PRINTERS OF DATA STRUCTURES
+	DEFINED BY ASN.1
+
+\item	PEPY IS SUFFICIENTLY POWERFUL TO PRODUCE A DECODER OF THE FULL FPDU
+	AND FADU SPECIFICATION (IT WAS USED EXTENSIVELY FOR THIS PURPOSE)
+
+\item	PEPY HAS BEEN USED IN OTHER PROJECTS AND HAS PROVEN USEFUL IN
+	FINDING ERRORS IN THE PDU SPECIFICATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+actually, there is one *small* part of the FPDU specification that PEPY
+doesn't support
+\end{note}
+
+
+\begin{bwslide}
+\part*	{A VIRTUAL FILESTORE\\ FOR UNIX:\\ TWO APPROACHES}\bf
+
+\begin{nrtc}
+\item	REGARDLESS OF THE NUMBER OF DIFFERENT LOCALSTORES THAT EXIST,
+	IT SHOULDN'T BE SURPRISING THAT THERE IS MORE THAN ONE WAY TO MAP A
+	VIRTUAL FILESTORE ONTO A LOCALSTORE
+
+\item	LET'S CONSIDER THE UNIX LOCALSTORE (BECAUSE OF ITS SIMPLICITY) AND
+	CONSIDER TWO DIFFERENT WAYS OF IMPLEMENTING THE VIRTUAL FILESTORE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REVIEW: THE UNIX LOCALSTORE}
+
+\begin{nrtc}
+\item	FILES IN UNIX ARE BYTE STREAMS, WITHOUT ANY INHERENT STRUCTURING
+	INFORMATION (e.g., RECORD LENGTHS, FORMATS, etc.)
+
+\item	TWO TYPES OF FILES ARE OF INTEREST
+    \begin{nrtc}
+    \item	REGULAR FILES WHICH CONTAIN DATA
+
+    \item	DIRECTORY FILES WHICH CONTAIN POINTERS TO OTHER FILES
+    \end{nrtc}
+
+\item	THE FILESYSTEM IS HIERARCHICAL (TREE-LIKE)
+
+\item	THERE ARE RELATIVELY FEW OPERATIONS
+    \begin{nrtc}
+    \item	OPEN, READ, WRITE, CLOSE: MANIPULATE REGULAR FILES
+
+    \item	LINK, UNLINK: MANIPULATE DIRECTORY FILES
+
+    \item	CHOWN, CHMOD, UTIMES: CHANGE FILE ATTRIBUTES
+
+    \item	STAT: RETURN INFORMATION ABOUT A FILE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE ``ALTERNATE FILESYSTEM'' APPROACH}
+
+\begin{nrtc}
+\item	OBSERVATION: THE UNIX LOCALSTORE ISN'T POWERFUL ENOUGH TO PERMIT
+	A DIRECT MAPPING TO THE FILESTORE
+
+\item	SOLUTION: ``PARTITION OFF'' A PART OF THE LOCAL FILESYSTEM,
+	INACCESSIBLE TO MOST USERS, AND GIVE THE FTAM RESPONDER FULL REIGN
+	THERE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MAPPINGS}
+
+\begin{nrtc}
+\item	START WITH A ``TOP-LEVEL'' DIRECTORY
+
+\item	TREAT EACH FILE IN THE VIRTUAL FILESTORE AS A UNIX DIRECTORY
+    \begin{nrtc}
+    \item	SINCE A FTAM FILENAME IS A SEQUENCE OF GraphicString's,
+		USE A DIRECTORY FOR EACH STRING IN THE SEQUENCE
+    \end{nrtc}
+
+\item	IN THE FILE'S DIRECTORY
+    \begin{nrtc}
+    \item	HAVE A UNIX FILE \verb"attributes" WHICH CONTAINS
+		DEFINITIONS FOR ALL OF THE FILE'S ATTRIBUTES
+
+    \item	HAVE UNIX FILES CALLED \verb"descriptor" AND \verb"DU"
+		WHICH DESCRIBE THE ROOT FADU
+
+    \item	FOR EACH CHILD OF THE ROOT, HAVE A DIRECTORY
+		(NAMED \verb"1", \verb"2", etc.)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: THE ``ALTERNATE FILESYSTEM'' APPROACH}
+
+\vskip.5in
+\diagram[p]{figure4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\diagram[p]{figure8}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BENEFITS OF THE ``ALTERNATE FILESYSTEM'' APPROACH}
+
+\begin{nrtc}
+\item	THE UNIX FILESYSTEM CAN HOST A DATABASE WHICH IS POWERFUL ENOUGH TO
+	MODEL THE FULL STRUCTURE OF FILES IN THE VIRTUAL FILESTORE
+
+\item	BY DISTINGUISHING BETWEEN FTAM ATTRIBUTES AND UNIX ATTRIBUTES,
+	THE FULL SET OF FTAM ATTRIBUTES CAN POTENTIALLY BE SUPPORTED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DISADVANTAGES OF\\ THE ``ALTERNATE FILESYSTEM'' APPROACH}
+
+\begin{nrtc}
+\item	NOT A ``INTEGRATED'' APPROACH
+    \begin{nrtc}
+    \item	USERS WISHING TO ACCESS FILES RESIDING IN THE LOCAL VIRTUAL
+		FILESTORE MUST STILL USE FTAM (SLOW AND REDUNDANT)
+    \end{nrtc}
+
+\item	NOT VERY EFFICIENT USE OF UNIX RESOURCES
+
+\item	REQUIRES SOME RE-INVENTING OF THE WHEEL
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE ``INTEGRATED'' APPROACH}
+
+\begin{nrtc}
+\item	IS THERE A WAY TO MAP UNIX FILE STRUCTURE AND ATTRIBUTES DIRECTLY
+	TO THE VIRTUAL FILESTORE?
+
+\item	CAUTION:
+    \begin{quote}\em
+	SOMETIMES WHEN YOU TRY TO TURN AN APPLE INTO AN ORANGE YOU GET BACK A
+	LEMON!    
+    \end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{MAPPING THE NATIVE FILESYSTEM TO THE VIRTUAL FILESTORE}\bf
+
+\begin{nrtc}
+\item	QUESTION: CAN AN ARBITRARY UNIX FILE APPEAR TO BE A FILE IN
+	THE VIRTUAL FILESTORE?
+
+\item	IMPLICATIONS
+    \begin{nrtc}
+    \item	THE UNIX FILE CONTENTS MAP TO AN FTAM FILE STRUCTURE
+
+    \item	THE UNIX FILESYSTEM ATTRIBUTES MAP TO VIRTUAL FILESYSTEM
+		ATTRIBUTES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MAPPINGS}
+
+\begin{nrtc}
+\item	INITIALLY, CONSIDER ONLY
+    \begin{nrtc}
+    \item	UNSTRUCTURED BINARY FILES (FTAM-3)
+
+    \item	UNSTRUCTURED TEXT FILES (NBS-2)
+
+    \item	FILE DIRECTORY FILES (NBS-9)
+    \end{nrtc}
+
+\item	AUTHENTICATION
+    \begin{nrtc}
+    \item	FTAM INITIATOR MAPS TO USER ENTRY IN THE UNIX PASSWORD FILE
+
+    \item	``ANON'' INITIATOR PROVIDED FOR GUEST (RESTRICTED) ACCESS
+    \end{nrtc}
+
+\item	MAPPING BETWEEN USER/GROUP IDs (UIDs/GIDs) AND FTAM ENTITIES
+    \begin{nrtc}
+    \item	PASSWORD OR GROUP FILE USED TO MAP NUMBER TO NAME
+
+    \item	IF ENTRY NOT FOUND, NUMBER CONVERTED TO STRING
+    \end{nrtc}
+
+\item	MAPPING BETWEEN UNIX TIME AND FTAM DATE/TIMES
+    \begin{nrtc}
+    \item	STRAIGHT-FORWARD (AT LAST)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ATTRIBUTE MAPPINGS}
+
+\begin{nrtc}
+\item	FILENAME
+    \begin{nrtc}
+    \item	A SINGLE STRING (WHAT MOST PROFILES SPECIFY ANYWAY)
+
+    \item	INTERPRETED RELATIVE TO THE USER'S HOME DIRECTORY 
+
+    \item	CHANGING THIS ATTRIBUTE RENAMES THE FILE
+    \end{nrtc}
+
+\item	CONTENTS TYPE
+    \begin{nrtc}
+    \item	BASED ON FILE TYPE (MORE DETAIL LATER)
+    \end{nrtc}
+
+\item	ACCOUNT
+    \begin{nrtc}
+    \item	THE FILE'S GID (GROUP ID) ATTRIBUTE
+    \end{nrtc}
+
+\item	DATES AND TIMES
+    \begin{nrtc}\small
+    \item	OF CREATION AND LAST MODIFICATION: THE FILE'S LAST MODIFICATION
+		TIME
+
+    \item	OF LAST READ ACCESS: THE FILE'S LAST ACCESS TIME
+
+    \item	OF LAST ATTRIBUTE MODIFICATION: THE INODE'S LAST CHANGE TIME
+
+    \item	NOT STRICTLY ACCURATE SINCE WRITING TO A FILE CHANGES EACH
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ATTRIBUTE MAPPINGS (cont.)}
+
+\begin{nrtc}
+\item	IDENTITIES:
+    \begin{nrtc}
+    \item	OF CREATOR: THE FILE'S OWNER
+
+    \item	OF OTHERS: DEPENDS ON THE FILE'S MODE, OTHERWISE UNAVAILABLE
+    \end{nrtc}
+
+\item	FILE-AVAILABILITY
+    \begin{nrtc}
+    \item	IMMEDIATE
+    \end{nrtc}
+
+\item	PERMITTED ACTIONS
+    \begin{nrtc}
+    \item	DEPENDS ON THE FILE'S MODE
+
+    \item	READ, WRITE: BASED ON INITIATOR'S PERMISSIONS
+
+    \item	READ ATTRIBUTES: ALWAYS
+
+    \item	CHANGE ATTRIBUTES: ONLY IF OWNER OF FILE
+
+    \item	DELETE: BASED ON WRITABILITY OF PARENT DIRECTORY
+    \end{nrtc}
+
+\item	FILESIZE
+    \begin{nrtc}
+    \item	THE FILE'S SIZE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{UNAVAILABLE ATTRIBUTES}
+
+\begin{nrtc}
+\item	FUTURE FILESIZE
+
+\item	ACCESS CONTROL
+
+\item	ENCRYPTION NAME
+
+\item	LEGAL QUALIFICATIONS
+
+\item	PRIVATE USE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{UNSTRUCTURED BINARY FILES}
+
+\begin{nrtc}
+\item	SEMANTICS: THE DOCUMENT CONSISTS OF A SINGLE DATA UNIT
+    \begin{nrtc}
+    \item	THE DATA UNIT CONSISTS OF AN UNBOUNDED SEQUENCE OF DATA
+		ELEMENTS
+
+    \item	EACH DATA ELEMENT IS AN OCTET STRING
+
+    \item	TRANSFER SYNTAX IS NOT SELF-DELIMITING
+    \end{nrtc}
+
+\item	CONSTRAINT SET: UNSTRUCTURED
+
+\item	THIS IS SIMPLY A REGULAR UNIX FILE, NO STRUCTURE MAPPING IS REQUIRED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EFFICIENCY CONSIDERATIONS}
+
+\begin{nrtc}
+\item	NEED TO DETERMINE HOW FADUs MAP TO SSDUs
+
+\item	IDEALLY, WISH TO CONFIGURE DATA TRANSFER SUCH THAT EACH PARTIAL
+	FADU SENT MAPS TO EXACTLY ONE SSDU!
+
+\item	THIS IS (ARGUABLY) A HORRIBLE VIOLATION OF THE LAYERING PHILOSOPHY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{UNSTRUCTURED TEXT FILES (VARCRLF)}
+
+\begin{nrtc}
+\item	SEMANTICS: THE DOCUMENT CONSISTS OF A SINGLE DATA UNIT
+    \begin{nrtc}
+    \item	THE DATA UNIT CONSISTS OF AN UNBOUNDED SEQUENCE OF DATA
+		ELEMENTS
+
+    \item	EACH DATA ELEMENT IS AN IA5String, TERMINATED BY CR-LF,
+		AND NEITHER CR NOR LF MAY APPEAR ANYWHERE ELSE IN THE STRING
+
+    \item	TRANSFER SYNTAX IS NOT SELF-DELIMITING
+    \end{nrtc}
+
+\item	CONSTRAINT SET: UNSTRUCTURED
+
+\item	HOW TO DETERMINE IF REGULAR FILE IS BINARY OR TEXT
+    \begin{nrtc}
+    \item	USE A HEURISTIC (AND ALL THAT IMPLIES)
+    \end{nrtc}
+
+\item	OTHERWISE, GIVEN CR-LF VS. NEWLINE HANDLING, STRAIGHT-FORWARD TO
+	HANDLE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FILE DIRECTORY FILES}
+
+\begin{nrtc}
+\item	ALTHOUGH THE VIRTUAL FILESTORE DOESN'T SUPPORT A ``DIRECTORY''
+	CONCEPT, WE CAN EMULATE IT
+
+\item	EXPERIENCE WITH OTHER NETWORK FILE SERVICES HAS SHOWN THIS TO BE
+	VERY USEFUL
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FILE DIRECTORY FILES (cont.)}
+
+\begin{nrtc}
+\item	SEMANTICS: THE DOCUMENT CONSISTS OF AN UNBOUNDED SEQUENCE OF DATA UNITS
+    \begin{nrtc}
+    \item	EACH DATA UNIT CONSISTS OF EXACTLY ONE DATA ELEMENT OF
+		TYPE FileDirectoryEntry
+
+    \item	THE TRANSFER SYNTAX IS SELF-DELIMITING
+    \end{nrtc}
+
+\item	CONSTRAINT SET: SEQUENTIAL FLAT
+
+\item	QUESTION: WHAT FILENAME TO REPORT IN EACH ENTRY?
+
+\item	EFFICIENCY CONCERN: ``BUFFER'' DATA ELEMENTS FOR F-DATA SERVICE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: FILE DIRECTORY FILE}\small
+
+\begin{tgrind}
+\let\linebox=\relax
+\input figure9\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMPARISON OF THE TWO APPROACHES}
+
+\begin{nrtc}
+\item	``PURITY'' OF VIRTUAL FILESTORE MAPPINGS
+    \begin{nrtc}
+    \item	ALTERNATE: ALL MAPPINGS CAN BE PERFORMED
+
+    \item	INTEGRATED: MOST MAPPINGS ARE DIRECT, SOME ARE STRAINED, OTHERS
+		ARE IMPOSSIBLE
+    \end{nrtc}
+
+\item	INTEGRATED: TIGHT INTERACTION WITH LOCAL ENVIRONMENT YIELDING
+	SIMPLICITY OF IMPLEMENTATION
+    \begin{nrtc}
+    \item	ABOUT 3500 LINES OF C CODE
+    \end{nrtc}
+
+\item	EFFICIENCY OF IMPLEMENTATION
+    \begin{nrtc}
+    \item	ALTERNATE: EFFICIENT FOR VIRTUAL FILESTORE
+
+    \item	INTEGRATED: EFFICIENT USE OF UNIX RESOURCES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+the responder, per se, currently runs on berkeley or at\&t unix
+(although only the berkeley version has been extensively tested)
+
+it was inspired, a bit, by the berkeley unix ftp server
+
+the library, of course, just needs a decent C compiler, unix isn't an issue
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{COMPARISON OF THE TWO APPROACHES (cont.)}
+
+\begin{nrtc}
+\item	FOR SIMPLE APPLICATIONS, THE ``INTEGRATED'' APPROACH IS PROBABLY
+	SUPERIOR
+
+\item	IT IS INSUFFICIENT FOR ADVANCED APPLICATIONS HOWEVER
+
+\item	THIS SUGGESTS THAT IMPLEMENTATIONS IN THE LONG-TERM WILL PROBABLY
+	EVOLVE TOWARD A HYBRID APPROACH
+
+\item	PERHAPS THE NEXT GENERATION LOCALSTORE SHOULD BE DESIGNED WITH FTAM
+	IN MIND?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+not discussed due to time constraints:
+
+managing multiple associations at the file store
+(needed: reasonable file-level locking facilities in the realstore)
+\end{note}
+
+
+\begin{bwslide}
+\part*	{SUMMARY}\bf
+
+\begin{nrtc}
+\item	THE FILE PROTOCOL IS TRIVIAL COMPARED TO IMPLEMENTING A GOOD MAPPING
+	OF THE VIRTUAL FILESTORE
+
+\item	THE ``ALTERNATE FILESYSTEM'' APPROACH CAN BE USED TO PROVIDE FULL
+	VIRTUAL FILESTORE SERVICES
+
+\item	THE ``INTEGRATED'' APPROACH, WHILE NOT AS CAPABLE, IS ACCEPTABLE FOR
+	MOST APPLICATIONS
+\end{nrtc}
+\end{bwslide}

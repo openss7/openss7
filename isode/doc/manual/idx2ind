@@ -1,0 +1,53 @@
+#! /bin/sh
+: 'idx2ind - new LaTeX index converter - 11-Jul-88/JLR'
+
+L=%%
+case x$1 in
+  x-l) L=""; shift ;;
+esac
+
+for i
+do
+  awk 'BEGIN {for (i = 97; i < 123; i++)	# index letters "a" to "z"
+		printf "%c\n", i; exit}' |\
+  cat - $i.idx |\
+  sed \
+    -e 's/	/ /g'\
+    -e 's/^\\indexentry{\(.*\)}{\([^}]*\)}$/\1	\2/'\
+    -e 's/^\\verb\(.\)\(.*\)\1	\(.*\)$/\2	\3	\\verb\1\2\1/'\
+    -e '/\\/!s/ *{}//'\
+    -e '/,/{;s/^\(.*\)	\(.*\)$/\1	\2	\1/;s/,/ /;}' |\
+  sort -u -t"	" +0fd -1 +1n |\
+  awk -F"	" '
+BEGIN	{printf "\\begin{theindex}\\makeatletter\n"
+	printf "\\raggedright\n"
+	printf "\\def\\newindex#1{{\\huge\\hspace{-.5in}"
+	printf "\\parbox[t]{.5in}{\\makebox[.35in][c]{\\uppercase{#1}}}"
+	printf "\\vspace{-1.5ex}}}\n"
+	}
+NF == 1	{x = $1; next}				# NF=1: index letter
+	{n = $1}
+NF == 3	{n = $3}				# NF=3: special sort key
+n == p	{printf ", %s", $2; next}		# another page number
+p != ""	{printf "\n"}				# end of this item
+x != ""	{if (p != "")				# index letter?
+	    printf "\\indexspace\n"
+	printf "'$L'\\newindex{%s}\n", x
+	}
+	{x = s = ""; i = n; l = $2}		# reset
+/,/	{s = "sub"				# sub-item
+	nf = split (i, a, ","); k = a[1]; i = a[2]
+	split (p, pk, ",")
+	if (pk[1] != k && pk[1] != k"{}")	# should use substr...
+	    {i = n; s =""}
+	else for (j = 3; j <= nf; j++) 		# add sub-sub-items
+	    i = sprintf ("%s,%s", i, a[j])
+	}
+	{printf "\\%sitem %s, %s", s, i, l}
+	{p = n}					# save for next comparison
+END	{printf "\n\\end{theindex}\n"
+	}' > $i.ind
+
+done
+
+exit 0

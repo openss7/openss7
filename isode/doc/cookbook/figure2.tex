@@ -1,0 +1,37 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \special{sh}%
+    \special{pa 0 2000}%
+    \special{pa 0 1500}%
+    \special{pa 750 1500}%
+    \special{pa 750 2000}%
+    \special{pa 0 2000}%
+    \special{fp}%
+    \rlap{\kern  1.125in\lower 0.958in\hbox to 0pt{\hss SERVICE\hss}}%
+    \rlap{\kern  1.125in\lower 1.124in\hbox to 0pt{\hss OFFERED\hss}}%
+    \special{sh}%
+    \special{pa 0 500}%
+    \special{pa 0 0}%
+    \special{pa 750 0}%
+    \special{pa 750 500}%
+    \special{pa 0 500}%
+    \special{fp}%
+    \special{pa 375 1500}%
+    \special{pa 375 500}%
+    \special{fp}%
+    \special{pa 400 600}%
+    \special{pa 375 500}%
+    \special{fp}%
+    \special{pa 350 600}%
+    \special{pa 375 500}%
+    \special{fp}%
+    \kern  1.126in
+  }\vss}%
+  \kern  2.001in
+}

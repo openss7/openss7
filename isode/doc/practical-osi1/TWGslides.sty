@@ -1,0 +1,374 @@
+% SLiTeX super-customization for the SLIDES style
+%	Instead of
+%
+%		\documentstyle[NRslides]{slides}
+%
+%	the correct usage is
+%
+%		\documentstyle{NRslides}
+%
+%	which will automatically include slides.sty
+
+\typeout{Document Style 'NRslides' -- version 1.04, released 28 August 1986}
+
+\newif\if@isode
+
+\@ifundefined{oldstyle}{\input NRcustom\relax \makeatletter}{}
+\let\@@options=\@options	\let\@options=\relax
+\input slides.sty
+\makeatletter			% backwards compatibility
+\let\@options=\@@options
+
+
+% Document style options:
+%   blackandwhite - don't use a secondary file
+%	    draft - generate black-boxes when boxes are overfull (NI)
+%	landscape - 11 x 8-1/2
+%	     nrtc - use ``Research and Technology Center'' in logo
+%	     oval - put an oval around title information
+%     pagenumbers - generate page numbers in left-hand corner of footer
+%	    plain - no logo in footer
+%	 portrait - 8-1/2 x 11
+%     proprietary - use ``PROPRIETARY'' in head/foot
+%	    small - make the slides a bit smaller than standard SLiTeX
+
+\def\ds@blackandwhite{%
+    \let\@document=\document
+    \def\document{%
+	\@document
+	\blackandwhite{null}
+	\@makingslidestrue
+    }%
+    \let\@enddocument=\enddocument
+    \def\enddocument{\@makingslidesfalse\@enddocument}%
+}
+
+\def\ds@draft{%
+    \overfullrule=5\p@
+    \def\NR@corner{+}%
+}
+\let\NR@corner=\empty
+
+\newif\if@landscape	\@landscapefalse
+\def\ds@landscape{%
+    \@landscapetrue
+    \textwidth=615\p@	\textheight=470\p@
+    \columnwidth=\textwidth
+}
+\def\ds@portrait{%
+    \@landscapefalse
+    \textwidth=470\p@	\textheight=615\p@
+    \columnwidth=\textwidth
+}
+
+\newif\if@nrtc		\@nrtcfalse
+\let\ds@nrtc=\@nrtctrue
+
+\newif\if@ovaltitle	\@ovaltitlefalse
+\let\ds@oval=\@ovaltitletrue
+
+\newif\if@pagenumbers	\@pagenumbersfalse
+\let\ds@pagenumbers=\@pagenumberstrue
+
+\if@isode
+\def\NR@logo{%
+    \vtop{%
+	\halign{\hfil##\hfil\cr
+	    \headfont NORTHROP\cr
+	    \if@nrtc \hbox{\lowfont\kern-1.2em\raise.6em 
+			\hbox{Research and Technology Center}}\cr\fi
+	}%
+    }%
+}
+\else
+\let\NR@logo=\empty
+\fi
+\let\NR@titlelogo=\NR@logo
+\def\ds@plain{\def\NR@logo{\NR@corner}\let\NR@titlelogo=\empty}
+
+\def\ds@proprietary{%
+    \def\NR@prop{{\propfont THE WOLLONGONG GROUP (Company Confidential)}}%
+}
+\let\NR@prop=\empty
+\font\propfont=cmbx10 scaled\magstep 1
+
+\def\ds@small{%
+    \let\Huge=\huge
+    \let\huge=\LARGE
+    \let\LARGE=\Large
+    \let\Large=\large
+    \let\large=\normalsize
+    \let\normalsize=\small
+    \let\small=\tiny
+    \let\footnotesize=\small
+    \let\scriptsize=\small
+
+    \normalsize
+
+    \let\ds@small=\empty
+}
+
+\@namedef{ds@10pt}{\@latexerr{No '10pt' layout for slides}\eha}
+\@namedef{ds@11pt}{\@latexerr{No '11pt' layout for slides}\eha}
+\@namedef{ds@12pt}{\@latexerr{No '12pt' layout for slides}\eha}
+\def\ds@openbib{\@latexerr{No 'openbib' layout for slides}\@eha}
+\def\ds@titlepage{\@latexerr{No 'titlepage' layout for slides}\@eha}
+\def\ds@twocolumn{\@latexerr{No 'twocolumn' layout for slides}\@eha}
+\def\ds@twoside{\@latexerr{No 'twoside' layout for slides}\@eha}
+
+\@options
+
+
+% Parameters different than SLiTeX
+
+\if@isode
+\font\headfont=northrop20
+\font\lowfont=mcbk9
+\font\notesfont=mcbk12
+\else
+\def\notesfont{\scriptsize\rm}
+\fi
+
+
+% Page Style
+
+\setbox\z@=\hbox{\@mainsize\NR@logo}
+\ifdim \ht\z@>\footheight
+    \advance\textheight by-\footheight
+    \footheight=\ht\z@
+    \advance\textheight by\footheight
+    \footskip=\footheight	\advance\footskip by11\p@
+\fi
+
+\def\ps@NRslides{%
+    \def\ps@slide{%
+	\def\@oddfoot{%
+	    \@mainsize\null
+	    \if@pagenumbers \hbox to3em{\thetopic-\theslide\hss}\fi
+%%%	    \hbox to 3.6in{\NR@notes\hfil}\NR@prop\hfil\NR@logo
+	    \hfill\NR@prop\NR@logo
+	}%
+	\def\@oddhead{\@mainsize\null \NR@corner\hfil\NR@corner}%
+	\let\@evenfoot=\@oddfoot
+	\let\@evenhead=\@oddhead
+    }%
+    \def\ps@overlay{%
+	\def\@oddfoot{%
+	    \@mainsize\null
+	    \if@pagenumbers \hbox to 3em{\thetopic-\theoverlay\hss}\fi
+	    \hfil\NR@corner
+	}%
+	\def\@oddhead{\@mainsize\null \NR@corner\hfil \NR@corner}%
+	\let\@evenfoot=\@oddfoot
+	\let\@evenhead=\@oddhead
+    }%
+    \def\ps@note{%
+	\def\@oddfoot{\@mainsize\null \hfil\thetopic-\thenote}%
+	\let\@oddhead=\empty
+	\let\@evenfoot=\@oddfoot
+	\let\@evenhead=\@oddhead
+    }%
+}
+
+\def\ps@title{%
+    \def\ps@slide{%
+	\def\@oddfoot{\@mainsize\null
+			\hbox to 3.6in{\NR@notes\hfil}\NR@prop\hfil\NR@titlelogo}%
+	\def\@oddhead{\@mainsize\null \hfil}%
+	\let\@evenfoot=\@oddfoot
+	\let\@evenhead=\@oddhead
+    }%
+    \def\ps@overlay{%
+	\let\@oddfoot=\empty
+	\let\@oddhead=\empty
+	\let\@evenfoot=\@oddfoot
+	\let\@evenhead=\@oddhead
+    }%
+    \def\ps@note{%
+	\let\@oddfoot=\empty
+	\let\@oddhead=\empty
+	\let\@evenfoot=\@oddfoot
+	\let\@evenhead=\@oddhead
+    }%
+    \ps@slide
+}
+
+
+% Titles (from article.sty)
+
+\def\maketitlepage{\begin{titlepage}\maketitle\end{titlepage}}
+
+\def\maketitle{%
+    \par
+    \begingroup
+	\def\thefootnote{\fnsymbol{footnote}}%
+	\def\@makefnmark{\hbox to\z@{$^{\@thefnmark}$\hss}}%
+	\newpage
+	\global\@topnum=\z@
+	\@maketitle
+	\thispagestyle{title}%
+	\@thanks
+    \endgroup
+    \setcounter{footnote}{\z@}
+    \global\let\@title=\empty
+    \global\let\@author=\empty
+    \global\let\@thanks=\empty
+}
+
+\newcount\title@ht	\newcount\title@wd
+\newcount\title@@ht	\newcount\title@@wd
+
+\def\@maketitle{%
+    \newpage
+    \null
+    \setbox\z@=\vbox{%
+	\ \vskip .75em
+	\begin{center}
+	    {\Large\bf \@title \par}%
+	    \vskip .5em
+	    {\large\bf
+		\lineskip=.25em 
+		\begin{tabular}[t]{c}
+		    \@author 
+		\end{tabular}
+		\par
+	    }%
+	    \vskip .5em
+	    {\large\bf \@date}%
+	\end{center}
+	\par
+	\vskip .75em
+    }%
+    \if@ovaltitle
+	\title@ht=\ht\z@	\title@wd=\wd\z@
+	\title@@ht=\ht\z@	\title@@wd=\wd\z@
+	\divide\title@@ht by2	\divide\title@@wd by2
+	\unitlength=1sp
+    \fi
+    \box\z@
+    \if@ovaltitle
+	\vskip -\title@ht\unitlength
+	{\centering
+	    \begin{picture}(\title@wd,\title@ht)
+		\put(\title@@wd,\title@@ht){\oval(\title@wd,\title@ht)}
+	    \end{picture}
+	\par}
+    \fi
+}
+
+\def\ctitle#1{%
+    \begin{center}
+	\large\bf#1%
+    \end{center}
+    \vskip.125in plus.25in
+}
+
+
+% Slides
+
+\def\bwslide{\let\NR@notes=\empty \slide\empty}
+\let\endbwslide=\endslide
+
+\def\bwoverlay{\overlay\empty}
+\let\endbwoverlay=\endoverlay
+
+
+% Parts (parts is parts...)
+
+\newcounter{part}
+\newcounter{topic}
+
+\def\part{\secdef\@part\@spart}
+
+\def\@part[#1]#2{%
+    \stepcounter{part}
+    \begin{center}
+	\Large\bf PART \thepart\\
+	\huge\bf #2%
+    \end{center}
+    \vskip1.25in plus.25in
+}
+
+\def\@spart#1{%
+    \begin{center}
+	\huge\bf #1%
+    \end{center}
+    \vskip1.15in plus.25in
+}
+
+\def\thepart{\Roman{part}}
+\def\thetopic{\Roman{topic}}
+
+
+% Macros for circled lists (similar to itemize)
+
+\newcount\@nrtcdepth		\@nrtcdepth=\z@
+
+\def\nrtc{%
+    \ifnum \@nrtcdepth>2
+	\@toodeep
+    \else
+	\advance\@nrtcdepth by\@ne
+	\edef\@nrtcitem{labelnrtc\romannumeral\the\@nrtcdepth}%
+	\list{\csname\@nrtcitem\endcsname}{%
+	    \def\makelabel##1{\hss\llap{##1}}%
+	    \labelwidth=\leftmargini	\advance\labelwidth-\labelsep
+	    \ifcase\@nrtcdepth\or
+		\itemindent=-1em	\listparindent=\itemindent
+	        \leftmargin=3em
+		\parsep=\the\parsep plus.5\parsep minus.5\parsep
+		\topsep=\parsep
+	    \or
+		\itemindent=-2em	\listparindent=\itemindent
+	        \leftmargin=4em
+		\parsep=\the\parsep plus.5\parsep minus.5\parsep
+		\topsep=\parsep
+	    \else
+		\itemindent=-2em	\listparindent=\itemindent
+	        \leftmargin=2em
+	    \fi
+	    \rightmargin=\z@
+	}%
+    \fi
+}
+\let\endnrtc=\endlist
+
+\def\labelnrtci{$\circ$}
+\let\labelnrtcii=\empty
+\let\labelnrtciii=\empty
+\let\labelnrtciv=\empty
+
+
+\def\slidenotes#1{\def\NR@notes{\notesfont#1}}
+\let\NR@notes=\empty
+
+
+% Macros for figures (PIC support)
+
+\let\slidepoint=\small
+
+\def\diagram{\@ifnextchar[{\@diagram}{\@diagram[]}}
+\def\@diagram[#1]#2{%
+    \let\@d@agram=\empty	\let\@di@gram=\empty
+    \@tfor\@tempa:=#1\do{%
+	\if\@tempa p
+	    \let\@d@agram=\slidepoint
+	    \def\@di@gram{\centerline{\box\graph}}\fi
+	\if\@tempa t
+	    \let\@d@agram=\slidepoint\fi	
+    }%
+    \@d@agram	\input #2\relax	\@di@gram
+}
+
+
+% Initialization
+
+\pagestyle{NRslides}
+
+\uchyph=\z@
+\brokenpenalty=\@M
+\hyphenpenalty=\@M
+\tolerance=500
+\pretolerance=\@M
+\clubpenalty=\@M
+\widowpenalty=\@M	\displaywidowpenalty=\@M

@@ -1,0 +1,1343 @@
+% run this through LaTeX with the appropriate wrapper
+
+%%% TODO: document
+%%%	pe2ssdu, ssdu2pe, pe2text, pe2uvec
+
+\chapter	{Encoding of Data-Structures}\label{libpsap}
+The \man libpsap(3) library implements presentation syntax abstractions
+for the machine-independent exchange of data structures.
+There are two objects which are manipulated:
+{\em presentation elements},
+which represent a particular, arbitrarily complex, data structure;
+and,
+{\em presentation streams},
+which represent an I/O path of these data structures.
+
+\section	{Presentation Streams}
+A presentation stream is an object,
+similar to a \verb"FILE" object in \man stdio(3s),
+which is used to read and write {\em presentation elements}.
+The \verb"PStream" structure contains several elements,
+only the most interesting are described here:
+\begin{describe}
+\item[\verb"ps\_errno":] the latest error to occur on the stream
+(codes are listed in Table~\ref{PStreamReasons});
+
+\item[\verb"ps\_addr":] the bottom-specific pointer;
+
+\item[\verb"ps\_primeP":] the bottom-specific prime routine;
+
+\item[\verb"ps\_readP":] the bottom-specific read routine;
+
+\item[\verb"ps\_writeP":] the bottom-specific write routine;
+and,
+
+\item[\verb"ps\_flushP":] the bottom-specific flush routine;
+and,
+
+\item[\verb"ps\_closeP":] the bottom-specific close routine.
+\end{describe}
+\tagtable[tp]{3-1}{Presentation Stream Failure Codes}{PStreamReasons}
+The typedef \verb"PS" is a pointer to an \verb"PStream" structure.
+The \verb"ps_errno" element of the \verb"PStream" structure can be given as a
+parameter to the routine \verb"ps_error" which returns a
+null-terminated diagnostic string.
+\begin{quote}\index{ps\_error}\small\begin{verbatim}
+char   *ps_error (c)
+int     c;
+\end{verbatim}\end{quote}
+
+\subsection	{Creating a Stream}
+A \verb"PStream" structure is created by calling the procedure \verb"ps_alloc",
+with the address of an integer-valued initialization routine.
+\begin{quote}\index{ps\_alloc}\small\begin{verbatim}
+PS      ps_alloc (init)
+int   (*init) ();
+\end{verbatim}\end{quote}
+The \verb"ps_alloc" routine allocates a new structure and then calls the
+initialization routine passed as a parameter,
+which should initialize the elements of the structure.
+The initialization routine should return the manifest constant \verb"OK" if
+all went well;
+otherwise it should return the manifest constant \verb"NOTOK" on error,
+which results in \verb"ps_alloc" freeing the newly allocated structure and
+then returning the value \verb"NULLPS".
+
+Several standard initialization routines are available:
+\begin{describe}
+\item[\verb"std\_open":]  for presentation streams connected to \man stdio(3s)
+\verb"FILE" objects;
+\begin{quote}\index{std\_open}\small\begin{verbatim}
+int     std_open (ps)
+PS      ps;
+\end{verbatim}\end{quote}
+
+\item[\verb"str\_open":] for presentation streams connected to string objects.
+\begin{quote}\index{str\_open}\small\begin{verbatim}
+int     str_open (ps)
+PS      ps;
+\end{verbatim}\end{quote}
+
+\item[\verb"fdx\_open":] for presentation streams connected to full-duplex
+file descriptors.
+\begin{quote}\index{fdx\_open}\small\begin{verbatim}
+int     fdx_open (ps)
+PS      ps;
+\end{verbatim}\end{quote}
+and,
+
+\item[\verb"dg\_open":] for presentation streams connected to datagram-based
+file descriptors.
+\begin{quote}\index{dg\_open}\small\begin{verbatim}
+int     dg_open (ps)
+PS      ps;
+\end{verbatim}\end{quote}
+\end{describe}
+Presentation streams which have been initialized by these routines will
+automatically allocate additional resources when necessary,
+to the limits allowed by the operating system
+(e.g., repeated writes to a presentation stream connected to a string object
+will result in additional memory being allocated).
+In the current implementation,
+presentation streams which have been initialized by these routines are
+uni-directional.
+That is,
+the presentation stream may be used for reading, or writing, but not both.
+
+After \verb"ps_alloc" successfully returns,
+final initialization is performed by calling a setup routine, usually either
+\begin{describe}
+\item[\verb"std\_setup":] for file objects.
+\begin{quote}\index{std\_setup}\small\begin{verbatim}
+int     std_setup (ps, fp)
+PS      ps;
+FILE   *fp;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"ps":] the presentation stream;
+and,
+
+\item[\verb"fp":] a pointer to the \verb"FILE" object to be bound to the
+presentation stream.
+\end{describe}
+
+\item[\verb"str\_setup":] for string objects.
+\begin{quote}\index{str\_setup}\small\begin{verbatim}
+int     str_setup (ps, cp, cc, inline)
+PS      ps;
+char   *cp;
+int     cc,
+	inline;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"ps":] the presentation stream;
+
+\item[\verb"cp":] a pointer to the string to be bound to the presentation
+stream
+(use the manifest constant \verb"NULLCP" if the stream is to be written);
+
+\item[\verb"cc":] the length of the string;
+and,
+
+\item[\verb"inline":] a magic argument,
+always use \verb"0" unless you know what you're doing.
+\end{describe}
+
+\item[\verb"fdx\_setup":] for full-duplex file-descriptor objects.
+\begin{quote}\index{fdx\_setup}\small\begin{verbatim}
+int     fdx_setup (ps, fd)
+PS      ps;
+int     fd;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"ps":] the presentation stream;
+and,
+
+\item[\verb"fd":] the file-descriptor.
+\end{describe}
+
+\item[\verb"dg\_setup":] for datagram objects.
+\begin{quote}\index{dg\_setup}\small\begin{verbatim}
+int     dg_setup (ps, fd, size, rfx, wfx)
+PS      ps;
+int     fd,
+        size;
+IFP     rfx,
+        wfx;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"ps":] the presentation stream;
+
+\item[\verb"fd":] the file-descriptor;
+
+\item[\verb"size":] the maximum datagram size;
+and,
+
+\item[\verb"rfx"/\verb"wfx":] routines to read and write datagrams.
+\end{describe}
+\end{describe}
+After the setup routine successfully returns
+(by returning the manifest constant \verb"OK"),
+the presentation stream is ready for reading or writing.
+
+\subsection	{Stream I/O}
+Low-level I/O is done from/to the stream by the macros \verb"ps_read" and
+\verb"ps_write",
+which behave as if they were defined as:
+\begin{quote}\index{ps\_read}\index{ps\_write}\small\begin{verbatim}
+int     ps_read (ps, data, cc, inline)
+PS      ps;
+char   *data;
+int     cc,
+        inline;
+
+int     ps_write (ps, data, cc, inline)
+PS      ps;
+char   *data;
+int     cc,
+        inline;
+\end{verbatim}\end{quote}
+The parameters to both of these macros are the same:
+\begin{describe}
+\item[\verb"ps":] the presentation stream;
+
+\item[\verb"data":] the address of a character buffer;
+
+\item[\verb"cc":] the number of characters to read/write from/to the buffer;
+and,
+
+\item[\verb"inline":] a magic argument,
+always use \verb"0" unless you know what you're doing.
+\end{describe}
+These both call an internal routine, \verb"ps_io", which switches to the
+object-specific read or write routine as appropriate.
+The \verb"ps_io" procedure will call the object-specific routines as many
+times as required to read/write the full number of \verb"cc" bytes from/to
+the \verb"data" buffer.
+
+\subsection	{Deleting a Stream}
+The routine \verb"ps_free" is used to close and deallocate a presentation
+stream.
+\begin{quote}\index{ps\_free}\small\begin{verbatim}
+void    ps_free (ps)
+PS      ps;
+\end{verbatim}\end{quote}
+It takes a single parameter,
+a pointer to the presentation stream to be freed.
+This routine first calls the routine specified by the \verb"ps_closeP"
+element in the \verb"PStream" structure (if any).
+It then frees the structure itself.
+
+\subsection	{Implementing Other Abstractions}
+Let us briefly consider the internal protocol and uniform interface used in
+the implementation of presentation streams.
+
+The initialization routine given as an argument to \verb"ps_alloc" typically
+initializes only the
+\begin{quote}\small\begin{verbatim}
+ps_primeP
+ps_readP
+ps_writeP
+ps_flushP
+ps_closeP
+\end{verbatim}\end{quote}
+elements in the \verb"PStream" structure.
+
+The setup routine is entirely dependent on the particular object used to
+realize the I/O abstraction for the presentation stream.
+In most cases, it allocates a structure of its own and sets the
+\verb"ps_addr" element to the address of the structure.
+
+The \verb"ps_readP" and \verb"ps_writeP" elements of the \verb"PStream"
+structure are used by the \verb"ps_io" routine as required for reading and
+writing.
+\begin{quote}\index{ps\_io}\small\begin{verbatim}
+int     ps_io (ps, io, data, cc, inline)
+PS      ps;
+int   (*io) ();
+char   *data;
+int     cc,
+\end{verbatim}\end{quote}
+The parameters to these routines are identical to those for their counterpart
+macros, \verb"ps_read" and \verb"ps_write",
+with one exception:
+\begin{describe}
+\item[\verb"io":] the address of an integer-valued function which does the
+actual reading or writing.
+It is invoked as:
+\begin{quote}\small\begin{verbatim}
+int     n = (*io) (ps, data, len, inline);
+\end{verbatim}\end{quote}
+\end{describe}
+where a return value of \verb"NOTOK" indicates an error occurred
+(the routine should set the \verb"ps_errno" element of the presentation
+stream);
+\verb"OK" indicates that the end-of-file has been read;
+and,
+any other value is the number of bytes actually transferred
+(which should be greater than \verb"0" but not greater than \verb"len").
+
+For some packet-oriented applications,
+it may be desirable to do a single ``read from the network'' before
+reading the components of a presentation element.
+The routine pointed to by the \verb"ps_primeP" element of the \verb"PStream"
+structure is called by \verb"ps2pe" (described momentarily)
+before any parts of the entire presentation element has been read.
+The routine is invoked as:
+\begin{quote}\small\begin{verbatim}
+(*ps -> ps_primeP) (ps, waiting)
+PS      ps;
+int	waiting;
+\end{verbatim}\end{quote}
+The routine should return \verb"NOTOK" if an error occurred
+(setting the \verb"ps_errno" element of the presentation stream in the
+process);
+otherwise,
+if  data is already queued and \verb"waiting" is non-zero,
+then \verb"DONE" is returned.
+otherwise \verb"OK" is returned.
+The routine \verb"ps_prime" may be called to explicitly ``prime the pump''
+associated with a presentation element:
+\begin{quote}\index{ps\_prime}\small\begin{verbatim}
+int     ps_prime (ps)
+PS      ps;
+\end{verbatim}\end{quote}
+This routine returns \verb"OK" on success,
+or \verb"NOTOK" on failure.
+
+In order to improve efficiency,
+it may be desirable to have \verb"ps_writeP" buffer output.
+The routine pointed to by the \verb"ps_flushP" element of the \verb"PStream"
+structure is called by \verb"pe2ps" (described momentarily)
+after the entire presentation element has been written.
+The routine is invoked as:
+\begin{quote}\small\begin{verbatim}
+(*ps -> ps_flushP) (ps)
+PS      ps;
+\end{verbatim}\end{quote}
+The routine should return \verb"NOTOK" if an error occurred
+(setting the \verb"ps_errno" element of the presentation stream in the
+process);
+or \verb"OK" if everything was fine.
+The routine \verb"ps_flush" may be called to explicitly flush any buffers
+associated with a presentation element:
+\begin{quote}\index{ps\_flush}\small\begin{verbatim}
+int     ps_flush (ps)
+PS      ps;
+\end{verbatim}\end{quote}
+This routine returns \verb"OK" on success,
+or \verb"NOTOK" on failure.
+
+Finally,
+the \verb"ps_closeP" element of the \verb"PStream" structure is used by the
+\verb"ps_free" routine to release any resources which the setup routine may
+have allocated.
+For example,
+if the setup routine allocated a structure and set the \verb"ps_addr"
+element of the presentation stream to point to that structure,
+then the function pointed to by the \verb"ps_closeP" element should free that
+structure,
+and, as a matter of good programming practice, set \verb"ps_addr" to
+\verb"NULL".
+
+\section	{Presentation Stream I/O}
+The routine \verb"ps2pe" can be used to read the next presentation element
+from a presentation stream.
+This routine returns a pointer to the presentation element or the manifest
+constant \verb"NULLPE" on error.
+(The typedef \verb"PE" is a pointer to a structure containing a presentation
+element; presentation elements are described more fully later.)
+\begin{quote}\index{ps2pe}\small\begin{verbatim}
+PE      ps2pe (ps)
+PS      ps;
+\end{verbatim}\end{quote}
+Similarly,
+the routine \verb"pe2ps" can be used to write a presentation element at the end
+of the presentation stream,
+returning \verb"OK" if all went well, or \verb"NOTOK" otherwise.
+\begin{quote}\index{pe2ps}\small\begin{verbatim}
+int     pe2ps (ps, pe)
+PS      ps;
+PE      pe;
+\end{verbatim}\end{quote}
+On errors with either routine,
+the \verb"ps_errno" element of the \verb"PStream" structure can be consulted
+to see what happened
+(see Table~\ref{PStreamReasons} on page~\pageref{PStreamReasons}).
+
+When writing to a presentation stream,
+the variable \verb"ps_len_strategy" controls how lengthy data structures
+are represented by determining when the ``indefinite form'' is used to encode
+the length of the data structure.
+\begin{quote}\index{ps\_len\_strategy}\small\begin{verbatim}
+int     ps_len_strategy;
+\end{verbatim}\end{quote}
+If this variable is equal to \verb"PS_LEN_SPAG" (the default),
+then the indefinite form is used whenever the length field of the
+presentation element cannot be represented in one octet.
+If the value instead is \verb"PS_LEN_INDF",
+then the indefinite form is used regardless of the length of the
+presentation element.
+Otherwise,
+if the value is \verb"PS_LEN_LONG",
+then the indefinite form is never used.
+
+The routine \verb"ps_get_abs" can be used to determine the total number of
+octets that will be required to represent the presentation element
+when written to a presentation stream.
+This is useful for buffer management purposes.
+\begin{quote}\index{ps\_get\_abs}\small\begin{verbatim}
+int     ps_get_abs (pe)
+PE      pe;
+\end{verbatim}\end{quote}
+
+\subsection	{Debugging}
+For debugging purposes,
+instead of treating a presentation stream as a binary object,
+the routines \verb"pl2pe" and \verb"pe2pl" can be used.
+\begin{quote}\index{pl2pe}\index{pe2pl}\small\begin{verbatim}
+PE      pl2pe (ps)
+PS      ps;
+
+int     pe2pl (ps, pe)
+PS      ps;
+PE      pe;
+\end{verbatim}\end{quote}
+These translate between presentation {\em lists\/} and presentation elements.
+A presentation list is identical to a presentation stream,
+but instead of using a binary representation,
+a list uses an ASCII text representation
+with a simple LISP-like syntax.
+
+\section	{Presentation Elements}
+A presentation element is an object which is used to represent a
+data structure in a machine-independent form.
+The \verb"PElement" structure contains several elements,
+only the most interesting are described here:
+\begin{describe}
+\item[\verb"pe\_errno":] the latest error to occur on the presentation element
+(codes are listed in Table~\ref{PElementReasons});
+
+\item[\verb"pe\_context":] the presentation context to which the element
+belongs (consult Section~\ref{psap:context} on page~\pageref{psap:context} of
+\voltwo/);
+
+\item[\verb"pe\_class":] the class of this presentation element
+(i.e., one of {\em universal}, {\em application-wide}, {\em context-specific},
+or {\em private\/});
+
+\item[\verb"pe\_form":] the form taken by this presentation element
+(i.e., {\em primitive}, or {\em constructed\/});
+
+\item[\verb"pe\_id":] the class-specific code identifying the type of this
+presentation element;
+
+\item[\verb"pe\_offset":] the offset of this presentation element in a
+sequence;
+and,
+
+\item[\verb"pe\_next":] a pointer to the next presentation element in a
+sequence.
+\end{describe}
+\tagtable[tp]{3-2}{Presentation Element Failure Codes}{PElementReasons}
+As mentioned earlier,
+the typedef \verb"PE" is a pointer to an \verb"PElement" structure.
+With the exception of the \verb"pe_errno" element,
+the elements of the \verb"PElement" structure are largely uninteresting to
+the user of the \man libpsap(3) library.
+The element \verb"pe_errno"
+can be given as a parameter to the routine \verb"pe_error" which returns a
+null-terminated diagnostic string.
+\begin{quote}\index{pe\_error}\small\begin{verbatim}
+char   *pe_error (c)
+int     c;
+\end{verbatim}\end{quote}
+
+Once a presentation stream has been initialized and elements are being read,
+there are several routines which can be used to translate between the
+machine-independent representation of the element and machine-specific
+objects such as integers, strings, and the like.
+It is extremely important that programs use these routines to perform the
+translation between objects.
+They have been carefully coded to present a simple, uniform interface between
+machine-specifics and the machine-independent encoding protocol.
+
+\subsection	{Creating an Element}
+A \verb"PElement" structure is created by calling the procedure
+\verb"pe_alloc".
+\begin{quote}\index{pe\_alloc}\small\begin{verbatim}
+PE      pe_alloc (class, form, id)
+PElementClass class;
+PElementForm form;
+PElementID id;
+\end{verbatim}\end{quote}
+This procedure takes three parameters:
+\begin{describe}
+\item[\verb"class":] the class of this presentation element.
+The codes are:
+
+\begin{tabular}{rp{3.0in}}
+\tt PE\_CLASS\_UNIV&	Universal\\
+\tt PE\_CLASS\_APPL&	Application-wide\\
+\tt PE\_CLASS\_CONT&	Context-specific\\
+\tt PE\_CLASS\_PRIV&	Private-use
+\end{tabular}
+
+\item[\verb"form":] the form of this presentation element
+The codes are:
+
+\begin{tabular}{rp{3.0in}}
+\tt PE\_FORM\_PRIM&	Primitive\\
+\tt PE\_FORM\_CONS&	Constructor
+\end{tabular}
+
+\item[\verb"id":] the class-specific code identifying the type of this
+presentation element
+(codes for the ``universal'' class are listed in Table~\ref{PElementIDs}).
+\end{describe}
+\tagtable[tp]{3-3}{Presentation Element Identifiers}{PElementIDs}
+
+\subsection	{Deleting an Element}
+The routine \verb"pe_free" is used to deallocate a presentation element.
+\begin{quote}\index{pe\_free}\small\begin{verbatim}
+void    pe_free (pe)
+PE      pe;
+\end{verbatim}\end{quote}
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	When using \verb"pe\_free" on a presentation element,
+		care must be taken to remove any references to that
+		presentation element in other structures.
+		For example, if you have a sequence containing a sequence,
+		and you free the child sequence,
+		be sure to zero-out the parent's pointer to the child,
+		otherwise subsequent calls using the parent will go romping
+		through hyperspace.
+		See \verb"pe\_extract" and \verb"pe\_expunge" below.
+\end{tabular}}\]
+
+\subsection	{Primitive Manipulation of Elements}
+Two presentation elements can be compared with \verb"pe_cmp",
+which takes two pointers to \verb"PElement" structures as arguments,
+and returns \verb"0" if the two structures are identical,
+\verb"1" otherwise.
+\begin{quote}\index{pe\_cmp}\small\begin{verbatim}
+int     pe_cmp (p, q)
+PE      p,
+        q;
+\end{verbatim}\end{quote}
+Further, an presentation element can be duplicated with \verb"pe_cpy".
+This routine takes a pointer to an \verb"PElement" structure as an argument,
+and  returns a pointer to a new \verb"PElement" structure,
+or \verb"NULLPE" on error.
+\begin{quote}\index{pe\_cpy}\small\begin{verbatim}
+PE      pe_cpy (pe)
+PE      pe;
+\end{verbatim}\end{quote}
+
+If a presentation element, \verb"pe", has a descendant \verb"r"
+(which appears below \verb"pe" exactly once),
+then \verb"pe_extract" can be used to destroy the relationship between
+the two presentation elements without freeing either element.
+\begin{quote}\index{pe\_extract}\small\begin{verbatim}
+int     pe_extract (pe, r)
+PE      pe,
+        r;
+\end{verbatim}\end{quote}
+This routine returns non-zero if \verb"r" was descended from \verb"pe",
+otherwise it returns zero.
+The \verb"pe_expunge" routine is similar to \verb"pe_extract",
+except that it always deallocates the parent element and returns the child
+element found, if any.
+\begin{quote}\index{pe\_expunge}\small\begin{verbatim}
+PE      pe_expunge (pe, r)
+PE      pe,
+        r;
+\end{verbatim}\end{quote}
+These two routines are provided primarily for efficiency considerations.
+They are extremely fragile.
+Do not use them unless you know what you're doing.
+
+Finally,
+the \verb"pe_pullup" routine can be used to ``pull-up'' a constructor type
+into a primitive.
+\begin{quote}\index{pe\_pullup}\small\begin{verbatim}
+int     pe_pullup (pe)
+PE      pe;
+\end{verbatim}\end{quote}
+This routine returns \verb"OK" on success;
+on failure it turns \verb"NOTOK",
+usually due to a memory allocation failure.
+
+\section	{Presentation Element Transformations}
+We now discuss how machine-specific objects can be encoded in a
+machine-independent fashion and vice-versa.
+Routines of the form \verb"XXX2prim" all return a pointer to a presentation
+element on success,
+or \verb"NULLPE" on failure
+(usually due to a failure in the memory allocator).
+Routines of the form \verb"prim2XXX" all return an \verb"XXX"-valued object
+on success,
+or \verb"NOTOK" or \verb"NULLxxx" on failure
+(depending on the object the routine normally returns).
+On failure,
+the \verb"pe_errno" element of the presentation element can be examined to
+determine the reason for failure.
+
+\subsection	{Boolean}
+A {\em boolean\/} is an integer taking on the values \verb"0" or \verb"1".
+The routine \verb"prim2flag" takes a pointer to an presentation element and
+returns the boolean value encoded therein.
+\begin{quote}\index{prim2flag}\small\begin{verbatim}
+int     prim2flag (pe)
+PE      pe;
+\end{verbatim}\end{quote}
+The routine \verb"bool2prim" is a macro which performs the inverse operation.
+It behaves as if it was defined as:
+\begin{quote}\index{bool2prim}\small\begin{verbatim}
+PE      bool2prim (b)
+int     b;
+\end{verbatim}\end{quote}
+In actuality,
+\verb"bool2prim" calls the routine \verb"flag2prim" which builds a
+presentation element containing the boolean value given and sets the
+\verb"pe_class" and \verb"pe_id" fields of the presentation element to the
+desired values.
+\begin{quote}\index{flag2prim}\small\begin{verbatim}
+PE      flag2prim (b, class, id)
+int     b;
+PElementClass class;
+PElementID id;
+\end{verbatim}\end{quote}
+
+\subsection	{Integer}
+An {\em integer\/} is a signed-quantity, whose precision is specific to a
+particular host.
+The routine \verb"prim2num" takes a pointer to a presentation element and
+returns the integer value
+encoded therein (if the value is \verb"NOTOK", check the \verb"pe_errno"
+element of the \verb"PElement" structure to see if there really was an error).
+\begin{quote}\index{prim2num}\small\begin{verbatim}
+int     prim2num (pe)
+PE      pe;
+\end{verbatim}\end{quote}
+The routine \verb"int2prim" is a macro which performs the inverse operation.
+It behaves as if it was defined as:
+\begin{quote}\index{int2prim}\small\begin{verbatim}
+PE      int2prim (i)
+int     i;
+\end{verbatim}\end{quote}
+In actuality,
+\verb"int2prim" calls the routine \verb"num2prim" which builds a presentation
+element containing the numeric value given and sets the \verb"pe_class" and
+\verb"pe_id" fields of the presentation element to the desired values.
+\begin{quote}\index{num2prim}\small\begin{verbatim}
+PE      num2prim (i, class, id)
+int     i;
+PElementClass class;
+PElementID id;
+\end{verbatim}\end{quote}
+
+\subsection	{Octetstring}
+An {\em octetstring\/} is a pair of values:
+a character pointer and an integer length.
+The pointer addresses the first octet in the string
+(which need not be null-terminated),
+the length indicates how many octets are in the string.
+The routine \verb"prim2str" takes a pointer to a presentation element and
+allocates a new string (using the \man malloc(3) routine)
+containing the value encoded therein.
+\begin{quote}\index{prim2str}\small\begin{verbatim}
+char   *prim2str (pe, len)
+PE      pe;
+int    *len;
+\end{verbatim}\end{quote}
+The routine \verb"oct2prim" is a macro which performs the inverse operation,
+copying the original string (and not de-allocating it).
+It behaves as if it was defined as:
+\begin{quote}\index{oct2prim}\small\begin{verbatim}
+PE      oct2prim (s, len)
+char   *s;
+int     len;
+\end{verbatim}\end{quote}
+In actuality,
+\verb"oct2prim" calls the routine \verb"str2prim" which builds a presentation
+element containing the string value given and sets the \verb"pe_class" and
+\verb"pe_id" fields of the presentation element to the desired values.
+\begin{quote}\index{str2prim}\small\begin{verbatim}
+PE      str2prim (s, len, class, id)
+char   *s;
+int     len;
+PElementClass class;
+PElementID id;
+\end{verbatim}\end{quote}
+
+In addition to \verb"oct2prim",
+there are several macros which manipulate octetstrings,
+setting the class and id of the presentation element to the
+appropriate value:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Macro}&
+		\multicolumn{1}{c|}{\bf String}\\
+\hline
+    \tt ia5s2prim&	IA5 string\\
+    \tt nums2prim&	Numeric string\\
+    \tt prts2prim&	Printable string\\
+    \tt t61s2prim&	T.61 string\\
+    \tt vtxs2prim&	Videotex string\\
+    \tt gfxs2prim&	Graphics string\\
+    \tt viss2prim&	Visible string\\
+    \tt gens2prim&	General string\\
+    \tt chrs2prim&	Character string\\
+    \tt ode2prim&	Object descriptor\\
+\hline
+\end{tabular}\]
+Each of these macros are defined in a similar manner to the \verb"oct2prim"
+macro.\index{ia5s2prim}\index{nums2prim}\index{prts2prim}\index{t61s2prim}
+\index{vtxs2prim}\index{gfxs2prim}\index{viss2prim}\index{gens2prim}	
+\index{ode2prim}
+
+\subsection	{Octetstrings revisited}\label{psap:qbuf}
+For efficiency reasons,
+it is often desirable to represent an octetstring using a \verb"qbuf"
+structure.
+Although the format of a \verb"qbuf" is described in Section~\ref{tsap:qbuf}
+on page~\pageref{tsap:qbuf} of \voltwo/,
+the \man libpsap(3) library provides several routines for ease of
+manipulation.
+
+The routine \verb"qb2prim" takes a linked-list of \verb"qbuf"s and builds a
+presentation element with the \verb"pe_class" and \verb"pe_id" fields of the
+presentation element set to the desired values:
+\begin{quote}\index{qb2prim}\small\begin{verbatim}
+PE      qb2prim (qb, class, id)
+struct qbuf *qb;
+PElementClass class;
+PElementID id;
+\end{verbatim}\end{quote}
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	The presentation element returned by \verb"qb2prim" contains
+		pointers into the linked-list of \verb"qbuf"s.
+		Therefore care must be taken not to delete any of the
+		\verb"qbuf"s in the linked-list prior to the final use of the
+		presentation element.  Note however, than the presentation
+		element may be de-allocated at anytime without affecting
+		the \verb"qbuf"s in the linked-list.
+\end{tabular}}\]
+
+
+The routine \verb"prim2qb" performs the inverse operation:
+\begin{quote}\index{prim2qb}\small\begin{verbatim}
+struct qbuf *prim2qb (pe)
+PE      pe;
+\end{verbatim}\end{quote}
+
+When examining the contents of a \verb"qbuf",
+it is most efficient to examine each \verb"qbuf" in the linked list,
+as in:
+\begin{quote}\small\begin{verbatim}
+register struct qbuf *qp;
+
+for (qp = qb -> qb_forw; qp != qb; qp = qp -> qb_forw)
+    /* examine qp -> qb_data, qp -> qb_len here */ ;
+\end{verbatim}\end{quote}
+However,
+some applications may wish to simply convert the \verb"qbuf" into one string
+and examine it without worrying about traversing the linked list.
+The routine \verb"qb2str" performs this function:
+\begin{quote}\index{qb2str}\small\begin{verbatim}
+char   *qb2str (qb)
+struct qbuf *qb;
+\end{verbatim}\end{quote}
+The routine \verb"str2qb" performs the inverse operation,
+converting a string to a \verb"qbuf".
+\begin{quote}\index{str2qb}\small\begin{verbatim}
+struct qbuf *str2qb (s, len, head)
+char   *s;
+int     len,
+	head;
+\end{verbatim}\end{quote}
+The \verb"head" parameter indicates whether \verb"str2qb" should allocate a
+\verb"qbuf" containing both the head of the linked list and one element
+(\verb"head" is non-zero),
+or just the element itself (\verb"head" is zero).
+
+The routine \verb"qb_pullup" can be used to compact a linked list of
+\verb"qbuf"s into a list containing the \verb"qbuf" head and one element:
+\begin{quote}\index{qb\_pullup}\small\begin{verbatim}
+int     qb_pullup (qb)
+struct qbuf *qb;
+\end{verbatim}\end{quote}
+This routine returns the manifest constant \verb"NOTOK" on failure,
+and \verb"OK" otherwise.
+
+The routine \verb"qbuf2pe" is used to set-up a presentation stream which reads
+from a linked list of \verb"qbuf"s and returns the presentation element
+encoded therein:
+\begin{quote}\index{qbuf2pe}\small\begin{verbatim}
+PE      qbuf2pe (qb, len, result)
+struct qbuf *qb;
+int     len,
+       *result;
+\end{verbatim}\end{quote}
+This routine returns a presentation element on success,
+and \verb"NULLPE" on failure.
+In the latter case, the parameter \verb"result" is updated to reflect the
+presentation stream error.
+
+Finally,
+the routine \verb"qb_free" will deallocate a linked list of \verb"qbuf"s:
+\begin{quote}\index{qb\_free}\small\begin{verbatim}
+void    qb_free (qb)
+\end{verbatim}\end{quote}
+
+\subsection	{Bitvector}\label{psap:bits}
+A {\em bitvector\/} is an arbitrarily long string of bits
+(starting with bit \verb"0") with three operations:
+\begin{describe}
+\item[\verb"bit\_on":] which turns the indicated bit on;
+\begin{quote}\index{bit\_on}\small\begin{verbatim}
+int     bit_on (pe, bitno)
+PE      pe;
+int     bitno;
+\end{verbatim}\end{quote}
+
+\item[\verb"bit\_off":] which turns the indicated bit off;
+\begin{quote}\index{bit\_off}\small\begin{verbatim}
+int     bit_off (pe, bitno)
+PE      pe;
+int     bitno;
+\end{verbatim}\end{quote}
+and,
+
+\item[\verb"bit\_test":] which returns a boolean value telling if the indicated
+bit was on.
+\begin{quote}\index{bit\_test}\small\begin{verbatim}
+int     bit_test (pe, bitno)
+PE      pe;
+int     bitno;
+\end{verbatim}\end{quote}
+\end{describe}
+The routine \verb"prim2bit" takes a pointer to a presentation element and
+builds such an abstraction containing the value encoded therein.
+\begin{quote}\index{prim2bit}\small\begin{verbatim}
+PE      prim2bit (pe)
+PE      pe;
+\end{verbatim}\end{quote}
+The routine \verb"bit2prim" performs the inverse operation.
+\begin{quote}\index{bit2prim}\small\begin{verbatim}
+PE      bit2prim (pe)
+PE      pe;
+\end{verbatim}\end{quote}
+
+There are also some support routines useful mainly with \pgm{pepy}.
+The routine \verb"strb2bitstr" takes a pointer to a character
+string and an integer containing the number of bits and constructs
+a bit vector as described above containing the bits.
+You need to call \verb"bit2prim" to convert it into a presentation element.
+\begin{quote}\index{strb2bitstr}\small\begin{verbatim}
+PE      strb2bitstr (cp, length, class, id)
+char   *cp;
+int     length;
+PElementClass class;
+PElementID id;
+\end{verbatim}\end{quote}
+The inverse operation is handled by the function \verb"bitstr2strb".
+This takes bit vector containing a bit string and produces
+a new character string with the appropriate bits set. The second
+parameter will contain the number of valid bits on return.
+\begin{quote}\index{bitstr2strb}\small\begin{verbatim}
+char   *bitstr2strb (pe, length)
+PE      pe;
+int    *length;
+\end{verbatim}\end{quote}
+Finally, the routines \verb"int2strb" and \verb"strb2int" are provided to
+convert an integer containing a bit list into a string of bits suitable for
+input to \verb"strb2bitstr", and to perform the inverse operation
+\begin{quote}\index{int2strb}\small\begin{verbatim}
+char   *int2strb (n, length)
+int     n;
+int     length;
+
+int     strb2int (cp, length)
+char   *cp;
+int     length;
+\end{verbatim}\end{quote}
+
+\subsection	{Object Identifier}\label{psap:oid}
+An {\em object identifier\/} represents an ordered set of authoritative
+designations used for identification.
+Internally,
+the \verb"OIDentifier" is used to represent this notion:
+\begin{quote}\index{OIDentifier}\small\begin{verbatim}
+typedef struct OIDentifier {
+    int     oid_nelem;
+
+    unsigned int *oid_elements;
+}       OIDentifier, *OID;
+#define NULLOID ((OID) 0)
+\end{verbatim}\end{quote}
+This structure contains two elements:
+\begin{describe}
+\item[\verb"oid\_elements"/\verb"oid\_nelem":] the (ordered) list of
+sub-identifiers (and the number of elements in the list).
+\end{describe}
+
+Two object identifiers can be compared with \verb"oid_cmp",
+which takes two pointers to \verb"OIDentifier" structures as arguments,
+and returns \verb"0" if the two structures are identical,
+\verb"1" otherwise.
+\begin{quote}\index{oid\_cmp}\small\begin{verbatim}
+int     oid_cmp (p, q)
+OID     p,
+        q;
+\end{verbatim}\end{quote}
+Further, an object identifier can be duplicated with \verb"oid_cpy".
+This routine takes a pointer to an \verb"OIDentifier" structure as an argument,
+and  returns a pointer to a new \verb"OIDentifier" structure,
+or \verb"NULLOID" on error.
+\begin{quote}\index{oid\_cpy}\small\begin{verbatim}
+OID     oid_cpy (oid)
+OID     oid;
+\end{verbatim}\end{quote}
+Simlarly, the routine \verb"oid_free" can be used to free an object
+identifier which has been allocated.
+\begin{quote}\index{oid\_free}\small\begin{verbatim}
+void    oid_free (oid)
+OID     oid;
+\end{verbatim}\end{quote}
+The routine \verb"sprintoid" can be used to return a null-terminated
+string describing the object identifier.
+\begin{quote}\index{sprintoid}\small\begin{verbatim}
+char   *sprintoid (oid)
+OID     oid;
+\end{verbatim}\end{quote}
+The default routine \verb"oid2ode"\index{oid2ode} is identical to the
+\verb"sprintoid",
+but is intended for user customization.
+For example,
+whilst \verb"sprintoid" should always be used when an object identifier should
+be expressed in ``dot notation'',
+the user may define a new \verb"oid2ode" which returns symbolic names,
+if so desired.
+
+The routine \verb"str2oid" can be used as the inverse of \verb"sprintoid":
+\begin{quote}\index{str2oid}\small\begin{verbatim}
+OID     str2oid (s)
+char   *s;
+\end{verbatim}\end{quote}
+Finally,
+the routine \verb"ode2oid" can be used to fetch an object identifier from the
+\man isobjects(5) database described in Chapter~\ref{isobjects}.
+\begin{quote}\index{oid\_free}\small\begin{verbatim}
+OID     ode2oid (descriptor)
+char   *descriptor;
+\end{verbatim}\end{quote}
+This routine performs a lookup using the \verb"getisobjectbyname" routine
+and then returns a pointer to a static \verb"OIDentifier" structure
+containing the desired information.
+The routine returns \verb"NULLOID" on failure.
+
+The routines \verb"prim2oid" and \verb"oid2prim" are used to translate
+between a machine-specific internal form and the machine-independent form.
+\begin{quote}\index{prim2oid}\index{oid2prim}\small\begin{verbatim}
+OID     prim2oid (pe)
+PE      pe;
+
+PE      oid2prim (o)
+OID     o;
+\end{verbatim}\end{quote}
+In actuality,
+\verb"oid2prim" is really a macro which calls the routine \verb"obj2prim"
+which builds a presentation element containing the object identifier given
+and sets the \verb"pe_class" an \verb"pe_id" fields of the presentation element
+to the desired values.
+\begin{quote}\index{obj2prim}\small\begin{verbatim}
+PE      obj2prim (o, class, id)
+OID     o;
+PElementClass class;
+PElementID id;
+\end{verbatim}\end{quote}
+
+\subsection	{Timestring}
+A {\em timestring\/} represents a date/time in many forms.
+Currently, two forms are supported: {\em universal time\/} and
+{\em generalized time}.
+Internally,
+the \verb"UTCtime" structure is used to represent both notions:
+\begin{quote}\index{UTCtime}\small\begin{verbatim}
+typedef struct UTCtime {
+    int     ut_year;
+    int     ut_mon;
+    int     ut_mday;
+    int     ut_hour;
+    int     ut_min;
+    int     ut_sec;
+
+    int     ut_msec;
+
+    int     ut_zone;
+
+    int     ut_flags;
+}       UTCtime, *UTC;
+#define NULLUTC ((UTC) 0)
+\end{verbatim}\end{quote}
+This structure contains several elements:
+\begin{describe}
+\item[\verb"ut\_year":] the year,
+either since the current century (e.g., \verb"86"),
+or absolute (e.g., \verb"1986");
+
+\item[\verb"ut\_mon":] the month of the year, in the range \verb"1..12";
+
+\item[\verb"ut\_mday":] the day of the month, in the range \verb"1..31";
+
+\item[\verb"ut\_hour":] the hour of the day, in the range \verb"0..23";
+
+\item[\verb"ut\_min":] the minute of the hour, in the range \verb"0..59";
+
+\item[\verb"ut\_sec":] (optionally) the second of the minute,
+in the range \verb"0..59";
+
+\item[\verb"ut\_usec":] (optionally) fractions of a second, in microseconds;
+
+\item[\verb"ut\_zone":] (optionally) the timezone, expressed as minutes from
+UT; and,
+
+\item[\verb"ut\_flags":] various flags describing the timestring:
+    \begin{describe}
+    \item[\verb"UT\_ZONE":] the \verb"ut_zone" element is present; 
+
+    \item[\verb"UT\_SEC":] the \verb"ut_sec" element is present; and,
+
+    \item[\verb"UT\_USEC":] the \verb"ut_usec" element is present.
+    \end{describe}
+\end{describe}
+
+The routine \verb"prim2utct" takes a pointer to a presentation element and
+returns the universal time encoded therein.
+\begin{quote}\index{prim2utct}\small\begin{verbatim}
+UTC     prim2utct (pe)
+PE      pe;
+\end{verbatim}
+\end{quote}
+The routine \verb"utct2prim" is a macro which performs the inverse operatoin.
+It behaves as if it was defined as:
+\begin{quote}\index{utct2prim}\small\begin{verbatim}
+PE      utct2prim (u)
+UTC     u;
+\end{verbatim}\end{quote}
+
+The routine \verb"prim2gent" takes a pointer to a presentation element and
+returns the universal time encoded therein.
+\begin{quote}\index{prim2gent}\small\begin{verbatim}
+UTC     prim2gent (pe)
+PE      pe;
+\end{verbatim}
+\end{quote}
+The routine \verb"gent2prim" is a macro which performs the inverse operatoin.
+It behaves as if it was defined as:
+\begin{quote}\index{gent2prim}\small\begin{verbatim}
+PE      gent2prim (u)
+UTC     u;
+\end{verbatim}\end{quote}
+
+In actuality,
+both \verb"utct2prim" and \verb"gent2prim" call the routine \verb"time2prim"
+which builds a
+presentation element containing the universal or general time given and sets
+the \verb"pe_class" an \verb"pe_id" fields of the presentation element to the
+desired values.
+\begin{quote}\index{time2prim}\small\begin{verbatim}
+PE      time2prim (ut, generalized, class, id)
+UTC     u;
+int	generalized;
+PElementClass class;
+PElementID id;
+\end{verbatim}\end{quote}
+
+To get a null-terminated string representation of a \verb"UTCtime" structure,
+the macros \verb"utct2str" and \verb"gent2str" can be
+used.\index{utct2str}\index{gent2str}
+Each take a single argument, a pointer to a \verb"UTCtime" structure.
+These call the routine \verb"time2str":
+\begin{quote}\index{time2str}\small\begin{verbatim}
+char   *time2str (ut, generalized)
+UTC     u;
+int     generalized;
+\end{verbatim}\end{quote}
+Both call the routine \verb"prim2time":
+\begin{quote}\index{prim2time}\small\begin{verbatim}
+UTC     prim2time (pe, generalized)
+PE      pe;
+int     generalized;
+\end{verbatim}\end{quote}
+
+The routines \verb"str2utct" and \verb"str2gent" perform the inverse
+operations:
+\begin{quote}\index{str2utct}\index{str2gent}\small\begin{verbatim}
+UTC     str2utct (cp, len)
+char   *cp;
+int     len;
+
+UTC     str2gent (cp, len)
+char   *cp;
+int     len;
+\end{verbatim}\end{quote}
+Each take a character-pointer and a length-indicator as arguments and return a
+\verb"UTCtime" structure on success.
+Otherwise, the manifest constant \verb"NULLUTC" is returned.
+
+There are also some utility routines to aid in converting between
+\verb"UTCtime" and \unix/ \verb"tm" time structures.
+The routine \verb"gtime" is the inverse of \man gmtime(3),
+it takes a time structure and returns a long-valued number.
+\begin{quote}\index{gtime}\small\begin{verbatim}
+long    gtime (tm)
+struct tm *tm;
+\end{verbatim}\end{quote}
+The routine \verb"ut2tm" returns a pointer to a static time structure
+which has been initialized by its \verb"UTC" argument.
+\begin{quote}\index{ut2tm}\small\begin{verbatim}
+struct tm *ut2tm (ut)
+UTC     ut;
+\end{verbatim}\end{quote}
+Finally, the routine \verb"tm2ut" performs the inverse operation,
+initializing a \verb"UTC" argument by using a time structure argument.
+\begin{quote}\index{tm2ut}\small\begin{verbatim}
+void     tm2ut (tm, ut)
+struct tm *tm;
+UTC     ut;
+\end{verbatim}\end{quote}
+
+\subsection	{Sets and Sequences}
+Two list disciplines are implemented:
+{\em sets}, in which each member is distinguished by a unique identifier;
+and,
+{\em sequences}, in which each element is distinguished by its offset from
+the head of the list. It should be noted that these definitions of
+sets and sequences do not exactly match those defined in ASN.1. In
+particular, the ASN.1 structure \verb*"SET OF" must be defined as a
+type \verb"SET", but be built up with the \verb"seq_add" construct,
+as these elements all have the same type.
+On both types of lists,
+the macro \verb"first_member" returns the first member in the list,
+while \verb"next_member" returns the next member.
+These macros behave as if they were defined as:
+\begin{quote}\index{first\_member}\index{next\_member}\small\begin{verbatim}
+PE      first_member (head)
+PE      head;
+
+PE      next_member (head, member)
+PE      head,
+        member;
+\end{verbatim}\end{quote}
+There are three operations on sets:
+\begin{describe}
+\item[\verb"set\_add":] adds a new member to the set;
+\begin{quote}\index{set\_add}\small\begin{verbatim}
+int     set_add (pe, r)
+PE      pe,
+        r;
+\end{verbatim}\end{quote}
+The routine \verb"set_addon" is an efficient version of \verb"set_add" that
+is used when adding several consecutive members to a set.\index{set\_addon}
+
+\item[\verb"set\_del":] removes the identified member from the
+set;
+\begin{quote}\index{set\_del}\small\begin{verbatim}
+int     set_del (pe, class, id)
+PE      pe;
+PElementClass class;
+PElementID id;
+\end{verbatim}\end{quote}
+and,
+
+\item[\verb"set\_find":] locates the identified member.
+\begin{quote}\index{set\_find}\small\begin{verbatim}
+PE      set_find (pe, class, id)
+PE      pe;
+PElementClass class;
+PElementID id;
+\end{verbatim}\end{quote}
+\end{describe}
+The routines \verb"prim2set" and \verb"set2prim" are used to translate between
+presentation elements and sets.
+\begin{quote}\index{prim2set}\index{set2prim}\small\begin{verbatim}
+PE      prim2set (pe)
+PE      pe;
+
+PE      set2prim (pe)
+PE      pe;
+\end{verbatim}\end{quote}
+In Figure~\ref{stepTHRUset},
+a convenient way of stepping through all the members of a set is presented.
+\tagrind[tp]{grind3-1}{Stepping through a Sequence}{stepTHRUset}
+
+There are three operations on sequences:
+\begin{describe}
+\item[\verb"seq\_add":] adds a new member \verb"r" to the sequence
+\verb"pe", at the given offset, an offset of \verb"-1" will add the
+element to the end of the sequence;
+\begin{quote}\index{seq\_add}\small\begin{verbatim}
+int     seq_add (pe, r, offset)
+PE      pe,
+        r;
+int     offset;
+\end{verbatim}\end{quote}
+The routine \verb"seq_addon" is an efficient version of \verb"seq_add" that
+is used when adding several consecutive elements to a set.\index{seq\_addon}
+
+\item[\verb"seq\_del":] removes the identified member from the
+sequence;
+\begin{quote}\index{seq\_del}\small\begin{verbatim}
+int     seq_del (pe, offset)
+PE      pe;
+int     offset;
+\end{verbatim}\end{quote}
+and,
+
+\item[\verb"seq\_find":] locates the identified element.
+\begin{quote}\index{seq\_find}\small\begin{verbatim}
+PE      seq_find (pe, offset)
+PE      pe;
+int     offset;
+\end{verbatim}\end{quote}
+\end{describe}
+The routines \verb"prim2seq" and \verb"seq2prim" are used to translate between
+presentation elements and sequences.
+\begin{quote}\index{prim2seq}\index{prim2seq}\small\begin{verbatim}
+PE      prim2seq (pe)
+PE      pe;
+
+PE      seq2prim (pe)
+PE      pe;
+\end{verbatim}\end{quote}
+In Figure~\ref{stepTHRUsequence},
+a convenient way of stepping through all the members of a sequence is
+presented.
+\tagrind[tp]{grind3-2}{Stepping through a Set}{stepTHRUsequence}
+
+\section	{Inline CONStructors}
+Please read the following important message.
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	The facilities described in this section are to be used only
+		as a last resort.
+		They are provided for compatibility with less-rich systems.
+\end{tabular}}\]
+
+When interfacing external software on top of various libraries,
+such as \man librosap(3n),
+the Remote Operations library,
+arguments which are expected to be \verb"PElement"s may be available instead
+as the raw encoded octets.
+It is inefficent to convert this into a \verb"PElement",
+pass the structure to the library,
+which then just encodes it again.
+To avoid this behavior,
+the routine, \verb"str2pe", may be used:
+\begin{quote}\index{str2pe}\small\begin{verbatim}
+PE      str2pe (s, len, advance, result)
+char   *s;
+int     len,
+       *advance,
+       *result;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"s"/\verb"len":] the encoded string (and its length);
+
+\item[\verb"advance":] a pointer to an integer-valued location indicating
+how far to advance the string to find the next ASN.1 object
+(use the manifest constant \verb"NULLIP" if you aren't interested in this),
+and,
+
+\item[\verb"result":] a pointer to an integer-valued location which indicates,
+if the call fails, the reason for the failure.
+\end{describe}
+On success,
+\verb"str2pe" returns a \verb"PElement" called an {\em Inline CONStructor}.
+This is a special kind of \verb"PElement" which really just contains a pointer
+to the original string.
+The underyling libraries now how to manipulate Inline CONStructors
+appropriately,
+e.g., when building an SSDU.
+On failure,
+\verb"str2pe" returns the manifest constant \verb"NULLPE" and the
+\verb"result" parameter contains an error code listed in Table
+Table~\ref{PStreamReasons} on page~\pageref{PStreamReasons}.
+
+For the inverse operation,
+the appropriate library must be informed that the ASN.1 objects associated
+with incoming indications should be returned in Inline CONStructor form.
+This mechanism is still being refined,
+and is not currently documented.
+
+However, the routine used by the libraries in order to unwrap an encoded
+string is available:
+\begin{quote}\index{qb2pe}\small\begin{verbatim}
+PE      qb2pe (qb, len, depth, result)
+struct qbuf *qb
+int     len,
+        depth,
+       *result;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"qb"/\verb"len":] a doubly-linked list of \verb"qbuf"s containing,
+e.g., an SSDU, and the total length of the data in the \verb"qbuf"s;
+
+\item[\verb"depth":] the level of unwrapping to permit;
+and,
+
+\item[\verb"result":] a pointer to an integer-valued location which indicates,
+if the call fails, the reason for the failure.
+\end{describe}
+On success,
+\verb"qb2pe" returns a \verb"PElement" which may ultimately contain
+Inline CONStructors.
+On failure,
+\verb"qb2pe" returns the manifest constant \verb"NULLPE" and the
+\verb"result" parameter contains an error code listed in Table
+Table~\ref{PStreamReasons}.
+
+\section	{Compiling and Loading}
+Programs which manipulate presentation streams or presentation elements
+should include the header file \verb"<isode/psap.h>".
+These programs should also be loaded with \verb"-lpsap" which contains the
+routines described in this chapter.
+
+\section	{An Example}
+Let's consider how one might read a presentation stream 
+from the standard input.
+The process is simple:
+we create a new presentation stream and then start the loop which reads
+from the stream until it is exhausted.
+This is shown in Figure~\ref{stepTHRUpstream}.
+In our example,
+we assume that the routine \verb"error" results in the process being
+terminated after printing a diagnostic.
+\tagrind[tp]{grind3-3}{Stepping through a Presentation Stream}{stepTHRUpstream}
+
+\section	{For Further Reading}
+The language for the Abstract Syntax Notation One (ASN.1) is specified in
+\cite{ISO.PP.Syntax} and \cite{CCITT.PP.Syntax},
+while the encoding rules are defined in \cite{ISO.PP.Encoding} and
+\cite{CCITT.PP.Syntax}.
+The older {\oldstyle 1984} CCITT recommendations,
+containing both definitions,
+is \cite{MHS.notation},
+which is often referred to as X.409.
+The ASN.1 is a superset of the X.409.
+
+%%% \section	{Changes Since the Last Release}\label{psap:changes}
+%%% A brief summary of the major changes between v~\isodeprevrsn/ and
+%%% v~\isodevrsn/ are now presented.
+%%% These are the user-visible changes only;
+%%% changes of a strictly internal nature are not discussed.
+

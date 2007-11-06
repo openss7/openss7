@@ -1,0 +1,199 @@
+\chapter {Overview}
+
+\section {Introduction}
+
+QUIPU is a Public Domain implementation of the OSI Directory as 
+specified in CCITT X.500 Recommendations /
+ISO DIS 9594 for Directory Services \cite{ISO.Directory}
+\cite{CCITT.Directory}.
+It is intended to provide an environment for experimentation and for early
+pilots using Standardised Directory Services.  QUIPU is currently aligned to
+the CCITT X.500 Recommendations (unofficial version).  This is expected to
+be technically identical to the ISO IS.  The latest available ISO version is
+the DIS.  
+
+This document describes the design of QUIPU 5.0, and looks at some
+extensions which are planned for QUIPU 6.0. 
+The reader who is only interested in the first aspect, should be careful to
+note those aspects (clearly marked) which are not yet implemented.
+This document is intended to complement
+the ISODE Manual \cite{QUIPU.Manual}, which describes how to operate QUIPU, and how
+to interface applications to it.  
+Familiarity with the OSI
+Directory specifications is assumed \cite{CCITT.Directory}.
+
+
+QUIPU fully implements both of the OSI Directory Protocols, and a number of
+extensions.
+The highlights of the QUIPU Directory Service
+Implementation are:
+
+\begin {itemize}
+\item
+Use of memory structures to provide fast access, without use of
+complex keying techniques.
+\item
+Activity scheduling within the DSA to allow for multiple accesses.
+\item
+General and flexible searching capabilities.
+\item
+A mechanism to provide non-local access control.
+\item
+A mechanism to provide external schema management.
+\item
+A sophisticated approach for management of distributed operations and
+replication.
+\end {itemize}
+
+The current implementation provides a DSA, and a procedural interface to the
+Directory Abstract Service and the associated Directory Access Protocol
+(DAP), which will enable other applications to use the Directory.
+
+\section {General Aims}
+
+To understand the rationale behind some of the decisions, it is
+useful to consider the original aims of the QUIPU project.
+These
+can then be mapped onto a number
+of more technical considerations:
+
+\begin {itemize}
+\item To produce an implementation which followed the
+emerging standards.  This is an aim in itself.
+
+\item Flexibility, to enable the system to be used
+for experimentation and research into problems relating to directory
+services.
+
+\item To provide a vehicle for experimentation in the area of
+distribution and replication.
+
+\item To provide some level of real usage.
+This sort of work is useless if entirely confined to the laboratory.
+It is important that it is capable of use for some level of experimental
+service.  However, it is not consciously designed to evolve into a full
+fledged product.
+\end {itemize}
+
+As the work has evolved, the following goals have emerged as
+additional to the original ones listed above:
+
+\begin {itemize}
+\item To provide a public domain the OSI Directory implementation as a part of
+the ISODE package.
+
+\item To provide integrated support for the ISODE Applications.
+
+\item To be used as a part of the initial pilot Directory Service in
+the UK Academic Community and in other pilots.
+\end {itemize}
+
+
+\section {Technical Goals}
+
+The major goals of the QUIPU Directory Service are:
+
+\begin {itemize}
+\item Full support of the Directory Access Protocol and Directory System
+Protocols \cite{CCITT.Directory}.
+\item
+Support of the majority of the service elements specified in the OSI Directory.
+\item
+Full interworking with other OSI Directory implementations.
+\item
+Very full searching and matching capabilities, beyond the minimum
+required by the OSI Directory.
+\item
+Provision of a system which has potential for very high distribution.
+
+\item Support of distributed operations in a manner which is full
+conformant with respect to non-QUIPU systems, and provides additional
+functionality for QUIPU systems.
+
+\end {itemize}
+
+The following areas were not intended as goals in the initial system.
+Some discussion is given as to how these areas might be tackled in
+future versions.
+
+\begin {itemize}
+\item
+The QUIPU Directory is not intended for very large scale
+systems (i.e., Millions and tens of Millions of entries per DSA or hundreds
+of megabytes of data per DSA).
+
+\item
+Substantial data robustness is not required: there is no need to employ
+complex data backup techniques, such as replicated hardware.
+\item
+The security aspects of the OSI Directory were initially omitted, as not
+required by the general aims.   
+At this point, there is no reason why this aspect should not be
+integrated.
+
+\end {itemize}
+
+\section {Further QUIPU documents}
+
+
+The following documents are available:
+
+\begin {itemize}
+\item This document, which describes the design of QUIPU \cite{QUIPU.Design}.
+
+\item The QUIPU Manual, which describes how to use QUIPU \cite{QUIPU.Manual}.
+
+\item A paper on the original design, which is mainly of historical interest
+\cite{ECW87.INCA}.
+
+\item A paper presented at the 1988 IFIP 6.5 conference, which gives a
+general overview \cite{QUIPU.IFIP}.
+
+\item A paper presented at Esprit Conference Week 1988, which describes the
+distributed operations \cite{QUIPU.Distributed}.
+\end {itemize}
+
+All of these papers, except the third, are distributed online with QUIPU.
+
+\section {Acknowledgements}
+
+QUIPU was developed in the Department of Computer Science at University
+College London, under the {\ae}gis of the INCA (Integrated Network
+Communication Architecture) project, which was project~395 
+of Esprit  (European Strategic Programme for Research into
+Information Technology). 
+The partners of INCA  (GEC plc, Olivetti,
+Nixdorf AG, and Modcomp GmbH) are acknowledged for releasing the first
+version of this
+software into the Public Domain.
+
+Continued funding of QUIPU as Openly Available Software is provided by the
+Joint Network Team.
+
+Colin Robbins, Alan Turland, Alastair Hickling, Marshall Rose, Stella Page,
+and Mike Roe have all made useful comments on this document.   
+
+QUIPU 5.0 was implemented
+primarily by Colin Robbins and Alan Turland.  Additional acknowledgements
+for implementation efforts 
+are given in the manual \cite{QUIPU.Manual}.
+
+\section {Pronouncing QUIPU}
+
+It is clearly important to distinguish QUIPU verbally as well as in writing.
+The official pronunciation of QUIPU is {\em kwip --- ooo}.
+
+\section {Why QUIPU}
+
+QUIPU was originally developed as a part of the INCA project.
+The Inca of Peru did not have writing.  Instead, they stored information on
+strings, carefully knotted in a specific manner and with coloured thread, and
+attached to a larger rope.
+These devices were known as ``Quipus''.
+The encoding was obscure, and could only be read by selected trained people:
+the Quipucamayocs.
+The Quipu was a key component of Inca society, as it contained information
+about property and locations throughout the extensive Inca empire.
+
+
+

@@ -1,0 +1,363 @@
+\begin{theindex}\makeatletter
+\raggedright
+\def\newindex#1{{\huge\hspace{-.5in}\parbox[t]{.5in}{\makebox[.35in][c]{\uppercase{#1}}}\vspace{-1.5ex}}}
+\newindex{a}
+\item AcABORTser, 42
+\item ACAFREE, 28
+\item AcAssocRequest, 31
+\item AcAssocResponse, 28
+\item AcAsynAssocRequest, 34
+\item AcAsynRetryRequest, 35
+\item ACCFREE, 34
+\item AcErrString, 49
+\item ACFFREE, 42
+\item AcFindPCI, 26
+\item AcFINISHser, 41
+\item AcInit, 25
+\item AcRelRequest, 36
+\item AcRelResponse, 39
+\item AcRelRetryRequest, 38
+\item ACRFREE, 38
+\item AcSAPabort, 27
+\item AcSAPconnect, 33
+\item AcSAPfinish, 41
+\item AcSAPindication, 27
+\item AcSAPrelease, 37
+\item AcSAPstart, 25
+\item ACS\_FATAL, 50
+\item ACSFREE, 27
+\item ACS\_OFFICIAL, 50
+\item AcUAbortRequest, 40
+\item add\_alias, 152
+\item aei2addr, 20
+\item AEInfo, 18
+\item aetbuild, 10
+\item alias2name, 151
+\item Aziz, Ashar, xix
+\indexspace
+\newindex{b}
+\item Betzler, Uli, xx
+\item bit2prim, 134
+\item bit\_off, 133
+\item bit\_on, 133
+\item bitstr2strb, 134
+\item bit\_test, 133
+\item bool2prim, 129
+\item Braun, Hans-Werner, xviii
+\item Brezak, John, xix
+\indexspace
+\newindex{c}
+\item Cass, Dwight E., xvi
+\item Chirieleison, Don, xix
+\item Cowin, Godfrey, xvii
+\indexspace
+\newindex{d}
+\item dg\_open, 117
+\item dg\_setup, 118
+\item dish, 9
+\item dsabuild, 10
+\item Dubous, Olivier, xviii
+\indexspace
+\newindex{e}
+\item Easterbrook, Stephen, xvii
+\item EEC, xvii
+\item endisobject, 158
+\item endisoentity, 155
+\item ESPRIT, xvii
+\indexspace
+\newindex{f}
+\item fdx\_open, 117
+\item fdx\_setup, 118
+\item Finni, Olli, xviii
+\item first\_member, 140
+\item flag2prim, 129
+\indexspace
+\newindex{g}
+\item gens2prim, 131
+\item gent2prim, 138
+\item gent2str, 138
+\item getisobject, 158
+\item getisobjectbyname, 158
+\item getisobjectbyoid, 158
+\item getisoentity, 155
+\item gfxs2prim, 131
+\item gmtime, 139
+\item Gosling, James, xx
+\item gtime, 139
+\indexspace
+\newindex{h}
+\item Hein\"{a}nen, Juha, xix
+\item Horton, Mark R., xviii
+\item Horvath, Nandor, xix
+\indexspace
+\newindex{i}
+\item ia5s2prim, 131
+\item int2prim, 129
+\item int2strb, 134
+\item iserver\_init, 46
+\item iserver\_wait, 47
+\item isoaliases, 152, 162
+\item isobject, 157
+\item isobjects, 136, 160, 161
+\item isodeserver, 44
+\item isoentities, 153, 160
+\item isoentity, 154
+\indexspace
+\newindex{j}
+\item Jacobsen, Ole-Jorgen, xix
+\item Jelfs, Philip B., xix
+\item Jordan, Kevin E., xix
+\indexspace
+\newindex{k}
+\item Keogh, Paul, xix
+\item Kille, Stephen E., xvii
+\item Knight, Graham, xix
+\indexspace
+\newindex{l}
+\item Lamport, Leslie, xx
+\item \LaTeX {}, xiv, 191
+\item Lavender, Greg, xviii
+\item libacsap, 7, 15, 16, 17, 50, 151, 154
+\item libdsap, 9
+\item libpsap, xvii, 7, 9, 115, 124, 131, 157
+\item libpsap2, 7, 8
+\item libpsap2-lpp, 8
+\item librosap, xvi, 7, 56, 57, 62, 67, 73, 75, 81, 144, 167, 168
+\item librosy, 9
+\item librtsap, 7, 86, 87, 95, 99, 103, 108, 167, 177
+\item libssap, 7
+\item libtsap, xix, 8
+\item lint, 10
+\indexspace
+\newindex{m}
+\item make, 5
+\item malloc, 27, 28, 34, 38, 42, 59, 68, 69, 70, 73, 89, 92, 96, 100, 103, 130, 171, 173, 180, 182
+\item McLoughlin, L., xix
+\item Michaelson, George, xvi
+\item Miller, Steve D., xviii
+\item Moore, Christopher W., xvi
+\indexspace
+\newindex{n}
+\item NBS, xviii
+\item next\_member, 140
+\item NIST, xviii
+\item Nordmark, Erik, xix
+\item num2prim, 129
+\item nums2prim, 131
+\indexspace
+\newindex{o}
+\item obj2prim, 136
+\item oct2prim, 130
+\item ode2prim, 131
+\item oid2aei, 18
+\item oid2ode, 136
+\item oid2prim, 136
+\item oid\_cmp, 135
+\item oid\_cpy, 135
+\item OIDentifier, 135
+\item oid\_free, 135, 136
+\item Onions, Julian, xvii
+\indexspace
+\newindex{p}
+\item pa2str, 22
+\item paddr2str, 20
+\item \_paddr2str, 22
+\item pause, 75, 175
+\item Pavel, John, xvii
+\item Pavlou, George, xix
+\item pe2pl, 123
+\item pe2ps, 122
+\item pe\_alloc, 125
+\item pe\_cmp, 126
+\item pe\_cpy, 126
+\item pe\_error, 124
+\item pe\_expunge, 128
+\item pe\_extract, 128
+\item pe\_free, 126
+\item pepsy, xviii, 9, 10
+\item pe\_pullup, 128
+\item pepy, xvii, 9, 10, 134
+\item pl2pe, 123
+\item posy, xviii, 8, 9, 10
+\item Prafullchandra, Hemma, xix
+\item Preuss, Don, xix
+\item prim2bit, 134
+\item prim2flag, 129
+\item prim2gent, 138
+\item prim2num, 129
+\item prim2oid, 136
+\item prim2qb, 132
+\item prim2seq, 143
+\item prim2set, 141
+\item prim2str, 130
+\item prim2time, 139
+\item prim2utct, 138
+\item Pring, Ed, xx
+\item prts2prim, 131
+\item ps2pe, 122
+\item ps\_alloc, 116
+\item ps\_error, 116
+\item ps\_flush, 122
+\item ps\_free, 120
+\item ps\_get\_abs, 123
+\item ps\_io, 120
+\item ps\_len\_strategy, 123
+\item ps\_prime, 121
+\item ps\_read, 119
+\item ps\_write, 119
+\indexspace
+\newindex{q}
+\item qb2pe, 145
+\item qb2prim, 131
+\item qb2str, 132
+\item qb\_free, 133
+\item qb\_pullup, 132
+\item qbuf2pe, 133
+\item quipu, 9
+\indexspace
+\newindex{r}
+\item Reinart, John A., xx
+\item Rekhter, Jacob, xix
+\item RGPTurnRequest, 102
+\item Robbins, Colin J., xvii
+\item RoBeginRequest, 172
+\item RoBeginResponse, 171
+\item ROCFREE, 173
+\item Roe, Mike, xvii
+\item ROEFREE, 70
+\item RoEndRequest, 173
+\item RoEndResponse, 174, 183
+\item RoErrorRequest, 66
+\item RoErrString, 75
+\item RoInit, 170
+\item RoInvokeRequest, 63, 64
+\item Romine, John L., xvi
+\item ROPFREE, 59
+\item RoResultRequest, 65
+\item RORFREE, 69
+\item RoSAPaddr, 168
+\item RoSAPconnect, 172
+\item RoSAPend, 71
+\item RoSAPerror, 70
+\item RoSAPindication, 58
+\item RoSAPinvoke, 68
+\item RoSAPpreject, 58
+\item RoSAPresult, 69
+\item RoSAPstart, 170
+\item RoSAPureject, 70
+\item Rose, Marshall T., xx
+\item RoSelectMask, 74
+\item RoSetIndications, 72
+\item RoSetService, 62
+\item ROS\_FATAL, 59
+\item ROSFREE, 171
+\item ROS\_OFFICIAL, 59
+\item rosy, 8
+\item RoURejectRequest, 71
+\item RoWaitRequest, 66
+\item ROXFREE, 68
+\item RTAFREE, 96
+\item RtBeginRequest, 181
+\item RtBeginResponse, 180
+\item RtBInit, 177
+\item RTCFREE, 92, 182
+\item RtCloseRequest, 92
+\item RtCloseResponse, 93
+\item RtEndRequest, 183
+\item RtErrString, 108
+\item RtInit, 88
+\item RtOpenRequest, 90
+\item RtOpenResponse, 89
+\item RtPTurnRequest, 101
+\item RtSAPabort, 96
+\item RtSAPaddr, 175
+\item RtSAPclose, 101
+\item RtSAPconnect, 91, 182
+\item RtSAPindication, 95
+\item RtSAPstart, 88, 179
+\item RtSAPtransfer, 100
+\item RtSAPturn, 100
+\item RtSelectMask, 103
+\item RtSetDownTrans, 104
+\item RtSetIndications, 102
+\item RtSetUpTrans, 106
+\item RTS\_FATAL, 96
+\item RTSFREE, 89, 180
+\item RTS\_OFFICIAL, 98
+\item RTTFREE, 100
+\item RtTransferRequest, 98
+\item RtUAbortRequest, 94
+\item RtWaitRequest, 99
+\item Ruttle, Keith, xvii
+\indexspace
+\newindex{s}
+\item Scott, John A., xviii
+\item select, 43
+\item seq\_add, 141
+\item seq\_addon, 141
+\item seq\_del, 141
+\item seq\_find, 141
+\item set2prim, 141
+\item set\_add, 140
+\item set\_addon, 140
+\item set\_del, 140
+\item set\_find, 141
+\item setisobject, 158
+\item setisoentity, 155
+\item setjmp, 51
+\item sprintaei, 18
+\item sprintoid, 136
+\item Srinivasan, Raj, xix
+\item stdio, 115, 117
+\item std\_open, 117
+\item std\_setup, 117
+\item \_str2aei, 19
+\item str2aeinfo, 19
+\item str2gent, 139
+\item str2oid, 136
+\item str2paddr, 22
+\item str2pe, 144
+\item str2prim, 130
+\item str2qb, 132
+\item str2utct, 139
+\item strb2bitstr, 134
+\item str\_open, 117
+\item str\_setup, 118
+\indexspace
+\newindex{t}
+\item t61s2prim, 131
+\item tar, xi
+\item Taylor, Jem, xviii
+\item time2prim, 138
+\item time2str, 139
+\item Titcombe, Steve, xvii
+\item tm2ut, 139
+\item tsapd, 25, 44, 50, 51, 87, 160, 161, 162, 168, 177
+\item Turland, Alan, xvii
+\indexspace
+\newindex{u}
+\item U.C.~Berkeley, xx
+\item ut2tm, 139
+\item utct2prim, 138
+\item utct2str, 138
+\item UTCtime, 137
+\indexspace
+\newindex{v}
+\item Vanderbilt, Peter, xix
+\item viss2prim, 131
+\item vtxs2prim, 131
+\indexspace
+\newindex{w}
+\item Walton, Simon, xvii
+\item Weller, Daniel, xix
+\item Wenzel, Oliver, xix
+\item Wilder, Rick, xix
+\item Willson, Stephen H., xvi
+\item Worsley, Andrew, xviii
+\indexspace
+\newindex{x}
+\item xselect, 43
+\indexspace
+\newindex{y}
+\item Young, Alan, xx
+\end{theindex}

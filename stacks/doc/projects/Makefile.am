@@ -57,7 +57,7 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= lab.texi hlr.texi voip.texi cnam.texi
+info_TEXINFOS		+= lab.texi hlr.texi voip.texi cnam.texi sg.texi
 
 lab_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -75,6 +75,10 @@ cnam_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
+sg_TEXINFOS		= \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi
+
 if MAINTAINER_MODE
 lab_TEXINFOS		+= \
 			  texi/args.texi
@@ -84,6 +88,8 @@ voip_TEXINFOS		+= \
 			  texi/args.texi
 cnam_TEXINFOS		+= \
 			  texi/args.texi
+sg_TEXINFOS		+= \
+			  texi/args.texi
 endif
 
 EXTRA_info_TEXINFOS	= \
@@ -92,7 +98,8 @@ EXTRA_info_TEXINFOS	= \
 			  $(lab_TEXINFOS) \
 			  $(hlr_TEXINFOS) \
 			  $(voip_TEXINFOS) \
-			  $(cnam_TEXINFOS)
+			  $(cnam_TEXINFOS) \
+			  $(sg_TEXINFOS)
 
 
 if PKG_BUILD_INDEP
@@ -177,7 +184,10 @@ FIG_FIGS		= \
 			labnode3.fig \
 			labnode4.fig \
 			labnode5.fig \
-			labnode6.fig
+			labnode6.fig \
+			sg_netarch.fig \
+			sg_sysarch.fig \
+			sg_platarch.fig
 
 TBL_TBLS		= \
 			hlr_schest.tbl \

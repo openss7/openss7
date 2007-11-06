@@ -1,0 +1,24 @@
+% run this through LaTeX with the appropriate wrapper
+
+\scriptsize
+\begin{verbatim}
+l=NY
+masterDSA= cn=Fruit Bat#
+slaveDSA= cn=Alpaca#
+acl= others # read # entry
+acl= group # c=US@l=NY@cn=Manager # write # entry
+acl= others # read # default
+acl= group # c=US@l=NY@cn=Manager # write # default
+acl= others # compare # attributes # accessControlList$userPassword
+acl= group # c=US@l=NY@cn=Manager # write # attributes # accessControlList$userPassword
+l= NY
+description= State of New York
+objectClass= top & quipuObject & quipuNonLeafObject
+objectClass= locality
+
+\end{verbatim}
+
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\empty

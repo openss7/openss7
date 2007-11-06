@@ -1,0 +1,431 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Pepsy}\label{pepsy}
+The \man pepsy(1) program is a table-driven replacement for \pgm{pepy} and
+\pgm{posy}.
+At present,
+all three compilers are available as a part of the standard distribution.
+In the next major release,
+\pgm{pepy} and \pgm{posy} will remain,
+but most likely will not be installed by default.
+
+The remainder of this chapter describes how to use \pgm{pepsy}.
+By virtue of having presented the preceeding two chapters,
+only a terse discussion is needed!
+
+\section	{Abstract Syntax Module}
+As with \pgm{posy},
+the \pgm{pepsy} program reads a description of an {\em abstract syntax
+module\/}
+and produces the corresponding {\em C\/} structures along with several tables
+that define the mapping between the ASN.1 objects in the module and the
+{\em C\/} structures.
+These tables replace the work done by the \pgm{pepy} program.
+
+Note that unlike \pgm{posy},
+\pgm{pepsy} does not accept arbitary annotations in the abstract syntax module.
+It should be raw ASN.1
+or the strictly limited augmentations of ASN.1 described later,
+either entered by hand,
+or produced by the \pgm{rosy} program.
+Note that you must tell \pgm{rosy} when \pgm{pepsy} will be used.
+This is accomplished with the \switch"pepsy" option,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+.ry.py:;          rosy -pepsy $(RYFLAGS) $<
+\end{verbatim}\end{quote}
+
+\section	{PEPSY Environment}
+The \pgm{pepsy} program will produce two files after reading its abstract
+syntax module.
+
+\subsection	{C Language Structures}
+For each type in the abstract syntax module,
+\pgm{pepy} will define a corresponding {\em C\/} language structure
+(\verb"struct"),
+using the same rules as \pgm{posy}
+(see Section~\ref{posy:c-struct} on page~\pageref{posy:c-struct}).
+
+\subsection	{Mapping tables}
+In addition to the definition of {\em C\/} language structures,
+\pgm{pepsy} will generate a {\em C\/} file containing several tables that
+define the mapping between the structures and the corresponding ASN.1 objects.
+As this is entirely an automatic process,
+the contents of the tables are relatively unimportant.
+
+\section	{Known Deficiences}
+\pgm{pepsy} uses essentially the same front-end as the \man posy(1) program,
+so it has some limitations in the ASN.1 syntax it can accept.
+Consult Section~\ref{posy:deficiencies} on page~\pageref{posy:deficiencies}
+for the details.
+
+\section	{Running PEPSY}
+Here are a few things to know when running \pgm{pepsy}.
+
+\subsection	{Options}
+The \pgm{pepsy} program has a few options to modify its behavior.
+
+The \switch"A" switch directs \pgm{pepsy} to produce mapping tables for
+encoding, decoding, and printing.
+
+The \switch"a" switch directs \pgm{pepsy} to augment the \verb"#include" file
+it generates with commentary text.
+
+The \switch"d" switch directs \pgm{pepsy},
+to always ignore all \pgm{pepy}-style augmentations,
+including the 
+``verbatim'' actions occuring at the very beginning and end of the module.
+
+The \switch"f" switch directs \pgm{pepsy} to generate {\em C\/} macros to
+deallocate the structures it defines
+(e.g., for type \verb"type_MODULE_type",
+a macro called \verb"free_MODULE_type" is defined).
+
+As with \pgm{posy},
+the \switch"h" switch enables additional heuristics when \pgm{pepsy} generates
+a {\em C\/} language structure definition.
+See Section~\ref{posy:options} on page~\pageref{posy:options}.
+Note the \switch"h2" does not work for pepsy (yet).
+
+Normally, \pgm{pepsy} prints the name of each type as it works.
+The \switch"s" switch disables this behavior.
+
+\subsection	{Makefiles}
+By convention,
+input files to \pgm{pepsy} have the extension \verb".py".
+In order to remain consistent with the naming scheme used by \pgm{posy},
+rather than starting with file \verb"module.py",
+we assume we are starting with file \verb"MODULE-asn.py".
+Let us arbitrarily select the file named \verb"MODULE-types.py" for the
+augmented abstract syntax module produced by \pgm{posy}.
+Hence
+\begin{quote}\begin{verbatim}
+pepsy MODULE-asn.py
+\end{verbatim}\end{quote}
+will produce:
+\begin{describe}
+\item[\verb"MODULE-types.h":]	the {\em C\/} language structures;
+				and,
+
+\item[\verb"MODULE\_tables.c":]	the mapping tables.
+\end{describe}
+
+Our \man make(1) rules are:
+\begin{quote}\small\begin{verbatim}
+MODULE_tables.o:  MODULE_tables.c MODULE-types.h
+
+MODULE_tables.c MODULE_tables.h: MODULE-asn.py
+		pepsy -A -f -h MODULE-asn.py
+\end{verbatim}\end{quote}
+
+\section{Pepy Enhancements to Pepsy}
+
+\pgm{pepsy} supports a limited subset of the \pgm{pepy} augmented
+ASN.1 grammar.
+This is for efficiency and to reduce the amount of work required to
+change from \pgm{pepy} to \pgm{pepsy}.
+See the file \file{pepsy/t3.py} for examples of these enhancements.
+
+\pgm{pepsy} differs from pepy in one very important mannar.
+There is only one version of the ASN.1 grammar which contains all
+the augmentations for encoding and decoding.
+In contrast pepy has one definition for each task and consequently
+the two functions can function very differently.
+One common problem when turning \pgm{pepy}
+code into \pgm{pepsy} code is that the decoding
+and encoding functions used in the \pgm{pepy} version have calling conventions
+different to those required by \pgm{pepsy}.
+\pgm{pepsy} requires that the encoding function be passed a pointer to the
+C data type carrying the data and the decoding function be passed the
+{\em address} of the pointer.
+There are no such restrictions in \pgm{pepy} and often people use other
+methods, these need to be thoroughly checked and fixed up otherwise
+obscure core dumps are sure to occur.
+
+\pgm{pepsy} also provides arbitary actions which can reference the encoded and
+unencoded data.
+Also provides the ability to slot in functions for handling particular types.
+Of \pgm{pepy}'s augmented ASN.1 the most efficient and encouraged are
+the value passing statements.
+This are compiled into very compact table entries and yield the
+best benefit of pepsy, its small size and corresponding compile times.
+
+\subsection{Verbatim Actions}
+
+Verbatim actions are supported exactly as per \pgm{pepy}.
+The verbatim actions are placed in the \verb"MODULE\_tables.c", at the
+start or the end as appropriate.
+This allows files to be conviently included that contain definitions
+for types used later in the augmented grammar.
+It is also convient place for functions that are only relevant to the
+encoding or decoding of that modules data structures.
+
+\subsection{Value Passing Statements}
+
+These are a restriction of the \pgm{pepy} grammar for value passing
+statements.
+The C expressions are limited to specifying the field of the C structure
+carrying data corresponding to that typereference.
+See Figure~\ref{pepsy1} for example.
+\tagrind[tp]{grind-pepsy1}{Pepsy value passing}{pepsy1}
+
+Here the C data type carrying the data from which the data is encoded from
+or decoded into is specified by the
+\begin{quote}\begin{verbatim}
+    [[ P struct pepy_refs * ]]
+\end{verbatim}\end{quote}
+augmentation.
+This is very useful as it allows the programmer to design their
+own data structures instead of being forced to use those
+produced by \pgm{pepsy}.
+This is especially useful for people changing over from another
+encoder/decoding system which uses different data structures to that of
+\pgm{posy} or \pgm{pepsy}.
+It is still restrictive in that integers must be passed in ints and booleans
+must be passed in chars but is considerable more flexible than \pgm{posy}.
+
+All the value passing types are supported with some being interpreted
+slightly differently and some news ones.
+The usage is the same as pepy except, as mentioned before, the C expressions
+are limited to structure fields.
+
+The name of the pointer to the structure is not used at all and
+in fact the C expression can be abreviated to just the name of the field which
+contains the data.
+Note if the name of a C type is not specified for the typereference
+pepsy assumes the C type it generates for the typereference.
+It always generates the definitions for these typereferences in the *-types.h
+file regardless of whether another type is specified by a \verb"P" value passing
+statement in the grammar.
+
+\begin{itemize}
+
+\item \verb"[[ t field]]" --- a bit vector.
+This is used for BIT STRING types and takes a bit vector as described
+in Section~\ref{psap:bits} in \volone/.
+Note that a bitvector is {\em not} the same as a Presentation Element and
+failing to convert between them properly will give inconsistant results.
+
+\item \verb"[[p field]]" --- a pointer type.
+value passing statement is interpreted slightly differently
+to its pepy usage.
+This specifies the field which should be treated as a pointer to another
+C type which carries the information corrresponding
+to that ASN.1 typereference.
+The structure containing the data can be the current structure,
+that is to say the data is contained in fields of the current structure and
+so it shouldn't follow any pointer to it.
+This is specified by putting a \verb"*" in the field arguement.
+
+\item \verb"[[T type $ field]]" --- a compact way of specifying
+a \verb"P" and a \verb"p" value passing statements.
+This is essential for contructed types like sequence and set
+which need both value passing statements but the normal (long) form is
+not suitable.
+If the Information in a contructed form is carried in a different type,
+perhaps a substructure, there is no way to specify this new type and
+how to get to it from the existing data structure.
+
+\item \verb"[[E fn-name]]" --- Encoding function
+\item \verb"[[D fn-name]]" --- Decoding function
+These entries give the name of a function which encodes/decodes that particular
+type.
+This allows people to get right in if they want and hand code routines for
+encoding/decoding particular types. Perhaps for efficiency or convience when
+converting from \pgm{pepy}.
+As \pgm{pepy} generates functions these could be suitable modified to conform
+with the convention outlined below and just included in a verbatim action.
+This may allow a particularly tricky piece of pepy code to be conviently
+carried over.
+Obviously if this is used every where the \pgm{pepsy} benefit of order of
+magnitude reduction in code size will be lost, so it is worth avoiding if
+possible.
+
+\end{itemize}
+
+Note that the type {\em must} match that of the ASN.1 being
+encoded/decoded.
+This means that the ASN.1 real will expect a double as it field and
+a boolean expects a char.
+Anything different will behave in a machine dependant mannar!
+
+\subsection{Constructed Types - Sequence and Set}
+
+As described above these ASN.1 types need to have a \verb"T" value
+passing statement when used inside a type reference
+if they are not using the \pgm{pepsy} generated C data structure.
+See Figure~\ref{pepsy2} for example.
+The outer most sequence or set does not need them of course.
+Notice in the example that all the \verb"T" fields are using the
+parent data structure for their information.
+This illustrates that \verb"*" and \verb"*parm" are considered equivalent,
+later case is supported for compatility with the augmented ASN.1 grammar
+produced by \pgm{posy}.
+\tagrind[tp]{pepsy-single}{Constructed Type Example}{pepsy2}
+
+Figure~\ref{pepsy3} shows an example with a different C type used for
+the SEQUENCE OF and SET OF to that specified in the \verb"P" value statement.
+In the case of the repeating types it is necessary to have a link list
+to carry the information, with a {\em next} pointer a part of the structure.
+The {\em next} field is indicated by placing it inside the \verb"<<" and
+\verb">>" backets as shown.
+If this control statement is left out it will assume there is a field
+called ``next'' in the current structure which does the job.
+This is consistent with what \pgm{posy} generates.
+Note in the component label \verb"b" the repeated type is a defined type
+and its data must be carried in the \verb"rep_elem" structure as the
+encoding/decoding routine is called with the current (\verb"rep_elem")
+structure.
+
+\tagrind[tp]{grind-repeat}{Repeated Type Example}{pepsy3}
+
+\subsection{Choice}
+
+A Choice is another example of a constructed type and so requires
+\verb"T" value statement.
+A Choice also needs an integer field for the selection value to go.
+In encoding this is used to determine which type to choose and for decoding
+it is set to indicate which type was found.
+It is used just like pepy with value of 1 meaning the first type and 2
+the second and so on.
+The selection field must be a field of the current structure and if it is
+left out will default to the \pgm{posy} generated value of ``offset'', which
+will generate syntax errors if this field is not defined when the corresponding
+tables field is compiled.
+There is an example of a choice in the previous Figure~\ref{pepsy3}.
+
+There is another ``pepy-like'' method of specifying which choice to take,
+which is illustrated in figure~\ref{pepsy4}.
+The syntax allows a C expression to specify which choice to take when encoding
+and for decoding a C lvalue of an integer in
+which to store the choice present in the data.
+If the choice taken in decoding is not important or can be worked out
+from other information zero can be specified for the lvalue and the choice
+taken will not be recorded which is a bit more efficient.
+This is to support people changing \pgm{pepy} code and allows a way to
+those difficult bits which just can't be done by the first method.
+It is not as efficient as the first as it obviously requires some C code to
+be especially evaluated for the choice.
+
+\tagrind[tp]{grind-choice}{Pepy-like selector in a choice}{pepsy4}
+
+\subsection{Default}
+
+Most defaults are handled transparently in \pgm{pepsy}.
+The user fills in what ever value required and \pgm{pepsy} will
+detect if that value is the default or not and encode it appropriately.
+Similarly on decoding it will decode into a normal value.
+The cases where it doesn't do this are constructed types.
+This has only been a problem so far with the default value being the
+empty sequence or set.
+At the moment the work around for this problem 
+is to change the default to optional and have the data
+carried in another structure.
+To the default null value is carried by setting the pointer the structure
+to null.
+This is pretty much the way \pgm{posy} handles these situations.
+Note: you can not specify a default value for an Object Identifier
+at the moment, again use a work around based on OPTIONAL.
+
+\subsection{Optional}
+
+Optionals are handled in several ways.
+The original mannar used in \pgm{posy} which is
+a null pointer for those types specified by a pointer and
+a bit in an integer field called \verb"optionals".
+The first optional being specified by the bit 01, the 2nd by 02,
+the third by 04 and so on.
+The \pgm{pepsy} generated data structures still contain this field
+and \#defines for the various bits if the ASN.1 type requires it,
+such as INTEGER or ENUMERATED type.
+
+The next method for handling optionals
+is a generalisation of the \pgm{posy} scheme.
+The user may specify a bit out of an array of bytes (chars) which
+specifies whether or not the element is present.
+To use this technique you add after the OPTIONAL
+and before the \verb"," or terminating \verb"}" the follow:
+\begin{quote}\begin{verbatim}
+     << char_array $ Bit_Number>>
+\end{verbatim}\end{quote}
+
+Where \verb"char_array" is the character array field
+and \verb"Bit_Number" is actual number of the bit used for this type,
+usually a \#define symbol.
+Figure~\ref{pepsy2} shows some use of this form of OPTIONAL.
+
+The third and final method of supporting optional is modeled on that used
+by pepy.
+It is the same as that used by the ``pepy-like'' choice selector which
+allows a C expression for encoding and an integer lvalue for decoding.
+As in the choice case it is not as efficient as the previous two methods
+but is much more general.
+But for optionals the meaning of the integer is slightly different, non zero
+means present and zero means absent.
+Figure~\ref{pepsy5} shows an example of this optional.
+In this case the
+the user is not interested in being notified if it is present in the
+decoded and so specifies zero for the lvalue.
+
+\tagrind[tp]{grind-optional}{Optional C-expression/lvalue}{pepsy5}
+
+\subsection{Encoding and Decoding Functions}
+
+\tagrind[tp]{grind-fn}{Example of Encoding/Decoding functions}{pepsy6}
+
+Figure~\ref{pepsy6} shows the usage of these functions.
+By placing the \verb"[[X fn ]]" after the type reference the handling for
+encoding or decoding can be passed to a user written function, called {\bf fn}.
+The encoding is specified if {\bf X} is an {\bf E} and decoding is
+specified by an {\bf D}.
+If only one of encoding or decoding is specified then the task left
+unspecified is done normally, see in the example the type E-ANY, which
+is encoded by calling the user function \verb"get_pe()" and decoded by
+the value passing statement \verb"[[ a * ]]".
+
+The definition of the encoding and decoding functions must follow a very
+precise calling and return value conventions.
+These are not the same as those used by \pgm{pepy} generated functions
+which requires lots of parameters, but it shouldn't be too hard to convert
+\pgm{pepy} generated functions into this form.
+Figure~\ref{pepsy7} shows the definition of a simple but complete example of
+encoding function.
+
+\tagrind[tp]{grind-encfn}{Definition of an Encoding function}{pepsy7}
+
+The encoding function is passed a pointer, {\bf parm},
+to the structure that contains
+the data at the level of the encoding function and the address of a PElement
+pointer, {\bf ppe}.
+It expects the user to encode the data present some where in the data
+structure into a PElement and set the pointer to this PElement.
+If everything works it should return OK, if something fails it should
+return NOTOK, to abort the whole encoding.
+
+The OPTIONAL and DEFAULT need to be detected by the function and it should
+return \verb"OK + 1" and not encode anything.
+In the example it checks for the value 1 which is the default value
+and returns correctly otherwise encodes the value and returns \verb"OK".
+Note: the tag and class do not need to be set as pepsy will take care
+of getting that correct.
+This allows the same function to be used in several places, with different
+tags.
+
+The decoding function also takes two pointers as arguements and returns
+\verb"OK" on success and \verb"NOTOK" on failure.
+The two pointers are different versions of the encoding function pointers,
+this time the first pointer is the address of the pointer to the decoding
+function and a pointer to the PElement containing the encoded data.
+The function is expected to construct the decoded data type which may include
+allocating space for it and setting pointers in the \verb"*parm" data
+structure to the allocated space.
+If the PElement pointer is null (there is no encoded data) it means the
+type is absent and it is up to the function to handle it.
+This would be the case if it were DEFAULT or OPTIONAL element.
+
+\tagrind[tp]{grind-decfn}{Definition of a Decoding function}{pepsy8}
+
+\subsection{Pepsy C Action Statements}
+
+\subsection{External Type References}
+

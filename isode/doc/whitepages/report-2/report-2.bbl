@@ -1,0 +1,71 @@
+\begin{thebibliography}{KRT89}
+
+\bibitem[CCI88]{CCITT.Directory}
+{The Directory~---~Overview of Concepts, Models, and Service}.
+\newblock International Telegraph and Telephone Consultative Committee,
+  December 1988.
+\newblock Recommendation X.500.
+
+\bibitem[ISO88]{ISO.Directory}
+{Information Processing Systems~---~Open Systems Interconnection~---~The
+  Directory~---~Overview of Concepts, Models, and Service}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, December 1988.
+\newblock International Standard 9594-1.
+
+\bibitem[Kil88]{QUIPU.Directory}
+Stephen~E. Kille.
+\newblock {The QUIPU Directory Service}.
+\newblock In Einar Stefferud, editor, {\em {Proceedings, Fourth International
+  Symposium on Computer Message Systems}}, pages 173--185, September 1988.
+\newblock Costa Mesa, California.
+
+\bibitem[Kil89a]{String.Addresses}
+Stephen~E. Kille.
+\newblock {A string encoding of Presentation Address}.
+\newblock Research Note RN/89/14, Department of Computer Science, University
+  College London, February 1989.
+
+\bibitem[Kil89b]{Interim.Addresses}
+Stephen~E. Kille.
+\newblock {An interim approach to use of Network Addresses}.
+\newblock Research Note RN/89/13, Department of Computer Science, University
+  College London, February 1989.
+
+\bibitem[Kil89c]{QUIPU.Design}
+Stephen~E. Kille.
+\newblock {The Design of QUIPU}.
+\newblock Research Note RN/89/19, Department of Computer Science, University
+  College London, March 1989.
+
+\bibitem[Kil89d]{thorn-na}
+Stephen~E. Kille.
+\newblock {The THORN X.500 Naming Architecture}.
+\newblock THORN Project Internal Report UCL-45, revision 6.1, University
+  College London, January 1989.
+
+\bibitem[KR78]{C.Language}
+Brian~W. Kernighan and Dennis~M. Ritchie.
+\newblock {\em {The C Programming Language}}.
+\newblock Software Series. Prentice-Hall, Inc., Englewood Cliffs, New Jersey,
+  1978.
+
+\bibitem[KRT89]{QUIPU.Manual}
+Stephen~E. Kille, Colin~J. Robbins, and Alan Turland.
+\newblock {\em {The ISO Development Environment: User's Manual, Volume 5:
+  QUIPU}}, April 1989.
+
+\bibitem[RC87]{TSAP.on.TCP}
+Marshall~T. Rose and Dwight~E. Cass.
+\newblock {ISO Transport Services on top of the TCP}.
+\newblock Request for Comments 1006, DDN Network Information Center, SRI
+  International, May 1987.
+
+\bibitem[Ros90]{Open.Book}
+Marshall~T. Rose.
+\newblock {\em {The Open Book: A Practical Perspective on Open Systems
+  Interconnection}}.
+\newblock Prentice-hall, 1990.
+\newblock ISBN 0--13--643016--3.
+
+\end{thebibliography}

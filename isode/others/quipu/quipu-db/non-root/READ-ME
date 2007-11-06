@@ -1,0 +1,33 @@
+This directory demonstates how to start a 
+DSA NOT holding a copy of the root EDB
+
+The start the DSA type
+	/etc/ros.quipu -t ./quiputailor
+in this directory.
+
+You will then see messages similar to...
+
+   dsa name c=GB@o=University College London@cn=toucan
+   WARNING - Can't open "./EDB" (2)- should I be able to ?
+   WARNING - Can't open "./c=GB/EDB" (2)- should I be able to ?
+   Loading "./c=GB/UCL/EDB"
+   DSA entry inconsistent - assuming EDB wrong, DSA file correct
+   Written ./DSA.real
+   Loading "./c=GB/UCL/CS/EDB"
+   DSA c=GB@o=University College London@cn=toucan has started on localHost=17003
+   DSA c=GB@o=University College London@cn=toucan has started on localHost=17003
+   secs: -1; nads: 0; iads 0x0, wads 0x0
+
+At this point the DSA has started.
+The DSA is named "c=GB@o=University College London@cn=toucan", and
+this entry was read from the c=GB/UCL/EDB file.
+You would not expect this DSA to hole the root EDB or c=GB/EDB files,
+so the warning messages can be ignored.
+
+The DSA is started on the address defined in 
+c=GB/UCL/EDB
+(presentationAddress= localHost=17003)
+
+NOTE this DSA only holds data for 
+c=GB/o=University College London/ou=Computer Science 
+locally, so attempts to read data higher up the tree will cause referrals.

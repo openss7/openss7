@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: man.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/12 19:05:31 $
+# @(#) $RCSfile: man.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/10/17 20:00:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/12 19:05:31 $ by $Author: brian $
+# Last Modified $Date: 2007/10/17 20:00:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -86,10 +86,14 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	AC_ARG_VAR([REFER], [Roff references command])
 	AC_ARG_VAR([TBL], [Roff table command])
 	AC_ARG_VAR([PIC], [Roff picture command])
-	AC_PATH_PROGS([SOELIM], [gsoelim soelim], [/bin/cat], [$PATH:/usr/local/bin:/usr/bin:/bin])
-	AC_PATH_PROGS([REFER], [grefer refer], [/bin/cat], [$PATH:/usr/local/bin:/usr/bin:/bin])
-	AC_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat], [$PATH:/usr/local/bin:/usr/bin:/bin])
-	AC_PATH_PROGS([PIC], [gpic pic], [/bin/cat], [$PATH:/usr/local/bin:/usr/bin:/bin])
+	AC_PATH_PROGS([SOELIM], [gsoelim soelim], [/bin/cat],
+		      [$PATH:/usr/local/bin:/usr/bin:/bin])
+	AC_PATH_PROGS([REFER], [grefer refer], [/bin/cat],
+		      [$PATH:/usr/local/bin:/usr/bin:/bin])
+	AC_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat],
+		      [$PATH:/usr/local/bin:/usr/bin:/bin])
+	AC_PATH_PROGS([PIC], [gpic pic], [/bin/cat],
+		      [$PATH:/usr/local/bin:/usr/bin:/bin])
     else
 	AC_MSG_RESULT([no])
     fi
@@ -109,16 +113,19 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	    GZIP='-f9v'
 	fi
 	AC_ARG_VAR([GZIP_CMD], [Gzip compression command @<:@default=gzip@:>@])
-	AC_PATH_PROG([GZIP_CMD], [gzip], [/usr/bin/gzip], [$PATH:/usr/local/bin:/usr/bin:/bin])
+	AC_PATH_PROG([GZIP_CMD], [gzip], [${am_missing_run}gzip],
+		     [$PATH:/usr/local/bin:/usr/bin:/bin])
 	AC_ARG_VAR([BZIP2], [Bzip2 default compression options @<:@default=@:>@])
 	if test -z "$BZIP2"; then
 	    BZIP2='-f9v'
 	fi
 	AC_ARG_VAR([BZIP2_CMD], [Bzip2 compression command @<:@default=bzip2@:>@])
-	AC_PATH_PROG([BZIP2_CMD], [bzip2], [/usr/bin/bzip2], [$PATH:/usr/local/bin:/usr/bin:/bin])
+	AC_PATH_PROG([BZIP2_CMD], [bzip2], [${am_missing_run}bzip2],
+		     [$PATH:/usr/local/bin:/usr/bin:/bin])
     fi
     AC_ARG_VAR([MAKEWHATIS], [Makewhatis command])
-    AC_PATH_PROG([MAKEWHATIS], [makewhatis], [/usr/sbin/makewhatis], [$PATH:/usr/local/sbin:/usr/sbin:/sbin])
+    AC_PATH_PROG([MAKEWHATIS], [makewhatis], [/usr/sbin/makewhatis],
+		 [$PATH:/usr/local/sbin:/usr/sbin:/sbin])
 ])# _MAN_CONVERSION_SETUP
 # =========================================================================
 
@@ -134,6 +141,9 @@ AC_DEFUN([_MAN_CONVERSION_OUTPUT], [dnl
 # =============================================================================
 #
 # $Log: man.m4,v $
+# Revision 0.9.2.15  2007/10/17 20:00:28  brian
+# - slightly different path checks
+#
 # Revision 0.9.2.14  2007/08/12 19:05:31  brian
 # - rearrange and update headers
 #

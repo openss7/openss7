@@ -1,0 +1,209 @@
+% run this through SLiTeX
+
+\documentstyle
+    [blackandwhite,landscape,oval,pagenumbers,small,plain]{NRslides}
+
+\input trademark
+\def\tradeORGfont{\rm}
+\def\tradeNAMfont{\rm}
+
+\raggedright
+
+\begin{document}
+
+\title	{Open System Network Standards:\\
+	TCP/IP, MAP/TOP AND THE REALITY OF\\ THE ISO PROTOCOLS}
+\author	{Marshall T.~Rose\\
+	Computer Science Laboratory\\
+	Northrop Research and Technology Center}
+\date	{January 23, 1987}
+\maketitlepage
+
+
+\begin{bwslide}
+\ctitle	{ARE THE ISO PROTOCOLS REAL?}
+
+\begin{nrtc}
+\item	THE ISO PROTOCOLS HAVE FOUND WIDESPREAD SUPPORT FROM
+	VENDORS AND USER GROUPS
+
+\item	BUT THERE ARE STILL DOUBTS AS TO THE VIABILITY OF THE ISO PROTOCOLS
+
+\item	TECHNICAL ISSUES:
+    \begin{nrtc}
+    \item	WORKABILITY - CAN THEY BE IMPLEMENTED?
+    \item	HARMONY - CAN DIFFERENT IMPLEMENTATIONS WORK TOGETHER?
+    \item	STABILITY - HOW OFTEN ARE THINGS GOING TO CHANGE?
+    \item	INTEROPERABILITY - WHAT TO DO ABOUT EXISTING NETWORKED
+		SYSTEMS?
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+question: are the iso protocols real?
+
+answer: a qualified yes!
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE: ISODE}
+
+\begin{nrtc}
+\item	AN OPENLY AVAILABLE ISO DEVELOPMENT ENVIRONMENT HAS BEEN IMPLEMENTED
+	AT NRTC
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OPERATING ENVIRONMENTS}
+
+\begin{nrtc}
+
+\item	CODED ENTIRELY IN C
+
+\item	OPERATING SYSTEMS
+    \begin{nrtc}
+    \item	4.2\bsd/ \unix/
+    \item	SVR2 AT\&T \unix/ WITH AN EXCELAN \exos/~8044 TCP/IP PACKAGE
+    \item	\vms/ AND \pcdos/ UNDER DEVELOPMENT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE APPLICATION ENVIRONMENT}
+
+\vskip.15in
+\diagram[p]{figure1}
+\end{bwslide}
+
+
+\begin{note}\em
+other ASEs: RTSE, CCR, and so on
+
+presentation: manage presentation contexts~---~abstract syntax and transfer
+
+session: manage tokens, activities, checkpointing, and so on
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{AN ALTERNATE ENVIRONMENT:\\ MHS ARCHITECTURE (c.~1984)}
+
+\vskip.15in
+\diagram[p]{figure2}
+\end{bwslide}
+
+
+\begin{note}\em
+(approximate) number of lines of code (excluding drivers, demos, etc.):
+\[\begin{tabular}{rr}
+transport&	4026\\
+session&	9106\\
+asn&		3706\\
+presentation&	5383\\
+acs&		2717\\
+rts&		2630\\
+ros&		3646\\
+total&		31574
+\end{tabular}\]
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{PERFORMANCE OBSERVATIONS}
+
+\begin{nrtc}
+\item	THE 5-P PRINCIPLE:\\
+	PROPER PLANNING PREVENTS POOR PERFORMANCE
+
+\item	INITIAL BENCHMARKING SUGGESTS THROUGHPUT RATES VERY CLOSE TO RAW TCP
+	FOR BOTH TRANSPORT AND SESSION ECHO AND SINK ENTITIES
+
+\item	AT THE APPLICATION INTERFACE (ABOVE ACSE/ROSE),
+	PERFORMANCE IS ONLY 10\%-12\% WORSE THAN RAW TCP
+
+\item	RESULTS PRIMARILY DUE TO MINIMIZED BYTE-COPYING BETWEEN
+	LAYERS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXPERIENCE SHOWS...}
+
+\begin{nrtc}
+\item	WORKABILITY - YES, THE PROTOCOLS CAN BE IMPLEMENTED
+    \begin{nrtc}
+    \item	ONLY ONE GLARING PROBLEM IN THE SPECIFICATIONS\\
+		(BEING ADDRESSED IN THE STANDARDS COMMITTEE)
+    \end{nrtc}
+
+\item	HARMONY - UNKNOWN, MORE IMPLEMENTATIONS MUST BE BUILT AND TESTED
+    \begin{nrtc}
+    \item	USER PROFILES ARE HELPFUL
+    \end{nrtc}
+
+\item	STABILITY - FAIR, ONCE A STANDARD BECOMES A ``DIS''
+
+\item	INTEROPERABILITY - AN OPEN QUESTION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHY ISODE USES TCP/IP}
+
+\begin{nrtc}
+\item	WANT TO BE CONSISTENT WITH ISO'S DIRECTION,
+	BUT WANT TO GET WORK DONE NOW
+
+\item	CURRENTLY, TCP/IP HAS SEVERAL ADVANTAGES OVER ISO TP4:
+    \begin{nrtc}
+    \item	MATURITY
+    \item	VENDOR SUPPORT
+    \item	LARGE BODY OF EXPERTISE
+    \end{nrtc}
+
+\item	MANY NEW, MAJOR INVESTMENTS BEING MADE IN CURRENT TECHNOLOGY
+	(e.g., NSFnet, NASA's PROPOSED INTERNET, etc.)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A MIGRATION STRATEGY}
+
+\begin{nrtc}
+\item	INSTALL ISO TSAP (RFC983) IN TCP/IP INTERNET AND USE ISO
+	DEVELOPMENT ENVIRONMENT
+
+\item	EXPERIMENT WITH AND DEPLOY DUAL-STACK IP-LEVEL GATEWAYS
+
+\item	GRADUAL PHASE-OUT OF TCP/IP-ONLY HOSTS
+\end{nrtc}
+\end{bwslide}
+
+
+
+\begin{bwslide}
+\ctitle	{ARE THE ISO PROTOCOLS REAL?}
+
+\begin{nrtc}
+\item	WORKABILITY - YES
+
+\item	HARMONY - OPEN QUESTION
+
+\item	STABILITY - A MATTER OF TIME
+
+\item	INTEROPERABILTY - SOME PROMISING APPROACHES ARE BEING PURSUED
+\end{nrtc}
+\end{bwslide}
+
+
+\end{document}

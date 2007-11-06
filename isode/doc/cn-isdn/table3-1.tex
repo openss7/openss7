@@ -1,0 +1,14 @@
+% TCP Service Primitives
+
+\[\begin{tabular}{llp{3.0in}}
+Events&	connected&	open succeeded (either ACTIVE or PASSIVE)\\
+&	connect fails&	ACTIVE open failed\\
+&	data ready&	data can be received\\
+&	errored&	the connection has errored and is now closed\\
+&	closed&		an orderly disconnection has started\\[0.2in]
+Actions&listen on port&	PASSIVE open on the given port (server)\\
+&	open port&	ACTIVE open on the given port (client)\\
+&	read data&	data is received\\
+&	send data&	data is sent\\
+&	close&		the connection is gracefully closed
+\end{tabular}\]

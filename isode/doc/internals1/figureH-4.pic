@@ -1,0 +1,22 @@
+.PS
+.ps 20
+boxwid	=	3*boxwid
+define boxit @
+	box "$1" with .n at ($2.s.x, $2.s.y-lineht/2)
+	line from $2.s to last box.n
+@
+## figure T-7
+B1:	box "APPLICATION"
+B2:	boxit(PRESENTATION,B1)
+B3:	boxit(SESSION,B2)
+B5:	box with .nw at (B1.ne.x+linewid, B1.ne.y) height B1.ne.y-B3.se.y \
+		width boxht/6 shaded
+	move to B5.e; "\ PURE OSI" ljust
+B4:	box "OSI TRANSPORT" "" "SERVICE IN A" "" "non-OSI NETWORK" \
+		with .n at (B3.s.x, B3.s.y-lineht/2) height 3*boxht
+	line from B3.s to B4.n
+B6:	box with .nw at (B4.ne.x+linewid, B4.ne.y) height B4.height \
+		width boxht/6 shaded
+	move to B6.e; "\ TS-STACK" ljust
+##
+.PE

@@ -1,0 +1,12 @@
+
+.SH VALID STATES
+.PP
+The A_RELEASE_IND primtive is issued by the AP provider in the AP_DATA_XFER or AP_WRELcnf_RELreq
+states.
+
+.SH NEW STATE
+.PP
+The new state is one of
+AP_WRELrsp_RELind,
+AP_WRELrsp_RELind_init,
+AP_WRELcnf_RELreq_rsp

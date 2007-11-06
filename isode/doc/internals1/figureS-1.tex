@@ -1,0 +1,21 @@
+\File{figureS\-1.c},{11:21},{May  5 1990}
+\L{\LB{\Proc{integer\_encode}integer\_encode (x, pe)}}
+\L{\LB{integer *x;}}
+\L{\LB{PE      *pe;}}
+\L{\LB{\{}}
+\L{\LB{    \K{return} ((*pe = int2prim (*x)) == NULLPE ? NOTOK : OK);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\Proc{integer\_decode}integer\_decode (x, pe)}}
+\L{\LB{integer **x;}}
+\L{\LB{PE        pe;}}
+\L{\LB{\{}}
+\L{\LB{    integer    i = prim2num (pe);}}
+\L{\LB{}}
+\L{\LB{    \K{if} ((i == NOTOK \&\& pe \-\> pe\_errno != PE\_ERR\_NONE)}}
+\L{\LB{}\Tab{8}{    \|\| (*x = (integer *) malloc (\K{sizeof} **x)) == NULL)}}
+\L{\LB{}\Tab{8}{\K{return} NOTOK;}}
+\L{\LB{    **x = i;}}
+\L{\LB{}}
+\L{\LB{    \K{return} OK;}}
+\L{\LB{\}}}

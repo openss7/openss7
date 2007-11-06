@@ -1,0 +1,46 @@
+.PS
+.ps 20
+## figure 5
+B1:	box "CLNP"
+C1:	box invis with .n at (B1.s.x, B1.s.y-lineht) "$\cdots$"
+C2:	box invis with .n at (B1.s.x-(boxwid+linewid), B1.s.y-lineht) \
+	    "subnetwork$_{1}$"
+C3:	box invis with .n at (B1.s.x+(boxwid+linewid), B1.s.y-lineht) \
+	    "subnetwork$_{N}$"
+	line from B1.s to C1.n
+	line from (B1.s.x-boxwid/4, B1.s.y) to C2.n
+	line from (B1.s.x+boxwid/4, B1.s.y) to C3.n
+##
+B2:	box "TP4" with .s at (B1.n.x, B1.n.y+lineht)
+	line from B1.n to B2.s
+##
+B3:	box "TP0 $\ldots$ TP3" width 2*boxwid \
+		with .e at (B2.w.x-3*linewid, B2.w.y)
+B4:	box "\~{}X.25" with .n at (B3.s.x, B3.s.y-lineht)
+	line from B3.s to B4.n
+	line dashed down from B4.s
+##
+	line from (B3.w.x-linewid/2, B3.n.y+lineht/2) \
+	     to   (B2.e.x+linewid/2, B2.n.y+lineht/2) dashed
+	move to (B2.e.x+linewid/2, B2.n.y+lineht/2); "\ OSI TS" ljust
+	line from B2.n to (B2.n.x, B2.n.y+lineht/2)
+	line from B3.n to (B3.n.x, B3.n.y+lineht/2)
+##
+B5:	box "SESSION" with .s at ((B3.w.x+B2.e.x)/2, B3.n.y+lineht) \
+		width (B2.e.x-B3.w.x)
+	line from (B5.s.x, B3.n.y+lineht/2) to B5.s
+B6:	box "PRESENTATION" with .s at (B5.n.x, B5.n.y+lineht) \
+		width (B2.e.x-B3.w.x)
+	line from B5.n to B6.s
+##
+dist	=	((B2.e.x-B3.w.x)-4*boxwid) / 3
+B7:	box "MHS" with .sw at (B6.nw.x, B6.nw.y+lineht)
+	line down from B7.s
+B8:	box "FTAM" with .w at (B7.e.x+dist, B7.e.y)
+	line down from B8.s
+B9:	box "VT" with .w at (B8.e.x+dist, B8.e.y)
+	line down from B9.s
+B10:	box "DS" with .w at (B9.e.x+dist, B9.e.y)
+	line down from B10.s
+##
+.PE

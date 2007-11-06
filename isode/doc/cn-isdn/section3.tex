@@ -1,0 +1,460 @@
+% run this through LaTeX with the appropriate wrapper
+
+\section	{The Approach}
+From the viewpoint of OSI-applications development,
+we should note that the best of all solutions to the problem sketched earlier
+requires a complementary co-existence:
+\begin{itemize}
+\item	we want to utilize mature TCP/IP functionality and stability which is
+	not currently present in the immature OSI protocol suite;
+
+\item	we want to utilize new OSI functionality as it becomes available;
+	and,
+
+\item	we want to develop OSI-based applications now in an {\em evolutionary},
+	not {\em revolutionary} fashion.
+\end{itemize}
+These criteria suggest motivations for a migration strategy.
+In migrating from the DDN protocol suite to the OSI protocol suite,
+there are several strategic choices to be made.
+
+For the lack of a better term,
+we will call the object which joins the two protocol suites a {\em magic box}.
+We favor the use of this term instead of {\em gateway},
+since the former term invokes less inference on the part of the reader.
+To choose where the magic box should ``live'',
+we make three observations:
+\begin{enumerate}
+\item	Joining at the session layer (or above) introduces too much
+dependency on the ARPAnet client/server model, as discussed in the
+introduction.
+This argues for the magic box to live no higher than the transport
+level.
+
+\item	Joining at the network layer (or below) foregoes use of the TCP and
+requires complete implementation of the TP on top of the \dod/ IP.
+It also prevents the use of the efficient board-level products which
+implement the TCP.
+This argues for the magic box to live no lower than the service
+access points at the top of the transport layer.
+
+\item	In general,
+the construction of magic boxes at any location other than the transport
+layer is problematic at best;
+this will be illustrated later on
+(in Section~\ref{comparison} on page~\pageref{comparison}).
+\end{enumerate}
+Given these arguments,
+the OSI Transport Service Access Point (TSAP) is the ideal place for the magic
+box to be constructed:
+it allows us to take advantages of the main strengths of the DDN protocol
+suite while providing OSI defined services at the layers above.
+Figure~\ref{tsap.model} outlines the relationships we propose.
+\tagfigure{3-1}{OSI Transport Services on top of the TCP}{tsap.model}
+
+Our approach is to utilize exactly one TCP port (number~102) with
+TS-peers running on this port to interpret the protocol data units (PDUs)
+on the connection and dispatch them accordingly.
+This is not nearly as difficult as it sounds,
+since the TCP performs all the multiplexing,
+and provides each client/server pair with exactly one connection to manage.
+As a result, the dispatch function is trivial (i.e., null).
+Currently,
+we use a very simple mapping between TSAP IDs and services
+(a shortcoming described later).
+
+\subsection	{Summary of the Protocol}\label{protocol}
+The external behavior of our magic box is to use the services offered by the
+TCP
+and co-operate with other magic boxes,
+to provide the services defined for the TP.
+For our purposes,
+we define the {\em services offered\/} by a protocol
+as its service primitives.
+The services offered by the TCP and the TP are summarized in
+Tables~\ref{tcp.services} and~\ref{tp.services} respectively
+(readers should consult the authoritative works \cite{TCP} and
+\cite{ISO.TP.Service} for more detailed information).
+For purposes of exposition,
+we use the term {\em TS-user\/} to denote an entity utilizing the transport
+services,
+and {\em TS-provider\/} to denote an entity providing those services.
+\tagtable{3-1}{TCP Service Primitives Offered}{tcp.services}
+\tagtable{3-2}{TP Service Primitives Offered}{tp.services}
+
+Since both the TCP and the TP primarily offer a virtual-circuit service,
+it is not surprising that
+all the ``hard parts'' of the TP are also done by the TCP
+(e.g., three-way handshake, choice of initial sequence number, windowing,
+multiplexing, and so on).
+This leaves us with the task of devising a protocol,
+running above the TCP,
+which performs whatever tasks are necessary to map one flavor of service
+primitives into the other.
+
+Despite the symmetry of the TP,
+it is useful to consider the magic-box protocol with the perspective of a
+client/server model.
+We view two entities, denoted {\em TS-peers}, as implementing this protocol.
+One of these TS-peers,
+the TSAP server, begins by LISTENing on TCP port~102.
+When the other peer, the TSAP client, successfully connects to this port,
+the protocol begins.
+
+A client TS-peer decides to connect to the TCP port on the service host
+when the client's TS-user issues the {\sf T-CONNECT.REQUEST\/} action.
+One of the parameters to this action specifies the TSAP ID (identifier) of
+the remote TS-user.
+The client uses the TSAP ID to ascertain the IP address of the server,
+and attempts to open a connection to TCP port~102 at that IP address.
+If not successful,
+the client fires the {\sf T-DISCONNECT.INDICATION\/} event for the TS-user.
+
+Although the TCP offers a byte-stream,
+the magic-box protocol packetizes the bytes into units which have the
+identical syntax (format) as data units in the TP (TPDUs).
+These packets are termed TPKTs to avoid any confusion with the term TPDU.
+When the connection is opened,
+the client fills in a request-connection TPKT, sends it to the server, and
+awaits a response.
+
+The server, upon receipt of the TPKT,
+validates the contents of the TPKT
+(checking the version number, verifying the type code, and so on).
+If the packet is invalid,
+the server sends a request-disconnection TPKT,
+closes the connection, and goes back to the listen state.
+Otherwise,
+the server examines the TSAP ID of the TS-user with which the remote TS-user
+wants to communicate.
+If the specified TS-user can be located and started,
+the server starts this TS-user by firing the {\sf T-CONNECT.INDICATION\/}
+event.
+Otherwise a request-disconnection TPKT is sent
+(and the server closes the connection and goes back to the LISTEN state).
+
+The TS-user receiving the event will now respond with one of two actions,
+either {\sf T-CONNECT.RESPONSE\/} or {\sf T-DISCONNECT.REQUEST}.
+Depending on the response,
+the server sends either a request-disconnection or a confirm-connection
+TPKT back to the client.
+The server then enters the SYMMETRIC PEER state.
+
+When the client receives the reply TPKT from the server,
+it performs the usual validation.
+If the packet received was a request-disconnection TPKT,
+the client fires the {\sf T-DISCONNECT.INDICATION\/} event,
+and closes the connection.
+Otherwise,
+it fires the {\sf T-CONNECT.CONFIRMATION\/} event
+and enters the SYMMETRIC PEER state.
+
+Once both sides have reached the SYMMETRIC PEER state,
+the protocol is completely symmetric and the notion of whether the TS-peer
+started as a client or server is lost.
+Both TS-peers act in the following fashion:
+if the TCP indicates that data can be read,
+the TS-peer reads the TPKT, and validates the contents.
+\begin{itemize}
+\item	A request-disconnection TPKT results in the
+{\sf T-DISCONNECT.INDICATION\/} event being fired, and the TCP connection
+being closed.
+
+\item	A data TPKT or expedited data TPKT results in {\sf T-DATA.INDICATION\/}
+or {\sf T-EXPEDITED DATA.INDICATION\/} event (respectively) being fired.
+
+\item	Invalid TPKTs result in the {\sf T-DISCONNECT.INDICATION\/} event
+being fired for the TS-user,
+a request-disconnection TPKT being sent,
+and the connection being gracefully closed.
+
+\item	An error on the TCP connection also results in the
+{\sf T-DISCONNECT.INDICATION\/} event being fired.
+\end{itemize}
+As expected,
+the {\sf T-DATA.REQUEST}, the {\sf T-EXPEDITED DATA.REQUEST},
+and the {\sf T-DISCONNECT.REQUEST\/} actions on the part of the TS-user
+result in the appropriate TPKT being sent to the remote TS-peer.
+
+In the interests of brevity,
+many parts of the protocol were simplified or omitted from the discussion
+above.
+For example,
+when a request-disconnect TPKT is sent,
+it contains a code indicating why the disconnect was initiated.
+The precise protocol (including state machines) is presented in
+\cite{TSAP.on.TCP.old}.
+
+\subsection	{Design Decisions}
+The previous section discussed the protocol in simplistic detail.
+We should now consider certain nuances in the protocol's design and behavior.
+
+\subsubsection	{Packet Format}
+The choice of packet format for the magic box protocol was made rather arbitrarily:
+the TP format for TPDUs was chosen as it was suitable for our needs.
+Although a few fields are ignored,
+this introduces a very small amount of additional overhead.
+For example,
+on a request-connection TPKT (the worse case),
+there are 6 octets of ``zero on output, ignore on input'' fields.
+Considering that the packet overhead is fixed,
+requiring that implementations allocate an additional 6 octets is not
+unreasonable.
+As experience is gained,
+some of these fields (e.g., the class field) may be used in future versions
+of the protocol.
+
+\subsubsection	{Quality of Service}
+In our proposal, this is left ``for further study''.
+We expect a future version of the protocol to attempt to map the TP QOS
+parameters into the DDN IP precedence and security parameters.
+
+\subsubsection	{Administration of Address Space}
+It is tempting to define a straight-forward mapping between the OSI and
+TCP/IP addressing domains.
+For example,
+the OSI network service access point identifier (NSAP ID) could be mapped
+into a DDN IP address,
+and a combination of the service access point selectors of the higher layers
+could be mapped into a TCP port number.
+Unfortunately there is no straight-forward mapping for
+the OSI session and presentation service access point selectors,
+as each application in the DDN protocol suite has its own implicit session
+and presentation mechanism.
+One solution is to view the mappings as:
+\[\begin{tabular}{rlc}
+	$<$NSAP ID$>$&
+			$\longleftrightarrow$&	$<$IP address$>$\\
+	$<$TSAP  selector, SSAP selector, PSAP selector$>$&
+			$\longleftrightarrow$&	$<$TCP port$>$
+\end{tabular}\]
+This approach is particularly interesting because it suggests that the
+TP can be run directly above the DDN IP protocol.
+However, this suggestion is not necessarily a benefit
+(again see Section~\ref{comparison}).
+
+However,
+the TCP port space cannot accommodate the space of OSI higher layer selectors.
+The TCP supports a port space denoted by small integers,
+represented as unsigned 16--bit quantities.
+Further, any port larger than~1023 is reserved for the use of clients,
+and ports larger than ~511 are reserved for the use of local servers.
+This leaves about 510~ports for well-known (pre-assigned) services,
+most of which are already in use by existing services.
+
+\subsubsection	{Expedited Data}
+The largest difference between the services offered by the TCP and the TP is
+the expedited data service offered by the TP.
+We initially experimented with three approaches which could be used in
+implementing expedited data with the TCP:
+\begin{itemize}
+\item	Use a single connection without the TCP URGENT\\[0.1in]
+All data TPKTs and expedited data TPKTs are placed on the same TCP connection.
+As a result,
+there is no actual ``priority'' associated with the
+{\sf EXPEDITED DATA.REQUEST\/} action other than it
+eventually resulting in the {\sf EXPEDITED DATA.INDICATION} event occuring in
+the future.
+Furthermore,
+we are guaranteed that once any expedited data is sent,
+it will arrive before any data sent in the future arrives.
+This is true to the letter, though perhaps not to the spirit of the TP.
+
+\item	Use a single connection with the TCP URGENT\\[0.1in]
+All data TPKTs and expedited data TPKTs are placed on the same TCP connection.
+However,
+expedited data TPKTs are sent with the URGENT bit set.
+The receiving TCP could signal the TS-provider that URGENT information was
+available on the connection.
+The TS-provider could then buffer all further TPKTs until the TPKT
+containing the URGENT pointer was received.
+After this TPKT had been handled,
+the buffered (non-expedited) data could be acted upon.
+Although this is more true to the spirit of the TP,
+it requires some complex buffer management and may not be implementable on
+single-thread implementations of the TCP
+(e.g., some implementations for \msdos/ on the PC).
+
+\item	Use two connections\\[0.1in]
+A third approach is to open two connections.
+During connection establishment,
+after making a TCP connection to the server,
+the client starts a PASSIVE, non-blocking TCP open.
+The address of a TCP port associated with the open is then passed
+in the TSAP ID of the request-connection TPKT.
+Immediately before the server sends the confirm-connection TPKT,
+it connects to the indicated port.
+Upon success,
+it passes in the confirm-connection TPKT the TCP port it used to make
+the second connection (thus introducing a secondary correctness check).
+This requires no buffer management on the part of the TS-provider,
+and can be implemented even in single-thread implementations of the TCP.
+The disadvantage of our approach is that it may violate the letter of the TP!
+Since two connections are used,
+the paths in the subnet taken by the packets may differ,
+and it is possible that non-expedited data sent after expedited data may
+actually arrive earlier.
+\end{itemize}
+Version~1 of the protocol used the third approach to implement the expedited
+data service.
+However, in order to guarantee the semantics of the service,
+it became apparent that a complicated buffering scheme was required.
+Rather than introduce additional complexity,
+in version~2 of the protocol we opted for the first approach.
+This requires no buffering and implements the semantics correctly,
+albeit at the boundaries of the service specification.
+
+\subsection	{Work To Date}
+Work to date has reached two milestones:
+
+\subsubsection	{RFC983}
+In April of {\oldstyle 1986},
+the DDN Network Information Center issued RFC983,
+entitled {\it ISO Transport Services on top of the TCP\/}\cite{TSAP.on.TCP.old}.%
+\footnote{\cite{TSAP.on.TCP.old} specifies version~1 of the protocol.
+Based on our experiences,
+we are currently running version~2,
+which consists of four minor changes to the original protocol.
+A new RFC, describing these changes, is undergoing review.
+Appendix~\ref{changes} summarizes these changes.}
+This document presents our model of operation and gives a formal description
+of the protocol described in the Section~\ref{protocol}.
+
+It is important to understand exactly what RFC983 intends.
+RFC983 does not specify how one constructs an interface to the OSI TSAP.
+It indicates how one might build such an interface on top of the TCP.
+That is,
+given the abstract service definitions for the TP,
+instructions are given as to how those can be mapped on to the services
+provided by the TCP.
+From our perspective, a proper implementation of RFC983 exhibits the
+following properties:  
+\begin{enumerate}
+\item	it has the TSAP interface that you want on your host;
+	and,
+\item	it uses the protocol defined in RFC983.
+\end{enumerate}
+RFC983 has no intention of specifying an ``OSI protocol''.
+Rather it specifies a DDN-style protocol which provides OSI services.
+It is the intent of RFC983 to permit standard OSI protocols to run on top of
+the TCP.
+It is not the intent to build OSI-like protocols for the DDN.  
+
+From our experience, we agree with John Leong of CMU that:
+\begin{quote}\em
+``In general,
+it is important for one to produce good generic protocol interface design so
+that a particular protocol implementation or even the protocol itself can
+easily be replaced without affecting the code in the upper or lower layer.''
+\end{quote}
+It is the intent of RFC983 to be true to this tenet.
+
+\subsubsection	{Prototype Implementation}
+To test our ideas,
+we constructed a prototype implementation of RFC983 under Berkeley \unix/.
+The implementation supports both OSI-style asynchronous {\sf INDICATION}
+events,
+and also DDN-style synchronous events.
+We intend this software to play a key role in the migration strategy which is
+discussed in the next section.
+
+\subsection	{Comparison to Other Approaches}\label{comparison}
+\cite{Protocol.Conversion} makes a thorough investigation of the many
+issues involved in protocol conversion and complementing,
+and it is unnecessary for us to summarize those findings here.
+Instead, let us concentrate on previous work devoted to implementing the magic
+boxes between two different protocol suites,
+and in particular between the DDN and OSI protocols.
+Further,
+it has been our claim throughout this paper that building a magic box at any
+location other than the transport layer is not particularly useful.
+In this section,
+we will consider this argument.
+
+In \cite{TCP.convert.ISO}
+it is proposed that conversion between the DDN and OSI protocol suites
+occur inside the transport layer instead of at the transport service access
+point.
+After an analysis of the state machines associated with the TCP and the TP,
+and the identification of a common subset of services,
+a state machine for a gateway between the two is derived.
+The resulting gateway algorithm is no more complicated than the most
+complicated of the two original machines.
+It is then suggested that this approach is practical as a short-term solution
+to the TCP/IP and OSI interoperability problem.
+
+\subsubsection	{Our Analysis of this Work}
+Unfortunately,
+in our opinion,
+the existence of such a gateway is of limited {\em practical\/} value.
+Although the gateway does achieve an end-to-end transport capability,
+with one TS-user utilizing a TP interface and the other TS-user utilizing a
+TCP interface,
+there is no common session, presentation, and application layer.
+That is,
+although entities above the transport layer can have the potential to
+communicate between the two suites,
+no useful work can occur
+until the DDN ``world'' implements the higher-layer OSI protocols,
+or the OSI ``world'' implements the higher-layer DDN protocols,
+or both.
+\cite{TCP.convert.ISO} suggests that the DDN domain immediately implement
+the FTAM on top of the TCP, and so on.
+In the authors opinion,
+this is not a practical short-term solution.
+Furthermore,
+it appears to violate the widely-held notion of separation of knowledge
+between layers.
+
+It does however illustrate a recurring theme in work wherein conversion
+between different protocol suites is reported
+(e.g., \cite{SNA.convert.XNS},
+which discusses the interconnection of SNA and XNS networks).
+The theme, of course, is that general utility requires that
+protocol conversion occur at every layer in which the two suites can be
+connected.
+For example,
+when considering the application of electronic mail,
+building a TCP/TP gateway is not useful unless there is either:
+\begin{itemize}
+\item	an SMTP implementation running in both the TCP and TP domains;
+	or,
+\item	an X.400 implementation running in both the TCP and TP domains;
+	or,
+\item	an SMTP/X.400 (or more precisely SMTP/P1\cite{MHS.P1}) gateway
+	running in the TCP/TP gateway.
+\end{itemize}
+Each of these three alternatives is expensive to implement,
+and in addition, the first two are politically unacceptable to the parties doing
+the implementing.
+All three require that everything above the transport layer,
+except for the application itself (i.e., session and presentation),
+be implemented as well.
+
+In comparing our approach with previous work,
+we see that ultimately both approaches have the same end-result:
+the same transport service is offered.
+However,
+our approach is significantly easier to implement.
+Neither approach makes the problem of achieving interoperability between
+applications in the two protocol suites any easier:
+the only way to achieve interoperability is to implement special-purpose
+gateways for each pair of related applications.
+However,
+the approach we suggest has two important advantages over the protocol
+translation approach, once we are willing to acknowledge that we intend to
+migrate to one of the protocol suites (i.e., from the DDN to the OSI protocol
+suite):
+first, we can develop and gain experience with OSI applications now;
+and, second,
+any new applications we develop can run in either environment.
+This has the important implication that from this point on,
+that any future applications we develop will be guaranteed to run in the
+protocol suites available to us
+(that is, no new work will have to be done when we migrate from one protocol
+suite to the other).
+
+In the next section,
+we will consider the value of our approach in the medium-term,
+when we want to transition from the DDN protocol suite to the OSI protocol
+suite.

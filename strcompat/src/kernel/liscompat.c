@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/08/15 05:33:09 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/10/15 17:20:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:33:09 $ by $Author: brian $
+ Last Modified $Date: 2007/10/15 17:20:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: liscompat.c,v $
+ Revision 0.9.2.51  2007/10/15 17:20:15  brian
+ - fix for 2.4 kernels and pci_module_init
+
  Revision 0.9.2.50  2007/08/15 05:33:09  brian
  - GPLv3 updates
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/08/15 05:33:09 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/10/15 17:20:15 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/08/15 05:33:09 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/10/15 17:20:15 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -111,7 +114,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/08/15 05:33:09 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/10/15 17:20:15 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -1251,7 +1254,11 @@ EXPORT_SYMBOL(lis_osif_pci_map_sg);
 _RP int
 lis_osif_pci_module_init(void *p)
 {
+#ifdef HAVE_KFUNC_PCI_MODULE_INIT
 	return WARN(pci_module_init(p));
+#else
+	return WARN(pci_register_driver(p));
+#endif
 }
 
 EXPORT_SYMBOL(lis_osif_pci_module_init);

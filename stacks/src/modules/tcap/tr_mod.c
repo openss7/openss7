@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/09/06 11:16:18 $
+ @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/10/15 17:17:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/09/06 11:16:18 $ by $Author: brian $
+ Last Modified $Date: 2007/10/15 17:17:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tr_mod.c,v $
+ Revision 0.9.2.5  2007/10/15 17:17:17  brian
+ - updates for 2.6.22.5-49.fc6 kernel
+
  Revision 0.9.2.4  2007/09/06 11:16:18  brian
  - testing updates
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/09/06 11:16:18 $"
+#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/10/15 17:17:17 $"
 
 static char const ident[] =
-    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/09/06 11:16:18 $";
+    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/10/15 17:17:17 $";
 
 /*
  * This is TR-MOD.  It is a simplified Transaction Interface (TRI) module for TCAP that can be
@@ -112,7 +115,7 @@ static char const ident[] =
 #include <ss7/tcap_ioctl.h>
 
 #define TR_DESCRIP	"SS7/TCAP-TR (TCAP Transaction Handling) STREAMS MODULE."
-#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/09/06 11:16:18 $"
+#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/10/15 17:17:17 $"
 #define TR_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define TR_DEVICE	"Provides OpenSS7 TCAP-TR module."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4253,6 +4256,8 @@ sc_m_proto(queue_t *q, mblk_t *mp)
 	sc_save_state(sc);
 	tr_save_state(sc->tr);
 	switch (prim) {
+	case N_DATA_IND:
+	case N_EXDATA_IND:
 		mi_strlog(q, STRLOGDA, SL_TRACE, "%s <-", sc_primname(prim));
 		break;
 	default:

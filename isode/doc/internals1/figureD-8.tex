@@ -1,0 +1,12 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pbm 436 118 118 118 /d/mrose/psi/talks/internals/figureD-8.pbm%
+    }%
+    \kern 3.695in
+  }\vss}%
+  \kern 1.000in
+}

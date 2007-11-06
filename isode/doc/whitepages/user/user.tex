@@ -1,0 +1,105 @@
+% -*- LaTeX -*-
+
+\input lcustom
+
+\def\theguide/{{\em The Guide\/}}
+\def\thebook/{{\em The Handbook\/}}
+\def\volfive/{{\em Volume Five\/}}
+\def\camayoc/{{\em Camayoc\/}}
+
+\documentstyle[12pt,sfwmac,twoside]{report}
+
+\makeatletter
+\let\titlep@ge=\titlepage
+\def\titlepage{\titlep@ge \def\thefootnote{\fnsymbol{footnote}}}
+
+\let\endtitlep@ge=\endtitlepage
+\let\endtitlepage=\relax
+
+\let\m@ketitle=\maketitle
+\def\maketitle{\m@ketitle\let\titlepage=\relax\let\endtitlepage=\endtitlep@ge}
+\makeatother
+
+\advance\textwidth by0.5in
+\advance\oddsidemargin by-0.25in
+\advance\evensidemargin by-0.25in
+
+%%% LaTeX has its margins mixed up!
+\newdimen\foosidemargin
+\let\foosidemargin=\oddsidemargin
+\let\oddsidemargin=\evensidemargin
+\let\evensidemargin=\foosidemargin
+
+\pagenumbering{roman}
+
+\begin{document}
+
+\title{PSI White Pages Pilot Project:\\ User's Handbook}
+\author{Marshall T.~Rose\\ Performance Systems International, Inc.\\
+	\tt mrose@psi.com}
+\date{\ifdraft \versiondate/\\ \tt Draft Version \versiontag/\else \today\fi}
+\maketitle
+
+\begin{abstract}
+The need for a comprehensive white pages service increases in relation to the
+size of the user community.
+The early Internet was served well by a relatively simple facility.
+Today's rapidly expanding Internet has outstripped the capabilities of the
+existing system.
+In order to meet new requirements,
+PSI is sponsoring a pilot project to provide white pages
+service based on the OSI Directory.
+
+This document describes the pilot project from a user's perspective
+and provides operational reference for the use of the white pages service.
+
+\footnotetext[0]{\hskip -2\parindent
+This work was partially supported by the
+U.S.~Defense Advanced Research Projects Agency
+and the Rome Air Development Center of the U.S.~Air Force Systems Command
+under contract number F30602--88--C--0016.
+The content of the information contained herein does not necessarily reflect
+the position or the policy of the U.S.~Government,
+and no official endorsement should be inferred.} 
+\end{abstract}
+
+\thispagestyle{empty}
+\newpage
+
+\thispagestyle{empty}
+\setcounter{page}{0}
+\mbox{}
+\newpage
+
+\tableofcontents
+\footnotetext[0]{\hskip -\parindent
+This document (version \versiontag/)
+was \LaTeX set \today\ with \fmtname\ v\fmtversion.}
+
+%\listoffigures
+
+%\listoftables
+
+\newpage
+\ifodd\value{page} \else
+    \thispagestyle{empty}
+    \mbox{}
+    \newpage
+\fi
+\pagenumbering{arabic}
+
+\include{introduction}
+\include{fred}
+\include{dish}
+\include{others}
+
+\appendix
+\include{attributes}
+
+\clearpage
+\ifodd\value{page} \else
+    \mbox{}
+    \newpage
+\fi
+
+\end{document}

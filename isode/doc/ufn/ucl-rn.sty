@@ -1,0 +1,50 @@
+% UCL Research Note Style - Steve Kille - May 1988
+%
+% usage \documentstyle [ucl-rn] {article}
+%
+% Use standard \maketitle options (\author, \title, \date)
+%
+% Note that an ABSTRACT is mandatory and must follow \maketitle
+%
+% Also \rnnumber {nnnn}
+% Defines the Research Note Number
+
+\typeout{Document Style Option 'UCL Research Note' -- Released 20th May 1988}
+
+\def\rnnumber#1{\def\@rnnumber{{#1}}} \rnnumber {nnnn}
+
+\def\@evenhead{\hfill Research Note \@rnnumber\hbox{}}
+\def\@oddhead{\hfill Research Note \@rnnumber\hbox{}}
+
+
+\def\maketitle{\titlepage
+\let\footnotesize\small \let\footnoterule\relax \setcounter{page}{0}
+\newlength{\tmpparindent}
+\setlength{\tmpparindent}{\parindent}
+\setlength{\parindent}{0em}
+\null
+Research Note \@rnnumber\hfill Research
+\linebreak
+\@date\hfill Note
+\vfil
+\setlength{\parindent}{\tmpparindent}
+\begin{center}
+{\Large \@title \par} \vskip 3em {\large \lineskip .75em
+\begin{tabular}[t]{c}\@author 
+\end{tabular}\par} 
+\end{center} \par
+\vfil
+\null
+\setcounter{footnote}{0} \let\thanks\relax
+\gdef\@thanks{}\gdef\@author{}\gdef\@title{}\let\maketitle\relax} 
+
+\def\abstract{
+\begin{center}
+{\bf Abstract}
+\end{center}}
+\def\endabstract{\par\vfil\null
+\begin{center}
+{\large Department of Computer Science \\
+University College London}
+\end{center}
+\endtitlepage}

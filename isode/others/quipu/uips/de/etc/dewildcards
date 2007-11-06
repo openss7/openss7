@@ -1,0 +1,17 @@
+It is possible to exercise some control over the matching that the interface
+does by use of wildcards.  Note that this feature is not fully general.
+Five wildcard formats are valid.
+
+*          This will either, depending on the context (see the help screens
+           for each input line), search or list all entries of the 
+	   specified type.
+paul*      Matches entries with a name beginning with the string "paul"
+*paul*     Matches entries with a name containing the string "paul"
+*paul      Matches entries with a name finishing with the string "paul"
+paul*ker   Matches entries with a name beginning with the string "paul"
+           and finishing with the string "ker"
+
+Note that the interface automatically provides some wildcard matching if 
+no wildcarding is specified but no exact match can be found.  The interface 
+will progressively try weaker and weaker matching in an attempt to satisfy
+a query.

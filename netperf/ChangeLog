@@ -1,3 +1,8 @@
+2007-10-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
+	* Makefile.am: add missing EXTRA_SCRIPTS
+
 2007-08-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: GPLv3 updates

@@ -1,0 +1,77 @@
+\def\pservice{[ISO/IEC 8822]}
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pa 250 1250}%
+    \special{pa 250 0}%
+    \special{pa 2875 0}%
+    \special{pa 2875 1250}%
+    \special{pa 250 1250}%
+    \special{fp}%
+    \rlap{\kern  1.563in\lower 0.666in\hbox to 0pt{\hss $\cdots$\hss}}%
+    \special{pa 438 875}%
+    \special{pa 438 375}%
+    \special{pa 1188 375}%
+    \special{pa 1188 875}%
+    \special{pa 438 875}%
+    \special{fp}%
+    \rlap{\kern  0.813in\lower 0.666in\hbox to 0pt{\hss ASE$_{1}$\hss}}%
+    \special{pa 1938 875}%
+    \special{pa 1938 375}%
+    \special{pa 2688 375}%
+    \special{pa 2688 875}%
+    \special{pa 1938 875}%
+    \special{fp}%
+    \rlap{\kern  2.313in\lower 0.666in\hbox to 0pt{\hss ASE$_{n}$\hss}}%
+    \rlap{\kern  1.563in\lower 0.166in\hbox to 0pt{\hss application entity\hss}}%
+    \special{pa 1563 1250}%
+    \special{pa 1563 2000}%
+    \special{fp}%
+    \special{pa 4375 1250}%
+    \special{pa 4375 0}%
+    \special{pa 7000 0}%
+    \special{pa 7000 1250}%
+    \special{pa 4375 1250}%
+    \special{fp}%
+    \rlap{\kern  5.688in\lower 0.666in\hbox to 0pt{\hss $\cdots$\hss}}%
+    \special{pa 4563 875}%
+    \special{pa 4563 375}%
+    \special{pa 5313 375}%
+    \special{pa 5313 875}%
+    \special{pa 4563 875}%
+    \special{fp}%
+    \rlap{\kern  4.938in\lower 0.666in\hbox to 0pt{\hss ASE$_{1}$\hss}}%
+    \special{pa 6063 875}%
+    \special{pa 6063 375}%
+    \special{pa 6813 375}%
+    \special{pa 6813 875}%
+    \special{pa 6063 875}%
+    \special{fp}%
+    \rlap{\kern  6.438in\lower 0.666in\hbox to 0pt{\hss ASE$_{n}$\hss}}%
+    \rlap{\kern  5.688in\lower 0.166in\hbox to 0pt{\hss application entity\hss}}%
+    \special{pa 5688 1250}%
+    \special{pa 5688 2000}%
+    \special{fp}%
+    \special{pa 250 2500}%
+    \special{pa 250 2000}%
+    \special{pa 7000 2000}%
+    \special{pa 7000 2500}%
+    \special{pa 250 2500}%
+    \special{fp}%
+    \rlap{\kern  3.625in\lower 2.291in\hbox to 0pt{\hss presentation provider\hss}}%
+    \special{pa 0 1625}%
+    \special{pa 7250 1625}%
+    \special{da  0.050}%
+    \rlap{\kern  6.625in\lower 1.666in\hbox to 0pt{\hss \ \ \begin{tabular}{r}presentation service\\ \pservice\end{tabular}\hss}}%
+    \special{pa 2875 625}%
+    \special{pa 4375 625}%
+    \special{da  0.050}%
+    \rlap{\kern  3.625in\lower 0.666in\hbox to 0pt{\hss \begin{tabular}{c} application\\ protocol\end{tabular}\hss}}%
+    \kern  7.251in
+  }\vss}%
+  \kern  2.501in
+}

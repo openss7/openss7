@@ -1,0 +1,183 @@
+-- idist.ry - IDIST protocol
+
+-- $Header: /xtel/isode/isode/others/idist/RCS/idist.ry,v 9.0 1992/06/16 12:42:00 isode Rel $
+--
+-- The UCB rdist protocol as rewritten in terms of ISO OPERATIONS.
+-- This comes out quite a lot cleaner than the original! It could come
+-- out cleaner still if some more tidying up of internals was done...
+--
+-- Julian Onions <jpo@cs.nott.ac.uk>
+-- Nottingham University Computer Science
+--
+--
+-- $Log: idist.ry,v $
+-- Revision 9.0  1992/06/16  12:42:00  isode
+-- Release 8.0
+--
+-- 
+-- 
+
+--
+--				  NOTICE
+--
+--    Acquisition, use, and distribution of this module and related
+--    materials are subject to the restrictions of a license agreement.
+--    Consult the Preface in the User's Manual for the full terms of
+--    this agreement.
+--
+--
+
+
+Idist DEFINITIONS ::=
+
+BEGIN
+
+-- operations
+
+				-- version specification
+init	OPERATION
+	ARGUMENT InitDir
+	RESULT NULL
+	ERRORS { congested, badfilename }
+	::= 0
+
+				-- transfer a file type (file/dir/link etc)
+transfer OPERATION
+	ARGUMENT FileSpec
+	RESULT IA5List
+	ERRORS { congested, badfilename, badfiletype }
+	::= 1
+
+	    			-- finished with this directory.
+terminate OPERATION
+	ARGUMENT TermStatus
+	RESULT NULL
+	ERRORS { writeerror, protocol, badfiletype, fileproblem }
+	::= 2
+
+	    			-- clean up a directory
+listcdir OPERATION
+	RESULT FileList
+	ERRORS { badfilename }
+	::= 3
+
+				-- query existance of file/directory
+query OPERATION
+	ARGUMENT String
+	RESULT	QueryResult
+	ERRORS { congested }
+	::= 4
+
+				-- execute special command
+special OPERATION
+	ARGUMENT String
+	RESULT  IA5List
+	ERRORS { execError }
+	::= 5
+
+data	OPERATION
+	ARGUMENT Data
+	RESULT NULL
+	ERRORS { writeerror }
+	::= 6
+
+deletefile OPERATION
+	ARGUMENT String
+	RESULT IA5List
+	ERRORS { protocol, badfilename }
+	::= 7
+
+-- Errors
+
+congested ERROR
+	PARAMETER	IA5List
+	::= 0
+
+execError ERROR
+	PARAMETER	IA5List
+	::= 1
+
+badfilename ERROR
+	PARAMETER	IA5List
+	::= 2
+
+badfiletype ERROR
+	::= 3
+
+writeerror ERROR
+	PARAMETER	IA5List
+	::= 4
+
+protocol ERROR
+	PARAMETER	IA5List
+	::= 5
+
+fileproblem ERROR
+	PARAMETER	IA5List
+	::= 6
+
+-- Data types
+
+Initiate ::= SEQUENCE {
+		version	INTEGER,
+		user	IA5String,
+		passwd	IA5String
+	}
+
+InitDir ::= CHOICE {
+		destdir[0]	IA5String,
+		nodestdir[1]	IA5String
+	}
+
+FileSpec ::= SEQUENCE {
+		filetype	FileType,
+		fileopts	Options,
+		filemode	INTEGER,
+		filesize	INTEGER,
+		filemtime	FileTime,
+		fileowner	IA5String,
+		filegroup	IA5String,
+		filename	IA5String,
+		linkname	IA5String
+	}
+
+FileType ::= ENUMERATED {
+	 	regular(0),
+		directory(1),
+		symlink(2),
+		hardlink(3)
+	}
+
+Options ::= BITSTRING {
+		verify(0),
+		whole(1),
+		younger(2),
+		compare(3),
+		remove(4),
+		follow(5),
+		ignlinks(6),
+		noinstall(7)
+	}
+
+TermStatus ::= SEQUENCE {
+		filetype	FileType,
+		status		BOOLEAN
+	}
+
+String ::= IA5String
+
+FileTime ::= INTEGER
+
+QueryResult ::= CHOICE {
+		doesntExist[0]	NULL,
+		doesExist[1]	FileSpec
+	}
+
+FileList ::= SEQUENCE OF FileSpec
+
+IA5List ::=
+	SEQUENCE OF IA5String
+
+Data ::= OCTET STRING
+
+END

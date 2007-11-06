@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2007/08/13 22:46:20 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.153 $) $Date: 2007/10/13 08:51:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:20 $ by $Author: brian $
+ Last Modified $Date: 2007/10/13 08:51:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.153  2007/10/13 08:51:45  brian
+ - updates for 2.6.22 FC6 kernel and added MIBs
+
  Revision 0.9.2.152  2007/08/13 22:46:20  brian
  - GPLv3 header updates
 
@@ -143,10 +146,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2007/08/13 22:46:20 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.153 $) $Date: 2007/10/13 08:51:45 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2007/08/13 22:46:20 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.153 $) $Date: 2007/10/13 08:51:45 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -428,7 +431,11 @@ skballoc(struct sk_buff *skb, uint priority)
 		// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
 		// _ensure(mp->b_cont == NULL, mp->b_cont = NULL);
 		mp->b_rptr = skb->data;
+#ifdef NET_SKBUFF_DATA_USES_OFFSET
+		mp->b_wptr = skb_tail_pointer(skb);
+#else
 		mp->b_wptr = skb->tail;
+#endif
 		// _ensure(mp->b_datap == db, mp->b_datap = db);
 		// _ensure(mp->b_band == 0, mp->b_band = 0);
 		// _ensure(mp->b_flag == 0, mp->b_flag = 0);
@@ -436,10 +443,18 @@ skballoc(struct sk_buff *skb, uint priority)
 		/* set up data block */
 		db->db_frtnp = frtnp;
 		db->db_base = skb->head;
+#ifdef NET_SKBUFF_DATA_USES_OFFSET
+		db->db_lim = skb_end_pointer(skb);
+#else
 		db->db_lim = skb->end;
+#endif
 		// _ensure(db->db_ref == 1, db->db_ref = 1);
 		// _ensure(db->db_type == M_DATA, db->db_type = M_DATA);
+#ifdef NET_SKBUFF_DATA_USES_OFFSET
+		db->db_size = skb->end;
+#else
 		db->db_size = skb->end - skb->head;
+#endif
 		db->db_flag = DB_SKBUFF;
 		return (mp);
 	}

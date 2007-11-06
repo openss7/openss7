@@ -1,0 +1,93 @@
+This directory demonstates how to start the first DSA for a new
+country. The DSA is holding a copy of the root EDB, and MASTER of the
+new country (c=GB in the example).  The new country has two
+organisations, X-Tel Services Ltd, and University College London.  The
+data for X-Tel is held in the DSA, the UCL DSA is held in another DSA.
+
+*** STARTING UP ***
+
+The start the DSA type
+	/etc/ros.quipu -t ./quiputailor &
+in this directory.
+
+You should see something of the form...
+
+       % /usr/local/etc/ros.quipu -t ./quiputailor &
+       [1] 12757
+       %
+       Loading oid table (oidtable)
+       *** Starting ***
+       dsa name cn=Vampire Bat
+       Loading "./EDB"
+       Warning sibling file ./c=AU/EDB NOT found
+       Warning sibling file ./c=DK/EDB NOT found
+       Warning sibling file ./c=CH/EDB NOT found
+       Warning sibling file ./c=CA/EDB NOT found
+       Warning sibling file ./c=DE/EDB NOT found
+       Warning sibling file ./c=FI/EDB NOT found
+       Loading "./c=GB/EDB"
+       Warning sibling file ./c=NL/EDB NOT found
+       Loading "./c=GB/xtel/EDB"
+       Loading "./c=GB/xtel/cn=lancaster/EDB"
+       o=University College London not found in map file ./c=GB/EDB.map
+       No DSA pseudo entry: "./DSA.pseudo" (2)
+       No DSA real entry: "./DSA.real" (2)
+       Written ./DSA.real
+       Net Starting
+       DSA cn=Vampire Bat has started on localHost=17003
+       DSA cn=Vampire Bat has started on localHost=17003
+       Listening for new associations
+       Not making new associations
+       secs: -1; nads: 0; iads 0x0, wads 0x0
+
+The Sibling file warnings can be ignored UNLESS you would expect the
+referenced files to be found (in this case ignore them!)
+
+The DSA name is "cn=Vampire Bat", this was read from the "quiputailor"
+file in this directory.  
+
+The first step is to read the "./EDB" file.  In this file there is and
+entry for the DSA (the first entry), amongst other things, this
+defines the presentation address of the DSA (do NOT use the localHost
+address as given in the example, this will not work when distributed
+to the network as a whole).  Suitable address formats are described in
+the ISODE and QUIPU manuals.
+
+The DSA will then load all the other EDB files it can.
+The it will write a copy of its own entry to a file called DSA.real.
+This is now considered the MASTER copy of the DSAs entry, if you need
+to re-edit the DSAs entry, you should modify this file.  The version
+in the EDB file is a (possibly out of date) copy.
+
+Finally it will start listening for associations.
+
+To stop all the diagnostic message you should re-direct the output to
+a file, for example, start the DSA with (using /bin/csh)
+
+       % /usr/local/etc/ros.quipu -t ./quiputailor >&/dev/null
+
+You will not need to run this is the background as the process will
+detach itself from the terminal and control will return to your shell.
+
+*** Configuring for YOUR country ***
+
+To add a new country create an entry for the top level EDB file to
+represent you country (following the other examples e.g., the c=GB entry).
+You will also need to add an entry for your DSA to this file
+(following the other examples e.g., the cn=Giant Tortoise entry).
+
+When complete, both these entries should be sent via email to
+     RFC822:  quipu-support@cs.ucl.ac.uk 
+     X.400:   /S=Quipu-Support/OU=CS/O=UCL/PRMD=UK.AC/ADMD=GOLD 400/c=GB/
+who currently maintain the MASTER root node of the DIT.
+
+
+*** UPDATING SLAVES ***
+
+Having registered your DSA and country you will be able to receive
+regular updates of the root node of the DIT by setting the variable
+   update on
+in your quiputailor file.
+
+
+

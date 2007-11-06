@@ -1,0 +1,37 @@
+\File{getedb.py},{10:04},{Jul 11 1991}
+\L{\LB{GetEntryDataBlock ABSTRACT\-OPERATION}}
+\L{\LB{}\Tab{8}{ARGUMENT GetEntryDataBlockArgument}}
+\L{\LB{}\Tab{8}{RESULT GetEntryDataBlockResult}}
+\L{\LB{}\Tab{8}{ERRORS \{NameError,ServiceError,SecurityError\}}}
+\L{\LB{}}
+\L{\LB{getEntryDataBlock GetEntryDataBlock ::= 10}}
+\L{\LB{}\Tab{32}{\C{}\-\- will make this an OBJECT IDENTIFER}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- when ISODE can support this form }}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- of operation code}}
+\CE{}\L{\LB{}}
+\L{\LB{\Proc{GetEntryDataBlockArgument}GetEntryDataBlockArgument ::= SET \{}}
+\L{\LB{}\Tab{8}{entry}}
+\L{\LB{}\Tab{16}{[0] DistinguishedName [[p ga\_entry]] ,}}
+\L{\LB{}\Tab{8}{CHOICE \{}}
+\L{\LB{                    \C{}\-\- Can only use CHOICE [1] if remote DSA is }}
+\CE{}\L{\LB{                    \C{}\-\- version is QUIPU 6.8 or less.}}
+\CE{}\L{\LB{}\Tab{8}{       sendIfMoreRecentThan [1] EDBVersion,}}
+\L{\LB{}\Tab{8}{       getVersionNumber [2] NULL,}}
+\L{\LB{}\Tab{8}{       getEDB [3] NULL,}}
+\L{\LB{}\Tab{8}{       continuation [4] SEQUENCE \{}}
+\L{\LB{                        EDBVersion,}}
+\L{\LB{                        nextEntryPosition INTEGER \}}}
+\L{\LB{                \},}}
+\L{\LB{}\Tab{8}{maxEntries [5] INTEGER OPTIONAL }}
+\L{\LB{                    \C{}\-\- Must omit if remote DSA is QUIPU 6.8 or less}}
+\CE{}\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\Proc{GetEntryDataBlockResult}GetEntryDataBlockResult ::= SEQUENCE \{}}
+\L{\LB{}\Tab{16}{versionHeld [0] EDBVersion,}}
+\L{\LB{}\Tab{16}{[1] EntryDataBlock OPTIONAL,}}
+\L{\LB{}\Tab{16}{nextEntryPostion INTEGER OPTIONAL}}
+\L{\LB{                    \C{}\-\- Must omit if remote DSA is QUIPU 6.8 or less}}
+\CE{}\L{\LB{}\Tab{8}{\}}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{\Proc{EDBVersion}EDBVersion ::= UTCTime}}

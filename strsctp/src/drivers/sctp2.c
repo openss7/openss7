@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2007/10/18 06:54:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/10/18 06:54:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.75  2007/10/18 06:54:16  brian
+ - corrected new socket buffer support
+
+ Revision 0.9.2.74  2007/10/15 17:24:24  brian
+ - updates for 2.6.22.5-49.fc6 kernel
+
  Revision 0.9.2.73  2007/07/18 17:02:19  brian
  - correct NETIF_F_HW_CSUM, XTI_SNDBUF and XTI_RCVBUF
 
@@ -154,10 +160,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/07/18 17:02:19 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2007/10/18 06:54:16 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/07/18 17:02:19 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2007/10/18 06:54:16 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -175,7 +181,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/07/18 17:02:19 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2007/10/18 06:54:16 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -230,6 +236,69 @@ MODULE_ALIAS("streams-driver-sctp");
 #define sctplogte(sp, fmt, ...)  sctplog(sp, SCTPLOGTE, SL_TRACE, fmt, ##__VA_ARGS__)
 #define sctplogno(sp, fmt, ...)  sctplog(sp, SCTPLOGNO, SL_TRACE, fmt, ##__VA_ARGS__)
 #define sctplogda(sp, fmt, ...)  sctplog(sp, SCTPLOGDA, SL_TRACE, fmt, ##__VA_ARGS__)
+
+#if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
+{
+	return skb->tail;
+}
+static inline unsigned char *skb_end_pointer(const struct sk_buff *skb)
+{
+	return skb->end;
+}
+static inline unsigned char *skb_transport_header(const struct sk_buff *skb)
+{
+	return skb->h.raw;
+}
+static inline unsigned char *skb_network_header(const struct sk_buff *skb)
+{
+	return skb->nh.raw;
+}
+static inline unsigned char *skb_mac_header(const struct sk_buff *skb)
+{
+	return skb->mac.raw;
+}
+static inline void skb_reset_tail_pointer(struct sk_buff *skb)
+{
+	skb->tail = skb->data;
+}
+static inline void skb_reset_end_pointer(struct sk_buff *skb)
+{
+	skb->end = skb->data;
+}
+static inline void skb_reset_transport_header(struct sk_buff *skb)
+{
+	skb->h.raw = skb->data;
+}
+static inline void skb_reset_network_header(struct sk_buff *skb)
+{
+	skb->nh.raw = skb->data;
+}
+static inline void skb_reset_mac_header(struct sk_buff *skb)
+{
+	skb->mac.raw = skb->data;
+}
+static inline void skb_set_tail_pointer(struct sk_buff *skb, const int offset)
+{
+	skb_reset_tail_pointer(skb);
+	skb->tail += offset;
+}
+static inline void skb_set_transport_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_transport_header(skb);
+	skb->h.raw += offset;
+}
+static inline void skb_set_network_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_network_header(skb);
+	skb->nh.raw += offset;
+}
+static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_mac_header(skb);
+	skb->mac.raw += offset;
+}
+#endif				/* !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 
 /*
  *  =========================================================================
@@ -1291,7 +1360,7 @@ struct sctpchdr {
 #ifdef HAVE_KMEMB_STRUCT_SK_BUFF_H_SH
 #define SCTP_SKB_SH(__skb)	((__skb)->h.sh)
 #else
-#define SCTP_SKB_SH(__skb)	((struct sctphdr *)((__skb)->h.raw))
+#define SCTP_SKB_SH(__skb)	((struct sctphdr *)(skb_network_header(__skb)))
 #endif
 #define SCTP_SKB_SH_SRCE(__skb)	(SCTP_SKB_SH(__skb)->srce)
 #define SCTP_SKB_SH_DEST(__skb)	(SCTP_SKB_SH(__skb)->dest)
@@ -4113,6 +4182,19 @@ __sctp_bhash_unhash(struct sctp *sp)
  *  probably want to listen on INADDR_ANY for specific port numbers.
  */
 
+#if !defined HAVE_DEV_BASE_HEAD_SYMBOL
+static inline struct net_device *
+first_net_device(void)
+{
+	return (dev_base);
+}
+static inline struct net_device *
+next_net_device(struct net_device *dev)
+{
+	return (dev->next);
+}
+#endif				/* !defined HAVE_DEV_BASE_HEAD_SYMBOL */
+
 /*
  *  Get Local Addresses
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -4129,7 +4211,7 @@ __sctp_get_addrs(sctp_t * sp, uint32_t daddr)
 #if ! ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 	read_lock(&inetdev_lock);
 #endif
-	for (dev = dev_base; dev; dev = dev->next) {
+	for (dev = first_net_device(); dev; dev = next_net_device(dev)) {
 		struct in_device *in_dev;
 		struct in_ifaddr *ifa;
 
@@ -5295,7 +5377,7 @@ STATIC INLINE int
 sctp_queue_xmit(struct sk_buff *skb)
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
-	struct iphdr *iph = skb->nh.iph;
+	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #ifdef NETIF_F_TSO
 	ip_select_ident_more(iph, &rt->u.dst, NULL, 0);
@@ -5392,7 +5474,15 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 			iph->saddr = saddr;
 			iph->protocol = 132;
 			iph->tot_len = htons(tlen);
+#if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if defined NET_SKBUFF_DATA_USES_OFFSET
+			skb->network_header = (unsigned char *) iph - skb->head;
+#else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
+			skb->network_header = (void *) iph;
+#endif				/* defined NET_SKBUFF_DATA_USES_OFFSET */
+#else				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 			skb->nh.iph = iph;
+#endif				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 #ifndef HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
@@ -5508,7 +5598,15 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 			iph->saddr = saddr;
 			iph->protocol = sp->protocol;
 			iph->tot_len = htons(tlen);
+#if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if defined NET_SKBUFF_DATA_USES_OFFSET
+			skb->network_header = (unsigned char *) iph - skb->head;
+#else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
+			skb->network_header = (void *) iph;
+#endif				/* defined NET_SKBUFF_DATA_USES_OFFSET */
+#else				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 			skb->nh.iph = iph;
+#endif				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 #ifndef HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
@@ -5665,7 +5763,15 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 		iph->saddr = sd->saddr;
 		iph->protocol = sp->protocol;
 		iph->tot_len = htons(tlen);
+#if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if defined NET_SKBUFF_DATA_USES_OFFSET
+		skb->network_header = (unsigned char *) iph - skb->head;
+#else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
+		skb->network_header = (void *) iph;
+#endif				/* defined NET_SKBUFF_DATA_USES_OFFSET */
+#else				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 		skb->nh.iph = iph;
+#endif				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 #ifndef HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 		__ip_select_ident(iph, sd->dst_cache);
@@ -29678,7 +29784,7 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
 		mp->b_band = 1;
 		*((uint32_t *) mp->b_wptr) = iph->daddr;
 		mp->b_wptr += sizeof(uint32_t);
-		*((struct icmphdr *) mp->b_wptr) = *(skb->h.icmph);
+		*((struct icmphdr *) mp->b_wptr) = *((struct icmphdr *)skb_transport_header(skb));
 		mp->b_wptr += sizeof(struct icmphdr);
 		putq(sp->rq, mp);	/* must succeed, band 1 already allocated */
 		goto discard_and_put;
@@ -29817,14 +29923,14 @@ sctp_v4_rcv(struct sk_buff *skb)
 		goto no_buffers;
 	// mp->b_rptr = skb->data;
 	// mp->b_wptr = mp->b_rptr + skb->len;
-	mp->b_datap->db_base = skb->nh.raw;	/* important */
+	mp->b_datap->db_base = skb_network_header(skb);	/* important */
 	mp->b_datap->db_lim = mp->b_wptr;
 	mp->b_datap->db_size = mp->b_datap->db_lim - mp->b_datap->db_base;
 #endif
 #endif
 	/* we do the lookup before the checksum */
 	{
-		struct iphdr *iph = skb->nh.iph;
+		struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 		printd(("%s: mp %p lookup up stream\n", __FUNCTION__, mp));
 		if (!(sp = sctp_lookup(sh, iph->daddr, iph->saddr)))

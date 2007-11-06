@@ -1,0 +1,60 @@
+.PS 8.5i
+.ps 20
+boxwid	=	2*boxwid
+define boxit @
+	box "$1" with .n at ($2.s.x, $2.s.y-lineht/2)
+	line from $2.s to last box.n
+@
+define peer @
+	box "$1" with .n at ($3.s.x, $3.s.y-lineht/2)
+	line    from $3.s to last box.n
+	line $4 from $2.e to last box.w
+@
+## figure 1
+B1:	box "APPLICATION"
+B2:	boxit(PRESENTATION,B1)
+B3:	boxit(SESSION,B2)
+B4:	box "TRANSPORT" "SERVICE" with .n at (B3.s.x, B3.s.y-lineht/2) \
+		height 2*boxht
+	line from B3.s to B4.n
+##
+P1:	box "APPLICATION" with .w at (B1.e.x+2*linewid, B1.e.y)
+	line dashed from B1.e to P1.w
+P2:	peer(PRESENTATION,B2,P1,dashed)
+P3:	peer(SESSION,B3,P2,dashed)
+P4:	box "TRANSPORT" "SERVICE" with .n at (P3.s.x, P3.s.y-lineht/2) \
+		height 2*boxht
+	line from P3.s to P4.n
+	line from B4.e to P4.w
+##
+C1:	box "APPLICATION" with .w at (P1.e.x+linewid, P1.e.y)
+C2:	boxit(PRESENTATION,C1)
+C3:	boxit(SESSION,C2)
+C4:	box "TRANSPORT" "SERVICE" with .n at (C3.s.x, C3.s.y-lineht/2) \
+		height 2*boxht
+	line from C3.s to C4.n
+##
+Q1:	box "APPLICATION" with .w at (C1.e.x+2*linewid, C1.e.y)
+	line dashed from C1.e to Q1.w
+Q2:	peer(PRESENTATION,C2,Q1,dashed)
+Q3:	peer(SESSION,C3,Q2,dashed)
+Q4:	box "TRANSPORT" "SERVICE" with .n at (Q3.s.x, Q3.s.y-lineht/2) \
+		height 2*boxht
+	line from Q3.s to Q4.n
+	line from C4.e to Q4.w
+##
+G1:	box "APPLICATION" "GATEWAY" \
+		with .sw at (P1.nw.x, P1.nw.y+lineht) \
+		height 2*boxht width C1.ne.x-P1.nw.x
+	line up from P1.n
+	line up from C1.n
+	line dashed from (G1.s.x, G1.s.y-lineht/2) \
+		    to (G1.s.x, C4.s.y-lineht/2)
+##
+G2:	box with .nw at (P4.sw.x, P4.sw.y-lineht) \
+		width C4.se.x-P4.sw.x height boxht/6 shaded
+	move to (G2.s.x, G2.s.y-lineht/2); "GATEWAY HOST"
+	move to ((B4.s.x+P4.s.x)/2, B4.s.y-lineht/2); "ISO"
+	move to ((C4.s.x+Q4.s.x)/2, C4.s.y-lineht/2); "non-ISO"
+##
+.PE

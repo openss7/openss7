@@ -1,0 +1,26 @@
+.PS
+.ps 20
+## figure 3
+boxwid  =       3*boxwid
+define boxit @
+        box "$1" with .n at ($2.s.x, $2.s.y-lineht/2)
+        line from $2.s to last box.n
+@
+define peer @
+        box "$1" with .n at ($3.s.x, $3.s.y-lineht/2)
+        line    from $3.s to last box.n
+        line $4 from $2.e to last box.w
+@
+##
+B1:     box "APPLICATION"
+B2:     boxit(PRESENTATION,B1)
+B3:     boxit(SESSION,B2)
+B4:     boxit(TRANSPORT,B3)
+B5:     boxit(NETWORK,B4)
+B6:     boxit(DATA LINK,B5)
+B7:     boxit(PHYSICAL,B6)
+##
+L1:	line dashed from (B3.sw.x-boxwid/2,B3.sw.y-(B3.sw.y-B4.nw.y)/2) \
+		      to (B3.se.x+boxwid/2,B3.sw.y-(B3.sw.y-B4.nw.y)/2)
+##
+.PE

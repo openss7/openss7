@@ -1,0 +1,185 @@
+\File{algo.py},{08:16},{Jul  6 1990}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\Proc{PurportedName}PurportedName ::= \K{SEQUENCE} \K{OF} String}}
+\L{\LB{}\Tab{16}{\C{}\-\- simplication, as attribute types can optionally be }}
+\CE{}\L{\LB{}\Tab{16}{\C{}\-\- specified}}
+\CE{}\L{\LB{}}
+\L{\LB{}\Tab{16}{\C{}\-\- Each element of the Purported Name is a string}}
+\CE{}\L{\LB{}\Tab{16}{\C{}\-\- which has been parsed from the BNF   }}
+\CE{}\L{\LB{}}
+\L{\LB{\Proc{Attribute}Attribute ::= \K{SEQUENCE} \{ }}
+\L{\LB{}\Tab{8}{type \K{OBJECT} \K{IDENTIFIER}, }}
+\L{\LB{}\Tab{8}{value \K{ANY} \}}}
+\L{\LB{}}
+\L{\LB{\Proc{RDN}RDN ::= Attribute \C{}\-\- simplification, as can be multi\-value}}
+\CE{}\L{\LB{}}
+\L{\LB{\Proc{DN}DN ::= \K{SEQUENCE} \K{OF} RDN}}
+\L{\LB{}}
+\L{\LB{\Proc{Environment}Environment ::= \K{SEQUENCE} \K{OF} DN}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\Proc{EnvironmentList}EnvironmentList ::= \K{SEQUENCE} \K{OF} \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{24}{lower\-bound \K{INTEGER},}}
+\L{\LB{}\Tab{24}{upper\-bound \K{INTEGER}, }}
+\L{\LB{}\Tab{24}{environment Environment \}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{friendlyMatch(p: PurportedName; el: EnvironmentList):  \K{SET} \K{OF} DN }}
+\L{\LB{\{}}
+\L{\LB{}\Tab{32}{\C{}\-\- Find correct environment}}
+\CE{}\L{\LB{}\Tab{32}{}}
+\L{\LB{}\Tab{8}{IF length(el) == 0 THEN return(\K{NULL});}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{IF length(p) \<= head(el).upper\-bound}}
+\L{\LB{}\Tab{24}{\&\& length(p) \>= head(el).lower\-bound THEN}}
+\L{\LB{}\Tab{16}{return envMatch (p, head(el).environment);}}
+\L{\LB{}\Tab{8}{ELSE}}
+\L{\LB{}\Tab{16}{return(friendlyMatch(p, tail(el));}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{envMatch(p: PurportedName; e: Environment):  \K{SET} \K{OF} DN }}
+\L{\LB{\{}}
+\L{\LB{}\Tab{32}{\C{}\-\- Check elements of environment}}
+\CE{}\L{\LB{}\Tab{32}{\C{}\-\- in the defined order}}
+\CE{}\L{\LB{}\Tab{32}{}}
+\L{\LB{}\Tab{8}{matches: \K{SET} \K{OF} DN;}}
+\L{\LB{}\Tab{8}{}}
+\L{\LB{}\Tab{8}{IF length(e) == 0 THEN return(\K{NULL});}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{matches = purportedMatch(head(el).DN, p)}}
+\L{\LB{ }\Tab{8}{IF matches != \K{NULL} THEN }}
+\L{\LB{}\Tab{16}{return(matches);}}
+\L{\LB{}\Tab{8}{ELSE}}
+\L{\LB{}\Tab{16}{return(envMatch(p, tail(e));}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{purportedMatch(base: DN; p: PurportedName): \K{SET} \K{OF} DN }}
+\L{\LB{\{}}
+\L{\LB{}\Tab{8}{s: String = head(p);}}
+\L{\LB{}\Tab{8}{matches: \K{SET} \K{OF} DN = \K{NULL};}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{IF length(p) == 1 THEN }}
+\L{\LB{}\Tab{16}{IF length(base) == 0 THEN}}
+\L{\LB{}\Tab{24}{IF (matches = rootSearch(s)) != \K{NULL} THEN }}
+\L{\LB{}\Tab{32}{return(matches);}}
+\L{\LB{}\Tab{24}{ELSE return(leafSearch(base, s, \K{FALSE});}}
+\L{\LB{}\Tab{16}{ELSE IF length(base) == 1 THEN}}
+\L{\LB{}\Tab{24}{IF (matches = intSearch(base, s)) != \K{NULL} THEN}}
+\L{\LB{}\Tab{32}{return(matches);}}
+\L{\LB{}\Tab{24}{ELSE return(leafSearch(base, s, \K{FALSE});}}
+\L{\LB{}\Tab{16}{ELSE }}
+\L{\LB{}\Tab{24}{IF (matches = leafSearch(base, s, \K{TRUE})) != \K{NULL} THEN}}
+\L{\LB{}\Tab{32}{return(matches);}}
+\L{\LB{}\Tab{24}{ELSE return(intsearch(base, s);}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{IF length(base) == 0 THEN}}
+\L{\LB{}\Tab{16}{\K{FOR} x IN rootSearch(s) DO}}
+\L{\LB{}\Tab{24}{matches += (purportedMatch(x, tail(p));}}
+\L{\LB{}\Tab{8}{ELSE}\Tab{32}{}}
+\L{\LB{}\Tab{16}{\K{FOR} x IN intSearch(base, s) DO}}
+\L{\LB{}\Tab{24}{matches += (purportedMatch(x, tail(p));}}
+\L{\LB{}\Tab{8}{return(matches);}}
+\L{\LB{\}}\Tab{24}{}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- General.  Might need to tighten the filter for short strings,}}
+\CE{}\L{\LB{\C{}\-\- in order to stop being flooded.  Alternatively, this could be }}
+\CE{}\L{\LB{\C{}\-\- done if the loose search hists a size limit}}
+\CE{}\L{\LB{}\Tab{8}{}}
+\L{\LB{rootSearch(s: String): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{}\Tab{8}{IF length == 2 THEN}}
+\L{\LB{}\Tab{16}{return(search(\K{NULL}, \K{FALSE}, s, \{CountryName, }}
+\L{\LB{}\Tab{24}{FriendlyCountryName, OrganizationName\},}}
+\L{\LB{}\Tab{24}{\{exact\}, \{Country, Organisation\}));}}
+\L{\LB{}\Tab{8}{ELSE}}
+\L{\LB{}\Tab{16}{return(search(\K{NULL}, \K{FALSE}, s, \{OrganizationName,}}
+\L{\LB{}\Tab{24}{FriendlyCountryName\}, \{substring, approx\},}}
+\L{\LB{}\Tab{24}{\{Country, Organisation\}));}}
+\L{\LB{\}}}
+\L{\LB{}\Tab{16}{}}
+\L{\LB{}}
+\L{\LB{intSearch( base: DN; s: String)}}
+\L{\LB{\{}}
+\L{\LB{}\Tab{8}{IF present(base, OrgUnitName) THEN}}
+\L{\LB{}\Tab{16}{return(search(base, \K{FALSE}, s, \{OrgUnitName\},}}
+\L{\LB{}\Tab{24}{\{substring, approx\}, \{OrgUnit\}));}}
+\L{\LB{}\Tab{8}{ELSE IF present(base, OrganisationName) THEN}}
+\L{\LB{}\Tab{16}{return(search(base, \K{FALSE}, \{OrgUnitName,}}
+\L{\LB{}\Tab{24}{LocalityName\}, \{substring, approx\},}}
+\L{\LB{}\Tab{24}{\{Organization, OrgUnit, Locality\}));}}
+\L{\LB{}\Tab{8}{ELSE IF present(base, LocalityName) THEN}}
+\L{\LB{}\Tab{16}{return(search(base, \K{FALSE}, s, \{OrganisationName\},}}
+\L{\LB{}\Tab{24}{\{substring, approx\}, \{Locality\});}}
+\L{\LB{}\Tab{8}{ELSE}}
+\L{\LB{}\Tab{16}{return(search(base, false, s, \{OrganisationName,}}
+\L{\LB{}\Tab{24}{LocalityName\}, \{substring, approx\}, }}
+\L{\LB{}\Tab{24}{\{Organisation, Locality\}));}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{present(d: DN; t: AttributeType): \K{BOOLEAN}}}
+\L{\LB{\{}}
+\L{\LB{}\Tab{8}{\K{FOR} x IN d DO}}
+\L{\LB{}\Tab{16}{IF x.type == t THEN return(\K{TRUE});}}
+\L{\LB{}\Tab{8}{return(\K{FALSE});}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{leafSearch(base: DN; s: String; subtree: \K{BOOLEAN}) }}
+\L{\LB{\{}\Tab{8}{}}
+\L{\LB{}\Tab{8}{return(search(base, subtree, s, \{CommonName, Surname,}}
+\L{\LB{}\Tab{16}{UserId\}, \{substring, approx\}));}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{search(base: DN; subtrees: \K{BOOLEAN}; s: string;}}
+\L{\LB{}\Tab{8}{alist \K{SET} \K{OF} AttributeType; matchtypes \K{SET} \K{OF} MatchType }}
+\L{\LB{}\Tab{8}{objectClasses \K{SET} \K{OF} ObjectClass \K{OPTIONAL}): \K{SET} \K{OF} DN }}
+\L{\LB{\{}}
+\L{\LB{}\Tab{8}{\C{}\-\- mapped onto Directory Search, with OR conjunction}}
+\CE{}\L{\LB{}\Tab{8}{\C{}\-\- of filter items}}
+\CE{}\L{\LB{}}
+\L{\LB{}\Tab{8}{return dNSelect (s, search\-results, alist);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{read(base: DN; alist \K{SET} \K{OF} AttributeType): \K{SET} \K{OF} Attribute;}}
+\L{\LB{\{}}
+\L{\LB{}\Tab{8}{\C{}\-\- mapped onto Directory Read}}
+\CE{}\L{\LB{}\Tab{8}{\C{}\-\- Types repeated to deal with multiple values}}
+\CE{}\L{\LB{}\Tab{8}{\C{}\-\- This would be implemented by returning selected info}}
+\CE{}\L{\LB{}\Tab{8}{\C{}\-\- with the search operation}}
+\CE{}\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{dNSelect(s: String; dlist \K{SET} \K{OF} DN; alist: \K{SET} \K{OF} AttributeType): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{}\Tab{8}{exact, good: \K{SET} \K{OF} DN;}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{FOR} x IN dlist DO}}
+\L{\LB{}\Tab{16}{IF last(DN).Value == s THEN}}
+\L{\LB{}\Tab{24}{exact += x;}}
+\L{\LB{}\Tab{16}{ELSE IF \K{FOR} y IN read(x, alist) DO}}
+\L{\LB{}\Tab{24}{IF y.value == s THEN}}
+\L{\LB{}\Tab{32}{good += x;}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{IF exact != \K{NULL} THEN return(exact);}}
+\L{\LB{}\Tab{8}{IF good != \K{NULL} THEN return(good);}}
+\L{\LB{}\Tab{8}{return(userQuery(dlist));}}
+\L{\LB{\}}\Tab{8}{}}
+\L{\LB{}\Tab{32}{}}
+\L{\LB{}}
+\L{\LB{userQuery(dlist \K{SET} \K{OF} DN): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{}\Tab{8}{\C{}\-\- pass back up for manual checking}}
+\CE{}\L{\LB{}\Tab{8}{\C{}\-\- user can strip all matches to force progres....}}
+\CE{}\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{head()    \C{}\-\- return first element of list}}
+\CE{}\L{\LB{tail()    \C{}\-\- return list with first element removed}}
+\CE{}\L{\LB{length()  \C{}\-\- return size of list}}
+\CE{}\L{\LB{last()}\Tab{8}{  \C{}\-\- return last element of list}}

@@ -1,0 +1,178 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: om_xxx.3.man,v 0.9.2.1 2007/09/29 14:08:31 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:31 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: om_xxx.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:31  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH OM_WORKSPACE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B OM_workspace
+\- 
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xom.h>
+.HP
+.B
+.\"
+.\"
+.SH MEMBERS
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Two application-specific APIs may involve the same class, the two APIs may
+employ different implementations of the service, for example, because they are
+supplied by different vendors, and the two implementations may represent
+private objects differently. If it is to use both application-specific APIs,
+the client must be able to specify which service implementation is to create
+an instance of the class that both support. In addition, the client may wish
+to present the object at both application-specific APIs, in which case the
+object must be converted from one internal format to another. Such
+interworking between service implementations is achieved by means of
+workspaces.
+.PP
+The service maintains private objects in workspaces. A workspace is a
+repository for instances of classes in the closures of one or more packages
+associated with the workspace. The implementations of the OM interface
+functions may differ from one workspace to another. A package may be
+associated with any number of workspaces. The OM package is implicitly
+associated with every workspace. Other packages may be explicitly associated
+with a workspace when it is defined.
+.PP
+The interface includes functions for effectively copying and moving objects
+from one workspace to another, provided that the objects classes are
+associated with both. How workspaces are created, made known to the client and
+destroyed, however, is outside the scope of this document. In all cases,
+destroying a workspace effectively applies the Delete function to each private
+object it contains.
+Notes:
+.IP 1. \w'0.\(em'u
+Typically workspaces are created, made known to the client, and destroyed by
+means of application-specific APIs designed to be used in conjunction with the
+present interface.
+.IP 2.
+Failure to delete private objects before closing the workspace could result in
+consumption of resources by those objects with no mechanism available for
+freeing those resources.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ap_snd (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR OM_workspace
+is compatible with XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR OM_workspace
+first appeared in XOM.
+.[
+xom
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XOM Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

@@ -1,0 +1,21 @@
+.PS
+.ps 20
+## figure D-32
+boxwid	=	3*boxwid/2
+##
+B1:	box "Directory" "Assistant"
+B2:	box "DSA" with .w at (B1.e.x+2*linewid, B1.e.y)
+B3:	box "DA-client" with .n at (B1.s.x, B1.s.y-2*lineht)
+	line <- -> from B2.w to B1.e
+	line <- -> from B1.s to B3.n
+##
+	line dashed from ((B1.e.x+B2.w.x)/2, B2.n.y+2*lineht) \
+		    to   ((B1.e.x+B2.w.x)/2, B3.s.y-2*lineht)
+	move to ((B1.e.x+B2.w.x)/2, B2.n.y+2*lineht); \
+	"\ \begin{tabular}{l} Directory Service\\ \ \ provided via DAP\end{tabular}" ljust
+	move to ((B1.e.x+B2.w.x)/2, B3.s.y-2*lineht); \
+		"Directory User\ " rjust
+	move to (B1.s.x, (B1.s.y+B3.n.y)/2); \
+	"\begin{tabular}{l} DA-service\\ \ \ provided via\\ \ \ DA-protocol\end{tabular}\ " rjust
+##
+.PE

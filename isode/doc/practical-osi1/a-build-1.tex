@@ -1,0 +1,112 @@
+\begin{bwslide}
+\part	{BUILDING AN OSI APPLICATION}\bf
+
+\begin{nrtc}
+\item	YOU ARE NOW FAMILIAR WITH:
+    \begin{nrtc}
+    \item	A MODEL FOR DISTRIBUTED OSI APPLICATIONS
+
+    \item	OSI SERVICES AVAILABLE TO THE APPLICATION
+    \end{nrtc}
+
+\item	WE NOW DESCRIBE A ``DISCIPLINE'' TO BRING THE PIECES TOGETHER
+\item	OUR SCENARIO WILL BUILD AN APPLICATION BASED ON REMOTE OPERATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INITIATORS}
+
+\begin{nrtc}
+\item	IN GENERAL, THERE ARE TWO KINDS OF INITIATOR IMPLEMENTATIONS
+
+\item	INTERACTIVE
+    \begin{nrtc}
+    \item	A USER RUNS A PROGRAM AND INTERACTIVELY DIRECTS THE
+		INVOCATION OF OPERATIONS
+    \end{nrtc}
+
+\item	EMBEDDED
+    \begin{nrtc}
+    \item	A PROGRAM CAUSES AN ASSOCIATION TO BE AUTOMATICALLY FORMED
+		AND OPERATIONS TO BE INVOKED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RESPONDERS}
+
+\begin{nrtc}
+\item	IN GENERAL, THERE ARE TWO KINDS OF RESPONDER IMPLEMENTATIONS,
+	DEPENDING ON HOW ASSOCIATIONS ARE GIVEN TO THE PROGRAM WHICH
+	IMPLEMENTS THE SERVICE
+
+\item	SINGLE ASSOCIATION (a.k.a. THE DYNAMIC APPROACH)
+    \begin{nrtc}
+    \item	EACH TIME THE SERVICE IS REQUESTED, A NEW INSTANCE OF
+		THE PROGRAM IS EXECUTED
+    \end{nrtc}
+
+\item	MULTIPLE ASSOCIATION (a.k.a. THE STATIC APPROACH)
+    \begin{nrtc}
+    \item	EACH TIME THE SERVICE IS REQUESTED, THE REQUEST IS GIVEN TO A
+		SINGLE, ALREADY EXECUTING, INSTANCE OF THE PROGRAM
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GENERAL ORGANIZATION}
+
+\begin{nrtc}
+\item	AT COMPILE-TIME:
+    \begin{nrtc}
+    \item	USE RO-SPECIFICATION TO GENERATE SUPPORT FACILITIES
+    \end{nrtc}
+
+\item	AT RUN-TIME:
+    \begin{nrtc}
+    \item	USE DIRECTORY SERVICES TO LOCATE/REGISTER SERVICES
+
+    \item	USE ASSOCIATION CONTROL TO BIND/UNBIND APPLICATIONS
+
+    \item	USE REMOTE OPERATIONS TO INVOKE TRANSACTIONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STATIC (COMPILE-TIME) ORGANIZATION}
+
+\vskip.15in
+\diagram[p]{figureA-10}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DYNAMIC (RUN-TIME) ORGANIZATION}
+
+\vskip.15in
+\diagram[p]{figureA-49}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{IN PERSPECTIVE}
+
+\begin{nrtc}
+\item	WE ARE DESCRIBING \emph{ONE} POSSIBLE METHOD
+	FOR REALIZING THE MODEL USING THE UNDERLYING FACILITIES
+
+\item	MANY MORE ARE POSSIBLE
+
+\item	THE APPROACH DESCRIBED IS THAT TAKEN BY THE \emph{ISODE},
+	KNOWN TO SOME AS \emph{THE COOKBOOK}
+
+\end{nrtc}
+\end{bwslide}

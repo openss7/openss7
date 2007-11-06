@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/12 19:05:30 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/10/17 20:00:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/12 19:05:30 $ by $Author: brian $
+# Last Modified $Date: 2007/10/17 20:00:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -243,31 +243,37 @@ AC_DEFUN([_DEB_DPKG_SETUP_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_SETUP_BUILD], [dnl
     AC_ARG_VAR([DPKG], [dpkg command])
-    AC_PATH_PROG([DPKG], [dpkg], [], [$PATH:/usr/local/bin:/usr/bin])
+    AC_PATH_PROG([DPKG], [dpkg], [],
+		 [$PATH:/usr/local/bin:/usr/bin])
     if test :"${DPKG:-no}" = :no ; then
 	case "$target_vendor" in
 	    (debian|ubuntu)
 		AC_MSG_WARN([Could not find dpkg program in PATH.])
 		;;
 	esac
+	DPKG="${am_missing_run}dpkg"
     fi
     AC_ARG_VAR([DPKG_SOURCE], [dpkg-source command])
-    AC_PATH_PROG([DPKG_SOURCE], [dpkg-source], [], [$PATH:/usr/local/bin:/usr/bin])
+    AC_PATH_PROG([DPKG_SOURCE], [dpkg-source], [],
+		 [$PATH:/usr/local/bin:/usr/bin])
     if test :"${DPKG_SOURCE:-no}" = :no ; then
 	case "$target_vendor" in
 	    (debian|ubuntu)
 		AC_MSG_WARN([Could not find dpkg-source program in PATH.])
 		;;
 	esac
+	DPKG_SOURCE="${am_missing_run}dpkg-source"
     fi
     AC_ARG_VAR([DPKG_BUILDPACKAGE], [dpkg-buildpackage command])
-    AC_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [], [$PATH:/usr/local/bin:/usr/bin])
+    AC_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [],
+		 [$PATH:/usr/local/bin:/usr/bin])
     if test :"${DPKG_BUILDPACKAGE:-no}" = :no ; then
 	case "$target_vendor" in
 	    (debian|ubuntu)
 		AC_MSG_WARN([Could not find dpkg-buildpackage program in PATH.])
 		;;
 	esac
+	DPKG_BUILDPACKAGE="${am_missing_run}dpkg-buildpackage"
     fi
     AC_ARG_VAR([DEB_BUILD_ARCH], [Debian build architecture])
     AC_ARG_VAR([DEB_BUILD_GNU_CPU], [Debian build cpu])
@@ -277,7 +283,7 @@ AC_DEFUN([_DEB_DPKG_SETUP_BUILD], [dnl
     AC_ARG_VAR([DEB_HOST_GNU_CPU], [Debian host/target cpu])
     AC_ARG_VAR([DEB_HOST_GNU_SYSTEM], [Debian host/target os])
     AC_ARG_VAR([DEB_HOST_GNU_TYPE], [Debian host/target alias])
-    AM_CONDITIONAL([BUILD_DPKG], [test :"${DPKG_SOURCE:-no}" != :no -a :"${DPKG_BUILDPACKAGE:-no}" != :no])dnl
+    AM_CONDITIONAL([BUILD_DPKG], [test :"${ac_cv_path_DPKG_SOURCE:-no}" != :no -a :"${ac_cv_path_DPKG_BUILDPACKAGE:-no}" != :no])dnl
 ])# _DEB_DPKG_SETUP_BUILD
 # =============================================================================
 
@@ -329,6 +335,9 @@ AC_DEFUN([_DEB_DPKG], [dnl
 # =============================================================================
 #
 # $Log: deb.m4,v $
+# Revision 0.9.2.20  2007/10/17 20:00:26  brian
+# - slightly different path checks
+#
 # Revision 0.9.2.19  2007/08/12 19:05:30  brian
 # - rearrange and update headers
 #

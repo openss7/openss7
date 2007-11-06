@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: libraries.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/12 19:05:31 $
+# @(#) $RCSfile: libraries.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/10/17 20:00:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/12 19:05:31 $ by $Author: brian $
+# Last Modified $Date: 2007/10/17 20:00:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,7 +75,8 @@ AC_DEFUN([_LDCONFIG_SPEC_OPTIONS], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LDCONFIG_SPEC_SETUP], [dnl
     AC_ARG_VAR([LDCONFIG], [Configure loader command])
-    AC_PATH_PROG([LDCONFIG], [ldconfig], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_PROG([LDCONFIG], [ldconfig], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${LDCONFIG:-no}" = :no ; then
 	AC_MSG_WARN([Could not find ldconfig program in PATH.])
 	LDCONFIG=/sbin/ldconfig
@@ -97,6 +98,9 @@ AC_DEFUN([_LDCONFIG_SPEC_OUTPUT], [dnl
 # =============================================================================
 #
 # $Log: libraries.m4,v $
+# Revision 0.9.2.14  2007/10/17 20:00:28  brian
+# - slightly different path checks
+#
 # Revision 0.9.2.13  2007/08/12 19:05:31  brian
 # - rearrange and update headers
 #

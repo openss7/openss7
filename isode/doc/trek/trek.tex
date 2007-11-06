@@ -1,0 +1,362 @@
+% run this through SLiTeX
+
+\documentstyle[blackandwhite,landscape,oval,pagenumbers,small]{NRslides}
+
+\raggedright
+
+\input trademark
+
+\begin{document}
+
+\title	{TREKKING TO ISO:\\ BEAM US OVER, SCOTTY}
+\author	{Marshall T.~Rose\\
+	Computer Science Laboratory\\
+	Northrop Research and Technology Center}
+\date	{October 7, 1987}
+\maketitlepage
+
+
+\begin{note}\em
+first a disclaimer:
+
+\begin{quote}
+i didn't get to choose the title for this talk!
+\end{quote}
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{FUNDAMENTAL PREMISES}
+
+\begin{nrtc}
+\item	OSI/ISO WILL DOMINATE COMPUTER COMMUNICATIONS
+
+\item	EXISTING INVESTMENTS (IN NON-OSI TECHNOLOGY) SHOULD BE PROTECTED
+    \begin{nrtc}
+    \item	BUT REALISTICALLY, EQUIPMENT HAS A HALF-LIFE OF 5 YEARS
+    \end{nrtc}
+
+\item	NEW INVESTMENTS SHOULD EITHER BE OSI OR HAVE A HIGH DEGREE OF
+	OSI-COMPATIBILITY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHAT IS OSI/ISO?}
+
+\begin{nrtc}
+\item	A LAYERED ARCHITECTURE FOR COMPUTER COMMUNICATIONS
+
+\item	STANDARDIZED IN THE INTERNATIONAL COMMUNITY
+
+\item	NON-PROPRIETARY IN NATURE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FROM A COMMUNICATIONS VIEWPOINT}
+
+\vskip.5in
+\diagram[p]{figure0a}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FROM A COMPUTER VIEWPOINT}
+
+\vskip.5in
+\diagram[p]{figure0b}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE 7--LAYER STACK}
+
+\vskip.5in
+\diagram[p]{figure0c}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE OSI APPLICATION LAYER}
+
+\begin{nrtc}
+\item	MANY STANDARD SERVICE ELEMENTS
+    \begin{nrtc}
+    \item	ASSOCATION CONTROL
+
+    \item	REMOTE OPERATIONS
+
+    \item	RELIABLE TRANSFER
+
+    \item	COMMITMENT, CONCURRENCY AND RECOVERY
+
+    \item	ABSTRACT SYNTAX NOTATION ONE\\
+		(REALLY PRESENTATION LAYER)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FTAM USE OF UPPER-LAYER ELEMENTS}
+
+\vskip.5in
+\diagram[p]{figure3}
+\end{bwslide}
+
+
+\begin{note}\em
+will use the terms ISO and OSI interchangeably from now on
+
+ISO will provide the dominant communication protocol family in the 1990's
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{POSSIBLE SOLUTION \#1\\ EXAGERATED, OBVIOUSLY}
+
+\begin{nrtc}
+\item	FIRE ALL NON-OSI PERSONNEL
+
+\item	SELL ALL NON-OSI EQUIPMENT
+
+\item	BANKROLL ONLY PURE-OSI INVESTMENTS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NOT A VERY GOOD IDEA\\ (NOT RECOMMENDED)}
+
+\begin{nrtc}
+\item	CAPABILITY OF {\bf CURRENT\/} OSI PRODUCTS
+	NOT AS GOOD AS OTHER EXISTING NETWORKING PRODUCTS
+    
+\item	WE CAN'T SHUTDOWN THE FACTORY/OFFICE
+
+\item	A REVOLUTIONARY APPROACH WHEN WE NEED EVOLUTION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+in fact, at one map/top meeting, it was noted that
+
+\begin{quote}
+``NORTHROP has shipped more OSI software than any OSI vendor''
+\end{quote}
+
+by one of the leading OSI vendors!
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{POSSIBLE SOLUTION \#2\\ NOT SO EXAGERATED}
+
+\begin{nrtc}
+\item	START BUILDING A SEPARATE OSI ENVIRONMENT INDEPENDENT OF THE EXISTING
+	ENVIRONMENT
+
+\item	SWITCH WHEN OSI TECHNOLOGY REACHES SUPERIOR CAPABILITY
+
+\item	EMPLOY HIGH-LEVEL GATEWAYS TO SHUTTLE INFORMATION BETWEEN ENVIRONMENTS
+	(e.g., PROFS TO X.400)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\diagram[p]{figure1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A BETTER IDEA, BUT NOT PERFECT}
+
+\begin{nrtc}
+\item	PERMITS US TO GAIN EXPERIENCE WITH THE NEW TECHNOLOGY
+
+\item	HOPEFULLY DOESN'T INTERFERE WITH EXISTING OPERATIONS
+
+\item	SOME DUPLICATION OF EFFORT
+    
+\item	HIGH-LEVEL GATEWAYS OFTEN DON'T WORK VERY WELL
+    \begin{nrtc}
+    \item	``SOMETIMES WHEN YOU TRY TO TURN AN APPLE INTO AN ORANGE YOU
+		GET BACK A LEMON''
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{POSSIBLE SOLUTION \#3}
+
+\begin{nrtc}
+\item	START BUILDING AN OSI ENVIRONMENT ON TOP OF EXISTING ENVIRONMENTS
+
+\item	BUILD SELECTED NEW SYSTEMS WITH OSI
+
+\item	MIGRATE EXISTING APPLICATIONS TO AN OSI FRAMEWORK AS THE TECHNOLOGY
+	BECOMES AVAILABLE
+
+\item	CONTINUE RUNNING SELECTED SYSTEMS ``AS IS''
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\diagram[p]{figure2a}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE:\\ ISO TRANSPORT SERVICES ON TOP OF DoD TCP}
+
+\vskip-0.1in
+\diagram[p]{figure2b}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE GOOD NEWS}
+
+\begin{nrtc}
+\item	AN ORDERLY AND GRADUAL MIGRATION
+
+\item	MAXIMIZES USE OF EXISTING RESOURCES
+
+\item	PROOF OF CONCEPT: ISODE, DECnet/ISO
+
+\item	FACILITATES BEST TOOL FOR THE JOB
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE BAD NEWS}
+
+\begin{nrtc}
+\item	 A ``NON-PURE'' SOLUTION (PURITY IS A RELIGION!)
+
+\item	DOES NOT SUPPORT A SINGLE TOOL FOR THE JOB
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SUMMARY}
+
+\begin{nrtc}
+\item	THE GOOD: INTEGRATED (USE SERVICE EMULATORS)
+
+\item	THE BAD: SEPARATE (USE APPLICATION GATEWAYS)
+
+\item	THE UGLY: REVOLUTION (START FROM SCRATCH)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ISODE}
+
+\begin{nrtc}
+\item	AN OPENLY AVAILABLE ISO DEVELOPMENT ENVIRONMENT
+
+\item	CODED ENTIRELY IN C
+
+\item	OPERATING SYSTEMS: BERKELEY AND AT\&T \unix/
+    \begin{nrtc}
+    \item	REQUIRES NO KERNEL MODIFICATIONS
+    \end{nrtc}
+
+\item	INFLUENCED A LOT BY GOSIP GUIDELINES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE APPLICATION ENVIRONMENT}
+
+\vskip.15in
+\diagram[p]{figure4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN ALTERNATE ENVIRONMENT:\\ MHS ARCHITECTURE (c.~1984)}
+
+\vskip.15in
+\diagram[p]{figure5}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TRANSPORT SERVICES}
+
+\begin{nrtc}
+\item	CURRENTLY A TP0 TRANSPORT SERVICE IS USED
+    \begin{nrtc}
+    \item	OVER X.25 (FOR EUROPEANS, et. al.)
+
+    \item	OVER TCP (FOR DEFENSE DATA NETWORK)
+    \end{nrtc}
+
+\item	TCP-BASED SERVICE IS INDISTINGUISHABLE FROM A CONNECTION-ORIENTED
+	NETWORK SERVICE\\ (SEE RFC1006 FOR THE DETAILS)
+
+\item	WORK WILL START SOON ON INTEGRATING A NATIVE TP4
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHERE NEXT?}
+
+\begin{nrtc}
+\item	UPGRADE TO FINAL (IS) SPECIFICATIONS
+
+\item	``COOKED'' SUPPORT FOR REMOTE OPERATIONS
+
+\item	INTEGRATION OF:
+    \begin{nrtc}
+    \item	MHS
+
+    \item	DIRECTORY SERVICES
+
+    \item	VIRTUAL TERMINAL
+    \end{nrtc}
+	IMPLEMENTATIONS DONE AT OTHER SITES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AVAILABILITY INFORMATION}
+
+\begin{nrtc}
+\item	VERSION 3 AVAILABLE OCTOBER 14, 1987
+
+\item	USPS: SEND CHECK OR INVOICE FOR \$200 US DOLLARS TO:
+    \[\begin{tabular}{l}
+	ISODE DISTRIBUTION\\
+	DEPARTMENT OF ELECTRICAL ENGINEERING\\
+	UNIVERSITY OF DELAWARE\\
+	NEWARK, DE  19716\\[0.25in]
+	TELCO: 302--451--1163
+    \end{tabular}\]
+
+\item	DISTRIBUTION CONTAINS:
+    \begin{nrtc}
+    \item	1600bpi TAR TAPE
+
+    \item	3 VOLUME DOCUMENTATION SET
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\end{document}

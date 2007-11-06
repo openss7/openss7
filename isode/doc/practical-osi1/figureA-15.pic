@@ -1,0 +1,45 @@
+.PS
+.ps 20
+## figure A-15
+
+boxwid	= 2*boxwid
+
+B1:	box "user"
+B2:	box with .n at (B1.s.x,B1.s.y-boxht) width 1.5*boxwid height 5*boxht
+B3:	box "user" "application" \
+	    with .n at (B2.n.x,B2.n.y-(boxht/3)) width 1.25*boxwid height 1.5*boxht
+B4:	box "presentation" with .sw at B2.sw width 1.5*boxwid
+B5:	box "acse" with .e at (B3.e.x,B3.se.y-(B3.se.y-B4.nw.y)/2) \
+	    width .5*boxwid height .75*boxht
+B6:	box invis "$\ldots$" with .nw at B2.sw width 1.5*boxwid
+##
+L1:	line <-> from (B1.sw.x-(B1.sw.x-B1.s.x)/2,B1.s.y) \
+	          to (B1.sw.x-(B1.sw.x-B1.s.x)/2,B3.n.y)
+L2:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B1.s.y) \
+	          to (B1.se.x-(B1.se.x-B1.s.x)/2,B3.n.y)
+L3:	line <-> from (B1.sw.x-(B1.sw.x-B1.s.x)/2,B3.s.y) \
+	          to (B1.sw.x-(B1.sw.x-B1.s.x)/2,B4.n.y)
+L4:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B3.s.y) \
+	          to (B1.se.x-(B1.se.x-B1.s.x)/2,B5.n.y)
+L5:	line <-> from (B1.se.x-(B1.se.x-B1.s.x)/2,B5.s.y) \
+	          to (B1.se.x-(B1.se.x-B1.s.x)/2,B4.n.y)
+
+
+
+
+#B1:     box "user" width 3*boxwid
+#B2:     box "PCI" with .ne at (B1.sw.x, B1.sw.y-lineht)
+#B3:     box "PDU" with .nw at (B2.sw.x, B2.sw.y-lineht) width 4*boxwid
+#        line from B1.s to (B1.s.x, B3.n.y)
+#        line from B2.s to (B2.s.x, B3.n.y)
+#B4:     box "ICI" with .e at B3.w dashed
+#B5:     box "IDU" with .nw at (B4.sw.x, B4.sw.y-lineht) width 5*boxwid dashed
+#B6:     box "ICI" with .nw at (B5.sw.x, B5.sw.y-lineht) dashed
+#B7:     box "SDU" with .w at B6.e width 4*boxwid
+###
+#        line dashed from B5.e to (B5.e.x+3*linewid, B5.e.y)
+#        move to (B5.e.x+3*linewid, B5.n.y); "layer-N" rjust
+#        line dashed from B5.w to (B5.w.x-3*linewid, B5.w.y)
+#        move to (B5.e.x+3*linewid, B5.s.y); "layer-(N-1)" rjust
+##
+.PE

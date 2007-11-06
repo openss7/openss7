@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nosi nocin
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.24 2007/08/15 05:32:51 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.26 2007/10/18 06:53:27 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/08/15 05:32:51 $ by $Author: brian $
+@c Last Modified $Date: 2007/10/18 06:53:27 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -119,6 +119,19 @@ Updated documentation.
 
 @item
 License upgrade to GPL Version 3.
+
+@item
+Fix for freezestr() and unfreezestr() on 2.4 kernels.
+
+@item
+Ability to strap out major documentation build and installation primarily for
+embedded targets.
+
+@item
+Improvements to common build process for embedded and cross-compile targets.
+
+@item
+Support for flex 2.5.33  in maintainer mode.
 
 @end itemize
 

@@ -1,0 +1,15 @@
+.PS
+.ps 20
+## figure 27
+B1:	box invis "error"
+	arrow from B1.sw to (B1.sw.x-linewid, B1.sw.y-lineht)
+	line dashed to (B1.sw.x-3*linewid, B1.sw.y-3*lineht)
+	arrow to (B1.sw.x-4*linewid, B1.sw.y-4*lineht)
+B2:	box invis "error" with .ne at (B1.sw.x-4*linewid, B1.sw.y-4*lineht)
+##
+	line from (B1.nw.x-linewid, B1.n.y+lineht/2) \
+	     to   (B1.nw.x-linewid, B2.s.y-lineht/2)
+	line from (B2.se.x+linewid, B1.n.y+lineht/2) \
+	     to   (B2.se.x+linewid, B2.s.y-lineht/2)
+##
+.PE

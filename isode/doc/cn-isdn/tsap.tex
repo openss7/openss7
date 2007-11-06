@@ -1,0 +1,91 @@
+% run this through LaTeX
+
+\input lcustom
+
+\documentstyle[11pt,sfwmac,titlepage]{article}
+
+\advance\textwidth by0.75in
+\advance\oddsidemargin by-0.375in
+\advance\evensidemargin by-0.375in
+
+\pagestyle{reprint}
+\def\reprintext{{\scriptsize\sf
+	Reprinrted from
+	{\em Computer Networks and ISDN Systems}, 12(3) {\oldstyle 1986}}}
+\let\reprintstring=\empty
+
+\begin{document}
+
+\title{OSI Transport Services\\ on top of the TCP}
+\author{Marshall T.~Rose\and Dwight E.~Cass}
+\date{\vskip-1.25em
+	Northrop Research and Technology Center\\
+	One Research Park\\
+	Palos Verdes Peninsula, CA  90274\\
+	USA\vskip1.5em
+	\ifdraft \versiondate/\\ \tt Draft Version \versiontag/\else \today\fi}
+\maketitle
+
+\begin{abstract}
+The ARPA Internet community has a well-developed,
+mature set of transport and internetwork protocols,
+which are quite successful in offering network and transport services to
+end-users.
+The protocols provide ``open system interconnection'' (OSI) for users,
+and a robust competitive market is supplied by a growing number of vendors.
+The CCITT and ISO have defined various network, transport, session, presentation,
+and application recommendations and standards which have been adopted by the
+international community and numerous vendors.
+To the largest extent possible,
+it is desirable to offer the higher level services (i.e., session and above)
+in networks based on the ARPA protocols,
+without disrupting existing facilities.
+It is also desirable to develop expertise with ISO and CCITT protocols while
+utilizing a robust set of transport services.
+Finally,
+given the probable, long-term dominance of the international standards,
+it is desirable to design a graceful transition strategy from networks based
+on the ARPA protocols to OSI-based networks.
+
+In this paper,
+we suggest an exercise in interoperability which achieves all three of these
+goals.
+Our solution is practical in the sense that it:
+can be easily implemented in a cost-effective manner in the short-term;
+permits application-designers to work with an OSI applications-framework,
+while utilizing existing robust transport and network protocols;
+and,
+provides the basis for a far-reaching migration strategy to the OSI protocols.
+\end{abstract}
+
+\newpage\thispagestyle{empty}
+\tableofcontents
+\footnotetext[0]{\hskip -\parindent
+This document (version \versiontag/)
+was \LaTeX set \today\ with \fmtname\ v\fmtversion.
+This document is also referenced as NRTC Technical Paper \#700.
+This work was supported in part by Northrop's Independent Research and
+Development program.}
+
+\makeatletter
+\let\s@ction=\section
+\def\section{\let\section=\s@ction \banner\section}
+\makeatother
+
+\include{section1}
+\include{section2}
+\include{section3}
+\include{section4}
+\include{section5}
+\include{section6}
+
+\appendix
+\include{appendix1}
+\include{appendix2}
+
+\bibliography{bcustom,networking}
+\bibliographystyle{alpha}
+
+\showsummary
+
+\end{document}

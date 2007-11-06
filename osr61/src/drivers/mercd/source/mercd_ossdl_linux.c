@@ -189,6 +189,11 @@ void linux_untimeout(void *rcvPtr )
 	return;
 }
 
+#ifdef IRQF_SHARED
+#undef SA_SHIRQ
+#define SA_SHIRQ IRQF_SHARED
+#endif
+
 /***************************************************************************
  * Function Name                : linux_intr_register_intr_srvc
  * Function Type                : OSSDL and OSAL Interface function

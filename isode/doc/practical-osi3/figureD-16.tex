@@ -1,0 +1,25 @@
+\File{figureD\-16.py},{08:27},{Mar 12 1991}
+\L{\LB{\Proc{Table}Table ::=}}
+\L{\LB{    \K{SET} \K{OF}}}
+\L{\LB{        \K{SEQUENCE} \{}}
+\L{\LB{            kind}}
+\L{\LB{                ObjectClass,}}
+\L{\LB{            base}}
+\L{\LB{                DN}}
+\L{\LB{        \}}}
+\L{\LB{\Proc{DN}DN ::=}}
+\L{\LB{    \K{SEQUENCE} \K{OF}}}
+\L{\LB{}\Tab{8}{RDN}}
+\L{\LB{}}
+\L{\LB{\Proc{RDN}RDN ::=}}
+\L{\LB{    \K{SET} \K{OF}}}
+\L{\LB{}\Tab{8}{DAV}}
+\L{\LB{}}
+\L{\LB{\Proc{DAV}DAV ::=}}
+\L{\LB{    \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{8}{type}}
+\L{\LB{}\Tab{8}{    \K{OBJECT} \K{IDENTIFIER},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{value}}
+\L{\LB{}\Tab{8}{    \K{ANY} \K{DEFINED} \K{BY} type}}
+\L{\LB{    \}}}

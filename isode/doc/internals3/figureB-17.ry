@@ -1,0 +1,14 @@
+-- application service elements
+
+userElement APPLICATION-SERVICE-ELEMENT
+    CONSUMER INVOKES { evalOperation }
+	::= { iso isode(17) demo(1) eval(8) application-service-element(3) }
+
+
+-- abstract syntaxes
+
+eval-abstract-syntax OBJECT IDENTIFIER :: =
+    { iso isode(17) demo(1) eval(8) abstract-syntax(1) }
+
+...
+

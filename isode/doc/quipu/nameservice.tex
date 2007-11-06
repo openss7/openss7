@@ -1,0 +1,100 @@
+
+\chapter {The QUIPU Nameservice}
+\label {ns_design}
+
+\section {Requirements}
+
+Many applications make a relatively simple use of the directory, with the
+following type of requirements:
+
+\begin {itemize}
+\item  Reading a single (or small number of) attribute(s).
+
+\item  Public data only (i.e., no need for access control)
+
+\item  Most data accessed is available locally
+\end {itemize}
+
+A typical usage is to look up and Application Entity Title to determine a
+presentation address.
+The DAP is a rather heavyweight procedure to achieve this.  
+This chapter describes a lightweight mechanism to access a 
+{\em local} DSA.   The protocol was designed by Marshall Rose.
+
+\section {Design}
+
+The QUIPU Name Server uses a lightweight interface to the QUIPU Directory
+Service.
+
+This gives an application the
+ability to supply a distinguished name, and the Attribute Type required, in
+IA5String format (because the encoding is more efficient).  The name server
+will then use the lightweight protocol to pass a ``read'' operation onto the
+directory.  The Directory will then perform a lookup of this data (giving
+the operation a high priority status), and return the value.
+
+
+The nameservice protocol is straight-forward.  The initiator formats a
+query message for the nameservice.  This message is sent via a connectionless
+protocol ``n'' times.  Each time after sending the message, the initiator
+waits up to ``s'' seconds for a response.  If the response arrives, the
+initiator processes it; otherwise, the initiator either sends another
+message or gives up.  A definition of the PDUs for a ``query'' and the
+``response'' to that query are shown in Figure~\ref{ns-h}.  
+
+\tagrind {ns}{Name Service Protocol}{ns-h}
+
+The request-id identifies this particular Query; the same value is used
+in the message, regardless of how many times the message is sent.
+
+The name identifies the DN being looked-up.  It is a string from the IA5
+repertoire which expresses the DN in the QUIPU format.
+
+The attribute identifies the desired attribute of the DN.  It is a
+string from the IA5 repertoire which expresses the attribute as known in
+it's user-friendly form.
+
+The cache-ok tells the nameservice if it is permitted to use cached
+information when responding to the query.
+
+When the nameservice receives a Query, it processes it as follows:
+
+\begin{enumerate}
+
+\item It constructs an environment to process the Query with access rights
+for publically-readable information.
+
+\item It prepares a Response using the request-id from the Query.
+
+\item It reads the indicated DN and attribute from the DIT.  If the DN
+exists with the given attribute, it returns the value of that attribute.
+In the event that multiple values are present, the nameservice returns
+any one of those values.  The ASN.1 encoded distinguished name is also
+returned, typically for use as the Application Entity Title.
+
+\item It then sends the response to the initiator.
+\end {enumerate}
+
+A message called the ``Response'' is returned by the name server (see
+Figure~\ref{ns-h}).
+
+request-id corresponds to the Query which invoked the nameservice.
+
+value is the answer to the Query.  It is present only if no errors
+occurred during processing.
+
+The transaction protocol used by the nameservice is very
+simple: Response messages are not cached and there are no Keep-alive nor
+In-Progress messages.
+
+\section {Support}
+
+This protocol can optionally be supported by a QUIPU DSA.
+
+A simple procedural interface (DUA) s supplied which is used by
+ISODE applications such as FTAM and IMISC to
+look up Presentation addresses of remote Application Processes.
+The interface is designed so that use of the lightweight protocol or DAP can
+be chosen at compile time (the saving in code size is significant, and so
+this is not a runtime choice).   This is described in the QUIPU Manual.
+

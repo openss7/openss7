@@ -1,0 +1,331 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH XAP-ROSE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B XAP-ROSE
+\- Remote Operations Service Element (XAP-ROSE) API
+.SH SYNOPSIS
+.PP
+.SH INTERFACE
+.PP
+XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+XAP-ROSE is used in conjunction with XAP to establish an association with a remote ROSE service user
+and then pass ROSE primitives between two ROSE service users.  An include file for the XAP-ROSE user
+containing structure definitions and constants is defined in \fB<xap_rose.h>\fP.
+.PP
+The XAP-ROSE API defines an additional structure,
+.BR ap_ro_cdata_t ,
+that is pointed to by the
+.I cdata
+argument.  This structure is used to pass ROSE-specific protocol information between the service
+user and the service provider.  The
+.B ap_ro_cdata_t
+structure is defined as follows:
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	long udata_length;
+	long rsn;
+	long evt;
+	long sync_p_sn;
+	long sync_type;
+	long resync_type;
+	long src;
+	long res;
+	long res_src;
+	long diag;
+	unsigned long tokens;
+	unsigned long token_assignment;
+	ap_a_assoc_env_t *env;
+	ap_octet_string_t act_id;
+	ap_octet_string_t old_act_id;
+	ap_old_conn_id_t *old_conn_id;
+
+	long pci;
+	long priority;
+	long invoke_id_present;
+	long invoke_id;
+	long linked_id_present;
+	long linked_id;
+	long op_class;
+	long type;
+	union {
+		unsigned long local;
+		ap_objid_t global;
+	} value;
+} ap_ro_cdata_t;
+\s+1\fP
+.fi
+.PP
+where,
+.TP
+.I pci
+presentation context identifier for user data,
+.TP
+.I priority
+prioity of the request (informative to provider),
+.TP
+.I invoke_id_present
+invoke identifier present flag,
+.TP
+.I invoke_id
+operation invocation identifier,
+.TP
+.I linked_id_present
+linked identifier present flag,
+.TP
+.I linked_id
+invocation identifier of parent operation,
+.TP
+.I op_class
+class of the operation,
+.TP
+.I type
+value, result or operation,
+.TP
+.I value.local
+local value (integer) of the operation code,
+.TP
+.I value.global
+global value (object identifier) of the operation code.
+.TP \w'\fBNote:\fR\(em'u
+.B Note:
+The ROSE specific
+.B ap_ro_cdata_t
+structure elements
+.IR priority " and " op_class
+support an RTSE-based implementation of ROSE which is currently not within the scope of this API.
+They are defined by this specification for future use and are not currently used.
+
+.\"
+.\"
+.SH ENVIRONMENT
+.PP
+The ROSE specific environment attributes are as follows:
+.TP
+.B AP_RO_FAC_AVAIL
+The AP_RO_FAC_AVAIL attribute is used to indicate the availability of facilities in the XAP-ROSE
+provider.
+The attribute type is \fBunsigned long\fP with bit values \fIAP_RO_BIND\fP.  The attribute is
+readable always and writable never.
+The attribute is bit significant, and the folllowing bit values are defined:
+.RS
+.TP
+.I AP_RO_BIND
+The ROSE bind and unbind primitives, AP_RO_BIND and AP_RO_UNBIND, are supported.
+.RE
+.TP
+.B AP_RO_PCI_LIST
+The AP_RO_PCI_LIST attribute is used to define those abstract syntaxes that the ROSE service
+provider should examine for the presence of ROSE PDUs.  The attribute consists of a list of
+presentation context identifiers (PCIs) for abstract syntaxes.  These PCIs are used to reference the
+abstract syntaxes defined in the XAP environment variables AP_DCS, AP_PCDL or AP_PCDRL (depending on
+the current state of the XAP-ROSE instance).
+.sp
+The attribute type is \fBap_ro_pci_list_t\fP as defined in \fB<xap_rose.h>\fP with a default of an
+empty list.  The attribute is readable always and writable always.
+.sp
+A value assigned to the AP_RO_PCI_LIST environment attribute is validated only when the
+.BR ap_ro_init (3)
+function is called.  At this point, if the content of the list represents valid abstract syntaxes
+for the association, the list will be used by the ROSE service provider to send and receive ROSE
+PDUs.  Subsequent change to the value of the AP_RO_PCI_LIST attribute will not take effect until the
+.BR ap_ro_init (3)
+function is called again.
+.sp
+The \fBap_ro_pci_list_t\fP, defined in \fB<xap_rose.h>\fP is used to specify a list of abstract
+syntaxes that the ROPM is to examine to identify incoming ROSE PDUs.  It is defined as:
+.sp
+.RS
+.nf
+\fC\s-1\
+typedef struct {
+    int size_pcil;
+    int *pci_list;
+} ap_ro_pci_list_t;
+\s+1\fP
+.fi
+.sp
+where,
+.TP
+.I size_pcil
+is the number of presentation contexts identifiers in the list, and
+.TP
+.I pci_list
+is a pointer to an integer array of presentation context identifiers.
+.RE
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+The XAP-ROSE API
+.[
+XAP-ROSE
+.]
+provides the following functions in addition to those defined by the XAP specifications:
+.[
+XAP
+.]
+.TP
+.BR ap_ro_init (3)
+\- initialize an XAP-ROSE instance.
+.sp
+The
+.BR ap_ro_init (3)
+function enables the operation of the ROSE service provider, allowing the API user to send XAP-ROSE
+request primitives and causing the service provider to filter incoming primitives to identify and
+deliver XAP-ROSE indication primitives.
+.TP
+.BR ap_ro_release (3)
+\- release an XAP-ROSE instance.
+.sp
+The
+.BR ap_ro_release (3)
+function releases an instance of the XAP-ROSE user environment from an established application
+association.
+
+.SH PRIMITIVES
+.PP
+.TP
+.BR AP_RO_BIND_REQ (7)
+.TP
+.BR AP_RO_BIND_IND (7)
+.TP
+.BR AP_RO_BIND_RSP (7)
+.TP
+.BR AP_RO_BIND_CNF (7)
+.TP
+.BR AP_RO_INVOKE_REQ (7)
+.TP
+.BR AP_RO_INVOKE_IND (7)
+.TP
+.BR AP_RO_RESULT_REQ (7)
+.TP
+.BR AP_RO_RESULT_IND (7)
+.TP
+.BR AP_RO_ERROR_REQ (7)
+.TP
+.BR AP_RO_ERROR_IND (7)
+.TP
+.BR AP_RO_REJECTU_REQ (7)
+.TP
+.BR AP_RO_REJECTU_IND (7)
+.TP
+.BR AP_RO_REJECTP_IND (7)
+.TP
+.BR AP_RO_UNBIND_REQ (7)
+.TP
+.BR AP_RO_UNBIND_IND (7)
+.TP
+.BR AP_RO_UNBIND_RSP (7)
+.TP
+.BR AP_RO_UNBIND_CNF (7)
+
+
+.SH ERRORS
+.PP
+.TP
+.RB [ AP_RO_BAD_PCI ]
+The PCI is not in the AP_PCDL or AP_DCS.
+.TP
+.RB [ AP_RO_EMPTY_LIST ]
+The list has no elements.
+.TP
+.RB [ AP_RO_CNTX_NOT_PRES ]
+One or more of the contexts identified is not in the relevant associations (presentation) defined
+context set.
+.TP
+.RB [ AP_RO_ILLEGAL_SIZE ]
+The list size is not a positive value or list is greater than the size of the AP_DCS attribute list.
+.TP
+.RB [ AP_RO_T_SYTX_NSUP ]
+The transfer syntax in the AP_DCS entry for this PCI is not supported.
+.TP
+.RB [ AP_NOT_SUPPORTED ]
+The identified instancs is not an XAP-ROSE instance - that is, the service provider selected in the
+call to
+.BR ap_open (3)
+does not support a ROSE service provider, or the AP_ROSE_MODE flag has not been set in the
+AP_MODE_SEL environment attribute.

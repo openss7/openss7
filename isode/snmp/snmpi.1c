@@ -1,0 +1,101 @@
+.TH SNMPI 1C "14 Sep 1989"
+.\" $Header: /xtel/isode/isode/snmp/RCS/snmpi.1c,v 9.0 1992/06/16 12:38:11 isode Rel $
+.\"
+.\" Contributed by NYSERNet Inc.  This work was partially supported by the
+.\" U.S. Defense Advanced Research Projects Agency and the Rome Air Development
+.\" Center of the U.S. Air Force Systems Command under contract number
+.\" F30602-88-C-0016.
+.\"
+.\"
+.\" $Log: snmpi.1c,v $
+.\" Revision 9.0  1992/06/16  12:38:11  isode
+.\" Release 8.0
+.\"
+.\" 
+.SH NAME
+snmpi \- really minimal SNMP initiator
+.SH SYNOPSIS
+.in +.5i
+.ti -.5i
+.B snmpi
+\%[-a\0agent]
+\%[-c\0community]
+\%[-f\0file]
+\%[-p\0portno]
+\%[-d]
+\%[-v]
+\%[-w]
+.in -.5i
+.SH DESCRIPTION
+The \fIsnmpi\fR program is an extremely simple program,
+used to test \fIsnmpd\fR.
+Once \fIsnmpd\fR is started,
+to see if it's running,
+do:
+.sp
+.in +.5i
+.nf
+% snmpi dump
+.fi
+.in -.5i
+.sp
+This should generate voluminous output.
+.SH OPTIONS
+The `-a' switch sets the address of the SNMP agent.
+Either a hostname, an IP-address, or a transport address (using
+Kille's string syntax) may be used.
+The default is the localhost.
+Similarly,
+the `-p' switch sets the UDP port number that the agent resides on
+(if an IP-style address is given, obviously).
+The default is UDP port 161.
+.PP
+The `-c' switch sets the community name for the SNMP request.
+The default is public.
+.PP
+The `-d' switch enables debugging.
+This doesn't do anything yet.
+.PP
+The `-f' switch selects a file containing compiled MIB module definitions.
+The default is \fIobjects.defs\fR.
+.PP
+The `-w' switch enables watching.
+When SNMP messages are exchanged,
+they will be pretty-printed on the terminal if the user is watching.
+.PP
+The `-v' switch enables verbose interaction.
+This doesn't do anything yet.
+.SH FILES
+.nf
+.ta \w'\*(EDobjects.defs  'u
+\*(EDobjects.defs	MIB definitions
+.re
+.fi
+.SH "NOTE WELL"
+The names of the objects in \fBobjects.defs\fR are case sensitive.
+This was necessary to improve the efficiency of the hashing algorithm
+used for object lookup.
+.SH "SEE ALSO"
+RFCs 1155, 1212, 1213, and 1157.
+.PP
+S.E.\0Kille,
+\fIA string encoding of Presentation Address\fR,
+Research Note RN/89/14,
+Department of Computer Science,
+University College London,
+(February, 1989).
+.SH AUTHOR
+Marshall T. Rose,
+Performance Systems International
+.PP
+This work was partially supported by the
+U.S. Defense Advanced Research Projects Agency and the Rome Air Development
+Center of the U.S. Air Force Systems Command under contract number
+F30602-88-C-0016.
+.PP
+Although this package is distributed with the ISODE,
+it is not an OSI program, per se.
+Inasmuch as the continued survival of the Internet hinges on all nodes
+becoming network manageable,
+this package was developed using the ISODE and is being freely
+distributed with releases of Berkeley UNIX.

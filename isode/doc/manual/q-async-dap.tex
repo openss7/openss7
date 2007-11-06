@@ -1,0 +1,724 @@
+% run this through LaTeX with the appropriate wrapper
+% adt@castle.ed.ac.uk
+
+\chapter {The Async DAP Procedural Interface}
+
+Originally, the procedural interface providing a representation of
+the X.500 DAP operations was only required to provide synchronous
+behaviour.
+It is likely that many useful applications will be written which only
+require synchronous representation of operations; so that having
+bound to a DSA, operations are constructed in some way and then
+the routine representing the relevant operation is called and will
+block until an appropriate response has been received from the DSA.
+
+However, in more sophisticated DUAs it will be desirable to have
+asyn\-chron\-ous or non-blocking routines representing the various
+DAP operations, so that the DUA can construct and send operations,
+perform useful work whilst waiting for the operations to complete,
+and collect and use the responses to operations as they become
+available.
+
+For the above reasons, a new set of procedure calls has been written
+as part of the \man libdsap(3n) library. These calls provide a representation
+of the X.500 operations (including the bind operation) which can be
+used to program asynchronous performance of operations within a DUA.
+This chapter describes those routines and their intended use.
+
+To use the async DAP interface described here it is necessary to include
+the file \file{quipu/dap2.h}.
+
+\section {Procedure Model}
+
+\subsection {Styles of Behaviour}
+
+The routines which it is desirable to have to represent X.500 DAP
+operations depends on the behaviour required within a DUA.
+A simple DUA may be more easily developed by expecting a synchronous
+behaviour from routines representing operations; DAP operations
+are invoked as routines which block until a response to the
+operation arrives and the DUA can then continue according to
+that response.
+
+If, for whatever reasons, it is undesirable to block every time a
+DAP operation is requested, then a different behaviour is
+required from the routines representing operations; the operation
+request should be issued and the routine returned. Subsequently
+a routine should be available to accept a response to the request
+issued and process that response.
+
+An additional twist is that there are actually three styles of
+behaviour which it is desirable to make available to DUA programs:
+a simple synchronous interface, an interruptible synchronous interface,
+and an asyn\-chron\-ous interface.
+
+The interruptible synchronous interface is the style of behaviour
+described in the previous section. If an operation is called
+synchronously and then interrupted (a Control-C to the user
+interface for instance) during performance of the operation, then
+an abandon DAP operation should automatically be invoked on the
+outstanding operation and appropriate responses gathered from the
+DSA before returning to the user.
+The interruptible synchronous style of behaviour is only available
+for the remote operations of the directory access context (read,
+add entry, \ldots) and not for the bind and unbind operations.
+
+Mixing of styles of behaviour is deprecated, although there are no
+known problems. An asynchronous operation request followed by
+a synchronous operation request may well get the response to either
+operation, which means checking the responses to all synchronous
+requests in the same ways as the responses to asynchronous requests
+must be checked, thus losing most of the advantages that make the
+synchronous style worthwhile in the first place.
+
+In order to enable the incorporation of all three styles, a generalised
+interface has been written over which the interruptible synchronous
+interface described in Section~\ref{proc_model} has been reimplemented.
+Thus, the routines in that previous section can be thought of as a
+specialised restriction of the interface described here.
+
+The generalised interface also differs, in that it does not provide
+automatic decoding of results and errors into particular parameters,
+instead returning an indication parameter which may include decoded
+structures within it.
+This means that the implementation of the old style interface using
+the generalised routines is not as straightforward as the above
+comments might suggest.
+
+Future revisions should take on board the separation of the provision
+of routines which perform DAP operations from the provision of routines
+which provide DUA services in the construction of DAP operations (e.g.,
+getting passwords for a bind request is a high-level DUA task;
+parameterisation which allows the use of pre-allocated result and 
+error return parameters is a lower-level DUA task). All that the DAP
+operations should provide is the encoding of arguments, sending of
+operations and appropriate subsequent behaviour.
+Hopefully, future documentation will be produced which is structured
+so as to enable a clearer relationship between the different interfaces
+and behaviour styles provided for DAP operations.
+
+Where each routine of the synchronous interface described in the
+previous chapter had a prefix of ``\verb"ds_"'' (when using an implicit
+association identifier) or of ``\verb"dap_"'' (when using an explicit
+association identifier), all the routines in the asynchronous interface
+have a prefix of ``\verb"Dap"''.
+All operations in the asynchronous interface take an explicit
+association identifier.
+
+For each of the DAP bind operations, the DAP unbind operations and the
+DAP remote operations (read, list, search, addentry, removeentry,
+modifyentry, modifyrdn and abandon) a request routine is provided.
+The request routine takes a parameter indicating the style of behaviour
+to be used (synchronous, or asynchronous for the bind and unbind
+operations requests; synchronous, interruptible or asynchronous for
+the DAP remote operations).
+
+If the style indicated is synchronous, then the request routine will
+attempt to construct and send the appropriate operation and wait for
+a response.
+If the operation completes successfully (a result or an error is
+returned) then the routine returns \verb"OK". Otherwise, on failure,
+the routine returns \verb"NOTOK".
+
+If the style indicated is interruptible, then the operation is sent and
+an interruptible wait initiated for a response from the DSA.
+If an interruption occurs (see a description of the routine
+\verb"RoIntrRequest" in the rosap module for details
+of what constitutes an interruption and how it is indicated), then an
+abandon operation is sent for the outstanding operation and responses
+from the DSA are awaited for both the abandon operation and for the
+outstanding operation.
+Except in the case of an interruption the style of behaviour is exactly
+the same as the synchronous style.
+
+If the style indicated is asynchronous, then the operation is sent
+and the routine returns.
+For the DAP bind and DAP unbind operations a retry routine is provided
+for each operation which when called will either complete the
+outstanding operation or indicate that it is not yet complete.
+For the DAP remote operations a single wait routine is available
+which will complete an outstanding operation, if there is one which
+can be completed, or indicate that there is no completable operation.
+
+The value used to indicate the style of behaviour is borrowed from the
+``\verb"rosap"'' module:
+\begin{describe}
+\item [\verb"ROS\_SYNC":]
+Simple synchronous behaviour: block until DSA responds.
+\item [\verb"ROS\_INTR":]
+Interruptible synchronous behaviour: block until DSA responds or an
+interruption occurs. (Untidily, the definition of the value
+\verb"ROS_INTR" is currently contained in \file{quipu/dap2.h}.)
+\item [\verb"ROS\_ASYNC"]:
+Asynchronous behaviour: send operation, do not block.
+\end{describe}
+
+\subsection {Arguments}
+
+Arguments taken by async DAP request operations are, in general, a
+binding (or association) identifier which identifies the association
+on which to invoke the operation; an operation identifier which it is
+the responsibility of the DUA to generate, maintain and use as a
+reference (e.g., for abandoning a previously requested operation);
+a representation of the argument for the operation; an indication
+return parameter through which information on the outcome of the
+operation can be returned to the invoker of the routine; and of course
+the behaviour style indicator.
+
+\subsection {Indications}
+
+All of the routines representing X.500 operations in this procedural
+interface take an indication parameter, the type of which is a
+pointer to a pre-allocated \verb"DAPindication" structure.
+
+\label{DAPindication}
+\begin{quote}\index{DAPindication}\small\begin{verbatim}
+struct DAPindication {
+    int     di_type;
+#define DI_RESULT       2
+#define DI_ERROR        3
+#define DI_PREJECT      4
+#define DI_ABORT        6
+    union {
+        struct DAPresult        di_un_result;
+        struct DAPerror         di_un_error;
+        struct DAPpreject       di_un_preject;
+        struct DAPabort         di_un_abort;
+    } di_un;
+#define di_result di_un.di_un_result
+#define di_error di_un.di_un_error
+#define di_preject di_un.di_un_preject
+#define di_abort di_un.di_un_abort
+};
+\end{verbatim}\end{quote}
+
+This structure is a discriminated union (tag element followed by
+a union).
+Depending on the routine called, style of behaviour requested, and
+the value returned by the routine the contents of the indication
+should be readily retrievable.
+
+For the bind and unbind routines the \verb"DAPindication" structure
+is only updated on failure and will contain an abort indication.
+
+For the DAP remote operations the \verb"DAPindication" structure is
+used to indicate failure of the association, failure of the request,
+an error response to a request, or a result response to a request.
+
+When the \verb"DAPindication" structure is used to indicate a
+failure of the association it will contain a \verb"DAPabort"
+structure.
+
+\label{DAPabort}
+\begin{quote}\index{DAPabort}\small\begin{verbatim}
+struct DAPabort {
+    int     da_source;
+
+    int     da_reason;
+
+#define DA_SIZE 512
+    int     da_cc;
+    char    da_data[DA_SIZE];
+}
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"da\_source":]
+the source of the abort, one of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+                \multicolumn{1}{c|}{\bf Source}\\
+\hline
+    \tt DA\_USER&              service-user (peer)\\
+    \tt DA\_PROVIDER&          service-provider\\
+    \tt DA\_LOCAL&             local DAPM\\
+\hline
+\end{tabular}\]
+
+
+\item [\verb"da\_reason":]
+The reason for aborting the association (if known). 
+
+\item [\verb"da\_data"/\verb"da\_cc":] a diagnostic string from the
+provider.
+\end{describe}
+
+When the \verb"DAPindication" structure is used to indicate a rejection
+it will contain a \verb"DAPpreject" structure.
+
+\label{DAPpreject}
+\begin{quote}\index{DAPpreject}\small\begin{verbatim}
+struct DAPpreject {
+    int           dp_id;
+
+    int           dp_source;
+
+    int           dp_reason;
+
+#define DP_SIZE 512
+    int     dp_cc;
+    char    dp_data[DP_SIZE];
+}
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"dp\_id":]
+the operation identifier of the operation rejected.
+
+\item [\verb"dp\_source":]
+the source of the abort, taking the same values as \verb"da_source"
+in the \verb"DAPabort" structure described above.
+
+\item [\verb"dp\_reason":]
+The reason for rejecting the operation (if known). 
+
+\item [\verb"dp\_data"/\verb"dp\_cc":] a diagnostic string from the
+provider.
+\end{describe}
+
+When the \verb"DAPindication" structure is used to indicate a result
+in response to a previously issued remote operation request
+it will contain a \verb"DAPresult" structure.
+
+\label{DAPresult}
+\begin{quote}\index{DAPresult}\small\begin{verbatim}
+struct DAPresult {
+    int                   dr_id;
+    struct DSResult       dr_res;
+}
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"dr\_id":]
+the operation identifier of the operation for which this is the result.
+
+\item [\verb"dr\_res":]
+the decoded result structure.
+\end{describe}
+
+The operation identifier should be used on the receipt of an operation
+result to determine the operation the result applies to, and the
+result structure handled appropriately.
+
+When the \verb"DAPindication" structure is used to indicate a error
+in response to a previously issued remote operation request
+it will contain a \verb"DAPerror" structure.
+
+\label{DAPerror}
+\begin{quote}\index{DAPerror}\small\begin{verbatim}
+struct DAPerror {
+    int                   de_id;
+    struct DSError        de_err;
+}
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"de\_id":]
+the operation identifier of the operation for which this is the error
+response.
+
+\item [\verb"de\_err":]
+the decoded error structure.
+\end{describe}
+
+The operation identifier should be used on the receipt of an operation
+error to determine the operation the error applies to, and the
+error structure handled appropriately.
+
+\subsection {Return Values}
+
+The values returned by the various routines in this interface and
+their meanings are more complicated than may be entirely reasonable.
+However, a quick overview goes as follows:
+\begin {itemize}
+\item
+for bind and unbind operations synchronous style and DAP remote
+operations in synchronous or interruptible style, the request routines
+may return \verb"NOTOK" on failure and \verb"OK" on success.
+
+\item
+for bind and unbind operations asynchronous style, the request routines
+may return \verb"NOTOK" on failure, \verb"DONE" on completion, and
+\verb"CONNECTING_1" or 
+\verb"CONNECTING_2" when incomplete.
+
+\item
+for DAP remote operations asynchronous style, the request routines
+may return \verb"NOTOK" on failure, \verb"OK" on successful invocation.
+\end{itemize}
+
+\section {Binding and Unbinding}
+
+\subsection {Binding}
+
+To be able to send DAP remote operations to a DSA it is necessary
+to establish an association with the DSA using a DAP bind operation.
+This can be accomplished either synchronously or asynchronously
+using the routine \verb"DapAsynBindReqAux".
+
+\begin{quote}\index{DapAsynBindReqAux}\small\begin{verbatim}
+int       DapAsynBindReqAux (callingtitle, calledtitle,
+                callingaddr, calledaddr, prequirements,
+                srequirements, isn, settings, sf,
+                bindarg, qos, dc, di, async)
+AEI                       callingtitle;
+AEI                       calledtitle;
+struct PSAPaddr         * callingaddr;
+struct PSAPaddr         * calledaddr;
+int                       prequirements;
+int                       srequirements;
+long                      isn;
+int                       settings;
+struct SSAPref          * sf;
+struct ds_bind_arg      * bindarg;
+struct QOStype          * qos;
+struct DAPconnect       * dc;
+struct DAPindication    * di;
+int                       async;
+\end{verbatim}\end{quote}
+
+This routine will attempt to call a DSA at the called address and/or
+with the called title, to establish a directory access association
+using the directory bind argument provided.
+
+Often, all that is required for many of these parameters is that they
+are initialised to appropriate values.
+The routine \verb"DapAsynBindRequest" is provided which sets up
+sensible defaults for most of the parameters before calling
+the routine \verb"DapAsynBindReqAux".
+
+\begin{quote}\index{DapAsynBindReqAux}\small\begin{verbatim}
+int DapAsynBindRequest (calledaddr, bindarg, dc, di, async)
+struct PSAPaddr         * calledaddr;
+struct ds_bind_arg      * bindarg;
+struct DAPconnect       * dc;
+struct DAPindication    * di;
+int                       async;
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"calledaddr":]
+the address of the DSA to send the bind request to.
+The \verb"PSAPaddr" structure is described in
+\voltwo/, and more general discussion of addresses is given in
+\volone/.
+
+\item [\verb"bindarg":]
+is a representation of the argument of the DAP bind operation.
+The \verb"ds_bind_arg" structure is described in Section~\ref{proc_model}.
+
+\item [\verb"dc":]
+is used to return bind response information when a response is received.
+The \verb"DAPconnect" structure comprises connection information from
+the underlying association and a structure containing a representation
+of the bind response (bind result or bind error) if any.
+
+\item [\verb"di":]
+is the indication parameter described above in Section~\ref{DAPindication}.
+
+\item [\verb"async":]
+can take one of two values: \verb"ROS_ASYNC" or \verb"ROS_SYNC".
+If the value is \verb"ROS_SYNC", then the routine will await a response
+to the association request and attempt to decode the value returned in
+that response.
+If the value is \verb"ROS_ASYNC", then the routine may return without
+receiving an association response, which may be checked for later
+using the \verb"DapAsynBindRetry" routine.
+\end{describe}
+
+The \verb"DAPconnect" structure is used to return the response to a DAP
+bind operation:
+
+\begin{quote}\index{DAPconnect}\small\begin{verbatim}
+struct DAPconnect {
+    int     dc_sd;
+    int     dc_pctx_id;
+    struct AcSAPconnect dc_connect;
+
+    int     dc_result;
+#define DC_RESULT       1
+#define DC_ERROR        2
+#define DC_REJECT       3
+
+    union {
+        struct ds_bind_arg        dc_bind_res;
+        struct ds_bind_error      dc_bind_err;
+    } dc_un;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+
+\item [\verb"dc\_sd":]
+the association identifier assigned to the bound association.
+
+\item [\verb"dc\_pctx\_id":]
+the identifier of the directory access context in the negotiated list of
+presentation contexts.
+
+\item [\verb"dc\_connect":]
+the connect information for the underlying association.
+
+\item [\verb"dc\_result":]
+the type of response received.
+
+\item [\verb"dc\_bind\_res":]
+the decoded bind result if the response is a result.
+
+\item [\verb"dc\_bind\_err":]
+the decoded bind error if the response is an error.
+\end{describe}
+
+For explanations of the other parameters to \verb"DapAsynBindReqAux"
+see the description of the \verb"AcAssocRequest" routine on
+page~\pageref{AcAssocRequest} of \volone/.
+
+When the asynchronous style of behaviour is selected for a bind request,
+the \verb"DapAsynBindRetry" can be used to attempt to complete the
+bind and process any response.
+In order to determine when to call \verb"DapAsynBindRetry", the
+methods for asynchronously establishing connections described in
+Section~\ref{tsap:async} on page~\pageref{tsap:async} in \voltwo/
+should be applied.
+Essentially, the values \verb"CONNECTING_1" and \verb"CONNECTING_2",
+are used to determine whether the association establishment is
+currently blocked on reading or writing, and is used in constructing
+a call to \verb"xselect" to determine if further progress can be
+made. If the call to \verb"xselect" indicates that further work
+can be done then \verb"DapAsynBindRetry" should be called.
+
+\begin{quote}\index{DapAsynBindRetry}\small\begin{verbatim}
+int       DapAsynBindRetry (sd, do_next_nsap, dc, di)
+int                       sd;
+int                       do_next_nsap;
+struct DAPconnect       * dc;
+struct DAPindication    * di;
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"sd":]
+the association descriptor returned in the \verb"DAPconnect"
+structure after an asynchronous call to \verb"DapAsynBindReqAux".
+
+\item [\verb"do\_next\_nsap":]
+is used to specify whether the association should be retried on the
+same NSAP of the called address originally passed to
+\verb"DapAsynBindReqAux" or whether to give up on the current NSAP
+and go on to the next (if any).
+A value of zero will specify retrying on the same NSAP, a non-zero
+value specifies retrying on the next NSAP.
+This is somewhat messy as it forces the calling code to keep track
+of how long a particular NSAP has been tried for and when to try
+another.
+If there are no more NSAPs when the next NSAP is requested, then the
+association attempt is deemed to have failed and an appropriate
+indication is generated.
+
+\item [\verb"dc":]
+if the routine returns \verb"DONE" then this structure will contain
+the connect information as described for \verb"DapAsynBindReqAux"
+above.
+
+\item [\verb"di":]
+if the routine returns \verb"NOTOK" then this structure will contain
+the indication information.
+\end{describe}
+
+\subsection {Unbinding}
+
+When a DUA no longer needs to be bound to a DSA it can issue a
+DAP unbind operation to unbind from the DSA and end the association.
+This is achieved by using the \verb"DapUnBindRequest" routine.
+
+\begin{quote}\index{DapAsynBindRequest}\small\begin{verbatim}
+int       DapUnBindRequest (sd, secs, dr, di)
+int                       sd;
+int                       secs;
+struct DAPrelease       * dr;
+struct DAPindication    * di;
+\end{verbatim}\end{quote}
+
+\begin {describe}
+
+\item [\verb"sd":]
+the association identifier for the association from which the
+DUA wishes to unbind.
+
+\item [\verb"secs":]
+the number of seconds to spend trying to unbind.
+
+\item [\verb"dr":]
+the result of unbinding when complete.
+
+\item [\verb"di":]
+an indication.
+\end{describe}
+
+If the unbind operation fails then the routine will return \verb"NOTOK"
+and an appropriate indication.
+
+If the unbind operation completes successfully within \verb"secs"
+seconds then the routine will return \verb"OK" and the \verb"DAPrelease"
+structure will be filled out.
+
+If no unbind response is received within \verb"secs" seconds the routine
+will return a value of \verb"DONE" and the unbind should be completed
+using the routine \verb"DapUnBindRetry".
+
+\begin{quote}\index{DapUnBindRetry}\small\begin{verbatim}
+int       DapUnBindRetry (sd, secs, dr, di)
+int                       sd;
+int                       secs;
+struct DAPrelease       * dr;
+struct DAPindication    * di;
+\end{verbatim}\end{quote}
+
+Which takes exactly the same parameters and has similar behaviour to the
+routine \verb"DapUnBindRequest" above.
+
+\section {DAP Remote Operations}
+
+For each DAP remote operation (read, abandon, add entry, \ldots) there
+is a routine in the asynchronous interface to request that operation.
+The \verb"DapRead" routine will be described in detail, which taken in
+conjunction with the descriptions of arguments given in
+Section~\ref{DUA:proc} should
+also provide adequate description of the routines \verb"DapCompare",
+\verb"DapAbandon", \verb"DapList", \verb"DapSearch", \verb"DapAddEntry",
+\verb"DapRemoveEntry", \verb"DapModifyEntry", and \verb"DapModifyRDN".
+
+All these routines can be invoked with synchronous, interruptible or
+asynchronous styles of behaviour. In the synchronous and interruptible
+cases the call will not return until a response is received (in the
+interruptible style an interruption will cause an automatic sending
+of an abandon request for the operation requested by the routine and
+will await and return the response to that operation).
+In the asynchronous case the routine will return after the request
+has been sent and specific procedures for receiving responses must be
+undertaken using the \verb"DapInitWaitRequest" routine.
+
+\subsection {Invoking Requests}
+
+\begin{quote}\index{DapRead}\small\begin{verbatim}
+int       DapRead (ad, id, arg, di, asyn)
+int                       ad;
+int                       id;
+struct ds_read_arg      * arg;
+struct DAPindication    * di;
+int                       asyn;
+\end{verbatim}\end{quote}
+
+\begin{describe}
+
+\item [\verb"ad":]
+the association identifier for the bound association over which to send
+the read operation.
+
+\item [\verb"id":]
+the operation identifier to assign the the read operation.
+
+\item [\verb"arg":]
+the read argument.
+
+\item [\verb"di":]
+an indication parameter, only used if the request fails.
+
+\item [\verb"asyn":]
+the behaviour style selector.
+\end{describe}
+
+If \verb"DapRead" is invoked with synchronous behaviour, then it
+will block until a response arrives, and hope that the response
+is for the operation just requested, although no guarantees are
+made that this is so.
+
+If the interruptible style is selected then the call may be interrupted
+by some signals and an abandon operation for the operation requested
+is generated when this occurs, with the routine then awaiting both
+the response to the abandon operation and to the original operation
+before returning.
+
+If the asynchronous style is selected, then the call issues the request
+and returns, the response should be expected in a subsequent call to
+the routine
+\verb"DapInitWaitRequest".
+
+\subsection {Receiving Responses}
+
+\begin{quote}\index{DapInitWaitRequest}\small\begin{verbatim}
+int       DapInitWaitRequest (sd, secs, di)
+int                       sd;
+int                       secs;
+struct DAPindication    * di;
+\end{verbatim}\end{quote}
+
+\begin{describe}
+
+\item [\verb"sd":]
+the association identifier.
+
+\item [\verb"secs":]
+the number of seconds to spend waiting for a response; \verb"OK" will
+produce a polling effect and \verb"NOTOK" will produce a blocking
+effect.
+
+\item [\verb"di":]
+the indication structure.
+\end{describe}
+
+If the \verb"DapInitWaitRequest" routine returns \verb"OK" then there
+is a response contained in the indication parameter.
+If it returns \verb"DONE" then there was no response available within
+the specified time.
+
+\section {Programming Comments}
+
+This interface has been written with expectations of the following
+sort of program structure in mind.
+
+Through interaction with a user or from arguments or tailoring, a
+DUA will undertake to attempt one or more DAP bind operations to
+one or more DSAs.
+
+An asynchronous call to \verb"DapAsynBindReqAux" should be made using
+an appropriate bind argument for each DSA that the DUA wishes to bind to.
+If the association completes then operations can be constructed and
+invoked on the bound association identified by the value returned in
+the \verb"dc_sd" fields of the \verb"DAPconnect" structure \verb"dc_sd".
+
+If the value returned by the \verb"DapAsynBindRequest" procedure call is
+either 
+\verb"CONNECTING_1" or \verb"CONNECTING_2" then this value should
+be recorded along with the value returned in the \verb"dc_sd" field
+of the \verb"dc" parameter, which identifies the association even
+though it is not yet complete.
+Operations {\em must not} be invoked using this identifier until the
+bound association is completely established.
+
+At a later stage, for each outstanding association request, depending
+on whether the last value returned for the association attempt on that
+association identifier is \verb"CONNECTING_1" or \verb"CONNECTING_2",
+the routine \verb"xselect" should be used to check for writing or
+reading on the value returned by \verb"PSelectMask" for the given
+association identifier.
+
+If the call to \verb"xselect" indicates that writing (or reading) is
+available then the routine \verb"DapAsynBindRetry" should be called
+for that association identifier.
+
+This should be repeated until the association attempt fails or is
+completed, at which point operations can be constructed and invoked over
+the bound association.
+This is done using the appropriate routine for the required operation.
+
+If operations are invoked asynchronously, then a call to
+the procedure \verb"DapInitWaitRequest" will need to check for responses
+to outstanding operations and to return such a response as an
+indication if there is one available.
+The DUA can then process responses to the operations it invoked.
+
+When the DUA no longer needs to be bound to a DSA, the
+procedure \verb"DapUnBindRequest" can be used to initiate the termination
+of a bound association, and if necessary, the \verb"DapUnBindRetry"
+routine used to complete the binding.

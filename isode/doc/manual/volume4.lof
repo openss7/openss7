@@ -1,0 +1,39 @@
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Example of a Remote Operations Module}}{34}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Example of an Abstract Syntax Module}}{42}
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Example of C Language Structures}}{51}
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Example of C Language Structures (with -h0)}}{57}
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Example of C Language Structures (with -h2)}}{58}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Example of a specification using ASN.1}}{61}
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Example of a TYPE action}}{65}
+\contentsline {figure}{\numberline {6.3}{\ignorespaces Example of a TAG action}}{65}
+\contentsline {figure}{\numberline {6.4}{\ignorespaces Examples of CONTROL actions}}{68}
+\contentsline {figure}{\numberline {6.5}{\ignorespaces Examples of Parameters in Pepy}}{71}
+\contentsline {figure}{\numberline {6.6}{\ignorespaces Simpler Pretty-Printer initialization}}{76}
+\contentsline {figure}{\numberline {6.7}{\ignorespaces Grind Entry for pretty-printing PEPY programs}}{79}
+\contentsline {figure}{\numberline {6.8}{\ignorespaces Pretty-Printer initialization}}{80}
+\contentsline {figure}{\numberline {6.9}{\ignorespaces Pretty-Printer top-level}}{82}
+\contentsline {figure}{\numberline {6.10}{\ignorespaces Pretty-Printer type definitions}}{83}
+\contentsline {figure}{\numberline {6.11}{\ignorespaces Pretty-Printer finalization}}{85}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Pepsy value passing}}{92}
+\contentsline {figure}{\numberline {7.2}{\ignorespaces Constructed Type Example}}{95}
+\contentsline {figure}{\numberline {7.3}{\ignorespaces Repeated Type Example}}{96}
+\contentsline {figure}{\numberline {7.4}{\ignorespaces Pepy-like selector in a choice}}{98}
+\contentsline {figure}{\numberline {7.5}{\ignorespaces Optional C-expression/lvalue}}{99}
+\contentsline {figure}{\numberline {7.6}{\ignorespaces Example of Encoding/Decoding functions}}{100}
+\contentsline {figure}{\numberline {7.7}{\ignorespaces Definition of an Encoding function}}{101}
+\contentsline {figure}{\numberline {7.8}{\ignorespaces Definition of a Decoding function}}{102}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {11.1}{\ignorespaces Remote Operations Module for the Password Lookup Service}}{173}
+\contentsline {figure}{\numberline {11.2}{\ignorespaces Makefile for the Password Lookup Service}}{177}
+\contentsline {figure}{\numberline {11.3}{\ignorespaces Initiator for the Password Lookup Service}}{183}
+\contentsline {figure}{\numberline {11.4}{\ignorespaces Responder for the Password Lookup Service}}{189}

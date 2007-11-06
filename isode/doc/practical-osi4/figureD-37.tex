@@ -1,0 +1,50 @@
+\tt
+\def\foo{\begin{tabular}[c]{rll}SUPR:&& $\mapsto$ DSA\#1\\CROSSR:& \verb|{ c=US, l=Nevada }|& $\mapsto$ DSA\#2\end{tabular}\ }
+\def\bar{\begin{tabular}[t]{rll}SUBR:& \verb|{ c=US, l=Calif., l=Mountain View }|& $\mapsto$ DSA\#3\\NSSR:& \verb|{ c=US, l=Calif., unknown }|& $\mapsto$ DSA\#4\end{tabular}}
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \rlap{\kern  0.500in\lower 0.291in\hbox to 0pt{\hss root\hss}}%
+    \special{pa 0 1500}%
+    \special{pa 0 1000}%
+    \special{pa 1000 1000}%
+    \special{pa 1000 1500}%
+    \special{pa 0 1500}%
+    \special{fp}%
+    \rlap{\kern  0.500in\lower 1.291in\hbox to 0pt{\hss c=US\hss}}%
+    \special{pa 500 1000}%
+    \special{pa 500 500}%
+    \special{fp}%
+    \special{pa 0 2500}%
+    \special{pa 0 2000}%
+    \special{pa 1000 2000}%
+    \special{pa 1000 2500}%
+    \special{pa 0 2500}%
+    \special{fp}%
+    \rlap{\kern  0.500in\lower 2.291in\hbox to 0pt{\hss l=Calif.\hss}}%
+    \special{pa 500 2000}%
+    \special{pa 500 1500}%
+    \special{fp}%
+    \rlap{\kern  0.000in\lower 1.291in\hbox to 0pt{\hss \foo}}%
+    \rlap{\kern  1.000in\lower 3.041in\hbox to 0pt{\hss \bar}}%
+    \special{pa 2000 500}%
+    \special{pa 2000 1500}%
+    \special{fp}%
+    \rlap{\kern  2.000in\lower 1.041in\hbox to0pt{\ name only, no attributes\hss}}%
+    \special{pa 2000 2000}%
+    \special{pa 2000 2500}%
+    \special{fp}%
+    \rlap{\kern  2.000in\lower 2.291in\hbox to0pt{\ complete information\hss}}%
+    \special{pa 2000 3000}%
+    \special{pa 2000 3500}%
+    \special{fp}%
+    \rlap{\kern  2.000in\lower 3.291in\hbox to0pt{\ subordinate knowledge\hss}}%
+    \kern  2.001in
+  }\vss}%
+  \kern  3.501in
+}

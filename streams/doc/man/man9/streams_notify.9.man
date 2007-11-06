@@ -1,0 +1,432 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: streams_notify.9.man,v 0.9.2.1 2007/10/18 07:28:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/10/18 07:28:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: streams_notify.9.man,v $
+.\" Revision 0.9.2.1  2007/10/18 07:28:54  brian
+.\" - added manpages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so streams.macros
+.\"
+.\"
+.TH STREAMS_NOTIFY 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B streams_notify, streams_register_notifier, streams_unregister_notifier
+\- STREAMS event notification call chain utilities
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+.BI "int streams_notify(int " event ", int " type ", modID_t " modid );
+.PD 0
+.HP
+.BI "int streams_register_notifier(struct streams_notify *" sn );
+.HP
+.BI "int streams_unregister_notifier(struct streams_notify *" sn );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I event
+Specifies the event typee for which to provide notification.  Defined event
+types are:
+.RS
+.TP \w'\fBSTREAMS_NTFY_APUSH_DEL\fP\(em'u
+.B STREAMS_NTFY_REG
+module registration,
+.PD 0
+.TP
+.B STREAMS_NTFY_DEREG
+module deregistration,
+.TP
+.B STREAMS_NTFY_APUSH_ADD
+driver autopush addition, and
+.TP
+.B STREAMS_NTFY_APUSH_DEL
+driver autopush deletion.
+.PD
+.RE
+.TP
+.I type
+Specifies the type of module to which the event corresponds.  Defined types
+are:
+.RS
+.TP \w'\fBSTR_IS_MODULE\fP\(em'u
+.B STR_IS_MODULE
+The module is a STREAMS pushable module.
+.PD 0
+.TP
+.B STR_IS_DRIVER
+The module is a STREAMS driver.
+.PD
+.RE
+.TP
+.I modid
+Specifies the Module Identification Number of the module to which the event
+corresponds.
+.TP
+.I sn
+Provides a pointer to a
+.B struct streams_notify
+structure containing the callback function to notify.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR streams_notify "(), " streams_register_notifier "(), and " streams_notify "(), "
+provide a notifier call chain for notification of STREAMS events.  Current
+events are:
+.TP
+.B STREAMS_NTFY_REG
+Provides a notification when a STREAMS module or driver registers with the
+STREAMS subsystem.
+.TP
+.B STREAMS_NTFY_DEREG
+Provides a notification when a STREAMS module or driver deregisters from the
+STREAMS subsystem.
+.TP
+.B STREAMS_NTFY_APUSH_ADD
+Provides a notification when a STREAMS driver has an autopush entry added.
+.TP
+.B STREAMS_NTFY_APUSH_DEL
+Provides a notification when a STREAMS driver has an autopush entry deleted.
+.PP
+THe primary purpose of this notifier mechanism is to permit the
+.BR sc (4)
+module and the
+.BR sad (4)
+driver with the ability to provide indications to control STREAMS that a
+configuration change has occurred.  This mechanism is used by user-space
+processes holding open
+.BR sc (4)
+or
+.BR sad (4)
+Streams to known when to reread cached configuration data.  The mechanism is
+used by the
+.BR strmib (8)
+STREAMS SNMP sub-agent.
+.\"
+.SS Notifier Registration
+.PP
+.BR streams_register_notifier ()
+is used with a caller-allocated
+.B streams_notify
+structure.  The
+.B streams_notify
+structure is formatted as follows:
+.sp
+.RS
+.nf
+\fC\s-1\
+struct streams_notify {
+    void (*sn_notify)(int event, int type, modID_t modid, struct streams_notify *sn);
+    struct list_head sn_list;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B streams_notify
+structure has the following members:
+.TP
+.I sn_notify
+.TP
+.I sn_list
+.RE
+.PP
+The caller must initialize the
+.I sn_notify
+member with a valid callback function before calling
+.BR streams_register_notifier ()
+for the structure.
+The caller should not access the
+.I sn_list
+member directly.
+.PP
+Once passed to
+.BR streams_register_notification (),
+the caller should not directly access the members of the passed in structure
+until
+.BR streams_unregister_notification ()
+has been called for the same structure, and the structure
+(as well as the reference from the
+.I sn_notify
+member of the structure)
+must remain valid
+between the calls to
+.BR streams_register_notification "() and " streams_unregister_notification ().
+.PP
+Each successful call to
+.BR streams_register_notification ()
+must be balanced with a call to
+.BR streams_unregister_notification ().
+.\"
+.SS Notifier Deregistration
+.PP
+.BR streams_unregister_notifier ()
+is used with a caller-allocated
+.B streams_notify
+structure.  The
+.B streams_notify
+structure must have previously been successfully passed to
+.BR streams_register_notifier ().
+.PP
+Once successfully passed to
+.BR streams_unregister_notifier (),
+the
+.B streams_notify
+structure and its associated
+.I sn_notify
+callback function may be deallocated.
+.\"
+.SS Notification
+.PP
+.BR streams_notify ()
+is used by
+.I STREAMS
+drivers and modules to request notification of all modules registered for
+notifications.  When notified, each client's
+.I sn_notify
+member will be called with the same
+.IR event ", " type " and " modid
+arguments that were passed to this function, along with a pointer to the
+client's registered
+.B streams_notify
+structure.
+.PP
+The
+.I event
+argument is an integer that describes the event being notified.  Current
+values are:
+.TP
+.B STREAMS_NTFY_REG
+Automatically issued by the
+.I STREAMS
+subsystem when a driver or module loads, this notification indicates to
+clients that the driver or module with module identifier number,
+.IR modid ,
+has successfully registered a
+.BR streamtab (9)
+entry.
+The
+.BR sc (4)
+module subscribes to notifications and watches for this event.
+.TP
+.B STREAMS_NTFY_DEREG
+Automatically issued by the
+.I STREAMS
+subsystem when a driver or module unloads, this notification idicates to
+clients that the driver or module with previous module identifier number,
+.IR modid ,
+has successfully deregistered a
+.BR streamtab (9)
+entry.
+The
+.BR sc (4)
+module subscribes to notifications and watches for this event.
+.TP
+.B STREAMS_NTFY_APUSH_ADD
+Automatically issued by the
+.I STREAMS
+subsystem when a driver has an autopush entry added, this notification
+indicates to clients that the driver with module identification number,
+.IR modid ,
+has had an autopush specification added to a minor device of the driver.
+The
+.BR sad (4)
+driver subscribes to notifications and watches for this event.
+.TP
+.B STREAMS_NTFY_APUSH_DEL
+Automatically issued by the
+.I STREAMS
+subsystem when a driver has an autopush entry removed, this notification
+indicates to clients that the driver with module identification number,
+.IR modid ,
+has had an autopush specification removed from a minor device of the driver.
+The
+.BR sad (4)
+driver subscribes to notifications and watches for this event.
+.PP
+The
+.I type
+argument is an integer that describes whether the pertinent
+.I STREAMS
+module is a driver
+.RB ( STR_IS_DRIVER ),
+or a module
+.RB ( STR_IS_MODULE ).
+.PP
+The
+.I modid
+argument is the module identifier number (from the
+.I mi_idnum
+member of the
+.BR streamtab (9)
+structure) of the
+.I STREAMS
+module to which the event applies.
+.\"
+.SS Callback Function
+.PP
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+.BR streams_register_notifier "() and " streams_unregister_notifier ()
+return zero (0) on success and the negative error number
+.RB [ EINVAL ]
+on failure.
+.PP
+.BR streams_notify ()
+returns the number of callbacks in the call chain that where invoked and which
+returns an indication that they handled the notification.  This return value
+may be used by callers to determine if any (and how many) clients handled the
+notification.
+.PP
+The
+.I sn_notify
+callback function returns
+.B SNMP_NTFY_HANDLED
+(positive) when it handles a notification,
+.B SNMP_NTFY_IGNORED
+(positive) when it ignores a notification,
+or a negative error number upon failure.
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+Notifier callbacks are called with the notifier chain read locked.  The
+callback must not attempt to register or deregister the notifier or
+single-party deadlock will occur.
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

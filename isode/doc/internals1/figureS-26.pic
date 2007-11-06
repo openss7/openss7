@@ -1,0 +1,30 @@
+.PS 8.5i
+.ps 20
+##
+boxht	=	2*boxht
+## figure S-26
+B1:	box invis "\xx incoming" "" "\xx Message"
+	arrow from B1.w to B1.e
+B2:	box dashed "\xx authentication" "" "\xx entity" with .w at B1.e
+B3:	box invis "\xx user" "" "\xx community" with .w at B2.e
+	arrow from B3.w to B3.e
+B4:	box "access" "" "policy" "" "table" with .w  at B3.e
+B5:	box invis "\xx view" "" "" with .w at B4.e
+	arrow from B5.w to B5.e
+B6:	box "prim." "" "view" "" "table" with .w at B5.e
+B7:	box invis "\xx access method" "" "\xx proxy info" with .w at B6.e
+	arrow from B7.w to B7.e
+	move to ((B4.n.x+B7.ne.x)/2, B4.n.y+3*lineht/4); "\xx permissions"
+	arrow from B4.n to (B4.n.x, B4.n.y+lineht/2) \
+			to (B7.ne.x, B7.ne.y+lineht/2) \
+			to B7.ne
+##
+B8:	box with .n at (B6.s.x, B6.s.y-lineht) "trap" "" "table"
+	arrow up from (B8.n.x-boxwid/4, B8.n.y)
+	arrow up from (B8.n.x+boxwid/4, B8.n.y)
+	move to (B8.n.x, (B8.n.y+B6.s.y)/2); "$\cdots$"
+	move to (B8.ne.x, (B8.n.y+B6.s.y)/2); "\xx views" ljust
+B9:	box invis with .e at B8.w "\xx outgoing" "" "\xx trap \#N"
+	arrow from B9.w to B9.e
+##
+.PE

@@ -1,0 +1,39 @@
+.PS 5i
+.ps 20
+## figure 6
+boxht	=	2*boxht/3
+lineht	=	2*lineht/3
+##
+B1:	box "SMTP"
+	arrow from B1.e to (B1.e.x+linewid, B1.e.y)
+B2:	box "X.400(84)" with .n at (B1.s.x, B1.s.y-lineht)
+	arrow from B2.e to (B2.e.x+linewid, B2.e.y)
+B3:	box "X.400(88)" with .n at (B2.s.x, B2.s.y-lineht)
+	arrow from B3.e to (B3.e.x+linewid, B3.e.y)
+B4:	box "BITNET" with .n at (B3.s.x, B3.s.y-lineht)
+	arrow from B4.e to (B4.e.x+linewid, B4.e.y)
+B5:	box "UUCP" with .n at (B4.s.x, B4.s.y-lineht)
+	arrow from B5.e to (B5.e.x+linewid, B5.e.y)
+B6:	box "local" with .n at (B5.s.x, B5.s.y-lineht)
+	arrow from B6.e to (B6.e.x+linewid, B6.e.y)
+##
+Q1:	box "queue" \
+	    width 3*boxwid/2 height B1.n.y-B6.s.y \
+	    with .nw at (B1.ne.x+linewid, B1.ne.y)
+##
+D1:	box "SMTP" with .nw at (Q1.ne.x+linewid, Q1.ne.y)
+	arrow from (D1.w.x-linewid, D1.w.y) to D1.w
+D2:	box "X.400(84)" with .n at (D1.s.x, D1.s.y-lineht)
+	arrow from (D2.w.x-linewid, D2.w.y) to D2.w
+D3:	box "X.400(88)" with .n at (D2.s.x, D2.s.y-lineht)
+	arrow from (D3.w.x-linewid, D3.w.y) to D3.w
+D4:	box "BITNET" with .n at (D3.s.x, D3.s.y-lineht)
+	arrow from (D4.w.x-linewid, D4.w.y) to D4.w
+D5:	box "UUCP" with .n at (D4.s.x, D4.s.y-lineht)
+	arrow from (D5.w.x-linewid, D5.w.y) to D5.w
+D6:	box "local" with .n at (D5.s.x, D5.s.y-lineht)
+	arrow from (D6.w.x-linewid, D6.w.y) to D6.w
+##
+	box invis "submit" with .n at ((B6.e.x+Q1.w.x)/2, B6.s.y-lineht)
+	box invis "deliver" with .n at ((Q1.e.x+D6.w.x)/2, D6.s.y-lineht)
+.PE

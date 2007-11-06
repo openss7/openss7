@@ -1,0 +1,348 @@
+\begin{theindex}\makeatletter
+\raggedright
+\def\newindex#1{{\huge\hspace{-.5in}\parbox[t]{.5in}{\makebox[.35in][c]{\uppercase{#1}}}\vspace{-1.5ex}}}
+\newindex{a}
+\item abandon, 227
+\item AccessPoint, 100
+\item access\_point, 203
+\item acl attribute, 100, 108, 145
+\item add, 37
+\item add\_attribute\_syntax, 195
+\item aetbuild, 10
+\item as, 187
+\item as\_combine, 191
+\item as\_comp\_new, 191
+\item as\_merge, 191
+\item ASN.1, 103
+\item as\_print, 186
+\item attribute inheritance, 165
+\item AttributeType, 187
+\item AttributeValue, 187, 190
+\item Attr\_Sequence, 187, 191
+\item AttrT, 187
+\item AttrT\_print, 186
+\item AttrV, 187
+\item AttrV\_print, 186
+\item Audio, 103
+\item AVA, 215
+\item avs, 187
+\item avs\_comp\_new, 190
+\item AV\_Sequence, 187, 190
+\item avs\_merge, 190
+\item avs\_print, 186
+\item Aziz, Ashar, xxv
+\indexspace
+\newindex{b}
+\item Barker, Paul, 17
+\item Betzler, Uli, xxvi
+\item bind, 40, 124
+\item Boolean, 99
+\item Braun, Hans-Werner, xxiv
+\item Brezak, John, xxv
+\item Brooks, Piete, 17
+\indexspace
+\newindex{c}
+\item cache\_entry, 247
+\item cache\_list, 248
+\item CaseExactString, 86
+\item CaseIgnoreIA5String, 102
+\item CaseIgnoreList, 90
+\item CaseIgnoreString, 89
+\item Cass, Dwight E., xxii
+\item Certificate, 97
+\item CertificateList, 98
+\item CertificatePair, 98
+\item Chaining DSP operations, 150
+\item Chirieleison, Don, xxv
+\item CommonArgs, 201
+\item CommonResults, 202
+\item compare, 39
+\item ContinuationRef, 203
+\item correlate\_search\_results, 219
+\item CountryString, 91
+\item Cowin, Godfrey, xxiii
+\item cron, 125
+\indexspace
+\newindex{d}
+\item DAP, 26
+\item DAPabort, 233
+\item DapAsynBindReqAux, 236, 237
+\item DapAsynBindRequest, 239
+\item DapAsynBindRetry, 239
+\item dap\_bind, 227
+\item DAPconnect, 237
+\item DAPerror, 235
+\item DAPindication, 233
+\item DapInitWaitRequest, 241
+\item DAPpreject, 234
+\item DapRead, 241
+\item DAPresult, 235
+\item DapUnBindRetry, 240
+\item dased, 119
+\item Data Quality syntax, 103
+\item dbm, 122
+\item de, 58
+\item delete, 38
+\item delete\_cache, 247
+\item DeliveryMethod, 96
+\item DestinationString, 92
+\item dish, 9, 29
+\item dishinit, 48, 56, 120, 130
+\item DN, 93, 187, 193
+\item dn\_append, 193
+\item dn\_comp\_new, 193
+\item dn\_print, 186
+\item DSA Quality syntax, 104
+\item DSA relay, 146
+\item ds\_abandon, 227
+\item dsabuild, 10
+\item dsacontrol, 46, 151
+\item ds\_addentry, 223
+\item dsap\_init, 188
+\item DSA.pseudo, 152
+\item dsaptailor, 45, 74, 82, 127
+\item DSA.real, 152
+\item dsastats, 179
+\item ds\_bind, 211
+\item ds\_compare, 214
+\item DSError, 204
+\item ds\_error, 208
+\item ds\_list, 216
+\item ds\_modifyentry, 225
+\item ds\_modifyrdn, 226
+\item DSP, 27
+\item ds\_read, 212, 228
+\item ds\_removeentry, 224
+\item ds\_search, 218
+\item ds\_unbind, 212
+\item Dubous, Olivier, xxiv
+\indexspace
+\newindex{e}
+\item Easterbrook, Stephen, xxiii
+\item EDB, 131, 135
+\item edb2dbm, 123
+\item edbcat, 123
+\item EDB.gdbm file, 135
+\item edbInfo attribute, 101, 144, 169, 170
+\item EDB.map file, 136
+\item editentry, 38
+\item EEC, xxiii
+\item Entry, 244
+\item EntryInfo, 187, 213
+\item EntryInfoSelection, 213
+\item entrymod, 225
+\item ESPRIT, xxiii, 16
+\indexspace
+\newindex{f}
+\item FacsimileTelephoneNumber, 96
+\item filter, 222, 250
+\item filter\_item, 220
+\item Findlay, Andrew, 17
+\item Finni, Olli, xxiv
+\item fred, 64
+\indexspace
+\newindex{g}
+\item gdbm, 122, 123
+\item GEC plc, 16
+\item GNU, 121, 122
+\item Gosling, James, xxvi
+\item Guide, 98
+\indexspace
+\newindex{h}
+\item Hein\"{a}nen, Juha, xxv, 17
+\item Horton, Mark R., xxiv
+\item Horvath, Nandor, xxv
+\item Howes, Tim, 17
+\indexspace
+\newindex{i}
+\item IA5String, 91
+\item iaed, 86, 119, 140
+\item INCA, 16
+\item inherited attribute, 102, 165
+\item Integer, 100
+\item isoentities, 119
+\item isoservices, 119
+\item isotailor, 140, 147
+\indexspace
+\newindex{j}
+\item Jacobsen, Ole-Jorgen, xxv
+\item Jelfs, Philip B., xxv
+\item JNT, 17
+\item Jokela, Petri, 17
+\item Jordan, Kevin E., xxv
+\indexspace
+\newindex{k}
+\item Keogh, Paul, xxv
+\item Kille, Stephen E., xxiii
+\item Knight, Graham, xxv
+\indexspace
+\newindex{l}
+\item Lamport, Leslie, xxvi
+\item \LaTeX {}, xxvi, 282
+\item Lavender, Greg, xxiv
+\item libacsap, 7
+\item libdsap, 9, 119, 185, 188, 195, 200, 208, 229, 244, 249
+\item libpsap, xxiii, 7, 9
+\item libpsap2, 7, 8
+\item libpsap2-lpp, 8
+\item libquipu, 244
+\item librosap, xxii, 7
+\item librosy, 9
+\item librtsap, 7
+\item libssap, 7
+\item libtsap, xxv, 8
+\item lint, 10
+\item list, 32
+\item load\_oid\_table, 188
+\item local\_find\_entry, 248
+\item log\_ds\_error, 208
+\indexspace
+\newindex{m}
+\item Mahl, Damanjit, 17
+\item Mailbox, 102
+\item make, 5
+\item masterDSA attribute, 93, 134, 154
+\item McLoughlin, L., xxv
+\item \MH /{}, 29, 70, 282
+\item Michaelson, George, xxii, 17
+\item Miller, Steve D., xxiv
+\item Modcomp GmbH, 16
+\item modify, 38
+\item modify\_av\_printer, 199
+\item modifyrdn, 39
+\item Moore, Christopher W., xxii, 17
+\item more, 47
+\item moveto, 30
+\indexspace
+\newindex{n}
+\item NBS, xxiv
+\item ndbm, 122
+\item NIST, xxiv
+\item Nixdorf AG, 16
+\item Nordmark, Erik, xxv
+\item NumericString, 92
+\indexspace
+\newindex{o}
+\item object class, 172
+\item objectClass attribute, 95, 133, 169
+\item OctetString, 91
+\item OID, 95
+\item oid\_table, 189
+\item Olivetti, 16
+\item Onions, Julian, xxiii, 17
+\indexspace
+\newindex{p}
+\item Password, 97
+\item Pavel, John, xxiii
+\item Pavlou, George, xxv
+\item PBM, 163
+\item Pederson, Gier, 17
+\item pepsy, xxiv, 9, 10, 196
+\item pepy, xxiii, 9, 10, 196
+\item Photo, 103
+\item pod, 78
+\item Poskanzer, Jef, 163
+\item PostalAddress, 93
+\item posy, xxiv, 8, 9, 10, 196
+\item PP, 104
+\item Prafullchandra, Hemma, xxv
+\item presentation address --- changing, 152
+\item presentation addresses, 97, 126, 139, 147
+\item Preuss, Don, xxv
+\item Pring, Ed, xxvi
+\item PrintableString, 86
+\item ProtectedPassword, 101
+\indexspace
+\newindex{q}
+\item quipu, 9, 147
+\item .quipurc, 44
+\item quipu\_syntaxes, 188
+\item quiputailor, 146
+\item quipuVersion attribute, 91, 144, 152
+\indexspace
+\newindex{r}
+\item RDN, 25, 133, 187, 192
+\item rdn\_comp\_new, 193
+\item rdn\_merge, 193
+\item rdn\_print, 186
+\item readline, 121
+\item Reinart, John A., xxvi
+\item Rekhter, Jacob, xxv
+\item Relay DSA, 146
+\item Robbins, Colin J., xxiii, 17
+\item Roe, Mike, xxiii, 17
+\item Romine, John L., xxii
+\item Rose, Marshall T., xxvi, 17
+\item ros.quipu, 119, 147, 168
+\item rosy, 8
+\item Ruttle, Keith, xxiii
+\indexspace
+\newindex{s}
+\item Schema, 101
+\item Scott, John A., xxiv
+\item sd, 72
+\item search, 33
+\item secure\_ds\_bind, 209
+\item SecurityPolicy, 101
+\item ServiceControl, 201
+\item set\_attribute\_syntax, 198
+\item set\_av\_printer, 198
+\item s\_filter, 222, 250
+\item shared libraries, 174
+\item Sharpe, Paul, 17
+\item showentry, 31
+\item showname, 39
+\item sid, 50, 120
+\item slaveDSA attribute, 134
+\item spot shadow, 148, 152, 155
+\item squid, 40
+\item Srinivasan, Raj, xxv
+\item str2as, 187
+\item str2AttrT, 187, 190
+\item str2AttrV, 187
+\item str2dn, 187
+\item str2rdn, 187
+\item synctree, 123
+\indexspace
+\newindex{t}
+\item T.61 Strings, 86
+\item tar, xvii
+\item Taylor, Jem, xxiv
+\item TelephoneNumber, 92
+\item TeletexTerminalIdentifier, 96
+\item TelexNumber, 95
+\item Titcombe, Steve, xxiii, 17
+\item tree2dbm, 122
+\item treeStructure attribute, 101, 134, 169
+\item tsapd, 140
+\item TURBO, 121
+\item Turland, Alan, xxiii, 17
+\indexspace
+\newindex{u}
+\item U.C.~Berkeley, xxvi
+\item UFN, 194
+\item ufn\_dn\_print, 194
+\item ufn\_match, 194
+\item unbind, 41
+\item user password attribute, 97, 106, 156
+\item UTCTime, 99
+\indexspace
+\newindex{v}
+\item Vanderbilt, Peter, xxv
+\item version --- of an EDB, 131
+\indexspace
+\newindex{w}
+\item Walton, Simon, xxiii, 17
+\item Weller, Daniel, xxv
+\item Wenzel, Oliver, xxv
+\item Wilder, Rick, xxv
+\item Willson, Stephen H., xxii
+\item Worsley, Andrew, xxiv, 17
+\indexspace
+\newindex{x}
+\item X Windows, 77, 87, 163
+\indexspace
+\newindex{y}
+\item Yee, Peter, 17
+\item Young, Alan, xxvi
+\end{theindex}

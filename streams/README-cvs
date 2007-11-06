@@ -1,5 +1,5 @@
-Linux Fast-STREAMS -- read me CVS file.  2007-08-19
-$Id: README-cvs,v 0.9.2.35 2007/08/19 12:40:01 brian Exp $
+Linux Fast-STREAMS -- read me CVS file.  2007-10-18
+$Id: README-cvs,v 0.9.2.36 2007/10/15 19:04:08 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -46,8 +46,17 @@ The build host requires the following GNU tools:
 
    * `gettext 0.16.1'
 
-These tools can be acquired from the FSF website (http://www.fsf.org/)
-in the free software directory, and also at the following locations:
+   * `bison 2.3'
+
+   * `flex 2.5.33'
+
+Most desktop development GNU/Linux distributions wil have these tools;
+however, some non-development or server-style installations might not
+and they must be installed separately.(1)
+
+Also, these tools can be acquired from the FSF website
+(http://www.fsf.org/) in the free software directory, and also at the
+following locations:
 
    * autoconf-2.61
      (http://www.openss7.org/tarballs/autoconf-2.61.tar.bz2)
@@ -61,10 +70,14 @@ in the free software directory, and also at the following locations:
    * gettext-0.16.1
      (http://www.openss7.org/tarballs/gettext-0.16.1.tar.gz)
 
+   * bison-2.3 (http://www.openss7.org/tarballs/bison-2.3.tar.bz2)
+
+   * flex-2.5.33 (http://www.openss7.org/tarballs/flex-2.5.33.tar.bz2)
+
 It should be stressed that, in particular, the `autoconf(1)', and `automake(1)',
 must be at version releases `2.61' and `1.10'.  _The versions normally
 distributed in some mainstream GNU/Linux distributions are, in fact,
-much older than these versions._(1)  GNU version of these packages
+much older than these versions._(2)  GNU version of these packages
 configured and installed to default directories will install in
 `/usr/local/' allowing them to coexist with distribution installed
 versions.
@@ -84,9 +97,13 @@ documentation tools:
 
    * `groff 1.17.2'
 
+   * `gnuplot 3.7'
+
+   * `latex2html 1.71'
+
 Most desktop GNU/Linux distributions will have these tools; however,
-some server-style installations (e.g. `Ubuntu'-server or `SLES 9') will
-not and they must be installed separately.
+some server-style installations (e.g. `Ubuntu'-server, `SLES 9' or
+`Fedora 6 or 7') will not and they must be installed separately.(3)
 
 For uncooked manual pages, the entire `groff(1)' package is required on
 `Debian' and `Ubuntu' systems (the base package does not include `grefer(1)'
@@ -134,8 +151,8 @@ Ball', in the manual.
 Do note, however, that `make(1)' will rebuild the documentation that is
 normally released with the package.  Additional tools may be necessary
 for building the documentation.  To avoid building and installing the
-documentation, use the `--disable-devel' option to configure described
-in `Configuring the Tar Ball', in the manual.
+documentation, use the `--disable-devel' or `--disable-docs' option to
+configure described in `Configuring the Tar Ball', in the manual.
 
 When configuring the package in a working directory and while working a
 change-compile-test cycle that involves configuration macros or
@@ -152,7 +169,17 @@ under the `/usr/src' directory.
 
 ---------- Footnotes ----------
 
-(1) A notable exception is Debian.
+(1) Older version of bison (2.0) and the older version of flex (2.5.4a)
+are also suitable.  Where possible, use the more recent bison 2.3 and
+flex 2.5.33.
+
+(2) A notable exception is Debian and Fedora 7.  Note that on Fedora 7
+the `gettext-devel' package must be installed.
+
+(3) In particular, for `CentOS', `Fedora 6 or 7', the `tetex-latex' and
+`gnuplot' packages must be loaded as well.  Note also that the
+`latex2html' used to be part of the textex package (or subpackages) but
+is now often packaged on its own.
 
 -----
 

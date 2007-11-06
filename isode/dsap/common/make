@@ -1,0 +1,9 @@
+: run this script through /bin/sh
+M=/bin/make
+if [ -f /usr/bin/make ]; then
+    M=/usr/bin/make
+elif [ -f /usr/ccs/bin/make ]; then
+    M=/usr/ccs/bin/make
+fi
+
+exec $M TOPDIR=../../ -f ../../config/CONFIG.make -f Makefile ${1+"$@"}

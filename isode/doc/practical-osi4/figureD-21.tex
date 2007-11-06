@@ -1,0 +1,21 @@
+\File{figureD\-21.py},{16:32},{May  1 1991}
+\L{\LB{aeLookup (p: PurportedName; sac: \K{OBJECT} \K{IDENTIFIER};}}
+\L{\LB{          el: EnvironmentList): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    x: DN;}}
+\L{\LB{    dlist, matches: \K{SET} \K{OF} DN;}}
+\L{\LB{}}
+\L{\LB{    \K{IF} ((dlist = friendlyMatch (p, el)) == \K{NULL}) \K{THEN}}}
+\L{\LB{        \K{RETURN} \K{NULL};}}
+\L{\LB{}}
+\L{\LB{    matches = \K{NULL};}}
+\L{\LB{    \K{FOR} x \K{IN} dlist \K{DO}}}
+\L{\LB{        matches += aeSearch (x, sac, oneLevel);}}
+\L{\LB{}}
+\L{\LB{    \K{IF} (matches == \K{NULL}) \K{THEN}}}
+\L{\LB{        \K{FOR} x \K{IN} dlist \K{DO}}}
+\L{\LB{            \K{IF} (length (x) \>= 2)}}
+\L{\LB{                matches += aeSearch (x, sac, wholeSubtree);}}
+\L{\LB{}}
+\L{\LB{    \K{RETURN} matches;}}
+\L{\LB{\}}}

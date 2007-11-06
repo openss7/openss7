@@ -1,0 +1,29 @@
+% run this through LaTeX with the appropriate wrapper
+%	TSAP Failure Codes
+
+\normalsize
+\[\begin{tabular}{rp{3.0in}}
+	\multicolumn{2}{c}{\bf Provider-initiated Disconnect (fatal)}\\
+\tt DR\_NORMAL&		Normal disconnect by session entity\\
+\tt DR\_REMOTE&		Remote transport entity congested at connect request
+			time\\
+\tt DR\_CONNECT&	Connection negotiation failed\\
+\tt DR\_DUPLICATE&	Duplicate source reference detected for the same pair
+			of NSAPs\\
+\tt DR\_MISMATCH&	Mismatched references\\
+\tt DR\_PROTOCOL&	Protocol error\\
+\tt DR\_OVERFLOW&	Reference overflow\\
+\tt DR\_REFUSED&	Connect request refused on this network connection\\
+\tt DR\_LENGTH&		Header or parameter length invalid\\
+\tt DR\_NETWORK&	Network disconnect\\[0.2in]
+		\multicolumn{2}{c}{\bf User-initiated Disconnect (fatal)}\\
+\tt DR\_UNKNOWN&	Reason not specifed\\
+\tt DR\_CONGEST&	Congestion at TSAP\\
+\tt DR\_SESSION&	Session entity not attached to TSAP\\
+\tt DR\_ADDRESS&	Address unknown\\[0.2in]
+		\multicolumn{2}{c}{\bf Interface Errors (non-fatal)}\\
+\tt DR\_PARAMETER&	Invalid parameter\\
+\tt DR\_OPERATION&	Invalid operation\\
+\tt DR\_TIMER&		Timer expired\\
+\tt DR\_WAITING&	Indications waiting
+\end{tabular}\]

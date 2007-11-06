@@ -1,0 +1,8 @@
+: run this script through /bin/sh
+: $Header: /xtel/isode/isode/others/quipu/uips/doog/RCS/make,v 9.0 1992/06/16 12:45:18 isode Rel $
+M=/bin/make
+if [ -f /usr/bin/make ]; then
+    M=/usr/bin/make
+fi
+
+exec $M TOPDIR=../../../../ -f ../../../../config/CONFIG.make -f Makefile ${1+"$@"}

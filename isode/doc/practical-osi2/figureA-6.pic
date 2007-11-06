@@ -1,0 +1,31 @@
+.PS
+.ps 20
+##
+lineht	=	2*lineht/3
+## figure A-6
+B1:	box "user-element" width 4*boxwid
+B1a:	box invis with .w at B1.w
+B1b:	box invis with .e at B1.e
+B2:	box "DASE" with .ne at (B1.se.x, B1.se.y-lineht)
+B4:	box "FTAM" with .nw at (B1.sw.x, B1.sw.y-lineht)
+B6:	box "ACSE" with .n at ((B4.n.x+B1.n.x)/2, B4.s.y-lineht)
+B7:	box "ROSE" with .n at (B2.s.x, B2.s.y-lineht)
+B5:	box with .n at (B1.n.x, B1.n.y+boxht/2) width 5*boxwid \
+	height boxht+B1.n.y-B6.s.y
+##
+	line from B1a.s to B4.n
+	line from (B4.s.x-boxwid/6, B4.s.y) to (B4.s.x-boxwid/6, B5.s.y)
+	line from B1b.s to B2.n
+	line from (B2.s.x+boxwid/6, B2.s.y) to B7.n
+	line from B7.s to (B7.s.x, B5.s.y)
+	line from (B4.s.x+boxwid/6, B4.s.y) to (B6.n.x-boxwid/6, B6.n.y)
+	line from (B2.s.x-boxwid/6, B2.s.y) to (B6.n.x+boxwid/6, B6.n.y)
+	line from B6.s to (B6.s.x, B5.s.y)
+##
+	line down from B5.s
+	line dashed from (B5.w.x-linewid/2, B5.s.y-lineht) \
+		    to   (B5.e.x+linewid/2, B5.s.y-lineht)
+	move to (B5.e.x+linewid/2 , B5.s.y-lineht); \
+	    "\ \ presentation service" ljust
+##
+.PE

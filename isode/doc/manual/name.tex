@@ -1,0 +1,45 @@
+\File{name.bnf},{17:20},{Feb 12 1991}
+\L{\LB{\<attribute\-value\> ::= \<NumericValue\>}}
+\L{\LB{                    \| \<ASNValue\>}}
+\L{\LB{                            \C{}\-\- For unknown syntaxes \& photos}}
+\CE{}\L{\LB{                    \| \<DNValue\>}}
+\L{\LB{                    \| \<OIDValue\>}}
+\L{\LB{                            \C{}\-\- OID \& ObjectClass}}
+\CE{}\L{\LB{                    \| \<PSAPvalue\>}}
+\L{\LB{                    \| \<StringValue\>}}
+\L{\LB{                            \C{}\-\- Used for:}}
+\CE{}\L{\LB{                            \C{}\-\-     CaseIgnoreString, CaseExactString,}}
+\CE{}\L{\LB{                            \C{}\-\-     PrintableString, CountryString,}}
+\CE{}\L{\LB{                            \C{}\-\-     OctetString, IA5String, Password}}
+\CE{}\L{\LB{                            \C{}\-\-     TelephoneNumber}}
+\CE{}\L{\LB{                    \| \<GuideValue\>}}
+\L{\LB{                    \| \<TelexNumberValue\>}}
+\L{\LB{                    \| \<TeletexTerminalIdentifierValue\>}}
+\L{\LB{                    \| \<FacsimileTelephoneNumberValue\>}}
+\L{\LB{                    \| \<PostalAddressValue\>}}
+\L{\LB{                    \| \<MailboxValue\>}}
+\L{\LB{                    \| \<UTCTimeValue\>}}
+\L{\LB{                    \| \<DeliveryValue\>}}
+\L{\LB{                    \| \<IntegerValue\>}}
+\L{\LB{                    \| \<BooleanValue\>}}
+\L{\LB{                    \| \<ACLValue\>}}
+\L{\LB{                    \| \<SchemaValue\>}}
+\L{\LB{                    \| \<EdbInfoValue\>             }}
+\L{\LB{                    \| \<otherValues\>}}
+\L{\LB{}}
+\L{\LB{\<otherValues\>   ::= ANY \C{}\-\- can be user defined.}}
+\CE{}\L{\LB{}}
+\L{\LB{\<namevalue\>     ::= \<namelist\> [\S{}\"\#\"\SE{}]}}
+\L{\LB{\<namelist\>      ::= \<name\> \| \<namelist\> \S{}\"\$\"\SE{} \<name\>}}
+\L{\LB{}}
+\L{\LB{\<attribute\>     ::= \<oid\> \S{}\"=\"\SE{} \<avlist\>}}
+\L{\LB{\<avlist\>        ::= \<attribute\-value\> \| \<avlist\> \S{}\"\&\"\SE{} \<attribute\-value\>}}
+\L{\LB{\<rdn\>           ::= \<attribute\> \| \<attribute\> \S{}\"\%\"\SE{} \<rdn\>}}
+\L{\LB{\<name\>          ::= \<rdn\> \| \<rdn\> \S{}\"@\"\SE{} \<name\>}}
+\L{\LB{                                \C{}\-\- most significant first}}
+\CE{}\L{\LB{}}
+\L{\LB{\C{}\-\- An example name might be:}}
+\CE{}\L{\LB{\C{}\-\-        ``c=GB @ o=UCL \% locality=London @ ou=CS\'\'}}
+\CE{}\L{\LB{\C{}\-\- Finally, this can be assembled together to give a format for a textual}}
+\CE{}\L{\LB{\C{}\-\- representation of an Entry Data Block.}}
+\CE{}\L{\LB{}}

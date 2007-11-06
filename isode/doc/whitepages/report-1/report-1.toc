@@ -1,0 +1,28 @@
+\contentsline {section}{\numberline {1}Introduction}{2}
+\contentsline {section}{\numberline {2}Approach}{3}
+\contentsline {subsection}{\numberline {2.1}OSI Infrastructure}{3}
+\contentsline {subsection}{\numberline {2.2}OSI Directory}{4}
+\contentsline {subsection}{\numberline {2.3}White Pages Abstraction}{5}
+\contentsline {subsubsection}{\numberline {2.3.1}Administrative Discipline}{5}
+\contentsline {subsubsection}{\numberline {2.3.2}User Interface}{6}
+\contentsline {section}{\numberline {3}First Milestone: Numbers}{8}
+\contentsline {subsection}{\numberline {3.1}Interop '89}{8}
+\contentsline {subsection}{\numberline {3.2}International Participation}{8}
+\contentsline {section}{\numberline {4}Second Milestone: Software}{9}
+\contentsline {subsection}{\numberline {4.1}Reliability}{9}
+\contentsline {subsection}{\numberline {4.2}Asynchrony}{9}
+\contentsline {subsection}{\numberline {4.3}Distribution}{10}
+\contentsline {subsection}{\numberline {4.4}User Interface}{10}
+\contentsline {subsection}{\numberline {4.5}An Update and Interpolation}{11}
+\contentsline {section}{\numberline {5}Direction}{12}
+\contentsline {subsection}{\numberline {5.1}Software}{12}
+\contentsline {subsubsection}{\numberline {5.1.1}Platforms}{12}
+\contentsline {subsubsection}{\numberline {5.1.2}Interfaces}{12}
+\contentsline {subsection}{\numberline {5.2}(Teutonic) Discipline}{12}
+\contentsline {subsubsection}{\numberline {5.2.1}Replication}{12}
+\contentsline {subsubsection}{\numberline {5.2.2}International Participation}{13}
+\contentsline {subsection}{\numberline {5.3}On the Far Horizon}{13}
+\contentsline {subsubsection}{\numberline {5.3.1}The Need for Support}{13}
+\contentsline {subsubsection}{\numberline {5.3.2}Three-level DMD Scheme}{13}
+\contentsline {section}{\numberline {6}Documents}{14}
+\contentsline {section}{\numberline {7}Acknowledgements}{16}

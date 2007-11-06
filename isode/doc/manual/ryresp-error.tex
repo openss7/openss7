@@ -1,0 +1,99 @@
+\File{ryresp\-error.c},{16:19},{May 30 1989}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{ros\_adios (rop, event)}}
+\L{\LB{\K{register} \K{struct} RoSAPpreject *rop;}}
+\L{\LB{\K{char}   *event;}}
+\L{\LB{\{}}
+\L{\LB{    ros\_advise (rop, event);}}
+\L{\LB{}}
+\L{\LB{    longjmp (toplevel, NOTOK);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{ros\_advise (rop, event)}}
+\L{\LB{\K{register} \K{struct} RoSAPpreject *rop;}}
+\L{\LB{\K{char}   *event;}}
+\L{\LB{\{}}
+\L{\LB{    \K{char}    buffer[BUFSIZ];}}
+\L{\LB{}}
+\L{\LB{    \K{if} (rop \-\> rop\_cc \> 0)}}
+\L{\LB{}\Tab{8}{(\K{void}) sprintf (buffer, \S{}\"[\%s] \%*.*s\"\SE{}, RoErrString (rop \-\> rop\_reason),}}
+\L{\LB{}\Tab{16}{rop \-\> rop\_cc, rop \-\> rop\_cc, rop \-\> rop\_data);}}
+\L{\LB{    \K{else}}}
+\L{\LB{}\Tab{8}{(\K{void}) sprintf (buffer, \S{}\"[\%s]\"\SE{}, RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}}
+\L{\LB{    advise (LLOG\_EXCEPTIONS, NULLCP, \S{}\"\%s: \%s\"\SE{}, event, buffer);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{acs\_advise (aca, event)}}
+\L{\LB{\K{register} \K{struct} AcSAPabort *aca;}}
+\L{\LB{\K{char}   *event;}}
+\L{\LB{\{}}
+\L{\LB{    \K{char}    buffer[BUFSIZ];}}
+\L{\LB{}}
+\L{\LB{    \K{if} (aca \-\> aca\_cc \> 0)}}
+\L{\LB{}\Tab{8}{(\K{void}) sprintf (buffer, \S{}\"[\%s] \%*.*s\"\SE{},}}
+\L{\LB{}\Tab{16}{AcErrString (aca \-\> aca\_reason),}}
+\L{\LB{}\Tab{16}{aca \-\> aca\_cc, aca \-\> aca\_cc, aca \-\> aca\_data);}}
+\L{\LB{    \K{else}}}
+\L{\LB{}\Tab{8}{(\K{void}) sprintf (buffer, \S{}\"[\%s]\"\SE{}, AcErrString (aca \-\> aca\_reason));}}
+\L{\LB{}}
+\L{\LB{    advise (LLOG\_EXCEPTIONS, NULLCP, \S{}\"\%s: \%s (source \%d)\"\SE{}, event, buffer,}}
+\L{\LB{}\Tab{16}{aca \-\> aca\_source);}}
+\L{\LB{\}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{\#ifndef}}\Tab{8}{lint}}
+\L{\LB{\K{void}}\Tab{8}{adios (va\_alist)}}
+\L{\LB{va\_dcl}}
+\L{\LB{\{}}
+\L{\LB{    va\_list ap;}}
+\L{\LB{}}
+\L{\LB{    va\_start (ap);}}
+\L{\LB{    }}
+\L{\LB{    \_ll\_log (pgm\_log, LLOG\_FATAL, ap);}}
+\L{\LB{}}
+\L{\LB{    va\_end (ap);}}
+\L{\LB{}}
+\L{\LB{    \_exit (1);}}
+\L{\LB{\}}}
+\L{\LB{\K{\#else}}}
+\L{\LB{\C{}\/* VARARGS2 *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{adios (what, fmt)}}
+\L{\LB{\K{char}   *what,}}
+\L{\LB{       *fmt;}}
+\L{\LB{\{}}
+\L{\LB{    adios (what, fmt);}}
+\L{\LB{\}}}
+\L{\LB{\K{\#endif}}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{\#ifndef}}\Tab{8}{lint}}
+\L{\LB{\K{void}}\Tab{8}{advise (va\_alist)}}
+\L{\LB{va\_dcl}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}}\Tab{8}{    code;}}
+\L{\LB{    va\_list ap;}}
+\L{\LB{}}
+\L{\LB{    va\_start (ap);}}
+\L{\LB{}}
+\L{\LB{    code = va\_arg (ap, \K{int});}}
+\L{\LB{}}
+\L{\LB{    \_ll\_log (pgm\_log, code, ap);}}
+\L{\LB{}}
+\L{\LB{    va\_end (ap);}}
+\L{\LB{\}}}
+\L{\LB{\K{\#else}}}
+\L{\LB{\C{}\/* VARARGS3 *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{void}}\Tab{8}{advise (code, what, fmt)}}
+\L{\LB{\K{char}   *what,}}
+\L{\LB{       *fmt;}}
+\L{\LB{\K{int}}\Tab{8}{code;}}
+\L{\LB{\{}}
+\L{\LB{    advise (code, what, fmt);}}
+\L{\LB{\}}}
+\L{\LB{\K{\#endif}}}

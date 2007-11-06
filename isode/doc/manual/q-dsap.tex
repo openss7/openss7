@@ -1,0 +1,701 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter {Programming the Directory}
+
+This part of the manual is written for implementors who wish to access the
+directory using the \man libdsap(3n) library.
+This might be an OSI application wishing to look up information,
+or an interactive directory user-interface.
+The interface to the directory is defined as a series of procedures which
+closely parallels the service defined in \cite{CCITT.Directory}.  This section
+defines the procedures,
+and shows how they relate to the standard.
+To avoid unnecessary wordiness, the user is expected to be familiar with
+the standard.
+
+\section      {Conventions}
+\label{quipu_conv}
+
+The library defines various {\em C} structures, described in the 
+following sections.
+Associated with the {\em C} structures, are routines which:
+
+\begin{itemize}
+\item allocate structures.
+
+\item free structures, including sub-structures.
+
+\item compare structures.
+
+\item copy structures.
+
+\item print structures.
+
+\item parse structures.
+\end{itemize}
+
+The following conventions are followed in many routines, which are then
+briefly identified later.
+For a general structure \verb"x", there will be the following routines:
+\begin{itemize}
+\item Allocation:
+\begin{quote}\small\begin{verbatim}
+struct x *x_alloc ()
+\end{verbatim}\end{quote}
+Allocate memory for structure \verb"x".
+
+\item Freeing:
+\begin{quote}\small\begin{verbatim}
+x_free (a)
+struct x * a;
+\end{verbatim}\end{quote}
+Free structure \verb"x", and any nested structures.
+
+If the structure \verb"x" is a linked-list type of structure, then as well
+as the routines described above, there will be routines of the
+form 
+\verb"x_comp_function" (where \verb"function" is \verb"alloc",
+\verb"free", and so on).  These act upon a single element of the
+list rather than the list as a whole.
+
+\item Copying:
+\begin{quote}\small\begin{verbatim}
+struct x * x_cpy (a)
+struct x *a;
+\end{verbatim}\end{quote}
+Return a copy of structure \verb"a".
+
+\item Comparing:
+\begin{quote}\small\begin{verbatim}
+int     x_cmp (a, b)
+struct x *a, *b;
+\end{verbatim}\end{quote}
+Return \verb"0" if the structures \verb"a" and \verb"b" same.  Return
+\verb"-1" if \verb"a<b", or \verb"1" if \verb"a>b".
+For some structures the notion of \verb"a>b" and \verb"a<b" is not defined,
+but will be consistent.
+
+\item Printing:
+\begin{quote}
+\index{rdn\_print}\index{dn\_print}\index{as\_print}\index{avs\_print}
+\index{AttrT\_print}\index{AttrV\_print}
+\small\begin{verbatim}
+int     x_print (ps, a, format)
+PS       ps;
+struct x *a;
+int      format;
+\end{verbatim}\end{quote}
+Print the structure \verb"a" to the presentation stream \verb"ps", using the
+specified format, either \verb"READOUT", for a pretty-printed format (for
+example the output of a showentry from DISH); or,
+\verb"EDBOUT", for a format suitable for inclusion in an EDB file.
+The \verb"PS" structure is described in \volone/ of this manual.
+
+For the structures representing a DN and RDN there is an extra format:
+\verb"DIROUT", which is used to get a representation of the name suitable
+for inclusion in a \unix/ filename (essentially \verb"EDBOUT" with the
+\verb"@" symbols replaced with \verb"/" separators).
+
+\item String format:
+\begin{quote}
+\index{str2rdn}\index{str2dn}\index{str2as}
+\index{str2AttrV}\index{str2AttrT}
+\small\begin{verbatim}
+struct x * str2x (str)
+char * str;
+\end{verbatim}\end{quote}
+Most attribute syntaxes have a string representation.
+A string of the required 
+syntax can be converted to the relevant {\em C} structure with the ``str2x''
+function.
+Each of the string parsers assumes the input string has had multiple spaces
+and tabs removed, and replaced with single spaces.
+The function 
+\begin{quote}\small\begin{verbatim}
+char * Tidy_String (a)
+char * a;
+\end{verbatim}\end{quote}
+will do the relevant tidying if required.
+Strings printed with the \verb"EDBOUT" format of x\_print should be parsable.
+
+Note: \verb"str2AttrV()" \index{str2AttrV} does not follow the ``convention''
+and has an extra parameter, 
+which is the expected syntax
+of the string.
+
+\end{itemize}
+
+The structures following the ``convention'' are listed below.
+The ``prefix'' column shows what value
+\verb"x" should take to use the routines for the associated
+ structure.
+\index{RDN}
+\index{DN}
+\index{AttributeType}\index{AttrT}
+\index{AttributeValue}\index{AttrV}
+\index{AV\_Sequence}\index{avs}
+\index{Attr\_Sequence}\index{as}
+\index{EntryInfo}
+
+
+\[\begin{tabular}{|l|l|} \hline
+Structure & Prefix \\ \hline
+RDN & rdn \\
+DN & dn \\
+AttributeType & AttrT \\
+AttributeValue & AttrV \\
+AV\_Sequence & avs \\
+Attr\_Sequence & as \\
+EntryInfo& entryinfo \\ \hline
+\end{tabular}\]
+
+\section {Attributes}
+
+Attributes are fundamental
+components of the directory.  
+Attributes have two parts, types and values, which are
+(respectfully) represented by two structures,
+\verb"AttributeType" and \verb"AttributeValue".
+
+To represent AttributeTypes, 
+\man libdsap(3n) has a table (described in
+Section~\ref{oidtables}) which maps a string representation of attribute
+types onto OIDs.
+
+This table must be loaded by calling
+\begin{quote}\index{load\_oid\_table}\small\begin{verbatim}
+load_oid_table(name)
+char * name;
+\end{verbatim}\end{quote}
+The \verb"name" parameter should be the name of the oidtable to load.
+For most purposes this should be ``\verb"oidtable"''.
+
+Before you load the table, any syntaxes you want special attribute handlers
+for should be loaded.  To do this you will probably want to call
+\label{quipusyntaxes}
+\index{quipu\_syntaxes}
+\begin{quote}\begin{verbatim}
+quipu_syntaxes()
+\end{verbatim}\end{quote}
+which will load all the syntax handlers defined in Chapter~\ref{syntaxes}.
+If not all there syntaxes are required, then a subset can be loaded by
+calling only the handlers required.
+
+
+The call
+\begin{quote}\index{dsap\_init}\small\begin{verbatim}
+dsap_init(argc,argv)
+int *argc;
+char *** argv;
+\end{verbatim}\end{quote}
+can be used to load the oidtable for you, with the additional 
+benifit that it will
+read the file \file{/etc/dsaptailor} to 
+find the location of the oidtable.
+The parameters it expects are the pointers to the 
+\verb"argc" and \verb"argv"
+parameters passed to your ``main()'' routine.
+If a ``\tt -c\rm '' flag is found then this is used as the name of
+the DSA to contact as per DISH (see Section~\ref{dish_bind}).
+A ``\tt -t\rm '' can be used to specify which \file{dsaptailor} file to
+use, and ``\tt -T\rm '' to define an oidtable.
+As with loading the tables, the syntaxes you require should have been loaded
+before you make a call to \verb+dsa_init+
+(Beware: \verb"dsap_init" removes flags it interprets from the parameter list, if you care,
+pass a copy of them, or pass nulls!).
+
+The oidtables are represented using the following structures:
+\begin{quote}\index{oid\_table}\small\begin{verbatim}
+typedef struct {
+        char    * ot_name;
+        char    * ot_stroid;
+        OID       ot_oid;
+        OID       ot_aliasoid;
+} oid_table;
+#define NULLTABLE ((oid_table * )0)
+
+typedef struct {
+        oid_table oa_ot;
+        short     oa_syntax;
+} oid_table_attr, * AttributeType;
+#define NULLTABLE_ATTR ((oid_table_attr *)0)
+#define NULLAttrT ((oid_table_attr *)0)
+\end{verbatim}\end{quote}
+
+The table consists of two fields, an integer syntax : \verb"oa_syntax".
+This is an integer handle onto the abstract syntax of the attribute value.
+The value ``\verb"0"'' indicates an unknown syntax hence ``ASN.1'' is used.
+
+The second field \verb"oa_ot", is a reference to an \verb"oid_table" structure,
+which contains the oid, \verb"ot_oid"; a numeric string representation 
+of the oid, 
+\verb"ot_stroid"; and the local key string, \verb"ot_name".
+
+The field \verb+ot_aliasoid+ is used to store an alternative OID for
+the same attribute.  This is used to allow an attribute to change its
+OID over a period of time.
+
+To create an \verb"AttributeType" given a string representation of an
+OID, you should use
+\begin{quote}\index{str2AttrT}\small\begin{verbatim}
+AttributeType str2AttrT (str)
+char   *str;
+\end{verbatim}\end{quote}
+which will look up the string supplied in the relevant OID tables and 
+returns an
+\verb"AttributeType" pointer into the oidtables.
+
+There are various low level routines to manipulate entries in
+the OID table; however, the \verb"AttributeType" routines described in 
+Section~\ref{quipu_conv}
+will be sufficient for most uses, so the details of these
+``invisible'' routines are omitted here.
+
+
+Attribute values are represented by the structure \verb"AttributeValue":
+
+\begin{quote}\index{AttributeValue}\small\begin{verbatim}
+typedef struct attrVal {
+        short      av_syntax;
+        caddr_t    av_struct;
+} * AttributeValue;
+
+#define NULLAttrV (AttributeValue) NULL
+\end{verbatim}\end{quote}
+
+The \verb"AttributeValue" structure can hold attribute values in many
+formats. Different syntaxes use different 
+specialised {\em C\/} structures pointed to by
+\verb"av_struct", the
+field \verb"av_syntax" defines the syntax represented by the
+\verb"av_struct" field.
+Unknown syntaxes are represented as a presentation element
+indicated by the syntax being zero.
+Section~\ref{add_syntax} describes this more fully.
+
+
+Attribute values can now be linked together to form a multivalue attribute
+value.
+For this the \verb"AV_Sequence" structure is used.
+
+\begin{quote}\index{AV\_Sequence}\small\begin{verbatim}
+typedef struct avseqcomp {     
+    attrVal             avseq_av;
+    struct avseqcomp    *avseq_next;
+} avseqcomp, *AV_Sequence;
+
+#define NULLAV ((AV_Sequence) 0)
+\end{verbatim}\end{quote}
+
+This is simply a linked list of AttributeValues.
+
+To create an \verb"AV_Sequence" the two routines
+\begin{quote}\index{avs\_comp\_new}\index{avs\_merge}\small\begin{verbatim}
+AV_Sequence avs_comp_new (av)
+AttributeValue av;
+
+AV_Sequence avs_merge (a,b)
+AV_Sequence a,b;
+\end{verbatim}\end{quote}
+can be used.
+
+Finally an attribute can now be formed by linking the attribute type, and
+multiple attribute values using the \verb"AttrSequence" structure:
+
+\begin{quote}\index{Attr\_Sequence}\small\begin{verbatim}
+typedef struct attrcomp {       
+    AttributeType       attr_type;
+    AV_Sequence         attr_value;
+    struct attrcomp     *attr_link;
+    struct acl_info     *attr_acl;
+} attrcomp, *Attr_Sequence;
+
+#define NULLATTR ((Attr_Sequence) 0)
+\end{verbatim}\end{quote}
+
+This structure is used singularly to represent an attribute, and as a linked
+list (linked using \verb"attr_link") to represent a set of attributes.
+
+To create an \verb"Attr_Sequence" the two routines
+\begin{quote}\index{as\_comp\_new}\index{as\_merge}\small\begin{verbatim}
+Attr_Sequence as_comp_new (at,as,acl)
+AttributeType at;
+AV_Sequence as;
+struct acl_info * acl;
+
+Attr_Sequence as_merge (a,b)
+Attr_Sequence a,b;
+\end{verbatim}\end{quote}
+can be used.
+The \verb"acl" parameter is only used by the DSA, for use in a DUA it should be
+set to \verb"NULLACL_INFO".
+
+The routine
+\begin{quote}\index{as\_combine}\small\begin{verbatim}
+Attr_Sequence as_combine (as,str)
+AV_Sequence as;
+char * str;
+\end{verbatim}\end{quote}
+is also provided, as an optimisation of
+\begin{quote}\small\begin{verbatim}
+as_merge(as,str2as(str));
+\end{verbatim}\end{quote}
+
+The approach to access control is defined in
+\cite{QUIPU.Design}.
+The representation of the attribute for access control is given by the
+structure shown below.  This closely follows the ASN.1
+definition.
+
+\begin{quote}\small\begin{verbatim}
+struct acl_info {
+    int              acl_categories;
+#define ACL_NONE        0
+#define ACL_DETECT      1
+#define ACL_COMPARE     2
+#define ACL_READ        3
+#define ACL_ADD         4
+#define ACL_WRITE       5
+    int              acl_selector_type;
+#define ACL_ENTRY       0
+#define ACL_OTHER       1
+#define ACL_PREFIX      2
+#define ACL_GROUP       3
+    DN               acl_name;
+    struct acl_info *acl_next;
+};
+\end{verbatim}\end{quote}
+
+The DN \verb"acl_name" is used for the type \verb"ACL_PREFIX" and
+\verb"ACL_OTHER" only.
+
+\section {Distinguished Names}
+The structures which define names are critical.  
+Names are essentially made up of attributes, but because of their
+importance, a different --- more specific structure is used.
+
+\begin{quote}\index{RDN}\small\begin{verbatim}
+typedef struct rdncomp {       
+    AttributeType       rdn_at;
+    attrVal             rdn_av;
+    struct rdncomp      *rdn_next;
+} rdncomp, *RDN;
+
+#define NULLRDN ((RDN) 0)
+\end{verbatim}\end{quote}
+
+An RDN consists of a set of attribute types 
+(\verb"rdn_at")
+and attribute values 
+(\verb"rdn_av");
+the set is linked using \verb"rdn_next".
+
+RDNs can the be joined in a sequence to form a distinguished name
+(DN):
+\begin{quote}\index{DN}\small\begin{verbatim}
+typedef struct dncomp {
+    RDN                 dn_rdn;
+    struct dncomp       *dn_parent;
+} dncomp, *DN;
+
+#define NULLDN ((DN) 0)
+\end{verbatim}\end{quote}
+
+The following routines are provided in addition to the routines defined in
+Section~\ref{quipu_conv} to allow the user to create and manipulate names;
+
+\begin{itemize}
+\item Create a DN given an RDN:
+\begin{quote}\index{dn\_comp\_new}\small\begin{verbatim}
+dn_comp_new (rdn)
+RDN     rdn;
+\end{verbatim}\end{quote}
+
+\item Append a DN to the end of another DN:
+\begin{quote}\index{dn\_append}\small\begin{verbatim}
+dn_append (dn1, dn2)
+DN      dn1,
+        dn2;
+\end{verbatim}\end{quote}
+\verb"dn2" is added to \verb"dn1".
+
+\item Create an RDN given an AttributeType and AttributeValue:
+\begin{quote}\small\index{rdn\_comp\_new}\begin{verbatim}
+RDN rdn_comp_new (at, av)
+AttributeType  at;
+AttributeValue av;
+\end{verbatim}\end{quote}
+
+\item Merge two RDNs:
+\begin{quote}\small\index{rdn\_merge}\begin{verbatim}
+RDN rdn_merge (rdn1, rdn2)
+RDN     rdn1,
+        rdn2;
+\end{verbatim}\end{quote}
+RDNs form a set. To make comparisons easier, this
+implementation assumes them to be ordered sets.  This routine
+takes two ordered RDN sets, and merges them.
+If RDNs received across the network are not ordered, the decoding
+process will order them for you.
+\end{itemize}
+
+\subsection {User-Friendly Naming}
+\label{UFN}
+\index{UFN}
+There are various routines to implement user friendly naming (UFN)\cite{UFN}.
+These are briefly described in this section.
+
+To print a DN to a PStream as a UFN you can use
+\begin{quote}\small\index{ufn\_dn\_print}\begin{verbatim}
+ufn_dn_print (ps,dn,multiline)
+PS  ps;
+DN  dn;
+int multiline;
+\end{verbatim}\end{quote}
+If the \verb+multiline+ option is \verb+TRUE+ the UFN will be printed
+on multiple lines, otherwise, a single line of output will be used.
+The \verb+ufn_dn_print+ routine prints each RDN using
+\begin{quote}\small\begin{verbatim}
+ufn_rdn_print (ps,rdn)
+RDN  rdn;
+PS   ps;
+\end{verbatim}\end{quote}
+
+Parsing a UFN into a DN is a little more complex:
+\begin{quote}\small\index{ufn\_match}\begin{verbatim}
+ufn_match (argc,argv,interact,result,el)
+int argc;
+char ** argv;
+DNS (* interact) ();
+DNS * result;
+envlist el;
+\end{verbatim}\end{quote}
+The \verb+argc+ and \verb+argv+ parameters provide the components of
+the UFN, which will typically have been generated from a comma
+separated UFN string.
+The \verb+el+ component is used to pass a UFN environment list to the
+lookup routine.  If this is left as NULL, this is generated from the
+system wide \file{ufnrc} file.
+
+A sequence of DNs is returned in the \verb+result+ paramenter.
+\verb+DNS+ has the following structure:
+\begin{quote}\small\begin{verbatim}
+typedef struct dn_seq {
+    DN  dns_dn;
+    struct dn_seq *dns_next;
+} *DNS;
+\end{verbatim}\end{quote}
+
+The \verb+interact+ parameter if the name of a routine to interact
+with the user if the UFN process is unclear as to which name to choose.
+\begin{quote}\small\begin{verbatim}
+DNS interact (dns,dn,s)
+DNS dns;
+DN dn;
+char * s;
+\end{verbatim}\end{quote}
+The \verb+dns+ parameter is the sequence of potential names, \verb+dn+
+is the DN of the environment below which the names have been, \verb+s+
+is UFN element being matched. 
+The user should be asked to select which DNs should be used, and the
+DNs returned.  DNs not required in the \verb+dns+ passed in should be
+freed.
+If user interaction is not required, a simple interact routine to
+return a NULL DNS should be provided.
+
+
+
+\section {Adding New Syntaxes to QUIPU}
+\label{add_syntax}
+
+
+It will probably be necessary to add knowledge of extra syntaxes to
+directory user interfaces as the range of applications grow.
+QUIPU has been designed to make this as easy as possible.
+
+This section describes how you might do this, by adding knowledge
+of a \verb"FOOBAR" syntax to \man libdsap(3n) library.
+\verb"FOOBAR" is represented by the {\em C} structure
+``\tt struct foobar \{\ldots\};\rm ''.
+
+The DSA does not need to know about the new structure, as it will
+handle unknown syntaxes as blocks of ASN.1.
+
+The procedure call
+\begin{quote}\index{add\_attribute\_syntax}\small\begin{verbatim}
+short add_attribute_syntax (sntx,enc,dec,parse,
+                      print,cpy,cmp,sfree,
+                      print_pe,approx,multiline)
+char *  sntx;
+IFP     enc,dec,parse,print,cpy,cmp,sfree,approx;
+char *  print_pe;
+char    multiline;
+\end{verbatim}\end{quote}
+is used to add knowledge of new attribute syntaxes to QUIPU.
+
+The procedure returns a {\em short} which can be used to reference the
+syntax handler defined.
+
+The parameters are used as follows:
+
+\begin{describe}
+\item [\verb"sntx":] The string defining the syntax; in this case it should
+be \verb"Foobar". Any attributes defined as having the syntax ``Foobar'' in
+the oidtables will then be handled using the following routines.
+
+\item [\verb"enc":] This is a function pointer to a routine that will convert
+a {\em C} structure representation 
+of foobar into a presentation element that can
+be sent across the network.
+The routine is given a single parameter, a pointer to the foobar structure,
+and is expected to return a PE.
+You are reminded of the \man pepy(1c), \man posy(1c) and \man pepsy(1c) 
+utilities described
+in \volfour/ of this manual, they may be of help in creating this encoder.
+
+\item [\verb"dec":] This performs the inverse of the above, it is passed a
+PE, and should return a {\em C} structure representation.
+
+\item [\verb"parse":] Each syntax needs to have a representation that can
+be read from and written to an EDB file.  This defined routine should take
+ a single
+\verb"char *" argument and return a C structure representation.
+
+\item [\verb"print":] This routine is used to print the syntax to a 
+\verb+PStream+\footnote{\verb+PStream+s are discussed in \volone/ of this
+manual.}.
+The arguments are:
+\begin{quote}\small\begin{verbatim}
+foobar_print (ps,fb,format)
+PS ps;
+struct foobar * fb;
+int format;
+\end{verbatim}\end{quote}
+If \verb"format" is \verb"READOUT" the structure should be printed to the
+stream PS in a ``human readable'' manner; otherwise is should be printed
+in a form that can be parsed by the ``parse'' function.
+{\em Note}: in many case both formats will be the same.
+
+\item [\verb"cpy":] This function should take a foobar structure as a
+parameter and returns a copy of it.
+
+\item [\verb"cmp":] A function that takes two foobar structures and compares
+them; returning 0 if they are the same; 1 if the first is considered
+``greater'' than the second; --1 otherwise.
+If there is no appropriate ordering for the syntax, returns 2.
+If an error occurs during the comparison, returns --2.
+
+\item[\verb"sfree":] A routine to free the structure foobar.
+
+\item[\verb"print\_pe":] The name of an external process to ``exec'' when the
+\verb+READOUT+ option is supplied to the print routine.
+This is generally set to \verb+NULLCP+ which means the default ``print''
+routine is used.
+
+\item[\verb"approx":] A routine to perform approximate matching (if
+required).
+The routine should expect two parameters as shown:
+\begin{quote}\begin{verbatim}
+foobar_approx (a,b)
+    struct filter_item * a;
+    AV_Sequence b;
+\end{verbatim}\end{quote}
+The routine should return \verb+OK+ or \verb+NOTOK+ depending on whether 
+any attribute value in the \verb+AV_Sequence+ approximately matches the 
+\verb+filter_item+.
+
+\item[\verb"multiline":] If \verb"TRUE" the multivalue attributes will be
+printed on separate lines:
+\begin{quote}\small\begin{verbatim}
+foobar = value1
+foobar = value2
+\end{verbatim}\end{quote}
+otherwise the attribute will be printed on one
+line:
+\begin{quote}\small\begin{verbatim}
+foobar = value1 & value2
+\end{verbatim}\end{quote}
+
+\end{describe}
+
+\subsection {Where to Add the Syntax Definition}
+
+Where should you add this procedure call to define the new syntaxes?
+
+This depends on which applications you want to know about the syntax.
+If you want the DSA and all DUAs to know about the syntax, then this call
+should be added to \file{libdsap}, in the directory {\em dsap/common}.
+The file
+\file{dsap/common/quipu\_sntx.c} is where other similar calls are made.
+A small test program \verb"test" is included in the common directory, and is
+made with ``\verb+make test+''.  It takes as input a string representation of
+attributes, and exercises the handlers.
+If this works for your new attribute, then it should be safe to recompile the
+DSA/DUA and try them.
+
+If you only wish your DUAs to know about the new syntax, then add the call
+into your DUA's code, before loading the oidtables or calling \verb+dsap_init+.
+
+
+\subsection {Modifying Previous Definitions}
+
+When developing DUAs, it is often required to handle standard
+attribute syntaxes in a different way to the predefined QUIPU
+handlers.  
+
+The procedure
+\begin{quote}\index{set\_attribute\_syntax}\small\begin{verbatim}
+set_attribute_syntax (sntx,enc,dec,parse,
+                      print,cpy,cmp,sfree,
+                      print_pe,approx,multiline)
+short sntx;
+IFP	enc,dec,parse,print,cpy,cmp,sfree,approx;
+char *  print_pe;
+char	multiline;
+\end{verbatim}\end{quote}
+is used to modify an existing syntax handler.  The parameters are
+exaclty the same as for the {\em add\_attribute\_syntax} except for the
+first {\em sntx} parameter, which should be 
+the {\em short} value returned by the
+{\em add\_attribute\_syntax} call.
+If you do not know the value the procedure
+\begin{quote}\small\begin{verbatim}
+short str2syntax (str)
+char * str;
+\end{verbatim}\end{quote}
+can be used to determine it, given the textual syntax name.
+The reverse mapping is preformed by
+\begin{quote}\small\begin{verbatim}
+char * syntax2str (sntx)
+short sntx;
+\end{verbatim}\end{quote}
+
+Often in DUA development you do not want to alter all the handling
+routines, but just the attribute value printers.  The routine
+\begin{quote}\index{set\_av\_printer}\small\begin{verbatim}
+set_av_printer (sntx,print)
+short sntx;
+IFP print;
+\end{verbatim}\end{quote}
+is used to alter the print routine for the given syntax.  This is
+changed for {\em all} attributes using this syntax.  If you only want
+to alter the handler for a specific attribute, then you should use
+\begin{quote}\index{modify\_av\_printer}\small\begin{verbatim}
+short modify_av_printer (at,sntx,print)
+AttributeType at;
+char * sntx;
+IFP print;
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item [\verb"at":] The attribute to alter the printer for,
+\item [\verb"sntx":] The new string used to reference the syntax,
+\item [\verb"print":] The print function.
+\end{describe}
+
+Finally, there is a routine to alter the external process printer:
+\begin{quote}\small\begin{verbatim}
+set_av_pe_print (sntx,print_pe)
+short sntx;
+char *  print_pe;
+\end{verbatim}\end{quote}

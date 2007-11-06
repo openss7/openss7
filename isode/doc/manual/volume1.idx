@@ -1,0 +1,430 @@
+\indexentry{\LaTeX {}}{iv}
+\indexentry{tar}{xi}
+\indexentry{tar}{xii}
+\indexentry{tar}{xiii}
+\indexentry{tar}{xiii}
+\indexentry{tar}{xiv}
+\indexentry{tar}{xiv}
+\indexentry{\LaTeX {}}{xiv}
+\indexentry{tar}{xiv}
+\indexentry{tar}{xiv}
+\indexentry{Moore, Christopher W.}{xvi}
+\indexentry{Cass, Dwight E.}{xvi}
+\indexentry{Romine, John L.}{xvi}
+\indexentry{Willson, Stephen H.}{xvi}
+\indexentry{librosap{}}{xvi}
+\indexentry{Michaelson, George}{xvi}
+\indexentry{Kille, Stephen E.}{xvi}
+\indexentry{pepy{}}{xvii}
+\indexentry{libpsap{}}{xvii}
+\indexentry{librosap{}}{xvii}
+\indexentry{Walton, Simon}{xvii}
+\indexentry{Kille, Stephen E.}{xvii}
+\indexentry{Robbins, Colin J.}{xvii}
+\indexentry{Turland, Alan}{xvii}
+\indexentry{Titcombe, Steve}{xvii}
+\indexentry{Roe, Mike}{xvii}
+\indexentry{EEC}{xvii}
+\indexentry{ESPRIT}{xvii}
+\indexentry{Onions, Julian}{xvii}
+\indexentry{pepy{}}{xvii}
+\indexentry{Easterbrook, Stephen}{xvii}
+\indexentry{posy{}}{xvii}
+\indexentry{Pavel, John}{xvii}
+\indexentry{Cowin, Godfrey}{xvii}
+\indexentry{pepy{}}{xvii}
+\indexentry{Ruttle, Keith}{xvii}
+\indexentry{Worsley, Andrew}{xviii}
+\indexentry{pepy}{xviii}
+\indexentry{posy}{xviii}
+\indexentry{pepsy}{xviii}
+\indexentry{Dubous, Olivier}{xviii}
+\indexentry{Finni, Olli}{xviii}
+\indexentry{Horton, Mark R.}{xviii}
+\indexentry{Lavender, Greg}{xviii}
+\indexentry{Miller, Steve D.}{xviii}
+\indexentry{Taylor, Jem}{xviii}
+\indexentry{Braun, Hans-Werner}{xviii}
+\indexentry{NIST}{xviii}
+\indexentry{NBS}{xviii}
+\indexentry{Scott, John A.}{xviii}
+\indexentry{Jelfs, Philip B.}{xix}
+\indexentry{Wilder, Rick}{xix}
+\indexentry{Chirieleison, Don}{xix}
+\indexentry{Rekhter, Jacob}{xix}
+\indexentry{Aziz, Ashar}{xix}
+\indexentry{Vanderbilt, Peter}{xix}
+\indexentry{Prafullchandra, Hemma}{xix}
+\indexentry{Srinivasan, Raj}{xix}
+\indexentry{Weller, Daniel}{xix}
+\indexentry{Nordmark, Erik}{xix}
+\indexentry{Brezak, John}{xix}
+\indexentry{Preuss, Don}{xix}
+\indexentry{Jacobsen, Ole-Jorgen}{xix}
+\indexentry{Horvath, Nandor}{xix}
+\indexentry{Pavlou, George}{xix}
+\indexentry{Knight, Graham}{xix}
+\indexentry{libtsap{}}{xix}
+\indexentry{Hein\"{a}nen, Juha}{xix}
+\indexentry{Keogh, Paul}{xix}
+\indexentry{Wenzel, Oliver}{xix}
+\indexentry{McLoughlin, L.}{xix}
+\indexentry{Jordan, Kevin E.}{xix}
+\indexentry{Reinart, John A.}{xx}
+\indexentry{Pring, Ed}{xx}
+\indexentry{Betzler, Uli}{xx}
+\indexentry{Young, Alan}{xx}
+\indexentry{Gosling, James}{xx}
+\indexentry{Lamport, Leslie}{xx}
+\indexentry{\LaTeX {}}{xx}
+\indexentry{U.C.~Berkeley}{xx}
+\indexentry{Rose, Marshall T.}{xx}
+\indexentry{make}{5}
+\indexentry{make}{5}
+\indexentry{make}{5}
+\indexentry{make}{5}
+\indexentry{make}{5}
+\indexentry{make}{5}
+\indexentry{make}{5}
+\indexentry{libacsap{}}{7}
+\indexentry{librosap{}}{7}
+\indexentry{librtsap{}}{7}
+\indexentry{libpsap{}}{7}
+\indexentry{libpsap2{}}{7}
+\indexentry{libssap{}}{7}
+\indexentry{libtsap{}}{8}
+\indexentry{libpsap2{}}{8}
+\indexentry{libpsap2-lpp{}}{8}
+\indexentry{rosy{}}{8}
+\indexentry{posy{}}{8}
+\indexentry{pepy{}}{9}
+\indexentry{pepsy{}}{9}
+\indexentry{pepy}{9}
+\indexentry{posy}{9}
+\indexentry{librosy{}}{9}
+\indexentry{quipu{}}{9}
+\indexentry{dish{}}{9}
+\indexentry{libdsap{}}{9}
+\indexentry{libpsap{}}{9}
+\indexentry{pepsy}{10}
+\indexentry{pepy}{10}
+\indexentry{posy}{10}
+\indexentry{dsabuild}{10}
+\indexentry{aetbuild}{10}
+\indexentry{lint{}}{10}
+\indexentry{libacsap{}}{15}
+\indexentry{libacsap{}}{16}
+\indexentry{libacsap{}}{17}
+\indexentry{AEInfo}{18}
+\indexentry{sprintaei}{18}
+\indexentry{oid2aei}{18}
+\indexentry{\_str2aei}{19}
+\indexentry{str2aei}{19}
+\indexentry{str2aeinfo}{19}
+\indexentry{aei2addr}{20}
+\indexentry{paddr2str}{20}
+\indexentry{str2paddr}{22}
+\indexentry{\_paddr2str}{22}
+\indexentry{pa2str}{22}
+\indexentry{tsapd{}}{25}
+\indexentry{AcInit}{25}
+\indexentry{AcSAPstart}{25}
+\indexentry{AcFindPCI}{26}
+\indexentry{malloc{}}{27}
+\indexentry{ACSFREE}{27}
+\indexentry{AcSAPindication}{27}
+\indexentry{AcSAPabort}{27}
+\indexentry{malloc{}}{28}
+\indexentry{ACAFREE}{28}
+\indexentry{AcAssocResponse}{28}
+\indexentry{AcAssocRequest}{31}
+\indexentry{AcSAPconnect}{33}
+\indexentry{malloc{}}{34}
+\indexentry{ACCFREE}{34}
+\indexentry{AcAsynAssocRequest}{34}
+\indexentry{AcAsynRetryRequest}{35}
+\indexentry{AcRelRequest}{36}
+\indexentry{AcSAPrelease}{37}
+\indexentry{malloc{}}{38}
+\indexentry{ACRFREE}{38}
+\indexentry{AcRelRetryRequest}{38}
+\indexentry{AcRelResponse}{39}
+\indexentry{AcUAbortRequest}{40}
+\indexentry{AcFINISHser}{41}
+\indexentry{AcSAPfinish}{41}
+\indexentry{malloc{}}{42}
+\indexentry{ACFFREE}{42}
+\indexentry{AcABORTser}{42}
+\indexentry{select{}}{43}
+\indexentry{select{}}{43}
+\indexentry{select{}}{43}
+\indexentry{xselect}{43}
+\indexentry{tsapd{}}{44}
+\indexentry{isodeserver}{44}
+\indexentry{iserver\_init}{46}
+\indexentry{iserver\_wait}{47}
+\indexentry{AcErrString}{49}
+\indexentry{ACS\_FATAL}{50}
+\indexentry{ACS\_OFFICIAL}{50}
+\indexentry{libacsap{}}{50}
+\indexentry{libacsap{}}{50}
+\indexentry{tsapd{}}{50}
+\indexentry{tsapd{}}{51}
+\indexentry{setjmp {}}{51}
+\indexentry{librosap{}}{56}
+\indexentry{librosap{}}{57}
+\indexentry{librosap{}}{57}
+\indexentry{RoSAPindication}{58}
+\indexentry{RoSAPpreject}{58}
+\indexentry{malloc{}}{59}
+\indexentry{ROPFREE}{59}
+\indexentry{ROS\_FATAL}{59}
+\indexentry{ROS\_OFFICIAL}{59}
+\indexentry{librosap{}}{62}
+\indexentry{librosap{}}{62}
+\indexentry{RoSetService}{62}
+\indexentry{RoInvokeRequest}{63}
+\indexentry{RoInvokeRequest}{64}
+\indexentry{RoResultRequest}{65}
+\indexentry{RoErrorRequest}{66}
+\indexentry{RoWaitRequest}{66}
+\indexentry{librosap{}}{67}
+\indexentry{RoSAPinvoke}{68}
+\indexentry{malloc{}}{68}
+\indexentry{ROXFREE}{68}
+\indexentry{RoSAPresult}{69}
+\indexentry{malloc{}}{69}
+\indexentry{RORFREE}{69}
+\indexentry{RoSAPerror}{70}
+\indexentry{malloc{}}{70}
+\indexentry{ROEFREE}{70}
+\indexentry{RoSAPureject}{70}
+\indexentry{RoSAPend}{71}
+\indexentry{RoURejectRequest}{71}
+\indexentry{RoSetIndications}{72}
+\indexentry{malloc{}}{73}
+\indexentry{librosap{}}{73}
+\indexentry{RoSelectMask}{74}
+\indexentry{RoErrString}{75}
+\indexentry{librosap{}}{75}
+\indexentry{pause{}}{75}
+\indexentry{librosap{}}{81}
+\indexentry{librtsap{}}{86}
+\indexentry{librtsap{}}{86}
+\indexentry{librtsap{}}{87}
+\indexentry{tsapd{}}{87}
+\indexentry{RtInit}{88}
+\indexentry{RtSAPstart}{88}
+\indexentry{malloc{}}{89}
+\indexentry{RTSFREE}{89}
+\indexentry{RtOpenResponse}{89}
+\indexentry{RtOpenRequest}{90}
+\indexentry{RtSAPconnect}{91}
+\indexentry{malloc{}}{92}
+\indexentry{RTCFREE}{92}
+\indexentry{RtCloseRequest}{92}
+\indexentry{RtCloseResponse}{93}
+\indexentry{RtUAbortRequest}{94}
+\indexentry{librtsap{}}{95}
+\indexentry{RtSAPindication}{95}
+\indexentry{RtSAPabort}{96}
+\indexentry{malloc{}}{96}
+\indexentry{RTAFREE}{96}
+\indexentry{RTS\_FATAL}{96}
+\indexentry{RTS\_OFFICIAL}{98}
+\indexentry{RtTransferRequest}{98}
+\indexentry{RtWaitRequest}{99}
+\indexentry{librtsap{}}{99}
+\indexentry{RtSAPtransfer}{100}
+\indexentry{malloc{}}{100}
+\indexentry{RTTFREE}{100}
+\indexentry{RtSAPturn}{100}
+\indexentry{RtSAPclose}{101}
+\indexentry{RtPTurnRequest}{101}
+\indexentry{RGPTurnRequest}{102}
+\indexentry{RtSetIndications}{102}
+\indexentry{malloc{}}{103}
+\indexentry{librtsap{}}{103}
+\indexentry{RtSelectMask}{103}
+\indexentry{RtSetDownTrans}{104}
+\indexentry{RtSetUpTrans}{106}
+\indexentry{RtErrString}{108}
+\indexentry{librtsap{}}{108}
+\indexentry{libpsap{}}{115}
+\indexentry{stdio{}}{115}
+\indexentry{ps\_error}{116}
+\indexentry{ps\_alloc}{116}
+\indexentry{stdio{}}{117}
+\indexentry{std\_open}{117}
+\indexentry{str\_open}{117}
+\indexentry{fdx\_open}{117}
+\indexentry{dg\_open}{117}
+\indexentry{std\_setup}{117}
+\indexentry{str\_setup}{118}
+\indexentry{fdx\_setup}{118}
+\indexentry{dg\_setup}{118}
+\indexentry{ps\_read}{119}
+\indexentry{ps\_write}{119}
+\indexentry{ps\_free}{120}
+\indexentry{ps\_io}{120}
+\indexentry{ps\_prime}{121}
+\indexentry{ps\_flush}{122}
+\indexentry{ps2pe}{122}
+\indexentry{pe2ps}{122}
+\indexentry{ps\_len\_strategy}{123}
+\indexentry{ps\_get\_abs}{123}
+\indexentry{pl2pe}{123}
+\indexentry{pe2pl}{123}
+\indexentry{libpsap{}}{124}
+\indexentry{pe\_error}{124}
+\indexentry{pe\_alloc}{125}
+\indexentry{pe\_free}{126}
+\indexentry{pe\_cmp}{126}
+\indexentry{pe\_cpy}{126}
+\indexentry{pe\_extract}{128}
+\indexentry{pe\_expunge}{128}
+\indexentry{pe\_pullup}{128}
+\indexentry{prim2flag}{129}
+\indexentry{bool2prim}{129}
+\indexentry{flag2prim}{129}
+\indexentry{prim2num}{129}
+\indexentry{int2prim}{129}
+\indexentry{num2prim}{129}
+\indexentry{malloc{}}{130}
+\indexentry{prim2str}{130}
+\indexentry{oct2prim}{130}
+\indexentry{str2prim}{130}
+\indexentry{ia5s2prim}{131}
+\indexentry{nums2prim}{131}
+\indexentry{prts2prim}{131}
+\indexentry{t61s2prim}{131}
+\indexentry{vtxs2prim}{131}
+\indexentry{gfxs2prim}{131}
+\indexentry{viss2prim}{131}
+\indexentry{gens2prim}{131}
+\indexentry{ode2prim}{131}
+\indexentry{libpsap{}}{131}
+\indexentry{qb2prim}{131}
+\indexentry{prim2qb}{132}
+\indexentry{qb2str}{132}
+\indexentry{str2qb}{132}
+\indexentry{qb\_pullup}{132}
+\indexentry{qbuf2pe}{133}
+\indexentry{qb\_free}{133}
+\indexentry{bit\_on}{133}
+\indexentry{bit\_off}{133}
+\indexentry{bit\_test}{133}
+\indexentry{prim2bit}{134}
+\indexentry{bit2prim}{134}
+\indexentry{pepy}{134}
+\indexentry{strb2bitstr}{134}
+\indexentry{bitstr2strb}{134}
+\indexentry{int2strb}{134}
+\indexentry{OIDentifier}{135}
+\indexentry{oid\_cmp}{135}
+\indexentry{oid\_cpy}{135}
+\indexentry{oid\_free}{135}
+\indexentry{sprintoid}{136}
+\indexentry{oid2ode}{136}
+\indexentry{str2oid}{136}
+\indexentry{isobjects{}}{136}
+\indexentry{oid\_free}{136}
+\indexentry{prim2oid}{136}
+\indexentry{oid2prim}{136}
+\indexentry{obj2prim}{136}
+\indexentry{UTCtime}{137}
+\indexentry{prim2utct}{138}
+\indexentry{utct2prim}{138}
+\indexentry{prim2gent}{138}
+\indexentry{gent2prim}{138}
+\indexentry{time2prim}{138}
+\indexentry{utct2str}{138}
+\indexentry{gent2str}{138}
+\indexentry{time2str}{139}
+\indexentry{prim2time}{139}
+\indexentry{str2utct}{139}
+\indexentry{str2gent}{139}
+\indexentry{gmtime{}}{139}
+\indexentry{gtime}{139}
+\indexentry{ut2tm}{139}
+\indexentry{tm2ut}{139}
+\indexentry{first\_member}{140}
+\indexentry{next\_member}{140}
+\indexentry{set\_add}{140}
+\indexentry{set\_addon}{140}
+\indexentry{set\_del}{140}
+\indexentry{set\_find}{141}
+\indexentry{prim2set}{141}
+\indexentry{set2prim}{141}
+\indexentry{seq\_add}{141}
+\indexentry{seq\_addon}{141}
+\indexentry{seq\_del}{141}
+\indexentry{seq\_find}{141}
+\indexentry{prim2seq}{143}
+\indexentry{prim2seq}{143}
+\indexentry{librosap{}}{144}
+\indexentry{str2pe}{144}
+\indexentry{qb2pe}{145}
+\indexentry{libacsap{}}{151}
+\indexentry{alias2name}{151}
+\indexentry{isoaliases{}}{152}
+\indexentry{add\_alias}{152}
+\indexentry{isoentities{}}{153}
+\indexentry{libacsap{}}{154}
+\indexentry{isoentity}{154}
+\indexentry{getisoentity}{155}
+\indexentry{setisoentity}{155}
+\indexentry{endisoentity}{155}
+\indexentry{libpsap{}}{157}
+\indexentry{isobject}{157}
+\indexentry{getisobject}{158}
+\indexentry{setisobject}{158}
+\indexentry{endisobject}{158}
+\indexentry{getisobjectbyname}{158}
+\indexentry{getisobjectbyoid}{158}
+\indexentry{isobjects{}}{160}
+\indexentry{tsapd}{160}
+\indexentry{isoentities{}}{160}
+\indexentry{isobjects{}}{161}
+\indexentry{isobjects{}}{161}
+\indexentry{tsapd}{161}
+\indexentry{tsapd}{162}
+\indexentry{tsapd}{162}
+\indexentry{tsapd}{162}
+\indexentry{tsapd}{162}
+\indexentry{tsapd}{162}
+\indexentry{isoaliases{}}{162}
+\indexentry{librosap{}}{167}
+\indexentry{librtsap{}}{167}
+\indexentry{RoSAPaddr}{168}
+\indexentry{librosap{}}{168}
+\indexentry{tsapd{}}{168}
+\indexentry{tsapd}{168}
+\indexentry{RoInit}{170}
+\indexentry{RoSAPstart}{170}
+\indexentry{malloc{}}{171}
+\indexentry{ROSFREE}{171}
+\indexentry{RoBeginResponse}{171}
+\indexentry{RoBeginRequest}{172}
+\indexentry{RoSAPconnect}{172}
+\indexentry{malloc{}}{173}
+\indexentry{ROCFREE}{173}
+\indexentry{RoEndRequest}{173}
+\indexentry{RoEndResponse}{174}
+\indexentry{pause{}}{175}
+\indexentry{RtSAPaddr}{175}
+\indexentry{librtsap{}}{177}
+\indexentry{tsapd{}}{177}
+\indexentry{tsapd}{177}
+\indexentry{RtBInit}{177}
+\indexentry{RtSAPstart}{179}
+\indexentry{malloc{}}{180}
+\indexentry{RTSFREE}{180}
+\indexentry{RtBeginResponse}{180}
+\indexentry{RtBeginRequest}{181}
+\indexentry{RtSAPconnect}{182}
+\indexentry{malloc{}}{182}
+\indexentry{RTCFREE}{182}
+\indexentry{RtEndRequest}{183}
+\indexentry{RoEndResponse}{183}
+\indexentry{\LaTeX {}}{191}

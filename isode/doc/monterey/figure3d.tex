@@ -1,0 +1,51 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \special{pa 0 1500}%
+    \special{pa 0 0}%
+    \special{pa 2250 0}%
+    \special{pa 2250 1500}%
+    \special{pa 0 1500}%
+    \special{fp}%
+    \rlap{\kern  1.125in\lower 0.791in\hbox to 0pt{\hss TCP/IP-only\hss}}%
+    \special{pa 3750 1500}%
+    \special{pa 3750 0}%
+    \special{pa 6000 0}%
+    \special{pa 6000 1500}%
+    \special{pa 3750 1500}%
+    \special{fp}%
+    \rlap{\kern  4.875in\lower 0.459in\hbox to 0pt{\hss ``HYBRID''\hss}}%
+    \rlap{\kern  4.875in\lower 0.625in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  4.875in\lower 0.791in\hbox to 0pt{\hss HIGHER-LEVEL ISO\hss}}%
+    \rlap{\kern  4.875in\lower 0.957in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  4.875in\lower 1.123in\hbox to 0pt{\hss TCP/IP\hss}}%
+    \special{pa 0 4500}%
+    \special{pa 0 3000}%
+    \special{pa 2250 3000}%
+    \special{pa 2250 4500}%
+    \special{pa 0 4500}%
+    \special{fp}%
+    \rlap{\kern  1.125in\lower 3.459in\hbox to 0pt{\hss ``DUAL''\hss}}%
+    \rlap{\kern  1.125in\lower 3.625in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  1.125in\lower 3.791in\hbox to 0pt{\hss TCP/IP\hss}}%
+    \rlap{\kern  1.125in\lower 3.957in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  1.125in\lower 4.123in\hbox to 0pt{\hss FULL ISO\hss}}%
+    \special{pa 3750 4500}%
+    \special{pa 3750 3000}%
+    \special{pa 6000 3000}%
+    \special{pa 6000 4500}%
+    \special{pa 3750 4500}%
+    \special{fp}%
+    \rlap{\kern  4.875in\lower 3.791in\hbox to 0pt{\hss ISO-only\hss}}%
+    \special{pa 4875 1500}%
+    \special{pa 4875 3000}%
+    \special{da  0.050}%
+    \kern  6.001in
+  }\vss}%
+  \kern  4.501in
+}

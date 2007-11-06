@@ -1,0 +1,98 @@
+\contentsline {chapter}{\numberline {1}Overview}{1}
+\contentsline {section}{\numberline {1.1}Introduction}{1}
+\contentsline {section}{\numberline {1.2}General Aims}{2}
+\contentsline {section}{\numberline {1.3}Technical Goals}{2}
+\contentsline {section}{\numberline {1.4}Further QUIPU documents}{3}
+\contentsline {section}{\numberline {1.5}Acknowledgements}{4}
+\contentsline {section}{\numberline {1.6}Pronouncing QUIPU}{4}
+\contentsline {section}{\numberline {1.7}Why QUIPU}{4}
+\contentsline {chapter}{\numberline {2}General Design}{5}
+\contentsline {section}{\numberline {2.1}Overview}{5}
+\contentsline {section}{\numberline {2.2}Service Controls}{6}
+\contentsline {section}{\numberline {2.3}Access Control}{6}
+\contentsline {subsection}{\numberline {2.3.1}ACLInfo applied to Attributes}{8}
+\contentsline {subsection}{\numberline {2.3.2}ACLInfo applied to entries}{8}
+\contentsline {subsection}{\numberline {2.3.3}childACL}{9}
+\contentsline {subsection}{\numberline {2.3.4}Example Use of ACLs}{9}
+\contentsline {subsection}{\numberline {2.3.5}An issue for further study}{10}
+\contentsline {section}{\numberline {2.4}Authentication}{10}
+\contentsline {section}{\numberline {2.5}Schemas}{10}
+\contentsline {subsection}{\numberline {2.5.1}Matching}{10}
+\contentsline {subsection}{\numberline {2.5.2}Structure}{12}
+\contentsline {section}{\numberline {2.6}Extended Searching}{13}
+\contentsline {section}{\numberline {2.7}Update}{13}
+\contentsline {section}{\numberline {2.8}Operation Status}{14}
+\contentsline {chapter}{\numberline {3}The QUIPU Nameservice}{15}
+\contentsline {section}{\numberline {3.1}Requirements}{15}
+\contentsline {section}{\numberline {3.2}Design}{15}
+\contentsline {section}{\numberline {3.3}Support}{17}
+\contentsline {chapter}{\numberline {4}Distributed Operation}{18}
+\contentsline {section}{\numberline {4.1}Overview}{18}
+\contentsline {section}{\numberline {4.2}DSA/DUA Interaction Model}{18}
+\contentsline {section}{\numberline {4.3}Model of Data Distribution}{19}
+\contentsline {subsection}{\numberline {4.3.1}Entry Data Blocks}{19}
+\contentsline {subsection}{\numberline {4.3.2}Masters and Slaves}{19}
+\contentsline {subsection}{\numberline {4.3.3}QUIPU Subordinate References}{20}
+\contentsline {subsection}{\numberline {4.3.4}Access to the root EDB}{20}
+\contentsline {section}{\numberline {4.4}Standard Knowledge References}{21}
+\contentsline {section}{\numberline {4.5}Navigation}{21}
+\contentsline {section}{\numberline {4.6}List}{23}
+\contentsline {section}{\numberline {4.7}Search}{23}
+\contentsline {section}{\numberline {4.8}Unavailable DSAs}{25}
+\contentsline {section}{\numberline {4.9}Presentation Addresses}{25}
+\contentsline {section}{\numberline {4.10}Operating When DSAs are not fully interconnected}{25}
+\contentsline {section}{\numberline {4.11}The External view of QUIPU}{26}
+\contentsline {section}{\numberline {4.12}Use of ACLs in DSP}{26}
+\contentsline {section}{\numberline {4.13}Access Control and Authentication}{27}
+\contentsline {section}{\numberline {4.14}Cached Data}{27}
+\contentsline {subsection}{\numberline {4.14.1}Caching Configuration Data}{28}
+\contentsline {subsection}{\numberline {4.14.2}Caching User Data}{28}
+\contentsline {subsection}{\numberline {4.14.3}Negative Data}{28}
+\contentsline {subsection}{\numberline {4.14.4}Writing Caches to disk}{29}
+\contentsline {section}{\numberline {4.15}Configuration and Slave Update}{29}
+\contentsline {section}{\numberline {4.16}DSA Naming}{30}
+\contentsline {subsection}{\numberline {4.16.1}Choice of Names to prevent loops}{30}
+\contentsline {section}{\numberline {4.17}Local DSA Information}{31}
+\contentsline {section}{\numberline {4.18}DSA Naming Architecture }{31}
+\contentsline {chapter}{\numberline {5}Replicating Updates}{34}
+\contentsline {section}{\numberline {5.1}Basic Update Approach}{34}
+\contentsline {section}{\numberline {5.2}Reliable ROS}{36}
+\contentsline {section}{\numberline {5.3}Incremental Update}{37}
+\contentsline {section}{\numberline {5.4}Subtree Update}{38}
+\contentsline {section}{\numberline {5.5}Spot Shadowing}{38}
+\contentsline {chapter}{\numberline {6}Management}{39}
+\contentsline {section}{\numberline {6.1}Introduction}{39}
+\contentsline {section}{\numberline {6.2}DUA Configuration}{39}
+\contentsline {section}{\numberline {6.3}DSA Management}{40}
+\contentsline {subsection}{\numberline {6.3.1}DSA Static Configuration}{40}
+\contentsline {subsection}{\numberline {6.3.2}DSA Dynamic Configuration}{41}
+\contentsline {subsection}{\numberline {6.3.3}DSA Control}{41}
+\contentsline {subsection}{\numberline {6.3.4}Consistency Checks}{42}
+\contentsline {section}{\numberline {6.4}Configuration Inspection}{42}
+\contentsline {section}{\numberline {6.5}Configuration Changes}{43}
+\contentsline {subsection}{\numberline {6.5.1}General Approach}{43}
+\contentsline {subsection}{\numberline {6.5.2}Add DSA}{43}
+\contentsline {subsection}{\numberline {6.5.3}Remove DSA}{44}
+\contentsline {subsection}{\numberline {6.5.4}Modify DSA info}{44}
+\contentsline {subsection}{\numberline {6.5.5}Add new EDB}{44}
+\contentsline {subsection}{\numberline {6.5.6}Add EDB copy}{45}
+\contentsline {subsection}{\numberline {6.5.7}Remove EDB copy}{45}
+\contentsline {subsection}{\numberline {6.5.8}Remove EDB}{45}
+\contentsline {subsection}{\numberline {6.5.9}Change EDB Master}{46}
+\contentsline {subsection}{\numberline {6.5.10}References}{46}
+\contentsline {subsection}{\numberline {6.5.11}Spot Shadows}{46}
+\contentsline {section}{\numberline {6.6}Bootstrap}{46}
+\contentsline {section}{\numberline {6.7}Authorisation}{47}
+\contentsline {section}{\numberline {6.8}User Data Management}{47}
+\contentsline {subsection}{\numberline {6.8.1}Aliases}{47}
+\contentsline {subsection}{\numberline {6.8.2}Externally mastered data}{47}
+\contentsline {subsection}{\numberline {6.8.3}Consistency Checking}{48}
+\contentsline {subsection}{\numberline {6.8.4}Changing Names and Arboriculture}{49}
+\contentsline {chapter}{\numberline {7}Implementation Choices}{50}
+\contentsline {section}{\numberline {7.1}DSA Structure}{50}
+\contentsline {subsection}{\numberline {7.1.1}Memory Structures}{50}
+\contentsline {subsection}{\numberline {7.1.2}Disk Structures}{51}
+\contentsline {subsection}{\numberline {7.1.3}BNF}{52}
+\contentsline {subsection}{\numberline {7.1.4}Procedural interface}{52}
+\contentsline {section}{\numberline {7.2}OSI Choices}{52}
+\contentsline {chapter}{\numberline {A}ASN.1 Summary}{53}

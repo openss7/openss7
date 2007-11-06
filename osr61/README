@@ -1,5 +1,5 @@
-Dialogic Open Systems Release 6.1 -- read me first file.  2007-08-19
-$Id: README,v 0.9.2.15 2007/08/19 12:39:51 brian Exp $
+Dialogic Open Systems Release 6.1 -- read me first file.  2007-10-18
+$Id: README,v 0.9.2.16 2007/10/15 19:04:02 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  Dialogic Open Systems Release 6.1
 ==================================
 
-Package osr61-0.9.2.3.rc1 was released under GPLv2 2007-08-19.
+Package osr61-0.9.2.3.rc1 was released under GPLv2 2007-10-18.
 
 The `Dialogic Open Systems Release 6.1' package provides "STREAMS"
 modules and drivers, libraries, programs, init scripts, and daemons
@@ -106,8 +106,8 @@ provided by `Linux Fast-STREAMS', based on the "STREAMS" protocol.
 
 `sctmr(4)'
      The `sctmr(4)' module is a timer module that is pushed over a
-      `dlgn(4)' driver Stream (but may also be pushed over a null Stream
-     such as `nuls(4)').
+      `dlgn(4)' driver Stream (but may also be pushed over a null
+     Stream such as `nuls(4)').
 
      The timer module is used by the global call libraries to keep time
      in kernel mode.  No other functionality is performed by this
@@ -150,7 +150,7 @@ well.
  Release
 --------
 
-This is the `osr61-0.9.2.3.rc1' package, released 2007-08-19.  This
+This is the `osr61-0.9.2.3.rc1' package, released 2007-10-18.  This
 `0.9.2.3.rc1' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -204,10 +204,10 @@ follows:
 
          - A fairly LSB compliant GNU/Linux distribution.(1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
-         - Linux 2.6 kernel (2.6.3 - 2.6.21);
+         - Linux 2.6 kernel (2.6.3 - 2.6.22);
          - glibc2 or better.
-         - GNU info (for info files).
          - GNU groff (for man pages).(2)
+         - GNU texinfo (for info files).
 
 (Note: If you acquired `osr61' a part of the `OpenSS7 Master Package',
 then the dependencies listed below will already have been met by

@@ -1,0 +1,35 @@
+\begin{thebibliography}{CCITT88}
+
+\bibitem[CCITT88]{CCITT.Directory}
+{The Directory~---~Overview of Concepts, Models, and Service}.
+\newblock International Telegraph and Telephone Consultative Committee,
+  December, {\oldstyle 1988}.
+\newblock Recommendation X.500.
+
+\bibitem[ISO88]{ISO.Directory}
+{Information Processing Systems~---~Open Systems Interconnection~---~The
+  Directory~---~Overview of Concepts, Models, and Service}.
+\newblock International Organization for Standardization and International
+  Electrotechnical Committee, December, {\oldstyle 1988}.
+\newblock International Standard 9594-1.
+
+\bibitem[IUCN82]{IUCN.Mammal}
+{The IUCN Mammal Red Data Book}.
+\newblock International Union for Conservation of Nature and Natural Resources,
+  {\oldstyle 1982}.
+\newblock Unwin Brothers Limited, The Gresham Press, Woking, Surrey, UK. ISBN
+  2--88032--600--1.
+
+\bibitem[SKill89a]{QUIPU.Design}
+Stephen~E. Kille.
+\newblock {\it {The Design of QUIPU}}.
+\newblock Research Note~RN/89/19, Department of Computer Science, University
+  College London, March, {\oldstyle 1989}.
+
+\bibitem[SKill89b]{QUIPU.Manual}
+Stephen~E. Kille, Colin~J. Robbins, and Alan Turland.
+\newblock {\it {The ISO Development Environment: User's Manual, Volume 5:
+  QUIPU}}.
+\newblock April, {\oldstyle 1989}.
+
+\end{thebibliography}

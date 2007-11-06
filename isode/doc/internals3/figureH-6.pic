@@ -1,0 +1,19 @@
+.PS 7.8i
+.ps 20
+## figure H-6
+B0:	box "TRANSPORT SWITCH" width 3*boxwid height boxht/2
+B1:	box "SESSION SERVICES" width 3*boxwid with .sw at B0.nw
+B2:	box "PRESENTATION SERVICES" width 3*boxwid with .sw at B1.nw
+B3:	box "ASN.1" "" "TOOLS" with .se at (B1.ne.x+boxwid, B1.ne.y+boxht/2) \
+		height 2*boxht
+B7:	box "\xx DIRECTORY" "\xx SERVICES" with .se at B2.ne \
+		width 3*boxwid/4
+B4:	box "\xx ASSOCIATION" "\xx CONTROL" with .ne at B7.nw \
+		width 3*boxwid/4
+B6:	box "\xx REMOTE" "\xx OPERATIONS" with .ne at B4.nw width 3*boxwid/4
+B8:	box "\xx RELIABLE" "\xx TRANSFER" with .ne at B6.nw width 3*boxwid/4
+##
+#	dvi2ps bug...
+	line from B7.nw to B7.ne to B7.se to B7.sw
+##
+.PE

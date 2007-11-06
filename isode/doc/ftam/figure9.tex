@@ -1,0 +1,24 @@
+\File{figure9.py},{22:56},{Jun  2 1987}
+\L{\LB{\Proc{FileDirectory}FileDirectory ::=}}
+\L{\LB{}\Tab{8}{[\K{PRIVATE} 2]}}
+\L{\LB{}\Tab{8}{    \K{IMPLICIT} \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{16}{fileName}}
+\L{\LB{}\Tab{16}{    GraphicString,}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{    ContentsType}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}}
+\L{\LB{\Proc{ContentsType}ContentsType ::=}}
+\L{\LB{}\Tab{8}{\K{CHOICE} \{}}
+\L{\LB{}\Tab{8}{    document\-type\-Name[0]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{OBJECT} \K{IDENTIFIER},}}
+\L{\LB{}\Tab{8}{    }}
+\L{\LB{}\Tab{8}{    constraint\-set\-and\-abstract\-syntax[1]}}
+\L{\LB{}\Tab{16}{\K{IMPLICIT} \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{16}{    constraint\-set\-Name[0]}}
+\L{\LB{}\Tab{24}{\K{IMPLICIT} \K{OBJECT} \K{IDENTIFIER},}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{    abstract\-syntax\-Name[1]}}
+\L{\LB{}\Tab{24}{\K{IMPLICIT} \K{OBJECT} \K{IDENTIFIER}}}
+\L{\LB{}\Tab{16}{\}}}
+\L{\LB{}\Tab{8}{\}}}

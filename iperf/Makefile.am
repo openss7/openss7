@@ -60,7 +60,9 @@ endif
 SUBDIRS += src
 
 if DEVELOPMENT
+if DOCUMENTATION
 SUBDIRS += doc
+endif
 endif
 
 ##
@@ -99,6 +101,8 @@ EXTRA_TEX			+= \
 				scripts/texi/testsuite.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
+dist_noinst_SCRIPTS		+= scripts/missing2
+EXTRA_SCRIPTS			+= scripts/missing2
 
 ##
 ## Rules for lsms

@@ -1,0 +1,50 @@
+\File{grind2b\-2.c},{14:12},{Feb 14 1990}
+\L{\LB{\K{\#include} \<stdio.h\>}}
+\L{\LB{\K{\#include} \S{}\"generic.h\"\SE{}}\Tab{32}{\C{}\/* defines OPERATIONS and ERRORS *\/\CE{}}}
+\L{\LB{\K{\#include} \<isode\/rosap.h\>}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\K{int}}\Tab{8}{ros\_indication ();}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\Proc{main}main (argc, argv, envp)}}
+\L{\LB{\K{int}}\Tab{8}{argc;}}
+\L{\LB{\K{char}  **argv,}}
+\L{\LB{      **envp;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}}\Tab{8}{    result,}}
+\L{\LB{}\Tab{8}{    sd;}}
+\L{\LB{    \K{struct} AcSAPstart   acss;}}
+\L{\LB{    \K{register} \K{struct} AcSAPstart *acs = \&acss;}}
+\L{\LB{    \K{struct} AcSAPindication  acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPindication *aci = \&acis;}}
+\L{\LB{    \K{register} \K{struct} AcSAPabort   *aca = \&aci \-\> aci\_abort;}}
+\L{\LB{    \K{register} \K{struct} PSAPstart *ps = \&acs \-\> acs\_start;}}
+\L{\LB{    \K{struct} RoSAPindication  rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPindication *roi = \&rois;}}
+\L{\LB{    \K{register} \K{struct} RoSAPpreject   *rop = \&roi \-\> roi\_preject;}}
+\L{\LB{}}
+\L{\LB{    \K{if} (AcInit (argc, argv, acs, aci) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"initialization fails: \%s\"\SE{}, AcErrString (aca \-\> aca\_reason));}}
+\L{\LB{}}
+\L{\LB{    sd = acs \-\> acs\_sd;}}
+\L{\LB{    ACSFREE (acs);}}
+\L{\LB{    }}
+\L{\LB{\C{}\/* read command line arguments here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{    \K{if} (AcAssocResponse (sd, ACS\_ACCEPT, ACS\_USER\_NULL, NULLOID, NULLAEI,}}
+\L{\LB{}\Tab{16}{\&ps \-\> ps\_called, NULLPC, ps \-\> ps\_defctxresult,}}
+\L{\LB{}\Tab{16}{ps \-\> ps\_prequirements, ps \-\> ps\_srequirements,}}
+\L{\LB{}\Tab{16}{SERIAL\_NONE, ps \-\> ps\_settings, \&ps \-\> ps\_connect,}}
+\L{\LB{}\Tab{16}{NULLPEP, 0, aci) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"A\-ASSOCIATE.RESPONSE: \%s\"\SE{}, AcErrString (aca \-\> aca\_reason));}}
+\L{\LB{}}
+\L{\LB{    \K{if} (RoSetService (sd, RoPService, roi) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"RoSetService: \%s\"\SE{}, RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}}
+\L{\LB{    \K{if} (RoSetIndications (sd, ros\_indication, roi) == NOTOK)}}
+\L{\LB{}\Tab{8}{error (\S{}\"RoSetIndications: \%s\"\SE{}, RoErrString (rop \-\> rop\_reason));}}
+\L{\LB{}}
+\L{\LB{    \K{for} (;;)}}
+\L{\LB{}\Tab{8}{pause ();}}
+\L{\LB{\}}}

@@ -1,0 +1,1282 @@
+% run this through SLiTeX with the appropriate wrapper
+
+\dotopic	{HISTORY AND INTRODUCTION}
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]		HISTORY OF THE ISODE
+
+\item[PART II:]		DESIGN AND IMPLEMENTATION
+
+\item[PART III:]	UNDERLYING ABSTRACTIONS
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{HISTORY OF THE ISODE}\bf
+
+\begin{nrtc}
+\item	EXPERIMENT WITH OSI UPPER LAYERS
+
+\item	EXPLORE PROTOCOL TRANSITION ISSUES
+
+\item	WHAT'S HAPPENED SINCE THEN
+
+\item	ISODE AVAILABILITY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHAT IS THE ISODE?}
+
+\begin{nrtc}
+\item	THE ISO DEVELOPMENT ENVIRONMENT
+
+\item	AN OPENLY AVAILABLE IMPLEMENATION OF THE UPPER LAYERS OF OSI?
+
+\item	A BASIS FOR THE TRANSITION TO OSI?
+
+\item	AN EXERCISE IN MEGA-CODING?
+
+\item	A PLAYGROUND FOR ``THE PIED-PIPER OF OSI''?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NORTHROP RESEARCH AND\\ TECHNOLOGY CENTER:\\ JANUARY, 1986}
+
+\begin{nrtc}
+\item	THE AUTOMATION SCIENCES LABORATORY WAS INTERESTED IN SOLVING CERTAIN
+	PROBLEMS IN THE FACTORY AUTOMATION AREA
+
+\item	AN ``AFTER-HOURS'' PROJECT WAS STARTED TO LOOK INTO THE APPLICABILITY
+	OF MIXING OSI AND TCP/IP TECHNOLOGIES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MOTIVATION\\ (WHY ISODE?)}
+
+\begin{nrtc}
+\item	EXPERIMENT WITH OSI UPPER LAYERS
+
+\item	EXPLORE PROTOCOL TRANSITION ISSUES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{EXPERIMENT WITH OSI UPPER LAYERS}\bf
+
+\begin{nrtc}
+\item	THE UPPER LAYERS OF OSI APPEARED TO BE A RICH PLAYGROUND
+
+\item	WE WANTED TO SEE HOW USEFUL THE UPPER LAYERS REALLY WERE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{(OBLIGATORY SLIDE SHOWING)\\ THE 7--LAYER STACK}
+
+\vskip.5in
+\diagram[p]{figureH-1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE UPPER-LAYER ARCHITECTURE}
+
+\begin{nrtc}
+\item	PROVIDES A COMMON FRAMEWORK FOR APPLICATIONS \emph{DESIGNERS}
+
+\item	TO MAKE BUILDING APPLICATIONS EASIER FOR \emph{IMPLEMENTORS}
+
+\item	IN THEORY, THIS YIELDS BETTER APPLICATIONS FOR THE \emph{USERS}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PAYOFF OF THE INFRASTRUCTURE}
+
+\begin{nrtc}
+\item	RAPID PROTOTYPING OF APPLICATIONS
+
+\item	FOCUS DESIGN/DEVELOPMENT ON \emph{APPLICATION} ISSUES,
+	RATHER THAN UNDERLYING ISSUES
+
+\item	MINIMIZE LONG-TERM INVESTMENT OF SOFTWARE-RELATED INVESTMENT
+    \begin{nrtc}
+    \item	(AT EXPENSE OF START-UP COST)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE UPPER-LAYER ARCHITECTURE}
+
+%\vskip.5in
+\diagram[p]{figureH-2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE OF APPLICATION LAYER USE}
+
+\vskip.5in
+\diagram[p]{figureH-3}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {INFRASTRUCTURE REVISITED}
+
+\begin{nrtc}
+\item	STRENGTHS
+    \begin{nrtc}
+    \item	COMMON INFRASTRUCTURE
+
+    \item	MORE TECHNICALLY COMPREHENSIVE
+    \end{nrtc}
+
+\item	WEAKNESSES
+    \begin{nrtc}
+    \item	COMPLEXITY
+
+    \item	POLITICAL POLARIZATION
+
+    \item	LACK OF PRACTICAL EXPERIENCE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{ONLY ONE LITTLE PROBLEM$\ldots$}
+
+\begin{nrtc}
+\item	HOW TO RUN THE OSI UPPER-LAYERS IN A TCP/IP-BASED NETWORK?
+
+\item	A SOLUTION IS OFFERED BY LAYERING
+    \begin{nrtc}
+    \item	THE OSI TRANSPORT \underline{SERVICE} IS VERY SIMPLE
+
+    \item	CAN WE PROVIDE AN EMULATION OF THAT SERVICE USING TCP?
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{EMULATION OF OSI END-TO-END SERVICES}\bf
+
+\begin{nrtc}
+\item	IS IT POSSIBLE TO PROVIDE OSI APPLICATIONS IN NON-OSI NETWORKS?
+
+\item	A SOLUTION IS OFFERED BY LAYERING
+    \begin{nrtc}
+    \item	THE OSI TRANSPORT \underline{SERVICE} IS VERY SIMPLE
+    \end{nrtc}
+
+\item	CAN WE OFFER THE OSI TRANSPORT SERVICE USING NON-OSI PROTOCOLS?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SERVICE EMULATOR AT TRANSPORT}
+
+\vskip.5in
+\diagram[p]{figureH-4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH:\\ TRANSPORT SERVICE\\ CONVERGENCE PROTOCOL}
+
+\begin{nrtc}
+\item	USE THE CONNECTION-ORIENTED TRANSPORT SERVICE PROVIDED BY
+	THE NON-OSI PROTOCOL SUITE
+
+\item	DEFINE A ``TSCP'' WHICH SMOOTHS OVER THE DIFFERENCES IN THE SERVICES
+	OFFERED
+    \begin{nrtc}
+    \item	IN PRACTICE, THESE ARE QUITE SMALL
+    \end{nrtc}
+
+\item	FOR EXAMPLE, THE RFC1006 METHOD DEFINES A TSCP FOR TCP/IP NETWORKS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OSI TRANSPORT SERVICES\\ ON TOP OF THE TCP}
+
+\vskip.25in
+\diagram[p]{figureH-5}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXPLORE PROTOCOL TRANSITION ISSUES}
+
+\begin{nrtc}
+\item	DOES THIS APPROACH MAKE TRANSITION OR COEXISTENCE EASIER?
+
+\item	BEYOND THE SCOPE OF THIS TALK
+    \begin{nrtc}
+    \item	(TOO BAD YOU MISSED MY TALK ON THIS LAST YEAR.  ha!)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{WHAT'S HAPPENED\\ SINCE THEN}\bf
+
+\begin{nrtc}
+\item	BASIS OF OSI-POSIX PROJECT
+
+\item	MULTIPLE VENDOR ADOPTION
+
+\item	FOUNDATION OF SEVERAL OSI PILOTS
+    \begin{nrtc}
+    \item	e.g., PSI/NYSERNet WHITE PAGES PILOT PROJECT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE LIST OF IMMORTALS\\ (TOO NUMEROUS TO MENTION, BUT $\ldots$)}
+
+\begin{nrtc}
+\item	CASS, LUKASIK, STEFFERUD
+
+\item	KILLE, ONIONS, ROBBINS, TURLAND, WALTON, ROE, MICHAELSON, TITCOMBE,
+	EASTERBROOK, PAVEL, WORSLEY, SCOTT, WILDER, PAVLOU, KNIGHT,
+	HEIN\"{A}NEN, MOORE
+
+\item	NORTHROP, WOLLONGONG, NYSERNet, PSI, UCL, UNott, MITRE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OPENLY AVAILABLE}
+
+\begin{nrtc}
+\item	NO LICENSES, CONTRACTS, OR LETTERS
+
+\item	SMALL DISTRIBUTION/HANDLING FEE
+
+\item	DO \emph{WHATEVER} YOU WANT, BUT
+
+\item	HOLD-HARMLESS ALL CONTRIBUTORS
+
+\item	AND WE SIGN NOTHING!
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FOR BETTER OR WORSE}
+
+\begin{nrtc}
+\item	THE ISODE IS NOW THE DE FACTO REFERENCE IMPLEMENTATION FOR OSI
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHAT THE ISODE IS NOT}
+
+\begin{nrtc}
+\item	OSI OVER TCP
+    \begin{nrtc}
+    \item	ISODE RUNS OVER PURE OSI TRANSPORT STACKS
+		(e.g., TP4/CLNP, TP0/X.25, etc.)
+    \end{nrtc}
+
+\item	RELATED TO THE INTERNATIONAL ORGANIZATION FOR STANDARDIZATION
+    \begin{nrtc}
+    \item	DO NOT EXPAND THE ``ISO'' IN ISODE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{ISODE AVAILABILITY}\bf
+
+\begin{nrtc}
+\item	STATUS: OPENLY AVAILABLE UNDER AN IMPLICIT ``HOLD HARMLESS'' CLAUSE
+
+\item	CURRENT RELEASE: 6.0
+    \begin{nrtc}
+    \item	AVAILABLE JANUARY 24, 1990
+    \end{nrtc}
+
+\item	SOURCE SIZE: \~{}250K LINES OF C AND ASN.1 (\~{}14MB)
+
+\item	DOC: 5~VOLUME USER'S MANUAL (\~{}1000~PAGES)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DISCUSSION GROUPS}
+
+\begin{nrtc}
+\item	THE GROUP:
+    \begin{nrtc}
+    \item	ISODE@NIC.DDN.MIL
+    \end{nrtc}
+
+\item	LIST ADDITIONS:
+    \begin{nrtc}
+    \item	ISODE-REQUEST@NIC.DDN.MIL
+    \end{nrtc}
+
+\item	BUG REPORTS
+    \begin{nrtc}
+    \item	BUG-ISODE@NISC.PSI.NET
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{DESIGN AND IMPLEMENTATION}\bf
+
+\begin{nrtc}
+\item	PORTABILITY PHILOSOPHY
+
+\item	SOFTWARE ARCHITECTURE
+
+\item	ROADMAP
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{PORTABILITY PHILOSOPHY}\bf
+
+\begin{nrtc}
+\item	USE \unix/ AND C
+
+\item	NO KERNEL MODIFICATIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{LANGUAGES AND OPERATING SYSTEMS}
+
+\begin{nrtc}
+\item	KNOWN PORTS FOR BERKELEY \unix/ (4BSD):
+    \begin{nrtc}
+    \item	VAXen, SUNs, Pyramids, RTs, etc.
+    \end{nrtc}
+
+\item	KNOWN PORTS FOR AT\&T \unix/ (SVR2 and SVR3):
+    \begin{nrtc}
+    \item	SGI, 3Bs, 386s, RT (AIX)
+    \end{nrtc}
+
+\item	RELY ON ``COMPATIBILITY'' LIBRARY TO SMOOTH OVER DIFFERENCES
+
+\item	ASSUMES A DECENT C COMPILER (EITHER K\&R OR ANSI)
+    \begin{nrtc}
+    \item	NO C++ SUPPORT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OTHER PLATFORMS}
+
+\begin{nrtc}
+\item	OTHER ORGANIZATIONS HAVE DONE ``PORTS'' TO OTHER TARGETS
+    \begin{nrtc}
+    \item	DOS
+
+    \item	MVS
+    \end{nrtc}
+    BUT NONE HAVE EVER BEEN INCORPORATED!
+
+\item	INCLUSION BACK INTO MAIN RELEASE IS HINDERED BECAUSE
+	CHANGES MUST BE MODULO TO \emph{CURRENT} RELEASE
+
+\item	AND, PEOPLE KEEP ASKING ABOUT A PORT TO VMS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMON GOTCHA's}
+
+\begin{nrtc}
+\item	C COMPILER/LOADER MUST HANDLE NAMES THAT ARE
+    \begin{nrtc}
+    \item	LONGER THAN 32~CHARACTERS
+
+    \item	NON-UNIQUE IN FIRST 32~CHARS
+
+    \item	PRE-PROCESS MUST HANDLE OVER 3000 DEFINES
+    \end{nrtc}
+
+\item	NEED \verb"fork" AND \verb"exec" TO DO DYNAMIC SERVERS
+
+\item	NEED SYNCHRONOUS MULTIPLEXING (e.g., \verb"select")
+
+\item	NEED DYNAMIC MEMORY ALLOCATION (e.g., \verb"malloc")
+
+\item	NEED \verb"make" WITH
+    \begin{nrtc}
+    \item	\verb"-f file" CAPABILITY
+
+    \item	\verb"sh expr" CAPABILITY
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{SOFTWARE ARCHITECTURE}\bf
+
+\begin{nrtc}
+\item	SEVERAL APPLICATION ENVIRONMENTS
+
+\item	ALL INTERFACES ARE EXPOSED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE APPLICATION ENVIRONMENT}
+
+\vskip.5in
+\diagram[p]{figureH-6}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN ALTERNATE ENVIRONMENT:\\ LIGHTWEIGHT PRESENTATION}
+
+\vskip.5in
+\diagram[p]{figureH-7}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN ALTERNATE ENVIRONMENT:\\ MHS ARCHITECTURE (c.~1984)}
+
+\vskip.5in
+\diagram[p]{figureH-8}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CALLING CONVENTIONS}
+
+\begin{nrtc}
+\item	MODEL EACH LAYER AS AN OBJECT LIBRARY
+
+\item	MODEL EACH USER-INITIATED PRIMITIVE AS A PROCEDURE CALL
+
+\item	MODEL EACH PROVIDER-INITIATED PRIMITIVE AS A STRUCTURE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INTERFACE STYLE}
+
+\begin{nrtc}
+\item	SERVICES ARE BASED ON A SYNCHRONOUS INTERFACE
+
+\item	CONFIRMED SERVICES USUALLY BLOCK WAITING FOR RESPONSE
+
+\item	HOWEVER, A NON-BLOCKING MODE CAN BE EMPLOYED BY USING
+    \begin{nrtc}
+    \item	A SUPPLIED ROUTINE WHICH IS A SELECT-PLUS
+
+    \item	WITH SUPPORT FOR QUEUED WRITES
+    \end{nrtc}
+
+\item	THERE IS ALSO (A NOT SO-WELL TESTED) ASYNCHRONOUS INTERFACE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: CONFIRMED SERVICE}
+
+\vskip.5in
+\diagram[p]{figureH-13}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: CONFIRMED SERVICE (cont.)}
+
+\vskip.5in
+\diagram[p]{figureH-14}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CONFIRMED SERVICE}\small
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureH-9\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WAIT FOR SOMETHING TO HAPPEN}\small
+
+\hrule\vskip.15in
+\begin{tgrind}\scriptsize
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureH-10\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{ROADMAP}\bf
+
+\begin{nrtc}
+\item	AND NOW, A VERY QUICK TOUR!
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ROADMAP (cont.)}
+
+\begin{nrtc}
+\item	\verb"acsap/" ACSE AND ALS LIBRARY
+
+\item	\verb"compat/" COMPATIBLITY LIBRARY
+
+\item	\verb"config/" CONFIGURATION TEMPLATES 
+
+\item	\verb"dirent/" GETDENTS COMPATILBILITY
+
+\item	\verb"doc/" DOCUMENT SET, INCLUDING:
+    \begin{nrtc}
+    \item	\verb"manual/" USER'S MANUAL
+
+    \item	\verb"whitepages/" WPP DOCUMENT SET
+    \end{nrtc}
+
+\item	\verb"dsap/" X.500 LIBRARY
+
+\item	\verb"ftam/" FTAM LIBRARY
+
+\item	\verb"ftam-ftp/" FTAM TO FTP GATEWAY
+
+\item	\verb"ftam2/" FTAM USER/FILESTORE PROGRAMS
+
+\item	\verb"ftp-ftam/" FTP TO FTAM GATEWAY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ROADMAP (cont.)}
+
+\begin{nrtc}
+\item	\verb"h/" INCLUDE FILES
+
+\item	\verb"imisc/" EXAMPLE APPLICATION
+
+\item	\verb"others/" ``UNSUPPORTED'' ADDITIONS, INCLUDING:
+    \begin{nrtc}
+    \item	\verb"mosy/" MANAGED OBJECT COMPILER
+
+    \item	\verb"tsbridge/" TS-BRIDGE
+    \end{nrtc}
+
+\item	\verb"pepy/" ASN.1 COMPILERS
+
+\item	\verb"pepsy/" ANOTHER ASN.1 COMPILER
+
+\item	\verb"psap/" PRESENTATION ABSTRACTIONS
+
+\item	\verb"psap2/" PRESENTATION LIBRARY
+
+\item	\verb"psap2-lpp/" RFC1085 LIBRARY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ROADMAP (cont.)}
+
+\begin{nrtc}
+\item	\verb"quipu/" DSA/DUA PROGRAMS
+
+\item	\verb"rosap/" ROSE LIBRARY
+
+\item	\verb"rosy/" RO-COMPILER
+
+\item	\verb"rtsap/" RTSE LIBRARY
+
+\item	\verb"snmp/" SNMP LIBRARY AND PROGRAMS
+
+\item	\verb"ssap/" SESSION LIBRARY
+
+\item	\verb"support/" DAEMONS, DATABASES, etc.
+
+\item	\verb"tsap/" TRANSPORT LIBRARY
+
+\item	\verb"vt/" VIRTUAL TERMINAL PROGRAMS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FOR FURTHER READING}
+
+\begin{nrtc}
+\item	Volume 1: Application Services\\
+    \begin{nrtc}
+    \item	\verb"acsap" \verb"psap" \verb"rosap" \verb"rtsap" 
+    \end{nrtc}
+
+\item	Volume 2: Underlying Services\\
+    \begin{nrtc}
+    \item	\verb"psap2" \verb"psap2-lpp" \verb"ssap" \verb"tsap"
+
+    \item	\verb"compat" (SORT OF)
+    \end{nrtc}
+
+\item	Volume 3: Applications\\
+    \begin{nrtc}
+    \item	\verb"ftam" \verb"ftam-ftp" \verb"ftam2" \verb"ftp-ftam"
+		\verb"imisc" \verb"vt"
+    \end{nrtc}
+
+\item	Volume 4: The Applications Cookbook\\
+    \begin{nrtc}
+    \item	\verb"pepy" \verb"rosy"
+    \end{nrtc}
+
+\item	Volume 5: QUIPU\\
+    \begin{nrtc}
+    \item	\verb"dsap" \verb"quipu"
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{UNDERLYING ABSTRACTIONS}\bf
+
+\begin{nrtc}
+\item	EVEN WITHIN A SINGLE FAMILY OF \unix/,
+	THERE IS JUST TOO MUCH VARIANCE IN
+    \begin{nrtc}
+    \item	CONSTANTS, ALGORITHMS, and INSTALLATION
+    \end{nrtc}
+
+\item	SO, NEED TO TAILOR AT
+    \begin{nrtc}
+    \item	COMPILE-TIME
+
+    \item	RUN-TIME
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{COMPILE-TIME}\bf
+
+\begin{nrtc}
+\item	TWO FILES ARE EDITED
+
+\item	\verb"config.h" COMPILE-TIME CONSTANTS
+
+\item	\verb"CONFIG.make" DIRECTIVES TO MAKE
+
+\item	EACH DIRECTORY HAS \verb"make/Makefile" COMBINATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{CANNED CONFIGURATIONS}
+
+\begin{nrtc}
+\item	EACH SUPPLIES TWO FILES
+\[\begin{tabular}{l}
+A/UX\\
+APOLLO\\
+BSD4.x\\
+HP-UX\\
+RISC/OS\\
+RT/PC (BSD OR AIX)\\
+SVR2\\
+SVR3\\
+SunOS\\
+Ultrix
+\end{tabular}\]
+\end{nrtc}
+\end{bwslide}
+
+\begin{bwslide}
+\ctitle	{OPTIONS IN \verb"config.h"}
+
+\begin{nrtc}
+\item	OPERATING SYSTEM BASE
+    \begin{nrtc}
+    \item	BSD: 4.2, 4.3, TAHOE, 4.4, SunOS4
+
+    \item	SV: R2, R3, HP-UX, AIX, A/UX
+    \end{nrtc}
+
+\item	NETWORK/TRANSPORT OPTIONS: TCP, X25, TP4
+    \begin{nrtc}
+    \item	TCP: SOCKETS, WIN, EXOS
+
+    \item	X.25: SunLink X.25, CAMTEC, UBC
+
+    \item	TP4: SunLink OSI, BSD/OSI
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OPTIONS IN \verb"config.h" (cont.)}
+
+\begin{nrtc}
+\item	GETDENTS COMPATIBILITY
+
+\item	NOTE THAT \verb"config.h" INTERACTS WITH
+    \begin{nrtc}
+    \item	\verb"manifest.h"
+
+    \item	\verb"general.h"
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OPTIONS IN \verb"CONFIG.make"}
+
+\[\begin{tabular}{rl}
+BINDIR&		user programs\\
+ETCDIR&		administrator files\\
+INCDIR&		include files\\
+LIBDIR&		object libraries\\
+LINTDIR&	 lint libraries\\
+LOGDIR&		log files\\
+SBINDIR&	 administrator programs\\
+MANDIR&		man pages\\
+MANOPTS&	canned make directives\\
+LSOCKET&	standard libraries\\
+SYSTEM&		configuration type
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{RUN-TIME}\bf
+
+\begin{nrtc}
+\item	STARTED OFF AS OS HARMONIZATION AT THE USER-LEVEL
+
+\item	NOW ITS GOT EVERYTHING AND THE KITCHEN-SINK
+
+\item	CHECK \verb"llib-lcompat" FOR THE CALLING CONVENTIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FILES OF INTEREST}
+
+\begin{nrtc}
+\item	\verb"manifest.h" USER/KERNEL
+
+\item	\verb"logger.h" LOGGING
+
+\item	\verb"isoaddrs.h" ADDRESSING
+
+\item	\verb"tailor.h" TAILORING
+
+\item	\verb"general.h" UTILITIES
+
+\item	\verb"internet.h" TCP ABSTRACTIONS
+
+\item	\verb"dgram.h" DATAGRAM ABSTRACTIONS
+
+\item	\verb"x25.h" X.25 ABSTRACTIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{USER/KERNEL}
+
+\begin{nrtc}
+\item	DUP2
+
+\item	BYTE-ORDERING
+
+\item	SELECT
+    \begin{nrtc}
+    \item	\verb"xselect" HANDLE SPECIAL CASES, ROTTEN FDs
+
+    \item	\verb"selsocket" SELECT WITH SECOND-ACCURACY
+    \end{nrtc}
+
+\item	BSD-STYLE SIGNALS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{USER/KERNEL (cont.)}
+
+\begin{nrtc}
+\item	A LOT OF TYPEDEFS FOR:
+    \begin{nrtc}
+    \item	SIGNAL HANDLING: \verb"SFP", \verb"SFD"
+
+    \item	FD-SETs
+
+    \item	POINTERS: \verb"IP", \verb"IFP", \verb"VFP"
+    \end{nrtc}
+
+\item	\verb"NOTOK", \verb"NULLCP", etc.
+
+\item	BRINGS IN SYSTEM TYPE INCLUDE FILE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{UDVECs}
+
+\begin{quote}\small\begin{verbatim}
+struct udvec {                  /* looks like a BSD iovec... */
+    caddr_t uv_base;
+    int     uv_len;
+
+    int     uv_inline;
+};
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{QBUFs}
+
+\begin{quote}\small\begin{verbatim}
+struct qbuf {
+    struct qbuf *qb_forw;       /* doubly-linked list */
+    struct qbuf *qb_back;       /*   .. */
+
+    int     qb_len;             /* length of data */
+    char   *qb_data;            /* current pointer into data */
+    char    qb_base[1];         /* extensible... */
+};
+
+QBFREE (qb);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{LOGGING}
+
+\begin{quote}\small\begin{verbatim}
+LLog _pgm_log = {
+    "tsapd.log", NULLCP, NULLCP,
+    LLOG_FATAL | LLOG_EXCEPTIONS | LLOG_NOTICE,
+    LLOG_FATAL,
+    -1,
+    LLOGCLS | LLOGCRT | LLOGZER,
+    NOTOK
+};
+LLog *lp = &_pgm_log;
+
+ll_open (lp); ... ll_close (lp);
+
+log_tai (lp, char **argv, int argc);
+ll_hdinit (lp, char *prefix);
+ll_dbinit (lp, char *prefix);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{LOGGING (cont.)}
+
+\begin{quote}\small\begin{verbatim}
+
+ll_log (lp, LLOG_level, char *what, char *fmt, ...);
+
+ll_printf (lp, fmt, ...);
+ll_sync (lp);
+
+SLOG (lp, event, what, (...));
+LLOG (lp, event, (...));
+DLOG (lp, event, what, (...));
+PLOG (lp, fnx, pe, text, rw);
+
+ll_check (lp);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ADDRESSING}
+
+\begin{quote}\small\begin{verbatim}
+struct PSAPaddr {
+    struct SSAPaddr pa_addr;
+
+#define PSSIZE  64
+    int     pa_selectlen;
+    char    pa_selector[PSSIZE];
+};
+
+struct SSAPaddr {
+    struct TSAPaddr sa_addr;
+
+#define SSSIZE  64
+    int     sa_selectlen;
+    char    sa_selector[SSSIZE];
+};
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ADDRESSING (cont.)}
+
+\begin{quote}\small\begin{verbatim}
+struct TSAPaddr {
+#define NTADDR  8
+    struct NSAPaddr ta_addrs[NTADDR];
+    int     ta_naddr;
+
+#define TSSIZE  64
+    int     ta_selectlen;
+    char    ta_selector[TSSIZE];
+};
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ADDRESSING (cont.)}
+
+\begin{quote}\small\begin{verbatim}
+struct NSAPaddr {
+    long    na_stack;    /* identifies TS-stack */
+#define NA_NSAP 0        /* used to be called na_type */
+#define NA_TCP  1
+#define NA_X25  2
+
+    long    na_community;  /* identifies community */
+                           /* used to be called na_subnet */
+#define SUBNET_REALNS           (-1)  /* hard-wired */
+#define SUBNET_INT_X25          1       
+#define SUBNET_JANET            2
+#define SUBNET_INTERNET         3
+#define SUBNET_DYNAMIC          100   /* dynamic start here... */
+
+    union {
+/* for realNS, TCP, and X.25... */
+    }       na_un;
+};
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ADDRESSING (cont.)}
+
+\begin{nrtc}
+\item	AN NSAP IS A NETWORK SERVICE ACCESS POINT
+
+\item	IDENTIFIES AN (LOGICAL) ATTACHMENT TO THE NETWORK
+
+\item	MANY DIFFERENT ADDRESSING AUTHORITIES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ADDRESSING (cont.)}
+
+\begin{nrtc}
+\item	ALL ACCORDING TO KILLE'S DEFINITIONS:
+    \begin{nrtc}
+    \item	STRING ENCODING OF PRESENTATION ADDRESS
+
+    \item	INTERIM USE OF NETWORK ADDRESS
+    \end{nrtc}
+\end{nrtc}
+\begin{quote}\small\begin{verbatim}
+struct PSAPaddr *str2paddr (str);
+
+char   *_paddr2str (pa, na, compact);
+
+struct NSAPaddr *na2norm (na);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A STRING ENCODING OF\\ PRESENTATION ADDRESS}
+
+\smaller
+\begin{verbatim}
+<address> ::= [[[ <psel> "/" ] <ssel> "/" ] <tsel> "/" ] <naddrs>
+
+<naddrs>  ::= <naddr> "|" <naddrs> | <naddr>
+
+<naddr>   ::= "NS" "+" <hexstring> | <afi> "+" <idi> [ "+" <dsp> ]
+
+<psel>    ::= <selector>
+<ssel>    ::= <selector>
+<tsel>    ::= <selector>
+
+<selector>::= '"' <ia5string> '"' | "#" digits | "'" <hexstring> "'H" | ""
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLES}
+
+\begin{verbatim}
+"256"/NS+a433bb93c1|NS+aa3106
+
+#63/#41/#12/X121+234219200300
+
+'3a'H/Janet=00002340555+CUDF+"892796"
+
+"s"//Internet=10.0.0.6
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FOR FURTHER READING}
+
+\begin{nrtc}
+\item	An interim approach to use of Network Addresses\\
+	Stephen E.~Kille\\
+	UCL-CS RN/89/13
+
+\item	A string encoding of Presentation Address\\
+	Stephen E.~Kille\\
+	UCL-CS RN/89/14
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{QUALITY OF SERVICE}
+
+\begin{quote}\small\begin{verbatim}
+struct QOStype {
+                                /* transport QOS */
+    int     qos_reliability;    /* "reliability" element */
+#define HIGH_QUALITY    0
+#define LOW_QUALITY     1
+
+                                /* session QOS */
+    int     qos_sversion;       /* session version required */
+    int     qos_extended;       /* extended control */
+    int     qos_maxtime;        /* for SPM response during S-CONNECT */
+};
+#define NULLQOS ((struct QOStype *) 0)
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TAILORING}
+
+\begin{quote}\small\begin{verbatim}
+void    isodetailor (myname, wantuser);
+
+void    isodesetvar (name, value, dynamic);
+
+void    isodexport (myname);
+
+char   *isodefile (path, file);
+
+char   *getlocalhost ();
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TAILORING VARIABLES}
+
+\begin{nrtc}
+\item	SYSTEM AREAS
+
+\item	LOGGING FILES/PARAMETERS
+
+\item	TRANSPORT-SWITCH
+
+\item	X.25
+
+\item	USER-FRIENDLY NAMESERVICE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{UTILITIES}
+
+\begin{nrtc}
+\item	VARARGS/SYSERR TO STRING
+
+\item	EXPLODE/IMPLODE OCTET STRING TO/FROM PRINTABLE STRING
+
+\item	GET PASSWORD FROM USER
+
+\item	CASE-INSENSITIVE STRING COMPARISON
+
+\item	ADD/REMOVE ENVIRONMENT VARIABLES
+
+\item	STRING ALLOCATION
+
+\item	CRACK COMMAND LINE/STRING INTO COMPONENTS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{UTILITIES (cont.)}
+
+\begin{nrtc}
+\item	BRINGS IN STRINGS INCLUDE FILE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TCP ABSTRACTIONS}
+
+\begin{quote}\small\begin{verbatim}
+fd = start_tcp_client (sock, priv);
+join_tcp_server (fd, sock);
+
+sd = start_tcp_server (sock, backlog, opt1, opt2);
+fd = join_tcp_client (sd, sock);
+
+read_tcp_socket
+write_tcp_socket
+close_tcp_socket
+select_tcp_socket
+
+struct hostent *gethostbystring (s);
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TCP ABSTRACTIONS (cont.)}
+
+\begin{nrtc}
+\item	4BSD SOCKETS
+
+\item	WIN/TCP for SVR2
+
+\item	EXOS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DATAGRAM ABSTRACTIONS}
+
+\begin{quote}\small\begin{verbatim}
+fd = start_udp_client (sock, backlog, opt1, opt2);
+join_udp_server (fd, sock);
+
+sd = start_udp_server (sock, backlog, opt1, opt2);
+fd = join_udp_client (sd, sock);
+
+read_dgram_socket (fd, struct qbuf **qb);
+hack_dgram_socket (fd, sock);
+write_dgram_socket (fd, struct qbuf *qb);
+close_dgram_socket
+select_dgram_socket
+\end{verbatim}\end{quote}
+DITTO FOR CLTS
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DATAGRAM (cont.)}
+
+\begin{nrtc}
+\item	4BSD SOCKETS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{X.25 ABSTRACTIONS}
+
+\begin{quote}\small\begin{verbatim}
+CONN_DB *gen2if (generic, specific, context);
+
+struct NSAPaddr *if2gen (generic, specific, context);
+
+fd = start_x25_client (na, priv);
+join_x25_server (fd, na);
+
+sd = start_x25_server (na, backlog, opt1, opt);
+fd = join_x25_client (sd, na);
+
+read_x25_socket
+write_x25_socket
+close_x25_socket
+select_x25_socket
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{X.25 ABSTRACTIONS (cont.)}
+
+\begin{nrtc}
+\item	SunLink X.25
+
+\item	CAMTEC/CAMTEC CCL
+
+\item	UBC X.25
+\end{nrtc}
+\end{bwslide}

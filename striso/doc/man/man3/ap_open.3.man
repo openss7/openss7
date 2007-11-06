@@ -1,0 +1,356 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_ioctl.3.man,v 0.9.2.1 2007/09/29 14:08:31 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:31 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_ioctl.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:31  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_OPEN 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ap_open
+\- Create an instance of XAP.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.B typedef int (*ap_ualloc_t)(int, ap_osi_vbuf_t **, void **, int, int, ulong *);
+.HP
+.B typedef int (*ap_udealloc_t)(int, ap_osi_vbuf_t *, void *, int, ulong *);
+.HP
+.BI "int ap_open(const char *" provider ", int " oflags ", ap_ualloc_t " ap_user_alloc ", ap_udealloc_t " ap_user_dealloc ", ulong *" aperrno_p ");
+.PP
+.B #include <ap_lib.h>
+.br
+.B #include <osi_lib.h>
+.HP
+.BI "int ap_open(
+.PD 0
+.RS
+.HP
+.BI "char *" pathname ,
+.HP
+.BI "int " oflags
+.RE
+.HP
+.BI );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I provider
+An implementation-specific string that identifies an instance of a communications provider.
+.TP
+.I oflags
+Flags indicating syncrhonous or asyncrhonous operation and buffer allocation strategy.
+.TP
+.I ap_user_alloc
+A user-supplied buffer allocation callback function.
+.TP
+.I ap_user_dealloc
+A user-supplied buffer deallocation callback function.
+.TP
+.I aperrno_p
+A pointer a an error number into which to have returned diagnostic error numbers.
+.\"
+.\"
+.SH INTERFACE
+XAP.
+.[
+XAP
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function creates an instance of XAP
+.[
+XAP
+.]
+using the communications provider identified by
+.IR provider .
+XAP does not assign any specific interpretation to the format of this string parameter.
+However, individual implementations may assign additional semantics to the string in order to
+implement conventions applicable to a particular operating system environment.
+.PP
+The
+.I oflags
+argument is a bit mask used to control certain aspects of how the
+.BR ap_open ()
+invocation is handled by XAP. Legal values for the
+.I oflags
+argument are formed by OR'ing together zero or more of the flags described below.
+.TP
+.B AP_NDELAY
+This flag indicates the XAP instance opened is to operat in the non-blocking execution mode:
+.B AP_NDELAY
+will be set in the
+.B AP_FLAGS
+environent attribute.  If this flag is not present, the opened XAP instance will operate in blocking
+execution mode.
+.TP
+.B AP_BUFFERS_ONLY
+This flag indicates that the user-supplied memory allocation and deallocation functions are to be
+used only to allocate and deallocate buffers.  XAP's internal memory allocation will be used to
+allocate and deallocated environment attributes.
+.PP
+If
+.B AP_BUFFERS_ONLY
+is present in
+.I oflags
+and both
+.I ap_user_alloc
+and
+.I ap_user_dealloc
+are absent, a value of minus one (-1) is returned and the location pointed to by
+.I aperrno_p
+(if any) is set to
+.RB [ AP_BADFLAGS ].
+.PP
+The
+.I ap_user_alloc
+parameter is a pointer to a user-supplied memory allocation function. The
+synopsis for a user-supplied memory allocation function is:
+.RS
+.HP
+.BI "int ap_user_alloc(int " fd ", ap_osi_vbuf_t **" buf ", void **" mem ", int " size ", int " type ", unsigned long *" aperrno_p ");
+.RE
+.PP
+This function is used by the XAP instance identified by
+.I fd
+to allocate either memory or buffer
+space. The
+.I type
+field takes the values
+.BR AP_BUFFERS " or " AP_MEMORY .
+When
+.B AP_BUFFERS
+is specified, a linked set of ap_osi_vbuf_t structures are returned in
+.IR buf ,
+and
+.I size
+indicates the
+number of octets of space requested. Notice that
+.I mem
+is not used in this case, and that a user
+allocation routine may return less or more bufferspace than requested. When
+.B AP_MEMORY
+is
+specified, a block of memory is returned in
+.IR mem ,
+and
+.I size
+indicates the number of octets of space
+requested. Notice that
+.I buf
+is not used in this case. Upon successful completion, a value of 0 is
+returned. Otherwise, a value of -1 is returned and the location pointed to by
+.I aperrno_p
+is set to
+indicate the error.
+.PP
+The
+.I ap_user_dealloc
+parameter is a pointer to a user-supplied memory deallocation function. The
+synopsis for a user-supplied memory deallocation function is:
+.RS
+.HP
+.BI "int ap_user_dealloc(int " fd ", ap_osi_vbuf_t *" buf ", void *" mem ", int " type ", unsigned long *" aperrno_p ");
+.RE
+.PP
+This function is used by the XAP instance identified by
+.I fd
+to deallocate either the memory or
+buffers that it allocated. The type field takes the values
+.BR AP_BUFFERS " or " AP_MEMORY .
+When
+.B AP_BUFFERS
+is specified, all buffers in the chain pointed to by
+.I buf
+are freed. Notice that
+.I mem
+is not used in this case. When
+.B AP_MEMORY
+is specified, the memory pointed to by
+.I mem
+is freed.
+Notice that
+.I buf
+is not used in this case. Upon successful completion, a value of 0 is returned.
+Otherwise, a value of -1 is returned and the location pointed to by
+.I aperrno_p
+is set to indicate the
+error.
+.PP
+The user allocation and deallocation routine parameters
+.RI ( ap_user_alloc "() and " ap_user_dealloc ())
+must either both be present or absent. If absent, they are represented by null values. If they are
+absent, XAP will use built-in functions to allocate and deallocate memory from the user memory
+space. The user supplied or built-in allocation routines are called by XAP to obtain or return
+memory for environment attributes.
+.TP
+.B Note:
+XAP users are advised that allowing
+.I ap_user_alloc
+to default to the XAP-supplied
+memory allocation mechanism means that the service will not perform dynamic
+allocation of user data buffers in order to receive incoming primitives. In this case the
+user must either pass sufficient buffers in the call to ap_rcv( ) to store the user data for
+the incoming primitive, or the user must call ap_rcv( ) multiple times to receive all the
+user data associated with the incoming primitive (see the discussion of the AP_MORE
+flag in the ap_rcv( ) manual page).
+.PP
+.I aperrno_p
+must be set to point to a location which will be used to carry an error code back to the
+user.
+.\"
+.\"
+.SH RETURN
+.PP
+On success,
+.BR ap_open ()
+returns an XAP instance identifier, an integer (³ 0), that is used to
+identify
+the XAP instance in subsequent calls to XAP functions. Otherwise, a value of -1 is returned and
+the location pointed to by
+.I aperrno_p
+is set to indicate the error. (The XAP environment must be
+initialised using a call to ap_init_env( ) or ap_restore( ) before it can be used to send or receive
+primitives.)
+.\"
+.\"
+.SH ERRORS
+.PP
+.TP
+.RB [ AP_BADALLOC ]
+The
+.IR ap_user_alloc / ap_user_dealloc
+argument combination was invalid.
+.TP
+.RB [ AP_BADFLAGS ]
+The specified combination of flags is invalid.
+.PP
+In addition, operating system class errors are reported.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ap_open (3),
+.BR open (2s).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR ap_open ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ap_open ()
+is compatible with XAP.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_open ()
+first appeared in XAP.
+.[
+xap
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XAP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

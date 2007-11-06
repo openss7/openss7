@@ -1,0 +1,723 @@
+-- unix.my - UNIX-specific MIB
+
+-- $Header: /xtel/isode/isode/snmp/RCS/unix.my,v 9.0 1992/06/16 12:38:11 isode Rel $
+--
+-- Contributed by NYSERNet Inc.  This work was partially supported by the
+-- U.S. Defense Advanced Research Projects Agency and the Rome Air Development
+-- Center of the U.S. Air Force Systems Command under contract number
+-- F30602-88-C-0016.
+--
+--
+-- $Log: unix.my,v $
+-- Revision 9.0  1992/06/16  12:38:11  isode
+-- Release 8.0
+--
+--
+
+--
+--				  NOTICE
+--
+--    Acquisition, use, and distribution of this module and related
+--    materials are subject to the restrictions of a license agreement.
+--    Consult the Preface in the User's Manual for the full terms of
+--    this agreement.
+--
+--
+
+
+UNIX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	unix
+		FROM BSDUNIX-MIB
+	Counter
+		FROM RFC1155-SMI
+	DisplayString
+		FROM RFC1213-MIB
+	OBJECT-TYPE
+		FROM RFC-1212;
+
+
+-- the agents group (defined in 4bsd.my)
+-- agents OBJECT IDENTIFIER ::=	{ unix 1 }
+
+
+-- the mbuf group (defined in smux.my)
+-- mbuf OBJECT IDENTIFIER ::= { unix 2 }
+
+
+-- the SMUX peer group (defined in 4bsd.my)
+-- peers OBJECT IDENTIFIER ::=	{ unix 3 }
+
+
+-- the SMUX protocol group (defined in smux.my)
+-- smux OBJECT IDENTIFIER ::=	{ unix 4 }
+
+
+-- the NETSTAT group (defined in smux.my)
+-- netstat OBJECT IDENTIFIER ::= { unix 5 }
+
+
+-- the print group
+
+print	OBJECT IDENTIFIER ::= { unix 6 }
+
+-- the printer queue table
+
+printQTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF PrintQEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The printer queue table."
+	::= { print 1 }
+
+printQEntry OBJECT-TYPE
+	SYNTAX	PrintQEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry for a queue in the printer table.
+
+		 Instance-identification is taken from
+
+			printQName
+
+		 and consists of `n' sub-identifiers, given that printQName
+		 is `n' octets in length."
+	INDEX	{ printQName }
+	::= { printQTable 1 }
+
+PrintQEntry ::=
+    SEQUENCE {
+	printQName
+	    DisplayString,
+	printQStatus
+	    INTEGER,
+	printQDisplay
+	    DisplayString,
+	printQEntries
+	    INTEGER,
+	printQAction
+	    INTEGER
+    }
+
+printQName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of a queue in the printer table."
+	::= { printQEntry 1 }
+
+printQStatus OBJECT-TYPE
+	SYNTAX	INTEGER (0..'7fffffff'h)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A value which indicates the current status of a queue in the
+		 printer table.
+
+		 The value is a sum.  This sum initially takes the value zero.
+		 Then, for each flag, F, in the range 1 through N, that this
+		 queue has TRUE, 2 raised to (F - 1) is added to the sum.
+
+		 flag	status
+		 ----	------
+		   1	queuing is enabled
+		   2	printing is enabled
+		   3	daemon is present
+
+		 Other values of flag are reserved for future definition."
+	::= { printQEntry 2 }
+
+printQDisplay OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A string indicating the current status of the queue."
+	::= { printQEntry 3 }
+
+printQEntries OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of jobs currently in the queue, including the
+		 current job printing (if any)."
+	::= { printQEntry 4 }
+
+printQAction OBJECT-TYPE
+	SYNTAX	INTEGER {
+		    other(1),
+		    abort(2),
+		    clean(3),
+		    enable(4),
+		    disable(5),
+		    restart(6),
+		    start(7),
+		    stop(8)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"A control variable used to trigger an action on a queue in
+		 the printer table.  When read, this variable always returns
+		 the most recent value that it was previously set to.  If it
+		 has not been set since the last initialization of the network 
+		 management subsystem on the node, it returns a value of
+		 `other'.
+
+		 When set, this variable causes the queue to undertake the
+		 indicated action:
+
+		 abort - terminate the current job printing in the queue
+			 and disable printing other jobs
+
+		 clean - remove incomplete jobs from the queue
+
+		 enable - enable spooling on the queue
+
+		 disable - disable spooling on the queue
+
+		 restart - restart printing from the queue
+
+		 start - start printing from the queue
+
+		 stop - stop printing from the queue after the current job
+			completes printing"
+	::= { printQEntry 5 }
+
+
+-- the printer job table
+
+printJTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF PrintJEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The printer job table."
+	::= { print 2 }
+
+printJEntry OBJECT-TYPE
+	SYNTAX	PrintJEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry for a job in a printer queue.
+
+		 Instance-identification is taken from
+
+			printJName + printJRank
+
+		 and consists of `n+1' sub-identifiers, given that printJName
+		 is `n' octets in length."
+	INDEX	{ printJName, printJRank }
+	::= { printJTable 1 }
+
+PrintJEntry ::=
+    SEQUENCE {
+	printJRank
+	    INTEGER,
+	printJName
+	    DisplayString,
+	printJOwner
+	    DisplayString,
+	printJDescription
+	    DisplayString,
+	printJSize
+	    INTEGER,
+	printJAction
+	    INTEGER
+    }
+
+printJRank OBJECT-TYPE
+	SYNTAX INTEGER (0..'7fffffff'h)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The rank of this job currently in the queue.  A value of zero
+		 indicates that the job is currently printing, a value of
+		 one indicates that it is next to print, etc."
+	::= { printJEntry 1 }
+
+printJName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of a job in the printer queue."
+	::= { printJEntry 2 }
+
+printJOwner OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A string indicating the owner of this job."
+	::= { printJEntry 3 }
+
+printJDescription OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A string describing the contents of this job."
+	::= { printJEntry 4 }
+
+printJSize OBJECT-TYPE
+	SYNTAX INTEGER (0..'7fffffff'h)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The size of job in octets."
+	::= { printJEntry 5 }
+
+printJAction OBJECT-TYPE
+	SYNTAX	INTEGER {
+		    other(1),
+		    topq(2),
+		    remove(3)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"A control variable used to trigger an action on a job in
+		 a printer queue.  When read, this variable always returns
+		 the most recent value that it was previously set to.  If it
+		 has not been set since the last initialization of the network 
+		 management subsystem on the node, it returns a value of
+		 `other'.
+
+		 When set, this variable causes the queue to undertake the
+		 indicated action:
+
+		 topq - place this job at the front of the queue,
+			after any job which is currently printing
+
+		remove - remove this job from the queue"
+	::= { printJEntry 6 }
+
+
+-- the user-admin group
+
+users	OBJECT IDENTIFIER ::= { unix 7 }
+
+-- the users table
+
+userTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF UserEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The users table."
+	::= { users 1 }
+
+userEntry OBJECT-TYPE
+	SYNTAX	UserEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the users table.
+
+		 Instance-identification is taken from
+
+			userName
+
+		 and consists of `n' sub-identifiers, given that userName
+		 is `n' octets in length."
+	INDEX	{ userName }
+	::= { userTable 1 }
+
+UserEntry ::=
+    SEQUENCE {
+	userName
+	    DisplayString,
+	userPasswd
+	    DisplayString,
+	userID
+	    INTEGER,
+	userGroup
+	    DisplayString,
+	userQuota
+	    INTEGER,
+	userComment
+	    DisplayString,
+	userFullName
+	    DisplayString,
+	userHome
+	    DisplayString,
+	userShell
+	    DisplayString,
+	userStatus
+	    INTEGER
+    }
+
+userName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of this user."
+	::= { userEntry 1 }
+
+userPasswd OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The encrypted password string for this user.
+
+		 This variable is usually unavailable for reading."
+	::= { userEntry 2 }
+
+userID OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The user's ID in the system."
+	::= { userEntry 3 }
+
+userGroup OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The user's group ID in the system."
+	::= { userEntry 4 }
+
+userQuota OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The user's quota."
+	::= { userEntry 5 }
+
+userComment OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"A string describing the user."
+	::= { userEntry 6 }
+
+userFullName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"A string giving the user's full name."
+	::= { userEntry 7 }
+
+userHome OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The user's home directory."
+	::= { userEntry 8 }
+
+userShell OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The user's shell."
+	::= { userEntry 9 }
+
+userStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		    other(1),
+		    invalid(2)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of user.
+
+		 Setting this object to the value invalid(2) has the effect
+		 of invaliding the corresponding entry in the userTable.  It
+		 is an implementation-specific matter as to whether the agent
+		 removes an invalidated entry from the table.  Accordingly,
+		 management stations must be prepared to receive tabular
+		 information from agents that correspond to entries not
+		 currently in use.  Proper interpretation of such entries
+		 requires examination of the relative userStatus object."
+	::= { userEntry 10 }
+
+-- the group table
+
+groupTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF GroupEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The group table."
+	::= { users 2 }
+
+groupEntry OBJECT-TYPE
+	SYNTAX	GroupEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the group table.
+
+		 Instance-identification is taken from
+
+			groupName
+
+		 and consists of `n' sub-identifiers, given that groupName
+		 is `n' octets in length."
+	INDEX	{ groupName }
+	::= { groupTable 1 }
+
+GroupEntry ::=
+    SEQUENCE {
+	groupName
+	    DisplayString,
+	groupPasswd
+	    DisplayString,
+	groupID
+	    INTEGER,
+	groupStatus
+	    INTEGER
+    }
+
+groupName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of this group."
+	::= { groupEntry 1 }
+
+groupPasswd OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The encrypted password string for this group.
+
+		 This variable is usually unavailable for reading."
+	::= { groupEntry 2 }
+
+groupID OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The group's ID in the system."
+	::= { groupEntry 3 }
+
+groupStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		    other(1),
+		    invalid(2)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of group.
+
+		 Setting this object to the value invalid(2) has the effect
+		 of invaliding the corresponding entry in the groupTable.  It
+		 is an implementation-specific matter as to whether the agent
+		 removes an invalidated entry from the table.  Accordingly,
+		 management stations must be prepared to receive tabular
+		 information from agents that correspond to entries not
+		 currently in use.  Proper interpretation of such entries
+		 requires examination of the relative groupStatus object."
+	::= { groupEntry 4 }
+
+-- the group/user table
+
+grUserTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF GrUserEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The group/user table."
+	::= { users 3 }
+
+grUserEntry OBJECT-TYPE
+	SYNTAX	GrUserEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry in the group/user table.
+
+		 Instance-identification is taken from
+
+			groupName + 0 + userName
+
+		 and consists of `n+1+m' sub-identifiers, given that groupName
+		 is `n' octets in length and userName is `m' octets in length."
+	::= { grUserTable 1 }
+
+GrUserEntry ::=
+    SEQUENCE {
+	grUserStatus
+	    INTEGER
+    }
+
+grUserStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		    other(1),
+		    invalid(2)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of relationship between a user and a group.
+
+		 Setting this object to the value invalid(2) has the effect
+		 of invaliding the corresponding entry in the grUserTable.  It
+		 is an implementation-specific matter as to whether the agent
+		 removes an invalidated entry from the table.  Accordingly,
+		 management stations must be prepared to receive tabular
+		 information from agents that correspond to entries not
+		 currently in use.  Proper interpretation of such entries
+		 requires examination of the relative grUserStatus object."
+	::= { grUserEntry 1 }
+
+-- unix file-system group
+
+unixFs		OBJECT IDENTIFIER ::= { unix 8 }
+
+-- the file-system table
+
+fsTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF FsTableEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The file system table"
+	::= { unixFs 1 }
+
+fsTableEntry OBJECT-TYPE
+	SYNTAX	FsTableEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A row in the file system table"
+	INDEX { fsIdentifier }
+	::= { fsTable 1 }
+
+FsTableEntry ::=
+    SEQUENCE { 
+	fsIdentifier
+	    INTEGER,
+	fsName
+	    DisplayString,
+	fsMountPoint
+	    DisplayString,
+	fsMountType
+	    DisplayString,
+	fsMountOptions
+	    DisplayString,
+	fsBlockSize
+	    INTEGER,
+	fsBlockCount
+	    INTEGER,
+	fsBlocksFree
+	    INTEGER,
+	fsBlocksAvailable
+	    INTEGER,
+	fsInodeCount
+	    INTEGER,
+	fsInodesAvailable
+	    INTEGER
+    }
+
+fsIdentifier OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A system-dependent unique identifier."
+	::= { fsTableEntry 1 }
+
+fsName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of the file system (device)."
+	::= { fsTableEntry 2 }
+
+fsMountPoint OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Mount point for the file system."
+	::= { fsTableEntry 3 }
+
+fsMountType OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of the mounted file system."
+	::= { fsTableEntry 4 }
+
+fsMountOptions OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"File system specific options."
+	::= { fsTableEntry 5 }
+
+fsBlockSize OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Block size for this file system."
+	::= { fsTableEntry 6 }
+
+fsBlockCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Total number on blocks in file system."
+	::= { fsTableEntry 7 }
+
+fsBlocksFree OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Total number of blocks free in file system."
+	::= { fsTableEntry 8 }
+
+fsBlocksAvailable OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of blocks available to non-priviledged users."
+	::= { fsTableEntry 9 }
+
+fsInodeCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Total number of i-nodes on this file system."
+	::= { fsTableEntry 10 }
+
+fsInodesAvailable OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of i-nodes available on file system."
+	::= { fsTableEntry 11 }
+
+END

@@ -1,0 +1,1483 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Installation and Configuration}\label{installation}
+This chapter describes how to install, configure, and test the pilot project
+software.
+Upon completion,
+your Level-1 DSA will have successfully joined the pilot project DMD!
+
+\section	{Software}
+The software supporting the pilot project is the QUIPU implementation
+of the OSI Directory,
+which is a part of the ISO Development Environment (ISODE).
+
+QUIPU was originally developed as a part of the INCA project
+(under the auspices of the ESPRIT initiative of the EEC).
+The Inca of Peru did not have writing.
+Instead,
+they stored information on strings,
+carefully knotted in a specific manner with colored thread,
+and attached to a larger rope.
+Such a device was known as a {\em Quipu\/}
+(pronounced {\em kwip-ooo}).
+The encoding was obscure,
+and could only be read by selected trained people:
+the {\em Quipucamayocs}.
+The Quipu was a key component of Inca society,
+as it contained information about property and locations throughout
+the extensive Inca empire.
+
+The pilot sponsors and the administrators of the participating organizations
+form the {\em camayocs\/} for the pilot project.
+There is a special mailing list
+\begin{quote}\small\begin{verbatim}
+wpp-camayocs@psi.com
+\end{verbatim}\end{quote}
+which each \camayoc/ belongs to.
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	This is the official mailing list for administrators of the
+		pilot project.
+		If you have a problem, send mail!
+\end{tabular}}\]
+
+\subsection	{Selecting a Machine}
+The machine you run the software on should support the Berkeley variant of
+\unix/.
+Although the software is known to run on other variants of \unix/, such as
+those from AT\&T and HP,
+these configurations are not supported by the pilot sponsors.
+
+You should plan on the DSA consuming 2Kbytes of memory {\em per\/} entry kept
+in your DMD
+This is called the QUIPU {\em 2K rule}.
+Make sure that your machine has available memory for the DSA.
+A memory-constrained (or worse yet, paging DSA) performs extremely poorly.
+Find an unloaded system to run your DSA.
+This investment might seem large,
+just think of it as a sunk cost.
+
+\subsection	{Files}
+Regardless of how you install QUIPU and the ISODE,
+the number of files needed for the pilot project are quite small.
+
+In ISODE's \verb"BINDIR" directory,
+typically \file{/usr/local/bin/},
+there are a few programs of interest:
+\begin{describe}
+\item[dish:]	The DIrectory SHell\\
+		This is a interface to the OSI Directory which can be used to
+		access the full functionality of the Directory service.
+		This program is not directly run by the ``users'' of the pilot
+		project, rather various front-ends access \pgm{dish}.
+		In addition,
+		the administrators employ this program directly to perform
+		routine maintenance and diagnostics.
+
+\item[bind:]	Shell interface to \pgm{dish}\\
+		There are actually several links to a program called
+		\pgm{bind}.
+		These act to export the \pgm{dish} interface to the \unix/
+		shell.
+		As such,
+		you can issue commands to \pgm{dish} from the shell,
+		rather than running \pgm{dish} directly.
+\begin{quote}
+\begin{tabular}{l}
+add\\
+compare\\
+delete\\
+dsacontrol\\
+list\\
+modify\\
+modifyrdn\\
+moveto\\
+search\\
+showentry\\
+showname\\
+squid
+\end{tabular}
+\end{quote}
+
+\item[fred:]	A white pages user interface\\
+		This is the interface for the users of the pilot project.
+
+\item[editentry:]	Edit a Directory entry\\
+		This is a simple shell script that \pgm{dish} invokes when you
+		ask \pgm{dish} to edit an entry in the Directory.
+
+\item[unbind:]	Unbind from \pgm{dish}\\
+		This command is used to terminate \pgm{dish}.
+\end{describe}
+In ISODE's \verb"SBINDIR" directory,
+typically \file{/usr/etc/},
+the DSA resides:
+\begin{describe}
+\item[ros.quipu:]	The QUIPU DSA\\
+			This program will be started once, for each DSA you
+			are running, from rc.local.
+			A script is provided to invoke this program,
+			in case you need to restart it.
+
+\item[dsaconfig:]	a configurator for Level-1 DSAs.
+\end{describe}
+In ISODE's \verb"ETCDIR" directory,
+also typically \file{/usr/etc/},
+there are a few programs and files of interest:
+\begin{describe}\sloppy
+\item[oidtable.at, oidtable.gen, oidtable.oc:]
+			These define the attribute types,
+			generic object identifiers,
+			and object classes known to the system.
+			(An object identifier is a method used to unambiguously
+			encode, among other things,
+			the names of attributes and object classes.)
+			These files you never deal with unless they are
+			accidently corrupted.
+			
+\item[dsaptailor:]	This is the run-time tailor file for the DUAs.
+			You will configure this file initially and then
+			probably leave it alone.
+
+
+\item[isoaliases, isobjects, isoentities, isomacros, isoservices:]
+			These are \\ %%%
+			various databases used by the ISODE.
+			These files you never deal with unless they are
+			accidently corrupted.
+
+\item[isologs:]		This script runs nightly under \man cron(8) to
+			trim the ISODE log files, kept in ISODE's \verb"LOGDIR"
+			directory,
+			typically \file{/usr/tmp/}.
+			This file you never deal with unless it is
+			accidently corrupted.
+
+\item[isotailor:]	This is the run-time tailor file for the ISODE.
+			You will configure this file initially and then
+			probably leave it alone.
+\end{describe}
+There are a few other things kept in a directory called \file{quipu/}
+which resides in ISODE's \verb"ETCDIR" directory.
+The \file{scripts/} directory contains various scripts which may be used for
+maintenance purposes.
+The \file{templates/} directory contains templates of entries.
+
+\subsection	{Source Release}
+You should retrieve a copy of the pilot software.
+It is available via anonymous FTP from from host
+\verb"uu.psi.com" (\verb"[136.161.128.3]"):
+\begin{quote}\small\begin{verbatim}
+% cd /usr/src/local/
+% ftp uu.psi.com
+Connected to uu.psi.com.
+220 uu.psi.com FTP server ready
+Name (uu.psi.com:user): anonymous
+Password (uu.psi.com:anonymous): guest
+331 Guest login ok, send ident as password.
+230 Guest login ok, access restrictions apply.
+ftp> binary
+200 Type set to I.
+ftp> cd pilot/src
+ftp> get isode-pilot.tar.Z
+ftp> quit
+% uncompress < isode-pilot.tar.Z | tar xfp -
+% rm isode-pilot.tar.Z
+\end{verbatim}\end{quote}
+Note that this is a interim release of the ISODE.
+All of the changes are upwards compatible,
+but you must run this version rather than the standard ISODE~5.0 release.
+
+Now change to the top-level directory.
+\begin{quote}\small\begin{verbatim}
+% cd isode-5.9/
+\end{verbatim}\end{quote}
+The file \file{READ-ME} in this directory contains instructions on how to
+configure, generate, and install the ISODE.
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	The source installation instructions are intended for
+		sites which are not already running QUIPU.
+		If you are,
+		care should be taken to see that your existing Directory
+		environment is not compromised.
+		For example,
+		the DSAs run under the pilot do not provide the
+		``higher performance'' name service,
+		nor is it intended that they support application entities
+		other than DSAs.
+\end{tabular}}\]
+
+\subsubsection	{Configuration of the ISODE}
+As described in the \file{READ-ME} file,
+configuration is straight-forward.
+Here's an example of how it's done on a Sun workstation running SunOS~3.5:
+\begin{quote}\small\begin{verbatim}
+% cp config/sunos3.h h/config.h
+% cp config/sunos3.make config/CONFIG.make
+% cp config/*.local support/
+\end{verbatim}\end{quote}
+For other systems,
+consult the \file{READ-ME} file to see which templates to use.
+For all systems,
+take a look at
+\[\begin{tabular}{l}
+\file{h/config.h}\\
+\file{config/CONFIG.make}\\
+\end{tabular}\]
+to see if things like \verb"BINDIR",
+\verb"SBINDIR", \verb"ETCDIR", and \verb"LOGDIR" are set to your liking.
+
+\subsubsection	{Generation of the ISODE}
+Once properly configured,
+generate both the ISODE and QUIPU using this command from the top-level
+directory:
+\begin{quote}\small\begin{verbatim}
+% ./make once-only all all-quipu
+\end{verbatim}\end{quote}
+This takes a while,
+so its best to redirect the output to a file and then go do something else for
+a few hours:
+\begin{quote}\small\begin{verbatim}
+% ./make once-only all all-quipu >& make.out &
+\end{verbatim}\end{quote}
+
+If the make command finishes with a non-zero exit status,
+or if you see a line with:
+\begin{quote}\small\begin{verbatim}
+*** Error code 1
+\end{verbatim}\end{quote}
+or perhaps
+\begin{quote}\small\begin{verbatim}
+Exit
+\end{verbatim}\end{quote}
+Then something has gone wrong.
+Try and determine what the problem is.
+If you are unable to find the problem,
+drop a note to the Internet Mailbox
+\begin{quote}\begin{verbatim}
+Bug-ISODE@NISC.PSI.NET
+\end{verbatim}\end{quote}
+Your message should contain your two configuration files,
+the output of the make command,
+and a description of the hardware/software platform you are using.
+
+Keep in mind that the ISODE runs ``flawlessly'' worldwide on many thousands of
+machines running numerous variants of \unix/.
+Failure to complete generation usually indicates a broken configuration file,
+or a non-standard system
+(i.e., one with a broken compiler or a different \pgm{make} command).
+
+Now generate the additional commands needed for the pilot project:
+\begin{quote}\small\begin{verbatim}
+% (cd others/quipu; ./make pilot)
+\end{verbatim}\end{quote}
+
+\subsubsection	{Installation of the ISODE}\label{isode:install}
+Once you are satisfied that the generation was successful,
+become the super-user and install both the ISODE and QUIPU.
+First make sure that the directories \verb"BINDIR",
+\verb"SBINDIR",
+\verb"ETCDIR",
+\verb"LOGDIR",
+ as defined in \file{config/CONFIG.make} exist.
+If not, create them using \pgm{mkdir}.
+The protection on the \verb"LOGDIR" directory should be 0777.
+
+Next, install the programs, databases, and libraries:
+\begin{quote}\small\begin{verbatim}
+# ./make inst-all inst-quipu
+# (cd others/quipu; ./make inst-pilot)
+\end{verbatim}\end{quote}
+
+Do {\bf not\/} perform any other installation instructions for QUIPU as
+given in the \file{READ-ME} file.
+The remainder of this chapter supercede those instructions.
+
+If you are not planning on doing program development (probably a safe bet),
+you can remove the various libraries and program development tools by using
+\begin{quote}\small\begin{verbatim}
+# ./make zap
+\end{verbatim}\end{quote}
+from the \file{isode-5.9/} directory as the super-user.
+
+\section	{Starting the ISODE}
+In order to aid debugging,
+you should keep the ISODE system around in an operational state.
+So,
+you need to do a few more things:
+\begin{enumerate}
+\item	Verify that the file \file{/etc/rc.local} has an entry like this:
+\begin{quote}\small\begin{verbatim}
+if [ -f $(SBINDIR)tsapd ]; then
+   $(SBINDIR)tsapd -t & (echo -n ' tsap') > /dev/console
+fi
+\end{verbatim}\end{quote}
+in the section where the network servers are started
+(e.g., where \man sendmail(8) is started).
+
+\item	Verify that the file \file{/etc/services} has an entry like this:
+\begin{quote}\small\begin{verbatim}
+tsap    102/tcp
+\end{verbatim}\end{quote}
+
+\item	Verify that the file \file{/usr/lib/crontab} has an entry similar 
+to this:
+\begin{quote}\small\begin{verbatim}
+0 4 * * * su daemon < $(SBINDIR)isologs
+\end{verbatim}\end{quote}
+or this
+\begin{quote}\small\begin{verbatim}
+0 4 * * * su daemon -c "/bin/sh $(SBINDIR)isologs"
+\end{verbatim}\end{quote}
+This runs a script to clean-up the logfiles at 4:00am each morning.
+
+\item	Start the \man tsapd(8c) daemon by hand:
+\begin{quote}\small\begin{verbatim}
+# $(SBINDIR)tsapd -t >& /dev/null
+\end{verbatim}\end{quote}
+The daemon will automatically detach.
+Instead,
+if its diagnostic output is associated with a terminal,
+then the daemon will not detach and will log informative messages to
+the terminal.
+
+\item	Now verify that the ISODE is installed and tailored correctly.
+See Sections~\ref{isode:tailoring} and~\ref{isode:testing}.
+\end{enumerate}
+
+\section	{ISODE Tailoring}\label{isode:tailoring}
+Before any DSAs or DUAs are installed,
+the file \file{isotailor} in the ISODE \verb"ETCDIR" directory should be
+properly configured. 
+
+Typically source installations have ISODE's \verb"ETCDIR" and \verb"LOGDIR"
+directories hard-wired in during configuration of the ISODE.
+As such,
+the source installation procedures do not install a \file{isotailor} file.
+If a future need arises,
+the \file{isotailor} file may be modified accordingly.
+Initially it is recommended that you use a tailoring file which contains
+no commands;
+copy it from the \file{quipu/scripts/} area:
+\begin{quote}\small\begin{verbatim}
+# cp $(ETCDIR)quipu/scripts/isotailor.empty $(ETCDIR)isotailor
+\end{verbatim}\end{quote}
+
+\section	{Testing of the ISODE}\label{isode:testing}
+The easiest way to test the ISODE system is to run
+the \file{isode-test} script in the directory \file{quipu/scripts/}
+under ISODE's \verb"ETCDIR" directory.
+\begin{quote}\small\begin{verbatim}
+% isode-test
+\end{verbatim}\end{quote}
+Prior to termination,
+the script will indicate the number of errors encountered.
+If an error occurs,
+try and determine what the problem is.
+If you are unable to find the problem,
+drop a note to the Internet Mailbox \verb"Bug-ISODE@NISC.PSI.NET".
+Your message should contain your two configuration files,
+the output of \file{isode-test},
+and a description of the hardware/software platform you are using.
+
+\section	{Configuration of DUAs}\label{dua:configure}
+The first step will be to have the \man dish(1c) program
+try to connect to one of the Level-0 DSAs in the pilot project:
+\begin{quote}\small\begin{verbatim}
+% dish -c "Alpaca"
+Welcome to Dish (DIrectory SHell)
+Dish ->
+\end{verbatim}\end{quote}
+indicates that you are able to connect.
+You might now try some simple commands.
+Figure~\ref{dish-simple} shows a small interaction.
+Chapter~4 of \volfive/ describes \pgm{dish} in considerable detail.
+\tagfigure[tp]{CNF-1}{A Small DISH Interaction}{dish-simple}
+
+\subsection	{DUA Failure}\label{dua:failure}
+There are a few reasons why the DUA might fail.
+First verify that the ISODE is operating correctly
+(see Section~\ref{isode:testing} on page~\pageref{isode:testing}.)
+If the ISODE is working,
+then here is the most common error encountered:
+
+If instead of the \verb"Dish ->" prompt,
+you see:
+\begin{quote}\small\begin{verbatim}
+*** Service error : Unable to contact DSA ***
+\end{verbatim}\end{quote}
+then it is likely that there is some problem with the network,
+or you have mistyped the name of the DSA.
+If you see any other diagnostic,
+contact a \camayoc/ for help.
+
+Otherwise,
+first check the spelling of the name you are providing.
+If this is correct,
+then look at the file \file{dsaptailor} in the ISODE \verb"ETCDIR" directory
+for the line which starts with:
+\begin{quote}\small\begin{verbatim}
+dsa_address "Alpaca"
+\end{verbatim}\end{quote}
+You will find an Internet address and TCP port number on the rest of
+the line.
+\begin{enumerate}
+\item	Use the \man ping(8c) utility to see if you can reach the IP address.
+
+\item	If not,
+	then try contacting one of the other DSAs,
+	e.g., \verb"Fruit Bat",
+	listed in the \file{dsaptailor} file.
+	
+	Repeat this process until \pgm{dish} successfully contacts a DSA.
+
+\item	If \pgm{ping} can reach the IP address,
+	then use \pgm{telnet} to try to connect to the TCP port.
+
+\item	If you can connect,
+	immediately close the connection.
+	Something is drastically wrong since \pgm{telnet} can reach the TCP
+	address of the DSA,
+	but \pgm{dish} can't.
+	Contact a \camayoc/ for assistance.
+
+\item	If \pgm{telnet} reports an error,
+	usually
+\begin{quote}\small\begin{verbatim}
+Connection refused
+\end{verbatim}\end{quote}
+	then this indicates that the DSA isn't listening at that TCP
+	address.
+	Either it is temporarily unavailable or it has moved to a new
+	address.
+	In either event,
+	notify a \camayoc/ of the situation.
+	Then go back to Step~2 above.
+\end{enumerate}
+If you exhaust all DSAs listed in the \file{dsaptailor} file,
+contact a \camayoc/ and give up.
+
+\section	{An Important Note}
+The configuration instructions contained herein are for sites in the United
+States.
+Depending on the policies of the administrators for other national DMDs,
+these instructions may, or may not, be useful. 
+If your DSA is joining a DMD other than that of c=US,
+then you should contact your national administrator to see what turn-key
+procedures exist for joining your national DMD.
+
+Note that the \man dsaconfig(8) program can be used to configure Level-1 DSAs
+residing outside of the c=US DMD.
+At present,
+the current list of supported countries is:
+\[\begin{tabular}{l}
+AU\\ DE\\ ES\\ FI\\ GB\\ IS\\ NO\\ SE
+\end{tabular}\]
+In most cases,
+for the countries listed above,
+you can simply follow the directions below substituting your country code for
+any occurrence of \verb"c=US".
+
+In all cases,
+for DSAs residing outside of the c=US DMD,
+you should always contact your national administrator before proceeding.
+
+\section	{Configuring your Level-1 DSA}
+The steps towards configuring a Level-1 DSA are straight-forward.
+For the text that follows,
+any example that includes \verb"O_i" means that the name of your organization
+should be substituted.
+Similarly,
+any occurrance of \verb"U_j" refers to the name of your organizational unit.
+
+\subsection	{Choosing a DSA Name}
+First, you must choose a name for your DSA.
+It is a QUIPU convention that DSAs should be named after endangered
+South American wildlife,
+and that the entry for the DSA should contain a description of the animal
+or plant in question.
+Table~\ref{endangered-wildlife},
+taken from \volfive/ of the ISODE User's Manual,
+contains a partial list of these species.
+You might also want to consult IUCN's {\em Red Book\/} \cite{IUCN.Mammal}.
+\tagtable[tp]{CNF-1}{Endangered South American Wildlife}{endangered-wildlife}
+
+For the purposes of the pilot project,
+the name of each Level-1 DSA takes the form:
+\begin{quote}\small\begin{verbatim}
+c=US@cn=wildlife name
+\end{verbatim}\end{quote}
+So, go to Table~\ref{endangered-wildlife} and pick an unused name.
+Alternately,
+find a name which sounds plausible enough to fool a \camayoc/.
+Prepend \verb"c=US@cn=",
+and this is the Distinguished name of your Level-1 DSA.
+
+To find out what names are already taken,
+do the following:
+\begin{quote}\small\begin{verbatim}
+% dish -c "Alpaca"
+Welcome to Dish (DIrectory SHell)
+Dish -> search @c=US -filter objectClass=dsa -nosizelimit
+\end{verbatim}\end{quote}
+This will print out the list of names already in use.
+
+Since some of the names in Table~\ref{endangered-wildlife} are long,
+it is acceptable to use only part of the wildlife name as the common name
+of your Level-1 DSA.
+For example,
+if the wildlife name is something like \verb"Southern Bearded Saki",
+then it's probably okay to use \verb"Saki" as the name of the DSA,
+e.g., \verb"c=US@cn=Saki".
+
+Now decide upon a ``sanitized'' name that will be used for the
+\unix/ directory which will contain the database for your Level-1 DSA.
+Using all lower case letters and substituting hyphens for spaces is a good
+rule.
+So, if the name of your DSA is \verb"c=US@cn=Spectacled Bear",
+then \file{spectacled-bear/} or just \file{bear/} would be fine.
+For the purpose of discussion,
+let's call this directory \file{wildlife/}.
+
+The owner of the directory should be some maintenance account
+(e.g., \verb"daemon") or \verb"root".
+When the DSA executes,
+it will set its user- and group-IDs based on the owner and group of this
+directory.
+
+\subsection	{Editing the DSA configuration file}
+Go to the directory \file{quipu/} under ISODE's \verb"ETCDIR" directory:
+\begin{quote}\small\begin{verbatim}
+# cd $(ETCDIR)quipu/
+\end{verbatim}\end{quote}
+Now copy the configuration tempate file, e.g.,
+\begin{quote}\small\begin{verbatim}
+# cp wildlife.dsa spectacled-bear.dsa
+# chmod 0600 spectacled-bear.dsa
+\end{verbatim}\end{quote}
+Now edit the new file to define the initial configuration for your Level-1
+DSA.
+Figure~\ref{dsaconfig} shows an example DSA configuration file.
+\tagfigure[tp]{CNF-2}{Example DSA configuration file}{dsaconfig}
+
+Please be sure to spell out the full name of your organization in the 
+configuration file,
+do not use an abbreviation (e.g., \verb"PSI").
+
+Note that when defining information such as \verb"streetaddress",
+\verb"telephone",
+and \verb"description", you should use the values for your organization,
+not for your own department.
+If you like,
+{\em after\/} your DSA is running,
+you can edit \file{c=US/o=O\_i/EDB} to insert the corresponding
+information for your own department.
+
+Note that if the name of your organization is long than 30 characters,
+then you will have to manually define a postal address in the configuration
+file for \pgm{dsaconfig}.
+The format is:
+\begin{quote}\small\begin{verbatim}
+postalAddress    "item1 $ item2 $ ... $ itemN"
+\end{verbatim}\end{quote}
+where each item is less-than or equal-to 30~characters in length and there are
+no more than six items.
+
+\subsection	{Running the DSA configuration program}
+Once the file is edited,
+run the DSA configuration program, \man dsaconfig(8):
+\begin{quote}\small\begin{verbatim}
+# $(SBINDIR)dsaconfig wildlife
+\end{verbatim}\end{quote}
+e.g.,
+\begin{quote}\small\begin{verbatim}
+# $(SBINDIR)dsaconfig spectacled-bear
+\end{verbatim}\end{quote}
+This will create the database directory and all requisite files.
+Finally,
+it will set the owner and group of the files appropriately.
+
+It is necessary to explain a little bit about what \pgm{dsaconfig} does.
+Way back in Section~\ref{edb:format} on page~\pageref{edb:format},
+the ``EDB format'' of the database was described.
+All that is now missing is an explanation how different nodes in the Directory
+tree are structured.
+This is done using the \unix/ directory hierarchy.
+
+Starting at the ROOT,
+at every level in the Directory tree for which your Level-1 DSA holds data,
+there is a single file called \file{EDB}.
+If an entry defined in an \file{EDB} file has children,
+the \file{EDB} file for the children will be found in a subdirectory
+whose name is the string encoded Relative Distinguished Name (RDN) of
+the entry.
+
+For example,
+if a \file{EDB} file has an entry whose RDN is \verb"o=Computer Science",
+and if the entry has children,
+and if your Level-1 DSA stores this information locally,
+then the information can be found in the file \file{o=Computer Science/EDB}
+relative to the current directory.
+Note that:
+\begin{itemize}
+\item	QUIPU is case sensitive when it looks for the subordinate \file{EDB}
+	file~---~the case of the attribute type
+	(e.g., \verb"o") is taken from the file \file{oidtable.at} in the
+	ISODE \verb"ETCDIR" directory, 
+	whilst the case of the attribute value is taken from the superior
+	\file{EDB} file;
+	and,	
+
+\item	blanks are {\em actually\/} present in the sub-directory name.%
+\footnote{An interesting example of the maxim {\em can implies shall\/}~---~because
+the Berkeley \unix/ file system {\em can\/} let us have long directory names
+with embedded spaces, we {\em shall\/} make use of that feature.}
+\end{itemize}
+Thus, for a Level-1 DSA, the initial database hierarchy looks like:
+\begin{quote}\begin{tabular}{l}
+\file{EDB}\\
+\file{c=US/EDB}\\
+\file{c=US/o=O\_i/EDB}\\
+\file{c=US/o=O\_i/ou=U\_j/EDB}\\
+\end{tabular}\end{quote}
+So,
+\pgm{dsaconfig} built these files for you.
+
+\subsection	{Testing the stand-alone DSA}
+The first thing to do is to start the DSA interactively so as to see
+that it can successfully load its local EDB files.
+So your Level-1 DSA is started thusly:
+\begin{quote}\small\begin{verbatim}
+# cd wildlife/
+# $(SBINDIR)ros.quipu -t ./quiputailor &
+\end{verbatim}\end{quote}
+If your DSA is configured properly,
+it will print out something like:
+\begin{quote}\smaller\begin{verbatim}
+DSA wildlife has started on '0101'H/Internet=130.117.128.3+17003
+\end{verbatim}\end{quote}
+
+\subsection	{DSA Failure}\label{dsa:failure}
+Instead,
+if the DSA prints out something like:
+\begin{quote}\smaller\begin{verbatim}
+FATAL ERROR: <<reason>>
+\end{verbatim}\end{quote}
+then something has gone wrong.
+
+There are a few reasons why the DSA might fail.
+First verify that the ISODE is operating correctly
+(see Section~\ref{isode:testing} on page~\pageref{isode:testing}.)
+Next, verify that the DUA is operating correctly
+(see Section~\ref{dua:configure} on page~\pageref{dua:configure}.)
+
+There are generally three causes of failure:
+\begin{itemize}
+\item	there is an attribute-related schema problem;
+
+\item	there is a structure-related schema problem;
+or,
+
+\item	something else is running at the OSI presentation address of the DSA.
+\end{itemize}
+Since you are using files which have been automatically generated,
+the first two errors are unlikely.
+However,
+they might occur due to spelling errors or catastrophic editing
+on your part.
+In order to diagnose the problem,
+you will need to look at the tail of the file \file{dsap.log} in the
+\file{wildlife/} directory.
+
+\subsubsection	{Attribute Errors}
+If you misspell the name of an attribute,
+then the diagnostic will look something like this:
+\begin{quote}\small\begin{verbatim}
+line 14: unknown attribute type '<<bad-name>>'
+File ...wildlife/c=US/o=O_i/EDB not loaded
+\end{verbatim}\end{quote}
+Alternately,
+if you specify an illegal attribute for an object
+(a violation of the object's schema),
+then the diagnostic will look something like this:
+\begin{quote}\small\begin{verbatim}
+attribute '<<illegal-name>>' not allowed in the specified objectclass
+Schema error in entry ending line 17...
+File ...wildlife/c=US/o=O_i/EDB not loaded
+\end{verbatim}\end{quote}
+Conversely,
+if you leave out an attribute which is required by an object:
+\begin{quote}\small\begin{verbatim}
+'Must' attribute missing '<<mandatory-name>>'
+Schema error in entry ending line 16...
+File ...wildlife/c=US/o=O_i/EDB not loaded
+\end{verbatim}\end{quote}
+
+\subsubsection	{Structure Errors}
+If a subordinate object belongs to a class which is not permitted by
+the schema of its immediate parent
+(as determined by the parent's \verb"treeStructure" attribute, if any),
+then the diagnostic looks something like this:
+\begin{quote}\small\begin{verbatim}
+Specified object class is not in the tree structure (schema) list
+Schema error in entry ending line 16...
+File ...wildlife/c=US/o=O_i/EDB not loaded
+\end{verbatim}\end{quote}
+Note that this means you have to look in the file \file{wildlife/c=US/EDB}
+to find the \verb"treeStructure" attribute of the parent entry
+and then compare that to the \verb"objectClass" attribute of the entry
+in error.
+
+\subsubsection	{Network Errors}
+If the local EDB files are consistent,
+but another process is already listening on the IP address and TCP
+port for the DSA,
+then your DSA will print:
+\begin{quote}\small\begin{verbatim}
+TNetListen: [Congestion at TSAP] start_tcp_server failed:
+        Address already in use
+Address: '0101'H/Internet=130.117.128.3+17003
+
+FATAL ERROR: Couldn't start the DSA!!
+\end{verbatim}\end{quote}
+Perhaps another copy of this DSA is already running
+or the TCP port in the entry for the DSA
+(found in the file \file{wildlife/c=US/EDB/})
+is wrong.
+It is also possible that an early invocation of the DSA was ungracefully
+terminated and left the TCP port in a \verb"FIN_WAIT_x" state.
+Use the \pgm{netstat} program to find out.
+If so,
+reboot \unix/.
+
+Alternately, you might see:
+\begin{quote}\small\begin{verbatim}
+TNetListen: [Congestion at TSAP] start_tcp_server failed:
+        Can't assign requested address
+Address: '0101'H/Internet=130.117.128.3+17003
+
+FATAL ERROR: Couldn't start the DSA!!
+\end{verbatim}\end{quote}
+This indicates that you mis-identified the IP address of your Level-1 DSA in
+your \pgm{dsaconfig} configuration file.
+
+\subsection	{Editing the DUA tailoring file}
+The file \file{dsaptailor} in the ISODE \verb"ETCDIR" directory contains
+run-time tailoring information for the DUAs provided by the pilot software.
+You will need to be the super-user to edit this file.
+
+You should now edit the \file{dsaptailor} file so that your DUAs
+will contact that DSA by default.
+This is done by looking for these two lines in the \file{dsaptailor} file:
+\begin{quote}\smaller\begin{verbatim}
+# the level-1 DSA
+#dsa_address "wildlife name"      '0101'H/Internet=aaa.bbb.ccc.ddd+port
+\end{verbatim}\end{quote}
+and then removing the \verb"`#'"-sign at the beginning of the second line.
+
+Next,
+you should also have your DUAs start, by default, in your portion of the
+Directory tree.
+This is done by looking for these two lines in the \file{dsaptailor} file:
+\begin{quote}\small\begin{verbatim}
+# local DIT position (where a DUA starts in the DIT)
+#local_DIT   "c=US@O_i"
+\end{verbatim}\end{quote}
+and then removing the \verb"`#'"-sign at the beginning of the second line.
+
+Section~12.2 of \volfive/ discusses the options available for run-time
+tailoring.
+Typically,
+you will have no need of further editing this file.
+
+Now run the \man dish(1c) program again,
+telling it to connect to your Level-1 DSA.
+\begin{quote}\small\begin{verbatim}
+% dish -c "wildlife name"
+Welcome to Dish (DIrectory SHell)
+Dish ->
+\end{verbatim}\end{quote}
+indicates that the DUA connected to your Level-1 DSA.
+Otherwise consult Section~\ref{dua:failure} on
+page~\pageref{dua:failure} and try to debug the problem.
+
+Now look around the Directory tree using \pgm{dish}:
+\begin{quote}\small\begin{verbatim}
+Dish -> list
+\end{verbatim}\end{quote}
+A good test to run is to try and bind to your own entry,
+but to do so by dereferencing the alias for the Manager of your DMD:
+\begin{quote}\small\begin{verbatim}
+Dish -> bind -user "@c=US@o=O_i@cn=Manager"
+Enter password for "@c=US@o=O_i@cn=Manager": 
+Dish -> 
+\end{verbatim}\end{quote}
+Indicates that you are now bound to the directory as that DN.
+Instead, if you see:
+\begin{quote}\small\begin{verbatim}
+Dish -> bind -user "@c=US@o=O_i@cn=Manager"
+Enter password for "@c=US@o=O_i@cn=Manager": 
+Security Error - check name and password
+\end{verbatim}\end{quote}
+then either you may have entered the DN or password wrong.
+Try again.
+If not,
+or if you encounter some other problem,
+contact a \camayoc/ for assistance.
+
+\subsection	{Joining the Pilot DMD}
+Once your DUA is configured to use your Level-1 DSA and your Level-1 DSA
+appears to be functioning properly in stand-alone mode,
+it is time for it to join the Pilot DMD.
+
+First,
+backup your EDB files:
+\begin{quote}\small\begin{verbatim}
+# cp EDB EDB.stand-alone
+# cp c=US/EDB c=US/EDB.stand-alone
+\end{verbatim}\end{quote}
+
+\subsubsection	{Contact the c=US Manager}
+Next,
+contact the Manager of the \verb"c=US" portion of the DMD.
+Use the \pgm{dish} program to get the necessary contact information, e.g.,
+\begin{quote}\small\begin{verbatim}
+% dish -c "Alpaca"
+Welcome to Dish (DIrectory SHell)
+Dish -> show @c=US@cn=Manager -fred
+\end{verbatim}\end{quote}
+If this fails,
+contact a \camayoc/ for assistance.
+Otherwise, e-mail the file \file{c=US/EDB} along with your phone number to the
+Manager and await a phone call or message in return.
+Leave your DSA running until you hear from the Manager.
+
+The Manager will enter these into the MASTER \verb"c=US" EDB and then
+try to connect to your DSA to test it out.
+The Manager will also give you a ``time slot'' when your \file{nightly.sh}
+script should run.
+(This is a feeble attempt to prevent multiple systems from
+mailing statistical information simultaneously each night.)
+
+If everything looks fine,
+the Manager will direct you to proceed.
+
+\subsubsection	{Connecting In and Checking Out}
+Restart your DSA and use \pgm{dish} to bind as the manager.
+Next,
+direct the DSA to update its slave EDBs:
+\begin{quote}\small\begin{verbatim}
+% dish -user "@c=US@o=O_i@cn=Manager" -simple
+Welcome to Dish (DIrectory SHell)
+Enter password for "@c=US@o=O_i@cn=Manager": 
+Dish -> dsacontrol -slave
+Scheduled
+Dish -> quit
+\end{verbatim}\end{quote}
+The \verb"Scheduled" message means that the EDB updates have been scheduled
+for execution.
+The DSA will actually perform these in the background,
+so it may be a few minutes (or longer, depending on DSA/network availability)
+before the EDBs are updated.
+
+To verify that your Level-1 DSA is updating its ROOT and \verb"c=US" EDB
+files,
+look for the files \file{EDB.bak} and \file{c=US/EDB.bak}
+in the \file{quipu/wildlife/} directory.
+If present,
+these indicate that your Level-1 DSA was able to successfully update the EDBs.
+If not,
+look at the \file{dsap.log} log file and contact a \camayoc/ for
+assistance.
+
+Finally,
+check that the global Directory tree knows about your DSA
+(the \verb"c=US" Manager verified this, but you should check anyway).
+Use the \pgm{dish} but connect to a Level-0 DSA:
+\begin{quote}\small\begin{verbatim}
+% dish -c "Alpaca"
+Welcome to Dish (DIrectory SHell)
+Dish -> moveto "@c=US@o=O_i"
+Dish -> list
+   ...
+Dish -> list "ou=U_j"
+   ...
+\end{verbatim}\end{quote}
+If this succeeds, the Level-0 DSAs know how to talk to your Level-1 DSA.
+
+The other Level-1 DSAs won't know about your organization and Level-1 DSA
+for another day or so.
+(The Manager of the \verb"c=US" may cause a few Level-1 DSAs to immediately
+reload the \verb"c=US" in order to facilitate things.)
+
+\subsubsection	{More System Administration}
+Once everything checks out,
+its time to restart the DSA in the background.
+First, edit the \file{quiputailor} file for your DSA by changing the
+line
+\begin{quote}\small\begin{verbatim}
+update  off
+\end{verbatim}\end{quote}
+to
+\begin{quote}\small\begin{verbatim}
+update  on
+\end{verbatim}\end{quote}
+This tells your DSA to automatically update its SLAVE EDB files on a regular
+basis.
+
+Next, use \pgm{dish} to abort the DSA:
+\begin{quote}\small\begin{verbatim}
+% dish -user "@c=US@o=O_i@cn=Manager" -simple
+Welcome to Dish (DIrectory SHell)
+Enter password for "@c=US@o=O_i@cn=Manager": 
+Dish -> dsacontrol -abort
+*** Problem with DSA ***
+Dish -> quit
+\end{verbatim}\end{quote}
+Now run the \file{startup.sh} script:
+\begin{quote}\small\begin{verbatim}
+% $(ETCDIR)quipu/wildlife/startup.sh
+\end{verbatim}\end{quote}
+Take a look at the log files it creates and once you're satisfied
+that it is operational,
+use \pgm{dish} one last time before considering things up and running.
+
+Finally,
+it's time for the last bit of system administration:
+\begin{enumerate}
+\item	Add an entry to the file \file{/etc/rc.local}:
+\begin{quote}\smaller\begin{verbatim}
+if [ -d $(ETCDIR)quipu/wildlife ]; then
+   $(ETCDIR)quipu/wildlife/startup.sh & \
+                                (echo -n ' wildlife') > /dev/console
+fi
+\end{verbatim}\end{quote}
+in the section where the network servers are started.
+If your \file{rc.local} file starts \man tsapd(8c),
+then place this entry after the one which starts \pgm{tsapd}.
+
+The next time your system reboots,
+check to make sure that your DSA started.
+On {\em some\/} systems running Sun's ``Yellow Pages'',
+it has been observed that YP prevents the \pgm{ros.quipu} from starting.
+No cause or cure is known for this.
+The problem just seems to ``go away'' after a while.
+
+\item	Based on the time that the \verb"c=US" manager gave you,
+modify the \file{crontab} file according; e.g.,
+\begin{quote}\small\begin{verbatim}
+0 4 * * * $(ETCDIR)quipu/wildlife/nightly.sh
+\end{verbatim}\end{quote}
+If the directory database for the Level-1 DSA is owned by a user-ID other
+than \verb"root" (e.g., \verb"daemon"),
+then instead the line should look something like this:
+\begin{quote}\smaller\begin{verbatim}
+0 4 * * * su daemon -c "/bin/sh $(ETCDIR)quipu/wildlife/nightly.sh"
+\end{verbatim}\end{quote}
+or perhaps
+this
+\begin{quote}\small\begin{verbatim}
+0 4 * * * su daemon -c "sh $(ETCDIR)quipu/wildlife/nightly.sh"
+\end{verbatim}\end{quote}
+Be sure that the ownership of the \file{nightly.sh} file matches that of the
+userid that will be running under cron.
+Verify that the user's shell, paths, and so on, are all correct as well.
+\end{enumerate}
+
+Congratulations!
+Your Level-1 DSA has now joined the pilot DMD.
+Further,
+the Manager of \verb"c=US" has elevated you to the role of
+junior \camayoc/ by adding your electronic mail address to the 
+\verb"wpp-camayocs" mailing list.
+Each \camayoc/ is expected to share experiences with others so as to
+expand and advance understanding of running a white pages service using the
+OSI Directory.
+
+\section	{Configuring the White Pages}
+The very last step you need do is to configure the white pages service which
+resides on top of the OSI Directory.
+
+You should now determine if a substantive portion of your user community does
+not have easy access to a machine running the pilot project software.
+If this is the case,
+then you will probably want to make the white pages service available via the
+network (either via the DA-service, or via TELNET, or by emulating WHOIS)
+or via electronic mail.
+
+\subsection	{White Pages via the DA-service}
+Choose a machine in your local environment which is running the pilot project
+software.
+This machine will offer the white pages service via the DA-service.
+
+On this machine,
+add an entry to the file \file{/etc/rc.local}
+\begin{quote}\smaller\begin{verbatim}
+if [ -f $(SBINDIR)dad ]; then
+   $(SBINDIR)dad & (echo -n ' da') > /dev/console
+fi
+\end{verbatim}\end{quote}
+in the section where the network servers are started.
+If your \file{rc.local} file starts a DSA,
+then place this entry after the one which starts the DSA.
+
+When this server starts,
+it will export the DA-service.
+
+If you want to enable picture support with the DA-service,
+you will also need to install the \pgm{pbmtofax} program.
+The sources to this program are in the directory \file{others/quipu/photo/}.
+You will need the PBMPLUS package to compile faxtopbm.
+See the \file{READ-ME} file in the \file{others/quipu/photo/} directory for
+further information.
+
+\subsubsection	{Fred-only hosts}
+After bringing up the software for both the Directory and the White Pages,
+you might wish to copy the executables to other machines,
+just to make \pgm{fred} available.
+To do this, you need the following files:
+\begin{itemize}
+\item	In the ISODE \verb"BINDIR" directory:
+\begin{quote}\begin{tabular}{l}
+\pgm{editentry}\\
+\pgm{fred}
+\end{tabular}\end{quote}
+
+\item	In the ISODE \verb"SBINDIR" directory:
+\begin{quote}\begin{tabular}{l}
+\file{fredrc}\\
+\file{isotailor}
+\end{tabular}\end{quote}
+Note that the \file{isotailor} file need not be present,
+depending on the dynamic changes to your system configuration.
+\end{itemize}
+Now simply add the line
+\begin{quote}\small\begin{verbatim}
+set server hostname
+\end{verbatim}\end{quote}
+to the \file{fredrc} file,
+where \verb"hostname" is the domain-name or IP-address of the machine running
+\pgm{dad}.
+The \pgm{fred} program will automatically connect to the server instead of
+trying to run \pgm{dish} locally.
+
+\subsection	{White Pages via TELNET}
+Choose a machine in your local environment which is running the pilot project
+software.
+This machine will offer the white pages service via TELNET.
+
+On this machine,
+add a line to the \file{/etc/passwd} file for a user called \verb"fred"
+\begin{quote}\smaller\begin{verbatim}
+fred::30:30:Anonyous White Pages User:/:$(SBINDIR)fredsh
+\end{verbatim}\end{quote}
+where group-id \verb"30" is the \verb"guest".
+
+\subsubsection	{Fred-only hosts}
+After bringing up the software for both the Directory and the White Pages,
+you might wish to copy the executables to other machines,
+just to make \pgm{fred} available.
+To do this, you need the following files:
+\begin{itemize}
+\item	In the ISODE \verb"BINDIR" directory:
+\begin{quote}\begin{tabular}{l}
+\pgm{dish}\\
+\pgm{editentry}\\
+\pgm{fred}
+\end{tabular}\end{quote}
+
+\item	In the ISODE \verb"SBINDIR" directory:
+\begin{quote}\begin{tabular}{l}
+\file{fredrc}\\
+\file{dsaptailor}\\
+\file{oidtable.*}\\
+\file{isobjects}\\
+\file{isologs}\\
+\file{isomacros}\\
+\file{isotailor}
+\end{tabular}\end{quote}
+Note that the \file{isotailor} file need not be present,
+depending on the dynamic changes to your system configuration.
+
+\item	In the ISODE \verb"SBINDIR" directory:
+\begin{quote}\begin{tabular}{l}
+\pgm{fredsh}\\
+\pgm{in.whitepages}
+\end{tabular}\end{quote}
+Note that you need \pgm{in.whitepages} only if you plan on using this host to
+offer the white pages via WHOIS emulation.
+\end{itemize}
+
+\subsection	{White Pages via WHOIS}\label{wp:whois}
+Choose a machine in your local environment which is running the pilot project
+software.
+This machine will offer the white pages service via a network port offering an
+emulation of the WHOIS service.
+
+On this machine,
+edit the file \file{/etc/services} so that it has an entry like this:
+\begin{quote}\small\begin{verbatim}
+whitepages 17005/tcp
+\end{verbatim}\end{quote}
+
+Next,
+edit the file \file{/etc/servers} so that it has an entry like this:
+\begin{quote}\small\begin{verbatim}
+whitepages tcp  $(SBINDIR)in.whitepages
+\end{verbatim}\end{quote}
+Because most user interfaces to WHOIS,
+e.g., \man whois(1c),
+do not allow the user to specify a special port,
+you should probably also add this line as well:
+\begin{quote}\small\begin{verbatim}
+whois   tcp     $(SBINDIR)in.whitepages
+\end{verbatim}\end{quote}
+If you already have a line for \verb"whois" in the \file{servers} file,
+then you are already running a WHOIS service,
+and you should {\bf not\/} add a second \verb"whois" line.
+This machine is not a good choice for running the white pages via WHOIS
+emulation.
+
+Note that on newer systems derived from Berkeley \unix/,
+\file{/etc/servers} is called \file{/etc/inetd.conf}.
+
+\subsubsection	{The whitepages Command}
+On those systems which are to access the white pages via the network and not
+locally
+(i.e., those systems which are not running the pilot project software),
+you should determine how a user invokes the WHOIS service via the network.
+For \unix/ systems,
+you should provide a shell script like this:
+\begin{quote}\small\begin{verbatim}
+: run this script through /bin/sh
+
+exec /usr/ucb/whois -h wp.psi.net "$*"
+\end{verbatim}\end{quote}
+where the name of a host running the pilot project software is substituted for
+\verb"whitepages", e.g., \verb"wp.psi.net".
+This host must have the files \file{/etc/services} and \file{/etc/servers}
+edited as described above.
+
+\subsection	{White Pages via mail}\label{wp:mail}
+In addition,
+you might want to make the whitepages available via electronic mail.
+To do this,
+choose a machine in your local environment which is running the pilot project
+software.
+
+On this machine,
+edit the file \file{/usr/lib/aliases} so that it has an entry like this:
+\begin{quote}\small\begin{verbatim}
+whitepages: "|/usr/local/bin/fred -m"
+\end{verbatim}\end{quote}
+After editing the \file{aliases} file,
+you will need to run the \pgm{newaliases} command as the super-user:
+\begin{quote}\small\begin{verbatim}
+# newaliases
+\end{verbatim}\end{quote}
+Also make sure that the \file{sendmail.cf} file lists \pgm{sh} and not
+\pgm{csh} as the \verb"prog" mailer.
+
+Once these changes are in place,
+Whenever someone sends to the address \verb"whitepages" on this machine,
+the subject line or body of the message will be interrogated for WHOIS-like
+commands and the appropriate reply generated.
+
+Note that on systems not running \man sendmail(8c),
+a similar procedure is followed.
+However,
+it's up to you to figure out how to define aliases that run commands on
+receipt of mail.
+
+You should tell the local PostMaster about the white pages service.
+In this fashion,
+when the PostMaster get queries from other sites,
+they can the sender of the message
+(and the Postmaster at the sender's site)
+about the service.
+
+\subsection	{An Undocumented Feature}
+In some environments,
+in which the IP-address of a host is reasonably trustworthy,
+it may be desirable to have an automatic means of mapping an IP-address into a
+Distinguished Name.
+\pgm{fred} provides such a mechanism under the following conditions:
+\begin{enumerate}
+\item	Create a file called \file{fredmap} in the ISODE \verb"ETCDIR"
+	directory.
+
+	The syntax of this file is a series of entries, one to a line.
+	Each line contains:
+    \begin{itemize}
+    \item	a IP-address mask
+		(in the familiar ``dot'' notation, e.g., \verb"255.255.255.0");
+
+    \item	a IP-network address
+		(in the familiar ``dot'' notation, e.g., \verb"192.52.180");
+
+    \item	a Distinguished Name
+		(e.g., \verb|"c=US@o=DMD@cn=anon"|);
+		and,
+
+    \item	the password to use when binding to that DN
+		(e.g, \verb|"secret"|).
+    \end{itemize}
+Blanks and/or tab characters are used to separate items.
+However, double-quotes may be used to prevent separation for items containing
+embedded whitspace.
+The sharp character (`\verb"#"') at the beginning of a line indicates a
+commentary line.
+
+This file should be mode \verb"0640", owned by user \verb"root" and
+some previously unused group, e.g., \verb"wp".
+
+\item	After installing \pgm{fred} with the
+\begin{quote}\small\begin{verbatim}
+# (cd others/quipu; ./make inst-pilot)
+\end{verbatim}\end{quote}
+command
+(this was done way back in Section~\ref{isode:install} on
+page~\pageref{isode:install}),
+make the group of the binary the same as the \file{fredmap} file,
+and change the mode to \verb"02755".
+
+\item	When a local user invokes \pgm{fred}
+\pgm{fred} looks-up the local IP-address,
+reads the \file{fredmap} file looking for the first entry satisfying:
+$$\mbox{(local IP-address)} \land \mbox{(IP-address mask)}\ \equiv\ 
+\mbox{(IP-network address)}$$
+Upon finding such an entry,
+\pgm{fred} will bind to the Directory using the DN and password for that entry.
+
+\item	When \pgm{fred} is accessed via the network
+(e.g., with the \verb"in.whitepages" mechanism described in
+Section~\ref{wp:whois} on page~\pageref{wp:whois}),
+\pgm{fred} will automatically read the \file{fredmap} file,
+looking for the first entry satisfying:
+$$\mbox{(remote IP-address)} \land \mbox{(IP-address mask)}\ \equiv\ 
+\mbox{(IP-network address)}$$
+Upon finding such an entry,
+\pgm{fred} will bind to the Directory using the DN and password for that entry.
+\end{enumerate}
+Of course,
+the ordering of entries in the \file{fredmap} file is important!
+It is suggested that the file begin with host-specific entries
+(those with an IP-address mask of \verb"255.255.255.255"),
+and then entries follow in decreasing order by the number of bits on in the
+IP-address mask.
+
+Although use of a ``default'' entry,
+one which will match any IP-address,
+is strongly discouraged,
+it is possible to define such an entry.
+This should be the very last entry in the \file{fredmap} file.
+The format of this entry is simply:
+\begin{quote}\small\begin{verbatim}
+0.0.0.0 0.0.0.0    "some DN"    "some password"
+\end{verbatim}\end{quote}
+
+It should be noted that this scheme provides a convenient mechanism for
+allowing ``local'' users to automatically be authorized as specific entries in
+the local DMD.
+By doing so,
+this eases the administrative burden of assigning passwords to users in an
+environment which contains read-only but, nonetheless, sensistive information.
+The information is protected via access control,
+e.g.,
+\begin{quote}\smaller\begin{verbatim}
+acl= prefix # c=US@o=DMD # read # attributes # <attribute-list>
+acl= self # write # attributes # <attribute-list>
+acl= others # none # attributes # <attribute-list>
+\end{verbatim}\end{quote}
+Note that for a writeable environment,
+whilst the access control scheme is still used,
+this simplification of locally anonymous DNs usually can not be made.
+
+Note that under the current QUIPU access scheme,
+the access control list above will prevent any user,
+regardless of the DN they are bound as (including local users),
+from searching on the values of the attributes named in
+\verb"<attribute-list>".
+As such, a less restrictive set of rules might be:
+\begin{quote}\smaller\begin{verbatim}
+acl= prefix # c=US@o=DMD # read # attributes # <attribute-list>
+acl= self # write # attributes # <attribute-list>
+acl= others # compare # attributes # <attribute-list>
+\end{verbatim}\end{quote}
+which will enable searching for all users.
+However,
+it will also allow any user to compare specific values against the attributes
+named in \verb"<attribute-list>".
+
+Of course,
+this simplification is severely limited in that it works only for
+IP-addresses, and further assumes that such addresses are trustworthy.
+The trustworthiness depends entire upon the network environment in which
+\pgm{fred} runs.
+For example,
+since IP-addresses can be readily forged,
+one might rely on routers on the edge of the local environment to simply drop
+IP datagrams with local source IP-addresses that originate from the outside
+world.
+In this case,
+entries in the \file{fredmap} file containing local IP-addresses can be
+thought to be ``reasonably'' secure against outside attack.
+Of course,
+nothing prevents a local host from forging a local IP-address.
+If the trust policy is simply to distinguish between local and non-local
+users,
+then the \file{fredmap} mechanism is adequite.
+
+Given all of these concerns,
+this ``undocumented feature'' is a useful, albeit non-OSI, local mechanism.
+
+\section	{Other Services}
+There are some additional programs that you might wish to install for your
+user community.
+
+\subsection	{Faces}
+When \pgm{fred} and \pgm{dish} display the entry for someone,
+they check to see if there is a photograph associated with the user.
+This is stored in facsimile format in the \verb"photo" attribute for the entry.
+If a photograph is present,
+then the \file{dsaptailor} file is consulted for directives
+indicating how the picture should be displayed.
+The most common entry is:
+\begin{quote}\small\begin{verbatim}
+photo    xterm Xphoto
+\end{verbatim}\end{quote}
+which says that if the user's terminal type is \verb"xterm" then the program
+\pgm{Xphoto} should be run.
+
+Although there are many different programs that can be used to display a
+photograph,
+only the \pgm{Xphoto} is supported by the sponsors of the pilot.
+
+\subsubsection	{Xphoto}
+To generate the \pgm{Xphoto} program,
+run the following command:
+\begin{quote}\small\begin{verbatim}
+% (cd others/quipu/photo; ./make all Xphoto)
+\end{verbatim}\end{quote}
+To install the program,
+become the super-user and do:
+\begin{quote}\small\begin{verbatim}
+# (cd others/quipu/photo; ./make inst-all)
+\end{verbatim}\end{quote}
+Next,
+add this line at the end of the \file{dsaptailor} file:
+\begin{quote}\small\begin{verbatim}
+photo    xterm Xphoto
+\end{verbatim}\end{quote}
+
+\subsubsection	{xwho and xface}
+There are two other programs which consult the Directory for people's faces.
+These are \pgm{xwho}, who for X windows;
+and,
+\pgm{xface}, face agent for X windows.
+
+To generate these programs,
+first generate \pgm{Xphoto} as described above.
+next:
+\begin{quote}\small\begin{verbatim}
+% (cd others/image; ./make all)
+\end{verbatim}\end{quote}
+To install the program,
+become the super-user and do:
+\begin{quote}\small\begin{verbatim}
+# (cd others/image; ./make inst-all)
+\end{verbatim}\end{quote}
+
+The \pgm{xwho} program is free-standing,
+but requires that the local system run the \man rwhod(8c) daemon.
+
+The \pgm{xface} program runs, for each user, in the background.
+When a mail reading program displays a message,
+it sends a wake-up call to \pgm{xface} which must then try to find the picture
+associated with the sender of the message.
+
+At present,
+only one mail reading system has been modified to communicate with
+\pgm{xface},
+the \MH/ system.
+The file \file{others/image/mhlsbr.c} is a replacement for the
+\file{uip/mhlsbr.c} in the \MH/ distribution.
+Once \MH/ has been modified,
+the manual entry for \man xface(1c) describes how the user tells \MH/ to
+display faces.
+
+Finally,
+the file \pgm{others/image/READ-ME} describes how images may be collected and
+placed in the Directory.
+
+\subsection	{Mail Composition}
+In addition to using the Directory when messages are being displayed, 
+the White Pages may also be consulted when a message is being composed.
+
+At present,
+only one mail composition system has been modified to use the White Pages,
+the \MH/ system.
+
+The file \file{others/quipu/uips/fred/mh-patches} contains a patch set to \MH/
+to use this facility along with instructions for apply the patch set.
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	These are very different from the patches supplied earlier
+		in the file \file{MH-patches}.
+		You should revert your \MH/ sources back to their
+		original condition and then apply the new patches.
+\end{tabular}}\]
+
+Once installed,
+users can specify a name by bracketing a White Pages query between
+``\verb"<<"'' and ``\verb">>"'' using the user-friendly naming syntax,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+To: << rose, psi, us >>
+\end{verbatim}\end{quote}
+At the \whatnow/ prompt,
+the user can say \verb"whom" to have the names expanded into addresses.
+Alternately, the \verb"send" option can be used as well.
+For each query appearing between ``\verb"<<"'' and ``\verb">>"'',
+the DA-server will be asked to perform a White Pages resolution.
+All matches are printed and the user is asked to select one.
+If one is not selected,
+the user returns to \whatnow/ level.
+
+Note that expansion can occur only if \verb"whom" or \verb"send" is invoked
+interactively. 
+If the \verb"push" option is used instead,
+then the expansion will fail because MH will be unable to query 
+the user to select/confirm the right entry to use for the substitution.
+
+Finally,
+to enable this feature,
+the user must add a line
+\begin{quote}\small\begin{verbatim}
+da-server: hostname
+\end{verbatim}\end{quote}
+to the \profile/,
+where \verb"hostname" is the domain-name or IP-address of the machine running
+\pgm{dad}.
+
+\section	{Tell The Users!}
+OK, everything is installed and running,
+so it's time for you to tell your users about the system!
+Print out copies of \thebook/ and the accompanying
+{\em White Pages Quick Reference Sheet},
+and start distributing them.
+Also, encourage your users to subscribe to the 
+\begin{quote}\begin{verbatim}
+wpp-users@psi.com
+\end{verbatim}\end{quote}
+discussion group.
+This is done by sending a message to the
+\begin{quote}\begin{verbatim}
+wpp-users-request@psi.com
+\end{verbatim}\end{quote}
+mailbox and asking to be added.
+
+\subsection	{More New and Exciting Stuff}
+New and exciting white pages applications are written from time to time.
+You should contact \verb"wpp-manager" to see if there's something fun that you
+can try out.

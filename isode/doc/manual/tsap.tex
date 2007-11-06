@@ -1,0 +1,1544 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Transport Services}\label{libtsap}
+At the heart of this distribution is the \man libtsap(3n) library.
+This library contains a set of routines which implement the
+transport services access point (TSAP).
+
+As with most models of OSI services,
+the underlying assumption is one of a symmetric, asynchronous environment.
+That is,
+although peers exist at a given layer, one does not necessarily view a peer as
+either a client or a server.
+Further,
+the service provider may generate events for the service user without the
+latter entity triggering the actions which led to the event.
+For example,
+in a synchronous environment,
+an indication that data has arrived usually occurs only when the service user
+asks the service provider to read data;
+in an asynchronous environment,
+the service provider may interrupt the service user at any time to announce
+the arrival of data.
+
+The \verb"tsap" module in this release initially uses a client/server
+paradigm to start communications.
+Once the connection is established,
+a symmetric view is taken.
+In addition,
+initially the interface is synchronous;
+however once the connection is established,
+an asynchronous interface may be selected.
+
+All of the routines in the \man libtsap(3n) library are integer-valued.
+They return the manifest constant \verb"OK" on success,
+or \verb"NOTOK" otherwise.
+
+\section	{Addresses}\label{tsap:addresses}
+Addresses at the transport service access point are represented by the
+\verb"TSAPaddr" structure.
+\begin{quote}\index{TSAPaddr}\small\begin{verbatim}
+struct TSAPaddr {
+#define NTADDR  4
+    struct NSAPaddr ta_addrs[NTADDR];
+    int    ta_naddr;
+
+#define TSSIZE  64
+    int    ta_selectlen;
+    char   ta_selector[TSSIZE];
+};
+#define NULLTA  ((struct TSAPaddr *) 0)
+\end{verbatim}\end{quote}
+This structure contains two elements:
+\begin{describe}
+\item[\verb"ta\_addrs"/\verb"ta\_nadr":] a list of network addresses,
+as described in the Section~\ref{nsap:addresses} on
+page~\pageref{nsap:addresses};
+
+\item[\verb"ta\_selector"/\verb"ta\_selectlen":] the transport selector.
+\end{describe}
+
+In Figure~\ref{getSSprovider},
+an example of how one constructs the TSAP address for the session provider on
+host \verb"RemoteHost" is presented.
+The routine \verb"is2taddr" takes a host and service,
+and then consults the \man isoentities(5) file described in
+Chapter~\ref{isoentities} of \volone/ to construct a transport
+address.
+\begin{quote}\index{is2taddr}\small\begin{verbatim}
+struct TSAPaddr *is2taddr (host, service, is)
+char   *host,
+       *service;
+struct isoservent *is;
+\end{verbatim}\end{quote}
+\tagrind[tp]{grind6-1}{Constructing the TSAP address for the Session provider}%
+	{getSSprovider}
+
+\subsection	{Calling Address}
+Certain users of the transport service
+might need to know the name of the local host when they initiate a connection.
+The routine \verb"TLocalHostName" has been provided for this reason.
+\begin{quote}\index{TLocalHostName}\small\begin{verbatim}
+char   *TLocalHostName ()
+\end{verbatim}\end{quote}
+
+\subsection	{Address Encodings}
+It may be useful to encode a transport address for viewing.
+Although a consensus for a standard way of doing this has not yet been
+reached,
+the routines \verb"taddr2str" and \verb"str2taddr" may be used in the interim.
+\begin{quote}\index{taddr2str}\small\begin{verbatim}
+char   *taddr2str (ta)
+struct TSAPaddr *ta;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"ta":] the transport address.
+\end{describe}
+If \verb"taddr2str" fails,
+it returns the manifest constant \verb"NULLCP".
+
+The routine \verb"str2taddr" takes an ascii string encoding and
+returns a
+transport address.
+\begin{quote}\index{str2taddr}\small\begin{verbatim}
+struct TSAPaddr *str2taddr (str)
+char   *str;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"str":] the ascii string.
+\end{describe}
+If \verb"str2taddr" fails,
+it returns the manifest constant \verb"NULLTA".
+
+Once a connection has been established,
+the routine \verb"TGetAddresses" may be called to retrieve to the associated
+addresses.
+(Normally this information is presented to the application during connection
+establishment.)
+\begin{quote}\index{TGetAddresses}\small\begin{verbatim}
+struct TSAPaddr *TGetAddresses (sd, initiating,
+        responding, td)
+int     sd;
+struct TSAPaddr *initiating,
+                *responding;
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+
+\item[\verb"initiating":] the TSAP address of the initiator (to be filled-in);
+
+\item[\verb"responding":] the TSAP address of the responder (to be filled-in);
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call is successful,
+the \verb"initiating" and \verb"responding" parameters will be updated
+accordingly.
+Otherwise,
+the parameter \verb"td" contains the reason for the failure.
+
+\section	{Connection Establishment}
+Until the connection has been fully established,
+the implementation distinguishes between clients and servers,
+which are more properly referred to as {\em initiators\/} and
+{\em responders}, to use the OSI terminology.
+
+\subsection	{Connection Negotiation}
+From the user's perspective,
+there are two parameters which are negotiated by the transport providers
+during connection establishment:
+{\em expedited data transfer},
+and the {\em maximum size\/} of transport service data units.
+
+\subsubsection	{Expedited Data}
+If the transfer of expedited data is negotiated,
+then small amounts of data may be sent out-of-band once the connection has
+been established.
+The size of the largest discrete unit to be sent is \verb"TX_SIZE"
+(which is non-negotiable).
+This parameter is negotiated downward;
+that is, both the initiator and responder must agree to the use of expedited
+data.
+
+\subsubsection	{Maximum TSDU Size}
+The transport provider will accept arbitrarily large transport service data
+units (TSDUs) and transparently fragment and re-assemble them during transit.
+Hence, the actual TSDU is of unlimited size.
+However, for efficiency reasons,
+it may be desirable for the user to send TSDUs which are no larger than a
+certain threshold.
+When a connection has been established,
+the service providers inform the initiator and responder as to what this
+threshold is.
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}\label{TSDU:atomic}
+\bf NOTE:&	In the current implementation,
+		TSDUs which are no larger than the maximum atomic TSDU size
+		are handled very efficiently.
+		For optimal performance,
+		users of the transport service should strive to avoid sending
+		TSDUs which are larger than this threshold.
+\end{tabular}}\]
+
+\subsection	{Server Initialization}
+The \man tsapd(8c) daemon,
+upon accepting a connection from an initiating host,
+consults the ISO services database to determine which program
+on the system implements the desired TSAP entity.
+For efficiency reasons,
+the \pgm{tsapd} program contains the bootstrap for several providers 
+(e.g., session).
+
+Once the program has been ascertained,
+the daemon runs the program with any arguments listed in the database.
+In addition, it appends some {\em magic arguments\/} to the argument vector.
+Hence, the very first action performed by the responder is to re-capture the
+TSAP state contained in these magic arguments.
+This is done by calling the routine \verb"TInit",
+which on a successful return,
+is equivalent to a {\sf T-CONNECT.INDICATION\/} event from the transport
+service provider.
+\begin{quote}\index{TInit}\small\begin{verbatim}
+int     TInit (vecp, vec, ts, td)
+int     vecp;
+char  **vec;
+struct TSAPstart *ts;
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"vecp":] the length of the argument vector;
+
+\item[\verb"vec":] the argument vector;
+
+\item[\verb"ts":] a pointer to a \verb"TSAPstart" structure, which is updated
+only if the call succeeds;
+and,
+
+\item[\verb"td":] a pointer to a  \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+If \verb"TInit" is successful,
+it returns information in the \verb"ts" parameter,
+which is a pointer to a \verb"TSAPstart" structure.
+\begin{quote}\index{TSAPstart}\small\begin{verbatim}
+struct TSAPstart {
+    int     ts_sd;
+
+    struct TSAPaddr ts_calling;
+    struct TSAPaddr ts_called;
+
+    int     ts_expedited;
+
+    int     ts_tsdusize;
+
+    struct QOStype ts_qos;
+
+#define TS_SIZE         32
+    int     ts_cc;
+    char    ts_data[TS_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}\label{TSAPstart}
+\item[\verb"ts\_sd":] the transport-descriptor to be used to reference this
+connection;
+
+\item[\verb"ts\_calling":] the address of peer initiating the connection;
+
+\item[\verb"ts\_called":] the address of the peer being asked to respond;
+
+\item[\verb"ts\_expedited":]	whether initiator requests the use of expedited
+	data;
+
+\item[\verb"ts\_tsdusize":]	the largest atomic TSDU size that can be used
+on the connection (see the note on page~\pageref{TSDU:atomic});
+
+\item[\verb"ts\_qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos});
+and,
+
+\item[\verb"ts\_data"/\verb"ts\_cc":] any initial data
+(and the length of that data).
+\end{describe}
+
+If the call to \verb"TInit" is not successful,
+then the user is informed that a {\sf T-DISCONNECT.INDICATION\/} event has
+occurred,
+and the relevant information is returned in a \verb"TSAPdisconnect" structure.
+\begin{quote}\index{TSAPdisconnect}\small\begin{verbatim}
+struct TSAPdisconnect {
+    int     td_reason;
+
+#define TD_SIZE         64
+    int     td_cc;
+    char    td_data[TD_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:\label{TSAPdisconnect}
+\begin{describe}
+\item[\verb"td\_reason":] reason for disconnect
+(codes are listed in Table~\ref{TSAPreasons});
+and,
+
+\item[\verb"td\_data"/\verb"td\_cc":] any disconnect data
+(and the length of that data) from the peer.
+\end{describe}
+\tagtable[tp]{6-1}{TSAP Failure Codes}{TSAPreasons}
+
+After examining the information returned by \verb"TInit" on a successful call
+(and possibly after examining the argument vector),
+the responder should either accept or reject the connection.
+If accepting, the \verb"TConnResponse" routine is called
+(which corresponds to the {\sf T-CONNECT.RESPONSE\/} action).
+\begin{quote}\index{TConnResponse}\small\begin{verbatim}
+int     TConnResponse (sd, responding, expedited, data, cc,
+                       qos, td)
+int     sd;
+struct TSAPaddr *responding;
+int     expedited,
+        cc;
+char   *data;
+struct QOStype *qos;
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+
+\item[\verb"responding":] the TSAP address of the responder
+(defaulting to the called address, if not present);
+
+\item[\verb"expedited":] whether expedited data is to be permitted
+(this value must be \verb"0" unless the {\sf T-CONNECT.INDICATION\/} event
+indicated a willingness on the part of the initiator to support expedited
+data transfer);
+
+\item[\verb"data"/\verb"cc":] any initial data
+(and the length of that data,
+which may not exceed \verb"TC_SIZE" octets);
+
+\item[\verb"qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos});
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"TConnResponse" is successful,
+then connection establishment has completed
+and the users of the transport service now operate as symmetric peers.
+Otherwise, if the call fails and the reason is not an interface error
+(see Table~\ref{TSAPreasons} on page~\pageref{TSAPreasons}),
+then the connection is closed.
+
+If instead, the responder wishes to reject the connection,
+it should fire the {\sf T-DISCONNECT.REQUEST\/} action by calling the
+\verb"TDiscRequest" routine.
+\begin{quote}\index{TDiscRequest}\small\begin{verbatim}
+int     TDiscRequest (sd, data, cc, td)
+int     sd;
+char   *data;
+int     cc;
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}\label{TDiscRequest}
+\item[\verb"sd":] the transport-descriptor;
+
+\item[\verb"data"/\verb"cc":] any disconnect data
+(and the length of that data, which may not exceed \verb"TD_SIZE" octets);
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+After a return from this call, the responder may exit.
+
+\subsection	{Client Initialization}
+A program wishing to connect to another user of transport services calls the
+\verb"TConnRequest" routine,
+which corresponds to the {\sf T-CONNECT.REQUEST\/} action.
+\begin{quote}\index{TConnRequest}\small\begin{verbatim}
+int     TConnRequest (calling, called, expedited, data, cc,
+                qos, tc, td)
+struct TSAPaddr *calling,
+                *called;
+int     expedited,
+        cc;
+char   *data;
+struct QOStype *qos;
+struct TSAPconnect *tc;
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"calling":] the TSAP address of the initiator;
+(need not be present);
+
+\item[\verb"called":] the TSAP address of the responder;
+
+\item[\verb"expedited":] whether expedited data is to be permitted;
+
+\item[\verb"data"/\verb"cc":] any initial data
+(and the length of that data, which may not exceed \verb"TS_SIZE" octets);
+
+\item[\verb"qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos});
+
+\item[\verb"tc":] a pointer to a \verb"TSAPconnect" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"TConnRequest" is successful
+(a successful return corresponds to a {\sf T-CONNECT.CONFIRMATION} event),
+then information is returned in the \verb"tc" parameter,
+which is a pointer to a \verb"TSAPconnect" structure.
+\begin{quote}\index{TSAPconnect}\small\begin{verbatim}
+struct TSAPconnect {
+    int     tc_sd;
+
+    struct TSAPaddr tc_responding;
+
+    int     tc_expedited;
+
+    int     tc_tsdusize;
+
+    struct QOStype tc_qos;
+
+#define TC_SIZE         32
+    int     tc_cc;
+    char    tc_data[TC_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"tc\_sd":] the transport-descriptor to be used to reference this
+connection;
+
+\item[\verb"tc\_responding":]	the responding peer's address
+(which is the same as the \verb"called" address given as a parameter to
+\verb"TConnRequest");
+
+\item[\verb"tc\_expedited":]	whether expedited data will be supported;
+
+\item[\verb"tc\_tsdusize":]	the largest atomic TSDU size that can be used
+on the connection (see the note on page~\pageref{TSDU:atomic});
+
+\item[\verb"tc\_qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos});
+and,
+
+\item[\verb"tc\_data"/\verb"tc\_cc":] any initial data
+(and the length of that data).
+\end{describe}
+If the call to \verb"TConnRequest" is successful,
+then connection establishment has completed
+and the users of the transport service now operate as symmetric peers.
+Otherwise, if the call fails then the connection is not established,
+and the \verb"TSAPdisconnect" structure has been updated.
+
+\subsubsection	{Asynchronous Connections}\label{tsap:async}
+Normally \verb"TConnRequest" returns only after a connection has succeeded or
+failed.
+This is termed a {\em synchronous\/} connection initiation.
+If the user desires, an {\em asynchronous\/} connection may be initiated.
+The routine \verb"TConnRequest" is really a macro which calls the routine
+\verb"TAsynConnRequest" with an argument indicating that a connection should
+be attempted synchronously.
+\begin{quote}\index{TAsynConnRequest}\small\begin{verbatim}
+int     TAsynConnRequest (calling, called, expedited,
+                data, cc, qos, tc, td, async)
+struct TSAPaddr *calling,
+                *called;
+int     expedited,
+        cc,
+        async;
+char   *data;
+struct QOStype *qos;
+struct TSAPconnect *tc;
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+The additional parameter to this procedure is:
+\begin{describe}
+\item[\verb"async":] whether the connection should be initiated asynchronously.
+\end{describe}
+If the \verb"async" parameter is non-zero,
+then \verb"TAsynConnRequest" returns one of four values:
+\verb"NOTOK", which indicates that the connection request failed;
+\verb"DONE", which indicates that the connection request succeeded;
+or, either of \verb"CONNECTING_1" or \verb"CONNECTING_2", which indicates that
+the connection request is still in
+progress.
+In the first two cases,
+the usual procedures for handling return values from \verb"TConnRequest" are
+employed
+(i.e., a \verb"NOTOK" return from \verb"TAsynConnRequest" is equivalent to a
+\verb"NOTOK" return from \verb"TConnRequest", and,
+a \verb"DONE" return from \verb"TAsynConnRequest" is equivalent to a
+\verb"OK" return from \verb"TConnRequest").
+In the final case, when either \verb"CONNECTING_1" or
+\verb"CONNECTING_2" is returned,
+only the \verb"tc_sd" element of the \verb"tc" parameter has been updated;
+it reflects the transport-descriptor to be used to reference this connection.
+Note that the \verb"data" parameter is still being referenced by
+\man libtsap(3n) and should not be tampered with until the connection attempt
+has been completed.
+
+To determine when the connection attempt has been completed,
+the routine \verb"xselect" (consult Section~\ref{acs:select} of \volone/)
+should be used after calling \verb"TSelectMask".
+In order to determine if the connection attempt was successful,
+the routine \verb"TAsynRetryRequest" is called:
+\begin{quote}\index{TAsynRetryRequest}\small\begin{verbatim}
+int     TAsynRetryRequest (sd, tc, td)
+int     sd;
+struct TSAPconnect *tc;
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+
+\item[\verb"tc":] a pointer to a \verb"TSAPconnect" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+Again, one of four values are returned:
+\verb"NOTOK", which indicates that the connection request failed;
+\verb"DONE", which indicates that the connection request succeeded;
+or, either of \verb"CONNECTING_1" or \verb"CONNECTING_2" which indicates that
+the connection request is still in progress.
+
+In order to make efficient use of the asychronous connection facility,
+it is necessary to understand a bit of its underlying mechanisms.
+From a temporal perspective,
+connection establishment consists of two parts:
+\begin{enumerate}
+\item	establishing a reliable end-to-end connection;
+	and,
+
+\item	exchanging connection establishment information.
+\end{enumerate}
+In some cases,
+the underlying transport mechanisms accomplish both simultaneously
+(when the end-to-end connection is built,
+connection establishment information is also exchanged).
+
+Thus, in order to to perform asynchronous connections effectively,
+use of \verb"TAsynConnRequest" and \verb"TAsynRetry" should reflect this
+two-step process:
+\begin{enumerate}
+\item	Call \verb"TAsynConnRequest" with the \verb"async" parameter taking the
+	value~1.
+	If the return value was either \verb"NOTOK"
+	(the connection was not established),
+	or \verb"DONE" (the connection was established),
+	then terminate this algorithm.
+
+	Otherwise, a return value of \verb"CONNECTING_1" or
+	\verb"CONNECTING_2" indicates that connection
+	establishment process has begun. Remember this value.
+
+\item	At some point in the future,
+	call \verb"TSelectMask" to get an argument for \verb"xselect".
+	Then call \verb"xselect" checking to see if writing is
+	permitted.  Then call \verb"xselect" checking for writing if
+	the remembered value was \verb"CONNECTING_1" and for reading
+	if it was \verb"CONNECTING_2".  If either call returns
+	\verb"NOTOK", then a catastrophic error has occurred.
+
+	Repeat this step as often as necessary until \verb"xselect" says that
+	reading or writing as required is permitted.
+
+\item	Call \verb"TAsynRetry".
+	If the return value was either \verb"NOTOK" (the connection
+	was not established), or \verb"DONE" (the connection was
+	established), then terminate this algorithm.
+
+	Otherwise, a return value of \verb"CONNECTING_1" or
+	\verb"CONNECTING_2" indicates that connection establishment is
+	{\em still\/} in progress. Remember this value and go back to
+	the previous step.
+
+\end{enumerate}
+Although this seems complicated,
+implementation of these rules is actually straight-forward.
+In most cases,
+your code will do some work unrelated to the connection
+
+Note that this procedure is equally applicable to the higher-layers
+(session, presentation, and association control) which also provide
+asynchronous connection facilities.
+For example,
+at the application layer,
+the routines \verb"AcAsynAssocRequest" and \verb"AcAsynRetryRequest" would be
+used.
+
+\section	{Data Transfer}
+Once the connection has been established,
+a transport-descriptor is used to reference the connection.
+This is usually the first parameter given to any of the remaining routines in
+the \man libtsap(3n) library.
+Further,
+the last parameter is usually a pointer to a \verb"TSAPdisconnect" structure
+(as described on page~\pageref{TSAPdisconnect}).
+If a call to one of these routines fails,
+then the structure is updated.
+Otherwise, if the value of the \verb"td_reason" element is associated with a
+fatal error, then the connection is closed.
+That is, a {\sf T-DISCONNECT.INDICATION\/} event has occurred.
+The \verb"DR_FATAL" macro can be used to determine this.
+\begin{quote}\index{DR\_FATAL}\small\begin{verbatim}
+int     DR_FATAL (r)
+int     r;
+\end{verbatim}\end{quote}
+For protocol purists,
+the \verb"DR_OFFICIAL" macro can be used to determine if the error is an
+``official'' error as defined by the specification,
+or an ``unofficial'' error used by the implementation.
+\begin{quote}\index{DR\_OFFICIAL}\small\begin{verbatim}
+int     DR_OFFICIAL (r)
+int     r;
+\end{verbatim}\end{quote}
+
+\subsection	{Sending Data}
+There are three routines that may be used to send data.
+A call to the \verb"TDataRequest" routine is equivalent to a
+{\sf T-DATA.REQUEST\/} action on the part of the user.
+\begin{quote}\index{TDataRequest}\small\begin{verbatim}
+int     TDataRequest (sd, data, cc, td)
+int     sd;
+char   *data;
+int     cc;
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+
+\item[\verb"data"/\verb"cc":] the data to be written
+(and the length of that data);
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"TDataRequest" is successful,
+then the data has been queued for sending.
+Otherwise,
+the \verb"td" parameter indicates the reason for failure.
+
+The \verb"TWriteRequest" routine is similar in nature to the
+\verb"TDataRequest" routine,
+but uses a different set of parameters.
+The invocation is:
+\begin{quote}\index{TWriteRequest}\small\begin{verbatim}
+int     TWriteRequest (sd, uv, td)
+int     sd;
+struct udvec *uv;
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+While the parameters are:
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+
+\item[\verb"uv":] the data to be written,
+described in a null-terminated array of scatter/gather elements:
+\begin{quote}\index{udvec}\small\begin{verbatim}
+struct udvec {
+    caddr_t uv_base;
+    int     uv_len;
+};
+\end{verbatim}\end{quote}
+    The elements of the structure are:
+    \begin{describe}
+    \item[\verb"uv\_base":] the base of an element; and,
+    \item[\verb"uv\_cc":] the length of an element.
+    \end{describe}
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"TWriteRequest" is successful,
+then the data has been queued for sending.
+Otherwise,
+the \verb"td" parameter indicates the reason for failure.
+
+A call to the \verb"TExpdRequest" routine is equivalent to a
+{\sf T-EXPEDITED-DATA.REQUEST\/} action on the part of the user.
+\begin{quote}\index{TExpdRequest}\small\begin{verbatim}
+int     TExpdRequest (sd, data, cc, td)
+int     sd;
+char   *data;
+int     cc;
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+
+\item[\verb"data"/\verb"cc":] the data to be written
+(and the length of that data, which may not exceed \verb"TX_SIZE" octets);
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"TExpdRequest" is successful,
+then the data has been queued for expedited sending.
+Otherwise,
+the \verb"td" parameter indicates the reason for failure.
+
+\subsection	{Receiving Data}
+There is one routine that is used to read data,
+\verb"TReadRequest",
+a call to which is equivalent to waiting for a {\sf T-DATA.INDICATION\/}
+or {\sf T-EXPEDITED-DA\-TA.IN\-DI\-CA\-TION} event.
+\begin{quote}\index{TReadRequest}\small\begin{verbatim}
+int     TReadRequest (sd, tx, secs, td)
+int     sd;
+struct TSAPdata *tx;
+int     secs;
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+
+\item[\verb"tx":] a pointer to the \verb"TSAPdata" structure to be given
+the data;
+
+\item[\verb"secs":] the maximum number of seconds to wait for the data
+(a value of \verb"NOTOK" indicates that the call should block indefinitely,
+whereas a value of \verb"OK" indicates that the call should not block at all,
+e.g., a polling action);
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"TReadRequest" is successful,
+then the data has been read into the \verb"tx" parameter.
+\begin{quote}\index{TSAPdata}\small\begin{verbatim}
+struct TSAPdata {
+    int     tx_expedited;
+
+    int     tx_cc;
+    struct qbuf tx_qbuf;
+};
+\end{verbatim}\end{quote}
+The elements of a \verb"TSAPdata" structure are:
+\begin{describe}
+\item[\verb"tx\_expedited":] whether the data was received via expedited
+transfer
+(i.e., an {\sf T-EXPEDITED-DATA.INDICATION\/} event occurred);
+
+\item[\verb"tx\_cc":] the total number of octets that was read;
+and,
+
+\item[\verb"tx\_qbuf":] the data that was read, in a buffer-queue form.
+\begin{quote}\index{qbuf}\small\begin{verbatim}
+struct qbuf {
+    struct qbuf *qb_forw;
+    struct qbuf *qb_back;
+
+    int    qb_len;
+    char  *qb_data;
+
+    char   qb_base[1];
+};
+\end{verbatim}\end{quote}
+The elements of a \verb"qbuf" structure are:\label{tsap:qbuf}
+\begin{describe}
+\item[\verb"qb\_forw"/\verb"qb\_back":] forward and back pointers;
+
+\item[\verb"qb\_data"/\verb"qb\_len":] the user data
+(and the length of that data);
+and,
+
+\item[\verb"qb\_base":] the extensible array containing the data.
+\end{describe}
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released by using the \verb"TXFREE" macro when no longer
+referenced.
+The \verb"TXFREE" macro,
+which is used for this purpose,
+behaves as if it was defined as:\label{TXFREE}
+\begin{quote}\index{TXFREE}\small\begin{verbatim}
+void    TXFREE (tx)
+struct TSAPdata *tx;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"TDataRequest",
+and not the \verb"TSAPdata" structure itself.
+Further,
+\verb"TXFREE" should be called only if the call to the \verb"TDataRequest"
+routine returned \verb"OK".
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	Because the \verb"TSAPdata" structure contains a
+		\verb"qbuf" element, care must be taken in initializing
+		and copying variables of this type.
+		The routines in \man libtsap(3n) library will correctly
+		initialize these structures when given as parameters.
+		But, users who otherwise manipulate \verb"TSAPdata"
+		structures should take great care.
+\end{tabular}}\]
+
+Otherwise if the call to \verb"TReadRequest" did not succeed,
+the \verb"td" parameter indicates the reason for failure.
+
+\subsection	{Asynchronous Event Handling}
+The data transfer events discussed thus far have been synchronous in nature.
+Some users of the transport service may wish an asynchronous interface.
+The \verb"TSetIndications" routine is used to change the service associated
+with a transport-descriptor to or from an asynchronous interface.
+\begin{quote}\index{TSetIndications}\small\begin{verbatim}
+int     TSetIndications (sd, data, disc, td)
+int     sd;
+int   (*data) (),
+      (*disc) ();
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+
+\item[\verb"data":] the address of an event-handler routine to be invoked when
+data has arrived
+(either a {\sf T-DATA.INDICATION\/} or {\sf T-EXPEDITED-DATA.INDICATION} event
+occurs);
+
+\item[\verb"disc":] the address of an event-handler routine to be invoked when
+the connection has been closed
+(a {\sf T-DISCONNECT.INDICATION\/} event occurs);
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+If the service is to be made asynchronous,
+then both \verb"data" and \verb"disc" are specified;
+otherwise,
+if the service is to be made synchronous,
+neither should be specified (use the manifest constant \verb"NULLIFP").
+The most likely reason for the call failing is \verb"DR_WAITING",
+which indicates that an event is waiting for the user.
+
+When an event-handler is invoked,
+future invocations of the event-hander are blocked until it returns.
+The return value of the event-handler is ignored.
+Further,
+during the execution of a synchronous call to the library,
+the event-handler will be blocked from being invoked.
+
+When an event associated with data arriving occurs,
+the event-handler routine is invoked with two parameters:
+\begin{quote}\small\begin{verbatim}
+(*data) (sd, tx);
+int     sd;
+struct TSAPdata *tx;
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+and,
+
+\item[\verb"tx":] a pointer to a \verb"TSAPdata" structure containing
+the data.
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"TXFREE" macro
+(described on page~\pageref{TXFREE}) when no longer needed.
+
+Similarly,
+when an event associated with connection release occurs,
+the event-handler is also invoked with two parameters:
+\begin{quote}\small\begin{verbatim}
+(*disc) (sd, td);
+int     sd;
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+The parameters are
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure
+indicating why the connection was released.
+\end{describe}
+Note that the transport-descriptor is no longer valid at the instant the
+call is made.
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	The \man libtsap(3n) library uses the SIGEMT signal to provide
+		these services.
+		Programs using asynchronous transport-descriptors should NOT
+		use SIGEMT for other purposes.
+\end{tabular}}\]
+
+\subsection	{Synchronous Event Multiplexing}
+A user of the transport service may wish to manage multiple
+transport-descriptors simultaneously;
+the routine \verb"TSelectMask" is provided for this purpose.
+This routine updates a file-descriptor mask and associated counter for use
+with \verb"xselect".
+\begin{quote}\index{TSelectMask}\small\begin{verbatim}
+int     TSelectMask (sd, mask, nfds, td)
+int     sd;
+fd_set *mask,
+int    *nfds;
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+
+\item[\verb"mask":] a pointer to a file-descriptor mask meaningful to
+\verb"xselect";
+
+\item[\verb"nfds":] a pointer to an integer-valued location meaningful to
+\verb"xselect";
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call is successful, then the \verb"mask" and \verb"nfds" parameters can
+be used as arguments to \verb"xselect".
+The most likely reason for the call failing is \verb"DR_WAITING",
+which indicates that an event is waiting for the user.
+
+If \verb"xselect" indicates that the transport-descriptor is ready for reading,
+\verb"TReadRequest" should be called with the \verb"secs" parameter equal to
+\verb"OK".
+If the network activity does not constitute an entire event for the user,
+then \verb"TReadRequest" will return \verb"NOTOK" with error code
+\verb"DR_TIMER".
+
+In addition,
+the routine \verb"TSelectOctets" is provided to return an estimate of how many
+octets might be returned by the next call to \verb"TReadRequest":
+\begin{quote}\index{TSelectOctets}\small\begin{verbatim}
+int     TSelectOctets (sd, nbytes, td)
+int     sd;
+long   *nbytes;
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+
+\item[\verb"nbytes":] a pointer to a longword location that, on success, will
+be updated to contain the number of octets that might be returned;
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+
+\section	{Connection Release}
+The \verb"TDiscRequest" routine is used to release a connection.
+Note, that the TSAP makes no guarantee that any queued data will be received
+before the connection closes.
+\begin{quote}\index{TDiscRequest}\small\begin{verbatim}
+int     TDiscRequest (sd, data, cc, td)
+int     sd;
+char   *data;
+int     cc;
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+The parameters to the procedure are described on page~\pageref{TDiscRequest}.
+
+\section	{State Saving and Restoration}
+Some users of the transport service,
+and in particular the session provider,
+require the ability to \man execve(2) another process image and have that
+process use the transport connection.
+Since the \man libtsap(3n) library is not kernel-resident,
+special provisions are necessary to support this behavior.
+
+\subsection	{Saving the State}
+The routine \verb"TSaveState" is used to record the state of the TSAP for a
+given transport-descriptor.
+\begin{quote}\index{TSaveState}\small\begin{verbatim}
+int     TSaveState (sd, vec, td)
+int     sd;
+char  **vec;
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+
+\item[\verb"vec":] a pointer to the first free slot in the argument vector for
+\man execve(2);
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call succeeds,
+then an extra {\em magic argument\/} has been placed in the argument vector.
+The most likely reason for the call failing is \verb"DR_WAITING",
+which indicates that an event is waiting for the user.
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	Once a successful call to \verb"TSaveState" is made on a
+		transport descriptor, that descriptor may no longer be
+		referenced until a corresponding call to \verb"TRestoreState"
+		is successful.
+\end{tabular}}\]
+
+\subsection	{Restoring the State}
+The routine \verb"TRestoreState" is used to re-initialize the state of the
+TSAP.
+\begin{quote}\index{TRestoreState}\small\begin{verbatim}
+int     TRestoreState (buffer, ts, td)
+char   *buffer;
+struct TSAPstart  *ts;
+struct TSAPdisconnect  *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"buffer":] the {\em magic argument\/} constructed by
+\verb"TSaveState";
+
+\item[\verb"ts":] a pointer to a \verb"TSAPstart" structure, which is updated
+only if the call succeeds;
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure, which is
+updated only if the call fails.
+\end{describe}
+If \verb"TRestoreState" is successful,
+it returns information in a \verb"TSAPstart" structure,
+as defined on page~\pageref{TSAPstart}.
+There is one exception however:
+in the current implementation the \verb"ts_cc" and
+\verb"ts_data" elements are undefined on a successful return from
+\verb"TRestoreState".
+
+\section	{Cookie Parameters}
+There are two {\em cookie\/} parameters:
+network addresses and quality of service.
+
+\subsection	{Network Addresses}\label{nsap:addresses}
+Network addresses can vary greatly.
+In this software distribution,
+a ``unified'' format has been adopted in the \verb"NSAPaddr" structure:
+\begin{quote}\index{NSAPaddr}\small\begin{verbatim}
+struct NSAPaddr {
+    long    na_stack;
+#define NA_NSAP 0
+#define NA_TCP  1
+#define NA_X25  2
+#define NA_BRG  3
+
+    long    na_community;
+
+    union {
+        struct na_nsap {
+#define NASIZE  64
+            char    na_nsap_address[NASIZE];
+            char    na_nsap_addrlen;
+        }               un_na_nsap;
+
+        struct na_tcp {
+#define NSAP_DOMAINLEN  63
+            char    na_tcp_domain[NSAP_DOMAINLEN + 1];
+            u_short na_tcp_port;
+            u_short na_tcp_tset;
+#define NA_TSET_TCP    0x0001
+#define NA_TSET_UDP    0x0002
+        }               un_na_tcp;
+
+        struct na_x25 {
+#define NSAP_DTELEN     15
+            char    na_x25_dte[NSAP_DTELEN + 1];
+            char    na_x25_dtelen;
+
+#define NPSIZE  4
+            char    na_x25_pid[NPSIZE];
+            char    na_x25_pidlen;
+
+#define CUDFSIZE 16
+            char    na_x25_cudf[CUDFSIZE];
+            char    na_x25_cudflen;
+
+#define FACSIZE 6
+            char    na_x25_fac[FACSIZE];
+            char    na_x25_faclen;
+        }               un_na_x25;
+    }               na_un;
+
+#define na_address      na_un.un_na_nsap.na_nsap_address
+#define na_addrlen      na_un.un_na_nsap.na_nsap_addrlen
+
+#define na_domain       na_un.un_na_tcp.na_tcp_domain
+#define na_port         na_un.un_na_tcp.na_tcp_port
+
+#define na_dte          na_un.un_na_x25.na_x25_dte
+#define na_dtelen       na_un.un_na_x25.na_x25_dtelen
+#define na_pid          na_un.un_na_x25.na_x25_pid
+#define na_pidlen       na_un.un_na_x25.na_x25_pidlen
+#define na_cudf         na_un.un_na_x25.na_x25_cudf
+#define na_cudflen      na_un.un_na_x25.na_x25_cudflen
+#define na_fac          na_un.un_na_x25.na_x25_fac
+#define na_faclen       na_un.un_na_x25.na_x25_faclen
+};				   
+#define NULLNA  ((struct NSAPaddr *) 0)
+\end{verbatim}\end{quote}
+As shown, this structure is really a discriminated union
+(a structure with a tag element followed by a union).
+Based on the value of the tag (\verb"na_stack"),
+a different structure is selected.
+
+For a native OSI CO-mode transport service,
+the value of the tag is \verb"NA_NSAP",
+and the following elements are meaningful:
+\begin{describe}
+\item[\verb"na\_address"/\verb"na\_addrlen":] the network address
+(and its length), binary-valued.
+\end{describe}
+
+For emulation of the OSI transport service on top of the TCP,
+the value of the tag is \verb"NA_TCP",
+and the following elements are meaningful:
+\begin{describe}
+\item[\verb"na\_domain":] the null-terminated domain name
+(e.g., ``gonzo.twg.com'') or dotted-quad (e.g., ``128.99.0.17'');
+
+\item[\verb"na\_port":] the TCP-port number offering the service
+(if zero, the service on port~102 is used);
+and,
+
+\item[\verb"na\_tset":] the set of IP-based transport services available at
+the address
+(if zero, the TCP service is used).
+\end{describe}
+
+For use of a single-subnet X.25,
+the value of the tag is \verb"NA_X25",
+and the following elements are meaningful:
+\begin{describe}
+\item[\verb"na\_dte"/\verb"na\_dtelen":] the X.121 address (and its length),
+ascii-valued, possibly null-terminated;
+
+\item[\verb"na\_pid"/\verb"na\_pidlen":] the protocol id (and its length),
+binary-valued;
+
+\item[\verb"na\_cudf"/\verb"na\_cudflen":] the call user data (and its length),
+binary-valued;
+and,
+
+\item[\verb"na\_fac"/\verb"na\_faclen":] the negotiated facilities proposed
+in the call request packet (and its length),
+binary-valued.
+\end{describe}
+For use of a TP0-bridge between the TCP and X.25,
+the value of the tag is \verb"NA_BRG",
+and the elements above are meaningful.
+
+If the value of the tag is not \verb"NA_NSAP",
+it may be useful to normalize the address into a ``real'' OSI address.
+The routine \verb"na2norm" is used:
+\begin{quote}\index{na2norm}\begin{verbatim}
+char   *na2norm (na)
+struct NSAPaddr *na;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"na"]: the network address to be normalized.
+\end{describe}
+A new network address is returned from a static area which contains the
+normalized form.
+
+The routine \verb"na2str" takes a network address and returns a
+null-ter\-mi\-na\-ted ascii string suitable for viewing:
+\begin{quote}\index{na2str}\begin{verbatim}
+char   *na2str (na)
+struct NSAPaddr *na;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"na"]: the network address to be printed.
+\end{describe}
+
+The \verb"na_community" field is an internal number used to distinguish
+between different OSI communities.
+Consult Chapter~\ref{tswitch} starting on page~\pageref{tswitch} for further
+details.
+
+\subsection	{Quality of Service}\label{tsap:qos}
+Currently, quality of service is largely uninterpreted by the software.
+However,
+the quality of service structure contains those parameters which are supported:
+\begin{quote}\index{QOStype}\small\begin{verbatim}
+struct QOStype {
+                              /* transport QOS */
+    int    qos_reliability;
+#define HIGH_QUALITY   0
+#define LOW_QUALITY    1
+
+                              /* session QOS */
+    int    qos_sversion;
+    int    qos_extended;
+    int    qos_maxtime;
+};
+#define NULLQOS ((struct QOStype *) 0)
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"qos\_reliability":] the ``reliability'' level of the connection,
+either high- or low-quality;
+
+\item[\verb"qos\_sversion":] the session version requested/negotiated on this
+connection (only applicable above the transport layer, obviously),
+if the manifest constant \verb"NOTOK" is used when initiating a connection,
+this indicates that the highest possible version should be negotiated;
+
+\item[\verb"qos\_extended":] the extended control parameter for the connection,
+(if non-zero, extended control is used by the session layer);
+and,
+
+\item[\verb"qos\_maxtime":] after a transport connection is established,
+the maximum number of seconds to wait for an acknowledgement from the
+responding SPM
+(any non-positive number indicates that no timelimit is desired).
+\end{describe}
+
+\section	{Listen Facility}\label{tsap:listen}
+The \man libtsap(3n) library,
+supports a facility which permits a process to {\em listen\/} for certain
+connections.
+This can be useful for implementing an application which requires that a
+single server process handle multiple clients,
+or for connection recovery.
+These routines return the manifest constant \verb"NOTOK" on error,
+and \verb"OK" on success,
+they also update the \verb"td" parameter given to the routine.
+This parameter is a pointer to a \verb"TSAPdisconnect" structure.
+
+Although this facility is described in terms of the \man libtsap(3n) library,
+it will function at any other higher-layer in the system
+(e.g., the listen facility can be used for session or application-entities).
+
+A program starts listening for an particular connection by calling the routine
+\verb"TNetListen".
+\begin{quote}\index{TNetListen}\small\begin{verbatim}
+int     TNetListen (ta, td)
+struct TSAPaddr *ta;
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"ta":] the transport address (0 or more network addresses)
+to listen on; and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call is successful,
+then the program is now listening for incoming connections on that network
+address.
+Otherwise,
+the \verb"td" parameter indicates the reason for failure.
+
+A variant of \verb"TNetListen" is the \verb"TNetUnique" routine,
+which starts the process listening on a set of unique network (sub)addresses.
+\begin{quote}\index{TNetUnique}\small\begin{verbatim}
+int     TNetUnique (ta, td)
+struct TSAPaddr *ta;
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"ta":] a transport address containing  one or more partially
+filled-in network addresses; and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call is successful,
+each network address in the \verb"ta" parameter is fully filled-in,
+the program is now listening for incoming connections on the resulting
+transport.
+Otherwise,
+the \verb"td" parameter indicates the reason for failure.
+
+To check when a new connection is waiting,
+or when existing connections have activity on them,
+the routine \verb"TNetAccept" is used.\label{tsap:accept}
+\begin{quote}\index{TNetAccept}\small\begin{verbatim}
+int     TNetAccept (vecp, vec, nfds, rfds, wfds, efds, secs,
+                td)
+int    *vecp,
+char  **vec;
+int     nfds;
+fd_set *rfds,
+       *wfds,
+       *efds;
+int     secs;
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"vecp"/\verb"vec":] the initialization vector for the new
+connection.
+
+\item[\verb"nfds"/\verb"rfds"/\verb"wfds"/\verb"efds":] connection-descriptors
+for use with \verb"xselect";
+
+\item[\verb"secs":] the maximum number of seconds to wait for activity
+(a value of \verb"NOTOK" indicates that the call should block indefinitely,
+whereas a value of \verb"OK" indicates that the call should not block at all,
+e.g., a polling action); and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call to \verb"TNetAccept" succeeds then the value of \verb"vecp"
+should be checked.
+If \verb"vecp" is greater than zero,
+a new connection has been accepted,
+and \verb"TInit" should be called,
+presumably followed by \verb"TConnResponse".%
+\footnote{Actually, any service addressable via a transport selector
+can use this service,
+e.g., if appropriate, a call to \verb"AcInit",
+followed by a call to \verb"AcAssocResponse",
+can be made.}
+Regardless of the value of \verb"vecp",
+the value of \verb"rfds" and \verb"wfds" should be checked to see which
+connections have activity pending.
+For these connections,
+any reads should probably be done with a \verb"secs" argument indicating a
+polling operation (i.e., a value of \verb"OK").
+Otherwise,
+if the call to \verb"TNetAccept" fails,
+then the \verb"td" parameter indicates the reason for failure.
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	The \verb|TNetAccept| procedure when first called arranges to
+		clean up dead child processes. If the program will run any
+		sub-processes and check their exit status, the automatic
+		collection of zombie process should be disabled, by first
+		calling \verb|TNetAccept| with a timeout of \verb|OK| and then
+		setting the child signal handler to it's default state. 
+\end{tabular}}\]
+
+The routine \verb"TNetAccept" is actually a macro which invokes a routine
+called \verb"TNetAcceptAux":
+\begin{quote}\index{TNetAcceptAux}\small\begin{verbatim}
+int     TNetAcceptAux (vecp, vec, newfd, ta, nfds, rfds, wfds,
+                efds, secs, td)
+int    *vecp,
+char  **vec;
+int     newfd;
+struct TSAPaddr *ta;
+int     nfds;
+fd_set *rfds,
+       *wfds,
+       *efds;
+int     secs;
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+The additional parameters to this procedure are:
+\begin{describe}
+\item[\verb"newfd":] a pointer to an integer which will be given the value of
+the connection-descriptor associated with the new connection;
+and,
+
+\item[\verb"ta":] a pointer to a \verb"TSAPaddr" structure which will be given
+the value of the transport address receiving the new connection
+(the called or listening address).
+\end{describe}
+
+Prior to exiting,
+the user should call \verb"TNetClose" to stop listening for connections.
+\begin{quote}\index{TNetClose}\small\begin{verbatim}
+int     TNetClose (ta, td)
+struct TSAPaddr *ta;
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"ta":] the transport address to stop listening on
+(use the manifest constant \verb"NULLTA" to stop listening on all addresses);
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call is successful,
+then the program has stopped listening for incoming connections on that network
+address.
+Otherwise,
+the \verb"td" parameter indicates the reason for failure.
+
+\section	{Queued (non-blocking) Writes Facility}
+All ``read'' operations in the ISODE are inherently non-blocking.
+Historically, ``write'' operations have not required this capability.
+However,
+some applications (e.g., the QUIPU DSA) require non-blocking writes.
+The routine \verb"TSetQueuesOK" is used to enable or disable this facility:
+\begin{quote}\index{TSetQueuesOK}\small\begin{verbatim}
+int     TSetQueuesOK (sd, onoff, td)
+int     sd;
+int     onoff;
+struct TSAPdisconnect *td;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the transport-descriptor;
+
+\item[\verb"onoff":] a flag indicating whether the facility is to be enabled
+(non-zero value) or disabled (zero value) for the transport-descriptor;
+and,
+
+\item[\verb"td":] a pointer to a \verb"TSAPdisconnect" structure,
+which is updated only if the call fails.
+\end{describe}
+If the call is not successful,
+the \verb"td" parameter indicates the reason for failure.
+Otherwise,
+if the \verb"onoff" parameter has a non-zero value,
+then any ``write'' operations which ultimately map to this
+transport-descriptor will not block the process.
+This is done by maintaining a queue of write operations and periodically
+retrying them.
+In order to schedule retries,
+the routine \verb"TNetAccept" described earlier should be called frequently.
+In addition,
+if some failure occurs during the retry
+(e.g., the transport connection is disconnected),
+then \verb"TNetAccept" will mark that descriptor as being ready for reading.
+When the program interrogates the descriptor,
+the appropriate error code will be returned.
+Note that in order for this action to occur,
+any descriptor which has queued writes enabled must be included in the
+\verb"rfs" parameter supplied when the \verb"TNetAccept" routine is called.
+
+\section	{Error Conventions}
+All of the routines in this library return the manifest constant \verb"NOTOK"
+on error,
+and also update the \verb"td" parameter given to the routine.
+The \verb"td_reason" element of the \verb"TSAPdisconnect" structure can be
+given as an parameter to the routine \verb"TErrString" which returns a
+null-terminated diagnostic string.
+\begin{quote}\index{TErrString}\small\begin{verbatim}
+char   *TErrString (c)
+int     c;
+\end{verbatim}\end{quote}
+
+\section	{Compiling and Loading}
+Programs using the \man libtsap(3n) library should include
+\verb"<isode/tsap.h>".
+These programs should also be loaded with \verb"-ltsap" and,
+for reasons explained momentarily,
+\verb"-licompat".
+
+\section	{An Example}
+Let's consider how one might construct a loopback entity that resides on the
+TSAP.
+This entity will use a synchronous interface.
+
+First, we must decide at what address the entity will reside.
+For simplicity's sake,
+we'll say that the location is \verb"tsap/echo",
+as defined in the \man isoservices(5) database.
+
+Next, we actually code the loopback entity.
+There are two parts to the program: initialization and data transfer;
+release will occur whenever data transfer fails.
+In our example,
+we assume that the routine \verb"error" results in the process being
+terminated after printing a diagnostic.
+
+In Figure~\ref{initTSloopback},
+the initialization steps for the loopback entity,
+including the outer {\em C\/} wrapper, is shown.
+The entity does not examine any of its arguments,
+but could do so after the call to \verb"TInit".
+After examining the arguments,
+it could decide to reject the connection attempt,
+by using \verb"TDiscRequest".
+Instead,
+it uses \verb"TConnResponse" with the exact negotiated parameters with which
+it was supplied.
+Hence,
+if the initiator wanted to use expedited data transfer,
+the loopback entity responding to the connection would honor that.
+
+In Figure~\ref{dataTSloopback} on page~\pageref{dataTSloopback},
+the data transfer loop is realized.
+The loopback entity awaits an event from the service provider,
+which either indicates that data has arrived or that the connection has been
+closed.
+If a disconnection occurred
+(a {\sf T-DISCONNECT.INDICATION\/} event is reported),
+then the reason is checked.
+If the event did not occur because the initiator performed a
+{\sf T-DISCONNECT.REQUEST\/} indication,
+then an error is signaled.
+Otherwise, the inner-loop is terminated and the process will gracefully
+terminate.
+If instead data arrived,
+it is echoed back to the initiator.
+\clearpage
+\tagrind[tp]{grind6-2}{Initializing the loopback entity}{initTSloopback}
+\clearpage
+\tagrind[tp]{grind6-3}{Data Transfer for the loopback entity}{dataTSloopback}
+
+\section	{Compatibility Issues}
+The \man libicompat(3) library is used as an aid for porting the software from
+one system to another.
+This library contains generic service routines,
+which are in turn composed of the native facilities available on the target
+host.
+All of the higher layer \verb"#include" files automatically reference parts
+of this library as appropriate.
+Hence, when loading the the portions of the software independently,
+the loader must be given the \verb"-licompat" flag.
+
+The problem of this approach, of course, is that not all facilities can be
+precisely emulated.
+To misquote M.A.~Padlipsky\cite{Gateways.Heffalumps}:
+\begin{quote}\em
+Sometimes when you try to make an apple look like an orange you get back
+something that smells like a lemon.
+\end{quote}
+
+\section	{For Further Reading}
+The ISO specification for transport services is defined in
+\cite{ISO.TP.Service}.
+The corresponding CCITT recommendation is defined in \cite{CCITT.TP.Service}.
+The document describing how these services can be implemented on top of the
+TCP\cite{TCP} is \cite{TSAP.on.TCP}.
+
+\section	{Changes Since the Last Release}\label{tsap:changes}
+A brief summary of the major changes between v~\isodeprevrsn/ and
+v~\isodevrsn/ are now presented.
+These are the user-visible changes only;
+changes of a strictly internal nature are not discussed.
+
+The \verb"na_type" and \verb"na_subnet" fields of the \verb"NSAPaddr"
+structure are now called \verb"na_stack" and \verb"na_community" respectively.
+For compatibility,
+macros are provided.
+These macros will be removed after this release.

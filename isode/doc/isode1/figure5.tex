@@ -1,0 +1,61 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \special{pa 0 500}%
+    \special{pa 0 0}%
+    \special{pa 2250 0}%
+    \special{pa 2250 500}%
+    \special{pa 0 500}%
+    \special{fp}%
+    \rlap{\kern  1.125in\lower 0.291in\hbox to 0pt{\hss APPLICATION\hss}}%
+    \special{pa 0 1250}%
+    \special{pa 0 750}%
+    \special{pa 2250 750}%
+    \special{pa 2250 1250}%
+    \special{pa 0 1250}%
+    \special{fp}%
+    \rlap{\kern  1.125in\lower 1.041in\hbox to 0pt{\hss PRESENTATION\hss}}%
+    \special{pa 1125 500}%
+    \special{pa 1125 750}%
+    \special{fp}%
+    \special{pa 0 2000}%
+    \special{pa 0 1500}%
+    \special{pa 2250 1500}%
+    \special{pa 2250 2000}%
+    \special{pa 0 2000}%
+    \special{fp}%
+    \rlap{\kern  1.125in\lower 1.791in\hbox to 0pt{\hss SESSION\hss}}%
+    \special{pa 1125 1250}%
+    \special{pa 1125 1500}%
+    \special{fp}%
+    \special{sh}%
+    \special{pa 2750 2000}%
+    \special{pa 2750 0}%
+    \special{pa 2833 0}%
+    \special{pa 2833 2000}%
+    \special{pa 2750 2000}%
+    \special{fp}%
+    \rlap{\kern  2.833in\lower 1.041in\hbox to0pt{\ PURE ISO\hss}}%
+    \special{pa 0 3750}%
+    \special{pa 0 2250}%
+    \special{pa 2250 2250}%
+    \special{pa 2250 3750}%
+    \special{pa 0 3750}%
+    \special{fp}%
+    \rlap{\kern  1.125in\lower 2.709in\hbox to 0pt{\hss ISO TRANSPORT\hss}}%
+    \rlap{\kern  1.125in\lower 2.875in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  1.125in\lower 3.041in\hbox to 0pt{\hss SERVICE IN A\hss}}%
+    \rlap{\kern  1.125in\lower 3.207in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  1.125in\lower 3.373in\hbox to 0pt{\hss non-ISO NETWORK\hss}}%
+    \special{pa 1125 2000}%
+    \special{pa 1125 2250}%
+    \special{fp}%
+    \kern  2.834in
+  }\vss}%
+  \kern  3.751in
+}

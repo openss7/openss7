@@ -352,4 +352,49 @@ typedef union {
 	void *v;
 } ap_val_t;
 
+typedef int (*ap_ualloc_t) (int, ap_osi_vbuf_t **, void **, int, int, unsigned long *);
+typedef int (*ap_udealloc_t) (int, ap_osi_vbuf_t *, void *, int, unsigned long *);
+
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif				/* __BEGIN_DECLS */
+
+int ap_bind(int fd, unsigned long *aperrno_p);
+
+int ap_close(int fd, unsigned long *apperno_p);
+
+const char *ap_error(unsigned long aperrno);
+
+int ap_free(int fd, unsigned long kind, void *val, unsigned long *apperno_p);
+
+int ap_get_env(int fd, unsigned long attr, void *val, unsigned long *aperrno_p);
+
+int app_init_env(int fd, const char *env_file, int flags, unsigned long *apperno_p);
+
+int ap_ioctl(int fd, int request, ap_val_t argument, unsigned long *apperno_p);
+
+int ap_look(int fd, unsigned long *sptype, ap_cdata_t * cdata, ap_osi_vbuf_t ** ubuf, int *flags, unsigned long *apperno_p);
+
+int ap_open(const char *provider, int oflags, ap_ualloc_t ap_user_alloc, ap_udealloc_t ap_user_dealloc, unsigned long *aperrno_p);
+
+int ap_poll(ap_pollfd_t fds[], int nfds, int timeout, unsigned long *apperno_p);
+
+int ap_rcv(int fd, unsigned long *sptype, ap_cdata_t * cdata, ap_osi_vbuf_t ** ubuf, int *flags, unsigned long *aperrno_p);
+
+int ap_restore(int fd, FILE * savef, int oflags, ap_ualloc_t ap_user_alloc, ap_udealloc_t ap_user_dealloc, unsigned long *aperrno_p);
+
+int ap_save(int fd, FILE *savef, unsigned long *apperno_p);
+
+int ap_set_env(int fd, unsigned long attr, ap_val_t val, unsigned long *apperno_p);
+
+int ap_snd(int fd, unsigned long sptype, ap_cdata_t *cdata, ap_osi_vbuf_t *ubuf, int flags, unsigned long *aperrno_p);
+
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif				/* __END_DECLS */
+
 #endif				/* __XAP_H__ */

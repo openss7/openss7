@@ -1,0 +1,323 @@
+% -*- LaTeX -*-		(really SLiTeX)
+
+\documentstyle[blackandwhite,landscape,oval,pagenumbers,small,tgrind]{NRslides}
+
+\def\emph#1{\underline{#1}}		
+
+\font\xx=cmbx10
+\font\yy=cmbx7
+
+\raggedright
+
+\begin{document}
+
+\title	{BUILDING DISTRIBUTED\\ APPLICATIONS IN AN\\ OSI FRAMEWORK}
+\author	{Marshall T.~Rose\\ The Wollongong Group}
+\date	{April 27, 1988}
+\maketitlepage
+
+
+\begin{bwslide}
+\ctitle	{INTRODUCTION}
+
+\begin{nrtc}
+\item	LOOSELY COUPLED SYSTEMS THAT ARE BUILT USING REMOTE PROCEDURE CALLS
+	(RPC) ARE GAINING POPULARITY, e.g., NFS
+
+\item	THE OSI REMOTE OPERATIONS CONCEPT IS INTENDED TO PROVIDE THIS
+	FUNCTIONALITY FOR:
+    \begin{nrtc}
+    \item	MESSAGING
+
+    \item	DIRECTORY SERVICES
+
+    \item	NETWORK MANAGEMENT
+
+    \item	REMOTE DATABASE ACCESS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MOTIVATION}
+
+\begin{nrtc}
+\item	MANY FEEL THAT THIS CAPABILITY MAY BE A KEY FACTOR IN THE OVERALL
+	SUCCESS OF OSI STANDARDIZATION
+
+\item	BUT, REMOTE OPERATIONS ARE SUFFICIENTLY GENERAL TO REQUIRE
+	ADDITIONAL DISCIPLINE, BEYOND THE ISO/CCITT STANDARDS,
+	FOR THEIR USE AS AN RPC MECHANISM
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE APPLICATIONS COOKBOOK}
+
+\begin{nrtc}
+\item	THE SET OF RULES AND LOCAL IMPLEMENTATION DECISIONS PLACED ON REMOTE
+	OPERATIONS TO MAKE THE PROBLEM MANAGEABLE:
+    \begin{nrtc}
+    \item	LANGUAGE BINDINGS (``C'')
+
+    \item	TOOLS FOR AUTOMATICALLY GENERATING PARTS OF THE
+		PROGRAMS WHICH USE REMOTE OPERATIONS
+
+    \item	A RUN-TIME ENVIRONMENT AND SOME BOILERPLATE
+
+    \item	CONVENTIONS FOR NAMING AND ADDRESSING SERVICES AND ENTITIES
+    \end{nrtc}
+
+\item	A (SMALL) PART OF THE ISO DEVELOPMENT ENVIRONMENT (ISODE)
+    \begin{nrtc}
+    \item	VOLUME 4 OF THE USER'S MANUAL
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FOREWORD}
+
+\begin{quote}\em
+``$\ldots$ The term `holistic' refers to my conviction that what we are
+concerned with here is the fundamental interconnectedness of all things.
+I do not concern myself with such petty things as fingerprint powder, telltale
+pieces of pocket fluff and inane footprints.
+I see the solution to each problem as being detectable in the pattern and web
+of the whole.
+The connections between causes and effects are often much more subtle and
+complex than we with our rough and ready understanding of the physical world
+might naturally suppose, Mrs.~Rawlinson.
+
+``Let me give you an example.
+If you go to an acupuncturist with a toothache he sticks a needle instead into
+your thigh.
+Do you know why he does that, Mrs.~Rawlinson?
+
+``No, neither do I, Mrs.~Rawlinson, but we intend to find out$\ldots$''
+\end{quote}
+
+\raggedright
+---DOUGLAS ADAMS, \em Dirk Gentley's Holistic Detective Agency (1987)
+\end{bwslide}
+
+
+\begin{note}\em
+\begin{center}
+\underline{an audience survey}
+\end{center}
+
+who has heard of, is familiar with, or understands:
+\begin{quote}
+the osi model?
+
+abstract syntax notation one?
+
+remote operations in the context of OSI?
+
+xerox courier, sun rpc, or apollo ncs/nidl?
+\end{quote}
+
+who knows how to program under unix using:
+\begin{quote}
+the C programming language, make, and the shell?
+\end{quote}
+\end{note}
+
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]		REVIEW OF BACKGROUND MATERIAL
+
+\item[PART II:]		A MODEL FOR DISTRIBUTED APPLICATIONS
+
+\item[PART III:]	UNDERLYING SERVICES
+
+\item[PART IV:]		STATIC FACILITIES
+
+\item[PART V:]		DYNAMIC FACILITIES
+
+\item[PART VI:]		WHERE NEXT?
+\end{description}
+\end{bwslide}
+
+
+\include	{review}
+\include	{model}
+\include	{services}
+\include	{static}
+\include	{dynamic}
+\include	{what}
+
+
+\begin{bwslide}
+\part*	{ISODE AVAILABILITY}\bf
+
+\begin{nrtc}
+\item	AVAILABILITY INFORMATION
+    \begin{nrtc}
+    \item	USPS
+
+    \item	DARPA/NSF INTERNET
+    \end{nrtc}
+
+\item	DISCUSSION GROUPS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AVAILABILITY INFORMATION:\\ USPS}
+
+\begin{nrtc}
+\item	VERSION 3 AVAILABLE OCTOBER 14, 1987
+    \begin{nrtc}
+    \item	CONTAINS THE UNDERLYING SERVICES
+
+    \item	CONTAINS THE SKELETAL FACILITIES DISCUSSED TODAY
+    \end{nrtc}
+
+\item	SEND CHECK OR PURCHASE ORDER FOR 200 US DOLLARS TO:
+    \[\begin{tabular}{l}
+	ISODE DISTRIBUTION\\
+	DEPARTMENT OF ELECTRICAL ENGINEERING\\
+	UNIVERSITY OF DELAWARE\\
+	NEWARK, DE  19716\\[0.25in]
+	TELCO: 302--451--1163
+    \end{tabular}\]
+
+\item	DISTRIBUTION CONTAINS:
+    \begin{nrtc}
+    \item	1600bpi TAR TAPE
+
+    \item	3 VOLUME DOCUMENTATION SET
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AVAILABILITY INFORMATION:\\ DARPA/NSF INTERNET}
+
+\begin{nrtc}
+\item	VERSION 3.5 (BETA) AVAILABLE MARCH 11, 1988
+    \begin{nrtc}
+    \item	CONTAINS \emph{THE COOKBOOK} (VOLUME 4)
+
+    \item	AND THE FACILITIES DISCUSSED TODAY
+    \end{nrtc}
+
+\item	USE ANONYMOUS FTP
+    \[\begin{tabular}{ll}
+	HOST&	louie.udel.edu\\
+	FILE&	portal/isode-beta.tar.Z\\
+	MODE&	binary
+    \end{tabular}\]
+
+\item	FILE IS A COMPRESSED TAR IMAGE
+
+\item	NEED \LaTeX{} AND A LASER PRINTER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DISCUSSION GROUPS}
+
+\begin{nrtc}
+\item	THE GROUP:
+    \begin{nrtc}
+    \item	ISODE@NRTC.NORTHROP.COM
+    \end{nrtc}
+
+\item	LIST ADDITIONS:
+    \begin{nrtc}
+    \item	ISODE-REQUEST@NRTC.NORTHROP.COM
+    \end{nrtc}
+
+\item	BUG REPORTS
+    \begin{nrtc}
+    \item	BUG-ISODE@NRTC.NORTHROP.COM
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{BIBLIOGRAPHY}%\bf
+
+\begin{description}
+\item[{[CCITT X.410]}]	Message Handling Systems: Remote Operations
+			and Reliable Transfer Server, October, 1984
+
+\item[{[ECMA TR/31]}]	Remote Operations: Concepts, Notation and
+			Connection-Oriented Mappings, December, 1985
+    \begin{quote}\em
+    sections 1--4 are relevant, the latter sections have been superceded by
+    the more recent work below
+    \end{quote}
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BIBLIOGRAPHY (cont.)}
+
+\begin{description}
+\item[{[ISO 8824]}]	Information Processing Systems~---~Open Systems
+			Interconnection: Specification of Abstract Syntax
+			Notation One (ASN.1), May, 1986
+
+\item[{[ISO 8825]}]	Information Processing Systems~---~Open Systems
+			Interconnection: Specification of Basic Encoding
+			Rules for Abstract Syntax One (ASN.1), May, 1986
+
+\item[{[ISO 9072]}]	Information Processing Systems~---~Text
+			Communication~---~MOTIS~---~Remote Operations,
+			February, 1987
+    \begin{description}
+    \item[{[ISO 9072/1]}]	Part 1: Model, Notation and Service
+				Definition
+
+    \item[{[ISO 9072/2]}]	Part 2: Protocol Specification
+    \end{description}
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{ACKNOWLEDGEMENTS}\bf
+
+\begin{quote}\em
+this presentation is based on experiences in implementing the ISO
+Development Environment (ISODE),
+an openly available implementation of the upper-layers of OSI
+
+many have made significant contributions to the content and quality of
+this presentation, notably:
+\begin{nrtc}
+\item	at ISI: Bob Braden
+
+\item	at NMA: Einar Stefferud
+
+\item	at Nott: Julian Onions
+
+\item	at TWG: Danielle Bercel, Shaun Jalalian, Keith McCloghrie,
+	and Don Wolski 
+
+\item	at UCL: Steve Kille
+
+\item	at UWisc: Nancy Hall
+\end{nrtc}
+
+also, UNIX is a trademark of at\&t bell laboratories
+\end{quote}
+\end{bwslide}
+
+
+\end{document}

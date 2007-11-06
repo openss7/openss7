@@ -1,0 +1,59 @@
+###############################################################################
+#
+# snmpd.peers - SNMP configuration for SMUX peers
+#
+# $Header: /xtel/isode/isode/snmp/RCS/snmpd.peers,v 9.0 1992/06/16 12:38:11 isode Rel $
+#
+# Contributed by NYSERNet Inc.  This work was partially supported by the
+# U.S. Defense Advanced Research Projects Agency and the Rome Air Development
+# Center of the U.S. Air Force Systems Command under contract number
+# F30602-88-C-0016.
+#
+#
+# $Log: snmpd.peers,v $
+# Revision 9.0  1992/06/16  12:38:11  isode
+# Release 8.0
+#
+# Revision 8.4  1992/04/03  08:26:06  isode
+# sync
+#
+# Revision 8.3  1992/02/26  13:46:55  isode
+# rel7_2
+#
+# Revision 8.2  1992/02/05  10:10:30  isode
+# "Release
+#
+# Revision 8.1  1991/12/05  08:02:04  jpo
+# MTR upgrade
+#
+# Revision 8.0  1991/07/17  13:01:02  isode
+# Release 7.0
+#
+# 
+###############################################################################
+
+
+###############################################################################
+#
+# Syntax:
+#
+#	<name>	<object id>	<password>	[<priority>]
+#
+#	Each token is seperated by LWSP, though double-quotes may be
+#	used to prevent separation
+#
+###############################################################################
+
+
+###############################################################################
+# SMUX peers standard to 4BSD/ISODE
+###############################################################################
+
+"unixd"	    1.3.6.1.4.1.4.3.1.3	"aintNoThing"
+
+
+###############################################################################
+# locally defined SMUX peers
+###############################################################################
+
+"osiappd"  1.3.6.1.4.1.4.3.1.4  "aintNoThing"

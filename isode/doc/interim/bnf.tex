@@ -1,0 +1,67 @@
+\File{bnf.bnf},{09:46},{Mar  4 1989}
+\L{\LB{}}
+\L{\LB{\<digit\> ::= [0\-9]}}
+\L{\LB{\<other\> ::= [0\-9a\-zA\-Z+\-.]}}
+\L{\LB{\<hexdigit\> ::= [0\-9a\-f]}}
+\L{\LB{}}
+\L{\LB{\<digitstring\> ::= \<digit\> \<digitstring\>}}
+\L{\LB{                        \| \<digit\>}}
+\L{\LB{\<otherstring\> ::= \<other\> \<otherstring\>}}
+\L{\LB{                        \| \<other\>}}
+\L{\LB{\<hexstring\> ::= \<hexdigit\> \<hexstring\> \| \<hexdigit\>}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{                        }}
+\L{\LB{}}
+\L{\LB{\<presentation\-address\> ::= }}
+\L{\LB{                [[[ \<psel\> \S{}\"\/\"\SE{} ] \<ssel\> \S{}\"\/\"\SE{} ] \<tsel\> \S{}\"\/\"\SE{} ] }}
+\L{\LB{                \<network\-address\-list\>}}
+\L{\LB{}}
+\L{\LB{\<network\-address\-list\> ::= \<network\-address\> \S{}\"\|\"\SE{} \<network\-address\-list\> }}
+\L{\LB{                           \| \<network\-address\>}}
+\L{\LB{}}
+\L{\LB{\<psel\> ::= \<selector\>}}
+\L{\LB{\<ssel\> ::= \<selector\>}}
+\L{\LB{\<tsel\> ::= \<selector\>}}
+\L{\LB{}}
+\L{\LB{\<selector\>  ::= \S{}\'\"\SE{}\S{}\' \<otherstring\> \'\SE{}\S{}\"\'\SE{}        \C{}\-\- IA5}}
+\CE{}\L{\LB{                                             \C{}\-\- For chars not in this}}
+\CE{}\L{\LB{                                             \C{}\-\- string use hex}}
+\CE{}\L{\LB{                \| \S{}\"\#\"\SE{} \<digitstring\>          \C{}\-\- US GOSIP}}
+\CE{}\L{\LB{                \| \S{}\"\'\SE{}\S{}\" \<hexstring\> \"\SE{}\S{}\'H\"\SE{}       \C{}\-\- Hex}}
+\CE{}\L{\LB{                \| \S{}\"\"\SE{}                         \C{}\-\- Empty but present}}
+\CE{}\L{\LB{}}
+\L{\LB{\<network\-address\> ::=   \S{}\"NS\"\SE{} \S{}\"+\"\SE{} \<hexstring\>}}
+\L{\LB{                                 \C{}\-\- Concrete Binary Representation}}
+\CE{}\L{\LB{                                 \C{}\-\- This is the compact encoding}}
+\CE{}\L{\LB{        \| \<afi\> \S{}\"+\"\SE{} \<idi\> [ \S{}\"+\"\SE{} \<dsp\> ]}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\<dsp\>  ::=}}
+\L{\LB{        \| \S{}\"d\"\SE{} \<digitstring\>          \C{}\-\- Abstract Decimal}}
+\CE{}\L{\LB{        \| \S{}\"x\"\SE{} \<hexstring\>            \C{}\-\- Abstract Binary}}
+\CE{}\L{\LB{        \| \S{}\"l\"\SE{} \<otherstring\>             \C{}\-\- IA5: local form only}}
+\CE{}\L{\LB{        \| \S{}\"RFC\-1006\"\SE{} \S{}\"+\"\SE{} \<prefix\> \S{}\"+\"\SE{} \<ip\> }}
+\L{\LB{           [ \S{}\"+\"\SE{} \<port\> [ \S{}\"+\"\SE{} \<tset\> ]]}}
+\L{\LB{        \| \S{}\"X.25(80)\"\SE{} \S{}\"+\"\SE{} \<prefix\> \S{}\"+\"\SE{} \<dte\> }}
+\L{\LB{           [ \S{}\"+\"\SE{} \<cudf\-or\-pid\> \S{}\"+\"\SE{} \<hexstring\> ]}}
+\L{\LB{        \| \S{}\"ECMA\-117\-Binary\"\SE{} \S{}\"+\"\SE{} \<hexstring\> \S{}\"+\"\SE{} \<hexstring\> }}
+\L{\LB{           \S{}\"+\"\SE{} \<hexstring\>}}
+\L{\LB{        \| \S{}\"ECMA\-117\-Decimal\"\SE{} \S{}\"+\"\SE{} \<digitstring\> \S{}\"+\"\SE{} }}
+\L{\LB{           \<digitstring\> \S{}\"+\"\SE{} \<digitstring\>}}
+\L{\LB{                }}
+\L{\LB{\<idi\> ::= \<digitstring\>}}
+\L{\LB{\<afi\> ::= \S{}\"X121\"\SE{} \| \S{}\"DCC\"\SE{} \| \S{}\"TELEX\"\SE{} \| \S{}\"PSTN\"\SE{} \| \S{}\"ISDN\"\SE{} }}
+\L{\LB{                \| \S{}\"ICD\"\SE{} \| \S{}\"LOCAL\"\SE{} }}
+\L{\LB{}}
+\L{\LB{\<prefix\> ::= \<digit\> \<digit\>         }}
+\L{\LB{}}
+\L{\LB{\<ip\> ::= \<otherstring\>}}
+\L{\LB{                        \C{}\-\- dotted decimal form (e.g., 10.0.0.6)}}
+\CE{}\L{\LB{                        \C{}\-\- or domain (e.g., twg.com)}}
+\CE{}\L{\LB{\<port\> ::= \<digitstring\>}}
+\L{\LB{\<tset\> ::= \<digitstring\>}}
+\L{\LB{}}
+\L{\LB{\<dte\> ::= \<digitstring\>}}
+\L{\LB{\<cudf\-or\-pid\> ::= \S{}\"CUDF\"\SE{} \| \S{}\"PID\"\SE{}}}
+\L{\LB{}}

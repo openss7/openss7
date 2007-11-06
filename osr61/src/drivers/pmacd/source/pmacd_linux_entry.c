@@ -1017,6 +1017,12 @@ int pmacd_ioctl(struct inode *inode, struct file *file,
   
   return(0);
 }
+
+#ifdef IRQF_SHARED
+#undef SA_SHIRQ
+#define SA_SHIRQ IRQF_SHARED
+#endif
+
 /*
  *  FunctionName:  pmacd_register_irq()
  *

@@ -1,0 +1,102 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter {Attribute Matching}
+\label{attr_match}
+
+An important part of QUIPU is the ability to search for specified attributes.
+This appendix describes the attribute you can search for and the type of
+search that is valid, using the standard tables.
+
+\section {Approximate Matches}
+The attributes shown in Figure~\ref{case_ignore} take a ``string'' value, 
+and perform approximate matching if asked.
+Substring matches are allowed.
+Exact matches are case independent.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|} \hline
+Attribute & Abbreviation \\ \hline
+knowledgeInformation & \\
+commonName & cn\\
+surname &\\
+serialNumber &\\
+countryName & c \\
+localityName  & l\\
+stateOrProvinceName & st\\
+streetAddress &\\
+organizationName & o\\
+organizationalUnitName & ou\\
+title &\\
+description &\\
+businessCategory &\\
+postalAddress  &\\
+postalCode &\\
+postOfficeBox &\\
+physicalDeliveryOfficeName &\\
+userid & uid\\
+textEncodedORaddress &\\
+rfc822Mailbox & mail\\
+info &\\
+favouriteDrink & drink\\
+roomNumber &\\
+userClass  &\\
+host &\\
+documentIdentifier &\\
+documentTitle &\\
+documentVersion  &\\
+documentLocation &\\
+friendlyCountryName & co\\
+orAddressComponent &\\\hline
+\end{tabular}
+\caption{Case Independent Attributes}
+\label{case_ignore}
+\end{table}
+
+Table \ref{case_sense} shows the attributes for which matches are case sensitive.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|} \hline
+Attribute \\ \hline
+telephoneNumber \\
+telexNumber  \\
+teletexTerminalIdentifier \\
+facsimileTelephoneNumber \\
+iSDNAddress \\
+registeredAddress  \\
+destinationIndicator  \\
+preferredDeliveryMethod  \\ \hline
+\end{tabular}
+\caption{Case Sensitive Attributes}
+\label{case_sense}
+\end{table}
+
+\section {Exact Matches Only}
+
+Table \ref{exact_match} shows attributes for which matches are for
+equality only.
+The syntax of the value is a formatted string; the syntax of which is
+shown.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|} \hline
+Attribute & Syntax \\ \hline
+objectClass & objectclass \\
+x121Address & numericstring\\
+supportedApplicationContext & oid\\
+aliasedObjectName & dn \\
+member & dn\\
+owner & dn\\
+roleOccupant & dn\\
+seeAlso & dn\\
+manager & dn\\
+documentAuthor & dn\\
+masterDSA & dn\\
+slaveDSA & dn\\
+filestore & dn\\ \hline
+\end{tabular}
+\caption{Exact Match Only Attributes}
+\label{exact_match}
+\end{table}

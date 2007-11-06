@@ -1,0 +1,27 @@
+\contentsline {section}{\numberline {1}Introduction}{2}
+\contentsline {subsection}{\numberline {1.1}For Further Reading}{3}
+\contentsline {subsection}{\numberline {1.2}Managing Infrastructural Information}{4}
+\contentsline {subsection}{\numberline {1.3}A Public Directory Service}{4}
+\contentsline {subsection}{\numberline {1.4}An Implementation}{5}
+\contentsline {section}{\numberline {2}Directory System Issues}{7}
+\contentsline {subsection}{\numberline {2.1}Writing Distinguished Names}{7}
+\contentsline {subsection}{\numberline {2.2}DIT Navigation}{7}
+\contentsline {subsubsection}{\numberline {2.2.1}Entry Data Blocks}{8}
+\contentsline {subsubsection}{\numberline {2.2.2}Use of Presentation Address}{9}
+\contentsline {subsection}{\numberline {2.3}Objects}{10}
+\contentsline {subsubsection}{\numberline {2.3.1}Object Class: friendlyCountry}{10}
+\contentsline {subsubsection}{\numberline {2.3.2}Object Class: domainRelatedObject}{10}
+\contentsline {subsubsection}{\numberline {2.3.3}Object Class: quipuObject}{10}
+\contentsline {subsubsection}{\numberline {2.3.4}Object Class: quipuNonLeafObject}{11}
+\contentsline {subsubsection}{\numberline {2.3.5}Object Class: quipuDSA}{11}
+\contentsline {subsection}{\numberline {2.4}Naming DSAs}{12}
+\contentsline {subsection}{\numberline {2.5}DSA Management}{13}
+\contentsline {section}{\numberline {3}Directory User Issues}{14}
+\contentsline {subsection}{\numberline {3.1}Objects}{14}
+\contentsline {subsubsection}{\numberline {3.1.1}Object Class: pilotPerson}{14}
+\contentsline {subsubsection}{\numberline {3.1.2}Other Object Classes}{17}
+\contentsline {subsection}{\numberline {3.2}Naming}{17}
+\contentsline {subsection}{\numberline {3.3}Searching}{23}
+\contentsline {subsection}{\numberline {3.4}Browsing}{27}
+\contentsline {subsection}{\numberline {3.5}Searching Revisited}{27}
+\contentsline {section}{\numberline {4}Acknowledgements}{29}

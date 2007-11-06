@@ -1,0 +1,313 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH MP_BIND 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B mp_bind
+\- Bind \- open an XMP management session.
+.\"
+.\"
+.SH INTERFACE
+.PP
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xom.h>
+.br
+.B #include <xmp.h>
+.HP
+.BI "MP_status mp_bind(
+.PD 0
+.RS
+.HP
+.BI "OM_object " session ,
+.HP
+.BI "OM_workspace " workspace ,
+.HP
+.BI "OM_private_object *" bound_session_return
+.RE
+.HP
+.BI );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I session
+specifies a program together with other details of the service required.  This argument may be
+either a public object or a private object.  The constant \fBMP_DEFAULT_SESSION\fP may also be used
+as the value of this argument, causing a new session to be created with default values for all its
+OM attributes.
+.TP
+.I workspace
+Specifies the workspace (obtained from a call to
+.BR mp_initialize (3))
+that is to be associated with the session.  All function results from management operations using
+this session will be returned as private objects in this workspace.  If the Session argument is a
+private object, it must be a private object in this workspace.
+.TP
+.I bound_session_return
+Upon successful completion, contains an instance of a mangement session which may be used as an
+argument to other functions (e.g.
+.BR mp_get (3)).
+This will be a new private object if the value of \fIsession\fP was \fBMP_DEFAULT_SESSION\fP or a
+public object, otherwise, it will be that supplied as an argument.  In the latter case, the session
+provided should nto be already in use.  The function will supply default values for any of the OM
+attributes which were not present in the \fIsession\fP instance supplied as an argument.  It will
+also set the value of the \fBFile-Descriptor\fP OM attribute (the value will be
+\fBNo-Valid-File-Descriptor\fP (\fBMP_NO_VALID_FILE_DESCRIPTOR\fP) if the functionality is not
+supported).
+.sp
+When ACM is disabled via
+.BR mp_negotiate (3),
+any session bound using
+.BR mp_bind ()
+is unconnected and may only be used to receive and send ACSE-related primitives (i.e\&. it cannot be
+used for CMIP and SNMP primitives).
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mp_bind ()
+opens a management session.  It creates a Session OM object describing the session suitable for
+supplying to other XMP functions.  A session must be opened before any management interactions can
+take place.
+.PP
+If the OM attribute requestor-Title is specified, only one unconnected session can be opened with
+the same value of the OM attribute.  There can be multiple connected or partially connected session
+objects with the same requestor-Title.
+.PP
+To allow for the implementation of automatic connection management, it is undefined as to whether
+.BR mp_bind ()
+causes any communication with the remote management entity.
+.\"
+.\"
+.SH RETURN
+.PP
+When successful,
+.BR mp_bind ()
+will return a status of
+.RB [ MP_SUCCESS ]
+and
+.I bound_session_return
+will contain a bound session;
+otherwise, the call fails and a diagnostic error code is returned and
+.I bound_session_return
+is unchanged.
+.PP
+Upon success,
+.IR bound_session_return
+will contain an instance of a mangement session that may be used as an
+argument to other functions (e.g.
+.BR mp_get (3)).
+This will be a new private object if the value of \fIsession\fP was \fBMP_DEFAULT_SESSION\fP or a
+public object; otherwise, it will be that supplied as an argument.  In the latter case, the session
+provided should nto be already in use.  The function will supply default values for any of the OM
+attributes that were not present in the \fIsession\fP instance supplied as an argument.  It will
+also set the value of the \fBFile-Descriptor\fP OM attribute (the value will be
+\fBNo-Valid-File-Descriptor\fP (\fBMP_NO_VALID_FILE_DESCRIPTOR\fP) if the functionality is not
+supported).
+.sp
+When ACM is disabled via
+.BR mp_negotiate (3),
+any session bound using
+.BR mp_bind ()
+is unconnected and may only be used to receive and send ACSE-related primitives (i.e\&. it cannot be
+used for CMIP and SNMP primitives).
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a System-Error or one of the following Library-Errors: bad-address,
+bad-session, bad-title, miscellaneous, not-supported, too-many-sessions.
+.PP
+This function can return a Communications-Error.
+.PP
+In addition, this function can return the error constants:
+.TP
+.RB [ MP_NO_WORKSPACE ]
+.TP
+.RB [ MP_INVALID_SESSION ]
+.TP
+.RB [ MP_INSUFFICIENT_RESOURCES ]
+.\"
+.\"
+.SH NOTICES
+.PP
+The caller should always check the whether the
+.I bound_session_return
+is the same as the passed in
+.I session
+and not attempt to delete the
+.I session
+object if they are the same.
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an examble of binding a default session:
+.RS
+.PP
+.nf
+\fC\s-1\
+OM_workspace myworkspace;
+
+if ((myworkspace = mp_initialize()) == NULL) {
+    fprintf(stderr, "could not allocate workspace\n");
+    exit(1);
+}
+
+OM_private_object mysession;
+MP_status error;
+
+if ((error =
+     mp_bind(MP_DEFAULT_SESSION, myworkspace,
+             &mysession)) != MP_SUCCESS) {
+    fprintf(stderr, "%s\n", mp_error_message(error));
+    mp_shutdown(myworkspace);
+    exit(1);
+}
+\s+1\fP
+.fi
+.RE
+.PP
+Another example, using a copy of \fBMP_DEFAULT_SESSION\fP:
+.RS
+.PP
+.nf
+\fC\s-1\
+OM_status status;
+OM_private_object mydefault;
+
+status = om_copy(MP_DEFAULT_SESSION, myworkspace, &mydefault);
+if (status != OM_SUCCESS) {
+	exit(1);
+}
+om_add
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR mp_unbind (3),
+.BR mp_negotiate (3),
+.BR mp_intialize (3),
+.BR xmp (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM,
+.[
+xom
+.]
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XMP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.TI

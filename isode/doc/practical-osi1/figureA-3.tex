@@ -1,0 +1,31 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \special{pa 0 1000}%
+    \special{pa 0 0}%
+    \special{pa 3750 0}%
+    \special{pa 3750 1000}%
+    \special{pa 0 1000}%
+    \special{fp}%
+    \rlap{\kern  1.875in\lower 0.541in\hbox to 0pt{\hss APPLICATION\hss}}%
+    \special{sh}%
+    \special{pa 0 2500}%
+    \special{pa 0 1500}%
+    \special{pa 3750 1500}%
+    \special{pa 3750 2500}%
+    \special{pa 0 2500}%
+    \special{fp}%
+    \rlap{\kern  1.875in\lower 2.041in\hbox to 0pt{\hss \normalsize TRANSPORT\hss}}%
+    \rlap{\kern  1.875in\lower 1.291in\hbox to0pt{\ circuits\hss}}%
+    \special{pa 1875 1000}%
+    \special{pa 1875 1500}%
+    \special{fp}%
+    \kern  3.751in
+  }\vss}%
+  \kern  2.501in
+}

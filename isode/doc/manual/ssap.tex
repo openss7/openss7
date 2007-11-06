@@ -1,0 +1,2493 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Session Services}\label{libssap}
+The \man libssap(3n) library implements the session service.
+
+As with most models of OSI services,
+the underlying assumption is one of a symmetric, asynchronous environment.
+That is,
+although peers exist at a given layer,
+one does not necessary view a peer as either a client or a server.
+Further,
+the service provider may generate events for the service user without the
+latter entity triggering the actions which led to the event.
+For example,
+in a synchronous environment,
+an indication that data has arrived usually occurs only when the service user
+asks the service provider to read data;
+in an asynchronous environment,
+the service provider may interrupt the service user at any time to announce
+the arrival of data.
+
+The \verb"ssap" module in this release initially uses a client/server
+paradigm to start communications.
+Once the connection is established,
+a symmetric view is taken.
+In addition,
+initially the interface is synchronous;
+however once the connection is established,
+an asynchronous interface may be selected.
+
+All of the routines in the \man libssap(3n) library are integer-valued.
+They return the manifest constant \verb"OK" on success,
+or \verb"NOTOK" otherwise.
+
+\section	{Warning}
+Please read the following important message.
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	Readers of this chapter should have an intimate understanding
+		of the OSI session service.  It is not the intent of this
+		chapter to present a tutorial on these services, so novice
+		users will suffer greatly if they choose to read further.
+\end{tabular}}\]
+
+\section	{Addresses}\label{ssap:addresses}
+Addresses at the session service access point are represented by the
+\verb"SSAPaddr" structure.
+\begin{quote}\index{SSAPaddr}\small\begin{verbatim}
+struct SSAPaddr {
+    struct TSAPaddr sa_addr;
+
+#define SSSIZE  64
+    int     sa_selectlen;
+    char    sa_selector[SSSIZE];
+};
+#define NULLSA  ((struct SSAPaddr *) 0)
+\end{verbatim}\end{quote}
+This structure contains two elements:
+\begin{describe}
+\item[\verb"sa\_addr":]	the transport address,
+as described in Section~\ref{tsap:addresses} on page~\pageref{tsap:addresses};
+and,
+
+\item[\verb"sa\_selector"/\verb"sa\_selectlen":] the session selector.
+\end{describe}
+
+In Figure~\ref{getASprovider},
+an example of how one constructs the SSAP address for the Presentation provider
+on host \verb"RemoteHost" is presented.
+The routine \verb"is2saddr" takes a host and service,
+and then consults the \man isoentities(5) file described in
+Chapter~\ref{isoentities} of \volone/ to construct a session
+address.
+\begin{quote}\index{is2saddr}\small\begin{verbatim}
+struct SSAPaddr *is2saddr (host, service, is)
+char   *host,
+       *service;
+struct isoservent *is;
+\end{verbatim}\end{quote}
+\tagrind[tp]{grind5b-1}%
+	{Constructing the SSAP address for the Presentation provider}%
+	{getASprovider}
+
+\subsection	{Calling Address}
+Certain users of the session service
+(e.g., the reliable transfer service)
+need to know the name of the local host when they initiate a connection.
+The routine \verb"SLocalHostName" has been provided for this reason.
+\begin{quote}\index{SLocalHostName}\small\begin{verbatim}
+char   *SLocalHostName ()
+\end{verbatim}\end{quote}
+
+\subsection	{Address Encodings}
+It may be useful to encode a session address for viewing.
+Although a consensus for a standard way of doing this has not yet been
+reached,
+the routines \verb"saddr2str" and \verb"str2saddr" may be used in the interim.
+\begin{quote}\index{saddr2str}\small\begin{verbatim}
+char   *saddr2str (sa)
+struct SSAPaddr *sa;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"sa":] the session address.
+\end{describe}
+If \verb"saddr2str" fails,
+it returns the manifest constant \verb"NULLCP".
+
+The routine \verb"str2saddr" takes an ascii string encoding and
+returns a
+session address.
+\begin{quote}\index{str2saddr}\small\begin{verbatim}
+struct SSAPaddr *str2saddr (str)
+char   *str;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"str":] the ascii string.
+\end{describe}
+If \verb"str2saddr" fails,
+it returns the manifest constant \verb"NULLSA".
+
+\section	{Connection Establishment}
+Until the connection has been fully established,
+the implementation distinguishes between clients and servers,
+which are more properly referred to as {\em initiators\/} and
+{\em responders}, to use OSI terminology.
+
+\subsection	{Connection Negotiation}\label{ssap:negotiation}
+From the user's perspective,
+there are several parameters which are negotiated by the session providers
+during connection establishment.
+Suggestions as to the values of some of these parameters are made by the user.
+
+\subsubsection	{Maximum SSDU Size}
+The session provider will accept arbitrarily large session service data units
+(SSDUs) and transparently fragment and re-assemble them during transit.
+Hence, the actual SSDU is of unlimited size.
+However, for efficiency reasons,
+it may be desirable for the user to send SSDUs which are no larger than a
+certain threshold.
+When a connection has been established,
+the service providers inform the initiator and responder as to what this
+threshold is.
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}\label{SSDU:atomic}
+\bf NOTE:&	In the current implementation,
+		SSDUs which are no larger than the maximum atomic SSDU size
+		are handled very efficiently.
+		For optimal performance,
+		users of the session service should strive to avoid sending
+		SSDUs which are larger than this threshold.
+\end{tabular}}\]
+
+\subsubsection	{Session Requirements}
+Users may specify the particular services that they will require from the
+session provider.
+The particular requirements supported in the current implementation are
+listed in Table~\ref{SSAPrequirements}.
+These requirements are always negotiated downward.
+That is,
+the initiator of the connection (i.e., the ``client'') indicates the
+desired session requirements.
+These are then given to the responder to the connection request
+(i.e., the ``server'') who may select any (or all) of the indicated session
+requirements.%
+\footnote{There is one exception,
+the responder may not select both the half- and full-duplex requirements.
+It must choose one.
+If the initiator selects both initially,
+it is indicating that the choice is made at the responder's discretion.}
+This selection is then indicated to the initiator.
+\tagtable[tp]{5b-1}{Session Requirements}{SSAPrequirements}
+
+\subsubsection	{Session Tokens}
+Depending on the session requirements selected,
+several session tokens may be available in order to coordinate the use of
+session services.
+
+There are two terms commonly used when referring to a session token:
+\begin{itemize}
+\item	Availability\\
+	If a token is available, then it exists for use during the session
+	connection.
+	The availability of a token depends on the session requirements
+	selected for the connection.
+\item	Ownership\\
+	Certain session services are may not be requested by a user unless
+	that user owns the token associated with those services.
+\end{itemize}
+The particular tokens supported in the current implementation,
+along with their associated availability information are
+listed in Table~\ref{SSAPtokens}.
+\tagtable[tp]{5b-2}{Session Tokens}{SSAPtokens}
+
+The session requirements are encoded as a single integer
+(actually, only the low-order 2~octets of an integer).
+To determine if a token is available,
+one can use a simple test involving the session requirements:
+\begin{quote}\small\begin{verbatim}
+if (requirements & SR_xxx_EXISTS) {
+    ...
+}
+\end{verbatim}\end{quote}
+For example,
+to determine if the negotiated release token is available:
+\begin{quote}\small\begin{verbatim}
+if (requirements & SR_RLS_EXISTS) {
+    ...
+}
+\end{verbatim}\end{quote}
+
+Finally,
+the macro \verb"dotokens" may be used to execute {\em C\/} code for each
+session token (regardless of availability).\index{dotokens}
+This macro acts as if it executes:
+\begin{quote}\index{dotoken}\small\begin{verbatim}
+dotoken (SR_xxx_EXISTS, ST_xxx_SHIFT, ST_xxx_TOKEN, "xxx");
+\end{verbatim}\end{quote}
+for each token.
+Usually,
+\verb"dotoken" is a macro which executes some code for each token.
+An example is provided momentarily.
+
+\subsubsection	{Initial Token Settings}
+For each token which is made available during connection negotiation,
+the choice as to which user initially has the token is left to the discretion
+of the initiator.
+The three choices for the initial settings of a token are listed in
+Table~\ref{SSAPsettings}.
+\tagtable[tp]{5b-3}{Initial Token Settings}{SSAPsettings}
+
+The initial settings for all available tokens are encoded in a single integer
+(actually, only the low-order 2~octets of an integer).
+To encode a value:
+\begin{quote}\small\begin{verbatim}
+settings &= ~(ST_MASK << ST_yyy_SHIFT);
+settings |= ST_xxx_VALUE << ST_yyy_SHIFT;
+\end{verbatim}\end{quote}
+For example,
+to indicate that the responder of the connection is to initially have the
+data token:
+\begin{quote}\small\begin{verbatim}
+settings &= ~(ST_MASK << ST_DAT_SHIFT);
+settings |= ST_RESP_VALUE << ST_DAT_SHIFT;
+\end{verbatim}\end{quote}
+The first statement,
+which clears the field in \verb"settings" by using \verb"ST_MASK",
+is not required if \verb"settings" is initially \verb"0".
+
+If the initiator indicates that the initial setting of a token is left to
+the responder's choice,
+then the responder must decide.
+In Figure~\ref{setINITtokens},
+an example of the \verb"dotokens" macro is presented.
+In this example,
+the responder examines the initial setting for each available token,
+and:
+\begin{itemize}
+\item	Notes if the responder initially owns the token
+	(the \verb"ST_RESP_VALUE" case); or,
+\item	Gives ownership of the token to the initiator if the choice is
+	at the responder's discretion
+	(the \verb"ST_CALL_VALUE" case).
+\end{itemize}
+\tagrind[tp]{grind5b-2}{Determining the Initial Token Settings}{setINITtokens}
+
+\subsection	{Server Initialization}
+The \man tsapd(8c) daemon,
+upon accepting a connection from an initiating host,
+consults the ISO services database to determine which program
+on the local system implements the desired TSAP entity.
+In the case of the session service,
+the \pgm{tsapd} program contains the bootstrap for the session provider.
+The daemon will again consult the ISO services database to determine which
+program on the system implements the desired SSAP entity.
+
+Once the program has been ascertained,
+the daemon runs the program with any arguments listed in the database.
+In addition,
+it appends some {\em magic arguments\/} to the argument vector.
+Hence,
+the very first action performed by the responder is to re-capture the SSAP
+state contained in the magic arguments.
+This is done by calling the routine \verb"SInit",
+which on a successful return,
+is equivalent to a {\sf S-CONNECT.INDICATION\/} from the session service
+provider.
+\begin{quote}\index{SInit}\small\begin{verbatim}
+int     SInit (vecp, vec, ss, si)
+int     vecp;
+char  **vec;
+struct SSAPstart *ss;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"vecp":] the length of the argument vector;
+
+\item[\verb"vec":] the argument vector;
+
+\item[\verb"ss":] a pointer to a \verb"SSAPstart" structure, which is updated
+only if the call succeeds;
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If \verb"SInit" is successful,
+it returns information in the \verb"ss" parameter,
+which is a pointer to a \verb"SSAPstart" structure.
+\begin{quote}\index{SSAPstart}\small\begin{verbatim}
+struct SSAPstart {
+    int     ss_sd;
+
+    struct SSAPref  ss_connect;
+
+    struct SSAPaddr ss_calling;
+    struct SSAPaddr ss_called;
+
+    int     ss_requirements;
+    int     ss_settings;
+    long    ss_isn;
+
+    int     ss_ssdusize;
+
+    struct QOStype ss_qos;
+
+#define SS_SIZE         512
+    int     ss_cc;
+    char    ss_data[SS_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"ss\_sd":] the session-descriptor to be used to reference this
+connection;
+
+\item[\verb"ss\_connect":] the connection identifier (a.k.a. SSAP reference)
+used by the initiator;
+
+\item[\verb"ss\_calling":] the address of the peer initiating the connection;
+
+\item[\verb"ss\_called":] the address of the peer being asked to respond;
+
+\item[\verb"ss\_requirements":] the proposed session requirements;
+
+\item[\verb"ss\_settings":] the initial token settings;
+
+\item[\verb"ss\_isn":] the initial serial-number;
+
+\item[\verb"ss\_ssdusize":] the largest atomic SSDU size that can be used on
+the connection (see the note on page~\pageref{SSDU:atomic});
+
+\item[\verb"ss\_qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos});
+and,
+
+\item[\verb"ss\_data"/\verb"ss\_cc":] any initial data
+(and the length of that data).
+\end{describe}
+
+The \verb"ss_connect" element is a \verb"SSAPref" structure,
+which is passed transparently by the session service.
+\begin{quote}\index{SSAPref}\small\begin{verbatim}
+struct SSAPref {
+#define SREF_USER_SIZE 64
+    u_char sr_ulen;
+    char    sr_udata[SREF_USER_SIZE];
+
+#define SREF_COMM_SIZE 64
+    u_char  sr_clen;
+    char    sr_cdata[SREF_COMM_SIZE];
+
+#define SREF_ADDT_SIZE 4
+    u_char  sr_alen;
+    char    sr_adata[SREF_ADDT_SIZE];
+
+    u_char  sr_vlen;
+    char    sr_vdata[SREF_USER_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:\label{SSAPref}
+\begin{describe}
+\item[\verb"sr\_udata"/\verb"sr\_ulen":] the user reference (and length of
+that reference, which may not exceed \verb"SREF_USER_SIZE" octets);
+
+\item[\verb"sr\_cdata"/\verb"sr\_clen":] the common reference (and length of
+that reference, which may not exceed \verb"SREF_COMM_SIZE" octets);
+
+\item[\verb"sr\_adata"/\verb"sr\_adata":] the additional reference (and length
+of that reference, which may not exceed \verb"SREF_ADDT_SIZE" octets);
+and,
+
+\item[\verb"sr\_vdata"/\verb"sr\_vlen":] a second user reference (and length
+of that reference, which may not exceed \verb"SREF_USER_SIZE" octets),
+which is used only when starting or resuming an activity.
+\end{describe}
+
+If the call to the \verb"SInit" routine is not successful,
+then a {\sf S-P-ABORT.IN\-DI\-CA\-TION\/} event is simulated,
+and the relevant information is returned in a \verb"SSAPindication"
+structure.\label{SSAPindication}
+\begin{quote}\index{SSAPindication}\small\begin{verbatim}
+struct SSAPindication {
+    int     si_type;
+#define SI_DATA         0x00
+#define SI_TOKEN        0x01
+#define SI_SYNC         0x02
+#define SI_ACTIVITY     0x03
+#define SI_REPORT       0x04
+#define SI_FINISH       0x05
+#define SI_ABORT        0x06
+
+    union {
+        struct SSAPdata si_un_data;
+        struct SSAPtoken si_un_token;
+        struct SSAPsync si_un_sync;
+        struct SSAPactivity si_un_activity;
+        struct SSAPreport si_un_report;
+        struct SSAPfinish si_un_finish;
+        struct SSAPabort si_un_abort;
+    }   si_un;
+#define si_data         si_un.si_un_data
+#define si_token        si_un.si_un_token
+#define si_sync         si_un.si_un_sync
+#define si_activity     si_un.si_un_activity
+#define si_report       si_un.si_un_report
+#define si_finish       si_un.si_un_finish
+#define si_abort        si_un.si_un_abort
+};
+\end{verbatim}\end{quote}
+As shown, this structure is really a discriminated union
+(a structure with a tag element followed by a union).
+Hence, on a failure return,
+one first coerces a pointer to the \verb"SSAPabort" structure contained
+therein,
+and then consults the elements of that structure.
+\begin{quote}\index{SSAPabort}\small\begin{verbatim}
+struct SSAPabort {
+    int     sa_peer;
+
+    int     sa_reason;
+
+#define SA_SIZE         512
+    int     sa_cc;
+    char    sa_data[SA_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of a \verb"SSAPabort" structure are:
+\begin{describe}
+\item[\verb"sa\_peer":] if set, indicates that a user-initiated abort occurred
+(a {\sf S-U-ABORT.INDICATION\/} event);
+if not set, indicates that a provider-initiated abort occurred
+(a {\sf S-P-ABORT.INDICATION\/} event);
+
+\item[\verb"sa\_reason":] the reason for the provider-initiated abort
+(codes are listed in Table~\ref{SSAPreasons}),
+meaningless if the abort is user-initiated;
+and,
+
+\item[\verb"sa\_data"/\verb"sa\_cc":] any abort data (and the length of that
+data) from the peer (if \verb"sa_peer" is set) or
+a diagnostic string from the provider (if \verb"sa_peer" is not set).
+\end{describe}
+\tagtable[tp]{5b-4}{SSAP Failure Codes}{SSAPreasons}
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	Although both \cite{ISO.SP.Protocol} and
+		\cite{CCITT.SP.Protocol} both require a maximum length
+		of \verb"9" octets for a user-initiated abort, the
+		current implementation permits up to \verb"512" octets to
+		be used.  Without this freedom, higher-layer protocols
+		which use presentation encoding mechanisms would be unable
+		to successfully use the session abort facility.
+\end{tabular}}\]
+
+After examining the information returned by \verb"SInit" on a successful call
+(and possibly after examining the argument vector),
+the responder should either accept or reject the connection.
+For either response,
+the responder should use
+the \verb"SConnResponse" routine
+(which corresponds to the {\sf S-CONNECT.RESPONSE\/} action).
+\begin{quote}\index{SConnResponse}\small\begin{verbatim}
+int     SConnResponse (sd, ref, called, result, requirements,
+                settings, isn, data, cc, si)
+int     sd;
+struct SSAPref *ref;
+struct SSAPaddr *called;
+int     result,
+        requirements,
+        settings,
+        cc;
+long	isn;
+char   *data;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"ref":]  the connection identifier used by the responder
+(consult page~\pageref{SSAPref} for a description of the \verb"SSAPref"
+structure);
+
+\item[\verb"called":] the SSAP address of the responder (defaulting to the
+called address, if not present);
+
+\item[\verb"result":] the acceptance indicator
+(either \verb"SC_ACCEPT" if the connection is to be accepted,
+or one of the user-initiated abort error codes listed in
+Table~\ref{SSAPreasons} on page~\pageref{SSAPreasons});
+
+\item[\verb"requirements":] the responder's session requirements
+(this may not include any requirements not listed in the initiator's session
+requirements);
+
+\item[\verb"settings":] the initial token settings
+(for each token,
+if the initiator specified \verb"ST_CALL_VALUE",
+then the responder should specify either \verb"ST_INIT_VALUE" or
+\verb"ST_RESP_VALUE";
+instead,
+if the initiator specified \verb"ST_INIT_VALUE",
+and the responder wants the token,
+it can specify the value \verb"ST_RSVD_VALUE".
+This is interpreted by the service provider as a ``tokens please'' request);
+
+\item[\verb"isn":] the initial serial-number;
+
+\item[\verb"data"/\verb"cc":] any initial data (and the length of that data,
+which may not exceed \verb"SC_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SConnResponse" is successful,
+and if the \verb"result" parameter is set to \verb"SC_ACCEPT",
+then connection establishment has completed
+and the users of the session service now operate as symmetric peers.
+If the call is successful,
+but the \verb"result" parameter is not \verb"SC_ACCEPT",
+then the connection has been rejected and the responder may exit.
+Otherwise, if the call fails and the reason is not an interface error
+(see Table~\ref{SSAPreasons} on page~\pageref{SSAPreasons}),
+then the connection is closed.
+
+Note that when the responder rejects the connection,
+it need not supply meaningful values for the the \verb"requirements",
+\verb"settings", and \verb"isn" parameters.
+The \verb"data"/\verb"cc" parameters are also optional,
+but it is recommended that the responder return some diagnostic information.
+
+\subsection	{Client Initialization}
+A program wishing to connect to another user of session services calls the
+\verb"SConnRequest" routine,
+which corresponds to the {\sf S-CONNECT.REQUEST\/} action.
+\begin{quote}\index{SConnRequest}\small\begin{verbatim}
+int     SConnRequest (ref, calling, called, requirements,
+                settings, isn, data, cc, qos, sc, si)
+struct SSAPref *ref;
+struct SSAPaddr *calling,
+                *called;
+int     requirements,
+        settings,
+        cc;
+long	isn;
+char   *data;
+struct QOStype *qos;
+struct SSAPconnect *sc;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"ref":] the connection identifier used by the initiator
+(consult page~\pageref{SSAPref} for a description of the \verb"SSAPref"
+structure);
+
+\item[\verb"calling":] the SSAP address of the responder;
+
+\item[\verb"called":] the SSAP address of the initiator;
+
+\item[\verb"requirements":] the session requirements;
+
+\item[\verb"settings":] the initial token settings;
+
+\item[\verb"isn":] the initial serial-number;
+
+\item[\verb"data"/\verb"cc":] any initial data (and the length of that data,
+which may not exceed \verb"SS_SIZE" octets);
+
+\item[\verb"qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos});
+
+\item[\verb"sc":] a pointer to a \verb"SSAPconnect" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if either:
+\begin{itemize}
+\item the call fails;
+or,
+
+\item the call succeeds,
+but the value of the \verb"sc_result" element of the \verb"sc" parameter
+is not \verb"SC_ACCEPT" (see below).
+\end{itemize}
+\end{describe}
+If the call to \verb"SConnRequest" is successful
+(a successful return corresponds to a {\sf S-CONNECT.CONFIRMATION\/} event),
+then information is returned in the \verb"sc" parameter,
+which is a pointer to a \verb"SSAPconnect" structure.
+\begin{quote}\index{SSAPconnect}\small\begin{verbatim}
+struct SSAPconnect {
+    int     sc_sd;
+
+    struct SSAPref  sc_connect;
+    
+    struct SSAPaddr sc_responding;
+
+    int     sc_result;
+
+    int     sc_requirements;
+    int     sc_settings;
+    int     sc_please;
+    lnog    sc_isn;
+
+    int     sc_ssdusize;
+
+    struct QOStype sc_qos;
+
+#define SC_SIZE         512
+    int     sc_cc;
+    char    sc_data[SC_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"sc\_sd":] the session-descriptor to be used to reference this
+connection;
+
+\item[\verb"sc\_connect":] the connection identifier used by the responder
+(consult page~\pageref{SSAPref} for a description of the \verb"SSAPref"
+structure);
+
+\item[\verb"sc\_responding":] the responding peer's address
+(which is the same as the \verb"called" parameter given to
+\verb"SConnRequest");
+
+\item[\verb"sc\_result":] the connection response;
+
+\item[\verb"sc\_requirements":] the (negotiated) session requirements;
+
+\item[\verb"sc\_settings":] the (negotiated) initial token settings;
+
+\item[\verb"sc\_please":] the tokens which the responder wants to own
+(if any);
+
+\item[\verb"sc\_isn":] the (negotiated) initial serial-number;
+
+\item[\verb"sc\_ssdusize":] the largest atomic SSDU size that can be used on
+the connection (see the note on page~\pageref{SSDU:atomic});
+
+\item[\verb"sc\_qos":] the quality of service on the connection
+(see Section~\ref{tsap:qos});
+and,
+
+\item[\verb"sc\_data"/\verb"sc\_cc":] any initial data (and the length of
+that data).
+\end{describe}
+If the call to \verb"SConnRequest" is successful,
+and the \verb"sc_result" element is set to \verb"SC_ACCEPT",
+then connection establishment has completed and the users of the session
+service now operate as symmetric peers.
+If the call is successful,
+but the \verb"sc_result" element is not \verb"SC_ACCEPT",
+then the connection has been rejected;
+consult Table~\ref{SSAPreasons} to determine the reason
+(further information can be found in the \verb"si" parameter).
+Otherwise, if the call fails then the connection is not established and the
+\verb"SSAPabort" structure of the \verb"SSAPindication" discriminated union
+has been updated.
+
+Normally \verb"SConnRequest" returns only after a connection has succeeded or
+failed.
+This is termed a {\em synchronous\/} connection initiation.
+If the user desires, an {\em asynchronous\/} connection may be initiated.
+The routine \verb"SConnRequest" is really a macro which calls the routine
+\verb"SAsynConnRequest" with an argument indicating that a connection should
+be attempted synchronously.
+\begin{quote}\index{SAsynConnRequest}\small\begin{verbatim}
+int     SAsynConnRequest (ref, calling, called,
+                requirements, settings, isn, data, cc,
+                qos, sc, si, async)
+struct SSAPref *ref;
+struct SSAPaddr *calling,
+                *called;
+int     requirements,
+        settings,
+        cc,
+        async;
+long	isn;
+char   *data;
+struct QOStype *qos;
+struct SSAPconnect *sc;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The additional parameter to this procedure is:
+\begin{describe}
+\item[\verb"async":] whether the connection should be initiated asynchronously.
+\end{describe}
+If the \verb"async" parameter is non-zero,
+then \verb"SAsynConnRequest" returns one of four values:
+\verb"NOTOK", which indicates that the connection request failed;
+\verb"DONE", which indicates that the connection request succeeded;
+or, either of \verb"CONNECTING_1" or \verb"CONNECTING_2", which indicates that
+the connection request is still in
+progress.
+In the first two cases,
+the usual procedures for handling return values from \verb"SConnRequest" are
+employed
+(i.e., a \verb"NOTOK" return from \verb"SAsynConnRequest" is equivalent to a
+\verb"NOTOK" return from \verb"SConnRequest", and,
+a \verb"DONE" return from \verb"SAsynConnRequest" is equivalent to a
+\verb"OK" return from \verb"SConnRequest").
+In the final case, when either \verb"CONNECTING_1" or
+\verb"CONNECTING_2" is returned,
+only the \verb"sc_sd" element of the \verb"sc" parameter has been updated;
+it reflects the session-descriptor to be used to reference this connection.
+Note that the \verb"data" parameter is still being referenced by
+\man libssap(3n) and should not be tampered with until the connection attempt
+has been completed.
+
+To determine when the connection attempt has been completed,
+the routine \verb"xselect" (consult Section~\ref{acs:select} of \volone/)
+should be used after calling \verb"SSelectMask".
+In order to determine if the connection attempt is successful,
+the \verb"SAsynRetryRequest" routine is called:
+\begin{quote}\index{SAsynRetryRequest}\small\begin{verbatim}
+int     SAsynRetryRequest (sd, sc, si)
+int     sd;
+struct SSAPconnect *sc;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"sc":] a pointer to a \verb"SSAPconnect" structure, which is
+updated only if the call succeeds;
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+Again, one of three values are returned:
+\verb"NOTOK", which indicates that the connection request failed;
+\verb"DONE", which indicates that the connection request succeeded;
+and, \verb"CONNECTING_1" or \verb"CONNECTING_2" which indicates that
+the connection request is still in progress.
+
+Refer to Section~\ref{tsap:async} on page~\pageref{tsap:async} for information
+on how to make efficient use of the asynchronous connection facility.
+
+\section	{Data Transfer}
+Once the connection has been established,
+a session-descriptor is used to reference the connection.
+This is usually the first parameter given to any of the remaining routines in
+the \man libssap(3n) library.
+Further,
+the last parameter is usually a pointer to a \verb"SSAPindication" structure
+(as described on page~\pageref{SSAPindication}).
+If a call to one of these routines fails,
+then the structure is updated.
+Consult the \verb"SSAPabort" element of the \verb"SSAPindication" structure.
+If the \verb"sa_reason" element of the \verb"SSAPabort" structure is
+associated with a fatal error,
+then the connection is closed.
+That is, a {\sf S-P-ABORT.INDICATION\/} event has occurred.
+The \verb"SC_FATAL" macro can be used to determine this.
+\begin{quote}\index{SC\_FATAL}\small\begin{verbatim}
+int     SC_FATAL (r)
+int     r;
+\end{verbatim}\end{quote}
+The most common interface error to occur is \verb"SC_OPERATION" which usually
+indicates that either the user is lacking ownership of a session token
+to perform an operation,
+or that a session requirement required by the operation was not negotiated
+during connection establishment.
+For protocol purists,
+the \verb"SC_OFFICIAL" macro can be used to determine if the error is an
+``official'' error as defined by the specification,
+or an ``unofficial'' error used by the implementation.
+\begin{quote}\index{SC\_OFFICIAL}\small\begin{verbatim}
+int     SC_OFFICIAL (r)
+int     r;
+\end{verbatim}\end{quote}
+
+\subsection	{Sending Data}
+There are six routines which may be used to send data.
+A call to the \verb"SDataRequest" routine is equivalent to a
+{\sf S-DATA.REQUEST\/} action on the part of the user.
+\begin{quote}\index{SDataRequest}\small\begin{verbatim}
+int     SDataRequest (sd, data, cc, si)
+int     sd;
+char   *data;
+int     cc;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"data"/\verb"cc":] the data to be written (and the length of that
+data);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is updated
+only if the call fails.
+\end{describe}
+If the call to \verb"SDataRequest" is successful,
+then the data has been queued for sending to the peer.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+A call to the \verb"SExpdRequest" routine is equivalent to a
+{\sf S-EXPEDITED-DATA.REQUEST\/} action on the part of the user.
+\begin{quote}\index{SExpdRequest}\small\begin{verbatim}
+int     SExpdRequest (sd, data, cc, si)
+int     sd;
+char   *data;
+int     cc;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"data"/\verb"cc":] the data to be written (and the length of that
+data, which may not exceed \verb"SX_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is updated
+only if the call fails.
+\end{describe}
+If the call to \verb"SExpdRequest" is successful,
+then the data has been queued for expedited sending.
+Otherwise the \verb"SSAPabort" element of the \verb"si" parameter
+contains the reason for failure.
+
+A call to the \verb"STypedRequest" routine is equivalent to a
+{\sf S-TYP\-ED-DA\-TA.RE\-QUEST\/} action on the part of the user.
+\begin{quote}\index{STypedRequest}\small\begin{verbatim}
+int     STypedRequest (sd, data, cc, si)
+int     sd;
+char   *data;
+int     cc;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"data"/\verb"cc":] the data to be written (and the length of that
+data);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is updated
+only if the call fails.
+\end{describe}
+If  the call to \verb"STypedRequest" is successful,
+then the data has been queued for sending to the peer.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+A call to the \verb"SCapdRequest" routine is equivalent to a {\sf
+S-CAPABILITY-DATA.REQUEST\/} action on the part of the user.
+\begin{quote}\index{SCapdRequest}\small\begin{verbatim}
+int     SCapdRequest (sd, data, cc, si)
+int     sd;
+char   *data;
+int     cc;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"data"/\verb"cc":] the data to be written (and the length of that
+data, which may not exceed \verb"SX_CDSIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is updated
+only if the call fails.
+\end{describe}
+If the call to \verb"SCapdRequest" is successful,
+then the data has been queued for sending.
+When the {\sf S-CAPABILITY-DATA.CONFIRMATION\/} event is received,
+the data has been successfully received.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+Upon receiving a {\sf S-CAPABILITY-DATA.INDICATION\/} event,
+the user is required to generate a {\sf S-CAPABILITY-DATA.RESPONSE\/} action
+using the \verb"SCapdResponse" routine.
+\begin{quote}\index{SCapdResponse}\small\begin{verbatim}
+int     SCapdResponse (sd, data, cc, si)
+int     sd;
+char   *data;
+int     cc;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"data"/\verb"cc":] the data to be written (and the length of that
+data, which may not exceed \verb"SX_CDASIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is updated
+only if the call fails.
+\end{describe}
+If  the call to \verb"SCapdResponse" is successful,
+then the data has been queued for sending to the peer.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+The \verb"SWriteRequest" routine is similar in nature to the
+\verb"SDataRequest" and \verb"STypedRequest" routines,
+but uses a different set of parameters.
+The invocation is:
+\begin{quote}\index{SWriteRequest}\small\begin{verbatim}
+int     SWriteRequest (sd, typed, uv, si)
+int     sd;
+int     typed;
+struct udvec *uv;
+int     cc;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"typed":] whether this is typed-data or not;
+
+\item[\verb"uv":] the data to be written,
+described in a null-terimated array of scatter/gather elements;
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is updated
+only if the call fails.
+\end{describe}
+If the call to \verb"SWriteRequest" is successful,
+then the data has been queued for sending to the peer.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+\subsection	{Receiving Data}
+There is one routine used to read data,
+\verb"SReadRequest",
+a call to which is equivalent to waiting for an event
+(usually an incoming data event) to occur.
+\begin{quote}\index{SReadRequest}\small\begin{verbatim}
+int     SReadRequest (sd, sx, secs, si)
+int     sd;
+struct SSAPdata *sx;
+int     secs;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"sx":] a pointer to the \verb"SSAPdata" structure to be given
+the data;
+
+\item[\verb"secs":] the maximum number of seconds to wait for the data
+(a value of \verb"NOTOK" indicates that the call should block indefinitely,
+whereas a value of \verb"OK" indicates that the call should not block at all,
+e.g., a polling action);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is updated
+only if data is not read.
+\end{describe}
+Unlike the other routines in the \man libssap(3n) library,
+the \verb"SReadRequest" routine returns one of three values:
+\verb"NOTOK" (on failure),
+\verb"OK" (on reading data),
+or
+\verb"DONE" (otherwise).
+
+If the call to \verb"SReadRequest" returns the manifest constant \verb"OK",
+then the data has been read into the \verb"sx" parameter,
+which is a pointer to a \verb"SSAPdata" structure.
+\begin{quote}\index{SSAPdata}\small\begin{verbatim}
+struct SSAPdata {
+    int     sx_type;
+#define SX_NORMAL       0x00
+#define SX_EXPEDITED    0x01
+#define SX_TYPED        0x02
+#define SX_CAPDIND      0x03
+#define SX_CAPDCNF      0x04
+
+    int     sx_cc;
+    struct qbuf sx_qbuf;
+};
+\end{verbatim}\end{quote}
+The elements of a \verb"SSAPdata" structure are:
+\begin{describe}
+\item[\verb"sx\_type":] indicates how the data was received:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Event}\\
+\hline
+    \tt SX\_NORMAL&	\sf S-DATA.INDICATION\\
+    \tt SX\_EXPEDITED&	\sf S-EXPEDITED-DATA.INDICATION\\
+    \tt SX\_TYPED&	\sf S-TYPED-DATA.INDICATION\\
+    \tt SX\_CAPDIND&	\sf S-CAPABILITY-DATA.INDICATION\\
+    \tt SX\_CAPDCNF&	\sf S-CAPABILITY-DATA.CONFIRMATION\\
+\hline
+\end{tabular}\]
+
+\item[\verb"sx\_cc":] the total number of octets that was read;
+and,
+
+\item[\verb"sx\_qbuf":] the data that was read in a buffer-queue form
+(see page~\pageref{tsap:qbuf} for a description of this structure).
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released by using the \verb"SXFREE" macro when no longer
+referenced.
+The \verb"SXFREE" macro,
+behaves as if it was defined as:\label{SXFREE}
+\begin{quote}\index{SXFREE}\small\begin{verbatim}
+void    SXFREE (sx)
+struct SSAPdata *sx;
+\end{verbatim}\end{quote}
+The macro frees only the data allocated by \verb"SReadRequest",
+and not the \verb"SSAPdata" structure itself.
+Further,
+\verb"SXFREE" should be called only if the call to the \verb"SReadRequest"
+routine returned \verb"OK".
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	Because the \verb"SSAPdata" structure contains a
+		\verb"qbuf" element, care must be taken in initializing
+		and copying variables of this type.
+		The routines in \man libssap(3n) library will correctly
+		initialize these structures when given as parameters.
+		But, users who otherwise manipulate these structures 
+		should take great care.
+\end{tabular}}\]
+
+Otherwise if the call to \verb"SReadRequest" returns the manifest constant
+\verb"NOTOK",
+then the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+If the call to \verb"SReadRequest" returns the manifest constant \verb"DONE",
+then some event other than data arrival has occurred.
+This event is encoded in the \verb"si" parameter,
+depending on the value of the \verb"si_type" element.
+When \verb"SReadRequest" returns \verb"DONE",
+the \verb"si_type" element may be set to one of five values:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+			\multicolumn{1}{c|}{\bf Event}\\
+\hline
+    \tt SI\_TOKEN&	Token management\\
+    \tt SI\_SYNC&	Synchronization management\\
+    \tt SI\_ACTIVITY&	Activity management\\
+    \tt SI\_REPORT&	Exception reporting\\
+    \tt SI\_FINISH&	Connection release\\
+\hline
+\end{tabular}\]
+
+\subsubsection	{Token Indications}
+When an event associated with token management occurs,
+the \verb"si_type" field of the \verb"si" parameter contains the value
+\verb"SI_TOKEN",
+and a \verb"SSAPtoken" structure is contained inside the \verb"si" parameter.
+\begin{quote}\index{SSAPtoken}\small\begin{verbatim}
+struct SSAPtoken {
+    int     st_type;
+#define ST_GIVE         0x00
+#define ST_PLEASE       0x01
+#define ST_CONTROL      0x02
+
+    u_char  st_tokens;
+    u_char  st_owned;
+
+#define ST_SIZE         512
+    int     st_cc;
+    char    st_data[ST_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of a \verb"SSAPtoken" structure are:
+\begin{describe}
+\item[\verb"st\_type":] defines the token management indication which
+occurred:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Event}\\
+\hline
+    \tt ST\_GIVE&	\sf S-TOKEN-GIVE.INDICATION\\
+    \tt ST\_PLEASE&	\sf S-TOKEN-PLEASE.INDICATION\\
+    \tt ST\_CONTROL&	\sf S-GIVE-CONTROL.INDICATION\\
+\hline
+\end{tabular}\]
+
+\item[\verb"st\_tokens":] the session tokens requested or given;
+
+\item[\verb"st\_owned":] all of the session tokens currently owned by the
+user;
+and,
+
+\item[\verb"st\_base"/\verb"st\_cc":]
+associated data (and the length of that data) if tokens are requested.
+\end{describe}
+It is entirely at the discretion of the user what actions are to be taken when
+an indication event associated with token management occurs.
+
+\subsubsection	{Synchronization Indications}
+When an event associated with synchronization occurs,
+the \verb"si_type" field of the \verb"si" parameter contains the value
+\verb"SI_SYNC",
+and a \verb"SSAPsync" structure is contained inside the \verb"si" parameter.
+\begin{quote}\index{SSAPsync}\small\begin{verbatim}
+struct SSAPsync {
+    int     sn_type;
+#define SN_MAJORIND     0x00
+#define SN_MAJORCNF     0x01
+#define SN_MINORIND     0x02
+#define SN_MINORCNF     0x03
+#define SN_RESETIND     0x04
+#define SN_RESETCNF     0x05
+
+    int     sn_options;
+#define SYNC_CONFIRM    1
+#define SYNC_NOCONFIRM  0
+
+#define SYNC_RESTART    0
+#define SYNC_ABANDON    1
+#define SYNC_SET        2
+
+    long    sn_ssn;
+#define SERIAL_NONE     (-1L)
+#define SERIAL_MIN      000000L
+#define SERIAL_MAX      999998L
+
+    int     sn_settings;
+
+#define SN_SIZE         512
+    int     sn_cc;
+    char    sn_data[SN_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of a \verb"SSAPsync" structure are:
+\begin{describe}
+\item[\verb"sn\_type":] defines the synchronization management indication
+which occurred:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Event}\\
+\hline
+	\tt SN\_MAJORIND&	\sf S-MAJOR-SYNC.INDICATION\\
+	\tt SN\_MAJORCNF&	\sf S-MAJOR-SYNC.CONFIRMATION\\
+	\tt SN\_MINORIND&	\sf S-MINOR-SYNC.INDICATION\\
+	\tt SN\_MINORCNF&	\sf S-MINOR-SYNC.CONFIRMATION\\
+	\tt SN\_RESETIND&	\sf S-RESYNCHRONIZE.INDICATION\\
+	\tt SN\_RESETCNF&	\sf S-RESYNCHRONIZE.CONFIRMATION\\
+\hline
+\end{tabular}\]
+
+\item[\verb"sn\_options":] various modifiers of the indication.
+For the minorsync indication (as described in Section~\ref{sync:mgmt}
+on page~\pageref{sync:mgmt}):
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Modifier}\\
+\hline
+    \tt SYNC\_CONFIRM&		peer wants explicit confirmation\\
+    \tt SYNC\_NOCONFIRM&	peer doesn't want explicit confirmation\\
+\hline
+\end{tabular}\]
+For the resync indication (also described in Section~\ref{sync:mgmt}):
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Modifier}\\
+\hline
+    \tt SYNC\_RESTART&	a ``restart'' resynchronization is requested\\
+    \tt SYNC\_ABANDON&	a ``abandon'' resynchronization is requested\\
+    \tt SYNC\_SET&	a ``set'' resynchronization is requested\\
+\hline
+\end{tabular}\]
+
+\item[\verb"sn\_ssn":] the serial-number associated with this synchronization
+management event;
+
+\item[\verb"sn\_settings":] for resync events,
+the proposed (resync indication) or new (resync confirmation) token settings;
+and,
+
+\item[\verb"sn\_data"/\verb"sn\_cc":] associated data
+(and the length of that data).
+\end{describe}
+Note that for minorsync events,
+the user is not obligated to confirm the synchronization point
+even if the originator requested it.
+
+\subsubsection	{Activity Indications}
+When an event associated with activity management occurs,
+the \verb"si_type" field of the \verb"si" parameter contains the value
+\verb"SI_ACTIVITY",
+and the \verb"si" parameter contains a \verb"SSAPactivity" structure.
+\begin{quote}\index{SSAPactivity}\small\begin{verbatim}
+struct SSAPactivity {
+    int     sv_type;
+#define SV_START        0x00
+#define SV_RESUME       0x01
+#define SV_INTRIND      0x02
+#define SV_INTRCNF      0x03
+#define SV_DISCIND      0x04
+#define SV_DISCCNF      0x05
+#define SV_ENDIND       0x06
+#define SV_ENDCNF       0x07
+
+    struct SSAPactid sv_id;
+
+    struct SSAPactid sv_oid;
+    struct SSAPref   sv_connect;
+
+    long    sv_ssn;
+
+    int     sv_reason;
+
+#define SV_SIZE         512
+    int     sv_cc;
+    char    sv_data[SV_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of a \verb"SSAPactivity" structure are:
+\begin{describe}
+\item[\verb"sv\_type":] defines the activity management indication which
+occurred:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Event}\\
+\hline
+	\tt SV\_START&		\sf S-ACTIVITY-START.INDICATION\\
+	\tt SV\_RESUME&		\sf S-ACTIVITY-RESUME.INDICATION\\
+	\tt SV\_INTRIND&	\sf S-ACTIVITY-INTERRUPT.INDICATION\\
+	\tt SV\_INTRCNF&	\sf S-ACTIVITY-INTERRUPT.CONFIRMATION\\
+	\tt SV\_DISCIND&	\sf S-ACTIVITY-DISCARD.INDICATION\\
+	\tt SV\_DISCCNF&	\sf S-ACTIVITY-DISCARD.CONFIRMATION\\
+	\tt SV\_ENDIND&		\sf S-ACTIVITY-END.INDICATION\\
+	\tt SV\_ENDCNF&		\sf S-ACTIVITY-END.CONFIRMATION\\
+\hline
+\end{tabular}\]
+
+\item[\verb"sv\_id":] the activity identifier for an activity start
+or resume indication;
+
+\item[\verb"sv\_oid":] the previous activity identifier for an activity resume
+indication (see page~\pageref{SSAPactref});
+
+\item[\verb"sv\_connect":] the previous connection identifier for an activity
+resume indication;
+
+\item[\verb"sv\_ssn":] the serial-number for an activity resume or end
+indication;
+
+\item[\verb"sv\_reason":] the reason for an activity interrupt or discard
+indication (codes are listed in Table~\ref{SSAPexceptions});
+and,
+
+\item[\verb"sv\_data"/\verb"sv\_cc":] associated data (and the length of that
+data).
+\end{describe}
+\tagtable[tp]{5b-5}{SSAP Exception Codes}{SSAPexceptions}
+
+\subsubsection	{Report Indications}
+When an event associated with exception reporting occurs,
+the \verb"si_type" field of the \verb"si" parameter contains the value
+\verb"SI_REPORT",
+and a \verb"SSAPreport" structure is contained inside the \verb"si"
+parameter.
+\begin{quote}\index{SSAPreport}\small\begin{verbatim}
+struct SSAPreport {
+    int     sp_peer;
+
+    int     sp_reason;
+
+#define SP_SIZE         512
+    int     sp_cc;
+    char    sp_data[SP_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of a \verb"SSAPreport" structure are:
+\begin{describe}
+\item[\verb"sp\_peer":] if set, indicates that a user-initiated
+report occurred (a {\sf S-U-EXCEPTION-REPORT.INDICATION\/} event);
+if not set,
+indicates that a provider-initiated report occurred
+(a {\sf S-P-EXCEPTION-REPORT.INDICATION\/} event);
+
+\item[\verb"sp\_reason":] the reason for the report
+(codes are listed in Table~\ref{SSAPexceptions} on
+page~\pageref{SSAPexceptions});
+and,
+
+\item[\verb"sp\_data"/\verb"sp\_cc":] any report data
+(and the length of that data) from the peer;
+meaningless if the report is provider-initiated.
+\end{describe}
+
+\subsubsection	{Finish Indication}
+When a {\sf S-RELEASE.INDICATION\/} event occurs,
+the \verb"si_type" field of the \verb"si" parameter contains the value
+\verb"SI_FINISH",
+and a \verb"SSAPfinish" structure is contained inside the \verb"si" parameter.
+\begin{quote}\index{SSAPfinish}\small\begin{verbatim}
+struct SSAPfinish {
+#define SF_SIZE         512
+    int     sf_cc;
+    char    sf_data[SF_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of a \verb"SSAPfinish" structure are:
+\begin{describe}
+\item[\verb"sf\_data"/\verb"sf\_cc":] any final data (and the length of that
+data).
+\end{describe}
+
+\subsection	{Token Management}
+The fundamental aspect of token management deals with transferring ownership
+of the tokens.
+
+\subsubsection	{Sending Tokens}
+To transfer ownership of one or more session tokens to the remote
+user,
+the \verb"SGTokenRequest" routine is called
+(which corresponds to the {\sf S-TOKEN-GIVE.REQUEST\/} action).
+\begin{quote}\index{SGTokenRequest}\small\begin{verbatim}
+int     SGTokenRequest (sd, tokens, si)
+int     sd;
+int     tokens;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"tokens":] the tokens to be transferred;
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SGTokenRequest" is successful,
+then ownership of the tokens has been transferred to the remote user.
+
+If activity management has been selected,
+then the ownership of all tokens can be transferred using the
+\verb"SGControlRequest" routine
+(which corresponds to the {\sf S-CONTROL-GIVE.REQUEST\/} action).
+\begin{quote}\index{SGControlRequest}\small\begin{verbatim}
+int     SGControlRequest (sd, si)
+int     sd;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SGControlRequest" is successful,
+then ownership of all available tokens has been transferred to the remote user.
+Until this transfer of ownership is acknowledged,
+other token management functions will (non-fatally) fail.
+
+\subsubsection	{Requesting Tokens}
+To request ownership of one or more session tokens,
+the \verb"SPTokenRequest" routine is called
+(which corresponds to the {\sf S-TOKEN-PLEASE.REQUEST\/} action).
+\begin{quote}\index{SPTokenRequest}\small\begin{verbatim}
+int     SPTokenRequest (sd, tokens, data, cc, si)
+int     sd;
+int     tokens,
+        cc;
+char   *data;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"tokens":] the tokens to requested;
+
+\item[\verb"data"/\verb"cc":] any additional data
+(and the length of that data, which may not exceed \verb"ST_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SPTokenRequest" is successful,
+then the remote user has been notified of the request;
+however, the ownership of the tokens is not actually transferred until the
+session provider notifies the user with a {\sf S-TOKEN-GIVE-INDICATION\/}
+event,
+which typically occurs on the next call to \verb"SReadRequest".
+
+\subsection	{Synchronization Management}\label{sync:mgmt}
+There are three types of synchronization services:
+majorsyncs, minorsyncs, and resyncs.
+
+\subsubsection	{Major Synchronization}
+To indicate a major synchronization point,
+the \verb"SMajSyncRequest" routine is used
+(which corresponds to the {\sf S-MAJOR-SYNC.REQUEST\/} action).
+\begin{quote}\index{SMajSyncRequest}\small\begin{verbatim}
+int     SMajSyncRequest (sd, ssn, data, cc, si)
+int     sd;
+long   *ssn;
+char   *data;
+int     cc;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"ssn":] a pointer to a long integer which,
+on a successful return,
+will be updated to reflect the current serial-number ($V(M)-1$);
+
+\item[\verb"data"/\verb"cc":] any additional data
+(and the length of that data, which may not exceed \verb"SN_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SMajSyncRequest" is successful,
+then the major synchronization has been queued for the remote user.
+When the {\sf S-MAJOR-SYNC.CON\-FIR\-MA\-TION\/} event is received,
+the major synchronization is complete.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+Upon receiving a {\sf S-MAJOR-SYNC.INDICATION\/} event,
+the user is required to generate a {\sf S-MAJOR-SYNC.RESPONSE\/} action
+by calling the \verb"SMajSyncResponse" routine.
+\begin{quote}\index{SMajSyncResponse}\small\begin{verbatim}
+int     SMajSyncResponse (sd, data, cc, si)
+int     sd;
+char   *data;
+int     cc;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"data"/\verb"cc":] any additional data
+(and the length of that data, which may not exceed \verb"SN_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SMajSyncResponse" is successful,
+then the major synchronization has been completed.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+\subsubsection	{Minor Synchronization}
+To indicate a minor synchronization point,
+the \verb"SMinSyncRequest" routine is used
+(which corresponds to the {\sf S-MINOR-SYNC.REQUEST\/} action).
+\begin{quote}\index{SMinSyncRequest}\small\begin{verbatim}
+int     SMinSyncRequest (sd, type, ssn, data, cc, si)
+int     sd;
+int     type;
+long   *ssn;
+char   *data;
+int     cc;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"type":] the type of minor synchronization requested,
+one of:
+\[\begin{tabular}{|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Value}&
+		\multicolumn{1}{c|}{\bf Type}\\
+\hline
+    \tt SYNC\_CONFIRM&		explicit confirmation requested\\
+    \tt SYNC\_NOCONFIRM&	no confirmation requested\\
+\hline
+\end{tabular}\]
+
+\item[\verb"ssn":] a pointer to a long integer which,
+on a successful return,
+will be updated to reflect the current serial-number ($V(M)-1$);
+
+\item[\verb"data"/\verb"cc":] any additional data
+(and the length of that data, which may not exceed \verb"SN_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SMinSyncRequest" is successful,
+then the minor synchronization has been queued for the remote user.
+If a {\sf S-MINOR-SYNC.CONFIRMATION\/} event is received,
+the minor synchronization is complete.
+However, the remote user is under no obligation to acknowledge the minorsync.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+Upon receiving a {\sf S-MINOR-SYNC.INDICATION\/} event,
+the user may optionally use the \verb"SMinSyncResponse" routine
+to generate a {\sf S-MINOR-SYNC.RESPONSE\/} action.
+\begin{quote}\index{SMinSyncResponse}\small\begin{verbatim}
+int     SMinSyncResponse (sd, ssn, data, cc, si)
+int     sd;
+long    ssn;
+char   *data;
+int     cc;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"ssn":] the highest serial-number being confirmed;
+
+\item[\verb"data"/\verb"cc":] any additional data
+(and the length of that data, which may not exceed \verb"SN_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SMinSyncResponse" is successful,
+then the minor synchronization has been completed.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+\subsubsection	{ReSynchronization}
+To resynchronize the connection to a known state,
+the \verb"SReSyncRequest" is used
+(which corresponds to the {\sf S-RESYNCHRONIZE.REQUEST\/} action).
+\begin{quote}\index{SReSyncRequest}\small\begin{verbatim}
+int     SReSyncRequest (sd, type, ssn, settings, data, cc, si)
+int     sd;
+int     type,
+        settings;
+long    ssn;
+char   *data;
+int     cc;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"type":] the type of resynchronization requested
+(either \verb"SYNC_RESTART", \verb"SYNC_ABANDON",
+or \verb"SYNC_SET");
+
+\item[\verb"ssn":] the serial-number to resynchronize to;
+
+\item[\verb"settings":] the new token settings;
+
+\item[\verb"data"/\verb"cc":] any additional data
+(and the length of that data, which may not exceed \verb"SN_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SReSyncRequest" is successful,
+then the resynchronization has been queued for the remote user.
+When the {\sf S-RESYNCHRONIZE.CON\-FIR\-MA\-TION\/} event is received,
+the resynchronization is complete.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+Upon receiving a {\sf S-RESYNCHRONIZE.INDICATION\/} event,
+the user is required to generate a {\sf S-RESYNCHRONIZE.RESPONSE\/} action
+using using the \verb"SReSyncResponse" routine.%
+\footnote{Actually,
+the user has other choices by using the rules of contention resolution.
+Consult the ISO session service specification for the gruesome details.}
+\begin{quote}\index{SReSyncResponse}\small\begin{verbatim}
+int     SReSyncResponse (sd, ssn, settings, data, cc, si)
+int     sd;
+int     settings;
+long    ssn;
+char   *data;
+int     cc;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"ssn":] the serial-number to resynchronize to;
+
+\item[\verb"settings":] the new token settings;
+
+\item[\verb"data"/\verb"cc":] any additional data
+(and the length of that data, which may not exceed \verb"SN_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+
+\subsection	{Activity Management}
+There are several types of activity management services:
+activity start and resume,
+activity interrupt and discard,
+and activity end.
+
+\subsubsection	{Activity Start/Resume}
+To initiate a new activity,
+the \verb"SActStartRequest" routine is used
+(which corresponds to the {\sf S-ACTIVITY-START.REQUEST\/} action).
+\begin{quote}\index{SActStartRequest}\small\begin{verbatim}
+int     SActStartRequest (sd, id, data, cc, si)
+int     sd;
+struct SSAPactid *id;
+char   *data;
+int     cc;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"id":] the activity-identifier;
+
+\item[\verb"data"/\verb"cc":] any additional data
+(and the length of that data, which may not exceed \verb"SV_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+
+The \verb"id" parameter is a pointer to a \verb"SSAPactid" structure,
+which is passed transparently by the session service.
+\begin{quote}\index{SSAPref}\small\begin{verbatim}
+struct SSAPactid {
+#define SID_DATA_SIZE   6
+    u_char  sd_len;
+    char    sd_data[SID_DATA_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:\label{SSAPactid}
+\begin{describe}
+\item[\verb"sd\_data"/\verb"sd\_len":] the data
+(and length of that data, which may not exceed \verb"SID_DATA_SIZE" octets);
+\end{describe}
+If the call to the \verb"SActStartRequest" routine is successful,
+then the activity is started.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+To resume a previously interrupted activity,
+the \verb"SActResumeRequest" routine is used
+(which corresponds to the {\sf S-ACTIVITY-RESUME.REQUEST\/} action).
+\begin{quote}\index{SActResumeRequest}\small\begin{verbatim}
+int     SActResumeRequest (sd, id, oid, ssn, ref, data, cc,
+                si)
+int     sd;
+struct SSAPactid *id,
+                 *oid;
+long    ssn;
+struct SSAPref *ref;
+char   *data;
+int     cc;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"id":] the activity-identifier
+(consult page~\pageref{SSAPactid} for a description of the \verb"SSAPactid"
+structure);
+
+\item[\verb"oid":] the previous activity-identifier
+(again, consult page~\pageref{SSAPactid});
+
+\item[\verb"ssn":] the serial-number to resume the activity at;
+
+\item[\verb"ref":] the previous connection identifier;
+
+\item[\verb"data"/\verb"cc":] any additional data
+(and the length of that data, which may not exceed \verb"SV_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+
+The \verb"ref" parameter is a pointer to a \verb"SSAPref" structure.
+Note that unlike the connection identifiers used during connection
+establishment (as described on page~\pageref{SSAPref}),
+there are four fields:\label{SSAPactref}
+\[\begin{tabular}{|l|l|l|}
+\hline
+    \multicolumn{1}{|c|}{\bf Field}&
+    \multicolumn{1}{c|}{\bf Contents}&
+    \multicolumn{1}{c|}{\bf Length}\\
+\hline
+    calling SSAP user reference&
+			\tt sr\_calling&	\tt sr\_calling\_len\\
+    called SSAP user reference&
+			\tt sr\_called&	\tt sr\_called\_len\\
+    common reference&
+			\tt sr\_cdata&	\tt sr\_clen\\
+    additional reference&
+			\tt sr\_adata&	\tt sr\_alen\\
+\hline
+\end{tabular}\]
+
+If the call to the \verb"SActResumeRequest" routine is successful,
+then the activity is resumed.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+\subsubsection	{Activity Interrupt/Discard}
+To interrupt an activity in progress,
+the \verb"SActIntrRequest" routine is used
+(which corresponds to the {\sf S-ACTIVITY-INTERRUPT.REQUEST\/} action).
+\begin{quote}\index{SActIntrRequest}\small\begin{verbatim}
+int     SActIntrRequest (sd, reason, si)
+int     sd;
+int     reason;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"reason":] the reason for the interrupt
+(codes are listed in Table~\ref{SSAPexceptions});
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SActIntrRequest" is successful,
+then the activity interrupt has been queued for the remote user.
+When the {\sf S-ACTIVITY-INTERRUPT.CON\-FIR\-MA\-TION\/} event is received,
+the activity interrupt is complete.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+Upon receiving a {\sf S-ACTIVITY-INTERRUPT.INDICATION\/} event,
+the user is required to generate a {\sf S-ACTIVITY-INTERRUPT.RESPONSE\/} action
+using the \verb"SActIntrResponse" routine.
+\begin{quote}\index{SActIntrResponse}\small\begin{verbatim}
+int     SActIntrResponse (sd, si)
+int     sd;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SActIntrResponse" is successful,
+then the activity interrupt has been completed.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+To discard an activity in progress,
+the \verb"SActDiscRequest" routine is used
+(which corresponds to the {\sf S-ACTIVITY-DISCARD.REQUEST\/} action).
+\begin{quote}\index{SActDiscRequest}\small\begin{verbatim}
+int     SActDiscRequest (sd, reason, si)
+int     sd;
+int     reason;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"reason":] the reason for the discard
+(codes are listed in Table~\ref{SSAPexceptions});
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SActDiscRequest" is successful,
+then the activity discard has been queued for the remote user.
+When the {\sf S-ACTIVITY-DISCARD.CON\-FIR\-MA\-TION\/} event is received,
+the activity discard is complete.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+Upon receiving a {\sf S-ACTIVITY-DISCARD.INDICATION\/} event,
+the user is required to generate a {\sf S-ACTIVITY-DISCARD.RESPONSE\/} action
+using the \verb"SActDiscResponse" routine.
+\begin{quote}\index{SActDiscResponse}\small\begin{verbatim}
+int     SActDiscResponse (sd, si)
+int     sd;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SActDiscResponse" is successful,
+then the activity discard has been completed.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+\subsubsection	{Activity End}
+To end an activity in progress,
+the \verb"SActEndRequest" routine is used
+(which corresponds to the {\sf S-ACTIVITY-END.REQUEST\/} action).
+\begin{quote}\index{SActEndRequest}\small\begin{verbatim}
+int     SActEndRequest (sd, ssn, data, cc, si)
+int     sd;
+long   *ssn;
+char   *data;
+int     cc;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"ssn":] a pointer to a long integer which,
+on a successful return,
+will be updated to reflect the current serial-number ($V(M)-1$);
+
+\item[\verb"data"/\verb"cc":] any additional data
+(and the length of that data, which may not exceed \verb"SV_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SActEndRequest" is successful,
+then the activity end has been queued for the remote user.
+When the {\sf S-ACTIVITY-END.CONFIRMATION\/} event is received,
+the activity end is complete.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+Upon receiving a {\sf S-ACTIVITY-END.INDICATION\/} event,
+the user is required to call the \verb"SActEndResponse" routine
+to generate a {\sf S-ACTIVITY-END.RESPONSE\/} action.
+\begin{quote}\index{SActEndResponse}\small\begin{verbatim}
+int     SActEndResponse (sd, data, cc, si)
+int     sd;
+char   *data;
+int     cc;
+struct SSAPindication *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"data"/\verb"cc":] any additional data
+(and the length of that data, which may not exceed \verb"SV_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SActEndResponse" is successful,
+then the activity end has been completed.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+\subsection	{Exception Reporting}
+To report an exception and place the connection in a special error-recovery
+state,
+the \verb"SUReportRequest" routine is called
+(which corresponds to the {\sf S-U-EXCEPTION-REPORT.REQUEST\/} action).
+\begin{quote}\index{SUReportRequest}\small\begin{verbatim}
+int	SUReportRequest (sd, reason, data, cc, si)
+int	sd;
+int     reason;
+char   *data;
+int	cc;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"reason":] the reason for the report
+(codes are listed in Table~\ref{SSAPexceptions});
+
+\item[\verb"data"/\verb"cc":] any report data
+(and the length of that data, which may not exceed \verb"SP_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SUReportRequest" is successful,
+then the connection is placed in an error state,
+and any data queued for the connection may be lost until recovery is complete.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+Typically,
+error recovery can be achieved by giving away the data token or by aborting
+the connection (discussed next).
+Error recovery is discussed in greater detail in the ISO session service
+specification.
+
+\subsection	{User-initiated Aborts}
+To unilaterally initiate an abort of the connection,
+the \verb"SUAbortRequest" routine is called
+(which corresponds to the {\sf S-U-ABORT.REQUEST\/} action).
+\begin{quote}\index{SUAbortRequest}\small\begin{verbatim}
+int	SUAbortRequest (sd, data, cc, si)
+int	sd;
+char   *data;
+int	cc;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"data"/\verb"cc":] any abort data
+(and the length of that data, which may not exceed \verb"SA_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SUAbortRequest" is successful,
+then the connection is immediately closed,
+and any data queued for the connection may be lost.
+
+\subsection	{Asynchronous Event Handling}
+The data transfer events discussed thus far have been synchronous in nature.
+Some users of the session service may wish an asynchronous interface.
+The \verb"SSetIndications" routine is used to change the service associated
+with a session-descriptor to or from an asynchronous interface.
+\begin{quote}\index{SSetIndications}\small\begin{verbatim}
+int     SSetIndications (sd, data, tokens, sync, activity,
+                report, finish, abort, si)
+int     sd;
+int   (*data) (),
+      (*tokens) (),
+      (*sync) (),
+      (*activity) (),
+      (*report) (),
+      (*finish) (),
+      (*abort) ();
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"data":] the address of an event-handler routine to be invoked when
+data has arrived;
+
+\item[\verb"tokens":] the address of an event-handler routine to be invoked
+when a token management event occurs;
+
+\item[\verb"sync":] the address of an event-handler routine to be invoked
+when a synchronization management event occurs;
+
+\item[\verb"activity":] the address of an event-handler routine to be invoked
+when an activity management event occurs;
+
+\item[\verb"report":] the address of an event-handler routine to be invoked
+when an exception report event occurs;
+
+\item[\verb"finish":] the address of an event-handler routine to be invoked
+when the connection is ready to be released;
+
+\item[\verb"abort":] the address of an event-handler routine to be invoked when
+a user-initiated abort (a {\sf S-U-ABORT.INDICATION\/} event occurs)
+or a provider-initiated abort
+(a {\sf S-P-ABORT.INDICATION\/} event occurs);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is updated
+only if the call fails.
+\end{describe}
+If the service is to be made asynchronous,
+then all event handlers are specified,
+otherwise,
+if the service is to be made synchronous,
+then no event handlers should be specified
+(use the manifest constant \verb"NULLIFP").
+The most likely reason for the call failing is \verb"SC_WAITING",
+which indicates that an event is waiting for the user.
+
+When an event-handler is invoked,
+future invocations of the event-hander are blocked until it returns.
+The return value of the event-handler is ignored.
+Further,
+during the execution of a synchronous call to the library,
+the event-handler will be blocked from being invoked.
+
+When an event associated with data arrival occurs,
+the event-handler routine is invoked with two parameters:
+\begin{quote}\small\begin{verbatim}
+(*data) (sd, sx);
+int     sd;
+struct SSAPdata *sx;
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+and,
+
+\item[\verb"sx":] a pointer to the \verb"SSAPdata" structure containing
+the data.
+\end{describe}
+Note that the data contained in the structure was allocated via \man malloc(3),
+and should be released with the \verb"SXFREE" macro
+(described on page~\pageref{SXFREE}) when no longer needed.
+
+When an event associated with token management arrives
+the event-handler routine is invoked with two parameters:
+\begin{quote}\small\begin{verbatim}
+(*tokens) (sd, st);
+int       sd;
+struct SSAPtoken *st;
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+and,
+
+\item[\verb"st":] a pointer to the \verb"SSAPtoken" structure containing
+the token management information.
+\end{describe}
+
+When an event associated with synchronization management arrives
+the event-handler routine is invoked with two parameters:
+\begin{quote}\small\begin{verbatim}
+(*sync) (sd, sn);
+int       sd;
+struct SSAPsync *sn;
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+and,
+
+\item[\verb"sn":] a pointer to the \verb"SSAPsync" structure containing
+the synchronization management information.
+\end{describe}
+
+When an event associated with activity management arrives
+the event-handler routine is invoked with two parameters:
+\begin{quote}\small\begin{verbatim}
+(*activity) (sd, sv);
+int       sd;
+struct SSAPactivity *sv;
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+and,
+
+\item[\verb"sv":] a pointer to the \verb"SSAPactivity" structure containing
+the activity management information.
+\end{describe}
+
+When an event associated with exception reporting arrives
+the event-handler routine is invoked with two parameters:
+\begin{quote}\small\begin{verbatim}
+(*report) (sd, sp);
+int       sd;
+struct SSAPreport *sp;
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+and,
+
+\item[\verb"sp":] a pointer to the \verb"SSAPreport" structure containing
+the exception report information.
+\end{describe}
+
+When an event associated with connection termination arrives
+the event-handler routine is invoked with two parameters:
+\begin{quote}\small\begin{verbatim}
+(*finish) (sd, sf);
+int       sd;
+struct SSAPfinish *sf;
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+and,
+
+\item[\verb"sf":] a pointer to the \verb"SSAPfinish" structure containing
+information concerning the request to terminate the connection.
+\end{describe}
+
+When an event associated with a user- or provider-initiated abort occurs,
+the event-handler is invoked with two parameters:
+\begin{quote}\small\begin{verbatim}
+(*abort) (sd, sa);
+int      sd;
+struct SSAPabort *sa;
+\end{verbatim}\end{quote}
+The parameters are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+and,
+
+\item[\verb"sa":] a pointer to the \verb"SSAPabort" structure
+indicating why the connection was aborted.
+\end{describe}
+Note that the session-descriptor is no longer valid at the instant the
+call is made.
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	The \man libssap(3n) library uses the SIGEMT signal to provide
+		these services.
+		Programs using asynchronous session-descriptors should NOT
+		use SIGEMT for other purposes.
+\end{tabular}}\]
+
+\subsection	{Synchronous Event Multiplexing}
+A user of the session service may wish to manage multiple
+session-de\-scrip\-tors simultaneously;
+the routine \verb"SSelectMask" is provided for this purpose.
+This routine updates a file-descriptor mask and associated counter for use
+with \verb"xselect".
+\begin{quote}\index{SSelectMask}\small\begin{verbatim}
+int     SSelectMask (sd, mask, nfds, si)
+int     sd;
+fd_set *mask,
+int    *nfds;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"mask":] a pointer to a file-descriptor mask meaningful to
+\verb"xselect";
+
+\item[\verb"nfds":] a pointer to an integer-valued location meaningful to
+\verb"xselect";
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is updated
+only if the call fails.
+\end{describe}
+If the call is successful, then the \verb"mask" and \verb"nfds" parameters can
+be used as arguments to \verb"xselect".
+The most likely reason for the call failing is \verb"SC_WAITING",
+which indicates that an event is waiting for the user.
+
+If \verb"xselect" indicates that the session-descriptor is ready for reading,
+\verb"SReadRequest" should be called with the \verb"secs" parameter equal to
+\verb"OK".
+If the network activity does not constitute an entire event for the user,
+then \verb"SReadRequest" will return \verb"NOTOK" with error code
+\verb"SC_TIMER".
+
+\section	{Connection Release}
+The \verb"SRelRequest" routine is used to request the release a connection,
+and corresponds to a {\sf S-RELEASE.REQUEST\/} action.
+The SSAP attempts to gracefully drain any queued data before closing
+the connection.
+\begin{quote}\index{SRelRequest}\small\begin{verbatim}
+int     SRelRequest (sd, data, cc, secs, sr, si)
+int     sd;
+char   *data;
+int     cc;
+int     secs;
+struct SSAPrelease  *sr;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"data"/\verb"cc":] any final data
+(and the length of that data,
+which may not exceed \verb"SF_SIZE" octets);
+
+\item[\verb"secs":] the maximum number of seconds to wait for a response
+(use the manifest constant \verb"NOTOK" if no time-out is desired);
+
+\item[\verb"sr":] a pointer to a \verb"SSAPrelease" structure, which is updated
+only if the call succeeds;
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is updated
+only if the call fails.
+\end{describe}
+If the call to \verb"SRelRequest" is successful,
+then this corresponds to a {\sf S-RELEASE.CONFIRMATION\/} event,
+and it returns information in the \verb"sr" parameter,
+which is a pointer to a \verb"SSAPrelease" structure.
+\begin{quote}\index{SSAPrelease}\small\begin{verbatim}
+struct SSAPrelease {
+    int     sr_affirmative;
+
+#define SR_SIZE         512
+    int     sr_cc;
+    char    sr_data[SR_SIZE];
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"sr\_affirmative":] the acceptance indicator;
+and,
+
+\item[\verb"sr\_data"/\verb"sr\_cc":] any final data
+(and the length of that data).
+\end{describe}
+If the call to \verb"SRelRequest" is successful,
+and the \verb"sr_affirmative" element is set,
+then the connection has been closed.
+If the call is successful,
+but the \verb"sr_affirmative" element is not set (i.e., zero),
+then the request to close the connection has been rejected by the remote user,
+and the connection is still open.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+
+Note that if a non-negative value is given to the \verb"secs" parameter and a
+response is not received within this number of seconds,
+then the value contained in the \verb"sa_reason" element is \verb"SC_TIMER".
+The user can then call the routine \verb"SRelRetryRequest" to continue waiting
+for a response:
+\begin{quote}\index{SRelRetryRequest}\small\begin{verbatim}
+int     SRelRetryRequest (sd, secs, sr, si)
+int     sd;
+int     secs;
+struct SSAPrelease  *sr;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"secs":] the maximum number of seconds to wait for a response
+(use the manifest constant \verb"NOTOK" if no time-out is desired);
+
+\item[\verb"sr":] a pointer to a \verb"SSAPrelease" structure, which is updated
+only if the call succeeds;
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is updated
+only if the call fails.
+\end{describe}
+If the call to \verb"SRelRetryRequest" is successful,
+and the \verb"sr_affirmative" element is set,
+then the connection has been closed.
+If the call is successful,
+but the \verb"sr_affirmative" element is not set (i.e., zero),
+then the request to close the connection has been rejected by the remote user,
+and the connection is still open.
+Otherwise the \verb"SSAPabort" structure contained in
+the \verb"SSAPindication" parameter
+\verb"si" contains the reason for failure.
+As expected,
+the value \verb"SC_TIMER" indicates that no response was received within the
+time given by the \verb"secs" parameter.
+
+Upon receiving a {\sf S-RELEASE.INDICATION\/} event,
+the user is required to generate a {\sf S-RELEASE.RESPONSE\/} action
+using the \verb"SRelResponse" routine.
+\begin{quote}\index{SRelResponse}\small\begin{verbatim}
+int     SRelResponse (sd, status, data, cc, si)
+int     sd;
+int     status,
+        cc;
+char   *data;
+struct SSAPindication  *si;
+\end{verbatim}\end{quote}
+The parameters to this procedure are:
+\begin{describe}
+\item[\verb"sd":] the session-descriptor;
+
+\item[\verb"status":] the acceptance indicator
+(either \verb"SC_ACCEPT" if the connection is to be closed,
+or \verb"SC_REJECTED" otherwise);
+
+\item[\verb"data"/\verb"cc":] any final data (and the length of that data,
+which may not exceed \verb"SR_SIZE" octets);
+and,
+
+\item[\verb"si":] a pointer to a \verb"SSAPindication" structure, which is
+updated only if the call fails.
+\end{describe}
+If the call to \verb"SRelResponse" is successful,
+and if the \verb"result" parameter is set to \verb"SC_ACCEPT",
+then the connection has been closed.
+If the call is successful,
+but the \verb"result" parameter is not \verb"SC_ACCEPT",
+then the connection still remains open.
+Note that in order to specify a value other tha \verb"SC_ACCEPT" for the
+\verb"result" parameter to \verb"SRelResponse",
+the release token must exist but must not be owned by the user making the
+call to \verb"SRelResponse".%
+\footnote{Gentle reader, we don't write the standards;
+we just try to implement them.}
+
+\section	{Restrictions on User Data}
+The \man libssap(3n) contains partial support for the use of unlimited user
+data for session services.
+With the exception of the {\sf S-DATA\/} and the {\sf S-TYPED-DATA\/} services,
+the initial session service limited the amount of user data that could be
+present. 
+With the introduction of the unlimited user data
+addendum\cite{ISO.SS.UserData,ISO.SP.UserData} to the session service and
+protocol,
+this restriction has been lifted.
+
+During connection establishment,
+the \man libssap(3n) library will attempt to negotate the use of unlimited
+user data.
+If this negotiation fails,
+then session services which permit user data,
+other than {\sf S-DATA\/} and {\sf S-TYPED-DATA},
+are limited to 512~octets of user data.%
+\footnote{Strictly speaking,
+the {\sf S-U-ABORT} service permits only 9~octets of user data.
+This limitation is unreasonable~---~upto 512~octets will be permitted.}
+
+If the negotation succeeds,
+then session services which permit user data,
+other than {\sf S-DATA\/} and {\sf S-TYPED-DATA},
+are limited to 65400~octets of user data,
+with the exception of the {\sf S-CONNECT.REQUEST\/} primitive,
+which is limited to 10240~octets of user data
+(the {\sf S-CONNECT.RESPONSE\/} primitive is limited to 65528~octets).%
+\footnote{Strictly speaking,
+the amount should be unlimited.
+However this full generality is not available at this time.}
+
+There is one further limitation however:
+although the initiator of a connection can send upto 10240~octets,
+due to limitations in the \unix/ kernel,
+if the \man tsapd(8c) is dispatching based on session selector,
+then a responder can accept upto approximately 1536~octets.
+To avoid this problem,
+have \man tsapd(8c) dispatch based on transport selector
+(see Section~\ref{service:standard} in \volone/).
+
+\section	{Error Conventions}
+All of the routines in this library return the manifest constant \verb"NOTOK"
+on error,
+and also update the \verb"si" parameter given to the routine.
+The \verb"si_abort" element of the \verb"SSAPindication" structure contains a
+\verb"SSAPabort" structure detailing the reason for the failure.
+The \verb"sa_reason" element of this latter structure can be given as a
+parameter to the routine \verb"SErrString" which returns a null-terminated
+diagnostic string.
+\begin{quote}\index{SErrString}\small\begin{verbatim}
+char   *SErrString (c)
+int     c;
+\end{verbatim}\end{quote}
+
+\section	{Compiling and Loading}
+Programs using the \man libssap(3n) library should include
+\verb"<isode/ssap.h>".
+The programs should also be loaded with \verb"-lssap" and \verb"-ltsap"
+(this latter library contains the routines which implement the transport
+services used by the session provider).
+
+\section	{An Example}
+Let's consider how one might construct a source entity that resides on the
+SSAP.
+This entity will use a synchronous interface.
+
+There are two parts to the program:
+initialization and data transfer;
+release will occur when the standard input has been exhausted.
+In our example,
+we assume that the routine \verb"error" results in the process being
+terminated after printing a diagnostic.
+
+In Figure~\ref{initSSsource},
+the initialization steps for the source entity,
+including the outer {\em C\/} wrapper,
+is shown.
+First, a lookup is done in the ISO services database,
+and the \verb"SSAPaddr" is initialized.
+The \verb"SSAPref" is zeroed.
+Next, for each token associated with the session requirements,
+initial ownership of that token is claimed.
+Finally,
+the call to \verb"SConnRequest" is made.
+If the call is successful,
+a check is made to see if the remote user accepted the connection.
+If so,
+the session-descriptor is captured,
+along with the negotiated requirements and initial token settings.
+
+In Figure~\ref{dataSSsource} on page~\pageref{dataSSsource},
+the data transfer loop is realized.
+The source entity reads a line from the standard input,
+and then queues that line for sending to the remote side.
+When an end-of-file occurs on the standard input,
+the source entity requests release and then gracefully terminates.
+Although no checking is done in this example,
+for the calls to \verb"SDataRequest" and \verb"SRelRequest",
+on failure
+a check for the operational error \verb"SC_OPERATION" should be made.
+For \verb"SDataRequest",
+this would occur when the data token was not owned by the user;
+for \verb"SRelRequest",
+this would occur when the release token was not owned by the user.
+\clearpage
+\tagrind[tp]{grind5b-3a}{Initializing the SSAP source entity}{initSSsource}
+\clearpage
+\tagrind[tp]{grind5b-3b}{Initializing the SSAP source entity (continued)}\empty
+\clearpage
+\tagrind[tp]{grind5b-4}{Data Transfer for the SSAP source entity}%
+	{dataSSsource}.
+
+\section	{For Further Reading}
+The ISO specification for session services is defined in
+\cite{ISO.SP.Service},
+while the complementary CCITT recommendation is defined in
+\cite{CCITT.SP.Service}.
+The corresponding protocol definitions are \cite{ISO.SP.Protocol} and
+\cite{CCITT.SP.Protocol}, respectively.
+
+%%% \section	{Changes Since the Last Release}\label{ssap:changes}
+%%% A brief summary of the major changes between v~\isodeprevrsn/ and
+%%% v~\isodevrsn/ are now presented.
+%%% These are the user-visible changes only;
+%%% changes of a strictly internal nature are not discussed.
+

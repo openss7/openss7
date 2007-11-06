@@ -1,0 +1,40 @@
+% run this through LaTeX with the appropriate wrapper
+
+\[\begin{tabular}{|l|c|l|}
+\hline
+\multicolumn{3}{|c|}{\bf Superclass Attributes}\\
+\hline
+\multicolumn{1}{|c|}{\bf Attribute Name}&
+			\multicolumn{1}{c|}{\bf Status}&
+				\multicolumn{1}{c|}{\bf Value}\\
+\hline
+\verb"objectClass"&	M&	\verb"top & quipuObject"\\
+\verb"acl"&		M&	\\
+\hline
+\hline
+\multicolumn{3}{|c|}{\bf Primary Class Attributes}\\
+\hline
+\multicolumn{1}{|c|}{\bf Attribute Name}&
+			\multicolumn{1}{c|}{\bf Status}&
+				\multicolumn{1}{c|}{\bf Value}\\
+\hline
+\verb"objectClass"&	M&	\verb"dSA & quipuDSA"\\
+\verb"commonName"&	RDN&	\\
+\verb"eDBinfo"&		M&	\\
+\verb"presentationAddress"&
+			M&	\\
+\verb"manager"&		M&	\\
+\verb"userPassword"&	M&	\\
+\verb"quipuVersion"&	M&	\\
+\verb"supportedApplicationContext"&
+			O&	\verb"x500DSP & x500DAP & quipuDSP"\\
+\verb"description"&	O&	\\
+\hline
+\end{tabular}\]
+
+\[\begin{tabular}{rp{4in}}
+\multicolumn{2}{c}{\bf Legend}\\
+M:&	mandatory\\
+O:&	optional, but recommended\\
+RDN:&	mandatory, must form the RDN for object
+\end{tabular}\]

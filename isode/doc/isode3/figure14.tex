@@ -1,0 +1,39 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \special{pa 0 3022}%
+    \special{pa 0 1511}%
+    \special{pa 8500 1511}%
+    \special{pa 8500 3022}%
+    \special{pa 0 3022}%
+    \special{fp}%
+    \rlap{\kern  4.250in\lower 2.142in\hbox to 0pt{\hss NETWORK SERVICES (CLNP AND ES-IS)\hss}}%
+    \rlap{\kern  4.250in\lower 2.308in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  4.250in\lower 2.474in\hbox to 0pt{\hss [U.~WISCONSIN]\hss}}%
+    \special{pa 0 1511}%
+    \special{pa 0 0}%
+    \special{pa 8500 0}%
+    \special{pa 8500 1511}%
+    \special{pa 0 1511}%
+    \special{fp}%
+    \rlap{\kern  4.250in\lower 0.631in\hbox to 0pt{\hss TRANSPORT SERVICES\hss}}%
+    \rlap{\kern  4.250in\lower 0.797in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  4.250in\lower 0.963in\hbox to 0pt{\hss [U.~WISCONSIN]\hss}}%
+    \special{pa 0 4533}%
+    \special{pa 0 3022}%
+    \special{pa 8500 3022}%
+    \special{pa 8500 4533}%
+    \special{pa 0 4533}%
+    \special{fp}%
+    \rlap{\kern  4.250in\lower 3.653in\hbox to 0pt{\hss SUBNETWORK SUPPORT (802.x AND X.25)\hss}}%
+    \rlap{\kern  4.250in\lower 3.819in\hbox to 0pt{\hss \hss}}%
+    \rlap{\kern  4.250in\lower 3.985in\hbox to 0pt{\hss [U.~WISCONSIN]\hss}}%
+    \kern  8.501in
+  }\vss}%
+  \kern  4.534in
+}

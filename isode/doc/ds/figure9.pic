@@ -1,0 +1,54 @@
+.PS
+#.ps 20
+## figure 9
+boxht = boxht/2
+ellipseht = boxht
+movewid = boxwid/4
+##
+boxht = boxht + boxht
+B9:	box width boxwid * 6.5
+B10:	box width boxwid * 3.25 \
+	  with .sw at (B9.sw.x, B9.sw.y - moveht * 2 )
+B11a:	box width boxwid * 6.5 \
+	  with .sw at (B10.sw.x, B10.sw.y - moveht * 2 )
+##
+M1:	move to B9.sw right boxwid/4 up boxht/6
+M2:	move to B10.sw right boxwid/4 up boxht/3
+M3:	move to B11a.sw right boxwid/4 up boxht/6
+##
+boxht = boxht/6 * 4
+B11:	box with .sw at M1
+B12:	box with .sw at (B11.se.x + boxwid/4,B11.se.y)
+B13:	box with .sw at (B12.se.x + boxwid/4,B11.se.y)
+B14:	box with .sw at (B13.se.x + boxwid/4,B11.se.y) invis
+B15:	box with .sw at (B14.se.x + boxwid/4,B11.se.y)
+##
+H1:	circle at B14.w rad .025i
+H2:	circle at B14.c same
+H3:	circle at B14.e same
+##
+L13:	line from B12.sw to B10.nw dashed
+L14:	line from B12.se to B10.ne dashed
+##
+B16:	box with .sw at M3 "\yy Distinguished" "\yy Value"
+B17:	box with .sw at (B16.se.x + boxwid/4,B16.se.y) "\yy Value"
+B18:	box with .sw at (B17.se.x + boxwid/4,B16.se.y) "\yy Value"
+B19:	box with .sw at (B18.se.x + boxwid/4,B16.se.y) invis
+B20:	box with .sw at (B19.se.x + boxwid/4,B16.se.y) "\yy Value"
+##
+H4:	circle at B19.w rad .025i
+H5:	circle at B19.c same
+H6:	circle at B19.e same
+##
+boxht = boxht/2
+B21:	box with .sw at M2 "\xx Type"
+B22:	box with .sw at (B21.se.x + boxwid/2,B21.se.y) "\xx Values"
+##
+L15:	line from B22.sw to B11a.nw dashed
+L16:	line from B22.se to B11a.ne dashed
+##
+B23:	box at (B9.w.x - boxwid,B9.y) "Entry" invis
+B24:	box at (B9.w.x - boxwid,B10.y) "Attribute" invis
+B25:	box at (B9.w.x - boxwid,B11a.y) "Attribute" "Values" invis
+##
+.PE

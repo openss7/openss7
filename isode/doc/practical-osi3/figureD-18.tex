@@ -1,0 +1,25 @@
+\File{figureD\-18.py},{08:28},{Mar 12 1991}
+\L{\LB{simpleMatch (kind: ObjectClass; name, qual: String; base: DN): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    x: DN;}}
+\L{\LB{    alist, qlist: \K{SET} \K{OF} AttributeType;}}
+\L{\LB{    subsettype: SubsetType;}}
+\L{\LB{}}
+\L{\LB{    \K{IF} (kind == person) \K{THEN}}}
+\L{\LB{        alist = \{ surName, rfc822Mailbox \};}}
+\L{\LB{    \K{ELSE}}}
+\L{\LB{        \K{IF} (kind == organization) \K{THEN}}}
+\L{\LB{            alist = \{ organizationName \};}}
+\L{\LB{        \K{ELSE}}}
+\L{\LB{            \K{IF} (kind == organizationalUnit) \K{THEN}}}
+\L{\LB{                alist = \{ organizationalUnitName \};}}
+\L{\LB{            \K{ELSE}}}
+\L{\LB{                \K{IF} (kind == organizationalRole) \K{THEN}}}
+\L{\LB{                    alist = \{ commonName \};}}
+\L{\LB{                \K{ELSE}}}
+\L{\LB{                    \K{IF} (kind == locality) \K{THEN}}}
+\L{\LB{                        alist = \{ localityName \};}}
+\L{\LB{                    \K{ELSE}}}
+\L{\LB{                        alist = \{ commonName, surName, rfc822Mailbox \};}}
+\L{\LB{}}
+\L{\LB{...}}

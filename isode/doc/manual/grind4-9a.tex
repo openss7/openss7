@@ -1,0 +1,40 @@
+\File{grind4\-9a.py},{11:13},{Jul  4 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\%\{}}
+\L{\LB{\/*    DEBUG *\/}}
+\L{\LB{}}
+\L{\LB{\#ifdef  DEBUG}}
+\L{\LB{testdebug (pe, s)}}
+\L{\LB{register PE pe;}}
+\L{\LB{register char *s;}}
+\L{\LB{\{}}
+\L{\LB{    static int  debug = OK;}}
+\L{\LB{    char   *cp;}}
+\L{\LB{    register PS     ps;}}
+\L{\LB{}}
+\L{\LB{    switch (debug) \{}}
+\L{\LB{}\Tab{8}{case NOTOK: }}
+\L{\LB{}\Tab{8}{    break;}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{case OK: }}
+\L{\LB{}\Tab{8}{    if ((debug = (cp = getenv (\S{}\"PEPYDEBUG\"\SE{})) \&\& *cp ? atoi (cp)}}
+\L{\LB{}\Tab{24}{: NOTOK) == NOTOK)}}
+\L{\LB{}\Tab{16}{break;}}
+\L{\LB{}\Tab{8}{    fprintf (stderr, \S{}\"\%s made with \%s\!n\"\SE{}, myname, pepyid);}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{default: }}
+\L{\LB{}\Tab{8}{    fprintf (stderr, \S{}\"\%s\!n\"\SE{}, s);}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    if ((ps = ps\_alloc (std\_open)) == NULLPS)}}
+\L{\LB{}\Tab{16}{return;}}
+\L{\LB{}\Tab{8}{    if (std\_setup (ps, stderr) != NOTOK)}}
+\L{\LB{}\Tab{16}{(void) pe2pl (ps, pe);}}
+\L{\LB{}\Tab{8}{    fprintf (stderr, \S{}\"\-\-\-\-\-\-\-\-\!n\"\SE{});}}
+\L{\LB{}\Tab{8}{    ps\_free (ps);}}
+\L{\LB{}\Tab{8}{    break;}}
+\L{\LB{    \}}}
+\L{\LB{\}}}
+\L{\LB{\#endif}}
+\L{\LB{}}
+\L{\LB{...}}

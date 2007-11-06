@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/15 05:33:10 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/10/15 17:20:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:33:10 $ by $Author: brian $
+ Last Modified $Date: 2007/10/15 17:20:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: svr4compat.c,v $
+ Revision 0.9.2.40  2007/10/15 17:20:16  brian
+ - fix for 2.4 kernels and pci_module_init
+
  Revision 0.9.2.39  2007/08/15 05:33:10  brian
  - GPLv3 updates
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/15 05:33:10 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/10/15 17:20:16 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/15 05:33:10 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/10/15 17:20:16 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -98,7 +101,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/15 05:33:10 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/10/15 17:20:16 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -356,8 +359,10 @@ spl(const pl_t level)
 		local_irq_disable();
 	else if (level >= pl_bh)
 		local_bh_disable();
+#if defined HAVE_KFUNC_IN_ATOMIC
 	else if (level >= pl_atomic)
 		preempt_disable();
+#endif				/* defined HAVE_KFUNC_IN_ATOMIC */
 	return (pl_base);
 }
 

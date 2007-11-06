@@ -1,0 +1,535 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_ERRNO 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B ap_errno
+\- APLI error codes.
+.\"
+.\"
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface (APLI).
+.[
+APLI UNIX International
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ap_lib.h>
+.br
+.B #include <osi_lib.h>
+.HP
+.B int ap_errno;
+.PP
+.nf
+\fB#define AP_NOERROR            \fP0 /* no error */
+\fB#define AP_ACCES              \fP1 /* request to bind to specified address denied */
+\fB#define AP_AGAIN              \fP2 /* request not completed */
+\fB#define AP_BADATTRVAL         \fP3 /* bad value for environment attribute */
+\fB#define AP_BADCD_ACT_ID       \fP4 /* cdata field value invalid: act_id */
+\fB#define AP_BADCD_DIAG         \fP5 /* cdata filed value invalid: diag */
+\fB#define AP_BADCD_EVT          \fP6 /* cdata field value invalid: event */
+\fB#define AP_BADCD_OLD_ACT_ID   \fP7 /* cdata field value invalid: old_act_id */
+\fB#define AP_BADCD_OLD_CONN_ID  \fP8 /* cdata field value invalid: old_conn_id */
+\fB#define AP_BADCD_PABORT_IND   \fP9 /* cdata field value invalid: pabort_ind */
+\fB#define AP_BADCD_RES         \fP10 /* cdata field value invalid: res */
+\fB#define AP_BADCD_RES_SRC     \fP11 /* cdata field value invalid: res_src */
+\fB#define AP_BADCD_RESYNC_TYPE \fP12 /* cdata field value invalid: resync_type */
+\fB#define AP_BADCD_RSN         \fP13 /* cdata field value invalid: rsn */
+\fB#define AP_BADCD_SRC         \fP14 /* cdata field value invalid: src */
+\fB#define AP_BADCD_SYNC_P_SN   \fP15 /* cdata field value invalid: sync_p_sn */
+\fB#define AP_BADCD_SYNC_TYPE   \fP16 /* cdata field value invalid: sync_type */
+\fB#define AP_BADCD_TOKENS      \fP17 /* cdata field value invalid: tokens */
+\fB#define AP_BADENC            \fP18 /* bad encoding chosen in enveloping function */
+\fB#define AP_BADENV            \fP19 /* a mandatory attribute is not set */
+\fB#define AP_BADF              \fP20 /* not a presentation service endpoint */
+\fB#define AP_BADFLAGS          \fP21 /* combination of flags is invalid */
+\fB#define AP_BADFREE           \fP22 /* could not free structure members */
+\fB#define AP_BADKIND           \fP23 /* unknown structure type */
+\fB#define AP_BADLSTATE         \fP24 /* instance in bad state for that command */
+\fB#define AP_BADPARSE          \fP25 /* attribute parse failed */
+\fB#define AP_BADPRIM           \fP26 /* unrecognized primitive from user */
+\fB#define AP_BADRESTR          \fP27 /* not restored due to more bin on (AP_MORE set) */
+\fB#define AP_BADROLE           \fP28 /* request invalid due to value of AP_ROLE */
+\fB#define AP_BADSAVE           \fP29 /* not saved due to more bit on (AP_MORE bit) */
+\fB#define AP_BADSAVEF          \fP30 /* invalid FILE pointer */
+\fB#define AP_BADUBUF           \fP31 /* bad length for user data */
+\fB#define AP_HANGUP            \fP32 /* association closed or aborted */
+\fB#define AP_INTERNAL          \fP33 /* internal error */
+\fB#define AP_LOOK              \fP34 /* a pending event requires attention */
+\fB#define AP_NOATTR            \fP35 /* no such attribute */
+\fB#define AP_NOENV             \fP36 /* no environment for that \fIfd\fP */
+\fB#define AP_NOMEM             \fP37 /* could not allocate enough memory */
+\fB#define AP_NOREAD            \fP38 /* attribute is not reabable */
+\fB#define AP_NOSET             \fP39 /* attribute is not setable */
+\fB#define AP_NOWRITE           \fP40 /* attribute is not writable */
+\fB#define AP_PDUREJ            \fP41 /* invalid PDU rejected */
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Provides a global error number into which error codes are returned when APLI API functions fail.
+.PP
+.TP
+.B AP_NOERROR\ -
+No error is indicated in the
+.B ap_errno
+variable.  The last operation was a success.
+.B ap_errno
+will not be set to this value (zero) by the library, the user must set
+.B ap_errno
+to zero before the APLI library call and when the call is successful, the
+.B ap_errno
+value will be unaffected.  There is no requirement that this value be set after a successful call,
+and calls are event permitted to change
+.B ap_errno
+to some other value, when the call is actually successful.
+.TP
+.B AP_BADCD_ACT_ID\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIact_id\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_DIAG\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIdiag\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_EVT\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIevt\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_OLD_ACT_ID\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIold_act_id\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_OLD_CONN_ID\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIold_conn_id\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_PABORT_IND\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIpabort_ind\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_RES\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIres\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_RES_SRC\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIres_src\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_RESYNC_TYPE\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIresync_type\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_RSN\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIrsn\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_SRC\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIsrc\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_SYNC_P_SN\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIsync_p_sn\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_SYNC_TYPE\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fIsync_type\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADCD_TOKENS\ -
+Roughly equivalent to UNIX system error EINVAL. The member, \fItokens\fP, of the \fIcdata\fP
+(\fBap_cdata_t\fP) structure passed to the \fBap_snd\fP(3) function contained a value that was not
+valid in the current state or context.
+.TP
+.B AP_BADENC\ -
+When the user passes data to the \fBap_snd\fP(3) function, it must be encoded in the appropriate
+encoding for the abstract/transfer syntax negotiated for the presentation layer.  The
+\fBap_snd\fP(3) function has determined that the choice of encoding for the envelope of the user
+data was incorrect.
+.TP
+.B AP_BADENV\ -
+A mandatory ALPI environment attribute, settable with the \fBap_set_env\fP(3) and gettable with the
+\fBap_get_env\fP(3) functions, was not set at the time of the call to \fBap_snd\fP(3), but the
+service primitive invoked by the function requires that the attribute be set by the caller to a
+specific value.  Therefore, the call to \fBap_snd\fP(3) has failed because a mandatory attribute is
+not set.
+.TP
+.B AP_BADF\ -
+Most APLI library functions have a file descriptor, \fIfd\fP, passed as the first argument of the
+function.  This file descriptor is both a handle to the APLI instance that the user wishes to
+control as well as being a character special file, pipe or named FIFO, representing a presentation
+service provider.  The APLI library tracks which of the process' file descriptors are associated
+with presentation service providers, and thus represent APLI instances.  Those that do not, such as
+standard input, standard output or standard error, cannot have their file descriptors passed to APLI
+library functions without generating this error.  This error indicates that the passed in file
+descriptor, \fIfd\fP, did not correspond to a presentation service endpoint, and so does not
+correspond to an APLI instances and therefore cannot be acted upon by the APLI library function.
+.TP
+.B AP_BADFLAGS\ -
+For some combinations of flags passed to APLI library functions as arguments, the combinations do
+not follow a strict choice of unrestricted logical OR combination.  Some flag combinations are not
+permitted or are invalid or are unspecified or unsupported.  This error indicates that a combination
+of flags passed by the user was invalid per the specification of the flags.
+.TP
+.B AP_BADFREE\ -
+When the \fBap_free\fP(3) function is called, it attempts to free, using the \fBfree\fP(3) C library
+call, all of the allocated structures internal to the passed in structure pointer.  The only
+internal structures that may be freed with \fBap_free\fP(3) are the structures that were allocated
+by the APLI library and passed to the user in response to a command.  As such, when these same
+internal structures are passed to the \fBap_free\fP(3) function, the APLI library may be able to
+verify whether the structures were indeed allocated by the library.  If this can be detected and it
+is determined that an internal structure was not allocated by the APLI library, the \fBap_free\fP(3)
+function will not free the structure with the \fBfree\fP(3) C library call, and will, instead,
+return this error indicating that it could not free structure members.
+.TP
+.B AP_BADKIND\ -
+The \fBap_free\fP(3) function is called with a \fIkind\fP argument that indicates to which type of
+structure the call applies.  The value of this argument may correspond to a struct type (in all
+capitals) symbolic constant, or a service primitive type symbolic constant, or an environment
+attribute symbolic constant.  When the \fIkind\fP argument value passed does not correspond to any
+of these symbolic constants, then the structure type is unknown and this error generated.
+.TP
+.B AP_BADPRIM\ -
+When calling the \fBap_snd\fP(3) function, an \fIsptype\fP argument is passed which specifies the
+\*(lqService Primitive TYPE\*(rq for the call.  The service primitive type identifies the protocol
+service primitive to be passed to the presentation service provider.  When this error is generated,
+it means that the user has passed a service primitive type, sptype, does not correspond to a
+symbolic constant know to the APLI library.
+.TP
+.B AP_BADRESTR\ -
+The \fBap_restore\fP(3) function can be used to set APLI environment attributes associated with an
+APLI instance.  When data is sent in multiple segments, the \fBAP_MORE\fP bit is used in the flags
+argument to \fBap_snd\fP(3) for all calls except the last.  Attributes are not permitted to change
+after calls to \fBap_snd\fP(3) in which the \fBAP_MORE\fP bit has been set, until a call to
+\fBap_snd\fP(3) has been made with the \fBAP_MORE\fP bit clear.  This error indicates that
+\fBap_restore\fP(3) was called while the \fBAP_MORE\fP bit was set (i.e. a call has been made to
+\fBap_snd\fP(3) with the \fBAP_MORE\fP bit set in the flags argument and no subsequent call to
+\fBap_snd\fP(3) without the \fBAP_MORE\fP bit set has been sent).
+.TP
+.B AP_BADROLE\ -
+The APLI library user has attempted to call a function, typically \fBap_snd\fP(3) for an environment
+attribute or service primitive type which is not applicable to the roles (intiiator or responder)
+for which the APLI instance is allowed (as per environment attribute \fBROLE_ALLOWED\fP).
+.TP
+.B AP_BADSAVE -
+The \fBap_save\fP(3) function can be used to store APLI environment attribtues associated with an
+APLI instance in a file.  When data is sent in multiple segments, the \fBAP_MORE\fP bit is used in
+the flags argument to \fBap_snd\fP(3) for all calls except the last.  Attributes are not permitted
+to change after calls to \fBap_snd\fP(3) in which the \fBAP_MORE\fP bit has been set, untila call to
+\fBap_snd\fP(3) has been made with the \fBAP_MORE\fP bit clear.  The \fBAP_MORE\fP bit is set in the
+environment during this period.  Because an attribute value including the \fBAP_MORE\fP bit should
+not be saved, the \fBap_save\fP(3) function will fail while the \fBAP_MORE\fP bit is set, with this
+error code.
+.TP
+.B AP_BADSAVEF\ -
+The FILE pointer argument, savef, passed to \fBap_save\fP(3) and \fBap_restore\fP(3) is not a valid
+file pointer.  It may be NULL or does not represent a valid file stream open for writing.
+.\"
+.\"
+.SH RETURN
+.PP
+The value of
+.B ap_errno
+is set each time that an APLI API function fails and returns minus one (-1).
+.\"
+.\"
+.SH ERRORS
+.PP
+.TP \w'[\fBAP_BADCD_RESYNC_TYPE\fP]\(em'u
+.RB [ AP_ACCES ]
+\- request to bind to specified address denied
+.PD 0
+.TP
+.RB [ AP_AGAIN ]
+\- request not completed
+.TP
+.RB [ AP_BADATTRVAL ]
+\- bad value for environment attribute
+.TP
+.RB [ AP_BADCD_ACT_ID ]
+\- cdata field value invalid: act_id
+.TP
+.RB [ AP_BADCD_DIAG ]
+\- cdata filed value invalid: diag
+.TP
+.RB [ AP_BADCD_EVT ]
+\- cdata field value invalid: event
+.TP
+.RB [ AP_BADCD_OLD_ACT_ID ]
+\- cdata field value invalid: old_act_id
+.TP
+.RB [ AP_BADCD_OLD_CONN_ID ]
+\- cdata field value invalid: old_conn_id
+.TP
+.RB [ AP_BADCD_PABORT_IND ]
+\- cdata field value invalid: pabort_ind
+.TP
+.RB [ AP_BADCD_RES ]
+\- cdata field value invalid: res
+.TP
+.RB [ AP_BADCD_RES_SRC ]
+\- cdata field value invalid: res_src
+.TP
+.RB [ AP_BADCD_RESYNC_TYPE ]
+\- cdata field value invalid: resync_type
+.TP
+.RB [ AP_BADCD_RSN ]
+\- cdata field value invalid: rsn
+.TP
+.RB [ AP_BADCD_SRC ]
+\- cdata field value invalid: src
+.TP
+.RB [ AP_BADCD_SYNC_P_SN ]
+\- cdata field value invalid: sync_p_sn
+.TP
+.RB [ AP_BADCD_SYNC_TYPE ]
+\- cdata field value invalid: sync_type
+.TP
+.RB [ AP_BADCD_TOKENS ]
+\- cdata field value invalid: tokens
+.TP
+.RB [ AP_BADENC ]
+\- bad encoding chosen in enveloping function
+.TP
+.RB [ AP_BADENV ]
+\- a mandatory attribute is not set
+.TP
+.RB [ AP_BADF ]
+\- not a presentation service endpoint
+.TP
+.RB [ AP_BADFLAGS ]
+\- combination of flags is invalid
+.TP
+.RB [ AP_BADFREE ]
+\- could not free structure members
+.TP
+.RB [ AP_BADKIND ]
+\- unknown structure type
+.TP
+.RB [ AP_BADLSTATE ]
+\- instance in bad state for that command
+.TP
+.RB [ AP_BADPARSE ]
+\- attribute parse failed
+.TP
+.RB [ AP_BADPRIM ]
+\- unrecognized primitive from user
+.TP
+.RB [ AP_BADRESTR ]
+\- not restored due to more bin on (AP_MORE set)
+.TP
+.RB [ AP_BADROLE ]
+\- request invalid due to value of AP_ROLE
+.TP
+.RB [ AP_BADSAVE ]
+\- not saved due to more bit on (AP_MORE bit)
+.TP
+.RB [ AP_BADSAVEF ]
+\- invalid FILE pointer
+.TP
+.RB [ AP_BADUBUF ]
+\- bad length for user data
+.TP
+.RB [ AP_HANGUP ]
+\- association closed or aborted
+.TP
+.RB [ AP_INTERNAL ]
+\- internal error
+.TP
+.RB [ AP_LOOK ]
+\- a pending event requires attention
+.TP
+.RB [ AP_NOATTR ]
+\- no such attribute
+.TP
+.RB [ AP_NOENV ]
+\- no environment for that \fIfd\fP
+.TP
+.RB [ AP_NOERROR ]
+\- no error
+.TP
+.RB [ AP_NOMEM ]
+\- could not allocate enough memory
+.TP
+.RB [ AP_NOREAD ]
+\- attribute is not reabable
+.TP
+.RB [ AP_NOSET ]
+\- attribute is not setable
+.TP
+.RB [ AP_NOWRITE ]
+\- attribute is not writable
+.TP
+.RB [ AP_PDUREJ ]
+\- invalid PDU rejected
+.PD
+.\"
+.\"
+.SH NOTICES
+.PP
+The OpenSS7 APLI Library implementation of
+.BR ap_errno ()
+is thread-safe.  A thread-specific area is used to store the error number.
+.\"
+.\"
+.SH DRIVERS
+.PP
+.TP
+.BR /dev/oopi ", " /dev/streams/clone/oopi
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ap_errno
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ap_error (3),
+.BR APLI (3).
+.\"
+.\"
+.SH COMPATIBLITY
+.PP
+.BR ap_errno
+is compatible with APLI,
+.[
+APLI UNIX International October 25, 1990
+.]
+and implementation based on APLI such as
+.IR "Solaris\(rg SunLink OSI" ,
+.IR "Solaris\(rg Solstice OSI" ,
+.IR "HP OSI Transport Services/9000 (OTS/9000)" ,
+.IR "SVR 4.2 Open Network Services (ONS)" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR APLI (3)
+and
+.BR STREAMS (4)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_errno
+first appeared in APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T2
+
+

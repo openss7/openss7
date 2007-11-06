@@ -1,0 +1,214 @@
+% run this through LaTeX with the appropriate wrapper
+
+\section{Models}
+
+\subsection{Access Control}
+
+QUIPU uses access control lists to represent access rights; the subjects
+are DUAs (represented by DNs) and the objects are entries in the DIT,
+attributes of entries, and the child-of relation for each entry (all represented
+by DNs, and, in the case of attributes, the attribute type as well).
+
+Furthermore, objects can be {\em containers} that hold other objects. To access
+an object within an container, it is necessary to have access rights both to
+the object and the container that holds it. In particular, entries in the DIT
+are containers. The attributes of the entry and the list of its children
+are contained within the entry. The children themselves are {\em not} contained
+within the parent.
+
+The possible levels of access are as follows: {\em none}, {\em detect}, 
+{\em compare}, {\em read}, {\em add} and {\em write}.
+
+\subsection{Security Domains}
+
+The DIT is a global database, maintained by many separate organisations.  
+It is possible for the manager of DSA to change its interpretation of the 
+access control rules, in order to  obtain access fraudulently to information
+held by other DSAs. 
+
+As a result, data in a DSA may need to be protected from the managers of other
+DSAs, as well as from users. This means that special checks must be performed
+on DSP operations that come from untrusted DSAs.
+
+In order to decide to trust a DSA, it is necessary to be able to authenticate it
+and to know that it should be trusted. The current version of QUIPU 
+can do neither of these, and
+so assumes that {\em all} DSAs are untrusted.
+
+
+\section{Representation in the DIT}
+
+\subsection{Simple Authentication}
+
+DUAs which use simple authentication have their password stored in the
+{\em userPassword} attribute of their entry.
+
+\subsection{Protected Simple Authentication}
+
+QUIPU represents both passwords (the $K_{A}$s) and authenticators by the
+ASN.1 type {\em ProtectedPassword} shown if Figure~\ref{protected-py}.
+
+When this structure represents a password,
+{\em algorithm} indicates which one-way function is being used and
+{\em password} is the (unencrypted) password. The other fields are
+not supplied.
+
+When this structure represents an authenticator, {\em password}
+is the hash value 
+\begin{math}
+f_{1}(K_{A}, t_{1}, q_{1})
+\end{math},
+where $t_{1}$ is {\em time1}, $q_{1}$ is {\em random1} and 
+$K_A$ is the password. {\em algorithm} is not supplied.
+
+A relation $\geq$ can be defined on the set of passwords and
+authenticators as follows: If $a$ is a password, $b$ is an authenticator,
+and $a$ matches $b$, then $a \geq b$. (Also, $a \geq a$). It can be shown
+that this relation
+is a partial ordering of the set, justifying our use of the symbol ``$\geq$''.
+We could have defined an attribute syntax for which the above relation corresponded
+to ``greater than or equal to'' without violating any of the implied semantics
+of X.500. However, the DAP {\em compare} operation cannot be used to test 
+``greater than or equal to'', only ``equal to'', and we wanted an easy
+way to ask the 
+directory to check this relation. To achieve this, we made the relation
+correspond to ``equals'' for the {\em ProtectedPassword} attribute syntax.
+
+\tagrind{protected}{ProtectedPassword}{protected-py}
+
+\subsection{Access Control Lists}
+
+The access control list for an entry is held in that entry's
+{\em accessControlList} attribute.
+
+\subsection{Security Policies}
+
+The {\em entrySecurityPolicy} attribute of an entry is used to indicate the
+amount of care that should be taken to preserve the integrity and
+confidentiality of that entry. While the {\em accessControlList} indicates
+who should have access to the entry, the {\em entrySecurityPolicy} indicates
+which steps should be taken to prevent unauthorized access.
+
+The {\em dsaDefaultSecurityPolicy} attribute of a DSA indicates which
+precautions the DSA will take when dealing with entries that do not have
+an {\em entrySecurityPolicy} attribute.
+
+The {\em dsaPermittedSecurityPolicy} attribute of a DSA indicates which
+security policies the DSA is prepared to enforce. A DSA may not support a
+security policy either because it lacks the necessary software or
+because its manager wishes to forbid use of that policy.
+
+The security policy attribute syntax is not yet implemented.
+
+\subsection{Labels}
+
+Security labels are one means of enforcing rule-based access control
+(sometimes referred to as mandatory access control). QUIPU does not
+provide mandatory access control in any form.
+
+\section{Distributed Operations}
+\label{des-auth}
+
+\subsection{(Protected) Simple Authentication}
+
+If the responding DSA holds the initiator's entry, then it may check the
+password directly. Otherwise, the responder will formulate a DSP compare
+operation to check it. If the result is {\em true}, the bind will be
+accepted.
+
+This approach can only be used to check a DAP bind; if it were used in DSP,
+there would be a danger of livelock. Hence, QUIPU will not attempt to
+verify the password in a DSP bind.
+
+\subsection{Strong Authentication}
+
+In strong authentication, it is necessary to build a certification path
+for the originator that will be believed by the recipient. From the standpoint
+of the protocol, the originator builds the certification path and sends it to
+the recipient. However, the originator does not know for certain which CA's
+the recipient trusts, and so cannot be sure of constructing a valid path.
+
+QUIPU solves this problem by treating the presented certification path
+as a hint. The recipient tries to build an acceptable certification path
+out of the components of the presented path and the certificates it has cached.
+
+\subsection{Restricting Read Access}
+
+To maintain the confidentiality of data, results from read, search etc. must
+not be passed to another DSA unless that DSA has rights to them.
+The current version of QUIPU solves this problem in the manner described below.
+
+When a DUA requests private data via an untrusted DSA, QUIPU checks whether
+any of the requested information can be seen by the DUA but not by the DSA.
+If it can, the security error ``inappropriate authentication'' is sent to
+the untrusted DSA. (Otherwise, the data can be safely sent over DSP).
+
+QUIPU DSAs will interpret this error if it is sent by another QUIPU DSA 
+to mean that they are not trusted, and
+will pass a referral back to the DUA. (Other DSAs may behave differently;
+X.500 ought to be clarified in this area).
+
+The DUA will chase the referral, and repeat its query directly to the DSA
+holding the data. The DSA will then give the DUA the results.
+
+\subsection{Restricting Write Access}
+
+To maintain the integrity of the data, requests to modify data over DSP must
+not be accepted unless they are signed or can be performed by anyone.
+
+QUIPU solves this problem as in the read access case, 
+by returning a security error.
+When strong authentication is added to QUIPU, modify requests will be
+accepted over DSP provided that they are signed by the DUA.
+
+As an optimisation, QUIPU DSAs never chain modify requests unless they are
+signed. (The operation will probably be rejected, so it is quicker to
+give a referral to the DUA immediately, rather than trying to chain.)
+
+\subsection{Caching}
+\label{dsp-acl}
+
+DSAs try to improve performance by caching the results of DSP operations.
+Caching interferes with access control in two ways:
+
+\begin{enumerate}
+\item
+The cached data may be incomplete.
+The DUA that requested it may not have had
+rights to all the data, or the DSA that held the data may not have been
+prepared to send all of it over DSP.
+\item
+Caching can prevent access control.
+The original data may have been subject to access controls which the holder of
+the cache is unaware of.
+\end{enumerate}
+
+QUIPU has a special solution that only works between QUIPU DSAs (using the
+QUIPU DSP application context): the ACL is sent along with the data across
+DSP.
+
+QUIPU DSAs will only cache data if they have the ACL to go with it.
+This ensures 
+that the same access controls will be applied to a cache as to the master copy.
+It also enables a DSA to tell if the cache is complete. The required
+information 
+is checked against the ACL in the cache; if any of it is not publicly readable,
+then it will not have been returned over DSP and the cache cannot be used.
+
+\subsection{Replicated Data}
+
+The mechanism originally envisaged for replicating data was ``reliable
+ROS'':  remote operations carried by X.400(88). DSAs could use the security
+mechanisms in X.400(88) to provide both integrity and confidentiality
+for the EDB updates.
+This would make the slave updates the only place in QUIPU where cryptographic 
+techniques are used to provide confidentiality, as opposed to integrity. The
+provision of confidentiality here is justified in view of the sensitivity of
+entire entry data blocks; many of them will contain user's passwords, for
+example.
+
+However, X.400(88) is not yet widespread, and hence cannot be used as the
+primary means of replicating data. In the interim, the {\em getEDB} mechanism
+is used. This provides neither confidentiality nor integrity, and is
+not even subject to access control (as DSP is unauthenticated).
+

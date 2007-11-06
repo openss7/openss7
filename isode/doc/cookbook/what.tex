@@ -1,0 +1,199 @@
+% -*- LaTeX -*-		(really SLiTeX)
+
+\begin{bwslide}
+\part	{WHAT NOW?}\bf
+
+\begin{nrtc}
+\item	COMPARISON TO SUN RPC/XDR
+
+\item	COMPARISON TO APOLLO NCS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{GUIDELINES}
+
+\begin{nrtc}
+\item	NOT TRYING TO SAY WHICH IS BETTER
+
+\item	MERELY TRYING TO COMPARE AND CONTRAST
+
+\item	REFERENCE DOCUMENT IS USED AS BASELINE\\
+	(SOME INFORMATION MAY BE DATED)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{COMPARISON TO\\ SUN RPC/XDR}\bf
+
+\begin{nrtc}
+\item	ALTHOUGH NOT THE FIRST RPC SYSTEM DEPLOYED,
+	CERTAINLY THE FIRST ``POPULARIZATION'' OF AN RPC SYSTEM
+
+\item	SUN RPC/XDR IS BEST (UN)KNOWN FOR MAKING NFS POSSIBLE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REFERENCE DOCUMENT}
+
+\begin{nrtc}
+\item	REMOTE PROCEDURE CALL PROGRAMMING GUIDE
+    \begin{nrtc}
+    \item	VERSION: REVISION B OF 17 FEBRUARY 1986
+
+    \item	SOURCE: SMI DOCUMENTATION SET
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SYNTAX CHARACTERISTICS}
+
+\begin{nrtc}
+\item	NO FORMAL ABSTRACT SYNTAX, PER SE
+    \begin{nrtc}
+    \item	APPLICATION PROTOCOL DEFINES DATA STRUCTURES EXCHANGED
+
+    \item	INITIALLY, NO STUB COMPILER\\ (THERE IS ONE NOW)
+    \end{nrtc}
+
+\item	SERIALIZATION METHOD IS CALLED XDR, EXTERNAL DATA REPRESENTATION
+    \begin{nrtc}
+    \item	CANONICAL FORM WITH IMPLICIT TAGS
+
+    \item	MOST QUANTITIES PADDED TO 32--BIT BOUNDARIES
+
+    \item	ANY DATA TYPE CAN BE SERIALIZED
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROTOCOL CHARACTERISTICS}
+
+\begin{nrtc}
+\item	PROTOCOL IS SIMPLE REQUEST/REPLY INTERACTION
+    \begin{nrtc}
+    \item	BY CONVENTION, EACH APPLICATION HAS A ``NULL'' PROCEDURE    
+    \end{nrtc}
+
+\item	MULTIPLE TRANSPORT PROTOCOLS SUPPORTED
+    \begin{nrtc}
+    \item	ALTHOUGH UDP (DoD USER DATAGRAM PROTOCOL) IS THE MOST COMMON
+
+    \item	THIS IMPACTS, e.g., THE SIZE OF ARGUMENTS THAT CAN BE PASSED
+		IN A REQUEST
+    \end{nrtc}
+
+\item	SUPPORT FOR BROADCAST MEDIA
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BINDING CHARACTERISTICS}
+
+\begin{nrtc}
+\item	SERVICE IS IDENTIFIED BY
+    \begin{nrtc}
+    \item	PROGRAM NUMBER (32--BITS)
+
+    \item	VERSION NUMBER (32--BITS)
+    \end{nrtc}
+
+\item	MAPPING OF SERVICE TO NETWORK ADDRESS IS DONE THROUGH PORT MAPPER
+
+\item	SUPPORT FOR DIFFERENT AUTHENTICATION SCHEMES
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{COMPARISON TO\\ APOLLO NCS}\bf
+
+\begin{nrtc}
+\item	ANOTHER ENTRY INTO THE POPULAR RPC MARKET
+
+\item	EMPHASIZES OBJECT-BASED ABSTRACTIONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REFERENCE DOCUMENT}
+
+\begin{nrtc}
+\item	NETWORK COMPUTING SYSTEM: A TECHNICAL OVERVIEW
+    \begin{nrtc}
+    \item	VERSION: FEBRUARY 1987 (DOCUMENT 002402--322)
+
+    \item	SOURCE: APOLLO WHITE PAPER
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SYNTAX CHARACTERISTICS}
+
+\begin{nrtc}
+\item	A FORMAL SYNTAX IS USED
+    \begin{nrtc}
+    \item	NETWORK INTERFACE DEFINITION LANGUAGE (NIDL)
+
+    \item	ANY DATA TYPE CAN BE DESCRIBED
+
+    \item	NIDL COMPILER PRODUCES ``C'' AND ``PASCAL'' BINDINGS
+    \end{nrtc}
+
+\item	SERIALIZATION (APOLLO CALLS IT \emph{MARSHALLING}) IS BASED ON THE
+    \begin{nrtc}
+    \item	``RECEIVER MAKES IT RIGHT''
+    \end{nrtc}
+    PRINCIPLE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROTOCOL CHARACTERISTICS}
+
+\begin{nrtc}
+\item	A LIGHTWEIGHT TRANSACTION PROTOCOL IS USED
+    \begin{nrtc}
+    \item	CAN DISTINGUISH (NON-)IDEMPOTENT OPERATIONS
+    \end{nrtc}
+
+\item	MULTIPLE TRANSPORT PROTOCOLS SUPPORTED
+    \begin{nrtc}
+    \item	EMPHASIZING USE OF THE BSD SOCKET ABSTRACTION
+    \end{nrtc}
+
+\item	SUPPORT FOR MULTI-TASKING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BINDING CHARACTERISTICS}
+
+\begin{nrtc}
+\item	SERVICE (OBJECT) IS IDENTIFIED BY \emph{UNIQUE ID} OR
+	\emph{INTERFACE NAME} 
+    \begin{nrtc}
+    \item	REPLICATION AND CONSISTENCY IS CONSIDERED
+    \end{nrtc}
+
+\item	MAPPING OF SERVICE TO NETWORK ADDRESS IS DONE THROUGH LOCATION BROKER
+
+\item	SUPPORT FOR DIFFERENT AUTHENTICATION SCHEMES
+
+\item	SUPPORT FOR AUTHORIZATION PLANNED
+\end{nrtc}
+\end{bwslide}

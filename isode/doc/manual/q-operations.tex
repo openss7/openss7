@@ -1,0 +1,1294 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter {The Procedural DUA}
+\label{DUA:proc}
+
+The \man libdsap(3n) library defines a set of procedure calls which
+correspond to each 
+of the X.500 abstract operations.
+This chapter describes those procedure calls.
+
+\section {Procedure Model}
+\label{proc_model}
+
+Each operation is accessed via a procedure call of the same name as the
+X.500 operation, prefixed by ``\verb"ds_"''.
+The procedure is supplied an argument structure, and returns either an error
+or result structure.
+For example the \verb"read" operation is invoked by calling
+\verb"ds_read (argument, error, result)".
+
+The return value of the procedures have the following common values, which
+indicated whether an error or result is returned:
+\begin{describe}
+\item [\verb"DS\_OK":]        Operation completed successfully; the result
+structure will have the corresponding result (if the operation generates
+results).
+\item [\verb"DS\_ERROR\_LOCAL":] Error within the DUA module.
+\item [\verb"DS\_ERROR\_CONNECT":] Failed to connect to a remote DSA.
+\item [\verb"DS\_ERROR\_PROVIDER":] Other OSI provider error.
+\item [\verb"DS\_ERROR\_REMOTE":] Remote error.  Further details will  
+be in the error parameter in the procedure call.
+\item [\verb"DS\_X500\_ERROR":] This is the same as \verb"DS_ERROR_REMOTE".
+\end{describe}
+These values defined in \file{quipu/ds\_error.h}, which must be included
+in your program (there are other return values defined here, but these
+should only occur within the DSA, and should not be returned by a DUA call).
+
+\section {Common Parameters}
+All of the DAP operations described in Sections~\ref{dap:bind} to \ref{modifyrdn}
+have certain common parameters in their arguments and results.
+These structures are now described.
+
+
+\subsection {Arguments}
+\label{common_args}
+
+The common arguments are represented by the following structure:
+\begin{quote}\index{CommonArgs}\small\begin{verbatim}
+typedef struct common_args {
+    ServiceControl        ca_servicecontrol;
+    DN                    ca_requestor;
+    struct op_progress    ca_progress;
+    int                   ca_aliased_rdns;
+#define CA_NO_ALIASDEREFERENCED -1
+    struct security_parms * ca_security;
+    struct signature    * ca_sig;
+    struct extension    * ca_ext;
+} CommonArgs;
+\end{verbatim}\end{quote}
+
+The fields \verb"ca_ext", \verb"ca_progress", \verb"ca_requestor" 
+and \verb"ca_aliased_rdns" are provided as
+they are defined within X.500.  Neither the QUIPU DSA or DUA use these fields.
+
+The field \verb"ca_servicecontrol" is used to select the type of service
+the DSA should provide, the structure is given below
+
+\begin{quote}\index{ServiceControl}\small\begin{verbatim}
+typedef struct svccontrol {    
+    int         svc_options;
+#define SVC_OPT_PREFERCHAIN             0X001
+#define SVC_OPT_CHAININGPROHIBIT        0X002
+#define SVC_OPT_LOCALSCOPE              0X004
+#define SVC_OPT_DONTUSECOPY             0X008
+#define SVC_OPT_DONTDERFERERENCEALIAS   0X010
+    char        svc_prio;
+#define SVC_PRIO_LOW    0
+#define SVC_PRIO_MED    1
+#define SVC_PRIO_HIGH   2
+    int         svc_timelimit; 
+#define SVC_NOTIMELIMIT -1
+    int         svc_sizelimit;
+#define SVC_NOSIZELIMIT -1
+    int         svc_scopeofreferral;
+#define SVC_REFSCOPE_NONE       -1
+#define SVC_REFSCOPE_DMD        0
+#define SVC_REFSCOPE_COUNTRY    1
+} svccontrol, ServiceControl;
+\end{verbatim}\end{quote}
+
+The values takes by each field within the ServiceControl
+structure are described in full
+in \cite{CCITT.Directory}.
+
+\subsection {Results}
+\label{common_results}
+
+\begin{quote}\index{CommonResults}\small\begin{verbatim}
+typedef struct common_results {
+    DN      cr_requestor;
+    char    cr_aliasdereferenced;
+    struct security_parms  * cr_security;
+    struct alg_id          * cr_alg;
+    char                   * cr_tmp;
+    int                      cr_len;
+} common_results, CommonResults;
+\end{verbatim}\end{quote}
+
+The filed \verb"cr_aliasdereferenced" is set to \verb"TRUE" if the base
+object of the operation was an alias, and was dereferenced.
+
+The other fields are used by {\em pepsy} whilst encoding and decoding
+the structure.
+
+\section {Continuation References}
+\label{cont_ref}
+
+``Continuation References'' are returned by the directory when the operation
+asked for could not be fully completed, in which case
+the structure \verb"ContinuationRef" is returned as part of the error or
+results structures.
+The structure is explained below:
+
+\begin{quote}\index{ContinuationRef}\small\begin{verbatim}
+typedef struct continuation_ref {
+    DN          cr_name;
+    struct op_progress cr_progress;
+    int         cr_rdn_resolved;
+#define CR_RDNRESOLVED_NOTDEFINED  -1
+    int         cr_aliasedRDNs;
+#define CR_NOALIASEDRDNS -1
+    int         cr_reftype;
+#define RT_UNDEFINED    -1
+#define RT_SUPERIOR     1
+#define RT_SUBORDINATE  2
+#define RT_CROSS        3
+#define RT_NONSPECIFICSUBORDINATE 4
+    struct access_point * cr_accesspoints;
+    struct continuation_ref *cr_next;
+}continuation_ref, *ContinuationRef;
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"cr\_name":] The DN that has only been partially explored.
+\item [\verb"cr\_rdn\_resolved":] The number of RDNs in the name that have
+been examined; hence, how far down the DIT the query has been taken.
+\item [\verb"cr\_aliasedRDNs":] If \verb"TRUE" then some of the RDNs were
+aliases.
+\item [\verb"cr\_reftype":] The type of reference that was used to get this
+information.
+\item [\verb"cr\_accesspoints":] The access point of the DSA to 
+contact.
+The structure for an access point is as follows:
+\begin{quote}\index{access\_point}\small\begin{verbatim}
+struct access_point { 
+    DN                  ap_name;
+    struct PSAPaddr     *ap_address;
+    struct access_point *ap_next;
+};
+\end{verbatim}\end{quote}
+\begin{describe}
+\item [\verb"ap\_name":] The DN of the DSA to contact.
+\item [\verb"ap\_address":] The address of the DSA (derivable from 
+the name).
+\item [\verb"ap\_next":] There may be more than one access point, hence they
+form a linked list structure.
+\end{describe}
+\item [\verb"cr\_next":] There may be more than one access point; if so they form
+a linked list structure.
+\end{describe}
+
+
+\section {Errors}
+
+All DAP operations return a common error structure, which maps closely 
+onto the service definitions.
+An error is only returned if the operation failed; if successful (indicated
+by the return value DS\_OK) the error structure returned is undefined.
+
+\begin{quote}\index{DSError}\small\begin{verbatim}
+struct DSError {
+    int dse_type;
+#define DSE_INTR_ABANDON_FAILED -5
+#define DSE_INTR_ABANDONED      -4
+#define DSE_INTRERROR           -3
+#define DSE_LOCALERROR          -2
+#define DSE_REMOTEERROR         -1
+#define DSE_NOERROR             0
+#define DSE_ATTRIBUTEERROR      1
+#define DSE_NAMEERROR           2
+#define DSE_SERVICEERROR        3
+#define DSE_REFERRAL            4
+#define DSE_ABANDONED           5
+#define DSE_SECURITYERROR       6
+#define DSE_ABANDON_FAILED      7
+#define DSE_UPDATEERROR         8
+#define DSE_DSAREFERRAL         9
+    union {
+       struct DSE_attribute    dse_un_attribute;
+       struct DSE_name         dse_un_name;
+       struct DSE_service      dse_un_service;
+       struct DSE_referral     dse_un_referral;
+       struct DSE_abandon_fail dse_un_abandon_fail;
+       struct DSE_security     dse_un_security;
+       struct DSE_update       dse_un_update;
+    }   dse_un;
+};
+\end{verbatim}\end{quote}
+
+The field \verb"dse_type" is used to indicate what sort of error has
+occurred, and hence which structure from the union is used.
+
+The value \verb"DSE_LOCALERROR" is used to indicate that the 
+error came from within the DUA; there is no associated 
+structure in the union for this error.
+
+The value \verb"DSE_REMOTEERROR" is used to indicate that an
+error occurred at the DSA end, and the request was rejected; again  there is
+no associated structure in the union for this error.
+
+The structures in the union for the other
+error conditions are as described in the following sections.
+
+
+\subsection{Attribute Error}
+\begin{quote}\small\begin{verbatim}
+struct DSE_attribute {
+    DN DSE_at_name;
+    struct DSE_at_problem DSE_at_plist;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"DSE\_at\_name":] The name of the entry causing the error.
+\item [\verb"DSE\_at\_plist":] A list of the errors:
+\begin{quote}\small\begin{verbatim}
+struct DSE_at_problem {
+    int                     DSE_at_what;
+#define DSE_AT_NOSUCHATTRIBUTE          1
+#define DSE_AT_INVALIDATTRIBUTESYNTAX   2
+#define DSE_AT_UNDEFINEDATTRIBUTETYPE   3
+#define DSE_AT_INAPPROPRIATEMATCHING    4
+#define DSE_AT_CONSTRAINTVIOLATION      5
+#define DSE_AT_TYPEORVALUEEXISTS        6
+    AttributeType           DSE_at_type;
+    AttributeValue          DSE_at_value;
+    struct DSE_at_problem * dse_at_next;
+};
+#define DSE_AT_NOPROBLEM ((struct DSE_at_problem*)0)
+\end{verbatim}\end{quote}
+
+The fields are used as follows:
+\begin{describe}
+\item [\verb"DSE\_at\_what":] Indicates which error has occurred.
+\item [\verb"DSE\_at\_type":] The attribute type causing the error.
+\item [\verb"DSE\_at\_value":] The associated value (if any).
+\item [\verb"dse\_at\_next":] There may be more than one such error; if
+so, they form a linked list.
+\end{describe}
+\end{describe}
+
+
+
+\subsection{Name Error}
+\begin{quote}\small\begin{verbatim}
+struct DSE_name {
+    int DSE_na_problem;
+#define DSE_NA_NOSUCHOBJECT             1
+#define DSE_NA_ALIASPROBLEM             2
+#define DSE_NA_INVALIDATTRIBIBUTESYNTAX 3
+#define DSE_NA_ALIASDEREFERENCE         4
+    DN  DSE_na_matched;
+};
+\end{verbatim}\end{quote}
+
+\verb"DSE_na_matched" is the part of the DN successfully matched.
+
+\subsection{Referral Errors}
+
+\begin{quote}\small\begin{verbatim}
+struct DSE_referral {
+    ContininuationRef DSE_ref_candidates;
+    DN                DSE_ref_prefix;
+};
+\end{verbatim}\end{quote}
+
+The continuation reference supplies information on how to continue the
+query.
+The structure is described in Section~\ref{cont_ref}
+
+The field \verb"DSE_ref_prefix" is for DSP only.
+You should generally chase such referrals.
+
+\subsection{Security Error}
+\label{error_sec}
+\begin{quote}\small\begin{verbatim}
+struct DSE_security {
+    int DSE_sc_problem;
+#define DSE_SC_AUTHENTICATION           1
+#define DSE_SC_INVALIDCREDENTIALS       2
+#define DSE_SC_ACCESSRIGHTS             3
+#define DSE_SC_INVALIDSIGNATURE         4
+#define DSE_SC_PROTECTIONREQUIRED       5
+#define DSE_SC_NOINFORMATION            6
+};
+\end{verbatim}\end{quote}
+
+\subsection{Service Error}
+\label{error_ser}
+\begin{quote}\small\begin{verbatim}
+struct DSE_service {
+    int DSE_sv_problem;
+#define DSE_SV_BUSY                         1
+#define DSE_SV_UNAVAILABLE                  2
+#define DSE_SV_UNWILLINGTOPERFORM           3
+#define DSE_SV_CHAININGREQUIRED             4
+#define DSE_SV_UNABLETOPROCEED              5
+#define DSE_SV_INVALIDREFERENCE             6
+#define DSE_SV_TIMELIMITEXCEEDED            7
+#define DSE_SV_ADMINLIMITEXCEEDED           8
+#define DSE_SV_LOOPDETECT                   9
+#define DSE_SV_UNAVAILABLECRITICALEXTENSION 10
+#define DSE_SV_OUTOFSCOPE                   11
+#define DSE_SV_DITERROR                     12
+};
+\end{verbatim}\end{quote}
+
+\subsection{Update Error}
+\begin{quote}\small\begin{verbatim}
+struct DSE_update {
+    int DSE_up_problem;
+#define DSE_UP_NAMINGVIOLATION          1
+#define DSE_UP_OBJECTCLASSVIOLATION     2
+#define DSE_UP_NOTONNONLEAF             3
+#define DSE_UP_NOTONRDN                 4
+#define DSE_UP_ALREADYEXISTS            5
+#define DSE_UP_AFFECTSMULTIPLEDSAS      6
+#define DSE_UP_NOOBJECTCLASSMODS        7
+};
+\end{verbatim}\end{quote}
+
+\subsection{Abandon Failure}
+If an abandon operation fails then the following is used:
+\begin{quote}\small\begin{verbatim}
+struct DSE_abandon_fail {
+    int DSE_ab_problem;
+#define DSE_AB_NOSUCHOPERATION  1
+#define DSE_AB_TOOLATE          2
+#define DSE_AB_CANNOTABANDON    3
+    int DSE_ab_invokeid;
+};
+\end{verbatim}\end{quote}
+
+\subsection {Error Handling Procedures}
+
+The \man libdsap(3n) library has three routines for handling errors:
+
+\begin{quote}\index{ds\_error}\small\begin{verbatim}
+ds_error (ps,error)
+PS ps;
+struct DSError * error;
+\end{verbatim}\end{quote}
+
+This routine will take the error, and pretty-print the contents to the
+PStream \verb"ps".
+
+\begin{quote}\index{log\_ds\_error}\small\begin{verbatim}
+log_ds_error (error)
+struct DSError * error;
+\end{verbatim}\end{quote}
+
+This routine will take an error structure, print a simple message
+in \file{dsap.log} at 
+the LLOG\_EXCEPTIONS logging level based on the error, and a more detailed
+report at LLOG\_TRACE logging level.
+
+\begin{quote}\small\begin{verbatim}
+ds_error_free (err)
+struct DSError * err;
+\end{verbatim}\end{quote}
+
+This frees the embedded structures within the error structure,
+{\em but not} \verb"DSError" itself.
+
+\section {Binding and Unbinding}
+\label{dap:bind}
+
+Before operations may be invoked, the DUA must BIND to the DSA.
+
+The \verb"bind" procedure
+\begin{quote}\index{secure\_ds\_bind}\small\begin{verbatim}
+secure_ds_bind (arg, error, result)
+    struct ds_bind_arg          * arg;
+    struct ds_bind_arg          * result;
+    struct ds_bind_error        * error;
+\end{verbatim}\end{quote}
+is used for this purpose.
+
+You will need to include \file{quipu/bind.h} to use this procedure.
+
+The \verb"ds_bind_arg" structure is defined as follows.
+\begin{quote}\small\begin{verbatim}
+struct ds_bind_arg {
+    int  dba_version; 
+#define DBA_VERSION_V1988 0
+    int dba_auth_type;
+#define DBA_AUTH_NONE      0
+#define DBA_AUTH_SIMPLE    1
+#define DBA_AUTH_STRONG    2
+#define DBA_AUTH_EXTERNAL  3
+#define DBA_AUTH_PROTECTED 4
+    char  *dba_time1;
+    char  *dba_time2;
+    struct random_number dba_r1;
+    struct random_number dba_r2;
+    DN     dba_dn;
+    int    dba_passwd_len;
+#define DBA_MAX_PASSWD_LEN 512
+    char   dba_passwd[DBA_MAX_PASSWD_LEN];
+    struct signature        *dba_sig;
+    struct certificate_list *dba_cpath;
+    char * dba_vtmp;
+    int    dba_vlen;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"dba\_version":] should always be set to
+\verb"DBA_VERSION_V1988".
+\item [\verb"dsa\_auth\_type":] is used to select the type of authentication
+required.
+\item [\verb"dba\_dn":] is the name of the entity you wish to bind as, this
+can be \verb"NULLDN" if you only require access to ``publically readable''
+information.
+\item [\verb"dba\_passwd":] The password required to bind as the entity.
+This will be checked against the ``userPassword'' attribute in the entity.
+\item [\verb"dba\_passwd\_len":] The length of the string in
+\verb"dsa_passwd".
+\item [\verb"dba\_sig":] The strong authentication signature (which must be
+provided if strong authentication is used in the bind call).
+\item [\verb"dba\_cpath":] The strong authentication certification path
+(optional).
+\item [\verb"dba\_time1":] Used for protected and strong authentication.
+\item [\verb"dba\_time2":] Optionally used for protected simple authentication.
+\item [\verb"dba\_r1":] Random number used for protected and strong
+authentication.
+\item [\verb"dba\_r2":] Optionally used for protected simple
+authentication.
+\item [\verb"dba\_vtmp":] Unused.
+\item [\verb"dba\_vlen":] Unused.
+\end{describe}
+
+The \verb"bind" operation will try to connect to the DSA, whose address is
+defined in the external ``\verb"char *"''. ``\verb"dsa_address"'', the
+syntax of the string is that of an ISODE PSAP address.
+
+If \verb"secure_ds_bind()" returns \verb"DS_OK", then you have a successful connection,
+otherwise a \verb"ds_bind_error" structure will inform you 
+of the error condition.
+
+\begin{quote}\small\begin{verbatim}
+struct ds_bind_error {
+    int  dbe_version;
+    char dbe_type;
+#define DBE_TYPE_SERVICE  1
+#define DBE_TYPE_SECURITY 2
+    int  dbe_value;        
+};
+\end{verbatim}\end{quote}
+
+The filed \verb"dbe_value" takes a value as defined for a \verb"DSE_security"
+or \verb"DSE_service" error shown in Sections~\ref{error_sec} and
+\ref{error_ser}.
+
+\subsection{No Authentication}
+
+To bind without using any authentication, 
+\verb+dsa_auth_type+ should be set to 
+\verb+DBA_AUTH_NONE+.
+The fields \verb+dba_version+ and \verb+dba_dn+ must be filled in.
+
+\subsection{Simple Authentication}
+
+To bind using simple authentication, 
+the \verb+dsa_auth_type+ field should be set to the value
+\verb+DBA_AUTH_SIMPLE+.
+The \verb+dba_version+, \verb+dba_dn+,
+\verb+dba_passwd+ and 
+\verb+dba_passwd_len+ fields must be filled in.
+
+For backwards compatibility the routine
+\begin{quote}\index{ds\_bind}\small\begin{verbatim}
+ds_bind (arg, error, result)
+    struct ds_bind_arg          * arg;
+    struct ds_bind_arg          * result;
+    struct ds_bind_error        * error;
+\end{verbatim}\end{quote}
+is still supplied, and gives you an unprotected simple bind request.
+
+
+\subsection{Protected Simple Authentication}
+
+To bind using protected simple authentication, 
+the \verb+dsa_auth_type+ field should be set to to the value
+\verb+DBA_AUTH_PROTECTED+.
+The fields \verb+dba_version+, \verb+dba_dn+, \verb+dba_time1+, \verb+dba_r1+,
+\verb+dba_passwd+ and \verb+dba_passwd_len+ must be filled in. The fields
+\verb+dba_time2+ and \verb+dba_r2+ must be either filled in or set to 
+\verb+NULL+.
+
+\subsection{Strong Authentication}
+
+To bind using strong authentication, 
+the \verb+dsa_auth_type+ field should be set to the value
+\verb+DBA_AUTH_STRONG+.
+The fields \verb+dba_version+, \verb+dba_dn+, \verb+dba_time1+, \verb+dba_r1+,
+and \verb+dba_sig+ must be filled in. The field
+\verb+dba_cpath+ must be either filled in or set to \verb+NULL+.
+
+\section{Unbind}
+
+The unbind operation has no parameters.
+\begin{quote}\index{ds\_unbind}\small\begin{verbatim}
+ds_unbind ()
+\end{verbatim}\end{quote}
+and is used to disconnect from the directory.
+
+\section {Read}
+
+The read operation is used to access information from a particular
+entity in the DSA.
+
+\begin{quote}\index{ds\_read}\small\begin{verbatim}
+ds_read (arg, error, result)
+    struct ds_read_arg          * arg;    
+    struct ds_read_result       * result;
+    struct DSError              * error;
+\end{verbatim}\end{quote}
+
+You will need to include \file{quipu/read.h} to use this procedure.
+
+The argument \verb"ds_read_arg" is used to formulate the DAP request:
+
+\begin{quote}\small\begin{verbatim}
+struct ds_read_arg {
+    CommonArgs         rda_common;
+    DN                 rda_object;
+    EntryInfoSelection rda_eis;
+};
+\end{verbatim}\end{quote}
+
+The parameters are used as follows:
+\begin{describe}
+\item [\verb"rda\_common":] The common arguments as described in
+Section~\ref{common_args}.
+\item [\verb"rda\_object":] The DN of the object you want to read.
+\item [\verb"rda\_eis":] The ``Entry Information Selection'', which defines
+which attributes you want to be returned, this is defined in
+Section~\ref{eis}.
+\end{describe}
+
+The results returned on a \verb"DS_OK" return form the structure shown below:
+
+\begin{quote}\small\begin{verbatim}
+struct ds_read_result {
+    CommonResults rdr_common;
+    EntryInfo     rdr_entry;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"rdr\_common":] The common results as described in
+Section~\ref{common_results}.
+\item [\verb"rdr\_entry":] This is a pointer to the 
+``Entry Information'' which contains the
+attributes you requested. This structure is defined in Section~\ref{einfo}.
+\end{describe}
+
+\subsection {Entry Information Selection}
+\label{eis}
+
+Operations that return an Entry Information structure, will have an ``Entry
+Information Selection'' in their arguments to specify exactly what the DSA
+should return.   The structure is represented thus:
+
+\begin{quote}\index{EntryInfoSelection}\small\begin{verbatim}
+typedef struct {
+    char                eis_allattributes;
+    Attr_Sequence       eis_select;
+    char                eis_infotypes;
+#define EIS_ATTRIBUTETYPESONLY  0
+#define EIS_ATTRIBUTESANDVALUES 1
+} EntryInfoSelection;
+\end{verbatim}\end{quote}
+
+The parameters are used as follows:
+\begin{describe}
+\item [\verb"eis\_allattributes":] If \verb"TRUE" the all attributes are
+required.
+\item [\verb"eis\_select":] If \verb"eis_allattributes" is \verb"FALSE" then
+this field is used to specify the attributes you want.
+{\em Only} the attribute types of this structure need to be set; any attribute
+values will be ignored.
+\item [\verb"eis\_infotypes":] If \verb"EIS_ATTRIBUTETYPESONLY" is set, then
+only attribute types will be returned; otherwise the
+values will also be returned.
+\end{describe}
+
+\subsection {Entry Information}
+\label{einfo}
+
+The structure ``Entry Information'' is used by some of the operations to
+return data to the DUA.
+
+\begin{quote}\index{EntryInfo}\small\begin{verbatim}
+typedef struct entrystruct { 
+    DN                  ent_dn;
+    Attr_Sequence       ent_attr;
+    int                 ent_iscopy;
+#define INFO_MASTER 0x001
+#define INFO_COPY   0x002
+#define INFO_CACHE  0x003
+    char                ent_pepsycopy;
+    time_t              ent_age;
+    struct entrystruct  *ent_next;
+} entrystruct, EntryInfo;
+\end{verbatim}\end{quote}
+
+The parameters are used as follows:
+\begin{describe}
+\item [\verb"ent\_dn":] The DN of the entry.
+\item [\verb"ent\_attr":] The requested attributes of the requested entry.
+\item [\verb"ent\_iscopy":] This is either \verb"INFO_MASTER" or
+\verb"INFO_COPY" indicating\\ whether master data or
+copied data was used to generate the results.
+\verb"INFO_CACHE" is not applicable to a DUA.
+\item [\verb"ent\_pepsycopy":] Unused.
+\item [\verb"ent\_age":] This field is the age of the entry, used to expire 
+cached information.
+\item [\verb"ent\_next":] There may be many results, this is used to link them.
+\end{describe}
+
+
+\section {Compare}
+
+The compare operation is used to compare an asserted attribute with an
+attribute in the directory.
+
+\begin{quote}\index{ds\_compare}\small\begin{verbatim}
+ds_compare (arg, error, result)
+    struct ds_compare_arg       * arg;    
+    struct ds_compare_result    * result;
+    struct DSError              * error;
+\end{verbatim}\end{quote}
+
+You will need to include \file{quipu/compare.h} to use this procedure.
+
+The argument is as follows:
+\begin{quote}\small\begin{verbatim}
+struct ds_compare_arg {
+    CommonArgs cma_common;
+    DN         cma_object;
+    AVA        cma_purported;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"cma\_common":] The common arguments as described in
+Section~\ref{common_args}.
+\item [\verb"cma\_object":] The DN of the object you want to compare an 
+attribute against.
+\item [\verb"cma\_purported":] The attribute you want to compare.  This
+structure is defined in Section~\ref{ava}.
+\end{describe}
+
+If successful, the result structure is as follows:
+\begin{quote}\small\begin{verbatim}
+struct ds_compare_result {
+    CommonResults cmr_common;
+    DN            cmr_object;
+    char          cmr_matched; 
+    char          cmr_iscopy; 
+    char          cmr_pepsycopy;
+    time_t        cmr_age;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"cmr\_common":] The common results as described in
+Section~\ref{common_results}.
+\item [\verb"cmr\_object":] The DN of the entry the attribute was compared
+against.  This may not be the same as the DN supplied in the argument (e.g.,
+if an alias was dereferenced).
+\item [\verb"cmr\_matched":] If \verb"TRUE" then the attributes were the
+same, otherwise they were different.
+\item [\verb"cmr\_iscopy":] If \verb"TRUE" then the compare took place
+against a copy of the attribute.
+\item [\verb"cmr\_pepsycopy":] Unused.
+\item [\verb"cmr\_age":] Unused.
+\end{describe}
+
+
+\subsection {Attribute Value Assertion}
+\label{ava}
+
+An ``Attribute Value Assertion'' is used by some of the operations to
+specify an attribute type/value pair, the structure used in this case is
+shown below.
+
+\begin{quote}\index{AVA}\small\begin{verbatim}
+typedef struct {
+    AttributeType  ava_type;
+    AttributeValue ava_value;
+}AVA;
+\end{verbatim}\end{quote}
+
+\section {List}
+
+The list operation is shown below.
+This returns a list of subordinates of the specified entry.
+
+\begin{quote}\index{ds\_list}\small\begin{verbatim}
+ds_list (arg, error, result)
+    struct ds_list_arg          * arg;    
+    struct ds_list_result       * result;
+    struct DSError              * error;
+\end{verbatim}\end{quote}
+
+You will need to include \file{quipu/list.h} to use this procedure.
+
+\begin{quote}\small\begin{verbatim}
+struct ds_list_arg {
+    CommonArgs lsa_common;
+    DN         lsa_object;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"lsa\_common":] The common arguments as described in
+Section~\ref{common_args}.
+\item [\verb"lsa\_object":] The DN of the object you want to list the
+children of.
+\end{describe}
+
+The results of a successful list form the following structure:
+
+\begin{quote}\small\begin{verbatim}
+struct ds_list_result {
+    CommonResults        lsr_common;
+    DN                   lsr_object;
+    time_t               lsr_age;
+    struct subordinate * lsr_subordinates;
+    POQ                  lsr_poq;
+    struct ds_list_result * lsr_next;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"lsr\_common":] The common results as described in
+Section~\ref{common_results}.
+\item [\verb"lsr\_object":]The DN of the entry whose children were listed.
+This may not be the same as the DN supplied in the argument (e.g.,
+if an alias was dereferenced). 
+\item [\verb"lsr\_age":] Not currently used.
+\item [\verb"lsr\_subordinates":] This structure contains the RDNs
+that were found below the base object.  The structure is as follows:
+\begin{quote}\small\begin{verbatim}
+struct subordinate {
+    RDN                  sub_rdn;
+    char                 sub_aliasentry; 
+    char                 sub_copy;
+    struct subordinate * sub_next;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"sub\_rdn":] The RDN of this child.
+\item [\verb"sub\_aliasentry":] If \verb"TRUE" then it is an alias entry.
+\item [\verb"sub\_copy":] If \verb"TRUE" then the list took place
+against a copy of the object.
+\item [\verb"sub\_next":] A pointer to the next element in the list.
+\end{describe}
+
+\item [\verb"lsr\_poq":] A partial outcome qualifier. The structure is
+as follows:
+\begin{quote}\small\begin{verbatim}
+#define LSR_NOLIMITPROBLEM      -1
+#define LSR_TIMELIMITEXCEEDED   0
+#define LSR_SIZELIMITEXCEEDED   1
+#define LSR_ADMINSIZEEXCEEDED   2
+typedef struct {
+   int             poq_limitproblem;
+   ContinuationRef poq_cref;
+   char            poq_no_ext;
+} POQ;
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"poq\_limitproblem":] Used to indicates which type of limit has
+been reached.
+\item [\verb"poq\_cref":] A list of continuation references.
+Continuation References are described in 
+Section~\ref{cont_ref}.
+\item [\verb"poq\_no\_ext":] Used by {\em pepsy}.
+\end{describe}
+\item [\verb"lsr\_next":] A pointer to the next element if the list is
+uncorrelated.  QUIPU will always return correlated results..
+\end{describe}
+
+\section {Search}
+\label{proc_search}
+The search operation performs a key directory functionality.  This is done on
+the basis of 
+filters as described in Section~\ref{filters} below.
+The operation is defined as:
+\begin{quote}\index{ds\_search}\small\begin{verbatim}
+ds_search (arg, error, result)
+    struct ds_search_arg        * arg;    
+    struct ds_search_result     * result;
+    struct DSError              * error;
+\end{verbatim}\end{quote}
+
+You will need to include \file{quipu/ds\_search.h} to use this procedure.
+
+\begin{quote}\small\begin{verbatim}
+struct ds_search_arg {
+    CommonArgs         sra_common;
+    DN                 sra_baseobject;
+    int                sra_subset;
+#define SRA_BASEOBJECT          0
+#define SRA_ONELEVEL            1
+#define SRA_WHOLESUBTREE        2
+    Filter             sra_filter;
+    char               sra_searchaliases;
+    EntryInfoSelection sra_eis;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"sra\_common":] The common arguments as described in
+Section~\ref{common_args}.
+\item [\verb"sra\_baseobject":] The DN of the object you want to start the
+search from.
+\item [\verb"sra\_subset":] This specifies which part of the DIT to search.
+\item [\verb"sra\_filter":] The filter to apply to the searched entries to
+see if the entry is required.  Filters are discussed in Section~\ref{filters}
+\item [\verb"sra\_searchaliases":] If \verb+TRUE+, aliases encountered below
+the search base object are dereferenced, and the dereferenced object searched. 
+Note: this is different from the service control
+\verb+dontderferencealiases+ which is used to control dereferencing of
+entities above the base object.
+\item [\verb"sra\_eis":] The ``Entry Information Selection'', which defines
+which attributes you want to be returned (if the filter is matched), 
+this is defined in Section~\ref{eis}.
+\end{describe}
+
+The results form the following structure:
+
+\begin{quote}\small\begin{verbatim}
+struct ds_search_result {
+    char  srr_correlated;
+    union {
+        struct ds_search_unit   * srr_unit;
+        struct ds_search_result * srr_parts;
+    }     srr_un;
+    struct ds_search_result * srr_next;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"srr\_correlated":] If \verb"TRUE" the the results are 
+said to be correlated; that is, there will only be one element
+in the list of search results.
+A DSA may return uncorrelated result, in which case the routine
+\begin{quote}\index{correlate\_search\_results}\small\begin{verbatim}
+correlate_search_results(sr_res)
+struct ds_search_result * sr_res;
+\end{verbatim}\end{quote}
+can be called, which will correlate the results.
+
+{\em Note}: QUIPU DSAs will always return correlated results.
+
+\item [\verb"srr\_un":] If the results are uncorrelated then the 
+union will contain a nested 
+\verb"ds_search_result" structure, which 
+contains a list of the uncorrelated results.
+
+If the results are correlated, then this union will
+contain a pointer to the correlated results.  These form the structure
+\begin{quote}\small\begin{verbatim}
+struct ds_search_unit {
+    CommonResults   srr_common;
+    DN              srr_object;
+    EntryInfo     * srr_entries;
+    POQ             srr_poq;    
+};
+#define CSR_common       srr_un.srr_unit->srr_common
+#define CSR_object       srr_un.srr_unit->srr_object
+#define CSR_entries      srr_un.srr_unit->srr_entries
+#define CSR_limitproblem srr_un.srr_unit->\
+                             srr_poq.poq_limitproblem
+#define CSR_cr           srr_un.srr_unit->\
+                             srr_poq.poq_cref
+\end{verbatim}\end{quote}
+{\em Note}: the \verb"#define"s to access the elements of this structure.
+The fields are used as follows:
+\begin{describe}
+\item [\verb"srr\_common":] The common results as described in Section
+\ref{common_results}.
+\item [\verb"srr\_object":] The DN of the entry used as the base object of
+the search.  This may not be the same as the DN supplied in the argument (e.g.,
+if an alias was dereferenced).
+\item [\verb"srr\_entries":] A pointer to the ``Entry Information'',
+which will contain the
+attributes you requested (if present in the entry). 
+The \verb+EntryInfo+ structure is defined in Section~\ref{einfo}.
+\item [\verb"srr\_poq":] A partial outcome qualifier.  This is the
+same as for the list operation described in the previous section.
+\end{describe}
+
+\item [\verb"srr\_next":] This is a pointer to the next 
+result in a list of uncorrelated results.
+\end{describe}
+
+\subsection {Filters}
+\label{filters}
+
+A filter in its simplest sense is a single \verb"filter_item".  This is
+used to perform one of six basic tests on one attribute of an entry.
+If the ``match'' is good, then the entry is returned as part of
+the search result structure.
+The six basic types of \verb"filter_item"
+are represented by the structure below:
+
+\begin{quote}\index{filter\_item}\small\begin{verbatim}
+struct filter_item {
+    int         fi_type;
+#define FILTERITEM_EQUALITY       1
+#define FILTERITEM_SUBSTRINGS     2
+#define FILTERITEM_GREATEROREQUAL 3
+#define FILTERITEM_LESSOREQUAL    4
+#define FILTERITEM_PRESENT        5
+#define FILTERITEM_APPROX         6
+    union {
+        AttributeType     fi_un_type;
+        AVA               fi_un_ava;
+        Filter_Substrings fi_un_substrings;
+    }           fi_un;
+    IFP         fi_ifp;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"fi\_type":] Defines the type of \verb"filter_item" being represented.
+\item [\verb"fi\_un.fi\_un\_type":] \verb"FILTERITEM_PRESENT"
+matches. Just supply an AttributeType, an entry matches if this attribute
+exists within the entry.
+
+\item [\verb"fi\_un.fi\_un\_ava":] \verb"FILTERITEM_EQUALITY",\\
+\verb"FILTERITEM_GREATEROREQUAL",\\
+ \verb"FILTERITEM_LESSOREQUAL",\\ and
+\verb"FILTERITEM_APPROX" searches all
+take an Attribute Value Assertion (AVA) structure, and return the entries
+for which the attribute in the entry matches the asserted value.
+The AVA structure is defined in Section~\ref{ava}.
+
+\item [\verb"fi\_un.un\_substrings":] 
+\verb"FILTERITEM_SUBSTRING" matches. Use the substring structure defined below, to specify
+which substrings to look for in the appropriate attribute.
+
+\begin{quote}\small\begin{verbatim}
+typedef struct {
+            AttributeType fi_sub_type;
+            AV_Sequence   fi_sub_initial;
+            AV_Sequence   fi_sub_any;
+            AV_Sequence   fi_sub_final;
+            char         *fi_sub_match; 
+        } Filter_Substrings;
+\end{verbatim}\end{quote}
+\end{describe}
+
+The \verb"AV_Sequence" structure is used to represent a string, and should be
+treated as essentially a linked list of \verb"char *" parameters.
+\begin{describe}
+\begin{describe}
+\item [\verb"fi\_sub\_type":] The attribute that you want to perform a
+substring search on.
+\item [\verb"fi\_sub\_initial":] This contains a single attribute value,
+that must appear at the start of the string.
+\item [\verb"fi\_sub\_any":] A set of values, which must appear in order in
+the middle of the string.
+\item [\verb"fi\_sun\_final":] This contains a single attribute value,
+that must appear at the end of the string.
+\item [\verb"fi\_sub\_match":] For DSA use only.
+\end{describe}
+\item [\verb"fi\_ifp":] For DSA use only.
+\end{describe}
+
+The single filter items can now be linked into a \verb"filter" structure
+to build more complex search definitions:
+\begin{quote}\index{filter}\index{s\_filter}\small\begin{verbatim}
+typedef struct s_filter {
+    char          flt_type;
+#define FILTER_ITEM 1
+#define FILTER_AND  2
+#define FILTER_OR   3
+#define FILTER_NOT  4
+   struct filter * flt_next;
+   union {
+        struct filter_item   flt_un_item;
+        struct filter      * flt_un_filter;
+   }               flt_un;
+}s_filter, *Filter;
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"flt\_type":] This defines whether the filter is a single item,
+or a more complex filter made up of one or more components.
+\item [\verb"flt\_un.flt\_un\_item":] If the filter represents a
+\verb"filter_item", then the item is placed here.
+\item [\verb"flt\_un.flt\_un\_filter":] \verb"AND", \verb"OR" and \verb"NOT"
+filters apply to a linked list of ``children'' filters.  This element is a
+pointer to the head of that list.
+\item [\verb"flt\_next":] If the parent filter is an \verb"AND", \verb"OR".
+or \verb"NOT"
+filter, then the component filters are linked using this field. 
+{\em Note}: that \verb"NOT" filters should contain a list of one child only.
+\end{describe}
+
+As an example, lets us consider a filter to represent a person whose name
+is either ``Robbins'' {\em or} ( ``Steve'' {\em and} ``Kille'' ).  The
+structure would look something like:
+\begin{small}
+\begin{quote}\begin{verbatim}
+flt_type = FILTER_OR
+        - The filter is an OR filter
+flt_un_filter.flt_type = FILTER_ITEM
+        - First component or the OR is an item
+flt_un_filter.flt_un_item = filter_item (Robbins)
+        - The item should match "robbins"
+flt_un_filter.flt_next->flt_type = FILTER_AND
+        - Second component or the OR is an AND filter
+flt_un_filter.flt_next->flt_un_filter.flt_type = FILTER_ITEM
+        - First component or the AND is an item
+flt_un_filter.flt_next->flt_un_filter.flt_un_item = 
+                                        filter_item (Steve)
+        - The item should match "Steve"
+flt_un_filter.flt_next->flt_un_filter.flt_next->flt_type = 
+                                        FILTER_ITEM
+        - Second component or the AND is an item
+flt_un_filter.flt_next->flt_un_filter.flt_next->flt_un_item = 
+                                        filter_item (Kille)
+        - The item should match "Kille"
+\end{verbatim}\end{quote}
+\end{small}
+\section {Modification Operations}\label{mod-op}
+
+There are four operations available to modify the directory.
+
+{\em Note}: with this version of QUIPU, modify operations are only
+allowed over DAP,
+attempts to modify over DSP will return referral errors.
+
+\subsection {Add}
+
+To add an entry to the DIT use
+\begin{quote}\index{ds\_addentry}\small\begin{verbatim}
+ds_addentry (arg, error)
+    struct ds_addentry_arg      * arg;    
+    struct DSError              * error;
+\end{verbatim}\end{quote}
+
+You will need to include \file{quipu/add.h} to use this procedure.
+The argument you must supply is made up as follows:
+
+\begin{quote}\small\begin{verbatim}
+struct ds_addentry_arg {
+    CommonArgs    ada_common;
+    DN            ada_object;
+    Attr_Sequence ada_entry;
+};
+\end{verbatim}\end{quote}
+
+
+\begin{describe}
+\item [\verb"ada\_common":] The common arguments as described in Section
+\ref{common_args}.
+\item [\verb"ada\_object":] The DN of the object you want to add.
+\item [\verb"ada\_entry":] The attributes you want to add for this entry.
+This must contain the RDN of the entry, and an ``objectclass'' attribute.
+Then, the other attribute {\em must} conform to the set of ``optional'' and
+``mandatory'' attribute for that object class.
+\end{describe}
+
+
+\subsection {Remove}
+
+This is used to remove an entry from the DIT.
+Only leaf entries can be removed.
+
+\begin{quote}\index{ds\_removeentry}\small\begin{verbatim}
+ds_removeentry (arg, error)
+    struct ds_removeentry_arg   * arg;    
+    struct DSError              * error;
+\end{verbatim}\end{quote}
+
+You will need to include \file{quipu/remove.h} to use this procedure.
+The argument you must supply is made up as follows:
+
+\begin{quote}\small\begin{verbatim}
+struct ds_removeentry_arg {
+    CommonArgs rma_common;
+    DN         rma_object;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"rma\_common":] The common arguments as described in
+\ref{common_args}.
+\item [\verb"rma\_object":] The DN of the object you want to remove.
+\end{describe}
+
+
+\subsection {Modify}
+
+\verb"ModifyEntry" is used to modify the attributes of the specified entry.
+There are strong restrictions on this operation as required by X.500.
+Invalid operations result in errors, and as such none of the requested
+modifications are made.
+To modify an attribute you must first \verb"remove" it then \verb"add" a new
+attribute.
+You cannot modify the RDN; you must use the \verb"ModifyRDN" operation
+described in Section~\ref{modifyrdn} to do this.
+
+\begin{quote}\index{ds\_modifyentry}\small\begin{verbatim}
+ds_modifyentry (arg, error)
+    struct ds_modifyentry_arg   * arg;    
+    struct DSError              * error;
+\end{verbatim}\end{quote}
+
+You will need to include \file{quipu/modify.h} to use this procedure.
+The argument you must supply is made up as follows:
+
+\begin{quote}\small\begin{verbatim}
+struct ds_modifyentry_arg {
+    CommonArgs        mea_common;
+    DN                mea_object;
+    struct entrymod * mea_changes;
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"mea\_common":] The common arguments as described in
+Section~\ref{common_args}.
+\item [\verb"mea\_object":] The DN of the object you want to modify.
+\item [\verb"mea\_changes":] A tree structure defining the changes you want to
+make to the entry.
+\begin{quote}\index{entrymod}\small\begin{verbatim}
+struct entrymod {
+    int               em_type;
+#define EM_ADDATTRIBUTE         1
+#define EM_REMOVEATTRIBUTE      2
+#define EM_ADDVALUES            3
+#define EM_REMOVEVALUES         4
+    Attr_Sequence     em_what;
+    struct entrymod * em_next;
+};
+\end{verbatim}\end{quote}
+\begin{describe}
+\item [\verb"em\_type":] The type of modification this is.
+\item [\verb"em\_what":] The attribute you want to add or remove.  If the
+operation type is remove, then this structure should only contain an
+attribute type, and not a value.
+\item [\verb"em\_next":] A modify operation is built up with a series of
+small modifications.  Hence this structure is a linked list.
+The operation is seen as one atomic operation.
+\end{describe}
+\end{describe}
+
+
+\subsection {ModifyRDN}
+\label{modifyrdn}
+
+To modify the distinguished attribute values of an entry, you must use
+this operation; \verb"modifyEntry" cannot be used.
+
+\begin{quote}\index{ds\_modifyrdn}\small\begin{verbatim}
+ds_modifyrdn (arg, error)
+    struct ds_modifyrdn_arg     * arg;    
+    struct DSError              * error;
+\end{verbatim}\end{quote}
+
+You will need to include \file{quipu/modifyrdn.h} to use this procedure.
+
+The arguments are:
+
+\begin{quote}\small\begin{verbatim}
+struct ds_modifyrdn_arg {
+    CommonArgs mra_common;
+    DN         mra_object;
+    RDN        mra_newrdn;
+    char       deleterdn; 
+};
+\end{verbatim}\end{quote}
+
+\begin{describe}
+\item [\verb"mra\_common":] The common arguments as described in Section
+\ref{common_args}.
+\item [\verb"mra\_object":] The DN of the object you want to modify the name
+of.
+\item [\verb"mra\_newrdn":] The new RDN.
+\item [\verb"deleterdn":] if \verb"TRUE" then the old RDN will be
+deleted as an attribute; otherwise it will remain as a nondistinguished
+attribute.
+\end{describe}
+
+\section {Abandon}
+\index{abandon}
+The abandon operation shown below is slightly
+different from the other DUA operations.
+It does not make much sense for a synchronous interface to
+handle abandon directly.
+In the next release, transparent use of abandon will be provided.
+
+\begin{quote}\index{ds\_abandon}\small\begin{verbatim}
+ds_abandon (arg, error)
+    struct ds_abandon_arg       * arg;    
+    struct DSError              * error;
+\end{verbatim}\end{quote}
+
+The argument structure contains a single parameter 
+supplies the operation invocation id.
+
+\begin{quote}\small\begin{verbatim}
+struct ds_abandon_arg {
+    int aba_invokeid;
+};
+\end{verbatim}\end{quote}
+
+
+In the synchronous interface, an operation may be abandoned by the
+user entering a ``control--c'' (unless trapped by user code).
+In this case, the abandon will be handled by the lower layers of
+QUIPU, and the outstanding operation will return.  It may have results
+if the abandon operation failed, or may indicate 
+``abandon successful'' via the DAP error structure!
+
+\section {Multiple Associations}
+
+The procedural interface described so far has been based on the assumption 
+of a connection to a single DSA.
+However, it is possible to make connection to multiple DSAs.
+
+
+\subsection {Multiple Binds}
+
+The bind and unbind routines needed to make 
+multiple association are as follows:
+\begin{quote}\index{dap\_bind}\small\begin{verbatim}
+dap_bind (ad, arg, error, result, addr)
+    int                         * ad;
+    struct ds_bind_arg          *arg;
+    struct ds_bind_arg          *result;
+    struct ds_bind_error        *error;
+    struct PSAPaddr             *addr;
+
+dap_unbind (ad)
+    int                         ad;
+\end{verbatim}\end{quote}
+
+The \verb"arg", \verb"error" and \verb"result" arguments are as defined 
+in Section~\ref{dap:bind} for the routine \verb"secure_ds_bind".
+
+The argument \verb"ad" is the association descriptor of the association.
+It will be different for each association.
+
+The \verb"addr" argument is the address of the DSA you wish to contact.
+
+\subsection {Other DAP Operations}
+
+The other DAP operations (read, list, modify\ldots), use the same format
+as already described, but with two extra integer parameters; thus
+\begin{quote}\index{ds\_read}\small\begin{verbatim}
+ds_read (arg, error, result)
+\end{verbatim}\end{quote}
+becomes
+\begin{quote}\index{ds\_read}\small\begin{verbatim}
+dap_read (ad, id, arg, error, result)
+\end{verbatim}\end{quote}
+where \verb"ad" is the association descriptor returned by the bind, and 
+\verb"id" uniquely identifies the operation with respect to other
+operation on the same association.
+
+

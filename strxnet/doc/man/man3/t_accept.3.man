@@ -291,7 +291,8 @@ can address multiple option levels.  A legal option is ignored by
 .BR t_accept ()
 if it is for an option level unknown to the transport provider.  A legal
 option is ignored by
-.BR t_accept() if it is for an option name unsupported by (unknown to) the
+.BR t_accept()
+if it is for an option name unsupported by (unknown to) the
 transport provider.
 .PP
 If a proposed value is an absolute requirement and the negotiated value is

@@ -1,0 +1,29 @@
+.PS 7.0i
+.ps 20
+## figure T-17
+B1:	box "TCP" "" "only"
+	line up from B1.n
+	box invis "$\cdots$" with .w at B1.e
+B2:	box with .w at (B1.e.x+boxwid, B1.e.y) "OSI" "" "only"
+	line up from B2.n
+	box invis "$\cdots$" with .w at B2.e
+B3:	box with .w at (B2.e.x+boxwid, B2.e.y) "OSI-UL" "" "TCP"
+	line up from B3.n
+B4:	box with .sw at (B1.ne.x, B1.ne.y+lineht*2) "TSB" "" "A-GWYs"
+	line down from B4.s
+	box invis "LOCAL USE" with .s at B4.n
+B5:	box with .w at (B4.e.x+boxwid, B4.e.y) "TSB" "" "A-GWYs"
+	line down from B5.s
+	line up dashed from B5.n
+	box invis with .s at (B5.n.x, B5.n.y+lineht) "X.25" "" "WAN"
+B6:	box with .w at (B5.e.x+boxwid, B5.e.y) "TSB" "" "A-GWYs"
+	line down from B6.s
+	line up dashed from B6.n
+	box invis with .s at (B6.n.x, B6.n.y+lineht) "IP" "" "WAN"
+##
+	line from (B1.w.x-linewid/2, B1.n.y+lineht) \
+	     to   (B6.e.x+linewid/2, B6.s.y-lineht)
+	move to (B6.e.x+linewid/2, B6.s.y-lineht); "\ LAN" ljust
+##
+##
+.PE

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.57 2007/08/19 11:11:08 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.61 2007/10/18 17:08:10 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/08/19 11:11:08 $ by $Author: brian $
+@c Last Modified $Date: 2007/10/18 17:08:10 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -662,11 +662,16 @@ The build host requires the following GNU tools:
 @item @command{libtool 1.5.22}
 @item @command{gettext 0.16.1}
 @item @command{bison 2.3}
-@item @command{flex 2.5.4a}
+@item @command{flex 2.5.33}
 @end itemize
 
-These tools can be acquired from the @url{http://www.fsf.org/,FSF website} in
-the free software directory, and also at the following locations:
+Most desktop development GNU/Linux distributions wil have these tools; however, some non-development
+or server-style installations might not and they must be installed separately.@footnote{Older
+version of bison (2.0) and the older version of flex (2.5.4a) are also suitable.  Where possible,
+use the more recent bison 2.3 and flex 2.5.33.}
+
+Also, these tools can be acquired from the @url{http://www.fsf.org/,FSF website} in the free
+software directory, and also at the following locations:
 
 @itemize
 @item @url{http://www.openss7.org/tarballs/autoconf-2.61.tar.bz2,autoconf-2.61}
@@ -674,7 +679,7 @@ the free software directory, and also at the following locations:
 @item @url{http://www.openss7.org/tarballs/libtool-1.5.22.tar.gz,libtool-1.5.22}
 @item @url{http://www.openss7.org/tarballs/gettext-0.16.1.tar.gz,gettext-0.16.1}
 @item @url{http://www.openss7.org/tarballs/bison-2.3.tar.bz2,bison-2.3}
-@item @url{http://www.openss7.org/tarballs/flex-2.5.4a.tar.gz,flex-2.5.4a}
+@item @url{http://www.openss7.org/tarballs/flex-2.5.33.tar.bz2,flex-2.5.33}
 @end itemize
 
 It should be stressed that, in particular, the @manpage{autoconf(1)}, and @manpage{automake(1)},
@@ -695,12 +700,15 @@ For building documentation, the build host also requires the following documenta
 @item @command{imagemagick 6.2.4}
 @item @command{groff 1.17.2}
 @item @command{gnuplot 3.7}
+@item @command{latex2html 1.71}
 @end itemize
 
 Most desktop GNU/Linux distributions will have these tools; however, some server-style installations
 (e.g. @cite{Ubuntu}-server, @cite{SLES 9} or @cite{Fedora 6 or 7}) will not and they must be
 installed separately.@footnote{In particular, for @cite{CentOS}, @cite{Fedora
-6 or 7}, the @command{tetex-latex} and @command{gnuplot} packages must be loaded as well.}
+6 or 7}, the @command{tetex-latex} and @command{gnuplot} packages must be loaded as well.  Note also
+that the @command{latex2html} used to be part of the textex package (or subpackages) but is now
+often packaged on its own.}
 
 For uncooked manual pages, the entire @manpage{groff(1)} package is required on @cite{Debian} and
 @cite{Ubuntu} systems (the base package does not include @manpage{grefer(1)} which is used extensively by
@@ -760,8 +768,8 @@ from the Tar Ball}.
 
 Do note, however, that @manpage{make(1)} will rebuild the documentation that is normally released
 with the package.  Additional tools may be necessary for building the documentation.  To avoid
-building and installing the documentation, use the @option{--disable-devel} option to configure
-described in @refman{Configuring the Tar Ball}.
+building and installing the documentation, use the @option{--disable-devel} or
+@option{--disable-docs} option to configure described in @refman{Configuring the Tar Ball}.
 
 When configuring the package in a working directory and while working a change-compile-test cycle
 that involves configuration macros or documentation, I find it of great advantage to invoke the GNU
@@ -1094,6 +1102,15 @@ static libraries, manual pages and @manpage{texinfo(1)} documentation.  The defa
 environment packages.  This option can be useful when building for an embedded target where only the
 runtime components are desired.
 
+@item --with docs
+@itemx --without docs
+@opindex docs
+Specifies whether to build and install major documentation such manual pages and
+@manpage{texinfo(1)} documentation.  The default is to build and install documentation.  This option
+can be useful when building for an embedded target where only the runtime and static compile
+components are desired, but not major documentation.  This option does not override the setting of
+@code{--without devel}.
+
 @item --with tools
 @itemx --without tools
 @opindex tools
@@ -1242,6 +1259,14 @@ Disables the installation of development environment components such as header f
 libraries, manual pages and @manpage{texinfo(1)} documentation.  The default is to install development
 environment components.  This option can be useful when configuring for an embedded target where
 only the runtime components are desired, or when performing a edit-compile-test cycle.
+
+@item --disable-docs
+@opindex docs
+Disables the build and installation of major documentation such manual pages and
+@manpage{texinfo(1)} documentation.  The default is to build and install documentation.  This option
+can be useful when building for an embedded target where only the runtime and static compile
+components are desired, but not major documentation.  This option does not override the setting of
+@option{--disable-devel}.
 
 @item --enable-tools
 @opindex tools
@@ -1962,7 +1987,8 @@ for the Linux @cite{Nex@-us@-Ware} cross-building environment.}
 
 Any of the normal @file{configure} script options (@pxrefman{Configuring the Tar Ball}) can be used
 on the same line as @samp{./configure.nexusware}.  One of particular interest to embedded targets is
-@option{--with-k-optimize=size} to attempt to reduce the size of the kernel modules.
+@option{--with-k-optimize=size} to attempt to reduce the size of the kernel modules.  Another is
+@option{--disable-docs} which can suppress the build and installation of major documentation.
 
 You must specify the kernel version of the kernel for which you are configuring.  Add the
 @option{--with-k-release=2.4.18} option for older @cite{Nex@-us@-Ware} releases,
@@ -2392,12 +2418,14 @@ can be invoked, what they do, and what they hope to achieve.  The available targ
 * User Targets::
 * Maintainer Targets::
 * Clean Targets::
+* Manual Page Targets::
 * Release Targets::
 * Logging Targets::
 * Problem Report Targets::
 * Release Archive Targets::
 * RPM Build Targets::
 * Debian Build Targets::
+* Documentation Targets::
 @end menu
 
 @node User Targets
@@ -2598,6 +2626,33 @@ log files before the next run.
 
 This is an @cite{OpenSS7 Project} specific makefile target.
 This target does not require root privilege.
+@end table
+
+@node Manual Page Targets
+@subsubsection Manual Page Targets
+
+The following targets are used to build, install and uninstall just the manual pages from the
+distribution.  These targets are good for creating a distribution of just the manual pages.  When
+building atop multiple packages, these targets recurse down through each package.
+
+@table @samp
+@item mans
+@mkindex mans
+Build all of the manual pages.  This involves performing parameter substitution on manual pages and
+optionally cooking the manual pages if @option{--with-cooked-manpages} was requested during
+configuration.
+
+@item install-mans
+@mkindex install-mans
+Installs the manual pages under @var{DESTDIR}.  Specify @var{DESTDIR} to place the manual pages
+wherever you see fit.  If @var{DESTDIR} is not specified on the command line, the manual pages will
+be installed in the normal installation directory.
+
+@item uninstall-mans
+@mkindex uninstall-mans
+Uninstalls the manual pages from @var{DESTDIR}.  Specify @var{DESTDIR} to indicate where to remove
+the manual pages from.  If @var{DESTDIR} is not specified on the command line, the manual pages will
+be removed from the normal installation directory.
 @end table
 
 @node Release Targets
@@ -2971,4 +3026,19 @@ to make with the @var{GNUPGPASS} variable.
 
 This is an @cite{OpenSS7 Project} specific makefile target.
 This target does not require root privilege.
+@end table
+
+@node Documentation Targets
+@subsubsection Documentation Targets
+
+On systems that have @manref{doxygen(1)} documentation tool, the following targets are used to
+generate doxygen html documentation:
+
+@table @samp
+@item doxy
+@mkindex doxy
+This target generates @manref{doxygen(1)} documetnation from suitably marked sources.  File
+containing the necessary documentation marks are discovered automatically by @command{configure}.
+Doxygen documentation can be generated bus is not distributed.  Documentation is cerated in the
+subdirectory @file{doc/html}.
 @end table

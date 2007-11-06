@@ -1,0 +1,19 @@
+\contentsline {section}{\numberline {1}Why a notation is needed}{3}
+\contentsline {section}{\numberline {2}A notation for Distinguished Name}{3}
+\contentsline {subsection}{\numberline {2.1}Goals}{3}
+\contentsline {subsection}{\numberline {2.2}Informal definition}{3}
+\contentsline {subsection}{\numberline {2.3}Formal definition}{4}
+\contentsline {section}{\numberline {3}Purported names}{6}
+\contentsline {section}{\numberline {4}Matching a purported name}{8}
+\contentsline {subsection}{\numberline {4.1}Environment}{8}
+\contentsline {subsection}{\numberline {4.2}Matching}{10}
+\contentsline {subsection}{\numberline {4.3}Top Level}{11}
+\contentsline {subsection}{\numberline {4.4}Intermediate Level}{12}
+\contentsline {subsection}{\numberline {4.5}Bottom level}{13}
+\contentsline {section}{\numberline {5}Examples}{13}
+\contentsline {section}{\numberline {6}Support required from the standard}{14}
+\contentsline {section}{\numberline {7}Support of OSI Services}{15}
+\contentsline {section}{\numberline {8}Experience}{15}
+\contentsline {section}{\numberline {9}Relationship to other work}{17}
+\contentsline {section}{\numberline {10}Proposal}{17}
+\contentsline {section}{\numberline {A}Pseudo-code for the matching algorithm}{19}

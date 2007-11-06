@@ -1,0 +1,570 @@
+% run this through SLiTeX with the appropriate wrapper
+
+\begin{bwslide}
+\part	{ISSUES IN IMPLEMENTING A CLIENT OF THE VIRTUAL FILESTORE}
+
+\begin{nrtc}\bf
+\item	AN INTERACTIVE FTAM INITIATOR FOR UNIX
+
+\item	DIRECTORY HANDLING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INITIATORS FOR FTAM}
+
+\begin{nrtc}
+\item	IN GENERAL, THREE APPROACHES
+
+\item	THE INTERACTIVE APPROACH: USER (OR PROGRAM) EXPLICITLY INVOKES
+	A PROGRAM TO REQUEST FILE SERVICES
+
+\item	THE APPLICATIONS APPROACH: PROGRAM INVOKES OTHER SERVICES
+	(e.g., DATABASE ACCESS) WHICH INVOKES FTAM
+
+\item	THE EMBEDDED APPROACH: THE HOST KERNEL USES FTAM AS A PART OF ITS
+	FILESYSTEM REPETOIRE
+    \begin{nrtc}
+    \item	THE USE OF FTAM IS TRANSPARENT TO USERS AND PROGRAMS
+    \end{nrtc}
+
+\item	THE EMBEDED APPROACH IS THE MOSE USEFUL, BUT ALSO THE MOST COMPLICATED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{AN INTERACTIVE FTAM INITIATOR FOR UNIX}%%%\bf
+
+\begin{nrtc}\small
+\item	IMPORTANT TO DISTINGUISH BETWEEN
+    \begin{nrtc}
+    \item	THE USER INTERFACE: HOW THE PROGRAM INTERACTS WITH THE USER
+
+    \item	THE FTAM INTERFACE: HOW THE PROGRAM ACCESS THE FILE SERVICE
+    \end{nrtc}
+
+\item	A ``FRIENDLY'' APPROACH WAS TAKEN FOR THE USER INTERFACE
+    \begin{nrtc}
+    \item	USER COMMANDS TO THE INITIATOR APPEAR TO BE UNIX COMMANDS
+    \end{nrtc}
+
+\item	SUPPORTS FTAM-3, NBS-2, NBS-9
+    \begin{nrtc}
+    \item	THE SAME DOCUMENT TYPES SUPPORTED BY THE RESPONDER
+    \end{nrtc}
+
+\item	ABOUT 6000 LINES OF C CODE AND 150 LINES OF PEPY CODE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+the initiator, per se, currently runs on berkeley or at\&t unix
+(although only the berkeley version has been extensively tested)
+
+the user interface was heavily inspired by the berkeley unix ftp client
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{COMMAND LOOP}
+
+\begin{nrtc}
+\item	ONCE INVOKED, PROGRAM PROMPTS AND ACCEPTS COMMANDS
+
+\item	SOME COMMANDS RESULT IN FILE SERVICE ACTIONS
+    \begin{nrtc}
+    \item	e.g., ASSOCIATE WITH FILESTORE
+
+    \item	UNEXPECTED DIAGNOSTICS ARE REPORTED TO THE USER
+    \end{nrtc}
+
+\item	OTHER COMMANDS SET OPTIONS CONTROLLING USE OF FILE SERVICE
+
+\item	OTHER COMMANDS SET OPTIONS CONTROLLING LOCAL SYSTEM
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FILESTORE ASSOCIATION COMMANDS}
+
+\begin{nrtc}
+\item	OPEN host user [account]
+    \begin{nrtc}
+    \item	PROMPTS FOR A PASSWORD
+
+    \item	ISSUES AN F-INITIALIZE.REQUEST AND AWAITS THE RESPONSE
+    \end{nrtc}
+
+\item	CLOSE
+    \begin{nrtc}
+    \item	TERMINATES THE ASSOCIATION WITH THE FILESTORE USING
+		F-TERMINATE.REQUEST
+    \end{nrtc}
+
+\item	ABORT
+    \begin{nrtc}
+    \item	UPON ENCOUNTERING A FATAL ERROR, F-U-ABORT.REQUEST IS USED
+    \end{nrtc}
+
+\item	STATUS
+    \begin{nrtc}
+    \item	REPORTS SUMMARY OF SERVICE PARAMETERS IN EFFECT OVER FTAM
+		REGIME
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: FILESTORE ASSOCIATION COMMANDS}\small
+
+\begin{verbatim}
+kr:22-- ftam
+ftam> open gr
+user (gr:mrose): mrose
+password (gr:mrose): 
+
+gr... connected
+gr> status
+associated with virtual filestore on "gr" as user "mrose"
+service level: reliable, service class: transfer-and-management
+functional units: 0x3b<READ,WRITE,LIMITED,ENHANCED,GROUPING>
+attribute groups: 0x3<STORAGE,SECURITY>
+document types:
+  1.0.8571.6.3  unstructured binary file
+  1.17.3.6.1    unstructured text file
+  1.17.3.6.8    file directory file
+estimated integral FADU size: 65502
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FILE TRANSFER COMMANDS}
+
+\begin{nrtc}
+\item	GET source destination
+    \begin{nrtc}
+    \item	RETREIVES A FILE FROM THE FILESTORE
+
+    \item	FILE SERVICES
+	\begin{nrtc}
+	\item	F-BEGIN-GROUP F-SELECT F-OPEN(READ) F-END-GROUP
+
+	\item	BULK DATA TRANSFER FOR READ
+
+	\item	F-BEGIN-GROUP F-CLOSE F-DESELECT F-END-GROUP
+	\end{nrtc}
+    \end{nrtc}
+
+\item	PUT source destination
+    \begin{nrtc}
+    \item	STORES A FILE ON THE FILESTORE
+
+    \item	FILE SERVICES
+	\begin{nrtc}
+	\item	F-BEGIN-GROUP F-CREATE(OVERWRITE) F-OPEN(WRITE) F-END-GROUP
+
+	\item	BULK DATA TRANSFER FOR WRITE
+
+	\item	F-BEGIN-GROUP F-CLOSE F-DESELECT F-END-GROUP
+	\end{nrtc}
+
+    \item	OPTION SETTING DETERMINES OVERWRITE MODE
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+need to exercise a fair bit of caution in ordering of local file access for
+the get command: 
+
+\begin{quote}
+ideally don't want to open file for write until remote open
+has succeeded; but if local open fails, still have to do a little bit of bulk
+data-transfer before backing out.
+\end{quote}
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{FILE TRANSFER COMMANDS (cont.)}
+
+\begin{nrtc}
+\item	APPEND source destination
+    \begin{nrtc}
+    \item	APPENDS TO A FILE IN THE FILESTORE
+
+    \item	FILE SERVICES: AS ABOVE, BUT F-CREATE(EXISTING)
+    \end{nrtc}
+
+\item	OPTION SETTING DETERMINES EITHER TEXT OR BINARY
+	(BUT RESPONSE FROM SERVER OVERRIDES THIS)
+
+\item	INTERRUPT FROM USER DURING TRANFSER INVOKES F-CANCEL SERVICE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: FILE TRANSFER COMMANDS}\small
+
+\begin{verbatim}
+gr> set type text
+type       = text       - file transfer mode
+gr> get manual.dvi manual.dvi
+ftam: unstructured binary file transfer
+ftam: 613628 bytes received in 10.33 seconds (58.00 Kbytes/s)
+gr> get calendar calendar
+ftam: 2051 bytes received in 0.13 seconds (15.06 Kbytes/s)
+gr> ls
+file: .
+.               ..              .Xdefaults      .mh_profile     bin        
+calendar        lib             manual.dvi      libisode.a      mhbox
+gr> get libisode.a libisode.a
+ftam: unstructured binary file transfer
+^C
+ftam: cancelling transfer
+ftam: 196506 bytes received in 5.48 seconds (35.00 Kbytes/s)
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{note}\em
+this is a good example of document type simplification:
+
+manual.dvi was not available as a text file,
+hence the responder in the open request returned a simplification of the
+document type requested
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{FILE MANAGEMENT COMMANDS}
+
+\begin{nrtc}
+\item	MV source destination
+    \begin{nrtc}
+    \item	CHANGES THE NAME OF A FILE
+
+    \item	FILE SERVICES
+	\begin{nrtc}
+	\item	F-BEGIN-GROUP F-SELECT F-CHANGE-ATTRIBUTE F-DESELECT
+		F-END-GROUP
+	\end{nrtc}
+    \end{nrtc}
+
+\item	RM file
+    \begin{nrtc}
+    \item	DELETES A FILE
+
+    \item	FILE SERVICES
+	\begin{nrtc}
+	\item	F-BEGIN-GROUP F-SELECT F-DELETE F-END-GROUP
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FILE MANAGEMENT COMMANDS (cont.)}
+
+\begin{nrtc}
+\item	LS file
+    \begin{nrtc}
+    \item	LISTS THE ATTRIBUTES OF A FILE (USE DIR FOR LONG LISTING)
+
+    \item	FILE SERVICES
+	\begin{nrtc}
+	\item	F-BEGIN-GROUP F-SELECT F-READ-ATTRIBUTE F-DESELECT F-END-GROUP
+	\end{nrtc}
+
+    \item	THE (APPROPRIATE) FTAM ATTRIBUTES ARE DISPLAYED AS UNIX
+		ATTRIBUTES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: FILE MANAGEMENT COMMANDS}\small
+
+\begin{verbatim}
+gr> mv calendar oldcalendar
+gr> rm manual.dvi
+gr> ls .
+.               ..              .Xdefaults      .mh_profile     bin
+lib             libisode.a      mhbox           oldcalendar
+gr> mv oldcalendar calendar
+gr> ls .
+.               ..              .Xdefaults      .mh_profile     bin
+calendar        lib             libisode.a      mhbox
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: FILE MANAGEMENT COMMANDS (cont.)}\small
+
+\begin{verbatim}
+gr> dir .
+d mrose    csl          1536 Jun  2 23:25 .
+d root     wheel         512 May 29 21:50 ..
+t mrose    csl           563 May 27 13:09 .Xdefaults
+t mrose    csl          1968 Apr 29 09:49 .mh_profile
+d mrose    csl          1536 May 29 21:58 bin
+t mrose    csl          2051 Jun  2 18:23 calendar
+d mrose    csl           512 May  4 19:13 lib
+b mrose    csl        691798 Jun  2 23:23 libisode.a
+d mrose    csl          1024 Jun  2 17:43 mhbox
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHAT THE RESPONDER PROVIDES}\small
+
+\begin{verbatim}
+read F-READ-ATTRIB-response, context 1
+{
+   {
+      action-result success,
+      attributes {
+         { filename { "." } },
+         { contents-type { document-type-name 1.17.3.6.8 } },
+         { storage-account "csl" },
+         { date-and-time-of-creation { actual-values "19870603062745Z" } },
+         { date-and-time-of-last-modification
+             { actual-values "19870603062745Z" }
+         },
+         { date-and-time-of-last-read-access
+             { actual-values "19870603062743Z" }
+         },
+         { date-and-time-of-last-attribute-modification
+             { actual-values "19870603062745Z" }
+         },
+         { identity-of-creator { actual-values "mrose" } },
+         { identity-of-last-modifier { actual-values "mrose" } },
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}\small
+\begin{verbatim}
+         { identity-of-last-reader { no-value-available "" } },
+         { identity-of-last-attribute-modifier
+             { no-value-available "mrose" }
+         },
+         { file-availability { actual-values immediate-availability } },
+         {
+            permitted-actions {
+               actual-values { read, insert, replace, extend, erase,
+                               read-attribute, change-attribute } }
+         },
+         { filesize { actual-values 1536 } },
+         { future-filesize { no-value-available "" } },
+         { encryption-name { no-value-available "" } },
+         { legal-qualification { no-value-available "" } }
+      }
+   }
+}
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{LOCAL ENVIRONMENT COMMANDS (AND MISCELLANY)}
+
+\begin{nrtc}
+\item	LCD [file]
+    \begin{nrtc}
+    \item	CHANGES THE WORKING DIRECTORY ON THE LOCAL SYSTEM
+    \end{nrtc}
+
+\item	HELP [command]
+
+\item	SET [variable [value]]
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+also need protocol exception reporting and tracing
+
+for debugging complete stacks
+(and resolving episodes of finger-pointing)
+
+good facilities for reporting exceptions and tracing protocol actions
+are invaluable
+\end{note}
+
+
+\begin{bwslide}
+\part*	{DIRECTORY HANDLING}\bf
+
+\begin{nrtc}
+\item	WHAT ARE WE MISSING?
+
+\item	SOME KIND OF RUDIMENTARY DIRECTORY FACILITIES
+
+\item	WILDCARDING OF FILENAMES (GLOBBING)
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY AND GLOBBING FUNCTIONS}
+
+\begin{nrtc}
+\item	CD [dir]
+    \begin{nrtc}
+    \item	CHANGES THE WORKING DIRECTORY ON THE VIRTUAL FILESTORE
+    \end{nrtc}
+
+\item	MKDIR dir
+    \begin{nrtc}
+    \item	CREATES A DIRECTORY ON THE VIRTUAL FILESTORE
+    \end{nrtc}
+
+\item	PWD
+    \begin{nrtc}
+    \item	PRINTS THE WORKING DIRECTORY ON THE LOCAL SYSTEM AND THE
+		VIRTUAL FILESTORE
+    \end{nrtc}
+
+\item	ECHO file $\ldots$
+    \begin{nrtc}
+    \item	EXPANDS WILDCARD EXPRESSIONS
+    \end{nrtc}
+
+\item	PLUS: VIRTUAL FILESTORE FILENAME ARGUMENTS FOR ALL COMMANDS ARE
+	GLOBBED, DEPENDING ON OPTION SETTING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BUT HOW TO DO THIS?}
+
+\begin{nrtc}
+\item	MKDIR IS EASY
+    \begin{nrtc}
+    \item	F-BEGIN F-CREATE(NBS-9) F-DESELECT F-END
+    \end{nrtc}
+
+\item	BUT CD AND GLOBBING AREN'T POSSIBLE:
+    \begin{nrtc}
+    \item	THE VIRTUAL FILESTORE LACKS A DIRECTORY CONCEPT
+    \end{nrtc}
+
+\item	SUPPOSITION
+    \begin{nrtc}
+    \item	IF WE KNOW THE RULES FOR BUILDING FILENAMES ON THE REMOTE
+		SYSTEM,
+
+    \item	THEN WE CAN EMULATE THIS CONCEPT IN THE INITIATOR!
+
+    \item	WE CAN ALSO MAKE THE USER INTERFACE SMARTER AS WELL
+		(BY DEFAULTING MISSING ARGUMENTS)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPROACH}
+
+\begin{nrtc}
+\item	LET THE ``REALSTORE'' OPTION DETERMINE HOW FILENAMES ARE BUILT
+
+\item	ON A CD COMMAND
+    \begin{nrtc}
+    \item	REMEMBER THE ARGUMENT
+
+    \item	NORMALIZE FUTURE ARGUMENTS USING THIS STRING
+    \end{nrtc}
+
+\item	FOR GLOBBING
+    \begin{nrtc}
+    \item	BASED ON THE REALSTORE, SELECT A GLOBBING ROUTINE WHICH
+		IS INTEGRATED WITH FTAM
+
+    \item	FOR THE UNIX LOCALSTORE THIS IS TRIVIAL
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+the globbing facility in the interactive ftam initiator is
+based on routines generously supplied by u.c. berkeley
+\end{note}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE: DIRECTORY HANDLING COMMANDS}\small
+
+\begin{verbatim}
+gr> set realstore unix
+realstore  = unix       - type of remote realstore
+gr> ls
+bin             lib             mhbox
+calendar        libisode.a      nrtc
+gr> ls lib
+MakeUpdEnv      ctype           icons           notes           termcap
+bfly            emacs           la-template     sl-template     tex82
+gr> ls lib/*tem*
+lib/la-template:
+Makefile        template.bbl    template.tex    text.tex        version.sh
+
+lib/sl-template:
+Makefile        figure.pic      template.tex
+gr> cd lib/sl-template
+gr> pwd
+local directory: /f/iso/ftam2
+virtual filestore directory: lib/sl-template
+gr> ls
+Makefile        figure.pic      template.tex
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE REALSTORE CONTROVERSY}
+
+\begin{nrtc}
+\item	THIS IS AN $M*N$ (RATHER THAN $M+N\/$) APPROACH
+    \begin{nrtc}
+    \item	THE INITIATOR ON ALL LOCAL SYSTEMS MUST POTENTIALLY KNOW ABOUT
+		ALL LOCAL SYSTEMS HOSTING A VIRTUAL FILESTORE
+    \end{nrtc}
+
+\item	NEEDLESS TO SAY THIS IS CONTRARY TO THE OSI PHILOSOPHY
+    \begin{nrtc}
+    \item	IT'S PROBABLY WORSE THAN THE PRIVATE ATTRIBUTE GROUP IN
+		THE FILESTORE
+    \end{nrtc}
+
+\item	IT'S ALSO AMAZINGLY USEFUL\\ (THE FOREWARD PROGRESS ARGUMENT)
+
+\item	THE BEST SOLUTION, HOWEVER, WOULD BE FOR FTAM TO BE FIXED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{SUMMARY}\bf
+
+\begin{nrtc}
+\item	AN INTERACTIVE FTAM CLIENT WITH REASONABLE CAPABILITIES CAN BE
+	IMPLEMENTED IN A STRAIGHT-FORWARD FASHION
+
+\item	DIRECTORY HANDLING CAN BE IMPLEMENTED, BUT AT A CONCEPTUAL COST
+\end{nrtc}
+\end{bwslide}

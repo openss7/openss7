@@ -1,0 +1,1471 @@
+% run this through SLiTeX with the appropriate wrapper
+
+\dotopic	{DIRECTORY SERVICES}
+
+\begin{bwslide}
+\part*	{OUTLINE}\bf
+
+\begin{description}
+\item[PART I:]		INTRODUCTION TO THE DIRECTORY
+
+\item[PART II:]		INTRODUCTION TO QUIPU
+
+\item[PART III:]	THE QUIPU DSA
+
+\item[PART IV:]		A WHITE PAGES SERVICE
+\end{description}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WE NEED TO START USING THE OSI DIRECTORY}
+
+\begin{nrtc}
+\item	APPLICATIONS
+    \begin{nrtc}
+    \item	MESSAGE HANDLING
+
+    \item	AE INFO LOOKUP
+
+    \item	WHITE PAGES
+    \end{nrtc}
+
+\item	EXPERIENCE WITH OTHER SERVICES IS LIMITED
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{INTRODUCTION TO THE DIRECTORY}\bf
+
+\begin{nrtc}
+\item	A VERY BRIEF OVERVIEW TO ``LEVEL THE FIELD''
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY CONCEPTS:\\ ENTRIES, ATTRIBUTES}
+
+\vskip.5in
+\diagram[p]{figureD-1}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY CONCEPTS: DIT}
+
+\vskip.5in
+\diagram[p]{figureD-2}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DIRECTORY CONCEPTS: DUAs, DSAs}
+
+\vskip.5in
+\diagram[p]{figureD-3}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{INTRODUCTION TO QUIPU}\bf
+
+\begin{nrtc}
+\item	A FULL IMPLEMENTATION OF THE DIRECTORY STANDARDS
+
+\item	BUT, STANDARD IS SILENT ON
+    \begin{nrtc}
+    \item	REPLICATION
+
+    \item	CACHING
+
+    \item	ACCESS CONTROL
+    \end{nrtc}
+
+\item	SO, THERE ARE REFINEMENTS FOR THESE AREAS
+
+\item	QUIPU HAS SEEN WIDE PILOT USAGE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{HISTORY}
+
+\begin{nrtc}
+\item	DEVELOPED AT UNIVERSITY COLLEGE LONDON
+
+\item	A PART OF THE INCA PROJECT UNDER ESPRIT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{WRITING DISTINGUISHED NAMES}\bf
+
+\begin{nrtc}
+\item	TEXTUAL NOTATION USED LOCALLY
+
+\item	RDNs ORDERED LEFT-TO-RIGHT SEPARATED BY \verb"`@'"-SIGN
+
+\item	MULTI-VALUE RDNs SEPARATED BY \verb"`%'"-SIGN
+\end{nrtc}
+\begin{quote}\small\begin{verbatim}
+c=US@o=NYSERNet Inc.
+
+l=North America@o=NYSERNet Inc.%l=US
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{(SUBSET OF) STANDARD ATTRIBUTE TYPES}
+
+\smaller
+
+\[\begin{tabular}{|r|l|l|}
+\hline
+\multicolumn{1}{|c|}{\bf Attribute Name}&
+	\multicolumn{1}{c|}{\bf Abbrev.}&
+			\multicolumn{1}{c|}{\bf Syntax}\\
+\hline
+\verb"aliasedObjectName"&&Distinguished Name\\
+\verb"businessCategory"&&string\\
+\verb"commonName"&\verb"cn"&string\\
+\verb"countryName"&\verb"c"&string\\
+\verb"description"&&string\\
+\verb"facsimileTelephoneNumber"&&string\\
+\verb"localityName"&\verb"l"&string\\
+\verb"objectClass"&&object class\\
+\verb"organizationName"&\verb"o"&string\\
+\verb"organizationalUnitName"&\verb"ou"&string\\
+\verb"physicalDeliveryOfficeName"&&string\\
+\verb"postOfficeBox"&&string\\
+\verb"postalAddress"&&special\\
+\verb"postalCode"&&string\\
+\verb"presentationAddress"&&special\\
+\verb"registeredAddress"&&special\\
+\verb"roleOccupant"&&Distinguished Name\\
+\verb"seeAlso"&&Distinguished Name\\
+\verb"stateOrProvinceName"&&string\\
+\verb"streetAddress"&&string\\
+\verb"surname"&\verb"sn"&string\\
+\verb"telephoneNumber"&&string\\
+\verb"telexNumber"&&special\\
+\verb"title"&&string\\
+\verb"userPassword"&&string\\
+\hline
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{(SUBSET OF) ADDITIONAL ATTRIBUTE TYPES}
+
+\smaller
+
+\[\begin{tabular}{|r|l|l|}
+\hline
+\multicolumn{1}{|c|}{\bf Attribute Name}&
+	\multicolumn{1}{c|}{\bf Abbrev.}&
+			\multicolumn{1}{c|}{\bf Syntax}\\
+\hline
+\verb"accessControlList"&\verb"acl"&special\\
+\verb"associatedDomain"&&string\\
+\verb"audio"&&octetstring\\
+\verb"eDBinfo"&&special\\
+\verb"favouriteDrink"&\verb"drink"&string\\
+\verb"friendlyCountryName"&\verb"co"&string\\
+\verb"homePhone"&&string\\
+\verb"homepostalAddress"&&special\\
+\verb"info"&&string\\
+\verb"lastModifiedBy"&&Distinguished Name\\
+\verb"lastModifiedTime"&& Universal Time\\
+\verb"manager"&&Distinguished Name\\
+\verb"masterDSA"&&Distinguished Name\\
+\verb"mobileTelephoneNumber"&\verb"mobile"&string\\
+\verb"otherMailbox"&&special\\
+\verb"pagerTelephoneNumber"&\verb"pager"&string\\
+\verb"photo"&&ASN.1 bitstring\\
+\verb"quipuVersion"&&string\\
+\verb"rfc822Mailbox"&\verb"mail"&string\\
+\verb"roomNumber"&&string\\
+\verb"secretary"&&Distinguished Name\\
+\verb"slaveDSA"&&Distinguished Name\\
+\verb"treeStructure"&&object class\\
+\verb"userClass"&&string\\
+\verb"userid"&\verb"uid"&string\\
+\hline
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{THE QUIPU DUA}\bf
+
+\begin{nrtc}
+\item	C PROCEDURAL INTERFACE: \verb"libdsap"
+
+\item	SHELL INTERFACE: \verb"dish"
+    \begin{nrtc}
+    \item	CAN ALSO BE ACCESSED VIA IPC FOR TEXTUAL INTERFACE
+    \end{nrtc}
+
+\item	SYNCHRONOUS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROGRAMATIC INTERFACES (APIs)}
+
+\vskip.5in
+\diagram[p]{figureD-4}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{THE QUIPU DSA}\bf
+
+\begin{nrtc}
+\item	FINDING INFORMATION
+
+\item	OBJECT CLASSES
+
+\item	CONFIGURATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BASIC DESIGN}
+
+\begin{nrtc}
+\item	MEMORY BASED
+    \begin{nrtc}
+    \item	DOES NOT RESTRICT QUERIES TO BE RESOLVED
+
+    \item	HIGH-PERFORMANCE FOR SMALL VOLUMES OF DATA
+
+    \item	TUNED FOR ORDER $10^4$ FOR A DSA ON A SMALL MACHINE
+    \end{nrtc}
+
+\item	DATA LOADED FROM STABLE STORAGE ON START-UP
+
+\item	MODIFICATIONS WRITTEN TO DISK PRIOR TO RESPONSE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{FINDING INFORMATION}\bf
+
+\begin{nrtc}
+\item	DUA CONTACTS DSA FOR INFORMATION
+
+\item	IF DSA DOES NOT HAVE INFORMATION RESIDENT,
+	IT EITHER
+    \begin{nrtc}
+    \item	\emph{CHAINS} REQUEST TO A DSA CLOSER TO THE INFORMATION
+
+    \item	\emph{REFERS} DUA TO A DSA CLOSER TO THE INFORMATION
+    \end{nrtc}
+
+\item	WHAT DOES \emph{RESIDENT} MEAN?
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ENTRY DATA BLOCK}
+
+\begin{nrtc}
+\item	AN ENTRY DATA BLOCK (OR EDB) CONSISTS OF A SMALL PORTION OF THE TREE
+    \begin{nrtc}
+    \item	THE NAMES AND ATTRIBUTES OF THE IMMEDIATE CHILDREN OF A
+		PARTICULAR NODE
+    \end{nrtc}
+
+\item	THREE KINDS OF EDBs
+    \begin{nrtc}
+    \item	SLAVE COPY: COMPLETE AND AUTHORITATIVE
+	\begin{nrtc}
+	\item	AUTOMATICALLY UPDATED FROM UPSTREAM DSA ON A REGULAR BASIS
+	\end{nrtc}
+
+    \item	CACHE COPY: POSSIBLY PARTIAL INFORMATION
+	\begin{nrtc}
+	\item	INFORMATION DETERMINED FROM CHAINING
+
+        \item	INVALIDATED RELATIVELY QUICKLY
+	\end{nrtc}
+
+    \item	MASTER COPY: THE ORIGINAL
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE RESIDENCY REQUIREMENT}
+
+\[\small\begin{tabular}{rl}
+\bf OPERATION REQUESTED&
+		\bf COPY REQUIRED FOR RESIDENCY\\
+READ, COMPARE&	MASTER, SLAVE, OR CACHE\\
+LIST, SEARCH&	MASTER, OR SLAVE\\
+UPDATE&		MASTER\\
+\end{tabular}\]
+
+\begin{nrtc}
+\item	IN ORDER TO IMPROVE SEARCHING,
+	SLAVE COPIES OF THE TWO TOP LEVELS (ROOT, COUNTRY) SHOULD BE KEPT AT
+	EACH DSA
+
+\item	UPDATES STILL RELY ON CENTRALIZED ENTITY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WRITING EDB FILES}
+
+\begin{nrtc}
+\item	USE \unix/ FILE SYSTEM TO MODEL LOCAL PORTION OF DIT
+    \begin{nrtc}
+    \item	\unix/ DIRECTORIES CORRESPOND TO NON-LEAF OBJECTS
+
+    \item	FILE \verb"EDB" HAS INFORMATION ON THOSE OBJECTS
+    \end{nrtc}
+
+\item	EDB FOR \verb"c=US@o=NYSERNet Inc." IS KEPT IN
+\begin{quote}\small\begin{verbatim}
+.../c=US/o=NYSERNet Inc./EDB
+\end{verbatim}\end{quote}
+(NOTE EMBEDDED SPACES IN NAME)
+
+\item	FILE \verb"EDB.map" CAN BE USED TO OVERRIDE, e.g.,
+\begin{quote}\small\begin{verbatim}
+o=NYSERNet Inc.#nysernet
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WRITING EDB FILES (cont.)}
+
+\begin{nrtc}
+\item	EDB FILE STARTS WITH KEYWORD
+    \begin{nrtc}
+    \item	\verb"MASTER", \verb"SLAVE", or \verb"CACHE"
+    \end{nrtc}
+    AND THEN VERSION STRING
+
+\item	FOLLOWING ARE ONE OR MORE ENTRIES
+
+\item	ENTRY CONSISTS OF
+    \begin{nrtc}
+    \item	RDN
+
+    \item	ATTRIBUTES
+
+    \item	BLANK LINE
+    \end{nrtc}
+
+\item	NEW VERSION HAS \verb"gdbm" SUPPORT FOR FASTER WRITING
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{EXAMPLE}
+
+\begin{quote}\small\begin{verbatim}
+MASTER
+900506161200Z
+cn=Manager
+acl=
+description= (haggard) Manager of the US DMD
+cn= Manager
+aliasedObjectName= c=US@o=DMD@cn=Manager
+objectClass= quipuObject & organizationalRole & alias & top
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{USE OF PRESENTATION ADDRESS}
+
+\begin{nrtc}
+\item	MUST ACCOMMODATE DIVERSE COMMUNITIES
+
+\item	CHAINING/REFERRAL
+    \begin{nrtc}
+    \item	SEE IF ORIGINATING NADDR IS IN SAME COMMUNITY
+    \end{nrtc}
+    AS ANY OF THE NADDRs FOR TARGET DSA
+
+\item	DIRECT CONTACT
+    \begin{nrtc}
+    \item	SEE IF LOCAL END-SYSTEM IS IN SAME COMMUNITY
+    \end{nrtc}
+    AS ANY OF THE NADDRs FOR TARGET DSA
+
+\item	KILLE'S INTERIM ADDRESS SCHEME IS USED TO MAKE COMPARISONS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PROTECTING INFORMATION}
+
+\begin{nrtc}
+\item	\emph{SIMPLE} SECURITY MODEL (PASSWORD-BASED)
+    \begin{nrtc}
+    \item	DUAs AUTHENTICATED USING \verb"userPassword" ATTRIBUTE
+    \end{nrtc}
+
+\item	ALSO A \emph{PROTECTED SIMPLE} MODEL USING HASHED-PASSWORDS
+
+\item	NEED TO ADDRESS \emph{STRONG} SECURITY MODEL WHICH USES
+	PATENTED TECHNOLOGY (RSA)
+
+\item	ACCESS CONTROL LISTS
+    \begin{nrtc}
+    \item	NONE, DETECT, COMPARE, READ, ADD, WRITE
+    \end{nrtc}
+    FOR ENTRIES, ATTRIBUTES, AND CHILDREN
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{OBJECT CLASSES}\bf
+
+\begin{nrtc}
+\item	TAKEN FROM THE THORN NAMING ARCHITECTURE
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{domainRelated OBJECT CLASS}
+
+\begin{nrtc}
+\item	USED TO INVERT THE INTERNET DNS ONTO THE DIT
+
+\item	CORRESPONDENT ENTRIES HAVE AN \verb"associatedDomain" ATTRIBUTE
+
+\item	e.g., \verb"c=US@o=NYSERNet Inc." MIGHT HAVE
+\begin{quote}\small\begin{verbatim}
+associatedDomain= nyser.net
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{iSODEApplicationEntity OBJECT CLASS}
+
+\begin{nrtc}
+\item	(FUTURE) USED BY \verb"tsapd" TO DETERMINE
+    \begin{nrtc}
+    \item	PRESENTATION ADDRESS TO LISTEN ON
+
+    \item	\unix/ PROGRAM TO RUN
+    \end{nrtc}
+    FOR LOCAL SERVICES (SUBCLASS OF \verb"applicationEntity")
+
+\item	CORRESPONDENT ENTRIES HAVE AN \verb"execVector" ATTRIBUTE
+
+\item	e.g., \verb"c=US@o=Performance Systems International@cn=filestore"
+	MIGHT HAVE
+\begin{quote}\small\begin{verbatim}
+execVector= iso.ftam -c
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{quipuObject CLASS}
+
+\begin{nrtc}
+\item	\verb"acl"~---~ACCESS CONTROL LIST
+
+\item	\verb"lastModifiedBy"~---~DN OF DUA (USER)
+
+\item	\verb"lastModifiedTime"~---~UTCTIME
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{quipuNonLeafObject CLASS}
+
+\begin{nrtc}
+\item	\verb"masterDSA"~---~DN OF DSA FOR UPDATES
+
+\item	\verb"slaveDSA"~---~DN OF DSA FOR READING
+
+\item	\verb"treeStructure"~---~OBJECT CLASSES PERMITTED IMMEDIATE CHILDREN
+
+\item	\verb"inheritedAttribute"~---~DEFAULT ATTRIBUTES FOR IMMEDIATE CHILDREN
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{quipuDSA CLASS}
+
+\begin{nrtc}
+\item	\verb"eDBinfo"~---~REPLICATION INFORMATION
+
+\item	\verb"userPassword"~---~FOR BINDING (IGNORED)
+
+\item	\verb"manager"~---~DSA's SUPER-USER
+
+\item	\verb"quipuVersion"~---~TEXT STRING
+
+\item	\verb"description"~---~DITTO
+
+\item	\verb"relayDSA"~---~OUTGOING APPLICATION RELAY
+
+\item	PLUS \verb"acl", \verb"lastModifiedBy", AND \verb"lastModifiedTime"
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{NAMING DSAs}
+
+\begin{nrtc}
+\item	A DSA SHOULD BE PLACED ONE LEVEL HIGHER THAN ANY EDB FOR WHICH IT IS
+	AUTHORITATIVE
+
+\item	HENCE, THE MASTER FOR \verb"c=US@o=NYSERNet Inc." IS
+\end{nrtc}
+\begin{quote}\small\begin{verbatim}
+c=US@cn=Spectacled Bear
+\end{verbatim}\end{quote}
+	AS DEFINED BY THE ENTRY'S \verb"masterDSA" ATTRIBUTE
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{quipuDSP APPLICATION CONTEXT}
+
+\begin{nrtc}
+\item	CONTAINS DSP OPERATIONS PLUS
+    \begin{nrtc}
+    \item	\verb"getEDB" OPERATION
+    \end{nrtc}
+
+\item	PREFERRED BY \verb"quipuDSA"s TO MAKE FULL USE OF REFINEMENTS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{CONFIGURATION}\bf
+
+\begin{nrtc}
+\item	OBJECT TABLES
+
+\item	\verb"libdsap" TAILORING
+
+\item	DSA TAILORING
+
+\item	REMOTE MANAGEMENT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OIDTABLES}
+
+\begin{nrtc}
+\item	\verb"oidtable.gen" CONTAINS DEFINITIONS OF BASIC OBJECT IDENTIFIERS
+\begin{quote}\small\begin{verbatim}
+ccitt: 0
+data:  ccitt.9
+pss:   data.2342
+ucl:   pss.19200300
+\end{verbatim}\end{quote}
+
+\item	\verb"oidtable.oc" CONTAINS DEFINITIONS OF OBJECT CLASSES
+\begin{quote}\small\begin{verbatim}
+person:    standardObjectClass.6 : \
+           top : \
+           CN, surname : \
+           description, seeAlso, telephoneNumber, userPassword
+\end{verbatim}\end{quote}
+
+\item	\verb"oidtable.at" CONTAINS DEFINITIONS OF ATTRIBUTE TYPES
+\begin{quote}\small\begin{verbatim}
+commonName,cn:    attributeType.3    :caseIgnoreString
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{dsaptailor}
+
+\begin{quote}\small\begin{verbatim}
+oidtable    oidtable
+oidformat   short
+
+dsa_address "Condor"    '0101'H/Internet=192.33.4.21+17001
+
+local_DIT    "c=US@o=NYSERNet Inc."
+
+photo        xterm      Xphoto
+
+sizelimit    20
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{quiputailor}
+
+\begin{quote}\small\begin{verbatim}
+oidtable    oidtable
+
+mydsaname   "c=US@cn=Condor"
+parent      "cn=Alpaca"    '0101'H/Internet=192.33.4.20+17007
+
+treedir     /usr/etc/quipu/condor
+
+dsaplog     level=exceptions file=dsap.log
+stats       level=all        file=stats.log
+logdir      /usr/etc/quipu/condor/
+
+nameserver  off
+update      off
+searchlevel 2
+
+adminsize   50
+admintime   300
+cachetime   21600
+conntime    300
+nsaptime    45
+retrytime   3600
+slavetime   21600
+\end{verbatim}\end{quote}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{REMOTE MANAGEMENT}
+
+\begin{nrtc}
+\item	AVAILABLE VIA NON-STANDARD \verb"control" ATTRIBUTE TYPE
+
+\item	OPERATIONS
+    \begin{nrtc}
+    \item	ABORT OR RESTART DSA
+
+    \item	REFRESH OR RE-WRITE EDB FROM/TO DISK
+
+    \item	MARK OR UN-MARK EDB AS READ-ONLY
+
+    \item	INITIATE EDB UPDATE PROCEDURE
+    \end{nrtc}
+
+\item	ALSO CAN BE USED TO GET A BASIC SNAPSHOT:
+\begin{quote}\small\begin{verbatim}
+Dish-> dsacontrol -info
+  0 Master entries (in 0 EDBs)
+431 Slave entries (in 32 EDBs)
+  0 Cached entries
+\end{verbatim}\end{quote}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part	{A WHITE PAGES SERVICE}\bf
+
+\begin{nrtc}
+\item	INTRODUCTION
+
+\item	USER INTERFACES
+
+\item	MAPPING ONTO DIT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{INTRODUCTION}\bf
+
+\begin{nrtc}
+\item	NETWORKS PROVIDE THE INFRASTRUCTURE BETWEEN USERS
+
+\item	NEED INFRASTRUCTURAL INFORMATION TO FACILITATE INTERACTIONS
+    \begin{nrtc}
+    \item	e.g., E-MAIL ADDRESSES
+    \end{nrtc}
+
+\item	WHITE PAGES CONTAIN 
+    \begin{nrtc}
+    \item	\emph{INFRASTRUCTURAL INFORMATION}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WHITE PAGES IN THE REAL WORLD}
+
+\begin{nrtc}
+\item	THE TELEPHONE BOOK IS THE BEST EXAMPLE
+
+\item	MANY PROVEN FEATURES:
+    \begin{nrtc}
+    \item	MULTIPLE TYPES OF INFORMATION 
+	\begin{nrtc}
+	\item	(USEFUL IN FINDING THE ``RIGHT'' ENTRY)
+	\end{nrtc}
+
+    \item	YELLOW PAGES KEYED BY BUSINESS SERVICE
+
+    \item	LOCALITY OF INFORMATION
+
+    \item	DIRECTORY ASSISTANCE
+	\begin{nrtc}
+	\item	(IMPRECISE MATCHING)
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle{WHITE PAGES IN THE COMPUTER WORLD}
+
+\begin{nrtc}
+\item	CONTAINS TELEPHONE BOOK INFORMATION
+    \begin{nrtc}
+    \item	ALONG WITH LOCAL ``PHONE'' INFORMATION
+
+    \item	SUGGESTS BOTH LOCALITY AND ACCESS CONTROL
+    \end{nrtc}
+
+\item	CONTAINS NETWORK-SPECIFIC INFORMATION
+    \begin{nrtc}
+    \item	E-MAIL ADDRESSES
+
+    \item	PRIVATE MAIL
+
+    \item	NETWORK MANAGEMENT
+    \end{nrtc}
+
+\item	ULTIMATELY: ``THE'' REPOSITORY OF ALL SYSTEM AND
+	NETWORK ADMINISTRATIVE INFORMATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A SMALL DISTINCTION}
+
+\begin{nrtc}
+\item	WHITE PAGES IMPLIES SEARCH BASED ON \emph{NAME}
+
+\item	YELLOW PAGES IMPLIES SEARCH BASED ON \emph{ATTRIBUTES}
+
+\item	SINCE ATTRIBUTES ARE USED IN DNs, DISTINCTION IS FUZZY AT BEST
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PSI/NYSERNet White Pages Pilot Project:\\ BEGAN IN JULY, 1989}
+
+\begin{nrtc}
+\item	A LARGE DISTRIBUTED INFORMATION SERVICE INVOLVING ADMINISTRATION BY
+	DIFFERENT ORGANIZATIONS
+
+\item	THE FIRST PRODUCTION-QUALITY FIELD TEST OF THE OSI DIRECTORY (X.500)
+
+\item	THE FIRST LARGE SCALE PRODUCTION APPLICATION OF OSI TECHNOLOGY ON TOP
+	OF THE TCP/IP SUITE OF PROTOCOLS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PILOT PROJECT USES THE OSI DIRECTORY}
+
+\begin{nrtc}
+\item	OSI INFRASTRUCTURE
+    \begin{nrtc}
+    \item	FULL OSI UPPER-LAYERS RUNNING ON TOP OF TCP/IP (ISODE)
+    \end{nrtc}
+
+\item	OSI DIRECTORY
+    \begin{nrtc}
+    \item	FULL DIRECTORY IMPLEMENTATION (QUIPU)
+    \end{nrtc}
+
+\item	WHITE PAGES ABSTRACTION
+    \begin{nrtc}
+    \item	ADMINISTRATIVE DISCIPLINE
+
+    \item	USER INTERFACES
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{USER INTERFACES}\bf
+
+\begin{nrtc}
+\item	SEVERAL USER INTERFACES (UIs) AT PRESENT
+    \begin{nrtc}
+    \item	FRED: TEXT-BASED
+	\begin{nrtc}
+	\item	AVAILABLE VIA TTY, NETWORK, AND MAIL
+	\end{nrtc}
+
+    \item	XWP: X WINDOW-BASED (PSI PROPRIETARY)
+	\begin{nrtc}
+	\item	AVAILABLE VIA NETWORK
+	\end{nrtc}
+
+    \item	MH: MAIL HANDLER
+	\begin{nrtc}
+	\item	INVOKES WHITE PAGES WHEN SENDING MAIL
+	\end{nrtc}
+
+    \item	XFACE/XWHO: WINDOW PROGRAMS
+	\begin{nrtc}
+	\item	THAT USE WHITE PAGES TO FIND PHOTOS
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FRED}
+
+{\small\begin{verbatim}
+whois input-field [record-type] [area-designator] [output-control]
+\end{verbatim}}
+
+\begin{nrtc}
+\item	PARTIAL NAME, e.g.,
+    \begin{nrtc}
+    \item	\verb"rose"
+    \end{nrtc}
+
+\item	FULLY-QUALIFIED HANDLE, e.g.,
+    \begin{nrtc}
+    \item	 \verb"@c=US@cn=Manager" OR \verb"!1"
+    \end{nrtc}
+
+\item	MAILBOX SPECIFICATION, e.g.,
+    \begin{nrtc}
+    \item	\verb"mrose@nisc.nyser.net"
+    \end{nrtc}
+
+\item	ALTERNATE QUERY FORMS, e.g.,
+    \begin{nrtc}
+    \item	\verb"rose -title scientist"
+
+    \item	\verb"-title scientist"
+
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AREA DESIGNATOR}
+
+\begin{nrtc}
+\item	SAYS WHERE TO SEARCH, EITHER
+
+\item	DIRECT REFERENCE, e.g.,
+    \begin{nrtc}
+    \item	\verb|"@c=US@o=NYSERNet Inc."| OR \verb"!3"
+    \end{nrtc}
+
+\item	INDIRECT REFERENCE, e.g.,
+    \begin{nrtc}
+    \item	\verb"-org nyser"
+    \end{nrtc}
+
+\item	INDIRECT REFERENCE CAUSES IMPLICIT SEARCH TO DETERMINE LIST OF AREAS
+	FOR SEARCH
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE}
+
+\smaller
+\begin{verbatim}
+
+
+% telnet wp.psi.com
+Trying 192.33.4.21 ...
+Connected to wp.psi.com.
+Escape character is '^]'.
+
+
+SunOS UNIX (wp.psi.com)
+
+login: fred
+Last login: Tue Feb 13 18:34:43 from esoteric.cc.sfu.
+SunOS Release 4.0.3 (ALEXANDER) #1: Mon Aug 7 11:44:08 EDT 1989
+
+
+Welcome to the NYSERNet White Pages Pilot Project
+
+Try   "help" for a list of commands
+     "whois" for information on how to find people
+    "manual" for detailed documentation
+    "report" to send a report to the white pages manager
+
+To find out about participating organizations, try
+    "whois -org *"
+
+  accessing service, please wait...
+
+fred>
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE (cont.)}
+
+\smaller
+\begin{verbatim}
+
+
+fred> whois -org *
+39 matches found.
+  1. Advanced Decision Systems                      +1 415-960-7300
+  2. Alfred University                              +1 607-871-2222
+  3. Anterior Technology                            +1 415-328-5615
+  4. Bell-Northern Research                         +1 613-763-2211
+  5. City College of CUNY                           +1 212-690-6741
+  6. Clarkson University                            +1 315-268-6400
+  7. Columbia University                            +1 212-854-1754
+  8. Corporation for National Research Initiatives  +1 703-620-8990
+  9. Dana Farber Cancer Institute                   +1 617-732-3000
+ 10. Defense Communications Agency                  +1 703-692-2788
+ 11. DMD                                            +1 415-961-3380
+ 12. Eastman Kodak Co.                              +1 716-724-4000
+ 13. GTE Laboratories, Inc.                         +1 617-890-8640
+ 14. Hewlett-Packard                                +1 415-857-1501
+...
+ 38. University of Rochester                        +1 716-275-2121
+ 39. Virginia Tech                                  +1 703-231-6527
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE (cont.)}
+
+\smaller
+\begin{verbatim}
+
+
+fred> whois goodfellow -org anterior
+Trying @c=US@o=Anterior Technology ...
+Geoffrey Goodfellow (2)         Geoff@Fernwood.MPK.CA.US
+     aka: Geoffrey S. Goodfellow
+
+President
+Anterior Technology
+  POB 1206
+  Menlo Park, CA  94026-1206
+
+Telephone: +1 415 328 5615
+FAX:       +1 415 328 5649
+TELEX:     number: 650 103 7391, country: US, answerback: MCI UW
+
+Mailbox information:
+  MCI-Mail: Geoff
+  Internet: Geoff@Fernwood.MPK.CA.US
+  UUCP: fernwood!Geoff
+
+Drinks:   chilled water
+Picture:  /usr/etc/g3fax/Xphoto invoked
+
+Handle:   @c=US@o=Anterior Technology@ou=Corporate@cn=Geoffrey Goodfellow (2)
+Modified: Fri Jul 21 11:41:27 1989
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{AN EXAMPLE (cont.)}
+
+\vskip.5in
+\diagram[p]{figureD-12}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{XWP}
+
+\begin{nrtc}
+\item	TWO WAYS TO USE THE WHITE PAGES
+    \begin{nrtc}
+    \item	SEARCHING
+
+    \item	BROWSING
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE LOOK AND FEEL}
+
+\vskip.5in
+\diagram[p]{figureD-6}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SEARCHING}
+
+\begin{nrtc}
+\item	LIKE FRED:
+    \begin{nrtc}
+    \item	SPECIFY NAME/AREA INFORMATION
+
+    \item	TWO STEPS
+    \end{nrtc}
+
+\item	STEP~1: RESOLVE AREA
+    \begin{nrtc}
+    \item	IF JUST ONE MATCH, GOTO STEP~2
+
+    \item	IF MORE THAN ONE, CREATE A VIEWPORT OF AREAS
+	\begin{nrtc}
+	\item	CLICKING ON A LINE DOES NAME SEARCH IN THAT AREA
+	\end{nrtc}
+    \end{nrtc}
+
+\item	STEP~2: RESOLVE NAME
+    \begin{nrtc}
+    \item	IF JUST ONE MATCH, CREATE A WINDOW CONTAINING INFORMATION
+
+    \item	IF MORE THAN ONE, CREATE A VIEWPORT OF NAMES
+	\begin{nrtc}
+	\item	CLICKING ON A LINE CREATES THE WINDOW
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SEARCHING (cont.)}
+
+\vskip.5in
+\diagram[p]{figureD-7}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SEARCHING (cont.)}
+
+\vskip.5in
+\diagram[p]{figureD-8}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SEARCHING (cont.)}
+
+\vskip.5in
+\diagram[p]{figureD-9}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SEARCHING (cont.)}
+
+%\vskip.5in
+\diagram[p]{figureD-10}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BROWSING}
+
+\begin{nrtc}
+\item	USES A VIEWPORT
+    \begin{nrtc}
+    \item	ONE ENTRY TO A LINE
+
+    \item	INDENTATION SHOWS PARENT/CHILD RELATIONSHIP
+    \end{nrtc}
+
+\item	CLICK ON A LINE TO EXPAND ENTRY, EITHER:
+    \begin{nrtc}
+    \item	IF LEAF, CREATE WINDOW SHOWING INFORMATION ON ENTRY
+
+    \item	OTHERWISE, LIST CHILDREN IN VIEWPORT
+    \end{nrtc}
+
+\item	USES ELLIPSIS ($\ldots$) TO SHOW INCOMPLETE INFORMATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SEARCHING (cont.)}
+
+\vskip.5in
+\diagram[p]{figureD-11}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{COMMAND BUTTONS}
+
+\begin{nrtc}
+\item	WHOIS: INVOKE SEARCHING
+
+\item	AREAS: SET DEFAULT AREAS
+
+\item	OPTIONS: SET OPERATING PARAMETERS
+
+\item	STATUS: REPORT ON CONNECTION TO SERVER
+
+\item	THISIS: SET BINDING INFORMATION
+
+\item	HELP: DISPLAY MANUAL PAGE
+
+\item	QUIT: TERMINATE XWP
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{MAIL HANDLER}
+
+\begin{nrtc}
+\item	WHEN COMPOSING MAIL, IT WOULD BE NICE TO USE THE WHITE PAGES TO GET
+	E-MAIL ADDRESSES
+
+\item	MH IS MODIFIED TO USE FRED FOR THIS PURPOSE
+    \begin{nrtc}
+    \item	SPECIAL SYNTAX USED TO DENOTE WHITE PAGES QUERY
+
+    \item	USER IS ASKED FOR CONFIRMATION/REFINEMENT
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{WINDOW PROGRAMS}
+
+\begin{nrtc}
+\item	YOU CAN STORE ARBITRARY DATA IN THE WHITE PAGES
+
+\item	ONE ATTRIBUTE IS A FACSIMILE IMAGE CALLED \verb"photo"
+
+\item	THERE ARE TWO X WINDOWS PROGRAMS WHICH DISPLAY THIS INFORMATION
+    \begin{nrtc}
+    \item	XFACE: WHEN READING A MESSAGE WITH MH, DISPLAYS PHOTO
+
+    \item	XWHO: LIKE RWHO, BUT WITH PHOTOs
+    \end{nrtc}
+
+\item	USES INVERSE MAPPING HEURISTICS TO TRAVERSE DIRECTORY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\part*	{MAPPING ONTO DIT}\bf
+
+\begin{nrtc}
+\item	EACH ENTRY IN THE WHITE PAGES CORRESPONDS TO AN ENTRY IN THE OSI
+	DIRECTORY
+
+\item	USE DISTINGUISHED NAME FOR WHITE PAGES HANDLE, e.g.,
+\begin{quote}\begin{verbatim}
+c=US
+    @o=Performance Systems International
+    @ou=Research and Development
+    @ou=California Office
+    @cn=Marshall Rose
+\end{verbatim}\end{quote}
+
+\item	ONLY LIMITED INFORMATION TYPES SUPPORTED
+    \begin{nrtc}
+    \item	ORGANIZATIONS, UNITS AND ROLES
+
+    \item	LOCALITIES
+
+    \item	PERSONS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ORGANIZATION}
+
+\begin{nrtc}
+\item	RESPONSIBILITY FOR INFORMATION DIVIDED INTO DIRECTORY MANAGEMENT
+	DOMAINS (DMDs)
+
+\item	LEVEL-0: HIGHLY-AVAILABLE AUTHORITATIVE SERVERS
+    \begin{nrtc}
+    \item	ROOT
+
+    \item	\verb"c=US"
+    \end{nrtc}
+
+\item	LEVEL-1: AUTHORITATIVE SERVER FOR EACH ORGANIZATION
+
+\item	LEVEL-2: OVERFLOW DSAs FOR AN ORGANIZATION
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{TOPOLOGY OF THE PILOT PROJECT}
+
+\vskip.5in
+\diagram[p]{figureD-5}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SEARCHING}
+
+\begin{nrtc}
+\item	THE SINGLE MOST IMPORTANT TASK;
+    \begin{nrtc}
+    \item	RELATE NAMING ARCHITECTURE TO SEARCH ALGORITHM
+    \end{nrtc}
+
+\item	ASSUME USER PROVIDES:
+    \begin{nrtc}
+    \item	KIND OF OBJECT (OPTIONAL)
+
+    \item	NAMING INFORMATION FOR OBJECT
+
+    \item	QUALIFYING INFORMATION (OPTIONAL)
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STEP 1: CONSTRUCT BASIC FILTER}
+
+\[\begin{tabular}{|r|l|}
+\hline
+\multicolumn{1}{|c|}{\bf What}&
+		\multicolumn{1}{|c|}{\bf Basic Filter}\\
+\hline
+default&	\tt cn$\approx$X $\lor$ sn$\approx$X $\lor$ mail=X@*\\
+organization&	\tt o$\approx$X\\
+unit&		\tt ou$\approx$X\\
+role&		\tt cn$\approx$X\\
+locality&	\tt l$\approx$X\\
+person&		\tt sn$\approx$X $\lor$ mail=X@*\\
+(or) person&	\tt cn$\approx$X\\
+\hline
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STEP 2: APPEND INFO FILTER\\ (IF QUALIFYING INFORMATION GIVEN)}
+
+\[\begin{tabular}{|r|l|}
+\hline
+\multicolumn{1}{|c|}{\bf What}&
+		\multicolumn{1}{|c|}{\bf Info Filter}\\
+\hline
+organization&	\tt businessCategory=X\\
+unit&		\tt businessCategory=X\\
+role&		\tt title=X\\
+person&		\tt title=X\\
+\hline
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STEP 3: DETERMINE HOW DEEP TO SEARCH}
+
+\[\begin{tabular}{|r|l|}
+\hline
+\multicolumn{1}{|c|}{\bf What}&
+		\multicolumn{1}{|c|}{\bf Depth}\\
+\hline
+default&	whole-subtree\\
+organization&	single-level\\
+unit&		whole-subtree\\
+role&		whole-subtree\\
+locality&	single-level\\
+person&		whole-subtree\\
+\hline
+\end{tabular}\]
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{PERFORM SEARCH}
+
+\begin{nrtc}
+\item	WITH THESE OPTIONS
+\begin{quote}\small\begin{verbatim}
+-preferchaining
+-dontdereferencealias
+-notimelimit
+-nosizelimit
+-nosearchaliases
+-types rfc822Mailbox telephoneNumber aliasedObjectName
+-values
+\end{verbatim}\end{quote}
+
+\item	RELATIVE TO A BASE OBJECT
+
+\item	BASED ON RESULT
+    \begin{nrtc}
+    \item	NO MATCHES: REPORT TO USER
+
+    \item	ONE MATCH: READ ENTRY (\verb"-dontdereference")
+
+    \item	MULTIPLE MATCHES:
+	\begin{nrtc}
+	\item	DISPLAY EACH ENTRY IN A CONCISE ONE-LINER
+
+	\item	LET USER DECIDE WHICH TO EXPAND
+	\end{nrtc}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DETERMINING BASE OBJECT}
+
+\begin{nrtc}
+\item	MAINTAIN DEFAULT TABLE, e.g.,
+\[\begin{tabular}{|r|l|}
+\hline
+\multicolumn{1}{|c|}{\bf What}&
+		\multicolumn{1}{|c|}{\bf Base}\\
+\hline
+default&	\tt @c=US@o=NYSERNet Inc.\\
+organization&	\tt @l=North America\\
+unit&		\tt @c=US@o=NYSERNet Inc.\\
+role&		\tt @c=US@o=NYSERNet Inc.\\
+locality&	\tt @c=US\\
+person&		\tt @c=US@o=NYSERNet Inc.\\
+\hline
+\end{tabular}\]
+
+\item	LET USER INPUT OVERRIDE THIS
+    \begin{nrtc}
+    \item	CONSTRUCT BASIC FILTER AND DO SEARCH
+
+    \item	DECIDE WHAT TO DO ON NUMBER OF MATCHES
+
+    \item	USED \verb"aliasedObjectName" WHEN EXPANDING AREAS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{BROWSING}
+
+\begin{nrtc}
+\item	ALTHOUGH YOU'D THINK THE \verb"list" OPERATION WAS THE WAY TO DO IT
+
+\item	EXPERIENCE INDICATES A SINGLE-LEVEL \verb"search" IS BETTER
+    \begin{nrtc}
+    \item	CAN RETRIEVE ATTRIBUTES
+
+    \item	CAN FILTER RESULTS, e.g.,
+\begin{quote}\small\tt
+objectClass$\neq$dSA
+\end{quote}
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{USER-FRIENDLY NAMING}
+
+\begin{nrtc}
+\item	NEW WORK IS BEING DONE ON KILLE'S
+    \begin{nrtc}
+    \item	USER-FRIENDLY NAMING SCHEME
+    \end{nrtc}
+    (ORDERED, UNTYPED)
+
+\item	NAMES APPEAR LIKE THIS:
+\begin{quote}\small\begin{verbatim}
+marshall rose, psi
+kille, cs, ucl, gb
+L. Eagle, "Sue, Grabbit, and Runn", Oxford
+\end{verbatim}\end{quote}
+
+\item	SEARCH ALGORITHM IS COMPLEX (BUT IMPLEMENTED)
+    \begin{nrtc}
+    \item	SEARCH EFFICIENCY IS GOOD
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{FOR FURTHER READING}
+
+\begin{nrtc}
+\item	Volume 5: QUIPU
+
+\item	The Design of QUIPU\\
+	Stephen E.~Kille\\
+	UCL-CS RN/89/19
+
+\item	The QUIPU Directory Service\\
+	Stephen E.~Kille\\
+        Proceedings, Fourth International Symposium on Computer Message
+	Systems, September, 1988
+
+\item	The THORN X.500 Naming Architecture\\
+	Stephen E.~Kille\\
+	UCL-CS Technical Report
+
+\item	Directory Navigation in the QUIPU X.500 System\\
+	Paul Barker and Colin J.~Robbins\\
+	UCL-CS Technical Report
+
+\item	Realizing the White Pages using the OSI Directory Service\\
+	Marshall T.~Rose\\
+	PSI TR\#90--05--10--1
+
+\item	ALONG WITH THE REST OF THE \verb"doc/whitepages/" DOCUMENT SET
+\end{nrtc}
+\end{bwslide}

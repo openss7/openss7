@@ -1,0 +1,17 @@
+
+.SH ATTRIBUTES
+.PP
+The following attributes may change as a result of the issuing of the A_ASSOC_IND primitive based on
+information contained in the received APDU associated with the indication: AP_ACSE_SEL,
+AP_CLD_AEID, AP_CLD_AEQ, AP_CLD_APID, AP_CLD_APT,
+AP_CLG_AEID, AP_CLG_AEQ, AP_CLG_APID, AP_CLG_APT,
+AP_CNTX_NAME, AP_DCS, AP_DPCN, AP_INIT_SYNC_PT, AP_INIT_TOKENS, AP_LCL_PADDR, AP_MODE_SEL, AP_PCDL,
+AP_PFU_SEL, AP_PRES_SEL, AP_QOS, AP_REM_PADDR, AP_ROLE_CURRENT, AP_SESS_SEL, AP_SFU_SEL, AP_STATE,
+AP_TOKENS_AVAIL, AP_TOKENS_OWNED.
+.SH VALID STATES
+.PP
+The A_ASSOC_IND primitive is only issued by the AP provider in the AP_IDLE state.
+.SH NEW STATE
+.PP
+The new state of the XAP instance is AP_WASSOCrsp_ASSOCind (waiting for an A-ASSOCIATE.Response
+having issued an A-ASSOCIATE.Indication).

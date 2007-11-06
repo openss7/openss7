@@ -1,0 +1,314 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_OPEN 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B ap_open
+\- open APLI instance.
+.\"
+.\"
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface (APLI).
+.[
+APLI UNIX International
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ap_lib.h>
+.br
+.B #include <osi_lib.h>
+.HP
+.BI "int ap_open(
+.PD 0
+.RS
+.HP
+.BI "char *" pathname ,
+.TP
+.BI "int " oflags
+.RE
+.HP
+.BI );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I pathname
+.TP
+.I oflags
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function creates a new instance of APLI that uses the service provider specified by
+.IR pathname .
+In the case of the SunLink implementation of APLI,
+.I pathname
+must identify the device
+.BR /dev/oopi
+that corresponds to the SunLink OSI Communication Platform.  Note that
+.I pathname
+may be the actual device name
+.BR /dev/oopi ,
+or a symbolic link that points to this device.
+.PP
+The SunLink implementation of APLI will not access a NULL value for
+.IR pathname .
+.PP
+The
+.I oflags
+argument is a bit mase set to
+.B O_NDELAY
+to request non-blocking execution mode (no delay).  Unless specified otherwise, the API instance
+operates in blocking mode.
+.PP
+The APLI environment must be initialized using a call to the
+.BR ap_init_env (3)
+function before the APLI instance can be used to send or receive primitives.
+.\"
+.\"
+.SH RETURN
+.PP
+On successful completion,
+.BR ap_open ()
+returns the integer value file descriptor,
+.IR fd ,
+that is used to identify the service provider in all subsequent function calls.  Otherwise, a value
+of minus one
+.RB ( -1 )
+is returned an
+.BR ap_errno (3)
+is set to indicate the error.
+The corresponding error message is returned by calling the
+.BR ap_error (3)
+function.
+.\"
+.\"
+.SH ERRORS
+.PP
+.TP
+.RB [ AP_NOMEM ]
+.PP
+In addition, operating system class errors are reported.
+.\"
+.\"
+.SH EXAMPLE
+.PP
+The following code fragment shows how
+.BR ap_open ()
+can be used to open an APLI isntance that will operate in blocking mode (default) by setting
+.I oflags
+to NULL or zero.  To operate in non-blocking mode,
+.I oflags
+must be set to
+.B O_NDLEAY
+(no delay).
+.PP
+.RS
+.nf
+\fC\s-1\
+#include <ap_lib.h>
+#include <osi_lib.h>
+
+int
+OpenApliInst(void)
+{
+    int fd;
+    char *descName = "/dev/oopi";
+
+    if ((fd = ap_open(descName, NULL)) == FAIL) {
+        printf("Error in ap_open %s \n", ap_error());
+        return (FAIL);
+    }
+    return (fd);
+}
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @pkgincludedir@/ap_lib.h
+.TP
+.B @pkgincludedir@/osi_lib.h
+.TP
+.B @pkgincludedir@/ap_poll.h
+.TP
+.B @libdir@/libapli.a
+.TP
+.B @libdir@/libapli.so.1
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.BR apmod (4)
+.TP
+.BR romod (4)
+.TP
+.BR tpmod (4)
+.TP
+.BR momod (4)
+.\"
+.\"
+.SH DRIVERS
+.PP
+.TP
+.BR /dev/oopi ", " /dev/streams/clone/oopi
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ap_open ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR apmod (4),
+.BR ap_close (3),
+.BR APLI (3).
+.\"
+.\"
+.SH COMPATIBLITY
+.PP
+.BR ap_open ()
+is compatible with APLI,
+.[
+APLI UNIX International October 25, 1990
+.]
+and implementation based on APLI such as
+.IR "Solaris\(rg SunLink OSI" ,
+.IR "Solaris\(rg Solstice OSI" ,
+.IR "HP OSI Transport Services/9000 (OTS/9000)" ,
+.IR "SVR 4.2 Open Network Services (ONS)" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+SunLink 8.1
+.[
+sunlink apli
+.]
+only supports the
+.B /dev/oopi
+device, or a symbolic link to that device, in the
+.I pathname
+argument.
+OpenSS7 APLI Library supports device
+.B /dev/oopi
+as well as any device that acts as an ASCE/Presentaiton provider.
+.IP \(em
+.PP
+See
+.BR APLI (3)
+and
+.BR STREAMS (4)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_open ()
+first appeared in APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T2

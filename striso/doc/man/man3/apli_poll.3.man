@@ -1,0 +1,316 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_POLL 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B ap_poll
+\- poll for the occurence of specified APLI events.
+.\"
+.\"
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface (APLI).
+.[
+APLI UNIX International
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ap_lib.h>
+.br
+.B #include <osi_lib.h>
+.HP
+.BI "int ap_poll(
+.PD 0
+.RS
+.HP
+.BI "struct ap_pollfd *" fds ,
+.HP
+.BI "int " nfds ,
+.HP
+.BI "int " timeout
+.RE
+.HP
+.BI );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fItimeout\fP\(em'u
+.I fds
+array of \fInfds\fP structures.
+.PD 0
+.TP
+.I nfds
+the size of the \fIfds\fP array.
+.TP
+.I timeout
+delay before timeout.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function provides a consistent interface for detecting when certain events have occurred on an
+APLI instance.  It is a macro for the UNIX system call
+.BR poll (2).
+.PP
+The
+.I fds
+argument is an array of
+.I nfds
+.B ap_pollfd_t
+structures defined as:
+.sp
+.RS
+.nf
+\fC\s-1\
+struct pollfd {
+    int fd;
+    short events;
+    short revents;
+};
+
+typedef struct pollfd ap_pollfd_t;
+\s+1\fP
+.fi
+.RE
+.sp
+where the
+.B pollfd
+structure is defined in
+.RB < sys/poll.h >.
+.PP
+One member,
+.IR fd ,
+should correspond to an APLI communication endpoint; however, any open file descriptor is accepted.
+The
+.I events
+field is a bitmask used to indicate which events should be reported for the isntance.  The
+.I revents
+field will be set by APLI to indicate which of the requested events have occurred:
+.sp
+.TS
+tab(:);
+lblbw(4.5i)
+lbl.
+Event Code:Description
+_
+AP_POLLIN:T{
+Data has arrived (on either band) and is available to be read.
+T}
+AP_POLLOUT:T{
+Data can be sent on the normal priority band.
+T}
+_
+.TE
+.sp
+See
+.BR poll (2s).
+.PP
+If none of the defined events have occurred on the selected instances,
+.BR ap_poll ()
+waits
+.I timeout
+milliseconds for an event to occur on one of the selected instances before returning.  If the value
+of
+.I timeout
+is
+.BR AP_INFTIM ,
+.BR ap_poll ()
+waits until a requested event occurs or until the call is interrupted.
+.PP
+The
+.BR ap_poll ()
+call is not affected by whether the APLI instance is operating in blocking or non-blocking execution
+mode.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success, a non-negative value is returned that indicates the number of instances for which
+.I revents
+is non-zero.  A return value of zero (0)
+indicates that the call timed out and no instances were selected.  Otherwise, a value of -1 is
+returned and
+.BR ap_errno (3)
+is set to indicate the error.  The corresponding error message is returned by calling
+.BR ap_error (3)
+function.
+.\"
+.\"
+.SH ERRORS
+.PP
+Only operating system error may be reported.
+.\"
+.\"
+.SH EXAMPLE
+.PP
+The following example shows how
+.BR ap_poll ()
+can be used to wait for the occurrence of a certain event.
+.PP
+.RS
+.nf
+\fC\s-1\
+struct pollfd poll_fd;
+int timeout;
+
+poll_fd.fd = fd;
+poll_fd.events = POLLIN;
+while ((rc = ap_poll(&poll_fd, 1, timeout)) > 0) {
+
+    /* do something */
+
+}
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH DRIVERS
+.PP
+.TP
+.BR /dev/oopi ", " /dev/streams/clone/oopi
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ap_poll ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR poll (2s),
+.BR APLI (3).
+.\"
+.\"
+.SH COMPATIBLITY
+.PP
+.BR ap_poll ()
+is compatible with APLI,
+.[
+APLI UNIX International October 25, 1990
+.]
+and implementation based on APLI such as
+.IR "Solaris\(rg SunLink OSI" ,
+.IR "Solaris\(rg Solstice OSI" ,
+.IR "HP OSI Transport Services/9000 (OTS/9000)" ,
+.IR "SVR 4.2 Open Network Services (ONS)" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR APLI (3)
+and
+.BR STREAMS (4)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_poll ()
+first appeared in APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T2
+
+

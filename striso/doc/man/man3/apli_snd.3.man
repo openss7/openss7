@@ -1,0 +1,395 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_SND 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B ap_snd
+\- send APLI ACSE/Presentation service primitive.
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface (APLI).
+.[
+APLI UNIX International
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ap_lib.h>
+.br
+.B #include <osi_lib.h>
+.HP
+.BI "int ap_snd(
+.PD 0
+.RS
+.HP
+.BI "int " fd ,
+.HP
+.BI "unsigned long " sptype ,
+.HP
+.BI "ap_cdata_t *" cdata ,
+.HP
+.BI "struct osi_buf *" ubuf ,
+.HP
+.BI "int " flags
+.RE
+.HP
+.BI );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fIsptype\fP\(em'u
+.I fd
+file descriptor.
+.PD 0
+.TP
+.I sptype
+primitive to be sent.
+.TP
+.I cdata
+union for protocol information.
+.TP
+.I ubuf
+buffer for sending user data.
+.TP
+.I flags
+set to indicate pending data.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function is used to send a request or response primitive.  The file descriptor,
+.IR fd ,
+specifies the service provider.  The
+.I sptype
+argument contains a symbolic constant that identifies the primitive to be sent.  The valid
+symbolic constants are derived from the primitive names by prefixing '\fBAP_\fP' to the name as
+follows:
+.PP
+.TS
+tab(:);
+lblblb
+lblil.
+Constant:Primitive:Description
+_
+AP_A_ASSOC_REQ:A_ASSOC_REQ:A-ASSOCIATE request
+AP_A_ASSOC_RSP:A_ASSOC_RSP:A-ASSOCIATE response
+AP_A_RELEASE_REQ:A_RELEASE_REQ:A-RELEASE request
+AP_A_RELEASE_RSP:A_RELEASE_RSP:A-RELEASE response
+AP_A_ABORT_REQ:A_ABORT_REQ:A-ABORT request
+AP_A_PABORT_REQ:A_PABORT_REQ:A-P-ABORT request
+AP_P_DATA_REQ:P_DATA_REQ:P-DATA request
+AP_P_TOKENGIVE_REQ:P_TOKENGIVE_REQ:P-TOKEN-GIVE request
+AP_P_TOKENPLEASE_REQ:P_TOKENPLEASE_REQ:P-TOKEN-PLEASE request
+_
+.TE
+.PP
+Any additional protocol information to be sent with a primitive is conveyed by the union of
+structures,
+.BR ap_cdata_t ,
+pointed to by
+.IR cdata .
+The value,
+.IR sptype ,
+defines which member of the union,
+.BR ap_cdata_t
+is affected.
+.PP
+Any encoded
+.[
+x227
+.]
+.[
+x237
+.]
+user data associated with the primitive is sent in the
+.B osi_buf
+structure pointed to by
+.IR ubuf .
+The
+.B osi_buf
+structure has the following members:
+.sp
+.nf
+\fC\s-1\
+struct osi_buf {
+    unsigned int maxlen;
+    unsigned int len;
+    char *buf;
+}
+\s+1\fP
+.fi
+.sp
+which are the same as a
+.BR netbuf (3)
+structure.
+.PP
+Before issuing the
+.BR ap_snd ()
+call,
+.I ubuf->buf
+must point to the buffer from which the data is to be taken and
+.BR ubuf->len
+must be set to the number of bytes of user data in the buffer.  If no user data is to be sent,
+.I ubuf
+must be
+.BR NULL .
+.PP
+The
+.I flags
+argument specifies whether an additional
+.BR ap_snd ()
+call contains more user data belonging to the same PDU.  Whenever the
+.I flags
+argument has the
+.BR AP_MORE
+bit set, it indicates that an additional call to
+.BR ap_snd ()
+will contain additional user data.  When the
+.I flags
+argument has the
+.BR AP_MORE
+bit clear, it indicates that this
+.BR ap_snd ()
+call contains the last of the user data belonging to this PDU and that the primitive is complete.
+The value of the
+.I sptype
+argument must be the same for all
+.BR ap_snd ()
+calls used to send a single primitive.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon successful completion, a value of zero (0) is returned; otherwise, minus one (-1) is returned
+and
+.BR ap_errno (3)
+is set to indicate the error.  The corresponding error message is returned by calling the
+.BR ap_error (3)
+function.
+.\"
+.\"
+.SH ERRORS
+.PP
+.TP
+.RB [ AP_AGAIN ]
+\- request not completed.
+.TP
+.RB [ AP_LOOK ]
+\- a pending event requires attention.
+.TP
+.RB [ AP_BADENV ]
+\- a mandatory attribute is not set.
+.TP
+.RB [ AP_BADLSTATE ]
+\- instance in bad state for that command.
+.TP
+.RB [ AP_BADPRIM ]
+\- unrecognized primitive from user.
+.TP
+.RB [ AP_BADUBUF ]
+\- bad length for user data.
+.TP
+.RB [ AP_HANGUP ]
+\- association closed or aborted.
+.TP
+.RB [ AP_NOENV ]
+\- no environment for that \fIfd\fP.
+.PP
+Also, operating system, asn.1, asce, presentation, session and transport class errors may be
+reported.
+.\"
+.\"
+.SH EXAMPLE
+.PP
+The following exmaple shows how
+.BR ap_snd ()
+can be used to issue an association request by sending the
+.BR AP_ASSOC_REQ
+primitive.
+.\" SHOULD THIS BE AP_A_ASSOC_REQ ????
+.sp
+.RS
+.nf
+\fC\s-1\
+#include <ap_lib.h>
+#include <osi_lib.h>
+
+int
+SndApliAReq(int fd)
+{
+    ap_cdata_t cdata;
+    struct osi_buf ubuf;
+    unsigned long sptype;
+    int flags;
+    int rc;
+    char msg[128];
+
+    cdata.assoc_req.tokens =
+        AP_DATA_TOK_REQ | AP_SYNCMINOR_TOK_REQ |
+        AP_MAJACT_TOK_REQ | AP_RELEASE_TOK_REQ;
+    cdata.assoc_req.udata_length = 0;
+    flags = 0;
+    ubuf.maxlen = 128;
+    ubuf.len = 0;
+    ubuf.buf = msg;
+    rc = ap_snd(fd, A_ASSOC_REQ, cdata, &ubuf, flags);
+    if (rc != 0) {
+        printf("error in ap_snd A_ASSOC_REQ %s \\n",
+               ap_error());
+        return (FAIL);
+    }
+    return (SUCCESS);
+}
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH DRIVERS
+.PP
+.TP
+.BR /dev/oopi ", " /dev/streams/clone/oopi
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ap_snd ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ap_set_env (3),
+.BR ap_get_env (3),
+.BR APLI (3).
+.\"
+.\"
+.SH COMPATIBLITY
+.PP
+.BR ap_snd ()
+is compatible with APLI,
+.[
+APLI UNIX International October 25, 1990
+.]
+and implementation based on APLI such as
+.IR "Solaris\(rg SunLink OSI" ,
+.IR "Solaris\(rg Solstice OSI" ,
+.IR "HP OSI Transport Services/9000 (OTS/9000)" ,
+.IR "SVR 4.2 Open Network Services (ONS)" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR APLI (3)
+and
+.BR STREAMS (4)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_snd ()
+first appeared in APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T2
+

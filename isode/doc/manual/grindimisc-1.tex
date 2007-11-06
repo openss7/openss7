@@ -1,0 +1,128 @@
+\File{grindimisc\-1.ry},{22:23},{Jun 12 1988}
+\L{\LB{IMISC \K{DEFINITIONS} ::=}}
+\L{\LB{}}
+\L{\LB{\K{BEGIN}}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- operations}}
+\CE{}\L{\LB{}}
+\L{\LB{utcTime \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{UTCResult}}
+\L{\LB{}\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested, unableToDetermineTime \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{0}}
+\L{\LB{}}
+\L{\LB{timeOfDay \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{TimeResult}}
+\L{\LB{}\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested, unableToDetermineTime \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{1}}
+\L{\LB{}}
+\L{\LB{users \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{IA5List}}
+\L{\LB{}\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested, unableToOpenFile \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{2}}
+\L{\LB{}}
+\L{\LB{charGen \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{IA5List}}
+\L{\LB{}\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{3}}
+\L{\LB{}}
+\L{\LB{qotd}\Tab{8}{\K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{IA5List}}
+\L{\LB{}\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested, unableToAccessFile, unableToPipe,}}
+\L{\LB{}\Tab{24}{  unableToFork, errorReading \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{4}}
+\L{\LB{}}
+\L{\LB{finger}\Tab{8}{\K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT}}\Tab{24}{IA5List}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{IA5List}}
+\L{\LB{}\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested, unableToAccessFile, unableToPipe,}}
+\L{\LB{}\Tab{24}{  unableToFork, errorReading \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{5}}
+\L{\LB{}}
+\L{\LB{pwdGen}\Tab{8}{\K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{IA5List}}
+\L{\LB{}\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{6}}
+\L{\LB{}}
+\L{\LB{genTime}\Tab{8}{\K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{GenResult}}
+\L{\LB{}\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested, unableToDetermineTime \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{7}}
+\L{\LB{}}
+\L{\LB{tellUser \K{OPERATION}}}
+\L{\LB{}\Tab{8}{\K{ARGUMENT}}\Tab{24}{IA5List}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{\K{NULL}}}
+\L{\LB{}\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested, unableToOpenFile, userNotLoggedIn \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{8}}
+\L{\LB{}}
+\L{\LB{ping \K{OPERATION}}}
+\L{\LB{    }\Tab{8}{\K{ARGUMENT}}\Tab{24}{Empty}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{Empty}}
+\L{\LB{    }\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{9}}
+\L{\LB{}\Tab{8}{    }}
+\L{\LB{sink \K{OPERATION}}}
+\L{\LB{    }\Tab{8}{\K{ARGUMENT}}\Tab{24}{Data}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{Empty}}
+\L{\LB{    }\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{10}}
+\L{\LB{}\Tab{8}{    }}
+\L{\LB{echo \K{OPERATION}}}
+\L{\LB{    }\Tab{8}{\K{ARGUMENT}}\Tab{24}{Data}}
+\L{\LB{}\Tab{8}{\K{RESULT}}\Tab{24}{Data}}
+\L{\LB{    }\Tab{8}{\K{ERRORS}}\Tab{24}{\{ congested \}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{11}}
+\L{\LB{}\Tab{8}{    }}
+\L{\LB{\C{}\-\- errors}}
+\CE{}\L{\LB{}}
+\L{\LB{congested}}
+\L{\LB{}\Tab{8}{\K{ERROR}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{0}}
+\L{\LB{}}
+\L{\LB{unableToDetermineTime}}
+\L{\LB{}\Tab{8}{\K{ERROR}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{1}}
+\L{\LB{}}
+\L{\LB{unableToOpenFile}}
+\L{\LB{}\Tab{8}{\K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER}}\Tab{24}{IA5List}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{2}}
+\L{\LB{}}
+\L{\LB{unableToAccessFile}}
+\L{\LB{}\Tab{8}{\K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER}}\Tab{24}{IA5List}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{3}}
+\L{\LB{}}
+\L{\LB{unableToPipe}}
+\L{\LB{}\Tab{8}{\K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER}}\Tab{24}{IA5List}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{4}}
+\L{\LB{}}
+\L{\LB{unableToFork}}
+\L{\LB{}\Tab{8}{\K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER}}\Tab{24}{IA5List}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{5}}
+\L{\LB{}}
+\L{\LB{errorReading}}
+\L{\LB{}\Tab{8}{\K{ERROR}}}
+\L{\LB{}\Tab{8}{\K{PARAMETER}}\Tab{24}{IA5List}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{6}}
+\L{\LB{}}
+\L{\LB{userNotLoggedIn}}
+\L{\LB{}\Tab{8}{\K{ERROR}}}
+\L{\LB{}\Tab{8}{::=}\Tab{24}{7}}
+\L{\LB{}}
+\L{\LB{\C{}\-\- types}}
+\CE{}\L{\LB{}}
+\L{\LB{IA5List ::=}}
+\L{\LB{}\Tab{8}{\K{SEQUENCE} \K{OF} IA5String}}
+\L{\LB{}}
+\L{\LB{UTCResult ::=}}
+\L{\LB{}\Tab{8}{UniversalTime}}
+\L{\LB{}}
+\L{\LB{TimeResult ::=}}
+\L{\LB{}\Tab{8}{\K{INTEGER}}}
+\L{\LB{}}
+\L{\LB{GenResult ::=}}
+\L{\LB{}\Tab{8}{GeneralizedTime}}
+\L{\LB{}}
+\L{\LB{\K{END}}}

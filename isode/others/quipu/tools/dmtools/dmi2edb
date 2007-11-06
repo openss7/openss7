@@ -1,0 +1,17 @@
+#!/bin/sh
+nawk ' BEGIN {
+	FS = "="
+}
+
+/^!*i(attr|nherit)/ {
+	i = index($0, "=")
+	n = split(substr($0, i + 1), vals, "~")
+	printf "%s=%s", $1, vals[1]
+	for (j = 2; j <= n; j++)
+		printf "\n%s", vals[j]
+	printf "\n"
+	next
+}
+{
+	print $0
+} '

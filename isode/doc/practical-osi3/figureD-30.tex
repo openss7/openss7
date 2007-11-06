@@ -1,0 +1,21 @@
+\File{figureD\-30.py},{08:27},{Mar 12 1991}
+\L{\LB{dnsMatch (dns: Domain; base: DN; matches: \K{SET} \K{OF} DN): \K{SET} \K{OF} DN}}
+\L{\LB{\{}}
+\L{\LB{    i: \K{INTEGER};}}
+\L{\LB{    x: DN;}}
+\L{\LB{    dlist, dprev: \K{SET} \K{OF} DN;}}
+\L{\LB{    dp: Domain;}}
+\L{\LB{}}
+\L{\LB{    dp = dns;}}
+\L{\LB{}}
+\L{\LB{    \K{FOR} (; \K{TRUE}; )}}
+\L{\LB{        \K{IF} ((i = length (dp)) \< dnsLevel)}}
+\L{\LB{            \K{RETURN} matches;}}
+\L{\LB{}}
+\L{\LB{        \C{}\-\- map onto Directory Search}}
+\CE{}\L{\LB{        \C{}\-\- baseObject: `base\'}}
+\CE{}\L{\LB{        \C{}\-\- subset: oneLevel}}
+\CE{}\L{\LB{        \C{}\-\- filter:}}
+\CE{}\L{\LB{        \C{}\-\-     build filter\-item of `dp\' using equality over associatedDomain}}
+\CE{}\L{\LB{}}
+\L{\LB{...}}

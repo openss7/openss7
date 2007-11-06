@@ -1,0 +1,177 @@
+% run this through SLiTeX
+
+\documentstyle
+    [blackandwhite,landscape,oval,pagenumbers,plain,small,tgrind]{NRslides}
+
+\makeatletter
+\def\@maketitle{%
+    \newpage
+    \null
+    \setbox\z@=\vbox{%
+	\ \vskip .75em
+	\begin{center}
+	    {\huge\bf \@title \par}%	%%% was \Large
+	    \vskip .5em
+	    {\Large\bf			%%% was \large
+		\lineskip=.25em 
+		\begin{tabular}[t]{c}
+		    \@author 
+		\end{tabular}
+		\par
+	    }%
+	    \vskip .25em		%%% was .5em
+	    {\Large\bf \@date}%		%%% was \large
+	\end{center}
+	\par
+	\vskip .75em
+    }%
+    \if@ovaltitle
+	\title@ht=\ht\z@	\title@wd=\wd\z@
+	\title@@ht=\ht\z@	\title@@wd=\wd\z@
+	\divide\title@@ht by2	\divide\title@@wd by2
+	\unitlength=1sp
+    \fi
+    \box\z@
+    \if@ovaltitle
+	\vskip -\title@ht\unitlength
+	{\centering
+	    \begin{picture}(\title@wd,\title@ht)
+		\put(\title@@wd,\title@@ht){\oval(\title@wd,\title@ht)}
+	    \end{picture}
+	\par}
+    \fi
+}
+\makeatother
+
+\raggedright
+
+\begin{document}
+
+\title	{FILE TRANSFER, ACCESS\\ AND MANAGEMENT}
+\author	{Marshall T.~Rose}
+\date	{September 1, 1987}
+\maketitlepage
+
+
+\begin{bwslide}
+\ctitle	{INTRODUCTION}
+
+\begin{nrtc}
+\item	FTAM - FILE TRANSFER, ACCESS AND MANAGEMENT
+
+\item	THE OPEN SYSTEMS FILE SERVICE
+
+\item	CURRENTLY A {\bf DRAFT INTERNATIONAL STANDARD}\\
+	SOON TO ACHIEVE FULL STANDARD STATUS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{THE OPEN SYSTEMS FILE SERVICE}
+
+\begin{nrtc}
+\item	NOT ``JUST'' FILE TRANSFER
+
+\item	THE BASIC BUILDING BLOCK FOR OSI
+    \begin{nrtc}
+    \item	FILESTORE TO FILESTORE TRANSFER
+
+    \item	WORKSTATION FILE RETRIEVAL
+
+    \item	DISKLESS WORKSTATION PROTOCOL
+
+    \item	SPECIAL APPLICATIONS (e.g., PRINTING, SPOOLING)
+
+    \item	REMOTE DATABASE ACCESS
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{note}\em
+as one of the OSI applications,
+FTAM is exciting
+as we get to see how all of the lower layer services are used
+
+because of its scope,
+FTAM is challenging
+as it has a very large operating charter
+(simple file transfer, database access, remote filesystems, and so on)
+
+it is a largish undertaking:
+the spec is about 350~pages,
+the ISODE implementation (which isn't complete) is about 40K~lines of C code
+(about 25\% machine-generated, thank goodness)
+\end{note}
+
+
+\begin{note}\em
+an audience survey, who has:
+
+heard of FTAM?
+
+read the FTAM specification?
+
+*understood* the FTAM specification?
+
+heard of association control (sometimes incorrectly called CASE)?
+
+heard of unix and the C programming language?
+\end{note}
+
+
+\begin{bwslide}
+\part*	{OUTLINE}
+
+\begin{nrtc}\bf
+\item	THE VIRTUAL FILESTORE
+
+\item	THE FILE SERVICE
+
+\item	THE FILE PROTOCOL
+
+\item	ISSUES IN IMPLEMENTING THE VIRTUAL FILESTORE
+
+\item	ISSUES IN IMPLEMENTING A CLIENT OF THE VIRTUAL FILESTORE
+
+\item	FTAM STATUS
+\end{nrtc}
+\end{bwslide}
+
+\include	{filestore}
+\include	{service}
+\include	{protocol}
+\include	{responder}
+\include	{initiator}
+\include	{status}
+
+\begin{bwslide}
+\part*	{ACKNOWLEDGEMENTS}
+
+\begin{quote}\em
+this presentation is based on experiences in implementing the
+ISO Development Environment (ISODE) at NRTC,
+an openly available implementation of the upper-layers of OSI
+
+others have made significant contributions to the content and quality of this
+presentation,
+notably:
+\end{quote}
+
+\begin{nrtc}\em
+\item	at UCL: Steve Kille
+
+\item	at BRL: Mike Muuss
+
+\item	at NPL: John Pavel
+
+\item	at NRTC: John L.~Romine
+
+\item	at NMA: Einar A.~Stefferud
+\end{nrtc}
+
+also, UNIX is a trademark of at\&t bell laboratories
+\end{bwslide}
+
+\end{document}

@@ -1,0 +1,214 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{A Discipline for Meal Preparation}\label{cook:discipline}
+The previous chapter
+presented a methodology for building distributed applications,
+based on two key aspects:
+{\em abstract data types}, and {\em remote operations}.
+During the exposition of these abstract terms,
+they were related to their more concrete realization in an OSI architecture,
+namely: abstract syntax, association control, and remote operations.
+
+In the chapters that follow,
+this volume will introduce the utensils (programming tools)
+and various recipes (boilerplate routines)
+which can be used to cook-up OSI applications.
+Future editions of this volume will no doubt detail how one can prepare
+either fast food, nouvelle cuisine, or gourmet cooking.
+Given the raw power of remote operations in OSI,
+the cooking analogy is actually quite appropriate:
+some features of the remote operations service will be restricted in order to
+make the programming work more digestable!
+
+In this chapter,
+the steps described in the following chapters are introduced and placed in
+perspective.
+Throughout the remaining chapters,
+an extended example is presented to illustrate, step-by-step,
+the use of remote operations.
+
+\section	{Defining A New Service}\label{service:define}
+A collection of remote operations forms {\em only\/} a partial definition of a
+service.
+Other parts of this definition include naming and addressing information.
+Chapter~\ref{services} of \volone/ describes fully how a service is defined
+in these terms.
+Rather than reproduce that chapter in this volume,
+let us consider the essential points.
+At first reading,
+this seems complicated.
+In point of fact,
+the first definition of a service is challenging,
+defining later services is straight-forward and only marginally tedious!
+
+Here are the ones we are interested in:
+\begin{describe}
+\item[abstract syntax:]	this describes the data structures being exchanged by
+the service;
+
+\item[application context name:] this describes the protocol being used by
+the service;
+
+\item[application-entity information:] this uniquely names an entity in the
+network;
+
+\item[presentation address:] this locates an entity in the network;
+and,
+
+\item[local program:] this identifies the program on the local system which
+implements the service.
+\end{describe}
+
+We now begin the example which will be repeatedly extended in the chapters
+which follow.
+Let us suppose that we are defining the {\em ISODE Image Service},
+which offers a simple image database service.
+
+Although Chapter~\ref{services} of \volone/ defines several approaches,
+we will take the ``standard'' approach for our example:
+\begin{describe}
+\item[abstract syntax:]	defined in the \man isobjects(5) file as:
+\begin{quote}\small\begin{verbatim}
+"local service pci"      1.17.2.n.1
+\end{verbatim}\end{quote}
+If we select \verb"n" as the lowest unassigned number in the \verb"1.17.2"
+subtree, e.g., \verb"7", we might have:
+\begin{quote}\small\begin{verbatim}
+"isode image pci"      1.17.2.7.1
+\end{verbatim}\end{quote}
+
+\item[application context name:] defined in the \man isobjects(5) file as:
+\begin{quote}\small\begin{verbatim}
+"local service"          1.17.2.n.2
+\end{verbatim}\end{quote}
+Similarly, for a value of \verb"7" for \verb"n", we have:
+\begin{quote}\small\begin{verbatim}
+"isode image"          1.17.2.7.2
+\end{verbatim}\end{quote}
+
+\item[{\small application-entity information/presentation address:}]
+defined with:
+\begin{quote}\small\begin{verbatim}
+default servicestore    1.17.4.1.n  ""  ""  #p
+\end{verbatim}\end{quote}
+in the \man isoentities(5) file
+(we say that \verb"servicestore" is the ``qualifier'' portion of the service).
+If we select \verb"p" as the lowest unassigned TSAP ID between \verb"1024"
+and \verb"2047" inclusive, e.g., \verb"1040", we might have:
+\begin{quote}\small\begin{verbatim}
+default imagestore     1.17.4.1.7  ""  ""  #1040
+\end{verbatim}\end{quote}
+
+\item[local program:] defined in the \man isoservices(5) file as:
+\begin{quote}\small\begin{verbatim}
+"tsap/servicestore"    #p  program arg1 arg2 ... argN
+\end{verbatim}\end{quote}
+If we select \pgm{ros.image} as the \unix/ program implementing the {\em ISODE
+Image Service},
+we might have something like:
+\begin{quote}\small\begin{verbatim}
+"tsap/imagestore"    #1040  ros.image
+\end{verbatim}\end{quote}
+\end{describe}
+By convention,
+the names of responder programs start with \verb+"ros."+.
+
+In future releases of the software,
+a facility might be added to determine most of this information directly
+from the formal definition of the service
+(i.e., from the remote operations module described momentarily).
+
+The definition of this naming and addressing information is an administrative
+necessity.
+With this out of the way,
+let's consider the actual work that goes into building a distributed
+application which uses remote operations.
+
+\section	{Defining A Remote Operations Module}
+A {\em remote operations module\/} defines the operations
+(and associated errors) along with the abstract syntax of the data structures
+exchanged by the service.
+The \man rosy(1) program reads a description of the module and produces the
+corresponding {\em C\/} stubs and definitions used in accessing the service.
+
+In simple terms,
+what this means is that \pgm{rosy} will produce routines that
+the invoker calls that will request the operation by the performer.
+
+\section	{Defining Concrete Data Structures}
+An {\em abstract syntax module\/} defines the data structures being exchanged
+by the service.
+In many senses,
+it is equivalent to a remote operations module with the definitions of the
+operations removed.
+The \man posy(1) program reads a description of the module and produces the
+corresponding {\em C\/} structure definitions along with an augmented module
+that is read by the \pgm{pepy} compiler.
+The {\em C\/} structure definitions are used by the invoker and the
+performer,
+the run-time environment is responsible for mapping these data structures to
+the abstract syntax and then for mapping the abstract syntax to the concrete
+syntax.
+
+In simple terms,
+what this means is that the invoker and performer worry about only the
+native machine {\em C\/} structures,
+and the open systems interface is handled entirely automatically.
+
+\section	{Building An Initiator}
+In general,
+an initiator might take one of two implementational forms:
+\begin{describe}
+\item[interactive:] the user runs a program and interactively directs the
+invocation of operations;
+or,
+
+\item[embedded:] as a part of its running,
+the program automatically forms an association and invokes operations as
+required.
+\end{describe}
+The choice of form is up to the implementor.
+Note that in both cases, the initiator is also acting as the invoker.
+
+In order to speed development,
+complete boilerplate for an interactive initiator,
+along with partial boilerplate for an embedded initiator is provided.
+
+\section	{Building A Responder}
+In general,
+a responder may also take on of two implementational forms:
+\begin{describe}
+\item[single association:] each time the service is requested,
+a new instantiation of the program implementing the service is executed
+(this is termed the {\em dynamic\/} approach);
+or,
+
+\item[multiple association:] each time the service is requested,
+the request is given to a single, already executing,
+instantiation of the program which implements the service
+(this is termed the {\em static\/} approach).
+\end{describe}
+Although Section~\ref{service:define} describes how to define addressing
+information for the dynamic approach,
+it is good practice to implement each responder to be capable of operating in
+either mode and then leaving the decision to the system administrator.
+
+In order to speed development,
+complete boilerplate for a dual-approach responder is provided.
+
+\section	{Putting It All Together}
+In addition to the skeletal information above,
+a set of consistent policies for file names, rules for \man make(1), and so on,
+are needed.
+These will be introduced at the appropriate time.
+
+It is important to understand that this volume
+defines {\bf one\/} possible discipline for using remote operations.
+There are, of course, {\bf many\/} possible disciplines for accomplishing the
+same goal.
+(And some will most likely be vastly superior.)
+The particular discipline described in {\sl The Applications Cookbook} was
+chosen primarily for its balance of relative simplicity and extensibility.
+For some developers, it will still be too under done;
+if this is the case, you are encouraged to build further cooked interfaces
+on top of these facilities.

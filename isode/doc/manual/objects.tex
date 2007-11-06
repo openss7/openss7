@@ -1,0 +1,90 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{The ISODE Objects Database}\label{isobjects}
+The database \file{isobjects} in the ISODE \verb"ETCDIR" directory
+(usually \file{/usr/etc/})
+contains a simple mapping between
+object descriptors and object identifiers.
+
+The database itself is an ordinary ASCII text file containing information
+regarding the known objects on the host.
+Each line contains
+\begin{itemize}
+\item	the descriptor of the object, a simple string; and,
+
+\item	the corresponding object identifier.
+\end{itemize}
+Blanks and/or tab characters are used to separate items.
+However, double-quotes may be used to prevent separation for items containing
+embedded whitspace.
+The sharp character (`\verb"#"') at the beginning of a line indicates a
+commentary line.
+
+\section	{Accessing the Database}\label{isobject}
+The \man libpsap(3) library contains the routines used to access the
+database.
+These routines ultimately manipulate an \verb"isobject" structure,
+which is the internal form.
+\begin{quote}\index{isobject}\small\begin{verbatim}
+struct isobject {
+    char          *io_descriptor;
+
+    OIDentifier    io_identity;
+};
+\end{verbatim}\end{quote}
+The elements of this structure are:
+\begin{describe}
+\item[\verb"io\_descriptor":] the object descriptor; and,
+
+\item[\verb"io\_identity":] the object identifier.
+\end{describe}
+
+The routine \verb"getisobject" reads the next entry in the database,
+opening the database if necessary.
+\begin{quote}\index{getisobject}\small\begin{verbatim}
+struct isobject *getisobject ()
+\end{verbatim}\end{quote}
+It returns the manifest constant \verb"NULL" on error or end-of-file.
+
+The routine \verb"setisobject" opens and rewinds the database.
+\begin{quote}\index{setisobject}\small\begin{verbatim}
+int     setisobject (f)
+int     f;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"f":] the ``stayopen'' indicator,
+if non-zero, then the database will remain open over subsequent calls to the
+library.
+\end{describe}
+The routine \verb"endisobject" closes the database.
+\begin{quote}\index{endisobject}\small\begin{verbatim}
+int     endisobject ()
+\end{verbatim}\end{quote}
+Both of these routines return non-zero on success and zero otherwise.
+
+There are two routines used to fetch a particular entry in the database.
+The routine \verb"getisobjectbyname" maps object descriptors into
+the internal form.
+\begin{quote}\index{getisobjectbyname}\small\begin{verbatim}
+struct isobject *getisobjectbyname (descriptor)
+char   *descriptor;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"descriptor":] the descriptor of the object.
+\end{describe}
+and returns the \verb"isobject" structure describing that object.
+On failure, the manifest constant \verb"NULL" is returned instead.
+
+The routine \verb"getisobjectbyoid" performs the inverse function.
+\begin{quote}\index{getisobjectbyoid}\small\begin{verbatim}
+struct isobject *getisobjectbyoid (oid)
+OID     oid;
+\end{verbatim}\end{quote}
+The parameter to this procedure is:
+\begin{describe}
+\item[\verb"oid":] the identifier of the object.
+\end{describe}
+On a successful return,
+an \verb"isobject" structure describing the object is returned.

@@ -1,0 +1,21 @@
+\File{figureS\-7.c},{11:21},{May  5 1990}
+\L{\LB{\K{static}  \K{int}     lastq = \-1;}}
+\L{\LB{}}
+\L{\LB{\K{static}  \K{int}     ipforwarding;}}
+\L{\LB{\K{\#define} FORW\_GATEWAY}\Tab{24}{1}}
+\L{\LB{\K{\#define} FORW\_HOST}\Tab{24}{2}}
+\L{\LB{}}
+\L{\LB{\K{static}  \K{struct} ipstat ipstat;}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{int}  o\_ip (oi, v, offset)}}
+\L{\LB{OI      oi;}}
+\L{\LB{\K{register} \K{struct} type\_SNMP\_VarBind *v;}}
+\L{\LB{\K{int}     offset;}}
+\L{\LB{\{}}
+\L{\LB{    \K{int}     ifvar;}}
+\L{\LB{    \K{register} \K{struct} ipstat *ips = \&ipstat;}}
+\L{\LB{    \K{register} OID    oid = oi \-\> oi\_name;}}
+\L{\LB{    \K{register} OT     ot = oi \-\> oi\_type;}}
+\L{\LB{    OID}\Tab{8}{    new;}}
+\L{\LB{}}
+\L{\LB{    ifvar = (\K{int}) ot \-\> ot\_info;}}

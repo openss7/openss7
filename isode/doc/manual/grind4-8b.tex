@@ -1,0 +1,23 @@
+\File{grind4\-8b.py},{11:13},{Jul  4 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{Date}Date ::=}}
+\L{\LB{}\Tab{8}{[\K{APPLICATION} 3]}}
+\L{\LB{}\Tab{8}{    \K{IMPLICIT} IA5String \C{}\-\- YYYYMMDD \-\-\CE{}}}
+\L{\LB{}\Tab{8}{    [[s Date]]}}
+\L{\LB{}\Tab{8}{    \%\{}}
+\L{\LB{}\Tab{16}{int year, month, day;}}
+\L{\LB{}\Tab{16}{static char buffer[BUFSIZ];}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{if (sscanf (Date, \S{}\"\%4d\%2d\%2d\"\SE{}, \&year, \&month, \&day) != 3}}
+\L{\LB{}\Tab{24}{\|\| year \< 1900 \|\| month \< 1 \|\| month \> 12}}
+\L{\LB{}\Tab{24}{\|\| day \< 1 \|\| day \> 31)}}
+\L{\LB{}\Tab{16}{    adios (NULLCP, \S{}\"bad date format: \%s\"\SE{}, Date);}}
+\L{\LB{}\Tab{16}{(void) sprintf (buffer, \S{}\"\%02d \%s \%4d\"\SE{}, day,}}
+\L{\LB{}\Tab{24}{    months[month \- 1], year);}}
+\L{\LB{}\Tab{16}{Date = buffer;}}
+\L{\LB{}\Tab{8}{    \%\}}}
+\L{\LB{}}
+\L{\LB{\K{END}}}
+\L{\LB{}}
+\L{\LB{...}}

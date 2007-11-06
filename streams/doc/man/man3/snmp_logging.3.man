@@ -1,0 +1,480 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: snmp_logging.3.man,v 0.9.2.1 2007/10/13 08:54:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/10/13 08:54:34 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: snmp_logging.3.man,v $
+.\" Revision 0.9.2.1  2007/10/13 08:54:34  brian
+.\" - added MIB agent files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so streams.macros
+.\"
+.\"
+.TH SNMP_LOGGING 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B init_snmp_logging, snmp_get_do_logging, snmp_disable_syslog, snmp_disable_filelog, snmp_disable_stderrlog, snmp_disable_calllog, snmp_disable_log, snmp_enable_syslog, snmp_enable_filelog, snmp_enable_stderrlog, snmp_enable_callog, snmp_log, snmp_vlog, snmp_log_perror
+\- SNMP logging API functions
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP
+\fBvoid\fP init_snmp_logging(\fBvoid\fP);
+.HP
+\fBint\fP snmp_get_do_logging(\fBvoid\fP);
+.HP
+\fBvoid\fP snmp_disable_syslog(\fBvoid\fP);
+.PD 0
+.HP
+\fBvoid\fP snmp_disable_filelog(\fBvoid\fP);
+.HP
+\fBvoid\fP snmp_disable_stderrlog(\fBvoid\fP);
+.HP
+\fBvoid\fP snmp_disable_calllog(\fBvoid\fP);
+.HP
+\fBvoid\fP snmp_disable_log(\fBvoid\fP);
+.PD
+.HP
+\fBvoid\fP snmp_enable_syslog(\fBvoid\fP);
+.PD 0
+.HP
+\fBvoid\fP snmp_enable_filelog(\fBconst char *\fP\fIlogfilename\fP, \fBint\fP \fIdont_zero_log\fP);
+.HP
+\fBvoid\fP snmp_enable_stderrlog(\fBvoid\fP);
+.HP
+\fBvoid\fP snmp_enable_calllog(\fBvoid\fP);
+.PD
+.HP
+\fBint\fP snmp_log(\fBint\fP \fIpriority\fP, \fBconst char *\fP\fIformat\fP, ...);
+.PD 0
+.HP
+\fBint\fP snmp_vlog(\fBint\fP \fIpriority\fP, \fBconst char *\fP\fIformat\fP, \fBva_list\fP \fIap\fP);
+.PD
+.HP
+\fBvoid\fP snmp_log_perror(\fBconst char *\fP\fIs\fP);
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I logfilename
+Specifies the full path to a log file.
+.TP
+.I dont_zero_log
+When true (non-zero), specifies that the log file should not be truncated
+before appending logs.  When false (0), specifies that the log file should be
+truncated before appending logs.
+.TP
+.I priority
+Specifies the priority of the log message.  The priority corresponds to the
+.BR syslog (3)
+.I level
+argument and may be one of:
+.BR LOG_EMERG ,
+.BR LOG_ALERT ,
+.BR LOG_CRIT ,
+.BR LOG_ERR ,
+.BR LOG_WARNING ,
+.BR LOG_NOTICE ,
+.BR LOG_INFO ,
+.BR LOG_DEBUG .
+.TP
+.I format
+Specifies a
+.BR printf (3)
+style format string.
+.TP
+.I ap
+Specifies variable arguments to the
+.B va_args
+version
+.BR snmp_vlog ().
+.TP
+.I s
+Specifies a
+.BR perror (3)
+style prefix string to the
+.BR snmp_perror ()
+function.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR UCD-SNMP .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B snmp_logging
+API provides a set of functions that control the logging of error and other
+informational messages for SNMP agents and sub-agents using the UCD-SNMP
+libraries.  This manual page provides information about the user-visible SNMP
+logging API functions.
+.\"
+.SS init_snmp_logging\fR()
+.PP
+Initializes SNMP logging in the SNMP library.  SNMP logging does not normally
+need to be explicitly initialized and is normally initialized by other SNMP
+library initialization functions.  This function is called by
+.BR init_snmp ()
+and does not need to be called by the user.
+.\"
+.SS snmp_get_do_logging\fR()
+.PP
+Establishes whether logging is in effect to any of the four logging sinks.
+The four logging sinks are the system logs (syslog), a file log (filelog),
+standard error (stderrlog) or the callback log (calllog).  When logging is not
+in effect to any of these sinks,
+.BR snmp_get_do_logging ()
+returns false (0); otherwise, if logging is in effect to any of these sinks,
+it returns true (1).
+.\"
+.SS snmp_disable_syslog\fR()
+.PP
+Disables logging to the system logs.
+.\"
+.SS snmp_disable_filelog\fR()
+.PP
+Disables logging to the file log.
+.\"
+.SS snmp_disable_stderrlog\fR()
+.PP
+Disables logging to standard error.
+.\"
+.SS snmp_disable_calllog\fR()
+.PP
+Disables logging to the callback log.
+.\"
+.SS snmp_disable_log\fR()
+.PP
+Disables logging to the system logs (syslog), the file log (filelog), standard
+error (stderrlog) and the callback log (calllog).  After a call to
+.BR snmp_disable_log (),
+.BR snmp_get_do_logging ()
+will return false (0).
+.\"
+.SS snmp_enable_syslog\fR()
+.PP
+Enables logging to the system logs.
+.\"
+.SS snmp_enable_filelog\fR()
+.PP
+Enables logging to the file log.
+.I logfilename
+specifies the full path to the file name to which logging is to commence.
+.I dont_zero_log
+specifies whether the log should be truncated or appended to.  When
+.I dont_zero_log
+is true (!0), information will be appended to the end of the log file;
+otherwise false (0), the file will be truncated first.
+.\"
+.SS snmp_enable_stderrlog\fR()
+.PP
+Enables logging to standard error.
+.\"
+.SS snmp_enable_calllog\fR()
+.PP
+Enables logging to the callback log.
+.\"
+.SS snmp_log\fR()
+.PP
+.I priority
+provides the log priority in the form of the
+.I level
+argument to 
+.BR syslog (3),
+and can take on the following values:
+.RS
+.TP \w'\fBLOG_WARNING\fR\(em'u
+.B LOG_EMERG
+system is unusable;
+.PD 0
+.TP
+.B LOG_ALERT
+action must be taken immediately;
+.TP
+.B LOG_CRIT
+critical conditions;
+.TP
+.B LOG_ERR
+error conditions;
+.TP
+.B LOG_WARNING
+warning conditions;
+.TP
+.B LOG_NOTICE
+normal, but significant, condition;
+.TP
+.B LOG_INFO
+informational message;
+.TP
+.B LOG_DEBUG
+debug-level message.
+.PD
+.RE
+.PP
+.I format
+provides a
+.BR printf (3)
+style format string, and the remainder of the arguments are used to complete
+the format string into a specific message.
+.PP
+.BR snmp_log ()
+returns zero (0), when successful; minus one (-1), when formatting fails; and,
+minus two (-2) when memory could not be allocated for formatting.
+.\"
+.SS snmp_vlog\fR()
+.PP
+This is the
+.B va_args
+version of
+.BR snmp_log ().
+.\"
+.SS snmp_log_perror\fR()
+.PP
+Provides a log message, in the style of
+.BR perror (3),
+which is logged at level
+.BR LOG_ERR .
+.\"
+.\"
+.SH USAGE
+.PP
+Because
+.BR init_snmp ()
+calls
+.BR init_snmp_logging (),
+the later is not usually called directly by the user.  After
+.BR init_snmp ()
+is called, it is typical to set logging options similar to the following:
+.sp
+.nf
+\fC\s-1\
+{
+    ...
+    init_snmp();
+    ...
+    snmp_disable_log();
+
+    if (log_to_file)
+        snmp_enable_filelog(logfilename, dont_zero);
+    if (log_to_stderr)
+        snmp_enable_stderrlog();
+    if (log_to_syslog)
+        snmp_enable_syslog();
+    if (log_to_calllog)
+        snmp_enable_calllog();
+
+    ...
+
+    snmp_log(LOG_NOTICE, "notice: %s\\n", "hello");
+
+    ...
+
+    if (errno == EINVAL)
+        snmp_log_perror("myprogram");
+    ...
+
+    snmp_disable_log();
+    shutdown_snmp();
+}
+\s+1\fP
+.fi
+.\"
+.\"
+.SH RETURN VALUE
+.PP
+.BR init_snmp_logging (),
+.BR snmp_disable_syslog (),
+.BR snmp_disable_filelog (),
+.BR snmp_disable_stderrlog (),
+.BR snmp_disable_calllog (),
+.BR snmp_disable_log (),
+.BR snmp_enable_syslog (),
+.BR snmp_enable_filelog (),
+.BR snmp_enable_stderrlog (),
+.BR snmp_enable_calllog (),
+.BR snmp_log_perror (),
+are always successful (or fail silently) and return
+.BR void .
+.PP
+.BR snmp_get_do_logging (),
+returns true (1) when logging is in effect to one of the logging sinks; and
+returns false (0) when logging is not in effect to any sink.
+.PP
+.BR snmp_log (),
+.BR snmp_vlog (),
+return zero (0), when logging is successful;
+minus one (-1), when the format string was in error;
+minus two (-2), when memory could not be allocated to format the string.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR snmp_log (),
+.BR snmp_vlog (),
+fail, they return a negative error code as follows:
+.TP
+.B -1
+The format string was in error.  This error can be avoided by declaring
+.BR snmp_log ()
+in such a way that the compiler ensures that the format string is correct.
+.TP
+.B -2
+Memory could not be allocated to format the buffer.
+.PP
+The other
+.B snmp_logging
+API functions do not provide any informative error codes and most fail
+silently.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.I DS_LIBRARY_ID
+boolean
+.I DS_LIB_LOG_TIMESTAMP
+provides a mechanism whereby prefixing of a timestamp can be controlled when
+logging is performed to a file log or standard error log.  Setting this
+boolean to true with
+.BR ds_set_boolean ()
+will result in prefixing of timestamps to file and standard error logs.
+Setting it to false will result in no timestamps being prefixed to file and
+standard error logs.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR snmp_vlog ()
+is implemented using
+.BR vsnprintf (3).
+.BR snmp_log ()
+and
+.BR snmp_perror ()
+are implemented using
+.BR snmp_vlog ().
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR default_store (3),
+.BR snmp_api (3),
+.BR snmp_agent_api (3).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B snmp_logging
+API functions have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+Note that NET-SNMP uses the constants
+.IR NETSNMP_DS_LIBRARY_ID " and " NETSNMP_DS_LIB_LOG_TIMESTAMP
+instead of
+.IR DS_LIBRARY_ID " and " DS_LIB_LOG_TIMESTAMP .
+Also, NET-SNMP uses the
+.BR netsnmp_ds_set_boolean ()
+function instead of
+.BR ds_set_boolean ().
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Conformance of logging APIs is not standardized.  This implementation of the
+.B snmp_logging
+API corresponds to the UCD-SNMP implementation, version 4.2.5.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B snmp_logging
+API functions first appeared in UCD-SNMP 4.0.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.TI

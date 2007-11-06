@@ -1,0 +1,39 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \rlap{\kern  0.375in\lower 1.791in\hbox to 0pt{\hss ANSI\hss}}%
+    \rlap{\kern  1.875in\lower 0.291in\hbox to 0pt{\hss ISO/IEC\hss}}%
+    \rlap{\kern  3.375in\lower 1.791in\hbox to 0pt{\hss NIST\hss}}%
+    \rlap{\kern  1.875in\lower 3.291in\hbox to 0pt{\hss IMPLEMENTORS\hss}}%
+    \special{pn 30}%
+    \special{pa 1414 557}%
+    \special{pa 1500 500}%
+    \special{fp}%
+    \special{pa 1397 510}%
+    \special{pa 1500 500}%
+    \special{fp}%
+    \special{ar 1873 1561 1125 1125  3.195  4.375}%
+    \special{pa 2970 1402}%
+    \special{pa 3000 1500}%
+    \special{fp}%
+    \special{pa 3020 1399}%
+    \special{pa 3000 1500}%
+    \special{fp}%
+    \special{ar 1877 1561 1125 1125  5.051  6.230}%
+    \special{pa 2336 2943}%
+    \special{pa 2250 3000}%
+    \special{fp}%
+    \special{pa 2353 2990}%
+    \special{pa 2250 3000}%
+    \special{fp}%
+    \special{ar 1877 1939 1125 1125  0.054  1.233}%
+    \special{pn 20}%
+    \kern  3.376in
+  }\vss}%
+  \kern  3.292in
+}

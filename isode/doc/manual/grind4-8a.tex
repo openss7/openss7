@@ -1,0 +1,35 @@
+\File{grind4\-8a.py},{11:13},{Jul  4 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\Proc{ChildInformation}ChildInformation ::=}}
+\L{\LB{}\Tab{8}{\K{SET} \{}}
+\L{\LB{}\Tab{16}{Name}}
+\L{\LB{}\Tab{16}{\%\{}}
+\L{\LB{}\Tab{16}{    printf (\S{}\"\!nChild Information\!nName: \%s \%s. \%s\!n\"\SE{},}}
+\L{\LB{}\Tab{24}{givenName, initial, familyName);}}
+\L{\LB{}\Tab{16}{\%\},}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    dateofBirth[0]}}
+\L{\LB{}\Tab{16}{Date}}
+\L{\LB{}\Tab{16}{\%\{ printf (\S{}\"Date of Birth: \%s\!n\"\SE{}, Date); \%\}}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}}
+\L{\LB{\Proc{Name}Name ::=}}
+\L{\LB{}\Tab{8}{[\K{APPLICATION} 1]}}
+\L{\LB{}\Tab{8}{    \K{IMPLICIT} \K{SEQUENCE} \{}}
+\L{\LB{}\Tab{16}{givenName}}
+\L{\LB{}\Tab{16}{    IA5String [[s givenName]],}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{initial}}
+\L{\LB{}\Tab{16}{    IA5String [[s initial]],}}
+\L{\LB{}}
+\L{\LB{}\Tab{16}{familyName}}
+\L{\LB{}\Tab{16}{    IA5String [[s familyName]]}}
+\L{\LB{}\Tab{8}{    \}}}
+\L{\LB{}}
+\L{\LB{\Proc{EmployeeNumber}EmployeeNumber ::=}}
+\L{\LB{}\Tab{8}{[\K{APPLICATION} 2]}}
+\L{\LB{}\Tab{8}{    \K{IMPLICIT} \K{INTEGER}}}
+\L{\LB{}\Tab{8}{    \%\{ printf (\S{}\"Employee Number: \%d\!n\"\SE{}, \$\$); \%\}}}
+\L{\LB{}}
+\L{\LB{...}}

@@ -1,0 +1,20 @@
+\File{figureA\-57.c},{20:14},{Jun 19 1989}
+\L{\LB{\Proc{do\_error}do\_error (sd, id, error, parameter, roi)}}
+\L{\LB{\K{int}}\Tab{8}{sd;}}
+\L{\LB{\K{int}}\Tab{8}{id,}}
+\L{\LB{}\Tab{8}{error;}}
+\L{\LB{caddr\_t parameter;}}
+\L{\LB{\K{struct} RoSAPindication *roi;}}
+\L{\LB{\{}}
+\L{\LB{    \K{switch} (error) \{}}
+\L{\LB{}\Tab{8}{\K{case} RY\_REJECT:}}
+\L{\LB{}\Tab{8}{\{}}
+\L{\LB{}\Tab{8}{    \K{int}}\Tab{16}{    reason = (\K{int}) parameter;}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \C{}\/* do something with ``reason\'\' here... *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}\Tab{8}{\}}}
+\L{\LB{}\Tab{8}{}}
+\L{\LB{...}}
+\L{\LB{}}

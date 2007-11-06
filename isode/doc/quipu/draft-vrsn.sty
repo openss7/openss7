@@ -1,0 +1,41 @@
+%  SEK - draft.sty - modified from lcustom.tex
+
+
+\def\draftstring{\tt Draft}
+
+\def\draftext{\tt Draft \versiontag/ of \versiondate/}
+
+\def\versiontag/{%
+    \gdef\versiontag/{\#0}%
+    \gdef\versiondate/{\today}%
+    \@input{\jobname.vrsn}%6
+    \versiontag/%
+}
+\def\versiondate/{%
+    \gdef\versiontag/{\#0}%
+    \gdef\versiondate/{\today}%
+    \@input{\jobname.vrsn}%
+    \versiondate/%
+}
+
+    \@ifundefined{ds@draft}{}{\ds@draft}%
+
+    
+   \gdef\ps@plain{%
+	\let\@mkboth=\@gobbletwo
+	\def\@oddhead{\draftext\hfil}%
+	\def\@oddfoot{\draftstring\hfil\rm\thepage\hfil\draftstring}%
+	\def\@evenhead{\hfil\draftext}%
+	\let\@evenfoot=\@oddfoot
+    }%
+    \let\ps@@headings=\ps@headings
+    \gdef\ps@headings{%
+	\ps@@headings
+	\def\@oddfoot{\draftext\hfil}%
+	\def\@evenfoot{\hfil\draftext}%
+     }%
+
+
+\let\title\relax
+\def\title#1{\gdef\@title{#1 { \large  \\ \draftext
+}}}

@@ -1,0 +1,11 @@
+\File{figureS\-11.c},{11:21},{May  5 1990}
+\L{\LB{\Proc{switch}    \K{switch} (offset) \{}}
+\L{\LB{}\Tab{8}{\K{case} type\_SNMP\_PDUs\_get\_\_request:}}
+\L{\LB{}\Tab{8}{    \K{if} (oid \-\> oid\_nelem != ot \-\> ot\_name \-\> oid\_nelem + IFN\_SIZE)}}
+\L{\LB{}\Tab{16}{\K{return} int\_SNMP\_error\_\_status\_noSuchName;}}
+\L{\LB{}\Tab{8}{    \K{if} ((rt = get\_rtent (oid \-\> oid\_elements + oid \-\> oid\_nelem}}
+\L{\LB{}\Tab{40}{\- IFN\_SIZE, IFN\_SIZE, rts\_inet, 0))}}
+\L{\LB{}\Tab{16}{    == NULL)}}
+\L{\LB{}\Tab{16}{\K{return} int\_SNMP\_error\_\_status\_noSuchName;}}
+\L{\LB{}\Tab{8}{    \K{break};}}
+\L{\LB{}}

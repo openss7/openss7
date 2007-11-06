@@ -1,0 +1,36 @@
+.PS 8.5i
+.ps 20
+## figure 9
+ellipsewid = ellipsewid*3/2
+ellipseht = ellipseht*5/4
+linewid = linewid*3/2
+##
+B1:     ellipse "\sf RO spec"
+B2:     box "\sf RO" "\sf compiler" \
+                with .w at (B1.e.x+linewid, B1.e.y)
+        arrow from B1.e to B2.w
+B2a:    ellipse invis with .s at (B2.n.x, B2.n.y+lineht)
+B2b:    ellipse "\sf stub" "\sf defs/tables" "\sf for operations" \
+                with .c at B2a.c width 9*ellipsewid/8 height 9*ellipseht/8
+        arrow from B2.n to B2b.s
+##
+B3:     box "\sf structure" "\sf generator" \
+                with .w at (B2.e.x+linewid, B2.e.y)
+        arrow from B2.e to B3.w
+B3a:    ellipse invis with .s at (B3.n.x, B3.n.y+lineht)
+B3b:    ellipse "\sf structure defs" "\sf for data types" \
+                with .c at B3a.c width 9*ellipsewid/8 height 9*ellipseht/8
+        arrow from B3.n to B3b.s
+##
+B4:     box "\sf encoder/decoder" "\sf genertor" \
+                with .w at (B3.e.x+linewid, B3.e.y)
+        arrow from B3.e to B4.w
+B4a:    ellipse invis with .s at (B4.n.x, B4.n.y+lineht)
+B4b:    ellipse "\sf conversion" "\sf routines" "\sf for data types" \
+                with .c at B4a.c width 9*ellipsewid/8 height 9*ellipseht/8
+        arrow from B4.n to B4b.s
+##
+        box dashed with .nw at (B2a.w.x-linewid/2, B2a.n.y+lineht/2) \
+                height ellipseht+boxht width B4a.e.x-B2a.w.x+boxwid
+##
+.PE

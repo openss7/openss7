@@ -1,0 +1,988 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Maintenance}
+Now that your Level-1 DSA has successfully joined the pilot project DMD,
+you must maintain your portion of the Directory tree.
+
+\section	{A file you should know about}
+The file \file{quiputailor} file in the \file{quipu/wildlife/} directory
+contains runtime configuration for your Level-1 DSA.
+It was automatically created earlier.
+
+Section~13.3 of \volfive/ discusses the options available for run-time
+tailoring.
+Typically,
+you will not need to edit this file.
+
+\section	{Nightly Maintenance}
+One of the last tasks performed when you Level-1 DSA joined the pilot project
+DMD was to direct your system to run a shell script, \file{nightly.sh}.
+This script performs two tasks:
+\begin{itemize}
+\item	it mails your logs to the pilot project sponsors
+	(this is only a temporary measure to aid our understanding of
+	how the software is behaving);
+	and,
+
+\item	it cycles your logs.
+\end{itemize}
+You might wish to modify this script so that you are also informed of the
+activities of your Level-1 DSA.
+Actually, the logs record only crude information.
+During the course of the pilot project,
+the pilot software might be upgraded to provide more meaningful information.
+This will be examined as experience is gained.
+
+\subsection	{Logs}
+The pilot software does a lot of logging.
+There are two logs which are generated,
+the first,
+\file{dsap.log},
+contains information on general DSA activity,
+whilst the second,
+\file{stats.log},
+contains statistical information on the DSA.
+
+\subsection	{Limiting the size of Logs}
+If your Level-1 DSA is particularly busy,
+it may generate large logs.
+As such,
+you might find it desirable to limit the maximum size that a log may grow to.
+Since two logs are generated,
+one for DSA activity and the other for statistics,
+you will need to make two edits.
+
+Look at the \file{quiputailor} file in the \file{quipu/wildlife/} directory.
+There should be four lines similar to this:
+\begin{quote}\small\begin{verbatim}
+# minimal logging
+dsaplog	level=exceptions dflags=tty file=dsap.log
+
+# full statistics
+stats	level=all dflags=tty file=stats.log
+\end{verbatim}\end{quote}
+Add the string \verb"size=100" at the end of the two lines,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+# minimal logging
+dsaplog	level=exceptions dflags=tty file=dsap.log size=100
+
+# full statistics
+stats	level=all dflags=tty file=stats.log size=100
+\end{verbatim}\end{quote}
+This will limit the size of each log to 100~Kbytes.
+If you wish other limits,
+change the value \verb"100" accordingly.
+
+\subsection	{Reading Logs}
+This is currently a black art.
+When the sponsors of the pilot project have mastered this,
+\theguide/ will be updated accordingly.
+In the meantime,
+if you figure something out,
+share it with the \verb"wpp-camayocs" list.
+Have fun.
+
+\section	{Adding Entries}
+Now comes the fun part:
+entering data into the Directory.
+In general,
+there are two kinds of activities:
+small, incremental changes are best made using \man dish(1c).
+However,
+for the wholesale entry of massive amounts of data,
+the easiest way is to run your favorite text editor and create EDB files
+manually. 
+(In a future release of the pilot project software,
+more management tools will be available to automate this process somewhat.)
+
+Note that if you edit the EDB files directly,
+you {\bf must\/} tell your DSA to re-read these files after you are done
+editing.
+This is accomplished by either killing and restarting the DSA
+or using the \switch"refresh" option to the \pgm{dish} command
+\verb"dsacontrol".
+
+To aid the process,
+a number of templates for the objects you might add are found in the directory
+\file{quipu/templates/}:
+\begin{quote}\begin{tabular}{rl}
+\file{alias}&	\verb"alias" object\\
+\file{dsa}&	Level-2 DSA\\
+\file{person}&	\verb"pilotPerson" object\\
+\file{role}&	\verb"organizationalRole" object\\
+\file{unit}&	\verb"organizationalUnit" object
+\end{tabular}\end{quote}
+Each of these files contains editing instructions.
+
+In the \file{quipu/} source directory,
+there is a program called \pgm{testedb},
+which can be used to check EDB files for correctness:
+\begin{quote}\small\begin{verbatim}
+% cd quipu/
+% ./make testedb
+% ./testedb < EDB
+\end{verbatim}\end{quote}
+The \pgm{testedb} program will find the vast majority of errors in an EDB file.
+It can not however,
+find errors due to schema violation
+(i.e., not conforming to the \verb"treeStructure" attribute of the EDB's
+parent).
+If your DSA fails to boot properly,
+the log will indicate:
+\begin{quote}\small\begin{verbatim}
+DSA Halted
+\end{verbatim}\end{quote}
+In this case,
+invoke the DSA interactively to determine the cause of the problem,
+e.g.,
+\begin{quote}\small\begin{verbatim}
+% $(SBINDIR)ros.quipu -t ./quiputailor
+Schema error in entry ending line 16...
+*** Attribute error ***
+<<DN of entry in error>>
+Attribute type objectClass - Constrain violation
+File ...wildlife/c=US/o=O_i/EDB not loaded
+FATAL ERROR: DSA Halted
+\end{verbatim}\end{quote}
+
+\subsection	{Using Dish}
+If you use the first approach,
+then your Level-1 DSA will automatically update the database directory.
+Thus,
+all you need be able to do is run one of the user interfaces.
+
+First, identify yourself to \pgm{dish} as the manager of the DSA holding the
+entries you want to modify:
+\begin{quote}\smaller\begin{verbatim}
+% dish -c "wildlife name" -user "c=US@o=O_i@cn=Manager" -simple
+Welcome to Dish (DIrectory SHell)
+Enter password for "c=US@o=O_i@cn=Manager":
+Dish ->
+\end{verbatim}\end{quote}
+You can now use the \verb"add" and \verb"modify" commands as appropriate.
+For the \verb"add" command,
+it is suggested you start with one of the supplied templates, e.g.,
+\begin{quote}\small\begin{verbatim}
+Dish -> add ou=Corporate -template $(ETCDIR)quipu/templates/unit
+\end{verbatim}\end{quote}
+will create a new organizational unit under the current node.
+
+The only tricky part is when objects of class \verb"organizationalUnit" or
+\verb"dsa" are added.
+
+\section	{Adding organizationalUnits}
+When an organizational unit is added,
+you must also modify the entries for the DSAs holding MASTER or SLAVE copies
+of the subordinates of the organizational unit.
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	At the present time, the pilot sponsors strongly recommend
+		against adding Level-2 DSAs.
+
+		A Level-2 DSA should be added only when a Level-1 DSA is too
+		large to run on an available system.  In this case,
+		a Level-2 DSA can be used to reduce the memory requirements
+		on the system running the Level-1 DSA.
+\end{tabular}}\]
+
+If the organizational unit is to be mastered by your Level-1 DSA,
+then the procedure is straight-forward:
+First,
+create a directory in your \file{wildlife/c=US/o=O\_i/} directory with
+the name of the organizational unit, e.g.,
+\begin{quote}\smaller\begin{verbatim}
+wildlife/c=US/o=Performance Systems International/ou=Corporate
+\end{verbatim}\end{quote}
+Second,
+create an \file{EDB} file in this \unix/ directory containing information on
+the entries in that organizational unit.
+Third,
+create an entry for that organizational unit in the Directory,
+e.g., by running \pgm{dish}, moving to your organization's entry,
+typing:
+\begin{quote}\small\begin{verbatim}
+Dish -> add ou=Corporate -template $(ETCDIR)quipu/templates/unit
+\end{verbatim}\end{quote}
+and then following the editing instructions in the file.
+
+\section	{Inherited Attributes}
+In order to make your EDB files (and in-core Directory) smaller,
+you can use attribute inheritance.
+
+There are a lot of possibilities,
+rather than list them all,
+here are the smallest number of steps to get the biggest savings:
+\begin{enumerate}
+\item	Look at each \verb"quipuNonLeafObject" in your part of the DIT
+(e.g., all the organizational units).
+
+\item	For each of these,
+add an attribute like this:
+\begin{quote}\smaller\begin{verbatim}
+iattr= $ default (
+acl= self # write # entry
+acl= others # read # entry
+acl= self # write # default
+acl= others # read # default
+acl= self # write # attributes # userPassword
+acl= others # compare # attributes # userPassword
+streetAddress
+postOfficeBox
+physicalDeliveryOfficeName
+stateOrProvinceName
+postalCode
+postalAddress
+telephoneNumber
+facsimileTelephoneNumber
+objectClass= top & quipuObject & person & thornPerson & pilotPerson
+)
+\end{verbatim}\end{quote}
+If the entry doesn't have some of these attributes listed above,
+then don't include those attributes in the \verb"iattr" list.
+
+\item	For each immediate child of these entries,
+if the child has an objectClass value of \verb"pilotPerson",
+remove {\bf all\/} the objectClass values.
+Next,
+if the child entry has a different value for any of the other attributes in
+the \verb"iattr" list in the parent,
+then that value should be present in the child,
+otherwise remove it.  
+\end{enumerate}
+
+One interesting variation on this is to specify the inherited attributes only
+once, rather than in each \verb"quipuNonLeafObject"
+\begin{enumerate}
+\item	In your organization's entry add an attribute like this:
+\begin{quote}\smaller\begin{verbatim}
+iattr= quipuNonLeafObject $ default (
+iattr
+)
+iattr= $ default (
+acl= self # write # entry
+acl= others # read # entry
+acl= self # write # default
+acl= others # read # default
+acl= self # write # attributes # userPassword
+acl= others # compare # attributes # userPassword
+streetAddress
+postOfficeBox
+physicalDeliveryOfficeName
+stateOrProvinceName
+postalCode
+postalAddress
+telephoneNumber
+facsimileTelephoneNumber
+objectClass= top & quipuObject & person & thornPerson & pilotPerson
+)
+\end{verbatim}\end{quote}
+If the entry for your organization,
+doesn't have some of these attributes listed above,
+then don't include those attributes in the second \verb"iattr" list.
+
+\item	Then, for any \verb"person" {\em anywhere\/} subordinate to your
+organization,
+if the child has an objectClass value of \verb"pilotPerson",
+remove {\bf all\/} the objectClass values.
+Next,
+if the child entry has a different value for any of the other attributes in
+the \verb"iattr" list in the parent,
+then that value should be present in the child,
+otherwise remove it.  
+\end{enumerate}
+This optimization assumes a fairly homogeneous relationship in your
+organization, which is often the case.
+
+\section	{Adding a Level-2 DSA}
+There are three aspects to adding a Level-2 DSA:
+first, the entry for your organization and Level-1 DSA must be modified,
+and an entry for your Level-2 DSA must be created;
+second,
+the Level-2 DSA must be configured;
+and,
+third,
+parts of the Directory tree mastered by the Level-1 DSA may be moved over to
+be mastered by the Level-2 DSA.
+
+First, you must choose a name for your new Level-2 DSA.
+Since there will probably be more Level-2 DSAs then endangered species of
+South American Wildlife,
+you do not have to use a wildlife name for a Level-2 DSA.
+Choose something associated with your organization or state.
+
+For the purposes of the pilot project,
+the name of each Level-2 DSA taks the form:
+\begin{quote}\small\begin{verbatim}
+c=US@o=O_i@cn=wildlife name
+\end{verbatim}\end{quote}
+As usual,
+you will have to pick a ``sanitized'' name that will be used for the \unix/
+directory which will contain the database for your Level-2 DSA.
+
+To remain consistent with the discussion on configuring a Level-1 DSA,
+we'll call the name of the DSA \verb"wildlife name" and the directory will be
+called \file{wildlife/}.
+
+\subsection	{Modifying the Level-1 DSA}
+To the entry for your Level-1 DSA,
+you will need to add these lines:
+\begin{quote}\small\begin{verbatim}
+eDBinfo= # # c=US@o=O_i@cn=wildlife name
+eDBinfo= c=US # # c=US@o=O_i@cn=wildlife name
+eDBinfo= c=US@o=O_i # # c=US@o=O_i@cn=wildlife name
+\end{verbatim}\end{quote}
+This says that your Level-1 DSA provide copies of the ROOT, \verb"c=US" and
+your organization's EDBs to your Level-2 DSA.
+
+This addition is done using the \verb"modify" command to \pgm{dish}:
+\begin{quote}\small\begin{verbatim}
+Dish -> modify "@c=US@cn=wildlife name"
+\end{verbatim}\end{quote}
+
+Note that even though your Level-2 DSA will contain a slave copy of the EDB
+for your organization,
+you do not add a \verb"slaveDSA" attribute to your organization's entry to
+reflect this.
+In order to contact your Level-2 DSA,
+it is necessary to find its \verb"presentationAddress" attribute by asking the
+directory.
+Since the entry for your Level-2 DSA is kept beneath your organization's
+entry, anyone asking for information about your Level-2 DSA would already have
+information on your organization!
+
+Finally,
+you need to add an entry for your Level-2 DSA to the EDB for your organization:
+\begin{quote}\small\begin{verbatim}
+Dish -> add "cn=wildlife name" -template $(ETCDIR)quipu/templates/dsa
+\end{verbatim}\end{quote}
+The template file contains these editing instructions:
+\begin{enumerate}
+\item	Change each occurrence of \verb"O_i" to your organization's name; e.g.,
+\begin{quote}\small\begin{verbatim}
+Performance Systems International
+\end{verbatim}\end{quote}
+
+\item	Change each occurrence of \verb"wildlife name" to the common name of
+	your DSA; e.g.,
+\begin{quote}\small\begin{verbatim}
+beeblebrox
+\end{verbatim}\end{quote}
+
+\item	For each organizational unit, \verb"U_j", this DSA will master,
+add a line:
+\begin{quote}\small\begin{verbatim}
+eDBinfo = c=US@o=O_i@ou=U_j # # c=US@cn=level-1 DSA
+\end{verbatim}\end{quote}
+where \verb"c=US@cn=level-1 DSA" is the name of your Level-1 DSA.
+
+\item	Change the value of the \verb"presentationAddress" attribute to
+	contain the IP address of the host running the Level-2 DSA,
+	and select an unused TCP port at this IP address
+	(port~17010 is suggested for Level-2 DSAs);
+	e.g.,
+\begin{quote}\small\begin{verbatim}
+'0101'H/Internet=130.117.118.3+17010
+\end{verbatim}\end{quote}
+If other Level-2 DSAs are to be run on this host,
+it is suggested that ascending port numbers, starting at 17011, be assigned.
+However,
+running multiple Level-2 DSAs on a single host is not recommended.
+
+\item	Change the value of the \verb"description" attribute for your
+	Level-2 DSA accordingly.
+	The first value should be the wildlife description.
+	Note that you should fully explain the meaning of the Level-2 DSA's
+	common name.
+	Another description value should be added for each organizational
+	unit mastered by this DSA, e.g.,
+\begin{quote}\small\begin{verbatim}
+Master DSA for U_j under O_i
+\end{verbatim}\end{quote}
+\end{enumerate}
+
+\subsection	{Configuring a Level-2 DSA}
+Configuring a Level-2 DSA is currently a pain as \pgm{dsaconfig} is not
+currently used for this task.
+
+Start by copying the database directory for your Level-2 DSA:
+\begin{quote}\small\begin{verbatim}
+# cd quipu/
+# cp -r level-1-dsa wildlife
+# chmod 700 wildlife
+# find wildlife -exec chown daemon {} \;
+# find wildlife -exec chgrp daemon {} \;
+# su daemon
+# cd wildlife/
+\end{verbatim}\end{quote}
+
+\subsubsection	{Editing the DSA tailoring file}
+Now edit the \file{quiputailor} file in the \file{quipu/wildlife/} directory.
+There are three things to do:
+\begin{enumerate}
+\item	Change the \verb"mydsaname" variable to reflect the Distinguished Name
+	of the DSA.
+	For example:
+\begin{quote}\small\begin{verbatim}
+mydsaname       "c=US@o=O_icn=wildlife name"
+\end{verbatim}\end{quote}
+	becomes
+\begin{quote}\smaller\begin{verbatim}
+mydsaname       "c=US@o=Performance Systems International@cn=beeblebrox"
+\end{verbatim}\end{quote}
+
+\item	Change the \verb"logdir" variable to reflect the \unix/ directory where
+QUIPU log files are to reside.
+	For example:
+\begin{quote}\small\begin{verbatim}
+logdir  $(ETCDIR)quipu/wildlife/
+\end{verbatim}\end{quote}
+	becomes
+\begin{quote}\small\begin{verbatim}
+logdir  $(ETCDIR)quipu/beeblebrox/
+\end{verbatim}\end{quote}
+(Note the trailing slash.)
+
+\item	Change the \verb"treedir" variable to reflect the \unix/ directory
+where the DSA's database resides.
+
+	For example:
+\begin{quote}\small\begin{verbatim}
+treedir $(ETCDIR)quipu/wildlife/
+\end{verbatim}\end{quote}
+	becomes
+\begin{quote}\small\begin{verbatim}
+treedir $(ETCDIR)quipu/beeblebrox/
+\end{verbatim}\end{quote}
+(Note the trailing slash.)
+\end{enumerate}
+
+Section~13.3 of \volfive/ discusses the options available for run-time
+tailoring.
+You will have no need of editing this file.
+
+\subsubsection	{Editing the DSA startup file}
+Now edit the \file{startup.sh} file in the \file{quipu/wildlife/} directory.
+There are two things to do:
+\begin{enumerate}
+\item	Change the \verb"W" variable to reflect the wildlife name of the DSA.
+	For example:
+\begin{quote}\small\begin{verbatim}
+W=wildlife
+\end{verbatim}\end{quote}
+	becomes
+\begin{quote}\small\begin{verbatim}
+W="Beeblebrox"
+\end{verbatim}\end{quote}
+
+\item	Change the \verb"D" variable to reflect the \unix/ directory where
+the DSA's database resides.
+	For example:
+\begin{quote}\small\begin{verbatim}
+D=$(ETCDIR)quipu/wildlife
+\end{verbatim}\end{quote}
+	becomes
+\begin{quote}\small\begin{verbatim}
+D=$(ETCDIR)quipu/beeblebrox
+\end{verbatim}\end{quote}
+\end{enumerate}
+
+\subsubsection	{Building an Initial Database}
+The directory database you created with the \pgm{cp} command earlier has done
+virtually all the work for you.
+Now all you need do is edit each EDB file to initially mark each as a
+SLAVE copy.
+A simple way of doing this is:
+\begin{quote}\small\begin{verbatim}
+# find . -name EDB -a -exec vi {} \;
+\end{verbatim}\end{quote}
+which will run \pgm{vi} on each EDB file.
+If the first line of this file says \verb"MASTER",
+change it to \verb"SLAVE".
+Otherwise the first line should say \verb"SLAVE"
+(if the first line of the EDB file says \verb"CACHE",
+then contact a \camayoc/ for assistance.)
+
+\subsubsection	{Testing the Level-2 DSA}
+At this point,
+your Level-2 DSA should be configured and you should start and test it:
+\begin{quote}\small\begin{verbatim}
+# $(SBINDIR)ros.quipu -t ./quiputailor &
+\end{verbatim}\end{quote}
+If your DSA is configured properly,
+it will print out something like:
+\begin{quote}\small\begin{verbatim}
+-- '0101'H/Internet=130.117.128.3+17010 --
+DSA Started
+\end{verbatim}\end{quote}
+If your Level-2 DSA does not boot for some reason,
+consult Section~\ref{dsa:failure} on page~\pageref{dsa:failure}.
+
+You should now try connecting to the Level-2 DSA.
+\begin{quote}\small\begin{verbatim}
+% dish -c "wildlife name"
+Welcome to Dish (DIrectory SHell)
+Dish ->
+\end{verbatim}\end{quote}
+indicates that the DUA connected to your Level-1 DSA.
+Otherwise consult Section~\ref{dua:failure} on
+page~\pageref{dua:failure} and try to debug the problem.
+
+\subsubsection	{Editing the DUA tailoring file}
+Once your Level-2 DSA is operational,
+you should edit the file \file{dsaptailor} in the ISODE \verb"ETCDIR"
+directory so that your DUAs 
+will know about this DSA.
+This is done by adding this line
+\begin{quote}\smaller\begin{verbatim}
+dsa_address "wildlife name"      '0101'H/Internet=aaa.bbb.ccc.ddd+port
+\end{verbatim}\end{quote}
+{\em after\/} the \verb"dsa_address" line for your Level-1 DSA
+and then making these edits:
+\begin{enumerate}
+\item	Substitute the common name of your DSA for \verb"wildlife name"; e.g.,
+\begin{quote}\small\begin{verbatim}
+Beeblebrox
+\end{verbatim}\end{quote}
+
+\item	Change the IP address and TCP port number to correspond to the
+	OSI presentation address you defined earlier in the entry for the
+	DSA;
+	e.g.,
+\begin{quote}\small\begin{verbatim}
+'0101'H/Internet=130.117.118.3+17010
+\end{verbatim}\end{quote}
+\end{enumerate}
+
+Now run the \man dish(1c) program again,
+telling it to connect to your Level-1 DSA.
+\begin{quote}\small\begin{verbatim}
+% dish -c "wildlife name"
+Welcome to Dish (DIrectory SHell)
+Dish ->
+\end{verbatim}\end{quote}
+indicates that the DUA connected to your Level-1 DSA.
+Otherwise consult Section~\ref{dua:failure} on
+page~\pageref{dua:failure} and try to debug the problem.
+
+Now look around the Directory tree using \pgm{dish}.
+Descend to \verb"c=US@o=O_i" to check on your own entries.
+A good test to run is to try and bind to your own entry,
+but to do so by dereferencing the alias for the Manager of your DMD:
+\begin{quote}\small\begin{verbatim}
+Dish -> bind -user "c=US@o=O_i@cn=Manager"
+Enter password for "c=US@o=O_i@cn=Manager": 
+Dish -> 
+\end{verbatim}\end{quote}
+Indicates that you are now bound to the directory as that DN.
+Instead, if you see:
+\begin{quote}\small\begin{verbatim}
+Dish -> bind -user "c=US@o=O_i@cn=Manager"
+Enter password for "c=US@o=O_i@cn=Manager": 
+Security Error - check name and password
+\end{verbatim}\end{quote}
+then either you may have entered the DN or password wrong.
+Try again.
+If not,
+or if you encounter some other problem,
+contact a \camayoc/ for assistance.
+
+\subsection	{Moving portions of the Directory Tree}
+For each organizational unit, \verb"ou=U_j", the Level-2 DSA will master,
+you now need to do two things:
+\begin{itemize}
+\item	tell your Level-1 DSA that it no longer masters the EDB;
+	and,
+
+\item	tell your Level-2 DSA that it now masters the EDB.
+\end{itemize}
+The first step is done as follows.
+Begin by using \pgm{dish} to bind to the Level-1 DSA:
+\begin{quote}\smaller\begin{verbatim}
+% dish -c "Level-1 DSA" -user "c=US@o=O_i@cn=Manager" -simple
+\end{verbatim}\end{quote}
+Next:
+\begin{enumerate}
+\item	Modify the entry for the organizational unit which is held by your
+Level-1 DSA.
+Change the \verb"masterDSA" attribute of the entry corresponding to that
+unit from:
+\begin{quote}\small\begin{verbatim}
+masterDSA= c=US@cn=Level-1 DSA
+\end{verbatim}\end{quote}
+to:
+\begin{quote}\small\begin{verbatim}
+masterDSA= c=US@o=O_i@cn=wildlife name
+\end{verbatim}\end{quote}
+You will also need to add a \verb"slaveDSA" attribute to this entry:
+\begin{quote}\small\begin{verbatim}
+slaveDSA= c=US@cn=Level-1 DSA
+\end{verbatim}\end{quote}
+
+These additions are done using \pgm{dish}:
+\begin{quote}\small\begin{verbatim}
+Dish -> modify "@c=US@o=O_i@ou=U_j"
+\end{verbatim}\end{quote}
+
+\item	Modify the entry for your Level-1 DSA.
+Change the line that says:
+\begin{quote}\small\begin{verbatim}
+eDBinfo= c=US@o=O_i@ou=U_j # #
+\end{verbatim}\end{quote}
+to:
+\begin{quote}\small\begin{verbatim}
+eDBinfo= c=US@o=O_i@ou=U_j # c=US@o=O_i@cn=wildlife name #
+\end{verbatim}\end{quote}
+This says that your Level-1 DSA will receive copies of the EDB for each
+organizational unit held by your Level-2 DSA.
+
+This change is done using the \verb"modify" command to \pgm{dish}:
+\begin{quote}\small\begin{verbatim}
+Dish -> modify "@c=US@cn=wildlife name"
+\end{verbatim}\end{quote}
+
+\item	Lock the Level-1 DSA's copy of the EDB file:
+\begin{quote}\small\begin{verbatim}
+Dish -> dsacontrol -lock "c=US@o=O_i@ou=U_j"
+\end{verbatim}\end{quote}
+
+\item	Edit the EDB file kept in the {\bf Level-1\/} DSA's directory
+database by changing the first line from \verb"MASTER" to \verb"SLAVE".
+(If the first line of this file does not say \verb"MASTER",
+then you are editing the {\bf wrong\/} directory database.)
+
+\item	Unlock the Level-1 DSA's copy of the EDB file:
+\begin{quote}\small\begin{verbatim}
+Dish -> dsacontrol -refresh "c=US@o=O_i@ou=U_j"
+Dish -> dsacontrol -unlock "c=US@o=O_i@ou=U_j"
+\end{verbatim}\end{quote}
+\end{enumerate}
+
+The second step is done as follows.
+Begin by using \pgm{dish} to bind to the Level-2 DSA:
+\begin{quote}\smaller\begin{verbatim}
+% dish -c "Level-2 DSA" -user "c=US@o=O_i@cn=Manager" -simple
+\end{verbatim}\end{quote}
+Next:
+\begin{enumerate}
+\item	Modify the entry for the for organizational unit which is to be
+mastered by your Level-2 DSA.
+Change the \verb"masterDSA" attribute of the entry corresponding to that
+unit from:
+\begin{quote}\small\begin{verbatim}
+masterDSA= c=US@cn=Level-1 DSA
+\end{verbatim}\end{quote}
+to:
+\begin{quote}\small\begin{verbatim}
+masterDSA= c=US@o=O_i@cn=wildlife name
+\end{verbatim}\end{quote}
+You will also need to add a \verb"slaveDSA" attribute to this entry:
+\begin{quote}\small\begin{verbatim}
+slaveDSA= c=US@cn=Level-1 DSA
+\end{verbatim}\end{quote}
+
+These additions are done using \pgm{dish}:
+\begin{quote}\small\begin{verbatim}
+Dish -> modify "@c=US@o=O_i@ou=U_j"
+\end{verbatim}\end{quote}
+
+\item	Modify the entry for your Level-2 DSA.
+Add this line:
+\begin{quote}\small\begin{verbatim}
+eDBinfo= c=US@o=O_i@ou=U_j # # c=US@cn=Level-1 DSA
+\end{verbatim}\end{quote}
+This says that your Level-1 DSA will receive copies of the EDB for each
+organizational unit held by your Level-2 DSA.
+
+This change is done using the \verb"modify" command to \pgm{dish}:
+\begin{quote}\small\begin{verbatim}
+Dish -> modify "@c=US@o=O_i@cn=wildlife name"
+\end{verbatim}\end{quote}
+
+\item	Lock the Level-2 DSA's copy of the EDB file:
+\begin{quote}\small\begin{verbatim}
+Dish -> dsacontrol -lock "@c=US@o=O_i@ou=U_j"
+\end{verbatim}\end{quote}
+
+\item	Edit the EDB file kept in the {\bf Level-2\/} DSA's directory
+database by changing the first line from \verb"SLAVE" to \verb"MASTER".
+(If the first line of this file does not say \verb"SLAVE",
+then you are editing the {\bf wrong\/} directory database.)
+
+\item	Unlock the Level-2 DSA's copy of the EDB file:
+\begin{quote}\small\begin{verbatim}
+Dish -> dsacontrol -unlock "@c=US@o=O_i@ou=U_j"
+\end{verbatim}\end{quote}
+\end{enumerate}
+You should now reboot your Level-2 DSA and then try to connect to it using
+\pgm{dish}.
+Once this is successfully,
+you should reboot your Level-1 DSA and also use \pgm{dish} to connect to it.
+
+When you restart the Level-2 DSA,
+it will try to update its ROOT,
+\verb"c=US",
+and \verb"o=O_i" EDB files from your Level-1 DSA.
+The first two should be the same as what your Level-2 is running,
+so no update will take place.
+The third will be different however,
+so you should see a file \file{c=US/o=O\_i/EDB.bak} created.
+
+When you restart the Level-1 DSA,
+in addition to trying to reload its ROOT and \verb"c=US" EDB files from the
+Level-0 DSAs,
+it will try to reload the EDB file for each organizational unit mastered by
+the Level-2 DSA.
+Since these will be the same,
+initially no update will take place.
+
+\subsubsection	{Editing the DUA tailoring file}
+You now edit the \file{dsaptailor} file one more time.
+Move the \verb"dsa_address" line for your Level-2 DSA above the line for your
+Level-1 DSA.
+This will tell your DUAs to contact the Level-2 DSA by default,
+rather than the Level-1 DSA.
+
+\subsubsection	{System Administration}
+Once everything checks out,
+its time to restart the DSA in the background.
+Use \pgm{dish} to abort the DSA and then run the \file{startup.sh} script:
+\begin{quote}\small\begin{verbatim}
+% $(ETCDIR)quipu/wildlife/startup.sh
+\end{verbatim}\end{quote}
+Take a look at the log files it creates and once you're satisfied
+that it is operational,
+use \pgm{dish} one last time before considering things up and running.
+
+Finally,
+it's time for the last bit of system administration:
+\begin{enumerate}
+\item	Add an entry to the file \file{/etc/rc.local}:
+\begin{quote}\smaller\begin{verbatim}
+if [ -d $(ETCDIR)quipu/wildlife ]; then
+   $(ETCDIR)quipu/wildlife/startup.sh & \
+                                (echo -n ' wildlife') > /dev/console
+fi
+\end{verbatim}\end{quote}
+in the section where the network servers are started.
+If your \file{rc.local} file starts \man tsapd(8c),
+then place this entry after the one which starts \pgm{tsapd}.
+
+\item	Edit the file \file{quipu/wildlife/nightly.sh},
+by looking for these three lines
+\begin{quote}\smaller\begin{verbatim}
+W="dsa name from dsaptailor, e.g., Beeblebrox"
+D="wildlife directory, e.g., $(ETCDIR)quipu/beeblebrox"
+\end{verbatim}\end{quote}
+and editing them appropriately.
+
+\item	Based on the time that the \verb"c=US" manager gave you for your
+Level-1 DSA, add one hour and modify the \file{crontab} file according; e.g.,
+\begin{quote}\small\begin{verbatim}
+0 5 * * * $(ETCDIR)quipu/wildlife/nightly.sh
+\end{verbatim}\end{quote}
+If the directory database for the Level-2 DSA is owned by a user-ID other
+than \verb"root" (e.g., \verb"daemon"),
+then instead the line should look something like this:
+\begin{quote}\small\begin{verbatim}
+0 5 * * * su daemon < $(ETCDIR)quipu/wildlife/nightly.sh
+\end{verbatim}\end{quote}
+\end{enumerate}
+
+Congratulations!
+Your Level-2 DSA has now joined the pilot DMD.
+
+\section	{Miscellaneous Topics}
+Here is information on a wide range of topics,
+arranged in  no particular order.
+
+\subsection	{Moving a Level-1 DSA}
+For various reasons you might need to move your DSA from one host to another.
+In OSI terminology,
+you need to change the presentation address of the DSA.
+The steps to do this are:
+\begin{enumerate}
+\item	Modify the \verb"presentationAddress" attribute of your DSA using
+\pgm{dish}.
+Since your DSA masters its own EDB entry,
+you should now send a message to the \verb"c=US" manager which indicates the
+new address of your DSA.
+The manager will tell the master DSA for \verb"c=US" to contact your DSA
+(at it's old address to get the new information).
+
+\item	Now wait a couple of days for this new information to propagate.
+This is important to avoid a transient service outage.
+
+\item	Stop the DSA and move its hierarchy over to the new host.
+
+\item	Start the DSA on the new host and verify that it is working okay.
+
+\item	Edit your \file{dsaptailor} file to reflect the new addrss.
+
+\item	Don't forget to edit \file{/etc/rc.local} and \file{/usr/lib/crontab}
+on both systems.
+\end{enumerate}
+
+%%% \subsection	{Running a SLAVE Level-1 DSA}
+%%% {\em to be supplied$\ldots$}
+
+%%% register at c=US
+%%% copy edb files
+%%% change masters to slaves
+%%% for each master add
+%%%     eDBinfo= dn # master #		to slave DSA entry
+%%%     eDBinfo= dn # # slave		to master entry
+%%%     slaveDSA= slave			to dn entry
+
+\subsection	{A Final Word on DSAs and Knowledge Information}
+It is important to appreciate that a DSA may hold knowledge
+(have local \file{EDB} files)
+even though the DIT does not indicate this
+(no corresponding \verb"slaveDSA" attribute for that portion of the tree).
+This is a feature.
+
+For example,
+if you wish to speed access to certain parts of the tree for your users,
+then to the entry of the DSA which MASTERs that information,
+you add this attribute: 
+\begin{quote}\small\begin{verbatim}
+eDBinfo = interesting_EDB # # slave_DSA_name
+\end{verbatim}\end{quote}
+to the entry of the DSA which is to have a copy,
+you add this attribute:
+\begin{quote}\small\begin{verbatim}
+eDBinfo = interesting_EDB # master_DSA_name #
+\end{verbatim}\end{quote}
+And you do {\bf not\/} add any \verb"slaveDSA" attribute to the entry
+corresponding that EDB.
+
+This configuration has the effect that any user contacting the slave DSA,
+will find that information local,
+but, since this DSA is not listed in the \verb"slaveDSA" attribute,
+then other DSAs won't bother it asking for information.
+
+\subsection	{Naming People}\label{naming:people}
+As noted earlier,
+entries in the Directory are uniquely named by their
+Relative Distinguished Name (RDN).
+In the pilot software,
+the RDN is represented as the first line of each entry in the \file{EDB} file
+for its immediate parent.
+Thus,
+within an \file{EDB} file,
+all RDNs must be unique.
+
+The simplest way of doing this is to use:
+\begin{quote}\small\begin{verbatim}
+cn=FirstName LastName
+\end{verbatim}\end{quote}
+as the RDN.
+However,
+in organizations with large numbers of people,
+this may not be sufficient to be unique.
+So, there are four alternative strategies:
+\begin{enumerate}
+\item	Use
+\begin{quote}\small\begin{verbatim}
+cn=FirstName LastName
+\end{verbatim}\end{quote}
+	whenever possible.
+	However,
+	whenever ambiguity occurs, use either
+\begin{quote}\small\begin{verbatim}
+cn=FirstName MiddleInitial LastName
+\end{verbatim}\end{quote}
+	or
+\begin{quote}\small\begin{verbatim}
+cn=FirstName MiddleName LastName
+\end{verbatim}\end{quote}
+	Note that,
+	the shorter forms should also be included to aid in searching.
+	Hence,
+	the first three lines of an entry might look like:
+\begin{quote}\small\begin{verbatim}
+cn=FirstName MiddleName LastName
+cn= FirstName MiddleInitial LastName
+cn= FirstName LastName
+\end{verbatim}\end{quote}
+	The first value is used for the RDN,
+	and the other two for searching.
+
+\item	Always use
+\begin{quote}\small\begin{verbatim}
+cn=FirstName MiddleName LastName
+\end{verbatim}\end{quote}
+	as the RDN for all entries,
+	and include the shorter forms whenever possible.
+
+\item	Always generate a uniquely constructed string
+\begin{quote}\small\begin{verbatim}
+cn=FML1
+\end{verbatim}\end{quote}
+and include whatever real naming information is available for searching
+purposes:
+\begin{quote}\small\begin{verbatim}
+cn= FirstName MiddleName LastName
+cn= FirstName MiddleInitial LastName
+cn= FirstName LastName
+\end{verbatim}\end{quote}
+The only caveat with this approach is that each time the EDB file is
+generated, it is best not to change the RDNs for entries which previously
+existed.
+
+\item	Use a multi-valued RDN ({\em deus ex machina\/} formed by a
+\verb"commonName" attribute and some other distinguishing attribute:
+\begin{quote}\small\begin{verbatim}
+cn=FirstName MiddleName LastName%userid=Lastname
+\end{verbatim}\end{quote}
+The \verb"`%'"-sign is used to concatenate attributes when forming an RDN.
+Hence,
+if the first line of an entry is
+\begin{quote}\small\begin{verbatim}
+cn=Marshall Rose%userid=mrose
+\end{verbatim}\end{quote}
+then the entry's RDN really has two parts:
+the most significant part is a \verb"commonName" attribute,
+and the next significant part is a \verb"userid" attribute.
+Other good choices besides \verb"userid" are things like \verb"localityName".
+
+Of course,
+the \verb"`%'"-notation can be used only on the first line of an entry,
+as it is used only for RDNs.
+\end{enumerate}
+In all cases,
+regardless of the actual RDN chosen,
+it is strongly recommended to include as many alternate forms as possible,
+in order to aid searching.
+
+\subsection	{Installing the Software on other hosts}
+You may wish to install the interfaces to the Directory,
+on other systems,
+whilst running a DSA on a single host.
+If the hardware/software configuration of the new hosts are the same as the
+initial host,
+then you can simply install the compiled binaries.
+Usually this is done by mounting the source hierarchy over the network,
+logging in to the new host,
+and using:
+\begin{quote}\small\begin{verbatim}
+# ./make inst-all inst-quipu
+# (cd others/quipu; ./make inst-pilot)
+\end{verbatim}\end{quote}
+Then,
+you must copy over two files from the ISODE \verb"ETCDIR" directory on the
+original host: \file{dsaptailor} and \file{fredrc}.
+
+If, however, you wish to change the software configuration,
+then after moutning the source hierarchy,
+you must clean the existing binaries in the source hierarchy,
+then select the new configuration files and go through the generation and
+installation process:
+\begin{quote}\small\begin{verbatim}
+% ./make distribution
+% ./make once-only all all-quipu
+% (cd others/quipu; ./make pilot)
+# ./make inst-all inst-quipu
+# (cd others/quipu; ./make inst-pilot)
+\end{verbatim}\end{quote}
+Next, you must then copy over the \file{dsaptailor} and \file{fredrc} files
+from the ISODE \verb"ETCDIR" directory on the original host.

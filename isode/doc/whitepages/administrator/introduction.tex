@@ -1,0 +1,1728 @@
+% run this through LaTeX with the appropriate wrapper
+
+\chapter	{Introduction}
+This document is {\em The Administrator's Guide\/} for the
+PSI White Pages Pilot.
+The goal of \theguide/ is to provide a site administrator
+with enough information to be able to participate in the White Pages
+Pilot.
+In practical terms,
+this means that \theguide/ provides information on how
+to install and maintain an OSI Directory at your site.
+
+The OSI Directory is used to provide the white pages service.
+\theguide/ is not intended as a tutorial nor a detailed description
+of the OSI Directory.
+However, as administrative responsibilities and procedures are
+outlined,
+the appropriate Directory concepts will be introduced.%
+\footnote{Actually this paragraph is a lie:
+you can't administer the white pages without knowing what you're
+doing,
+and you don't know what you're doing unless you understand both
+the basics of the OSI Directory and how the pilot project software
+implements the Directory Service.
+As such,
+this entire chapter is really a thinly-veiled primer on these
+two topics.}
+
+Your comments are welcome!
+The OSI Directory is a new, complex technology.
+Although \theguide/ attempts to be straight-forward it probably doesn't
+succeed all the time.
+If you have comments on this document, send them to the Internet
+mailbox
+\begin{quote}\begin{verbatim}
+wpp-camayocs@uu.psi.com
+\end{verbatim}\end{quote}
+so that \theguide/ can be improved.
+
+\newpage
+
+\section*	{Related Documentation}
+The white paper
+{\em An Introduction to a NYSERNet White Pages Pilot Project\/}
+introduces the goals and phases of the pilot project.
+Administrators should familiarize themselves with this document
+before proceeding.
+
+There is also a document which you should provide to the user community at
+your organization.
+It is called
+{\em PSI White Pages Pilot Project: User's Handbook},
+or simply \thebook/.
+
+The OSI Directory standard is defined in \cite{ISO.Directory,CCITT.Directory}.
+
+The research note {\em The Design of QUIPU\/} \cite{QUIPU.Design}
+describes the design of the software used for the pilot project,
+whilst {\em Volume Five\/} of the ISODE User's Manual \cite{QUIPU.Manual},
+henceforth termed \volfive/,
+describes the implementation of the software.
+\theguide/ is intended to replace these later two documents as the
+primary reference for administrators of the pilot project.
+
+PostScript versions of these documents are available via anonymous FTP
+from host \verb"uu.psi.com" (\verb"[136.161.128.3]"):
+\begin{quote}\small\begin{verbatim}
+% cd /usr/src/local/
+% ftp uu.psi.com
+Connected to uu.psi.com.
+220 uu.psi.com FTP server ready
+Name (uu.psi.com:user): anonymous
+Password (uu.psi.com:anonymous): guest
+331 Guest login ok, send ident as password.
+230 Guest login ok, access restrictions apply.
+ftp> binary
+200 Type set to I.
+ftp> cd pub/isode
+ftp> get isode-ps.tar.Z
+ftp> get pilot-ps.tar.Z
+ftp> quit
+% uncompress < isode-ps.tar.Z | tar xf -
+% uncompress < pilot-ps.tar.Z | tar xf -
+% rm isode-ps.tar.Z pilot-ps.tar.Z
+\end{verbatim}\end{quote}
+
+\newpage
+\section	{Informational Model}
+From a theoretical standpoint,
+the internals of the white pages service can be viewed from 
+four different perspectives.
+We begin with the Informational Model which describes the service in terms of
+information objects.
+The Directory's representation of an information object,
+typically called an {\em entry},
+contains information about a person, a place, an organization, etc.
+Each entry consists of one or more attributes.
+
+Each attribute consists of a type,\index{attribute types}
+indicating what kind of attribute it is,
+and one or more values
+(one of which is termed the {\em distinguished value\/}).
+Attribute values are structured using a data definition language
+called  Abstract Syntax Notation One (ASN.1).
+As such,
+different programs using the Directory will interpret information in the same
+way.
+In addition,
+the Directory will perform type-checking on the values in order
+to keep things consistent.
+
+\subsection	{Naming}
+One of the attributes of an entry is particularly special:
+it is referred to as the {\em Relative Distinguished Name\/} (RDN) of
+the entry.
+The RDN is formed by taking the name of the attribute and its
+distinguished value.
+For example,
+if the attribute in question was called \verb"countryName" and it had
+a distinguished value of \verb"US", then we might say that the RDN
+for the entry was \verb"countryName=US".
+Of course,
+this is strictly a ``user-friendly'' notation:
+the Directory uses a concise binary format for representing an RDN.
+Fortunately,
+the pilot project software allows simple textual strings to be used in their
+place and converts back and forth accordingly.
+
+In the OSI Directory,
+information is primarily organized according to a hierarchical tree
+structure.
+The top of the tree is termed the {\em root},
+and has no explicit name.
+To find the  name of an object,
+termed its {\em Distinguished Name\/} (DN),
+one concatenates the RDNs found when traversing the tree by starting
+at the root and proceeding directly to the object's entry.
+
+For purposes of discussion,
+we write a Distinguished Name as an ordered series of RDNs separated by
+an \verb"`@'"-sign with the most significant RDN appearing at the left;
+e.g.,
+\begin{quote}\smaller\begin{verbatim}
+countryName=US@organizationName=Performance Systems International
+\end{verbatim}\end{quote}
+refers to an entry with an RDN of
+\verb"organizationName=Performance Systems International"
+whose parent has an RDN of \verb"countryName=US".
+In turn,
+this parent entry is an immediate child of the root.
+
+To avoid any potential ambiguity when using an interface to the Directory
+such as \man fred(1c) or \man dish(1c),
+one prefixes a \verb"`@'"-sign to a string when referring to a fully
+qualified Distinguished Name;
+e.g.,
+\begin{quote}\small\begin{verbatim}
+@countryName=US@organizationName=Performance Systems International
+\end{verbatim}\end{quote}
+always refers to the same entry regardless of context.
+Note that this is a convention only for interface programs such as these.
+
+As a rule,
+unless searching,
+text before the \verb"`='"-sign is not case sensitive,
+neither is text after the \verb"`='"-sign.
+
+Of course, names like \verb"countryName",
+while more friendly than binary strings,
+are still rather long,
+so there are several abbreviations that the pilot project software permits.
+Table~\ref{attribute-types} lists the attribute types supported by
+the pilot project, any abbreviations, and the syntax associated with
+each attribute's value.
+Throughout \theguide/,
+the semantics of these attributes will be introduced.
+When using this document later on,
+refer to the Index to quickly find a particular attribute you are interested
+in.
+\tagtable[tp]{INT-1}{Supported Attribute Types}{attribute-types}
+\tagtable[tp]{INT-1b}{Supported Attribute Types (cont.)}\empty
+
+The entities which access the Directory on behalf of a user
+are termed {\em Directory User Agents\/} (DUAs).
+The entities which provide the Directory service are termed
+{\em Directory System Agents\/} (DSAs).
+Both kinds of entities are identified by their Distinguished Name.
+That is,
+the DSAs and DUAs are not only network processes,
+they are also objects which have entries in the Directory.
+
+\subsection	{How Entries and Objects are Described}\label{edb:format}
+It is now time to explain the notation used to describe entries.
+This notation is termed the ``EDB format'',
+and is named after the disk-resident data structures used by the
+pilot project software.
+
+An entry is textually described in an ASCII formatted file.
+The format of the file is simple:
+\begin{itemize}
+\item	Each entry consists of two or more lines followed by a blank line.
+
+\item	Each line consists of an attribute type/value pair using
+	the familiar
+\begin{quote}\small\begin{verbatim}
+name=value
+\end{verbatim}\end{quote}
+notation,
+such as:
+\begin{quote}\small\begin{verbatim}
+c=US
+\end{verbatim}\end{quote}
+
+\item	If multiple values are present for an entry,
+	then either multiple lines may be used or the values may
+	be separated by the \verb"`&'"-sign.
+	The first value occurring is the distinguished value.
+	Hence,
+\begin{quote}\small\begin{verbatim}
+co=US
+co=United States of America
+\end{verbatim}\end{quote}
+and
+\begin{quote}\small\begin{verbatim}
+co=US & United States of America
+\end{verbatim}\end{quote}
+are identical:
+both say that the attribute \verb"friendlyCountryName" has two values:
+the distinguished value is \verb"US" and an alternate value is
+\verb"United States of America".
+
+\item	Most attributes take textual strings for their value.
+	However, for a large number of attributes,
+	the actual characters used are limited to a subset of the
+	``printable'' characters: 
+\begin{quote}\begin{tabular}{l}
+\verb"A" through \verb"Z"\\
+\verb"a" through \verb"z"\\
+\verb"0" through \verb"9"\\
+\verb"'" (apostrophe)\\
+\verb"(" (left parenthesis)\\
+\verb")" (right parenthesis)\\
+\verb"+" (plus-sign)\\
+\verb"," (comma)\\
+\verb"-" (hyphen)\\
+\verb"." (period)\\
+\verb"/" (solidus)\\
+\verb":" (colon)\\
+\verb"?" (question-mark)\\
+space
+\end{tabular}\end{quote}
+	In particular, note that the characters \verb"`='", \verb"`&'",
+	\verb"`$'" and \verb"`#'" are not allowed.
+
+	If it makes sense to use a particular character, e.g., \verb"`@'"
+	in a mail address,
+	then this usage is usually permitted.
+
+	If it is necessary to characters from the restricted set,
+	proceed the value with \verb"{T.61}", e.g.,
+\begin{quote}\small
+\begin{verbatim}
+{T.61}whatever$you$want
+\end{verbatim}\end{quote}
+
+	Always use the appropriate case (upper or lower) when entering
+	values.
+	Although the Directory supports imprecise matching for searching,
+	direct lookup is made on the basis of an exact match.
+
+	When strings are read by the pilot project software,
+	it strips leading and trailing blanks and also compresses multiple
+	blanks to a single blank space.
+
+\item	Another common kind of attribute value is a Distinguished
+	Name, which is specified using the DN notation described earlier.
+	Note that a DN is always interpreted in absolute form when it is
+	written in an EDB file.
+	Hence, the leading \verb"`@'"-sign is never written.
+
+\item	Of course,
+	there are a few attributes with very special syntaxes,
+	when these attributes are introduced,
+	the associated notation will be discussed.
+\end{itemize}
+Note that the first line for an entry gives the object's RDN.
+This line should be repeated later on in the entry,
+this causes it to be included in the attributes for the object.
+(The pilot software includes this attribute automatically,
+but it is a good practice regardless.)
+
+An EDB file contains all of the child objects of a node in the tree.
+The first line of the file consists of a single keyword, one of:
+\begin{describe}
+\item[MASTER:]	indicating that this EDB file is the original source of the
+		information;
+
+\item[SLAVE:]	indicating that this EDB file is a copy of the information
+		from an authoritative source;
+		and,
+
+\item[CACHE:]	indicating that this EDB file is a partial, unauthoriative
+		copy of the information.
+\end{describe}
+The second line of the file contains the creation date of the information
+in the file.
+This is expressed as a \verb"UniversalTime".
+Put simply,
+the format used is:\label{UniversalTime}
+\begin{quote}\small\begin{verbatim}
+yyyymmddhhmmssZ
+\end{verbatim}\end{quote}
+as in:
+\begin{quote}\small\begin{verbatim}
+19890509213614Z
+\end{verbatim}\end{quote}
+which is May 9$^{\underline{\mbox{\scriptsize th}}}$, {\oldstyle 1989},
+21:36:14 hours at UT.
+
+Hence,
+the format of an EDB file is:
+\begin{quote}\small\begin{verbatim}
+<keyword>
+yyyymmddhhmmssZ
+<entries>
+\end{verbatim}\end{quote}
+(remember that each entry ends with a blank line).
+Figure~\ref{edb-example} shows an example of a simple EDB file
+containing two entries.
+\tagfigure[tp]{INT-1}{An Example of an EDB file}{edb-example}
+
+\subsection	{Object Classes}\index{object classes}\index{attribute types, objectClass}
+One attribute of an entry,
+its \verb"objectClass",
+determines what kind of object this entry corresponds to (e.g., a person).
+The value of this attribute indicates what types of attributes the
+entry {\em must\/} and {\em may\/} contain.
+For example,
+if the value of \verb"objectClass" indicates that the entry corresponds
+to a person,
+then it would make sense for that entry to have a \verb"surName"
+attribute.
+On the other hand,
+if the value of \verb"objectClass" indicates that the entry corresponds
+to an organization,
+then a \verb"surName" attribute would be inappropriate.
+
+The OSI Directory is flexible in that it defines several common
+types of objects,
+and then allows users to define their own objects.
+Further,
+object definition is based on the notion of {\em class inheritance}.
+This means that an object class can be defined as a ``subclass'' of
+a previously defined object class with additional refinements.
+As a subclass,
+the newly defined object ``inherits'' all the semantics of its
+superclass,
+in addition to having additional semantics.
+
+For example,
+the Directory defines an object class called \verb"person".
+This object class defines the attributes which a person in
+the real world might have.
+It may be useful to refine this somewhat to talk about persons
+who have Internet access.
+So, we need a new object class, e.g., \verb"internetPerson".
+This can be defined in a straight-forward fashion:
+\begin{quote}
+The object class \verb"internetPerson" is a subclass of the object class
+\verb"person" which {\em may\/} contain an additional attribute,
+\verb"internetMailbox".
+
+The syntax of an \verb"internetMailbox" is a simple string of printable
+characters which is not case sensitive when performing comparisons.
+\end{quote}
+Thus,
+when entries are defined with an \verb"objectClass" attribute which contains
+the value \verb"internetPerson":
+\begin{itemize}
+\item	they {\em must\/} contain whatever attributes an entry with
+	\verb"objectClass" \verb"person" {\em must\/} contain;
+
+\item	they {\em may\/} contain whatever attributes an entry with
+	\verb"objectClass" \verb"person" {\em may\/} contain;
+	and,
+
+\item	they {\em may\/} contain the \verb"internetMailbox" attribute.
+\end{itemize}
+
+As was seen in Figure~\ref{edb-example} on page~\pageref{edb-example},
+the \verb"objectClass" attribute is multi-valued.
+For our purposes,
+object class values fall into one of two categories:
+\begin{itemize}
+\item	the primary class,
+	of which each object has one
+	(this is the class that inherited all the properties from the
+	superclasses);
+	and,
+
+\item	one or more superclasses.
+\end{itemize}
+In order to limit the focus of the pilot project,
+only a few primary classes are supported.
+Further,
+of those classes,
+not all optional attributes are supported.%
+\footnote{This limitation is specific to the pilot project;
+the pilot project software can support the entire range of object classes
+and attribute types.}
+Before discussing the primary classes and their class-specific attributes,
+there are a few attributes which are required for every object.
+These are introduced by looking at a few key superclasses.
+
+\subsubsection	{The top objectClass}\index{object classes, top}
+The Directory requires that every object have \verb"top" as a super
+class.
+Only one attribute is required for members of this class:
+\begin{describe}
+\item[objectClass:]\index{attribute types, objectClass}
+			which defines all the classes that this object belongs
+			to.
+\end{describe}
+
+\subsubsection	{The quipuObject objectClass}\index{object classes, quipuObject}
+In addition,
+the pilot project software requires that every object also have the object
+class \verb"quipuObject" as a superclass.
+Only one attribute is required for members of this class:
+\begin{describe}
+\item[accessControlList:]\index{attribute types, accessControlList}\index{attribute types, acl (accessControlList)}
+			which defines how users of the Directory may
+			access the entry.
+\end{describe}
+The \verb"accessControlList" attribute uses a special notation to enter
+its value in the EDB file:
+\begin{quote}\small\begin{verbatim}
+<syntax> ::= <who> "#" <action> "#" <what>
+
+<who> ::=       "group" "#" DN
+            |   "prefix" "#" DN
+            |   "others"
+            |   "self"
+
+<action> ::=    "none"
+            |   "detect"
+            |   "compare"
+            |   "read"
+            |   "add"
+            |   "write"
+
+<what> ::=      "child"
+            |   "entry"
+            |   "default"
+            |   "attributes" "#" <attribute-list>
+
+<attribute-list> ::=
+                attribute-name
+            |   attribute-name "$" <attribute-list>
+\end{verbatim}\end{quote}
+The \verb"<who>" part indicates who the rule applies to.
+Recall that when a user connects to the Directory,
+the user {\em binds\/} on behalf of a Distinguished Name.
+This DN is used to determine which rules apply to the user:
+\begin{describe}
+\item[group:]	indicates a DN which has an \verb"objectClass" attribute
+		of \verb"groupOfNames" or \verb"organizationalRole",
+		or it indicates a particular DN, which is the most
+		common case.
+
+\item[prefix:]	indicates all DNs which start with the indicated
+		prefix.  Thus, access may be granted to all users
+		at or below a particular part of the tree.
+
+\item[self:]	indicates the DN which corresponds to this object.
+
+\item[others:]	the default case.
+\end{describe}
+The \verb"<what>" part indicates what part of the entry the rule applies
+to:
+\begin{describe}
+\item[child:]	the access control rule applies to children immediately below
+		the entry.
+
+\item[entry:]	the access control rule applies to the entry itself.
+
+\item[attributes:] the access control rule applies to exactly those
+		attributes listed.
+		Multiple attributes pertaining to the same rule are
+		separated by the \verb"`$'"-sign.
+
+\item[default:]	the default rule for attributes.
+\end{describe}
+The \verb"<action>" part indicates the actions which are permitted.
+The semantics of this part vary, depending on the \verb"<what>" part.
+However,
+the \verb"<action>" values are ordered from least- to most-significant;
+e.g., having ``read'' permission implies both ``compare'' and ``detect''
+permission.
+\begin{describe}
+\item[none:]
+\begin{tabular}[t]{rp{3.35in}}
+for entries:&	 	any knowledge of the entry is hidden\\
+for attributes:&	any knowledge of the attribute is hidden\\
+for children:&		downwards progress is blocked
+\end{tabular}
+
+\item[detect:]
+\begin{tabular}[t]{rp{3.35in}}
+for entries:& determination of the entry's existence is permitted\\
+for attributes:& determination of the attribute's existence is permitted\\
+for children:& the existence of children is admitted, but downwards progress is still blocked\\
+\end{tabular}
+
+\item[compare:]
+\begin{tabular}[t]{rp{3.35in}}
+for entries:& the RDN may be compared\\
+for attributes:& the values of the attribute may be compared\\
+for children:& exactly specified RDNs may be matched\\
+\end{tabular}
+
+\item[read:]
+\begin{tabular}[t]{rp{3.35in}}
+for entries:& the RDN may be read\\
+for attributes:& the attribute values may be read\\
+for children:& the child information may be listed, and downward searches are permitted\\
+\end{tabular}
+
+\item[add:]
+\begin{tabular}[t]{rp{3.35in}}
+for entries:& new attributes may be added\\
+for attributes:& new attribute values may be added\\
+for children:& new children may be added\\
+\end{tabular}
+
+\item[write:]
+\begin{tabular}[t]{rp{3.35in}}
+for entries:& the RDN may be changed and existing attributes may be added\\
+for attributes:& values may be modified or removed\\
+for children:& children may be removed\\
+\end{tabular}
+\end{describe}
+The only exception to these rules is the \verb"accessControlList" attribute
+itself: access control rules may be added only to the extent access is
+allowed by the user.
+
+The default access control list is
+\begin{quote}\small\begin{verbatim}
+acl=
+\end{verbatim}\end{quote}
+which simply means ``read'' access for everything and also
+\begin{quote}\small\begin{verbatim}
+self # write # entry
+self # write # default
+\end{verbatim}\end{quote}
+
+There are two optional attributes.
+These are maintained automatically by the Directory:
+\begin{describe}
+\item[lastModifiedBy:]\index{attribute types, lastModifiedBy}
+			identifies the Directory entity which last modified
+			this entry.
+			The value is a Distinguished Name.
+
+\item[lastModifiedTime:]\index{attribute types, lastModifiedTime}
+			identifies the time at which this entry was last
+			modified.
+			The value is a \verb"UniversalTime",
+			the syntax of which was described earlier on
+			page~\pageref{UniversalTime}.
+\end{describe}
+
+\subsubsection	{The quipuNonLeafObject objectClass}\index{object classes, quipuNonLeafObject}
+If an object is permitted children,
+the pilot project software requires that that object also have
+\verb"quipuNonLeafObject" as a superclass.
+
+This class has one mandatory attribute:
+\begin{describe}
+\item[masterDSA:]\index{attribute types, masterDSA}
+			identifies the Directory entity which is responsible
+			for maintaining the MASTER EDB for the children of
+			this entry.
+			The value is a Distinguished Name.
+\end{describe}
+There is typically a single MASTER for a particular entry in the tree.
+Hence, this value is usually single-valued.
+When an entry is to be modified,
+the Directory must contact the entity responsible for the MASTER EDB for
+that entry in order to perform the modification.
+
+This class has two optional attributes:
+\begin{describe}
+\item[slaveDSA:]\index{attribute types, slaveDSA}
+			identifies any Directory entities which have
+			authoritative copies of the EDB for the children
+			of this entry.
+			The value is one or more Distinguished Names.
+
+\item[treeStructure:]\index{attribute types, treeStructure}
+			identifies the object classes which may exist
+			immediately below this entry.
+			The value is one or more object classes.
+\end{describe}
+Since a fundamental assumption of the Directory is that reads (queries)
+occur much more frequently than writes (updates),
+it is common to have several entities containing authoritative copies of an
+EDB.
+By keeping copies locally,
+queries can be answered with less latency.
+
+\subsubsection	{The domainRelatedObject objectClass}\index{object classes, domainRelatedObject}
+If an object has some relationship to the Internet Domain Name System (DNS),
+the pilot project software requires that that object also have
+\verb"domainRelatedObject" as a superclass.
+
+This class has one mandatory attribute:
+\begin{describe}
+\item[associatedDomain:]\index{attribute types, associatedDomain}
+			identifies the domain which corresponds to this object.
+			The value is a domain string, e.g.,
+\begin{quote}\small\begin{verbatim}
+psi.com
+\end{verbatim}\end{quote}
+\end{describe}
+There is typically a single MASTER for a particular entry in the tree.
+Hence, this value is usually single-valued.
+When an entry is to be modified,
+the Directory must contact the entity responsible for the MASTER EDB for
+that entry in order to perform the modification.
+
+Now we look at the primary object classes.
+Keep in mind that these all have both \verb"top" and \verb"quipuObject" as
+superclasses.
+Further,
+the primary classes which are permitted children all have
+\verb"quipuNonLeafObject" as a superclass.
+
+\subsubsection	{The friendlyCountry objectClass}\index{object classes, friendlyCountry}
+Objects of this class represent a sovereign nation.
+For the purposes of the PSI White Pages Pilot,
+there is only one of these,
+although the pilot project is attached to a world-wide Directory service.
+
+Table~\ref{friendlyCountry-attributes} summarizes the attributes types for
+a \verb"friendlyCountry" object.
+There are two mandatory attributes:
+\begin{describe}
+\item[countryName:]\index{attribute types, countryName}\index{attribute types, c (countryName)}
+			which gives the name of the country.
+			The value of this attribute is a two-letter ISO~3166
+			code; e.g.,
+\begin{quote}\small\begin{verbatim}
+US
+\end{verbatim}\end{quote}
+
+\item[friendlyCountryName:]\index{attribute types, friendlyCountryName}\index{attribute types, co (friendlyCountryName)}
+			which gives a user-friendly rendition of the
+			country's name (hence the term \verb"friendlyCountry").
+			The value of this attribute is a string; e.g.,
+\begin{quote}\small\begin{verbatim}
+United States of America
+\end{verbatim}\end{quote}
+\end{describe}
+\tagtable[tp]{INT-2}{Attribute Types for the friendlyCountry Object Class}%
+	{friendlyCountry-attributes}
+
+In addition,
+there is one attribute that may be present:
+\begin{describe}
+\item[description:]\index{attribute types, description}
+			which is a simple textual description;
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+the land of the free and the home of the brave
+\end{verbatim}\end{quote}
+\end{describe}
+
+Putting everything together,
+one could describe an entry for an object of class \verb"friendlyCountry"
+thusly:
+\begin{quote}\small\begin{verbatim}
+c=US
+masterDSA= cn=Alpaca#
+slaveDSA= cn=Fruit Bat#
+slaveDSA= cn=Giant Tortoise# 
+acl= others # read # entry
+acl= group # c=US@cn=Manager # write # entry
+acl= others # read # default
+acl= group # c=US@cn=Manager # write # default
+treeStructure= quipuNonLeafObject & organization & locality
+treeStructure= quipuDSA & alias & organizationalRole
+c= US
+co= USA & US & United States of America
+objectClass= top & quipuObject & quipuNonLeafObject
+objectClass= country & friendlyCountry
+\end{verbatim}\end{quote}
+These lines indicate that:
+\begin{itemize}
+\item	The RDN for this object is \verb"c=US"
+	(read ``country name is US'').
+
+\item	The user-friendly name for this country takes on one of three values
+\begin{quote}\small\begin{verbatim}
+USA
+US
+United States of America
+\end{verbatim}\end{quote}
+
+\item	There are two DSAs which have SLAVE copies of the EDB for this
+	object, one is called \verb"cn=Giant Tortoise" and the other
+	is called \verb"cn=Fruit Bat".
+	(We'll discuss how these colorful names are chosen later on.)
+
+\item	The DSA responsible for maintaining the MASTER copy of the EDB
+	is called \verb"cn=Alpaca".
+	Note that all three of these DSAs live directly under the ROOT of
+	the Directory tree.
+
+\item	Everyone is allowed to read the entry and all of its attributes,
+	and only \verb"c=US@cn=Manager" is allowed to change anything.
+
+\item	The \verb"treeStructure" attribute says that the children immediately
+	below this object:
+    \begin{itemize}
+     \item	may have children themselves (\verb"quipuNonLeafObject"),
+		in which case, the objects under \verb"c=US" are either
+		\verb"organization" or \verb"locality" objects; or,
+
+     \item	needn't have children, being a DSA
+		(of object class \verb"quipuDSA")
+		or an \verb"organizationalRole";
+		or,
+
+    \item	may be an \verb"alias".
+    \end{itemize}
+
+\item	The official name of this country is \verb"US".
+
+\item	This object belongs to five object classes:
+    \begin{itemize}
+    \item	\verb"top" and \verb"quipuObject" because membership is
+		mandatory;
+
+    \item	\verb"quipuNonLeafObject" so that children may reside
+		under the entry;
+
+    \item	\verb"friendlyCountry" which is the primary object class; and,
+
+    \item	\verb"country" which is a superclass of \verb"friendlyCountry".
+    \end{itemize}
+\end{itemize}
+
+\subsubsection	{The organization objectClass}\index{object classes, organization}
+Objects of this class represent a top-level organizational entity,
+such as a corporation, university, government entity, and so on.
+There is an \verb"organization" object for each organization participating in
+the PSI White Pages Pilot.
+
+Table~\ref{organization-attributes} summarizes the attributes types for
+an \verb"organization" object.
+There is one mandatory attribute:
+\begin{describe}
+\item[organizationName:]\index{attribute types, organizationName}\index{attribute types, o (organizationName)}
+			which gives the name of the organization.
+			The value of this attribute is a string; e.g.,
+\begin{quote}\small\begin{verbatim}
+Performance Systems International
+\end{verbatim}\end{quote}
+\end{describe}
+\tagtable[tp]{INT-3}{Attribute Types for the organization Object Class}%
+	{organization-attributes}
+
+There are several attributes that may be present,
+which are divided into three groups:
+physical address, telecommunications address, and miscellaneous information.
+
+The first group describes the physical address of the object:
+\begin{describe}
+\item[postalAddress:]\index{attribute types, postalAddress}
+			which describes how physical mail is addressed to the
+			object.
+			The syntax of this attribute's value is special:
+			it consists of~1 to~6 fields, seperated by the
+			``\verb"$"''-sign, each field being from~1 to~30
+			characters long; e.g.
+\begin{quote}\tiny\begin{verbatim}
+Performance Systems International $ 11800 Sunrise Valley Drive $ Reston, VA  22091
+\end{verbatim}\end{quote}
+
+\item[registeredAddress:]\index{attribute types, registeredAddress}
+			which defines how registered physical mail is
+			addressed to the object.
+			The syntax is identical to that of the
+			\verb"postalAddress" attribute.
+
+\item[streetAddress:]\index{attribute types, streetAddress}
+			which is a string describing where the object
+			physically resides
+			(i.e., the street name, place, avenue, and building
+			number); e.g.,
+			object
+\begin{quote}\small\begin{verbatim}
+165 Jordan Road
+\end{verbatim}\end{quote}
+			This need have no relationship to the object's
+			postal address.
+
+\item[postOfficeBox:]\index{attribute types, postOfficeBox}
+			which is a string describing the box at which the
+			object will receive physical postal delivery; e.g.,
+\begin{quote}\small\begin{verbatim}
+1010
+\end{verbatim}\end{quote}
+
+\item[physicalDeliveryOfficeName:]\index{attribute types, physicalDeliveryOfficeName}
+			which is a string describing the geographical location
+			of the physical delivery office which services the
+			postal address of this object; e.g.,
+\begin{quote}\small\begin{verbatim}
+Troy
+\end{verbatim}\end{quote}
+
+\item[stateOrProvinceName:]\index{attribute types, stateOrProvinceName}\index{attribute types, st (stateOrProvinceName)}
+			which is a string describing the state in which
+			the \verb"locality" is found; e.g.,
+\begin{quote}\small\begin{verbatim}
+NY
+\end{verbatim}\end{quote}
+
+\item[postalCode:]\index{attribute types, postalCode}
+			which is a string containing the ZIP code; e.g.,
+\begin{quote}\small\begin{verbatim}
+12180
+\end{verbatim}\end{quote}
+or
+\begin{quote}\small\begin{verbatim}
+94043-2112
+\end{verbatim}\end{quote}
+
+\item[localityName:]\index{attribute types, localityName}\index{attribute types, l (localityName)}
+			which is a string describing the geographical
+			area containing the \verb"streetAddress"; e.g.,
+\begin{quote}\small\begin{verbatim}
+Troy, New York
+\end{verbatim}\end{quote}
+\end{describe}
+The second optional group describes telecommunications addressing information
+for the object.
+\begin{describe}
+\item[telephoneNumber:]\index{attribute types, telephoneNumber}
+		which is a string describing the phone number of the object
+		using the international notation; e.g.,
+\begin{quote}\small\begin{verbatim}
++1 518-283-8860
+\end{verbatim}\end{quote}
+or
+\begin{quote}\small\begin{verbatim}
++1 518-283-8860 x1234
+\end{verbatim}\end{quote}
+In general, the syntax is:
+\begin{quote}\smaller\begin{verbatim}
++<<country code>> <<national number>> [x<<extension>>]
+\end{verbatim}\end{quote}
+
+\item[facsimileTelephoneNumber:]\index{attribute types, facsimileTelephoneNumber}
+		which is a string describing the fax number of the object
+		using the international notation; e.g.,
+\begin{quote}\small\begin{verbatim}
++1 518-283-8904
+\end{verbatim}\end{quote}
+
+\item[telexNumber:]\index{attribute types, telexNumber}
+		which is defines the TELEX address of the object in a
+		three-field format:
+\begin{quote}\small\begin{verbatim}
+number $ country $ answerback
+\end{verbatim}\end{quote}
+		e.g.,
+\begin{quote}\small\begin{verbatim}
+650 103 7390 $ US $ MCI UW
+\end{verbatim}\end{quote}
+\end{describe}
+The final optional group contains one miscellaneous attribute:
+\begin{describe}
+\item[description:]\index{attribute types, description}
+			which is a simple textual description;
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+Not-for-profit organization providing network services
+\end{verbatim}\end{quote}
+\end{describe}
+Figure~\ref{organization-edb} shows an entry for an \verb"organization" object.
+\tagfigure[tp]{INT-2}{An Example of an Entry for the organization Object Class}%
+	{organization-edb}
+
+\subsubsection	{The organizationalUnit objectClass}\index{object classes, organizationalUnit}
+Objects of this class represent a unit within an organization,
+such as a division or department.
+Each organization participating in the PSI White Pages Pilot decides
+how many organizational units it wishes to maintain as subordinates to
+its organization entry.
+
+Table~\ref{organizationalUnit-attributes} summarizes the attributes types for
+an \verb"organizationalUnit" object.
+There is one mandatory attribute:
+\begin{describe}
+\item[organizationalUnitName:]\index{attribute types, organizationUnitName}\index{attribute types, ou (organizationUnitName)}
+			which gives the name of the organizational unit.
+			The value of this attribute is a string; e.g.,
+\begin{quote}\small\begin{verbatim}
+Research and Development
+\end{verbatim}\end{quote}
+\end{describe}
+\tagtable[tp]{INT-4}{Attribute Types for the organizationalUnit Object Class}%
+	{organizationalUnit-attributes}
+
+There are several attributes that may be present.
+They belong to the physical address, telecommunications address,
+and miscellaneous information groups described earlier.
+
+Figure~\ref{organizationalUnit-edb} shows an entry for an
+\verb"organizationalUnit" object.
+\tagfigure[tp]{INT-3}%
+	{An Example of an Entry for the organizationalUnit Object Class}%
+	{organizationalUnit-edb}
+
+\subsubsection	{The locality objectClass}\index{object classes, locality}
+Objects of this class represent a geographical area,
+such as a state, county, or city.
+The sponsors of the PSI White Pages Pilot maintain such an entry for
+the State of New York.
+This is used to contain objects corresponding to individuals who are
+associated with organizations that are not participating in the pilot
+project.
+
+Table~\ref{locality-attributes} summarizes the attributes types for
+a \verb"locality" object.
+There is one mandatory attribute:
+\begin{describe}
+\item[localityName:]\index{attribute types, localityName}\index{attribute types, l (localityName)}
+			which gives the name of the locality.
+			The value of this attribute is a string; e.g.,
+\begin{quote}\small\begin{verbatim}
+NY
+\end{verbatim}\end{quote}
+or
+\begin{quote}\small\begin{verbatim}
+Rensselaer County
+\end{verbatim}\end{quote}
+\end{describe}
+\tagtable[tp]{INT-5}{Attribute Types for the locality Object Class}%
+	{locality-attributes}
+
+There is only one attribute that may be present,
+it  belongs to the miscellaneous information group described earlier.
+
+Figure~\ref{sony-edb} shows the entry for the State of New York,
+whilst Figure~\ref{locality-edb} shows an entry for a subordinate
+\verb"locality" object.
+\tagfigure[tp]{INT-4}{The Entry for The State of New York}{sony-edb}
+\tagfigure[tp]{INT-5}{An Example of an Entry for the locality Object Class}%
+		{locality-edb}
+
+\subsubsection	{The pilotPerson objectClass}\index{object classes, pilotPerson}
+Objects of this class represent a person participating in the pilot project.
+
+Table~\ref{pilotPerson-attributes} summarizes the attributes types for
+a \verb"pilotPerson" object.
+There are two mandatory attributes:
+\begin{describe}
+\item[commonName:]\index{attribute types, commonName}\index{attribute types, cn (commonName)}
+			which gives a (potentially ambiguous) name for
+			the person.
+			The value of this attribute is a string usually
+			containing the person's first and last names; e.g.,
+\begin{quote}\small\begin{verbatim}
+Marshall Rose
+\end{verbatim}\end{quote}
+			This attribute is usually multi-valued, containing
+			variations on the first, middle, and last names; e.g.,
+\begin{quote}\small\begin{verbatim}
+Colin Robbins
+Colin John Robbins
+Colin J. Robbins
+\end{verbatim}\end{quote}
+			For purposes of the pilot project, the distinguished
+			value of the attribute usually contains only the
+			person's first and last names.
+			(See Section~\ref{naming:people} on 
+			page~\pageref{naming:people} for a discussion of this.)
+
+\item[surName:]\index{attribute types, surName}
+			which gives the person's last name.
+			The value of this attribute is a string; e.g.,
+\begin{quote}\small\begin{verbatim}
+Rose
+\end{verbatim}\end{quote}
+\end{describe}
+\tagtable[tp]{INT-6}{Attribute Types for the pilotPerson Object Class}%
+	{pilotPerson-attributes}
+
+There are several attributes that may be present,
+which are divided into five groups:
+physical address, telecommunication information, 
+computer environment,
+miscellaneous information,
+and home information.
+The first two groups have been previously described.
+
+The third group describes information relating to the person's
+computer environment:
+\begin{describe}
+\item[rfc822Mailbox:]\index{attribute types, rfc822Mailbox}
+			which is the user's computer mail address,
+			e.g., 
+\begin{quote}\small\begin{verbatim}
+mrose@psi.com
+\end{verbatim}\end{quote}
+
+\item[otherMailbox:]\index{attribute types, otherMailbox}
+			which is the user's computer mail address
+			in various domains.
+			The syntax of this attribute's value is special:
+\begin{quote}\small\begin{verbatim}
+<domain> $ <mailbox>
+\end{verbatim}\end{quote}
+			e.g., 
+\begin{quote}\small\begin{verbatim}
+internet $ mrose@psi.com
+\end{verbatim}\end{quote}
+The current list of mail domains are:
+\[\begin{tabular}{l}
+applelink\\
+bitnet\\
+compuserve\\
+genie\\
+internet\\
+mcimail\\
+nasamail\\
+preferred\\
+uucp
+\end{tabular}\]
+
+\item[userid:]\index{attribute types, userid}
+			which is the user's login name; e.g.,
+\begin{quote}\small\begin{verbatim}
+mrose
+\end{verbatim}\end{quote}
+
+\item[userClass:]\index{attribute types, userClass}
+			which describe's the user's classification; e.g.,
+\begin{quote}\small\begin{verbatim}
+staff
+\end{verbatim}\end{quote}
+\end{describe}
+The next optional group contains a few miscellaneous attributes:
+\begin{describe}
+\item[description:]\index{attribute types, description}
+			which is a simple textual description;
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+Principal Implementor of the ISO Development Environment
+\end{verbatim}\end{quote}
+
+\item[info:]\index{attribute types, info}
+			which is additional information about the object;
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+It's nearly as good as BIND
+\end{verbatim}\end{quote}
+
+\item[businessCategory:]\index{attribute types, businessCategory}
+			which describes the person's business,
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+networking
+\end{verbatim}\end{quote}
+
+\item[title:]\index{attribute types, title}
+			which is the person's job title,
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+Senior Scientist
+\end{verbatim}\end{quote}
+
+\item[roomNumber:]\index{attribute types, roomNumber}
+			which is a string describing where the object resides
+			at the location, e.g.,
+\begin{quote}\small\begin{verbatim}
+Building T-30
+\end{verbatim}\end{quote}
+
+\item[userPassword:]\index{attribute types, userPassword}
+			which is a string containing the object's
+			password in the Directory.  This is used,
+			for example, when the user wants to update
+			the entry.
+			The password is kept in the clear
+			(the security ramifications of this are
+			discussed later on); e.g.,
+\begin{quote}\small\begin{verbatim}
+secret
+\end{verbatim}\end{quote}
+
+\item[mobileTelephoneNumber:]\index{attribute types, mobileTelephoneNumber}\index{attribute types, mobile (mobileTelephoneNumber)}
+			which is a string describing the user's mobile
+			number (e.g., for a cellular phone).
+
+\item[pagerTelephoneNumber:]\index{attribute types, pagerTelephoneNumber}\index{attribute types, pager (pagerTelephoneNumber)}
+			which is a string describing the user's pager number.
+
+\item[favouriteDrink:]\index{attribute types, favouriteDrink}\index{attribute types, drink (favouriteDrink)}
+			which is a string describing the user's favorite drink.
+
+\item[secretary:]\index{attribute types, secretary}
+			which is the Distinguished Name of the user's
+			secretary.
+
+\item[seeAlso:]\index{attribute types, seeAlso}
+			which is a Distinguished Name pointing to another
+			entry related to the user (perhaps in a different
+			role).
+
+\item[photo:]\index{attribute types, photo}
+			which is a facsimile bitmap of the user's face.
+\end{describe}
+The final optional group contains a few attributes about the person at home:
+\begin{describe}
+\item[homePostalAddress:]\index{attribute types, homePostalAddress}
+			which describes how physical mail is addressed to the
+			person's home.
+			The syntax of this attribute's value is special:
+			it consists of~1 to~6 fields, seperated by the
+			``\verb"$"''-sign, each field being from~1 to~30
+			characters long.
+
+\item[homePhone:]\index{attribute types, homePhone}
+		which is a string describing the phone number of the object
+		using the international notation.
+\end{describe}
+Figure~\ref{pilotPerson-edb} shows an entry for a \verb"pilotPerson" object.
+\tagfigure[tp]{INT-6}{An Example of an Entry for the pilotPerson Object Class}%
+	{pilotPerson-edb}
+
+\subsubsection	{The alias objectClass}\index{object classes, alias}
+Objects of this class represent an alias to some other entry in the
+PSI White Pages Pilot.
+Each organization participating in the pilot must define at least two of
+these:
+\begin{itemize}
+\item	a manager responsible for the organization's portion of the Directory
+	tree;
+	and,
+
+\item	a postmaster responsible for the organization's electronic mail.
+\end{itemize}
+
+Table~\ref{alias-attributes} summarizes the attributes types for
+an \verb"alias".
+There are two mandatory attributes:
+\begin{describe}
+\item[commonName:]\index{attribute types, commonName}\index{attribute types, cn (commonName)}
+			which gives the name of the alias.
+			The value of this attribute is a string; e.g.,
+\begin{quote}\small\begin{verbatim}
+PostMaster
+\end{verbatim}\end{quote}
+
+\item[aliasedObjectName:]\index{attribute types, aliasedObjectName}
+			which is a pointer to another object in the Directory;
+			e.g.,
+\begin{quote}\tiny\begin{verbatim}
+c=US@o=Performance Systems International@ou=Operations@cn=Wengyik yeong
+\end{verbatim}\end{quote}
+\[\fbox{\begin{tabular}{lp{0.4\textwidth}}
+\bf NOTE:&	The value of this attribute must not be another alias:
+		each alias must point to a non-aliased entry!
+\end{tabular}}\]
+\end{describe}
+There are no optional attributes for this object class.
+Figure~\ref{alias-edb} shows an entry for an \verb"alias" object.
+\tagtable[tp]{INT-7}{Attribute Types for the alias Object Class}%
+	{alias-attributes}
+\tagfigure[tp]{INT-7}{An Example of an Entry for the alias Object Class}%
+	{alias-edb}
+
+\subsubsection	{The organizationalRole objectClass}\index{object classes, organizationalRole}
+Objects of this class represent a position filled by a person.
+
+Table~\ref{organizationalRole-attributes} summarizes the attributes types for
+a \verb"organizationalRole".
+There is one mandatory attribute:
+\begin{describe}
+\item[commonName:]\index{attribute types, commonName}\index{attribute types, cn (commonName)}
+			which gives the name of the role.
+			The value of this attribute is a string; e.g.,
+\begin{quote}\small\begin{verbatim}
+Manager
+\end{verbatim}\end{quote}
+\end{describe}
+There are several attributes that may be present,
+which are divided into three groups:
+physical address, telecommunication information, 
+and miscellaneous information.
+The first two groups have been previously described.
+The final optional group contains two miscellaneous attributes:
+\begin{describe}
+\item[description:]\index{attribute types, description}
+			which is a simple textual description;
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+Manager of the Troy Office
+\end{verbatim}\end{quote}
+
+\item[roleOccupant:]\index{attribute types, roleOccupant}
+			which is a pointer to another object in the Directory,
+			referring to the person who currently fills the role.
+			e.g.,
+\begin{quote}\tiny\begin{verbatim}
+c=US@o=Performance Systems International@ou=Administration@cn=Kimberly Brown
+\end{verbatim}\end{quote}
+\end{describe}
+Figure~\ref{organizationalRole-edb} shows an entry for a \verb"organizationalRole"
+object.
+\tagtable[tp]{INT-9}{Attribute Types for the organizationalRole Object Class}%
+	{organizationalRole-attributes}
+\tagfigure[tp]{INT-14}%
+	{An Example of an Entry for the organizationalRole Object Class}%
+	{organizationalRole-edb}
+
+\subsubsection	{The quipuDSA objectClass}\index{object classes, quipuDSA}
+Objects of this class represent a Directory System Agent (DSA) running 
+the pilot project software.
+Each organization participating in the PSI White Pages Pilot typically
+runs at least one DSA.
+
+Table~\ref{quipuDSA-attributes} summarizes the attributes types for
+a \verb"quipuDSA".
+There are several mandatory attributes:
+\begin{describe}
+\item[commonName:]\index{attribute types, commonName}\index{attribute types, cn (commonName)}
+			which gives the name of the DSA,
+			by convention this is the name of an endangered species
+			in South America; e.g.,
+\begin{quote}\small\begin{verbatim}
+Fruit Bat
+\end{verbatim}\end{quote}
+
+\item[eDBinfo:]\index{attribute types, eDBinfo}
+			which indicates how the DSA participates when
+			propagating authoritative EDB information
+			(this is the dual
+			of the \verb"masterDSA" and \verb"slaveDSA"
+			attribute types discussed earlier).
+			The syntax of this attribute's value is special:
+\begin{quote}\small\begin{verbatim}
+<name> # <upstream> # <downstream>
+\end{verbatim}\end{quote}
+The \verb"<name>" field is a Distinguished Name referring to the object
+containing the EDB.
+By convention, if absent this refers to the ROOT (unnamed) EDB.
+The \verb"<upstream>" field is the Distinguished Name of a DSA which is
+considered to be ``closer'' to the MASTER of this EDB.
+It may be the name of the actual DSA containing the MASTER EDB,
+but it might also be the name of an intermediate DSA (containing a SLAVE copy).
+If this field is empty,
+then this DSA does not pull the EDB from another DSA
+(this needn't mean that it holds the MASTER EDB,
+though usually this is the case).
+The \verb"<downstream>" field is the Distinguished Name of a DSA which is
+allowed to copy the EDB from this DSA.
+If this field is empty,
+then this DSA does not allow other DSAs to copy the EDB.
+If the \verb"<downstream>" field is to contain more than one DSA,
+either enter multiple \verb"eDBinfo" lines or separate the Distinguished
+Names of the downstream DSAs with the \verb"`$'"-sign.
+
+A few examples:
+\begin{quote}\small\begin{verbatim}
+# cn=Giant Tortoise # cn=Fruit Bat
+c=US # # cn=Fruit Bat
+c=US # # c=US@cn=Spectacled Bear
+c=US@l=NY # cn=Fruit Bat #
+\end{verbatim}\end{quote}
+Note that there is no harm to using multiple \verb"eDBinfo" lines,
+even if they refer to the same EDB.
+These lines indicate that:
+\begin{itemize}
+\item	The ROOT EDB is read from the \verb"cn=Giant Tortoise" DSA,
+	further the \verb"cn=Fruit Bat" DSA is allowed to read the
+	ROOT EDB from this DSA.
+
+\item	The \verb"cn=Fruit Bat" DSA and the \verb"c=US@cn=Spectacled Bear" DSA
+	are allowed to read the EDB for \verb"c=US". 
+	Note that the second and third line could be combined as:
+\begin{quote}\small\begin{verbatim}
+c=US # # cn=Fruit Bat$c=US@cn=Spectacled Bear
+\end{verbatim}\end{quote}
+While more concise,
+this format is not recommended as it is probably more difficult to read.
+
+\item	The DSA named \verb"cn=Fruit Bat" supplies the EDB for \verb"c=US@l=NY"
+	to this DSA.
+\end{itemize}
+
+\item[presentationAddress:]\index{attribute types, presentationAddress}
+			which is the OSI presentation address that the DSA
+			resides at.
+			The syntax of this attribute's value is special:
+\begin{quote}\small\begin{verbatim}
+'0101'H/Internet=<quad>+<port>
+\end{verbatim}\end{quote}
+or
+\begin{quote}\small\begin{verbatim}
+'0101'H/Internet=<quad-1>+<port>|Internet=<quad-2>+<port>
+\end{verbatim}\end{quote}
+if the DSA is capable of listing on multiple IP addresses.%
+\footnote{Actually, the rules for forming OSI presentation addresses are
+{\em much\/} more complicated;
+however, for the purposes of the pilot project,
+this should suffice.}
+The \verb"<quad>" field is a 32-bit IP address expressed in the
+usual quad notation (e.g., \verb"130.117.128.2").
+The \verb"<port>" field is a decimal TCP port which isn't likely to
+be used on your system.
+The value \verb"17003" is recommended for the purposes of the pilot project.
+
+A simple example:
+\begin{quote}\small\begin{verbatim}
+'0101'H/Internet=130.117.128.2+17003
+\end{verbatim}\end{quote}
+Note that multiple values for the \verb"presentationAddress" attribute type
+should not be used:
+multiple IP addresses (up to~4) can be specified using a single attribute value.
+
+\item[manager:]\index{attribute types, manager}
+			which is a pointer to another object in the Directory
+			of the person who manages this DSA;
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+c=US@o=Performance Systems International@cn=Manager
+\end{verbatim}\end{quote}
+
+\item[userPassword:]\index{attribute types, userPassword}
+			which is a string containing the DSA's
+			password in the Directory.  This is used
+			when the manager of the DSA wants to
+			change the entry for the DSA itself
+			(as opposed to the entries held by the DSA).
+			The password is kept in the clear
+			(the security ramifications of this are
+			discussed later on); e.g.,
+\begin{quote}\small\begin{verbatim}
+secret
+\end{verbatim}\end{quote}
+
+\item[quipuVersion:]\index{attribute types, quipuVersion}
+			which is a simple string relating the version of
+			the pilot project software being run by this DSA;
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+Version 5.0
+\end{verbatim}\end{quote}
+\end{describe}
+There are two optional attributes:
+\begin{describe}
+\item[description:]\index{attribute types, description}
+			which, by convention, is multi-valued.
+			The distinguished value is the wildlife description
+			of the \verb"commonName" attribute whilst the other
+			values describe the role that the DSA plays in
+			the pilot project;
+			e.g.,
+\begin{quote}\small\begin{verbatim}
+The Mischevous Varmint
+A MASTER DSA for l=NY under c=US
+A SLAVE DSA for ROOT and c=US
+\end{verbatim}\end{quote}
+
+\item[supportedApplicationContext:]\index{attribute types, supportedApplicationContext}
+			which defines the application ports offerred by this
+process.
+			The current values are:
+\begin{quote}\small\begin{verbatim}
+x500DSP & x500DAP & quipuDSP
+\end{verbatim}\end{quote}
+\end{describe}
+Figure~\ref{quipuDSA-edb} shows an entry for a \verb"quipuDSA" object.
+\tagtable[tp]{INT-8}{Attribute Types for the quipuDSA Object Class}%
+	{quipuDSA-attributes}
+\tagfigure[tp]{INT-8}{An Example of an Entry for the quipuDSA Object Class}%
+	{quipuDSA-edb}
+
+\section	{Functional Model}
+The Functional Model describes the service in terms of entities.
+As noted earlier,
+two kinds of entities exist:
+{\em Directory User Agents\/} (DUAs),
+which operate on behalf of a user,
+and
+{\em Directory System Agents\/} (DSAs),
+which provide the service.
+
+The key aspect of the functional model is deciding how information
+is transferred through the system.
+When a DUA requests some action from a DSA
+(e.g., to read an entry),
+the DSA may not have that information resident.
+In this case,
+the DSA has a choice:
+it may either contact another DSA which is ``closer'' to the information
+and propagate the request (this is called {\em chaining\/}),
+or it may return information about this ``closer'' DSA to the DUA,
+and let the DUA re-issue its request
+(this is called {\em referral\/}).
+WHen DSAs communicate between themselves,
+they may also chain or refer requests.
+
+For the purposes of the pilot,
+it is important to understand what the term ``resident'' means with respect
+to information.
+This residency requirement is:
+\[\begin{tabular}{|l|l|}
+\hline
+\multicolumn{1}{|c|}{\bf Operation Requested}&
+		\multicolumn{1}{|c|}{\bf EDB Required for Residency}\\
+\hline
+read, compare&	MASTER, SLAVE, or CACHE\\
+list, search&	MASTER, or SLAVE\\
+update&		MASTER\\
+\hline
+\end{tabular}\]
+Note that after an update occurs,
+the DSA actually performing the update (the one holding the MASTER EDB)
+will write the in-core EDB structure to disk prior to returning the result
+of the operation.
+Of course,
+once a MASTER DSA updates its copy of the EDB,
+there is still the question of how DSAs with SLAVE copies receive this
+new information.
+The MASTER DSA does not explicitly inform them.
+A polling model is used instead.
+
+
+At present,
+a SLAVE DSA will reload its copy of an EDB when it starts,
+or when its \verb"manager" issues a management command directing it to do so.
+Later on,
+a script will be discussed which performs this task.
+The frequency at which the script runs (or how often a DSA reboots)
+determines how out of date a SLAVE copy of an EDB can become.
+
+Prior to requesting a copy of an EDB,
+a DSA checks to see if the timestamp has changed.
+If so,
+the EDB is updated.
+As noted earlier,
+the timestamp is the second line of an EDB file.
+Whenever a modification is made to an entry in an EDB file,
+the MASTER DSA for that EDB will update the timestamp accordingly.
+Similarly,
+whenever a text editor is used to modify an EDB file,
+the user should update the timestamp.
+The actual value is unimportant:
+when a DSA examines the timestamp,
+it looks only for a change;
+it does not consider whether the EDB is newer or older.
+
+Thus, while replication in the pilot is important to speed queries,
+updates still rely on a centralized entity being available.
+(This is the best compromise which can be taken without making the system
+tremendously more complex.)
+
+\section	{Organizational Model}
+The Organizational Model describes the service in terms of the policy
+defining interactions between entities and the information they hold.
+That is,
+this model describes how portions of the Directory tree map onto the DSAs.
+This includes issues of replication and access control.
+A {\em Directory Management Domain\/} (DMD) defines a portion of the
+Directory Tree and how it is managed.
+
+For the purposes of the pilot project,
+DSAs are divided into three categories:
+\begin{describe}
+\item[Level-0:]	These DSAs are run by the sponsors of the PSI White
+		Pages Pilot.  Their goal is to be highly-available
+		authoritative servers.
+
+\item[Level-1:]	Each organization participating in the pilot project runs
+		a Level-1 DSA.%
+\footnote{The pilot project sponsors may run the Level-1 DSA on behalf of an
+organization so requested.
+This is discouraged, but may be necessary for resource constrained sites.}
+The Level-1 DSA for a participating organization holds authoritative
+information about that organization object.
+
+\item[Level-2:]	As the size of the organization's subtree requires,
+an organization runs one or more Level-2 DSA to hold a portion of that subtree.
+Typically,
+a Level-2 DSA is run for each top-level organizational unit in the
+participating organization.
+\end{describe}
+Figure~\ref{dmd-topology} shows the top-level topology of the pilot project DMD.
+Each participating organization is represented by an \verb"organization"
+object ($O_1$ through $O_n$) under the \verb"c=US" tree.
+Underneath each \verb"c=US@o=O_i" object,
+one or more objects of class \verb"organizationalUnit" are placed.
+The structure beneath each \verb"c=US@o=O_i@ou=U_j" object
+is decided by the participating organization.
+The pilot project sponsors suggest that only \verb"pilotPerson" objects
+be placed underneath the organizational units.
+\tagfigure[tp]{INT-9}{Topology of the Pilot Project Directory Management Domain}%
+	{dmd-topology}
+
+Now that the general structure is outlined,
+how does this portion of the Directory tree map onto DSAs?
+
+\subsection	{Level-0 DSAs}
+There are two Level-0 DSAs.
+Both reside directly under the ROOT.
+
+The first Level-0 DSA, \verb"cn=Alpaca",
+contains a copy of the ROOT EDB which it obtains directly from the
+DSA holding the MASTER copy of the ROOT EDB.
+In addition,
+\verb"cn=Alpaca" is a MASTER DSA for \verb"c=US".
+It propagates this EDB to the second Level-0 DSA,
+and to the Level-1 DSAs of all participating organizations
+(e.g., each DSA holding the MASTER of the \verb"c=US@o=O_i" EDB).
+In addition,
+these Level-1 DSAs propagate a copy of their EDB for \verb"c=US@o=O_i"
+to this Level-0 DSA.
+Finally,
+this DSA receives a copy of the EDB for \verb"c=US@l=NY".
+
+Figure~\ref{alpaca-edb} shows the entry corresponding to this DSA.
+A single participating organization is shown in this entry.
+\tagfigure[tp]{INT-10}{The Entry for the Level-0 DSA, cn=Alpaca}{alpaca-edb}
+
+The second Level-0 DSA, \verb"cn=Fruit Bat",
+contains a copy of the ROOT and \verb"c=US" EDBs which it obtains from
+\verb"cn=Alpaca".
+It may propagate these EDBs to any Level-1 DSA
+(in case \verb"cn=Alpaca" is unavailable for an extended period of time).
+In addition,
+these Level-1 DSAs
+propagate a copy of their MASTER EDB to this Level-0 DSA.
+Finally,
+\verb"cn=Fruit Bat" is a MASTER DSA for \verb"c=US@l=NY",
+which it propagates to \verb"cn=Alpaca".
+
+Figure~\ref{fruitbat-edb} shows the entry corresponding to this DSA.
+As with the \verb"cn=Alpaca" DSA,
+a single participating organization is shown.
+\tagfigure[tp]{INT-11}{The Entry for the Level-0 DSA, cn=Fruit Bat}%
+	{fruitbat-edb}
+
+Level-0 DSAs perform chaining when handling requests from other DSAs.
+
+\subsection	{Level-1 DSAs}
+Each participating organization runs a DSA which contains the MASTER EDB
+for that organization.
+This DSA resides directly under \verb"c=US".
+
+This DSA receives a copy of the ROOT and \verb"c=US" EDBs from
+one of the Level-0 DSAs (usually \verb"cn=Alpaca").
+It also propagates its MASTER copy of the \verb"c=US@o=O_i" EDB to
+both Level-0 DSAs.
+
+In addition,
+this DSA propagates its EDB and a copy of the ROOT and \verb"c=US" EDBs
+to all Level-2 DSAs run by this organization.
+Similarly,
+each of these Level-2 DSAs propagate {\em all\/} of the EDBs they
+MASTER (e.g., \verb"c=US@o=O_i@ou=U_j") to this Level-1 DSA.
+
+Level-1 DSAs perform chaining when handling requests from other DSAs.
+
+Figure~\ref{spectacledbear-edb} shows the entry corresponding to a Level-1 DSA,
+which might be named \verb"c=US@cn=Spectacled Bear".
+A single subordinate Level-2 DSA is shown in this entry.
+\tagfigure[tp]{INT-12}{The Entry for a Level-1 DSA}{spectacledbear-edb}
+
+\subsection	{Level-2 DSAs}
+Each participating organization runs zero or more Level-2 DSAs as the size of
+their organizational units require.
+These DSAs reside directly under \verb"c=US@o=O_i".
+
+\[\fbox{\begin{tabular}{lp{0.8\textwidth}}
+\bf NOTE:&	At present, the pilot sponsors discourage the use of Level-2
+		DSAs.
+
+		Nevertheless,
+		it is important to structure an organization so that it 
+		contains organizational units.
+		In this fashion,
+		when a Level-1 DSA is too large to run on an available system,
+		a Level-2 DSA can be used to reduce the memory requirements
+		on the system running the Level-1 DSA.
+\end{tabular}}\]
+
+Level-2 DSAs receive a copy of the \verb"c=US@o=O_i" EDB from their
+superior Level-1 DSA,
+along with SLAVE copies of the ROOT and \verb"c=US" EDBs.
+They also propagate all MASTER copies of the EDBs they hold to this Level-1
+DSA. 
+
+Level-1 DSAs perform referrals when handling requests from other DSAs.
+
+Figure~\ref{toucan-edb} shows the entry corresponding to a Level-2 DSA,
+which might be named \verb"c=US@o=Performance Systems International@cn=Toucan".
+\tagfigure[tp]{INT-13}{The Entry for a Level-2 DSA}{toucan-edb}
+
+\subsection	{DUAs}
+In terms of the pilot project,
+DUAs conceptually exist at the same level as Level-2 DSAs.
+When a DUA associates with a DSA to access the Directory service,
+chaining is preferred over referrals,
+so that the associated DSA may cache the results to any query made by the DUA.
+This will slightly enhance the performance for other DUAs which later
+associate with this particular DSA.
+
+The preference to be used when associating with a DSA is:
+\begin{itemize}
+\item	``closest'' Level-2 DSA; followed by
+
+\item	Level-1 DSA; followed by
+
+\item	\verb"cn=Fruit Bat"; followed by
+
+\item	\verb"cn=Alpaca".
+\end{itemize}
+
+\section	{Security Model}
+The Security Model describes the service in terms of authentication
+and authorization.
+For the purposes of the pilot project,
+``simple'' authentication is performed (i.e., passwords).
+The pilot project supports an anonymous DN, termed the NULL DN,
+which may be used for public, read-only access.
+Otherwise,
+users are required to bind to the Distinguished Name which corresponds
+to them.
+
+Note that an important feature of the DMD topology presented in the
+Organizational Model is that information on users
+(and hence their passwords and any other sensitive information)
+is kept only on Level-1 and Level-2 DSAs.
+Since,
+in general,
+these DSAs are run by each participating organization,
+each organization may safeguard the disk-resident EDB files accordingly.
+
+Because the ROOT, \verb"c=US", and \verb"c=US@o=O_i" EDBs are widely
+replicated,
+entries contained therein should not rely on \verb"self" access control
+for modification.
+That is,
+the entries contained in this EDBs should:
+\begin{itemize}
+\item	if of object class \verb"quipuDSA", have a \verb"manager"
+	attribute which resolves to an entry which is not propagated outside
+	of the associated organization; e.g.,
+\begin{quote}\small\begin{verbatim}
+manager= c=US@o=O_i@cn=Manager
+\end{verbatim}\end{quote}
+which is an object of classe \verb"alias" to
+\begin{quote}\small\begin{verbatim}
+c=US@o=O_i@ou=Development@cn=FirstName LastName
+\end{verbatim}\end{quote}
+	and,
+
+\item	regardless of the object class,
+	always use \verb"group" access to specify an entry which is not
+	propagated outside of the associated organization; e.g.,
+\begin{quote}\scriptsize\begin{verbatim}
+acl= others # read # entry
+acl= group # c=US@o=O_i@cn=Manager # write # entry
+acl= others # read # default
+acl= group # c=US@o=O_i@cn=Manager # write # default
+acl= others # compare # attributes # accessControlList$userPassword
+acl= group # c=US@o=O_i@cn=Manager # write # attributes # accessControlList$userPassword
+\end{verbatim}\end{quote}
+\end{itemize}
+Note that the object associated with the \verb"manager" attribute of a DSA
+is effectively the ``super user'' for all EDBs which that DSA MASTERs.
+As such,
+the \verb"userPassword" associated with the corresponding object should be 
+protected to the greatest extent practical.
+
+Since there is no hope of protecting the passwords for a DSA or any object
+residing in the ROOT, \verb"c=US", and possibly \verb"c=US@o=O_i" EDBs,
+this policy effectively revokes any privileges assocated with the passwords of
+the entries contained in these EDBs.
+
+\section	{Running your DMD}
+The pilot sponsors prefer that you administer your own DMD by running the
+pilot software on one of your own systems,
+doing maintenance,
+and so on.
+You should now continue with Chapter~\ref{installation}.
+
+However,
+if your site is a member of PSInet,
+then the pilot sponsors will administer the DMD for you,
+if you lack the facilities to do so.
+In this case,
+you will be required to provide EDB files to the pilot sponsors.
+Contact 
+\begin{quote}\small\begin{verbatim}
+wpp-manager@uu.psi.com
+\end{verbatim}\end{quote}
+to find out the full details.
+
+For now, 
+note that entries are formatted as described above,
+but with a few read-only modifications:
+\begin{itemize}
+\item	The \verb"accessControlList" attribute is simply:
+\begin{quote}\small\begin{verbatim}
+acl=
+\end{verbatim}\end{quote}
+
+\item	The \verb"userPassword" attribute is not present.
+\end{itemize}
+

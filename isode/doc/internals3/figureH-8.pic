@@ -1,0 +1,17 @@
+.PS
+.ps 20
+## figure H-8
+boxwid = 4 * boxwid
+B1:	box height 7*boxht/2
+B2:	box with .n at B1.s "RTS" height 3*boxht/2
+B3:	box with .n at B2.s "SESSION" height 3*boxht/2
+B4:	box with .n at B3.s "TRANSPORT SWITCH" height 3*boxht/2
+	line dotted from B1.n to B1.s
+##
+boxwid = boxwid / 4
+B1a:	box with .w at (B1.w.x+boxwid/2, B1.w.y) "P1" dashed
+B1b:	box with .ne at (B1.ne.x-boxwid/2, B1.n.y-boxht/2) "P3" dashed
+B1c:	box with .se at (B1.ne.x-boxwid/2, B1.s.y+boxht/2) "ROS"
+	line from B1b.s to B1c.n
+##
+.PE

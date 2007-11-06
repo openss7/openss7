@@ -1,0 +1,167 @@
+MASTER
+910514084657Z
+cn=DSA Probe
+objectClass= top & person & applicationEntity & quipuObject
+cn= DSA Probe
+sn= Probe
+description= Person to allow password
+presentationAddress= TELEX+00728722+X.25(80)+02+000021001029
+userPassword= {CRYPT}SQLAF
+lastModifiedTime= 910514084657Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= others # compare # attributes # userPassword
+
+cn=file service
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= file service
+presentationAddress= '0103'H/TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00737346+RFC-1006+03+128.243.9.1|TELEX+00728722+X.25(80)+06+20433450210399
+supportedApplicationContext= iso ftam
+lastModifiedTime= 910228144721Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= iso.ftam
+
+cn=isode echo
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= isode echo
+presentationAddress= '0200'H/TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00737346+RFC-1006+03+128.243.9.1
+lastModifiedTime= 910228144724Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= isod.acsap
+
+cn=isode idist
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= isode idist
+presentationAddress= '020d'H/TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00737346+RFC-1006+03+128.243.9.1|TELEX+00728722+X.25(80)+06+20433450210399
+supportedApplicationContext= isode
+lastModifiedTime= 910228144727Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= ros.idist
+
+cn=isode miscellany
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= isode miscellany
+presentationAddress= '0206'H/TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00737346+RFC-1006+03+128.243.9.1|TELEX+00728722+X.25(80)+06+20433450210399
+supportedApplicationContext= isode miscellany
+lastModifiedTime= 910228144730Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= ros.imisc
+
+cn={T.61}isode ros_echo
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= {T.61}isode ros_echo
+presentationAddress= '0202'H/TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00737346+RFC-1006+03+128.243.9.1
+lastModifiedTime= 910228144733Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= isod.rtsap -rtse -rose
+
+cn={T.61}isode ros_sink
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= {T.61}isode ros_sink
+presentationAddress= '0205'H/TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00737346+RFC-1006+03+128.243.9.1
+lastModifiedTime= 910228144735Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= isod.rtsap -rtse -rose
+
+cn=isode rtse echo
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= isode rtse echo
+presentationAddress= '0201'H/TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00737346+RFC-1006+03+128.243.9.1
+lastModifiedTime= 910228144738Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= isod.rtsap -rtse
+
+cn=isode rtse sink
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= isode rtse sink
+presentationAddress= '0204'H/TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00737346+RFC-1006+03+128.243.9.1
+lastModifiedTime= 910228144741Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= isod.rtsap -rtse
+
+cn=isode sink
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= isode sink
+presentationAddress= '0203'H/TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00737346+RFC-1006+03+128.243.9.1
+lastModifiedTime= 910228144748Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= isod.acsap
+
+cn=p7 server
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= p7 server
+presentationAddress= "595"/TELEX+00737346+RFC-1006+03+128.243.9.1+19001
+supportedApplicationContext= 2.6.0.1.4
+lastModifiedTime= 910301133801Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= /u3/pp/cmds/chans/p7server
+
+cn=pp qmgr
+objectClass= top & applicationEntity & quipuObject
+cn= pp qmgr
+description= {T.61}Submit to Qmgr - iaed must NOT listen on this one !
+presentationAddress= '1001'H/TELEX+00737346+RFC-1006+03+128.243.9.1+18000
+supportedApplicationContext= 0.9.2342.60200172.201.1
+lastModifiedTime= 910228144751Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+
+cn=terminal service
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= terminal service
+presentationAddress= '0104'H/TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00737346+RFC-1006+03+128.243.9.1|TELEX+00728722+X.25(80)+06+20433450210399
+supportedApplicationContext= iso vt
+lastModifiedTime= 910228144753Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= iso.vt
+
+cn=transport echo
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= transport echo
+presentationAddress= '0080'H/TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00737346+RFC-1006+03+128.243.9.1
+lastModifiedTime= 910228144756Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= isod.tsap
+
+cn=transport sink
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= transport sink
+presentationAddress= '0081'H/TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00737346+RFC-1006+03+128.243.9.1
+lastModifiedTime= 910228144759Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= isod.tsap
+
+cn=x40084
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= x40084
+description= X.400 service (1984)
+presentationAddress= "594"/TELEX+00737346+RFC-1006+03+128.243.9.1|TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00728722+X.25(80)+06+20433450210399
+supportedApplicationContext= 2.6.0.1.6
+lastModifiedTime= 910124160041Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= /u3/pp/cmds/chans/x400in84
+
+cn=x40088
+objectClass= top & applicationEntity & quipuObject & iSODEApplicationEntity
+cn= x40088
+description= X.400 service (1988)
+presentationAddress= "597"/TELEX+00737346+RFC-1006+03+128.243.9.1|TELEX+00728722+X.25(80)+02+00002100102999|TELEX+00728722+X.25(80)+06+20433450210399
+supportedApplicationContext= 2.6.0.1.6
+lastModifiedTime= 910124160045Z
+lastModifiedBy= c=GB@o=X-Tel Services Ltd@cn=Camayoc
+acl= 
+execVector= /u3/pp/cmds/chans/x400in88 -c x400in88 -n
+

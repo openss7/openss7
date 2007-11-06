@@ -1,0 +1,19 @@
+.PS
+.ps 20
+## figure T-3
+B1:	box "O"
+B2:	box "S" with .n at (B1.s.x, B1.s.y-lineht)
+	line from B1.s to B2.n
+B3:	box "F" with .w at (B2.e.x+2*linewid, B2.e.y)
+	line from B2.e to B3.w
+B4:	box "D" with .w at (B3.e.x+2*linewid, B3.e.y)
+	line from B3.e to B4.w
+B5:	box "R" with .s at (B4.n.x, B4.n.y+lineht)
+	line from B4.n to B5.s
+	line dashed from B1.e to B5.w "end-to-end" ""
+	line dashed from (B2.e.x, B2.s.y-lineht/2) \
+		    to   (B4.w.x, B4.s.y-lineht/2)
+	move to (B3.s.x, B4.s.y-(lineht/2+boxht/4)); \
+		"store-and-forward" center
+##
+.PE

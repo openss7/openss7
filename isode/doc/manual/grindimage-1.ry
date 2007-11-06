@@ -1,0 +1,144 @@
+IMAGE DEFINITIONS ::=
+
+BEGIN
+
+-- operations
+
+initialize OPERATION
+	ARGUMENT	Initialize-INV
+	RESULT		Initialize-RSP
+	ERRORS		{ congested, versionNotSupported }
+	::=		1
+
+readImage OPERATION
+	ARGUMENT	ReadImage-INV
+	RESULT		ReadImage-RSP
+	ERRORS		{ congested, noMatches, formatNotSupported }
+	::=		2
+
+
+-- errors
+
+congested ERROR
+	::=		1
+
+versionNotSupported ERROR
+	PARAMETER	VersionsSupported
+	::=		2
+
+noMatches ERROR
+	::=		3
+
+formatNotSupported ERROR
+	PARAMETER	FormatsSupported
+	::=		4
+
+
+-- types
+
+Initialize-INV ::=
+	SEQUENCE {
+	    proposed[0]
+		IMPLICIT Version
+		DEFAULT { version-1 }
+	}
+
+Initialize-RSP ::=
+	SEQUENCE {
+	    negotiated[0]	-- need not be present if only one
+				-- version was requested and that was chosen,
+				-- otherwise exactly one bit is set
+		IMPLICIT Version
+		OPTIONAL
+	}
+
+VersionsSupported ::=
+	SEQUENCE {
+	    supported[0]
+		IMPLICIT Version
+	}
+
+Version ::=
+	BITSTRING { version-1(0) }
+
+
+ReadImage-INV ::=
+	SEQUENCE {
+				-- in order of preference for searching
+	    SEQUENCE OF
+		CHOICE {
+		    file-name[0]
+			IMPLICIT Filename,
+
+		    mail-address[1]
+			IMPLICIT Mail-Address
+		},
+
+				-- in order of preference for retrieval
+	    SEQUENCE OF
+		Format
+	}
+
+ReadImage-RSP ::=
+	SEQUENCE {
+	    CHOICE {
+		x-windows
+		    X-Windows-Bitmap
+	    }
+	}
+
+FormatsSupported ::=
+	SEQUENCE {
+	    supported[0]
+		IMPLICIT Format
+	}
+
+Format ::=
+	BITSTRING { x-windows-bitmap(0) }
+
+
+-- discriminants
+
+Filename ::=
+	[APPLICATION 1]
+	    IMPLICIT GraphicString
+
+Mail-Address ::=
+	[APPLICATION 2]
+	    IMPLICIT SEQUENCE {
+		local[0]
+		    IMPLICIT GraphicString,
+
+		domain[1]
+		    IMPLICIT GraphicString,
+
+		options[2]
+		    IMPLICIT BITSTRING { default-local(0), default-host(1) }
+		    DEFAULT { default-local, default-host }
+	    }
+
+
+-- image formats
+
+X-Windows-Bitmap ::=
+	[APPLICATION 100]
+	    IMPLICIT SET {
+		width[0]
+		    IMPLICIT INTEGER,
+
+		height[1]
+		    IMPLICIT INTEGER,
+
+		hot-spot-x[2]
+		    IMPLICIT INTEGER
+		    DEFAULT -1,
+
+		hot-spot-y[3]
+		    IMPLICIT INTEGER
+		    DEFAULT -1,
+
+		data[4]		-- padded to short boundaries
+		    IMPLICIT OCTETSTRING
+	}
+
+END

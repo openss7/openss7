@@ -1,0 +1,60 @@
+The use of this program may not be readily apparent.  If you are using
+TranScript, and your printer's name is "ps", you would use a command
+sequence that looked something like this:
+
+	% tex myfile
+	% dvi2ps myfile > myfile.ps
+	% lpr -Pps myfile.ps
+
+The first few pages will print in a very very slow fashion while the fonts
+are being defined.  Printing speeds up a little as you get further down the
+document.
+
+
+Installation comments:
+======================
+
+In installing this software, you will need to put tex.ps in
+/usr/lib/tex/tex.ps.  If you want to put it somewhere else, see the
+definition in the Makefile.  tex.ps is incorporated into the PostScript file
+produced by dvi2ps. The file tex.ps.doc is tex.ps with all the
+comments.
+
+The font area is assumed to be /usr/lib/tex/fonts. 
+This filter supports the TEXFONTS environment path.  The font area is
+arranged in a new fashion that will probably be showing up in other device
+drivers as well.  All the tfm files are contained in /usr/lib/tex/fonts.  If
+a file named SUBDIR is present in /usr/lib/tex/fonts (or whatever directory
+name you select), then the name of the font is taken as the name of a
+subdirectory in searching for the gf file associated with the font.  In
+other words, cmr10.300gf will be found in
+/usr/lib/tex/fonts/cmr10/cmr10.300gf.  When the file named SUBDIR is not
+present, all gf files are looked for in the directory itself, in other
+words, /usr/lib/tex/fonts/cmr10.300gf in the above example.
+
+printcap information
+====================
+
+MIT uses another program called dvipsf when the LaserWriter is used with the
+/etc/printcap file.  dvipsf invokes dvi2ps and applef.  Both dvipsf.c and
+applef.c are included here.  MIT's printcap entry for the laserwriter reads:
+7th Floor LaserWriter|lw7|7lw|laserwriter|apple|LE-MONDE|LE-MONDE-LGP|LE-MONDE-ASCII|LE-MONDE-DVI:\
+	:cP=LE-MONDE-LGP:cT:dP=LE-MONDE-DVI:dT:vP=LE-MONDE:\
+	:br#9600:rw:fc#0000374:fs#0000003:xc#0:xs#0040040:mx#0:\
+	:lp=/dev/ttyh5:sd=/usr/spool/lw7:pl#66:pw#89:\
+	:lf=/usr/spool/lw7/log:of=/usr/lib/applef:\
+	:md=/usr/spool/lw7/motd:vf=/usr/lib/applef:\
+	:df=/usr/lib/dvipsf:cf=/usr/lib/applebitf:
+
+
+History and acknowledgements
+============================
+
+The driver was converted by Neal Holtz of Carleton University from a Sun
+previewer originally written by Mark Senn and later modified by others (see
+dvi2ps for specifics).  Additional modifications and enhancements have been
+done by Scott Jones and Chris Lindblad at MIT. tpic support and misc
+bug fixes by Dorab Patel <dorab@cs.ucla.edu> with help from Dan
+Trinkle <trinkle@purdue.edu>.
+
+(These notes added by Richard Furuta)

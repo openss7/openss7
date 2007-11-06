@@ -1,0 +1,69 @@
+BEGIN {
+	INVALID = 2;
+
+	didone = 0;
+	for (i in userName) {
+	    if (!didone) {
+		printf "Users:\n";
+		printf "%-8s %-5s %-8s %-22s %-20s %s\n",
+		       "Name",
+			     "  ID",
+				  "Group",
+				       "Full Name",
+					     "Home",
+						    "Shell";
+		didone = 1;
+	    }
+
+	    if (userStatus == INVALID)
+		continue;
+	    printf "%-8s %5d %-8s %-22s %-20s %s\n",
+		    userName,
+			 userID,
+			     userGroup,
+				  userFullName,
+					userHome,
+					      userShell;
+	    if (userQuota > 0 || userComment != "")
+		printf "    quota: %d, comment: %s\n", userQuota, userComment;
+	}
+	if (!didone && DIAGNOSTIC)
+	    printf "users: %s\n", DIAGNOSTIC;
+
+
+	didone = 0;
+	for (i in groupName) {
+	    if (!didone) {
+		printf "Groups:\n";
+		printf "%-8s %-5s%s\n",
+		       "Name",
+			     "  ID",
+				  "    Members";
+		didone = 1;
+	    }
+
+	    if (groupStatus == INVALID)
+		continue;
+	    printf "%-8s %5d",
+		    groupName,
+			 groupID;
+
+	    s = i "." 0;
+	    t = "    ";
+	    for (j in grUserStatus, s) {
+		if (grUserStatus == INVALID)
+		    continue;
+		x = split (j, instance, ".");
+		for (y = x; y > 0; y--)
+		    if (instance[y] == 0)
+			break;
+		printf "%s", t;
+		for (y++; y <= x; y++)
+		    printf "%c", instance[y];
+		t = " ";
+	    }
+	    printf "\n";
+	}
+	if (!didone && DIAGNOSTIC)
+	    printf "groups: %s\n", DIAGNOSTIC;
+      }

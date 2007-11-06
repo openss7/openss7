@@ -1,0 +1,33 @@
+.PS
+.ps 20
+## figure 1
+B1a:	box "APPL-$\alpha$" height boxht+lineht/2+boxht/2 width 3*boxwid/2
+B1:	box invis with .s at B1a.s height boxht/2
+B2:	box invis with .sw at (B1.se.x+3*linewid/2, B1.sw.y+lineht/2) \
+		height boxht/2
+B2a:	box invis with .s at B2.n
+B3a:	box "APPL-$\gamma$"  with .sw at (B2.se.x+3*linewid/2-boxht/2, B1a.sw.y) \
+	    height boxht+lineht/2+boxht/2 width 3*boxwid/2
+B3:	box invis with .s at B3a.s height boxht/2
+##
+B4:	box "OSI" "" "STACK" with .n at (B1.s.x, B1.s.y-lineht) \
+		height 2*boxht width 3*boxwid/2
+B5:	box "TCP" "" "STACK"with .n at (B3.s.x, B3.s.y-lineht) \
+		height 2*boxht width 3*boxwid/2
+##
+B6:	box "MEDIA" "DRIVER" with .n at ((B4.s.x+B5.s.x)/2, B4.s.y-lineht) \
+	width 2*boxwid
+##
+	line from B1.s to (B4.n.x, B4.n.y)
+	line from B3.s to (B5.n.x, B5.n.y)
+	line from B4.s to (B6.n.x-boxwid/3, B6.n.y)
+	line from B5.s to (B6.n.x+boxwid/3, B6.n.y)
+	line from B6.s to (B6.s.x, B6.s.y-2*lineht)
+	line from (B1.w.x-2*linewid, B6.s.y-2*lineht) \
+	     to   (B3.e.x+2*linewid, B6.s.y-2*lineht)
+##
+B7:	box with .nw at (B1.nw.x-linewid, B2a.nw.y+lineht) \
+		width B3.e.x-B1.w.x+2*linewid \
+		height B2a.n.y-B6.s.y+2*lineht
+##
+.PE

@@ -1,0 +1,15 @@
+\File{figureS\-14.c},{11:21},{May  5 1990}
+\L{\LB{}\Tab{8}{\K{default}:}}
+\L{\LB{}\Tab{8}{    \K{return} int\_SNMP\_error\_\_status\_genErr;}}
+\L{\LB{    \}}}
+\L{\LB{}}
+\L{\LB{    \K{switch} (ifvar) \{}}
+\L{\LB{}\Tab{8}{\K{case} ipNextHop:}}
+\L{\LB{}\Tab{8}{    \K{return} o\_ipaddr (oi, v, (\K{struct} sockaddr\_in *) \&rt \-\> rt\_gateway);}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{}\Tab{8}{\K{default}:}}
+\L{\LB{}\Tab{8}{    \K{return} int\_SNMP\_error\_\_status\_noSuchName;}}
+\L{\LB{    \}}}
+\L{\LB{\}}}

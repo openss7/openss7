@@ -1,0 +1,366 @@
+MASTER
+910529185430Z
+o=X-Tel Services Ltd
+objectClass= top & organization & organizationalUnit & thornObject & domainRelatedObject & quipuObject & quipuNonLeafObject
+l= Nottingham
+st= Nottingham
+o= xtel &\
+	X-Tel Services Ltd
+ou= X-Tel Services Ltd
+description= General support and development of OSI applications
+searchGuide= mhsDistributionList#cn$APPROX &\
+	applicationEntity#supportedApplicationContext$EQ &\
+	organizationalRole#cn$APPROX &\
+	person#(sn$EQ)|(cn$APPROX)|(cn$SUBSTR)|(uid$EQ)
+businessCategory= Quipu support &\
+	PP support &\
+	ISODE support
+postalAddress= X-Tel Services Ltd $ University Park $ Nottingham $ NG7 2RD
+telephoneNumber= +44 602 484848 x3595 &\
+	+44 602-412648
+telexNumber= 37346 $ G $ UNINOT
+facsimileTelephoneNumber= +44 602 790278
+preferredDeliveryMethod= MHS $ TELEPHONE $ G3FAX $ PHYSICAL
+seeAlso= c=GB@o=Nottingham University@ou=Affiliates@ou=Zeton Limited
+photo= {FILE}
+lastModifiedTime= 910520101835Z
+lastModifiedBy= o=Cosine@ou=Paradise@cn=Camayoc
+associatedDomain= xtel.co.uk
+acl= group # c=GB@o=X-Tel Services Ltd@cn=Camayoc # write # child &\
+	others # read # child &\
+	group # c=GB@o=X-Tel Services Ltd@cn=Camayoc # write # entry &\
+	others # read # entry &\
+	group # c=GB@o=X-Tel Services Ltd@cn=Camayoc # write # default &\
+	others # read # default
+masterDSA= cn=Vampire Bat
+slaveDSA= cn=Giant Tortoise
+iattr= organizationalPerson $ DEFAULT (
+postalAddress=
+telephoneNumber=
+facsimileTelephoneNumber=
+preferredDeliveryMethod=
+acl= self # write # attributes # userPassword &\
+	others # compare # attributes # userPassword
+)
+
+o=University College London
+objectClass= top & organization & domainRelatedObject & quipuObject & quipuNonLeafObject
+l= London
+st= London
+streetAddress= Gower Street
+o= University College London &\
+	UCL
+businessCategory= University
+postalAddress= University College London $ Gower Street $ London $ WC1E 6BT
+postalCode= WC1E 6BT
+telephoneNumber= +44 71-387-7050
+x121Address= 234219200300
+userPassword= {CRYPT}V\40O
+lastModifiedTime= 910516111109Z
+lastModifiedBy= c=GB@o=University College London@ou=Computer Science@cn=Incads
+associatedDomain= ucl.ac.uk
+acl= others # read # child &\
+	others # read # entry &\
+	group # c=GB@o=University College London@ou=Computer Science@cn=incads # write # entry &\
+	others # read # default &\
+	group # c=GB@o=University College London@ou=Computer Science@cn=incads # write # default
+masterDSA= c=GB@cn=Giant Armadillo
+slaveDSA= c=GB@cn=Vicuna
+
+cn=Giant Armadillo
+objectClass= top & applicationEntity & dSA & quipuDSA
+cn= Priodontes Maximus &\
+	Giant Armadillo
+l= London
+o= University College London
+description= Rolls into a ball for protection &\
+	DSA running on sparc, holding UCL data.
+presentationAddress= TELEX+00728722+X.25(80)+02+00000511320040|NS+5400728722041280400200030200500000
+supportedApplicationContext= X500DSP & X500DAP & quipuDSP
+seeAlso= c=GB@cn=Vicuna
+userPassword= {CRYPT}bQN
+manager= c=GB@o=University College London@ou=Computer Science@cn=incads &\
+	c=GB@o=University College London@ou=Central Computing Service@cn=A Barker
+lastModifiedTime= 910424114105Z
+lastModifiedBy= c=GB@o=University College London@ou=Computer Science@cn=Incads
+acl= others # read # child &\
+	others # read # entry &\
+	group # c=GB@o=University College London@ou=Computer Science@cn=incads$c=GB@o=X-Tel Services Ltd@cn=Camayoc # write # entry &\
+	others # read # default &\
+	group # c=GB@o=University College London@ou=Computer Science@cn=incads$c=GB@o=X-Tel Services Ltd@cn=Camayoc # write # default
+eDBinfo= #c=GB@cn=Vicuna# &\
+	c=GB#c=GB@cn=Vicuna# &\
+	c=GB@o=University College London##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Wellcome Institute for the History of Medicine##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=University College and Middlesex School of Medicine (Administration)##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=UCLi Ltd##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=UCL Union##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Tufts University##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Transport Studies##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Trades Union Office##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Surgery##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Student Residences Office##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Statistical Science##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Spanish and Latin American Studies##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Slade School of Fine Art##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Security Office##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Secretary's Office##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Scandinavian Studies##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Safety Office##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Royal Historical Society##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Registrar's Division##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Refectory##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Publicity and External Affairs##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Psychology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Psychiatry##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Provost's Office##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Primary Health Care##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Physiology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Physics and Astronomy##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Photography and Illustration Centre##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Photogrammetry and Surveying##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Phonetics and Linguistics##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Philosophy##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Pharmacology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Personnel##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Paediatrics##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Oncology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Occupational Health##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Obstetrics and Gynaecology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Nuclear Medicine##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Neurological Studies (The Rena Lila Weston Institute)##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Molecular Endocrinology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Modern European Studies##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Medicine##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Medical Research Council##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Medical Physics and Bio-Engineering##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Medical Microbiology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Mechanical Engineering##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Mathematics##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Management Information Systems Unit##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Library, Archive and Information Studies##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Library##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Laws##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Latin Greek and Latin##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Italian##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Institute of Classical Studies##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Institute of Archaeology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Immunology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Human Tumour Immunology Group##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=History of Art##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=History and Philosophy of Science##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=History##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Histopathology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=HIPACT##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Hebrew and Jewish Studies##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Health Centre (Gower Place Practice)##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Haematology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Greek and Latin##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=German##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Geological Sciences##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Geography##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Genito-Urinary Medicine##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Genetics and Biometry##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=General Division##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Furnishings Bursar's Department##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=French Language and Literature##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Finance Division##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Ferens Institute of Oto-Laryngology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Faculty of Mathematical and Physical Sciences##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Faculty of Life Sciences##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Faculty of Engineering##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Faculty of Arts##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=External Relations##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=English Language and Literature##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Electronic and Electrical Engineering##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Egyptology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Economics##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Dutch##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Domestic Office Central Services##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Development Planning Unit##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Dental School (University College and Middlesex School of Dentistry)##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Dental Centre##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Dean of Students Office##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Day Nursery##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Counselling Service##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Computerised Tomography##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Computer Science#c=GB@cn=vicuna# &\
+	c=GB@o=University College London@ou=Community Medicine##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Community Dental Health and Dental Practice##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Cobbold Laboratory##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Clinical Pharmacology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Classical Archaeology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Civil and Municipal Engineering##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Chemistry Department - Birkbeck College##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Chemistry##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Chemical Pathology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Chemical and Biochemical Engineering##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Central Services##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Central Computing Service##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Careers Service##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Bursar's Department##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=British National Lymphoma Investigation##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Bloomsbury Theatre##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Biology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Biochemistry and Molecular Biology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Bentham Project - Department of History##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Beadles##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Bartlett School of Architecture and Planning##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Audio Visual Centre##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Anthropology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=Anatomy and Developmental Biology##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=American Institute for Foreign Study##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@ou=A.U.T. Office##c=GB@cn=Vicuna &\
+	c=GB@o=University College London@cn=Dir##c=GB@cn=Vicuna
+quipuVersion= quipu 6.8 \23128 (dir.ucl.ac.uk) of Thu May 23 15:01:58 BST 1991
+relayDSA= cn=Giant Tortoise
+
+cn=Vicuna
+objectClass= top & applicationEntity & dSA & quipuDSA
+cn= Vicuna &\
+	Camelius Vicugna
+l= London
+o= University College London
+ou= Computer Science
+description= DSA running on bells, holding slave of UCL, with CS master &\
+	A wild animal of the Alpaca family, slightly smaller than a Llama, resembling a camel &\
+	75cm high, tawny brown coat, with white bib and underparts
+presentationAddress= TELEX+00728722+RFC-1006+03+128.16.5.31+50987|X121+23421920030046|NS+5400728722041280160050315098800000|TELEX+00728722+X.25(80)+02+00000511160046
+supportedApplicationContext= X500DSP & X500DAP & quipuDSP
+seeAlso= c=GB@cn=Giant Armadillo
+userPassword= {CRYPT}UJ\40VMB
+manager= c=GB@o=University College London@ou=Computer Science@cn=incads
+lastModifiedTime= 910528112952Z
+lastModifiedBy= c=GB@o=University College London@ou=Computer Science@cn=Incads
+acl= others # read # child &\
+	others # read # entry &\
+	group # c=GB@o=University College London@ou=Computer Science@cn=incads # write # entry &\
+	others # read # default &\
+	group # c=GB@o=University College London@ou=Computer Science@cn=incads # write # default
+eDBinfo= #cn=False Cobra#cn=Passionflower Leaf Beetle$c=GB@cn=Giant Armadillo &\
+	c=GB#cn=False Cobra#cn=Passionflower Leaf Beetle$c=GB@cn=Giant Armadillo &\
+	c=GB@o=University College London#c=GB@cn=Giant Armadillo#cn=Passionflower Leaf Beetle &\
+	c=GB@o=University College London@ou=Wellcome Institute for the History of Medicine#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=University College and Middlesex School of Medicine (Administration)#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=UCLi Ltd#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=UCL Union#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Tufts University#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Transport Studies#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Trades Union Office#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Surgery#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Student Residences Office#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Statistical Science#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Spanish and Latin American Studies#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Slade School of Fine Art#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Security Office#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Secretary'S Office#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Scandinavian Studies#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Safety Office#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Royal Historical Society#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Registrar's Division#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Refectory#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Publicity and External Affairs#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Psychology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Psychiatry#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Provost'S Office#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Primary Health Care#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Physiology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Physics and Astronomy#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Photography and Illustration Centre#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Photogrammetry and Surveying#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Phonetics and Linguistics#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Philosophy#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Pharmacology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Personnel#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Paediatrics#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Oncology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Occupational Health#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Obstetrics and Gynaecology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Nuclear Medicine#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Neurological Studies (The Rena Lila Weston Institute)#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Molecular Endocrinology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Modern European Studies#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Medicine#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Medical Research Council#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Medical Physics and Bio-Engineering#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Medical Microbiology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Mechanical Engineering#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Mathematics#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Management Information Systems Unit#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Library, Archive and Information Studies#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Library#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Laws#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Latin Greek and Latin#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Italian#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Institute of Classical Studies#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Institute of Archaeology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Immunology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Human Tumour Immunology Group#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=History Of Art#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=History and Philosophy of Science#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=History#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Histopathology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=HIPACT#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Hebrew and Jewish Studies#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Health Centre (Gower Place Practice)#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Haematology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Greek and Latin#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=German#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Geological Sciences#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Geography#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Genito-Urinary Medicine#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Genetics and Biometry#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=General Division#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Furnishings Bursar's Department#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=French Language and Literature#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Finance Division#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Ferens Institute of Oto-Laryngology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Faculty of Mathematical and Physical Sciences#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Faculty of Life Sciences#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Faculty of Engineering#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Faculty of Arts#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=External Relations#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=English Language and Literature#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Electronic and Electrical Engineering#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Egyptology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Economics#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Dutch#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Domestic Office Central Services#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Development Planning Unit#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Dental School (University College and Middlesex School of Dentistry)#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Dental Centre#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Dean of Students Office#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Day Nursery#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Counselling Service#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Computerised Tomography#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Computer Science##cn=Passionflower Leaf Beetle &\
+	c=GB@o=University College London@ou=Computer Science##c=GB@cn=Giant Armadillo &\
+	c=GB@o=University College London@ou=Computer Science@cn=Auchentoshan#cn=Passonflower Leaf Beetle# &\
+	c=GB@o=University College London@ou=Community Medicine#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Community Dental Health and Dental Practice#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Cobbold Laboratory#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Clinical Pharmacology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Classical Archaeology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Civil and Municipal Engineering#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Chemistry Department - Birkbeck College#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Chemistry#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Chemical Pathology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Chemical and Biochemical Engineering#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Central Services#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Central Computing Service#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Careers Service#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Bursar'S Department#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=British National Lymphoma Investigation#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Bloomsbury Theatre#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Biology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Biochemistry and Molecular Biology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Bentham Project - Department of History#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Beadles#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Bartlett School of Architecture and Planning#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Audio Visual Centre#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Anthropology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=Anatomy and Developmental Biology#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=American Institute for Foreign Study#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@ou=A.U.T. Office#c=GB@cn=Giant Armadillo# &\
+	c=GB@o=University College London@cn=Dir#c=GB@cn=Giant Armadillo#
+quipuVersion= quipu 6.8 \23128 (bells.cs.ucl.ac.uk) of Tue Mar 19 09:42:25 GMT 1991

@@ -1,0 +1,19 @@
+To find Paul Barker who works in a science department of a London university
+in England, you might type the following:
+
+person>       barker
+department>   science
+organisation> london 
+country>      england
+
+There are several matches for london, each tagged by a number.  E.g.
+    1 Brunel University
+    2 University College London
+
+Type 2 at the prompt for an ORGANISATION to select "University College London"
+There are several matches for science, each tagged by a number. E.g.
+      1 Computer Science
+      2 Faculty of Life Sciences
+      
+Type 1 at the prompt for a DEPARTMENT to select	"Computer Science" and the 
+query will now complete and display information about the person required.

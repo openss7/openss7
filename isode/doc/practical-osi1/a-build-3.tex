@@ -1,0 +1,716 @@
+% -*- LaTeX -*-		(really SLiTeX)
+
+\begin{bwslide}
+\ctitle	{DYNAMIC FACILITIES}\bf
+
+\begin{nrtc}
+\item	RUN-TIME ENVIRONMENT
+
+\item	INITIATORS TEMPLATE
+
+\item	RESPONDERS TEMPLATE
+
+\item	DEFINING A NEW SERVICE
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{note}\em
+%this part of the presentation corresponds to part~iv along with section~3.1
+%of The Applications Cookbook
+%\end{note}
+
+
+\begin{bwslide}
+\ctitle	{DYNAMIC FACILITIES\\ OVERVIEW}
+
+\vskip.15in
+\diagram[p]{figureA-49}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RUN-TIME ENVIRONMENT}
+
+\begin{nrtc}
+\item	RUN-TIME ENVIRONMENT RESPONSIBLE FOR ``CIVILIZING'' REMOTE OPERATIONS
+	SERVICE
+
+\item	IMPORTANT TRADE-OFF:
+    \begin{nrtc}
+    \item	FLEXIBILITY FOR SIMPLICITY
+    \end{nrtc}
+
+%\item	IN \emph{THE COOKBOOK}, \verb"ROSYLIB" IMPLEMENTS THE RUN-TIME
+%	ENVIRONMENT
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DATA STRUCTURES}
+
+\begin{nrtc}
+\item	STUB GENERATOR PRODUCES OPERATION TABLES AS WELL
+
+\item	FOR EACH OPERATION, A TABLE IS DEFINED CONTAINING:
+    \begin{nrtc}
+    \item	NAME AND NUMBER OF OPERATION
+
+    \item	ARGUMENT ENCODE/DECODE ROUTINES
+
+    \item	RESULT ENCODE/DECODE/FREE ROUTINES
+
+    \item	ERROR TABLE
+    \end{nrtc}
+\end{nrtc}\small
+
+\begin{verbatim}
+    ...
+
+                                        /* OPERATION m-ConfirmedEventReport */
+    "m-ConfirmedEventReport", operation_CMIP_m__ConfirmedEventReport,
+        encode_CMIP_m__ConfirmedEventReport_argument,
+        decode_CMIP_m__ConfirmedEventReport_argument,
+        1, encode_CMIP_m__ConfirmedEventReport_result,
+           decode_CMIP_m__ConfirmedEventReport_result,
+           free_CMIP_m__ConfirmedEventReport_result,
+        errors_CMIP_m__ConfirmedEventReport,
+
+    ...
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DATA STRUCTURES (cont.)}
+
+\begin{nrtc}
+\item	FOR EACH ERROR, A TABLE IS DEFINED CONTAINING:
+    \begin{nrtc}
+    \item	NAME AND NUMBER OF ERROR
+
+    \item	PARAMETER ENCODE/DECODE/FREE ROUTINES
+    \end{nrtc}
+\end{nrtc}\small
+
+\begin{verbatim}
+    ...
+
+                                        /* ERROR noSuchObject */
+    "noSuchObject", error_CMIP_noSuchObject,
+        encode_CMIP_noSuchObject_parameter,
+        decode_CMIP_noSuchObject_parameter,
+        free_CMIP_noSuchObject_parameter,
+
+    ...
+\end{verbatim}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{A TABLE-DRIVEN APPROACH}
+
+\begin{nrtc}
+\item	RUN-TIME ENVIRONMENT SHOULD BE GENERALIZED TO WORK WITH THE LARGEST
+	POSSIBLE SET OF APPLICATIONS USING REMOTE OPERATIONS
+
+\item	A TABLE-DRIVEN APPROACH PERMITS US TO DECOUPLE OPERATION-SPECIFIC
+	INFORMATION
+    \begin{nrtc}
+    \item	WHAT ARGUMENTS REPRESENTED, HOW THEY ARE ENCODED, etc.
+    \end{nrtc}
+	FROM OPERATION-GENERIC INFORMATION
+    \begin{nrtc}
+    \item	THE OPERATION TAKES ARGUMENTS WHICH MUST BE ENCODED, etc.
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{STUBS REVISITED}
+
+\begin{nrtc}
+%\item	STUBS DEFINED BY ROSY CALL EITHER THE \verb"RyOperation" OR THE
+%	\verb"RyStub" ROUTINE
+%
+\item	GENERALLY YOUR STUB ROUTINES WILL USE ``POLICY'' ROUTINES, MAINTAING:
+	\begin{nrtc}
+	\item	INVOCATION IDENTIFIERS
+	\item	LINKED--INVOCATION IDs
+	\end{nrtc}
+%\item	THE \verb"RyStub" ROUTINE IMPLEMENTS A LESS RESTRICTIVE POLICY:
+%    \begin{nrtc}
+%    \item	USER SELECTS OPERATION CLASS AND INVOCATION IDENTIFIER
+%    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ASYNCHRONOUS STUBS}
+
+\begin{nrtc}
+\item	RECALL
+{\small
+\begin{verbatim}
+#define stub_CMIP_m__ConfirmedEventReport(sd,id,in,rfx,efx,class,roi) \
+RyStub ((sd), table_CMIP_Operations, \
+        operation_CMIP_m__ConfirmedEventReport, (id), \
+        (caddr_t) (in), (rfx), (efx), (class), (roi))
+\end{verbatim}}
+
+\item	THE MEANING OF THE PARAMETERS:
+    \begin{nrtc}
+    \item	\verb"sd": ASSOCIATION-DESCRIPTOR
+
+    \item	\verb"id": INVOCATION IDENTIFIER
+
+    \item	\verb"in": ARGUMENT FOR OPERATION
+
+    \item	\verb"rfx": DISPATCH ROUTINE FOR RESULT
+
+    \item	\verb"efx": DISPATCH ROUTINE FOR ERRORS OR REJECTIONS
+
+    \item	\verb"class": (A)SYNCHRONOUS
+
+    \item	\verb"roi": LOCAL SERVICE INTERFACE INFORMATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{INSIDE RYSTUB}
+%
+%\begin{nrtc}
+%\item	RUDIMENTARY PARAMETER CHECK
+%
+%\item	BUILD PRESENTATION ELEMENT FOR ARGUMENT
+%
+%\item	BUILD \emph{ACTIVATION BLOCK}
+%
+%\item	ISSUE RO-INVOKE.REQUEST
+%
+%\item	IF ASYNCHRONOUS, RETURN
+%
+%\item	LOOP, WAITING FOR ANY RESPONSE:
+%    \begin{nrtc}
+%    \item	RO-INVOKE.INDICATION:
+%	\begin{nrtc}
+%	\item	 PUSH ACTIVATION BLOCK FOR DISPATCHING OPERATION
+%	\end{nrtc}
+%
+%    \item	RO-RESULT, ERROR, OR REJECTION.INDICATION:
+%	\begin{nrtc}
+%	\item	PARSE OPERATION RESULT OR ERROR PARAMETER AND CALL DISPATCH
+%		ROUTINE
+%\begin{verbatim}
+%result = (*fnx) (sd, id, reason, value, roi);
+%\end{verbatim}
+%
+%	\item	IF RESPONSE WAS FOR US, RETURN
+%	\end{nrtc}
+%    \end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SYNCHRONOUS STUBS}
+
+\begin{nrtc}
+\item	RECALL
+\begin{verbatim}
+#define op_CMIP_m__ConfirmedEventReport(sd,in,out,rsp,roi) \
+RyOperation ((sd), table_CMIP_Operations, \
+        operation_CMIP_m__ConfirmedEventReport, \
+        (caddr_t) (in), (out), (rsp), (roi))
+\end{verbatim}
+
+\item	THE MEANING OF THE PARAMETERS:
+    \begin{nrtc}
+    \item	\verb"sd": ASSOCIATION-DESCRIPTOR
+
+    \item	\verb"in": ARGUMENT FOR OPERATION
+
+    \item	\verb"out": RESULT FOR OPERATION OR PARAMETER FOR ERROR
+
+    \item	\verb"rsp": TELLS HOW TO INTERPRET \verb"out"
+
+    \item	\verb"roi": REJECTION INFORMATION FOR OPERATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{INSIDE RYOPERATION}
+%
+%\begin{nrtc}
+%\item	RUDIMENTARY PARAMETER CHECK
+%
+%\item	BUILD PRESENTATION ELEMENT FOR ARGUMENT
+%
+%\item	BUILD \emph{ACTIVATION BLOCK}
+%
+%\item	ISSUE RO-INVOKE.REQUEST
+%
+%\item	LOOP, WAITING FOR SOME RESPONSE:
+%    \begin{nrtc}
+%    \item	RO-INVOKE.INDICATION:
+%	\begin{nrtc}
+%	\item	 PUSH ACTIVATION BLOCK FOR DISPATCHING OPERATION
+%	\end{nrtc}
+%
+%    \item	RO-RESULT, ERROR, OR REJECTION.INDICATION:
+%	\begin{nrtc}
+%	\item	IF FOR US: PARSE OPERATION RESULT OR ERROR PARAMETER AND RETURN
+%
+%	\item	IF NOT FOR US: STUFF INFORMATION INTO CORRESPONDING ACTIVATION
+%		BLOCK
+%	\end{nrtc}
+%    \end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RESPONDERS}
+
+\begin{nrtc}
+\item	REGISTER A DISPATCH ROUTINE FOR EACH OPERATION USING \verb"RyDispatch"
+\begin{verbatim}
+RyDispatch (sd, ryo, op, fnx, roi)
+\end{verbatim}
+
+\item	THE MEANING OF THE PARAMETERS:
+    \begin{nrtc}
+    \item	\verb"sd": ASSOCIATION-DESCRIPTOR
+
+    \item	\verb"ryo": OPERATION TABLE
+
+    \item	\verb"op": OPERATION NUMBER
+
+    \item	\verb"fnx": DISPATCH ROUTINE
+
+    \item	\verb"roi": FAILURE INDICATOR
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{OPERATION DISPATCH}
+
+\begin{nrtc}
+\item	WHILE WAITING FOR ``SOMETHING TO HAPPEN'', A RO-INVOKE.INDICATION
+	CAUSES,
+
+\item	THE PRESENTATION ELEMENT FOR THE OPERATIONS ARGUMENT IS PARSED INTO A STRUCTURE
+	AND THE DISPATCH ROUTINE IS CALLED:
+%\begin{verbatim}
+%result = (*fnx) (sd, ryo, rox, in, roi)    
+%\end{verbatim}
+
+\item	DISPATCH ROUTINE HAS THREE OPTIONS
+    \begin{nrtc}
+    \item	TO RETURN A RESULT
+
+    \item	TO RETURN AN ERROR
+
+    \item	TO REJECT AN OPERATION
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{CLEAN-UP}
+%
+%\begin{nrtc}
+%\item	WHEN AN ASSOCIATION IS ABORTED (e.g., DUE TO NETWORK FAILURE),
+%	SOMETHING MUST BE DONE WITH ACTIVATION BLOCKS
+%
+%\item	IDEALLY, WOULD LIKE TO:
+%    \begin{nrtc}
+%    \item	RETAIN THIS STATE,
+%
+%    \item	RE-ESTABLISH THE ASSOCIATION, AND
+%
+%    \item	CONTINUE WHERE WE LEFT OFF
+%    \end{nrtc}
+%
+%\item	NO SUCH LUCK, ACTIVATION BLOCKS ARE FLUSHED!
+%    \begin{nrtc}
+%    \item	A LOT OF HARD ISSUES NEED TO BE RESOLVED IN ORDER TO DO THE
+%		``RIGHT THING''
+%
+%    \item	ACTUALLY, FOR ASYNCHRONOUS INVOCATIONS, A REJECTION IS
+%		PASSED UP
+%    \end{nrtc}
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INSIDE AN INITIATOR}\bf
+
+\begin{nrtc}
+\item	ALMOST OF THIS IS ``BOILERPLATE''
+\item	WE'LL CONSIDER ONLY THE HIGHLIGHT:
+		INVOKING AN OPERATION
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{INVOKING AN OPERATION}
+%
+%\begin{nrtc}
+%\item	ALTHOUGH \emph{THE COOKBOOK} TRIED TO MAKE THINGS SIMPLE,
+%	CALLING A STUB IS NOT EASY
+%\end{nrtc}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{ASYNCHRONOUS INVOCATION}\small
+%
+%\hrule\vskip.15in
+%\begin{tgrind}
+%\let\linebox=\relax
+%\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+%\input figureA-54\relax
+%\end{tgrind}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle	{ASYNCHRONOUS INVOCATION (cont.)}\small
+%
+%\hrule\vskip.15in
+%\begin{tgrind}
+%\let\linebox=\relax
+%\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+%\input figureA-55\relax
+%\end{tgrind}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle	{ASYNCHRONOUS INVOCATION (cont.)}\small
+%
+%\hrule\vskip.15in
+%\begin{tgrind}
+%\let\linebox=\relax
+%\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+%\input figureA-56\relax
+%\end{tgrind}
+%\end{bwslide}
+%
+%
+%\begin{bwslide}
+%\ctitle	{ASYNCHRONOUS INVOCATION (cont.)}\small
+%
+%\hrule\vskip.15in
+%\begin{tgrind}
+%\let\linebox=\relax
+%\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+%\input figureA-57\relax
+%\end{tgrind}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{ASYNCHRONOUS INVOCATION (cont.)}\small
+%
+%\hrule\vskip.15in
+%\begin{tgrind}
+%\let\linebox=\relax
+%\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+%\input figureA-58\relax
+%\end{tgrind}
+%\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{SIMPLIFIED ASYNCHRONOUS INVOCATION}\small
+%
+%\hrule\vskip.15in
+%\begin{tgrind}
+%\let\linebox=\relax
+%\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+%\input figureA-59\relax
+%\end{tgrind}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SYNCHRONOUS INVOCATION}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureA-60\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SYNCHRONOUS INVOCATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureA-61\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{SYNCHRONOUS INVOCATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureA-62\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{INSIDE A RESPONDER}\bf
+
+\begin{nrtc}
+\item	AGAIN, A LOT OF THIS WILL BE ``BOILERPLATE''
+\item	WE WILL ONLY LOOK AT RESPONDING TO AN OPERATION INVOKATION
+\end{nrtc}
+\end{bwslide}
+
+
+%\begin{bwslide}
+%\ctitle	{RESPONDING TO AN OPERATION}
+%
+%\begin{nrtc}
+%\item	WHEN AN ACTIVATION BLOCK IS PUSHED,
+%	THE DISPATCH ROUTINE IS CALLED
+%\end{nrtc}
+%\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RESPONDING TO AN OPERATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureA-63\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RESPONDING TO AN OPERATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureA-64\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{RESPONDING TO AN OPERATION (cont.)}\small
+
+\hrule\vskip.15in
+\begin{tgrind}
+\let\linebox=\relax
+\def\_{\ifstring{\char'137}\else\underline{\ }\fi}
+\input figureA-65\relax
+\end{tgrind}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DEFINING A NEW SERVICE}\bf
+
+\begin{nrtc}
+\item	FINALLY, NEED TO IDENTIFY THE APPLICATION TO THE NETWORK
+
+\item	THINGS TO BE DEFINED:
+    \begin{nrtc}
+    \item	ABSTRACT SYNTAX
+
+    \item	APPLICATION CONTEXT NAME
+
+    \item	APPLICATION ENTITY TITLE
+
+    \item	PRESENTATION ADDRESS
+
+    \item	LOCAL PROGRAM
+    \end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{ABSTRACT SYNTAX}
+
+\begin{nrtc}
+\item	DESCRIBES THE DATA STRUCTURES BEING EXCHANGED BY THE SERVICE
+
+\item	\begin{verbatim} "ips-osi-mips cmip pci"    1.0.9596.2.1.1 \end{verbatim}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{APPLICATION CONTEXT NAME}
+
+\begin{nrtc}
+\item	DESCRIBES THE ELEMENTS AND PROTOCOL BEING USED BY THE SERVICE
+
+\item	\begin{verbatim} "iso cmip"    1.0.9596.2.2.1 \end{verbatim}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {APPLICATION ENTITY TITLE}
+
+\begin{nrtc}
+\item	UNIQUELY NAMES AN ENTITY IN THE NETWORK
+\item	VALUE IS A DISTINGUISHED NAME, e.g.,
+\begin{quote}\small\begin{verbatim}
+	c=US@o=TWG@ou=Software Engineering@cn=boomer@cn=filestore
+	\end{verbatim}\end{quote}
+	(THIS IS A STRING REPRESENTATION OF A COMPLEX ASN.1 TYPE!)
+\item	SIMPLER APPROACH IS TO USE LOCAL ALIASING (``boomer-filestore'') PRIOR TO
+	RESOLUTION:
+	\begin{nrtc}
+	\item	LHS (QUALIFIER) MAPS TO INITIAL PART OF DISTINGUISHED NAME
+	\item	RHS (DESIGNATOR) MAPS TO SUFFIX
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {APPLICATION ENTITY TITLE}
+
+\begin{nrtc}
+\item	FOR INITIATORS, THE DIRECTORY IS ASKED TO RETURN THE ``PRESENTATION ADDRESS''
+	ATTRIBUTE OF THIS OBJECT
+\item	CONCEPTUALLY, RESPONDERS STORE THIS INFORMATION IN THE DIRECTORY
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {DYNAMIC CHARACTERISTICS: \\ PRESENTATION ADDRESS}
+
+\begin{nrtc}
+\item	UNIQUELY IDENTIFIES THE LOCATION OF AN ENTITY
+\item	VALUE IS
+	\begin{nrtc}
+	\item	PRESENTATION SELECTOR (0+ OCTETS)
+	\item	SESSION SELECTOR (0+ OCTETS)
+	\item	TRANSPORT SELECTOR (0+ OCTETS)
+	\item	NETWORK ADDRESSES (AT LEAST 1)
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {LOCAL ENVIRONMENT: \\ CURRENT METHOD}
+
+\begin{nrtc}
+\item	TRANSPORT LISTENER RESIDES ON EACH END-SYSTEM
+\item	FOR EACH SERVICE LISTED IN LOCAL DATABASE
+	\begin{nrtc}
+	\item	LISTEN ON ASSOCIATED TRANSPORT ADDRESS
+	\item	UPON RECEIVING AN INCOMING CONNECTION, TSAPD
+		INVOKES ASSOCIATED PROGRAM
+	\end{nrtc}
+\item	PROGRAM IS CALLED A DYNAMIC RESPONDER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {LOCAL ENVIRONMENT: \\ CURRENT METHOD (cont.)}
+
+\begin{nrtc}
+\item	SOME RESPONDERS MAY WISH TO SERVICE MULTIPLE INITIATORS
+\item	DIFFERENT APPROACH:
+	\begin{nrtc}
+	\item	SERVICE NOT LISTED IN LOCAL DATABASE
+	\item	PROGRAM LISTENS ON OWN TRANSPORT ADDRESS
+	\end{nrtc}
+\item	PROGRAM IS CALLED A STATIC RESPONDER
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {LOCAL ENVIRONMENT: \\ FUTURE METHOD}
+
+\begin{nrtc}
+\item	LOCAL DATABASE CONTAINS
+	\begin{nrtc}
+	\item	SERVICE NAME
+	\item	LOCAL PROGRAM
+	\end{nrtc}
+	\begin{verbatim} "tsap/cmip"    #519    /usr/etc/ros.cmip args...  \end{verbatim}
+	BUT NOT TRANSPORT ADDRESS
+\item	FOR EACH SERVICE
+	\begin{nrtc}
+	\item	TRANSPORT LISTENER LISTENS ON RANDOM TRANSPORT ADDRESS
+	\item	LISTENER REGISTERS SERVICE \& TRANSPORT ADDRESS WITH THE DIRECTORY
+	\end{nrtc}
+\item	SIMILAR APPROACH IS USED BY STATIC RESPONDERS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle	{DYNAMIC FACILITIES:\\ REVIEW}
+
+\vskip.15in
+\diagram[p]{figureA-49}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {CLOSING COMMENTS\\UPPER--LAYER ADDRESSING}
+
+\begin{nrtc}
+\item	TOO MUCH FREEDOM
+\item	DYNAMIC RESPONDER PREFER TO ``DISPATCH'' ON TRANSPORT SELECTOR
+\item	STATIC RESPONDERS MAY REQUIRE A UNIQUE NETWORK ADDRESS
+\end{nrtc}
+\end{bwslide}
+
+
+\begin{bwslide}
+\ctitle {UPPER--LAYER ADDRESSING}
+
+\begin{nrtc}
+\item	U.S. GOSIP CALLS FOR DISPATCHING ON PRESENTATION SELECTOR
+\item	OKAY FOR DYNAMIC RESPONDERS
+\item	STATIC RESPONDERS MAY STILL REQUIRE A UNIQUE NETWORK ADDRESS
+	\begin{nrtc}
+	\item	WITH REAL OSI NETWORK SERVICE, STATIC RESPONDERS CAN DISPATCH
+		ON TRANSPORT SELECTOR
+	\end{nrtc}
+\end{nrtc}
+\end{bwslide}

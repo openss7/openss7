@@ -1,0 +1,35 @@
+MASTER
+890825152711Z
+ou=Computer Science
+slaveDSA= cn=Giant Tortoise
+masterDSA= c=GB@cn=Toucan
+acl= others # read # child
+acl= others # read # entry
+acl= group # c=GB@o=XX@ou=Computer Science@cn=incads # write # entry
+acl= others # read # default
+acl= group # c=GB@o=XX@ou=Computer Science@cn=incads # write # default
+acl= group # c=GB@o=XX@ou=Computer Science@cn=incads # write # child
+userPassword= csdept
+preferredDeliveryMethod= MHS $ PHYSICAL $ TELEPHONE
+x121Address= 234219200300 & 000005111600
+searchGuide= person#cn$APPROX
+searchGuide= person#cn$SUBSTR
+searchGuide= person#uid$EQ
+searchGuide= person#sn$EQ
+facsimileTelephoneNumber= +44-1-387-1397
+telexNumber= 28722 $ G $ UCLPHYS
+telephoneNumber= +44-1-380-7214
+postalCode= WC1E 6BT
+postalAddress= Dept. of Compter Science $ XX $ XX Street $ London 
+businessCategory= Computer Science
+associatedDomain= cs.xx.ac.uk
+ou= cs
+ou= Computer Science
+streetAddress= Gower Street
+stateOrProvinceName= London
+l= pearson building
+objectClass= quipuNonLeafObject & quipuObject & organizationalUnit & top & domainRelatedObject
+InheritedAttribute = organizationalPerson $ default (
+userClass = staff
+)
+

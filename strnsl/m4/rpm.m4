@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/08/12 19:05:31 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/10/17 20:00:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/12 19:05:31 $ by $Author: brian $
+# Last Modified $Date: 2007/10/17 20:00:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -503,16 +503,18 @@ AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_BUILD], [dnl
     AC_ARG_VAR([RPM], [Rpm command])
-    AC_PATH_PROG([RPM], [rpm], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_PROG([RPM], [rpm], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${RPM:-no}" = :no ; then
 	AC_MSG_WARN([Could not find rpm program in PATH.])
-	RPM=/bin/rpm
+	RPM="${am_missing_run}rpm"
     fi
     AC_ARG_VAR([RPMBUILD], [Build rpms command])
-    AC_PATH_PROG([RPMBUILD], [rpmbuild], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_PROG([RPMBUILD], [rpmbuild], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${RPMBUILD:-${RPM:-no}}" = :no ; then
 	AC_MSG_WARN([Could not find rpmbuild program in PATH.])
-	RPMBUILD=/usr/bin/rpmbuild
+	RPMBUILD="${am_missing_run}rpmbuild"
     fi
     if test :"${RPMBUILD:-no}" = :no ; then
 	RPMBUILD="$RPM"
@@ -521,7 +523,7 @@ dnl
 dnl I add a test for the existence of /var/lib/rpm because debian has rpm commands
 dnl but no rpm database and therefore cannot build rpm packages.
 dnl
-    AM_CONDITIONAL([BUILD_RPMS], [test :"${RPMBUILD:-no}" != :no -a -d /var/lib/rpm])dnl
+    AM_CONDITIONAL([BUILD_RPMS], [test :"${ac_cv_path_DOXYGEN:-no}" != :no -a -d /var/lib/rpm])dnl
 ])# _RPM_SPEC_SETUP_BUILD
 # =============================================================================
 
@@ -551,6 +553,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.63  2007/10/17 20:00:28  brian
+# - slightly different path checks
+#
 # Revision 0.9.2.62  2007/08/12 19:05:31  brian
 # - rearrange and update headers
 #

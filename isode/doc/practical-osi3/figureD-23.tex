@@ -1,0 +1,26 @@
+\File{figureD\-23.py},{10:33},{Jan 27 1991}
+\L{\LB{Query\-REQ ::=}}
+\L{\LB{    [0] \K{IMPLICIT}}}
+\L{\LB{        \K{SEQUENCE} \{}}
+\L{\LB{            name                        \C{}\-\- e.g., \{ \"cs\", \"ucl\", \"gb\" \}}}
+\CE{}\L{\LB{                \K{SEQUENCE} \K{OF}}}
+\L{\LB{                    IA5String,}}
+\L{\LB{}}
+\L{\LB{            interactive                 \C{}\-\- true IFF allow callbacks}}
+\CE{}\L{\LB{                \K{BOOLEAN},}}
+\L{\LB{}}
+\L{\LB{            envlist                     \C{}\-\- search list}}
+\CE{}\L{\LB{                \K{SEQUENCE} \K{OF}}}
+\L{\LB{                    Environment,}}
+\L{\LB{}}
+\L{\LB{            context                     \C{}\-\- e.g., \"iso ftam\"}}
+\CE{}\L{\LB{                IA5String,}}
+\L{\LB{}}
+\L{\LB{            userdn                      \C{}\-\- DN for binding}}
+\CE{}\L{\LB{                IA5String}}
+\L{\LB{                \K{OPTIONAL},}}
+\L{\LB{}}
+\L{\LB{            passwd                      \C{}\-\- for simple authentication}}
+\CE{}\L{\LB{                IA5String}}
+\L{\LB{                \K{OPTIONAL}}}
+\L{\LB{        \}}}

@@ -1,0 +1,904 @@
+.\" tbl | nroff -ms
+.RP
+.ND
+.sp 2
+.TL
+The Obviously Required Name-server (THORN)
+.sp 4
+The THORN and RARE X.500 Naming Architecture
+.sp 4
+.AU
+S.E. Kille
+.sp 4
+.AI
+Date: 19th May 1989
+UCL Reference:
+Category:
+Main Task:
+Subtask:
+Document: UCL-64
+Revision: 1
+Correction: No
+Distribution: Public
+.sp 1
+Company: UCL
+Document Location: London
+Person Responsible: S.E. Kille
+.AB
+.nh
+This document defines an X.500 Naming Architecture, which is independent of
+any specific implementation.
+This specification is agreed for use in the RARE community, and in the THORN
+Project and Large Scale Pilot Exercise.
+.sp
+The initial contents of this document were developed for the
+THORN project and result substantially from experience with the ECMA TR 32
+based pilot exercise.  
+This document obsoletes the user naming aspects of the
+earlier THORN Naming Architecture [UCL-45.6].
+THORN specific information is now contained in "The THORN System Naming
+Architecture" [UCL-63].
+This document has evolved on the basis of input from THORN, RARE, and other
+groups.  
+.AE
+.NH 1
+Contents of The Architecture
+.LP
+.nh
+This document contains a number of items.
+.IP -
+A definition of all OIDs required
+.IP -
+A definition of the standard X.500 attributes and object classes supported.
+.IP -
+Various new attributes and object classes
+.NH 1
+Sources
+.LP
+There are a number of  sources for information contained in this document.
+Where possible, references are made to external documents, rather than
+repeating information here. 
+.IP - 
+X.500
+.IP -
+X.400 (1988)/ ISO/IEC 10021
+.IP -
+A number of attributes defined here
+.IP -
+The RARE WG3 naming Architecture
+.IP -
+Working paper "X.500 and Domains" by S.E. Kille
+.br
+.NH 1
+What Support of This Architecture Means
+.LP
+It is not reasonable to require that a DSA which supports this architecture
+has specific code to handle each of the defined syntaxes.  However, the
+following requirements are made:
+.IP 1.
+A DSA shall be able to store all of the attributes and object class values
+specified.
+.IP 2.
+A DUA shall be able to identify each attribute type and object class to the
+user, with an appropriate representation (e.g., a string).
+.LP
+The following are desirable, but not required:
+.IP 1.
+For a DSA to match correctly on the basis of all attribute syntaxes defined
+.IP 2.
+For a DSA to enforce the Object Class schema implied by these definitions
+.IP 3.
+For a DUA to correctly display the attribute values (syntaxes) defined
+.ne 24
+.NH 1
+Object Classes
+.LP
+The following X.500 standard object classes are supported.
+Abbreviations are defined for use in the next section.
+.TS
+allbox, center, tab(#);
+cc
+ll.
+Object Class#Key
+_
+Alias#A
+Country#C
+Locality#L
+Organisation#O
+Organisational Unit#OU
+Person#P
+Organisational Person#OP
+Organisational Role#OR
+Group of Names#GN
+Residential Person#RP
+Directory System Agent#DSA
+Application Entity#AE
+Application Process#AP
+.TE
+The following X.400 standard object classes are supported.
+Abbreviations are defined for use in the next section.
+.TS
+allbox, center, tab(#);
+cc
+ll.
+Object Class#Key
+_
+mhs-distribution-list#LIST
+mhs-message-transfer-agent#MTA
+mhs-user#MHS-USER
+mhs-user-agent#UA
+.TE
+.ne 7
+The following object classes are described in the RARE Naming Architecture.
+The ASN.1 definitions are repeated here:
+.TS
+allbox, center, tab(#);
+cc
+ll.
+Object Class#Description
+_
+WKD#Well Known Domain
+DUR#Domain Under Resorbtion
+RareApplicationEntity#Application Entity -- extra attributes
+.TE
+.ne 7
+The following object classes are defined in "X.500 and Domains".
+.TS
+allbox, center, tab(#);
+cc
+ll.
+Object Class#Description
+_
+Domain
+RFC822LocalPart
+DNSDomain
+NRSDomain
+DomainRelatedObject
+.TE
+.ne 7
+.LP
+The following new object classes are defined.
+.TS
+allbox, center, tab(#);
+cc
+ll.
+Object Class#Description
+_
+Account#Corresponds to an account on a host
+Document#A document of some form
+Document Series#A Document Series (e.g., RFC)
+Room#Room
+THORN Object#Any object with THORN defined attributes
+THORN Person#Any person with THORN defined attributes
+.TE
+The first three are object classes which do not have a natural support within
+the X.521 framework.
+The last two are introduced in line with the changes proposed at
+Washington wrt class inheritance.   
+It is assumed that an object may belong to these classes in addition
+to other object classes.
+.ne 30
+.NH 1
+Attribute Types
+.LP
+The following standard X.500 attribute types are supported:
+.TS
+allbox, center;
+c.
+Attribute Type
+_
+Object Class
+Aliased Object Name
+Common Name
+Surname
+Country Name
+Locality Name
+State or Province Name
+Street Address
+Organisation Name
+Organisational Unit Name
+Facsimile Telephone Number
+Title
+Description
+Business Category
+Postal Address
+Postal Code
+Post Office Box
+Physical Delivery Office Name
+Telephone Number
+Telex Number
+x121 Address
+Registered Address
+Presentation Address
+Member
+Role Occupant
+See Also
+User Password
+.TE
+The following standard X.400 attribute types are supported:
+.TS
+allbox, center;
+c.
+Attribute Type
+_
+mhs-deliverable-content-length
+mhs-deliverable-content-types
+mhs-deliverable-eits
+mhs-dl-members
+mhs-dl-submit-permissions
+mhs-or-address
+mhs-preferred-delivery-methods
+.TE
+.ne 8
+The following attribute types are explained in the RARE definitions.
+The syntaxes are redfined here:
+.TS
+allbox, center;
+c.
+Attribute Type
+_
+DurName
+WkdName
+ProtocolProfile
+ObjectId
+.TE
+.ne 8
+The following attribute types are explained in "X.500 and Domains".
+.TS
+allbox, center;
+c.
+Attribute Type
+_
+DomainComponent
+ARecord
+MDRecord
+MXRecord
+NSRecord
+SOARecord
+CNAMERecord
+NRSSystemDescription
+ForwardOnlyInformation
+ReverseOnlyInformation
+ForwardAndReverseInformation
+NRSTextualDescription
+AssociatedDomain
+AssociatedName
+.TE
+.ne 25
+.LP
+A number of attributes are now defined.
+.TS
+tab(#), allbox, center;
+cccc
+llll.
+Attribute#Description#Standard Classes#Syntax
+_
+Userid#Login name on host##CaseIgnoreString
+Text Encoded O/R Name##P,OP,OR,GN,RP#CaseIgnoreString
+RFC 822 mailbox##P,OP,OR,GN,RP#CaseIgnoreIA5String
+Info#Anything you like#All#CaseIgnoreString
+Favourite drink#Favourite LSPX Attribute#P,OP,RP#CaseIgnoreString
+Room Number##P,OP,PR,RP#CaseIgnoreString
+Photo##P,OP,PR,RP#BITString
+User Class#e.g. Student#P,OP#CaseIgnoreString
+Host#Directory Name of host##CaseIgnoreString
+Manager#Manager of the object##DistinguishedName
+Document Identifier###CaseIgnoreString
+Document Title###CaseIgnoreString
+Document Version###CaseIgnoreString
+Document Author###DistinguishedName
+Document Location###CaseIgnoreString
+Home Phone###CaseIgnoreString
+Secretary###DistinguishedName
+Other Mailbox###private
+Last Modified Time###UTCTime
+Last Modified By###DistinguishedName
+.TE
+The Photographs are encoded as G3 Fax, with one or two dimensional encoding.
+.PP
+Phone numbers should be stored in the form "+44-1-380-7294".   
+.PP
+The language of a descriptive attribute should be appropriate to the likely
+users of the directory.  
+.PP
+Use of the Text Encoded O/R Name is deprecated.  This attribute is for
+interim use only.
+.bp
+.NH 1
+The Architecture
+.LP
+The final sections of the definitions gives
+the LSPX Attributes, Object Classes and Rules are
+defined.  This information is for the user of the directory.
+.sp 2
+.\" @(#)tmac.vgrind 1.7 88/02/08 SMI; from UCB 4.3 beta
+'ds _ \d\(mi\u
+'ps 9p
+'vs 10p
+'ds - \(mi
+'ds / \\h'\\w' 'u-\\w'/'u'/
+'ds /* \\h'\\w' 'u-\\w'/'u'/*
+'bd B 3
+'bd S B 3
+'nr cm 0
+'nf
+'de vH
+'ev 2
+'if t 'if !\nv 'tl '\-\-''\-\-'
+'ft 1
+'sp .35i
+'tl '\s14\f3\\*(=F\fP\s0'\\*(=H'\f3\s14\\*(=F\fP\s0'
+'sp .25i
+'ft 1
+\f2\s12\h'\\n(.lu-\w'\\*(=f'u'\\*(=f\fP\s0\h'|0u'
+.sp .05i
+'ev
+'ds =G \\*(=F
+..
+'de vF
+'ev 2
+'sp .35i
+'tl '\f2\\*(=M''Page % of \\*(=G\fP'
+'bp
+'ev
+'ft 1
+'if \\n(cm=1 'ft 2
+..
+'de ()
+'pn 1
+..
+'de +C
+'nr cm 1
+'ft 2
+'ds +K
+'ds -K
+..
+'de -C
+'nr cm 0
+'ft 1
+'ds +K \f3
+'ds -K \fP
+..
+'+C
+'-C
+'am +C
+'ne 3
+..
+'de FN
+\f2\s14\h'\\n(.lu-\w'\\$1'u'\\$1\fP\s0\h'|0u'\c
+.if \\nx .tm \\$1 \\*(=F \\n%
+'ds =f \&...\\$1
+..
+'de FC
+.if \\nx .tm \\$1 \\*(=F \\n%
+'ds =f \&...\\$1
+..
+'de -F
+'rm =f
+..
+'ft 1
+'lg 0
+'-F
+.vS
+.DS L
+
+RareNamingArchitecture
+\*(+KDEFINITIONS\*(-K ::=
+\*(+KBEGIN\*(-K
+
+\*(+KIMPORTS\*(-K
+
+\*(+KATTRIBUTE\*(-K, \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K, \*(+KOBJECT\*(-K\*-\*(+KCLASS\*(-K ;
+    \*(+KFROM\*(-K InformationFramework \*(+K{\*(-Kjoint\*-iso\*-ccitt ds(5) modules(1) informationFramework(1)\*(+K}\*(-K
+
+distinguishedNameSyntax, caseIgnoreStringSyntax, caseIgnoreListSyntax ;
+    \*(+KFROM\*(-K SelectedAttributeTypes \*(+K{\*(-Kjoint\*-iso\*-ccitt ds(5) modules(1) selectedAttributeTypes(5)\*(+K}\*(-K
+
+EVERYTHING
+    \*(+KFROM\*(-K DomainsAndX500;
+    
+thorn \*(+KOBJECT\*(-K \*(+KIDENTIFIER\*(-K\h'|41n'::= \*(+K{\*(-Kccitt data(9) pss(2342) ucl(19200300) thorn(100)\*(+K}\*(-K
+\h'|41n'\*-\*-\c\c
+'+C
+ interim THORN OID
+\c
+'-C
+
+thornAttributeType\h'|31n'\*(+KOBJECT\*(-K \*(+KIDENTIFIER\*(-K ::= \*(+K{\*(-Kthorn thornAttributeType(1)\*(+K}\*(-K    
+thornAttributeSyntax\h'|31n'\*(+KOBJECT\*(-K \*(+KIDENTIFIER\*(-K ::= \*(+K{\*(-Kthorn thornAttributeSyntax(3)\*(+K}\*(-K
+ThornObjectClass\h'|31n'\*(+KOBJECT\*(-K \*(+KIDENTIFIER\*(-K ::= \*(+K{\*(-Kthorn thornObjectClass(4)\*(+K}\*(-K
+
+.DE
+.vE    
+.\" @(#)tmac.vgrind 1.7 88/02/08 SMI; from UCB 4.3 beta
+'ds _ \d\(mi\u
+'ps 9p
+'vs 10p
+'ds - \(mi
+'ds / \\h'\\w' 'u-\\w'/'u'/
+'ds /* \\h'\\w' 'u-\\w'/'u'/*
+'bd B 3
+'bd S B 3
+'nr cm 0
+'nf
+'de vH
+'ev 2
+'if t 'if !\nv 'tl '\-\-''\-\-'
+'ft 1
+'sp .35i
+'tl '\s14\f3\\*(=F\fP\s0'\\*(=H'\f3\s14\\*(=F\fP\s0'
+'sp .25i
+'ft 1
+\f2\s12\h'\\n(.lu-\w'\\*(=f'u'\\*(=f\fP\s0\h'|0u'
+.sp .05i
+'ev
+'ds =G \\*(=F
+..
+'de vF
+'ev 2
+'sp .35i
+'tl '\f2\\*(=M''Page % of \\*(=G\fP'
+'bp
+'ev
+'ft 1
+'if \\n(cm=1 'ft 2
+..
+'de ()
+'pn 1
+..
+'de +C
+'nr cm 1
+'ft 2
+'ds +K
+'ds -K
+..
+'de -C
+'nr cm 0
+'ft 1
+'ds +K \f3
+'ds -K \fP
+..
+'+C
+'-C
+'am +C
+'ne 3
+..
+'de FN
+\f2\s14\h'\\n(.lu-\w'\\$1'u'\\$1\fP\s0\h'|0u'\c
+.if \\nx .tm \\$1 \\*(=F \\n%
+'ds =f \&...\\$1
+..
+'de FC
+.if \\nx .tm \\$1 \\*(=F \\n%
+'ds =f \&...\\$1
+..
+'de -F
+'rm =f
+..
+'ft 1
+'lg 0
+'-F
+.vS
+.DS L
+
+\*-\*-\c\c
+'+C
+ THORN User Definitions 
+\c
+'-C
+
+thornObject \*(+KOBJECT\*(-K\*-\*(+KCLASS\*(-K
+\h'|31n'\*-\*-\c\c
+'+C
+ An object which uses RARE\f2\h'\w' 'u-\w'/'u'/\fPTHORN Attributes
+\c
+'-C
+  \*(+KSUBCLASS\*(-K \*(+KOF\*(-K top
+  \*(+KMAY\*(-K \*(+KCONTAIN\*(-K \*(+K{\*(-K
+\h'|11n'info,
+\h'|11n'photo,
+\h'|11n'lastModifiedTime,
+\h'|11n'lastModifiedBy\*(+K}\*(-K
+  ::= \*(+K{\*(-KthornObjectClass 4\*(+K}\*(-K
+  
+thornPerson \*(+KOBJECT\*(-K\*-\*(+KCLASS\*(-K
+  \*(+KSUBCLASS\*(-K \*(+KOF\*(-K thornObject, person
+  \*(+KMAY\*(-K \*(+KCONTAIN\*(-K \*(+K{\*(-K
+  \h'|11n'userid,
+\h'|11n'textEncodedORAddress,
+\h'|11n'rfc822mailbox,
+\h'|11n'favouriteDrink,
+\h'|11n'roomNumber,
+\h'|11n'userClass,
+\h'|11n'homePhone,
+\h'|11n'secretary\*(+K}\*(-K
+::= \*(+K{\*(-KthornObjectClass 5\*(+K}\*(-K\h'|41n'
+
+account \*(+KOBJECT\*(-K\*-\*(+KCLASS\*(-K
+    \*(+KSUBCLASS\*(-K \*(+KOF\*(-K thornObject
+    \*(+KMUST\*(-K \*(+KCONTAIN\*(-K \*(+K{\*(-K
+\h'|11n'userid\*(+K}\*(-K
+    \*(+KMAY\*(-K \*(+KCONTAIN\*(-K \*(+K{\*(-K
+    \h'|11n'description,
+\h'|11n'seeAlso,
+\h'|11n'localityName,
+\h'|11n'organizationName,
+\h'|11n'organizationalUnitName,
+    \h'|11n'host,
+\h'|11n'info\*(+K}\*(-K
+::= \*(+K{\*(-KthornObjectClass 6\*(+K}\*(-K\h'|41n'
+
+.DE
+.DS L
+document \*(+KOBJECT\*(-K\*-\*(+KCLASS\*(-K
+    \*(+KSUBCLASS\*(-K \*(+KOF\*(-K top
+    \*(+KMUST\*(-K \*(+KCONTAIN\*(-K \*(+K{\*(-K
+    \h'|11n'documentIdentifier\*(+K}\*(-K
+    \*(+KMAY\*(-K \*(+KCONTAIN\*(-K \*(+K{\*(-K
+\h'|11n'commonName,    
+\h'|11n'description,
+\h'|11n'seeAlso,
+\h'|11n'localityName,
+\h'|11n'organizationName,
+\h'|11n'organizationalUnitName,
+\h'|11n'documentTitle,
+\h'|11n'documentVersion,
+\h'|11n'documentAuthor,
+\h'|11n'documentLocation\*(+K}\*(-K
+::= \*(+K{\*(-KthornObjectClass 7\*(+K}\*(-K\h'|41n'
+
+.DE
+.DS L
+documentSeries \*(+KOBJECT\*(-K\*-\*(+KCLASS\*(-K
+  \*(+KSUBCLASS\*(-K \*(+KOF\*(-K top
+  \*(+KMUST\*(-K \*(+KCONTAIN\*(-K \*(+K{\*(-K
+       commonName\*(+K}\*(-K
+  \*(+KMAY\*(-K \*(+KCONTAIN\*(-K \*(+K{\*(-K
+  \h'|11n'description,
+\h'|11n'seeAlso,
+\h'|11n'telephoneNumber,
+\h'|11n'localityName,
+\h'|11n'organizationName,
+\h'|11n'organizationalUnitName \*(+K}\*(-K
+::= \*(+K{\*(-KthornObjectClass 9\*(+K}\*(-K\h'|41n'
+.DE
+.DS L
+room \*(+KOBJECT\*(-K\*-\*(+KCLASS\*(-K
+  \*(+KSUBCLASS\*(-K \*(+KOF\*(-K thornObject
+  \*(+KMUST\*(-K \*(+KCONTAIN\*(-K \*(+K{\*(-K
+  \h'|11n'commonName \*(+K}\*(-K
+  \*(+KMAY\*(-K \*(+KCONTAIN\*(-K \*(+K{\*(-K
+  \h'|11n'description,
+\h'|11n'seeAlso,
+\h'|11n'telephoneNumber,
+\h'|11n'localityName,
+\h'|11n'organizationName,
+\h'|11n'organizationalUnitName \*(+K}\*(-K
+::= \*(+K{\*(-KthornObjectClass 8\*(+K}\*(-K\h'|41n'
+.DE
+.DS L
+\*-\*-\c\c
+'+C
+ The RARE Object Classes
+\c
+'-C
+
+wkd \*(+KOBJECT\*(-K\*-\*(+KCLASS\*(-K 
+  \*(+KSUBCLASS\*(-K \*(+KOF\*(-K top
+  \*(+KMUST\*(-K \*(+KCONTAIN\*(-K \*(+K{\*(-K
+       wkdName \*(+K}\*(-K
+::= \*(+K{\*(-KthornObjectClass 10\*(+K}\*(-K
+
+dur \*(+KOBJECT\*(-K\*-\*(+KCLASS\*(-K 
+  \*(+KSUBCLASS\*(-K \*(+KOF\*(-K top
+  \*(+KMUST\*(-K \*(+KCONTAIN\*(-K \*(+K{\*(-K
+       durName \*(+K}\*(-K
+::= \*(+K{\*(-KthornObjectClass 11\*(+K}\*(-K
+
+rareApplicationEntity \*(+KOBJECT\*(-K\*-\*(+KCLASS\*(-K
+   \*(+KSUBCLASS\*(-K \*(+KOF\*(-K applicationEntity
+   \*(+KMAY\*(-K \*(+KCONTAIN\*(-K \*(+K{\*(-K
+       protocolProfile,
+       owner,
+       objectId\*(+K}\*(-K
+::= \*(+K{\*(-KthornObjectClass 12\*(+K}\*(-K
+.DE
+.DS L
+\*-\*-\c\c
+'+C
+ Domain Definitions
+\c
+'-C
+
+domain Domain ::= \*(+K{\*(-KthornObjectClass 13\*(+K}\*(-K
+rFC822LocalPart RFC822LocalPart ::= \*(+K{\*(-KthornObjectClass 14\*(+K}\*(-K
+dNSDomain DNSDomain: := \*(+K{\*(-KthornObjectClass 15\*(+K}\*(-K
+nRSDomain NRSDomain ::= \*(+K{\*(-KthornObjectClass 16\*(+K}\*(-K
+domainRelatedObject DomainRelatedObject ::= \*(+K{\*(-KthornObjectClass 17\*(+K}\*(-K
+
+.DE
+.bp
+.DS L
+\*-\*-\c\c
+'+C
+ A couple of standard constraints
+\c
+'-C
+
+ub\*-reasonable \*(+KINTEGER\*(-K ::= 256
+
+ub\*-biggish \*(+KINTEGER\*(-K ::= 2048
+
+\*-\*-\c\c
+'+C
+ Now the LSPX User Attributes
+\c
+'-C
+
+userid \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K caseIgnoreStringSyntax 
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    ::= \*(+K{\*(-KthornAttributeType 1\*(+K}\*(-K
+
+textEncodedORAddress \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K
+    caseIgnoreStringSyntax 
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    ::= \*(+K{\*(-KthornAttributeType 2\*(+K}\*(-K
+
+rfc822Mailbox \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K iA5StringSyntax
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    ::= \*(+K{\*(-KthornAttributeType 3\*(+K}\*(-K
+
+.DE
+.DS L
+
+info \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K caseIgnoreListSyntax 
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-biggish)
+    ::= \*(+K{\*(-KthornAttributeType 4\*(+K}\*(-K
+
+favouriteDrink \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    caseIgnoreStringSyntax ::= \*(+K{\*(-KthornAttributeType 5\*(+K}\*(-K
+.DE
+.DS L
+
+roomNumber \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K caseIgnoreStringSyntax
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    ::= \*(+K{\*(-KthornAttributeType 6\*(+K}\*(-K
+
+ub\*-photo \*(+KINTEGER\*(-K ::= 10000
+photo \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K \*(+KBIT\*(-K \*(+KSTRING\*(-K \*-\*-\c\c
+'+C
+ G3 Fax encoding
+\c
+'-C
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-photo)
+    ::= \*(+K{\*(-KthornAttributeType 7\*(+K}\*(-K
+
+userClass \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K caseIgnoreStringSyntax 
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    ::= \*(+K{\*(-KthornAttributeType 8\*(+K}\*(-K
+
+.DE
+.DS L
+
+host \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K caseIgnoreStringSyntax ::=
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    \*(+K{\*(-KthornAttributeType 9\*(+K}\*(-K 
+.DE
+.DS L
+
+manager \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K distinguishedNameSyntax ::=
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    \*(+K{\*(-KthornAttributeType 10\*(+K}\*(-K
+.DE
+.DS L
+
+
+documentIdentifier \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    caseIgnoreStringSyntax ::= \*(+K{\*(-KthornAttributeType 11\*(+K}\*(-K
+
+documentTitle \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K caseIgnoreStringSyntax
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    ::= \*(+K{\*(-KthornAttributeType 12\*(+K}\*(-K
+
+.DE
+.DS L
+documentVersion \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K caseIgnoreStringSyntax 
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    ::= \*(+K{\*(-KthornAttributeType 13\*(+K}\*(-K
+
+documentAuthor \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K distinguishedNameSyntax 
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    ::= \*(+K{\*(-KthornAttributeType 14\*(+K}\*(-K
+
+.DE
+.DS L
+documentLocation \*(+KATTRIBUTE\*(-K \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K caseIgnoreStringSyntax 
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    ::= \*(+K{\*(-KthornAttributeType 15\*(+K}\*(-K
+
+.DE
+.DS L
+\*-\*-\c\c
+'+C
+ The RARE Attributes
+\c
+'-C
+
+durName \*(+KATTRIBUTE\*(-K 
+    \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K caseIgnoreStringSyntax
+    ::= \*(+K{\*(-KthornAttributeType 16\*(+K}\*(-K
+    
+wkdName \*(+KATTRIBUTE\*(-K
+    \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K caseIgnoreStringSyntax
+    ::= \*(+K{\*(-KthornAttributeType 17\*(+K}\*(-K
+    
+protocolProfile \*(+KATTRIBUTE\*(-K
+    \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K caseIgnoreStringSyntax
+    ::= \*(+K{\*(-KthornAttributeType 18\*(+K}\*(-K
+    
+objectId \*(+KATTRIBUTE\*(-K
+    \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K objectIdentifierSyntax
+    ::= \*(+K{\*(-KthornAttributeType 19\*(+K}\*(-K
+.DE
+.DS L
+\*-\*-\c\c
+'+C
+ Some More attributes
+\c
+'-C
+
+homePhone \*(+KATTRIBUTE\*(-K 
+    \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K caseIgnoreStringSyntax 
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    ::= \*(+K{\*(-KthornAttributeType 20\*(+K}\*(-K
+
+secretary \*(+KATTRIBUTE\*(-K 
+    \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K distinguishedNameSyntax
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    ::= \*(+K{\*(-KthornAttributeType 21\*(+K}\*(-K
+
+otherMailbox \*(+KATTRIBUTE\*(-K
+        \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K \*(+KSEQUENCE\*(-K \*(+K{\*(-K
+        mailboxType PrintableString,  \*-\*-\c\c
+'+C
+ e\&.g\&. Telemail
+\c
+'-C
+\h'|11n'mailbox IA5String             \*-\*-\c\c
+'+C
+ e\&.g\&. X378:Joe
+\c
+'-C
+\h'|11n'\*(+K}\*(-K
+    ::= \*(+K{\*(-KthornAttributeType 22\*(+K}\*(-K
+
+
+lastModifiedTime \*(+KATTRIBUTE\*(-K 
+    \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K UTCTime
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    ::= \*(+K{\*(-KthornAttributeType 23\*(+K}\*(-K
+
+lastModifiedBy \*(+KATTRIBUTE\*(-K 
+    \*(+KWITH\*(-K \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K distinguishedNameSyntax
+    \*(+KSIZE\*(-K (1\&.\&.ub\*-reasonable)
+    ::= \*(+K{\*(-KthornAttributeType 24\*(+K}\*(-K
+.DE
+.DS L
+\*-\*-\c\c
+'+C
+ X\&.500\f2\h'\w' 'u-\w'/'u'/\fPDomain Attributes
+\c
+'-C
+
+domainComponent DomainComponent ::= \*(+K{\*(-KthornAttributeType 25\*(+K}\*(-K
+aRecord ARecord ::= \*(+K{\*(-KthornAttributeType 26\*(+K}\*(-K
+mDRecord MDRecord ::= \*(+K{\*(-KthornAttributeType 27\*(+K}\*(-K
+mXRecord MXRecord ::= \*(+K{\*(-KthornAttributeType 28\*(+K}\*(-K
+nSRecord NSRecord ::= \*(+K{\*(-KthornAttributeType 29\*(+K}\*(-K
+sOARecord SOARecord ::= \*(+K{\*(-KthornAttributeType 30\*(+K}\*(-K
+cNAMERecord CNAMERecord ::= \*(+K{\*(-KthornAttributeType 31\*(+K}\*(-K
+nRSSystemDescription NRSSystemDescription ::= \*(+K{\*(-KthornAttributeType 32\*(+K}\*(-K
+forwardOnlyInformation ForwardOnlyInformation ::= \*(+K{\*(-KthornAttributeType 33\*(+K}\*(-K
+reverseOnlyInformation ReverseOnlyInformation ::= \*(+K{\*(-KthornAttributeType 34\*(+K}\*(-K
+forwardAndReverseInformation ForwardAndReverseInformation ::= \*(+K{\*(-KthornAttributeType 35\*(+K}\*(-K
+nRSTextualDescription NRSTextualDescription ::= \*(+K{\*(-KthornAttributeType 36\*(+K}\*(-K
+associatedDomain AssociatedDomain ::= \*(+K{\*(-KthornAttributeType 37\*(+K}\*(-K
+associatedName AssociatedName ::= \*(+K{\*(-KthornAttributeType 38\*(+K}\*(-K
+
+.DE
+.DS L
+
+\*-\*-\c\c
+'+C
+ And a few Syntaxes
+\c
+'-C
+
+
+iA5StringSyntax \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K
+    IA5String
+    \*(+KMATCHES\*(-K \*(+KFOR\*(-K \*(+KEQUALITY\*(-K \*(+KSUBSTRINGS\*(-K
+    ::= \*(+K{\*(-KthornAttributeSyntax 4\*(+K}\*(-K
+
+caseIgnoreIA5StringSyntax \*(+KATTRIBUTE\*(-K\*-\*(+KSYNTAX\*(-K
+    IA5String
+    \*(+KMATCHES\*(-K \*(+KFOR\*(-K \*(+KEQUALITY\*(-K \*(+KSUBSTRINGS\*(-K
+    ::= \*(+K{\*(-KthornAttributeSyntax 4\*(+K}\*(-K
+.DE
+.vE
+.\" @(#)tmac.vgrind 1.7 88/02/08 SMI; from UCB 4.3 beta
+'ds _ \d\(mi\u
+'ps 9p
+'vs 10p
+'ds - \(mi
+'ds / \\h'\\w' 'u-\\w'/'u'/
+'ds /* \\h'\\w' 'u-\\w'/'u'/*
+'bd B 3
+'bd S B 3
+'nr cm 0
+'nf
+'de vH
+'ev 2
+'if t 'if !\nv 'tl '\-\-''\-\-'
+'ft 1
+'sp .35i
+'tl '\s14\f3\\*(=F\fP\s0'\\*(=H'\f3\s14\\*(=F\fP\s0'
+'sp .25i
+'ft 1
+\f2\s12\h'\\n(.lu-\w'\\*(=f'u'\\*(=f\fP\s0\h'|0u'
+.sp .05i
+'ev
+'ds =G \\*(=F
+..
+'de vF
+'ev 2
+'sp .35i
+'tl '\f2\\*(=M''Page % of \\*(=G\fP'
+'bp
+'ev
+'ft 1
+'if \\n(cm=1 'ft 2
+..
+'de ()
+'pn 1
+..
+'de +C
+'nr cm 1
+'ft 2
+'ds +K
+'ds -K
+..
+'de -C
+'nr cm 0
+'ft 1
+'ds +K \f3
+'ds -K \fP
+..
+'+C
+'-C
+'am +C
+'ne 3
+..
+'de FN
+\f2\s14\h'\\n(.lu-\w'\\$1'u'\\$1\fP\s0\h'|0u'\c
+.if \\nx .tm \\$1 \\*(=F \\n%
+'ds =f \&...\\$1
+..
+'de FC
+.if \\nx .tm \\$1 \\*(=F \\n%
+'ds =f \&...\\$1
+..
+'de -F
+'rm =f
+..
+'ft 1
+'lg 0
+'-F
+.vS
+.DS L
+
+\*(+KEND\*(-K
+.DE
+.vE

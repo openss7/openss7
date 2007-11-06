@@ -1,0 +1,41 @@
+\catcode`@=11
+\expandafter\ifx\csname graph\endcsname\relax \alloc@4\box\chardef\insc@unt\graph\fi
+\catcode`@=12
+\setbox\graph=\vtop{%
+  \baselineskip=0pt \lineskip=0pt \lineskiplimit=0pt
+  \vbox to0pt{\hbox{%
+    \special{pn 8}%
+    \special{pn 20}%
+    \rlap{\kern  3.125in\lower 0.541in\hbox to 0pt{\hss result\hss}}%
+    \special{pa 2750 750}%
+    \special{pa 2250 1250}%
+    \special{fp}%
+    \special{pa 2303 1162}%
+    \special{pa 2250 1250}%
+    \special{fp}%
+    \special{pa 2338 1197}%
+    \special{pa 2250 1250}%
+    \special{fp}%
+    \special{pa 2250 1250}%
+    \special{pa 1250 2250}%
+    \special{da  0.050}%
+    \special{pa 1250 2250}%
+    \special{pa 750 2750}%
+    \special{fp}%
+    \special{pa 803 2662}%
+    \special{pa 750 2750}%
+    \special{fp}%
+    \special{pa 838 2697}%
+    \special{pa 750 2750}%
+    \special{fp}%
+    \rlap{\kern  0.375in\lower 3.041in\hbox to 0pt{\hss result\hss}}%
+    \special{pa 2250 0}%
+    \special{pa 2250 3500}%
+    \special{fp}%
+    \special{pa 1250 0}%
+    \special{pa 1250 3500}%
+    \special{fp}%
+    \kern  3.126in
+  }\vss}%
+  \kern  3.501in
+}

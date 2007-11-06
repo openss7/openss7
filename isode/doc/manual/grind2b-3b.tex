@@ -1,0 +1,36 @@
+\File{grind2b\-3b.c},{22:23},{Jun 12 1988}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{\K{int}     OP1 (), ..., OPn ();}}
+\L{\LB{}}
+\L{\LB{}}
+\L{\LB{\C{}\/* OPERATIONS are numbered APDU\_OPx, where each is a unique integer.  Further,}}
+\L{\LB{   APDU\_UNKNOWN is used as a tag different than any valid operation.}}
+\L{\LB{}}
+\L{\LB{   ERRORS are numbered ERROR\_xyz, where each is a unique integer.}}
+\L{\LB{   ERROR\_MISTYPED is used to signal an argument error to an operation.}}
+\L{\LB{   Further, ERROR\_UNKNOWN is used as a tag to indicate that the operation}}
+\L{\LB{   succeeded.}}
+\L{\LB{}}
+\L{\LB{   Finally, note that rox \-\> rox\_args is updated in place by these routines.}}
+\L{\LB{   If the routine returns ERROR\_UNKNOWN, then rox\_args contains the results}}
+\L{\LB{   of the operation.  If the routine returns ERROR\_MISTYPED, then rox\_args is}}
+\L{\LB{   untouched.  Otherwise, if the routine returns any other value, then}}
+\L{\LB{   rox\_args contains the parameters of the error which occurred.  Obviously,}}
+\L{\LB{   each routine calls ROXFREE prior to setting rox\_args to a new value.}}
+\L{\LB{ *\/\CE{}}}
+\L{\LB{}}
+\L{\LB{\K{static} \K{struct} dispatch \{}}
+\L{\LB{    \K{int}     ds\_operation;}}
+\L{\LB{    IFP     ds\_vector;}}
+\L{\LB{\}       dispatches[] = \{}}
+\L{\LB{    APDU\_OP1,   OP1,}}
+\L{\LB{}}
+\L{\LB{...}}
+\L{\LB{}}
+\L{\LB{    APDU\_OPn,   OPn,}}
+\L{\LB{}}
+\L{\LB{    APDU\_UNKNOWN}}
+\L{\LB{\};}}
+\L{\LB{}}
+\L{\LB{...}}
