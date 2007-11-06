@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo nosi nocin noai tw=100
 % =========================================================================
 %
-% @(#) $Id$
+% @(#) $Id: sg.texi,v 0.9.2.1 2007/11/06 09:33:53 brian Exp $
 %
 % =========================================================================
 %
@@ -53,11 +53,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date$ by $Author$
+% Last Modified $Date: 2007/11/06 09:33:53 $ by $Author: brian $
 %
 % =========================================================================
 %
-% $Log$
+% $Log: sg.texi,v $
+% Revision 0.9.2.1  2007/11/06 09:33:53  brian
+% - added sg document
+%
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
 @c vim: ft=texinfo nosi nocin noai tw=100
@@ -387,7 +390,10 @@ Project} website for a current version.
 
 @smallexample
 
-$Log$
+$Log: sg.texi,v $
+Revision 0.9.2.1  2007/11/06 09:33:53  brian
+- added sg document
+
 @end smallexample
 
 @subsubsection ISO 9000 Compliance
