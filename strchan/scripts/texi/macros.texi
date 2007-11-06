@@ -81,10 +81,10 @@
 @c @end cartouche
 @end macro
 
-@macro figure {image, number, caption}
+@macro figure {image, number, caption, width, height, alttext, extension}
 @cartouche
 @float Figure,Figure \number\
-@center @image{\image\}
+@center @image{\image\,\width\,\height\,\alttext\,\extension\}
 @caption{@emph{\caption\}}
 @end float
 @end cartouche
@@ -134,8 +134,8 @@
 @sp 1
 @end macro
 
-@macro figure {image, number, caption}
-@center @image{\image\}
+@macro figure {image, number, caption, width, height, alttext, extension}
+@center @image{\image\,\width\,\height\,\alttext\,\extension\}
 @sp 1
 @anchor{Figure \number\}
 @center @emph{Figure \number\.@:  \caption\}
