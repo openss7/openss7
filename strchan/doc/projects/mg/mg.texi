@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosi nocin noai tw=100
 % =========================================================================
 %
-% @(#) $Id: mg.texi,v 0.9.2.2 2007/08/14 06:47:23 brian Exp $
+% @(#) $Id: mg.texi,v 0.9.2.3 2007/11/06 09:04:25 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/14 06:47:23 $ by $Author: brian $
+% Last Modified $Date: 2007/11/06 09:04:25 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: mg.texi,v $
+% Revision 0.9.2.3  2007/11/06 09:04:25  brian
+% - working up documentation
+%
 % Revision 0.9.2.2  2007/08/14 06:47:23  brian
 % - GPLv3 header update
 %
@@ -394,6 +397,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: mg.texi,v $
+Revision 0.9.2.3  2007/11/06 09:04:25  brian
+- working up documentation
+
 Revision 0.9.2.2  2007/08/14 06:47:23  brian
 - GPLv3 header update
 
@@ -765,14 +771,14 @@ MGs.
 @item Trans-MG calls originate on a network SSP and terminate on a network VoIP gateway.
 @end enumerate
 
-@figure{netarch,3.1,Network Architecture,5.5in,,,}
+@figuresized{netarch,3.1,Network Architecture,5.5in}
 
 Signalling is via a path typically separate from the MG.  In the illustration in @figref{3.1}, the
 signalling is via external STPs that are attached to switching complex Signalling Gateways (SGs)
 that communicate with the Media Gateway Controller.  In some arrangements, the MG is possibly
 also a Signalling Gateway.
 
-@figure{netarch2,3.2,Network Architecture,5.5in,,,}
+@figuresized{netarch2,3.2,Network Architecture,5.5in}
 
 @figref{3.2} illustrates the placement of the Media Gateway (MG) within the decomposed Service
 Switching Point and its connection to Media Gateway Controllers within the switching complex as well
@@ -788,7 +794,7 @@ network SSPs using TDM voice trunks.
 
 @figref{2.1} illustrates the ETSI TIPHON reference architecture.
 
-@figure{tiphon,2.1,Reference Architecture,,,,}
+@figuresized{tiphon,2.1,Reference Architecture,}
 
 @subsection ETSI TIPHON Entities
 
@@ -873,7 +879,7 @@ The ETSI TIPHON model illustrated in @figref{2.1} contains the following referen
 
 @section Interfaces
 
-@figure{iface,2.3,Interfaces,3.5in,,,}
+@figuresized{iface,2.3,Interfaces,3.5in}
 
 The interfaces suppored by the @value{MANUAL_TITLE} are illustrated in @figref{2.3}.  The interfaces
 are enumerated as follows:
@@ -964,7 +970,7 @@ The solution system has the following requirements:
 
 @end itemize
 
-@figure{sysarch,4.1,System Architecture,5.0in,,,}
+@figuresized{sysarch,4.1,System Architecture,5.0in}
 
 @node Platform Architecture
 @chapter Platform Architecture
@@ -979,7 +985,7 @@ computing platform and associated hardware, interfaces and peripherals.
 
 @figref{5.1} illustrates the solution platform rack configuration.
 
-@figure{rack,5.1,Rack Mount Components,,,,}
+@figuresized{rack,5.1,Rack Mount Components,}
 
 The solution platform consists of the following:
 
@@ -1016,7 +1022,7 @@ The PC chasses is equipped with the following:@footnote{For detailing sizing con
 @figref{6.1} illustrates the protocol configuration of the @value{MANUAL_TITLE} system.  The
 protocol stack uses the following OpenSS7 stack components:
 
-@figure{protconf,6.1,Protocol Architecture,6in,,,}
+@figuresized{protconf,6.1,Protocol Architecture,6in}
 
 @menu
 * Protocol Components::
@@ -1276,13 +1282,13 @@ experienced over equivalent user-space applications.  @dfn{STREAMS} modules and 
 by passing priority.  In addition, @dfn{STREAMS} provides memory management, timer, locking,
 syncrhonization, flow control and other facilities commonly used by protocol modules.
 
-@figure{osimap,7.1,SS7 to ISO/OSI Mapping,,,,}
+@figuresized{osimap,7.1,SS7 to ISO/OSI Mapping,}
 
 Each OpenSS7 protocol module provides standardized X/Open ISO/OSI interfaces as well as more SS7
 specialized interfaces.  Many of the OpenSS7 protocol modules provide TPI Revision 2.0 interfaces
 with support fot he OpenSS7 XTI/TLI Library.
 
-@figure{stack,7.2,STREAMS SS7/SIGTRAN Stack Architecture,3.8in,,,}
+@figuresized{stack,7.2,STREAMS SS7/SIGTRAN Stack Architecture,3.8in}
 
 @figref{7.2} illustrates the organization of @dfn{STREAMS} modules, multiplexing drivers,
 pseudo-device drivers and real device drivers in the OpenSS7 SS7 stack.  At each interface, the
@@ -1301,9 +1307,9 @@ interface.
 
 @figref{8.1} illustrates the hardware configuration for the @value{MANUAL_TITLE}.
 
-@figure{platarch,8.1,Platform Architecture,6.0in,,,}
+@figuresized{platarch,8.1,Platform Architecture,6.0in}
 
-@figure{platarch2,8.2,Platform Architecture,6.0in,,,}
+@figuresized{platarch2,8.2,Platform Architecture,6.0in}
 
 The configuration show in @figref{8.1} shows:
 
@@ -1345,7 +1351,7 @@ managed switching element view.
 
 @end enumerate
 
-@figure{manarch,9.1,Management Architecture,4in,,,}
+@figuresized{manarch,9.1,Management Architecture,4in}
 
 The management facilities provided by the hardware platform, operating system and associated
 subsystems are illustrated in @figref{9.1}.  They are summarized as follows:

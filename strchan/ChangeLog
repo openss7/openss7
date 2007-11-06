@@ -1,3 +1,36 @@
+2007-11-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/Makefile.am: working up documentation
+	* doc/projects/mg/.cvsignore: working up documentation
+	* doc/projects/mg/Makefile.am: working up documentation
+	* doc/projects/mg/mg.texi: working up documentation
+
+	* doc/projects/mg/iface.fig: added figures
+	* doc/projects/mg/iface.txt: added figures
+	* doc/projects/mg/manarch.fig: added figures
+	* doc/projects/mg/manarch.txt: added figures
+	* doc/projects/mg/netarch.fig: added figures
+	* doc/projects/mg/netarch.txt: added figures
+	* doc/projects/mg/netarch2: added figures
+	* doc/projects/mg/netarch2.fig: added figures
+	* doc/projects/mg/netarch2.txt: added figures
+	* doc/projects/mg/osimap.fig: added figures
+	* doc/projects/mg/osimap.txt: added figures
+	* doc/projects/mg/platarch.fig: added figures
+	* doc/projects/mg/platarch.txt: added figures
+	* doc/projects/mg/platarch2.fig: added figures
+	* doc/projects/mg/platarch2.txt: added figures
+	* doc/projects/mg/protconf.fig: added figures
+	* doc/projects/mg/protconf.txt: added figures
+	* doc/projects/mg/rack.fig: added figures
+	* doc/projects/mg/rack.txt: added figures
+	* doc/projects/mg/stack.fig: added figures
+	* doc/projects/mg/stack.txt: added figures
+	* doc/projects/mg/sysarch.fig: added figures
+	* doc/projects/mg/sysarch.txt: added figures
+	* doc/projects/mg/tiphon.fig: added figures
+	* doc/projects/mg/tiphon.txt: added figures
+
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
