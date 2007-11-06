@@ -1,3 +1,8 @@
+2007-11-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: added notifier manual pages to release
+	* doc/manual/STREAMS.texi: minor correction
+
 2007-10-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: build updates
