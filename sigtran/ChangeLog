@@ -2,6 +2,7 @@
 
 	* src/util/m2payac.y: corrections for old compilers
 	* doc/man/sigtran.macros: better grefer macros
+	* doc/man/sigtran.refs: more better references
 
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 

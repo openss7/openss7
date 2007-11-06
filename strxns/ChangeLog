@@ -33,6 +33,7 @@
 	* doc/man/man5/xhosts.5.man: added manual page
 
 	* doc/man/strxns.macros: better grefer macros
+	* doc/man/strxns.refs: more better references
 
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 

@@ -2,6 +2,7 @@
 
 	* scripts/texi/macros.texi: added @figureimage
 	* openss7.macros: better grefer macros
+	* openss7.refs: more better references
 
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 
