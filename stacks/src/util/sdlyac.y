@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlyac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:40 $
+ @(#) $RCSfile: sdlyac.y,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/11/06 09:40:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 11:57:40 $ by $Author: brian $
+ Last Modified $Date: 2007/11/06 09:40:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdlyac.y,v $
+ Revision 0.9.2.3  2007/11/06 09:40:23  brian
+ - miscellaneous corrections
+
  Revision 0.9.2.2  2007/08/19 11:57:40  brian
  - move stdbool.h, obviate need for YFLAGS, general workup
 
@@ -62,9 +65,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: sdlyac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:40 $"
+#ident "@(#) $RCSfile: sdlyac.y,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/11/06 09:40:23 $"
 
-static char const ident[] = "$RCSfile: sdlyac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:40 $";
+static char const ident[] = "$RCSfile: sdlyac.y,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/11/06 09:40:23 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -446,15 +449,15 @@ command:
     ;
 
 usage:
-    TOK_USAGE { help(1, (char *[]){ prompt }); } TOK_EOL
+    TOK_USAGE { help(1, &prompt); } TOK_EOL
     ;
 
 copying:
-    TOK_COPYING { copying(1, (char *[]){ prompt }); } TOK_EOL
+    TOK_COPYING { copying(1, &prompt); } TOK_EOL
     ;
 
 version:
-    TOK_VERSION { version(1, (char *[]){ prompt }); } TOK_EOL
+    TOK_VERSION { version(1, &prompt); } TOK_EOL
     ;
 
 clear: TOK_CLEAR TOK_EOL { fprintf(stdout, "\f"); } ;
@@ -896,7 +899,7 @@ what:
 	", prompt);
     }
     | TOK_GET
-    | TOK_USAGE { usage(1, (char *[]){ prompt }); }
+    | TOK_USAGE { usage(1, &prompt); }
     | TOK_CLEAR
     {
 	fprintf(stdout, "\n\
