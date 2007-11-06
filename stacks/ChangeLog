@@ -14,6 +14,11 @@
 	* src/util/sdlyac.y: corrections for old bison/compiler
 	* src/util/x400yac.y: corrections for old bison/compiler
 
+	* src/mibs/OPENSS7-TMN-SMI.mib: MIB updates
+	* src/mibs/OPENSS7-X400P-MIB.mib: MIB updates
+	* src/mibs/OPENSS7-SL-MUX-MIB.mib: MIB updates
+
+
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
