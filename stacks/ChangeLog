@@ -1,3 +1,13 @@
+2007-11-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/projects/Makefile.am: added sg document
+	* doc/projects/cnam.texi: added sg document
+	* doc/projects/sg.texi: added sg document
+	* doc/projects/sg_netarch.fig: added sg document
+	* doc/projects/sg_netarch.txt: added sg document
+	* doc/projects/sg_platarch.fig: added sg document
+	* doc/projects/sg_sysarch.fig: added sg document
+
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
