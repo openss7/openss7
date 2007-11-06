@@ -248,6 +248,22 @@
 	* doc/man/man7/P_XDATA_REQ.7.man: added manpage
 	* doc/man/man7/ROSE.7.man: added manpage
 
+	* src/include/xap.h: updated header file
+	* src/include/xom.h: updated header file
+
+	* src/include/ap_lib.h: added header file
+	* src/include/ap_poll.h: added header file
+	* src/include/osi_lib.h: added header file
+	* src/include/ro_lib.h: added header file
+	* src/include/xap_env.h: added header file
+
+	* src/lib/apli/apli.VERSION: added library version file
+	* src/lib/apli/apli.c: added library file
+
+	* src/lib/xap/xap.VERSION: added library version file
+	* src/lib/xap/xap.c: added library file
+
+
 2007-10-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: fixed AC_FUNC_REALLOC cross-compile problem
