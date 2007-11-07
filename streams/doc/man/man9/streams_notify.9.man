@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: streams_notify.9.man,v 0.9.2.1 2007/10/18 07:28:54 brian Exp $
+.\" @(#) $Id: streams_notify.9.man,v 0.9.2.2 2007/11/07 10:05:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/10/18 07:28:54 $ by $Author: brian $
+.\" Last Modified $Date: 2007/11/07 10:05:05 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: streams_notify.9.man,v $
+.\" Revision 0.9.2.2  2007/11/07 10:05:05  brian
+.\" - updates to pass check target
+.\"
 .\" Revision 0.9.2.1  2007/10/18 07:28:54  brian
 .\" - added manpages
 .\"
@@ -155,7 +158,7 @@ implementation specific.
 .\"
 .SH DESCRIPTION
 .PP
-.BR streams_notify "(), " streams_register_notifier "(), and " streams_notify "(), "
+.BR streams_notify "(), " streams_register_notifier "(), and " streams_unregister_notifier "(), "
 provide a notifier call chain for notification of STREAMS events.  Current
 events are:
 .TP
@@ -212,8 +215,13 @@ The
 structure has the following members:
 .TP
 .I sn_notify
+provides a notification callback function to be invoked with the appropriate
+.I event
+when that event occurs.
 .TP
 .I sn_list
+provides a list for the notifier chain's private use for linking this
+structure to other structures in the notifier chain.
 .RE
 .PP
 The caller must initialize the
@@ -350,10 +358,16 @@ module to which the event applies.
 .\"
 .SS Callback Function
 .PP
+The callback functions (the
+.I sn_notify
+member of the structure passed to
+.BR streams_regsiter_notifier ())
+is invoked with the same parameters which were passed to
+.BR streams_notify ().
 .\"
 .\"
-.SH USAGE
-.PP
+.\".SH USAGE
+.\".PP
 .\"
 .\"
 .SH RETURN
@@ -381,10 +395,54 @@ or a negative error number upon failure.
 .\"
 .SH ERRORS
 .PP
+When
+.BR streams_register_notify ()
+fails, it returns a negative error code.
+.BR streams_register_notify ()
+fails when:
+.TP
+.RB [ EINVAL ]
+The passed in structure pointer,
+.IR sn ,
+is
+.BR NULL .
+.TP
+.RB [ EINVAL ]
+The
+.I sn_notify
+member of the passed in structure,
+.IR sn ,
+is
+.BR NULL .
+.PP
+When
+.BR streams_unregister_notifier ()
+fails, it returns a negative error code.
+.BR streams_unregister_notifier ()
+fails when:
+.TP
+.RB [ EINVAL ]
+The passed in structure pointer,
+.IR sn ,
+is
+.BR NULL .
+.PP
+.BR streams_notify ()
+is always successful.
 .\"
 .\"
 .SH CONTEXT
 .PP
+.BR streams_register_notifier ()
+and
+.BR streams_unregister_notifier ()
+are intended on being called in process (blockable) context, however, they may
+be called from any context including interrupt service routines.
+.PP
+.BR streams_notify (),
+and therefore the resulting callback functions,
+will be called at process (blockable) context, however, the user context is
+unusable.
 .\"
 .\"
 .SH MP-STREAMS
@@ -396,22 +454,59 @@ single-party deadlock will occur.
 .\"
 .SH NOTICES
 .PP
-.\"
-.\"
-.SH IMPLEMENTATION
+.BR streams_notify (),
+.BR streams_register_notifier ()
+and
+.BR streams_unregsiter_notifier ()
+were added to
+.B @PACKAGE_TITLE@
+for the specific purpose of supporting SNMP agent functions and should not be
+used by portable STREAMS modules and drivers.
 .PP
+Note that the structure,
+.IR sn ,
+passed to
+.BR streams_register_notifier ()
+must remain in core unaltered by the allocating module until after the
+.BR streams_unregister_notifier ()
+function has been called for the same structure.
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR register_strmod (9),
+.BR unregister_strmod (9),
+.BR register_strdrv (9),
+.BR unregister_strdrv (9),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
 .PP
+.BR streams_notify (),
+.BR streams_register_notifier ()
+and
+.BR streams_unregsiter_notifier ()
+have no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.BR streams_notify (),
+.BR streams_register_notifier ()
+and
+.BR streams_unregsiter_notifier ()
+are
+.B @PACKAGE_TITLE@
+specific functions and are not intended on being compatible with any other
+implementation.
+.IP \(em \w'\(em\(em'u
+There is no equivalent for these functions in LiS, nor documented equivalents
+for other STREAMS implementations.
 .PP
 See
 .BR STREAMS (9)
@@ -420,10 +515,23 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
+.BR streams_notify (),
+.BR streams_register_notifier ()
+and
+.BR streams_unregsiter_notifier ()
+are internal
+.B @PACKAGE_TITLE@
+implementation specific functions and are not subject to standandardization.
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR streams_notify (),
+.BR streams_register_notifier ()
+and
+.BR streams_unregsiter_notifier ()
+are new to
+.BR "@PACKAGE@ 0.9.2.4" .
 .\"
 .\"
 .[
