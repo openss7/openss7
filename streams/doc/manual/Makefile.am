@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/08/15 05:33:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/11/07 10:05:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/15 05:33:18 $ by $Author: brian $
+# Last Modified $Date: 2007/11/07 10:05:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,7 +56,7 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= STREAMS.texi STREAMS_FAQ.texi SPG2.texi # SPG.texi porting.texi
+info_TEXINFOS		+= STREAMS.texi STREAMS_FAQ.texi SPG2.texi SPG.texi # porting.texi
 
 STREAMS_TEXINFOS	= \
 			  configure.texi \
@@ -210,6 +210,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.55  2007/11/07 10:05:06  brian
+# - updates to pass check target
+#
 # Revision 0.9.2.54  2007/08/15 05:33:18  brian
 # - GPLv3 updates
 #

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strmib.8.man,v 0.9.2.1 2007/10/13 08:54:35 brian Exp $
+.\" @(#) $Id: strmib.8.man,v 0.9.2.2 2007/11/07 10:05:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/10/13 08:54:35 $ by $Author: brian $
+.\" Last Modified $Date: 2007/11/07 10:05:04 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strmib.8.man,v $
+.\" Revision 0.9.2.2  2007/11/07 10:05:04  brian
+.\" - updates to pass check target
+.\"
 .\" Revision 0.9.2.1  2007/10/13 08:54:35  brian
 .\" - added MIB agent files
 .\"
@@ -1185,8 +1188,8 @@ agentx
 interface.
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DEVICES
@@ -1249,6 +1252,8 @@ however, load an file that beings with a '.' or descend into subdirectories.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR snmp (5),
+.BR snmpd (8).
 .\"
 .\"
 .SH BUGS
@@ -1389,7 +1394,13 @@ OpenSS7 coding standards.
 .B strmib
 conforms to SNMPv1, SNMPv2,
 .[
-std58
+rfc2578
+.]
+.[
+rfc2579
+.]
+.[
+rfc2580
 .]
 SNMPv2c, SNMPv3 and AgentX.
 .[

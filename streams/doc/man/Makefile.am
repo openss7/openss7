@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2007/11/06 10:27:03 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2007/11/07 10:05:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/11/06 10:27:03 $ by $Author: brian $
+# Last Modified $Date: 2007/11/07 10:05:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1282,6 +1282,7 @@ man_MANS = \
 	man9/rmvb.9 \
 	man9/rmvq.9 \
 	man9/runqueues.9 \
+	man9/Strinfo.9 \
 	man9/sd_get.9 \
 	man9/sd_put.9 \
 	man9/sdev_add.9 \
@@ -2430,6 +2431,7 @@ dist_noinst_MANS = \
 	man9/rmvb.9.man \
 	man9/rmvq.9.man \
 	man9/runqueues.9.man \
+	man9/Strinfo.9.man \
 	man9/sd_get.9.man \
 	man9/sd_put.9.man \
 	man9/sdev_add.9.man \
@@ -2522,6 +2524,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.90  2007/11/07 10:05:02  brian
+# - updates to pass check target
+#
 # Revision 0.9.2.89  2007/11/06 10:27:03  brian
 # - miscellaneous corrections
 #

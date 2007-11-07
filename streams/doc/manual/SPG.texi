@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.59 2007/08/12 06:44:24 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.60 2007/11/07 10:05:06 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/12 06:44:24 $ by $Author: brian $
+% Last Modified $Date: 2007/11/07 10:05:06 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -82,7 +82,7 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2005  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -128,7 +128,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2005  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2007  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -447,7 +447,9 @@ Copying
 @unnumbered Acknowledgements
 @cindex credits
 
+@raisesections
 @include texi/funding.texi
+@lowersections
 
 @unnumberedsec Authors
 
@@ -548,6 +550,9 @@ package.
 @smallexample
 
 $Log: SPG.texi,v $
+Revision 0.9.2.60  2007/11/07 10:05:06  brian
+- updates to pass check target
+
 Revision 0.9.2.59  2007/08/12 06:44:24  brian
 - updated licenses in manuals
 
@@ -863,7 +868,7 @@ This system conforms to @cite{UNIX System V Release 4.2} for @cite{Linux}.
 
 @subsection Copyright
 
-@copyright{} 1997-2005  OpenSS7 Corporation.  All Rights Reserved.
+@copyright{} 1997-2007  OpenSS7 Corporation.  All Rights Reserved.
 
 
 @node Introduction
@@ -8510,7 +8515,7 @@ For a driver to be recognized as part of the system, information on driver type,
 resides, interrupts, and so on, must be stored in appropriate files.
 
 The following summarizes information needed to include a driver in the system (this information is
-unique to the AT&T 3B2):
+unique to the @cite{AT&T 3B2}):
 
 @ftable @file
 
@@ -9642,12 +9647,12 @@ The sequence of instructions to this point is:
     @}
 @end smallexample
 
-I_LINK takes two file descriptors as arguments.  The first file descriptor, fd_ip, must reference
-the @dfn{Stream} connected to the multiplexing driver, and the second file descriptor, fd_802_4,
-must reference the @dfn{Stream} to be connected below the multiplexer.  @figref{32} shows the state
-of these @dfn{Streams} following the @ioctlref{I_LINK} call.  The complete @dfn{Stream} to the 802.4
-driver has been connected below the IP driver.  The @dfn{Stream head}'s queues of the 802.4 driver
-will be used by the IP driver to manage the lower half of the multiplexer.
+@streamio{I_LINK} takes two file descriptors as arguments.  The first file descriptor, fd_ip, must
+reference the @dfn{Stream} connected to the multiplexing driver, and the second file descriptor,
+fd_802_4, must reference the @dfn{Stream} to be connected below the multiplexer.  @figref{32} shows
+the state of these @dfn{Streams} following the @ioctlref{I_LINK} call.  The complete @dfn{Stream} to
+the 802.4 driver has been connected below the IP driver.  The @dfn{Stream head}'s queues of the 802.4
+driver will be used by the IP driver to manage the lower half of the multiplexer.
 
 @figuresized{SPG_fig32,32,IP Multiplexer After First Link,4in}
 
@@ -9716,9 +9721,9 @@ multiplexer.
 
 At this point the file descriptors associated with the lower drivers can be closed without affecting
 the operation of the multiplexer.  If these file descriptors are not closed, all subsequent read,
-write, @command{ioctl}, poll, getmsg, and putmsg system calls issued to them will fail.  That is because
-I_LINK associates the @dfn{Stream head} of each linked @dfn{Stream} with the multiplexer, so the user may not
-access that @dfn{Stream} directly for the duration of the link.
+write, @command{ioctl}, poll, getmsg, and putmsg system calls issued to them will fail.  That is
+because @streamio{I_LINK} associates the @dfn{Stream head} of each linked @dfn{Stream} with the multiplexer, so
+the user may not access that @dfn{Stream} directly for the duration of the link.
 
 The following sequence of system calls completes the daemon example:
 
@@ -11241,11 +11246,11 @@ account when calculating tab expansions.  When using multi-byte characters or mu
 characters ldterm automatically handles tab expansion (when @constant{TAB3} is set) and does not
 leave this handling to a lower module or driver.
 
-As an example, consider the 3B2 PORTS board that has a processor and runs firmware on the board that
-can handle output post-processing.  However, the firmware on the PORTS board has no knowledge of
-@dfn{EUC} unless one can change the firmware.  Therefore, with some @dfn{EUC} code sets,
+As an example, consider the @cite{3B2 PORTS} board that has a processor and runs firmware on the board
+that can handle output post-processing.  However, the firmware on the @cite{PORTS} board has no
+knowledge of @dfn{EUC} unless one can change the firmware.  Therefore, with some @dfn{EUC} code sets,
 particularly those where number of bytes in a character is not equivalent to the width of the
-character on the screen (for example, 3 byte codes that take only 2 screen columns), the PORTS
+character on the screen (for example, 3 byte codes that take only 2 screen columns), the @cite{PORTS}
 board's firmware miscalculates the number of spaces required to expand the tab.  Hence, if the board
 is allowed to handle tab expansion, it may get the expansion wrong in some cases.
 
@@ -11407,13 +11412,13 @@ on the @dfn{Stream}.
 Most of the actions taken by the hardware emulation module are the same regardless of the underlying
 architecture.  However, there are some actions that are different depending on whether the
 communication is local or remote and whether the underlying transport protocol is used to support
-the remote connection.  For example, @dfn{NTTY} is a hardware emulation module supported by AT&T in
-its Starla networking environment.  This hardware emulation module behaves in a way understood by
-the @dfn{URP} protocol driver that exists below @dfn{NTTY}.  On receipt of a @termio{TCSBRK}
-@command{ioctl}, @dfn{NTTY} sends an @msg{M_BREAK} message downstream.  When the baud rate is 0, the
-hardware emulation module sends a @dfn{TPI} message requesting a disconnect.  These actions are
-valid for a network situation but may not make sense in other environments when there is no
-module/driver below to understand the @dfn{TPI} messages or handle @msg{M_BREAK} messages.
+the remote connection.  For example, @dfn{NTTY} is a hardware emulation module supported by
+@cite{AT&T} in its StarLAN networking environment.  This hardware emulation module behaves in a way
+understood by the @dfn{URP} protocol driver that exists below @dfn{NTTY}.  On receipt of a
+@termio{TCSBRK} @command{ioctl}, @dfn{NTTY} sends an @msg{M_BREAK} message downstream.  When the baud
+rate is 0, the hardware emulation module sends a @dfn{TPI} message requesting a disconnect.  These
+actions are valid for a network situation but may not make sense in other environments when there is
+no module/driver below to understand the @dfn{TPI} messages or handle @msg{M_BREAK} messages.
 
 Each hardware emulation module has an open, close, read queue @command{put} procedure, and write
 queue @command{put} procedure.
@@ -12085,11 +12090,12 @@ utilities return.  The same is true for @manref{qtimeout(9)}, @manref{qbufcall(9
 there is a reference to a statically allocated data structure contained within the kernel module.
 If a @dfn{STREAMS} module does not cancel all callbacks in the module @command{close} procedure, the
 associated kernel module must not be permitted to be unloaded.  @dfn{STREAMS} handles all references
-with the exception of references to the free routine provided to @manref{esballoc(9)}.
-
-@dfn{STREAMS} loadable kernel modules that pass free routines to @manref{esballoc(9)} are
-responsible for incrementing their own module counts upon the call to @manref{esballoc(9)} and
-decrementing them when the @member{free_rtn} function exits.
+with the exception of references to the free routine provided to @manref{esballoc(9)}.  @dfn{STREAMS}
+loadable kernel modules that pass free routines to @manref{esballoc(9)} are responsible for
+incrementing their own module counts upon the call to @manref{esballoc(9)} and decrementing them when
+the @member{free_rtn} function exits.@footnote{On kernels supporting the mapping of addresses to
+kernel modules, the esballoc function will hold a reference on the module until the corresponding free
+function is called and reference counting of @manref{esballoc(9)} is also atutomatic.}
 
 @node MP Locking
 @section MP Locking
@@ -17444,6 +17450,7 @@ included.
 This appendix also includes a list of @dfn{STREAMS} related tunable parameters and describes the
 autopush facility.
 
+@node Configuring STREAMS Modules and Drivers
 @appendixsubsec Configuring STREAMS Modules and Drivers
 
 Each character device that is configured into a @cite{UNIX} system results in an entry being placed in the
@@ -17624,6 +17631,7 @@ into the control part of a message (in an M_PROTO or M_PCPROTO block). A @manpag
 part exceeding this size will fail with ERANGE.
 @end table
 
+@node Autopush Facility
 @appendixsubsec Autopush Facility
 
 The Autopush facility (see @manref{autopush(8)}) is a general mechanism that configures the list of

@@ -1,3 +1,13 @@
+2007-11-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: updates to pass check target
+	* doc/man/streams.refs: updates to pass check target
+	* doc/man/man8/strmib.8.man: updates to pass check target
+	* doc/man/man9/streams_notify.9.man: updates to pass check target
+	* doc/manual/Makefile.am: updates to pass check target
+	* doc/manual/SPG.texi: updates to pass check target
+	* doc/man/man9/Strinfo.9.man: updates to pass check target
+
 2007-11-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: added notifier manual pages to release
