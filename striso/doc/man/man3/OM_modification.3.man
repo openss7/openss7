@@ -145,7 +145,7 @@ replace-certain-values:OM_REPLACE_CERTAIN_VALUES:5
 .BR OM_modification
 is compatible with XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
@@ -153,7 +153,7 @@ xom
 .PP
 XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
@@ -162,13 +162,13 @@ xom
 .BR OM_modification
 first appeared in XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
 .SH VERSIONS
 .PP
-This manpage was written for the OpenSS7 XOM Library.
+This manual page was written for the OpenSS7 XOM Library.
 .\"
 .\"
 .[

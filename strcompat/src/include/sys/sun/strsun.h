@@ -94,67 +94,95 @@
 
 #include <linux/types.h>
 
+#if 0
 __SUN_EXTERN_INLINE unsigned char *
 DB_BASE(mblk_t *mp)
 {
 	return (unsigned char *) (mp->b_datap->db_base);
 }
-#define DB_BASE(mp) (mp->b_datap->db_base)
+#endif
+#ifndef DB_BASE
+#define DB_BASE(mp) ((mp)->b_datap->db_base)
+#endif
+#if 0
 __SUN_EXTERN_INLINE unsigned char *
 DB_LIM(mblk_t *mp)
 {
 	return (unsigned char *) (mp->b_datap->db_lim);
 }
-#define DB_LIM(mp) (mp->b_datap->db_lim)
+#endif
+#ifndef DB_LIM
+#define DB_LIM(mp) ((mp)->b_datap->db_lim)
+#endif
+#if 0
 __SUN_EXTERN_INLINE size_t
 DB_REF(mblk_t *mp)
 {
 	return (size_t) (mp->b_datap->db_ref);
 }
-#define DB_REF(mp) (mp->b_datap->db_ref)
+#endif
+#ifndef DB_REF
+#define DB_REF(mp) ((mp)->b_datap->db_ref)
+#endif
+#if 0
 __SUN_EXTERN_INLINE int
 DB_TYPE(mblk_t *mp)
 {
 	return (int) (mp->b_datap->db_type);
 }
-#define DB_TYPE(mp) (mp->b_datap->db_type)
+#endif
+#ifndef DB_TYPE
+#define DB_TYPE(mp) ((mp)->b_datap->db_type)
+#endif
 
 __SUN_EXTERN_INLINE long
 MBLKL(mblk_t *mp)
 {
 	return (long) (mp->b_wptr - mp->b_rptr);
 }
-#define MBLKL(mp) (mp->b_wptr - mp->b_rptr)
+#ifndef MBLKL
+#define MBLKL MBLKL
+#endif
 __SUN_EXTERN_INLINE long
 MBLKSIZE(mblk_t *mp)
 {
 	return (long) (mp->b_datap->db_lim - mp->b_datap->db_base);
 }
-#define MBLKSIZE(mp) (mp->b_datap->db_lim - mp->b_datap->db_base)
+#ifndef MBLKSIZE
+#define MBLKSIZE MBLKSIZE
+#endif
 __SUN_EXTERN_INLINE long
 MBLKHEAD(mblk_t *mp)
 {
 	return (long) (mp->b_rptr - mp->b_datap->db_base);
 }
-#define MBLKHEAD(mp) (mp->b_rptr - mp->b_datap->db_base)
+#ifndef MBLKHEAD
+#define MBLKHEAD MBLKHEAD
+#endif
 __SUN_EXTERN_INLINE long
 MBLKTAIL(mblk_t *mp)
 {
 	return (long) (mp->b_datap->db_lim - mp->b_wptr);
 }
-#define MBLKTAIL(mp) (mp->b_datap->db_lim - mp->b_wptr)
+#ifndef MBLKTAIL
+#define MBLKTAIL MBLKTAIL
+#endif
 __SUN_EXTERN_INLINE long
 MBLKIN(mblk_t *mp, ssize_t off, size_t len)
 {
 	return ((off >= 0) && (mp->b_rptr + off + len < mp->b_wptr));
 }
-#define MBLKIN(mp,off,len) ((off >= 0) && (mp->b_rptr + off + len <= mp->b_wptr))
+#ifndef MBLKIN
+#define MBLKIN MBLKIN
+#endif
 __SUN_EXTERN_INLINE long
 OFFSET(void *p, void *base)
 {
 	return (long) ((caddr_t) p - (caddr_t) base);
 }
-#define OFFSET(p,base) ((long)((caddr_t) p - (caddr_t) base))
+#ifndef OFFSET
+#define OFFSET OFFSET
+#endif
 
 __SUN_EXTERN_INLINE void
 merror(queue_t *q, mblk_t *mp, int error)

@@ -97,11 +97,10 @@ is an OSI ACSE/Presentation Interface
 .IR STREAMS (4)
 multiplexing pseudo-device driver.
 .PP
-The driver provides Session, Presentation, ACSE and ROSE OSI protocol layer
-services.  For normal OSI transport providers, the driver provides full OSI
-Session, Presentation and ASCE services.  Users of the driver may access
-ACSE/Presentation services using the ACSE/Presentation Library Interface
-(APLI),
+The driver provides Session, Presentation, ACSE and ROSE OSI protocol layer services.  For normal
+OSI transport providers, the driver provides full OSI Session, Presentation and ASCE services.
+Users of the driver may access ACSE/Presentation services using the ACSE/Presentation Library
+Interface (APLI),
 .[
 apli UNIX International
 .]
@@ -111,20 +110,18 @@ or the X/Open ACSE/Presentation Library Interface (XAP),
 xap c303
 .]
 .BR xap (3).
-ROSE services may be provided optionally using the ACSE/Presentation ROSE
-Interface (APRI) or the X/Open ACSE/Presentation Library Inteface for ROSE
-(XAP-ROSE).
+ROSE services may be provided optionally using the ACSE/Presentation ROSE Interface (APRI) or the
+X/Open ACSE/Presentation Library Inteface for ROSE (XAP-ROSE).
 .[
 xap-rose
 .]
-DTP services may be provided optionally using the X/Open ACSE/Presentation
-Library Interface for DTP (XAP-TP).
+DTP services may be provided optionally using the X/Open ACSE/Presentation Library Interface for DTP
+(XAP-TP).
 .[
 xap-tp
 .]
 .PP
-Additional OSI application services can be provided by the
-XMHS,
+Additional OSI application services can be provided by the XMHS,
 .[
 xmhs
 .]
@@ -142,7 +139,7 @@ xmp
 .]
 These library interfaces, based on XOM,
 .[
-xom
+xom osi
 .]
 provide services via the APLI/XAP libraries which utilize almost exclusively the
 .B oopi
@@ -157,29 +154,27 @@ drivers is configured by the OSI Networking Daemon,
 .BR osinetd (8).
 The
 .BR osinetd (8)
-daemon is responsible for initializing and configuring the OSI network layer,
-transport layer, and ACSE/Presentation layer.
+daemon is responsible for initializing and configuring the OSI network layer, transport layer, and
+ACSE/Presentation layer.
 .PP
 Without configuration, the
 .B oopi
-driver will allow uses to open Streams on the driver and attempt to bind the
-device to a Presentation Address; however, as there are no transports
-configured, all attempts to bind to a presentation address will fail.  Once
-configured for a number of transports, users will be able to open and bind
-Streams on the upper multiplex to Presentation addresses supported by the
-available transports.
+driver will allow users to open Streams on the driver and attempt to bind the device to a
+Presentation Address; however, as there are no transports configured, all attempts to bind to a
+presentation address will fail.  Once configured for a number of transports, users will be able to
+open and bind Streams on the upper multiplex to Presentation addresses supported by the available
+transports.
 .\"
 .\"
 .SH USAGE
 .PP
 Although the
 .B oopi
-driver provides a service primitive interface at the upper boundary to
-ACSE/Presentation users, this service primitive interface is OpenSS7 specific
-and cannot be used directly in a portable way.  To utilize the driver in a
-portable way, the APLI
+driver provides a service primitive interface at the upper boundary to ACSE/Presentation users, this
+service primitive interface is OpenSS7 specific and cannot be used directly in a portable way.  To
+utilize the driver in a portable way, the APLI
 .[
-alpi UNIX International
+apli UNIX International
 .]
 .[
 sunlink-apli
@@ -197,14 +192,13 @@ library interfaces should be used.
 .PP
 The
 .B oopi
-driver provides an ASCE/Presentation ROSE Interface (APRI) at its upper
-service interface and a Transport Provider Interface (TPI),
+driver provides an ASCE/Presentation ROSE Interface (APRI) at its upper service interface and a
+Transport Provider Interface (TPI),
 .[
 tpi revision 2.0.0
 .]
 .BR tpi (7),
-at its lower boundary.
-In addition to providing an APLI user interface at the upper service
+at its lower boundary.  In addition to providing an APLI user interface at the upper service
 interface boundary, the
 .B oopi
 driver also provide a specialized management stream.
@@ -232,6 +226,21 @@ driver also provide a specialized management stream.
 .\"
 .SH IMPLEMENTATION
 .PP
+The OpenSS7 implementation of the service interface is OpenSS7 specific.  An resemblance to other
+vendor offerings is coincidental.
+.PP
+OpenSS7 implements the
+.B oopi
+as a multiplexing STREAMS pseudo-device driver.  Streams opened on the upper multiplex provide a
+Presentation Provider Interface.   Streams under the lower multiplex must provide an OSI Transport
+Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.[
+xns 5.2
+.]
+.BR tpi (7).
 .\"
 .\"
 .SH FILES
@@ -260,6 +269,35 @@ driver also provide a specialized management stream.
 .\"
 .SH COMPATIBILITY
 .PP
+The
+.B oopi
+pseudo-device driver is compatible with APLI and XAP and implementations based on APLI and XAP
+including
+.IR Solaris \(rg,
+.IR HP-UX \(rg,
+and other implementations based on AT&T SVR 4.2, with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Some distributions of
+.IR UNIX \(rg
+have different inplementations of drivers, and different device paths, to support the APLI and XAP
+libraries.  The
+.B oopi
+driver is named after the
+.IR Solaris \(rg
+device of the same purpose.  Nevertheless, the details of the interface between the APLI and XAP
+libraries on
+.IR Solaris \(rg
+and the
+.B oopi
+device is not mentioned in readily available documentation.  Therefore, any similarity between the
+OpenSS7 implemetnation of a service interface for
+.B oopi
+and that of
+.IR Solaris \(rg
+is purely coincidental.
+The only portability and compatibility that is acheived as a result is via the APLI and XAP
+libraries, whose interfaces are better documented.
+.IP \(em
 .\"
 .\"
 .SH CONFORMANCE
@@ -268,6 +306,29 @@ driver also provide a specialized management stream.
 .\"
 .SH HISTORY
 .PP
+The
+.b oopi
+driver and the service interface between the ACSE/Presentation provider and the ACSE/Presentation
+user (in the form of the APLI
+.[
+apli UNIX international
+.]
+and
+XAP
+.[
+xap c303
+.]
+libraries) is not well documented.  At the time of writing, the author did not have access to any
+SVR 4.2 derived APLI code nor documentation on the APLI driver.  These capabilities were treated as
+an add-on (the ONS add-on package) and not part of the base operating system.  Sun Microsystems did
+much of this development in the late 80's and made source licensing available to other UNIX vendors
+in 1987.
+.PP
+While the original APLI specifications where developed by UNIX International in the same manner as
+the DLPI, NPI and TPI interfaces, there is currently no public access to the draft document.  All
+that is available is Sun Microsystems' and HP's documentation on their APLI library implementations
+(which are close enough aligned on some primary documents that it appears that they might closely
+reflect the original UNIX documentation).
 .\"
 .\"
 .SH VERSIONS

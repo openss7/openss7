@@ -210,7 +210,7 @@ has no known bugs.
 .BR om_copy ()
 is compatible with XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
@@ -218,7 +218,7 @@ xom
 .PP
 XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
@@ -227,13 +227,13 @@ xom
 .BR om_copy ()
 first appeared in XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
 .SH VERSIONS
 .PP
-This manpage was written for the OpenSS7 XOM Library.
+This manual page was written for the OpenSS7 XOM Library.
 .\"
 .\"
 .[

@@ -55,11 +55,40 @@ if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
 nobase_pkginclude_HEADERS = \
+	ap_lib.h \
+	ap_poll.h \
+	omp_dmi.h \
+	osi.h \
+	osi_lib.h \
+	ro_lib.h \
+	xap_env.h \
+	xap.h \
+	xap_rose.h \
+	xdsbdcp.h \
+	xds.h \
+	xdsmdup.h \
+	xdssap.h \
+	xmp_cmis.h \
+	xmp.h \
+	xmp_snmp.h \
+	xmsga.h \
+	xms.h \
+	xmsima.h \
+	xom.h \
+	xomi.h \
 	xti.h \
-	xti_osi.h \
 	xti_mosi.h \
-	sys/xti_osi.h \
-	sys/xti_mosi.h
+	xti_osi.h \
+	xti_xx25.h \
+	sys/clns.h \
+	sys/cons.h \
+	sys/lapb_ioctl.h \
+	sys/np.h \
+	sys/osi.h \
+	sys/tp.h \
+	sys/xti_mosi.h \
+	sys/xti_osi.h
+
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/$(PACKAGE)/config.h \

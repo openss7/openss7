@@ -552,43 +552,35 @@ extern int ddi_unmap_regs(void);
 /*
  *  Solaris helper functions from sys/strsun.h
  */
-#undef DB_BASE
+#if 0
 __SUN_EXTERN_INLINE unsigned char *DB_BASE(mblk_t *mp);
 
 EXPORT_SYMBOL(DB_BASE);
-#undef DB_LIM
 __SUN_EXTERN_INLINE unsigned char *DB_LIM(mblk_t *mp);
 
 EXPORT_SYMBOL(DB_LIM);
-#undef DB_REF
 __SUN_EXTERN_INLINE size_t DB_REF(mblk_t *mp);
 
 EXPORT_SYMBOL(DB_REF);
-#undef DB_TYPE
 __SUN_EXTERN_INLINE int DB_TYPE(mblk_t *mp);
 
 EXPORT_SYMBOL(DB_TYPE);
-#undef MBLKL
+#endif
 __SUN_EXTERN_INLINE long MBLKL(mblk_t *mp);
 
 EXPORT_SYMBOL(MBLKL);
-#undef MBLKSIZE
 __SUN_EXTERN_INLINE long MBLKSIZE(mblk_t *mp);
 
 EXPORT_SYMBOL(MBLKSIZE);
-#undef MBLKHEAD
 __SUN_EXTERN_INLINE long MBLKHEAD(mblk_t *mp);
 
 EXPORT_SYMBOL(MBLKHEAD);
-#undef MBLKTAIL
 __SUN_EXTERN_INLINE long MBLKTAIL(mblk_t *mp);
 
 EXPORT_SYMBOL(MBLKTAIL);
-#undef MBLKIN
 __SUN_EXTERN_INLINE long MBLKIN(mblk_t *mp, ssize_t off, size_t len);
 
 EXPORT_SYMBOL(MBLKIN);
-#undef OFFSET
 __SUN_EXTERN_INLINE long OFFSET(void *p, void *base);
 
 EXPORT_SYMBOL(OFFSET);

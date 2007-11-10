@@ -151,6 +151,17 @@
 %U http://www.opengroup.org/onlinepubs/
 %S X/Open CAE Specification
 
+%L XGDMO
+%A X/Open
+%R C502 (XGDMO)
+%T GDMO\ to\ XOM Translation Algorithm
+%D October 1995
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-126-8
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
 %L TCI
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
@@ -3917,6 +3928,17 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
 
+%K x722
+%K GDMO
+%L X.722
+%A ITU
+%R ITU-T Recommendation X.722 [ISO/IEC 10165-4 : 1992]
+%C Geneva
+%D January 1992
+%T Information Technology \(em Open Systems Interconnection \(em Structure of Management %Information: Guidelines for the Definition of Managed Objects
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K h225.0
 %L H.225.0
@@ -4106,6 +4128,156 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 4: File Protocol Specification \(em Amendment 1: Filestore Management
 %D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso1118301
+%L ISO/IEC 11183-1
+%R ISO/IEC ISP 11183-1:1992
+%A ISO/IEC
+%T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 1: Specification of ACSE \(em Presentation and session protocols for use by ROSE and CMISE
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso1118302
+%L ISO/IEC 11183-2
+%R ISO/IEC ISP 11183-2:1992
+%A ISO/IEC
+%T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 2: CMISE/ROSE for AOM12 \(em Enhanced Management Communications
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso1118303
+%L ISO/IEC 11183-3
+%R ISO/IEC ISP 11183-3:1992
+%A ISO/IEC
+%T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 3: CMISE/ROSE for AOM11 \(em Basic Management Communications
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14360
+%L ISO/IEC 14360
+%R ISO/IEC 14360:1996
+%A ISO/IEC
+%T Information Technology \(em Open Systems Interconnection (OSI) Abstract Data Manipulation \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14361
+%L ISO/IEC 14361
+%R ISO/IEC 14361:1996
+%A ISO/IEC
+%T Information Technology \(em MHS-Based Electronic Messaging \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14362
+%L ISO/IEC 14362
+%R ISO/IEC 14362:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformace to Open Systems Interconnection (OSI) Abstract Data Manipulation \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14363
+%L ISO/IEC 14363
+%R ISO/IEC 14363:1996
+%A ISO/IEC
+%D 1996
+%T Information Technology \(em Test Methods for Measuring Conformance to MHS-Based Electronic Messaging \(em Application Program Interface (API) [Language Independent]
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14364
+%L ISO/IEC 14364
+%R ISO/IEC 14364:1996
+%A ISO/IEC
+%T Information Technology \(em Open Systems Interconnection (OSI) Abstract Data Manipulation C Language Interface \(em Bindings for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14365
+%L ISO/IEC 14365
+%R ISO/IEC 14365:1996
+%A ISO/IEC
+%T Information Technology \(em MHS-Based Electronic Messagin C Language Interfaces \(em Binding for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14366
+%L ISO/IEC 14366
+%R ISO/IEC 14366:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformance to Open Systems Interconnection (OSI) Abstract Data Manipulation C Language Interface \(em Binding for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14367
+%L ISO/IEC 14367
+%R ISO/IEC 14367:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformance to MHS-Based Electronic Messaging C Language Interfaces \(em Binding for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14392
+%L ISO/IEC 14392
+%R ISO/IEC 14392:1996
+%A ISO/IEC
+%T Information Technology \(em Directory Services \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14393
+%L ISO/IEC 14393
+%R ISO/IEC 14393:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformace to Directory Services \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14394
+%L ISO/IEC 14394
+%R ISO/IEC 14394:1996
+%A ISO/IEC
+%T Information Technology \(em Directory Services C Language Interfaces \(em Binding for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14395
+%L ISO/IEC 14395
+%R ISO/IEC 14395:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformance to Directory Services C Language Interface \(em Binding for Application Program Interface (API)
+%D 1996
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -5494,6 +5666,20 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2078.txt
 
+%K AgentX
+%L RFC2741
+%R RFC 2741
+%A M. Daniele
+%A B. Wijnen
+%E M. Ellison
+%E D. Francisco
+%D January 2000
+%T Agent Extensibility (AgentX) Protocol, Version 1
+%O (Obsoletes RFC 2257)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2741.txt
+
 %K GSSAPI
 %K rfc2743
 %L RFC2743
@@ -6196,6 +6382,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1901.txt
 
 %L RFC1902
 %R RFC 1902
@@ -6208,6 +6395,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1902.txt
 
 %L RFC1903
 %R RFC 1903
@@ -6220,6 +6408,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1903.txt
 
 %L RFC1904
 %R RFC 1904
@@ -6232,6 +6421,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1904.txt
 
 %L RFC1905
 %R RFC 1905
@@ -6244,6 +6434,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1905.txt
 
 %L RFC1906
 %R RFC 1906
@@ -6256,6 +6447,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1906.txt
 
 %L RFC2271
 %R RFC 2271
@@ -6267,6 +6459,7 @@ Part 1: Protocol Specification
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2271.txt
 
 %L RFC2272
 %R RFC 2272
@@ -6279,6 +6472,7 @@ Part 1: Protocol Specification
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2272.txt
 
 %L RFC2273
 %R RFC 2273
@@ -6290,6 +6484,7 @@ Part 1: Protocol Specification
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2273.txt
 
 %L RFC2275
 %R RFC 2275
@@ -6301,6 +6496,7 @@ Part 1: Protocol Specification
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2275.txt
 
 %L RFC2575
 %R RFC 2575
@@ -6312,6 +6508,7 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2575.txt
 
 %L RFC2574
 %R RFC 2574
@@ -6322,6 +6519,7 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2574.txt
 
 %L RFC2578
 %R RFC 2578
@@ -6333,6 +6531,8 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%O (Also STD 58)
+%U http://www.ietf.org/rfc/rfc2578.txt
 
 %L RFC2579
 %R RFC 2579
@@ -6344,6 +6544,8 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%O (Also STD 58)
+%U http://www.ietf.org/rfc/rfc2579.txt
 
 %L RFC2580
 %R RFC 2580
@@ -6355,6 +6557,8 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%O (Also STD 58)
+%U http://www.ietf.org/rfc/rfc2580.txt
 
 %L RFC3410
 %R RFC 3410
@@ -6367,6 +6571,7 @@ Part 1: Protocol Specification
 %D December 2002
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc3410.txt
 
 %K rfc3064
 %L RFC3064

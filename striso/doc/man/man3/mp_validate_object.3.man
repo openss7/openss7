@@ -1,0 +1,227 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.TH MP_VALIDATE_OBJECT 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 XMP Library Calls"
+.SH NAME
+.B mp_validate_object
+\- Validate-Object \- analyze OM-Object and return Bad-Argument details if necessary.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xom.h>
+.br
+.B #include <xmp.h>
+.HP
+.BI "MP_status mp_validate_object(
+.PD 0
+.RS
+.HP
+.BI "OM_workspace " workspace ,
+.HP
+.BI "OM_object " test_object ,
+.HP
+.BI "OM_private_object *" bad_argument_return
+.RE
+.HP
+.BI );
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function is used to analyze any OM-Object to validate its structure.  It may be used as a debug
+tool prior to issuing other XMP function calls.  It may also be used after XMP function calls that
+return
+.RB [ MP_E_BAD_ARGUMENT ].
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I workspace
+Specifies the workspace (obtained froma call to
+.BR mp_initialize (3)),
+in which a
+.RB { MP_C_BAD_ARGUMENT }
+OM object will be created if the return status is
+.RB [ MP_E_BAD_ARGUMENT ].
+.I test_object
+does not need to be from this workspace.
+.TP
+.I test_object
+The OM-Object to analyze and validate.
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.I status
+Indicates whether or not the validation was successful.  A value of
+.RB [ MP_E_BAD_ARGUMENT ]
+indicates a validation failure and problem details are in the
+.I bad_argument_return
+parameter.
+.TP
+.I bad_argument_return
+If
+.I status
+is
+.RB [ MP_E_BAD_ARGUMENT ],
+the result is one instance of the OM Class
+.RB { MP_C_BAD_ARGUMENT }.
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return the error constants:
+.TP
+.RB [ MP_NO_WORKSPACE ]
+.PD 0
+.TP
+.RB [ MP_INSUFFICIENT_RESOURCES ]
+.TP
+.RB [ MP_E_SYSTEM ]
+.TP
+.RB [ MP_E_BAD_ARGUMENT ]
+.PD
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XMP (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mp_validate_object (3)
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This function is compatible with
+.I Solstice CMIP 9.0
+and implementations based on XMP,
+.[
+xmp
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+This function is source compatible.  Binary compatibility was not attempted.
+.PP
+See also,
+.BR XMP (3),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM,
+.[
+xom osi
+.]
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+This function first appeared in XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+XMP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

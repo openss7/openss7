@@ -1,0 +1,255 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.TH MP_UNBIND 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 XMP Library Calls"
+.SH NAME
+.B mp_unbind
+\- Unbind \- unbind from a management session.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xom.h>
+.br
+.B #include <xmp.h>
+.HP
+.BI "MP_status mp_unbind(
+.PD 0
+.RS
+.HP
+.BI "OM_private_object " session
+.RE
+.HP
+.BI );
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function terminates the given management session, and makes the argument unavailable for use
+with other interface functions (except
+.BR mp_bind (3)).
+.PP
+Note that this means the results of any outstanding asynchronous operations that were initiated
+using the given
+.I session
+can no longer by received.  Any such operations may be terminated prematurely.  For this reason, it
+is recommended that all outstanding asynchronous operations are processed using
+.BR mp_receive (3)
+before
+.BR mp_unbind ()
+is called.
+.PP
+The unbound session may be used again as an argument to
+.BR mp_bind (3)
+possibly after modification by the XOM
+.[
+xom osi
+.]
+functions.  When it is no longer required, it must be deleted using the XOM
+.[
+xom osi
+.]
+functions.
+.PP
+The
+.B Library-Error
+.RB [ MP_E_SESSION_TERMINATE ]
+will be returned as the error value to a synchronous function call using the terminated session.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I session
+The management session that is to be unbound.  This must be a private object previously returned by
+.BR mp_bind (3).
+The value of the
+.RB [ MP_FILE_DESCRIPTOR ]
+OM attribute will be
+.RB [ MP_NO_VALID_FILE_DESCRIPTOR ]
+if the function succeeds.  The other OM attributes will be unchanged.
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.I status
+Returns the value
+.RB [ MP_SUCCESS ]
+if the
+.I session
+was unbound, and returns an error value if not.
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a
+.B System-Error
+or one of the following
+.BR Library-Error s:
+.TP
+.RB [ MP_E_BAD_CLASS ]
+.PD 0
+.TP
+.RB [ MP_E_BAD_SESSION ]
+.TP
+.RB [ MP_E_MISCELLANEOUS ]
+.TP
+.RB [ MP_E_SESSION_TERMINATED ]
+.PD
+.PP
+This function does not return a
+.BR Communications-Error 
+or any management service errors.
+.PP
+Also, this function can return the error constants:
+.TP
+.RB [ MP_NO_WORKSPACE ]
+.PD 0
+.TP
+.RB [ MP_INVALID_SESSION ]
+.TP
+.RB [ MP_INSUFFICIENT_RESOURCES ]
+.PD
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR mp_bind (3),
+.BR XMP (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mp_unbind (3)
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This function is compatible with
+.I Solstice CMIP 9.0
+and implementations based on XMP,
+.[
+xmp
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+This function is source compatible.  Binary compatibility was not attempted.
+.PP
+See also,
+.BR XMP (3),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM,
+.[
+xom osi
+.]
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+This function first appeared in XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+XMP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

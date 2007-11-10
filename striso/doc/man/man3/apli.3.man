@@ -402,6 +402,24 @@ for more information on environment attributes.
 .\"
 .SH USAGE
 .PP
+There are a number of idosynchrasies with the APLI library which might seem foreign to a user of the XTI API.
+.IP \(bu \w'\(bu\(em'u
+Whereas XTI permits multiple outstanding connection indications on a given listening file descriptor, APLI only
+supports one oustanding connection indication.
+.IP \(bu
+Whereas XTI permits accepting a connection indication on a file descriptor other than the listening file descriptor,
+APLI must accept the connection indication on the same file descriptor.
+.IP \(bu
+Whereas XTI permits only one file descriptor for one process to be bound to a listening transport address, APLI
+permtis multiple file descriptors for multiple processes to be bound to the same presentation address or overlapping
+wildcarding of presentation address.
+.PP
+This means that there is a mismatch between ACSE/Presentation services and transport services.  When an XAP user binds
+to an address, a transport address must also be bound and linked to the ACSE/Presentation service provider. When an
+A_ASSOC_IND is accepted with an A_ASSOC_RSP, a new transport stream must be created and linked ot the service
+ACSE/Presentation provider, and this new transport stream used to accept the transport connection.  If an A_ASSOC_REQ
+is attempted, a new transport stream can be created (either at bind or at A_ASSOC_REQ time) and that stream linked to
+the ACSE/Presentation service provider and used to attempt the transport connection.
 .\"
 .\"
 .SH NOTICES

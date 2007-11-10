@@ -198,7 +198,17 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR ap_bind ()
-is compatible with XAP.
+is compatible with XAP,
+.[
+xap c303
+.]
+and implementations based on XAP such as
+UNIX Systems Laboratory Open Networking Platform (ONP)
+Solaris\(rg SunLink OSI 8.0,
+Solaris\(rg Solstice OSI 9.0,
+HP-UX\(rg OSI Transport Services (OTS)/9000
+AIX\(rg OSI/6000
+Digital\(rg DECnet/OSI
 .\"
 .\"
 .SH CONFORMANCE
@@ -217,7 +227,7 @@ xap c303
 .\"
 .SH VERSIONS
 .PP
-This manpage was written for the OpenSS7 XAP Library.
+This manual page was written for the OpenSS7 XAP Library.
 .\"
 .\"
 .[

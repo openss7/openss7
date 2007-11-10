@@ -1,0 +1,366 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_poll.3.man,v 0.9.2.1 2007/09/29 14:08:31 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:31 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_poll.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:31  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 32
+search-ignore XYZ
+.R2
+.so striso.macros
+.TH AP_POLL 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 XAP Library Calls"
+.\"
+.\"
+.SH NAME
+.B ap_poll
+\- input/output multiplexing
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.BR "int " ap_poll(
+.PD 0
+.RS
+.HP
+.BI "ap_pollfd_t " fds [],
+.HP
+.BI "int " nfds ,
+.HP
+.BI "int " timeout ,
+.HP
+.BI "unsigned long *" aperrno_p
+.RE
+.HP
+.RB );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.TP \w'\fIaperrno_p\fP\(em'u
+.I fds
+an array of structures of type
+.B ap_pollfd_t
+that contain the file descriptors of XAP instances to poll.
+.TP
+.I nfds
+the number of structures in the
+.I fds
+array.
+.TP
+.I timeout
+the amount of time to wait in milliseconds.
+.TP
+.I aperrno_p
+a location into which to store a diagnostic error code when unsuccessful.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function provides users with a consistent interface for detecting when
+certain events have occurred on an XAP instance.
+.PP
+The
+.I fds
+argument is an array of
+.I nfds
+number of
+.B ap_pollfd_t
+structures.  The
+.B ap_pollfd_t
+structure includes the following members:
+.sp
+.nf
+\fC\s-2\
+int fd;         /* XAP instance identifier */
+short events;   /* requested events        */
+short revents;  /* returned events         */
+\s+2\fP
+.fi
+.PP
+The
+.IR UNIX \(rg
+file descriptor is used for the purposes of clarification in the standard,
+although
+.I fd
+may be replaced with a comparable entity on a
+.RI non- UNIX \(rg
+system.
+.PP
+The
+.I events
+field is a bitmask used to indicate which events should be reported for the
+instance.
+The
+.I revents
+field will be set by XAP to indicate which of the requested events have
+occurred.  All XAP Library implementations recognize the following events:
+.TP \w'\fBAP_POLLWRNORM\fP\(em'u
+.B AP_POLLRDNORM
+Data (e\&.g\&. an XAP Library primitive of user data associated with an XAP
+library primitive) has arrived on the normal data flow and is available to be
+read.
+.TP
+.B AP_POLLRDBAND
+Data has arrived outside the normal data flow and is available to be read.
+This event may occur if the implementation supports out-of-band-data and a
+\fBP_XDATA_IND\fP(7) primitive arrives.  In implementations that do not
+support multiple data bands, expedited data will arrive on the normal data
+flow and this event will never occur.
+.TP
+.B AP_POLLIN
+Data has arrived (on either band) and is available to be read.
+.TP
+.B AP_POLLOUT
+Data can be sent on the normal priority band.
+.TP
+.B AP_POLLWRNORM
+The same as \fBAP_POLLOUT\fP.
+.TP
+.B AP_POLLWRBAND
+Out-of-band data can be sent.  This event will never be true in
+implementations that do not support multiple data bands.
+.TP
+.B AP_POLLNVAL
+Specified file descriptor is an invalid XAP instance identifier.  This bit is
+only valid for
+.IR revents .
+.PP
+If none of the defined events have occurred on the selected instances,
+.BR ap_poll ()
+waits
+.I timeout
+milliseconds for an event to occur on one of the selected instances before
+returning.  On implementations where millisecond timing is not available,
+.I timeout
+is rounded up to the nearest legal value on the system.  If the value of
+.I timeout
+is zero (0),
+.BR ap_poll ()
+returns immediately.  If the value of
+.I timeout is
+.BR AP_INFTIM ,
+.BR ap_poll ()
+waits until a requested event occurs or until the call is interrupted.  The
+.BR ap_poll ()
+call is not affected by whether the specified instances are operating in
+blocking or non-blocking execution mode.
+.PP
+.I aperrno_p
+must be set to point to a location which will be used to carry an error code
+back to the user.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successul completion, a non-negative value is returned.  A positive value
+indicates the number of instances for which
+.I revents
+is non-zero.  A return value of zero (0) indicates that the call timed out and
+no instances were selected.  Upon failure, a value of minus one (-1, FAIL) is
+returned and the location pointed to by
+.I aperrno_p
+is set to indicate the error.
+.\"
+.\"
+.SH ERRORS
+.PP
+Only operating system class errors are reported.
+.\"
+.\"
+.SH NOTICES
+.PP
+Support for events other than those listed above is optional in the standard.
+Users interested in developing applications that are portable across different
+XAP Library implementations should keep this caveat in mind.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The OpenSS7 implementation of
+.BR ap_poll ()
+calls
+.BR poll (2s)
+directly.
+The
+.B ap_pollfd_t
+structure is a typedef of
+the
+.BR pollfd
+structure, see
+.BR poll (2s).
+Additional
+.I revents
+that may be returned are
+.BR POLLERR ,
+.BR POLLHUP ,
+and
+.BR POLLMSG ,
+as defined in
+.BR poll (2s).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ap_snd (3),
+.BR ap_rcv (3),
+.BR XAP (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR ap_poll ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ap_poll ()
+is compatible with XAP,
+.[
+xap c303
+.]
+and implementations based on XAP such as
+.IR Solaris \(rg
+and
+.IR HP-UX \(rg,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See also,
+.BR XAP (3),
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XNS,
+.[
+xns 5.2
+.]
+XAP,
+.[
+xap c303
+.]
+XAP-ROSE.
+.[
+xap-rose
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_poll ()
+first appeared in APLI.
+.[
+apli unix international
+.]
+The older function,
+.BR apli_poll (3),
+did not have the
+.I aperrno_p
+argument and defined the
+.B ap_pollfd_t
+as:
+.sp
+.nf
+\fC\s-2\
+typedef struct pollfd ap_pollfd_t;
+\s+2\fP
+.fi
+where the
+.B pollfd
+structure is defined in
+.RB < sys/poll.h >,
+which is what the OpenSS7 implementation of both versions of
+.BR ap_poll ()
+does.
+The older function only documented the use of
+.BR AP_POLLIN
+and
+.BR AP_POLLOUT .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XAP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

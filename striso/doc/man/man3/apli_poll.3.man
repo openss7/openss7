@@ -219,7 +219,7 @@ function.
 .\"
 .SH ERRORS
 .PP
-Only operating system error may be reported.
+Only operating system errors may be reported.
 .\"
 .\"
 .SH EXAMPLE
@@ -278,7 +278,26 @@ and implementation based on APLI such as
 .IR "SVR 4.2 Open Network Services (ONS)" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+The OpenSS7 implementation of the APLI library function,
+.BR ap_poll (),
+supports all of the flags supported by
+.BR poll (2s)
+and defined in
+.RB < sys/poll.h >.
+Portable programs will use only the defined
+.BR AP_POLLIN
+and
+.BR AP_POLLOUT
+functions.
 .IP \(em
+Only source compatibility is attempted:
+binary compatibility is not guaranteed and would only occur by hapless coincidence.
+.IP \(em
+The
+.BR APLI (3)
+is deprecated and is only provided for backward compatibility.  New programs should use the standard
+.BR XAP (3)
+implemetnation of the X/Open ACSE/Presentation Library instead.
 .PP
 See
 .BR APLI (3)
@@ -301,6 +320,12 @@ APLI UNIX International October 25, 1990
 first appeared in APLI.
 .[
 APLI UNIX International October 25, 1990
+.]
+Note that the
+.BR ap_poll ()
+function also appears in the X/Open XAP.
+.[
+xap c303
 .]
 .\"
 .\"

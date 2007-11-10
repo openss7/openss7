@@ -78,26 +78,177 @@ abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
 .so striso.macros
-.\"
-.\"
-.TH MP_ABANDON 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
-.\"
-.\"
+.TH MP_ABANDON 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 XMP Library Calls"
 .SH NAME
 .B mp_abandon
-\- 
+\- abandon locally the result of a pending, asyncrhonously-executing operation/notification
 .\"
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <xom.h>
+.br
 .B #include <xmp.h>
 .HP
-.BI "MP_status mp_abandon(OM_private_object " session ", OM_sint32 " invoke_id );
+.BI "MP_status mp_abandon("
+.PD 0
+.RS
+.HP
+.BI "OM_private_object " session ,
+.HP
+.BI "OM_sint32 " invoke_id
+.RE
+.HP
+.BI );
+.PD
 .\"
 .\"
 .SH INTERFACE
 .PP
-XMP
+XMP.
 .[
 xmp
 .]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function abandons the result of an outstanding asynchronous function
+call.  The function is no longer outstanding after this function returns, and
+the result (or the remaining results in case of multiple linked replies) will
+never be returned by
+.BR mp_receive (3).
+.PP
+.BR mp_abandon ()
+may, but need not, cause the Management Information Service (MIS) Provider to
+abandon the outstanding asyncrhonous operation itself (as opposed to simply
+discarding the result).  Note that the specified behaviour is a local matter,
+and no statement is made about underlying management operations/notifications
+that may or may not be abandoned.
+.PP
+This function can only be called in sychronous mode.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I session
+The management session in which the confirmed operation/notification was
+requested.  This must be a private object previously returned from
+.BR mp_bind (3).
+.TP
+.I invoke_id
+Selects the specific outstanding asyncrhonous oepration submitted via the
+.I session
+to be terminated.  The outstanding operation may be a non-confirmed service.
+In that case the abandon is without effect.  The value
+.I invoke_id
+must be that which was returned by the function call that initiated the
+asynchronous management operation to be abandonned.
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.I status
+Indicates whether or not the abandoned function succeeded.
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a
+.B System-Error
+or one of the following
+.BR Library-Error s:
+.TP
+.RB [ MP_E_BAD_CLASS ]
+.PD 0
+.TP
+.RB [ MP_E_BAD_SESSION ]
+.TP
+.RB [ MP_E_BAD_PROCEDURAL_USE ]
+.TP
+.RB [ MP_E_MISCELLANEOUS ]
+.TP
+.RB [ MP_E_SESSION_TERMINATED ]
+.PD
+.PP
+This function can return a
+.BR Communications-Error .
+.PP
+Note that the abaondon function is successful even if the operation or
+notification to be abandoned does not exist (any longer) or is not confirmed.
+The abadon is then without effect.
+.PP
+Also, this function can return the errors:
+.TP
+.RB [ MP_NO_WORKSPACE ]
+.PD 0
+.TP
+.RB [ MP_INVALID_SESSION ]
+.TP
+.RB [ MP_INSUFFICIENT_RESOURCES ]
+.PD
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR mp_receive (3),
+.BR mp_bind (3),
+.BR XMP (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mp_abandon ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This function is compatible with
+.I Solstice CMIP 9.0
+and implementations based on XMP,
+.[
+xmp
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+This function is source compatible.  Binary compatibility was not attempted.
+.PP
+See also,
+.BR XMP (3),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM,
+.[
+xom osi
+.]
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+This function first appeared in XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+XMP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

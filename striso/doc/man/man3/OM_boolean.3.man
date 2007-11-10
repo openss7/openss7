@@ -119,7 +119,7 @@ referes to the integer one specifically.
 .BR OM_boolean
 is compatible with XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
@@ -127,7 +127,7 @@ xom
 .PP
 XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
@@ -136,13 +136,13 @@ xom
 .BR OM_boolean ()
 first appeared in XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
 .SH VERSIONS
 .PP
-This manpage was written for the OpenSS7 XOM Library.
+This manual page was written for the OpenSS7 XOM Library.
 .\"
 .\"
 .[

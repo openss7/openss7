@@ -141,7 +141,7 @@ exclusions.
 .BR OM_exclusions
 is compatible with XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
@@ -149,7 +149,7 @@ xom
 .PP
 XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
@@ -158,13 +158,13 @@ xom
 .BR OM_exclusions
 first appeared in XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
 .SH VERSIONS
 .PP
-This manpage was written for the OpenSS7 XOM Library.
+This manual page was written for the OpenSS7 XOM Library.
 .\"
 .\"
 .[

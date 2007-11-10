@@ -78,20 +78,10 @@ abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
 .so striso.macros
-.\"
-.\"
-.TH MP_SHUTDOWN 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.TH MP_SHUTDOWN 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 XMP Library Calls"
 .SH NAME
 .B mp_shutdown
 \- Shutdown \- delete a workspace and the associated resources.
-.\"
-.\"
-.SH INTERFACE
-.PP
-XMP.
-.[
-xmp
-.]
 .\"
 .\"
 .SH SYNOPSIS
@@ -111,13 +101,12 @@ xmp
 .PD
 .\"
 .\"
-.SH ARGUMENTS
+.SH INTERFACE
 .PP
-.TP
-.I workspace
-Specifies the workspace (obtained from a call to
-.BR mp_initialize (3))
-that is to be deleted.
+XMP.
+.[
+xmp
+.]
 .\"
 .\"
 .SH DESCRIPTION
@@ -136,30 +125,31 @@ No other functions may reference the specified workspace after it has been
 deleted.
 .\"
 .\"
+.SH ARGUMENTS
+.PP
+.TP
+.I workspace
+Specifies the workspace (obtained from a call to
+.BR mp_initialize (3))
+that is to be deleted.
+.\"
+.\"
 .SH RETURN
 .PP
-Returns \fBMP_status\fP reflecting the success or failure of the call.  When
-successful,
-.BR mp_shutdown ()
-returns
-.RB [ MP_SUCCESS ].
-When unsuccessful, a diagnostic error code is returned.
+.TP
+.I status
+Indicates whether or not the shutdown function succeeded.
 .\"
 .\"
 .SH ERRORS
 .PP
-When
-.BR mp_shutdown ()
-fails, the specified workspace is not deleted and an error code is returned as
-follows:
+This function can return the error constants:
 .TP
 .RB [ MP_NO_WORKSPACE ]
-The specified workspace,
-.IR workspace ,
-does not exist or is invalid.
+.PD 0
 .TP
 .RB [ MP_INSUFFICIENT_RESOURCES ]
-There were insufficient resources available to shut down the workspace.
+.PD
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -180,15 +170,34 @@ are freed and finally the overloaded XOM workspace structure is freed.
 .BR xmp (3).
 .\"
 .\"
+.SH BUGS
+.PP
+.BR mp_shutdown (3)
+has no known bugs.
+.\"
+.\"
 .SH COMPATIBILITY
 .PP
+This function is compatible with
+.I Solstice CMIP 9.0
+and implementations based on XMP,
+.[
+xmp
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+This function is source compatible.  Binary compatibility was not attempted.
+.PP
+See also,
+.BR XMP (3),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
 XOM,
 .[
-xom
+xom osi
 .]
 XMP.
 .[
@@ -198,16 +207,20 @@ xmp
 .\"
 .SH HISTORY
 .PP
+This function first appeared in XMP.
+.[
+xmp
+.]
 .\"
 .\"
 .SH VERSIONS
 .PP
-This manual page was written for the OpenSS7 XMP Library.
+This manual page was written for the
+.B @PACKAGE_TITLE@
+XMP Library.
 .\"
 .\"
 .[
 $LIST$
 .]
-.\"
-.\"
-.TI
+.T2

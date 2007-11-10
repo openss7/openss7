@@ -1,0 +1,477 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.TH MP_RECEIVE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 XMP Library Calls"
+.SH NAME
+.B mp_receive
+\- Receive \- get the argument of an operation or notification or retrieve the (partial) result of an asynchronously executed operation or notification.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xom.h>
+.br
+.B #include <xmp.h>
+.HP
+.BI "MP_status mp_receive(
+.PD 0
+.RS
+.HP
+.BI "OM_private_object " session ,
+.HP
+.BI "OM_sint *" mode_return ,
+.HP
+.BI "OM_sint *" primitive_return ,
+.HP
+.BI "OM_sint *" completion_flag_return ,
+.HP
+.BI "MP_status *" operation_notification_status_return ,
+.HP
+.BI "OM_private_object *" result_or_argument_return ,
+.HP
+.BI "OM_sint32 *" invoke_id_return
+.RE
+.HP
+.BI );
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function is used to retrieve the argument of an invoked operation or a reported notification
+and to retrieve a partial result (linked reply) or the completed result of a previous asynchronous
+operation or notification.
+.PP
+The function results include two status indications.  One, called
+.IR status ,
+indicates that this function call itself was successful; it is always returned.  The other, called
+.IR operation_notification_status_return ,
+is used to return the status of the completed asynchronous operation or notification, and is only
+returned if there is one.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I session
+The management session against which this operation or notification is performed.
+This must be a private object previously returned from
+.BR mp_bind (3),
+or a connected or partially connected session object returned from
+.BR mp_assoc_req (3),
+.BR mp_assoc_rsp (3)
+or
+.BR mp_receive ().
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.I status
+Returns an error value if one of the library errors or system errors listed below occurred during
+execution of this function.  Returns the value
+.RB [ MP_SUCCESS ]
+if this function returned successfullReturns the value
+.RB [ MP_SUCCESS ]
+if this function returned successfully.
+.TP
+.I primitive_return
+The management service primitives:
+.RB ( MP_GET_IND ,
+.BR MP_GET_NEXT_IND ,
+.BR MP_GET_CNF ,
+.BR MP_SET_IND ,
+.BR MP_SET_CNF ,
+.BR MP_ACTION_IND ,
+.BR MP_ACTION_CNF ,
+.BR MP_CREATE_IND ,
+.BR MP_CREATE_CNF ,
+.BR MP_DELETE_IND ,
+.BR MP_DELETE_CNF ,
+.BR MP_EVENT_REPORT_IND ,
+.BR MP_EVENT_REPORT_CNF ,
+.BR MP_CANCEL_GET_IND ,
+.BR MP_CANCEL_GET_CNF ).
+.BR MP_GET_IND ,
+.sp
+The ACSE service primitives:
+.RB ( MP_ASSOC_IND ,
+.BR MP_ASSOC_CNF ,
+.BR MP_RELEASE_IND ,
+.BR MP_RELEASE_CNF ,
+.BR MP_ABORT_IND ).
+.sp
+Determines the operation or notification of this result or argument.  This result is only valid if
+.IR completion_flag_return
+has the value
+.RB [ MP_COMPLETED ],
+.RB [ MP_INCOMING ],
+or
+.RB [ MP_PARIAL ].
+.TP
+.I mode_return
+This indicates the mode of an indidcation.  When 
+.RB [ MP_T_CONFIRMED ]
+invoked operation or the reported management notification has to be confirmed, a reply is expected.
+When
+.RB [ MP_T_NON_CONFIRMED ],
+the requested service is nto to be confirmed.
+.sp
+This result is only valid if
+.I completion_flag_return
+has the value
+.RB [ MP_INCOMING ].
+.TP
+.I completion_flag_return
+This flag indicates the stauts of the received data, if any.
+.RS
+.TP
+.RB [ MP_COMPLETED ]
+This flag indicates that a final response has been received.  For management primitives this may be
+the confirmation for a non-scoped request or the last confirmation of a linked reply.  In the latter
+case, the
+.I result_or_argument_return
+parameter will be the
+.RB ( MP_ABSENT_OBJECT ).
+.TP
+.RB [ MP_INCOMING ]
+An indication has been received.
+.TP
+.RB [ MP_NOTHING ]
+There are not indications or notifications to receive.  Further, there are no outstanding
+asynchronous requests.
+.TP
+.RB [ MP_OUTSTANDING ]
+There are no indications or confirmations to receive.  There are still outstanding requests, but no
+confirmations have yet arrived.
+.TP
+.RB [ MP_PARTIAL ]
+A confirmation has been received that is part of a linked reply.  This is used for all bu the last
+in a series of linked replies.  (See completed, above.)
+.PP
+This reseult is only valid if
+.I status
+has the value
+.RB [ MP_SUCCESS ].
+In that case, the validity of the other results is given in the following table:
+.sp
+.TS
+box center tab(:);
+cb|cb|cb|cb|cb|cb
+cb|cb|cb|cb|cb|cb
+cb|cb|cb|cb|cb|cb
+cb|c|c|c|c|c.
+Completion-Flag:Primitive:Mode:Operation:Result or:Invoke-ID
+value:::/Notification:Argument:
+:::Status::
+_
+Completed:yes(1):no:yes:yes(1):yes
+Incoming:yes:yes:no:yes:yes
+Nothing:no:no:no:no:no
+Outstanding:no:no:no:no:no
+Partial:yes(1):no:yes:yes(1):yes
+_
+.T&
+lsssss.
+T{
+(1) This result is only valid if Operation-Notification-Status has the value success.
+T}
+.TE
+.RE
+.TP
+.I operation_notification_status_return
+Takes an eror value if a communications error occured during the execution of the asynchronous
+operation or notification, and
+.RB [ MP_SUCCESS ]
+otherwise.  The possible error values are listed for each individual operation int he corresponding
+manual page.  The result is only valid if
+.I completion_flag_return
+has the value
+.RB [ MP_COMPLETED ]
+or
+.RB [ MP_PARTIAL ].
+.TP
+.I result_or_argument_return
+This object contains the resutls of an asynchronous request, or informaiton about an indication.
+The class of object received is dependent on the values of the
+.I primitive_return
+and
+.I completion_flag_return
+parameters.  The following table defines the OM classes of the
+.I result_or_argument
+parameter that can be returned for the three applicable
+.I completion_flag_return
+values.  The actual class returned is dependent upon the value of
+.IR primitive_return .
+.RS
+.PP
+Completion flag set to completed:
+.PP
+.TS
+tab(:);
+ll.
+CMIS-Action-Result:MP_ACTION_CNF
+CMIS-Create-Result:MP_CREATE_CNF
+CMIS-Delete-Result:MP_DELETE_CNF
+CMIS-Event-Report-Result:MP_EVENT_REPORT_CNF
+CMIS-Get-Result or Pdus (get-Response):MP_GET_CNF
+CMIS-Set-Result or Pdus (set-Response):MP_SET_CNF
+CMIS-Service-Error or CMIS-Service-Reject or Pdus:All Confirmations
+Assoc-Result:MP_ASSOC_CNF
+Release-Result:MP_RELEASE_CNF
+Absent-Object:All Confirmations
+.TE
+.PP
+Note that
+.RB ( MP_ABSENT_OBJECT )
+may be returned in three cases:
+.IP 1. \w'0.\(em'u
+The confirmation contains no data (i.e. Cancel-get()).
+.IP 2.
+A scoped request was issued, but no objects were selected.
+.IP 3.
+As the terminator of a linked-reply list.  In this case, the invoke identifier parameter can be used
+to determine which linked reply has been terminated.
+.PP
+Completion flag set to incoming:
+.PP
+.TS
+tab(:);
+ll.
+CMIS-Action-Argument:MP_ACTION_IND
+CMIS-Cancel-Get-Argument:MP_CANCEL_GET_IND
+CMIS-Create-Argument:MP_CREATE_IND
+CMIS-Delete-Argument:MP_DELETE_IND
+CMIS-Event-Report-Argument or Pdus (trap):MP_EVENT_REPORT_IND
+CMIS-Get-Argument or Pdus (get-Request):MP_GET_IND or MP_GET_NEXT_IND
+CMIS-Set-Argumnet or Pdus (set-Reqeust):MP_SET_IND
+Assoc-Argument:MP_ASSOC_IND
+Release-Argument:MP_RELEASE_IND
+Abort-Argument:MP_ABORT_IND
+.TE
+.PP
+Completion flag set to partial:
+.PP
+.TS
+tab(:);
+ll.
+CMIS-Linked-Reply-Argument:All primitives.
+.TE
+.PP
+For
+.I completion_flag_return
+values of
+.RB [ MP_COMPLETED ]
+or
+.RB [ MP_PARTIAL ],
+the
+.I result_or_argument_return
+parameter is valid only if the
+.I operation_notification_status_return
+contains the value
+.RB [ MP_SUCCESS ].
+The parameter is not valid for
+.I completion_flag_return
+values of
+.RB [ MP_NOTHING ]
+or
+.RB [ MP_OUTSTANDING ].
+.RE
+.TP
+.I invoke_id_return
+The invoke identifier of the operation or notification whose error, result or argument is being
+returned.  This result is only valid if the
+.I status
+has the value
+.RB [ MP_SUCCESS ]
+and
+.I completion_flag_return
+has the value
+.RB [ MP_COMPLETED ],
+.RB [ MP_PARTIAL ]
+or
+.RB [ MP_INCOMING ].
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a
+.B System-Error
+or one of the following
+.BR Library-Error s:
+.TP
+.RB [ MP_E_BAD_CLASS ]
+.PD 0
+.TP
+.RB [ MP_E_BAD_CONTEXT ]
+.TP
+.RB [ MP_E_BAD_SESSION ]
+.TP
+.RB [ MP_E_MISCELLANEOUS ]
+.TP
+.RB [ MP_E_SESSION_TERMINATED ]
+.TP
+.RB [ MP_E_TIME_LIMIT_EXCEEDED ]
+.PD
+.PP
+This function does not report any
+.BR Communications-Error ,
+in its
+.I status
+result.  (Any such errors related the completed asynchronous oepration or notification are reported
+in 
+.IR operation_notification_status_return ,
+as described above.)
+.PP
+Also, this function can return the error constants:
+.TP
+.RB [ MP_NO_WORKSPACE ]
+.PD 0
+.TP
+.RB [ MP_INVALID_SESSION ]
+.TP
+.RB [ MP_INSUFFICIENT_RESOURCES ]
+.PD
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR mp_bind (3),
+.BR mp_assoc_req (3),
+.BR mp_assoc_rsp (3),
+.BR XMP (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mp_receive (3)
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This function is compatible with
+.I Solstice CMIP 9.0
+and implementations based on XMP,
+.[
+xmp
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+This function is source compatible.  Binary compatibility was not attempted.
+.PP
+See also,
+.BR XMP (3),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM,
+.[
+xom osi
+.]
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+This function first appeared in XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+XMP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

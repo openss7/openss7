@@ -262,13 +262,13 @@ XAP.
 .BR ap_ioctl ()
 first appeared in XAP.
 .[
-xap
+xap c303
 .]
 .\"
 .\"
 .SH VERSIONS
 .PP
-This manpage was written for the OpenSS7 XAP Library.
+This manual page was written for the OpenSS7 XAP Library.
 .\"
 .\"
 .[
