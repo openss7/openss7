@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xmp_cmis.h,v 0.9.2.1 2007/09/29 14:08:34 brian Exp $
+ @(#) $Id: xmp_cmis.h,v 0.9.2.2 2007/11/10 19:40:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/09/29 14:08:34 $ by $Author: brian $
+ Last Modified $Date: 2007/11/10 19:40:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmp_cmis.h,v $
+ Revision 0.9.2.2  2007/11/10 19:40:52  brian
+ - documentation updates
+
  Revision 0.9.2.1  2007/09/29 14:08:34  brian
  - added new files
 
@@ -58,7 +61,7 @@
 #ifndef __XMP_CMIS_H__
 #define __XMP_CMIS_H__
 
-#ident "@(#) $RCSfile: xmp_cmis.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xmp_cmis.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  * The <xmp_cmis.h> header declares the interface functions, the structures passed to and from those

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: xmp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/11/10 19:41:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/11/10 19:41:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xmp.c,v $
+ Revision 0.9.2.1  2007/11/10 19:41:07  brian
+ - documentation updates
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: xmp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/11/10 19:41:07 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: xmp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/11/10 19:41:07 $";
 
 #include <xom.h>
 #include <xmp.h>

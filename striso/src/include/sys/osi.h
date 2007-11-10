@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: osi.h,v 0.9.2.2 2007/08/14 07:05:08 brian Exp $
+ @(#) $Id: osi.h,v 0.9.2.3 2007/11/10 19:40:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 07:05:08 $ by $Author: brian $
+ Last Modified $Date: 2007/11/10 19:40:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: osi.h,v $
+ Revision 0.9.2.3  2007/11/10 19:40:53  brian
+ - documentation updates
+
  Revision 0.9.2.2  2007/08/14 07:05:08  brian
  - GNUv3 header update
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_OSI_H__
 #define __SYS_OSI_H__
 
-#ident "@(#) $RCSfile: osi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: osi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
