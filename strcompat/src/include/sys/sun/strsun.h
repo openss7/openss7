@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsun.h,v 0.9.2.14 2007/09/06 09:45:21 brian Exp $
+ @(#) $Id: strsun.h,v 0.9.2.15 2007/11/10 19:40:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/09/06 09:45:21 $ by $Author: brian $
+ Last Modified $Date: 2007/11/10 19:40:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsun.h,v $
+ Revision 0.9.2.15  2007/11/10 19:40:43  brian
+ - documentation updates
+
  Revision 0.9.2.14  2007/09/06 09:45:21  brian
  - correction to MBLKIN
 
@@ -70,7 +73,7 @@
 #ifndef __SYS_SUN_STRSUN_H__
 #define __SYS_SUN_STRSUN_H__
 
-#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef _SYS_STRSUN_H
 #warning "Do not include sys/sun/strsun.h directly, include sys/strsun.h instead."

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/08/15 05:33:10 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/11/10 19:40:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:33:10 $ by $Author: brian $
+ Last Modified $Date: 2007/11/10 19:40:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: suncompat.c,v $
+ Revision 0.9.2.38  2007/11/10 19:40:44  brian
+ - documentation updates
+
  Revision 0.9.2.37  2007/08/15 05:33:10  brian
  - GPLv3 updates
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/08/15 05:33:10 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/11/10 19:40:44 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/08/15 05:33:10 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/11/10 19:40:44 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -101,7 +104,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/08/15 05:33:10 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/11/10 19:40:44 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
