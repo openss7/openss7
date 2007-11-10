@@ -1,0 +1,284 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.TH MP_WAIT 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 XMP Library Calls"
+.SH NAME
+.B mp_wait
+\- Wait \- wait for the availablity of management message(s) from one or more bound sessions.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xom.h>
+.br
+.B #include <xmp.h>
+.HP
+.BI "MP_status mp_wait(
+.PD 0
+.RS
+.HP
+.BI "MP_waiting_sessions " bound_session_list [],
+.HP
+.BI "OM_workspace " workspace ,
+.HP
+.BI "OM_uint32 " timeout
+.RE
+.HP
+.BI );
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function is used to suspend the caller until a management operation or notification is
+available for a bound session.  A timeout value specified the maximum number of milliseconds to
+suspend before returning when no messages are available.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I bound_session_list
+An ordered sequence of management session to wait upon.  The last value must evaluate to
+.BR NULL .
+.TP
+.I workspace
+Specifies the workspace (obtained from a call to
+.BR mp_initialize (3)),
+in which an
+.B MP_status
+object will be created if the return status is other than
+.RB [ MP_SUCCESS ].
+Session(s) specified in the
+.B bound_session_list
+do not need to be from this workspace.
+.TP
+.I timeout
+The maximum number of milliseconds to suspend before returning when there are no messages form the
+list of Session(s).  A value of zero specifies an indefinite timeout.
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.I status
+Indicates whether or not the function completed successfully.  A successful completion means that
+either a message is available from a Session or that the timeout limit has been reached.  The
+.BR mp_receive ()
+function must be called to determine whether a message is available.
+.TP
+.I activated
+If the function was completed successfully, this result contains an ordered sequence of boolean
+values, with the same number of elements as the
+.IR bound_session_list .
+If true, each value indicates that the corrresponding session has data waiting in queue.  If false,
+each value indicates that the corresponding session does not have data waiting in queue.
+.RS
+.PP
+In the C binding, this result is combined with the
+.I bound_session_list
+argument as a single array of structures of type
+.BR MP_waiting_sessions ,
+which is defined as:
+.sp
+.nf
+\fC\s-2\
+typedef struct {
+    OM_private_object bound_session;
+    OM_boolean activated;
+} MP_waiting_sessions;
+\s+2\fP
+.fi
+.RE
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a
+.B System-Error
+or one of the following
+.BR Library-Error s:
+.TP
+.RB [ MP_E_BAD_ADDRESS ]
+.PD 0
+.TP
+.RB [ MP_E_BAD_SESSION ]
+.TP
+.RB [ MP_E_BAD_WORKSPACE ]
+.TP
+.RB [ MP_E_MISCELLANEOUS ]
+.TP
+.RB [ MP_E_SESSION_TERMINATED ]
+.PD
+.PP
+Also, this function can return the error constants:
+.TP
+.RB [ MP_NO_WORKSPACE ]
+.PD 0
+.TP
+.RB [ MP_INVALID_SESSION ]
+.TP
+.RB [ MP_INSUFFICIENT_RESOURCES ]
+.PD
+.\"
+.\"
+.SH NOTICES
+.PP
+It should be noted that, in a
+multithreaded environment,
+.BR mp_wait ()
+may report the presence of a message which will have been processed by another thread by the time
+the first thread calls
+.BR mp_receive (3)
+to process it.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR mp_initialize (3),
+.BR mp_receive (3),
+.BR mp_bind (3),
+.BR XMP (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mp_wait (3)
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This function is compatible with
+.I Solstice CMIP 9.0
+and implementations based on XMP,
+.[
+xmp
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+This function is source compatible.  Binary compatibility was not attempted.
+.IP \(em
+Use the value minus one (-1),
+.BR 0xffffffff ,
+for an zero length timeout().  The function will return immediately and not
+block.
+This is consistent with the
+.I Solstice CMIP 8.2
+product descriptions from Sun Microsystems.
+.PP
+See also,
+.BR XMP (3),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM,
+.[
+xom osi
+.]
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+This function first appeared in XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+XMP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

@@ -61,20 +61,18 @@
 #ident "@(#) $RCSfile: xmp_snmp.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
- * The <xmp_snmp.h> header declares the interface functions, the structures
- * passed to and from those functions, and the defined constants used by the
- * functions and structures.
+ * The <xmp_snmp.h> header declares the interface functions, the structures passed to and from those
+ * functions, and the defined constants used by the functions and structures.
  *
- * All application programs which include this header must first include the
- * OSI-Abstract-Data Manipulation header <xom.h>.
+ * All application programs which include this header must first include the OSI-Abstract-Data
+ * Manipulation header <xom.h>.
  */
 #include <xom.h>
 
 /*
- * All Object Identifiers are represented by constants defined in the headers.
- * These constants are used with the macros defined in the XOM API (see
- * reference XOM). A constant is defined to represent the Object Identifier of
- * the SNMP Management Service package:
+ * All Object Identifiers are represented by constants defined in the headers.  These constants are
+ * used with the macros defined in the XOM API (see reference XOM). A constant is defined to
+ * represent the Object Identifier of the SNMP Management Service package:
  */
 #define OMP_O_MP_SNMP_PKG "\x2a\x86\x3a\x00\x88\x1a\x06\x03"
 
@@ -86,15 +84,13 @@
 /* OM class names (prefixed MP_C_) */
 
 /*
- * Every application program which makes use of a class or other Object
- * Identifier must explicitly import it into every compilation unit (C source
- * program) which uses it. Each such class or Object Identifier name must be
- * explicitly exported from just one compilation unit.
+ * Every application program which makes use of a class or other Object Identifier must explicitly
+ * import it into every compilation unit (C source program) which uses it. Each such class or Object
+ * Identifier name must be explicitly exported from just one compilation unit.
  *
- * In the header file, OM class constants are prefixed with the OPM_O prefix to
- * denote that they are OM classes. However, when using the OM_IMPORT and
- * OM_EXPORT macros, the base names (without the OMP_O prefix) should be used.
- * For example:
+ * In the header file, OM class constants are prefixed with the OPM_O prefix to denote that they are
+ * OM classes. However, when using the OM_IMPORT and OM_EXPORT macros, the base names (without the
+ * OMP_O prefix) should be used.  For example:
  * 
  * OM_IMPORT(MP_C_OBJECT_SYNTAX)
  */
@@ -139,8 +135,8 @@
 #define MP_VARIABLE_BINDINGS		((OM_type)11228)
 
 /*
- * The following enumeration tags and enumeration constants are defined for use
- * as values of the corresponding OM attributes:
+ * The following enumeration tags and enumeration constants are defined for use as values of the
+ * corresponding OM attributes:
  */
 /* MP_T_Generic_Trap: */
 #define MP_T_AUTHENTICATION_FAILURE	1

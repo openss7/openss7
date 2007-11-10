@@ -85,18 +85,44 @@ sort-adjacent-labels
 \- 
 .\"
 .\"
+.SH INTERFACE
+.PP
+XOM.
+.[
+xom osi
+.]
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xom.h>
 .HP
-.BI "OM_return_code om_xxx();"
+.BR OM_return_code " om_xxx(
+.PD 0
+.RS
+.HP
+.BI "const OM_private_object " object ,
+.HP
+.BI "const OM_workspace " workspace
+.RE
+.HP
+.RB );
+.PD
 .\"
 .\"
 .SH ARGUMENTS
+.PP
+.TP
+.I object
+.TP
+.I workspace
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.BR om_xxx ()
+function
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -107,11 +133,41 @@ is returned. Otherwise, a non-zero diagnostic error value is returned.
 .\"
 .\"
 .SH ERRORS
+.PP
+When
+.BR om_xxx ()
+fails, it returns a non-zero error code, as follows:
+.TP
+.RB [ OM_FUNCTION_INTERRUPTED ]
+.TP
+.RB [ OM_MEMORY_INSUFFICIENT ]
+.TP
+.RB [ OM_NETWORK_ERROR ]
+.TP
+.RB [ OM_NO_SUCH_CLASS ]
+.TP
+.RB [ OM_NO_SUCH_OBJECT ]
+.TP
+.RB [ OM_NO_SUCH_WORKSPACE ]
+.TP
+.RB [ OM_NOT_PRIVATE ]
+.TP
+.RB [ OM_PERMANENT_ERROR ]
+.TP
+.RB [ OM_POINTER_INVALID ]
+.TP
+.RB [ OM_SYSTEM_ERROR ]
+.TP
+.RB [ OM_TEMPORARY_ERROR ]
+.TP
+.RB [ OM_TOO_MANY_VALUES ]
+.PP
+Other arguments passed to or returned by the function are unaffected.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR ap_snd (3).
+.BR XOM (3).
 .\"
 .\"
 .SH "BUGS"
@@ -123,17 +179,33 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR om_xxx ()
-is compatible with XOM.
+is compatible with
+.IR "Solstice OSI 8.0 "  to " 9.0
+and implementations based on
+XOM,
 .[
-xom
+xom osi
 .]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Note that many add-on OSI packages for popular UNIX SVR 4.2 based releases
+provided the XOM interface and the associated set of X/Open, IEEE and ISO
+standard interfaces.
+.IP \(em
+The function is source compatibile only.  Binary compatibility was not
+attempted.
+.IP \(em
+.PP
+See also,
+.BR XOM (3),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
 XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
@@ -142,19 +214,18 @@ xom
 .BR om_xxx ()
 first appeared in XOM.
 .[
-xom
+xom osi
 .]
 .\"
 .\"
 .SH VERSIONS
 .PP
-This manpage was written for the OpenSS7 XOM Library.
+This manual page was written for the 
+.B @PACKAGE_TITLE@
+XOM Library.
 .\"
 .\"
 .[
 $LIST$
 .]
 .T4
-
-
-

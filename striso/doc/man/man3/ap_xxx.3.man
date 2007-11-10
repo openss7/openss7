@@ -74,7 +74,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 search-truncate 32
-search-ignore TXYZR
+search-ignore XYZ
 .R2
 .so striso.macros
 .\"
@@ -149,7 +149,7 @@ has no known bugs.
 .BR ap_xxx ()
 is compatible with XAP.
 .[
-xap
+xap c303
 .]
 .\"
 .\"
@@ -157,15 +157,15 @@ xap
 .PP
 XNS,
 .[
-xns
+xns 5.2
 .]
-XOM,
+XAP,
 .[
-xom
+xap c303
 .]
-XAP.
+XAP-ROSE.
 .[
-xap
+xap-rose
 .]
 .\"
 .\"
@@ -174,13 +174,13 @@ xap
 .BR ap_xxx ()
 first appeared in XAP.
 .[
-xap
+xap c303
 .]
 .\"
 .\"
 .SH VERSIONS
 .PP
-This manpage was written for the OpenSS7 XAP Library.
+This manual page was written for the OpenSS7 XAP Library.
 .\"
 .\"
 .[

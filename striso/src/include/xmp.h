@@ -72,15 +72,49 @@
  * These constants are used with the macros defined in the XOM API (see
  * reference XOM). A constant is defined to represent the Object Identifier of
  * the Common Management Service package:
+ *
+ * { iso(1) member-national-body(2) bsi(826) disc(0) xopen(1050) xmp-cae(6) common(1) }
  */
-#define OMP_O_MP_COMMON_PKG "\x2a\x86\x3a\x00\x88\x1a\x06\x01"
+#define OMP_O_MP_COMMON_PKG "\x2a\x86\x3a\x00\x88\x1a\x06\x01" /* 1.2.826.0.1050.6.1 */
 
 /* 
  * Constants are also defined to represent the Object Identifiers for Features
  * defined by this specification:
+ *
+ * { iso(1) member-national-body(2) bsi(826) disc(0) xopen(1050) xmp-cae(6) common(1)
+ *   automatic-connection-management(1) }
  */
-#define OMP_O_MP_AUTOMATIC_CONNECTION_MANAGEMENT "\x2a\x86\x3a\x00\x88\x1a\x06\x01\x01"
-#define OMP_O_MP_AUTOMATIC_DECODING "\x2a\x86\x3a\x00\x88\x1a\x06\x01\x02"
+#define OMP_O_MP_AUTOMATIC_CONNECTION_MANAGEMENT "\x2a\x86\x3a\x00\x88\x1a\x06\x01\x01" /* 1.2.826.0.1050.6.1.1 */
+/*
+ * { iso(1) member-national-body(2) bsi(826) disc(0) xopen(1050) xmp-cae(6) common(1)
+ *   automatic-decoding(2) }
+ */
+#define OMP_O_MP_AUTOMATIC_DECODING "\x2a\x86\x3a\x00\x88\x1a\x06\x01\x02" /* 1.2.826.0.1050.6.1.2 */
+
+/*
+ * Solaris Solstice CMIP 8.2 extensions:
+ */
+/* If this implementation specific feature is enabled, each session has its own file descriptor.  If
+ * this implementation specific feature is disabled, all sessions share the same file descriptor.
+ * In either case, the file descriptor is set in the MP_FILE_DESCRIPTOR attribute of the session
+ * object.
+ *
+ * { iso(1) member-national-body(2) bsi(826) disc(0) xopen(1050) xmp-cae(6) common(1)
+ *   on-fd-per-session(3) }
+ */
+#define OMP_O_MP_ONE_FD_PER_SESSION "\x2a\x86\x3a\x00\x88\x1a\x06\x01\x03" /* 1.2.826.0.1050.6.1.3 */
+
+/* If this implementation specific feature is enabled, then any application context can be specified
+ * in the MP_APPLICATION_CONTEXT attribute of the MP_ACSE_ARGS attirbute object of the session
+ * object.  For outgoing associations, the application context is sent in the associate request PDU.
+ * Only associate request PDUs that contain a valid application context are accepted by incoming
+ * associations.  By default, only the ISO, NMF and TMN application contexts can be specified in the
+ * sesssion object.
+ *
+ * { iso(1) member-national-body(2) bsi(826) disc(0) xopen(1050) xmp-cae(6) common(1)
+ *   any-appl-context(4) }
+ */
+#define OMP_O_MP_ANY_APP_CONTEXT "\x2a\x86\x3a\x00\x88\x1a\x06\x01\x04" /* 1.2.826.0.1050.6.1.4 */
 
 /*
  * Prototypes are defined for the following functions:
@@ -125,60 +159,60 @@
 
 /* OM class names (prefixed MP_C_) */
 /*
- * Every application program which makes use of a class or other Object
- * Identifier must explicitly import it into every compilation unit (C source
- * program) which uses it. Each such class or Object Identifier name must be
- * explicitly exported from just one compilation unit.
+ * Every application program which makes use of a class or other Object Identifier must explicitly
+ * import it into every compilation unit (C source program) which uses it. Each such class or Object
+ * Identifier name must be explicitly exported from just one compilation unit.
  *
- * In the header file, OM class constants are prefixed with the OPM_O prefix
- * to denote that they are OM classes. However, when using the OM_IMPORT and
- * OM_EXPORT macros, the base names (without the OMP_O prefix) should be used.
- * For example:
+ * In the header file, OM class constants are prefixed with the OPM_O prefix to denote that they are
+ * OM classes. However, when using the OM_IMPORT and OM_EXPORT macros, the base names (without the
+ * OMP_O prefix) should be used.  For example:
  */
 
 /* *INDENT-OFF* */
 OM_IMPORT(MP_C_AVA);
 /* *INDENT-ON* */
 
-#define OMP_O_MP_C_ABORT_ARGUMENT		mpP_comn(\x87\x69)
-#define OMP_O_MP_C_ACCESS_CONTROL		mpP_comn(\x87\x6A)
-#define OMP_O_MP_C_ACSE_ARGS			mpP_comn(\x87\x6B)
-#define OMP_O_MP_C_ADDRESS			mpP_comn(\x87\x6C)
-#define OMP_O_MP_C_AE_TITLE			mpP_comn(\x87\x6D)
-#define OMP_O_MP_C_ASSOC_ARGUMENT		mpP_comn(\x87\x6E)
-#define OMP_O_MP_C_ASSOC_DIAGNOSTIC		mpP_comn(\x87\x6F)
-#define OMP_O_MP_C_ASSOCIATION_INFORMATION	mpP_comn(\x87\x70)
-#define OMP_O_MP_C_ASSOC_RESULT			mpP_comn(\x87\x71)
-#define OMP_O_MP_C_AUTHENTICATION_INFORMATION	mpP_comn(\x87\x72)
-#define OMP_O_MP_C_AUTHENTICATION_OTHER		mpP_comn(\x87\x73)
-#define OMP_O_MP_C_AVA				mpP_comn(\x87\x74)
-#define OMP_O_MP_C_BAD_ARGUMENT			mpP_comn(\x87\x75)
-#define OMP_O_MP_C_CMIP_ASSOC_ARGS		mpP_comn(\x87\x76)
-#define OMP_O_MP_C_COMMUNITY_NAME		mpP_comn(\x87\x77)
-#define OMP_O_MP_C_CONTEXT			mpP_comn(\x87\x78)
-#define OMP_O_MP_C_DS_DN			mpP_comn(\x87\x79)
-#define OMP_O_MP_C_DS_RDN			mpP_comn(\x87\x7A)
-#define OMP_O_MP_C_ENTITY_NAME			mpP_comn(\x87\x7B)
-#define OMP_O_MP_C_ERROR			mpP_comn(\x87\x7C)
-#define OMP_O_MP_C_EXTENSION			mpP_comn(\x87\x7D)
-#define OMP_O_MP_C_EXTERNAL_AC			mpP_comn(\x87\x7E)
-#define OMP_O_MP_C_FORM1			mpP_comn(\x87\x7F)
-#define OMP_O_MP_C_FORM2			mpP_comn(\x88\x00)
-#define OMP_O_MP_C_FUNCTIONAL_UNIT_PACKAGE	mpP_comn(\x88\x01)
-#define OMP_O_MP_C_NAME				mpP_comn(\x88\x02)
-#define OMP_O_MP_C_NAME_STRING			mpP_comn(\x88\x03)
-#define OMP_O_MP_C_NETWORK_ADDRESS		mpP_comn(\x88\x04)
-#define OMP_O_MP_C_PRESENTATION_ADDRESS		mpP_comn(\x88\x05)
-#define OMP_O_MP_C_PRESENTATION_CONTEXT		mpP_comn(\x88\x06)
-#define OMP_O_MP_C_PRESENTATION_LAYER_ARGS	mpP_comn(\x88\x07)
-#define OMP_O_MP_C_RELATIVE_NAME		mpP_comn(\x88\x08)
-#define OMP_O_MP_C_RELEASE_ARGUMENT		mpP_comn(\x88\x09)
-#define OMP_O_MP_C_RELEASE_RESULT		mpP_comn(\x88\x0A)
-#define OMP_O_MP_C_SESSION			mpP_comn(\x88\x0B)
-#define OMP_O_MP_C_SMASE_USER_DATA		mpP_comn(\x88\x0C)
-#define OMP_O_MP_C_SNMP_OBJECT_NAME		mpP_comn(\x88\x0D)
-#define OMP_O_MP_C_STANDARD_EXTERNALS		mpP_comn(\x88\x0E)
-#define OMP_O_MP_C_TITLE			mpP_comn(\x88\x0F)
+#define OMP_O_MP_C_ABORT_ARGUMENT		mpP_comn(\x87\x69)  /* 1001 */
+#define OMP_O_MP_C_ACCESS_CONTROL		mpP_comn(\x87\x6A)  /* 1002 */
+#define OMP_O_MP_C_ACSE_ARGS			mpP_comn(\x87\x6B)  /* 1003 */
+#define OMP_O_MP_C_ADDRESS			mpP_comn(\x87\x6C)  /* 1004 */
+#define OMP_O_MP_C_AE_TITLE			mpP_comn(\x87\x6D)  /* 1005 */
+#define OMP_O_MP_C_ASSOC_ARGUMENT		mpP_comn(\x87\x6E)  /* 1006 */
+#define OMP_O_MP_C_ASSOC_DIAGNOSTIC		mpP_comn(\x87\x6F)  /* 1007 */
+#define OMP_O_MP_C_ASSOCIATION_INFORMATION	mpP_comn(\x87\x70)  /* 1008 */
+#define OMP_O_MP_C_ASSOC_RESULT			mpP_comn(\x87\x71)  /* 1009 */
+#define OMP_O_MP_C_AUTHENTICATION_INFORMATION	mpP_comn(\x87\x72)  /* 1010 */
+#define OMP_O_MP_C_AUTHENTICATION_OTHER		mpP_comn(\x87\x73)  /* 1011 */
+#define OMP_O_MP_C_AVA				mpP_comn(\x87\x74)  /* 1012 */
+#define OMP_O_MP_C_BAD_ARGUMENT			mpP_comn(\x87\x75)  /* 1013 */
+#define OMP_O_MP_C_CMIP_ASSOC_ARGS		mpP_comn(\x87\x76)  /* 1014 */
+#define OMP_O_MP_C_COMMUNITY_NAME		mpP_comn(\x87\x77)  /* 1015 */
+#define OMP_O_MP_C_CONTEXT			mpP_comn(\x87\x78)  /* 1016 */
+#define OMP_O_MP_C_DS_DN			mpP_comn(\x87\x79)  /* 1017 */
+#define OMP_O_MP_C_DS_RDN			mpP_comn(\x87\x7A)  /* 1018 */
+#define OMP_O_MP_C_ENTITY_NAME			mpP_comn(\x87\x7B)  /* 1019 */
+#define OMP_O_MP_C_ERROR			mpP_comn(\x87\x7C)  /* 1020 */
+#define OMP_O_MP_C_EXTENSION			mpP_comn(\x87\x7D)  /* 1021 */
+#define OMP_O_MP_C_EXTERNAL_AC			mpP_comn(\x87\x7E)  /* 1022 */
+#define OMP_O_MP_C_FORM1			mpP_comn(\x87\x7F)  /* 1023 */
+#define OMP_O_MP_C_FORM2			mpP_comn(\x88\x00)  /* 1024 */
+#define OMP_O_MP_C_FUNCTIONAL_UNIT_PACKAGE	mpP_comn(\x88\x01)  /* 1025 */
+#define OMP_O_MP_C_NAME				mpP_comn(\x88\x02)  /* 1026 */
+#define OMP_O_MP_C_NAME_STRING			mpP_comn(\x88\x03)  /* 1027 */
+#define OMP_O_MP_C_NETWORK_ADDRESS		mpP_comn(\x88\x04)  /* 1028 */
+#define OMP_O_MP_C_PRESENTATION_ADDRESS		mpP_comn(\x88\x05)  /* 1029 */
+#define OMP_O_MP_C_PRESENTATION_CONTEXT		mpP_comn(\x88\x06)  /* 1030 */
+#define OMP_O_MP_C_PRESENTATION_LAYER_ARGS	mpP_comn(\x88\x07)  /* 1031 */
+#define OMP_O_MP_C_RELATIVE_NAME		mpP_comn(\x88\x08)  /* 1032 */
+#define OMP_O_MP_C_RELEASE_ARGUMENT		mpP_comn(\x88\x09)  /* 1033 */
+#define OMP_O_MP_C_RELEASE_RESULT		mpP_comn(\x88\x0A)  /* 1034 */
+#define OMP_O_MP_C_SESSION			mpP_comn(\x88\x0B)  /* 1035 */
+#define OMP_O_MP_C_SMASE_USER_DATA		mpP_comn(\x88\x0C)  /* 1036 */
+#define OMP_O_MP_C_SNMP_OBJECT_NAME		mpP_comn(\x88\x0D)  /* 1037 */
+#define OMP_O_MP_C_STANDARD_EXTERNALS		mpP_comn(\x88\x0E)  /* 1038 */
+#define OMP_O_MP_C_TITLE			mpP_comn(\x88\x0F)  /* 1039 */
+
+#define OMP_O_MP_C_PROPRIETARY_ARGS		mpP_comn(\x88\x10)  /* 1040 */
 
 /* The OM attribute names which are defined are listed below. */
 #define MP_ABORT_DIAGNOSTIC			((OM_type)11001)
@@ -253,9 +287,26 @@ OM_IMPORT(MP_C_AVA);
 #define MP_USER_INFO				((OM_type)11070)
 #define MP_USER_INFORMATION			((OM_type)11071)
 
+/*
+ * Solstice CMIP 8.2 extensions:
+ */
+#define MP_PROPRIETARY_ARGS			((OM_type)11072)
+#define MP_INACTIVIY_TIMER			((OM_type)11073)
+#define MP_BIND_STATE				((OM_type)11074)
+#define MP_CONNECT_STATE			((OM_type)11075)
+
+#define MP_T_UNBOUND				0
+#define MP_T_BOUND				1
+
+#define MP_T_UNCONNECTED			0
+#define MP_T_PARTLY_CONNECTED			1
+#define MP_T_CONNECTED				2
+
+#define MP_T_SINGLE_ASSOC			0x80
+
 /* 
- * The following enumeration tags and enumeration constants are defined for
- * use as values of the corresponding OM attributes:
+ * The following enumeration tags and enumeration constants are defined for use as values of the
+ * corresponding OM attributes:
  */
 
 /* MP_T_CMIS_Functional_Units: */

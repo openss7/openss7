@@ -1,0 +1,397 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.TH MP_NEGOTIATE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 XMP Library Calls"
+.SH NAME
+.B mp_negotiate
+\- Negotiate \- negotiate features of the XMP interface and service.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xom.h>
+.br
+.B #include <xmp.h>
+.HP
+.BI "MP_status mp_negotiate(
+.PD 0
+.RS
+.HP
+.BI "MP_feature " feature_list [],
+.HP
+.BI "OM_workspace " workspace
+.RE
+.HP
+.BI );
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function negotiates features of the interface; each feature is represented as an Object
+Identifier.  Several features are defined and registered within this specification - refer to the
+feature list below.  Features may also include management contents packages, vendor extensions, and
+new features defined in future versions of this specification.  Features can be negotiated after a
+workspace has been initialized, and can be renegotiated any time until the workspace is discarded.
+Note that all sessions on a given workspace share the same features.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I feature_list
+An ordered sequence of features, each represented by an object identifier and a request value.  The
+request value can contain one of the following values:
+.RS
+.TP
+.RB [ MP_ACTIVATE ]
+.PD 0
+.TP
+.RB [ MP_DEACTIVATE ]
+.TP
+.RB [ MP_QUERY_STATE ]
+.TP
+.RB [ MP_QUERY_SUPPORTED ]
+.PD
+.PP
+The sequence is terminated by an object identifier having no components (a length of zero and any
+value of the data pointer in the C representation).  The response value is returned upon completion
+of the
+.BR mp_negotiate ()
+invocation.
+.PP
+In the C binding, the
+.I feature_list
+argument is a single array of structures of type
+.BR MP_feature ,
+which is defined as:
+.sp
+.nf
+\fC\s-2\
+#define MP_ACTIVATE         0
+#define MP_DEACTIVATE       1
+#define MP_QUERY_STATE      2
+#define MP_QUERY_SUPPORTED  3
+
+typedef struct {
+    OM_object_identifier feature;
+    OM_sint request;
+    OM_boolean response;
+} MP_feature;
+\s+2\fP
+.fi
+.PP
+The following features are defined and registered by this specification:
+.IP \(bu \w'\(bu\(em'u
+Management Service Packages
+.sp
+The CMIS Management Service package and the SNMP Management Service package are specified.
+Additional Management Service packages may be specified in the future.
+The Object-Identifier associated with this feature is
+.BR "{ iso(1) member-national-body(2) bsi(826) disc(0) xopen(1050) xmp-cae(6) common(1) }" .
+The Object-Identifier is also represented by the constant
+.RB ( MP_COMMON_PKG ).
+OM object classes that are common to CMIS and SNMP under XMP are defined under
+this arc.
+.sp
+The Object-Identifier associated with the CMIS Management Service package is:
+.BR "{ iso(1) member-national-body(2) bsi(826) disc(0) xopen(1050) xmp-cae(6) cmis(2) }" .
+The Object-Identifier is also represented by the constant
+.RB ( MP_CMIS_PKG ).
+OM object classes that are specific to CMIS are defined under this arc.
+.sp
+The Object-Identifier associated with the SNMP Management Service package is:
+.BR "{ iso(1) member-national-body(2) bsi(826) disc(0) xopen(1050) xmp-cae(6) snmp(3) }" .
+The Object-Identifier is also represented by the constant
+.RB ( MP_SNMP_PKG ).
+OM object classes that are specific to SNMP are defined under this arc.
+.IP \(bu
+Automatic Connection Management
+.sp
+This feature provides for automatic establishment and release of the underlying protocol
+connection(s) (if any); see
+.BR XMP (3).
+The Object-Identifier associated with this feature is
+.BR "{ iso(1) member-national-body(2) bsi(826) disc(0) xopen(1050) xmp-cae(6) common(1) automatic-connection-management(1) }" .
+This Object-Identifier is represented by the constant
+.RB ( MP_AUTOMATIC_CONNECTION_MANAGEMENT ).
+Automatic Connection Management is enabled by default.
+.IP \(bu
+Automatic ASN.1 BER Encoding/Decoding
+.sp
+This feature provides for automatic encoding and decoding of OM class and attribute types using
+ASN.1 BER.
+.[
+x690
+.]
+The Object-Identifier associated with this feature is
+.BR "{ iso(1) member-national-body(2) bsi(826) disc(0) xopen(1050) xmp-cae(6) common(1) automatic-decoding(2) }" .
+This Object-Identifier is repesented by the constant
+.RB ( MP_AUTOMATIC_DECODING ).
+Automatic ASN.1 BER Encoding/Decoding is enabled by default.
+.IP \(bu
+One FD Per Session
+.sp
+If this implementation-specific (Solaris Solstice CMIP 8.2) feature is enabled, each session has its
+own file descriptor.  If this implemenntation specific feature is disabled, all sessions share the
+same file descriptor.  In either case, the file descriptor is set in the
+.RB [ MP_FILE_DESCRIPTOR ]
+attribute of the session object.
+.sp
+The Object-Identifier associated with this feature is
+.BR "{ iso(1) member-national-body(2) bsi(826) disc(0) xopen(1050) xmp-cae(6) common(1) one-fd-per-session(3) }" .
+This Object-Identifer is represented by the constant
+.RB ( MP_ON_FD_PER_SESSION ).
+.IP \(bu
+Any Application Context
+.sp
+If this implementation-specific (Solaris Solstice CMIP 8.2) feature is enabled, then any application
+context can be specified in the
+.RB [ MP_APPLICATION_CONTEXT ]
+attribute of the
+.RB [ MP_ACSE_ARGS ]
+attribute object of the session object.  For outgoing associations, the application context is sent
+in the associated request PDU.  Only associate request PDUs that contain a valid application context
+are accepted by incoming associations.  By default, only the ISO, NMP and TMN application contexts can
+be specified in the session object.
+.sp
+The Object-Identifier associated with this feature is
+.BR "{ iso(1) member-national-body(2) bsi(826) disc(0) xopen(1050) xmp-cae(6) common(1) any-appl-context(4) }" .
+This Object-Identifier is represented by the constant
+.RB ( MP_ANY_APPL_CONTEXT ).
+
+.PP
+Management Contents packages are also negotiated as part of the feature list.  Management Contents
+packages may be defined by X/Open, by other standards organizations or consortia, by vendors, or by
+users.  The X/Open GDMO to XOM Translation Algorithm
+.[
+xgdmo
+.]
+provides guidance on how Management Contents packages may be generated.
+.PP
+Registered Obejct Identifiers representing future features and vendor extensions may also be
+included in the feature list for negotiation.
+.RE
+.TP
+.I workspace
+The handle to the workspace.
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.I status
+Indicates whether or not the function was successful.
+.TP
+.I response
+If the function completed successfully, this result contains an ordered list of Boolean values, with
+the same number of elements as the
+.IR feature_list .
+The significance of the values is shown in the following table:
+.sp
+.TS
+box center tab(:);
+cb|cb|cbss
+l|l|lss.
+Request:Response:Meaning
+_
+Activate:True:T{
+Activated.
+T}
+:False:T{
+Cannot activate the feature (or the feature is not supported).
+T}
+Deactivate:True:T{
+Deactivated.
+T}
+:False:T{
+Cannot deactivate feature (or the feature is not supported).
+T}
+Query-state:True:T{
+Activated.
+T}
+:False:T{
+Deactivated (or the feature is not supported).
+T}
+Query-supported:True:T{
+Supported.
+T}
+:False:T{
+Not supported.
+T}
+Invalid:True:T{
+Cannot be returned.
+T}
+:False:T{
+Invalid argument.
+T}
+.TE
+.sp
+In the C binding, this result is combined with the
+.I feature_list
+argument as a single array of strutures of type
+.BR MP_feature ,
+as defined above.
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a
+.B System-Error
+or one of the following
+.BR Library-Error :
+.TP
+.RB [ MP_E_BAD_MISCELLANEOUS ]
+.PP
+This function can return a
+.BR Communications-Error ,
+or any management service errors.
+.PP
+Also, this function can return the error constants:
+.TP
+.RB [ MP_NO_WORKSPACE ]
+.PD 0
+.TP
+.RB [ MP_INSUFFICIENT_RESOURCES ]
+.PD
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR mp_initialize (3),
+.BR XMP (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mp_negotiate (3)
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This function is compatible with
+.I Solstice CMIP 9.0
+and implementations based on XMP,
+.[
+xmp
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+This function is source compatible.  Binary compatibility was not attempted.
+.PP
+See also,
+.BR XMP (3),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM,
+.[
+xom osi
+.]
+XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+This function first appeared in XMP.
+.[
+xmp
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+XMP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

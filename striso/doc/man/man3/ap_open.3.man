@@ -137,7 +137,7 @@ A pointer a an error number into which to have returned diagnostic error numbers
 .SH INTERFACE
 XAP.
 .[
-XAP
+xap c303
 .]
 .\"
 .\"
@@ -145,7 +145,7 @@ XAP
 .PP
 This function creates an instance of XAP
 .[
-XAP
+xap c303
 .]
 using the communications provider identified by
 .IR provider .
@@ -341,13 +341,13 @@ XAP.
 .BR ap_open ()
 first appeared in XAP.
 .[
-xap
+xap c303
 .]
 .\"
 .\"
 .SH VERSIONS
 .PP
-This manpage was written for the OpenSS7 XAP Library.
+This manual page was written for the OpenSS7 XAP Library.
 .\"
 .\"
 .[

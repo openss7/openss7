@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mp_initialize.3.man,v 0.9.2.1 2007/11/06 11:43:15 brian Exp $
+.\" @(#) $Id$
 .\"
 .\" =========================================================================
 .\"
@@ -53,17 +53,11 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/11/06 11:43:15 $ by $Author: brian $
+.\" Last Modified $Date$ by $Author$
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: mp_initialize.3.man,v $
-.\" Revision 0.9.2.1  2007/11/06 11:43:15  brian
-.\" - updated manual pages
-.\"
-.\" Revision 0.9.2.1  2007/09/29 14:08:30  brian
-.\" - added new files
-.\"
+.\" $Log$
 .\" =========================================================================
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
@@ -78,20 +72,10 @@ abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
 .so striso.macros
-.\"
-.\"
-.TH MP_INITIALIZE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.TH MP_INITIALIZE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 XMP Library Calls"
 .SH NAME
 .B mp_initialize
-\- Initialize \- intiialize the XMP interface.
-.\"
-.\"
-.SH INTERFACE
-.PP
-XMP.
-.[
-xmp
-.]
+\- Initialize \- intialize the XMP interface.
 .\"
 .\"
 .SH SYNOPSIS
@@ -104,16 +88,19 @@ xmp
 .PD 0
 .RS
 .HP
-.BI "void
+.B void
 .RE
 .HP
 .BI );
 .PD
 .\"
 .\"
-.SH ARGUMENTS
+.SH INTERFACE
 .PP
-None.
+XMP.
+.[
+xmp
+.]
 .\"
 .\"
 .SH DESCRIPTION
@@ -128,47 +115,63 @@ but not yet deleted by
 .BR mp_shutdown (3).
 .\"
 .\"
-.SH RETURN
-.PP
-Upon successful completion, returns a handle to a workspace in which OM
-objects can be created and manipulated.  Objects created in this workspace,
-using
-.BR om_copy (3)
-or
-.BR om_create (3),
-and only such objects, may be used as arguments to the other management
-interface functions.  This function returns \fBNULL\fP if it fails.
-.\"
-.\"
-.SH ERRORS
+.SH ARGUMENTS
 .PP
 None.
 .\"
 .\"
-.SH IMPLEMENTATION
+.SH RETURN
 .PP
-This function establishes a new XMP instance as an overloaded XOM workspace
-structure which contains additional members for tracking sessions, contexts
-and other created OM objects and initializes the workspace with default
-values.  A pointer to the resulting workspace is returned from this function.
+.TP
+.I workspace
+Upon successful completion, contains a handle to a workspace in which OM object can be created and
+manipulated.  Objects created in this workspace, and only such object, may be used as arguments to
+the other management interface functions.
+.\"
+.\"
+.SH ERRORS
+.PP
+This function returns
+.BR NULL
+if it fails.
 .\"
 .\"
 .SH SEE ALSO
+.PP
 .BR mp_shutdown (3),
 .BR om_copy (3),
 .BR om_create (3),
-.BR xmp (3).
+.BR XMP (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mp_initialize (3)
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+This function is compatible with
+.I Solstice CMIP 9.0
+and implementations based on XMP,
+.[
+xmp
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+This function is source compatible.  Binary compatibility was not attempted.
+.PP
+See also,
+.BR XMP (3),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
 XOM,
 .[
-xom
+xom osi
 .]
 XMP.
 .[
@@ -178,16 +181,20 @@ xmp
 .\"
 .SH HISTORY
 .PP
+This function first appeared in XMP.
+.[
+xmp
+.]
 .\"
 .\"
 .SH VERSIONS
 .PP
-This manual page was written for the OpenSS7 XMP Library.
+This manual page was written for the
+.B @PACKAGE_TITLE@
+XMP Library.
 .\"
 .\"
 .[
 $LIST$
 .]
-.\"
-.\"
-.TI
+.T2

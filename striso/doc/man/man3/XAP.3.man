@@ -87,7 +87,7 @@ sort-adjacent-labels
 .PP
 XAP.
 .[
-XAP
+xap c303
 .]
 .\"
 .\"
@@ -436,11 +436,13 @@ bound to the Transport Layer SAP(s) identified by the specified Transport
 Address (consisting of the T-selector value and Network Address(es)).
 .PP
 The semantics of this Selector wildcard Presentation Address are that any
-incoming A_ASSOC_IND primitive which specifies that Transport Address will be
-sent to the XAP user bound to the wildcard address irrespective of the called
-S- and P-selector values. The XAP user is then responsible for validating the
-called S- and P-selector values and determining whether or not to accept the
-application association.
+incoming
+.BR A_ASSOC_IND (7)
+primitive which specifies that Transport Address will be sent to the XAP user
+bound to the wildcard address irrespective of the called S- and P-selector
+values. The XAP user is then responsible for validating the called S- and
+P-selector values and determining whether or not to accept the application
+association.
 .PP
 Note that multiple Selector wildcard addresses can freely coexist with each
 other and with fully specified addresses. XAP will always pass an incoming
@@ -468,19 +470,20 @@ to the presentation address specified in
 .SS General Comments
 .PP
 When an indication is received by an XAP Instance which is bound to a wildcard
-address, the environment variable AP_LCL_PADDR is set to the specific
+address, the environment variable \fBAP_LCL_PADDR\fP is set to the specific
 presentation address to which the association is directed (the called
-presentation address from the A_ASSOC_REQ primitive). The address in
-AP_LCL_PADDR is always used as the responding presentation address when
-sending an A_ASSOC_RSP primitive. The XAP user may respond to an incoming
-A_ASSOC_IND on an address other that the called presentation address by
-supplying a fully specified address in AP_BIND_PADDR and calling the
+presentation address from the \fBA_ASSOC_REQ\fP(7) primitive). The address in
+\fBAP_LCL_PADDR\fP is always used as the responding presentation address when
+sending an \fBA_ASSOC_RSP\fP(7) primitive. The XAP user may respond to an
+incoming \fBA_ASSOC_IND\fP(7) on an address other that the called presentation
+address by supplying a fully specified address in \fBAP_BIND_PADDR\fP and
+calling the
 .BR ap_bind (3)
-function, which in turn sets the value of AP_LCL_PADDR. It should be noted
-that new values may be specified for the Pselector and S-selector only. An
-attempt to specify values for the T-selector or NSAP that differ from those
-received in AP_LCL_PADDR results in the primitive being rejected by XAP with
-an error code of AP_ACCESS.
+function, which in turn sets the value of \fBAP_LCL_PADDR\fP. It should be
+noted that new values may be specified for the Pselector and S-selector only.
+An attempt to specify values for the T-selector or NSAP that differ from those
+received in \fBAP_LCL_PADDR\fP results in the primitive being rejected by XAP
+with an error code of [\fBAP_ACCESS\fP].
 .SS Memory Management Mechanisms
 .PP
 The service user may elect to handle all allocation and deallocation of memory
@@ -753,17 +756,17 @@ with a particular primitive in a singler
 call. If that is the case, the XAP Library must be informed that the primitive
 will be issued as a series of
 .BR ap_snd (3)
-calls. This is accomplished by setting the AP_MORE bit in the flags parameter
-of the
+calls. This is accomplished by setting the \fBAP_MORE\fP bit in the flags
+parameter of the
 .BR ap_snd (3)
 function. The user may continue sending data associated with the current
 primitive by repeatedly calling
 .BR ap_snd (3)
-with the AP_MORE bit set. The sptype argument must remain the same for each of
-these calls. When the last buffer of data associated with the primitive is
-sent,
+with the \fBAP_MORE\fP bit set. The sptype argument must remain the same for
+each of these calls. When the last buffer of data associated with the
+primitive is sent,
 .BR ap_snd (3)
-must be invoked with the AP_MORE bit reset.
+must be invoked with the \fBAP_MORE\fP bit reset.
 .PP
 The cdata argument also should not change when a sequence of
 .BR ap_snd (3)
@@ -774,8 +777,9 @@ call in such a sequence, no error is reported if its value is subsequently
 modified.
 .PP
 Primitives that are not associated with either an ACSE or Presentation Layer
-PDU (for example, P_DATA_REQ, P_SYNCMINOR_REQ, P_SYNCMINOR_RSP,
-P_TOKENGIVE_REQ, P_TOKENPLEASE_REQ, etc.) cannot be terminated by a final
+PDU (for example, \fBP_DATA_REQ\fP(7), \fBP_SYNCMINOR_REQ\fP(7),
+\fBP_SYNCMINOR_RSP\fP(7), \fBP_TOKENGIVE_REQ\fP(7),
+\fBP_TOKENPLEASE_REQ\fP(7), etc.) cannot be terminated by a final
 .BR ap_snd (3)
 invocation that does not carry any user data. Thus the final
 .BR ap_snd (3)
@@ -783,24 +787,24 @@ invocation always carries 1 or more octets of user data for these primitives.
 .PP
 If all data associated with the primitive is present on the
 .BR ap_snd (3)
-call, the function must be issued with the AP_MORE bit not set.
+call, the function must be issued with the \fBAP_MORE\fP bit not set.
 .PP
 In a similar fashion, if XAP elects to return data associated with a service
 primitive via multiple
 .BR ap_rcv (3)
-invocations, it sets the AP_MORE bit of the flags argument when
+invocations, it sets the \fBAP_MORE\fP bit of the flags argument when
 .BR ap_rcv (3)
 returns. The
 .BR ap_rcv (3)
-function returns with the AP_MORE bit reset when the received primitive is
+function returns with the \fBAP_MORE\fP bit reset when the received primitive is
 complete.  Note that it is possible that XAP may receive a zero-length final
 fragment.
 .PP
 It should be noted that the value of the sptype argument must be checked after
 each
 .BR ap_rcv (3)
-call.  This is because another primitive (for example, A_PABORT_IND) could
-arrive before all data associated with the first primitive is processed.
+call.  This is because another primitive (for example, \fBA_PABORT_IND\fP(7))
+could arrive before all data associated with the first primitive is processed.
 .\"
 .\"
 .SH EXAMPLES
@@ -1014,11 +1018,11 @@ primitives).
 .PP
 Note that, unlike other OSI-based application interfaces, the XAP
 .[
-xap
+xap c303
 .]
 does not require abstract data manipulation using the XOM
 .[
-xom
+xom osi
 .]
 model or interfaces.
 It is, therefore, fairly easy to implement the A- and P- primitives directly
@@ -1031,7 +1035,7 @@ interface is possible.  Because a Stream provides an XAP compatible service
 interface, does not mean that all classes services or primitives are supported.
 For example, it is possible to use XAP
 .[
-xap
+xap c303
 .]
 as an inteface for TCAP.
 .[
@@ -1044,7 +1048,7 @@ q771
 xns99
 .]
 .[
-xap
+xap c303
 .]
 .[
 xti/tli revision 1

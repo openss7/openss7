@@ -3227,6 +3227,93 @@ gdmo_fprintwrap(FILE *output, const char *str, int len, int width)
 	}
 }
 
+static void
+version(int argc, char *argv[])
+{
+	fprintf(stdout, "\
+%2$s\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under GPL Version 3, included here by reference.\n\
+See `%1$s --copying' for copying permissions.\n\
+", argv[0], ident);
+}
+static void
+usage(int argc, char *argv[])
+{
+	fprintf(stderr, "\
+Usage:\n\
+    %1$s [options] [{-f|--filename} FILENAME] [{-o|--output} OUTFILE]\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
+", argv[0]);
+}
+static void
+help(int argc, char *argv[])
+{
+	fprintf(stdout, "\
+Usage:\n\
+    %1$s [options] [{-f|--filename} FILENAME] [{-o|--output} OUTFILE]\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
+Options:\n\
+    -f, --filename FILENAME\n\
+        specify the input file (default is stdin)\n\
+    -o, --output OUTFILE\n\
+        specify the output file (default is stdout)\n\
+    -h, --help\n\
+        print this usage information and exit\n\
+    -V, --version\n\
+        print the version and exit\n\
+    -C, --copying\n\
+        print copying permissions and exit\n\
+", argv[0]);
+}
+static void
+copying(int argc, char *argv[])
+{
+	fprintf(stdout, "\
+--------------------------------------------------------------------------------\n\
+%1$s\n\
+--------------------------------------------------------------------------------\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+--------------------------------------------------------------------------------\n\
+This program is free software;  you can redistribute  it and/or modify  it under\n\
+the terms  of the GNU General Public License  as  published by the Free Software\n\
+Foundation; Version 3 of the License.\n\
+\n\
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
+\n\
+You should  have received a copy of the GNU  General  Public License  along with\n\
+this pgrogram.  If not, see <http://www.gnu.org/licenses/>, or write to the Free\n\
+Software Foundation, Inc., 675 Mass. Ave, Cambridge, MA 02139, USA.\n\
+--------------------------------------------------------------------------------\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
+the Software is supplied by the  Department of Defense (\"DoD\"), it is classified\n\
+as \"Commercial  Computer  Software\"  under  paragraph  252.227-7014  of the  DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the  license rights granted\n\
+herein (the license rights customarily provided to non-Government users). If the\n\
+Software is supplied to any unit or agency of the Government  other than DoD, it\n\
+is  classified as  \"Restricted Computer Software\" and the Government's rights in\n\
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition\n\
+Regulations (\"FAR\")  (or any successor regulations) ir, in the case of NASA, in\n\
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor\n\
+regulations).\n\
+--------------------------------------------------------------------------------\n\
+Commercial  licensing  and  support of this  software is  available from OpenSS7\n\
+Corporation at a fee.  See http://www.openss7.com/\n\
+--------------------------------------------------------------------------------\n\
+", ident);
+}
+
 /** @brief main
   * @param argc number of arguments.
   * @param argv the array of arguments.
@@ -3247,14 +3334,32 @@ main(int argc, char *argv[])
 			{"filename",	required_argument,	NULL,	'f'},
 			{"output",	required_argument,	NULL,	'o'},
 			{"debug",	no_argument,		NULL,	'D'},
+			{"help",	no_argument,		NULL,	'h'},
+			{"version",	no_argument,		NULL,	'V'},
+			{"copying",	no_argument,		NULL,	'C'},
 			{NULL,		0,			NULL,	 0 }
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, ":W:f:o:D", long_options, &option_index);
+		c = getopt_long(argc, argv, ":W:f:o:DhVC", long_options, &option_index);
 		if (c == -1)
 			break;
 		switch (c) {
+		case 'h':	/* -h, --help */
+			if (yydebug)
+				fprintf(stderr, "%s: printing help message", argv[0]);
+			help(argc, argv);
+			exit (0);
+		case 'V':	/* -V, --version */
+			if (yydebug)
+				fprintf(stderr, "%s: printing version message", argv[0]);
+			version(argc, argv);
+			exit (0);
+		case 'C':	/* -C, --copying */
+			if (yydebug)
+				fprintf(stderr, "%s: printing copying message", argv[0]);
+			copying(argc, argv);
+			exit (0);
 		case 'f':
 			if (optarg == NULL)
 				goto missing_arg;
@@ -3272,12 +3377,14 @@ main(int argc, char *argv[])
 		      missing_arg:
 			optind--;
 			fprintf(stderr, "%s: missing argument -- %s\n", argv[0], argv[optind]);
+			usage(argc, argv);
 			exit(2);
 		case '?':
 		default:
 		      syntax_error:
 			optind--;
 			fprintf(stderr, "%s: illegal syntax -- %s\n", argv[0], argv[optind]);
+			usage(argc, argv);
 			exit(2);
 		}
 	}

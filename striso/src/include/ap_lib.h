@@ -62,8 +62,33 @@
 
 /* This file can be processed with doxygen(1). */
 
+#include <sys/poll.h>
+
 /** @weakgroup apli OpenSS7 APLI Library
   * @{ */
+
+struct ap_pollfd {
+	int fd;				/* APLI instance identifier. */
+	short events;			/* Requested events. */
+	short revents;			/* Returnd events. */
+};
+
+typedef struct pollfd ap_pollfd_t;
+
+#define AP_POLLIN	POLLIN
+#define AP_POLLOUT	POLLOUT
+#define AP_POLLPRI	POLLPRI
+#define AP_POLLRDNORM	POLLRDNORM
+#define AP_POLLWRNORM	POLLWRNORM
+#define AP_POLLWRBAND	POLLWRBAND
+
+#define AP_POLLERR	POLLERR
+#define AP_POLLHUP	POLLHUP
+#define AP_POLLMSG	POLLMSG
+
+#define AP_POLLNVAL	POLLNVAL
+
+#define AP_INFTIM	(-1)
 
 /** @file
   * APLI (User) Header File. */

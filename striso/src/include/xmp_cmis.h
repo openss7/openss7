@@ -61,19 +61,17 @@
 #ident "@(#) $RCSfile: xmp_cmis.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
- * The <xmp_cmis.h> header declares the interface functions, the structures
- * passed to and from those functions, and the defined constants used by the
- * functions and structures.
+ * The <xmp_cmis.h> header declares the interface functions, the structures passed to and from those
+ * functions, and the defined constants used by the functions and structures.
  *
- * All application programs which include this header must first include the
- * OSI-Abstract-Data Manipulation header <xom.h>.
+ * All application programs which include this header must first include the OSI-Abstract-Data
+ * Manipulation header <xom.h>.
  */
 #include <xom.h>
 /*
- * All Object Identifiers are represented by constants defined in the headers.
- * These constants are used with the macros defined in the XOM API (see
- * reference XOM). A constant is defined to represent the Object Identifier of
- * the CMIS Management Service package:
+ * All Object Identifiers are represented by constants defined in the headers.  These constants are
+ * used with the macros defined in the XOM API (see reference XOM). A constant is defined to
+ * represent the Object Identifier of the CMIS Management Service package:
  */
 #define OMP_O_MP_CMIS_PKG "\x2a\x86\x3a\x00\x88\x1a\x06\x02"
 
@@ -83,79 +81,77 @@
 
 /* OM class names (prefixed MP_C_) */
 /* 
- * Every application program which makes use of a class or other Object
- * Identifier must explicitly import it into every compilation unit (C source
- * program) which uses it. Each such class or Object Identifier name must be
- * explicitly exported from just one compilation unit.
+ * Every application program which makes use of a class or other Object Identifier must explicitly
+ * import it into every compilation unit (C source program) which uses it. Each such class or Object
+ * Identifier name must be explicitly exported from just one compilation unit.
  * 
- * In the header file, OM class constants are prefixed with the OPM_O prefix to
- * denote that they are OM classes. However, when using the OM_IMPORT and
- * OM_EXPORT macros, the base names (without the OMP_O prefix) should be used.
- * For example:
+ * In the header file, OM class constants are prefixed with the OPM_O prefix to denote that they are
+ * OM classes. However, when using the OM_IMPORT and OM_EXPORT macros, the base names (without the
+ * OMP_O prefix) should be used.  For example:
  *
  * OM_IMPORT(MP_C_EVENT_REPLY)
  */
-#define OMP_O_MP_C_ACTION_ERROR			mpP_cmis(\x8F\x51)
-#define OMP_O_MP_C_ACTION_ERROR_INFO		mpP_cmis(\x8F\x52)
-#define OMP_O_MP_C_ACTION_INFO			mpP_cmis(\x8F\x53)
-#define OMP_O_MP_C_ACTION_REPLY			mpP_cmis(\x8F\x54)
-#define OMP_O_MP_C_ACTION_TYPE_ID		mpP_cmis(\x8F\x55)
-#define OMP_O_MP_C_ATTRIBUTE			mpP_cmis(\x8F\x56)
-#define OMP_O_MP_C_ATTRIBUTE_ERROR		mpP_cmis(\x8F\x57)
-#define OMP_O_MP_C_ATTRIBUTE_ID			mpP_cmis(\x8F\x58)
-#define OMP_O_MP_C_ATTRIBUTE_ID_ERROR		mpP_cmis(\x8F\x59)
-#define OMP_O_MP_C_ATTRIBUTE_ID_LIST		mpP_cmis(\x8F\x5A)
-#define OMP_O_MP_C_BASE_MANAGED_OBJECT_ID	mpP_cmis(\x8F\x5B)
-#define OMP_O_MP_C_CMIS_ACTION_ARGUMENT		mpP_cmis(\x8F\x5C)
-#define OMP_O_MP_C_CMIS_ACTION_RESULT		mpP_cmis(\x8F\x5D)
-#define OMP_O_MP_C_CMIS_CANCEL_GET_ARGUMENT	mpP_cmis(\x8F\x5E)
-#define OMP_O_MP_C_CMIS_CREATE_ARGUMENT		mpP_cmis(\x8F\x5F)
-#define OMP_O_MP_C_CMIS_CREATE_RESULT		mpP_cmis(\x8F\x60)
-#define OMP_O_MP_C_CMIS_DELETE_ARGUMENT		mpP_cmis(\x8F\x61)
-#define OMP_O_MP_C_CMIS_DELETE_RESULT		mpP_cmis(\x8F\x62)
-#define OMP_O_MP_C_CMIS_EVENT_REPORT_ARGUMENT	mpP_cmis(\x8F\x63)
-#define OMP_O_MP_C_CMIS_EVENT_REPORT_RESULT	mpP_cmis(\x8F\x64)
-#define OMP_O_MP_C_CMIS_FILTER			mpP_cmis(\x8F\x65)
-#define OMP_O_MP_C_CMIS_GET_ARGUMENT		mpP_cmis(\x8F\x66)
-#define OMP_O_MP_C_CMIS_GET_LIST_ERROR		mpP_cmis(\x8F\x67)
-#define OMP_O_MP_C_CMIS_GET_RESULT		mpP_cmis(\x8F\x68)
-#define OMP_O_MP_C_CMIS_LINKED_REPLY_ARGUMENT	mpP_cmis(\x8F\x69)
-#define OMP_O_MP_C_CMIS_SERVICE_ERROR		mpP_cmis(\x8F\x6A)
-#define OMP_O_MP_C_CMIS_SERVICE_REJECT		mpP_cmis(\x8F\x6B)
-#define OMP_O_MP_C_CMIS_SET_ARGUMENT		mpP_cmis(\x8F\x6C)
-#define OMP_O_MP_C_CMIS_SET_LIST_ERROR		mpP_cmis(\x8F\x6D)
-#define OMP_O_MP_C_CMIS_SET_RESULT		mpP_cmis(\x8F\x6E)
-#define OMP_O_MP_C_COMPLEXITY_LIMITATION	mpP_cmis(\x8F\x6F)
-#define OMP_O_MP_C_CREATE_OBJECT_INSTANCE	mpP_cmis(\x8F\x70)
-#define OMP_O_MP_C_DELETE_ERROR			mpP_cmis(\x8F\x71)
-#define OMP_O_MP_C_ERROR_INFO			mpP_cmis(\x8F\x72)
-#define OMP_O_MP_C_EVENT_INFO			mpP_cmis(\x8F\x73)
-#define OMP_O_MP_C_EVENT_REPLY			mpP_cmis(\x8F\x74)
-#define OMP_O_MP_C_EVENT_TYPE_ID		mpP_cmis(\x8F\x75)
-#define OMP_O_MP_C_FILTER_ITEM			mpP_cmis(\x8F\x76)
-#define OMP_O_MP_C_GET_INFO_STATUS		mpP_cmis(\x8F\x77)
-#define OMP_O_MP_C_INVALID_ARGUMENT_VALUE	mpP_cmis(\x8F\x78)
-#define OMP_O_MP_C_MISSING_ATTRIBUTE_VALUE	mpP_cmis(\x8F\x79)
-#define OMP_O_MP_C_MODIFICATION			mpP_cmis(\x8F\x7A)
-#define OMP_O_MP_C_MODIFICATION_LIST		mpP_cmis(\x8F\x7B)
-#define OMP_O_MP_C_MULTIPLE_REPLY		mpP_cmis(\x8F\x7C)
-#define OMP_O_MP_C_NO_SUCH_ACTION		mpP_cmis(\x8F\x7D)
-#define OMP_O_MP_C_NO_SUCH_ACTION_ID		mpP_cmis(\x8F\x7E)
-#define OMP_O_MP_C_NO_SUCH_ARGUMENT		mpP_cmis(\x8F\x7F)
-#define OMP_O_MP_C_NO_SUCH_EVENT_ID		mpP_cmis(\x90\x00)
-#define OMP_O_MP_C_NO_SUCH_EVENT_TYPE		mpP_cmis(\x90\x01)
-#define OMP_O_MP_C_OBJECT_CLASS			mpP_cmis(\x90\x02)
-#define OMP_O_MP_C_OBJECT_INSTANCE		mpP_cmis(\x90\x03)
-#define OMP_O_MP_C_PROCESSING_FAILURE		mpP_cmis(\x90\x04)
-#define OMP_O_MP_C_SCOPE			mpP_cmis(\x90\x05)
-#define OMP_O_MP_C_SET_INFO_STATUS		mpP_cmis(\x90\x06)
-#define OMP_O_MP_C_SETOF_ATTRIBUTE		mpP_cmis(\x90\x07)
-#define OMP_O_MP_C_SETOF_CMIS_FILTER		mpP_cmis(\x90\x08)
-#define OMP_O_MP_C_SETOF_GET_INFO_STATUS	mpP_cmis(\x90\x09)
-#define OMP_O_MP_C_SETOF_SET_INFO_STATUS	mpP_cmis(\x90\x0A)
-#define OMP_O_MP_C_SPECIFIC_ERROR_INFO		mpP_cmis(\x90\x0B)
-#define OMP_O_MP_C_SUBSTRING			mpP_cmis(\x90\x0C)
-#define OMP_O_MP_C_SUBSTRINGS			mpP_cmis(\x90\x0D)
+#define OMP_O_MP_C_ACTION_ERROR			mpP_cmis(\x8F\x51)  /* 2001 */
+#define OMP_O_MP_C_ACTION_ERROR_INFO		mpP_cmis(\x8F\x52)  /* 2002 */
+#define OMP_O_MP_C_ACTION_INFO			mpP_cmis(\x8F\x53)  /* 2003 */
+#define OMP_O_MP_C_ACTION_REPLY			mpP_cmis(\x8F\x54)  /* 2004 */
+#define OMP_O_MP_C_ACTION_TYPE_ID		mpP_cmis(\x8F\x55)  /* 2005 */
+#define OMP_O_MP_C_ATTRIBUTE			mpP_cmis(\x8F\x56)  /* 2006 */
+#define OMP_O_MP_C_ATTRIBUTE_ERROR		mpP_cmis(\x8F\x57)  /* 2007 */
+#define OMP_O_MP_C_ATTRIBUTE_ID			mpP_cmis(\x8F\x58)  /* 2008 */
+#define OMP_O_MP_C_ATTRIBUTE_ID_ERROR		mpP_cmis(\x8F\x59)  /* 2009 */
+#define OMP_O_MP_C_ATTRIBUTE_ID_LIST		mpP_cmis(\x8F\x5A)  /* 2010 */
+#define OMP_O_MP_C_BASE_MANAGED_OBJECT_ID	mpP_cmis(\x8F\x5B)  /* 2011 */
+#define OMP_O_MP_C_CMIS_ACTION_ARGUMENT		mpP_cmis(\x8F\x5C)  /* 2012 */
+#define OMP_O_MP_C_CMIS_ACTION_RESULT		mpP_cmis(\x8F\x5D)  /* 2013 */
+#define OMP_O_MP_C_CMIS_CANCEL_GET_ARGUMENT	mpP_cmis(\x8F\x5E)  /* 2014 */
+#define OMP_O_MP_C_CMIS_CREATE_ARGUMENT		mpP_cmis(\x8F\x5F)  /* 2015 */
+#define OMP_O_MP_C_CMIS_CREATE_RESULT		mpP_cmis(\x8F\x60)  /* 2016 */
+#define OMP_O_MP_C_CMIS_DELETE_ARGUMENT		mpP_cmis(\x8F\x61)  /* 2017 */
+#define OMP_O_MP_C_CMIS_DELETE_RESULT		mpP_cmis(\x8F\x62)  /* 2018 */
+#define OMP_O_MP_C_CMIS_EVENT_REPORT_ARGUMENT	mpP_cmis(\x8F\x63)  /* 2019 */
+#define OMP_O_MP_C_CMIS_EVENT_REPORT_RESULT	mpP_cmis(\x8F\x64)  /* 2020 */
+#define OMP_O_MP_C_CMIS_FILTER			mpP_cmis(\x8F\x65)  /* 2021 */
+#define OMP_O_MP_C_CMIS_GET_ARGUMENT		mpP_cmis(\x8F\x66)  /* 2022 */
+#define OMP_O_MP_C_CMIS_GET_LIST_ERROR		mpP_cmis(\x8F\x67)  /* 2023 */
+#define OMP_O_MP_C_CMIS_GET_RESULT		mpP_cmis(\x8F\x68)  /* 2024 */
+#define OMP_O_MP_C_CMIS_LINKED_REPLY_ARGUMENT	mpP_cmis(\x8F\x69)  /* 2025 */
+#define OMP_O_MP_C_CMIS_SERVICE_ERROR		mpP_cmis(\x8F\x6A)  /* 2026 */
+#define OMP_O_MP_C_CMIS_SERVICE_REJECT		mpP_cmis(\x8F\x6B)  /* 2027 */
+#define OMP_O_MP_C_CMIS_SET_ARGUMENT		mpP_cmis(\x8F\x6C)  /* 2028 */
+#define OMP_O_MP_C_CMIS_SET_LIST_ERROR		mpP_cmis(\x8F\x6D)  /* 2029 */
+#define OMP_O_MP_C_CMIS_SET_RESULT		mpP_cmis(\x8F\x6E)  /* 2030 */
+#define OMP_O_MP_C_COMPLEXITY_LIMITATION	mpP_cmis(\x8F\x6F)  /* 2031 */
+#define OMP_O_MP_C_CREATE_OBJECT_INSTANCE	mpP_cmis(\x8F\x70)  /* 2032 */
+#define OMP_O_MP_C_DELETE_ERROR			mpP_cmis(\x8F\x71)  /* 2033 */
+#define OMP_O_MP_C_ERROR_INFO			mpP_cmis(\x8F\x72)  /* 2034 */
+#define OMP_O_MP_C_EVENT_INFO			mpP_cmis(\x8F\x73)  /* 2035 */
+#define OMP_O_MP_C_EVENT_REPLY			mpP_cmis(\x8F\x74)  /* 2036 */
+#define OMP_O_MP_C_EVENT_TYPE_ID		mpP_cmis(\x8F\x75)  /* 2037 */
+#define OMP_O_MP_C_FILTER_ITEM			mpP_cmis(\x8F\x76)  /* 2038 */
+#define OMP_O_MP_C_GET_INFO_STATUS		mpP_cmis(\x8F\x77)  /* 2039 */
+#define OMP_O_MP_C_INVALID_ARGUMENT_VALUE	mpP_cmis(\x8F\x78)  /* 2040 */
+#define OMP_O_MP_C_MISSING_ATTRIBUTE_VALUE	mpP_cmis(\x8F\x79)  /* 2041 */
+#define OMP_O_MP_C_MODIFICATION			mpP_cmis(\x8F\x7A)  /* 2042 */
+#define OMP_O_MP_C_MODIFICATION_LIST		mpP_cmis(\x8F\x7B)  /* 2043 */
+#define OMP_O_MP_C_MULTIPLE_REPLY		mpP_cmis(\x8F\x7C)  /* 2044 */
+#define OMP_O_MP_C_NO_SUCH_ACTION		mpP_cmis(\x8F\x7D)  /* 2045 */
+#define OMP_O_MP_C_NO_SUCH_ACTION_ID		mpP_cmis(\x8F\x7E)  /* 2046 */
+#define OMP_O_MP_C_NO_SUCH_ARGUMENT		mpP_cmis(\x8F\x7F)  /* 2047 */
+#define OMP_O_MP_C_NO_SUCH_EVENT_ID		mpP_cmis(\x90\x00)  /* 2048 */
+#define OMP_O_MP_C_NO_SUCH_EVENT_TYPE		mpP_cmis(\x90\x01)  /* 2049 */
+#define OMP_O_MP_C_OBJECT_CLASS			mpP_cmis(\x90\x02)  /* 2050 */
+#define OMP_O_MP_C_OBJECT_INSTANCE		mpP_cmis(\x90\x03)  /* 2051 */
+#define OMP_O_MP_C_PROCESSING_FAILURE		mpP_cmis(\x90\x04)  /* 2052 */
+#define OMP_O_MP_C_SCOPE			mpP_cmis(\x90\x05)  /* 2053 */
+#define OMP_O_MP_C_SET_INFO_STATUS		mpP_cmis(\x90\x06)  /* 2054 */
+#define OMP_O_MP_C_SETOF_ATTRIBUTE		mpP_cmis(\x90\x07)  /* 2055 */
+#define OMP_O_MP_C_SETOF_CMIS_FILTER		mpP_cmis(\x90\x08)  /* 2056 */
+#define OMP_O_MP_C_SETOF_GET_INFO_STATUS	mpP_cmis(\x90\x09)  /* 2057 */
+#define OMP_O_MP_C_SETOF_SET_INFO_STATUS	mpP_cmis(\x90\x0A)  /* 2058 */
+#define OMP_O_MP_C_SPECIFIC_ERROR_INFO		mpP_cmis(\x90\x0B)  /* 2059 */
+#define OMP_O_MP_C_SUBSTRING			mpP_cmis(\x90\x0C)  /* 2060 */
+#define OMP_O_MP_C_SUBSTRINGS			mpP_cmis(\x90\x0D)  /* 2061 */
 
 /* The OM attribute names which are defined are listed below. */
 

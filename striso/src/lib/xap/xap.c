@@ -592,6 +592,9 @@ __asm__(".symver __xap_ap_open,ap_open@@XAP_1.0");
 int
 __xap_ap_poll(ap_pollfd_t fds[], int nfds, int timeout, unsigned long *aperrno_p)
 {
+	struct pollfd *pfds = (struct pollfd *)fds;
+
+	return poll(pfds, nfds, timeout);
 }
 
 /** @fn int ap_poll(ap_pollfd_t fds[], int nfds, int timeout, unsigned long *aperrno_p)

@@ -156,7 +156,7 @@ has no known bugs.
 .BR ap_close ()
 is compatible with XAP.
 .[
-xap
+xap c303
 .]
 .\"
 .\"
@@ -164,7 +164,7 @@ xap
 .PP
 XAP.
 .[
-xap
+xap c303
 .]
 .\"
 .\"
@@ -173,13 +173,13 @@ xap
 .BR ap_close ()
 first appeared in XAP.
 .[
-xap
+xap c303
 .]
 .\"
 .\"
 .SH VERSIONS
 .PP
-This manpage was written for the OpenSS7 XAP Library.
+This manual page was written for the OpenSS7 XAP Library.
 .\"
 .\"
 .[

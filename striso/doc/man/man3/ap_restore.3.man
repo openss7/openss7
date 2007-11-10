@@ -1,0 +1,487 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ap_xxx.3.man,v 0.9.2.1 2007/09/29 14:08:31 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:08:31 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_xxx.3.man,v $
+.\" Revision 0.9.2.1  2007/09/29 14:08:31  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 32
+search-ignore XYZ
+.R2
+.so striso.macros
+.TH AP_RESTORE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 XAP Library Calls"
+.SH NAME
+.B ap_restore
+\- restore an XAP instance.
+.\"
+.\"
+.SH INTERFACE
+.PP
+XAP,
+.[
+xap c303
+.]
+XAP-ROSE.
+.[
+xap-rose
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <stdio.h>
+.br
+.B #include <xap.h>
+.HP
+.B typedef int (*ap_alloc_t) (int, ap_osi_vbuf_t **, void **, int, int, unsigned long *);
+.HP
+.B typedef int (*ap_dealloc_t) (int, ap_osi_vbuf_t *, void *, int, unsigned long *);
+.HP
+.BR "int " ap_restore(
+.PD 0
+.RS
+.HP
+.BI "int " fd ,
+.HP
+.BI "FILE *" savef ,
+.HP
+.BI "int " oflags ,
+.HP
+.BI "ap_alloc_t " ap_user_alloc ,
+.HP
+.BI "ap_dealloc_t " ap_user_dealloc ,
+.HP
+.BI "unsigned long *" aperrno_p
+.RE
+.PD
+.HP
+.RB );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I fd
+a file descriptor associated with an XAP instance, compatible communications endpoint or XAP service provider.
+.TP
+.I savef
+a file pointer to an open file from which to restore the environment.
+.TP
+.I oflags
+flags for the restoration.  This may contain the flag
+.BR AP_BUFFERS_ONLY .
+.TP
+.I ap_user_alloc
+provides a function pointer to a user-supplied allocation function, or
+.BR NULL .
+.TP
+.I ap_user_dalloc
+provides a function pointer to a user-supplied deallocation function, or
+.BR NULL .
+.TP
+.I aperrno_p
+provides a pointer to an extent into which to provide an error.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR ap_restore ()
+is used in conjunction with
+.BR ap_save (3).
+It provides a way for cooperating processes to share a single instance of XAP.
+The
+.BR ap_restore ()
+function recreates the XAP instance that was saved to the file associated with the file pointer,
+.IR savef ,
+in the calling process address space.
+.PP
+Used with a
+.B NULL
+.I savef
+argument, this function provides a means for applications which are invoked by an \*(lqAssociation Listener,\*(rq see
+.BR XAP (3),
+to:
+.IP \(bu \w'\(bu\(em'u
+establish an XAP environment.
+.IP \(bu
+restore the XAP instance state to
+.BR AP_IDLE .
+.IP \(bu
+set the local presentation address from information held within the communications provider.
+.PP
+The restored XAP instance will be supported by the communication endpoint identified by
+.IR fd .
+This must be the same communication endpoint that supported this instance of XAP when it was saved or transferred by
+an \*(lqAssociation Listener\*(rq.  As the service provider cannot detect whether or not a restore has been performed
+to the same communication endpoint, the behaviour of the service provider in this case is not specified.
+.PP
+.I fd
+will be used to identify the restored instance of XAP in subsequent invocation of XAP functions.  If the
+communications endpoint identified by the file descriptor,
+.IR fd ,
+currently supports an XAP instance, the instance is released prior to being recreated using the snapshot saved in the
+file associated with file pointer,
+.IR savef ,
+along with user allocation and deallocation routines passed in the
+.IR ap_user_alloc "() and " ap_user_dealloc ()
+arguments.
+.PP
+The file pointer,
+.IR savef ,
+must have been opened for reading.  The
+.BR ap_restore ()
+function begins reading from the current position in the file and does not close the file pointer,
+.IR savef ,
+when it finishes.
+.PP
+The flags argument,
+.IR oflags ,
+may be used to control aspects of buffer allocation.  The user may choose to supply allocation and deallocation
+routines for receive buffers while allowing XAP to handle allocation of memory for values of environment attributes.
+This is indicated by setting the
+.B AP_BUFFERS_ONLY
+flag in the flags argument,
+.IR oflags .
+.\"
+.\"
+.SS Buffer Allocation
+.PP
+The
+.IR ap_user_alloc ()
+argument is a pointer to a user-supplied memory allocation function.  The synopsis for a user-supplied memory
+allocation function is:
+.sp
+.nf
+\fC\s-2\
+int ap_user_alloc(
+    int fd,
+    ap_osi_vbuf_t **buf,
+    void **mem,
+    int size,
+    int type,
+    unsigned long *aperrno_p);
+\s+2\fP
+.fi
+.PP
+This function is used by the XAP instance identified by
+.I fd
+to allocate either memory or buffer space.  The
+.I type
+field takes the values
+.BR AP_BUFFERS " or " AP_MEMORY .
+When
+.B AP_BUFFERS
+is specified, a linked set of
+.B ap_osi_vbuf_t
+structures are returned in
+.IR buf ,
+and
+.I size
+indicates the number of octets of space requested.  Notice that
+.I mem
+is not used in this case, and that a user allocation routine may return less or more space than requested.  When
+.B AP_MEMORY
+is specified, a block of memory is returned in
+.IR mem ,
+and
+.I size
+indicates the number of octets of space requested.  Notice that
+.I buf
+is not used in this case.  Upon successful completion, a value of zero (0) is returned.  Otherwise, a value of minus
+one (-1) is returned and the location pointed to by
+.I aperrno_p
+is set to indicate the error.
+.PP
+The
+.IR ap_user_dealloc ()
+argument is a pointer to a user-supplied memory deallocation function.  The synopsis for a user-supplied memory
+deallocation function is:
+.sp
+.nf
+\fC\s-2\
+int ap_user_dealloc(
+    int fd,
+    ap_osi_vbuf_t *buf,
+    void *mem,
+    int type,
+    unsigned long *aperrno_p);
+\s+2\fP
+.fi
+.PP
+This function is used by the XAP instance identified by the file descriptor,
+.IR fd ,
+to deallocated either the memory or buffers that it allocated.  The
+.I type
+field takes the values
+.BR AP_BUFFERS " or " AP_MEMORY .
+WHen
+.B AP_BUFFERS
+is specified, all buffers in the chain pointed to by
+.I buf
+are freed.  Note that
+.I mem
+is not used in this case.  When
+.B AP_MEMORY
+is specified, the memory pointed to by
+.I mem
+is freed.  Note that
+.I buf
+is not used in this case.  Upon successful completion, a value of zero (0) is returned.  Otherwise, a value of minus
+one (-1) is returned an the location pointed to by
+.I aperrno_p
+is set to indicated the error.
+.PP
+.B Note:
+If the
+.I ap_user_alloc
+and
+.I ap_user_dealloc
+argument combination is invalid, minus one (-1) is returned and the location pointed to by
+.I aperrno_p
+is set to the
+.RB [ AP_BADALLOC ]
+error code; any existing XAP instance remains unchanged.
+.PP
+The user allocation and deallocation routine parameters
+.RI ( ap_user_alloc "() and " ap_user_dealloc ())
+must either both be
+.RB non- NULL
+or
+.BR NULL .
+If they are both
+.BR NULL ,
+XAP will use built-in functions to allocate and deallocate memory from the user memory space.  The user supplied or
+built-in allocation routines are called by XAP to obtain or return memory for environment attributes.
+.PP
+.B Note:
+XAP users are advised that allowing
+.IR ap_user_alloc ()
+to default to the XAP-supplied memory allocation mechanism means that the application is unable to apply flow control.
+In this case, special attention must be paid to the handling of unlimited user data on inbound events.
+.PP
+Coordination between several cooperating processes sharing the same XAP instance can be achieved by using the file
+permission and file and record locking capabilities of the operating system to control access to the save file
+associated with argument,
+.IR savef .
+.PP
+It should be noted that the
+.BR ap_restore ()
+function does not provide a way to \*(lqroll-back\*(rq the state of the service provider.  Events that were processed
+after an XAP instance was saved cannot be recovered by restoring the isntance to its state before the messages were
+consumed.
+.PP
+.I aperrno_p
+must be set to point to a location that will be used to carry an error code back to the user.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion, a value of zero
+.RB ( 0 )
+is returned. Otherwise, a value of
+minus one
+.RB ( -1 )
+is returned and the location pointed to by
+.I aperrno_p
+is set to indicate the error.
+.\"
+.\"
+.SH ERRORS
+.TP
+.RB [ AP_BADALLOC ]
+The
+.IR ap_user_alloc "() and " ap_user_dealloc ()
+argument combination was invalid.
+.TP
+.RB [ AP_BADF ]
+The file descriptor,
+.IR fd ,
+does not identify an XAP instance.
+.TP
+.RB [ AP_BADPARSE ]
+XAP was unable to read the contents of the environment from
+.IR savef .
+.TP
+.RB [ AP_BADRESTR ]
+The environment cannot be restored because the current environment is being used to send/receive data (i.e., utilizing
+the
+.B AP_MORE
+bit).
+.TP
+.RB [ AP_BADSAVEF ]
+The argument,
+.IR savef ,
+is
+.BR NULL ,
+or was opened improperly.
+.TP
+.RB [ AP_NOT_SUPPORTED ]
+The
+.BR ap_restore ()
+operation is not supported by this implementation of XAP.
+.PP
+Also, operating system class errors are reported.
+.\"
+.\"
+.SH NOTICES
+.PP
+The behaviour of an XAP instance that has been restored in an improper manner is undefined by the standard.  This
+includes all cases in which there has been any intervening operation on the supporting communication endpoint between
+the time the instance was saved and the time it was restored.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+There are several ways to implement the XAP library to make these functions unnecessary and that is the approach
+taken by the OpenSS7 APLI library which lacks these functions.  The approaches are as follows:
+.IP 1. \w'0.\(em'u
+Save the XAP environment associated with
+.I fd
+in the service provider (i.e. within the kernel driver) and translate ap_get_env() and ap_set_env() calls into
+input-output controls that affect the environment associated with the file descriptor.  In this case, forking a child
+with an open file descriptor automatically transfers the environment and ap_restore() with a NULL savef argument is a
+noop.
+.IP 2.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ap_save (3),
+.BR ap_init_env (3),
+.BR XAP (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR ap_restore ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ap_restore ()
+is compatible with XAP,
+.[
+xap c303
+.]
+and implementations based on XAP such as
+.IR Solaris \(rg,
+.IR HP-UX \(rg,
+and
+.IR OSF/1 \(rg,
+with the folowing compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See also
+.BR XAP (3)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XNS,
+.[
+xns 5.2
+.]
+XAP,
+.[
+xap c303
+.]
+XAP-ROSE.
+.[
+xap-rose
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_restore ()
+first appeared in XAP.
+.[
+xap c303
+.]
+The SVR 4.2 APLI library does not support this function directly, but, rather, may use the
+.BR apli_init_env (3)
+function instead.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XAP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

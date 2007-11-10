@@ -72,7 +72,7 @@ __BEGIN_DECLS
 extern int getmyclnsnsap(int nsap_maxlen, char *nsap);
 extern int getmyconsnsap(int nsap_maxlen, char *nsap);
 extern int getnamebynsap(int hostname_maxlen, char *hostname, char *nsap);
-extern int getnsapbynam(int nsap_maxlen, char *hostname, char *nsap);
+extern int getnsapbyname(int nsap_maxlen, char *hostname, char *nsap);
 extern int gettselbyname(int tsel_maxlen, char *name, char *tsel);
 extern int nsap2net(int net_len, char *net, char *nsap);
 extern int tsap2net(int net_len, char *net, char *nsap, char *tsel);

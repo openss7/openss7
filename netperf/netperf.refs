@@ -5494,6 +5494,20 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2078.txt
 
+%K AgentX
+%L RFC2741
+%R RFC 2741
+%A M. Daniele
+%A B. Wijnen
+%E M. Ellison
+%E D. Francisco
+%D January 2000
+%T Agent Extensibility (AgentX) Protocol, Version 1
+%O (Obsoletes RFC 2257)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2741.txt
+
 %K GSSAPI
 %K rfc2743
 %L RFC2743
@@ -6196,6 +6210,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1901.txt
 
 %L RFC1902
 %R RFC 1902
@@ -6208,6 +6223,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1902.txt
 
 %L RFC1903
 %R RFC 1903
@@ -6220,6 +6236,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1903.txt
 
 %L RFC1904
 %R RFC 1904
@@ -6232,6 +6249,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1904.txt
 
 %L RFC1905
 %R RFC 1905
@@ -6244,6 +6262,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1905.txt
 
 %L RFC1906
 %R RFC 1906
@@ -6256,6 +6275,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1906.txt
 
 %L RFC2271
 %R RFC 2271
@@ -6267,6 +6287,7 @@ Part 1: Protocol Specification
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2271.txt
 
 %L RFC2272
 %R RFC 2272
@@ -6279,6 +6300,7 @@ Part 1: Protocol Specification
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2272.txt
 
 %L RFC2273
 %R RFC 2273
@@ -6290,6 +6312,7 @@ Part 1: Protocol Specification
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2273.txt
 
 %L RFC2275
 %R RFC 2275
@@ -6301,6 +6324,7 @@ Part 1: Protocol Specification
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2275.txt
 
 %L RFC2575
 %R RFC 2575
@@ -6312,6 +6336,7 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2575.txt
 
 %L RFC2574
 %R RFC 2574
@@ -6322,6 +6347,7 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2574.txt
 
 %L RFC2578
 %R RFC 2578
@@ -6333,6 +6359,8 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%O (Also STD 58)
+%U http://www.ietf.org/rfc/rfc2578.txt
 
 %L RFC2579
 %R RFC 2579
@@ -6344,6 +6372,8 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%O (Also STD 58)
+%U http://www.ietf.org/rfc/rfc2579.txt
 
 %L RFC2580
 %R RFC 2580
@@ -6355,6 +6385,8 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%O (Also STD 58)
+%U http://www.ietf.org/rfc/rfc2580.txt
 
 %L RFC3410
 %R RFC 3410
@@ -6367,6 +6399,7 @@ Part 1: Protocol Specification
 %D December 2002
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc3410.txt
 
 %K rfc3064
 %L RFC3064
