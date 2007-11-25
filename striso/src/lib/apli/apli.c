@@ -1702,8 +1702,11 @@ int
 __apli_ap_poll(struct ap_pollfd *fds, int nfds, int timeout)
 {
 	struct pollfd *_fds = (struct pollfd *) fds;
+	int err;
 
-	return poll(fds, nfds, timeout);
+	if ((err = poll(fds, nfds, timeout)) == -1)
+		aperrno = AP_INTERNAL;
+	return (err);
 }
 
 /** @fn int ap_poll(struct ap_pollfd *fds, int nfds, int timeout)
@@ -2013,6 +2016,14 @@ __asm__(".symver __apli_ap_error,ap_error@@APLI_1.0");
 static int
 _apli_ap_close(struct _ap_user *user, int fd)
 {
+	int err;
+	if ((err = close(fd)) != 0) {
+		if (errno == EBADF)
+			aperrno = AP_BADF;
+		else
+			aperrno = AP_INTERNAL;
+	}
+	return (err);
 }
 
 /** @brief close an APLI instance.

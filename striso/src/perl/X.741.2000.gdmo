@@ -4,11 +4,12 @@
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Wed Sep 12 10:57:58 MDT 2007
+--@@ Date: Wed Nov 21 11:11:43 MST 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.740.gdmo" >--
---< GDMO.Document "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" { joint-iso-ccitt(2) ms(9) function(2) part9(9) } >--
+--< GDMO.Document "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995"
+--  { joint-iso-ccitt(2) ms(9) function(2) part9(9) } >--
 --< GDMO.Namespace itut_x741 >--
 --< GDMO.Alias "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" "X.741",
 --  "ITU-T Rec. X.741 (1995)/Cor.2 (1998) | ISO/IEC 10164-9 : 1995/Cor.2 : 1999",
@@ -1231,7 +1232,8 @@ validAccessAttempts ATTRIBUTE
 REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) validAccessAttempts(29) };
 
 END
---< GDMO.EndDocument "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" { joint-iso-ccitt(2) ms(9) function(2) part9(9) } >--
+--< GDMO.EndDocument "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995"
+--  { joint-iso-ccitt(2) ms(9) function(2) part9(9) } >--
 --@@ 
 --@@ end of gdmos
 --@@ 

@@ -88,14 +88,21 @@ search-ignore XYZ
 .\"
 .SH INTERFACE
 .PP
-XAP,
+ACSE/Presentation Library Interface,
+APLI,
+.[
+APLI UNIX International
+.]
+XAP.
 .[
 xap c303
 .]
-XAP-ROSE.
-.[
-xap-rose
-.]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libapli (3),
+.BR libxap (3).
 .\"
 .\"
 .SH SYNOPSIS

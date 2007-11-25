@@ -1,1 +1,815 @@
-.so man4/dl.4.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.TH LAPB 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.SH ADDRESS
+.PP
+The LAPB DLSAP is contained in the following structure:
+.PP
+.nf
+\fC\s-1\
+struct pstnformat {
+    uint8 pstn_len;     /* Address length in octets */
+    uint8 pstn_add[20]; /* LAPB Address, binary format. */
+};
+\s+1\fP
+.fi
+.PP
+Where
+.TP
+.I pstn_len
+The length of the address contained in the \fIpstn_add\fP field in octets.
+.TP
+.I psnt_add
+The LSAP in binary format.  This can be up to 20 octets long.
+.PP
+On Sun systems this structure is contained in the
+.B /usr/include/netx25/sdlpi.h
+header file.
+.\"
+.\"
+.SH QUALITY OF SERVICE
+.PP
+Quality of service options are not used.  On primitives issued by the DL-User,
+\fIdl_qos_length\fP and \fIdl_qos_offset\fP are ignored by the DL-Provider.
+On primitives issued by the DL-provider, \fIdl_qos_length\fP and
+\fIdl_qos_offset\fP are set to zero.
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+.SS DL_ATTACH_REQ\fR(7)\fP
+.PP
+The \fIdl_ppa\fP field of the primitive contains the device interface identifier.  This is either a
+Linux device ID that can be obtained using Linux Fast-STREAMS specific input-output controls to
+translate a device name (such as \*(lqwan0\*(rq) to an interface identifier, or it is a Linux
+Fast-STREAMS PPA address that was assigned to a device which was linked under the multiplexing
+driver at configuration time and assigned a PPA at that time.
+.\"
+.SS DL_DETACH_REQ\fR(7)\fP
+.PP
+No changes.  See \fBDL_DETACH_REQ\fP(7).
+.\"
+.SS DL_BIND_REQ\fR(7)\fP
+.PP
+The \fIdl_service_mode\fP filed in the primitive can be \fBDL_CODLS\fP.  Any other value produces an
+error.
+.PP
+The SSAP. For LAPB this is set to zero (0).
+.\"
+.SS DL_BIND_ACK\fR(7)\fP
+.PP
+The \fIdl_addr_length\fP field of the primitive will be set to 0.  Point to point links do no have a
+SNPA address.  The \fIdl_sap\fP field will return zero 0.
+.\"
+.SS DL_UNBIND_REQ\fR(7)\fP
+.PP
+No changes, see \fBDL_UNBIND_REQ\fP(7).
+.\"
+.SS DL_CONNECT_REQ\fR(7)\fP
+.PP
+The \fIdl_dest_addr_length\fP and \fIdl_dest_addr_offet\fP are both zero.  (They specify the E.163
+or E.164 address when PSTN or ISDN dial access is used, but may be specified as zero even if dial
+acess is used and a dial number has been configured against the PPA).
+.PP
+The \fIdl_qos_length\fP and \fIdl_qos_offset\fP fields are ignored by the
+provider.
+.\"
+.SS DL_CONNECT_IND\fR(7)\fP
+.PP
+The \fIdl_called_addr_length\fP and \fIdl_called_addr_offset\fP fields either indicate no called
+address or indicate the E.163 or E.164 called number on dial access.
+.\"
+.SS DL_CONNECT_RES\fR(7)\fP
+.PP
+The \fIdl_qos_length\fP and \fIdl_qos_offset\fP fields are ignored.  The \fIdl_token\fP filed must
+be set to zero (accepted on the same stream as the indication) or an error will result.
+.\"
+.SS DL_CONNECT_CON\fR(7)\fP
+.PP
+The \fIdl_resp_addr_length\fP will be set to 0 or 21.  When set to 21, the address contains a one
+octet length and 0 to 20 octets of X.121 address in the format shown above under
+\*(lqADDRESSES\*(rq.
+.PP
+The \fIdl_qos_length\fP and \fIdl_qos_offset\fP fields are always set to zero
+(0).
+.\"
+.SS DL_DISCONNECT_REQ\fR(7)\fP
+.PP
+No changes, see \fBDL_DISCONNECT_REQ\fP(7).
+.\"
+.SS DL_DISCONNECT_IND\fR(7)\fP
+.PP
+The \fIdl_originator\fP field is one of:
+.RS
+.TP
+.B DL_USER
+A DISC frame was received from the network.
+.TP
+.B DL_PROVIDER
+The ack timer expired.
+.RE
+.PP
+The \fIdl_reason\fP field is one of:
+.RS
+.TP
+.B DL_CONREJ_DEST_UNREACH_TRANSIENT
+A pending conneciton was aborted.
+.TP
+.B DL_DISC_TRANSIENT_CONDITION
+An active connection was disconnected.
+.TP
+.B DL_DISC_PERMANENT_CONDITION
+The physical level is not connected.
+.RE
+.\"
+.SS DL_INFO_REQ\fR(7)\fP
+.PP
+No changes, see \fBDL_INFO_REQ\fP(7).
+.\"
+.SS DL_INFO_ACK\fR(7)\fP
+.PP
+The \fIdl_mac_type\fP is one of:
+.TP
+.B DL_X25
+The medium is X.25 LAPB.
+.TP
+.B DL_ISDN
+The medium is ISDN.
+.TP
+.B DL_FRAME
+The medium is Frame Relay LAPF.
+.TP
+.B DL_LOOP
+The medium is software loopback.
+.PP
+The \fIdl_sap_length\fP field is zero (0).
+.PP
+The \fIdl_qos_length\fP and \fBdl_qos_offset\fP fields are zero (0).
+.\"
+.SS DL_OK_ACK\fR(7)\fP
+.PP
+No changes, see \fBDL_OK_ACK\fP(7).
+.\"
+.SS DL_ERROR_ACK\fR(7)\fP
+.PP
+No changes, see \fBDL_ERROR_ACK\fP(7).
+.\"
+.SS DL_RESET_REQ\fR(7)\fP
+.PP
+No changes, see \fBDL_RESET_REQ\fR(7).
+.\"
+.SS DL_RESET_IND\fR(7)\fP
+.PP
+The \fIdl_originator\fP field is always \fBDL_USER\fP.  The \fIdl_reason\fP
+field is always \fBDL_RESET_RESYNCH\fP.
+.\"
+.SS DL_RESET_RES\fR(7)\fP
+.PP
+No changes, see \fBDL_RESET_RES\fR(7).
+.\"
+.SS DL_RESET_CON\fR(7)\fP
+.PP
+No changes, see \fBDL_RESET_CON\fR(7).
+.\"
+.SS DL_TOKEN_REQ\fR(7)\fP
+.PP
+No changes, see \fBDL_TOKEN_REQ\fR(7).
+.\"
+.SS DL_TOKEN_ACK\fR(7)\fP
+.PP
+For LAPB there is only one connection that can be made and the token cannot be used in the
+\fBDL_CONNECT_RES\fP(7) primitive.
+.\"
+.\"
+.SH IOCTLS
+.PP
+SunLink input-output controls are supported:
+.\"
+.SS L_GETSTATS
+.PP
+Reads per-link (i.e., per-PPA) statistics from the LAPB driver.  L_GETSTATS uses the
+\fBlapb_stioc\fP structure:
+.sp
+.nf
+\fC\s-1\
+struct lapb_stioc {
+    unsigned char lli_type;
+    unsigned char lli_spare[3];
+    unsigned int lli_ppa;
+    lapbstats_t lli_stats;
+};
+
+typeef struct lapb2_stats {
+    unsigned int lapbmonarray[lapbstatmax];
+} lapbstats_t;
+
+#define tx_ign		 0
+#define rx_badlen	 1
+#define rx_unknown	 2
+#define t1_exp		 3
+#define t4_exp		 4
+#define t4_n2_exp	 5
+
+#define RR_rx_cmd	 6
+#define RR_rx_rsp	 7
+#define RR_tx_cmd	 8
+#define RR_tx_rsp	 9
+#define RR_tx_cmd_p	10
+
+#define RNR_rx_cmd	11
+#define RNR_rx_rsp	12
+#define RNR_tx_cmd	13
+#define RNR_tx_rsp	14
+#define RNR_tx_cmd_p	15
+
+#define REJ_rx_cmd	16
+#define REJ_rx_rsp	17
+#define REJ_tx_cmd	18
+#define REJ_tx_rsp	19
+#define REJ_tx_cmd_p	20
+
+#define SABME_rx_cmd	21
+#define SABME_tx_cmd	22
+
+#define DISC_rx_cmd	23
+#define DISC_tx_cmd	24
+
+#define UA_rx_rsp	25
+#define UA_tx_rsp	26
+
+#define DM_rx_rsp	27
+#define DM_tx_rsp	28
+
+#define I_rx_cmd	29
+#define I_tx_cmd	30
+
+#define FRMR_rx_rsp	31
+#define FRMR_tx_rsp	32
+
+#define tx_rtr		33
+#define rx_bad		34
+#define rx_dud		35
+#define rx_ign		36
+
+#define I_rx_rsp	37
+#define I_tx_rsp	38
+
+#define UI_rx_cmd	39
+#define UI_tx_cmd	40
+
+#define XID_rx_cmd	41
+#define XID_rx_rsp	42
+#define XID_tx_cmd	43
+#define XID_tx_rsp	44
+
+#define TEST_rx_cmd	45
+#define TEST_rx_rsp	46
+#define TEST_tx_cmd	47
+#define TEST_tx_rsp	48
+
+#define llc2statmax	40
+\s+1\fP
+.fi
+.PP
+Where,
+.TP \w'\fISABME_rx_cmd\fP\(em'u
+.I lli_type
+The table type.  Always LI_STATS.
+.TP
+.I lli_spare
+Reserved field set to zero.
+.TP
+.I lli_ppa
+The Physical Point of Attachment (PPA).
+.TP
+.I lli_stats
+The statistics table.
+.TP
+.I tx_ign
+.PD 0
+.TP
+.I rx_badlen
+.TP
+.I rx_unknown
+.TP
+.I t1_exp
+.TP
+.I t4_exp
+.TP
+.I t4_n2_exp
+.TP
+.I RR_rx_cmd
+.TP
+.I RR_rx_rsp
+.TP
+.I RR_tx_cmd
+.TP
+.I RR_tx_rsp
+.TP
+.I RR_tx_cmd_p
+.TP
+.I RNR_rx_cmd
+.TP
+.I RNR_rx_rsp
+.TP
+.I RNR_tx_cmd
+.TP
+.I RNR_tx_rsp
+.TP
+.I RNR_tx_cmd_p
+.TP
+.I REJ_rx_cmd
+.TP
+.I REJ_rx_rsp
+.TP
+.I REJ_tx_cmd
+.TP
+.I REJ_tx_rsp
+.TP
+.I REJ_tx_cmd_p
+.TP
+.I SABME_rx_cmd
+.TP
+.I SABME_tx_cmd
+.TP
+.I DISC_rx_cmd
+.TP
+.I DISC_tx_cmd
+.TP
+.I UA_rx_rsp
+.TP
+.I UA_tx_rsp
+.TP
+.I DM_rx_rsp
+.TP
+.I DM_tx_rsp
+.TP
+.I I_rx_cmd
+.TP
+.I I_tx_cmd
+.TP
+.I FRMR_rx_rsp
+.TP
+.I FRMR_tx_rsp
+.TP
+.I tx_rtr
+.TP
+.I rx_bad
+.TP
+.I rx_dud
+.TP
+.I rx_ign
+.TP
+.I I_rx_rsp
+.TP
+.I I_tx_rsp
+.TP
+.I UI_rx_cmd
+.TP
+.I UI_tx_cmd
+.TP
+.I XID_rx_cmd
+.TP
+.I XID_rx_rsp
+.TP
+.I XID_tx_cmd
+.TP
+.I XID_tx_rsp
+.TP
+.I TEST_rx_cmd
+.TP
+.I TEST_rx_rsp
+.TP
+.I TEST_tx_cmd
+.TP
+.I TEST_tx_rsp
+.TP
+.I llc2statmax
+.PD
+.\"
+.SS L_ZEROSTATS
+.PP
+Clears per-link statistics in the LLC2 and LAPB drivers.  L_ZEROSTATS uses the \fBll_hdioc\fP
+structure:
+.sp
+.nf
+\fC\s-1\
+struct ll_hdioc {
+    unsigned char lli_type;
+    unsigned char lli_spare[3];
+    unsigned int lli_ppa;
+};
+\s+1\fP
+.fi
+.PP
+Where,
+.TP
+.I lli_type
+The table type.  Always LI_PLAIN.
+.TP
+.I lli_spare
+Reserved for alignment.
+.TP
+.I lli_ppa
+The Physical Point of Attachment (PPA).  Set this value to 0xff to zero statistics for all links.
+.\"
+.SS L_GETGSTATS
+.PP
+Reads global layer 2 statistics from the LAPB driver.  LAPB uses the \fBlapb_gstioc\fP structure:
+.sp
+.nf
+\fC\s-1\
+struct lapb_gstioc {
+    unsigned char lli_type;
+    unsigned char lli_spare[3];
+    unsigned int lapbgstats[globstatmax];
+};
+#define frames_tx     0
+#define frames_rx     1
+#define sabme_tx      2
+#define sabme_rx      3
+#define bytes_tx      4
+#define bytes_rx      5
+#define globstatmax   6
+\s+1\fP
+.fi
+.PP
+Where
+.TP \w'\fIglobstatmax\fP\(em'u
+.I lli_type
+The table type.  Always \fBLI_GSTATS\fP.
+.TP
+.I lli_spare
+Reserved.
+.TP
+.I labpgstats
+The global stats table.
+.TP
+.I frames_tx
+Frames transmitted.
+.TP
+.I frames_rx
+Frames received.
+.TP
+.I sabme_tx
+SABMEs transmitted.
+.TP
+.I sabme_rx
+SABMEs received.
+.TP
+.I bytes_tx
+Data bytes transmitted.
+.TP
+.I bytes_rx
+Data bytes received.
+.TP
+.I globstatmax
+The size of the global statistics table.
+.\"
+.SS L_SETPPA
+.PP
+Sets the link specific information associated with the Stream.  L_SETPPA uses
+the \fBll_snioc\fP structure.
+.\"
+.SS L_GETPPA
+.PP
+Returns the PPA and link index associated with the Stream.  L_GETPPA uses the \fBll_snioc\fP
+structure:
+.sp
+.nf
+\fC\s-1\
+struct ll_snioc {
+    unsigned char lli_type;
+    unsigned char lli_class;
+    unsigned short lli_slp_pri;
+    unsigned int lli_ppa;
+    unsigned int lli_index;
+};
+\s+1\fP
+.fi
+.PP
+Where,
+.TP
+.I lli_type
+The table type.  Always \fBLI_SSPA\fP.
+.TP
+.I lli_class
+DTE/DCE/extended.  This indicates the type of link.  \fBLC_LLC2\fP must be used for LLC2.
+LC_LAPBDTE or LC_LAPBDCE must be used for LAPB.  The file /usr/include/netdlc/ll_proto.h contains a
+complete list of values.
+.TP
+.I lli_slp_pri
+SLP priority when used in an MLP multiplexer.  This determines the priority of SLP when MLP is used.
+The configuration file name is \fBmlp_priority\fP.  Numeric value between 1 and 12.
+.TP
+.I lli_ppa
+Physical Point of Attachment (PPA) and Subnetwork ID character.
+.TP
+.I lli_index
+Link index under the MLP multiplexing driver.  This must be set with the muxid value returned by the
+I_LINK(7) ioctl when LAPB is placed over a serial driver.
+.\"
+.SS L_SETTUNE
+.PP
+Sets the tunable parameters in the LLC2 and LAPB drivers for a given PPA.
+LAPB uses the \fBlapb_tnioc\fP structure.
+.\"
+.SS L_GETTUNE
+.PP
+Retrieves the tunable parameters in the LLC2 and LAPB drivers for a given PPA.
+LAPB uses the \fBlapb_tnioc\fP structure:
+.sp
+.nf
+\fC\s-1\
+struct lapb_tnioc {
+    unsigned char lli_type;
+    unsigned char lli_spare[3];
+    unsigned int lli_ppa;
+    lapbtune_t lapb_tune;
+};
+
+typedef struct lapb_tune {
+    unsigned short N2;
+    unsigned short T1;
+    unsigned short Tpf;
+    unsigned short Trej;
+    unsigned short Tbusy;
+    unsigned short Tidle;
+    unsigned short ack_delay;
+    unsigned short notack_max;
+    unsigned short tx_window;
+    unsigned short tx_probe;
+    unsigned short max_I_len;
+    unsigned short liconform;
+} labptune_t;
+\s+1\fP
+.fi
+.PP
+Where
+.TP \w'\fInotack_delay\fP\(em'u
+.I lli_type
+The table type.  Always \fBLI_LAPBTUNE\fP.
+.TP
+.I lli_ppa
+The PPA.
+.TP
+.I llc2_tune
+A table of tuning values.
+.TP
+.I N2
+Maximum number of retries.
+Configuration file name is \fBn2_count\fP.
+Numeric value between 1 and 255.  The default value is 10.
+.TP
+.I T1
+Acknowledgement time (units of 0.1 seconds).
+Configuration file name is \fBt1_timer\fP.
+Numeric value between 1.0 and 300.0 seconds.  The default value is 9.0 seconds.
+.TP
+.I Tpf
+P/F cycle retry time (units of 0.1 seconds).
+Configuration file name is \fBpf_timer\fP.
+Numeric value between 1.0 and 300.0 seconds.  The default value is 0.7 seconds.
+.TP
+.I Tref
+Reject retry time (units of 0.1 seconds).
+Configuration file name is \fBreject_timer\fP.
+Numeric value between 1.0 and 1000.0 seconds.  The default value is 2.5 seconds.
+.TP
+.I Tbusy
+Remote busy check time (units of 0.1 seconds).
+Configuration file name is \fBbusy_timer\fP.
+Numeric value between 1.0 and 3000.0 seconds.  The default value is 10.0 seconds.
+.TP
+.I Tidle
+Idle P/F cycle time (units of 0.1 seconds).
+Configuration file name is \fBidle_timer\fP.
+Numeric value between 0.0 and 3200.0 seconds.  The default value is 25.0 seconds.
+.TP
+.I ack_delay
+RR delay time (units of 0.1 seconds).
+Configuration file name is \fBrr_ack_delay\fP.
+Numeric value between 0.0 seconds and 300.0 seconds.  The default value is 0.4 seconds.
+.TP
+.I notack_max
+Maximum number of unacknowledged received I-frames.
+Configuration file name is \fBunack_max\fP.
+Numeric value between 0 and 127.  The default value is 3.
+(The maximum value of this parameter can be larger for super- (32767) and
+jumbo- (2147483647) extended asynchronous balanced mode.)
+.TP
+.I tx_window
+Transmit window (if no XID received).
+Configuration file name is \fBlocal_win\fP.
+For modulo 8 networks, a numeric value between 1 and 7.  For modulo 128 networks, a numeric value
+between 1 and 127.  For modulo 32768 networks, a numeric value between 1 and 32767.
+(The maximum value of this parameter can be larger for super- (32767) and
+jumbo- (2147483647) extended asynchronous balanced mode.)
+.TP
+.I tx_probe
+P-bit position before end of transmit window.
+Configuration file name is \fBlocal_probe\fP.
+For modulo 8 networks, a numeric value between 1 and 7.  For modulo 128 networks, a numeric value
+between 1 and 127.  For modulo 32768 networks, a numeric value between 1 and 32767.
+(The maximum value of this parameter can be larger for super- (32767) and
+jumbo- (2147483647) extended asynchronous balanced mode.)
+.TP
+.I max_I_len
+Maximum I-frame length.
+.TP
+.I liconform
+LAPB conformance.
+Configuration file names are \fBign_ua_error\fP, \fBfrmr_frmr_error\fP, \fBfrmr_invrsp_error\fP,
+\fBsframe_pbit\fP, \fBno_dm_adm\fP, \fBios8882\fP, \fBsabm_in_x32\fP, \fBinitial_down\fP.  Each of
+these parameter values can be true or false.
+.\"
+.SS W_SETTUNE
+.PP
+Sets the tunable parameters of the LAPB wanmod module.  This controls physical parameters such as
+the maximum frame length and line speed.  The W_SETTUNE input-output control uses the
+\fBwan_tnioc\fP structure (defined in \fB/usr/include/netx25/wan_control.h\fP on Sun):
+.sp
+.nf
+\fC\s-1\
+struct wan_tnioc {
+    unsigned char w_type;
+    unsigned char w_spare[3];
+    unsigned int w_snid;
+    wantune_t wan_tune;
+};
+
+typedef struct wantune {
+    unsigned short WAN_options;
+    struct WAN_hddef WAN_hd;
+} wantune_t;
+
+struct WAN_ddef {
+    unsigned short WAN_maxframe;
+    int WAN_baud;
+    unsigned short WAN_interface;
+    union {
+	unsigned short WAN_cptype;
+	struct WAN_x21 WAN_x21def;
+	struct WAN_v25 WAN_v25def;
+    } WAN_cpdef;
+};
+
+struct WAN_v25 {
+    unsigned short WAN_cptype;
+    unsigned short callreq;
+};
+\s+1\fP
+.fi
+.PP
+Where,
+.TP
+.I w_snid
+The link id.  It should be set to the same value as lli_ppa in the L_SETPPA and L_SETTUNE
+input-output controls.
+.TP
+.I WAN_options
+Reserved for future use.  Must be set to zero (0).
+.TP
+.I WAN_maxframe
+The maximum frame size to be used on this interface (in units of octets).
+.TP
+.I WAN_baud
+The speed of the line (in units of baud, 0 is used for external clocking).
+.TP
+.I WAN_interface
+The type of interface.  Should alway sbe set to \fBWAN_V28\fP.
+.TP
+.I WAN_cptype
+The type of interface.  Set this to \fBWAN_NONE\fP if no calling procedrues are used (the most
+frequent case), or to WAN_V25bis if a calling procedure and V25bis modem are used.  In this
+instance, the WAN_v25 structure must be filled.
+.\"
+.\"
+.SH MANAGED OBJECTS
+.PP
+.TP
+.B datalinkSubsystem (communicationsEntity)
+.TP
+.B lAPBDLE (datalinkEntity)
+Belongs to a \fBdatalinkSubsystem\fP.
+.sp
+There may be multiple isntances of the lAPBDLE managed object in a system.  Systems not supporting
+the LAPB Data Link procedures defined in ISO/IEC 7776 are not required to support the lAPBDLE and
+containing managed objects.
+.sp
+The lAPBDLE managed object has a conditional mlp Package.  There may be multiple instances of
+lAPBDLE MO in a system, both with and without the mlp Package.  For those instances in which the
+package is absent, the mlp procedures do not apply and the lAPBDLE MO may contain at most one sLPPM
+MO.  For those instances in which the package is present, the mlp procedures do apply and the
+lAPBDLE MO may contain multiple instances of sLPPM MO.
+.sp
+A lAPBDLE MO may contain at mose one dLSAP MO.  The value of the sap1Address attribute is of no
+significance.  The cardinality of the userEntityNames attribute is limited to one.
+.sp
+A lAPBDLE MO may be created and deleted explicitly by management operation or created and deleted
+automatically as part of system operation.
+.sp
+When the lAPBDLE MO is operable, the operationalState shall have the value \*(lqenabled\*(rq;
+otherwise it shall have the value \*(lqdisabled\*(rq.  Transitions of operationalState shall be
+reported using the stateChange notification.
+.TP
+.B dLSAP (sap1)
+Belongs to a \fBdatalinkEntity\fP.
+.TP
+.B sLPPM (coProtocolMachine)
+Belongs to a \fBlAPBDLE\fP.
+.TP
+.B sLPConnection, sLPConnectionIVMO
+Belongs to a \fBsLPPM\fP.
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

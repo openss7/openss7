@@ -100,7 +100,23 @@ is an OSI ACSE/Presentation Interface
 .IR STREAMS (4)
 multiplexing pseudo-device driver.
 .PP
-The driver provides Session, Presentation, ACSE and ROSE OSI protocol layer services.  For normal
+The driver provides Session,
+.[
+x225
+.]
+Presentation,
+.[
+x226
+.]
+ACSE
+.[
+x227
+.]
+and ROSE
+.[
+x229
+.]
+OSI protocol layer services.  For normal
 OSI transport providers, the driver provides full OSI Session, Presentation and ASCE services.
 Users of the driver may access ACSE/Presentation services using the ACSE/Presentation Library
 Interface (APLI),
@@ -189,6 +205,41 @@ xap c303
 .]
 .BR xap (3),
 library interfaces should be used.
+.PP
+A daemon,
+.BR osinetd (8),
+is used to configure the multiplexing driver at system initialization time.
+The daemon opens and permanently links wildcarded network address and
+transport selector listening Streams for each NSAP type available on the
+system.  These permanently linked Streams are bound in a listening mode only,
+and may be shared by processes that open an upper multiplex Stream.
+.PP
+When a bind is attempted on a upper multiplex Stream, the user must provide
+the lower multiplex identifier of an unbound, temporarily linked, transport
+Stream to use in initiator or responder roles.  In initiator roles, this
+Stream will be used for the outbound transport connection.  In responder
+roles, this Stream will be used to accept inbound transport connections.
+.PP
+When a bind is attempted that includes a responder role, the driver will
+search for an appropriate permanently linked Stream.  If one is found for the
+specified bound local presentation address, the provided temporarily linked
+Stream will be bound in a non-listening mode and will only be used to accept
+inbound transport connections.  The driver adds the upper multiplex Stream to
+internal demultiplexing logic.  When no appropriate permanently linked Stream
+is found, an attempt will be made to bind the provided temporarily linked
+Stream to the requested presentation address in a listening mode.
+.PP
+Note that creating a suitable transport Stream to tbe linked under the driver
+might also entail a similar process for the transport driver.  See
+.BR tp (4).
+.PP
+To avoid the necessity of temporarily linking an appropriate transport
+provider Stream, the
+.B oopi
+driver can also be implemented as a generic transport provider Stream that
+autopushes a presentation module.  In this case, the opening and temporarily
+linking of the transport Stream becomes a matter of simply opening the
+autopush transport entry.
 .\"
 .\"
 .SH INTERFACE

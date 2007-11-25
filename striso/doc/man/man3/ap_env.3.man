@@ -80,7 +80,22 @@ sort-adjacent-labels
 .TH AP_ENV 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
 .B ap_env
-\- XAP environment attributes
+\- ACSE/Presentation environment attributes
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface,
+APLI,
+.[
+apli unix international
+.]
+XAP.
+.[
+xap c303
+.]
+.SH LIBRARY
+.PP
+.BR libapli (3),
+.BR libxap (3).
 .SH SYNOPSIS
 .PP
 .B #include <xap.h>
@@ -1424,7 +1439,7 @@ This attribute is readable always and writable never.
 .PP
 The OpenSS7 XAP Library is compatible with other XAP
 .[
-XAP ACSE C306
+xap c303
 .]
 implementaions, with the following portability considerations:
 .IP \(em \w'\(em\(em'u
@@ -1436,7 +1451,7 @@ onto service primitives for the lower layer.
 .sp
 This is not specified in XAP,
 .[
-XAP ACSE C306
+xap c303
 .]
 and is inherently non-portable.  Portable XAP programs will not reply upon this capability.
 .IP \(em

@@ -81,3 +81,22 @@ sort-adjacent-labels
 .\"
 .\"
 .TH AP_SET_ENV 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface,
+APLI,
+.[
+apli unix international
+.]
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libapli (3),
+.BR libxap (3).

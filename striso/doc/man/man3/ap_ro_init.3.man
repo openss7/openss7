@@ -81,15 +81,27 @@ sort-adjacent-labels
 .SH NAME
 .B ap_ro_init
 \- initialize the ROSE user environment.
+.\"
+.\"
 .SH INTERFACE
-XAP,
+.PP
+ACSE/Presentation ROSE Interface,
+APRI,
 .[
-XAP ACSE
+APLI UNIX International
 .]
 XAP-ROSE.
 .[
-XAP-ROSE
+xap-rose
 .]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libapri (3),
+.BR libxaprose (3).
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xap_rose.h>
@@ -234,7 +246,7 @@ for additional compatibility considerations.
 .PP
 XAP,
 .[
-XAP ACSE
+xap c303
 .]
 XAP-ROSE.
 .[

@@ -88,7 +88,48 @@ search-ignore XYZ
 \- input/output multiplexing
 .\"
 .\"
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface,
+APLI,
+.[
+APLI UNIX International
+.]
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libapli (3),
+.BR libxap (3).
+.\"
+.\"
 .SH SYNOPSIS
+.PP
+APLI Library prototype:
+.PP
+.B #include <ap_lib.h>
+.br
+.B #include <osi_lib.h>
+.HP
+.BR "int " ap_poll(
+.PD 0
+.RS
+.HP
+.BI "struct ap_pollfd *" fds ,
+.HP
+.BI "int " nfds ,
+.HP
+.BI "int " timeout
+.RE
+.HP
+.BR );
+.PD
+.PP
+XAP Library prototype:
 .PP
 .B #include <xap.h>
 .HP
@@ -125,7 +166,8 @@ array.
 the amount of time to wait in milliseconds.
 .TP
 .I aperrno_p
-a location into which to store a diagnostic error code when unsuccessful.
+for XAP, a location into which to store a diagnostic error code when
+unsuccessful.
 .\"
 .\"
 .SH DESCRIPTION
@@ -219,6 +261,7 @@ waits until a requested event occurs or until the call is interrupted.  The
 call is not affected by whether the specified instances are operating in
 blocking or non-blocking execution mode.
 .PP
+For XAP,
 .I aperrno_p
 must be set to point to a location which will be used to carry an error code
 back to the user.
@@ -231,14 +274,65 @@ indicates the number of instances for which
 .I revents
 is non-zero.  A return value of zero (0) indicates that the call timed out and
 no instances were selected.  Upon failure, a value of minus one (-1, FAIL) is
-returned and the location pointed to by
+returned.  For XAP, the location pointed to by
 .I aperrno_p
-is set to indicate the error.
+is set to indicate the error; for APLI, the global thread-specific
+.BR aperrno (3)
+variable contains the error.
 .\"
 .\"
 .SH ERRORS
 .PP
-Only operating system class errors are reported.
+Only operating system class errors are reported.  For XAP, operating system
+errors are reported in \fB*aperrno_p\fP; for APLI, in \fIerrno\fP(3).
+.TP \w'[\fBEINVAL\fP]\(em'u
+.RB [ EBADF ]
+An invalid \fIfd\fP member was given in one of the \fBpollfd\fP structures
+specified by the \fIfds\fP argument.  This error is not specified by SUSv2
+.[
+susv2
+.]
+or POSIX.
+.[
+susv3
+.]
+.TP
+.RB [ ENOMEM ]
+There was insufficient memory to allocate file descriptor tables.  This error
+is not specified by SUSv2
+.[
+susv2
+.]
+or POSIX
+.[
+susv3
+.]
+(see [\fBEAGAIN\fP], below).
+.TP
+.RB [ EFAULT ]
+The \fIfds\fP argument specifies an address outside the caller's valid address
+space.
+.TP
+.RB [ EINTR ]
+A signal was caught during \fBap_poll\fP().
+.TP
+.RB [ EINVAL ]
+The \fInfds\fP argument is greater than {\fBNR_OPEN\fP}, or one of the
+\fIfd\fP members refers to a Stream or multiplexer that is linked (directly or
+indirectly) downstream from a multiplexer.
+.TP
+.RB [ EAGAIN ]
+The allocation of internal data structures failed but a subsequent request may
+succeed.
+.\"
+.\"
+.SH MT-LEVEL
+.PP
+.BR ap_poll ()
+is MT-safe.  Note that
+.BR ap_poll ()
+represents a thread cancellation point as does
+.BR poll (2s).
 .\"
 .\"
 .SH NOTICES
@@ -246,6 +340,39 @@ Only operating system class errors are reported.
 Support for events other than those listed above is optional in the standard.
 Users interested in developing applications that are portable across different
 XAP Library implementations should keep this caveat in mind.
+.PP
+The OpenSS7 XAP library also supports the following:
+.TP \w'\fBAP_POLLWRNORM\fP\(em'u
+.B AP_POLLPRI
+High priority data may be read from \fIfd\fP without blocking.  For
+\fISTREAMS\fP(4) APLI and XAP instances, this event occurs when an
+\fBM_PCPROTO\fP(9) or \fBM_HPDATA\fP(9) message arrives at the Stream head and
+is generated even when the data available is of zero length.
+This flag is valid in both the corresponding \fIevents\fP and \fIrevents\fP
+members.
+.TP
+.B AP_POLLERR
+An error has occured on the file.  For \fISTREAMS\fP(4) APLI and XAP
+instances, this event occurs when an \fBM_ERROR\fP(9) message indicating an
+error arrives at the Stream head.
+This flag is only valid in the corresponding \fIrevents\fP member.
+.TP
+.B AP_POLLHUP
+A hangup has occured on the file.  For \fISTREAMS\fP(4) APLI and XAP
+instances, this event occurs when an \fBM_HANGUP\fP(9) message arrives at the
+Stream head or the Stream is closing.  A Stream cannot be writable while this
+event is in force.
+This flag is only valid in the corresponding \fIrevents\fP member.
+.TP
+.B AP_POLLNVAL
+The corresponding \fIfd\fP is invalid.
+This flag is only valid in the corresponding \fIrevents\fP member.
+.TP
+.B AP_POLLMSG
+A pending signal has occured on the file.  For \fISTREAMS\fP(4) APLI and XAP
+instances, this event occurs when an \fBM_SIG\fP(9) message arrives at the
+Stream head.
+This flag is only valid in the corresponding \fIrevents\fP member.
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -265,18 +392,20 @@ structure, see
 Additional
 .I revents
 that may be returned are
-.BR POLLERR ,
-.BR POLLHUP ,
+.BR POLLERR " (" AP_POLLERR ),
+.BR POLLHUP " (" AP_POLLHUP ),
 and
-.BR POLLMSG ,
+.BR POLLMSG " (" AP_POLLMSG ),
 as defined in
 .BR poll (2s).
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR poll (2s),
 .BR ap_snd (3),
 .BR ap_rcv (3),
+.BR ap_ioctl (3),
 .BR XAP (3).
 .\"
 .\"
@@ -299,7 +428,17 @@ and
 .IR HP-UX \(rg,
 with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
+The APLI function only documents the \fBAP_POLLIN\fP and \fBAP_POLLOUT\fP
+flags.  Only these flags will be used by portable APLI implementations.
 .IP \(em
+The XAP function only documents the \fBAP_POLLIN\fP, \fBAP_POLLOUT\fP,
+\fBAP_POLLRDNORM\fP, \fBAP_POLLRDBAND\fP, \fBAP_POLLWRNORM\fP and
+\fBAP_POLLWRBAND\fP flags.  Only these flags will be used by portable XAP
+implementations.
+.IP \(em
+The OpenSS7 APLI and XAP libraries implement the full range of \fBpoll\fP(2s)
+flags for both these functions.  Portable programs will only use those defined
+by the standard.
 .PP
 See also,
 .BR XAP (3),
@@ -353,6 +492,12 @@ The older function only documented the use of
 .BR AP_POLLIN
 and
 .BR AP_POLLOUT .
+.PP
+Both the APLI and XAP versions of the function seem to be an attempt to escape
+the POSIX programming model and the use of \fISTREAMS\fP as the underlying
+implementation.  For both the OpenSS7 APLI and XAP libraries, the POSIX
+conformant \fBpoll\fP(2s) system call can be used instead of \fBap_poll\fP()
+in a fully portable manner.
 .\"
 .\"
 .SH VERSIONS

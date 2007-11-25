@@ -367,7 +367,7 @@ conforms as closely as possible to the
 specifications.
 Where a specific
 .IR "SVR 4.2" -based
-implemntation differs from
+implementation differs from
 .IR POSIX/SUSv3 ,
 there will be differences with this
 .I @PACKAGE_TITLE@
@@ -377,6 +377,52 @@ Portable
 .I STREAMS
 applications programs will expect conformance to
 .IR POSIX/SUSv3 .
+.IP \(em
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+and
+.IR UnixWare \(rg
+document that, when command is
+.BR I_SETCLTIME ,
+.I arg
+is a pointer to an integer timeout value.
+.IR Solaris \(rg
+documents that, when command is
+.BR I_SETCLTIME ,
+.I arg
+is a long timeout value.
+.I LiS
+implementation follows
+.IR Solaris \(rg
+documentation.
+.B SUSv2
+.[
+susv2
+.]
+and
+.B SUSv3
+.[
+susv3
+.]
+document that, when command is
+.BR I_SETCLTIME ,
+.I arg
+is a pointer to an integer timeout value.
+.IR Solaris \(rg
+can be seen in
+.BR strace (8)
+output to pass a pointer instead of a value.  This means that
+.IR Solaris \(rg
+documentation is erroneous, and
+.I LiS
+implementation is wrong.
+.IP ""
+Portable
+.IR STREAMS (9)
+libraries and applications programs will use
+.B @PACKAGE_TITLE@
+instead of
+.IR LiS .
 .PP
 For general
 .BR ioctl (2s)

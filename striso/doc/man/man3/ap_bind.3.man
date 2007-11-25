@@ -91,6 +91,20 @@ sort-adjacent-labels
 \- Bind a Presentation Address to an XAP Instance
 .\"
 .\"
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface,
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libxap (3).
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xap.h>
@@ -99,17 +113,25 @@ sort-adjacent-labels
 .\"
 .\"
 .SH ARGUMENTS
-.TP
+.TP \w'\fIaperrno_p\fP\ \(em'u
 .I fd
+a file descriptor corresponding to an XAP instance.
+.PD 0
 .TP
 .I apperrno_p
+an extent into which to place an error code when unsuccessful.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 This function associates the Presentation Address stored in the
 .B AP_BIND_PADDR
-environment vairable witht he XAP Instances specified by
+environment variable with the XAP
+.[
+xap c303
+.]
+Instances specified by
 .IR fd .
 Upon successful completion the service provider may begin enqueueing incoming
 associations or sending outbound associations requests.  All necessary
@@ -120,7 +142,7 @@ should be set prior to calling
 .BR ap_bind ().
 .PP
 When this function is called, an attempt may be made to bind to the specified
-address.  As a part of the bind procedure, an authroization check may be
+address.  As a part of the bind procedure, an authorization check may be
 performed to verify that all of the processes that share this XAP instance are
 authorized to use the new address.  If all are authorized to do so, the bind
 request will succeed and the XAP instance may be used to send (receive)
@@ -128,12 +150,12 @@ primitives from (addressed to) the new address.  Successfully calling this
 function causes the state of XAP to move from
 .BR AP_UNBOUND " to " AP_IDLE .
 .PP
-Some implementations may perform not authorization checking.  In this case the
+Some implementations may perform no authorization checking.  In this case the
 .RB [ AP_ACCES ]
 error response will not be returned.  Other implementations may defer binding
 and authorization until a
 .BR A_ASSOC_REQ " or " A_ASSOC_RSP
-primtive is issued.  In this case, if the authorization check failes, the
+primitive is issued.  In this case, if the authorization check fails, the
 .RB [ AP_ACCES ]
 error will be returned by
 .BR ap_snd (3).
@@ -144,11 +166,11 @@ An instance can be bound to a presentation address only if all of the processes
 that share it are authorized to use the requested address.  Consequently, when
 an attempt is made to bind an address, the effective UIDs of all of the
 processes that share this instance of XAP may be checked against the list of
-users allowed to use the requested address. If all are authorised to use the
+users allowed to use the requested address. If all are authorized to use the
 address,
 .BR ap_bind ()
 succeeds and the instance is bound to the specified presentation address. On the
-other hand, if any of the processes is not authorised to use the requested
+other hand, if any of the processes is not authorized to use the requested
 address,
 .BR ap_bind ()
 fails and the instance remains unbound.
@@ -170,14 +192,14 @@ is set to indicate the error.
 .\"
 .\"
 .SH ERRORS
-.TP
+.TP \w'[\fBAP_BADNSAP\fP]\(em'u
 .RB [ AP_ACCES ]
 Request to bind to specified address denied.
 .TP
 .RB [ AP_BADF ]
 The
 .I fd
-paramter does not identify an XAP instance.
+parameter does not identify an XAP instance.
 .TP
 .RB [ AP_BADNSAP ]
 The format of the NSAP portion of the Presentation Address is not supported.
@@ -187,9 +209,63 @@ There is no XAP environment associated with
 .IR fd .
 .\"
 .\"
+.SH DEVICES
+.PP
+.TP
+.BR /dev/tp ", " /dev/streams/clone/tp
+The OSI Transport Provider.
+.TP
+.BR /dev/oopi ", " /dev/streams/clone/oopi
+The OSI Open Presentation Interface device.
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.BR apmod (4)
+An ACSE/Presentation Module named
+.RB \*(lq apmod \*(rq.
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+In the OpenSS7 implementation,
+.BR ap_open (3)
+results in the opening of a Stream on the Transport Provider (TP),
+.B /dev/tp
+pseudo-device driver, and pushing of the ACSE/Presentation Module (APMOD),
+.RB \*(lq apmod \*(rq.
+This may also be accomplished by opening an device minor number on the TP
+driver for which an autopush specification has been made, commonly called
+.BR /dev/oopi .
+Assigning
+.B AP_BIND_PADDR
+and, possibly,
+.B AP_ROLE_ALLOWED
+is accomplished using
+.BR ap_set_env ().
+This associates those attributes with the environment associated with the
+Stream.  This is vague way of saying that these options are set on the Stream;
+either in a library structure associated with the file descriptor,
+.IR fd ,
+by the library, or in a kernel resident structure associated with the Stream.
+.PP
+Multiple processes may have access to the same Stream which corresponds to
+multiple processes having access to the same APLI or XAP instance.
+On the other hand, multiple APLI or XAP instances may share the same transport
+provider.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
-.BR ap_snd (3).
+.BR ap_set_env (3),
+.BR ap_snd (3),
+.BR XAP (3),
+.BR STREAMS (4).
 .\"
 .\"
 .SH "BUGS"
@@ -205,18 +281,33 @@ is compatible with XAP,
 .[
 xap c303
 .]
-and implementations based on XAP such as
-UNIX Systems Laboratory Open Networking Platform (ONP)
-Solaris\(rg SunLink OSI 8.0,
-Solaris\(rg Solstice OSI 9.0,
-HP-UX\(rg OSI Transport Services (OTS)/9000
-AIX\(rg OSI/6000
-Digital\(rg DECnet/OSI
+and implementations based on XAP, such as
+.IR "USL ONP\(rg" ,
+.IR "Solaris\(rg Solstice OSI" ,
+.IR "HP-UX\(rg OTS/9000" ,
+.IR "AIX\(rg OSI/6000" ,
+.IR "Digital\(rg DECnet/OSI" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.IP \(em
+Only source compatibility is supported.  Binary compatibility is not
+attempted: any exhibited binary compatibility is coincidental and is scheduled
+to be removed on the next release.
+.PP
+See also,
+.BR XAP (3)
+and
+.BR STREAMS (4),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
 XAP.
+.[
+xap c303
+.]
 .\"
 .\"
 .SH HISTORY
@@ -226,6 +317,10 @@ first appeared in XAP.
 .[
 xap c303
 .]
+In the older APLI library, there was no separate function for bind: binding was
+enabled whenever the
+.B AP_BIND_PADDR
+environment variable was set.
 .\"
 .\"
 .SH VERSIONS

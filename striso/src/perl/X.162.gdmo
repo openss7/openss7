@@ -1,10 +1,10 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.3 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Sat Sep 15 09:45:12 MDT 2007
+--@@ Date: Wed Nov 21 11:08:47 MST 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.723.gdmo" >--
@@ -2494,8 +2494,12 @@ END
 --@@ |  +- itut_x281::physicalEntity
 --@@ |  +- itut_x282::datalinkEntity
 --@@ |  |  +- itut_x282::lAPBDLE
+--@@ |  |  +- itut_x282::mACDLE
+--@@ |  |  +- itut_x282::lLCDLE
 --@@ |  +- itut_x283::networkEntity
 --@@ +- itut_x723::clProtocolMachine
+--@@ |  +- itut_x282::lLCCLPM
+--@@ |  +- itut_x282::lLCCOPM
 --@@ |  +- itut_x283::cLNS
 --@@ +- itut_x723::coProtocolMachine
 --@@ |  +- itut_x281::dataCircuit
@@ -2896,6 +2900,7 @@ END
 --@@ |  +- itut_x162::historySlpTrafficData
 --@@ +- itut_q822::thresholdData
 --@@ +- itut_x282::sLPConnectionIVMO
+--@@ +- itut_x282::mAC
 --@@ +- iso_10589_2::adjacency
 --@@ +- iso_10589_2::virtualAdjacency
 --@@ +- iso_10589_2::destination
@@ -3010,6 +3015,12 @@ END
 --@@ |  >- itut_x282::sLPConnection
 --@@ |  >- itut_x282::sLPConnection
 --@@ |  >- itut_x282::sLPConnectionIVMO
+--@@ itut_x282::mACDLE
+--@@ >- itut_x282::mAC
+--@@ >- itut_x282::mAC
+--@@ itut_x282::lLCDLE
+--@@ >- itut_x282::lLCCLPM
+--@@ >- itut_x282::lLCCOPM
 --@@ itut_x282::datalinkSubsystem
 --@@ >- itut_x282::datalinkEntity
 --@@ |  >- itut_x282::dLSAP

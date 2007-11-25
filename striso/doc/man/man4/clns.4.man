@@ -515,6 +515,664 @@ primitive on the provider Stream and processing the
 response.
 .\"
 .\"
+.SH CONFIGURATION
+.PP
+Configuration is according to both ISO/IEC 8473
+.[
+iso8473
+.]
+and
+ISO/IEC 9542.
+.[
+iso9542
+.]
+For each interface, the following information applies:
+.IP \(bu \w'\(bu\(em'u
+Whether the Network systems is acting as an End System, an Intermediate System, a SNARE, or
+combinations of these.
+.IP \(bu
+Whether the Network system is supporting Configuration Information, Route Redirection Information,
+ES Address Configuration, and IS Address Configuration. (IS Address Configuration is provdided using
+a separate user-level application.)
+.IP \(bu
+Statically configured NSAPs for the network interface.
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.\"
+.\"
+.SS cLNS
+.PP
+.TP
+.B cLNS-P Package
+This package provides the following attributes:
+.RS
+.TP
+.I administrativeState
+.TP
+.I clProtocolMachineId
+.TP
+.I supportedProtocols
+.TP
+.I operationalSystemType
+.RE
+.TP
+.B cLNS8473-P Package
+Present if the protocol defined in ITU-T Rec. X.233 | ISO/IEC 8473-1 is used to implement the CLNS.
+This package provides the following attributes:
+.RS
+.TP
+.I octetsSentCOunter
+.TP
+.I octetsReceivedCounter
+.TP
+.I segmentsReceived
+.TP
+.I segmentsSent
+.TP
+.I segmentsDiscarded
+.TP
+.I assemblingSegmentsDiscarded
+.TP
+.I errorReportsReceived
+.TP
+.I pDUDiscards
+.TP
+.I congestionDiscards
+.TP
+.I maximumLifetime
+.RE
+.TP
+.B cLNSChecksum-P Package
+Present if the ITU-T REc. X.233 | ISO/IEC 8473-1 Generate Checksum option is implemented.
+This package provides the following attributes:
+.RS
+.TP
+.I enabledChecksum
+.RE
+.TP
+.B cLNSISISBasic-P Package
+Present if the system is an ISO 10589 Intermediate System.
+This package provides the following attributes:
+.RS
+.TP
+.I version
+.TP
+.I iSType
+The type of this Intermediate System.  The value of this attribute is only settable via the create
+parameter.  It has values level1IS(1) or level2IS(2).
+.TP
+.I systemId
+The ID for the local system, to be appended to each of the systems's area address(es) to form the
+Network Identity Titles valie for this IS.  The derivation of a value for SystemId is a local
+matter.  OCTET STRING(SIZE(0..8)).
+.TP
+.I maximumPathSplits
+Maximum number of paths which it is permitted to split traffic between.  INTEGER(1..32).
+.TP
+.I minimumLSPTransmissionInterval
+Minimum interval between retransmissions of an LSP.
+.TP
+.I maximumLSPGenerationInterval
+Maximum interval between generated LSPs by this system.
+.TP
+.I minimumBroadcastLSPTransmissionInterval
+Minimum interval between transmission of LSP on a broadcast circuit (See clause 7.3.15.6).  This
+timer shall be capable of a resolution not coarser than 10 ms.
+.TP
+.I completeSNPInterval
+Interval between generation of Complete Sequence Numbers PDUs by a Designated Intermediate System on
+a broadcast circuit.
+.TP
+.I originatingL1LSPBufferSize
+The maximum size of Level 1 LSPs and SNPs originated by this system.  INTEGER(512..1492).
+.TP
+.I manualAreaAddresses
+Area Addresses to be used for this Intermediate System.  At least one value must be supplied.  The
+maximum number of Area Addresses which may exist in the set is maximumAreaAddresses.  SET OF OCTET
+STRING(SIZE(0..20)).
+.TP
+.I maximumAreaAddresses
+Maximum number of area addresses to be permitted for this ISs area.  Note that all ISs in the area
+mst have the same value configured for this attribute if correct operation is to be assured.
+INTEGER(0..254).
+.TP
+.I minimumLSPGenerationInterval
+Minimum interval between successive generation of LSPs with the same LSP ID by this IS.
+.TP
+.I pollESHelloRate
+The value to be used for the suggested ES configuration timer in ISH PDUs when soliciting the ES
+configuration.
+.TP
+.I partialSNPInterval
+Minimum interval between sending Partial Sequence Number PDUs.
+.TP
+.I waitingTime
+Amount of time to delay in waiting state before entering On state.
+.TP
+.I dRISISHelloTimer
+The interval between the generation of IIH PDUs by the designated IS on a LAN.
+.TP
+.I l1State
+The state of the Level 1 database.  Values are: off(0), on(1) or waiting(2).
+.TP
+.I areaAddresses
+The union of the sets of manualAreaAddresses reported in all Level 1 Link State PDUs received from
+this Intermediate System.  SET OF OCTET STRING(SIZE(0..20)).
+.TP
+.I corruptedLSPsDetected
+Number of Corrupted LSP Detected events generated.
+.TP
+.I lSPL1DatabaseOverloads
+Number of times the l1LSPDatabaseOverload even has been generated.
+.TP
+.I manualAddressesDroppedFromArea
+Number of times the manualAddressDroppedFromArea even has been generated.
+.TP
+.I attemptsToExceedMaximumSequenceNumber
+.TP
+.I sequenceNumberSkips
+.TP
+.I ownLSPPurges
+.TP
+.I iDFieldLengthMismatches
+.TP
+.I maximumAreaAddressesMismatches
+.TP
+.I originatingLSPBuffersSizeMismatches
+.TP
+.I lSPTooLargeToPropagate
+.RE
+.TP
+.B cLNSISISAuthentication-P Package
+Present if the system is an ISO 10589 IS and the authentication procedures are implemented.
+This package provides the following attributes:
+.RS
+.TP
+.I areaTransmitPassword
+.TP
+.I areaReceivePasswords
+.TP
+.I authenticationFailures
+.RE
+.TP
+.B cLNSISISLevel2-P Package
+Present if the system is an ISO 10589 Level 2 IS and the partition repair procedures are
+implemented.
+This package provides the following attributes:
+.RS
+.TP
+.I maximumVirtualAdjacencies
+.TP
+.I paritionAreaAddresses
+.TP
+.I partitionDesignatedL2IntermediateSsytem
+.TP
+.I partitionVirtualLinkChanges
+.RE
+.TP
+.B cLNSISISLevel2-P Package
+Present if the system is an ISO 10589 Level 2 IS.
+This package provides the following attributes:
+.RS
+.TP
+.I originatingL2LSPBufferSize
+.TP
+.I l2State
+.TP
+.I lSPL2DatabaseOverloads
+.RE
+.TP
+.B cLNSISISLevel2Authentication-P Package
+Present if the system is an ISO 10589 Level 2 IS and the authentication procedrues are implemented.
+This package provides the following attributes:
+.RS
+.TP
+.I domainTransmitPassword
+.TP
+.I domainReceivePasswords
+.RE
+.\"
+.\"
+.SS Linkage
+.PP
+For each linkage between a subnetwork and this network entity (subnetwork point of attachment), the
+following information is maintained:
+.TP
+.B linkage-P Package
+This mandatory package contains the following attributes:
+.RS
+.TP
+.I linkageId
+The naming attribute of the linkage MO instance.
+.TP
+.I operationalState
+The operational state of the linkage.
+.TP
+.I administativeState
+The administrative state of the linkage.
+.TP
+.I sN-ServiceProvider
+Distinguished name of the SN service provider MO.  This attribute identifies the subnetwork entity
+to be used to support the linkage, when enable.  The subnetwork service provider may be in the
+Datalink Layer, or it may be in the Nework Layer (for example when operating ITU-T Rec. X.233 |
+ISO/IEC 8473-1 over the ISO/IEC 8208 or ITU-T Rec. X.25 SNDCF).
+.TP
+.I sN-SAP
+Distringuished name of the service provider SAP MO (if present).  This is obtained via an internal
+interface when the linkage is enabled.  The sN-SAP may be a relationship to an SAP MO in the
+Datalink Layer, or it may be a relationship to another Managed Object within the Network Layer which
+is not an SAP MO.  For example, when operating ITU-T Rec. X.233 | ISO/IEC 8473-1 over the ISO/IEC
+8208 or ITU-T Rec. X.25 SNDCF, it is a relationship to the same x25PLE-DTE MO which is pointed to by
+the sN-ServiceProvider Attribute.
+.TP
+.I operationalProtocols
+The set of network layer protocols supported by this instance of the linkage MO, expressed as the
+registered OBJECT IDENTIFIERs of the relevant International Standard.  The value is a SET OF a
+sequence of an OBJECT IDENTIFIER identifying the protocol, a SET OF operational protocol versions
+which can include iSO8208V1(0), iSO8208V2(1), x2584(2) or x2588(3), and a SET OF defects repaired
+which is an OPTIONAL SET OF OBJECT IDENTIFIERs.
+.RE
+.TP
+.B linkage-ISO9542IS-P Package
+This conditional package is present if suport for ISO 9542 operating as an Intermediate System (IS).
+The package provides the following attributes:
+.RS
+.TP
+.I iSO9542OperationalSubsets
+The set of ISO 9542 subsets operation on this linkage.  The values are a combination of:
+configuration(0) and redirection(1).
+.TP
+.I holdingTimerMultiplier
+The factor to derive the holding timer from configuration timer.  This value, when multiplied by a
+configuration timer yeilds the value of the holding timer parameter issued with configuration
+information.  The semantics of this parameter are such that it is permissible to also add a delta
+value to the result to compensate for possible delays and imprecision of timers.  The result of the
+calculation is truncated, upon overflow, to the maximum value for the paramter permitted by the
+protocol (65535).  The value is an INTEGER.
+.TP
+.I iSConfigurationTimer
+Value in seconds for the ISO 9542 IS configuration timer.  It is used to determine how often an IS
+reports configuration infomration to ESs.
+.TP
+.I sugggestedESConfigurationTimer
+Value to be used for the ISO 9542 suggested ES configuration timer value (in seconds), advertized in
+IS hellos generated by this network entity.
+.TP
+.I redirectHoldingTime
+The holding time (in seconds) to be specified in Redirect PDUs generated by this system.
+.TP
+.I eSReachabilityChanges
+Count of the number of changes in reachability of End Systems from this system.
+.TP
+.I invalid9542PDUs
+Counter of invalid 9542 PDUs received.   This is the number of ISO 9542 PDUs received which are
+discarded as a result of the PDU Header Error Detection or Protocol Error Processing Functions
+specified in ISO 9542.
+.RE
+.TP
+.B linkage-ISO9542ES-P Package
+.RS
+This conditional package is present if support for ISO 9542 operating as an End System (ES) is
+supported.
+The package provides the following attributes:
+.TP
+.I iSO9542OperationalSubsets
+The set of ISO 9542 subsets operation on this linkage.  The values are a combination of:
+configuration(0) and redirection(1).
+.TP
+.I holdingTimerMultiplier
+The factor to derive the holding timer from configuration timer.  This value, when multiplied by a
+configuration timer yeilds the value of the holding timer parameter issued with configuration
+information.  The semantics of this parameter are such that it is permissible to also add a delta
+value to the result to compensate for possible delays and imprecision of timers.  The result of the
+calculation is truncated, upon overflow, to the maximum value for the paramter permitted by the
+protocol (65535).  The value is an INTEGER.
+.TP
+.I manualISSNPAAddress
+The set of SNPA Addresses to which calls associated with the SNDCF are to be established in the
+absense of any other information.  The maximum set cardinality shall be implementation specific.  An
+attempt to set the value of an element of this set to a type of SNPAAddress which is not supported
+by this linkage shall result in a failure of the SET operation.  The value is a SET OF SNPAAddress,
+where an SNPAAddress is a sequence of a type and an address where the type is an OBJECT IDENTIFIER
+and the address is an OCTET STRING.  The type OBJECT IDENTIFIERS defined are
+.B { joint-iso-ccitt(2) network-layer(13) management(0) nLM(2) standardSpecificExtensions(0) sNPAAddressType(5) dTEAddress(1) }
+.I \\\\0x5d\\\\0x00\\\\0x02\\\\0x00\\\\0x05\\\\0x01
+for a DTE address and
+.B { joint-iso-ccitt(2) network-layer(13) management(0) nLM(2) standardSpecificExtensions(0) sNPAAddressType(5) mACAddress(2) }
+.I \\\\0x5d\\\\0x00\\\\0x02\\\\0x00\\\\0x05\\\\0x02
+for a MAC address.
+.TP
+.I defaultESConfigTimer
+Default value for the ISO 9542 ES configuration timer in seconds.  This value is used when the ES
+has not received, or has not chosen to accept, a suggested configuration timer value from an
+Intermediate System.
+.TP
+.I activeESConfigTimer
+Currently active value for the ISO 9542 ES configuration timer in seconds.
+.TP
+.I iSReachabilityChanges
+Counter of the number of changes in reachability of Intermediate Systems from this system.
+.TP
+.I invalid9542PDUs
+Counter of invalid 9542 PDUs received.   This is the number of ISO 9542 PDUs received which are
+discarded as a result of the PDU Header Error Detection or Protocol Error Processing Functions
+specified in ISO 9542.
+.RE
+.TP
+.B linkage-ISO9542Checksum-P Package
+This conditional package is present if support for ISO 9542 PDU Header Checksum Generation function
+is provided.
+The package provides the following attributes:
+.RS
+.TP
+.I enableChecksum
+.RE
+.TP
+.B linkageInitialMinimumTimer-P Package
+This package is present if support for the initial minimum timer attribute of the ITU-T Rec. X.233 |
+ISO/IEC 8473-1 SNDCF when operating ITU-T Rec. X.233 | ISO/IEC 8473-1 over an ISO/IEC 8208 or ITU-T
+Rec. X.25 or CO Datalink Service.
+.[
+x622
+.]
+.[
+x623
+.]
+The package provides the following attributes:
+.RS
+.TP
+.I initialMinimumTimer
+Controls the ability, when implemented, of an ISO/IEC 8208 or ITU-T Rec. X.25 or CO Data link SNDCF
+for ITU-T Rec. X.233 | ISO/IEC 8473-1 to close an established Virtual Call when it is idle, but only
+after a minimum time after its establishment.
+.RE
+.TP
+.B linkageReserveTimer-P Package
+This conditional package is present if there is support for the reserve timer attribute of the ITU-T
+Rec. X.233 | ISO/IEC 8473-1 SNDCF when operating ITU-T Rec. X.233 | ISO/IEC 8473-1 over an ISO/IEC
+8208 or ITU-T Rec. X.25 or CO Datalink Service.
+.[
+x622
+.]
+.[
+x623
+.]
+The package provides the following attributes:
+.RS
+.TP
+.I reserveTimer
+Controls the ability, when implemented, of an ISO/IEC 8208 or ITU-T Rec. X.25 or CO Dtaalink SNDCF
+for ITU-T Rec. X.233 | ISO/IEC 8473-1 to close an established Virtual Call when it is idle, but
+retain resources for its re-establishment.
+.RE
+.TP
+.B linkageIdleTimer-P Package
+This conditional package is present if there is support for the idle timer attribute of the ITU-T
+Rec. X.233 | ISO/IEC 8473-1 SNDCF when operating ITU-T Rec. X.233 | ISO/IEC 8473-1 over an ISO/IEC
+8208 or ITU-T Rec. X.25 or CO Datalink Service.
+.[
+x622
+.]
+.[
+x623
+.]
+The package provides the following attributes:
+.RS
+.TP
+.I idleTimer
+Controls the ability, when implemented, of an ISO/IEC 8208 or ITU-T Rec. X.25 or CO Datalink SNDCF
+for ITU-T Rec. X.233 | ISO/IEC 8473-1 to close an established Virtual Call when it is idle.
+.[
+x622
+.]
+.RE
+.TP
+.B linkage-ISO8473-ISO8208SNDCF-P Package
+This conditional package is present if operating ITU-T Rec. X.233 | ISO/IEC 8473-1 over ISO/IEC 8208
+or ITU-T Rec. X.25.
+The package provides the following attributes:
+.RS
+.TP
+.I callsPlaced
+Counter fo the number of X.25 VCs successfully established by the SNDCF.
+.TP
+.I callsFailed
+Count of the number of X.25 call failures while attempting establishment by the SNDCF.
+.RE
+.TP
+.B linkageCODLService-P Package
+This conditional package is present if operating ITU-T Rec. X.233 | ISO/IEC 8473-1 over the CO
+Datalink Service.
+.[
+x623
+.]
+The package provides the following attributes:
+.RS
+.TP
+.I callsPlaced
+Counter fo the number of CO Datalink connections successfully established by the SNDCF.
+.TP
+.I callsFailed
+Count of the number of CO Datalink connection failures while attempting establishment by the SNDCF.
+.RE
+.TP
+.B linkageISISBasic-P
+This conditional package is present if the system is an ISO 10589 Intermediate System (IS).
+The package provides the following attributes:
+.RS
+.TP
+.I type
+The type of circuit.  This attribute may only be set when the linkage MO is created.  Subsequently
+it is read-only.  It can take on values: broadcast(0), ptToPt(1), staticIn(2), staticOut(3), dA(4).
+.TP
+.I iSISHelloTimer
+The period between IIH PDUs.  It is also used as the period between ISH PDUs when polling the ES
+configuration.
+.TP
+.I l1DefaultMetric
+The default metric value of this circuit for Level 1 traffic.  Can take on values 0..63.
+.TP
+.I l1DelayMetric
+The default metric value of this circuit for Level 1 traffic.  The value of zero is reserved to
+indicate that this metric is not supported.
+Can take on values 0..63.
+.TP
+.I l1ExpenseMetric
+The expense metric value of this circuit for Level 1 traffic.  The value of zero is reserved to
+indicate that this metric is not supported.
+Can take on values 0..63.
+.TP
+.I l1ErrorMetric
+The error metric value of this circuit for Level 1 traffic.  The value of zero is reserved to
+indicate that this metric is not supported.
+Can take on values 0..63.
+.TP
+.I externalDomain
+Boolean.  If true, suppresses normal transmission of an interpretation of Intra-domain ISIS PDUs on
+this circuit.
+.TP
+.I changesInAdjacencyState
+Number of adjacency state change events generated.
+.TP
+.I intialisationFailures
+Number of initialization failure events generated.
+.TP
+.I rejectedAdjacencies
+Number of rejected adjacency events generated.
+.TP
+.I iSISControlPDUsSent
+Number of control PDUs sent on this circuit.
+.TP
+.I iSISControlPDUsReceived
+Number of control PDUs received on this circuit.
+.TP
+.I iDFieldLengthMismatches
+Number of times the ID field length mismatch event has been generated.
+.TP
+.I maximumAreaAddressesMismatches
+Count of the maximum aread addresses mismatch events.
+.RE
+.TP
+.B linkageISISAuthentication-P
+This conditional package is present if the authentication procedures are implemented on an ISO 10589
+IS.
+The package provides the following attributes:
+.RS
+.TP
+.I circuitTransmitPassword
+The value to be used as a transmit password in IIH PDUs transmitted by this Intermediate System.  It
+is an OCTET STRING of size 0..254.
+.TP
+.I circuitReceivePasswords
+The values to be used as receive passwords to check the receipt of IIH PDUs.  It is a SET OF OCTET
+STRING of size 0..254.
+.TP
+.I authenticationFailures
+Count of the authentication failure events.
+.RE
+.TP
+.B linkageISISBroadcast-P
+This conditional package is present if the linkage is a broadcast circuit on an ISO 10589 IS.
+The package provides the following attributes:
+.RS
+.TP
+.I l1IntermediateSystemPriority
+Priority for becoming LAN Level 1 Designated Intermediate System (0..127).
+.TP
+.I l1CircuitId
+The LAN ID allocated by the LAN Level 1 Designated Intermediate System.  Where this system is not
+aware of the value (because it is not participating in the Level 1 Designated Intermediate System
+election), this attribute has the value which would be proposed for this circuit. (i.e. the
+concatentaiton of the local system ID and the one octet local Circuit ID for this circuit.
+This is an OCTET STRING(SIZE(2..9)).
+.TP
+.I l1DesignatedIntermediateSystem
+The ID of the LAN Level 1 Designated Intermediate System on this circuit.  If, for any reason this
+system is not partaking in the relevant Designated Intermedate System election process, then the
+value returned is the zero length OCTET STRING.
+This is an OCTET STRING(SIZE(0..8)).
+.TP
+.I lanL1DestinatedIntermediateSystemChanges
+Number of LAN L1 Designated Intermediate System Change events generated.
+.RE
+.TP
+.B linkageISISDACallEstablishmentMetricIncrement-P
+This conditional package is present if the linkage is a DA Circuit and support is implemented for
+call establishment metric increment values greater than zero on an ISO/IEC 10589 IS.
+The package provides the following attributes:
+.RS
+.TP
+.I callEstablishmentDefaultMetricIncrement
+Additonal value to be reported for the default metric value of unestablished DA adjacencies.
+The value is 0..63.
+.TP
+.I callEstablishmentDelayMetricIncrement
+Additonal value to be reported for the delay metric value of unestablished DA adjacencies.
+The value is 0..63.
+.TP
+.I callEstablishmentExpenseMetricIncrement
+Additonal value to be reported for the expense metric value of unestablished DA adjacencies.
+The value is 0..63.
+.TP
+.I callEstablishmentErrorMetricIncrement
+Additonal value to be reported for the error metric value of unestablished DA adjacencies.
+The value is 0..63.
+.RE
+.TP
+.B linkageISISPtToPt-P
+This conditional package is present if the linkage is a point to point circuit on an ISO 10589 IS.
+The package provides the following attributes:
+.RS
+.TP
+.I ptPtCircuitID
+The ID of the circuit allocated during initialization.  If no value has been negotiated (either
+because adjacency is to an End system, or because initialization has not yet successfully
+completed), this attribute has the value which would be proposed for this circuit.  (i.e. the
+concatenation of the local system ID and the one octet local Circuit ID for this circuit.
+The value is an OCTET STRING(SIZE(2..9)).
+.RE
+.TP
+.B linkageISISStatic-P
+This conditional package is present if the linkage is an X.25 static circuit (IN or OUT) on an ISO
+10589 IS.
+The package provides the following attributes:
+.RS
+.TP
+.I outgoingCallIVMO
+Refernece to the virtualCallIVMO to be used to estbalish communication with a neigbour over this
+circuit.  This IVMO contains, amoung other things, the SNPA Address to use as the called address.
+.TP
+.I ptPtCircuitID
+The ID of the circuit allocated during initialization.  If no value has been negotiated (either
+because adjacency is to an End system, or because initialization has not yet successfully
+completed), this attribute has the value which would be proposed for this circuit.  (i.e. the
+concatenation of the local system ID and the one octet local Circuit ID for this circuit.
+The value is an OCTET STRING(SIZE(2..9)).
+.TP
+.I neighbourSNPAAddress
+The SNPA address of the neighbour system.
+.RE
+.TP
+.B linkageISISLevel2-P
+This conditional package is present if the system is an ISO/IEC 10589 Level 2 IS.
+The package provides the following attributes:
+.RS
+.TP
+.I l2DefaultMetric
+The default metric value of this circuit for Level 2 traffic.
+Values are 0..63.
+.TP
+.I l2DelayMetric
+The delay metric value of this circuit for Level 2 traffic.
+The value of zero is reserved to indicate that this metric is not supported.
+Values are 0..63.
+.TP
+.I l2ExpenseMetric
+The expense metric value of this circuit for Level 2 traffic.
+The value of zero is reserved to indicate that this metric is not supported.
+Values are 0..63.
+.TP
+.I l2ErrorMetric
+The error metric value of this circuit for Level 2 traffic.
+The value of zero is reserved to indicate that this metric is not supported.
+Values are 0..63.
+.TP
+.I manualL2OnlyMode
+Boolean.  When true, indicates that this circuit is to be used only for level 2.
+.RE
+.TP
+.B linkageISISLevel2Broadcast-P
+This conditional package is present if the linkage is a broadcast circuit on in ISO 10589 Level 2
+Intermedate System.
+The package provides the following attributes:
+.RS
+.TP
+.I l2IntermediateSystemPriority
+Priority for becoming LAN Level 2 Designated Intermediate System.
+.TP
+.I l2CircuitID
+The LAN ID allocated by the LAN Level 2 Designated Intermediate System.  Where this system is not
+aware of the value (because it is not participating in the Level 2 Designated Intermediate System
+election), this attribute has the value which would be proposed for this circuit. (i.e. the
+concatenation of the local system ID and the one octet local Circuit ID for this circuit.
+The value is an OCTET STRING(SIZE(2..9)).
+.TP
+.I l2DesignatedIntermediateSystem
+The ID of the LAN Level 2 Designated Intermediate System on this circuit.  If, for any reason this
+system is not partaking in the relevant Designated Intermediate System election process, then the
+value returned is the zero length OCTET STRING.
+The value is an OCTET STRING(SIZE(0..8)).
+.TP
+.I lanL2DesignatedIntermediateSystemChanges
+Number of LAN L2 Designated Intermediate System Change events generated.
+.RE
+.\"
+.\"
 .SH NOTICES
 .PP
 Note that the CLNS driver does not perform ES-IS, IS-IS or IDRP routing.  It

@@ -88,6 +88,25 @@ sort-adjacent-labels
 \- Examine next ACSE/Presentation primitive from the association/connection.
 .\"
 .\"
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface,
+APLI,
+.[
+APLI UNIX International
+.]
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libapli (3),
+.BR libxap (3).
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xap.h>

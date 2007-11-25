@@ -88,6 +88,25 @@ sort-adjacent-labels
 \- Free user memory associated with XAP data structures.
 .\"
 .\"
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface,
+APLI,
+.[
+APLI UNIX International
+.]
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libapli (3),
+.BR libxap (3).
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xap.h>
