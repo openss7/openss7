@@ -826,7 +826,7 @@ says that in byte-stream mode a zero-length message terminates the read (a short
 say that the zero-length message is placed back on the stream.
 .I SVR 4
 also says that an
-.B M_READ (9)
+.BR M_READ (9)
 message is generated downstream when there is insufficient data at the STREAM head to satisfy the
 .BR read ()
 request, and that, when

@@ -79,6 +79,9 @@ GDMOS = \
 	ISO10589.gdmo \
 	ISO10733.gdmo \
 	ISO10733D.gdmo \
+	ISO10742.gdmo \
+	ISO8802-1.gdmo \
+	ISO8802-2.gdmo \
 	M.3100.2005.gdmo \
 	M.3100.gdmo \
 	M3100.gdmo \
@@ -164,6 +167,8 @@ EXTRA_GDMOS = \
 	ISO10733.gdmo \
 	ISO10589.1.gdmo \
 	ISO10589.2.gdmo \
+	ISO10742.1994.gdmo \
+	ISO10742.1995.gdmo \
 	G.774.03.gdmo \
 	G.774.04.gdmo
 
@@ -186,6 +191,7 @@ ASNS = \
 	ISO10589.asn \
 	ISO10733.asn \
 	ISO10733D.asn \
+	ISO10742.asn \
 	M.3100.2005.asn \
 	M.3100.asn \
 	M3100.asn \
@@ -226,7 +232,9 @@ ASNS = \
 	X.754.asn \
 	X.790.asn \
 	X.711.asn \
-	X.750.asn
+	X.750.asn \
+	ISO8802-1.asn \
+	ISO8802-2.asn
 
 EXTRA_ASNS = \
 	ASN1.asn \
@@ -275,7 +283,9 @@ EXTRA_ASNS = \
 	X.751.1998.asn \
 	X.751.2000.asn \
 	X.753.1997.asn \
-	X.754.2000.asn
+	X.754.2000.asn \
+	ISO10742.1994.asn \
+	ISO10742.1995.asn
 
 NEW_ASNS = $(ASNS:%.asn=%.new.asn)
 

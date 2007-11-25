@@ -82,6 +82,7 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-ignore T
 .R2
 .so striso.macros
 .\"
@@ -115,8 +116,8 @@ x25
 .\"
 .SH USAGE
 .PP
-Streams providing LAPB or LLC2 data links conforming to the Data Link Provider
-Interface (DLPI),
+Streams providing LAPB, MLP, LLC2 or XOT/XOS data links conforming to the Data
+Link Provider Interface (DLPI),
 .[
 dlpi revision 2.0.0
 .]
@@ -131,6 +132,34 @@ npi revision 2.0.0
 .]
 .BR npi (7),
 OSI conforming service interface.
+.PP
+.nf
+\fC\s-1\
+ ---------------------------------------------------------------
+ Network +----------------------------------+                   
+ Layer   |                CONS              |                   
+         +--+--------+--------------+-------+                   
+            |        |              |                           
+            |        |   +----------+-------------------------+ 
+            |        |   |              X.25 PLP              | 
+            |        |   +----+-------+--------+---------+----+ 
+            |        |        |       |        |         |      
+ -----------|--------|--------|-------|--------|---------|------
+ Datalink   |        |        |       |        |         |      
+ Layer  +---+--+ +---+--+ +---+--+ +--+--+ +---+--+ +----+----+ 
+        | ISOT | | LLC1 | | LLC2 | | XOT | | LAPB | |   MLP   | 
+        +---+--+ +---+--+ +--+---+ +--+--+ +---+--+ +-+-----+-+ 
+            |        |       |        |        |    +-+-+ +-+-+ 
+            +--------|-------|--------+        |    |SLP| |SLP| 
+                     |       |        |        |    +-+-+ +-+-+ 
+ --------------------|-------|--------|--------|------|-----|---
+ Communications      |       |        |        |      |     |   
+ Device          +---+-------+---+ +--+--+  +--+------+-----+-+ 
+ Layer           |      802      | | TCP |  |       WAN       | 
+                 +---------------+ +-----+  +-----------------+ 
+ ---------------------------------------------------------------
+\s+1\fP
+.fi
 .PP
 A user of the PLP network service opens the pseudo-device driver by opening
 the clone device

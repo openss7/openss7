@@ -167,7 +167,7 @@ One member,
 should correspond to an APLI communication endpoint; however, any open file descriptor is accepted.
 The
 .I events
-field is a bitmask used to indicate which events should be reported for the isntance.  The
+field is a bitmask used to indicate which events should be reported for the instance.  The
 .I revents
 field will be set by APLI to indicate which of the requested events have occurred:
 .sp

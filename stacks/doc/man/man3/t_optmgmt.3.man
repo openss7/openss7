@@ -76,6 +76,7 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-ignore T
 .R2
 .so strss7.macros
 .\"
@@ -708,7 +709,7 @@ TPI Revision 2.0.0
 XPG5,
 XNS 5.2,
 .[
-xns
+xns 5.2
 .]
 SUSv2.
 .[

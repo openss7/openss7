@@ -77,6 +77,9 @@
 /** @weakgroup xap OpenSS7 XAP Library
   * @{ */
 
+/** @file
+  * XAP (User) Header File. */
+
 /*
  * Data structures for X/Open ACSE/Presentation Library environment attributes and cdata parameters.
  */
@@ -96,6 +99,15 @@
 #define AP_SESS_ID	( 5)
 #define AP_TRAN_ID	( 4)
 #define AP_OS_ID	( 0)
+
+
+/*
+ * ap_val_t union for val argument to ap_set_env()
+ */
+typedef union {
+	long l;
+	void *v;
+} ap_val_t;
 
 /*
  * Object Identifier structure
@@ -136,17 +148,17 @@ typedef struct {
 
 /** @brief Use to convey context defninition lists.
   *
-  * The context definition list comprieses a series of elements in the array, m_ap_cdl.  The number
-  * of elements in this array is given as size.
+  * The context definition list comprises a series of elements in the array, m_ap_cdl.
+  * The number of elements in this array is given as size.
   *
-  * The presentation context identifier is represented by m_ap_cdl[i].pci.  m_ap_cdl[i].a_sytx is a
-  * pointer to an ap_objid_t and is used to convey the abstract syntax name associated wtih the
-  * presentation context identifer.  m_ap_cdl[i].m_t_sytx is a pointer to an array of type
-  * ap_objid_t * which includes the transfer syntaxes that the association-initiator is capable of
-  * supporting for the named abstract syntax.  m_ap_cdl[i].size_t_sytx is the number of elements in
-  * the m_ap_cdl[i].m_t_sytx array.
+  * The presentation context identifier is represented by m_ap_cdl[i].pci.
+  * m_ap_cdl[i].a_sytx is a pointer to an ap_objid_t and is used to convey the abstract syntax name
+  * associated with the presentation context identifer.  m_ap_cdl[i].m_t_sytx is a pointer to
+  * an array of type ap_objid_t * which includes the transfer syntaxes that the
+  * association-initiator is capable of supporting for the named abstract syntax.
+  * m_ap_cdl[i].size_t_sytx is the number of elements in the m_ap_cdl[i].m_t_sytx array.
   *
-  * The context definition list is an optional paraemter of the CP PPDU. Setting size to minus one
+  * The context definition list is an optional parameter of the CP PPDU.  Setting size to minus one
   * (-1) specifies that this parameter is not present.  The presentation context definition list may
   * also be specified to be absent by invoking ap_set_env() with AP_PCDL as the attr argument to
   * that function and a NULL pointer as the val argument to that function.
@@ -158,24 +170,7 @@ typedef struct {
 	ap_cdl_elt_t *m_ap_cdl;
 } ap_cdl_t;
 
-/* AP_DCN */
-typedef struct {
-	ap_objid_t *a_sytx;
-	ap_objid_t *t_sytx;
-} ap_dcn_t;
-
 /* AP_PCDRL */
-
-/* AP_PCDRL.res */
-#define AP_ACCEPT		(0)
-#define AP_USER_REJ		(1)
-#define AP_PROV_REJ		(2)
-
-/* AP_PCDRL.prov_rsn */
-#define AP_RSN_NSPEC		(0)	/**< Reason not specified. */
-#define AP_A_SYTX_NSUP		(1)	/**< Abstract syntax not supported. */
-#define AP_PROP_T_SYTX_NSUP	(2)	/**< Proprosed trasnfer syntaxes not supported. */
-#define AP_LCL_LMT_DCS_EXCEEDED	(3)	/**< Local limit on DCS exceeded. */
 
 typedef struct {
 	long res;
@@ -185,26 +180,29 @@ typedef struct {
 
 /** @brief Used to convey context definnition result lists.
   *
-  * The context definition result list comprises a series of elements in the array, mp_ap_cdrl.  The
-  * number of elements in this array is given as size.
+  * The context definition result list comprises a series of elements in the array, mp_ap_cdrl.
+  * The number of elements in this array is given as size.
   *
   * There is a one-to-one correspondence between the elements of a context definition list and those
   * in the related context definition result list.  For each entry in the presentation context
-  * definition list, the m_ap_cdrl[i].res field of the corresponding eleemnt in the presentation
+  * definition list, the m_ap_cdrl[i].res field of the corresponding element in the presentation
   * context definition result list must be set by the association-responder to one of AP_ACCEPT,
   * AP_USER_REJ or AP_PROV_REJ.  If m_ap_cdlr[i].res is set to AP_ACCESSP, then m_ap_cdrl[i].t_sytx
-  * indicates the trasnfer syntax selected by the association-responder.  If m_ap_cdrl[i].res is set
-  * to either AP_USER_REJ or AP_PROV_REJ, m_ap_cdrl[i].prov_rsn is set to the reason for the
+  * indicates the transfer syntax selected by the association-responder.  If m_ap_cdrl[i].res is
+  * set to either AP_USER_REJ or AP_PROV_REJ, m_ap_cdrl[i].prov_rsn is set to the reason for the
   * rejection of the abstract syntax.
   *
-  * The possible values for ap_cdrl[i].prov_rsn are AP_RSN_NSPEC (reason not specified),
-  * AP_A_SYTX_NSUP (abstract syntax not supported).  AP_PROP_T_SYTX_NSUP (proposed trasnfer
-  * syntaexes not supported), and AP_LCL_LMT_DCS_EXCEEDED (local limit on DCS exceeded).
+  * The possible values for ap_cdrl[i].prov_rsn are:
+  *
+  * AP_RSN_NSPEC (reason not specified),
+  * AP_A_SYTX_NSUP (abstract syntax not supported),
+  * AP_PROP_T_SYTX_NSUP (proposed transfer syntaxes not supported), and
+  * AP_LCL_LMT_DCS_EXCEEDED (local limit on DCS exceeded).
   *
   * The context definition result list is an optional parameter of the CPA and CPR PPDUs.  Setting
   * the value of size to -1 indicates that this parameter is not present.  The presentation context
-  * defintiion result list may also be specified to be absent by invoking ap_set_env() with AP_PCDRL
-  * as the attr argument an a NULL pointer as the val argument to the function.
+  * definition result list may also be specified as absent by invoking ap_set_env() with AP_PCDRL as
+  * the attr argument and a NULL pointer as the val argument to the function.
   *
   * This structure is used with the AP_PCDRL environment attribute.
   */
@@ -212,6 +210,29 @@ typedef struct {
 	int size;
 	ap_cdrl_elt_t *m_ap_cdl;
 } ap_cdrl_t;
+
+/* AP_PCDRL.res */
+#define AP_ACCEPT		(0)	/**< Proposed presentation context accepted. */
+#define AP_USER_REJ		(1)	/**< Proposed presentation context rejected by user. */
+#define AP_PROV_REJ		(2)	/**< Proposed presentation context rejected by provider. */
+
+/* AP_PCDRL.prov_rsn */
+#define AP_RSN_NSPEC		(0)	/**< Reason not specified (unknown). */
+#define AP_A_SYTX_NSUP		(1)	/**< Abstract syntax not supported. */
+#define AP_PROP_T_SYTX_NSUP	(2)	/**< Proposed transfer syntaxes not supported. */
+#define AP_LCL_LMT_DCS_EXCEEDED	(3)	/**< Local limit on DCS exceeded. */
+
+/** @type ap_octet_string_t
+  * @brief Octet-String
+  *
+  * The length member of this structure indicates the number of octets in the octet string pointed
+  * to by the data member.  To specify a null octet string value, the length field of the
+  * ap_octet_string_t structure is set to zero (0).
+  */
+typedef struct {
+	long length;			/**< Number of octets. */
+	unsigned char *data;		/**< Octets. */
+} ap_octet_string_t;
 
 /** @brief Used to convey objects specified as ASN.1 type AE-Qualifier.
   *
@@ -255,19 +276,6 @@ typedef struct {
 	unsigned char *udata;	/**< Buffer with user encoded AE-identifier or AP-identifier. */
 } ap_aei_api_id_t;
 
-/** @type ap_octet_string_t
-  * @brief Octet-String
-  *
-  * The length member of this structure indicates the number of octets in the octet string pointed
-  * to by the data member.  To specify a null octet string value, the length field of the
-  * ap_octet_string_t structure is set to zero
-  * (0).
-  */
-typedef struct {
-	long length;
-	unsigned char *data;
-} ap_octet_string_t;
-
 /* AP_BIND_PADDR, AP_LCL_PADDR, AP_REM_PADDR */
 typedef struct {
 	ap_octet_string_t nsap;		/* NSAPAddress */
@@ -286,16 +294,21 @@ typedef struct {
   * The p_selector, s_selector and t_selector are pointers to octet strings corresponding to the
   * presentation, session and transport selectors respectively.  These octet strings are represented
   * by the ap_octet_string_t structure.  The length field of this structure indicates how many
-  * octets are in the octet string pointed to by data.  To specify a null selector value, the length
-  * field of the ap_octet_string_t structure is set to zero 0.  For selector wildcard presentation
-  * addresses, non-specified selector values are indicated by setting the corresponding pointer(s)
-  * in the ap_paddr_t structure to NULL.
+  * octets are in the octet string pointed to by data.
+  *
+  * To specify a null selector value, the length field of the ap_octet_string_t structure is set to
+  * zero (0).
+  *
+  * For selector wildcard presentation addresses, non-specified selector values are
+  * indicated by setting the corresponding pointer(s) in the ap_paddr_t structure to NULL.
   *
   * The n_nsaps element is used to specify how many network address components are in the array,
-  * nsaps.  Each element of the nsaps array is an ap_octet_string_t structure with an associated
-  * nsap_type which identifies the type of network (or system dependent values) to which the NSAP
-  * refers.  An nsap_type of AP_UNKNOWN indicates that the network type is not known.  Note that the
-  * concept of a nsap_type is new for XAP and was not present in APLI.
+  * nsaps.
+  *
+  * Each element of the nsaps array is an ap_octet_string_t structure with an associated nsap_type
+  * which identifies the type of network (or system dependent values) to which the NSAP refers.  An
+  * nsap_type of AP_UNKNOWN indicates that the network type is not known.  Note that the concept of
+  * a nsap_type is new for XAP and was not present in APLI.
   *
   * When multiple network address components are included in a presentation address, the specific
   * network address(es) chosen by the provider and the manner by which it is selected for intiating
@@ -418,6 +431,35 @@ typedef struct {
 	char *error;			/* textual message */
 } ap_diag_t;
 
+/* ap_diag_t.src values: */
+#define AP_ACSE_SERV_PROV	(FIXME)
+#define AP_PRES_SERV_PROV	(FIXME)
+#define AP_SESS_SERV_PROV	(FIXME)
+#define AP_TRAN_SERV_PROV	(FIXME)
+
+/* ap_diag_t.rsn values: */
+/* ap_diag_t.src == AP_ACSE_SERV_PROV */
+#define AP_NSPEC		(FIXME)
+#define AP_UNREC_APDU		(FIXME)
+#define AP_UNEXPT_APDU		(FIXME)
+#define AP_UNREC_APDU_PARM	(FIXME)
+#define AP_UNEXPT_APDU_PARM	(FIXME)
+#define AP_INVAL_APDU_PARM	(FIXME)
+/* ap_diag_t.src == AP_TRAN_SERV_PROV */
+#define AP_TRAN_DISCONNECT	(FIXME)
+
+/* ap_diag_t.evt values: */
+/* ap_diag_t.src == AP_ACSE_SERV_PROV */
+#define AP_AEI_AARQ		(FIXME)	/**< Associate request APDU. */
+#define AP_AEI_AARE		(FIXME)	/**< Associate response APDU. */
+#define AP_AEI_RLRQ		(FIXME)	/**< Associate release request APDU. */
+#define AP_AEI_RLRE		(FIXME)	/**< Associate release response APDU. */
+#define AP_AEI_ABRT		(FIXME)	/**< Associate abort APDU. */
+
+/* If the src field is set to AP_TRAN_SERV_PROV and the rsn field is set to AP_TRAN_DISCONNECT, the
+ * evt field will be set to an implementation-defined diagnostic value such as that returned by the
+ * XTI t_rcvdis(3) call. */
+
 /*
  * ap_pollfd structure for fds argument to ap_poll().
  */
@@ -441,6 +483,7 @@ typedef struct pollfd ap_pollfd_t;
 #define AP_POLLHUP	POLLHUP
 #define AP_POLLNVAL	POLLNVAL
 #define AP_POLLMSG	POLLMSG
+#define AP_POLLURG	POLLNVAL
 
 #define AP_INFTIM	(-1)
 
@@ -518,12 +561,365 @@ typedef struct {
 } ap_a_assoc_env_t;
 
 /*
- * ap_val_t union for val argument to ap_set_env()
+ * These are the bit definitions for the ap_a_assoc_env_t.mask field.  I have no idea if these line
+ * up with other implementations.  Only source level compatibility is attempted.  Binaries are
+ * guaranteed to break.
  */
-typedef union {
-	long l;
-	void *v;
-} ap_val_t;
+#define AP_MODE_SEL_BIT		(1<< 0)
+#define AP_CNTX_NAME_BIT	(1<< 1)
+#define AP_CLG_AEID_BIT		(1<< 2)
+#define AP_CLG_AEQ_BIT		(1<< 3)
+#define AP_CLG_APID_BIT		(1<< 4)
+#define AP_CLG_APT_BIT		(1<< 5)
+#define AP_CLD_AEID_BIT		(1<< 6)
+#define AP_CLD_AEQ_BIT		(1<< 7)
+#define AP_CLD_APID_BIT		(1<< 8)
+#define AP_CLD_APT_BIT		(1<< 9)
+#define AP_REM_PADDR_BIT	(1<<10)
+#define AP_PCDL_BIT		(1<<11)
+#define AP_DPCN_BIT		(1<<12)
+#define AP_QOS_BIT		(1<<13)
+#define AP_A_VERSION_SEL_BIT	(1<<14)
+#define AP_ACSE_SEL_BIT		AP_A_VERSION_SEL_BIT	/* Error in XAP spec. */
+#define AP_P_VERSION_SEL_BIT	(1<<15)
+#define AP_PRES_SEL_BIT		AP_P_VERSION_SEL_BIT	/* Error in XAP spec. */
+#define AP_S_VERSION_SEL_BIT	(1<<16)
+#define AP_SESS_SEL_BIT		AP_S_VERSION_SEL_BIT	/* Error in XAP spec. */
+#define AP_AFU_SEL_BIT		(1<<17)
+#define AP_PFU_SEL_BIT		(1<<18)
+#define AP_SFU_SEL_BIT		(1<<19)
+#define AP_CLG_CONN_ID_BIT	(1<<20)
+#define AP_CLD_CONN_ID_BIT	(1<<21)
+#define AP_INIT_SYNC_PT_BIT	(1<<22)
+#define AP_INIT_TOKENS_BIT	(1<<23)
+#define AP_RSP_AEID_BIT		(1<<24)
+#define AP_RSP_AEQ_BIT		(1<<25)
+#define AP_RSP_APID_BIT		(1<<26)
+#define AP_RSP_APT_BIT		(1<<27)
+#define AP_PCDRL_BIT		(1<<28)
+#define AP_DPCR_BIT		(1<<29)
+/* only two bits left! */
+
+/** @name XAP Environment Attributes
+  * The following XAP environment attributes can be written with ap_set_env() or read with
+  * ap_get_env().
+  *
+  * I have no idea if these line up with other implementations as they are not described in the
+  * standards documents.  Only source compatibility is attempted.  Binaries are guaranteed to break
+  * as the values of these symbolic constants are not standardized.  Anyone wanting to contribute a
+  * compatible list for a given architecture is welcomed to do so.
+  * @{ */
+#define AP_ACSE_AVAIL		((AP_ACSE_ID<<16) |  1)
+#define AP_ACSE_SEL		((AP_ACSE_ID<<16) |  2)
+#define AP_BIND_PADDR		((AP_PRES_ID<<16) |  3)
+#define AP_CLD_AEID		((AP_ACSE_ID<<16) |  4)
+#define AP_CLD_AEQ		((AP_ACSE_ID<<16) |  5)
+#define AP_CLD_APID		((AP_ACSE_ID<<16) |  6)
+#define AP_CLD_APT		((AP_ACSE_ID<<16) |  7)
+#define AP_CLD_CONN_ID		((AP_SESS_ID<<16) |  8)
+#define AP_CLG_AEID		((AP_ACSE_ID<<16) |  9)
+#define AP_CLG_AEQ		((AP_ACSE_ID<<16) | 10)
+#define AP_CLG_APID		((AP_ACSE_ID<<16) | 11)
+#define AP_CLG_APT		((AP_ACSE_ID<<16) | 12)
+#define AP_CLG_CONN_ID		((AP_SESS_ID<<16) | 13)
+#define AP_CNTX_NAME		((AP_ACSE_ID<<16) | 14)
+#define AP_DCS			((AP_PRES_ID<<16) | 15)
+#define AP_DPCN			((AP_PRES_ID<<16) | 16)
+#define AP_DPCR			((AP_PRES_ID<<16) | 17)
+#define AP_INIT_SYNC_PT		((AP_SESS_ID<<16) | 18)
+#define AP_LCL_PADDR		((AP_PRES_ID<<16) | 19)
+#define AP_LIB_AVAIL		((AP_ID     <<16) | 20)
+#define AP_LIB_SEL		((AP_ID     <<16) | 21)
+#define AP_MODE_AVAIL		((AP_ACSE_ID<<16) | 22)
+#define AP_MODE_SEL		((AP_ACSE_ID<<16) | 23)
+#define AP_MSTATE		((AP_ID	    <<16) | 24)
+#define AP_PCDL			((AP_PRES_ID<<16) | 25)
+#define AP_PCDRL		((AP_PRES_ID<<16) | 26)
+#define AP_PFU_AVAIL		((AP_PRES_ID<<16) | 27)
+#define AP_PFU_SEL		((AP_PRES_ID<<16) | 28)
+#define AP_PRES_AVAIL		((AP_PRES_ID<<16) | 29)
+#define AP_PRES_SEL		((AP_PRES_ID<<16) | 30)
+#define AP_REM_PADDR		((AP_PRES_ID<<16) | 31)
+#define AP_ROLE_ALLOWED		((AP_ACSE_ID<<16) | 32)
+#define AP_ROLE_CURRENT		((AP_ACSE_ID<<16) | 33)
+#define AP_RSP_AEID		((AP_ACSE_ID<<16) | 34)
+#define AP_RSP_AEQ		((AP_ACSE_ID<<16) | 35)
+#define AP_RSP_APID		((AP_ACSE_ID<<16) | 36)
+#define AP_RSP_APT		((AP_ACSE_ID<<16) | 37)
+#define AP_SESS_AVAIL		((AP_SESS_ID<<16) | 38)
+#define AP_SESS_SEL		((AP_SESS_ID<<16) | 39)
+#define AP_SFU_AVAIL		((AP_SESS_ID<<16) | 40)
+#define AP_SFU_SEL		((AP_SESS_ID<<16) | 41)
+#define AP_STATE		((AP_ACSE_ID<<16) | 42)
+#define AP_FLAGS		((AP_ID     <<16) | 43)	/* Called AP_STREAM_FLAGS in APLI. */
+#define AP_TOKENS_AVAIL		((AP_SESS_ID<<16) | 44)
+#define AP_TOKENS_OWNED		((AP_SESS_ID<<16) | 45)
+#define AP_AFU_AVAIL		((AP_ACSE_ID<<16) | 46)	/* Not APLI. */
+#define AP_AFU_SEL		((AP_ACSE_ID<<16) | 47)	/* Not APLI. */
+#define AP_COPYENV		((AP_ID     <<16) | 48)	/* Not APLI. */
+#define AP_DIAGNOSTIC		((AP_ACSE_ID<<16) | 49)	/* Not APLI. */
+#define AP_INIT_TOKENS		((AP_SESS_ID<<16) | 50)	/* Not APLI. */
+#define AP_OLD_CONN_ID		((AP_SESS_ID<<16) | 51)	/* Not APLI. */
+#define AP_OPT_AVAIL		((AP_SESS_ID<<16) | 52)	/* Not APLI. */
+#define AP_QLEN			((AP_TRAN_ID<<16) | 53)	/* Not APLI. */
+#define AP_QOS			((AP_TRAN_ID<<16) | 54)	/* Not APLI. */
+#define AP_SESS_OPT_AVAIL	((AP_SESS_ID<<16) | 55)	/* Not APLI. */
+/** @} */
+
+/* bit values for AP_ACSE_AVAIL and AP_ACSE_SEL */
+#define AP_ACSEVER1		(1<<0)
+
+/* values for AP_DPCR */
+#define AP_DPCR_NOVAL		(-1)
+//#define AP_ACCEPT		0
+//#define AP_USER_REJ		1
+//#define AP_PROV_REJ		2
+
+/* values for AP_INIT_SYNC_PT */
+#define AP_MIN_SYNCP		0
+#define AP_MAX_SYNCP		999999
+
+/* bit values for AP_LIB_AVAIL and AP_LIB_SEL */
+/* Strangely, this value cannot be used to determine the difference betweent the APLI version of the
+ * library and the XAP version of the library. */
+#define AP_LIBVER1		(1<<0)
+
+/* bit values for AP_MODE_AVAIL and AP_MODE_SEL */
+#define AP_NORMAL_MODE		(1<<0)
+#define AP_X410_MODE		(1<<1)
+#define AP_ROSE_MODE		(1<<2)
+
+/* bit values for AP_MSTATE */
+#define AP_SNDMORE		(1<<0)
+#define AP_RCVMORE		(1<<1)
+
+/* bit values for AP_PRES_SEL */
+#define AP_PRESVER1		(1<<0)
+
+/* bit values for AP_ROLE_ALLOWED and AP_ROLE_CURRENT */
+#define AP_INITIATOR		(1<<0)
+#define AP_RESPONDER		(1<<1)
+
+/* bit values for AP_SESS_AVAIL and AP_SESS_SEL */
+#define AP_SESSVER1		(1<<0)
+#define AP_SESSVER2		(1<<1)
+
+/* bit values for AP_SESS_OPT_AVAIL */
+#define AP_UCBC			(1<<0)
+#define AP_UCEC			(1<<1)
+
+/* bit values for AP_SFU_AVAIL and AP_SFU_SEL */
+#define AP_SESS_DUPLEX		(1<< 0)
+#define AP_SESS_HALFDUPLEX	(1<< 1)
+#define AP_SESS_XDATA		(1<< 2)
+#define AP_SESS_TDATA		(1<< 3)
+#define AP_SESS_MINORSYNC	(1<< 4)
+#define AP_SESS_MAJORSYNC	(1<< 5)
+#define AP_SESS_RESYNC		(1<< 6)
+#define AP_SESS_EXCEPT		(1<< 7)
+#define AP_SESS_ACTMGMT		(1<< 8)
+#define AP_SESS_NEGREL		(1<< 9)	/* Not APLI. */
+#define AP_SESS_CDATA		(1<<10)	/* Not APLI. */
+#define AP_SESS_DATASEP		(1<<11)	/* Not APLI. */
+
+/* values for AP_STATE */
+#define AP_UNBOUND		(1<< 0)
+#define AP_IDLE			(1<< 1)
+#define AP_DATA_XFER		(1<< 2)
+#define AP_WASSOCrsp_ASSOCind	(1<< 3)
+#define AP_WASSOCcnf_ASSOCreq	(1<< 4)
+#define AP_WRELrsp_RELind	(1<< 5) /* Not APLI. */
+#define AP_WRELcnf_RELreq	(1<< 6) /* Not APLI. */
+#define AP_WRESYNrsp_RESYNind	(1<< 7) /* Not APLI. */
+#define AP_WRESYNcnf_RESYNreq	(1<< 8) /* Not APLI. */
+#define AP_WRELrsp_RELind_init	(1<< 9) /* Not APLI. */
+#define AP_WRELcnf_RELreq_rsp	(1<<10) /* Not APLI. */
+#define AP_WACTDrsp_ACTDind	(1<<11) /* Not APLI. */
+#define AP_WACTDcnf_ACTDreq	(1<<12) /* Not APLI. */
+#define AP_WACTErsp_ACTEind	(1<<13) /* Not APLI. */
+#define AP_WACTEcnf_ACTEreq	(1<<14) /* Not APLI. */
+#define AP_WACTIrsp_ACTIind	(1<<15) /* Not APLI. */
+#define AP_WACTIcnf_ACTIreq	(1<<16) /* Not APLI. */
+#define AP_WSYNCMArsp_SYNCMAind	(1<<17) /* Not APLI. */
+#define AP_WSYNCMAcnf_SYNCMAreq	(1<<18) /* Not APLI. */
+#define AP_WCDATArsp_CDATAind	(1<<19) /* Not APLI. */
+#define AP_WCDATAcnf_CDATAreq	(1<<20) /* Not APLI. */
+#define AP_WRECOVERYind		(1<<21) /* Not APLI. */
+#define AP_WRECOVERYreq		(1<<22) /* Not APLI. */
+
+/* values for AP_FLAGS */
+#define AP_NDELAY		O_NDELAY
+
+/* bit values for AP_TOKENS_AVAIL and AP_TOKENS_OWNED */
+#define AP_DATA_TOK		(1<<0)
+#define AP_SYNCMINOR_TOK	(1<<1)
+#define AP_MAJACT_TOK		(1<<2)
+#define AP_RELEASE_TOK		(1<<3)
+
+/* values for AP_COPYENV */
+#define TRUE			1
+#define FALSE			0
+
+/* bit values for AP_INIT_TOKENS */
+#define AP_DATA_TOK_REQ		(1<< 0)
+#define AP_DATA_TOK_ACPT	(1<< 1)
+#define AP_DATA_TOK_CHOICE	(1<< 2)
+#define AP_SYNCMINOR_TOK_REQ	(1<< 3)
+#define AP_SYNCMINOR_TOK_ACPT	(1<< 4)
+#define AP_SYNCMINOR_TOK_CHOICE	(1<< 5)
+#define AP_MAJACT_TOK_REQ	(1<< 6)
+#define AP_MAJACT_TOK_ACPT	(1<< 7)
+#define AP_MAJACT_TOK_CHOICE	(1<< 8)
+#define AP_RELEASE_TOK_REQ	(1<< 9)
+#define AP_RELEASE_TOK_ACPT	(1<<10)
+#define AP_RELEASE_TOK_CHOICE	(1<<11)
+
+/* bit values for AP_OPT_AVAIL */
+#define AP_NSAP_WILD		(1<<0)
+#define AP_TSEL_WILD		(1<<1)
+#define AP_SSEL_WILD		(1<<2)
+#define AP_PSEL_WILD		(1<<3)
+
+
+/*
+ *  sptypes for primitives.  I have no idea if these line up with other implemetnations as they are
+ *  not described in the standards documents.  Only source compatibility is attempted.  Binaries are
+ *  guaranteed to break as the value of these sybolic constants are not standardized.
+ */
+#define A_ASSOC_REQ		((AP_ACSE_ID<<16) | 0x01)
+#define A_ASSOC_IND		((AP_ACSE_ID<<16) | 0x02)
+#define A_ASSOC_RSP		((AP_ACSE_ID<<16) | 0x03)
+#define A_ASSOC_CNF		((AP_ACSE_ID<<16) | 0x04)
+#define A_RELEASE_REQ		((AP_ACSE_ID<<16) | 0x05)
+#define A_RELEASE_IND		((AP_ACSE_ID<<16) | 0x06)
+#define A_RELEASE_RSP		((AP_ACSE_ID<<16) | 0x07)
+#define A_RELEASE_CNF		((AP_ACSE_ID<<16) | 0x08)
+#define A_ABORT_REQ		((AP_ACSE_ID<<16) | 0x09)
+#define A_ABORT_IND		((AP_ACSE_ID<<16) | 0x0A)
+#define A_PABORT_REQ		((AP_ACSE_ID<<16) | 0x0B)
+#define A_PABORT_IND		((AP_ACSE_ID<<16) | 0x0C)
+
+#define P_DATA_REQ		((AP_PRES_ID<<16) | 0x01)
+#define P_DATA_IND		((AP_PRES_ID<<16) | 0x02)
+#define P_TOKENGIVE_REQ		((AP_PRES_ID<<16) | 0x03)
+#define P_TOKENGIVE_IND		((AP_PRES_ID<<16) | 0x04)
+#define P_TOKENPLEASE_REQ	((AP_PRES_ID<<16) | 0x05)
+#define P_TOKENPLEASE_IND	((AP_PRES_ID<<16) | 0x06)
+
+#define P_CDATA_REQ		((AP_PRES_ID<<16) | 0x07)	/* Not APLI. */
+#define P_CDATA_IND		((AP_PRES_ID<<16) | 0x08)	/* Not APLI. */
+#define P_CDATA_RSP		((AP_PRES_ID<<16) | 0x09)	/* Not APLI. */
+#define P_CDATA_CNF		((AP_PRES_ID<<16) | 0x0A)	/* Not APLI. */
+#define P_TDATA_REQ		((AP_PRES_ID<<16) | 0x0B)	/* Not APLI. */
+#define P_TDATA_IND		((AP_PRES_ID<<16) | 0x0C)	/* Not APLI. */
+#define P_XDATA_REQ		((AP_PRES_ID<<16) | 0x0D)	/* Not APLI. */
+#define P_XDATA_IND		((AP_PRES_ID<<16) | 0x0E)	/* Not APLI. */
+#define P_CTRLGIVE_REQ		((AP_PRES_ID<<16) | 0x0F)	/* Not APLI. */
+#define P_CTRLGIVE_IND		((AP_PRES_ID<<16) | 0x10)	/* Not APLI. */
+#define P_SYNCMINOR_REQ		((AP_PRES_ID<<16) | 0x11)	/* Not APLI. */
+#define P_SYNCMINOR_IND		((AP_PRES_ID<<16) | 0x12)	/* Not APLI. */
+#define P_SYNCMINOR_RSP		((AP_PRES_ID<<16) | 0x13)	/* Not APLI. */
+#define P_SYNCMINOR_CNF		((AP_PRES_ID<<16) | 0x14)	/* Not APLI. */
+#define P_SYNCMAJOR_REQ		((AP_PRES_ID<<16) | 0x15)	/* Not APLI. */
+#define P_SYNCMAJOR_IND		((AP_PRES_ID<<16) | 0x16)	/* Not APLI. */
+#define P_SYNCMAJOR_RSP		((AP_PRES_ID<<16) | 0x17)	/* Not APLI. */
+#define P_SYNCMAJOR_CNF		((AP_PRES_ID<<16) | 0x18)	/* Not APLI. */
+#define P_RESYNC_REQ		((AP_PRES_ID<<16) | 0x19)	/* Not APLI. */
+#define P_RESYNC_IND		((AP_PRES_ID<<16) | 0x1A)	/* Not APLI. */
+#define P_RESYNC_RSP		((AP_PRES_ID<<16) | 0x1B)	/* Not APLI. */
+#define P_RESYNC_CNF		((AP_PRES_ID<<16) | 0x1C)	/* Not APLI. */
+#define P_UXREPORT_REQ		((AP_PRES_ID<<16) | 0x1D)	/* Not APLI. */
+#define P_UXREPORT_IND		((AP_PRES_ID<<16) | 0x1E)	/* Not APLI. */
+#define P_PXREPORT_IND		((AP_PRES_ID<<16) | 0x1F)	/* Not APLI. */
+#define P_ACTSTART_REQ		((AP_PRES_ID<<16) | 0x20)	/* Not APLI. */
+#define P_ACTSTART_IND		((AP_PRES_ID<<16) | 0x21)	/* Not APLI. */
+#define P_ACTEND_REQ		((AP_PRES_ID<<16) | 0x22)	/* Not APLI. */
+#define P_ACTEND_IND		((AP_PRES_ID<<16) | 0x23)	/* Not APLI. */
+#define P_ACTEND_RSP		((AP_PRES_ID<<16) | 0x24)	/* Not APLI. */
+#define P_ACTEND_CNF		((AP_PRES_ID<<16) | 0x25)	/* Not APLI. */
+#define P_ACTINTR_REQ		((AP_PRES_ID<<16) | 0x26)	/* Not APLI. */
+#define P_ACTINTR_IND		((AP_PRES_ID<<16) | 0x27)	/* Not APLI. */
+#define P_ACTINTR_RSP		((AP_PRES_ID<<16) | 0x28)	/* Not APLI. */
+#define P_ACTINTR_CNF		((AP_PRES_ID<<16) | 0x29)	/* Not APLI. */
+#define P_ACTDISCARD_REQ	((AP_PRES_ID<<16) | 0x2A)	/* Not APLI. */
+#define P_ACTDISCARD_IND	((AP_PRES_ID<<16) | 0x2B)	/* Not APLI. */
+#define P_ACTDISCARD_RSP	((AP_PRES_ID<<16) | 0x2C)	/* Not APLI. */
+#define P_ACTDISCARD_CNF	((AP_PRES_ID<<16) | 0x2D)	/* Not APLI. */
+
+/** @name ACSE/Presentation Library Error Codes
+  * The following error codes are place in aperrno by ap_() functions.
+  * @{ */
+#define APErr(n) ((AP_ID<<8)|n)
+#define AP_ACCES		APErr( 1) /**< Request to bind to specified address denied. */
+#define AP_AGAIN		APErr( 2) /**< Request not completed. */
+#define AP_BADATTRVAL		APErr( 3) /**< Bad value for environment attribute. */
+#define AP_BADCD_ACT_ID		APErr( 4) /**< Cdata field value invalid: act_id. */
+#define AP_BADCD_DIAG		APErr( 5) /**< Cdata field value invalid: diag. */
+#define AP_BADCD_EVT		APErr( 6) /**< Cdata field value invalid: evt. */
+#define AP_BADCD_OLD_ACT_ID	APErr( 7) /**< Cdata field value invalid: old_act_id. */
+#define AP_BADCD_OLD_CONN_ID	APErr( 8) /**< Cdata field value invalid: old_conn_id. */
+#define AP_BADCD_RES		APErr( 9) /**< Cdata field value invalid: res. */
+#define AP_BADCD_RES_SRC	APErr(10) /**< Cdata field value invalid: res_src. */		/* APLI only. */
+#define AP_BADCD_RESYNC_TYPE	APErr(11) /**< Cdata field value invalid: resync_type. */
+#define AP_BADCD_RSN		APErr(12) /**< Cdata field value invalid: rsn. */
+#define AP_BADCD_SRC		APErr(13) /**< Cdata field value invalid: src. */		/* APLI only. */
+#define AP_BADCD_SYNC_P_SN	APErr(14) /**< Cdata field value invalid: sync_p_sn. */
+#define AP_BADCD_SYNC_TYPE	APErr(15) /**< Cdata field value invalid: sync_type. */
+#define AP_BADCD_TOKENS		APErr(16) /**< Cdata field value invalid: tokens. */
+#define AP_BADENC		APErr(17) /**< Bad encoding choice in enveloping function. */	/* APLI only. */
+#define AP_BADENV		APErr(18) /**< A mandatory attribute is not set. */
+#define AP_BADF			APErr(19) /**< Not a presentation service endpoint. */
+#define AP_BADFLAGS		APErr(20) /**< The specified combination of flags is invalid. */
+#define AP_BADFREE		APErr(21) /**< Could not free structure members. */
+#define AP_BADKIND		APErr(22) /**< Unknown structure type. */
+#define AP_BADLSTATE		APErr(23) /**< Instance in bad state for that command. */
+#define AP_BADPARSE		APErr(24) /**< Attribute parse failed. */
+#define AP_BADPRIM		APErr(25) /**< Unrecognized primitive from user. */
+#define AP_BADREF		APErr(26) /**< Bad reference in enveloping function. */		/* APLI only. */
+#define AP_BADRESTR		APErr(27) /**< Attributes not restore due to more bit on. */
+#define AP_BADROLE		APErr(28) /**< Request invalid due to value of AP_ROLE. */
+#define AP_BADSAVE		APErr(29) /**< Attributes not saved due to more bit on. */
+#define AP_BADSAVEF		APErr(30) /**< Invalid FILE pointer. */
+#define AP_BADUBUF		APErr(31) /**< Bad length for user data. */
+#define AP_HANGUP		APErr(32) /**< Association closed or aborted. */
+#define AP_INTERNAL		APErr(33) /**< Internal error. */				/* APLI only. */
+#define AP_LOOK			APErr(34) /**< A pending event requires attention. */
+#define AP_NOATTR		APErr(35) /**< No such attribute. */
+#define AP_NOENV		APErr(36) /**< No environment for that fd. */
+#define AP_NOERROR		(0)       /**< No error. */					/* APLI only. */
+#define AP_NOMEM		APErr(37) /**< Could not allocate enough memory. */
+#define AP_NOREAD		APErr(38) /**< Attribute is not readable. */
+#define AP_NOSET		APErr(39) /**< Attribute is not setable. */			/* APLI only. */
+#define AP_NOWRITE		APErr(40) /**< Attribute is not writable. */
+#define AP_PDUREJ		APErr(41) /**< Invalid PDU rejected. */
+
+/* The following are XAP only (not APLI). */
+#define AP_SUCCESS		(0)       /**< Success. */
+#define AP_AGAIN_DATA_PENDING	APErr(42) /**< XAP was unable to complete the requested action.  Try
+					       again.  There is an event available for the user to
+					       receive. */
+#define AP_BADALLOC		APErr(43) /**< The ap_user_alloc/ap_user_dealloc argumnent combination
+					       was invalid. */
+#define AP_BADASLSYN		APErr(44) /**< The transfer syntaxes proposed for the ACSE syntax are
+					       not supported. */
+#define AP_BADDATA		APErr(45) /**< User data not allowed on this service. */
+#define AP_BADNSAP		APErr(46) /**< The format of the NSAP portion of the Presentation
+					       Address is not supported. */
+#define AP_DATA_OVERFLOW	APErr(47) /**< User data and presentation service pci exceeds 512
+					       bytes on session V1 or the length of user data
+					       exceeds a locally defined limit, as state in the CSQ. */
+#define AP_NOBUF		APErr(48) /**< Could not allocate enough buffers. */
+#define AP_NODATA		APErr(49) /**< An attempt was made to send a primitive with no user
+					       data. */
+#define AP_NO_PRECEDENCE	APErr(50) /**< The resynchronization requested by the local user does
+					       not have precedence over the one requested by the
+					       remote user. */
+#define AP_NOT_SUPPORTED	APErr(51) /**< The action requested is not supported by this
+					       implementaiton of XAP. */
+#define AP_SUCCESS_DATA_PENDING	APErr(52) /**< The requested action was completed successfully.  There
+					       is an event available for the user to receive. */
+/** @> */
+
 
 typedef int (*ap_ualloc_t) (int, ap_osi_vbuf_t **, void **, int, int, unsigned long *);
 typedef int (*ap_udealloc_t) (int, ap_osi_vbuf_t *, void *, int, unsigned long *);

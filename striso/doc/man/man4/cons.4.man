@@ -123,6 +123,11 @@ as well as X.25/LLC2 as described in ISO/IEC 8881.
 .[
 ISO/IEC 8881
 .]
+This approach can utilize a SNARE for both address and route determination
+using configuration information or redirection information per ISO/IEC 10030.
+.[
+ISO/IEC 10030
+.]
 .IP 2.
 Another way is providing CONS over X.25, but providing X.25 using an X.25
 over TCP protocol such as
@@ -133,6 +138,12 @@ rfc1613
 .]
 or a similar SCTP protocol,
 .BR xos (4).
+These are not symmetrical protocols in the sense that one XOT/XOS system
+accesses X.25 links available on the other, while the other serves X.25 links
+to XOT/XOS systems.  As such it is a client-server protocol.  It is not very
+useful to have systems act in both roles.  Because XOT/XOS systems of the
+server variety are normally routers (and typically Cisco routers), this
+implementation, at least initially, only implements the network user role.
 .IP 3.
 Another way of providing ISO CONS is to use a CONS over TCP/IP protocol,
 .BR isot (4),
@@ -143,6 +154,7 @@ rfc1006
 or a similar SCTP protocol,
 .BR isos (4).
 This is only suitable for use by TP0.
+This is a symmetrical peer-to-peer protocol.
 .IP 4.
 Another CONS over TCP/IP protocol,
 .BR itot (4),
@@ -153,6 +165,7 @@ rfc2126
 or a similar SCTP protocol,
 .BR itos (4).
 This approach is suitable for use by TP0 or TP2 (and TP4 for SCTP).
+This is a symmetrical peer-to-peer protocol.
 .\"
 .\"
 .SH USAGE

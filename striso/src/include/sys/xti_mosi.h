@@ -116,7 +116,7 @@ struct t_mosiaddr {
 #define T_AP_CNTX_NAME	0x1
 #define T_AP_PCL	0x2
 
-#define T_OPT_VALEN(opt) (opt->len - sizeof(struct t_opthder)).
+#define T_OPT_VALEN(opt) (opt->len - sizeof(struct t_opthdr)).
 
 /**
   * Presentation Context structure.

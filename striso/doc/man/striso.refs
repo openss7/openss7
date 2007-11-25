@@ -3466,6 +3466,28 @@ Part 1: Protocol Specification
 %I International Organization for Standardization
 %U http://www.iso.org/
 
+%K iso10038
+%L ISO/IEC 10038
+%A ISO
+%R ISO/IEC 10038 : 1993
+%T Information technlology \(em Telecommunications and information exchange between systems \(em Local area networks Media access control (MAC) bridges
+%D 1993
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O Replaced by ISO/IEC 15802-3:1988.  Also IEEE 802.1D 1993.
+
+%K iso1580203
+%L ISO/IEC 15802-3
+%A ISO
+%R ISO/IEC 15802-3 : 1998
+%T Information technlology \(em Telecommunications and information exchange between systems \(em Local and metropolitan area networks Common specifications \(em Part 3: Media Access Contrl (MAC) Bridges
+%D 1998
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O Replaces ISO/IEC 10038.  Also IEEE 802.1D 1998.
+
 %K iso10589
 %L ISO/IEC 10589
 %A ISO
@@ -4146,7 +4168,7 @@ Part 1: Protocol Specification
 %L ISO/IEC 11183-2
 %R ISO/IEC ISP 11183-2:1992
 %A ISO/IEC
-%T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 2: CMISE/ROSE for AOM12 \(em Enhanced Management Communications
+%T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 3: CMISE/ROSE for AOM11 \(em Basic Management Communications
 %D 1992
 %Q International Organization for Standardization
 %I International Organization for Standardization
@@ -4156,7 +4178,7 @@ Part 1: Protocol Specification
 %L ISO/IEC 11183-3
 %R ISO/IEC ISP 11183-3:1992
 %A ISO/IEC
-%T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 3: CMISE/ROSE for AOM11 \(em Basic Management Communications
+%T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 2: CMISE/ROSE for AOM12 \(em Enhanced Management Communications
 %D 1992
 %Q International Organization for Standardization
 %I International Organization for Standardization

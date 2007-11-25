@@ -1,0 +1,608 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.TH OSINETD 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Adminstrative Commands"
+.SH NAME
+.B osinetd
+\- OSI networking daemon
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.SH SYSCTLS
+.PP
+.SS ACSE/Presentation Entity
+.TP
+.B sys.osinet.acse_presentation.status
+Turns the selected Presentation and ACSE entity on or off.  If you turn the
+entity status off, the Presentation and ACSE entity is isolated, and data no
+longer passes through this entity.  You might want to do this for security or
+debugging purposes.
+.TP
+.B sys.osinet.acse_presentation.max_alter_ctx_size
+Sets the maximum size for PDUs accepted by the Presentation and ACSE entity
+for an Alter Context (AC) or Alter Context Acknowledgement (ACA) PDU.  This
+size only applies when the context management functional unit has been
+negoitated for the connection.
+.sp
+Possible values are 0, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096,
+8192, 16384, 32768, 65546.  The default value is 4096.
+.SS Session Entity
+.TP
+.B sys.osinet.session.status
+Turns the selected session entity on or off.  If you turn the entity status
+off, the session entity is isolated, and data no longer passes thorugh the
+session entity.  You might want to do this for security or debugging purposes.
+.TP
+.B sys.osinet.session.timeout
+Defines the time during which a session connection can wait for an accept,
+after which the connection aborts.  Specify a value btween 30 and 120
+(seconds).  The default is 60 seconds.
+.TP
+.B sys.osinet.session.max_tsdu_queue
+Not implemented.
+.TP
+.B sys.osinet.session.initiator_reuse_timeout
+If the transport connection can be reused (according to the outcome of the
+Propose Reuse of TC protocol negotiation), then when the timeout between the
+termination of a session connection and the initiation of another session
+connection expires, the associated transport connection is terminated.  This
+timeout specifies how long to maintain the transport connection open after the
+associated session connection is closed, if the connection was intiiated
+locally.  Specify a value between 30 and 1200 (seconds).  The default value is
+30 seconds.
+.TP
+.B sys.osinet.session.acceptor_reuse_timeout
+If the transport connection can be reused (according to the outcome fo the
+Propose Reuse of TC protocol negotiation), then when the timeout between the
+termination of a session connection and the initiation of another session
+connection expires, the associated trasnport connection is terminated.  This
+timeout specifies how long to maintain the transport connection open after the
+associated session connection is closed, the the connection was initiated
+remotely.  Specify a value btween 30 and 1200 (seconds), the default value is
+30 seconds.
+.TP
+.B sys.osinet.session.accept_reuse_of_tc
+Accepts the resue of a transport connection when proposed by the remote
+system.
+.TP
+.B sys.osinet.session.propose_reuse_of_tc
+Proposes to the peer session entity that the transport connection should be
+used again after the specified timeout.  If the peer session entity accepts,
+then the transport connection can be reused.  If you choose this option, make
+sure that the accept_reuse_of_tc is also set on.
+.TP
+.B sys.osinet.session.include_ssap_id_in_ac_spdu
+Adds the session service access point identifier to the AC SPDU (Session layer
+protocol data unit accept PDU).
+.TP
+.B sys.osinet.session.try_to_reuse_tc
+Specifies that new connection requests can attempt to reuse a transport
+connection to the peer session entity.  If you choose this option, make sure
+that the propose_resuse_of_tc is also set on.  The peer session entity must
+allow reuse of transport connections.  Ensure that the accept_reuse_of_tcp and
+propose_reuse_of_tc are both selected if you choose this option.
+.TP
+.B sys.osinet.session.use_trs_expedited_data
+Specifies that the transport expedited data service should be used if it is
+available.
+.TP
+.B sys.osinet.session.protocol_version_1
+Protocol version 1 specifies certain length restrictions on PDUs.  At least
+version 1 or version 2 must be set.
+.TP
+.B sys.osinet.session.protocol_version_2
+Protocol version 2 specifies no length restrictions on PDUs.  At least version
+1 or version 2 must be set.
+.TP
+.B sys.osinet.session.extended_concatentation
+Allows the extended concatenation of PDUs and TPUs.
+.TP
+.B sys.osinet.session.negotiated_release
+Enables or disables the negotiated release functional unit.  When disbled,
+this functional unit will not be proposed or accepted during negotiation.
+Disabling of this function unit is normally for debugging purposes only.
+.TP
+.B sys.osinet.session.half_duplex
+Enables or disables the half-duplex functional unit.  When disbled, this
+functional unit will not be proposed or accepted during negotiation.
+Disabling of this function unit is normally for debugging purposes only.
+.TP
+.B sys.osinet.session.duplex
+Enables or disabled the duplex functional unit.  When disbled, this functional
+unit will not be proposed or accepted during negotiation.  Disabling of this
+function unit is normally for debugging purposes only.
+.TP
+.B sys.osinet.session.expedited_data
+Enables or disables the expedited data functional unit.  When disbled, this
+functional unit will not be proposed or accepted during negotiation.
+Disabling of this function unit is normally for debugging purposes only.
+.TP
+.B sys.osinet.session.typed_data
+Enables or disables the typed data functional unit.  When disbled, this
+functional unit will not be proposed or accepted during negotiation.
+Disabling of this function unit is normally for debugging purposes only.
+.TP
+.B sys.osinet.session.capability_data
+Enables or disables the capability data functional unit.  When disbled, this
+functional unit will not be proposed or accepted during negotiation.
+Disabling of this function unit is normally for debugging purposes only.
+.TP
+.B sys.osinet.session.minor_syncrhonize
+Enables or disables the minor synchronize functional unit.  When disbled, this
+functional unit will not be proposed or accepted during negotiation.
+Disabling of this function unit is normally for debugging purposes only.
+.TP
+.B sys.osinet.session.major_synchronize
+Enables or disables the major synchronize functional unit.  When disbled, this
+functional unit will not be proposed or accepted during negotiation.
+Disabling of this function unit is normally for debugging purposes only.
+.TP
+.B sys.osinet.session.resynchronize
+Enables or disables the resynchronize functional unit.  When disbled, this
+functional unit will not be proposed or accepted during negotiation.
+Disabling of this function unit is normally for debugging purposes only.
+.TP
+.B sys.osinet.session.exceptions
+Enables or disables the exceptions functional unit.  When disbled, this
+functional unit will not be proposed or accepted during negotiation.
+Disabling of this function unit is normally for debugging purposes only.
+.TP
+.B sys.osinet.session.activity_management
+Enables or disables the activity management functional unit.  When disbled,
+this functional unit will not be proposed or accepted during negotiation.
+Disabling of this function unit is normally for debugging purposes only.
+.SS Transport and CLNS Entity
+.TP
+.B sys.osinet.transport.clns.status
+Turns the selected transport entity on or off.  If you turn the entity status
+off, the transport entity is isolated, and data no longer passes through this
+transprot layer.  You might want to do this for security or debuggin purposes.
+.TP
+.B sys.osinet.transport.clns.max_pdu_size
+Specifies the maximum size for a transport PDU.  The actual value is
+negotiated between the local and the remote system, the lower value being
+accepted.   Specify one of the following values: 128, 256, 512, 1024, 2148,
+4096 or 8192.  The default size is 512.
+.TP
+.B sys.osinet.transport.clns.credit_window
+This value is used in the calculation to define the maximum buffer space
+allowed for PDUs that can be received before sending an acknowledgement.  The
+maximum buffer space is credit_window times the allocation_quantum_size
+divided by the negotiated size of PDUs.  Specify a value between 1 and 15.
+The default value is 5.
+.TP
+.B sys.osinet.transport.clns.retransmission_limit
+Specifies the maximum number of TPDU retransmission attempts that can be made
+before aborting the connection.  Specify a value between 2 and 20.  The
+default value is 5.
+.TP
+.B sys.osinet.transport.clns.retransmission_timer
+Specifies the initial time between retransmissions in the case of an error.
+The time between retransmissions doubles each time a retransmission attempt
+fails.  Specify a value between 1 and 100 (seconds).  The default value is 40
+seconds.
+.TP
+.B sys.osinet.transport.clns.window_timer
+Specifies a timer that can be used to keep a connection open if the connection
+is inactive.  An acknowledgement PDU is sent when this timer expires, if there
+is no activity.  If this is less than the inactivity timer on the remote
+system, then the connection remains open.  Specify a value between 1 and 100
+(seconds).  The default value is 50 (seconds).
+.TP
+.B sys.osinet.transport.clns.default_clnp_lifetime
+Specifies the maximum lifetime that a CLNP PDU can exist in the network, after
+which it is discarded.  Specify a value between 2 and 255 (decaseconds).  The
+default value is 50 decaseconds, or 500 seconds.
+.TP
+.B sys.osinet.transport.clns.propose_checksum
+Allows checksum to be negotiated if you are initiating a transport class 4
+connection.  The use of checksum is negotiated and will only be used if both
+the local and remote systems select this option.
+.TP
+.B sys.osinet.transport.clns.use_extended_formats
+Proposes the use of extended formats for PDUs to the remote system.  This is
+negotiated and will only be used if both the local and the remote system
+select this option.
+.TP
+.B sys.osinet.transport.clns.disconnect_on_protocol_error
+When set, sends a disconnection request TPDU when a protocol error has
+occurred.  When unset, it sends an error TPDU or ignores the bad PDU.
+.TP
+.B sys.osinet.transport.clns.allocation_quantum_size
+Used to control credit in terms of buffer space rather than in terms of PDUs
+since the PDU size is negotiated.  It is used in conjunction with the Credit
+Window parameter.  Specify one of the following values: 128, 256, 512, 1024,
+2048, 4096 or 8192.  The default value is 512 octets.
+.TP
+.B sys.osinet.transport.clns.tidu_size
+Since the size of the TSDUs is unlimited, they might need to be divided into
+TIDUs, so that the session entity can deal with them.  However, if these TIDUs
+are too small, the session control PDUs are also divided.  This TIDU size
+specifies the minimum size allowed for a TIDU, where the inimum size is the
+specified value * 512 plus 1100.  Even if you set a TIDU size of zero, the
+minimum size will be 1100.  Note that this parameter is a default value that
+may be overridden by the user of the transport connection at connection time.
+Sepcify a value btween 0 and 64.  The default value is 0.
+.TP
+.B sys.osinet.transport.clns.acknowledgement_timer
+Specifies the maximum delay allowed before sending a TPDU acknowledgement in
+response to a data TPDU.  This can be used to minimize the number of TPDU
+acknoweldgements sent, by sending one acknowledgement for several TPDUs
+received.  It should be used in conjunction with the ignore_criteral_for_ack
+and ignore_acknowledgement_timer protocol options.  Specify a value between 1
+and 100 seconds.  The default value is 10 seconds.
+.TP
+.B sys.osinet.transport.clns.receiving_window
+Implements flow control for data passed from the transport layer to the user
+of the transport service.  This value defines the maximum number of TSDUs that
+can be received and queued internally before invoking flow control.  Specify a
+value between 1 and 20.  The default value is 5 TSDUs.
+.TP
+.B sys.osinet.transport.clns.sending_queue_size
+Specifies the limit on the number of data TPDUs waiting to be transmitted or
+waiting to be retransmitted if not acknowledged.  Specify a value between 1
+and 20.  The default value is 10 TPDUs.
+.TP
+.B sys.osinet.transport.clns.max_reassemble_size
+Specifies the maximum number of CLNP PDUs that can be queued for reassembly.
+Any additional PDUs are discarded.  This is only used when the full CLNP
+protocol is being used.  Specify a value between 1 and 100 (decapdus).  The
+default value is 5 decapdus (50 PDUs).
+.TP
+.B sys.osinet.transport.clns.control_block_quantum
+Specifies the maximum number of segments that can be handled when reassembling
+a NSDU.  This is only used when the full CLNP protocol is being used.  Specify
+a value between 1 and 100 (decaPDUs).  The default value is 2 decaPDUs (20
+PDUs).
+.TP
+.B sys.osinet.transport.clns.ignore_criteria_for_ack
+When set, this delays the sending of a TPDU acknowledgement for the amount of
+time specified by the acknowledgement_timer.  The default is unset.
+.TP
+.B sys.osinet.transport.clns.ignore_acknolwedgement_timer
+When set, ignores the acknowledgement_timer and sends PDU acknowledgements
+immediately.  The default is set.
+.TP
+.B sys.osinet.transport.clns.set_checksum_on_spurious_response
+When set, if an invaokd TPDU is received (such as data request sent in
+response to a connection request), then a checksum is included in the
+responding TPDU.  The default is unset.
+.TP
+.B sys.osinet.transport.clns.ignore_checksum_when_receiving
+When set, this ignores the checksum when receiving TPDUs, even if checksum was
+negotiated during the connection procedure.  The default is unset.
+.TP
+.B sys.osinet.transport.clns.send_burst_of_tpdus_as_nudtrq
+When set, allows concatenation of TPDUs into a single NSDU.  The default is
+unset.
+.SS Transport over CONS
+.TP
+.B sys.osinet.transport.cons.status
+Turns the selected transport entity on or off.  If you turn the transport over
+CONS status off, the entity is isolated and data no longer passes through it.
+You might want to do this for security or debugging purposes.
+.TP
+.B sys.osinet.transport.cons.max_pdu_size
+Specifies the maximum size a transport PDU is allowed to be on this system.
+The actual value is negoitated between the local and the remote system, the
+lower value being accpeted.  Specify one of: 128, 256, 512, 1024, 2148, 4096
+or 8192.  The default size is 512.
+.TP
+.B sys.osinet.transport.cons.credit_window
+This value is used in the calculation to define the maximum buffer space
+allowed for PDUs that can be received before sending an acknowledgment.  The
+calculation is the credit_window times the allocation_quantum_size divided by
+the negotiated maximum size of TPDUs.  Specify a value between 1 and 15.  The
+default value is 5.
+.TP
+.B sys.osinet.transport.cons.ts1_ts2_timer
+Specifies the TS1/TS2 timers (as defined in ISO 8073)
+.[
+x224
+.]
+for disconnection of an inactive network connection.  Specify a value between
+3 and 12 (decaseconds).  The default value is 6 decaseconds (60 seconds).
+.TP
+.B sys.osinet.transport.cons.t1r_timeout
+Specifies the time between trying to resynchronize or reassing the trasnport
+connection after a transmission failure.  It is only used when the local
+system initiated a class 3 protocol connection.  Specify a value between 3 and
+12 (decaseconds).  The default value is 6 decaseconds (60 seconds).
+.TP
+.B sys.osinet.transport.cons.twr_increment
+This is used to specify the time to wait for resynchronization or reassignment
+of the trasnsport connection after a transmission failure.  It is only used
+when the remote system intiated a class 3 connection.  The state value is the
+difference between the TTR timer (plus the maximum disconnection wait and the
+maximum transmission time) and the TWR timer.  Specify a vlue between 1 and 11
+(decaseconds).  The default value is 2 decaseconds (20 seconds).
+.TP
+.B sys.osinet.transport.cons.retransmission_timer
+Specifies the initial timer between retransmissions in the case of an error
+for transport class 4 connections.  The time between retransmissions doubles
+each time a retransmission takes place.  Specify a value beteween 30 and 120
+seconds.  The default value is 30 seconds.
+.TP
+.B sys.osinet.transport.cons.retransmission_limit
+Specifies the maximum number of TPDU retransmission attempts that can be made
+before aborting the connection.  Specify a value between 2 and 20.  The
+default value is 3.
+.TP
+.B sys.osinet.transport.cons.class_0_only
+Specifies that connections always use class 0 protocol which provides basic
+transport connection support that can detect errors but not recover from them.
+.sp
+If no class options are set, class 2 is selected.
+.TP
+.B sys.osinet.transport.cons.propose_class_3
+Means that class 3 is proposed as the preferred class and if the remote system
+accepts class 3, the transport connection is established according to class 3
+trasnport protocol specifications.  This includes recovery from network
+disconnections.
+.sp
+If both propose_class_3 and propose_class_4 are set, then the class chosen
+depends on the remote system.    When the remote system initiates the
+connection, the local system accepts the higher class proposed, that is, class
+4 is preferred.
+.sp
+If no class options are set, class 2 is selected.
+.TP
+.B sys.osinet.transport.cons.propose_class_4
+Means that class 4 is proposed as the preferred class and if the remote system
+accepts class 4, the transport protocol connection is established according to
+class 4 transport protocol specifications.  This includes flow control and
+full error control.
+.sp
+If both propose_class_3 and propose_class_4 are set, then the class chosen
+depends on the remote system.    When the remote system initiates the
+connection, the local system accepts the higher class proposed, that is, class
+4 is preferred.
+.sp
+If no class options are set, class 2 is selected.
+.TP
+.B sys.osinet.transport.cons.include_tsap_id_in_cc
+Includes the transport service access point identifier in PDUs for operability
+with systems that require it.
+.TP
+.B sys.osinet.transport.cons.null_pid_if_osi
+Should be set if you do not want to include the protocol identifier in a
+connection request PDU.
+.TP
+.B sys.osinet.transport.cons.allocation_quantum_size
+Used to control credit in terms of buffer space rather than in terms of PDUs
+since the PDU size is negotiated.  It is used in conjunction with the Credit
+Window parameter.  Specify one of the following values: 128, 256, 512, 1024,
+2048, 4096 or 8192.  The default value is 512 octets.
+.TP
+.B sys.osinet.transport.cons.max_multiplexing_initiator
+Specifies the maximum multiplexing for locally initiated transport connections
+onto a single network connection.  Specify a value between 1 and 126.  The
+default value is 5 connections.
+.TP
+.B sys.osinet.transport.cons.max_multiplexing_acceptor
+Specifies the maximum multiplexing for remotely initiated transport
+connections onto a single network connection.  It should be a greater value
+thatn the max_multiplexing_initiator control.  Specify a value between 1 and
+126.  The default value is 10 connections.
+.TP
+.B sys.osinet.transport.cons.tidu_size
+Since the size of the TSDUs is unlimited, they might need to be divided into
+TIDUs, so that the session entity can deal with them.  However, if these TIDUs
+are too small, the session control PDUs are also divided.  This TIDU size
+specifies the minimum size allowed for a TIDU, where the inimum size is the
+specified value * 512 plus 1100.  Even if you set a TIDU size of zero, the
+minimum size will be 1100.  Note that this parameter is a default value that
+may be overridden by the user of the transport connection at connection time.
+Sepcify a value btween 0 and 64.  The default value is 0.
+.TP
+.B sys.osinet.transport.cons.long_nc_timeout
+Specifies the inactivity timer for a network connection when: the local system
+is not the initiator of the network connection, and multiplexing is being used
+for the network connection.  Specify a value between 3 and 48 (decaseconds).
+The default value is 24 decaseconds (240 seconds).
+.TP
+.B sys.osinet.transport.cons.short_nc_timeout
+Specifies an inactivity timer for a network connection when: the local system
+initiated the network connection, and multiplexing is not being used for the
+network connection.  Specify a value between 3 and 6 (decaseconds).  The
+default value is 3 decaseconds (30 seconds).
+.TP
+.B sys.osinet.transport.cons.qos_threshold_nfc
+Sets a threshold for the use of flow control in the class 2 transport
+protocol.  The default value of zero suppresses flow control.  A value of 8
+switches flow control on.
+.TP
+.B sys.osinet.transport.cons.qos_threshold_mpx
+Sets a threshold for the use of multiplexing in class 2 trasnport protocol.  A
+value of zero suppresses multiplexing.  The default value is 1.
+.TP
+.B sys.osinet.transport.cons.max_size_nofc
+For class 2 transport protocol, specifies a maximum limit for the receiving
+queue size where no flow control has been negotiated at this level, since flow
+control can be exercised at the TIDU level.  When this limit is exceeded, an
+error PDU is generated.  Specify a value between 1 and 100 (2^10 bytes). The
+default is 4 kbytes (4096 bytes).
+.TP
+.B sys.osinet.transport.cons.disconnect_unused_nc
+When set, disconnect an inactive network connection to allow it to be
+reassigned if a new connection is required.  The default is unset.
+.TP
+.B sys.osinet.transport.cons.support_network_reset
+Set to configure the local system to send an N-RESET when an error occurs and
+to take the appropriate action when an N-RESET is received.  If this is set,
+and the use_dr_in_case_of_error or use_dr_or_er_in_case_of_error options are
+unset, then an N-RESET is sent when an error occurs.  If
+support_network_reset, use_dr_in_case_of_error and
+use_dr_or_er_in_case_of_eror are all unset, a disconnect request is sent.
+.TP
+.B sys.osinet.transport.cons.suppress_expedited
+When set, prevents expedited data from being proposed or accepted.
+.TP
+.B sys.osinet.transport.cons.use_dr_in_case_of_error
+When set, sends a disconnect request TPDU when an error occurs, according to
+the type of error.  Not normally used.
+.TP
+.B sys.osinet.transport.cons.use_dr_or_er_in_case_of_error
+When set, sends a disconnect request or error TPDU when an error occurs.  Not
+normally used: some remote systems might require this option.
+.SS CONS Entity
+.TP
+.B sys.osinet.network.cons.status
+Turns the selected network entity on or off.  If you turn the entity status
+off, the CONS entity is isolated, and data no longer passes through it.  You
+might want to do this for debugging or security purposes.
+.TP
+.B sys.osinet.network.cons.default_x25_packet_size
+Specifies the default packet size for an X.25 network connection.  Specify one
+of: 16, 32, 64, 128, 256, 512, 1024, 2048 or 4096.  The default value is 128
+octets.
+.TP
+.B sys.osinet.network.cons.max_nsdu_length
+Specifies the maximum length allowed for a NSDU.  This value should be greater
+than or equal to the maximum PDU size specified for transport.  Specify a
+value between 1 and 40 (256 octet chunks).  THe default value is 8 chunks
+(2048 octets).
+.TP
+.B sys.osinet.network.cons.connection_timer
+Specifies the maximum time allowed for establishing a connection.  If the
+connection is not established within the specified time, the connection
+attempt is aborted.  This timer is used for all version of X.25 networks.
+Specify a value between 0 and 60 (decaseconds).  The default value is 30
+decaseconds (5 minutes).
+.TP
+.B sys.osinet.network.cons.connection_timer_x25_80
+Specifies the maximum time allowed for establishing a connection in an X.25/80
+(SNDCP) network.  It should be less than or equal to the connection timer
+defined above.  If the connection is not established within the specified
+time, the connection attempt is aborted.  Specify a value between 0 and 30
+(decaseconds).  The default value is 25 decaseconds (250 seconds).
+.TP
+.B sys.osinet.network.cons.deconnection_timer_x25_80
+Specifies the time for completion for disconnecting a network connection, in an
+X.25/80 (SNDCP) network.  If the disconnection is not complete within the
+specified time, the disconnection is aborted.  Specify a value between 1 and
+30 (decaseconds).  The default value is 20 decaseconds (200 seconds).
+.TP
+.B sys.osinet.network.cons.grcb_pool_size
+This is used to define the size of the routing table for the network.  It
+specifies the maximum number of entries int he general routing information
+table.  Specify a value between 0 and 255 (decaentries).  The default value is
+3 decaentries (30 entries).  You should not need to change this value, unless
+a large number of routes is required.
+.TP
+.B sys.osinet.network.cons.rccb_pool_size
+This is used to define the routing table for the network.  It specifies the
+size of the cache to be used for routes that are currently or frequently used.
+Specify a value between 0 and 255 (decaentries).  The default value is 3
+decaentries (30 entries).  You should not need to change this value, unless a
+large number of routes is required.
+.TP
+.B sys.osinet.network.cons.recb_pool_size
+This is used to define the routing table for the network.  It specifies the
+maximum number of routes for each entry (described in the grcb_pool_size
+above) in the general routing information table.  Specify a value between 0
+and 255 (decaentries).  The default value is 3 decaentries (30 entries).  You
+should not need to change this value, unless a large number of routes is
+required.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP

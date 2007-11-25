@@ -1199,7 +1199,7 @@ ptm_register_strdev(major_t major)
 	/* Because we are stealing Linux's device number for pseudo-terminals, we do not want to
 	   publish this device to the external file system nor create device nodes.  Leave it in
 	   the specfs(5) so that it can be accessed with /dev/streams/ptm/ptmx. */
-	if ((err = register_strdrv(&ptm_cdev)) < 0)
+	if ((err = register_strdrv(&ptm_cdev, major)) < 0)
 		return (err);
 #endif
 	if ((err = register_strnod(&ptm_cdev, &ptmx, 0)) < 0)
@@ -1245,7 +1245,7 @@ pts_register_strdev(major_t major)
 	/* Because we are stealing Linux's device number for pseudo-terminals, we do not want to
 	   publish this device to the external file system nor create device nodes.  Leave it in
 	   the specfs(5) so that it can be accessed with /dev/streams/pts/N. */
-	if ((err = register_strdrv(&pts_cdev)) < 0)
+	if ((err = register_strdrv(&pts_cdev, major)) < 0)
 		return (err);
 #endif
 	return (0);

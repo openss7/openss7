@@ -96,6 +96,12 @@ xap c303
 .]
 .\"
 .\"
+.SH LIBRARY
+.PP
+.BR libapli (3),
+.BR libxap (3).
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <ap_lib.h>
@@ -581,6 +587,10 @@ of these symbolic constants, then the structure type is unknown and this error g
 .B AP_BADLSTATE\ -
 .TP
 .B AP_BADNSAP\ -
+The format of the NSAP portion of the Presentation Address is not supported.  XAP provides an
+\fInsap_type\fP for each NSAP.  The \fInsap_type\fP can be \fBAP_UNKNOWN\fP, \fBAP_CLNS\fP,
+\fBAP_CONS\fP, \fBAP_RFC1006\fI, or an implementation defined type.  The type associated with an
+NSAP is not supported by the XAP provider.
 .sp
 This is an XAP-only extension to the APLI library.
 .TP
@@ -623,38 +633,59 @@ The FILE pointer argument, savef, passed to \fBap_save\fP(3) and \fBap_restore\f
 file pointer.  It may be NULL or does not represent a valid file stream open for writing.
 .TP
 .B AP_BADUBUF\ -
+The provided user data has a bad length.
 .sp
 This is an APLI-only error code for the APLI library.
 .TP
 .B AP_DATA_OVERFLOW\ -
+user data and presentation service pci exceeds 512 bytes on session protocol version 1, or the
+length of user data exceeds a locally defined limit, as stated in the CSQ.
 .sp
 This is an XAP-only extension to the APLI library.
 .TP
 .B AP_HANGUP\ -
+The association closed or aborted.
 .TP
 .B AP_INTERNAL\ -
+An internal error occurred causing the operation to fail.
 .sp
 This is an APLI-only error code for the APLI library.
 .TP
 .B AP_LOOK\ -
+A pending event requires attention.
 .TP
 .B AP_NOATTR\ -
+No such attribute.  The \fIattr\fP argument to \fBap_set_env\fP(3) or \fBap_get_env\fP(3) specified
+an attribute that is unknown to the service provider.
 .TP
 .B AP_NOBUF\ -
+The XAP library allocates buffers for user data.  This error is returned when the provider could not
+allocate sufficient buffers to complete the requested operation.
 .sp
 This is an XAP-only extension to the APLI library.
 .TP
 .B AP_NODATA\ -
+An attempt was made to send a primitive with no user data.  This error is returned to
+\fBap_snd\fP(3) when the primitive requires user data to be specified but no user data was provided.
 .sp
 This is an XAP-only extension to the APLI library.
 .TP
 .B AP_NOENV\ -
+No environment exists for the fd.
 .TP
 .B AP_NOERROR\ -
+No error occurred.  The operation was successful.  The user may set the \fIaperrno\fP
+thread-specific global variable to this value before calling a function.
+.sp
+This is an APLI-only error code for the APLI library.
 .TP
 .B AP_NOMEM\ -
+The library must allocate memory for environment variables and user data.  This error is returned
+when the library or the provider could not allocation sufficient memory to complete the operation.
 .TP
 .B AP_NO_PRECEDENCE\ -
+The resynchronization requested by the local user does not have precedence over the one requested by
+the remote user.
 .sp
 This is an XAP-only extension to the APLI library.
 .TP
@@ -683,6 +714,12 @@ apli UNIX International
 This is an APLI-only error code for the APLI library.
 .TP
 .B AP_NOT_SUPPORTED\ -
+The action requested is not supported by this implementation of XAP.
+This error may be returned from a call to \fBap_init_env\fP(3) when the use of a non-\fBNULL\fP
+value for \fIenv_file\fP is not supported by this implementation of XAP.  The OpenSS7 XAP
+implementation supports a non-\fBNULL\fP value for \fIenv_file\fP.
+This error may be returned from a call to \fBap_ioctl\fP(3) when the XAP implementation does not
+support the function.  The OpenSS7 XAP implementation supports the \fBap_ioctl\fP(3) function.
 .sp
 This is an XAP-only extension to the APLI library.
 .TP
@@ -693,8 +730,12 @@ environment attribute which is never writable, or is not writable in the current
 or XAP instance.  This error is generated to indicate that the attribute is not writable.
 .TP
 .B AP_PDUREJ\ -
+An invalid PDU was rejected.  This error may be returned from a call to \fBap_rcv\fP(3) or
+\fBap_look\fP(3) when the received PDU was rejected by the APLI or XAP library.
 .TP
 .B AP_SUCCESS_DATA_PENDING\ -
+The requested action completed successfully; however, there is an event available for the user to
+receive.  This error may be returned to \fBap_snd\fP(3).
 .sp
 This is an XAP-only extension to the APLI library.
 .\"

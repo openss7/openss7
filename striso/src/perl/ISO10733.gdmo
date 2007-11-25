@@ -2827,7 +2827,7 @@ END
 --  $Log: ISO10733.gdmo,v $
 --  Revision 0.9.2.3  2007/09/29 14:28:05  brian
 --  - update gdmos and asns
---
+--  
 --  Revision 0.9.2.2  2007/09/09 22:58:47  brian
 --  - updates for namespace
 --  

@@ -1,0 +1,187 @@
+-- 6 ASN.1 module
+DLM { joint-iso-itu-t datalink-layer(15) management(0) asn1Module(2) 0 }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+IMPORTS
+GroupObjects, ObservedValue, PerceivedSeverity
+	FROM Attribute-ASN1Module { joint-iso-itu-t ms(9) part2(2) asn1Module(2) 1 }
+SetInfoStatus, AttributeId, ObjectInstance
+	FROM CMIP-1 { joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3) };
+
+-- Note: In this standard, the identifier joint-iso-itu-t is used as a synonym for the identifier joint-iso-ccitt and has 
+-- the same value (2), defined in ISO/IEC 8824.
+
+-- "infrastructure" object identifier definitions
+datalink-layer OBJECT IDENTIFIER ::= { joint-iso-itu-t datalink-layer(15) }
+dloi OBJECT IDENTIFIER ::= { datalink-layer management(0) }
+sseoi OBJECT IDENTIFIER ::= { dloi standardSpecificExtension(0) }
+moi OBJECT IDENTIFIER ::= { dloi objectClass(3) }
+poi OBJECT IDENTIFIER ::= { dloi package(4) }
+proi OBJECT IDENTIFIER ::= { dloi parameter(5) }
+nboi OBJECT IDENTIFIER ::= { dloi nameBinding(6) }
+aoi OBJECT IDENTIFIER ::= { dloi attribute(7) }
+agoi OBJECT IDENTIFIER ::= { dloi attributeGroup(8) }
+acoi OBJECT IDENTIFIER ::= { dloi action(9) }
+noi OBJECT IDENTIFIER ::= { dloi notification(10) }
+--
+-- value assignments for Data Link layer specificProblems
+--
+fRMRReceived OBJECT IDENTIFIER ::= { sseoi specificProblems(11) fRMRReceived(5) }
+fRMRReasons OBJECT IDENTIFIER ::= { sseoi specificProblems(11) fRMRReasons(6) }
+fRMRReasonsControlFieldUndefinedOrUnimplemented OBJECT IDENTIFIER ::= { sseoi specificProblems(11) fRMRReasons(6) controlFieldUndefinedOrUnimplemented(1) }
+fRMRReasonsFormatError OBJECT IDENTIFIER ::= { sseoi specificProblems(11) fRMRReasons(6) formatError(2) }
+fRMRReasonsInfoFieldLengthGreaterThanMaximum OBJECT IDENTIFIER ::= { sseoi specificProblems(11) fRMRReasons(6) infoFieldLengthGreaterThanMaximum(3) }
+fRMRReasonsInvalidNR OBJECT IDENTIFIER ::= { sseoi specificProblems(11) fRMRReasons(6) invalidNR(4) }
+fRMRReasonsNonSpecific OBJECT IDENTIFIER ::= { sseoi specificProblems(11) fRMRReasons(6) nonSpecific(5) }
+--
+-- value assignments for Data Link layer specific errorIds for activate action processingFailure
+-- errors.
+--
+activateFailure OBJECT IDENTIFIER ::= { sseoi action(9) activate(1) errors(1) processingFailure(1) }
+activateFailureInsufficientResources OBJECT IDENTIFIER ::= { activateFailure insufficientResources(1) }
+activateFailureProviderDoesNotExist OBJECT IDENTIFIER ::= { activateFailure providerDoesNotExist(2) }
+activateFailureProviderNotAvailable OBJECT IDENTIFIER ::= { activateFailure providerNotAvailable(3) }
+activateFailureRequiredServiceNotAvailable OBJECT IDENTIFIER ::= { activateFailure requiredServiceNotAvailable(4) }
+activateFailureSystemSpecific OBJECT IDENTIFIER ::= { activateFailure systemSpecific(5) }
+--
+-- other definitions
+--
+datalinkSubsystemId-Value GraphicString ::= "datalinkSubsystem"
+FRMRSyntax ::= OCTET STRING
+NamingString ::= GraphicString
+Integer ::= INTEGER
+InterfaceType ::= ENUMERATED {
+	dTE(0),
+	dCE(1) }
+interfaceTypeDefault InterfaceType ::= dTE
+
+MACAddress ::= OCTET STRING -- Minimum length 6 octets
+
+-- If the MAC address is a 48-bit address the minimum length of the octet string shall be 6 octets.
+-- If the MAC address is a 60-bit address the minimum length of the octet string shall be 8 octets.
+-- The octet encoding is derived from the hexidecimal display representation order for the MAC address,
+-- AB-CD-EF-GH-IJ-KL for the 49-bit address; AB-CD-EF-GH-IJ-LK-MN-OP for the 60-bit address format.
+-- The octets are encoded as follows:
+-- The first pair of hexadecimal digits, AB, are encoded in the first octet.
+-- The second pair, CD, is encoded in the second octet, etc.  (See Annex D, clause D.1.2 
+-- "MACAddress Attribute" for definition of 60-bit hexidecimal display format)
+
+MACAddresses ::= SET OF MACAddress
+
+MaximumIFrameSize ::= INTEGER
+-- in bits, 1080 (135 octets) minimum
+MW ::= SEQUENCE {
+	mWSend [0] IMPLICIT INTEGER(0..4095),
+	mWReceive [1] IMPLICIT INTEGER(0..4095) }
+MX ::= SEQUENCE {
+	mXSend [0] IMPLICIT INTEGER(0..4095),
+	mXReceive [1] IMPLICIT INTEGER(0..4095) }
+Octet ::= OCTET STRING(SIZE(1))
+OctetString ::= OCTET STRING
+SequenceModulus ::= Integer
+SLPProtocolState ::= ENUMERATED {
+	disconnectedPhase(0),
+	linkdisconnection-phase(1),
+	link-set-up-phase(2),
+	information-Transfer-phase(3),
+	frame-Reject-condition(4),
+	busy-condition(5),
+	sent-Reject-condition(6),
+	system-Parameters-and-error-recovery(7) }
+WindowSize ::= CHOICE {
+	modulo8ws [0] INTEGER(1..7),-- for modulo 8
+	modulo128ws [1] INTEGER(1..127) }-- for modulo 128
+END
+
+-- B.5 ASN.1 Module
+
+IEEE802CommonDefinitions
+{ iso(1) member-body(2) us(840) ieee802dot1partf(10011) asn1Module(2) commondefinitions(0) version1(0) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+IMPORTS
+SetInfoStatus, AttributeId
+	FROM CMIP-1 { joint-iso-itu ms(9) cmip(1) modules(0) protocol(3) }
+GroupObjects, ObservedValue, PerceivedSeverity
+	FROM Attribute-ASN1Module { joint-iso-itu ms(9) smi(3) part2(2) asn1Module(2) 1 };
+
+-- Note: In this standard, the identifier joint-iso-itu is used as a synonym for the identifier joint-iso-ccitt and has 
+-- the same value (2), defined in ISO/IEC 8824.
+
+-- EXPORTS everything
+
+-- Note: This clause includes ASN.1 definitions specific to Annex B.
+
+DerivedGaugeNotCurrentType ::= SEQUENCE {
+	currentTime [5] IMPLICIT GeneralizedTime OPTIONAL,
+	setInfoList [6] IMPLICIT SET OF SetInfoStatus }
+
+ManufacturerOUI ::= OCTET STRING
+
+-- ManufacturerOUI takes the value of an Organizationally Unique Identifier, as defined in section 5.1 of IEEE 802.1 
+-- Overview and Architecture.  When encoded as an OCTET STRING, the encoding of the value field of the OCTET STRING 
+-- shall comply with the representation defined in sections 5.1.2 of the Overview and Architecture.  Inasmuch as 
+-- multiple OUI assignments are possible for a gvien manufacturer and no public registry of such assignments exists, 
+-- methods for aplication of the OUI as a globally unique manufacturer identifier is outside the scope of this standard.
+
+ManufacturerName ::= PrintableString
+
+-- ManufacturerName is a printable string used to identify the manufacturer of the resource.  Global assignemtn of 
+-- unique name strings is outside the scope of this standard.  Maximum string length is 128 octets.
+
+ManufacturerProductName ::= PrintableString
+
+-- ManufacturerProductName is a printable string used to identify the manufacturer's product name of the the resource.  
+-- Maximum string length is 128 octets.
+
+ManufacturerProductVersion ::= PrintableString
+
+-- ManufacturerProductVersion is a printable string used to identify the manufacturer's product version of the resource.  
+-- Maximum string length is 128.
+
+partf OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840) ieee802dot1partf(10011) }
+
+ResourceInfo ::= SEQUENCE {
+	manufacturerOUI [0] ManufacturerOUI OPTIONAL,
+	manufacturerName [1] ManufacturerName OPTIONAL,
+	manufacturerProductName [2] ManufacturerProductName OPTIONAL,
+	manufacturerProductVersion [3] ManufacturerProductVersion OPTIONAL }
+
+-- ResourceInfo provides a means of indicating, in data readable from a managed object, information that ideetifies the 
+-- source of the implementation.
+
+ResourceTypeIdName ::= GraphicString
+-- the only value allowed is "RTID"
+
+ScannerId ::= GraphicString
+
+SeverityIndGaugeThreshold ::= SET OF SEQUENCE {
+	severityIndNotifyLow SeverityIndThreshold,
+	severityIndNotifyHigh SeverityIndThreshold }
+
+SeverityIndThreshold ::= SEQUENCE {
+	threshold ObservedValue,
+	notifyonoff BOOLEAN,
+	severityIndication PerceivedSeverity OPTIONAL
+		-- shall be present if notifyonoff is TRUE
+		}
+
+-- A reange of time period units from picoseconds to days.  No implication is to be inferred as to the degree of 
+-- resolution required within the implementation of a attribute which is to be represented as a time period.  Likewise 
+-- no restirction is imposed on the method (i.e. time period units) by which the time period is represented within the 
+-- implementation of a managed object.  Implementations are not required to support all time period values.
+
+TimePeriod ::= CHOICE {
+	days [0] IMPLICIT INTEGER,
+	hours [1] IMPLICIT INTEGER,
+	minutes [2] IMPLICIT INTEGER,
+	seconds [3] IMPLICIT INTEGER,
+	milliSecs [4] IMPLICIT INTEGER,
+	microSecs [5] IMPLICIT INTEGER,
+	nanoSecs [6] IMPLICIT INTEGER,
+	picoSecs [7] IMPLICIT INTEGER
+}
+
+END
+
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

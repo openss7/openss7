@@ -495,6 +495,7 @@ EXPORT_SYMBOL(unregister_strmod);
 /**
  *  register_strdrv:	- register STREAMS driver to specfs
  *  @cdev:	STREAMS device structure to register
+ *  @major:	major device number
  *
  *  register_strdrv() registers the specified cdevsw(9) structure to the specfs(5).  This results in
  *  the allocation of a specfs(5) directory node for the driver.  This is probably not the function
@@ -503,7 +504,7 @@ EXPORT_SYMBOL(unregister_strmod);
  *  For full details, see register_strdrv(9).
  */
 streams_fastcall int
-register_strdrv(struct cdevsw *cdev)
+register_strdrv(struct cdevsw *cdev, major_t major)
 {
 	struct module_info *mi;
 	struct cdevsw *c;
@@ -538,7 +539,7 @@ register_strdrv(struct cdevsw *cdev)
 			_ptrace(("Error path taken!\n"));
 			goto ebusy;
 		}
-		if (!(modid = mi->mi_idnum)) {
+		if (!(modid = major) && !(modid = mi->mi_idnum)) {
 			/* find a free module id */
 			_ptrace(("Finding a free module id\n"));
 			for (modid = (modID_t) (-1UL); modid && __cdrv_lookup(modid); modid--) ;
@@ -573,6 +574,7 @@ register_strdrv(struct cdevsw *cdev)
 			_ptrace(("Error path taken!\n"));
 			goto unlock_release_exit;
 		}
+		cdev->d_modid = modid;
 		if ((err = sdev_add(cdev))) {
 			_ptrace(("Error path taken!\n"));
 			goto unlock_release_exit;
@@ -908,9 +910,12 @@ register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops
 	int err;
 	struct devnode *cmaj;
 
-	if ((err = register_strdrv(cdev)) < 0 && err != -EBUSY)
+	if ((err = register_strdrv(cdev, major)) < 0 && err != -EBUSY)
 		goto no_strdrv;
 	err = -ENOMEM;
+	/* If major is zero, use the module id as the major device number. */
+	if (major == 0)
+		major = cdev->d_modid;
 	if (!(cmaj = kmalloc(sizeof(*cmaj), GFP_ATOMIC)))
 		goto no_cmaj;
 	memset(cmaj, 0, sizeof(*cmaj));

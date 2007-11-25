@@ -84,14 +84,21 @@ sort-adjacent-labels
 .\"
 .SH INTERFACE
 .PP
-XAP,
+ACSE/Presentation ROSE Interface,
+APRI,
 .[
-XAP ACSE
+APLI UNIX International
 .]
 XAP-ROSE.
 .[
-XAP-ROSE
+xap-rose
 .]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libapri (3),
+.BR libxaprose (3).
 .\"
 .\"
 .SH SYNOPSIS
@@ -193,7 +200,7 @@ for additional compatiblity considerations.
 .PP
 XAP,
 .[
-XAP ACSE
+xap c303
 .]
 XAP-ROSE.
 .[

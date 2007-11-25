@@ -79,8 +79,8 @@
 
  *****************************************************************************/
 
-#ifndef _XTI_INET_H
-#define _XTI_INET_H
+#ifndef _XTI_MOSI_H
+#define _XTI_MOSI_H
 
 #ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
@@ -98,6 +98,6 @@ __END_DECLS
 /* *INDENT-ON* */
 #endif
 
-#endif				/* _XTI_INET_H */
+#endif				/* _XTI_MOSI_H */
 
 // vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

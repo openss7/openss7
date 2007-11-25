@@ -89,6 +89,8 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-ignore TXYZ
+search-truncate 12
 .R2
 .so striso.macros
 .\"

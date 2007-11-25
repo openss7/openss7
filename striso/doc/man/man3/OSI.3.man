@@ -177,7 +177,7 @@ x237
 T}:T{
 XAP
 .[
-XAP ACSE C303
+xap c303
 .]
 T}
 T{
@@ -231,7 +231,7 @@ x711
 .PP
 XAP
 .[
-XAP ACSE C303
+xap c303
 .]
 is adequate for providing both interface to kernel-level communications
 facilities as well as  the ability to implement ACSE, Presentation and Session

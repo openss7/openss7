@@ -4,7 +4,7 @@
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Wed Sep 12 10:54:44 MDT 2007
+--@@ Date: Wed Nov 21 11:06:20 MST 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.739.gdmo" >--
@@ -1050,7 +1050,7 @@ REGISTERED AS { mtpNameBinding 30 };
 --  $Log: T1.116.1D.gdmo,v $
 --  Revision 0.9.2.3  2007/09/29 14:28:09  brian
 --  - update gdmos and asns
---
+--  
 --  Revision 0.9.2.2  2007/09/09 22:58:49  brian
 --  - updates for namespace
 --  

@@ -113,15 +113,24 @@ specified in
 ISO 3309
 .]
 and
-.BR "ISO 4333" .
+.BR "ISO 4335" .
 .[
 ISO 4335
 .]
 .B HDLC
 is intended to be used with the
 .BR lapb (4),
+.[
+x25
+.]
 .BR lapd (4),
+.[
+q921
+.]
 .BR lapf (4),
+.[
+q922
+.]
 multiplexing drivers.
 .\"
 .\"
@@ -254,9 +263,9 @@ operation as described in
 .PP
 The
 .B HDLC
-module conforms to the CDI Specification, Revision 1.0.
+module conforms to the CDI Specification, Revision 0.9.2.
 .[
-cdi
+cdi specification
 .]
 .PP
 The

@@ -46,7 +46,7 @@ Standard group MAC addresses:
 Group MAC addresses used in ISO 9542 ES-IS protocol:
 
 09-00-2B-00-00-04   (ISO 9542/RFC 995) All End System Network Entities Address
-09-00-2B-00-00-05   (ISO 9542/RFC 995) All Intermeidate System Network Entities Address
+09-00-2B-00-00-05   (ISO 9542/RFC 995) All Intermediate System Network Entities Address
 
 Locally administered group MAC address used by IEEE Std. 802.5
 

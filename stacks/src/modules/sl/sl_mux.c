@@ -4893,7 +4893,7 @@ sl_muxinit(void)
 		err = -ENOMEM;
 		goto nocache;
 	}
-	if ((err = register_strdrv(&sl_cdev)) < 0) {
+	if ((err = register_strdev(&sl_cdev, major)) < 0) {
 		cmn_err(CE_WARN, "%s: could not register driver, err = %d\n", DRV_NAME, err);
 		goto nostrdrv;
 	}
@@ -4935,7 +4935,7 @@ sl_muxinit(void)
       noanode:
 	unregister_strnod(&sl_cdev, SL_C_MINOR);
       nocnode:
-	unregister_strdrv(&sl_cdev);
+	unregister_strdev(&sl_cdev, major);
       nostrdrv:
 	kmem_cache_destroy(sl_priv_cachep);
       nocache:

@@ -352,6 +352,12 @@ __asm__(".symver __xap_ap_bind,ap_bind@@XAP_1.0");
 int
 __xap_ap_close(int fd, unsigned long *aperrno_p)
 {
+	int err;
+
+	if ((err = close(fd)) != 0 && aperrno_p != NULL)
+		if ((*aperrno_p = errno) == EBADF)
+			*aperrno_p = AP_BADF;
+	return (err);
 }
 
 /** @fn int ap_close(int fd, unsigned long *aperrno_p)
@@ -497,12 +503,99 @@ __asm__(".symver __xap_ap_init_env,ap_init_env@@XAP_1.0");
   * @par Alias:
   * This symbol is an implementation of ap_ioctl().
   *
+  * The implementation is a direct translation to I_SETSIG and I_GETSIG.
+  * Unfortunately, the AP_POLLxxx bits are poll(2s) bits instead of
+  * I_SETSIG(7) bits and the call and return values must be bit-translated.
+  * Also, we do not want to necessarily set AP_SETPOLL to I_SETSIG and
+  * AP_GETPOLL to I_GETSIG, so those are translated too.
+  *
   * @aperrno_p must be set to point to a location which will be used to carry an
   * error code to the user.
   */
 int
 __xap_ap_ioctl(int fd, int request, ap_val_t argument, unsigned long *aperrno_p)
 {
+	int events = 0;
+	int flags = 0;
+	int err;
+
+	switch (request) {
+	case AP_SETPOLL:
+		/* translate POLL bis to SIG bits */
+		if (argument.l & AP_POLLIN)
+			events |= S_INPUT;
+		if (argument.l & AP_POLLPRI)
+			events |= S_HIPRI;
+		if (argument.l & AP_POLLOUT)
+			events |= S_OUTPUT;
+		if (argument.l & AP_POLLRDNORM)
+			events |= S_RDNORM;
+		if (argument.l & AP_POLLRDBAND)
+			events |= S_RDBAND;
+		if (argument.l & AP_POLLWRNORM)
+			events |= S_WRNORM;
+		if (argument.l & AP_POLLWRBAND)
+			events |= S_WRBAND;
+		if (argument.l & AP_POLLERR)
+			events |= S_ERROR;
+		if (argument.l & AP_POLLHUP)
+			events |= S_HANGUP;
+		if (argument.l & AP_POLLMSG)
+			events |= S_MSG;
+		if (argument.l & AP_POLLURG)
+			events |= S_BANDURG;
+		if ((err = ioctl(fd, I_SETSIG, events)) == -1)
+			break;
+		return (0);
+	case AP_GETPOLL:
+		if ((err = ioctl(fd, I_GETSIG, &events)) == -1)
+			break;
+		if (events & S_INPUT)
+			flags |= AP_POLLIN;
+		if (events & S_HIPRI)
+			flags |= AP_POLLPRI;
+		if (events & S_OUTPUT)
+			flags |= AP_POLLOUT;
+		if (events & S_RDNORM)
+			flags |= AP_POLLRDNORM;
+		if (events & S_RDBAND)
+			flags |= AP_POLLRDBAND;
+		if (events & S_WRNORM)
+			flags |= AP_POLLWRNORM;
+		if (events & S_WRBAND)
+			flags |= AP_POLLWRBAND;
+		if (events & S_ERROR)
+			flags |= AP_POLLERR;
+		if (events & S_HANGUP)
+			flags |= AP_POLLHUP;
+		if (events & S_MSG)
+			flags |= AP_POLLMSG;
+		if (events & S_BANDURG)
+			flags |= AP_POLLURG;
+		*(long *)argument.v = flags;
+		return (0);
+	default:
+		errno = EINVAL;
+		break;
+	}
+	switch (errno) {
+	case EBADF:
+	case ENOSTR:
+	case ENOTTY:
+	case ENODEV:
+		if (aperrno_p != NULL)
+			*aperrno_p = AP_BADF;
+		break;
+	case EOPNOTSUPP:
+		if (aperrno_p != NULL)
+			*aperrno_p = AP_NOT_SUPPORTED;
+		break;
+	default:
+		if (aperrno_p != NULL)
+			*aperrno_p = errno;
+		break;
+	}
+	return (-1);
 }
 
 /** @fn int ap_ioctl(int fd, int request, ap_val_t argument, unsigned long *aperrno_p)
@@ -596,8 +689,11 @@ int
 __xap_ap_poll(ap_pollfd_t fds[], int nfds, int timeout, unsigned long *aperrno_p)
 {
 	struct pollfd *pfds = (struct pollfd *)fds;
+	int err;
 
-	return poll(pfds, nfds, timeout);
+	if  ((err = poll(pfds, nfds, timeout)) == -1 && aperrno_p != NULL)
+		*aperrno_p = errno;
+	return (err);
 }
 
 /** @fn int ap_poll(ap_pollfd_t fds[], int nfds, int timeout, unsigned long *aperrno_p)

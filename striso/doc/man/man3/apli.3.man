@@ -483,7 +483,7 @@ functions.
 The APLI interface was developed by UNIX Systems Laboratories and later standardized by the
 OpenGroup (then X/Open), the IEEE and ISO as the X/Open ACSE/Presentation API (XAP).
 .[
-XAP ACSE C303
+xap c303
 .]
 .\"
 .\"

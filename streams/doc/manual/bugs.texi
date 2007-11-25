@@ -58,6 +58,23 @@
 @c =========================================================================
 
 @table @code
+@item 016.  2007-11-14T17:23:57+0000
+
+Read is blocking when data has been read an O_NONBLOCK and O_NDELAY unset and RFILL unset in
+non-SVR4 mode.  This violates POSIX specifications.  Corrected and test case added to verify
+regressions.
+
+@emph{*fixed*} in @command{streams-0.9.2.4}
+
+@item 015.  2007-11-14T17:19:01+0000
+
+Dynamic allocation of major device numbers is not working on recent 2.6 kernels.  Someone slipped
+some code in the kernel to have register_chrdev() allocate from major 255 down (again).  Changed
+code to allocate modid according to our own rules and then request the same for a major device
+number.  This also ensures that module ID and major are the same.
+
+@emph{*fixed*} in @command{streams-0.9.2.4}
+
 @item 014.  2007-05-17T21:48:24+0000
 
 The dupb() utility had an obnoxious bug where it permitted the db_ref count to wrap to zero, causing

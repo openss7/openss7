@@ -4,7 +4,7 @@
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Fri Sep 14 13:28:22 MDT 2007
+--@@ Date: Wed Nov 21 10:55:43 MST 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Document "ITU-T Rec. Q.751.3 (1992)"
@@ -567,7 +567,7 @@ END
 --  $Log: MTPacct.gdmo,v $
 --  Revision 0.9.2.3  2007/09/29 14:28:07  brian
 --  - update gdmos and asns
---
+--  
 --  Revision 0.9.2.2  2007/09/09 22:58:48  brian
 --  - updates for namespace
 --  
@@ -609,12 +609,15 @@ END
 --@@ These modules define "CCITT Rec. X.721(1992)"
 --@@ These modules define "CCITT Rec. X.721|ISO/IEC 10165-2"
 --@@ These modules define "DMI"
+--@@ These modules define "DMI:1992"
+--@@ These modules define "ISO/IEC 10165-2"
 --@@ These modules define "ITU Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
 --@@ These modules define "ITU-T Rec. Q.751.3 (1992)"
 --@@ These modules define "ITU-T Rec. X.721 (1992)"
 --@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
 --@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2: 1992"
 --@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define "ITU-T Rec. X.721 : 1992"
 --@@ These modules define "ITU-T Rec. X.721 | ISO/IEC 10165-2 : 1992"
 --@@ These modules define "ITU-T Recommendation X.721"
 --@@ These modules define "ITU-T Recommendation X.721:1992"
@@ -627,11 +630,13 @@ END
 --@@ These modules define "Rec. X.721 | ISO/IEC 10165-2"
 --@@ These modules define "Rec. X.721 | ISO/IEC 10165-2 : 1992"
 --@@ These modules define "Rec. X.721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "Rec. X.721|ISO/IEC 10165-2 : 1992"
 --@@ These modules define "Recommendation X.721"
 --@@ These modules define "Recommendation X.721 "
 --@@ These modules define "Recommendation X.721 : 1992"
 --@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2"
 --@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2: 1992"
 --@@ These modules define "Recommendation X.721: 1992"
 --@@ These modules define "Recommendation X.721:1992"
 --@@ These modules define "X.721"

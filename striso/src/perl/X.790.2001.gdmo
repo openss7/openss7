@@ -11,8 +11,7 @@
 --< GDMO.Document "ITU-T Rec. X.790 (1995)"
 --  { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) } >--
 --< GDMO.Namespace itut_x790 >--
---< GDMO.Alias "ITU-T Rec. X.790 (1995)"
---  "ITU-T Recommendation X.790",
+--< GDMO.Alias "ITU-T Rec. X.790 (1995)" "ITU-T Recommendation X.790",
 --  "ITU-T Rec. X.790" >--
 MODULE "ITU-T Rec. X.790 (1995)" { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) }
 -- Annex A

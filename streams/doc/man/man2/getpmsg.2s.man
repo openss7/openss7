@@ -114,7 +114,7 @@ a pointer to a integer containing passed in and returned flags.
 .\"
 .SH DESCRIPTION
 .PP
-.B getpmsg()
+.BR getpmsg ()
 reads a
 .I STREAMS
 message from the read queue of a stream head into the caller
@@ -131,7 +131,7 @@ The semantics of these contents forms a necessary part of the
 module
 documentation.
 .PP
-.B getpmsg()
+.BR getpmsg ()
 provides finer control over the messages retrieved than does
 .BR getmsg (2).
 .PP
@@ -248,18 +248,18 @@ band greater than or equal to the priority band specified in
 .PP
 If the stream head is set for non-blocking operation and no message of the
 specified type and priority band is available to be read,
-.B getpmsg()
+.BR getpmsg ()
 will fail and set
 .I errno
 to
 .BR EAGAIN " or " EWOULDBLOCK .
 If the stream head is set for blocking operation,
-.B getpmsg()
+.BR getpmsg ()
 will block until a message of the specified type and priority band becomes
-availble on the stream head read queue, or the call is interrupted by a
+available on the stream head read queue, or the call is interrupted by a
 signal.
 If the call is interrupted by a signal in this fashion,
-.B getpmsg()
+.BR getpmsg ()
 will fail and set
 .I errno
 to
@@ -267,7 +267,7 @@ to
 .\"
 .PP
 If a hangup occurs on the stream from which messages are to be retrieved,
-.B getpmsg()
+.BR getpmsg ()
 continues to operate normally, as described above, until the
 stream head read queue is empty.  Thereafter, it returns 0 in the
 .I len
@@ -278,7 +278,7 @@ field of
 .SH "RETURN VALUES"
 .PP
 Upon failure,
-.B getpmsg()
+.BR getpmsg ()
 will
 return -1 and set
 .I errno
@@ -287,29 +287,29 @@ as described under
 below.
 .PP
 Upon success,
-.B getpmsg()
+.BR getpmsg ()
 will return a non-negative value with any of the following flags set:
 .TP
 .B MORECTL
 indicates that more control information belonging to the same message is
 waiting to be retrieved from the stream head read queue with a subsequent
-.B getpmsg()
+.BR getpmsg ()
 operation.
 .TP
 .B MOREDATA
 indicates that more data belonging to the same message is waiting to be
 retrieved from the stream head read queue with a subsequent
-.B getpmsg()
+.BR getpmsg ()
 operation.
 .B 0
 indicates that the entire message was received successfully.
 .PP
-.B getpmsg()
+.BR getpmsg ()
 with the appropriate arguments will retrieve a higher priority message before
 the remainder of a partially retrieved lower priority message is retrieved.
 .PP
 Upon success,
-.B getpmsg()
+.BR getpmsg ()
 will also alter the
 .I len
 values in the
@@ -367,7 +367,7 @@ the integer
 points to returns the priority band of the retrieved message.
 .PP
 For
-.B getpmsg()
+.BR getpmsg ()
 the integer pointed to by
 .I flagsp
 will contain one of the following values:
@@ -385,7 +385,7 @@ indicates the priority band of the retrieved message.
 .SH ERRORS
 .PP
 Upon failure,
-.BR getpmsg()
+.BR getpmsg ()
 will
 return -1 and set
 .I errno
@@ -413,7 +413,7 @@ structure pointed to by
 .RB [ ENODEV ]
 .I fd
 refers to a device that does not support the
-.B getpmsg()
+.BR getpmsg ()
 system call.
 .TP
 .RB [ ENOSTR ]
@@ -435,15 +435,15 @@ refers to a stream that is open but is in the process of closing.
 .RB [ EINVAL ]
 .I fd
 is linked under a multiplexing driver; or,
-.B getpmsg()
+.BR getpmsg ()
 is not supported; or, the flags were invalid for
-.B getpmsg()
+.BR getpmsg ()
 (not
 .BR MSG_HIPRI ", " MSG_ANY " or " MSG_BAND ).
 .TP
 .RB [ EAGAIN "], [" EWOULDBLOCK ]
 The stream head is set for non-blocking operation and
-.B getpmsg()
+.BR getpmsg ()
 would block: that is, no message of the requested type and priority band is
 available to be read.
 .TP
@@ -451,7 +451,7 @@ available to be read.
 A signal was caught, or an
 .BR M_SIG (9)
 message processed, before the call to
-.B getpmsg()
+.BR getpmsg ()
 could return any data.
 .TP
 .RB [ ENOSTR ]
@@ -469,12 +469,12 @@ or priority band as specified by
 .IR bandp .
 .PP
 Other errors may be returned by
-.BR getpmsg() .
+.BR getpmsg ().
 If the protocol module sends a
 .BR M_ERROR (9)
 message to the stream head, the error returned on all subsequent read
 operations, including
-.BR getpmsg() ,
+.BR getpmsg (),
 is specified in the
 .BR M_ERROR (9)
 message by the protocol module.
@@ -594,7 +594,7 @@ structure, or is mangled.
 .[
 LiS
 .]
-incorreclty returns
+incorrectly returns
 .RB [ EINVAL ]
 instead of
 .RB [ EIO ]
@@ -613,7 +613,7 @@ LiS
 does not return
 .RB [ EIO ]
 when
-.B getpmsg()
+.BR getpmsg ()
 is called on a closing stream.
 .IP \(em
 .B LiS
@@ -627,7 +627,7 @@ instead of
 when an
 .BR M_SIG (9)
 message causes a signal that interrupts the call to
-.B getpmsg()
+.BR getpmsg ()
 before any data is read.
 .IP \(em
 .B LiS
@@ -652,7 +652,7 @@ instead of
 when
 .I fd
 refers to a device that does not support the
-.B getpmsg()
+.BR getpmsg ()
 system calls.
 .PP
 .B Linux Fast-STREAMS
@@ -693,7 +693,7 @@ POSIX.
 .\"
 .SH HISTORY
 .PP
-.B getpmsg()
+.BR getpmsg ()
 first appeared in SVR 3.
 .[
 svr3
