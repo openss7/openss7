@@ -1,7 +1,7 @@
--- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-M3UA-TC.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/10/15 01:15:42 $
+-- @(#) $RCSfile: OPENSS7-M3UA-TC.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/15 20:19:12 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -10,18 +10,19 @@
 --
 -- All Rights Reserved.
 --
--- This program is free software; you can redistribute it and/or modify it under
--- the terms of the GNU General Public License as published by the Free Software
--- Foundation; version 3 of the License.
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
 --
--- This program is distributed in the hope that it will be useful, but WITHOUT
--- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
--- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
--- details.
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
 --
--- You should have received a copy of the GNU General Public License along with
--- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
--- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/10/15 01:15:42 $ by $Author: brian $
+-- Last Modified $Date: 2007/12/15 20:19:12 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-M3UA-TC.mib,v $
+-- Revision 0.9.2.2  2007/12/15 20:19:12  brian
+-- - updates
+--
 -- Revision 0.9.2.1  2007/10/15 01:15:42  brian
 -- - added MIBs
 --
@@ -67,19 +71,22 @@ IMPORTS
 		FROM OPENSS7-SMI;
 
 m3uaTC MODULE-IDENTITY
-	LAST-UPDATED	"200709300000Z"
-	ORGANIZATION	"OpenSS7 Corporation"
-	CONTACT-INFO	"The OpenSS7 Project
-			 c/o Brian Bidulock
-			 OpenSS7 Corporation
-			 1469 Jefferys Crescent
-			 Edmonton, Alberta
-			 Canada T6L 6T1
-			 Tel: +1 780 490 1141
-			 Fax: +1 780 490 1241
-			 Mob: +1 780 953 0557
-			 Email: bidulock@openss7.org"
-	DESCRIPTION	"Provides textual conventions for M3UA."
+	LAST-UPDATED
+		"200709300000Z"
+	ORGANIZATION
+		"The OpenSS7 Project"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta  T6L 6T1
+		 CANADA
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 Email: bidulock@openss7.org"
+	DESCRIPTION
+		"Provides textual conventions for M3UA."
 	::= { openss7Modules 33 }
 
 m3uaObjectIds		OBJECT IDENTIFIER ::= { m3uaTC	     1 }
@@ -104,5 +111,4 @@ m3uaVersionRFC3332 OBJECT-IDENTITY
 
 END
 
--- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
-
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8

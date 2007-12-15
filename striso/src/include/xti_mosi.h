@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_mosi.h,v 0.9.2.2 2007/08/14 07:05:06 brian Exp $
+ @(#) $Id: xti_mosi.h,v 0.9.2.3 2007/12/15 20:20:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 07:05:06 $ by $Author: brian $
+ Last Modified $Date: 2007/12/15 20:20:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti_mosi.h,v $
+ Revision 0.9.2.3  2007/12/15 20:20:30  brian
+ - updates
+
  Revision 0.9.2.2  2007/08/14 07:05:06  brian
  - GNUv3 header update
 
@@ -82,7 +85,7 @@
 #ifndef _XTI_MOSI_H
 #define _XTI_MOSI_H
 
-#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/xti_mosi.h>
 

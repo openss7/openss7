@@ -1,7 +1,7 @@
--- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-M3UA-SGP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/10/15 01:15:42 $
+-- @(#) $RCSfile: OPENSS7-M3UA-SGP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/15 20:19:12 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -10,18 +10,19 @@
 --
 -- All Rights Reserved.
 --
--- This program is free software; you can redistribute it and/or modify it under
--- the terms of the GNU General Public License as published by the Free Software
--- Foundation; version 3 of the License.
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
 --
--- This program is distributed in the hope that it will be useful, but WITHOUT
--- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
--- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
--- details.
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
 --
--- You should have received a copy of the GNU General Public License along with
--- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
--- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/10/15 01:15:42 $ by $Author: brian $
+-- Last Modified $Date: 2007/12/15 20:19:12 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-M3UA-SGP-MIB.mib,v $
+-- Revision 0.9.2.2  2007/12/15 20:19:12  brian
+-- - updates
+--
 -- Revision 0.9.2.1  2007/10/15 01:15:42  brian
 -- - added MIBs
 --
@@ -71,48 +75,57 @@ IMPORTS
 		FROM OPENSS7-SMI;
 
 m3uaSgpMIB MODULE-IDENTITY
-	LAST-UPDATED "200709300000Z"
-	ORGANIZATION "OpenSS7 Corporation"
-	CONTACT-INFO "Brian Bidulock
-		      1460 Jefferys Crescent
-		      Edmonton, Alberta
-		      Canada
-		      T6L 6T1
-		      Tel: +1 780 490 1141
-		      Fax: +1 780 490 1241
-		      E-Mail: bidulock@openss7.org"
-	DESCRIPTION  "MIB Module for SIGTRAN M3UA SGP management.
+	LAST-UPDATED
+		"200709300000Z"
+	ORGANIZATION
+		"OpenSS7 Corporation"
+	CONTACT-INFO
+		"Brian Bidulock
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta  T6L 6T1
+		 Canada
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 E-Mail: bidulock@openss7.org"
+	DESCRIPTION
+		"MIB Module for SIGTRAN M3UA SGP management.
 
-			In the containment model for the SGP side, the correspondences to SS7 
-			MTP entities is different than the ASP side.
+		 In the containment model for the SGP side, the 
+		 correspondences to SS7 MTP entities is different than 
+		 the ASP side.
 
-			- ASPs serving an AS within an SP correspond to routes.  There is no
-			  correspondence for route lists; i.e., there is only one route list 
-			  containing all routes.  For each SP which has AS served to ASPs there 
-			  is one route set containing this single route list.  A route in a 
-			  route list corresponds to a load selection.  If LOADSEL is supported, 
-			  the ASP may conttrol its load selection membership.  Each load 
-			  selection is organized into a load group.  Route Sets on the SGP side 
-			  are finer than on the ASP side.
+		 - ASPs serving an AS within an SP correspond to routes.  
+		   There is no correspondence for route lists; i.e., 
+		   there is only one route list containing all routes.  
+		   For each SP which has AS served to ASPs there is one 
+		   route set containing this single route list.  A route 
+		   in a route list corresponds to a load selection.  If 
+		   LOADSEL is supported, the ASP may conttrol its load 
+		   selection membership.  Each load selection is 
+		   organized into a load group.  Route Sets on the SGP 
+		   side are finer than on the ASP side.
 
-			Note that the underlying MTP implementation must be smart enough to 
-			properly route 'Alias' signalling points.  The use of Alias point codes 
-			for SCCP GTT function in ANSI MTP networks at STPs is described in ANSI 
-			T1.111.4/2000.  When assigning an M3UA point code to an STP pair, that 
-			point code needs to be declared as an Alias point code.  In extension to 
-			the ANSI T1.111.4/2000 SCCP Alias behaviour, the MTP implementation must 
-			also permit other SI values (other than SCCP) as well as multiple SI 
-			values to be active.  If a given SI value is unavailable on the local 
-			STP, it should be routed, if possible, to the associated STP (note that 
-			the transfer-prohibited procedures of 13.2.2 apply).  If is is not 
-			possible to route the message to the associated STP (perhaps because a 
-			transfer-prohibited message with regard to the signalling point has been 
-			received), the message is given UPU treatment.  If all SI values are 
-			inaccessble at the STP, trasnfer-prohibited procedures will be invoked 
-			for the entire point code.
-
-	
-	"
+		 Note that the underlying MTP implementation must be 
+		 smart enough to properly route 'Alias' signalling 
+		 points.  The use of Alias point codes for SCCP GTT 
+		 function in ANSI MTP networks at STPs is described in 
+		 ANSI T1.111.4/2000.  When assigning an M3UA point code 
+		 to an STP pair, that point code needs to be declared as 
+		 an Alias point code.  In extension to the ANSI 
+		 T1.111.4/2000 SCCP Alias behaviour, the MTP 
+		 implementation must also permit other SI values (other 
+		 than SCCP) as well as multiple SI values to be active.  
+		 If a given SI value is unavailable on the local STP, it 
+		 should be routed, if possible, to the associated STP 
+		 (note that the transfer-prohibited procedures of 13.2.2 
+		 apply).  If is is not possible to route the message to 
+		 the associated STP (perhaps because a 
+		 transfer-prohibited message with regard to the 
+		 signalling point has been received), the message is 
+		 given UPU treatment.  If all SI values are inaccessble 
+		 at the STP, trasnfer-prohibited procedures will be 
+		 invoked for the entire point code."
 	::=  { openss7Modules 32 }
 
 -- Top-level structure of the MIB
@@ -138,26 +151,35 @@ m3uaProtocolVersions		OBJECT IDENTIFIER ::= { m3uaSgpOids	 1 }
 
 m3uaRfc3332ProtocolVersion OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"Provides an object identifier which identifies the RFC 3332 version of 
-			 the M3UA protocol, for use with the ProtocolVersion textual convention 
-			 from OPENSS7-SIGTRAN-TC."
-	REFERENCE	"RFC 3332"
+	DESCRIPTION
+		"Provides an object identifier which identifies the RFC 
+		 3332 version of the M3UA protocol, for use with the 
+		 ProtocolVersion textual convention from 
+		 OPENSS7-SIGTRAN-TC."
+	REFERENCE
+		"RFC 3332"
 	::= { m3uaProtocolVersions 1 }
 
 m3uaTs102142ProtocolVersion OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"Provides an object identifier which identifies the ETSI TS 102 142 
-			 version of the M3UA protocol, for use with the ProtocolVersion textual 
-			 convention from OPENSS7-SIGTRAN-TC."
-	REFERENCE	"RFC 3332 and ETSI TS 102 142"
+	DESCRIPTION
+		"Provides an object identifier which identifies the ETSI 
+		 TS 102 142 version of the M3UA protocol, for use with 
+		 the ProtocolVersion textual convention from 
+		 OPENSS7-SIGTRAN-TC."
+	REFERENCE
+		"RFC 3332 and ETSI TS 102 142"
 	::= { m3uaProtocolVersions 2 }
 
 m3uaRfc4666ProtocolVersion OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"Provides an object identifier which identifies the RFC 4666 version of
-			 the M3UA protocol, for use with the ProtocolVersion textual convention 
-			 from OPENSS7-SIGTRAN-TC."
-	REFERENCE	"RFC 4666"
+	DESCRIPTION
+		"Provides an object identifier which identifies the RFC 
+		 4666 version of the M3UA protocol, for use with the 
+		 ProtocolVersion textual convention from 
+		 OPENSS7-SIGTRAN-TC."
+	REFERENCE
+		"RFC 4666"
 	::= { m3uaProtocolVersions 3 }
 
 -- ====================================================================
@@ -167,8 +189,9 @@ m3uaSgpAgNextIndex OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides the next available index into the AG table.  The value returned is 
-		 zero if there are no more available entries in the table (i.e. the table is 
+		"Provides the next available index into the AG table.  
+		 The value returned is zero if there are no more 
+		 available entries in the table (i.e. the table is 
 		 exahausted)."
 	::= { m3uaSgpAg 1 }
 
@@ -177,9 +200,11 @@ m3uaSgpAgTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides the access group (AG) table.  Each entry in the AG table represents 
-		 and access group.  An access group is a group of signalling gateways (SG) to 
-		 which ASPs route messages with equal route priority (and thus loadhsharing)."
+		"Provides the access group (AG) table.  Each entry in 
+		 the AG table represents and access group.  An access 
+		 group is a group of signalling gateways (SG) to which 
+		 ASPs route messages with equal route priority (and thus 
+		 loadhsharing)."
 	::= { m3uaSgpAg 2 }
 
 m3uaSgpAgEntry OBJECT-TYPE
@@ -187,11 +212,13 @@ m3uaSgpAgEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides an entry in the access group (AG) table.  Each entry in the AG table 
-		 represents an access group which consists of a number of signalling gateways 
-		 (SGs).  As an access group is a logical concept, access groups can be added to 
-		 and removed from this table by management stations.  The contents of this table 
-		 must survive an agent reboot."
+		"Provides an entry in the access group (AG) table.  Each 
+		 entry in the AG table represents an access group which 
+		 consists of a number of signalling gateways (SGs).  As 
+		 an access group is a logical concept, access groups can 
+		 be added to and removed from this table by management 
+		 stations.  The contents of this table must survive an 
+		 agent reboot."
 	INDEX	{
 			m3uaSgpAgIndex
 		}
@@ -228,8 +255,9 @@ m3uaSgpAgIndex OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides an index into the AG table as well as an identifier for referring to 
-		 groupsings of SG into AG (access groups)."
+		"Provides an index into the AG table as well as an 
+		 identifier for referring to groupsings of SG into AG 
+		 (access groups)."
 	::= { m3uSgpAgEntry 1 }
 
 m3uaSgpAgName OBJECT-TYPE
@@ -237,14 +265,18 @@ m3uaSgpAgName OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the name of the access group following COMMON LANGUAGE procedures and 
-		 the CommonLanguageName textual convention.  The COMMON LANGUAGE name of each 
-		 access group should be formed by taking the CLLI of the managed element and 
-		 appending the two characters 'AG' followed by the two digits 'NN', where the 
-		 two digits 'NN' are the ordinal of the m3uaSgpAgIndex.  So, for example, if the 
-		 host CLLI is EDTNAB99CG7, and this is the 3rd entry in the AG table, the name 
-		 should be EDTNAB99CG7AG03."
-	REFERENCE	"OPENSS7-TC"
+		"Provides the name of the access group following COMMON 
+		 LANGUAGE procedures and the CommonLanguageName textual 
+		 convention.  The COMMON LANGUAGE name of each access 
+		 group should be formed by taking the CLLI of the 
+		 managed element and appending the two characters 'AG' 
+		 followed by the two digits 'NN', where the two digits 
+		 'NN' are the ordinal of the m3uaSgpAgIndex.  So, for 
+		 example, if the host CLLI is EDTNAB99CG7, and this is 
+		 the 3rd entry in the AG table, the name should be 
+		 EDTNAB99CG7AG03."
+	REFERENCE
+		"OPENSS7-TC"
 	::= { m3uSgpAgEntry 2 }
 
 m3uaSgpAgProtocolVersion OBJECT-TYPE
@@ -252,23 +284,30 @@ m3uaSgpAgProtocolVersion OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the protocol version supported by all signalling gateways in the 
-		 access group.  The version is an object identifier and autonomous type.  It is 
-		 set to interoperableVersion when the implementation claims to support all 
-		 versions.  Otherwise it is set to one of the versions defined by this MIB, or 
-		 defined in another document or MIB, including an enterprise MIB for private or 
-		 prorprietary protocol variations.  Protocol versions can be 
-		 interoperableProtocolVersion, indicating that the implementations in the AG 
-		 interoperate with all protocol versions; m3uaRfc3332ProtocolVersion, indicating 
-		 that the implementation supports RFC 3332 version of the protocol; 
-		 m3uaTs102142ProtocolVersion, indication that the implementation supports ETSI 
-		 TS 102 142 version of the protocol; or, m3uaRfc4666ProtocolVersion, indicataing 
-		 that the implementation supports RFC 4666 version of the protocol.
+		"Provides the protocol version supported by all 
+		 signalling gateways in the access group.  The version 
+		 is an object identifier and autonomous type.  It is set 
+		 to interoperableVersion when the implementation claims 
+		 to support all versions.  Otherwise it is set to one of 
+		 the versions defined by this MIB, or defined in another 
+		 document or MIB, including an enterprise MIB for 
+		 private or prorprietary protocol variations.  Protocol 
+		 versions can be interoperableProtocolVersion, 
+		 indicating that the implementations in the AG 
+		 interoperate with all protocol versions; 
+		 m3uaRfc3332ProtocolVersion, indicating that the 
+		 implementation supports RFC 3332 version of the 
+		 protocol; m3uaTs102142ProtocolVersion, indication that 
+		 the implementation supports ETSI TS 102 142 version of 
+		 the protocol; or, m3uaRfc4666ProtocolVersion, 
+		 indicataing that the implementation supports RFC 4666 
+		 version of the protocol.
 		 
-		 Whether this value may be changed on an active entry is implementation 
-		 dependent, and the effects when changed on an active entry is also 
-		 implementation dependent."
-	REFERENCE	"OPENSS7-SIGTRAN-TC"
+		 Whether this value may be changed on an active entry is 
+		 implementation dependent, and the effects when changed 
+		 on an active entry is also implementation dependent."
+	REFERENCE
+		"OPENSS7-SIGTRAN-TC"
 	DEFVAL		{ interoperableProtocolVersion }
 	::= { m3uSgpAgEntry 3 }
 
@@ -277,14 +316,18 @@ m3uaSgpAgOptions OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the options supported within the access group following the 
-		 SigtranOptions textual convention.  Options that are not pertinent to M3UA may 
-		 be ignored.  If the access group supports ASPEXT, these options will be 
-		 reported to the ASPs when they execute the ASP Up procedure.
+		"Provides the options supported within the access group 
+		 following the SigtranOptions textual convention.  
+		 Options that are not pertinent to M3UA may be ignored.  
+		 If the access group supports ASPEXT, these options will 
+		 be reported to the ASPs when they execute the ASP Up 
+		 procedure.
 		 
-		 If this value is modified on an active entry, it will not take effect until an 
-		 SGP in the Access Group engages in the ASP Up procedure with an ASP."
-	REFERENCE	"OPENSS7-SIGTRAN-TC"
+		 If this value is modified on an active entry, it will 
+		 not take effect until an SGP in the Access Group 
+		 engages in the ASP Up procedure with an ASP."
+	REFERENCE
+		"OPENSS7-SIGTRAN-TC"
 	DEFVAL		{ '000000000'B }
 	::= { m3uSgpAgEntry 4 }
 
@@ -293,19 +336,24 @@ m3uaSgpAgRegistrationPolicy OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the registration policy of the SG in the Access Group following the 
-		 RegistrationPolicy textual convention.  The registration policy may be 
-		 unknown(1), where the registration policy is left to the implementation, 
-		 forbidden(2), where the registration procedures will not be used, required(4), 
-		 where the registration procedures will always be used, and permitted(3), where 
-		 the registration procedures will be used if configured and not otherwise.  
+		"Provides the registration policy of the SG in the 
+		 Access Group following the RegistrationPolicy textual 
+		 convention.  The registration policy may be unknown(1), 
+		 where the registration policy is left to the 
+		 implementation, forbidden(2), where the registration 
+		 procedures will not be used, required(4), where the 
+		 registration procedures will always be used, and 
+		 permitted(3), where the registration procedures will be 
+		 used if configured and not otherwise.  
 
-		 Changing this value on an active entry will not affect the effective 
-		 regsitration policy until an ASP has cycled through the ASP Down state 
-		 following the setting to a new value.  The new value will be in force for the 
-		 next ASP Up procedure invoked by the ASP that has cycled through the ASP Down 
-		 procedure."
-	REFERENCE	"OPENSS7-SIGTRAN-TC"
+		 Changing this value on an active entry will not affect 
+		 the effective regsitration policy until an ASP has 
+		 cycled through the ASP Down state following the setting 
+		 to a new value.  The new value will be in force for the 
+		 next ASP Up procedure invoked by the ASP that has 
+		 cycled through the ASP Down procedure."
+	REFERENCE
+		"OPENSS7-SIGTRAN-TC"
 	DEFVAL		{ unknown(1) }
 	::= { m3uSgpAgEntry 5 }
 
@@ -315,14 +363,17 @@ m3uaSgpAgAspIdPolicy OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the ASP Identifier policy of the access group following the 
-		 AspIdPolicy textual convention.  This convention describes whether SG in the 
-		 Access Group have no set ASP Identifier policy, or permit, require or forbid 
-		 the use of ASP Identifiers.
+		"Provides the ASP Identifier policy of the access group 
+		 following the AspIdPolicy textual convention.  This 
+		 convention describes whether SG in the Access Group 
+		 have no set ASP Identifier policy, or permit, require 
+		 or forbid the use of ASP Identifiers.
 		 
-		 If this value is modified on an active entry, it will not take effect until an 
-		 SGP in the Access Group engages in the ASP Up procedure with an ASP."
-	REFERENCE	"OPENSS7-SIGTRAN-TC"
+		 If this value is modified on an active entry, it will 
+		 not take effect until an SGP in the Access Group 
+		 engages in the ASP Up procedure with an ASP."
+	REFERENCE
+		"OPENSS7-SIGTRAN-TC"
 	DEFVAL		{ unknown(1) }
 	::= { m3uSgpAgEntry 6 }
 
@@ -331,12 +382,13 @@ m3uaSgpAgProtocolPayloadId OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the SCTP Payload Protocol Identifier to be used in DATA chunks 
-		 containing M3uA messages sent between SGP in this Access Group and ASPs.  This 
-		 value must either be zero (0) or three (3).
+		"Provides the SCTP Payload Protocol Identifier to be 
+		 used in DATA chunks containing M3uA messages sent 
+		 between SGP in this Access Group and ASPs.  This value 
+		 must either be zero (0) or three (3).
 
-		 When changed on an active entry, the PPI value set will take effect on the next 
-		 DATA chunk sent."
+		 When changed on an active entry, the PPI value set will 
+		 take effect on the next DATA chunk sent."
 	DEFVAL		{ 3 }
 	::= { m3uSgpAgEntry 7 }
 
@@ -345,17 +397,21 @@ m3uaSgpAgIpPort OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the IP port number on which SGP in this Access Group will listen.  
-		 This largely assumes that each SGP in the Access Group is on a separate host.  
-		 For the case where multiple SG are provided for one or more hosts, set this 
-		 value to zero (0) to indicate that the port number is specified in the m3uaSgp 
-		 table.  The default is to have all SGP listen on the well-known M3UA server 
-		 port number as assigned by IANA, 2905.
+		"Provides the IP port number on which SGP in this Access 
+		 Group will listen.  This largely assumes that each SGP 
+		 in the Access Group is on a separate host.  For the 
+		 case where multiple SG are provided for one or more 
+		 hosts, set this value to zero (0) to indicate that the 
+		 port number is specified in the m3uaSgp table.  The 
+		 default is to have all SGP listen on the well-known 
+		 M3UA server port number as assigned by IANA, 2905.
 
-		 When changed on an active entry that results in a change in the port on which 
-		 an active SGP should be listening, the SGP stops listening on the old port 
-		 immediately and starts listening on the new port immediately.  What actions are 
-		 performed with regard to outstanding connection attempts at the time of the 
+		 When changed on an active entry that results in a 
+		 change in the port on which an active SGP should be 
+		 listening, the SGP stops listening on the old port 
+		 immediately and starts listening on the new port 
+		 immediately.  What actions are performed with regard to 
+		 outstanding connection attempts at the time of the 
 		 change are implementation dependent."
 	DEFVAL		{ 2905 }
 	::= { m3uaSgpAgEntry 8 }
@@ -365,13 +421,16 @@ m3uaSgpAgMinOstreams OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the minimum number of outbound streams to request from SGP in this 
-		 Access Group.  The minimum value is 2 per RFC 4666.  For ITU-T or ETSI 
-		 newtorks, a reasonable default is 17 (one stream for the control stream (0) and 
-		 16 data streams for the 16 possible SLS values); for ANSI newtorks, 33 or 257 
-		 (one stream for the control stream (0) and 32 (5-bit SLS) or 256 (8-bit SLS) 
-		 data streams for the  32 or 256 possible SLS values).   The default value is 
-		 set to 33 to handle most cases without an excessive number of streams."
+		"Provides the minimum number of outbound streams to 
+		 request from SGP in this Access Group.  The minimum 
+		 value is 2 per RFC 4666.  For ITU-T or ETSI newtorks, a 
+		 reasonable default is 17 (one stream for the control 
+		 stream (0) and 16 data streams for the 16 possible SLS 
+		 values); for ANSI newtorks, 33 or 257 (one stream for 
+		 the control stream (0) and 32 (5-bit SLS) or 256 (8-bit 
+		 SLS) data streams for the  32 or 256 possible SLS 
+		 values).   The default value is set to 33 to handle 
+		 most cases without an excessive number of streams."
 	DEFVAL		{ 33 }
 	::= { m3uSgpAgEntry 9 }
 
@@ -380,11 +439,14 @@ m3uaSgpAgMaxIstreams OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Proivdes the maximum number of inbound streams that will be reported when 
-		 forming a connection to SGP in this access group.  The minimum value to support 
-		 RFC 4666 is 2.  The value of 33 is amore reasonable default.  See the analysis 
-		 for the number of default streanms in the description in the same table as 
-		 this, m3uaSgpAg, table for the m3uaSgpAgMinOstreams column in the same entry."
+		"Proivdes the maximum number of inbound streams that 
+		 will be reported when forming a connection to SGP in 
+		 this access group.  The minimum value to support RFC 
+		 4666 is 2.  The value of 33 is amore reasonable 
+		 default.  See the analysis for the number of default 
+		 streanms in the description in the same table as this, 
+		 m3uaSgpAg, table for the m3uaSgpAgMinOstreams column in 
+		 the same entry."
 	DEFVAL		{ 33 }
 	::= { m3uSgpAgEntry 10 }
 
@@ -437,10 +499,12 @@ m3uaSgpSctpProfileNextIndex OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides the next available index in the SCTP parameter profile table.  When a 
-		 management station get operation returns zero (0), the table is full and new 
-		 rows cannot be created in the table."
-	REFERENCE	"STD 58"
+		"Provides the next available index in the SCTP parameter 
+		 profile table.  When a management station get operation 
+		 returns zero (0), the table is full and new rows cannot 
+		 be created in the table."
+	REFERENCE
+		"STD 58"
 	::= { m3uaSgpSctpProfile 1 }
 
 
@@ -449,8 +513,8 @@ m3uaSgpSctpProfileTable OBJECT-TYPE
 	MAX-ACCESS	read-only
 
 	DESCRIPTION
-		"Provides an SCTP parameters profile for use when forming SCTP associations with 
-		 an SCTP peer."
+		"Provides an SCTP parameters profile for use when 
+		 forming SCTP associations with an SCTP peer."
 
 
 
@@ -462,8 +526,8 @@ m3uaSgpAspTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides the ASP table for this host.  The ASP table contains an entry for each 
-		 ASP known to the host."
+		"Provides the ASP table for this host.  The ASP table 
+		 contains an entry for each ASP known to the host."
 	::= { m3uaSgpAsp 1 }
 
 m3uaSgpAspEntry OBJECT-TYPE
@@ -471,8 +535,8 @@ m3uaSgpAspEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides an ASP table entry.  Each entry in the ASP table describes an ASP 
-		 known to this host."
+		"Provides an ASP table entry.  Each entry in the ASP 
+		 table describes an ASP known to this host."
 	INDEX	{
 			m3uaSgpAspIndex
 		}
@@ -511,9 +575,10 @@ m3uaSgpAspIndex OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides an index into the ASP table and also provides an unsigned integer 
-		 handle to an entry in the table that may be used as a shorthand for the 
-		 equivalent RowPointer."
+		"Provides an index into the ASP table and also provides 
+		 an unsigned integer handle to an entry in the table 
+		 that may be used as a shorthand for the equivalent 
+		 RowPointer."
 	::= { m3uaSgpAspEntry 1 }
 
 m3uaSgpAspName OBJECT-TYPE
@@ -521,9 +586,10 @@ m3uaSgpAspName OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the name of the ASP using COMMON LANGUAGE procedures and the 
-		 CommonLanguageName textual convention.  This value is persistent across an 
-		 agent reboot."
+		"Provides the name of the ASP using COMMON LANGUAGE 
+		 procedures and the CommonLanguageName textual 
+		 convention.  This value is persistent across an agent 
+		 reboot."
 	::= { m3uaSgpAspEntry 2 }
 
 m3uaSgpAspOperationalState OBJECT-TYPE
@@ -531,10 +597,12 @@ m3uaSgpAspOperationalState OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides the overall operational state of the ASP as viewed by the managed 
-		 element using the OperationalState textual convention.  The overall operational 
-		 state is the most operable state of all of the SGP-ASP associations that are 
-		 configured for this managed element."
+		"Provides the overall operational state of the ASP as 
+		 viewed by the managed element using the 
+		 OperationalState textual convention.  The overall 
+		 operational state is the most operable state of all of 
+		 the SGP-ASP associations that are configured for this 
+		 managed element."
 	DEFVAL		{ disabled(0) }
 	::= { m3uaSgpAspEntry 3 }
 
@@ -543,10 +611,12 @@ m3uaSgpAspUsageState OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides the overall usage status of the ASP as viewd by the managed element 
-		 using the UsageState textual convention.  The overall usage state is the most 
-		 utilized state of each of the AS served by each SGP-ASP associaiton that is 
-		 configured for this managed element."
+		"Provides the overall usage status of the ASP as viewd 
+		 by the managed element using the UsageState textual 
+		 convention.  The overall usage state is the most 
+		 utilized state of each of the AS served by each SGP-ASP 
+		 associaiton that is configured for this managed 
+		 element."
 	DEFVAL		{ idle(0) }
 	::= { m3uaSgpAspEntry 4 }
 
@@ -555,15 +625,18 @@ m3uaSgpAspAdministrativeState OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the adminstrative state of the ASP as viewd by the managed element 
-		 using the AdministrativeState textual convention.  When locked(0), no SGP-ASP 
-		 association related to this ASP is permitted to be formed.  When unlocked(1), 
-		 the SGP-ASP associations to this ASP may form and the ASP may activate AS for 
-		 the association.  When shuttingDown(2), no new SGP-ASP association to this ASP 
-		 may form and no new AS may activate for any association; any AS served will be 
-		 issued an unsolicited ASP Inactive Ack to deactivate the AS.  The value 
-		 represents current conditions and is not guaranteed peristent across an agent 
-		 reboot."
+		"Provides the adminstrative state of the ASP as viewd by 
+		 the managed element using the AdministrativeState 
+		 textual convention.  When locked(0), no SGP-ASP 
+		 association related to this ASP is permitted to be 
+		 formed.  When unlocked(1), the SGP-ASP associations to 
+		 this ASP may form and the ASP may activate AS for the 
+		 association.  When shuttingDown(2), no new SGP-ASP 
+		 association to this ASP may form and no new AS may 
+		 activate for any association; any AS served will be 
+		 issued an unsolicited ASP Inactive Ack to deactivate 
+		 the AS.  The value represents current conditions and is 
+		 not guaranteed peristent across an agent reboot."
 	DEFVAL		{ locked(0) }
 	::= { m3uaSgpAspEntry 5 }
 
@@ -572,8 +645,9 @@ m3uaSgpAspAlarmStatus OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the alarm status for the ASP as viewed by the managed element using 
-		 the AlarmStatus textual convention.  The value reflects current conditions and 
+		"Provides the alarm status for the ASP as viewed by the 
+		 managed element using the AlarmStatus textual 
+		 convention.  The value reflects current conditions and 
 		 is not guaranteed persistent across an agent reboot."
 	DEFVAL		{ '00000'B }
 	::= { m3uaSgpAspEntry 6 }
@@ -583,10 +657,11 @@ m3uaSgpAspProceduralStatus OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides the overall procedureal status for the ASP using the ProceduralStatus 
-		 textual convention.  The overall procedural status is the set-union (logical 
-		 OR) of the procedural status of all SGP-ASP associations configured for this 
-		 ASP."
+		"Provides the overall procedureal status for the ASP 
+		 using the ProceduralStatus textual convention.  The 
+		 overall procedural status is the set-union (logical OR) 
+		 of the procedural status of all SGP-ASP associations 
+		 configured for this ASP."
 	DEFVAL		{ '00000'B }
 	::= { m3uaSgpAspEntry 7 }
 
@@ -595,9 +670,10 @@ m3uaSgpAspAvailabilityStatus OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides the overal availability status for the ASP using the 
-		 AvailabilityStatus textual convention.  The overal availablity status is the 
-		 set-union (logical OR) of the availability status of all SGP-ASP associations 
+		"Provides the overal availability status for the ASP 
+		 using the AvailabilityStatus textual convention.  The 
+		 overal availablity status is the set-union (logical OR) 
+		 of the availability status of all SGP-ASP associations 
 		 cofnigured for this ASP."
 	DEFVAL		{ '000000'B }
 	::= { m3uaSgpAspEntry 8 }
@@ -607,14 +683,17 @@ m3uaSgpAspAspState OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the overall ASP state for the ASP using the AspState textual 
-		 convention.  The overall ASP state is the most active state of the individual 
-		 SGP-ASP associations configured for this ASP.  Setting a stable state value 
-		 (up or down) will cause all of the SGP-ASP associations configured to 
-		 transition to that state by invoking the appropriate procedures.  Note that 
-		 this is not a persistent state change as autonomous actions may be performed to 
-		 return the ASP to its previous state.  This value reflects current conditions 
-		 and is not guaranteed persistent across an agent reboot."
+		"Provides the overall ASP state for the ASP using the 
+		 AspState textual convention.  The overall ASP state is 
+		 the most active state of the individual SGP-ASP 
+		 associations configured for this ASP.  Setting a stable 
+		 state value (up or down) will cause all of the SGP-ASP 
+		 associations configured to transition to that state by 
+		 invoking the appropriate procedures.  Note that this is 
+		 not a persistent state change as autonomous actions may 
+		 be performed to return the ASP to its previous state.  
+		 This value reflects current conditions and is not 
+		 guaranteed persistent across an agent reboot."
 	DEFVAL		{ down(0) }
 	::= { m3uaSgpAspEntry 9 }
 
@@ -623,15 +702,18 @@ m3uaSgpAspSctpProfile OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides a row pointer into the m3uaSgpSctpProfileTable or an SCTP protocol 
-		 parameter profile table known to the agent, or zeroDotZero for an 
-		 implementation dependent default profile.  The referenced profile entry 
-		 provides SCTP parameters that will be used when forming associations to this 
-		 ASP.  The value is persistent accross agent reboots.  When set on an active 
-		 entry, the values will not be effective util the next time that an SCTP 
-		 association is formed with the ASP.  Management stations can force a new 
-		 association to be formed with this ASP using the m3uaSgpAspAdministrativeState 
-		 column."
+		"Provides a row pointer into the m3uaSgpSctpProfileTable 
+		 or an SCTP protocol parameter profile table known to 
+		 the agent, or zeroDotZero for an implementation 
+		 dependent default profile.  The referenced profile 
+		 entry provides SCTP parameters that will be used when 
+		 forming associations to this ASP.  The value is 
+		 persistent accross agent reboots.  When set on an 
+		 active entry, the values will not be effective util the 
+		 next time that an SCTP association is formed with the 
+		 ASP.  Management stations can force a new association 
+		 to be formed with this ASP using the 
+		 m3uaSgpAspAdministrativeState column."
 	DEFVAL		{ zeroDotZero }
 	::= { m3uaSgpAspEntry 10 }
 
@@ -640,11 +722,14 @@ m3uaSgpAspMaxInitRetries OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the SCTP maximum number of init retries used for SGP-ASP associations 
-		 for this ASP.  The value is persistent across an agent reboot.  When set on an 
-		 active entry, the value will not be effective until the next time that an 
-		 associaiton is formed with this ASP.  Mangement stations can force a new 
-		 association to be formed using the AdministrativeState textual convention."
+		"Provides the SCTP maximum number of init retries used 
+		 for SGP-ASP associations for this ASP.  The value is 
+		 persistent across an agent reboot.  When set on an 
+		 active entry, the value will not be effective until the 
+		 next time that an associaiton is formed with this ASP.  
+		 Mangement stations can force a new association to be 
+		 formed using the AdministrativeState textual 
+		 convention."
 	::= { m3uaSgpAspEntry 10 }
 
 m3uaSgpAspMaxPathRetrans OBJECT-TYPE
@@ -652,42 +737,53 @@ m3uaSgpAspMaxPathRetrans OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the SCTP maximum number of path retransmissions use for SGP-ASP 
-		 associations for this ASP.  The value is persistent across an agent reboot.  
-		 When set on an active entry, the value will not be effective until the next 
-		 time that an association is formed with this ASP.  Mangement stations can force 
-		 a new association to be formed using the AdministrativeState textual 
-		 convention."
+		"Provides the SCTP maximum number of path 
+		 retransmissions use for SGP-ASP associations for this 
+		 ASP.  The value is persistent across an agent reboot.  
+		 When set on an active entry, the value will not be 
+		 effective until the next time that an association is 
+		 formed with this ASP.  Mangement stations can force a 
+		 new association to be formed using the 
+		 AdministrativeState textual convention."
 	::= { m3uaSgpAspEntry 11 }
 
 m3uaSgpAspRtoMin OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the RTO Minimum value used for SGP-ASP associations for this ASP.  The 
-		 RTO minimum value must be less than the RTO maximum value. The value is 
-		 persistent across agent reboots.  When set on an active entry, the value will 
-		 not be effective until the next time that an association is formed with this 
-		 ASP.  Mangement stations can force a new association to be formed using the 
-		 AdministrativeState textual convention."
+		"Provides the RTO Minimum value used for SGP-ASP 
+		 associations for this ASP.  The RTO minimum value must 
+		 be less than the RTO maximum value. The value is 
+		 persistent across agent reboots.  When set on an active 
+		 entry, the value will not be effective until the next 
+		 time that an association is formed with this ASP.  
+		 Mangement stations can force a new association to be 
+		 formed using the AdministrativeState textual 
+		 convention."
 	::= { m3uaSgpAspEntry 12 }
 
 m3uaSgpAspRtoMax OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the RTO maximum value used for SGP-ASP associations for this ASP.  The 
-		 RTO maximum value must be greater than the RTO minimum value.  The value is 
-		 persistent across agent reboots.  When set on an active entry, the value will 
-		 not be effective until the next time that an association is formed with this 
-		 ASP.  Mangement stations can force a new association to be formed using the 
-		 AdministrativeState textual convention."
+		"Provides the RTO maximum value used for SGP-ASP 
+		 associations for this ASP.  The RTO maximum value must 
+		 be greater than the RTO minimum value.  The value is 
+		 persistent across agent reboots.  When set on an active 
+		 entry, the value will not be effective until the next 
+		 time that an association is formed with this ASP.  
+		 Mangement stations can force a new association to be 
+		 formed using the AdministrativeState textual 
+		 convention."
 	::= { m3uaSgpAspEntry 12 }
 
 m3uaSgpAspHeartbeatInterval OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -696,6 +792,7 @@ m3uaSgpAspHeartbeatInterval OBJECT-TYPE
 
 m3uaSgpAspMaxLifeTime OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -704,6 +801,7 @@ m3uaSgpAspMaxLifeTime OBJECT-TYPE
 
 m3uaSgpAspTimerDivert OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -730,8 +828,9 @@ m3uaSgpNextIndex OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides the next available indes in the SGP table.  The value returned is zero 
-		 if there are no more entries available in the table."
+		"Provides the next available indes in the SGP table.  
+		 The value returned is zero if there are no more entries 
+		 available in the table."
 	::= { m3uaSgp 1 }
 
 m3uaSgpTable OBJECT-TYPE
@@ -739,9 +838,10 @@ m3uaSgpTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides the SGP Table.  The SGP Table contains an instance of every signalling 
-		 gateway process (SGP) defined for the host, by the signalling gateway (SG) and 
-		 access group (AG) to which they belong."
+		"Provides the SGP Table.  The SGP Table contains an 
+		 instance of every signalling gateway process (SGP) 
+		 defined for the host, by the signalling gateway (SG) 
+		 and access group (AG) to which they belong."
 	::= { m3uaSgp 2 }
 
 m3uaSgpEntry OBJECT-TYPE
@@ -749,10 +849,12 @@ m3uaSgpEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides an entry in the SGP Table.  Each entry contains information about the 
-		 characteristics of the SGP.  Because SGP are logical entities, the may be 
-		 created or destroyed by management stations by adding or deleting them from 
-		 this table.  All entries in this table must survive an agent reboot."
+		"Provides an entry in the SGP Table.  Each entry 
+		 contains information about the characteristics of the 
+		 SGP.  Because SGP are logical entities, the may be 
+		 created or destroyed by management stations by adding 
+		 or deleting them from this table.  All entries in this 
+		 table must survive an agent reboot."
 	INDEX	{
 			m3uaSgpAgIndex,		-- shared index
 			m3uaSgpSgIndex,		-- shared index
@@ -792,5 +894,4 @@ M3uaSgpEntry ::=
 
 END
 
--- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
-
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8

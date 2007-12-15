@@ -1,7 +1,7 @@
--- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-TMN-TC.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/10/15 01:14:28 $
+-- @(#) $RCSfile: OPENSS7-TMN-TC.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:19:14 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -10,18 +10,19 @@
 --
 -- All Rights Reserved.
 --
--- This program is free software; you can redistribute it and/or modify it under
--- the terms of the GNU General Public License as published by the Free Software
--- Foundation; version 3 of the License.
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
 --
--- This program is distributed in the hope that it will be useful, but WITHOUT
--- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
--- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
--- details.
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
 --
--- You should have received a copy of the GNU General Public License along with
--- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
--- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/10/15 01:14:28 $ by $Author: brian $
+-- Last Modified $Date: 2007/12/15 20:19:14 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-TMN-TC.mib,v $
+-- Revision 0.9.2.3  2007/12/15 20:19:14  brian
+-- - updates
+--
 -- Revision 0.9.2.2  2007/10/15 01:14:28  brian
 -- - updated MIBs
 --
@@ -70,7 +74,8 @@ IMPORTS
 		FROM OPENSS7-SMI;
 
 TmnTC MODULE-IDENTITY
-	LAST-UPDATED	"200709250000Z"
+	LAST-UPDATED
+		"200709250000Z"
 	ORGANIZATION
 		"OpenSS7 Corporation"
 	CONTACT-INFO
@@ -78,41 +83,50 @@ TmnTC MODULE-IDENTITY
 		 OpenSS7 Corporation
 		 1469 Jefferys Crescent
 		 Edmonton, Alberta T6L 6T1
-		 Canada
-
+		 CANADA
 		 Tel: +1 780 490 1141
 		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
 		 E-mail: bidulock@openss7.org"
 	DESCRIPTION
-		"This is a basic MIB module providing textual conventions based on the TMN 
-		 (ITU-T Rec. X.721 (1992)).  One of the major purpose of providing TMN based 
-		 textual conventions is to get the labelling of members or enumerated type the 
-		 same and even getting the value of enumerated type and members the same.  This 
-		 simplifies TMN and SNMP agent design to a great degree while also to some 
-		 degree lending SNMP the higher grade information available from TMN.  For the 
-		 most part this  module only contains the textual conventions that correspond to 
-		 X.721.  Textual conventions belonging to more application area specific 
-		 information, such as that of M.3100, are contained in the mibs which are more 
-		 related.
+		"This is a basic MIB module providing textual 
+		 conventions based on the TMN (ITU-T Rec. X.721 (1992)).  
+		 One of the major purpose of providing TMN based textual 
+		 conventions is to get the labelling of members or 
+		 enumerated type the same and even getting the value of 
+		 enumerated type and members the same.  This simplifies 
+		 TMN and SNMP agent design to a great degree while also 
+		 to some degree lending SNMP the higher grade 
+		 information available from TMN.  For the most part this  
+		 module only contains the textual conventions that 
+		 correspond to X.721.  Textual conventions belonging to 
+		 more application area specific information, such as 
+		 that of M.3100, are contained in the mibs which are 
+		 more related.
 
-		 Note that there is also an OPENSS7-TMN-SMI mib that defines object identities 
-		 and general purpose notifications for use with some of these textual 
+		 Note that there is also an OPENSS7-TMN-SMI mib that 
+		 defines object identities and general purpose 
+		 notifications for use with some of these textual 
 		 conventions."  
 	::= { openss7Modules 3 }
 
 AlarmType ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"The alarm type textual convention is an object identifier that is one of the 
-		 object identifiers assigned to TMN notifications of an alarm type.  The actual 
-		 alarm type values from X.721 (i.e. in the { joint-iso-ccitt(2) ms(9) smi(3) 
-		 part2(2) notifications(10) } arc) may be used directly.  Additional defined 
-		 alarm type extensions defined by other documents such as Q.751.1 may also be 
-		 used.  Alternately, the corresponding notification values registered in 
-		 OPENSS7-TMN-MIB can be used directly.
+		"The alarm type textual convention is an object 
+		 identifier that is one of the object identifiers 
+		 assigned to TMN notifications of an alarm type.  The 
+		 actual alarm type values from X.721 (i.e. in the { 
+		 joint-iso-ccitt(2) ms(9) smi(3) part2(2) 
+		 notifications(10) } arc) may be used directly.  
+		 Additional defined alarm type extensions defined by 
+		 other documents such as Q.751.1 may also be used.  
+		 Alternately, the corresponding notification values 
+		 registered in OPENSS7-TMN-MIB can be used directly.
 
-		 Object identifiers used with the AlarmType textual convention must be defined 
-		 in an OBJECT-IDENTITY macro and their use and meaning must be described in the 
+		 Object identifiers used with the AlarmType textual 
+		 convention must be defined in an OBJECT-IDENTITY macro 
+		 and their use and meaning must be described in the 
 		 DESCRIPTION clause of that macro."
 	REFERENCE
 		"ITU-T Recommendation X.721 (1992) : NOTIFICATION"
@@ -121,16 +135,19 @@ AlarmType ::= TEXTUAL-CONVENTION
 ProbableCause ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"The probable cause textual convention is an object identifier that is one of 
-		 the object identifiers assigned to probable causes.  The actual probable cause 
-		 values from X.721 (i.e. in the { joint-iso-ccitt(2) ms(9) smi(3) part2(2) 
-		 standardsSpecificExtensions(0) arf(0) } arc) may be used directly.  Additional 
-		 defined probable cause extensions defined by other documents such as Q.751.1 
-		 may also be used.
+		"The probable cause textual convention is an object 
+		 identifier that is one of the object identifiers 
+		 assigned to probable causes.  The actual probable cause 
+		 values from X.721 (i.e. in the { joint-iso-ccitt(2) 
+		 ms(9) smi(3) part2(2) standardsSpecificExtensions(0) 
+		 arf(0) } arc) may be used directly.  Additional defined 
+		 probable cause extensions defined by other documents 
+		 such as Q.751.1 and Q.751.2 may also be used.
 		 
-		 Object identifiers used with the ProbableCause textual convention must be 
-		 defined in an OBJECT-IDENTITY macro and their use and meaning must be described 
-		 in the DESCRIPTION clause of that macro."
+		 Object identifiers used with the ProbableCause textual 
+		 convention must be defined in an OBJECT-IDENTITY macro 
+		 and their use and meaning must be described in the 
+		 DESCRIPTION clause of that macro."
 	REFERENCE
 		"ITU-T Recommendation X.721 (1992) : ProbableCause"
 	SYNTAX	OBJECT IDENTIFIER
@@ -138,15 +155,18 @@ ProbableCause ::= TEXTUAL-CONVENTION
 SecurityAlarmCause ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"The security alarm cause textual convention is an object identifier that is one 
-		 of the object identifiers assigned to security alarm causes.  The actual 
-		 security alarm cause values from X.721 object identifier arcs may be used 
-		 directly.  Additional defined security alarm cause extensions defined by other 
-		 documents such as Q.751.1 may also be used.
+		"The security alarm cause textual convention is an 
+		 object identifier that is one of the object identifiers 
+		 assigned to security alarm causes.  The actual security 
+		 alarm cause values from X.721 object identifier arcs 
+		 may be used directly.  Additional defined security 
+		 alarm cause extensions defined by other documents such 
+		 as Q.751.1 may also be used.
 
-		 Object identifiers used with the SecurityAlarmCause textual convention must be 
-		 defined in an OBJECT-IDENTITY marco an their use and meaning must be described 
-		 in the DESCRIPTION clause of that macro."
+		 Object identifiers used with the SecurityAlarmCause 
+		 textual convention must be defined in an 
+		 OBJECT-IDENTITY marco an their use and meaning must be 
+		 described in the DESCRIPTION clause of that macro."
 	REFERENCE
 		"ITU-T Recommendation X.721 (1992) : SecurityAlarmCause"
 	SYNTAX	OBJECT IDENTIFIER
@@ -155,21 +175,26 @@ SecurityAlarmCause ::= TEXTUAL-CONVENTION
 PerceivedSeverity ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This is the perceived severity of an alarm defined in accordance with the 
-		 definitions in the OSI SMI.  When it appears within a scalar defined for use in 
-		 a notification, it represents the severity of the notification.  Under OSI SMI, 
-		 the perceived severity is used to indicate both the onset of an alarm condition 
+		"This is the perceived severity of an alarm defined in 
+		 accordance with the definitions in the OSI SMI.  When 
+		 it appears within a scalar defined for use in a 
+		 notification, it represents the severity of the 
+		 notification.  Under OSI SMI, the perceived severity is 
+		 used to indicate both the onset of an alarm condition 
 		 and the clearing of an alarm condition.
 		 
-		 When set to any value other than cleared(5), the notification represents the 
-		 onset of the alarm corresponding to the notification with a severity level 
-		 indicated by the value.  Normal telecommunications warning, minor, major, 
-		 critical alarm indications can be indicated.  (Note that the setting of 
-		 indeterminate(0) is only applied when none of the other characterizations will 
-		 suffice.)
+		 When set to any value other than cleared(5), the 
+		 notification represents the onset of the alarm 
+		 corresponding to the notification with a severity level 
+		 indicated by the value.  Normal telecommunications 
+		 warning, minor, major, critical alarm indications can 
+		 be indicated.  (Note that the setting of 
+		 indeterminate(0) is only applied when none of the other 
+		 characterizations will suffice.)
 
-		 When set to to cleared(5), the notification represents the clearing of the 
-		 alarm condition corresponding to the notification."
+		 When set to to cleared(5), the notification represents 
+		 the clearing of the alarm condition corresponding to 
+		 the notification."
 	REFERENCE
 		"ITU-T Recommendation X.721 (1992) : PerceivedSeverity"
 	SYNTAX	INTEGER {
@@ -184,9 +209,11 @@ PerceivedSeverity ::= TEXTUAL-CONVENTION
 SecurityAlarmSeverity ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This is the same as PerceivedSeverity but does not have a cleared(5) value."
+		"This is the same as PerceivedSeverity but does not have 
+		 a cleared(5) value."
 	REFERENCE
-		"ITU-T Recommendation X.721 (1992) : SecurityAlarmSeverity"
+		"ITU-T Recommendation X.721 (1992) : 
+		 SecurityAlarmSeverity"
 	SYNTAX	INTEGER {
 			indeterminate(0),
 			critical(1),
@@ -198,19 +225,22 @@ SecurityAlarmSeverity ::= TEXTUAL-CONVENTION
 SecurityAlarmDetector ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This is either a mechanism identified by an object identifier, or an object 
-		 instance (in the same manner as a RowPointer) or an application object 
-		 identifier.  All except for the RowPointer should be defined previously in an 
-		 OBJECT-IDENTITY marco with a full description of the detector."
+		"This is either a mechanism identified by an object 
+		 identifier, or an object instance (in the same manner 
+		 as a RowPointer) or an application object identifier.  
+		 All except for the RowPointer should be defined 
+		 previously in an OBJECT-IDENTITY marco with a full 
+		 description of the detector."
 	REFERENCE
-		"ITU-T Recommendation X.721 (1992) : SecurityAlarmDetector"
+		"ITU-T Recommendation X.721 (1992) : 
+		 SecurityAlarmDetector"
 	SYNTAX	OBJECT IDENTIFIER
 
 ServiceUser ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"Identification of the service user.  In TMN this is an any defined by type.  
-		 Here it is a display string."
+		"Identification of the service user.  In TMN this is an 
+		 any defined by type.  Here it is a display string."
 	REFERENCE
 		"ITU-T Recommendation X.721 (1992) : ServiceUser"
 	SYNTAX	OCTET STRING
@@ -218,8 +248,8 @@ ServiceUser ::= TEXTUAL-CONVENTION
 ServiceProvider ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"Identification of the service provider.  In TMN this is an any defined by type.  
-		 Here it is a display string."
+		"Identification of the service provider.  In TMN this is 
+		 an any defined by type.  Here it is a display string."
 	REFERENCE
 		"ITU-T Recommendation X.721 (1992) : ServiceProvider"
 	SYNTAX	OCTET STRING
@@ -227,15 +257,18 @@ ServiceProvider ::= TEXTUAL-CONVENTION
 SpecificProblems ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"The specific porblems textual convention is an object identifier that is one of 
-		 the object identifiers assigned to a specific problem.  The actual specific
-		 problem values from TMN specifications may be used directly.  Additional 
-		 defined specific problem extensions defined by other documents such a Q.751.1 
+		"The specific porblems textual convention is an object 
+		 identifier that is one of the object identifiers 
+		 assigned to a specific problem.  The actual specific
+		 problem values from TMN specifications may be used 
+		 directly.  Additional defined specific problem 
+		 extensions defined by other documents such a Q.751.1 
 		 may also be used.
 		 
-		 Object identifiers used with the SepcificProblems textual convention must be 
-		 defined in an OBJECT-IDENTITY macro and their use and meaning must be described 
-		 in the DESCRIPTION clause of that macro."
+		 Object identifiers used with the SepcificProblems 
+		 textual convention must be defined in an 
+		 OBJECT-IDENTITY macro and their use and meaning must be 
+		 described in the DESCRIPTION clause of that macro."
 	REFERENCE
 		"ITU-T Recommendation X.721 (1992) : SpecificProblems"
 	SYNTAX	OBJECT IDENTIFIER
@@ -243,12 +276,15 @@ SpecificProblems ::= TEXTUAL-CONVENTION
 SourceIndicator ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This textual convention provides the source of an action that resulted in the 
-		 change in state of a managed object, alteration of its attributes or addition or 
-		 deletion of the object.  resourceOperation(0) indicates that the managed 
-		 element or agent performed the change; managementOperation(1) indicates that a 
-		 management station was the source of the change; and unknown(2) indicates that 
-		 the souce of the change is unknown."
+		"This textual convention provides the source of an 
+		 action that resulted in the change in state of a 
+		 managed object, alteration of its attributes or 
+		 addition or deletion of the object.  
+		 resourceOperation(0) indicates that the managed element 
+		 or agent performed the change; managementOperation(1) 
+		 indicates that a management station was the source of 
+		 the change; and unknown(2) indicates that the souce of 
+		 the change is unknown."
 	REFERENCE
 		"ITU-T Rec. X.721 (1992) : sourceIndicator"
 	SYNTAX	INTEGER {
@@ -260,8 +296,8 @@ SourceIndicator ::= TEXTUAL-CONVENTION
 AdditionalText ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This textual convention represents additional text to be added to a TMN 
-		 notification in TMN style."
+		"This textual convention represents additional text to 
+		 be added to a TMN notification in TMN style."
 	REFERENCE
 		"ITU-T Rec. X.721 (1992) : additionalText"
 	SYNTAX	OCTET STRING
@@ -270,9 +306,11 @@ AdditionalInformation ::= TEXTUAL-CONVENTION
 	DISPLAY-HINT	"1x "
 	STATUS		current
 	DESCRIPTION
-		"This textual convention represents additional information to be added to a TMN 
-		 notification in TMN style.  This could contain things like an entire 
-		 communications PDU.  The additionalText should described this data."
+		"This textual convention represents additional 
+		 information to be added to a TMN notification in TMN 
+		 style.  This could contain things like an entire 
+		 communications PDU.  The additionalText should 
+		 described this data."
 	REFERENCE
 		"ITU-T Rec. X.721 (1992) : additionalInformation"
 	SYNTAX	OCTET STRING
@@ -280,28 +318,36 @@ AdditionalInformation ::= TEXTUAL-CONVENTION
 OperationalState ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This is the operational state of an Entry in accordance with the definitions in 
-		 ITU-T Recommendation X.731 (1992).  When it appears within a row of a 
-		 conceptual table, it refers to the operational state of the managed object 
-		 represented by the row.
+		"This is the operational state of an Entry in accordance 
+		 with the definitions in ITU-T Recommendation X.731 
+		 (1992).  When it appears within a row of a conceptual 
+		 table, it refers to the operational state of the 
+		 managed object represented by the row.
 		 
-		 The operational state textual convention is single-valued and read-only.  It 
-		 can have one of the following values:
+		 The operational state textual convention is 
+		 single-valued and read-only.  It can have one of the 
+		 following values:
 
-		 - disabled: The resource is totally inoperable and unable to provide service to 
-		   the user(s).
+		 - disabled: The resource is totally inoperable and 
+		   unable to provide service to the user(s).
 
-		 - enabled: The resource is partially or fully operable and available for use.
+		 - enabled: The resource is partially or fully operable 
+		   and available for use.
 
-		 Precise definition of the states is specific to the managed object represented.
+		 Precise definition of the states is specific to the 
+		 managed object represented.
 		 
-		 When placed in a column of a conceptual table, this textual convention is given 
-		 a MAX-ACCESS of read-only, permitting management stations to simply retrieve 
-		 the state.  The DEFVAL associated with this entry is disabled(0).  Precise 
-		 definitions of what conditions exist in each state must appear in the 
-		 DESCRIPTION for the object type definition using this textual convention."
+		 When placed in a column of a conceptual table, this 
+		 textual convention is given a MAX-ACCESS of read-only, 
+		 permitting management stations to simply retrieve the 
+		 state.  The default value associated with this entry is 
+		 disabled(0).  Precise definitions of what conditions 
+		 exist in each state must appear in the DESCRIPTION for 
+		 the object type definition using this textual 
+		 convention."
 	REFERENCE
-		"ITU-T Rec. X.731 (1992) : 8.1.1.1, ITU-T Rec. X.721 (1992) : operationalState"
+		"ITU-T Rec. X.731 (1992) : 8.1.1.1, ITU-T Rec. X.721 
+		 (1992) : operationalState"
 	SYNTAX	INTEGER {
 			disabled(0),
 			enabled(1)
@@ -310,31 +356,40 @@ OperationalState ::= TEXTUAL-CONVENTION
 UsageState ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This is the usage state of an Entry in accordance with the definitions in ITU-T 
-		 Recommendation X.731 (1992).  When it appears within a row of a conceptual 
-		 table, it refers to the usage state of the object represented by the row.
+		"This is the usage state of an Entry in accordance with 
+		 the definitions in ITU-T Recommendation X.731 (1992).  
+		 When it appears within a row of a conceptual table, it 
+		 refers to the usage state of the object represented by 
+		 the row.
 		 
-		 The usage state textual convention is single-valued and read-only.  It can have 
-		 one of the following values, not all of which are applicable to every class of 
+		 The usage state textual convention is single-valued and 
+		 read-only.  It can have one of the following values, 
+		 not all of which are applicable to every class of 
 		 managed object:
 
 		 - idle: The resource is not currently in use.
 
-		 - active: The resource is in used, and has sufficient spare operating capcity 
-		   to provide for additional users simultaneously.
+		 - active: The resource is in used, and has sufficient 
+		   spare operating capcity to provide for additional 
+		   users simultaneously.
 
-		 - busy: The resource is in use, but it has no spare operating capacity to 
-		   provide for additional users at this instant.
+		 - busy: The resource is in use, but it has no spare 
+		   operating capacity to provide for additional users at 
+		   this instant.
 
-		 Precise definition of the states is specific to the managed object represented.
+		 Precise definition of the states is specific to the 
+		 managed object represented.
 
-		 When placed in a conceptual column, this textual convention is given a 
-		 MAX-ACCESS of read-only, permitting management stations to simply retrieve the 
-		 state.  The DEFVAL associated with this entry is idle(0).  Precise definitions 
-		 of what conditions exist in each state must appear in the DESCRIPTION for the 
+		 When placed in a conceptual column, this textual 
+		 convention is given a MAX-ACCESS of read-only, 
+		 permitting management stations to simply retrieve the 
+		 state.  The default value associated with this entry is 
+		 idle(0).  Precise definitions of what conditions exist 
+		 in each state must appear in the DESCRIPTION for the 
 		 object type definition using this textual convention."
 	REFERENCE
-		"ITU-T Rec. X.731 (1992) : 8.1.1.2, ITU-T Rec. X.721 (1992) : usageState"
+		"ITU-T Rec. X.731 (1992) : 8.1.1.2, ITU-T Rec. X.721 
+		 (1992) : usageState"
 	SYNTAX	INTEGER {
 			idle(0),
 			active(1),
@@ -344,51 +399,62 @@ UsageState ::= TEXTUAL-CONVENTION
 AdministrativeState ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This is the adminstrative state of an Entry in accordance with the definitions 
-		 in ITU-T Recommendation X.731 (1992).  When it appears within a row  of a 
-		 conceptual table it refers to the administrative state of the object 
-		 represented by the row.
+		"This is the adminstrative state of an Entry in 
+		 accordance with the definitions in ITU-T Recommendation 
+		 X.731 (1992).  When it appears within a row  of a 
+		 conceptual table it refers to the administrative state 
+		 of the object represented by the row.
 
-		 The admninistrative state textual convention is single valued and read-write.  
-		 It can have one of the following values, not all of which are applicable to 
+		 The admninistrative state textual convention is single 
+		 valued and read-write.  It can have one of the 
+		 following values, not all of which are applicable to 
 		 every class of managed object:
 
-		 - locked: The resource is administratively prohibited from performing services 
-		   for its users.
+		 - locked: The resource is administratively prohibited 
+		   from performing services for its users.
 
-		 - shutting down: Use of the resource is administratively permitted to existing 
-		   instances of use only.  While the system remains in the shutting down state, 
-		   the manager may at any time cause the managed object to revert to the 
-		   unlocked state.
+		 - shutting down: Use of the resource is 
+		   administratively permitted to existing instances of 
+		   use only.  While the system remains in the shutting 
+		   down state, the manager may at any time cause the 
+		   managed object to revert to the unlocked state.
 
-		 - unlocked: The resource is administratively permitted to perform services for 
-		   its users.  This is independent of its inherent operability.
+		 - unlocked: The resource is administratively permitted 
+		   to perform services for its users.  This is 
+		   independent of its inherent operability.
 		 
-		 Precise definition of the states is specific to the managed object represented.
+		 Precise definition of the states is specific to the 
+		 managed object represented.
 
-		 When placed in a column of a conceptual table, this textual convention is given 
-		 an MAX-ACCESS of read-write or read-create, permitting management stations the 
+		 When placed in a column of a conceptual table, this 
+		 textual convention is given an MAX-ACCESS of read-write 
+		 or read-create, permitting management stations the 
 		 ability to set the value.
 		 
-		 Values that can be set are locked(0), unlocked(1) or shuttingDown(2).  The 
-		 actions performed when set to locked(0), unlocked(1) or shuttingDown(2) will be 
-		 described specifically in the DESCRIPTION section for the object. however, in 
-		 general, setting the object to locked(0) results in immediate and disruptive 
-		 withdrawal from service of the object represented by the row and all contained 
-		 objects.  Setting the object to shuttingDown(2) results in the graceful 
-		 withdrawal from service of the object represented by the row and all contained 
-		 objects.  Setting the object to unlocked(1) results in placing back into 
-		 service the represented object and all contained objects that do not have an 
-		 administrative state of their own, or that have an administrative state which 
-		 is also unlocked(1).
+		 Values that can be set are locked(0), unlocked(1) or 
+		 shuttingDown(2).  The actions performed when set to 
+		 locked(0), unlocked(1) or shuttingDown(2) will be 
+		 described specifically in the DESCRIPTION section for 
+		 the object. however, in general, setting the object to 
+		 locked(0) results in immediate and disruptive 
+		 withdrawal from service of the object represented by 
+		 the row and all contained objects.  Setting the object 
+		 to shuttingDown(2) results in the graceful withdrawal 
+		 from service of the object represented by the row and 
+		 all contained objects.  Setting the object to 
+		 unlocked(1) results in placing back into service the 
+		 represented object and all contained objects that do 
+		 not have an administrative state of their own, or that 
+		 have an administrative state which is also unlocked(1).
 
-		 The DEFVAL associated with this row is locked(0) and the managed object 
-		 represented by the conceptual row is created in the administratively locked 
-		 state.
+		 The default value associated with this row is locked(0) and 
+		 the managed object represented by the conceptual row is 
+		 created in the administratively locked state.
 		 
-		 Precise defintions of both the conditions when the state is fetched and the 
-		 conditions when the state is set must appear in the DESCRIPTION of the 
-		 object type definition using this textual convention."
+		 Precise defintions of both the conditions when the 
+		 state is fetched and the conditions when the state is 
+		 set must appear in the DESCRIPTION of the object type 
+		 definition using this textual convention."
 	REFERENCE
 		"ITU-T Rec. X.721 (1992) : administrativeState"
 	SYNTAX	INTEGER {
@@ -400,56 +466,71 @@ AdministrativeState ::= TEXTUAL-CONVENTION
 AlarmStatus ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This texutal convention represents the alarm status of an managed object in 
-		 accordance with the definitions in the OSI SMI.  When it appears within a row 
-		 in a conceptual table, it refers to the alarm status of the managed object 
-		 represented by the row.  Rows in conceptual tables representing managed objects 
-		 that may generate alarms should contain this textual convention.
+		"This texutal convention represents the alarm status of 
+		 an managed object in accordance with the definitions in 
+		 the OSI SMI.  When it appears within a row in a 
+		 conceptual table, it refers to the alarm status of the 
+		 managed object represented by the row.  Rows in 
+		 conceptual tables representing managed objects that may 
+		 generate alarms should contain this textual convention.
 
-		 The alarm status textual convention is set-valued and read-write.  It can have 
-		 zero or more of the following values, not all of which are applicable to every 
-		 class of managed object:
+		 The alarm status textual convention is set-valued and 
+		 read-write.  It can have zero or more of the following 
+		 values, not all of which are applicable to every class 
+		 of managed object:
 
-		 - under repair: The resource is currently being repaired.  When the under 
-		   repair value is present, the operational state is either disabled or enabled.
+		 - under repair: The resource is currently being 
+		   repaired.  When the under repair value is present, 
+		   the operational state is either disabled or enabled.
 
-		 - critical: One or more citical alarms indicating a fault have been detected 
-		   in the resource, and have not been cleared.  The operational state of the 
+		 - critical: One or more citical alarms indicating a 
+		   fault have been detected in the resource, and have 
+		   not been cleared.  The operational state of the 
 		   managed object can be disabled or enabled.
 
-		 - major: One or more major alarms indicating a fault have been detected in 
-		   the resource, and have not yet been cleared.  The operational state of the 
-		   managed object can be disabled or enabled.
+		 - major: One or more major alarms indicating a fault 
+		   have been detected in the resource, and have not yet 
+		   been cleared.  The operational state of the managed 
+		   object can be disabled or enabled.
 
-		 - minor: One or more minor alarms indicating a fault have been detected in 
-		   the resource, and have not yet been cleared.  The operational state of the 
-		   managed object can be disabled or enabled.
+		 - minor: One or more minor alarms indicating a fault 
+		   have been detected in the resource, and have not yet 
+		   been cleared.  The operational state of the managed 
+		   object can be disabled or enabled.
 
-		 - alarm outstanding:  One or more alarms have been detected in the resource, 
-		   the condition of which may or may not be disabling.  If the operational state 
-		   is enabled, additional attributes, particular to the managed object class, 
-		   may indicate the nature and cause of the condition and the services that are 
+		 - alarm outstanding:  One or more alarms have been 
+		   detected in the resource, the condition of which may 
+		   or may not be disabling.  If the operational state is 
+		   enabled, additional attributes, particular to the 
+		   managed object class, may indicate the nature and 
+		   cause of the condition and the services that are 
 		   affected.
 
-		 The presence of the above alarm state conditions do not suppress the generation 
-		 of future fault related notifications.
+		 The presence of the above alarm state conditions do not 
+		 suppress the generation of future fault related 
+		 notifications.
 
-		 When placed in a column of a conceptual table, this textual convention is given 
-		 a MAX-ACCESS of read-write or read-create, permitting management stations the 
+		 When placed in a column of a conceptual table, this 
+		 textual convention is given a MAX-ACCESS of read-write 
+		 or read-create, permitting management stations the 
 		 ability to set the value.
 
-		 Values that can be added to the set are underRepair(0).  Values that can be 
-		 removed from the set are critical(1), major(2), minor(3), and 
+		 Values that can be added to the set are underRepair(0).  
+		 Values that can be removed from the set are 
+		 critical(1), major(2), minor(3), and 
 		 alarmOutstanding(4).
 
-		 The DEFVAL associated with this row is the empty set ('00000'B) and the managed 
-		 object created by the conceptual row is created without alarms or repair 
+		 The default value associated with this row is the empty set 
+		 ('00000'B) and the managed object created by the 
+		 conceptual row is created without alarms or repair 
 		 conditions.
 
-		 Precise defintions of which values are applicable must appear in the 
-		 DESCRIPTION claus of the object type definition using this textual convention."
+		 Precise defintions of which values are applicable must 
+		 appear in the DESCRIPTION claus of the object type 
+		 definition using this textual convention."
 	REFERENCE
-		"ITU-T Rec. X.731 (1993) : 8.1.2.1, ITU-T Rec. X.721 (1882) : alarmStatus"
+		"ITU-T Rec. X.731 (1993) : 8.1.2.1, ITU-T Rec. X.721 
+		 (1882) : alarmStatus"
 	SYNTAX	BITS {
 			underRepair(0),
 			critical(1),
@@ -461,61 +542,81 @@ AlarmStatus ::= TEXTUAL-CONVENTION
 ProceduralStatus ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This is the procedural status of an Entry in accodance with the definitions in 
-		 ITU-T Recommendation X.731 (1992).  Under X.731 the syntax of a 
-		 ProceduralStatus is a SET OF INTEGER with these defined values, however, SNMP 
-		 can't do that, so we use BITS instead.  When it appears in an entry in a 
-		 conceptual table, this textual convention refers to the procedural or active 
-		 status of the managed object represented by the entry.
+		"This is the procedural status of an Entry in accodance 
+		 with the definitions in ITU-T Recommendation X.731 
+		 (1992).  Under X.731 the syntax of a ProceduralStatus 
+		 is a SET OF INTEGER with these defined values, however, 
+		 SNMP can't do that, so we use BITS instead.  When it 
+		 appears in an entry in a conceptual table, this textual 
+		 convention refers to the procedural or active status of 
+		 the managed object represented by the entry.
 
-		 The procedural status textual convention is supported only by those managed 
-		 objects that represent some procedure (e.g, a test process) which progresses 
-		 through a sequence of phases.  Depending upon the managed object class 
-		 definition, the procedure may be required to reach certain phase for the 
-		 resource to be operational and available for use (i.e, for the managed object 
-		 to be enabled).  Not all phases may be applicable to every class of managed 
-		 object.  If the value of this textual convention is an emtpy set, the managed 
-		 object is ready, for example, the initialization is complete.
+		 The procedural status textual convention is supported 
+		 only by those managed objects that represent some 
+		 procedure (e.g, a test process) which progresses 
+		 through a sequence of phases.  Depending upon the 
+		 managed object class definition, the procedure may be 
+		 required to reach certain phase for the resource to be 
+		 operational and available for use (i.e, for the managed 
+		 object to be enabled).  Not all phases may be 
+		 applicable to every class of managed object.  If the 
+		 value of this textual convention is an emtpy set, the 
+		 managed object is ready, for example, the 
+		 initialization is complete.
 
-		 - intialization required: The resource requires initialization to be invoked by 
-		   the manager before it can perform its normal functions, and this procedure 
-		   has not been initiated.  The manager may be able to invoke such 
-		   initialization through an action.  The terminating condition may also be 
-		   present.  The operational state is disabled.
+		 - intialization required: The resource requires 
+		   initialization to be invoked by the manager before it 
+		   can perform its normal functions, and this procedure 
+		   has not been initiated.  The manager may be able to 
+		   invoke such initialization through an action.  The 
+		   terminating condition may also be present.  The 
+		   operational state is disabled.
 
-		 - not initialized: The resource requires initialization before it can perform 
-		   its normal functions, and this procedure has not been initiated.  The 
-		   resource initializes itself autonomously, but the operational state may be 
-		   either disabled or enabled, dependeing upon the managed object class 
-		   definition.
+		 - not initialized: The resource requires initialization 
+		   before it can perform its normal functions, and this 
+		   procedure has not been initiated.  The resource 
+		   initializes itself autonomously, but the operational 
+		   state may be either disabled or enabled, dependeing 
+		   upon the managed object class definition.
 
-		 - initializing: The resource requires initialization before it can perform its 
-		   normal functions, and this procedure has been initiated but is not yet 
-		   complete.  When this condition is present, the intitialization required 
-		   condition is absent, since initialization has already begun.  The operational 
-		   state may be disabled or enabled, depending upon the managed object class
+		 - initializing: The resource requires initialization 
+		   before it can perform its normal functions, and this 
+		   procedure has been initiated but is not yet complete.  
+		   When this condition is present, the intitialization 
+		   required condition is absent, since initialization 
+		   has already begun.  The operational state may be 
+		   disabled or enabled, depending upon the managed 
+		   object class
 		   defintion.
 
-		 - terminating: The resource is in a termination phase.  If the resource does 
-		   not reinitialize itself autonomously, the Initialization Required condition 
-		   is also present and the operational state is disabled.  Otherwise, the 
-		   operational state may be either disabled or enabled, depending upon the 
+		 - terminating: The resource is in a termination phase.  
+		   If the resource does not reinitialize itself 
+		   autonomously, the Initialization Required condition 
+		   is also present and the operational state is 
+		   disabled.  Otherwise, the operational state may be 
+		   either disabled or enabled, depending upon the 
 		   managed object class definition.
 
-		 When placed in a column of a conceptual table, this textual convention is given 
-		 a MAX-ACESS of read-only, permitting management station to ability to fetch the 
+		 When placed in a column of a conceptual table, this 
+		 textual convention is given a MAX-ACCESS of read-only, 
+		 permitting management station to ability to fetch the 
 		 value.
 
-		 The DEFVAL associated with this row is the empty set ('00000'B) and the managed 
-		 object created by the conceptual row is created in the functional state.
+		 The default value associated with this row is the empty set 
+		 ('00000'B) and the managed object created by the 
+		 conceptual row is created in the functional state.
 
-		 Precise definition of the status is specific to the managed object represented.
-		 Not all status members are applicable to all managed objects.  Precise 
-		 definitions of which members are applicable and what conditions exist for each 
-		 applicable member of the state must appear in the DESCRIPTION of the object 
-		 type definition using this textual convention."
+		 Precise definition of the status is specific to the 
+		 managed object represented.
+		 Not all status members are applicable to all managed 
+		 objects.  Precise definitions of which members are 
+		 applicable and what conditions exist for each 
+		 applicable member of the state must appear in the 
+		 DESCRIPTION of the object type definition using this 
+		 textual convention."
 	REFERENCE
-		"ITU-T Rec. X.731 (1993) : 8.1.2.2, ITU-T Rec. X.721 (1992) : proceduralStatus"
+		"ITU-T Rec. X.731 (1993) : 8.1.2.2, ITU-T Rec. X.721 
+		 (1992) : proceduralStatus"
 	SYNTAX	BITS { -- labels taken from X.721
 			initializationRequired(0),
 			notInitialized(1),
@@ -527,78 +628,101 @@ ProceduralStatus ::= TEXTUAL-CONVENTION
 AvailabilityStatus ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This is the availability status of an Entry in accordance with the definitions 
-		in the OSI SMI.  When it appears within a conceptual row it refers to the 
-		availability status of the manage objected represented by the conceptual row.
+		"This is the availability status of an Entry in 
+		 accordance with the definitions in the OSI SMI.  When 
+		 it appears within a conceptual row it refers to the 
+		 availability status of the manage objected represented 
+		 by the conceptual row.
 
-		The availability status textual convention is set-valued and read-only.  It can 
-		have zero or more of the following values, not all of which are applicable to 
-		every class of managed object.  When the value of this attribute is empty, this 
-		implies that none of the status conditions described below are present.
+		The availability status textual convention is set-valued 
+		and read-only.  It can have zero or more of the 
+		following values, not all of which are applicable to 
+		every class of managed object.  When the value of this 
+		attribute is empty, this implies that none of the status 
+		conditions described below are present.
 
-		- in test: The resource is undergoing a test procedure.  If the administrative 
-		  state is locked or shutting down then normal users are precluded from using 
-		  the resource and the control status attribute has the value reserved for test.  
-		  Tests that do not exclude additional users can be present in any operational 
-		  or administrative state but the reserved for test condition should not be 
-		  present.
+		- in test: The resource is undergoing a test procedure.  
+		  If the administrative state is locked or shutting down 
+		  then normal users are precluded from using the 
+		  resource and the control status attribute has the 
+		  value reserved for test.  Tests that do not exclude 
+		  additional users can be present in any operational or 
+		  administrative state but the reserved for test 
+		  condition should not be present.
 
-		- failed: The resource has an internal fault that prevents it from operating.  
-		  The operational state is disabled.
-
-		- power off: The resource requires power to be applied and is not powered on.  
-		  For example, a fuse or other protection device is known to have removed power 
-		  or a low voltage condition has been detected.  The operational state is 
+		- failed: The resource has an internal fault that 
+		  prevents it from operating.  The operational state is 
 		  disabled.
 
-		- offline: The resource requires a routing operation to be performed to place it 
-		  online and make it available for use.  The operation may be manual or 
-		  automatic, or both.  The operational state is disabled.
+		- power off: The resource requires power to be applied 
+		  and is not powered on.  For example, a fuse or other 
+		  protection device is known to have removed power or a 
+		  low voltage condition has been detected.  The 
+		  operational state is disabled.
 
-		- off duty: The resource has been made inactive by an internal control process 
-		  in accordance with a predetermined time schedule.  Under normal conditions the 
-		  control process can be expected to reactivate the resource at some scheduled 
-		  time, and it is therefore considered to be optional.  The operational state is 
+		- offline: The resource requires a routing operation to 
+		  be performed to place it online and make it available 
+		  for use.  The operation may be manual or automatic, or 
+		  both.  The operational state is disabled.
+
+		- off duty: The resource has been made inactive by an 
+		  internal control process in accordance with a 
+		  predetermined time schedule.  Under normal conditions 
+		  the control process can be expected to reactivate the 
+		  resource at some scheduled time, and it is therefore 
+		  considered to be optional.  The operational state is 
 		  enabled or disabled.
 
-		- dependency: The resource cannot operate because some other resource on which 
-		  it depends is (i.e, a resource not represented by the same managed object) 
-		  unavailable.  For example, a device is not accessible because its controller 
-		  is powered off.  The operational state is disabled.
+		- dependency: The resource cannot operate because some 
+		  other resource on which it depends is (i.e, a resource 
+		  not represented by the same managed object) 
+		  unavailable.  For example, a device is not accessible 
+		  because its controller is powered off.  The 
+		  operational state is disabled.
 
-		- degraded: The service available from the resource is degraded in some respect, 
-		  such as in speed or operating capacity.  Failure of a teset or an unacceptable 
-		  performance measurement has established that some or all services are not 
-		  functional or are degraded due to presence of a defect.  However, the resource 
-		  remains available for service, either because some services are satisfactory 
-		  or because degraded service is preferable to no service at all.  Object 
-		  specific attributes may be deinfed to represent further information 
-		  indicating, for example, which serivces are not functional and the nature of 
-		  the degradation.  The operational state is enabled.
+		- degraded: The service available from the resource is 
+		  degraded in some respect, such as in speed or 
+		  operating capacity.  Failure of a teset or an 
+		  unacceptable performance measurement has established 
+		  that some or all services are not functional or are 
+		  degraded due to presence of a defect.  However, the 
+		  resource remains available for service, either because 
+		  some services are satisfactory or because degraded 
+		  service is preferable to no service at all.  Object 
+		  specific attributes may be deinfed to represent 
+		  further information indicating, for example, which 
+		  serivces are not functional and the nature of the 
+		  degradation.  The operational state is enabled.
 
-		- not installed: The resource represented by the managed object is not present, 
-		  or is incomplete.  For example, a plug-in module is missing, a cable is 
-		  disconnected or a software module is not loaded.  The operational state is 
-		  disabled.
+		- not installed: The resource represented by the managed 
+		  object is not present, or is incomplete.  For example, 
+		  a plug-in module is missing, a cable is disconnected 
+		  or a software module is not loaded.  The operational 
+		  state is disabled.
 
-		- log full: This indicates a log full condition the semantics of which are 
-		  defined in ITU-T Rec. X.735.
+		- log full: This indicates a log full condition the 
+		  semantics of which are defined in ITU-T Rec.  X.735.
 		
-		When placed in a column of a conceptual table, this textual convention is given 
-		a MAX-ACCESS of read-only, permitting management stations the ability to 
-		retrieve the value only.
+		When placed in a column of a conceptual table, this 
+		textual convention is given a MAX-ACCESS of read-only, 
+		permitting management stations the ability to retrieve 
+		the value only.
 
-		The DEFVAL associated with this row is the empty set ('000000000'B) and the 
-		managed object created by the conceptual row is created is an available state.
+		The default value associated with this row is the empty set 
+		('000000000'B) and the managed object created by the 
+		conceptual row is created is an available state.
 
-		Precise definition of the states is specific to the managed object represented.  
-		Not all states are applicable to all managed objects.  Precise definitions of 
-		which states are applicable and what conditions exist in each applicable state 
-		must appear in the DESCRIPTION of the object type definition using this textual 
+		Precise definition of the states is specific to the 
+		managed object represented.  Not all states are 
+		applicable to all managed objects.  Precise definitions 
+		of which states are applicable and what conditions exist 
+		in each applicable state must appear in the DESCRIPTION 
+		of the object type definition using this textual 
 		convention."
 	REFERENCE
-		"ITU-T Rec. X.731 (1993) : 8.1.2.3, ITU-T Rec. X.721 (1992) : availablityStatus"
-	SYNTAX	INTEGER {
+		"ITU-T Rec. X.731 (1993) : 8.1.2.3, ITU-T Rec. X.721 
+		 (1992) : availablityStatus"
+	SYNTAX	BITS {
 			inTest(0),
 			failed(1),
 			powerOff(2),
@@ -613,51 +737,66 @@ AvailabilityStatus ::= TEXTUAL-CONVENTION
 ControlStatus ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This textual convention represents the control status of an managed object in 
-		 accordance with the definitions in ITU-T Recommendation X.731 (1992).  When it 
-		 appears within a row of a coneceptual table, it refers to the control status of 
-		 the managed object represented by the row.
+		"This textual convention represents the control status 
+		 of an managed object in accordance with the definitions 
+		 in ITU-T Recommendation X.731 (1992).  When it appears 
+		 within a row of a coneceptual table, it refers to the 
+		 control status of the managed object represented by the 
+		 row.
 
-		 The control status textual convention is read-write and set-valued.  It can 
-		 have zero or more of the following values, not all of which are applicable to 
-		 every class of managed object.  When the value of this textual convention is 
-		 empty, this implies that none of the status conditions described below are 
-		 present.
+		 The control status textual convention is read-write and 
+		 set-valued.  It can have zero or more of the following 
+		 values, not all of which are applicable to every class 
+		 of managed object.  When the value of this textual 
+		 convention is empty, this implies that none of the 
+		 status conditions described below are present.
 
-		 - subject to test: The resource is available to normal users, but tests may be 
-		   conducted on it simultaneously at unpredicatble times, which may cause it to 
-		   exhibit unusual characteristics to users.
+		 - subject to test: The resource is available to normal 
+		   users, but tests may be conducted on it 
+		   simultaneously at unpredicatble times, which may 
+		   cause it to exhibit unusual characteristics to users.
 
-		 - part of services locked: This value indicates whether a manager has 
-		   administratively restricted a particular part of a service from the user(s) 
-		   of a resource.  The administrative state is unlocked.  Examples are incoming 
-		   service barred, outgoing service barred, write locked by media key, read 
+		 - part of services locked: This value indicates whether 
+		   a manager has administratively restricted a 
+		   particular part of a service from the user(s) of a 
+		   resource.  The administrative state is unlocked.  
+		   Examples are incoming service barred, outgoing 
+		   service barred, write locked by media key, read 
 		   locked.
 
-		 - reserved for test: The resource has been made administratively unavailable 
-		   to normal users because it is undergoing a test procedure.  The 
+		 - reserved for test: The resource has been made 
+		   administratively unavailable to normal users because 
+		   it is undergoing a test procedure.  The 
 		   administrative state is locked.
 
-		 - suspended: Service has been administratively suspended to the users of the 
-		   resource.  The resource may retain knowledge of current users and/or requests 
-		   for usage, depending upon the managed object class definition, but does not 
-		   resume performing serivces until the suspended condition is revoked.  The 
+		 - suspended: Service has been administratively 
+		   suspended to the users of the resource.  The resource 
+		   may retain knowledge of current users and/or requests 
+		   for usage, depending upon the managed object class 
+		   definition, but does not resume performing serivces 
+		   until the suspended condition is revoked.  The 
 		   administrative state is unlocked.
 
-		 When placed in a column of a conceptual table, this textual convention si given 
-		 a MAX-ACCESS of read-write or read-create, permitting management stations the 
+		 When placed in a column of a conceptual table, this 
+		 textual convention si given a MAX-ACCESS of read-write 
+		 or read-create, permitting management stations the 
 		 ability to set or retrieve the value.
 
-		 The DEFVAL associated with this row is the empty set ('0000'B) and the managed 
-		 object created by the conceptual row is created in a state available to users.
+		 The default value associated with this row is the empty set 
+		 ('0000'B) and the managed object created by the 
+		 conceptual row is created in a state available to 
+		 users.
 
-		 Precise definition of the status is specific to the managed object represented.  
-		 Not all status values are applicable to all managed objects.  Precise 
-		 definition of which status values are applicable, and what conditions exist 
-		 when each status exists must appear in the DESCRIPTION clause of the object 
-		 type definition using this textual convention."
+		 Precise definition of the status is specific to the 
+		 managed object represented.  Not all status values are 
+		 applicable to all managed objects.  Precise definition 
+		 of which status values are applicable, and what 
+		 conditions exist when each status exists must appear in 
+		 the DESCRIPTION clause of the object type definition 
+		 using this textual convention."
 	REFERENCE
-		"ITU-T Rec. X.731 (1993) : 8.1.2.4, ITU-T Rec. X.721 (1992) : controlStatus"
+		"ITU-T Rec. X.731 (1993) : 8.1.2.4, ITU-T Rec. X.721 
+		 (1992) : controlStatus"
 	SYNTAX	BITS {
 			subjectToTest(0),
 			partOfServicesLocked(1),
@@ -668,53 +807,70 @@ ControlStatus ::= TEXTUAL-CONVENTION
 StandbyStatus ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This textual convention represents the standby status of an Entry in accordance 
-		 with the defintions in ITU-T Recommendation X.731 (1992).  When it appears 
-		 within a row of a conceptual table it refers to the standby status of the 
-		 managed object represented by the row.
+		"This textual convention represents the standby status 
+		 of an Entry in accordance with the defintions in ITU-T 
+		 Recommendation X.731 (1992).  When it appears within a 
+		 row of a conceptual table it refers to the standby 
+		 status of the managed object represented by the row.
 
-		 The standby status textual convention is single-valued and read-only.  It shall 
-		 have one of the following values.  The value is only meaningful when the 
-		 back-up relationship role exists.
+		 The standby status textual convention is single-valued 
+		 and read-only.  It shall have one of the following 
+		 values.  The value is only meaningful when the back-up 
+		 relationship role exists.
 
-		 - hot standby: The resource is not providing service, but is operating in 
-		   synchronism with another resource that is to be backed-up (e.g, a computer 
-		   shadowing another computer).  A resource with a hot standby status will be 
-		   immediately able to take over the role of the resource to be backed-up, 
-		   without the need for intialization activity, and will contain the same 
-		   information as the resource being backed up.  The hot standby condition is 
-		   mutually exclusive with the cold standby and providing service conditions.
-		   The operational state is enabled.  The administrative state is unlocked.  The 
-		   availability status is offline.
+		 - hot standby: The resource is not providing service, 
+		   but is operating in synchronism with another resource 
+		   that is to be backed-up (e.g, a computer shadowing 
+		   another computer).  A resource with a hot standby 
+		   status will be immediately able to take over the role 
+		   of the resource to be backed-up, without the need for 
+		   intialization activity, and will contain the same 
+		   information as the resource being backed up.  The hot 
+		   standby condition is mutually exclusive with the cold 
+		   standby and providing service conditions.
+		   The operational state is enabled.  The administrative 
+		   state is unlocked.  The availability status is 
+		   offline.
 
-		 - cold standby: The resource is to back-up another resource, but is not 
-		   syncrhonized with that resource.  A resource with a cold standby status will 
-		   not be immediately able to take over the role of a resource to be backed up, 
-		   and will require some initialization activity.  The cold standby condition is 
-		   mutually exclusive with the hot standby and providing service condition.
-		   The operational state is enabled or disabled.  The administrative state is 
-		   locked or unlocked.  The procedural status contains not initialized or 
-		   initialization required.  The availability status is offline.
+		 - cold standby: The resource is to back-up another 
+		   resource, but is not syncrhonized with that resource.  
+		   A resource with a cold standby status will not be 
+		   immediately able to take over the role of a resource 
+		   to be backed up, and will require some initialization 
+		   activity.  The cold standby condition is mutually 
+		   exclusive with the hot standby and providing service 
+		   condition.
+		   The operational state is enabled or disabled.  The 
+		   administrative state is locked or unlocked.  The 
+		   procedural status contains not initialized or 
+		   initialization required.  The availability status is 
+		   offline.
 
-		 - providing service: The back-up resource is providing service and is backing 
-		   up another resource.  The providing service condition is mutually exclusive 
-		   with the hot stanbdy and cold standby conditions.  The operational state is 
-		   enabled.  The administrative state is unlocked.  The availability status is 
+		 - providing service: The back-up resource is providing 
+		   service and is backing up another resource.  The 
+		   providing service condition is mutually exclusive 
+		   with the hot stanbdy and cold standby conditions.  
+		   The operational state is enabled.  The administrative 
+		   state is unlocked.  The availability status is 
 		   online.
 
-		 When placed in a column of a conceptual table, this textual convention is given 
-		 a MAX-ACCESS of read-only, permitting management stations the ability to 
-		 retrieve the value only.
+		 When placed in a column of a conceptual table, this 
+		 textual convention is given a MAX-ACCESS of read-only, 
+		 permitting management stations the ability to retrieve 
+		 the value only.
 
-		 The DEFVAL associated with this row is coldStandby(1).
+		 The default value associated with this row is coldStandby(1).
 
-		 Precise definition of the states is specific to the managed object represented.  
-		 Not all states are applicable to all managed objects.  Precise definition of 
-		 which states are applicable, and what conditions exist in each applicable state 
-		 must appear in the DESCRIPTION claus of the object type definition using this 
-		 textual convention."
+		 Precise definition of the states is specific to the 
+		 managed object represented.  Not all states are 
+		 applicable to all managed objects.  Precise definition 
+		 of which states are applicable, and what conditions 
+		 exist in each applicable state must appear in the 
+		 DESCRIPTION claus of the object type definition using 
+		 this textual convention."
 	REFERENCE
-		"ITU-T Rec. X.731 (1992) : 8.1.2.5, ITU-T Rec. X.721 (1992) : standbyStatus"
+		"ITU-T Rec. X.731 (1992) : 8.1.2.5, ITU-T Rec. X.721 
+		 (1992) : standbyStatus"
 	SYNTAX	INTEGER {
 			hotStandby(0),
 			coldStandby(1),
@@ -724,18 +880,46 @@ StandbyStatus ::= TEXTUAL-CONVENTION
 UnknownStatus ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"The unknown status textual convention is used to indicated that the state of 
-		 the resource represented by the managed object is unknown.  When the unknown 
-		 status textual convention value is true, the value of the other state textual 
-		 conventions may not reflect the actual state of the resource."
+		"The unknown status textual convention is used to 
+		 indicated that the state of the resource represented by 
+		 the managed object is unknown.  When the unknown status 
+		 textual convention value is true, the value of the 
+		 other state textual conventions may not reflect the 
+		 actual state of the resource."
 	REFERENCE
-		"ITU-T Rec. X.731 (1992) : 8.1.2.6, ITU-T Rec. X.721 (1992) : unknownStatus"
+		"ITU-T Rec. X.731 (1992) : 8.1.2.6, ITU-T Rec. X.721 
+		 (1992) : unknownStatus"
 	SYNTAX	INTEGER {
 			false(0),
 			true(1)
 		}
 
+SimpleNameType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"The simple name type textual convention is used to 
+		 specify a name for a conceptual row in a table for use 
+		 as an index that is both an integer representation as 
+		 well as a string representation.  When representing an 
+		 integer, the convention is coded as a string that 
+		 represents the displayed value of the integer.  When 
+		 representing a string, the string is coded directly.  
+		 Some implementations might not be able to accept 
+		 arbitrary string values for this textual convention and 
+		 may required integer representations.  When 
+		 representing a string, the string must not contain 
+		 whitespace, control characters or commas.
+
+		 Note that the X.72 SimpleNameType is a choice between 
+		 an INTEGER and a GraphicString.  This textual 
+		 convention cannot faithfully represent all values 
+		 possible for the X.721 SimpleNameType."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 ASN.1 
+		 ManagedObjectClassDefinitions.SimpleNameType"
+	SYNTAX		DisplayString
 
 
 END
--- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8

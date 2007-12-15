@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/10/15 17:20:14 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/12/15 20:19:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/15 17:20:14 $ by $Author: brian $
+# Last Modified $Date: 2007/12/15 20:19:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -681,7 +681,7 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
 			pci_dac_dma_sync_single_for_device pci_dac_set_dma_mask \
 			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
-			pci_dac_page_to_dma pci_dac_dma_to_page \
+			pci_dac_page_to_dma pci_dac_dma_to_page request_dma free_dma \
 			pci_dac_dma_to_offset pci_module_init vmalloc vfree \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
 			read_trylock write_trylock atomic_add_return path_lookup \
@@ -743,6 +743,7 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #ifdef HAVE_KINC_LINUX_COMPAT_H
 #include <linux/compat.h>
 #endif
+#include <asm/dma.h>		/* for request_dma, free_dma */
 ])
     _LINUX_CHECK_MACROS([MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
 			 read_trylock write_trylock], [:], [:], [
@@ -1189,6 +1190,9 @@ AC_DEFUN([_COMPAT_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.34  2007/12/15 20:19:20  brian
+# - updates
+#
 # Revision 0.9.2.33  2007/10/15 17:20:14  brian
 # - fix for 2.4 kernels and pci_module_init
 #

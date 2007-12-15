@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dummy1.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:33:42 $
+# @(#) $RCSfile: dummy1.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/12/15 20:20:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -35,9 +35,9 @@
 # -----------------------------------------------------------------------------
 # 
 # As an exception to the above, this software may be distributed under the GNU
-# General Public License (GPL) Version 3, so long as the software is distributed
-# with, and only used for the testing of, OpenSS7 modules, drivers, and
-# libraries.
+# Affero General Public License (GPL) Version 3, so long as the software is
+# distributed with, and only used for the testing of, OpenSS7 modules, drivers,
+# and libraries.
 #
 # -----------------------------------------------------------------------------
 #
@@ -62,7 +62,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/15 05:33:42 $ by $Author: brian $
+# Last Modified $Date: 2007/12/15 20:20:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,6 +78,9 @@ AT_CLEANUP
 # =============================================================================
 #
 # $Log: dummy1.m4,v $
+# Revision 0.9.2.8  2007/12/15 20:20:22  brian
+# - updates
+#
 # Revision 0.9.2.7  2007/08/15 05:33:42  brian
 # - GPLv3 updates
 #

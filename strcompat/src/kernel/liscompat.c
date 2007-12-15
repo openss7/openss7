@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/10/15 17:20:15 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/12/15 20:19:22 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/10/15 17:20:15 $ by $Author: brian $
+ Last Modified $Date: 2007/12/15 20:19:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: liscompat.c,v $
+ Revision 0.9.2.52  2007/12/15 20:19:22  brian
+ - updates
+
  Revision 0.9.2.51  2007/10/15 17:20:15  brian
  - fix for 2.4 kernels and pci_module_init
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/10/15 17:20:15 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/12/15 20:19:22 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/10/15 17:20:15 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/12/15 20:19:22 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -114,7 +117,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/10/15 17:20:15 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/12/15 20:19:22 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -1429,7 +1432,11 @@ EXPORT_SYMBOL(lis_pcibios_write_config_word);
 _RP int
 lis_request_dma(unsigned int dma_nr, const char *device_id)
 {
+#ifdef HAVE_KFUNC_REQUEST_DMA
 	return WARN(request_dma(dma_nr, device_id));
+#else
+	return (-ENOSYS);
+#endif
 }
 
 EXPORT_SYMBOL(lis_request_dma);
@@ -1783,7 +1790,11 @@ EXPORT_SYMBOL(lis_enable_irq);
 _RP void
 lis_free_dma(unsigned int dma_nr)
 {
+#ifdef HAVE_KFUNC_FREE_DMA
 	return WARN(free_dma(dma_nr));
+#else
+	return;
+#endif
 }
 
 EXPORT_SYMBOL(lis_free_dma);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ap_lib.h,v 0.9.2.2 2007/11/10 19:40:52 brian Exp $
+ @(#) $Id: ap_lib.h,v 0.9.2.3 2007/12/15 20:20:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/11/10 19:40:52 $ by $Author: brian $
+ Last Modified $Date: 2007/12/15 20:20:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ap_lib.h,v $
+ Revision 0.9.2.3  2007/12/15 20:20:30  brian
+ - updates
+
  Revision 0.9.2.2  2007/11/10 19:40:52  brian
  - documentation updates
 
@@ -61,7 +64,7 @@
 #ifndef __AP_LIB_H__
 #define __AP_LIB_H__
 
-#ident "@(#) $RCSfile: ap_lib.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ap_lib.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

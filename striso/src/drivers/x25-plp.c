@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 07:05:03 $
+ @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 07:05:03 $ by $Author: brian $
+ Last Modified $Date: 2007/12/15 20:20:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-plp.c,v $
+ Revision 0.9.2.3  2007/12/15 20:20:29  brian
+ - updates
+
  Revision 0.9.2.2  2007/08/14 07:05:03  brian
  - GNUv3 header update
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 07:05:03 $"
+#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:29 $"
 
 static char const ident[] =
-    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 07:05:03 $";
+    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:29 $";
 
 /*
  * This is an X.25 PLP (LLC2, XOT, SLP and MLP) (CONS) driver per X.223.  It can be used with the
@@ -82,7 +85,7 @@ static char const ident[] =
 #define X25_PLP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define X25_PLP_EXTRA		"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define X25_PLP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
-#define X25_PLP_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define X25_PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:29 $"
 #define X25_PLP_DEVICE		"SVR 4.2 STREAMS X.25 PLP (ISO 8208) Network Provider"
 #define X25_PLP_CONTACT		"Brian BIdulock <bidulock@openss7.org>"
 #define X25_PLP_LICENSE		"GPL"

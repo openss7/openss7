@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG2.texi,v 0.9.2.16 2007/08/12 06:44:32 brian Exp $
+% @(#) $Id: SPG2.texi,v 0.9.2.17 2007/12/15 20:19:43 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/12 06:44:32 $ by $Author: brian $
+% Last Modified $Date: 2007/12/15 20:19:43 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -434,7 +434,9 @@ Examples
 
 Copying
 
+* GNU Affero General Public License::	AGPL
 * GNU General Public License::		GPL
+* GNU Lesser General Public License::	LGPL
 * GNU Free Documentation License::	FDL
 
 Glossary
@@ -482,8 +484,8 @@ Reports}.
 @cindex document notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
-General Public License}).  Please note, however, that there are different licensing terms for the
+This package is released and distributed under the @cite{GNU Affero General Public License} (@pxref{GNU
+Affero General Public License}).  Please note, however, that there are different licensing terms for the
 manual pages and some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX
 International.} publications and other sources).  Consult the permission notices contained in the
 documentation for more information.
@@ -552,6 +554,9 @@ package.
 @smallexample
 
 $Log: SPG2.texi,v $
+Revision 0.9.2.17  2007/12/15 20:19:43  brian
+- updates
+
 Revision 0.9.2.16  2007/08/12 06:44:32  brian
 - updated licenses in manuals
 
@@ -7193,13 +7198,18 @@ file system).
 @node Copying
 @appendix Copying
 @menu
+* GNU Affero General Public License::	AGPL
 * GNU General Public License::		GPL
+* GNU Lesser General Public License::	LGPL
 * GNU Free Documentation License::	FDL
 @end menu
 
 @page
+@include texi/agpl3.texi
+@page
 @include texi/gpl3.texi
-
+@page
+@include texi/lgpl3.texi
 @page
 @include texi/fdl.texi
 
