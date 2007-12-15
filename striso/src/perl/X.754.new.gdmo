@@ -1,0 +1,202 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 11:17:02 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.754 (2000)"
+--  { itu-t(0) recommendation(0) x(24) eecmod(754) informationModel(0) } >--
+--< GDMO.Namespace itut_x754 >--
+MODULE "ITU-T Rec. X.754 (2000)" { itu-t(0) recommendation(0) x(24) eecmod(754) informationModel(0) }
+-- 8 Management information
+-- 8.1 Managed object classes
+-- 8.1.1 Disseminator log
+-- The disseminator log managed object class is a subclass of log and provides for storage of event
+-- records for transmittal by disseminator queue objects.
+
+disseminatorLog MANAGED OBJECT CLASS
+	DERIVED FROM
+		"X.721":log;
+	CHARACTERIZED BY
+		disseminatorLogPackage PACKAGE
+			BEHAVIOUR
+				disseminatorLogBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object class is used to retain event reports when any destination 
+						to which event reports are to be sent by the contained destination queues 
+						becomes unavailable. Additional details are defined in ITU-T X.734 | ISO/IEC 
+						10164-5. Detailed behaviour is specified in section 7.1.3";;
+			ATTRIBUTES
+				discardCount GET;
+			ACTIONS
+				getDestinations ACTION
+					BEHAVIOUR
+						getDestinationBehaviour BEHAVIOUR
+							DEFINED AS
+								"This action retrieves the list of destinations to which event reports 
+								corresponding to a particular record Id will be sent. Multiple records may be 
+								identified in the same request. If no record Id is specified then the action 
+								applies to all records currently in the log.";;-- correction
+					MODE CONFIRMED;
+					WITH INFORMATION SYNTAX EnhancedErASN1Productions.GetDestinationArgument;
+					WITH REPLY SYNTAX EnhancedErASN1Productions.GetDestinationsResult;;;--correction
+			NOTIFICATIONS
+				"X.721":attributeValueChange;;;--correction
+	-- This notification is used to send the discard count when the log begins to accept new events for
+	-- a log that had halted.
+	CONDITIONAL PACKAGES
+		agingPackage
+			PRESENT IF
+				"supported by the implementation";
+REGISTERED AS { eecObjectClass 1 };
+-- 8.1.2 Disseminator queue
+-- The disseminator queue managed object class is a subclass of event forwarding discriminator and
+-- provides for storage of event record Ids for transmittal of event reports by disseminator queue
+-- objects.
+
+
+disseminatorQueue MANAGED OBJECT CLASS
+	DERIVED FROM
+		"X.721":eventForwardingDiscriminator;
+	CHARACTERIZED BY
+		disseminatorQueuePackage PACKAGE
+			BEHAVIOUR
+				disseminatorLogBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object class is used to maintain a list of event report record Ids 
+						for a particular destination that is unavailable. Detailed behaviour is 
+						specified in section 7.1.4";;
+			ATTRIBUTES
+				recordIdList GET-REPLACE,
+				maximumQueueSize GET-REPLACE,
+				currentQueueSize GET,
+				queueAlarmThreshold GET-REPLACE,
+				queueDiscipline GET-REPLACE,
+				queueFullAction GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		agingPackage
+			PRESENT IF
+				"supported by the implementation";
+REGISTERED AS { eecObjectClass 2 };
+-- 8.2 Conditional packages
+
+
+agingPackage PACKAGE
+	BEHAVIOUR
+		agingPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package is used to specify the period of time for which an object or event 
+				is to be aged. The aging period is measured relative to the time the record is 
+				inserted into the log. The action to be taken when the aging period expires 
+				needs to be specified in the object class using this package.";;
+	ATTRIBUTES
+		agingPeriod GET-REPLACE
+			DEFAULT VALUE XXX.minusOne
+			;-- -1
+	REGISTERED AS { eecPackage 1 };
+-- 8.3 Attributes
+-- 8.3.1 Aging period
+-- The semantics of the agingPeriod attribute type are specified in the aging attribute in ITU-T X.734 |
+-- ISO/IEC 10164-5.
+
+
+agingPeriod ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.AgingPeriod;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { eecAttribute 1 };
+-- 8.3.2 Queuing discipline
+-- The semantics of the queuingDiscipline attribute type are specified in the queuing discipline
+-- attribute in ITU-T X.734 | ISO/IEC 10164-5.
+
+
+queuingDiscipline ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.QueuingDiscipline;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { eecAttribute 2 };
+-- 8.3.3 Record ID list
+-- The semantics of the recordIdList attribute type are specified in the record list attribute in
+-- ITU-T X.734 | ISO/IEC 10164-5.
+
+
+recordIdList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.RecordIdList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { eecAttribute 3 };
+-- 8.3.4 Current queue size
+-- The semantics of the currentQueueSize attribute type are specified in the current queue size
+-- attribute in ITU-T X.734 | ISO/IEC 10164-5.
+
+
+currentQueueSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.QueueSize;
+	MATCHES FOR EQUALITY, ORDERING;
+REGISTERED AS { eecAttribute 4 };
+-- 8.3.5 Maximum queue size
+-- The semantics of the maximumQueueSize attribute type are specified in the max queue size
+-- attribute in ITU-T X.734 | ISO/IEC 10164-5.
+
+
+maximumQueueSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.QueueSize;
+	MATCHES FOR EQUALITY, ORDERING;
+REGISTERED AS { eecAttribute 5 };
+-- 8.3.6 Queue alarm threshold
+-- The semantics of the queueAlarmThreshold attribute type are specified in the queue alarm
+-- threshold attribute in ITU-T X.734 | ISO/IEC 10164-5.
+
+
+queueAlarmThreshold ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.CapacityAlarmThreshold;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { eecAttribute 6 };
+-- 8.3.7 Queue full action
+-- The semantics of the queueFullAction attribute type are specified in the queue full action attribute
+-- in ITU-T X.734 | ISO/IEC 10164-5.
+
+
+queueFullAction ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.LogFullAction;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { eecAttribute 7 };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.754 (2000)"
+--  { itu-t(0) recommendation(0) x(24) eecmod(754) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ |  |  +- itut_x754::disseminatorQueue
+--@@ +- itut_x721::log
+--@@ |  +- itut_x754::disseminatorLog
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ +- itut_x721::system
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

@@ -1,0 +1,1003 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 19:31:42 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000"
+--  { joint-iso-ccitt ms(9) smi(3) part8(8) } >--
+--< GDMO.Version 1.3 "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000" >--
+-- Annex B
+-- Management Information Definitions
+-- (This annex forms an integral part of this Recommendation | International Standard)
+
+aCSE MANAGED OBJECT CLASS
+	DERIVED FROM
+		aso;
+	CHARACTERIZED BY
+		aCSEPackage PACKAGE
+			BEHAVIOUR
+				aCSEBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of ase is a specialized application service object holds reference 
+						information about an ACSE application service element. It specializes by adding 
+						the following attributes:
+
+						- acseFUinitiator, the ACSE functional units supported as initiator;
+
+						- acseFUresponder, the ACSE functional units supported as responder;
+
+						- acseEditionsSupported, the ACSE editions supported;
+
+						An application service element does not qualify as an asoEntity or as a "Rec. 
+						X.723 | ISO/IEC 10165-5 : 1994":communicationsEntity because it does not have 
+						both the association phase and the transfer phase of communication. ACSE 
+						provides only the association phase of communication.!;;
+			ATTRIBUTES
+				acseFUinitiator GET,
+				acseEditionsSupported GET,
+				acseFUresponder GET;;;
+REGISTERED AS { UL-AttributeModule.acseMOCId };
+
+
+acseAssociation MANAGED OBJECT CLASS
+	DERIVED FROM
+		asoInvocation;
+	CHARACTERIZED BY
+		acseAssociationPackage PACKAGE
+			BEHAVIOUR
+				acseAssociationBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of aseInvocation holds reference information for an ACSE 
+						association. It specializes by adding the following attributes:
+
+						- calling AE title,
+
+						- ACSE functional units negotiated in use,
+
+						- Application context in use,
+
+						- parent ASO invocation (relationship pointer to parent ASO invocation, which 
+						  could be the AEI).
+
+						It may also have an attribute for the called AE title, if known.!;;
+			ATTRIBUTES
+				callingAEtitle GET,
+				acseFUinUse GET,
+				applContextInUse GET,
+				parentASOinvoc GET;;;
+	CONDITIONAL PACKAGES
+		calledAEtitlePackage PACKAGE
+			ATTRIBUTES
+				calledAEtitle GET;
+		REGISTERED AS { UL-AttributeModule.calledAEtitlePId };
+			PRESENT IF
+				!Present only if the called AE Title is known.!;
+REGISTERED AS { UL-AttributeModule.acseAssociationMOCId };
+
+
+apInvocation MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		apInvocationPackage PACKAGE
+			BEHAVIOUR
+				apInvocationBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of "Rec. X.721 | ISO/IEC 10165-2 : 1992":top holds reference 
+						information about an Application Process Invocation. It specializes by adding 
+						the following attributes:
+
+						- apInvocationId;
+
+						- invocationOfPointer.
+
+						The apInvocationId attribute serves as the naming attribute for instances of 
+						this class. The invocationOfPointer attribute identifies the specific 
+						Application Process (using the distinguished name, DN, of an instance of the 
+						"Rec. X.723 | ISO/IEC 10165-5 : 1994":applicationProcess managed object class) 
+						of which the instance of this class is an invocation.!;;
+			ATTRIBUTES
+				apInvocationId GET,
+				invocationOfPointer GET;;;
+REGISTERED AS { UL-AttributeModule.apInvocationMOCId };
+
+
+applicationEntity MANAGED OBJECT CLASS
+	DERIVED FROM
+		asoEntity;
+	CHARACTERIZED BY
+		applicationEntityPackage PACKAGE
+			BEHAVIOUR
+				applicationEntityBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of asoEntity holds reference information about an application 
+						entity. For an instance of the applicationEntity object class, the asoQualifier 
+						attribute contains the value of the local application entity (AE) qualifier. The 
+						asoTitle attribute contains the value of the associated application process (AP) 
+						title. The communicationsEntityId attribute holds the instances Application 
+						Entity (AE) Id. The localSapNames attribute identifies a pSAP object instance.
+
+						An applicationEntity object is always the outermost ASO Entity in an AP and 
+						serves as the supporting service for all of its contained ASOs (including ASO 
+						Entities and ASEs).!;;;;
+REGISTERED AS { UL-AttributeModule.applicationEntityMOCId };
+
+
+applicationEntityInvocation MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":singlePeerConnection,
+		asoInvocation;
+	CHARACTERIZED BY
+		applicationEntityInvocationPackage PACKAGE
+			BEHAVIOUR
+				aEInvocationBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of "Rec. X.723 | ISO/IEC 10165-5 : 1994":singlePeerConnection and 
+						asoInvocation represents an invocation of an application entity. It adds no 
+						additional attributes.
+
+						The inherited "Rec. X.723 | ISO/IEC 10165-5 : 1994":connectionId attribute 
+						serves as the naming attribute for instances of this class, and represents the 
+						application entity (AE) invocation id. The inherited attribute "Rec. X.723 | 
+						ISO/IEC 10165-5 : 1994":underlyingConnectionNames identifies the supporting 
+						services or connections, which for instances of this class is a presentation 
+						address (the distinguished name of an object instance representing a 
+						presentation invocation). The inherited invocationOfPointer attribute identifies 
+						the application entity of which an instance of this class is an invocation.!;;;;
+REGISTERED AS { UL-AttributeModule.applicationEntityInvocationMOCId };
+
+
+applicationSubsystem MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":subsystem;
+	CHARACTERIZED BY
+		applicationSubsystemPackage PACKAGE
+			BEHAVIOUR
+				applicationSubsystemBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of "Rec. X.723 | ISO/IEC 10165-5 : 1994":subsystem is used as a 
+						common containment point for managed objects in a system that relate to the 
+						application layer (i.e., application entity Mos). It can use the "Rec. X.723 | 
+						ISO/IEC 10165-5 : 1994":subsystem-system Name Binding.!;;;;
+REGISTERED AS { UL-AttributeModule.applicationSubsystemMOCId };
+
+
+aso MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		asoPackage PACKAGE
+			BEHAVIOUR
+				asoBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of "Rec. X.721 | ISO/IEC 10165-2 : 1992":top holds reference 
+						information about an ASO, which is a collection of two or more ASOs (including 
+						specialized ASOs, e.g., ASEs) together with a Control Function that moderates 
+						the interactions of the component ASEs and ASOs with the service provided and 
+						the supporting service. An ASO contains one or more ASEs/ASOs that provide for 
+						data transfer phase of communication. An ASO may also contain an ASE that 
+						provides for the establishment phase of communication. An ASO association can 
+						only be established to an ASO that provides for both the establishment and data 
+						transfer phases.
+
+						This managed object class is non-instantiable. Subclasses of this class provide 
+						information about specific ASOs including the information about the Controlling 
+						Function. The information about the Control Function may only be specified via 
+						the behaviour definitions of subclasses of this class, but can be made visible 
+						via attributes of the subclass if needed.
+
+						It specializes by adding the following attributes:
+
+						- "Rec. X.723 | ISO/IEC 10165-5 : 1994":communicationsEntityId;
+
+						- asoTitle;
+
+						- asoQualifier;
+
+						- "Rec. X.721 | ISO/IEC 10165-2 : 1992":operationalState.
+
+						The attribute "Rec. X.723 | ISO/IEC 10165-5 : 1994":communicationsEntityId 
+						serves as the naming attribute for instances of this class. The ASO Name is 
+						formed by concatenating the asoTitle and the asoQualifier. The operationalState 
+						is used to indicate whether instances of this class are enabled or disabled, the 
+						syntax and semantics of which are defined in Rec. X.721 | ISO/IEC 10165-2 and 
+						Rec. X.731 | ISO/IEC 10164-2.!;;
+			ATTRIBUTES
+				"Rec. X.723 | ISO/IEC 10165-5 : 1994":communicationsEntityId GET,
+				asoTitle GET,
+				asoQualifier GET,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":operationalState GET;;;
+REGISTERED AS { UL-AttributeModule.asoMOCId };
+
+
+asoEntity MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":communicationsEntity,
+		aso;
+	CHARACTERIZED BY
+		asoEntityPackage PACKAGE
+			BEHAVIOUR
+				asoEntityBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of aso and "Rec. X.723 | ISO/IEC 10165-5 : 
+						1994":communicationsEntity holds reference information about an ASO entity, 
+						which is an ASO that contains ACSE for the establishment phase of communication. 
+						Thus, it represents an ASO with which communications may be established.
+
+						An instance of an asoEntity serves as the supporting service for its contained 
+						objects, which can include ASOs (i.e., subclasses of the ASO managed object 
+						class: this includes ASEs, e.g., ACSE, CMISE, SMASE, and also other ASO 
+						Entities).
+
+						It specializes by adding the following attribute:
+
+						- applContextNameSupport.
+
+						The applContextNameSupport attribute identifies the specific application 
+						contexts that are supported by an instance of this class. These are identified 
+						using the given application contextse object identifier values.!;;
+			ATTRIBUTES
+				applContextNameSupport GET;;;
+REGISTERED AS { UL-AttributeModule.asoEntityMOCId };
+
+
+asoInvocation MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		asoInvocationPackage PACKAGE
+			BEHAVIOUR
+				asoInvocationBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of "Rec. X.721 | ISO/IEC 10165-2 : 1992":top holds reference 
+						information about an ASO Invocation. This managed object class is 
+						non-instantiable. Subclasses of this class provide information about invocations 
+						of specific ASOs.
+
+						An instance of a subclass of ASO Invocation serves as the supporting service for 
+						its * contained * object instances, which are in turn also subclasses of ASO 
+						Invocation (e.g., AE Invocation, ACSE Invocation, CMISE Invocation, SMASE 
+						Invocation).
+
+						It specializes by adding the following attributes:
+
+						- connectionId;
+
+						- invocationOfPointer.
+
+						The connectionId attribute serves as the naming attribute for instances of this 
+						class. The invocationOfPointer attribute identifies a specific ASO of which the 
+						instance of this class is an invocation.!;;
+			ATTRIBUTES
+				"Rec. X.723 | ISO/IEC 10165-5 : 1994":connectionId GET,
+				invocationOfPointer GET;;;
+REGISTERED AS { UL-AttributeModule.asoInvocationMOCId };
+
+
+monoULConnection MANAGED OBJECT CLASS
+	DERIVED FROM
+		applicationEntityInvocation,
+		presentationConnection,
+		sessionConnection;
+	CHARACTERIZED BY
+		monoULConnectionPackage PACKAGE
+			BEHAVIOUR
+				monoULConnectionBehaviour BEHAVIOUR
+					DEFINED AS
+						!The monoULConnection managed object class is a subclass of three object classes: 
+						applicationEntityInvocation, presentationConnection and sessionConnection. It 
+						holds reference information about an application connection which has monolithic 
+						connection of all three upper layers. It adds no additional attributes.!;;;;
+REGISTERED AS { UL-AttributeModule.monoULConnectionMOCId };
+
+
+monoULEntity MANAGED OBJECT CLASS
+	DERIVED FROM
+		applicationEntity,
+		presentationEntity,
+		sessionEntity,
+		presentationCopm,
+		sessionCopm;
+	CHARACTERIZED BY
+		monoULEntityP1 PACKAGE
+			BEHAVIOUR
+				monoULEntityBehaviour BEHAVIOUR
+					DEFINED AS
+						!The monoULEntity managed object class is a subclass of applicationEntity, 
+						presentationEntity, sessionEntity, presentationCopm and sessionCopm object 
+						classes. It holds reference information about an application entity which has 
+						monolithic implementation of all three upper layers.
+
+						The communicationsEntityId attribute is multiply inherited from all three 
+						"Entity" superclasses and serves as the naming attribute for instances of this 
+						class. It should have the exact value as the coProtocolMachineId attribute, 
+						multiply inherited from "Copm" superclasses.
+
+						The operationalState attribute has the semantics and syntax defined in "Rec. 
+						X.731 | ISO/IEC 10164-2" State Management Function. The value of the 
+						localSAPName attribute (inherited) should contain the address of the SAP that 
+						the virtual sessionEntity points to. The value of the asoQualifier attribute 
+						(inherited from aso) is the local AE Qualifier. The value of the asoTitle 
+						attribute (inherited from aso) is the AP Title. The value of the application 
+						context names supported (inherited from applicationEntity) contains the values 
+						supported by the virtual application layer.
+
+						Since this is a subclass of presentationCopm and sessionCopm, it also holds 
+						reference information pertaining to the capabilities of a protocol machine which 
+						has monolithic implementation of all three upper layers.
+
+						The following attributes are inherited from presentationCopm:
+
+						- Presentation functional units supported (bitstring);
+
+						- Abstract syntaxes supported (set of OBJECT IDENTIFIER);
+
+						- Transfer syntaxes supported (set of OBJECT IDENTIFIER).
+
+						The following attributes are inherited from sessionCopm:
+
+						- Session functional units supported (bitstring);
+
+						- Optional session support requirements (i.e., segmenting);
+
+						- Session protocol versions supported.
+
+						This object class specializes by adding the following attributes:
+
+						- presentation selector value;
+
+						- session selector value.
+
+						These two attributes are needed because in the monolithic implementation the 
+						functionality of the PSAP and SSAP object classes are "absorbed" into this 
+						object class along with their containers (presentationEntity and sessionEntity).!;;
+			ATTRIBUTES
+				presSelectorValue GET,
+				sessionSelectorValue GET;;;
+REGISTERED AS { UL-AttributeModule.monoULEntityMOCId };
+
+
+monolithicUpperLayerSubsytem MANAGED OBJECT CLASS
+	DERIVED FROM
+		sessionSubsystem,
+		presentationSubsystem,
+		applicationSubsystem;
+	CHARACTERIZED BY
+		monolithicUpperLayerSubsystemPackage PACKAGE
+			BEHAVIOUR
+				monolithicUpperLayerSubsystemBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of sessionSubsystem, presentationSubsystem, applicationSubsystem 
+						is used as a common containment point for managed objects in a system that 
+						relate to the a monolithic upper layer. It can use the "Rec. X.723 | ISO/IEC 
+						10165-5 : 1994":subsystem-system Name Binding.!;;;;
+REGISTERED AS { UL-AttributeModule.monolithicUpperLayerSubsystemMOCId };
+
+
+pSap MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":sap1;
+	CHARACTERIZED BY
+		pSapP1 PACKAGE
+			BEHAVIOUR
+				pSapB1 BEHAVIOUR
+					DEFINED AS
+						!This subclass of "Rec. X.723 | ISO/IEC 10165-5 : 1994":sap1 has the P-selector 
+						and the binding between the AE and the sap.!;;;;
+REGISTERED AS { UL-AttributeModule.pSapMOCId };
+
+
+presentationConnection MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":singlePeerConnection;
+	CHARACTERIZED BY
+		presConnEndpointP1 PACKAGE
+			BEHAVIOUR
+				presConnectionBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of "Rec. X.723 | ISO/IEC 10165-5 : 1994":singlePeerConnection 
+						holds reference information pertaining to the single presentation connection for 
+						the association. The underlying connections attribute is used to point to the 
+						session connection endpoint used.
+
+						It specializes by adding the following attributes:
+
+						- presentation functional units negotiated in use;
+
+						- presentation contexts in use.!;;
+			ATTRIBUTES
+				presFUinUse GET,
+				presContextInUse GET;;;
+REGISTERED AS { UL-AttributeModule.presentationConnectionMOCId };
+
+
+presentationCopm MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":coProtocolMachine;
+	CHARACTERIZED BY
+		presentationCopmP1 PACKAGE
+			BEHAVIOUR
+				presentationCopmBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of "Rec. X.723 | ISO/IEC 10165-5 : 1994":coProtocolMachine holds 
+						reference information pertaining to the capabilities of a Presentation protocol 
+						machine.
+
+						It specializes by adding the following attributes:
+
+						- Presentation functional units supported (bitstring);
+
+						- Abstract syntaxes supported (set of OBJECT IDENTIFIER);
+
+						- Transfer syntaxes supported (set of OBJECT IDENTIFIER).!;;
+			ATTRIBUTES
+				presFUsupport GET,
+				abstrSyntaxSupport GET,
+				transfSyntaxSupport GET;;;
+REGISTERED AS { UL-AttributeModule.presentationCopmMOCId };
+
+
+presentationEntity MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":communicationsEntity;
+	CHARACTERIZED BY
+		presentationEntityP1 PACKAGE
+			BEHAVIOUR
+				presentationEntityB1 BEHAVIOUR
+					DEFINED AS
+						!This subclass of "Rec. X.723 | ISO/IEC 10165-5 : 1994":communicationsEntity 
+						holds reference information about a Presentation Entity. It specializes by 
+						adding only behaviour.!;;;;
+REGISTERED AS { UL-AttributeModule.presentationEntityMOCId };
+
+
+presentationSubsystem MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":subsystem;
+	CHARACTERIZED BY
+		presentationSubsystemPackage PACKAGE
+			BEHAVIOUR
+				presentationSubsystemBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of "Rec. X.723 | ISO/IEC 10165-5 : 1994":subsystem is used as a 
+						common containment point for managed objects in a system that relate to the 
+						presentation layer (i.e., presentation entity MOs). It can use the "Rec. X.723 | 
+						ISO/IEC 10165-5 : 1994": subsystem-system Name Binding.!;;;;
+REGISTERED AS { UL-AttributeModule.presentationSubsystemMOCId };
+
+
+sSap MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":sap1;
+	CHARACTERIZED BY
+		sSapP1 PACKAGE
+			BEHAVIOUR
+				sSapB1 BEHAVIOUR
+					DEFINED AS
+						!This managed object is a subclass of "Rec. X.723 | ISO/IEC 10165-5 : 1994":sap1 
+						and has the S- selector and binding between PE and SAP.!;;;;
+REGISTERED AS { UL-AttributeModule.sSapMOCId };
+
+
+sessionConnection MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":singlePeerConnection;
+	CHARACTERIZED BY
+		sessionConnEndpointP1 PACKAGE
+			BEHAVIOUR
+				sessionConnEndpointBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of "Rec. X.723 | ISO/IEC 10165-5 : 1994":singlePeerConnection 
+						holds reference information pertaining to the single session connection for the 
+						association. The underlying connections attribute is used to point to the 
+						transport connection used.
+
+						It specializes by adding the following attributes:
+
+						- Session protocol version in use;
+
+						- Session functional units negotiated in use;
+
+						 it may have an attribute for the negotiated maximum TSDU size if segmenting is 
+						 in use.!;;
+			ATTRIBUTES
+				sessProtInUse GET,
+				sessFUinUse GET;;;
+	CONDITIONAL PACKAGES
+		maxTSDUsizePackage PACKAGE
+			ATTRIBUTES
+				maxTSDUsize GET;
+		REGISTERED AS { UL-AttributeModule.maxTSDUsizePId };
+			PRESENT IF
+				"Present only if segmenting is in use.";
+REGISTERED AS { UL-AttributeModule.sessionConnectionMOCId };
+
+
+sessionCopm MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":coProtocolMachine;
+	CHARACTERIZED BY
+		sessionCopmP1 PACKAGE
+			BEHAVIOUR
+				sessionCopmBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of "Rec. X.723 | ISO/IEC 10165-5 : 1994":coProtocolMachine holds 
+						reference information pertaining to the capabilities of a Session protocol 
+						machine.
+
+						It specializes by adding the following attributes:
+
+						- Session protocol versions supported (bitstring);
+
+						- Session functional units supported (bitstring);
+
+						- optional support requirements (i.e., segmenting).!;;
+			ATTRIBUTES
+				sessProtVerSupport GET,
+				sessFUsupport GET,
+				sessOptSupport GET;;;
+REGISTERED AS { UL-AttributeModule.sessionCopmMOCId };
+
+
+sessionEntity MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":communicationsEntity;
+	CHARACTERIZED BY
+		sessionEntityP1 PACKAGE
+			BEHAVIOUR
+				sessionEntityB1 BEHAVIOUR
+					DEFINED AS
+						!This managed object holds reference information about the session entity and is 
+						a subclass of "Rec. X.723 | ISO/IEC 10165-5 : 1994":communicationsEntity.!;;;;
+REGISTERED AS { UL-AttributeModule.sessionEntityMOCId };
+
+
+sessionSubsystem MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":subsystem;
+	CHARACTERIZED BY
+		sessionSubsystemPackage PACKAGE
+			BEHAVIOUR
+				sessionSubsystemBehaviour BEHAVIOUR
+					DEFINED AS
+						!This subclass of "Rec. X.723 | ISO/IEC 10165-5 : 1994":subsystem is used as a 
+						common containment point for managed objects in a system that relate to the 
+						session layer (i.e., session entity MOs). It can use the "Rec. X.723 | ISO/IEC 
+						10165-5 : 1994":subsystem-system Name Binding.!;;;;
+REGISTERED AS { UL-AttributeModule.sessionSubsystemMOCId };
+
+
+abstrSyntaxSupport ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.AbstrSyntaxSupport;
+REGISTERED AS { UL-AttributeModule.abstrSyntaxSupportAId };
+
+
+acseEditionsSupported ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.AcseEditionsSupported;
+REGISTERED AS { UL-AttributeModule.acseEditionsSupportedAId };
+
+
+acseFUinUse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.AcseFUs;
+REGISTERED AS { UL-AttributeModule.acseFUinUseAId };
+
+
+acseFUinitiator ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.AcseFUs;
+REGISTERED AS { UL-AttributeModule.acseFUinitiatorAId };
+
+
+acseFUresponder ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.AcseFUs;
+REGISTERED AS { UL-AttributeModule.acseFUresponderAId };
+
+
+aeInvocationId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.AeInvocationId;
+REGISTERED AS { UL-AttributeModule.aeInvocationIdAId };
+
+
+apInvocationId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.ApInvocationId;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { UL-AttributeModule.ulAttributeIDAId };
+
+
+apInvocationPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.ApInvocation;
+REGISTERED AS { UL-AttributeModule.apInvocationIdAId };
+
+
+applContextInUse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.ApplContextInUse;
+REGISTERED AS { UL-AttributeModule.applContextInUseAId };
+
+
+applContextNameSupport ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.ApplContextNameSupport;
+REGISTERED AS { UL-AttributeModule.applContextNameSupportAId };
+
+
+asoQualifier ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.ASOQualifier;
+REGISTERED AS { UL-AttributeModule.asoQualifierAId };
+
+
+asoTitle ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.ASOTitle;
+REGISTERED AS { UL-AttributeModule.asoTitleAId };
+
+
+calledAEtitle ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.CallAEtitle;
+REGISTERED AS { UL-AttributeModule.calledAEtitleAId };
+
+
+callingAEtitle ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.CallAEtitle;
+REGISTERED AS { UL-AttributeModule.callingAEtitleAId };
+
+
+invocationOfPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.ObjectInstance;
+REGISTERED AS { UL-AttributeModule.invocationOfPointerAId };
+
+
+maxTSDUsize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.MaxTSDUsize;
+REGISTERED AS { UL-AttributeModule.maxTSDUsizeAId };
+
+
+parentASOinvoc ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.ParentASOinvoc;
+REGISTERED AS { UL-AttributeModule.parentASOinvocAId };
+
+
+presContextInUse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.PresContextInUse;
+REGISTERED AS { UL-AttributeModule.presContextInUseAId };
+
+
+presFUinUse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.PresFUs;
+REGISTERED AS { UL-AttributeModule.presFUinUseAId };
+
+
+presFUsupport ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.PresFUs;
+REGISTERED AS { UL-AttributeModule.presFUsupportAId };
+
+
+presSelectorValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.PresSelectorValue;
+REGISTERED AS { UL-AttributeModule.presSelectorValueAId };
+
+
+sessFUinUse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.SessFUs;
+REGISTERED AS { UL-AttributeModule.sessFUinUseAId };
+
+
+sessFUsupport ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.SessFUs;
+REGISTERED AS { UL-AttributeModule.sessFUsupportAId };
+
+
+sessOptSupport ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.SessOptSupport;
+REGISTERED AS { UL-AttributeModule.sessOptSupportAId };
+
+
+sessProtInUse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.SessProtVer;
+REGISTERED AS { UL-AttributeModule.sessProtInUseAId };
+
+
+sessProtVerSupport ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.SessProtVer;
+REGISTERED AS { UL-AttributeModule.sessProtVerSupportAId };
+
+
+sessionSelectorValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.SessionSelectorValue;
+REGISTERED AS { UL-AttributeModule.sessionSelectorValueAId };
+
+
+supportingServices ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.SupportingServices;
+REGISTERED AS { UL-AttributeModule.supportingServicesAId };
+
+
+transfSyntaxSupport ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX UL-AttributeModule.TransfSyntaxSupport;
+REGISTERED AS { UL-AttributeModule.transfSyntaxSupportAId };
+
+
+ap-applicationSubsystem NAME BINDING
+	SUBORDINATE OBJECT CLASS "Rec. X.723 | ISO/IEC 10165-5 : 1994":applicationProcess AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS applicationSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":applicationProcessId;
+REGISTERED AS { UL-AttributeModule.ap-applicationSubsystemNBId };
+
+
+apInvocation-applicationSubsystem NAME BINDING
+	SUBORDINATE OBJECT CLASS apInvocation AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS applicationSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		apInvocationId;
+REGISTERED AS { UL-AttributeModule.apInvocation-applicationSubsystemNBId };
+
+
+aso-aso NAME BINDING
+	SUBORDINATE OBJECT CLASS aso AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS aso AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":communicationsEntityId;
+REGISTERED AS { UL-AttributeModule.aso-asoNBId };
+
+
+aso-asoEntity NAME BINDING
+	SUBORDINATE OBJECT CLASS aso AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS asoEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":communicationsEntityId;
+REGISTERED AS { UL-AttributeModule.aso-asoEntityNBId };
+
+
+asoEntity-applicationProcess NAME BINDING
+	SUBORDINATE OBJECT CLASS asoEntity AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. X.723 | ISO/IEC 10165-5 : 1994":applicationProcess AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":communicationsEntityId;
+REGISTERED AS { UL-AttributeModule.asoEntity-applicationProcessNBId };
+
+
+asoInvocation-apInvocation NAME BINDING
+	SUBORDINATE OBJECT CLASS asoInvocation AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS apInvocation AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":connectionId;
+REGISTERED AS { UL-AttributeModule.asoInvocation-apInvocationNBId };
+
+
+asoInvocation-asoInvocation NAME BINDING
+	SUBORDINATE OBJECT CLASS asoInvocation AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS asoInvocation AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Rec. X.723 | ISO/IEC 10165-5 : 1994":connectionId;
+REGISTERED AS { UL-AttributeModule.asoInvocation-asoInvocationNBId };
+
+--< ASN1.Version 1990,1994 UL-AttributeModule
+--  { joint-iso-ccitt ms(9) smi(3) part8(8) asn1Module(2) 0 } >--
+UL-AttributeModule { joint-iso-ccitt ms(9) smi(3) part8(8) asn1Module(2) 0 }
+DEFINITIONS ::=
+BEGIN
+--EXPORTS everything
+IMPORTS
+RelativeDistinguishedName
+	FROM InformationFramework { joint-iso-ccitt ds(5) modules(1) informationFramework(1) }
+AP-title, Application-context-name, AE-invocation-identifier, AP-invocation-identifier, AE-qualifier, AE-title, ACSE-requirements
+	FROM ACSE-1 { joint-iso-ccitt association-control(2) modules(0) apdus(0) version1(1) }
+Presentation-requirements, Presentation-selector, Context-list, Abstract-syntax-name, Transfer-syntax-name
+	FROM ISO8823-PRESENTATION
+ObjectInstance
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) };
+--value references--
+ulMObjectClass OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) smi(3) part8(8) managedObjectClass(3) }
+ulMoPackage OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) smi(3) part8(8) package(4) }
+ulAttributeID OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) smi(3) part8(8) attribute(7) }
+ulNameBinding OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) smi(3) part8(8) nameBinding(6) }
+acseMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 1 }
+acseAssociationMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 2 }
+apInvocationMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 3 }
+applicationEntityMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 4 }
+applicationEntityInvocationMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 5 }
+applicationSubsystemMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 6 }
+asoMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 7 }
+asoEntityMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 8 }
+asoInvocationMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 9 }
+monoULConnectionMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 10 }
+monoULEntityMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 11 }
+monolithicUpperLayerSubsystemMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 12 }
+pSapMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 13 }
+presentationConnectionMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 14 }
+presentationCopmMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 15 }
+presentationEntityMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 16 }
+presentationSubsystemMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 17 }
+sSapMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 18 }
+sessionConnectionMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 19 }
+sessionCopmMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 20 }
+sessionEntityMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 21 }
+sessionSubsystemMOCId OBJECT IDENTIFIER ::= { ulMObjectClass 22 }
+calledAEtitlePId OBJECT IDENTIFIER ::= { ulMoPackage 1 }
+maxTSDUsizePId OBJECT IDENTIFIER ::= { ulMoPackage 2 }
+abstrSyntaxSupportAId OBJECT IDENTIFIER ::= { ulAttributeID 1 }
+acseEditionsSupportedAId OBJECT IDENTIFIER ::= { ulAttributeID 2 }
+acseFUinUseAId OBJECT IDENTIFIER ::= { ulAttributeID 3 }
+acseFUinitiatorAId OBJECT IDENTIFIER ::= { ulAttributeID 4 }
+acseFUresponderAId OBJECT IDENTIFIER ::= { ulAttributeID 5 }
+aeInvocationIdAId OBJECT IDENTIFIER ::= { ulAttributeID 6 }
+ulAttributeIDAId OBJECT IDENTIFIER ::= { ulAttributeID 7 }
+apInvocationIdAId OBJECT IDENTIFIER ::= { ulAttributeID 8 }
+applContextInUseAId OBJECT IDENTIFIER ::= { ulAttributeID 9 }
+applContextNameSupportAId OBJECT IDENTIFIER ::= { ulAttributeID 10 }
+asoQualifierAId OBJECT IDENTIFIER ::= { ulAttributeID 11 }
+asoTitleAId OBJECT IDENTIFIER ::= { ulAttributeID 12 }
+calledAEtitleAId OBJECT IDENTIFIER ::= { ulAttributeID 13 }
+callingAEtitleAId OBJECT IDENTIFIER ::= { ulAttributeID 14 }
+invocationOfPointerAId OBJECT IDENTIFIER ::= { ulAttributeID 15 }
+maxTSDUsizeAId OBJECT IDENTIFIER ::= { ulAttributeID 16 }
+parentASOinvocAId OBJECT IDENTIFIER ::= { ulAttributeID 17 }
+presContextInUseAId OBJECT IDENTIFIER ::= { ulAttributeID 18 }
+presFUinUseAId OBJECT IDENTIFIER ::= { ulAttributeID 19 }
+presFUsupportAId OBJECT IDENTIFIER ::= { ulAttributeID 20 }
+presSelectorValueAId OBJECT IDENTIFIER ::= { ulAttributeID 21 }
+sessFUinUseAId OBJECT IDENTIFIER ::= { ulAttributeID 22 }
+sessFUsupportAId OBJECT IDENTIFIER ::= { ulAttributeID 23 }
+sessOptSupportAId OBJECT IDENTIFIER ::= { ulAttributeID 24 }
+sessProtInUseAId OBJECT IDENTIFIER ::= { ulAttributeID 25 }
+sessProtVerSupportAId OBJECT IDENTIFIER ::= { ulAttributeID 26 }
+sessionSelectorValueAId OBJECT IDENTIFIER ::= { ulAttributeID 27 }
+supportingServicesAId OBJECT IDENTIFIER ::= { ulAttributeID 28 }
+transfSyntaxSupportAId OBJECT IDENTIFIER ::= { ulAttributeID 29 }
+ap-applicationSubsystemNBId OBJECT IDENTIFIER ::= { ulNameBinding 1 }
+apInvocation-applicationSubsystemNBId OBJECT IDENTIFIER ::= { ulNameBinding 2 }
+aso-asoNBId OBJECT IDENTIFIER ::= { ulNameBinding 3 }
+aso-asoEntityNBId OBJECT IDENTIFIER ::= { ulNameBinding 4 }
+asoEntity-applicationProcessNBId OBJECT IDENTIFIER ::= { ulNameBinding 5 }
+asoInvocation-apInvocationNBId OBJECT IDENTIFIER ::= { ulNameBinding 6 }
+asoInvocation-asoInvocationNBId OBJECT IDENTIFIER ::= { ulNameBinding 7 }
+--Type references--
+AbstrSyntaxSupport ::= SET OF Abstract-syntax-name
+AcseEditionsSupported ::= BIT STRING
+AcseFUs ::= ACSE-requirements-- from amendment 1 to acse protocol
+AeInvocationId ::= AE-invocation-identifier
+ApInvocationId ::= AP-invocation-identifier
+ApInvocation ::= AP-invocation-identifier
+ApplContextInUse ::= Application-context-name
+ApplContextNameSupport ::= SET OF Application-context-name
+AsoInvocId ::= INTEGER-- This should be compatible syntax with AeInvocationId
+ASOId ::= GraphicString
+ASOInvocationId ::= GraphicString
+ASOTitle ::= SEQUENCE {
+	ap-title AP-title,
+	aso-name SEQUENCE OF ASOQualifier }
+ASOQualifier ::= RelativeDistinguishedName--of ASO--
+CallAEtitle ::= AE-title
+LocalAEqualifier ::= AE-qualifier
+MaxTSDUsize ::= INTEGER-- four octets maximum length
+ParentASOinvoc ::= ObjectInstance
+PresContextInUse ::= Context-list-- only one transfer syntax used for each abstract syntax
+PresFUs ::= Presentation-requirements
+PresSelectorValue ::= Presentation-selector
+SessFUs ::= BIT STRING {
+	half-duplex(0),
+	duplex(1),
+	expedited-data(2),
+	minor-synchronize(3),
+	major-synchronize(4),
+	resynchronize(5),
+	activity-management(6),
+	negotiated-release(7),
+	capability-data(8),
+	exceptions(9),
+	typed-data(10) }
+SessionSelectorValue ::= OCTET STRING-- 16 octets max
+SessOptSupport ::= BIT STRING {
+	segmenting(0) }
+SessProtVer ::= BIT STRING {
+	version1(0),
+	version2(1) }
+SupportingServices ::= SET OF ObjectInstance
+TransfSyntaxSupport ::= SET OF Transfer-syntax-name
+END-- of UL-AttributeModule
+
+
+--< GDMO.EndDocument "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000"
+--  { joint-iso-ccitt ms(9) smi(3) part8(8) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":asoEntity
+--@@ |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":applicationEntity
+--@@ |  |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":monoULEntity
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":presentationEntity
+--@@ |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":monoULEntity
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":sessionEntity
+--@@ |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":monoULEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":presentationCopm
+--@@ |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":monoULEntity
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":sessionCopm
+--@@ |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":monoULEntity
+--@@ +- itut_x723::sap1
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":pSap
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":sSap
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":applicationEntityInvocation
+--@@ |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":monoULConnection
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":presentationConnection
+--@@ |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":monoULConnection
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":sessionConnection
+--@@ |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":monoULConnection
+--@@ +- itut_x723::subsystem
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":applicationSubsystem
+--@@ |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":monolithicUpperLayerSubsytem
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":presentationSubsystem
+--@@ |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":monolithicUpperLayerSubsytem
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":sessionSubsystem
+--@@ |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":monolithicUpperLayerSubsytem
+--@@ +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":apInvocation
+--@@ +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":aso
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":aCSE
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":asoEntity
+--@@ |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":applicationEntity
+--@@ |  |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":monoULEntity
+--@@ +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":asoInvocation
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":acseAssociation
+--@@ |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":applicationEntityInvocation
+--@@ |  |  +- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":monoULConnection
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ |  >- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":asoEntity
+--@@ |  |  >- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":aso
+--@@ |  |  |  >- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":aso
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":applicationSubsystem
+--@@ >- itut_x723::applicationProcess +++
+--@@ >- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":apInvocation
+--@@ |  >- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":asoInvocation
+--@@ |  |  >- "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000":asoInvocation
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

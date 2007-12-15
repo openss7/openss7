@@ -1,0 +1,3905 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 19:26:13 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Include "Q.822.gdmo" >--
+--< GDMO.Include "Q.824.0.gdmo" >--
+--< GDMO.Document "ITU-T Rec. Q.836.1 (02/2000)"
+--  { itu-t(0) recommendation(0) q(17) inmod(1831) informationModel(0) } >--
+--< GDMO.Namespace itut_q836_1 >--
+MODULE "ITU-T Rec. Q.836.1 (02/2000)" { itu-t(0) recommendation(0) q(17) inmod(1831) informationModel(0) }
+-- 7 Managed Object Class Definitions
+-- 7.1 IN Authorization
+
+inAuthorization MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		inAuthorizationPackage PACKAGE
+			BEHAVIOUR
+				inAuthorizationBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is used to support IN features offered to customers from 
+						remote exchanges. The inAuthorization managed object is associated with trunk- 
+						or office-based triggers to identify the customers who have access to the IN 
+						capabilities.";;
+			ATTRIBUTES
+				inAuthorizationId GET;;;
+REGISTERED AS { inSSFManagedObjectClass 101 };
+
+
+inAuthorizationOriginating MANAGED OBJECT CLASS
+	DERIVED FROM
+		inAuthorization;
+	CHARACTERIZED BY
+		inAuthorizationOriginatingPackage PACKAGE
+			BEHAVIOUR
+				inAuthorizationOriginatingBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is used to authorize the use of originating triggers or 
+						trigger bases by individual customers. This managed object class may only be 
+						associated with originating side triggers or trigger bases.
+
+						This object is only used to associate triggers to customers in remote exchanges. 
+						For line based (customer profile based) triggers the association to a particular 
+						directory number is established via the trigger criteria in the appropriate 
+						trigger object.";;
+			ATTRIBUTES
+				authenticationCode SET-BY-CREATE,-- Replaceable but not readable.
+				callingPartyNumberList GET-REPLACE ADD-REMOVE;;;
+REGISTERED AS { inSSFManagedObjectClass 102 };
+
+
+inAuthorizationTerminating MANAGED OBJECT CLASS
+	DERIVED FROM
+		inAuthorization;
+	CHARACTERIZED BY
+		inAuthorizationTerminatingPackage PACKAGE
+			BEHAVIOUR
+				inAuthorizationTerminatingBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is used to authorize the use of terminating triggers or 
+						trigger bases by individual customers. This managed object class may only be 
+						associated with terminating side triggers or trigger bases.
+
+						This object is only used to associate triggers to customers in remote exchanges. 
+						For line-based (customer profile based) triggers the association to a particular 
+						directory number is established via the trigger criteria in the appropriate 
+						trigger object.";;
+			ATTRIBUTES
+				calledPartyNumberList GET-REPLACE ADD-REMOVE;;;
+REGISTERED AS { inSSFManagedObjectClass 61 };
+-- 7.2 Basic Call State Model (BCSM)
+
+
+bcsm MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		bcsmPackage PACKAGE
+			BEHAVIOUR
+				bcsmBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class represents the basic call processing capability.";;
+			ATTRIBUTES
+				bcsmId GET,
+				version GET SET-BY-CREATE;;;
+REGISTERED AS { inSSFManagedObjectClass 62 };
+-- 7.3 Trigger Detection Point (TDP)
+
+
+tdp MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		tdpPackage PACKAGE
+			BEHAVIOUR
+				tdpBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a non-instantiable superclass for trigger point objects. 
+						Trigger point objects serve as launch points for the invocation of IN features. 
+						The tdpId attribute is used as the RDN for naming.
+
+						TDPs may be of one of two types: 'request' (which request that a control 
+						relation be established between the SCF and SSF and an operation may need to be 
+						performed at the SCF, the SSF may need to wait before continuing call 
+						processing) and a 'notification' (which does not result in the establishment of 
+						a control relation).
+
+						The triggerAssociation attribute identifies the trigger base associated with 
+						that trigger.
+
+						The inEscape attribute defines a set of conditions that will cause escape from 
+						IN feature invocation and result in normal call processing.
+
+						The congestionAction attribute defines the action to be taken when the SCF is 
+						overloaded and IN service requests cannot be processed in a timely manner. 
+						Possible actions are termination of the call, playing of an announcement with 
+						subsequent termination or playing announcement with user option of continuing 
+						the call.
+
+						The serviceKey attribute defines which IN service will be activated in response 
+						to this trigger.
+
+						The administrative attribute may be used to administratively lock a trigger; 
+						this results in the trigger becoming inactive. Only the locked and unlocked 
+						state values are used (shutting-down is not meaningful in this context).";;
+			ATTRIBUTES
+				tdpId GET,
+				tdpMode GET-REPLACE,
+				triggerAssociation GET-REPLACE,
+				inEscape GET-REPLACE,
+				congestionAction GET-REPLACE,
+				serviceKey GET-REPLACE,
+				"ITU-T Rec. X.735":administrativeState GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 63 };
+-- 7.4 Originating Attempt Authorized Trigger
+
+
+oAttemptAuthorized MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		oAttemptAuthorizedPackage PACKAGE
+			BEHAVIOUR
+				oAttemptAuthorizedBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call O_NULL & Authorize_Origination_Attempt when a seizure event was 
+						accepted. Triggering may be unconditional or dependent on trigger criteria.
+
+						The attribute tdp1Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp1Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. For 
+						trunk-based triggers only callingPartyNumber and bearerCapability are allowed.
+
+						For subscriber- (customer profile) based triggers only classOfService is 
+						allowed.";;
+			ATTRIBUTES
+				tdp1Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 1 };
+-- 7.5 Collected Information Trigger
+
+
+collectedInfoTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		collectedInfoPackage PACKAGE
+			BEHAVIOUR
+				collectedInfoBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call collect Information as dialled digits are received. Triggering 
+						might be unconditional or dependent on trigger criteria.
+
+						The attribute tdp2Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp2Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp2Criteria construct include: calledPartyNumber, 
+						callingPartyNumber, digitString and stringLength.";;
+			ATTRIBUTES
+				tdp2Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 2 };
+-- 7.6 Analysed Information Trigger
+
+
+analysedInfoTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		analysedInfoPackage PACKAGE
+			BEHAVIOUR
+				analysedInfoBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call Analyse Information when the exchange analyses the received 
+						digits. Triggering may be unconditional or dependent on trigger criteria.
+
+						The attribute tdp3Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp3Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp3Criteria construct include: calledPartyNumber, 
+						callingPartyNumber, natureOfAddress, digitString, stringLength, 
+						facilityInformation and featureActivation.";;
+			ATTRIBUTES
+				tdp3Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 3 };
+-- 7.7 Route Select Failure Trigger
+
+
+routeSelectFailureTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		routeSelectFailurePackage PACKAGE
+			BEHAVIOUR
+				routeSelectFailureBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call Routing_&_Alerting when the call fails due to a route select 
+						failure. Triggering may be unconditional or dependent on trigger criteria.
+
+						The attribute tdp4Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp4Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp4Criteria construct include: cause, callingPartyNumber, and 
+						featureActivation.";;
+			ATTRIBUTES
+				tdp4Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 4 };
+-- 7.8 Originating Called Party Busy Trigger
+
+
+oCalledPartyBusyTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		oCalledPartyBusyPackage PACKAGE
+			BEHAVIOUR
+				oCalledPartyBusyBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call Routing_&_Alerting when the call encounters a busy condition. 
+						Triggering may be unconditional or dependent on trigger criteria.
+
+						The attribute tdp5Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp5Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp5Criteria construct include: cause and featureActivation.";;
+			ATTRIBUTES
+				tdp5Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 5 };
+-- 7.9 Originating No Answer Trigger
+
+
+oNoAnswerTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		oNoAnswerPackage PACKAGE
+			BEHAVIOUR
+				oNoAnswerBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call Routing_&_Alerting when the call encounters a no-answer condition. 
+						Triggering may be unconditional or dependent on trigger criteria.
+
+						The attribute tdp6Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp6Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp6Criteria construct include: cause and featureActivation.";;
+			ATTRIBUTES
+				tdp6Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 6 };
+-- 7.10 Originating Answer Trigger
+
+
+oAnswerTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		oAnswerPackage PACKAGE
+			BEHAVIOUR
+				oAnswerBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call O_Active when the call is answered. Triggering may be 
+						unconditional or dependent on trigger criteria.
+
+						The attribute tdp7Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp7Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp7Criteria construct include: facilityInformation and 
+						featureActivation.";;
+			ATTRIBUTES
+				tdp7Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 7 };
+-- 7.11 Originating Mid Call Trigger
+
+
+oMidCallTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		oMidCallPackage PACKAGE
+			BEHAVIOUR
+				oMidCallBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call O_Active when feature activation is invoked in the active state of 
+						the call. Triggering may be unconditional or dependent on trigger criteria.
+
+						The attribute tdp8Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp8Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp8Criteria construct include: facilityInformation and 
+						featureActivation.";;
+			ATTRIBUTES
+				tdp8Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 8 };
+-- 7.12 Originating Disconnect Trigger
+
+
+oDisconnectTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		oDisconnectPackage PACKAGE
+			BEHAVIOUR
+				oDisconnectBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call O_Active when a disconnect occurs. Triggering may be unconditional 
+						or dependent on trigger criteria.
+
+						The attribute tdp9Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp9Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp9Criteria construct include: cause and featureActivation.";;
+			ATTRIBUTES
+				tdp9Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 9 };
+-- 7.13 Originating Abandon Trigger
+
+
+oAbandonTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		oAbandonPackage PACKAGE
+			BEHAVIOUR
+				oAbandonBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						points in call when a call abandon occurs. Triggering may be unconditional or 
+						dependent on trigger criteria.
+
+						The attribute tdp10Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp10Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp10Criteria construct include: cause and featureActivation.";;
+			ATTRIBUTES
+				tdp10Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 10 };
+-- 7.14 Terminating Attempt Authorized Trigger
+
+
+tAttemptAuthorized MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		tAttemptAuthorizedPackage PACKAGE
+			BEHAVIOUR
+				tAttemptAuthorizedBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call T_NULL & Authorize_Termination_Attempt when a seizure event was 
+						accepted. Triggering may be unconditional or dependent on trigger criteria.
+
+						The attribute tdp12Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp12Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp12Criteria construct include: callingPartyNumber and 
+						featureActivation.";;
+			ATTRIBUTES
+				tdp12Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 12 };
+-- 7.15 Terminating Called Party Busy Trigger
+
+
+tCalledPartyBusyTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		tCalledPartyBusyPackage PACKAGE
+			BEHAVIOUR
+				tCalledPartyBusyBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call Select_Facility_&_Present_Call when the call encounters a busy 
+						condition. Triggering may be unconditional or dependent on trigger criteria.
+
+						The attribute tdp13Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp13Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp13Criteria construct include: cause, callingPartyNumber and 
+						featureActivation.";;
+			ATTRIBUTES
+				tdp13Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 13 };
+-- 7.16 Terminating No Answer Trigger
+
+
+tNoAnswerTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		tNoAnswerPackage PACKAGE
+			BEHAVIOUR
+				tNoAnswerBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call Select_Facility_&_Present_Call when the call encounters a 
+						no-answer condition. Triggering may be unconditional or dependent on trigger 
+						criteria.
+
+						The attribute tdp14Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp14Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp14Criteria construct include: cause, callingPartyNumber and 
+						featureActivation.";;
+			ATTRIBUTES
+				tdp14Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 14 };
+-- 7.17 Terminating Answer Trigger
+
+
+tAnswerTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		tAnswerPackage PACKAGE
+			BEHAVIOUR
+				tAnswerBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call T_Active when the call is answered. Triggering may be 
+						unconditional or dependent on trigger criteria.
+
+						The attribute tdp15Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp15Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp15Criteria construct include: facilityInformation and 
+						featureActivation.";;
+			ATTRIBUTES
+				tdp15Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 15 };
+-- 7.18 Terminating Mid Call Trigger
+
+
+tMidCallTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		oMidCallPackage PACKAGE
+			BEHAVIOUR
+				tMidCallBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call T_Active when feature activation is invoked in the active state of 
+						the call. Triggering may be unconditional or dependent on trigger criteria.
+
+						The attribute tdp16Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp16Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp16Criteria construct include: facilityInformation and 
+						featureActivation.";;
+			ATTRIBUTES
+				tdp16Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 16 };
+-- 7.19 Terminating Disconnect Trigger
+
+
+tDisconnectTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		tDisconnectPackage PACKAGE
+			BEHAVIOUR
+				tDisconnectBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						point in call T_Active when a disconnect occurs. Triggering may be unconditional 
+						or dependent on trigger criteria.
+
+						The attribute tdp17Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp17Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp17Criteria construct include: cause and featureActivation.";;
+			ATTRIBUTES
+				tdp17Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 17 };
+-- 7.20 Terminating Abandon Trigger
+
+
+tAbandonTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		tdp;
+	CHARACTERIZED BY
+		tAbandonPackage PACKAGE
+			BEHAVIOUR
+				tAbandonBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is a subclass of tdp. It is used to trigger IN control at 
+						points in call when a call abandon occurs. Triggering may be unconditional or 
+						dependent on trigger criteria.
+
+						The attribute tdp18Criteria indicates whether the trigger is conditional or 
+						unconditional. If the trigger is conditional, the tdp18Criteria attribute 
+						contains the logical expression that specifies the applicable criteria. Valid 
+						parameters in the tdp18Criteria construct include: cause and featureActivation.";;
+			ATTRIBUTES
+				tdp18Criteria GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 18 };
+-- 7.21 Trigger Base
+
+
+triggerBase MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		triggerBasePackage PACKAGE
+			BEHAVIOUR
+				triggerBaseBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is used to define an association between a set of triggers and 
+						the scope of these triggers, e.g. Originating Line, Terminating Line, 
+						Originating Trunk, Terminating Trunk, Private Facility, Office (Analysed Info 
+						Base).
+
+						The triggerBaseId attribute is used for naming.
+
+						The associatedObject attribute is a pointer to the object instance with which 
+						the trigger base is associated. The basePriority attribute allows specification 
+						of which triggerList will be active when several would apply simultaneously to a 
+						call.
+
+						The trigger list is a prioritized list of trigger objects that will apply to a 
+						call. The triggers that may be contained in this list will be constrained by the 
+						behaviour of subclasses of this object class.
+
+						The administrative attribute may be used to administratively lock a 
+						trigger-base; this results in the triggerbase becoming inactive, thereby 
+						deactivating all triggers associated with that base. Only the locked and 
+						unlocked state values are used (shutting-down is not meaningful in this 
+						context).";;
+			ATTRIBUTES
+				triggerBaseId GET,
+				associatedObject GET SET-BY-CREATE,
+				basePriority GET-REPLACE,
+				triggerList GET-REPLACE ADD-REMOVE,
+				"ITU-T Rec. X.735":administrativeState GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 21 };
+-- 7.22 Originating Line Trigger Base
+
+
+olineTriggerBase MANAGED OBJECT CLASS
+	DERIVED FROM
+		triggerBase;
+	CHARACTERIZED BY
+		olineTriggerBasePackage PACKAGE
+			BEHAVIOUR
+				olineTriggerBaseBehaviour BEHAVIOUR
+					DEFINED AS
+						"The triggerList attribute of this object class is constrained to triggers of 
+						type (see Rec. Q.1241) 1,2,3,4,5,6 and 8.";;;;
+REGISTERED AS { inSSFManagedObjectClass 22 };
+-- 7.23 Originating Trunk Trigger Base
+
+
+otrunkTriggerBase MANAGED OBJECT CLASS
+	DERIVED FROM
+		triggerBase;
+	CHARACTERIZED BY
+		otrunkTriggerBasePackage PACKAGE
+			BEHAVIOUR
+				otrunkTriggerBehaviour BEHAVIOUR
+					DEFINED AS
+						"The triggerList attribute of this object class is constrained to triggers of 
+						type (see Rec. Q.1241) 1,2,3,4,5,6 and 8.";;;;
+REGISTERED AS { inSSFManagedObjectClass 23 };
+-- 7.24 Terminating Line Trigger Base
+
+
+tlineTriggerBase MANAGED OBJECT CLASS
+	DERIVED FROM
+		triggerBase;
+	CHARACTERIZED BY
+		tlineTriggerBasePackage PACKAGE
+			BEHAVIOUR
+				tlineTriggerBaseBehaviour BEHAVIOUR
+					DEFINED AS
+						"The triggerList attribute of this object class is constrained to triggers of 
+						type (see Rec. Q.1241) 12,13,14 and 16.";;;;
+REGISTERED AS { inSSFManagedObjectClass 24 };
+-- 7.25 Terminating Trunk Trigger Base
+
+
+ttrunkTriggerBase MANAGED OBJECT CLASS
+	DERIVED FROM
+		triggerBase;
+	CHARACTERIZED BY
+		ttrunkTriggerBasePackage PACKAGE
+			BEHAVIOUR
+				ttrunkTriggerBaseBehaviour BEHAVIOUR
+					DEFINED AS
+						"The triggerList attribute of this object class is constrained to triggers of 
+						type (see Rec. Q.1241) 12,13,14 and 16.";;;;
+REGISTERED AS { inSSFManagedObjectClass 25 };
+-- 7.26 Private Facility Trigger Base
+
+
+privateFacilityTriggerBase MANAGED OBJECT CLASS
+	DERIVED FROM
+		triggerBase;
+	CHARACTERIZED BY
+		privateFacilityBasePackage PACKAGE
+			BEHAVIOUR
+				privateFacilityBaseBehaviour BEHAVIOUR
+					DEFINED AS
+						"The triggerList attribute of this object class may contain triggers of any type 
+						(see Rec. Q.1241).";;;;
+REGISTERED AS { inSSFManagedObjectClass 26 };
+-- 7.27 Office Trigger Base
+
+
+officeTriggerBase MANAGED OBJECT CLASS
+	DERIVED FROM
+		triggerBase;
+	CHARACTERIZED BY
+		officeTriggerBasePackage PACKAGE
+			BEHAVIOUR
+				officeTriggerBaseBehaviour BEHAVIOUR
+					DEFINED AS
+						"The triggerList attribute of this object class may contain triggers of type (see 
+						Rec. Q.1241) 3-18.";;;;
+REGISTERED AS { inSSFManagedObjectClass 27 };
+-- 7.28 IN Call Gap
+
+
+inCallGap MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		inCallGapPackage PACKAGE
+			BEHAVIOUR
+				inCallGapBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class defines the OSF defined call gapping criteria.
+
+						The inCallGapId attribute is used as the RDN for naming.
+
+						The gapCriteria attribute allows configuring criteria for the calls to be 
+						gapped. Calls may be gapped for
+
+						particular destinations, particular services or both.
+
+						The gapDuration attribute specifies the time interval for which gapping is 
+						active.
+
+						The gapInterval attribute specifies the minimum inter-arrival time between calls 
+						that will be passed.
+
+						The controlType attribute indicates how call gapping was activated. Call gapping 
+						may be activated by the SCP or the OSF.
+
+						The gapTreatment attribute specifies the treatment to be given to calls that 
+						have been gapped.
+
+						The administrative attribute may be used to administratively lock a inCallGap 
+						object.";;
+			ATTRIBUTES
+				inCallGapId GET,
+				gapCriteria GET-REPLACE,
+				gapDuration GET-REPLACE,
+				gapInterval GET-REPLACE,
+				controlType GET-REPLACE,
+				gapTreatment GET-REPLACE,
+				"ITU-T Rec. X.735":administrativeState GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 28 };
+-- 7.29 Service Filtering
+
+
+serviceFiltering MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		serviceFilteringPackage PACKAGE
+			BEHAVIOUR
+				serviceFilteringBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class is used to specify how IN calls are to be filtered. It 
+						contains the criteria for filtering and specifies the treatment of filtered 
+						calls.
+
+						The object is created by the SSF as a result of the receipt of an 
+						activateServiceFiltering operation from the SCF.
+
+						- If the filteringCriteria attribute in the received operation has the value 
+						  serviceKey, the filtering will be activated for that particular service and 
+						  the serviceFiltering object will be associated with that particular service.
+
+						- If the filteringCriteria attribute in the received operation has the value 
+						  dialledNumber or callingPartyNumber, the filtering will be activated for the 
+						  particular services associated with the calling party or dialled number.
+
+						The SCF specifies that the network-dependent default duration is to be used by 
+						setting the attribute duration to '-2'.
+
+						This object instance is automatically deleted when the stopTime is reached or 
+						when duration expires. Prior to deletion, the objectId, filteringCriteria and 
+						the countersValues are passed to the INAP ASE to be used in the INAP 
+						serviceFilteringResponse operation.
+
+						The serviceFilterId attribute is used as the RDN for naming.
+
+						The startTime attribute specifies the time at which service filtering will be or 
+						is started.
+
+						The stopTime attribute specifies the time at which service filtering will be 
+						stopped. If the incoming message specified a duration, the stop time is derived 
+						by adding the duration to the start time. If default timing was specified in the 
+						incoming request the stopTime will be set at the time this object instance is 
+						created by adding the default duration (specified in the 
+						serviceFilteringDefaultDuration object) to the specified start time.
+
+						NOTE This implies that changes to the default duration made subsequent to 
+						creation of this object instance will have no effect on the stopTime.
+
+						The releaseCause specifies the release cause to be used for filtered calls.
+
+						The billingChargingCharacteristics attribute specifies the charging to be 
+						applied to filtered calls.
+
+						The filteredCallTreatment attribute specifies the treatment to be given to calls 
+						that have been filtered, e.g. inBandInfo, tone, etc.";;
+			ATTRIBUTES
+				serviceFilterId GET,
+				startTime GET,
+				stopTime GET,
+				releaseCause GET,
+				billingChargingCharacteristics GET,
+				filteredCallTreatment GET;;;
+	CONDITIONAL PACKAGES
+		timeBasedFilteringPackage PACKAGE
+			BEHAVIOUR
+				timeBasedFilteringPackageBhvr BEHAVIOUR
+					DEFINED AS
+						"This package specifies that all calls an interval of at least 'interval' must 
+						pass between calls that invoke SCF service logic";;
+			ATTRIBUTES
+				interval GET-REPLACE;
+		REGISTERED AS { inSSFPackage 1 };
+			PRESENT IF
+				"the incoming activateServiceFiltering message specified time based filtering",
+		countBasedFilteringPackage PACKAGE
+			BEHAVIOUR
+				countBasedFilteringPackageBhvr BEHAVIOUR
+					DEFINED AS
+						"This package specifies that only every nth call will be sent to the SFC where N 
+						is numberOfCalls + 1";;
+			ATTRIBUTES
+				numberOfCalls GET-REPLACE;
+		REGISTERED AS { inSSFPackage 2 };
+			PRESENT IF
+				"the incoming activateServiceFiltering message specified time based filtering",
+		countersPackage PACKAGE
+			BEHAVIOUR
+				countersPackageBhvr BEHAVIOUR
+					DEFINED AS
+						"This package specifies the maximum number of counters to be used and provides 
+						pointers to the counters used";;
+			ATTRIBUTES
+				maximumNumberofCounters GET,
+				counterPointerList GET;
+		REGISTERED AS { inSSFPackage 3 };
+			PRESENT IF
+				"the incoming activateServiceFiltering message specified the use of counters";
+REGISTERED AS { inSSFManagedObjectClass 29 };
+-- 7.30 Service Filtering Counter
+
+
+serviceFilteringCounter MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		serviceFilteringCounterPackage PACKAGE
+			BEHAVIOUR
+				serviceFilteringCounterBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object counts calls that have been subjected to service filtering. The 
+						counterValue attribute contains the count and is automatically reset whenever 
+						the SSF sends a serviceFilteringResponse for that service filter.
+
+						The associatedServiceFilter attribute points to the serviceFilter for which this 
+						counter is active.";;
+			ATTRIBUTES
+				serviceFilteringCounterId GET,
+				counterValue GET,
+				associatedServiceFilter GET;;;
+REGISTERED AS { inSSFManagedObjectClass 30 };
+-- NOTE  Do we need to model how counters are used. I.e. what causes one or another counter to be incremented.
+-- 7.31 Service Filtering Duration Default
+
+
+serviceFilteringDurationDefault MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		serviceFilteringDurationDefaultPackage PACKAGE
+			BEHAVIOUR
+				serviceFilteringDurationDefaultBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class stores the default duration to be used for service filtering. 
+						This value is stored in the interval attribute.";;
+			ATTRIBUTES
+				serviceFilteringDurationDefaultId GET,
+				interval GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 31 };
+-- 7.32 Initiate Call Default Information
+
+
+initiateCallDefaultInformation MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		initiateCallDefaultInformationPackage PACKAGE
+			BEHAVIOUR
+				initiateCallDefaultInformationBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class stores the default information to be used in setting up a call 
+						when the SCF provides incomplete call-setup information in the 
+						initiateCallAttempt operation.";;
+			ATTRIBUTES
+				initiateCallDefaultInformationId GET,
+				callingPartyNumber GET-REPLACE,
+				callingPartyCategory GET-REPLACE,
+				forwardCallIndicators GET-REPLACE,
+				natureOfConnectionIndicator GET-REPLACE,
+				bearerService GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 32 };
+-- 7.33 INAP Counter
+
+
+iNAPCounter MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		iNAPCounterPackage PACKAGE
+			BEHAVIOUR
+				iNAPCounterBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class provides the capability for counting particular events that 
+						occur in association with the use of INAP.
+
+						The attribute observedEventId specifies the semantics of the events counted by 
+						this particular counter. This value cannot be changed after the counter has been 
+						instantiated.
+
+						The attribute observedSCFAccessList identifies the SCF accesses that are being 
+						observed by this counter.
+
+						The attribute count contains the number of times the event has occurred since 
+						the last time the counter was zeroed."
+						--NOTE  Do we want to allow resets?
+						;;
+			ATTRIBUTES
+				iNAPCounterId GET,
+				observedEventId GET SET-BY-CREATE,
+				observedSCFAccessList GET SET-BY-CREATE,
+				administrativeState GET-REPLACE,
+				count GET SET-BY-CREATE;;;
+REGISTERED AS { inSSFManagedObjectClass 33 };
+-- 7.34 Service Feature Control
+
+
+serviceFeatureControl MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		servicefeatureControlPackage PACKAGE
+			BEHAVIOUR
+				servicefeatureControlBehaviour BEHAVIOUR
+					DEFINED AS
+						"The serviceFeatureControl managed object represents the capability of 
+						controlling an IN service.
+
+						The serviceFeatureControlId Attribute is used as the RDN.
+
+						The serviceKey attribute identifies the service to be invoked.
+
+						The administrativeState indicates whether the IN service has been 
+						administratively disabled.
+
+						The defaultCharging attribute specifies how charging is to be applied if no 
+						instructions are received from the SCF.
+
+						The chargingProfile attribute specifies the type of record to be generated if 
+						this is not clear from the context of the call or from the instructions received 
+						from the SCF.
+
+						The iNAPASE attribute identifies the INAP ASE to be associated with that 
+						service.
+
+						The sCFAccessPointer attribute identifies the sCFAccess to which INAP messages 
+						for this service are to be sent.
+
+						The processingInstructions attribute specifies the default values for feature 
+						control, e.g. that IN-IN interworking is not allowed.
+
+						The exceptionHandling attribute specifies the actions to be taken by the SSF if 
+						invocation of the IN service logic fails.";;
+			ATTRIBUTES
+				serviceFeatureControlId GET,
+				serviceKey GET-REPLACE,
+				administrativeState GET-REPLACE,
+				defaultCharging GET-REPLACE,
+				chargingProfile GET-REPLACE,
+				iNAPASE GET-REPLACE,
+				sCFAccessPointer GET-REPLACE,
+				processingInstructions GET-REPLACE,
+				routeListMapping GET-REPLACE,
+				exceptionHandling GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 34 };
+-- 7.35 SCF Access
+
+
+scfAccess MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		scfAccessPackage PACKAGE
+			BEHAVIOUR
+				scfAccessBehaviour BEHAVIOUR
+					DEFINED AS
+						"The scfAccess managed object identifies the SCF access to be used for particular 
+						services and is used as a single point of reference for data items used for IN 
+						service control. The scfAccessId Attribute is used as the RDN.";;
+			ATTRIBUTES
+				scfAccessId GET;;;
+REGISTERED AS { inSSFManagedObjectClass 35 };
+-- 7.36 SCF Access Point Code Based
+
+
+scfAccessPointCodeBased MANAGED OBJECT CLASS
+	DERIVED FROM
+		scfAccess;
+	CHARACTERIZED BY
+		scfAccessPointCodeBasedPackage PACKAGE
+			BEHAVIOUR
+				scfAccessPointCodeBasedBehaviour BEHAVIOUR
+					DEFINED AS
+						"The scfAccessPointCodeBased managed object identifies the SCF access by means of 
+						point codes.
+
+						The dPCPointer attribute points to an object of class mtpSignPoint that 
+						identifies the destination point code to be used.
+
+						The oPCPointer attribute points to an object of class mtpSignPoint that 
+						identifies the origination point code to be used.
+
+						The sSIDPointer attribute points to an object of class sccpAccessPoint that 
+						identifies the subsystem id to be used.";;
+			ATTRIBUTES
+				dPCPointer GET-REPLACE,
+				oPCPointer GET-REPLACE,
+				sSIDPointer GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 36 };
+-- 7.37 SCF Global Title Based
+
+
+scfAccessGlobalTitleBased MANAGED OBJECT CLASS
+	DERIVED FROM
+		scfAccess;
+	CHARACTERIZED BY
+		scfAccessGlobalTitleBasedPackage PACKAGE
+			BEHAVIOUR
+				scfAccessGlobalTitleBasedBehaviour BEHAVIOUR
+					DEFINED AS
+						"The scfAccessPointCodeBased managed object identifies the SCF access by means of 
+						point codes.
+
+						The globalTitleRulePtr attribute points to an object of class gtRule.
+
+						The sCPAddress attribute
+
+						The sSIDPointer attribute points to an object of class sccpAccessPoint that 
+						identifies the subsystem id to be used.";;
+			ATTRIBUTES
+				globalTitleRulePtr GET-REPLACE,
+				sCPAddress GET-REPLACE,
+				sSIDPointer GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 37 };
+-- 7.38 IP Configuration
+
+
+iPConfiguration MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		iPConfigurationPackage PACKAGE
+			BEHAVIOUR
+				scfAccessGlobalTitleBasedBehaviour BEHAVIOUR
+					DEFINED AS
+						"The iPConfigurationId managed object specifies the capabilities of an IP and its 
+						availability.
+
+						The iPConfigurationId is used in forming the RDN.
+
+						The operationalState attribute specifies whether the IP is enabled.
+
+						The administrativeState specifies whether the IP is locked or unlocked.
+
+						The iPCapabilityList attribute describes the functional capabilities of the IP; 
+						e.g. tone generation, speech synthesis, etc.";;
+			ATTRIBUTES
+				iPConfigurationId GET,
+				"Recommendation X.721 : 1992":administrativeState GET-REPLACE,
+				"Recommendation X.721 : 1992":operationalState GET-REPLACE,
+				iPCapabilityList GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 38 };
+-- 7.39 Assist Treatment Configuration
+
+
+assistTreatmentConfiguration MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		assistTreatmentConfigurationPackage PACKAGE
+			BEHAVIOUR
+				assistTreatmentConfigurationBehaviour BEHAVIOUR
+					DEFINED AS
+						"The assistTreatmentConfiguration managed object the way in which the assisting 
+						SSF should determine how to manipulate information to be sent in the 
+						assistRequestInstruction (ARI) message and the SCF access to which the ARI is to 
+						be sent.
+
+						The assistTreatmentConfigurationId is used in forming the RDN.
+
+						The digitStringToCorrelationIdMapping attribute specifies how to map the 
+						received digit string to the correlationId to be used in the ARI message so that 
+						the SCF can correlate the ARI with its ETC (establishTemporaryConnection) 
+						message.
+
+						The digitStringToScfIdMapping specifies the mapping from the received 
+						digitString to the sCFId so that the SSF can identify the SCP with which it has 
+						to communicate in order to receive assist instructions.
+
+						The sCFAccessPtr attribute identifies the sCFAccess to be used for communicating 
+						with the previously identified SCP.";;
+			ATTRIBUTES
+				assistTreatmentConfigurationId GET,
+				digitStringToCorrelationIdMapping GET-REPLACE,
+				digitStringToScfIdMapping GET-REPLACE,
+				sCFAccessPtr GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 39 };
+-- 7.40 Ported Number Trigger
+
+
+portedNumberTrigger MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		portedNumberTriggerPackage PACKAGE
+			BEHAVIOUR
+				portedNumberTriggerBehaviour BEHAVIOUR
+					DEFINED AS
+						"The portedNumberTrigger managed object specifies the length of the dialled 
+						digits string on which the decision to check for a ported number is made.";;
+			ATTRIBUTES
+				portedNumberTriggerId GET SET-BY-CREATE,
+				serviceKey GET SET-BY-CREATE,
+				dialledDigitLength GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 40 };
+-- 7.41 Ported Number List
+
+
+portedNumberList MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		portedNumberListPackage PACKAGE
+			BEHAVIOUR
+				portedNumberListBehaviour BEHAVIOUR
+					DEFINED AS
+						"The portedNumberList managed object specifies the list of dialled digits of the 
+						terminating address for which the exchange has to check for additional routing 
+						information.";;
+			ATTRIBUTES
+				portedNumberListId GET SET-BY-CREATE,
+				terminatingDialDigitsList GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 41 };
+-- 7.42 INAP Current Data
+
+
+iNAPCurrentData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation Q.822":currentData;
+	CHARACTERIZED BY
+		iNAPCurrentDataPackage PACKAGE
+			BEHAVIOUR
+				iNAPCurrentDataBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class provides the capability for counting particular events that 
+						occur in a given time period in association with the use of INAP. Also, the 
+						threshold attribute allows thresholding of the count during the time interval. 
+						If the threshold is exceeded, a notification is emitted. Detailed behavioural 
+						description is found in the superclass definition.
+
+						The attribute observedEventId specifies the semantics of the events counted by 
+						this particular object.
+
+						The attribute observedSCFAccessList identifies the SCF accesses that are being 
+						observed by this object.
+
+						The attribute count contains the number of times the event has occurred during 
+						the time interval.";;
+			ATTRIBUTES
+				observedEventId GET SET-BY-CREATE,
+				observedSCFAccessList GET SET-BY-CREATE,
+				count GET;;;
+REGISTERED AS { inSSFManagedObjectClass 42 };
+-- 7.43 INAP History Data
+
+
+iNAPHistoryData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation Q.822":historyData;
+	CHARACTERIZED BY
+		iNAPHistoryDataPackage PACKAGE
+			BEHAVIOUR
+				iNAPHistoryDataBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class provides the capability for storing the content of previous 
+						iNAPCurrentData. objectsDetailed behavioural description is found in the 
+						superclass definition.
+
+						The attribute observedEventId specifies the semantics of the events counted by 
+						this particular object.
+
+						The attribute observedSCFAccessList identifies the SCF accesses that are being 
+						observed by this object.
+
+						The attribute count contains the number of times the event has occurred during 
+						the time interval.";;
+			ATTRIBUTES
+				observedEventId GET SET-BY-CREATE,
+				observedSCFAccessList GET SET-BY-CREATE,
+				count GET;;;
+REGISTERED AS { inSSFManagedObjectClass 43 };
+-- 7.44 Default Charging
+
+
+defaultCharging MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721":top;
+	CHARACTERIZED BY
+		defaultChargingPackage PACKAGE
+			BEHAVIOUR
+				defaultChargingBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class defines the default action to be taken if no specific charging 
+						information is supplied for the IN call. The default action may be service 
+						dependent.";;
+			ATTRIBUTES
+				defaultChargingId GET SET-BY-CREATE,
+				defaultChargingAction GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 44 };
+-- 7.45 Exception Handler
+
+
+exceptionHandler MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721":top;
+	CHARACTERIZED BY
+		exceptionHandlerPackage PACKAGE
+			BEHAVIOUR
+				exceptionHandlerBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class defines the action to be taken by the SSF as default treatment 
+						when an error occurs in call processing.";;
+			ATTRIBUTES
+				exceptionHandlerId GET SET-BY-CREATE,
+				missingCustomerRecordException GET-REPLACE,
+				missingParameterException GET-REPLACE,
+				systemFailureException GET-REPLACE,
+				taskRefusedException GET-REPLACE,
+				unexpectedValueException GET-REPLACE,
+				unexpectedparameterException GET-REPLACE,
+				unexpectedValueException GET-REPLACE,
+				unexpectedComponentSequenceException GET-REPLACE;
+			NOTIFICATIONS
+				callProcessingException;;;
+REGISTERED AS { inSSFManagedObjectClass 45 };
+-- [NOTE  Do we want OA&M alarms generated by this]
+-- 7.46 SSF Timer
+
+
+sSFTimer MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721":top;
+	CHARACTERIZED BY
+		defaultChargingPackage PACKAGE
+			BEHAVIOUR
+				sSFTimerBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class defines the value of the timer TSSF";;
+			ATTRIBUTES
+				sSFTimerId GET SET-BY-CREATE,
+				timerValue GET-REPLACE;;;
+REGISTERED AS { inSSFManagedObjectClass 46 };
+-- 7.47 SCF Application Entity
+
+
+scfApplicationEntity MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":software;
+	CHARACTERIZED BY
+		scfApplicationEntityPackage PACKAGE
+			BEHAVIOUR
+				scfApplicationEntityBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class represents the SCF application process.";;;;
+REGISTERED AS { inSSFManagedObjectClass 47 };
+-- 7.48 SSF Application Entity
+
+
+ssfApplicationEntity MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":software;
+	CHARACTERIZED BY
+		ssfApplicationEntityPackage PACKAGE
+			BEHAVIOUR
+				ssfApplicationEntityBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class represents the SSF application process.";;;;
+REGISTERED AS { inSSFManagedObjectClass 48 };
+-- 8 Package definitions
+-- No external conditional packages defined.
+-- 9 Attribute definitions
+-- 9.1 bcsmId Attribute
+
+
+bcsmId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bcsmIdBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as the RDN attribute for naming.";;
+REGISTERED AS { inSSFattribute 1 };
+-- 9.2 tdpId Attribute
+
+
+tdpId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdpIdBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as the RDN attribute for naming.";;
+REGISTERED AS { inSSFattribute 2 };
+-- 9.3 tdpMode Attribute
+
+
+tdpMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.TdpMode;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdpModeBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies whether the TDP is configured as a request or 
+				notification TDP.
+
+				NOTE In some cases only one particular mode may be valid for a TDP. This will be 
+				specified in the appropriate subclass.";;
+REGISTERED AS { inSSFattribute 3 };
+-- 9.4 tdp1Criteria Attribute
+
+
+tdp1Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP1Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp1CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include calling party number, bearer capability and class of 
+				service.";;
+REGISTERED AS { inSSFattribute 4 };
+-- 9.5 tdp2Criteria Attribute
+
+
+tdp2Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP2Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp2CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include calledPartyNumber, callingPartyNumber, digitString and 
+				stringLength.";;
+REGISTERED AS { inSSFattribute 5 };
+-- 9.6 tdp3Criteria Attribute
+
+
+tdp3Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP3Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp3CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include calledPartyNumber, callingPartyNumber, natureOfAddress, 
+				digitString, stringLength, facilityInformation and featureActivation.";;
+REGISTERED AS { inSSFattribute 6 };
+-- 9.7 tdp4Criteria Attribute
+
+
+tdp4Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP4Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp4CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include cause, callingPartyNumber, and featureActivation.";;
+REGISTERED AS { inSSFattribute 7 };
+-- 9.8 tdp5Criteria Attribute
+
+
+tdp5Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP5Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp5CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include cause and featureActivation.";;
+REGISTERED AS { inSSFattribute 8 };
+-- 9.9 tdp6Criteria Attribute
+
+
+tdp6Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP6Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp6CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include cause and featureActivation.";;
+REGISTERED AS { inSSFattribute 9 };
+
+
+tdp7Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP7Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp7CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include facilityInformation and featureActivation.";;
+REGISTERED AS { inSSFattribute 10 };
+-- 9.11 tdp8Criteria Attribute
+
+
+tdp8Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP8Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp8CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include facilityInformation and featureActivation.";;
+REGISTERED AS { inSSFattribute 11 };
+-- 9.12 tdp9Criteria Attribute
+
+
+tdp9Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP9Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp9CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include cause and featureActivation.";;
+REGISTERED AS { inSSFattribute 12 };
+-- 9.13 tdp10Criteria Attribute
+
+
+tdp10Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP10Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp10CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include cause and featureActivation.";;
+REGISTERED AS { inSSFattribute 13 };
+-- 9.14 tdp12Criteria Attribute
+
+
+tdp12Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP12Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp12CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include classOfService and callingPartyNumber.";;
+REGISTERED AS { inSSFattribute 14 };
+-- 9.15 tdp13Criteria Attribute
+
+
+tdp13Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP13Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp13CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include featureActivation and callingPartyNumber.";;
+REGISTERED AS { inSSFattribute 15 };
+-- 9.16 tdp14Criteria Attribute
+
+
+tdp14Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP14Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp14CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include featureActivation and callingPartyNumber.";;
+REGISTERED AS { inSSFattribute 16 };
+-- 9.17 tdp15Criteria Attribute
+
+
+tdp15Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP15Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp15CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include facilityInformation and featureActivation.";;
+REGISTERED AS { inSSFattribute 17 };
+-- 9.18 tdp16Criteria Attribute
+
+
+tdp16Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP16Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp15CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include facilityInformation and featureActivation.";;
+REGISTERED AS { inSSFattribute 18 };
+-- 9.19 tdp17Criteria Attribute
+
+
+tdp17Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP17Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp17CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include cause and featureActivation.";;
+REGISTERED AS { inSSFattribute 19 };
+-- 9.20 tdp18Criteria Attribute
+
+
+tdp18Criteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TDP18Filter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tdp18CriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies criteria that will cause a triggering of an IN service. 
+				It is structured syntactically as a filter in order to allow formulation of 
+				complex trigger conditions based on the combination of various predicates. The 
+				criteria may include cause and featureActivation.";;
+REGISTERED AS { inSSFattribute 20 };
+-- 9.21 triggerAssociation Attribute
+
+
+triggerAssociation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.TriggerAssociation;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		triggerAssociationBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the basis on which the trigger is to be applied.";;
+REGISTERED AS { inSSFattribute 21 };
+-- Editor's Note: Should this attribute be set-valued?
+-- 9.22 inEscape Attribute
+
+
+inEscape ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.INEscapes;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		inEscapeBhvr BEHAVIOUR
+			DEFINED AS
+				"This set valued attribute specifies the call related information on the basis of 
+				which escape from IN processing would occur.";;
+REGISTERED AS { inSSFattribute 22 };
+-- 9.23 congestionAction Attribute
+
+
+congestionAction ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.CongestionAction;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		congestionActionBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the action to be taken if the SCF cannot be reached or 
+				does not respond in time. Valid actions are terminate call, play announcement, 
+				play announcement and terminate call.";;
+REGISTERED AS { inSSFattribute 23 };
+-- 9.24 serviceKey Attribute
+
+
+serviceKey ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.ServiceKey;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		serviceKeyBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the logical service key for the IN service to be 
+				invoked.";;
+REGISTERED AS { inSSFattribute 24 };
+-- 9.25 inCallGapId Attribute
+
+
+inCallGapId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		inCallGapIdBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for the RDN of the inCallGap object.";;
+REGISTERED AS { inSSFattribute 25 };
+-- 9.26 gapDuration Attribute
+
+
+gapDuration ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.GapDuration;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gapDurationBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to specify the length of time for which gapping is to be 
+				applied.";;
+REGISTERED AS { inSSFattribute 26 };
+-- 9.27 gapInterval Attribute
+
+
+gapInterval ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.GapInterval;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gapIntervalBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to specify the fraction of calls to be gapped. No gapping 
+				when the attribute is zero and gap all calls gapInterval is one.";;
+REGISTERED AS { inSSFattribute 27 };
+-- 9.28 gapTreatment Attribute
+
+
+gapTreatment ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.CallTreatment;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gapTreatmentBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to specify the treatment to be applied to a gapped call. 
+				It may specify information to be sent to the calling party, release of the call 
+				with a cause value or information to be sent and subsequent release of the call.";;
+REGISTERED AS { inSSFattribute 28 };
+-- 9.29 digitString Attribute
+
+
+digitString ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.DigitString;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		digitStringBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to identify a digit string. In trigger point objects this 
+				digit string may be used as criterion or a part of a logical expression for 
+				invoking IN service logic.";;
+REGISTERED AS { inSSFattribute 29 };
+-- 9.30 authenticationCode Attribute
+
+
+authenticationCode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.AuthenticationCode;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		authenticationCodeBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute contains a parameter used in authenticating a user for access to 
+				data or services.";;
+REGISTERED AS { inSSFattribute 30 };
+-- 9.31 calledPartyNumberList Attribute
+
+
+calledPartyNumberList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.CalledPartyNumberList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		calledPartyNumberListBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute is a list of called party directory numbers. The list may be used 
+				as screening list.";;
+REGISTERED AS { inSSFattribute 31 };
+-- 9.32 callingPartyNumberList Attribute
+
+
+callingPartyNumberList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.CallingPartyNumberList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		callingPartyNumberListBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute is a list of calling party directory numbers. The list may be 
+				used as screening list.";;
+REGISTERED AS { inSSFattribute 32 };
+-- 9.33 version Attribute
+
+
+version ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.Version;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		versionBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the version of an entity. The data-type used to encode 
+				the version value must support ordering.";;
+REGISTERED AS { inSSFattribute 33 };
+-- 9.34 observedEventId Attribute
+
+
+observedEventId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.ObservedEventId;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		observedEventIdBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the event that is being observed by the object in 
+				which it is installed. If this object is a counter, the count will change every 
+				time one of these events occurs.";;
+REGISTERED AS { inSSFattribute 34 };
+-- 9.35 observedSCFAccessList Attribute
+
+
+observedSCFAccessList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.ObservedSCFAccessList;
+	MATCHES FOR EQUALITY, ORDERING, SET-INTERSECTION, SET-COMPARISON;
+	BEHAVIOUR
+		observedSCFAccessListBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the set of SCF access to which the object is related 
+				or with which it is associated.";;
+REGISTERED AS { inSSFattribute 35 };
+-- 9.36 count Attribute
+
+
+count ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.Count;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		countBhvr BEHAVIOUR
+			DEFINED AS
+				"This is an integer count of the specified event.";;
+REGISTERED AS { inSSFattribute 36 };
+-- 9.37 defaultCharging Attribute
+
+
+defaultCharging ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.DefaultCharging;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		defaultChargingBhvr BEHAVIOUR
+			DEFINED AS
+				"Services do not necessarily require that charging information be sent from the 
+				SCF to the SSF.
+
+				The SSF, therefore, needs to be able to refer to a choice of default charging 
+				options. This attribute specifies the following options:
+
+				- indication that same charging level has to be used as that determined by PSTN 
+				  before (single value);
+
+				- indication for setting the call to 'free of charge' (single value);
+
+				- indication to reject the call (single value);
+
+				- specific charge level (set of values).";;
+REGISTERED AS { inSSFattribute 37 };
+-- 9.38 chargingProfile Attribute
+
+
+chargingProfile ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.ChargingProfile;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		chargingProfileBhvr BEHAVIOUR
+			DEFINED AS
+				"IN triggering may occur before the SSP specific usage metering control function 
+				determines the kind of usage metering. In this cases the 'charging profile' of 
+				the IN service determines the kind of usage metering recording. This attribute 
+				is defined network operator specific.";;
+REGISTERED AS { inSSFattribute 38 };
+-- 9.39 iNAPASE Attribute
+
+
+iNAPASE ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		iNAPASEBhvr BEHAVIOUR
+			DEFINED AS
+				"Associates an INAP ASE with the object that has this attribute.";;
+REGISTERED AS { inSSFattribute 39 };
+-- 9.40 iNEscape Attribute
+
+
+iNEscape ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.INEscape;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		iNEscapeBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute defines a set of conditions that will cause escape from IN call 
+				processing and result in normal call processing.";;
+REGISTERED AS { inSSFattribute 40 };
+-- 9.41 exceptionHandling Attribute
+
+
+exceptionHandling ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.ExceptionHandling;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		exceptionHandlingBhvr BEHAVIOUR
+			DEFINED AS
+				"This attributes contains continuation information for the call processing (e.g. 
+				intercept treatment, announcements, etc.). Includes pointers to customizable 
+				resources.";;
+REGISTERED AS { inSSFattribute 41 };
+-- 9.42 sCFAccessPointer Attribute
+
+
+sCFAccessPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sCFAccessPointerBhvr BEHAVIOUR
+			DEFINED AS
+				"This attributes identifies the SCP to which INAP messages for this service are 
+				to be sent.";;
+REGISTERED AS { inSSFattribute 42 };
+-- 9.43 triggerList Attribute
+
+
+triggerList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TriggerAssociation;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		triggerListBhvr BEHAVIOUR
+			DEFINED AS
+				"This attribute associates a set of triggers to the object that has this 
+				attribute.";;
+REGISTERED AS { inSSFattribute 43 };
+-- 9.44 basePriority Attribute
+
+
+basePriority ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		basePriorityBhvr BEHAVIOUR
+			DEFINED AS
+				"The basePriority attribute allows specification of which triggerList will be 
+				active when several would apply simultaneously to a call. The larger number 
+				indicates lower priority.";;
+REGISTERED AS { inSSFattribute 44 };
+-- 9.45 gapCriteria Attribute
+
+
+gapCriteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.GapCriteria;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		gapCriteriaBhvr BEHAVIOUR
+			DEFINED AS
+				"The gapCriteria attribute allows configuring criteria for the calls to be 
+				gapped. Calls may be gapped for particular destinations, particular services or 
+				both.";;
+REGISTERED AS { inSSFattribute 45 };
+-- 9.46 gapDuration Attribute
+
+
+gapDuration ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.GapDuration;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		gapDurationBhvr BEHAVIOUR
+			DEFINED AS
+				"The gapDuration attribute specifies the time interval for which gapping is 
+				active.";;
+REGISTERED AS { inSSFattribute 46 };
+-- 9.47 gapInterval Attribute
+
+
+gapInterval ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		gapIntervalBhvr BEHAVIOUR
+			DEFINED AS
+				"The gapInterval attribute specifies the minimum inter-arrival time between calls 
+				that will be passed. The time is specified in milliseconds.";;
+REGISTERED AS { inSSFattribute 47 };
+-- 9.48 gapTreatment Attribute
+
+
+gapTreatment ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.CallTreatment;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		gapTreatmentBhvr BEHAVIOUR
+			DEFINED AS
+				"The gapTreatment attribute specifies the treatment to be given to calls that 
+				have been
+				gapped.";;
+REGISTERED AS { inSSFattribute 48 };
+-- 9.49 controlType Attribute
+
+
+controlType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.ControlType;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		controlTypeBhvr BEHAVIOUR
+			DEFINED AS
+				"The controlType attribute indicates how call gapping was activated. Call gapping 
+				may be activated by the SCP or the OSF.";;
+REGISTERED AS { inSSFattribute 49 };
+-- 9.50 iPCapabilityList Attribute
+
+
+iPCapabilityList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.ControlType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		iPCapabilityListBhvr BEHAVIOUR
+			DEFINED AS
+				"The iPCapabilityList attribute describes the functional capabilities of the IP, 
+				e.g. tone generation, speech synthesis, etc.";;
+REGISTERED AS { inSSFattribute 50 };
+-- 9.51 dialledDigitLength
+
+
+dialledDigitLength ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.DialledDigitLength;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		dialledDigitLengthBhvr BEHAVIOUR
+			DEFINED AS
+				"The dialledDigitLength specifies the number of digits on which the decision to 
+				check the portedNumberList is made.";;
+REGISTERED AS { inSSFattribute 51 };
+-- 9.52 terminatingDialDigitsList Attribute
+
+
+terminatingDialDigitsList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.TerminatingDialDigitsList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		terminatingDialDigitsListBhvr BEHAVIOUR
+			DEFINED AS
+				"The terminatingDialDigitsList attribute is a list of entries that specifies the 
+				dialled digits for which the exchange needs to obtain instructions on how to 
+				route the call due to possible porting of that number. The list consists of 
+				digit strings that if matched will cause triggering of an LNP (Local Number 
+				Portability) query.";;
+REGISTERED AS { inSSFattribute 52 };
+-- 9.53 defaultChargingAction Attribute
+
+
+defaultChargingAction ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.DefaultChargingAction;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		defaultChargingActionBhvr BEHAVIOUR
+			DEFINED AS
+				"The defaultChargingAction attribute defines the default action to be taken if no 
+				specific charging information is supplied for the IN call. The default action 
+				may be service dependent.";;
+REGISTERED AS { inSSFattribute 53 };
+-- 9.54 timerValue Attribute
+
+
+timerValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.TimerValue;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		timerValueBhvr BEHAVIOUR
+			DEFINED AS
+				"The timerValue attribute specifies the amount of time that is to elapse after a 
+				particular event has occurred prior to the occurrence of another event. The 
+				values is specified in milliseconds.";;
+REGISTERED AS { inSSFattribute 54 };
+-- 9.55 missingCustomerRecordException Attribute
+
+
+missingCustomerRecordException ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SSFASN1Module.INAPException;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		missingCustomerRecordExceptionBhvr BEHAVIOUR
+			DEFINED AS
+				"The missingCustomerRecordException attribute specifies the action to be taken if 
+				the customer record for a particular call cannot be located.";;
+REGISTERED AS { inSSFattribute 55 };
+-- NOTE  Similar templates will be provided in the final edit for the following exceptions:
+-- missingParameterException, systemFailureException, taskRefusedException, unexpectedValueException,
+-- unexpectedparameterException, unexpectedValueException, unexpectedComponentSequenceException.
+-- 10 Name Bindings
+-- 10.1 TDP to BCSM
+
+
+tdp-bcsm NAME BINDING
+	SUBORDINATE OBJECT CLASS tdp AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS bcsm AND SUBCLASSES;
+	WITH ATTRIBUTE
+		tdpId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 1 };
+-- 10.2 Originating Trunk Trigger Base to Configured End Point Group
+
+
+otrunkTriggerBase-cepsg NAME BINDING
+	SUBORDINATE OBJECT CLASS otrunkTriggerBase AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cepsg AND SUBCLASSES;
+	WITH ATTRIBUTE
+		triggerBaseId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 2 };
+-- 10.3 Terminating Trunk Trigger Base to Configured End Point Group
+
+
+ttrunkTriggerBase-cepsg NAME BINDING
+	SUBORDINATE OBJECT CLASS ttrunkTriggerBase AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cepsg AND SUBCLASSES;
+	WITH ATTRIBUTE
+		triggerBaseId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 3 };
+-- 10.4 Originating Line Trigger Base to Customer Profile
+
+
+olineTriggerBase-customerProfile NAME BINDING
+	SUBORDINATE OBJECT CLASS olineTriggerBase AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation Q.824.1":customerProfile AND SUBCLASSES;
+	WITH ATTRIBUTE
+		triggerBaseId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 4 };
+-- 10.5 Terminating Line Trigger Base to Customer Profile
+
+
+ttrunkTriggerBase-customerProfile NAME BINDING
+	SUBORDINATE OBJECT CLASS tlineTriggerBase AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation Q.824.1":customerProfile AND SUBCLASSES;
+	WITH ATTRIBUTE
+		triggerBaseId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 5 };
+-- 10.6 SCF Access to Managed Element
+
+
+sCFAccess-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS sCFAccess AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		sCFAccessId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 6 };
+-- 10.7 BCSM to Managed Element
+
+
+bcsm-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS bcsm AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		sCFAccessId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 7 };
+-- 10.8 IN Call Gap to SSF-SCF Application Entity
+
+
+inCallGap-ssfScfAE NAME BINDING
+	SUBORDINATE OBJECT CLASS inCallGap AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS ssfScfAE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		inCallGapId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 8 };
+-- 10.9 Service Filtering to Service Feature Control
+
+
+serviceFiltering-serviceFeatureControl NAME BINDING
+	SUBORDINATE OBJECT CLASS serviceFiltering AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS serviceFeatureControl AND SUBCLASSES;
+	WITH ATTRIBUTE
+		serviceFilteringId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 9 };
+-- 10.10 IP Configuration to Managed Element
+
+
+iPConfiguration-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS iPConfiguration AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		iPConfigurationId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 10 };
+-- 10.11 Dialled Digit Length to Managed Element
+
+
+dialledDigitLength-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS dialledDigitLength AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		portedNumberTriggerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 11 };
+-- 10.12 Terminating Dialled Digit List to Dialled Digit Length
+
+
+terminatingDialledDigitList-dialledDigitLength NAME BINDING
+	SUBORDINATE OBJECT CLASS terminatingDialledDigitList AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS dialledDigitLength AND SUBCLASSES;
+	WITH ATTRIBUTE
+		portedNumberListId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 12 };
+-- 10.13 inAuthorization to tdp
+
+
+inAuthorization-tdp NAME BINDING
+	SUBORDINATE OBJECT CLASS inAuthorization AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS tdp AND SUBCLASSES;
+	WITH ATTRIBUTE
+		inAuthorizationId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 13 };
+-- 10.14 Initiate Call Default Information to Managed Element
+
+
+initiateCallDefaultInformation-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS initiateCallDefaultInformation AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		initiateCallDefaultInformationId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 14 };
+-- 10.15 Assist Treatment Configuration to Managed Element
+
+
+assistTreatmentConfiguration-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS assistTreatmentConfiguration AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		assistTreatmentConfigurationId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 15 };
+-- 10.16 Ported Number Trigger to Managed Element
+
+
+portedNumberTrigger-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS portedNumberTrigger AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		portedNumberTriggerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 16 };
+-- 10.17 Ported Number List to Managed Element
+
+
+portedNumberList-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS portedNumberList AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS portedNumberTrigger AND SUBCLASSES;
+	WITH ATTRIBUTE
+		portedNumberListId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 17 };
+-- 10.18 Default Charging to Service Feature Control
+
+
+defaultCharging-serviceFeatureControl NAME BINDING
+	SUBORDINATE OBJECT CLASS defaultCharging AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS serviceFeatureControl AND SUBCLASSES;
+	WITH ATTRIBUTE
+		defaultChargingId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 18 };
+-- 10.19 Exception Handler to Service Feature Control
+
+
+exceptionHandler-serviceFeatureControl NAME BINDING
+	SUBORDINATE OBJECT CLASS exceptionHandler AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS serviceFeatureControl AND SUBCLASSES;
+	WITH ATTRIBUTE
+		exceptionHandlerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 19 };
+-- 10.20 SSF Timer to SCF Access
+
+
+sSFTimer-sCFAccess NAME BINDING
+	SUBORDINATE OBJECT CLASS sSFTimer AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sCFAccess AND SUBCLASSES;
+	WITH ATTRIBUTE
+		sSFTimerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 20 };
+-- 10.21 INAP Counter to SSF Application Entity
+
+
+iNAPCounter-ssfApplicationEntity NAME BINDING
+	SUBORDINATE OBJECT CLASS iNAPCounter AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS ssfApplicationEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		iNAPCounterId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 21 };
+-- 10.22 INAP Current Data to SSF Application Entity
+
+
+iNAPCurrentData-ssfApplicationEntity NAME BINDING
+	SUBORDINATE OBJECT CLASS iNAPCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS ssfApplicationEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Recommendation Q.822":currentDataId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 22 };
+-- 10.23 INAP History Data to SSF Application Entity
+
+
+iNAPHistoryData-ssfApplicationEntity NAME BINDING
+	SUBORDINATE OBJECT CLASS iNAPHistoryData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS ssfApplicationEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Recommendation Q.822":historyDataId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 23 };
+-- 10.24 Assist Treatment Configuration to SSF Application Entity
+
+
+assistTreatmentConfiguration-ssfApplicationEntity NAME BINDING
+	SUBORDINATE OBJECT CLASS assistTreatmentConfiguration AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS ssfApplicationEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		assistTreatmentConfigurationId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 24 };
+-- 10.25 Service Feature Control to SSF Application Entity
+
+
+serviceFeatureControl-ssfApplicationEntity NAME BINDING
+	SUBORDINATE OBJECT CLASS serviceFeatureControl AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS ssfApplicationEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		serviceFeatureControlId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { inSSFNameBinding 25 };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. Q.836.1 (02/2000)"
+--  { itu-t(0) recommendation(0) q(17) inmod(1831) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@
+--@@ These modules reference "ITU-T Rec. X.735" 3 times.
+--@@ These modules reference "Recommendation Q.824.1" 2 times.
+--@@
+--@@
+--@@ These modules define " CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define " ITU-T X.721|ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec X.721 | ISO/IEC 10165-2"
+--@@ These modules define "CCITT Rec. 721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. 721 | ISO/IEC10162:1992"
+--@@ These modules define "CCITT Rec. 721| ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. M.3100"
+--@@ These modules define "CCITT Rec. M.3100(1992)"
+--@@ These modules define "CCITT Rec. X.721"
+--@@ These modules define "CCITT Rec. X.721 (1992)"
+--@@ These modules define "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO /IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2 :1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721(1992)"
+--@@ These modules define "CCITT Rec. X.721|ISO/IEC 10165-2"
+--@@ These modules define "CCITT Rec. X.723 (1993)"
+--@@ These modules define "CCITT Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
+--@@ These modules define "CCITT Rec. X.723 | ISO/IEC 10165-5"
+--@@ These modules define "CCITT Recommendation Q.822"
+--@@ These modules define "CCITT X.521"
+--@@ These modules define "DMI"
+--@@ These modules define "DMI:1992"
+--@@ These modules define "GMI"
+--@@ These modules define "GNM"
+--@@ These modules define "ISO/IEC 10165-2"
+--@@ These modules define "ITU Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "ITU-T G.774.1 (02/2001)"
+--@@ These modules define "ITU-T G.774.4 (02/2001)"
+--@@ These modules define "ITU-T Rec. G.774"
+--@@ These modules define "ITU-T Rec. G.774 : 2001"
+--@@ These modules define "ITU-T Rec. G.774.3"
+--@@ These modules define "ITU-T Rec. G.774.3 : 2001"
+--@@ These modules define "ITU-T Rec. G.774.5"
+--@@ These modules define "ITU-T Rec. M.3100 (1992)"
+--@@ These modules define "ITU-T Rec. M.3100 (1995)"
+--@@ These modules define "ITU-T Rec. M.3100: 1995"
+--@@ These modules define "ITU-T Rec. M.3100:1995"
+--@@ These modules define "ITU-T Rec. Q.821 (2000)"
+--@@ These modules define "ITU-T Rec. Q.822"
+--@@ These modules define "ITU-T Rec. Q.822 (1994)"
+--@@ These modules define "ITU-T Rec. Q.824.0 (1995)"
+--@@ These modules define "ITU-T Rec. Q.836.1 (02/2000)"
+--@@ These modules define "ITU-T Rec. X.521"
+--@@ These modules define "ITU-T Rec. X.721 (1992)"
+--@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2: 1992"
+--@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define "ITU-T Rec. X.721 : 1992"
+--@@ These modules define "ITU-T Rec. X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "ITU-T Rec. X.723 (1993)"
+--@@ These modules define "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
+--@@ These modules define "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1993"
+--@@ These modules define "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994"
+--@@ These modules define "ITU-T Rec. X.723 | ISO/IEC 10165-5"
+--@@ These modules define "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995"
+--@@ These modules define "ITU-T Rec. X.738 (1993)/Cor.1 (1998): | ISO/IEC 10164-13 : 1995/Cor.1 : 1999"
+--@@ These modules define "ITU-T Rec. X.738 (1993)/Cor.2 (2000): | ISO/IEC 10164-13 : 1995/Cor.2 : 2002"
+--@@ These modules define "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993"
+--@@ These modules define "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994"
+--@@ These modules define "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994"
+--@@ These modules define "ITU-T Rec. X.739 (1993)/Cor.1 (1998) | ISO/IEC 10164-11 : 1994/Cor.1 : 1999"
+--@@ These modules define "ITU-T Rec. X.739 (1993)|ISO/IEC 10164-11:1994"
+--@@ These modules define "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995"
+--@@ These modules define "ITU-T Rec. X.742 (1995)/Cor.1 (1998) | ISO/IEC 10164-10 : 1995/Cor.1 : 1999"
+--@@ These modules define "ITU-T Rec. X.742 (1995)/Cor.2 (2000) | ISO/IEC 10164-10 : 1995/Cor.2 : 2001"
+--@@ These modules define "ITU-T Rec. X.742 | ISO/IEC 10164-10"
+--@@ These modules define "ITU-T Rec. X.742 | ISO/IEC 10164-10 : 1995"
+--@@ These modules define "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993"
+--@@ These modules define "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12:1994"
+--@@ These modules define "ITU-T Rec. X.745 (1993)/Cor.1 (1997) | ISO/IEC 10164-12 : 1993/Cor.1 : 1998"
+--@@ These modules define "ITU-T Rec. X.745 (1993)/Cor.2 (1998) | ISO/IEC 10164-12 : 1993/Cor.2 : 1999"
+--@@ These modules define "ITU-T Rec. X.745 (1993)/Cor.3 (2000) | ISO/IEC 10164-12 : 1993/Cor.3 : 2001"
+--@@ These modules define "ITU-T Rec. X.745 | ISO/IEC 10164-12"
+--@@ These modules define "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002"
+--@@ These modules define "ITU-T Rec. X.746 | ISO/IEC 10164-15"
+--@@ These modules define "ITU-T Recommendation G.774-04"
+--@@ These modules define "ITU-T Recommendation M.3100"
+--@@ These modules define "ITU-T Recommendation M.3100 : 1992"
+--@@ These modules define "ITU-T Recommendation M.3100: 1995"
+--@@ These modules define "ITU-T Recommendation M.3100:1995"
+--@@ These modules define "ITU-T Recommendation Q.822"
+--@@ These modules define "ITU-T Recommendation X.721"
+--@@ These modules define "ITU-T Recommendation X.721:1992"
+--@@ These modules define "ITU-T Recommendation X.739 | ISO/IEC 10164-11"
+--@@ These modules define "ITU-T Recommendation X.746"
+--@@ These modules define "ITU-T X.721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "ITU-T X.721|ISO/IEC 10165-2:1992"
+--@@ These modules define "M.3100:1995"
+--@@ These modules define "Rec. CCITT X.721 | ISO/IEC 10165-2"
+--@@ These modules define "Rec. G.774.3"
+--@@ These modules define "Rec. M.3100"
+--@@ These modules define "Rec. M.3100 : 1992"
+--@@ These modules define "Rec. M.3100:1995"
+--@@ These modules define "Rec. Q.822"
+--@@ These modules define "Rec. X. 723 | ISO/IEC 10165-5"
+--@@ These modules define "Rec. X.721 (1992)"
+--@@ These modules define "Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define "Rec. X.721 | ISO/IEC 10165-2"
+--@@ These modules define "Rec. X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Rec. X.721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "Rec. X.721|ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Rec. X.723 (1993)"
+--@@ These modules define "Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
+--@@ These modules define "Rec. X.723 | ISO/IEC 10165-5"
+--@@ These modules define "Rec. X.723 | ISO/IEC 10165-5 : 1994"
+--@@ These modules define "Rec. X.738 (1993)"
+--@@ These modules define "Rec. X.738|ISO/IEC 10164-13:1992"
+--@@ These modules define "Rec. X.739"
+--@@ These modules define "Rec. X.739 (1993)"
+--@@ These modules define "Rec. X.739 (1993) | ISO/IEC 10164-11:1994"
+--@@ These modules define "Rec. X.742 (1995)"
+--@@ These modules define "Rec. X.745 (1993)"
+--@@ These modules define "Rec. X.745 (1993) | ISO/IEC 10164-12:1994"
+--@@ These modules define "Rec. X.745 (1993) | ISO/IEC 10164-12:1994 "
+--@@ These modules define "Rec. X.746 (1995)"
+--@@ These modules define "Recommendation G.774"
+--@@ These modules define "Recommendation G.774 : 1992"
+--@@ These modules define "Recommendation G.774.01"
+--@@ These modules define "Recommendation G.774.03"
+--@@ These modules define "Recommendation G.774.05"
+--@@ These modules define "Recommendation G.774.3"
+--@@ These modules define "Recommendation G.774.3: 1994"
+--@@ These modules define "Recommendation G.774.5"
+--@@ These modules define "Recommendation M.3100"
+--@@ These modules define "Recommendation M.3100 : 1992"
+--@@ These modules define "Recommendation M.3100: 1992"
+--@@ These modules define "Recommendation M.3100: 1995"
+--@@ These modules define "Recommendation M.3100:1992"
+--@@ These modules define "Recommendation M.3100:1995"
+--@@ These modules define "Recommendation Q.821:1992"
+--@@ These modules define "Recommendation Q.822"
+--@@ These modules define "Recommendation Q.822 : 1993"
+--@@ These modules define "Recommendation Q.822:1994"
+--@@ These modules define "Recommendation X.721"
+--@@ These modules define "Recommendation X.721 "
+--@@ These modules define "Recommendation X.721 : 1992"
+--@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2"
+--@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2: 1992"
+--@@ These modules define "Recommendation X.721: 1992"
+--@@ These modules define "Recommendation X.721:1992"
+--@@ These modules define "Recommendation X.738 : 1992"
+--@@ These modules define "Recommendation X.738:1993"
+--@@ These modules define "Recommendation X.739"
+--@@ These modules define "Recommendation X.739:1993"
+--@@ These modules define "Recommendation X.742 | ISO/IEC 10164-10: 1995"
+--@@ These modules define "X.721"
+--@@ These modules define "X.721:1992"
+--@@ These modules define "X.723"
+--@@ These modules define "X.739"
+--@@ These modules define "X.742"
+--@@ These modules define "X.745"
+--@@ These modules define "X.746"
+--@@
+--@@
+--@@ These modules reference ATTRIBUTE currentDataId in module "ITU-T Recommendation Q.822".
+--@@
+--@@ These modules define ATTRIBUTE a-TPInstance.
+--@@ These modules define ATTRIBUTE aEnd.
+--@@ These modules define ATTRIBUTE aEndNetworkTPList.
+--@@ These modules define ATTRIBUTE acceptableCircuitPackTypeList.
+--@@ These modules define ATTRIBUTE accessChannelPtrList.
+--@@ These modules define ATTRIBUTE accessGroupId.
+--@@ These modules define ATTRIBUTE accessPointList.
+--@@ These modules define ATTRIBUTE accessPortProfileId.
+--@@ These modules define ATTRIBUTE accessPortProfilePtr.
+--@@ These modules define ATTRIBUTE accessPortProfilePtrList.
+--@@ These modules define ATTRIBUTE accountableObjectReference.
+--@@ These modules define ATTRIBUTE accountableObjectsReferenceList.
+--@@ These modules define ATTRIBUTE actionResponse.
+--@@ These modules define ATTRIBUTE activeDestination.
+--@@ These modules define ATTRIBUTE actualStartTime.
+--@@ These modules define ATTRIBUTE actualStopTime.
+--@@ These modules define ATTRIBUTE additionalInformation.
+--@@ These modules define ATTRIBUTE additionalText.
+--@@ These modules define ATTRIBUTE administrativeState.
+--@@ These modules define ATTRIBUTE affectedObjectClass.
+--@@ These modules define ATTRIBUTE affectedObjectInstances.
+--@@ These modules define ATTRIBUTE affectedObjectList.
+--@@ These modules define ATTRIBUTE alarmReportingControlList.
+--@@ These modules define ATTRIBUTE alarmReportingControlManagerId.
+--@@ These modules define ATTRIBUTE alarmSeverityAssignmentList.
+--@@ These modules define ATTRIBUTE alarmSeverityAssignmentProfileId.
+--@@ These modules define ATTRIBUTE alarmSeverityAssignmentProfilePointer.
+--@@ These modules define ATTRIBUTE alarmStatus.
+--@@ These modules define ATTRIBUTE alarmStatusList.
+--@@ These modules define ATTRIBUTE algorithmIdentifier.
+--@@ These modules define ATTRIBUTE algorithmOutputs.
+--@@ These modules define ATTRIBUTE algorithmParameters.
+--@@ These modules define ATTRIBUTE allomorphs.
+--@@ These modules define ATTRIBUTE applicationProcessId.
+--@@ These modules define ATTRIBUTE applicationProcessTitle.
+--@@ These modules define ATTRIBUTE arcDefaultNALMCDInterval.
+--@@ These modules define ATTRIBUTE arcDefaultNALMTIInterval.
+--@@ These modules define ATTRIBUTE arcIntervalProfileId.
+--@@ These modules define ATTRIBUTE arcIntervalProfilePointer.
+--@@ These modules define ATTRIBUTE arcManagementRequestedInterval.
+--@@ These modules define ATTRIBUTE arcProbableCauseList.
+--@@ These modules define ATTRIBUTE arcQIStatus.
+--@@ These modules define ATTRIBUTE arcState.
+--@@ These modules define ATTRIBUTE arcTimeRemaining.
+--@@ These modules define ATTRIBUTE assignedLinkEndCapacity.
+--@@ These modules define ATTRIBUTE associatedObjects.
+--@@ These modules define ATTRIBUTE attributeIdentifierList.
+--@@ These modules define ATTRIBUTE attributeList.
+--@@ These modules define ATTRIBUTE attributeRangesId.
+--@@ These modules define ATTRIBUTE attributeValueChangeDefinition.
+--@@ These modules define ATTRIBUTE au3CTPId.
+--@@ These modules define ATTRIBUTE au4CTPId.
+--@@ These modules define ATTRIBUTE auditInfo.
+--@@ These modules define ATTRIBUTE augId.
+--@@ These modules define ATTRIBUTE authenticationCode.
+--@@ These modules define ATTRIBUTE availabilityStatus.
+--@@ These modules define ATTRIBUTE availableLinkCapacity.
+--@@ These modules define ATTRIBUTE availableLinkEndCapacity.
+--@@ These modules define ATTRIBUTE availableSignalRateList.
+--@@ These modules define ATTRIBUTE bBE.
+--@@ These modules define ATTRIBUTE backUpDestinationList.
+--@@ These modules define ATTRIBUTE backUpObject.
+--@@ These modules define ATTRIBUTE backedUpObject.
+--@@ These modules define ATTRIBUTE backedUpStatus.
+--@@ These modules define ATTRIBUTE baseManagedObject.
+--@@ These modules define ATTRIBUTE basePriority.
+--@@ These modules define ATTRIBUTE bcsmId.
+--@@ These modules define ATTRIBUTE bearerServiceId.
+--@@ These modules define ATTRIBUTE bearerServicePtr.
+--@@ These modules define ATTRIBUTE bearerServicePtrList.
+--@@ These modules define ATTRIBUTE beginTime.
+--@@ These modules define ATTRIBUTE beginTimeOffset.
+--@@ These modules define ATTRIBUTE bufferedObservationIdList.
+--@@ These modules define ATTRIBUTE bufferedObservationList.
+--@@ These modules define ATTRIBUTE c2SignalLabelExpected.
+--@@ These modules define ATTRIBUTE c2SignalLabelReceive.
+--@@ These modules define ATTRIBUTE c2SignalLabelSend.
+--@@ These modules define ATTRIBUTE cSESEvent.
+--@@ These modules define ATTRIBUTE cTPId.
+--@@ These modules define ATTRIBUTE calledPartyNumberList.
+--@@ These modules define ATTRIBUTE callingPartyNumberList.
+--@@ These modules define ATTRIBUTE capacityAlarmThreshold.
+--@@ These modules define ATTRIBUTE cataloguedOptionalUserFacilitiesId.
+--@@ These modules define ATTRIBUTE cataloguedOptionalUserFacilitiesPtr.
+--@@ These modules define ATTRIBUTE cataloguedSupplementaryServiceId.
+--@@ These modules define ATTRIBUTE cataloguedSupplementaryServicePtr.
+--@@ These modules define ATTRIBUTE cataloguedTeleserviceId.
+--@@ These modules define ATTRIBUTE cataloguedTeleservicePtr.
+--@@ These modules define ATTRIBUTE channelNumber.
+--@@ These modules define ATTRIBUTE characteristicInformation.
+--@@ These modules define ATTRIBUTE chargingProfile.
+--@@ These modules define ATTRIBUTE circuitDirectionality.
+--@@ These modules define ATTRIBUTE circuitEndPointSubgroupId.
+--@@ These modules define ATTRIBUTE circuitEndPointSubgroupOrderedPtrList.
+--@@ These modules define ATTRIBUTE circuitEndPointSubgroupPtrList.
+--@@ These modules define ATTRIBUTE circuitPackType.
+--@@ These modules define ATTRIBUTE clProtocolMachineId.
+--@@ These modules define ATTRIBUTE clientCTPList.
+--@@ These modules define ATTRIBUTE clientConnectionList.
+--@@ These modules define ATTRIBUTE clientLinkConnectionPointerList.
+--@@ These modules define ATTRIBUTE clientLinkEndPointerList.
+--@@ These modules define ATTRIBUTE clientLinkPointerList.
+--@@ These modules define ATTRIBUTE clientTrail.
+--@@ These modules define ATTRIBUTE coProtocolMachineId.
+--@@ These modules define ATTRIBUTE communicationsEntityId.
+--@@ These modules define ATTRIBUTE componentPointers.
+--@@ These modules define ATTRIBUTE compositePointer.
+--@@ These modules define ATTRIBUTE configurablePCT.
+--@@ These modules define ATTRIBUTE configuredConnectivity.
+--@@ These modules define ATTRIBUTE confirmedMode.
+--@@ These modules define ATTRIBUTE congestionAction.
+--@@ These modules define ATTRIBUTE connectedTpCount.
+--@@ These modules define ATTRIBUTE connectionId.
+--@@ These modules define ATTRIBUTE connectionList.
+--@@ These modules define ATTRIBUTE connectivityPointer.
+--@@ These modules define ATTRIBUTE connectorType.
+--@@ These modules define ATTRIBUTE containedAccessGroupList.
+--@@ These modules define ATTRIBUTE containedInSubNetworkList.
+--@@ These modules define ATTRIBUTE containedLinkEndList.
+--@@ These modules define ATTRIBUTE containedLinkList.
+--@@ These modules define ATTRIBUTE containedNetworkTPList.
+--@@ These modules define ATTRIBUTE containedSubNetworkList.
+--@@ These modules define ATTRIBUTE controlObjectId.
+--@@ These modules define ATTRIBUTE controlStatus.
+--@@ These modules define ATTRIBUTE controlType.
+--@@ These modules define ATTRIBUTE correlatedNotifications.
+--@@ These modules define ATTRIBUTE corruptedPDUsReceivedCounter.
+--@@ These modules define ATTRIBUTE corruptedPDUsReceivedThreshold.
+--@@ These modules define ATTRIBUTE count.
+--@@ These modules define ATTRIBUTE counter.
+--@@ These modules define ATTRIBUTE counter-Threshold.
+--@@ These modules define ATTRIBUTE counterThresholdAttributeList.
+--@@ These modules define ATTRIBUTE crossConnectionId.
+--@@ These modules define ATTRIBUTE crossConnectionName.
+--@@ These modules define ATTRIBUTE crossConnectionObjectPointer.
+--@@ These modules define ATTRIBUTE currentAlarmSummaryControlId.
+--@@ These modules define ATTRIBUTE currentControlState.
+--@@ These modules define ATTRIBUTE currentLogSize.
+--@@ These modules define ATTRIBUTE currentProblemList.
+--@@ These modules define ATTRIBUTE currentTypeOfDay.
+--@@ These modules define ATTRIBUTE customerProfileId.
+--@@ These modules define ATTRIBUTE customerProfilePtr.
+--@@ These modules define ATTRIBUTE customerProfilePtrList.
+--@@ These modules define ATTRIBUTE customizedResourceId.
+--@@ These modules define ATTRIBUTE customizedResourcePtrList.
+--@@ These modules define ATTRIBUTE dataErrors.
+--@@ These modules define ATTRIBUTE dataObjectId.
+--@@ These modules define ATTRIBUTE dataObjectsReferenceList.
+--@@ These modules define ATTRIBUTE dateTranslationList.
+--@@ These modules define ATTRIBUTE defaultCharging.
+--@@ These modules define ATTRIBUTE defaultChargingAction.
+--@@ These modules define ATTRIBUTE defaultIndex.
+--@@ These modules define ATTRIBUTE derivedGauge.
+--@@ These modules define ATTRIBUTE derivedGaugeTimeStamp.
+--@@ These modules define ATTRIBUTE destination.
+--@@ These modules define ATTRIBUTE destinationAddress.
+--@@ These modules define ATTRIBUTE dialledDigitLength.
+--@@ These modules define ATTRIBUTE digitString.
+--@@ These modules define ATTRIBUTE directionality.
+--@@ These modules define ATTRIBUTE directoryNumberId.
+--@@ These modules define ATTRIBUTE directoryNumberPtrList.
+--@@ These modules define ATTRIBUTE discriminatorConstruct.
+--@@ These modules define ATTRIBUTE discriminatorId.
+--@@ These modules define ATTRIBUTE downstreamConnectivityPointer.
+--@@ These modules define ATTRIBUTE e164DirectoryNumber.
+--@@ These modules define ATTRIBUTE eS.
+--@@ These modules define ATTRIBUTE elapsedTime.
+--@@ These modules define ATTRIBUTE electricalSPITTPId.
+--@@ These modules define ATTRIBUTE endTime.
+--@@ These modules define ATTRIBUTE endTimeOffset.
+--@@ These modules define ATTRIBUTE enhancedCurrentAlarmSummaryControlId.
+--@@ These modules define ATTRIBUTE equipmentHolderAddress.
+--@@ These modules define ATTRIBUTE equipmentHolderType.
+--@@ These modules define ATTRIBUTE equipmentId.
+--@@ These modules define ATTRIBUTE estimateOf100-PCTPercentile.
+--@@ These modules define ATTRIBUTE estimateOfLargest.
+--@@ These modules define ATTRIBUTE estimateOfLargestInReplication.
+--@@ These modules define ATTRIBUTE estimateOfMean.
+--@@ These modules define ATTRIBUTE estimateOfMeanSeverityIndicatingGaugeThreshold.
+--@@ These modules define ATTRIBUTE estimateOfMedian.
+--@@ These modules define ATTRIBUTE estimateOfPCTPercentile.
+--@@ These modules define ATTRIBUTE estimateOfSmallest.
+--@@ These modules define ATTRIBUTE estimateOfSmallestInReplication.
+--@@ These modules define ATTRIBUTE estimateOfVariance.
+--@@ These modules define ATTRIBUTE eventTime.
+--@@ These modules define ATTRIBUTE eventType.
+--@@ These modules define ATTRIBUTE exceptionHandling.
+--@@ These modules define ATTRIBUTE excessiveBERMtceInhibit.
+--@@ These modules define ATTRIBUTE externalPointId.
+--@@ These modules define ATTRIBUTE externalPointMessage.
+--@@ These modules define ATTRIBUTE externalSchedulerName.
+--@@ These modules define ATTRIBUTE externalTime.
+--@@ These modules define ATTRIBUTE fEBBE.
+--@@ These modules define ATTRIBUTE fECSESEvent.
+--@@ These modules define ATTRIBUTE fEES.
+--@@ These modules define ATTRIBUTE fESES.
+--@@ These modules define ATTRIBUTE fabricId.
+--@@ These modules define ATTRIBUTE firstScanInitiationTime.
+--@@ These modules define ATTRIBUTE fromTermination.
+--@@ These modules define ATTRIBUTE gapCriteria.
+--@@ These modules define ATTRIBUTE gapDuration.
+--@@ These modules define ATTRIBUTE gapInterval.
+--@@ These modules define ATTRIBUTE gapTreatment.
+--@@ These modules define ATTRIBUTE gauge.
+--@@ These modules define ATTRIBUTE gauge-Threshold.
+--@@ These modules define ATTRIBUTE gaugeThresholdAttributeList.
+--@@ These modules define ATTRIBUTE generatorEnabled.
+--@@ These modules define ATTRIBUTE genericNonWrappingCounter.
+--@@ These modules define ATTRIBUTE genericWrappingCounter.
+--@@ These modules define ATTRIBUTE granularityPeriod.
+--@@ These modules define ATTRIBUTE gtpId.
+--@@ These modules define ATTRIBUTE historyDataId.
+--@@ These modules define ATTRIBUTE historyRetention.
+--@@ These modules define ATTRIBUTE holdOffTime.
+--@@ These modules define ATTRIBUTE holderStatus.
+--@@ These modules define ATTRIBUTE iNAPASE.
+--@@ These modules define ATTRIBUTE iNEscape.
+--@@ These modules define ATTRIBUTE iPCapabilityList.
+--@@ These modules define ATTRIBUTE idleTpCount.
+--@@ These modules define ATTRIBUTE inCallGapId.
+--@@ These modules define ATTRIBUTE inEscape.
+--@@ These modules define ATTRIBUTE incomingConnectionRejectErrorCounter.
+--@@ These modules define ATTRIBUTE incomingConnectionRejectErrorThreshold.
+--@@ These modules define ATTRIBUTE incomingConnectionRequestsCounter.
+--@@ These modules define ATTRIBUTE incomingConnectionRequestsThreshold.
+--@@ These modules define ATTRIBUTE incomingDisconnectCounter.
+--@@ These modules define ATTRIBUTE incomingDisconnectErrorCounter.
+--@@ These modules define ATTRIBUTE incomingDisconnectErrorThreshold.
+--@@ These modules define ATTRIBUTE incomingProtocolErrorCounter.
+--@@ These modules define ATTRIBUTE incomingProtocolErrorThreshold.
+--@@ These modules define ATTRIBUTE incompleteScan.
+--@@ These modules define ATTRIBUTE informationData.
+--@@ These modules define ATTRIBUTE informationTransferCapabilities.
+--@@ These modules define ATTRIBUTE informationType.
+--@@ These modules define ATTRIBUTE initializingTime.
+--@@ These modules define ATTRIBUTE interceptTreatmentOrigin.
+--@@ These modules define ATTRIBUTE interceptTreatmentTerm.
+--@@ These modules define ATTRIBUTE interval.
+--@@ These modules define ATTRIBUTE intervalsOfDay.
+--@@ These modules define ATTRIBUTE j1PathTraceExpected.
+--@@ These modules define ATTRIBUTE j1PathTraceReceive.
+--@@ These modules define ATTRIBUTE j1PathTraceSend.
+--@@ These modules define ATTRIBUTE j2PathTraceExpected.
+--@@ These modules define ATTRIBUTE j2PathTraceReceive.
+--@@ These modules define ATTRIBUTE j2PathTraceSend.
+--@@ These modules define ATTRIBUTE kind.
+--@@ These modules define ATTRIBUTE labelOfFarEndExchange.
+--@@ These modules define ATTRIBUTE lastAttemptResult.
+--@@ These modules define ATTRIBUTE layer2SignalingEntityPtr.
+--@@ These modules define ATTRIBUTE layer3SignalingEntityPtr.
+--@@ These modules define ATTRIBUTE layer4InfoEntityPtr.
+--@@ These modules define ATTRIBUTE layer4InfoEntityType.
+--@@ These modules define ATTRIBUTE layer5InfoEntityPtr.
+--@@ These modules define ATTRIBUTE layer5InfoEntityType.
+--@@ These modules define ATTRIBUTE layer6InfoEntityPtr.
+--@@ These modules define ATTRIBUTE layer6InfoEntityType.
+--@@ These modules define ATTRIBUTE layer7InfoEntityPtr.
+--@@ These modules define ATTRIBUTE layer7InfoEntityType.
+--@@ These modules define ATTRIBUTE layerEntityId.
+--@@ These modules define ATTRIBUTE layerNetworkDomainId.
+--@@ These modules define ATTRIBUTE linkConnectionPointerList.
+--@@ These modules define ATTRIBUTE linkDirectionality.
+--@@ These modules define ATTRIBUTE linkEndId.
+--@@ These modules define ATTRIBUTE linkId.
+--@@ These modules define ATTRIBUTE linkPointer.
+--@@ These modules define ATTRIBUTE linkPointerList.
+--@@ These modules define ATTRIBUTE listOfCharacteristicInfo.
+--@@ These modules define ATTRIBUTE localSapNames.
+--@@ These modules define ATTRIBUTE locationName.
+--@@ These modules define ATTRIBUTE lockedInCondition.
+--@@ These modules define ATTRIBUTE logFullAction.
+--@@ These modules define ATTRIBUTE logId.
+--@@ These modules define ATTRIBUTE logRecordId.
+--@@ These modules define ATTRIBUTE loggingTime.
+--@@ These modules define ATTRIBUTE logicalEndDirectionality.
+--@@ These modules define ATTRIBUTE mORTs.
+--@@ These modules define ATTRIBUTE managedElementComplexId.
+--@@ These modules define ATTRIBUTE managedElementId.
+--@@ These modules define ATTRIBUTE managedElementType.
+--@@ These modules define ATTRIBUTE managedObjectClass.
+--@@ These modules define ATTRIBUTE managedObjectInstance.
+--@@ These modules define ATTRIBUTE maxLogSize.
+--@@ These modules define ATTRIBUTE maxSuppressedIntervals.
+--@@ These modules define ATTRIBUTE maximumLinkConnectionCount.
+--@@ These modules define ATTRIBUTE maximumNetworkCTPCount.
+--@@ These modules define ATTRIBUTE measurementList.
+--@@ These modules define ATTRIBUTE member.
+--@@ These modules define ATTRIBUTE missingCustomerRecordException.
+--@@ These modules define ATTRIBUTE modelCode.
+--@@ These modules define ATTRIBUTE modulusValue.
+--@@ These modules define ATTRIBUTE monitorActive.
+--@@ These modules define ATTRIBUTE monitoredAttributes.
+--@@ These modules define ATTRIBUTE monitoredEntityTypes.
+--@@ These modules define ATTRIBUTE movingTimePeriod.
+--@@ These modules define ATTRIBUTE mpCrossConnectionId.
+--@@ These modules define ATTRIBUTE msCTPId.
+--@@ These modules define ATTRIBUTE msDatacomCTPId.
+--@@ These modules define ATTRIBUTE msOrderwireCTPId.
+--@@ These modules define ATTRIBUTE msTTPId.
+--@@ These modules define ATTRIBUTE nCSES.
+--@@ These modules define ATTRIBUTE nameBinding.
+--@@ These modules define ATTRIBUTE neAliases.
+--@@ These modules define ATTRIBUTE neAssignmentPointer.
+--@@ These modules define ATTRIBUTE networkCTPsInLinkEndList.
+--@@ These modules define ATTRIBUTE networkId.
+--@@ These modules define ATTRIBUTE networkLevelPointer.
+--@@ These modules define ATTRIBUTE networkTPPointer.
+--@@ These modules define ATTRIBUTE nonWrapping64BitCounter.
+--@@ These modules define ATTRIBUTE normalControlState.
+--@@ These modules define ATTRIBUTE notificationCause.
+--@@ These modules define ATTRIBUTE notificationIdentifier.
+--@@ These modules define ATTRIBUTE notifiedProtectionUnit.
+--@@ These modules define ATTRIBUTE numSuppressedIntervals.
+--@@ These modules define ATTRIBUTE numberOfBChannels.
+--@@ These modules define ATTRIBUTE numberOfCircuits.
+--@@ These modules define ATTRIBUTE numberOfPorts.
+--@@ These modules define ATTRIBUTE numberOfRecords.
+--@@ These modules define ATTRIBUTE numberOfReplications.
+--@@ These modules define ATTRIBUTE numericAttributeIdArray.
+--@@ These modules define ATTRIBUTE numericAttributeIdList.
+--@@ These modules define ATTRIBUTE objectClass.
+--@@ These modules define ATTRIBUTE objectList.
+--@@ These modules define ATTRIBUTE observationIdList.
+--@@ These modules define ATTRIBUTE observationReportList.
+--@@ These modules define ATTRIBUTE observationScanList.
+--@@ These modules define ATTRIBUTE observedAttributeId.
+--@@ These modules define ATTRIBUTE observedEventId.
+--@@ These modules define ATTRIBUTE observedObjectClass.
+--@@ These modules define ATTRIBUTE observedObjectInstance.
+--@@ These modules define ATTRIBUTE observedSCFAccessList.
+--@@ These modules define ATTRIBUTE octetsReceivedCounter.
+--@@ These modules define ATTRIBUTE octetsReceivedThreshold.
+--@@ These modules define ATTRIBUTE octetsRetransmittedErrorCounter.
+--@@ These modules define ATTRIBUTE octetsRetransmittedThreshold.
+--@@ These modules define ATTRIBUTE octetsSentCounter.
+--@@ These modules define ATTRIBUTE octetsSentThreshold.
+--@@ These modules define ATTRIBUTE officeEquipment.
+--@@ These modules define ATTRIBUTE officeEquipmentList.
+--@@ These modules define ATTRIBUTE onDuty.
+--@@ These modules define ATTRIBUTE onceReportAttributeIdList.
+--@@ These modules define ATTRIBUTE onceReportAttributeList.
+--@@ These modules define ATTRIBUTE operationResult.
+--@@ These modules define ATTRIBUTE operationSpecifications.
+--@@ These modules define ATTRIBUTE operationalState.
+--@@ These modules define ATTRIBUTE opticalReach.
+--@@ These modules define ATTRIBUTE opticalSPITTPId.
+--@@ These modules define ATTRIBUTE opticalWavelength.
+--@@ These modules define ATTRIBUTE optionalUserFacilitiesId.
+--@@ These modules define ATTRIBUTE outgoingConnectionRejectErrorCounter.
+--@@ These modules define ATTRIBUTE outgoingConnectionRejectErrorThreshold.
+--@@ These modules define ATTRIBUTE outgoingConnectionRequestsCounter.
+--@@ These modules define ATTRIBUTE outgoingConnectionRequestsThreshold.
+--@@ These modules define ATTRIBUTE outgoingDisconnectCounter.
+--@@ These modules define ATTRIBUTE outgoingDisconnectErrorCounter.
+--@@ These modules define ATTRIBUTE outgoingDisconnectErrorThreshold.
+--@@ These modules define ATTRIBUTE outgoingProtocolErrorCounter.
+--@@ These modules define ATTRIBUTE outgoingProtocolErrorThreshold.
+--@@ These modules define ATTRIBUTE owner.
+--@@ These modules define ATTRIBUTE packages.
+--@@ These modules define ATTRIBUTE pdusReceivedCounter.
+--@@ These modules define ATTRIBUTE pdusReceivedThreshold.
+--@@ These modules define ATTRIBUTE pdusRetransmittedErrorCounter.
+--@@ These modules define ATTRIBUTE pdusRetransmittedErrorThreshold.
+--@@ These modules define ATTRIBUTE pdusSentCounter.
+--@@ These modules define ATTRIBUTE pdusSentThreshold.
+--@@ These modules define ATTRIBUTE peer.
+--@@ These modules define ATTRIBUTE perceivedSeverity.
+--@@ These modules define ATTRIBUTE perceivedSeverityList.
+--@@ These modules define ATTRIBUTE periodEndTime.
+--@@ These modules define ATTRIBUTE periodSynchronizationTime.
+--@@ These modules define ATTRIBUTE physicalPortAttribute.
+--@@ These modules define ATTRIBUTE physicalPortId.
+--@@ These modules define ATTRIBUTE physicalPortSignalRateAndMappingList.
+--@@ These modules define ATTRIBUTE pointDirectionality.
+--@@ These modules define ATTRIBUTE pointerSinkType.
+--@@ These modules define ATTRIBUTE pointerSourceType.
+--@@ These modules define ATTRIBUTE portAssociations.
+--@@ These modules define ATTRIBUTE portSignalRateAndMappingList.
+--@@ These modules define ATTRIBUTE potentialCapacity.
+--@@ These modules define ATTRIBUTE potentialLinkCapacity.
+--@@ These modules define ATTRIBUTE potentialLinkEndCapacity.
+--@@ These modules define ATTRIBUTE previousScanCounterValue.
+--@@ These modules define ATTRIBUTE previousScanGaugeValue.
+--@@ These modules define ATTRIBUTE primary.
+--@@ These modules define ATTRIBUTE priority.
+--@@ These modules define ATTRIBUTE probableCause.
+--@@ These modules define ATTRIBUTE probableCauseList.
+--@@ These modules define ATTRIBUTE proceduralStatus.
+--@@ These modules define ATTRIBUTE proposedRepairActions.
+--@@ These modules define ATTRIBUTE protected.
+--@@ These modules define ATTRIBUTE protectedTTPId.
+--@@ These modules define ATTRIBUTE protecting.
+--@@ These modules define ATTRIBUTE protectionCriteria.
+--@@ These modules define ATTRIBUTE protectionGroupId.
+--@@ These modules define ATTRIBUTE protectionGroupType.
+--@@ These modules define ATTRIBUTE protectionMismatchStatus.
+--@@ These modules define ATTRIBUTE protectionStatus.
+--@@ These modules define ATTRIBUTE protectionStatusR1.
+--@@ These modules define ATTRIBUTE protectionSwitchMode.
+--@@ These modules define ATTRIBUTE protectionUnitId.
+--@@ These modules define ATTRIBUTE providerEntityNames.
+--@@ These modules define ATTRIBUTE providerId.
+--@@ These modules define ATTRIBUTE providerObject.
+--@@ These modules define ATTRIBUTE provisionedLinkCapacity.
+--@@ These modules define ATTRIBUTE provisionedLinkConnectionCount.
+--@@ These modules define ATTRIBUTE provisionedLinkEndCapacity.
+--@@ These modules define ATTRIBUTE provisionedNetworkCTPCount.
+--@@ These modules define ATTRIBUTE qualityOfConnectivityService.
+--@@ These modules define ATTRIBUTE ranges.
+--@@ These modules define ATTRIBUTE reach.
+--@@ These modules define ATTRIBUTE redline.
+--@@ These modules define ATTRIBUTE relatedRoutingProfile.
+--@@ These modules define ATTRIBUTE relationshipChangeDefinition.
+--@@ These modules define ATTRIBUTE reliableResourcePointer.
+--@@ These modules define ATTRIBUTE reliableResourcePointerR1.
+--@@ These modules define ATTRIBUTE replaceable.
+--@@ These modules define ATTRIBUTE reportAllAttributes.
+--@@ These modules define ATTRIBUTE reportPeriod.
+--@@ These modules define ATTRIBUTE reportedProtectionUnit.
+--@@ These modules define ATTRIBUTE reportingTriggers.
+--@@ These modules define ATTRIBUTE resynchronizeMode.
+--@@ These modules define ATTRIBUTE revertive.
+--@@ These modules define ATTRIBUTE routingBlockId.
+--@@ These modules define ATTRIBUTE routingBlockPtr.
+--@@ These modules define ATTRIBUTE routingBlockPtrList.
+--@@ These modules define ATTRIBUTE rsCTPId.
+--@@ These modules define ATTRIBUTE rsDatacomCTPId.
+--@@ These modules define ATTRIBUTE rsOrderwireCTPId.
+--@@ These modules define ATTRIBUTE rsTTPId.
+--@@ These modules define ATTRIBUTE rsUserChannelCTPId.
+--@@ These modules define ATTRIBUTE sCFAccessPointer.
+--@@ These modules define ATTRIBUTE sES.
+--@@ These modules define ATTRIBUTE sap1Address.
+--@@ These modules define ATTRIBUTE sap2Address.
+--@@ These modules define ATTRIBUTE sapId.
+--@@ These modules define ATTRIBUTE scanAttributeIdList.
+--@@ These modules define ATTRIBUTE scanInitiationTime.
+--@@ These modules define ATTRIBUTE scannerId.
+--@@ These modules define ATTRIBUTE scanningFilter.
+--@@ These modules define ATTRIBUTE scheduleId.
+--@@ These modules define ATTRIBUTE scheduledManagedObjects.
+--@@ These modules define ATTRIBUTE schedulerID.
+--@@ These modules define ATTRIBUTE schedulerName.
+--@@ These modules define ATTRIBUTE schedulingData.
+--@@ These modules define ATTRIBUTE scope.
+--@@ These modules define ATTRIBUTE sdhPriority.
+--@@ These modules define ATTRIBUTE secondMovingTimePeriod.
+--@@ These modules define ATTRIBUTE secondary.
+--@@ These modules define ATTRIBUTE securityAlarmCause.
+--@@ These modules define ATTRIBUTE securityAlarmDetector.
+--@@ These modules define ATTRIBUTE securityAlarmSeverity.
+--@@ These modules define ATTRIBUTE sensitiveCircuit.
+--@@ These modules define ATTRIBUTE sequenceOfDays.
+--@@ These modules define ATTRIBUTE sequenceOfMonths.
+--@@ These modules define ATTRIBUTE sequenceOfWeeks.
+--@@ These modules define ATTRIBUTE serialNumber.
+--@@ These modules define ATTRIBUTE serverConnectionList.
+--@@ These modules define ATTRIBUTE serverTTPPointer.
+--@@ These modules define ATTRIBUTE serverTrail.
+--@@ These modules define ATTRIBUTE serverTrailList.
+--@@ These modules define ATTRIBUTE serviceAffected.
+--@@ These modules define ATTRIBUTE serviceKey.
+--@@ These modules define ATTRIBUTE serviceManagerId.
+--@@ These modules define ATTRIBUTE servicePackageId.
+--@@ These modules define ATTRIBUTE serviceProvider.
+--@@ These modules define ATTRIBUTE servicePtrList.
+--@@ These modules define ATTRIBUTE serviceUser.
+--@@ These modules define ATTRIBUTE severityIndicatingGaugeThreshold.
+--@@ These modules define ATTRIBUTE signalDegradeThreshold.
+--@@ These modules define ATTRIBUTE signalId.
+--@@ These modules define ATTRIBUTE signalType.
+--@@ These modules define ATTRIBUTE signallingCapabilities.
+--@@ These modules define ATTRIBUTE softwareId.
+--@@ These modules define ATTRIBUTE sourceIndicator.
+--@@ These modules define ATTRIBUTE specificProblems.
+--@@ These modules define ATTRIBUTE specificProblemsIndicator.
+--@@ These modules define ATTRIBUTE standbyStatus.
+--@@ These modules define ATTRIBUTE startTime.
+--@@ These modules define ATTRIBUTE stateChangeDefinition.
+--@@ These modules define ATTRIBUTE stmLevel.
+--@@ These modules define ATTRIBUTE stopTime.
+--@@ These modules define ATTRIBUTE sub-partitionPointer.
+--@@ These modules define ATTRIBUTE subNetworkConnectionId.
+--@@ These modules define ATTRIBUTE subNetworkConnectionPointer.
+--@@ These modules define ATTRIBUTE subNetworkId.
+--@@ These modules define ATTRIBUTE subordinateCircuitPackSoftwareLoad.
+--@@ These modules define ATTRIBUTE subsystemId.
+--@@ These modules define ATTRIBUTE superPartitionPointer.
+--@@ These modules define ATTRIBUTE supplementaryServiceId.
+--@@ These modules define ATTRIBUTE supportEntityNames.
+--@@ These modules define ATTRIBUTE supportableClientList.
+--@@ These modules define ATTRIBUTE supportedByAccessPortPtrList.
+--@@ These modules define ATTRIBUTE supportedByObjectList.
+--@@ These modules define ATTRIBUTE supportedConnectionNames.
+--@@ These modules define ATTRIBUTE supportedFeatures.
+--@@ These modules define ATTRIBUTE supportedTOClasses.
+--@@ These modules define ATTRIBUTE supportedTTPList.
+--@@ These modules define ATTRIBUTE supportedUncontrolledTests.
+--@@ These modules define ATTRIBUTE suppressAdditionalThresholds.
+--@@ These modules define ATTRIBUTE suppressObjectInstance.
+--@@ These modules define ATTRIBUTE suspectIntervalFlag.
+--@@ These modules define ATTRIBUTE suspectIntervals.
+--@@ These modules define ATTRIBUTE switchStatus.
+--@@ These modules define ATTRIBUTE systemId.
+--@@ These modules define ATTRIBUTE systemTimingSource.
+--@@ These modules define ATTRIBUTE systemTitle.
+--@@ These modules define ATTRIBUTE tTPId.
+--@@ These modules define ATTRIBUTE tdp10Criteria.
+--@@ These modules define ATTRIBUTE tdp12Criteria.
+--@@ These modules define ATTRIBUTE tdp13Criteria.
+--@@ These modules define ATTRIBUTE tdp14Criteria.
+--@@ These modules define ATTRIBUTE tdp15Criteria.
+--@@ These modules define ATTRIBUTE tdp16Criteria.
+--@@ These modules define ATTRIBUTE tdp17Criteria.
+--@@ These modules define ATTRIBUTE tdp18Criteria.
+--@@ These modules define ATTRIBUTE tdp1Criteria.
+--@@ These modules define ATTRIBUTE tdp2Criteria.
+--@@ These modules define ATTRIBUTE tdp3Criteria.
+--@@ These modules define ATTRIBUTE tdp4Criteria.
+--@@ These modules define ATTRIBUTE tdp5Criteria.
+--@@ These modules define ATTRIBUTE tdp6Criteria.
+--@@ These modules define ATTRIBUTE tdp7Criteria.
+--@@ These modules define ATTRIBUTE tdp8Criteria.
+--@@ These modules define ATTRIBUTE tdp9Criteria.
+--@@ These modules define ATTRIBUTE tdpId.
+--@@ These modules define ATTRIBUTE tdpMode.
+--@@ These modules define ATTRIBUTE teleServicePtrList.
+--@@ These modules define ATTRIBUTE teleserviceId.
+--@@ These modules define ATTRIBUTE terminatingDialDigitsList.
+--@@ These modules define ATTRIBUTE testActionPerformerId.
+--@@ These modules define ATTRIBUTE testInvocationId.
+--@@ These modules define ATTRIBUTE testObjectId.
+--@@ These modules define ATTRIBUTE testOutcome.
+--@@ These modules define ATTRIBUTE testSessionId.
+--@@ These modules define ATTRIBUTE testStep.
+--@@ These modules define ATTRIBUTE testStepQualifier.
+--@@ These modules define ATTRIBUTE thresholdDataId.
+--@@ These modules define ATTRIBUTE thresholdDataInstance.
+--@@ These modules define ATTRIBUTE thresholdInfo.
+--@@ These modules define ATTRIBUTE tideMark.
+--@@ These modules define ATTRIBUTE timeAttributeIdentifier.
+--@@ These modules define ATTRIBUTE timePeriod.
+--@@ These modules define ATTRIBUTE timeStampReportMode.
+--@@ These modules define ATTRIBUTE timeoutPeriod.
+--@@ These modules define ATTRIBUTE timer.
+--@@ These modules define ATTRIBUTE timerValue.
+--@@ These modules define ATTRIBUTE toTermination.
+--@@ These modules define ATTRIBUTE topologicalEndDirectionality.
+--@@ These modules define ATTRIBUTE topologicalGroupPointer.
+--@@ These modules define ATTRIBUTE topologicalPointId.
+--@@ These modules define ATTRIBUTE totalLinkCapacity.
+--@@ These modules define ATTRIBUTE totalLinkEndCapacity.
+--@@ These modules define ATTRIBUTE totalRemoteSAPs.
+--@@ These modules define ATTRIBUTE totalTpCount.
+--@@ These modules define ATTRIBUTE tpPoolId.
+--@@ These modules define ATTRIBUTE tpsInGtpList.
+--@@ These modules define ATTRIBUTE tpsInTpPoolList.
+--@@ These modules define ATTRIBUTE trafficDescriptor.
+--@@ These modules define ATTRIBUTE trailId.
+--@@ These modules define ATTRIBUTE trailTraceExpected.
+--@@ These modules define ATTRIBUTE trailTraceReceive.
+--@@ These modules define ATTRIBUTE trailTraceSend.
+--@@ These modules define ATTRIBUTE transmissionCharacteristics.
+--@@ These modules define ATTRIBUTE trendIndication.
+--@@ These modules define ATTRIBUTE triggerAssociation.
+--@@ These modules define ATTRIBUTE triggerList.
+--@@ These modules define ATTRIBUTE ttpPortID.
+--@@ These modules define ATTRIBUTE tu11CTPId.
+--@@ These modules define ATTRIBUTE tu12CTPId.
+--@@ These modules define ATTRIBUTE tu2CTPId.
+--@@ These modules define ATTRIBUTE tu3CTPId.
+--@@ These modules define ATTRIBUTE tug2Id.
+--@@ These modules define ATTRIBUTE tug3Id.
+--@@ These modules define ATTRIBUTE typeOfDayControllerId.
+--@@ These modules define ATTRIBUTE typeOfDayControllerInstance.
+--@@ These modules define ATTRIBUTE typeText.
+--@@ These modules define ATTRIBUTE uAS.
+--@@ These modules define ATTRIBUTE underlyingConnectionNames.
+--@@ These modules define ATTRIBUTE unknownStatus.
+--@@ These modules define ATTRIBUTE unprotectedCTPId.
+--@@ These modules define ATTRIBUTE unreliableResourcePointer.
+--@@ These modules define ATTRIBUTE unreliableResourcePointerR1.
+--@@ These modules define ATTRIBUTE upstreamConnectivityPointer.
+--@@ These modules define ATTRIBUTE usageCost.
+--@@ These modules define ATTRIBUTE usageInfo.
+--@@ These modules define ATTRIBUTE usageState.
+--@@ These modules define ATTRIBUTE userEntityNames.
+--@@ These modules define ATTRIBUTE userLabel.
+--@@ These modules define ATTRIBUTE userObject.
+--@@ These modules define ATTRIBUTE v5SignalLabelExpected.
+--@@ These modules define ATTRIBUTE v5SignalLabelReceive.
+--@@ These modules define ATTRIBUTE v5SignalLabelSend.
+--@@ These modules define ATTRIBUTE validControlType.
+--@@ These modules define ATTRIBUTE vc11TTPId.
+--@@ These modules define ATTRIBUTE vc12TTPId.
+--@@ These modules define ATTRIBUTE vc2TTPId.
+--@@ These modules define ATTRIBUTE vc3TTPId.
+--@@ These modules define ATTRIBUTE vc4TTPId.
+--@@ These modules define ATTRIBUTE vcnUserChannelCTPId.
+--@@ These modules define ATTRIBUTE vendorName.
+--@@ These modules define ATTRIBUTE version.
+--@@ These modules define ATTRIBUTE waitToRestoreTime.
+--@@ These modules define ATTRIBUTE weekDayTranslationList.
+--@@ These modules define ATTRIBUTE weekMask.
+--@@ These modules define ATTRIBUTE wrapping64BitCounter.
+--@@ These modules define ATTRIBUTE x121DirectoryNumber.
+--@@ These modules define ATTRIBUTE z-TPInstance.
+--@@ These modules define ATTRIBUTE zEnd.
+--@@ These modules define ATTRIBUTE zEndNetworkTPList.
+--@@ 
+--@@ objects cepsg referenced but never defined!
+--@@ ClassReference references undefined "":cepsg
+--@@ ClassReference references undefined "":cepsg
+--@@ objects dialledDigitLength referenced but never defined!
+--@@ ClassReference references undefined "":dialledDigitLength
+--@@ ClassReference references undefined "":dialledDigitLength
+--@@ objects sCFAccess referenced but never defined!
+--@@ ClassReference references undefined "":sCFAccess
+--@@ ClassReference references undefined "":sCFAccess
+--@@ objects ssfScfAE referenced but never defined!
+--@@ ClassReference references undefined "":ssfScfAE
+--@@ objects terminatingDialledDigitList referenced but never defined!
+--@@ ClassReference references undefined "":terminatingDialledDigitList
+--@@ attributes assistTreatmentConfigurationId referenced but never defined!
+--@@ AttributeReference references undefined "":assistTreatmentConfigurationId
+--@@ AttributeReference references undefined "":assistTreatmentConfigurationId
+--@@ attributes currentDataId referenced but never defined!
+--@@ AttributeReference references undefined "ITU-T Recommendation Q.822":currentDataId
+--@@ attributes defaultChargingId referenced but never defined!
+--@@ AttributeReference references undefined "":defaultChargingId
+--@@ attributes exceptionHandlerId referenced but never defined!
+--@@ AttributeReference references undefined "":exceptionHandlerId
+--@@ attributes iNAPCounterId referenced but never defined!
+--@@ AttributeReference references undefined "":iNAPCounterId
+--@@ attributes iPConfigurationId referenced but never defined!
+--@@ AttributeReference references undefined "":iPConfigurationId
+--@@ attributes inAuthorizationId referenced but never defined!
+--@@ AttributeReference references undefined "":inAuthorizationId
+--@@ attributes initiateCallDefaultInformationId referenced but never defined!
+--@@ AttributeReference references undefined "":initiateCallDefaultInformationId
+--@@ attributes portedNumberListId referenced but never defined!
+--@@ AttributeReference references undefined "":portedNumberListId
+--@@ AttributeReference references undefined "":portedNumberListId
+--@@ attributes portedNumberTriggerId referenced but never defined!
+--@@ AttributeReference references undefined "":portedNumberTriggerId
+--@@ AttributeReference references undefined "":portedNumberTriggerId
+--@@ attributes sCFAccessId referenced but never defined!
+--@@ AttributeReference references undefined "":sCFAccessId
+--@@ AttributeReference references undefined "":sCFAccessId
+--@@ attributes sSFTimerId referenced but never defined!
+--@@ AttributeReference references undefined "":sSFTimerId
+--@@ attributes serviceFeatureControlId referenced but never defined!
+--@@ AttributeReference references undefined "":serviceFeatureControlId
+--@@ attributes serviceFilteringId referenced but never defined!
+--@@ AttributeReference references undefined "":serviceFilteringId
+--@@ attributes triggerBaseId referenced but never defined!
+--@@ AttributeReference references undefined "":triggerBaseId
+--@@ AttributeReference references undefined "":triggerBaseId
+--@@ AttributeReference references undefined "":triggerBaseId
+--@@ AttributeReference references undefined "":triggerBaseId
+--@@ notifications callProcessingException referenced but never defined!
+--@@ NotificationReference references undefined "":callProcessingException
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ +- itut_x723::subsystem
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ |  |  +- itut_q836_1::iNAPCurrentData
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ |  +- itut_q836_1::iNAPHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ |  +- itut_q824_0::administeredCircuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ |  +- itut_q836_1::scfApplicationEntity
+--@@ |  +- itut_q836_1::ssfApplicationEntity
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  |  +- itut_q824_0::accessChannel
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  |  +- itut_q824_0::accessChannel
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- itut_q824_0::accessPort
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- itut_q824_0::accessPort
+--@@ +- itut_m3100::tpPool
+--@@ +- itut_q824_0::accessPortProfile
+--@@ +- itut_q824_0::bearerService
+--@@ +- itut_q824_0::customerProfile
+--@@ +- itut_q824_0::directoryNumber
+--@@ |  +- itut_q824_0::directoryNumberE164
+--@@ |  +- itut_q824_0::directoryNumberX121
+--@@ +- itut_q824_0::layerEntity
+--@@ +- itut_q824_0::routingBlock
+--@@ +- itut_q824_0::cataloguedOptionalUserFacilities
+--@@ +- itut_q824_0::cataloguedSupplementaryService
+--@@ +- itut_q824_0::cataloguedTeleservice
+--@@ +- itut_q824_0::customizedResource
+--@@ +- itut_q824_0::optionalUserFacilities
+--@@ +- itut_q824_0::supplementaryServiceServiceDependent
+--@@ +- itut_q824_0::supplementaryServiceServiceIndependent
+--@@ +- itut_q824_0::teleservice
+--@@ +- itut_q824_0::serviceManager
+--@@ +- itut_q824_0::servicePackage
+--@@ +- itut_q836_1::inAuthorization
+--@@ |  +- itut_q836_1::inAuthorizationOriginating
+--@@ |  +- itut_q836_1::inAuthorizationTerminating
+--@@ +- itut_q836_1::bcsm
+--@@ +- itut_q836_1::tdp
+--@@ |  +- itut_q836_1::oAttemptAuthorized
+--@@ |  +- itut_q836_1::collectedInfoTrigger
+--@@ |  +- itut_q836_1::analysedInfoTrigger
+--@@ |  +- itut_q836_1::routeSelectFailureTrigger
+--@@ |  +- itut_q836_1::oCalledPartyBusyTrigger
+--@@ |  +- itut_q836_1::oNoAnswerTrigger
+--@@ |  +- itut_q836_1::oAnswerTrigger
+--@@ |  +- itut_q836_1::oMidCallTrigger
+--@@ |  +- itut_q836_1::oDisconnectTrigger
+--@@ |  +- itut_q836_1::oAbandonTrigger
+--@@ |  +- itut_q836_1::tAttemptAuthorized
+--@@ |  +- itut_q836_1::tCalledPartyBusyTrigger
+--@@ |  +- itut_q836_1::tNoAnswerTrigger
+--@@ |  +- itut_q836_1::tAnswerTrigger
+--@@ |  +- itut_q836_1::tMidCallTrigger
+--@@ |  +- itut_q836_1::tDisconnectTrigger
+--@@ |  +- itut_q836_1::tAbandonTrigger
+--@@ +- itut_q836_1::triggerBase
+--@@ |  +- itut_q836_1::olineTriggerBase
+--@@ |  +- itut_q836_1::otrunkTriggerBase
+--@@ |  +- itut_q836_1::tlineTriggerBase
+--@@ |  +- itut_q836_1::ttrunkTriggerBase
+--@@ |  +- itut_q836_1::privateFacilityTriggerBase
+--@@ |  +- itut_q836_1::officeTriggerBase
+--@@ +- itut_q836_1::inCallGap
+--@@ +- itut_q836_1::serviceFiltering
+--@@ +- itut_q836_1::serviceFilteringCounter
+--@@ +- itut_q836_1::serviceFilteringDurationDefault
+--@@ +- itut_q836_1::initiateCallDefaultInformation
+--@@ +- itut_q836_1::iNAPCounter
+--@@ +- itut_q836_1::serviceFeatureControl
+--@@ +- itut_q836_1::scfAccess
+--@@ |  +- itut_q836_1::scfAccessPointCodeBased
+--@@ |  +- itut_q836_1::scfAccessGlobalTitleBased
+--@@ +- itut_q836_1::iPConfiguration
+--@@ +- itut_q836_1::assistTreatmentConfiguration
+--@@ +- itut_q836_1::portedNumberTrigger
+--@@ +- itut_q836_1::portedNumberList
+--@@ +- itut_q836_1::defaultCharging
+--@@ +- itut_q836_1::exceptionHandler
+--@@ +- itut_q836_1::sSFTimer
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ |  >- itut_q824_0::accessPortProfile
+--@@ |  >- itut_q824_0::cataloguedOptionalUserFacilities
+--@@ |  >- itut_q824_0::cataloguedSupplementaryService
+--@@ |  >- itut_q824_0::cataloguedTeleservice
+--@@ |  >- itut_q824_0::customerProfile
+--@@ |  |  >- itut_q824_0::administeredCircuitEndPointSubgroup
+--@@ |  |  >- itut_q824_0::bearerService
+--@@ |  |  |  >- itut_q824_0::optionalUserFacilities
+--@@ |  |  |  >- itut_q824_0::supplementaryServiceServiceDependent
+--@@ |  |  >- itut_q824_0::customizedResource
+--@@ |  |  >- itut_q824_0::layerEntity
+--@@ |  |  >- itut_q824_0::routingBlock
+--@@ |  |  >- itut_q824_0::supplementaryServiceServiceIndependent
+--@@ |  |  >- itut_q824_0::teleservice
+--@@ |  |  |  >- itut_q824_0::supplementaryServiceServiceDependent
+--@@ |  |  >- itut_q836_1::olineTriggerBase
+--@@ |  |  >- itut_q836_1::tlineTriggerBase
+--@@ |  >- itut_q824_0::directoryNumber
+--@@ |  >- itut_q824_0::serviceManager
+--@@ |  >- itut_q824_0::servicePackage
+--@@ |  >- itut_q836_1::bcsm
+--@@ |  |  >- itut_q836_1::tdp
+--@@ |  |  |  >- itut_q836_1::inAuthorization
+--@@ |  >- itut_q836_1::iPConfiguration
+--@@ |  >- itut_q836_1::initiateCallDefaultInformation
+--@@ |  >- itut_q836_1::assistTreatmentConfiguration
+--@@ |  >- itut_q836_1::portedNumberTrigger
+--@@ |  |  >- itut_q836_1::portedNumberList
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_q836_1::ssfApplicationEntity
+--@@ >- itut_q836_1::iNAPCounter
+--@@ >- itut_q836_1::iNAPCurrentData
+--@@ >- itut_q836_1::iNAPHistoryData
+--@@ >- itut_q836_1::assistTreatmentConfiguration
+--@@ >- itut_q836_1::serviceFeatureControl
+--@@ |  >- itut_q836_1::serviceFiltering
+--@@ |  >- itut_q836_1::defaultCharging
+--@@ |  >- itut_q836_1::exceptionHandler
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_q824_0::accessPort
+--@@ >- itut_q824_0::accessChannel
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@ itut_q824_0::accessPort +++
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

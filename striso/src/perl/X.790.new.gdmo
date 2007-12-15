@@ -1,0 +1,3002 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 19:35:09 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.790 (1995)"
+--  { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) } >--
+--< GDMO.Namespace itut_x790 >--
+--< GDMO.Alias "ITU-T Rec. X.790 (1995)" "ITU-T Recommendation X.790",
+--  "ITU-T Rec. X.790" >--
+MODULE "ITU-T Rec. X.790 (1995)" { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) }
+-- Annex A
+-- Managed objects
+-- (This annex forms an integral part of this Recommendation)
+-- A.1 Managed object class and package definitions
+-- Recommendation X.790 (11/95)
+-- A.1.1 Account
+
+account MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		accountPkg PACKAGE
+			ATTRIBUTES
+				accountName GET,
+				additionalText GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		aAccountContactAttributeListPkg PACKAGE
+			ATTRIBUTES
+				accountContactList GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { x790Package 1 };
+			PRESENT IF
+				"an instance supports it and accountContactObjectListPkg is not present.",
+		aAccountContactObjectListPkg PACKAGE
+			BEHAVIOUR
+				accountContactObjectListBehaviour BEHAVIOUR
+					DEFINED AS
+						"The Account Contact Object List package contains one attribute which points to 
+						instances of the Contact object that represent individuals in the managers 
+						organization who can be contacted about an account.";;
+			ATTRIBUTES
+				contactObjectPtrList GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { x790Package 2 };
+			PRESENT IF
+				"an instance supports it and accountContactAttributeListPkg is not present.";
+REGISTERED AS { x790ObjectClass 1 };
+-- A.1.2 cnmService
+
+
+cnmService MANAGED OBJECT CLASS
+	DERIVED FROM
+		service;
+	CHARACTERIZED BY
+		cnmServicePkg PACKAGE
+			ATTRIBUTES
+				serviceLocationList GET,
+				serviceDescription GET;;;
+	CONDITIONAL PACKAGES
+		csServiceAliasPkg PACKAGE
+			ATTRIBUTES
+				serviceAliasList GET;
+			-- Administrations may specify structure
+			-- of serviceAliasList GraphicString
+			REGISTERED AS { x790Package 3 };
+			PRESENT IF
+				"an instance supports it.",
+		csTroubleReportFormatObjectPtrPkg PACKAGE
+			ATTRIBUTES
+				troubleReportFormatObjectPtr GET;
+		REGISTERED AS { x790Package 4 };
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { x790ObjectClass 2 };
+-- A.1.3 contact
+
+
+contact MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		contactPkg,
+		"Rec. M.3100 : 1992":attributeValueChangeNotificationPackage,
+		"Rec. M.3100 : 1992":createDeleteNotificationsPackage;
+	CONDITIONAL PACKAGES
+		contactCompanyPkg PACKAGE
+			BEHAVIOUR
+				contactCompanyPkgDefinition BEHAVIOUR
+					DEFINED AS
+						"This package contains one attribute that specifies the company name that a 
+						specific contact works for or is associated with.";,
+				contactCompanyPkgBehaviour BEHAVIOUR
+					DEFINED AS
+						"If the attributeValueChange notification is defined for the managed object class 
+						using this package, this notification is emitted when the contactCompany 
+						attribute changes value.";;
+			ATTRIBUTES
+				contactCompany
+					PERMITTED VALUES X790ASN1Module.GraphicString64
+					GET-REPLACE;
+		REGISTERED AS { x790Package 5 };
+			PRESENT IF
+				! an instance supports it!,
+		contactFunctionPkg PACKAGE
+			BEHAVIOUR
+				contactFunctionPkgDefinition BEHAVIOUR
+					DEFINED AS
+						"This package contains one attribute that provides information about the work 
+						function performed by the contact person.";,
+				contactFunctionPkgBehaviour BEHAVIOUR
+					DEFINED AS
+						"If the attributeValueChange notification is defined for the managed object class 
+						using this package, this notification is emitted when the contactFunction 
+						attribute changes value.";;
+			ATTRIBUTES
+				contactFunction GET-REPLACE;
+		REGISTERED AS { x790Package 6 };
+			PRESENT IF
+				! an instance supports it!,
+		contactNamesPkg PACKAGE
+			ATTRIBUTES
+				contactNames GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { x790Package 7 };
+			PRESENT IF
+				! an instance supports it!,
+		contactTypePkg PACKAGE
+			BEHAVIOUR
+				contactTypePkgDefinition BEHAVIOUR
+					DEFINED AS
+						"This package contains one attribute that provides information about the type of 
+						contact.";,
+				contactTypePkgBehaviour BEHAVIOUR
+					DEFINED AS
+						"If the attributeValueChange notification is defined for the managed object class 
+						using this package, this notification is emitted when the contactType attribute 
+						changes value.";;
+			ATTRIBUTES
+				contactType GET-REPLACE;
+		REGISTERED AS { x790Package 8 };
+			PRESENT IF
+				! an instance supports it!,
+		electronicMailAddressPkg PACKAGE
+			BEHAVIOUR
+				electronicMailAddressPkgDefinition BEHAVIOUR
+					DEFINED AS
+						"This package contains one attribute that specifies the electronic mail address 
+						associated with an object.";,
+				electronicMailAddressPkgBehaviour BEHAVIOUR
+					DEFINED AS
+						"If the attributeValueChange notification is defined for the managed object class 
+						using this package, this notification is emitted when the electronicMailAddress 
+						attribute changes value.";;
+			ATTRIBUTES
+				electronicMailAddress
+					PERMITTED VALUES X790ASN1Module.ElectronicMailAddressRange
+					GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { x790Package 9 };
+			PRESENT IF
+				! an instance supports it!,
+		facsimileTelephoneNumberListPkg PACKAGE
+			BEHAVIOUR
+				facsimileTelephoneNumberListPkgDefinition BEHAVIOUR
+					DEFINED AS
+						"This package contains one attribute that specifies telephone numbers for 
+						facsimile terminals associated with an object.";,
+				facsimileTelephoneNumberListPkgBehaviour BEHAVIOUR
+					DEFINED AS
+						"If the attributeValueChange notification is defined for the managed object class 
+						using this package, this notification is emitted when the 
+						facsimileTelephoneNumberList attribute changes value.";;
+			ATTRIBUTES
+				facsimileTelephoneNumberList
+					PERMITTED VALUES X790ASN1Module.TelephoneNumberListRange
+					GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { x790Package 10 };
+			PRESENT IF
+				! an instance supports it!,
+		"Rec. M.3100 : 1992":locationNamePackage
+			PRESENT IF
+				! an instance supports it!,
+		typeTextPkg PACKAGE
+			ATTRIBUTES
+				typeText GET-REPLACE;
+		REGISTERED AS { x790Package 11 };
+			PRESENT IF
+				! an instance supports it!,
+		"Rec. M.3100 : 1992":userLabelPackage
+			PRESENT IF
+				! an instance supports it!;
+REGISTERED AS { x790ObjectClass 3 };
+
+
+contactPkg PACKAGE
+	BEHAVIOUR
+		contactPkgDefinition BEHAVIOUR
+			DEFINED AS
+				"The contact managed object class refers to a person or organization having 
+				responsibility for one or more managed object instances.";,
+		contactPkgBehaviour BEHAVIOUR
+			DEFINED AS
+				"Attributes whose values are names of other managed object instances (e.g. 
+				locationPointer) must have names of managed objects which actually exist. The 
+				attributeValueChange notification is emitted when any of the following 
+				attributes change in value: contactDetails and telephoneNumberList. All 
+				attributeValueChange notifications shall include the Attribute Identifier List 
+				parameter. Conditions under which an attributeValueChange notification is 
+				emitted are stated in the behaviour of the appropriate package or attribute. In 
+				the absence of such a statement in the behaviour, the attribute does not cause 
+				an attribute ValueChange notification to be emitted.
+
+				A value for the contactID attribute can only be provided when the object is 
+				created. Furthermore, once the object is created, the value of contactID may not 
+				be modified (i.e. the instance cannot be renamed). The contact object is created 
+				locally by the agent. .";,
+		commonCreationBehaviour BEHAVIOUR
+			DEFINED AS
+				"Unless otherwise specified, all attributes can be set by an M-CREATE.";;
+	ATTRIBUTES
+		contactDetails
+			PERMITTED VALUES X790ASN1Module.GraphicString128
+			GET-REPLACE,
+		contactID
+			PERMITTED VALUES X790ASN1Module.SimpleNameRange
+			GET,
+		telephoneNumberList
+			PERMITTED VALUES X790ASN1Module.TelephoneNumberListRange
+			GET-REPLACE ADD-REMOVE;
+REGISTERED AS { x790Package 12 };
+-- A.1.4 providerTroubleReport
+
+
+providerTroubleReport MANAGED OBJECT CLASS
+	DERIVED FROM
+		troubleReport;
+	CHARACTERIZED BY
+		providerTroubleReportPkg,
+		trAttributeValueChangePkg,
+		trObjectCreationDeletionPkg;
+	-- trObjectCreationDeletionPkg is defined in A.1.9,
+	-- inline to the tourbleReport class
+	CONDITIONAL PACKAGES
+		ptrUnavailableServicePtrPkg PACKAGE
+			ATTRIBUTES
+				unavailableServicePtr GET;
+		REGISTERED AS { x790Package 13 };
+			PRESENT IF
+				"an instance supports it and if a service is impacted";
+REGISTERED AS { x790ObjectClass 4 };
+
+
+providerTroubleReportPkg PACKAGE
+	BEHAVIOUR
+		providerTroubleReportBehaviour,
+		providerTroubleReportPkgDefinition;
+	ATTRIBUTES
+		beginTime GET,
+		endTime GET,
+		troubleLocation GET;;
+
+
+providerTroubleReportPkgDefinition BEHAVIOUR
+	DEFINED AS
+		!The providerTroubleReport object is created by the agent role CME to 
+		specifically notify the manager role CME that planned maintenance will be 
+		carried out at a given time and that all or parts of the service(s), 
+		resource(s), network or system will be inaccessible during that time. In this 
+		case the trouble management function is used to notify the manager that planned 
+		maintenance action is scheduled to prevent future trouble.!;
+
+
+providerTroubleReportBehaviour BEHAVIOUR
+	DEFINED AS
+		!In the following text, the term "agent" refers to a system operating in the 
+		agent role, and "manager" refers to a system operating in the manager role.
+
+		Only the agent is allowed to create or delete an instance of the Provider 
+		Trouble Report managed object class. The manager cannot create or delete an 
+		instance of the Provider Trouble Report managed object class. If the manager 
+		attempts to create or delete an instance of the Provider Trouble Report managed 
+		object class, then the "accessDenied" CMIS error is returned by the agent.
+
+		When the agent creates an instance of the Provider Trouble Report managed object 
+		class, the "objectCreation" notification is emitted.
+
+		When the agent deletes an instance of the Provider Trouble Report managed object 
+		class, the "objectDeletion" notification is emitted.
+
+		When the agent updates one or several attributes of an instance of the Provider 
+		Trouble Report managed object class, the "attributeValueChange" notification is 
+		emitted.
+
+		If no specific additional information relative to the Provider Trouble Report 
+		managed object instance is known at creation time, then the 
+		additionalTroubleInfoList attribute must be set to GraphicString::="".
+
+		The receivedTime attribute is the creation time of the Provider Trouble Report 
+		managed object instance.
+
+		If the maintenance has already started at creation time, then the Provider 
+		Trouble Report managed object instance must be created with the state set to 
+		"open/active". If the maintenance has not started yet at creation time, then the 
+		Provider Trouble Report managed object instance must be created with the state 
+		set to "queued". In this case the Provider Trouble Report managed object 
+		instance will enter the "open/active" state when the maintenance will start. 
+		When the maintenance is done, then the Provider Trouble Report managed object 
+		instance must enter the "cleared" state. When the Provider Trouble Report 
+		managed object instance enters the cleared state, then the "troubleFound" 
+		attribute can be set for example to "information" if no specific problems have 
+		been detected during the maintenance. The Provider Trouble Report managed object 
+		instance will then enter the "closed" state.
+
+		The attributes that can be updated by the agent during the processing of a 
+		Provider Trouble Report managed object instance are :
+
+		activityDuration -- when the PTR is in the "cleared" or "closed" state
+
+		additionalTroubleInfoList -- at any time
+
+		agentContactPerson or agentContactObjectPtr -- at any time
+
+		beginTime -- when the PTR is in the "queued" state
+
+		closeOutNarr -- when the PTR is in the "cleared" or "closed" state
+
+		endTime -- when the PTR is not in the "closed" state
+
+		managedObjectInstanceAliasList -- at any time
+
+		relatedTroubleReportList -- at any time
+
+		repairActivityList -- at any time
+
+		restoredTime -- when the PTR is in the "cleared" or "closed" state
+
+		troubleClearancePerson -- according to the attribute"s behaviour
+
+		troubleFound -- when the PTR is in the "cleared" or "closed" state
+
+		troubleLocation -- at any time
+
+		troubleReportNumberList -- at any time
+
+		troubleReportState -- according to the attributes behaviour
+
+		troubleReportStatus -- according to the attribute s behaviour
+
+		troubleReportStatusTime -- when the "troubleReportStatus" is updated.
+
+		The manager cannot update attributes of a Provider Trouble Report managed object 
+		instance. If the manager attempts to update one or several attributes of a 
+		Provider Trouble Report managed object instance, then the "accessDenied" CMIS 
+		error is returned by the agent.
+
+		A value for the troubleReportID attribute can only be provided when the object 
+		is created.
+
+		Furthermore, once the object is created, the value of troubleReportID may not be 
+		modified (i.e. the instance cannot be renamed).!;
+
+
+trAttributeValueChangePkg PACKAGE
+	NOTIFICATIONS
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":attributeValueChange;
+REGISTERED AS { x790Package 14 };
+-- System Management Implementors Guide version 4 April 1996
+-- S5 X790/007 delete definition of the
+-- PACKAGE trObjectCreationDeletionPkg
+--
+--trObjectCreationDeletionPkg PACKAGE
+--	NOTIFICATIONS
+--		"Rec. X.721 | ISO/IEC 10165-2 : 1992":objectCreation,
+--		"Rec. X.721 | ISO/IEC 10165-2 : 1992":objectDeletion;
+--REGISTERED AS { x790Package 15 };
+-- A.1.5 repairActivity
+
+
+repairActivity MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		repairActivityPkg PACKAGE
+			ATTRIBUTES
+				repairActivityID GET,
+				entryTime GET,
+				activityInfo
+					DEFAULT VALUE X790ASN1Module.activityInfoActivityInfoDefault
+					GET;;;
+	CONDITIONAL PACKAGES
+		raActivityPersonPkg PACKAGE
+			ATTRIBUTES
+				activityPerson GET;
+		REGISTERED AS { x790Package 16 };
+			PRESENT IF
+				"an instance supports it.",
+		raActivityCodePkg PACKAGE
+			ATTRIBUTES
+				activityCode GET;
+		REGISTERED AS { x790Package 17 };
+			PRESENT IF
+				"an instance supports it.",
+		raObjectCreationPkg PACKAGE
+			NOTIFICATIONS
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":objectCreation;
+		REGISTERED AS { x790Package 18 };
+			PRESENT IF
+				"an instance supports it.",
+		repairCommitmentTime PACKAGE
+			ATTRIBUTES
+				commitmentTime GET;
+		REGISTERED AS { x790Package 107 };
+			PRESENT IF
+				"An instance supports it.";
+REGISTERED AS { x790ObjectClass 5 };
+-- A.1.6 service
+
+
+service MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		servicePackage PACKAGE
+			BEHAVIOUR
+				serviceBehaviour BEHAVIOUR
+					DEFINED AS
+						"The service object class is a class of managed objects that represents offerings 
+						from a provider that supplies specific network functionality to one or more 
+						customers. A service may or may not be tariffed. Services may be nested, thereby 
+						creating a containment relationship. The Service Type identifies the 
+						distinguishing characteristics of the Service. The Supported Service Name List 
+						identifies other Services supported by the Service, and the Supported By Object 
+						List identifies the objects that support the Service.";;
+			ATTRIBUTES
+				serviceID GET,
+				serviceType GET-REPLACE;
+			NOTIFICATIONS
+				"Rec. X.721 | ISO/IEC 10165-2":qualityofServiceAlarm;;;
+	CONDITIONAL PACKAGES
+		"Rec. M.3100 : 1992":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in
+				Recommendation X.721 are supported by an instance of this class.",
+		"Rec. M.3100 : 1992":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in Recommendation X.721 is
+				supported by an instance of this class.",
+		"Rec. M.3100 : 1992":stateChangeNotificationPackage
+			PRESENT IF
+				"the stateChange notification defined in Recommendation X.721 is supported by
+				an instance of this class.",
+		"Rec. M.3100 : 1992":administrativeOperationalStatesPackage
+			PRESENT IF
+				"an instance supports it.",
+		usageStatePackage
+			PRESENT IF
+				"an instance supports it.",
+		alarmStatusPackage
+			PRESENT IF
+				"an instance supports it.",
+		"Rec. M.3100 : 1992":currentProblemListPackage
+			PRESENT IF
+				"an instance supports it.",
+		supportedServiceNameListPackage
+			PRESENT IF
+				"an instance supports it.",
+		supportedByObjectListPackage
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { x790ObjectClass 6 };
+
+
+supportedByObjectListPackage PACKAGE
+	ATTRIBUTES
+		"Rec. M.3100 : 1992":supportedByObjectList GET-REPLACE ADD-REMOVE;
+REGISTERED AS { x790Package 19 };
+
+
+supportedServiceNameListPackage PACKAGE
+	ATTRIBUTES
+		supportedServiceNameList GET-REPLACE ADD-REMOVE;
+REGISTERED AS { x790Package 20 };
+
+
+alarmStatusPackage PACKAGE
+	ATTRIBUTES
+		"Rec. M.3100 : 1992":alarmStatus GET;
+REGISTERED AS { x790Package 21 };
+
+
+usageStatePackage PACKAGE
+	ATTRIBUTES
+		"Rec. X.721 | ISO/IEC 10165-2":usageState GET;
+REGISTERED AS { x790Package 22 };
+-- A.1.7 telecommunicationsTroubleReport
+
+
+telecommunicationsTroubleReport MANAGED OBJECT CLASS
+	DERIVED FROM
+		troubleReport;
+	CONDITIONAL PACKAGES
+		trAfterHrsRepairAuthPkg PACKAGE
+			ATTRIBUTES
+				afterHrsRepairAuth
+					DEFAULT VALUE X790ASN1Module.afterHrsRepairAuthAfterHrsRepairAuthDefault
+					GET-REPLACE;
+		REGISTERED AS { x790Package 23 };
+			PRESENT IF
+				"an instance supports it and trAuthorizationListPkg is not present.",
+		trAlarmRecordPtrListPkg PACKAGE
+			ATTRIBUTES
+				alarmRecordPtrList GET;
+			-- Necessary condition: Trouble Report shall have been generated as a result of an alarm.
+			-- Not a sufficient condition: some instances may choose not to support even if the trouble report
+			-- was generated as a result of an alarm received or generated in the agent.
+			REGISTERED AS { x790Package 24 };
+			PRESENT IF
+				"an instance supports it.",
+		trAlternateManagerContactPersonAttributePkg PACKAGE
+			ATTRIBUTES
+				alternateManagerContactPerson GET-REPLACE;
+		REGISTERED AS { x790Package 25 };
+			PRESENT IF
+				"an instance supports it and trAlternateManagerContactPersonObjectPkg
+				is not present.",
+		trAlternateManagerContactPersonObjectPkg PACKAGE
+			BEHAVIOUR
+				alternateManagerContactPersonObjectBehaviour BEHAVIOUR
+					DEFINED AS
+						"The Alternate Manager Contact Person Object package contains one attribute which 
+						points to an instance of the Contact object which represents the alternative 
+						person to the manager contact who can be contacted regarding the reported 
+						trouble.";;
+			ATTRIBUTES
+				alternateManagerContactObjectPtr GET-REPLACE;
+		REGISTERED AS { x790Package 26 };
+			PRESENT IF
+				"an instance supports it and trAlternateManagerContactPersonAttributePkg
+				is not present.",
+		trAuthorizationListPkg PACKAGE
+			ATTRIBUTES
+				authorizationList
+					DEFAULT VALUE X790ASN1Module.authorizationAuthorizationDefault
+					GET-REPLACE ADD-REMOVE
+					troubleReportChangeDenied;
+		REGISTERED AS { x790Package 27 };
+			PRESENT IF
+				"an instance supports it and trAfterHrsRepairAuthPkg is not present.",
+		trCallBackInfoListPkg PACKAGE
+			ATTRIBUTES
+				callBackInfoList GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { x790Package 28 };
+			PRESENT IF
+				"an instance supports it.",
+		trCalledNumberPkg PACKAGE
+			ATTRIBUTES
+				calledNumber GET;
+		REGISTERED AS { x790Package 29 };
+			PRESENT IF
+				"an instance supports it.",
+		trCancelRequestedByManagerPkg PACKAGE
+			ATTRIBUTES
+				cancelRequestedByManager
+					INITIAL VALUE X790ASN1Module.troubleReportCancelRequestedByManagerInitial
+					GET-REPLACE
+					troubleReportChangeDenied
+					canNotClose;
+		REGISTERED AS { x790Package 30 };
+			PRESENT IF
+				"an instance supports it.",
+		trCloseOutVerificationPkg PACKAGE
+			ATTRIBUTES
+				closeOutVerification
+					INITIAL VALUE X790ASN1Module.closeOutVerificationCloseOutVerificationInitial
+					GET-REPLACE
+					cannotVerifyOrDenyAtThisTime;
+		REGISTERED AS { x790Package 31 };
+			PRESENT IF
+				"an instance supports it.",
+		trCommitmentTimePkg PACKAGE
+			ATTRIBUTES
+				commitmentTime GET;
+		REGISTERED AS { x790Package 32 };
+			PRESENT IF
+				"an instance supports it.",
+		trCommitmentTimeRequestPkg PACKAGE
+			ATTRIBUTES
+				commitmentTimeRequest GET-REPLACE
+					troubleReportChangeDenied;
+		REGISTERED AS { x790Package 33 };
+			PRESENT IF
+				"an instance supports it.",
+		trCustomerWorkCenterPkg PACKAGE
+			ATTRIBUTES
+				customerWorkCenter GET SET-BY-CREATE;
+		REGISTERED AS { x790Package 34 };
+			PRESENT IF
+				"an instance supports it.",
+		trCustTroubleTickNumPkg PACKAGE
+			ATTRIBUTES
+				custTroubleTickNum GET SET-BY-CREATE;
+		REGISTERED AS { x790Package 35 };
+			PRESENT IF
+				"an instance supports it.",
+		trDialogPkg PACKAGE
+			ATTRIBUTES
+				dialog GET-REPLACE;
+		REGISTERED AS { x790Package 36 };
+			PRESENT IF
+				"an instance supports it.",
+		trEscalationListPkg PACKAGE
+			ATTRIBUTES
+				escalationList GET ADD
+					troubleReportChangeDenied;
+		REGISTERED AS { x790Package 37 };
+			PRESENT IF
+				"an instance supports it.",
+		trHandOffCenterPkg PACKAGE
+			ATTRIBUTES
+				handOffCenter
+					INITIAL VALUE X790ASN1Module.handOffCenterHandOffCenterInitial
+					GET;
+		REGISTERED AS { x790Package 38 };
+			PRESENT IF
+				"an instance supports it.",
+		trHandOffLocationPkg PACKAGE
+			ATTRIBUTES
+				handOffLocation
+					INITIAL VALUE X790ASN1Module.handOffLocationHandOffLocationInitial
+					GET;
+		REGISTERED AS { x790Package 39 };
+			PRESENT IF
+				"an instance supports it.",
+		trHandOffPersonNamePkg PACKAGE
+			BEHAVIOUR
+				handOffPersonNameBehaviour BEHAVIOUR
+					DEFINED AS
+						"Modifications to handOffPersonName are required only in the service provider to 
+						service provider interface. The CMIS error yaccess denied may be issued in 
+						response to attempts to modify this attribute on any other interface.";;
+			ATTRIBUTES
+				handOffPersonName
+					INITIAL VALUE X790ASN1Module.handOffPersonNameHandOffPersonNameInitial
+					GET-REPLACE;
+		REGISTERED AS { x790Package 40 };
+			PRESENT IF
+				"an instance supports it and trHandOffPersonPtrPkg is not present.",
+		trHandOffPersonPtrPkg PACKAGE
+			BEHAVIOUR
+				handOffPersonPtrBehaviour BEHAVIOUR
+					DEFINED AS
+						"Modifications to handOffPersonPtr are required only in the service provider to 
+						service provider interface. The CMIS error taccess deniedd may be issued in 
+						response to attempts to modify this attribute on any other interface.";;
+			ATTRIBUTES
+				handOffPersonPtr GET-REPLACE;
+		REGISTERED AS { x790Package 41 };
+			PRESENT IF
+				"an instance supports it and trHandOffPersonNamePkg is not present.",
+		trHandOffTimePkg PACKAGE
+			ATTRIBUTES
+				handOffTime
+					INITIAL VALUE X790ASN1Module.handOffTimeHandOffTimeInitial
+					GET;
+		REGISTERED AS { x790Package 42 };
+			PRESENT IF
+				"an instance supports it.",
+		trInitiatingModePkg PACKAGE
+			ATTRIBUTES
+				initiatingMode GET;
+		REGISTERED AS { x790Package 43 };
+			PRESENT IF
+				"an instance supports it.",
+		trLastUpdateTimePkg PACKAGE
+			ATTRIBUTES
+				lastUpdateTime GET;
+		REGISTERED AS { x790Package 44 };
+			PRESENT IF
+				"an instance supports it.",
+		trALocationPkg PACKAGE
+			ATTRIBUTES
+				aLocationAccessAddress GET-REPLACE;
+		REGISTERED AS { x790Package 45 };
+			PRESENT IF
+				"an instance supports it.",
+		trZLocationPkg PACKAGE
+			ATTRIBUTES
+				zLocationAccessAddress GET-REPLACE;
+		REGISTERED AS { x790Package 46 };
+			PRESENT IF
+				"an instance supports it.",
+		trALocationAccessHoursPkg PACKAGE
+			ATTRIBUTES
+				aLocationAccessHours GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { x790Package 47 };
+			PRESENT IF
+				"an instance supports it.",
+		trZLocationAccessHoursPkg PACKAGE
+			ATTRIBUTES
+				zLocationAccessHours GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { x790Package 48 };
+			PRESENT IF
+				"an instance supports it.",
+		trALocationAccessPersonPkg PACKAGE
+			ATTRIBUTES
+				aLocationAccessPerson GET-REPLACE;
+		REGISTERED AS { x790Package 49 };
+			PRESENT IF
+				"an instance supports it.",
+		trZLocationAccessPersonPkg PACKAGE
+			ATTRIBUTES
+				zLocationAccessPerson GET-REPLACE;
+		REGISTERED AS { x790Package 50 };
+			PRESENT IF
+				"an instance supports it.",
+		trMaintenanceOrgContactNamePkg PACKAGE
+			BEHAVIOUR
+				maintenanceOrgContactNameBehaviour BEHAVIOUR
+					DEFINED AS
+						"Modifications to maintenanceOrgContactName are required only in the service 
+						provider to service provider interface. The CMIS error iaccess deniedh may be 
+						issued in response to attempts to modify this attribute on any other interface.";;
+			ATTRIBUTES
+				maintenanceOrgContactName
+					INITIAL VALUE X790ASN1Module.maintenanceOrgContactNameMaintenanceOrgContactNameInitial
+					GET-REPLACE;
+		REGISTERED AS { x790Package 51 };
+			PRESENT IF
+				"an instance supports it and trMaintenanceOrgContactPtrPkg is not present.",
+		trMaintenanceOrgContactPtrPkg PACKAGE
+			BEHAVIOUR
+				maintenanceOrgContactPtrBehaviour BEHAVIOUR
+					DEFINED AS
+						"Modifications to maintenanceOrgContactPtr are required only in the service 
+						provider to service provider interface. The CMIS error raccess deniede may be 
+						issued in response to attempts to modify this attribute on any other interface.";;
+			ATTRIBUTES
+				maintenanceOrgContactPtr GET-REPLACE;
+		REGISTERED AS { x790Package 52 };
+			PRESENT IF
+				"an instance supports it and trMaintenanceOrgContactNamePkg is not present.",
+		trMaintenanceOrgContactTimePkg PACKAGE
+			BEHAVIOUR
+				maintenanceOrgContactTimeBehaviour BEHAVIOUR
+					DEFINED AS
+						"Modifications to maintenanceOrgContactTime are required only in the service 
+						provider to service provider interface. The CMIS error aaccess deniedn may be 
+						issued in response to attempts to modify this attribute on any other interface.";;
+			ATTRIBUTES
+				maintenanceOrgContactTime
+					INITIAL VALUE X790ASN1Module.maintenanceOrgContactTimeMaintenanceOrgContactTimeInitial
+					GET-REPLACE;
+		REGISTERED AS { x790Package 53 };
+			PRESENT IF
+				"an instance supports it.",
+		trMaintServiceChargePkg PACKAGE
+			ATTRIBUTES
+				maintServiceCharge
+					INITIAL VALUE X790ASN1Module.maintServiceChargeMaintServiceChargeInitial
+					GET;
+		REGISTERED AS { x790Package 54 };
+			PRESENT IF
+				"an instance supports it.",
+		trManagedObjectAccessHoursPkg PACKAGE
+			ATTRIBUTES
+				managedObjectAccessHours GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { x790Package 55 };
+			PRESENT IF
+				"an instance supports it.",
+		trManagedObjectAccessFromTimePkg PACKAGE
+			ATTRIBUTES
+				managedObjectAccessFromTime GET-REPLACE;
+		REGISTERED AS { x790Package 56 };
+			PRESENT IF
+				"an instance supports it.",
+		trManagedObjectAccessToTimePkg PACKAGE
+			ATTRIBUTES
+				managedObjectAccessToTime GET-REPLACE;
+		REGISTERED AS { x790Package 57 };
+			PRESENT IF
+				"an instance supports it.",
+		trManagerContactPersonAttributePkg PACKAGE
+			ATTRIBUTES
+				managerContactPerson GET-REPLACE;
+		REGISTERED AS { x790Package 58 };
+			PRESENT IF
+				"an instance supports it and trManagerContactPersonObjectPkg is not present.",
+		trManagerContactPersonObjectPkg PACKAGE
+			BEHAVIOUR
+				managerContactPersonObjectBehaviour BEHAVIOUR
+					DEFINED AS
+						"The Manager Contact Person Object package contains one attribute which points to 
+						an instance of the Contact object that identifies an individual in the managerhs 
+						organization who can be contacted regarding the reported trouble.";;
+			ATTRIBUTES
+				managerContactObjectPtr GET-REPLACE;
+		REGISTERED AS { x790Package 59 };
+			PRESENT IF
+				"an instance supports it and trManagerContactPersonAttributePkg is not present.",
+		trManagerSearchKeyPkg PACKAGE
+			ATTRIBUTES
+				managerSearchKey1 GET-REPLACE,
+				managerSearchKey2 GET-REPLACE,
+				managerSearchKey3 GET-REPLACE;
+		REGISTERED AS { x790Package 60 };
+			PRESENT IF
+				"an instance supports it and trManagerSearchKeyListPkg is not present.",
+		trManagerSearchKeyListPkg PACKAGE
+			ATTRIBUTES
+				managerSearchKeyList GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { x790Package 61 };
+			PRESENT IF
+				"an instance supports it and trManagerSearchKeyPkg is not present.",
+		trOutageDurationPkg PACKAGE
+			ATTRIBUTES
+				outageDuration
+					INITIAL VALUE X790ASN1Module.outageDurationOutageDurationInitial
+					GET;
+		REGISTERED AS { x790Package 62 };
+			PRESENT IF
+				"an instance supports it.",
+		trPerceivedTroubleSeverityPkg PACKAGE
+			ATTRIBUTES
+				perceivedTroubleSeverity GET-REPLACE;
+		REGISTERED AS { x790Package 63 };
+			PRESENT IF
+				"an instance supports it.",
+		trPreferredPriorityPkg PACKAGE
+			ATTRIBUTES
+				preferredPriority GET-REPLACE;
+		REGISTERED AS { x790Package 64 };
+			PRESENT IF
+				"an instance supports it.",
+		trRepeatReportPkg PACKAGE
+			ATTRIBUTES
+				repeatReport GET-REPLACE;
+		REGISTERED AS { x790Package 65 };
+			PRESENT IF
+				"an instance supports it.",
+		trResponsiblePersonNamePkg PACKAGE
+			BEHAVIOUR
+				responsiblePersonNameBehaviour BEHAVIOUR
+					DEFINED AS
+						"Modifications to responsiblePersonName are required only in the service provider 
+						to service provider interface. The CMIS error raccess deniedi may be issued in 
+						response to attempts to modify this attribute on any other interface.";;
+			ATTRIBUTES
+				responsiblePersonName GET-REPLACE;
+		REGISTERED AS { x790Package 66 };
+			PRESENT IF
+				"an instance supports it and trResponsiblePersonPtrPkg is not present.",
+		trResponsiblePersonPtrPkg PACKAGE
+			BEHAVIOUR
+				responsiblePersonPtrBehaviour BEHAVIOUR
+					DEFINED AS
+						"Modifications to responsiblePersonPtr are required only in the service provider 
+						to service provider interface. The CMIS error saccess deniedu may be issued in 
+						response to attempts to modify this attribute on any other interface.";;
+			ATTRIBUTES
+				responsiblePersonPtr GET-REPLACE;
+		REGISTERED AS { x790Package 67 };
+			PRESENT IF
+				"an instance supports it and trResponsiblePersonNamePkg is not present.",
+		trSuspectObjectListPkg PACKAGE
+			ATTRIBUTES
+				suspectObjectList GET SET-BY-CREATE;
+		REGISTERED AS { x790Package 68 };
+			PRESENT IF
+				"an instance supports it.",
+		trTroubleDetectionTimePkg PACKAGE
+			ATTRIBUTES
+				troubleDetectionTime
+					DEFAULT VALUE X790ASN1Module.troubleDetectionTimeTroubleDetectionTimeDefault
+					GET-REPLACE;
+		REGISTERED AS { x790Package 69 };
+			PRESENT IF
+				"an instance supports it.",
+		trTroubleLocationPkg PACKAGE
+			BEHAVIOUR
+				troubleLocationBehaviour BEHAVIOUR
+					DEFINED AS
+						"Modifications to troubleLocation are required only in the service provider to 
+						service provider interface. The CMIS error naccess denied may be issued in 
+						response to attempts to modify this attribute on any other interface.";;
+			ATTRIBUTES
+				troubleLocation GET-REPLACE;
+		REGISTERED AS { x790Package 70 };
+			PRESENT IF
+				"an instance supports it.",
+		trTroubleReportStatusWindowPkg PACKAGE
+			ATTRIBUTES
+				additionalTroubleStatusInfo GET,
+				troubleReportStatusWindow GET-REPLACE;
+			NOTIFICATIONS
+				troubleReportProgressNotification;
+		REGISTERED AS { x790Package 71 };
+			PRESENT IF
+				"an instance supports it.",
+		trTspPriorityPkg PACKAGE
+			ATTRIBUTES
+				tspPriority GET SET-BY-CREATE;
+		REGISTERED AS { x790Package 72 };
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { x790ObjectClass 7 };
+-- A.1.8 troubleHistoryRecord
+
+
+troubleHistoryRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":eventLogRecord;
+	CHARACTERIZED BY
+		troubleHistoryRecordPkg PACKAGE
+			ATTRIBUTES
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":eventTime GET,
+				-- indicates close-out time, optional attribute in eventLogRecord
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":managedObjectInstance GET SET-BY-CREATE,
+				-- Copied from the corresponding trouble report object.
+				-- Refers to instance of CNM Service
+				-- or GNM object representing a
+				-- telecommunications resource.
+				receivedTime GET,
+				-- indicates trouble report creation time
+				troubleFound GET;;;
+	CONDITIONAL PACKAGES
+		thrActivityDurationPkg PACKAGE
+			ATTRIBUTES
+				activityDuration GET;
+		REGISTERED AS { x790Package 73 };
+			PRESENT IF
+				"an instance supports it.",
+		thrAdditionalTroubleInfoListPkg PACKAGE
+			ATTRIBUTES
+				additionalTroubleInfoList GET;
+		REGISTERED AS { x790Package 74 };
+			PRESENT IF
+				"an instance supports it.",
+		thrAuthorizationPkg PACKAGE
+			ATTRIBUTES
+				authorizationList GET;
+		REGISTERED AS { x790Package 75 };
+			PRESENT IF
+				"an instance supports it.",
+		thrCancelRequestedByManagerPkg PACKAGE
+			ATTRIBUTES
+				cancelRequestedByManager GET;
+		REGISTERED AS { x790Package 76 };
+			PRESENT IF
+				"an instance supports it.",
+		thrCloseOutNarrPkg PACKAGE
+			ATTRIBUTES
+				closeOutNarr GET;
+		REGISTERED AS { x790Package 77 };
+			PRESENT IF
+				"an instance supports it.",
+		thrCloseOutVerificationPkg PACKAGE
+			ATTRIBUTES
+				closeOutVerification GET;
+		REGISTERED AS { x790Package 78 };
+			PRESENT IF
+				"an instance supports it.",
+		thrCommitmentTimePkg PACKAGE
+			ATTRIBUTES
+				commitmentTime GET;
+		REGISTERED AS { x790Package 79 };
+			PRESENT IF
+				"an instance supports it.",
+		thrCustTroubleTickNumPkg PACKAGE
+			ATTRIBUTES
+				custTroubleTickNum GET;
+		REGISTERED AS { x790Package 80 };
+			PRESENT IF
+				"an instance supports it.",
+		thrPerceivedTroubleSeverityPkg PACKAGE
+			ATTRIBUTES
+				perceivedTroubleSeverity GET;
+		REGISTERED AS { x790Package 81 };
+			PRESENT IF
+				"an instance supports it.",
+		thrRestoredTimePkg PACKAGE
+			ATTRIBUTES
+				restoredTime GET;
+		REGISTERED AS { x790Package 82 };
+			PRESENT IF
+				"an instance supports it.",
+		thrTroubleClearancePersonPkg PACKAGE
+			ATTRIBUTES
+				troubleClearancePerson GET;
+		REGISTERED AS { x790Package 83 };
+			PRESENT IF
+				"an instance supports it.",
+		thrTroubleReportNumberListPkg PACKAGE
+			ATTRIBUTES
+				troubleReportNumberList GET;
+		REGISTERED AS { x790Package 84 };
+			PRESENT IF
+				"an instance supports it.",
+		thrTroubleTypePkg PACKAGE
+			ATTRIBUTES
+				troubleType GET SET-BY-CREATE;
+		REGISTERED AS { x790Package 85 };
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { x790ObjectClass 8 };
+-- A.1.9 troubleReport
+
+
+troubleReport MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721|ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		troubleReportPkg PACKAGE
+			BEHAVIOUR
+				troubleReportBehaviour BEHAVIOUR
+					DEFINED AS
+						"Modifications to troubleFound, troubleReportState, and troubleReportStatus are 
+						required only in the service provider to service provider interface. The CMIS 
+						error taccess deniedo may be issued in response to attempts to modify these 
+						attributes on any other interface.";;
+			ATTRIBUTES
+				additionalTroubleInfoList GET ADD,
+				-- some implementations may not support a GET
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":managedObjectInstance GET,
+				receivedTime GET,
+				troubleFound
+					INITIAL VALUE X790ASN1Module.troubleFoundTroubleFoundInitial
+					GET-REPLACE,
+				troubleReportID GET,
+				troubleReportState GET-REPLACE,
+				troubleReportStatus GET-REPLACE,
+				troubleReportStatusTime GET,
+				troubleType GET;;;
+	CONDITIONAL PACKAGES
+		trActivityDurationPkg PACKAGE
+			BEHAVIOUR
+				activityDurationBehaviour BEHAVIOUR
+					DEFINED AS
+						!Modifications to activityDuration are required only in the service provider to 
+						service provider interface. The CMIS error "access denied" may be issued in 
+						response to attempts to modify this attribute on any other interface.!;;
+			ATTRIBUTES
+				activityDuration
+					INITIAL VALUE X790ASN1Module.activityDurationactivityDurationInitial
+					GET ADD;
+		REGISTERED AS { x790Package 86 };
+			PRESENT IF
+				"an instance supports it.",
+		trAgentContactPersonAttributePkg PACKAGE
+			ATTRIBUTES
+				agentContactPerson GET;
+		REGISTERED AS { x790Package 87 };
+			PRESENT IF
+				"an instance supports it and trAgentContactPersonObjectPkg is not present.",
+		trAgentContactPersonObjectPkg PACKAGE
+			BEHAVIOUR
+				agentContactPersonObjectBehaviour BEHAVIOUR
+					DEFINED AS
+						"The Agent Contact Person Object package points to an instance of the Contact 
+						object that identifies an individual in the agentgs organization who can be 
+						contacted regarding the reported trouble.";;
+			ATTRIBUTES
+				agentContactObjectPtr GET;
+		REGISTERED AS { x790Package 88 };
+			PRESENT IF
+				"an instance supports it and trAgentContactPersonAttributePkg is not present.",
+		trCloseOutNarrPkg PACKAGE
+			BEHAVIOUR
+				closeOutNarrBehaviour BEHAVIOUR
+					DEFINED AS
+						"Modifications to closeOutNarr are required only in the service provider to 
+						service provider interface. The CMIS error 'access denied' may be issued in 
+						response to attempts to modify this attribute on any other interface.";;
+			ATTRIBUTES
+				closeOutNarr
+					INITIAL VALUE X790ASN1Module.closeOutNarrCloseOutNarrInitial
+					GET-REPLACE;
+		REGISTERED AS { x790Package 89 };
+			PRESENT IF
+				"an instance supports it.",
+		trManagedObjectInstanceAliasListPkg PACKAGE
+			ATTRIBUTES
+				managedObjectInstanceAliasList GET;
+		REGISTERED AS { x790Package 90 };
+			PRESENT IF
+				"an instance supports it.",
+		x790NumberListPkg PACKAGE
+			ATTRIBUTES
+				troubleReportNumberList GET;
+		REGISTERED AS { x790Package 91 };
+			PRESENT IF
+				"an instance supports it.",
+		trRelatedTroubleReportListPkg PACKAGE
+			ATTRIBUTES
+				relatedTroubleReportList GET;
+		REGISTERED AS { x790Package 92 };
+			PRESENT IF
+				"an instance supports it.",
+		trRepairActivityListPkg PACKAGE
+			BEHAVIOUR
+				repairActivityListBehaviour BEHAVIOUR
+					DEFINED AS
+						"Modifications to repairActivityList are required only in the service provider to 
+						service provider interface. The CMIS error 'access denied' may be issued in 
+						response to attempts to modify this attribute on any other interface.";;
+			ATTRIBUTES
+				repairActivityList
+					INITIAL VALUE X790ASN1Module.repairActivityListRepairActivityListInitial
+					GET ADD;
+			-- Support for repairActivityList determined by policies of administration performing repair.
+			REGISTERED AS { x790Package 93 };
+			PRESENT IF
+				"an instance supports it and no RepairActivity object is contained in an instance 
+				of
+				this object class or its subclasses.",
+		trRestoredTimePkg PACKAGE
+			BEHAVIOUR
+				restoredTimeBehaviour BEHAVIOUR
+					DEFINED AS
+						"Modifications to restoredTime are required only in the service provider to 
+						service provider interface. The CMIS error 'access denied' may be issued in 
+						response to attempts to modify this attribute on any other interface";;
+			ATTRIBUTES
+				restoredTime
+					INITIAL VALUE X790ASN1Module.restoredTimeRestoredTimeInitial
+					GET-REPLACE;
+		REGISTERED AS { x790Package 94 };
+			PRESENT IF
+				"an instance supports it.",
+		trTroubleClearancePersonAttributePkg PACKAGE
+			ATTRIBUTES
+				troubleClearancePerson
+					DEFAULT VALUE X790ASN1Module.troubleClearancePersonTroubleClearancePersonDefault
+					GET-REPLACE;
+		REGISTERED AS { x790Package 95 };
+			PRESENT IF
+				"an instance supports it.",
+		trTroubleReportFormatObjectPtrPkg PACKAGE
+			ATTRIBUTES
+				troubleReportFormatObjectPtr GET;
+		REGISTERED AS { x790Package 96 };
+			PRESENT IF
+				"an instance supports it.",
+		x790AttributeValueChangePkg PACKAGE
+			NOTIFICATIONS
+				"Rec. X.721|ISO/IEC 10165-2 : 1992":attributeValueChange;
+		REGISTERED AS { x790Package 97 };
+			PRESENT IF
+				"an instance supports it.",
+		trObjectCreationDeletionPkg PACKAGE
+			NOTIFICATIONS
+				"Rec. X.721|ISO/IEC 10165-2 : 1992":objectCreation,
+				"Rec. X.721|ISO/IEC 10165-2 : 1992":objectDeletion;
+		REGISTERED AS { x790Package 98 };
+			PRESENT IF
+				"an instance supports it.",
+		trHistoryEventPkg PACKAGE
+			NOTIFICATIONS
+				troubleHistoryEventNotification;
+		REGISTERED AS { x790Package 99 };
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { x790ObjectClass 9 };
+-- A.1.10 troubleReportFormatDefn
+
+
+troubleReportFormatDefn MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721|ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		troubleReportFormatDefnPkg PACKAGE
+			ATTRIBUTES
+				tRFormatID GET;;;
+	CONDITIONAL PACKAGES
+		trfdApplicableManagedObjectClassListPkg PACKAGE
+			ATTRIBUTES
+				applicableManagedObjectClassList GET;
+			-- present if this instance of the format definition object applies to all objects of classes in this list
+			REGISTERED AS { x790Package 100 };
+			PRESENT IF
+				"an instance supports it.",
+		trfdApplicableManagedObjectInstanceListPkg PACKAGE
+			ATTRIBUTES
+				applicableManagedObjectInstanceList GET;
+			-- present if this instance of the format definition object applies to only some instances of an
+			-- object class
+			REGISTERED AS { x790Package 101 };
+			PRESENT IF
+				"an instance supports it.",
+		trfdTrConstrainedToSingleValueAttrIDListPkg PACKAGE
+			BEHAVIOUR
+				trfdTrConstrainedToSingleValueAttrIDListBehaviour BEHAVIOUR
+					DEFINED AS
+						!If a manager attempts to add more than one value to attributes of this list, a 
+						CMISE "complexity limitation" error will be generated.!;;
+			ATTRIBUTES
+				tRConstrainedToSingleValueAttrIDList GET;
+		REGISTERED AS { x790Package 102 };
+			PRESENT IF
+				"an instance supports it.",
+		trfdTrMayBePresentAttrIDListPkg PACKAGE
+			ATTRIBUTES
+				tRMayBePresentAttrIDList GET;
+		REGISTERED AS { x790Package 103 };
+			PRESENT IF
+				"an instance supports it.",
+		-- either tRMayBePresentAttrIDList or tRMustBePresentAttrIDList or both shall be present in an
+		-- instance of the Trouble Report Format Defn. object
+		trfdTrMustBePresentAttrIDListPkg PACKAGE
+			ATTRIBUTES
+				tRMustBePresentAttrIDList GET;
+		REGISTERED AS { x790Package 104 };
+			PRESENT IF
+				"an instance supports it.",
+		-- either tRMayBePresentAttrIDList or tRMustBePresentAttrIDList or both shall be present in an
+		-- instance of the Trouble Report Format Defn. object
+		trfdAttributeValueChangePkg PACKAGE
+			NOTIFICATIONS
+				"Rec. X.721|ISO/IEC 10165-2 : 1992":attributeValueChange;
+		REGISTERED AS { x790Package 105 };
+			PRESENT IF
+				"an instance supports it.",
+		trfdObjectCreationDeletionPkg PACKAGE
+			NOTIFICATIONS
+				"Rec. X.721|ISO/IEC 10165-2 : 1992":objectCreation,
+				"Rec. X.721|ISO/IEC 10165-2 : 1992":objectDeletion;
+		REGISTERED AS { x790Package 106 };
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { x790ObjectClass 10 };
+-- A.2 Attribute definitions
+-- A.2.1 Account contact list
+
+
+accountContactList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.AccountContactList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+REGISTERED AS { x790Attribute 1 };
+-- A.2.2 Account name
+
+
+accountName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.AccountName;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+REGISTERED AS { x790Attribute 2 };
+-- A.2.3 Activity code
+
+
+activityCode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ActivityCode;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 3 };
+-- A.2.4 Activity duration
+
+
+activityDuration ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ActivityDuration;
+REGISTERED AS { x790Attribute 4 };
+-- A.2.5 Activity info
+
+
+activityInfo ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ActivityInfo;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+REGISTERED AS { x790Attribute 5 };
+-- A.2.6 Activity person
+
+
+activityPerson ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ActivityPerson;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 6 };
+-- A.2.7 Additional text
+
+
+additionalText ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.AdditionalText;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+REGISTERED AS { x790Attribute 7 };
+-- A.2.8 Additional trouble info list
+
+
+additionalTroubleInfoList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.AdditionalTroubleInfoList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+REGISTERED AS { x790Attribute 8 };
+-- A.2.9 Additional trouble status info
+
+
+additionalTroubleStatusInfo ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.AdditionalTroubleStatusInfo;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+REGISTERED AS { x790Attribute 9 };
+-- administrativeState attribute is imported from Recommendation X.721
+-- A.2.10 After hrs repair auth
+
+
+afterHrsRepairAuth ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.AfterHrsRepairAuth;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 10 };
+-- A.2.11 Agent contact person
+
+
+agentContactPerson ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.PersonReach;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 11 };
+-- A.2.12 Agent contact object ptr
+
+
+agentContactObjectPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.AgentContactObjectPtr;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 12 };
+-- A.2.13 Alarm record ptr list
+
+
+alarmRecordPtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.AlarmRecordPtrList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+REGISTERED AS { x790Attribute 13 };
+-- alarmStatus attribute is imported from Recommendation M.3100
+-- A.2.14 Alternate manager contact person
+
+
+alternateManagerContactPerson ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.PersonReach;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 14 };
+-- A.2.15 Alternate manager contact object ptr
+
+
+alternateManagerContactObjectPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.AlternateManagerContactObjectPtr;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 15 };
+-- A.2.16 Applicable managed object class list
+
+
+applicableManagedObjectClassList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ApplicableManagedObjectClassList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+REGISTERED AS { x790Attribute 16 };
+-- A.2.17 Applicable managed object instance list
+
+
+applicableManagedObjectInstanceList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ApplicableManagedObjectInstanceList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+REGISTERED AS { x790Attribute 17 };
+-- A.2.18 Authorization list
+
+
+authorizationList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.AuthorizationList;
+REGISTERED AS { x790Attribute 18 };
+-- A.2.19 Begin time
+
+
+beginTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.BeginTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 19 };
+-- A.2.20 Call back info list
+
+
+callBackInfoList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.CallBackInfoList;
+REGISTERED AS { x790Attribute 20 };
+-- A.2.21 Called number
+
+
+calledNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.CalledNumber;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+REGISTERED AS { x790Attribute 21 };
+-- A.2.22 Cancel requested by manager
+
+
+cancelRequestedByManager ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.CancelRequestedByManager;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 22 };
+-- A.2.23 Close out narr
+
+
+closeOutNarr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.CloseOutNarr;
+REGISTERED AS { x790Attribute 23 };
+-- A.2.24 Commitment time
+
+
+commitmentTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.CommitmentTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 24 };
+-- A.2.25 Commitment time request
+
+
+commitmentTimeRequest ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.CommitmentTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 25 };
+-- A.2.26 Contact company
+
+
+contactCompany ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ContactCompany;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+REGISTERED AS { x790Attribute 26 };
+-- A.2.27 Contact details
+
+
+contactDetails ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ContactDetails;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+REGISTERED AS { x790Attribute 27 };
+-- A.2.28 Contact function
+
+
+contactFunction ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ContactFunction;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 28 };
+-- A.2.29 Contact id
+
+
+contactID ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.SimpleNameType;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 29 };
+-- A.2.30 Contact names
+
+
+contactNames ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.Names;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { x790Attribute 30 };
+-- A.2.31 Contact object ptr list
+
+
+contactObjectPtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ContactObjectPtrList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+REGISTERED AS { x790Attribute 31 };
+-- A.2.32 Contact type
+
+
+contactType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ContactType;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+REGISTERED AS { x790Attribute 32 };
+-- A.2.33 Close out verification
+
+
+closeOutVerification ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.CloseOutVerification;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 33 };
+-- currentproblemList attribute is imported from Recommendation M.3100
+-- A.2.34 Cust trouble tick num
+
+
+custTroubleTickNum ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.CustTroubleTickNum;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+REGISTERED AS { x790Attribute 34 };
+-- A.2.35 Customer work center
+
+
+customerWorkCenter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.CustomerWorkCenter;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+REGISTERED AS { x790Attribute 35 };
+-- A.2.36 Dialog
+
+
+dialog ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.Dialog;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+REGISTERED AS { x790Attribute 36 };
+-- A.2.37 Electronic mail address
+
+
+electronicMailAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ElectronicMailAddress;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { x790Attribute 37 };
+-- A.2.38 End time
+
+
+endTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.EndTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 38 };
+-- A.2.39 Entry time
+
+
+entryTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.EntryTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 39 };
+-- A.2.40 Escalation list
+
+
+escalationList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.EscalationList;
+REGISTERED AS { x790Attribute 40 };
+-- A.2.41 Facsimile telephone number list
+
+
+facsimileTelephoneNumberList ATTRIBUTE
+	DERIVED FROM
+		telephoneNumberList;
+REGISTERED AS { x790Attribute 41 };
+-- The eventTime attribute is imported from Recommendation X.721
+-- A.2.42 Hand off center
+
+
+handOffCenter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.HandOffCenter;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+REGISTERED AS { x790Attribute 42 };
+-- A.2.43 Hand off location
+
+
+handOffLocation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.HandOffLocation;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+REGISTERED AS { x790Attribute 43 };
+-- A.2.45 Hand off person name
+
+
+handOffPersonName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.PersonReach;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 45 };
+-- A.2.46 Hand off person ptr
+
+
+handOffPersonPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.HandOffPersonPtr;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 46 };
+-- A.2.47 Hand off time
+
+
+handOffTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.HandOffTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 47 };
+-- A.2.48 Initiating mode
+
+
+initiatingMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.InitiatingMode;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 48 };
+-- A.2.49 Last update time
+
+
+lastUpdateTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.LastUpdateTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 49 };
+-- A.2.50 A location access address
+
+
+aLocationAccessAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.LocationAddress;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 50 };
+-- A.2.51 Z location access address
+
+
+zLocationAccessAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.LocationAddress;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 51 };
+-- A.2.52 A location access hours
+
+
+aLocationAccessHours ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.LocationAccessHours;
+REGISTERED AS { x790Attribute 52 };
+-- A.2.53 Z location access hours
+
+
+zLocationAccessHours ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.LocationAccessHours;
+REGISTERED AS { x790Attribute 53 };
+-- A.2.54 A location access person
+
+
+aLocationAccessPerson ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.PersonReach;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 54 };
+-- A.2.55 Z location access person
+
+
+zLocationAccessPerson ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.PersonReach;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 55 };
+-- A.2.56 Maintenance org contact name
+
+
+maintenanceOrgContactName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.PersonReach;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 56 };
+-- A.2.57 Maintenance org contact ptr
+
+
+maintenanceOrgContactPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.MaintenanceOrgContactPtr;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 57 };
+-- A.2.58 Maintenance org contact time
+
+
+maintenanceOrgContactTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.MaintenanceOrgContactTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 58 };
+-- A.2.59 Maint service charge
+
+
+maintServiceCharge ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.MaintServiceCharge;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 59 };
+-- A.2.60 Managed object access from time
+
+
+managedObjectAccessFromTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ManagedObjectAccessFromTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 60 };
+-- A.2.61 Managed object access hours
+
+
+managedObjectAccessHours ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ManagedObjectAccessHours;
+REGISTERED AS { x790Attribute 61 };
+-- A.2.62 Managed object access to time
+
+
+managedObjectAccessToTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ManagedObjectAccessToTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 62 };
+-- A.2.63 This clause is not used.
+-- A.2.64 Managed object instance alias list
+
+
+managedObjectInstanceAliasList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ManagedObjectInstanceAliasList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+REGISTERED AS { x790Attribute 64 };
+-- A.2.65 Manager contact person
+
+
+managerContactPerson ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.PersonReach;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 65 };
+-- A.2.66 Manager contact object ptr
+
+
+managerContactObjectPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ManagerContactObjectPtr;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 66 };
+-- A.2.67 Manager search key1
+
+
+managerSearchKey1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ManagerSearchKey;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 67 };
+-- A.2.68 Manager search key2
+
+
+managerSearchKey2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ManagerSearchKey;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 68 };
+-- A.2.69 Manager search key3
+
+
+managerSearchKey3 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ManagerSearchKey;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 69 };
+-- A.2.70 Manager search key list
+
+
+managerSearchKeyList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ManagerSearchKeyList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+REGISTERED AS { x790Attribute 70 };
+-- operationalState attribute is imported from Recommendation X.721
+-- A.2.71 Outage duration
+
+
+outageDuration ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.OutageDuration;
+REGISTERED AS { x790Attribute 71 };
+-- A.2.72 perceived trouble severity
+
+
+perceivedTroubleSeverity ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.PerceivedTroubleSeverity;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 72 };
+-- A.2.73 Preferred priority
+
+
+preferredPriority ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.PreferredPriority;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 73 };
+-- A.2.74 Received time
+
+
+receivedTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ReceivedTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 74 };
+-- A.2.75 Related trouble report list
+
+
+relatedTroubleReportList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.RelatedTroubleReportList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+REGISTERED AS { x790Attribute 75 };
+-- A.2.76 Repair activity
+
+
+repairActivityID ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.RepairActivityID;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 76 };
+-- A.2.77 Repair activity list
+
+
+repairActivityList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.RepairActivityList;
+REGISTERED AS { x790Attribute 77 };
+-- A.2.78 Repeat report
+
+
+repeatReport ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.RepeatReport;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 78 };
+-- A.2.79 Responsible person name
+
+
+responsiblePersonName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.PersonReach;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 79 };
+-- A.2.80 Responsible person ptr
+
+
+responsiblePersonPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ResponsiblePersonPtr;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 80 };
+-- A.2.81 Restored time
+
+
+restoredTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.RestoredTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 81 };
+-- A.2.82 Service alias list
+
+
+serviceAliasList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ServiceAliasList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+REGISTERED AS { x790Attribute 82 };
+-- A.2.83 Service description
+
+
+serviceDescription ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ServiceDescription;
+REGISTERED AS { x790Attribute 83 };
+-- A.2.84 Service location list
+
+
+serviceLocationList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ServiceLocationList;
+REGISTERED AS { x790Attribute 84 };
+-- The Service Identifier is the distinguishing attribute of the CNM Service managed object class. It
+-- is assigned by the service provider at the time the service is delivered to the customer. The
+-- Service ID may include a combination of the Service Alias attribute and the Service Type attribute
+-- (or some other attribute) to guarantee that the Service ID is unique.
+-- A.2.85 Service Id
+
+
+serviceID ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ServiceId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		serviceIDBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Service ID is an attribute type whose distinguished value can be used as an 
+				RDN when naming an instance of the Management Operations Schedule object class";;
+REGISTERED AS { x790Attribute 85 };
+-- The Service Type attribute identifies the category of service (e.g. POTS, CENTREX, private line)
+-- A.2.86 Service type
+
+
+serviceType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ServiceType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		serviceTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				"The service Type attribute identifies the distinguishing characteristics of a 
+				Service";;
+REGISTERED AS { x790Attribute 86 };
+-- The Supported Service Name List attribute type specifies the services supported by a given
+-- managed object --
+-- A.2.87 Supported service name list
+
+
+supportedServiceNameList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.ObjectList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		supportedServiceNameListBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Supported Service Name List attribute type specifies the services supported 
+				by a given managed object";;
+REGISTERED AS { x790Attribute 87 };
+-- supportedbByObjectList attribute is imported from Recommendation M.3100
+-- A.2.88 Suspect object list
+
+
+suspectObjectList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.SuspectObjectList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+REGISTERED AS { x790Attribute 88 };
+-- A.2.89 Telephone number list
+
+
+telephoneNumberList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TelephoneNumberList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { x790Attribute 89 };
+-- A.2.90 Trouble clearance person
+
+
+troubleClearancePerson ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.PersonReach;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 90 };
+-- A.2.91 Trouble detection time
+
+
+troubleDetectionTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TroubleDetectionTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 91 };
+-- A.2.92 Trouble found
+
+
+troubleFound ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TroubleFound;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 92 };
+-- A.2.93 Trouble location
+
+
+troubleLocation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TroubleLocation;
+REGISTERED AS { x790Attribute 93 };
+-- A.2.94 Tr constrained to single value attr id list
+
+
+tRConstrainedToSingleValueAttrIDList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.AttributeIDList;
+REGISTERED AS { x790Attribute 94 };
+-- A.2.95 Trouble report format object ptr
+
+
+troubleReportFormatObjectPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TroubleReportFormatObjectPtr;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 95 };
+-- A.2.96 Tr format id
+
+
+tRFormatID ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TRFormatID;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 96 };
+-- A.2.97 Trouble report id
+
+
+troubleReportID ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.NamingString;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 97 };
+-- A.2.98 Tr must be present attr id list
+
+
+tRMustBePresentAttrIDList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.AttributeIDList;
+REGISTERED AS { x790Attribute 98 };
+-- A.2.99 Tr may be present attr id list
+
+
+tRMayBePresentAttrIDList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.AttributeIDList;
+REGISTERED AS { x790Attribute 99 };
+-- A.2.100 Trouble report number list
+
+
+troubleReportNumberList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TroubleReportNumberList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+REGISTERED AS { x790Attribute 100 };
+-- A.2.101 Trouble report state
+
+
+troubleReportState ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TroubleReportState;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 101 };
+-- A.2.102 Trouble report status
+
+
+troubleReportStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TroubleReportStatus;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 102 };
+-- A.2.103 Trouble report status time
+
+
+troubleReportStatusTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TroubleReportStatusTime;
+	MATCHES FOR ORDERING;
+REGISTERED AS { x790Attribute 103 };
+-- A.2.104 Trouble report status window
+
+
+troubleReportStatusWindow ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TroubleReportStatusWindow;
+REGISTERED AS { x790Attribute 104 };
+-- A.2.105 Trouble type
+
+
+troubleType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TroubleType;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 105 };
+-- A.2.106 Tsp priority
+
+
+tspPriority ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TspPriority;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 106 };
+-- A.2.107 Type text
+
+
+typeText ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.TypeText;
+REGISTERED AS { x790Attribute 107 };
+-- A.2.108 Unavailable service ptr
+
+
+unavailableServicePtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX X790ASN1Module.UnavailableServicePtr;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { x790Attribute 108 };
+-- A.3 Error messages
+-- A.3.1 Trouble Report Already Exists
+
+
+troubleReportAlreadyExists PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX X790ASN1Module.TroubleReportAlreadyExists;
+	BEHAVIOUR
+		troubleReportAlreadyExistsBehaviour BEHAVIOUR
+			DEFINED AS
+				"This error is applicable only where Administrations restrict the number of 
+				trouble reports per managed object. In such cases, the manager may use the 
+				additionalTroubleInfo attribute to include information on the new trouble. The 
+				error message returns the instance of the object, optionally the managed object 
+				class and the instance of the trouble report on which a trouble already exists.";;
+REGISTERED AS { x790Parameter 1 };
+-- A.3.2 Fallback Reporting
+
+
+fallBackReporting PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX X790ASN1Module.FallBackReporting;
+	BEHAVIOUR
+		callBackReportingBehaviour BEHAVIOUR
+			DEFINED AS
+				"A trouble report object will not be created (although the agent may accept the 
+				trouble report and process it manually). Fallback trouble reporting is defined 
+				to be outside the scope of the information model. Since a trouble report object 
+				will not exist, none of the other services normally associated with the Trouble 
+				Report object class are supported for fallback reporting. This error will be 
+				returned in the following two cases:
+
+				-- Service predesignated by agent to receive fallback reporting
+
+				-- Agent partially failed or temporarily unavailable for receiving trouble 
+				reports.";;
+REGISTERED AS { x790Parameter 2 };
+-- A.3.3 Can Not close
+
+
+canNotClose PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX X790ASN1Module.CanNotClose;
+	BEHAVIOUR
+		canNotCloseBehaviour BEHAVIOUR
+			DEFINED AS
+				"This error message is sent to the manager when the trouble report cannot be 
+				closed by the agent because it is already cleared.";;
+REGISTERED AS { x790Parameter 3 };
+-- A.3.4 Trouble Report Must Be Present Attribute Missing
+
+
+tRMustBePresentAttributeMissing PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX X790ASN1Module.TRMustBePresentAttributeMissing;
+	BEHAVIOUR
+		tRMustBePresentAttributeMissingBehaviour BEHAVIOUR
+			DEFINED AS
+				"This error message is sent to the manager by the agent when the manager fails to 
+				provide all required attributes identified in the attribute 
+				tRMustBePresentAttrID List, the error message contains the attributeIDs of the 
+				missing attributes.";;
+REGISTERED AS { x790Parameter 4 };
+-- A.3.5 Cannot Verify or Deny at This Time
+
+
+cannotVerifyOrDenyAtThisTime PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX X790ASN1Module.CannotVerifyOrDenyAtThisTime;
+	BEHAVIOUR
+		cannotVerifyOrDenyAtThisTimeBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the manager changes the value of the CloseOut Verification attribute before 
+				the Trouble Report Status value is clearedAwaitingCustVerification, the agent 
+				system may optionally respond with this error.";;
+REGISTERED AS { x790Parameter 5 };
+-- A.3.6 Trouble Report Change Denied
+
+
+troubleReportChangeDenied PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX X790ASN1Module.TroubleReportChangeDenied;
+	BEHAVIOUR
+		troubleReportChangeDeniedBehaviour BEHAVIOUR
+			DEFINED AS
+				"This error message is sent to the manager when the manager attempts to change a 
+				trouble report which is
+				not in an appropriate state to accept the change.";;
+REGISTERED AS { x790Parameter 6 };
+-- A.4 Events
+
+
+troubleHistoryEventNotification NOTIFICATION
+	WITH INFORMATION SYNTAX X790ASN1Module.TroubleHistoryInfo;
+REGISTERED AS { x790Notification 1 };
+
+
+troubleReportProgressNotification NOTIFICATION
+	WITH INFORMATION SYNTAX X790ASN1Module.TroubleProgressInfo;
+REGISTERED AS { x790Notification 2 };
+-- A.5 Name Bindings
+
+
+account-account NAME BINDING
+	SUBORDINATE OBJECT CLASS account;
+	NAMED BY
+	SUPERIOR OBJECT CLASS account;
+	WITH ATTRIBUTE
+		accountName;
+REGISTERED AS { x790NameBinding 1 };
+
+
+account-network NAME BINDING
+	SUBORDINATE OBJECT CLASS account;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. M.3100 : 1992":network AND SUBCLASSES;
+	WITH ATTRIBUTE
+		accountName;
+REGISTERED AS { x790NameBinding 2 };
+
+
+contact-account NAME BINDING
+	SUBORDINATE OBJECT CLASS contact;
+	NAMED BY
+	SUPERIOR OBJECT CLASS account;
+	WITH ATTRIBUTE
+		contactID;
+REGISTERED AS { x790NameBinding 3 };
+
+
+contact-network NAME BINDING
+	SUBORDINATE OBJECT CLASS contact;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. M.3100 : 1992":network AND SUBCLASSES;
+	WITH ATTRIBUTE
+		contactID;
+REGISTERED AS { x790NameBinding 4 };
+
+
+contact-service NAME BINDING
+	SUBORDINATE OBJECT CLASS contact;
+	NAMED BY
+	SUPERIOR OBJECT CLASS service;
+	WITH ATTRIBUTE
+		contactID;
+REGISTERED AS { x790NameBinding 5 };
+
+
+contact-system NAME BINDING
+	SUBORDINATE OBJECT CLASS contact;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. X.721|ISO/IEC 10165-2 : 1992":system;
+	WITH ATTRIBUTE
+		contactID;
+REGISTERED AS { x790NameBinding 6 };
+
+
+cnmService-account NAME BINDING
+	SUBORDINATE OBJECT CLASS cnmService;
+	NAMED BY
+	SUPERIOR OBJECT CLASS account;
+	WITH ATTRIBUTE
+		serviceID;
+REGISTERED AS { x790NameBinding 7 };
+
+
+eventForwardingDiscriminator-account NAME BINDING
+	SUBORDINATE OBJECT CLASS "Rec. X.721|ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator;
+	NAMED BY
+	SUPERIOR OBJECT CLASS account;
+	WITH ATTRIBUTE
+		"Rec. X.721|ISO/IEC 10165-2 : 1992":discriminatorId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { x790NameBinding 8 };
+
+
+telecommunicationsTroubleReport-account NAME BINDING
+	SUBORDINATE OBJECT CLASS telecommunicationsTroubleReport;
+	NAMED BY
+	SUPERIOR OBJECT CLASS account;
+	WITH ATTRIBUTE
+		troubleReportID;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING, WITH-REFERENCE-OBJECT
+	troubleReportAlreadyExists
+	fallBackReporting
+	tRMustBePresentAttributeMissing;
+REGISTERED AS { x790NameBinding 9 };
+
+
+telecommunicationsTroubleReport-cnmService NAME BINDING
+	SUBORDINATE OBJECT CLASS telecommunicationsTroubleReport;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cnmService;
+	WITH ATTRIBUTE
+		troubleReportID;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING, WITH-REFERENCE-OBJECT
+	troubleReportAlreadyExists
+	fallBackReporting
+	tRMustBePresentAttributeMissing;
+REGISTERED AS { x790NameBinding 10 };
+
+
+telecommunicationsTroubleReport-network NAME BINDING
+	SUBORDINATE OBJECT CLASS telecommunicationsTroubleReport;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. M.3100 : 1992":network AND SUBCLASSES;
+	WITH ATTRIBUTE
+		troubleReportID;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING, WITH-REFERENCE-OBJECT
+	troubleReportAlreadyExists
+	fallBackReporting
+	tRMustBePresentAttributeMissing;
+REGISTERED AS { x790NameBinding 11 };
+
+
+telecommunicationsTroubleReport-system NAME BINDING
+	SUBORDINATE OBJECT CLASS telecommunicationsTroubleReport;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. X.721|ISO/IEC 10165-2 : 1992":system;
+	WITH ATTRIBUTE
+		troubleReportID;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING, WITH-REFERENCE-OBJECT
+	troubleReportAlreadyExists
+	fallBackReporting
+	tRMustBePresentAttributeMissing;
+REGISTERED AS { x790NameBinding 12 };
+
+
+log-account NAME BINDING
+	SUBORDINATE OBJECT CLASS "Rec. X.721|ISO/IEC 10165-2 : 1992":log;
+	NAMED BY
+	SUPERIOR OBJECT CLASS account;
+	WITH ATTRIBUTE
+		"Rec. X.721|ISO/IEC 10165-2 : 1992":logId;
+REGISTERED AS { x790NameBinding 13 };
+
+
+log-cnmService NAME BINDING
+	SUBORDINATE OBJECT CLASS "Rec. X.721|ISO/IEC 10165-2 : 1992":log;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cnmService;
+	WITH ATTRIBUTE
+		"Rec. X.721|ISO/IEC 10165-2 : 1992":logId;
+REGISTERED AS { x790NameBinding 14 };
+
+
+repairActivity-telecommunicationsTroubleReport NAME BINDING
+	SUBORDINATE OBJECT CLASS repairActivity;
+	NAMED BY
+	SUPERIOR OBJECT CLASS telecommunicationsTroubleReport;
+	WITH ATTRIBUTE
+		repairActivityID;
+REGISTERED AS { x790NameBinding 15 };
+
+
+troubleHistoryRecord-log NAME BINDING
+	SUBORDINATE OBJECT CLASS troubleHistoryRecord;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. X.721|ISO/IEC 10165-2 : 1992":log;
+	WITH ATTRIBUTE
+		"Rec. X.721|ISO/IEC 10165-2 : 1992":logRecordId;
+	DELETE;
+REGISTERED AS { x790NameBinding 16 };
+
+
+troubleReportFormatDefn-network NAME BINDING
+	SUBORDINATE OBJECT CLASS troubleReportFormatDefn;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. M.3100 : 1992":network AND SUBCLASSES;
+	WITH ATTRIBUTE
+		tRFormatID;
+REGISTERED AS { x790NameBinding 17 };
+
+
+troubleReportFormatDefn-system NAME BINDING
+	SUBORDINATE OBJECT CLASS troubleReportFormatDefn;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. X.721|ISO/IEC 10165-2 : 1992":system;
+	WITH ATTRIBUTE
+		tRFormatID;
+REGISTERED AS { x790NameBinding 18 };
+
+
+providerTroubleReport-network NAME BINDING
+	SUBORDINATE OBJECT CLASS providerTroubleReport;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. M.3100 : 1992":network AND SUBCLASSES;
+	WITH ATTRIBUTE
+		troubleReportID;
+REGISTERED AS { x790NameBinding 19 };
+
+
+providerTroubleReport-account NAME BINDING
+	SUBORDINATE OBJECT CLASS providerTroubleReport;
+	NAMED BY
+	SUPERIOR OBJECT CLASS account;
+	WITH ATTRIBUTE
+		troubleReportID;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING, WITH-REFERENCE-OBJECT
+	troubleReportAlreadyExists
+	fallBackReporting
+	tRMustBePresentAttributeMissing;
+REGISTERED AS { x790NameBinding 20 };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.790 (1995)"
+--  { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ |  |  +- itut_x790::troubleHistoryRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ +- itut_x723::subsystem
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ +- itut_m3100::tpPool
+--@@ +- itut_x790::account
+--@@ +- itut_x790::contact
+--@@ +- itut_x790::repairActivity
+--@@ +- itut_x790::service
+--@@ |  +- itut_x790::cnmService
+--@@ +- itut_x790::troubleReport
+--@@ |  +- itut_x790::providerTroubleReport
+--@@ |  +- itut_x790::telecommunicationsTroubleReport
+--@@ +- itut_x790::troubleReportFormatDefn
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ |  >- itut_x790::troubleHistoryRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ >- itut_x790::contact
+--@@ >- itut_x790::telecommunicationsTroubleReport
+--@@ |  >- itut_x790::repairActivity
+--@@ >- itut_x790::troubleReportFormatDefn
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ |  >- itut_x790::account
+--@@ |  |  >- itut_x790::account
+--@@ |  |  >- itut_x790::contact
+--@@ |  |  >- itut_x790::cnmService
+--@@ |  |  |  >- itut_x790::telecommunicationsTroubleReport +++
+--@@ |  |  |  >- itut_x721::log +++
+--@@ |  |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  |  >- itut_x790::telecommunicationsTroubleReport +++
+--@@ |  |  >- itut_x721::log +++
+--@@ |  |  >- itut_x790::providerTroubleReport
+--@@ |  >- itut_x790::contact
+--@@ |  >- itut_x790::telecommunicationsTroubleReport +++
+--@@ |  >- itut_x790::troubleReportFormatDefn
+--@@ |  >- itut_x790::providerTroubleReport
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@ itut_x790::service
+--@@ >- itut_x790::contact
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

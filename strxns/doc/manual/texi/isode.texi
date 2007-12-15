@@ -41,5 +41,5 @@ As used above, "contributor" includes, but is not limited to:
 
 In particular, the Northrop Corporation provided the initial sponsorship for the ISODE, and the
 Wollongong Gorup, Inc., also supported this effort.  The ISODE received partial support from the
-U.S.~Defence Advanced Research Projects Agency and the Rome Air Development Center of the U.S.~Air
+U.S.@: Defence Advanced Research Projects Agency and the Rome Air Development Center of the U.S.@: Air
 Force Systems Command under contract number F30602-88-C-0016 to NYSERNet Inc.

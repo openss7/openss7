@@ -1,0 +1,2535 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 19:24:05 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Document "ITU-T Rec. Q.824.0 (1995)"
+--  { itu-t(0) recommendation(0) q(17) ca(824) dot(127) common(0) informationModel(0) } >--
+--< GDMO.Namespace itut_q824_0 >--
+MODULE "ITU-T Rec. Q.824.0 (1995)" { itu-t(0) recommendation(0) q(17) ca(824) dot(127) common(0) informationModel(0) }
+-- 3 Basic customer administration object classes
+-- 3.1 Access Channel
+-- The Access Channel object class is a class of managed objects that terminate a Channel of an Access Port within the
+-- exchange. It identifies the set of attributes that apply in common to all types of Access Channels. Instances of this object
+-- class are contained within the related Access Ports. The numbers of Access Channels belonging to an Access Port are
+-- dependent on the ISDN.
+-- Access Port architecture. This object may be related to a set of customized resources when services must be provisioned
+-- on a per access channel basis.
+
+accessChannel MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. M.3100":connectionTerminationPointBidirectional;
+	CHARACTERIZED BY
+		"CCITT Rec. M.3100":administrativeOperationalStatesPackage,
+		"CCITT Rec. M.3100":ctpInstancePackage,
+		accessChannelPkg PACKAGE
+			BEHAVIOUR
+				accessChannelBhv BEHAVIOUR
+					DEFINED AS
+						"The Access Channel managed object is a service class object that points to the 
+						supporting physical resources for a particular channel. The attribute 
+						customizedResourcePtrList is synchronized with customizedChannelPtrList in the 
+						customizedResource managed object class. That is, when a reference to an 
+						instance of the customizedResource object class is added to or deleted from the 
+						attribute customizedResourcePtrList, customizedResource attribute is updated 
+						accordingly.";;
+			ATTRIBUTES
+				"CCITT Rec. X.721":alarmStatus GET,
+				customizedResourcePtrList GET-REPLACE ADD-REMOVE
+					DEFAULT VALUE CACommonModule.emptySet
+					GET-REPLACE ADD-REMOVE;;;
+	CONDITIONAL PACKAGES
+		officeEquipmentPkg
+			PRESENT IF
+				"supported by Administration.";
+REGISTERED AS { cACommonObjectClass 1 };
+-- 3.2 Access Port
+-- The access Port represents the resource concept and is used to identify the resource capabilities supporting a subscriber
+-- services. The resource abstraction is defined as the Trail Termination Points that terminates trails between the Switching
+-- Network Element and the Customer Premise Equipment. These Trail Termination Points send the signalling and service
+-- information to the customer.
+
+
+accessPort MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. M.3100":trailTerminationPointBidirectional;
+	CHARACTERIZED BY
+		"CCITT Rec. M.3100":ttpInstancePackage,
+		accessPortPkg PACKAGE
+			BEHAVIOUR
+				accessPortBhv BEHAVIOUR
+					DEFINED AS
+						"The Access Port is a resource managed object, the Access Port Objects of this 
+						class terminate customer service access within the exchange. When the 
+						supportedByAccessPortPtrList attribute in the corresponding AccessPort Profile 
+						object is changed, the accessPortProfilePtr in the Access Port must be updated.";;
+			ATTRIBUTES
+				accessPortProfilePtr GET,
+				"CCITT Rec. X.721":administrativeState GET-REPLACE,
+				"CCITT Rec. X.721":operationalState GET,
+				officeEquipment GET-REPLACE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721":stateChange,
+				"CCITT Rec. X.721":attributeValueChange;;;
+REGISTERED AS { cACommonObjectClass 2 };
+-- 3.3 Access port profile
+-- The access port profile object (and those of the subclasses) represents those aspects of an exchange access that cannot be
+-- configured until subscription at which time the mode in which the access port is to be used by the subscriber is known.
+
+
+accessPortProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721(1992)":top;
+	CHARACTERIZED BY
+		accessPortProfilePkg PACKAGE
+			BEHAVIOUR
+				accessPortProfileBhv BEHAVIOUR
+					DEFINED AS
+						"The Access Port Profile managed object is a service class object that points to 
+						the supporting resources for a particular access. It is related to the other 
+						service objects and is the means by which these service objects become 
+						associated with the access resources. In addition, Access Port objects point to 
+						the Access Port Profile object so that a relationship can be found between the 
+						resources and the services they support. If the supportedByAccessPortPtrList 
+						attribute is changed, the attribute accessPortProfilePtr in the related 
+						AccessPort object shall be changed as well.";;
+			ATTRIBUTES
+				accessPortProfileId GET SET-BY-CREATE,
+				customerProfilePtrList GET-REPLACE ADD-REMOVE,
+				customerProfilePtrList GET-REPLACE ADD-REMOVE,
+				customizedResourcePtrList
+					DEFAULT VALUE CACommonModule.empty
+					GET-REPLACE ADD-REMOVE,
+				supportedByAccessPortPtrList GET-REPLACE ADD-REMOVE,
+				sensitiveCircuit REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CACommonModule.false
+					GET-REPLACE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":attributeValueChange,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion;;;
+REGISTERED AS { cACommonObjectClass 3 };
+-- 3.4 Administered Circuit Endpoint Subgroup
+
+
+administeredCircuitEndPointSubgroup MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. M.3100":circuitEndPointSubgroup;
+	CHARACTERIZED BY
+		administeredCircuitEndPointSubgroupPkg PACKAGE
+			BEHAVIOUR
+				administeredCircuitEndPointSubgroupBhv BEHAVIOUR
+					DEFINED AS
+						"The circuit endpoint subgroup (CEPSG) managed object class is used to order 
+						channels that may belong to different Access Ports. This set may then be 
+						associated with services (servicePtrList) and with routing blocks 
+						(routingBlockPtrList). If no association is made to services using the 
+						servicePrtList this list is empty and the underlying channel capabilites 
+						determine the service capabilites of the CEPSG. If no association is made to 
+						routing blocks then the routingBlockPtrList is empty. The channels that are 
+						ordered by CEPSG must have the following common characteristics:
+
+						- uniform signalling
+
+						- common endpoints
+
+						- same directionality
+
+						The circuitEndPointSubgroupOrderedPtrList points to an ordered list of channels 
+						and may be empty.";;
+			ATTRIBUTES
+				servicePtrList GET-REPLACE ADD-REMOVE,
+				routingBlockPtrList GET,
+				circuitEndPointSubgroupOrderedPtrList GET-REPLACE;
+			ACTIONS
+				insertCSGChannels,
+				removeCSGChannels;;;
+REGISTERED AS { cACommonObjectClass 4 };
+-- 3.5 Bearer Service
+
+
+bearerService MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721":top;
+	CHARACTERIZED BY
+		bearerServicePkg PACKAGE
+			BEHAVIOUR
+				bearerServiceBhv BEHAVIOUR
+					DEFINED AS
+						"The Bearer Service object class represents the common aspects of the ISDN bearer 
+						services. While the Bearer Service object class is not instantiated, it is a 
+						superclass from which specialized subclasses are derived and instantiated.
+
+						The communication service provided by a bearer service is defined by the 
+						specific settings of the Information Transfer Attributes and the Access 
+						Attributes defined in Table B.1/I.210. Bearer Service is subclassed on the basis 
+						of these attributes for each of the individual bearer services defined in the 
+						I-Series Recommendations. For each of the individual bearer service subclasses, 
+						the I.210 Information Transfer Attributes and Access Attributes have unique 
+						predefined value settings and are non-customizable.
+
+						The Information Transfer Attributes include:
+
+						- Information Transfer Mode
+
+						- Information Transfer Rate
+
+						- Information Transfer Capability
+
+						- Structure
+
+						- Establishment of Communication
+
+						- Symmetry
+
+						- Communication Configuration
+
+						The Access Attributes include:
+
+						- Access Channel and Rate
+
+						- Signalling Access Protocol Layer 1
+
+						- Signalling Access Protocol Layer 2
+
+						- Signalling Access Protocol Layer 3
+
+						- Information Access Protocol Layer 1
+
+						- Information Access Protocol Layer 2
+
+						- Information Access Protocol Layer 3
+
+						The attribute customizedResourcePtrList is synchronized with 
+						bearerServicePtrList in the customizedResource managed object class. That is, 
+						when bearerServicePtrList in the associated instance of the customizedResource 
+						object class or a subclass is updated, the customizedResourcePtrList is updated 
+						accordingly.
+
+						The numberOfBChannels attribute limits the B-Channel resources that the 
+						bearerService can use at any point in time.
+
+						The value of the attribute in this object must be equal to or less than the 
+						value of the numberOfBChannels attribute in the Customer Profile object instance 
+						containing the Bearer Service object instance. The default value of 1 for this 
+						attribute indicates that all of the B-channel Access Channel Object instances 
+						associated with the Customer Profile are available.";;
+			ATTRIBUTES
+				bearerServiceId GET SET-BY-CREATE,
+				"CCITT Rec. X.721":administrativeState GET-REPLACE,
+				customizedResourcePtrList
+					DEFAULT VALUE CACommonModule.emptySet
+					GET-REPLACE ADD-REMOVE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721":stateChange,
+				"CCITT Rec. X.721":attributeValueChange;;;
+	CONDITIONAL PACKAGES
+		numberOfChannelsPkg
+			PRESENT IF
+				"the bearer services provided supports use of B-channels",
+		bearerSignalingPkg
+			PRESENT IF
+				"the bearer services supports ON DEMAND establishement and supported by 
+				Administration";
+REGISTERED AS { cACommonObjectClass 5 };
+-- 3.6 Customer Profile
+
+
+customerProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721":top;
+	CHARACTERIZED BY
+		customerProfilePkg PACKAGE
+			BEHAVIOUR
+				customerProfileBhv BEHAVIOUR
+					DEFINED AS
+						"The Customer Profile represents a single point of reference used to bind 
+						together a range of services and resources for customer administration purposes. 
+						It is a class of managed objects representing the characteristics of the 
+						Directory Number(s) (DN) assigned to an individual subscriber, independent of 
+						the access type and bearer service. Each instance of the customer profile object 
+						class includes a Directory Number Pointer List attribute that represents the 
+						Directory Number(s) assigned to the customer profile object and an Access Port 
+						Profile List attribute that represents Access Port Profile(s) also assigned to 
+						the customer profile object.";;
+			ATTRIBUTES
+				customerProfileId GET SET-BY-CREATE,
+				accessPortProfilePtrList GET-REPLACE ADD-REMOVE,
+				directoryNumberPtrList GET-REPLACE ADD-REMOVE;;;
+REGISTERED AS { cACommonObjectClass 6 };
+-- 3.7 Directory Number
+
+
+directoryNumber MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721":top;
+	CHARACTERIZED BY
+		directoryNumberPkg PACKAGE
+			BEHAVIOUR
+				directoryNumberBhv BEHAVIOUR
+					DEFINED AS
+						"The Directory Number managed object class represents a managed resource. It is a 
+						constituent part of the user interface and it is directly related to one or more 
+						dialling plans which are part of a managed element. The attributes 
+						customerProfilePtr and customizedResourcePtrList are synchronized with 
+						directoryNumberPtrList in the customerProfile managed object class and with the 
+						directoryNumberPtrList in the customizedResource managed object class, 
+						respectively. For example, when directoryNumberPtrList in the associated 
+						instance of the customerProfile object class or a subclass is updated, the 
+						customerProfilePtr is updated accordingly.";;
+			ATTRIBUTES
+				directoryNumberId GET SET-BY-CREATE,
+				"CCITT Rec. X.721":administrativeState GET-REPLACE,
+				customizedResourcePtrList GET,
+				customerProfilePtr GET;
+			NOTIFICATIONS
+				"CCITT Rec. X.721":objectCreation,
+				"CCITT Rec. X.721":objectDeletion,
+				"CCITT Rec. X.721":stateChange,
+				"CCITT Rec. X.721":attributeValueChange;;;
+	CONDITIONAL PACKAGES
+		routingBlockPtrPkg
+			PRESENT IF
+				"hierarchical routing to physical channel subgroups on egress is supported";
+REGISTERED AS { cACommonObjectClass 7 };
+-- 3.8 Directory Number E.164
+
+
+directoryNumberE164 MANAGED OBJECT CLASS
+	DERIVED FROM
+		directoryNumber;
+	CHARACTERIZED BY
+		directoryNumberE164Pkg PACKAGE
+			BEHAVIOUR
+				directoryNumberE164Bhv BEHAVIOUR
+					DEFINED AS
+						"The E.164 Directory Number object class represents directory numbers belonging 
+						to the numbering plan of the ISDN era as defined in E.164. The E.164 Directory 
+						Number is a single-valued, read-only attribute, set only at creation time. The 
+						intercept treatment attributes provide the handling treatment (announcement, 
+						tone, or otherwise) that should be applied to a disconnected E.164 Directory 
+						Number or a Directory Number to which service is temporarily suspended.";;
+			ATTRIBUTES
+				e164DirectoryNumber GET SET-BY-CREATE,
+				interceptTreatmentTerm REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CACommonModule.interceptTreatmentTerm
+					GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		interceptTreatmentOriginPkg
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { cACommonObjectClass 8 };
+-- 3.9 Directory Number X.121
+
+
+directoryNumberX121 MANAGED OBJECT CLASS
+	DERIVED FROM
+		directoryNumber;
+	CHARACTERIZED BY
+		directoryNumberX121Pkg PACKAGE
+			BEHAVIOUR
+				directoryNumberX121Bhv BEHAVIOUR
+					DEFINED AS
+						"This object class characterizes the X.121 packet switched Directory Number 
+						resource.";;
+			ATTRIBUTES
+				x121DirectoryNumber GET SET-BY-CREATE;;;
+REGISTERED AS { cACommonObjectClass 9 };
+-- 3.10 Layer Entity
+
+
+layerEntity MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721":top;
+	CHARACTERIZED BY
+		layerEntityPkg PACKAGE
+			BEHAVIOUR
+				layerEntityBhv BEHAVIOUR
+					DEFINED AS
+						"This class describes the customizable characteristics common to all layer 
+						protocols which are used for signalling purpose or for user information purpose. 
+						This object class is not instantiated.";;
+			ATTRIBUTES
+				layerEntityId GET SET-BY-CREATE,
+				"CCITT Rec. X.721":usageState GET,
+				"CCITT Rec. X.721":administrativeState GET-REPLACE,
+				"CCITT Rec. X.721":operationalState GET;
+			NOTIFICATIONS
+				"CCITT Rec. X.721":objectCreation,
+				"CCITT Rec. X.721":stateChange,
+				"CCITT Rec. X.721":objectDeletion,
+				"CCITT Rec. X.721":attributeValueChange;;;
+REGISTERED AS { cACommonObjectClass 10 };
+-- 3.11 Routing Block
+
+
+routingBlock MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721":top;
+	CHARACTERIZED BY
+		routingBlockPkg PACKAGE
+			BEHAVIOUR
+				routingBlockBhv BEHAVIOUR
+					DEFINED AS
+						"The routing block managed object class associates an ordered list of channel 
+						subgroups with a list of directory numbers. This list of circuitSubgroups is 
+						ordered so that the preference of circuitSubgroups to use for a particular 
+						directory number can be expressed. The routingBlockCircuitSubgroupPtrList is a 
+						complex attribute that also contains information on how to present the number on 
+						departure.";;
+			ATTRIBUTES
+				routingBlockId GET SET-BY-CREATE,
+				directoryNumberPtrList GET-REPLACE ADD-REMOVE,
+				circuitEndPointSubgroupPtrList GET-REPLACE;
+			ACTIONS
+				insertCircuitSubgroups,
+				removeCircuitSubgroups,
+				modifyCircuitSubgroup;;;
+REGISTERED AS { cACommonObjectClass 11 };
+-- 4 Auxiliary Managed Object Classes
+-- 4.1 Catalogued Optional User Facilities
+-- The catalogued Optional User Facilities managed object class is a superclass for other service subclasses that have
+-- attributes that are not customizable by the subscriber. The subclasses will be defined once candidates for the
+-- non-customizable attributes have been identified.
+
+
+cataloguedOptionalUserFacilities MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721(1992)":top;
+	CHARACTERIZED BY
+		cataloguedOptionalUserFacilitiesPkg PACKAGE
+			BEHAVIOUR
+				cataloguedOptionalUserFacilitiesBhv BEHAVIOUR
+					DEFINED AS
+						"The catalogued Optional User Facilities managed object class is a superclass for 
+						all Optional User Facilities classes.";;
+			ATTRIBUTES
+				cataloguedOptionalUserFacilitiesId GET SET-BY-CREATE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721":objectCreation,
+				"CCITT Rec. X.721":objectDeletion,
+				"CCITT Rec. X.721":attributeValueChange;;;
+REGISTERED AS { cACommonObjectClass 12 };
+-- 4.2 Catalogued Supplementary Service
+-- The catalogued supplementary service managed object class is a superclass for other service subclasses that have
+-- attributes that are not customizable by the subscriber. The subclasses will be defined once candidates for the noncustomizable
+-- attributes have been identified.
+
+
+cataloguedSupplementaryService MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721(1992)":top;
+	CHARACTERIZED BY
+		cataloguedSupplementaryServicePkg PACKAGE
+			BEHAVIOUR
+				cataloguedSupplementaryServiceBhv BEHAVIOUR
+					DEFINED AS
+						"The catalogued services managed object class is a superclass for all 
+						supplementary services classes.";;
+			ATTRIBUTES
+				cataloguedSupplementaryServiceId GET SET-BY-CREATE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721":objectCreation,
+				"CCITT Rec. X.721":objectDeletion,
+				"CCITT Rec. X.721":attributeValueChange;;;
+REGISTERED AS { cACommonObjectClass 13 };
+-- 4.3 Catalogued Teleservice
+
+
+cataloguedTeleservice MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721":top;
+	CHARACTERIZED BY
+		layerInfoPkg,
+		cataloguedTeleservicePkg PACKAGE
+			BEHAVIOUR
+				cataloguedTeleserviceBhv BEHAVIOUR
+					DEFINED AS
+						"The catalogued teleservice managed object class defines a communication service 
+						that makes available layer 4-layer 7 capabilities and have attributes that are 
+						not customizable by the subscriber. This object class is a superclass from which 
+						specific catalogued teleservice objects may be derived as subclasses.";;
+			ATTRIBUTES
+				cataloguedTeleserviceId GET SET-BY-CREATE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721":objectCreation,
+				"CCITT Rec. X.721":objectDeletion,
+				"CCITT Rec. X.721":attributeValueChange;;;
+REGISTERED AS { cACommonObjectClass 14 };
+-- 4.4 Customized Resource
+-- The Customized Resource object class is a class of the managed objects that represents the service provisioning for a
+-- subscriber. It allows association of a set of services to one or more Access Port and Channels as illustrated in
+-- Appendix I.
+
+
+customizedResource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721":top;
+	CHARACTERIZED BY
+		customizedResourcePkg PACKAGE
+			BEHAVIOUR
+				customizedResourceBhv BEHAVIOUR
+					DEFINED AS
+						"The Customized Resource object class is a class of the managed objects that 
+						represents the service provisioning for a subscriber. It allows association of a 
+						set of services to one or more Access Port and Channels. The pointer list 
+						attributes: bearerServicePtrList, directoryNumberPtrList, teleServicePtrList, 
+						accessPortProfilePtrList, and accessChannelPtrList should be maintained 
+						synchronized with their corresponding pointing attribute in the objects they 
+						point out to. For example, the attribute accessChannelPtrList is synchronized 
+						with
+
+						customizedResourcePtrList in the accessChannel managed object class. That is, 
+						when a reference to an instance of the accessChannel object class is added to 
+						(or deleted from) the attribute accessChannelPtrList, customizedResourcePtrList 
+						attribute in accessChannel is updated accordingly.";;
+			-- The accessChannelPtrList attribute should not be used to point at 
+			-- accessChannels that are associated with the
+			-- customizedResource via the accessPortProfilePtrList, since such a relationship would be redundant.
+			ATTRIBUTES
+				customizedResourceId GET SET-BY-CREATE,
+				bearerServicePtrList GET-REPLACE ADD-REMOVE,
+				directoryNumberPtrList GET-REPLACE ADD-REMOVE,
+				numberOfBChannels GET-REPLACE ADD-REMOVE,
+				teleServicePtrList GET-REPLACE ADD-REMOVE,
+				accessPortProfilePtrList GET-REPLACE ADD-REMOVE,
+				accessChannelPtrList GET-REPLACE ADD-REMOVE;;;
+REGISTERED AS { cACommonObjectClass 15 };
+-- 4.5 Optional User Facilities
+-- Optional User Facilities, as defined in Recommendation X.2, are services that can only be used in conjunction with
+-- Packet Mode bearer services. The Optional user facilities object class is defined to allow the creation of specific optional
+-- services subclasses.
+
+
+optionalUserFacilities MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721":top;
+	CHARACTERIZED BY
+		optionalUserFacilitiesPkg PACKAGE
+			BEHAVIOUR
+				optionalUserFacilitiesBhv BEHAVIOUR
+					DEFINED AS
+						"The Optional user facilities service object class is defined to allow the 
+						creation of specific Optional user facilities that can only be used in 
+						conjunction with Packet Mode bearer services.";;
+			ATTRIBUTES
+				optionalUserFacilitiesId GET SET-BY-CREATE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721":attributeValueChange,
+				"CCITT Rec. X.721":objectCreation,
+				"CCITT Rec. X.721":objectDeletion;;;
+	CONDITIONAL PACKAGES
+		cataloguedOptionalUserFacilitiesPtrPkg
+			PRESENT IF
+				"catalogued optional user facilities is supported by Administration.";
+REGISTERED AS { cACommonObjectClass 16 };
+-- 4.6 Supplementary Service Service Dependent
+-- This superclass is used to model supplementary services that are defined in the underlying ITU-T supplementary service
+-- definition as being configurable on a per service basis. Such services are modeled as being contained in the appropriate
+-- service object (teleservice or bearer service). These supplementary services DO NOT have a pointer to
+-- bearer/teleservices. These supplementary services are name-bound to the bearer/teleservice managed object to which
+-- they pertain and this establishes the service to supplementary service binding.
+
+
+supplementaryServiceServiceDependent MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721":top;
+	CHARACTERIZED BY
+		supplementaryServiceServiceDependentPkg PACKAGE
+			BEHAVIOUR
+				supplementaryServiceServiceDependentBhv BEHAVIOUR
+					DEFINED AS
+						"This object class is defined to allow the creation of specific supplementary 
+						service subclasses for those supplementary services that are defined by ITU-T to 
+						be configurable on a per bearer or teleservice basis.
+
+						Supplementary services, as defined in I.210, are services that can only be used 
+						in conjunction with another bearer service or another teleservice.";;
+			ATTRIBUTES
+				supplementaryServiceId GET SET-BY-CREATE,
+				"CCITT Rec. X.721":administrativeState GET-REPLACE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721":stateChange,
+				"CCITT Rec. X.721":attributeValueChange,
+				"CCITT Rec. X.721":objectCreation,
+				"CCITT Rec. X.721":objectDeletion;;;
+	CONDITIONAL PACKAGES
+		cataloguedSupplementaryServicePtrPkg
+			PRESENT IF
+				"catalogued supplementary service is supported by Administration.";
+REGISTERED AS { cACommonObjectClass 17 };
+-- 4.7 Supplementary Service Service Independent
+-- This superclass is used to model supplementary services that are defined in the underlying ITU-T supplementary service
+-- definition as being service independent (i.e. applicable to multiple services in a uniform manner). Such services are
+-- modeled as being contained in the customer profile managed object. These supplementary services HAVE a pointer to
+-- bearer/teleservices. These pointers allow association of the bearer/teleservice with particular services when an
+-- Administration requires this capability to implement tariff/service offerings. These supplementary services are
+-- name-bound to the customer profile managed object and their relationship to a service is established via the service
+-- pointer values.
+
+
+supplementaryServiceServiceIndependent MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721":top;
+	CHARACTERIZED BY
+		supplementaryServiceServiceIndependentPkg PACKAGE
+			BEHAVIOUR
+				supplementaryServiceServiceIndependentBhv BEHAVIOUR
+					DEFINED AS
+						"This object class is defined to allow the creation of specific supplementary 
+						service subclasses for those supplementary services that are defined by ITU-T to 
+						be independent of any particular bearer/teleservice.
+
+						Supplementary services, as defined in I.210, are services that can only be used 
+						in conjunction with another bearer service or another teleservice.";;
+			ATTRIBUTES
+				supplementaryServiceId GET SET-BY-CREATE,
+				"CCITT Rec. X.721":administrativeState GET-REPLACE,
+				servicePtrList GET-REPLACE ADD-REMOVE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721":stateChange,
+				"CCITT Rec. X.721":attributeValueChange,
+				"CCITT Rec. X.721":objectCreation,
+				"CCITT Rec. X.721":objectDeletion;;;
+	CONDITIONAL PACKAGES
+		cataloguedSupplementaryServicePtrPkg
+			PRESENT IF
+				"catalogued supplementary service is supported by Administration.";
+REGISTERED AS { cACommonObjectClass 18 };
+-- 4.8 Teleservice
+
+
+teleservice MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721":top;
+	CHARACTERIZED BY
+		teleservicePkg PACKAGE
+			BEHAVIOUR
+				teleserviceBhv BEHAVIOUR
+					DEFINED AS
+						"The teleservices managed object class defines a communication service that makes 
+						available layer 1-layer 7 capabilities. The characteristics of teleservice are 
+						defined in accordance with I.240. Teleservices may be subclassed on the basis of 
+						the user information type attribute (Speech, Video, Fax, etc.) defined in I.240. 
+						The various Teleservices are defined in the Blue Book Recommendations.";;
+			ATTRIBUTES
+				teleserviceId GET SET-BY-CREATE,
+				bearerServicePtr GET-REPLACE,
+				"CCITT Rec. X.721":administrativeState GET-REPLACE,
+				customizedResourcePtrList
+					DEFAULT VALUE CACommonModule.emptySet
+					GET-REPLACE ADD-REMOVE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721":stateChange;;;
+	CONDITIONAL PACKAGES
+		cataloguedTeleservicePtrPkg
+			PRESENT IF
+				"catalogued teleservice is supported by Administration.",
+		layerInfoPkg
+			PRESENT IF
+				"teleserviceIs layers are configurable per subscriber";
+REGISTERED AS { cACommonObjectClass 19 };
+-- 5 Operations support managed object classes
+-- 5.1 Service Manager
+-- The Service Manager is a support object that is needed to complete the exchange provisioning without a detailed
+-- knowledge of the provisioning model. The Service Manager is a superclass object that can be subclassed to support
+-- specific actions for specific functions or technologies. The Service Manager is used in conjunction with Service Package
+-- object instances to perform these actions. The Service Package contains instances of managed objects with initial values
+-- that are used in creating all or part of a customeris service. If resource managed object classes are included in a Service
+-- Package, then their attributes (e.g. e164DirectoryNumber attribute of the e164DN object or the officeEquipment
+-- attribute of the accessPort object) must have dummy values. The actual values are taken from the ACTION parameters.
+-- Knowledge of the Service Manager or Service Packages used to create the customer service is not retained. Different
+-- Service Packages may be defined by Service Providers to meet specific business requirements.
+-- Service Packages that can be defined for a particular Service Manager must only use those parameters that are defined in
+-- the Action of that Service Manager. If additional input parameters are required, a new subclass of Service Manager has
+-- to be created.
+-- These Service Packages are defined using the same object classes as in the model providing service definitions.
+
+
+serviceManager MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721":top;
+	CHARACTERIZED BY
+		serviceManagerPkg PACKAGE
+			BEHAVIOUR
+				serviceManagerBhv BEHAVIOUR
+					DEFINED AS
+						"This is the superclass for all service managers. The subclasses will have 
+						service managment actions defined. Upon the reception of an action request, the 
+						serviceManager will perform the action according to the action specification. In 
+						case of an action failure, the services will remain unchanged and an error 
+						message will be returned to the managing system instead of the action reply.";;
+			ATTRIBUTES
+				serviceManagerId GET SET-BY-CREATE;;;
+REGISTERED AS { cACommonObjectClass 20 };
+-- 5.2 Service Package
+-- This object class is used to group instances of different object classes that are used to provide initial values for attributes
+-- of service objects created by the Service Manager object class.
+
+
+servicePackage MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721":top;
+	CHARACTERIZED BY
+		servicePackagePkg PACKAGE
+			BEHAVIOUR
+				servicePackageBhv BEHAVIOUR
+					DEFINED AS
+						"This object class is a passive object. However, this object affects the 
+						behaviour of the object instances that are contained in (named by) instances of 
+						this class. The instances contained are also passive and do not represent live 
+						services. They are rather only instantiated to provide initial values for the 
+						creation of real, connected services.";;
+			ATTRIBUTES
+				servicePackageId GET SET-BY-CREATE;;;
+REGISTERED AS { cACommonObjectClass 21 };
+-- 6 Package templates
+-- 6.1 Bearer Signalling Package
+
+
+bearerSignalingPkg PACKAGE
+	ATTRIBUTES
+		layer2SignalingEntityPtr GET-REPLACE,
+		layer3SignalingEntityPtr GET-REPLACE;
+REGISTERED AS { cACommonPackage 1 };
+-- 6.2 Catalogued Optional User Facilities Package
+
+
+cataloguedOptionalUserFacilitiesPtrPkg PACKAGE
+	ATTRIBUTES
+		cataloguedOptionalUserFacilitiesPtr GET-REPLACE;
+REGISTERED AS { cACommonPackage 2 };
+-- 6.3 Catalogued Supplementary Service Pointer Package
+
+
+cataloguedSupplementaryServicePtrPkg PACKAGE
+	ATTRIBUTES
+		cataloguedSupplementaryServicePtr GET-REPLACE;
+REGISTERED AS { cACommonPackage 3 };
+-- 6.4 Catalogued Teleservice Package
+
+
+cataloguedTeleservicePtrPkg PACKAGE
+	ATTRIBUTES
+		cataloguedTeleservicePtr GET-REPLACE;
+REGISTERED AS { cACommonPackage 4 };
+-- 6.5 Intercept Treatment Originating Package
+
+
+interceptTreatmentOriginPkg PACKAGE
+	ATTRIBUTES
+		interceptTreatmentOrigin REPLACE-WITH-DEFAULT
+			DEFAULT VALUE CACommonModule.interceptTreatmentOrigin
+			GET-REPLACE;
+REGISTERED AS { cACommonPackage 5 };
+-- 6.6 Layer Info Package
+
+
+layerInfoPkg PACKAGE
+	ATTRIBUTES
+		layer4InfoEntityType GET-REPLACE,
+		layer4InfoEntityPtr GET-REPLACE,
+		layer5InfoEntityType GET-REPLACE,
+		layer5InfoEntityPtr GET-REPLACE,
+		layer6InfoEntityType GET-REPLACE,
+		layer6InfoEntityPtr GET-REPLACE,
+		layer7InfoEntityType GET-REPLACE,
+		layer7InfoEntityPtr GET-REPLACE;
+REGISTERED AS { cACommonPackage 6 };
+-- 6.7 Number of B-Channel Package
+
+
+numberOfChannelsPkg PACKAGE
+	ATTRIBUTES
+		numberOfBChannels REPLACE-WITH-DEFAULT;
+REGISTERED AS { cACommonPackage 7 };
+-- 6.8 Office Equipment Package
+
+
+officeEquipmentPkg PACKAGE
+	ATTRIBUTES
+		officeEquipmentList GET-REPLACE ADD-REMOVE;
+REGISTERED AS { cACommonPackage 8 };
+-- 6.9 Routing Block Pointer Package
+
+
+routingBlockPtrPkg PACKAGE
+	ATTRIBUTES
+		routingBlockPtr GET-REPLACE;
+REGISTERED AS { cACommonPackage 9 };
+-- 7 Attribute templates
+-- This clause contains the ASN.1 definitions for all attributes in the described object classes. These definitions identify the
+-- function of the attributes and their valid characteristics, such as their valid values, interdependencies, read/write
+-- constraints, etc. The attributes are identified by their ASN.1 descriptors.
+-- 7.1 Access Channel Pointer List
+
+
+accessChannelPtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.AccessChannelPtrList;
+	MATCHES FOR SET-INTERSECTION, SET-COMPARISON;
+	BEHAVIOUR
+		accessChannelPtrListBhv BEHAVIOUR
+			DEFINED AS
+				"This is a set-valued attribute whose value(s) points to one or more instances of 
+				the Access Channel object class.";;
+REGISTERED AS { cACommonAttribute 1 };
+-- 7.2 Access Port Profile Id
+
+
+accessPortProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		accessPortProfileIdBhv BEHAVIOUR
+			DEFINED AS
+				"The naming attribute of the managed object access port profile.";;
+REGISTERED AS { cACommonAttribute 2 };
+-- 7.3 Access Port Profile Pointer
+
+
+accessPortProfilePtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		accessPortProfilePtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a pointer to an instance of the Access Port Profile 
+				managed object class.";;
+REGISTERED AS { cACommonAttribute 3 };
+-- 7.4 Access Port Profile Pointer List
+
+
+accessPortProfilePtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.SetOfInstances;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		accessPortProfilePtrListBhv BEHAVIOUR
+			DEFINED AS
+				"This is a set-valued attribute whose value(s) points to one or more instances of 
+				the Access Port Profile object class or its subclasses.";;
+REGISTERED AS { cACommonAttribute 4 };
+-- 7.5 Bearer Service Id
+
+
+bearerServiceId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bearerServiceIdBhv BEHAVIOUR
+			DEFINED AS
+				"The Bearer Service Id attribute is used to compose the RDN when naming an 
+				instance of the bearer service subclasses. The bearer service is a term that 
+				describes the nature of the call in an Integrated Services Digital Network 
+				(ISDN). A bearer capability is a subset of the characteristics associated with 
+				the ISDN term bearer service. A bearer service is, in part, defined in terms of 
+				the transmission characteristics of the channel provided between ISDN users on 
+				successful connection of a call.";;
+REGISTERED AS { cACommonAttribute 5 };
+-- 7.6 Bearer Service Pointer
+
+
+bearerServicePtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		bearerServicePtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used from any managed object to reference a bearer service 
+				managed object.";;
+REGISTERED AS { cACommonAttribute 6 };
+-- 7.7 Bearer Service Pointer List
+
+
+bearerServicePtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.SetOfInstances;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		bearerServicePtrListBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute references multiple bearer services.";;
+REGISTERED AS { cACommonAttribute 7 };
+-- 7.8 Catalogued Optional User Facilities Id
+
+
+cataloguedOptionalUserFacilitiesId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		cataloguedOptionalUserFacilitiesIdBhv BEHAVIOUR
+			DEFINED AS
+				"The Catalogued OptionalUserFacilitiesId attribute is used to compose the RDN 
+				when naming an instance of the Catalogued Optional User Facilities subclasses.";;
+REGISTERED AS { cACommonAttribute 8 };
+-- 7.9 Catalogued Optional User Facilities Pointer
+
+
+cataloguedOptionalUserFacilitiesPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		cataloguedOptionalUserFacilitiesPtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used from any managed object to reference a Catalogued User 
+				Facilities managed object.";;
+REGISTERED AS { cACommonAttribute 9 };
+-- 7.10 Catalogued Supplementary Service Id
+
+
+cataloguedSupplementaryServiceId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		cataloguedSupplementaryServiceIdBhv BEHAVIOUR
+			DEFINED AS
+				"The Catalogued Supplementary Service Id attribute is used to compose the RDN 
+				when naming an instance of the Catalogued Supplementary Service subclasses.";;
+REGISTERED AS { cACommonAttribute 10 };
+-- 7.11 Catalogued Supplementary Service Pointer
+
+
+cataloguedSupplementaryServicePtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		cataloguedSupplementaryServicePtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used from any managed object to reference a Catalogued 
+				Supplementary Service managed object.";;
+REGISTERED AS { cACommonAttribute 11 };
+-- 7.12 Catalogued Teleservice Id
+
+
+cataloguedTeleserviceId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		cataloguedTeleserviceIdBhv BEHAVIOUR
+			DEFINED AS
+				"The Catalogued Teleservice Id attribute is used to compose the RDN when naming 
+				an instance of the Catalogued Teleservice subclasses.";;
+REGISTERED AS { cACommonAttribute 12 };
+-- 7.13 Catalogued Teleservice Pointer
+
+
+cataloguedTeleservicePtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		cataloguedTeleservicePtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used from any managed object to reference a Catalogued 
+				Teleservice managed object.";;
+REGISTERED AS { cACommonAttribute 13 };
+-- 7.14 Circuit Endpoint Subgroup Ordered Pointer List
+
+
+circuitEndPointSubgroupOrderedPtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.CircuitSubgroupChannelPtrList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		circuitEndPointSubgroupOrderedPtrListBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is an ordered list of B-Channels. Each member of the list points 
+				to a CTP managed object class or its subclasses.";;
+REGISTERED AS { cACommonAttribute 14 };
+-- 7.15 Circuit Endpoint Subgroup Pointer List
+
+
+circuitEndPointSubgroupPtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.CircuitSubgroupPtrList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		circuitEndPointSubgroupPtrListBhv BEHAVIOUR
+			DEFINED AS
+				"This complex attribute is an ordered list; each member of the list has three 
+				elements in a sequence. The first element is the name of the 
+				circuitEndPointSubgroup. The second element indicates how many digits to delete 
+				from the incoming number when the call is presented on this CSG. The third 
+				element indicates the string to prefix when the call is presented on this CSG. 
+				The members to this list may be inserted using the insertCircuitSubgroupChannel 
+				action, removed using the removeCircuitSubgroupChannel or the second and third 
+				elements may be modified using the modifyCircuitSubgroupChannel action. When a 
+				CSG is inserted or removed from this list the corresponding backward pointer 
+				(routingBlockPtrList) in the CSG (circuitSubGroup) managed object is 
+				automatically updated";;
+REGISTERED AS { cACommonAttribute 15 };
+-- 7.16 Customer Profile Id
+
+
+customerProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		customerProfileIdBhv BEHAVIOUR
+			DEFINED AS
+				"The Customer Profile represents a single point of reference used to bind 
+				together a range of services and resources for customer administration purposes. 
+				The Customer Profile may therefore represent a single subscriber or a group of 
+				subscribers (e.g. Centrex group), thus allowing the maximum flexibility in the 
+				administration of all subscribers. The customerProfileId attribute is used to 
+				name instances of this class. This is a naming attribute. If the string choice 
+				for the syntax is used, matching on the substrings is permitted. If the number 
+				choice for the syntax is used, then matching on ordering is permitted.";;
+REGISTERED AS { cACommonAttribute 16 };
+-- 7.17 Customer Profile Pointer
+
+
+customerProfilePtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.PointerOrNull;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		customerProfilePtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a pointer to an instance of the customer Profile 
+				managed object class. The attribute value is null if no directory number is 
+				assigned to the customer profile.";;
+REGISTERED AS { cACommonAttribute 17 };
+-- 7.18 Customer Profile Pointer List
+
+
+customerProfilePtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.SetOfInstances;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		customerProfilePtrListBhv BEHAVIOUR
+			DEFINED AS
+				"This is a set-valued attribute whose value(s) points to instances of the 
+				customer Profile object class or its subclasses.";;
+REGISTERED AS { cACommonAttribute 18 };
+-- 7.19 Customized Resource Id
+
+
+customizedResourceId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		customizedResourceIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cACommonAttribute 19 };
+-- 7.20 Customized Resource Pointer List
+
+
+customizedResourcePtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.SetOfInstances;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		customizedResourcePtrListBhv BEHAVIOUR
+			DEFINED AS
+				"This is a set-valued attribute whose value(s) points to instances of the 
+				Customized Resources object class.";;
+REGISTERED AS { cACommonAttribute 20 };
+-- 7.21 Directory Number Id
+
+
+directoryNumberId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		directoryNumberIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cACommonAttribute 21 };
+-- 7.22 Directory Number Pointer List
+
+
+directoryNumberPtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.SetOfInstances;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		directoryNumberPtrListBhv BEHAVIOUR
+			DEFINED AS
+				"This is a set-valued attribute whose value(s) points to instances of the 
+				Directory Number object class or its subclasses.";;
+REGISTERED AS { cACommonAttribute 22 };
+-- 7.23 E.164 Directory Number
+
+
+e164DirectoryNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.E164DN;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		e164DirectoryNumberBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents directory numbers belonging to the Numbering Plan for 
+				the ISDN Era defined in E.164.";;
+REGISTERED AS { cACommonAttribute 23 };
+-- 7.24 Intercept Treatment Originating
+
+
+interceptTreatmentOrigin ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.InterceptTreatmentOrigin;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		interceptTreatmentOriginBhv BEHAVIOUR
+			DEFINED AS
+				"This attributevs value identifies the intercept treatment to be applied to line 
+				originations for each non-normal condition indicated by the administrativeState 
+				attribute. A non-normal condition is one which denies user access to the 
+				subscribed services (i.e. service disconnected or suspended).
+
+				This attribute is a choice between a numericString (supplier specified) or an 
+				integer (generalized types). The generalized types are as follows:
+
+				Site Translations This intercept treatment indicates that the switchwide defined 
+				intercept treatments are to be used. The remainder of the values allow specific 
+				intercept treatment for individual subscribers.
+
+				No Dial Tone This intercept treatment indicates that originating call attempts 
+				should not receive dial tone. Local Announcement This intercept treatment 
+				indicates that originating call attempts should be routed to announcement 
+				(indicating no service) instead of receiving dial tone.
+
+				Basic Business Group (BBG) Special Announcement This intercept treatment 
+				indicates that originating call attempts from a BBG line should be routed to a 
+				BBG customized announcement (indicating no service) instead of dial tone.
+
+				Soft Dial Tone Emergency Service/Business Office This intercept treatment 
+				indicates that originating calls should be allowed to emergency numbers and 
+				service provider business office numbers only. Originating calls to all other 
+				destinations are blocked and routed to a soft dial tone announcement.";;
+REGISTERED AS { cACommonAttribute 24 };
+-- 7.25 Intercept Treatment Terminating
+
+
+interceptTreatmentTerm ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.InterceptTreatmentTerm;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		interceptTreatmentTermBhv BEHAVIOUR
+			DEFINED AS
+				"This attributeBs value identifies the intercept treatment to be applied to line 
+				terminations for each non-normal condition indicated by the administrativeState 
+				attribute. A non-normal condition is one which denies user access to the 
+				subscribed services (i.e. service disconnected or suspended).
+
+				This attribute is a choice between a numericString (supplier specified) or an 
+				integer (generalized type). The generalized types are as follows:
+
+				Site Translations This intercept treatment indicates that the switchwide defined 
+				intercept treatments are to be used. The remainder of the values allow specific 
+				intercept treatment for individual subscribers.
+
+				Trouble/SuspendedServiceAnnouncement This intercept treatment indicates that the 
+				terminating call should be routed to an announcement indicating that the called 
+				partyts service has been suspended.
+
+				Operator Intercept This intercept treatment indicates that the terminating call 
+				should be routed to an operator for handling.
+
+				DN Change/Disconnect Announcement This intercept treatment indicates that the 
+				terminating call should be routed to a change/disconnected DN announcement.
+
+				Announce And Operator This intercept treatment indicates that the terminating 
+				call should be routed to an announcement first and then to an operator for 
+				handling. The intercept is specified on a switchwide basis and is not 
+				customizable for individual subscribers.
+
+				External Automatic Intercept System This intercept treatment indicates that the 
+				terminating call should be routed to an external Automatic Intercept System 
+				(AIS). The AIS then determines what treatment to provide based on the steering 
+				digits and DN supplied by the switch. An example of AIS capabilities is DN 
+				aging. When a customer s DN is changed, the AIS will give a change DN 
+				announcement for a specified time period after the change. Following this time 
+				period, calls to the old DN are then routed to the intercept for an unassigned 
+				DN.
+
+				Business Group Announcement for Disconnected or Term Restricted Lines This 
+				intercept treatment indicates that the terminating call should be routed to a 
+				non-working Business Group DN announcement.";;
+REGISTERED AS { cACommonAttribute 25 };
+-- 7.26 Layer 2 Signalling Entity Pointer
+
+
+layer2SignalingEntityPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		layer2SignalingEntityPtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a pointer to an instance of the Layer2SignalingEntity 
+				managed object class.";;
+REGISTERED AS { cACommonAttribute 26 };
+-- 7.27 Layer 3 Signalling Entity Pointer
+
+
+layer3SignalingEntityPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		layer3SignalingEntityPtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a pointer to an instance of the Layer3SignalingEntity 
+				managed object class.";;
+REGISTERED AS { cACommonAttribute 27 };
+-- 7.28 Layer 4 Entity Pointer
+
+
+layer4InfoEntityPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		layer4InfoEntityPtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a pointer to an instance of the Layer4InfoEntity 
+				managed object class.";;
+REGISTERED AS { cACommonAttribute 28 };
+-- 7.29 Layer 4 Entity Type
+
+
+layer4InfoEntityType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		layer4InfoEntityTypeBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a pointer to an instance of the Layer4InfoEntity 
+				managed object class.";;
+REGISTERED AS { cACommonAttribute 29 };
+-- 7.30 Layer 5 Entity Pointer
+
+
+layer5InfoEntityPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		layer5InfoEntityPtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a pointer to an instance of the Layer5InfoEntity 
+				managed object class.";;
+REGISTERED AS { cACommonAttribute 30 };
+-- 7.31 Layer 5 Entity Type
+
+
+layer5InfoEntityType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.Layer5InfoEntityType;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { cACommonAttribute 31 };
+-- 7.32 Layer 6 Entity Pointer
+
+
+layer6InfoEntityPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		layer6InfoEntityPtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a pointer to an instance of the Layer6InfoEntity 
+				managed object class.";;
+REGISTERED AS { cACommonAttribute 32 };
+-- 7.33 Layer 6 Entity Type
+
+
+layer6InfoEntityType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.Layer6InfoEntityType;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { cACommonAttribute 33 };
+-- 7.34 Layer 7 Entity Pointer
+
+
+layer7InfoEntityPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		layer7InfoEntityPtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a pointer to an instance of the Layer7InfoEntity 
+				managed object class.";;
+REGISTERED AS { cACommonAttribute 34 };
+-- 7.35 Layer 7 Entity Type
+
+
+layer7InfoEntityType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.Layer7InfoEntityType;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { cACommonAttribute 35 };
+-- 7.36 Layer Entity Id
+
+
+layerEntityId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		layerEntityIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cACommonAttribute 36 };
+-- 7.37 Number Of B-Channels
+
+
+numberOfBChannels ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NumberOfBChannels;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		numberOfBChannelsBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the number of ISDN B-channels.";;
+REGISTERED AS { cACommonAttribute 37 };
+-- 7.38 Office Equipment
+
+
+officeEquipment ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.StringName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		officeEquipmentBhv BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute is a printable string of alphanumeric characters 
+				that uniquely identifies the office equipment used to terminate the subscriber s 
+				line.";;
+REGISTERED AS { cACommonAttribute 38 };
+-- 7.39 Office Equipment List
+
+
+officeEquipmentList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.SetOfStringNames;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		officeEquipmentListBhv BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute is a set of graphic strings that identifies a set of 
+				office equipments.";;
+REGISTERED AS { cACommonAttribute 39 };
+-- 7.40 Optional User Facilities Id
+
+
+optionalUserFacilitiesId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		optionalUserFacilitiesIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cACommonAttribute 40 };
+-- 7.41 Routing Block Id
+
+
+routingBlockId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		routingBlockIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cACommonAttribute 41 };
+-- 7.42 Routing Block Pointer
+
+
+routingBlockPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		routingBlockPtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute points to an instance of routing block managed object.";;
+REGISTERED AS { cACommonAttribute 42 };
+-- 7.43 Routing Block Pointer List
+
+
+routingBlockPtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.SetOfInstances;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		routingBlockPtrListBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute points to instances of routing block object class.";;
+REGISTERED AS { cACommonAttribute 43 };
+-- 7.44 Sensitive Circuit
+
+
+sensitiveCircuit ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sensitiveCircuitBhv BEHAVIOUR
+			DEFINED AS
+				"An attribute value of TRUE indicates that the access (circuit) is sensitive for 
+				such critical sources as a police station, first aid, hospital, etc. A sensitive 
+				circuit implies that a special clearance is required from the customer before 
+				the circuit can be put out of service. The default value FALSE, meaning the 
+				circuit is not sensitive to those sources.";;
+REGISTERED AS { cACommonAttribute 44 };
+-- 7.45 Service Manager Id
+
+
+serviceManagerId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		servicePackageIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cACommonAttribute 45 };
+-- 7.46 Service Package Id
+
+
+servicePackageId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		serviceManagerIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cACommonAttribute 46 };
+-- 7.47 Service Pointer List
+
+
+servicePtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.SetOfInstances;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		servicePtrListBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute points to instances of the Bearer Service class and its 
+				subclasses, or to the Teleservice class and its subclasses, or to instances of 
+				Service Restriction class (defined in Q.824.2) or its subclasses or to other 
+				service classes such as those characterizing hunt group algorithms.";;
+REGISTERED AS { cACommonAttribute 47 };
+-- 7.48 Supplementary Service Id
+
+
+supplementaryServiceId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		supplementaryServiceIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cACommonAttribute 48 };
+-- 7.49 Supported By Access Port Pointer List
+
+
+supportedByAccessPortPtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.SupportedByAccessPortPtrList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		supportedByAccessPortPtrListBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is a complex attribute that points the managed object instance of 
+				accessPort class and includes a second parameter AccessPortInterfaceIdPtr which 
+				is applicable only if the accessPortProfile instance points to non-associated 
+				signalling controlling interfaces. The AccessPortInterfaceIdPtr presents an 
+				interface identifier to the channel identification information element contained 
+				in some appropriate messages such as SETUP message which is defined in Q.931. 
+				The accessPortInterfaceIdPtr is only used with nonassociated signalling.";;
+REGISTERED AS { cACommonAttribute 49 };
+-- 7.50 Teleservice Id
+
+
+teleserviceId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		teleserviceIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cACommonAttribute 50 };
+-- 7.51 Teleservice Pointer List
+
+
+teleServicePtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.SetOfInstances;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		teleServicePtrListBhv BEHAVIOUR
+			DEFINED AS
+				"This is a set-valued attribute whose value(s) points to instances of the Access 
+				Port Profile object class or its subclasses.";;
+REGISTERED AS { cACommonAttribute 51 };
+-- 7.52 X.121 Directory Number
+
+
+x121DirectoryNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.X121DN;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		x121DirectoryNumberBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents directory numbers belonging to the Numbering Plan for 
+				Packet Data Networks defined in X.121.";;
+REGISTERED AS { cACommonAttribute 52 };
+-- 8 Name Bindings
+-- 8.1 accessChannel-accessPort Name Binding
+
+
+accessChannel-accessPort NAME BINDING
+	SUBORDINATE OBJECT CLASS accessChannel AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS accessPort AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"CCITT Rec. M.3100(1992)":cTPId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 1 };
+-- 8.2 accessPortProfile-managedElement Name Binding
+
+
+accessPortProfile-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS accessPortProfile AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		accessPortProfileId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 2 };
+-- 8.3 administeredCircuitEndPointSubgroup-customerProfile Name Binding
+
+
+administeredCircuitEndPointSubgroup-customerProfile NAME BINDING
+	SUBORDINATE OBJECT CLASS administeredCircuitEndPointSubgroup AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS customerProfile AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"CCITT Rec. M.3100":circuitEndPointSubgroupId;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING, WITH-REFERENCE-OBJECT;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { cACommonNameBinding 3 };
+-- 8.4 bearerService-customerProfile Name Binding
+
+
+bearerService-customerProfile NAME BINDING
+	SUBORDINATE OBJECT CLASS bearerService AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS customerProfile AND SUBCLASSES;
+	WITH ATTRIBUTE
+		bearerServiceId;
+	BEHAVIOUR
+		bearerService-customerProfileBhv BEHAVIOUR
+			DEFINED AS
+				"This name binding is used to bind service independent supplementary services to 
+				the containing customer profile. This name binding is applicable only to service 
+				independent supplementary services.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 4 };
+-- 8.5 cataloguedOptionalUserFacilities-managedElement Name Binding
+
+
+cataloguedOptionalUserFacilities-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS cataloguedOptionalUserFacilities AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cataloguedOptionalUserFacilitiesId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 5 };
+-- 8.6 cataloguedSupplementaryService-managedElement Name Binding
+
+
+cataloguedSupplementaryService-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS cataloguedSupplementaryService AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cataloguedSupplementaryServiceId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 6 };
+-- 8.7 cataloguedTeleservice-managedElement Name Binding
+
+
+cataloguedTeleservice-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS cataloguedTeleservice AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cataloguedTeleserviceId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 7 };
+-- 8.8 customerProfile-managedElement Name Binding
+
+
+customerProfile-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS customerProfile AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		customerProfileId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 8 };
+-- 8.9 customizedResource-customerProfile Name Binding
+
+
+customizedResource-customerProfile NAME BINDING
+	SUBORDINATE OBJECT CLASS customizedResource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS customerProfile AND SUBCLASSES;
+	WITH ATTRIBUTE
+		customizedResourceId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 10 };
+-- 8.10 directoryNumber-managedElement Name Binding
+
+
+directoryNumber-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS directoryNumber AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		directoryNumberId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 11 };
+-- 8.11 layerEntity-customerProfile Name Binding
+
+
+layerEntity-customerProfile NAME BINDING
+	SUBORDINATE OBJECT CLASS layerEntity AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS customerProfile AND SUBCLASSES;
+	WITH ATTRIBUTE
+		layerEntityId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 12 };
+-- 8.12 optionalUserFacilities-bearerService Name Binding
+
+
+optionalUserFacilities-bearerService NAME BINDING
+	SUBORDINATE OBJECT CLASS optionalUserFacilities AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS bearerService AND SUBCLASSES;
+	WITH ATTRIBUTE
+		optionalUserFacilitiesId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 13 };
+-- 8.13 routingBlock-customerProfile Name Binding
+
+
+routingBlock-customerProfile NAME BINDING
+	SUBORDINATE OBJECT CLASS routingBlock AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS customerProfile AND SUBCLASSES;
+	WITH ATTRIBUTE
+		routingBlockId;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING, WITH-REFERENCE-OBJECT;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { cACommonNameBinding 14 };
+-- 8.14 serviceManager-managedElement Name Binding
+
+
+serviceManager-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS serviceManager AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		serviceManagerId;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING, WITH-REFERENCE-OBJECT;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { cACommonNameBinding 15 };
+-- 8.15 servicePackage-managedElement Name Binding
+
+
+servicePackage-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS servicePackage AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		servicePackageId;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING, WITH-REFERENCE-OBJECT;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { cACommonNameBinding 16 };
+-- 8.16 supplementaryServiceServiceDependent-bearerService Name Binding
+
+
+supplementaryServiceServiceDependent-bearerService NAME BINDING
+	SUBORDINATE OBJECT CLASS supplementaryServiceServiceDependent AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS bearerService AND SUBCLASSES;
+	WITH ATTRIBUTE
+		supplementaryServiceId;
+	BEHAVIOUR
+		sSSD-BS-NBBhv BEHAVIOUR
+			DEFINED AS
+				"This name binding is used to bind service dependent supplementary services to 
+				the containing bearer service and establishes an association between the bearer 
+				service and the supplementary service.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 17 };
+-- 8.17 supplementaryServiceServiceDependent-teleservice Name Binding
+
+
+supplementaryServiceServiceDependent-teleservice NAME BINDING
+	SUBORDINATE OBJECT CLASS supplementaryServiceServiceDependent AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS teleservice AND SUBCLASSES;
+	WITH ATTRIBUTE
+		supplementaryServiceId;
+	BEHAVIOUR
+		sSSD-TS-NBBhv BEHAVIOUR
+			DEFINED AS
+				"This name binding is used to bind service dependent supplementary services to 
+				the containing teleservice and establishes an association between the 
+				teleservice and the supplementary service.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 18 };
+-- 8.18 supplementaryServiceServiceIndependent-customerProfile Name Binding
+
+
+supplementaryServiceServiceIndependent-cutomerProfile NAME BINDING
+	SUBORDINATE OBJECT CLASS supplementaryServiceServiceIndependent AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS customerProfile AND SUBCLASSES;
+	WITH ATTRIBUTE
+		supplementaryServiceId;
+	BEHAVIOUR
+		sSSID-CP-NBBhv BEHAVIOUR
+			DEFINED AS
+				"This name binding is used to bind service independent supplementary services to 
+				the containing customer profile. This name binding is applicable only to service 
+				independent supplementary services.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 19 };
+-- 8.19 teleservice-customerProfile Name Binding
+
+
+teleservice-customerProfile NAME BINDING
+	SUBORDINATE OBJECT CLASS teleservice AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS customerProfile AND SUBCLASSES;
+	WITH ATTRIBUTE
+		teleserviceId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 20 };
+-- 9 Actions
+-- 9.1 Insert Circuit Subgroups Action
+
+
+insertCircuitSubgroups ACTION
+	BEHAVIOUR
+		insertCircuitSubgroupsBhv BEHAVIOUR
+			DEFINED AS
+				"The action request contains the circuit subgroup to insert new data. The new 
+				data is a set of elements, each member consisting of three elements in a 
+				sequence; first, the name of the administeredCircuitEndPointSubgroup; second, 
+				delete element and the third the prefix element (see 
+				circuitEndPointSubgroupPtrList Bhv). The new members are inserted after the 
+				member whose administeredCircuitEndPointSubgroup name component matches the name 
+				of the object in the insert after field. The action specifies the name of an 
+				instance of CTP managed object class or its subclassses after which the new 
+				member must be inserted. The successful insertion is returned as a response to 
+				the action which contains only the invoke identifier. If the 
+				insertAfterCircuitSubgroup object instance is NULL the new members are inserted 
+				at the beginning of the sequence.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX CACommonModule.InsertCircuitSubgroups;
+REGISTERED AS { cACommonAction 1 };
+-- 9.2 Insert CSG Channels Action
+
+
+insertCSGChannels ACTION
+	BEHAVIOUR
+		insertCSGChannelsBhv BEHAVIOUR
+			DEFINED AS
+				"The action is used to insert new members after a specific element in the 
+				sequence of the administeredCircuitEndPointSubgroupOrderedPtrList attribute. The 
+				action specifies the name of an instance of CTP managed object class or its 
+				subclassses after which the new members must be inserted. The successful 
+				insertion is returned as a response to the action which contains only the invoke 
+				identifier. If the insertAfter object instance is NULL the CSGs are inserted at 
+				the beginning of the sequence.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX CACommonModule.InsertCSGChannels;
+REGISTERED AS { cACommonAction 2 };
+-- 9.3 Modify Circuit Subgroup Action
+
+
+modifyCircuitSubgroup ACTION
+	BEHAVIOUR
+		modifyCircuitSubgroupBhv BEHAVIOUR
+			DEFINED AS
+				"The action is used to modify the delete and prefix elements of an existing 
+				member of the circuitEndPointSubgroupPtrList attribute. The action specifies the 
+				name of administeredCircuitEndPointSubgroup and the new values for the delete 
+				and/or prefix elements. The successful modification is returned as a response to 
+				the action which contains only the invoke identifier.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX CACommonModule.ModifyCircuitSubgroup;
+REGISTERED AS { cACommonAction 3 };
+-- 9.4 Remove Circuit Subgroups Action
+
+
+removeCircuitSubgroups ACTION
+	BEHAVIOUR
+		removeCircuitSubgroupsBhv BEHAVIOUR
+			DEFINED AS
+				"The action is used to remove existing members in the sequence of the 
+				circuitEndPointSubgroupPtrList attribute. The action specifies the name of 
+				administeredCircuitEndPointSubgroup that must be removed. The successful removal 
+				is returned as a response to the action which contains only the invoke 
+				identifier";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX CACommonModule.RemoveCircuitSubgroups;
+REGISTERED AS { cACommonAction 4 };
+-- 9.5 Remove CSG Channels Action
+
+
+removeCSGChannels ACTION
+	BEHAVIOUR
+		removeCSGChannelsBhv BEHAVIOUR
+			DEFINED AS
+				"The action is used to remove existing members in the sequence of the CTP managed 
+				object class or its subclassses that must be removed. The successful removal is 
+				returned as a response to the action which contains only the invoke identifier.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX CACommonModule.RemoveCSGChannels;
+REGISTERED AS { cACommonAction 5 };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. Q.824.0 (1995)"
+--  { itu-t(0) recommendation(0) q(17) ca(824) dot(127) common(0) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ +- itut_x723::subsystem
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ |  +- itut_q824_0::administeredCircuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  |  +- itut_q824_0::accessChannel
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  |  +- itut_q824_0::accessChannel
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- itut_q824_0::accessPort
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- itut_q824_0::accessPort
+--@@ +- itut_m3100::tpPool
+--@@ +- itut_q824_0::accessPortProfile
+--@@ +- itut_q824_0::bearerService
+--@@ +- itut_q824_0::customerProfile
+--@@ +- itut_q824_0::directoryNumber
+--@@ |  +- itut_q824_0::directoryNumberE164
+--@@ |  +- itut_q824_0::directoryNumberX121
+--@@ +- itut_q824_0::layerEntity
+--@@ +- itut_q824_0::routingBlock
+--@@ +- itut_q824_0::cataloguedOptionalUserFacilities
+--@@ +- itut_q824_0::cataloguedSupplementaryService
+--@@ +- itut_q824_0::cataloguedTeleservice
+--@@ +- itut_q824_0::customizedResource
+--@@ +- itut_q824_0::optionalUserFacilities
+--@@ +- itut_q824_0::supplementaryServiceServiceDependent
+--@@ +- itut_q824_0::supplementaryServiceServiceIndependent
+--@@ +- itut_q824_0::teleservice
+--@@ +- itut_q824_0::serviceManager
+--@@ +- itut_q824_0::servicePackage
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ |  >- itut_q824_0::accessPortProfile
+--@@ |  >- itut_q824_0::cataloguedOptionalUserFacilities
+--@@ |  >- itut_q824_0::cataloguedSupplementaryService
+--@@ |  >- itut_q824_0::cataloguedTeleservice
+--@@ |  >- itut_q824_0::customerProfile
+--@@ |  |  >- itut_q824_0::administeredCircuitEndPointSubgroup
+--@@ |  |  >- itut_q824_0::bearerService
+--@@ |  |  |  >- itut_q824_0::optionalUserFacilities
+--@@ |  |  |  >- itut_q824_0::supplementaryServiceServiceDependent
+--@@ |  |  >- itut_q824_0::customizedResource
+--@@ |  |  >- itut_q824_0::layerEntity
+--@@ |  |  >- itut_q824_0::routingBlock
+--@@ |  |  >- itut_q824_0::supplementaryServiceServiceIndependent
+--@@ |  |  >- itut_q824_0::teleservice
+--@@ |  |  |  >- itut_q824_0::supplementaryServiceServiceDependent
+--@@ |  >- itut_q824_0::directoryNumber
+--@@ |  >- itut_q824_0::serviceManager
+--@@ |  >- itut_q824_0::servicePackage
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_q824_0::accessPort
+--@@ >- itut_q824_0::accessChannel
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@ itut_q824_0::accessPort +++
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

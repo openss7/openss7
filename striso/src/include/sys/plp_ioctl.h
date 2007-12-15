@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: plp_ioctl.h,v 0.9.2.1 2007/12/15 20:16:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/12/15 20:16:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: plp_ioctl.h,v $
+ Revision 0.9.2.1  2007/12/15 20:16:48  brian
+ - added new mib files
+
  *****************************************************************************/
 
 #ifndef __SYS_PLP_IOCTL_H__
 #define __SYS_PLP_IOCTL_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: plp_ioctl.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #include <linux/ioctl.h>
 

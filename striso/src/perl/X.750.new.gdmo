@@ -1,0 +1,1287 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 11:15:57 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997" >--
+--< GDMO.Namespace itut_x750 >--
+--< GDMO.Alias "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997" "X.750",
+--  "ITU-T Rec. X.750 (1996)/Amd.1 (1997) | ISO/IEC 10164-16 : 1997/Amd.1 1998",
+--  "ITU-T Rec. X.750 (1996)/Cor.1 (2000) | ISO/IEC 10164-16 : 1997/Cor.1 2001" >--
+MODULE "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997"
+-- Annex A
+-- Management knowledge managed objects
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- ISO/IEC 10164-16 : 1997 (E)
+-- ITU-T Rec. X.750 (1996 E)
+-- A.2 Repertoire managed object definitions
+-- A.2.1 Managed object classes
+
+managedObjectClassRepertoire MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		managedObjectClassRepertoirePackage PACKAGE
+			BEHAVIOUR
+				managedObjectClassRepertoireBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						Managed objects with this behaviour issue the object creation notification upon 
+						creation, the object deletion notification upon deletion and the attribute value 
+						change notification upon a change of value of either the supported conditional 
+						package list attribute or the implemented values attribute.!;;
+			ATTRIBUTES
+				managedObjectClassRepertoireId GET,
+				supportedConditionalPackageList GET;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":attributeValueChange,
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":objectCreation,
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":objectDeletion;;;
+	CONDITIONAL PACKAGES
+		implementedValuesPackage PACKAGE
+			BEHAVIOUR
+				implementedValuesPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						Presence of the implemented values conditional package implies that the managed 
+						object implementation supports the indicated implemented values for each of the 
+						managed object attributes indicated within the implemented values attribute.!;;
+			ATTRIBUTES
+				implementedValues GET;
+		REGISTERED AS { MKMD.mkmPackage 2 };
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { MKMD.mkmMObjectClass 2 };
+
+
+repertoire MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		repertoirePackage PACKAGE
+			BEHAVIOUR
+				repertoireBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+
+						An instance with this behaviour reflects system capabilities: when a system is 
+						enabled for support of new managed object classes, new managed relationship 
+						classes, new name bindings, or new CMIP profiles, or when existing support is 
+						disabled, the new capability shall be reflected in the values of the 
+						corresponding attributes. An instance with this behaviour shall emit the object 
+						creation notification upon creation, the object deletion notification upon 
+						deletion and the attribute value change notification upon a change of value of 
+						the supported managed object class list, supported relationship class list, 
+						supported name binding list, or supported CMIP profiles attribute.
+
+						If a managed system has any instances of the repertoire managed object, it shall 
+						have one named under the system managed object with the value "REP1" for the 
+						repertoire Id attribute. A managed system may have multiple instances of the 
+						repertoire managed object.!;;
+			ATTRIBUTES
+				repertoireId GET,
+				supportedNameBindingList GET,
+				supportedManagedObjectClassList GET,
+				supportedRelationshipClassList GET;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":objectCreation,
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":objectDeletion,
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":attributeValueChange;;;
+	CONDITIONAL PACKAGES
+		supportedCmipProfilesPackage PACKAGE
+			ATTRIBUTES
+				supportedCmipProfiles GET;
+		REGISTERED AS { MKMD.mkmPackage 1 };
+			PRESENT IF
+				"this managed object represents the managed
+				system components that support communications";
+REGISTERED AS { MKMD.mkmMObjectClass 1 };
+-- A.2.2 Name bindings
+
+
+managedObjectClassRepertoire-repertoire NAME BINDING
+	SUBORDINATE OBJECT CLASS managedObjectClassRepertoire AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS repertoire AND SUBCLASSES;
+	WITH ATTRIBUTE
+		managedObjectClassRepertoireId;
+	BEHAVIOUR
+		managedObjectClassRepertoire-repertoireBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				The value of the managed object class repertoire Id attribute shall be the 
+				OBJECT IDENTIFIER for the managed object class with which the repertoire is 
+				associated.!;;
+REGISTERED AS { MKMD.mkmNameBinding 2 };
+
+
+repertoire-system NAME BINDING
+	SUBORDINATE OBJECT CLASS repertoire AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		repertoireId;
+	BEHAVIOUR
+		repertoire-systemBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				The use of a fixed relative distinguished name for a common way to access a 
+				repertoire managed object is provided by this name binding when the value "REP1" 
+				is used for the repertoire Id attribute.!;;
+REGISTERED AS { MKMD.mkmNameBinding 1 };
+-- A.2.3 Attributes
+
+
+implementedValues ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX RepertoireASN1Module.ImplementedValues;
+	BEHAVIOUR
+		implementedValuesBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+
+				This attribute represents class implementation information related to a set of 
+				attributes of a managed object class. This set-valued attribute shall not 
+				contain more than one element with the same attributeId value. The information 
+				provided applies only to instances of the class for which information is being 
+				provided: in other words, implementation information represented by this 
+				attribute is not inherited by derived classes.
+
+				The following information about an attribute can be represented:
+
+				� initialValue: The value the attribute first takes when an instance of the 
+				  class comes into existence.
+
+				� defaultValue: The value to which the attribute is set when a set-to-default 
+				  management operation is applied to it.
+
+				� minValue: For an attribute of type INTEGER, REAL, or a subtype of either of 
+				  these types, which has ranges for both its permitted and required values sets, 
+				  minValue indicates the minimum value that the attribute can take in an 
+				  instance of the class. minValue shall be greater than or equal to the smallest 
+				  permitted value and less than or equal to the smallest required value.
+
+				� maxValue: For an attribute of type INTEGER, REAL, or a subtype of either of 
+				  these types, which has ranges for both its permitted and required values sets, 
+				  maxValue indicates the maximum value that the attribute can take in an 
+				  instance of the class. maxValue shall be less than or equal to the largest 
+				  permitted value and greater than or equal to the largest required value.!;;
+REGISTERED AS { MKMD.mkmAttribute 6 };
+
+
+managedObjectClassRepertoireId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX RepertoireASN1Module.ManagedObjectClassRepertoireId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		managedObjectClassRepertoireIdBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				The value of this attribute is the OBJECT IDENTIFIER with which the managed 
+				object class was registered.!;;
+REGISTERED AS { MKMD.mkmAttribute 2 };
+
+
+repertoireId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX RepertoireASN1Module.RepertoireId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		repertoireIdBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				The repertoireId attribute is a distinguishing attribute suitable for naming.!;;
+REGISTERED AS { MKMD.mkmAttribute 1 };
+
+
+supportedCmipProfiles ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX RepertoireASN1Module.SupportedCmipProfiles;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		supportedCmipProfilesBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+
+				This attribute indicates the CMIP profiles supported by the system operating in 
+				the agent role. The following values are defined:
+
+				 aom10(0): The managed system supports ISP 11183-1.
+
+				 aom11(1): The managed system supports ISP 11183-3.
+
+				 aom12(2): The managed system supports ISP 11183-2.!;;
+REGISTERED AS { MKMD.mkmAttribute 4 };
+
+
+supportedConditionalPackageList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX RepertoireASN1Module.SupportedConditionalPackageList;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		supportedConditionalPackageListBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This set-valued, read-only attribute identifies the conditional packages 
+				supported in the implementation of the managed object class.!;;
+REGISTERED AS { MKMD.mkmAttribute 5 };
+
+
+supportedManagedObjectClassList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX RepertoireASN1Module.SupportedManagedObjectClassList;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		supportedManagedObjectClassListBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				The supportedManagedObjectClassList attribute indicates the managed object 
+				classes, actual and allomorphic, supported by a system operating in the agent 
+				role.!;;
+REGISTERED AS { MKMD.mkmAttribute 3 };
+
+
+supportedNameBindingList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX RepertoireASN1Module.SupportedNameBindingList;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		supportedNameBindingListBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				The supportedNameBindingList attribute indicates the name bindings supported by 
+				the system operating in the agent role.!;;
+REGISTERED AS { MKMD.mkmAttribute 42 };
+
+
+supportedRelationshipClassList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX RepertoireASN1Module.SupportedRelationshipClassList;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		supportedRelationshipClassListBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				The supportedRelationshipClassList attribute indicates the relationship classes 
+				supported by the system operating in the agent role.!;;
+REGISTERED AS { MKMD.mkmAttribute 44 };
+-- A.3 Definition managed object definitions
+-- A.3.1 Managed object classes
+
+
+actionTemplate MANAGED OBJECT CLASS
+	DERIVED FROM
+		template;
+	CHARACTERIZED BY
+		actionPackage PACKAGE
+			ATTRIBUTES
+				behaviour GET,
+				modeConfirmed GET,
+				parameters GET,
+				withInformationSyntax GET,
+				withReplySyntax GET,
+				registeredAs GET;;;
+REGISTERED AS { MKMD.mkmMObjectClass 12 };
+
+
+aSN1Module MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		aSN1ModulePackage PACKAGE
+			BEHAVIOUR
+				aSN1ModuleBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						When an instance of this class is named subordinate to a document managed 
+						object, the moduleReference attribute provides unique identification within the 
+						scope of that document managed object. A managed object with this behaviour 
+						supports the retrieval of the asn1ModuleContents attribute via the 
+						getTextualRepresentation action.!;;
+			ATTRIBUTES
+				moduleReference GET,
+				asn1ModuleContents GET,
+				asn1Version GET,
+				optionallyRegisteredAs GET;
+			ACTIONS
+				getTextualRepresentation;;;
+REGISTERED AS { MKMD.mkmMObjectClass 4 };
+
+
+attributeGroupTemplate MANAGED OBJECT CLASS
+	DERIVED FROM
+		template;
+	CHARACTERIZED BY
+		attributeGroupPackage PACKAGE
+			ATTRIBUTES
+				groupElements GET,
+				fixed GET,
+				description GET,
+				registeredAs GET;;;
+REGISTERED AS { MKMD.mkmMObjectClass 10 };
+
+
+attributeTemplate MANAGED OBJECT CLASS
+	DERIVED FROM
+		template;
+	CHARACTERIZED BY
+		attributePackage PACKAGE
+			ATTRIBUTES
+				derivedOrWithSyntaxChoice GET,
+				matchesFor GET,
+				behaviour GET,
+				parameters GET,
+				optionallyRegisteredAs GET;;;
+REGISTERED AS { MKMD.mkmMObjectClass 9 };
+
+
+behaviourTemplate MANAGED OBJECT CLASS
+	DERIVED FROM
+		template;
+	CHARACTERIZED BY
+		behaviourPackage PACKAGE
+			BEHAVIOUR
+				behaviourTemplateBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						A managed object with this behaviour supports the retrieval of the definedAs 
+						attribute via the getTextualRepresentation action.!;;
+			ATTRIBUTES
+				definedAs GET;
+			ACTIONS
+				getTextualRepresentation;;;
+REGISTERED AS { MKMD.mkmMObjectClass 11 };
+
+
+document MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		documentPackage PACKAGE
+			BEHAVIOUR
+				documentBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						When an instance of this class is named subordinate to a system managed object, 
+						either the documentName or the documentObjectIdentifier attribute provides 
+						unique identification within the scope of that system managed object. When the 
+						documentName attribute is used for ITU-T Recommendations or for International 
+						Standards, it is formed as specified for a <standard-name> in 8.2(k) of CCITT 
+						Rec. X.722 (1992) | ISO/IEC 10165-4:1992.!;;
+			ATTRIBUTES
+				documentName GET,
+				documentObjectIdentifier GET;;;
+	CONDITIONAL PACKAGES
+		documentSpecificationPackage PACKAGE
+			BEHAVIOUR
+				documentSpecificationBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						A managed object with this behaviour supports the retrieval of the specification 
+						attribute via the getTextualRepresentation action.!;;
+			ATTRIBUTES
+				specification GET;
+			ACTIONS
+				getTextualRepresentation;
+		REGISTERED AS { MKMD.mkmPackage 4 };
+			PRESENT IF
+				"document is available as a text string";
+REGISTERED AS { MKMD.mkmMObjectClass 14 };
+
+
+managedObjectClassTemplate MANAGED OBJECT CLASS
+	DERIVED FROM
+		template;
+	CHARACTERIZED BY
+		managedObjectClassPackage PACKAGE
+			ATTRIBUTES
+				derivedFrom GET,
+				characterizedBy GET,
+				conditionalPackages GET,
+				registeredAs GET;;;
+REGISTERED AS { MKMD.mkmMObjectClass 5 };
+
+
+nameBindingTemplate MANAGED OBJECT CLASS
+	DERIVED FROM
+		template;
+	CHARACTERIZED BY
+		nameBindingPackage PACKAGE
+			ATTRIBUTES
+				subordinateObjectClass GET,
+				namedBySuperiorObjectClass GET,
+				withAttribute GET,
+				behaviour GET,
+				create GET,
+				delete GET,
+				registeredAs GET;;;
+REGISTERED AS { MKMD.mkmMObjectClass 8 };
+
+
+notificationTemplate MANAGED OBJECT CLASS
+	DERIVED FROM
+		template;
+	CHARACTERIZED BY
+		notificationPackage PACKAGE
+			ATTRIBUTES
+				behaviour GET,
+				modeConfirmed GET,
+				parameters GET,
+				withInformationSyntax GET,
+				andAttributeIds GET,
+				withReplySyntax GET,
+				registeredAs GET;;;
+REGISTERED AS { MKMD.mkmMObjectClass 13 };
+
+
+packageTemplate MANAGED OBJECT CLASS
+	DERIVED FROM
+		template;
+	CHARACTERIZED BY
+		packagePackage PACKAGE
+			ATTRIBUTES
+				behaviour GET,
+				attributes GET,
+				attributeGroups GET,
+				actions GET,
+				notifications GET,
+				optionallyRegisteredAs GET;;;
+REGISTERED AS { MKMD.mkmMObjectClass 6 };
+
+
+parameterTemplate MANAGED OBJECT CLASS
+	DERIVED FROM
+		template;
+	CHARACTERIZED BY
+		parameterPackage PACKAGE
+			ATTRIBUTES
+				context GET,
+				syntaxOrAttribute GET,
+				behaviour GET,
+				optionallyRegisteredAs GET;;;
+REGISTERED AS { MKMD.mkmMObjectClass 7 };
+-- Amendment 1
+
+
+relationshipClassTemplate MANAGED OBJECT CLASS
+	DERIVED FROM
+		template;
+	CHARACTERIZED BY
+		relationshipClassPackage PACKAGE
+			BEHAVIOUR
+				relationshipClassBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						A managed object with this behaviour represents a RELATIONSHIP CLASS template.!;;
+			ATTRIBUTES
+				derivedFrom GET,
+				behaviour GET;;;
+	CONDITIONAL PACKAGES
+		relationshipClassSupportsPackage PACKAGE
+			BEHAVIOUR
+				relationshipClassSupportsBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						A managed object with this behaviour represents a template that was defined with 
+						the SUPPORTS
+						construct.!;;
+			ATTRIBUTES
+				supports GET;
+		REGISTERED AS { MKMD.mkmPackage 5 };
+			PRESENT IF
+				"managed object represents a template that was
+				defined with the SUPPORTS construct",
+		relationshipClassQualifiedByPackage PACKAGE
+			BEHAVIOUR
+				relationshipClassQualifiedByBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						A managed object with this behaviour represents a template that was defined with 
+						the QUALIFIED
+						BY construct.!;;
+			ATTRIBUTES
+				qualifiedBy GET;
+		REGISTERED AS { MKMD.mkmPackage 6 };
+			PRESENT IF
+				"managed object represents a template that was
+				defined with the QUALIFIED BY construct",
+		relationshipClassRoleSpecifierPackage PACKAGE
+			BEHAVIOUR
+				relationshipClassRoleSpecifierBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						A managed object with this behaviour represents a template that was defined with 
+						the role-specifier
+						supporting production.!;;
+			ATTRIBUTES
+				roleSpecifier GET;
+		REGISTERED AS { MKMD.mkmPackage 7 };
+			PRESENT IF
+				"managed object represents a template that was
+				defined with the role-specifier supporting production";
+REGISTERED AS { MKMD.mkmMObjectClass 16 };
+-- Amendment 1
+
+
+relationshipMappingTemplate MANAGED OBJECT CLASS
+	DERIVED FROM
+		template;
+	CHARACTERIZED BY
+		relationshipMappingPackage PACKAGE
+			BEHAVIOUR
+				relationshipMappingBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						A managed object with this behaviour represents a RELATIONSHIP MAPPING template.!;;
+			ATTRIBUTES
+				mappedRelationshipClass GET,
+				behaviour GET,
+				roleMappingSpecificationSet GET,
+				registeredAs GET;;;
+	CONDITIONAL PACKAGES
+		relationshipMappingRelationshipObjectPackage PACKAGE
+			BEHAVIOUR
+				relationshipMappingRelationshipObjectBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						A managed object with this behaviour represents a template that was defined with 
+						the
+						RELATIONSHIP OBJECT construct.!;;
+			ATTRIBUTES
+				relationshipObject GET;
+		REGISTERED AS { MKMD.mkmPackage 8 };
+			PRESENT IF
+				"managed object represents a template that
+				was defined with the RELATIONSHIP OBJECT construct",
+		relationshipMappingOperationsMappingPackage PACKAGE
+			BEHAVIOUR
+				relationshipMappingOperationsMappingBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						A managed object with this behaviour represents a template that was defined with 
+						the
+						OPERATIONS MAPPING construct.!;;
+			ATTRIBUTES
+				operationsMapping GET;
+		REGISTERED AS { MKMD.mkmPackage 9 };
+			PRESENT IF
+				"managed object represents a template that
+				was defined with the OPERATIONS MAPPING construct";
+REGISTERED AS { MKMD.mkmMObjectClass 17 };
+
+
+template MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		templatePackage PACKAGE
+			BEHAVIOUR
+				templateBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						When an instance of this class is named subordinate to a document managed 
+						object, the templateName attribute provides unique identification within the 
+						scope of that document managed object.!;;
+			ATTRIBUTES
+				templateName GET;;;
+	CONDITIONAL PACKAGES
+		templateDefinitionPackage PACKAGE
+			BEHAVIOUR
+				templateDefinitionPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						A managed object with this behaviour supports retrieval of the information of 
+						the templateDefinition attribute via the getTextualRepresentation action.!;;
+			ATTRIBUTES
+				templateDefinition GET;
+			ACTIONS
+				getTextualRepresentation;
+		REGISTERED AS { MKMD.mkmPackage 3 };
+			PRESENT IF
+				!template is represented as text string!;
+REGISTERED AS { MKMD.mkmMObjectClass 3 };
+-- A.3.2 Name bindings
+
+
+aSN1Module-document NAME BINDING
+	SUBORDINATE OBJECT CLASS aSN1Module AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS document AND SUBCLASSES;
+	WITH ATTRIBUTE
+		moduleReference;
+REGISTERED AS { MKMD.mkmNameBinding 4 };
+
+
+document-system NAME BINDING
+	SUBORDINATE OBJECT CLASS document AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		documentObjectIdentifier;
+REGISTERED AS { MKMD.mkmNameBinding 6 };
+
+
+document-system2 NAME BINDING
+	SUBORDINATE OBJECT CLASS document AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		documentName;
+REGISTERED AS { MKMD.mkmNameBinding 7 };
+
+
+template-document NAME BINDING
+	SUBORDINATE OBJECT CLASS template AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS document AND SUBCLASSES;
+	WITH ATTRIBUTE
+		templateName;
+REGISTERED AS { MKMD.mkmNameBinding 3 };
+-- A.3.3 Attributes
+
+
+actions ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.Actions;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		actionsBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This set-valued attribute identifies the actions, and associated parameters, of 
+				a package.!;;
+REGISTERED AS { MKMD.mkmAttribute 18 };
+
+
+andAttributeIds ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.AndAttributeIds;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		andAttributeIdsBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This set-valued attribute identifies the assignment of attributes to fields of a 
+				notifications argument.!;;
+REGISTERED AS { MKMD.mkmAttribute 36 };
+
+
+asn1ModuleContents ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.ASN1ModuleContents;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		asn1ModuleContentsBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute holds the ASN.1 module contents in textual form.!;;
+REGISTERED AS { MKMD.mkmAttribute 9 };
+
+
+asn1Version ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.ASN1Version;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		asn1VersionBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute holds a bit string that has one bit set for each ASN.1 version to 
+				which the module conforms.!;;
+REGISTERED AS { MKMD.mkmAttribute 45 };
+
+
+attributeGroups ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.AttributeGroups;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		attributeGroupsBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This set-valued attribute identifies the attribute groups, and associated 
+				attributes, of a package.!;;
+REGISTERED AS { MKMD.mkmAttribute 17 };
+
+
+attributes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.Attributes;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		attributesBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This set-valued attribute identifies the attributes, and associated qualifiers 
+				and parameters, of a package.!;;
+REGISTERED AS { MKMD.mkmAttribute 16 };
+
+
+behaviour ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.Behaviour;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		behaviourBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This set-valued attribute identifies the behaviours associated with an element 
+				of management information.!;;
+REGISTERED AS { MKMD.mkmAttribute 15 };
+
+
+characterizedBy ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.CharacterizedBy;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		characterizedByBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This set-valued attribute identifies the mandatory packages of a managed object 
+				class.!;;
+REGISTERED AS { MKMD.mkmAttribute 11 };
+
+
+conditionalPackages ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.ConditionalPackages;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		conditionalPackagesBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This set-valued attribute identifies the conditional packages, and their 
+				conditions, of a managed object class.!;;
+REGISTERED AS { MKMD.mkmAttribute 12 };
+
+
+context ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.Context;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		contextBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the context of a parameter.!;;
+REGISTERED AS { MKMD.mkmAttribute 20 };
+
+
+create ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.Create;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		createBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the create element specification of a name binding. If 
+				no create element is present, then this attribute s value shall be null.!;;
+REGISTERED AS { MKMD.mkmAttribute 25 };
+
+
+definedAs ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.DefinedAs;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		definedAsBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute contains the definition of a behaviour.!;;
+REGISTERED AS { MKMD.mkmAttribute 32 };
+
+
+delete ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.Delete;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		deleteBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the delete element specification of a name binding. If 
+				no delete element is present, then this attribute s value shall be null.!;;
+REGISTERED AS { MKMD.mkmAttribute 26 };
+
+
+derivedFrom ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.DerivedFrom;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		derivedFromBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This set-valued attribute identifies the immediate superclasses of a managed 
+				object class or managed relationship class.!;;
+REGISTERED AS { MKMD.mkmAttribute 10 };
+
+
+derivedOrWithSyntaxChoice ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.DerivedOrWithSyntaxChoice;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		derivedOrWithSyntaxChoiceBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the syntax specification of an attribute.!;;
+REGISTERED AS { MKMD.mkmAttribute 27 };
+
+
+description ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.Description;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		descriptionBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute contains the description of an attribute group.!;;
+REGISTERED AS { MKMD.mkmAttribute 31 };
+
+
+documentName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.DocumentName;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		documentNameBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies with a graphic string the document represented by the 
+				managed object. E.g. "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992" identifies 
+				the Definition of management information.!;;
+REGISTERED AS { MKMD.mkmAttribute 38 };
+
+
+documentObjectIdentifier ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.DocumentObjectIdentifier;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		documentObjectIdentifierBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies with an ASN.1 object identifier value the document 
+				represented by the managed object. E.g. {2 9 3 2} identifies the Definition of 
+				management information, CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992 (as 
+				specified in the registration tables for Recommendation | International Standard 
+				documents for OSI Systems Management published in CCITT Rec. X.722 | ISO/IEC 
+				10165-4).!;;
+REGISTERED AS { MKMD.mkmAttribute 39 };
+
+
+fixed ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.Fixed;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		fixedBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies an attribute group as being fixed or dynamic.!;;
+REGISTERED AS { MKMD.mkmAttribute 30 };
+
+
+groupElements ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.GroupElements;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		groupElementsBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This set-valued attribute identifies the elements of an attribute group.!;;
+REGISTERED AS { MKMD.mkmAttribute 29 };
+
+
+matchesFor ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.MatchesFor;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		matchesForBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the matching characteristics of an attribute.!;;
+REGISTERED AS { MKMD.mkmAttribute 28 };
+-- Ammendment 1
+
+
+mappedRelationshipClass ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GrmAttributeDefinitionModule.MappedRelationshipClass;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { MKMD.mkmAttribute 46 };
+-- Ammendment 1
+
+
+operationsMapping ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GrmAttributeDefinitionModule.OperationsMapping;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { MKMD.mkmAttribute 47 };
+-- Ammendment 1
+
+
+qualifiedBy ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GrmAttributeDefinitionModule.QualifiedBy;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { MKMD.mkmAttribute 48 };
+-- Ammendment 1
+
+
+relationshipObject ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GrmAttributeDefinitionModule.RelationshipObject;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { MKMD.mkmAttribute 49 };
+-- Ammendment 1
+
+
+roleMappingSpecificationSet ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GrmAttributeDefinitionModule.RoleMappingSpecificationSet;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { MKMD.mkmAttribute 50 };
+-- Ammendment 1
+
+
+roleSpecifier ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GrmAttributeDefinitionModule.RoleSpecifier;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { MKMD.mkmAttribute 51 };
+-- Ammendment 1
+
+
+supports ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GrmAttributeDefinitionModule.Supports;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { MKMD.mkmAttribute 52 };
+
+
+modeConfirmed ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.ModeConfirmed;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		modeConfirmedBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies an action or notification as being confirmed or not.!;;
+REGISTERED AS { MKMD.mkmAttribute 33 };
+
+
+moduleReference ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.Identifier;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		moduleReferenceBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the name of the ASN.1 module.!;;
+REGISTERED AS { MKMD.mkmAttribute 8 };
+
+
+namedBySuperiorObjectClass ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.NamingObjectClass;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		namedBySuperiorObjectClassBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the superior object classes of a name binding.!;;
+REGISTERED AS { MKMD.mkmAttribute 23 };
+
+
+notifications ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.Notifications;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		notificationsBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This set-valued attribute identifies the notifications, and associated 
+				parameters, of a package.!;;
+REGISTERED AS { MKMD.mkmAttribute 19 };
+
+
+optionallyRegisteredAs ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.OptionallyRegisteredAs;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		optionallyRegisteredAsBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the identifier of the represented element of 
+				management information. If no identifier has been assigned, this attribute shall 
+				have a null value.!;;
+REGISTERED AS { MKMD.mkmAttribute 43 };
+
+
+parameters ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.Parameters;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		parametersBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This set-valued attribute identifies the parameters associated with an element 
+				of management information.!;;
+REGISTERED AS { MKMD.mkmAttribute 13 };
+
+
+registeredAs ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.RegisteredAs;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		registeredAsBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the identifier of the represented element of 
+				management information.!;;
+REGISTERED AS { MKMD.mkmAttribute 14 };
+
+
+specification ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.Specification;
+	BEHAVIOUR
+		specificationBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute contains a representation of only the GDMO and ASN.1 
+				specifications and embedded comments contained within the document.!;;
+REGISTERED AS { MKMD.mkmAttribute 40 };
+
+
+subordinateObjectClass ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.NamingObjectClass;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		subordinateObjectClassBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the subordinate managed object classes of a name 
+				binding.!;;
+REGISTERED AS { MKMD.mkmAttribute 22 };
+
+
+syntaxOrAttribute ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.SyntaxOrAttribute;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		syntaxOrAttributeBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the syntax specification of a parameter.!;;
+REGISTERED AS { MKMD.mkmAttribute 21 };
+
+
+templateDefinition ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.TemplateDefinition;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		templateDefinitionBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute contains a text string representation of the GDMO template 
+				definition. In-line templates are not included in this text string, even if they 
+				appear in line in the document represented by the document managed object under 
+				which the template managed object is named. It is not necessary that GDMO 
+				comments be included in this representation.!;;
+REGISTERED AS { MKMD.mkmAttribute 37 };
+
+
+templateName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.TemplateName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		templateNameBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute names template managed objects. Its value is that of the label of 
+				the GDMO template which is represented.!;;
+REGISTERED AS { MKMD.mkmAttribute 7 };
+
+
+withAttribute ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.WithAttribute;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		withAttributeBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the naming attribute of a name binding.!;;
+REGISTERED AS { MKMD.mkmAttribute 24 };
+
+
+withInformationSyntax ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.WithSyntax;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		withInformationSyntaxBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the syntax of the argument of an action or 
+				notification.!;;
+REGISTERED AS { MKMD.mkmAttribute 34 };
+
+
+withReplySyntax ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DefinitionASN1Module.WithSyntax;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		withReplySyntaxBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the syntax of the reply to an action or notification.!;;
+REGISTERED AS { MKMD.mkmAttribute 35 };
+-- A.3.4 Actions and parameters
+
+
+getTextualRepresentation ACTION
+	BEHAVIOUR
+		getTextualRepresentationBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+
+				The action returns a textual representation of the information in a single 
+				attribute of the managed object to which it is directed. The action response, 
+				which may be spread across multiple Linked Replies, consists of a sequence of 
+				line images. If there are multiple Linked Replies, the sequences from all of 
+				them are logically combined into a single, longer sequence of line images.
+
+				For an attribute with the syntax DefinitionASN1Module.TextualRepresentation, the 
+				result of retrieving the attribute via this action and, if necessary, combining 
+				the contents of multiple Linked Replies, is identical to result of the get 
+				attribute value management operation.!;;
+	PARAMETERS
+		attributeNotAvailableViaThisAction;
+	WITH INFORMATION SYNTAX DefinitionASN1Module.AttributeId;
+	WITH REPLY SYNTAX DefinitionASN1Module.TextualRepresentation;
+REGISTERED AS { MKMD.mkmAction 2 };
+
+
+attributeNotAvailableViaThisAction PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX DefinitionASN1Module.Null;
+	BEHAVIOUR
+		attributeNotAvailableViaThisActionBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This error indicates that retrieval of the requested attribute via the 
+				getTextualRepresentation action is not supported.!;;
+REGISTERED AS { MKMD.mkmParameter 1 };
+-- A.4 Discovery managed object definitions
+-- A.4.1 Managed object classes
+
+
+discoveryObject MANAGED OBJECT CLASS
+	DERIVED FROM
+		" CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		discoveryObjectPackage PACKAGE
+			BEHAVIOUR
+				discoveryObjectBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+
+						A managed object with this behaviour responds to mITSearch action requests 
+						concerning subtrees of managed objects within a managed systemvs naming tree. 
+						The query specifies a base object and the required scope of the search.
+
+						The response is a set of rooted tree structures that together cover the 
+						requested scope under the requested base object. Each rooted tree has the 
+						distinguished name of its root but does not repeat common name components within 
+						its structure, i.e. only the RDN is used to identify subordinate managed 
+						objects.!;;
+			ATTRIBUTES
+				discoveryId GET;-- Ammendment 1
+			ACTIONS
+				mITSearch;;;
+REGISTERED AS { MKMD.mkmMObjectClass 15 };
+-- A.4.2 Name bindings
+
+
+discovery-system NAME BINDING
+	SUBORDINATE OBJECT CLASS discoveryObject AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		discoveryId;
+	BEHAVIOUR
+		discovery-systemBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+
+				The use of a fixed relative distinguished name for a common way to access a 
+				discovery managed object is provided by this name binding when the value "DSC1" 
+				is used for the repertoire Id attribute.
+
+				Subordinate to a given system managed object, there shall be only one allowed 
+				value for the discovery Id attribute, namely "DSC1".!;;
+REGISTERED AS { MKMD.mkmNameBinding 5 };
+-- A.4.3 Attributes
+
+
+discoveryId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DiscoveryASN1Module.DiscoveryId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		discoveryIdBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute is used to identify an instance of the discovery managed object.!;;
+REGISTERED AS { MKMD.mkmAttribute 41 };
+-- A.4.4 Actions
+
+
+mITSearch ACTION
+	BEHAVIOUR
+		mitSearchBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+
+				The argument has the base object, the required scope of the search and an 
+				optional class request parameter. The response has a tree structure, under any 
+				specified base managed object, without repeating common name components (i.e. 
+				only RDN components are sent).
+
+				It shall, if specified in the request, also report the managed object class type 
+				associated with each node in the tree.!;;
+	WITH INFORMATION SYNTAX DiscoveryASN1Module.MITSearch;
+	WITH REPLY SYNTAX DiscoveryASN1Module.MITSearchResponse;
+REGISTERED AS { MKMD.mkmAction 1 };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997" >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x750::managedObjectClassRepertoire
+--@@ +- itut_x750::repertoire
+--@@ +- itut_x750::aSN1Module
+--@@ +- itut_x750::document
+--@@ +- itut_x750::template
+--@@ |  +- itut_x750::actionTemplate
+--@@ |  +- itut_x750::attributeGroupTemplate
+--@@ |  +- itut_x750::attributeTemplate
+--@@ |  +- itut_x750::behaviourTemplate
+--@@ |  +- itut_x750::managedObjectClassTemplate
+--@@ |  +- itut_x750::nameBindingTemplate
+--@@ |  +- itut_x750::notificationTemplate
+--@@ |  +- itut_x750::packageTemplate
+--@@ |  +- itut_x750::parameterTemplate
+--@@ |  +- itut_x750::relationshipClassTemplate
+--@@ |  +- itut_x750::relationshipMappingTemplate
+--@@ +- itut_x750::discoveryObject
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x750::repertoire
+--@@ |  >- itut_x750::managedObjectClassRepertoire
+--@@ >- itut_x750::document
+--@@ |  >- itut_x750::aSN1Module
+--@@ |  >- itut_x750::template
+--@@ >- itut_x750::document +++
+--@@ >- itut_x750::discoveryObject
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

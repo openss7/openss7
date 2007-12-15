@@ -1,0 +1,3140 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 19:16:25 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Include "X.521.gdmo" >--
+--< GDMO.Document "ITU-T Rec. M.3100 (1992)"
+--  { ccitt recommendation m gnm(3100) informationModel(0) } >--
+--< GDMO.Namespace itut_m3100 >--
+--< GDMO.Version 1.3 >--
+--< GDMO.Alias "ITU-T Rec. M.3100 (1992)" "ITU-T Rec. M.3100:1995",
+--  "Recommendation M.3100",
+--  "CCITT Rec. M.3100 (1992)",
+--  "ITU-T Rec. M.3100 (1995)" >--
+--< GDMO.Copyright
+--  =============================================================================
+--  
+--  @(#) $RCSfile: M3100.new.gdmo,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/15 20:16:40 $
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--  
+--  All Rights Reserved.
+--  
+--  This program is free software; you can redistribute it and/or modify it under
+--  the terms of the GNU General Public License as published by the Free Software
+--  Foundation; version 3 of the License.
+--  
+--  This program is distributed in the hope that it will be useful, but WITHOUT
+--  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+--  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+--  details.
+--  
+--  You should have received a copy of the GNU General Public License along with
+--  this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+--  Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+--  behalf of the U.S. Government ("Government"), the following provisions apply
+--  to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+--  is classified as "Commercial Computer Software" under paragraph 252.227-7014
+--  of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+--  successor regulations) and the Government is acquiring only the license rights
+--  granted herein (the license rights customarily provided to non-Government
+--  users).  If the Software is supplied to any unit or agency of the Government
+--  other than DoD, it is classified as "Restricted Computer Software" and the
+--  Government's rights in the Software are defined in paragraph 52.227-19 of the
+--  Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+--  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+--  (or any successor regulations).
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Commercial licensing and support of this software is available from OpenSS7
+--  Corporation at a fee.  See http://www.openss7.com/
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Last Modified $Date: 2007/12/15 20:16:40 $ by $Author: brian $
+--  
+--  =============================================================================
+--  >--
+MODULE "ITU-T Rec. M.3100 (1992)" { ccitt recommendation m gnm(3100) informationModel(0) }
+
+network MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		networkPackage PACKAGE
+			BEHAVIOUR
+				networkDefinition;
+			ATTRIBUTES
+				networkId GET;;;
+	CONDITIONAL PACKAGES
+		userLabelPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { m3100ObjectClass 1 };
+
+
+networkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		network;
+	CHARACTERIZED BY
+		networkR1Package PACKAGE
+			ATTRIBUTES
+				"Recommendation X.721:1992":systemTitle GET-REPLACE;;;
+REGISTERED AS { m3100ObjectClass 33 };
+
+
+circuitPack MANAGED OBJECT CLASS
+	DERIVED FROM
+		equipmentR1;
+	CHARACTERIZED BY
+		createDeleteNotificationsPackage,
+		administrativeOperationalStatesPackage,
+		stateChangeNotificationPackage,
+		equipmentsEquipmentAlarmR1Package,
+		currentProblemListPackage,
+		equipmentAlarmEffectOnServicePackage,
+		alarmSeverityAssignmentPointerPackage,
+		circuitPackPackage PACKAGE
+			BEHAVIOUR
+				circuitPackBehaviour;
+			ATTRIBUTES
+				circuitPackType GET SET-BY-CREATE,
+				"Recommendation X.721: 1992":availabilityStatus
+					PERMITTED VALUES ASN-CONTDefinedTypesModule.CircuitPackAvailabilityStatus
+					GET;;;
+REGISTERED AS { m3100ObjectClass 30 };
+
+
+equipment MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		equipmentPackage PACKAGE
+			BEHAVIOUR
+				equipmentBehaviour BEHAVIOUR
+					DEFINED AS
+						"The equipment object class is a class of managed objects that represents 
+						physical components of a managedelement, including replaceable components. An 
+						instance of this object class is present in a single geographic location. An 
+						equipment may be nested within another equipment, thereby creating a 
+						containmentrelationship. The equipment type shall be identified by sub-classing 
+						this object class. Either the name of the sub-class or an attribute may be used 
+						for identifying the equipment type. When the attribute value change notification 
+						package is present, the attributeValueChange notificationdefined in 
+						Recommendation X.721 shall be emitted when the value of one of the following 
+						atrribute changes: alarm status, affected object list, user label, version, 
+						location name and current problem list. Because theabove attributes are all in 
+						conditional packages, the behaviour for emitting the attribute value change 
+						notification applies only when the corresponding conditional packages are 
+						present in the managed object.When the state change notification package is 
+						present, the stateChangeNotification defined in Recommendation X.721 shall be 
+						emitted if the value of administrative state or operational state changes(when 
+						the administrativeOperationalStates conditional package is present).";;
+			ATTRIBUTES
+				equipmentId GET SET-BY-CREATE,
+				replaceable GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in Recommendation 
+				X.721 are supported by an instance of this class.",
+		attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in Recommendation X.721 is 
+				supported by an instance of this class.",
+		stateChangeNotificationPackage
+			PRESENT IF
+				"the stateChange notification defined in Recommendation X.721 is supported by an 
+				instance of this class.",
+		administrativeOperationalStatesPackage
+			PRESENT IF
+				"an instance supports it.",
+		affectedObjectListPackage
+			PRESENT IF
+				"an instance supports it.",
+		equipmentsEquipmentAlarmPackage
+			PRESENT IF
+				"the equipmentAlarm notification defined in Recommendation X.721 is supported by 
+				an instance of this class.",
+		environmentalAlarmPackage
+			PRESENT IF
+				"the environmentalAlarm notification defined in Recommendation X.721 is supported 
+				by an instance of this class.",
+		tmnCommunicationsAlarmInformationPackage
+			PRESENT IF
+				"the communicationsAlarm notificationdefined in Recommendation X.721 is supported 
+				by an instance of this class.",
+		processingErrorAlarmPackage
+			PRESENT IF
+				"the processingErrorAlarm notification defined inRecommendation X.721 is 
+				supported by an instance of this class.",
+		userLabelPackage
+			PRESENT IF
+				"an instance supports it",
+		vendorNamePackage
+			PRESENT IF
+				"an instance supports it",
+		versionPackage
+			PRESENT IF
+				"an instance supports it",
+		locationNamePackage
+			PRESENT IF
+				"an instance supports it",
+		currentProblemListPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { m3100ObjectClass 2 };
+
+
+equipmentHolder MANAGED OBJECT CLASS
+	DERIVED FROM
+		equipmentR1;
+	CHARACTERIZED BY
+		equipmentHolderPackage PACKAGE
+			BEHAVIOUR
+				equipmentHolderBehaviour;
+			ATTRIBUTES
+				equipmentHolderType GET SET-BY-CREATE,
+				equipmentHolderAddress GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		subordinateCircuitPackPackage
+			PRESENT IF
+				"the resource represented by this equipmentHolder instance is allowed to contain 
+				a circuit pack";
+REGISTERED AS { m3100ObjectClass 32 };
+
+
+equipmentR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		equipment;
+	CHARACTERIZED BY
+		equipmentR1Package PACKAGE
+			ATTRIBUTES
+				serialNumber GET,
+				supportedByObjectList GET-REPLACE ADD-REMOVE;;;
+	CONDITIONAL PACKAGES
+		alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"the managed object supports configuration of alarm severities",
+		equipmentsEquipmentAlarmR1Package
+			PRESENT IF
+				"the equipmentAlarm notification defined in Recommendation X.721 is supported by 
+				an instance of this class.",
+		environmentalAlarmR1Package
+			PRESENT IF
+				"the environmentalAlarm notification defined in Recommendation X.721 is supported 
+				by an instance of this class.",
+		processingErrorAlarmR1Package
+			PRESENT IF
+				"the processingErrorAlarm notification defined in Recommendation X.721 is 
+				supported by an instance of this class.";
+REGISTERED AS { m3100ObjectClass 28 };
+
+
+managedElement MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		managedElementPackage PACKAGE
+			BEHAVIOUR
+				managedElementBehaviour BEHAVIOUR
+					DEFINED AS
+						"The Managed Element object class is a class of managed objects representing 
+						telecommunicationsequipment or TMN entities (either groups or parts) within the 
+						telecommunications network that performs managed element functions, i.e. 
+						provides support and/or service to the subscriber. Managed elements may ormay 
+						not additionally perform mediation/OS functions. A managed element communicates 
+						with the manager (directly or indirectly) over one or more standard Q-interfaces 
+						for the purpose of being monitored and/orcontrolled. A managed element contains 
+						equipment that may or may not be geographically distributed. When the attribute 
+						value change notification package is present, the attributeValueChange 
+						notificationdefined in Recommendation X.721 shall be emitted when the value of 
+						one of the following attribute changes: alarm status, user label, version, 
+						location name and current problem list. For the above attributes that are 
+						inconditional packages, the behaviour for emitting the attribute value change 
+						notification applies only when the corresponding conditional packages are 
+						present in the managed object. When the state change notificationpackage is 
+						present, the stateChangeNotification defined in Recommendation X.721 shall be 
+						emitted if the value of administrative state or operational state or usage state 
+						changes.";;
+			ATTRIBUTES
+				managedElementId GET,
+				"Recommendation X.721: 1992":systemTitle GET-REPLACE,
+				alarmStatus GET,
+				"Recommendation X.721: 1992":administrativeState GET-REPLACE,
+				"Recommendation X.721: 1992":operationalState GET,
+				"Recommendation X.721: 1992":usageState GET;
+			NOTIFICATIONS
+				"Recommendation X.721: 1992":environmentalAlarm,
+				"Recommendation X.721: 1992":equipmentAlarm,
+				"Recommendation X.721: 1992":communicationsAlarm,
+				"Recommendation X.721: 1992":processingErrorAlarm;;;
+	CONDITIONAL PACKAGES
+		createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletionnotifications defined in Recommendation 
+				X.721 are supported by an instance of this class.",
+		attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangenotification defined in Recommendation X.721 is 
+				supported by an instance of this class.",
+		stateChangeNotificationPackage
+			PRESENT IF
+				"the stateChange notification defined inRecommendation X.721 is supported by an 
+				instance of this class.",
+		audibleVisualLocalAlarmPackage
+			PRESENT IF
+				"an instance supports it",
+		resetAudibleAlarmPackage
+			PRESENT IF
+				"an instance supports it",
+		userLabelPackage
+			PRESENT IF
+				"an instance supports it",
+		vendorNamePackage
+			PRESENT IF
+				"an instance supports it",
+		versionPackage
+			PRESENT IF
+				"an instance supports it",
+		locationNamePackage
+			PRESENT IF
+				"an instance supports it",
+		currentProblemListPackage
+			PRESENT IF
+				"an instance supports it",
+		externalTimePackage
+			PRESENT IF
+				"an instance supports it",
+		systemTimingSourcePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { m3100ObjectClass 3 };
+
+
+managedElementR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		managedElement;
+	CHARACTERIZED BY
+		managedElementR1Package PACKAGE
+			NOTIFICATIONS
+				"Recommendation X.721: 1992":environmentalAlarm
+					"Recommendation Q.821:1992":logRecordIdParameter
+					"Recommendation Q.821:1992":correlatedRecordNameParameter
+					"Recommendation Q.821:1992":suspectObjectListParameter,
+				"Recommendation X.721: 1992":equipmentAlarm
+					"Recommendation Q.821:1992":logRecordIdParameter
+					"Recommendation Q.821:1992":correlatedRecordNameParameter
+					"Recommendation Q.821:1992":suspectObjectListParameter,
+				"Recommendation X.721: 1992":communicationsAlarm
+					"Recommendation Q.821:1992":logRecordIdParameter
+					"Recommendation Q.821:1992":correlatedRecordNameParameter
+					"Recommendation Q.821:1992":suspectObjectListParameter,
+				"Recommendation X.721: 1992":processingErrorAlarm
+					"Recommendation Q.821:1992":logRecordIdParameter
+					"Recommendation Q.821:1992":correlatedRecordNameParameter
+					"Recommendation Q.821:1992":suspectObjectListParameter;;;
+	CONDITIONAL PACKAGES
+		alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"the managed object supports configuration of alarm severities";
+REGISTERED AS { m3100ObjectClass 27 };
+
+
+managedElementComplex MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		managedElementComplexPackage PACKAGE
+			BEHAVIOUR
+				managedElementComplexBehaviour BEHAVIOUR
+					DEFINED AS
+						"The Managed Element Complex object class is a class of managed objects that 
+						represents a collection ofnetwork elements. An OS can reference and manage one 
+						or more NEs belonging to the complex represented by an instance of this object 
+						class.";;
+			ATTRIBUTES
+				managedElementComplexId GET,
+				"Recommendation X.721: 1992":systemTitle GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in Recommendation 
+				X.721 are supported by an instance of this class.";
+REGISTERED AS { m3100ObjectClass 34 };
+
+
+software MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		softwarePackage PACKAGE
+			BEHAVIOUR
+				softwareBehaviour BEHAVIOUR
+					DEFINED AS
+						"The Software object class is a class of managed objects that represent logical 
+						information stored inequipment, including programs and data tables. Software may 
+						be nested within other software, thereby creating a containment relationship. 
+						When the attribute value change notification package is present, the 
+						attributeValueChange notificationdefined in Recommendation X.721 shall be 
+						emitted when the value of one of the following attribute changes: alarm status, 
+						affected object list, user label, version, and current problem list. Because the 
+						above attributes areall in conditional packages, the behaviour for emitting the 
+						attribute value change notification applies only when the corresponding 
+						conditional packages are present in the managed object. When the state 
+						changenotification package is present, the stateChangeNotification defined in 
+						Recommendation X.721 shall be emitted if the value of administrative state or 
+						operational state changes (when theadministrativeOperationalStates conditional 
+						package is present).";;
+			ATTRIBUTES
+				softwareId GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in Recommendation 
+				X.721 are supported by an instance of this class.",
+		attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in Recommendation X.721 is 
+				supported by an instance of this class.",
+		stateChangeNotificationPackage
+			PRESENT IF
+				"the stateChange notification defined in Recommendation X.721 is supported by an 
+				instance of this class.",
+		administrativeOperationalStatesPackage
+			PRESENT IF
+				"an instance supports it.",
+		affectedObjectListPackage
+			PRESENT IF
+				"an instance supports it.",
+		softwareProcessingErrorAlarmPackage
+			PRESENT IF
+				"an instance supports it.",
+		userLabelPackage
+			PRESENT IF
+				"an instance supports it",
+		vendorNamePackage
+			PRESENT IF
+				"an instance supports it",
+		versionPackage
+			PRESENT IF
+				"an instance supports it",
+		currentProblemListPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { m3100ObjectClass 4 };
+
+
+softwareR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		software;
+	CONDITIONAL PACKAGES
+		alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"the managed object supports configuration of alarm severities",
+		softwareProcessingErrorAlarmR1Package
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { m3100ObjectClass 29 };
+
+
+connectionTerminationPointBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		connectionTerminationPointSource,
+		connectionTerminationPointSink;
+REGISTERED AS { m3100ObjectClass 5 };
+
+
+connectionTerminationPointSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		terminationPoint;
+	CHARACTERIZED BY
+		connectionTerminationPointSinkPackage PACKAGE
+			BEHAVIOUR
+				connectionTerminationPointSinkBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object terminates a link connection. The downstream connectivity 
+						pointer attribute points tothe termination point managed object, within the same 
+						managed element, that receives information (traffic) from this termination point 
+						at the same layer, or is null. The referenced object shall be an instance of one 
+						ofthe following classes or its subclasses: Trail Termination Point Sink, Trail 
+						Termination Point Bidirectional, Connection Termination Point Source, Connection 
+						Termination Point Bidirectional. The downstreamconnectivity pointer may identify 
+						one or more objects depending on whether the signal is connected to one or more 
+						termination point objects.";;
+			ATTRIBUTES
+				downstreamConnectivityPointer
+					PERMITTED VALUES-- The allowed choices for the syntax of this attribute are restricted in the subtype
+					-- CTPDownstreamPointer
+					ASN-CONTDefinedTypesModule.CTPDownstreamPointer
+					GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		ctpInstancePackage
+			PRESENT IF
+				"the name binding used to create an instance of this object class requires this 
+				attribute.",
+		channelNumberPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { m3100ObjectClass 6 };
+
+
+connectionTerminationPointSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		terminationPoint;
+	CHARACTERIZED BY
+		connectionTerminationPointSourcePackage PACKAGE
+			BEHAVIOUR
+				connectionTerminationPointSourceBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object originates a link connection. The upstream connectivity 
+						pointer attribute points to thetermination point managed object, within the same 
+						managed element, that sends information (traffic) to this termination point at 
+						the same layer, or is null. The referenced object shall be an instance of one of 
+						thefollowing classes or its subclasses: Trail Termination Point Source, Trail 
+						Termination Point Bidirectional, Connection Termination Point Sink, Connection 
+						Termination Point Bidirectional.";;
+			ATTRIBUTES
+				upstreamConnectivityPointer
+					PERMITTED VALUES-- The allowed choices for the syntax of this attribute are restricted in the subtype
+					-- CTPUpstreamPointer
+					ASN-CONTDefinedTypesModule.CTPUpstreamPointer
+					GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		ctpInstancePackage
+			PRESENT IF
+				"the name binding used to create an instance of this object class requires this 
+				attribute.",
+		channelNumberPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { m3100ObjectClass 7 };
+
+
+terminationPoint MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		terminationPointPackage PACKAGE
+			BEHAVIOUR
+				terminationPointBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object represents the termination of a transport entity, such as a 
+						trail or a connection. Thecharacteristic information attribute is used to 
+						identify equivalence between subclasses of termination points in order to 
+						determine whether cross connection or connectivity is possible. The operational 
+						state reflects theperceived ability to generate and/or receive a valid signal. 
+						Subclasses of termination point shall specify the attributes and states for 
+						which attribute value change and state change notifications will be generated.";;
+			ATTRIBUTES
+				supportedByObjectList GET;;;
+	CONDITIONAL PACKAGES
+		createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in Recommendation 
+				X.721 are supported by an instance of this managed object class",
+		attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in Recommendation X.721 is 
+				supported by an instance of thismanaged object class",
+		stateChangeNotificationPackage
+			PRESENT IF
+				"the stateChange notification defined in Recommendation X.721 is supported by an 
+				instance of this managed object class",
+		operationalStatePackage
+			PRESENT IF
+				"the resource represented by this managed object is capable of assessing the 
+				ability to generate and/or receive avalid signal.",
+		crossConnectionPointerPackage
+			PRESENT IF
+				"the termination point can be flexibly assigned, (i.e. cross connected).",
+		characteristicInformationPackage
+			PRESENT IF
+				"an instance supports it.",
+		networkLevelPackage
+			PRESENT IF
+				"an instance supports it",
+		tmnCommunicationsAlarmInformationPackage
+			PRESENT IF
+				"the communicationsAlarm notification (as defined in Recommendation X.721) is 
+				supported by this managedobject",
+		alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"the tmnCommunicationsAlarmInformationPackage package is present AND the managed 
+				object supports configuration of alarm severities";
+REGISTERED AS { m3100ObjectClass 8 };
+
+
+trailTerminationPointBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		trailTerminationPointSource,
+		trailTerminationPointSink;
+	CHARACTERIZED BY
+		trailTerminationPointBidirectionalPackage PACKAGE
+			BEHAVIOUR
+				trailTerminationPointBidirectionalBehaviour BEHAVIOUR
+					DEFINED AS
+						"The operational state is disabled if either the sink or source part of the 
+						termination point is disabled.";;;;
+REGISTERED AS { m3100ObjectClass 9 };
+
+
+trailTerminationPointSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		terminationPoint;
+	CHARACTERIZED BY
+		operationalStatePackage,
+		trailTerminationPointSinkPackage PACKAGE
+			BEHAVIOUR
+				trailTerminationPointSinkBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object represents a termination point where a trail is terminated. 
+						It represents the accesspoint in a layer network which is a focus for both the 
+						trail relationship and the client/server relationship. The operational state 
+						reflects the perceived ability to receive a valid signal. If the termination 
+						point detectsthat a signal received has failed or it is unable to process the 
+						incoming signal, then the operational state will have the value disabled. When 
+						the administrative state is locked, the termination point is administratively 
+						removed from service.When the administrative state is unlocked, the termination 
+						point is administratively in service. Changes to administrative state have no 
+						effect on the connectivity pointer. A change in the operational state shall 
+						cause a state change notification. If administrative state is present inan 
+						instance of trail termination point sink class, it shall not emit a state change 
+						notification. However, subclasses of trail termination point sink class may 
+						modify this behaviour to require this notification.Subclasses of trail 
+						termination point sink shall specify the attributes for which attribute value 
+						change notifications should be generated. The upstream connectivity pointer 
+						attribute points to the termination point managed object, within the samemanaged 
+						element, that sends information (traffic) to this termination point at the same 
+						layer, or is null. The referenced object shall be an instance of one of the 
+						following classes or its subclasses: ConnectionTermination Point Sink or 
+						Bidirectional (single or a concatenated sequence) or Trail Termination Point 
+						Source or Bidirectional.";;
+			ATTRIBUTES
+				upstreamConnectivityPointer GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		"Recommendation X.721:1992":administrativeStatePackage
+			PRESENT IF
+				"the resource represented by the managed object is capable of being 
+				administratively placed in and out ofservice",
+		supportableClientListPackage
+			PRESENT IF
+				"the object class can support more than one type of client",
+		ttpInstancePackage
+			PRESENT IF
+				"the name binding used to create an instance of this object class requires this 
+				attribute.";
+REGISTERED AS { m3100ObjectClass 10 };
+
+
+trailTerminationPointSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		terminationPoint;
+	CHARACTERIZED BY
+		operationalStatePackage,
+		trailTerminationPointSourcePackage PACKAGE
+			BEHAVIOUR
+				trailTerminationPointSourceBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object represents a termination point where a trail is originated. 
+						It represents the accesspoint in a layer network which is a focus for both the 
+						trail relationship and the client/server relationship. The operational state 
+						reflects the perceived ability to generate a valid signal. If the termination 
+						point detectsthat a valid signal cannot be generated, then the operational state 
+						will have the value disabled. When the administrative state is locked, the 
+						termination point is administratively removed from service.When the 
+						administrative state is unlocked, the termination point is administratively in 
+						service. Changes to administrative state have no effect on the connectivity 
+						pointer. A change in the operational state shall cause a state change 
+						notification. If administrative state is present inan instance of trail 
+						termination point source class, it shall not emit a state change notification. 
+						However, subclasses of trail termination point source class may modify this 
+						behaviour to require this notification.Subclasses of trail termination point 
+						source shall specify the attributes for which attribute value change 
+						notifications should be generated. The downstream connectivity pointer attribute 
+						points to the termination point managed object, within thesame managed element, 
+						that receives information (traffic) from this termination point at the same 
+						layer, or is null. The referenced object shall be an instance of one of the 
+						following classes or its subclasses: ConnectionTermination Point Source or 
+						Bidirectional (single or a concatenated sequence or a set if connected to more 
+						than one connection termination point source objects) or Trail Termination Point 
+						Sink or Bidirectional(single or a set if connected to more than one trail 
+						termination point sink objects).";;
+			ATTRIBUTES
+				downstreamConnectivityPointer GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		"Recommendation X.721: 1992":administrativeStatePackage
+			PRESENT IF
+				"the resource represented by the managed object is capable of being 
+				administratively placed in and out ofservice",
+		supportableClientListPackage
+			PRESENT IF
+				"the object class can support more than one type of client",
+		ttpInstancePackage
+			PRESENT IF
+				"the name binding used to create an instance of this object class requires this 
+				attribute.";
+REGISTERED AS { m3100ObjectClass 11 };
+
+
+circuitEndPointSubgroup MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		circuitEndPointSubgroupPackage PACKAGE
+			BEHAVIOUR
+				circuitSubgroupBehaviour BEHAVIOUR
+					DEFINED AS
+						"A set of circuit end points that directly interconnects one exchange with 
+						another, having common values for theattributes listed in this package. Note 
+						that the term exchange includes PBX where applicable."-- Annex A/E.410 defines circuit sub group--;;
+			ATTRIBUTES
+				circuitEndPointSubgroupId GET,
+				numberOfCircuits GET,
+				labelOfFarEndExchange GET,
+				signallingCapabilities GET,
+				informationTransferCapabilities GET,
+				circuitDirectionality GET,
+				transmissionCharacteristics GET,
+				userLabel GET-REPLACE;
+			NOTIFICATIONS
+				"Recommendation X.721:1992":attributeValueChange,
+				"Recommendation X.721:1992":objectCreation,
+				"Recommendation X.721:1992":objectDeletion;;;
+REGISTERED AS { m3100ObjectClass 31 };
+
+
+connectionR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		pipe;
+	CHARACTERIZED BY
+		connectionPackage PACKAGE
+			BEHAVIOUR
+				connectionBehaviour BEHAVIOUR
+					DEFINED AS
+						"The Connection object class is a class of managed objects responsible for the 
+						transparent transfer ofinformation between connection termination points. A 
+						connection is a component of a trail. Several connections can be bundled into a 
+						higher rate trail. A sequence of one or more connections are linkedtogether to 
+						form a trail. A connection may be either uni- or bi-directional.";;
+			ATTRIBUTES
+				connectionId GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		serverTrailListPackage
+			PRESENT IF
+				"an instance supports it",
+		clientTrailPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { m3100ObjectClass 23 };
+
+
+pipe MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		pipePackage PACKAGE
+			BEHAVIOUR
+				pipeBehaviour BEHAVIOUR
+					DEFINED AS
+						"The Pipe object class is a class of managed objects which ensures the transfer 
+						of information between twotermination points. The pipe object class is not 
+						instantiable because the transfer is effected via the client-server relationship 
+						of trail and connection. Connectivity direction is determined by the 
+						directionality of the a and ztermination points. If an instance of this class is 
+						bidirectional, the a- and z-termination points shall also be bidirectional. If 
+						aninstance of this class is unidirectional, the a-point shall be the source TP 
+						and the z-termination point shall be the sink TP. The operational state 
+						indicates the capability to carry a signal.";;
+			ATTRIBUTES
+				directionality GET,
+				"Recommendation X.721: 1992":administrativeState GET-REPLACE,
+				"Recommendation X.721: 1992":operationalState GET,
+				a-TPInstance GET SET-BY-CREATE,
+				z-TPInstance GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in Recommendation 
+				X.721 are supported by an instanceof this managed object class",
+		attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in Recommendation X.721 is 
+				supported by an instance of thismanaged object class",
+		stateChangeNotificationPackage
+			PRESENT IF
+				"the stateChange notification defined in Recommendation X.721 is supported by an 
+				instance of this managed objectclass",
+		characteristicInformationPackage
+			PRESENT IF
+				"an instance supports it.",
+		protectedPackage
+			PRESENT IF
+				"an instance supports it.",
+		tmnCommunicationsAlarmInformationPackage
+			PRESENT IF
+				"the communicationsAlarm notification (as defined in Recommendation X.721) is 
+				supported by this managed object",
+		alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"the tmnCommunicationsAlarmInformationPackage package is present AND the managed 
+				object supportsconfiguration of alarm severities",
+		userLabelPackage
+			PRESENT IF
+				"an instance supports it";-- the above package may be used for M.1400 type designations.
+	REGISTERED AS { m3100ObjectClass 24 };
+
+
+trailR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		pipe;
+	CHARACTERIZED BY
+		trailR1Package PACKAGE
+			BEHAVIOUR
+				trailBehaviour BEHAVIOUR
+					DEFINED AS
+						"Trail is a class of managed objects in layer networks which is responsible for 
+						the integrity of transfer ofcharacteristic information from one or more other 
+						layer networks. A trail is composed of two Trail Termination Points and one or 
+						more connection and associated connection termination points.";;
+			ATTRIBUTES
+				trailId GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		serverConnectionListPackage
+			PRESENT IF
+				"an instance supports it",
+		clientConnectionListPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { m3100ObjectClass 25 };
+
+
+crossConnection MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		crossConnectionPackage PACKAGE
+			BEHAVIOUR
+				crossConnectionBehaviour BEHAVIOUR
+					DEFINED AS
+						"A managed object of this class represents an assignment relationship between the 
+						termination point or GTPobject listed in the From Termination attribute and the 
+						termination point or GTP objects listed in the To Termination attribute of this 
+						managed object. The To Termination attribute will always be non-NULL. The From 
+						Termination attribute will only be NULL inthe case of point-to-multipoint 
+						configurations. If the From Termination attribute has a value of NULL, the 
+						assignment relationship is between the termination point object or the GTP 
+						object listed in the From Terminationattribute of the containing Multipoint 
+						Cross-Connection managed object and the termination point object or GTP object 
+						listed in the To Termination attribute of this managed object. A point to point 
+						cross-connection can be established between: one of CTP Sink, CTP Bidirectional, 
+						TTP Source,TTP Bidirectional, or GTP; and one of CTP Source, CTP Bidirectional, 
+						TTP Sink, TTP Bidirectional, or GTP. In a unidirectional cross-connection, the 
+						termination or GTP object pointed to by the From Termination and thetermination 
+						point or GTP object pointed to by the To Termination attribute (in this object 
+						or the containing mpCrossConnection) are related in such a way that traffic can 
+						flow between the termination points representedby these managed objects. In a 
+						bidirectional cross-connection, information flows in both directions. If the 
+						objects listed in the From Termination and To Termination attributes are GTPs, 
+						the nth element of theFrom Termination GTP is related to the nth element of the 
+						To Termination GTP (for every n). If the fromTermination attribute has a value 
+						of NULL, the directionality attribute must have the value'unidirectional'. The 
+						total rate of the From Terminations must be equal to the total rate of To 
+						Terminations. The attribute Signal Type describes the signal that is 
+						cross-connected. The termination points or GTPs that arecross-connected must 
+						have signal types that are compatible. If an instance of this object class is 
+						contained in a multipoint cross-connection and the operational state of 
+						thecontaining multipoint cross-connection is 'disabled', the operational state 
+						of this object will also be 'disabled'. The following are the definitions of the 
+						administrative state and the operational state attributes: Administrative State: 
+						- Unlocked: The Cross-Connection object is administratively unlocked. Traffic is 
+						allowed to pass through theconnection. - Locked: No traffic is allowed to pass 
+						through the Cross-Connection. The connectivity pointers in the cross-connected 
+						termination points is NULL. Operational State: - Enabled: The Cross-Connection 
+						is performing its normal function. - Disabled: The Cross-Connection is incapable 
+						of performing its normal cross-connection function.";;
+			ATTRIBUTES
+				crossConnectionId GET,
+				"Recommendation X.721 : 1992":administrativeState GET-REPLACE,
+				"Recommendation X.721 : 1992":operationalState GET,
+				signalType GET,
+				fromTermination GET,
+				toTermination GET,
+				directionality GET;;;
+REGISTERED AS { m3100ObjectClass 15 };
+
+
+fabric MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		fabricPackage PACKAGE
+			BEHAVIOUR
+				fabricBehaviour BEHAVIOUR
+					DEFINED AS
+						"The Fabric object represents the function of managing the establishment and 
+						release of cross-connections. It also manages the assignment of termination 
+						points to TP Pools and GTPs. Administrative State: - Unlocked: The Fabric is 
+						allowed to perform its normal functions. ACTIONS will be accepted to setup or 
+						remove cross-connections, to rearrange TP Pools, to add/remove termination 
+						points to/from GTPs. - Locked: The Fabric is not allowed to perform its normal 
+						functions. No ACTIONS will be accepted. No new cross-connection can be setup or 
+						removed, no TP Pool can be rearranged, and no termination points can be 
+						added/removed to/from GTPs. Operational State: - Enabled: When the Fabric is in 
+						the enabled operational state, it may be fully-operational or 
+						partially-operational (partially operational is indicated by the availability 
+						status attribute). - Disabled: The Fabric is incapable of performing its normal 
+						function. For instance, the managing system will not be able to: 1) setup or 
+						remove any cross-connection; 2) rearrange TP Pools; and 3) add/remove 
+						termination points to/from GTPs. Availability Status: The supported values for 
+						this attribute are: - Degraded: The Fabric is degraded in some respect. For 
+						instance, the Fabric cannot perform the function of establishing new 
+						cross-connections while it can still accept ACTIONs to re-arrange TP Pools. The 
+						Fabric remains available for service (i.e. its operational state is enabled) 
+						while it is degraded. - Empty SET.";;
+			ATTRIBUTES
+				fabricId GET SET-BY-CREATE,
+				"Recommendation X.721: 1992":administrativeState GET-REPLACE,
+				"Recommendation X.721 : 1992":operationalState GET,
+				"Recommendation X.721 : 1992":availabilityStatus GET,
+				listOfCharacteristicInfo GET SET-BY-CREATE,
+				supportedByObjectList GET-REPLACE ADD-REMOVE;
+			ACTIONS
+				addTpsToGTP,
+				removeTpsFromGTP,
+				addTpsToTpPool,
+				removeTpsFromTpPool,
+				connect,
+				disconnect;;;
+REGISTERED AS { m3100ObjectClass 16 };
+
+
+fabricR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		fabric;
+	CHARACTERIZED BY
+		fabricR1Package PACKAGE
+			ACTIONS
+				switchOver;;;
+	CONDITIONAL PACKAGES
+		createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in Recommendation 
+				X.721 are supported by an instance of this class.";
+REGISTERED AS { m3100ObjectClass 26 };
+
+
+gtp MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		gtpPackage PACKAGE
+			BEHAVIOUR
+				gtpBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class represents a group of termination points treated as a single 
+						unit for management purposes suchas cross-connections. The signalType attribute 
+						describes the composition of the GTP. When a termination point is involved in a 
+						GTP, it cannot be cross-connected independently of that GTP.";;
+			ATTRIBUTES
+				gtpId GET,
+				crossConnectionObjectPointer GET,
+				signalType GET,
+				tpsInGtpList GET;;;
+REGISTERED AS { m3100ObjectClass 17 };
+
+
+mpCrossConnection MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		mpCrossConnectionPackage PACKAGE
+			BEHAVIOUR
+				mpCrossConnectionBehaviour BEHAVIOUR
+					DEFINED AS
+						"This class represents an assignment relationship between the termination point 
+						or GTP object listed in the FromTermination attribute and the termination point 
+						or GTP objects listed in the To Termination attributes of the contained 
+						crossConnection managed objects. A multipoint cross-connection can be 
+						established between one of CTP Sink, CTP Bidirectional, TTP Source, 
+						TTPBidirectional, or GTP; and a set whose members are CTP Source, CTP 
+						Bidirectional, TTP Sink, TTP Bidirectional, or GTP. The fromTermination 
+						attribute will always be non-NULL. The termination point or GTP object pointed 
+						to by thefromTermination attribute is related to all the termination point or 
+						GTP objects pointed to by the toTermination attribute of the contained 
+						crossConnection managed objects in such a way that traffic can flow between 
+						thetermination points represented by these managed objects. Information flows 
+						from the From Termination to the To Termination of the contained 
+						cross-connection objects. If the objects listed in the fromTermination attribute 
+						and in the toTermination attribute of the containedcrossConnection objects are 
+						GTPs, the nth element of the From Termination GTP is related to the nth element 
+						of the To Termination GTP (for every n). The total rate of the From Terminations 
+						must be equal to the total rate of To Terminations in each 
+						containedcrossConnection object. The attribute Signal Type describes the signal 
+						that is cross-connected. The termination points or GTPs that arecross-connected 
+						must have signal types that are compatible. The following are the definitions of 
+						the administrative state and the operational state attributes: Administrative 
+						State: - Unlocked: The mpCrossConnection object is administratively unlocked. It 
+						allows traffic to pass through eachcontained connection depending on its 
+						administrative state. - Locked: No traffic is allowed to pass through the 
+						Cross-Connection between the cross-connected terminationpoints. The effect of 
+						this value overrides the effect of the administrative state of each contained 
+						crossconnection. Operational State: The operational state of a Multipoint 
+						Cross-Connection object reflects the overall health of the cross- 
+						connectionincluding all the Cross-Connection objects contained in the Multipoint 
+						Cross-Connection. - Enabled: The Cross-Connection is performing its normal 
+						function. Note that some (but not all) of the cross-connection objects contained 
+						in the Multipoint Cross-Connection may be disabled. - Disabled: The 
+						Cross-Connection is incapable of performing its normal cross-connection 
+						function. All thecross-connection objects contained in the Multipoint 
+						Cross-Connection are disabled. Availability Status: The supported values for 
+						this attribute are: - In test - Degraded: The Multipoint Cross-Connection is 
+						degraded in some respect. For instance, if one or more (butnot all) 
+						Cross-Connection objects contained in the Multipoint Cross-Connection are 
+						disabled, the Multipoint Cross-Connection will be considered as degraded. The 
+						Multipoint Cross-Connection remains available forservice (i.e. its operational 
+						state is enabled) while it is degraded. - Empty SET.";;
+			ATTRIBUTES
+				mpCrossConnectionId GET,
+				"Recommendation X.721 : 1992":administrativeState GET-REPLACE,
+				"Recommendation X.721 : 1992":operationalState GET,
+				"Recommendation X.721 : 1992":availabilityStatus GET,
+				signalType GET,
+				fromTermination GET;;;
+REGISTERED AS { m3100ObjectClass 18 };
+
+
+namedCrossConnection MANAGED OBJECT CLASS
+	DERIVED FROM
+		crossConnection;
+	CHARACTERIZED BY
+		namedCrossConnectionPackage;
+REGISTERED AS { m3100ObjectClass 19 };
+
+
+namedMpCrossConnection MANAGED OBJECT CLASS
+	DERIVED FROM
+		mpCrossConnection;
+	CHARACTERIZED BY
+		namedCrossConnectionPackage;
+REGISTERED AS { m3100ObjectClass 20 };
+
+
+tpPool MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		tpPoolPackage PACKAGE
+			BEHAVIOUR
+				tpPoolBehaviour BEHAVIOUR
+					DEFINED AS
+						"The tpPool object represents a set of termination points or GTPs that are used 
+						for some management purpose,such as routing. A termination point that is a 
+						member of a GTP cannot be a member of a tpPool independent of the remainder of 
+						the GTP.";;
+			ATTRIBUTES
+				tpPoolId GET,
+				tpsInTpPoolList GET,
+				totalTpCount GET,
+				connectedTpCount GET,
+				idleTpCount GET;;;
+REGISTERED AS { m3100ObjectClass 21 };
+
+
+alarmSeverityAssignmentProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		alarmSeverityAssignmentProfilePackage PACKAGE
+			BEHAVIOUR
+				alarmSeverityAssignmentProfileBehaviour BEHAVIOUR
+					DEFINED AS
+						"The alarm severity assignment profile object class is a class of management 
+						support object that specifies thealarm severity assignment for managed objects. 
+						Instances of this object are referenced by the 
+						alarmSeverityAssignmentProfilePointer attribute in the managed objects.";;
+			ATTRIBUTES
+				alarmSeverityAssignmentProfileId GET SET-BY-CREATE,
+				alarmSeverityAssignmentList GET-REPLACE ADD-REMOVE;;;
+	CONDITIONAL PACKAGES
+		objectManagementNotificationsPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { m3100ObjectClass 22 };
+
+
+administrativeOperationalStatesPackage PACKAGE
+	ATTRIBUTES
+		"Recommendation X.721:1992":administrativeState GET-REPLACE,
+		"Recommendation X.721:1992":operationalState GET;
+REGISTERED AS { m3100Package 1 };
+
+
+affectedObjectListPackage PACKAGE
+	ATTRIBUTES
+		affectedObjectList GET;
+REGISTERED AS { m3100Package 2 };
+
+
+alarmSeverityAssignmentPointerPackage PACKAGE
+	BEHAVIOUR
+		alarmSeverityAssignmentPointerPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the alarm severity assignment profile pointer is NULL, then one of the 
+				following two choices applies whenreporting alarms: a) agent assigns the 
+				severity; or b) the value 'indeterminate' is used.";;
+	ATTRIBUTES
+		alarmSeverityAssignmentProfilePointer GET-REPLACE;
+REGISTERED AS { m3100Package 3 };
+
+
+attributeValueChangeNotificationPackage PACKAGE
+	NOTIFICATIONS
+		"Recommendation X.721:1992":attributeValueChange;
+REGISTERED AS { m3100Package 4 };
+
+
+audibleVisualLocalAlarmPackage PACKAGE
+	ACTIONS
+		allowAudibleVisualLocalAlarm
+			inhibitAudibleVisualLocalAlarm;
+REGISTERED AS { m3100Package 5 };
+
+
+channelNumberPackage PACKAGE
+	ATTRIBUTES
+		channelNumber GET SET-BY-CREATE;
+REGISTERED AS { m3100Package 6 };
+
+
+characteristicInformationPackage PACKAGE
+	ATTRIBUTES
+		characteristicInformation GET SET-BY-CREATE;
+REGISTERED AS { m3100Package 7 };
+
+
+clientConnectionListPackage PACKAGE
+	ATTRIBUTES
+		clientConnectionList GET SET-BY-CREATE;
+REGISTERED AS { m3100Package 35 };
+
+
+clientTrailPackage PACKAGE
+	ATTRIBUTES
+		clientTrail GET SET-BY-CREATE;
+REGISTERED AS { m3100Package 9 };
+
+
+createDeleteNotificationsPackage PACKAGE
+	NOTIFICATIONS
+		"Recommendation X.721:1992":objectCreation,
+		"Recommendation X.721:1992":objectDeletion;
+REGISTERED AS { m3100Package 10 };
+
+
+crossConnectionPointerPackage PACKAGE
+	ATTRIBUTES
+		crossConnectionObjectPointer GET;
+REGISTERED AS { m3100Package 11 };
+
+
+ctpInstancePackage PACKAGE
+	ATTRIBUTES
+		cTPId GET SET-BY-CREATE;
+REGISTERED AS { m3100Package 12 };
+
+
+currentProblemListPackage PACKAGE
+	ATTRIBUTES
+		currentProblemList GET;
+REGISTERED AS { m3100Package 13 };
+
+
+environmentalAlarmPackage PACKAGE
+	NOTIFICATIONS
+		"Recommendation X.721:1992":environmentalAlarm;
+REGISTERED AS { m3100Package 14 };
+
+
+environmentalAlarmR1Package PACKAGE
+	NOTIFICATIONS
+		"Recommendation X.721:1992":environmentalAlarm
+			"Recommendation Q.821:1992":logRecordIdParameter
+			"Recommendation Q.821:1992":correlatedRecordNameParameter
+			"Recommendation Q.821:1992":suspectObjectListParameter;
+REGISTERED AS { m3100Package 36 };
+
+
+equipmentAlarmEffectOnServicePackage PACKAGE
+	NOTIFICATIONS
+		"Recommendation X.721:1992":equipmentAlarm
+			alarmEffectOnServiceParameter;
+REGISTERED AS { m3100Package 38 };
+
+
+equipmentsEquipmentAlarmPackage PACKAGE
+	ATTRIBUTES
+		alarmStatus GET;
+	NOTIFICATIONS
+		"Recommendation X.721:1992":equipmentAlarm;
+REGISTERED AS { m3100Package 15 };
+
+
+equipmentsEquipmentAlarmR1Package PACKAGE
+	ATTRIBUTES
+		alarmStatus GET;
+	NOTIFICATIONS
+		"Recommendation X.721:1992":equipmentAlarm
+			"Recommendation Q.821:1992":logRecordIdParameter
+			"Recommendation Q.821:1992":correlatedRecordNameParameter
+			"Recommendation Q.821:1992":suspectObjectListParameter;
+REGISTERED AS { m3100Package 37 };
+
+
+externalTimePackage PACKAGE
+	ATTRIBUTES
+		externalTime GET-REPLACE;
+REGISTERED AS { m3100Package 16 };
+
+
+locationNamePackage PACKAGE
+	ATTRIBUTES
+		locationName GET-REPLACE;
+REGISTERED AS { m3100Package 17 };
+
+
+namedCrossConnectionPackage PACKAGE
+	ATTRIBUTES
+		redline GET-REPLACE,
+		crossConnectionName GET-REPLACE;;
+-- The above package is not registered because it is used as a mandatory package in 
+-- this Recommendation.
+
+
+networkLevelPackage PACKAGE
+	BEHAVIOUR
+		networkLevelPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"The network level pointer identifies a network level object. The value of the 
+				network level pointer shall only bemodified by the managing system.";;
+	ATTRIBUTES
+		networkLevelPointer GET-REPLACE;
+REGISTERED AS { m3100Package 18 };
+
+
+operationalStatePackage PACKAGE
+	ATTRIBUTES
+		"Recommendation X.721: 1992":operationalState GET;
+REGISTERED AS { m3100Package 19 };
+
+
+objectManagementNotificationsPackage PACKAGE
+	NOTIFICATIONS
+		"Recommendation X.721:1992":objectCreation,
+		"Recommendation X.721:1992":objectDeletion,
+		"Recommendation X.721:1992":attributeValueChange;
+REGISTERED AS { m3100Package 20 };
+
+
+processingErrorAlarmPackage PACKAGE
+	NOTIFICATIONS
+		"Recommendation X.721:1992":processingErrorAlarm;
+REGISTERED AS { m3100Package 21 };
+
+
+protectedPackage PACKAGE
+	ATTRIBUTES
+		protected GET SET-BY-CREATE;
+REGISTERED AS { m3100Package 22 };
+
+
+resetAudibleAlarmPackage PACKAGE
+	ACTIONS
+		"Recommendation Q.821:1992":resetAudibleAlarm;
+REGISTERED AS { m3100Package 23 };
+
+
+serverConnectionListPackage PACKAGE
+	ATTRIBUTES
+		serverConnectionList GET SET-BY-CREATE;
+REGISTERED AS { m3100Package 24 };
+
+
+serverTrailListPackage PACKAGE
+	ATTRIBUTES
+		serverTrailList GET SET-BY-CREATE;
+REGISTERED AS { m3100Package 25 };
+
+
+softwareProcessingErrorAlarmPackage PACKAGE
+	ATTRIBUTES
+		alarmStatus GET;
+	NOTIFICATIONS
+		"Recommendation X.721:1992":processingErrorAlarm;
+REGISTERED AS { m3100Package 26 };
+
+
+softwareProcessingErrorAlarmR1Package PACKAGE
+	ATTRIBUTES
+		alarmStatus GET;
+	NOTIFICATIONS
+		"Recommendation X.721:1992":processingErrorAlarm
+			"Recommendation Q.821:1992":logRecordIdParameter
+			"Recommendation Q.821:1992":correlatedRecordNameParameter
+			"Recommendation Q.821:1992":suspectObjectListParameter;
+REGISTERED AS { m3100Package 40 };
+
+
+subordinateCircuitPackPackage PACKAGE
+	ATTRIBUTES
+		acceptableCircuitPackTypeList GET-REPLACE ADD-REMOVE,
+		holderStatus GET,
+		subordinateCircuitPackSoftwareLoad GET-REPLACE;
+REGISTERED AS { m3100Package 41 };
+
+
+supportableClientListPackage PACKAGE
+	ATTRIBUTES
+		supportableClientList GET SET-BY-CREATE;
+REGISTERED AS { m3100Package 27 };
+
+
+stateChangeNotificationPackage PACKAGE
+	NOTIFICATIONS
+		"Recommendation X.721:1992":stateChange;
+REGISTERED AS { m3100Package 28 };
+
+
+systemTimingSourcePackage PACKAGE
+	ATTRIBUTES
+		systemTimingSource GET-REPLACE;
+REGISTERED AS { m3100Package 29 };
+
+
+tmnCommunicationsAlarmInformationPackage PACKAGE
+	BEHAVIOUR
+		tmnCommunicationsAlarmInformationBehaviour;
+	ATTRIBUTES
+		alarmStatus GET,
+		currentProblemList GET;
+	NOTIFICATIONS
+		"Recommendation X.721:1992":communicationsAlarm
+			"Recommendation Q.821:1992":logRecordIdParameter
+			"Recommendation Q.821:1992":correlatedRecordNameParameter
+			"Recommendation Q.821:1992":suspectObjectListParameter;
+REGISTERED AS { m3100Package 30 };
+
+
+ttpInstancePackage PACKAGE
+	ATTRIBUTES
+		tTPId GET SET-BY-CREATE;
+REGISTERED AS { m3100Package 31 };
+
+
+userLabelPackage PACKAGE
+	ATTRIBUTES
+		userLabel GET-REPLACE;
+REGISTERED AS { m3100Package 32 };
+
+
+vendorNamePackage PACKAGE
+	ATTRIBUTES
+		vendorName GET-REPLACE;
+REGISTERED AS { m3100Package 33 };
+
+
+versionPackage PACKAGE
+	ATTRIBUTES
+		version GET-REPLACE;
+REGISTERED AS { m3100Package 34 };
+
+
+a-TPInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.RelatedObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		aTPInstanceBehaviour BEHAVIOUR
+			DEFINED AS
+				"The A-Termination Point Instance attribute type identifies one of the two 
+				termination points of an instance ofthe connectivity object class or one of its 
+				subclasses.";;
+REGISTERED AS { m3100Attribute 1 };
+
+
+acceptableCircuitPackTypeList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.AcceptableCircuitPackTypeList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		acceptableCircuitPackTypeListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the types of the circuit packs that can be contained in 
+				an equipment holderobject.";;
+REGISTERED AS { m3100Attribute 58 };
+
+
+affectedObjectList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		affectedObjectListBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Affected Object List attribute type specifies the object instances which can 
+				be directly affected by a changein state or deletion of a given managed object. 
+				The attribute does not force internal details to be specified, but only the 
+				necessary level of detail required for management.";;
+REGISTERED AS { m3100Attribute 2 };
+
+
+alarmSeverityAssignmentList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.AlarmSeverityAssignmentList;
+	BEHAVIOUR
+		alarmSeverityAssignmentListBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Alarm Severity Assignment List is an attribute type whose value provides a 
+				listing of all abnormalconditions that may exist in instances of an object 
+				class, and shows the assigned alarm severity information (minor, major, etc.) 
+				for each condition.";;
+REGISTERED AS { m3100Attribute 3 };
+
+
+alarmSeverityAssignmentProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		alarmSeverityAssignmentProfileIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Alarm Severity AssignmentProfile Id is an attribute type whose distinguished 
+				value can be used as a RDNwhen naming an instance of the Alarm 
+				SeverityAssignment Profile object class.";;
+REGISTERED AS { m3100Attribute 4 };
+
+
+alarmSeverityAssignmentProfilePointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.PointerOrNull;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		alarmSeverityAssignmentProfilePointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies a Alarm Severity Assignment Profile object.";;
+REGISTERED AS { m3100Attribute 5 };
+
+
+alarmStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.AlarmStatus;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		alarmStatusBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Alarm Status attribute type indicates the occurrence of an abnormal 
+				condition relating to an object. Thisattribute may also function as a summary 
+				indicator of alarm conditions associated with a specific resource. It is used to 
+				indicate the existence of an alarm condition, a pending alarm condition such as 
+				threshold situations, or(when used as a summary indicator) the highest severity 
+				of active alarm conditions. When used as a summary indicator, the order of 
+				severity (from highest to lowest) is: 
+				activeReportable-CriticalactiveReportable-Major 
+				activeReportable-MinoractiveReportable-Indeterminate 
+				activeReportable-WarningactivePending cleared.";;
+REGISTERED AS { m3100Attribute 6 };
+
+
+channelNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ChannelNumber;
+	MATCHES FOR EQUALITY, ORDERING;
+REGISTERED AS { m3100Attribute 7 };
+
+
+characteristicInformation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.CharacteristicInformation;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		characteristicInformationBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute is used to verify the connectability of instances of 
+				the termination pointsubclasses.";;
+REGISTERED AS { m3100Attribute 8 };
+
+
+circuitDirectionality ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.CircuitDirectionality;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		circuitDirectionalityBehaviour BEHAVIOUR
+			DEFINED AS
+				"The attribute type specifies the directionality of the circuits in the circuit 
+				subgroup.";;
+REGISTERED AS { m3100Attribute 66 };
+
+
+circuitEndPointSubgroupId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		circuitEndPointSubgroupIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The circuitEndPointsubgroup Id is an attribute type whose distinguished value 
+				can be used as a RDN whennaming an instance of the circuitEndPointsubgroup 
+				object class.";;
+REGISTERED AS { m3100Attribute 61 };
+
+
+circuitPackType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.CircuitPackType;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		circuitPackTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the type of the circuit pack.";;
+REGISTERED AS { m3100Attribute 54 };
+
+
+clientConnectionList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		clientConnectionListBehaviour BEHAVIOUR
+			DEFINED AS
+				"The values of this attribute identify the client connections served by a trail. 
+				These client connections may beeither of a lower or same rate as the trail. In 
+				the latter case, the list consists of only one client connection.";;
+REGISTERED AS { m3100Attribute 53 };
+
+
+clientTrail ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		clientTrailBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute identifies the trail object instance in the same 
+				network layer as the connection servedby a connection object.";;
+REGISTERED AS { m3100Attribute 10 };
+
+
+connectedTpCount ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Count;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		connectedTpCountBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the total number of termination points associated with 
+				a tpPool that have beenconnected.";;
+REGISTERED AS { m3100Attribute 11 };
+
+
+connectionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		connectionIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Connection Id is an attribute type whose distinguished value can be used as 
+				a RDN when naming aninstance of the Connection object class.";;
+REGISTERED AS { m3100Attribute 12 };
+
+
+cTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour;
+	-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+	REGISTERED AS { m3100Attribute 13 };
+
+
+crossConnectionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		crossConnectionIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Cross-Connection Id is an attribute type whose distinguished value can be 
+				used as a RDN when naming aninstance of the crossConnection object class.";;
+REGISTERED AS { m3100Attribute 14 };
+
+
+crossConnectionName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.CrossConnectionName;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		crossConnectionNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is a descriptive name for a cross-connection or multipoint 
+				cross-connection managedobject.";;
+REGISTERED AS { m3100Attribute 15 };
+
+
+crossConnectionObjectPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.CrossConnectionObjectPointer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		crossConnectionObjectPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute points to a managed object such as a Cross-connection, a GTP or a 
+				Fabric. When atermination point is neither connected nor reserved for 
+				connection, its crossConnectionObjectPointer points to the Fabric object 
+				responsible for its connection.";;
+REGISTERED AS { m3100Attribute 16 };
+
+
+currentProblemList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.CurrentProblemList;
+	BEHAVIOUR
+		currentProblemListBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Current Problem List attribute type identifies the current existing 
+				problems, with severity, associated withthe managed object.";;
+REGISTERED AS { m3100Attribute 17 };
+
+
+directionality ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Directionality;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		directionalityBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Directionality attribute type specifies whether the associated managed 
+				object is uni- or bi-directional.";;
+REGISTERED AS { m3100Attribute 18 };
+
+
+downstreamConnectivityPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.DownstreamConnectivityPointer;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		downstreamConnectivityPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"The matching for equality is applicable for all choices of the syntax. The set 
+				operations are permitted onlywhen the choice of the syntax correspond to either 
+				broadcast or concatenated broadcast.";;
+REGISTERED AS { m3100Attribute 19 };
+
+
+equipmentHolderAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.EquipmentHolderAddress;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		equipmentHolderAddressBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the physical location of the resource represented by 
+				the equipmentHolder instance.Depending on the containment hierarchy of the 
+				equipmentHolder in the managed system, the value of this attribute may vary. For 
+				example, if a system has three levels of equipment holders representing Bay, 
+				Shelf andSlot respectively (i.e. the managed Element contains multiple Bay 
+				equipment holders, each Bay equipment holder contains multiple Shelf equipment 
+				holders and each Shelf equipment holder contains multiple Slotequipment 
+				holders), then: - for the equipmentHolder representing a Bay, the Frame 
+				Identification code may be used as the value of thisattribute; - for the 
+				equipmentHolder representing a Shelf, the Bay Shelf code may be used as the 
+				value of this attribute; - for the equipmentHolder representing a Slot, the 
+				position code may be used as the value of this attribute. If the system uses 
+				only one level of equipment holder, that represents the Shelves (i.e., the 
+				managedElementcontains multiple Shelf equipment holders, and each Shelf 
+				equipment holder contains a circuit pack), then the value of this attribute is a 
+				sequence of the Frame Identification code and the Bay Shelf Code.";;
+REGISTERED AS { m3100Attribute 56 };
+
+
+equipmentHolderType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.EquipmentHolderType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		equipmentHolderTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				"The equipment holder type attribute indicates the type of equipment holder using 
+				a character string. Thepossible values for the character string may be bay, 
+				shelf, drawer, slot and rack.";;
+REGISTERED AS { m3100Attribute 57 };
+
+
+equipmentId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		equipmentIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Equipment Id is an attribute type whose distinguished value can be used as a 
+				RDN when naming aninstance of the Equipment object class.";;
+REGISTERED AS { m3100Attribute 20 };
+
+
+externalTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ExternalTime;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		externalTimeBehaviour BEHAVIOUR
+			DEFINED AS
+				"The External time attribute provides time-of-day system time. The attribute 
+				functions as a reference for all timestamp activities in the managed element.";;
+REGISTERED AS { m3100Attribute 21 };
+
+
+fabricId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		fabricIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Fabric Id is an attribute type whose distinguished value can be used as a 
+				RDN when naming an instance ofthe Fabric object class.";;
+REGISTERED AS { m3100Attribute 22 };
+
+
+fromTermination ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.PointerOrNull;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		fromTerminationBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies a TTP (source or bidirectional), a CTP (sink or 
+				bidirectional) or a GTP composed ofmembers of one of these categories.";;
+REGISTERED AS { m3100Attribute 23 };
+
+
+gtpId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		gtpIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The gtp Id is an attribute type whose distinguished value can be used as a RDN 
+				when naming an instance of thegtp object class.";;
+REGISTERED AS { m3100Attribute 24 };
+
+
+holderStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.HolderStatus;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		holderStatusBehaviour BEHAVIOUR
+			DEFINED AS
+				"The holderStatus attribute indicates the status of the physical holder. It 
+				specifies if the holder is empty or has acircuitPack of specific type (that may 
+				or not be acceptable to the holder) or has an indeterminate type.";;
+REGISTERED AS { m3100Attribute59 };
+
+
+idleTpCount ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Count;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		idleTpCountBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the total number of termination points associated with 
+				a tpPool that are in anoperational state of enabled and that are available for 
+				Cross-Connection.";;
+REGISTERED AS { m3100Attribute 25 };
+
+
+informationTransferCapabilities ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.InformationTransferCapabilities;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		informationTransferCapabilitiesBehaviour BEHAVIOUR
+			DEFINED AS
+				"The attribute type specifies the different service types such as speech, 64 
+				kbits unrestricted data supported bythe circuit subgroup.";;
+REGISTERED AS { m3100Attribute 65 };
+
+
+labelOfFarEndExchange ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.UserLabel;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		labelOfFarEndExchangeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute type assigns a user friendly name to the Far End Exchange 
+				terminating this circuitsubgroup.";;
+REGISTERED AS { m3100Attribute 63 };
+
+
+listOfCharacteristicInfo ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ListOfCharacteristicInformation;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		listOfCharacteristicInfoBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute lists the characteristic information types that can be 
+				cross-connected by a Fabric.";;
+REGISTERED AS { m3100Attribute 26 };
+
+
+locationName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.LocationName;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		locationNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Location Name attribute type identifies a location.";;
+REGISTERED AS { m3100Attribute 27 };
+
+
+managedElementId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		managedElementIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Managed Element Id is an attribute type whose distinguished value can be 
+				used as a RDN when namingan instance of the Managed Element object class.";;
+REGISTERED AS { m3100Attribute 28 };
+
+
+managedElementComplexId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		managedElementComplexIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Managed Element Complex Id is an attribute type whose distinguished value 
+				can be used as a RDN whennaming an instance of the Managed Element Complex 
+				object class.";;
+REGISTERED AS { m3100Attribute 68 };
+
+
+mpCrossConnectionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		mpCrossConnectionIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The mp Cross-Connection Id is an attribute type whose distinguished value can be 
+				used as a RDN when namingan instance of the mpCrossConnection object class.";;
+REGISTERED AS { m3100Attribute 29 };
+
+
+networkId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		networkIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Network Id is an attribute type whose distinguished value can be used as a 
+				RDN when naming an instanceof the Network object class.";;
+REGISTERED AS { m3100Attribute 30 };
+
+
+networkLevelPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { m3100Attribute 31 };
+
+
+numberOfCircuits ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NumberOfCircuits;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		numberOfCircuitsBehaviour BEHAVIOUR
+			DEFINED AS
+				"The number of circuits in a circuit subgroup.";;
+REGISTERED AS { m3100Attribute 62 };
+
+
+protected ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		protectedBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies whether the associated managed object is protected or 
+				not. The value TRUE implies itis protected.";;
+REGISTERED AS { m3100Attribute 32 };
+
+
+redline ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		redlineBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies whether the associated managed object is red lined, 
+				e.g. identified as being part of asensitive circuit.";;
+REGISTERED AS { m3100Attribute 33 };
+
+
+replaceable ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Replaceable;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		replaceableBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Replaceable attribute type indicates whether the associated managed object 
+				is replaceable or non-replaceable.";;
+REGISTERED AS { m3100Attribute 34 };
+
+
+serialNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SerialNumber;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		serialNumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"The serial number attribute type identifies the serial number of the physical 
+				resource.";;
+REGISTERED AS { m3100Attribute69 };
+
+
+serverConnectionList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SequenceOfObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		serverConnectionListBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute identifies one or more connection objects within the 
+				same network layer as the trailthat are connected in series to constitute the 
+				trail.";;
+REGISTERED AS { m3100Attribute 35 };
+
+
+serverTrailList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		serverTrailListBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute identifies the trail objects (in most cases one) in 
+				a lower order network layer whichmay be used in parallel to serve a connection 
+				object.";;
+REGISTERED AS { m3100Attribute 36 };
+
+
+signallingCapabilities ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SignallingCapabilities;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		signallingCapabilitiesBehaviour BEHAVIOUR
+			DEFINED AS
+				"The attribute type specifies the signalling types supported by the circuit 
+				subgroup.";;
+REGISTERED AS { m3100Attribute 64 };
+
+
+signalType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SignalType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		signalTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute uniquely identifies the signal type of a cross-connection, TP 
+				pool or GTP. The signal type caneither be simple, bundle, or complex. If the 
+				signal type is simple, it consists of a single type of characteristic 
+				information. If the signal type is bundle, it is made up of a number of signal 
+				types all of the same characteristicinformation. If the signal type is complex, 
+				it consists of a sequence of bundle signal type. The order in the complex signal 
+				type represents the actual composition of the signal.";;
+REGISTERED AS { m3100Attribute 37 };
+
+
+softwareId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		softwareIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Software Id is an attribute type whose distinguished value can be used as a 
+				RDN when naming an instanceof the Software object class.";;
+REGISTERED AS { m3100Attribute 38 };
+
+
+subordinateCircuitPackSoftwareLoad ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SubordinateCircuitPackSoftwareLoad;
+	BEHAVIOUR
+		subordinateCircuitPackSoftwareLoadBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the software, if any, that is currently designated as 
+				the one to be loaded to thecontaining circuit pack whenever automatic reload of 
+				software is needed. The values of this attribute may be one of the following: 
+				sequence of printable string, sequence of object instance or NULL. The NULL 
+				choice is usedwhen the contained circuit pack is not software loadable, or no 
+				software load has been designated. The choice of sequence of ObjectInstance 
+				identifies an ordered set of software instances. When the choice of 
+				PrintableString isused, the semantics is a local matter.";;
+REGISTERED AS { m3100Attribute 60 };
+
+
+supportableClientList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SupportableClientList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		supportableClientListBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute is the list of object classes representing the 
+				clients which the particular managedobject is capable of supporting. This may be 
+				a subset of the client layers identified in Recommendation G.803 by the 
+				particular server layer managed object.";;
+REGISTERED AS { m3100Attribute 39 };
+
+
+supportedByObjectList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		supportedByObjectListBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Supported By Object List is an attribute type whose value identifies a set 
+				of object instances which arecapable of directly affecting a given managed 
+				object. The object instances include both physical and logical objects. This 
+				attribute does not force internal details to be specified, but only the 
+				necessary level of detailrequired for management. If the object instances 
+				supporting the managed object are unknown to that object, then this attribute is 
+				an empty set.";;
+REGISTERED AS { m3100Attribute 40 };
+
+
+systemTimingSource ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SystemTimingSource;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		systemTimingSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				"The System Timing Source attribute is used to specify the primary and secondary 
+				managed element timingsource for synchronization.";;
+REGISTERED AS { m3100Attribute 41 };
+
+
+totalTpCount ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Count;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		totalTpCountBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the total number of termination points associated with 
+				a tpPool.";;
+REGISTERED AS { m3100Attribute 42 };
+
+
+toTermination ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Pointer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		toTerminationBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies a CTP (source or bidirectional), a TTP (sink or 
+				bidirectional) or a GTP composed ofmembers of one of these categories.";;
+REGISTERED AS { m3100Attribute 43 };
+
+
+tpPoolId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		tpPoolIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The TP Pool Id is an attribute type whose distinguished value can be used as a 
+				RDN when naming an instanceof the tpPool object class.";;
+REGISTERED AS { m3100Attribute 44 };
+
+
+tpsInGtpList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TpsInGtpList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tpsInGtpListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute lists the termination points that are represented by a GTP.";;
+REGISTERED AS { m3100Attribute 45 };
+
+
+tpsInTpPoolList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ListOfTPs;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tpsInTpPoolListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute lists the termination points that are represented by a TP Pool.";;
+REGISTERED AS { m3100Attribute 46 };
+
+
+trailId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		trailIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Trail Id is an attribute type whose distinguished value can be used as a RDN 
+				when naming an instance ofthe Trail object class.";;
+REGISTERED AS { m3100Attribute 47 };
+
+
+tTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721 : 1992":rDNIdBehaviour,
+		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
+		ttpIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Trail Termination Point Id is an attribute type whose distinguished value 
+				can be used as a RDN whennaming an instance of the Trail Termination Point 
+				object class.";;
+REGISTERED AS { m3100Attribute 48 };
+
+
+transmissionCharacteristics ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TransmissionCharacteristics;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		transmissionCharacteristicsBehaviour BEHAVIOUR
+			DEFINED AS
+				"The attribute type specifies the different transmission characteristics such as 
+				satellite, echo control supported ornot supported by the circuit subgroup. The 
+				bit positions are set to indicate if a particular characteristic is supported.";;
+REGISTERED AS { m3100Attribute 67 };
+
+
+upstreamConnectivityPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ConnectivityPointer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		upstreamConnectivityPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"The matching for equality is applicable for all the choices of the syntax.";;
+REGISTERED AS { m3100Attribute 49 };
+
+
+userLabel ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.UserLabel;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		userLabelBehaviour BEHAVIOUR
+			DEFINED AS
+				"The User Label attribute type assigns a user friendly name to the associated 
+				object.";;
+REGISTERED AS { m3100Attribute 50 };
+
+
+vendorName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.VendorName;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		vendorNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Vendor Name attribute type identifies the vendor of the associated managed 
+				object.";;
+REGISTERED AS { m3100Attribute 51 };
+
+
+version ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Version;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		versionBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Version attribute type identifies the version of the associated managed 
+				object.";;
+REGISTERED AS { m3100Attribute 52 };
+
+
+z-TPInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.RelatedObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		z-TPInstanceBehaviour BEHAVIOUR
+			DEFINED AS
+				"The Z-Termination Point Instance attribute type identifies one of the two 
+				termination points of an instance ofthe connectivity object class.";;
+REGISTERED AS { m3100Attribute 55 };
+
+
+alarmSeverityAssignment-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS alarmSeverityAssignmentProfile AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		alarmSeverityAssignmentProfileId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 1 };
+
+
+circuitPack-equipmentHolder-autoCreated NAME BINDING
+	SUBORDINATE OBJECT CLASS circuitPack AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS equipmentHolder AND SUBCLASSES;
+	WITH ATTRIBUTE
+		equipmentId;
+	BEHAVIOUR
+		circuitPack-equipmentHolder-autoCreateBeh;
+REGISTERED AS { m3100NameBinding 32 };
+
+
+circuitPack-equipmentHolder-explicitlyCreated NAME BINDING
+	SUBORDINATE OBJECT CLASS circuitPack AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS equipmentHolder AND SUBCLASSES;
+	WITH ATTRIBUTE
+		equipmentId;
+	BEHAVIOUR
+		circuitPack-equipmentHolder-explicitlyCreateBeh;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING
+	createErrorParameter;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 33 };
+
+
+connectionR1-network NAME BINDING
+	SUBORDINATE OBJECT CLASS connectionR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS network;
+	WITH ATTRIBUTE
+		connectionId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 25 };
+
+
+connectionTerminationPointSource-trailTerminationPointSource NAME BINDING
+	SUBORDINATE OBJECT CLASS connectionTerminationPointSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS trailTerminationPointSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cTPId;
+	BEHAVIOUR
+		cTPSource-TTPBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 3 };
+
+
+connectionTerminationPointSource-trailTerminationPointBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS connectionTerminationPointSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS trailTerminationPointBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cTPId;
+	BEHAVIOUR
+		cTPSource-TTPBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 4 };
+
+
+connectionTerminationPointSink-trailTerminationPointSink NAME BINDING
+	SUBORDINATE OBJECT CLASS connectionTerminationPointSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS trailTerminationPointSink AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cTPId;
+	BEHAVIOUR
+		cTPSink-TTPBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 5 };
+
+
+connectionTerminationPointSink-trailTerminationPointBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS connectionTerminationPointSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS trailTerminationPointBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cTPId;
+	BEHAVIOUR
+		cTPSink-TTPBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 6 };
+
+
+crossConnection-fabric NAME BINDING
+	SUBORDINATE OBJECT CLASS crossConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS fabric AND SUBCLASSES;
+	WITH ATTRIBUTE
+		crossConnectionId;
+	BEHAVIOUR
+		crossConnection-fabricBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of the fromTermination attribute in the Cross-Connection object shall 
+				not be NULL. When an instanceof cross-connection is deleted, the following 
+				attributes will be affected. The crossConnectionObjectPointer attribute in the 
+				termination point objects or in the GTP objects that were pointing to the 
+				deleted cross-connectioninstance shall be set to point to the Fabric responsible 
+				for the connection of the termination points. The counters in the appropriate TP 
+				Pool objects (if applicable) shall be updated. The connectivityPointer 
+				attributesin the disconnected termination points shall be set to NULL. Deleting 
+				a cross-connection object instance has no effect on the composition of any GTP.";;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 7 };
+
+
+crossConnection-mpCrossConnection NAME BINDING
+	SUBORDINATE OBJECT CLASS crossConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS mpCrossConnection AND SUBCLASSES;
+	WITH ATTRIBUTE
+		crossConnectionId;
+	BEHAVIOUR
+		crossConnection-mpCrossConnectionBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of the fromTermination attribute in the Cross-Connection object must 
+				be NULL. When an instance ofcross-connection is deleted, the following 
+				attributes will be affected. The crossConnectionObjectPointer attribute in the 
+				termination point object or in the GTP object that was pointing to the deleted 
+				cross-connection instanceshall be set to point to the Fabric responsible for the 
+				connection of the termination points. The counters in the appropriate TP Pool 
+				objects (if applicable) shall be updated. The connectivity pointers in the 
+				disconnectedtermination point shall be set to NULL. Deleting the last 
+				cross-connection contained in a multipoint cross-connection object instance has 
+				the effect of alsodeleting the multipoint cross-connect object instance (and 
+				updating the appropriate pointers). Deleting a crossconnection object instance 
+				has no effect on the composition of any GTP.";;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 8 };
+
+
+equipment-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS equipment AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		equipmentId;
+	BEHAVIOUR
+		equipmentNameBindingBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 9 };
+
+
+equipment-equipment NAME BINDING
+	SUBORDINATE OBJECT CLASS equipment AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS equipment AND SUBCLASSES;
+	WITH ATTRIBUTE
+		equipmentId;
+	BEHAVIOUR
+		equipmentNameBindingBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 10 };
+
+
+equipmentHolder-equipmentHolder NAME BINDING
+	SUBORDINATE OBJECT CLASS equipmentHolder AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS equipmentHolder AND SUBCLASSES;
+	WITH ATTRIBUTE
+		equipmentId;
+	BEHAVIOUR
+		equipmentHolder-equipmentHolderBeh;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING
+	createErrorParameter;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 31 };
+
+
+eventForwardingDiscriminator-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation X.721:1992":eventForwardingDiscriminator;
+	NAMED BY
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.721:1992":discriminatorId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 11 };
+
+
+fabric-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS fabric AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		fabricId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 12 };
+
+
+gtp-fabric NAME BINDING
+	SUBORDINATE OBJECT CLASS gtp;
+	NAMED BY
+	SUPERIOR OBJECT CLASS fabric AND SUBCLASSES;
+	WITH ATTRIBUTE
+		gtpId;
+REGISTERED AS { m3100NameBinding 13 };
+
+
+log-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation X.721:1992":log;
+	NAMED BY
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.721:1992":logId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 14 };
+
+
+managedElement-network NAME BINDING
+	SUBORDINATE OBJECT CLASS managedElement AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS network;
+	WITH ATTRIBUTE
+		managedElementId;
+	BEHAVIOUR
+		managedElementCreateBehaviour BEHAVIOUR
+			DEFINED AS
+				"Managed Element object is not created or deleted by system management protocol. 
+				The object is created wheninitializing the managed element.";;
+REGISTERED AS { m3100NameBinding 15 };
+
+
+managedElement-organization NAME BINDING
+	SUBORDINATE OBJECT CLASS managedElement AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT X.521":organization AND SUBCLASSES;
+	WITH ATTRIBUTE
+		managedElementId;
+	BEHAVIOUR
+		managedElement-organizationBeh;
+REGISTERED AS { m3100NameBinding 27 };
+
+
+managedElement-organizationalUnit NAME BINDING
+	SUBORDINATE OBJECT CLASS managedElement AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT X.521":organizationalUnit AND SUBCLASSES;
+	WITH ATTRIBUTE
+		managedElementId;
+	BEHAVIOUR
+		managedElement-organizationalUnitBeh;
+REGISTERED AS { m3100NameBinding 28 };
+
+
+managedElement-managedElementComplex NAME BINDING
+	SUBORDINATE OBJECT CLASS managedElement AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS managedElementComplex AND SUBCLASSES;
+	WITH ATTRIBUTE
+		managedElementId;
+	BEHAVIOUR
+		managedElementCreateBehaviour BEHAVIOUR
+			DEFINED AS
+				"Managed Element object is not created or deleted by system management protocol. 
+				The object is created wheninitializing the managed element.";;
+REGISTERED AS { m3100NameBinding 34 };
+
+
+managedElementComplex-organization NAME BINDING
+	SUBORDINATE OBJECT CLASS managedElementComplex AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT X.521":organization AND SUBCLASSES;
+	WITH ATTRIBUTE
+		managedElementComplexId;
+	BEHAVIOUR
+		managedElementComplex-organizationBeh;
+REGISTERED AS { m3100NameBinding 35 };
+
+
+managedElementComplex-organizationalUnit NAME BINDING
+	SUBORDINATE OBJECT CLASS managedElementComplex AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT X.521":organizationalUnit AND SUBCLASSES;
+	WITH ATTRIBUTE
+		managedElementComplexId;
+	BEHAVIOUR
+		managedElementComplex-organizationalUnitBeh;
+REGISTERED AS { m3100NameBinding 36 };
+
+
+mpCrossConnection-fabric NAME BINDING
+	SUBORDINATE OBJECT CLASS mpCrossConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS fabric AND SUBCLASSES;
+	WITH ATTRIBUTE
+		mpCrossConnectionId;
+REGISTERED AS { m3100NameBinding 16 };
+
+
+network-network NAME BINDING
+	SUBORDINATE OBJECT CLASS network AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS network AND SUBCLASSES;
+	WITH ATTRIBUTE
+		networkId;
+	BEHAVIOUR
+		networkCreateBehaviour BEHAVIOUR
+			DEFINED AS
+				"Network object is not created or deleted by system management protocol. The 
+				object is created when initializingthe network.";;
+REGISTERED AS { m3100NameBinding 17 };
+
+
+network-organization NAME BINDING
+	SUBORDINATE OBJECT CLASS network AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT X.521":organization AND SUBCLASSES;
+	WITH ATTRIBUTE
+		networkId;
+	BEHAVIOUR
+		network-organizationBeh;
+REGISTERED AS { m3100NameBinding 29 };
+
+
+network-organizationalUnit NAME BINDING
+	SUBORDINATE OBJECT CLASS network AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT X.521":organizationalUnit AND SUBCLASSES;
+	WITH ATTRIBUTE
+		networkId;
+	BEHAVIOUR
+		network-organizationalUnitBeh;
+REGISTERED AS { m3100NameBinding 30 };
+
+
+software-equipment NAME BINDING
+	SUBORDINATE OBJECT CLASS software AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS equipment AND SUBCLASSES;
+	WITH ATTRIBUTE
+		softwareId;
+	BEHAVIOUR
+		softwareNameBindingBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 18 };
+
+
+software-software NAME BINDING
+	SUBORDINATE OBJECT CLASS software AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS software AND SUBCLASSES;
+	WITH ATTRIBUTE
+		softwareId;
+	BEHAVIOUR
+		softwareNameBindingBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 19 };
+
+
+software-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS software AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		softwareId;
+	BEHAVIOUR
+		softwareNameBindingBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 20 };
+
+
+tpPool-fabric NAME BINDING
+	SUBORDINATE OBJECT CLASS tpPool;
+	NAMED BY
+	SUPERIOR OBJECT CLASS fabric AND SUBCLASSES;
+	WITH ATTRIBUTE
+		tpPoolId;
+REGISTERED AS { m3100NameBinding 21 };
+
+
+trailR1-network NAME BINDING
+	SUBORDINATE OBJECT CLASS trailR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS network;
+	WITH ATTRIBUTE
+		trailId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 26 };
+
+
+trailTerminationPointSource-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS trailTerminationPointSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		tTPId;
+	BEHAVIOUR
+		trailTerminationPointNameBindingBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 23 };
+
+
+trailTerminationPointSink-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS trailTerminationPointSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		tTPId;
+	BEHAVIOUR
+		trailTerminationPointNameBindingBehaviour;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { m3100NameBinding 24 };
+
+
+addTpsToGTP ACTION
+	BEHAVIOUR
+		addTpsToGtpBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action is used to ACTION BEHAVIOUR termination points into GTPs. If the 
+				group termination point instance does notexist then a new one is automatically 
+				created and its identity returned in the result. Otherwise the termination 
+				points are added to those already in the GTP. Termination points may be members 
+				of zero or one GTP. This actionwill fail if the GTP is involved in a 
+				cross-connection, if the GTP is a member of a TP pool or if the termination 
+				point is already a member of a GTP. A bidirectional termination point that can 
+				provide independent unidirectionalconnectivity may be a member of zero or one 
+				GTP for each direction of connectivity.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX ASN1DefinedTypesModule.AddTpsToGtpInformation;
+	WITH REPLY SYNTAX ASN1DefinedTypesModule.AddTpsToGtpResult;
+REGISTERED AS { m3100Action 1 };
+
+
+addTpsToTpPool ACTION
+	BEHAVIOUR
+		addTpsToTpPoolBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action is used to arrange termination points or GTPs into pools of 
+				termination points or GTPs that are allequivalent for some management purpose 
+				such as routing. If the tpPool instance does not exist then a new one is 
+				automatically created and its identity returned in the result. Otherwise the 
+				termination points or GTPs are added tothose already in the tpPool. If an 
+				Indirect Adaptor is specified, a GTP representing the CTPs contained from the 
+				Indirect Adaptor will be created and it will be added to the tpPool.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX ASN1DefinedTypesModule.AddTpsToTpPoolInformation;
+	WITH REPLY SYNTAX ASN1DefinedTypesModule.AddTpsToTpPoolResult;
+REGISTERED AS { m3100Action 2 };
+
+
+allowAudibleVisualLocalAlarm ACTION
+	BEHAVIOUR
+		allowAudibleVisualLocalAlarmBehaviour;
+REGISTERED AS { m3100Action 3 };
+
+
+connect ACTION
+	BEHAVIOUR
+		connectBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action is used to establish a connection between termination points or 
+				GTPs. The termination points to beconnected can be specified in one of two ways: 
+				1) by explicitly identifying the two termination points or GTPs; 2) by 
+				specifying one termination point or GTP, and specifying a tpPool from which any 
+				idle terminationpoint/GTP may be used. The result, if successful, always returns 
+				an explicit list of termination points or GTP. There are two basic forms of 
+				cross-connection arrangement: point-to-point and point to multi-point 
+				(broadcast). Asingle cross-connection is created if either the explicitPtoP or 
+				ptoTpPool option is selected in this action. This cross-connection object points 
+				to the termination points or GTPs involved in the cross-connection. 
+				Connectionsare indicated in termination points by the connectivityPointer 
+				attribute. If the administrativeState in the crossConnection object is unlocked, 
+				this attribute is set, as a result of this action, to the local name of 
+				thetermination point to which it is connected. Also, the 
+				crossConnectionObjectPointer in the termination points or GTPs points to the 
+				cross-connection object. For point to multi-point cross-connection (indicated by 
+				choosing the explicitPtoMp or ptoMPools option), onemulti-point cross-connection 
+				object will be created containing one crossConnection object for each 
+				termination point specified in the toTps parameter. In the source TP the 
+				crossConnectionObjectPointer will point at the newlycreated Multi-point 
+				cross-connect object. In each Tp named in the toTPs list (possibly selected from 
+				a specified tpPool), the CrossConnectionObject pointer will point at the 
+				corresponding cross-connection object. Theconnectivity pointers in the connected 
+				termination points will be updated to reflect the new connectivity. The 
+				idleTPcount and the connectedTPcount attributes in the tpPool object (if any) 
+				are updated as a result of theaction. If a GTP is implicitly defined by 
+				specifying several termination points to be connected together, the GTP object 
+				will be automatically created and its id will be returned in the action reply. 
+				If an Indirect Adaptor is specified, a GTP representing the CTPs contained from 
+				the Indirect Adaptor will becreated and it will be connected. The administrative 
+				state of the created cross-connection or multi-point cross-connection objects is 
+				specified as anoptional parameter of this action. If this parameter is omitted, 
+				the administrative state will be set to 'unlocked' (unless the addLegs parameter 
+				is specified). This action will fail if any of the termination points specified 
+				isalready involved in a cross-connection or if part of an existing GTP is 
+				specified. If the addLeg parameter is specified, one or more Legs will be added 
+				to an existing multi-point cross-connectionarrangement. Selected termination 
+				points or GTPs must support a similar signal type to that of the termination 
+				points already connected to the arrangement. The result, if successful, always 
+				returns the termination points orGTPs involved in the multi-point 
+				cross-connection. A cross-connection object is created as a result of this 
+				action. This object will be named from the specified mpCrossConnection object 
+				instance. The administrative state of thecreated cross-connection object will be 
+				the same as that of the containing multi-point cross-connection object unless 
+				otherwise specified in the action parameters.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX ASN1DefinedTypesModule.ConnectInformation;
+	WITH REPLY SYNTAX ASN1DefinedTypesModule.ConnectResult;
+REGISTERED AS { m3100Action 4 };
+
+
+disconnect ACTION
+	BEHAVIOUR
+		disconnectBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action is used to take down a cross-connection. The connection to be taken 
+				down is specified by identifyingtermination point(s) [or GTP(s)] of the 
+				connection. If the connection was point-to-point, then the other termination 
+				point or GTP is implicitly disconnected as well and the cross-connection object 
+				is deleted. If the connection waspoint to multi-point and the action referred to 
+				the master, all the termination points or GTPs that are legs are implicitly 
+				disconnected as well and the multi-point cross-connection and cross-connection 
+				objects are deleted. If the connection was point-to-multi-point and the action 
+				referred to a leg, then just that leg is disconnected, unlessit is the last leg, 
+				in which case the master termination point is also implicitly disconnected and 
+				the multipoint cross-connection and cross-connection objects are deleted. The 
+				idleTPcount and the connectedTPcount attributesin the tpPool objects (if any) 
+				are updated as a result of the action. The connectivity pointers in the 
+				disconnected termination points will be set to NULL as a result of this action. 
+				This action has no effect on the composition of GTPs and GTPs are not deleted as 
+				a result of this action. Thisaction will fail if part of a GTP is specified.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX ASN1DefinedTypesModule.DisconnectInformation;
+	WITH REPLY SYNTAX ASN1DefinedTypesModule.DisconnectResult;
+REGISTERED AS { m3100Action 5 };
+
+
+inhibitAudibleVisualLocalAlarm ACTION
+	BEHAVIOUR
+		inhibitAudibleVisualLocalAlarmBehaviour;
+REGISTERED AS { m3100Action 6 };
+
+
+removeTpsFromGTP ACTION
+	BEHAVIOUR
+		removeTpsFromGtpBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action is used to remove termination points from GTPs. This action will 
+				fail if the GTP is involved in across-connection or if it is a member of a TP 
+				pool. Removing the last termination point from a GTP has the effect of deleting 
+				the GTP object. If the GTP is deleted, the name of the GTP will be sent back in 
+				the ACTION reply.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX ASN1DefinedTypesModule.RemoveTpsFromGtpInformation;
+	WITH REPLY SYNTAX ASN1DefinedTypesModule.RemoveTpsFromGtpResult;
+REGISTERED AS { m3100Action 7 };
+
+
+removeTpsFromTpPool ACTION
+	BEHAVIOUR
+		removeTpsFromTpPoolBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action is used to remove termination points from termination point pools. 
+				Removing the last terminationpoint from a pool has the effect of deleting the TP 
+				Pool object. If the TP pool is deleted, the name of the TP Pool will be sent 
+				back in the ACTION reply.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX ASN1DefinedTypesModule.RemoveTpsFromTpPoolInformation;
+	WITH REPLY SYNTAX ASN1DefinedTypesModule.RemoveTpsFromTpPoolResult;
+REGISTERED AS { m3100Action 8 };
+
+
+switchOver ACTION
+	BEHAVIOUR
+		switchOverBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action offers the capability, in an atomic way, to: Switch an existing 
+				connection to another one of the sametype maintaining one of the original 
+				cross-connected termination points. If the operation succeeds, this will result 
+				in the deletion of the old connection indicated in the action information and 
+				the connection of the new terminationpoint. The new termination point indicated 
+				in the action information must be available (disconnected for the respective 
+				direction) in order to establish the new cross-connection. The switch over of an 
+				individual connection isconsidered an atomic operation. Switch a bundle of 
+				existing connections. Each of these connections are switched over as described 
+				above. In thiscase, the action will behave according to a best effort policy and 
+				only those connections which can be successfully switched over will be performed 
+				independently of each other. In any case, a connection designates a 
+				unidirectional or bidirectional point-to-point connection (i.e.crossConnection), 
+				a leg of a multi-point connection (i.e. crossConnection contained in a 
+				mpCrossConnection), or a leg of a multipoint connection protection defined in 
+				Recommendation G.774.04.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX ASN1DefinedTypesModule.SwitchOverInformation;
+	WITH REPLY SYNTAX ASN1DefinedTypesModule.SwitchOverResult;
+REGISTERED AS { m3100Action 9 };
+
+
+alarmEffectOnServiceParameter PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX ASN1DefinedTypesModule.AlarmEffectOnServiceParameter;
+	BEHAVIOUR
+		alarmEffectOnServiceParameterBehaviour BEHAVIOUR
+			DEFINED AS
+				"The alarmEffectOnServiceParameter is a parameter to be included as an element of 
+				a set in theAdditionalInformation parameter of the AlarmInfo defined in 
+				Recommendation X.721. The alarmEffectOnServiceParameter indicates whether the 
+				service is affected by the alarm.";;
+REGISTERED AS { m3100Parameter 1 };
+
+
+createErrorParameter PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX ASN1DefinedTypesModule.CreateError;
+	BEHAVIOUR
+		createErrorParameterBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the maximum number of instances of the object class exist within the superior 
+				(containing) managed object,attempts to create additional instances will result 
+				in the CMIP processing failure error. The syntax of the specific error is an 
+				integer defined by CreateError. The value of the integer indicates the number of 
+				instances that arecurrently contained in the superior object.";;
+REGISTERED AS { m3100Parameter 2 };
+
+END
+--< GDMO.ChangeLog
+--  =============================================================================
+--  
+--  $Log: M3100.new.gdmo,v $
+--  Revision 0.9.2.1  2007/12/15 20:16:40  brian
+--  - added new mib files
+--
+--  Revision 0.9.2.3  2007/09/29 14:28:06  brian
+--  - update gdmos and asns
+--  
+--  Revision 0.9.2.2  2007/09/09 22:58:48  brian
+--  - updates for namespace
+--  
+--  Revision 0.9.2.1  2007/09/06 10:58:58  brian
+--  - added new gdmo files
+--  
+--  =============================================================================
+--  >--
+--< GDMO.EndDocument "ITU-T Rec. M.3100 (1992)"
+--  { ccitt recommendation m gnm(3100) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@
+--@@ These modules reference "Recommendation Q.821:1992" 25 times.
+--@@
+--@@
+--@@ These modules define " CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define " ITU-T X.721|ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec X.721 | ISO/IEC 10165-2"
+--@@ These modules define "CCITT Rec. 721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. 721 | ISO/IEC10162:1992"
+--@@ These modules define "CCITT Rec. 721| ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. M.3100 (1992)"
+--@@ These modules define "CCITT Rec. X.721"
+--@@ These modules define "CCITT Rec. X.721 (1992)"
+--@@ These modules define "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO /IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2 :1992"
+--@@ These modules define "CCITT Rec. X.721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "CCITT Rec. X.721(1992)"
+--@@ These modules define "CCITT Rec. X.721|ISO/IEC 10165-2"
+--@@ These modules define "CCITT Rec. X.723 (1993)"
+--@@ These modules define "CCITT Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
+--@@ These modules define "CCITT Rec. X.723 | ISO/IEC 10165-5"
+--@@ These modules define "CCITT X.521"
+--@@ These modules define "DMI"
+--@@ These modules define "DMI:1992"
+--@@ These modules define "GMI"
+--@@ These modules define "ISO/IEC 10165-2"
+--@@ These modules define "ITU Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "ITU-T Rec. M.3100 (1992)"
+--@@ These modules define "ITU-T Rec. M.3100 (1995)"
+--@@ These modules define "ITU-T Rec. M.3100:1995"
+--@@ These modules define "ITU-T Rec. X.521"
+--@@ These modules define "ITU-T Rec. X.721 (1992)"
+--@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2: 1992"
+--@@ These modules define "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define "ITU-T Rec. X.721 : 1992"
+--@@ These modules define "ITU-T Rec. X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "ITU-T Rec. X.723 (1993)"
+--@@ These modules define "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
+--@@ These modules define "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1993"
+--@@ These modules define "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994"
+--@@ These modules define "ITU-T Rec. X.723 | ISO/IEC 10165-5"
+--@@ These modules define "ITU-T Recommendation X.721"
+--@@ These modules define "ITU-T Recommendation X.721:1992"
+--@@ These modules define "ITU-T X.721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "ITU-T X.721|ISO/IEC 10165-2:1992"
+--@@ These modules define "Rec. CCITT X.721 | ISO/IEC 10165-2"
+--@@ These modules define "Rec. X. 723 | ISO/IEC 10165-5"
+--@@ These modules define "Rec. X.721 (1992)"
+--@@ These modules define "Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Rec. X.721 (1992) | ISO/IEC 10165-2:1992"
+--@@ These modules define "Rec. X.721 | ISO/IEC 10165-2"
+--@@ These modules define "Rec. X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Rec. X.721 | ISO/IEC 10165-2:1992"
+--@@ These modules define "Rec. X.721|ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Rec. X.723 (1993)"
+--@@ These modules define "Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
+--@@ These modules define "Rec. X.723 | ISO/IEC 10165-5"
+--@@ These modules define "Rec. X.723 | ISO/IEC 10165-5 : 1994"
+--@@ These modules define "Recommendation M.3100"
+--@@ These modules define "Recommendation X.721"
+--@@ These modules define "Recommendation X.721 "
+--@@ These modules define "Recommendation X.721 : 1992"
+--@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2"
+--@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2 : 1992"
+--@@ These modules define "Recommendation X.721 | ISO/IEC 10165-2: 1992"
+--@@ These modules define "Recommendation X.721: 1992"
+--@@ These modules define "Recommendation X.721:1992"
+--@@ These modules define "X.721"
+--@@ These modules define "X.721:1992"
+--@@ These modules define "X.723"
+--@@
+--@@
+--@@ These modules reference PARAMETER correlatedRecordNameParameter in module "Recommendation Q.821:1992".
+--@@ These modules reference PARAMETER logRecordIdParameter in module "Recommendation Q.821:1992".
+--@@ These modules reference PARAMETER suspectObjectListParameter in module "Recommendation Q.821:1992".
+--@@
+--@@ These modules define PARAMETER alarmEffectOnServiceParameter.
+--@@ These modules define PARAMETER createErrorParameter.
+--@@ These modules define PARAMETER miscellaneousError.
+--@@
+--@@ These modules reference ACTION resetAudibleAlarm in module "Recommendation Q.821:1992".
+--@@
+--@@ These modules define ACTION activate.
+--@@ These modules define ACTION addTpsToGTP.
+--@@ These modules define ACTION addTpsToTpPool.
+--@@ These modules define ACTION allowAudibleVisualLocalAlarm.
+--@@ These modules define ACTION connect.
+--@@ These modules define ACTION deactivate.
+--@@ These modules define ACTION deactivateWhenNoUsers.
+--@@ These modules define ACTION disconnect.
+--@@ These modules define ACTION inhibitAudibleVisualLocalAlarm.
+--@@ These modules define ACTION removeTpsFromGTP.
+--@@ These modules define ACTION removeTpsFromTpPool.
+--@@ These modules define ACTION switchOver.
+--@@ 
+--@@ packages processingErrorAlarmR1Package referenced but never defined!
+--@@ PackageReference references undefined "":processingErrorAlarmR1Package
+--@@ parameters correlatedRecordNameParameter referenced but never defined!
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":correlatedRecordNameParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":correlatedRecordNameParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":correlatedRecordNameParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":correlatedRecordNameParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":correlatedRecordNameParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":correlatedRecordNameParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":correlatedRecordNameParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":correlatedRecordNameParameter
+--@@ parameters inhibitAudibleVisualLocalAlarm referenced but never defined!
+--@@ ParameterReference references undefined "":inhibitAudibleVisualLocalAlarm
+--@@ parameters logRecordIdParameter referenced but never defined!
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":logRecordIdParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":logRecordIdParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":logRecordIdParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":logRecordIdParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":logRecordIdParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":logRecordIdParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":logRecordIdParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":logRecordIdParameter
+--@@ parameters suspectObjectListParameter referenced but never defined!
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":suspectObjectListParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":suspectObjectListParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":suspectObjectListParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":suspectObjectListParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":suspectObjectListParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":suspectObjectListParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":suspectObjectListParameter
+--@@ ParameterReference references undefined "Recommendation Q.821:1992":suspectObjectListParameter
+--@@ behaviours allowAudibleVisualLocalAlarmBehaviour referenced but never defined!
+--@@ BehaviourReference references undefined "":allowAudibleVisualLocalAlarmBehaviour
+--@@ behaviours cTPSink-TTPBehaviour referenced but never defined!
+--@@ BehaviourReference references undefined "":cTPSink-TTPBehaviour
+--@@ BehaviourReference references undefined "":cTPSink-TTPBehaviour
+--@@ behaviours cTPSource-TTPBehaviour referenced but never defined!
+--@@ BehaviourReference references undefined "":cTPSource-TTPBehaviour
+--@@ BehaviourReference references undefined "":cTPSource-TTPBehaviour
+--@@ behaviours circuitPack-equipmentHolder-autoCreateBeh referenced but never defined!
+--@@ BehaviourReference references undefined "":circuitPack-equipmentHolder-autoCreateBeh
+--@@ behaviours circuitPack-equipmentHolder-explicitlyCreateBeh referenced but never defined!
+--@@ BehaviourReference references undefined "":circuitPack-equipmentHolder-explicitlyCreateBeh
+--@@ behaviours circuitPackBehaviour referenced but never defined!
+--@@ BehaviourReference references undefined "":circuitPackBehaviour
+--@@ behaviours equipmentHolder-equipmentHolderBeh referenced but never defined!
+--@@ BehaviourReference references undefined "":equipmentHolder-equipmentHolderBeh
+--@@ behaviours equipmentHolderBehaviour referenced but never defined!
+--@@ BehaviourReference references undefined "":equipmentHolderBehaviour
+--@@ behaviours equipmentNameBindingBehaviour referenced but never defined!
+--@@ BehaviourReference references undefined "":equipmentNameBindingBehaviour
+--@@ BehaviourReference references undefined "":equipmentNameBindingBehaviour
+--@@ behaviours inhibitAudibleVisualLocalAlarmBehaviour referenced but never defined!
+--@@ BehaviourReference references undefined "":inhibitAudibleVisualLocalAlarmBehaviour
+--@@ behaviours managedElement-organizationBeh referenced but never defined!
+--@@ BehaviourReference references undefined "":managedElement-organizationBeh
+--@@ behaviours managedElement-organizationalUnitBeh referenced but never defined!
+--@@ BehaviourReference references undefined "":managedElement-organizationalUnitBeh
+--@@ behaviours managedElementComplex-organizationBeh referenced but never defined!
+--@@ BehaviourReference references undefined "":managedElementComplex-organizationBeh
+--@@ behaviours managedElementComplex-organizationalUnitBeh referenced but never defined!
+--@@ BehaviourReference references undefined "":managedElementComplex-organizationalUnitBeh
+--@@ behaviours network-organizationBeh referenced but never defined!
+--@@ BehaviourReference references undefined "":network-organizationBeh
+--@@ behaviours network-organizationalUnitBeh referenced but never defined!
+--@@ BehaviourReference references undefined "":network-organizationalUnitBeh
+--@@ behaviours networkDefinition referenced but never defined!
+--@@ BehaviourReference references undefined "":networkDefinition
+--@@ behaviours softwareNameBindingBehaviour referenced but never defined!
+--@@ BehaviourReference references undefined "":softwareNameBindingBehaviour
+--@@ BehaviourReference references undefined "":softwareNameBindingBehaviour
+--@@ BehaviourReference references undefined "":softwareNameBindingBehaviour
+--@@ behaviours tmnCommunicationsAlarmInformationBehaviour referenced but never defined!
+--@@ BehaviourReference references undefined "":tmnCommunicationsAlarmInformationBehaviour
+--@@ behaviours trailTerminationPointNameBindingBehaviour referenced but never defined!
+--@@ BehaviourReference references undefined "":trailTerminationPointNameBindingBehaviour
+--@@ BehaviourReference references undefined "":trailTerminationPointNameBindingBehaviour
+--@@ actions resetAudibleAlarm referenced but never defined!
+--@@ ActionReference references undefined "Recommendation Q.821:1992":resetAudibleAlarm
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ +- itut_x723::subsystem
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_m3100::managedElementR1
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ +- itut_m3100::gtp
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::tpPool
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

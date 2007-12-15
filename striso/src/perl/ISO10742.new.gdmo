@@ -1,0 +1,2025 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 18:56:01 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Document "ISO/IEC 10742 : 1994"
+--  { joint-iso-itu-t datalink-layer(15) management(0) } >--
+--< GDMO.Namespace iso_10742 >--
+--< GDMO.Alias "ISO/IEC 10742 : 1994" "DLM",
+--  "ISO/IEC 10742 : 1994 Amd. 1 1995",
+--  "ISO/IEC 10742 : 1994 Amd. 2 1995",
+--  "ISO/IEC 10742 : 1994 Amd. 3 1996",
+--  "ISO/IEC 10742",
+--  "ITU-T Rec. X.282 (1999)",
+--  "ITU-T Rec. X.282",
+--  "Rec. X.282",
+--  "DML",
+--  "DLMO" >--
+MODULE "ISO/IEC 10742 : 1994" { joint-iso-itu-t datalink-layer(15) management(0) }
+-- 5.2 Common Data Link Layer GDMO definitions
+-- Behaviours
+
+commonCreationDeletion-B BEHAVIOUR
+	DEFINED AS
+		Managed object class imports the Rec. X.721 | ISO/IEC 10165-2 objectCreation 
+		and/or objectDeletion notifications. Used as follows:
+
+		objectCreation - Generated whenever an instance of the managed object class is 
+		created. Implementations may optionally include the sourceIndicator parameter in 
+		the notification. If creation occurred as a result of internal operation of the 
+		resource, the value 'resourceOperation' is used. If creation occurred in 
+		response to a management operation, the value 'managementOperation' is used. A 
+		value of 'unknown' may be returned if it is not possible to determine the source 
+		of the operation. None of the other optional parameters are used.
+
+		objectDeletion - Generated whenever an instance of the managed object class is 
+		deleted. Implementations may optionally include the sourceIndicator parameter in 
+		the notification. If deletion occurred as a result of internal operation of the 
+		resource, the value 'resourceOperation' is used. If deletion occurred in 
+		response to a management operation, the value 'managementOperation' is used. A 
+		value of 'unknown' may be returned if it is not possible to determine the source 
+		of the operation. None of the other optional parameters are used.;
+
+
+commonStateChange-B BEHAVIOUR
+	DEFINED AS
+		Managed object class imports the Rec. X.721 | ISO/IEC 10165-2 stateChange 
+		notification. Used to report the changes to the operationalState attribute, and 
+		where present, the administrativeState attribute. A single parameter set is 
+		included in the State change definition field. Only the (mandatory) attributeId 
+		and (optional) newAttributeValue parameters are used.;
+-- Attribute Groups
+
+
+timers ATTRIBUTE GROUP
+	-- Empty group definition. Timer attributes are added to the group in 
+	-- package definitions.
+	DESCRIPTION
+		The group of all timer attributes;
+REGISTERED AS { DLM.agoi timers(1) };
+-- 5.3 The Data Link Subsystem managed object
+-- There shall be exactly one of these managed objects within a system. 
+-- It exists to provide a container for all managed objects in a system, 
+-- that relate to the operation of the Datalink layer.
+--
+-- The datalinkSubsystem managed object cannot be created or deleted 
+-- explicitly by management operation. It exists inherently in a system; 
+-- created and deleted as part of system operation.
+
+
+datalinkSubsystem MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":subsystem;
+	CHARACTERIZED BY
+		datalinkSubsystem-P PACKAGE
+			ATTRIBUTES
+				"GMI":subsystemId
+					INITIAL VALUE DLM.datalinkSubsystemId-Value
+					GET;;;
+REGISTERED AS { DLM.moi datalinkSubsystem(1) };
+-- Name Bindings
+-- IMPORT "GMI":subsystem-system NAME BINDING
+-- 5.4 The Data Link Entity managed object
+-- The generic DLE MO from which protocol- and media-specific DLE MOs 
+-- may be derived.
+
+
+datalinkEntity MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":communicationsEntity;
+	CHARACTERIZED BY
+		datalinkEntity-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B,
+				commonStateChange-B;
+			ATTRIBUTES
+				providerEntityNames REPLACE-WITH-DEFAULT GET-REPLACE;
+			ATTRIBUTE GROUPS
+				"DMI":state
+					"DMI":operationalState;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion,
+				"DMI":stateChange;;;
+REGISTERED AS { DLM.moi datalinkEntity(2) };
+-- Name Bindings
+-- IMPORT "GMI":communicationsEntity-subsystem NAME BINDING
+
+
+datalinkEntity-datalinkSubsystem-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS datalinkEntity AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS datalinkSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":communicationsEntityId;
+	BEHAVIOUR
+		datalinkEntity-datalinkSubsystem-Management-B BEHAVIOUR
+			DEFINED AS
+				The name binding which applies when a datalinkEntity managed object (or an 
+				instance of a subclass of the datalinkEntity MO class) can be created by 
+				management as a subordinate object of the datalinkSubsystem managed object (or 
+				subclass), and deleted by management.;;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { DLM.nboi datalinkEntity-datalinkSubsystem-Management(1) };
+-- Attributes
+
+
+providerEntityNames ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.GroupObjects;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		providerEntityNames-B BEHAVIOUR
+			DEFINED AS
+				The distinguished names of provider entity managed objects. The managed objects 
+				that represent the entities to be used to provide services to this entity.;;
+REGISTERED AS { DLM.aoi providerEntityNames(11) };
+-- 5.5 The Data Link Service Access Point managed object
+-- The dLSAP managed object class is used to represent a service access 
+-- point at which services are provided by a DLE to the user entity. 
+-- Instances of the dLSAP managed object class are contained within 
+-- instances of subclasses derived from the datalinkEntity managed object 
+-- class. Constraints on the number of contained dLSAP MOs and any 
+-- specific semantics of the attributes are given as part of the definition 
+-- of the containing DLE managed object class.
+--
+-- A dLSAP managed object may be created and deleted explicitly by 
+-- management operation or created and deleted automatically as part of 
+-- system operation, e.g. when a user of the Data Link layer service 
+-- requests and is granted use of the service. The mechanism by which 
+-- this happens is a local matter and not subject to OSI standardization.
+
+
+dLSAP MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":sap1;
+REGISTERED AS { DLM.moi dLSAP(13) };
+-- Name Bindings
+-- IMPORT "GMI":sap1-communicationsEntity NAME BINDING
+
+
+dLSAP-datalinkEntity-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS dLSAP AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS datalinkEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":sapId;
+	BEHAVIOUR
+		dLSAP-datalinkEntity-Management-B BEHAVIOUR
+			DEFINED AS
+				The name binding which applies when a dLSAP managed object (or an instance of a 
+				subclass of the dLSAP MO class) can be created by management as a subordinate 
+				object of a datalinkEntity managed object (or subclasses), and deleted by 
+				management.;;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { DLM.nboi dLSAP-datalinkEntity-Management(2) };
+-- 5.6 The LAPB Data Link Entity managed object
+-- There may be multiple instances of the lAPBDLE managed object in a system. Systems not 
+-- supporting the LAPB Data Link procedures defined in ISO/IEC 7776 are not required 
+-- to support the lAPBDLE and contained managed objects.
+--
+-- The lAPBDLE managed object has a conditional mlp Package. There may 
+-- be multiple instances of lAPBDLE MO in a system, both with and without 
+-- the mlp Package. For those instances in which the package is absent, 
+-- the mlp procedures do not apply and the lAPBDLE MO may contain at 
+-- most one sLPPM MO. For those instances in which the package is 
+-- present, the mlp procedures do apply and the lAPBDLE MO may contain 
+-- multiple instances of sLPPM MO.
+--
+-- A lAPBDLE MO may contain at most one dLSAP MO. The value of the 
+-- sap1Address attribute is of no significance. The cardinality of the 
+-- userEntityNames attribute is limited to one.
+--
+-- A lAPBDLE MO may be created and deleted explicitly by 
+-- management operation or created and deleted automatically as 
+-- part of system operation.
+--
+-- When the lAPBDLE MO is operable, the operationalState shall 
+-- have the value 'enabled'; otherwise it shall have the value 'disabled'. 
+-- Transitions of operationalState shall be reported using the 
+-- stateChange notification.
+
+
+lAPBDLE MANAGED OBJECT CLASS
+	DERIVED FROM
+		datalinkEntity;
+	CONDITIONAL PACKAGES
+		mLP-P
+			PRESENT IF
+				lAPBDLE supports mlp procedures,
+		mT2-P
+			PRESENT IF
+				lAPBDLE supports mlp procedures and mT2 timer.,
+		mLP-Counters-P
+			PRESENT IF
+				ITU-T DCE mode operation is supported;
+REGISTERED AS { DLM.moi lAPBDLE(3) };
+-- Packages
+
+
+mLP-P PACKAGE
+	BEHAVIOUR
+		mLP-P-B BEHAVIOUR
+			DEFINED AS
+				Additional properties of an lAPBDLE MO, present when mlp procedures supported.;;
+	ATTRIBUTES
+		mT1Timer REPLACE-WITH-DEFAULT GET-REPLACE,
+		mT3Timer REPLACE-WITH-DEFAULT GET-REPLACE,
+		mW REPLACE-WITH-DEFAULT GET-REPLACE,
+		mX REPLACE-WITH-DEFAULT GET-REPLACE;
+	ATTRIBUTE GROUPS
+		timers
+			mT1Timer
+			mT3Timer;
+REGISTERED AS { DLM.poi mLP-P(1) };
+
+
+mT2-P PACKAGE
+	BEHAVIOUR
+		mT2-P-B BEHAVIOUR
+			DEFINED AS
+				Additional properties present when mT2 timer is supported.;;
+	ATTRIBUTES
+		mT2Timer REPLACE-WITH-DEFAULT GET-REPLACE;
+	ATTRIBUTE GROUPS
+		timers
+			mT2Timer;
+REGISTERED AS { DLM.poi mT2-P(5) };
+
+
+mLP-Counters-P PACKAGE
+	BEHAVIOUR
+		mLP-Counters-P-B BEHAVIOUR
+			DEFINED AS
+				Additional properties present when ITU-T DCE mode operation is supported.;;
+	ATTRIBUTES
+		receivedMlpResets REPLACE-WITH-DEFAULT GET-REPLACE,
+		timesMT1Expired REPLACE-WITH-DEFAULT GET-REPLACE,
+		iFramesReassignments REPLACE-WITH-DEFAULT GET-REPLACE,
+		mlpFramesReceived REPLACE-WITH-DEFAULT GET-REPLACE,
+		mlpFramesSent REPLACE-WITH-DEFAULT GET-REPLACE,
+		mlpFramesOutsideWindowGuard REPLACE-WITH-DEFAULT GET-REPLACE,
+		receivedMlpFramesInGuardRegion REPLACE-WITH-DEFAULT GET-REPLACE;
+REGISTERED AS { DLM.poi mLP-Counters-P(6) };
+-- Attributes
+
+
+mT1Timer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		mT1Timer-B BEHAVIOUR
+			DEFINED AS
+				Value of the ISO/IEC 7776 parameter MT1 (lost frame timer). Unit is seconds.;;
+REGISTERED AS { DLM.aoi mT1Timer(12) };
+
+
+mT2Timer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		mT2Timer-B BEHAVIOUR
+			DEFINED AS
+				Value of the ISO/IEC 7776 parameter MT2 (group busy timer). Unit is seconds.;;
+REGISTERED AS { DLM.aoi mT2Timer(13) };
+
+
+mT3Timer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		mT3Timer-B BEHAVIOUR
+			DEFINED AS
+				Value of the ISO/IEC 7776 parameter MT3 (mlp reset confirmation timer). Unit is 
+				seconds.;;
+REGISTERED AS { DLM.aoi mT3Timer(14) };
+
+
+iFramesReassignments ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		iFramesReassignments-B BEHAVIOUR
+			DEFINED AS
+				Counter. Number of reassignments of IFrames on another slp.;;
+REGISTERED AS { DLM.aoi iFramesReassignments(46) };
+
+
+mlpFramesReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		mlpFramesReceived-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of mlp frames received.;;
+REGISTERED AS { DLM.aoi mlpFramesReceived(52) };
+
+
+mlpFramesSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		mlpFramesSent-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of mlp frames Sent.;;
+REGISTERED AS { DLM.aoi mlpFramesSent(53) };
+
+
+mlpFramesOutsideWindowGuard ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		mlpFramesOutsideWindowGuard-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of mlp frames outside the window guard that have been 
+				received.;;
+REGISTERED AS { DLM.aoi mlpFramesOutsideWindowGuard(54) };
+
+
+mW ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.WindowSize;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		mW-B BEHAVIOUR
+			DEFINED AS
+				MLP window size.;;
+REGISTERED AS { DLM.aoi mW(47) };
+
+
+mX ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.MX;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		mX-B BEHAVIOUR
+			DEFINED AS
+				Receive MLP window in the Guard Region.;;
+REGISTERED AS { DLM.aoi mX(48) };
+
+
+receivedMlpFramesInGuardRegion ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		receivedMlpFramesInGuardRegion-B BEHAVIOUR
+			DEFINED AS
+				Counter. Number of MLP Frames received in the Guard Region.;;
+REGISTERED AS { DLM.aoi receivedMlpFramesInGuardRegion(49) };
+
+
+receivedMlpResets ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		receivedMlpResets-B BEHAVIOUR
+			DEFINED AS
+				Counter. Number of received MLP Resets.;;
+REGISTERED AS { DLM.aoi receivedMlpResets(50) };
+
+
+timesMT1Expired ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		timesMT1Expired-B BEHAVIOUR
+			DEFINED AS
+				Counter. Lost multilink frames.;;
+REGISTERED AS { DLM.aoi timesMT1Expired(51) };
+-- 5.7 The LAPB Single Link Protocol Machine managed object
+-- The sLPPM managed object represents the operation of the LAPB Data 
+-- Link layer protocol machine described in ISO/IEC 7776 over a single physical 
+-- link.  An sLPPM managed object may contain at most one sLPConnection 
+-- MO and one or more sLPConnectionIVMO.
+--
+-- An sLPPM MO may be created and deleted explicitly by 
+-- management operation or created and deleted automatically as 
+-- part of system operation.
+--
+-- When the sLPPM MO is operable, the operationalState shall 
+-- have the value 'enabled'; otherwise it shall have the value 'disabled'. 
+-- Transitions of operationalState shall be reported using the 
+-- stateChange notification.
+
+
+sLPPM MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":coProtocolMachine;
+	CHARACTERIZED BY
+		sLPPM-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B,
+				commonStateChange-B;
+			ATTRIBUTE GROUPS
+				"DMI":state
+					"DMI":operationalState;
+			ACTIONS
+				"GMI":activate,
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion,
+				"DMI":stateChange;;;
+REGISTERED AS { DLM.moi sLPPM(4) };
+-- Name Bindings
+-- IMPORT "GMI":coProtocolMachine-entity NAME BINDING
+
+
+sLPPM-lAPBDLE-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS sLPPM AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS lAPBDLE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":coProtocolMachineId;
+	BEHAVIOUR
+		sLPPM-lAPBDLE-Management-B BEHAVIOUR
+			DEFINED AS
+				The name binding which applies when a sLPPM managed object (or an instance of a 
+				subclass of the sLPPM MO class) can be created by management as a subordinate 
+				object of a lAPBDLE managed object (or subclass), and deleted by management.;;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { DLM.nboi sLPPM-lAPBDLE-Management(3) };
+-- 5.8 The LAPB Single Link Protocol Connection managed object
+-- The sLPConnection managed object represents the local view of a 
+-- connection between LAPB DLEs over a single physical link.
+-- An sLPConnection MO is created automatically as part of system 
+-- operation.
+-- An sLPConnection MO may be deleted automatically as part of system 
+-- operation or may be deleted as a result of the deactivate or delete 
+-- management operations.
+-- An sLPConnectionIVMO may be used as the source of 
+-- initial values of attributes of an sLPConnection MO.
+
+
+sLPConnection MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":singlePeerConnection;
+	CHARACTERIZED BY
+		commonSLPConnection-P,
+		sLPConnection-P;
+	CONDITIONAL PACKAGES
+		t3-P
+			PRESENT IF
+				Optional Timer T3 of ISO/IEC 7776 is supported or ITU-T DCE mode operation is 
+				supported.,
+		t4-P
+			PRESENT IF
+				Timer T4 of ISO 7776 or ITU-T DCE mode is supported,
+		link-reset-disconnect-n2-P
+			PRESENT IF
+				supported;
+REGISTERED AS { DLM.moi sLPConnection(5) };
+-- Packages
+
+
+commonSLPConnection-P PACKAGE
+	BEHAVIOUR
+		commonCreationDeletion-B;
+	ATTRIBUTES
+		interfaceType REPLACE-WITH-DEFAULT
+			DEFAULT VALUE DLM.interfaceTypeDefault-- dTE
+			GET-REPLACE,
+		k REPLACE-WITH-DEFAULT GET-REPLACE,
+		n1 REPLACE-WITH-DEFAULT GET-REPLACE,
+		n2 REPLACE-WITH-DEFAULT GET-REPLACE,
+		sequenceModulus REPLACE-WITH-DEFAULT GET-REPLACE,
+		t1Timer REPLACE-WITH-DEFAULT GET-REPLACE,
+		t2Timer REPLACE-WITH-DEFAULT GET-REPLACE;
+	ATTRIBUTE GROUPS
+		timers
+			t1Timer
+			t2Timer;
+	NOTIFICATIONS
+		"DMI":objectCreation,
+		"DMI":objectDeletion;;-- not registered
+
+
+sLPConnection-P PACKAGE
+	BEHAVIOUR
+		commonDeactivateConnection-B,
+		commonStateChange-B,
+		fRMRReceivedCommunicationsAlarm-B;
+	ATTRIBUTES
+		fCSErrorsReceived GET,
+		fRMRsReceived GET,
+		fRMRsSent GET,
+		iFrameDataOctetsReceived GET,
+		iFrameDataOctetsSent GET,
+		iFramesReceived GET,
+		iFramesSent GET,
+		pollsReceived GET,
+		rEJsReceived GET,
+		rEJsSent GET,
+		rNRsReceived GET,
+		rNRsSent GET,
+		sABMsReceived GET,
+		sABMsSent GET,
+		sLPProtocolState GET,
+		timesT1Expired GET;
+	ATTRIBUTE GROUPS
+		"GMI":counters
+			fCSErrorsReceived
+			fRMRsReceived
+			fRMRsSent
+			iFrameDataOctetsReceived
+			iFrameDataOctetsSent
+			iFramesReceived
+			iFramesSent
+			pollsReceived
+			rEJsReceived
+			rEJsSent
+			rNRsReceived
+			rNRsSent
+			sABMsReceived
+			sABMsSent
+			timesT1Expired,
+		"DMI":state
+			sLPProtocolState;
+	ACTIONS
+		"GMI":deactivate;
+	NOTIFICATIONS
+		"DMI":communicationsAlarm
+			fRMR;
+	-- NOTE  The fRMR parameter is carried
+	-- as additionalInformation in the communicationsAlarm.
+	;-- not registered
+
+
+t3-P PACKAGE
+	BEHAVIOUR
+		t3-P-B BEHAVIOUR
+			DEFINED AS
+				Present if the optional Timer T3 is supported.;;
+	ATTRIBUTES
+		t3Timer REPLACE-WITH-DEFAULT GET-REPLACE,
+		timesT3Expired GET;
+	ATTRIBUTE GROUPS
+		"GMI":counters
+			timesT3Expired,
+		timers
+			t3Timer;
+REGISTERED AS { DLM.poi t3-P(2) };
+
+
+link-reset-disconnect-n2-P PACKAGE
+	BEHAVIOUR
+		link-reset-disconnect-n2-P-B BEHAVIOUR
+			DEFINED AS
+				Present if supported.;;
+	ATTRIBUTES
+		abnormalLinkDisconnectsReceived GET,
+		abnormalLinkDisconnectsSent GET,
+		linkResetsReceived GET,
+		linkResetsSent GET,
+		timesN2Reached GET;
+	ATTRIBUTE GROUPS
+		"GMI":counters
+			abnormalLinkDisconnectsReceived
+			abnormalLinkDisconnectsSent
+			linkResetsReceived
+			linkResetsSent
+			timesN2Reached;
+REGISTERED AS { DLM.poi link-reset-disconnect-n2-P(4) };
+
+
+t4-P PACKAGE
+	BEHAVIOUR
+		t4-P-B BEHAVIOUR
+			DEFINED AS
+				Present if the Timer T4 is supported.;;
+	ATTRIBUTES
+		t4Timer REPLACE-WITH-DEFAULT GET-REPLACE,
+		timesT4Expired GET;
+	ATTRIBUTE GROUPS
+		"GMI":counters
+			timesT4Expired,
+		timers
+			t4Timer;
+REGISTERED AS { DLM.poi t4-P(7) };
+-- Behaviours
+
+
+commonDeactivateConnection-B BEHAVIOUR
+	DEFINED AS
+		Managed object class imports the Recommendation X.723 | ISO/IEC 10165 deactivate 
+		action. The deactivate action causes the connection to be terminated. The 
+		termination should occur as rapidly as practical, but no particular time 
+		constraints are implied. Typically, this action simulates a disconnect request 
+		received across the service interface. If a more rapid means for terminating the 
+		connection exists, then this should be used. The termination shall occur in 
+		conformance to the protocol standard.
+
+		The Managed Object remains in existence after completion of the deactivate 
+		action. It is subsequently deleted when the connection is terminated, in the 
+		same way as if the connection had been terminated by other means. A deactivate 
+		action may fail (with the ProcessingFailure response) if it is temporarily not 
+		possible to terminate the connection.;
+
+
+fRMRReceivedCommunicationsAlarm-B BEHAVIOUR
+	DEFINED AS
+		Managed object imports the Recommendation X.721 | ISO/IEC 10165-2 
+		communicationsAlarm notification. Used to report the following conditions:
+
+		fRMRReceived - A FRMR frame is received. The received FRMR frame is reported as 
+		additionalInformation in the notification, using the fRMR parameter. The 
+		significance sub-parameter shall be set as described above.
+
+		The probableCause parameter is set to the value communicationsProtocolError.
+
+		The value DLM.fRMRReceived shall be reported in the specificProblems parameter. 
+		In addition, the reason why the frame was sent is also returned in 
+		specificProblems. Values are specified in the DLM ASN.1 module for 
+		controlFieldUndefinedOrUnimplemented, infoFieldLengthGreaterThanMaximum, 
+		invalidNR, formatError, and nonSpecific.
+
+		The perceivedSeverity parameter is set to the value Minor. A subsequent 
+		communicationsAlarm with a perceivedSeverity value of Cleared is not generated. 
+		No other parameters are used.;
+
+
+sLPConnection-sLPPM-Automatic-B BEHAVIOUR
+	DEFINED AS
+		The name binding which applies when an sLPConnection managed object (or an 
+		instance of a subclass of the sLPConnection MO class) is created automatically 
+		by the operation of the system as a subordinate object of an sLPPM managed 
+		object (or subclass), and deleted automatically.
+
+		The creation of an instance of an sLPConnection MO (or subclass) using this name 
+		binding may reference an instance of the sLPConnectionIVMO (or subclass). The 
+		means by which an instance (if any) of the sLPConnectionIVMO are identified are 
+		a local matter. When this occurs, some of the initial values of the attributes 
+		of the instance of the sLPConnection MO may be supplied by the values of the 
+		attributes in the specified instance of sLPConnectionIVMO.
+
+		However, any such value may be overridden by a value supplied by local means 
+		(for example across an internal interface). Where values are supplied by the 
+		IVMO, the initial value of an attribute of the sLPConnection MO shall be the 
+		value of the corresponding attribute in the sLPConnectionIVMO (that is, which 
+		has the same attribute template label). The naming attribute of the 
+		sLPConnection MO is assigned a value according to local mechanisms.;
+
+
+sLPConnection-sLPPM-Management-B BEHAVIOUR
+	DEFINED AS
+		The name binding which applies when an sLPConnection managed object (or an 
+		instance of a subclass of the sLPConnection MO class) which is a subordinate 
+		object of an sLPPM managed object (or subclass), can be deleted by management.;
+-- Name Bindings
+
+
+sLPConnection-sLPPM-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS sLPConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sLPPM AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":connectionId;
+	BEHAVIOUR
+		sLPConnection-sLPPM-Automatic-B;
+REGISTERED AS { DLM.nboi sLPConnection-sLPPM-Automatic(4) };
+
+
+sLPConnection-sLPPM-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS sLPConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sLPPM AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":connectionId;
+	BEHAVIOUR
+		sLPConnection-sLPPM-Automatic-B,
+		sLPConnection-sLPPM-Management-B;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { DLM.nboi sLPConnection-sLPPM-Management(5) };
+-- Attributes
+
+
+fCSErrorsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		fCSErrorsReceived-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of frames received with a bad frame check.;;
+REGISTERED AS { DLM.aoi fCSErrorsReceived(15) };
+
+
+fRMRsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		fRMRsReceived-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of FRMR frames received.;;
+REGISTERED AS { DLM.aoi fRMRsReceived(1) };
+
+
+fRMRsSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		fRMRsSent-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of FRMR frames sent.;;
+REGISTERED AS { DLM.aoi fRMRsSent(2) };
+
+
+iFrameDataOctetsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		iFrameDataOctetsReceived-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of data octets received in I frames. Only data octets in 
+				new I frames are counted, i.e. retransmitted frames that are received do not 
+				cause the counter to be incremented.;;
+REGISTERED AS { DLM.aoi iFrameDataOctetsReceived(16) };
+
+
+iFrameDataOctetsSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		iFrameDataOctetsSent-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of data octets sent in I frames. Only data octets in new I 
+				frames are counted, i.e. retransmitted frames that are sent do not cause the 
+				counter to be incremented.;;
+REGISTERED AS { DLM.aoi iFrameDataOctetsSent(17) };
+
+
+iFramesReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		iFramesReceived-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of I frames received. Only new I frames are counted, i.e. 
+				retransmitted frames that are received do not cause the counter to be 
+				incremented.;;
+REGISTERED AS { DLM.aoi iFramesReceived(3) };
+
+
+iFramesSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		iFramesSent-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of I frames sent. Only new I frames are counted, i.e. 
+				retransmitted frames that are sent do not cause the counter to be incremented.;;
+REGISTERED AS { DLM.aoi iFramesSent(4) };
+
+
+interfaceType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.InterfaceType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		interfaceType-B BEHAVIOUR
+			DEFINED AS
+				Determines the address mode used by the local DTE.;;
+REGISTERED AS { DLM.aoi interfaceType(18) };
+
+
+k ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.WindowSize;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		k-B BEHAVIOUR
+			DEFINED AS
+				Value of the ISO/IEC 7776 parameter k. The maximum number of sequentially 
+				numbered I frames that a DTE may have outstanding (i.e. unacknowledged) at any 
+				given time.;;
+REGISTERED AS { DLM.aoi k(19) };
+
+
+n1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.MaximumIFrameSize;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		n1-B BEHAVIOUR
+			DEFINED AS
+				Value of the ISO/IEC 7776 parameter N1. The maximum number of bits in an I frame 
+				(excluding flags and "0" bits inserted for transparency).;;
+REGISTERED AS { DLM.aoi n1(20) };
+
+
+n2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		n2-B BEHAVIOUR
+			DEFINED AS
+				Value of the ISO/IEC 7776 parameter N2. The maximum number of attempts that 
+				shall be made to complete the successful transmission of a frame.;;
+REGISTERED AS { DLM.aoi n2(21) };
+
+
+pollsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		pollsReceived-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of command frames received with P-bit set.;;
+REGISTERED AS { DLM.aoi pollsReceived(22) };
+
+
+rEJsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		rEJsReceived-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of REJ frames received.;;
+REGISTERED AS { DLM.aoi rEJsReceived(5) };
+
+
+rEJsSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		rEJsSent-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of REJ frames sent.;;
+REGISTERED AS { DLM.aoi rEJsSent(6) };
+
+
+rNRsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		rNRsReceived-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of RNR frames received.;;
+REGISTERED AS { DLM.aoi rNRsReceived(7) };
+
+
+rNRsSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		rNRsSent-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of RNR frames sent.;;
+REGISTERED AS { DLM.aoi rNRsSent(8) };
+
+
+sABMsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		sABMsReceived-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of SABM frames received.;;
+REGISTERED AS { DLM.aoi sABMsReceived(9) };
+
+
+sABMsSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		sABMsSent-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of SABM frames sent.;;
+REGISTERED AS { DLM.aoi sABMsSent(10) };
+
+
+sLPProtocolState ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.SLPProtocolState;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sLPProtocolState-B BEHAVIOUR
+			DEFINED AS
+				Local state of a LAPB (SLP) connection.;;
+REGISTERED AS { DLM.aoi sLPProtocolState(23) };
+
+
+sequenceModulus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.SequenceModulus;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sequenceModulus-B BEHAVIOUR
+			DEFINED AS
+				Determines basic (modulo 8) or extended (modulo 128) operation.;;
+REGISTERED AS { DLM.aoi sequenceModulus(24) };
+
+
+t1Timer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		t1Timer-B BEHAVIOUR
+			DEFINED AS
+				Value of the ISO/IEC 7776 parameter Timer T1. Unit is hundreds of milliseconds.;;
+REGISTERED AS { DLM.aoi t1Timer(25) };
+
+
+t2Timer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		t2Timer-B BEHAVIOUR
+			DEFINED AS
+				Value of the ISO/IEC 7776 parameter T2. Unit is hundreds of milliseconds.;;
+REGISTERED AS { DLM.aoi t2Timer(26) };
+
+
+t3Timer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		t3Timer-B BEHAVIOUR
+			DEFINED AS
+				Value of the ISO/IEC 7776 optional parameter or ITU-T X.25 mandatory parameter 
+				T3. Unit is seconds.;;
+REGISTERED AS { DLM.aoi t3Timer(27) };
+
+
+t4Timer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		t4Timer-B BEHAVIOUR
+			DEFINED AS
+				Value of the ISO/IEC 7776 parameter T4. The maximum time a DTE or a DCE will 
+				allow without frames being exchanged on the data link. Unit is seconds.;;
+REGISTERED AS { DLM.aoi t4Timer(28) };
+
+
+timesT1Expired ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		timesT1Expired-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of times the local Timer T1 expired.;;
+REGISTERED AS { DLM.aoi timesT1Expired(29) };
+
+
+timesT3Expired ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		timesT3Expired-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of times local Timer T3 expired.;;
+REGISTERED AS { DLM.aoi timesT3Expired(30) };
+
+
+timesT4Expired ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		timesT4Expired-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of times local Timer T4 expired.;;
+REGISTERED AS { DLM.aoi timesT4Expired(32) };
+
+
+abnormalLinkDisconnectsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		abnormalLinkDisconnectsReceived-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of received abnormal Link Disconnects.;;
+REGISTERED AS { DLM.aoi abnormalLinkDisconnectsReceived(41) };
+
+
+abnormalLinkDisconnectsSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		abnormalLinkDisconnectsSent-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of sent abnormal Link Disconnects.;;
+REGISTERED AS { DLM.aoi abnormalLinkDisconnectsSent(42) };
+
+
+linkResetsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		linkResetsReceived-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of received Link Resets.;;
+REGISTERED AS { DLM.aoi linkResetsReceived(43) };
+
+
+linkResetsSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		linkResetsSent-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of sent Link Resets.;;
+REGISTERED AS { DLM.aoi linkResetsSent(44) };
+
+
+timesN2Reached ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		timesN2Reached-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of times N2 was Reached.;;
+REGISTERED AS { DLM.aoi timesN2Reached(45) };
+-- Parameters
+
+
+fRMR PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX DLM.FRMRSyntax;
+	BEHAVIOUR
+		fRMR-B BEHAVIOUR
+			DEFINED AS
+				FRMR frame. Returned as additionalInformation in a communicationsAlarm 
+				notification when specificProblems has the value DLM.fRMRReceived.;;
+REGISTERED AS { DLM.proi fRMR(1) };
+-- 5.9 The LAPB Single Link Protocol Connection Initial Values managed object
+-- An sLPConnectionIVMO may be used to supply initial values for the
+-- attributes of sLPConnection MOs. Different instances of sLPConnectionIVMO may
+-- contain different initial values.
+--
+-- An sLPConnectionIVMO may be created and deleted explicitly by management operation.
+
+
+sLPConnectionIVMO MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		commonSLPConnection-P,
+		sLPConnectionIVMO-P;
+	CONDITIONAL PACKAGES
+		t3IVMO-P
+			PRESENT IF
+				optional Timer T3 of ISO/IEC 7776 is supported or ITU-T DCE mode operation is 
+				supported.,
+		t4IVMO-P
+			PRESENT IF
+				Timer T4 of ISO/IEC 7776 or ITU-T DCE mode is supported.;
+REGISTERED AS { DLM.moi sLPConnectionIVMO(6) };
+-- Packages
+
+
+sLPConnectionIVMO-P PACKAGE
+	ATTRIBUTES
+		sLPConnectionIVMOId GET;;-- not registered
+
+
+t3IVMO-P PACKAGE
+	BEHAVIOUR
+		t3IVMO-P-B BEHAVIOUR
+			DEFINED AS
+				Present if the optional Timer T3 is supported.;;
+	ATTRIBUTES
+		t3Timer REPLACE-WITH-DEFAULT GET-REPLACE;
+	ATTRIBUTE GROUPS
+		timers
+			t3Timer;
+REGISTERED AS { DLM.poi t3IVMO-P(3) };
+
+
+t4IVMO-P PACKAGE
+	BEHAVIOUR
+		t4IVMO-P-B BEHAVIOUR
+			DEFINED AS
+				Present if the Timer T4 is supported.;;
+	ATTRIBUTES
+		t4Timer REPLACE-WITH-DEFAULT GET-REPLACE,
+		timesT4Expired GET;
+	ATTRIBUTE GROUPS
+		"GMI":counters
+			timesT4Expired,
+		timers
+			t4Timer;
+REGISTERED AS { DLM.poi t4IVMO-P(8) };
+-- Name Bindings
+
+
+sLPConnectionIVMO-sLPPM-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS sLPConnectionIVMO AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sLPPM AND SUBCLASSES;
+	WITH ATTRIBUTE
+		sLPConnectionIVMOId;
+	BEHAVIOUR
+		sLPConnectionIVMO-sLPPM-B BEHAVIOUR
+			DEFINED AS
+				The name binding which applies when an sLPConnectionIVMO managed object (or an 
+				instance of a subclass of the sLPConnectionIVMO MO class) can be created by 
+				management as a subordinate object of a sLPPM managed object (or subclass), and 
+				deleted by management.;;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { DLM.nboi sLPConnectionIVMO-sLPPM-Management(6) };
+-- Attributes
+
+
+sLPConnectionIVMOId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.NamingString;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sLPConnectionIVMOId-B BEHAVIOUR
+			DEFINED AS
+				Naming attribute for the sLPConnectionIVMO managed object.;;
+REGISTERED AS { DLM.aoi sLPConnectionIVMOId(31) };
+-- 5.10 The MAC Data Link Entity managed object
+-- There may be multiple instances of the mACDLE managed object in a system.  
+-- Systems not supporting connections to LAN media are not required to support 
+-- the mACDLE and contained managed objects.
+--
+-- A mACDLE managed object may contain at most one instance of a mac-specific MO 
+-- derived from the generic mAC MO.  A mACDLE MO may contain at most one dLSAP 
+-- MO.  The value of the sap1Address attribute is of no significance.  The 
+-- cardinality of the userEntityNames attribute is limited to one.
+--
+-- A mACDLE MO may be created and deleted explicitly by management operation or 
+-- created and deleted automatically as part of system operation.
+--
+-- When the mACDLE MO is operable, the operationalSate shall have the value 
+-- 'enabled'; otherwise it shall have the value 'disabled'.  Transitions of 
+-- operationalState shall be reported using the stateChange notification.
+
+
+mACDLE MANAGED OBJECT CLASS
+	DERIVED FROM
+		datalinkEntity;
+REGISTERED AS { DLM.moi mACDLE(7) };
+-- Name Bindings
+-- IMPORT "GMI":communicationsEntity-subsystem NAME BINDING
+-- datalinkEntity-datalinkSubsystem-Management NAME BINDING
+-- 5.11 The MAC managed object
+-- The generic MAC MO from which media-specifc MAC MOs may be derived.
+
+
+mAC MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		mAC-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B,
+				commonStateChange-B;
+			ATTRIBUTES
+				"DMI":operationalState GET,
+				mACId GET;
+			ATTRIBUTE GROUPS
+				"DMI":state
+					"DMI":operationalState,
+				"GMI":couters;
+			ACTIONS
+				"GMI":activate,
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion,
+				"DMI":stateChange;;;
+REGISTERED AS { DLM.moi mAC(8) };
+-- Name Bindings
+
+
+mAC-mACDLE-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS mAC AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS mACDLE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		mACId;
+	BEHAVIOUR
+		mAC-mACDLE-Automatic-B BEHAVIOUR
+			DEFINED AS
+				The name binding which applies when a mAC managed object (or an instance of a 
+				subclass of the mAC MO class) is created automatically by the operation of the 
+				system as a subordinate object of a mACDLE managed object (or subclass), and 
+				deleted automatically.;;
+REGISTERED AS { DLM.nboi mAC-mACDLE-Automatic(7) };
+
+
+mAC-mACDLE-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS mAC AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS mACDLE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		mACId;
+	BEHAVIOUR
+		mAC-mACDLE-Management-B BEHAVIOUR
+			DEFINED AS
+				The name binding which applies when a mAC managed object (or an instance of a 
+				subclass of the mAC MO class) can be created by management as a subordinate 
+				object of a mACDLE managed object (or subclass), and deleted by management.;;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { DLM.nboi mAC-mACDLE-Management(8) };
+-- Attributes
+
+
+framesReceivedOK ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		framesReceivedOK-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of frames successfully received. These are frames that 
+				passed address and protocol type filtering and include multicast frames. This 
+				provides a gross measurement of incoming MAC usage by the local subsystem and 
+				information that can be used in conjunction with other coutners to determine the 
+				ration of error conditions to successful receives or to approximate average 
+				received frame size.;;
+REGISTERED AS { DLM.aoi framesReceivedOK(32) };
+
+
+framesTransmittedOK ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		framesTransmittedOK-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of frames successfully transmitted. This provides a gross 
+				measurement of outgoing MAC usage by the local system and information that can 
+				be used in conjunction with other counters to determine the ratio of error 
+				conditions to successful transmits or to approximate average transmit frame 
+				size.;;
+REGISTERED AS { DLM.aoi framesTransmittedOK(33) };
+
+
+localMACAddresses ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.MACAddresses;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		localMACAddresses-B BEHAVIOUR
+			DEFINED AS
+				MAC address(es) of the local system.;;
+REGISTERED AS { DLM.aoi localMACAddresses(34) };
+
+
+mACAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.MACAddress;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		mACAddress-B BEHAVIOUR
+			DEFINED AS
+				Octet string of fixed length of 6 octets (48 bit MAC address) or 8 octets (60 
+				bit 802.6 MAC address). Used to represent a MAC address of a LAN or MAN station. 
+				This attribute is readable, and may also be writable if the specific use to 
+				which it is put permits modification of its contents. See Annex B, MACAddress 
+				Attribute for furhter behaviour definition.;;
+REGISTERED AS { IEEE802CommonDefinitions.partf attribute(7) macaddress(0) };
+
+
+mACId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.NamingString;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		mACId-B BEHAVIOUR
+			DEFINED AS
+				The naming attribute for the mAC MO.;;
+REGISTERED AS { DLM.aoi mACId(36) };
+
+
+multicastFramesReceivedOK ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		multicastFramesReceivedOK-B BEHAVIOUR
+			DEFINED AS
+				Counter. Number of multicast frames successfully received. In conjunction with 
+				total frames received, it provides a gross percentage of the MAC medium usage 
+				for multicast frames received by the local system.;;
+REGISTERED AS { DLM.aoi multicastFramesReceivedOK(37) };
+
+
+multicastFramesTransmittedOK ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		multicastFramesTransmittedOK-B BEHAVIOUR
+			DEFINED AS
+				Coutner. Number of multicast frames transmitted. It is a subset of the 
+				framesSent counter. In conjunction with total frames sent, it provides a gross 
+				percentage of the MAC medium usage for multicast frames transmitted by the local 
+				system.;;
+REGISTERED AS { DLM.aio multicastFramesTransmittedOK(38) };
+
+
+octetsReceivedOK ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		octetsReceivedOK-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of MAC user octets successfully received. This does not 
+				include MAC headers. These are the octets from frames that passed address and 
+				protocol type filtering for both individual and multicast MAC addresses. When 
+				the frames Received counter is used to calculate protocol overhead, the overhead 
+				plus octetsReceived provides a measurement of the amount of MAC bandwidth 
+				consumed by frames received by the local system.;;
+REGISTERED AS { DLM.aoi octetsReceivedOK(39) };
+
+
+octetsTransmittedOK ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		octetsTransmittedOK-B BEHAVIOUR
+			DEFINED AS
+				Counter. Total number of MAC user octets successfully transmitted. This does not 
+				include MAC headers. When the number of frames sent is used to calculate 
+				protocol overhead, the overhead plus octetsSent provides a measurement of the 
+				amout of MAC bandwidth (over time) consumed by frames sent by the local system. 
+				The counter is not incremented until a frame has been successfully transmitted.;;
+REGISTERED AS { DLM.aoi octetsTransmittedOK(40) };
+-- 5.12 The LLC Data Link Entity managed object
+-- There may be multiple instances of the lLCDLE managed object in a system.  
+-- Systems not supporting LLC procedures are not required to support the lLCDLE 
+-- and contained managed objects.
+--
+-- An lLCDLE managed object may contain instances of llc-specific connectionless 
+-- and connection-mode protocol machine MOs derived form the generic lLCCOPM and 
+-- lLCCLPM MO.  An lLCDLE MO may contain multiple dLSAP MOs.  The cardinality of 
+-- the userEntityNames attribute is limited to one.
+--
+-- An lLCDLE MO may be created and deleted explicity by management operation or 
+-- created and deleted automatically as part of ssytem operation.
+--
+-- When the lLCDLE MO is operable, the operationalState shall have the value 
+-- 'enabled'; otherwise it shall have the value 'disabled'.  Transitions of 
+-- operationalState shall be reported using the stateChange notification.
+
+
+lLCDLE MANAGED OBJECT CLASS
+	DERIVED FROM
+		datalinkEntity;
+REGISTERED AS { DLM.moi lLCDLE(9) };
+-- Name Bindings
+-- IMPORT "GMI":communicationsEntity-subsystem NAME BINDING
+-- datalinkEntity-datalinkSubsystem-Management NAME BINDING
+-- 5.13 The LLC Connectionless Protocol Machine managed object
+-- The generic LLC Connectionless PM MO form which protocol-specific LLC PM MOs 
+-- may be derived.
+
+
+lLCCLPM MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":clProtocolMachine;
+	CHARACTERIZED BY
+		lLCCLPM-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B,
+				commonStateChange-B;
+			ATTRIBUTE GROUPS
+				"DMI":state
+					"DMI":operationalState;
+			ACTIONS
+				"GMI":activate,
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion,
+				"DMI":stateChange;;;
+REGISTERED AS { DLM.moi lLCCLPM(10) };
+-- Name Bindings
+-- IMPORT "GMI":clProtocolMachine-entity NAME BINDING
+
+
+lLCCLPM-lLCDLE-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS lLCCLPM AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS lLCDLE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":clProtocolMachineId;
+	BEHAVIOUR
+		lLCCLPM-lLCDLE-Management-B BEHAVIOUR
+			DEFINED AS
+				The name binding which applies when an lLCCLPM managed object (or an instance of 
+				a subclass of the lLCCLPM MO class) can be created by management as a 
+				subordinate object of a lLCDLE managed object (or subclasses), and deleted by 
+				management.;;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { DLM.nboi lLCCLPM-lLCDLE-Management(9) };
+-- 5.14 The LLC Connection-mode Protocol Machine managed object
+-- The generic LLC Connection-mode PM MO from which protocol specific LLC PM MOs 
+-- may be derived.
+
+
+lLCCOPM MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":clProtocolMachine;
+	CHARACTERIZED BY
+		lLCCOPM-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B,
+				commonStateChange-B;
+			ATTRIBUTE GROUPS
+				"DMI":state
+					"DMI":operationalState;
+			ACTIONS
+				"GMI":activate,
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion,
+				"DMI":stateChange;;;
+REGISTERED AS { DLM.moi lLCCOPM(11) };
+-- Name Bindings
+-- IMPORT "GMI":coProtocolMachine-entity NAME BINDING
+
+
+lLCCOPM-lLCDLE-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS lLCCOPM AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS lLCDLE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":coProtocolMachineId;
+	BEHAVIOUR
+		lLCCOPM-lLCDLE-Management-B BEHAVIOUR
+			DEFINED AS
+				The name binding which applies when a lLCCOPM managed object (or an instance of 
+				a subclass of the lLCCOPM MO class) can be created by management as a 
+				subordinate object of a lLCDLE managed object (or subclass), and deleted by 
+				management.;;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { DLM.nboi lLCCOPM-lLCDLE-Management(10) };
+-- Annex B
+-- B.4.1 The ResourceTypeId managed object
+-- The resourceTypeId managed object class can be used within IEEE 802 LAN/MAN resources to 
+-- identify information about the managed system.  This managed object can be used to identify 
+-- any resource within a LAN/MAN system.  The information is provided by the manufacturer, 
+-- however, and is read-only.  Support of the resourceTypeId managed object is strongly recommended.
+
+
+resourceTypeId MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		resourceTypeId-P PACKAGE
+			ATTRIBUTES
+				resourceTypeIdName GET,
+				resourceInfo GET;;;
+REGISTERED AS { IEEE802CommonDefinitions.partf managedObjectClass(3) resourcetypeid(0) };
+-- Name Bindings
+
+
+resourceTypeId-lLCDLE-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS resourceTypeId AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS lLCDLE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		resourceTypeIdName;
+	BEHAVIOUR
+		resourceTypeId-lLCDLE-Automatic-B BEHAVIOUR
+			DEFINED AS
+				The name binding which applies when a resourceTypeId managed object (or an 
+				instance of a subclass of the resourceTypeId class) is created automatically by 
+				the operation of the system as a subordinate object of an lLCDLE managed object 
+				(or subclass), and deleted automatically.;;
+REGISTERED AS { DLM.nboi resourceTypeId-lLCDLE-Automatic(11) };
+
+
+resourceTypeId-mACDLE-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS resourceTypeId AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS mACDLE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		resourceTypeIdName;
+	BEHAVIOUR
+		resourceTypeId-mACDLE-Automatic-B BEHAVIOUR
+			DEFINED AS
+				The name binding which applies when a resourceTypeId managed object (or an 
+				instance of a subclass of the resourceTypeId class) is created automatically by 
+				the operation of the system as a subordinate object of a mACDLE managed object 
+				(or subclass), and deleted automatically.;;
+REGISTERED AS { DLM.nboi resourceTypeId-mACDLE-Automatic(12) };
+-- Note: In IEEE 802.1F there is only one Name Binding,
+-- REGISTERED AS { IEEE802CommonDefinitions.partf nameBinding(6) resourcetypeid-system(0) }.
+-- Attributes
+
+
+resourceTypeIdName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.ResourceTypeIdName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		resourceTypeIdName-B BEHAVIOUR
+			DEFINED AS
+				Contains the name of the resourceTypeId managed object. The attribute is 
+				read-only and always contains the value 'RTID'. This attribute shall not be used 
+				as a naming attribute for any other managed object class.;;
+REGISTERED AS { IEEE802CommonDefinitions.partf attribute(7) restypeidname(1) };
+
+
+resourceInfo ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.ResourceInfo;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		resourceInfo-B BEHAVIOUR
+			DEFINED AS
+				Manufacturer-supplied infor describing the resource.
+
+				A structured atttribute that specifies:
+
+				ManufacturerOUI. This takes the value of a valid instance of the orgnizationally 
+				unique identifier described in section 5.1 of IEEE 802.1 Overview and 
+				Architecture.
+
+				ManufacturerName. This identifies the manufacturer of the resource. Global 
+				assignment of unique strings is outside the scope of this standard.
+
+				ManufacturerProductName. This is the manufacturer-defined product name.
+
+				ManufacturerProdcutVersion. This is the manufacturer-defined product revision 
+				designation.;;
+REGISTERED AS { IEEE802CommonDefinitions.partf attribute(7) resourceinfo(2) };
+-- B.4.2 The Scanner managed object
+-- The scanner managed object class is a superclass from which the eWMAMetricMonitor 
+-- managed object class is derived.  It defines facilities for periodically sampling the value of a 
+-- specified attribute within a specified object.  The scanner managed object class is never 
+-- instantiated.
+
+
+scanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		scanner-P PACKAGE
+			BEHAVIOUR
+				scanner-P-B BEHAVIOUR
+					DEFINED AS
+						See 'scanner Behaviour' in clause B.3.1.2.;;
+			ATTRIBUTES
+				"DMI":administrativeState GET-REPLACE,
+				"DMI":operationalState GET,
+				granularityPeriod GET-REPLACE,
+				scannerid GET;;;
+	CONDITIONAL PACKAGES
+		configurationEventsReporting-P
+			PRESENT IF
+				configuration event reporting is supported.;
+REGISTERED AS { IEEE802CommonDefinitions.partf managedObjectClass(3) scanner(1) };
+-- Packages
+
+
+configurationEventsReporting-P PACKAGE
+	BEHAVIOUR
+		configurationEventsReporting-P-B BEHAVIOUR
+			DEFINED AS
+				See clause B.6.2.2. 'Configuration Events Reporting Package'.;;
+	NOTIFICATIONS
+		"DMI":attributeValueChange,
+		"DMI":objectCreation,
+		"DMI":objectDeletion,
+		"DMI":stateChange;
+REGISTERED AS { IEEE802CommonDefinitions.partf package(4) configchangereport(1) };
+-- Attributes
+
+
+granularityPeriod ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.TimePeriod;
+	MATCHES FOR EQUALITY, ORDERING;
+REGISTERED AS { IEEE802CommonDefinitions.partf attribute(7) granulariryperiod(8) };
+
+
+scannerId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.ScannerId;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { IEEE802CommonDefinitions.partf attribute(7) scannerid(3) };
+-- B.4.3 The Exponentially Weighted Moving Average Metric Monitor managed object
+-- The eWMAMetricMonitor managed object class is defined as a subclass of the scanner 
+-- managed object class.  Support of the eWMAMetricMonitor managed object is optional.
+
+
+eWMAMetricMonitor MANAGED OBJECT CLASS
+	DERIVED FROM
+		scanner;
+	CHARACTERIZED BY
+		eWMAMetricMonitor-P PACKAGE
+			BEHAVIOUR
+				eWMAMetricMonitor-P-B;
+			ATTRIBUTES
+				derivedGuage GET-REPLACE
+					derivedGaugeNotCurrent,
+				estimateOfMean GET-REPLACE,
+				movingTimePeriod GET-REPLACE,
+				observedAttributeId GET-REPLACE,
+				observedManagedObjectInstance GET-REPLACE,
+				severityIndicatingThreshold GET-REPLACE ADD-REMOVE;
+			NOTIFICATIONS
+				"DMI":qualityofServiceAlarm;;;
+	CONDITIONAL PACKAGES
+		counterDifference-P
+			PRESENT IF
+				"counter to gauge conversion is requested",
+		counterOverflow-P
+			PRESENT IF
+				"the counterDifference-P package is present and modulo arithmetic is required to 
+				calculate the new value of the derived gauge on counter overflow";
+REGISTERED AS { IEEE802CommonDefinitions.partf managedObjectClass(3) ewmametrictmonitor(2) };
+-- Packages
+
+
+counterDifference-P PACKAGE
+	BEHAVIOUR
+		counterDifference-P-B;
+	ATTRIBUTES
+		counterTMinusGP GET-REPLACE;
+REGISTERED AS { IEEE802CommonDefinitions.partf package(4) counterdifference(0) };
+
+
+counterOverflow-P PACKAGE
+	BEHAVIOUR
+		counterOverflow-P-B;
+	ATTRIBUTES
+		counterModulus GET-REPLACE;
+REGISTERED AS { IEEE802CommonDefinitions.partf package(4) countermodulus(2) };
+-- Behaviours
+
+
+eWMAMetricMonitor-P-B BEHAVIOUR
+	DEFINED AS
+		See "EWMA Metric Monitor Behavior" in clause B.3.1.3. for general behaviour of 
+		this object. The detailed smoothing algorithm for estimateOfMean is as follows:
+
+		The estimate of the mean (estimateOfMean), ~V(t), is defined to be a weighted 
+		moving average of a gauge, ~V[t]. The specified weighting is exponential. The 
+		algorithm has the property that more recent event occurrences in the moving time 
+		period are "weighted" more heavily than older occurrences. The exponentially 
+		weighted moving average (EWMA) is defined by the following recursive algorithm.
+
+		~V[t] = ~V[t - GP] + GP * (V[t] - ~V[t - GP])/T1
+
+		where
+
+		t, is the current value of time,
+
+		V[t], is the value of the gauge (derivedGuage) at time t,
+
+		~V[t], is the estimate of the mean (estimateOfMean) of the gauge V[t] at time t,
+
+		~V[t - GP], is the estimate of the mean of the gauge V[t] at time (t-GP), the 
+		last estimate of the mean,
+
+		GP, is the time between the last observation of V[t] and the current observation 
+		constrained to be a positive value larger than zero (granularityPeriod). It is 
+		sufficient to have a best effort to make GP a constant value.
+
+		T1, is the time constant of the exponentially weighted moving average with the 
+		same units as GP. T1 is defined by the equation T = (MTP + GP)/2.
+
+		MTP, is the moving time period (movingTimePeriod) over which the mean is 
+		estimated.
+
+		MTP must be greater than or equal to GP. Therefore the value of T1 is greater 
+		than or equal to GP.
+
+		When GP = MTP the calculated mean value for the gauge becomes the current gauge 
+		value, i.e. ~V[t] = V[t].
+
+		Both GP and MTP can be reset by the managing system. This mean time period, T1, 
+		can be chosen to be integer multiples of the granularity period, GP.
+
+		The initial condition (or reset condition) of the EWMA of the estimated mean is 
+		provided by setting the estimateOfMean attribute.
+
+		The units of ~V[t] are the same as the units of the gauge to which the estimate 
+		of the mean is applied.;
+
+
+counterDifference-P-B BEHAVIOUR
+	DEFINED AS
+		V[t] = [counter[t] - counter[t-GP]]
+
+		where
+
+		V[t], is the difference between successive observations of the counter,
+
+		counter[t], is the value of the counter at the current time t (not save in any 
+		attribute),
+
+		counter[t-GP], is the previous value of the counter at time t-GP (i.e., 
+		counterTMinusGP),
+
+		GP, is the sampling interval in units of time (Granularity Period).
+
+		The initial value of counter[t-GP] determines the initial difference value.
+
+		Whenever the metric object transitions from locked to unlocked status, the first 
+		scan is treated in a special manner.
+
+		On first scan
+
+		counter[t-GP] <- observed counter
+
+		derivedGuage <- unspecified, if retrieved returns error parameter
+
+		pDerivedGuageNotCurrent
+
+		estimateOfMean <- either as initialized or value when last locked
+
+		On second or subsequent scans
+
+		read observed counter
+
+		derivedGuage <- observed counter - counter[t-GP]
+
+		counter[t-GP] <- observed counter
+
+		estimate of mean <- results of EWMA summarization function;
+
+
+severityIndicatingThreshold-B BEHAVIOUR
+	DEFINED AS
+		This attribute type has all the behaviour of a gauge-threshold attribute type, 
+		as defined in clause 8.4.2 of ISO/IEC 10165-2. As an enhancement to the syntax 
+		of the gauge-Threshold attribute type it adds an optional severityIndication 
+		parameter to the syntax of both the notifyHigh and notifyLow submembers within 
+		each threshold level member. This attribute type has additional behaviour 
+		associated with these optional perceivedSeverity indication parameters, which is 
+		defined as follows:
+
+		- If the notify-high's switch is on, the notify-high's severityIndication value 
+		  shall be reported in the perceivedSeverity parameter of any notification 
+		  triggered by the gauge value crossing the notify-high's guageThreshold value 
+		  in the positive going direction.
+
+		- If the notify-low's switch is on, the notify-low's severityIndication value 
+		  shall be reported in the perceivedSeverity parameter of any notification 
+		  triggered by the gauge value corssing the notify-low's guageThreshold value in 
+		  the negative going direction.
+
+		If both swtiches are on for a single thresholdLevel, one of the 
+		severityIndication values shall be "clear".;
+
+
+counterOverflow-P-B BEHAVIOUR
+	DEFINED AS
+		The gauge value derived (V[t]) is calculated using the following method:
+
+		If [counter[t] - counter[t-GP]] is positive
+
+		V[t] is evaluated as defined by bCounterDifference behaviour
+
+		If [counter[t] - coutner[t-GP]] is negative
+
+		V[t] = [counter[t] - counter[t-GP] + modulus value].
+
+		If the value of the modulus value attribute is zero the actual modulus value 
+		used to evaluate V[t] is a local matter.;
+-- Name Bindings
+
+
+eWMAMetricMonitor-lLCDLE-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS eWMAMetricMonitor AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS lLCDLE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		scannerId;
+	BEHAVIOUR
+		eWMAMetricMonitor-lLCDLE-Management-B BEHAVIOUR
+			DEFINED AS
+				See "scanner Behaviour" in clause B.3.1.2 and "eWMAMetricMonitor Behavior" in 
+				clause B.3.1.3.;;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { DLM.nboi eWMAMetricMonitor-lLCDLE-Management(13) };
+
+
+eWMAMetricMonitor-mACDLE-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS eWMAMetricMonitor AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS mACDLE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		scannerId;
+	BEHAVIOUR
+		eWMAMetricMonitor-mACDLE-Management-B BEHAVIOUR
+			DEFINED AS
+				See "scanner Behaviour" in clause B.3.1.2 and "eWMAMetricMonitor Behaviour" in 
+				clause B.3.1.3.;;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { DLM.nboi eWMAMetricMonitor-mACDLE-Management(14) };
+-- Note: In IEEE 802.1F there is only one Name Binding,
+-- REGISTERED AS { IEEE802CommonDefinitions.partf nameBinding(6) ewmametricmonitor-system(1) }.
+-- Attributes
+
+
+counterTMinusGP ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+REGISTERED AS { IEEE802CommonDefinitions.partf attribute(7) countertminusgp(4) };
+-- Note: In IEEE 802.1F "DERIVED FROM" refers to "DMI":counter instead.
+
+
+counterModulus ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+REGISTERED AS { IEEE802CommonDefinitions.partf attribute(7) countermodulus(5) };
+-- Note: in IEEE 802.1F "DERIVED FROM" referes to "DMI":counter instead.
+
+
+derivedGuage ATTRIBUTE
+	DERIVED FROM
+		"DMI":gauge;
+REGISTERED AS { IEEE802CommonDefinitions.partf attribute(7) derivedGuage(6) };
+
+
+estimateOfMean ATTRIBUTE
+	DERIVED FROM
+		"DMI":gauge;
+REGISTERED AS { IEEE802CommonDefinitions.partf attribute(7) estimateofmean(7) };
+
+
+observedAttributeId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.AttributeId;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { IEEE802CommonDefinitions.partf attribute(7) observedattributeid(9) };
+-- Note: In IEEE 802.1F "WITH ATTRIBUTE SYNTAX" referes to "ISO/IEC 9596-1:1991, CMIP" instead.
+
+
+observedManagedObjectInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX DLM.ObjectInstance;
+REGISTERED AS { IEEE802CommonDefinitions.partf attribute(7) observedmanagedobjectinstance(10) };
+-- Note: In IEEE 802.1F "WITH ATTRIBUTE SYNTAX" refers to "ISO/IEC 9596-1:1992, CMIP" instead.
+
+
+severityIndicatingThreshold ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.SeverityIndGaugeThreshold;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		severityIndicatingThreshold-B;
+REGISTERED AS { IEEE802CommonDefinitions.partf attribute(7) severityindicatingthreshold(11) };
+
+
+movingTimePeriod ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.TimePeriod;
+	MATCHES FOR EQUALITY, ORDERING;
+REGISTERED AS { IEEE802CommonDefinitions.partf attribute(7) movingtimeperiod(12) };
+-- Parameters
+
+
+derivedGaugeNotCurrent PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX IEEE802CommonDefinitions.DerivedGaugeNotCurrentType;
+	BEHAVIOUR
+		derivedGaugeNotCurrent-B BEHAVIOUR
+			DEFINED AS
+				Derived gauge set to an inconsistent value. May occur during the first scan 
+				interval after transitioning to the unlocked state or whcn the counter 
+				difference derives a negative value. The syntax of the parameter permits the 
+				recipient of the operation to return the values of all attributes referenced by 
+				the Set operation.;;
+REGISTERED AS { IEEE802CommonDefinitions.partf parameter(5) derivedgaugenotcurrent(0) };
+-- Annex E
+-- (informative)
+-- Additional attributes and action required for systems
+--
+-- E.1 Introduction
+--
+-- In complete intermediate systems, such as a repeater, some attributes and actions are necessary to fill out the 
+-- management of a complete system.  These items are generic in the sense that they are required for managed systems in 
+-- general.  The following items are defined to aid in the completeness of this International Standard, although it is 
+-- recognized that they are outside the bounds of the definition are for a layer 2 standard.
+--
+-- E.2 Scope
+--
+-- This annex defines additional attributes and an action that are necessary to the management of a complete 
+-- intermediate system such as a repeater.  They are not specifically related to a Data Link Management Standard.
+--
+-- When a generic systems management standard is available with these definitions (or similar), it is expected that this 
+-- portion of this International Standard will be removed.
+--
+-- E.3 Attributes and Action
+--
+-- Attributes
+
+
+aTimeSinceSystemReset ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AttributeModule.ResettableCounter32;
+	BEHAVIOUR
+		bTimeSinceSystemReset BEHAVIOUR
+			DEFINED AS
+				The time in test of milliseconds since the last time that the system, including 
+				network management was reset. This may have been caused by ResetSystemAction or 
+				other means. This counter has a value of 0 when intialized.
+
+				Though the count is reported in tens of milliseconds, the required resolution is 
+				to the nearest 100ms. The clocking source for the counter shall be accurate to 
+				within 1 % through the full counting range.;;
+	-- NOTE: The approximate minimum time for counter rollover is 497 days.
+	REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot3(10006) releaterMgt(19) attribute(7) sysResetTime(47) };
+
+
+aRepeaterResetTimeStamp ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AttributeModule.Integer32;
+	BEHAVIOUR
+		bRepeaterResetTimeStamp BEHAVIOUR
+			DEFINED AS
+				Not a counter, this attribute provides the value of TimeSinceSystemReset when 
+				the repeater enters the START state. This value may never be greater than 
+				aTimeSinceSystemReset.;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot3(10006) repeaterMgt(19) attribute(7) repeaterResetTimeStamp(48) };
+-- Action
+
+
+acRsetSystemAction ACTION
+	BEHAVIOUR
+		acResetSystem BEHAVIOUR
+			DEFINED AS
+				This action initializes the resettable management counters of the system and 
+				also of all contained objects. The value of non-resettable counters may change 
+				as a result of this action.;;
+	-- NOTE: This action may result in the loss of packets.
+	MODE CONFIRMED;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot3(10006) repeaterMgt(19) action(9) resetSystem(49) };
+
+END
+--< GDMO.EndDocument "ISO/IEC 10742 : 1994"
+--  { joint-iso-itu-t datalink-layer(15) management(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ |  +- iso_10742::datalinkEntity
+--@@ |  |  +- iso_10742::lAPBDLE
+--@@ |  |  +- iso_10742::mACDLE
+--@@ |  |  +- iso_10742::lLCDLE
+--@@ +- itut_x723::clProtocolMachine
+--@@ |  +- iso_10742::lLCCLPM
+--@@ |  +- iso_10742::lLCCOPM
+--@@ +- itut_x723::coProtocolMachine
+--@@ |  +- iso_10742::sLPPM
+--@@ +- itut_x723::sap1
+--@@ |  +- iso_10742::dLSAP
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ |  +- iso_10742::sLPConnection
+--@@ +- itut_x723::subsystem
+--@@ |  +- iso_10742::datalinkSubsystem
+--@@ +- iso_10742::sLPConnectionIVMO
+--@@ +- iso_10742::mAC
+--@@ +- iso_10742::resourceTypeId
+--@@ +- iso_10742::scanner
+--@@ |  +- iso_10742::eWMAMetricMonitor
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ iso_10742::lAPBDLE
+--@@ >- iso_10742::sLPPM
+--@@ |  >- iso_10742::sLPConnection
+--@@ |  >- iso_10742::sLPConnection
+--@@ |  >- iso_10742::sLPConnectionIVMO
+--@@ iso_10742::mACDLE
+--@@ >- iso_10742::mAC
+--@@ >- iso_10742::mAC
+--@@ >- iso_10742::resourceTypeId
+--@@ >- iso_10742::eWMAMetricMonitor
+--@@ iso_10742::lLCDLE
+--@@ >- iso_10742::lLCCLPM
+--@@ >- iso_10742::lLCCOPM
+--@@ >- iso_10742::resourceTypeId
+--@@ >- iso_10742::eWMAMetricMonitor
+--@@ iso_10742::datalinkSubsystem
+--@@ >- iso_10742::datalinkEntity
+--@@ |  >- iso_10742::dLSAP
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

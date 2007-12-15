@@ -1,0 +1,2052 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 19:17:24 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Include "Q.822.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Document "ITU-T Rec. M.3641 (1994)"
+--  { itu(0) recommendation(0) m(13) m3641(3641) informationModel(0) } >--
+--< GDMO.Namespace itut_m3641 >--
+MODULE "ITU-T Rec. M.3641 (1994)" { itu(0) recommendation(0) m(13) m3641(3641) informationModel(0) }
+-- 2 Managed object classes
+-- 2.1 Access port ISDN2)
+
+accessPortISDN MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100 : 1992":trailTerminationPointBidirectional;
+	CHARACTERIZED BY
+		accessPortISDN-package;
+REGISTERED AS { m3641ManagedObjectClass 1 };
+-- 2.2 D Channel2)
+
+
+dChannel MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100 : 1992":connectionTerminationPointBidirectional;
+	CHARACTERIZED BY
+		dChannel-package;
+REGISTERED AS { m3641ManagedObjectClass 2 };
+-- 2.3 D-channel log
+
+
+dChannelLog MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":log;
+	CHARACTERIZED BY
+		dChannelLog-package;
+REGISTERED AS { m3641ManagedObjectClass 3 };
+-- 2.4 Error frames log record
+
+
+errorFramesLogRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":eventLogRecord;
+	CHARACTERIZED BY
+		errorFramesLogRecord-package;
+REGISTERED AS { m3641ManagedObjectClass 4 };
+-- 2.5 Invalid frames log record
+
+
+invalidFramesLogRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":eventLogRecord;
+	CHARACTERIZED BY
+		invalidFramesLogRecord-package;
+REGISTERED AS { m3641ManagedObjectClass 5 };
+-- 2.6 Managed data link D-channel
+
+
+mgdDataLinkDChannel MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		mgdDataLinkDChannel-package;
+	CONDITIONAL PACKAGES
+		invalidFramesNotification-package
+			PRESENT IF
+				"the events of invalid frame received are to be logged3).";
+REGISTERED AS { m3641ManagedObjectClass 6 };
+-- 2.7 Managed data link current data
+
+
+mgdDataLinkCurrentData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation Q.822 : 1993":currentData;
+	CHARACTERIZED BY
+		"Recommendation Q.822 : 1993":thresholdPkg,
+		mgdDataLinkCurrentData-package;
+	CONDITIONAL PACKAGES
+		invalidFramesCurrentData-package
+			PRESENT IF
+				"the events of invalid frame received are to be counted4).";
+REGISTERED AS { m3641ManagedObjectClass 7 };
+-- 2.8 Managed data link history data
+
+
+mgdDataLinkHistoryData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation Q.822 : 1993":historyData;
+	CHARACTERIZED BY
+		mgdDataLinkHistoryData-package;
+	CONDITIONAL PACKAGES
+		invalidFramesHistoryData-package
+			PRESENT IF
+				"the events of invalid frame received are to be counted4)";
+REGISTERED AS { m3641ManagedObjectClass 8 };
+-- 2.9 Managed network layer D-channel
+
+
+mgdNetwLayerDChannel MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":top;
+	CHARACTERIZED BY
+		mgdNetwLayerDChannel-package;
+	CONDITIONAL PACKAGES
+		otherSpecialMessageNotification-package
+			PRESENT IF
+				"the events of other special message received are to be logged5).",
+		messageCallRefErrorNotification-package
+			PRESENT IF
+				"the events of message Call Reference Error detected are to be logged6).";
+REGISTERED AS { m3641ManagedObjectClass 9 };
+-- 2.10 Managed network layer current data
+
+
+mgdNetwLayerCurrentData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation Q.822 : 1993":currentData;
+	CHARACTERIZED BY
+		"Recommendation Q.822 : 1993":thresholdPkg,
+		mgdNetwLayerCurrentData-package;
+	CONDITIONAL PACKAGES
+		otherSpecialMessageCurrentData-package
+			PRESENT IF
+				"the events of other special message received are to be counted5).",
+		messageCallRefErrorCurrentData-package
+			PRESENT IF
+				"the events of message Call Reference Error detected are to be counted6).";
+REGISTERED AS { m3641ManagedObjectClass 10 };
+-- 2.11 Managed network layer history data
+
+
+mgdNetwLayerHistoryData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation Q.822 : 1993":historyData;
+	CHARACTERIZED BY
+		mgdNetwLayerHistoryData-package;
+	CONDITIONAL PACKAGES
+		otherSpecialMessageHistoryData-package
+			PRESENT IF
+				"the events of other special message received are to be counted5).",
+		messageCallRefErrorHistoryData-package
+			PRESENT IF
+				"the events of message Call Reference Error detected are to be counted7).";
+REGISTERED AS { m3641ManagedObjectClass 11 };
+-- 2.12 Message call reference error log record
+
+
+messageCallRefErrorLogRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":eventLogRecord;
+	CHARACTERIZED BY
+		messageCallRefErrorLogRecord-package;
+REGISTERED AS { m3641ManagedObjectClass 12 };
+-- 2.13 Other special message log record
+
+
+otherSpecialMessageLogRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":eventLogRecord;
+	CHARACTERIZED BY
+		otherSpecialMessageLogRecord-package;
+REGISTERED AS { m3641ManagedObjectClass 13 };
+-- 2.14 Special message type log record
+
+
+specialMessageTypeLogRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":eventLogRecord;
+	CHARACTERIZED BY
+		specialMessageTypeLogRecord-package;
+REGISTERED AS { m3641ManagedObjectClass 14 };
+-- 2.15 Timer expiry network log record
+
+
+timerExpiryNetworkLogRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":eventLogRecord;
+	CHARACTERIZED BY
+		timerExpiryNetworkLogRecord-package;
+REGISTERED AS { m3641ManagedObjectClass 15 };
+-- 2.16 Unexpected frames log record
+
+
+unexpectedFramesLogRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721 : 1992":eventLogRecord;
+	CHARACTERIZED BY
+		unexpectedFramesLogRecord-package;
+REGISTERED AS { m3641ManagedObjectClass 16 };
+-- 3 Packages
+-- 3.1 Access port ISDN
+
+
+accessPortISDN-package PACKAGE
+	BEHAVIOUR
+		accessPortISDNBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package is contained by the access port ISDN object which reflects the 
+				management view of the termination of an ISDN D-channel on a switch.";;
+REGISTERED AS { m3641Package 1 };
+-- 3.2 D-channel
+
+
+dChannel-package PACKAGE
+	BEHAVIOUR
+		dChannelBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package is contained by the D-channel object which reflects the management 
+				view of an ISDN D-channel on a switch.";;
+REGISTERED AS { m3641Package 2 };
+-- 3.3 D-channel log
+
+
+dChannelLog-package PACKAGE
+	BEHAVIOUR
+		dChannelLogBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the notification which will be sent by the dChannelLog 
+				object instance in case the D-channel Log is full and the oldest record in this 
+				log is younger than the value indicated by attribute oldestRecordAge.";;
+	ATTRIBUTES
+		oldestRecordAge GET-REPLACE;
+	NOTIFICATIONS
+		oldestRecordLessThanLimit;
+REGISTERED AS { m3641Package 3 };
+-- 3.4 Error frames log record
+
+
+errorFramesLogRecord-package PACKAGE
+	BEHAVIOUR
+		errorFramesLogRecordBehaviour BEHAVIOUR
+			DEFINED AS
+				"This managed object is used to represent logged information from notifications 
+				received from the mgdDataLinkDChannel managed object in case of detection of the 
+				receipt of error frames.";;
+	ATTRIBUTES
+		errorFrames GET;
+REGISTERED AS { m3641Package 4 };
+-- 3.5 Invalid frames log record
+
+
+invalidFramesLogRecord-package PACKAGE
+	BEHAVIOUR
+		invalidFramesLogRecordBehaviour BEHAVIOUR
+			DEFINED AS
+				"This managed object is used to represent logged information from notifications 
+				received from the mgdDataLinkDChannel managed object in case an invalid frame 
+				other than a frame with an FCS error is received.";;
+	ATTRIBUTES
+		invalidFrames GET;
+REGISTERED AS { m3641Package 5 };
+-- 3.6 Invalid frames current data
+
+
+invalidFramesCurrentData-package PACKAGE
+	BEHAVIOUR
+		invalidFramesCurrentDataBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the noOfInvalidFrames attribute. When this attribute 
+				exceeds a threshold, a qualityofServiceAlarm notification is issued. The 
+				threshold corresponding to this attribute is contained in a thresholdData 
+				managed object. The mgdDataLinkHistoryData object corresponds to the 
+				mgdDataLinkCurrentData object according to the performance management model of 
+				Recommendation Q.822 [2].";;
+	ATTRIBUTES
+		noOfInvalidFrames REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET;
+REGISTERED AS { m3641Package 6 };
+-- 3.7 Invalid frames history data
+
+
+invalidFramesHistoryData-package PACKAGE
+	BEHAVIOUR
+		invalidFramesHistoryDataBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the history data of the noOfInvalidFrames attribute.";;
+	ATTRIBUTES
+		noOfInvalidFrames GET;
+REGISTERED AS { m3641Package 7 };
+-- 3.8 Invalid frames notification
+
+
+invalidFramesNotification-package PACKAGE
+	BEHAVIOUR
+		invalidFramesNotificationBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the notification which will be sent in case an invalid 
+				frame other than a frame with an FCS error is received.";;
+	NOTIFICATIONS
+		invalidFrames;
+REGISTERED AS { m3641Package 8 };
+-- 3.9 Message call reference error current data
+
+
+messageCallRefErrorCurrentData-package PACKAGE
+	BEHAVIOUR
+		messageCallRefErrorCurrentDataBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains an attribute that counts the number of messages with a 
+				call reference error. When this attribute exceeds a threshold, a 
+				qualityofServiceAlarm notification is issued. The threshold corresponding to 
+				this attribute is contained in a thresholdData managed object. The 
+				mgdNetwLayerHistoryData object corresponds to the mgdNetwLayerCurrentData object 
+				according to the performance management model of Recommendation Q.822 [2].";;
+	ATTRIBUTES
+		messageCallReferenceErrors REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET;
+REGISTERED AS { m3641Package 9 };
+-- 3.10 Message call reference error history data
+
+
+messageCallRefErrorHistoryData-package PACKAGE
+	BEHAVIOUR
+		messageCallRefErrorHistoryDataBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the history data of the messageCallReferenceErrors 
+				attribute.";;
+	ATTRIBUTES
+		messageCallReferenceErrors GET;
+REGISTERED AS { m3641Package 10 };
+-- 3.11 Message call reference error log record
+
+
+messageCallRefErrorLogRecord-package PACKAGE
+	BEHAVIOUR
+		messageCallRefErrorLogRecordBehaviour BEHAVIOUR
+			DEFINED AS
+				"This managed object is used to represent logged information from notifications 
+				received from the mgdNetwLayerDChannel managed object in case a message with a 
+				call reference error was detected.";;
+	ATTRIBUTES
+		messageCallRefError GET;
+REGISTERED AS { m3641Package 11 };
+-- 3.12 Message call reference error notification
+
+
+messageCallRefErrorNotification-package PACKAGE
+	BEHAVIOUR
+		messageCallRefErrorNotificationBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the notification which will be sent by the 
+				mgdNetwLayerDChannel object instance in case a message with a call reference 
+				error was detected.";;
+	NOTIFICATIONS
+		messageCallRefError;
+REGISTERED AS { m3641Package 12 };
+-- 3.13 Managed data link D-channel
+
+
+mgdDataLinkDChannel-package PACKAGE
+	BEHAVIOUR
+		mgdDataLinkDChannelBehaviour BEHAVIOUR
+			DEFINED AS
+				"This managed object class reflects the management information for the data link 
+				layer protocol. The major part of this information is for fault and performance 
+				management.";;
+	ATTRIBUTES
+		mgdDataLinkDChannelId GET,
+		"Recommendation X.721 : 1992":operationalState GET;
+	NOTIFICATIONS
+		errorFrames,
+		unexpectedFrames,
+		"Recommendation X.721 : 1992":stateChange;
+REGISTERED AS { m3641Package 13 };
+-- 3.14 Managed data link current data
+
+
+mgdDataLinkCurrentData-package PACKAGE
+	BEHAVIOUR
+		mgdDataLinkCurrentDataBehaviour BEHAVIOUR
+			DEFINED AS
+				"When one of the attributes in this package exceeds a threshold, a 
+				qualityofServiceAlarm notification is issued. The thresholds corresponding to 
+				the attributes are contained in a thresholdData managed object. The 
+				mgdDataLinkHistoryData object is corresponding to the mgdDataLinkCurrentData 
+				object according to the performance management model of Recommendation Q.822 
+				[2].";;
+	ATTRIBUTES
+		noOfFramesWithFCSERROR REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET,
+		noOfFramesReceived REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET,
+		noOfFramesTransmitted REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET,
+		noOfFramesRetransmitted REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET;
+REGISTERED AS { m3641Package 14 };
+-- 3.15 Managed data link history data
+
+
+mgdDataLinkHistoryData-package PACKAGE
+	BEHAVIOUR
+		mgdDataLinkHistoryDataBehaviour BEHAVIOUR
+			DEFINED AS
+				"The managed object, characterized by this package contains the history data of 
+				the performance attributes for layer two of an ISDN D-channel.";;
+	ATTRIBUTES
+		noOfFramesWithFCSERROR GET,
+		noOfFramesReceived GET,
+		noOfFramesTransmitted GET,
+		noOfFramesRetransmitted GET;
+REGISTERED AS { m3641Package15 };
+-- 3.16 Managed network layer D-channel
+
+
+mgdNetwLayerDChannel-package PACKAGE
+	BEHAVIOUR
+		mgdNetwLayerDChannelBehaviour BEHAVIOUR
+			DEFINED AS
+				"This managed object class represents the management view of the basic call 
+				control function in the network layer of the D-channel.";;
+	ATTRIBUTES
+		mgdNetwLayerDChannelId GET,
+		"Recommendation X.721 : 1992":operationalState GET;
+	NOTIFICATIONS
+		timerExpiryNetwork,
+		specialMessageType,
+		"Recommendation X.721 : 1992":stateChange;
+REGISTERED AS { m3641Package 16 };
+-- 3.17 Managed network layer current data
+
+
+mgdNetwLayerCurrentData-package PACKAGE
+	BEHAVIOUR
+		mgdNetwLayerCurrentDataBehaviour BEHAVIOUR
+			DEFINED AS
+				"When one of the attributes in this package exceeds a threshold, a 
+				qualityofServiceAlarm notification is issued. The thresholds corresponding to 
+				the attributes are contained in a thresholdData managed object. The 
+				mgdNetwLayerHistoryData object is corresponding to the mgdNetwLayerCurrentData 
+				object according to the performance management model of Recommendation Q.822 
+				[2].";;
+	ATTRIBUTES
+		messageWithWrongPdi REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET,
+		messagesTooShort REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET,
+		messagesWithGenInfoElemMissing REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET,
+		messagesWithMandInfoElemMissing REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET,
+		noOfT303Expiries REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET,
+		noOfT310Expiries REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET;
+REGISTERED AS { m3641Package 17 };
+-- 3.18 Managed network layer history data
+
+
+mgdNetwLayerHistoryData-package PACKAGE
+	BEHAVIOUR
+		mgdNetwLayerHistoryDataBehaviour BEHAVIOUR
+			DEFINED AS
+				"The managed object, characterized by this package contains the history data of 
+				the attributes it has.";;
+	ATTRIBUTES
+		messageWithWrongPdi GET,
+		messagesTooShort GET,
+		messagesWithGenInfoElemMissing GET,
+		messagesWithMandInfoElemMissing GET,
+		noOfT303Expiries GET,
+		noOfT310Expiries GET;
+REGISTERED AS { m3641Package 18 };
+-- 3.19 Other special message current data
+
+
+otherSpecialMessageCurrentData-package PACKAGE
+	BEHAVIOUR
+		otherSpecialMessageCurrentDataBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains attributes that count the receipt or transmission of 
+				STATUS and RESTART messages. When one of these attributes exceeds a threshold, a 
+				qualityofServiceAlarm notification is issued. The thresholds corresponding to 
+				these attributes are contained in a thresholdData managed objet. The 
+				mgdNetwLayerHistoryData object is corresponding to the mgdNetwLayerCurrentData 
+				object according to the performance management model of Recommendation Q.822 
+				[2].";;
+	ATTRIBUTES
+		sTATUSMessagesReceived REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET,
+		sTATUSMessagesTransmitted REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET,
+		rESTARTMessagesReceived REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET,
+		rESTARTMessagesTransmitted REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultZero
+			GET;
+REGISTERED AS { m3641Package 19 };
+-- 3.20 Other special message log record
+
+
+otherSpecialMessageLogRecord-package PACKAGE
+	BEHAVIOUR
+		otherSpecialMessageLogRecordBehaviour BEHAVIOUR
+			DEFINED AS
+				"This managed object is used to represent logged information from notifications 
+				received from the mgdNetwLayerDChannel managed object in case a STATUS or 
+				RESTART message is received or transmitted.";;
+	ATTRIBUTES
+		otherSpecialMessage GET;
+REGISTERED AS { m3641Package 20 };
+-- 3.21 Other special message notification
+
+
+otherSpecialMessageNotification-package PACKAGE
+	BEHAVIOUR
+		otherSpecialMessageNotificationBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the notification which will be sent by the 
+				mgdNetwLayerDChannel object instance in case a status or restart message is 
+				received or transmitted.";;
+	NOTIFICATIONS
+		otherSpecialMessage;
+REGISTERED AS { m3641Package 21 };
+-- 3.22 Other special message history data
+
+
+otherSpecialMessageHistoryData-package PACKAGE
+	BEHAVIOUR
+		otherSpecialMessageHistoryDataBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the history data of the attributes it has.";;
+	ATTRIBUTES
+		sTATUSMessagesReceived GET,
+		sTATUSMessagesTransmitted GET,
+		rESTARTMessagesReceived GET,
+		rESTARTMessagesTransmitted GET;
+REGISTERED AS { m3641Package 22 };
+-- 3.23 Special message type log record
+
+
+specialMessageTypeLogRecord-package PACKAGE
+	BEHAVIOUR
+		specialMessageTypeLogRecordBehaviour BEHAVIOUR
+			DEFINED AS
+				"This managed object is used to represent logged information from notifications 
+				received from the mgdNetwLayerDChannel managed object in case of the receipt or 
+				transmission of a DISCONNECT, RELEASE or RELEASE COMPLETE message.";;
+	ATTRIBUTES
+		specialMessageType GET;
+REGISTERED AS { m3641Package 23 };
+-- 3.24 Timer expiry network log record
+
+
+timerExpiryNetworkLogRecord-package PACKAGE
+	BEHAVIOUR
+		timerExpiryNetworkLogRecordBehaviour BEHAVIOUR
+			DEFINED AS
+				"This managed object is used to represent logged information from notifications 
+				received from the mgdNetwLayerDChannel managed object in case of detection of 
+				the expiry of timers T308, T309, T316 or T317.";;
+	ATTRIBUTES
+		timerExpiryNetwork GET;
+REGISTERED AS { m3641Package 24 };
+-- 3.25 Unexpected frames log record
+
+
+unexpectedFramesLogRecord-package PACKAGE
+	BEHAVIOUR
+		unexpectedFramesLogRecordBehaviour BEHAVIOUR
+			DEFINED AS
+				"This managed object is used to represent logged information from notifications 
+				received from the mgdDataLinkDChannel managed object in case of receipt of 
+				unexpected frames.";;
+	ATTRIBUTES
+		unexpectedFrames GET;
+REGISTERED AS { m3641Package 25 };
+-- 4 Name bindings
+-- 4.1 Access port ISDN  Managed element
+
+
+accessPortISDN-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS accessPortISDN AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100 : 1992":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation M.3100 : 1992":tTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { m3641NameBinding 1 };
+-- 4.2 D-channel log  Managed element
+
+
+dChannelLog-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS dChannelLog AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100 : 1992":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.721 : 1992":logId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { m3641NameBinding 2 };
+-- 4.3 D-channel  Access port ISDN
+
+
+dChannel-accessPortISDN NAME BINDING
+	SUBORDINATE OBJECT CLASS dChannel AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS accessPortISDN AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { m3641NameBinding 3 };
+-- 4.4 Managed data link D-channel  D-channel
+
+
+mgdDataLinkDChannel-dChannel NAME BINDING
+	SUBORDINATE OBJECT CLASS mgdDataLinkDChannel AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS dChannel AND SUBCLASSES;
+	WITH ATTRIBUTE
+		mgdDataLinkDChannelId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { m3641NameBinding 4 };
+-- 4.5 Managed network layer D-channel  D-channel
+
+
+mgdNetwLayerDChannel-dChannel NAME BINDING
+	SUBORDINATE OBJECT CLASS mgdNetwLayerDChannel AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS dChannel AND SUBCLASSES;
+	WITH ATTRIBUTE
+		mgdNetwLayerDChannelId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { m3641NameBinding 5 };
+-- 4.6 Managed data link current data  Managed data link D-channel
+
+
+mgdDataLinkCurrentData-mgdDataLinkDChannel NAME BINDING
+	SUBORDINATE OBJECT CLASS mgdDataLinkCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS mgdDataLinkDChannel AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.738 : 1992":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { m3641NameBinding 6 };
+-- 4.7 Managed network layer current data  Managed network layer D-channel
+
+
+mgdNetwLayerCurrentData-mgdNetwLayerDChannel NAME BINDING
+	SUBORDINATE OBJECT CLASS mgdNetwLayerCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS mgdNetwLayerDChannel AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.738 : 1992":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { m3641NameBinding 7 };
+-- The naming of mgdDataLinkHistoryData instances by mgdDataLinkCurrentData instances is specified in
+-- Recommendation Q.822 [2] by means of the name binding between currentData and historyData instances. This is also
+-- true for naming of mgdNetwLayerHistoryData instances by mgdNetwLayerCurrentData instances. The naming of
+-- thresholdData instances by managedElement instances is also specified in Recommendation Q.822 [2].
+-- The naming of eventForwardingDiscriminator instances by managedElement instances is specified in
+-- Recommendation M.3100 [6].
+-- The naming of the following generic and the following D-channel specific object instances by dChannelLog instances is
+-- specified in Recommendation X.721 [4] by means of the name binding between log and logRecord instances:
+--  objectCreationRecord;
+--  objectDeletionRecord;
+--  attributeValueChangeRecord;
+--  stateChangeRecord;
+--  alarmRecord;
+--  errorFramesLogRecord;
+--  invalidFramesLogRecord;
+--  messageCallRefErrorLogRecord;
+--  otherSpecialMessageLogRecord;
+--  specialMessageTypeLogRecord;
+--  timerExpiryNetworkLogRecord;
+--  unexpectedFramesLogRecord.
+-- 5 Attributes
+-- 5.1 Call Reference Flag
+
+
+callReferenceFlag ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.CallReferenceFlag;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callReferenceFlagBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the value of the call reference flag.";;
+REGISTERED AS { m3641Attribute 1 };
+-- 5.2 Call Reference Value
+
+
+callReferenceValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.CallReferenceValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callReferenceValueBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the incorrect call reference value.";;
+REGISTERED AS { m3641Attribute 2 };
+-- 5.3 Cause Value
+
+
+causeValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.CauseType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		causeValueBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the octets three to five as defined in Recommendation 
+				Q.931, which includes the cause value, location and diagnostic field.";;
+REGISTERED AS { m3641Attribute 3 };
+-- 5.4 Data Link State
+
+
+dataLinkState ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.DataLinkState;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dataLinkStateBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the state of the data link.";;
+REGISTERED AS { m3641Attribute 4 };
+-- 5.5 Error Frames
+
+
+errorFrames ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ErrorFrames;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		errorFramesAttrBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the specific error information that is stored in the 
+				errorFramesLogRecord.";;
+REGISTERED AS { m3641Attribute 5 };
+-- 5.6 Frame Type
+
+
+frameType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.FrameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		frameTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the type of the unexpected frame.";;
+REGISTERED AS { m3641Attribute 6 };
+-- 5.7 Invalid Frames
+
+
+invalidFrames ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.InvalidFrames;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		invalidFramesAttrBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the specific error information that is stored in the 
+				invalidFramesLogRecord.";;
+REGISTERED AS { m3641Attribute 7 };
+-- 5.8 Managed data link D-channel identification
+
+
+mgdDataLinkDChannelId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		mgdDataLinkDChannelIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the identification of the mgdDataLinkDChannel managed 
+				object class.";;
+REGISTERED AS { m3641Attribute 8 };
+-- 5.9 Managed network layer D-channel identification
+
+
+mgdNetwLayerDChannelId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		mgdNetwLayerDChannelIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the identification of the mgdNetwLayerDChannel managed 
+				object class.";;
+REGISTERED AS { m3641Attribute 9 };
+-- 5.10 Message call reference error
+
+
+messageCallRefError ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.MessageCallRefError;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		messageCallRefErrorAttrBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the specific error information that is stored in the 
+				messageCallRefErrorLogRecord.";;
+REGISTERED AS { m3641Attribute 10 };
+-- 5.11 Message call reference errors
+
+
+messageCallReferenceErrors ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		messageCallReferenceErrorsBehaviour BEHAVIOUR
+			DEFINED AS
+				"A call reference is used to specify a call. This attribute represents the number 
+				of messages with call reference errors. In the following situations, the call 
+				reference error is not correct:
+				Messages: All messages except: SETUP, STATUS, RESUME
+				Call reference value: Which is not relating to an active call or a call in 
+				progress
+				Messages: SETUP, RESUME
+				Call reference value: Which is not relating to an active call or a call in 
+				progress and with a call reference flag set to '1'
+				Messages: SETUP
+				Call reference value: Which is relating to an active call or a call in progress
+				Messages: All messages except: RESTART, RESTART ACK, STATUS
+				Call reference value: Which is the global call reference";;
+REGISTERED AS { m3641Attribute 11 };
+-- 5.12 Messages too short
+
+
+messagesTooShort ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		messagesTooShortBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents a counter for the number of messages that are too 
+				short to contain a complete message type.";;
+REGISTERED AS { m3641Attribute 12 };
+-- 5.13 Messages with general information element missing
+
+
+messagesWithGenInfoElemMissing ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		messagesWithGenInfoElemMissingBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents a counter for counting the number of general 
+				information element errors. The counter is raised when an information element is 
+				out of sequence or when a duplicated information element was detected, see 
+				5.8.5/Q.931.";;
+REGISTERED AS { m3641Attribute 13 };
+-- 5.14 Messages with mandatory information element missing
+
+
+messagesWithMandInfoElemMissing ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		messagesWithMandInfoElemMissingBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents a counter for counting the number of messages with 
+				mandatory information element errors. The counter is raised when a mandatory 
+				information element is missing or when a mandatory information element content 
+				error was detected, see 5.8.5 and 5.8.6/Q.931.";;
+REGISTERED AS { m3641Attribute 14 };
+-- 5.15 Message type
+
+
+messageType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.MessageType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		messageTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the type of layer 3 message.";;
+REGISTERED AS { m3641Attribute 15 };
+-- 5.16 Message with wrong protocol discriminator
+
+
+messageWithWrongPdi ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		messageWithWrongPdiBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents a counter. This counter holds the number of messages 
+				receved with a protocol discriminator that is not valid, i.e. a protocol 
+				discriminator other than 'Q.931 user-network call control message'. The counter 
+				has an associated threshold.";;
+REGISTERED AS { m3641Attribute 16 };
+-- 5.17 Number of frames received
+
+
+noOfFramesReceived ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		noOfFramesReceivedBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the total number of frames received for a D-channel.";;
+REGISTERED AS { m3641Attribute 17 };
+-- 5.18 Number of frames retransmitted
+
+
+noOfFramesRetransmitted ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		noOfFramesRetransmittedBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the total number of frames retransmitted for a 
+				D-channel.";;
+REGISTERED AS { m3641Attribute 18 };
+-- 5.19 Number of frames transmitted
+
+
+noOfFramesTransmitted ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		noOfFramesTransmitted BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the total number of frames transmitted for a 
+				D-channel.";;
+REGISTERED AS { m3641Attribute 19 };
+-- 5.20 Number of frames with frame check sequence error
+
+
+noOfFramesWithFCSERROR ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		noOfFramesWithFCSERRORBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents a counter for the total number of frames received with 
+				FCS-error for
+				a D-channel.";;
+REGISTERED AS { m3641Attribute 20 };
+-- 5.21 Number of invalid frames
+
+
+noOfInvalidFrames ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		noOfInvalidFramesBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the number of invalid frames received.";;
+REGISTERED AS { m3641Attribute 21 };
+-- 5.22 Number of timer 303 expiries
+
+
+noOfT303Expiries ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		noOfT303ExpiriesBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the number of expiries of T303. The counter is raised 
+				after the second expiry. This implies that the user did not respond after a 
+				SETUP was sent to the user on a point-to-point link.";;
+REGISTERED AS { m3641Attribute 22 };
+-- 5.23 Number of timer 310 expiries
+
+
+noOfT310Expiries ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		noOfT310ExpiriesBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the number of expiries of T310. T310 expires after 
+				receipt of a CALL PROCEEDING, no response has reached the network.";;
+REGISTERED AS { m3641Attribute 23 };
+-- 5.24 Oldest record age
+
+
+oldestRecordAge ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.OldestRecordAge;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		oldestRecordAgeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the time when the notification 
+				oldestRecordLessThanLimit will be emitted by object dChannelLog.";;
+REGISTERED AS { m3641Attribute 24 };
+-- 5.25 Other special message
+
+
+otherSpecialMessage ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.OtherSpecialMessage;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		otherSpecialMessageAttrBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the specific error information that is stored in the 
+				otherSpecialMessageLogRecord.";;
+REGISTERED AS { m3641Attribute 25 };
+-- 5.26 Received
+
+
+received ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.Received;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		receivedBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates whether a message was received or not, i.e. sent.";;
+REGISTERED AS { m3641Attribute 26 };
+-- 5.27 Relating To Active Call
+
+
+relatingToActiveCall ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.RelatingToActiveCall;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		relatingToActiveCallBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates whether a call reference relates to an active call.";;
+REGISTERED AS { m3641Attribute 27 };
+-- 5.28 Restart messages received
+
+
+rESTARTMessagesReceived ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		rESTARTMessagesReceivedBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the number of RESTART messages received.";;
+REGISTERED AS { m3641Attribute 28 };
+-- 5.29 Restart messages transmitted
+
+
+rESTARTMessagesTransmitted ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		rESTARTMessagesTransmittedBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the number of RESTART messages transmitted.";;
+REGISTERED AS { m3641Attribute 29 };
+-- 5.30 Special message type
+
+
+specialMessageType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.SpecialMessageType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		specialMessageTypeAttrBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the specific error information that is stored in the 
+				specialMessageTypeLogRecord";;
+REGISTERED AS { m3641Attribute 30 };
+-- 5.31 Status messages received
+
+
+sTATUSMessagesReceived ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		sTATUSMessagesReceivedBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the number of STATUS messages received.";;
+REGISTERED AS { m3641Attribute 31 };
+-- 5.32 Status messages transmitted
+
+
+sTATUSMessagesTransmitted ATTRIBUTE
+	DERIVED FROM
+		"Recommendation X.721 : 1992":counter;
+	BEHAVIOUR
+		sTATUSMessagesTransmittedBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the number of STATUS messages transmitted.";;
+REGISTERED AS { m3641Attribute 32 };
+-- 5.33 TEI value
+
+
+tEIValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.TEIValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tEIValueBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the TEI Value of the terminal involved.";;
+REGISTERED AS { m3641Attribute 33 };
+-- 5.34 Timer expiry network
+
+
+timerExpiryNetwork ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.TimerExpiryNetwork;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		timerExpiryNetworkAttrBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the specific error information that is stored in the 
+				timerExpiryNetworkLogRecord.";;
+REGISTERED AS { m3641Attribute 34 };
+-- 5.35 Type Of Error Frame
+
+
+typeOfErrorFrame ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.TypeOfErrorFrame;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		typeOfErrorFrameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the type of error when a frame error was detected.";;
+REGISTERED AS { m3641Attribute 35 };
+-- 5.36 Type Of Timer
+
+
+typeOfTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.TypeOfTimer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		typeOfTimerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the type of the timer expired.";;
+REGISTERED AS { m3641Attribute 36 };
+-- 5.37 Unexpected frames
+
+
+unexpectedFrames ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.UnexpectedFrames;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		unexpectedFramesAttrBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the specific error information that is stored in the 
+				unexpectedFramesLogRecord.";;
+REGISTERED AS { m3641Attribute 37 };
+-- 6 Notifications
+-- 6.1 Error frames
+
+
+errorFrames NOTIFICATION
+	BEHAVIOUR
+		errorFramesBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is issued when a protocol error is detected. It will contain 
+				one of the following messages:
+				- The frames received with a control field that is undefined or not implemented: 
+				  framesWithBadControlfield.
+				- The frames received with an information field that is not permitted: 
+				  framesWithBadInfoField.
+				- The supervisory frames with incorrect length: supervisoryFramesWithBadLength.
+				- The unnumbered frames with incorrect length: unnumberedFramesBadLength.
+				- The frames received with an invalid receive sequence number (i.e. invalid 
+				  N(R)) framesWithInvalidReceiveSeqNumber.
+				- The frames received with an information field that exceeds the maximum 
+				  established length. A parameter is defined for the maximum established length. 
+				  The default value is 260 octets: framesWithInfoFieldTooLong.
+				- The Frame Reject (FRMR) frames received: fRMRReceived.
+				- The Disconnect Mode (DM) frames received in response to a Set Asynchronous 
+				  Balanced Mode Extended (SABME) frame: dMFramesSentInResponseToSABME.
+				- The proper responses (i.e. unnumbered acknowledgement or disconnect mode 
+				  frames not received to establish or restore the link after N200 SABME frames 
+				  were sent: notProperResponseAfterN200SABMEs.
+				- The Disconnect Mode (DM) frames received in response to a Set Asynchronous 
+				  Balanced Mode Extended (SABME) frame: dMFramesReceivedInResponseToSABME.
+				It also contains the TEI value to identify the terminal involved.";;
+	WITH INFORMATION SYNTAX ASN1TypeModule.ErrorFrames
+		AND ATTRIBUTE IDS
+			tEIValue
+				tEIValue,
+			typeOfErrorFrame
+				typeOfErrorFrame;
+REGISTERED AS { m3641Notification 1 };
+-- 6.2 Invalid frames
+
+
+invalidFrames NOTIFICATION
+	BEHAVIOUR
+		invalidFramesBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is emitted on receipt of an invalid frame. The notification 
+				contains the invalid frame. An invalid frame is a frame with any of the 
+				following:
+				- is not properly bounded by two flags;
+				- has fewer than six octets between flags of frames that contain sequence 
+				  numbers and fewer than five octets between flags of frames that do not contain 
+				  sequence numbers;
+				- does not consist of an integral number of octets prior to zero bit insertion 
+				  or following zero bit extraction;
+				- contains a single address field;
+				- contains a service access point identifier, which is not supported by the 
+				  receiver.";;
+	WITH INFORMATION SYNTAX ASN1TypeModule.InvalidFrames;
+REGISTERED AS { m3641Notification 2 };
+-- 6.3 Message call reference error
+
+
+messageCallRefError NOTIFICATION
+	BEHAVIOUR
+		messageCallRefErrorBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is issued when a message with a call reference error was 
+				detected. A call reference is used to specify a call. In the following 
+				situations, the call reference error is not correct:
+				Messages: All messages except: SETUP, STATUS, RESUME
+				Call reference value>: Which is not relating to an active call or a call in 
+				progress
+				Messages: SETUP, RESUME
+				Call reference value>: Which is not relating to an active call or a call in 
+				progress and with a call reference flag set to '1'
+				Messages: SETUP
+				Call reference value>: Which is relating to an active call or a call in progress
+				Messages: All messages except: RESTART, RESTART ACK, STATUS
+				Call reference value>: Which is the global call reference
+				It also contains the TEI value to identify the terminal involved.";;
+	WITH INFORMATION SYNTAX ASN1TypeModule.MessageCallRefError
+		AND ATTRIBUTE IDS
+			messageType
+				messageType,
+			relatingToActiveCall
+				relatingToActiveCall,
+			callReferenceFlag
+				callReferenceFlag,
+			callReferenceValue
+				callReferenceValue,
+			tEIValue
+				tEIValue;
+REGISTERED AS { m3641Notification 3 };
+-- 6.4 Oldest record less than limit
+
+
+oldestRecordLessThanLimit NOTIFICATION
+	BEHAVIOUR
+		oldestRecordLessThanLimitBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is emitted when the oldest record in the full D-Channel Log is 
+				less old than the value indicated by attribute oldestRecordAge of object 
+				dChannelLog.";;
+	WITH INFORMATION SYNTAX ASN1TypeModule.OldestRecordLessThanLimit;
+REGISTERED AS { m3641Notification 4 };
+-- 6.5 Other special message
+
+
+otherSpecialMessage NOTIFICATION
+	BEHAVIOUR
+		otherSpecialMessageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is issued upon the receipt or transmission of a STATUS or 
+				RESTART message. The notification contains the information whether the message 
+				was received or transmitted and the message concerned. It also contains the TEI 
+				value to identify the terminal involved. In case of a STATUS message, it also 
+				contains the contents of the cause field. The cause field contains the octets 
+				three to five as defined in Recommendation Q.931. This includes the cause value, 
+				location and the diagnostic field.";;
+	WITH INFORMATION SYNTAX ASN1TypeModule.OtherSpecialMessage
+		AND ATTRIBUTE IDS
+			messageType
+				messageType,
+			received
+				received,
+			tEIValue
+				tEIValue,
+			causeValue
+				causeValue;
+REGISTERED AS { m3641Notification 5 };
+-- 6.6 Special message type
+
+
+specialMessageType NOTIFICATION
+	BEHAVIOUR
+		specialMessageTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is issued upon the receipt or transmission of a DISCONNECT, 
+				RELEASE and RELEASE COMPLETE message. This notification is only issued when the 
+				cause value indicates an other than normal event. The notification contains the 
+				information whether the message was received or transmitted and the message 
+				concerned. It also contains the TEI value to identify the terminal involved. It 
+				also contains the contents of the cause field. The cause field contains the 
+				octets three to five as defined in Recommendation Q.931. This includes the cause 
+				value, location and the diagnostic field.";;
+	WITH INFORMATION SYNTAX ASN1TypeModule.SpecialMessageType
+		AND ATTRIBUTE IDS
+			messageType
+				messageType,
+			received
+				received,
+			tEIValue
+				tEIValue,
+			causeValue
+				causeValue;
+REGISTERED AS { m3641Notification 6 };
+-- 6.7 Timer expiry network
+
+
+timerExpiryNetwork NOTIFICATION
+	BEHAVIOUR
+		timerExpiryNetworkBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is issued upon expiry of timers:
+
+				T308: A DISCONNECT was received from the user. The network answers with a 
+				      RELEASE. T308 expires when no answer was received from the user after 
+				      that. After the second expiry the B-channel will be placed in a 
+				      maintenance condition.
+
+				T309: The data link failure has not been recovered from a data link layer 
+				      malfunction.
+
+				T316: No RESTART ACKNOWLEDGE was received after a RESTART was transmitted. After 
+				      'n' expiries the Operations System shall be notified.
+
+				T317: After a RESTART was received, the restart procedure did not work. It also 
+				      contains the TEI value to identify the terminal involved.";;
+	WITH INFORMATION SYNTAX ASN1TypeModule.TimerExpiryNetwork
+		AND ATTRIBUTE IDS
+			tEIValue
+				tEIValue,
+			typeOfTimer
+				typeOfTimer;
+REGISTERED AS { m3641Notification 7 };
+-- 6.8 Unexpected frames
+
+
+unexpectedFrames NOTIFICATION
+	BEHAVIOUR
+		unexpectedFramesBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is emitted on receipt of an unexpected frame. The notification 
+				contains the unexpected frame. In Table 9/Q.921, an overview of unexpected 
+				frames is given. It also contains the TEI value to identify the terminal 
+				involved.";;
+	WITH INFORMATION SYNTAX ASN1TypeModule.UnexpectedFrames
+		AND ATTRIBUTE IDS
+			frameType
+				frameType,
+			dataLinkState
+				dataLinkState,
+			tEIValue
+				tEIValue;
+REGISTERED AS { m3641Notification 8 };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. M.3641 (1994)"
+--  { itu(0) recommendation(0) m(13) m3641(3641) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ |  +- itut_m3641::dChannelLog
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_m3641::errorFramesLogRecord
+--@@ |  |  +- itut_m3641::invalidFramesLogRecord
+--@@ |  |  +- itut_m3641::messageCallRefErrorLogRecord
+--@@ |  |  +- itut_m3641::otherSpecialMessageLogRecord
+--@@ |  |  +- itut_m3641::specialMessageTypeLogRecord
+--@@ |  |  +- itut_m3641::timerExpiryNetworkLogRecord
+--@@ |  |  +- itut_m3641::unexpectedFramesLogRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ +- itut_x723::subsystem
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  |  +- itut_m3641::dChannel
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  |  +- itut_m3641::dChannel
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- itut_m3641::accessPortISDN
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- itut_m3641::accessPortISDN
+--@@ +- itut_m3100::tpPool
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ |  |  +- itut_m3641::mgdDataLinkCurrentData
+--@@ |  |  +- itut_m3641::mgdNetwLayerCurrentData
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ |  +- itut_m3641::mgdDataLinkHistoryData
+--@@ |  +- itut_m3641::mgdNetwLayerHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_m3641::mgdDataLinkDChannel
+--@@ +- itut_m3641::mgdNetwLayerDChannel
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_m3641::accessPortISDN
+--@@ |  |  >- itut_m3641::dChannel
+--@@ |  |  |  >- itut_m3641::mgdDataLinkDChannel
+--@@ |  |  |  |  >- itut_m3641::mgdDataLinkCurrentData
+--@@ |  |  |  >- itut_m3641::mgdNetwLayerDChannel
+--@@ |  |  |  |  >- itut_m3641::mgdNetwLayerCurrentData
+--@@ |  >- itut_m3641::dChannelLog
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi
