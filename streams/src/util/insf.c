@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/13 22:46:37 $
+ @(#) $RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/12/15 20:20:20 $
 
  -----------------------------------------------------------------------------
 
@@ -10,17 +10,18 @@
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:37 $ by $Author: brian $
+ Last Modified $Date: 2007/12/15 20:20:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: insf.c,v $
+ Revision 0.9.2.17  2007/12/15 20:20:20  brian
+ - updates
+
  Revision 0.9.2.16  2007/08/13 22:46:37  brian
  - GPLv3 header updates
 
@@ -61,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/13 22:46:37 $"
+#ident "@(#) $RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/12/15 20:20:20 $"
 
 static char const ident[] =
-    "$RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/13 22:46:37 $";
+    "$RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/12/15 20:20:20 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -153,16 +157,16 @@ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
-the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; Version 3 of the License.\n\
+the terms of the GNU Affero General Public License as published by the Free\n\
+Software Foundation; Version 3 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
+PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.\n\
 \n\
-You should  have received a copy of the GNU  General  Public License  along with\n\
-this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free\n\
-Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
+You should have received a copy of the GNU  Affero  General Public License along\n\
+with this program.   If not, see <http://www.gnu.org/licenses/>, or write to the\n\
+Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
 --------------------------------------------------------------------------------\n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\

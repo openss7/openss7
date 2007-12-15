@@ -1,7 +1,7 @@
--- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-X400P-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/11/06 09:47:06 $
+-- @(#) $RCSfile: OPENSS7-X400P-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/15 20:19:14 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -10,18 +10,19 @@
 --
 -- All Rights Reserved.
 --
--- This program is free software; you can redistribute it and/or modify it under
--- the terms of the GNU General Public License as published by the Free Software
--- Foundation; version 3 of the License.
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
 --
--- This program is distributed in the hope that it will be useful, but WITHOUT
--- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
--- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
--- details.
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
 --
--- You should have received a copy of the GNU General Public License along with
--- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
--- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/11/06 09:47:06 $ by $Author: brian $
+-- Last Modified $Date: 2007/12/15 20:19:14 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-X400P-MIB.mib,v $
+-- Revision 0.9.2.4  2007/12/15 20:19:14  brian
+-- - updates
+--
 -- Revision 0.9.2.3  2007/11/06 09:47:06  brian
 -- - updated mibs
 --
@@ -116,8 +120,10 @@ x400pCardNextIndex OBJECT-TYPE
 	SYNTAX		Unsigned32
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Provides the next available index into the x400pCardTable for use by 
-			 management stations when adding rows to the table."
+	DESCRIPTION	
+		"Provides the next available index into the 
+		 x400pCardTable for use by management stations when 
+		 adding rows to the table."
 	REFERENCE	"STD 58"
 	::= { x400pCard 1 }
 
@@ -126,7 +132,8 @@ x400pCardTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides the x400pCard table which indexes each card in the managed element."
+		"Provides the x400pCard table which indexes each card in 
+		 the managed element."
 	::= { x400pCard 2 }
 
 x400pCardEntry OBJECT-TYPE
@@ -134,45 +141,69 @@ x400pCardEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides an entry in the x400pCard table.  Each entry in the table indexes a 
-		 card in the managed element.  Cards are not intended on being added to or 
-		 removed from this table by management stations.  Physical insertion and removal 
-		 of cards is required and as these cards do not support PCI hotplug, the system
-		 needs to be rebooted in which case the cards will appear in this table on 
-		 reboot.  Therefore there is no NextIndex scalar or RowStatus column for this 
-		 table."
+		"Provides an entry in the x400pCard table.  Each entry 
+		 in the table indexes a card in the managed element.  
+		 Cards are not intended on being added to or removed 
+		 from this table by management stations.  Physical 
+		 insertion and removal of cards is required and as these 
+		 cards do not support PCI hotplug, the system needs to 
+		 be rebooted in which case the cards will appear in this 
+		 table on reboot.  Therefore there is no NextIndex 
+		 scalar or RowStatus column for this table."
 	::= { x400pCardTable 1 }
 
 X400pCardEntry ::=
 	SEQUENCE {
-		x400pCardIndex			Unsigned32,
-		x400pCardName			CommonLanguageName,
+		x400pCardIndex
+			Unsigned32,
+		x400pCardName
+			CommonLanguageName,
 
-		x400pCardOperationalState	OperationalState,
-		x400pCardUsageState		UsageState,
-		x400pCardAdministrativeState	AdministrativeState,
+		x400pCardOperationalState
+			OperationalState,
+		x400pCardUsageState
+			UsageState,
+		x400pCardAdministrativeState
+			AdministrativeState,
 
-		x400pCardAlarmStatus		AlarmStatus,
-		x400pCardProcedrualStatus	ProceduralStatus,
-		x400pCardAvailabilityStatus	AvailabilityStatus,
-		x400pCardControlStatus		ControlStatus,
-		x400pCardStandbyStatus		StandbyStatus,
-		x400pCardUnknownStatus		UnknownStatus
+		x400pCardAlarmStatus
+			AlarmStatus,
+		x400pCardProcedrualStatus
+			ProceduralStatus,
+		x400pCardAvailabilityStatus
+			AvailabilityStatus,
+		x400pCardControlStatus
+			ControlStatus,
+		x400pCardStandbyStatus
+			StandbyStatus,
+		x400pCardUnknownStatus
+			UnknownStatus
 
-		x400pCardType			INTEGER,
-		x400pCardIdentifier		INTEGER,
-		x400pCardRevision		DisplayString,
-		x400pCardChipType		INTEGER,
-		x400pCardChipRevision		DisplayString,
+		x400pCardType
+			INTEGER,
+		x400pCardIdentifier
+			INTEGER,
+		x400pCardRevision
+			DisplayString,
+		x400pCardChipType
+			INTEGER,
+		x400pCardChipRevision
+			DisplayString,
 
-		x400pCardTxLevel		INTEGER,
-		x400pCardRxLevel		INTEGER,
+		x400pCardTxLevel
+			INTEGER,
+		x400pCardRxLevel
+			INTEGER,
 
-		x400pCardPciBus			Unsigned32,
-		x400pCardPciSlot		Unsigned32,
-		x400pCardPciIrq			Unsigned32,
+		x400pCardPciBus
+			Unsigned32,
+		x400pCardPciSlot
+			Unsigned32,
+		x400pCardPciIrq
+			Unsigned32,
 
-		x400pCardStatus			RowStatus
+		x400pCardStatus
+			RowStatus
 	}
 
 
@@ -181,9 +212,9 @@ x400pCardIndex OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides an index for the x400p card in the managed element.  This is the 
-		 ordinal value of the card number and is used as a handle to refer to this x400p 
-		 card."
+		"Provides an index for the x400p card in the managed 
+		 element.  This is the ordinal value of the card number 
+		 and is used as a handle to refer to this x400p card."
 	::= { x400pCardEntry xx }
 
 x400pCardName OBJECT-TYPE
@@ -191,8 +222,9 @@ x400pCardName OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides the name of the x400p card using COMMON LANGUAGE procedures and the 
-		 CommonLanguageName textual convention."
+		"Provides the name of the x400p card using COMMON 
+		 LANGUAGE procedures and the CommonLanguageName textual 
+		 convention."
 	REFERENCE	"OPENSS7-TC"
 	::= { x400pCardEntry xx }
 
@@ -202,11 +234,11 @@ x400pCardOperationalState OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides the operational state of the x400p card using the OperationalState 
-		 textual convention.  When disabled(0), the card is totally inoperable and 
-		 unable to provide service to users.  When enabled(1), the card is partially or 
-		 fully operable and available for use.
-		 "
+		"Provides the operational state of the x400p card using 
+		 the OperationalState textual convention.  When 
+		 disabled(0), the card is totally inoperable and unable 
+		 to provide service to users.  When enabled(1), the card 
+		 is partially or fully operable and available for use."
 	REFERENCE	"OPENSS7-TMN-TC"
 	DEFVAL		{ disabled(0) }
 	::= { x400pCardEntry xx }
@@ -217,9 +249,11 @@ x400pCardUsageState OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides the usage state of the x400p card using the UsageState textual 
-		 convention.  When idle(0), no channels are in use.  When active(1), some 
-		 channels are in use.  When busy(2), all spans and channels are in use."
+		"Provides the usage state of the x400p card using the 
+		 UsageState textual convention.  When idle(0), no 
+		 channels are in use.  When active(1), some channels are 
+		 in use.  When busy(2), all spans and channels are in 
+		 use."
 	REFERENCE	"OPENSS7-TMN-TC"
 	DEFVAL		{ idle(0) }
 	::= { x400pCardEntry xx }
@@ -230,17 +264,19 @@ x400pCardAdministrativeState OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the administrative state of the x400p card using the 
-		 AdministrativeState textual convention.
+		"Provides the administrative state of the x400p card 
+		 using the AdministrativeState textual convention.
 
-		 - locked(0): no user will be permitted to access a channel on the card.
+		 - locked(0): no user will be permitted to access a 
+		   channel on the card.
 
-		 - unlocked(1): users will be permitted to access channels on the card.
+		 - unlocked(1): users will be permitted to access 
+		   channels on the card.
 
-		 - shuttingDown(2): no new users will be permitted to access channels on the 
-		   card, however, existing users will be allowed to continue using channels 
-		   until they are released by the user.
-		"
+		 - shuttingDown(2): no new users will be permitted to 
+		   access channels on the card, however, existing users 
+		   will be allowed to continue using channels until they 
+		   are released by the user."
 	REFERENCE	"OPENSS7-TMN-TC"
 	DEFVAL		{ locked(0) }
 	::= { x400pCardEntry xx }
@@ -251,26 +287,28 @@ x400pCardAlarmStatus OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the alarm status for the x400p card using the AlarmStatus texutal 
-		 convention.
-		 
-		 - underRepair(0): the card is currently being repaired, the operational state 
-		   is disabled(0);
+		"Provides the alarm status for the x400p card using the 
+		 AlarmStatus texutal convention.
+			 
+		 - underRepair(0): the card is currently being repaired, 
+		   the operational state is disabled(0);
 
 		 - critical(1): does not occur;
 
 		 - major(2) does not occur;
 
-		 - minor(3): indicates that one or more minor alarms indicating a faults have 
-		   been detected in the resource, and have not yet been cleared, the operational 
-		   status is enabled(1);
+		 - minor(3): indicates that one or more minor alarms 
+		   indicating a faults have been detected in the 
+		   resource, and have not yet been cleared, the 
+		   operational status is enabled(1);
 
-		 - alarmOutstanding(4): indicates that one or more alarms have been detected in 
-		   the resource, and have not yet been cleared, the condition of which may be 
-		   disabling.  When alarmOutstanding(4) is set, and the operational state is 
-		   enabled(1), other status and state attributes provide additional information, 
-		   particularly the carrier alarm related columns.
-		"
+		 - alarmOutstanding(4): indicates that one or more 
+		   alarms have been detected in the resource, and have 
+		   not yet been cleared, the condition of which may be 
+		   disabling.  When alarmOutstanding(4) is set, and the 
+		   operational state is enabled(1), other status and 
+		   state attributes provide additional information, 
+		   particularly the carrier alarm related columns."
 	REFERENCE	"OPENSS7-TMN-TC"
 	::= { x400pCardEntry xx }
 
@@ -280,24 +318,26 @@ x400pCardProcedrualStatus OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides the procedural status of the x400p card using the ProceduralStatus 
-		 textual convention.
+		"Provides the procedural status of the x400p card using 
+		 the ProceduralStatus textual convention.
 
-		 - initializationRequired(0): a driver has not been loaded against this card or 
-		   the card has not been configured for operation.  The operational state is 
+		 - initializationRequired(0): a driver has not been 
+		   loaded against this card or the card has not been 
+		   configured for operation.  The operational state is 
 		   disabled(0).
 
-		 - notIntitialized(1): a driver has been loaded against the card and the card 
-		   has been configured for operation; however, spans still require configuration 
-		   before the channels on the card are usable.  The operational state is 
-		   disabled(1).
+		 - notIntitialized(1): a driver has been loaded against 
+		   the card and the card has been configured for 
+		   operation; however, spans still require configuration 
+		   before the channels on the card are usable.  The 
+		   operational state is disabled(1).
 
-		 - intializing(2): spans are being initialized.  The operational state is 
-		   enabled(1).
+		 - intializing(2): spans are being initialized.  The 
+		   operational state is enabled(1).
 
-		 - terminating(4): the resource is in a termination phase and the driver is 
-		   being unloaded.  The operational state is disabled(0).
-		 "
+		 - terminating(4): the resource is in a termination 
+		   phase and the driver is being unloaded.  The 
+		   operational state is disabled(0)."
 	REFERENCE	"OPENSS7-TMN-TC"
 	::= { x400pCardEntry xx }
 
@@ -306,38 +346,43 @@ x400pCardAvailabilityStatus OBJECT-TYPE
 	SYNTAX		AvailabilityStatus
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION
-		"Provides the availability status of the x400p card using the AvailabilityStatus 
-		 textual convention.
+	DESCRIPTION	
+		"Provides the availability status of the x400p card 
+		 using the AvailabilityStatus textual convention.
 
-		 - inTest(0):  Not applicable.  The card is not tested as a whole.
+		 - inTest(0):  Not applicable.  The card is not tested 
+		   as a whole.
 
-		 - failed(1):  x400p cards fail when firmware cannot be loaded, or the card 
-		   cannot be configured for operation, or some aspect of the hardware is 
-		   incompatible with a driver.  The operational state is disabled.  An alarm 
-		   will have been generated.
+		 - failed(1):  x400p cards fail when firmware cannot be 
+		   loaded, or the card cannot be configured for 
+		   operation, or some aspect of the hardware is 
+		   incompatible with a driver.  The operational state is 
+		   disabled.  An alarm will have been generated.
 
-		 - powerOff(2):  Not applicable.  x400p cards do not support power management.
+		 - powerOff(2):  Not applicable.  x400p cards do not 
+		   support power management.
 
-		 - offLine(3): When the card is configured for use but the transmitters and 
-		   receivers have been powered down, the card is considered offline.
+		 - offLine(3): When the card is configured for use but 
+		   the transmitters and receivers have been powered 
+		   down, the card is considered offline.
 
 		 - offDuty(4):  Not applicable.
 
-		 - dependency(5):  x400p cards have the dependency that spans and channels must 
-		   at least be partially configured before they are available for use.  This 
-		   value is reflected until at least one span and one channel are configured.
+		 - dependency(5):  x400p cards have the dependency that 
+		   spans and channels must at least be partially 
+		   configured before they are available for use.  This 
+		   value is reflected until at least one span and one 
+		   channel are configured.
 
-		 - degraded(6):  x400p cards are degraded when thier spans or circuits are 
-		   degraded.
+		 - degraded(6):  x400p cards are degraded when thier 
+		   spans or circuits are degraded.
 
-		 - notInstalled(7):  The x400p card does not exist in the system, or the card 
-		   exists in the system but is not loaded with a driver.  The operational state 
-		   is diabled(0).
+		 - notInstalled(7):  The x400p card does not exist in 
+		   the system, or the card exists in the system but is 
+		   not loaded with a driver.  The operational state is 
+		   diabled(0).
 
-		 - logFull(8): Not applicable.
-
-		 "
+		 - logFull(8): Not applicable."
 	REFERENCE	"OPENSS7-TMN-TC"
 	::= { x400pCardEntry xx }
 
@@ -347,18 +392,18 @@ x400pCardControlStatus OBJECT-TYPE
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Provides the x400p card control status according to the ControlStatus textual 
-		 convention.
+		"Provides the x400p card control status according to the 
+		 ControlStatus textual convention.
 
 		 - subjectToTest(0): Not applicable.
 
-		 - partOfServicesLocked(1):  The x400p card may exhibit this value when the card 
-		   is unlocked(1), but one or more of its spans or channels is locked(1).
+		 - partOfServicesLocked(1):  The x400p card may exhibit 
+		   this value when the card is unlocked(1), but one or 
+		   more of its spans or channels is locked(1).
 
 		 - reservedForTest(2): Not applicable.
 
-		 - suspended(3): Not applicable.
-		"
+		 - suspended(3): Not applicable."
 	REFERENCE	"OPENSS7-TMN-TC"
 	::= { x400pCardEntry xx }
 
@@ -368,28 +413,35 @@ x400pCardStandbyStatus OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides the standby status of the x400p card according to the StandbyStatus 
-		 textual convention.  This status returns a standby status when the card has 
-		 been configured in the system to act as a backup unit for another card 
-		 providing service to the same span.  This is performed by placing the receivers 
-		 into high impedance mode, and powering down the transmitters.
+		"Provides the standby status of the x400p card according 
+		 to the StandbyStatus textual convention.  This status 
+		 returns a standby status when the card has been 
+		 configured in the system to act as a backup unit for 
+		 another card providing service to the same span.  This 
+		 is performed by placing the receivers into high 
+		 impedance mode, and powering down the transmitters.
 
-		 - hotStandby(0): The receivers are in high impedance mode and are monitoring 
-		   the T1/E1/J1 spans, however, the transmitters are open-circuited.  In this 
-		   case, the card is syncrhonized to the incoming frames and ready to be brought 
-		   into service by merely powering up the transmitters.
+		 - hotStandby(0): The receivers are in high impedance 
+		   mode and are monitoring the T1/E1/J1 spans, however, 
+		   the transmitters are open-circuited.  In this case, 
+		   the card is syncrhonized to the incoming frames and 
+		   ready to be brought into service by merely powering 
+		   up the transmitters.
 
-		 - coldStandby(1): Both the receives and the transmitters are open-circuited, or 
-		   are connected to a separate facility via a DACCS or other cross-connect 
-		   system which will be connected when a changeover occurs.
+		 - coldStandby(1): Both the receives and the 
+		   transmitters are open-circuited, or are connected to 
+		   a separate facility via a DACCS or other 
+		   cross-connect system which will be connected when a 
+		   changeover occurs.
 
-		 - providingService(2): Both the receivers and transmitters are connects and 
-		   powered up.  The spans on the card are passing data to and from the wire.
+		 - providingService(2): Both the receivers and 
+		   transmitters are connects and powered up.  The spans 
+		   on the card are passing data to and from the wire.
 
-		 There are a number of backup arrangements possible with this card, however, 
-		 have an entire card act as a backup for another entire card is the only way 
-		 that line synchronization can be made the same for both cards.
-		"
+		 There are a number of backup arrangements possible with 
+		 this card, however, have an entire card act as a backup 
+		 for another entire card is the only way that line 
+		 synchronization can be made the same for both cards."
 	REFERENCE	"OPENSS7-TMN-TC"
 	::= { x400pCardEntry xx }
 
@@ -439,7 +491,8 @@ x400pCardRevision OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Actually one alphabetic character staring at A and working up."
+		"Actually one alphabetic character staring at A and 
+		 working up."
 	::= { x400pCardEntry xx }
 
 x400pCardChipType OBJECT-TYPE
@@ -456,9 +509,10 @@ x400pCardChipType OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"This is the type of Dallas framer chip found in the device.  The DS2152, 
-		 DS21352, DS21552 are T1 chips, the DS2154, DS21354, DS21554 are E1 chips.  The 
-		 DS2155 and DS2156 are E1/T1/J1 chips."
+		"This is the type of Dallas framer chip found in the 
+		 device.  The DS2152, DS21352, DS21552 are T1 chips, the 
+		 DS2154, DS21354, DS21554 are E1 chips.  The DS2155 and 
+		 DS2156 are E1/T1/J1 chips."
 	::= { x400pCardEntry xx }
 
 x400pCardChipRevision OBJECT-TYPE
@@ -466,7 +520,8 @@ x400pCardChipRevision OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Actually one aphabetic character starting at A and working up."
+		"Actually one aphabetic character starting at A and 
+		 working up."
 	::= { x400pCardEntry xx }
 
 
@@ -475,8 +530,9 @@ x400pCardPciBus OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Indicates the PCI bus number for the PCI bus on which the card is located.  The 
-		 value zero (0) means that the card is not on a bus."
+		"Indicates the PCI bus number for the PCI bus on which 
+		 the card is located.  The value zero (0) means that the 
+		 card is not on a bus."
 	::= { x400pCardEntry xx }
 
 x400pCardPciSlot OBJECT-TYPE
@@ -484,8 +540,9 @@ x400pCardPciSlot OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Indicates the PCI bus slot number in which the card is located.  The value zero 
-		 (0) means that the card is not in a slot."
+		"Indicates the PCI bus slot number in which the card is 
+		 located.  The value zero (0) means that the card is not 
+		 in a slot."
 	::= { x400pCardEntry xx }
 
 x400pCardPciIrq OBJECT-TYPE
@@ -493,8 +550,9 @@ x400pCardPciIrq OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Indicates the PCI IRQ that is assigned to the card.  The value zero (0) means 
-		 that no IRQ is currently assigned."
+		"Indicates the PCI IRQ that is assigned to the card.  
+		 The value zero (0) means that no IRQ is currently 
+		 assigned."
 	::= { x400pCardEntry xx }
 
 x400pCardStatus INTEGER
@@ -502,16 +560,18 @@ x400pCardStatus INTEGER
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Provides management stations with the ability to add and delete rows from the 
-		 x400pCardTable.  All written columns in all rows are persistent across agent 
-		 reboot.  Management stations may add to this table but may not add to the 
-		 subordinate tables.  Entries in subordinate tables are established 
-		 automatically by the agent when a row is created in this table.
+		"Provides management stations with the ability to add 
+		 and delete rows from the x400pCardTable.  All written 
+		 columns in all rows are persistent across agent reboot.  
+		 Management stations may add to this table but may not 
+		 add to the subordinate tables.  Entries in subordinate 
+		 tables are established automatically by the agent when 
+		 a row is created in this table.
 
-		 The primary purpose for allowing management stations to add to this table is 
-		 toe permit management station to configure cards that have not yet been 
-		 installed in the system.
-		 "
+		 The primary purpose for allowing management stations to 
+		 add to this table is toe permit management station to 
+		 configure cards that have not yet been installed in the 
+		 system."
 	::= { x400pCardEntry xx }
 
 -- ====================================================================
@@ -538,47 +598,69 @@ x400pSpanEntry OBJECT-TYPE
 
 X400pSpanEntry ::=
 	SEQUENCE {
-		x400pSpanIndex			Unsigned32,
+		x400pSpanIndex
+			Unsigned32,
 
-		x400pSpanOperationalState	OperationalStaqte,
-		x400pSpanUsageState		UsageState,
-		x400pSpanAdministrativeState	AdministrativeState,
+		x400pSpanOperationalState
+			OperationalStaqte,
+		x400pSpanUsageState
+			UsageState,
+		x400pSpanAdministrativeState
+			AdministrativeState,
 
-		x400pSpanAlarmStatus		AlarmStatus,
-		x400pSpanProceduralStatus	Proceduralstatus,
-		x400pSpanAvailabilityStatus	AvailabilityStatus,
-		x400pSpanControlStatus		ControlStatus,
-		x400pSpanStandbyStatus		StandbyStatus,
-		x400pSpanUnknownStatus		UnknownStatus,
+		x400pSpanAlarmStatus
+			AlarmStatus,
+		x400pSpanProceduralStatus
+			Proceduralstatus,
+		x400pSpanAvailabilityStatus
+			AvailabilityStatus,
+		x400pSpanControlStatus
+			ControlStatus,
+		x400pSpanStandbyStatus
+			StandbyStatus,
+		x400pSpanUnknownStatus
+			UnknownStatus,
 
-		x400pSpanType			INTEGER,
-		x400pSpanRate			INTEGER,
-		x400pSpanMode			INTEGER,
-		x400pSpanCrc			INTEGER,
-		x400pSpanClocking		INTEGER,
-		x400pSpanCoding			INTEGER,
-		x400pSpanFraming		INTEGER,
+		x400pSpanType
+			INTEGER,
+		x400pSpanRate
+			INTEGER,
+		x400pSpanMode
+			INTEGER,
+		x400pSpanCrc
+			INTEGER,
+		x400pSpanClocking
+			INTEGER,
+		x400pSpanCoding
+			INTEGER,
+		x400pSpanFraming
+			INTEGER
 	}
 
 x400pSpanIndex OBJECT-TYPE
 	SYNTAX		Unsigned32 (0..4)
 	MAX-ACCESS	not-accessible
 	STATUS		current
-	DESCRIPTION	"Provides and index by card of the span.  This is a small integer from  
-			 0..4, where 1 through 4 indicates spans 1 through 4 on the card, and 
-			 the special index 0 indicates defaults or settings for the entire 
-			 card.  Spans can only be added to this table by the agent.  Management 
-			 stations can control or configure the span by accessing the read-write 
-			 columns for each span entry."
+	DESCRIPTION
+		"Provides and index by card of the span.  This is a 
+		 small integer from 0..4, where 1 through 4 indicates 
+		 spans 1 through 4 on the card, and the special index 0 
+		 indicates defaults or settings for the entire card.  
+		 Spans can only be added to this table by the agent.  
+		 Management stations can control or configure the span 
+		 by accessing the read-write columns for each span 
+		 entry."
 	::= { x400pSpanEntry xx }
 
 x400pSpanOperationalState OBJECT-TYPE
 	SYNTAX		OperationalState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Provides the operational state of the circuit.  The state is either 
-			 disabled(0) or enabled(1).  When disabled(0), the circuit is 
-			 unusable.  When enabled(1), the circuit is operational."
+	DESCRIPTION
+		"Provides the operational state of the circuit.  The 
+		 state is either disabled(0) or enabled(1).  When 
+		 disabled(0), the circuit is unusable.  When enabled(1), 
+		 the circuit is operational."
 	REFERENCE	"OPENSS7-TMN-TC"
 	::= { x400pSpanEntry xx }
 
@@ -586,10 +668,11 @@ x400pSpanUsageState OBJECT-TYPE
 	SYNTAX		UsageState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Provides the usage state of the circuit.  When idle(0), not data is 
-			 being transferred in the circuit; when active(1), data is being 
-			 exchanged with the circuit; busy(2), the card is consumed with 
-			 transferring data."
+	DESCRIPTION
+		"Provides the usage state of the circuit.  When idle(0), 
+		 not data is being transferred in the circuit; when 
+		 active(1), data is being exchanged with the circuit; 
+		 busy(2), the card is consumed with transferring data."
 	REFERENCE	"OPENSS7-TMN-TC"
 	::= { x400pSpanEntry xx }
 
@@ -597,10 +680,12 @@ x400pSpanAdministrativeState OBJECT-TYPE
 	SYNTAX		AdminisrativeState
 	MAX-ACCESS	read-write
 	STATUS		current
-	DESCRIPTION	"Provides the administrative state of the circuit.  When locked(0), no 
-			 user can use the span.  When unlocked(1), users may use the span.  When 
-			 shuttingDown(2), existing users can complete using the resource before 
-			 the system is shut down."
+	DESCRIPTION
+		"Provides the administrative state of the circuit.  When 
+		 locked(0), no user can use the span.  When unlocked(1), 
+		 users may use the span.  When shuttingDown(2), existing 
+		 users can complete using the resource before the system 
+		 is shut down."
 	REFERENCE	"OPENSS7-TMN-TC"
 	::= { x400pSpanEntry xx }
 
@@ -664,20 +749,24 @@ x400pSpanType OBJECT-TYPE
 		}
 	MAX-ACCESS	read-write
 	STATUS		current
-	DESCRIPTION	"Defines the group interface type for the span.  THis can be t1, j1,
-			 e1, or none.  When t1(2), the span is configured, dependently 
-			 configured or pre-configured for T1 operation; j1(2), for J1 operation; 
-			 e1(3), for E1 operation.  When none(1), the interface is capable of 
-			 being placed in any of the three modes and has not yet been configured 
-			 for one of them."
+	DESCRIPTION
+		"Defines the group interface type for the span.  THis 
+		 can be t1, j1, e1, or none.  When t1(2), the span is 
+		 configured, dependently configured or pre-configured 
+		 for T1 operation; j1(2), for J1 operation; e1(3), for 
+		 E1 operation.  When none(1), the interface is capable 
+		 of being placed in any of the three modes and has not 
+		 yet been configured for one of them."
 	::= { x400pSpanEntry xx }
 
 x400pSpanRate OBJECT-TYPE
 	SYNTAX		INTEGER (0|1544000|2048000)
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Returns T1/J1 rate when configured for T1 or J1; E1 rate when for E1.  
-			 Returns zero (0) when not configured for any interface type yet."
+	DESCRIPTION
+		"Returns T1/J1 rate when configured for T1 or J1; E1 
+		 rate when for E1.  Returns zero (0) when not configured 
+		 for any interface type yet."
 	::= { x400pSpanEntry xx }
 
 x400pSpanMode OBJECT-TYPE
@@ -688,9 +777,10 @@ x400pSpanMode OBJECT-TYPE
 		}
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"When in localLoopback(2), loopback has been locally asserted; 
-			 remoteLoopback(3), loopback has been remotedly asserted; none(1), no 
-			 loopback is asserted."
+	DESCRIPTION
+		"When in localLoopback(2), loopback has been locally 
+		 asserted; remoteLoopback(3), loopback has been 
+		 remotedly asserted; none(1), no loopback is asserted."
 	::= { x400pSpanEntry xx }
 	
 x400pSpanCrc OBJECT-TYPE
@@ -811,32 +901,46 @@ x400pChanEntry OBJECT-TYPE
 
 X400pChanEntry ::=
 	SEQUENCE {
-		x400pChanIndex			Unsigned32,
+		x400pChanIndex
+			Unsigned32,
 
-		x400pChanOperationalState	OperationalState,
-		x400pChanUsageState		UsageState,
-		x400pChanAdministativeState	AdministrativeState,
+		x400pChanOperationalState
+			OperationalState,
+		x400pChanUsageState
+			UsageState,
+		x400pChanAdministativeState
+			AdministrativeState,
 
-		x400pChanAlarmStatus		AlarmStatus,
-		x400pChanProceduralStatus	ProceduralStatus,
-		x400pChanAvailabilityStatus	AvailabilityStatus,
-		x400pChanControlStatus		ControlStatus,
-		x400pChanStandbyStatus		StandbyStatus,
+		x400pChanAlarmStatus
+			AlarmStatus,
+		x400pChanProceduralStatus
+			ProceduralStatus,
+		x400pChanAvailabilityStatus
+			AvailabilityStatus,
+		x400pChanControlStatus
+			ControlStatus,
+		x400pChanStandbyStatus
+			StandbyStatus,
 
-		x400pChanType			INTEGER,
-		x400pChanRate			Unsigned32,
-		x400pChanMode			INTEGER,
+		x400pChanType
+			INTEGER,
+		x400pChanRate
+			Unsigned32,
+		x400pChanMode
+			INTEGER
 	}
 
 x400pChanIndex OBJECT-TYPE
 	SYNTAX		Unsigned32 (0..31)
 	MAX-ACCESS	not-accessible
 	STATUS		current
-	DESCRIPTION	"Provides an index into the card and span of the channel.  Special 
-			 semanics channel 0 refers to the characteristics of all the other 
-			 channels statistically multiplexed together into a single virtual 
-			 channel.  Management stations do not add or delete rows from this 
-			 table, only agents, and then only at boot time."
+	DESCRIPTION
+		"Provides an index into the card and span of the 
+		 channel.  Special semanics channel 0 refers to the 
+		 characteristics of all the other channels statistically 
+		 multiplexed together into a single virtual channel.  
+		 Management stations do not add or delete rows from this 
+		 table, only agents, and then only at boot time."
 	::= { x400pChanEntry xx }
 
 
@@ -878,130 +982,162 @@ x400pChanMode OBJECT-TYPE
 --
 -- Card Types
 --
--- Cards can largely be identifier by their PCI information in Chip numbers, but theses are some 
--- autonomous types that permit the MIB to be extended without changing it when a new card comes 
--- along.
+-- Cards can largely be identifier by their PCI information in Chip 
+-- numbers, but theses are some autonomous types that permit the MIB to 
+-- be extended without changing it when a new card comes along.
 --
 -- ====================================================================
 
 x400pCardTypePLX9030 OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"This the the PLX 90303 board resulting from finding '9030'X in the PCI 
-			 id.  This is a card that has not has the correct PCI Id burnt into it."
+	DESCRIPTION
+		"This the the PLX 90303 board resulting from finding 
+		 '9030'X in the PCI id.  This is a card that has not has 
+		 the correct PCI Id burnt into it."
 	::= { x400pCardTypes 1 }
 
 x400pCardTypePLXDevelopmentBoard OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"This is a PLX development board as identified by the PCI Id '3001'X."
+	DESCRIPTION
+		"This is a PLX development board as identified by the 
+		 PCI Id '3001'X."
 	::= { x400pCardTypes 2 }
 
 x400pCardTypeX400P OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"This is an old Digium X400P card as identified by its PCI Id 'D00D'X.  
-			 The next position below this arc identifies whether it is a T1 card or 
-			 an E1 card.  If there is nothing below this arc, the card supports both 
-			 E1 and T1 modes.  These cards were discontinued when Digium decided to 
-			 force upgrade everyone to a TE410 card."
+	DESCRIPTION
+		"This is an old Digium X400P card as identified by its 
+		 PCI Id 'D00D'X.  The next position below this arc 
+		 identifies whether it is a T1 card or an E1 card.  If 
+		 there is nothing below this arc, the card supports both 
+		 E1 and T1 modes.  These cards were discontinued when 
+		 Digium decided to force upgrade everyone to a TE410 
+		 card."
 	::= { x400pCardTypes 3 }
 
 x400pCardTypeE400P OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"This is an old Digium E400P card as identifier by its PCI Id 'D00D'X.  
-			 The card reports a DS2154, DS21354, DS21554 Dallas chip indicating that 
-			 this is an E1 card.  This card does not support a T1 mode. It also does 
-			 not support some of the snazzier features.  These cards were 
-			 discontinued when Digium decided to force upgrade everyone to a TE410 
-			 card."
+	DESCRIPTION
+		"This is an old Digium E400P card as identifier by its 
+		 PCI Id 'D00D'X.  The card reports a DS2154, DS21354, 
+		 DS21554 Dallas chip indicating that this is an E1 card.  
+		 This card does not support a T1 mode. It also does not 
+		 support some of the snazzier features.  These cards 
+		 were discontinued when Digium decided to force upgrade 
+		 everyone to a TE410 card."
 	::= { x400pCardTypeX400P 1 }
 
 x400pCardTypeT400P OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"This is the old Digium T400P card as identified by its PCI Id 'D00D'X.  
-			 The card reporets a DS2152, DS21352, DS21552 Dallas chip indicating 
-			 that this ia a T1 card.  This card does not support an E1 mode. It also 
-			 does not support some of the snazzier features.  These cards were 
-			 discontinued when Digium decided to force upgrade everyone to a TE410 
-			 card."
+	DESCRIPTION
+		"This is the old Digium T400P card as identified by its 
+		 PCI Id 'D00D'X.  The card reporets a DS2152, DS21352, 
+		 DS21552 Dallas chip indicating that this ia a T1 card.  
+		 This card does not support an E1 mode. It also does not 
+		 support some of the snazzier features.  These cards 
+		 were discontinued when Digium decided to force upgrade 
+		 everyone to a TE410 card."
 	::= { x400pCardTypeX400P 2 }
 
 x400pCardTypeX400P-SS7 OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"This is an old OpenSS7 X400P-SS7 card as identified by its PCI Id 
-			 '0557'X. The next position below this arc identifies whether this is a 
-			 T1 card or an E1 card.  If there is nothing below this arc, the card 
-			 supports both E1 and T1.  These cards were discontinued when Digium 
-			 decided to force upgrade everyone to a TE410 card."
+	DESCRIPTION
+		"This is an old OpenSS7 X400P-SS7 card as identified by 
+		 its PCI Id '0557'X. The next position below this arc 
+		 identifies whether this is a T1 card or an E1 card.  If 
+		 there is nothing below this arc, the card supports both 
+		 E1 and T1.  These cards were discontinued when Digium 
+		 decided to force upgrade everyone to a TE410 card."
 	::= { x400pCardTypes 4 }
 
 x400pCardTypeE400P-SS7 OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"This is an old OpenSS7 E400P-SS7 card as identified by its PCI Id 
-			 '0557'X.  These are electically equivalent to the E400P card.  The card 
-			 reports a DS2154, DS21354 or DS21554 Dallas chip indicating that this 
-			 is an E1 card.  This card does not support a T1 mode.  It also does not 
-			 support some othe snazzier features.  These cards were discontinued 
-			 when Digium decided to force upgrade everyone to a TE410 card."
+	DESCRIPTION
+		"This is an old OpenSS7 E400P-SS7 card as identified by 
+		 its PCI Id '0557'X.  These are electically equivalent 
+		 to the E400P card.  The card reports a DS2154, DS21354 
+		 or DS21554 Dallas chip indicating that this is an E1 
+		 card.  This card does not support a T1 mode.  It also 
+		 does not support some othe snazzier features.  These 
+		 cards were discontinued when Digium decided to force 
+		 upgrade everyone to a TE410 card."
 	::= { x400pCardTypeX400P-SS7 1 }
 
 x400pCardTypeT400P-SS7 OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"This is an old OpenSS7 T400P-SS7 card as identified by its PCI Id 
-			 '0557'X.  These are electically equivalent to the T400P card.  The card 
-			 reports a DS2152, DS21352 or DS21552 Dallas chip indicating that this 
-			 is a T1 card.  This card does not support an E1 mode.  It also does not 
-			 support some othe snazzier features.  These cards were discontinued 
-			 when Digium decided to force upgrade everyone to a TE410 card."
+	DESCRIPTION
+		"This is an old OpenSS7 T400P-SS7 card as identified by 
+		 its PCI Id '0557'X.  These are electically equivalent 
+		 to the T400P card.  The card reports a DS2152, DS21352 
+		 or DS21552 Dallas chip indicating that this is a T1 
+		 card.  This card does not support an E1 mode.  It also 
+		 does not support some othe snazzier features.  These 
+		 cards were discontinued when Digium decided to force 
+		 upgrade everyone to a TE410 card."
 	::= { x400pCardTypeX400P-SS7 2 }
 
 x400PCardTypeV400P OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"This is a old Varion V400P card as identified by its PCI id '4000'X.  
-			 The next position below this arc identifies whether this is a T1 card 
-			 or an E1 card.  If there is nothing below this arc, the card supports 
-			 both E1 and T1.  These cards were discontinued by Varion due to 
-			 excessive lead content compared to newer European standards."
+	DESCRIPTION
+		"This is a old Varion V400P card as identified by its 
+		 PCI id '4000'X.  The next position below this arc 
+		 identifies whether this is a T1 card or an E1 card.  If 
+		 there is nothing below this arc, the card supports both 
+		 E1 and T1.  These cards were discontinued by Varion due 
+		 to excessive lead content compared to newer European 
+		 standards."
 	::= { x400pCardTypes 5 }
 
 x400PCardTypeV400PE OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"This is an old Varion V400PE card as identified by its PCI id '4000'X.  
-			 These cards sometimes have a E1 only chip and sometimes have a chip 
-			 that does both E1 and T1.  Some of the E1/T1 chips can be configured 
-			 for J1.  These cards are treated as E1 only.  These cards were 
-			 discontinued by Varion due to excessive lead content compared to newer 
-			 European standards."
+	DESCRIPTION
+		"This is an old Varion V400PE card as identified by its 
+		 PCI id '4000'X.  These cards sometimes have a E1 only 
+		 chip and sometimes have a chip that does both E1 and 
+		 T1.  Some of the E1/T1 chips can be configured for J1.  
+		 These cards are treated as E1 only.  These cards were 
+		 discontinued by Varion due to excessive lead content 
+		 compared to newer European standards."
 	::= { x400pCardTypeV400P 1 }
 
 x400PCardTypeV400PT OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"This is an old Varion V400PT card as identified by its PCI id '4000'X.  
-			 These cards sometimes have a T1 only chip and sometimes have a chip 
-			 that does both E1 and T1.  Some of the E1/T1 chips can be configured 
-			 for J1.  These cards are treated as T1 only.  These cards were 
-			 discontinued by Varion due to excessive lead content compared to newer 
-			 European standards."
+	DESCRIPTION
+		"This is an old Varion V400PT card as identified by its 
+		 PCI id '4000'X.  These cards sometimes have a T1 only 
+		 chip and sometimes have a chip that does both E1 and 
+		 T1.  Some of the E1/T1 chips can be configured for J1.  
+		 These cards are treated as T1 only.  These cards were 
+		 discontinued by Varion due to excessive lead content 
+		 compared to newer European standards."
 	::= { x400pCardTypeV400P 2 }
 
 x400PCardTypeV401PE OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"This is a current Varion V401PE card as identified by its PCI id 
-			 'D33D'X.  Unfortunately, even though it reports itself as an E1 card, 
-			 most of these cards are electrically identical to the T1 card, just 
-			 reporting a different PCI Id.  The chips support E1/T1/J1 and can be
-			 configured for any mode of operation, typically on a card by card basis 
-			 and sometimes on a span by span basis."
+	DESCRIPTION
+		"This is a current Varion V401PE card as identified by 
+		 its PCI id 'D33D'X.  Unfortunately, even though it 
+		 reports itself as an E1 card, most of these cards are 
+		 electrically identical to the T1 card, just reporting a 
+		 different PCI Id.  The chips support E1/T1/J1 and can 
+		 be configured for any mode of operation, typically on a 
+		 card by card basis and sometimes on a span by span 
+		 basis."
 	::= { x400pCardTypes 6 }
 
 x400PCardTypeV401PT OBJECT-IDENTITY
 	STATUS		current
-	DESCRIPTION	"This is a current Varion V401PT card as identified by its PCI id 
-			 'D44D'X.  Unfortunately, even though it reports itself as a T1 card, 
-			 most of these cards are electrically identical to the E1 card, just 
-			 reporting a different PCI Id.  The chips support E1/T1/J1 and can be 
-			 configured for any mode of operation, typically on a card by card basis 
-			 and sometimes on a span by span basis."
+	DESCRIPTION
+		"This is a current Varion V401PT card as identified by 
+		 its PCI id 'D44D'X.  Unfortunately, even though it 
+		 reports itself as a T1 card, most of these cards are 
+		 electrically identical to the E1 card, just reporting a 
+		 different PCI Id.  The chips support E1/T1/J1 and can 
+		 be configured for any mode of operation, typically on a 
+		 card by card basis and sometimes on a span by span 
+		 basis."
 	::= { x400pCardTypes 7 }
 
 END
--- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
 
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8

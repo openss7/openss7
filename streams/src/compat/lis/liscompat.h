@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/13 22:46:13 $
+ @(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/12/15 20:19:52 $
 
  -----------------------------------------------------------------------------
 
@@ -10,17 +10,18 @@
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:13 $ by $Author: brian $
+ Last Modified $Date: 2007/12/15 20:19:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: liscompat.h,v $
+ Revision 0.9.2.15  2007/12/15 20:19:52  brian
+ - updates
+
  Revision 0.9.2.14  2007/08/13 22:46:13  brian
  - GPLv3 header updates
 
@@ -61,7 +65,7 @@
 #ifndef __LOCAL_LISCOMPAT_H__
 #define __LOCAL_LISCOMPAT_H__
 
-#ident "@(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define LIS_MAXAPUSH	8
 #define LIS_FMNAMESZ	8

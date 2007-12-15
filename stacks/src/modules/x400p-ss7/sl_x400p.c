@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/10/15 17:17:19 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/12/15 20:19:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/10/15 17:17:19 $ by $Author: brian $
+ Last Modified $Date: 2007/12/15 20:19:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.50  2007/12/15 20:19:16  brian
+ - updates
+
  Revision 0.9.2.49  2007/10/15 17:17:19  brian
  - updates for 2.6.22.5-49.fc6 kernel
 
@@ -157,10 +160,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/10/15 17:17:19 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/12/15 20:19:16 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/10/15 17:17:19 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/12/15 20:19:16 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -212,7 +215,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/10/15 17:17:19 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/12/15 20:19:16 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1805,8 +1808,8 @@ STATIC sdt_config_t sdt_default_e1_span = {
 	.D = 256,
 	.t8 = 100,
 	.Te = 793544,
-	.De = 11328000,
-	.Ue = 198384000,
+	.De = 11328,
+	.Ue = 198384,
 	.N = 16,
 	.m = 272,
 	.b = 8,
@@ -1819,8 +1822,8 @@ STATIC sdt_config_t sdt_default_t1_span = {
 	.D = 256,
 	.t8 = 100,
 	.Te = 577169,
-	.De = 9308000,
-	.Ue = 144292000,
+	.De = 9308,
+	.Ue = 144292,
 	.N = 16,
 	.m = 272,
 	.b = 8,
@@ -1833,8 +1836,8 @@ STATIC sdt_config_t sdt_default_j1_span = {
 	.D = 256,
 	.t8 = 100,
 	.Te = 577169,
-	.De = 9308000,
-	.Ue = 144292000,
+	.De = 9308,
+	.Ue = 144292,
 	.N = 16,
 	.m = 272,
 	.b = 8,
@@ -1847,8 +1850,8 @@ STATIC sdt_config_t sdt_default_e1_chan = {
 	.D = 256,
 	.t8 = 100,
 	.Te = 793544,
-	.De = 11328000,
-	.Ue = 198384000,
+	.De = 11328,
+	.Ue = 198384,
 	.N = 16,
 	.m = 272,
 	.b = 8,
@@ -1861,8 +1864,8 @@ STATIC sdt_config_t sdt_default_t1_chan = {
 	.D = 256,
 	.t8 = 100,
 	.Te = 577169,
-	.De = 9308000,
-	.Ue = 144292000,
+	.De = 9308,
+	.Ue = 144292,
 	.N = 16,
 	.m = 272,
 	.b = 8,
@@ -1875,8 +1878,8 @@ STATIC sdt_config_t sdt_default_j1_chan = {
 	.D = 256,
 	.t8 = 100,
 	.Te = 577169,
-	.De = 9308000,
-	.Ue = 144292000,
+	.De = 9308,
+	.Ue = 144292,
 	.N = 16,
 	.m = 272,
 	.b = 8,

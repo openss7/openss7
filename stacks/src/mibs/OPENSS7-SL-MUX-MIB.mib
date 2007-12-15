@@ -1,7 +1,7 @@
--- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SL-MUX-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/11/06 09:47:06 $
+-- @(#) $RCSfile: OPENSS7-SL-MUX-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/15 20:19:14 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -10,18 +10,19 @@
 --
 -- All Rights Reserved.
 --
--- This program is free software; you can redistribute it and/or modify it under
--- the terms of the GNU General Public License as published by the Free Software
--- Foundation; version 3 of the License.
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
 --
--- This program is distributed in the hope that it will be useful, but WITHOUT
--- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
--- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
--- details.
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
 --
--- You should have received a copy of the GNU General Public License along with
--- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
--- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/11/06 09:47:06 $ by $Author: brian $
+-- Last Modified $Date: 2007/12/15 20:19:14 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SL-MUX-MIB.mib,v $
+-- Revision 0.9.2.2  2007/12/15 20:19:14  brian
+-- - updates
+--
 -- Revision 0.9.2.1  2007/11/06 09:47:06  brian
 -- - updated mibs
 --
@@ -67,30 +71,37 @@ IMPORTS
 		FROM OPENSS7-MIB;
 
 slMuxMIB MODULE-IDENTITY
-	LAST-UPDATED	"200710010724Z"
-	ORGANIZATION	"The OpenSS7 Project"
-	CONTACT-INFO	"Brian Bidulock
-			 OpenSS7 Corporation
-			 1469 Jefferys Crescent
-			 Emonton, Alberta T6L 6T1
-			 CANADA
-			 Tel: +1 780 490 1141
-			 Fax: +1 780 490 1241
-			 Mob: +1 780 953 0557
-			 mailto:bidulock@openss7.org"
-	DESCRIPTION	"MIB module for the Signalling Link Multiplexer.
+	LAST-UPDATED
+		"200710010724Z"
+	ORGANIZATION
+		"The OpenSS7 Project"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Emonton, Alberta T6L 6T1
+		 CANADA
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 mailto:bidulock@openss7.org"
+	DESCRIPTION
+		"MIB module for the Signalling Link Multiplexer.
 
-			 The SL-MUX is a signalling link multiplexer implemented as a STREAMS 
-			 multiplexing driver that is used to organize and manage signalling 
-			 links on the OpenSS7 platform.  Streams are opened on device drivers to 
-			 obtain signalling link Streams which are then linked under the 
-			 multiplexing driver and assigned a global PPA (Physical Point of 
-			 Attachement) and a CLEI (Common Language Equipment Identifier) or other 
-			 administrative string.  Signalling links so established can be accessed 
-			 by opening a Stream on the SL multiplexer.  The multiplexer hides 
-			 device specifics from the user of the SL multiplexer.  This MIB 
-			 provides the ability to establish these Streams and reference them from 
-			 other MIBs."
+		 The SL-MUX is a signalling link multiplexer implemented 
+		 as a STREAMS multiplexing driver that is used to 
+		 organize and manage signalling links on the OpenSS7 
+		 platform.  Streams are opened on device drivers to 
+		 obtain signalling link Streams which are then linked 
+		 under the multiplexing driver and assigned a global PPA 
+		 (Physical Point of Attachement) and a CLEI (Common 
+		 Language Equipment Identifier) or other administrative 
+		 string.  Signalling links so established can be 
+		 accessed by opening a Stream on the SL multiplexer.  
+		 The multiplexer hides device specifics from the user of 
+		 the SL multiplexer.  This MIB provides the ability to 
+		 establish these Streams and reference them from other 
+		 MIBs."
 	::= { openss7Modules 5 }
 
 -- top level organization of the MIB
@@ -115,57 +126,78 @@ slMuxObjects		OBJECT IDENTIFIER ::= { slMuxConformance 2 }
 GlobalPPA ::= TEXTUAL-CONVENTION
 	DISPLAY-HINT	"1x:"
 	STATUS		current
-	DESCRIPTION	"The GlobalPPA textual convention defines a Global PPA (Physical Point 
-			 of Attachement).  The syntax is a 4 octet string.  Embedded in the 
-			 octet string is the encoding of a reference to a specific TDM channel 
-			 on the managed element."
+	DESCRIPTION
+		"The GlobalPPA textual convention defines a Global PPA 
+		 (Physical Point of Attachement).  The syntax is a 4 
+		 octet string.  Embedded in the octet string is the 
+		 encoding of a reference to a specific TDM channel on 
+		 the managed element."
 	SYNTAX		OCTET STRING (SIZE(4))
 
 LocalPPA ::= TEXTUAL-CONVENTION
 	DISPLAY-HINT	"1x:"
 	STATUS		current
-	DESCRIPTION	"The LocalPPA textual convention defines a Local PPA (Physical Point of 
-			 Attachment).  The syntax is a 2 octet string.  The interpretation of 
-			 the bits within the octets is device specific."
+	DESCRIPTION
+		"The LocalPPA textual convention defines a Local PPA 
+		 (Physical Point of Attachment).  The syntax is a 2 
+		 octet string.  The interpretation of the bits within 
+		 the octets is device specific."
 	SYNTAX		OCTET STRING (SIZE(2))
 
 LinkDriver ::= TEXTUAL-CONVENTION
 	STATUS		current
-	DESCRIPTION	"The LinkDriver textual convention defines a STREAMS driver that will be 
-			 used to provide
+	DESCRIPTION
+		"The LinkDriver textual convention defines a STREAMS 
+		 driver that will be used to provide the signalling 
+		 link."
+	SYNTAX		DisplayString
 
 
 -- ====================================================================
 
 SlMuxNameEntry ::=
 	SEQUENCE {
-		slMuxNameName		SnmpAdminString,
-		slMuxNamePPA		GlobalPPA
+		slMuxNameName
+			SnmpAdminString,
+		slMuxNamePPA
+			GlobalPPA
 	}
 
 SlMuxLinkEntry ::=
 	SEQUENCE {
-		slMuxLinkPPA			GlobalPPA,
-		slMuxLinkName			SnmpAdminString,
+		slMuxLinkPPA
+			GlobalPPA,
+		slMuxLinkName
+			SnmpAdminString,
 
-		slMuxLinkOperationalState	OperationalState,
-		slMuxLinkUsageState		UsageState,
-		slMuxLinkAdministrativeState	AdministrativeState,
+		slMuxLinkOperationalState
+			OperationalState,
+		slMuxLinkUsageState
+			UsageState,
+		slMuxLinkAdministrativeState
+			AdministrativeState,
 
-		slMuxLinkAlarmStatus		AlarmStatus,
-		slMuxLinkProceduralStatus	ProceduralStatus,
-		slMuxLinkAvailabilityStatus	AvailabilityStatus,
-		slMuxLinkControlStatus		ControlStatus,
-		slMuxLinkUnknownStatus		UnknownStatus,
+		slMuxLinkAlarmStatus
+			AlarmStatus,
+		slMuxLinkProceduralStatus
+			ProceduralStatus,
+		slMuxLinkAvailabilityStatus
+			AvailabilityStatus,
+		slMuxLinkControlStatus
+			ControlStatus,
+		slMuxLinkUnknownStatus
+			UnknownStatus,
 
-		slMuxLinkDriver			OBJECT IDENTIFIER,
-		slMuxLinkLocalPPA		LocalPPA,
+		slMuxLinkDriver
+			OBJECT IDENTIFIER,
+		slMuxLinkLocalPPA
+			LocalPPA,
 
-		slMuxLinkStatus			RowStatus
+		slMuxLinkStatus
+			RowStatus
 	}
 
 
 END
 
--- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
-
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8

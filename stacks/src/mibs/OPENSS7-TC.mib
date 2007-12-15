@@ -1,3 +1,61 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-TC.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:19:14 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2007/12/15 20:19:14 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-TC.mib,v $
+-- Revision 0.9.2.3  2007/12/15 20:19:14  brian
+-- - updates
+--
+-- =============================================================================
 
 OPENSS7-TC DEFINITIONS ::= BEGIN
 
@@ -10,7 +68,8 @@ IMPORTS
 		FROM OPENSS7-SMI;
 
 openss7TextualConventions MODULE-IDENTITY
-	LAST-UPDATED	"200709220000Z"
+	LAST-UPDATED
+		"200709220000Z"
 	ORGANIZATION
 		"OpenSS7 Corporation"
 	CONTACT-INFO
@@ -18,106 +77,109 @@ openss7TextualConventions MODULE-IDENTITY
 		 OpenSS7 Corporation
 		 1469 Jefferys Crescent
 		 Edmonton, Alberta T6L 6T1
-		 Canada
-
+		 CANADA
 		 Tel: +1 780 490 1141
 		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
 		 E-mail: bidulock@openss7.org"
 	DESCRIPTION
-		"This module defines textual conventions use throughout the
-		 OpenSS7 enterprise MIBs."
+		"This module defines textual conventions use throughout 
+		 the OpenSS7 enterprise MIBs."
 	::= { openss7Modules 1 }
 
 openss7ProfileId ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"A configured name associated with an SS7 signalling protocol
-		 profile."
+		"A configured name associated with an SS7 signalling 
+		 protocol profile."
 
-openss7MilliSeconds ::= TEXTUAL-CONVENTION
+MilliSeconds ::= TEXTUAL-CONVENTION
 	DISPLAY-HINT	"d-3"
 	STATUS		current
 	DESCRIPTION
-		"This textual convetion is used to represent time durations in
-		 milliseconds instead of centiseconds as is TimeValue."
+		"This textual convetion is used to represent time 
+		 durations in milliseconds instead of centiseconds as is 
+		 TimeValue."
 	SYNTAX		Unsigned32
 
 openss7Ss7ProtocolStandard ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This textual convention is used for identifying the protocol
-		 standard.  This is the same values as are used by protocol
-		 management."
-	SYNTAX		INTEGER {
-				itut(0),
-				etsi(1),
-				jttc(2),
-				china(3),
-				singapore(4),
-				spain(5)
-			}
+		"This textual convention is used for identifying the 
+		 protocol standard.  This is the same values as are used 
+		 by protocol management."
+	SYNTAX	INTEGER { itut(0), etsi(1), jttc(2), china(3), 
+				singapore(4), spain(5) }
 
 openss7Ss7ProtocolYear ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This textual convention is used for identifying the standard
-		 issue year.  Only values within a 4 year interval are
-		 significant; that is, 1988..1991 are all interpreted as 1988,
-		 1992..1995 are interpreted as 1992, etc."
+		"This textual convention is used for identifying the 
+		 standard issue year.  Only values within a 4 year 
+		 interval are significant; that is, 1988..1991 are all 
+		 interpreted as 1988, 1992..1995 are interpreted as 
+		 1992, etc."
 	SYNTAX		INTEGER (1984..2999)
 
 openss7Ss7ProtocolOptions ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This textual convention is used to specify protocol options
-		 accross anumber of protocol levels.  Not all protocol options
-		 apply to all levels.  When a protocol option is set for a level
-		 to which it does not apply, it has no effect."
-	SYNTAX		BITS {
-				mplev(0),	-- multiple priority/congestion levels
-				pcr(1),		-- preventative cyclic retransmission
-				hsl(2),		-- high speed links
-				xsn(3),		-- extended sequence numbers
-				nopr(4)		-- no proving
-			}
+		"This textual convention is used to specify protocol 
+		 options accross anumber of protocol levels.  Not all 
+		 protocol options apply to all levels.  When a protocol 
+		 option is set for a level to which it does not apply, 
+		 it has no effect."
+	SYNTAX	BITS {
+			mplev(0),	-- multiple priority/congestion levels
+			pcr(1),		-- preventative cyclic retransmission
+			hsl(2),		-- high speed links
+			xsn(3),		-- extended sequence numbers
+			nopr(4)		-- no proving
+		}
 
 CircuitIdentificationCode ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-		"This an an SS7 circuit identification code as used by TUP or
-		 ISUP to identify a circuit (channel) between two signalling
-		 point codes (MTP instances).  In ITU-T based networks, this can
-		 take on the value (0..4095).  In ANSI based networks, this
-		 can take on the value from (0..16383).  At one time, the 12
-		 bits of the ITU-T CIC were broken into 4 x 4-bit fields to
-		 identify the facility, group and channel of the circuit.
-		 Nowadays, while the low order 4 bits still represents the
-		 channel for E1, CICs are assigned pseudo-arbitrarily to
-		 circuits.  The only constraint is that a contiguous range of
-		 CICs are assigned to the channels making up a circuit group."
+		"This an an SS7 circuit identification code as used by 
+		 TUP or ISUP to identify a circuit (channel) between two 
+		 signalling point codes (MTP instances).  In ITU-T based 
+		 networks, this can take on the value (0..4095).  In 
+		 ANSI based networks, this can take on the value from 
+		 (0..16383).  At one time, the 12 bits of the ITU-T CIC 
+		 were broken into 4 x 4-bit fields to identify the 
+		 facility, group and channel of the circuit.  Nowadays, 
+		 while the low order 4 bits still represents the channel 
+		 for E1, CICs are assigned pseudo-arbitrarily to 
+		 circuits.  The only constraint is that a contiguous 
+		 range of CICs are assigned to the channels making up a 
+		 circuit group."
 	SYNTAX		INTEGER (0..16383)
 
 CommonLanguageName ::= TEXTUAL-CONVENTION
 	DISPLAY-HINT	"a"
 	STATUS		current
 	DESCRIPTION
-		"In the Telcordia style, this is an extended Common Lanuage
-		 Location Identifier.  The identifier is a Telcordia CLLI
-		 extended by a brief text string identifying the equipment
-		 or facility at the switch location.  Alternately, barring a
-		 CLLI assignment from Telcorida or other name assigning body,
-		 this can be any fixed fielded ASCII identifier.  It should not
-		 contain control characters, graphics characters, nor whitespace"
+		"In the Telcordia style, this is an extended Common 
+		 Lanuage Location Identifier.  The identifier is a 
+		 Telcordia CLLI extended by a brief text string 
+		 identifying the equipment or facility at the switch 
+		 location.  Alternately, barring a CLLI assignment from 
+		 Telcorida or other name assigning body, this can be any 
+		 fixed fielded ASCII identifier.  It should not contain 
+		 control characters, graphics characters, nor 
+		 whitespace"
 	SYNTAX		OCTET STRING (SIZE(0..32))
 
 CircuitCode ::= TEXTUAL-CONVENTION
 	DISPLAY-HINT	"1x-"
 	STATUS		current
 	DESCRIPTION
-		"This is a physical point of appearance (PPA) or circuit
-		 code which uniquely identifies a circuit within the
+		"This is a physical point of appearance (PPA) or circuit 
+		 code which uniquely identifies a circuit within the 
 		 managed switching element."
 	SYNTAX		OCTET STRING (SIZE(4))
 
 
 END
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8

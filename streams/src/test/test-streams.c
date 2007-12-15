@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/08/15 05:33:37 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2007/12/15 20:20:15 $
 
  -----------------------------------------------------------------------------
 
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 3, so long as the software is distributed
- with, and only used for the testing of, OpenSS7 modules, drivers, and
- libraries.
+ Affero General Public License (GPL) Version 3, so long as the software is
+ distributed with, and only used for the testing of, OpenSS7 modules, drivers,
+ and libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:33:37 $ by $Author: brian $
+ Last Modified $Date: 2007/12/15 20:20:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.70  2007/12/15 20:20:15  brian
+ - updates
+
  Revision 0.9.2.69  2007/08/15 05:33:37  brian
  - GPLv3 updates
 
@@ -282,9 +285,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/08/15 05:33:37 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2007/12/15 20:20:15 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/08/15 05:33:37 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2007/12/15 20:20:15 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -22338,8 +22341,9 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 3,  so long as the  software is distributed\n\
-with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
+Affero  General Public License (AGPL)  Version 3,  so long  as  the  software is\n\
+distributed with,  and only used for the  testing of,  OpenSS7 modules, drivers,\n\
+and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\

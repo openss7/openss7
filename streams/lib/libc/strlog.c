@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/13 22:46:11 $
+ @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/12/15 20:19:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:11 $ by $Author: brian $
+ Last Modified $Date: 2007/12/15 20:19:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlog.c,v $
+ Revision 0.9.2.5  2007/12/15 20:19:51  brian
+ - updates
+
  Revision 0.9.2.4  2007/08/13 22:46:11  brian
  - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/13 22:46:11 $"
+#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/12/15 20:19:51 $"
 
 static char const ident[] =
-    "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/13 22:46:11 $";
+    "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/12/15 20:19:51 $";
+
+#define rpl_realloc realloc /* hah! */
 
 #include "streams.h"
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/11/10 19:40:54 $
+ @(#) $RCSfile: xap.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/11/10 19:40:54 $ by $Author: brian $
+ Last Modified $Date: 2007/12/15 20:20:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xap.c,v $
+ Revision 0.9.2.3  2007/12/15 20:20:33  brian
+ - updates
+
  Revision 0.9.2.2  2007/11/10 19:40:54  brian
  - documentation updates
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/11/10 19:40:54 $"
+#ident "@(#) $RCSfile: xap.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:33 $"
 
-static char const ident[] = "$RCSfile: xap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/11/10 19:40:54 $";
+static char const ident[] = "$RCSfile: xap.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:33 $";
 
 /* This file can be processed with doxygen(1). */
 

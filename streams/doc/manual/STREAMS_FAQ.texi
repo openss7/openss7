@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS_FAQ.texi,v 0.9.2.11 2007/08/12 06:44:33 brian Exp $
+% @(#) $Id: STREAMS_FAQ.texi,v 0.9.2.12 2007/12/15 20:19:44 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/12 06:44:33 $ by $Author: brian $
+% Last Modified $Date: 2007/12/15 20:19:44 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -226,7 +226,9 @@ FAQ
 
 Copying
 
+* GNU Affero General Public License::	AGPL
 * GNU General Public License::		GPL
+* GNU Lesser General Public License::	LGPL
 * GNU Free Documentation License::	FDL
 
 @end menu
@@ -278,8 +280,8 @@ Reports}.
 @cindex document notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
-General Public License}).  Please note, however, that there are different licensing terms for the
+This package is released and distributed under the @cite{GNU Affero General Public License} (@pxref{GNU
+Affero General Public License}).  Please note, however, that there are different licensing terms for the
 manual pages and some of the documentation (derived from X/Open publications and other sources).
 Consult the permission notices contained in the documentation for more information.
 
@@ -347,6 +349,9 @@ package.
 @smallexample
 
 $Log: STREAMS_FAQ.texi,v $
+Revision 0.9.2.12  2007/12/15 20:19:44  brian
+- updates
+
 Revision 0.9.2.11  2007/08/12 06:44:33  brian
 - updated licenses in manuals
 
@@ -1108,7 +1113,7 @@ assertions approaches in its implementation avoiding these difficulties.
 @cite{@value{PACKAGE_TITLE}} is a completely new implementation of @dfn{STREAMS} independent from
 @cite{LiS} and not derived from @cite{LiS}.  @cite{LiS} is a collection of software available under
 various licenses with little or no commercial licensing alternatives available.
-@cite{@value{PACKAGE_TITLE}} is released in entirety under the @dfn{GPL}, but the implementation can
+@cite{@value{PACKAGE_TITLE}} is released in entirety under the @dfn{AGPL}, but the implementation can
 be commercially licensed from @uref{http://www.openss7.com/,OpenSS7 Corporation}.
 
 @item Scalable
@@ -1280,13 +1285,18 @@ user-space facilities and system calls are completely defined and described.
 @appendix Copying
 
 @menu
+* GNU Affero General Public License::	AGPL
 * GNU General Public License::		GPL
+* GNU Lesser General Public License::	LGPL
 * GNU Free Documentation License::	FDL
 @end menu
 
 @page
+@include texi/agpl3.texi
+@page
 @include texi/gpl3.texi
-
+@page
+@include texi/lgpl3.texi
 @page
 @include texi/fdl.texi
 

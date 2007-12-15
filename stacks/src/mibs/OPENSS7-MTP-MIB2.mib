@@ -1,7 +1,7 @@
--- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MTP-MIB2.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/10/15 01:15:43 $
+-- @(#) $RCSfile: OPENSS7-MTP-MIB2.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/15 20:19:14 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -10,18 +10,19 @@
 --
 -- All Rights Reserved.
 --
--- This program is free software; you can redistribute it and/or modify it under
--- the terms of the GNU General Public License as published by the Free Software
--- Foundation; version 3 of the License.
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
 --
--- This program is distributed in the hope that it will be useful, but WITHOUT
--- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
--- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
--- details.
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
 --
--- You should have received a copy of the GNU General Public License along with
--- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
--- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/10/15 01:15:43 $ by $Author: brian $
+-- Last Modified $Date: 2007/12/15 20:19:14 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MTP-MIB2.mib,v $
+-- Revision 0.9.2.2  2007/12/15 20:19:14  brian
+-- - updates
+--
 -- Revision 0.9.2.1  2007/10/15 01:15:43  brian
 -- - added MIBs
 --
@@ -75,19 +79,22 @@ IMPORTS
 		FROM OPENSS7-SMI;
 
 mtpMIB2 MODULE-IDENTITY
-	LAST-UPDATED	"200709301118Z"
-	ORGANIZATION	"The OpenSS7 Project"
-	CONTACT-INFO	"Brian Bidulock
-			 OpenSS7 Corporation
-			 1469 Jefferys Crescent
-			 Edmonton, Alberta
-			 Canada T6L 6T1
-			 Tel: +1 780 490 1141
-			 Fax: +1 780 490 1241
-			 Mob: +1 780 953 0557
-			 mailto:bidulock@openss7.org"
+	LAST-UPDATED
+		"200709301118Z"
+	ORGANIZATION
+		"The OpenSS7 Project"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta  T6L 6T1
+		 CANADA
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 mailto:bidulock@openss7.org"
 	DESCRIPTION
-			"Second crack at SS7 MTP MIB."
+		"Second crack at SS7 MTP MIB."
 	::= { openss7Modules 3 }
 
 -- top level organization of the MIB
@@ -176,36 +183,63 @@ mtpL2ProfileEntry OBJECT-TYPE
 
 MtpL2ProfileEntry ::=
 	SEQUENCE {
-		mtpL2ProfileIndex		Unsigned32,
-		mtpL2ProfileTransmissionRate	MtpTransmissionRate,
-		mtpL2ProfileName		SnmpAdminString,
-		mtpL2ProfileTimerT1		TimeInterval,
-		mtpL2ProfileTimerT2		TimeInterval,
-		mtpL2ProfileTimerT2L		TimeInterval,
-		mtpL2ProfileTimerT2H		TimeInterval,
-		mtpL2ProfileTimerT3		TimeInterval,
-		mtpL2ProfileTimerT4N		TimeInterval,
-		mtpL2ProfileTimerT4E		TimeInterval,
-		mtpL2ProfileTimerT5		TimeInterval,
-		mtpL2ProfileTimerT6		TimeInterval,
-		mtpL2ProfileTimerT7		TimeInterval,
-		mtpL2ProfileN1			Unsigned32,
-		mtpL2ProfileN2			Unsigned32,
-		mtpL2ProfileRbAccept		Unsigned32,
-		mtpL2ProfileRbDiscard		Unsigned32,
-		mtpL2ProfileRbAbate		Unsigned32,
-		mtpL2ProfileTbAbate0		Unsigned32,
-		mtpL2ProfileTbOnset0		Unsigned32,
-		mtpL2ProfileTbDiscard0		Unsigned32,
-		mtpL2ProfileTbAbate1		Unsigned32,
-		mtpL2ProfileTbOnset1		Unsigned32,
-		mtpL2ProfileTbDiscard1		Unsigned32,
-		mtpL2ProfileTbAbate2		Unsigned32,
-		mtpL2ProfileTbOnset2		Unsigned32,
-		mtpL2ProfileTbDiscard2		Unsigned32,
-		mtpL2ProfileStatus		RowStatus
-	}
-
+		mtpL2ProfileIndex
+			Unsigned32,
+		mtpL2ProfileTransmissionRate
+			MtpTransmissionRate,
+		mtpL2ProfileName
+			SnmpAdminString,
+		mtpL2ProfileTimerT1
+			TimeInterval,
+		mtpL2ProfileTimerT2
+			TimeInterval,
+		mtpL2ProfileTimerT2L
+			TimeInterval,
+		mtpL2ProfileTimerT2H
+			TimeInterval,
+		mtpL2ProfileTimerT3
+			TimeInterval,
+		mtpL2ProfileTimerT4N
+			TimeInterval,
+		mtpL2ProfileTimerT4E
+			TimeInterval,
+		mtpL2ProfileTimerT5
+			TimeInterval,
+		mtpL2ProfileTimerT6
+			TimeInterval,
+		mtpL2ProfileTimerT7
+			TimeInterval,
+		mtpL2ProfileN1
+			Unsigned32,
+		mtpL2ProfileN2
+			Unsigned32,
+		mtpL2ProfileRbAccept
+			Unsigned32,
+		mtpL2ProfileRbDiscard
+			Unsigned32,
+		mtpL2ProfileRbAbate
+			Unsigned32,
+		mtpL2ProfileTbAbate0
+			Unsigned32,
+		mtpL2ProfileTbOnset0
+			Unsigned32,
+		mtpL2ProfileTbDiscard0
+			Unsigned32,
+		mtpL2ProfileTbAbate1
+			Unsigned32,
+		mtpL2ProfileTbOnset1
+			Unsigned32,
+		mtpL2ProfileTbDiscard1
+			Unsigned32,
+		mtpL2ProfileTbAbate2
+			Unsigned32,
+		mtpL2ProfileTbOnset2
+			Unsigned32,
+		mtpL2ProfileTbDiscard2
+			Unsigned32,
+		mtpL2ProfileStatus
+			RowStatus
+	} 
 
 mtpL2ProfileIndex OBJECT-TYPE
 	SYNTAX		Unsigned32
@@ -241,6 +275,7 @@ mtpL2ProfileName OBJECT-TYPE
 
 mtpL2ProfileTimerT1 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -266,6 +301,7 @@ mtpL2ProfileTimerT1 OBJECT-TYPE
 
 mtpL2ProfileTimerT2 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -276,6 +312,7 @@ mtpL2ProfileTimerT2 OBJECT-TYPE
 
 mtpL2ProfileTimerT2L OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -287,6 +324,7 @@ mtpL2ProfileTimerT2L OBJECT-TYPE
 
 mtpL2ProfileTimerT2H OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -298,6 +336,7 @@ mtpL2ProfileTimerT2H OBJECT-TYPE
 
 mtpL2ProfileTimerT3 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -305,8 +344,10 @@ mtpL2ProfileTimerT3 OBJECT-TYPE
 	REFERENCE
 		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
 	::= { mtpL2ProfileEntry 8 }
+
 mtpL2ProfileTimerT4N OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -324,6 +365,7 @@ mtpL2ProfileTimerT4N OBJECT-TYPE
 
 mtpL2ProfileTimerT4E OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -341,6 +383,7 @@ mtpL2ProfileTimerT4E OBJECT-TYPE
 
 mtpL2ProfileTimerT5 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -351,6 +394,7 @@ mtpL2ProfileTimerT5 OBJECT-TYPE
 
 mtpL2ProfileTimerT6 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -361,6 +405,7 @@ mtpL2ProfileTimerT6 OBJECT-TYPE
 
 mtpL2ProfileTimerT7 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -549,32 +594,58 @@ mtpSlProfileEntry OBJECT-TYPE
 
 MtpSlProfileEntry ::=
 	SEQUENCE {
-		mtpSlProfileIndex		Unsigned32,
-		mtpSlProfileName		SnmpAdminString,
-		mtpSlProfileTimerT1		TimeInterval,
-		mtpSlProfileTimerT2		TimeInterval,
-		mtpSlProfileTimerT3		TimeInterval,
-		mtpSlProfileTimerT4		TimeInterval,
-		mtpSlProfileTimerT5		TimeInterval,
-		mtpSlProfileTimerT12		TimeInterval,
-		mtpSlProfileTimerT13		TimeInterval,
-		mtpSlProfileTimerT14		TimeInterval,
-		mtpSlProfileTimerT17		TimeInterval,
-		mtpSlProfileTimerT19A		TimeInterval,
-		mtpSlProfileTimerT20A		TimeInterval,
-		mtpSlProfileTimerT21A		TimeInterval,
-		mtpSlProfileTimerT22		TimeInterval,
-		mtpSlProfileTimerT23		TimeInterval,
-		mtpSlProfileTimerT24		TimeInterval,
-		mtpSlProfileTimerT31A		TimeInterval,
-		mtpSlProfileTimerT32A		TimeInterval,
-		mtpSlProfileTimerT33A		TimeInterval,
-		mtpSlProfileTimerT34A		TimeInterval,
-		mtpSlProfileTimerT1T		TimeInterval,
-		mtpSlProfileTimerT2T		TimeInterval,
-		mtpSlProfileTimerT1S		TimeInterval,
-		mtpSlProfileL2Default		Unsigned32,
-		mtpSlProfileStatus		RowStatus
+		mtpSlProfileIndex
+			Unsigned32,
+		mtpSlProfileName
+			SnmpAdminString,
+		mtpSlProfileTimerT1
+			TimeInterval,
+		mtpSlProfileTimerT2
+			TimeInterval,
+		mtpSlProfileTimerT3
+			TimeInterval,
+		mtpSlProfileTimerT4
+			TimeInterval,
+		mtpSlProfileTimerT5
+			TimeInterval,
+		mtpSlProfileTimerT12
+			TimeInterval,
+		mtpSlProfileTimerT13
+			TimeInterval,
+		mtpSlProfileTimerT14
+			TimeInterval,
+		mtpSlProfileTimerT17
+			TimeInterval,
+		mtpSlProfileTimerT19A
+			TimeInterval,
+		mtpSlProfileTimerT20A
+			TimeInterval,
+		mtpSlProfileTimerT21A
+			TimeInterval,
+		mtpSlProfileTimerT22
+			TimeInterval,
+		mtpSlProfileTimerT23
+			TimeInterval,
+		mtpSlProfileTimerT24
+			TimeInterval,
+		mtpSlProfileTimerT31A
+			TimeInterval,
+		mtpSlProfileTimerT32A
+			TimeInterval,
+		mtpSlProfileTimerT33A
+			TimeInterval,
+		mtpSlProfileTimerT34A
+			TimeInterval,
+		mtpSlProfileTimerT1T
+			TimeInterval,
+		mtpSlProfileTimerT2T
+			TimeInterval,
+		mtpSlProfileTimerT1S
+			TimeInterval,
+		mtpSlProfileL2Default
+			Unsigned32,
+		mtpSlProfileStatus
+			RowStatus
 	}
 
 mtpSlProfileIndex OBJECT-TYPE
@@ -595,6 +666,7 @@ mtpSlProfileName OBJECT-TYPE
 
 mtpSlProfileTimerT1 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -603,6 +675,7 @@ mtpSlProfileTimerT1 OBJECT-TYPE
 
 mtpSlProfileTimerT2 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -611,6 +684,7 @@ mtpSlProfileTimerT2 OBJECT-TYPE
 
 mtpSlProfileTimerT3 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -619,6 +693,7 @@ mtpSlProfileTimerT3 OBJECT-TYPE
 
 mtpSlProfileTimerT4 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -627,6 +702,7 @@ mtpSlProfileTimerT4 OBJECT-TYPE
 
 mtpSlProfileTimerT5 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -635,6 +711,7 @@ mtpSlProfileTimerT5 OBJECT-TYPE
 
 mtpSlProfileTimerT12 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -643,6 +720,7 @@ mtpSlProfileTimerT12 OBJECT-TYPE
 
 mtpSlProfileTimerT13 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -651,6 +729,7 @@ mtpSlProfileTimerT13 OBJECT-TYPE
 
 mtpSlProfileTimerT14 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -659,6 +738,7 @@ mtpSlProfileTimerT14 OBJECT-TYPE
 
 mtpSlProfileTimerT17 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -667,6 +747,7 @@ mtpSlProfileTimerT17 OBJECT-TYPE
 
 mtpSlProfileTimerT19A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -675,6 +756,7 @@ mtpSlProfileTimerT19A OBJECT-TYPE
 
 mtpSlProfileTimerT20A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -683,6 +765,7 @@ mtpSlProfileTimerT20A OBJECT-TYPE
 
 mtpSlProfileTimerT21A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -691,6 +774,7 @@ mtpSlProfileTimerT21A OBJECT-TYPE
 
 mtpSlProfileTimerT22 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -699,6 +783,7 @@ mtpSlProfileTimerT22 OBJECT-TYPE
 
 mtpSlProfileTimerT23 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -707,6 +792,7 @@ mtpSlProfileTimerT23 OBJECT-TYPE
 
 mtpSlProfileTimerT24 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -715,6 +801,7 @@ mtpSlProfileTimerT24 OBJECT-TYPE
 
 mtpSlProfileTimerT31A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -723,6 +810,7 @@ mtpSlProfileTimerT31A OBJECT-TYPE
 
 mtpSlProfileTimerT32A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -731,6 +819,7 @@ mtpSlProfileTimerT32A OBJECT-TYPE
 
 mtpSlProfileTimerT33A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -739,6 +828,7 @@ mtpSlProfileTimerT33A OBJECT-TYPE
 
 mtpSlProfileTimerT34A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -747,6 +837,7 @@ mtpSlProfileTimerT34A OBJECT-TYPE
 
 mtpSlProfileTimerT1T OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -755,6 +846,7 @@ mtpSlProfileTimerT1T OBJECT-TYPE
 
 mtpSlProfileTimerT2T OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -763,6 +855,7 @@ mtpSlProfileTimerT2T OBJECT-TYPE
 
 mtpSlProfileTimerT1S OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -814,16 +907,26 @@ mtpLkProfileEntry OBJECT-TYPE
 
 MtpLkProfileEntry ::=
 	SEQUENCE {
-		mtpLkProfileIndex		Unsigned32,
-		mtpLkProfileTimerT7		TimeInterval,
-		mtpLkProfileTimerT19		TimeInterval,
-		mtpLkProfileTimerT21		TimeInterval,
-		mtpLkProfileTimerT25A		TimeInterval,
-		mtpLkProfileTimerT28A		TimeInterval,
-		mtpLkProfileTimerT29A		TimeInterval,
-		mtpLkProfileTimerT30A		TimeInterval,
-		mtpLkProfileSlDefault		Unsigned32,
-		mtpLkProfileStatus		RowStatus
+		mtpLkProfileIndex
+			Unsigned32,
+		mtpLkProfileTimerT7
+			TimeInterval,
+		mtpLkProfileTimerT19
+			TimeInterval,
+		mtpLkProfileTimerT21
+			TimeInterval,
+		mtpLkProfileTimerT25A
+			TimeInterval,
+		mtpLkProfileTimerT28A
+			TimeInterval,
+		mtpLkProfileTimerT29A
+			TimeInterval,
+		mtpLkProfileTimerT30A
+			TimeInterval,
+		mtpLkProfileSlDefault
+			Unsigned32,
+		mtpLkProfileStatus
+			RowStatus
 	}
 
 mtpLkProfileIndex OBJECT-TYPE
@@ -836,6 +939,7 @@ mtpLkProfileIndex OBJECT-TYPE
 
 mtpLkProfileTimerT7 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -846,6 +950,7 @@ mtpLkProfileTimerT7 OBJECT-TYPE
 
 mtpLkProfileTimerT19 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -856,6 +961,7 @@ mtpLkProfileTimerT19 OBJECT-TYPE
 
 mtpLkProfileTimerT21 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -866,6 +972,7 @@ mtpLkProfileTimerT21 OBJECT-TYPE
 
 mtpLkProfileTimerT25A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -876,6 +983,7 @@ mtpLkProfileTimerT25A OBJECT-TYPE
 
 mtpLkProfileTimerT28A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -886,6 +994,7 @@ mtpLkProfileTimerT28A OBJECT-TYPE
 
 mtpLkProfileTimerT29A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -896,6 +1005,7 @@ mtpLkProfileTimerT29A OBJECT-TYPE
 
 mtpLkProfileTimerT30A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -953,11 +1063,16 @@ mtpRtProfileEntry OBJECT-TYPE
 
 MtpRtProfileEntry ::=
 	SEQUENCE {
-		mtpRtProfileIndex		Unsigned32,
-		mtpRtProfileName		SnmpAdminString,
-		mtpRtProfileTimerT6		TimeInterval,
-		mtpRtProfileTimerT10		TimeInterval,
-		mtpRtProfileStatus		RowStatus
+		mtpRtProfileIndex
+			Unsigned32,
+		mtpRtProfileName
+			SnmpAdminString,
+		mtpRtProfileTimerT6
+			TimeInterval,
+		mtpRtProfileTimerT10
+			TimeInterval,
+		mtpRtProfileStatus
+			RowStatus
 	}
 
 mtpRtProfileIndex OBJECT-TYPE
@@ -978,6 +1093,7 @@ mtpRtProfileName OBJECT-TYPE
 
 mtpRtProfileTimerT6 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -986,6 +1102,7 @@ mtpRtProfileTimerT6 OBJECT-TYPE
 
 mtpRtProfileTimerT10 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1028,15 +1145,24 @@ mtpRsProfileEntry OBJECT-TYPE
 
 MtpRsProfileEntry ::=
 	SEQUENCE {
-		mtpRsProfileIndex		Unsigned32,
-		mtpRsProfileName		SnmpAdminString,
-		mtpRsProfileTimerT8		TimeInterval,
-		mtpRsProfileTimerT11		TimeInterval,
-		mtpRsProfileTimerT15		TimeInterval,
-		mtpRsProfileTimerT16		TimeInterval,
-		mtpRsProfileTimerT18A		TimeInterval,
-		mtpRsProfileRtDefault		Unsigned32,
-		mtpRsProfileStatus		RowStatus
+		mtpRsProfileIndex
+			Unsigned32,
+		mtpRsProfileName
+			SnmpAdminString,
+		mtpRsProfileTimerT8
+			TimeInterval,
+		mtpRsProfileTimerT11
+			TimeInterval,
+		mtpRsProfileTimerT15
+			TimeInterval,
+		mtpRsProfileTimerT16
+			TimeInterval,
+		mtpRsProfileTimerT18A
+			TimeInterval,
+		mtpRsProfileRtDefault
+			Unsigned32,
+		mtpRsProfileStatus
+			RowStatus
 	}
 
 mtpRsProfileIndex OBJECT-TYPE
@@ -1057,6 +1183,7 @@ mtpRsProfileName OBJECT-TYPE
 
 mtpRsProfileTimerT8 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1065,6 +1192,7 @@ mtpRsProfileTimerT8 OBJECT-TYPE
 
 mtpRsProfileTimerT11 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1073,6 +1201,7 @@ mtpRsProfileTimerT11 OBJECT-TYPE
 
 mtpRsProfileTimerT15 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1081,6 +1210,7 @@ mtpRsProfileTimerT15 OBJECT-TYPE
 
 mtpRsProfileTimerT16 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1089,6 +1219,7 @@ mtpRsProfileTimerT16 OBJECT-TYPE
 
 mtpRsProfileTimerT18A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1141,19 +1272,32 @@ mtpSpProfileEntry OBJECT-TYPE
 
 MtpSpProfileEntry ::=
 	SEQUENCE {
-		mtpSpProfileIndex		Unsigned32,
-		mtpSpProfileName		SnmpAdminString,
-		mtpSpProfileTimerT1R		TimeInterval,
-		mtpSpProfileTimerT18		TimeInterval,
-		mtpSpProfileTimerT20		TimeInterval,
-		mtpSpProfileTimerT22A		TimeInterval,
-		mtpSpProfileTimerT23A		TimeInterval,
-		mtpSpProfileTimerT24A		TimeInterval,
-		mtpSpProfileTimerT26A		TimeInterval,
-		mtpSpProfileTimerT27A		TimeInterval,
-		mtpSpProfileRsDefault		Unsigned32,
-		mtpSpProfileLkDefault		Unsigned32,
-		mtpSpProfileStatus		RowStatus
+		mtpSpProfileIndex
+			Unsigned32,
+		mtpSpProfileName
+			SnmpAdminString,
+		mtpSpProfileTimerT1R
+			TimeInterval,
+		mtpSpProfileTimerT18
+			TimeInterval,
+		mtpSpProfileTimerT20
+			TimeInterval,
+		mtpSpProfileTimerT22A
+			TimeInterval,
+		mtpSpProfileTimerT23A
+			TimeInterval,
+		mtpSpProfileTimerT24A
+			TimeInterval,
+		mtpSpProfileTimerT26A
+			TimeInterval,
+		mtpSpProfileTimerT27A
+			TimeInterval,
+		mtpSpProfileRsDefault
+			Unsigned32,
+		mtpSpProfileLkDefault
+			Unsigned32,
+		mtpSpProfileStatus
+			RowStatus
 	}
 
 mtpSpProfileIndex OBJECT-TYPE
@@ -1174,6 +1318,7 @@ mtpSpProfileName OBJECT-TYPE
 
 mtpSpProfileTimerT1R OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1182,6 +1327,7 @@ mtpSpProfileTimerT1R OBJECT-TYPE
 
 mtpSpProfileTimerT18 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1190,6 +1336,7 @@ mtpSpProfileTimerT18 OBJECT-TYPE
 
 mtpSpProfileTimerT20 OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1198,6 +1345,7 @@ mtpSpProfileTimerT20 OBJECT-TYPE
 
 mtpSpProfileTimerT22A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1206,6 +1354,7 @@ mtpSpProfileTimerT22A OBJECT-TYPE
 
 mtpSpProfileTimerT23A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1214,6 +1363,7 @@ mtpSpProfileTimerT23A OBJECT-TYPE
 
 mtpSpProfileTimerT24A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1222,6 +1372,7 @@ mtpSpProfileTimerT24A OBJECT-TYPE
 
 mtpSpProfileTimerT26A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1230,6 +1381,7 @@ mtpSpProfileTimerT26A OBJECT-TYPE
 
 mtpSpProfileTimerT27A OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -1265,14 +1417,22 @@ mtpSpProfileStatus OBJECT-TYPE
 
 MtpNaProfileEntry ::=
 	SEQUENCE {
-		mtpNaProfileIndex		Unsigned32,
-		mtpNaProfileName		SnmpAdminString,
-		mtpNaProtocolVariant		Ss7ProtocolVariant,
-		mtpNaProtocolYear		INTEGER,
-		mtpNaNetworkIndicator		INTEGER,
-		mtpNaPointCodeFormat		INTEGER,
-		mtpNaProfileSpDefault		Unsigned32,
-		mtpNaProfileStatus		RowStatus
+		mtpNaProfileIndex
+			Unsigned32,
+		mtpNaProfileName
+			SnmpAdminString,
+		mtpNaProtocolVariant
+			Ss7ProtocolVariant,
+		mtpNaProtocolYear
+			INTEGER,
+		mtpNaNetworkIndicator
+			INTEGER,
+		mtpNaPointCodeFormat
+			INTEGER,
+		mtpNaProfileSpDefault
+			Unsigned32,
+		mtpNaProfileStatus
+			RowStatus
 	}
 
 
@@ -1310,15 +1470,22 @@ mtpNaEntry OBJECT-TYPE
 		}
 	::= { mtpNaTable 1 }
 
-MtpNaEntry ::= 
+MtpNaEntry ::=
 	SEQUENCE {
-		mtpNaIndex			Unsigned32,
-		mtpNaName			SnmpAdminString,
-		mtpNaProfile			Unsigned32,
-		mtpNaNetworkIndicator		INTEGER,
-		mtpNaPointCodeFormat		INTEGER,
-		mtpNaSpDefault			Unsigned32,
-		mtpNaStatus			RowStatus
+		mtpNaIndex
+			Unsigned32,
+		mtpNaName
+			SnmpAdminString,
+		mtpNaProfile
+			Unsigned32,
+		mtpNaNetworkIndicator
+			INTEGER,
+		mtpNaPointCodeFormat
+			INTEGER,
+		mtpNaSpDefault
+			Unsigned32,
+		mtpNaStatus
+			RowStatus
 	}
 
 mtpNaIndex OBJECT-TYPE
@@ -1342,48 +1509,82 @@ mtpNaIndex OBJECT-TYPE
 
 MtpSpEntry ::=
 	SEQUENCE {
-		mtpSpIndex			Unsigned32,
-		mtpSpName			CommonLanguageName,
-		mtpSpProfile			Unsigned32,
-		mtpSpTimerT1R			TimeInterval,
-		mtpSpTimerT18			TimeInterval,
-		mtpSpTimerT20			TimeInterval,
-		mtpSpTimerT22A			TimeInterval,
-		mtpSpTimerT23A			TimeInterval,
-		mtpSpTimerT24A			TimeInterval,
-		mtpSpTimerT26A			TimeInterval,
-		mtpSpTimerT27A			TimeInterval,
-		mtpSpRsDefault			Unsigned32,
-		mtpSpLkDefault			Unsigned32,
-		mtpSpTimeDiscontinuity		TimeStamp,
-		mtpSpMsusRouteDiscard		Counter32,		-- Q.752, 5.5
-		mtpSpTfcRecvCong0		Counter32,		-- Q.752, 5.8
-		mtpSpTfcRecvCong1		Counter32,		-- Q.752, 5.8
-		mtpSpTfcRecvCong2		Counter32,		-- Q.752, 5.8
-		mtpSpOctetsXferred		Counter32,
-		mtpSpStatus			RowStatus
+		mtpSpIndex
+			Unsigned32,
+		mtpSpName
+			CommonLanguageName,
+		mtpSpProfile
+			Unsigned32,
+		mtpSpTimerT1R
+			TimeInterval,
+		mtpSpTimerT18
+			TimeInterval,
+		mtpSpTimerT20
+			TimeInterval,
+		mtpSpTimerT22A
+			TimeInterval,
+		mtpSpTimerT23A
+			TimeInterval,
+		mtpSpTimerT24A
+			TimeInterval,
+		mtpSpTimerT26A
+			TimeInterval,
+		mtpSpTimerT27A
+			TimeInterval,
+		mtpSpRsDefault
+			Unsigned32,
+		mtpSpLkDefault
+			Unsigned32,
+		mtpSpTimeDiscontinuity
+			TimeStamp,
+		mtpSpMsusRouteDiscard
+			Counter32,		-- Q.752, 5.5
+		mtpSpTfcRecvCong0
+			Counter32,		-- Q.752, 5.8
+		mtpSpTfcRecvCong1
+			Counter32,		-- Q.752, 5.8
+		mtpSpTfcRecvCong2
+			Counter32,		-- Q.752, 5.8
+		mtpSpOctetsXferred
+			Counter32,
+		mtpSpStatus
+			RowStatus
 	}
 
 MtpSpInt5minEntry ::=
 	SEQUENCE {
-		mtpSpInt5minInterval		Unsigned32,
-		mtpSpInt5minTimeStamp		TimeStamp,
-		mtpSpInt5minMsusRouteDiscard	Gauge32,		-- Q.752, 5.5
-		mtpSpInt5minTfcRecvCong0	Gauge32,		-- Q.752, 5.8
-		mtpSpInt5minTfcRecvCong1	Gauge32,		-- Q.752, 5.8
-		mtpSpInt5minTfcRecvCong2	Gauge32,		-- Q.752, 5.8
-		mtpSpInt5minOctetsXferred	Gauge32,
+		mtpSpInt5minInterval
+			Unsigned32,
+		mtpSpInt5minTimeStamp
+			TimeStamp,
+		mtpSpInt5minMsusRouteDiscard
+			Gauge32,		-- Q.752, 5.5
+		mtpSpInt5minTfcRecvCong0
+			Gauge32,		-- Q.752, 5.8
+		mtpSpInt5minTfcRecvCong1
+			Gauge32,		-- Q.752, 5.8
+		mtpSpInt5minTfcRecvCong2
+			Gauge32,		-- Q.752, 5.8
+		mtpSpInt5minOctetsXferred
+			Gauge32
 	}
 
 MtpSpInt30minEntry ::=
 	SEQUENCE {
-		mtpSpInt30minInterval		Unsigned32,
-		mtpSpInt30minTimeStamp		TimeStamp,
-		mtpSpInt30minMsusRouteDiscard	Gauge32,		-- Q.752, 5.5
-		mtpSpInt30minTfcRecvCong0	Gauge32,		-- Q.752, 5.8
-		mtpSpInt30minTfcRecvCong1	Gauge32,		-- Q.752, 5.8
-		mtpSpInt30minTfcRecvCong2	Gauge32,		-- Q.752, 5.8
-		mtpSpInt30minOctetsXferred	Gauge32,
+		mtpSpInt30minInterval
+			Unsigned32,
+		mtpSpInt30minTimeStamp
+			TimeStamp,
+		mtpSpInt30minMsusRouteDiscard
+			Gauge32,		-- Q.752, 5.5
+		mtpSpInt30minTfcRecvCong0
+			Gauge32,		-- Q.752, 5.8
+		mtpSpInt30minTfcRecvCong1
+			Gauge32,		-- Q.752, 5.8
+		mtpSpInt30minTfcRecvCong2
+			Gauge32,		-- Q.752, 5.8
+		mtpSpInt30minOctetsXferred
+			Gauge32
 	}
 
 	INDEX	{
@@ -1394,51 +1595,76 @@ MtpSpInt30minEntry ::=
 
 MtpSpSiEntry ::=
 	SEQUENCE {
-		mtpSpSiCode			Unsigned32,
-		mtpSpSiTimeDiscontinuity	TimeStamp,
-		mtpSpSiUpuSent			Counter32,	-- Q.752, 5.6
-		mtpSpSiUpuRecv			Counter32,	-- Q.752, 5.7
-		mtpSpSiOctetsXferred		Counter32,	-- Q.752, 6.3
-		mtpSpSiStatus			RowStatus
+		mtpSpSiCode
+			Unsigned32,
+		mtpSpSiTimeDiscontinuity
+			TimeStamp,
+		mtpSpSiUpuSent
+			Counter32,	-- Q.752, 5.6
+		mtpSpSiUpuRecv
+			Counter32,	-- Q.752, 5.7
+		mtpSpSiOctetsXferred
+			Counter32,	-- Q.752, 6.3
+		mtpSpSiStatus
+			RowStatus
 	}
 
 MtpSpSiInt5minEntry ::=
 	SEQUENCE {
-		mtpSpSiInt5minInterval		Unsigned32,
-		mtpSpSiInt5minTimeStamp		TimeStamp,
-		mtpSpSiInt5minUpuSent		Gauge32,	-- Q.752, 5.6
-		mtpSpSiInt5minUpuRecv		Gauge32,	-- Q.752, 5.7
-		mtpSpSiInt5minOctetsXferred	Gauge32,	-- Q.752, 6.3
+		mtpSpSiInt5minInterval
+			Unsigned32,
+		mtpSpSiInt5minTimeStamp
+			TimeStamp,
+		mtpSpSiInt5minUpuSent
+			Gauge32,	-- Q.752, 5.6
+		mtpSpSiInt5minUpuRecv
+			Gauge32,	-- Q.752, 5.7
+		mtpSpSiInt5minOctetsXferred
+			Gauge32		-- Q.752, 6.3
 	}
 
 MtpSpSiInt30minEntry ::=
 	SEQUENCE {
-		mtpSpSiInt30minInterval		Unsigned32,
-		mtpSpSiInt30minTimeStamp	TimeStamp,
-		mtpSpSiInt30minUpuSent		Gauge32,	-- Q.752, 5.6
-		mtpSpSiInt30minUpuRecv		Gauge32,	-- Q.752, 5.7
-		mtpSpSiInt30minOctetsXferred	Gauge32,	-- Q.752, 6.3
+		mtpSpSiInt30minInterval
+			Unsigned32,
+		mtpSpSiInt30minTimeStamp
+			TimeStamp,
+		mtpSpSiInt30minUpuSent
+			Gauge32,	-- Q.752, 5.6
+		mtpSpSiInt30minUpuRecv
+			Gauge32,	-- Q.752, 5.7
+		mtpSpSiInt30minOctetsXferred
+			Gauge32		-- Q.752, 6.3
 	}
 
 MtpSpStudyEntry ::=
 	SEQUENCE {
-		mtpSpStudyIndex			Unsigned32,
-		mtpSpStudyTimeDiscontinuity	TimeStamp,
-		mtpSpStudyOctetsXferred		Counter32,	-- Q.752, 6.7
-		mtpSpStudyStatus		RowStatus
+		mtpSpStudyIndex
+			Unsigned32,
+		mtpSpStudyTimeDiscontinuity
+			TimeStamp,
+		mtpSpStudyOctetsXferred
+			Counter32,	-- Q.752, 6.7
+		mtpSpStudyStatus
+			RowStatus
 	}
 
 MtpSpStudyInt5minEntry ::=
 	SEQUENCE {
-		mtpSpStudyInt5minInterval	Unsigned32,
-		mtpSpStudyInt5minTimeStamp	TimeStamp,
-		mtpSpStudyInt5minOctetsXferred	Gauge32		-- Q.752, 6.7
+		mtpSpStudyInt5minInterval
+			Unsigned32,
+		mtpSpStudyInt5minTimeStamp
+			TimeStamp,
+		mtpSpStudyInt5minOctetsXferred
+			Gauge32		-- Q.752, 6.7
 	}
 
 MtpSpStudyInt30minEntry ::=
 	SEQUENCE {
-		mtpSpStudyInt30minInterval	Unsigned32,
-		mtpSpStudyInt30minOctetsXferred	Gauge32		-- Q.752, 6.7
+		mtpSpStudyInt30minInterval
+			Unsigned32,
+		mtpSpStudyInt30minOctetsXferred
+			Gauge32		-- Q.752, 6.7
 	}
 
 	INDEX	{
@@ -1450,16 +1676,20 @@ MtpSpStudyInt30minEntry ::=
 		}
 MtpSpStudyMapEntry ::=
 	SEQUENCE {
-		mtpSpStudyMapStatus		RowStatus
+		mtpSpStudyMapStatus
+			RowStatus
 	}
 
 -- ====================================================================
 
 MtpMsEntry ::=
 	SEQUENCE {
-		mtpMsIndex			Unsigned32,
-		mtpMsName			SnmpAdminString,
-		mtpMsStatus			RowStatus
+		mtpMsIndex
+			Unsigned32,
+		mtpMsName
+			SnmpAdminString,
+		mtpMsStatus
+			RowStatus
 	}
 
 
@@ -1467,315 +1697,544 @@ MtpMsEntry ::=
 
 MtpRsEntry ::=
 	SEQUENCE {
-		mtpRsIndex			Unsigned32,
-		mtpRsName			CommonLanguageName,
-		mtpRsProfile			Unsigned32,
-		mtpRsTimerT8			TimeInterval,
-		mtpRsTimerT11			TimeInterval,
-		mtpRsTimerT15			TimeInterval,
-		mtpRsTimerT16			TimeInterval,
-		mtpRsTimerT18A			TimeInterval,
-		mtpRsRtDefault			Unsigned32,
-		mtpRsTimeDiscontinuity		TimeStamp,
-		mtpRsOctetsRecv			Counter32,	-- Q.752, 6.1
-		mtpRsOctetsSent			Counter32,	-- Q.752, 6.2
-		mtpRsMsusRecv			Counter32,
-		mtpRsMsusSent			Counter32,
-		mtpRsInacEvents			Counter32,	-- Q.752, 4.9
-		mtpRsInacDuration		Counter32,	-- Q.752, 4.10
-		mtpRsStatus			RowStatus
+		mtpRsIndex
+			Unsigned32,
+		mtpRsName
+			CommonLanguageName,
+		mtpRsProfile
+			Unsigned32,
+		mtpRsTimerT8
+			TimeInterval,
+		mtpRsTimerT11
+			TimeInterval,
+		mtpRsTimerT15
+			TimeInterval,
+		mtpRsTimerT16
+			TimeInterval,
+		mtpRsTimerT18A
+			TimeInterval,
+		mtpRsRtDefault
+			Unsigned32,
+		mtpRsTimeDiscontinuity
+			TimeStamp,
+		mtpRsOctetsRecv
+			Counter32,	-- Q.752, 6.1
+		mtpRsOctetsSent
+			Counter32,	-- Q.752, 6.2
+		mtpRsMsusRecv
+			Counter32,
+		mtpRsMsusSent
+			Counter32,
+		mtpRsInacEvents
+			Counter32,	-- Q.752, 4.9
+		mtpRsInacDuration
+			Counter32,	-- Q.752, 4.10
+		mtpRsStatus
+			RowStatus
 	}
 
 MtpRsInt5minEntry ::=
 	SEQUENCE {
-		mtpRsInt5minInterval		Unsigned32,
-		mtpRsInt5minTimeStamp		TimeStamp,
-		mtpRsInt5minOctetsRecv		Gauge32,	-- Q.752, 6.1
-		mtpRsInt5minOctetsSent		Gauge32,	-- Q.752, 6.2
-		mtpRsInt5minMsusRecv		Gauge32,
-		mtpRsInt5minMsusSent		Gauge32,
-		mtpRsInt5minInacEvents		Gauge32,	-- Q.752, 4.9
-		mtpRsInt5minInacDuration	Gauge32,	-- Q.752, 4.10
+		mtpRsInt5minInterval
+			Unsigned32,
+		mtpRsInt5minTimeStamp
+			TimeStamp,
+		mtpRsInt5minOctetsRecv
+			Gauge32,	-- Q.752, 6.1
+		mtpRsInt5minOctetsSent
+			Gauge32,	-- Q.752, 6.2
+		mtpRsInt5minMsusRecv
+			Gauge32,
+		mtpRsInt5minMsusSent
+			Gauge32,
+		mtpRsInt5minInacEvents
+			Gauge32,	-- Q.752, 4.9
+		mtpRsInt5minInacDuration
+			Gauge32		-- Q.752, 4.10
 	}
 
 MtpRsInt30minEntry ::=
 	SEQUENCE {
-		mtpRsInt30minInterval		Unsigned32,
-		mtpRsInt30minTimeStamp		TimeStamp,
-		mtpRsInt30minOctetsRecv		Gauge32,	-- Q.752, 6.1
-		mtpRsInt30minOctetsSent		Gauge32,	-- Q.752, 6.2
-		mtpRsInt30minMsusRecv		Gauge32,
-		mtpRsInt30minMsusSent		Gauge32,
-		mtpRsInt30minInacEvents		Gauge32,	-- Q.752, 4.9
-		mtpRsInt30minInacDuration	Gauge32,	-- Q.752, 4.10
+		mtpRsInt30minInterval
+			Unsigned32,
+		mtpRsInt30minTimeStamp
+			TimeStamp,
+		mtpRsInt30minOctetsRecv
+			Gauge32,	-- Q.752, 6.1
+		mtpRsInt30minOctetsSent
+			Gauge32,	-- Q.752, 6.2
+		mtpRsInt30minMsusRecv
+			Gauge32,
+		mtpRsInt30minMsusSent
+			Gauge32,
+		mtpRsInt30minInacEvents
+			Gauge32,	-- Q.752, 4.9
+		mtpRsInt30minInacDuration
+			Gauge32		-- Q.752, 4.10
 	}
 
 MtpRsSiEntry ::=
 	SEQUENCE {
-		mtpRsSiCode			Unsigned32,
-		mtpRsSiTimeDiscontinuity	TimeStamp,
-		mtpRsSiOctetsRecv		Counter32,	-- Q.752, 6.4
-		mtpRsSiOctetsSent		Counter32,	-- Q.752, 6.5
-		mtpRsSiMsusRecv			Counter32,
-		mtpRsSiMsusSent			Counter32,
-		mtpRsSiStatus			RowStatus
+		mtpRsSiCode
+			Unsigned32,
+		mtpRsSiTimeDiscontinuity
+			TimeStamp,
+		mtpRsSiOctetsRecv
+			Counter32,	-- Q.752, 6.4
+		mtpRsSiOctetsSent
+			Counter32,	-- Q.752, 6.5
+		mtpRsSiMsusRecv
+			Counter32,
+		mtpRsSiMsusSent
+			Counter32,
+		mtpRsSiStatus
+			RowStatus
 	}
 
 MtpRsSiInt5minEntry ::=
 	SEQUENCE {
-		mtpRsSiInt5minInterval		Unsigned32,
-		mtpRsSiInt5minTimeStamp		TimeStamp,
-		mtpRsSiInt5minOctetsRecv	Gauge32,	-- Q.752, 6.4
-		mtpRsSiInt5minOctetsSent	Gauge32,	-- Q.752, 6.5
-		mtpRsSiInt5minMsusRecv		Gauge32,
-		mtpRsSiInt5minMsusSent		Gauge32,
+		mtpRsSiInt5minInterval
+			Unsigned32,
+		mtpRsSiInt5minTimeStamp
+			TimeStamp,
+		mtpRsSiInt5minOctetsRecv
+			Gauge32,	-- Q.752, 6.4
+		mtpRsSiInt5minOctetsSent
+			Gauge32,	-- Q.752, 6.5
+		mtpRsSiInt5minMsusRecv
+			Gauge32,
+		mtpRsSiInt5minMsusSent
+			Gauge32
 	}
 
 MtpRsSiInt30minEntry ::=
 	SEQUENCE {
-		mtpRsSiInt30minInterval		Unsigned32,
-		mtpRsSiInt30minTimeStamp	TimeStamp,
-		mtpRsSiInt30minOctetsRecv	Gauge32,	-- Q.752, 6.4
-		mtpRsSiInt30minOctetsSent	Gauge32,	-- Q.752, 6.5
-		mtpRsSiInt30minMsusRecv		Gauge32,
-		mtpRsSiInt30minMsusSent		Gauge32,
+		mtpRsSiInt30minInterval
+			Unsigned32,
+		mtpRsSiInt30minTimeStamp
+			TimeStamp,
+		mtpRsSiInt30minOctetsRecv
+			Gauge32,	-- Q.752, 6.4
+		mtpRsSiInt30minOctetsSent
+			Gauge32,	-- Q.752, 6.5
+		mtpRsSiInt30minMsusRecv
+			Gauge32,
+		mtpRsSiInt30minMsusSent
+			Gauge32
 	}
 
 -- ====================================================================
 
 MtpRlEntry ::=
 	SEQUENCE {
-		mtpRlIndex			Unsigned32,
-		mtpRlProfile			Unsigned32,
-		mtpRlRtDefault			Unsigned32,
-		mtpRlStatus			RowStatus
+		mtpRlIndex
+			Unsigned32,
+		mtpRlProfile
+			Unsigned32,
+		mtpRlRtDefault
+			Unsigned32,
+		mtpRlStatus
+			RowStatus
 	}
 
 -- ====================================================================
 
 MtpRtEntry ::=
 	SEQUENCE {
-		mtpRtIndex			Unsigned32,
-		mtpRtName			CommonLanguageName,
-		mtpRtProfile			Unsigned32,
-		mtpRtTimerT6			TimeInterval,
-		mtpRtTimerT10			TimeInterval,
-		mtpRtStatus			RowStatus
+		mtpRtIndex
+			Unsigned32,
+		mtpRtName
+			CommonLanguageName,
+		mtpRtProfile
+			Unsigned32,
+		mtpRtTimerT6
+			TimeInterval,
+		mtpRtTimerT10
+			TimeInterval,
+		mtpRtStatus
+			RowStatus
 	}
 
 -- ====================================================================
 
 MtpLsEntry ::=
 	SEQUENCE {
-		mtpLsIndex			Unsigned32,
-		mtpLsName			CommonLanguageName,
-		mtpLsLkDefault			Unsigned32,
-		mtpLsStatus			RowStatus
+		mtpLsIndex
+			Unsigned32,
+		mtpLsName
+			CommonLanguageName,
+		mtpLsLkDefault
+			Unsigned32,
+		mtpLsStatus
+			RowStatus
 	}
 
 -- ====================================================================
 
 MtpLkEntry ::=
 	SEQUENCE {
-		mtpLkIndex			Unsigned32,
-		mtpLkName			CommonLanguageName,
-		mtpLkProfile			Unsigned32,
-		mtpLkTimerT7			TimeInterval,
-		mtpLkTimerT19			TimeInterval,
-		mtpLkTimerT21			TimeInterval,
-		mtpLkTimerT25A			TimeInterval,
-		mtpLkTimerT28A			TimeInterval,
-		mtpLkTimerT29A			TimeInterval,
-		mtpLkTimerT30A			TimeInterval,
-		mtpLkSlDefault			Unsigned32,
-		mtpLkTimeDiscontinuity		TimeStamp,
-		mtpLkAdjSpInacEvents		Counter32,	-- Q.752, 5.1
-		mtpLkAdjSpInacDuration		Counter32,	-- Q.752, 5.2
-		mtpLkUnavailDuration		Counter32,	-- Q.752, 4.2
-		mtpLkStatus			RowStatus
+		mtpLkIndex
+			Unsigned32,
+		mtpLkName
+			CommonLanguageName,
+		mtpLkProfile
+			Unsigned32,
+		mtpLkTimerT7
+			TimeInterval,
+		mtpLkTimerT19
+			TimeInterval,
+		mtpLkTimerT21
+			TimeInterval,
+		mtpLkTimerT25A
+			TimeInterval,
+		mtpLkTimerT28A
+			TimeInterval,
+		mtpLkTimerT29A
+			TimeInterval,
+		mtpLkTimerT30A
+			TimeInterval,
+		mtpLkSlDefault
+			Unsigned32,
+		mtpLkTimeDiscontinuity
+			TimeStamp,
+		mtpLkAdjSpInacEvents
+			Counter32,	-- Q.752, 5.1
+		mtpLkAdjSpInacDuration
+			Counter32,	-- Q.752, 5.2
+		mtpLkUnavailDuration
+			Counter32,	-- Q.752, 4.2
+		mtpLkStatus
+			RowStatus
 	}
 
 MtpLkInt5minEntry ::=
 	SEQUENCE {
-		mtpLkInt5minInterval		Unsigned32,
-		mtpLkInt5minTimeStamp		TimeStamp,
-		mtpLkInt5minAdjSpInacEvents	Gauge32,	-- Q.752, 5.1
-		mtpLkInt5minAdjSpInacDuration	Gauge32,	-- Q.752, 5.2
-		mtpLkInt5minUnavailDuration	Gauge32,	-- Q.752, 4.2
+		mtpLkInt5minInterval
+			Unsigned32,
+		mtpLkInt5minTimeStamp
+			TimeStamp,
+		mtpLkInt5minAdjSpInacEvents
+			Gauge32,	-- Q.752, 5.1
+		mtpLkInt5minAdjSpInacDuration
+			Gauge32,	-- Q.752, 5.2
+		mtpLkInt5minUnavailDuration
+			Gauge32		-- Q.752, 4.2
 	}
 
 MtpLkInt30minEntry ::=
 	SEQUENCE {
-		mtpLkInt30minInterval		Unsigned32,
-		mtpLkInt30minTimeStamp		TimeStamp,
-		mtpLkInt30minAdjSpInacEvents	Gauge32,	-- Q.752, 5.1
-		mtpLkInt30minAdjSpInacDuration	Gauge32,	-- Q.752, 5.2
-		mtpLkInt30minUnavailDuration	Gauge32,	-- Q.752, 4.2
+		mtpLkInt30minInterval
+			Unsigned32,
+		mtpLkInt30minTimeStamp
+			TimeStamp,
+		mtpLkInt30minAdjSpInacEvents
+			Gauge32,	-- Q.752, 5.1
+		mtpLkInt30minAdjSpInacDuration
+			Gauge32,	-- Q.752, 5.2
+		mtpLkInt30minUnavailDuration
+			Gauge32		-- Q.752, 4.2
 	}
 
 -- ====================================================================
 
 MtpSlEntry ::=
 	SEQUENCE {
-		mtpSlIndex			Unsigned32,
-		mtpSlName			CommonLanguageName,
-		mtpSlProfile			Unsigned32,
-		mtpSlTimerT1			TimeInterval,
-		mtpSlTimerT2			TimeInterval,
-		mtpSlTimerT3			TimeInterval,
-		mtpSlTimerT4			TimeInterval,
-		mtpSlTimerT5			TimeInterval,
-		mtpSlTimerT12			TimeInterval,
-		mtpSlTimerT13			TimeInterval,
-		mtpSlTimerT14			TimeInterval,
-		mtpSlTimerT17			TimeInterval,
-		mtpSlTimerT19A			TimeInterval,
-		mtpSlTimerT20A			TimeInterval,
-		mtpSlTimerT21A			TimeInterval,
-		mtpSlTimerT22			TimeInterval,
-		mtpSlTimerT23			TimeInterval,
-		mtpSlTimerT24			TimeInterval,
-		mtpSlTimerT31A			TimeInterval,
-		mtpSlTimerT32A			TimeInterval,
-		mtpSlTimerT33A			TimeInterval,
-		mtpSlTimerT34A			TimeInterval,
-		mtpSlTimerT1T			TimeInterval,
-		mtpSlTimerT2T			TimeInterval,
-		mtpSlTimerT1S			TimeInterval,
-		mtpSlL2Default			Unsigned32,
-		mtpSlTimeDiscontinuity		TimeStamp,
-		mtpSlUnavailDuration		Counter32,	-- Q.752, 2.1
-		mtpSlLocInhibDuration		Counter32,	-- Q.752, 2.5
-		mtpSlRemInhibDuration		Counter32,	-- Q.752, 2.6
-		mtpSlFailedDuration		Counter32,	-- Q.752, 2.7
-		mtpSlRemProcOutDuration		Counter32,	-- Q.752, 2.9
-		mtpSlLocInhibEvent		Counter32,	-- Q.752, 2.13
-		mtpSlLocUninhibEvent		Counter32,	-- Q.752, 2.14
-		mtpSlCongInds			Counter32,	-- Q.752, 3.6
-		mtpSlCongDuration		Counter32,	-- Q.752, 3.7
-		mtpSlCongMsusDiscarded		Counter32,	-- Q.752. 3.10
-		mtpSlCongLossOfMsus		Counter32,	-- Q.752, 3.11
-		mtpSlChangeovers		Counter32,	-- Q.752, 1.10
-		mtpSlChangebacks		Counter32,	-- Q.752, 1.11
-		mtpSlRestorations		Counter32,	-- Q.752, 1.12
-		mtpSlStatus			RowStatus
+		mtpSlIndex
+			Unsigned32,
+		mtpSlName
+			CommonLanguageName,
+		mtpSlProfile
+			Unsigned32,
+		mtpSlTimerT1
+			TimeInterval,
+		mtpSlTimerT2
+			TimeInterval,
+		mtpSlTimerT3
+			TimeInterval,
+		mtpSlTimerT4
+			TimeInterval,
+		mtpSlTimerT5
+			TimeInterval,
+		mtpSlTimerT12
+			TimeInterval,
+		mtpSlTimerT13
+			TimeInterval,
+		mtpSlTimerT14
+			TimeInterval,
+		mtpSlTimerT17
+			TimeInterval,
+		mtpSlTimerT19A
+			TimeInterval,
+		mtpSlTimerT20A
+			TimeInterval,
+		mtpSlTimerT21A
+			TimeInterval,
+		mtpSlTimerT22
+			TimeInterval,
+		mtpSlTimerT23
+			TimeInterval,
+		mtpSlTimerT24
+			TimeInterval,
+		mtpSlTimerT31A
+			TimeInterval,
+		mtpSlTimerT32A
+			TimeInterval,
+		mtpSlTimerT33A
+			TimeInterval,
+		mtpSlTimerT34A
+			TimeInterval,
+		mtpSlTimerT1T
+			TimeInterval,
+		mtpSlTimerT2T
+			TimeInterval,
+		mtpSlTimerT1S
+			TimeInterval,
+		mtpSlL2Default
+			Unsigned32,
+		mtpSlTimeDiscontinuity
+			TimeStamp,
+		mtpSlUnavailDuration
+			Counter32,	-- Q.752, 2.1
+		mtpSlLocInhibDuration
+			Counter32,	-- Q.752, 2.5
+		mtpSlRemInhibDuration
+			Counter32,	-- Q.752, 2.6
+		mtpSlFailedDuration
+			Counter32,	-- Q.752, 2.7
+		mtpSlRemProcOutDuration
+			Counter32,	-- Q.752, 2.9
+		mtpSlLocInhibEvent
+			Counter32,	-- Q.752, 2.13
+		mtpSlLocUninhibEvent
+			Counter32,	-- Q.752, 2.14
+		mtpSlCongInds
+			Counter32,	-- Q.752, 3.6
+		mtpSlCongDuration
+			Counter32,	-- Q.752, 3.7
+		mtpSlCongMsusDiscarded
+			Counter32,	-- Q.752. 3.10
+		mtpSlCongLossOfMsus
+			Counter32,	-- Q.752, 3.11
+		mtpSlChangeovers
+			Counter32,	-- Q.752, 1.10
+		mtpSlChangebacks
+			Counter32,	-- Q.752, 1.11
+		mtpSlRestorations
+			Counter32,	-- Q.752, 1.12
+		mtpSlStatus
+			RowStatus
 	}
 
 MtpSlInt5minEntry ::=
 	SEQUENCE {
-		mtpSlInt5minInterval		Unsigned32,
-		mtpSlInt5minTimeStamp		TimeStamp,
-		mtpSlInt5minUnavailDuration	Gauge32,	-- Q.752, 2.1
-		mtpSlInt5minLocInhibDuration	Gauge32,	-- Q.752, 2.5
-		mtpSlInt5minRemInhibDuration	Gauge32,	-- Q.752, 2.6
-		mtpSlInt5minFailedDuration	Gauge32,	-- Q.752, 2.7
-		mtpSlInt5minRemProcOutDuration	Gauge32,	-- Q.752, 2.9
-		mtpSlInt5minLocInhibEvent	Gauge32,	-- Q.752, 2.13
-		mtpSlInt5minLocUninhibEvent	Gauge32,	-- Q.752, 2.14
-		mtpSlInt5minCongInds		Gauge32,	-- Q.752, 3.6
-		mtpSlInt5minCongDuration	Gauge32,	-- Q.752, 3.7
-		mtpSlInt5minCongMsusDiscarded	Gauge32,	-- Q.752. 3.10
-		mtpSlInt5minCongLossOfMsus	Gauge32,	-- Q.752, 3.11
-		mtpSlInt5minChangeovers		Gauge32,	-- Q.752, 1.10
-		mtpSlInt5minChangebacks		Gauge32,	-- Q.752, 1.11
-		mtpSlInt5minRestorations	Gauge32,	-- Q.752, 1.12
+		mtpSlInt5minInterval
+			Unsigned32,
+		mtpSlInt5minTimeStamp
+			TimeStamp,
+		mtpSlInt5minUnavailDuration
+			Gauge32,	-- Q.752, 2.1
+		mtpSlInt5minLocInhibDuration
+			Gauge32,	-- Q.752, 2.5
+		mtpSlInt5minRemInhibDuration
+			Gauge32,	-- Q.752, 2.6
+		mtpSlInt5minFailedDuration
+			Gauge32,	-- Q.752, 2.7
+		mtpSlInt5minRemProcOutDuration
+			Gauge32,	-- Q.752, 2.9
+		mtpSlInt5minLocInhibEvent
+			Gauge32,	-- Q.752, 2.13
+		mtpSlInt5minLocUninhibEvent
+			Gauge32,	-- Q.752, 2.14
+		mtpSlInt5minCongInds
+			Gauge32,	-- Q.752, 3.6
+		mtpSlInt5minCongDuration
+			Gauge32,	-- Q.752, 3.7
+		mtpSlInt5minCongMsusDiscarded
+			Gauge32,	-- Q.752. 3.10
+		mtpSlInt5minCongLossOfMsus
+			Gauge32,	-- Q.752, 3.11
+		mtpSlInt5minChangeovers
+			Gauge32,	-- Q.752, 1.10
+		mtpSlInt5minChangebacks
+			Gauge32,	-- Q.752, 1.11
+		mtpSlInt5minRestorations
+			Gauge32		-- Q.752, 1.12
 	}
 
 MtpSlInt30minEntry ::=
 	SEQUENCE {
-		mtpSlInt30minInterval		Unsigned32,
-		mtpSlInt30minTimeStamp		TimeStamp,
-		mtpSlInt30minUnavailDuration	Gauge32,	-- Q.752, 2.1
-		mtpSlInt30minLocInhibDuration	Gauge32,	-- Q.752, 2.5
-		mtpSlInt30minRemInhibDuration	Gauge32,	-- Q.752, 2.6
-		mtpSlInt30minFailedDuration	Gauge32,	-- Q.752, 2.7
-		mtpSlInt30minRemProcOutDuration	Gauge32,	-- Q.752, 2.9
-		mtpSlInt30minLocInhibEvent	Gauge32,	-- Q.752, 2.13
-		mtpSlInt30minLocUninhibEvent	Gauge32,	-- Q.752, 2.14
-		mtpSlInt30minCongInds		Gauge32,	-- Q.752, 3.6
-		mtpSlInt30minCongDuration	Gauge32,	-- Q.752, 3.7
-		mtpSlInt30minCongMsusDiscarded	Gauge32,	-- Q.752. 3.10
-		mtpSlInt30minCongLossOfMsus	Gauge32,	-- Q.752, 3.11
-		mtpSlInt30minChangeovers	Gauge32,	-- Q.752, 1.10
-		mtpSlInt30minChangebacks	Gauge32,	-- Q.752, 1.11
-		mtpSlInt30minRestorations	Gauge32,	-- Q.752, 1.12
+		mtpSlInt30minInterval
+			Unsigned32,
+		mtpSlInt30minTimeStamp
+			TimeStamp,
+		mtpSlInt30minUnavailDuration
+			Gauge32,	-- Q.752, 2.1
+		mtpSlInt30minLocInhibDuration
+			Gauge32,	-- Q.752, 2.5
+		mtpSlInt30minRemInhibDuration
+			Gauge32,	-- Q.752, 2.6
+		mtpSlInt30minFailedDuration
+			Gauge32,	-- Q.752, 2.7
+		mtpSlInt30minRemProcOutDuration
+			Gauge32,	-- Q.752, 2.9
+		mtpSlInt30minLocInhibEvent
+			Gauge32,	-- Q.752, 2.13
+		mtpSlInt30minLocUninhibEvent
+			Gauge32,	-- Q.752, 2.14
+		mtpSlInt30minCongInds
+			Gauge32,	-- Q.752, 3.6
+		mtpSlInt30minCongDuration
+			Gauge32,	-- Q.752, 3.7
+		mtpSlInt30minCongMsusDiscarded
+			Gauge32,	-- Q.752. 3.10
+		mtpSlInt30minCongLossOfMsus
+			Gauge32,	-- Q.752, 3.11
+		mtpSlInt30minChangeovers
+			Gauge32,	-- Q.752, 1.10
+		mtpSlInt30minChangebacks
+			Gauge32,	-- Q.752, 1.11
+		mtpSlInt30minRestorations
+			Gauge32		-- Q.752, 1.12
 	}
 
 -- ====================================================================
 
 MtpL2Entry ::=
 	SEQUENCE {
-		mtpL2Index			Unsigned32,
-		mtpL2Name			CommonLanguageName,
-		mtpL2Profile			Unsigned32,
-		mtpL2TimerT1			TimeInterval,
-		mtpL2TimerT2			TimeInterval,
-		mtpL2TimerT2L			TimeInterval,
-		mtpL2TimerT2H			TimeInterval,
-		mtpL2TimerT3			TimeInterval,
-		mtpL2TimerT4N			TimeInterval,
-		mtpL2TimerT4E			TimeInterval,
-		mtpL2TimerT5			TimeInterval,
-		mtpL2TimerT6			TimeInterval,
-		mtpL2TimerT7			TimeInterval,
-		mtpL2N1				Unsigned32,
-		mtpL2N2				Unsigned32,
-		mtpL2RbAccept			Unsigned32,
-		mtpL2RbDiscard			Unsigned32,
-		mtpL2RbAbate			Unsigned32,
-		mtpL2TbAbate0			Unsigned32,
-		mtpL2TbOnset0			Unsigned32,
-		mtpL2TbDiscard0			Unsigned32,
-		mtpL2TbAbate1			Unsigned32,
-		mtpL2TbOnset1			Unsigned32,
-		mtpL2TbDiscard1			Unsigned32,
-		mtpL2TbAbate2			Unsigned32,
-		mtpL2TbOnset2			Unsigned32,
-		mtpL2TbDiscard2			Unsigned32,
-		mtpL2InserviceDuration		Counter32,	-- Q.752, 1.1
-		mtpL2AlignmentFailures		Counter32,	-- Q.752, 1.7
-		mtpL2SusInError			Counter32,	-- Q.752, 1.8
-		mtpL2NacksReceived		Counter32,	-- Q.752, 1.9
-		mtpL2OctetsSent			Counter32,	-- Q.752, 3.1
-		mtpL2OctetsReSent		Counter32,	-- Q.752, 3.2
-		mtpL2MsusSent			Counter32,	-- Q.752, 3.3
-		mtpL2OctetsRecv			Counter32,	-- Q.752, 3.4
-		mtpL2MsusRecv			Counter32,	-- Q.752, 3.5
-		mtpL2SibsSent			Counter32,	-- Q.752, 2.15
-		mtpL2TimeDicontinuity		TimeStamp,
-		mtpL2Status			RowStatus
+		mtpL2Index
+			Unsigned32,
+		mtpL2Name
+			CommonLanguageName,
+		mtpL2Profile
+			Unsigned32,
+		mtpL2TimerT1
+			TimeInterval,
+		mtpL2TimerT2
+			TimeInterval,
+		mtpL2TimerT2L
+			TimeInterval,
+		mtpL2TimerT2H
+			TimeInterval,
+		mtpL2TimerT3
+			TimeInterval,
+		mtpL2TimerT4N
+			TimeInterval,
+		mtpL2TimerT4E
+			TimeInterval,
+		mtpL2TimerT5
+			TimeInterval,
+		mtpL2TimerT6
+			TimeInterval,
+		mtpL2TimerT7
+			TimeInterval,
+		mtpL2N1
+			Unsigned32,
+		mtpL2N2
+			Unsigned32,
+		mtpL2RbAccept
+			Unsigned32,
+		mtpL2RbDiscard
+			Unsigned32,
+		mtpL2RbAbate
+			Unsigned32,
+		mtpL2TbAbate0
+			Unsigned32,
+		mtpL2TbOnset0
+			Unsigned32,
+		mtpL2TbDiscard0
+			Unsigned32,
+		mtpL2TbAbate1
+			Unsigned32,
+		mtpL2TbOnset1
+			Unsigned32,
+		mtpL2TbDiscard1
+			Unsigned32,
+		mtpL2TbAbate2
+			Unsigned32,
+		mtpL2TbOnset2
+			Unsigned32,
+		mtpL2TbDiscard2
+			Unsigned32,
+		mtpL2InserviceDuration
+			Counter32,	-- Q.752, 1.1
+		mtpL2AlignmentFailures
+			Counter32,	-- Q.752, 1.7
+		mtpL2SusInError
+			Counter32,	-- Q.752, 1.8
+		mtpL2NacksReceived
+			Counter32,	-- Q.752, 1.9
+		mtpL2OctetsSent
+			Counter32,	-- Q.752, 3.1
+		mtpL2OctetsReSent
+			Counter32,	-- Q.752, 3.2
+		mtpL2MsusSent
+			Counter32,	-- Q.752, 3.3
+		mtpL2OctetsRecv
+			Counter32,	-- Q.752, 3.4
+		mtpL2MsusRecv
+			Counter32,	-- Q.752, 3.5
+		mtpL2SibsSent
+			Counter32,	-- Q.752, 2.15
+		mtpL2TimeDicontinuity
+			TimeStamp,
+		mtpL2Status
+			RowStatus
 	}
 
 MtpL2Int5minEntry ::=
 	SEQUENCE {
-		mtpL2Int5minInterval		Unsigned32,
-		mtpL2Int5minTimestamp		TimeStamp,
-		mtpL2Int5minInserviceDuration	Gauge32,	-- Q.752, 1.1
-		mtpL2Int5minAlignmentFailures	Gauge32,	-- Q.752, 1.7
-		mtpL2Int5minSusInError		Gauge32,	-- Q.752, 1.8
-		mtpL2Int5minNacksReceived	Gauge32,	-- Q.752, 1.9
-		mtpL2Int5minOctetsSent		Gauge32,	-- Q.752, 3.1
-		mtpL2Int5minOctetsReSent	Gauge32,	-- Q.752, 3.2
-		mtpL2Int5minMsusSent		Gauge32,	-- Q.752, 3.3
-		mtpL2Int5minOctetsRecv		Gauge32,	-- Q.752, 3.4
-		mtpL2Int5minMsusRecv		Gauge32,	-- Q.752, 3.5
-		mtpL2Int5minSibsSent		Gauge32,	-- Q.752, 2.15
+		mtpL2Int5minInterval
+			Unsigned32,
+		mtpL2Int5minTimestamp
+			TimeStamp,
+		mtpL2Int5minInserviceDuration
+			Gauge32,	-- Q.752, 1.1
+		mtpL2Int5minAlignmentFailures
+			Gauge32,	-- Q.752, 1.7
+		mtpL2Int5minSusInError
+			Gauge32,	-- Q.752, 1.8
+		mtpL2Int5minNacksReceived
+			Gauge32,	-- Q.752, 1.9
+		mtpL2Int5minOctetsSent
+			Gauge32,	-- Q.752, 3.1
+		mtpL2Int5minOctetsReSent
+			Gauge32,	-- Q.752, 3.2
+		mtpL2Int5minMsusSent
+			Gauge32,	-- Q.752, 3.3
+		mtpL2Int5minOctetsRecv
+			Gauge32,	-- Q.752, 3.4
+		mtpL2Int5minMsusRecv
+			Gauge32,	-- Q.752, 3.5
+		mtpL2Int5minSibsSent
+			Gauge32		-- Q.752, 2.15
 	}
 
 MtpL2Int30minEntry ::=
 	SEQUENCE {
-		mtpL2Int30minInterval		Unsigned32,
-		mtpL2Int30minTimestamp		TimeStamp,
-		mtpL2Int30minInserviceDuration	Gauge32,	-- Q.752, 1.1
-		mtpL2Int30minAlignmentFailures	Gauge32,	-- Q.752, 1.7
-		mtpL2Int30minSusInError		Gauge32,	-- Q.752, 1.8
-		mtpL2Int30minNacksReceived	Gauge32,	-- Q.752, 1.9
-		mtpL2Int30minOctetsSent		Gauge32,	-- Q.752, 3.1
-		mtpL2Int30minOctetsReSent	Gauge32,	-- Q.752, 3.2
-		mtpL2Int30minMsusSent		Gauge32,	-- Q.752, 3.3
-		mtpL2Int30minOctetsRecv		Gauge32,	-- Q.752, 3.4
-		mtpL2Int30minMsusRecv		Gauge32,	-- Q.752, 3.5
-		mtpL2Int30minSibsSent		Gauge32,	-- Q.752, 2.15
+		mtpL2Int30minInterval
+			Unsigned32,
+		mtpL2Int30minTimestamp
+			TimeStamp,
+		mtpL2Int30minInserviceDuration
+			Gauge32,	-- Q.752, 1.1
+		mtpL2Int30minAlignmentFailures
+			Gauge32,	-- Q.752, 1.7
+		mtpL2Int30minSusInError
+			Gauge32,	-- Q.752, 1.8
+		mtpL2Int30minNacksReceived
+			Gauge32,	-- Q.752, 1.9
+		mtpL2Int30minOctetsSent
+			Gauge32,	-- Q.752, 3.1
+		mtpL2Int30minOctetsReSent
+			Gauge32,	-- Q.752, 3.2
+		mtpL2Int30minMsusSent
+			Gauge32,	-- Q.752, 3.3
+		mtpL2Int30minOctetsRecv
+			Gauge32,	-- Q.752, 3.4
+		mtpL2Int30minMsusRecv
+			Gauge32,	-- Q.752, 3.5
+		mtpL2Int30minSibsSent
+			Gauge32		-- Q.752, 2.15
 	}
 
 -- ====================================================================
@@ -1836,4 +2295,4 @@ mtpProtocolSpan OBJECT-IDENTITY
 
 END
 
--- vim: ft=mib comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=96 nocin nosi
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
