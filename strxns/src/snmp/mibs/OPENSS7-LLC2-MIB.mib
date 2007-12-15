@@ -1,0 +1,2213 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-LLC2-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/15 20:16:52 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under
+-- the terms of the GNU General Public License as published by the Free Software
+-- Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+-- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU General Public License along with
+-- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+-- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2007/12/15 20:16:52 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-LLC2-MIB.mib,v $
+-- Revision 0.9.2.1  2007/12/15 20:16:52  brian
+-- - added new mib files
+--
+-- =============================================================================
+
+OPENSS7-LLC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	InterfaceIndex
+		FROM
+	RowPointer, RowStatus, DisplayString, Counter32, Gauge32, 
+	TimeInterval, TruthValue
+		FROM SNMPv2-TC
+	OperationalState
+		FROM OPENSS7-TMN-TC
+	SimpleNameType
+		FROM OPENSS7-TC
+
+openss7		OBJECT IDENTIFIER ::= { enterprises 29591 }
+openss7MIBs	OBJECT IDENTIFIER ::= { openss7 1 }
+openss7Modules	OBJECT IDENTIFIER ::= { openss7MIBs 1 }
+
+llc-MIB MODULE-IDENTITY
+	LAST-UPDATED
+		"20071214184454Z"
+	ORGANIZATION
+		"The OpenSS7 Project"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta  T6L 6T1
+		 CANADA
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 mailto:bidulock@openss7.org"
+	DESCRIPTION
+		"This MIB provides configuration and status information 
+		 for an ISO/IEC 8802 LLC1/LLC2 subsystem."
+	::= { openss7Modules 2 }
+
+ -- top level organization of the MIB
+ 
+llcNotifications	OBJECT IDENTIFIER ::= { llc-MIB		 0 }
+llcObjects		OBJECT IDENTIFIER ::= { llc-MIB		 1 }
+llcConformance		OBJECT IDENTIFIER ::= { llc-MIB		 2 }
+
+llcTables		OBJECT IDENTIFIER ::= { llcObjects	 1 }
+llcScalars		OBJECT IDENTIFIER ::= { llcObjects	 2 }
+llcNotifs		OBJECT IDENTIFIER ::= { llcObjects	 3 }
+llcOids			OBJECT IDENTIFIER ::= { llcObjects	 4 }
+
+llcCompliances		OBJECT IDENTIFIER ::= { llcConformance	 1 }
+llcGroups		OBJECT IDENTIFIER ::= { llcConformance	 2 }
+
+mACDLE			OBJECT IDENTIFIER ::= { llcTables	 1 }
+mAC			OBJECT IDENTIFIER ::= { llcTables	 2 }
+resourceTypeId		OBJECT IDENTIFIER ::= { llcTables	 3 }
+dLSAP			OBJECT IDENTIFIER ::= { llcTables	 4 }
+
+lLCDLE			OBJECT IDENTIFIER ::= { llcTables	 5 }
+lLCStation		OBJECT IDENTIFIER ::= { llcTables	 6 }
+lLCSAP			OBJECT IDENTIFIER ::= { llcTables	 7 }
+rDESetup		OBJECT IDENTIFIER ::= { llcTables	 8 }
+rDEPair			OBJECT IDENTIFIER ::= { llcTables	 9 }
+
+lLCCLPM			OBJECT IDENTIFIER ::= { llcTables	10 }
+lLCConnectionLess	OBJECT IDENTIFIER ::= { llcTables	11 }
+
+lLCCOPM			OBJECT IDENTIFIER ::= { llcTables	12 }
+lLCConnection2		OBJECT IDENTIFIER ::= { llcTables	13 }
+lLCConnection2IVMO	OBJECT IDENTIFIER ::= { llcTables	14 }
+lLCConnectionlessAck	OBJECT IDENTIFIER ::= { llcTables	15 }
+lLCConnectionlessAckIVMO
+			OBJECT IDENTIFIER ::= { llcTables	16 }
+
+llcGlobals		OBJECT IDENTIFIER ::= { llcScalars	 1 }
+llcDefaults		OBJECT IDENTIFIER ::= { llcScalars	 2 }
+
+lLCConnection2Defaults	OBJECT IDENTIFIER ::= { llcDefaults	 1 }
+lLCConnectionilessAckDefaults
+			OBJECT IDENTIFIER ::= { llcDefaults	 2 }
+
+-- 1.3.6.1.4.1.25951.1.1
+-- +--(yy)
+--    |--(0) llcNotifications
+--    |--(1) llcObjects
+--    |  |--(1) llcTables
+--    |  |  |--( 1) mACDLE
+--    |  |  |  +--(1) mACDLETable
+--    |  |  |     +--(1) mACDLEEntry
+--    |  |  |        |--(xx) 
+--    |  |  |--( 2) mAC
+--    |  |  |  +--(1) mACTable
+--    |  |  |     +--(1) mACEntry
+--    |  |  |        |--(xx) 
+--    |  |  |--( 3) resourceTypeId
+--    |  |  |  +--(1) resourceTypeIdTable
+--    |  |  |     +--(1) resourceTypeIdEntry
+--    |  |  |        |--(xx) 
+--    |  |  |--( 4) dLSAP
+--    |  |  |  +--(1) dLSAPTable
+--    |  |  |     +--(1) dLSAPEntry
+--    |  |  |        |--(xx) 
+--    |  |  |--( 5) lLCDLE
+--    |  |  |  +--(1) lLCDLETable
+--    |  |  |     +--(1) lLCDLEEntry
+--    |  |  |        |--(xx) 
+--    |  |  |--( 6) lLCStation
+--    |  |  |  +--(1) lLCStationTable
+--    |  |  |     +--(1) lLCStationEntry
+--    |  |  |        |--(xx) 
+--    |  |  |--( 7) lLCSAP
+--    |  |  |  +--(1) lLCSAPTable
+--    |  |  |     +--(1) lLCSAPEntry
+--    |  |  |        |--(xx) 
+--    |  |  |--( 8) rDESetup
+--    |  |  |  +--(1) rDESetupTable
+--    |  |  |     +--(1) rDESetupEntry
+--    |  |  |        |--(xx) 
+--    |  |  |--( 9) rDEPair
+--    |  |  |  +--(1) rDEPairTable
+--    |  |  |     +--(1) rDEPairEntry
+--    |  |  |        |--(xx) 
+--    |  |  |--(10) lLCCLPM
+--    |  |  |  +--(1) lLCCLPMTable
+--    |  |  |     +--(1) lLCCLPMEntry
+--    |  |  |        |--(xx) 
+--    |  |  |--(11) lLCConnectionLess
+--    |  |  |  +--(1) lLCConnectionLessTable
+--    |  |  |     +--(1) lLCConnectionLessEntry
+--    |  |  |        |--(xx) 
+--    |  |  |--(12) lLCCOPM
+--    |  |  |  +--(1) lLCCOPMTable
+--    |  |  |     +--(1) lLCCOPMEntry
+--    |  |  |        |--(xx) 
+--    |  |  |--(13) lLCConnection2
+--    |  |  |  +--(1) lLCConnection2Table
+--    |  |  |     +--(1) lLCConnection2Entry
+--    |  |  |        |--(xx) 
+--    |  |  |--(14) lLCConnection2IVMO
+--    |  |  |  +--(1) lLCConnection2IVMOTable
+--    |  |  |     +--(1) lLCConnection2IVMOEntry
+--    |  |  |        |--(xx) 
+--    |  |  |--(15) lLCConnectionlessAck
+--    |  |  |  +--(1) lLCConnectionlessAckTable
+--    |  |  |     +--(1) lLCConnectionlessAckEntry
+--    |  |  |        |--(xx) 
+--    |  |  +--(16) lLCConnectionlessAckIVMO
+--    |  |     +--(1) lLCConnectionlessAckIVMOTable
+--    |  |        +--(1) lLCConnectionlessAckIVMOEntry
+--    |  |  |        |--(xx) 
+--    |  |--(2) llcScalars
+--    |  |  |--(1) llcGlobals
+--    |  |  +--(2) llcDefaults
+--    |  |     |--(1) llcConnection2Defaults
+--    |  |     +--(2) llcConnectionlessAckDefaults
+--    |  |--(3) llcNotifs
+--    |  +--(4) llcOids
+--    |
+--    +--(2) llcConformance
+--       |--(1) llcComplicances
+--       +--(2) llcGroups
+
+-- =====================================================================
+--
+-- Textual Conventions
+
+LLCServices TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This textual convention represents the LLC services the 
+		 are available or selected.  Per ISO/IEC 8802-2, the 
+		 services are type1(0), type2(1), type3Initiate(2), 
+		 type3ReceiveData(3) and type3ReturnData(4)."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2 ASN.1, LLCServices."
+	SYNTAX BITS {
+			type1(0),
+			type2(1),
+			type3Initiate(2),
+			type3ReceiveData(3),
+			type3ReturnData(4)
+		}
+
+LLCStationStatus TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This textual convetion represents the status of an LLC 
+		 station.  Per ISO/IEC 8802-2, the status can be up(0), 
+		 down(1), or other (2)."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2 ASN.1, Status."
+	SYNTAX	INTEGER {
+			up(0),
+			down(1),
+			other(2)
+		}
+
+STRIndicator TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This textual convention indicates the type of source 
+		 routed MAC bridging per ISO/IEC 8802-2 (IEEE 802.2), 
+		 the types are nsr(0) or ste(1)."
+	SYNTAX BITS {
+			nsr(0),
+			ste(1)
+		}
+
+MACAddress ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This textual convention represents a MAC Address.  The 
+		 minmum length is 6 octets.  If the MAC address is a 
+		 48-bit address, the length of the octet string shall be 
+		 6 octets.  If the MAC address is a 60-bit address, the 
+		 length of the octet string shall be 8 octets.  The 
+		 octet encoding is derived from the hexadecimal 
+		 representation order for the MAC address.  
+		 AB-CD-EF-GH-IJ-KL for the 48-bit address format; 
+		 AB-CD-EF-GH-IJ-KL-MN-OP ofr the 60-bit address format.  
+		 The octets are encoded as follows: the first pari of 
+		 hexadecimal digits, AB, are encoded in the first octet.  
+		 The second pair, CD, is encoded in the second octet, 
+		 etc.  (See ISO/IEC 8802-2 6.2, MAC address attribute, 
+		 for definition of 60-bit hexadecimal display format.)"
+	SYNTAX		OCTET STRING(SIZE(0|6|8))
+
+DLSAP ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This texutal convention represents a fully qualified 
+		 DLSAP which consistes of a 6 or 8 octet MACAddress (as 
+		 described for the MACAddress texutal convention) 
+		 followed by a one octet DSAP.  When null (zero length 
+		 octet string) the value represents no specific address."
+	SYNTAX		OCTET STRING(SIZE(0|7|9))
+
+LSAP ::= TEXTUAL-CONVENTION
+'	STATUS		current
+	DESCRIPTION
+		"This textual convention represents an LLC LSAP which 
+		 consists of a 1-octet value which contains the LLC 
+		 LSAP.  Note that technically the LSAP could be 
+		 continued into subsequent octets, however, this is not 
+		 normally necessary for X.25/ISO 8208 and CLNS."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2) ASN.1, LSAP."
+	SYNTAX		OCTET STRING(SIZE(1))
+
+LSAPPairId TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This textual convention represents an RDE Pair ID whcih 
+		 consists of a 1-octet value which contains the LLC 
+		 SSAP, followed by the 6 or 8 octet MACAddress (the 
+		 combination as described in the DLSAP textual 
+		 convention), following by anoth 1-octet value which 
+		 contains the LLC DSAP, followed by the 6 or 8 octet 
+		 MACAddress."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2) ASN.1, LSAPPairID."
+	SYNTAX		OCTET STRING(SIZE(0|14|18))
+
+RoutingInformationField TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"The routing information field varies in length up to 30 
+		 octets.  When source routing is not used the RIF is 
+		 said to be NULL and contains no information.  The first 
+		 bit of the MAC source address is defined as the Routing 
+		 Information Indicator (RII). When the RIF is null, the 
+		 RII is set to zero (0).  When the RIF is not null, the 
+		 RII is set to 1.  The first two octets are the Routing 
+		 Control field (RC) and the remainder of the RIF 
+		 contains Routing Descriptors (RD).  Each RD is two 
+		 octets in length, therefore a maximum of 14 RDs can 
+		 exists in a RIF."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2) ASN.1, RIF."
+	SYNTAX		OCTET STRING(SIZE(0..30))
+
+-- =====================================================================
+
+mACDLETable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF MACDLEEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The MAC Data Link Entity managed object class.  There 
+		 may be multiple instances of the mACDLE managed object 
+		 in a system.  Systems not supported connections to LAN 
+		 media are not required to support the mACDLE and 
+		 contained managed objects.
+		 
+		 A mACDLE managed object may contain at modes on 
+		 instance of a mac-specific MO derived from the generic 
+		 mAC MO.  A mACDLE MO may contain at most one dLSAP MO.  
+		 The value of the sap1Address attribute is of no 
+		 significance.  The cardinality of the userEntityNames 
+		 attribute is limited to one.
+		 
+		 A mACDLE MO may be created and deleted explicitly by 
+		 management operation or created and deleted 
+		 automatically as part of system operation.
+		 
+		 When the mACDLE MO is operable, the operationalState 
+		 shall have the value 'enabled'; otherwise, it shall 
+		 have the value 'disabled'.  Transitions of 
+		 operationalState shall be reported using the 
+		 stateChange notification.
+		 
+		 The mACDLE MOC is derived from the datalinkEntity MOC.  
+		 The mACDLE MO contains mAC MOs.
+		 
+		 An instance of the mACDLE MO represents an instance of 
+		 the IEEE 802.2 MAC sublayer.  The MAC data link entity 
+		 can contain mAC MOs.  Each mAC MO instance contained 
+		 represents a MAC address that belongs to the mACDLE."
+	REFERENCE
+		"ITU-T Rec. X.272 | ISO/IEC 10742, mACDLE MOC."
+	::= { mACDLE 1 }
+
+mACDLEEntry OBJECT-TYPE
+	SYNTAX		MACDLEEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.272 | ISO/IEC 10742, mACDLE MO."
+	INDEX	{
+			mACDLECommunicationsEntityId -- index
+		}
+	::= { mACDLETable 1 }
+
+MACDLEEntry ::=
+	SEQUENCE {
+		-- X.723 communicationsEntity
+		mACDLECommunicationsEntityId
+			InterfaceIndex, -- index
+		mACDLELocalSapNames
+			RowPointer,
+		mACDLEOperationalState
+			OperationalState,
+		-- X.282 datalinkEntity
+		mACDLEProviderEntityNames
+			RowPointer,
+		--
+		mACDLERowStatus
+			RowStatus
+	}
+
+mACDLECommunicationsEntityId OBJECT-TYPE
+	SYNTAX		InterfaceIndex
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION	""
+	REFERENCE	"ITU-T Rec. X.282 | ISO/IEC 10742, mACDLE."
+	::= { mACDLEEntry xx }
+
+mACDLELocalSapNames OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"The localSapNames attribute identifies the providing 
+		 entity's SAP objects.  In this case, the providing 
+		 entity is a Ph-Entity and the Ph-SAP is indicated by 
+		 the name."
+	REFERENCE	"ITU-T Rec. X.282 | ISO/IEC 10742, mACDLE."
+	::= { mACDLEEntry xx }
+
+mACDLEOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	""
+	REFERENCE	"ITU-T Rec. X.282 | ISO/IEC 10742, mACDLE."
+	::= { mACDLEEntry xx }
+
+mACDLEProviderEntityNames OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION	""
+	REFERENCE	"ITU-T Rec. X.282 | ISO/IEC 10742, mACDLE."
+	::= { mACDLEEntry xx }
+
+mACDLERowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION	""
+	REFERENCE	"ITU-T Rec. X.282 | ISO/IEC 10742, mACDLE."
+	::= { mACDLEEntry xx }
+
+
+-- =====================================================================
+
+mACTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF MACEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 mAC MOC."
+	::= { mAC 1 }
+
+mACEntry OBJECT-TYPE
+	SYNTAX		MACEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 mAC MO."
+	INDEX	{
+			mACDLECommunicationsEntityId, -- shared index
+			mACId -- index
+		}
+	::= { mACTable 1 }
+
+MACEntry ::=
+	SEQUENCE {
+		mACOperationalState
+			OperationalState,
+		mACId
+			SimpleNameType, -- index
+		mACRowStatus
+			RowStatus
+	}
+
+mACOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the X.721 operationalState of the mAC 
+		 according to the OperationalState textual convention 
+		 from the OPENSS7-TMN-TC module.  The state is 'enabled' 
+		 when the mAC is operational; 'disabled' otherwise."
+	REFERENCE
+	::= { mACEntry 1 }
+
+mACId OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION
+		"Provides a naming attribute for the mAC MO."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 mACId."
+	::= { mACEntry 2 }
+
+mACRowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"
+		 The mACId-mACDLE-Automatic name binding applies when a 
+		 mAC managed object (or an instance of a subclass of the 
+		 mAC MO class) is created automatically by the operation 
+		 of the system as a subordinate object of a mACDLE 
+		 managed object (or subclass), and deleted 
+		 automatically.
+
+		 The mACId-mACDLE-Management name binding applies when a 
+		 mAC managed object (or an instance of a subclass or the 
+		 mAC MO class) can be created by management as a 
+		 subordiante object of a mACDLE managed object (or 
+		 subclass), and deleted by management.
+		 "
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 
+		 mACId-mACDLE-Automatic, mACId-mACDLE-Management, STD 
+		 58, SNMPv2-TC RowStatus."
+	::= { mACEntry 3 }
+
+-- =====================================================================
+
+resourceTypeIdTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF ResourceTypeIdEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ISO/IEC 10742 but not ITU-T Rec. X.282"
+	::= { resourceTypeId 1 }
+
+resourceTypeIdEntry OBJECT-TYPE
+	SYNTAX		ResourceTypeIdEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ISO/IEC 10742 but not ITU-T Rec. X.282"
+	INDEX	{
+			mACDLECommunicationsEntityId -- shared index
+		}
+	::= { resourceTypeIdTable 1 }
+
+ResourceTypeIdEntry ::=
+	SEQUENCE {
+		resourceTypeIdName
+			SimpleNameType,
+		resourceInfoManufacturerOUI
+			OCTET STRING,
+		resourceInfoManufacturerName
+			DisplayString,
+		resourceInfoManufacturerProductName
+			DisplayString,
+		resourceInfoManufacturerProductVersion
+			DisplayString
+	}
+
+resourceTypeIdName OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ISO/IEC 10742 but not ITU-T Rec. X.282"
+	DEFVAL		{ "RTID" }
+	::= { resourceTypeIdEntry 1 }
+
+resourceInfoManufacturerOUI OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"ManufacturerOUI takes the value of an Organizationally 
+		 Unique Identifier, as defined in secion 5.1 of IEEE 
+		 802.1 Overview and Architecture.  When encoded as an 
+		 OCTET STRING, the encoding of the value field of the 
+		 OCTET STRING shall comply with the representation 
+		 defined in sections 5.1.2 of the Overview and 
+		 Architecture.  Inasmcuh as multiple OUI assignements 
+		 are possible for a given manufacturer and no public 
+		 registry of such assigments exists, methods for 
+		 application of the OUI as a globally unique 
+		 manufacturer identifier is outside the scope of this 
+		 standard."
+	REFERENCE
+		"ISO/IEC 10742 but not ITU-T Rec. X.282"
+	::= { resourceTypeIdEntry 2 }
+
+resourceInfoManufacturerName OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE(0..128))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"ManufactererName is a printable string used to identify 
+		 the manufacturer of the resource.  Global assignment of 
+		 unique name strngs is outside the scope of this 
+		 standard.  Maximum string length is 128 octets."
+	REFERENCE
+		"ISO/IEC 10742 but not ITU-T Rec. X.282"
+	::= { resourceTypeIdEntry 3 }
+
+resourceInfoManufacturerProductName OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE(0..128))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"ManufactererProductName is a printable string used to 
+		 identify the manufacturer's product name of the 
+		 resource.  Maximum string length is 128 octets."
+	REFERENCE
+		"ISO/IEC 10742 but not ITU-T Rec. X.282"
+	::= { resourceTypeIdEntry 4 }
+
+resourceInfoManufacturerProductVersion OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE(0..128))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"ManufacturerProductVersion is a printable string used 
+		 to identify the manufacturer's product version of the 
+		 resource.  Maximum string length is 128."
+	REFERENCE
+		"ISO/IEC 10742 but not ITU-T Rec. X.282"
+	::= { resourceTypeIdEntry 5 }
+
+
+-- =====================================================================
+
+dLSAPTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF DLSAPEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The data link service access point managed object 
+		 class.  The dLSAP maanged object class is used to 
+		 represent a service access point at which services are 
+		 provided by a data link entity to the user entity.  
+		 Instances of dLSAP managed object class are contained 
+		 within instances of subclasses derived from the 
+		 datalinkEntity managed object class.  Constraints on 
+		 the number of contained dLSAP MOs and any specific 
+		 semantics of the attreibutes are given as part of the 
+		 definition of the containing DLE managed object class.
+
+		 A dLSAP managed object may be created and deleted 
+		 explicitly by management operation or created and 
+		 deleted automatically as part of system operation, e.g. 
+		 when a user of the data link layer service requests and 
+		 is granted user of the service.  The mechanism by which 
+		 this happens is a local matter and not subject to OSI 
+		 standardization."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 dLSAP MOC."
+	::= { dLSAP 1 }
+
+dLSAPEntry OBJECT-TYPE
+	SYNTAX		DLSAPEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 dLSAP MO."
+	INDEX	{
+			mACDLECommunicationsEntityId, -- shared index
+			dLSAPSapId -- index
+		}
+	::= { dLSAPTable 1 }
+
+DLSAPEntry ::=
+	SEQUENCE {
+		dLSAPSapId
+			SimpleNameType,
+		dLSAPSap1Address
+			INTEGER,
+		dLSAPUserEntityNames
+			RowPointer,
+		dLSAPRowStatus
+			RowStatus
+	}
+
+dLSAPSapId OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides a naming attribute for the dLSAP object."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5, sapId."
+	::= { dLSAPEntry 1 }
+
+dLSAPSap1Address OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the address of the dLSAP which is only of 
+		 local significance.  It can be the Physical Point of 
+		 Attachment attached to the dLSAP or the InterfaceIndex 
+		 of the entity to which the dLSAP is attached."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5, sap1Address."
+	DEFVAL		{ 0 }
+	::= { dLSAPEntry 2 }
+
+dLSAPUserEntityNames OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the distinguished names of the entities using 
+		 this dLSAP.  For data links this is a single user 
+		 entity name formatted as a RowPointer to the entry in 
+		 the table at which the user entity exists.  This is 
+		 likely the network entity.  If the user entity is 
+		 detached or unknown, the value will be zeroDotZero."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5, userEntityNames."
+	DEFVAL		{ zeroDotZero }
+	::= { dLSAPEntry 3 }
+
+dLSAPRowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations, 
+		 following the RowStatus textual convention of the 
+		 SNMPv2-TC module, may create or delete conceptual rows 
+		 from this table.
+
+		 The dLSAP-datalinkEntity-Management name binding 
+		 applies when a dLSAP managed object (or an instance of 
+		 a subclass of the dLSAP MO class) can be created by 
+		 management as a subordinate object of a datalinkEntity 
+		 maanged object (or subclasses), and deleted by 
+		 management."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, 
+		 dLSAP-datalinkEntity-Management, STD 58, SNMPv2-TC 
+		 RowStatus."
+	::= { dLSAPEntry 4 }
+
+
+-- =====================================================================
+
+lLCDLETable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF LLCDLEEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The LLC Data Link Entity managed object.  There may be 
+		 multiple instances of the lLCDLE managed object in a 
+		 system.  Systems not supporting LLC procedures are not 
+		 required to support the lLCDLE and contained managed 
+		 objects.
+
+		 An lLCDLE managed object may contain instances of 
+		 llc-specific connectionless and connection-mode 
+		 protocol machine MOs derived form the generic lLCCOPM 
+		 and lLCCLPM MO.  An lLCDLE MO may contain multiple 
+		 dLSAP MOs.  The cardinality of the userEntityNames 
+		 attribute is limited to one.
+
+		 An lLCDLE MO may be created and deleted explicity by 
+		 management operation or created and deleted 
+		 automatically as part of ssytem operation.
+
+		 When the lLCDLE MO is operable, the operationalState 
+		 shall have the value 'enabled'; otherwise it shall have 
+		 the value 'disabled'.  Transitions of operationalState 
+		 shall be reported using the stateChange notification.
+
+		 The lLCDLE MOC is derived from the datalinkEntity MOC.  
+		 The lLCDLE contains connectionless and connection 
+		 oriented protocol machines representing LLC1, and LLC2 
+		 and/or LLC3 operation.  The lLCDLE also contains an LLC 
+		 station and one or more lLCSAP service access points.
+
+		 Each lLCDLE MO uses the services of a mACDLE.  The 
+		 mACDLE provides service to an lLCDLE.  (Note that 
+		 Ethernet II accesses the MAC sublayer directly, via a 
+		 dlSAP MO contained by the mACDLE.)
+		 
+		 An instance of the lLCDLE MO represents an instance of 
+		 the IEEE 802.2 LLC sublayer.  The LLC data link entity 
+		 can contain lLCCLPM and lLCCOPM protocol machines MOs, 
+		 an lLCstation MO, and one or more lLCSAP MOs."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, lLCDLE MOC."
+	::= { lLCDLE 1 }
+
+lLCDLEEntry OBJECT-TYPE
+	SYNTAX		LLCDLEEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, lLCDLE MO."
+	INDEX	{
+			lLCDLECommunicationsEntityId
+		}
+	::= { lLCDLETable 1 }
+
+LLCDLEEntry ::=
+	SEQUENCE {
+		-- X.723 communicationsEntity
+		lLCDLECommunicationsEntityId
+			InterfaceIndex,
+		lLCDLELocalSapNames
+			RowPointer,
+		lLCDLEOperationalState
+			OperationalState,
+		-- X.282 datalinkEntity
+		lLCDLEProviderEntityNames
+			RowPointer,
+		--
+		lLCDELRowStatus
+			RowStatus
+	}
+
+lLCDLECommunicationsEntityId OBJECT-TYPE
+	SYNTAX		InterfaceIndex
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION
+		"Provides an index for the lLCDLE entries in this table."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5 
+		 communicationsEntityId."
+	::= { lLCDLEEntry 1 }
+
+lLCDLELocalSapNames OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"The localSapNames attribute identifies the providing 
+		 entity's SAP objects.  In the case of the lLCDLE, the 
+		 localSapNames identifies the dLSAP of the mACDLE object 
+		 which is providing service to the lLCDLE."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5 localSapNames."
+	::= { lLCDLEEntry 2 }
+
+lLCDLEOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the operational state of the logical link 
+		 control data link entity following the OperationalState 
+		 textual convention of the OPENSS7-TMN-TC module.
+
+		 When the lLCDLE MO is operable, the operationalState 
+		 shall have the value 'enabled'; otherwise it shall have 
+		 the value 'disabled'.  Transitions of operationalState 
+		 shall be reported using the stateChange notification.
+		 "
+	REFERENCE
+		"ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState."
+	::= { lLCDLEEntry 3 }
+
+lLCDLEProviderEntityNames OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"The providerEntityNames attribute identifies the 
+		 entities providing service to this datalinkEntity.  In 
+		 the case of the LLC data link entity, lLCDLE, the 
+		 provider entity is a MAC data link entity, mACDLE.  
+		 At most one mACDLE can provide service to an lLCDLE, 
+		 and at most one lLCDLE can be provided service by a 
+		 mACDLE.
+
+		 When there is no mACDLE providing service to the 
+		 lLCDLE, this attribute will contain zeroDotZero.  When 
+		 there is a mACDLE associated with this lLCDLE, the 
+		 value of this attribute will be the RowPointer to the 
+		 entry in the mACDLE table at which the corresponding 
+		 mACDLE entry occurs.
+
+		 When there is a mACDLE providing service to this 
+		 lLCDLE, the mACDLECommunicationsEntityId will be the 
+		 same as the lLCDLECommunicationsEntityId and this entry 
+		 will contain the RowPointer of the corresponding row in 
+		 the mACDLE table.  
+		 "
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { lLCDLEEntry 4 }
+
+lLCDLERowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations, 
+		 following the RowStatus textual convention of the 
+		 SNMPv2-TC module, may create and destroy conceptual 
+		 rows in this table.
+
+		 Rows must have been created by a management station to 
+		 be deleted by a management station.  Rows created by 
+		 system operation must be deleted by system operation."
+	REFERENCE
+		"STD 58, SNMPv2-TC RowStatus."
+	::= { lLCDLEEntry 5 }
+
+
+-- =====================================================================
+
+lLCStationTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF LLCStationEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The station component is responsible for processing the 
+		 events that affect the entire LLC entity.  The station 
+		 component handles PDUs addressed to the null DSAP 
+		 address and processes the duplicate address check, if 
+		 implemented.  One station component shall exist for 
+		 each MAC service access point present on the local 
+		 area network.
+
+		 Provides a table of LLC Stations.  There is in entry in 
+		 this table for each MAC service access point present on 
+		 the local area network.
+
+		 Provides a table of statistics for LLC stations.  There 
+		 is an entry in this table for each MAC service access 
+		 point present on a local area network attached to this 
+		 system."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, lLCStation MOC."
+	::= { lLCStation 1 }
+
+lLCStationEntry OBJECT-TYPE
+	SYNTAX		LLCStationEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The station component is responsible for handling all 
+		 events that are directed to the LLC as a whole (i.e, 
+		 events affecting all SAPs and connections serviced by 
+		 that LLC).  The station component shall begin in the 
+		 DOWN state, optionally check for a duplicate station 
+		 address, and potentially enter the UP state; see figure 
+		 24 and table 1 of IEEE 802.2 (ISO/IEC 8802-2).  The UP 
+		 state of the LLC station component provides the 
+		 enabling conditions for the operation of the service 
+		 access point (SAP) components.
+		 
+		 The station component shall be capable of receiving and 
+		 responding to XID and TEST command PDUs.  It shall 
+		 optionally be capable of initiating the XID commend 
+		 PDU, if duplicate address checking is performed by the 
+		 LLC entity in a particular implementation; see table 2 
+		 of IEEE 802.2 (ISO/IEC 8802-2).  These PDUs shall used 
+		 the null DSAP address to denote that the station 
+		 component is being referenced.
+		 
+		 The performance of the duplicate address check requires 
+		 that the station component be prepared to received its 
+		 own XID PDUs.  The definition of the MAC operation 
+		 provides for the ability to simultaneously transmit and 
+		 receive.  Since the DA = SA in the XID PDUs can be used 
+		 for duplicate address check, the MAC will recognize its 
+		 own address and pass the PDU to the station component.  
+		 The station component will respond to an XID command 
+		 PDU with an XID responose PDU, regardless of whether it 
+		 originated from itself or a remote LLC.  The station 
+		 component provides the duplicate address check by 
+		 maintaining a count of received XID response PDUs.  If 
+		 more than one XID response PDU is received, then at 
+		 least one other identical MAC DA exists on the LAN.  
+		 See figure 24 and table 1 in IEEE 802.2 (ISO/IEC 
+		 8802-2) for details.
+
+		 Provides an entry in the X.25 LLC2 Station table for 
+		 one LLC2 connection to the media (MAC Access).  Each 
+		 MAC is indexed by its ifIndex into the interface 
+		 table.
+
+		 Provides an enty in the X.25 LLC Station table for one 
+		 LLC connection to the media (MAC Access).  Each MAC is 
+		 indexed by its ifIndex into the interface table."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, lLCStation MO."
+	INDEX	{
+			lLCDLECommunicationsEntityId, -- shared index
+			dLSAPSapId -- derived from DLSAP
+		}
+	::= { lLCStationTable 1 }
+
+LLCStationEntry ::=
+	SEQUENCE {
+		-- lLCStation-P mandatory package
+		lLCStationLLCName
+			SimpleNameType,
+		lLCStationMaximumLSAPsConfigured
+			INTEGER,
+		lLCStationNumberOfActiveLSAPs
+			Gauge32,
+		lLCStationSupportedServicesTypes
+			LLCServices,
+		lLCStationStatus
+			LLCStationStatus,
+		-- need reinitialize action
+		-- lLCDupAddress-P conditional package
+		lLCStationType1AcknowledgeTimeoutValue
+			TimeInterval,
+		lLCStationType1MaximumRetryCount
+			INTEGER,
+		-- lLCType3-P conditional package
+		lLCStationMaximumPDUN3
+			INTEGER,
+		lLCStationMaximumRetransmissions4
+			INTEGER,
+		lLCStationReceiveVariableLifetime
+			TimeInterval,
+		lLCStationTransmitVariableLifetime
+			TimeInterval,
+		lLCStationType3AcknowledgeTimeoutValue
+			TimeInterval,
+		lLCStationType3Retransmissions
+			Counter32,
+		-- need lLC3StationEvent notification
+		-- lLCBuffer-P conditional package
+		lLCStationAvgBufferUseSize
+			Gauge32,
+		lLCStationBufferProblems
+			Counter32,
+		lLCStationBufferSize
+			INTEGER,
+		lLCStationMaxBufferUseSize
+			Gauge32,
+		-- need lLCStationEvent notification
+		-- pDUsDiscarded-P conditional package
+		lLCStationInactiveLSAP
+			Counter32,
+		lLCStationPDUsDiscard
+			Counter32,
+		-- need lLCStationEvent notification
+		-- rDE-P conditional package
+		lLCStationSTRIndicator
+			STRIndicator,
+		lLCStationVersionNumber
+			INTEGER,
+		-- type1AcknowledgmentTimerTimeouts-P conditional package
+		lLCStationType1AcknowledgmentTimerTimeouts
+			Counter32
+	}
+
+-- lLCStation-P mandatory package
+--
+-- The lLCStation package contains the definition of all attributes and 
+-- all actions that are common to the LLC station as a whole, regardless 
+-- of which LLC operations are supported.
+--
+lLCStationLLCName OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"This attriute is used to name the instance of the 
+		 lLCStation managed object."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, lLCName"
+	::= { lLCStationEntry 1 }
+
+lLCStationMaximumLSAPsConfigured OBJECT-TYPE
+	SYNTAX		INTEGER(1..128)
+	UNITS		"LSAPs"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The maximum number of LSAPs that can be supported by 
+		 this station at any moment in time.  All LLC stations 
+		 must support at least one LSAP (the null LSAP used for 
+		 duplicate address detection and station-wide XID and 
+		 TEST commands).  Station numbers (LSAP IDs) range from 
+		 0 to 127.  Therefore, the range of this value is from 1 
+		 to 128.  IEEE 802.2F (ISO/IEC 8802-2) does not 
+		 constrain the range of this attribute.  The number 
+		 reported is implementation dependent.  This is a 
+		 read-only column."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, maximumLSAPsConfigured"
+	::= { lLCStationEntry 2 }
+
+lLCStationNumberOfActiveLSAPs OBJECT-TYPE
+	SYNTAX		Gauge32(1..128)
+	UNITS		"LSAPs"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The number of active LSAPs that the station currently 
+		 supports."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, numberOfActiveLSAPs"
+	::= { lLCStationEntry 3 }
+
+lLCStationSupportedServicesTypes OBJECT-TYPE
+	SYNTAX		LLCServices
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The type or types of service supported (i.e., Type 1, 
+		 Type 2, Type 3.) The type or types of service supported 
+		 by this station.  The type are a combination of 
+
+		 - type1(0),
+		 - type2(1),
+		 - type3Initiate(2),
+		 - kype3ReceiveData(3),
+		 - type3ReturnData(4).
+
+		 Implementations supporting this MIB must support at 
+		 least type1(0) and should support type2(1) if at all 
+		 possible."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, supportedServicesTypes"
+	::= { lLCStationEntry 4 }
+
+lLCStationStatus OBJECT-TYPE
+	SYNTAX		LLCStationStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the status of the station.  This attribute 
+		 allows a manager to determine what state (UP, DOWN, 
+		 etc.) the LLC Station entity is in.  Note that the only 
+		 reason that the integer values start at zero (0) here 
+		 instead of one (1) is that the values are already 
+		 defined in the GDMO MIBs of IEEE 802.2 (ISO/IEC 
+		 8802-2)."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, status"
+	::= { lLCStationEntry 5 }
+
+-- need reinitialize action
+
+-- lLCDupAddress-P conditional package
+--
+-- This is a conditional part of the lLCStation component object.  It 
+-- exists if the LLC object supports duplicate station address detection 
+-- (see 6.9.2.1).
+
+lLCStationType1AcknowledgeTimeoutValue OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The timeout value of the Ack timer, which is measured 
+		 in centiseconds, displayed in seconds.  THe Ack timer 
+		 is described in IEEE 802.2 (ISO/IEC 8802-2) 6.9.2.2 and 
+		 6.9.2.3.  It is used by the station to supervise the 
+		 acknowledgement of an XID message sent to detect 
+		 duplicate MAC addresses.  If no XID response message is 
+		 received within this time period, the XID message will 
+		 be reattempted up to the maximum retry count."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), 
+		 type1AcknowledgeTimeoutValue, 6.9.2.2 and 6.9.2.3."
+	::= { lLCStationEntry 6 }
+
+lLCStationType1MaximumRetryCount OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS		"retries"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The maximum number of retries during duplicate address 
+		 checking.  If the acknowledgement timer expires after 
+		 sending an XID message for duplicate address checking, 
+		 the XID message will be retransmitted this number of 
+		 times, before moving to the UP state."
+	REFERENCE
+		"ISO/IEC 8802-2 (IEEE 802.2), type1MaximumRetryCount, 
+		 6.9.2.2 and 6.9.2.3."
+	::= { lLCStationEntry 7 }
+
+-- lLCType3-P conditional package
+--
+-- This is a conditional part of the lLCStation component object.  It 
+-- exists if the LLC object supports LLC Type 3 service.
+
+lLCStationMaximumPDUN3 OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS		"octets"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The maximum size of a Type 3 command PDU.
+		 
+		 Unless Type 3 service is supported on the LLC station, 
+		 this value is of no significance."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, maximumPDUN3"
+	::= { lLCStationEntry 8 }
+
+lLCStationMaximumRetransmissions4 OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS		"retransmissions"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The number of retransmissions of a Type 3 PDU due to 
+		 error conditions preventing receive of an 
+		 acknowledgement.
+
+		 Unless Type 3 service is supported on the LLC station, 
+		 this value is of no significance."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, maximumRetransmissions4"
+	::= { lLCStationEntry 9 }
+
+lLCStationReceiveVariableLifetime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The amount of time the Type 3 LLC receive state 
+		 variables are maintained.
+
+		 Unless Type 3 service is suported on the LLC station, 
+		 this value is of no significance."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, receiveVariableLifetime"
+	::= { lLCStationEntry 10 }
+
+lLCStationTransmitVariableLifetime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The amout of time the Type 3 LLC transmit state 
+		 variables are maintained.
+		 
+		 Unless Type 3 service is supported on the LLC station, 
+		 this value is of no significance."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, transmitVariableLifetime"
+	::= { lLCStationEntry 11 }
+
+lLCStationType3AcknowledgeTimeoutValue OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the time interval during which the LLC 
+		 expects to receive a response to an acknowledged 
+		 connectionless request.
+
+		 Unless Type 3 service is supported by the LLC station, 
+		 this value is of no significance."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, 
+		 type3AcknowledgeTimeoutValue"
+	::= { lLCStationEntry 12 }
+
+lLCStationType3Retransmissions OBJECT-TYPE
+	SYNTAX		Counter32
+	UNITS		"octets"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Provides a count of the number of PDUs which were 
+		 retrasmitted (at least once) by the Type 3 LLC service.
+
+		 Provides a count of the number of PDUs which were 
+		 retransmitted (at least once) by the Type 3 LLC 
+		 service.  This value is of no significance unless the 
+		 LLC station supports Type 3 operation."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, type3Retransmissions"
+	::= { lLCStationEntry 13 }
+
+-- need lLC3StationEvent notification
+
+-- lLCBuffer-P conditional package
+--
+-- This package provides the total amount of buffer space available for 
+-- this station, the amount of buffer space in use and the average 
+-- buffer space in use by this station.
+
+lLCStationAvgBufferUseSize OBJECT-TYPE
+	SYNTAX		Gauge32
+	UNITS		"octets"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the average amount of buffer space (in 
+		 octets) in use at the same time by LLC for this 
+		 station."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, avgBufferUseSize"
+	::= { lLCStationEntry 14 }
+
+lLCStationBufferProblems OBJECT-TYPE
+	SYNTAX		Counter32
+	UNITS		"PDUs"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"This counter provides a count of PDUs discarded due to 
+		 buffer limitations."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, bufferProblems"
+	::= { lLCStationEntry 15 }
+
+lLCStationBufferSize OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS		"octets"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"THe amount of buffer space (in octets) for use by LLC."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, bufferSize"
+	::= { lLCStationEntry 16 }
+
+lLCStationMaxBufferUseSize OBJECT-TYPE
+	SYNTAX		Gauge32
+	UNITS		"octets"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the maximum amount of buffer space (in 
+		 octets) in use at the same time by LLC for this 
+		 station."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, maxBufferUseSize"
+	::= { lLCStationEntry 17 }
+
+-- need lLCStationEvent notification
+
+-- pDUsDiscarded-P conditional package
+--
+-- This package is present if the implementation supports the counting 
+-- of the number of invalid PDUs discarded also if implementation 
+-- supports the counting of PDUs discarded due to the specification of 
+-- an inactive DSAP.
+
+lLCStationInactiveLSAP OBJECT-TYPE
+	SYNTAX		Counter32
+	UNITS		"PDUs"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"This counts the number of PDUs discarded due to the 
+		 specification of an inactive DSAP."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, inactiveLSAP"
+	::= { lLCStationEntry 18 }
+
+lLCStationPDUsDiscard OBJECT-TYPE
+	SYNTAX		Counter32
+	UNITS		"invalid PDUs"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Provides a total count of invalid PDUs that are 
+		 discarded.  A discarded (invalid) PDU shall be defined 
+		 as one that meets at least one of the following 
+		 coniditions:
+
+		 1. It is identified by such by the PHY or the MAC 
+		    sublayer;
+		 2. It is not an integral number of octets in length;
+		 3. It does not contain two properly formatted address 
+		    fields, one control field, and optionally an 
+		    information field in their proper order.
+		 4. Its length is less that 3 octets (one-octet control 
+		    field) or 4 octets (two-octet control field)."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, pDUsDiscard"
+	::= { lLCStationEntry 19 }
+
+-- need lLCStationEvent notification
+
+-- rDE-P conditional package
+--
+-- If RDE is suppored by this station, then two attributes will be 
+-- present at the Station level.
+
+lLCStationSTRIndicator OBJECT-TYPE
+	SYNTAX		STRIndicator
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"A value that indicates if the spanning tree will be 
+		 traversed by a NSR or STE routing."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, sTRIndicator"
+	::= { lLCStationEntry 20 }
+
+lLCStationVersionNumber OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The version of sap RDE protocol implemented at this 
+		 station.  The value of 1 will be used to represent the 
+		 current version.  The special value zero (0) indicates 
+		 that RDE is not support at this station."
+	REFERENCE
+		"IEEE 802.2 | ISO/IEC 8802-2, versionNumber"
+	::= { lLCStationEntry 21 }
+
+-- type1AcknowledgmentTimerTimeouts-P conditional package
+--
+-- This package is present if the implementation supports the 
+-- Acknolwedgment Timer attribute.
+
+lLCStationType1AcknowledgmentTimerTimeouts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the number of times the ACK timer has 
+		 expired."
+	REFERENCE
+		"ISO/IEC 8802-2 (IEEE 802.2), 
+		 type1AcknowledgmentTimerTimeouts, 6.9.2.2 and 6.9.2.3."
+	::= { lLCStationEntry 22 }
+
+
+
+-- =====================================================================
+
+lLCSAPTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF LLCSAPEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The Link Service Access Point (SAP) component  is 
+		 responsible for processing the events that affect a 
+		 specific operating service access point.  One SAP 
+		 component shall exist for each SAP within the LLC 
+		 entity.
+
+		 lLCSAP managed object.  This managed object contains 
+		 attributes associated wtih an LLC SAP that are 
+		 independent of any paticular type of Operation."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2)."
+	::= { lLCSAP 1 }
+
+lLCSAPEntry OBJECT-TYPE
+	SYNTAX		LLCSAPEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2)."
+	INDEX	{
+			lLCDLECommunicationsEntityId, -- contained by lLCDLE
+			dLSAPSapId -- derived from dLSAP
+		}
+	::= { lLCSAPTable 1 }
+
+LLCSAPEntry ::=
+	SEQUENCE {
+		-- lLCSAP-P mandatory package
+		lLCSAPName
+			SimpleNameType,
+		lLCSAPAddress
+			LSAP,
+		lLCSAPRDE
+			TruthValue
+	}
+
+-- lLCSAP-P mandatory package
+--
+-- The lLCSAP package contains the definitions of all attributes and 
+-- actions aassociatedw ith an LLC SAP that are independent of what LLC 
+-- types of operation are supported.
+
+lLCSAPName OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Used to name the instance of this lLCSAP managed object 
+		 within the scope of a containing lLCDLE managed object."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), lLCSAPName."
+	::= { lLCSAPEntry 1 }
+
+lLCSAPAddress OBJECT-TYPE
+	SYNTAX		LSAP
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The individual LLC address identifying this LSAP."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), lLCAddress."
+	::= { lLCSAPEntry 2 }
+
+lLCSAPRDE OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A boolean value that, if set to true, means that RDE 
+		 is supported by this SAP."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), rDE."
+	::= { lLCSAPEntry 3 }
+
+
+-- =====================================================================
+
+rDESetupTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RDESetupEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"
+		 RDE setup managed object.  A rDESetup managed object 
+		 instance is instaniated if an instance of the lLCSAP 
+		 object enables RDE.  RDE setup managed objects are not 
+		 created nor deleted explicitly by management operation.
+		 "
+	REFERENCE
+		""
+	::= { rDESetup 1 }
+
+rDESetupEntry OBJECT-TYPE
+	SYNTAX		RDESetupEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	INDEX	{
+			lLCDLECommunicationsEntityId, -- contained by lLCDLE
+			dLSAPSapId -- derived from dLSAP
+		}
+	::= { rDESetupTable 1 }
+
+RDESetupEntry ::=
+	SEQUENCE {
+		rDESetupAgingEnabled
+			TruthValue,
+		rDESetupAgingValue
+			INTEGER,
+		rDESetupEnableType2Reset
+			INTEGER,
+		rDESetupMaximumRouteDescriptors
+			INTEGER,
+		rDESetupMaximumResponseTime
+			TimeInterval,
+		rDESetupMinimumPDUSize
+			INTEGER,
+		rDESetupRDEHold
+			TruthValue,
+		rDESetupRDEReplace
+			TruthValue,
+		rDESetupName
+			INTEGER,
+		rDESetupResetOnTestEnabled
+			TruthValue
+	}
+
+rDESetupAgingEnabled OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"A boolean value representing the policy that, when true, 
+		 allows a manager to age a route."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), agingEnabled."
+	::= { rDESetupEntry 1 }
+
+rDESetupAgingValue OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"A value used to determine if a route should be flushed 
+		 due to inactivity for a specified time period."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), agingValue."
+	::= { rDESetupEntry 2 }
+
+rDESetupEnableType2Reset OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), enableType2Reset."
+	::= { rDESetupEntry 3 }
+
+rDESetupMaximumRouteDescriptors OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The maximum number or route descriptors that an 
+		 acceptable route may contain."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), maximumRouteDescriptors."
+	::= { rDESetupEntry 4 }
+
+rDESetupMaximumResponseTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The timer value used to limit the maximum route trip 
+		 response time allowed for route discovery and 
+		 consequently the maximum time a PDU can reamin in the 
+		 system."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), maximumResponseTime."
+	::= { rDESetupEntry 5 }
+
+rDESetupMinimumPDUSize OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The minimum number of octets that must be supported by 
+		 an acceptable route as indicated by the LF bits of the 
+		 routing information field."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), minimumPDUSize."
+	::= { rDESetupEntry 6 }
+
+rDESetupRDEHold OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"A boolean value representing the policy that, when 
+		 true, requires RDE to withhold sending PDUs while 
+		 changing routes."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), rDEHold."
+	::= { rDESetupEntry 7 }
+
+rDESetupRDEReplace OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"A boolean value representing the policy that, when 
+		 true, enables the RDE to use the route selected by the 
+		 remote station."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), rDEReplace."
+	::= { rDESetupEntry 8 }
+
+rDESetupName OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Naming attribute for the rDESetup managed object."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), rDESetupName."
+	::= { rDESetupEntry 9 }
+
+rDESetupResetOnTestEnabled OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"This attribute is a boolean value.  If the attribute is 
+		 true, then if a test frame is rceieved the source route 
+		 is reset."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2), resetOnTestEnabled."
+	::= { rDESetupEntry 10 }
+
+-- =====================================================================
+
+rDEPairTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RDEPairEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"
+		 RDE pair managed object.  An instance of this managed 
+		 object will exist for each RDE pair used by any type of 
+		 LLC service provided.  This managed object contains the 
+		 local MAC address and local SAP and the remote MAC 
+		 address and remote SAP, plus counters.
+
+		 An instance of this managed object will exist for each 
+		 RDE pair used by any type of LLC service provided. This 
+		 managed object contains the local MAC address and local 
+		 SAP and the remote MAC address and remote SAP, plus 
+		 counters.
+		 
+		 Provides a table that lists the pairing of local LSAP 
+		 and MAC with remote LSAP Id and MAC, as a pair for use 
+		 by the route determination entity (RDE)."
+	REFERENCE
+		""
+	::= { rDEPair 1 }
+
+rDEPairEntry OBJECT-TYPE
+	SYNTAX		RDEPairEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an entry into the rDEPairTable which 
+		 represets the route determination entity routing 
+		 information for one local LSAP/MAC and remote 
+		 LSAPId/MAC pair.  The pair is indexed by the 
+		 rDEPairIndex which indicates the local LLC station 
+		 and the rDEPairName which indicates the remote LLC 
+		 station.
+
+		 Each entry can have the flushRoute action performed on 
+		 it.  The flushRoute action takes no parameters.  This 
+		 action will be sent when management requests an RDE 
+		 Parit o flush its route.  This does not cause the RDE 
+		 to discover a new route.
+
+		 Each entry can have the the readCounters action 
+		 performed on it.  The readCounters action will be sent 
+		 when management requests information concerning RDE 
+		 counters.
+		 "
+	REFERENCE
+		""
+	INDEX	{
+			lLCDLECommunicationsEntityId, -- contained by lLCDLE
+			dLSAPSapId, -- derived from dLSAP
+			rDEPairName -- index
+		}
+	::= { rDEPairTable 1 }
+
+RDEPairEntry ::=
+	SEQUENCE {
+		rDEPairName
+			LSAPPairId, -- index
+		rDEPairDiscardCounter
+			Counter32,
+		rDEPairNSRPDUCounter
+			Counter32,
+		rDEPairNSRSelectedCounter
+			Counter32,
+		rDEPairRIF
+			RoutingInformationField,
+		rDEPairSRFPDUCounter
+			Counter32,
+		rDEPairQueryCounter
+			Counter32
+	}
+
+rDEPairName OBJECT-TYPE
+	SYNTAX		LSAPPairId
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION
+		"The local LSAP and remote LSAPId and the local and 
+		 remote MAC Addresses.  Because the local LSAP and local 
+		 MAC address are implied by this LAN station, only the 
+		 remote LSAPId and remote MAC are provided in this 
+		 attribute.  The field is encoded as a MACAddress 
+		 textual convenstion (6 octet or 8 octet MAC address) 
+		 except that it is also followed by a single octet 
+		 inicating the remote LSAPId and can have values between 
+		 0 and 127."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2) rDEPairName."
+	::= { rDEPairEntry 1 }
+
+rDEPairDiscardCounter OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A value that represents the number of times a new 
+		 selection has been made."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2) discardCounter."
+	::= { rDEPairEntry 2 }
+
+rDEPairNSRPDUCounter OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A value that represents the number of frames without a 
+		 routing field."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2) nSRPDUCounter."
+	::= { rDEPairEntry 3 }
+
+rDEPairNSRSelectedCounter OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A value that represents the number of times that 
+		 acceptable SRF route existed resulting in the selection 
+		 of the NSR path."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2) nSRSelectedCounter."
+	::= { rDEPairEntry 4 }
+
+rDEPairRIF OBJECT-TYPE
+	SYNTAX		RoutingInformationField
+			-- OCTET STRING(SIZE(0..30))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The routing information field varies in length up to 30 
+		 octets.  When source routing is not used the RIF is 
+		 said to be NULL and contains no information.  The first 
+		 bit of the MAC source address is defined as the Routing 
+		 Information Indicator (RII). When the RIF is null, the 
+		 RII is set to zero (0).  When the RIF is not null, the 
+		 RII is set to 1.  The first two octets are the Routing 
+		 Control field (RC) and the remainder of the RIF 
+		 contains Routing Descriptors (RD).  Each RD is two 
+		 octets in length, therefore a maximum of 14 RDs can 
+		 exists in a RIF."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2) rIF."
+	::= { rDEPairEntry 5 }
+
+rDEPairSRFPDUCounter OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A value that represents the number of frames with 
+		 routing field."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2) sRFPDUCounter."
+	::= { rDEPairEntry 6 }
+
+rDEPairQueryCounter OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A value that represents the numer of Route Query 
+		 commands generated."
+	REFERENCE
+		"IEEE 802.2 (ISO/IEC 8802-2) queryCounter."
+	::= { rDEPairEntry 7 }
+
+
+-- =====================================================================
+
+lLCCLPMTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF LLCCLPMEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The LLC Connectionless Protocol Machine managed object.  
+		 The generic LLC Connectionless PM MO from which 
+		 protocol-specific LLC PM MOs bay be derived."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742"
+	::= { lLCCLPM 1 }
+
+lLCCLPMEntry OBJECT-TYPE
+	SYNTAX		LLCCLPMEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The CL PM is contaned by a datalinkEntity, in this case 
+		 a lLCDLE.
+
+
+		 Each entry supports an activation and deactivation 
+		 action.
+
+		 Whenever an entry is created, the objectCreation 
+		 notification is issued.  Whenever an entry is deleted, 
+		 the objectDeletion notification is issued.  Whenever 
+		 the operational state changes a stateChange 
+		 notification is issued.  Objects may be created and 
+		 deleted by explicity management operation.  Deletion 
+		 and deactivation have a similar effect, as does 
+		 creation and activation.
+		 
+		 "
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742"
+	INDEX	{
+			lLCCLPMClProtooclMachineId
+		}
+	::= { lLCCLPMTable 1 }
+
+LLCCLPMEntry ::=
+	SEQUENCE {
+		-- derived from clProtocolMachine
+		lLCCLPMClProtocolMachineId
+			SimpleNameType,
+		lLCCLPMOperationalState
+			OperationalState,
+		-- clProtocolMachineP2 package
+		lLCCLPMTotalRemoteSAPs
+			Counter32,
+		lLCCLPMRowStatus
+			RowStatus
+	}
+
+-- derived from clProtocolMachine
+lLCCLPMClProtocolMachineId OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION
+		"Provides a naming attribute for the logical link 
+		 control connectionless protocol machine."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5, clProtocolMachineId."
+	::= { lLCCLPMEntry 1 }
+
+lLCCLPMOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the operational state of the logical link 
+		 control connectionless protocol machine."
+	REFERENCE
+		"ITU-T Rec. X.721 | ISO/IEC 10165-2, operationalState."
+	::= { lLCCLPMEntry 2 }
+
+-- clProtocolMachineP2 package
+lLCCLPMTotalRemoteSAPs OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Counts the number of remote (N) SAPs that the 
+		 containing clProtocolMachine has communicated with.  
+		 incremented by 1 every time communication with a remote 
+		 (N) SAP is acheived."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5, totalRemoteSAPs."
+	::= { lLCCLPMEntry 3 }
+
+lLCCLPMRowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations, 
+		 following the RowStatus textual convention of the 
+		 SNMPv2-TC module, may create or delete conceptual rows 
+		 from this table.
+		 
+		 The lLCCLPM-lLCDLE-Management name binding applies when 
+		 an lLCCLPM managed object (or an instance of a subclass 
+		 of the lLCCLPM MO class) can be created by management 
+		 as a subordinate object of a lLCDLE managed object (or 
+		 subclasses), and deleted by mangement."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, 
+		 lLCCLPM-lLCDLE-Management, STD 58, SNMPv2-TC 
+		 RowStatus."
+	::= { lLCCLPMEntry 4 }
+
+
+-- =====================================================================
+
+lLCConnectionLessTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF LLCConnectionLessEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { lLCConnectionLess 1 }
+
+lLCConnectionLessEntry OBJECT-TYPE
+	SYNTAX		LLCConnectionLessEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { lLCConnectionLessTable 1 }
+
+LLCConnectionLessEntry ::=
+	SEQUENCE {
+	}
+
+-- =====================================================================
+
+lLCCOPMTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF LLCCOPMEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The LLC Connection-mode Protocol Machine managed 
+		 object.  The generic LLC Connection-mode PM MO from 
+		 which protocol specific LLC PM MOs may be derived.
+		 "
+	REFERENCE
+		""
+	::= { lLCCOPM 1 }
+
+lLCCOPMEntry OBJECT-TYPE
+	SYNTAX		LLCCOPMEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { lLCCOPMTable 1 }
+
+LLCCOPMEntry ::=
+	SEQUENCE {
+		-- derived from coProtooclMachine
+		lLCCOPMCoProtocolMachineId
+			SimpleNameType,
+		lLCCLPMOperationalState
+			OperationalState,
+		--
+		lLCCOPMRowStatus
+			RowStatus
+	}
+
+-- derived from coProtooclMachine
+lLCCOPMCoProtocolMachineId OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides a naming attribute for the logical link 
+		 control connection-oriented protocol machine."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5, coProtocolMachineId."
+	::= { lLCCOPMEntry 1 }
+
+lLCCLPMOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the operational state of the logical link 
+		 contorl connection-oriented protocol machine."
+	REFERENCE
+		"ITU-T Rec. X.721 | ISO/IEC 10165-2, operationalState."
+	::= { lLCCOPMEntry 2 }
+
+--
+lLCCOPMRowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations, 
+		 following the RowStatus textual convention of the 
+		 SNMPv2-TC module, may create or delete conceptual rows 
+		 from this table.
+		 
+		 The lLCCOPM-lLCDLE-Management name binding applies when 
+		 an lLCCOPM managed object (or an instance of a subclass 
+		 of the lLCCOPM MO class) can be created by management 
+		 as a subordinate object of a lLCDLE managed object (or 
+		 subclasses), and deleted by mangement."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, 
+		 lLCCOPM-lLCDLE-Management, STD 58, SNMPv2-TC 
+		 RowStatus."
+	::= { lLCCOPMEntry 3 }
+
+
+-- =====================================================================
+
+lLCConnection2Table OBJECT-TYPE
+	SYNTAX		SEQUENCE OF LLCConnection2Entry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { lLCConnection2 1 }
+
+lLCConnection2Entry OBJECT-TYPE
+	SYNTAX		LLCConnection2Entry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { lLCConnection2Table 1 }
+
+LLCConnection2Entry ::=
+	SEQUENCE {
+	}
+
+-- =====================================================================
+
+lLCConnection2IVMOTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF LLCConnection2IVMOEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { lLCConnection2IVMO 1 }
+
+lLCConnection2IVMOEntry OBJECT-TYPE
+	SYNTAX		LLCConnection2IVMOEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { lLCConnection2IVMOTable 1 }
+
+LLCConnection2IVMOEntry ::=
+	SEQUENCE {
+	}
+
+-- =====================================================================
+
+lLCConnectionlessAckTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF LLCConnectionlessAckEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { lLCConnectionlessAck 1 }
+
+lLCConnectionlessAckEntry OBJECT-TYPE
+	SYNTAX		LLCConnectionlessAckEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { lLCConnectionlessAckTable 1 }
+
+LLCConnectionlessAckEntry ::=
+	SEQUENCE {
+	}
+
+-- =====================================================================
+
+lLCConnectionlessAckIVMOTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF LLCConnectionlessAckIVMOEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { lLCConnectionlessAckIVMO 1 }
+
+lLCConnectionlessAckIVMOEntry OBJECT-TYPE
+	SYNTAX		LLCConnectionlessAckIVMOEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { lLCConnectionlessAckIVMOTable 1 }
+
+LLCConnectionlessAckIVMOEntry ::=
+	SEQUENCE {
+	}
+
+-- =====================================================================
+
+END
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8

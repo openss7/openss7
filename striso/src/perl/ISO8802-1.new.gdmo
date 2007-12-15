@@ -1,0 +1,420 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 18:56:05 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Document "ISO/IEC 8802-1 : 1993"
+--  { iso(1) member-body(2) us(840) ieee802dot1partF(10011) } >--
+--< GDMO.Namespace ieee_802_1 >--
+--< GDMO.Alias "ISO/IEC 8802-1 : 1993" "IEEE802-1",
+--  "802-1" >--
+MODULE "ISO/IEC 8802-1 : 1993" { iso(1) member-body(2) us(840) ieee802dot1partF(10011) }
+-- Annex A
+-- Common managed objects
+-- (normative)
+-- This annex provides the definitive statement of registration values as required by annex C, C.4.3.
+-- A.1 Managed object class definitions
+
+oResourceTypeID MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ISO/IEC 10165-2":top;
+	CHARACTERIZED BY
+		pResourceTypeID PACKAGE
+			ATTRIBUTES
+				aResourceTypeIDName GET,
+				aResourceInfo GET;;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) managedObjectClass(3) resourcetypid(0) };
+
+
+oScanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ISO/IEC 10165-2":top;
+	CHARACTERIZED BY
+		pScanner PACKAGE
+			BEHAVIOUR
+				bScanner BEHAVIOUR
+					DEFINED AS
+						"See 7.1.2.1, Scanner behaviour";;
+			ATTRIBUTES
+				aScannerID GET,
+				"ISO/IEC 10165-2":administrativeState GET-REPLACE,
+				aGranularityPeriod GET-REPLACE,
+				"ISO/IEC 10165-2":operationalState GET;;;
+	CONDITIONAL PACKAGES
+		pConfigEventsReporting
+			PRESENT IF
+				"configuration event reporting is supported";
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) managedObjectClass(3) scanner(1) };
+
+
+oEWMAMetricMonitor MANAGED OBJECT CLASS
+	DERIVED FROM
+		oScanner;
+	CHARACTERIZED BY
+		pEWMAMetricMonitor PACKAGE
+			BEHAVIOUR
+				bEWMAMetricMonitor;
+			ATTRIBUTES
+				aObservedManagedObjectInstance GET-REPLACE,
+				aObservedAttributeID GET-REPLACE,
+				aDerivedGauge GET-REPLACE
+					pDerivedGaugeNotCurrent,
+				aEstimateOfMean GET-REPLACE,
+				aMovingTimePeriod GET-REPLACE,
+				aSeverityIndicatingThreshold GET-REPLACE ADD-REMOVE;
+			NOTIFICATIONS
+				"ISO/IEC 10165-2":qualityofServiceAlarm;;;
+	CONDITIONAL PACKAGES
+		pCounterDifference
+			PRESENT IF
+				"counter to gauge conversion is
+				requested",
+		pCounterOverflow
+			PRESENT IF
+				"the pCounterDifference package is present
+				and modulo arithmetic is required to calculate
+				the new value of the derived gauge
+				on counter overflow";
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) managedObjectClass(3) ewmametricmonitor(2) };
+-- A.2 Parameters
+
+
+pDerivedGaugeNotCurrent PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX IEEE802CommonDefinitions.DerivedGaugeNotCurrentType;
+	BEHAVIOUR
+		bDerivedGaugeNotCurrent BEHAVIOUR
+			DEFINED AS
+				"Derived gauge set to an inconsistent value. May occur during the first
+				scan interval after transitioning to the unlocked state or when the counter
+				difference derives a negative value. The syntax of the parameter permits
+				the recipient of the operation to return the values of all attributes referenced
+				by the Set operation.";;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) parameter(5) derivedgaugenotcurrent(0) };
+-- A.3 Name bindings
+
+
+nbResourceTypeID-system NAME BINDING
+	SUBORDINATE OBJECT CLASS oResourceTypeID AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ISO/IEC 10165-2":system;
+	WITH ATTRIBUTE
+		aResourceTypeIDName;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) nameBinding(6) resourcetypeid-system(0) };
+
+
+nbEWMAMetricMonitor-system NAME BINDING
+	SUBORDINATE OBJECT CLASS oEWMAMetricMonitor AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ISO/IEC 10165-2":system;
+	WITH ATTRIBUTE
+		aScannerID;
+	BEHAVIOUR
+		bNBewmaMetricMonitor BEHAVIOUR
+			DEFINED AS
+				"See 7.1.2.1, Scanner behaviour, and 7.1.3.1, EWMA metric
+				monintor behaviour";;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) nameBinding(6) ewmametricmonitor-system(1) };
+-- A.4 Package definitions
+
+
+pCounterDifference PACKAGE
+	BEHAVIOUR
+		bCounterDifference;
+	ATTRIBUTES
+		aCounterTMinusGP GET-REPLACE;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) package(4) counterdifference(0) };
+
+
+pConfigEventsReporting PACKAGE
+	BEHAVIOUR
+		bConfigChangeReport BEHAVIOUR
+			DEFINED AS
+				"see 7.2.2.1, Configuration events
+				reporting behaviour";;
+	NOTIFICATIONS
+		"ISO/IEC 10165-2":stateChange,
+		"ISO/IEC 10165-2":attributeValueChange,
+		"ISO/IEC 10165-2":objectCreation,
+		"ISO/IEC 10165-2":objectDeletion;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) package(4) configchangereport(1) };
+
+
+pCounterOverflow PACKAGE
+	BEHAVIOUR
+		bCounterOverflow;
+	ATTRIBUTES
+		aCounterModulus GET-REPLACE;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) package(4) countermodulus(2) };
+-- A.5 Attribute definitions
+
+
+aMacAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.MACAddress;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		bMacAddress BEHAVIOUR
+			DEFINED AS
+				Octet string of fixed length of 6 octets
+				(48-bit MAC address) or 8 octets (60-bit
+				802.6 MAC address). Used to represent a
+				MAC address of a LAN or MAN station.
+				This attribute is readable, and may also
+				be writable if the specific use to which
+				it is put permits modification of its
+				contents. See 6.2, MAC address
+				attribute, for further behaviour
+				definition.;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) attribute(7) macaddress(0) };
+
+
+aResourceTypeIDName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.ResourceTypeIDName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bResourceTypeID BEHAVIOUR
+			DEFINED AS
+				Contains the name of the Resource Type
+				ID managed object. The attribute is
+				read-only and always contains the value
+				"RTID." This attribute value shall not
+				be used as a naming attribute for any
+				other managed object class;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) attribute(7) restypeidname(1) };
+
+
+aResourceInfo ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.ResourceInfo;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bResourceInfo BEHAVIOUR
+			DEFINED AS
+				A structured attribute that specifies:
+				ManufacturerOUI. This takes the value of a valid instance of the 
+				organizationally
+				unique identifier described in 5.1 of IEEE Std 802-1990.
+				ManufacturerName. This identifies the manufacturer of the resource. Global
+				assignment of unique name strings is outside the scope of this standard.
+				ManufacturerProductName. This is the manufacturer-defined product name.
+				ManufacturerProductVersion. This is the manufacturer-defined product revision
+				designation.;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) attribute(7) resourceinfo(2) };
+
+
+aScannerID ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.ScannerID;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) attribute(7) scannerid(3) };
+
+
+aCounterTMinusGP ATTRIBUTE
+	DERIVED FROM
+		"ISO/IEC 10165-2":counter;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) attribute(7) countertminusgp(4) };
+
+
+aCounterModulus ATTRIBUTE
+	DERIVED FROM
+		"ISO/IEC 10165-2":counter;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) attribute(7) countermodulus(5) };
+
+
+aDerivedGauge ATTRIBUTE
+	DERIVED FROM
+		"ISO/IEC 10165-2":gauge;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) attribute(7) derivedgauge(6) };
+
+
+aEstimateOfMean ATTRIBUTE
+	DERIVED FROM
+		"ISO/IEC 10165-2":gauge;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) attribute(7) estimateofmean(7) };
+
+
+aGranularityPeriod ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.TimePeriod;
+	MATCHES FOR EQUALITY, ORDERING;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) attribute(7) granularityperiod(8) };
+
+
+aObservedAttributeID ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.AttributeID;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) attribute(7) observedattributeid(9) };
+
+
+aObservedManagedObjectInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.ObjectInstance;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) attribute(7) observedmanagedobjectinstance(10) };
+
+
+aSeverityIndicatingThreshold ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.SeverityIndGaugeThreshold;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bSeverityIndicatingThreshold;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) attribute(7) severityindicatingthreshold(11) };
+
+
+aMovingTimePeriod ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX IEEE802CommonDefinitions.TimePeriod;
+	MATCHES FOR EQUALITY, ORDERING;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802dot1partF(10011) attribute(7) movingtimeperiod(12) };
+-- A.6 Behaviour definitions
+
+
+bEWMAMetricMonitor BEHAVIOUR
+	DEFINED AS
+		See 7.1.3.1, EWMA metric monitor behaviour, for general behaviour of this 
+		object.
+		The detailed smoothing algorithm for estimateOfMean is as follows:
+		The estimate of the mean (estimateOfMean), ~V(t), is defined to be a weighted 
+		moving
+		average of a gauge, V[t]. The specified weighting is exponential. The algorithm 
+		has
+		the property that more recent event occurrences in the moving time period are
+		'weighted' more heavily than older occurrences. The exponentially weighted 
+		moving
+		average (EWMA) is defined by the following recursive algorithm:
+		~V[t] = ~V[tGP] + GP * ( V[t]~V[tGP] ) / T1
+		where
+		t is the current value of time,
+		V[t] is the value of the gauge (derivedGauge) at time t,
+		~V[t] is the estimate of the mean (estimateOfMean) of the
+		gauge V[t] at time t,
+		~V[tGP] is the estimate of the mean of the gauge V[t] at time
+		(tGP), the last estimate of the mean,
+		GP is the time between the last observation of V[t] and
+		the current observation constrained to be a positive
+		value larger than zero (granularityPeriod). It is
+		sufficient to have a best effort to make GP a constant
+		value.
+		T1 is the time constant of the exponentially weighted
+		moving average with the same units as GP. T1 is
+		defined by the equation T1 = (MTP + GP)/2.
+		MTP is the moving time period (movingTimePeriod) over
+		which the mean is estimated.
+		MTP must be greater than or equal to GP. Therefore, the value of T1 is greater 
+		than
+		or equal to 1.
+		When GP = MTP, the calculated mean value for the gauge becomes the current gauge
+		value, i.e., ~V[t] = V[t].
+		Both GP and MTP can be reset by the managing system. The mean time period, T1, 
+		can
+		be chosen to be integer multiples of the granularity period, GP.
+		The initial condition (or reset condition) of the EWMA of the estimated mean is 
+		provided
+		by setting the estimateOfMean attribute.
+		The units of ~V[t] are the same as the units of the gauge to which the estimate 
+		of
+		the mean is applied.;
+
+
+bCounterDifference BEHAVIOUR
+	DEFINED AS
+		V[t] = [counter[t]counter[t-GP]]
+		where
+		V[t] is the difference between successive observations of
+		the counter,
+		counter[t] is the value of the counter at the current time t
+		(not saved in any attribute),
+		counter[t-GP] is the previous value of the counter at time t-GP
+		(i.e., counterTMinusGP),
+		GP is the sampling interval in units of time (Granularity
+		Period).
+		The initial value of counter[t-GP] determines the initial difference value.
+		Whenever the metric object transitions from locked to unlocked status, the first
+		scan is treated in a special manner.
+		On first scan
+		counter[t-GP] <- observed counter
+		derivedGauge <- unspecified, if retrieved returns error parameter
+		pDerivedGaugeNotCurrent
+		estimateOfMean <- either as initialized or value when last locked
+		On second and subsequent scans
+		read observed counter
+		derivedGauge <- observed countercounter[t-GP]
+		counter[t-GP] <- observed counter
+		estimate of mean <- results of EWMA summarization function;
+
+
+bSeverityIndicatingThreshold BEHAVIOUR
+	DEFINED AS
+		This attribute type has all the behaviour of a gauge-threshold attribute type, 
+		as
+		defined in 8.4.2 of ISO/IEC 10165-2 : 1992. As an enhancement to the syntax of 
+		the
+		gauge-threshold attribute type, it adds an optional severityIndication parameter 
+		to
+		the syntax of both the notifyHigh and notifyLow submembers within each threshold
+		level member. This attribute type has additional behaviour associated with these
+		optional perceivedSeverity indication parameters, which is defined as follows:
+		 If the notifyHigh s switch is on, the notifyHighss severityIndication value
+		shall be reported in the perceivedSeverity parameter of any notification
+		triggered by the gauge value crossing the notifyHigh s gaugeThreshold value
+		in the positive going direction.
+		 If the notifyLowes switch is on, the notifyLows severityIndication value
+		shall be reported in the perceivedSeverity parameter of any notification
+		triggered by the gauge value crossing the notifyLowrs gaugeThreshold value
+		in the negative going direction.
+		 If both switches are on for a single thresholdLevel, one of the
+		severityIndication values shall be 'clear.';
+
+
+bCounterOverflow BEHAVIOUR
+	DEFINED AS
+		The gauge value derived (V[t]) is calculated using the following method:
+		If [counter[t]counter[t-GP]] is positive
+		V[t] is evaluated as defined in bCounterDifference behaviour
+		If [counter[t]counter[t-GP]] is negative
+		V[t] = [counter[t]counter[t-GP] + modulus value].
+		If the value of the modulus value attribute is zero the actual modulus value 
+		used to
+		evaluate V[t] is a local matter.;
+
+END
+--< GDMO.EndDocument "ISO/IEC 8802-1 : 1993"
+--  { iso(1) member-body(2) us(840) ieee802dot1partF(10011) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ +- itut_x721::system
+--@@ +- ieee_802_1::oResourceTypeID
+--@@ +- ieee_802_1::oScanner
+--@@ |  +- ieee_802_1::oEWMAMetricMonitor
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- ieee_802_1::oResourceTypeID
+--@@ >- ieee_802_1::oEWMAMetricMonitor
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

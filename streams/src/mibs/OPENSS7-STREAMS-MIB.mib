@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile$ $Name$($Revision$) $Date$
+-- @(#) $RCSfile: OPENSS7-STREAMS-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/15 20:16:36 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -10,18 +10,19 @@
 --
 -- All Rights Reserved.
 --
--- This program is free software; you can redistribute it and/or modify it under
--- the terms of the GNU General Public License as published by the Free Software
--- Foundation; version 3 of the License.
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
 --
--- This program is distributed in the hope that it will be useful, but WITHOUT
--- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
--- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
--- details.
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
 --
--- You should have received a copy of the GNU General Public License along with
--- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
--- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date$ by $Author$
+-- Last Modified $Date: 2007/12/15 20:16:36 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
--- $Log$
+-- $Log: OPENSS7-STREAMS-MIB.mib,v $
+-- Revision 0.9.2.1  2007/12/15 20:16:36  brian
+-- - added new mib files
+--
 -- =============================================================================
 
 OPENSS7-STREAMS-MIB DEFINITIONS ::= BEGIN
@@ -68,19 +72,23 @@ openss7MIBs	OBJECT IDENTIFIER ::= { openss7 1 }
 openss7Modules	OBJECT IDENTIFIER ::= { openss7MIBs 1 }
 
 strMIB MODULE-IDENTITY
-	LAST-UPDATED	"200710010804Z"
-	ORGANIZATION	"The OpenSS7 Project"
-	CONTACT-INFO	"Brian Bidulock
-			 OpenSS7 Corporation
-			 1469 Jefferys Crescent
-			 Edmonton, Alberta T6L 6T1
-			 CANADA
-			 Tel: +1 780 490 1141
-			 Fax: +1 780 490 1241
-			 Mob: +1 780 953 0557
-			 mailto:bidulock@openss7.org"
-	DESCRIPTION	"This MIB provides configuration and status 
-			 information for a STREAMS subsystem."
+	LAST-UPDATED
+		"200710010804Z"
+	ORGANIZATION
+		"The OpenSS7 Project"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta T6L 6T1
+		 CANADA
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 mailto:bidulock@openss7.org"
+	DESCRIPTION
+		"This MIB provides configuration and status information 
+		 for a STREAMS subsystem."
 	::= { openss7Modules 1 }
 
 -- top level orgaization of the MIB
@@ -105,6 +113,106 @@ strStats		OBJECT IDENTIFIER ::= { strTables	 5 }
 
 strTunables		OBJECT IDENTIFIER ::= { strScalars	 1 }
 strStatistics		OBJECT IDENTIFIER ::= { strScalars	 2 }
+
+
+-- ====================================================================
+
+-- 1.3.6.1.4.1.29591.1.1
+-- +--(1) strMIB
+--    |--(0) strNotifications
+--    |--(1) strObjects
+--    |  |--(1) strTables
+--    |  |  |--(1) strMod
+--    |  |  |  +--(1) strModTable
+--    |  |  |     +--(1) strModEntry
+--    |  |  |        |--( 1) strModIdnum
+--    |  |  |        |--( 2) strModName
+--    |  |  |        |--( 3) strModType
+--    |  |  |        |--( 4) strModMajor
+--    |  |  |        +--( 5) strModRowStatus
+--    |  |  |--(2) strModInfo
+--    |  |  |  +--(1) strModInfoTable
+--    |  |  |     +--(1) strModInfoEntry
+--    |  |  |        |--( 1) strModInfoIndex
+--    |  |  |        |--( 2) strModInfoQueues
+--    |  |  |        |--( 3) strModInfoMinpsz
+--    |  |  |        |--( 4) strModInfoMaxpsz
+--    |  |  |        |--( 5) strModInfoHiwat
+--    |  |  |        |--( 6) strModInfoLowat
+--    |  |  |        +--( 7) strModInfoTraceLevel
+--    |  |  |--(3) strModStat
+--    |  |  |  +--(1) strModStatTable
+--    |  |  |     +--(1) strModStatEntry
+--    |  |  |        |--( 1) strModStatIndex
+--    |  |  |        |--( 2) strModStatQueues
+--    |  |  |        |--( 3) strModStatPCnt
+--    |  |  |        |--( 4) strModStatScnt
+--    |  |  |        |--( 5) strModStatOcnt
+--    |  |  |        |--( 6) strModStatCcnt
+--    |  |  |        |--( 7) strModStatAcnt
+--    |  |  |        |--( 8) strModStatPrivate
+--    |  |  |        +--( 9) strModStatFlags
+--    |  |  |--(4) strApsh
+--    |  |  |  +--(1) strApshTable
+--    |  |  |     +--(1) strApshEntry
+--    |  |  |        |--( 1) strApshName
+--    |  |  |        |--( 2) strApshMajor
+--    |  |  |        |--( 3) strApshMinor
+--    |  |  |        |--( 4) strApshLastMinor
+--    |  |  |        |--( 5) strApshModules
+--    |  |  |        +--( 6) strApshRowStatus
+--    |  |  +--(5) strStats
+--    |  |     +--(1) strStatsTable
+--    |  |        +--(1) strStatsEntry
+--    |  |           |--( 1) strStatsStructure
+--    |  |           |--( 2) strStatsCurrentAllocs
+--    |  |           +--( 3) strStatsHighWaterMark
+--    |  |--(2) strScalars
+--    |  |  |--(1) strTunables
+--    |  |  |  |--( 1) strCltime
+--    |  |  |  |--( 2) strMaxApush
+--    |  |  |  |--( 3) strMaxMblk
+--    |  |  |  |--( 4) strMaxStramod
+--    |  |  |  |--( 5) strMaxStrdev
+--    |  |  |  |--( 6) strMaxStrmod
+--    |  |  |  |--( 7) strMsgPriority
+--    |  |  |  |--( 8) strNband
+--    |  |  |  |--( 9) strNstrmsgs
+--    |  |  |  |--(10) strNstrpush
+--    |  |  |  |--(11) strHiwat
+--    |  |  |  |--(12) strLowat
+--    |  |  |  |--(13) strMaxpsz
+--    |  |  |  |--(14) strMinpsz
+--    |  |  |  |--(15) strReuseFmodsw
+--    |  |  |  |--(16) strRtime
+--    |  |  |  |--(17) strStrhold
+--    |  |  |  |--(18) strStrctlsz
+--    |  |  |  |--(19) strStrmsgsz
+--    |  |  |  |--(20) strStrthresh
+--    |  |  |  |--(21) strLowthresh
+--    |  |  |  |--(22) strMedthresh
+--    |  |  |  +--(23) strIoctime
+--    |  |  +--(2) strStatistics
+--    |  |--(3) strNotifs
+--    |  +--(4) strOids
+--    +--(2) strConformance
+--       |--(1) strCompliances
+--       |  +--(1) strMIBCompliance
+--       +--(2) strGroups
+--          |--( 1) strTunablesMandatoryGroup
+--          |--( 2) strMessagePoolsConditionalGroup
+--          |--( 3) strHoldConditionalGroup
+--          |--( 4) strOptionalTunables
+--          |--( 5) strApshTableMandatoryGroup
+--          |--( 6) strApshTableConditionalGroup
+--          |--( 7) strModTableMandatoryGroup
+--          |--( 8) strModTableConditionalGroup
+--          |--( 9) strModInfoTableMandatoryGroup
+--          |--(10) strModInfoTableConditionalGroup
+--          |--(11) strModStatTableMandatoryGroup
+--          |--(12) strModStatTableConditionalGroup
+--          |--(13) strStatsTableMandatoryGroup
+--          +--(14) strStatsTableConditionalGroup
 
 
 -- ====================================================================
@@ -156,11 +264,11 @@ strModTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides a table of modules and drivers which provides 
-		 some information about their initial packet sizes and 
-		 water marks as well as providing an index for an 
-		 auxillary statistics table."
-	REFERENCE	"scls(8)"
+		"A table of STREAMS drivers and modules which contains 
+		 information about the STREAMS driver or module initial 
+		 packet sizes and water marks."
+	REFERENCE
+		"scls(8)"
 	::= { strMod 1 }
 
 strModEntry OBJECT-TYPE
@@ -168,12 +276,14 @@ strModEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides a entry in the STREAMS modules table for one 
-		 module or driver."
-	REFERENCE	"scls(8)"
-	INDEX	{
-			strModIdnum
-		}
+		"An entry in the STREAMS modules table for one driver or 
+		 module.  Each table entry is indexed by the module 
+		 identifier which is the STREAMS module identifier that 
+		 appears in the mi_idnum field of the module_info(9) 
+		 STREAMS structure."
+	REFERENCE
+		"scls(8)"
+	INDEX	{ strModIdnum }
 	::= { strModTable 1 }
 
 StrModEntry ::=
@@ -185,7 +295,9 @@ StrModEntry ::=
 		strModType
 			INTEGER,
 		strModMajor
-			Unsigned32
+			Unsigned32,
+		strModRowStatus
+			RowStatus
 	}
 
 strModIdnum OBJECT-TYPE
@@ -195,39 +307,82 @@ strModIdnum OBJECT-TYPE
 	DESCRIPTION
 		"Indicates the driver or module STREAMS module id.  The 
 		 STREAMS module id is unique within the entire system 
-		 and is used as an index to this and other tables."
-	REFERENCE	"scls(8)"
+		 and is used as an index to this and other tables.  This 
+		 is the module identifier that appears in the mi_idnum 
+		 field of the module_info(9) STREAMS structure for the 
+		 module or driver."
+	REFERENCE
+		"scls(8)"
 	::= { strModEntry 1 }
 
 strModName OBJECT-TYPE
 	SYNTAX		StreamsModuleName
-	MAX-ACCESS	read-only
+	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Indicates the name of the STREAMS driver or module as an 
-		 index into the table."
-	REFERENCE	"scls(8)"
+		"Indicates the name of the STREAMS driver or module.  
+		 This is the module name that appears in the mi_idname 
+		 field of the module_info(9) STREAMS structure for the 
+		 module or driver.  It uses the StreamsModuleName 
+		 textual convention as STREAMS module names are limited 
+		 to FMNAMESZ in length.  Once this object is created in 
+		 an entry, it becomes read-only until it is destroyed."
+	REFERENCE
+		"scls(8)"
 	::= { strModEntry 2 }
 
 strModType OBJECT-TYPE
 	SYNTAX		INTEGER { module(1), driver(2) }
-	MAX-ACCESS	read-only
+	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
 		"Indicates the type of the object, whether a STREAMS 
-		 driver or module."
-	REFERENCE	"scls(8)"
+		 driver(2) or module(1).  STREAMS modules and drivers 
+		 share a name space as well as a module identifier 
+		 space.  Once this object is created in an entry, it 
+		 becomes read-only until it is destroyed."
+	REFERENCE
+		"scls(8)"
 	::= { strModEntry 3 }
 
 strModMajor OBJECT-TYPE
 	SYNTAX		Unsigned32 (0..16383)
-	MAX-ACCESS	read-only
+	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Indicates the major device number of a STREAMS driver or 
-		 zero (0) for a STREAMS module."
-	REFERENCE	"scls(8)"
+		"Indicates the major device number of a STREAMS driver 
+		 or zero (0) for a STREAMS module.  Once this object is 
+		 created in an entry, it becomes read-only until it is 
+		 destroyed."
+	REFERENCE
+		"scls(8)"
 	::= { strModEntry 4 }
+
+strModRowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations, using 
+		 the RowStatus textual convention of the SNMPv2-TC 
+		 module, may create and destroy conceptual rows in this 
+		 table.
+
+		 Attempting to create a conceptual row from a management 
+		 station results in an attempt to load the corresponding 
+		 module identifier, or assigned name, or assigned major 
+		 device number (when assigned as a driver).  If all of 
+		 these fail, the row will not be created and an error is 
+		 returned.
+		 
+		 Attempting to destroy a conceptual row from a 
+		 management station results in an attempt to unload the 
+		 corresponding STREAMS driver or module.  If the 
+		 unloading of the module fails for any reason, the row 
+		 will not be destroyed and an error is returned."
+	REFERENCE
+		"scls(8), modprobe(8), insmod(8), rmmod(8)"
+	::= { strModEntry 5 }
 
 -- ====================================================================
 
@@ -236,9 +391,10 @@ strModInfoTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides a table of STREAMS module information.  This 
-		 is information contained in the module_info structure 
-		 associated with the STREAMS module or driver."
+		"Provides a side-table of STREAMS module information for 
+		 the strModTable.  This is information contained in one  
+		 or more module_info(9) structures associated with a 
+		 single STREAMS module or driver."
 	REFERENCE
 		"module_info(9)"
 	::= { strModInfo 1 }
@@ -262,16 +418,31 @@ strModInfoEntry OBJECT-TYPE
 		 have at least one and at most four entries in this 
 		 table.
 
-		 Changing values in an entry will only affect newly 
-		 opened instances of the STREAMS module for the queues 
-		 indicated in the strModInfoQueues column.  These values 
-		 are only the default values for the Stream in effect at 
-		 open.  No existing Streams will be affected by changing 
-		 values.  Values perist across an agent reboot but not 
-		 across a STREAMS module reload.  After a STREAMS module 
-		 reload (which occurs on system reboot) the values will 
-		 revert back to the values compiled-in for the STREAMS 
-		 module."
+		 ENTRY LIFECYCLE: Rows cannot be explicitly created nor 
+		 destroyed by management stations: configuration is 
+		 statically determined by the STREAMS driver or module 
+		 at the time that the driver of module is registered.  
+		 If the STREAMS subsystem has the ability to dynamiclly 
+		 load STREAMS drivers or module, rows are created by 
+		 internal system operations whenever a STREAMS driver or 
+		 module registers with the STREAMS subsystem.  If the 
+		 STREAMS subsystem has the ability to dynamically unload 
+		 STREAMS driver or modules, rows are destroyed by 
+		 internal system operations whenever a STREAMS driver or 
+		 module deregisters from the STREAMS subsystem.
+
+		 EFFECT OF CHANGING VALUES: Changing values in an entry 
+		 will only affect newly opened instances of the STREAMS 
+		 module for the queues indicated in the strModInfoQueues 
+		 column.  These values are only the default values for 
+		 the Stream in effect at open.  No existing Streams will 
+		 be affected by changing values.
+		 
+		 VALUE PERSISTENCE: Values perist across an agent reboot 
+		 but not across a STREAMS module reload.  After a 
+		 STREAMS module reload (which occurs on system reboot) 
+		 the values will revert back to the values compiled-in 
+		 for the STREAMS module."
 	INDEX	{
 			strModIdnum,	-- shared index
 			strModInfoIndex
@@ -301,10 +472,12 @@ strModInfoIndex OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provide an index for the STREAMS information entry.  
+		"Provides an index for the STREAMS information entry.  
 		 STREAMS module and non-multiplexing driver can have one 
 		 or two entries.  STREAMS multiplexing drivers can have 
-		 one to four entries."
+		 one to four entries.  The ordinal value of this index 
+		 is unimportant and the indices are simply number from 1 
+		 to a maximum of 4."
 	::= { strModInfoEntry 1 }
 
 strModInfoQueues OBJECT-TYPE
@@ -313,10 +486,15 @@ strModInfoQueues OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 		"Identifies to which queues in the module the STREAMS 
-		 information applies."
-	REFERENCE	"scls(8), sc(4), module_info(9)"
+		 information applies.  module_info(9) structures can be 
+		 referenced by more than one qinit(9) structure, where 
+		 the qinit(9) structure belongs to one of: the upper 
+		 read queue, rd(0), the upper write queue, wr(1), the 
+		 lower multiplex read queue, muxrq(2), or the lower 
+		 multiplex write queue, muxwq(3)."
+	REFERENCE
+		"scls(8), sc(4), module_info(9)"
 	::= { strModInfoEntry 2 }
-
 
 strModInfoMinpsz OBJECT-TYPE
 	SYNTAX		INTEGER
@@ -325,8 +503,11 @@ strModInfoMinpsz OBJECT-TYPE
 	DESCRIPTION
 		"Specifies the minimum packet size associated with the 
 		 driver or module for the queues indicated in the 
-		 strModInfoQueues column."
-	REFERENCE	"scls(8), sc(4), module_info(9)"
+		 strModInfoQueues column.  This column has the same 
+		 value as the mi_minpsz field of the corresponding 
+		 module_info(9) structure."
+	REFERENCE
+		"scls(8), sc(4), module_info(9)"
 	::= { strModInfoEntry 3 }
 
 strModInfoMaxpsz OBJECT-TYPE
@@ -336,8 +517,11 @@ strModInfoMaxpsz OBJECT-TYPE
 	DESCRIPTION
 		"Specifies the maximum packet size associated with the 
 		 driver or module for the queues indicated in the 
-		 strModInfoQueues column."
-	REFERENCE	"scls(8), sc(4), module_info(9)"
+		 strModInfoQueues column.  This column has the same 
+		 value as the mi_maxpsz field of the corresponding 
+		 module_info(9) structure."
+	REFERENCE
+		"scls(8), sc(4), module_info(9)"
 	::= { strModInfoEntry 4 }
 
 strModInfoHiwat OBJECT-TYPE
@@ -347,8 +531,11 @@ strModInfoHiwat OBJECT-TYPE
 	DESCRIPTION
 		"Specifies the high water mark associated with the 
 		 driver or module for the queues indicated in the 
-		 strModInfoQueues column."
-	REFERENCE	"scls(8), sc(4), module_info(9)"
+		 strModInfoQueues column.  This column has the same 
+		 value as the mi_hiwat field of the corresponding 
+		 module_info(9) structure."
+	REFERENCE
+		"scls(8), sc(4), module_info(9)"
 	::= { strModInfoEntry 5 }
 
 strModInfoLowat OBJECT-TYPE
@@ -356,10 +543,13 @@ strModInfoLowat OBJECT-TYPE
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION
-		"Specifies the low water mark associated with the 
-		 driver or module for the queues indicated in the 
-		 strModInfoQueues column."
-	REFERENCE	"scls(8), sc(4), module_info(9)"
+		"Specifies the low water mark associated with the driver 
+		 or module for the queues indicated in the 
+		 strModInfoQueues column.  This column has the same 
+		 value as the mi_lowat field of the corresponding 
+		 module_info(9) structure."
+	REFERENCE
+		"scls(8), sc(4), module_info(9)"
 	::= { strModInfoEntry 6 }
 
 strModInfoTraceLevel OBJECT-TYPE
@@ -369,8 +559,10 @@ strModInfoTraceLevel OBJECT-TYPE
 	DESCRIPTION
 		"Specifies the trace level associated with the driver or 
 		 module for the queues indicated in the strModInfoQueues 
-		 column."
-	REFERENCE	"scls(8), sc(4), module_info(9)"
+		 column.  This column does not correspond to a field in  
+		 the module_info(9) structure."
+	REFERENCE
+		"scls(8), sc(4), module_info(9)"
 	::= { strModInfoEntry 7 }
 
 -- ====================================================================
@@ -380,7 +572,12 @@ strModStatTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides a table of STREAMS module statistics."
+		"Provides a side-table of STREAMS module statistics for 
+		 the strModTable.  This is statistics contained in on or 
+		 more module_stat(9) structures associated with a single 
+		 STREAMS module or driver."
+	REFERENCE
+		"module_stat(9)"
 	::= { strModStat 1 }
 
 strModStatEntry OBJECT-TYPE
@@ -395,9 +592,31 @@ strModStatEntry OBJECT-TYPE
 		 there are no statistics groups, no entry exists in 
 		 this table for the module name.  When one to four, one 
 		 to four entries exist in this table.
-		 
-		 Counters in this table are only reset during system 
-		 reinialiation or STREAMS subsystem reinitialization."
+
+		 Not all STREAMS drivers and modules will have an entry 
+		 in this table.  Modules and non-multiplexing drivers 
+		 can have zero, one or two entries, multiplexing drivers 
+		 can have zero through four entries.
+
+		 ENTRY LIFECYCLE: Rows cannot be explicitly create or 
+		 destroyed by management stations: configuration is 
+		 statically deteremined by the STREAMS driver or module 
+		 at the time that the driver of module is registered.  
+		 If the STREAMS subsystem has the ability to dynamically 
+		 load STREAMS drivers or modules, rows are created 
+		 by internal system operations whenever a STREAMS driver  
+		 or module regisers with the STREAMS subsystem.  If the 
+		 STREAMS subsystem has the ability to dynamically unload 
+		 STREAMS driver modules, rows are destroyed by internal 
+		 system operations whenever a STREAMS driver of module 
+		 deregisters from the STREAMS sybsystem.
+
+		 EFFECT OF CHANGING VALUES:  All values in this entry 
+		 are read-only.  Counters in this table are only reset 
+		 during system reinialiation or STREAMS subsystem 
+		 reinitialization.  The scalar strDiscontinuityTime is 
+		 used to determine when the last discontinuity in 
+		 counter values occured."
 	INDEX	{
 			strModIdnum,	-- shared index
 			strModStatIndex
@@ -446,7 +665,8 @@ strModStatQueues OBJECT-TYPE
 	DESCRIPTION
 		"Identifies to which queues in the module the STREAMS 
 		 statistics applies."
-	REFERENCE	"scls(8), sc(4), module_stat(9)"
+	REFERENCE
+		"scls(8), sc(4), module_stat(9)"
 	::= { strModStatEntry 2 }
 
 strModStatPCnt OBJECT-TYPE
@@ -585,7 +805,8 @@ strApshTable OBJECT-TYPE
 		 table provides the STREAMS modules which are configured 
 		 by the system to be autopushed on top of driver minor 
 		 devices."
-	REFERENCE	"autopush(8)"
+	REFERENCE
+		"autopush(8)"
 	::= { strApsh 1 }
 
 strApshEntry OBJECT-TYPE
@@ -600,7 +821,8 @@ strApshEntry OBJECT-TYPE
 			strApshName,
 			strApshMinor
 		}
-	REFERENCE	"autopush(8)"
+	REFERENCE
+		"autopush(8)"
 	::= { strApshTable 1 }
 
 StrApshEntry ::=
@@ -615,7 +837,7 @@ StrApshEntry ::=
 			Unsigned32,
 		strApshModules
 			StreamsModuleList,
-		strApshStatus
+		strApshRowStatus
 			RowStatus
 	}
 
@@ -625,7 +847,8 @@ strApshName OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 		"Provides the driver name."
-	REFERENCE	"autopush(8)"
+	REFERENCE
+		"autopush(8)"
 	::= { strApshEntry 1 }
 
 strApshMajor OBJECT-TYPE
@@ -635,7 +858,8 @@ strApshMajor OBJECT-TYPE
 	DESCRIPTION
 		"Provides the primary majro device number associated 
 		 with the driver."
-	REFERENCE	"autopush(8)"
+	REFERENCE
+		"autopush(8)"
 	::= { strApshEntry 2 }
 
 strApshMinor OBJECT-TYPE
@@ -648,7 +872,8 @@ strApshMinor OBJECT-TYPE
 		 specification applies.  When specified as 'FFFFFFFF'X, 
 		 the specification applies to all minor device numbers 
 		 for this driver and LastMinor is ignored."
-	REFERENCE	"autopush(8)"
+	REFERENCE
+		"autopush(8)"
 	::= { strApshEntry 3 }
 
 strApshLastMinor OBJECT-TYPE
@@ -661,7 +886,8 @@ strApshLastMinor OBJECT-TYPE
 		 'FFFFFFFF'X.  The agent must ensure that the range 
 		 specified by this number does not overlap with other 
 		 ranges specified in this autopush specification entry."
-	REFERENCE	"autopush(8)"
+	REFERENCE
+		"autopush(8)"
 	::= { strApshEntry 4 }
 
 strApshModules OBJECT-TYPE
@@ -674,18 +900,20 @@ strApshModules OBJECT-TYPE
 		 space-separated list of Streams module names.  When 
 		 this entry is created, it is persistent accross agent 
 		 reboots, and might first be verified by the agent."
-	REFERENCE	"autopush(8)"
+	REFERENCE
+		"autopush(8)"
 	::= { strApshEntry 5 }
 
 
-strApshStatus OBJECT-TYPE
+strApshRowStatus OBJECT-TYPE
 	SYNTAX		RowStatus
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
 		"Provides management stations with the ability to add 
 		 rows to, or delete rows from, the STREAMS autopush table."
-	REFERENCE	"autopush(8)"
+	REFERENCE
+		"autopush(8)"
 	::= { strApshEntry 6 }
 
 
@@ -813,6 +1041,7 @@ strStatsHighWaterMark OBJECT-TYPE
 
 strCltime OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"seconds"
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION
@@ -829,7 +1058,7 @@ strCltime OBJECT-TYPE
 		 control sys.streams.cltime."
 	REFERENCE
 		"sys.streams.cltime."
-	DEFVAL		{ 1500 }
+	DEFVAL		{ 1500 } -- 1500 centiseconds, 15.00 seconds
 	::= { strTunables 1 }
 
 strMaxApush OBJECT-TYPE
@@ -1162,6 +1391,7 @@ strRtime OBJECT-TYPE
 		 the system control sys.streams.rtime."
 	REFERENCE
 		"sys.streams.rtime"
+	DEFVAL		{ 1 } -- 1 centisecond, 10 milliseconds
 	::= { strTunables 16 }
 
 strStrhold OBJECT-TYPE
@@ -1280,6 +1510,7 @@ strMedthresh OBJECT-TYPE
 
 strIoctime OBJECT-TYPE
 	SYNTAX		TimeInterval
+	UNITS		"seconds"
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION
@@ -1295,7 +1526,7 @@ strIoctime OBJECT-TYPE
 		 coresponds to the system control sys.streams.ioctime."
 	REFERENCE
 		"sys.streams.ioctime"
-	DEFVAL		{ 1500 }
+	DEFVAL		{ 1500 } -- 1500 centiseconds, 15.00 seconds
 	::= { strTunables 23 }
 
 -- ====================================================================
@@ -1379,13 +1610,13 @@ strApshTableMandatoryGroup OBJECT-GROUP
 
 strApshTableConditionalGroup OBJECT-GROUP
 	OBJECTS	{
-			strApshStatus
+			strApshRowStatus
 		}
 	STATUS		current
 	DESCRIPTION
 		"A collection of objects necessary for implementing a 
-		 strApshTable that allows management stations to add 
-		 entries."
+		 strApshTable that allows management stations to create  
+		 and destroy entries."
 	::= { strGroups 6 }
 
 strModTableMandatoryGroup OBJECT-GROUP
@@ -1403,6 +1634,17 @@ strModTableMandatoryGroup OBJECT-GROUP
 		 read-only strModTable."
 	::= { strGroups 7 }
 
+strModTableConditionalGroup OBJECT-GROUP
+	OBJECTS {
+			strModRowStatus
+		}
+	STATUS		current
+	DESCRIPTION
+		"A collection of objects necessary for implementing a 
+		 strModTable that allows management stations to create 
+		 and destroy  entries."
+	::= { strGroups 8 }
+
 strModInfoTableMandatoryGroup OBJECT-GROUP
 	OBJECTS {
 			strModInfoTable,
@@ -1419,7 +1661,7 @@ strModInfoTableMandatoryGroup OBJECT-GROUP
 		"A collection of objects necessary for implementing a 
 		 strModInfoTable that provides STREAMS module 
 		 information."
-	::= { strGroups 8 }
+	::= { strGroups 9 }
 
 strModInfoTableConditionalGroup OBJECT-GROUP
 	OBJECTS {
@@ -1430,7 +1672,7 @@ strModInfoTableConditionalGroup OBJECT-GROUP
 		"A collection of objects necessary for implementing an 
 		 enhanced strModInfoTable that provides STREAMS module 
 		 information."
-	::= { strGroups 9 }
+	::= { strGroups 10 }
 
 strModStatTableMandatoryGroup OBJECT-GROUP
 	OBJECTS {
@@ -1449,7 +1691,7 @@ strModStatTableMandatoryGroup OBJECT-GROUP
 		"A collection of objects necessary for implementing a 
 		 strModStatTable that provides STREAMS module 
 		 statistics."
-	::= { strGroups 10 }
+	::= { strGroups 11 }
 
 strModStatTableConditionalGroup OBJECT-GROUP
 	OBJECTS {
@@ -1461,7 +1703,7 @@ strModStatTableConditionalGroup OBJECT-GROUP
 		"A collection of objects necessary for implementing an 
 		 enhanced strModStatTable that provides STREAMS module 
 		 statistics."
-	::= { strGroups 11 }
+	::= { strGroups 12 }
 
 strStatsTableMandatoryGroup OBJECT-GROUP
 	OBJECTS {
@@ -1475,7 +1717,7 @@ strStatsTableMandatoryGroup OBJECT-GROUP
 		"A collection of objects necessary for implementing a 
 		 strStatsTable that provides STREAMS subsystem 
 		 statistics."
-	::= { strGroups 12 }
+	::= { strGroups 13 }
 
 strStatsTableConditionalGroup OBJECT-GROUP
 	OBJECTS {
@@ -1485,14 +1727,17 @@ strStatsTableConditionalGroup OBJECT-GROUP
 	DESCRIPTION
 		"A collection of objects necessary for implementing a 
 		 strStatsTable that includes high water marks."
-	::= { strGroups 13 }
+	::= { strGroups 14 }
 
 -- ====================================================================
 
 strMIBCompliance MODULE-COMPLIANCE
 	STATUS		current
-	DESCRIPTION	""
-	REFERENCE	""
+	DESCRIPTION
+		"Provides the module compliance requirements for the 
+		 STREAMS MIB."
+	REFERENCE
+		""
 	MODULE -- for this information module
 	MANDATORY-GROUPS {
 		strTunablesMandatoryGroup,
@@ -1517,6 +1762,12 @@ strMIBCompliance MODULE-COMPLIANCE
 			 capable of adding entries to an autopush 
 			 specification while the system is running and 
 			 without rebooting."
+	GROUP strModTableConditionalGroup
+		DESCRIPTION
+			"Mandatory when the STREAMS implementation is 
+			 capable of creating or destroying entries in 
+			 the module or driver switch table while the 
+			 system is running and without rebooting."
 	GROUP strModInfoTableConditionalGroup
 		DESCRIPTION
 			"Mandatory if the STREAMS implementation 
@@ -1701,12 +1952,8 @@ strMIBCompliance MODULE-COMPLIANCE
 			 capability to add rows is not provided."
 	::= { strCompliances 1 }
 
-
-
-
 -- ====================================================================
 
 END
 
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
-

@@ -1,0 +1,2522 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 18:56:13 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "ISO10742.gdmo" >--
+--< GDMO.Include "ISO8802-1.gdmo" >--
+--< GDMO.Document "ISO/IEC 8802-2 : 1998"
+--  { iso(1) member-body(2) us(840) ieee802-2(10032) } >--
+--< GDMO.Namespace ieee_802_2 >--
+--< GDMO.Alias "ISO/IEC 8802-2 : 1998" "IEE802-1",
+--  "802-1" >--
+MODULE "ISO/IEC 8802-2 : 1998" { iso(1) member-body(2) us(840) ieee802-2(10032) }
+-- 10.1 LLCStation managed object
+-- This managed object is responsible for processing the events that affect the entire LLC entity. One LLCStation
+-- object shall exist for each MAC service access point present on the local area network. The formal
+-- description is as follows:
+
+lLCStation MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DML":dLSAP;
+	CHARACTERIZED BY
+		lLCStation-P;
+	CONDITIONAL PACKAGES
+		lLCDupAddress-P
+			PRESENT IF
+				Duplicate station address detection is supported,
+		lLCType3-P
+			PRESENT IF
+				Type 3 LLC is supported,
+		lLCBuffer-P
+			PRESENT IF
+				Buffer Management is supported,
+		pDUsDiscarded-P
+			PRESENT IF
+				PDUs Discarded counter is supported,
+		rDE-P
+			PRESENT IF
+				RDE is supported by the Station,
+		type1AcknowledgmentTimerTimeouts-P
+			PRESENT IF
+				PDUs Type 1 Acknowledgment Timer is supported;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) managedObjectclass(3) llcstation(9) };
+-- Name Bindings --
+
+
+lLCStation-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS lLCStation AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "DMI:1992":lLCDLE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		lLCName;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) nameBinding(6) llcstationnb(10) };
+-- Packages --
+
+
+lLCStation-P PACKAGE
+	BEHAVIOUR
+		lLCStation-B BEHAVIOUR
+			DEFINED AS
+				!The lLCStation package contains the definition of all attributes and
+				actions that are common to the LLC station as a whole, regardless of which
+				LLC operations are supported.!;;
+	ATTRIBUTES
+		lLCName GET,
+		maximumLSAPsConfigured GET,
+		numberOfActiveLSAPs GET,
+		supportedServicesTypes GET,
+		status GET;
+	ACTIONS
+		reinitialize-AC;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) llcstationp(33) };
+
+
+lLCDupAddress-P PACKAGE
+	BEHAVIOUR
+		lLCDupAddress-B BEHAVIOUR
+			DEFINED AS
+				!This is a conditional part of the LLCStationComponent object. It
+				exists if the LLC object supports duplicate station address detection
+				(see 6.9.2.1).!;;
+	ATTRIBUTES
+		type1AcknowledgeTimeoutValue GET-REPLACE,
+		type1MaximumRetryCount GET-REPLACE;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) llcdupaddress(2) };
+
+
+lLCType3-P PACKAGE
+	BEHAVIOUR
+		lLCType3-B BEHAVIOUR
+			DEFINED AS
+				!This is a conditional part of the LLCStationComponent Object.
+				It exists if the LLC object supports LLC Type 3 service.!;;
+	ATTRIBUTES
+		maximumPDUN3 GET-REPLACE,
+		maximumRetransmissions4 GET-REPLACE,
+		receiveVariableLifetime GET-REPLACE,
+		transmitVariableLifetime GET-REPLACE,
+		type3AcknowledgeTimeoutValue GET-REPLACE,
+		type3Retransmissions GET;
+	NOTIFICATIONS
+		lLCStationEvent-N;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) llctype3(3) };
+
+
+lLCBuffer-P PACKAGE
+	BEHAVIOUR
+		lLCBuffer-B BEHAVIOUR
+			DEFINED AS
+				!This package provides the total amount of buffer space available for
+				this station, the amount of buffer space in use and the average buffer
+				space in use by this station.!;;
+	ATTRIBUTES
+		avgBufferUseSize GET-REPLACE,
+		bufferProblems GET,
+		bufferSize GET-REPLACE,
+		maxBufferUseSize GET-REPLACE;
+	NOTIFICATIONS
+		lLCStationEvent-N;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) llcbuffer(4) };
+
+
+pDUsDiscarded-P PACKAGE
+	BEHAVIOUR
+		pDUsDiscarded-B BEHAVIOUR
+			DEFINED AS
+				!This package is present if the implementation supports the counting
+				of the number of invalid PDUs discarded also if implementation
+				supports the counting of PDUs discarded due to the specification
+				of an inactive DSAP.!;;
+	ATTRIBUTES
+		inactiveLSAP GET,
+		pDUsDiscarded GET;
+	NOTIFICATIONS
+		lLCStationEvent-N;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) pdusdiscarded(5) };
+
+
+rDE-P PACKAGE
+	BEHAVIOUR
+		rDE-P-B BEHAVIOUR
+			DEFINED AS
+				!If RDE is supported by this station then two attributes will be present
+				at the Station level.!;;
+	ATTRIBUTES
+		sTRIndicator GET-REPLACE,
+		versionNumber GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) rdep(6) };
+
+
+type1AcknowledgmentTimerTimeouts-P PACKAGE
+	BEHAVIOUR
+		bType1AcknowledgmentTimerTimeouts BEHAVIOUR
+			DEFINED AS
+				!This package is present if the implementation supports the
+				Acknowledgment Timer attribute.!;;
+	ATTRIBUTES
+		type1AcknowledgmentTimerTimeouts GET-REPLACE;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type1acknowledgmenttimertimeouts(7) };
+-- Attributes --
+
+
+avgBufferUseSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.AvgBufferUseSize;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		avgBufferUseSize-B BEHAVIOUR
+			DEFINED AS
+				!Specifies the average amount of buffer space (in octets) in
+				use at the same time by LLC for this station!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) avgbufferusesize(0) };
+
+
+bufferProblems ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bufferProblems-B BEHAVIOUR
+			DEFINED AS
+				!This counter provides a count of PDUs discarded due to buffer
+				limitations!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) bufferproblems(1) };
+
+
+bufferSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.BufferSize;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bufferSize-B BEHAVIOUR
+			DEFINED AS
+				!The amount of buffer space (in octets) for use by LLC!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) buffersize(2) };
+
+
+inactiveLSAP ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		inactiveLSAP-B BEHAVIOUR
+			DEFINED AS
+				!This counts the number of PDUs discarded due to the specification of
+				an inactive DSAP!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) inactivelsap(3) };
+
+
+lLCName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.LLCName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		lLCName-B BEHAVIOUR
+			DEFINED AS
+				!This attribute is used to name the instance of the lLCStation
+				managed object.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) llcname(4) };
+
+
+maxBufferUseSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.MaxBufferUseSize;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maxBufferUseSize-B BEHAVIOUR
+			DEFINED AS
+				!Specifies the maximum amount of buffer space (in octets) in use at
+				the same time by LLC!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) maxbufferusesize(5) };
+
+
+maximumLSAPsConfigured ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.MaximumLSAPsConfigured;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maximumLSAPsConfigured-B BEHAVIOUR
+			DEFINED AS
+				!The maximum number of LSAPs that can support at any moment in time.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) maximumlsapsconfigured(6) };
+
+
+maximumPDUN3 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.MaximumPDUN3;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maximumPDUN3-B BEHAVIOUR
+			DEFINED AS
+				!The maximum size of a Type 3 command PDU!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) maximumpdun3(7) };
+
+
+maximumRetransmissions4 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.MaximumRetransmissions4;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maximumRetransmissions4-B BEHAVIOUR
+			DEFINED AS
+				!The number of retransmissions of a Type 3 PDU due to error
+				conditions preventing receipt of an acknowledgment.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) maximumretransmissions4(8) };
+
+
+numberOfActiveLSAPs ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.NumberofActiveLSAPs;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		numberOfActiveLSAPs-B BEHAVIOUR
+			DEFINED AS
+				!The number of active LSAPs that the station currently supports.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) numberofactivelsaps(9) };
+
+
+pDUsDiscarded ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		pDUsDiscarded-B BEHAVIOUR
+			DEFINED AS
+				!Provides a total count of invalid PDUs that are discarded. A Discarded
+				(invalid) PDU shall be defined as one that meets at least one of
+				the following conditions:
+				1) It is identified as such by the PHY or the MAC sublayer.
+				2) It is not an integral number of octets in length.
+				3) It does not contain two properly formatted address fields, one control
+				field, and optionally an information field in their proper order.
+				4) Its length is less than 3 octets (one-octet control field) or 4 octets
+				(two-octet control field).!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) pdusdiscarded(10) };
+
+
+receiveVariableLifetime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.ReceiveVariableLifetime;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		receiveVariableLifetime-B BEHAVIOUR
+			DEFINED AS
+				!The amount of time the Type 3 LLC receive state variables are
+				maintained!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) receivevariablelifetime(12) };
+
+
+status ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Status;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		status-B BEHAVIOUR
+			DEFINED AS
+				!This attribute allows a manager to determine what state (UP, DOWN, etc.)
+				the lLCStation entity is in.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) status(13) };
+
+
+strIndicator ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.STRIndicator;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sTRIndicator-B BEHAVIOUR
+			DEFINED AS
+				!A value that indicates if the spanning tree will be traversed by a NSR
+				or STE routing.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) strindicator(14) };
+
+
+supportedServicesTypes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.SupportedServicesTypes;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		supportedServicesTypes-B BEHAVIOUR
+			DEFINED AS
+				!The type or types of service supported (i.e., Type 1, Type 2, Type 3.)!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) supportedservicestypes(15) };
+
+
+transmitVariableLifetime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.TransmitVariableLifetime;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		transmitVariableLifetime-B BEHAVIOUR
+			DEFINED AS
+				!The amount of time the Type 3 LLC transmit state variables are
+				maintained!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) transmitvariablelifetime(16) };
+
+
+type1AcknowledgeTimeoutValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.AcknowledgeTimeoutValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type1AcknowledgeTimeoutValue-B BEHAVIOUR
+			DEFINED AS
+				!The timeout value of the Ack timer, which is measured in milliseconds
+				(6.9.2.2 and 6.9.2.3).!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type1AcknowledgeTimeoutValue(17) };
+
+
+type1AcknowledgmentTimerTimeouts ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type1AcknowledgmentTimerTimeouts-B BEHAVIOUR
+			DEFINED AS
+				!Specifies the number of times the ACK timer has expired
+				(see 6.9.2.2 and 6.9.2.3).!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type1acknowledgmenttimertimeouts(18) };
+
+
+type1MaximumRetryCount ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.MaximumRetryCount;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type1MaximumRetryCount-B BEHAVIOUR
+			DEFINED AS
+				!The maximum number of retries during duplicate address checking
+				(see 6.9.2.2 and 6.9.2.3).!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type1maximumretrycount(19) };
+
+
+type3AcknowledgeTimeoutValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Type3AcknowledgeTimeoutValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3AcknowledgeTimeoutValue-B BEHAVIOUR
+			DEFINED AS
+				!Specifies the time interval during which the LLC expects to
+				receive a response to an acknowledged connectionless request!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3acknowledgetimeoutvalue(20) };
+
+
+type3Retransmissions ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3Retransmissions-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the number of PDUs which were retransmitted
+				(at least once) by the Type 3 LLC service!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3retransmissions(21) };
+
+
+versionNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.VersionNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		versionNumber-B BEHAVIOUR
+			DEFINED AS
+				!The version of sap RDE protocol implemented at this staion.
+				The value of 1 will be used to represent this current version.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) versionnumber(22) };
+-- Actions --
+
+
+reinitialize-AC ACTION
+	BEHAVIOUR
+		reinitialize-B BEHAVIOUR
+			DEFINED AS
+				!This CONFIRMED action causes the entire LLC sublayer to be reset to its
+				initial configuration!;;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX LLCDefinitions.ReinitializeData;
+	WITH REPLY SYNTAX LLCDefinitions.ReinitializeResponse;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) action(9) reinitialize(0) };
+-- Notifications --
+
+
+lLCStationEvent-N NOTIFICATION
+	BEHAVIOUR
+		lLCStationEvent-B BEHAVIOUR
+			DEFINED AS
+				!This notification will be sent for either pdusdiscarded, buffer problems,
+				or Type 3 Retransmissions!;;
+	WITH INFORMATION SYNTAX LLCDefinitions.LLCStationEvent;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) notification(10) llcstationevent(0) };
+-- 10.2 lLCSAP managed object
+-- This managed object contains attributes associated with an LLC SAP that are independent of any particular
+-- Type of Operation. The formal description is as follows:
+
+
+lLCSAP MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DML":dLSAP;
+	CHARACTERIZED BY
+		lLCSAP-P;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) managedObjectclass(3) llcsap(1) };
+-- Name Bindings --
+
+
+lLCSAP-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS lLCSAP AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "DMI:1992":lLCDLE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		lLCSAPName;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) nameBinding(6) llcsapnb(1) };
+-- Packages --
+
+
+lLCSAP-P PACKAGE
+	BEHAVIOUR
+		lLCSAP-B BEHAVIOUR
+			DEFINED AS
+				!The lLCSAP package contains the definition of all attributes and actions
+				associated with an LLC SAP that are independent of that LLC types of
+				operation are supported.!;;
+	ATTRIBUTES
+		lLCSAPName GET,
+		lLCAddress GET,
+		rDE GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) llcsapp(1) };
+-- Attributes --
+
+
+lLCSAPName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.LLCSAPName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		lLCSAPName-B BEHAVIOUR
+			DEFINED AS
+				!Used to name the instance of the lLCSAP managed object!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) llcsapname(110) };
+
+
+lLCAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.LSAP;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		lLCAddress-B BEHAVIOUR
+			DEFINED AS
+				!The individual LLC address identifying this LSAP!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) llcaddress(111) };
+
+
+rDE ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.RDE;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		rDE-B BEHAVIOUR
+			DEFINED AS
+				!A boolean value that, if set to 1, means that RDE is supported by this
+				SAP.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) rde(11) };
+-- 10.3 LLCConnectionless managed object
+-- This clause contains those attributes, actions, and event notifications associated with an LLC connectionless
+-- environment. The formal description is as follows:
+
+
+lLCConnectionless MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DML":lLCCLPM;
+	CHARACTERIZED BY
+		lLCConnectionless-P;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) managedObjectclass(3) llcconnectionless(2) };
+-- Name Bindings --
+
+
+lLCConnectionless-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS lLCConnectionless AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "DML":lLCCLPM AND SUBCLASSES;
+	WITH ATTRIBUTE
+		lLCClessName;
+	CREATE;
+	DELETE;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) nameBinding(6) llcconnectionlessnb(2) };
+-- Packages --
+
+
+lLCConnectionless-P PACKAGE
+	BEHAVIOUR
+		lLCConnectionless-B BEHAVIOUR
+			DEFINED AS
+				!This managed object is responsible for processing the attributes,
+				actions, and notifications that are associated with the LLC
+				connectionless service.!;;
+	ATTRIBUTES
+		lLCClessName GET,
+		maximumLLCInformationFieldSize GET,
+		tESTReceivedABBResponse GET,
+		tESTReceivedCommand GET,
+		tESTReceivedResponse GET,
+		tESTSentABBResponse GET,
+		tESTSentCommand GET,
+		tESTSentResponse GET,
+		uIReceived GET,
+		uISent GET,
+		xIDReceivedCommand GET,
+		xIDReceivedResponse GET,
+		xIDSentCommand GET,
+		xIDSentResponse GET;
+	ACTIONS
+		tESTSendCommand-AC,
+		xIDSendCommand-AC;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) llcsapcomponent(8) };
+-- Attributes --
+
+
+lLCClessName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.LLCClessName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		lLCClessName-B BEHAVIOUR
+			DEFINED AS
+				!Provides the name of the higher level entity associated with this
+				object class.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) llcclessname(23) };
+
+
+maximumLLCInformationFieldSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.MaximumLLCInformationFieldSize;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maximumLLCInformationFieldSize-B BEHAVIOUR
+			DEFINED AS
+				!The maximum length SDU that the LSAP will accommodate!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) maximumllcinformationfieldsize(24) };
+
+
+tESTReceivedABBResponse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tESTReceivedABBResponse-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of TEST responses received by this LSAP
+				without the LSDU due to limited resources at the remote station.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) testreceivedabbresponse(25) };
+
+
+tESTReceivedCommand ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tESTReceivedCommand-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of TEST commands received from the MAC sublayer by
+				this LSAP. This includes commands received with any group address
+				recognized by this LSAP.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) testreceivedcommand(26) };
+
+
+tESTReceivedResponse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tESTReceivedResponse-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of TEST responses received from the MAC sublayer by
+				this LSAP.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) testreceivedresponse(27) };
+
+
+tESTSentABBResponse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tESTSentABBResponse-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of TEST responses that were delivered to the
+				MAC without the LSDU data due to limited resources.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) testsentabbresponse(28) };
+
+
+tESTSentCommand ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tESTSentCommand-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of TEST commands sent to the MAC sublayer by this
+				LSAP.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) testsentcommand(29) };
+
+
+tESTSentResponse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		tESTSentResponse-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of TEST responses sent to the MAC sublayer by
+				this LSAP.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) testsentresponse(30) };
+
+
+uIReceived ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		uIReceived-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of user data PDUs that were received by the LSAP from
+				the MAC sublayer and passed to the user layer. This includes commands
+				received with group addresses of which this LSAP is a member.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) uireceived(31) };
+
+
+uISent ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		uISent-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of user data PDUs that were accepted by the LSAP from
+				the user layer and delivered to the MAC sublayer.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) uisent(32) };
+
+
+xIDReceivedCommand ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		xIDReceivedCommand-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of XID commands received from the MAC sublayer by this
+				LSAP. This includes commands received with any group address recognized
+				by this LSAP.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) xidreceivedcommand(33) };
+
+
+xIDReceivedResponse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		xIDReceivedResponse-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of XID responses received from the MAC sublayer by this
+				LSAP.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) xidreceivedresponse(34) };
+
+
+xIDSentCommand ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		xIDSentCommand-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of XID commands sent to the MAC sublayer by
+				this LSAP.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) xidsentcommand(35) };
+
+
+xIDSentResponse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		xIDSentResponse-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of XID responses sent to the MAC sublayer by this
+				LSAP.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) xidsentresponse(36) };
+-- Actions --
+
+
+tESTSendCommand-AC ACTION
+	BEHAVIOUR
+		tESTSendCommand-AC-B BEHAVIOUR
+			DEFINED AS
+				!This action causes the LLCSAP Component to send a TEST command PDU to a
+				specified remote LSAP!;;
+	WITH INFORMATION SYNTAX LLCSAP.TESTSendCommand;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) action(9) testsendcommand(2) };
+
+
+xIDSendCommand-AC ACTION
+	BEHAVIOUR
+		xIDSendCommand-AC-B BEHAVIOUR
+			DEFINED AS
+				!Causes the LLCSAP component to send an XID command PDU to a specified
+				remote LSAP. The information in the XID PDU (supported LLC types and send
+				window size value) is determined by the current configuration of the LSAP
+				and LSAP pair!;;
+	WITH INFORMATION SYNTAX LLCDefinitions.XIDSendCommand;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) action(9) xidsendcommand(3) };
+-- 10.4 LLCConnection2 managed object
+-- This clause contains those attributes, actions, and event notifications associated with an LLC Type 2 (connection)
+-- environment. This managed object is responsible for processing the events that affect the current
+-- data link connection during its lifetime (i.e., timeframe of link established until link disconnect). One LLC
+-- Connection managed object shall exist for each data link (LLC Type 2) connection supported in the LLC
+-- entity. The formal description is:
+
+
+lLCConnection2 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DML":lLCCOPM;
+	CHARACTERIZED BY
+		lLCConnection2-P;
+	CONDITIONAL PACKAGES
+		connectionBusy-P
+			PRESENT IF
+				the local and remote busy counters are used with LLC Type 2,
+		connectionReset-P
+			PRESENT IF
+				!the local, remote and provider initiated reset counters are
+				used with LLC Type 2!,
+		connectionRoute-P
+			PRESENT IF
+				route known to the LSAP pair object,
+		type2FlowControl-P
+			PRESENT IF
+				flow control is used with LLC Type 2,
+		type2I-P
+			PRESENT IF
+				the sent and receive I counters are used with LLC Type 2,
+		type2Iack-P
+			PRESENT IF
+				the sent and received acknowledgment counters are used with
+				LLC Type 2,
+		type2FRMR-P
+			PRESENT IF
+				the sent and receive FRMR counters are used with LLC Type 2,
+		type2RR-P
+			PRESENT IF
+				the sent and receive RR counters are used with LLC Type 2,
+		type2RNR-P
+			PRESENT IF
+				the sent and receive RNR counters are used with LLC Type 2,
+		type2REJ-P
+			PRESENT IF
+				the sent and receive REJ counters are used with LLC Type 2,
+		type2SABME-P
+			PRESENT IF
+				the sent and receive SABME counters are used with LLC Type 2,
+		type2UA-P
+			PRESENT IF
+				the sent and receive UA counters are used with LLC Type 2,
+		type2DISC-P
+			PRESENT IF
+				the sent and receive DISC counters are used with LLC Type 2,
+		type2DM-P
+			PRESENT IF
+				the sent and receive DM counters are used with LLC Type 2,
+		type2PDUs-P
+			PRESENT IF
+				using PDUs event notifications with LLC Type 2,
+		type2OptTolIPDUs-P
+			PRESENT IF
+				Optional Toleration of Duplicate I PDUs is implemented in
+				LLC Type 2,
+		type2Violation-P
+			PRESENT IF
+				counting violations with LLC Type 2;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) managedObjectclass(3) llcconnection2(3) };
+-- Name Bindings --
+
+
+lLCConnection2-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS lLCConnection2 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "DML":lLCCOPM AND SUBCLASSES;
+	WITH ATTRIBUTE
+		lLCConnection2Name;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) nameBinding(6) llcconnection2nb(3) };
+-- Packages --
+
+
+lLCConnection2-P PACKAGE
+	BEHAVIOUR
+		lLCConnection2-B BEHAVIOUR
+			DEFINED AS
+				!The LLC Connection object is responsible for processing the attributes,
+				actions and notifications that affect a specific data link connection
+				(for LLC Type 2 connections).
+				One data connection shall exist for each data link connection supported.!;;
+	ATTRIBUTES
+		lLCConnection2Name GET,
+		maximumRetransmissions GET-REPLACE,
+		receiveWindowSize GET-REPLACE,
+		sendWindowSize GET-REPLACE,
+		type2AcknowledgeTimeoutValue GET-REPLACE,
+		type2BusyStateTimeoutValue GET-REPLACE,
+		type2PBitTimeoutValue GET-REPLACE,
+		type2RejectTimeoutValue GET-REPLACE;
+	ACTIONS
+		correlatorExchange-AC;
+	NOTIFICATIONS
+		communicationAlarm-N,
+		lLCConnection2Event-N;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) llcconnection2p(9) };
+
+
+connectionBusy-P PACKAGE
+	BEHAVIOUR
+		connectionBusy-B BEHAVIOUR
+			DEFINED AS
+				!Contains attributes that count instances of local or remote
+				busy conditions!;;
+	ATTRIBUTES
+		localBusy GET,
+		remoteBusy GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) connectionbusy(34) };
+
+
+connectionReset-P PACKAGE
+	BEHAVIOUR
+		connectionReset-B BEHAVIOUR
+			DEFINED AS
+				!Contains attributes that count instances of particular types of reset!;;
+	ATTRIBUTES
+		remoteReset GET,
+		localReset GET,
+		providerReset GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) connectionReset(35) };
+
+
+connectionRoute-P PACKAGE
+	BEHAVIOUR
+		connectionRoute-B BEHAVIOUR
+			DEFINED AS
+				!This is a conditional part of the LLC Connection Object. It is present
+				if source routing is used and the connection is cognizant of its route.
+				This conditional package contains one attribute, the source route that the
+				LSAP Pair uses to communicate. Source Routing is described in ISO/IEC
+				10038 : 1993!;;
+	ATTRIBUTES
+		route GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) connectionroute(10) };
+
+
+type2DISC-P PACKAGE
+	BEHAVIOUR
+		type2DISC-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of DISC PDUs either delivered or received from the
+				MAC.!;;
+	ATTRIBUTES
+		type2ReceivedDISC GET,
+		type2SentDISC GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2disc(11) };
+
+
+type2DM-P PACKAGE
+	BEHAVIOUR
+		type2DM-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of DM PDUs either delivered or received from
+				the MAC.!;;
+	ATTRIBUTES
+		type2ReceivedDM GET,
+		type2SentDM GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2dm(12) };
+
+
+type2FlowControl-P PACKAGE
+	BEHAVIOUR
+		type2FlowControl-B BEHAVIOUR
+			DEFINED AS
+				!This conditional package contains two attributes that are used to provide
+				flow control.!;;
+	ATTRIBUTES
+		kStep GET-REPLACE,
+		maxSendWindowSize GET-REPLACE;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2flowcontrol(13) };
+
+
+type2FRMR-P PACKAGE
+	BEHAVIOUR
+		type2FRMR-P-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of FRMR PDUs delivered to the MAC and a
+				count of FRMR PDUs received from the MAC and not discarded.!;;
+	ATTRIBUTES
+		type2ReceivedFRMR GET,
+		type2SentFRMR GET;
+	NOTIFICATIONS
+		lLCConnection2Event-N;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2frmr(14) };
+
+
+type2I-P PACKAGE
+	BEHAVIOUR
+		type2I-B BEHAVIOUR
+			DEFINED AS
+				!This conditional package counts the number of I PDUs received
+				and sent (see 7.5.1, 7.5.6, 7.5.8, 7.5.9, and 7.8.4).!;;
+	ATTRIBUTES
+		type2ReceivedIGET,
+		type2SentIGET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2i(15) };
+
+
+type2Iack-P PACKAGE
+	BEHAVIOUR
+		type2Iack-B BEHAVIOUR
+			DEFINED AS
+				!Contains attributes that count acknowledgments sent and received!;;
+	ATTRIBUTES
+		sentAcks GET,
+		receivedAcks GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2iack(36) };
+
+
+type2OptTolIPDUs-P PACKAGE
+	BEHAVIOUR
+		type2OptTolIPDUs-B BEHAVIOUR
+			DEFINED AS
+				!This optional package contains two attributes: a Boolean to indicate
+				support for the Optional Toleration of Duplicate I PDUs function and
+				an event counter to count the number of Duplicate I PDUs received.!;;
+	ATTRIBUTES
+		optionalTolerationIPDUsGET,
+		duplicateIPDUsReceivedGET;
+	NOTIFICATIONS
+		lLCConnection2Event-N;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2OptTolIPDUs(37) };
+
+
+type2PDUs-P PACKAGE
+	BEHAVIOUR
+		type2PDUs-B BEHAVIOUR
+			DEFINED AS
+				!This conditional package contains attributes that count a number of
+				different types of discarded PDUs.!;;
+	ATTRIBUTES
+		pDUsDiscarded1 GET,
+		pDUsDiscarded2 GET,
+		pDURetransmissions GET;
+	NOTIFICATIONS
+		lLCConnection2Event-N;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2pdus(16) };
+
+
+type2REJ-P PACKAGE
+	BEHAVIOUR
+		type2REJ-B BEHAVIOUR
+			DEFINED AS
+				!This conditional package contains two attributes to count sent and
+				received REJ PDUs (see Clause 7.5.9).!;;
+	ATTRIBUTES
+		type2ReceivedREJ GET,
+		type2SentREJ GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2rej(17) };
+
+
+type2RNR-P PACKAGE
+	BEHAVIOUR
+		type2RNR-B BEHAVIOUR
+			DEFINED AS
+				!This conditional package contains attributes that specify the
+				count of RNR PDUs either delivered or received from the MAC.!;;
+	ATTRIBUTES
+		type2ReceivedRNR GET,
+		type2SentRNR GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2rnr(18) };
+
+
+type2RR-P PACKAGE
+	BEHAVIOUR
+		type2RR-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of RR PDUs either delivered or received from the MAC.!;;
+	ATTRIBUTES
+		type2ReceivedRR GET,
+		type2SentRR GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2rr(19) };
+
+
+type2SABME-P PACKAGE
+	BEHAVIOUR
+		type2SABME-B BEHAVIOUR
+			DEFINED AS
+				!This conditional package contains attributes that specify the
+				count of SABME PDUs either delivered or received.!;;
+	ATTRIBUTES
+		type2ReceivedSABME GET,
+		type2SentSABME GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2sabme(20) };
+
+
+type2UA-P PACKAGE
+	BEHAVIOUR
+		type2UA-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of UA PDUs either delivered or received from the MAC.!;;
+	ATTRIBUTES
+		type2ReceivedUA GET,
+		type2SentUA GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2ua(21) };
+
+
+type2Violation-P PACKAGE
+	BEHAVIOUR
+		type2Violation-P-B BEHAVIOUR
+			DEFINED AS
+				!This conditional package provides an attribute and notification for
+				type 2 violations.!;;
+	ATTRIBUTES
+		type2Violation GET;
+	NOTIFICATIONS
+		lLCConnection2Event-N;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type2violation(22) };
+-- Attributes --
+
+
+dupIPDUsReceived ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Definitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dupIPDUsReceived-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the number of duplicate I PDUs received for this
+				connection.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) dupIPDUsReceived(120) };
+
+
+kStep ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.KStep;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		kStep-B BEHAVIOUR
+			DEFINED AS
+				!The value of the flow control parameter!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) kstep(38) };
+
+
+lLCConnection2Name ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.LLCConnectionName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		lLCConnection2Name-B BEHAVIOUR
+			DEFINED AS
+				!The localLSAP and remoteLSAPId and the local and remote MACAddress!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) llcconnectionname2(37) };
+
+
+localBusy ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		localBusy-B BEHAVIOUR
+			DEFINED AS
+				!Counts occurrences of entry into the busy condition!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) localBusy(112) };
+
+
+localReset ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		localReset-B BEHAVIOUR
+			DEFINED AS
+				!Counts instances of user request for reset while in a connected state!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) localReset(113) };
+
+
+maximumRetransmissions ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.MaximumRetransmissions;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maximumRetransmissions-B BEHAVIOUR
+			DEFINED AS
+				!The number of times that the LLC Type 2 should attempt to realize a
+				successful PDU transfer!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) maximumretransmissions(39) };
+
+
+maxSendWindowSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.MaxSendWindowSize;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maxSendWindowSize-B BEHAVIOUR
+			DEFINED AS
+				!The maximum size of the send window!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) maxSendWindowSize(40) };
+
+
+optionalTolerationIPDUs ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Definitions.OptTolIPDU;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		optionalTolerationIPDUs-B BEHAVIOUR
+			DEFINED AS
+				!Indicates if the Toleration of Duplicate I PDUs is on or off.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) optionalTolerationIPDUs(119) };
+
+
+pDUsDiscarded1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		pDUsDiscarded1-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of PDUs discarded due to insufficient resources for
+				this connection.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) pdusdiscarded1(41) };
+
+
+pDUsDiscarded2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		pDUsDiscarded2-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of I PDUs discarded due to unexpected or invalid sequence
+				number for this connection.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) pdusdiscarded2(42) };
+
+
+pDURetransmissions ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		pDURetransmissions-B BEHAVIOUR
+			DEFINED AS
+				! Specifies a count of the number of times the Type 2 LLC service
+				retransmitted PDUs for this connection.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) pduretransmissions(43) };
+
+
+providerReset ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		providerReset-B BEHAVIOUR
+			DEFINED AS
+				! Counts instances of provider-initiated reset due to FRMR PDU sent, FRMR
+				received, or retry exhaustion!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) providerReset(114) };
+
+
+receivedAcks ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		receivedAcks-B BEHAVIOUR
+			DEFINED AS
+				! Counts I PDUs acknowledged by connection partner!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) receivedacks(115) };
+
+
+receiveWindowSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.ReceiveWindowSize;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		receiveWindowSize-B BEHAVIOUR
+			DEFINED AS
+				!The value of the receive window!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) receivewindowsize(44) };
+
+
+remoteBusy ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		remoteBusy-B BEHAVIOUR
+			DEFINED AS
+				! Counts RNR PDUs received when the remote busy condition is not
+				already set!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) remoteBusy(116) };
+
+
+remoteReset ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		remoteReset-B BEHAVIOUR
+			DEFINED AS
+				!Counts instances of partner-initiated reset (SABME PDU received in a
+				connected state)!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) remoteReset(117) };
+
+
+route ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Route;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		route-B BEHAVIOUR
+			DEFINED AS
+				!This is a conditional part of the LSAP Pair Object. It is present if
+				source routing is used and the LSAP Pair is cognizant of its route. This
+				attribute is used by the LSAP Pair to communicate. Source Routing is described
+				in ISO/IEC 10038 : 1993!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) route(45) };
+
+
+sendWindowSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.SendWindowSize;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sendWindowSize-B BEHAVIOUR
+			DEFINED AS
+				!The value of the send window!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) sendwindowsize(46) };
+
+
+sentAcks ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sentAcks-B BEHAVIOUR
+			DEFINED AS
+				!Counts acknowledgments sent for received I PDUs!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) sentAcks(118) };
+
+
+type2AcknowledgeTimeoutValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.AcknowledgeTimeoutValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2AcknowledgeTimeoutValue-B BEHAVIOUR
+			DEFINED AS
+				!This attribute defines the time interval during which the LLC shall expect
+				to receive an acknowledgment to one or more outstanding I PDUs or an
+				expected response PDU to a sent unnumbered command PDU. This value is measured
+				in milliseconds (see 7.4.1, 7.4.3, 7.4.5, 7.5, 7.5.5, 7.5.9, 7.6,
+				7.8.1.1, 7.9.2, 7.9.2.2, and 7.9.2.3).!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2acknowledgetimeoutvalue(47) };
+
+
+type2BusyStateTimeoutValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.BusyStateTimeoutValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2BusyStateTimeoutValue-B BEHAVIOUR
+			DEFINED AS
+				!This attribute defines the time interval during which the LLC shall wait
+				for an indication of the clearance of a busy condition at the other LLC.
+				This time value is measured in milliseconds (see 7.5.7, 7.5.9, 7.8.1.4,
+				7.9.2, 7.9.2.2, and 7.9.2.3).!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2busystatetimeoutvalue(48) };
+
+
+type2PBitTimeoutValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.PBitTimeoutValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2PBitTimeoutValue-B BEHAVIOUR
+			DEFINED AS
+				!The P-bit timer defines the time interval during which the LLC shall expect
+				to receive a PDU with the F bit set to "1" in response to a sent Type
+				2 command with the P bit set to "1". This value is measured in seconds
+				(see 7.5.9, 7.8.1.2, 7.9.2, 7.9.2.2, and 7.9.2.3).!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2pbittimeoutvalue(49) };
+
+
+type2ReceivedDISC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2ReceivedDISC-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of DISC PDUs received from the MAC and not
+				discarded.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2receiveddisc(50) };
+
+
+type2ReceivedDM ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2ReceivedDM-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of DM PDUs received from the MAC and not
+				discarded.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2receiveddm(51) };
+
+
+type2ReceivedFRMR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2ReceivedFRMR-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of FRMR PDUs received from the MAC and not
+				discarded.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2receivedfrmr(52) };
+
+
+type2ReceivedI ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2ReceivedI-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of I PDUs received from the MAC and passed to the LLC
+				user.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2receivedI(53) };
+
+
+type2ReceivedREJ ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2ReceivedREJ-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of REJ PDUs received from the MAC and not discarded.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2receivedrej(54) };
+
+
+type2ReceivedRNR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2ReceivedRNR-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of RNR PDUs received from the MAC and not discarded.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2receivedrnr(55) };
+
+
+type2ReceivedRR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2ReceivedRR-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of RR PDUs received from the MAC and not discarded.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2receivedrr(56) };
+
+
+type2ReceivedSABME ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2ReceivedSABME-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of SABME PDUs received from the MAC and not
+				discarded.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2receivedsabme(57) };
+
+
+type2ReceivedUA ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2ReceivedUA-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of UA PDUs received from the MAC and not discarded.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2receivedua(58) };
+
+
+type2RejectTimeoutValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.RejectTimeoutValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2RejectTimeoutValue-B BEHAVIOUR
+			DEFINED AS
+				!The Reject timer defines the time interval during which the LLC shall
+				expect to receive a reply to a sent REJ PDU. This value is measured in
+				milliseconds (see 7.5.4, 7.8.1.3, 7.9.2, 7.9.2.2, and 7.9.2.3).!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2rejecttimeoutvalue(59) };
+
+
+type2SentDISC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2SentDISC-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of DISC PDUs delivered to the MAC.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2sentdisc(60) };
+
+
+type2SentDM ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2SentDM-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of DM PDUs delivered to the MAC.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2sentdm(61) };
+
+
+type2SentFRMR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2SentFRMR-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of FRMR PDUs delivered to the MAC.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2sentfrmr(62) };
+
+
+type2SentI ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2SentI-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of I PDUs delivered to the MAC!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2sentI(63) };
+
+
+type2SentREJ ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2SentREJ-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of REJ PDUs delivered to the MAC.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2sentrej(64) };
+
+
+type2SentRNR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2SentRNR-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of RNR PDUs delivered to the MAC.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2sentrnr(65) };
+
+
+type2SentRR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2SentRR-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of RR PDUs delivered to the MAC.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2sentrr(66) };
+
+
+type2SentSABME ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2SentSABME-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of SABME PDUs delivered to the MAC.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2sentsabme(67) };
+
+
+type2SentUA ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2SentUA-B BEHAVIOUR
+			DEFINED AS
+				!Specifies a count of UA PDUs delivered to the MAC.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2sentua(68) };
+
+
+type2Violation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type2Violation-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the number of protocol violations detected by this
+				connection. Protocol violations include the following:
+				1) those that result in the LLC entity sending an FRMR frame
+				2) those that result in a data link resetting action to be initiated by
+				the receiving LLC entity itself.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type2violation(69) };
+-- Actions --
+
+
+correlatorExchange-AC ACTION
+	BEHAVIOUR
+		correlatorExchange-B BEHAVIOUR
+			DEFINED AS
+				!The action is used when two ends of a link connection report errors
+				relating to the same problem. A correlator is reported in the events so
+				that the managing process can assume that the errors are related to the
+				same failure. This section describes the function that uses the CMIP
+				protocol verb Confirmed Action to facilitate a correlator exchange between
+				the two ends of the link connection. At the end of the link connection
+				set-up (when the LSAP Pair has initially entered into LINK-OPENED state),
+				a Manager will send a confirmed Correlator Exchange Action to the Manager
+				of the adjacent link station. Upon receipt of this Action, the Manager
+				will compute a correlator. Once this correlator is generated, it is
+				returned to the initiating Manager. This correlator will be sent in events
+				relating to the link connection. If the response is not received, no
+				correlator is sent in the events. If the MAC address of the two ends of
+				the link connection are the same, the link station that initiated the
+				connection (sent SABME) should initiate the Correlator Exchange Action.!;;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX LLCDefinitions.CorrelatorData;
+	WITH REPLY SYNTAX LLCDefinitions.CorrelatorRspData;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) action(9) correlatorexchange(4) };
+-- Notifications --
+
+
+communicationAlarm-N NOTIFICATION
+	BEHAVIOUR
+		communicationAlarm-B BEHAVIOUR
+			DEFINED AS
+				!Defined in the ISO Standards - Alarm Reporting Function!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) notification(10) communicationalarm(1) };
+
+
+lLCConnection2Event-N NOTIFICATION
+	BEHAVIOUR
+		lLCConnection2Event-B BEHAVIOUR
+			DEFINED AS
+				!This event will be sent for the following conditions:
+				DupIPDUs Received
+				PDUs Discarded1
+				PDUs Discarded2
+				PDU Retransmissions
+				Type2 Violation
+				Type2 Acknowledgment Timeout Value
+				Type2 Reject Timeout Value
+				Type2 Busy-State
+				Timeout Value Type2
+				P-Bit Timeout Value
+				Retransmissions!;;
+	WITH INFORMATION SYNTAX LLCDefinitions.LLCConnection2Event;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) notification(10) llcconnection2event(2) };
+-- 10.5 LLCConnection2IVMO managed object
+-- A 1LCConnection2IVMO may be used to supply initial values for the attributes of 1LCConnection2 MOs.
+-- Different instances of lLCConnection2IVMO may contain different initial values.
+
+
+lLCConnection2IVMO MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI:1992":top;
+	CHARACTERIZED BY
+		lLCConnection2-P,
+		lLCConnection2IVMO-P;
+	CONDITIONAL PACKAGES
+		connectionRoute-P
+			PRESENT IF
+				route known to LSAP Pair object,
+		type2FlowControl-P
+			PRESENT IF
+				flow control is supported,
+		type2I-P
+			PRESENT IF
+				the sent and receive I counters are supported,
+		type2FRMR-P
+			PRESENT IF
+				the sent and receive FRMR counters are supported,
+		type2RR-P
+			PRESENT IF
+				the sent and receive RR counters are supported,
+		type2RNR-P
+			PRESENT IF
+				the sent and receive RR counters are supported,
+		type2REJ-P
+			PRESENT IF
+				the sent and receive REJ counters are supported,
+		type2SABME-P
+			PRESENT IF
+				the sent and receive SABME counters are supported,
+		type2UA-P
+			PRESENT IF
+				the sent and receive UA counters are supported,
+		type2DISC-P
+			PRESENT IF
+				the sent and receive DISC counters are supported,
+		type2DM-P
+			PRESENT IF
+				the sent and receive DM counters are supported,
+		type2PDUs-P
+			PRESENT IF
+				using PDUs event notification,
+		type2OptTolIPDUs-P
+			PRESENT IF
+				counting received I PDUs recognized as duplicates is supported,
+		type2Violation-P
+			PRESENT IF
+				counting violations;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) managedObjectClass(3) llcconnection2ivmo(4) };
+-- Name Bindings --
+
+
+lLCConnection2IVMOB-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS lLCConnection2IVMO AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS lLCConnection2 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		lLCConnection2IVMOName;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) namebinding(6) llcconnection2ivmonb(4) };
+-- Packages --
+
+
+lLCConnection2IVMO-P PACKAGE
+	ATTRIBUTES
+		lLCConnection2IVMOName GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) llcconnection2ivmop(23) };
+-- Attributes --
+
+
+lLCConnection2IVMOName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.GraphicString;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		lLCConnection2IVMOName-B BEHAVIOUR
+			DEFINED AS
+				!Naming attribute for the lLCConnection2IVMO managed object.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) llcconnection2ivmoname(70) };
+-- 10.6 LLCConnectionlessAck managed object
+-- This clause contains those attributes, actions and event notifications associated with an LLC Type 3 (connectionless
+-- acknowledge) environment. The formal description is:
+
+
+lLCConnectionlessAck MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DML":lLCCOPM;
+	CHARACTERIZED BY
+		lLCConnectionlessAck-P;
+	CONDITIONAL PACKAGES
+		type3Retransmissions-P
+			PRESENT IF
+				the Retransmissions counter is used with LLC Type 3,
+		type3NoResponse-P
+			PRESENT IF
+				the NoResponse counter is used with LLC Type 3,
+		type3Command-P
+			PRESENT IF
+				the sent and receive command counters are used with LLC Type 3,
+		type3Response-P
+			PRESENT IF
+				the sent and receive command counters are used with LLC Type 3,
+		type3Violation-P
+			PRESENT IF
+				violation detect counter is used with LLC Type 3;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) managedObjectclass(3) llcconnectionlessack(5) };
+-- Name Bindings
+
+
+lLCConnectionlessAck-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS lLCConnectionlessAck AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "DML":lLCCOPM AND SUBCLASSES;
+	WITH ATTRIBUTE
+		lLCConnectionlessAckName;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) nameBinding(6) llcconnectionlessacknb(5) };
+-- Packages --
+
+
+lLCConnectionlessAck-P PACKAGE
+	BEHAVIOUR
+		lLCConnectionlessAck-B BEHAVIOUR
+			DEFINED AS
+				!The LLC Connectionless Ack object is responsible for processing the attributes,
+				actions and notifications which affect a specific data link connection
+				(for LLC Type 3 connections). One data connection shall exist for
+				each data link connection supported.!;;
+	ATTRIBUTES
+		lLCConnectionlessAckName GET,
+		maximumLLCInformationFieldSize GET,
+		maximumRetransmissions GET-REPLACE,
+		tESTReceivedABBResponse GET,
+		tESTReceivedCommand GET,
+		tESTReceivedResponse GET,
+		tESTSentABBResponse GET,
+		tESTSentCommand GET,
+		tESTSentResponse GET,
+		type3ReceiveResources GET,
+		uIReceived GET,
+		uISent GET,
+		xIDReceivedCommand GET,
+		xIDReceivedResponse GET,
+		xIDSentCommand GET,
+		xIDSentResponse GET;
+	ACTIONS
+		tESTSendCommand-AC,
+		xIDSendCommand-AC;
+	NOTIFICATIONS
+		communicationAlarm-N,
+		lLCConnection2Event-N;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) llcconnectionlessackp(24) };
+
+
+type3Command-P PACKAGE
+	BEHAVIOUR
+		type3Command-P-B BEHAVIOUR
+			DEFINED AS
+				!This conditional packages contains attributes (counters) that
+				count received responses with the command status field set.!;;
+	ATTRIBUTES
+		type3CommandIP GET,
+		type3CommandIT GET,
+		type3CommandOK GET,
+		type3CommandPE GET,
+		type3CommandRS GET,
+		type3CommandUE GET,
+		type3CommandUN GET,
+		type3ReceivedACCommand GET,
+		type3SentACCommand GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type3command(25) };
+
+
+type3NoResponse-P PACKAGE
+	BEHAVIOUR
+		type3NoResponse-P-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of failures to obtain a response from the destination
+				associated with an LSAPPairComponent, after exhausting the retry counter
+				Retransmission4. When this counter is updated an event notification is
+				forwarded.!;;
+	ATTRIBUTES
+		type3NoResponse GET;
+	NOTIFICATIONS
+		lLCClessACKEvent-N;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type3noresponse(26) };
+
+
+type3Response-P PACKAGE
+	BEHAVIOUR
+		type3Response-P-B BEHAVIOUR
+			DEFINED AS
+				!This conditional packages contains attributes (counters) that
+				count received responses with the response status field set.!;;
+	ATTRIBUTES
+		type3ResponseIP GET,
+		type3ResponseIT GET,
+		type3ResponseNE GET,
+		type3ResponseNR GET,
+		type3ResponseOK GET,
+		type3ResponseRS GET,
+		type3ResponseUE GET,
+		type3ResponseUN GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type3response(27) };
+
+
+type3Retransmissions-P PACKAGE
+	BEHAVIOUR
+		type3Retransmissions-P-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of retransmissions that have occurred to the
+				destination associated with this LSAP pair.!;;
+	ATTRIBUTES
+		type3Retransmissions GET;
+	NOTIFICATIONS
+		lLCClessACKEvent-N;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type3retransmissions(28) };
+
+
+type3Violation-P PACKAGE
+	BEHAVIOUR
+		type3Violation-P-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the number of protocol violations detected by this
+				connection.!;;
+	ATTRIBUTES
+		type3Violation GET;
+	NOTIFICATIONS
+		lLCClessACKEvent-N;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) type3violation(29) };
+-- Attributes
+
+
+lLCConnectionlessAckName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.LLCConnectionlessAckName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		lLCConnectionlessAckName-B BEHAVIOUR
+			DEFINED AS
+				!The localLSAP and remoteLSAPId and the local and remote MAC Address!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) llcconnectionlessackname2(71) };
+
+
+type3CommandIP ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3CommandIP-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the command status field
+				set to indicate "Permanent implementation dependent error," as defined in
+				5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3commandip(72) };
+
+
+type3CommandIT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3CommandIT-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the command status field
+				set to indicate "Temporarily implementation dependent error," as defined
+				in 5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3commandit(73) };
+
+
+type3CommandOK ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3CommandOK-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the command status field
+				set to indicate "Command accepted," as defined in 5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3commandok(74) };
+
+
+type3CommandPE ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3CommandPE-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the command status field
+				set to indicate "Protocol error," as defined in 5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3commandpe(75) };
+
+
+type3CommandRS ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3CommandRS-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the command status field
+				set to indicate "Unimplemented or inactivated service," as defined in
+				5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3commandrs(76) };
+
+
+type3CommandUE ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3CommandUE-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the command status field
+				set to indicate "LLC user interface error," as defined in 5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3commandue(77) };
+
+
+type3CommandUN ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3CommandUN-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the command status field
+				set to indicate "Resources temporarily unavailable," as defined in
+				5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3commandun(78) };
+
+
+type3NoResponse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3NoResponse-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of failures to obtain a response from the destination
+				associated with this LSAP pair, after exhausting the retry counter
+				MaximumRetransmissions4.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3noresponse(79) };
+
+
+type3ReceiveResources ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Type3ReceiveResources;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3ReceiveResources-B BEHAVIOUR
+			DEFINED AS
+				!Causes the LSAP entity to either enable or disable the resources for
+				reception of the data field of Type 3 command PDUs sent to this LSAP.
+				If a Type 3 PDU containing data is received while disabled, the UN status
+				code is returned in the CCCC field of the response PDU.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3receiveresources(80) };
+
+
+type3ReceivedACCommand ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3ReceivedACCommand-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of AC command PDUs received from the other LSAP of the
+				connection (LSAP PAIR).!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3receivedaccommand(81) };
+
+
+type3SentACCommand ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3SentACCommand-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of AC command PDUs sent to the other LSAP of the
+				connection (LSAP PAIR).!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3sentaccommand(82) };
+
+
+type3ResponseIP ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3ResponseIP-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the response status field
+				set to indicate "Permanent implementation dependent error," as defined in
+				5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3responseip(83) };
+
+
+type3ResponseIT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3ResponseIT-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the response status field
+				set to indicate "Temporary implementation dependent error," as defined in
+				5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3responseit(84) };
+
+
+type3ResponseNE ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3ResponseNE-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the response status field
+				set to indicate "Response LSDU never submitted," as defined in 5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3responsene(85) };
+
+
+type3ResponseNR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3ResponseNR-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the response status field
+				set to indicate "Response LSDU not requested," as defined in 5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3responsenr(86) };
+
+
+type3ResponseOK ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3ResponseOK-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the response status field
+				set to indicate "Response LSDU present," as defined in 5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3responseok(87) };
+
+
+type3ResponseRS ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3ResponseRS-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the response status field
+				set to indicate "Unimplemented or inactivated service," as defined in
+				5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3responsers(88) };
+
+
+type3ResponseUE ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3ResponseUE-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the response status field
+				set to indicate "LLC user interface error," as defined in 5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3responseue(89) };
+
+
+type3ResponseUN ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3ResponseUN-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the received responses with the response status field
+				set to indicate "Resources temporarily unavailable," as defined in
+				5.4.3.2.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3responseun(90) };
+
+
+type3Retransmissions ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3Retransmissions-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of retransmissions that have occurred to the
+				destination associated with this LSAP pair.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3retransmissions(91) };
+
+
+type3Violation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.EventCounter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		type3Violation-B BEHAVIOUR
+			DEFINED AS
+				!Provides a count of the number of protocol violations detected by this
+				connection.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) type3violation(92) };
+-- Notifications --
+
+
+lLCClessACKEvent-N NOTIFICATION
+	BEHAVIOUR
+		lLCClessACKEvent-B BEHAVIOUR
+			DEFINED AS
+				!This event will be sent for the following conditions:
+				Retransmissions
+				NoResponse
+				Type3 Violation!;;
+	WITH INFORMATION SYNTAX LLCDefinitions.LLCConnection2Event;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) notification(10) llcclessackevent(3) };
+-- 10.7 LLCConnectionlessAckIVMO managed object
+-- An lLCConnectionlessAckIVMO may be used to supply initial values for the attributes of lLCConnectionlessACK
+-- MOs. Different instances of lLCConnectionlessAckIVMO may contain different initial values.
+
+
+lLCConnectionlessAckIVMO MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI:1992":top;
+	CHARACTERIZED BY
+		lLCConnectionlessAck-P,
+		lLCConnectionlessAckIVMO-P;
+	CONDITIONAL PACKAGES
+		type3Retransmissions-P
+			PRESENT IF
+				the retransmissions counter is supported,
+		type3NoResponse-P
+			PRESENT IF
+				the NoResponse counter is supported,
+		type3Command-P
+			PRESENT IF
+				the sent and receive command counters are supported,
+		type3Response-P
+			PRESENT IF
+				the sent and receive responses counters are supported,
+		type3Violation-P
+			PRESENT IF
+				violation detection counter is supported;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) managedObjectClass(3) llcconnectionlessAckIVMO(6) };
+-- Name Bindings --
+
+
+lLCConnectionlessAckIVMO-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS lLCConnectionlessAckIVMO AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS lLCConnectionlessAck AND SUBCLASSES;
+	WITH ATTRIBUTE
+		lLCConnectionlessAckIVMOName;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) namebinding(6) llcconnectionlessackivmonb(6) };
+-- Packages --
+
+
+lLCConnectionlessAckIVMO-P PACKAGE
+	ATTRIBUTES
+		lLCConnectionlessAckIVMOName GET;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) llcconnectionlessackivmo(30) };
+-- Attributes --
+
+
+lLCConnectionlessAckIVMOName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.GraphicString;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		lLCConnectionlessAckIVMOName-B BEHAVIOUR
+			DEFINED AS
+				!Naming attribute for the LLCConnectionlessAckIVMO managed object.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) llcconnectionlessackivmoname(93) };
+-- 10.8 RDE setup managed object
+-- A rDESetup managed object instance is instaniated if an instance of the lLCSAP object enables RDE.
+
+
+rDESetup MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI:1992":top;
+	CHARACTERIZED BY
+		rDESetup-P;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) managedObjectClass(3) rdesetup(7) };
+-- Name Bindings --
+
+
+rDESetup-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS rDESetup AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS lLCSAP AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rDESetupName;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) namebinding(6) rdesetupnb(7) };
+-- Packages --
+
+
+rDESetup-P PACKAGE
+	BEHAVIOUR
+		rDESetup-B BEHAVIOUR
+			DEFINED AS
+				!A rDESetup managed object instance is instaniated
+				if an instance of the lLCSAP object enables RDE.!;;
+	ATTRIBUTES
+		agingEnabled GET-REPLACE,
+		agingValue GET-REPLACE,
+		enableType2Reset GET-REPLACE,
+		maximumRouteDescriptors GET-REPLACE,
+		maximumResponseTime GET-REPLACE,
+		minimumPDUSize GET-REPLACE,
+		rDEHold GET-REPLACE,
+		rDEReplace GET-REPLACE,
+		rDESetupName GET,
+		resetOnTestEnabled GET-REPLACE;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) rdesetupp(31) };
+-- Attributes --
+
+
+agingEnabled ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.AgingEnabled;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		agingEnabled-B BEHAVIOUR
+			DEFINED AS
+				!A BOOLEAN value representing the policy that, when true,
+				allows a manager to age a route.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) agingEnabled(94) };
+
+
+agingValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.AgingValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		agingValue-B BEHAVIOUR
+			DEFINED AS
+				!A value used to determine if a route should be flushed due to inactivity
+				for specified time period.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) agingValue(95) };
+
+
+maximumRouteDescriptors ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.MaximumRouteDescriptors;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maximumRouteDescriptors-B BEHAVIOUR
+			DEFINED AS
+				!The maximum number or route descriptors that an acceptable route
+				may contain.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) maximumRouteDescriptors(96) };
+
+
+maximumResponseTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.MaximumResponseTime;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maximumResponseTime-B BEHAVIOUR
+			DEFINED AS
+				!The timer value used to limit the maximum round trip response time
+				allowed for route discovery and consequently the maximum time a PDU can
+				remain in the system.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) maximumResponseTime(97) };
+
+
+minimumPDUSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.MinimumPDUSize;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		minimumPDUSize-B BEHAVIOUR
+			DEFINED AS
+				!The minimum number of octets that must be supported by an acceptable
+				route as indicated by the LF bits of the routing information field.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) minimumPDUSize(98) };
+
+
+rdeHold ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.RDEHold;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		rDEHold-B BEHAVIOUR
+			DEFINED AS
+				!A BOOLEAN value representing the policy that, when true,
+				requires RDE to withhold sending PDUs while changing routes.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) rdehold(99) };
+
+
+rdeReplace ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.RDEReplace;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		rDEReplace-B BEHAVIOUR
+			DEFINED AS
+				!A BOOLEAN value representing the policy that, when true,
+				enables the RDE to use the route selected by the remote station.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) rdereplace(100) };
+
+
+rDESetupName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.GraphicString;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		rDESetupName-B BEHAVIOUR
+			DEFINED AS
+				!Naming attribute for the rDESetup managed object.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) rdesetupname(101) };
+
+
+resetOnTestEnabled ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.ResetOnTestEnabled;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		resetOnTestEnabled-B BEHAVIOUR
+			DEFINED AS
+				!This attribute is a BOOLEAN value. If the attribute equals TRUE, then
+				if a test frame is received the source route is reset.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) resetOnTestEnabled(102) };
+-- 10.9 1RDE pair managed object
+-- An instance of this managed object will exist for each RDE pair used by any type of LLC service provided.
+-- This managed object contains the local MAC address and local SAP and the remote MAC address and
+-- remote SAP, plus counters.
+
+
+rDEPair MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI:1992":top;
+	CHARACTERIZED BY
+		rDEPair-P;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) managedObjectClass(3) rdepair(8) };
+-- Name Bindings --
+
+
+rDEPair-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS rDEPair AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS rDESetup AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rDEPairName;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) namebinding(6) rdepairnb(8) };
+-- Packages --
+
+
+rDEPair-P PACKAGE
+	BEHAVIOUR
+		rDEPair-B BEHAVIOUR
+			DEFINED AS
+				!An instance of this managed object will exist for each RDE pair used
+				by any type of LLC service provided. This managed object contains the
+				local MAC address and local SAP and the remote MAC address and remote
+				SAP, plus counters.!;;
+	ATTRIBUTES
+		rDEPairName GET-REPLACE,
+		discardCounter GET-REPLACE,
+		nSRPDUCounter GET-REPLACE,
+		nSRSelectedCounter GET-REPLACE,
+		rIF GET-REPLACE,
+		sRFPDUCounter GET-REPLACE,
+		queryCounter GET-REPLACE;
+	ACTIONS
+		flushRoute-AC,
+		readCounters-AC;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) package(4) rdepairp(32) };
+-- Attributes --
+
+
+rDEPairName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.RDEPairId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		rDEPair-A-B BEHAVIOUR
+			DEFINED AS
+				!The local LSAP and remote LSAPId and the local and remote
+				MAC Addresses.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) rdepaira(103) };
+
+
+discardCounter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		discardCounter-B BEHAVIOUR
+			DEFINED AS
+				!A value that represents the number of times a new selection has been
+				made.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) discardcounter(104) };
+
+
+nSRPDUCounter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter2;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nSRPDUCounter-B BEHAVIOUR
+			DEFINED AS
+				!A value that represents the number of frames without a routing field.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) nsrpducounter(105) };
+
+
+nSRSelectedCounter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nSRSelectedCounter-B BEHAVIOUR
+			DEFINED AS
+				!A value that represents the number of times that acceptable
+				SRF route existed resulting in the selection of the NSR path.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) nsrselectedcounter(106) };
+
+
+rIF ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.RIF;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		rIF-B BEHAVIOUR
+			DEFINED AS
+				!The routing information field varies in length up to 30 octets. When
+				source routing is not used the RIF is said to be NULL and contains no
+				information. The first bit of the MAC source address is defined as the
+				Routing Information Indicator (RII). When the RIF is null, the RII is set
+				to 0. When the RIF is not null, the RII is set to 1. The first two octets
+				are the Rounting Control field (RC) and the remainder of the RIF contains
+				Routing Descriptors (RD). Each RD is two octets in length, therefore a
+				maximum of 14 RDs can exist in an RIF.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) rif(107) };
+
+
+sRFPDUCounter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter2;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sRFPDUCounter-B BEHAVIOUR
+			DEFINED AS
+				!A value that represents the number of frames with routing field.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) sRFPDUcounter(108) };
+
+
+queryCounter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX LLCDefinitions.Counter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		queryCounter-B BEHAVIOUR
+			DEFINED AS
+				!A value that represents the number of Route Query commands
+				generated.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) attribute(7) querycounter(109) };
+-- Actions --
+
+
+readCounters-AC ACTION
+	BEHAVIOUR
+		readCounters-B BEHAVIOUR
+			DEFINED AS
+				!This action will be sent when management request information concerning
+				RDE counters.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) action(9) readcounters(5) };
+
+
+flushRoute-AC ACTION
+	BEHAVIOUR
+		flushRoute-B BEHAVIOUR
+			DEFINED AS
+				!This action will be sent when management request an RDE Pair to flush
+				its route. This does not cause the RDE to discover a new route.!;;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) action(9) flushroute(6) };
+-- 10.10 Resource Type ID managed object
+-- This is the name binding for the Resource Type Id managed object that is defined in IEEE Std 802.1F-1993
+-- and incorporated in ISO/IEC 10742 : 1994.
+
+
+resourceTypeId-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS "DLM":resourceTypeId AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "IEEE802-1":oResourceTypeID AND SUBCLASSES;
+	WITH ATTRIBUTE
+		lLCName;
+REGISTERED AS { iso(1) member-body(2) us(840) ieee802-2(10032) nameBinding(6) resourcetypeid(9) };
+
+END
+--< GDMO.EndDocument "ISO/IEC 8802-2 : 1998"
+--  { iso(1) member-body(2) us(840) ieee802-2(10032) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ |  +- iso_10742::datalinkEntity
+--@@ |  |  +- iso_10742::lAPBDLE
+--@@ |  |  +- iso_10742::mACDLE
+--@@ |  |  +- iso_10742::lLCDLE
+--@@ +- itut_x723::clProtocolMachine
+--@@ |  +- iso_10742::lLCCLPM
+--@@ |  |  +- ieee_802_2::lLCConnectionless
+--@@ |  +- iso_10742::lLCCOPM
+--@@ |  |  +- ieee_802_2::lLCConnection2
+--@@ |  |  +- ieee_802_2::lLCConnectionlessAck
+--@@ +- itut_x723::coProtocolMachine
+--@@ |  +- iso_10742::sLPPM
+--@@ +- itut_x723::sap1
+--@@ |  +- iso_10742::dLSAP
+--@@ |  |  +- ieee_802_2::lLCStation
+--@@ |  |  +- ieee_802_2::lLCSAP
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ |  +- iso_10742::sLPConnection
+--@@ +- itut_x723::subsystem
+--@@ |  +- iso_10742::datalinkSubsystem
+--@@ +- iso_10742::sLPConnectionIVMO
+--@@ +- iso_10742::mAC
+--@@ +- iso_10742::resourceTypeId
+--@@ +- iso_10742::scanner
+--@@ |  +- iso_10742::eWMAMetricMonitor
+--@@ +- ieee_802_1::oResourceTypeID
+--@@ +- ieee_802_1::oScanner
+--@@ |  +- ieee_802_1::oEWMAMetricMonitor
+--@@ +- ieee_802_2::lLCConnection2IVMO
+--@@ +- ieee_802_2::lLCConnectionlessAckIVMO
+--@@ +- ieee_802_2::rDESetup
+--@@ +- ieee_802_2::rDEPair
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- ieee_802_1::oResourceTypeID
+--@@ |  >- iso_10742::resourceTypeId
+--@@ >- ieee_802_1::oEWMAMetricMonitor
+--@@ iso_10742::lAPBDLE
+--@@ >- iso_10742::sLPPM
+--@@ |  >- iso_10742::sLPConnection
+--@@ |  >- iso_10742::sLPConnection
+--@@ |  >- iso_10742::sLPConnectionIVMO
+--@@ iso_10742::mACDLE
+--@@ >- iso_10742::mAC
+--@@ >- iso_10742::mAC
+--@@ >- iso_10742::resourceTypeId
+--@@ >- iso_10742::eWMAMetricMonitor
+--@@ iso_10742::lLCDLE
+--@@ >- iso_10742::lLCCLPM
+--@@ |  >- ieee_802_2::lLCConnectionless
+--@@ >- iso_10742::lLCCOPM
+--@@ |  >- ieee_802_2::lLCConnection2
+--@@ |  |  >- ieee_802_2::lLCConnection2IVMO
+--@@ |  >- ieee_802_2::lLCConnectionlessAck
+--@@ |  |  >- ieee_802_2::lLCConnectionlessAckIVMO
+--@@ >- iso_10742::resourceTypeId
+--@@ >- iso_10742::eWMAMetricMonitor
+--@@ >- ieee_802_2::lLCStation
+--@@ >- ieee_802_2::lLCSAP
+--@@ |  >- ieee_802_2::rDESetup
+--@@ |  |  >- ieee_802_2::rDEPair
+--@@ iso_10742::datalinkSubsystem
+--@@ >- iso_10742::datalinkEntity
+--@@ |  >- iso_10742::dLSAP
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

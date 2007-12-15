@@ -1,0 +1,568 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 19:31:16 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.281 (1999) | ISO/IEC 13642 : 1999"
+--  { joint-iso-itu-t physical-layer(18) management(0) } >--
+--< GDMO.Namespace itut_x281 >--
+--< GDMO.Alias "ITU-T Rec. X.281 (1999) | ISO/IEC 13642 : 1999" "ITU-T Rec. X.281 | ISO/IEC 13642" >--
+MODULE "ITU-T Rec. X.281 (1999) | ISO/IEC 13642 : 1999" { joint-iso-itu-t physical-layer(18) management(0) }
+-- 5.2 Common Physical Layer GDMO definitions
+-- Behaviours
+
+commonCreationDeletion-B BEHAVIOUR
+	DEFINED AS
+		Managed object class imports the X.721 | ISO/IEC 10165-2 objectCreation and/or 
+		objectDeletion notifications. Used as follows:
+
+		objectCreation - Generated whenever an instance of the managed object class is 
+		created. Implementations may optionally include the sourceIndicator parameter in 
+		the notification.
+
+		If creation occurred as a result of internal operation of the resource, the 
+		value 'resourceOperation' is used. If creation occurred in response to a 
+		management operation, the value 'managementOperation' is used. A value of 
+		'unknown' may be returned if it is not possible to determine the source of the 
+		operation. None of the other optional parameters are used.
+
+		objectDeletion - Generated whenever an instance of the managed object class is 
+		deleted. Implementations may optionally include the sourceIndicator parameter in 
+		the notification.
+
+		If deletion occurred as a result of internal operation of the resource, the 
+		value 'resourceOperation' is used. If deletion occurred in response to a 
+		management operation, the value 'managementOperation' is used. A value of 
+		'unknown' may be returned if it is not possible to determine the source of the 
+		operation. None of the other optional parameters are used.;
+
+
+commonDeactivateConnection-B BEHAVIOUR
+	DEFINED AS
+		Managed object class imports the X.723 | ISO/IEC 10165-5 deactivate action. The 
+		deactivate action causes the connection to be terminated. The termination should 
+		occur as rapidly as practical, but no particular time constraints are implied. 
+		Typically, this action simulates a disconnect request received across the 
+		service interface. If a more rapid means for terminating the connection exists, 
+		then this should be used. The termination shall occur in conformance to the 
+		protocol standard. The Managed Object remains in existence after completion of 
+		the deactivate action. It is subsequently deleted when the connection is 
+		terminated, in the same way as if the connection had been terminated by other 
+		means. A deactivate action may fail (with the ProcessingFailure response) if it 
+		is temporarily not possible to terminate the connection;
+
+
+commonStateChange-B BEHAVIOUR
+	DEFINED AS
+		Managed object class imports the X.721 | ISO/IEC 10165-2 stateChange 
+		notification. Used to report the changes to the operationalState attribute, and 
+		where present, the administrativeState attribute. A single parameter set is 
+		included in the State change definition field. Only the (mandatory) attributeId 
+		and (optional) newAttributeValue parameters are used;
+
+
+communicationsAlarm-B BEHAVIOUR
+	DEFINED AS
+		Managed object class imports the X.721 | ISO/IEC 10165-2 communicationsAlarm 
+		notification. Used to report the alarm principally associated with procedures 
+		and/or processes required to convey information from one point to another.
+
+		The probableCause parameter is set to the value lossOfSignal.
+
+		The perceivedSeverity parameter is set to the value Critical.;
+
+
+equipmentAlarm-B BEHAVIOUR
+	DEFINED AS
+		Managed object class imports the X.721 | ISO/IEC 10165-2 equipmentAlarm 
+		notification. Used to report the alarm principally associated with an equipment 
+		fault.
+
+		The probableCause parameter is set to the value datasetOrModemError.
+
+		The perceivedSeverity parameter is set to the value Major.;
+
+
+qualityofServiceAlarm-B BEHAVIOUR
+	DEFINED AS
+		Managed object class imports the X.721 | ISO/IEC 10165-2 qualityofServiceAlarm 
+		notification. Used to report the alarm principally associated with a degradation 
+		in the quality of a service.
+
+		The probableCause parameter is set to the value thresholdCrossed.
+
+		The perceivedSeverity parameter is set to the value Warning.;
+-- 5.3 The Physical Layer Subsystem Managed Object
+-- There shall be exactly one of these managed objects within a system.
+-- It exists to provide a container for all managed objects in a system
+-- that relate to the operation of the Physical layer.
+-- The physicalSubsystem managed object cannot be created or deleted
+-- explicitly by management operation. It exists inherently in a system;
+-- created and deleted as part of system operation.
+
+
+physicalSubsystem MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":subsystem;
+	-- which is derived from "DMI":top
+	CHARACTERIZED BY
+		physicalSubsystem-P PACKAGE
+			ATTRIBUTES
+				"GMI":subsystemId
+					INITIAL VALUE PhLM.physicalSubsystemId-Value
+					GET;;;
+REGISTERED AS { PHLM.moi physicalSubsystem(1) };
+-- Name Bindings
+
+
+physicalSubsystem-system NAME BINDING
+	SUBORDINATE OBJECT CLASS physicalSubsystem AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "DMI":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":subsystemId;
+REGISTERED AS { PHLM.nboi physicalSubsystem-system(1) };
+-- 5.4 Physical Entity Managed Object
+-- There may be multiple instances of these MOs within a system.
+-- These managed objects can not be created or deleted explicitly by
+-- management operation. They exist inherently in a system;
+-- created and deleted as part of system operation.
+
+
+physicalEntity MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":communicationsEntity;
+	CHARACTERIZED BY
+		physicalEntity-P PACKAGE
+			ATTRIBUTES
+				physicalEntityTitles REPLACE-WITH-DEFAULT GET-REPLACE;
+			ATTRIBUTE GROUPS
+				"DMI":state
+					"DMI":operationalState;
+			NOTIFICATIONS
+				"DMI":stateChange;;;
+REGISTERED AS { PHLM.moi physicalEntity(2) };
+-- Name Bindings
+-- IMPORT"GMI":communicationsEntity-subsystem NAME BINDING
+
+
+physicalEntity-physicalSubsystem-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS physicalEntity AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS physicalSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":communicationsEntityId;
+REGISTERED AS { PHLM.nboi physicalEntity-physicalSubsystem(2) };
+-- Attributes
+
+
+physicalEntityTitles ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.PhysicalEntityTitle;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		physicalEntityTitles-B BEHAVIOUR
+			DEFINED AS
+				The set of Physical Entity Titles which unambiguously identify the Physical 
+				Entity in an End or Intermediate System.
+
+				The value may be entered by a system management operation or it may be derived 
+				by some local means.;;
+REGISTERED AS { PHLM.aoi physicalEntityTitles(1) };
+-- 5.5 Physical Service Access Point Managed Object
+-- Physical SAP MO class is used to represent a service access point where the
+-- interactions between the physical service user and the physical service
+-- provider take place.
+-- phSAP managed objects are created automatically as part of system
+-- operation when a Physical layer user requests and is granted use
+-- of the Physical layer services. The mechanism by which this happens
+-- is system-specific and not subject to OSI standardization.
+
+
+physicalSAP MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":sap1;
+REGISTERED AS { PHLM.moi physicalSAP(3) };
+-- Name Bindings
+-- IMPORT "GMI":sap1-Subsystem NAME BINDING
+
+
+physicalSAP-physicalSubsystem NAME BINDING
+	SUBORDINATE OBJECT CLASS physicalSAP AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS physicalSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":sapId;
+	BEHAVIOUR
+		physicalSAP-physicalSubsystem-Management-B BEHAVIOUR
+			DEFINED AS
+				The name binding which applies when a phSAP managed object (or an instance of a 
+				subclass of the phSAP MO class) can be created by management as a subordinate 
+				object of a phEntity managed object (or subclass), and deleted by management.;;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { PHLM.nboi phSAP-physicalSubsystem(3) };
+-- 5.6 Data-circuit Managed Object
+-- The data-circuit managed object class is used to represent a communication
+-- path in the physical media for OSI between two physical-entities,
+-- together with the facilities necessary in the Physical Layer for the
+-- transmission of bits on it.
+
+
+dataCircuit MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":coProtocolMachine;
+	CHARACTERIZED BY
+		dataCircuit-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B,
+				commonStateChange-B;
+			ATTRIBUTES
+				bitErrorsReceived GET,
+				bitErrorsTransmitted GET,
+				bitErrorsThreshold GET-REPLACE,
+				dataCircuitType GET,
+				physicalMediaNames GET,
+				physicalInterfaceType GET,
+				physicalInterfaceStandard GET,
+				synchronizationMode GET,
+				-- sync, async --
+				transmissionCoding GET,
+				-- coding scheme --
+				transmissionMode GET,
+				-- FDX, HDX, simplex, duplex --
+				transmissionRate GET;
+			ATTRIBUTE GROUPS
+				"GMI":counters
+					bitErrorsReceived
+					bitErrorsTransmitted,
+				"DMI":state
+					"DMI":operationalState;
+			NOTIFICATIONS
+				"DMI":communicationsAlarm
+					connectionError
+					lossOfSignal
+					lossOfSynchronization,
+				"GMI":communicationsInformation
+					connectionEstablished,
+				"DMI":equipmentAlarm,
+				"DMI":objectCreation,
+				"DMI":objectDeletion,
+				"DMI":qualityofServiceAlarm
+					bitErrorThresholdReached,
+				"DMI":stateChange;;;
+REGISTERED AS { PHLM.moi dataCircuit(4) };
+-- Name Bindings
+
+
+dataCircuit-physicalEntity NAME BINDING
+	SUBORDINATE OBJECT CLASS dataCircuit AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS physicalEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":coProtocolMachineId;
+	BEHAVIOUR
+		dataCircuit-physicalEntity-B BEHAVIOUR
+			DEFINED AS
+				The name binding which applies when a dataCircuit managed object can be created 
+				by management as a subordinate object of a physicalEntity managed object and 
+				deleted by management.;;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { PHLM.nboi dataCircuit-physicalEntity(4) };
+-- Attributes
+
+
+bitErrorsReceived ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.BitErrors;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bitErrorsReceived-B BEHAVIOUR
+			DEFINED AS
+				The number of bit errors received.;;
+REGISTERED AS { PHLM.aoi bitErrorsReceived(13) };
+
+
+bitErrorsTransmitted ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.BitErrors;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bitErrorsTransmitted-B BEHAVIOUR
+			DEFINED AS
+				The number of bit errors transmitted.;;
+REGISTERED AS { PHLM.aoi bitErrorsTransmitted(14) };
+
+
+bitErrorsThreshold ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.BitErrorsThreshold;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bitErrorsThreshold-B BEHAVIOUR
+			DEFINED AS
+				Value of the threshold for bit Error.;;
+REGISTERED AS { PHLM.aoi bitErrorsThreshold(2) };
+
+
+dataCircuitType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.DataCircuitType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dataCircuitType-B BEHAVIOUR
+			DEFINED AS
+				Determines the data-circuit supports the relaying functions.;;
+REGISTERED AS { PHLM.aoi dataCircuitType(3) };
+
+
+physicalInterfaceStandard ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.PhysicalInterfaceStandard;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		physicalInterfaceStandard-B BEHAVIOUR
+			DEFINED AS
+				Determines the Standard or Recommendation number/name that the interface comply 
+				to.;;
+REGISTERED AS { PHLM.aoi physicalInterfaceStandard(4) };
+
+
+physicalInterfaceType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.PhysicalInterfaceType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		physicalInterfaceType-B BEHAVIOUR
+			DEFINED AS
+				Determines the physical characteristics of the line/cable that the data-circuit 
+				supports.;;
+REGISTERED AS { PHLM.aoi physicalInterfaceType(5) };
+
+
+physicalMediaNames ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.PhysicalMediaNames;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		physicalMediaNames-B BEHAVIOUR
+			DEFINED AS
+				The distinguished names of physical media which the data-circuit uses.;;
+REGISTERED AS { PHLM.aoi physicalMediaNames(6) };
+
+
+synchronizationMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.SynchronizationMode;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		synchronizationMode-B BEHAVIOUR
+			DEFINED AS
+				Determines the mode of synchronization, such as synchronous and asynchronous.;;
+REGISTERED AS { PHLM.aoi synchronizationMode(7) };
+
+
+transmissionCoding ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.TransmissionCoding;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		transmissionCoding-B BEHAVIOUR
+			DEFINED AS
+				Coding rule of data transmission.;;
+REGISTERED AS { PHLM.aoi transmissionCoding(8) };
+
+
+transmissionMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.TransmissionMode;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		transmissionMode-B BEHAVIOUR
+			DEFINED AS
+				Determines the transmission mode.;;
+REGISTERED AS { PHLM.aoi transmissionMode(9) };
+
+
+transmissionRate ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.TransmissionRate;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		transmissionRate-B BEHAVIOUR
+			DEFINED AS
+				Value of the transmission rate.;;
+REGISTERED AS { PHLM.aoi transmissionRate(10) };
+-- Parameters
+
+
+bitErrorThresholdReached PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX PHLM.BitErrorThresholdReached;
+	BEHAVIOUR
+		bitErrorThresholdReached-B BEHAVIOUR
+			DEFINED AS
+				Indicates that bit error reached to the threshold value.;;
+REGISTERED AS { PHLM.proi bitErrorThresholdReached(1) };
+
+
+connectionError PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX PHLM.ConnectionError;
+	BEHAVIOUR
+		connectionError-B BEHAVIOUR
+			DEFINED AS
+				Indicates that connection error occurred.;;
+REGISTERED AS { PHLM.proi connectionError(2) };
+
+
+connectionEstablished PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX PHLM.ConnectionEstablished;
+	BEHAVIOUR
+		connectionEstablished-B BEHAVIOUR
+			DEFINED AS
+				Indicates that connection is established.;;
+REGISTERED AS { PHLM.proi connectionEstablished(3) };
+
+
+lossOfSignal PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX PHLM.LossOfSignal;
+	BEHAVIOUR
+		losOfSignal-B BEHAVIOUR
+			DEFINED AS
+				Indicates that loss of signal error occurred.;;
+REGISTERED AS { PHLM.proi lossOfSignal(4) };
+
+
+lossOfSynchronization PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX PHLM.LossOfSynchronization;
+	BEHAVIOUR
+		losOfSynchronization-B BEHAVIOUR
+			DEFINED AS
+				Indicates that loss of synchronization error occurred.;;
+REGISTERED AS { PHLM.proi lossOfSynchronization(5) };
+-- 5.7 Physical Connection Managed Object
+-- The Physical Connection managed Object class is used to represent an
+-- interconnection of data-circuits in the Physical Layer.
+
+
+physicalConnection MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":singlePeerConnection;
+	CHARACTERIZED BY
+		phConnection-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B,
+				commonDeactivateConnection-B,
+				commonStateChange-B;
+			ATTRIBUTES
+				"GMI":connectionId GET,
+				endpointIdentifier GET,
+				portNumber GET;
+			ACTIONS
+				"GMI":activate,
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion,
+				"DMI":stateChange;;;
+REGISTERED AS { PHLM.moi physicalConnection(5) };
+-- Name Bindings
+
+
+physicalConnection-dataCircuit NAME BINDING
+	SUBORDINATE OBJECT CLASS physicalConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS dataCircuit AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":connectionId;
+	BEHAVIOUR
+		physicalConnection-B BEHAVIOUR
+			DEFINED AS
+				The name bindings which applies when a phConnection managed object (or an 
+				instance of a subclass of the phConnection MO class) can be changed by 
+				management as a subordinate object of phProtocol managed object (or subclass), 
+				and deleted by management.;;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { PHLM.nboi phConnection-dataCircuit(5) };
+-- Attributes
+
+
+endpointIdentifier ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.EndpointIdentifier;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		endpointIdentifier-B BEHAVIOUR
+			DEFINED AS
+				The naming attribute for the physical connection managed object.;;
+REGISTERED AS { PHLM.aoi endpointIdentifier(11) };
+
+
+portNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PHLM.PortNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		portNumber-B BEHAVIOUR
+			DEFINED AS
+				The distinguished names of port which the connection is established.;;
+REGISTERED AS { PHLM.aoi portNumber(12) };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.281 (1999) | ISO/IEC 13642 : 1999"
+--  { joint-iso-itu-t physical-layer(18) management(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ |  +- itut_x281::physicalEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ |  +- itut_x281::dataCircuit
+--@@ +- itut_x723::sap1
+--@@ |  +- itut_x281::physicalSAP
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ |  +- itut_x281::physicalConnection
+--@@ +- itut_x723::subsystem
+--@@ |  +- itut_x281::physicalSubsystem
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x281::physicalSubsystem
+--@@ |  >- itut_x281::physicalEntity
+--@@ |  |  >- itut_x281::dataCircuit
+--@@ |  |  |  >- itut_x281::physicalConnection
+--@@ |  >- itut_x281::physicalSAP
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

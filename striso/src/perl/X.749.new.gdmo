@@ -1,0 +1,2181 @@
+
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 11:15:53 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.725.gdmo" >--
+--< GDMO.Include "X.746.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.749 (1997) | ISO/IEC 10164-19 : 1997"
+--  { joint-iso-itu-t ms(9) function(2) part19(19) } >--
+--< GDMO.Namespace itut_x749 >--
+MODULE "ITU-T Rec. X.749 (1997) | ISO/IEC 10164-19 : 1997" { joint-iso-itu-t ms(9) function(2) part19(19) }
+-- Annex A
+-- Definition of management information
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- ISO/IEC 10164-19 : 1997 (E)
+-- ITU-T Rec. X.749 (1997 E)
+-- A.2 Definition of relationship classes
+-- This Recommendation | International Standard defines the following relationship classes:
+
+jurisdictionRelationship RELATIONSHIP CLASS
+	BEHAVIOUR
+		jurisdictionRelationshipBehaviour BEHAVIOUR
+			DEFINED AS
+				"This relationship is the management view of a jurisdiction and identifies two 
+				roles: policy and domain. A jurisdiction is created by an ESTABLISH operation 
+				and deleted with a TERMINATE operation. The policy and domain of the 
+				jurisdiction are set when the relationship is established and cannot be modified 
+				without terminating the relationship.";;
+	ROLE policyRole
+		COMPATIBLE-WITH policy
+		PERMITTED-ROLE-CARDINALITY-CONSTRAINT MDMPMF.OneToOne
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT MDMPMF.OneToOne
+	ROLE domainRole
+		COMPATIBLE-WITH domain
+		PERMITTED-ROLE-CARDINALITY-CONSTRAINT MDMPMF.OneToOne
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT MDMPMF.OneToOne;
+REGISTERED AS { MDMPMF.mdmpmfRelationship 1 };
+
+
+administrativeAspectRelationship RELATIONSHIP CLASS
+	BEHAVIOUR
+		administrativeAspectRelationshipBehaviour BEHAVIOUR
+			DEFINED AS
+				"This relationship is the management view of an administrative aspect 
+				relationship and identifies two roles: administrative aspect and administered 
+				object.
+
+				An administrative aspect relationship is created by an ESTABLISH operation and 
+				deleted with a TERMINATE operation. The administrative aspect and administered 
+				object of the administrative aspect relationship are set when the relationship 
+				is established and cannot be modified without terminating the relationship.";;
+	ROLE administrativeAspectRole
+		COMPATIBLE-WITH administrativeAspect
+		PERMITTED-ROLE-CARDINALITY-CONSTRAINT MDMPMF.OneToOne
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT MDMPMF.OneToOne
+	ROLE administeredObjectRole
+		COMPATIBLE-WITH "CCITT Rec. X.721 | ISO/IEC 10165-2":top
+		PERMITTED-ROLE-CARDINALITY-CONSTRAINT MDMPMF.OneToOne
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT MDMPMF.OneToOne
+		PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT MDMPMF.OneToOne;
+REGISTERED AS { MDMPMF.mdmpmfRelationship 2 };
+-- A.3 Definition of managed object classes
+-- This Recommendation | International Standard defines the following managed object classes:
+
+
+policy MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2":top;
+	CHARACTERIZED BY
+		policyPackage PACKAGE
+			BEHAVIOUR
+				policyPackageBehaviour BEHAVIOUR
+					DEFINED AS
+						"See definition of (systems management) policy in PDAM2/SMO
+
+						An object creation notification is emitted when an instance of this class is 
+						created. An object deletion notification is emitted when an instance of this 
+						class is deleted. A state change notification is emitted when the administrative 
+						or operational state changes.
+
+						The determine violation status action is used to determine whether an object 
+						instance, named as a parameter of the action, is in violation of this policy. If 
+						the policyas operational state is disabled, or if the policy s administrative 
+						state is not unlocked, or if the availability status includes the off-duty 
+						status value, the violation status action response will indicate that no 
+						violation has been detected. Otherwise, the action response returns the result 
+						of evaluating this policy to determine the object,s violation status, returning 
+						an indication of violation, non-violation, or unknown status.
+
+						The administrative aspect pointer provides the name of any related object in the 
+						administrative aspect role.";;
+			ATTRIBUTES
+				policyId GET SET-BY-CREATE NO-MODIFY,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":administrativeState GET-REPLACE,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":operationalState GET,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":availabilityStatus GET,
+				administrativeAspectPointer GET-REPLACE;
+			ATTRIBUTE GROUPS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":state;
+			ACTIONS
+				determineViolationStatus;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":stateChange
+					"CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation,-- correction
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion;;;
+REGISTERED AS { MDMPMF.mdmpmfManagedObject 1 };
+
+
+scheduledPolicy MANAGED OBJECT CLASS
+	DERIVED FROM
+		policy;
+	CHARACTERIZED BY
+		dutySchedulePackage PACKAGE
+			BEHAVIOUR
+				dutyScheduleBehaviour BEHAVIOUR
+					DEFINED AS
+						"This objectFs availability status is affected by the external scheduler 
+						referenced by its external scheduler attribute. This scheduler controls whether 
+						the availability status attribute includes the off-duty status value.
+
+						When off-duty, this object will not evaluate any object as being in violation of 
+						its policy.";;
+			ATTRIBUTES
+				"ITU-T Rec. X.746 | ISO/IEC 10164-15":externalSchedulerName GET-REPLACE;;;
+REGISTERED AS { MDMPMF.mdmpmfManagedObject 2 };
+
+
+jurisdiction MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7: 1996":genericRelationshipObject;
+	CHARACTERIZED BY
+		jurisdictionPackage PACKAGE
+			BEHAVIOUR
+				jurisdictionBehaviour BEHAVIOUR
+					DEFINED AS
+						"See definition of jurisdiction in PDAM2/SMO.
+
+						An objectCreation notification is emitted when an instance of this class is 
+						created. An objectDeletion notification is emitted when an instance of this 
+						class is deleted. A stateChange notification is emitted when the operational or 
+						administrative state changes. The list membership action is used to obtain a 
+						best-efforts listing of the membership of this objectms domain. The verify 
+						membership status action is used to determine whether a given object instance is 
+						in the set of members of this objectus domain. The determine violation status 
+						action is used to determine whether a given object is in the set of members of 
+						this objectus domain, and, if it is, whether it is in violation of this object s 
+						policy. If this objectus operational state is disabled, a processing failure 
+						will be returned. If the requested object is not among the members of this 
+						objectss domain, or if the membership status cannot be determined, the action 
+						reply will indicate this fact. Otherwise, if this object s administrative state 
+						is locked or if its operational state is disabled or if its availability status 
+						includes the off-duty status, the result will indicate that no policy violation 
+						has been detected. Otherwise, the policy will be consulted, possibly resulting 
+						in the detection of a policy violation. The result of the policy evaluation is 
+						returned in the action reply.
+
+						When a policy violation is detected, a policy violation notification shall be 
+						emitted to report the detected violation. A policy violation notification shall 
+						not be emitted unless a policy violation has been detected. Subclasses may 
+						specify additional circumstances under which policy violations are detected.
+
+						The administrative aspect pointer provides the name of an object fulfilling the 
+						administrative aspect role. The value of this attribute has no effect on the 
+						operation of this object.";;
+			ATTRIBUTES
+				jurisdictionId GET SET-BY-CREATE NO-MODIFY,
+				domainPointer GET SET-BY-CREATE,
+				policyPointer GET SET-BY-CREATE,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":administrativeState GET-REPLACE,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":operationalState GET,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":availabilityStatus GET,
+				administrativeAspectPointer GET-REPLACE;
+			ATTRIBUTE GROUPS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":state;
+			ACTIONS
+				listMembership,
+				determineViolationStatus,
+				verifyMembershipStatus;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":stateChange,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion,
+				policyViolation;;;
+REGISTERED AS { MDMPMF.mdmpmfManagedObject 3 };
+
+
+enhancedJurisdiction MANAGED OBJECT CLASS
+	DERIVED FROM
+		jurisdiction;
+	CHARACTERIZED BY
+		dutySchedulePackage,
+		operationApplierPackage PACKAGE
+			BEHAVIOUR
+				operationApplierBehaviour BEHAVIOUR
+					DEFINED AS
+						"If this objectEs operational state is disabled, or if its administrative state 
+						is locked, or if its availability status includes the off-duty status value, the 
+						receipt of an apply operation to membership action results in an error response.
+
+						Otherwise, receipt of the applyOperationToMembership action causes it to assess 
+						each member of its domain for policy violation. For all policy violations 
+						detected, a policy violation notification is emitted. For all members of the 
+						domain for which policy violations are not detected, the operation is applied. 
+						The action result includes, for each member object, the outcome of the policy 
+						violation assessment and any results from the operation if applied.";;
+			ACTIONS
+				applyOperationToMembership;;;
+REGISTERED AS { MDMPMF.mdmpmfManagedObject 4 };
+
+
+domain MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2":top;
+	CHARACTERIZED BY
+		domainPackage PACKAGE
+			BEHAVIOUR
+				domainBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object allows specification of a set of members. This set is the union of 
+						this objects direct members and its indirect members. The set of indirect 
+						members is the union of the sets of members specified by the objects named in 
+						the indirect membership specifier list. The set of direct members is the 
+						intersection of the set of objects named in the member selection list with the 
+						set of objects for which the expression in the member selection filter evaluates 
+						to true. An empty member selection filter always evaluates to true; an empty 
+						member selection list is equivalent to specifying the set of all managed 
+						objects. If the member selection filter has a value which always evaluates to 
+						false, the set of direct members is empty.
+
+						The verify membership status action request is evaluated on a best-effort basis, 
+						returning a result indicating whether the object for which membership status was 
+						requested was a member, was not a member, or could not be determined.
+
+						The list membership action requests a best-effort determination of which object 
+						instances are members of this domain. The response contains the resulting list.
+
+						The list direct membership action requests a best effort determination of which 
+						object instances are direct members of this domain. The response contains the 
+						resulting list. An object creation notification is emitted when an instance of 
+						this class is created. An object deletion notification is emitted when an 
+						instance of this class is deleted. The administrative aspect pointer provides 
+						the name of any related object in the administrative aspect role.";;
+			ATTRIBUTES
+				domainId GET SET-BY-CREATE NO-MODIFY,
+				memberSelectionList GET ADD-REMOVE,
+				memberSelectionFilter GET-REPLACE,
+				indirectMembershipSpecifierList GET ADD-REMOVE,
+				administrativeAspectPointer GET-REPLACE;
+			ACTIONS
+				listDirectMembership,
+				listMembership,
+				verifyMembershipStatus;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion;;;
+REGISTERED AS { MDMPMF.mdmpmfManagedObject 5 };
+
+
+administrativeAspect MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2":top;
+	CHARACTERIZED BY
+		administrativeAspectPackage PACKAGE
+			BEHAVIOUR
+				administrativeAspectBehaviour BEHAVIOUR
+					DEFINED AS
+						"An instance of this class provides information describing administrative aspects 
+						of an object related to it.
+
+						The administrative authority attribute describes the administrative authority 
+						responsible for the related object.
+
+						The administrative contact information attribute describes the administrative 
+						contact associated with the related object.
+
+						The administrative owner attribute describes the owner of the related object. 
+						The administrative specifier attribute describes the specifier of the related 
+						object, and must be provided when an instance of this class is created.
+
+						The creation time attribute records the time at which this object was created.
+
+						The last update time attribute records the most recent time any of its 
+						administrative authority, administrative contact information, administrative 
+						owner, or version identifier attributes was modified. The initial value of the 
+						last update time attribute is the objects time of creation.
+
+						The version identifier attribute provides version identification information for 
+						this object instance.
+
+						The values of this objects attributes do not affect the operation of the related 
+						object whose administrative aspects it describes.
+
+						An object creation notification is emitted when an instance of this class is 
+						created. An object deletion notification is emitted when an instance of this 
+						class is deleted.";;
+			ATTRIBUTES
+				administrativeAspectId GET SET-BY-CREATE NO-MODIFY,
+				administrativeAuthority GET-REPLACE,
+				administrativeContactInformation GET-REPLACE,
+				administrativeOwner GET-REPLACE,
+				administrativeSpecifier GET SET-BY-CREATE,
+				creationTime GET NO-MODIFY,
+				lastUpdateTime GET NO-MODIFY,
+				versionIdentifier GET-REPLACE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion;;;
+REGISTERED AS { MDMPMF.mdmpmfManagedObject 6 };
+
+
+policyViolationLogRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2":eventLogRecord;
+	CHARACTERIZED BY
+		policyViolationLogRecordPackage PACKAGE
+			BEHAVIOUR
+				policyViolationLogRecordBehaviour BEHAVIOUR
+					DEFINED AS
+						"This log record records the receipt of a policy violation notification.";;
+			ATTRIBUTES
+				violatorName GET,
+				violatedPolicy GET;;;
+REGISTERED AS { MDMPMF.mdmpmfManagedObject 7 };
+
+
+valueAssertionPolicy MANAGED OBJECT CLASS
+	DERIVED FROM
+		policy;
+	CHARACTERIZED BY
+		valueAsertionPolicyPackage PACKAGE
+			BEHAVIOUR
+				valueAssertionPolicyBehaviour BEHAVIOUR
+					DEFINED AS
+						"This object class supports the ability to use value assertions specified like 
+						CMIS filters to determine the policy.
+
+						The value of the policy is encapsulated in the assertion attribute, and the 
+						semantics of specifying a policy in this mannner is described in the behaviour 
+						of the assertion attribute.";;
+			ATTRIBUTES
+				assertion GET-REPLACE;;;
+REGISTERED AS { MDMPMF.mdmpmfManagedObject 8 };
+-- A.4 Definition of relationship mappings
+-- This Recommendation | International Standard defines the following relationship mappings:
+
+
+jurisdictionRelationshipMapping RELATIONSHIP MAPPING
+	RELATIONSHIP CLASS
+		jurisdictionRelationship;
+	BEHAVIOUR
+		domainRelationshipMappingBehaviour BEHAVIOUR
+			DEFINED AS
+				"This is a mapping of the jurisdiction relationship class. A jurisdiction is a 
+				relationship object that binds a single policy and a single domain. The 
+				existence of the jurisdiction is directly related to the existence of the 
+				relationship object. The policy of the jurisdiction is set at creation time of 
+				the relationship object and cannot be modified during the lifetime of the 
+				relationship object. The domain is set at the creation time of the relationship 
+				object and cannot be modified during the lifetime of that object.";;
+	RELATIONSHIP OBJECT jurisdiction;
+	ROLE policyRole
+		RELATED-CLASSES policy
+		REPRESENTED-BY
+		RELATIONSHIP-OBJECT-USING-POINTER
+			policyPointer,
+	ROLE domainRole
+		RELATED-CLASSES domain
+		REPRESENTED-BY
+		RELATIONSHIP-OBJECT-USING-POINTER
+			domainPointer;
+	OPERATIONS MAPPING
+		ESTABLISH MAPS-TO-OPERATION
+			CREATE OF RELATIONSHIP OBJECT,
+		TERMINATE MAPS-TO-OPERATION
+			DELETE OF RELATIONSHIP OBJECT;
+REGISTERED AS { MDMPMF.mdmpmfRelationshipMapping 1 };
+
+
+administrativeAspectRelationshipMapping RELATIONSHIP MAPPING
+	RELATIONSHIP CLASS
+		administrativeAspectRelationship;
+	BEHAVIOUR
+		administrativeAspectRelationshipMappingBehaviour BEHAVIOUR
+			DEFINED AS
+				"This is a mapping of the administrative aspect relationship class. The 
+				relationship is represented by a relationship pointer, pointing from the 
+				administered object to the adminstrative aspect object. The administered object 
+				role is not represented by any relationship representation, so there are no 
+				means of inferring which administered objects are actually administered by the 
+				same administrative aspect object.";;
+	ROLE administrativeAspectRole
+		RELATED-CLASSES administrativeAspect
+		REPRESENTED-BY ATTRIBUTE administrativeAspectPointer,
+	ROLE administeredObjectRole
+		RELATED-CLASSES domain
+		jurisdiction
+		policy;-- correction
+	OPERATIONS MAPPING
+		ESTABLISH MAPS-TO-OPERATION
+			ADD administrativeAspectPointer OF administeredObjectRole,
+		TERMINATE MAPS-TO-OPERATION
+			REMOVE administrativeAspectPointer OF administeredObjectRole;
+REGISTERED AS { MDMPMF.mdmpmfRelationshipMapping 2 };
+-- A.5 Definition of attributes
+-- This Recommendation | International Standard defines the following attributes:
+
+
+administrativeAspectId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.SimpleNameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		administrativeAspectIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This is the distinguishing attribute of an administrative aspect object.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 1 };
+
+
+administrativeAspectPointer ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7:1996":participantPointer;
+	BEHAVIOUR
+		administrativeAspectPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the relationship between an object and its 
+				administrative aspects.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 2 };
+
+
+administrativeAuthority ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.InformationString;
+	BEHAVIOUR
+		administrativeAuthorityBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute provides a description of an administrative authority.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 3 };
+
+
+administrativeContactInformation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.InformationString;
+	BEHAVIOUR
+		administrativeContactInformationBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute provides contact information.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 4 };
+
+
+administrativeOwner ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.InformationString;
+	BEHAVIOUR
+		administrativeOwnerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute provides ownership information.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 5 };
+
+
+administrativeSpecifier ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.InformationString;
+	BEHAVIOUR
+		administrativeSpecifierBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute provides a description of an administrative specifier.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 6 };
+
+
+assertion ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.CMISFilter;
+	BEHAVIOUR
+		assertionBehaviour BEHAVIOUR
+			DEFINED AS
+				"An assertion is specified in accordance with the description in 8.2.8
+
+				Every assertion is a boolean expression which evaluates to true or false.
+
+				A value assertion is specified in terms of a pair consisting of an identifier 
+				identifying the information whose value is to be tested, followed by a value to 
+				be used in performing the test, in the same form as the attribute value 
+				assertions defined for use in a CMIS filter.
+
+				To specify identifiers of asserted values, the following object identifier 
+				values are allocated in Annex A:
+
+				 operationType;
+
+				 errorType;
+
+				 notificationType;
+
+				 actionType;
+
+				 eventInfo;
+
+				 eventReply;
+
+				 actionInfo;
+
+				 actionReply.
+
+				Attribute value assertions are specified in the usual form, applying both to 
+				attribute oriented operations and notifications (using the WITH ATTRIBUTE ID 
+				construct). Assertions on other items of information, contained in either event 
+				replies, action info, and action replies can be achieved if the information is 
+				properly registered by use of a PARAMETER template.
+
+				A policy is constructed from value assertions in the same way as filters are 
+				constructed from Attribute Value Assertions (AVA), using the and, the or, and 
+				the not operators to combine nested policies. See CCITT Rec. X.720 | ISO/IEC 
+				10165-1 (5.4) for details.
+
+				A policy violation occurs when the policy evaluates to false. No policy 
+				violation is possible for a policy containing zero rules.
+
+				An empty assertion always evaluates to true.
+
+				Any ordering in the actual evaluation of the filter items in the assertion (e.g. 
+				for optimization purposes) is an implementation issue.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 7 };
+
+
+creationTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.TimeStamp;
+	BEHAVIOUR
+		creationTimeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute records an object's time of creation. Its value is established 
+				when the object is created, and may not be modified.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 8 };
+
+
+domainId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.SimpleNameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		domainIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is the distinguishing attribute for a domain.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 9 };
+
+
+domainPointer ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7: 1996":participantPointer;
+	BEHAVIOUR
+		domainPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the relationship between a jurisdiction and its 
+				domain.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 10 };
+
+
+indirectMembershipSpecifierList ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.725 (1996) | ISO/IEC 10165-7: 1996":rolePointer;
+	BEHAVIOUR
+		indirectMembershipSpecifierListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute lists the names of objects whose membership is of interest.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 11 };
+
+
+jurisdictionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.SimpleNameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		jurisdictionIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This is the distinguishing attribute of a jurisdiction object.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 12 };
+
+
+lastUpdateTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.TimeStamp;
+	BEHAVIOUR
+		lastUpdateTimeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute records the time of the most recent modification of an object, 
+				where what constitutes a modification is recorded in the class definition. This 
+				attribute is always read-only.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 13 };
+
+
+memberSelectionFilter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.CMISFilter;
+	BEHAVIOUR
+		memberSelectionFilterBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents constraints on membership";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 14 };
+
+
+memberSelectionList ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7: 1996":rolePointer;
+	BEHAVIOUR
+		memberSelectionListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute names the members of a set of managed objects that are of 
+				potential interest.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 15 };
+
+
+policyId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.SimpleNameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		policyIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This is the distinguishing attribute of a policy.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 16 };
+
+
+policyPointer ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7: 1996":participantPointer;
+	BEHAVIOUR
+		policyPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the relationship between a jurisdiction and its 
+				policy.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 17 };
+
+
+versionIdentifier ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.InformationString;
+	BEHAVIOUR
+		versionIdentifierBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute describes the version of an object.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 18 };
+
+
+violatedPolicy ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		violatedPolicyBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies a policy which has been violated.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 19 };
+
+
+violatorName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MdmpmfASN1Module.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		violatorNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies an object which has violated a policy.";;
+REGISTERED AS { MDMPMF.mdmpmfAttribute 20 };
+-- A.6 Definition of notifications
+-- This Recommendation | International Standard defines the following notifications:
+
+
+policyViolation NOTIFICATION
+	BEHAVIOUR
+		policyViolationBehaviour BEHAVIOUR
+			DEFINED AS
+				"The policy violation notification is emitted when a policy violation has been 
+				detected. The violated policy component identifies the policy which has been 
+				violated; the violator name component identifies the object which violated the 
+				policy.";;
+	WITH INFORMATION SYNTAX MdmpmfASN1Module.PolicyViolation
+		AND ATTRIBUTE IDS
+			violatorName
+				violatorName,
+			violatedPolicy
+				violatedPolicy;
+REGISTERED AS { MDMPMF.mdmpmfNotification 1 };
+-- A.7 Definition of actions
+-- This Recommendation | International Standard defines the following actions:
+
+
+applyOperationToMembership ACTION
+	BEHAVIOUR
+		applyOperationToMembershipBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action is used to apply a specified operation on all the members of the 
+				domain participating in the domainRole role in the jurisdictionRelationship 
+				represented by the enhancedJurisdiction. The operation to be performed is 
+				specified in the request parameter, and can be either a get of attribute 
+				value(s), a set of attribute value(s) (replace, addValues, removeValues or 
+				setToDefault) or an action. The request parameter is structured to contain the 
+				relevant argument as carried in the CMIP protocol, GetArgument, SetArgument or 
+				ActionArgument.
+
+				The results of applying the operation to the membership of the domain are 
+				collected and reported in the reply. The applyOperationToMembership action is 
+				deemed to have failed only if performing of operations on the membership has not 
+				been attempted, i.e. the action will report success even if all the performed 
+				operations have failed.
+
+				The results of an attribute oriented applied operation are reported using one 
+				GetResult or SetResult alternative component of the OperationResult for each of 
+				the objects where the applied operation has succeeded, and one GetListError of 
+				SetListError alternative component for each object where the applied operation 
+				has (partially) failed.
+
+				The results of an action are reported using the ActionResult alternative 
+				component of the OperationResult, if the action succeeded. Actions that have 
+				failed (and failed attribute oriented operations that cannot be appropriately 
+				reported using GetListError or SetListError) are reported using the CommonError 
+				alternative component of the OperationResult. The result reported in the 
+				CommonError is either the appropriate CMIP error or any specific error defined 
+				as applicable to the operation and managed object in question.
+
+				If one or more managed objects do not respond to the operation applied within 
+				reasonable time, a timeout error as specified in the timeOutError parameter may 
+				be reported in the reply.";;
+	MODE CONFIRMED;
+	PARAMETERS
+		timeOutError;
+	WITH INFORMATION SYNTAX MdmpmfASN1Module.ApplyOperationToMembershipRequest;
+	WITH REPLY SYNTAX MdmpmfASN1Module.ApplyOperationToMembershipReply;
+REGISTERED AS { MDMPMF.mdmpmfAction 1 };
+
+
+determineViolationStatus ACTION
+	BEHAVIOUR
+		determineViolationStatusBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action is used to request an assessment of the violation status of the 
+				object whose name is provided as a parameter in the action request. The response 
+				contains the results of this assessment.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX MdmpmfASN1Module.DetermineViolationStatusRequest;
+	WITH REPLY SYNTAX MdmpmfASN1Module.DetermineViolationStatusReply;
+REGISTERED AS { MDMPMF.mdmpmfAction 2 };
+
+
+listDirectMembership ACTION
+	BEHAVIOUR
+		listDirectMembershipBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action is used to request a list of the direct members of a domain. All 
+				objects identified in the response must satisfy the criteria for direct 
+				membership in the domain.";;
+	MODE CONFIRMED;
+	WITH REPLY SYNTAX MdmpmfASN1Module.ListMembershipReply;
+REGISTERED AS { MDMPMF.mdmpmfAction 3 };
+
+
+listMembership ACTION
+	BEHAVIOUR
+		listMembershipBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action is used to request a list of the members of a domain. All objects 
+				identified in the membership parameter of the response must satisfy the domain 
+				membership criteria. The completeness parameter of the response identifies 
+				whether the list of members is known to be a complete list, is known to be an 
+				incomplete list, or if the completeness of the list is not known.";;
+	MODE CONFIRMED;
+	WITH REPLY SYNTAX MdmpmfASN1Module.ListMembershipReply;
+REGISTERED AS { MDMPMF.mdmpmfAction 4 };
+
+
+verifyMembershipStatus ACTION
+	BEHAVIOUR
+		verifyMembershipBehaviour BEHAVIOUR
+			DEFINED AS
+				"Requests a determination of the membership status of an object. The response 
+				indicates whether the object in question is a member, is not a member, or its 
+				status could not be determined.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX MdmpmfASN1Module.VerifyMembershipStatusRequest;
+	WITH REPLY SYNTAX MdmpmfASN1Module.VerifyMembershipStatusReply;
+REGISTERED AS { MDMPMF.mdmpmfAction 5 };
+-- A.8 Definition of Name Bindings
+-- This Recommendation | International Standard defines the following name bindings:
+
+
+domain-System NAME BINDING
+	SUBORDINATE OBJECT CLASS domain AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 | ISO/IEC 10165-2":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		domainId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MDMPMF.mdmpmfNameBinding 1 };
+
+
+policy-System NAME BINDING
+	SUBORDINATE OBJECT CLASS policy AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 | ISO/IEC 10165-2":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		policyId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MDMPMF.mdmpmfNameBinding 2 };
+
+
+jurisdiction-System NAME BINDING
+	SUBORDINATE OBJECT CLASS jurisdiction AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 | ISO/IEC 10165-2":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		jurisdictionId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MDMPMF.mdmpmfNameBinding 3 };
+
+
+administrativeAspect-System NAME BINDING
+	SUBORDINATE OBJECT CLASS administrativeAspect AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 | ISO/IEC 10165-2":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		administrativeAspectId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { MDMPMF.mdmpmfNameBinding 4 };
+-- A.9 Definition of parameters
+-- This Recommendation | International Standard defines the following parameters:
+
+
+timeoutError PARAMETER
+	CONTEXT MdmpmfASN1Module.CommonError.errorValue;
+	WITH SYNTAX MdmpmfASN1Module.Nothing;
+	BEHAVIOUR
+		timeoutErrorBehaviour BEHAVIOUR
+			DEFINED AS
+				"The timeOut parameter registers a value to be reported in the CommonError reply 
+				of the applyOperationToMembership, in cases where the reply to an operation does 
+				not arrive within reasonable time.
+
+				Establishing of appropriate time-out periods is done by the implementation and 
+				may be specified in the conformance claim associated with the timeOut parameter. 
+				Furthermore the enhancedJurisdiction class may be specialized to provide the 
+				ability to manage time-out periods.
+
+				The syntax of the parameter is a NULL, and only used to allow registration of 
+				the parameter. It shall not be transmitted in the CommonError";;
+REGISTERED AS { MDMPMF.mdmpmfParameter 1 };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.749 (1997) | ISO/IEC 10164-19 : 1997"
+--  { joint-iso-itu-t ms(9) function(2) part19(19) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@
+--@@ These modules reference PARAMETER objectCreation in module "CCITT Rec. X.721 | ISO/IEC 10165-2".
+--@@
+--@@ These modules define PARAMETER affectedObjectListParameter.
+--@@ These modules define PARAMETER alarmEffectOnServiceParameter.
+--@@ These modules define PARAMETER alarmingResumedParameter.
+--@@ These modules define PARAMETER associatedObjectNotAvailable.
+--@@ These modules define PARAMETER boundSubnetwork.
+--@@ These modules define PARAMETER cancelledAlarmSynchronizationParameter.
+--@@ These modules define PARAMETER channelsAlreadyProvisioned.
+--@@ These modules define PARAMETER circuitPackResetError.
+--@@ These modules define PARAMETER conflictingPackagesRequestedError.
+--@@ These modules define PARAMETER correlatedRecordNameActionParameter.
+--@@ These modules define PARAMETER correlatedRecordNameParameter.
+--@@ These modules define PARAMETER createErrorParameter.
+--@@ These modules define PARAMETER deniedMeteringAction.
+--@@ These modules define PARAMETER failureToAddLinkConnections.
+--@@ These modules define PARAMETER failureToAddNetworkCTPs.
+--@@ These modules define PARAMETER failureToAssociateLCs.
+--@@ These modules define PARAMETER failureToAssociateNetworkTTP.
+--@@ These modules define PARAMETER failureToBindLink.
+--@@ These modules define PARAMETER failureToBindLinkEnd.
+--@@ These modules define PARAMETER failureToBindTopologicalLink.
+--@@ These modules define PARAMETER failureToCreateAccessGroup.
+--@@ These modules define PARAMETER failureToCreateLCs.
+--@@ These modules define PARAMETER failureToCreateLink.
+--@@ These modules define PARAMETER failureToCreateLinkEnd.
+--@@ These modules define PARAMETER failureToCreateNetworkTTP.
+--@@ These modules define PARAMETER failureToCreateSubnetwork.
+--@@ These modules define PARAMETER failureToDeassignLinkConnection.
+--@@ These modules define PARAMETER failureToDeassignNetworkCTP.
+--@@ These modules define PARAMETER failureToDecreaseCapacity.
+--@@ These modules define PARAMETER failureToDisassociateNetworkTTP.
+--@@ These modules define PARAMETER failureToIncreaseCapacity.
+--@@ These modules define PARAMETER failureToRemoveAccessGroup.
+--@@ These modules define PARAMETER failureToRemoveLC.
+--@@ These modules define PARAMETER failureToRemoveNetworkCTPs.
+--@@ These modules define PARAMETER failureToRemoveNetworkTTP.
+--@@ These modules define PARAMETER failureToRemoveSubnetwork.
+--@@ These modules define PARAMETER failureToSetDirectionality.
+--@@ These modules define PARAMETER failureToSetLinkConnectionCallerId.
+--@@ These modules define PARAMETER failureToSetNetworkCTPCallerId.
+--@@ These modules define PARAMETER failureToSetUserIdentifier.
+--@@ These modules define PARAMETER failureToSupportLCs.
+--@@ These modules define PARAMETER generalErrorParameter.
+--@@ These modules define PARAMETER inconsistentDirectionality.
+--@@ These modules define PARAMETER inconsistentSignalIdentification.
+--@@ These modules define PARAMETER independentTestInvocationError.
+--@@ These modules define PARAMETER insufficientCapacity.
+--@@ These modules define PARAMETER invalidBaseManagedObjectErrorParameter.
+--@@ These modules define PARAMETER invalidChannelsNumber.
+--@@ These modules define PARAMETER invalidLinkConnection.
+--@@ These modules define PARAMETER invalidNetworkCTP.
+--@@ These modules define PARAMETER invalidObjectInstanceErrorParameter.
+--@@ These modules define PARAMETER invalidServiceCharacteristicsRequested.
+--@@ These modules define PARAMETER invalidTPType.
+--@@ These modules define PARAMETER invalidTestOperation.
+--@@ These modules define PARAMETER invalidTrafficDescriptorRequested.
+--@@ These modules define PARAMETER invokeProtectionError.
+--@@ These modules define PARAMETER linkAndLinkConnectionNotCompatible.
+--@@ These modules define PARAMETER linkConnectionAlreadyAssigned.
+--@@ These modules define PARAMETER linkEndAndNetworkCTPNotCompatible.
+--@@ These modules define PARAMETER logRecordIdActionParameter.
+--@@ These modules define PARAMETER logRecordIdParameter.
+--@@ These modules define PARAMETER mORTNotAvailable.
+--@@ These modules define PARAMETER miscellaneousError.
+--@@ These modules define PARAMETER mistypedTestCategoryInformation.
+--@@ These modules define PARAMETER networkCTPAlreadyAssigned.
+--@@ These modules define PARAMETER networkTTPAndAccessGroupNotCompatible.
+--@@ These modules define PARAMETER networkTTPAndSubnetworkNotCompatible.
+--@@ These modules define PARAMETER networkTTPAssociatedWithAccessGroup.
+--@@ These modules define PARAMETER networkTTPAssociatedWithSubnetwork.
+--@@ These modules define PARAMETER networkTTPTerminatesTrail.
+--@@ These modules define PARAMETER networkTTPsExisting.
+--@@ These modules define PARAMETER newServiceCharacteristicsExistsAlready.
+--@@ These modules define PARAMETER newTrafficDescriptorExistsAlready.
+--@@ These modules define PARAMETER noLinkCapacity.
+--@@ These modules define PARAMETER noLinkEndCapacity.
+--@@ These modules define PARAMETER noSuchAssociatedObject.
+--@@ These modules define PARAMETER noSuchInvokeIdErrorParameter.
+--@@ These modules define PARAMETER noSuchLink.
+--@@ These modules define PARAMETER noSuchLinkEnd.
+--@@ These modules define PARAMETER noSuchMORT.
+--@@ These modules define PARAMETER noSuchObject.
+--@@ These modules define PARAMETER noSuchTestInvocationId.
+--@@ These modules define PARAMETER noSuchTestSessionId.
+--@@ These modules define PARAMETER notAssignedToCaller.
+--@@ These modules define PARAMETER notEnoughLinkConnections.
+--@@ These modules define PARAMETER notEnoughNetworkCTPs.
+--@@ These modules define PARAMETER notSupportedProbableCause.
+--@@ These modules define PARAMETER protectionStatusParameter.
+--@@ These modules define PARAMETER protectionStatusParameterR1.
+--@@ These modules define PARAMETER relatedTOError.
+--@@ These modules define PARAMETER relationshipCardinalityViolation.
+--@@ These modules define PARAMETER releaseProtectionError.
+--@@ These modules define PARAMETER roleCardinalityViolation.
+--@@ These modules define PARAMETER roleInstanceConflict.
+--@@ These modules define PARAMETER scanActionError.
+--@@ These modules define PARAMETER serviceAffectedErrorParameter.
+--@@ These modules define PARAMETER subnetworkInUse.
+--@@ These modules define PARAMETER suspectObjectListActionParameter.
+--@@ These modules define PARAMETER suspectObjectListParameter.
+--@@ These modules define PARAMETER switchStatusParameter.
+--@@ These modules define PARAMETER testSuspendResumeError.
+--@@ These modules define PARAMETER testTerminateError.
+--@@ These modules define PARAMETER timeoutError.
+--@@
+--@@ These modules reference ATTRIBUTE rolePointer in module "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7: 1996".
+--@@ These modules reference ATTRIBUTE rolePointer in module "ITU-T Rec. X.725 (1996) | ISO/IEC 10165-7: 1996".
+--@@
+--@@ These modules define ATTRIBUTE a-TPInstance.
+--@@ These modules define ATTRIBUTE aEnd.
+--@@ These modules define ATTRIBUTE aEndNetworkTPList.
+--@@ These modules define ATTRIBUTE acceptableCircuitPackTypeList.
+--@@ These modules define ATTRIBUTE accessGroupId.
+--@@ These modules define ATTRIBUTE accessPointList.
+--@@ These modules define ATTRIBUTE accountableObjectReference.
+--@@ These modules define ATTRIBUTE accountableObjectsReferenceList.
+--@@ These modules define ATTRIBUTE actionResponse.
+--@@ These modules define ATTRIBUTE activeDestination.
+--@@ These modules define ATTRIBUTE actualStartTime.
+--@@ These modules define ATTRIBUTE actualStopTime.
+--@@ These modules define ATTRIBUTE additionalInformation.
+--@@ These modules define ATTRIBUTE additionalText.
+--@@ These modules define ATTRIBUTE administrativeAspectId.
+--@@ These modules define ATTRIBUTE administrativeAspectPointer.
+--@@ These modules define ATTRIBUTE administrativeAuthority.
+--@@ These modules define ATTRIBUTE administrativeContactInformation.
+--@@ These modules define ATTRIBUTE administrativeOwner.
+--@@ These modules define ATTRIBUTE administrativeSpecifier.
+--@@ These modules define ATTRIBUTE administrativeState.
+--@@ These modules define ATTRIBUTE affectedObjectClass.
+--@@ These modules define ATTRIBUTE affectedObjectInstances.
+--@@ These modules define ATTRIBUTE affectedObjectList.
+--@@ These modules define ATTRIBUTE alarmReportingControlList.
+--@@ These modules define ATTRIBUTE alarmReportingControlManagerId.
+--@@ These modules define ATTRIBUTE alarmSeverityAssignmentList.
+--@@ These modules define ATTRIBUTE alarmSeverityAssignmentProfileId.
+--@@ These modules define ATTRIBUTE alarmSeverityAssignmentProfilePointer.
+--@@ These modules define ATTRIBUTE alarmStatus.
+--@@ These modules define ATTRIBUTE alarmStatusList.
+--@@ These modules define ATTRIBUTE algorithmIdentifier.
+--@@ These modules define ATTRIBUTE algorithmOutputs.
+--@@ These modules define ATTRIBUTE algorithmParameters.
+--@@ These modules define ATTRIBUTE allomorphs.
+--@@ These modules define ATTRIBUTE applicationProcessId.
+--@@ These modules define ATTRIBUTE applicationProcessTitle.
+--@@ These modules define ATTRIBUTE arcDefaultNALMCDInterval.
+--@@ These modules define ATTRIBUTE arcDefaultNALMTIInterval.
+--@@ These modules define ATTRIBUTE arcIntervalProfileId.
+--@@ These modules define ATTRIBUTE arcIntervalProfilePointer.
+--@@ These modules define ATTRIBUTE arcManagementRequestedInterval.
+--@@ These modules define ATTRIBUTE arcProbableCauseList.
+--@@ These modules define ATTRIBUTE arcQIStatus.
+--@@ These modules define ATTRIBUTE arcState.
+--@@ These modules define ATTRIBUTE arcTimeRemaining.
+--@@ These modules define ATTRIBUTE assertion.
+--@@ These modules define ATTRIBUTE assignedLinkEndCapacity.
+--@@ These modules define ATTRIBUTE associatedObjects.
+--@@ These modules define ATTRIBUTE attributeIdentifierList.
+--@@ These modules define ATTRIBUTE attributeList.
+--@@ These modules define ATTRIBUTE attributeRangesId.
+--@@ These modules define ATTRIBUTE attributeValueChangeDefinition.
+--@@ These modules define ATTRIBUTE au3CTPId.
+--@@ These modules define ATTRIBUTE au4CTPId.
+--@@ These modules define ATTRIBUTE auditInfo.
+--@@ These modules define ATTRIBUTE augId.
+--@@ These modules define ATTRIBUTE availabilityStatus.
+--@@ These modules define ATTRIBUTE availableLinkCapacity.
+--@@ These modules define ATTRIBUTE availableLinkEndCapacity.
+--@@ These modules define ATTRIBUTE availableSignalRateList.
+--@@ These modules define ATTRIBUTE bBE.
+--@@ These modules define ATTRIBUTE backUpDestinationList.
+--@@ These modules define ATTRIBUTE backUpObject.
+--@@ These modules define ATTRIBUTE backedUpObject.
+--@@ These modules define ATTRIBUTE backedUpStatus.
+--@@ These modules define ATTRIBUTE baseManagedObject.
+--@@ These modules define ATTRIBUTE beginTime.
+--@@ These modules define ATTRIBUTE beginTimeOffset.
+--@@ These modules define ATTRIBUTE bufferedObservationIdList.
+--@@ These modules define ATTRIBUTE bufferedObservationList.
+--@@ These modules define ATTRIBUTE c2SignalLabelExpected.
+--@@ These modules define ATTRIBUTE c2SignalLabelReceive.
+--@@ These modules define ATTRIBUTE c2SignalLabelSend.
+--@@ These modules define ATTRIBUTE cSESEvent.
+--@@ These modules define ATTRIBUTE cTPId.
+--@@ These modules define ATTRIBUTE capacityAlarmThreshold.
+--@@ These modules define ATTRIBUTE channelNumber.
+--@@ These modules define ATTRIBUTE characteristicInformation.
+--@@ These modules define ATTRIBUTE circuitDirectionality.
+--@@ These modules define ATTRIBUTE circuitEndPointSubgroupId.
+--@@ These modules define ATTRIBUTE circuitPackType.
+--@@ These modules define ATTRIBUTE clProtocolMachineId.
+--@@ These modules define ATTRIBUTE clientCTPList.
+--@@ These modules define ATTRIBUTE clientConnectionList.
+--@@ These modules define ATTRIBUTE clientLinkConnectionPointerList.
+--@@ These modules define ATTRIBUTE clientLinkEndPointerList.
+--@@ These modules define ATTRIBUTE clientLinkPointerList.
+--@@ These modules define ATTRIBUTE clientTrail.
+--@@ These modules define ATTRIBUTE coProtocolMachineId.
+--@@ These modules define ATTRIBUTE communicationsEntityId.
+--@@ These modules define ATTRIBUTE componentPointers.
+--@@ These modules define ATTRIBUTE compositePointer.
+--@@ These modules define ATTRIBUTE configurablePCT.
+--@@ These modules define ATTRIBUTE configuredConnectivity.
+--@@ These modules define ATTRIBUTE confirmedMode.
+--@@ These modules define ATTRIBUTE connectedTpCount.
+--@@ These modules define ATTRIBUTE connectionId.
+--@@ These modules define ATTRIBUTE connectionList.
+--@@ These modules define ATTRIBUTE connectivityPointer.
+--@@ These modules define ATTRIBUTE connectorType.
+--@@ These modules define ATTRIBUTE containedAccessGroupList.
+--@@ These modules define ATTRIBUTE containedInSubNetworkList.
+--@@ These modules define ATTRIBUTE containedLinkEndList.
+--@@ These modules define ATTRIBUTE containedLinkList.
+--@@ These modules define ATTRIBUTE containedNetworkTPList.
+--@@ These modules define ATTRIBUTE containedSubNetworkList.
+--@@ These modules define ATTRIBUTE controlObjectId.
+--@@ These modules define ATTRIBUTE controlStatus.
+--@@ These modules define ATTRIBUTE correlatedNotifications.
+--@@ These modules define ATTRIBUTE corruptedPDUsReceivedCounter.
+--@@ These modules define ATTRIBUTE corruptedPDUsReceivedThreshold.
+--@@ These modules define ATTRIBUTE counter.
+--@@ These modules define ATTRIBUTE counter-Threshold.
+--@@ These modules define ATTRIBUTE counterThresholdAttributeList.
+--@@ These modules define ATTRIBUTE creationTime.
+--@@ These modules define ATTRIBUTE crossConnectionId.
+--@@ These modules define ATTRIBUTE crossConnectionName.
+--@@ These modules define ATTRIBUTE crossConnectionObjectPointer.
+--@@ These modules define ATTRIBUTE currentAlarmSummaryControlId.
+--@@ These modules define ATTRIBUTE currentControlState.
+--@@ These modules define ATTRIBUTE currentLogSize.
+--@@ These modules define ATTRIBUTE currentProblemList.
+--@@ These modules define ATTRIBUTE currentTypeOfDay.
+--@@ These modules define ATTRIBUTE dataErrors.
+--@@ These modules define ATTRIBUTE dataObjectId.
+--@@ These modules define ATTRIBUTE dataObjectsReferenceList.
+--@@ These modules define ATTRIBUTE dateTranslationList.
+--@@ These modules define ATTRIBUTE defaultIndex.
+--@@ These modules define ATTRIBUTE derivedGauge.
+--@@ These modules define ATTRIBUTE derivedGaugeTimeStamp.
+--@@ These modules define ATTRIBUTE destination.
+--@@ These modules define ATTRIBUTE destinationAddress.
+--@@ These modules define ATTRIBUTE directionality.
+--@@ These modules define ATTRIBUTE discriminatorConstruct.
+--@@ These modules define ATTRIBUTE discriminatorId.
+--@@ These modules define ATTRIBUTE domainId.
+--@@ These modules define ATTRIBUTE domainPointer.
+--@@ These modules define ATTRIBUTE downstreamConnectivityPointer.
+--@@ These modules define ATTRIBUTE eS.
+--@@ These modules define ATTRIBUTE elapsedTime.
+--@@ These modules define ATTRIBUTE electricalSPITTPId.
+--@@ These modules define ATTRIBUTE endTime.
+--@@ These modules define ATTRIBUTE endTimeOffset.
+--@@ These modules define ATTRIBUTE enhancedCurrentAlarmSummaryControlId.
+--@@ These modules define ATTRIBUTE equipmentHolderAddress.
+--@@ These modules define ATTRIBUTE equipmentHolderType.
+--@@ These modules define ATTRIBUTE equipmentId.
+--@@ These modules define ATTRIBUTE estimateOf100-PCTPercentile.
+--@@ These modules define ATTRIBUTE estimateOfLargest.
+--@@ These modules define ATTRIBUTE estimateOfLargestInReplication.
+--@@ These modules define ATTRIBUTE estimateOfMean.
+--@@ These modules define ATTRIBUTE estimateOfMeanSeverityIndicatingGaugeThreshold.
+--@@ These modules define ATTRIBUTE estimateOfMedian.
+--@@ These modules define ATTRIBUTE estimateOfPCTPercentile.
+--@@ These modules define ATTRIBUTE estimateOfSmallest.
+--@@ These modules define ATTRIBUTE estimateOfSmallestInReplication.
+--@@ These modules define ATTRIBUTE estimateOfVariance.
+--@@ These modules define ATTRIBUTE eventTime.
+--@@ These modules define ATTRIBUTE eventType.
+--@@ These modules define ATTRIBUTE excessiveBERMtceInhibit.
+--@@ These modules define ATTRIBUTE externalPointId.
+--@@ These modules define ATTRIBUTE externalPointMessage.
+--@@ These modules define ATTRIBUTE externalSchedulerName.
+--@@ These modules define ATTRIBUTE externalTime.
+--@@ These modules define ATTRIBUTE fEBBE.
+--@@ These modules define ATTRIBUTE fECSESEvent.
+--@@ These modules define ATTRIBUTE fEES.
+--@@ These modules define ATTRIBUTE fESES.
+--@@ These modules define ATTRIBUTE fabricId.
+--@@ These modules define ATTRIBUTE firstScanInitiationTime.
+--@@ These modules define ATTRIBUTE fromTermination.
+--@@ These modules define ATTRIBUTE gauge.
+--@@ These modules define ATTRIBUTE gauge-Threshold.
+--@@ These modules define ATTRIBUTE gaugeThresholdAttributeList.
+--@@ These modules define ATTRIBUTE generatorEnabled.
+--@@ These modules define ATTRIBUTE genericNonWrappingCounter.
+--@@ These modules define ATTRIBUTE genericWrappingCounter.
+--@@ These modules define ATTRIBUTE granularityPeriod.
+--@@ These modules define ATTRIBUTE gtpId.
+--@@ These modules define ATTRIBUTE historyDataId.
+--@@ These modules define ATTRIBUTE historyRetention.
+--@@ These modules define ATTRIBUTE holdOffTime.
+--@@ These modules define ATTRIBUTE holderStatus.
+--@@ These modules define ATTRIBUTE idleTpCount.
+--@@ These modules define ATTRIBUTE incomingConnectionRejectErrorCounter.
+--@@ These modules define ATTRIBUTE incomingConnectionRejectErrorThreshold.
+--@@ These modules define ATTRIBUTE incomingConnectionRequestsCounter.
+--@@ These modules define ATTRIBUTE incomingConnectionRequestsThreshold.
+--@@ These modules define ATTRIBUTE incomingDisconnectCounter.
+--@@ These modules define ATTRIBUTE incomingDisconnectErrorCounter.
+--@@ These modules define ATTRIBUTE incomingDisconnectErrorThreshold.
+--@@ These modules define ATTRIBUTE incomingProtocolErrorCounter.
+--@@ These modules define ATTRIBUTE incomingProtocolErrorThreshold.
+--@@ These modules define ATTRIBUTE incompleteScan.
+--@@ These modules define ATTRIBUTE indirectMembershipSpecifierList.
+--@@ These modules define ATTRIBUTE informationData.
+--@@ These modules define ATTRIBUTE informationTransferCapabilities.
+--@@ These modules define ATTRIBUTE informationType.
+--@@ These modules define ATTRIBUTE initializingTime.
+--@@ These modules define ATTRIBUTE interval.
+--@@ These modules define ATTRIBUTE intervalsOfDay.
+--@@ These modules define ATTRIBUTE j1PathTraceExpected.
+--@@ These modules define ATTRIBUTE j1PathTraceReceive.
+--@@ These modules define ATTRIBUTE j1PathTraceSend.
+--@@ These modules define ATTRIBUTE j2PathTraceExpected.
+--@@ These modules define ATTRIBUTE j2PathTraceReceive.
+--@@ These modules define ATTRIBUTE j2PathTraceSend.
+--@@ These modules define ATTRIBUTE jurisdictionId.
+--@@ These modules define ATTRIBUTE kind.
+--@@ These modules define ATTRIBUTE labelOfFarEndExchange.
+--@@ These modules define ATTRIBUTE lastAttemptResult.
+--@@ These modules define ATTRIBUTE lastUpdateTime.
+--@@ These modules define ATTRIBUTE layerNetworkDomainId.
+--@@ These modules define ATTRIBUTE linkConnectionPointerList.
+--@@ These modules define ATTRIBUTE linkDirectionality.
+--@@ These modules define ATTRIBUTE linkEndId.
+--@@ These modules define ATTRIBUTE linkId.
+--@@ These modules define ATTRIBUTE linkPointer.
+--@@ These modules define ATTRIBUTE linkPointerList.
+--@@ These modules define ATTRIBUTE listOfCharacteristicInfo.
+--@@ These modules define ATTRIBUTE localSapNames.
+--@@ These modules define ATTRIBUTE locationName.
+--@@ These modules define ATTRIBUTE lockedInCondition.
+--@@ These modules define ATTRIBUTE logFullAction.
+--@@ These modules define ATTRIBUTE logId.
+--@@ These modules define ATTRIBUTE logRecordId.
+--@@ These modules define ATTRIBUTE loggingTime.
+--@@ These modules define ATTRIBUTE logicalEndDirectionality.
+--@@ These modules define ATTRIBUTE mORTs.
+--@@ These modules define ATTRIBUTE managedElementComplexId.
+--@@ These modules define ATTRIBUTE managedElementId.
+--@@ These modules define ATTRIBUTE managedElementType.
+--@@ These modules define ATTRIBUTE managedObjectClass.
+--@@ These modules define ATTRIBUTE managedObjectInstance.
+--@@ These modules define ATTRIBUTE maxLogSize.
+--@@ These modules define ATTRIBUTE maxSuppressedIntervals.
+--@@ These modules define ATTRIBUTE maximumLinkConnectionCount.
+--@@ These modules define ATTRIBUTE maximumNetworkCTPCount.
+--@@ These modules define ATTRIBUTE measurementList.
+--@@ These modules define ATTRIBUTE member.
+--@@ These modules define ATTRIBUTE memberSelectionFilter.
+--@@ These modules define ATTRIBUTE memberSelectionList.
+--@@ These modules define ATTRIBUTE modelCode.
+--@@ These modules define ATTRIBUTE modulusValue.
+--@@ These modules define ATTRIBUTE monitorActive.
+--@@ These modules define ATTRIBUTE monitoredAttributes.
+--@@ These modules define ATTRIBUTE monitoredEntityTypes.
+--@@ These modules define ATTRIBUTE movingTimePeriod.
+--@@ These modules define ATTRIBUTE mpCrossConnectionId.
+--@@ These modules define ATTRIBUTE msCTPId.
+--@@ These modules define ATTRIBUTE msDatacomCTPId.
+--@@ These modules define ATTRIBUTE msOrderwireCTPId.
+--@@ These modules define ATTRIBUTE msTTPId.
+--@@ These modules define ATTRIBUTE nCSES.
+--@@ These modules define ATTRIBUTE nameBinding.
+--@@ These modules define ATTRIBUTE neAliases.
+--@@ These modules define ATTRIBUTE neAssignmentPointer.
+--@@ These modules define ATTRIBUTE networkCTPsInLinkEndList.
+--@@ These modules define ATTRIBUTE networkId.
+--@@ These modules define ATTRIBUTE networkLevelPointer.
+--@@ These modules define ATTRIBUTE networkTPPointer.
+--@@ These modules define ATTRIBUTE nonWrapping64BitCounter.
+--@@ These modules define ATTRIBUTE normalControlState.
+--@@ These modules define ATTRIBUTE notificationCause.
+--@@ These modules define ATTRIBUTE notificationIdentifier.
+--@@ These modules define ATTRIBUTE notifiedProtectionUnit.
+--@@ These modules define ATTRIBUTE numSuppressedIntervals.
+--@@ These modules define ATTRIBUTE numberOfCircuits.
+--@@ These modules define ATTRIBUTE numberOfPorts.
+--@@ These modules define ATTRIBUTE numberOfRecords.
+--@@ These modules define ATTRIBUTE numberOfReplications.
+--@@ These modules define ATTRIBUTE numericAttributeIdArray.
+--@@ These modules define ATTRIBUTE numericAttributeIdList.
+--@@ These modules define ATTRIBUTE objectClass.
+--@@ These modules define ATTRIBUTE objectList.
+--@@ These modules define ATTRIBUTE observationIdList.
+--@@ These modules define ATTRIBUTE observationReportList.
+--@@ These modules define ATTRIBUTE observationScanList.
+--@@ These modules define ATTRIBUTE observedAttributeId.
+--@@ These modules define ATTRIBUTE observedObjectClass.
+--@@ These modules define ATTRIBUTE observedObjectInstance.
+--@@ These modules define ATTRIBUTE octetsReceivedCounter.
+--@@ These modules define ATTRIBUTE octetsReceivedThreshold.
+--@@ These modules define ATTRIBUTE octetsRetransmittedErrorCounter.
+--@@ These modules define ATTRIBUTE octetsRetransmittedThreshold.
+--@@ These modules define ATTRIBUTE octetsSentCounter.
+--@@ These modules define ATTRIBUTE octetsSentThreshold.
+--@@ These modules define ATTRIBUTE onDuty.
+--@@ These modules define ATTRIBUTE onceReportAttributeIdList.
+--@@ These modules define ATTRIBUTE onceReportAttributeList.
+--@@ These modules define ATTRIBUTE operationResult.
+--@@ These modules define ATTRIBUTE operationSpecifications.
+--@@ These modules define ATTRIBUTE operationalState.
+--@@ These modules define ATTRIBUTE opticalReach.
+--@@ These modules define ATTRIBUTE opticalSPITTPId.
+--@@ These modules define ATTRIBUTE opticalWavelength.
+--@@ These modules define ATTRIBUTE outgoingConnectionRejectErrorCounter.
+--@@ These modules define ATTRIBUTE outgoingConnectionRejectErrorThreshold.
+--@@ These modules define ATTRIBUTE outgoingConnectionRequestsCounter.
+--@@ These modules define ATTRIBUTE outgoingConnectionRequestsThreshold.
+--@@ These modules define ATTRIBUTE outgoingDisconnectCounter.
+--@@ These modules define ATTRIBUTE outgoingDisconnectErrorCounter.
+--@@ These modules define ATTRIBUTE outgoingDisconnectErrorThreshold.
+--@@ These modules define ATTRIBUTE outgoingProtocolErrorCounter.
+--@@ These modules define ATTRIBUTE outgoingProtocolErrorThreshold.
+--@@ These modules define ATTRIBUTE owner.
+--@@ These modules define ATTRIBUTE packages.
+--@@ These modules define ATTRIBUTE participantPointer.
+--@@ These modules define ATTRIBUTE pdusReceivedCounter.
+--@@ These modules define ATTRIBUTE pdusReceivedThreshold.
+--@@ These modules define ATTRIBUTE pdusRetransmittedErrorCounter.
+--@@ These modules define ATTRIBUTE pdusRetransmittedErrorThreshold.
+--@@ These modules define ATTRIBUTE pdusSentCounter.
+--@@ These modules define ATTRIBUTE pdusSentThreshold.
+--@@ These modules define ATTRIBUTE peer.
+--@@ These modules define ATTRIBUTE perceivedSeverity.
+--@@ These modules define ATTRIBUTE perceivedSeverityList.
+--@@ These modules define ATTRIBUTE periodEndTime.
+--@@ These modules define ATTRIBUTE periodSynchronizationTime.
+--@@ These modules define ATTRIBUTE physicalPortAttribute.
+--@@ These modules define ATTRIBUTE physicalPortId.
+--@@ These modules define ATTRIBUTE physicalPortSignalRateAndMappingList.
+--@@ These modules define ATTRIBUTE pointDirectionality.
+--@@ These modules define ATTRIBUTE pointerSinkType.
+--@@ These modules define ATTRIBUTE pointerSourceType.
+--@@ These modules define ATTRIBUTE policyId.
+--@@ These modules define ATTRIBUTE policyPointer.
+--@@ These modules define ATTRIBUTE portAssociations.
+--@@ These modules define ATTRIBUTE portSignalRateAndMappingList.
+--@@ These modules define ATTRIBUTE potentialCapacity.
+--@@ These modules define ATTRIBUTE potentialLinkCapacity.
+--@@ These modules define ATTRIBUTE potentialLinkEndCapacity.
+--@@ These modules define ATTRIBUTE previousScanCounterValue.
+--@@ These modules define ATTRIBUTE previousScanGaugeValue.
+--@@ These modules define ATTRIBUTE primary.
+--@@ These modules define ATTRIBUTE priority.
+--@@ These modules define ATTRIBUTE probableCause.
+--@@ These modules define ATTRIBUTE probableCauseList.
+--@@ These modules define ATTRIBUTE proceduralStatus.
+--@@ These modules define ATTRIBUTE proposedRepairActions.
+--@@ These modules define ATTRIBUTE protected.
+--@@ These modules define ATTRIBUTE protectedTTPId.
+--@@ These modules define ATTRIBUTE protecting.
+--@@ These modules define ATTRIBUTE protectionCriteria.
+--@@ These modules define ATTRIBUTE protectionGroupId.
+--@@ These modules define ATTRIBUTE protectionGroupType.
+--@@ These modules define ATTRIBUTE protectionMismatchStatus.
+--@@ These modules define ATTRIBUTE protectionStatus.
+--@@ These modules define ATTRIBUTE protectionStatusR1.
+--@@ These modules define ATTRIBUTE protectionSwitchMode.
+--@@ These modules define ATTRIBUTE protectionUnitId.
+--@@ These modules define ATTRIBUTE providerEntityNames.
+--@@ These modules define ATTRIBUTE providerId.
+--@@ These modules define ATTRIBUTE providerObject.
+--@@ These modules define ATTRIBUTE provisionedLinkCapacity.
+--@@ These modules define ATTRIBUTE provisionedLinkConnectionCount.
+--@@ These modules define ATTRIBUTE provisionedLinkEndCapacity.
+--@@ These modules define ATTRIBUTE provisionedNetworkCTPCount.
+--@@ These modules define ATTRIBUTE qualityOfConnectivityService.
+--@@ These modules define ATTRIBUTE ranges.
+--@@ These modules define ATTRIBUTE reach.
+--@@ These modules define ATTRIBUTE redline.
+--@@ These modules define ATTRIBUTE relatedRoutingProfile.
+--@@ These modules define ATTRIBUTE relationshipChangeDefinition.
+--@@ These modules define ATTRIBUTE relationshipClass.
+--@@ These modules define ATTRIBUTE relationshipMapping.
+--@@ These modules define ATTRIBUTE relationshipName.
+--@@ These modules define ATTRIBUTE reliableResourcePointer.
+--@@ These modules define ATTRIBUTE reliableResourcePointerR1.
+--@@ These modules define ATTRIBUTE replaceable.
+--@@ These modules define ATTRIBUTE reportAllAttributes.
+--@@ These modules define ATTRIBUTE reportPeriod.
+--@@ These modules define ATTRIBUTE reportedProtectionUnit.
+--@@ These modules define ATTRIBUTE reportingTriggers.
+--@@ These modules define ATTRIBUTE resynchronizeMode.
+--@@ These modules define ATTRIBUTE revertive.
+--@@ These modules define ATTRIBUTE rsCTPId.
+--@@ These modules define ATTRIBUTE rsDatacomCTPId.
+--@@ These modules define ATTRIBUTE rsOrderwireCTPId.
+--@@ These modules define ATTRIBUTE rsTTPId.
+--@@ These modules define ATTRIBUTE rsUserChannelCTPId.
+--@@ These modules define ATTRIBUTE sES.
+--@@ These modules define ATTRIBUTE sap1Address.
+--@@ These modules define ATTRIBUTE sap2Address.
+--@@ These modules define ATTRIBUTE sapId.
+--@@ These modules define ATTRIBUTE scanAttributeIdList.
+--@@ These modules define ATTRIBUTE scanInitiationTime.
+--@@ These modules define ATTRIBUTE scannerId.
+--@@ These modules define ATTRIBUTE scanningFilter.
+--@@ These modules define ATTRIBUTE scheduleId.
+--@@ These modules define ATTRIBUTE scheduledManagedObjects.
+--@@ These modules define ATTRIBUTE schedulerID.
+--@@ These modules define ATTRIBUTE schedulerName.
+--@@ These modules define ATTRIBUTE schedulingData.
+--@@ These modules define ATTRIBUTE scope.
+--@@ These modules define ATTRIBUTE sdhPriority.
+--@@ These modules define ATTRIBUTE secondMovingTimePeriod.
+--@@ These modules define ATTRIBUTE secondary.
+--@@ These modules define ATTRIBUTE securityAlarmCause.
+--@@ These modules define ATTRIBUTE securityAlarmDetector.
+--@@ These modules define ATTRIBUTE securityAlarmSeverity.
+--@@ These modules define ATTRIBUTE sequenceOfDays.
+--@@ These modules define ATTRIBUTE sequenceOfMonths.
+--@@ These modules define ATTRIBUTE sequenceOfWeeks.
+--@@ These modules define ATTRIBUTE serialNumber.
+--@@ These modules define ATTRIBUTE serverConnectionList.
+--@@ These modules define ATTRIBUTE serverTTPPointer.
+--@@ These modules define ATTRIBUTE serverTrail.
+--@@ These modules define ATTRIBUTE serverTrailList.
+--@@ These modules define ATTRIBUTE serviceAffected.
+--@@ These modules define ATTRIBUTE serviceProvider.
+--@@ These modules define ATTRIBUTE serviceUser.
+--@@ These modules define ATTRIBUTE severityIndicatingGaugeThreshold.
+--@@ These modules define ATTRIBUTE signalDegradeThreshold.
+--@@ These modules define ATTRIBUTE signalId.
+--@@ These modules define ATTRIBUTE signalType.
+--@@ These modules define ATTRIBUTE signallingCapabilities.
+--@@ These modules define ATTRIBUTE softwareId.
+--@@ These modules define ATTRIBUTE sourceIndicator.
+--@@ These modules define ATTRIBUTE specificProblems.
+--@@ These modules define ATTRIBUTE specificProblemsIndicator.
+--@@ These modules define ATTRIBUTE standbyStatus.
+--@@ These modules define ATTRIBUTE startTime.
+--@@ These modules define ATTRIBUTE stateChangeDefinition.
+--@@ These modules define ATTRIBUTE stmLevel.
+--@@ These modules define ATTRIBUTE stopTime.
+--@@ These modules define ATTRIBUTE sub-partitionPointer.
+--@@ These modules define ATTRIBUTE subNetworkConnectionId.
+--@@ These modules define ATTRIBUTE subNetworkConnectionPointer.
+--@@ These modules define ATTRIBUTE subNetworkId.
+--@@ These modules define ATTRIBUTE subordinateCircuitPackSoftwareLoad.
+--@@ These modules define ATTRIBUTE subsystemId.
+--@@ These modules define ATTRIBUTE superPartitionPointer.
+--@@ These modules define ATTRIBUTE supportEntityNames.
+--@@ These modules define ATTRIBUTE supportableClientList.
+--@@ These modules define ATTRIBUTE supportedByObjectList.
+--@@ These modules define ATTRIBUTE supportedConnectionNames.
+--@@ These modules define ATTRIBUTE supportedFeatures.
+--@@ These modules define ATTRIBUTE supportedTOClasses.
+--@@ These modules define ATTRIBUTE supportedTTPList.
+--@@ These modules define ATTRIBUTE supportedUncontrolledTests.
+--@@ These modules define ATTRIBUTE suppressAdditionalThresholds.
+--@@ These modules define ATTRIBUTE suppressObjectInstance.
+--@@ These modules define ATTRIBUTE suspectIntervalFlag.
+--@@ These modules define ATTRIBUTE suspectIntervals.
+--@@ These modules define ATTRIBUTE switchStatus.
+--@@ These modules define ATTRIBUTE systemId.
+--@@ These modules define ATTRIBUTE systemTimingSource.
+--@@ These modules define ATTRIBUTE systemTitle.
+--@@ These modules define ATTRIBUTE tTPId.
+--@@ These modules define ATTRIBUTE testActionPerformerId.
+--@@ These modules define ATTRIBUTE testInvocationId.
+--@@ These modules define ATTRIBUTE testObjectId.
+--@@ These modules define ATTRIBUTE testOutcome.
+--@@ These modules define ATTRIBUTE testSessionId.
+--@@ These modules define ATTRIBUTE testStep.
+--@@ These modules define ATTRIBUTE testStepQualifier.
+--@@ These modules define ATTRIBUTE thresholdDataId.
+--@@ These modules define ATTRIBUTE thresholdDataInstance.
+--@@ These modules define ATTRIBUTE thresholdInfo.
+--@@ These modules define ATTRIBUTE tideMark.
+--@@ These modules define ATTRIBUTE timeAttributeIdentifier.
+--@@ These modules define ATTRIBUTE timePeriod.
+--@@ These modules define ATTRIBUTE timeStampReportMode.
+--@@ These modules define ATTRIBUTE timeoutPeriod.
+--@@ These modules define ATTRIBUTE timer.
+--@@ These modules define ATTRIBUTE toTermination.
+--@@ These modules define ATTRIBUTE topologicalEndDirectionality.
+--@@ These modules define ATTRIBUTE topologicalGroupPointer.
+--@@ These modules define ATTRIBUTE topologicalPointId.
+--@@ These modules define ATTRIBUTE totalLinkCapacity.
+--@@ These modules define ATTRIBUTE totalLinkEndCapacity.
+--@@ These modules define ATTRIBUTE totalRemoteSAPs.
+--@@ These modules define ATTRIBUTE totalTpCount.
+--@@ These modules define ATTRIBUTE tpPoolId.
+--@@ These modules define ATTRIBUTE tpsInGtpList.
+--@@ These modules define ATTRIBUTE tpsInTpPoolList.
+--@@ These modules define ATTRIBUTE trafficDescriptor.
+--@@ These modules define ATTRIBUTE trailId.
+--@@ These modules define ATTRIBUTE trailTraceExpected.
+--@@ These modules define ATTRIBUTE trailTraceReceive.
+--@@ These modules define ATTRIBUTE trailTraceSend.
+--@@ These modules define ATTRIBUTE transmissionCharacteristics.
+--@@ These modules define ATTRIBUTE trendIndication.
+--@@ These modules define ATTRIBUTE ttpPortID.
+--@@ These modules define ATTRIBUTE tu11CTPId.
+--@@ These modules define ATTRIBUTE tu12CTPId.
+--@@ These modules define ATTRIBUTE tu2CTPId.
+--@@ These modules define ATTRIBUTE tu3CTPId.
+--@@ These modules define ATTRIBUTE tug2Id.
+--@@ These modules define ATTRIBUTE tug3Id.
+--@@ These modules define ATTRIBUTE typeOfDayControllerId.
+--@@ These modules define ATTRIBUTE typeOfDayControllerInstance.
+--@@ These modules define ATTRIBUTE typeText.
+--@@ These modules define ATTRIBUTE uAS.
+--@@ These modules define ATTRIBUTE underlyingConnectionNames.
+--@@ These modules define ATTRIBUTE unknownStatus.
+--@@ These modules define ATTRIBUTE unprotectedCTPId.
+--@@ These modules define ATTRIBUTE unreliableResourcePointer.
+--@@ These modules define ATTRIBUTE unreliableResourcePointerR1.
+--@@ These modules define ATTRIBUTE upstreamConnectivityPointer.
+--@@ These modules define ATTRIBUTE usageCost.
+--@@ These modules define ATTRIBUTE usageInfo.
+--@@ These modules define ATTRIBUTE usageState.
+--@@ These modules define ATTRIBUTE userEntityNames.
+--@@ These modules define ATTRIBUTE userLabel.
+--@@ These modules define ATTRIBUTE userObject.
+--@@ These modules define ATTRIBUTE v5SignalLabelExpected.
+--@@ These modules define ATTRIBUTE v5SignalLabelReceive.
+--@@ These modules define ATTRIBUTE v5SignalLabelSend.
+--@@ These modules define ATTRIBUTE validControlType.
+--@@ These modules define ATTRIBUTE vc11TTPId.
+--@@ These modules define ATTRIBUTE vc12TTPId.
+--@@ These modules define ATTRIBUTE vc2TTPId.
+--@@ These modules define ATTRIBUTE vc3TTPId.
+--@@ These modules define ATTRIBUTE vc4TTPId.
+--@@ These modules define ATTRIBUTE vcnUserChannelCTPId.
+--@@ These modules define ATTRIBUTE vendorName.
+--@@ These modules define ATTRIBUTE version.
+--@@ These modules define ATTRIBUTE versionIdentifier.
+--@@ These modules define ATTRIBUTE violatedPolicy.
+--@@ These modules define ATTRIBUTE violatorName.
+--@@ These modules define ATTRIBUTE waitToRestoreTime.
+--@@ These modules define ATTRIBUTE weekDayTranslationList.
+--@@ These modules define ATTRIBUTE weekMask.
+--@@ These modules define ATTRIBUTE wrapping64BitCounter.
+--@@ These modules define ATTRIBUTE z-TPInstance.
+--@@ These modules define ATTRIBUTE zEnd.
+--@@ These modules define ATTRIBUTE zEndNetworkTPList.
+--@@ 
+--@@ parameters objectCreation referenced but never defined!
+--@@ ParameterReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation
+--@@ parameters timeOutError referenced but never defined!
+--@@ ParameterReference references undefined "":timeOutError
+--@@ attributes rolePointer referenced but never defined!
+--@@ AttributeReference references undefined "ITU-T Rec. X.725 (1996) | ISO/IEC 10165-7: 1996":rolePointer
+--@@ AttributeReference references undefined "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7: 1996":rolePointer
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_x749::policyViolationLogRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x725::genericRelationshipObject
+--@@ |  +- itut_x749::jurisdiction
+--@@ |  |  +- itut_x749::enhancedJurisdiction
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ +- itut_x723::subsystem
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ +- itut_m3100::tpPool
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x749::policy
+--@@ |  +- itut_x749::scheduledPolicy
+--@@ |  +- itut_x749::valueAssertionPolicy
+--@@ +- itut_x749::domain
+--@@ +- itut_x749::administrativeAspect
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x725::genericRelationshipObject
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ >- itut_x749::domain
+--@@ >- itut_x749::policy
+--@@ >- itut_x749::jurisdiction
+--@@ >- itut_x749::administrativeAspect
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

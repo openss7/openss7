@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: xti_apli.h,v 0.9.2.1 2007/12/15 20:16:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/12/15 20:16:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xti_apli.h,v $
+ Revision 0.9.2.1  2007/12/15 20:16:48  brian
+ - added new mib files
+
  *****************************************************************************/
 
 #ifndef _SYS_XTI_APLI_H
 #define _SYS_XTI_APLI_H
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_apli.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

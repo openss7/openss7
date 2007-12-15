@@ -1,0 +1,329 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 19:34:07 MST 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. X.751 (1995) | ISO/IEC 10164-17 : 1996"
+--  { joint-iso-ccitt ms(9) function(2) part17(17) } >--
+--< GDMO.Namespace itut_x751 >--
+--< GDMO.Alias "ITU-T Rec. X.751 (1995) | ISO/IEC 10164-17 : 1996" "X.751",
+--  "ITU-T Rec. X.751 (1995)/Cor.1 (1998) | ISO/IEC 10164-17 : 1996/Cor.1 : 1999" >--
+--  "ITU-T Rec. X.751 (1995)/Cor.2 (2000) | ISO/IEC 10164-17 : 1996/Cor.2 : 2001" >--
+MODULE "ITU-T Rec. X.751 (1995) | ISO/IEC 10164-17 : 1996" { joint-iso-ccitt ms(9) function(2) part17(17) }
+-- Annex A
+-- Management information definitions
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- A.1 Managed relationship definitions
+
+changeOverRelationship RELATIONSHIP CLASS
+	BEHAVIOUR
+		changeOverRelationshipBehaviour BEHAVIOUR
+			DEFINED AS
+				"See 8.2.1.1.";;-- Corrigendum 1
+	SUPPORTS ESTABLISH, TERMINATE, QUERY;
+	ROLE primaryRole
+		COMPATIBLE-WITH primary-backedUpObject
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT ChangeOverASN1Productions.OneToOne
+		PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT ChangeOverASN1Productions.OneToOne
+	REGISTERED AS { part17Role 1 }
+	ROLE secondaryRole
+		COMPATIBLE-WITH secondary-backUpObject
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT ChangeOverASN1Productions.OneToN
+		BIND-SUPPORT bindSecondary
+		UNBIND-SUPPORT unbindSecondary
+		PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT ChangeOverASN1Productions.OneToN
+	REGISTERED AS { part17Role 2 }
+	ROLE backedupRole
+		COMPATIBLE-WITH primary-backedUpObject
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT ChangeOverASN1Productions.ZeroOrOne
+		BIND-SUPPORT bindBackedup
+		UNBIND-SUPPORT unbindBackedup
+		PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT ChangeOverASN1Productions.OneToOne
+	REGISTERED AS { part17Role 3 }
+	ROLE backupRole
+		COMPATIBLE-WITH secondary-backUpObject
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT ChangeOverASN1Productions.ZeroOrOne
+		BIND-SUPPORT bindBackup
+		UNBIND-SUPPORT unbindBackup
+		PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT ChangeOverASN1Productions.OneToOne
+	REGISTERED AS { part17Role 4 }
+	ROLE changeOverControlRole
+		COMPATIBLE-WITH changeOverControlObject
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT ChangeOverASN1Productions.OneToOne
+	REGISTERED AS { part17Role 5 };
+REGISTERED AS { part17MRelClass 1 };
+-- A.2 Managed object class definitions
+
+
+primary-backedUpObject MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;-- Corrigendum 1
+	CHARACTERIZED BY
+		primary-backedUpObjectPackage PACKAGE
+			BEHAVIOUR
+				primary-backedUpObjectBehaviour BEHAVIOUR
+					DEFINED AS
+						"INVARIANT: No specific characteristics are defined. POSTCONDITION: After 
+						participating in the change over relationship, this managed object plays the 
+						primary role and the backed-up role of change over managed relationship and 
+						composes the part of the managed relationship instance.";;
+			ATTRIBUTES
+				"Rec. X.721 (1992) | ISO/IEC 10165-2:1992":operationalState GET;;;-- Corrigendum 1
+	CONDITIONAL PACKAGES
+		secondaryAttributePackage
+			PRESENT IF
+				" The fallback relationship is one-way from primary to secondary or reciprocal.",
+		backUpObjectAttributePackage
+			PRESENT IF
+				" The back-up relationship is one-way from backed-up to back-up or
+				reciprocal.";
+REGISTERED AS { part17MObjectClass 1 };
+
+
+secondary-backUpObject MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;-- Corrigendum 1
+	CHARACTERIZED BY
+		secondary-backUpObjectPackage PACKAGE
+			BEHAVIOUR
+				secondary-backUpObjectBehaviour BEHAVIOUR
+					DEFINED AS
+						"INVARIANT: No specific characteristics are defined. POSTCONDITION: After 
+						participating in the change over relationship, this managed object plays the 
+						secondary role and the back-up role of change over managed relationship and 
+						composes the part of the managed relationship instance.";;
+			ATTRIBUTES
+				"Rec. X.721 (1992) | ISO/IEC 10165-2:1992":administrativeState GET-REPLACE,
+				"Rec. X.721 (1992) | ISO/IEC 10165-2:1992":operationalState GET,
+				"Rec. X.721 (1992) | ISO/IEC 10165-2:1992":standbyStatus GET;;;-- Corrigendum 1
+	CONDITIONAL PACKAGES-- correction
+		primaryAttributePackage
+			PRESENT IF
+				" The fallback relationship is one-way from secondary to primary or reciprocal.",
+		backedUpObjectAttributePackage
+			PRESENT IF
+				" The back-up relationship is one-way from back-up to backed-up or reciprocal.";
+REGISTERED AS { part17MObjectClass 2 };
+
+
+changeOverControlObject MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;-- Corrigendum 1
+	CHARACTERIZED BY
+		changeOverActionPackage,
+		changeOverControlObjectPackage PACKAGE-- Corrigendum 1
+			BEHAVIOUR
+				changeOverControlObjectBehaviour BEHAVIOUR
+					DEFINED AS
+						" INVARIANT: No specific characteristics are defined. POSTCONDITION: After 
+						 participating in the change over relationship, this managed object plays the 
+						 change over control role and controls the change over function by receiving 
+						 change over operations.";;
+			ATTRIBUTES
+				primaryObject GET;;,-- Corrigendum 1
+		changeOverActionPackage;
+	CONDITIONAL PACKAGES-- Corrigendum 1
+		secondaryAttributePackage
+			PRESENT IF
+				"The primary-backed-up object does not have the secondary attribute.",
+		backUpObjectAttributePackage
+			PRESENT IF
+				"The primary-backed-up object does not have the backedUpObject attribute.",-- Corrigendum 1
+		changeBackActionPackage
+			PRESENT IF
+				"The managed object supports this action.";
+REGISTERED AS { part17MObjectClass 3 };
+-- A.3 Package definitions
+
+
+backedUpObjectAttributePackage PACKAGE
+	BEHAVIOUR
+		backedupObjAttribPkgBeh BEHAVIOUR
+			DEFINED AS
+				! See CCITT Rec. X.732 | ISO/IEC 10164-3, 8.1.7 for definition of the 
+				 backedUpObject attribute. The value of the attribute backedUpObject must be the 
+				 managed object name of the object fulfilling the backed-up role. A back-up is 
+				 absent if the value of the attribute backedUpObject is NULL.!;;
+	ATTRIBUTES
+		"Rec. X.721 (1992) | ISO/IEC 10165-2:1992":backedUpObject GET;-- Corrigendum 1
+	REGISTERED AS { part17Package 1 };
+
+
+backUpObjectAttributePackage PACKAGE
+	BEHAVIOUR
+		backupObjAttribPkgBeh BEHAVIOUR
+			DEFINED AS
+				! See CCITT Rec. X.732 | ISO/IEC 10164-3, 8.1.6 for the definition of the 
+				 backUpObject attribute. The value of the attribute backUpObject must be the 
+				 managed object name of the object fulfilling the back-up role. A back-up is 
+				 absent if the value of the attribute backUpObject is NULL.!;;
+	ATTRIBUTES
+		"Rec. X.721 (1992) | ISO/IEC 10165-2:1992":backUpObject GET;-- Corrigendum 1
+	REGISTERED AS { part17Package 2 };-- Corrigendum 1
+
+
+changeBackActionPackage PACKAGE
+	BEHAVIOUR
+		changeBackActionPackageBeh BEHAVIOUR
+			DEFINED AS
+				! See 8.6.2.1.!;;
+	ACTIONS
+		changeBack;
+REGISTERED AS { part17Package 3 };
+
+
+changeOverActionPackage PACKAGE
+	BEHAVIOUR
+		changeOverActionPackageBeh BEHAVIOUR
+			DEFINED AS
+				! See 8.6.1.1.!;;
+	ACTIONS
+		changeOver;
+REGISTERED AS { part17Package 4 };
+
+
+primaryAttributePackage PACKAGE
+	ATTRIBUTES
+		"Rec. X.721 (1992) | ISO/IEC 10165-2:1992":primary GET-REPLACE ADD-REMOVE;
+REGISTERED AS { part17Package 5 };
+
+
+secondaryAttributePackage PACKAGE
+	ATTRIBUTES
+		"Rec. X.721 (1992) | ISO/IEC 10165-2:1992":secondary GET-REPLACE ADD-REMOVE;
+REGISTERED AS { part17Package 6 };
+-- A.4 Attribute definition
+
+
+primaryObject ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ChangeOverASN1Productions.PrimaryObject;-- Corrigendum 1
+	MATCHES FOR EQUALITY;-- Corrigendum 1
+	REGISTERED AS { part17Attribute 1 };-- Corrigendum 1
+-- A.5 Action definitions
+
+
+changeOver ACTION
+	BEHAVIOUR
+		changeOverBehaviour BEHAVIOUR
+			DEFINED AS
+				"See 8.6.1.1.";;
+	MODE CONFIRMED;
+	PARAMETERS
+		noSuchParticipant,
+		changeOverCapabilityAbsent,
+		noSuchRelationships,
+		expectedResultUnsatisfied,
+		alreadyBackedUp,
+		secondaryInstanceUnavailable,
+		preconditionsNotMet,
+		postconditionsNotMet;
+	WITH INFORMATION SYNTAX ChangeOverASN1Productions.ChangeOverInfo;
+	WITH REPLY SYNTAX ChangeOverASN1Productions.ObjectInstance;-- Corrigendum 1
+	REGISTERED AS { part17Action 1 };
+
+
+changeBack ACTION
+	BEHAVIOUR
+		changeBackBehaviour BEHAVIOUR
+			DEFINED AS
+				"See 8.6.2.1.";;-- Corrigendum 1
+	MODE CONFIRMED;
+	PARAMETERS
+		noSuchParticipant,
+		backup-backedup-Mismatch,
+		notBackedUp,
+		preconditionsNotMet,
+		postconditionsNotMet;
+	WITH INFORMATION SYNTAX ChangeOverASN1Productions.ChangeBackInfo;
+REGISTERED AS { part17Action 2 };
+-- A.6 Parameter definitions
+
+
+alreadyBackedUp PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX ChangeOverASN1Productions.BackUpObject;
+REGISTERED AS { part17Parameter 1 };
+
+
+backup-backedup-Mismatch PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX ChangeOverASN1Productions.BackUpInfo;
+REGISTERED AS { part17Parameter 2 };
+
+
+changeOverCapabilityAbsent PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX ChangeOverASN1Productions.PrimaryObjectSpecified;
+REGISTERED AS { part17Parameter 3 };
+
+
+expectedResultUnsatisfied PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX ChangeOverASN1Productions.UnattainableAttributeList;
+REGISTERED AS { part17Parameter 4 };
+
+
+noSuchParticipant PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX ChangeOverASN1Productions.NoSuchParticipant;
+REGISTERED AS { part17Parameter 5 };
+
+
+noSuchRelationships PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX ChangeOverASN1Productions.NoSuchRelationship;
+REGISTERED AS { part17Parameter 6 };
+
+
+notBackedUp PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX ChangeOverASN1Productions.BackUpInfo;
+REGISTERED AS { part17Parameter 7 };
+
+
+postconditionsNotMet PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX ChangeOverASN1Productions.Conditions;
+REGISTERED AS { part17Parameter 8 };
+
+
+preconditionsNotMet PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX ChangeOverASN1Productions.Conditions;
+REGISTERED AS { part17Parameter 9 };
+
+
+secondaryInstanceUnavailable PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX ChangeOverASN1Productions.ObjectInstance;
+REGISTERED AS { part17Parameter 10 };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.751 (1995) | ISO/IEC 10164-17 : 1996"
+--  { joint-iso-ccitt ms(9) function(2) part17(17) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@
+--@@ These modules reference "Rec. X.721 (1992) | ISO/IEC 10165-2:1992" 11 times.
+--@@
+--@@
+--@@ These modules define "ITU-T Rec. X.751 (1995) | ISO/IEC 10164-17 : 1996"
+--@@ These modules define "ITU-T Rec. X.751 (1995)/Cor.1 (1998) | ISO/IEC 10164-17 : 1996/Cor.1 : 1999"
+--@@ These modules define "X.751"
+--@@
+--@@
+--@@ These modules reference MANAGED OBJECT CLASS top in module "Rec. X.721 (1992) | ISO/IEC 10165-2:1992".
+--@@
+--@@ These modules define MANAGED OBJECT CLASS changeOverControlObject.
+--@@ These modules define MANAGED OBJECT CLASS primary-backedUpObject.
+--@@ These modules define MANAGED OBJECT CLASS secondary-backUpObject.
+--@@ 
+--@@ objects top referenced but never defined!
+--@@ ClassReference references undefined "Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top
+--@@ ClassReference references undefined "Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top
+--@@ ClassReference references undefined "Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi
