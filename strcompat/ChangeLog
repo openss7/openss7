@@ -1,3 +1,9 @@
+2007-12-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: check for request_dma free_dma
+	* src/kernel/liscompat.c: strap out lis_request_dma if not available
+
+
 2007-11-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strcompat.macros: better grefer macros

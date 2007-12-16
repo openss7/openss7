@@ -1,3 +1,7 @@
+2007-12-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* README-cvs: updates
+
 2007-11-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/sctp.macros: better grefer macros
