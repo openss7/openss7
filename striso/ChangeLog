@@ -1,3 +1,71 @@
+2007-12-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* .cvsignore: updates
+	* ANNOUNCE: update for release.
+	* AUTHORS: update for release.
+	* ChangeLog: update for release.
+	* Makefile.am: update to GPLv3.
+	* NEWS: update for release.
+	* README: update for release.
+	* README-LiS: update for release.
+	* README-cvs: update for release.
+	* THANKS: update for release.
+	* acinclude.m4: updated to GPLv3.
+	* configure.ac: updated to GPLv3.
+	* striso.lsm.in: updated
+	* striso.spec.in: updates
+	* debian/changelog: updates
+	* debian/control.in: updates
+	* debian/copyright: updates
+	* debian/mscript_header.in: updates
+	* debian/mscript_postinst.in: updates
+	* debian/mscript_postrm.in: updates
+	* debian/mscript_preinst.in: updates
+	* debian/mscript_prerm.in: updates
+	* debian/rules.in: updates
+	* debian/striso-core.postinst.in: updates
+	* debian/striso-core.postrm.in: updates
+	* debian/striso-core.preinst.in: updates
+	* debian/striso-core.prerm.in: updates
+	* debian/striso-dev.postinst.in: updates
+	* debian/striso-dev.preinst.in: updates
+	* debian/striso-dev.prerm.in: updates
+	* debian/striso-devel.preinst.in: updates
+	* debian/striso-doc.postinst.in: updates
+	* debian/striso-doc.preinst.in: updates
+	* debian/striso-doc.prerm.in: updates
+	* debian/striso-init.postinst.in: updates
+	* debian/striso-init.postrm.in: updates
+	* debian/striso-init.preinst.in: updates
+	* debian/striso-init.prerm.in: updates
+	* debian/striso-lib.preinst.in: updates
+	* debian/striso-source.preinst.in: updates
+	* debian/striso-util.preinst.in: updates
+	* doc/.cvsignore: updates
+	* doc/Makefile.am: updates
+	* doc/manual/.cvsignore: updates
+	* doc/manual/Makefile.am: updates
+	* doc/manual/releases.texi: updates
+	* doc/manual/rpm.texi: updates
+	* doc/manual/striso.texi: updates
+	* doc/manual/tree.texi: updates
+	* src/.cvsignore: updates
+	* src/Makefile.am: updates
+	* src/drivers/lis.conf: updates
+	* src/include/.cvsignore: updates
+	* src/include/Makefile.am: updates
+	* src/modules/lis.conf: updates
+	* tests/.cvsignore: updates
+	* tests/Makefile.am: updates
+	* tests/atlocal.in: updates
+	* tests/dummy1.m4: updates
+	* tests/dummy2.m4: updates
+	* tests/dummy3.m4: updates
+	* tests/dummy4.m4: updates
+	* tests/kernel.at: updates
+	* tests/local.at: updates
+	* tests/testsuite.at: updates
+
 2007-11-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/striso.macros: better grefer macros

@@ -1,3 +1,9 @@
+2007-12-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man3/t_optmgmt.3.man: biblio correction
+	* src/modules/sl/sl_mux.c: register_strdev instead of register_strdrv
+	* src/modules/x400p-ss7/sl_x400p.c: correct values for De and Ue
+
 2007-11-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/Makefile.am: added sg document

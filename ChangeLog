@@ -1,3 +1,24 @@
+2007-12-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/archive.am: upgrade license to AGPLv3.
+	* am/autotest.am: upgrade license to AGPLv3.
+	* am/bcm.am: upgrade license to AGPLv3.
+	* am/deb.am: upgrade license to AGPLv3.
+	* am/genksyms.am: upgrade license to AGPLv3.
+	* am/help.am: upgrade license to AGPLv3.
+	* am/info.am: upgrade license to AGPLv3.
+	* am/init.am: upgrade license to AGPLv3.
+	* am/kernel.am: upgrade license to AGPLv3.
+	* am/libraries.am: upgrade license to AGPLv3.
+	* am/lsm.am: upgrade license to AGPLv3.
+	* am/man.am: upgrade license to AGPLv3.
+	* am/openss7.am: upgrade license to AGPLv3.
+	* am/packages.am: upgrade license to AGPLv3.
+	* am/pr.am: upgrade license to AGPLv3.
+	* am/rpm.am: upgrade license to AGPLv3.
+	* am/sctp.am: upgrade license to AGPLv3.
+	* am/strconf.am: upgrade license to AGPLv3.
+
 2007-11-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/macros.texi: added @figureimage
