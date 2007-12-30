@@ -1,3 +1,8 @@
+2007-12-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/man.am: perform more substitutions
+	* m4/openss7.m4: remove strict prototypes
+
 2007-12-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: check for request_dma free_dma

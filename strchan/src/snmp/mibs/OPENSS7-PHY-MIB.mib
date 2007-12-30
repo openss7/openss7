@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-PHY-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/15 20:16:35 $
+-- @(#) $RCSfile: OPENSS7-PHY-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/29 22:18:14 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +46,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/12/15 20:16:35 $ by $Author: brian $
+-- Last Modified $Date: 2007/12/29 22:18:14 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-PHY-MIB.mib,v $
+-- Revision 0.9.2.2  2007/12/29 22:18:14  brian
+-- - updating mibs
+--
 -- Revision 0.9.2.1  2007/12/15 20:16:35  brian
 -- - added new mib files
 --
@@ -540,7 +543,10 @@ physicalSAPRowStatus OBJECT-TYPE
 		 by management.  Management stations may only delete 
 		 physicalSAP objects that do not contain any subordinate 
 		 objects."
-		 
+	REFERENCE
+		"ITU-T Rec. X.281 | ISO/IEC 13642 
+		 physicalSAP-physicalSubsystem."
+	::= { physicalSAP 4 }
 
 -- =====================================================================
 

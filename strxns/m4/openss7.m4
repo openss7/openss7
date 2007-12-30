@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/10/18 06:12:53 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2007/12/16 03:52:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/18 06:12:53 $ by $Author: brian $
+# Last Modified $Date: 2007/12/16 03:52:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -229,6 +229,9 @@ dnl
 # _OPENSS7_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OUTPUT], [dnl
+    # expand these first
+    test "x$prefix" = xNONE && prefix=$ac_default_prefix
+    test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
     eval "PACKAGE_BINDIR=\"${bindir}\""
     eval "PACKAGE_BINDIR=\"${PACKAGE_BINDIR}\""
     eval "PACKAGE_BINDIR=\"${PACKAGE_BINDIR}\""
@@ -434,7 +437,8 @@ AC_DEFUN([_OPENSS7_DEBUG], [dnl
 dnl	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wundef,,g'`  dnl this frags out flex 2.5.33
 	CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
 dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wundef -Wp,-D_FORTIFY_SOURCE=2 -Werror"
-	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wp,-D_FORTIFY_SOURCE=2 -Werror"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wp,-D_FORTIFY_SOURCE=2 -Werror"
+	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wno-trigraphs -Wp,-D_FORTIFY_SOURCE=2 -Werror"
     fi
 ])# _OPENSS7_DEBUG
 # =============================================================================
@@ -735,8 +739,8 @@ dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wwrite-strings"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wconversion"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wsign-compare"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Waggregate-return"
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?strict-prototypes,,g'`
-	    CFLAGS="${CFLAGS:+$CFLAGS }-Wstrict-prototypes"
+dnl	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?strict-prototypes,,g'`
+dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wstrict-prototypes"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wmissing-prototypes"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wmissing-declarations"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wmissing-noreturn"
@@ -825,6 +829,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.58  2007/12/16 03:52:53  brian
+# - updated release files
+#
 # Revision 0.9.2.57  2007/10/18 06:12:53  brian
 # - more -Wundef to remove
 #

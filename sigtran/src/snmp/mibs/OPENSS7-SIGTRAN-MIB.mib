@@ -1,0 +1,828 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-SIGTRAN-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/15 20:19:12 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2007/12/15 20:19:12 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-SIGTRAN-MIB.mib,v $
+-- Revision 0.9.2.2  2007/12/15 20:19:12  brian
+-- - updates
+--
+-- Revision 0.9.2.1  2007/10/15 01:15:42  brian
+-- - added MIBs
+--
+-- =============================================================================
+
+OPENSS7-SIGTRAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE
+		FROM SNMPv2-SMI
+	RowStatus, TimeInterval
+		FROM SNMPv2-TC
+	SnmpAdminString
+		FROM SNMP-FRAMEWORK-MIB
+	openss7Modules
+		FROM OPENSS7-SMI;
+
+sigtranMIB MODULE-IDENTITY
+	LAST-UPDATED
+		"200709300837Z"
+	ORGANIZATION
+		"The OpenSS7 Project"
+	CONTACT-INFO
+		"The OpenSS7 Project
+		 c/o Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta  T6L 6T1
+		 CANADA
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 mailto:bidulock@openss7.org"
+	DESCRIPTION
+		"Provides the SIGTRAN MIB which contains tables and 
+		 constructs common to all SIGTRAN user adaptation 
+		 layers."
+	::= { openss7Modules 15 }
+
+-- top level organization of the mib
+
+sigtranNotifications	OBJECT IDENTIFIER ::= { sigtranMIB		 0 }
+sigtranObjects		OBJECT IDENTIFIER ::= { sigtranMIB		 1 }
+sigtranConformance	OBJECT IDENTIFIER ::= { sigtranMIB		 2 }
+
+sigtranScalars		OBJECT IDENTIFIER ::= { sigtranObjects		 1 }
+sigtranTables		OBJECT IDENTIFIER ::= { sigtranObjects		 2 }
+sigtranNotifObjects	OBJECT IDENTIFIER ::= { sigtranObjects		 3 }
+sigtranOids		OBJECT IDENTIFIER ::= { sigtranObjects		 4 }
+
+sigtranCompliance	OBJECT IDENTIFIER ::= { sigtranConformance	 1 }
+sigtranGroups		OBJECT IDENTIFIER ::= { sigtranConformance	 2 }
+
+sigtranSctpProfile	OBJECT IDENTIFIER ::= { sigtranTables		 1 }
+
+-- ====================================================================
+
+sigtranSctpProfileNextIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the next available index into the SCTP Profile 
+		 table.  When a management station get operation returns 
+		 zero (0) for this value, the SCTP Profile table is full 
+		 or cannot accept any further entries."
+	::= { sigtranSctpProfile 1 }
+
+sigtranSctpProfileTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SigtranSctpProfileEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides the SCTP Profile table for SIGTRAN.  This 
+		 table contains SCTP association parameter profiles for 
+		 use by ASPs, SGPs and SGs when forming SCTP 
+		 associations with their peers.  Specific SIGTRAN UA 
+		 MIBs can specify a profile in this table using the 
+		 RowPointer textual convention."
+	::= { sigtranSctpProfile 2 }
+
+sigtranSctpProfileEntry OBJECT-TYPE
+	SYNTAX		SigtranSctpProfileEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an entry in the SCTP Profile table which 
+		 contains the protocol parameters pertinent to the 
+		 specific profile that corresponds to an entry in the 
+		 table.  All entries in this table are persistent across 
+		 an agent reboot.  Changing an active entry has no 
+		 effect on existing associations that were formed using 
+		 a previous value in the profile."
+	INDEX		{ sigtranSctpProfileIndex }
+	::= { sigtranSctpProfileTable 1 }
+
+SigtranSctpProfileEntry ::=
+	SEQUENCE {
+		sigtranSctpProfileIndex
+			Unsigned32,
+		sigtranSctpProfileName
+			SnmpAdminString,
+		sigtranSctpProfileNodelay
+			TruthValue,
+		sigtranSctpPayloadProtocolId
+			Unsigned32,
+		sigtranSctpLifetime
+			TimeInterval,
+		sigtranSctpProfileCsumType
+			INTEGER,
+		sigtranSctpProfileMacType
+			INTEGER,
+		sigtranSctpProfileValidCookieLife
+			TimeInterval,
+		sigtranSctpProfileCookieInc
+			TimeInterval,
+		sigtranSctpProfileMaxIstreams
+			Unsigned32,
+		sigtranSctpProfileReqOstreams
+			Unsigned32,
+		sigtranSctpEcn
+			TruthValue,
+		sigtranSctpAdaptationLayerInfo
+			Unsigned32,
+		sigtranSctpProfileMaxInitRetries
+			Unsigned32,
+		sigtranSctpProfileMaxBurst
+			Unsigned32,
+		sigtranSctpProfileAssocMaxRetrans
+			Unsigned32,
+		sigtranSctpProfileMaxSackDelay
+			TimeInterval,
+		sigtranSctpProfileRtoMin
+			TimeInterval,
+		sigtranSctpProfileRtoInitial
+			TimeInterval,
+		sigtranSctpProfileRtoMax
+			TimeInterval,
+		sigtranSctpProfilePathMaxRetrans
+			Unsigned32,
+		sigtranSctpProfileHeartbeatItvl
+			TimeInterval,
+		sigtranSctpProfileStatus
+			RowStatus
+	}
+
+
+sigtranSctpProfileIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an index into the SCTP Profile table.  The 
+		 value zero (0) has special significance in that it 
+		 specifies the default SCTP parameters profile that will 
+		 be used if no profile is specified."
+	::= { sigtranSctpProfileEntry 1 }
+
+sigtranSctpProfileName OBJECT-TYPE
+	SYNTAX		SnmpAdminString
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides an administrative name for the profile 
+		 according to the SnmpAdminString textual convention.  
+		 The same name may not be used for multiple entries in 
+		 the table."
+	::= { sigtranSctpProfileEntry 2 }
+
+sigtranSctpProfileNodelay OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether the Nagle algorithm will be used on 
+		 the association or not.  When set to true, the Nalge 
+		 algorithm will be suppressed and data chunks will be 
+		 immediately sent when possible.  When set to false, the 
+		 Nagle algorithm will be permitted if provided by the 
+		 SCTP implementation and data chunks may be held for a 
+		 short duration pending suitable network conditions or 
+		 events."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ false(2) }
+	::= { sigtranSctpProfileEntry 3 }
+
+sigtranSctpPayloadProtocolId OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the payload protocol identifier that is to be 
+		 included in SCTP data chunks originated on the 
+		 association.  The value 0 is appropriate to all SIGTRAN 
+		 User Adaptation Layers.  Specific values have been 
+		 assigned by IANA for various IETF adaptation layers.  
+		 When a protocol profile is reference by an adpatation 
+		 layer this column should be checked to ensure that it 
+		 is consistent with the value for the UA (e.g. 0 or 3 
+		 for M3uA) before permitting the reference.  Note that 
+		 this value is normally used by network monitoring 
+		 packages to determine the presentation of the payload 
+		 where the payload cannot be determined by other methods 
+		 (e.g. by determining that one port in the association 
+		 is to a well-known port for a standard protocol).  When 
+		 standard well-known port numbers are used, this value 
+		 can be zero (0).  When locally assigned port numbers 
+		 are used, this value should be the payload protocol 
+		 identifier assigned to the SIGTRAN UA to which the 
+		 profile applies."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 0 }
+	::= { sigtranSctpProfileEntry 4 }
+
+sigtranSctpLifetime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the maximum lifetime that data will be held 
+		 in the send buffer awaiting transmission.  Not all SCTP 
+		 implemetnations support this feature.  When supported, 
+		 the imlementation should abort the association in the 
+		 event that a lifetime expires."
+	REFERENCE
+		"RFC 4960"
+	::= { sigtranSctpProfileEntry 5 }
+
+sigtranSctpProfileCsumType OBJECT-TYPE
+	SYNTAX	INTEGER {
+			crc32c(1),
+			adler32(2),
+			none(3),
+			adaptive(4),
+			other(5)
+		}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"For backward compatibility with previous SCTP 
+		 implementations, this column specifies the checksum 
+		 type to be used on the association.  WHen crc32c(1) the 
+		 standard CRC calculation is used according to RFC 4960 
+		 and RFC 3309.  When adler32(2) is specified, the 
+		 obsolete Adler32 calculation from RFC 2960 is used.  
+		 When none(3), the checksum field in the SCTP header is 
+		 filled with zeros.  When adaptive(4), the 
+		 implementation will adaptively determine the CRC used 
+		 by the peer.  When other(5), the implementation 
+		 specific method of CRC calculation will be used (which 
+		 may just be CRC32C).  If set to other(5) and the 
+		 implementation specified algorithm is one of the other 
+		 algorithms, the value will be returned as one of those 
+		 algorithms.  For example, if set to other(5) my a 
+		 management station and the implementation specified 
+		 algorithm is CRC32C, the value returned by a subsequent 
+		 get operation will be crc32c(1).
+
+		 The default value is crc32c(1).  Other values should 
+		 only be used in special circumstances."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ crc32c(1) }
+	::= { sigtranSctpProfileEntry 6 }
+
+sigtranSctpProfileMacType OBJECT-TYPE
+	SYNTAX	INTEGER {
+			md5(1),
+			sha1(2),
+			none(3),
+			other(4)
+		}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the Message Authentication Code signing 
+		 algorithm to use when signing  cookies when forming 
+		 associations.  When md5(1), the MD5 algorithm will be 
+		 used to sign cookies.  When sha1(2), the SHA-1 
+		 algorithm will be used to sign cookies.  When none(3), 
+		 the HMAC will be filled with ones (no signature).  When 
+		 other(4) an implementation specified algorithm will be 
+		 used.  When set to other(4) and the implementation 
+		 specified algorithm corresponds to one of the other 
+		 values, the corresponding value will be returned by 
+		 subsequent management get operations.  For example, if 
+		 other(4) is set by a management station and the 
+		 implementation specified signing algorithm is MD5, the 
+		 value md5(1) will be returned on subsequent management 
+		 get operations.
+
+		 The default value is other(5), which may will normally 
+		 translate into md5(1) or sha1(2).  The value none(3) 
+		 defeats security associated with association 
+		 establishment and should only be used in special 
+		 circumstances or for testing."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ other(5) }
+	::= { sigtranSctpProfileEntry 7 }
+
+sigtranSctpProfileValidCookieLife OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the valid cookie lifetime for the 
+		 association, that is, the amount of time that cookies 
+		 sent to a peer endpoint in an INIT-ACK message will be 
+		 valid.  Values of zero (0) should be converted to the 
+		 minmum clock granularity of the implementation.  Valid 
+		 values span the full range of a TimeInterval.  Not all 
+		 implementations will support all values in the range.
+
+		 The default value from RFC 4960 is 60 seconds (6000 
+		 centiseconds).  Unfortuantely the default value must be 
+		 adjusted to accomodate the slowest peer on the slowest 
+		 connection.  The default value is adequate for Internet 
+		 applications.
+
+		 Reducing this value will increase the chances that 
+		 passive connection attempts will fail due to expired 
+		 cookies.  Increasing the value will reduce the overall 
+		 security of the system by permitting attackers an 
+		 increased interval within which to crack HMACs and 
+		 guess verification tags."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 6000 }	-- 6000 centiseconds, 60.00 seconds
+	::= { sigtranSctpProfileEntry 8 }
+
+sigtranSctpProfileCookieInc OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the cookie increment for the association, 
+		 that is, the default time increment that will be added 
+		 to the lifespan of the cookie in an INIT ACK if the 
+		 received INIT requests cookie preservative to lenthen 
+		 the lifespan of the cookie.  Valid values are the 
+		 entire range of a TimeInterval.  Not all 
+		 implementations will support the entire range.
+
+		 The default value from RFC 4960 is 1 second (100 
+		 centiseconds).  The default value is appropriate for 
+		 Internet applications.
+
+		 Reducing this value will increase the chances that 
+		 passive connection attempts will fail due to expired 
+		 cookies.  Increasing the value will reduce the overall 
+		 security of the system by permitting attackers an 
+		 increased interval within which to crack HMACs and 
+		 guess verification tags."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 100 }	-- 100 centiseconds, 1.00 seconds
+	::= { sigtranSctpProfileEntry 9 }
+
+sigtranSctpProfileMaxIstreams OBJECT-TYPE
+	SYNTAX		Unsigned32 (2..16384)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the maximum allowed number of inbound streams 
+		 that will be reported on formation of the association.  
+		 SIGTRAN User Adaptation Layers require one stream for 
+		 management information and one stream for data, so 
+		 valid values are from 2 to 16834.  Not all 
+		 implementations will support the full range, but must 
+		 support at least 2.
+
+		 The default value is 257 or the implementation 
+		 specified maximum number of inbound streams for an SCTP 
+		 association.  The default value is suitable for most 
+		 SIGTRAN applications.
+
+		 Reducing this number from the implementation maximum 
+		 beneath about 257 will increase the chances that head 
+		 of line blocking occurs between independent data flows.  
+		 Increasing the number toward the implementation maximum 
+		 above 257 will have less benefit to head of line 
+		 blocking and will consume more system resources to 
+		 support inbound streams."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 257 }
+	::= { sigtranSctpProfileEntry 10 }
+
+sigtranSctpProfileReqOstreams OBJECT-TYPE
+	SYNTAX		Unsigned32 (2..16384)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the number of outbound streams that will be 
+		 requested on formation of the association.  SIGTRAN 
+		 User Adaptation Layers required on stream for 
+		 management and one stream for data, so valid values are 
+		 from 2 to 18384.  Not all implementations will support 
+		 the full range, but must support at least 2.
+		 
+		 The default value is 257 or the implementation 
+		 specified maximum number of outbound streams for an 
+		 SCTP association.  The default value is suitable for 
+		 most SIGTRAN applications.
+		 
+		 Reducing this number from the implementation maximum 
+		 beneath about 257 will increas the chances that head of 
+		 line blocking occurs between independent data flows.  
+		 Increasing the number toward the implementation maximum 
+		 above 257 will have less benefit to head of line 
+		 blocking and will consume more system resources to 
+		 support outbound streams."
+ 	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 257 }
+	::= { sigtranSctpProfileEntry 11 }
+
+sigtranSctpEcn OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether Explicit Congestion Notification 
+		 (ECN) is supported on the association.  ECN is 
+		 mechanism by which a intermediate router or a receiving 
+		 hosts can indicate explicitly that they are expriencing 
+		 congestion and that packets are being dropped due to 
+		 congestion rather than noise, increasing the 
+		 performance of congestion algorithms.  Not all 
+		 implementations will permit this value to be changed on 
+		 a per-association basis.  Valid values are TRUE or 
+		 FALSE.
+
+		 - When TRUE, ECN will be supported on the association.  
+		 - When FALSE, ECN will not be supported.
+
+		 The default is TRUE.  ECN implementations can be 
+		 problematic.  This value should be set to FALSE if an 
+		 ECN implementation problem is suspected."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ true(1) }
+	::= { sigtranSctpProfileEntry 12 }
+
+sigtranSctpAdaptationLayerInfo OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Defines the adaptation layer information flags that 
+		 will be sent in an INIT or INIT-ACK message.  Valid 
+		 values include any 32-bit unsigned integer.  The 
+		 default value for backward compatibility is zero (0) 
+		 which indicates to not send the Adaptation Layer 
+		 Information parameter in an INIT or INIT-ACK.  No all 
+		 implementations will support the sending of Adaptation 
+		 Layer Information."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 0 }
+	::= { sigtranSctpProfileEntry 13 }
+
+sigtranSctpProfileMaxInitRetries OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Defines the number of times that an INIT or COOKIE-ECHO 
+		 will be resent to a given destination before 
+		 abandonning an active open attempt for the association.  
+		 Valid values are the full range of Unsigned32.  Not all 
+		 implementations will support the entire range, but must 
+		 support the value 8.
+
+		 The default value from RFC 4960 is 8 retires.  The 
+		 default value is suitable for Internet applications.
+
+		 Reducing this value will reduce the chances that an 
+		 active open of an SCTP association will succeed, but 
+		 will also reduce the latency in detecting initiation 
+		 attempt failures.  Increasing the value will increase 
+		 the chances that an active open request succeeds, but 
+		 will also increase dramatically the latency in 
+		 detecting initiation attempt failures."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 8 }
+	::= { sigtranSctpProfileEntry 14 }
+
+sigtranSctpProfileMaxBurst OBJECT-TYPE
+	SYNTAX		Unsigned32 (1..4294967295)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Defines the maximum number of MTUs of new data chunks 
+		 that will be sent in a burst in accordance with RFC 
+		 4960.  Valid values are from one to the maximum of an 
+		 Unsigned32.  Not all implementations will support the 
+		 upper ranges of an Unsigned32.
+		 
+		 The default vlaue from RFC 4960 is 4.  The default 
+		 value is required for Internet applications.
+		 
+		 Alterting this value has little effect on most 
+		 implementations."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 4 }
+	::= { sigtranSctpProfileEntry 15 }
+
+sigtranSctpProfileAssocMaxRetrans OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Defines the number of times that the sending endpoint 
+		 will attempt retransmission of a packet on any active 
+		 destination transport address before it aborts the 
+		 association.  Value values are zero (0) or greater.
+		
+		The default value from RFC 4960 is 10 retries.  The 
+		default value is suitable for Internet applications.
+
+		This value should be larger than the sum of the maximum 
+		path retransmission values for each destination.  
+		Setting the value to less than this sum has the 
+		interesting effect on some implementations of permitting 
+		an association to persist even when all destinations 
+		have been deemed inactive, which is undesirable for 
+		SIGTRAN applications."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 10 }
+	::= { sigtranSctpProfileEntry 16 }
+
+sigtranSctpProfileMaxSackDelay OBJECT-TYPE
+	SYNTAX		TimeInterval (0..50)
+	UNITS		"seconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Defines the maximmum interval of time that the sending 
+		 endpoint is permitted to delay an acknowledgement of 
+		 received data.  Value values are in the range from 0 to 
+		 500 milliseconds (50 centiseconds).  RFC 4960 forbis 
+		 setting this value larger than 500 milliseconds for 
+		 Internet applications.  The default value from RFC 4960 
+		 is 200 milliseconds (20 centiseconds).  The default 
+		 value is suitable for Internet applications.
+
+		 Reducing this value (even to 0) has the effect that 
+		 more SACKs are sent for the same data flow, but reduces 
+		 the chances of spurious false congestion events.  
+		 Increasing this value has little effect on reducing 
+		 SACKs sent, yet increases spurious retransmission by 
+		 the peer due to delayed SACK.  For many SIGTRAN 
+		 applications, this value should be set to zero (0)."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 20 } -- 20 centiseconds, 200 milliseconds
+	::= { sigtranSctpProfileEntry 17 }
+
+sigtranSctpProfileRtoMin OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Defines the minimum time interval that will be used as 
+		 a RTO (Retransmission Time Out) value when sending 
+		 packets to a destination transport address for the 
+		 association.  When a data chunk is sent and does not 
+		 receive acknowlegement within an RTO, the data chunk is 
+		 retransmitted.  Value values are zero (0) to the full 
+		 range of a TimeInterval.  Not all implementations will 
+		 support the upper ranges.  When set to zero (0), the 
+		 implementation should use the minimum clock granularity 
+		 instead.   This minimum must be less than or equal to 
+		 both RtoInitial and RtoMax.  Also, the value must be 
+		 greater than the MaxSackDelay of the far end.
+
+		 The default value from RFC 4960 is 1 second (100 
+		 centiseconds).  The default value is suitable for 
+		 Internet applications.
+
+		 It is generally agreed that the default values of 
+		 RtoMin, RtoInitial and RtoMax are all too high for high 
+		 performance SIGTRAN applications operating on 
+		 engineered networks.  Values from 200 milliseconds down 
+		 to zero are more appropriate for RtoMin, (but note that 
+		 the SACK delay of the far end must be adjusted downward 
+		 as well).  Increasing the value increases the latency 
+		 for detecting failure of the association due to path 
+		 failures in the network.  Decreasing the value 
+		 decreases the latency in detecting failure of the 
+		 association due to path failures in the network at the 
+		 costs of performing retransmission at higher initial 
+		 rate before detection."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 100 } -- 100 centiseconds, 1.00 seconds
+	::= { sigtranSctpProfileEntry 18 }
+
+sigtranSctpProfileRtoInitial OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Defines the initial time interval that wille be used as 
+		 a RTO (Retransmission Time Out) value when sending 
+		 packets to a destination transport address for the 
+		 association.  When a data chunk is sent and does not 
+		 receive acknowledgement within an RTO, the data chunk 
+		 is retransmitted.  Valid values are zero (0) to the 
+		 full range of a TimeInterval.  Not all implementations 
+		 will support the upper ranges. When set to zero (0), 
+		 the implementation should use the minimum clock 
+		 granularity instead.  This minimum must be less than or 
+		 equal to RtoMax and must be greater than or equal to 
+		 RtoMin.
+		
+		 The default value from RFC 4960 is 3 seconds.  The 
+		 default value is suitable for Internet applications.
+		
+		 It is generally agreed that the default values of 
+		 RtoMin, RtoInitial and RtoMax are all too high for high 
+		 performance SIGTRAN applications operating on 
+		 engineered networks.  Values at some midpoint between 
+		 suitable values of RtoMin and RtoMax should be chosen."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 300 } -- 300 centiseconds, 3.00 seconds
+	::= { sigtranSctpProfileEntry 19 }
+
+sigtranSctpProfileRtoMax OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Defines the maximum time interval that will be used as 
+		 a maximum RTO (Retransmission Time Out) value when 
+		 sending packets to a destination transport address for 
+		 the association.  When a data chunk is sent and does 
+		 not receive acknowledgement within an RTO, the data 
+		 chunk is restransmitted.  Valid values are zero (0) to 
+		 the full range of a TimeInterval.  Not all 
+		 implementations will support the upper ranges.  When 
+		 set to zero (0), the implementation should use the 
+		 minimum clock granularity instead.  This maximum must 
+		 be greater than both RtoInitial and RtoMin.
+
+		 The default from RFC 4960 is 60 seconds.  The default 
+		 value is sutiable for Internet applications.
+
+		 It is generally agreed that the default values of 
+		 RtoMin, RtoInitial and RtoMax are all too high for high 
+		 performance SIGTRAN applications operating on 
+		 engineered networks.  Values from 1 second down to 200 
+		 milliseconds are more appropriate for RtoMax.  
+		 Increasing the value dramatically increases the latency 
+		 for detecting associations unusable due to path or 
+		 interface failures, yet decreases spurious 
+		 retransmissions.  Reducing the value dramatically 
+		 reduces the latency for detecing associations unusable 
+		 due to path or interface failures, at the cost of a 
+		 moderate increase in spurious retransmissions."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 6000 } -- 6000 centiseconds, 60.00 seconds
+	::= { sigtranSctpProfileEntry 20 }
+
+sigtranSctpProfilePathMaxRetrans OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Defines the maximum number of times that an association 
+		 will attempt retranmitting a packet to a given 
+		 destination transport address before it considers that 
+		 detination transport address inactive.  Valid values 
+		 are
+		 zero (0) or greater.  Note that the value of 
+		 MaxInitiRetries should be greater than this number 
+		 times the number of interfaces at the peer engaged in a 
+		 multihomed association.
+		 
+		 The default value from RFC 4960 is 5 retries.  The 
+		 default value is suitable for Internet applications.
+
+		 Adjusting the value has a dramatic effect on the period 
+		 of time taken to fail-over between destinations for 
+		 multi-homed connections.  Lower values (including zero) 
+		 will yield faster fail-over response timers.  Lower 
+		 values, however, may cause thrashing between 
+		 destinations contributing to congestion in the network 
+		 and cause the peer more effort in reordering packets.  
+		 It is generally agreed that the default value is too 
+		 high for high performance SIGTRAN applications running 
+		 on engineered networks."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 5 }
+	::= { sigtranSctpProfileEntry 21 }
+
+sigtranSctpProfileHeartbeatItvl OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Defines the interval between successive HEARTBEAT 
+		 messages used to probe destination transport addresses 
+		 for RTT calculation and activity.  Valid values are 
+		 from zero (0) and greater.  Not all implementations 
+		 will support the upper ranges.  When set to zero(0) the 
+		 implementation should set the value to the granularity 
+		 of the system clock.  The default value from RFC 4960 
+		 is 60 seconds (6000 centiseconds).  This value is 
+		 appropriate for Internet applications.
+		
+		 Adjusting this value higher will have little effect on 
+		 reducing the number of packets in the network but will 
+		 greatly increase the latency of detection of path and 
+		 interface failures.  Decreasing the value will greatly 
+		 reduce the latency in detecting path and interface 
+		 failures, and the cost of a moderate increase in 
+		 packets sent on idle paths and interfaces connections.
+		
+		 It is generally agreed that the default value is too 
+		 high for high performance SIGTRAN applications running 
+		 on engineered newtorks.  Values from 1 second down to 
+		200 milliseconds are more appropriate."
+	REFERENCE
+		"RFC 4960"
+	DEFVAL		{ 6000 } -- 6000 centiseconds, 60.00 seconds
+	::= { sigtranSctpProfileEntry 22 }
+
+sigtranSctpProfileStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the ability for management stations to add and 
+		 delete rows from this table.  Rows may also be added 
+		 and deleted by the agent in respond to actions from a 
+		 local craft interface.
+
+		 Note that all values in the SCTP profile table are 
+		 persistent across an agent reboot."
+	REFERENCE
+		"STD 58"
+	::= { sigtranSctpProfileEntry 23 }
+
+
+-- ====================================================================
+-- ====================================================================
+-- ====================================================================
+-- ====================================================================
+-- ====================================================================
+
+END
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8

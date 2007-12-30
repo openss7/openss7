@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/10/18 06:52:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/12/16 03:53:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/18 06:52:57 $ by $Author: brian $
+# Last Modified $Date: 2007/12/16 03:53:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -148,14 +148,14 @@ libISOmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libISOdrvs_a_SOURCES = \
 				  src/drivers/clns.c \
-				  src/drivers/x25-lapb.c \
-				  src/drivers/x25-plp.c
+				  src/drivers/x25-lapb.c
+#				  src/drivers/x25-plp.c
 
 dist_EXTRA_libISOdrvs_a_SOURCES = \
 				  src/drivers/clns.c \
 				  src/drivers/tp.c \
-				  src/drivers/x25-lapb.c \
-				  src/drivers/x25-plp.c
+				  src/drivers/x25-lapb.c
+#				  src/drivers/x25-plp.c
 
 drvs_source_FILES		= $(nodist_EXTRA_libISOdrvs_a_SOURCES)
 
@@ -243,14 +243,14 @@ libISOmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libISOdrvs_a_SOURCES = \
 				  src/drivers/clns.c \
-				  src/drivers/x25-lapb.c \
-				  src/drivers/x25-plp.c
+				  src/drivers/x25-lapb.c
+#				  src/drivers/x25-plp.c
 
 dist_EXTRA_libISOdrvs_a_SOURCES = \
 				  src/drivers/clns.c \
 				  src/drivers/tp.c \
-				  src/drivers/x25-lapb.c \
-				  src/drivers/x25-plp.c
+				  src/drivers/x25-lapb.c
+#				  src/drivers/x25-plp.c
 
 drvs_source_FILES		= $(nodist_EXTRA_libISOdrvs_a_SOURCES)
 
@@ -462,6 +462,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.17  2007/12/16 03:53:05  brian
+# - updated release files
+#
 # Revision 0.9.2.16  2007/10/18 06:52:57  brian
 # - new build support
 #

@@ -1,0 +1,3436 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-M3UA-ASP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:19:11 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2007/12/15 20:19:11 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-M3UA-ASP-MIB.mib,v $
+-- Revision 0.9.2.3  2007/12/15 20:19:11  brian
+-- - updates
+--
+-- Revision 0.9.2.2  2007/10/15 01:14:26  brian
+-- - updated MIBs
+--
+-- Revision 0.9.2.1  2007/09/29 14:31:32  brian
+-- - added new mib files
+--
+-- =============================================================================
+
+OPENSS7-M3UA-ASP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MtpOptions, MtpAvailabilityStatus
+		FROM OPENSS7-MTP-TC
+	ProtocolVersion, SigtranOptions, RegistrationPolicy, AspIdPolicy, AssociationPolicy, 
+	AspState
+		FROM OPENSS7-SIGTRAN-TC
+	openss7Modules
+		FROM OPENSS7-SMI;
+
+M2uaAspMIB MODULE-IDENTITY
+	LAST-UPDATED
+		"200709260000Z"
+	ORGANIZATION
+		"OpenSS7 Corporation"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta T6L 6T1
+		 CANADA
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 E-Mail: bidulock@openss7.org"
+	DESCRIPTION
+		"MIB Module for SIGTRAN M3UA ASP management.
+
+		 General containment rules:
+
+		 -  Each ASP has a number of SG to which it connects.
+		 -  Each SG consists of one or more SGP
+		 -  Each ASP communicating with an SG forms an 
+		    association to each SGP in the SG.
+
+		 -  Each AS can be treated as similar to an MTP-SAP.
+		 -  Each ASP can be treated as similar to a signalling 
+		    point.
+		 -  Each SGP can be treated by an ASP as similar to a 
+		    signalling link.
+		 -  Each SG can be treated by an ASP as similar to a 
+		    (direct) link set
+		 -  Each SG grouping can be treated by an ASP as a 
+		    combined link set
+		 -  Each ASP can have route sets, route lists and routes 
+		    which correspond to destinations, combined link sets 
+		    (SG groupings), and link sets (SGs)
+		
+		 Then, management becomes applying the SS7 MTP 
+		 management model to these correspondences.  Treat SCTP 
+		 associations to SGPs like signalling links, SGs liked 
+		 link sets, SG groupings like combined link sets.  When 
+		 routing, apply the MTP routing management model.  When 
+		 generating alarms and collecting statistics, use the 
+		 MTP model.
+
+		"
+	::= { openss7Modules 31 }
+
+-- Top-level structure of the MIB
+
+m3uaAspNotifications		OBJECT IDENTIFIER ::= { M3uaAspMIB		 0 }
+m3uaAspObjects			OBJECT IDENTIFIER ::= { M3uaAspMIB		 1 }
+m3uaAspConformance		OBJECT IDENTIFIER ::= { M3uaAspMIB		 2 }
+
+--
+-- From STD 58: [To] achieve compatiblity with SNMPv1 traps, both when converting SMIv1 information 
+-- modules to an dfrom this SMI, and in the procedures employed by multi-lingual systems and proxy 
+-- forwarding applications, the next to last subidentifier must have the value zero.
+--
+
+m3uaAspScalars			OBJECT IDENTIFIER ::= { m3uaAspObjects		 1 }
+m3uaAspTables			OBJECT IDENTIFIER ::= { m3uaAspObjects		 2 }
+m3uaAspNotifObjects		OBJECT IDENTIFIER ::= { m3uaAspObjects		 3 }
+
+m3uaAspCompliances		OBJECT IDENTIFIER ::= { m3uaAspConformance	 1 }
+m3uaAspGroups			OBJECT IDENTIFIER ::= { m2uaAspConformance	 2 }
+
+m3uaAsp				OBJECT IDENTIFIER ::= { m3uaAspTables		 1 }
+m3uaAspAg			OBJECT IDENTIFIER ::= { m3uaAspTables		 2 }
+m3uaAspSg			OBJECT IDENTIFIER ::= { m3uaAspTables		 3 }
+m3uaAspSgp			OBJECT IDENTIFIER ::= { m3uaAspTables		 4 }
+m3uaAspSp			OBJECT IDENTIFIER ::= { m3uaAspTables		 5 }
+m3uaAspMt			OBJECT IDENTIFIER ::= { m3uaAspTables		 6 }
+m3uaAspRs			OBJECT IDENTIFIER ::= { m3uaAspTables		 7 }
+m3uaAspRl			OBJECT IDENTIFIER ::= { m3uaAspTables		 8 }
+m3uaAspRt			OBJECT IDENTIFIER ::= { m3uaAspTables		 9 }
+m3uaAspRc			OBJECT IDENTIFIER ::= { m3uaAspTables		10 }
+m3uaAspAs			OBJECT IDENTIFIER ::= { m3uaAspTables		11 }
+m3uaAspAf			OBJECT IDENTIFIER ::= { m3uaAspTables		12 }
+
+
+-- ====================================================================
+
+m3uaAspNextIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the next available index in the ASP table.  
+		 The value returned is zero if there are no more entries 
+		 available in the table."
+	::= { m3uaAsp 1 }
+
+m3uaAspTable
+	SYNTAX		SEQUENCE OF M3uaAspEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Defines the ASPs known to this host."
+	::= { m3uaAsp 2 }
+
+m3uaAspEntry
+	SYNTAX		M3uaAspEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Defines the characteristics of an ASP."
+	INDEX		{ m3uaAspIndex }
+	::= { m3uaAspTable 1 }
+
+M3uaAspEntry ::=
+	SEQUENCE {
+		m3uaAspIndex
+			Unsigned32,
+		m3uaAspName
+			CommonLanguageName,
+		m3uaAspAdministrativeState
+			AdministrativeState,
+		m3uaAspProceduralStatus
+			ProceduralStatus,
+		m3uaAspUsageState
+			UsageState,
+		m3uaAspState
+			AspState,		-- OPENSS7-SIGTRAN-TC
+		m3uaAspCapabilities
+			SigtranOptions,		-- OPENSS7-SIGTRAN-TC
+		m3uaAspIdPolicy
+			AspIdPolicy,		-- OPENSS7-SIGTRAN-TC
+		m3uaAspRegistrationPolicy
+			RegistrationPolicy,	-- OPENSS7-SIGTRAN-TC
+		m3uaAspAssociationPolicy
+			AssociationPolicy,	-- OPENSS7-SIGTRAN-TC
+		m3uaAspStatus
+			RowStatus
+	}
+
+m3uaAspIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an index for the table."
+	::= { m3uaAspEntry 1 }
+
+m3uaAspName OBJECT-TYPE
+	SYNTAX		CommonLanguageName
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a name for the ASP following COMMON LANGUAGE 
+		 naming procedures according to the CommonLanugageName 
+		 textual convention."
+	::= { m3uaAspEntry 2 }
+
+m3uaAspAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall adminstrative state of the ASP 
+		 following the AdministrativeState textual convention. 
+		 When locked(0), no SCTP associations will exist with 
+		 any SGP and no local AS will be permited to activate.  
+		 When unlocked(0) all unlocked associations may be 
+		 formed and attempts to bind and activate local AS will 
+		 be permited.  The state can be set."
+	::= { m3uaAspEntry 3 }
+
+m3uaAspProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall procedural status of the ASP 
+		 following the ProceduralStatus textual convention.  The 
+		 overall procedural status is the set-union (logical OR) 
+		 of the procedural statuses of all of the ASP-SGP 
+		 associations defined for this ASP."
+	::= { m3uaAspEntry 1 }
+
+m3uaAspUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall usage state of the ASP following 
+		 the UsageState textual convention.  The overall usage 
+		 state is the greatest value of the state of the 
+		 individual usage states of the ASP-SGP associations."
+	::= { m3uaAspEntry 2 }
+
+m3uaAspState OBJECT-TYPE
+	SYNTAX		AspState -- OPENSS7-SIGTRAN-TC
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall ASP state of the ASP following the 
+		 AspState textual convention.  The overall state is the 
+		 largest state number of the individual ASP-SGP 
+		 associations."
+	::= { m3uaAspEntry 3 }
+
+m3uaAspCapabilities OBJECT-TYPE
+	SYNTAX		SigtranOptions -- OPENSS7-SIGTRAN-TC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the capabilities of the AS using the 
+		 SigtranOptions textual convention."
+	::= { m3uaAspEntry 4 }
+
+m3uaAspIdPolicy OBJECT-TYPE
+	SYNTAX		AspIdPolicy -- OPENSS7-SIGTRAN-TC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the default ASP Id policy for the ASP 
+		 following the AspIdPolicy textual convention."
+	::= { m3uaAspEntry 5 }
+
+m3uaAspRegistrationPolicy OBJECT-TYPE
+	SYNTAX		RegistrationPolicy -- OPENSS7-SIGTRAN-TC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the registration policy for the ASP and is 
+		 intended on reflecting the registration policy of the 
+		 ASP toward the local AS that it serves.  It is tempered 
+		 by the registration policy of the particular SG that 
+		 serves an ASP."
+	::= { m3uaAspEntry 6 }
+
+m3uaAspAssociationPolicy OBJECT-TYPE
+	SYNTAX		AssociationPolicy -- OPENSS7-SIGTRAN-TC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the association formation policy for the ASP 
+		 following the AssociationPolicy textual convention."
+	::= { m3uaAspEntry 7 }
+
+m3uaAspStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the ability for management stations to add an 
+		 delete entries from this table according to the 
+		 RowStatus textual convention."
+	::= { m3uaAspEntry 8 }
+
+
+-- ====================================================================
+
+m3uaAspAgNextIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the next available index in the AG table.  The 
+		 value returned is zero if there are no more entries 
+		 available in the table."
+	::= { m3uaAspAg 1 }
+
+m3uaAspAgTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M3uaAspAgEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Defines the SG groupings known to the host.  Each 
+		 grouping known to the host is defined by one entry in 
+		 this table."
+	::= { m3uaAspAg 2 }
+
+m3uaAspAgEntry OBJECT-TYPE
+	SYNTAX		M3uaAspAgEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Defines the charactersits of each SG grouping.  Most 
+		 characteristics of signalling gateways are expected to 
+		 be the same within a signalling gateway grouping."
+	INDEX { m3uaAspAgIndex }
+	::= { m3uaAspAgTable 1 }
+
+M3uaAspAgEntry ::=
+	SEQUENCE {
+		m3uaAspAgIndex
+			Unsigned32,
+		m3uaAspAgProtocolVersion
+			ProtocolVersion,	-- OPENSS7-SIGTRAN-TC
+		m3uaAspAgOptions
+			SigtranOptions,		-- OPENSS7-SIGTRAN-TC
+		m3uaAspAgRegistrationPolicy
+			RegistrationPolicy,	-- OPENSS7-SIGTRAN-TC
+		m3uaAspAgAspIdPolicy
+			AspIdPolicy,		-- OPENSS7-SIGTRAN-TC
+		m3uaAspAgAspProtocolPayloadId
+			INTEGER,
+		m3uaAspAgIpPort
+			IpPort,
+		m3uaAspAgMinOstreams
+			INTEGER,
+		m3uaAspAgMaxIstreams
+			INTEGER,
+		m3uaAspAgTimerT7
+			TimeInterval,
+		m3uaAspAgTimerT19
+			TimeInterval,
+		m3uaAspAgTimerT21
+			TimeInterval,
+		m3uaAspAgTimerT25A
+			TimeInterval,
+		m3uaAspAgTimerT28A
+			TimeInterval,
+		m3uaAspAgTimerT29A
+			TimeInterval,
+		m3uaAspAgTimerT30A
+			TimeInterval,
+		m3uaAspAgStatus
+			RowStatus
+	}
+
+m3uaAspAgIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an index into the AG table as well as an 
+		 identifier for refereing to groupings of SG."
+	::= { m3uaAspAgEntry 1 }
+
+m3uaAspAgProtocolVersion OBJECT-TYPE
+	SYNTAX		ProtocolVersion -- OPENSS7-SIGTRAN-TC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the protocol version associated with the 
+		 remote signalling gateway.  The version is either 
+		 rfc3332(1) for RFC 3332 behaviour, ts102142(2) for ETSI 
+		 TS 102 142 behaviour, or rfc4666(3) for RFC 4666 
+		 behaviour, or interoperable(0) for interoperable 
+		 behaviour that can accomodate all of these."
+	REFERENCE
+		"RFC 3332, RFC 4666, ETSI TS 102 142-V1.1.1 (2003-05)"
+	::= { m3uaAspAgEntry 2 }
+
+m3uaAspAgOptions OBJECT-TYPE
+	SYNTAX		SigtranOptions -- OPENSS7-SIGTRAN-TC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall options associated with the remote 
+		 SGs in the grouping an follows the SigtranOptions 
+		 textual convention.  Options that are not pertinent to 
+		 M3UA may be ignored.  If the SGs support ASPEXT, the 
+		 agent will be able to update these options after an ASP 
+		 Up procedure has been established with the SG.  If 
+		 there is an inconsistency between SG in the grouping, 
+		 use the set that  is supported by all SG."
+	::= { m3uaAspAgEntry 3 }
+
+m3uaAspAgRegistrationPolicy OBJECT-TYPE
+	SYNTAX		RegistrationPolicy -- OPENSS7-SIGTRAN-TC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the registration policy of the SG in the group 
+		 following the RegistrationPolicy textual convention."
+	::= { m3uaAspAgEntry 4 }
+
+m3uaAspAgAspIdPolicy OBJECT-TYPE
+	SYNTAX		AspIdPolicy -- OPENSS7-SIGTRAN-TC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the ASP Id policy of the SG in the group 
+		 following the AspIdPolicy textual convention."
+	::= { m3uaAspAgEntry 5 }
+
+m3uaAspAgAspProtocolPayloadId OBJECT-TYPE
+	SYNTAX		INTEGER (0|3)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the SCTP payload protocol identifier to be 
+		 used in data chunks passed in associations to SGP for 
+		 the SG in this group.  This can either be 0 or 3 
+		 according to RFC 4666."
+	REFERENCE	"RFC 4666"
+	::= { m3uaAspAgEntry 6 }
+
+m3uaAspAgIpPort OBJECT-TYPE
+	SYNTAX		IpPort
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the IP port number at which to contact SGP in 
+		 this group.  The default 
+		is the well known port number for M3UA."
+	DEFVAL		{ 2905 }
+	::= { m3uaAspAgEntry 7 }
+
+m3uaAspAgMinOstreams OBJECT-TYPE
+	SYNTAX		INTEGER (2..16384)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the minimum number of outbound streams to 
+		 request from SGP in this group.  The minimum value is 2 
+		 per RFC 4666.  A reasonable default is 32."
+	DEFVAL		{ 32 }
+	::= { m3uaAspAgEntry 8 }
+
+m3uaAspAgMaxIstreams OBJECT-TYPE
+	SYNTAX		INTEGER (2..16384)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the maximum number of inbound streams that 
+		 will be reported when forming a connection to SGP in 
+		 this group.  The minimum value to support RFC 4666 is 
+		 2.  The value of 32 is a more reasonable default."
+	::= { m3uaAspAgEntry 9 }
+
+m3uaAspAgTimerT7 OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { m3uaAspAgEntry 10 }
+
+m3uaAspAgTimerT19 OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"In addition, [to sending TRA] timer T19 is started for 
+		 all signalling points to which a TRA message has just 
+		 been sent.  Normal operation is then resumed.
+
+		 If a signalling point X recieves an unexpected TRA 
+		 message from an adjacent node Y and no associated T19 
+		 timer is running, X sends to Y any necessary TFP and 
+		 TFR messages if X has the transfer function, and a TRA 
+		 message to Y.  In addition, X starts timer T19 
+		 associated with Y.
+
+		 If a signalling point receives a TRA message from an 
+		 adjacent node and an associated T19 is running, this 
+		 TRA is discarded and no further action is taken.
+
+		 Note: ITU T19 is like ANSI T29 and T30 and is set on a 
+		 link set basis.
+		"
+	REFERENCE
+		"Q.704 (1996) 9.2.4, 9.5.1, 9.5.2"
+	::= { m3uaAspAgEntry 11 }
+
+m3uaAspAgTimerT21 OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"MTP Restart timer.
+		
+		 A signalling point X considers that MTP of an 
+		 inaccessible adjacent signalling point Y is restarting 
+		 when:
+
+		 -  the first link in a direct link set is in the 'in 
+		    serivce' state at level 2; or
+		 -  another route becomes available due either to 
+		    reception of a corresponding TFA, TFR or TRA 
+		    message, or by the corresponding link set becoming 
+		    available.
+
+		 When the first link in a direct link set toward 
+		 signalling point Y, whose MTP is restarting, is in the 
+		 'in service' state at level 2, signalling point X 
+		 starts a timer T21 and takes into account of any TFP, 
+		 TFA and TFR messages received from signalling point Y.  
+		 In addition, X takes the following action:
+
+		 -  If X has the transfer function, when the direct link 
+		    set is available at level 3, X sends any necessary 
+		    TFP and TFR message to Y; then
+
+		 -  X sends a traffic restart allowed message to 
+		    signalling point Y.
+
+		 If a signalling point, previously declared to be 
+		 inacessible, becomes available again before T21 is 
+		 stopped or expires, a corresponding TFA or TFR message 
+		 is sent to the signalling point Y whose MTP is 
+		 restarting.
+
+		 If a signalling point becomes prohibited or restricted 
+		 to signalling point X after a TRA message has been sent 
+		 to X by Y, X stops timer T21.
+
+		 When T21 is stopped or expires, signalling point X 
+		 sends an MTP-RESUME primitive concerning Y, and all 
+		 signalling points made available via Y, to all local 
+		 MTP Users.  If X has the transfer function, it 
+		 broadcasts to adjacent available signalling points 
+		 transfer-allowed and/or tansfer restricted messages 
+		 concerning Y and all signalling points made accessible 
+		 by Y.
+
+		 After the MTP of an adjacent node X has restarted, and 
+		 if T21 has been started, all routes using X are 
+		 considered to be available unless corresponding TFP or 
+		 TFR messages have been received whilst T21 was running.
+
+		 NOTE: ITU-T T21 is similar to ANSI T28 and T25.
+		 "
+	REFERENCE
+		"Q.704 (1996) 9.3.1, 9.3.2, 9.6.2"
+	::= { m3uaAspAgEntry 12 }
+
+m3uaAspAgTimerT25A OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"9.1. When the first signalling link goes into the in 
+		 service state at level 2, the restarting signalling 
+		 point begins taking into account any 
+		 trasnfer-prohibited, trasnfer-restricted, 
+		 transfer-allowed, traffic restart-allowed, and traffic 
+		 restart waiting messages received.  The restarting 
+		 point starts timer T22 and T26 either when the first 
+		 signalling link goes in the in service state at level 2 
+		 or when the first signalling link becomes available at 
+		 level 3.  When a traffic restart waiting message is 
+		 received before user traffic is restarted on the 
+		 link(s) to the point that sent the traffic restart 
+		 waiting message, timer T25 is started and user traffic 
+		 is not restarted on that link set until a traffic 
+		 restart allowed message is received or timer T25 
+		 expires.
+
+		 9.3. A signalling point X considers that the MTP of an 
+		   inaccessible adjacent signalling point Y is 
+		   restarting when: (1) The first link in a direct link 
+		   set is in the in service state at level 2, or (2) a 
+		   route other than a direct link set becomes available, 
+		   e.g. through receipt of a transfer allowed or 
+		   transfer restart allowed message or the availability 
+		   of the corresponding link set.
+
+		 When the first link in a direct link set toward the 
+		 restarting signalling point Y goes into the in service 
+		 state at level 2, signalling point X begins taking into 
+		 account any traffic restart waiting, traffic restart 
+		 allowed, transfer-prohibited, transfer-restricted, and 
+		 transfer-allowed messages from Y.  Signalling oint X 
+		 starts timer T28 either when the first link goes into 
+		 the in service state at level 2 or when the first 
+		 signalling link becomes available at level 3.  In 
+		 addition it takes the following actions:
+
+		 (1) If a TRW message is receive from Y while T28 is 
+		 running or before it is started, X starts T25.  X stops 
+		 T28 if it is running.
+		 (2) If a TRW message is receives from Y while T25 is 
+		 running, X restarts T25.
+		 (3) When the first link in a link set to Y becomes 
+		 available, signalling point X sends to Y a traffic 
+		 restart allowed message or, if X has the transfer 
+		 function, a traffic restart wiating mesasge followed by 
+		 transfer-prohibited (note that all transfer prohibited 
+		 messages according to 13.2.2(1) must be sent) and 
+		 transfer-restriced messages and a traffic restart 
+		 allowed message.
+		 (4) If a destination becomes prohibited, restricted, or 
+		 available at X, after X has sent a traffic restart 
+		 allowed message to Y, X notifies Y of the status change 
+		 by the normal procedures in Section 13.
+		 (5) When a traffic restart allowed message has been 
+		 sent to Y and a traffic restart allowed message has 
+		 been received from Y, X stops T25 or T28, whichever is 
+		 running, and restarts traffic on the link set to Y.  X 
+		 gives MTP-RESUME primitives to users concerning Y and 
+		 any destinations made accessible via Y.  If X has the 
+		 transfer function it also broadcasts trasnfer-allowed 
+		 or transfer-restricted messages concerning the same 
+		 destinations.
+		 (6) If T28 expires, X restarts traffic on the link set 
+		 to Y as in (5), unless a traffic restart allowed 
+		 message has not been sent to Y.  In that case, X starts 
+		 T25 and completes the sending of transfer prohibited 
+		 and transfer restricted messages, followed by a traffic 
+		 restart allowed message.  Then, unless a traffic 
+		 restart waiting message has been received from Y 
+		 without a subsequent traffic restart allowed message, X 
+		 stops T25 and restarts traffic on the link set to Y.
+
+		 (7) If T25 expires, X restarts traffic on the link set 
+		 toward Y.  In the abnormal case when X has not 
+		 completed sending transfer-prohibited and 
+		 transfer-restricted messages to Y, X completes sending 
+		 transfer-prohibited messges required by 13.2.2 (1) and 
+		 sends a traffic restart allowed message before 
+		 restarting user traffic.
+
+		 (8) If no traffic restart allowed message has been 
+		 received from Y when traffic is restarted to Y, timer 
+		 T9 is started.
+
+		 When signalling point Y becomes accessible via a route 
+		 other than a direct link set between X and Y, X sends 
+		 MTP-RESUME primitives concerning Y to all local MTP 
+		 users.  In addition, if signalling point X has the 
+		 transfer function, X sends to Y any required transfer 
+		 prohibitied and transfer restricted messages concerning 
+		 Y.
+		 "
+	REFERENCE
+		"ANSI T1.111.4/2000 9.1, 9.3"
+	::= { m3uaAspAgEntry 13 }
+
+m3uaAspAgTimerT28A OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"See TimerT25A above."
+	REFERENCE
+		"ANSI T1.111.4/2000 9.3"
+	::= { m3uaAspAgEntry 14 }
+
+m3uaAspAgTimerT29A OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ANSI T1.111.4/2000 9.4"
+	::= { m3uaAspAgEntry 15 }
+
+m3uaAspAgTimerT30A OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"9.4.  If the receiving point has the transfer function, 
+		 it starts timer T30, sends a traffic resart waiting 
+		 message followed by the necessary transfer and transfer 
+		 prohibited messages (preventative transfer-prohibited 
+		 messages acording to 13.2.2(1) are required for traffic 
+		 currently being routed via the point from which the 
+		 unexpected traffic restart allowed or traffic resart 
+		 wating messge was received), and a traffic restart 
+		 allowed messge.  It then stops T30 and starts T29.  IN 
+		 the abnormal case that T30 expires before the sending 
+		 of transfer-prohibited and transfer-restricted messages 
+		 is completed, it sends a traffic restart allowed 
+		 message, starts T29, and then completes sending any 
+		 preventative transfer-prohibited messages according to 
+		 13.2.2 (1) for traffic currently being routed via the 
+		 point from which the unexpected traffic restart allowed 
+		 or traffic restart waiting message was received.
+		"
+	REFERENCE
+		"ANSI T1.111.4/2000 9.4"
+	::= { m3uaAspAgEntry 16 }
+
+
+-- TODO: other primary SCTP protocol parameters for the association need to be included here or 
+-- somewhere.  Because the SG may be geographically distant from each other, however, the SGP 
+-- making up an SG are expected to be collocated, the refined QoS related SCTP protocol 
+-- parameters should be set for each SG rather than for the group.
+
+m3uaAspAgStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the ability for management stations to add, 
+		 delete and otherwise control the containing row in the 
+		 AG table.  Characteristics that are set while in the 
+		 active state might not be applied to SG within this 
+		 group until the next  time that an association is 
+		 formed with an SGP in this group."
+	::= { m3uaAspAgEntry 17 }
+
+
+-- ====================================================================
+
+m3uaAspSgTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M3uaAspSgEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Defines the individual SG that belong to SG groups."
+	::= { m3uaAspSg 1 }
+
+m3uaAspSgEntry OBJECT-TYPE
+	SYNTAX		M3uaAspSgEntry
+	MAX-ACCESS	not-accessible
+	DESCRIPTION
+		"Defines the characteristis of individual SG within an 
+		 SG grouping."
+	INDEX { m3uaAspAgIndex, m3uaAspSgIndex }
+	::= { m3uaAspSgTable 1 }
+
+M3uaAspSgEntry ::=
+	SEQUENCE {
+		m3uaAspSgIndex
+			Unsigned32,
+		m3uaAspSgName
+			CommonLanaguageName,
+		m3uaAspSgAdministrativeState
+			AdministrativeState,
+		m3uaAspSgOperationalState
+			OperationalState,
+		m3uaAspSgProcedurealStatus
+			ProceduralStatus,
+		m3uaAspSgUsgageState
+			UsageState,
+		m3uaAspSgAspState
+			AspState, -- OPENSS7-SIGTRAN-TC
+		m3uaAspSgMaxInitRetrans
+			Unsigned32,
+		m3uaAspSgMaxPathRetrans
+			Unsigned32,
+		m3uaAspSgMaxLifeTime
+			TimeInterval,
+		m3uaAspSgTimerT1
+			TimeInterval,
+		m3uaAspSgTimerT2
+			TimeInterval,
+		m3uaAspSgTimerT3
+			TimeInterval,
+		m3uaAspSgTimerT4
+			TimeInterval,
+		m3uaAspSgTimerT5
+			TimeInterval,
+		m3uaAspSgTimerT17
+			TimeInterval,
+		m3uaAspSgTimerT19A
+			TimeInterval,
+		m3uaAspSgTimerT24
+			TimeInterval,
+		m3uaAspSgTimerT31A
+			TimeInterval,
+		m3uaAspSgTimerT32A
+			TimeInterval,
+		m3uaAspSgTimerT33A
+			TimeInterval,
+		m3uaAspSgTimerT34A
+			TimeInterval,
+		m3uaAspSgTimerT1T
+			TimeInterval,
+		m3uaAspSgTimerT2T
+			TimeInterval,
+		m3uaAspSgStatus
+			RowStatus
+	}
+
+m3uaAspSgIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an index into the SG grouping identifying the 
+		 SG in the group.  In most circumstances there will only 
+		 be one or maybe two SG in a group."
+	::= { m3uaAspSgEntry 1 }
+
+m3uaAspSgName OBJECT-TYPE
+	SYNTAX		CommonLanaguageName
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a name for the SG following COMMON LANGUAGE 
+		 procedures and the CommonLanguageName textual 
+		 convention."
+	::= { m3uaAspSgEntry 2 }
+
+m3uaAspSgAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provide the overall administrative state of the SG, 
+		 following the AdministrativeState textual convention.  
+		 When in the locked(0) state, no association will exist 
+		 between an ASP and an SGP belonging to the SG.  When in 
+		 the unlocked(1) state, an association may exist between 
+		 ASPs and SGP belonging to the SG.  When set to the 
+		 locked(0) state, all ASPs will place themselves in the 
+		 ASP Down state for the SGP belonging to the SG and 
+		 shutdown SCTP associations to the SGP.  When set to the 
+		 unlocked(0) state, any ASPs in the unlocked 
+		 administrative state will form associations to SGP in 
+		 the unlocked administrative state and bring themsleves 
+		 to the ASP Up state."
+	DEFVAL		{ locked(0) }
+	::= { m3uaAspSgEntry 3 }
+
+m3uaAspSgOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall operational state of the SG 
+		 following the OperationalState textual convention.  The 
+		 operational state is the most active operational state 
+		 of the SGP belonging to the SG."
+	DEFVAL		{ disabled(0) }
+	::= { m3uaAspSgEntry 4 }
+
+m3uaAspSgProcedurealStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall procedural state of the SG 
+		 following the ProceduralState textual convention.  The 
+		 overall procedural state is the set-union (logical OR) 
+		 of the procedural states of the invividual SGP 
+		 belonging to the SG."
+	DEFVAL		{ '000000'B }
+	::= { m3uaAspSgEntry 5 }
+
+m3uaAspSgUsgageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall usage state of the SG following 
+		 the UsageState textual convention.  The overall usage 
+		 state of the SG is the most active usage state of the 
+		 SGP belonging to the SG."
+	DEFVAL		{ idle(0) }
+	::= { m3uaAspSgEntry 6 }
+
+m3uaAspSgAspState OBJECT-TYPE
+	SYNTAX		AspState -- OPENSS7-SIGTRAN-TC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall ASP state of the SG following the 
+		 AspState textual convention.  The overall ASP state is 
+		 the most active ASP state of the SGP belonging to the 
+		 SG.  Setting this column to down(0) causes the ASP in a 
+		 state other than down(0) or terminating(3) to perform 
+		 an ASP Down procedure.  Setting this column to up(3) 
+		 causes the ASP in a state other than up(3) or 
+		 initializing(1) to perform the ASP Up procedure."
+	::= { m3uaAspSgEntry 7 }
+
+m3uaAspSgMaxInitRetrans OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the MaxInitRetrans SCTP protocol parameter 
+		 that will be used by SCTP associations formed by ASPs 
+		 when connecting to SGP belonging to this SG.  The 
+		 default is the default defined by RFC 4960."
+	REFERENCE	"RFC 4960"
+	DEFVAL		{ 5 }
+	::= { m3uaAspSgEntry 8 }
+
+m3uaAspSgMaxPathRetrans OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the MaxPathRetrans SCTP protocol parameter 
+		 that will be used by SCTP associations formed by ASPs 
+		 when connecting to SGP belonging to this SG.  The 
+		 default value is the default defined by RFC 4960."
+	REFERENCE	"RFC 4960"
+	DEFVAL		{ 10 }
+	::= { m3uaAspSgEntry 9 }
+
+m3uaAspSgMaxLifeTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the maximum life time of messages sent on SCTP 
+		 assocations to SGP making up this SG.  This is the 
+		 maximum life time following the life time mechanism of 
+		 RFC 4960 and additional procedures of RFC 4666 and 
+		 draft-bidulock-sigtran-corid.  If a transmitted message 
+		 has not been acknowledged by the peer on an SCTP 
+		 association within this interval, the SCTP association 
+		 will be aborted.
+
+		 When the SCTP association is first formed to an SGP, 
+		 M3UA sends a heartbeat message (or interrogates SCTP) 
+		 to determine the round trip time (RTT) experienced on 
+		 the association.  If twice the RTT experienced on the 
+		 association is greater than this lifetime, the SCTP 
+		 association is aborted and the SCTP asssociation 
+		 restoration procedures adopted.
+
+		 While an SCTP association is in service, every T2T, 
+		 M3UA sends a heartbeat message (or interrogates SCTP) 
+		 to determine a new value of the smoothed round trip 
+		 time (SRTT) experienced on the association.  If the 
+		 SRTT exceeds this maximum life time, the SCTP 
+		 association will be considered failed, the SCTP
+		 association aborted and the SCTP assocation restoration 
+		 procedures invoked.
+		"
+
+m3uaAspSgTimerT1 OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the time-controlled changeover timer T1 
+		 timeout value.  In the ITU-T and ANSI MTP networks, 
+		 this timeout has a range from 0.5 to 1.2 seconds and a 
+		 recommended value of 0.8 seconds.  The default value 
+		 for the M3UA newtork is 
+		 0.8 seconds (80 centiseconds).
+
+		 When an ASP receives an unsolicited ASP Inactive Ack 
+		 message for an application server, the application 
+		 server is considered blocked until ASP Active 
+		 procedures are successful for the given application 
+		 server.  When the ASP receives the unsolicited ASP 
+		 Inactive Ack, timer T1 is started and messages destined 
+		 for the corresponding SGP are buffered.  The ASP then 
+		 attempts to return the AS to its previous state by 
+		 performing the ASP Active procedures for the AS.  If 
+		 the ASP Active procedures are successful before timer 
+		 T1 expires, traffic is directed to the SGP for the AS 
+		 beginning with the contents of the buffer.  If T1 
+		 expires before the ASP Active procedures are 
+		 successful, the contents of the buffer are diverted to 
+		 other SGP for which the AS is active within the same SG 
+		 grouping, or forced rerouting procedures are invoked 
+		 for the traffic."
+	REFERENCE
+		"draft-bidulock-sigtran-corid"
+	DEFVAL		{ 80 }
+	::= { m3uaAspSgEntry 10 }
+
+m3uaAspSgTimerT2 OBJECT-TYPE
+	SYNTAX		TimeInterval -- (70..200)
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the sequenced changeover timer T2 timeout 
+		 value.  In the IUT-T, ETSI and ANSI MTP networks, this 
+		 timeout has a range from 0.7 to 2.0 seconds, with a 
+		 default value of 1.4 seconds.  The default value for 
+		 the M3UA network is 1.4 seconds (140 centiseconds).
+
+		 When an SCTP association to an SGP fails and traffic 
+		 for a given set of application servers was being 
+		 directed to that SGP, and a alternate SGP in the same 
+		 SG is active for those application servers, and the 
+		 CORID procedures are supported between the ASP and the 
+		 SGP, the ASP tags the traffic and diverts it 
+		 immediately to the alternate SGP.  Where the ASP or the 
+		 SGP do not support CORID procedures, a timer T2 is 
+		 started and message traffic destined to the failed SGP 
+		 is buffered.  When timer T2 expires, message traffic is 
+		 diverted to the atlernate SGP for each AS flow, 
+		 beginning with the buffered traffic.
+
+		 When there is no alternate SGP within the same SG for a 
+		 given AS traffic flow toward the failed SGP, forced 
+		 rerouting procedures are also invoked for the AS flow."
+	REFERENCE
+		"draft-bidulock-sigtran-corid"
+	DEFVAL		{ 140 }
+	::= { m3uaAspSgEntry 11 }
+
+m3uaAspSgTimerT3 OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the time-controlled changeback timer T3 
+		 timeout value.  In the IUT-T, ETSI and ANSI MTP 
+		 networks, this timeout has a range from 0.5 to 1.2 
+		 seconds and a default value of 0.8 seconds.  For M3UA 
+		 newtorks, the default value is 
+		 0.8 seconds or (80 centiseconds).
+
+		 When an SCTP association to an SGP is activated or 
+		 restored and the ASP Active procedure is successful, 
+		 and the ASP wishes to redirect traffic curently 
+		 delivered to an alternate SGP back to the newly 
+		 acivated SGP which is the normal SGP for the traffic, 
+		 and the alternate SGP and the newly resotred SGP do not 
+		 belong to the same SG, the time-controlled changeback 
+		 procedures are invoked in accordance with CORID.  The 
+		 ASP esablishes a changeback buffer for the AS traffic 
+		 to be diverted back to the restored SGP and starts 
+		 timer T3.  Messages for the AS traffic flows is 
+		 diverted to the changeback buffer.  When T3 expires, 
+		 the AS traffic flows are restarted to the restored SGP, 
+		 beginning with the contents of the changeback buffer."
+	REFERENCE
+		"draft-bidulock-sigtran-corid"
+	DEFVAL		{ 80 }
+	::= { m3uaAspSgEntry 12 }
+
+m3uaAspSgTimerT4 OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the coordinated changeback timer T4 timeout 
+		 value.  In the ITU-T, ETSI and ANSI networks, this 
+		 timeout has a range from 0.5 to 1.2 seconds and a 
+		 default value of 0.8 seconds.  For M3UA networks, the 
+		 default value is 0.8 seconds or (80 centiseconds).
+
+		 When an SCTP association to an SGP is activated or 
+		 restored and the ASP Active procedure is successful, 
+		 and the ASP wishes to redirect traffic currently 
+		 delivered to an alternate SGP back to the newly 
+		 activated SGP which is the normal SGP for the traffic, 
+		 and the alternate SGP and the newly restored SGP belong 
+		 to the same SG, the coordinated changeback procedures 
+		 are invoked in accordance with CORID.  The ASP 
+		 establishes a changeback buffer for the AS traffic to 
+		 be diverted back to the restored SGP and starts timer 
+		 T4.  An M3UA BEAT message for each SCTP association and 
+		 SCTP stream corresponding to an
+		 AS flow is formulated and sent on that stream.  Once 
+		 all of the BEAT Acknowledgement messages have been 
+		 reaceived for the AS flows, while T4 is running, T4 is 
+		 stopped and the AS traffic will be redirected to the 
+		 newly restored SGP beginning with the traffic in the 
+		 changeback buffer.
+		 
+		 If T4 expires before all of the BEAT acknowledgement 
+		 messages are received, another BEAT message is sent for 
+		 the AS flows for which no BEAT acknolwedgement message 
+		 has been received and timer T5 is started."
+	REFERENCE
+		"draft-bidulock-sigtran-corid"
+	DEFVAL		{ 80 }
+	::= { m3uaAspSgEntry 13 }
+
+m3uaAspSgTimerT5 OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the coordinated changeback timer T5 timeout 
+		 value.  In the ITU-T, ETSI and ANSI MTP networks, this 
+		 timer has the range from 0.5 to 1.2 seconds and a 
+		 default value of 0.8 seconds.  For M3UA networks, the 
+		 default value is 
+		 0.8 seconds (80 centiseconds).
+
+		 When an initial coordianted changeback procedure does 
+		 not complete within timer T4, a second round of M3UA 
+		 BEAT messages is sent and timer T5 is started.  If all 
+		 of the BEAT acknowledgement messages are received 
+		 before while T5 is running, T5 is stopped and the AS 
+		 traffic will be redirected to the newly restored SGP 
+		 beginning with the traffic in the changeback buffer.
+
+		 If T5 expires before all of the BEAT acknowledgement 
+		 messages are received, the AS traffic will be 
+		 redirected to the newly restored SGP beginning with the 
+		 traffic in the changeback buffer."
+	REFERENCE
+		"draft-bidulock-sigtran-corid"
+	DEFVAL		{ 80 }
+	::= { m3uaAspSgEntry 14 }
+
+m3uaAspSgTimerT17 OBJECT-TYPE
+	SYNTAX		TimeInterval -- (80..150)
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides SCTP Association oscillation timer T17 
+		 timeout.  This timer and associated procedures are only 
+		 pertinent when the RestorationPolicy associated with 
+		 the SG grouping is set to simple(1) and when automatic 
+		 restoration is performed.  Values for T17 in the ITU-T 
+		 MTP network are from 0.8 to 1.5 seconds.  The default 
+		 for M3UA networks is 1 second (100 centiseconds).
+
+		 The T17 timeout value is used as follows:
+
+		 When a automatic devision is taken to activate an 
+		 ASP-SGP relation, the initiation of an SCTP assocaition 
+		 start.  If the SCTP association formation is 
+		 successful, the ASP Up procedure is invoked.  If the 
+		 ASP Up procedure is successful, the association test 
+		 procedure is invoked.  If the association test 
+		 procedure is successful, the association becomes ready 
+		 for activation of application servers.  In the case 
+		 where SCTP establishment is not possible, as determined 
+		 by SCTP, new association procedures are started for the 
+		 same ASP-SGP relation after a timer T17 (delay to avoid 
+		 the oscillation of establishment procedures).  The 
+		 value of T17 should be greater than the loop delay and 
+		 less than the association establishment and ASP Up 
+		 procedure timeouts.  If the ASP Up procedure fails, 
+		 SCTP association restoration starts until the 
+		 association is established or a manual intervention is 
+		 made.
+
+		 After an SCTP association failure is detected, 
+		 association establishment will take place.  In the case 
+		 when the association establishment is successful, the 
+		 ASP UP procedure is invoked.  If the ASP Up procedure 
+		 is successful, the association is restored and thus 
+		 available for activation of AS.
+
+		 If the establishment of the SCTP association is not 
+		 possible, as determined by SCTP, new establishment 
+		 procedures may be started on the same ASP-SGP relation 
+		 after a time T17, until the association is restored or 
+		 a manual intervention is made.  If the ASP Up procedure 
+		 fails, the association is aborted and the restoration 
+		 procedure is repeated until the association is restored 
+		 or manual intervention is made."
+	REFERENCE
+		"ITU-T Rec. Q.704 (1996) : Clause 12."
+	DEFVAL		{ 100 }
+	::= { m3uaAspSgEntry 15 }
+
+m3uaAspSgTimerT19A OBJECT-TYPE
+	SYNTAX		TimeInterval -- (48000..60000)
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the SCTP association maintenance timer T19A 
+		 timeout.  This timer and associated procedures are only 
+		 pertinent when the RestorationPolicy associated with 
+		 the SG grouping is set to simple(1), procedureA(2), 
+		 procedureB(3) or other(4) and when automatic 
+		 restoration is performed.  Values for T19A in the ANSI 
+		 MTP network are from 8 to 10 minutes.  The default 
+		 value for the M3UA newtork is 8 minutes (48000 
+		 centiseconds).
+
+		 After an SCTP association failure is detected, 
+		 automatic association restoration may take place.  When 
+		 the association establishment is successful, the ASP Up 
+		 procedures is started.  If the ASP Up procedure is 
+		 successful, the ASP is considered in the ASP Up state 
+		 and AS activation may be performed on the association.
+
+		 If SCTP association establishment is not possible, as 
+		 determined by SCTP, new association establishment 
+		 procedures may be started automaticall for the 
+		 association, when association oscillation filtering 
+		 procedures permit, until the SCTP association is 
+		 restored or manual intervention is made.  If after time 
+		 T19A, the SCTP association has not activated, a 
+		 management function is notified, and, optionally, T19A 
+		 may be restarted."
+	REFERENCE
+		"ANSI T1.111.4 (1996 and 2000) 12.2.2"
+	DEFVAL		{ 0 }
+	::= { m3uaAspSgEntry 16 }
+
+m3uaAspSgTimerT24 OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"LPO timer.
+		
+		 As a national option, local processor outage may also 
+		 be applied to the affected signalling link before 
+		 commencement of the appropriate signalling traffic 
+		 management option.  On completion of that siganlling 
+		 traffic management action, local processor outage is 
+		 removed from the affected signalling link.  No further 
+		 signalling traffic management will be performed on that 
+		 affected signalling link until a timer T24 has expired 
+		 or been cancelled, thus allowing time for indications 
+		 from the remote end to stabilize as it carries out any 
+		 siganlling traffic management of its own."
+	DEFVAL		{ 0 }
+	::= { m3uaAspSgEntry 17 }
+
+m3uaAspSgTimerT31A OBJECT-TYPE
+	SYNTAX		TimeInterval -- (1000..12000)
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the false association congestion detection 
+		 timer T31A timeout for SGP in this SG.  This timer an 
+		 associated procedures are only pertinent if multiple 
+		 congestion levels are supported for AS supported by the 
+		 association.  Values for T31A in the ANSI MTP newtork 
+		 range from 10 to 120 seconds.  The default value for 
+		 M3UA networks is 10 seconds (1000 centiseconds).
+
+		 If an SCTP association remains at a congestion level 
+		 for greater than T31A (a false association congestion 
+		 condition), it also reamins ESTABLISHED and in the ASP 
+		 Up state, an audit should trigger the SCTP association 
+		 to be restarted.  T31A is started when transmit buffer 
+		 occupancy increases through onset level 1.  Any change 
+		 of congestion level (defined as a change of SCTP 
+		 association congestion status and optionally including 
+		 the first time the discard status is increased to N 
+		 after association congestion status is increased to N 
+		 (N=1, 2, 3)) restart the timer.  T31A is stopped when 
+		 the SCTP association congestion status is zero.  
+		 Management should be notified if the SCTP association 
+		 is restarted due to false congestion detection."
+	REFERENCE
+		"ANSI T1.111.5 (2000) 3.8.2.2, 
+		 draft-bidulock-sigtran-aspcong"
+	DEFVAL		{ 1000 }
+	::= { m3uaAspSgEntry 18 }
+
+m3uaAspSgTimerT32A OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the SCTP association oscillation timer 
+		 (Procedure A) T32A timeout.  This timeout value and 
+		 associated procedures are only pertinent when the 
+		 RestorationPolicy for the SG grouping is set to 
+		 procedureA(2).  Values for the ANSI MTP network range 
+		 from 5 to 120 seconds.  The default for the M3UA 
+		 network is 60 seconds (6000 centiseconds).  The 
+		 oscillation timer T32 value is chosen for a given 
+		 ASP-SG relation may be modified by management action.
+
+		 When automatic association restoration begins, the 
+		 oscillation timer T32 is started.  If the SCTP 
+		 association, ASP Up procedure or test procedure fails 
+		 within T32, the SCTP association is placed in the 
+		 'suspension' state until T32 expires.  When an SCTP 
+		 association exits the 'suspension' state, association 
+		 restoration is to be started and T32 is restarted.  
+		 When an association is in 'suspension', the association 
+		 remains in the CLOSED state, restoration procedures to 
+		 establish the association are not invoked and 
+		 association attempts by the peer are rejected.
+
+		 The expiration of the timer does not change the ASP 
+		 state."
+	REFERENCE
+		"ANSI T1.111.4 (1996 and 2000) 12.2.2"
+	DEFVAL		{ 6000 }
+	::= { m3uaAspSgEntry 19 }
+
+m3uaAspSgTimerT33A OBJECT-TYPE
+	SYNTAX		TimeInterval -- (6000..60000)
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+		"Provides the SCTP association oscillation probation 
+		 timer (Procedure B) T33A timeout.  This timeout value 
+		 and associated procedures are only pertinent when the 
+		 RestorationPolicy for the SG grouping is set to 
+		 procedureB(3).  The value of T33 for ASNI MTP networks 
+		 has the range from 1 to 10 minutes.  The default value 
+		 for M3UA networks is 1 minute or 6000 centiseconds.  
+		 The value chosen in a given network node for the 
+		 probation time period is dependent upon the type and 
+		 function of the node in the network and may be modified 
+		 by manamgement action.
+
+		 When an SCTP association between an ASP and SGP has 
+		 been formed, it is put on probtion for a period 
+		 controlled by timer T33 which starts running when the 
+		 SCTP association enters the ESTABLISHED state and 
+		 succesfully completes the ASP Up procedure, and stops 
+		 when T33 expires or the SCTP association leaves the 
+		 ESTABLISHED state."
+	REFERENCE
+		"ANSI T1.111.4 (1996 and 2000) 12.2.2 (B)"
+	DEFVAL		{ 6000 }
+	::= { m3uaAspSgEntry 20 }
+
+m3uaAspSgTimerT34A OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the SCTP oscillation suspension timer 
+		 (Procedure B) T34A timeout.  This timeout value and 
+		 associated procedure are only pertinent when the 
+		 RestorationPolicy for the SG grouping is set to 
+		 procedureB(3).  The value of T35 for ANSI MTP networks 
+		 has the range from 5 to 120 seconds.  The default value 
+		 for M3UA networks is 5 seconds (500 centiseconds).  The 
+		 value chosen in a given network node for the suspension 
+		 time period is dependent upon the type and function of 
+		 the node in the network and may be modified by 
+		 management action.
+
+		 If the SCTP association fails during the probation 
+		 period, i.e., before expiration of timer T33A, it is 
+		 put on suspension.  While in suspension the SCTP 
+		 association remains in the CLOSED state, automatic 
+		 restoration procedures to establish the SCTP 
+		 association are not invoked, and association 
+		 initialization attempts by the peer are refused.
+
+		 The suspension time period is controlled by timer T34A, 
+		 which starts running when SCTP enters the CLOSED state.  
+		 Automatic SCTP association restoration is initiated on 
+		 expiry of timer T34."
+	REFERENCE
+		"ANSI T1.111.4 (1996 and 2000) 12.2.2"
+	DEFVAL		{ 500 }
+	::= { m3uaAspSgEntry 21 }
+
+m3uaAspSgTimerT1T OBJECT-TYPE
+	SYNTAX		TimeInterval -- (400..1200)
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the initial retest timer time duration for the 
+		 signalling link test procedure of Q.707 as applied to 
+		 SCTP association formed with SGP.  The range of this 
+		 timer for MTP, both ITU-T and ANSI is 4 to 12 seconds.  
+		 The default value for M3UA is 8 seconds (800 
+		 centiseconds).
+		 
+		 Once an association forms, M3UA sends the ASP Up 
+		 message on the association, starts T1T  and awaits an 
+		 ASP Up Acknowledgement message.  When an ASP Up 
+		 Acknolwedgement message is received, T1T is stopped and 
+		 the round trip time (RTT) is calculated as the duration 
+		 of time between sending the ASP Up message and 
+		 receiving the ASP Up Acknowledgement message.  If this 
+		 RTT is greater than one half off the 
+		 m3uaAspSgMaxLifeTime setting in this entry, the 
+		 association is aborted, and SCTP association failure 
+		 and restoration procedures invoked.
+
+		 If an ASP Up Acknowledgement message is not forthcoming 
+		 and T1T expires, a second ASPUP message is sent, and 
+		 T1T restarted.  If T1T expires for a second time, the 
+		 SCTP association is aborted and the SCTP assocaition 
+		 failure and restoration procedures are invoked.
+
+		 If an ASP Down Acknowledgement message is received 
+		 while T1T is running, or an Error message indicating 
+		 'management blocking' is received in response to the 
+		 initial ASP Up message, T1T is stopped, the association 
+		 is considered failed, the SCTP association is aborted, 
+		 and SCTP association failure and restoration procedures 
+		 invoked.
+
+		 If an Error message indicating an 'invalid version' is 
+		 received in response to the ASP Up message, it is 
+		 considered a permanent failure of the SCTP association, 
+		 the SCTP assocaition is aborted, and management is 
+		 informed.  Automatic  restoration procedures are not 
+		 invoked."
+	REFERENCE
+		"ITU-T Rec. Q.707 (1988) 2.2"
+	DEFVAL		{ 800 }
+	::= { m3uaAspSgEntry 22 }
+
+m3uaAspSgTimerT2T OBJECT-TYPE
+	SYNTAX		TimeInterval -- (3000..9000)
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the periodic retest timer time duration for 
+		 the signalling link test procedure of Q.707 as applied 
+		 to SCTP associations formed with SGP.  The range of 
+		 this timer for MTP, both ITU-T and ANIS is 30 to 90 
+		 seconds.  The default value for M3UA is 60 seconds 
+		 (6000 centiseconds).
+		 
+		 Every T2T interval while the SCTP association is 
+		 active, a M3UA heartbeat is sent, or SCTP interrogated, 
+		 to determine the smoothed round trip time (SRTT) for 
+		 the SCTP association.  If this value should exceed the 
+		 value of m3uaAspSgMaxLifeTime, the SCTP association 
+		 will be aborted and SCTP association failure and 
+		 restoration procedures invoked.  Note that the same 
+		 procedures as described for ASPUP/Ack messages using 
+		 m3uaAspSgTimerT1T is performed with regard to the M3UA 
+		 BEAT/Ack messages when the BEAT/Ack approach is used.  
+		 When SCTP is interrogated for the SRTT, no timers are 
+		 involved, nor messages exchanged."
+	REFERENCE
+		"ITU-T Rec. Q.707 (1988) 2.2"
+	DEFVAL		{ 6000 }
+	::= { m3uaAspSgEntry 23 }
+
+m3uaAspSgStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations may 
+		 add or delete rows from the SG table.  Adding a row to 
+		 the SG table adds an SG to an SG group.  Removing a row 
+		 from the table removes an SG from an SG group."
+	::= { m3uaAspSgEntry 24 }
+
+
+-- ====================================================================
+
+m3uaAspSgpTable
+	SYNTAX		SEQUENCE OF M3uaAspSgpEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Defines the SGP that belong to each SG and how they can 
+		 be contacted by the ASP.  Also provides configuration 
+		 and state information about the SCTP associations 
+		 between ASP and SGP.
+
+		 This is the SGP table.  It is similary to the SS7 
+		 signalling link table.  Each SGP is associated with an 
+		 SCTP association between the ASP and the SGP.  The 
+		 state of these SGP can be treated 
+		 "
+	::= { m3uaAspSgp 1 }
+
+m3uaAspSgpEntry
+	SYNTAX		M3uaAspSgpEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Defines the characteristics of SGP belonging to an SG within an SG grouping.  
+		 Most of the characteristics of an SGP are inherited from the SG or the SG 
+		 grouping, including many timer values and SCTP 
+		 parameters."
+	INDEX { m3uaAspAgIndex, m3uaAspSgIndex, m3uaAspSgpIndex }
+	::= { m3uaAspSgpTable 1 }
+
+M3uaAspSgpEntry ::=
+	SEQUENCE {
+		m3uaAspSgpIndex
+			Unsigned32,
+		m3uaAspSgpName
+			CommonLanguageName,
+		m3uaAspSgpAdministrativeState
+			AdministrativeState,
+		m3uaAspSgpProceduralStatus
+			ProceduralStatus,
+		m3uaAspSgpOperationalState
+			OperationalState,
+		m3uaAspSgpUsageState
+			UsageState,
+		m3uaAspSgpAspState
+			AspState, -- OPENSS7-SIGTRAN-TC
+		m3uaAspSgpPrimaryAddress
+			IpAddress,
+		m3uaAspSgpHostName
+			HostName,
+		m3uaAspSgpStatus
+			RowStatus
+	}
+
+m3uaAspSgpIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an index into the SGP table which is the index 
+		 of the SGP within an SG 
+		 within an SG grouping."
+	::= { m3uaAspSgpEntry 1 }
+
+m3uaAspSgpName OBJECT-TYPE
+	SYNTAX		CommonLanguageName
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a name for the SGP following COMMON LANGUAGE 
+		 procedures and the CommonLanguageName textual 
+		 convention."
+	::= { m3uaAspSgpEntry 2 }
+
+m3uaAspSgpAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the administrative state of the SGP according 
+		 to the AdministrativeState textual convention.  When 
+		 locked(0) there is no SCTP association formed between 
+		 the SGP and any ASP.  When unlocked(1) associations
+		 may be formed between any ASP in the unlocked 
+		 administrative state.  Setting the state to locked(0) 
+		 will result in all ASPs in the up ASP state performing 
+		 the ASP Down procedure and shutting down its SCTP 
+		 association to this SGP.  Setting the state to 
+		 unlocked(1) permits any ASPs in the unlocked 
+		 administrative state to form an SCTP association with 
+		 the SGP and execute the ASP Up procedures for this 
+		 SGP."
+	DEFVAL		{ locked(0) }
+	::= { m3uaAspSgpEntry 3 }
+
+m3uaAspSgpProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall procedural status of the SGP 
+		 following the ProceduralStatus textual convention.  The 
+		 overall procedural status is the set-union (logical OR) 
+		 of the procedural statuses of the ASP-SGP associations 
+		 for which this SGP is configured."
+	DEFVAL		{ '000000'B }
+	::= { m3uaAspSgpEntry 4 }
+
+m3uaAspSgpOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall operational state of the SGP 
+		 following the OperationalState textual convention.  The 
+		 overall operational state is the most active 
+		 operational state of all of the ASP-SGP associations 
+		 configured for this SGP."
+	DEFVAL		{ disabled(0) }
+	::= { m3uaAspSgpEntry 5 }
+
+m3uaAspSgpUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall usage state of the SGP following 
+		 the UsageState textual convention.  The overall usage 
+		 state of the SGP is most active state of any of the 
+		 ASP-SGP associations configured for this SGP."
+	DEFVAL		{ idle(0) }
+	::= { m3uaAspSgpEntry 6 }
+
+m3uaAspSgpAspState OBJECT-TYPE
+	SYNTAX		AspState -- OPENSS7-SIGTRAN-TC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall ASP state of the SGP following the 
+		 AspState textual convention.  The overall ASP state of 
+		 the SGP is the most active ASP state of any of the 
+		 ASP-SGP associations configured for this SGP.  The most 
+		 active ASP state of the ASP-SGP associations can be 
+		 affected by setting the ASP state of the SGP to a 
+		 stable state up(3) or down(0).  However, this is not a 
+		 permanent condition and any autonomous operations will 
+		 return the state to the management state.  For a 
+		 persistent state change, use the AdministrativeState 
+		 textual convention."
+	::= { m3uaAspSgpEntry 7 }
+
+m3uaAspSgpPrimaryAddress OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the primary IP address for forming SCTP 
+		 associations with the SGP.  This is the primary IP 
+		 address that will be used by all ASPs configured to 
+		 form SCTP associations with this SGP."
+	::= { m3uaAspSgpEntry 8 }
+
+m3uaAspSgpHostName OBJECT-TYPE
+	SYNTAX		HostName
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a host name for forming SCTP associations with 
+		 the SGP.  This is the host name that may be used by all 
+		 ASPs configured to form SCTP associations with this SGP 
+		 from this host.  For a service name, see the SG group 
+		 table."
+	::= { m3uaAspSgpEntry 9 }
+
+m3uaAspSgpStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism by which management stations can 
+		 add or delete rows to the SGP table following the 
+		 RowStatus textual convention."
+	REFERENCE	"STD 58"
+	::= { m3uaAspSgpEntry 10 }
+
+
+-- ====================================================================
+
+m3uaAspSpNextIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides access for management stations to the next 
+		 available index in the SP table.  If this value is 
+		 returned as zero, there are no available entries left 
+		 in the table."
+	::= { m3uaAspSp 1 }
+
+m3uaAspSpTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M3uaAspSpEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Defines the signalling points locally accessible at 
+		 this ASP.  These are effectively full point code routed 
+		 AS.
+
+		 This is signalling point table.  It is similar to the 
+		 SS7 table.  Each signalling point has a group of 
+		 routesets and a set of MTP-SAPs (AS)."
+	::= { m3uaAspSp 2 }
+
+m3uaAspSpEntry OBJECT-TYPE
+	SYNTAX		M3uaAspSpEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Defines the characteristics of signalling point codes 
+		 known to this host."
+	INDEX { m3uaAspSpIndex }
+	::= { m3uaAspSpTable 1 }
+
+M3uaAspSpEntry ::=
+	SEQUENCE {
+		m3uaAspSpIndex
+			Unsigned32,
+		m3uaAspSpName
+			CommonLanguageName,
+		m3uaAspSpOperationalState
+			OperationalState,
+		m3uaAspSpUsageState
+			UsageState,
+		m3uaAspSpAdministrativeState
+			AdministrativeState,
+		m3uaAspSpAlarmStatus
+			AlarmStatus,
+		m3uaAspSpProceduralStatus
+			ProceduralStatus,
+		m3uaAspSpAvailabilityStatus
+			AvailabilityStatus,
+		m3uaAspSpPointCode
+			NetworkPointCode,
+		m3uaAspSpTimerT1R
+			TimeInterval,
+		m3uaAspSpTimerT18
+			TimeInterval,
+		m3uaAspSpTimerT20
+			TimeInterval,
+		m3uaAspSpTimerT22A
+			TimeInterval,
+		m3uaAspSpTimerT23A
+			TimeInterval,
+		m3uaAspSpTimerT24A
+			TimeInterval,
+		m3uaAspSpTimerT26A
+			TimeInterval,
+		m3uaAspSpTimerT27A
+			TimeInterval,
+		m3uaAspSpStatus
+			RowStatus
+	}
+
+m3uaAspSpIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an index into the SP table and handle with 
+		 which to reference instances of point codes."
+	::= { m3uaAspSpEntry 1 }
+
+m3uaAspSpName OBJECT-TYPE
+	SYNTAX		CommonLanguageName
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a name for the signalling point using COMMON 
+		 LANGUAGE procedures according to the CommonLanguageName 
+		 textual convention."
+	::= { m3uaAspSpEntry 2 }
+
+
+m3uaAspSpOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the operational state of the signalling point 
+		 according to the OperationalState texutal convention.
+		 "
+	REFERENCE
+		"OPENSS7-TMN-TC"
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the usage state of ths signalling point 
+		 according to the UsageState 
+		 textual convention."
+	REFERENCE
+		"OPENSS7-TMN-TC"
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the administrative state of the signalling 
+		 point according to the AdministrativeState textual 
+		 convention."
+	REFERENCE
+		"OPENSS7-TMN-TC"
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpAlarmStatus OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the alarm status of the signalling point 
+		 according to the AlarmStatus textual convention."
+	REFERENCE
+		"OPENSS7-TMN-TC"
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpProceduralStatus OBJECT-TYPE
+	SYNTAX ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the procedural status of the signalling point 
+		 according to the ProceduralStatus textual convention.
+		 "
+	REFERENCE
+		"OPENSS7-TMN-TC"
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpAvailabiltyStatus OBJECT-TYPE
+	SYNTAX		AvailabilityStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the availablity status of the signalling point 
+		 according to the AvailabilityStatus textual convention.
+		 "
+	REFERENCE
+		"OPENSS7-TMN-TC"
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpPointCode OBJECT-TYPE
+	SYNTAX		NetworkPointCode
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the network and signalling point code 
+		 associated with the signalling point, according to the 
+		 NewtorkPointCode textual convention."
+	::= { m3uaAspSpEntry 3 }
+
+m3uaAspSpTimerT1R OBJECT-TYPE
+	SYNTAX		TimeInterval,
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the MTP restart required timer T1R timeout 
+		 value."
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpTimerT18 OBJECT-TYPE
+	SYNTAX		TimeInterval,
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the MTP restart phase 1 timer T18 timeout 
+		 value.
+
+		 Timer T18 is a phase 1 restart timer and is started by 
+		 a restarting signalling point with the transfer 
+		 function when the first link goes into service at level 
+		 2.
+		"
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpTimerT20 OBJECT-TYPE
+	SYNTAX		TimeInterval,
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the MTP restart phase 2 timer T20 timeout 
+		 value.
+		"
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpTimerT22A OBJECT-TYPE
+	SYNTAX		TimeInterval,
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"When the first SCTP association for the signalling 
+		 point initiates the ASP Up state, the retstarting 
+		 signalling point begins taking into account any DUNA, 
+		 DRST, DAVA messages received.  THe restarting point 
+		 starts timer T22A and T26A either when the first SCTP 
+		 association reaches the ASP Up state, or the first AS 
+		 initiates the ASP Active state.  When a 
+		 "
+	REFERENCE
+		"ANSI T1.111.4/2000 : 9.2"
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpTimerT23A OBJECT-TYPE
+	SYNTAX		TimeInterval,
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpTimerT24A OBJECT-TYPE
+	SYNTAX		TimeInterval,
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpTimerT26A OBJECT-TYPE
+	SYNTAX		TimeInterval,
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpTimerT27A OBJECT-TYPE
+	SYNTAX		TimeInterval,
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { m3uaAspSpEntry xx }
+
+m3uaAspSpStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism for management stations to add and 
+		 delete rows from the SP table following the RowStatus 
+		 textual convention."
+	::= { m3uaAspSpEntry 4 }
+
+-- ====================================================================
+
+m3uaAspMtTable
+	SYNTAX		SEQUENCE OF M3uaAspMtEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Defines the MTP-SAPs accessible on signalling points 
+		 known to this host."
+	::= { m3uaAspMt 1 }
+
+m3uaAspMtEntry
+	SYNTAX		M3uaAspMtEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Defines an MTP-SAP instance for a signalling point 
+		 (SP).  The MTP-SAP instance may also be used to form a 
+		 routing key.  Each MTP-SAP represents an application 
+		 server at the local host.
+		
+		 Entries that exist in this table will be considered 
+		 equipped from the SS7 MTP user part perspective, but 
+		 may be inaccessible or accessible depending upon their 
+		 current operational state.  When an MTP-SAP is not 
+		 provided in this table, the corresponding user part 
+		 will be considered unequipped."
+	INDEX { m3uaAspSpIndex, m3uaAspMtIndex }
+	::= { m3uaAspMtTable 1 }
+
+M3uaAspMtEntry ::=
+	SEQUENCE {
+		m3uaAspMtIndex
+			Unsigned32,
+		m3uaAspMtName
+			CommonLanguageName,
+		m3uaAspMtAdministrativeState
+			AdministrativeState,
+		m3uaAspMtOperationalState
+			OperationalState,
+		m3uaAspMtProceduralStatus
+			ProceduralStatus,
+		m3uaAspMtUsageState
+			UsageState,
+		m3uaAspMtAsState
+			AsState,
+		m3uaAspMtStatus
+			RowStatus
+	}
+
+m3uaAspMtIndex OBJECT-TYPE
+	SYNTAX		MtpUserPart
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides both an index into the MTP-SAP table for a 
+		 signalling point as well as providing the SI value of 
+		 the MTP-SAP using the MtpUserPart textual convention."
+	REFERENCE
+		"ITU-T Rec. Q.704 (1997), ANSI T1.111.4/2000, ETSI ETS 
+		 300 008-1"
+	::= { m3uaAspMtEntry 1 }
+
+m3uaAspMtName OBJECT-TYPE
+	SYNTAX		CommonLanguageName
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a COMMON LANGUAGE name for the MTP-SAP using 
+		 the CommonLanguageName textual convention.  The value 
+		 should be the CLLI of the signalling point followed by 
+		 a common language substring representing the MTP-SAP."
+	::= { m3uaAspMtEntry 2 }
+
+m3uaAspMtAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the administrative state of the MTP-SAP 
+		 following the AdministrativeState textual convention.  
+		 When locked(0), no local application will be permitted 
+		 to bind to or activate the MTP-SAP and the 
+		 corresponding application server will be deregistered 
+		 from or deactivated for any signalling gateway process 
+		 that serves it.  When unlocked(0), applications will be 
+		 permitted to bind to an activate the MTP-SAP and the 
+		 corresponding application server may be registered with 
+		 serving SGP and activated."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : administrativeState"
+	DEFVAL		{ locked(0) }
+	::= { m3uaAspMtEntry 3 }
+
+m3uaAspMtOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the operational state of the MTP-SAP following 
+		 the OperationalState textual convention.  When 
+		 disabled(0), the MTP-SAP has no user application 
+		 associated with it an is not able to accept traffic.  
+		 When enabled(1), the MTP-SAP has an application 
+		 associated with it and is able to accept traffic."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : operationalState"
+	DEFVAL		{ disabled(0) }
+	::= { m3uaAspMtEntry 4 }
+
+m3uaAspMtProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the procedural status of the MTP-SAP following 
+		 the ProceduralStatus textual convention, as viewed 
+		 toward the user application.  WHen the status contains 
+		 initializationRequired(0), the MTP-SAP exists but has 
+		 not been initialized for use by user applications.  
+		 When notInitialized(1), the MTP-SAP exists and has been 
+		 initialized for application use, however, the MTP-SAP 
+		 still needs to be initialized by an MTP-SAP application 
+		 for use.  When initializing(2) a user application is in 
+		 the process of binding to the MTP-SAP.  When 
+		 terminaing(4) a user application is in the process of 
+		 unbinding from the MTP-SAP.  When empty, the MTP-SAP is 
+		 procedurally idle."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : proceduralStatus"
+	DEFVAL		{ '000000'B }
+	::= { m3uaAspMtEntry 5 }
+
+m3uaAspMtUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the usage state of the MTP-SAP following the 
+		 UsageState textual convention.  The view of the usage 
+		 state is toward the local user application.  When 
+		 idle(0) the MTP-SAP is not carrying any user traffic.  
+		 When active(1), the MTP-SAP is actively carrying user 
+		 traffic to and from the MTP-SAP.  When busy(2), the 
+		 interface between the MTP-SAP and the user application 
+		 is busy with user traffic."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : usageSate"
+	DEFVAL		{ idle(0) }
+	::= { m3uaAspMtEntry 6 }
+
+m3uaAspMtAsState OBJECT-TYPE
+	SYNTAX		AsState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the AS state of the MTP-SAP following the 
+		 AsState textual convention.  The view of the As state 
+		 is toward the serving SGP.  The AS state is the overall 
+		 state of the AS considering the AS state in each SGP 
+		 that serves the AS.  The overall AS state is the most 
+		 active state of the MTP-SAP for any SGP configured to 
+		 serve the AS.
+		 
+		 The state of the AS can be affected by setting this 
+		 value to down(0), inactive(1) or active(4).  When set 
+		 to down(0), all routing keys for this MTP-SAP will be 
+		 deregistered with the serving SGP.  When set to 
+		 inactive(1), each ASP will register the AS if required, 
+		 or perform ASP Inactive procedures necessary to move 
+		 the AS to the AS Inactive state.  When set to 
+		 active(4), each ASP that is able will register and 
+		 activate the AS.  Note that this is not a peristent 
+		 state change and that autonomous operations may act to 
+		 move the AS back to a previous state.  Use the 
+		 AdministrativeState textual convention for a persistent 
+		 result."
+	DEFVAL		{ down(0) }
+	::= { m3uaAspMtEntry 7 }
+
+
+m3uaAspMtStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations may 
+		 add and delete rows in the MTP-SAP table following the 
+		 RowStatus textual convention.  Adding rows to this 
+		 table defines a new MTP-SAP instance for a signalling 
+		 point.  Deleting rows from the MTP-SAP table removes an 
+		 MTP-SAP instance from a signalling point."
+	::= { m3uaAspMtEntry 8 }
+		
+
+-- ====================================================================
+
+m3uaAspRsEvents OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Arc for notification events generated by route sets."
+	::= { m3uaAspRs 0 }
+
+m3uaAspRsAlarm NOTIFICATION-TYPE
+	OBJECTS {
+		m3uaAspSpIndex, m3uaAspSpName,
+		m3uaAspRsIndex, m3uaAspRsName,
+		m3uaAspRsAvailabilityStatus,
+		m3uaAspRsCongestionLevel
+	}
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. Q.751.1 (1997), Q.752 (1996)"
+	::= { m3uaAspRsEvent 1 }
+
+
+m3uaAspRsTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M3uaAspRsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is the routeset table.  It is similar to the SS7 
+		 table  Each routeset is associated with a remote 
+		 signalling point code.  There is no concept of an 
+		 adjacent signalling point here.  Each route set 
+		 consists of a number of route lists, each with a 
+		 priority in the route set.  When routing outbound 
+		 messages, the highest priority active route list from 
+		 the list is selected.  Perform controlled and forced 
+		 rerouting procedures as normal.
+		"
+	::= { m3uaAspRs 1 }
+
+m3uaAspRsEntry OBJECT-TYPE
+	SYNTAX		M3uaAspRsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is an entry in the RS table.  Each entry in the RS 
+		 table corresponds to an SS7 MTP routeset belonging to a 
+		 signalling point.  It describes a routing procedure for 
+		 sending messages from a local signalling point to a 
+		 remote signalling point.  The route set is independent 
+		 of the application server process that is using it.  
+		 Availbility of route sets is intrinsic to the SS7 
+		 network and is extrinsic to the M3UA model.  
+		 Information obtained about routes to elements in the 
+		 SS7 network obtained by one local ASP is applicable to 
+		 other local ASPs.  Availability of remote SS7 
+		 signalling points does not vary over application 
+		 servers.
+		 
+		 Route sets here are very similar to the route sets used 
+		 by the SS7 MTP."
+	INDEX { m3uaAspSpIndex, m3uaAspRsIndex }
+	::= { m3uaAspRsTable 1 }
+
+M3uaAspRsEntry ::=
+	SEQUENCE {
+		m3uaAspRsIndex
+			Unsigned32,
+		m3uaAspRsName
+			CommonLanguageName,
+		m3uaAspRsRemotePointCode
+			NetworkPointCode,
+		m3uaAspRsOperationalState
+			OperationalState,
+		m3uaAspRsAdministrativeState
+			AdministrativeState,
+		m3uaAspRsUsageState
+			UsageState,
+		m3uaAspRsAlarmStatus
+			AlarmStatus,
+		m3uaAspRsProceduralStatus
+			ProceduralStatus,
+		m3uaAspRsTimerT8
+			TimeInterval,
+		m3uaAspRsTimerT11
+			TimeInterval,
+		m3uaAspRsTimerT15
+			TimeInterval,
+		m3uaAspRsTimerT16
+			TimeInterval,
+		m3uaAspRsTimerT18A
+			TimeInterval,
+		m3uaAspRsOptions
+			MtpOptions,
+		m3uaAspRsAvailabilityStatus
+			MtpAvailabilityStatus,
+		m3uaAspRsCongestionLevel
+			MtpCongestionLevel,
+		m3uaAspRsStatus
+			RowStatus
+	}
+
+m3uaAspRsIndex OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an index into the routeset table.  This index 
+		 is relative to the signalling point index."
+	::= { m3uaAspRsEntry 1 }
+
+m3uaAspRsName OBJECT-TYPE
+	SYNTAX		CommonLanguageName
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides a name for the route set following COMMON 
+		 LANGUAGE procedures and the CommonLanguageName textual 
+		 convention."
+	::= { m3uaAspRsEntry 2 }
+
+m3uaAspRsRemotePointCode OBJECT-TYPE
+	SYNTAX		NetworkPointCode
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the point code of the destination 
+		 corresponding to this entry.  Perhaps the signalling 
+		 point code part of this should have been used as an 
+		 index as it must be unique.  This column follows the 
+		 NetworkPointCode textual convention"
+	::= { m3uaAspRsEntry 3 }
+
+m3uaAspRsOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the operational state of the route set 
+		 following the OperationalState textual convention."
+	::= { m3uaAspRsEntry xx }
+
+m3uaAspRsAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the administrative state of the route set 
+		 following the AdministrativeState textual convention.  
+		 When locked(0), the route set will be prohibited and 
+		 MTP users will be issued the MTP-PAUSE primitive with 
+		 regard to this route set; unlocked(1), the route set 
+		 will have the availability as indicated by the MTP 
+		 availability, which may require issuing an MTP-RESUME 
+		 or MTP-STATUS primitive to local MTP users.
+		"
+	::= { m3uaAspRsEntry xx }
+
+m3uaAspRsUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the usage state of the route set following the 
+		 UsageState textual convention.  When idle(0), the route 
+		 set is not handling user traffic; active(1), activly 
+		 handling user traffic; busy(1) consumed with handling 
+		 user traffic.  Note that the usage state can be idle(0) 
+		 or busy(1) (but not active(1)) while the 
+		 CongesetionLevel is other than none(0)."
+	::= { m3uaAspRsEntry xx }
+
+m3uaAspRsAlarmStatus OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the alarm status for the route set according 
+		 to the AlarmStatus 
+		 textual convention."
+	::= { m3uaAspRsEntry xx }
+
+m3uaAspRsProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the procedural status for the route set 
+		 according to the ProceduralStatus textual convention.  
+		 When the route set does not contain route lists, the 
+		 procedural status will contain 
+		 initializationRequired(), when the SP is failed or 
+		 restarting, the procedural status will contain 
+		 notInitialized(); when the SP is restarting the status 
+		 will contain initializing()."
+	::= { m3uaAspRsEntry xx }
+
+m3uaAspRsTimerT8 OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides a TFP response timer.
+
+		 13.2.1 ... Transfer-prohibited emssages are always 
+		    address to an adjacent signalling point.  They man 
+		    use any available signalling route that leads to 
+		    that signalling point.
+
+		 13.2.2 A transfer prohibited message relating to a 
+		    given destination X is sent from a signalling 
+		    transfer point Y in the following cases:
+
+		    1.   When signalling transfer point Y starts to 
+			 route (a changeover, changeback, forced or 
+			 controlled rerouting) signalling destined to a 
+			 signalling point X via a signalling transfer 
+			 point Z not currently use by signalling 
+			 transfer point Y for this traffic.  In this 
+			 case, the transfer prohibited message is sent 
+			 to singalling transfer point Z.
+
+		    2.   When signalling trasnfer point Y recognizes the 
+			 inaccessibility of signalling point X (see 
+			 5.3.3 and 7.2.3).  In this case a 
+			   transfer-prohibited message is sent to ll 
+			   accessing signalling points (Broadcast 
+			   method) and timer T8 (see clause 16) is 
+			   started concernng SP X.
+
+		    3.   When a message destined to signaling point X is 
+			 received at signalling trasnfer point Y and Y 
+			 is unable to transfer the message, and if no 
+			 corresponding timer T8 is running.  In this 
+			 case the transfer-prohibited message is sent to 
+			 the adjacent signalling poin from which the 
+			 message concerned was received (Response 
+			 Method).  In addition, timet T8 is started 
+			 concerning SP X.
+
+		    4.   When an adjacent signalling point Z becomes 
+			 accessible, STP Y sends to Z a transfer 
+			 prohibited message concerning destination X, if 
+			 X is inacessible from Y (clause 9).
+
+		    5.   When a signalling transfer point Y restarts, it 
+			 broadcasts to all accessible adjacent 
+			 singalling points trasnfer prohibited messages 
+			 concerning destination X, if X is inaccessible 
+			 from Y (see clause 9).
+		"
+	REFERENCE
+		"ITU-T Rec. Q.704 (1996) 13.2.1, 13.2.2"
+	::= { m3uaAspRsEntry 4 }
+
+m3uaAspRsTimerT11 OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"ANSI T1.111.4 (1996-2000)  13.4.2 ... (1) When the 
+		 normal route(s) to destination X become unavailable and 
+		 signalling transfer point Y begins using a lower 
+		 priority route to destination X, timer T11 is started.  
+		 When timer T11 expires or the lower priority route 
+		 experiences danger of congestion (whichever occurs 
+		 first), signalling transfer point Y notifies accessible 
+		 adjacent signalling points using one of two possible 
+		 methods:
+
+		 (a) Broadcast Method
+ 
+		 Signalling transfer point Y sends transfer-restricted 
+		 messages concerning destination X to all accessible 
+		 adjacent signalling points, except those signalling 
+		 points that receive a transfer-prohibited message 
+		 according to 
+		 13.2.2 (1) and except destination X if it is an 
+		    adjacent point.  Timer T18 is started after the 
+		    broadcast is complete.  If the failure is still 
+		    present and T18 expires, a transfer-restricted 
+		    message is sent once per incoming link or link set 
+		    by signalling transfer point Y in response to a 
+		    message for destination X.
+ 
+		 As a network option, the rate that transfer-restricted 
+		 messages are broadcast may be regulated to minimize the 
+		 burst of traffic that can occur due to controlled 
+		 rerouting in adjacent nodes.  This regulation is not 
+		 performed for the broadcasting of transfer-restricted 
+		 messages indicating that a previously isolated 
+		 destination is accessible.
+		"
+	REFERENCE
+		"ANSI T1.111.4 (1996-2000) 13.4.2"
+	::= { m3uaAspRsEntry 5 }
+
+m3uaAspRsTimerT15 OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"
+		 13.7.5  If T15 expires after the last update of the 
+		    signalling route set toward destination X by a 
+		    transfer-controlled message relating to the same 
+		    destination, the signalling route set congestion 
+		    test procedure is invoked (see 13.9).
+		 
+		 13.9.4  Provided that the signalling route set toward 
+		    destination X is not in the 'unavailable' state, a 
+		    signalling route set congestion test message is sent 
+		    from an originating signalling point to destination 
+		    X in the following cases: i) When T15 expires after 
+		    the last update of the congestion status of the 
+		    signalling route set toward destination X by a 
+		    transfer controlled message relating to the same 
+		    destination.
+
+		 Start:  TFC received
+		 Stop:   --
+		 Expiry: Send RCT, start T16
+		"
+	REFERENCE
+		"ITU-T Rec. Q.704 (1996) 13.7.5, 13.9.4"
+	::= { m3uaAspRsEntry 6 }
+
+m3uaAspRsTimerT16 OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"
+		 13.9.3  If T16 expires after sending a signalling route 
+		    set congestion test message without a transfer 
+		    controlled message relating to the concerned 
+		    destination having been received, the signalling 
+		    point changes the congestion status associated with 
+		    the signalling route set toward the concerned 
+		    destination to the next lower status.
+		 
+		 13.9.4  Provided that the signalling route set toward 
+		    destination X is not in the 'unavailable' state, a 
+		    signalling route set congestion test message is sent 
+		    from an originating signalling point to destination 
+		    X in the following cases: i) ... ii) When T16 
+		    expires after sending a signalling route set 
+		    congestion test message to destination X without a 
+		    transfer controlled message relating to the same 
+		    destination having been received.  After the 
+		    congestion status have been decremented by one, the 
+		    test is repeated, unless the congestion status is 
+		    zero.
+		 
+		 Start:  T15 expires
+		 Stop:   TFC received
+		 Expiry: Decrement cong status, inform users, send RCT 
+		 and restart if still congested
+		"
+	REFERENCE
+		"ITU-T Rec. Q.704 (1995) 13.9.3, 13.9.4"
+	::= { m3uaAspRsEntry 7 }
+
+m3uaAspRsTimerT18A OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Timer T18 is a phase 1 restart timer and is started by 
+		 a restarting signalling point with the transfer 
+		 function when the first link goes into service at level 
+		 2.
+		 
+		 9.2.2 ... Timer T18 is implementation and network 
+		   dependent, and is stopped when:
+		 
+		   1) sufficient links and link sets are available to 
+		      carry the expected signalling traffic; and
+		 
+		   2) enough TRA messages (and therefore routing data) 
+		      have been received to give a high level of 
+		      confidence in the MTP routing tables.
+		 
+		 NOTE -- In normal circumstances the restarting MTP 
+		 should wait for TRA messages from all adjacent nodes.  
+		 There are, however, other situations where this might 
+		 not be useful, e.g. for a long-term equipment failure.
+		 
+		 When T18 is stopped or expires, these second phase 
+		 begins, which includes as a major part a broadcast of 
+		 non-preventative transfer prohibited messages [i.e.  
+		 those TFPs according to 13.2.2 v)] and 
+		 transfer-restricted messages, taking into account 
+		 signalling link sets which are not available and any 
+		 TFP, TFA and TFR messages received during phase 1.  
+		 Note that timer T18 is determined such that during 
+		 phase 2 the broadcast of TFP and TFR messages may be 
+		 completed in normal situations.
+		"
+	::= { m3uaAspRsEntry 8 }
+
+m3uaAspRsOptions OBJECT-TYPE
+	SYNTAX		MtpOptions
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { m3uaAspRsEntry 9 }
+
+m3uaAspRsAvailabilityStatus OBJECT-TYPE
+	SYNTAX		MtpAvailabilityStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { m3uaAspRsEntry 10 }
+
+m3uaAspRsCongestionLevel OBJECT-TYPE
+	SYNTAX		MtpCongesetionLevel -- OPENSS7-SS7-TC
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the current congestion level associated with 
+		 the route set following the MtpCongestionLevel textual 
+		 convention."
+	REFERENCE
+		"ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000, 
+		 OPENSS7-SS7-TC"
+	::=  { m3uaAspRsEntry 11 }
+
+m3uaAspRsStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { m3uaAspRsEntry 12 }
+
+
+-- ====================================================================
+
+m3uaAspRlTable
+	SYNTAX		SEQUENCE OF M3uaAspRlEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is the route list (RL) table.  It is similar to 
+		 the SS7 MTP route list table.  Each routelist consists 
+		 of a group of routes of equal priority.  When routing 
+		 outbound messages, loadsharing is performed over the 
+		 active routes in the route list.  Controlled rerouting 
+		 and forced rerouting procedures are perfromed as 
+		 normal, utilizing a controlled rerouting buffer an T6 
+		 timer.
+		"
+	::= { m3uaAspRl 1 }
+
+m3uaAspRlEntry
+	SYNTAX		M3uaAspRlEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is the route list table entry.  It consists of a group of routes.  Route 
+		 lists correspond to SG groups for M3UA (whereas they correspond to combined link 
+		 sets for MTP."
+	INDEX	{
+			m3uaAspSpIndex,	-- shared index
+			m3uaAspRsIndex,	-- shared index
+			m3uaAspAgIndex		-- shared index
+		}
+	::= { m3uaAspRlTable 1 }
+
+M3uaAspRlEntry ::=
+	SEQUENCE {
+		m3uaAspRlCost
+			Unsigned32,
+		m3uaAspRlAdministrativeState
+			AdministrativeState,
+		m3uaAspRlOperationalState
+			OperationalState,
+		m3uaAspRlProceduralStatus
+			ProceduralStatus,
+		m3uaAspRlUsageState
+			UsageState,
+		m3uaAspRlAvailabilityStatus
+			MtpAvaliabiltiyStatus,
+		m3uaAspRlStatus
+			RowStatus
+	}
+
+m3uaAspRlCost OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the cost of this route list within the 
+		 containing route set.  When messages are routed to a 
+		 destination corresponding to a route set, an active 
+		 route list within the route set with the lowest cost 
+		 value is selected.  Only one route list for a gven 
+		 route set can have the same cost value."
+	REFERENCE
+		""
+	DEFVAL		{ 0 }
+	::= { m3uaAspRlEntry 1 }
+
+m3uaAspRlAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the administrative state of the route list 
+		 according to the AdministrativeState textual 
+		 convention.  When locked(0), the route list will not be 
+		 used to route traffic and will be considered inhibited 
+		 by the route set.  When unlocked(0), the route list may 
+		 be used to route traffic according to its availability 
+		 status, and will be considered as uninhibited.  Setting 
+		 a route list to locked(0) has the effect of changing 
+		 the route list availablity to inhibited and performing 
+		 whatever forced rerouting procedures are required to 
+		 remove the route list from service.  Setting a route 
+		 list to unlocked(0) has the effect of changing the 
+		 route list availbility to uninhibited and may result in 
+		 controlled rerouting of traffic to this route list from 
+		 a route list of higher cost in the route set."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : administrativeState"
+	DEFVAL		{ locked(0) }
+	::= { m3uaAspRlEntry 1 }
+
+m3uaAspRlOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the operational state of the route list 
+		 according to the OperationalState textual convention.  
+		 When disabled(0), the route list is operationally 
+		 unable to carry traffic; when enabled(1) the route list 
+		 is operationally able to carry traffic (according to 
+		 its availability status)."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : operationalState"
+	DEFVAL		{ enabled(1) }
+	::= { m3uaAspRlEntry 1 }
+
+m3uaAspRlProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the procedural status of the route list 
+		 according to the ProceduralStatus textual convention.  
+		 This is the overall procedural status of the route list 
+		 which is the set-union (logical OR) of the procedural 
+		 status of the contained routes."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : proceduralStatus"
+	DEFVAL		{ '000000'B }
+	::= { m3uaAspRlEntry 1 }
+
+m3uaAspRlUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the usage state of the route list according to 
+		 the UsageState textual convention.  The usage state of 
+		 the route list is an overall usage state that reflects 
+		 the most active usage state of the contained routes.  
+		 When idle(0), the contained routes are not carrying 
+		 user traffic (regardless of their availability state); 
+		 when active(1), the contained routes are carrying user 
+		 traffic; when busy(2), the contained routes are 
+		 congested with user traffic.
+
+		 Note that the busy(2) state and the congestion state of 
+		 the individual routes are separate concepts.  A 
+		 contained route can be congested (as reported by the 
+		 network) but can be idle(0) from a usage perspective.
+		 
+		 Only one route list within a route set will be in other 
+		 than the idle(0) state at any given instant in time."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : usageState"
+	::= { m3uaAspRlEntry 1 }
+
+m3uaAspRlAvailabilityStatus OBJECT-TYPE
+	SYNTAX		MtpAvaliabiltiyStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the MTP availability status of the route list 
+		 according to the MtpAvailabilityStatus textual 
+		 convention.  This is the overall availability status of 
+		 the contained routes and is the set-union (logical OR) 
+		 of the availability status of the contained routes."
+	REFERENCE
+		"ITU-T Rec. Q.704 (1996)"
+	::= { m3uaAspRlEntry 1 }
+
+m3uaAspRlStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism for management stations to add and 
+		 delete rows from the Route List (RL) conceptual table 
+		 following the RowStatus textual convention."
+	REFERENCE
+		"STD 58"
+	::= { m3uaAspRlEntry 1 }
+
+
+
+-- ====================================================================
+
+m3uaAspRtTable
+	SYNTAX		SEQUENCE OF M3uaAspRtEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is the route table.  It is similar to the MTP 
+		 table.  Each route consists of a group of SCTP 
+		 associations termiating to SGP on the same SG.  Treat 
+		 these like signalling links.  Map to assocation and 
+		 stream id using SLS.  Perform changeover and changeback 
+		 procedures using heartbeat CORID procedures as normal."
+	::= { m3uaAspRt 1 }
+
+m3uaAspRtEntry
+	SYNTAX		M3uaAspRtEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an entry in the Route (RT) conceptual table 
+		 and defines the characteristics of each route.  The 
+		 table has four indexes.  Each route belongs to a route 
+		 list, which belongs to a route set, which belongs to a 
+		 signalling point.  Some route characteristics are 
+		 inherited from the superior tables.
+		"
+	INDEX { m3uaAspSpIndex, m3uaAspRsIndex, m3uaAspAgIndex, m3uaAspSgIndex }
+
+M3uaAspRtEntry ::= {
+	SEQUENCE {
+		m3uaAspRtCost
+			Unsigned32,
+		m3uaAspRtTimerT6
+			TimeInterval,
+		m3uaAspRtTimerT10
+			TimeInterval,
+		m3uaAspRtAvailabilityStatus
+			MtpAvailabiltiyStatus,
+		m3uaAspRtAdminstrativeState
+			AdministrativeState,
+		m3uaAspRtOperationalState
+			OperationalState,
+		m3uaAspRtProceduralStatus
+			ProcedurealStatus,
+		m3uaAspRtUsageState
+			UsageState,
+		m3uaAspRtStatus
+			RowStatus
+	}
+
+m3uaAspRtCost OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { m3uaAspRtEntry 1 }
+
+m3uaAspRtTimerT6 OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the timeout value for the controlled rerouting 
+		 timer.  The controlled rerouting timer, T6, of MTP.  
+		 When a signalling point X becomes accessible via a 
+		 route A normally used to carry traffic to signalling 
+		 point X, the controlled rerouting procedure is used.  
+		 The traffic being routed on current routes B, C,  D 
+		 that is normaly routed on route A is directed to a 
+		 controlled rerouting buffer.  New traffic for route A 
+		 is also directed to the controlled rerouting buffer.  
+		 Timer T6 is started.  When timer T6 expires, the 
+		 controlled rerouting buffer and any new traffic for 
+		 route A are directed to route A.
+
+		 This time is the interval, T6, for which messages will 
+		 be held in the controlled rerouting buffer.  Default 
+		 values are: range for ITU-T 0.5 sec to 
+		 1.2 sec, default 0.8 seconds; ANSI is the same.  This 
+		   value should not be set any lower than 50 
+		   centiseconds and no higher than 120 centiseconds for 
+		   MTP.  
+
+		 For M3UA there are no recommended values.  The value of 
+		 this timer should be greater than the lifetime of 
+		 messages sent on SCTP associations to the SGP making up 
+		 the SG.  If the value is not longer than the lifetime 
+		 of messages sent on SCTP associations, the procedure 
+		 will not have the desired effect of avoiding message 
+		 missequencing at the destination.
+
+		 M3UA performs similar procedures following 
+		 draft-bidulock-sigtran-corid for controlled rerouting 
+		 of traffic between routes.  Routes in M3uA consist of 
+		 signalling gateways rather than link sets.
+		"
+	REFERENCE
+		"ITU-T Rec. Q.704 (1996)"
+	DEFVAL		{ 80 }
+	::= { m3uaAspRtEntry 2 }
+
+m3uaAspRtTimerT10 OBJECT-TYPE
+	SYNTAX		TimeInterval -- (3000..6000)
+	UNITS		"centiseconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the destination audit timer T10 timeout value.  
+		 ITU-T and ANSI MTP networks provide a range of T10 
+		 values from 30 to 60 seconds.  M3UA networks use a 
+		 default value of 60 seconds (6000 centiseconds).
+
+		 This timer is started after receiving DUNA or DRST for 
+		 the route (from any SGP in the SG).  It runs and sends 
+		 a DAUD message on the route (to any SGP in the SG) 
+		 every T10 seconds until stopped.  This timer is stopped 
+		 after receiving a DAVA message for the route.
+
+		 A DAUD message is sent from an ASP for a signalling 
+		 point after a DUNA message or DRST message is received 
+		 from an SGP in the SG.  In this case, a DAUD message is 
+		 sent to that SG referring to the destination declared 
+		 inaccessible or restricted by the DUNA or DRST message, 
+		 every T10 period until a DAVA message, indicating that 
+		 the destination has become accessible, is received.
+
+		 The timer T10 is started when a DUNA or DRST message is 
+		 received causing the route to change to prohibited or 
+		 restricted.  The timer is stopped when a DAVA message 
+		 is received causing the route to change to available, 
+		 or when the node is restarted.  Upon timer expiry, a 
+		 DAUD message is sent to the SG associated with the 
+		 route and the timer is restarted.
+		"
+	REFERENCE
+		"ITU-T Rec. Q.704 (1996) : 13.5.2, ANSI T1.111.4/2000 
+		 13.5.2"
+	DEFVAL		{ 6000 }
+	::= { m3uaAspRtEntry 3 }
+
+m3uaAspRtAvailabilityStatus OBJECT-TYPE
+	SYNTAX		MtpAvailabiltiyStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the MTP availability status for the route 
+		 according to the MtpAvailabiltyStatus textual 
+		 convention.  This is the overall availability status of 
+		 the SGP belonging to the SG corresponding to this 
+		 route.  It is the set-union (logical OR) of the 
+		 availablity status of the contained ASP-SGP 
+		 associations and AS for this signalling point.  It may 
+		 contain:
+
+		 - inactive(0), there is an inactive ASP-SGP association 
+		   for the SG; blocked(1), the AS is inactive for an 
+		   ASP-SGP association for the SG;
+
+		 - inhibited(2), the AS is inhibited for an ASP-SGP 
+		   association for the SG; 
+
+		 - prohibited(3), no ASP-SGP association is active for 
+		   this SP, or a DUNA has been received from the SG 
+		   reagarding the destination associated with this 
+		   route;
+
+		 - restart(4), the ASP is restarting with  respect to 
+		   this SG;
+
+		 - restricted(5), a DRST has been received from the SG 
+		   regarding the destination associated with this route;
+
+		 - congested(6), a SCON has been received from the SG 
+		   regarding the destination associated with this route, 
+		   or an ASP-SGP association belonging to this route is 
+		   congested;
+
+		 - danger(7), the route, or and ASP-SGP association 
+		   within the route, is being loaded with traffic beyond 
+		   its normal capacity and is in danger of congestion;
+
+		 - allowed(8) a DAVA has been received from the SG 
+		   regarding the destination associated with this route.
+		"
+	::= { m3uaAspRtEntry 4 }
+
+m3uaAspRtAdminstrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : administrativeState"
+	::= { m3uaAspRtEntry 5 }
+
+m3uaAspRtOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the operational state of the route according 
+		 to the OperationalState textual convention.  When 
+		 disabled(0) the route is operationally unable to carry 
+		 traffic; when enabled(1) the route is operationally 
+		 able to carry traffic."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : operationalState"
+	::= { m3uaAspRtEntry 6 }
+
+m3uaAspRtProceduralStatus OBJECT-TYPE
+	SYNTAX		ProcedurealStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the procedural status of the route according 
+		 to the ProceduralStatus textual convention.  It may 
+		 contain:
+		 
+		 - intiializationRequired(0), the ASP-SGP associations 
+		   for the SG need to be established;
+		   
+		 - notInitialized(1), the ASP-SGP associations for the 
+		   SG are established but no AS corresponding to this SP 
+		   is active for those associations.
+
+		 - initializing(2), the ASP-SGP associations for the SG 
+		   are established and an AS is being activated for this 
+		   SP for on one or more of those associations.
+
+		 - reporting(3), not applicable;
+
+		 - terminating(4), ASP-SGP associations or AS are in the 
+		   process of being deactivated associated with this 
+		   route."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : proceduralStatus"
+	::= { m3uaAspRtEntry 7 }
+
+m3uaAspRtUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the usage state of the route according to the 
+		 UsageState textual convention.  When idle(0), the route 
+		 is not actively carrying user traffic; when active(1) 
+		 the route is actively carrying user traffic; when 
+		 busy(2), the route is congested with user traffic."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : usageState"
+	::= { m3uaAspRtEntry 8 }
+
+m3uaAspRtStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism for managements stations to add or 
+		 delete entries from the route (RT) conceptual table 
+		 according to the RowStatus textual convention."
+	REFERENCE
+		"STD 58"
+	::= { m3uaAspRtEntry 9 }
+
+
+-- ====================================================================
+
+m3uaAspRcTable
+	SYNTAX		SEQUENCE OF M3uaAspRcEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Defines the routing contexts and traffic modes 
+		 associated with an MTP-SAP (AS) on an SG Group basis.
+		 "
+	::= { m3uaAspRc 1 }
+
+m3uaAspRcEntry
+	SYNTAX		M3uaAspRcEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an entry in the Routing Context (RC) 
+		 conceptual table.  This table is indexed by SP, MTP-SAP 
+		 and SG group.  An entry is therefore provided for each 
+		 AS and SG group.  This is the basis on which RC values 
+		 and traffic modes can be assigned and this entry 
+		 defines the RC value and traffic mode assignment for 
+		 each AS."
+	INDEX { m3uaAspIndex, m3uaAspSpIndex, m3uaAspMtIndex, m3uaAspAgIndex }
+	::= { m3uaAspRcTable 1 }
+
+M3uaAspRcEntry ::=
+	SEQUENCE {
+		m3uaAspRcValue
+			Unsigned32,
+		m3uaAspRcRegistrationPolicy
+			RegistrationPolicy, -- OPENSS7-SIGTRAN-TC
+		m3uaAspRcTrafficMode
+			TrafficMode,
+		m3uaAspRcStatus
+			RowStatus
+	}
+
+m3uaAspRcValue OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the 32-bit value of the Routing Context used 
+		 to access the Application Server corresponding to this 
+		 MTP-SAP.  This is either the value that was assigned by 
+		 a management or the value that was obtained from the SG 
+		 by dynamic registration."
+	::= { m3uaAspRcEntry 1 }
+
+m3uaAspRcRegstrationPolicy OBJECT-TYPE
+	SYNTAX		RegistrationPolicy -- OPENSS7-SIGTRAN-TC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the registration policy for this MTP-SAP (AS) 
+		 for this SG group following the RegistrationPolicy 
+		 textual convention.  When set by a management station, 
+		 this value overrides the value associated with the SG 
+		 group as a whole provided that the SG value is 
+		 unknown(0) or permitted(2).
+
+		 - unknown(0), is not applicable and will be refused;
+
+		 - forbidden(1), means that registration will not be 
+		   attemtped and the RC value provided in this entry 
+		   will be used;
+
+		 - permitted(2), means that registration will be 
+		   attempted and if refused, the RC value provided in 
+		   this entry will be used; and,
+
+		 - required(3), means that registration will be 
+		   attempted and if refused, the activation of the AS 
+		   will fail; when successful, the registered value will 
+		   be indicated as the RC value in this entry.
+
+		 When the value in the entry associated with this SG is 
+		 forbidden(1), this value will be forbidden(1).  When 
+		 the value in the entry associated with this SG is 
+		 required(3), this value will be required(3).
+		 "
+	::= { m3uaAspRcEntry 3 }
+
+m3uaAspRcTrafficMode OBJECT-TYPE
+	SYNTAX		TrafficMode -- OPENSS7-SIGTRAN-TC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the traffic mode of the AS within the SG group 
+		 according to the TrafficMode textual convention.  This 
+		 object identity is populated with activeStandby, 
+		 loadShare, broadCast or an implementation defined 
+		 object identity.  When one of the defined traffic 
+		 modes, the corresponding traffic mode type will be 
+		 included in the ASP Active message along with the RC 
+		 value defined or registered by this entry.  For 
+		 implementation defined types, the behaviour with regard 
+		 to ASP Active message is implementation defined.
+		 "
+	REFERENCE
+		"RFC 4666, OPENSS7-SIGTRAN-TC"
+	::= { m3uaAspRcEntry 4 }
+
+m3uaAspRcStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the ability for management stations to add and 
+		 delete entries from the Routing Context (RC) conceptual 
+		 table according to the RowStatus textual convention."
+	REFERENCE
+			"STD 58"
+	::= { m3uaAspRcEntry 5 }
+
+
+-- ====================================================================
+
+m3uaAspAsTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M3uaAspAsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall state of an AS for an SG."
+	::= { m3uaAspAs 1 }
+
+m3uaAspAsEntry OBJECT-TYPE
+	SYNTAX		M3uaAspAsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an entry in an ASP's AS table for an SG.  This 
+		 is indexex by ASP, MTP-SAP (AS) and SG.  It is not 
+		 intended that rows be added or deleted from this 
+		 conceptual table by management stations as its purpose 
+		 is to reflect state only."
+	INDEX { m3uaAspIndex, m3uaAspSpIndex, m3uaAspMtIndex, m3uaAspAgIndex, m3uaAspSgIndex }
+	::= { m3uaAspAsTable 1 }
+
+M3uaAspAsEntry ::=
+	SEQUENCE {
+		m3uaAspAsAsState
+			AsState,
+		m3uaAspAsOperationalState
+			OperationalState,
+		m3uaAspAsProceduralState
+			ProceduralState,
+		m3uaAspAsUsageState
+			UsageState
+	}
+
+m3uaAspAsAsState OBJECT-TYPE
+	SYNTAX		AsState,
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall AS state for this SG following the 
+		 AsState textual convention.  This overall state 
+		 reflects the most active AS state for the AS over the 
+		 SGP making up the SG.  When down(0), the AS is down for 
+		 all SGP in the SG; activating(1), the AS is activating 
+		 for some SGP in the SG; deactivating(2), the AS is 
+		 deactivating for some SGP; up(3), the AS is up for some 
+		 SGP."
+	REFERENCE
+		"RFC 4666"
+	::= { m3uaAspAsEntry 1 }
+
+m3uaAspAsOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState,
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall operational state of the AS as 
+		 viewed by the ASP for this SG according to the 
+		 OperationalState textual convention.  When disabled(0), 
+		 the AS is operationally unable to be used; when 
+		 enable(1), the AS is operationally enabled for use; 
+		 when shuttingDown(2), the AS is moving from the enabled 
+		 state to the disabled state."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : operationalState"
+	::= { m3uaAspAsEntry 2 }
+
+m3uaAspAsProceduralState OBJECT-TYPE
+	SYNTAX		ProceduralState,
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the procedural status of the AS as viewed by 
+		 the ASP for this SG according to the ProceduralStatus 
+		 textual convention.  As the overall status, it is the 
+		 set-union (logical OR) of the procedural status of the 
+		 AS state for the individual SGP making up this SG."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : proceduralStatus"
+	::= { m3uaAspAsEntry 3 }
+
+m3uaAspAsUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the overall usage state of the AS as viewed by 
+		 the ASP for this SG according to the UsageState textual 
+		 convention.  As the overall usage state, this state 
+		 reflects the most active state of the AS for the SGP 
+		 making up the SG.  When idle(0), the AS is not carrying 
+		 user traffic for any SGP; active(1), the AS is carrying 
+		 user traffic for some SGP in the SG; busy(2), the AS is 
+		 congested by user traffic for some SGP."
+	REFERENCE	"ITU-T Rec. X.721 (1992) : usageState"
+	::= { m3uaAspAsEntry 4 }
+
+
+-- ====================================================================
+
+m3uaAspAfTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF M3uaAspAfEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides the states of the AS for each association."
+	::= { m3uaAspAf 1 }
+
+m3uaAspAfEntry OBJECT-TYPE
+	SYNTAX		M3uaAspAfEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an entry into the AS Flow (AF) Table.  Entries 
+		 are not expected to be added or removed from this table 
+		 by management stations and is intended to simply 
+		 reflect the state of AS flows established by other 
+		 tables."
+	INDEX { m3uaAspIndex, m3uaAspSpIndex, m3uaAspMtIndex, m3uaAspAgIndex, m3uaAspSgIndex, m3uaAspSgpIndex }
+	::= { m3uaAspAfTable 1 }
+
+M3uaAspAfEntry ::=
+	SEQUENCE {
+		m3uaAspAfAsState
+			AsState,
+		m3uaAspAfAdministrativeState
+			AdministrativeState,
+		m3uaAspAfOperationalState
+			OperationalState,
+		m3uaAspAfProceduralStatus
+			ProceduralStatus,
+		m3uaAspAfUsageState
+			UsageState
+	}
+
+m3uaAspAfAsState OBJECT-TYPE
+	SYNTAX		AsState
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Provides the AS state for the AS as viewed by the ASP 
+		 following the AsState textual convention.  When 
+		 down(0), the AS is not registered for a routing context 
+		 or the ASP-SGP asssociation is down; when 
+		 initializing(2), the ASP is registering for a routing 
+		 context for the AS with the SGP; terminating(2), the 
+		 ASP is deregistering the routing context; inactive(3), 
+		 the ASP is inactive for this AS with this SGP; 
+		 activating(4), the ASP is performing ASP Active 
+		 procedure for this AS with this SGP; deactivating(5), 
+		 the ASP is performing ASP Inactive procedure for this 
+		 AS with this SGP; active(6), the ASP is active for this 
+		 AS with this SGP.
+		 
+		 By writing a stable state value to this column, 
+		 management stations can requeust tha the corresponding 
+		 operations to achieve that state be performed.  Note, 
+		 however, that this is not a persistent state change and 
+		 automatic procedures may be invoked to return the AS to 
+		 a previous state.  Use the AdministrativeState textual 
+		 convention on this or superior objects to persistently 
+		 affect state."
+	REFERENCE
+		"RFC 4666"
+	::= { m3uaAspAfEntry 1 }
+
+m3uaAspAfAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState -- OPENSS7-TMN-TC
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Provides the administrative state of this AS as viewed 
+		 by the ASP for this SGP according to the 
+		 AdministrativeState textual convention.  When 
+		 locked(0), the AS is administratively locked and no 
+		 routing key will be registered nor will the AS be 
+		 activated for this SGP; when unlocked(1), the AS is 
+		 administratively permitted to register a routing key 
+		 and activate.  Setting this column to locked(0) has the 
+		 effect of causing the AS to deactivate and unregister 
+		 any registered routing keys.  Setting this column to 
+		 unlocked(1), permits automatic procedures to 
+		 immediately register a routing key for the AS an 
+		 activate the AS."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : administrativeState, 
+		 OPENSS7-TMN-TC"
+	::= { m3uaAspAfEntry 2 }
+
+
+m3uaAspAfOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState -- OPENSS7-TMN-TC
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the operational state of this AS as viewed by 
+		 the ASP for this SGP according to the OperationalState 
+		 textual convention.  When disabled(0), the AS is 
+		 operatinally unable to provide service; when 
+		 enabled(1), the AS is operationally able to provdie 
+		 service; when shuttingDown(2), the AS is transitioning 
+		 from enabled(1) to disabled(0) and service may be 
+		 restricted at this time."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : operationalState, 
+		 OPENSS7-TMN-TC"
+	::= { m3uaAspAfEntry 3 }
+
+m3uaAspAfProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus -- OPENSS7-TMN-TC
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the procedural status of the AS as viewed by 
+		 the ASP for this SGP according to the ProceduralStatus 
+		 textual convention.  It may contain: 
+		 initializationReqired(0), the AS has not registered for 
+		 nor been assigned an RC; notIntialized(1), the AS has 
+		 not activated; intializing(2), the ASP is performing 
+		 the ASP Active procedure for the AS; reporting(3), not 
+		 applicable; terminating(4), the ASP is performing the 
+		 ASP Inactive procedure for the AS."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : proceduralStatus, 
+		 OPENSS7-TMN-TC"
+	::= { m3uaAspAfEntry 4 }
+
+m3uaAspAfUsageState OBJECT-TYPE
+	SYNTAX		UsageState -- OPENSS7-TMN-TC
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the usage state of the AS as viewd by the ASP 
+		 for this SGP according to the UsageState textual 
+		 convention.  When idle(0), the AS is not currently 
+		 carrying user traffic from the ASP to the SGP; 
+		 active(1), the AS is actively carrying user traffic 
+		 from the ASP to the SGP; busy(1), the AS is consumed 
+		 with user traffic."
+	REFERENCE
+		"ITU-T Rec. X.721 (1992) : usageState, OPENSS7-TMN-TC"
+	::= { m3uaAspAfEntry 5 }
+
+
+-- ====================================================================
+
+
+
+
+
+
+
+
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8

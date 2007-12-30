@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-LAPB-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/15 20:16:52 $
+-- @(#) $RCSfile: OPENSS7-LAPB-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/29 23:10:21 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +46,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/12/15 20:16:52 $ by $Author: brian $
+-- Last Modified $Date: 2007/12/29 23:10:21 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-LAPB-MIB.mib,v $
+-- Revision 0.9.2.2  2007/12/29 23:10:21  brian
+-- - updating mibs
+--
 -- Revision 0.9.2.1  2007/12/15 20:16:52  brian
 -- - added new mib files
 --
@@ -59,29 +62,57 @@
 OPENSS7-LAPB-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	communicationsAlarm, objectCreation, objectDeletion, 
-	attributeValueChange
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	OBJECT-TYPE,
+	enterprises
+		FROM SNMPv2-SMI
+	Counter32,
+	DisplayString,
+	Gauge32,
+	RowPointer, 
+	RowStatus,
+	TimeInterval,
+	TimeStamp,
+	TruthValue,
+	Unsigned32
+		FROM SNMPv2-TC
+	attributeValueChange,
+	communicationsAlarm,
+	objectCreation,
+	objectDeletion,
+	objectInstance
 		FROM OPENSS7-TMN-SMI
+	AdministrativeState, 
+	AlarmStatus,
+	OperationalState,
+	ProceduralStatus,
+	SimpleNameType,
+	UsageState
+		FROM OPENSS7-TMN-TC;
 
 openss7		OBJECT IDENTIFIER ::= { enterprises 29591 }
 openss7MIBs	OBJECT IDENTIFIER ::= { openss7 1 }
 openss7Modules	OBJECT IDENTIFIER ::= { openss7MIBs 1 }
 
 lapb-MIB MODULE-IDENTITY
-	LAST-UPDATED	"20071213072912Z"
-	ORGANIZATION	"The OpenSS7 Project"
-	CONTACT-INFO	"Brian Bidulock
-			 OpenSS7 Corporation
-			 1469 Jefferys Crescent
-			 Edmonton, Alberta  T6L 6T1
-			 CANADA
-			 Tel: +1 780 490 1141
-			 Fax: +1 780 490 1241
-			 Mob: +1 780 953 0557
-			 mailto:bidulock@openss7.org"
-	DESCRIPTION	"Provides a management information base for X.25 
-			 LAPB based on ITU-T Rec. X.282 | ISO/IEC 
-			 10742."
+	LAST-UPDATED
+		"200712170903Z"
+	ORGANIZATION
+		"The OpenSS7 Project"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta  T6L 6T1
+		 CANADA
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 mailto:bidulock@openss7.org"
+	DESCRIPTION
+		"Provides a management information base for X.25 LAPB 
+		 based on ITU-T Rec. X.282 | ISO/IEC 10742."
 	::= { openss7Modules yy }
 
  -- top level origanization of the MIB
@@ -95,8 +126,8 @@ lapbScalars		OBJECT IDENTIFIER ::= { lapbObjects	 2 }
 lapbNotifs		OBJECT IDENTIFIER ::= { lapbObjects	 3 }
 lapbOids		OBJECT IDENTIFIER ::= { lapbObjects	 4 }
 
-lapbCompliances		OBJECT IDENTIFIER ::= { lapbConformance	 1 }
-lapbGroups		OBJECT IDENTIFIER ::= { lapbConformance	 2 }
+lapbGroups		OBJECT IDENTIFIER ::= { lapbConformance	 1 }
+lapbCompliances		OBJECT IDENTIFIER ::= { lapbConformance	 2 }
 
 lAPBDLE			OBJECT IDENTIFIER ::= { lapbTables	 1 }
 dLSAP			OBJECT IDENTIFIER ::= { lapbTables	 2 }
@@ -110,132 +141,132 @@ lapbDefaults		OBJECT IDENTIFIER ::= { lapbScalars	 2 }
 sLPConnectionDefaults	OBJECT IDENTIFIER ::= { lapbDefaults	 1 }
 
 -- 1.3.6.1.4.1.29591.1.1
--- +--(yy)
---    |--(0) lapbNotifications
---    |--(1) lapbObjects
---    |  |--(1) lapbTables
---    |  |  |--(1) lAPBDLE
---    |  |  |  +--(1) lAPBDLETable
---    |  |  |     +--(1) lAPBDLEEntry
---    |  |  |        |--( 1) lAPBDLEcommunicationsEntityId
---    |  |  |        |--( 2) lAPBDLElocalSapNames
---    |  |  |        |--( 3) lAPBDLEoperationalState
---    |  |  |        |--( 4) lAPBDLEproviderEntityNames
---    |  |  |        |--( 5) lAPBDLEmT1Timer
---    |  |  |        |--( 6) lAPBDLEmT3Timer
---    |  |  |        |--( 7) lAPBDLEmW
---    |  |  |        |--( 8) lAPBDLEmXSend
---    |  |  |        |--( 9) lAPBDLEmXReceive
---    |  |  |        |--(10) lAPBDLEmT2Timer
---    |  |  |        |--(11) lAPBDLEreceivedMlpResets
---    |  |  |        |--(12) lAPBDLEtimesMT1Expired
---    |  |  |        |--(13) lAPBDLEIframesReassignments
---    |  |  |        |--(14) lAPBDLEmlpFramesReceived
---    |  |  |        |--(15) lAPBDLEmlpFramesSent
---    |  |  |        |--(16) lAPBDLEmlpFramesOutsideWindowGuard
---    |  |  |        |--(17) lAPBDLEreceivedMlpFramesInGuardRegion
---    |  |  |        +--(18) lAPBDLERowStatus
+-- +нн(yy)
+--    |нн(0) lapbNotifications
+--    |нн(1) lapbObjects
+--    |  |нн(1) lapbTables
+--    |  |  |нн(1) lAPBDLE
+--    |  |  |  +нн(1) lAPBDLETable
+--    |  |  |     +нн(1) lAPBDLEEntry
+--    |  |  |        |нн( 1) lAPBDLEcommunicationsEntityId
+--    |  |  |        |нн( 2) lAPBDLElocalSapNames
+--    |  |  |        |нн( 3) lAPBDLEoperationalState
+--    |  |  |        |нн( 4) lAPBDLEproviderEntityNames
+--    |  |  |        |нн( 5) lAPBDLEmT1Timer
+--    |  |  |        |нн( 6) lAPBDLEmT3Timer
+--    |  |  |        |нн( 7) lAPBDLEmW
+--    |  |  |        |нн( 8) lAPBDLEmXSend
+--    |  |  |        |нн( 9) lAPBDLEmXReceive
+--    |  |  |        |нн(10) lAPBDLEmT2Timer
+--    |  |  |        |нн(11) lAPBDLEreceivedMlpResets
+--    |  |  |        |нн(12) lAPBDLEtimesMT1Expired
+--    |  |  |        |нн(13) lAPBDLEIframesReassignments
+--    |  |  |        |нн(14) lAPBDLEmlpFramesReceived
+--    |  |  |        |нн(15) lAPBDLEmlpFramesSent
+--    |  |  |        |нн(16) lAPBDLEmlpFramesOutsideWindowGuard
+--    |  |  |        |нн(17) lAPBDLEreceivedMlpFramesInGuardRegion
+--    |  |  |        +нн(18) lAPBDLERowStatus
 --    |  |  |
---    |  |  |--(2) dLSAP
---    |  |  |  +--(1) dLSAPTable
---    |  |  |     +--(1) dLSAPEntry
---    |  |  |        |--( 1) dLSAPsapId
---    |  |  |        |--( 2) dLSAPsap1Address
---    |  |  |        |--( 3) dLSAPuserEntityNames
---    |  |  |        +--( 4) dLSAPRowStatus
+--    |  |  |нн(2) dLSAP
+--    |  |  |  +нн(1) dLSAPTable
+--    |  |  |     +нн(1) dLSAPEntry
+--    |  |  |        |нн( 1) dLSAPsapId
+--    |  |  |        |нн( 2) dLSAPsap1Address
+--    |  |  |        |нн( 3) dLSAPuserEntityNames
+--    |  |  |        +нн( 4) dLSAPRowStatus
 --    |  |  |
---    |  |  |--(3) sLPPM
---    |  |  |  +--(1) sLPPMTable
---    |  |  |     +--(1) sLPPMEntry
---    |  |  |        |--( 1) sLPPMcoProtocolMachineId
---    |  |  |        |--( 2) sLPPMoperationalState
---    |  |  |        |--( 3) sLPPMadministrativeState
---    |  |  |        +--( 4) sLPPMRowStatus
+--    |  |  |нн(3) sLPPM
+--    |  |  |  +нн(1) sLPPMTable
+--    |  |  |     +нн(1) sLPPMEntry
+--    |  |  |        |нн( 1) sLPPMcoProtocolMachineId
+--    |  |  |        |нн( 2) sLPPMoperationalState
+--    |  |  |        |нн( 3) sLPPMadministrativeState
+--    |  |  |        +нн( 4) sLPPMRowStatus
 --    |  |  |
---    |  |  |--(4) sLPConnection
---    |  |  |  +--(1) sLPConnectionTable
---    |  |  |     +--(1) sLPConnectionEntry
---    |  |  |        |--( 1) sLPConnectionConnectionId
---    |  |  |        |--( 2) sLPConnectionUnderlyingConnectionNames
---    |  |  |        |--( 3) sLPConnectionSupportedConnectionNames
---    |  |  |        |--( 4) sLPConnectionInterfaceType
---    |  |  |        |--( 5) sLPConnectionK
---    |  |  |        |--( 6) sLPConnectionN1
---    |  |  |        |--( 7) sLPConnectionN2
---    |  |  |        |--( 8) sLPConnectionSequenceModulus
---    |  |  |        |--( 9) sLPConnectionT1Timer
---    |  |  |        |--(10) sLPConnectionT2Timer
---    |  |  |        |--(11) sLPConnectionFCSErrorsReceived
---    |  |  |        |--(12) sLPConnectionFRMRsReceived
---    |  |  |        |--(13) sLPConnectionFRMRsSent
---    |  |  |        |--(14) sLPConnectionIFrameDataOctetsReceived
---    |  |  |        |--(15) sLPConnectionIFrameDataOctetsSent
---    |  |  |        |--(16) sLPConnectionIFramesReceived
---    |  |  |        |--(17) sLPConnectionIFramesSent
---    |  |  |        |--(18) sLPConnectionPollsReceived
---    |  |  |        |--(19) sLPConnectionREJsReceived
---    |  |  |        |--(20) sLPConnectionREJsSent
---    |  |  |        |--(21) sLPConnectionRNRsReceived
---    |  |  |        |--(22) sLPConnectionRNRsSent
---    |  |  |        |--(23) sLPConnectionSABMsReceived
---    |  |  |        |--(24) sLPConnectionSABMsSent
---    |  |  |        |--(25) sLPConnectionProtocolState
---    |  |  |        |--(26) sLPConnectionTimesT1Expired
---    |  |  |        |--(27) sLPConnectionT3Timer
---    |  |  |        |--(28) sLPConnectionTimesT3Expired
---    |  |  |        |--(29) sLPConnectionT4Timer
---    |  |  |        |--(30) sLPConnectionTimesT4Expired
---    |  |  |        |--(31) sLPConnectionAbnormalLinkDisconnectsReceived
---    |  |  |        |--(32) sLPConnectionAbnormalLinkDisconnectsSent
---    |  |  |        |--(33) sLPConnectionLinkResetsReceived
---    |  |  |        |--(34) sLPConnectionLinkResetsSent
---    |  |  |        |--(35) sLPConnectionTimesN2Reached
---    |  |  |        |--(36) sLPConnectionAdministrativeState
---    |  |  |        |--(37) sLPConnectionOperationalState
---    |  |  |        |--(38) sLPConnectionUsageState
---    |  |  |        |--(39) sLPConnectionProceduralStatus
---    |  |  |        |--(40) sLPConnectionAlarmStatus
---    |  |  |        +--(41) sLPConnectionRowStatus
+--    |  |  |нн(4) sLPConnection
+--    |  |  |  +нн(1) sLPConnectionTable
+--    |  |  |     +нн(1) sLPConnectionEntry
+--    |  |  |        |нн( 1) sLPConnectionConnectionId
+--    |  |  |        |нн( 2) sLPConnectionUnderlyingConnectionNames
+--    |  |  |        |нн( 3) sLPConnectionSupportedConnectionNames
+--    |  |  |        |нн( 4) sLPConnectionInterfaceType
+--    |  |  |        |нн( 5) sLPConnectionK
+--    |  |  |        |нн( 6) sLPConnectionN1
+--    |  |  |        |нн( 7) sLPConnectionN2
+--    |  |  |        |нн( 8) sLPConnectionSequenceModulus
+--    |  |  |        |нн( 9) sLPConnectionT1Timer
+--    |  |  |        |нн(10) sLPConnectionT2Timer
+--    |  |  |        |нн(11) sLPConnectionFCSErrorsReceived
+--    |  |  |        |нн(12) sLPConnectionFRMRsReceived
+--    |  |  |        |нн(13) sLPConnectionFRMRsSent
+--    |  |  |        |нн(14) sLPConnectionIFrameDataOctetsReceived
+--    |  |  |        |нн(15) sLPConnectionIFrameDataOctetsSent
+--    |  |  |        |нн(16) sLPConnectionIFramesReceived
+--    |  |  |        |нн(17) sLPConnectionIFramesSent
+--    |  |  |        |нн(18) sLPConnectionPollsReceived
+--    |  |  |        |нн(19) sLPConnectionREJsReceived
+--    |  |  |        |нн(20) sLPConnectionREJsSent
+--    |  |  |        |нн(21) sLPConnectionRNRsReceived
+--    |  |  |        |нн(22) sLPConnectionRNRsSent
+--    |  |  |        |нн(23) sLPConnectionSABMsReceived
+--    |  |  |        |нн(24) sLPConnectionSABMsSent
+--    |  |  |        |нн(25) sLPConnectionProtocolState
+--    |  |  |        |нн(26) sLPConnectionTimesT1Expired
+--    |  |  |        |нн(27) sLPConnectionT3Timer
+--    |  |  |        |нн(28) sLPConnectionTimesT3Expired
+--    |  |  |        |нн(29) sLPConnectionT4Timer
+--    |  |  |        |нн(30) sLPConnectionTimesT4Expired
+--    |  |  |        |нн(31) sLPConnectionAbnormalLinkDisconnectsReceived
+--    |  |  |        |нн(32) sLPConnectionAbnormalLinkDisconnectsSent
+--    |  |  |        |нн(33) sLPConnectionLinkResetsReceived
+--    |  |  |        |нн(34) sLPConnectionLinkResetsSent
+--    |  |  |        |нн(35) sLPConnectionTimesN2Reached
+--    |  |  |        |нн(36) sLPConnectionAdministrativeState
+--    |  |  |        |нн(37) sLPConnectionOperationalState
+--    |  |  |        |нн(38) sLPConnectionUsageState
+--    |  |  |        |нн(39) sLPConnectionProceduralStatus
+--    |  |  |        |нн(40) sLPConnectionAlarmStatus
+--    |  |  |        +нн(41) sLPConnectionRowStatus
 --    |  |  |
---    |  |  +--(5) sLPConnectionIVMO
---    |  |     +--(1) sLPConnectionIVMOTable
---    |  |        +--(1) sLPConnectionIVMOEntry
---    |  |           |--( 1) sLPConnectionIVMOid
---    |  |           |--( 2) sLPConnectionIVMOinterfaceType
---    |  |           |--( 3) sLPConnectionIVMOk
---    |  |           |--( 4) sLPConnectionIVMOn1
---    |  |           |--( 5) sLPConnectionIVMOn2
---    |  |           |--( 6) sLPConnectionIVMOsequenceModulus
---    |  |           |--( 7) sLPConnectionIVMOt1Timer
---    |  |           |--( 8) sLPConnectionIVMOt2Timer
---    |  |           |--( 9) sLPConnectionIVMOt3Timer
---    |  |           |--(10) sLPConnectionIVMOt4Timer
---    |  |           +--(11) sLPConnectionIVMORowStatus
+--    |  |  +нн(5) sLPConnectionIVMO
+--    |  |     +нн(1) sLPConnectionIVMOTable
+--    |  |        +нн(1) sLPConnectionIVMOEntry
+--    |  |           |нн( 1) sLPConnectionIVMOid
+--    |  |           |нн( 2) sLPConnectionIVMOinterfaceType
+--    |  |           |нн( 3) sLPConnectionIVMOk
+--    |  |           |нн( 4) sLPConnectionIVMOn1
+--    |  |           |нн( 5) sLPConnectionIVMOn2
+--    |  |           |нн( 6) sLPConnectionIVMOsequenceModulus
+--    |  |           |нн( 7) sLPConnectionIVMOt1Timer
+--    |  |           |нн( 8) sLPConnectionIVMOt2Timer
+--    |  |           |нн( 9) sLPConnectionIVMOt3Timer
+--    |  |           |нн(10) sLPConnectionIVMOt4Timer
+--    |  |           +нн(11) sLPConnectionIVMORowStatus
 --    |  |
---    |  |--(2) lapbScalars
---    |  |  |--(1) lapbGlobals
---    |  |  |  +--(1) lapbDiscontinuityTime
+--    |  |нн(2) lapbScalars
+--    |  |  |нн(1) lapbGlobals
+--    |  |  |  +нн(1) lapbDiscontinuityTime
 --    |  |  |
---    |  |  +--(2) lapbDefaults
---    |  |     +--(1) sLPConnectionDefaults
---    |  |        |--( 1) sLPConnectionDefaultInterfaceType
---    |  |        |--( 2) sLPConnectionDefaultK
---    |  |        |--( 3) sLPConnectionDefaultN1
---    |  |        |--( 4) sLPConnectionDefaultN2
---    |  |        |--( 5) sLPConnectionDefaultSequenceModulus
---    |  |        |--( 6) sLPConnectionDefaultT1Timer
---    |  |        |--( 7) sLPConnectionDefaultT2Timer
---    |  |        |--( 8) sLPConnectionDefaultT3Timer
---    |  |        +--( 9) sLPConnectionDefaultT4Timer
+--    |  |  +нн(2) lapbDefaults
+--    |  |     +нн(1) sLPConnectionDefaults
+--    |  |        |нн( 1) sLPConnectionDefaultInterfaceType
+--    |  |        |нн( 2) sLPConnectionDefaultK
+--    |  |        |нн( 3) sLPConnectionDefaultN1
+--    |  |        |нн( 4) sLPConnectionDefaultN2
+--    |  |        |нн( 5) sLPConnectionDefaultSequenceModulus
+--    |  |        |нн( 6) sLPConnectionDefaultT1Timer
+--    |  |        |нн( 7) sLPConnectionDefaultT2Timer
+--    |  |        |нн( 8) sLPConnectionDefaultT3Timer
+--    |  |        +нн( 9) sLPConnectionDefaultT4Timer
 --    |  |
---    |  |--(3) lapbNotifs
---    |  |  +--(1) fRMR
+--    |  |нн(3) lapbNotifs
+--    |  |  +нн(1) fRMR
 --    |  |
---    |  +--(4) lapbOids
+--    |  +нн(4) lapbOids
 --    |
---    +--(2) lapbConformance
---       |--(1) lapbComplicanes
---       +--(2) lapbGroups
+--    +нн(2) lapbConformance
+--       |нн(1) lapbComplicanes
+--       +нн(2) lapbGroups
 
 
 -- =====================================================================
@@ -267,11 +298,11 @@ fRMRReceived OBJECT-IDENTITY
 	DESCRIPTION
 		"This object identity is used as the value of the 
 		 specificProblems parameter in the communicationsAlarm 
-		 notification issued for an sLPConnection table entry.  
-		 It indicates that an FRMR was received.  The FRMR frame 
-		 itself is include in the fRMR parameter provided as 
-		 additional information for the communicationsAlarm 
-		 notification.
+		 notification issued for an sLPConnection or 
+		 lLCConnection2 table entry.  It indicates that an FRMR 
+		 was received.  The FRMR frame itself is include in the 
+		 fRMR parameter provided as additional information for 
+		 the communicationsAlarm notification.
 		 
 		 A FRMR frame was received.  The received FRMR frame is 
 		 reported as additionalInformation in the notification, 
@@ -300,9 +331,9 @@ fRMRReasonsControlFieldUndefinedOrUnimplemented OBJECT-IDENTITY
 		"This object identity is used as an additional value of 
 		 the specificProblems parameter in the 
 		 communicationsAlarm notification issued for an 
-		 sLPConnection table entry.  It indicates that the 
-		 reason for receiving the FRMR was an undefined or 
-		 unimplemented control field."
+		 sLPConnection or lLCConnection2 table entry.  It 
+		 indicates that the reason for receiving the FRMR was an 
+		 undefined or unimplemented control field."
 	REFERENCE
 		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 
 		 fRMRReasonsControlFieldUndefinedOrUnimplemented."
@@ -311,11 +342,12 @@ fRMRReasonsControlFieldUndefinedOrUnimplemented OBJECT-IDENTITY
 fRMRReasonsFormatError OBJECT-IDENTITY
 	STATUS		current
 	DESCRIPTION
-		"This object identity is used as an additional value of the 
-		 specificProblems parameter in the communicationsAlarm 
-		 notification issued for an sLPConnection table entry.  
-		 It indicates that the reason for receiving the FRMR was 
-		 a format error."
+		"This object identity is used as an additional value of 
+		 the specificProblems parameter in the 
+		 communicationsAlarm notification issued for an 
+		 sLPConnection or lLCConnection2 table entry.  It 
+		 indicates that the reason for receiving the FRMR was a 
+		 format error."
 	REFERENCE
 		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 
 		 fRMRReasonsFormatError."
@@ -324,10 +356,11 @@ fRMRReasonsFormatError OBJECT-IDENTITY
 fRMRReasonsInfoFieldLengthGreaterThanMaximum OBJECT-IDENTITY
 	STATUS		current
 	DESCRIPTION
-		"This object identity is used as an additional value of the 
-		 specificProblems parameter in the communicationsAlarm 
-		 notification issued for an sLPConnection table entry.  
-		 It indicates that the reason for receiving the FRMR was 
+		"This object identity is used as an additional value of 
+		 the specificProblems parameter in the 
+		 communicationsAlarm notification issued for an 
+		 sLPConnection or lLCConnection2 table entry.  It 
+		 indicates that the reason for receiving the FRMR was 
 		 that the information field length was greater than the 
 		 maximum."
 	REFERENCE
@@ -339,10 +372,11 @@ fRMRReasonsInfoFieldLengthGreaterThanMaximum OBJECT-IDENTITY
 fRMRReasonsInvalidNR OBJECT-IDENTITY
 	STATUS		current
 	DESCRIPTION
-		"This object identity is used as an additional value of the 
-		 specificProblems parameter in the communicationsAlarm 
-		 notification issued for an sLPConnection table entry.  
-		 It indicates that the reason for receiving the FRMR was 
+		"This object identity is used as an additional value of 
+		 the specificProblems parameter in the 
+		 communicationsAlarm notification issued for an 
+		 sLPConnection or lLCConnection2 table entry.  It 
+		 indicates that the reason for receiving the FRMR was 
 		 that the NR included in the command was invalid."
 	REFERENCE
 		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 fRMRReasonsInvalidNR."
@@ -351,10 +385,11 @@ fRMRReasonsInvalidNR OBJECT-IDENTITY
 fRMRReasonsNonSpecific OBJECT-IDENTITY
 	STATUS		current
 	DESCRIPTION
-		"This object identity is used as an additional value of the 
-		 specificProblems parameter in the communicationsAlarm 
-		 notification issued for an sLPConnection table entry.  
-		 It indicates that the reason for receiving the FRMR was 
+		"This object identity is used as an additional value of 
+		 the specificProblems parameter in the 
+		 communicationsAlarm notification issued for an 
+		 sLPConnection or lLCConnection2 table entry.  It 
+		 indicates that the reason for receiving the FRMR was 
 		 unknown or unspecified."
 	REFERENCE
 		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 fRMRReasonsNonSpecific."
@@ -672,7 +707,7 @@ LAPBDLEEntry ::=
 	SEQUENCE { 
 		-- X.723 communicationsEntity inherited attributes:
 		lAPBDLEcommunicationsEntityId
-			DisplayString,
+			SimpleNameType,
 		lAPBDLElocalSapNames
 			RowPointer,
 		lAPBDLEoperationalState
@@ -717,7 +752,7 @@ LAPBDLEEntry ::=
 
 -- X.723 communicationsEntity inherited attributes:
 lAPBDLEcommunicationsEntityId OBJECT-TYPE
-	SYNTAX		DisplayString
+	SYNTAX		SimpleNameType
 	MAX-ACCESS	not-accessible -- index
 	STATUS		current
 	DESCRIPTION	""
@@ -753,7 +788,6 @@ lAPBDLEoperationalState OBJECT-TYPE
 
 -- X.282 datalinkEntity inherited attributes:
 lAPBDLEproviderEntityNames OBJECT-TYPE
-	SYNTAX		RowPointer
 	SYNTAX		RowPointer
 	MAX-ACCESS	read-create
 	STATUS		current
@@ -1029,7 +1063,7 @@ DLSAPEntry ::=
 	SEQUENCE {
 		-- X.723 sap1 inherited attributes:
 		dLSAPsapId
-			DisplayString,
+			SimpleNameType,
 		dLSAPsap1Address
 			Unsigned32,
 		dLSAPuserEntityNames
@@ -1041,7 +1075,7 @@ DLSAPEntry ::=
 
 -- X.723 sap1 inherited attributes:
 dLSAPsapId OBJECT-TYPE
-	SYNTAX		DisplayString
+	SYNTAX		SimpleNameType
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
@@ -1173,7 +1207,7 @@ SLPPMEntry ::=
 	SEQUENCE {
 		-- X.723 coProtocolMachine inherited attributes:
 		sLPPMcoProtocolMachineId
-			DisplayString,
+			SimpleNameType,
 		sLPPMoperationalState
 			OperationalState,
 		-- Added attribute to mimic activate/deactiveate 
@@ -1186,7 +1220,7 @@ SLPPMEntry ::=
 
 -- X.723 coProtocolMachine inherited attributes:
 sLPPMcoProtocolMachineId OBJECT-TYPE
-	SYNTAX		DisplayString
+	SYNTAX		SimpleNameType
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
@@ -1312,7 +1346,7 @@ SLPConnectionEntry ::=
 	SEQUENCE {
 		-- X.723 singlePeerConnection inherited attributes
 		sLPConnectionConnectionId
-			DisplayString,
+			SimpleNameType,
 		sLPConnectionUnderlyingConnectionNames
 			RowPointer,
 		-- X.723 singlePeerConnection singlePeerConnectionP2 package
@@ -1405,7 +1439,7 @@ SLPConnectionEntry ::=
 
 -- X.723 singlePeerConnection inherited attributes
 sLPConnectionConnectionId OBJECT-TYPE
-	SYNTAX		DisplayString
+	SYNTAX		SimpleNameType
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
@@ -1931,8 +1965,7 @@ sLPConnectionAlarmStatus OBJECT-TYPE
 
 		 The fRMR parameter containing the received frame is 
 		 included in the additionalInformation.  No other 
-		 parameters are used.
-		 "
+		 parameters are used."
 	REFERENCE
 		"ITU-T Rec. X.282 | ISO/IEC 10742,
 			 ITU-T Rec. X.721 (1992)."
@@ -2008,7 +2041,7 @@ sLPConnectionIVMOEntry OBJECT-TYPE
 SLPConnectionIVMOEntry ::=
 	SEQUENCE {
 		sLPConnectionIVMOid
-			DisplayString,
+			SimpleNameType,
 		sLPConnectionIVMOinterfaceType
 			INTEGER,
 		sLPConnectionIVMOk
@@ -2032,7 +2065,7 @@ SLPConnectionIVMOEntry ::=
 	}
 
 sLPConnectionIVMOid OBJECT-TYPE
-	SYNTAX		DisplayString
+	SYNTAX		SimpleNameType
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
