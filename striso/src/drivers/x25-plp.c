@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:29 $
+ @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/16 03:53:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:20:29 $ by $Author: brian $
+ Last Modified $Date: 2007/12/16 03:53:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-plp.c,v $
+ Revision 0.9.2.4  2007/12/16 03:53:07  brian
+ - updated release files
+
  Revision 0.9.2.3  2007/12/15 20:20:29  brian
  - updates
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:29 $"
+#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/16 03:53:07 $"
 
 static char const ident[] =
-    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:29 $";
+    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/16 03:53:07 $";
 
 /*
  * This is an X.25 PLP (LLC2, XOT, SLP and MLP) (CONS) driver per X.223.  It can be used with the
@@ -82,27 +85,27 @@ static char const ident[] =
 #include <sys/npi.h>
 #include <sys/tihdr.h>
 
-#define X25_PLP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define X25_PLP_EXTRA		"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define X25_PLP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
-#define X25_PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:29 $"
-#define X25_PLP_DEVICE		"SVR 4.2 STREAMS X.25 PLP (ISO 8208) Network Provider"
-#define X25_PLP_CONTACT		"Brian BIdulock <bidulock@openss7.org>"
-#define X25_PLP_LICENSE		"GPL"
-#define X25_PLP_BANNER		X25_PLP_DESCRIP		"\n" \
-				X25_PLP_EXTRA		"\n" \
-				X25_PLP_COPYRIGHT	"\n" \
-				X25_PLP_DEVICE		"\n" \
-				X25_PLP_CONTACT
-#define X25_PLP_SPLASH		X25_PLP_DESCRIP		" - " \
-				X25_PLP_REVISION
+#define PLP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define PLP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
+#define PLP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
+#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/16 03:53:07 $"
+#define PLP_DEVICE	"SVR 4.2 STREAMS X.25 PLP (ISO 8208) Network Provider"
+#define PLP_CONTACT	"Brian BIdulock <bidulock@openss7.org>"
+#define PLP_LICENSE	"GPL"
+#define PLP_BANNER	PLP_DESCRIP		"\n" \
+			PLP_EXTRA		"\n" \
+			PLP_COPYRIGHT	"\n" \
+			PLP_DEVICE		"\n" \
+			PLP_CONTACT
+#define PLP_SPLASH	PLP_DESCRIP		" - " \
+			PLP_REVISION
 
 #ifdef LINUX
-MODULE_AUTHOR(X25_PLP_CONTACT);
-MODULE_DESCRIPTION(X25_PLP_DESCRIP);
-MODULE_SUPPORTED_DEVICE(X25_PLP_DEVICE);
+MODULE_AUTHOR(PLP_CONTACT);
+MODULE_DESCRIPTION(PLP_DESCRIP);
+MODULE_SUPPORTED_DEVICE(PLP_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(X25_PLP_LICENSE);
+MODULE_LICENSE(PLP_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODUL_ALIAS
 MODULE_ALIAS("streams-x25-plp");
@@ -110,26 +113,26 @@ MODULE_ALIAS("streams-x25-plp");
 #endif				/* LINUX */
 
 #ifdef LFS
-#define X25_PLP_DRV_ID		CONFIG_STREAMS_X25_PLP_MODID
-#define X25_PLP_DRV_NAME	CONFIG_STREAMS_X25_PLP_NAME
-#define X25_PLP_CMAJORS		CONFIG_STREAMS_X25_PLP_NMAJORS
-#define X25_PLP_CMAJOR_0	CONFIG_STREAMS_X25_PLP_MAJOR
-#define X25_PLP_UNITS		CONFIG_STREAMS_X25_PLP_NMINORS
+#define PLP_DRV_ID	CONFIG_STREAMS_PLP_MODID
+#define PLP_DRV_NAME	CONFIG_STREAMS_PLP_NAME
+#define PLP_CMAJORS	CONFIG_STREAMS_PLP_NMAJORS
+#define PLP_CMAJOR_0	CONFIG_STREAMS_PLP_MAJOR
+#define PLP_UNITS	CONFIG_STREAMS_PLP_NMINORS
 #endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
 #ifdef LFS
-MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_X25_PLP_MODID));
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_PLP_MODID));
 MODULE_ALIAS("streams-driver-x25-plp");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_X25_PLP_MAJOR));
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_PLP_MAJOR));
 MODULE_ALIAS("/dev/streams/x25-plp");
 MODULE_ALIAS("/dev/streams/x25-plp/*");
 MODULE_ALIAS("/dev/streams/clone/x25-plp");
 #endif				/* LFS */
-MODULE_ALIAS("char-major-" __stringify(X25_PLP_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(X25_PLP_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(X25_PLP_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(PLP_CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(PLP_CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(PLP_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/x25-plp");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
@@ -142,16 +145,16 @@ MODULE_ALIAS("/dev/x25-plp");
  *  =========================================================================
  */
 
-#define DRV_ID		X25_PLP_DRV_ID
-#define DRV_NAME	X25_PLP_DRV_NAME
-#define CMAJORS		X25_PLP_CMAJORS
-#define CMAJOR_0	X25_PLP_CMAJOR_0
-#define UNITS		X25_PLP_UNITS
+#define DRV_ID		PLP_DRV_ID
+#define DRV_NAME	PLP_DRV_NAME
+#define CMAJORS		PLP_CMAJORS
+#define CMAJOR_0	PLP_CMAJOR_0
+#define UNITS		PLP_UNITS
 
 #ifdef MODULE
-#define DRV_BANNER	X25_PLP_BANNER
+#define DRV_BANNER	PLP_BANNER
 #else				/* MODULE */
-#define DRV_BANNER	X25_PLP_SPLASH
+#define DRV_BANNER	PLP_SPLASH
 #endif				/* MODULE */
 
 static struct module_info xp_minfo = {
@@ -422,6 +425,8 @@ dl_primname(dl_ulong prim)
 		return ("DL_????");
 	}
 }
+
+struct xp;
 
 /*
  * ==========================================================================

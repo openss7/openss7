@@ -1,3 +1,23 @@
+2007-12-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/man.am: perform more substitutions
+	* m4/openss7.m4: remove strict prototypes
+	* mibs/OPENSS7-MIB.mib: added common MIBS
+	* mibs/OPENSS7-SMI.mib: added common MIBS
+	* mibs/OPENSS7-TC.mib: added common MIBS
+	* mibs/OPENSS7-TMN-SMI.mib: added common MIBS
+	* mibs/OPENSS7-TMN-TC.mib: added common MIBS
+	* snmp/ds_agent.h: added common SNMP files
+	* snmp/header_complex.h: added common SNMP files
+	* snmp/mib2c: added common SNMP files
+	* snmp/mib2c.conf: added common SNMP files
+	* snmp/mib2c.openss7.conf: added common SNMP files
+	* snmp/mib2c.storage.conf: added common SNMP files
+	* snmp/mib2c.vartypes.conf: added common SNMP files
+	* snmp/mib_modules.h: added common SNMP files
+	* snmp/struct.h: added common SNMP files
+	* snmp/util_funcs.h: added common SNMP files
+
 2007-12-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/archive.am: upgrade license to AGPLv3.

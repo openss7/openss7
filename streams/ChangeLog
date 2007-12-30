@@ -1,3 +1,25 @@
+2007-12-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/man.am: perform more substitutions
+	* m4/openss7.m4: remove strict prototypes
+	* src/mibs/OPENSS7-STREAMS-MIB.mib: updated MIB
+	* src/snmp/makestubs: updates
+	* src/snmp/mib2c: updated script
+	* src/snmp/mib2c.conf: updated template
+	* src/snmp/mib2c.storage.conf: updated template
+	* src/snmp/mib2c.vartypes.conf: updated template
+	* src/snmp/mibs/OPENSS7-STREAMS-MIB.mib: updated MIB
+	* src/snmp/strMIB.c: changes from MIB and script updates
+	* src/snmp/strMIB.h: changes from MIB and script updates
+
+	* src/snmp/mib2c.openss7.conf: added common SNMP file
+	* src/snmp/mibs/OPENSS7-MIB.mib: added common MIBS
+	* src/snmp/mibs/OPENSS7-SMI.mib: added common MIBS
+	* src/snmp/mibs/OPENSS7-STREAMS-EXT-MIB.mib: added extension MIB
+	* src/snmp/mibs/OPENSS7-TC.mib: added common MIBS
+	* src/snmp/mibs/OPENSS7-TMN-SMI.mib: added common MIBS
+	* src/snmp/mibs/OPENSS7-TMN-TC.mib: added common MIBS
+
 2007-12-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS

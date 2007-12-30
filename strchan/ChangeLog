@@ -1,3 +1,27 @@
+2007-12-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/man.am: perform more substitutions
+	* m4/openss7.m4: remove strict prototypes
+	* src/snmp/mibs/OPENSS7-PHY-MIB.mib: updated mibs
+
+	* src/snmp/ds_agent.h: added common SNMP files
+	* src/snmp/header_complex.h: added common SNMP files
+	* src/snmp/mib2c: added common SNMP files
+	* src/snmp/mib2c.conf: added common SNMP files
+	* src/snmp/mib2c.openss7.conf: added common SNMP files
+	* src/snmp/mib2c.storage.conf: added common SNMP files
+	* src/snmp/mib2c.vartypes.conf: added common SNMP files
+	* src/snmp/mib_modules.h: added common SNMP files
+	* src/snmp/struct.h: added common SNMP files
+	* src/snmp/util_funcs.h: added common SNMP files
+
+	* src/snmp/mibs/OPENSS7-MIB.mib: added common MIB
+	* src/snmp/mibs/OPENSS7-SMI.mib: added common MIB
+	* src/snmp/mibs/OPENSS7-TC.mib: added common MIB
+	* src/snmp/mibs/OPENSS7-TMN-SMI.mib: added common MIB
+	* src/snmp/mibs/OPENSS7-TMN-TC.mib: added common MIB
+	* src/snmp/mibs/OPENSS7-X400P-MX-MIB.mib: added X400P MX MIB
+
 2007-11-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/Makefile.am: working up documentation

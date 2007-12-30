@@ -1,3 +1,38 @@
+2007-12-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/man.am: perform more substitutions
+	* m4/openss7.m4: remove strict prototypes
+	* Makefile.am: strap out x25-plp driver for now
+	* src/drivers/x25-plp.c: working up driver
+	* src/mibs/OPENSS7-X25-LLC-MIB.mib: mib updates
+	* src/perl/ISO10733.gdmo: GDMO corrections
+	* src/perl/Q.751.1.gdmo: GDMO corrections
+
+	* src/snmp/ds_agent.h: added common SNMP files
+	* src/snmp/header_complex.h: added common SNMP files
+	* src/snmp/mib2c: added common SNMP files
+	* src/snmp/mib2c.conf: added common SNMP files
+	* src/snmp/mib2c.openss7.conf: added common SNMP files
+	* src/snmp/mib2c.storage.conf: added common SNMP files
+	* src/snmp/mib2c.vartypes.conf: added common SNMP files
+	* src/snmp/mib_modules.h: added common SNMP files
+	* src/snmp/struct.h: added common SNMP files
+	* src/snmp/util_funcs.h: added common SNMP files
+
+	* src/snmp/mibs/CLNS-MIB.mib: added MIB
+	* src/snmp/mibs/OPENSS7-CLNS-MIB.mib: added MIB
+	* src/snmp/mibs/OPENSS7-CONS-MIB.mib: added MIB
+	* src/snmp/mibs/OPENSS7-MIB.mib: added common MIB file
+	* src/snmp/mibs/OPENSS7-SMI.mib: added common MIB file
+	* src/snmp/mibs/OPENSS7-TC.mib: added common MIB file
+	* src/snmp/mibs/OPENSS7-TMN-SMI.mib: added common MIB file
+	* src/snmp/mibs/OPENSS7-TMN-TC.mib: added common MIB file
+	* src/snmp/mibs/OPENSS7-X25-LLC-MIB.mib: added MIB
+	* src/snmp/mibs/OPENSS7-X25-PLP-MIB.mib: added MIB
+	* src/snmp/mibs/RFC1381-MIB.mib: added MIB
+	* src/snmp/mibs/RFC1382-MIB.mib: added MIB
+	* src/snmp/mibs/RS-232-MIB.mib: added MIB
+
 2007-12-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* .cvsignore: updates

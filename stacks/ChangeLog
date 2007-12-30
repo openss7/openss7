@@ -1,3 +1,37 @@
+2007-12-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/man.am: perform more substitutions
+	* m4/openss7.m4: remove strict prototypes
+	* src/mibs/OPENSS7-SCCP-MIB.mib: updated mibs
+	* src/mibs/OPENSS7-TMN-SMI.mib: updated mibs
+	* src/mibs/OPENSS7-TMN-TC.mib: updated mibs
+	* src/mibs/OPENSS7-X400P-MIB.mib: updated mibs
+	* src/snmp/ds_agent.h: added common SNMP files
+	* src/snmp/header_complex.h: added common SNMP files
+	* src/snmp/mib2c: added common SNMP files
+	* src/snmp/mib2c.conf: added common SNMP files
+	* src/snmp/mib2c.openss7.conf: added common SNMP files
+	* src/snmp/mib2c.storage.conf: added common SNMP files
+	* src/snmp/mib2c.vartypes.conf: added common SNMP files
+	* src/snmp/mib_modules.h: added common SNMP files
+	* src/snmp/mibs/OPENSS7-ISUP-MIB.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-MIB.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-MTP-MIB2.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-MTP-MIB.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-MTP-TC.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-SCCP-MIB.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-SL-MUX-MIB.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-SMI.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-SS7-MIB.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-SS7-TC.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-TCAP-MIB.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-TC.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-TMN-SMI.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-TMN-TC.mib: added SS7 mibs
+	* src/snmp/mibs/OPENSS7-X400P-MIB.mib: added SS7 mibs
+	* src/snmp/struct.h: added common SNMP files
+	* src/snmp/util_funcs.h: added common SNMP files
+
 2007-12-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man3/t_optmgmt.3.man: biblio correction

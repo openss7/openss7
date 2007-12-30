@@ -1,0 +1,2445 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-X25-PLP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/15 20:16:53 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2007/12/15 20:16:53 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-X25-PLP-MIB.mib,v $
+-- Revision 0.9.2.1  2007/12/15 20:16:53  brian
+-- - added new mib files
+--
+-- =============================================================================
+
+OPENSS7-X25-PLP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Integer32,
+	Unsigned32, enterprises
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString, MODULE-COMPLIANCE,
+	OBJECT-GROUP, TimeInterval, TruthValue, RowStatus, RowPointer
+		FROM SNMPv2-TC
+	AdministativeState, OperationalState, UsageState, 
+	ProceduralStatus, AvailabilityStatus, AlarmStatus
+		FROM OPENSS7-TMN-TC
+
+openss7		OBJECT IDENTIFIER ::= { enterprises 29591 }
+openss7MIBs	OBJECT IDENTIFIER ::= { openss7 1 }
+openss7Modules	OBJECT IDENTIFIER ::= { openss7MIBs 1 }
+
+x25-PLP-MIB MODULE-IDENTITY
+	LAST-UPDATED
+		"20071125221024Z"
+	ORGANIZATION
+		"The OpenSS7 Project"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta T6L 6T1
+		 CANADA
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 mailto:bidulock@openss7.org"
+	DESCRIPTION
+		"This MIB provides configuration and status information 
+		 for an X.25 PLP subsystem, where the X.25 PLP is in 
+		 accordance with ITU-T Rec.  X.25 | ISO/IEC 8208 and 
+		 management information from ITU-T Rec. X.283 | ISO/IEC 
+		 10733."
+	::= { openss7Modules 3 }
+
+ -- top level organization of the MIB
+
+x25PLPNotifications	 OBJECT IDENTIFIER ::= { x25-PLP-MIB	 0 }
+x25PLPObjects		 OBJECT IDENTIFIER ::= { x25-PLP-MIB	 1 }
+x25PLPConform		 OBJECT IDENTIFIER ::= { x25-PLP-MIB	 2 }
+
+x25PLPTables		 OBJECT IDENTIFIER ::= { x25PLPObjects	 1 }
+x25PLPScalars		 OBJECT IDENTIFIER ::= { x25PLPObjects	 2 }
+x25PLPNotifs		 OBJECT IDENTIFIER ::= { x25PLPObjects	 3 }
+x25PLPOids		 OBJECT IDENTIFIER ::= { x25PLPObjects	 4 }
+
+x25PLPComplicances	 OBJECT IDENTIFIER ::= { x25PLPConform	 1 }
+x25PLPGroups		 OBJECT IDENTIFIER ::= { x25PLPConform	 2 }
+
+x25PLEConfig		 OBJECT IDENTIFIER ::= { x25PLPTables	 1 }
+x25PLEProfile		 OBJECT IDENTIFIER ::= { x25PLPTables	 2 }
+x25PLEState		 OBJECT IDENTIFIER ::= { x25PLPTables	 3 }
+x25PLEStats		 OBJECT IDENTIFIER ::= { x25PLPTables	 4 }
+
+x25VCConfig		 OBJECT IDENTIFIER ::= { x25PLPTables	 5 }
+x25VCProfile		 OBJECT IDENTIFIER ::= { x25PLPTables	 6 }
+x25VCStats		 OBJECT IDENTIFIER ::= { x25PLPTables	 7 }
+
+x25PVCConfig		 OBJECT IDENTIFIER ::= { x25PLPTables	 8 }
+x25SVCConfig		 OBJECT IDENTIFIER ::= { x25PLPTables	 9 }
+
+
+-- ====================================================================
+
+DTEAddress TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		""
+	SYNTAX		DisplayString(0..15)
+
+LogicalChannelNumber TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		""
+	SYNTAX		INTEGER(0..4095)
+
+Throughput TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		""
+	SYNTAX		INTEGER(0..15)
+
+RedirectReason TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		""
+	SYNTAX		INTEGER(0..127)
+
+NetworkAddress TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		""
+	SYNTAX		OCTET STRING(SIZE(0..20))
+
+-- ====================================================================
+
+
+x25PLEConfigTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X25PLEConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides a table of X.25 Packet Layer Protocol (PLP) 
+		 Entities.  Each X.25 Packet Layer Entity corresponsds 
+		 to an X.25 DTE or DCE over which permanent virtual 
+		 circuits exist or virtual calls can be placed."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25PLEConfig 1 }
+
+x25PLEConfigEntry OBJECT-TYPE
+	SYNTAX		X25PLEConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an entry in the x25PLEConfigTable.  Each entry 
+		 corresponds to an instance of an x25PLE managed object, 
+		 which represents a DTE, DCE or DXE X.25 packet layer 
+		 entity, from which permanent virtual circuits are 
+		 formed or virtual calls are established."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10733."
+	INDEX		{ x25PLEConfigIndex }
+	::= { x25PLEConfigTable 1 }
+
+X25PLEConfigEntry ::=
+	SEQUENCE {
+		x25PLEConfigIndex
+			,
+		-- x25PLEConfigOperationalState
+		--	,
+		-- x25PLEConfigAdministrativeState
+		--	,
+		x25PLEConfigProtocolVersionSupported
+			INTEGER,
+		x25PLEConfigLocalDTEAddress
+			DTEAddress,
+		x25PLEConfigInterfaceMode
+			INTEGER,
+		x25PLEConfigDefaultThroughputClass
+			Throughput,
+		x25PLEConfigFlowControlNegotiationPermitted
+			TruthValue,
+		x25PLEConfigCallDeflectionSubscription
+			TruthValue, -- 10733 only
+		x25PLEConfigMaxActiveCalls
+			INTEGER, -- 10733 only
+		x25PLEConfigRestartTime
+			TimeInterval, -- 10733 only
+		x25PLEConfigDefaultPacketSizeIncoming
+			INTEGER,
+		x25PLEConfigDefaultPacketSizeOutgoing
+			INTEGER,
+		x25PLEConfigDefaultWindowSizeIncoming
+			INTEGER,
+		x25PLEConfigDefaultWindowSizeOutgoing
+			INTEGER,
+		x25PLEConfigMinimumRecallTimer
+			TimeInterval, -- 10733 only
+		x25PLEConfigRestartCount
+			INTEGER, -- 10733 only
+		x25PLEConfigSN-ServiceProvider
+			RowPointer,
+		x25PLEConfigSN-SA-P
+			RowPointer,
+		x25PLEConfigLogicalChannelAssignmentsPVC
+			OCTET STRING,
+		x25PLEConfigLogicalChannelAssignmentsLIC
+			LogicalChannelNumber,
+		x25PLEConfigLogicalChannelAssignmentsHIC
+			LogicalChannelNumber,
+		x25PLEConfigLogicalChannelAssignmentsL2W
+			LogicalChannelNumber,
+		x25PLEConfigLogicalChannelAssignmentsH2W
+			LogicalChannelNumber,
+		x25PLEConfigLogicalChannelAssignmentsLOG
+			LogicalChannelNumber,
+		x25PLEConfigLogicalChannelAssignmentsHOG
+			LogicalChannelNumber,
+		x25PLEConfigPacketSequencing
+			INTEGER, -- 10733 only
+		x25PLEConfigPLEClientMOName
+			RowPointer, -- 10733 only
+		x25PLEConfigRegistrationRequestTime
+			TimeInterval, -- 10733 only
+		x25PLEConfigRegistrationRequestCount
+			INTEGER, -- 10733 only
+		x25PLEConfigRegistrationPermitted
+			TruthValue -- 10733 only
+	}
+
+x25PLEConfigProtocolVersionSupported OBJECT-TYPE
+	SYNTAX		INTEGER(1..255)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The protocol versions of ISO8208 available on the PLE 
+		 interface."
+	REFERENCE	"ISO/IEC 10733 : protocolVersionSupported."
+	::= { x25PLEConfigEntry 1 }
+
+x25PLEConfigLocalDTEAddress OBJECT-TYPE
+	SYNTAX		DTEAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The full DTE address of this PLE expressed as an X.121, 
+		 X.31, etc. address."
+	REFERENCE	"ISO/IEC 10733 : localDTEAddress."
+	::= { x25PLEConfigEntry 2 }
+
+x25PLEConfigInterfaceMode OBJECT-TYPE
+	SYNTAX		INTEGER { dTE(0), dCE(1) }
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The DCE/DTE mode in which the interface is currently 
+		 operating."
+	REFERENCE	"ISO/IEC 10733 : interfaceMode."
+	::= { x25PLEConfigEntry 3 }
+
+x25PLEConfigDefaultThroughputClass OBJECT-TYPE
+	SYNTAX		Throughput
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The default throughput class value currently agreed 
+		 with the DCE.  This may be the normal default, or may 
+		 have been changed as a result of the use of the 
+		 defaultThroughputClassAssignment facility."
+	REFERENCE	"ISO/IEC 10733 : defaultThroughputClass."
+	::= { x25PLEConfigEntry 4 }
+
+x25PLEConfigFlowControlNegotiationPermitted OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Indicates whether flow control parameter negotiation is 
+		 permitted.  When this has the value True, the use of 
+		 flow control parameter negotiation (by specifying 
+		 values for the window and packet size in call request 
+		 and accept packets) is permitted.  When it has the 
+		 value False, no such values shall be specified in call 
+		 request and accept packets, and any values specified in 
+		 a Profile or via an internal interface shall be 
+		 ignored."
+	REFERENCE	"ISO/IEC 10733 : flowControlNegotiationPermitted."
+	::= { x25PLEConfigEntry 5 }
+
+x25PLEConfigCallDeflectionSubscription OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Indicates whether call deflection has been subscribed 
+		 to.  When this has value True, call deflection has been 
+		 subscribed to."
+	REFERENCE	"ISO/IEC 10733 : callDeflectionSubscription."
+	::= { x25PLEConfigEntry 6 }
+
+x25PLEConfigMaxActiveCalls OBJECT-TYPE
+	SYNTAX		INTEGER(0..4096)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The maximum number of active circuits permitted on this 
+		 PLE.  When the NULL value (zero (0)) is specified, the 
+		 maximum number of active circuits shall be likmited 
+		 only by the resources available to the entity."
+	REFERENCE	"ISO/IEC 10733 : maxActiveCalls."
+	DEFVAL		{ 0 }
+	::= { x25PLEConfigEntry 7 }
+
+x25PLEConfigRestartTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for Timer T20 (Restart Request Response Timer) in 
+		 centiseconds.  Note that the default timer is 
+		 ultimately dependent upon the underlying data link 
+		 provider type."
+	REFERENCE	"ISO/IEC 10733 : restartTime."
+	DEFVAL		{ 18000 } -- 180 seconds
+	::= { x25PLEConfigEntry 8 }
+
+x25PLEConfigDefaultPacketSizeIncoming OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The default value of the packet size parameter for this 
+		 DTE.  A value of NULL (zero (0)) indicates the ISO 8208 
+		 default value of 128.  Any other value indicates the 
+		 value agreed by the nonstandard default packet size 
+		 facility."
+	REFERENCE	"ISO/IEC 10733 : defaultPacketSize, ITU-T Rec. 
+			 X.283 : defaultPacketSizes."
+	DEFVAL		{ 0 }
+	::= { x25PLEConfigEntry 9 }
+
+x25PLEConfigDefaultPacketSizeOutgoing OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The default value of the packet size parameter for this 
+		 DTE.  A value of NULL (zero (0)) indicates the ISO/IEC 
+		 8208  or ITU-T Rec. X.25 default value of 128.  Any 
+		 other value indicates the value agreed by the 
+		 nonstandard default packet size facility."
+	REFERENCE	"ISO/IEC 10733 : defaultPacketSize, ITU-T Rec.  
+			 X.283 : defaultPacketSizes."
+	DEFVAL		{ 0 }
+	::= { x25PLEConfigEntry 10 }
+
+x25PLEConfigDefaultWindowSizeIncoming OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The default value of the window size parameter for this 
+		 DTE.  A value of NULL (zero (0)) indicates the ISO/IEC 
+		 8208 or ITU-T Rec X.25 default value of 2.  Any other 
+		 value indicates the value agreed by the nonstandard 
+		 default window sizes facility."
+	REFERENCE	"ISO/IEC 10733 : defaultWindowSize, ITU-T Rec.  
+			 X.283 : defaultWindowSizes."
+	DEFVAL		{ 0 }
+	::= { x25PLEConfigEntry 11 }
+
+x25PLEConfigDefaultWindowSizeOutgoing OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The default value of the window size parameter for this 
+		 DTE.  A value of NULL (zero (0)) indicates the ISO/IEC 
+		 8208 or ITU-T Rec X.25 default value of 2.  Any other 
+		 value indicates the value agreed by the nonstandard 
+		 default window sizes facility."
+	REFERENCE	"ISO/IEC 10733 : defaultWindowSize, ITU-T Rec.  
+			 X.283 : defaultWindowSizes."
+	DEFVAL		{ 0 }
+	::= { x25PLEConfigEntry 12 }
+
+x25PLEConfigMinimumRecallTimer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Minimum time in centiseconds before recall permitted.  
+		 This timer determines the minimum interval (in 
+		 centiseconds) which shall elapse following an 
+		 unsuccessful first call attempt before a subsequent 
+		 call attempt is permitted."
+	REFERENCE	"ISO/IEC 10733 : minimumRecallTime."
+	::= { x25PLEConfigEntry 13 }
+
+x25PLEConfigRestartCount OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for count R20 (Restart Request Retransmission 
+		 Count)."
+	REFERENCE	"ISO/IEC 10733 : restartCount."
+	DEFVAL		{ 1 }
+	::= { x25PLEConfigEntry 14 }
+
+x25PLEConfigSN-ServiceProvider OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Distinguished name of the subnetwork (SN) service 
+		 provider MO.  This attribute identifies the subnetwork 
+		 entity to be used to support the linkage, when enabled.  
+		 The subnetwork service provider may be in the datalink 
+		 layer, or it may be in the network layer (for example 
+		 when operating ISO 8473 over the ISO 8208 SNDCF)."
+	REFERENCE	"ISO/IEC 10733 : sN-ServiceProvider."
+	::= { x25PLEConfigEntry 15 }
+
+x25PLEConfigSN-SA-P OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Distinguished name of the service provider SA-P MO (if 
+		 present).  THis is obtained via an internal interface 
+		 when the linkage is enabled.  The sN-SA-P may be a 
+		 relationship to a SA-P MO in the datalink layer, or it 
+		 may be a relationship to another Managed Object within 
+		 the network layer which is not a SA-P MO.  For example, 
+		 when operating ISO 8473 over the ISO 8208 SNDCF, it is 
+		 a relationship to the same x25PLE MO which is pointed 
+		 to by the sN-ServiceProvider Attribute."
+	REFERENCE	"ISO/IEC 10733 : sN-SA-P."
+	::= { x25PLEConfigEntry 16 }
+
+x25PLEConfigLogicalChannelAssignmentsPVC OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Represents the logical channel assigments of this PLE, 
+		 expressed as a four-tuple where the values represent 
+		 the set (with maximum permitted cardinality (LIC - 1), 
+		 minimum required cardinality of zero) of PVC channels 
+		 (with a maximum value (LIC - 1), and minmum value 1) 
+		 assigned, the incoming channel range, the two-way 
+		 channel range, the outgoing channel range, 
+		 respectively.
+
+		 The presence of each of the rangest shall be optional.  
+		 Absense of a particular range shall signify that there 
+		 are no channels of that type assigned.  Within each 
+		 range, the low value shall be less than or equal to the 
+		 high value, and there shall be no value in any set or 
+		 range which is greater than or equal to a value in a 
+		 subsequent range when ordered as above.
+
+		 This attribute is subject to the rules for logical 
+		 assignements described in ISO/IEC 8208 clause 3.7.  it 
+		 is understood that the Highest Permanent Channel (HPC) 
+		 is defined by the Lowest Incoming Channel (LIC) value 
+		 minus one.
+
+		 The OCTET STRING is encoded as two octets, most 
+		 significant octet followed by least significant octet, 
+		 where each pair of octets represents another channel 
+		 number from 1..4095 (but less than LIC), the logical 
+		 channel number to which a Permanent Virtual Circuit 
+		 (PVC) has been assigned."
+	REFERENCE	"ISO/IEC 10733 : logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEConfigEntry 17 }
+
+x25PLEConfigLogicalChannelAssignmentsLIC OBJECT-TYPE
+	SYNTAX		LogicalChannelNumber
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The lowest incoming logical channel in the incoming 
+		 logical channel range.  When set to zero (0), or the 
+		 same value as the highest incoming logical channel, it 
+		 indicates that there is no incoming logical channel 
+		 range and the highest incoming logical channel is 
+		 ignored.
+		 
+		 This value is subject to the rules for logical channel 
+		 assignments described in ISO/IEC 8208 clause 3.7."
+	REFERENCE	"ISO/IEC 10733 ; logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEConfigEntry 18 }
+
+x25PLEConfigLogicalChannelAssignmentsHIC OBJECT-TYPE
+	SYNTAX		LogicalChannelNumber
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The highest incoming logical channel in the incoming 
+		 logical channel range.  When set to zero (0), or the 
+		 same value as the lowest incoming logical channel, it 
+		 indicates that there is no incoming logical channel 
+		 range and the lowest incoming logical channel is 
+		 ignored.
+		 
+		 This value is subject to the rules for logical channel 
+		 assignments described in ISO/IEC 8208 clause 3.7."
+	REFERENCE	"ISO/IEC 10733 ; logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEConfigEntry 19 }
+
+x25PLEConfigLogicalChannelAssignmentsL2W OBJECT-TYPE
+	SYNTAX		LogicalChannelNumber
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The lowest two-way logical channel in the two-way 
+		 logical channel range.  When set to zero (0), or to the 
+		 same value as the highest two-way logical channel, it 
+		 indicates that there is no two-way logical channel 
+		 range and the highest two-way logical channel is 
+		 ignored.
+		 
+		 This value is subject to the rules for logical channel 
+		 assignments described in ISO/IEC 8208 clause 3.7."
+	REFERENCE	"ISO/IEC 10733 ; logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEConfigEntry 20 }
+
+x25PLEConfigLogicalChannelAssignmentsH2W OBJECT-TYPE
+	SYNTAX		LogicalChannelNumber
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The highest two-way logical channel in the two-way 
+		 logical channel range.  When set to zero (0), or to the 
+		 same value as the lowest two-way logical channel, it 
+		 indicates that there is no two-way logical channel 
+		 range and the lowest two-way logical channel is 
+		 ignored.
+		 
+		 This value is subject to the rules for logical channel 
+		 assignments described in ISO/IEC 8208 clause 3.7."
+	REFERENCE	"ISO/IEC 10733 ; logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEConfigEntry 21 }
+
+x25PLEConfigLogicalChannelAssignmentsLOG OBJECT-TYPE
+	SYNTAX		LogicalChannelNumber
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The lowest outgoing logical channel in the outgoing 
+		 logical channel range.  When set to zero (0), or to the  
+		 same value as the highest outgoing logical channel, it 
+		 indicates that there is no outgoing channel range and 
+		 the highest outgoing logical channel is ignored.
+		 
+		 This value is subject to the rules for logical channel 
+		 assignments described in ISO/IEC 8208 clause 3.7."
+	REFERENCE	"ISO/IEC 10733 ; logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEConfigEntry 22 }
+
+x25PLEConfigLogicalChannelAssignmentsHOG OBJECT-TYPE
+	SYNTAX		LogicalChannelNumber
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The highest outgoing logical channel in the outgoing 
+		 logical channel range.  When set to zero (0), or to the 
+		 same value as the lowest outgoing logical channel, it 
+		 indicates that there is no outgoing logical channel 
+		 range and the lowest outgoing logical channel is 
+		 otherwise ignored.
+		 
+		 This value is subject to the rules for logical channel 
+		 assignments described in ISO/IEC 8208 clause 3.7."
+	REFERENCE	"ISO/IEC 10733 ; logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEConfigEntry 23 }
+
+x25PLEConfigPacketSequencing OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The module of the packet sequence number space.  
+		 Expressed as an integer.  ISO/IEC 8208 only requires 
+		 support for at least one of the two values 8 and 128, 
+		 but it is possible that some future revision may extend 
+		 the range.  A system is only required to support the 
+		 setting of values which are also required by the 
+		 protocol standard.  A system shall return an error when 
+		 an attempt is made to set the value to a value which is 
+		 not supported by that system."
+	REFERENCE	"ISO/IEC 10733 : packetSequencing."
+	::= { x25PLEConfigEntry 24 }
+
+x25PLEConfigPLEClientMOName OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The Distinguished name of the client MO.  Note that 
+		 this will either be a Transport Layer MO or a CLNS MO."
+	REFERENCE	"ISO/IEC 10733 : pLEClientMOName."
+	::= { x25PLEConfigEntry 25 }
+
+x25PLEConfigRegistrationRequestTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for Timer T28 (Registration Request Timer) in 
+		 centiseconds."
+	REFERENCE	"ISO/IEC 10733 : regsitrationRequestTime."
+	DEFVAL		{ 30000 } -- 300 seconds
+	::= { x25PLEConfigEntry 26 }
+
+x25PLEConfigRegistrationRequestCount OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for count R28 (Registration Request Count)."
+	REFERENCE	"ISO/IEC 10733 : registrationRequestCount."
+	DEFVAL		{ 1 }
+	::= { x25PLEConfigEntry 27 }
+
+x25PLEConfigRegistrationPermitted OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"When true, the use of online facility registration is 
+		 permitted."
+	REFERENCE	"ISO/IEC 10733 : registrationPermitted."
+	DEFVAL		{ false(2) }
+	::= { x25PLEConfigEntry 28 }
+
+-- ====================================================================
+
+x25PLEProfileTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X25PLEProfileEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This table provides profiles for the x25PLE.  These 
+		 profiles are not created nor deleted by management 
+		 stations; however, their values may be altered.  Each 
+		 entry in the table consists of a separate profile.  The 
+		 managemed element may choose to use profile values when 
+		 creating instances of x25PLEs (entries in the 
+		 x25PLEConfig table."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25PLEProfile 1 }
+
+x25PLEProfileEntry OBJECT-TYPE
+	SYNTAX		X25PLEProfileEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Each entry in the table provides a separate profile 
+		 identified by the x25PLEProfileId which consists of a 
+		 DisplayString used to identify the profile.  The agent 
+		 or implementation may used specific profiles to create 
+		 instances of x25PLEs.  Management stations may not 
+		 create nor delete entries in this table, however, the 
+		 values associated with a given profile may be altered."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10733."
+	INDEX		{ x25PLEProfileName }
+	::= { x25PLEProfileTable 1 }
+
+X25PLEProfileEntry ::=
+	SEQUENCE {
+		x25PLEProfileName
+			DisplayString,
+		x25PLEProfileLocalDTEAddress
+			DTEAddress,
+		x25PLEProfileInterfaceMode
+			INTEGER,
+		x25PLEProfileDefaultThroughputClass
+			Throughput,
+		x25PLEProfileFlowControlNegotiationPermitted
+			TruthValue,
+		x25PLEProfileCallDeflectionSubscription
+			TruthValue,
+		x25PLEProfileMaxActiveCircuits
+			INTEGER,
+		x25PLEProfileRestartTime
+			TimeInterval,
+		x25PLEProfileDefaulPacketSizeIncoming
+			INTEGER,
+		x25PLEProfileDefaulPacketSizeOutgoing
+			INTEGER,
+		x25PLEProfileDefaultWindowSizeIncoming
+			INTEGER,
+		x25PLEProfileDefaultWindowSizeOutgoing
+			INTEGER,
+		x25PLEProfileMinimumRecallTimer
+			TimeInterval,
+		x25PLEProfileRestartCount
+			INTEGER,
+		x25PLEProfileSN-ServiceProvider
+			RowPointer,
+		x25PLEProfileSN-SA-P
+			RowPointer,
+		x25PLEProfileLogicalChannelAssignementsPVC
+			INTEGER,
+		x25PLEProfileLogicalChannelAssignementsLIC
+			INTEGER,
+		x25PLEProfileLogicalChannelAssignementsHIC
+			INTEGER,
+		x25PLEProfileLogicalChannelAssignementsL2W
+			INTEGER,
+		x25PLEProfileLogicalChannelAssignementsH2W
+			INTEGER,
+		x25PLEProfileLogicalChannelAssignementsLOG
+			INTEGER,
+		x25PLEProfileLogicalChannelAssignementsHOG
+			INTEGER,
+		x25PLEProfilePacketSequencing
+			INTEGER,
+		x25PLEProfileRegistrationRequestTime
+			TimeInterval,
+		x25PLEProfileRegistrationRequestCount
+			INTEGER,
+		x25PLEProfileRegistrationPermitted
+			TruthValue
+	}
+
+x25PLEProfileName OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	""
+	::= { x25PLEProfileEntry 1 }
+
+x25PLEProfileLocalDTEAddress OBJECT-TYPE
+	SYNTAX		DTEAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The protocol versions of ISO8208 available on the PLE 
+		 interface."
+	REFERENCE	"ISO/IEC 10733 : protocolVersionSupported."
+	::= { x25PLEProfileEntry 2 }
+
+x25PLEProfileInterfaceMode OBJECT-TYPE
+	SYNTAX		INTEGER { dTE(0), dCE(1) }
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The DCE/DTE mode in which the interface is currently 
+		 operating."
+	REFERENCE	"ISO/IEC 10733 : interfaceMode."
+	::= { x25PLEProfileEntry 3 }
+
+x25PLEProfileDefaultThroughputClass OBJECT-TYPE
+	SYNTAX		Throughput
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The default throughput class value currently agreed 
+		 with the DCE.  This may be the normal default, or may 
+		 have been changed as a result of the use of the 
+		 defaultThroughputClassAssignment facility."
+	::= { x25PLEProfileEntry 4 }
+
+x25PLEProfileFlowControlNegotiationPermitted OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Indicates whether flow control parameter negotiation is 
+		 permitted.  When this has the value True, the use of 
+		 flow control parameter negotiation (by specifying 
+		 values for the window and packet size in call request 
+		 and accept packets) is permitted.  When it has the 
+		 value False, no such values shall be specified in call 
+		 request and accept packets, and any values specified in 
+		 a Profile or via an internal interface shall be 
+		 ignored."
+	REFERENCE	"ISO/IEC 10733 : flowControlNegotiationPermitted."
+	::= { x25PLEProfileEntry 5 }
+
+x25PLEProfileCallDeflectionSubscription OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Indicates whether call deflection has been subscribed 
+		 to.  When this has value True, call deflection has been 
+		 subscribed to."
+	REFERENCE	"ISO/IEC 10733 : callDeflectionSubscription."
+	::= { x25PLEProfileEntry 6 }
+
+x25PLEProfileMaxActiveCircuits OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The maximum number of active circuits permitted on this 
+		 PLE.  When the NULL value (zero (0)) is specified, the 
+		 maximum number of active circuits shall be likmited 
+		 only by the resources available to the entity."
+	REFERENCE	"ISO/IEC 10733 : maxActiveCalls."
+	DEFVAL		{ 0 }
+	::= { x25PLEProfileEntry 7 }
+
+x25PLEProfileRestartTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for Timer T20 (Restart Request Response Timer) in 
+		 centiseconds.  Note that the default timer is ultimately 
+		 dependent upon the underlying data link provider type."
+	REFERENCE	"ISO/IEC 10733 : restartTime."
+	DEFVAL		{ 18000 } -- 180 seconds
+	::= { x25PLEProfileEntry 8 }
+
+x25PLEProfileDefaulPacketSizeIncoming OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The default value of the packet size parameter for this 
+		 DTE.  A value of NULL (zero (0)) indicates the ISO 8208 
+		 default value of 128.  Any other value indicates the 
+		 value agreed by the nonstandard default packet size 
+		 facility."
+	REFERENCE	"ISO/IEC 10733 : defaultPacketSize, ITU-T Rec. 
+			 X.283 : defaultPacketSizes."
+	DEFVAL		{ 0 }
+	::= { x25PLEProfileEntry 9 }
+
+x25PLEProfileDefaulPacketSizeOutgoing OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The default value of the packet size parameter for this 
+		 DTE.  A value of NULL (zero (0)) indicates the ISO/IEC 
+		 8208  or ITU-T Rec. X.25 default value of 128.  Any 
+		 other value indicates the value agreed by the 
+		 nonstandard default packet size facility."
+	REFERENCE	"ISO/IEC 10733 : defaultPacketSize, ITU-T Rec.  
+			 X.283 : defaultPacketSizes."
+	DEFVAL		{ 0 }
+	::= { x25PLEProfileEntry 10 }
+
+x25PLEProfileDefaultWindowSizeIncoming OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The default value of the window size parameter for this 
+		 DTE.  A value of NULL (zero (0)) indicates the ISO/IEC 
+		 8208 or ITU-T Rec X.25 default value of 2.  Any other 
+		 value indicates the value agreed by the nonstandard 
+		 default window sizes facility."
+	REFERENCE	"ISO/IEC 10733 : defaultWindowSize, ITU-T Rec.  
+			 X.283 : defaultWindowSizes."
+	DEFVAL		{ 0 }
+	::= { x25PLEProfileEntry 11 }
+
+x25PLEProfileDefaultWindowSizeOutgoing OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The default value of the window size parameter for this 
+		 DTE.  A value of NULL (zero (0)) indicates the ISO/IEC 
+		 8208 or ITU-T Rec X.25 default value of 2.  Any other 
+		 value indicates the value agreed by the nonstandard 
+		 default window sizes facility."
+	REFERENCE	"ISO/IEC 10733 : defaultWindowSize, ITU-T Rec.  
+			 X.283 : defaultWindowSizes."
+	DEFVAL		{ 0 }
+	::= { x25PLEProfileEntry 12 }
+
+x25PLEProfileMinimumRecallTimer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Minimum time in centiseconds before recall permitted.  
+		 This timer determines the minimum interval (in 
+		 centiseconds) which shall elapse following an 
+		 unsuccessful first call attempt before a subsequent 
+		 call attempt is permitted."
+	REFERENCE	"ISO/IEC 10733 : minimumRecallTime."
+	::= { x25PLEProfileEntry 13 }
+
+x25PLEProfileRestartCount OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for count R20 (Restart Request Retransmission 
+		 Count)."
+	REFERENCE	"ISO/IEC 10733 : restartCount."
+	DEFVAL		{ 1 }
+	::= { x25PLEProfileEntry 14 }
+
+x25PLEProfileSN-ServiceProvider OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Distinguished name of the subnetwork (SN) service 
+		 provider MO.  This attribute identifies the subnetwork 
+		 entity to be used to support the linkage, when enabled.  
+		 The subnetwork service provider may be in the datalink 
+		 layer, or it may be in the network layer (for example 
+		 when operating ISO 8473 over the ISO 8208 SNDCF)."
+	REFERENCE	"ISO/IEC 10733 : sN-ServiceProvider."
+	::= { x25PLEProfileEntry 15 }
+
+x25PLEProfileSN-SA-P OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Distinguished name of the service provider SA-P MO (if 
+		 present).  THis is obtained via an internal interface 
+		 when the linkage is enabled.  The sN-SA-P may be a 
+		 relationship to a SA-P MO in the datalink layer, or it 
+		 may be a relationship to another Managed Object within 
+		 the network layer which is not a SA-P MO.  For example, 
+		 when operating ISO 8473 over the ISO 8208 SNDCF, it is 
+		 a relationship to the same x25PLE MO which is pointed 
+		 to by the sN-ServiceProvider Attribute."
+	REFERENCE	"ISO/IEC 10733 : sN-SA-P."
+	::= { x25PLEProfileEntry 16 }
+
+x25PLEProfileLogicalChannelAssignementsPVC OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Represents the logical channel assigments of this PLE, 
+		 expressed as a four-tuple where the values represent 
+		 the set (with maximum permitted cardinality (LIC - 1), 
+		 minimum required cardinality of zero) of PVC channels 
+		 (with a maximum value (LIC - 1), and minmum value 1) 
+		 assigned, the incoming channel range, the two-way 
+		 channel range, the outgoing channel range, 
+		 respectively.
+
+		 The presence of each of the rangest shall be optional.  
+		 Absense of a particular range shall signify that there 
+		 are no channels of that type assigned.  Within each 
+		 range, the low value shall be less than or equal to the 
+		 high value, and there shall be no value in any set or 
+		 range which is greater than or equal to a value in a 
+		 subsequent range when ordered as above.
+
+		 This attribute is subject to the rules for logical 
+		 assignements described in ISO/IEC 8208 clause 3.7.  it 
+		 is understood that the Highest Permanent Channel (HPC) 
+		 is defined by the Lowest Incoming Channel (LIC) value 
+		 minus one.
+
+		 The OCTET STRING is encoded as two octets, most 
+		 significant octet followed by least significant octet, 
+		 where each pair of octets represents another channel 
+		 number from 1..4095 (but less than LIC), the logical 
+		 channel number to which a Permanent Virtual Circuit 
+		 (PVC) has been assigned."
+	REFERENCE	"ISO/IEC 10733 : logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEProfileEntry 17 }
+
+x25PLEProfileLogicalChannelAssignementsLIC OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The lowest incoming logical channel in the incoming 
+		 logical channel range.  When set to zero (0), or the 
+		 same value as the highest incoming logical channel, it 
+		 indicates that there is no incoming logical channel 
+		 range and the highest incoming logical channel is 
+		 ignored.
+		 
+		 This value is subject to the rules for logical channel 
+		 assignments described in ISO/IEC 8208 clause 3.7."
+	REFERENCE	"ISO/IEC 10733 ; logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEProfileEntry 18 }
+
+x25PLEProfileLogicalChannelAssignementsHIC OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The highest incoming logical channel in the incoming 
+		 logical channel range.  When set to zero (0), or the 
+		 same value as the lowest incoming logical channel, it 
+		 indicates that there is no incoming logical channel 
+		 range and the lowest incoming logical channel is 
+		 ignored.
+		 
+		 This value is subject to the rules for logical channel 
+		 assignments described in ISO/IEC 8208 clause 3.7."
+	REFERENCE	"ISO/IEC 10733 ; logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEProfileEntry 19 }
+
+x25PLEProfileLogicalChannelAssignementsL2W OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The lowest two-way logical channel in the two-way 
+		 logical channel range.  When set to zero (0), or to the 
+		 same value as the highest two-way logical channel, it 
+		 indicates that there is no two-way logical channel 
+		 range and the highest two-way logical channel is 
+		 ignored.
+		 
+		 This value is subject to the rules for logical channel 
+		 assignments described in ISO/IEC 8208 clause 3.7."
+	REFERENCE	"ISO/IEC 10733 ; logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEProfileEntry 20 }
+
+x25PLEProfileLogicalChannelAssignementsH2W OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The highest two-way logical channel in the two-way 
+		 logical channel range.  When set to zero (0), or to the 
+		 same value as the lowest two-way logical channel, it 
+		 indicates that there is no two-way logical channel 
+		 range and the lowest two-way logical channel is 
+		 ignored.
+		 
+		 This value is subject to the rules for logical channel 
+		 assignments described in ISO/IEC 8208 clause 3.7."
+	REFERENCE	"ISO/IEC 10733 ; logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEProfileEntry 21 }
+
+x25PLEProfileLogicalChannelAssignementsLOG OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The lowest outgoing logical channel in the outgoing 
+		 logical channel range.  When set to zero (0), or to the  
+		 same value as the highest outgoing logical channel, it 
+		 indicates that there is no outgoing channel range and 
+		 the highest outgoing logical channel is ignored.
+		 
+		 This value is subject to the rules for logical channel 
+		 assignments described in ISO/IEC 8208 clause 3.7."
+	REFERENCE	"ISO/IEC 10733 ; logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEProfileEntry 22 }
+
+x25PLEProfileLogicalChannelAssignementsHOG OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The highest outgoing logical channel in the outgoing 
+		 logical channel range.  When set to zero (0), or to the 
+		 same value as the lowest outgoing logical channel, it 
+		 indicates that there is no outgoing logical channel 
+		 range and the lowest outgoing logical channel is 
+		 otherwise ignored.
+		 
+		 This value is subject to the rules for logical channel 
+		 assignments described in ISO/IEC 8208 clause 3.7."
+	REFERENCE	"ISO/IEC 10733 ; logicalChannelAssignments, 
+			 ISO/IEC 8208 clause 3.7."
+	::= { x25PLEProfileEntry 23 }
+
+x25PLEProfilePacketSequencing OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The module of the packet sequence number space.  
+		 Expressed as an integer.  ISO/IEC 8208 only requires 
+		 support for at least one of the two values 8 and 128, 
+		 but it is possible that some future revision may extend 
+		 the range.  A system is only required to support the 
+		 setting of values which are also required by the 
+		 protocol standard.  A system shall return an error when 
+		 an attempt is made to set the value to a value which is 
+		 not supported by that system."
+	REFERENCE	"ISO/IEC 10733 : packetSequencing."
+	::= { x25PLEProfileEntry 24 }
+
+x25PLEProfileRegistrationRequestTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for Timer T28 (Registration Request Timer) in 
+		 centiseconds."
+	REFERENCE	"ISO/IEC 10733 : regsitrationRequestTime."
+	DEFVAL		{ 30000 } -- 30000 centiseconds, 300.00 seconds
+	::= { x25PLEProfileEntry 25 }
+
+x25PLEProfileRegistrationRequestCount OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for count R28 (Registration Request Count)."
+	REFERENCE	"ISO/IEC 10733 : registrationRequestCount."
+	DEFVAL		{ 1 }
+	::= { x25PLEProfileEntry 26 }
+
+x25PLEProfileRegistrationPermitted OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"When true, the use of online facility registration is 
+		 permitted."
+	REFERENCE	"ISO/IEC 10733 : registrationPermitted."
+	DEFVAL		{ false(2) }
+	::= { x25PLEProfileEntry 27 }
+
+
+-- ====================================================================
+
+x25PLEStateTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X25PLEStateEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The x25PLEStateTable provides state information for 
+		 each x25PLE object which are represented by the rows in 
+		 the table.  Each row corresponds to an X.25 Packet 
+		 Layer Entity."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10733, ITU-T Rec. 
+			 X.721 | ISO/IEC 10165-2."
+	::= { x25PLEState 1 }
+
+x25PLEStateEntry OBJECT-TYPE
+	SYNTAX		X25PLEStateEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The x25PLEStateEntry provides an entry in the X.25 
+		 Packet Layer Entity state table which provides the 
+		 state information for a single packet layer entity as 
+		 indicated by the index into the table."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10733, ITU-T Rec. 
+			 X.721 | ISO/IEC 10165-2."
+	INDEX		{ x25PLEStateIndex }
+	::= { x25PLEStateTable 1 }
+
+X25PLEStateEntry ::=
+	SEQUENCE {
+		x25PLEStateIndex
+			INTEGER,
+		x25PLEStateAdministrativeState
+			AdministrativeState,
+		x25PLEStateOperationalState
+			OperationalState,
+		x25PLEStateUsageStatus
+			UsageStatus,
+		x25PLEStateProceduralStatus
+			ProceduralStatus,
+		x25PLEStateAlarmStatus
+			AlarmStatus
+	}
+
+-- ====================================================================
+
+x25PLEStatsTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X25PLEStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The x25PLEStatsTable provides statistics and counts for 
+		 each X25PLE object which are represented by the rows in 
+		 the table.  Each row corresponds to an X.25 Packet 
+		 Layer Entity."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25PLEStats 1 }
+
+x25PLEStatsEntry OBJECT-TYPE
+	SYNTAX		X25PLEStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the x25PLEStatsTable.  Each row or entry 
+		 provides statistics for one X.25 Packet Layer Entity.  
+		 Rows cannot be created or deleted by management 
+		 stations."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10733."
+	INDEX		{ x25PLEStatsIndex }
+	::= { x25PLEStatsTable 1 }
+
+X25PLEStatsEntry ::=
+	SEQUENCE {
+		x25PLEStatsIndex
+			INTEGER,
+		x25PLEStatsOctetsSentCounter
+			Counter32, -- 10733 only
+		x25PLEStatsOctetsReceivedCounter
+			Counter32, -- 10733 only
+		x25PLEStatsDataPacketsSent
+			Counter32, -- 10733 only
+		x25PLEStatsDataPacketsReceived
+			Counter32, -- 10733 only
+		x25PLEStatsCallAttempts
+			Counter32, -- 10733 only
+		x25PLEStatsCallsConnected
+			Counter32, -- 10733 only
+		x25PLEStatsProviderInitiatedDisconnects
+			Counter32, -- 10733 only
+		x25PLEStatsCallTimeouts
+			Counter32, -- 10733 only
+		x25PLEStatsClearTimeouts
+			Counter32, -- 10733 only
+		x25PLEStatsRemotelyInitiatedResets
+			Counter32, -- 10733 only
+		x25PLEStatsDataRetransmissionTimerExpires
+			Counter32, -- 10733 only
+		x25PLEStatsProviderInitiatedResets
+			Counter32, -- 10733 only
+		x25PLEStatsResetTimeouts
+			Counter32, -- 10733 only
+		x25PLEStatsRemotelyInitiatedRestarts
+			Counter32, -- 10733 only
+		x25PLEStatsRestartCountsExceeded
+			Counter32, -- 10733 only
+		x25PLEStatsProtocolErrorsDetectedLocally
+			Counter32, -- 10733 only
+		x25PLEStatsProtocolErrorsAccusedOf
+			Counter32, -- 10733 only
+		x25PLEStatsCallEstablishmentRetryCountsExceeded
+			Counter32, -- 10733 only
+		x25PLEStatsClearCountsExceeded
+			Counter32 -- 10733 only
+	}
+
+x25PLEStatsIndex OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	""
+	::= { x25PLEStatsEntry 1 }
+
+
+x25PLEStatsOctetsSentCounter OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This corresponds to the ISO/IEC 8208 Octets Sent 
+		 attribute.  Note that the DMI definition is in terms of 
+		 user data octets."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 2 }
+
+x25PLEStatsOctetsReceivedCounter OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This corresponds to the ISO/IEC 8208 Octets Received 
+		 attribute.  Note that the DMI definition is in terms of 
+		 user data octets."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 3 }
+
+x25PLEStatsDataPacketsSent OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the total number of data packets sent."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 4 }
+
+x25PLEStatsDataPacketsReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the total number of data packets received."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 5 }
+
+x25PLEStatsCallAttempts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the total number of calls attempted."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 6 }
+
+x25PLEStatsCallsConnected OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the total number of calls which have reached 
+		 the open state."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 7 }
+
+x25PLEStatsProviderInitiatedDisconnects OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter for the provider initiated disconnect events 
+		 which generate communications alarm notifications."
+	REFERENCE	"ISO/IEC 10733 : providerInitiatedDisconnects."
+	::= { x25PLEStatsEntry 8 }
+
+x25PLEStatsCallTimeouts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the number of times timer T21 expiry is 
+		 experienced by the PLE."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 9 }
+
+x25PLEStatsClearTimeouts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the number of times timer T23 expiry is 
+		 experienced by the PLE."
+	REFERENCE	"ISO/IEC 10733 : clearTimeouts."
+	::= { x25PLEStatsEntry 10 }
+
+
+x25PLEStatsRemotelyInitiatedResets OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter associated with the remotely initiated reset 
+		 event which generates a communications alarm 
+		 notification."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 11 }
+
+x25PLEStatsDataRetransmissionTimerExpires OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the number of expires of timer T25.  Returns 
+		 zero if the option is not implemented."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 12 }
+
+x25PLEStatsProviderInitiatedResets OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter associated with the provider initiated reset 
+		 event which generates a communication alarm 
+		 notification."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 13 }
+
+x25PLEStatsResetTimeouts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the number of timer T22 expires experienced 
+		 by the PLE."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 14 }
+
+x25PLEStatsRemotelyInitiatedRestarts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the number of remotely initiated restarts.  
+		 This is the total number of remotely intitiated 
+		 (including provider initiated) restarts experienced by 
+		 the PLE, excluding the restart associated with bringing 
+		 up the PLE interface."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 15 }
+
+x25PLEStatsRestartCountsExceeded OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter associated with the restart count exceeded 
+		 event which generate a communication alarm 
+		 notification."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 16 }
+
+x25PLEStatsProtocolErrorsDetectedLocally OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter associated with the protocol error detected 
+		 locally event which generates a communications alarm 
+		 notification."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 17 }
+
+x25PLEStatsProtocolErrorsAccusedOf OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter associated wtih the accused of protocol error 
+		 event which generates communications alarm 
+		 notification."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 18 }
+
+x25PLEStatsCallEstablishmentRetryCountsExceeded OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter associated with the call establishment retry 
+		 count exceeded event which generates a communications 
+		 alarm notification."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 19 }
+
+x25PLEStatsClearCountsExceeded OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter associated with the clear count exceeded event 
+		 which generates a communications alarm notification."
+	REFERENCE	"ISO/IEC 10733 : octetsSentCounter."
+	::= { x25PLEStatsEntry 20 }
+
+
+
+-- ====================================================================
+
+x25VCConfigTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X25VCProfileEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { x25VCConfig 1 }
+
+x25VCConfigEntry OBJECT-TYPE
+	SYNTAX		X25VCProfileEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	INDEX		{ x25VCConfigId, x25VCConfigChannel }
+	::= { x25VCConfigTable 1 }
+
+X25VCConfigEntry ::=
+	SEQUENCE {
+		x25VCConfigId
+			INTEGER,
+		x25VCConfigChannel
+			LogicalChannelNumber,
+		x25VCConfigPacketSizeIncoming
+			INTEGER,
+		x25VCConfigPacketSizeOutgoing
+			INTEGER,
+		x25VCConfigWindowSizeIncoming
+			INTEGER,
+		x25VCConfigWindowSizeOutgoing
+			INTEGER,
+		x25VConfigThroughputClassIncoming
+			INTEGER,
+		x25VConfigThroughputClassOutgoing
+			INTEGER
+	}
+
+x25VCConfigId OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10742."
+	::= { x25VCConfigEntry 1 }
+
+x25VCConfigChannel OBJECT-TYPE
+	SYNTAX		LogicalChannelNumber
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10742."
+	::= { x25VCConfigEntry 2 }
+
+x25VCConfigPacketSizeIncoming OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The incoming packet size for this VC.  In the case of a 
+		 profile entry, it is the proposed value of the incoming 
+		 packet size to be used when establishing the virtual 
+		 call, expressed in octets.  The value NULL (or zero 
+		 (0)) indicates that the default incoming packet size as 
+		 indicated by the x25PLEConfigDefaultPacketSizeIncoming 
+		 attribute of the containing x25PLE entry), is to be 
+		 used.  In the case of a non-profile entry, it is the 
+		 actual packet size in use for the VC."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10742."
+	::= { x25VCConfigEntry 3 }
+
+x25VCConfigPacketSizeOutgoing OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The outgoing packet size for this VC.  In the case of a 
+		 profile entry, it is the proposed value of the outgoing 
+		 packet size to be used when establishing the virtual 
+		 call, expressed in octets.  The value NULL (or zero 
+		 (0)) indicates that the default outgoing packet size as 
+		 indicated by the x25PLEConfigDefaultPacketSizeOutgoing 
+		 attribute of the containing x25PLE etnry), is to be 
+		 used.  Int he case of a non-profile entry, it is the 
+		 actual packet size in used for the VC."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10742."
+	::= { x25VCConfigEntry 4 }
+
+x25VCConfigWindowSizeIncoming OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The actual incoming window size in use for this VC."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10742."
+	::= { x25VCConfigEntry 5 }
+
+x25VCConfigWindowSizeOutgoing OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The actual outgoing window size in use for this VC."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10742."
+	::= { x25VCConfigEntry 6 }
+
+x25VConfigThroughputClassIncoming OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The incoming throughput class in use or to be used.  
+		 For a profile, this is the throughput class to be 
+		 proposed.  For a non-profile it is the actual 
+		 throughput class in use.  For Virtual Calls this is the 
+		 result of negotiation."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10742."
+	::= { x25VCConfigEntry 7 }
+
+x25VConfigThroughputClassOutgoing OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The outgoing throughput class in use or to be used.  
+		 For a profile, this is the throughput class to be 
+		 proposed.  For a non-profile it is the actual 
+		 throughput class in use.  For Virtual Calls this is the 
+		 result of negotiation."
+	REFERENCE	"ITU-T Rec. X.283 | ISO/IEC 10742."
+	::= { x25VCConfigEntry 8 }
+
+
+-- ====================================================================
+
+x25VCProfileTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X25VCProfileEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	"ISO/IEC 10733 : virtualCall."
+	::= { x25VCProfile 1 }
+
+x25VCProfileEntry OBJECT-TYPE
+	SYNTAX		X25VCProfileEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This managed objecte exsts in order to permit the 
+		 values of various parameters of a virtual call to be 
+		 specified in advance by management.  When a virtual 
+		 call is to be established, the values of all the 
+		 parameters to be used can be identified by specifying 
+		 an instance of this MO.  However it is permitted for 
+		 values specified by other means (for example, across 
+		 and internal user interface) to override the values 
+		 supplied in the profile.  There may be multiple entries 
+		 in this table."
+	REFERENCE
+		"ISO/IEC 10733 : virtualCall."
+	INDEX		{ x25VCProfileId }
+	::= { x25VCProfileTable 1 }
+
+
+X25VCProfileEntry ::=
+	SEQUENCE {
+		x25VCProfileId
+			INTEGER,
+		x25VCProfileProposedPacketSizeIncoming
+			INTEGER,
+		x25VCProfileProposedPacketSizeOutgoing
+			INTEGER,
+		x25VCProfileProposedWindowSizeIncoming
+			INTEGER,
+		x25VCProfileProposedWindowSizeOutgoing
+			INTEGER,
+		x25VCProfileAcceptReverseCharging
+			TruthValue,
+		x25VCProfileProposeReverseCharging
+			TruthValue,
+		x25VCProfileFastSelect
+			INTEGER,
+		x25VCProfileCallTime
+			TimeInterval,
+		x25VCProfileResetTime
+			TimeInterval,
+		x25VCProfileClearTime
+			TimeInterval,
+		x25VCProfileInterruptTime
+			TimeInterval,
+		x25VCProfileResetCount
+			INTEGER,
+		x25VCProfileClearCount
+			INTEGER,
+		x25VCProfileWindowTime
+			TimeInterval,
+		x25VCProfileDataRetransmissionTime
+			TimeInterval,
+		x25VCProfileDataRetransmissionCount
+			INTEGER,
+		x25VCProfileRejectTime
+			TimeInterval,
+		x25VCProfileRejectCount
+			INTEGER
+	}
+
+x25VCProfileId OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	"ISO/IEC 10733."
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileProposedPacketSizeIncoming OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The proposed value of the packet size paraemter to be 
+		 used when establishing the virtual call, expressed in 
+		 octets.  The value of NULL (zero (0)) indicatest that 
+		 the default packet size (as indicated by the 
+		 defaultPacketSize attribute of the containing X.25 PLE 
+		 MO), is to be used."
+	REFERENCE	"ISO/IEC 10733."
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileProposedPacketSizeOutgoing OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The proposed value of the packet size paraemter to be 
+		 used when establishing the virtual call, expressed in 
+		 octets.  The value of NULL (zero (0)) indicatest that 
+		 the default packet size (as indicated by the 
+		 defaultPacketSize attribute of the containing X.25 PLE 
+		 MO), is to be used."
+	REFERENCE	"ISO/IEC 10733."
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileProposedWindowSizeIncoming OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The proposed value of the window size parameter to be 
+		 used when establishing the virtual call.  The value of 
+		 NULL (zero (0)) indicates that the default window size 
+		 (as indicated by the defaultWindowSize attribute of the 
+		 containing X.25 PLE MO), is to be used."
+	REFERENCE	"ISO/IEC 10733."
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileProposedWindowSizeOutgoing OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The proposed value of the window size parameter to be 
+		 used when establishing the virtual call.  The value of 
+		 NULL (zero (0)) indicates that the default window size 
+		 (as indicated by the defaultWindowSize attribute of the 
+		 containing X.25 PLE MO), is to be used."
+	REFERENCE	"ISO/IEC 10733."
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileAcceptReverseCharging OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"When false(2), an incoming call requesting reverse 
+		 charging shall not be accepted."
+	REFERENCE	"ISO/IEC 10733."
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileProposeReverseCharging OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"When true(1), an outgoing call shall be initiated 
+		 requesting reverse charging."
+	REFERENCE	"ISO/IEC 10733."
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileFastSelect OBJECT-TYPE
+	SYNTAX		INTEGER {
+				notSpecified(0),
+				fastSelect(1),
+				fastSelectWithRestrictedResponse(2),
+				noFastSelect(3)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Type of fast select to be used for the call.  This 
+		 specifies that one of 'fast select', 'fast select with 
+		 restricted response', or no fast select facility is to 
+		 be used for the call.  Includes a value 'not specified' 
+		 which indicates that no preference is expressed."
+	REFERENCE	"ISO/IEC 10733."
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileCallTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for Timer T21 (Call Request Response Timer) in 
+		 centiseconds."
+	REFERENCE	"ISO/IEC 10733."
+	DEFVAL		{ 20000 } -- 20000 centiseconds, 200.00 seconds
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileResetTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"THe value for Timer T22 (Reset Request Response Timer) 
+		 in centiseconds."
+	REFERENCE	"ISO/IEC 10733."
+	DEFVAL		{ 18000 } -- 18000 ceniseconds, 180.00 seconds
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileClearTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for Timer T23 (Clear Request Response Timer) in 
+		 centiseconds."
+	REFERENCE	"ISO/IEC 10733."
+	DEFVAL		{ 18000 } -- 18000 centiseconds, 180.00 seconds
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileInterruptTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for Timer T26 (Interrupt Response Timer) in 
+		 centiseconds."
+	REFERENCE	"ISO/IEC 10733."
+	DEFVAL		{ 18000 } -- 18000 centiseconds, 180.00 seconds
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileResetCount OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for count R22 (Reset Request Retransmission 
+		 Count)."
+	REFERENCE	"ISO/IEC 10733."
+	DEFVAL		{ 1 }
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileClearCount OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for count R23 (Clear Request Retransmission 
+		 Count)."
+	REFERENCE	"ISO/IEC 10733."
+	DEFVAL		{ 1 }
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileWindowTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for Timer 24 (Window Status Transmission Timer) 
+		 in centiseconds.
+
+		 Valid when implemented and using the optional window 
+		 rotation recovery procedures at a receiving DTE as 
+		 described in Clause 11.2.2 of ISO/IEC 8208 (2nd 
+		 Edition)."
+	REFERENCE	"ISO/IEC 10733, ISO/IEC 8208 clause 11.2.2."
+	DEFVAL		{ 6000 } -- 6000 centisecond, 60.00 seconds
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileDataRetransmissionTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Default for Timer T25 (Window Rotation Timer) in 
+		 centiseconds.
+
+		 Valid when implemented and using the operation 
+		 tranmitting window rotation recovery procedures at a 
+		 tranmitting DTE as described in Clause 11.2.1 of 
+		 ISO/IEC 8208 (2nd Edition)."
+	REFERENCE	"ISO/IEC 10733."
+	DEFVAL		{ 20000 } -- 20000 centiseconds, 200.00 seconds
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileDataRetransmissionCount OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for count R25 (Data Packet Retransmission Count).
+
+		 Valid when implemented and using the operation 
+		 tranmitting window rotation recovery procedures at a 
+		 tranmitting DTE as described in Clause 11.2.1 of 
+		 ISO/IEC 8208 (2nd Edition)."
+	REFERENCE	"ISO/IEC 10733."
+	DEFVAL		{ 0 } -- do not retransmit
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileRejectTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for Timer T27 (Reject Response Timer) in 
+		 centiseconds.
+
+		 Valid when the optional packet retranmission procedures 
+		 are implemented and used."
+	REFERENCE	"ISO/IEC 10733."
+	DEFVAL		{ 6000 } -- 6000 centiseconds, 60.00 seconds
+	::= { x25VCProfileEntry 1 }
+
+x25VCProfileRejectCount OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Value for count R27 (Reject Retransmission Count).
+
+		 Valid when the optional packet retranmission procedures 
+		 are implemented and used."
+	REFERENCE	"ISO/IEC 10733."
+	DEFVAL		{ 0 }
+	::= { x25VCProfileEntry 1 }
+
+-- ====================================================================
+
+x25VCStatsTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X25VCStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	"ISO/IEC 10733."
+	::= { x25VCStats 1 }
+
+x25VCStatsEntry OBJECT-TYPE
+	SYNTAX		X25VCStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	"ISO/IEC 10733."
+	INDEX		{ x25VCStatsIndex, X25VCStatsChannel }
+	::= { x25VCStatsTable 1 }
+
+X25VCStatsEntry ::=
+	SEQUENCE {
+		x25VCStatsIndex
+			INTEGER,
+		x25VCStatsChannel
+			INTEGER,
+		x25VCStatsOctetsSentCounter
+			Counter32,
+		x25VCStatsOctetsReceivedCounter
+			Counter32,
+		x25VCStatsDataPacketsSent
+			Counter32,
+		x25VCStatsDataPacketsReceived
+			Counter32,
+		x25VCStatsProviderInitiatedDisconnects
+			Counter32,
+		x25VCStatsRemotelyInitiatedResets
+			Counter32,
+		x25VCStatsDataRetranmissionTimerExpiries
+			Counter32,
+		x25VCStatsProviderInitiatedResets
+			Counter32,
+		x25VCStatsResetTimeouts
+			Counter32,
+		x25VCStatsRemotelyInitiatedRestarts
+			Counter32,
+		x25VCStatsInterruptPacketsSent
+			Counter32,
+		x25VCStatsInterruptPacketsReceived
+			Counter32,
+		x25VCStatsInterruptTimerExpiries
+			Counter32,
+		x25VCStatsX25SegmentsSent
+			Counter32,
+		x25VCStatsX25SegmentsReceived
+			Counter32
+	}
+
+x25VCStatsIndex OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25VCStatsEntry 1 }
+
+x25VCStatsChannel OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25VCStatsEntry 2 }
+
+x25VCStatsOctetsSentCounter OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25VCStatsEntry 3 }
+
+x25VCStatsOctetsReceivedCounter OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25VCStatsEntry 4 }
+
+x25VCStatsDataPacketsSent OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the total number of data packets sent by the 
+		 PLE or over the PVC/VC."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733 dataPacketsSent."
+	::= { x25VCStatsEntry 5 }
+
+x25VCStatsDataPacketsReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the total number of data packets received by 
+		 the PLE or over the PVC/VC."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733 dataPacketsReceived."
+	::= { x25VCStatsEntry 6 }
+
+x25VCStatsProviderInitiatedDisconnects OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter for the provider initiated disconnect events 
+		 which generate communication alarm notifications."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25VCStatsEntry 7 }
+
+x25VCStatsRemotelyInitiatedResets OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter associated with the remotely initiated reset 
+		 event which generates a communication alarm 
+		 notification."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25VCStatsEntry 8 }
+
+x25VCStatsDataRetranmissionTimerExpiries OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the number of expires of timer T25.  Returns 
+		 zero if the option is not implemented."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25VCStatsEntry 9 }
+
+x25VCStatsProviderInitiatedResets OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter associated with the provider intiiated reset 
+		 event which generates a communcation alarm 
+		 notification."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25VCStatsEntry 10 }
+
+x25VCStatsResetTimeouts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the number of timer T22 expiries 
+		 experienced by the PLE or over the PVC/VC."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25VCStatsEntry 11 }
+
+x25VCStatsRemotelyInitiatedRestarts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the number of remotely initiated restarts.  
+		 This is the total number of remotely initiated 
+		 (including provider initiated) restarts experienced by 
+		 the PLE, including the restart associated with bringing 
+		 up the PDE interface."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25VCStatsEntry 12 }
+
+x25VCStatsInterruptPacketsSent OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the number of interrupt packets sent by the 
+		 PLE or over the PVC/VC."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25VCStatsEntry 13 }
+
+x25VCStatsInterruptPacketsReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the number of interrupt packets received by 
+		 the PLE or over the PVC/VC."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25VCStatsEntry 14 }
+
+x25VCStatsInterruptTimerExpiries OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter of the number of expiries of timer T26 
+		 experienced by the PLE or over the PVC/VC."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733."
+	::= { x25VCStatsEntry 15 }
+
+x25VCStatsX25SegmentsSent OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Value for count of X.25 Segments Received."
+	REFERENCE
+		"ITU-T Rec. X.283 | but not ISO/IEC 10733."
+	::= { x25VCStatsEntry 16 }
+
+x25VCStatsX25SegmentsReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Value for count of X.25 Segments Sent."
+	REFERENCE
+		"ITU-T Rec. X.283 | but not ISO/IEC 10733."
+	::= { x25VCStatsEntry 17 }
+
+
+-- ====================================================================
+
+x25PVCConfigTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X25PVCConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10742."
+	::= { X25PVCConfig 1 }
+
+x25PVCConfigEntry
+	SYNTAX		X25PVCConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry exists for each Permanent Virtual Circuit.  It 
+		 may be both created and deleted by management stations.  
+		 
+		 For DTEs, when an entry is created, the protocol 
+		 machine shall be reinitialized and a reset PDU shall be 
+		 transmitted with a cause code of DTE originated 
+		 (encoded as 00000000) and a diagnostic code of DTE 
+		 operational (161) shall be transmitted.  When the entry 
+		 is deleted, the protocol machine shall be reinitialized 
+		 and a reset PDU with cause code of DTE originated 
+		 (ecnoded as 00000000) and a diagnostic code of DTE not 
+		 operational (162) shall be transmitted.
+		 
+		 For DCEs, when an entry is created, the prtocol machine 
+		 shall be re-initialized and a reset PDU shall be 
+		 transmitted.  A cause code of remote DTE Operational 
+		 (econded as X000 1001) or Network Operational (encoded 
+		 as X000 1111) may, for example, be included.  When the 
+		 entry is deteled the protocol machine shall be 
+		 reinitialized and a reset PDU shall be transmitted.  A 
+		 cause code of Out of Order (encoded as X000 0001) or 
+		 Network Out of Order (encoded as X001 1101) may, for 
+		 example, be included."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10742."
+	::= { X25PVCConfigTable 1 }
+
+X25PVCConfigEntry ::=
+	SEQUENCE {
+		x25PVCConfigId
+			INTEGER,
+		x25PVCConfigChannel
+			LogicalChannelNumber,
+		x25PVCConfigRowStatus
+			RowStatus
+	}
+
+x25PVCConfigId OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { x25PVCConfigEntry 1 }
+
+x25PVCConfigChannel OBJECT-TYPE
+	SYNTAX		LogicalChannelNumber
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { x25PVCConfigEntry 2 }
+
+x25PVCConfigRowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		""
+	::= { x25PVCConfigEntry 3 }
+
+
+
+
+-- ====================================================================
+
+x25SVCConfigTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X25SVCConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10742."
+	::= { X25SVCConfig 1 }
+
+x25SVCConfigEntry OBJECT-TYPE
+	SYNTAX		X25SVCConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10742."
+	INDEX		{ x25SVCConfigId, x25SVCConfigChannel }
+	::= { X25SVCConfigTable 1 }
+
+X25SVCConfigEntry ::=
+	SEQUENCE {
+		x25SVCConfigId
+			INTEGER,
+		x25SVCConfigChannel
+			LogicalChannelNumber,
+		x25SVCConfigDirection
+			INTEGER,
+		x25SVCConfigRemoteDTEAddress
+			DTEAddress,
+		x25SVCConfigThroughputClass
+			Throughput,
+		x25SVCConfigRedirectReason
+			RedirectReason,
+		x25SVCConfigOriginallyCalledAddress
+			DTEAddress,
+		x25SVCConfigCallingAddressExtension
+			NetworkAddress,
+		x25SVCConfigCalledAddressExtension
+			NetworkAddress
+	}
+
+x25SVCConfigId OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	""
+	::= { x25SVCConfigEntry 1 }
+
+x25SVCConfigChannel OBJECT-TYPE
+	SYNTAX		LogicalChannelNumber
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE	""
+	::= { x25SVCConfigEntry 2 }
+
+x25SVCConfigDirection OBJECT-TYPE
+	SYNTAX		INTEGER { incoming(0), outgoing(1) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The direction (incoming(0) or outgoing(1)) of the call."
+	REFERENCE	"ISO/IEC 10733 : direction."
+	::= { x25SVCConfigEntry 3 }
+
+x25SVCConfigRemoteDTEAddress OBJECT-TYPE
+	SYNTAX		DTEAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The DTE Address of the remote DTE.  In the case of an 
+		 outgoing call, this is the remote DTE address from the 
+		 called address of the transmitted call request packet.  
+		 In the case of an incoming call, it is the calling 
+		 address from the received call request packet."
+	REFERENCE	"ISO/IEC 10733 remoteDTEAddress."
+	::= { x25SVCConfigEntry 4 }
+
+x25SVCConfigThroughputClass OBJECT-TYPE
+	SYNTAX		Throughput
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The actual through class in used for the call.  For 
+		 SVCs this is the result of negotiation."
+	REFERENCE	"ISO/IEC 10733 : throughputClass."
+	::= { x25SVCConfigEntry 5 }
+
+x25SVCConfigRedirectReason OBJECT-TYPE
+	SYNTAX		RedirectReason
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The reason for call redirect.  The zero value indicates 
+		 that the call was not redirected."
+	REFERENCE	"ISO/IEC 10733 : redirectReason."
+	::= { x25SVCConfigEntry 6 }
+
+x25SVCConfigOriginallyCalledAddress OBJECT-TYPE
+	SYNTAX		DTEAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The originally called address."
+	REFERENCE	"ISO/IEC 10733 : originallyCalledAddress."
+	::= { x25SVCConfigEntry 7 }
+
+x25SVCConfigCallingAddressExtension OBJECT-TYPE
+	SYNTAX		NetworkAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The contents of the calling address extension field.
+
+		 In the OSI context, this will always be an NSAP address 
+		 but in other uses it may not.  In any case, it may be 
+		 null, for example, when used by ISO 8473."
+	REFERENCE	""
+	::= { x25SVCConfigEntry 8 }
+
+x25SVCConfigCalledAddressExtension OBJECT-TYPE
+	SYNTAX		NetworkAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The contents of the called address extension field.
+
+		 In the OSI context, this will always be an NSAP address 
+		 but in other uses it may not.  In any case, it may be 
+		 null, for example, when used by ISO 8473."
+	REFERENCE	""
+	::= { x25SVCConfigEntry 9 }
+
+-- ====================================================================
+
+
+-- ====================================================================
+
+-- ====================================================================
+
+-- ====================================================================
+
+-- ====================================================================
+
+
+END
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8

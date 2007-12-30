@@ -1,0 +1,2553 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-X400P-MX-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/29 22:18:14 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under
+-- the terms of the GNU General Public License as published by the Free Software
+-- Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+-- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU General Public License along with
+-- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+-- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2007/12/29 22:18:14 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-X400P-MX-MIB.mib,v $
+-- Revision 0.9.2.1  2007/12/29 22:18:14  brian
+-- - updating mibs
+--
+-- =============================================================================
+
+OPENSS7-X400P-MX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, 
+	DisplayString, Counter32, Gauge32
+		FROM SNMPv2-SMI
+	openss7Modules
+		FROM OPENSS7-MIB
+	AdministrativeState, OperationalState, UsageState, AlarmStatus, 
+	ProceduralStatus, AvailabilityStatus, ControlStatus, 
+	StanbyStatus
+		FROM OPENSS7-TMN-TC
+
+x400pMxMIB MODULE-IDENTITY
+	LAST-UPDATED
+		"200712272315Z"
+	ORGANIZATION
+		"The OpenSS7 Project"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crecent
+		 Edmonton AB  T6L 6T1
+		 CANADA
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 E-Mail: bidulock@openss7.org"
+	DESCRIPTION
+		"MIB Module for the X400P MX Drivers and Cards."
+	::= { openss7Modules 10 }
+
+ -- top level organization of the MIB
+
+x400pMxNotifications	OBJECT IDENTIFIER ::= { x400pMxMIB	 0 }
+x400pMxObjects		OBJECT IDENTIFIER ::= { x400pMxMIB	 1 }
+x400pMxConformance	OBJECT IDENTIFIER ::= { x400pMxMIB	 2 }
+
+x400pMxTables		OBJECT IDENTIFIER ::= { x400pMxObjects	 1 }
+x400pMxScalars		OBJECT IDENTIFIER ::= { x400pMxObjects	 2 }
+x400pMxNotifs		OBJECT IDENTIFIER ::= { x400pMxObjects	 3 }
+x400pMxOids		OBJECT IDENTIFIER ::= { x400pMxObjects	 4 }
+x400pMxStats		OBJECT IDENTIFIER ::= { x400pMxObjects	 5 }
+
+x400pMxCard		OBJECT IDENTIFIER ::= { x400pMxTables	 1 }
+x400pMxSpan		OBJECT IDENTIFIER ::= { x400pMxTables	 2 }
+x400pMxChan		OBJECT IDENTIFIER ::= { x400pMxTables	 3 }
+
+x400pMxCardTypes	OBJECT IDENTIFIER ::= { x400pMxOids	 1 }
+
+x400pMxGroups		OBJECT IDENTIFIER ::= { x400pMxConformance 1 }
+x400pMxCompliances	OBJECT IDENTIFIER ::= { x400pMxConformance 2 }
+
+-- =====================================================================
+
+X400pChannelId ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"1d:1d:1d"
+	STATUS		current
+	DESCRIPTION
+		"Provides a specification of a channel identifier 
+		 amoungst all of channels available on all X400P cards 
+		 in the system.  The octet string is coded as follows: 
+		 the first octet is the card number (1..16); the second 
+		 octet the span number on the card (1..4) and the third 
+		 octet is the channel (time slot) number (1..24) T1/J1 
+		 or (1..31) E1."
+	SYNTAX		OCTET STRING (SIZE(0|3))
+
+X400pSpanId ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"1d:1d"
+	STATUS		current
+	DESCRIPTION
+		"Provides a specification of a span identifier amoungst 
+		 all of the spans available on all X400P cards in the 
+		 system.  The octet string is coded as follows: the 
+		 first octet is the card number (1..16); the second 
+		 octet is the span number on the card (1..4)."
+	SYNTAX		OCTET STRING (SIZE(0|2))
+
+-- =====================================================================
+
+x400pMxCardTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X400pMxCardEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The X400P Card Table provides an entry for each of the 
+		 equipped X400P cards in the system."
+	::= { x400pMxCard 1 }
+
+x400pMxCardEntry OBJECT-TYPE
+	SYNTAX		X400pMxCardEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Rows are neither created nor deleted explicity by 
+		 mangement stations but are present inherently as a part 
+		 of system operation.  Each entry in the table 
+		 corresponds to an existing and installed X400P card."
+	INDEX	{
+			x400pMxCardIndex -- index
+		}
+	::= { x400pMxCardTable 1 }
+
+X400pMxCardEntry ::=
+	SEQUENCE {
+		x400pMxCardIndex
+			Unsigned32,
+
+		x400pMxCardType
+			INTEGER,
+		x400pMxCardIdentifier
+			OCTET STRING,
+		x400pMxCardRevision
+			DisplayString,
+		x400pMxChipType
+			INTEGER,
+		x400pMxChipRevision
+			DisplayString,
+
+		x400pMxPciBus
+			Unsigned32,
+		x400pMxPciSlot
+			Unsigned32,
+		x400pMxPciIrq
+			Unsigned32,
+
+		x400pMxCardSpanType
+			INTEGER,
+		x400pMxCardMode
+			BITS,
+		x400pMxCardSyncMaster
+			INTEGER,
+		x400pMxCardSyncSource
+			INTEGER,
+		x400pMxCardSyncGroup
+			Unsigned32,
+
+		x400pMxCardAdministrativeState
+			AdminstrativeState,
+		x400pMxCardOperationalState
+			OperationalState,
+		x400pMxCardUsageState
+			UsageState,
+
+		x400pMxCardAlarmStatus
+			AlarmStatus,
+		x400pMxCardProceduralStatus
+			ProceduralStatus,
+		x400pMxCardAvailabilityStatus
+			AvailabilityStatus,
+		x400pMxCardControlStatus
+			ControlStatus,
+
+		x400pMxCardSyncSpanId
+			X400pSpanId,
+		x400pMxCardSyncTransitions
+			Counter32,
+	}
+
+
+x400pMxCardIndex OBJECT-TYPE
+	SYNTAX		Unsigned32 (1..16)
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION
+		"Provides an index for the X400P card two which this 
+		 entry corresponds.  This is a small ordinal number 
+		 begining an 1 and enumerating as many as 16 cards."
+	::= { x400pMxCardEntry 1 }
+
+
+x400pMxCardType OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				plx9030(1),
+				plxDevBrd(2),
+				x400p(3),
+				e400p(4),
+				t400p(5),
+				x400p-ss7(6),
+				e400p-ss7(7),
+				t400p-ss7(8),
+				v400p(9),
+				v400pe(10),
+				v400pt(11),
+				v401pe(12),
+				v401pt(13)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the card type for the entry.  Some of these 
+		 card types are obsolete."
+	::= { x400pMxCardEntry 2 }
+
+x400pMxCardIdentifier OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(2))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is a 2 octet card identifier that is written to 
+		 the card to identify it regardless of the slot 
+		 position."
+	::= { x400pMxCardEntry 3 }
+
+x400pMxCardRevision OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(1))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates a single character revision (e.g. Rev. A) 
+		 indicating the board revision number.  It is typically 
+		 a single character beginning an A and working up.  That 
+		 is, the first revision of a board is Rev. A, the second 
+		 revision, Rev. B, an so on."
+	::= { x400pMxCardEntry 4 }
+
+x400pMxChipType OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				ds2152(1),
+				ds21352(2),
+				ds21552(3),
+				ds2154(4),
+				ds21354(5),
+				ds21554(6),
+				ds2155(7),
+				ds2156(8)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the type of Dallas framer chip found in the 
+		 device.  The framer chip can be one of:
+
+		 - none(0), indicates that the equipment is either 
+		   absent, not configured or failed.
+
+		 - ds2152(1), the DS2152 T1 chip.
+		 - ds21352(2), the DS21352 T1 chip.
+		 - ds21552(3), the DS21552 T1 chip.
+
+		 - ds2154(4), the DS2154 E1 chip.
+		 - ds21354(5), the DS21354 E1 chip.
+		 - ds21554(6), the DS21554 E1 chip.
+
+		 - ds2155(7), the DS2155 E1/T1/J1 chip.
+		 - ds2156(8), the DS2156 E1/T1/J1 chip.
+
+		 The DS2152, DS21352, DS21552 are T1-only chips; 
+		 the DS2154, DS21354, DS21554 are E1-only chips; the 
+		 DS2155 and DS2156 are E1/T1/J1 chips."
+
+	::= { x400pMxCardEntry 5 }
+
+x400pMxChipRevision OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates a single character revision (e.g. Rev. A) 
+		 indicate the chipset revision number.  It is typically 
+		 a single character beginning at A and working up.  That 
+		 is, the first revision of a chipset is Rev. A, the 
+		 second revision, Rev. B, and so on."
+	::= { x400pMxCardEntry 6 }
+
+
+x400pMxPciBus OBJECT-TYPE
+	SYNTAX		Unsigned32 (0..16)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the PCI bus number for the PCI bun on which 
+		 the card is located.  The value zero (0) means that the 
+		 card is not on a bus (i.e. the card is unequiped)."
+	::= { x400pMxCardEntry 7 }
+
+x400pMxPciSlot OBJECT-TYPE
+	SYNTAX		Unsigned32 (0..16)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the PCI bus slot number in which the card is 
+		 located.  The value zero (0) means that the card is not 
+		 in a slot (i.e. the card is unequipped)."
+	::= { x400pMxCardEntry 8 }
+
+x400pMxPciIrq OBJECT-TYPE
+	SYNTAX		Unsigned32 (0..1024)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the PCI IRQ that is assigned to the card.  
+		 The value zero (0) means that no IRQ is currently 
+		 assigned (i.e. the card is unequipped or is not 
+		 configured at the system level)."
+	::= { x400pMxCardEntry 9 }
+
+x400pMxCardSpanType OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(1),
+				t1(2),
+				e1(3),
+				j1(4)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies or indicates the span type for the indexed 
+		 card.  Some cards and chipsets support mutliple span 
+		 types, in which case, this column sets the default span 
+		 type.  Some cards and chipsets only support a single 
+		 span type, in which case, this column is read-only and 
+		 provides the span type for all spans on the card.  The 
+		 value can be:
+
+		 - none(1), unknown or unspecified.
+
+		 - t1(2), the default is T1 operation.
+
+		 - e1(3), the default is E1 operation.
+
+		 - j1(4), the default is J1 operation.
+
+		 The value none(1) can be read but not written.  When 
+		 read, the value none(1) indicates that the equipment is 
+		 either absent, not configured or failed.
+
+		 Note that not all values are applicable to all card 
+		 types and chipsets.  Also, not all cards or chipsets 
+		 will allow all values to be set."
+	::= { x400pMxCardEntry 10 }
+
+x400pMxCardMode OBJECT-TYPE
+	SYNTAX		BITS {
+				remoteLoopback(0),
+				localLoopback(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the loopback mode for the entire card.  The 
+		 value may contain:
+
+		 - remoteLoopback(0), RSER is looped back on TSER for 
+		   all spans; that is, all received bits are looped back 
+		   to the transmit between the elastic store and the 
+		   system bus.  This is equivalent to a per-span payload 
+		   loopback, but is performed through the elastic store 
+		   and on a card basis.
+		   
+		 - localLoopback(1), RxBuf is driven by TxBuf; that is, 
+		   all transmitted data bits are passed to the 
+		   corresponding receive data bits between the elastic 
+		   store and the system bus.
+		   
+		 These modes are only useful for specialized testing and 
+		 the card must have a control status of subjectToTest(0) 
+		 or reservedForTest(2) before either of these values may 
+		 be added to the set."
+	::= { x400pMxCardEntry 11 }
+
+x400pMxCardSyncMaster OBJECT-TYPE
+	SYNTAX		INTEGER {
+				slave(0),
+				master(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether the card is a slave or a master on 
+		 the external timing bus.  The value can be one of:
+		 
+		 - slave(0), the external timing bus may be used as a 
+		   synchronization source for the card by setting the 
+		   card synchronization source to syncExtern(5).  Spans 
+		   that use the external timing source should have their 
+		   span clocking set to slave(6).
+
+		 - master(1), the card drives the external timing bus 
+		   and the synchronization source may not also be set to 
+		   syncExtern(5)."
+	::= { x400pMxCardEntry 12 }
+
+x400pMxCardSyncSource OBJECT-TYPE
+	SYNTAX		INTEGER {
+				syncSelf(0),
+				sync1(1),
+				sync2(2),
+				sync3(3),
+				sync4(4),
+				syncExtern(5),
+				syncAuto(6)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the synchronization source for the entire 
+		 card (the synchronization applied to the TCLK pin on 
+		 all spans).  The synchronization source may be one of:
+		 
+		 - syncSelf(0), the internal clock will be used as a 
+		   synchronization source for the card.
+
+		 - sync1(1), sync2(2), sync3(3) or sync4(4), the 
+		   corresponding span RCLK output will be used as the 
+		   TCLK input for all spans on the card.
+
+		 - syncExtern(5), the TCLK input for all spans will be 
+		   taken from the external timing bus.
+
+		 - syncAuto(6), the driver will use the spans specified 
+		   in the x400pMxSyncTable side-table for the card as 
+		   syncrhonization sources.
+		 
+		 Note that the card syncrhonization source only affects 
+		 spans that are set for internal(2) or slave(6) span 
+		 clocking."
+	::= { x400pMxCardEntry 13 }
+
+x400pMxCardSyncGroup OBJECT-TYPE
+	SYNTAX		Unsigned32 (1..16)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the syncrhonization group to which this card 
+		 belongs.  This value is only significant when the 
+		 synchronization source is set to syncAuto(6).  A 
+		 synchronization group is a group of cards, including 
+		 the current card in the set, that are connected 
+		 together with a timing cable and therefore share the 
+		 same timing bus.  The order of cards and spans that 
+		 will be used for timing are specified against the 
+		 syncrhonization group that has an group index of the 
+		 same value as this column."
+	::= { x400pMxCardEntry 14 }
+
+x400pMxCardAdministrativeState OBJECT-TYPE
+	SYNTAX		AdminstrativeState
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the administrative state of the card 
+		 following the AdministrativeState textual convention of 
+		 the OPENSS7-TMN-TC module in accodance with the 
+		 administrativeState attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+		 
+		 The administrative state may be one of locked(0), 
+		 unlocked(1) or shuttingDown(2).  When locked(0), the 
+		 card is administratively prohibited from providing 
+		 service to users.  When unlocked(1), the card is 
+		 administratively permitted to provide service to users.  
+		 When shuttingDown(2), the card will continue to 
+		 provider service to existing users but will reject new 
+		 users.  Once there are no more users of the card, the 
+		 card will move to the locked(1) state."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 administrativeState."
+	::= { x400pMxCardEntry 15 }
+
+x400pMxCardOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the operational state of the card following 
+		 the OperationalState textual convention of the 
+		 OPENSS7-TMN-TC module in accodance with the 
+		 operationalState attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+		 
+		 The operational state is one of:
+
+		 - disabled(0), the card is unable to provide service to 
+		   users;
+
+		 - enabled(1), it is partially or fully operable and 
+		   available for use."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 operationalState."
+	::= { x400pMxCardEntry 16 }
+
+x400pMxCardUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the usage state of the card following the 
+		 UsageState textual convention of the OPENSS7-TMN-TC 
+		 module in accodance with the usageState attribute of 
+		 ITU-T Rec. X.721 | ISO/IEC 10165-2.
+		 
+		 The usage state is one of idle(0), active(1), or 
+		 busy(2).  When idle(0), the card is not currently in 
+		 use; when active(1), the card is in use and has 
+		 sufficient oparting capacity to provide for additional 
+		 users simultaneously (i.e. some channel in some span is 
+		 idle(0)); when busy(2), the card is in use and has no 
+		 spare capacity (i.e. all spans are busy(2))."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 usageState."
+	::= { x400pMxCardEntry 17 }
+
+
+x400pMxCardAlarmStatus OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the alarm status of the card following the 
+		 AlarmStatus textual convention of the OPENSS7-TMN-TC 
+		 module in accodance with the alarmStatus attribute of 
+		 ITU-T Rec. X.721 | ISO/IEC 10165-2.
+		 
+		 The alarm status set-valued and may contain:
+
+		 - underRepair(0), the card is marked as under repair 
+		   either locally or by a management station.
+
+		 - critical(1), one or more critical faults were 
+		   detected for which alarms are oustanding.
+
+		 - major(2), one or more major faults were detected for 
+		   which alarms are oustanding.
+
+		 - minor(3), one or more minor faults were detected fro 
+		   which alarms are outstanding.
+
+		 - alarmOutstanding(4), one more more alarms are 
+		   outstanding.
+		 
+		 The alarm status for the card is not directly associated 
+		 with the alarm status of the spans provided by the 
+		 card.  Alarm notifications associated with the card 
+		 occur when syncrhonization is lost the span currently 
+		 used as a syncrhonization source and the card is 
+		 searching for another syncrhonization source."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 alarmStatus."
+	::= { x400pMxCardEntry 18 }
+
+x400pMxCardProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the procedural status of the card following 
+		 the ProceduralStatus textual convention of the 
+		 OPENSS7-TMN-TC module in accodance with the 
+		 proceduralStatus attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+		 
+		 The procedural status is set-valued and may contain the 
+		 following:
+		 
+		 - initializationRequired(0), the card requires 
+		   initialization by the management station before it 
+		   can perform normal functions and this procedure has 
+		   not been initiated.  The operational state is 
+		   disabled.
+		 
+		 - notInitialized(1), the card requires initialization 
+		   before it can perform its normal functions and this 
+		   procedure has not been initiated.  The card 
+		   initializes itself autonomously.  The operational 
+		   state is disabled.
+		 
+		 - initializing(2), the card requires initialization 
+		   before it can perform its normal functions and this 
+		   procedure has been initiated but is not yet complete.  
+		   When this condition is present, the initialization 
+		   requried condition is absent.  The operational state 
+		   is disabled.
+		 
+		 - reporting(3), the card is reporting the results of a 
+		   procedure.  This condition is not applicable.
+		 
+		 - terminating(4), the card is in a termination phase.  
+		   If the resource does not initialize itself 
+		   autonomously, the initialization required condition 
+		   is also present and operational state is disabled."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 proceduralStatus."
+	::= { x400pMxCardEntry 19 }
+
+x400pMxCardAvailabilityStatus OBJECT-TYPE
+	SYNTAX		AvailabilityStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the availability status of the card following 
+		 the AvailabilityStatus textual convention of the 
+		 OPENSS7-TMN-TC module in accodance with the 
+		 availabilityStatus attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+		 
+		 The availability status is set-valued and may contain 
+		 the following:
+		 
+		 - inTest(0), the card is undergoing a test procedure.  
+		   The administrative state is locked(0) and the 
+		   operational state is disabled(1).  This condition 
+		   exists while the card is powering up or is being 
+		   reset.
+		 
+		 - failed(1), the card has an internal fault that 
+		   prevents it from operating.  The operational state is 
+		   disabled.
+		 
+		 - powerOff(2), the card requires power to be applied 
+		   and is not powered on.  For example, power 
+		   managements may have removed power from the device.
+		 
+		 - offLine(3), the card requires a routing operation to 
+		   be performed to place it online an make it available 
+		   for use.  The operation may be manual or autoamtic, 
+		   or both.  The operational state is disabled.
+		 
+		 - offDuty(4), the card has been made inactve by an 
+		   internal control process in accordance with a 
+		   predetermined time schedule.  Under normal 
+		   conditions, the control process can be expected to 
+		   reactivate the card at some scheduled time.
+		 
+		 - dependency(5), the card cannot operate because some 
+		   other resource on which it depends is unavailable.
+		 
+		 - degraded(6), the card is operating with degraded 
+		   performance.  This is the case when the card is 
+		   searching for a new syncrhonization source and a 
+		   yellow or red alarm condition has occurred on the 
+		   current syncrhonization source.
+		 
+		 - notInstalled(7), the card is not present in the 
+		   system or is incomplete.
+		 
+		 - logFull(8), not used."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 availablityStatus."
+	::= { x400pMxCardEntry 20 }
+
+x400pMxCardControlStatus OBJECT-TYPE
+	SYNTAX		ControlStatus
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the control status of the card following the 
+		 ControlStatus textual convention of the OPENSS7-TMN-TC 
+		 module in accodance with the controlStatus attribute of 
+		 ITU-T Rec. X.721 | ISO/IEC 10165-2.
+
+		 The control status is set-valued and may contain:
+
+		 - subjectToTest(0), the card is available to normal 
+		   users but tests may be conducted on it simultaneously 
+		   at unpredicatble times, which may cause it to exhibit 
+		   unusual characteristics to users.
+
+		 - partOfServicesLocked(1), when present, a manager has 
+		   administratively locked some part of the card.
+
+		 - reservedForTest(2), when present, the card is 
+		   undergoing a test procedures and is unavailable to 
+		   users.
+
+		 - suspended(3), when present, service has been 
+		   administratively suspended to users."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 controlStatus."
+	::= { x400pMxCardEntry 21 }
+
+
+x400pMxCardSyncSpanId OBJECT-TYPE
+	SYNTAX		X400pSpanId
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indiecates which card and span is being used as the 
+		 current syncrhonization source for the indexed card.  
+		 When the syncrhonization source is set to syncSelf(0) 
+		 or syncExtern(5), this value will be the null octet 
+		 string.  When the syncrhonization source is set to 
+		 sync1(1), sync2(2), sync3(3) or sync4(4), the value 
+		 will always ben the same as the identifier of span 1, 
+		 2, 3 or 4, respectively, for the indexed card.  When 
+		 the synchronization source is set to syncAuto(6), the 
+		 value reflectes the identifier of the span currently 
+		 providing the synchronization source, or the null octet 
+		 string if no span is providing the synchroniation 
+		 source."
+	::= { x400pMxCardEntry 22 }
+
+x400pMxCardSyncTransitions OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the number of times since the last 
+		 discontinuity that the synchronization span has 
+		 transitioned."
+	::= { x400pMxCardEntry 23 }
+
+-- =====================================================================
+
+x400pMxSyncTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X400pMxSyncEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The X400P syncrhonization table is a table of 
+		 syncrhonization groups.  Equipped X400P cards that are 
+		 configured for automatic synchronzation are assigned to 
+		 a syncrhonization group."
+	::= { x400pMxSync 1 }
+
+x400pMxSyncEntry OBJECT-TYPE
+	SYNTAX		X400pMxSyncEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Each entry in the syncrhonization table represents a 
+		 synchronization source to be used for automatic 
+		 synchronization within each group in the order of the 
+		 index.  Rows may be created and deleted explicitly by 
+		 management stations.  Rows may be deleted implicitly as 
+		 a part of system operation when a card is disassociated 
+		 with a syncrhoniation group."
+	INDEX	{
+			x400pMxSyncGroup, -- index
+			x400pMxSyncIndex -- index
+		}
+	::= { x400pMxSyncTable 1 }
+
+X400pMxSyncEntry ::=
+	SEQUENCE {
+		x400pMxSyncGroup
+			Unsigned32,
+		x400pMxSyncIndex
+			Unsigned32,
+		x400pMxSyncSpanId
+			X400pSpanId,
+		x400pMxSyncRowStatus
+			RowStatus
+	}
+
+x400pMxSyncGroup OBJECT-TYPE
+	SYNTAX		Unsigned32 (1..16)
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION
+		"Specifies the group number of the entry.  A 
+		 synchronization group is a group of cards which share a 
+		 common timing bus.  Membership in the group is the 
+		 cards which have an synchronization group value equal 
+		 to this index and a synchronization source setting of 
+		 syncAuto(6)."
+	::= { x400pMxSyncEntry 1 }
+
+x400pMxSyncIndex OBJECT-TYPE
+	SYNTAX		Unsigned32 (1..8)
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION
+		"Specifies the index of the entry and the priority at 
+		 which the entry will be used for syncrhonization of the 
+		 card.  Index value 1 is the highest priority and index 
+		 value 8 is the lowest priority."
+	::= { x400pMxSyncEntry 2 }
+
+x400pMxSyncSpanId OBJECT-TYPE
+	SYNTAX		X400pSpanId
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the card and span to be used as a card 
+		 syncrhonization source at the priority of the 
+		 corresponding index.  Cards 1..16 and spans 1..4 can be 
+		 specified in accordance with the X400pSpanId textual 
+		 convention.  However, the card number specified must 
+		 belong to the same syncrhonization group as the indexed 
+		 group.  That is, the card must have its synchronization 
+		 group set to the index of this entry, and the card 
+		 synchronization source must be set to syncAuto(6)."
+	::= { x400pMxSyncEntry 3 }
+
+x400pMxSyncRowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations may 
+		 create or delete rows in this table.
+
+		 Rows may be created or deleted explicitly by 
+		 management stations or implicitly as a part of system 
+		 oepration.  When a card is removed from a 
+		 synchronization group (by having its sychronization 
+		 group number changed or having its synchronization 
+		 source set to other than syncAuto(6)), the system may 
+		 automatically delete rows from this table."
+	REFERENCE
+		"STD 58, SNMPv2-TC RowStatus."
+	::= { x400pMxSyncEntry 4 }
+
+-- =====================================================================
+
+x400pMxSpanTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X400pMxSpanEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The X400P Span Table provides an entry for each of the 
+		 spans of each equipped X400P card in the system."
+	::= { x400pMxSpan 1 }
+
+x400pMxSpanEntry OBJECT-TYPE
+	SYNTAX		X400pMxSpanEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Rows are neither created nor deleted explicitly by 
+		 management stations but are present inherently as a 
+		 part of system operation.  Each entry in the table 
+		 corresponds to a span on an existing and installed 
+		 X400P card."
+	INDEX	{
+			x400pMxCardIndex, -- shared index
+			x400pMxSpanIndex -- index
+		}
+	::= { x400pMxSpanTable 1 }
+
+X400pMxSpanEntry ::=
+	SEQUENCE {
+		x400pMxSpanIndex
+			Unsigned32,
+
+		x400pMxSpanType
+			INTEGER,
+		x400pMxSpanRate
+			INTEGER,
+		x400pMxSpanMode
+			BITS,
+		x400pMxSpanCrc
+			INTEGER,
+		x400pMxSpanClocking
+			INTEGER,
+		x400pMxSpanCoding
+			INTEGER,
+		x400pMxSpanFraming
+			INTEGER,
+
+		x400pMxSpanLineBuildout
+			INTEGER,
+		x400pMxSpanTxTerm
+			INTEGER,
+		x400pMxSpanRxTerm
+			INTEGER,
+		x400pMxSpanTxLevel
+			INTEGER,
+		x400pMxSpanRxLevel
+			INTEGER,
+		x400pMxSpanEqualizerGainLimit
+			INTEGER,
+		x400pMxSpanAlarmSettleTime
+			TimeInterval,
+		x400pMxSpanLineCodeTime
+			TimeInterval,
+		x400pMxSpanPrimary
+			X400pSpanId,
+		x400pMxSpanBertMode
+			INTEGER,
+		x400pMxSpanBertSelect
+			INTEGER,
+		x400pMxSpanBertPattern
+			OCTET STRING,
+
+		x400pMxSpanAdministrativeState
+			AdminstrativeState,
+		x400pMxSpanOperationalState
+			OperationalState,
+		x400pMxSpanUsageState
+			UsageState,
+
+		x400pMxSpanAlarmStatus
+			AlarmStatus,
+		x400pMxSpanProceduralStatus
+			ProceduralStatus,
+		x400pMxSpanAvailabilityStatus
+			AvailabilityStatus,
+		x400pMxSpanControlStatus
+			ControlStatus,
+		x400pMxSpanStandbyStatus
+			StandbyStatus,
+
+		x400pMxSpanAlarms
+			BITS,
+		x400pMxSpanEvents
+			BITS,
+		x400pMxSpanReceiveLevel
+			INTEGER,
+
+		x400pMxSpanLossOfSyncEvents
+			Counter32,
+		x400pMxSpanCarrierLossEvents
+			Counter32,
+		x400pMxSpanUnframedAllOnesEvents
+			Counter32,
+		x400pMxSpanYellowAlarmEvents
+			Counter32,
+		x400pMxSpanRemoteAlarmEvents
+			Counter32,
+		x400pMxSpanDistantMFAlarmEvents
+			Counter32,
+		x400pMxSpanLossOfRxClockEvents
+			Counter32,
+		x400pMxSpanLossOfTxClockEvents
+			Counter32,
+		x400pMxSpanLoopUpCodeEvents
+			Counter32,
+		x400pMxSpanLoopDownCodeEvents
+			Counter32,
+		x400pMxSpanSpareCodeEvents
+			Counter32,
+		x400pMxSpanTransmitOpenCircuitEvents
+			Counter32,
+		x400pMxSpanTransmitShortCircuitEvents
+			Counter32,
+
+		x400pMxSpanLineCodeViolations
+			Gauge32,
+		x400pMxSpanPathCodeViolations
+			Gauge32,
+		x400pMxSpanFramesOutOfSync
+			Gauge32,
+		x400pMxSpanFarEndBlockErrors
+			Gauge32,
+
+		x400pMxSpanBertBitCount
+			Counter32,
+		x400pMxSpanBertErrorCount
+			Counter32
+	}
+
+x400pMxSpanIndex OBJECT-TYPE
+	SYNTAX		Unsigned32 (1..4)
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION
+		"Provides an index for the span on the indexed card.  
+		 Spans range from 1..4 for X400P cards.  Entries for 
+		 spans are not created nor deleted by managemen stations 
+		 but are inherently present in a managed system when the  
+		 corresponding card is present."
+	::= { x400pMxSpanEntry 1 }
+
+
+x400pMxSpanType OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(1),
+				t1(2),
+				e1(3),
+				j1(4)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the type of span, whether E1, T1 or J1.  Some 
+		 cards and chipsets that do not operate in multiple 
+		 modes will not permit this attribute to be written.  
+		 Others have the capability to operate in multiple modes 
+		 and will permit having this value written.  This value 
+		 cannot be written unless the card is in an locked 
+		 administrative state.
+
+		 The value none(1) can be read but not written.  When 
+		 read, the value none(1) indicates that the equipment is 
+		 either absent, not configured or failed.
+
+		 Note that not all values are applicable to all span 
+		 types.  Also, not all chipsets or cards will allow all 
+		 values to be set."
+	::= { x400pMxSpanEntry 2 }
+
+x400pMxSpanRate OBJECT-TYPE
+	SYNTAX		INTEGER (1544000|2048000)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the syncrhonous bit rate of the span.  This 
+		 is either the E1 rate (2.048 Mbps) or T1/J1 rate (1.544 
+		 Mbps)"
+	::= { x400pMxSpanEntry 3 }
+
+x400pMxSpanMode OBJECT-TYPE
+	SYNTAX		BITS {
+				localLoopback(0),
+				remoteLoopback(1),
+				framerLoopback(2),
+				payloadLoopback(3),
+				distantLoopback(4)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies and indicates the loopback modes of the 
+		 span.  The value may contain:
+
+		 - localLoopback(0), performs a loopback from the 
+		   transmit to the receive between the jitter attenuator 
+		   and the line interface unit.  Data is transmitted as 
+		   normal but the received data stream is discarded.
+
+		 - remoteLoopback(1), performs a loopback from the 
+		   receive to the transmit between the framer and the 
+		   jitter attenuator.  Transmit data from the host is 
+		   ignored, but received data is delivered to the host.
+
+		 - framerLoopback(2), performs a loopback from the 
+		   transmitted data to the received data between the 
+		   the framer and the jitter attenuator.  All ones is 
+		   tranmitted to the line interface and received 
+		   information is ignored.
+
+		 - payloadLoopback(3), performs a loopback from the 
+		   received data to the transmitted data between the 
+		   system bus and the framer.  Received data is 
+		   delivered to the host but transmitted data from the 
+		   host is ignored.
+
+		 - distantLoopback(4), adding this value requests that 
+		   the distant interface perform a remote loopback by 
+		   sending a loop-up code on T1 or J1 interfaces; 
+		   removing this value request that the distance 
+		   interface remove a remote loopback by sending a 
+		   loop-down code on T1 or J1 interfaces.
+		 
+		  Only one of framerLoopback(2) or payloadLoopback(3) 
+		  may be present.  Only one of localLoopback(0) and 
+		  remoteLoopback(1) may be present.  The presence of 
+		  localLoopback(0) and remoteLoopback(1) may change 
+		  autonomously on T1 and J1 interfaces as a result of 
+		  the receipt of a loop-up or loop-down code.
+		  
+		  localLoopback(0), framerLoopback(2) and 
+		  payloadLoopback(3) are useful only for specialized 
+		  testing.  The span must have a control status of 
+		  subjectToTest(0) or reservedForTest(2) before any 
+		  values may be added to the set by a management 
+		  station or by receipt of a loop-up code on a T1 or J1 
+		  span."
+	DEFVAL		{ '00000'B }
+	::= { x400pMxSpanEntry 4 }
+
+x400pMxSpanCrc OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(1),
+				crc4(2),
+				crc5(3),
+				crc6(4),
+				crc6j(6)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the cyclic redundancy check code for the 
+		 span.  The CRC is one of the following:
+
+		 - none(1), the CRC is unknown or unspecified.
+
+		 - crc4(2), CRC4 is used.  This value is only applicable 
+		   when the span type is E1.
+
+		 - crc5(3), CRC5 is used.  This value is only applicable 
+		   when the span type is E1.  CRC5 is the default for E1 
+		   spans.
+
+		 - crc6(4), CRC6 is used.  This value is only applicable 
+		   when the span type is T1.  CRC6 is the default for T1 
+		   spans.
+
+		 - crc6j(6), CRC6 is used.  This value is only 
+		   applicable when the span type is J1.  CRC6J is the 
+		   default for J1 spans.
+
+		 The value none(1) can be read but not written.  When 
+		 read, the value none(1) indicates that the equipment is 
+		 either absent, not configured or failed.
+
+		 Note that not all values are applicable to all span 
+		 types.  Also, not all chipsets or cards will allow all 
+		 values to be set."
+	::= { x400pMxSpanEntry 5 }
+
+x400pMxSpanClocking OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(1),
+				internal(2),
+				external(3),
+				loop(4),
+				master(5),
+				slave(6)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the clock source for the span.  The clock 
+		 source is one of the following:
+
+		 - none(1), the source of the clock is unknown or 
+		   unspecified.
+
+		 - internal(2), the source of the clock is the TCLK pin 
+		   on the framer which corresponds to the card 
+		   synchronization source.  If this clock fails the 
+		   span transmitter will fail.  The source of the TCLK 
+		   pin depends on the card synchronization source 
+		   setting.
+
+		 - external(3), the source of the clock is the scaled 
+		   TSYSCLK pin on the framer which corresponds to the 
+		   system bus clock.
+
+		 - loop(4), the source of the clock is the RCLK on the 
+		   frame which corresponds to the recovered clock from 
+		   the receiver.
+
+		 - master(5), the source of the clock is the scaled MCLK 
+		   pin on the LIU.
+
+		 - slave(6), the source of the clock is the TCLK pin on 
+		   the framer which coresponds to the card 
+		   synchronization source; however, if this clock fails 
+		   the transmit clock will be taken from the RCLK for 
+		   the span.  The source of the TCLK pin depends on the 
+		   card synchronization source setting.
+
+		 The source of the TCLK pin for the internal(2) or 
+		 slave(6) is determined by the x400pMxCardSyncSource 
+		 setting that can be one of:
+
+		 - syncSelf(0), the source of the TCLK pins is the 
+		   internal crystal clock.
+
+		 - sync1(1), the source of the TCLK pins is the RCLK 
+		   output from span 1.
+
+		 - sync2(2), the source of the TCLK pins is the RCLK 
+		   output from span 2.
+
+		 - sync3(3), the source of the TCLK pins is the RCLK 
+		   output from span 3.
+
+		 - sync4(4), the source of the TCLK pins is the RCLK 
+		   output from span 4.
+
+		 - syncExtern(5), the source of the TCLK pins is the 
+		   external timing bus.
+
+		 - syncAuto(6), the source of the TCLK pins is the RCLK 
+		   output from span 1, 2, 3 or 4, depending on the 
+		   priority and reliability of the source.
+
+		 The value none(1) can be read but not written.  When 
+		 read, the value none(1) indicates that the equipment is 
+		 either absent, not configured or failed.
+
+		 Note that some settings of the span clock source and 
+		 the card synchronization source are not usable on some 
+		 cards.  Also, not all chipsets or cards will allow all 
+		 values to be set."
+	::= { x400pMxSpanEntry 6 }
+
+x400pMxSpanCoding OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(1),
+				ami(2),
+				b6zs(3),
+				b8zs(4),
+				hdb3(5)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the coding.  This value can be one of:
+
+		 - none(1), unknown or unspecified.
+
+		 - ami(2),  AMI coding.  This coding is appliable to all 
+		   span types.
+
+		 - b6zs(3), six zero bit suppression coding. Not used.
+
+		 - b8zs(4), eight zero bit suppression coding.  This 
+		   coding is only applicable to T1 or J1 spans.  This is 
+		   the default for T1 or J1 spans.
+
+		 - hdb3(5), HDB3 coding.  This coding is only applicable 
+		   to E1 spans.  This is the default for E1 spans.
+
+		 The value none(1) can be read but not written.  When 
+		 read, the value none(1) indicates that the equipment is 
+		 either absent, not configured or failed.
+
+		 Note that not all values are applicable to all span 
+		 types.  Also, not all chipsets or cards will allow all 
+		 values to be set."
+
+	::= { x400pMxSpanEntry 7 }
+
+x400pMxSpanFraming OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(1),
+				ccs(2),
+				cas(3),
+				sf(4),
+				d4(5),
+				esf(6)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the framing used.  This value can be one of:
+
+		 - none(1), unknown or unspecified.
+
+		 - ccs(2), common channel signalling framing.  This 
+		   setting is only applicable to E1 spans.  When set, 
+		   channel 17 (timeslot 16) is available for use.
+
+		 - cas(3), channel associated signalling framing.  This 
+		   setting is only applicable to E1 spans.  When set, 
+		   channel 17 (timeslot 16) is unavailable for use.
+
+		 - sf(4), super-frame framing.  This setting is only 
+		   applicable to T1 and J1 spans.
+
+		 - d4(5), D4 framing.This setting is only applicable to 
+		   T1 and J1 spans.
+
+		 - esf(6), extended super-frame framing.This setting is 
+		   only applicable to T1 and J1 spans.
+
+		 The value none(1) can be read but not written.  When 
+		 read, the value none(1) indicates that the equipment is 
+		 either absent, not configured or failed.
+
+		 Note that not all values are applicable to all span 
+		 types.  Also, not all chipsets or cards will allow all 
+		 values to be set."
+
+	::= { x400pMxSpanEntry 8 }
+
+
+x400pMxSpanLineBuildout OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(1),
+				dsx-133ft(2),
+				dsx-266ft(3),
+				dsx-399ft(4),
+				dsx-533ft(5),
+				dsx-666ft(6),
+				csu-0dB(7),
+				csu-8dB(8),
+				csu-15dB(9),
+				csu-23dB(10),
+				nm-75-Ohm(11),
+				nm-120-Ohm(12),
+				pr-75-Ohm(13),
+				pr-120-Ohm(14),
+				hrl-75-Ohm(15),
+				hrl-120-Ohm(16),
+				mon-0dB(17),
+				mon-12dB(18),
+				mon-20dB(19),
+				mon-26dB(20),
+				mon-30dB(21),
+				mon-32dB(22)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the line buildout, impedance, CSU operation 
+		 or monitoring operation.  During monitoring operation 
+		 the tranmitters are powered off.
+
+		 For all spans, the value can be:
+
+		- mon-0dB(17), 0 dB gain monitoring mode.
+		- mon-12dB(18), 12 dB gain monitoring mode.
+		- mon-20dB(19), 20 dB gain monitoring mode.
+		- mon-26dB(20), 26 dB gain monitoring mode.
+		- mon-30dB(21), 30 dB gain monitoring mode.
+		- mon-32dB(22), 32 dB gain monitoring mode.
+
+		 For E1 spans, the value can be:
+
+		 - nm-75-Ohm(11), normal 75 Ohm impedance.
+		 - nm-120-Ohm(12), normal 120 Ohm impedance.
+		 - pr-75-Ohm(13),
+		 - pr-120-Ohm(14),
+		 - hrl-75-Ohm(15), high return-loss 75 Ohm impedance.
+		 - hrl-120-Ohm(16), high return-loss 120 Ohm impedance.
+
+		 For T1 or J1 spans, the value can be:
+
+		 - dsx-133ft(2), for DSX-1 0 to 133 feet.
+		 - dsx-266ft(3), for DSX-1 133 to 266 feet.
+		 - dsx-399ft(4), for DSX-1 266 to 399 feet.
+		 - dsx-533ft(5), for DSX-1 399 to 533 feet.
+		 - dsx-666ft(6), for DSX-1 533 to 666 feet.
+
+		 - csu-0dB(7), for 0 dB CSU.
+		 - csu-8dB(8), for -8 dB CSU.
+		 - csu-15dB(9), for -15 dB CSU.
+		 - csu-23dB(10), for -23 dB CSU.
+
+		 The value none(1) can be read but not written.  When 
+		 read, the value none(1) indicates that the equipment is 
+		 either absent, not configured or failed.
+
+		 Note that not all values are applicable to all span 
+		 types.  Also, not all chipsets or cards will allow this 
+		 value to be set."
+	::= { x400pMxSpanEntry 9 }
+
+x400pMxSpanTxTerm OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(1),
+				int75Ohm(2),
+				int100Ohm(2),
+				int120Ohm(2)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the internal termination impedance for the 
+		 transmit tip and ring.  The internal tranmitter 
+		 impedance can be one of:
+
+		 - none(1), no internal termination impedance.
+
+		 - int75Ohm(2), 75 Ohm internal termination impedance.
+
+		 - int100Ohm(2), 100 Ohm internal termination impedance.  
+		   This is the default for T1 or J1 spans.
+
+		 - int120Ohm(2), 120 Ohm internal termination impedance.  
+		   This is the default for E1 spans.
+
+		 Note that not all values are applicable to all span 
+		 types.  Also, not all chipsets or cards will allow this 
+		 value to be set."
+	::= { x400pMxSpanEntry 10 }
+
+x400pMxSpanRxTerm OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(1),
+				int75Ohm(2),
+				int100Ohm(2),
+				int120Ohm(2)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the intermal termination impedance for the 
+		 receive tip and ring.  The internal receiver impedance 
+		 can be one of:
+
+		 - none(1), no internal termination impedance.
+
+		 - int75Ohm(2), 75 Ohm internal termination impedance.
+
+		 - int100Ohm(2), 100 Ohm internal termination impedance.  
+		   This is the default for T1 or J1 spans.
+
+		 - int120Ohm(2), 120 Ohm internal termination impedance.  
+		   This is the default for E1 spans.
+
+		 Note that not all values are applicable to all span 
+		 types.  Also, not all chipsets or cards will allow this 
+		 value to be set."
+	::= { x400pMxSpanEntry 11 }
+
+x400pMxSpanTxLevel OBJECT-TYPE
+	SYNTAX		INTEGER {
+				off(1),
+				on(2)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether the tranmitters are on(2) or off(1).  
+		 Note that in monitoring modes, the transmitters are 
+		 always off(1)."
+	::= { x400pMxSpanEntry 12 }
+
+x400pMxSpanRxLevel OBJECT-TYPE
+	SYNTAX		INTEGER {
+				off(1),
+				on(2)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether the receivers are on(2) or off(1)."
+	::= { x400pMxSpanEntry 13 }
+
+x400pMxSpanEqualizerGainLimit OBJECT-TYPE
+	SYNTAX		INTEGER {
+				longHaul(0),
+				shortHaul(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the equalizer gain limit which controls the 
+		 sensitivity of the receive equalizer.  This can be one 
+		 of the following values:
+
+		 - longHaul(0), for long haul applications, the receive 
+		   equalizer gain limit is -36dB for T1 spans and -43dB 
+		   for E1 spans.  This is the default for both T1 and E1 
+		   spans.
+
+		 - shortHaul(1), for short haul applications (E1) and 
+		   limited long haul applications (T1), the receive 
+		   equalizer gain limit is -15dB for T1 spans and -12dB 
+		   for E1 spans.
+		   
+		 This value may be changed autonomously by the driver.  
+		 The driver might not permit this value to be changed 
+		 from longHaul(0).  Some cards and chipsets might not 
+		 allow this value to be changed and may always report 
+		 longHaul(0)."
+	DEFVAL		{ 0 }
+	::= { x400pMxSpanEntry 14 }
+
+x400pMxSpanAlarmSettleTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"After local alarm conditions clear, the driver will 
+		 continue to transmit a yellow alarm (T1/J1) or RAI (E1) 
+		 to the remote terminal until the local alarm conditions 
+		 have remained clear for this period of time.  The 
+		 default is 5 seconds (500 centiseconds).  This column 
+		 may be read-only for some systems."
+	DEFVAL		{ 500 }
+	::= { x400pMxSpanEntry 15 }
+
+x400pMxSpanLineCodeTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The period of time for which to transmit or expect to 
+		 receive a loop-up, loop-down, or spare code.  This 
+		 value is only significant for T1 or J1 operation.  The 
+		 default value is 5 seconds (500 centiseconds).  This 
+		 column may be read-only for some systems."
+	DEFVAL		{ 500 }
+	::= { x400pMxSpanEntry 16 }
+
+x400pMxSpanPrimary OBJECT-TYPE
+	SYNTAX		X400pSpanId
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies a primary span identifier of the X400P span 
+		 in the system to which this span is acting as a backup.  
+		 When the span is not acting as a backup (it is a 
+		 primary span, the default), the identifier is set to a 
+		 null octet string.  Only one X400P span in the system 
+		 may act as a backup to any other X400P span in the 
+		 system.  The span specified must be a primary span 
+		 (that is, the primary span must not be backing up 
+		 another span and its corresponding value in this column 
+		 must be the null octet string).
+		 
+		 The state of the backup span is indicated by the 
+		 standby status of the span."
+	DEFVAL		{ ''X }
+	::= { x400pMxSpanEntry 17 }
+
+x400pMxSpanBertMode OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(1),
+				channel(2),
+				fbit(3)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Controls BERT testing for the span on chipsets that 
+		 support it (DS2155 and DS2156).  The column can have 
+		 one of the following values:
+
+		 - none(1), no testing will be performed.
+
+		 - channel(2), testing will be performed on the channels 
+		   that have been marked for test.
+
+		 - fbit(3), testing will be performed using the F-bit.  
+		   This value can only be set for T1 or J1 mode spans 
+		   with the appropriate chipset.
+		   
+		 Not all values are supported by all spans and not all 
+		 values are supported by all chipsets."
+	::= { x400pMxSpanEntry 18 }
+
+x400pMxSpanBertSelect OBJECT-TYPE
+	SYNTAX		INTEGER {
+				pr2E7minus1(1),
+				pr2E9minus1(2),
+				pr2E11minus1(3),
+				pr2E15minus1(4),
+				qrss(5),
+				daly(6),
+				repeating(7),
+				alternating(8)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the BERT test pattern selected.  The value 
+		 can be one of:
+
+		 - pr2E7minus1(1), a pseudorandom 2E7 - 1 pattern.
+
+		 - pr2E9minus1(2), a pseudorandom 2E9 - 1 pattern.
+
+		 - pr2E11minus1(3), a pseudorandom 2E11 - 1 pattern.
+
+		 - pr2E15minus1(4), a pseudorandom 2E15 - 1 pattern.
+
+		 - qrss(5), a pseudorandom QRSS 2E20 - 1 pattern with 14 
+		   consecutive zero restrictions.
+
+		 - daly(6), a modified 55 octet daly (ATIS T1.TR25) 
+		   pattern.
+
+		 - repeating(7), a repeating pattern.
+
+		 - alternating(8), an alternating word pattern.
+
+		 For the repeating(7), and alternating(8), the BERT 
+		 pattern must also be set appropriately."
+	::= { x400pMxSpanEntry 19 }
+
+x400pMxSpanBertPattern OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(5))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the BERT pattern to use when the BERT test 
+		 pattern selected is repeating(7) or alternating(8).  
+
+		 When the BERT test pattern selected is repeating(7), 
+		 the first octet provides the bit length of the pattern 
+		 (1..32) and the remaining octets provide the bit 
+		 pattern itself beginning with the first bit of the 
+		 first octet.  The first octet will be treated modulo 
+		 32, with zero (0) mapping to 32, should the value be 
+		 outside the valid range (1..32).  For example, the 
+		 value 129 will be treated as the length 1.  Bits 
+		 specified beyond the number of bits indicated by the 
+		 bit length are ignored.
+		 
+		 When the BERT test pattern selected is alternating(8), 
+		 the first octet provides the number of times to repeat 
+		 each word (1..255), the second and third octets 
+		 provides the first word to alternate, and the fourth 
+		 and fifth octets provides the second word to alternate.
+		 
+		 Note that this value is of no significance when the 
+		 BERT pattern selected is other than repeating(7) or 
+		 alternating(8)."
+	DEFVAL		{ '10FFFFFFFF'X }
+	::= { x400pMxSpanEntry 20 }
+
+x400pMxSpanAdministrativeState OBJECT-TYPE
+	SYNTAX		AdminstrativeState
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the administrative state of the span in 
+		 accordance with the AdministrativeState textual 
+		 convetion of the OPENSS7-TMN-TC module in accordance 
+		 with ITU-T Rec. X.721 | ISO/IEC 10165-2 attribute 
+		 administrativeState.
+
+		 When locked(0), the span is administratively prohibited 
+		 from providing service.  When unlocked(1) the span is 
+		 administratively permitted to provide service.  When 
+		 shuttingDown(2), the span may provide service to 
+		 existing users by will not provider service to new 
+		 users.  Once all current users have released the span, 
+		 the administrative state will transition from 
+		 shuttingDown(2) to locked(0)."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 administrativeState."
+	::= { x400pMxSpanEntry 21 }
+
+x400pMxSpanOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the operational state of the span following 
+		 the OperationalState textual convention of the 
+		 OPENSS7-TMN-TC module in accordance with ITU-T Rec. 
+		 X.721 | ISO/IEC 10165-2.
+		 
+		 The operational state is one of:
+		 
+		 - disabled(0), the span is totally inoperable and 
+		   unable to provide service to users;
+
+		 - enabled(1), the span is partially or fully operable 
+		   and available for use."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 operationalState."
+	::= { x400pMxSpanEntry 22 }
+
+x400pMxSpanUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the usage state of the span following the 
+		 UsageState textual convention of the OPENSS7-TMN-TC 
+		 module in accordance with ITU-T Rec. X.721 | ISO/IEC 
+		 10165-2.
+		 
+		 The usage is one of:
+		 
+		 - idle(0), the span is not currently in use;
+
+		 - active(1), the span is in use and has sufficient 
+		   operating capacity to provide for additional users 
+		   simultanteously (e.g. some channels are available);
+
+		 - busy(2), the span is in use and has no spare capacity 
+		   (i.e. all channels are in use).
+
+		 If the driver does not support the independent use of 
+		 channels, only the values idle(0) and busy(2) are 
+		 returned."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 usageState."
+	::= { x400pMxSpanEntry 23 }
+
+
+x400pMxSpanAlarmStatus OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the alarm status of the span in accordance 
+		 with the AlarmStatus textual convention of the 
+		 OPENSS7-TMN-TC module in accordance with the 
+		 alarmStatus attribute of ITU-T Rec. X.721 | ISO/IEC 
+		 10165-2.
+		 
+		 This attribute is set-valued and can contain zero or 
+		 more of the following:
+		 
+		 - underRepair(0), specifies that the span is currently 
+		   being repaired.
+		 
+		 - critical(1), one or more critical alarms indicating a 
+		   fault have been detected and have not been cleared.
+		 
+		 - major(2), one or more major alarms indicating a fault 
+		   have been detected and have not been cleared.
+		 
+		 - minor(3), one or more minor alarms indicating a fault 
+		   have beem detected and have not been cleared.
+		 
+		 - alarmOutstanding(4), one or more alarms have been 
+		   detected, the condition of which may or may not be 
+		   disabling.
+
+		 The presence or absence of an alarm state condition 
+		 does not affect the generation of future fault related 
+		 notifications.  Only underRepair(0) may be added to the 
+		 set by management stations.  The remaining alarm 
+		 statuses can only be removed from the set by management 
+		 stations and has the effect of a manual clearing 
+		 action, particularly for those alarm conditions that do 
+		 not have clearing events."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 alarmStatus."
+	::= { x400pMxSpanEntry 24 }
+
+x400pMxSpanProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the procedural status of the span following 
+		 the ProceduralStatus textual convention of the 
+		 OPENSS7-TMN-TC module in accodance with the 
+		 proceduralStatus attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+		 
+		 The procedural status is set-valued and may contain the 
+		 following:
+		 
+		 - initializationRequired(0), the span requires 
+		   initialization by the management station before it 
+		   can perform normal functions and this procedure has 
+		   not been initiated.  The operational state is 
+		   disabled.
+		 
+		 - notInitialized(1), the span requires initialization 
+		   before it can perform its normal functions and this 
+		   procedure has not been initiated.  The span 
+		   initializes itself autonomously.  The operational 
+		   state is disabled.
+		 
+		 - initializing(2), the span requires initialization 
+		   before it can perform its normal functions and this 
+		   procedure has been initiated but is not yet complete.  
+		   When this condition is present, the initialization 
+		   requried condition is absent.  The operational state 
+		   is disabled.
+		 
+		 - reporting(3), the span is reporting the results of a 
+		   procedure.  This condition is not applicable.
+		 
+		 - terminating(4), the span is in a termination phase.  
+		   If the resource does not initialize itself 
+		   autonomously, the initialization required condition 
+		   is also present and operational state is disabled."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 proceduralStatus."
+	::= { x400pMxSpanEntry 25 }
+
+x400pMxSpanAvailabilityStatus OBJECT-TYPE
+	SYNTAX		AvailabilityStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the availability status of the span following 
+		 the AvailabilityStatus textual convention of the 
+		 OPENSS7-TMN-TC module in accordance with the 
+		 availabilityStatus attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+
+		 This attribute is set-valued and may contain the 
+		 following:
+
+		 - inTest(0), the span is undergoing a test procedure.  
+		   If the administrative state is locked or shutting 
+		   down then normal users are precluded from using the 
+		   resource and the control status attribute has the 
+		   value reservedForTest(2).  Tests that do not exclude 
+		   additional uses can be present in any operational or 
+		   administrative state but the reservedForTest(2) 
+		   condition should not be present.  This condition is 
+		   present when the span is in one of the loopback or 
+		   test modes.
+
+		 - failed(1), the span has an internal fault that 
+		   prevents it from operating (e.g. blue alarm).  The 
+		   operational state is disabled.
+
+		 - powerOff(2), the resource requires power to be 
+		   applied and is not powered on.  For example, a fuse 
+		   or other protection devices is known to have removed 
+		   power or a low voltage condition has been detected.  
+		   The operational state is disabled.
+
+		 - offLine(3), the resource requires a routine operation 
+		   to be performed to place it online and make it 
+		   available for use.  The operation may be manual or 
+		   automatic, or both.  The operational state is 
+		   disabled.
+
+		 - offDuty(4), the resource has been made inactive by an 
+		   internal control process in accordance with a 
+		   predetermined time schedule.  Under normal conditions 
+		   the control process can be expected to reactivate the 
+		   resource at some scheduled time.  The operational 
+		   state is enabled or disabled.
+
+		 - dependency(5), the resource cannot operate because of 
+		   some other resource on which it depends is 
+		   unavailable (e.g. the card is not operational).  The 
+		   operational state is disabled.
+
+		 - degraded(6), the service available from the resource 
+		   is degraded in some respect, such as in speed or 
+		   operating capacity.  However, the resource remains 
+		   available for service, either because some services 
+		   are satisfactory or because degraded service is 
+		   preferrable to no service at all.  This is the cause 
+		   for yellow and red alarm conditions on the carrier.  
+		   The operational state is enabled.
+
+		 - notInstalled(7), the resource represented is not 
+		   present, or is incomplete.  For example, a card is 
+		   missing or a span is not provided by a card.
+
+		 - logFull(8), indicate a log full condition.  This 
+		   is not applicable to spans."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 availabilityStatus."
+	::= { x400pMxSpanEntry 26 }
+
+x400pMxSpanControlStatus OBJECT-TYPE
+	SYNTAX		ControlStatus
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the control status of the span following the 
+		 ControlStatus textual convention of the OPENSS7-TMN-TC 
+		 module in accordance with the controlStatus attribute 
+		 of ITU-T Rec. X.721 | ISO/IEC 10165-2.
+		 
+		 This attribute is set-valued and may contain the 
+		 following:
+
+		 - subjectToTest(0), the span is available for use but 
+		   may be subject to test at unpredictable times and may 
+		   cause it to exhibit unusual characteristics to users; 
+		   the adminitrative state is unlocked(1).
+
+		 - partOfServicesLocked(1), although the administrative 
+		   is unlocked(1), some part of the service is locked 
+		   (such as specific channels).
+
+		 - reservedForTest(2), the span is unavailable to normal 
+		   users because it is undergoing a test procedure; the 
+		   administrative state is locked(0).
+
+		 - suspended(3), service has been administratively 
+		   suspsended to users of the resource and does not 
+		   resume performing services until the suspended 
+		   condition is revoked; the administrative state is 
+		   unlocked(1).
+		 "
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 controlStatus."
+	::= { x400pMxSpanEntry 27 }
+
+x400pMxSpanStandbyStatus OBJECT-TYPE
+	SYNTAX		StandbyStatus
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the standby status of the span following the 
+		 StandbyStatus textual convention of the OPENSS7-TMN-TC 
+		 module in accordance with the standbyStatus attribute of 
+		 ITU-T Rec. X.721 | ISO/IEC 10165-2.
+		 
+		 The standby state may be one of the following:
+		 
+		 - hotStandby(0), the card is synchronizing with the 
+		   receive stream but is not providing service (i.e. the 
+		   transmitters are off.  Writing this value for a 
+		   backup span results in the span assuming a hot 
+		   standby role.
+		 
+		 - coldStandby(1), the card has both receiver and 
+		   transmitters off.  Writing this value for a backup 
+		   span results in the span assuming a cold standby 
+		   role.
+		 
+		 - providingService(2), the card responsible for 
+		   providing service as a back-up, or is a primary or 
+		   solitary resource.  This value cannot be written.
+
+		 This value cannot be written for primary or solitary 
+		 spans.  For backup spans, any value may be written, 
+		 but the value read reflects the current state of the 
+		 backup span.
+
+		 The value will transition from the hotStandby(0) or 
+		 coldStandby(1) value to the providingService(2) value 
+		 should the primary span to which this span is a backup 
+		 experiences a disabling fault condition or is otherwise 
+		 disabled by a management station."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 standbyStatus."
+	::= { x400pMxSpanEntry 28 }
+
+
+x400pMxSpanAlarms OBJECT-TYPE
+	SYNTAX		BITS {
+				yellow(0),
+				red(1),
+				blue(2),
+				recovery(3)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the current span alarm.  This may contain:
+		 
+		 - yellow(0), a yellow alarm (T1/J1) or RAI (E1).  Set 
+		   while a received yellow alarm or RAI condition 
+		   persists.
+
+		 - red(1), a red alarm.  Set while a receive 
+		   loss-of-sync or receive carrier loss condition 
+		   persists.
+
+		 - blue(2), a blue alarm (T1/J1) or AIS (E1).  Set while 
+		   a receive unframed all-ones condition persists.
+
+		 - recovery(3), after a red or blue/AIS alarm condition 
+		   has cleared, the driver waits for an alarm recovery 
+		   period before clearing the sending of yellow alarm 
+		   condition in T1/J1 mode.  This bit is set after the 
+		   red and blue alarms clear while waiting for the alarm 
+		   recovery period."
+	::= { x400pMxSpanEntry 29 }
+
+x400pMxSpanEvents OBJECT-TYPE
+	SYNTAX		BITS {
+				rlos(0),
+				frcl(1),
+				rua1(2),
+				ryel(3),
+				rra(4),
+				rdma(5),
+				v52lnk(6),
+				lorc(7),
+				lotc(8),
+				lup(9),
+				ldn(10),
+				lspare(11),
+				tocd(12),
+				tcle(13)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the current span detected events.  This may 
+		 contain the following:
+
+		 - rlos(0), receiver loss of synchronization, set while 
+		   the framer is not synchronized to the receive data 
+		   stream.
+
+		 - frcl(1), framer receive carrier loss, set when a 
+		   frame (or second) of consecutive zeros has been 
+		   detected.
+
+		 - rua1(2), receive unframed all ones, T1 blue alarm, E1 
+		   AIS, set when an unframed all one's code is received.
+
+		 - ryel(3), receive yellow alarm condition, T1 yellow 
+		   alarm, set when a yellow alarm is received.
+
+		 - rra(4), receive remote alarm condition, E1 only, set 
+		   when a remote alarm is received.
+
+		 - rdma(5), receive distant multiframe alarm condition, 
+		   E1 only, set when bit 6 of time slot 16 in frame 0 
+		   has been set for two consecutive mutliframes.
+
+		 - v52lnk(6), V5.2 link detected condition, E1 only, set 
+		   on detection of a V5.2 link identification signal 
+		   (G.965).
+
+		 - lorc(7), loss of receive clock condition, set when 
+		   the receive clock has not transitioned fro on channel 
+		   time.
+
+		 - lotc(8), loss of transmit clock condition, set when 
+		   the TCLK pin has not transitioned for one channel 
+		   time.
+
+		 - lup(9), loop-up code detected condition, T1 only, set 
+		   when the loop-up code is being received.
+
+		 - ldn(10), loop-down code detected condition, T1 only, 
+		   set when the loop-down code is being received.
+
+		 - lspare(11), spare code detected condition, T1 only, 
+		   set when the spare code is being received.
+
+		 - tocd(12), transmit open circuit detected, set when an 
+		   open circuit on the transmit leads is detected.
+
+		 - tcle(13), transmit current limite exceeded, set when 
+		   the 50mA short circuit current limiter is in effect.
+		
+		 Note that some of these conditions are only applicable 
+		 to T1 operation and some are only applicable to E1 
+		 operation.  Not all cards and chipsets will report all 
+		 conditions.  Some conditions may also cause alarm 
+		 conditions and notifications."
+	::= { x400pMxSpanEntry 30 }
+
+x400pMxSpanReceiveLevel OBJECT-TYPE
+	SYNTAX		INTEGER (0..15)
+	UNITS		"-2.5 decibels"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the receive level in increments of -2.5 dB.  
+		 That is, when the value is zero (0) the receive level 
+		 is between 0 dB and -2.5 dB; when one (1), -2.5 dB and 
+		 -5.0 dB; and so on.  The level indicates is only within 
+		 the range detected by the device.  For long haul 
+		 applications, the receiver gain limit is -36dB for T1 
+		 and -43dB for E1.  For short haul E1 applications, the 
+		 gain limit is -12dB.  For limited long haul T1 
+		 applications, the gain limit is -15dB."
+	::= { x400pMxSpanEntry 31 }
+
+
+x400pMxSpanLossOfSyncEvents OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of receive loss of 
+		 synchronization events that have occured."
+	::= { x400pMxSpanEntry 32 }
+
+x400pMxSpanCarrierLossEvents OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of receiver loss of 
+		 carrier events that have occured."
+	::= { x400pMxSpanEntry 33 }
+
+x400pMxSpanUnframedAllOnesEvents OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Inidicates the count of the number of received unframed 
+		 all ones events that have occured."
+	::= { x400pMxSpanEntry 34 }
+
+x400pMxSpanYellowAlarmEvents OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of yellow alarm 
+		 events that have occurred."
+	::= { x400pMxSpanEntry 35 }
+
+x400pMxSpanRemoteAlarmEvents OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of remote alarm 
+		 indication events that have been received."
+	::= { x400pMxSpanEntry 36 }
+
+x400pMxSpanDistantMFAlarmEvents OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of distant 
+		 multi-frame alarm indication events that have been 
+		 received."
+	::= { x400pMxSpanEntry 37 }
+
+x400pMxSpanLossOfRxClockEvents OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of loss of receive 
+		 clock events that have occurred."
+	::= { x400pMxSpanEntry 38 }
+
+x400pMxSpanLossOfTxClockEvents OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of loss of transmit 
+		 clock events that have occured."
+	::= { x400pMxSpanEntry 39 }
+
+x400pMxSpanLoopUpCodeEvents OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of loop-up code 
+		 detection events that have occurred."
+	::= { x400pMxSpanEntry 40 }
+
+x400pMxSpanLoopDownCodeEvents OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of loop-down code 
+		 detection events that have occurred."
+	::= { x400pMxSpanEntry 41 }
+
+x400pMxSpanSpareCodeEvents OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of spare code 
+		 detection events that have occurred."
+	::= { x400pMxSpanEntry 42 }
+
+x400pMxSpanTransmitOpenCircuitEvents OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of transmit open 
+		 circuit events detected."
+	::= { x400pMxSpanEntry 43 }
+
+x400pMxSpanTransmitShortCircuitEvents OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of transmit short 
+		 circuit events detected."
+	::= { x400pMxSpanEntry 44 }
+			
+
+x400pMxSpanLineCodeViolations OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the number of line code violations that 
+		 occurred during the last 1 second interval."
+	::= { x400pMxSpanEntry 45 }
+
+x400pMxSpanPathCodeViolations OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the number of path code violations that 
+		 occured during the last 1 second interval."
+	::= { x400pMxSpanEntry 46 }
+
+x400pMxSpanFramesOutOfSync OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the number of frames out of synchroniation 
+		 received during the last 1 second interval."
+	::= { x400pMxSpanEntry 47 }
+
+x400pMxSpanFarEndBlockErrors OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the number of far end block errors 
+		 (multi-frame errors) indicated during the last 1 second 
+		 interval for E1 spans only.  For T1 spans the value 
+		 will always be zero (0)."
+	::= { x400pMxSpanEntry 48 }
+
+x400pMxSpanBertBitCount OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of bits tested.  At a 
+		 minimum, this counter will wrap every 30 minutes.  This 
+		 counter only increments while the BERT receiver is 
+		 synchronized on the test pattern."
+	::= { x400pMxSpanEntry 49 }
+
+x400pMxSpanBertErrorCount OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of bits in error.  At 
+		 a minimum, this counter will wrap every 30 minutes.  
+		 This counter only increments while the BERT receiver is 
+		 synchronized on the test pattern."
+	::= { x400pMxSpanEntry 50 }
+
+-- =====================================================================
+
+x400pMxChanTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF X400pMxChanEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The X400P channel trable provides an etnry for each of 
+		 the channels for each span for each equipped X400P card 
+		 in the system."
+	::= { x400pMxChan 1 }
+
+x400pMxChanEntry OBJECT-TYPE
+	SYNTAX		X400pMxChanEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Rows are neither created nor deleted explicitly by 
+		 management stations but are present inherently as a 
+		 part of system operation.  Each entry in the table 
+		 corresponds to a channel of a span on an existing and 
+		 installed X400P card."
+	INDEX	{
+			x400pMxCardIndex, -- shared index
+			x400pMxSpanIndex, -- shared index
+			x400pMxChanIndex -- index
+		}
+	::= { x400pMxChanTable 1 }
+
+X400pMxChanEntry ::=
+	SEQUENCE {
+		x400pMxChanIndex
+			Unsigned32,
+
+		x400pMxChanType
+			INTEGER,
+		x400pMxChanRate
+			INTEGER,
+		x400pMxChanMode
+			INTEGER,
+
+		x400pMxChanAdministrativeState
+			AdministrativeState,
+		x400pMxChanUsageState
+			UsageState,
+		x400pMxChanAvailabilityStatus
+			AvailabilityStatus,
+		x400pMxChanControlStatus
+			ControlStatus
+	}
+
+x400pMxChanIndex OBJECT-TYPE
+	SYNTAX		Unsigned32 (1..31)
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION
+		"Provides a channel index.  For T1 or J1 spans, the 
+		 channel indicies 1..24 index the corresponding time 
+		 slot in the span.  For E1, the channel indices 1..31 
+		 index the corresponding time slot in the span."
+	::= { x400pMxChanEntry 1 }
+
+x400pMxChanType OBJECT-TYPE
+	SYNTAX	INTEGER {
+			none(1),
+			cas(2),
+			ccs(3)
+		}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether the channel has channel associated 
+		 signalling or common channel signalling.  For T1 or J1 
+		 spans, channel associated signalling implies 56kbps 
+		 DS0A operation within the channel; otherwise, 64kbps 
+		 DS0 operation within the channel is indicated.  The 
+		 default is ccs(3).  For E1 CAS operation, channel 17 
+		 (timeslot 16) is unavailable for use."
+	DEFVAL		{ 3 }
+	::= { x400pMxChanEntry 2 }
+
+x400pMxChanRate OBJECT-TYPE
+	SYNTAX		INTEGER (56000|64000)
+	UNITS		"bits per second"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Indicates the bit rate of the channel.  Channels 1..24 
+		 for T1 and J1 can be 56 or 64 kbps.  Channels 1..31 for 
+		 E1 are 64 kbps but can synthetically be placed into 56 
+		 kbps mode.  The default is 64kbps for E1 and T1 ccs(3) 
+		 channels; 56kbps for T1 cas(2) channels."
+	::= { x400pMxChanEntry 3 }
+
+x400pMxChanMode OBJECT-TYPE
+	SYNTAX	BITS {
+			remoteLoopback(0),
+			localLoopback(1),
+			test(2)
+		}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the channel mode.  The value may contain:
+
+		 - remoteLoopback(0), the receive data in the channel is 
+		   looped back to replace the transmit data for the 
+		   channel.  This may either be accomplished within the 
+		   host or using the per-channel loopback capability of 
+		   the chip sets.
+
+		 - localLoopback(1), the transmit data for the channel 
+		   is looped back to replace the receive data for the 
+		   channel.  This may is accomplished within the host.
+
+		 - test(2), the channel is marked for BERT testing.  
+		   When BERT testing for the span is enabled on a 
+		   channel basis, this channel will be included in the 
+		   channels upon which the BERT test pattern is 
+		   transmitted.
+
+		 Because these tests are disruptive, no value can be 
+		 added to this set unless the channel has a control 
+		 status of subjectToTest(0) or reservedForTest(2)."
+	DEFVAL		{ '000'B }
+	::= { x400pMxChanEntry 4 }
+
+
+x400pMxChanAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the administrative state of the channel 
+		 following the AdministrativeState textual convention of 
+		 the OPENSS7-TMN-TC module in accordance with the 
+		 administrativeState attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+		 
+		 The administrative state may be one of locked(0), 
+		 unlocked(1) or shuttingDown(2).  When locked(0), the 
+		 channel is administratively prohibited from providing 
+		 service to users.  When unlocked(1), the channel is 
+		 administratively permitted to provider service to 
+		 users.  When shuttingDown(2), the channel will continue 
+		 to provide service to existing users but will reject 
+		 new users.  Once there are no more users of the channel, 
+		 the channel will move to the locked state."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 administrativeState."
+	::= { x400pMxChanEntry 5 }
+
+x400pMxChanUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the usage state of the channel following the 
+		 UsageState textual convention of the OPENSS7-TMN-TC 
+		 module in accodance with the usageState attribute of 
+		 ITU-T Rec. X.721 | ISO/IEC 10165-2.
+		 
+		 The usage state is one of:
+
+		 - idle(0), the channel is not currently in use;
+
+		 - active(1), the channel is in use and has sufficient 
+		   operating capacity to provide for additional users 
+		   simultaneously (e.g. a half-channel is used);
+
+		 - busy(2), the channel is in use and has no spare 
+		   capacity (i.e. the full channel is in use).
+		   
+		 If the driver does not support partial channels, only 
+		 the values idle(0) and busy(2) are returned."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 usageState."
+	::= { x400pMxChanEntry 6 }
+
+x400pMxChanAvailabilityStatus OBJECT-TYPE
+	SYNTAX		AvailabilityStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the availability status of the channel 
+		 following the AvailabilityStatus textual convention of 
+		 the OPENSS7-TMN-TC module in accodance with the 
+		 availabilityStatus attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+		 
+		 The availability status is set-valued and may contain 
+		 the following:
+		 
+		 - inTest(0), the channel is undergoing a test 
+		   procedure.  The administrative state is locked(0) and 
+		   the operational state is disabled(1).  This condition 
+		   exists while the card is powering up or the span is 
+		   being reset.
+		 
+		 - failed(1), the channel has an internal fault that 
+		   prevents it from operating.  The operational state is 
+		   disabled.  This value is present when the same value 
+		   is present in the span availability status.
+		 
+		 - powerOff(2), the channel requires power to be applied 
+		   and is not powered on.  For example, power 
+		   managements may have removed power from the device.  
+		   This value is present when the same value is present 
+		   in the span availability status.
+		 
+		 - offLine(3), the channel requires a routing operation to 
+		   be performed to place it online an make it available 
+		   for use.  The operation may be manual or automatic, 
+		   or both.  The operational state is disabled.  This 
+		   value is present when the same value is present in 
+		   the span availability status.
+		 
+		 - offDuty(4), the channel has been made inactve by an 
+		   internal control process in accordance with a 
+		   predetermined time schedule.  Under normal 
+		   conditions, the control process can be expected to 
+		   reactivate the channel at some scheduled time.
+		 
+		 - dependency(5), the channel cannot operate because some 
+		   other resource on which it depends is unavailable. 
+		   (For example, the span or card.)
+		 
+		 - degraded(6), the channel is operating with degraded 
+		   performance.  This value is present when the same 
+		   value is present in the span availability status.
+		 
+		 - notInstalled(7), the channel is not present in the 
+		   system or is incomplete.
+		 
+		 - logFull(8), not used."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 availablityStatus."
+	::= { x400pMxChanEntry 7 }
+
+x400pMxChanControlStatus OBJECT-TYPE
+	SYNTAX		ControlStatus
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the control status of the channel following 
+		 the ControlStatus textual convention of the 
+		 OPENSS7-TMN-TC module in accodance with the 
+		 controlStatus attribute of ITU-T Rec. X.721 | ISO/IEC 
+		 10165-2.
+
+		 The control status is set-valued and may contain:
+
+		 - subjectToTest(0), the channel is available to normal 
+		   users but tests may be conducted on it simultaneously 
+		   at unpredicatble times, which may cause it to exhibit 
+		   unusual characteristics to users.
+
+		 - partOfServicesLocked(1), when present, a manager has 
+		   administratively locked some part of the channel.
+
+		 - reservedForTest(2), when present, the channel is 
+		   undergoing a test procedures and is unavailable to 
+		   users.
+
+		 - suspended(3), when present, service has been 
+		   administratively suspended to users."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 controlStatus."
+	::= { x400pMxChanEntry 8 }
+
+
+-- =====================================================================
+
+
+END
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8

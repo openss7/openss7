@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/10/13 08:54:36 $
+# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/29 23:01:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/13 08:54:36 $ by $Author: brian $
+# Last Modified $Date: 2007/12/29 23:01:51 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: makestubs,v $
+# Revision 0.9.2.2  2007/12/29 23:01:51  brian
+# - working up mib2c
+#
 # Revision 0.9.2.1  2007/10/13 08:54:36  brian
 # - added MIB agent files
 #
@@ -64,15 +67,25 @@ export MIBS
 export MIBDIRS
 export MIBFILES
 
-all: basic storage
+all: basic storage openss7
 
-basic:
+basic: strMIB_simple.c strMIB_simple.h
+
+strMIB_simple.c strMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-STREAMS-MIB.mib
 	./mib2c -c ./mib2c.conf -f strMIB_simple strMIB
 	indent -nhnl strMIB_simple.[ch]
 
-storage:
+storage: strMIB_storage.c strMIB_storage.h
+
+strMIB_storage.c strMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-STREAMS-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f strMIB_storage strMIB
 	indent -nhnl strMIB_storage.[ch]
+
+openss7: strMIB_openss7.c strMIB_openss7.h
+
+strMIB_openss7.c strMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-STREAMS-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f strMIB_openss7 strMIB
+	indent -nhnl strMIB_openss7.[ch]
 
 tables:
 	./mib2c -c ./mib2c.storage.conf strModTable
@@ -85,5 +98,7 @@ tables:
 clean:
 	rm -f strMIB_simple.[ch]
 	rm -f strMIB_storage.[ch]
+	rm -f strMIB_openss7.[ch]
 	rm -f strMIB_simple.[ch]~
 	rm -f strMIB_storage.[ch]~
+	rm -f strMIB_openss7.[ch]~
