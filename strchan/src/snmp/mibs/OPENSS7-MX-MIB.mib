@@ -1,0 +1,3048 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-MX-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2008/01/01 13:59:39 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2008/01/01 13:59:39 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-MX-MIB.mib,v $
+-- Revision 0.9.2.1  2008/01/01 13:59:39  brian
+-- - added new mibs
+--
+-- =============================================================================
+
+OPENSS7-MX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE
+		FROM SNMPv2-SMI
+	Unsigned32, Counter32, StorageType, RowStatus, TimeInterval, 
+	TruthValue
+		FROM SNMPv2-TC
+	PerfCurrentCount, PerfIntervalCount, PerfTotalCount
+		FROM PerfHist-TC-MIB
+	openss7Modules
+		FROM OPENSS7-SMI
+	AdministrativeState, OperationalState, UsageState, AlarmStatus, 
+	ProceduralStatus, AvailabilityStatus, ControlStatus, 
+	StandbyStatus, UnknownStatus, SimpleNameType
+		FROM OPENSS7-TMN-TC;
+
+mxMIB MODULE-IDENTITY
+	LAST-UPDATED
+		"200801011353Z"
+	ORGANIZATION
+		"The OpenSS7 Project"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crecent
+		 Edmonton AB  T6L 6T1
+		 CANADA
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 E-Mail: bidulock@openss7.org"
+	DESCRIPTION
+		"MIB Module for the MX multiplexing driver.  In the 
+		 OpenSS7 system the MX multiplexing driver is is TDM 
+		 switching module."
+	::= { openss7Modules 11 }
+
+-- top level organization of the MIB
+
+mxNotifications		OBJECT IDENTIFIER ::= { mxMIB		 0 }
+mxObjects		OBJECT IDENTIFIER ::= { mxMIB		 1 }
+mxConformance		OBJECT IDENTIFIER ::= { mxMIB		 2 }
+
+mxTables		OBJECT IDENTIFIER ::= { mxObjects	 1 }
+mxScalars		OBJECT IDENTIFIER ::= { mxObjects	 2 }
+mxNotifs		OBJECT IDENTIFIER ::= { mxObjects	 3 }
+mxOids			OBJECT IDENTIFIER ::= { mxObjects	 4 }
+mxStats			OBJECT IDENTIFIER ::= { mxObjects	 5 }
+
+mxSpan			OBJECT IDENTIFIER ::= { mxTables	 1 }
+mxChan			OBJECT IDENTIFIER ::= { mxTables	 2 }
+mxXcon			OBJECT IDENTIFIER ::= { mxTables	 3 }
+mxBert			OBJECT IDENTIFIER ::= { mxTables	 4 }
+
+mxNearEndStats		OBJECT IDENTIFIER ::= { mxStats		 1 }
+mxFarEndStats		OBJECT IDENTIFIER ::= { mxStats		 2 }
+
+mxNearEndCurrent	OBJECT IDENTIFIER ::= { mxNearEndStats	 1 }
+mxNearEndInterval	OBJECT IDENTIFIER ::= { mxNearEndStats	 2 }
+mxNearEndTotal		OBJECT IDENTIFIER ::= { mxNearEndStats	 3 }
+
+mxFarEndCurrent		OBJECT IDENTIFIER ::= { mxFarEndStats	 1 }
+mxFarEndInterval	OBJECT IDENTIFIER ::= { mxFarEndStats	 2 }
+mxFarEndTotal		OBJECT IDENTIFIER ::= { mxFarEndStats	 3 }
+
+mxCompliances		OBJECT IDENTIFIER ::= { mxConformance	 1 }
+mxGroups		OBJECT IDENTIFIER ::= { mxConformance	 2 }
+
+-- =====================================================================
+
+
+-- =====================================================================
+
+mxSpanTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF MxSpanEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The MX Span Table provides an entry for each of the 
+		 equipped spans in the system."
+	::= { mxSpan 1 }
+
+mxSpanEntry OBJECT-TYPE
+	SYNTAX		MxSpanEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Rows are neither created nor deleted explicitly by 
+		 management stations but are present inherently as a 
+		 part of system operation.  Each entry in the table 
+		 corresponds to a euipped and installed span."
+	INDEX	{
+			mxSpanIndex -- index
+		}
+	::= { mxSpanTable 1 }
+
+MxSpanEntry ::=
+	SEQUENCE {
+		mxSpanIndex
+			SimpleNameType,
+		mxSpanDevice
+			SimpleNameType,
+		mxSpanEquipmentId
+			OCTET STRING,
+		mxSpanType
+			INTEGER,
+		mxSpanNumber
+			Unsigned32,
+		mxSpanRate
+			INTEGER,
+		mxSpanMode
+			BITS,
+		mxSpanCrc
+			INTEGER,
+		mxSpanClocking
+			INTEGER,
+		mxSpanCoding
+			INTEGER,
+		mxSpanFraming
+			INTEGER,
+		mxSpanLineImpedance
+			INTEGER,
+		mxSpanLineMode
+			INTEGER,
+		mxSpanLineLength
+			INTEGER,
+		mxSpanLineAttenuation
+			INTEGER,
+		mxSpanLineGain
+			INTEGER,
+		mxSpanLineDelay
+			Unsigned32,
+		mxSpanTxLevel
+			INTEGER,
+		mxSpanRxLevel
+			INTEGER,
+		mxSpanAlarmSettleTime
+			TimeInterval,
+		mxSpanLineCodeTime
+			TimeInterval,
+		mxSpanPrimary
+			SimpleNameType,
+		mxSpanDataLink
+			BITS,
+		mxSpanLineCode
+			INTEGER,
+		mxSpanAlarmSeverityMappingProfile
+			SimpleNameType,
+		mxSpanAdministrativeState
+			AdministrativeState,
+		mxSpanOperationalState
+			OperationalState,
+		mxSpanUsageState
+			UsageState,
+		mxSpanAlarmStatus
+			AlarmStatus,
+		mxSpanProceduralStatus
+			ProceduralStatus,
+		mxSpanAvailabilityStatus
+			AvailabilityStatus,
+		mxSpanControlStatus
+			ControlStatus,
+		mxSpanStandbyStatus
+			StandbyStatus,
+		mxSpanUnknownStatus
+			UnknownStatus,
+		mxSpanSap
+			SimpleNameType,
+		mxSpanLoopbackStatus
+			BITS,
+		mxSpanLineStatus
+			BITS,
+		mxSpanAlarms
+			BITS,
+		mxSpanEvents
+			BITS,
+		mxSpanReceiveLevel
+			INTEGER,
+		mxSpanReceiveThreshold
+			INTEGER,
+		mxSpanRowStatus
+			RowStatus
+	}
+
+mxSpanIndex OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	not-accessible --index
+	STATUS		current
+	DESCRIPTION
+		"Provides a name for the span and an index into the 
+		 mxSpanTable."
+	::= { mxSpanEntry 1 }
+
+mxSpanDevice OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the name of the device or driver which 
+		 provides the span.  In some implementations this may be 
+		 the name of a device driver.  This name must be 
+		 sepcified on row creation and must be a valid device 
+		 name."
+	::= { mxSpanEntry 2 }
+
+mxSpanEquipmentId OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the equipment identifier that identifies the 
+		 span within the device or driver.  This equipment 
+		 identifier must be specified on row creation and must 
+		 be a valid equipment identifier."
+	::= { mxSpanEntry 3 }
+
+mxSpanType OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				t1(1),
+				e1(2),
+				j1(3),
+				e2(4),
+				e3(5),
+				t3(6)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the span type.  The object can have one of 
+		 the following values:
+		 
+		 - none(0), unknown or unspecified (this value cannot be 
+		   set);
+
+		 - t1(1), the span is a T1 or DSX1 span;
+
+		 - e1(2), the span is an E1 span;
+
+		 - j1(3), the span is a J1 or DSX1 span;
+
+		 - e2(4), the span is an E1 span in an E2 facility;
+
+		 - e3(5), the span is an E1 span in an E3 facility;
+
+		 - t3(6), the span is a T1 span in an T3 facility.
+
+		 The value none(0) can be read but not written.  When 
+		 read, the value none(0) indicates that the equipment is 
+		 either absent, not configured, or failed.
+
+		 For some implemntations this might be a read-only 
+		 field.  The default value if unspecified on row 
+		 creation is implementation specific."
+	::= { mxSpanEntry 4 }
+
+mxSpanNumber OBJECT-TYPE
+	SYNTAX		Unsigned32 (0..27)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the span number within an E2, E3 or T3 
+		 facility.  For simple span types this value is zero.  
+		 The agent may supply a default based on the 
+		 mxSpanEquipmentId, or may require that this value be 
+		 set upon creation."
+	::= { mxSpanEntry 5 }
+
+mxSpanRate OBJECT-TYPE
+	SYNTAX		INTEGER (1544|2048)
+	UNITS		"kilobits per second"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the span unframed syncrhonous bit rate in 
+		 kilobits per second.  This is either the T1 rate (1544 
+		 kbps) or the E1 rate (2048 kbps)."
+	::= { mxSpanEntry 6 }
+
+mxSpanMode OBJECT-TYPE
+	SYNTAX		BITS {
+				localLoopback(0),
+				remoteLoopback(1),
+				framerLoopback(2),
+				payloadLoopback(3)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the local loopback to apply.  This object may  
+		 include the following values:
+
+		 - localLoopback(0), payload bits for tranmission from 
+		   the host interface are looped back on receive payload 
+		   bits (data may be transmitted as normal but the 
+		   received payload is discarded);
+
+		 - remoteLoopback(1), the received serial bit stream is 
+		   looped back after the line interface unit to the 
+		   transmitted serial bit stream (transmit data from the 
+		   host is ignored, but received data may be delivered 
+		   to the host);
+
+		 - framerLoopback(2), the transmitted serial bit stream 
+		   is looped back at the framer to the receive serial 
+		   bit stream (unframed all ones is transmittted to the 
+		   line interface and received information is ignored);
+
+		 - payloadLoopback(3), the received payload bits are 
+		   looped back to the tranmit payload bits at the 
+		   framer (transmitted data from the host is ignored, 
+		   but received data may be delivered to the host).
+
+		 Only one of framerLoopback(2) or payloadLoopback(3) may 
+		 be present.  Only one of localLoopback(0) and 
+		 remoteLoopback(1) may be present.  localLoopback(0) and 
+		 framerLoopback(2) are only useful for specialized 
+		 testing.  The span must have a control status of 
+		 subjectToTest(0) or reservedForTest(2) before any 
+		 values may be added to the set by a management station.
+
+		 These values represent the loopback condition that has 
+		 been set by a management station or locallly as a part 
+		 of system operations.  The current loppback condition 
+		 is reported in the mxSpanLoopbackStatus object.
+		 
+		 To request or remote a loopback at the far end, use the 
+		 mxSpanLineCode object."
+	::= { mxSpanEntry 7 }
+
+mxSpanCrc OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				crc4(1),
+				crc5(2),
+				crc6(3),
+				crc6j(4)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies and indicates the cyclic redundancy check 
+		 code and policy for the span.  The object can have one 
+		 of the following values:
+
+		 - none(0), unknown or unspecified;
+
+		 - crc4(1), CRC4 is used for MF alignment in addition to 
+		   CRC5 for errorred frames on E1 spans;
+
+		 - crc5(2), CRC4 is not used for MF alignment, only CRC5 
+		   is used for errored frames on E1 spans (default);
+
+		 - crc6(3), CRC6 is used on T1 spans;
+
+		 - crc6j(4), CRC6J is used on J1 spans.
+
+		 The value none(0) can be read but not written.  When 
+		 read, the value none(0) indicates that the equipment is 
+		 either absent, not configured, or failed."
+	::= { mxSpanEntry 8 }
+
+mxSpanClocking OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				internal(1),
+				external(2),
+				loop(3),
+				master(4),
+				slave(5),
+				adaptive(6)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+--
+-- FIXME:  This should be set-valued where slave and master are 
+-- independent of the other settings.
+--
+-- Timing sources can be local (a local crystal oscillator), external 
+-- (an timing signal supplied external to the box), adaptive (based on 
+-- the DSU interface), reference (a network reference span), loop (based 
+-- on recovered receive clock).  When slave is present, the span will 
+-- revert to loop if the source fails.  When master is present, the span 
+-- is currently providing recovered receive clock as a network reference 
+-- clock.
+--
+	DESCRIPTION
+		"Specifies and indicates the span clock source.  The 
+		 object may have one of the following values:
+
+		 - none(0), the value is unknown or unspecified (the 
+		   span might not be operational while this value is 
+		   present);
+
+		 - internal(1), clocking is specific to the device (i.e.  
+		   whatever is defined for the device);
+
+		 - external(2), clocking is external to the device (e.g. 
+		   a system bus or external timing bus);
+
+		 - loop(3), the transmit clock is derived from the 
+		   recovered receive clock for the span;
+
+		 - master(4), the transmit clock is derived from the 
+		   device's local crystal ocillator;
+
+		 - slave(5), clocking is internal (device and system 
+		   specific); however, if the clock fails the recovered 
+		   receive clock for this span will be used instead;
+
+		 - adaptive(6), some other mechanism is used to derive 
+		   or recover clocking.
+
+		 The value none(0) can be read but not written. When 
+		 read, the value none(0) indicates that the equipment is 
+		 either absent, not configured, or failed."
+	::= { mxSpanEntry 9 }
+
+mxSpanCoding OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				ami(1),
+				b6zs(2),
+				b8zs(3),
+				hdb3(4),
+				jbzs(5),
+				zbtsi(6)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies and indicates the span line coding.  The 
+		 object may have one of the following values:
+
+		 - none(0), the value is unknown or unspecified (the 
+		   span might not be operational while this value is 
+		   present);
+
+		 - ami(1), Alternate Mark Inversion (AMI), applicable to 
+		   all span types;
+
+		 - b6zs(2), Bipolar with 6 Zero Substitution (B6ZS), 
+		   applicable to ds3 span types, not used;
+
+		 - b8zs(3), Bipolar with 8 Zero Substitution (B8ZS), 
+		   applicable to, and the default for, T1 and J1 spans;
+
+		 - hdb3(4), High-Density Bipolar 3 (HDB3), applicable 
+		   to, and the default for, E1 spans;
+
+		 - jbzs(5), Jammed Bit Zero Suppression (JBZS), 
+		   applicable to T1 clear channel and E1 CCS spans;
+
+		 - zbtsi(6), Zero Byte Time Slot Interchange (ZBTSI), 
+		   not used.
+
+		 The value none(0) can be read but not written.  When 
+		 read, the value none(0), indicates that the equipment 
+		 is either absent, not configured, or failed."
+	::= { mxSpanEntry 10 }
+
+mxSpanFraming OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				ccs(1),
+				cas(2),
+				sf(3),
+				d4(4),
+				esf(5)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies and indicates the framing for the span.  The 
+		 object can have one of the following values:
+
+		 - none(0), the framing is unknown or unspecified;
+
+		 - ccs(1), common channel signalling framing for E1 
+		   spans (CCS signalling on TS16 without CAS MF);
+
+		 - cas(2), channel associated signalling framing for E1 
+		   spans (CAS signalling on TS16 with CAS MF);
+
+		 - sf(3), super-frame (SF) framing for T1 spans;
+
+		 - d4(4), D4 framing for T1 spans;
+
+		 - esf(5), extended super-frame framing for T1 or J1 
+		   spans.
+
+		 The value none(0) can be read but not writtern.  When 
+		 read, the value none(0) indicates that the equipment 
+		 is either absent, not configured, or failed."
+	::= { mxSpanEntry 11 }
+
+mxSpanLineImpedance OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				unbalanced75ohm(1),
+				balanced100ohm(2),
+				balanced120ohm(3)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies and indicates the line impedance of the span.  
+		 The object can have one of the following values:
+
+		 - none(0), unknown or unspecified;
+
+		 - unbalanced75ohm(1), unbalanced 75 Ohm line 
+		   impeadance, for E1 spans;
+
+		 - balanced100ohm(2), balanced 100 Ohm line impedance, 
+		   for T1 or J1 spans;
+
+		 - balanced120ohm(3), balanced 120 Ohm line impedance, 
+		   for E1 spans."
+	::= { mxSpanEntry 12 }
+
+mxSpanLineMode OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				dsu(1), -- short or limited-long haul
+				csu(2), -- long haul
+				monitor(3)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies and indicates the line mode.  The object can 
+		 have one of the following values:
+
+		 - none(0), unknown or unspecified;
+
+		 - dsu(1), data service unit application (short-haul E1 
+		   and limited long-haul, DSX, T1 spans);
+
+		 - csu(2), channel service unit application (long-haul 
+		   span);
+
+		 - monitor(3), high-impedance line monitoring 
+		   of the span."
+	::= { mxSpanEntry 13 }
+
+mxSpanLineLength OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				dsx133ft(1),
+				dsx266ft(2),
+				dsx399ft(3),
+				dsx533ft(4),
+				dsx666ft(5)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies and indicates the line length for T1 DSX 
+		 operation.  The object can have one of the following 
+		 values:
+
+		 - none(0), unknown, unspecified or not applicable;
+		 - dsx133ft(1), DSX-1 0 to 133 feet;
+		 - dsx266ft(2), DSX-1 133 to 266 feet;
+		 - dsx399ft(3), DSX-1 266 to 399 feet;
+		 - dsx533ft(4), DSX-1 399 to 533 feet;
+		 - dsx666ft(5), DSX-1 533 to 666 feet.
+
+		 The value none(0) can be read but not written.  When 
+		 read, the value none(0) indicates that the span is 
+		 either absent, not configured or failed.
+		 
+		 The value is only significant when mxSpanLineMode is 
+		 set to dsu(1) for T1 spans."
+	DEFVAL		{ 1 } -- dsx133ft(1)
+	::= { mxSpanEntry 14 }
+
+mxSpanLineAttenuation OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				csu0dB(1),
+				csu8dB(2),
+				csu15dB(3),
+				csu23db(4)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies and indicates the line attenuation for T1 CSU 
+		 operation.  The object can have one of the following 
+		 values:
+
+		 - none(0), unknown, unspecified or not applicable;
+		 - csu0dB(1), CSU 0 dB;
+		 - csu8dB(2), CSU -7.5 dB;
+		 - csu15dB(3), CSU -15 dB;
+		 - csu23db(4), CSU -22.5 dB.
+
+		 The value none(0) can be read but not written.  When 
+		 read, the value none(0) indicates that the span is 
+		 either absent, not configured, or failed.
+
+		 The value is only significant when mxSpanLineMode is 
+		 set to csu(2) for T1 spans."
+	::= { mxSpanEntry 15 }
+
+mxSpanLineGain OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				mon0dB(1),
+				mon12dB(2),
+				mon20dB(3),
+				mon26dB(4),
+				mon30dB(5),
+				mon32dB(6)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies and indicates the line gain for monitoring 
+		 operation.  The object can have one of the following 
+		 values:
+
+		 - none(0), unknown, unspecified or not applicable;
+		 - mon0dB(1), 0 dB linear monitoring gain;
+		 - mon12dB(2), 12 dB linear monitoring gain;
+		 - mon20dB(3), 20 dB linear monitoring gain;
+		 - mon26dB(4), 26 dB linear monitoring gain;
+		 - mon30dB(5), 30 dB linear monitoring gain;
+		 - mon32dB(6), 32 dB linear monitoring gain.
+
+		 The value none(0) can be read but not written.  When 
+		 read, the value none(0) indicates that the span is 
+		 either absent, not configured, or failed.
+
+		 The value is only significant when mxSpanLineMode is 
+		 set to monitor(3)."
+	::= { mxSpanEntry 16 }
+
+mxSpanLineDelay OBJECT-TYPE
+	SYNTAX		Unsigned32
+	UNITS		"microseconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { mxSpanEntry 17 }
+
+mxSpanTxLevel OBJECT-TYPE
+	SYNTAX		INTEGER {
+				off(0),
+				on(1)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies and indicates whether the transmitter is 
+		 on(1) or off(0).  Note that if the mxSpanLineMode is 
+		 set to monitor(3), the tranmitter may be fixed at 
+		 off(0)."
+	DEFVAL		{ 1 } -- on (except off for monitor mode)
+	::= { mxSpanEntry 18 }
+
+mxSpanRxLevel OBJECT-TYPE
+	SYNTAX		INTEGER {
+				off(0),
+				on(1)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies and indicates whether the receiver is on(1) 
+		 or off(0)."
+	DEFVAL		{ 1 } -- on
+	::= { mxSpanEntry 19 }
+
+mxSpanAlarmSettleTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"After local alarm conditions clear, the driver will 
+		 continue to transmit a yellow alarm (T1/J1) or RAI (E1) 
+		 to the remote terminal until the local alarm conditions 
+		 have remained clear for this period of time.  The 
+		 default is 5 seconds (500 centiseconds).  This column 
+		 may be read-only for some systems."
+	DEFVAL		{ 500 } -- 5 seconds
+	::= { mxSpanEntry 20 }
+
+mxSpanLineCodeTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"The period of time for which to transmit or expect to 
+		 receive a loop-up, loop-down, or spare code.  This 
+		 value is only significant for T1 or J1 operation.  The 
+		 default value is 5 seconds (500 centiseconds).  This 
+		 column may be read-only for some systems."
+	DEFVAL		{ 500 } -- 5 seconds
+	::= { mxSpanEntry 21 }
+
+mxSpanPrimary OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies a primary span index of the MX span in the 
+		 system to which this span is acting as a backup.  When 
+		 the span is not acting as a backup (it is a primary 
+		 span, the default), the index is set to the null 
+		 string, an invalid span index. Only one MX span in the 
+		 system may act as a backup to any other MX span in the 
+		 system.  The span index specified must be a primary 
+		 span (that is, the primay span must not be backing up 
+		 another span and its corrresponding value in this 
+		 column must be the null string.
+		 
+		 The state of the backup span is indicated by the 
+		 standby status of the span.  Only the primary span 
+		 index can be referenced directly by a service access 
+		 point."
+	DEFVAL		{ ''X } -- null string
+	::= { mxSpanEntry 22 }
+
+mxSpanDataLink OBJECT-TYPE
+	SYNTAX		BITS {
+				ansiT1403(0),
+				aTT54016(1),
+				other(2)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies and indicates the use of a facility data 
+		 link.  This set may contain:
+
+		 - ansiT1403(0), present when the ANSI T1.403 protocol 
+		   issued on the FDL;
+
+		 - aTT54016(1), present when the AT&T TR54016 protocol 
+		   is used on the FDL;
+
+		 - other(2), present when another protocol is used.
+		   
+		 When the set is empty, no FDL is used."
+	::= { mxSpanEntry 23 }
+
+mxSpanLineCode OBJECT-TYPE
+	SYNTAX		INTEGER {
+				noCode(1),
+				lineCode(2),
+				payloadCode(3),
+				resetCode(4),
+				testCode(5),
+				unframedAllOnes(6)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the line code being tranmitted.  The object 
+		 can have values:
+		 
+		 - noCode(1), no code is being tranmitted: normal or 
+		   loopback data is being transmitted if the 
+		   transmitters are enabled;
+
+		 - lineCode(2), the loop-up line code is being 
+		   transmitted;
+
+		 - payloadCode(3), the loop-up payload code is being 
+		   transmitted;
+
+		 - resetCode(4), the loop-down code is being 
+		   transmitted;
+
+		 - testCode(5), a BERT code or test pattern is being 
+		   transmitted;
+
+		 - unframedAllOnes(6), unframed All ones is being 
+		   transmitted.
+
+		 The linkCode(2), payloadCode(3) and resetCode(4) 
+		 settings will only persist for 5 seconds.  Other 
+		 settings will persist until reset."
+	DEFVAL		{ 1 } -- noCode(1)
+	::= { mxSpanEntry 24 }
+
+mxSpanAlarmSeverityMappingProfile OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the name of an alarm severity mapping profile 
+		 to be used when generating alarm notifications.  When 
+		 this is the null string, or when a mapping does not 
+		 exist, the default values will be used."
+	DEFVAL		{ ''X }
+	::= { mxSpanEntry 25 }
+
+mxSpanAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the administrative state of the span in 
+		 accordance with the AdministrativeState textual 
+		 convetion of the OPENSS7-TMN-TC module in accordance 
+		 with ITU-T Rec. X.721 | ISO/IEC 10165-2 attribute 
+		 administrativeState.
+
+		 When locked(0), the span is administratively prohibited 
+		 from providing service.  When unlocked(1) the span is 
+		 administratively permitted to provide service.  When 
+		 shuttingDown(2), the span may provide service to 
+		 existing users by will not provider service to new 
+		 users.  Once all current users have released the span, 
+		 the administrative state will transition from 
+		 shuttingDown(2) to locked(0)."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 administrativeState."
+	DEFVAL		{ 1 } -- locked(1)
+	::= { mxSpanEntry 26 }
+
+mxSpanOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the operational state of the span following 
+		 the OperationalState textual convention of the 
+		 OPENSS7-TMN-TC module in accordance with ITU-T Rec. 
+		 X.721 | ISO/IEC 10165-2.
+		 
+		 The operational state is one of:
+		 
+		 - disabled(0), the span is totally inoperable and 
+		   unable to provide service to users;
+
+		 - enabled(1), the span is partially or fully operable 
+		   and available for use."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 operationalState."
+	::= { mxSpanEntry 27 }
+
+mxSpanUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the usage state of the span following the 
+		 UsageState textual convention of the OPENSS7-TMN-TC 
+		 module in accordance with ITU-T Rec. X.721 | ISO/IEC 
+		 10165-2.
+		 
+		 The usage is one of:
+		 
+		 - idle(0), the span is not currently in use;
+
+		 - active(1), the span is in use and has sufficient 
+		   operating capacity to provide for additional users 
+		   simultanteously (e.g. some channels are available);
+
+		 - busy(2), the span is in use and has no spare capacity 
+		   (i.e. all channels are in use).
+
+		 If the driver does not support the independent use of 
+		 channels, only the values idle(0) and busy(2) are 
+		 returned."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 usageState."
+	::= { mxSpanEntry 28 }
+
+mxSpanAlarmStatus OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the alarm status of the span in accordance 
+		 with the AlarmStatus textual convention of the 
+		 OPENSS7-TMN-TC module in accordance with the 
+		 alarmStatus attribute of ITU-T Rec. X.721 | ISO/IEC 
+		 10165-2.
+		 
+		 This attribute is set-valued and can contain zero or 
+		 more of the following:
+		 
+		 - underRepair(0), specifies that the span is currently 
+		   being repaired.
+		 
+		 - critical(1), one or more critical alarms indicating a 
+		   fault have been detected and have not been cleared.
+		 
+		 - major(2), one or more major alarms indicating a fault 
+		   have been detected and have not been cleared.
+		 
+		 - minor(3), one or more minor alarms indicating a fault 
+		   have beem detected and have not been cleared.
+		 
+		 - alarmOutstanding(4), one or more alarms have been 
+		   detected, the condition of which may or may not be 
+		   disabling.
+
+		 The presence or absence of an alarm state condition 
+		 does not affect the generation of future fault related 
+		 notifications.  Only underRepair(0) may be added to the 
+		 set by management stations.  The remaining alarm 
+		 statuses can only be removed from the set by management 
+		 stations and has the effect of a manual clearing 
+		 action, particularly for those alarm conditions that do 
+		 not have clearing events."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 alarmStatus."
+	DEFVAL		{ '00000'B }
+	::= { mxSpanEntry 29 }
+
+mxSpanProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the procedural status of the span following 
+		 the ProceduralStatus textual convention of the 
+		 OPENSS7-TMN-TC module in accordance with the 
+		 proceduralStatus attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+		 
+		 The procedural status is set-valued and may contain the 
+		 following:
+		 
+		 - initializationRequired(0), the span requires 
+		   initialization by the management station before it 
+		   can perform normal functions and this procedure has 
+		   not been initiated.  The operational state is 
+		   disabled.
+		 
+		 - notInitialized(1), the span requires initialization 
+		   before it can perform its normal functions and this 
+		   procedure has not been initiated.  The span 
+		   initializes itself autonomously.  The operational 
+		   state is disabled.
+		 
+		 - initializing(2), the span requires initialization 
+		   before it can perform its normal functions and this 
+		   procedure has been initiated but is not yet complete.  
+		   When this condition is present, the initialization 
+		   requried condition is absent.  The operational state 
+		   is disabled.
+		 
+		 - reporting(3), the span is reporting the results of a 
+		   procedure.  This condition is not applicable.
+		 
+		 - terminating(4), the span is in a termination phase.  
+		   If the resource does not initialize itself 
+		   autonomously, the initialization required condition 
+		   is also present and operational state is disabled."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 proceduralStatus."
+	::= { mxSpanEntry 30 }
+
+mxSpanAvailabilityStatus OBJECT-TYPE
+	SYNTAX		AvailabilityStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the availability status of the span following 
+		 the AvailabilityStatus textual convention of the 
+		 OPENSS7-TMN-TC module in accordance with the 
+		 availabilityStatus attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+
+		 This attribute is set-valued and may contain the 
+		 following:
+
+		 - inTest(0), the span is undergoing a test procedure.  
+		   If the administrative state is locked or shutting 
+		   down then normal users are precluded from using the 
+		   resource and the control status attribute has the 
+		   value reservedForTest(2).  Tests that do not exclude 
+		   additional uses can be present in any operational or 
+		   administrative state but the reservedForTest(2) 
+		   condition should not be present.  This condition is 
+		   present when the span is in one of the loopback or 
+		   test modes.
+
+		 - failed(1), the span has an internal fault that 
+		   prevents it from operating (e.g. blue alarm).  The 
+		   operational state is disabled.
+
+		 - powerOff(2), the resource requires power to be 
+		   applied and is not powered on.  For example, a fuse 
+		   or other protection devices is known to have removed 
+		   power or a low voltage condition has been detected.  
+		   The operational state is disabled.
+
+		 - offLine(3), the resource requires a routine operation 
+		   to be performed to place it online and make it 
+		   available for use.  The operation may be manual or 
+		   automatic, or both.  The operational state is 
+		   disabled.
+
+		 - offDuty(4), the resource has been made inactive by an 
+		   internal control process in accordance with a 
+		   predetermined time schedule.  Under normal conditions 
+		   the control process can be expected to reactivate the 
+		   resource at some scheduled time.  The operational 
+		   state is enabled or disabled.
+
+		 - dependency(5), the resource cannot operate because of 
+		   some other resource on which it depends is 
+		   unavailable (e.g. the card is not operational).  The 
+		   operational state is disabled.
+
+		 - degraded(6), the service available from the resource 
+		   is degraded in some respect, such as in speed or 
+		   operating capacity.  However, the resource remains 
+		   available for service, either because some services 
+		   are satisfactory or because degraded service is 
+		   preferrable to no service at all.  This is the cause 
+		   for yellow and red alarm conditions on the carrier.  
+		   The operational state is enabled.
+
+		 - notInstalled(7), the resource represented is not 
+		   present, or is incomplete.  For example, a card is 
+		   missing or a span is not provided by a card.
+
+		 - logFull(8), indicate a log full condition.  This 
+		   is not applicable to spans."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 availabilityStatus."
+	::= { mxSpanEntry 31 }
+
+mxSpanControlStatus OBJECT-TYPE
+	SYNTAX		ControlStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the control status of the span following the 
+		 ControlStatus textual convention of the OPENSS7-TMN-TC 
+		 module in accordance with the controlStatus attribute 
+		 of ITU-T Rec. X.721 | ISO/IEC 10165-2.
+		 
+		 This attribute is set-valued and may contain the 
+		 following:
+
+		 - subjectToTest(0), the span is available for use but 
+		   may be subject to test at unpredictable times and may 
+		   cause it to exhibit unusual characteristics to users; 
+		   the adminitrative state is unlocked(1).
+
+		 - partOfServicesLocked(1), although the administrative 
+		   is unlocked(1), some part of the service is locked 
+		   (such as specific channels).
+
+		 - reservedForTest(2), the span is unavailable to normal 
+		   users because it is undergoing a test procedure; the 
+		   administrative state is locked(0).
+
+		 - suspended(3), service has been administratively 
+		   suspsended to users of the resource and does not 
+		   resume performing services until the suspended 
+		   condition is revoked; the administrative state is 
+		   unlocked(1).
+		 "
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 controlStatus."
+	DEFVAL		{ '0000'B } -- empty set
+	::= { mxSpanEntry 32 }
+
+mxSpanStandbyStatus OBJECT-TYPE
+	SYNTAX		StandbyStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the standby status of the span following the 
+		 StandbyStatus textual convention of the OPENSS7-TMN-TC 
+		 module in accordance with the standbyStatus attribute of 
+		 ITU-T Rec. X.721 | ISO/IEC 10165-2.
+		 
+		 The standby state may be one of the following:
+		 
+		 - hotStandby(0), the card is synchronizing with the 
+		   receive stream but is not providing service (i.e. the 
+		   transmitters are off.  Writing this value for a 
+		   backup span results in the span assuming a hot 
+		   standby role.
+		 
+		 - coldStandby(1), the card has both receiver and 
+		   transmitters off.  Writing this value for a backup 
+		   span results in the span assuming a cold standby 
+		   role.
+		 
+		 - providingService(2), the card responsible for 
+		   providing service as a back-up, or is a primary or 
+		   solitary resource.  This value cannot be written.
+
+		 This value cannot be written for primary or solitary 
+		 spans.  For backup spans, any value may be written, 
+		 but the value read reflects the current state of the 
+		 backup span.
+
+		 The value will transition from the hotStandby(0) or 
+		 coldStandby(1) value to the providingService(2) value 
+		 should the primary span to which this span is a backup 
+		 experiences a disabling fault condition or is otherwise 
+		 disabled by a management station."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 standbyStatus."
+	DEFVAL		{ 2 } -- providingService(2)
+	::= { mxSpanEntry 33 }
+
+mxSpanUnknownStatus OBJECT-TYPE
+	SYNTAX		UnknownStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates whether the state of the span is known or 
+		 unknown.  When set to true(1), the value of the other 
+		 TMN state and status textual conventions may not 
+		 reflect the actual state of the span.  When set to 
+		 false(0), the value of the other TMN state and status 
+		 textual conventions reflects the actual state of the 
+		 span."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 unknownStatus."
+	::= { mxSpanEntry 34 }
+
+mxSpanSap OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the name of the service access point that 
+		 represents the user of the entire span.   When the 
+		 value is the null string, it indicates that there is no 
+		 user of the entire span."
+	::= { mxSpanEntry 35 }
+
+mxSpanLoopbackStatus OBJECT-TYPE
+	SYNTAX		BITS {
+				nearEndInwardLoopback(0),
+				nearEndLineLoopback(1),
+				nearEndFramerLoopback(2),
+				nearEndPayloadLoopback(3),
+				farEndLineLoopback(4),
+				farEndPayloadLoopback(5)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the current (versus the desired) loopback 
+		 status of the span.  This object may contain the 
+		 following values:
+
+		 - nearEndInwardLoopback(0), payload bits for 
+		   transmission overwrite the receive payload bits;
+
+		 - nearEndLineLoopback(1), the received serial bit 
+		   stream is copied to the transmit serial bit 
+		   stream;
+
+		 - nearEndFramerLoopback(2), the transmit serial bit 
+		   stream is copied to the receive serial bit stream;
+
+		 - nearEndPayloadLoopback(3), the received payload bits 
+		   overwrite the transmit payload bits;
+
+		 - farEndLineLoopback(4), the far end is in line 
+		   loopback;
+
+		 - farEndPayloadLoopback(5), the far end is in payload 
+		   loopback.
+		 
+		 When the object contains no values, the loopback status 
+		 is either unknown or no loopback is present.  The two 
+		 conditions can be distinguished using the 
+		 mxSpanUnknownStatus object in the same row."
+	::= { mxSpanEntry 36 }
+
+mxSpanLineStatus OBJECT-TYPE
+	SYNTAX		BITS {
+				none(0),
+				rcvFarEndLOF(1),
+				xmtFarEndLOF(2),
+				rcvAIS(3),
+				xmtAIS(4),
+				lossOfFrame(5),
+				lossOfSignal(6),
+				loopbackState(7),
+				t16AIS(8),
+				rcvFarEndLOMF(9),
+				xmtFarEndLOMF(10),
+				rcvTestCode(11),
+				otherFailure(12),
+				uavailSigState(13),
+				netEquipOOS(14),
+				rcvPayloadAIS(15),
+				perfThreshold(16)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { mxSpanEntry 37 }
+
+mxSpanAlarms OBJECT-TYPE
+	SYNTAX		BITS {
+				yellow(0),
+				red(1),
+				blue(2),
+				recovery(3)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the current span alarms.  The may contain:
+
+		 - yellow(0), a yellow alarm (T1/J1) or RAI (E1) 
+		   condition exists, present while a received yellow 
+		   alarm or RAI condition perists;
+
+		 - red(1), a red alarm condition exists, present while a 
+		   receive loss of sync or receive carrier loss 
+		   condition persists;
+
+		 - blue(2), a blue alarm (T1/J1) or AIS (E1) condition 
+		   exists, present while a received unframed all-ones 
+		   condition persists;
+
+		 - recovery(3), after a read or blue/AIS alarm condition 
+		   has cleared, the driver waits for an alarm recovery 
+		   period (mxSpanAlarmSettleTime) before clearing the 
+		   sending of yellow alarm (T1/J1) or RAI condition 
+		   (E1), present after the red or blue/AIS alarms clear 
+		   while waiting for the alarm recovery period."
+	::= { mxSpanEntry 38 }
+
+mxSpanEvents OBJECT-TYPE
+	SYNTAX		BITS {
+				rlos(0),
+				frcl(1),
+				rual(2),
+				ryel(3),
+				rra(4),
+				rdma(5),
+				v52lnk(6),
+				lorc(7),
+				lotc(8),
+				lup(9),
+				ldn(10),
+				lspare(11),
+				tocd(12),
+				tcle(13)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the current span detected events.  This may 
+		 contain the following:
+
+		 - rlos(0), receiver loss of synchronization, present 
+		   while the framer is not synchronized to the receive 
+		   data stream;
+
+		 - frcl(1), framer receive carrier loss, present when a 
+		   frame (or second) of consecutive zeros has been 
+		   detected;
+
+		 - rua1(2), receive unframed all ones, T1 blue alarm, E1 
+		   AIS, present when an unframed all one's code is 
+		   received;
+
+		 - ryel(3), receive yellow alarm condition, T1 yellow 
+		   alarm, present when a yellow alarm is received;
+
+		 - rra(4), receive remote alarm condition, E1 only, 
+		   present when a remote alarm is received.
+
+		 - rdma(5), receive distant multiframe alarm condition, 
+		   E1 only, present when bit 6 of time slot 16 in frame 
+		   0 has been set for two consecutive mutliframes.
+
+		 - v52lnk(6), V5.2 link detected condition, E1 only, 
+		   present on detection of a V5.2 link identification 
+		   signal (G.965).
+
+		 - lorc(7), loss of receive clock condition, present 
+		   when the receive clock has not transitioned fro on 
+		   channel time.
+
+		 - lotc(8), loss of transmit clock condition, present 
+		   when the TCLK pin has not transitioned for one 
+		   channel time.
+
+		 - lup(9), loop-up code detected condition, T1 only, 
+		   present when the loop-up code is being received.
+
+		 - ldn(10), loop-down code detected condition, T1 only, 
+		   present when the loop-down code is being received.
+
+		 - lspare(11), spare code detected condition, T1 only, 
+		   present when the spare code is being received.
+
+		 - tocd(12), transmit open circuit detected, present 
+		   when an open circuit on the transmit leads is 
+		   detected.
+
+		 - tcle(13), transmit current limite exceeded, present 
+		   when the 50mA short circuit current limiter is in 
+		   effect.
+		
+		 Note that some of these conditions are only applicable 
+		 to T1 operation and some are only applicable to E1 
+		 operation.  Not all devices will report all conditions.  
+		 Some conditions may also cause alarm conditions and 
+		 notifications."
+	::= { mxSpanEntry 39 }
+
+mxSpanReceiveLevel OBJECT-TYPE
+	SYNTAX		INTEGER (0..600)
+	UNITS		"negative tenths of a decibel"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the receive level in increments of -0.1 dB.  
+		 The level indicated is only within the range detected 
+		 by the device."
+	::= { mxSpanEntry 40 }
+
+mxSpanReceiveThreshold OBJECT-TYPE
+	SYNTAX		INTEGER (0..600)
+	UNITS		"negative tenths of a decibel"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies or indicates the lowest receive level 
+		 threshold in increments of -0.1 dB.  The level 
+		 indicated by the mxSpanReceiveLevel is only within the 
+		 range from 0 to this value.  When this value returns 
+		 zero (0), the device is incapable of providing the 
+		 receive level."
+	::= { mxSpanEntry 41 }
+
+mxSpanRowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations may 
+		 create or delete rows in this table."
+	::= { mxSpanEntry 42 }
+
+
+-- =====================================================================
+
+mxChanTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF MxChanEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The MX channel table provides an entry for each of the 
+		 channels for each span in the system."
+	::= { mxChan 1 }
+
+mxChanEntry OBJECT-TYPE
+	SYNTAX		MxChanEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Rows are neither created nor deleted explicitly by 
+		 management stations but are present inherently as a 
+		 part of system operation.  Each entry in the table 
+		 corresponds to a channel of an equipped span."
+	INDEX	{
+			mxSpanIndex, -- shared index
+			mxChanIndex -- index
+		}
+	::= { mxChanTable 1 }
+
+MxChanEntry ::=
+	SEQUENCE {
+		mxChanIndex
+			INTEGER,
+		mxChanType
+			INTEGER,
+		mxChanRate
+			INTEGER,
+		mxChanMode
+			BITS,
+		mxChanAdministrativeState
+			AdministrativeState,
+		mxChanUsageState
+			UsageState,
+		mxChanAvailabilityStatus
+			AvailabilityStatus,
+		mxChanControlStatus
+			ControlStatus,
+		mxChanSap
+			SimpleNameType
+	}
+
+mxChanIndex OBJECT-TYPE
+	SYNTAX		INTEGER (1..31)
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION
+		"Provides a time slot index for the channel.  For T1 and 
+		 J1 spans, the time slots 1..24 index the corresponding  
+		 time slot in the span.  For E1 spans, the time slot 
+		 indices 1..31 index the corresponding time slot in the  
+		 span.
+
+		 For E1 operation, TS0 is unusable and does not appear 
+		 in this table.  For E1 CAS operation, TS16 is not 
+		 available to users for payload but continues to appear 
+		 in this table."
+	::= { mxChanEntry 1 }
+
+mxChanType OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				cas(1),
+				ccs(2)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether the channel has channel associated 
+		 signalling or common channel signalling.  For T1 or J1 
+		 spans, channel associated signalling implies 56kbps 
+		 DS0A operation within the channel; otherwise, 64kbps 
+		 DS0 operation within the channel is indicated.  The 
+		 default is ccs(1).  For E1 CAS operation, channel 17 
+		 (timeslot 16) is unavailable for use."
+	DEFVAL		{ 2 } -- ccs(2)
+	::= { mxChanEntry 2 }
+
+mxChanRate OBJECT-TYPE
+	SYNTAX		INTEGER  (56|64)
+	UNITS		"kilobits per second"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Indicates the bit rate of the channel.  Channels 1..24 
+		 for T1 and J1 can be 56 or 64 kbps.  Channels 1..31 for 
+		 E1 are 64 kbps but can be placed into 56 kbps mode.  
+		 The default is 64kbps for E1 and T1 ccs(3) channels; 
+		 56kbps for T1 cas(2) channels."
+	::= { mxChanEntry 3 }
+
+mxChanMode OBJECT-TYPE
+	SYNTAX		BITS {
+				remoteLoopback(0),
+				localLoopback(1),
+				test(2)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the channel mode.  The value may contain:
+
+		 - remoteLoopback(0), the receive data in the channel is 
+		   looped back to replace the transmit data for the 
+		   channel.  This may either be accomplished within the 
+		   host or using the per-channel loopback capability of 
+		   the chip sets.
+
+		 - localLoopback(1), the transmit data for the channel 
+		   is looped back to replace the receive data for the 
+		   channel.  This may is accomplished within the host.
+
+		 - test(2), the channel is marked for BERT testing.  
+		   When BERT testing for the span is enabled on a 
+		   channel basis, this channel will be included in the 
+		   channels upon which the BERT test pattern is 
+		   transmitted.
+
+		 Because these tests are disruptive, no value can be 
+		 added to this set unless the channel has a control 
+		 status of subjectToTest(0) or reservedForTest(2)."
+	::= { mxChanEntry 4 }
+
+mxChanAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the administrative state of the channel 
+		 following the AdministrativeState textual convention of 
+		 the OPENSS7-TMN-TC module in accordance with the 
+		 administrativeState attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+		 
+		 The administrative state may be one of the following:
+		 
+		 - locked(0), the channel is administratively prohibited 
+		   from providing service to users;
+
+		 - unlocked(1), the channel is administratively 
+		   permitted to provider service to users;
+
+		 - shuttingDown(2), the channel will continue to provide 
+		   service to existing users but will reject new users: 
+		   once there are no more users of the channel, the 
+		   channel will move to the locked state."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 administrativeState."
+	DEFVAL		{ 0 } -- locked(0)
+	::= { mxChanEntry 5 }
+
+mxChanUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the usage state of the channel following the 
+		 UsageState textual convention of the OPENSS7-TMN-TC 
+		 module in accordance with the usageState attribute of 
+		 ITU-T Rec. X.721 | ISO/IEC 10165-2.
+		 
+		 The usage state is one of:
+
+		 - idle(0), the channel is not currently in use;
+
+		 - active(1), the channel is in use and has sufficient 
+		   operating capacity to provide for additional users 
+		   simultaneously (e.g. a half-channel is used);
+
+		 - busy(2), the channel is in use and has no spare 
+		   capacity (i.e. the full channel is in use).
+		   
+		 If partial channels are not supportted, only the values 
+		 idle(0) and busy(2) are returned."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 usageState."
+	::= { mxChanEntry 6 }
+
+mxChanAvailabilityStatus OBJECT-TYPE
+	SYNTAX		AvailabilityStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the availability status of the channel 
+		 following the AvailabilityStatus textual convention of 
+		 the OPENSS7-TMN-TC module in accordance with the 
+		 availabilityStatus attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+		 
+		 The availability status is set-valued and may contain 
+		 the following:
+		 
+		 - inTest(0), the channel is undergoing a test 
+		   procedure.  The administrative state is locked(0) and 
+		   the operational state is disabled(1).  This condition 
+		   exists while the span is in test in a manner 
+		   diruptive to the channel, or when the channel is in 
+		   loopback or test mode.
+		 
+		 - failed(1), the channel has an internal fault that 
+		   prevents it from operating.  The operational state is 
+		   disabled.  This value is present when the same value 
+		   is present in the span availability status.
+		 
+		 - powerOff(2), the channel requires power to be applied 
+		   and is not powered on.  For example, power 
+		   managements may have removed power from the device.  
+		   This value is present when the same value is present 
+		   in the span availability status.
+		 
+		 - offLine(3), the channel requires a routing operation to 
+		   be performed to place it online an make it available 
+		   for use.  The operation may be manual or automatic, 
+		   or both.  The operational state is disabled.  This 
+		   value is present when the same value is present in 
+		   the span availability status.
+		 
+		 - offDuty(4), the channel has been made inactve by an 
+		   internal control process in accordance with a 
+		   predetermined time schedule.  Under normal 
+		   conditions, the control process can be expected to 
+		   reactivate the channel at some scheduled time.
+		 
+		 - dependency(5), the channel cannot operate because some 
+		   other resource on which it depends is unavailable 
+		   (e.g. the span).
+		 
+		 - degraded(6), the channel is operating with degraded 
+		   performance.  This value is present when the same 
+		   value is present in the span availability status.
+		 
+		 - notInstalled(7), the channel is not present in the 
+		   system or is incomplete.
+		 
+		 - logFull(8), not used."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 availablityStatus."
+	::= { mxChanEntry 7 }
+
+mxChanControlStatus OBJECT-TYPE
+	SYNTAX		ControlStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies the control status of the channel following 
+		 the ControlStatus textual convention of the 
+		 OPENSS7-TMN-TC module in accordance with the 
+		 controlStatus attribute of ITU-T Rec. X.721 | ISO/IEC 
+		 10165-2.
+
+		 The control status is set-valued and may contain:
+
+		 - subjectToTest(0), the channel is available to normal 
+		   users but tests may be conducted on it simultaneously 
+		   at unpredicatble times, which may cause it to exhibit 
+		   unusual characteristics to users.
+
+		 - partOfServicesLocked(1), when present, a manager has 
+		   administratively locked some part of the channel.
+
+		 - reservedForTest(2), when present, the channel is 
+		   undergoing a test procedures and is unavailable to 
+		   users.
+
+		 - suspended(3), when present, service has been 
+		   administratively suspended to users."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 controlStatus."
+	DEFVAL		{ '0000'B } -- empty set
+	::= { mxChanEntry 8 }
+
+mxChanSap OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the name of the service access point that 
+		 represents the user of the channel.  WHen the value is 
+		 the null string, it indicates that there is no user of 
+		 the channel."
+	::= { mxChanEntry 9 }
+
+
+-- =====================================================================
+
+mxXconTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF MxXconEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The MX cross-connect table provides a 1-1 and 0-0 cross 
+		 connect capability."
+	::= { mxXcon 1 }
+
+mxXconEntry OBJECT-TYPE
+	SYNTAX		MxXconEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Each entry in the MX cross-connect table describes 
+		 either a 1-1 cross-connect or a 0-0 cross-connect.  
+		 When the channel indices are both zero, the entry 
+		 describes a 1-1 cross-connect; when both non-zero, a 
+		 0-0 cross-connect.  When the both span and both channel 
+		 indices are the same, the entry describes either a 1-1 
+		 loopback or a 0-0 loopback.
+		 
+		 Entries in the table can be created and deleted by 
+		 management stations.  Entries may also be created or 
+		 delete autonomously as a part of system operation.  
+		 Management stations may only create and delete entries 
+		 that correspond to permanent or semi-permanent 
+		 connections.  As a part of system operation, permanent, 
+		 semi-permanent, or switched connections may be created 
+		 or deleted autonomously.
+		 
+		 Entries created or deleted by management stations 
+		 typically survive an agent and system reboot, however, 
+		 the storage type can be used to alter this behaviour."
+	INDEX	{
+			mxSpanIndex, -- shared index
+			mxChanIndex, -- shared index
+			mxSpanIndex, -- shared index
+			mxChanIndex -- shared index
+		}
+	::= { mxXconTable 1 }
+
+MxXconEntry ::=
+	SEQUENCE {
+		mxXconType
+			INTEGER,
+		mxXconStorageType
+			StorageType,
+		mxXconRowStatus
+			RowStatus
+	}
+
+mxXconType OBJECT-TYPE
+	SYNTAX		INTEGER {
+				switched(1),
+				semiPermanent(2),
+				permanent(3)
+			}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies and indicates the type of connection.  The 
+		 value may be one of:
+
+		 - switched(1), connection is a switch connection;
+
+		 - semiPermanent(2), connection is a semi-permanent 
+		   connection;
+
+		 - permanent(3), connection is a permanent connection.
+
+		 Switched connections cannot be created by management 
+		 stations (but the agent may support management station 
+		 deletion of switch connections).  Management stations 
+		 may create and delete semi-permanent and permanent 
+		 connections."
+	DEFVAL		{ 3 } -- permanent(3)
+	::= { mxXconEntry 1 }
+
+mxXconStorageType OBJECT-TYPE
+	SYNTAX		StorageType
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the memory realization of a conceptual row.  
+		 Possible values are:
+		 
+		 - volatile(2), the row is lost upon reboot, applicable 
+		   to switched, semi-permanent and permanent 
+		   connections;
+		   
+		 - nonVolatile(3), the row is not lost upon reboot, 
+		   applicable to semi-permanent and permanent 
+		   connections."
+	DEFVAL		{ 3 } -- nonVolatile(3)
+	::= { mxXconEntry 2 }
+
+mxXconRowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations can 
+		 explicitly create and delete rows in this table.  
+		 Management stations cannot explicitly create a switched 
+		 connection type but may explicitly delete all 
+		 connection types.  Rows may be created or deleted 
+		 implicitly as a part of system operations.  Rows cannot 
+		 be created that would form a connection to a span and 
+		 channel which is already engaged in another connection, 
+		 the other connection must first be deleted.  Rows may 
+		 not be taken out of service."
+	DEFVAL		{ 1 } -- active(1)
+	::= { mxXconEntry 3 }
+
+
+-- =====================================================================
+
+mxBertTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF MxBertEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { mxBert 1 }
+
+mxBertEntry OBJECT-TYPE
+	SYNTAX		MxBertEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	INDEX	{
+			mxSpanIndex -- shared index
+		}
+	::= { mxBertTable 1 }
+
+MxBertEntry ::=
+	SEQUENCE {
+		mxBertMode
+			INTEGER,
+		mxBertSelect
+			INTEGER,
+		mxBertPattern
+			OCTET STRING,
+		mxBertOperationalState
+			OperationalState,
+		mxBertProceduralStatus
+			ProceduralStatus,
+		mxBertBitCount
+			Counter32,
+		mxBertErrorCount
+			Counter32
+	}
+
+mxBertMode OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				span(1),
+				channel(2),
+				fbit(3)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the BERT testing for the span on span types 
+		 and span equipment that supports the selected BERT 
+		 testing.  This object can have one of the following 
+		 values:
+
+		 - none(0), no testing will be performed;
+
+		 - span(1), BERT testing will be peformed on the entire 
+		   span;
+
+		 - channel(2), BERT testing will be performed on the 
+		   channels that have been marked for test;
+
+		 - fbit(3), testing will be performed using the F-bit.
+
+		 The value fbit(3) can only be set for T1 or J1 mode 
+		 spans with supporting span equipment.  To set span(1), 
+		 because it disrupts the entire span, the span must be 
+		 idle.  To set channel(2), because it distrupts the 
+		 selected channels, selected channels must be idle.
+		 
+		 Not all values are supported by all spans, and not all 
+		 values are supported by all span equipment."
+	DEFVAL		{ 0 } -- none
+	::= { mxBertEntry 1 }
+
+mxBertSelect OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				pre2E7minus1(1),
+				pre2E9minus1(2),
+				pre2E11minus1(3),
+				pre2E15minus1(4),
+				qrss(5),
+				daly(6),
+				repeating(7),
+				alternating(8)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the BERT test pattern selected.  The value 
+		 can be one of:
+
+		 - none(0), the test pattern selected is unknown or 
+		   unspecified;
+
+		 - pre2E7minus1(1), a pseudorandom 127-bit pattern;
+
+		 - pre2E9minus1(2), a pseudorandom 511-bit pattern.
+
+		 - pre2E11minus1(3), a pseudorandom 2047-bit pattern;
+
+		 - pre2E15minus1(4), a pesudorandom 16383-bit pattern;
+
+		 - qrss(5), a pseudorandom QRSS 1048575-bit pattern;
+
+		 - daly(6), a 55-octet (440-bit) daly (ATIS T1.TR25) 
+		   pattern;
+
+		 - repeating(7), a repeating bit pattern between one and 
+		   32 bits long;
+
+		 - alternating(8), an alternating word pattern with 1 to 
+		   255 repetitions of one 16-bit word followed by the 
+		   same number of repetitions of a second 16-bit word.
+
+		 Not all values are supported by all span types and not 
+		 all values are supported by all span equipment."
+	DEFVAL		{ 0 } -- none(0)
+	::= { mxBertEntry 2 }
+
+mxBertPattern OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the BERT pattern to use when the BERT test 
+		 pattern selected is repeating(7) or alternating(8).  
+
+		 When the BERT test pattern selected is repeating(7), 
+		 the first octet provides the bit length of the pattern 
+		 (1..32) and the remaining octets provide the bit 
+		 pattern itself beginning with the first bit of the 
+		 first octet.  The first octet will be treated modulo 
+		 32, with zero (0) mapping to 32, should the value be 
+		 outside the valid range (1..32).  For example, the 
+		 value 129 will be treated as the length 1.  Bits 
+		 specified beyond the number of bits indicated by the 
+		 bit length are ignored.
+		 
+		 When the BERT test pattern selected is alternating(8), 
+		 the first octet provides the number of times to repeat 
+		 each word (1..255), the second and third octets 
+		 provides the first word to alternate, and the fourth 
+		 and fifth octets provides the second word to alternate.
+		 
+		 Note that this value is of no significance when the 
+		 BERT pattern selected is other than repeating(7) or 
+		 alternating(8)."
+	DEFVAL		{ '10FFFFFFFF'X }
+	::= { mxBertEntry 3 }
+
+mxBertOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the operational state of the test following 
+		 the OperationalState textual convention of the 
+		 OPENSS7-TMN-TC module in accordance with the 
+		 operationalState attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+		 
+		 The operational state is one of:
+
+		 - disabled(0), the test is unable to provide service to 
+		   users;
+
+		 - enabled(1), it is partially or fully operable and 
+		   available for use."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 operationalState."
+	::= { mxBertEntry 4 }
+
+mxBertProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the procedure status of BERT testing 
+		 following the ProceduralStatus textual convention of 
+		 the OPENSS7-TMN-TC module in accordance with the 
+		 proceduralStatus attribute of ITU-T Rec. X.721 | 
+		 ISO/IEC 10165-2.
+
+		 The procedural status is set-valued and may contain the 
+		 following:
+
+		 - initializationRequired(0), the test requires 
+		   initialization by the management station before it 
+		   can perform test functions and this procedure has 
+		   not been initiated.  The operational state of the 
+		   test is disabled.
+		 
+		 - notInitialized(1), the test requires initialization 
+		   before it can perform its test functions and this 
+		   procedure has not been initiated.  The test 
+		   initializes itself autonomously.  The operational 
+		   state of the test is disabled.
+		 
+		 - initializing(2), the test requires initialization 
+		   before it can perform its test functions and this 
+		   procedure has been initiated but is not yet complete.  
+		   When this condition is present, the initialization 
+		   required condition is absent.  The operational state 
+		   of the test is disabled.
+		 
+		 - reporting(3), the test is reporting the results of a 
+		   procedure.  The results counts are valid while this 
+		   value is present.
+		 
+		 - terminating(4), the test is in a termination phase.  
+		   If the test does not initialize itself autonomously, 
+		   the initialization required condition is also present 
+		   and operational state of the test is disabled."
+	REFERENCE
+		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
+		 proceduralStatus."
+	::= { mxBertEntry 5 }
+
+mxBertBitCount OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of bits tested.  At a 
+		 minimum, this counter will wrap every 30 minutes.  This 
+		 counter only increments while the BERT receiver is 
+		 synchronized on the test pattern."
+	::= { mxBertEntry 6 }
+
+mxBertErrorCount OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the count of the number of bits in error.  At 
+		 a minimum, this counter will wrap every 30 minutes.  
+		 This counter only increments while the BERT receiver is 
+		 synchronized on the test pattern."
+	::= { mxBertEntry 7 }
+
+-- =====================================================================
+
+mxNearEndCurrentTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF MxNearEndCurrentEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { mxNearEndCurrent 1 }
+
+mxNearEndCurrentEntry OBJECT-TYPE
+	SYNTAX		MxNearEndCurrentEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	INDEX	{
+			mxSpanIndex -- shared index
+		}
+	::= { mxNearEndCurrentTable 1 }
+
+MxNearEndCurrentEntry ::=
+	SEQUENCE {
+		mxNearEndCurrentTimeElapsed
+			INTEGER,
+		mxNearEndCurrentESs
+			PerfCurrentCount,
+		mxNearEndCurrentSESs
+			PerfCurrentCount,
+		mxNearEndCurrentSEFSs
+			PerfCurrentCount,
+		mxNearEndCurrentUASs
+			PerfCurrentCount,
+		mxNearEndCurrentCSSs
+			PerfCurrentCount,
+		mxNearEndCurrentPCVs
+			PerfCurrentCount,
+		mxNearEndCurrentLESs
+			PerfCurrentCount,
+		mxNearEndCurrentBESs
+			PerfCurrentCount,
+		mxNearEndCurrentDMs
+			PerfCurrentCount,
+		mxNearEndCurrentLCVs
+			PerfCurrentCount
+	}
+
+mxNearEndCurrentTimeElapsed OBJECT-TYPE
+	SYNTAX		INTEGER (0..899)
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of seconds that have elapsed in the current 
+		 measurement period."
+	::= { mxNearEndCurrentEntry 1 }
+
+mxNearEndCurrentESs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Errored Seconds (ESs) in the current 
+		 interval.  An Errored Second has one or more Path Code 
+		 Violations, one or more Out of Frame defects, one or 
+		 more Controlled Slip events, or a detected Alarm 
+		 Indication Signal (AIS) defect."
+	::= { mxNearEndCurrentEntry 2 }
+
+mxNearEndCurrentSESs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Severely Errored Seconds (SESs) in the 
+		 current interval.  A Severely Errored Second ...."
+	::= { mxNearEndCurrentEntry 3 }
+
+mxNearEndCurrentSEFSs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Severely Errored Framing Seconds (SEFSs) 
+		 in the current interval.  A Severely Errored Frame 
+		 Second has one or more Out of Frame defects or a 
+		 detected AIS defect."
+	::= { mxNearEndCurrentEntry 4 }
+
+mxNearEndCurrentUASs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Unavailable Seconds (UASs) in the current 
+		 interval."
+	::= { mxNearEndCurrentEntry 5 }
+
+mxNearEndCurrentCSSs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Controlled Slip Seconds (CSSs) in the 
+		 current interval."
+	::= { mxNearEndCurrentEntry 6 }
+
+mxNearEndCurrentPCVs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"violations"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Path Coding Violations (PCVs) in the 
+		 current interval.  A Path Coding Violation is a frame 
+		 syncrhonization bit error in the D4 and E1 no-CRC4 
+		 formats, or a CRC or frame syncrhonization bit error in 
+		 the ESF and E1 CRC4 formats."
+	::= { mxNearEndCurrentEntry 7 }
+
+mxNearEndCurrentLESs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Line Errored Seconds (LESs) in the 
+		 current interval.  A Line Errored Second is a second in 
+		 which one or more Line Code Violation error events are 
+		 detected."
+	::= { mxNearEndCurrentEntry 8 }
+
+mxNearEndCurrentBESs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Bursty Errored Seconds (BESs) in the 
+		 current interval.  A Bursty Errored Second has 2 to 319 
+		 Path Coding Violation error events, no Severely Errored 
+		 Frame defects, and no detected incoming AIS defects."
+	::= { mxNearEndCurrentEntry 9 }
+
+mxNearEndCurrentDMs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"minutes"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Degraded Minutes (DMs) in the current 
+		 interval."
+	::= { mxNearEndCurrentEntry 10 }
+
+mxNearEndCurrentLCVs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"violations"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Line Coding Violations (LCVs) in the 
+		 current interval.  An LCV is the occurence of a Bipolar 
+		 Violation (BPV) or Excessive Zeroes (EXZ) error event."
+	::= { mxNearEndCurrentEntry 11 }
+
+
+-- =====================================================================
+
+mxNearEndIntervalTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF MxNearEndIntervalEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { mxNearEndInterval 1 }
+
+mxNearEndIntervalEntry OBJECT-TYPE
+	SYNTAX		MxNearEndIntervalEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	INDEX	{
+			mxSpanIndex, -- shared index
+			mxNearEndIntervalIndex
+		}
+	::= { mxNearEndIntervalTable 1 }
+
+MxNearEndIntervalEntry ::=
+	SEQUENCE {
+		mxNearEndIntervalIndex
+			INTEGER, -- index
+		mxNearEndIntervalESs
+			PerfIntervalCount,
+		mxNearEndIntervalSESs
+			PerfIntervalCount,
+		mxNearEndIntervalSEFSs
+			PerfIntervalCount,
+		mxNearEndIntervalUASs
+			PerfIntervalCount,
+		mxNearEndIntervalCSSs
+			PerfIntervalCount,
+		mxNearEndIntervalPCVs
+			PerfIntervalCount,
+		mxNearEndIntervalLESs
+			PerfIntervalCount,
+		mxNearEndIntervalBESs
+			PerfIntervalCount,
+		mxNearEndIntervalDMs
+			PerfIntervalCount,
+		mxNearEndIntervalLCVs
+			PerfIntervalCount,
+		mxNearEndIntervalValidData
+			TruthValue
+	}
+
+mxNearEndIntervalIndex OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { mxNearEndIntervalEntry 1 }
+
+mxNearEndIntervalESs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Errored Seconds (ESs) in the indexed 
+		 interval."
+	::= { mxNearEndIntervalEntry 2 }
+
+mxNearEndIntervalSESs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Severely Errored Seconds (SESs) in the 
+		 indexed interval."
+	::= { mxNearEndIntervalEntry 3 }
+
+mxNearEndIntervalSEFSs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Severely Errored Framing Seconds (SEFSs) 
+		 in the indexed interval."
+	::= { mxNearEndIntervalEntry 4 }
+
+mxNearEndIntervalUASs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Unavailable Seconds (UASs) in the indexed 
+		 interval."
+	::= { mxNearEndIntervalEntry 5 }
+
+mxNearEndIntervalCSSs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Controlled Slip Seconds (CSSs) in the 
+		 indexed interval."
+	::= { mxNearEndIntervalEntry 6 }
+
+mxNearEndIntervalPCVs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"violations"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Path Coding Violations (PCVs) in the 
+		 indexed interval."
+	::= { mxNearEndIntervalEntry 7 }
+
+mxNearEndIntervalLESs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Line Errored Seconds (LESs) in the 
+		 indexed interval."
+	::= { mxNearEndIntervalEntry 8 }
+
+mxNearEndIntervalBESs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Bursty Errored Seconds (BESs) in the 
+		 indexed interval."
+	::= { mxNearEndIntervalEntry 9 }
+
+mxNearEndIntervalDMs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"minutes"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Degraded Minutes (DMs) in the indexed 
+		 interval."
+	::= { mxNearEndIntervalEntry 10 }
+
+mxNearEndIntervalLCVs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"violations"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Line Coding Violations (LCVs) in the 
+		 indexed interval."
+	::= { mxNearEndIntervalEntry 11 }
+
+mxNearEndIntervalValidData OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates whether the performance interval counts are 
+		 valid for the indexed interval."
+	::= { mxNearEndIntervalEntry 12 }
+
+-- =====================================================================
+
+mxNearEndTotalTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF MxNearEndTotalEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { mxNearEndTotal 1 }
+
+mxNearEndTotalEntry OBJECT-TYPE
+	SYNTAX		MxNearEndTotalEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	INDEX	{
+			mxSpanIndex -- shared index
+		}
+	::= { mxNearEndTotalTable 1 }
+
+MxNearEndTotalEntry ::=
+	SEQUENCE {
+		mxNearEndTotalValidIntervals
+			INTEGER,
+		mxNearEndTotalInvalidIntervals
+			INTEGER,
+		mxNearEndTotalESs
+			PerfTotalCount,
+		mxNearEndTotalSESs
+			PerfTotalCount,
+		mxNearEndTotalSEFSs
+			PerfTotalCount,
+		mxNearEndTotalUASs
+			PerfTotalCount,
+		mxNearEndTotalCSSs
+			PerfTotalCount,
+		mxNearEndTotalPCVs
+			PerfTotalCount,
+		mxNearEndTotalLESs
+			PerfTotalCount,
+		mxNearEndTotalBESs
+			PerfTotalCount,
+		mxNearEndTotalDMs
+			PerfTotalCount,
+		mxNearEndTotalLCVs
+			PerfTotalCount
+	}
+
+mxNearEndTotalValidIntervals OBJECT-TYPE
+	SYNTAX		INTEGER (0..96)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of intervals for which data was collected."
+	::= { mxNearEndTotalEntry 1 }
+
+mxNearEndTotalInvalidIntervals OBJECT-TYPE
+	SYNTAX		INTEGER (0..96)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of intervals in the range from 0 to 
+		 mxNearEndTotalValidIntervals for which data is invalid 
+		 (missing)."
+	::= { mxNearEndTotalEntry 2 }
+
+mxNearEndTotalESs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Errored Seconds (ESs) in all 
+		 available intervals over the last 24-hour period."
+	::= { mxNearEndTotalEntry 3 }
+
+mxNearEndTotalSESs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Severly Errored Seconds (SESs) in 
+		 all available intervals over the last 24-hour period."
+	::= { mxNearEndTotalEntry 4 }
+
+mxNearEndTotalSEFSs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Severely Errored Framing Seconds 
+		 (SEFSs) in all available intervals over the last 
+		 24-hour period."
+	::= { mxNearEndTotalEntry 5 }
+
+mxNearEndTotalUASs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Unavailable Seconds (UASs) in all 
+		 available intervals over the last 24-hour period."
+	::= { mxNearEndTotalEntry 6 }
+
+mxNearEndTotalCSSs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Controlled Slip Seconds (CSSs) in 
+		 all available intervals over the last 24-hour period."
+	::= { mxNearEndTotalEntry 7 }
+
+mxNearEndTotalPCVs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"violations"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Path Coding Violations (PCVs) in 
+		 all available intervals over the last 24-hour period."
+	::= { mxNearEndTotalEntry 8 }
+
+mxNearEndTotalLESs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Line Errored Seconds (LESs) in all 
+		 available intervals over the last 24-hour period."
+	::= { mxNearEndTotalEntry 9 }
+
+mxNearEndTotalBESs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Bursty Errored Seconds (BESs) in 
+		 all available intervals over the last 24-hour period."
+	::= { mxNearEndTotalEntry 10 }
+
+mxNearEndTotalDMs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"minutes"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Degraded Minutes (DMs) in all 
+		 available intervals over the last 24-hour period."
+	::= { mxNearEndTotalEntry 11 }
+
+mxNearEndTotalLCVs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"violations"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Line Coding Violations (LCVs) in 
+		 all available intervals over the last 24-hour period."
+	::= { mxNearEndTotalEntry 12 }
+
+
+-- =====================================================================
+
+mxFarEndCurrentTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF MxFarEndCurrentEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { mxFarEndCurrent 1 }
+
+mxFarEndCurrentEntry OBJECT-TYPE
+	SYNTAX		MxFarEndCurrentEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	INDEX	{
+			mxSpanIndex -- shared index
+		}
+	::= { mxFarEndCurrentTable 1 }
+
+MxFarEndCurrentEntry ::=
+	SEQUENCE {
+		mxFarEndCurrentTimeElapsed
+			INTEGER,
+		mxFarEndCurrentESs
+			PerfCurrentCount,
+		mxFarEndCurrentSESs
+			PerfCurrentCount,
+		mxFarEndCurrentSEFSs
+			PerfCurrentCount,
+		mxFarEndCurrentUASs
+			PerfCurrentCount,
+		mxFarEndCurrentCSSs
+			PerfCurrentCount,
+		mxFarEndCurrentPCVs
+			PerfCurrentCount,
+		mxFarEndCurrentLESs
+			PerfCurrentCount,
+		mxFarEndCurrentBESs
+			PerfCurrentCount,
+		mxFarEndCurrentDMs
+			PerfCurrentCount
+	}
+
+mxFarEndCurrentTimeElapsed OBJECT-TYPE
+	SYNTAX		INTEGER (0..899)
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of seconds that have elapsed in the current 
+		 measurement period."
+	::= { mxFarEndCurrentEntry 1 }
+
+mxFarEndCurrentESs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Errored Seconds (ESs) in the current 
+		 interval."
+	::= { mxFarEndCurrentEntry 2 }
+
+mxFarEndCurrentSESs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Severely Errored Seconds (SESs) in the 
+		 current interval."
+	::= { mxFarEndCurrentEntry 3 }
+
+mxFarEndCurrentSEFSs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Severely Errored Framing Seconds (SEFSs) 
+		 in the current interval."
+	::= { mxFarEndCurrentEntry 4 }
+
+mxFarEndCurrentUASs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Unavailable Seconds (UASs) in the current 
+		 interval."
+	::= { mxFarEndCurrentEntry 5 }
+
+mxFarEndCurrentCSSs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Controlled Slip Seconds (CSSs) in the 
+		 current interval."
+	::= { mxFarEndCurrentEntry 6 }
+
+mxFarEndCurrentPCVs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"violations"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Path Coding Violations (PCVs) in the 
+		 current interval."
+	::= { mxFarEndCurrentEntry 7 }
+
+mxFarEndCurrentLESs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Line Errored Seconds (LESs) in the 
+		 current interval."
+	::= { mxFarEndCurrentEntry 8 }
+
+mxFarEndCurrentBESs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Bursty Errored Seconds (BESs) in the 
+		 current interval."
+	::= { mxFarEndCurrentEntry 9 }
+
+mxFarEndCurrentDMs OBJECT-TYPE
+	SYNTAX		PerfCurrentCount
+	UNITS		"minutes"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Degraded Minutes (DMs) in the current 
+		 interval."
+	::= { mxFarEndCurrentEntry 10 }
+
+-- =====================================================================
+
+mxFarEndIntervalTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF MxFarEndIntervalEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { mxFarEndInterval 1 }
+
+mxFarEndIntervalEntry OBJECT-TYPE
+	SYNTAX		MxFarEndIntervalEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	INDEX	{
+			mxSpanIndex, -- shared index
+			mxFarEndIntervalIndex
+		}
+	::= { mxFarEndIntervalTable 1 }
+
+MxFarEndIntervalEntry ::=
+	SEQUENCE {
+		mxFarEndIntervalIndex
+			INTEGER, -- index
+		mxFarEndIntervalESs
+			PerfIntervalCount,
+		mxFarEndIntervalSESs
+			PerfIntervalCount,
+		mxFarEndIntervalSEFSs
+			PerfIntervalCount,
+		mxFarEndIntervalUASs
+			PerfIntervalCount,
+		mxFarEndIntervalCSSs
+			PerfIntervalCount,
+		mxFarEndIntervalPCVs
+			PerfIntervalCount,
+		mxFarEndIntervalLESs
+			PerfIntervalCount,
+		mxFarEndIntervalBESs
+			PerfIntervalCount,
+		mxFarEndIntervalDMs
+			PerfIntervalCount,
+		mxFarEndIntervalValidData
+			TruthValue
+	}
+
+mxFarEndIntervalIndex OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { mxFarEndIntervalEntry 1 }
+
+mxFarEndIntervalESs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Errored Seconds (ESs) in the indexed 
+		 interval."
+	::= { mxFarEndIntervalEntry 2 }
+
+mxFarEndIntervalSESs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Severely Errored Seconds (SESs) in the 
+		 indexed interval."
+	::= { mxFarEndIntervalEntry 3 }
+
+mxFarEndIntervalSEFSs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Severely Errored Framing Seconds (SEFSs) 
+		 in the indexed interval."
+	::= { mxFarEndIntervalEntry 4 }
+
+mxFarEndIntervalUASs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Unavailable Seconds (UASs) in the indexed 
+		 interval."
+	::= { mxFarEndIntervalEntry 5 }
+
+mxFarEndIntervalCSSs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Controlled Slip Seconds (CSSs) in the 
+		 indexed interval."
+	::= { mxFarEndIntervalEntry 6 }
+
+mxFarEndIntervalPCVs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"violations"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Path Coding Violations (PCVs) in the 
+		 indexed interval."
+	::= { mxFarEndIntervalEntry 7 }
+
+mxFarEndIntervalLESs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Line Errored Seconds (LESs) in the 
+		 indexed interval."
+	::= { mxFarEndIntervalEntry 8 }
+
+mxFarEndIntervalBESs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Bursty Errored Seconds (BESs) in the 
+		 indexed interval."
+	::= { mxFarEndIntervalEntry 9 }
+
+mxFarEndIntervalDMs OBJECT-TYPE
+	SYNTAX		PerfIntervalCount
+	UNITS		"minutes"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of Degraded Minutes (DMs) in the indexed 
+		 interval."
+	::= { mxFarEndIntervalEntry 10 }
+
+mxFarEndIntervalValidData OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates whether the performance interval counts are 
+		 valid for the indexed interval."
+	::= { mxFarEndIntervalEntry 11 }
+
+-- =====================================================================
+
+mxFarEndTotalTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF MxFarEndTotalEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { mxFarEndTotal 1 }
+
+mxFarEndTotalEntry OBJECT-TYPE
+	SYNTAX		MxFarEndTotalEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	INDEX	{
+			mxSpanIndex -- shared index
+		}
+	::= { mxFarEndTotalTable 1 }
+
+MxFarEndTotalEntry ::=
+	SEQUENCE {
+		mxFarEndTotalValidIntervals
+			INTEGER,
+		mxFarEndTotalInvalidIntervals
+			INTEGER,
+		mxFarEndTotalESs
+			PerfTotalCount,
+		mxFarEndTotalSESs
+			PerfTotalCount,
+		mxFarEndTotalSEFSs
+			PerfTotalCount,
+		mxFarEndTotalUASs
+			PerfTotalCount,
+		mxFarEndTotalCSSs
+			PerfTotalCount,
+		mxFarEndTotalPCVs
+			PerfTotalCount,
+		mxFarEndTotalLESs
+			PerfTotalCount,
+		mxFarEndTotalBESs
+			PerfTotalCount,
+		mxFarEndTotalDMs
+			PerfTotalCount
+	}
+
+mxFarEndTotalValidIntervals OBJECT-TYPE
+	SYNTAX		INTEGER (0..96)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of intervals for which data was collected."
+	::= { mxFarEndTotalEntry 1 }
+
+mxFarEndTotalInvalidIntervals OBJECT-TYPE
+	SYNTAX		INTEGER (0..96)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of intervals in the range from 0 to 
+		 mxFarEndTotalValidIntervals for which data is invalid 
+		 (missing)."
+	::= { mxFarEndTotalEntry 2 }
+
+mxFarEndTotalESs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Errored Seconds (ESs) in all 
+		 available intervals over the last 24-hour period."
+	::= { mxFarEndTotalEntry 3 }
+
+mxFarEndTotalSESs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Severly Errored Seconds (SESs) in 
+		 all available intervals over the last 24-hour period."
+	::= { mxFarEndTotalEntry 4 }
+
+mxFarEndTotalSEFSs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Severely Errored Framing Seconds 
+		 (SEFSs) in all available intervals over the last 
+		 24-hour period."
+	::= { mxFarEndTotalEntry 5 }
+
+mxFarEndTotalUASs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Unavailable Seconds (UASs) in all 
+		 available intervals over the last 24-hour period."
+	::= { mxFarEndTotalEntry 6 }
+
+mxFarEndTotalCSSs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Controlled Slip Seconds (CSSs) in 
+		 all available intervals over the last 24-hour period."
+	::= { mxFarEndTotalEntry 7 }
+
+mxFarEndTotalPCVs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"violations"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Path Coding Violations (PCVs) in 
+		 all available intervals over the last 24-hour period."
+	::= { mxFarEndTotalEntry 8 }
+
+mxFarEndTotalLESs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Line Errored Seconds (LESs) in all 
+		 available intervals over the last 24-hour period."
+	::= { mxFarEndTotalEntry 9 }
+
+mxFarEndTotalBESs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Bursty Errored Seconds (BESs) in 
+		 all available intervals over the last 24-hour period."
+	::= { mxFarEndTotalEntry 10 }
+
+mxFarEndTotalDMs OBJECT-TYPE
+	SYNTAX		PerfTotalCount
+	UNITS		"minutes"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of Degraded Minutes (DMs) in all 
+		 available intervals over the last 24-hour period."
+	::= { mxFarEndTotalEntry 11 }
+
+
+-- =====================================================================
+
+END
+
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8

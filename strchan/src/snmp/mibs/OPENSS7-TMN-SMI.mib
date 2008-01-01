@@ -1,11 +1,11 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-TMN-SMI.mib,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/12/29 21:57:41 $
+-- @(#) $RCSfile: OPENSS7-TMN-SMI.mib,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008/01/01 13:59:39 $
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 --
 -- All Rights Reserved.
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/12/29 21:57:41 $ by $Author: brian $
+-- Last Modified $Date: 2008/01/01 13:59:39 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-TMN-SMI.mib,v $
+-- Revision 0.9.2.6  2008/01/01 13:59:39  brian
+-- - added new mibs
+--
 -- Revision 0.9.2.5  2007/12/29 21:57:41  brian
 -- - updates
 --
@@ -81,7 +84,7 @@ IMPORTS
 
 tmnMIB MODULE-IDENTITY
 	LAST-UPDATED
-		"200709250000Z"
+		"200801011353Z"
 	ORGANIZATION
 		"OpenSS7 Corporation"
 	CONTACT-INFO
@@ -1253,6 +1256,740 @@ versionMismatch OBJECT-IDENTITY
 	REFERENCE
 		"ITU-T Rec. X.721 (1992) : versionMismatch"
 	::= { arfProbableCause 57 }
+
+-- ====================================================================
+--
+-- PROBABLE CAUSES (from M.3100)
+--
+-- ====================================================================
+-- Note that these probable causes are simple local values in M.3100 but 
+-- are coded as global values here.  Some names conflict with object 
+-- identities of the same name from X.721 and, for those cases, a Gnm 
+-- suffix is added to the name.
+--
+
+gnmProbableCause OBJECT IDENTIFIER ::=
+{ ccitt(0) recommendation(0) m(13) gmn(3100) informationModel(0) standardSpecificExtension(0) probableCauses(1) }
+
+--
+-- Probable Causes from M.3100 for use with communicationsAlarm
+--
+
+aIS OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : aIS"
+	::= { gnmProbableCause 1 }
+
+callSetUpFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : callSetUpFailure"
+	::= { gnmProbableCause 2 }
+
+degradedSignalGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : degradedSignal"
+	::= { gnmProbableCause 3 }
+
+farEndReceiverFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : farEndReceiverFailure"
+	::= { gnmProbableCause 4 }
+
+framingErrorGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm.  The original name conflicts 
+		 with the ITU-T Rec. X.721 probable cause of the same 
+		 name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : framingError"
+	::= { gnmProbableCause 5 }
+
+lossOfFrameGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm.  The original name conflicts 
+		 with the ITU-T Rec. X.721 probable cause of the same 
+		 name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : lossOfFrame"
+	::= { gnmProbableCause 6 }
+
+lossOfPointer OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : lossOfPointer"
+	::= { gnmProbableCause 7 }
+
+lossOfSignalGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm.  The original name conflicts 
+		 with the ITU-T Rec. X.721 probable cause of the same 
+		 name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : lossOfSignal"
+	::= { gnmProbableCause 8 }
+
+payloadTypeMismatch OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : payloadTypeMismatch"
+	::= { gnmProbableCause 9 }
+
+transmissionError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : transmissionError"
+	::= { gnmProbableCause 10 }
+
+remoteAlarmInterface OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : remoteAlarmInterface"
+	::= { gnmProbableCause 11 }
+
+excessiveBER OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : excessiveBER"
+	::= { gnmProbableCause 12 }
+
+pathTraceMismatch OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : pathTraceMismatch"
+	::= { gnmProbableCause 13 }
+
+unavailable OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : unavailable"
+	::= { gnmProbableCause 14 }
+
+signalLabelMismatch OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : signalLabelMismatch"
+	::= { gnmProbableCause 15 }
+
+lossOfMultiFrame OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with communicationsAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : lossOfMultiFrame"
+	::= { gnmProbableCause 16 }
+
+--
+-- Values 17-50 are reserved for communications alarm related probable causes
+--
+
+--
+-- Probable Causes from M.3100 for use with equipmentAlarm
+--
+
+backplaneFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : backplaneFailure"
+	::= { gnmProbableCause 51 }
+
+dataSetProblem OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : dataSetProblem"
+	::= { gnmProbableCause 52 }
+
+equipmentIdentifierDuplication OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : 
+		 equipmentIdentifierDuplication"
+	::= { gnmProbableCause 53 }
+
+externalIFDeviceProblem OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : externalIFDeviceProblem"
+	::= { gnmProbableCause 54 }
+
+lineCardProblem OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : lineCardProblem"
+	::= { gnmProbableCause 55 }
+
+multiplexerProblemGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm.  The original name conflicts with 
+		 the ITU-T Rec. X.721 probable cause of the same name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : multiplexerProblem"
+	::= { gnmProbableCause 56 }
+
+nEIdentifierDuplication OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : nEIdentifierDuplication"
+	::= { gnmProbableCause 57 }
+
+powerProblemGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm.  The original name conflicts with 
+		 the ITU-T Rec. X.721 probable cause of the same name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : powerProblem"
+	::= { gnmProbableCause 58 }
+
+processorProblemGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm.  The original name conflicts with 
+		 the ITU-T Rec. X.721 probable cause of the same name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : processorProblem"
+	::= { gnmProbableCause 59 }
+
+protectionPathFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : protectionPathFailure"
+	::= { gnmProbableCause 60 }
+
+receiverFailureGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm.  The original name conflicts with 
+		 the ITU-T Rec. X.721 probable cause of the same name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : receiverFailure"
+	::= { gnmProbableCause 61 }
+
+replaceableUnitMissing OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : replaceableUnitMissing"
+	::= { gnmProbableCause 62 }
+
+replaceableUnitTypeMismatch OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : replaceableUnitTypeMismatch"
+	::= { gnmProbableCause 63 }
+
+synchronizationSourceMismatch OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : 
+		 synchronizationSourceMismatch"
+	::= { gnmProbableCause 64 }
+
+terminalProblem OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : terminalProblem"
+	::= { gnmProbableCause 65 }
+
+timingProblemGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm.  The original name conflicts with 
+		 the ITU-T Rec. X.721 probable cause of the same name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : timingProblem"
+	::= { gnmProbableCause 66 }
+
+transmitterFailureGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm.  The original name conflicts with 
+		 the ITU-T Rec. X.721 probable cause of the same name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : transmitterFailure"
+	::= { gnmProbableCause 67 }
+
+trunkCardProblem OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : trunkCardProblem"
+	::= { gnmProbableCause 68 }
+
+replaceableUnitProblem OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with equipmentAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : replaceableUnitProblem"
+	::= { gnmProbableCause 69 }
+
+--
+-- Values 70-100 are reserved for equipment alarm related probable causes
+--
+
+--
+-- Probable Causes from M.3100 for use with environmentalAlarm
+--
+
+airCompressorFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : airCompressorFailure"
+	::= { gnmProbableCause 101 }
+
+airConditioningFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : airConditioningFailure"
+	::= { gnmProbableCause 102 }
+
+airDryerFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : airDryerFailure"
+	::= { gnmProbableCause 103 }
+
+batteryDischarging OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : batteryDischarging"
+	::= { gnmProbableCause 104 }
+
+batteryFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : batteryFailure"
+	::= { gnmProbableCause 105 }
+
+commercialPowerFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : commercialPowerFailure"
+	::= { gnmProbableCause 106 }
+
+coolingFanFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : coolingFanFailure"
+	::= { gnmProbableCause 107 }
+
+engineFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : engineFailure"
+	::= { gnmProbableCause 108 }
+
+fireDetectorFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : fireDetectorFailure"
+	::= { gnmProbableCause 109 }
+
+fuseFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : fuseFailure"
+	::= { gnmProbableCause 110 }
+
+generatorFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : generatorFailure"
+	::= { gnmProbableCause 111 }
+
+lowBatteryThreshold OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : lowBatteryThreshold"
+	::= { gnmProbableCause 112 }
+
+pumpFailureGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm.  The original name conflicts 
+		 with the ITU-T Rec. X.721 probable cause of the same 
+		 name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : pumpFailure"
+	::= { gnmProbableCause 113 }
+
+rectifierFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : rectifierFailure"
+	::= { gnmProbableCause 114 }
+
+rectifierHighVoltage OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : rectifierHighVoltage"
+	::= { gnmProbableCause 115 }
+
+rectifierLowVoltage OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : rectifierLowVoltage"
+	::= { gnmProbableCause 116 }
+
+ventilationsSystemFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : ventilationsSystemFailure"
+	::= { gnmProbableCause 117 }
+
+enclosureDoorOpenGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm.  The original name conflicts 
+		 with the ITU-T Rec. X.721 probable cause of the same 
+		 name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : enclosureDoorOpen"
+	::= { gnmProbableCause 118 }
+
+explosiveGas OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : explosiveGas"
+	::= { gnmProbableCause 119 }
+
+fire OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : fire"
+	::= { gnmProbableCause 120 }
+
+flood OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : flood"
+	::= { gnmProbableCause 121 }
+
+highHumidity OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : highHumidity"
+	::= { gnmProbableCause 122 }
+
+highTemperature OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : highTemperature"
+	::= { gnmProbableCause 123 }
+
+highWind OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : highWind"
+	::= { gnmProbableCause 124 }
+
+iceBuildUp OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : iceBuildUp"
+	::= { gnmProbableCause 125 }
+
+intrusionDetectionGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm.  The original name conflicts 
+		 with the ITU-T Rec. X.721 probable cause of the same 
+		 name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : intrusionDetection"
+	::= { gnmProbableCause 126 }
+
+lowFuel OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : lowFuel"
+	::= { gnmProbableCause 127 }
+
+lowHumidity OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : lowHumidity"
+	::= { gnmProbableCause 128 }
+
+lowCablePressure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : lowCablePressure"
+	::= { gnmProbableCause 129 }
+
+lowTemperature OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : lowTemperature"
+	::= { gnmProbableCause 130 }
+
+lowWater OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : lowWater"
+	::= { gnmProbableCause 131 }
+
+smoke OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : smoke"
+	::= { gnmProbableCause 132 }
+
+toxicGas OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with environmentalAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : toxicGas"
+	::= { gnmProbableCause 133 }
+
+--
+-- Values 134-150 are reserved for environmental alarm related probable causes
+--
+
+--
+-- Probable Causes from M.3100 for use with processingErrorAlarm
+--
+
+storageCapacityProblemGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with processingErrorAlarm.  The original name conflicts 
+		 with the ITU-T Rec. X.721 probable cause of the same 
+		 name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : storageCapacityProblem"
+	::= { gnmProbableCause 151 }
+
+memoryMismatchGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with processingErrorAlarm.  The original name conflicts 
+		 with the ITU-T Rec. X.721 probable cause of the same 
+		 name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : memoryMismatch"
+	::= { gnmProbableCause 152 }
+
+corruptDataGnm OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with processingErrorAlarm.  The original name conflicts 
+		 with the ITU-T Rec. X.721 probable cause of the same 
+		 name."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : corruptData"
+	::= { gnmProbableCause 153 }
+
+outOfCPUCycles OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with processingErrorAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : outOfCPUCycles"
+	::= { gnmProbableCause 154 }
+
+sfwrEnvironmentProblem OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with processingErrorAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : sfwrEnvironmentProblem"
+	::= { gnmProbableCause 155 }
+
+sfwrDownloadFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"Global value of M.3100 probable cause error for use 
+		 with processingErrorAlarm."
+	REFERENCE
+		"ITU-T Rec. M.3100 (1992) : sfwrDownloadFailure"
+	::= { gnmProbableCause 156 }
 
 -- ====================================================================
 --

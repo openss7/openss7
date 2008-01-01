@@ -1,26 +1,26 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/10/18 06:52:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008/01/01 13:59:34 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 3 of the License.
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU General Public License along with
-# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
-# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/18 06:52:48 $ by $Author: brian $
+# Last Modified $Date: 2008/01/01 13:59:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,11 +80,18 @@ if RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
 				  @PACKAGE_TARNAME@_mknod \
+				  x400pmib \
+				  mxmib \
+				  phymib \
 				  test-chan
 
 pkglibexec_PROGRAMS		= test-chan
 
 sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod
+
+if WITH_SNMP_AGENT
+sbin_PROGRAMS			+= x400pmib mxmib phymib
+endif
 
 bin_PROGRAMS			= 
 
@@ -99,6 +106,24 @@ dist_sbin_SCRIPTS		=
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+
+x400pmib_SOURCES		= src/snmp/x400pMIB.c src/snmp/x400pMIB.h
+x400pmib_LDFLAGS		= $(SNMP_LDFLAGS)
+x400pmib_LDADD			= $(STREAMS_LDADD) $(SNMP_LDADD)
+x400pmib_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+x400pmib_CFLAGS			= $(USER_CFLAGS)
+
+mxmib_SOURCES			= src/snmp/mxMIB.c src/snmp/mxMIB.h
+mxmib_LDFLAGS			= $(SNMP_LDFLAGS)
+mxmib_LDADD			= $(STREAMS_LDADD) $(SNMP_LDADD)
+mxmib_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+mxmib_CFLAGS			= $(USER_CFLAGS)
+
+phymib_SOURCES			= src/snmp/phyMIB.c src/snmp/phyMIB.h
+phymib_LDFLAGS			= $(SNMP_LDFLAGS)
+phymib_LDADD			= $(STREAMS_LDADD) $(SNMP_LDADD)
+phymib_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+phymib_CFLAGS			= $(USER_CFLAGS)
 
 test_chan_SOURCES		= src/test/test-chan.c
 test_chan_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -345,6 +370,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.9  2008/01/01 13:59:34  brian
+# - added new mibs
+#
 # Revision 0.9.2.8  2007/10/18 06:52:48  brian
 # - new build support
 #

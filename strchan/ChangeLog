@@ -1,3 +1,40 @@
+2008-01-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates release files
+	* NEWS: updates release files
+	* README: updates release files
+	* README-cvs: updates release files
+	* THANKS: updates release files
+
+	* Makefile.am: added mib implementations
+	* acinclude.m4: added SNMP checks
+	* doc/manual/prerequisites.texi: corrections
+	* lib32/Makefile.am: updated header
+	* src/snmp/mib2c.openss7.conf: corrections, header updates
+
+	* src/snmp/mibs/OPENSS7-MIB.mib: updated MIBs
+	* src/snmp/mibs/OPENSS7-PHY-MIB.mib: updated MIBs
+	* src/snmp/mibs/OPENSS7-TMN-SMI.mib: updated MIBs
+	* src/snmp/mibs/OPENSS7-TMN-TC.mib: updated MIBs
+	* src/snmp/mibs/OPENSS7-X400P-MX-MIB.mib: updated MIBs
+
+	* src/snmp/ds1.c: added new mib implementation
+	* src/snmp/ds1.h: added new mib implementation
+	* src/snmp/ds1EXT.c: added new mib implementation
+	* src/snmp/ds1EXT.h: added new mib implementation
+	* src/snmp/makestubs: added new mib implementation
+	* src/snmp/mxMIB.c: added new mib implementation
+	* src/snmp/mxMIB.h: added new mib implementation
+	* src/snmp/phyMIB.c: added new mib implementation
+	* src/snmp/phyMIB.h: added new mib implementation
+	* src/snmp/x400pMIB.c: added new mib implementation
+	* src/snmp/x400pMIB.h: added new mib implementation
+
+	* src/snmp/mibs/OPENSS7-MX-MIB.mib: added new MIB
+	* src/snmp/mibs/RFC3593-MIB.txt: added new MIB
+	* src/snmp/mibs/RFC4805-EXT-MIB.mib: added new MIB
+	* src/snmp/mibs/RFC4805-MIB.txt: added new MIB
+
 2007-12-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/man.am: perform more substitutions
