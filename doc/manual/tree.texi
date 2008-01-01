@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.6 2007/06/22 00:18:21 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.7 2008/01/01 14:40:24 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/22 00:18:21 $ by $Author: brian $
+@c Last Modified $Date: 2008/01/01 14:40:24 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -80,8 +80,8 @@ describe some of the kernel modules installed by add-on packages in the @value{P
 * strsock Kernel Modules::
 * strinet Kernel Modules::
 * strsctp Kernel Modules::
-* striso Kernel Modules::
 * strchan Kernel Modules::
+* striso Kernel Modules::
 * strisdn Kernel Modules::
 * strss7 Kernel Modules::
 * sigtran Kernel Modules::
@@ -550,6 +550,26 @@ See @manref{tpiperf(4)} for more information.
 
 @end table
 
+@node strchan Kernel Modules
+@subsubsection strchan
+
+The @command{strchan-@value{VERSION_STRCHAN}} add-on package provides a range of @dfn{STREAMS}
+drivers and modules as kernel modules.  The drivers and modules implement various protocol
+components for @cite{Isochronous Channels} and related devices.
+A number of these drivers and modules were formerly part of the commercial @command{strss7} package
+releases.
+
+Kernel modules installed by @command{strchan-@value{VERSION_STRCHAN}} are as follows:
+
+@table @asis
+
+@item 
+
+This add-on package currently installs no kernel modules.  Modules will be added from the commercial
+release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS}.
+
+@end table
+
 @node striso Kernel Modules
 @subsubsection striso
 
@@ -635,26 +655,6 @@ provide the @cite{Data Link Provider Interface (DLPI)}, @manpage{dlpi(7)} for LA
 provides the @cite{Network Provider Interface (NPI)}, @manpage{npi(7)}, for connection-oriented
 network service.
 For more information, see @manref{x25-plp(4)}.
-
-@end table
-
-@node strchan Kernel Modules
-@subsubsection strchan
-
-The @command{strchan-@value{VERSION_STRCHAN}} add-on package provides a range of @dfn{STREAMS}
-drivers and modules as kernel modules.  The drivers and modules implement various protocol
-components for @cite{Isochronous Channels} and related devices.
-A number of these drivers and modules were formerly part of the commercial @command{strss7} package
-releases.
-
-Kernel modules installed by @command{strchan-@value{VERSION_STRCHAN}} are as follows:
-
-@table @asis
-
-@item 
-
-This add-on package currently installs no kernel modules.  Modules will be added from the commercial
-release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS}.
 
 @end table
 

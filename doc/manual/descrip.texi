@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.7 2007/06/22 00:18:20 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.8 2008/01/01 14:40:24 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/22 00:18:20 $ by $Author: brian $
+@c Last Modified $Date: 2008/01/01 14:40:24 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -76,9 +76,9 @@ The @cite{@value{PACKAGE_TITLE}} package contains:
 @command{strsock-@value{VERSION_STRSOCK}} (@cite{STREAMS Sockets}), @*
 @command{strinet-@value{VERSION_STRINET}} (@cite{STREAMS Internet}), @*
 @command{strsctp-@value{VERSION_STRSCTP}} (@cite{STREAMS SCTP}), @*
+@command{strchan-@value{VERSION_STRCHAN}} (@cite{STREAMS Channels}), @*
 @command{striso-@value{VERSION_STRISO}} (@cite{STREAMS Open Systems Interconnect}), @*
 @command{netperf-@value{VERSION_NETPERF}} (@cite{Network Performance}), @*
-@command{strchan-@value{VERSION_STRCHAN}} (@cite{STREAMS Channels}), @*
 @command{strisdn-@value{VERSION_STRISDN}} (@cite{STREAMS ISDN Stack}), @*
 @command{strss7-@value{VERSION_STRSS7}} (@cite{STREAMS SS7 Stacks}), @*
 @command{sigtran-@value{VERSION_SIGTRAN}} (@cite{STREAMS SIGTRAN Stack}), @*
