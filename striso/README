@@ -1,5 +1,5 @@
 OpenSS7 ISO Stack -- read me first file.  2007-12-16
-$Id: README,v 0.9.2.32 2007/12/29 23:32:29 brian Exp $
+$Id: README,v 0.9.2.33 2008/01/01 14:40:43 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -171,7 +171,7 @@ unpacking the master package.)
   9. `OpenSS7 STREAMS SCTP', strsctp-0.9.2.9
      (http://www.openss7.org/tarballs/strsctp-0.9.2.9.tar.bz2).
 
- 10. `OpenSS7 STREAMS Channels', striso-0.9.2.4
+ 10. `OpenSS7 STREAMS Channels', strchan-0.9.2.4
      (http://www.openss7.org/tarballs/strchan-0.9.2.4.tar.bz2).
 
 When configuring and building multiple `OpenSS7 Project' release

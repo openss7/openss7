@@ -1,5 +1,5 @@
-OpenSS7 Master Package -- read me first file.  2007-12-16
-$Id: README,v 0.9.2.35 2007/12/29 23:32:15 brian Exp $
+OpenSS7 Master Package -- read me first file.  2007-12-30
+$Id: README,v 0.9.2.36 2008/01/01 14:40:21 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 Master Package
 =======================
 
-Package openss7-0.9.2.G was released under AGPLv3 2007-12-16.
+Package openss7-0.9.2.G was released under AGPLv3 2007-12-30.
 
 This is the `OpenSS7 Master Package' package.  It consists of a master
 package that contains all other OpenSS7 Project package releases.  Use
@@ -28,9 +28,9 @@ The `OpenSS7 Master Package' package contains:
 `strsock-0.9.2.4' (`STREAMS Sockets'),
 `strinet-0.9.2.7' (`STREAMS Internet'),
 `strsctp-0.9.2.9' (`STREAMS SCTP'),
+`strchan-0.9.2.4' (`STREAMS Channels'),
 `striso-0.9.2.4' (`STREAMS Open Systems Interconnect'),
 `netperf-2.3.7' (`Network Performance'),
-`strchan-0.9.2.4' (`STREAMS Channels'),
 `strisdn-0.9.2.4' (`STREAMS ISDN Stack'),
 `strss7-0.9a.8' (`STREAMS SS7 Stacks'),
 `sigtran-0.9.2.4' (`STREAMS SIGTRAN Stack'),
@@ -49,7 +49,7 @@ well.
  Release
 --------
 
-This is the `openss7-0.9.2.G' package, released 2007-12-16.  This
+This is the `openss7-0.9.2.G' package, released 2007-12-30.  This
 `0.9.2.G' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:

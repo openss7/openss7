@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.17 2007/08/12 06:43:30 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.18 2008/01/01 14:40:24 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/12 06:43:30 $ by $Author: brian $
+% Last Modified $Date: 2008/01/01 14:40:24 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -405,6 +405,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: openss7.texi,v $
+Revision 0.9.2.18  2008/01/01 14:40:24  brian
+- updated release files
+
 Revision 0.9.2.17  2007/08/12 06:43:30  brian
 - updated licenses in manuals
 
@@ -1294,8 +1297,9 @@ distribution.  This package relies upon the presence of the following packages a
 @enumerate
 @item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
 @item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
-@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}), and
-@item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}).
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
+@item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}), and
+@item @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}).
 @end enumerate
 
 This package is contained in the @file{striso} subdirectory in the @value{PACKAGE_TITLE} source
@@ -1319,7 +1323,8 @@ packages also included in the @value{PACKAGE_TITLE}:
 @item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}),
 @item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
 @item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
-@item @cite{STREAMS ISO} (@command{strsctp-@value{VERSION_STRISO}}).
+@item @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}),
+@item @cite{STREAMS ISO} (@command{striso-@value{VERSION_STRISO}}).
 @end enumerate
 
 This package is contained in the @file{netperf} subdirectory in the @value{PACKAGE_TITLE} source
@@ -1335,7 +1340,7 @@ networks.
 The components in this subpackage are the
 ISDN
 components that were originally part of the @command{strss7} package.@footnote{The @command{strss7}
-package was getting much too large and was split into @command{strchan}, @command{strsio},
+package was getting much too large and was split into @command{strchan}, @command{striso},
 @command{strisdn}, @command{strss7}, @command{sigtran} and @command{strvoip} sub-packages.}
 
 This package is a work in progress and partially tested.  This package relies upon the presence of
@@ -1347,8 +1352,9 @@ the following packages also included, in the @value{PACKAGE_TITLE}:
 @item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
 @item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}),
 @item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
-@item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}), and
-@item @cite{STREAMS ISO} (@command{strsctp-@value{VERSION_STRISO}}).
+@item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
+@item @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}), and
+@item @cite{STREAMS ISO} (@command{striso-@value{VERSION_STRISO}}).
 @end enumerate
 
 This package is contained in the @file{strisdn} subdirectory in the @value{PACKAGE_TITLE} source
@@ -1365,7 +1371,7 @@ for legacy and VoIP networks.
 The components in this subpackage are the
 SS7
 components that were originally part of the @command{strss7} package.@footnote{The @command{strss7}
-package was getting much too large and was split into @command{strchan}, @command{strsio},
+package was getting much too large and was split into @command{strchan}, @command{striso},
 @command{strisdn}, @command{strss7}, @command{sigtran} and @command{strvoip} sub-packages.}
 
 This package is a work in progress and partially tested.   This package relies upon the presence of
@@ -1378,7 +1384,8 @@ the following packages also included in the @value{PACKAGE_TITLE}:
 @item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}),
 @item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
 @item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
-@item @cite{STREAMS ISO} (@command{strsctp-@value{VERSION_STRISO}}), and
+@item @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}),
+@item @cite{STREAMS ISO} (@command{striso-@value{VERSION_STRISO}}), and
 @item @cite{STREAMS ISDN} (@command{strisdn-@value{VERSION_STRISDN}}).
 @end enumerate
 
@@ -1394,7 +1401,7 @@ of Signalling Transport components used for telephony signalling over SCTP/IP.
 The components in this subpackage are the
 SIGTRAN
 components that were originally part of the @command{strss7} package.@footnote{The @command{strss7}
-package was getting much too large and was split into @command{strchan}, @command{strsio},
+package was getting much too large and was split into @command{strchan}, @command{striso},
 @command{strisdn}, @command{strss7}, @command{sigtran} and @command{strvoip} sub-packages.}
 
 This package is a work in progress and partially tested.   This package relies upon the presence of
@@ -1407,7 +1414,8 @@ the following packages also included in the @value{PACKAGE_TITLE}:
 @item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}),
 @item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
 @item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
-@item @cite{STREAMS ISO} (@command{strsctp-@value{VERSION_STRISO}}),
+@item @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}),
+@item @cite{STREAMS ISO} (@command{striso-@value{VERSION_STRISO}}),
 @item @cite{STREAMS ISDN} (@command{strisdn-@value{VERSION_STRISDN}}), and
 @item @cite{STREAMS SS7} (@command{strisdn-@value{VERSION_STRSS7}}).
 @end enumerate
@@ -1418,7 +1426,7 @@ the following packages also included in the @value{PACKAGE_TITLE}:
 The components in this subpackage are the
 VoIP
 components that were originally part of the @command{strss7} package.@footnote{The @command{strss7}
-package was getting much too large and was split into @command{strchan}, @command{strsio},
+package was getting much too large and was split into @command{strchan}, @command{striso},
 @command{strisdn}, @command{strss7}, @command{sigtran} and @command{strvoip} sub-packages.}
 
 This package is a work in progress and partially tested.   This package relies upon the presence of
@@ -1431,8 +1439,8 @@ the following packages also included in the @value{PACKAGE_TITLE}:
 @item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}),
 @item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
 @item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
-@item @cite{STREAMS Channels} (@command{strsctp-@value{VERSION_STRCHAN}}),
-@item @cite{STREAMS ISO} (@command{strsctp-@value{VERSION_STRISO}}),
+@item @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}),
+@item @cite{STREAMS ISO} (@command{striso-@value{VERSION_STRISO}}),
 @item @cite{STREAMS ISDN} (@command{strisdn-@value{VERSION_STRISDN}}),
 @item @cite{STREAMS SS7} (@command{strisdn-@value{VERSION_STRSS7}}), and
 @item @cite{STREAMS SIGTRAN} (@command{sigtran-@value{VERSION_SIGTRAN}}).
@@ -2066,11 +2074,11 @@ shared libraries, and kernel modules in a structured manner.
 
 Header files are installed, typically, in the @file{/@-usr/@-include/@-@var{name}/} subdirectory,
 where @var{name} is the name of the package.@footnote{That is, where @emph{name} is one of
-@file{sctp}, @file{iperf}, @file{streams}, @file{strcompat}, @file{strutil}, @file{strxns},
-@file{strxnet}, @file{strnsl}, @file{strinet}, @file{strtty}, @file{striso}, @file{strchan},
-@file{strsctp}, @file{netperf}, or @file{LiS}.} To use the header files from one of the packages,
-@samp{-I/@-usr/@-include/@-@var{name}/} must be included as a @command{gcc} compile option.  This is
-true regardless of whether user space or kernel programs are being compiled.
+@file{sctp}, @file{iperf}, @file{streams}, @file{strcompat}, @file{strutil}, @file{strbcm},
+@file{strtty}, @file{strxns}, @file{strxnet}, @file{strnsl}, @file{strinet}, @file{strchan},
+@file{striso}, @file{strsctp}, @file{netperf}, or @file{LiS}.} To use the header files from one of
+the packages, @samp{-I/@-usr/@-include/@-@var{name}/} must be included as a @command{gcc} compile
+option.  This is true regardless of whether user space or kernel programs are being compiled.
 
 In general, @samp{-I} include directives on the @command{gcc} command line should be ordered in the
 reverse order of the dependencies between packages.  So, for example, if include files for all
@@ -2088,6 +2096,9 @@ add-on packages are required, the order of these directives should be:
 @item @samp{-I/usr/include/strxnet}
 @item @samp{-I/usr/include/strnsl}
 @item @samp{-I/usr/include/strxns}
+@item @samp{-I/usr/include/strtty}
+@item @samp{-I/usr/include/strbcm}
+@item @samp{-I/usr/include/strutil}
 @item @samp{-I/usr/include/strcompat}
 @item @samp{-I/usr/include/streams}
 @end enumerate
@@ -2255,25 +2266,6 @@ header files in @file{/@-usr/@-in@-clude/@-str@-tty/@-}:
 @tab replacement for the standard @cite{SVR 4} header file.
 @end multitable
 
-@node strxns Header Files
-@subsubsection strxns
-
-The @command{strxns-@value{VERSION_STRXNS}} add-on package provides the following user-visible
-header files in @file{/usr/include/strxns}:
-
-@multitable @columnfractions .25 .75
-@item @file{sys/cdi.h}
-@tab system specific @cite{Communications Device Interface (CDI)} header file.
-@item @file{sys/dlpi.h}
-@tab system specific @cite{Data Link Provider Interface (DLPI)} header file.
-@item @file{sys/ldl.h}
-@tab system specific header file for the @manref{ldl(4)} driver.
-@item @file{sys/npi.h}
-@tab system specific @cite{Network Provider Interface (NPI)} header file.
-@item @file{sys/npi_ip.h}
-@tab system specific @cite{NPI for Internet Protocol (IP)} header file.
-@end multitable
-
 @node strxnet Header Files
 @subsubsection strxnet
 
@@ -2436,6 +2428,25 @@ header files in @file{/usr/include/strsctp}:
 
 The @command{strchan-@value{VERSION_STRCHAN}} add-on package provides the following user-visible
 header files in @file{/usr/include/strchan}:
+
+@node strxns Header Files
+@subsubsection strxns
+
+The @command{strxns-@value{VERSION_STRXNS}} add-on package provides the following user-visible
+header files in @file{/usr/include/strxns}:
+
+@multitable @columnfractions .25 .75
+@item @file{sys/cdi.h}
+@tab system specific @cite{Communications Device Interface (CDI)} header file.
+@item @file{sys/dlpi.h}
+@tab system specific @cite{Data Link Provider Interface (DLPI)} header file.
+@item @file{sys/ldl.h}
+@tab system specific header file for the @manref{ldl(4)} driver.
+@item @file{sys/npi.h}
+@tab system specific @cite{Network Provider Interface (NPI)} header file.
+@item @file{sys/npi_ip.h}
+@tab system specific @cite{NPI for Internet Protocol (IP)} header file.
+@end multitable
 
 @node striso Header Files
 @subsubsection striso
