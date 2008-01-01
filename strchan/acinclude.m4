@@ -3,27 +3,27 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 06:47:09 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008/01/01 13:59:34 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 3 of the License.
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU General Public License along with
-# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
-# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 06:47:09 $ by $Author: brian $
+# Last Modified $Date: 2008/01/01 13:59:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,6 +75,10 @@ m4_include([m4/sock.m4])
 m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
 m4_include([m4/doxy.m4])
+m4_include([m4/lib32.m4])
+m4_include([m4/perl.m4])
+m4_include([m4/snmp.m4])
+m4_include([m4/agent.m4])
 
 # =============================================================================
 # AC_CHAN
@@ -167,6 +171,7 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     CPPFLAGS=
     CFLAGS=
     _CHAN_OUTPUT
+    _AGENT
     _AUTOTEST
     _DOXY
 ])# AC_CHAN
@@ -390,6 +395,9 @@ AC_DEFUN([_CHAN_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.15  2008/01/01 13:59:34  brian
+# - added new mibs
+#
 # Revision 0.9.2.14  2007/08/14 06:47:09  brian
 # - GPLv3 header update
 #
@@ -434,7 +442,7 @@ AC_DEFUN([_CHAN_], [dnl
 #
 # =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
