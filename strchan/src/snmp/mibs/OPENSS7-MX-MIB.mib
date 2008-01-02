@@ -63,7 +63,7 @@ IMPORTS
 	MODULE-IDENTITY, OBJECT-TYPE
 		FROM SNMPv2-SMI
 	Unsigned32, Counter32, StorageType, RowStatus, TimeInterval, 
-	TruthValue
+	TimeStamp, TruthValue
 		FROM SNMPv2-TC
 	PerfCurrentCount, PerfIntervalCount, PerfTotalCount
 		FROM PerfHist-TC-MIB
@@ -128,6 +128,244 @@ mxGroups		OBJECT IDENTIFIER ::= { mxConformance	 2 }
 
 -- =====================================================================
 
+-- (1.3.6.1.4.1.29591.1.1.11) mxMIB
+-- |нн(0) mxNotifications
+-- |
+-- |нн(1) mxObjects
+-- |  |нн(1) mxTables
+-- |  |  |нн(1) mxSpan
+-- |  |  |  +нн(1) mxSpanTable
+-- |  |  |     +нн(1) mxSpanEntry
+-- |  |  |        |нн( 1) mxSpanIndex
+-- |  |  |        |нн( 2) mxSpanDevice
+-- |  |  |        |нн( 3) mxSpanEquipmentId
+-- |  |  |        |нн( 4) mxSpanType
+-- |  |  |        |нн( 5) mxSpanNumber
+-- |  |  |        |нн( 6) mxSpanRate
+-- |  |  |        |нн( 7) mxSpanMode
+-- |  |  |        |нн( 8) mxSpanCrc
+-- |  |  |        |нн( 9) mxSpanClocking
+-- |  |  |        |нн(10) mxSpanPriority
+-- |  |  |        |нн(11) mxSpanCoding
+-- |  |  |        |нн(12) mxSpanFraming
+-- |  |  |        |нн(13) mxSpanLineImpedance
+-- |  |  |        |нн(14) mxSpanLineMode
+-- |  |  |        |нн(15) mxSpanLineLength
+-- |  |  |        |нн(16) mxSpanLineAttenuation
+-- |  |  |        |нн(17) mxSpanLineGain
+-- |  |  |        |нн(18) mxSpanLineDelay
+-- |  |  |        |нн(19) mxSpanTxLevel
+-- |  |  |        |нн(20) mxSpanRxLevel
+-- |  |  |        |нн(21) mxSpanAlarmSettleTime
+-- |  |  |        |нн(22) mxSpanLineCodeTime
+-- |  |  |        |нн(23) mxSpanPrimary
+-- |  |  |        |нн(24) mxSpanDataLink
+-- |  |  |        |нн(25) mxSpanLineCode
+-- |  |  |        |нн(26) mxSpanAlarmSeverityMappingProfile
+-- |  |  |        |нн(27) mxSpanAdministrativeState
+-- |  |  |        |нн(28) mxSpanOperationalState
+-- |  |  |        |нн(29) mxSpanUsageState
+-- |  |  |        |нн(30) mxSpanAlarmStatus
+-- |  |  |        |нн(31) mxSpanProceduralStatus
+-- |  |  |        |нн(32) mxSpanAvailabilityStatus
+-- |  |  |        |нн(33) mxSpanControlStatus
+-- |  |  |        |нн(34) mxSpanStandbyStatus
+-- |  |  |        |нн(35) mxSpanUnknownStatus
+-- |  |  |        |нн(36) mxSpanSap
+-- |  |  |        |нн(37) mxSpanLoopbackStatus
+-- |  |  |        |нн(38) mxSpanLineStatus
+-- |  |  |        |нн(39) mxSpanAlarms
+-- |  |  |        |нн(40) mxSpanEvents
+-- |  |  |        |нн(41) mxSpanReceiveLevel
+-- |  |  |        |нн(42) mxSpanReceiveThreshold
+-- |  |  |        +нн(43) mxSpanRowStatus
+-- |  |  |
+-- |  |  |нн(2) mxChan
+-- |  |  |  +нн(1) mxChanTable
+-- |  |  |     +нн(1) mxChanEntry
+-- |  |  |        |нн( 1) mxChanIndex
+-- |  |  |        |нн( 2) mxChanType
+-- |  |  |        |нн( 3) mxChanRate
+-- |  |  |        |нн( 4) mxChanMode
+-- |  |  |        |нн( 5) mxChanAdministrativeState
+-- |  |  |        |нн( 6) mxChanUsageState
+-- |  |  |        |нн( 7) mxChanAvailabilityStatus
+-- |  |  |        |нн( 8) mxChanControlStatus
+-- |  |  |        +нн( 9) mxChanSap
+-- |  |  |
+-- |  |  |нн(3) mxXcon
+-- |  |  |  +нн(1) mxXconTable
+-- |  |  |     +нн(1) mxXconEntry
+-- |  |  |        |нн( 1) mxXconSpanIndex
+-- |  |  |        |нн( 2) mxXconChanIndex
+-- |  |  |        |нн( 3) mxXconType
+-- |  |  |        |нн( 4) mxXconStorageType
+-- |  |  |        +нн( 5) mxXconRowStatus
+-- |  |  |
+-- |  |  +нн(4) mxBert
+-- |  |     +нн(1) mxBertTable
+-- |  |        +нн(1) mxBertEntry
+-- |  |           |нн( 1) mxBertMode
+-- |  |           |нн( 2) mxBertSelect
+-- |  |           |нн( 3) mxBertPattern
+-- |  |           |нн( 4) mxBertOperationalState
+-- |  |           |нн( 5) mxBertProceduralStatus
+-- |  |           |нн( 6) mxBertBitCount
+-- |  |           +нн( 7) mxBertErrorCount
+-- |  |
+-- |  |нн(2) mxScalars
+-- |  |
+-- |  |нн(3) mxNotifs
+-- |  |
+-- |  |нн(4) mxOids
+-- |  |
+-- |  +нн(5) mxStats
+-- |     |нн(1) mxNearEndStats
+-- |     |  |нн(1) mxNearEndCurrent
+-- |     |  |  +нн(1) mxNearEndCurrentTable
+-- |     |  |     +нн(1) mxNearEndCurrentEntry
+-- |     |  |        |нн( 1) mxNearEndCurrentTimeElapsed
+-- |     |  |        |нн( 2) mxNearEndCurrentESs
+-- |     |  |        |нн( 3) mxNearEndCurrentSESs
+-- |     |  |        |нн( 4) mxNearEndCurrentSEFSs
+-- |     |  |        |нн( 5) mxNearEndCurrentUASs
+-- |     |  |        |нн( 6) mxNearEndCurrentCSSs
+-- |     |  |        |нн( 7) mxNearEndCurrentPCVs
+-- |     |  |        |нн( 8) mxNearEndCurrentLESs
+-- |     |  |        |нн( 9) mxNearEndCurrentBESs
+-- |     |  |        |нн(10) mxNearEndCurrentDMs
+-- |     |  |        +нн(11) mxNearEndCurrentLCVs
+-- |     |  |
+-- |     |  |нн(2) mxNearEndInterval
+-- |     |  |  +нн(1) mxNearEndIntervalTable
+-- |     |  |     +нн(1) mxNearEndIntervalEntry
+-- |     |  |        |нн( 1) mxNearEndIntervalIndex
+-- |     |  |        |нн( 2) mxNearEndIntervalESs
+-- |     |  |        |нн( 3) mxNearEndIntervalSESs
+-- |     |  |        |нн( 4) mxNearEndIntervalSEFSs
+-- |     |  |        |нн( 5) mxNearEndIntervalUASs
+-- |     |  |        |нн( 6) mxNearEndIntervalCSSs
+-- |     |  |        |нн( 7) mxNearEndIntervalPCVs
+-- |     |  |        |нн( 8) mxNearEndIntervalLESs
+-- |     |  |        |нн( 9) mxNearEndIntervalBESs
+-- |     |  |        |нн(10) mxNearEndIntervalDMs
+-- |     |  |        |нн(11) mxNearEndIntervalLCVs
+-- |     |  |        +нн(12) mxNearEndIntervalValidData
+-- |     |  |
+-- |     |  +нн(3) mxNearEndTotal
+-- |     |     +нн(1) mxNearEndTotalTable
+-- |     |        +нн(1) mxNearEndTotalEntry
+-- |     |           |нн( 1) mxNearEndTotalValidIntervals
+-- |     |           |нн( 2) mxNearEndTotalInvalidIntervals
+-- |     |           |нн( 3) mxNearEndTotalESs
+-- |     |           |нн( 4) mxNearEndTotalSESs
+-- |     |           |нн( 5) mxNearEndTotalSEFSs
+-- |     |           |нн( 6) mxNearEndTotalUASs
+-- |     |           |нн( 7) mxNearEndTotalCSSs
+-- |     |           |нн( 8) mxNearEndTotalPCVs
+-- |     |           |нн( 9) mxNearEndTotalLESs
+-- |     |           |нн(10) mxNearEndTotalBESs
+-- |     |           |нн(11) mxNearEndTotalDMs
+-- |     |           +нн(12) mxNearEndTotalLCVs
+-- |     |
+-- |     +нн(2) mxFarEndStats
+-- |        |нн(1) mxFarEndCurrent
+-- |        |  +нн(1) mxFarEndCurrentTable
+-- |        |     +нн(1) mxFarEndCurrentEntry
+-- |        |        |нн( 1) mxFarEndCurrentTimeElapsed
+-- |        |        |нн( 2) mxFarEndCurrentESs
+-- |        |        |нн( 3) mxFarEndCurrentSESs
+-- |        |        |нн( 4) mxFarEndCurrentSEFSs
+-- |        |        |нн( 5) mxFarEndCurrentUASs
+-- |        |        |нн( 6) mxFarEndCurrentCSSs
+-- |        |        |нн( 7) mxFarEndCurrentPCVs
+-- |        |        |нн( 8) mxFarEndCurrentLESs
+-- |        |        |нн( 9) mxFarEndCurrentBESs
+-- |        |        +нн(10) mxFarEndCurrentDMs
+-- |        |
+-- |        |нн(2) mxFarEndInterval
+-- |        |  +нн(1) mxFarEndIntervalTable
+-- |        |     +нн(1) mxFarEndIntervalEntry
+-- |        |        |нн( 1) mxFarEndIntervalIndex
+-- |        |        |нн( 2) mxFarEndIntervalESs
+-- |        |        |нн( 3) mxFarEndIntervalSESs
+-- |        |        |нн( 4) mxFarEndIntervalSEFSs
+-- |        |        |нн( 5) mxFarEndIntervalUASs
+-- |        |        |нн( 6) mxFarEndIntervalCSSs
+-- |        |        |нн( 7) mxFarEndIntervalPCVs
+-- |        |        |нн( 8) mxFarEndIntervalLESs
+-- |        |        |нн( 9) mxFarEndIntervalBESs
+-- |        |        |нн(10) mxFarEndIntervalDMs
+-- |        |        +нн(11) mxFarEndIntervalValidData
+-- |        |
+-- |        +нн(3) mxFarEndTotal
+-- |           +нн(1) mxFarEndTotalTable
+-- |              +нн(1) mxFarEndTotalEntry
+-- |                 |нн( 1) mxFarEndTotalValidIntervals
+-- |                 |нн( 2) mxFarEndTotalInvalidIntervals
+-- |                 |нн( 3) mxFarEndTotalESs
+-- |                 |нн( 4) mxFarEndTotalSESs
+-- |                 |нн( 5) mxFarEndTotalSEFSs
+-- |                 |нн( 6) mxFarEndTotalUASs
+-- |                 |нн( 7) mxFarEndTotalCSSs
+-- |                 |нн( 8) mxFarEndTotalPCVs
+-- |                 |нн( 9) mxFarEndTotalLESs
+-- |                 |нн(10) mxFarEndTotalBESs
+-- |                 +нн(11) mxFarEndTotalDMs
+-- |
+-- +нн(2) mxConformance
+--    |нн(1) mxCompliances
+--    +нн(1) mxGroups
+
+-- =====================================================================
+
+SpanNumber ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Provides a specification of a span relative to a span 
+		 group.  This is a small ordinal number from 1 to 32.  
+		 The number zero (0) indicates no span or an entire span 
+		 group. The values 1..3 are used for E2; 1..4 for T1; 
+		 1..21 for E3; and 1..28 for T3."
+	SYNTAX		INTEGER (0..32)
+
+ChannelNumber ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Provides a specification of a channel relative to a 
+		 span.  This is a small ordinal number from 1 to 24 for 
+		 T1 spans and 1 to 31 for E1 spans.  The number is the 
+		 same as the time slot number for the span.  The number 
+		 zero (0) indicates no chanel or an entire span."
+	SYNTAX		INTEGER (0..31)
+
+ChannelSet ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Provides a specificiation of a set of channels within a 
+		 span.  This is bit mask of the channels included in the 
+		 set (channels 1 through 24 for T1 and 1 through 31 for 
+		 E1)."
+	SYNTAX		BITS {
+				ch1(0), ch2(1), ch3(2), ch4(3), ch5(4), 
+				ch6(5), ch7(6), ch8(7), ch9(8), ch10(9), 
+				ch11(10), ch12(11), ch13(12), ch14(13), 
+				ch15(14), ch16(15), ch17(16), ch18(17), 
+				ch19(18), ch20(19), ch21(20), ch22(21), 
+				ch23(22), ch24(23), ch25(24), ch26(25), 
+				ch27(26), ch28(27), ch29(28), ch30(29), 
+				ch31(30)
+			}
+
+-- =====================================================================
+
+mxDiscontinuityTime OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the uptime of the last discontinuity."
+	::= { mxScalars 1 }
 
 -- =====================================================================
 
@@ -165,7 +403,7 @@ MxSpanEntry ::=
 		mxSpanType
 			INTEGER,
 		mxSpanNumber
-			Unsigned32,
+			SpanNumber,
 		mxSpanRate
 			INTEGER,
 		mxSpanMode
@@ -174,6 +412,8 @@ MxSpanEntry ::=
 			INTEGER,
 		mxSpanClocking
 			INTEGER,
+		mxSpanPriority
+			Unsigned32,
 		mxSpanCoding
 			INTEGER,
 		mxSpanFraming
@@ -315,7 +555,7 @@ mxSpanType OBJECT-TYPE
 	::= { mxSpanEntry 4 }
 
 mxSpanNumber OBJECT-TYPE
-	SYNTAX		Unsigned32 (0..27)
+	SYNTAX		SpanNumber
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
@@ -339,42 +579,41 @@ mxSpanRate OBJECT-TYPE
 
 mxSpanMode OBJECT-TYPE
 	SYNTAX		BITS {
-				localLoopback(0),
-				remoteLoopback(1),
-				framerLoopback(2),
-				payloadLoopback(3)
+				local(0),
+				remote(1),
+				framer(2),
+				payload(3)
 			}
 	MAX-ACCESS	read-create
 	STATUS		current
 	DESCRIPTION
-		"Specifies the local loopback to apply.  This object may  
+		"Specifies the loopback to apply.  This object may  
 		 include the following values:
 
-		 - localLoopback(0), payload bits for tranmission from 
-		   the host interface are looped back on receive payload 
-		   bits (data may be transmitted as normal but the 
-		   received payload is discarded);
+		 - local(0), payload bits for tranmission from the host 
+		   interface are looped back on receive payload bits 
+		   (data may be transmitted as normal but the received 
+		   payload is discarded);
 
-		 - remoteLoopback(1), the received serial bit stream is 
-		   looped back after the line interface unit to the 
-		   transmitted serial bit stream (transmit data from the 
-		   host is ignored, but received data may be delivered 
-		   to the host);
+		 - remote(1), the received serial bit stream is looped 
+		   back after the line interface unit to the transmitted 
+		   serial bit stream (transmit data from the host is 
+		   ignored, but received data may be delivered to the 
+		   host);
 
-		 - framerLoopback(2), the transmitted serial bit stream 
-		   is looped back at the framer to the receive serial 
-		   bit stream (unframed all ones is transmittted to the 
-		   line interface and received information is ignored);
+		 - framer(2), the transmitted serial bit stream is 
+		   looped back at the framer to the receive serial bit 
+		   stream (unframed all ones is transmittted to the line 
+		   interface and received information is ignored);
 
-		 - payloadLoopback(3), the received payload bits are 
-		   looped back to the tranmit payload bits at the 
-		   framer (transmitted data from the host is ignored, 
-		   but received data may be delivered to the host).
+		 - payload(3), the received payload bits are looped back 
+		   to the tranmit payload bits at the framer 
+		   (transmitted data from the host is ignored, but 
+		   received data may be delivered to the host).
 
-		 Only one of framerLoopback(2) or payloadLoopback(3) may 
-		 be present.  Only one of localLoopback(0) and 
-		 remoteLoopback(1) may be present.  localLoopback(0) and 
-		 framerLoopback(2) are only useful for specialized 
+		 Only one of framer(2) or payload(3) may be present.  
+		 Only one of local(0) and remote(1) may be present.  
+		 local(0) and framer(2) are only useful for specialized 
 		 testing.  The span must have a control status of 
 		 subjectToTest(0) or reservedForTest(2) before any 
 		 values may be added to the set by a management station.
@@ -423,12 +662,11 @@ mxSpanCrc OBJECT-TYPE
 mxSpanClocking OBJECT-TYPE
 	SYNTAX		INTEGER {
 				none(0),
-				internal(1),
-				external(2),
-				loop(3),
-				master(4),
-				slave(5),
-				adaptive(6)
+				loop(1),
+				local(2),
+				internal(3),
+				external(4),
+				adaptive(5)
 			}
 	MAX-ACCESS	read-create
 	STATUS		current
@@ -452,29 +690,37 @@ mxSpanClocking OBJECT-TYPE
 		   span might not be operational while this value is 
 		   present);
 
-		 - internal(1), clocking is specific to the device (i.e.  
-		   whatever is defined for the device);
-
-		 - external(2), clocking is external to the device (e.g. 
-		   a system bus or external timing bus);
-
-		 - loop(3), the transmit clock is derived from the 
+		 - loop(1), the transmit clock is derived from the 
 		   recovered receive clock for the span;
 
-		 - master(4), the transmit clock is derived from the 
-		   device's local crystal ocillator;
+		 - local(2), the timing source is internal to the evice 
+		   (e.g. provided by a crystal oscillator);
 
-		 - slave(5), clocking is internal (device and system 
-		   specific); however, if the clock fails the recovered 
-		   receive clock for this span will be used instead;
+		 - internal(3), clocking is specific to the device (i.e.  
+		   whatever is defined for the device);
 
-		 - adaptive(6), some other mechanism is used to derive 
-		   or recover clocking.
+		 - external(4), clocking is external to the device (e.g. 
+		   bus an external timing bus or timing input);
+
+		 - adaptive(6), clocking is adpated to the DSU side 
+		   system or serial bus.
 
 		 The value none(0) can be read but not written. When 
 		 read, the value none(0) indicates that the equipment is 
 		 either absent, not configured, or failed."
 	::= { mxSpanEntry 9 }
+
+mxSpanPriority OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Specifies or indicates the priority of this span as a 
+		 timing source.  When zero(0), this span will not be 
+		 used as a timing source.  When non-zero, the recovered 
+		 receive clock of this span will be used as the timing 
+		 source with the priority given."
+	::= { mxSpanEntry 10 }
 
 mxSpanCoding OBJECT-TYPE
 	SYNTAX		INTEGER {
@@ -517,7 +763,7 @@ mxSpanCoding OBJECT-TYPE
 		 The value none(0) can be read but not written.  When 
 		 read, the value none(0), indicates that the equipment 
 		 is either absent, not configured, or failed."
-	::= { mxSpanEntry 10 }
+	::= { mxSpanEntry 11 }
 
 mxSpanFraming OBJECT-TYPE
 	SYNTAX		INTEGER {
@@ -552,7 +798,7 @@ mxSpanFraming OBJECT-TYPE
 		 The value none(0) can be read but not writtern.  When 
 		 read, the value none(0) indicates that the equipment 
 		 is either absent, not configured, or failed."
-	::= { mxSpanEntry 11 }
+	::= { mxSpanEntry 12 }
 
 mxSpanLineImpedance OBJECT-TYPE
 	SYNTAX		INTEGER {
@@ -577,7 +823,7 @@ mxSpanLineImpedance OBJECT-TYPE
 
 		 - balanced120ohm(3), balanced 120 Ohm line impedance, 
 		   for E1 spans."
-	::= { mxSpanEntry 12 }
+	::= { mxSpanEntry 13 }
 
 mxSpanLineMode OBJECT-TYPE
 	SYNTAX		INTEGER {
@@ -602,7 +848,7 @@ mxSpanLineMode OBJECT-TYPE
 
 		 - monitor(3), high-impedance line monitoring 
 		   of the span."
-	::= { mxSpanEntry 13 }
+	::= { mxSpanEntry 14 }
 
 mxSpanLineLength OBJECT-TYPE
 	SYNTAX		INTEGER {
@@ -633,8 +879,8 @@ mxSpanLineLength OBJECT-TYPE
 		 
 		 The value is only significant when mxSpanLineMode is 
 		 set to dsu(1) for T1 spans."
-	DEFVAL		{ 1 } -- dsx133ft(1)
-	::= { mxSpanEntry 14 }
+	DEFVAL		{ dsx133ft } -- dsx133ft(1)
+	::= { mxSpanEntry 15 }
 
 mxSpanLineAttenuation OBJECT-TYPE
 	SYNTAX		INTEGER {
@@ -663,7 +909,7 @@ mxSpanLineAttenuation OBJECT-TYPE
 
 		 The value is only significant when mxSpanLineMode is 
 		 set to csu(2) for T1 spans."
-	::= { mxSpanEntry 15 }
+	::= { mxSpanEntry 16 }
 
 mxSpanLineGain OBJECT-TYPE
 	SYNTAX		INTEGER {
@@ -696,7 +942,7 @@ mxSpanLineGain OBJECT-TYPE
 
 		 The value is only significant when mxSpanLineMode is 
 		 set to monitor(3)."
-	::= { mxSpanEntry 16 }
+	::= { mxSpanEntry 17 }
 
 mxSpanLineDelay OBJECT-TYPE
 	SYNTAX		Unsigned32
@@ -705,7 +951,7 @@ mxSpanLineDelay OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 		""
-	::= { mxSpanEntry 17 }
+	::= { mxSpanEntry 18 }
 
 mxSpanTxLevel OBJECT-TYPE
 	SYNTAX		INTEGER {
@@ -719,8 +965,8 @@ mxSpanTxLevel OBJECT-TYPE
 		 on(1) or off(0).  Note that if the mxSpanLineMode is 
 		 set to monitor(3), the tranmitter may be fixed at 
 		 off(0)."
-	DEFVAL		{ 1 } -- on (except off for monitor mode)
-	::= { mxSpanEntry 18 }
+	DEFVAL		{ on } -- on (except off for monitor mode)
+	::= { mxSpanEntry 19 }
 
 mxSpanRxLevel OBJECT-TYPE
 	SYNTAX		INTEGER {
@@ -732,8 +978,8 @@ mxSpanRxLevel OBJECT-TYPE
 	DESCRIPTION
 		"Specifies and indicates whether the receiver is on(1) 
 		 or off(0)."
-	DEFVAL		{ 1 } -- on
-	::= { mxSpanEntry 19 }
+	DEFVAL		{ on } -- on
+	::= { mxSpanEntry 20 }
 
 mxSpanAlarmSettleTime OBJECT-TYPE
 	SYNTAX		TimeInterval
@@ -747,7 +993,7 @@ mxSpanAlarmSettleTime OBJECT-TYPE
 		 default is 5 seconds (500 centiseconds).  This column 
 		 may be read-only for some systems."
 	DEFVAL		{ 500 } -- 5 seconds
-	::= { mxSpanEntry 20 }
+	::= { mxSpanEntry 21 }
 
 mxSpanLineCodeTime OBJECT-TYPE
 	SYNTAX		TimeInterval
@@ -760,7 +1006,7 @@ mxSpanLineCodeTime OBJECT-TYPE
 		 default value is 5 seconds (500 centiseconds).  This 
 		 column may be read-only for some systems."
 	DEFVAL		{ 500 } -- 5 seconds
-	::= { mxSpanEntry 21 }
+	::= { mxSpanEntry 22 }
 
 mxSpanPrimary OBJECT-TYPE
 	SYNTAX		SimpleNameType
@@ -783,7 +1029,7 @@ mxSpanPrimary OBJECT-TYPE
 		 index can be referenced directly by a service access 
 		 point."
 	DEFVAL		{ ''X } -- null string
-	::= { mxSpanEntry 22 }
+	::= { mxSpanEntry 23 }
 
 mxSpanDataLink OBJECT-TYPE
 	SYNTAX		BITS {
@@ -806,7 +1052,7 @@ mxSpanDataLink OBJECT-TYPE
 		 - other(2), present when another protocol is used.
 		   
 		 When the set is empty, no FDL is used."
-	::= { mxSpanEntry 23 }
+	::= { mxSpanEntry 24 }
 
 mxSpanLineCode OBJECT-TYPE
 	SYNTAX		INTEGER {
@@ -845,8 +1091,8 @@ mxSpanLineCode OBJECT-TYPE
 		 The linkCode(2), payloadCode(3) and resetCode(4) 
 		 settings will only persist for 5 seconds.  Other 
 		 settings will persist until reset."
-	DEFVAL		{ 1 } -- noCode(1)
-	::= { mxSpanEntry 24 }
+	DEFVAL		{ noCode } -- noCode(1)
+	::= { mxSpanEntry 25 }
 
 mxSpanAlarmSeverityMappingProfile OBJECT-TYPE
 	SYNTAX		SimpleNameType
@@ -858,7 +1104,7 @@ mxSpanAlarmSeverityMappingProfile OBJECT-TYPE
 		 this is the null string, or when a mapping does not 
 		 exist, the default values will be used."
 	DEFVAL		{ ''X }
-	::= { mxSpanEntry 25 }
+	::= { mxSpanEntry 26 }
 
 mxSpanAdministrativeState OBJECT-TYPE
 	SYNTAX		AdministrativeState
@@ -882,8 +1128,8 @@ mxSpanAdministrativeState OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
 		 administrativeState."
-	DEFVAL		{ 1 } -- locked(1)
-	::= { mxSpanEntry 26 }
+	DEFVAL		{ locked } -- locked(1)
+	::= { mxSpanEntry 27 }
 
 mxSpanOperationalState OBJECT-TYPE
 	SYNTAX		OperationalState
@@ -905,7 +1151,7 @@ mxSpanOperationalState OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
 		 operationalState."
-	::= { mxSpanEntry 27 }
+	::= { mxSpanEntry 28 }
 
 mxSpanUsageState OBJECT-TYPE
 	SYNTAX		UsageState
@@ -934,7 +1180,7 @@ mxSpanUsageState OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
 		 usageState."
-	::= { mxSpanEntry 28 }
+	::= { mxSpanEntry 29 }
 
 mxSpanAlarmStatus OBJECT-TYPE
 	SYNTAX		AlarmStatus
@@ -978,7 +1224,7 @@ mxSpanAlarmStatus OBJECT-TYPE
 		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
 		 alarmStatus."
 	DEFVAL		{ '00000'B }
-	::= { mxSpanEntry 29 }
+	::= { mxSpanEntry 30 }
 
 mxSpanProceduralStatus OBJECT-TYPE
 	SYNTAX		ProceduralStatus
@@ -1023,7 +1269,7 @@ mxSpanProceduralStatus OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
 		 proceduralStatus."
-	::= { mxSpanEntry 30 }
+	::= { mxSpanEntry 31 }
 
 mxSpanAvailabilityStatus OBJECT-TYPE
 	SYNTAX		AvailabilityStatus
@@ -1096,7 +1342,7 @@ mxSpanAvailabilityStatus OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
 		 availabilityStatus."
-	::= { mxSpanEntry 31 }
+	::= { mxSpanEntry 32 }
 
 mxSpanControlStatus OBJECT-TYPE
 	SYNTAX		ControlStatus
@@ -1134,7 +1380,7 @@ mxSpanControlStatus OBJECT-TYPE
 		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
 		 controlStatus."
 	DEFVAL		{ '0000'B } -- empty set
-	::= { mxSpanEntry 32 }
+	::= { mxSpanEntry 33 }
 
 mxSpanStandbyStatus OBJECT-TYPE
 	SYNTAX		StandbyStatus
@@ -1176,8 +1422,8 @@ mxSpanStandbyStatus OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
 		 standbyStatus."
-	DEFVAL		{ 2 } -- providingService(2)
-	::= { mxSpanEntry 33 }
+	DEFVAL		{ providingService } -- providingService(2)
+	::= { mxSpanEntry 34 }
 
 mxSpanUnknownStatus OBJECT-TYPE
 	SYNTAX		UnknownStatus
@@ -1194,7 +1440,7 @@ mxSpanUnknownStatus OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
 		 unknownStatus."
-	::= { mxSpanEntry 34 }
+	::= { mxSpanEntry 35 }
 
 mxSpanSap OBJECT-TYPE
 	SYNTAX		SimpleNameType
@@ -1205,16 +1451,16 @@ mxSpanSap OBJECT-TYPE
 		 represents the user of the entire span.   When the 
 		 value is the null string, it indicates that there is no 
 		 user of the entire span."
-	::= { mxSpanEntry 35 }
+	::= { mxSpanEntry 36 }
 
 mxSpanLoopbackStatus OBJECT-TYPE
 	SYNTAX		BITS {
-				nearEndInwardLoopback(0),
-				nearEndLineLoopback(1),
-				nearEndFramerLoopback(2),
-				nearEndPayloadLoopback(3),
-				farEndLineLoopback(4),
-				farEndPayloadLoopback(5)
+				nearEndInward(0),
+				nearEndLine(1),
+				nearEndFramer(2),
+				nearEndPayload(3),
+				farEndLine(4),
+				farEndPayload(5)
 			}
 	MAX-ACCESS	read-only
 	STATUS		current
@@ -1223,30 +1469,27 @@ mxSpanLoopbackStatus OBJECT-TYPE
 		 status of the span.  This object may contain the 
 		 following values:
 
-		 - nearEndInwardLoopback(0), payload bits for 
-		   transmission overwrite the receive payload bits;
+		 - nearEndInward(0), payload bits for transmission 
+		   overwrite the receive payload bits;
 
-		 - nearEndLineLoopback(1), the received serial bit 
-		   stream is copied to the transmit serial bit 
-		   stream;
+		 - nearEndLine(1), the received serial bit stream is 
+		   copied to the transmit serial bit stream;
 
-		 - nearEndFramerLoopback(2), the transmit serial bit 
-		   stream is copied to the receive serial bit stream;
+		 - nearEndFramer(2), the transmit serial bit stream is 
+		   copied to the receive serial bit stream;
 
-		 - nearEndPayloadLoopback(3), the received payload bits 
+		 - nearEndPayload(3), the received payload bits 
 		   overwrite the transmit payload bits;
 
-		 - farEndLineLoopback(4), the far end is in line 
-		   loopback;
+		 - farEndLine(4), the far end is in line loopback;
 
-		 - farEndPayloadLoopback(5), the far end is in payload 
-		   loopback.
+		 - farEndPayload(5), the far end is in payload loopback.
 		 
 		 When the object contains no values, the loopback status 
 		 is either unknown or no loopback is present.  The two 
 		 conditions can be distinguished using the 
 		 mxSpanUnknownStatus object in the same row."
-	::= { mxSpanEntry 36 }
+	::= { mxSpanEntry 37 }
 
 mxSpanLineStatus OBJECT-TYPE
 	SYNTAX		BITS {
@@ -1271,8 +1514,54 @@ mxSpanLineStatus OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		""
-	::= { mxSpanEntry 37 }
+		"
+		 - none(0), only present when no other status is 
+		   present;
+
+		 - rcvFarEndLOF(1), receiving a far end loss of frame 
+		   indication (receiving yellow alarm/RAI);
+
+		 - xmtFarEndLOF(2), transmitting a far end loss of frame 
+		   indication (transmitting yellow alarm/RAI);
+
+		 - rcvAIS(3), receiving an AIS indication (receiving blue 
+		   alarm/AIS);
+
+		 - xmtAIS(4), transmitting an AIS indication 
+		   (transmitting blue alarm/AIS);
+
+		 - lossOfFrame(5), experiencing a receive loss of frame 
+		   condition;
+
+		 - lossOfSignal(6), experiencing a receive loss of 
+		   signal condition;
+
+		 - loopbackState(7), in a loopback state;
+
+		 - t16AIS(8), receiving an AIS indication in TS16;
+
+		 - rcvFarEndLOMF(9), receiving a far end loss of 
+		   multiframe indication (receiving E-bits);
+
+		 - xmtFarEndLOMF(10), transmitting a far end loss of 
+		   multiframe indication (transmitting E-bits);
+
+		 - rcvTestCode(11), receiving a test code;
+
+		 - otherFailure(12), other failure (e.g. transitter open 
+		   circuit, transmitter short circuit);
+
+		 - uavailSigState(13), in an unavailable signalling 
+		   state;
+
+		 - netEquipOOS(14), associated network equipment is out 
+		   of service;
+
+		 - rcvPayloadAIS(15), receiving a payload AIS;
+
+		 - perfThreshold(16), performance threshold exceeded.
+		 "
+	::= { mxSpanEntry 38 }
 
 mxSpanAlarms OBJECT-TYPE
 	SYNTAX		BITS {
@@ -1304,7 +1593,7 @@ mxSpanAlarms OBJECT-TYPE
 		   sending of yellow alarm (T1/J1) or RAI condition 
 		   (E1), present after the red or blue/AIS alarms clear 
 		   while waiting for the alarm recovery period."
-	::= { mxSpanEntry 38 }
+	::= { mxSpanEntry 39 }
 
 mxSpanEvents OBJECT-TYPE
 	SYNTAX		BITS {
@@ -1385,7 +1674,7 @@ mxSpanEvents OBJECT-TYPE
 		 operation.  Not all devices will report all conditions.  
 		 Some conditions may also cause alarm conditions and 
 		 notifications."
-	::= { mxSpanEntry 39 }
+	::= { mxSpanEntry 40 }
 
 mxSpanReceiveLevel OBJECT-TYPE
 	SYNTAX		INTEGER (0..600)
@@ -1396,7 +1685,7 @@ mxSpanReceiveLevel OBJECT-TYPE
 		"Indicates the receive level in increments of -0.1 dB.  
 		 The level indicated is only within the range detected 
 		 by the device."
-	::= { mxSpanEntry 40 }
+	::= { mxSpanEntry 41 }
 
 mxSpanReceiveThreshold OBJECT-TYPE
 	SYNTAX		INTEGER (0..600)
@@ -1410,7 +1699,7 @@ mxSpanReceiveThreshold OBJECT-TYPE
 		 range from 0 to this value.  When this value returns 
 		 zero (0), the device is incapable of providing the 
 		 receive level."
-	::= { mxSpanEntry 41 }
+	::= { mxSpanEntry 42 }
 
 mxSpanRowStatus OBJECT-TYPE
 	SYNTAX		RowStatus
@@ -1419,7 +1708,7 @@ mxSpanRowStatus OBJECT-TYPE
 	DESCRIPTION
 		"Provides a mechanism whereby management stations may 
 		 create or delete rows in this table."
-	::= { mxSpanEntry 42 }
+	::= { mxSpanEntry 43 }
 
 
 -- =====================================================================
@@ -1503,7 +1792,7 @@ mxChanType OBJECT-TYPE
 		 DS0 operation within the channel is indicated.  The 
 		 default is ccs(1).  For E1 CAS operation, channel 17 
 		 (timeslot 16) is unavailable for use."
-	DEFVAL		{ 2 } -- ccs(2)
+	DEFVAL		{ ccs } -- ccs(2)
 	::= { mxChanEntry 2 }
 
 mxChanRate OBJECT-TYPE
@@ -1577,7 +1866,7 @@ mxChanAdministrativeState OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
 		 administrativeState."
-	DEFVAL		{ 0 } -- locked(0)
+	DEFVAL		{ locked } -- locked(0)
 	::= { mxChanEntry 5 }
 
 mxChanUsageState OBJECT-TYPE
@@ -1753,14 +2042,16 @@ mxXconEntry OBJECT-TYPE
 		 the storage type can be used to alter this behaviour."
 	INDEX	{
 			mxSpanIndex, -- shared index
-			mxChanIndex, -- shared index
-			mxSpanIndex, -- shared index
 			mxChanIndex -- shared index
 		}
 	::= { mxXconTable 1 }
 
 MxXconEntry ::=
 	SEQUENCE {
+		mxXconSpanIndex
+			SimpleNameType,
+		mxXconChanIndex
+			INTEGER,
 		mxXconType
 			INTEGER,
 		mxXconStorageType
@@ -1768,6 +2059,24 @@ MxXconEntry ::=
 		mxXconRowStatus
 			RowStatus
 	}
+
+mxXconSpanIndex OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the name of the span to which the indexed span 
+		 is cross-connected."
+	::= { mxXconEntry 1 }
+
+mxXconChanIndex OBJECT-TYPE
+	SYNTAX		INTEGER (1..31)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the channel number of the channel to which the 
+		 indexed span and channel is cross-connected."
+	::= { mxXconEntry 2 }
 
 mxXconType OBJECT-TYPE
 	SYNTAX		INTEGER {
@@ -1793,8 +2102,8 @@ mxXconType OBJECT-TYPE
 		 deletion of switch connections).  Management stations 
 		 may create and delete semi-permanent and permanent 
 		 connections."
-	DEFVAL		{ 3 } -- permanent(3)
-	::= { mxXconEntry 1 }
+	DEFVAL		{ permanent } -- permanent(3)
+	::= { mxXconEntry 3 }
 
 mxXconStorageType OBJECT-TYPE
 	SYNTAX		StorageType
@@ -1811,8 +2120,8 @@ mxXconStorageType OBJECT-TYPE
 		 - nonVolatile(3), the row is not lost upon reboot, 
 		   applicable to semi-permanent and permanent 
 		   connections."
-	DEFVAL		{ 3 } -- nonVolatile(3)
-	::= { mxXconEntry 2 }
+	DEFVAL		{ nonVolatile } -- nonVolatile(3)
+	::= { mxXconEntry 4 }
 
 mxXconRowStatus OBJECT-TYPE
 	SYNTAX		RowStatus
@@ -1829,8 +2138,8 @@ mxXconRowStatus OBJECT-TYPE
 		 channel which is already engaged in another connection, 
 		 the other connection must first be deleted.  Rows may 
 		 not be taken out of service."
-	DEFVAL		{ 1 } -- active(1)
-	::= { mxXconEntry 3 }
+	DEFVAL		{ active } -- active(1)
+	::= { mxXconEntry 5 }
 
 
 -- =====================================================================
@@ -1840,7 +2149,8 @@ mxBertTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"The MX BERT table provides a mechanism whereby BERT 
+		 teseting can be performed on a span by span basis."
 	::= { mxBert 1 }
 
 mxBertEntry OBJECT-TYPE
@@ -1848,7 +2158,11 @@ mxBertEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"Each entry in the table provides an interface to BERT 
+		 testing for the span.  Entries exist in this table as a 
+		 part of system configuration.  A span whose device 
+		 hardware or driver does not support any BERT testing 
+		 will not have a corresponding entry in this table."
 	INDEX	{
 			mxSpanIndex -- shared index
 		}
@@ -1905,7 +2219,7 @@ mxBertMode OBJECT-TYPE
 		 
 		 Not all values are supported by all spans, and not all 
 		 values are supported by all span equipment."
-	DEFVAL		{ 0 } -- none
+	DEFVAL		{ none } -- none
 	::= { mxBertEntry 1 }
 
 mxBertSelect OBJECT-TYPE
@@ -1951,7 +2265,7 @@ mxBertSelect OBJECT-TYPE
 
 		 Not all values are supported by all span types and not 
 		 all values are supported by all span equipment."
-	DEFVAL		{ 0 } -- none(0)
+	DEFVAL		{ none } -- none(0)
 	::= { mxBertEntry 2 }
 
 mxBertPattern OBJECT-TYPE
@@ -2083,7 +2397,7 @@ mxNearEndCurrentTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"Provides a table of near end current statistic."
 	::= { mxNearEndCurrent 1 }
 
 mxNearEndCurrentEntry OBJECT-TYPE
@@ -2091,7 +2405,11 @@ mxNearEndCurrentEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"Each entry in this table provides the current 
+		 accumulation of near end performance statistics for a 
+		 given span.  Spans that do not support the far end 
+		 reporting of performance measurements will not have an 
+		 associated entry in this table."
 	INDEX	{
 			mxSpanIndex -- shared index
 		}
@@ -2254,7 +2572,9 @@ mxNearEndIntervalTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"Provides a table of near end performance interval 
+		 measurements for a given span.  Entries exist 
+		 the previous 96 intervals associated with each span."
 	::= { mxNearEndInterval 1 }
 
 mxNearEndIntervalEntry OBJECT-TYPE
@@ -2262,7 +2582,13 @@ mxNearEndIntervalEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"Each entry in the table provides the interval 
+		 measurements for one of 96 intervals associated with 
+		 each span.  If the associated span does not support the 
+		 reporting of near end performance measurements, there 
+		 may be no intervals in this table for the associated 
+		 span; or the intervals may have the 
+		 mxNearEndIntervalValidData column set to false(2)."
 	INDEX	{
 			mxSpanIndex, -- shared index
 			mxNearEndIntervalIndex
@@ -2421,7 +2747,8 @@ mxNearEndTotalTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"Provides a table of near end performance measurement 
+		 totals."
 	::= { mxNearEndTotal 1 }
 
 mxNearEndTotalEntry OBJECT-TYPE
@@ -2429,7 +2756,12 @@ mxNearEndTotalEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"Each entry in the table provides near end perofrmance 
+		 statistics for a given span.  Spans whose drivers or 
+		 equipment does not support the reporting of near end 
+		 performance measurements will not have an entry in this 
+		 table, or may have an entry where the 
+		 mxNearEndTotalValidIntervals is zero (0)."
 	INDEX	{
 			mxSpanIndex -- shared index
 		}
@@ -2590,7 +2922,7 @@ mxFarEndCurrentTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"Provides a table of far end current statistic."
 	::= { mxFarEndCurrent 1 }
 
 mxFarEndCurrentEntry OBJECT-TYPE
@@ -2598,7 +2930,11 @@ mxFarEndCurrentEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"Each entry in this table provides the current 
+		 accumulation of far end performance statistics for a 
+		 given span.  Spans that do not support the far end 
+		 reporting of performance measurements will not have an 
+		 associated entry in this table."
 	INDEX	{
 			mxSpanIndex -- shared index
 		}
@@ -2735,7 +3071,9 @@ mxFarEndIntervalTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"Provides a table of far end performance interval 
+		 measurements for a given span.  Entries exist 
+		 the previous 96 intervals associated with each span."
 	::= { mxFarEndInterval 1 }
 
 mxFarEndIntervalEntry OBJECT-TYPE
@@ -2743,7 +3081,13 @@ mxFarEndIntervalEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"Each entry in the table provides the interval 
+		 measurements for one of 96 intervals associated with 
+		 each span.  If the associated span does not support the 
+		 reporting of far end performance measurements, there 
+		 may be no intervals in this table for the associated 
+		 span; or the intervals may have the 
+		 mxFarEndIntervalValidData column set to false(2)."
 	INDEX	{
 			mxSpanIndex, -- shared index
 			mxFarEndIntervalIndex
@@ -2890,7 +3234,8 @@ mxFarEndTotalTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"Provides a table of far end performance statistic 
+		 totals."
 	::= { mxFarEndTotal 1 }
 
 mxFarEndTotalEntry OBJECT-TYPE
@@ -2898,7 +3243,12 @@ mxFarEndTotalEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		""
+		"Each entry in the table provides far end performance 
+		 statistics for a given span.  Spans whose drivers or 
+		 equipment does not support the reporting of far end 
+		 performance measurements will not have an entry in this  
+		 table, or may have an entry where the 
+		 mxFarEndTotalValidIntervals is zero (0)."
 	INDEX	{
 			mxSpanIndex -- shared index
 		}

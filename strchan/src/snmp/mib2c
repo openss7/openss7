@@ -246,6 +246,8 @@ sub loadMib {
 	    $variables{$vroutine}{'indexes'} = $mib->{'indexes'};
 	    foreach $i (@{$mib->{'indexes'}}) {
 		$variables{$vroutine}{$i}{'isanindex'} = 1;
+		my $j = $SNMP::MIB{$i};
+		loadMib($j, $depth) unless ($j->{'label'} eq "mib-2");
 	    }
 	}
     }
@@ -260,7 +262,16 @@ sub loadMib {
 	    $vroutine="$mibName";
 	}
 	else {
-	    $newdepth = max(loadMib($i, $depth), $newdepth);
+	    my $m;
+	    my $j;
+	    foreach $j (@{$mib->{'indexes'}}) {
+		    if ($j eq $i->{'label'}) {
+			    $m = $j;
+		    }
+	    }
+	    if ($m ne $i->{'label'}) {
+		    $newdepth = max(loadMib($i, $depth), $newdepth);
+	    }
 	}
     }
     return $newdepth;

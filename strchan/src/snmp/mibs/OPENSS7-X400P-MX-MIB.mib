@@ -181,10 +181,10 @@ x400pSyncTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"The X400P syncrhonization table is a table of 
-		 syncrhonization groups.  Equipped X400P cards that are 
+		"The X400P synchronization table is a table of 
+		 synchronization groups.  Equipped X400P cards that are 
 		 configured for automatic synchronzation are assigned to 
-		 a syncrhonization group."
+		 a synchronization group."
 	::= { x400pSync 1 }
 
 x400pSyncEntry OBJECT-TYPE
@@ -192,13 +192,13 @@ x400pSyncEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Each entry in the syncrhonization table represents a 
+		"Each entry in the synchronization table represents a 
 		 synchronization source to be used for automatic 
 		 synchronization within each group in the order of the 
 		 index.  Rows may be created and deleted explicitly by 
 		 management stations.  Rows may be deleted implicitly as 
 		 a part of system operation when a card is disassociated 
-		 with a syncrhoniation group."
+		 with a synchroniation group."
 	INDEX	{
 			x400pSyncGroup, -- index
 			x400pSyncIndex -- index
@@ -236,7 +236,7 @@ x400pSyncIndex OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 		"Specifies the index of the entry and the priority at 
-		 which the entry will be used for syncrhonization of the 
+		 which the entry will be used for synchronization of the 
 		 card.  Index value 1 is the highest priority and index 
 		 value 8 is the lowest priority."
 	::= { x400pSyncEntry 2 }
@@ -247,11 +247,11 @@ x400pSyncSpanId OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 		"Specifies the card and span to be used as a card 
-		 syncrhonization source at the priority of the 
+		 synchronization source at the priority of the 
 		 corresponding index.  Cards 1..16 and spans 1..4 can be 
 		 specified in accordance with the X400pSpanId textual 
 		 convention.  However, the card number specified must 
-		 belong to the same syncrhonization group as the indexed 
+		 belong to the same synchronization group as the indexed 
 		 group.  That is, the card must have its synchronization 
 		 group set to the index of this entry, and the card 
 		 synchronization source must be set to syncAuto(6)."
@@ -365,7 +365,7 @@ x400pCardIndex OBJECT-TYPE
 	MAX-ACCESS	not-accessible -- index
 	STATUS		current
 	DESCRIPTION
-		"Provides an index for the X400P card two which this 
+		"Provides an index for the X400P card to which this 
 		 entry corresponds.  This is a small ordinal number 
 		 begining an 1 and enumerating as many as 16 cards."
 	::= { x400pCardEntry 1 }
@@ -614,9 +614,9 @@ x400pCardSyncSource OBJECT-TYPE
 
 		 - syncAuto(6), the driver will use the spans specified 
 		   in the x400pSyncTable side-table for the card as 
-		   syncrhonization sources.
+		   synchronization sources.
 		 
-		 Note that the card syncrhonization source only affects 
+		 Note that the card synchronization source only affects 
 		 spans that are set for internal(2) or slave(6) span 
 		 clocking."
 	::= { x400pCardEntry 13 }
@@ -626,7 +626,7 @@ x400pCardSyncGroup OBJECT-TYPE
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION
-		"Specifies the syncrhonization group to which this card 
+		"Specifies the synchronization group to which this card 
 		 belongs.  This value is only significant when the 
 		 synchronization source is set to syncAuto(6).  A 
 		 synchronization group is a group of cards, including 
@@ -634,7 +634,7 @@ x400pCardSyncGroup OBJECT-TYPE
 		 together with a timing cable and therefore share the 
 		 same timing bus.  The order of cards and spans that 
 		 will be used for timing are specified against the 
-		 syncrhonization group that has an group index of the 
+		 synchronization group that has an group index of the 
 		 same value as this column."
 	::= { x400pCardEntry 14 }
 
@@ -739,9 +739,9 @@ x400pCardAlarmStatus OBJECT-TYPE
 		 The alarm status for the card is not directly associated 
 		 with the alarm status of the spans provided by the 
 		 card.  Alarm notifications associated with the card 
-		 occur when syncrhonization is lost the span currently 
-		 used as a syncrhonization source and the card is 
-		 searching for another syncrhonization source."
+		 occur when synchronization is lost the span currently 
+		 used as a synchronization source and the card is 
+		 searching for another synchronization source."
 	REFERENCE
 		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2 
 		 alarmStatus."
@@ -836,9 +836,9 @@ x400pCardAvailabilityStatus OBJECT-TYPE
 		 
 		 - degraded(6), the card is operating with degraded 
 		   performance.  This is the case when the card is 
-		   searching for a new syncrhonization source and a 
+		   searching for a new synchronization source and a 
 		   yellow or red alarm condition has occurred on the 
-		   current syncrhonization source.
+		   current synchronization source.
 		 
 		 - notInstalled(7), the card is not present in the 
 		   system or is incomplete.
@@ -903,11 +903,11 @@ x400pCardSyncSpanId OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"Indiecates which card and span is being used as the 
-		 current syncrhonization source for the indexed card.  
-		 When the syncrhonization source is set to syncSelf(0) 
+		"Indicates which card and span is being used as the 
+		 current synchronization source for the indexed card.  
+		 When the synchronization source is set to syncSelf(0) 
 		 or syncExtern(5), this value will be the null octet 
-		 string.  When the syncrhonization source is set to 
+		 string.  When the synchronization source is set to 
 		 sync1(1), sync2(2), sync3(3) or sync4(4), the value 
 		 will always ben the same as the identifier of span 1, 
 		 2, 3 or 4, respectively, for the indexed card.  When 

@@ -121,10 +121,10 @@ The
 driver is an implementation of the SS7 Message Transfer Part (MTP) protocol as
 defined in ITU-T Recommendation Q.701-Q.707.
 .B MTP-IOCTL
-provide the definition of the managed objects for the
+provides the definition of the managed objects for the
 .BR mtp (4)
 driver in accordance with the managed object model in
-ITU-T Recommeendation Q.751.1.
+ITU-T Recommendation Q.751.1.
 .\"
 .\"
 .PP
