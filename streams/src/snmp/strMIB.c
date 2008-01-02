@@ -266,91 +266,91 @@ struct variable7 strMIB_variables[] = {
 	{STRMODMAJOR, ASN_UNSIGNED, RONLY, var_strModTable, 6, {1, 1, 1, 1, 1, 4}},
 #define   STRMODROWSTATUS       7
 	{STRMODROWSTATUS, ASN_INTEGER, RWRITE, var_strModTable, 6, {1, 1, 1, 1, 1, 5}},
-#define   STRMODINFOQUEUES      11
+#define   STRMODINFOQUEUES      12
 	{STRMODINFOQUEUES, ASN_BIT_STR, RONLY, var_strModInfoTable, 6, {1, 1, 2, 1, 1, 2}},
-#define   STRMODINFOMINPSZ      12
+#define   STRMODINFOMINPSZ      13
 	{STRMODINFOMINPSZ, ASN_INTEGER, RWRITE, var_strModInfoTable, 6, {1, 1, 2, 1, 1, 3}},
-#define   STRMODINFOMAXPSZ      13
+#define   STRMODINFOMAXPSZ      14
 	{STRMODINFOMAXPSZ, ASN_INTEGER, RWRITE, var_strModInfoTable, 6, {1, 1, 2, 1, 1, 4}},
-#define   STRMODINFOHIWAT       14
+#define   STRMODINFOHIWAT       15
 	{STRMODINFOHIWAT, ASN_UNSIGNED, RWRITE, var_strModInfoTable, 6, {1, 1, 2, 1, 1, 5}},
-#define   STRMODINFOLOWAT       15
+#define   STRMODINFOLOWAT       16
 	{STRMODINFOLOWAT, ASN_UNSIGNED, RWRITE, var_strModInfoTable, 6, {1, 1, 2, 1, 1, 6}},
-#define   STRMODINFOTRACELEVEL  16
+#define   STRMODINFOTRACELEVEL  17
 	{STRMODINFOTRACELEVEL, ASN_UNSIGNED, RWRITE, var_strModInfoTable, 6, {1, 1, 2, 1, 1, 7}},
-#define   STRMODSTATQUEUES      20
+#define   STRMODSTATQUEUES      22
 	{STRMODSTATQUEUES, ASN_BIT_STR, RONLY, var_strModStatTable, 6, {1, 1, 3, 1, 1, 2}},
-#define   STRMODSTATPCNT        21
+#define   STRMODSTATPCNT        23
 	{STRMODSTATPCNT, ASN_COUNTER, RONLY, var_strModStatTable, 6, {1, 1, 3, 1, 1, 3}},
-#define   STRMODSTATSCNT        22
+#define   STRMODSTATSCNT        24
 	{STRMODSTATSCNT, ASN_COUNTER, RONLY, var_strModStatTable, 6, {1, 1, 3, 1, 1, 4}},
-#define   STRMODSTATOCNT        23
+#define   STRMODSTATOCNT        25
 	{STRMODSTATOCNT, ASN_COUNTER, RONLY, var_strModStatTable, 6, {1, 1, 3, 1, 1, 5}},
-#define   STRMODSTATCCNT        24
+#define   STRMODSTATCCNT        26
 	{STRMODSTATCCNT, ASN_COUNTER, RONLY, var_strModStatTable, 6, {1, 1, 3, 1, 1, 6}},
-#define   STRMODSTATACNT        25
+#define   STRMODSTATACNT        27
 	{STRMODSTATACNT, ASN_COUNTER, RONLY, var_strModStatTable, 6, {1, 1, 3, 1, 1, 7}},
-#define   STRMODSTATPRIVATE     26
+#define   STRMODSTATPRIVATE     28
 	{STRMODSTATPRIVATE, ASN_OCTET_STR, RONLY, var_strModStatTable, 6, {1, 1, 3, 1, 1, 8}},
-#define   STRMODSTATFLAGS       27
+#define   STRMODSTATFLAGS       29
 	{STRMODSTATFLAGS, ASN_UNSIGNED, RONLY, var_strModStatTable, 6, {1, 1, 3, 1, 1, 9}},
-#define   STRAPSHMAJOR          31
-	{STRAPSHMAJOR, ASN_UNSIGNED, RONLY, var_strApshTable, 6, {1, 1, 4, 1, 1, 2}},
-#define   STRAPSHMODULES        34
+#define   STRAPSHMAJOR          34
+	{STRAPSHMAJOR, ASN_UNSIGNED, RONLY, var_strApshTable, 6, {1, 1, 4, 1, 1, 3}},
+#define   STRAPSHMODULES        36
 	{STRAPSHMODULES, ASN_OCTET_STR, RWRITE, var_strApshTable, 6, {1, 1, 4, 1, 1, 5}},
-#define   STRAPSHROWSTATUS      35
+#define   STRAPSHROWSTATUS      37
 	{STRAPSHROWSTATUS, ASN_INTEGER, RWRITE, var_strApshTable, 6, {1, 1, 4, 1, 1, 6}},
-#define   STRSTATSSTRUCTURE     38
+#define   STRSTATSSTRUCTURE     40
 	{STRSTATSSTRUCTURE, ASN_INTEGER, RONLY, var_strStatsTable, 6, {1, 1, 5, 1, 1, 1}},
-#define   STRSTATSCURRENTALLOCS  39
+#define   STRSTATSCURRENTALLOCS  41
 	{STRSTATSCURRENTALLOCS, ASN_GAUGE, RONLY, var_strStatsTable, 6, {1, 1, 5, 1, 1, 2}},
-#define   STRSTATSHIGHWATERMARK  40
+#define   STRSTATSHIGHWATERMARK  42
 	{STRSTATSHIGHWATERMARK, ASN_GAUGE, RONLY, var_strStatsTable, 6, {1, 1, 5, 1, 1, 3}},
-#define   STRCLTIME             41
+#define   STRCLTIME             43
 	{STRCLTIME, ASN_INTEGER, RWRITE, var_strMIB, 4, {1, 2, 1, 1}},
-#define   STRMAXAPUSH           42
+#define   STRMAXAPUSH           44
 	{STRMAXAPUSH, ASN_UNSIGNED, RWRITE, var_strMIB, 4, {1, 2, 1, 2}},
-#define   STRMAXMBLK            43
+#define   STRMAXMBLK            45
 	{STRMAXMBLK, ASN_UNSIGNED, RWRITE, var_strMIB, 4, {1, 2, 1, 3}},
-#define   STRMAXSTRAMOD         44
+#define   STRMAXSTRAMOD         46
 	{STRMAXSTRAMOD, ASN_UNSIGNED, RWRITE, var_strMIB, 4, {1, 2, 1, 4}},
-#define   STRMAXSTRDEV          45
+#define   STRMAXSTRDEV          47
 	{STRMAXSTRDEV, ASN_UNSIGNED, RONLY, var_strMIB, 4, {1, 2, 1, 5}},
-#define   STRMAXSTRMOD          46
+#define   STRMAXSTRMOD          48
 	{STRMAXSTRMOD, ASN_UNSIGNED, RONLY, var_strMIB, 4, {1, 2, 1, 6}},
-#define   STRMSGPRIORITY        47
+#define   STRMSGPRIORITY        49
 	{STRMSGPRIORITY, ASN_INTEGER, RWRITE, var_strMIB, 4, {1, 2, 1, 7}},
-#define   STRNBAND              48
+#define   STRNBAND              50
 	{STRNBAND, ASN_UNSIGNED, RONLY, var_strMIB, 4, {1, 2, 1, 8}},
-#define   STRNSTRMSGS           49
+#define   STRNSTRMSGS           51
 	{STRNSTRMSGS, ASN_UNSIGNED, RWRITE, var_strMIB, 4, {1, 2, 1, 9}},
-#define   STRNSTRPUSH           50
+#define   STRNSTRPUSH           52
 	{STRNSTRPUSH, ASN_UNSIGNED, RWRITE, var_strMIB, 4, {1, 2, 1, 10}},
-#define   STRHIWAT              51
+#define   STRHIWAT              53
 	{STRHIWAT, ASN_UNSIGNED, RWRITE, var_strMIB, 4, {1, 2, 1, 11}},
-#define   STRLOWAT              52
+#define   STRLOWAT              54
 	{STRLOWAT, ASN_UNSIGNED, RWRITE, var_strMIB, 4, {1, 2, 1, 12}},
-#define   STRMAXPSZ             53
+#define   STRMAXPSZ             55
 	{STRMAXPSZ, ASN_INTEGER, RWRITE, var_strMIB, 4, {1, 2, 1, 13}},
-#define   STRMINPSZ             54
+#define   STRMINPSZ             56
 	{STRMINPSZ, ASN_INTEGER, RWRITE, var_strMIB, 4, {1, 2, 1, 14}},
-#define   STRREUSEFMODSW        55
+#define   STRREUSEFMODSW        57
 	{STRREUSEFMODSW, ASN_INTEGER, RWRITE, var_strMIB, 4, {1, 2, 1, 15}},
-#define   STRRTIME              56
+#define   STRRTIME              58
 	{STRRTIME, ASN_INTEGER, RWRITE, var_strMIB, 4, {1, 2, 1, 16}},
-#define   STRSTRHOLD            57
+#define   STRSTRHOLD            59
 	{STRSTRHOLD, ASN_INTEGER, RWRITE, var_strMIB, 4, {1, 2, 1, 17}},
-#define   STRSTRCTLSZ           58
+#define   STRSTRCTLSZ           60
 	{STRSTRCTLSZ, ASN_UNSIGNED, RWRITE, var_strMIB, 4, {1, 2, 1, 18}},
-#define   STRSTRMSGSZ           59
+#define   STRSTRMSGSZ           61
 	{STRSTRMSGSZ, ASN_UNSIGNED, RWRITE, var_strMIB, 4, {1, 2, 1, 19}},
-#define   STRSTRTHRESH          60
+#define   STRSTRTHRESH          62
 	{STRSTRTHRESH, ASN_UNSIGNED, RWRITE, var_strMIB, 4, {1, 2, 1, 20}},
-#define   STRLOWTHRESH          61
+#define   STRLOWTHRESH          63
 	{STRLOWTHRESH, ASN_UNSIGNED, RWRITE, var_strMIB, 4, {1, 2, 1, 21}},
-#define   STRMEDTHRESH          62
+#define   STRMEDTHRESH          64
 	{STRMEDTHRESH, ASN_UNSIGNED, RWRITE, var_strMIB, 4, {1, 2, 1, 22}},
-#define   STRIOCTIME            63
+#define   STRIOCTIME            65
 	{STRIOCTIME, ASN_INTEGER, RWRITE, var_strMIB, 4, {1, 2, 1, 23}},
 
 };
@@ -475,6 +475,8 @@ parse_strMIB(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->strIoctime, &tmpint);
 
 	strMIB_add(StorageTmp);
+
+	(void) tmpint;
 
 	DEBUGMSGTL(("strMIB", "done.\n"));
 }
@@ -785,6 +787,8 @@ var_strMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *v
 	/* Refresh the MIB values if required. */
 	refresh_strMIB();
 
+	(void) StorageTmp;
+
 	/* This is where we do the value assignments for the mib results. */
 
 	switch (vp->magic) {
@@ -1026,6 +1030,9 @@ strModInfoTable_add(struct strModInfoTable_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 
+	/* strModIdnum */
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->strModIdnum,
+				  sizeof(thedata->strModIdnum));
 	/* strModInfoIndex */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED,
 				  (u_char *) &thedata->strModInfoIndex,
@@ -1054,6 +1061,8 @@ parse_strModInfoTable(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
+
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strModIdnum, &tmpint);
 
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strModInfoIndex, &tmpint);
 
@@ -1106,6 +1115,8 @@ store_strModInfoTable(int majorID, int minorID, void *serverarg, void *clientarg
 		cptr = line + strlen(line);
 
 		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModIdnum, &tmpint);
+		cptr =
 		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModInfoIndex,
 					   &tmpint);
 		cptr =
@@ -1146,6 +1157,9 @@ strModStatTable_add(struct strModStatTable_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 
+	/* strModIdnum */
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->strModIdnum,
+				  sizeof(thedata->strModIdnum));
 	/* strModStatIndex */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED,
 				  (u_char *) &thedata->strModStatIndex,
@@ -1174,6 +1188,8 @@ parse_strModStatTable(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
+
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strModIdnum, &tmpint);
 
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strModStatIndex, &tmpint);
 
@@ -1234,6 +1250,8 @@ store_strModStatTable(int majorID, int minorID, void *serverarg, void *clientarg
 		strcat(line, "strModStatTable ");
 		cptr = line + strlen(line);
 
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModIdnum, &tmpint);
 		cptr =
 		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModStatIndex,
 					   &tmpint);
@@ -1315,9 +1333,9 @@ parse_strApshTable(const char *token, char *line)
 		return;
 	}
 
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strApshMajor, &tmpint);
-
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strApshMinor, &tmpint);
+
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strApshMajor, &tmpint);
 
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->strApshLastMinor, &tmpint);
 
@@ -1364,9 +1382,9 @@ store_strApshTable(int majorID, int minorID, void *serverarg, void *clientarg)
 		    read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strApshName,
 					   &StorageTmp->strApshNameLen);
 		cptr =
-		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strApshMajor, &tmpint);
-		cptr =
 		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strApshMinor, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strApshMajor, &tmpint);
 		cptr =
 		    read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strApshLastMinor,
 					   &tmpint);
@@ -4097,8 +4115,8 @@ sa_version(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
-Distributed under GPL Version 3, included here by reference.\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under Affero GPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
@@ -4218,7 +4236,7 @@ sa_copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\

@@ -71,6 +71,8 @@
 struct mxMIB_data {
 	unsigned int mxMIB_request;
 
+	long mxDiscontinuityTime;
+
 };
 
 struct mxSpanTable_data {
@@ -82,12 +84,13 @@ struct mxSpanTable_data {
 	char *mxSpanEquipmentId;
 	size_t mxSpanEquipmentIdLen;
 	long mxSpanType;
-	u_long mxSpanNumber;
+	long mxSpanNumber;
 	long mxSpanRate;
 	char *mxSpanMode;
 	size_t mxSpanModeLen;
 	long mxSpanCrc;
 	long mxSpanClocking;
+	u_long mxSpanPriority;
 	long mxSpanCoding;
 	long mxSpanFraming;
 	long mxSpanLineImpedance;
@@ -137,6 +140,8 @@ struct mxSpanTable_data {
 
 struct mxChanTable_data {
 	unsigned int mxChanTable_request;
+	char *mxSpanIndex;
+	size_t mxSpanIndexLen;
 	long mxChanIndex;
 	long mxChanType;
 	long mxChanRate;
@@ -154,6 +159,12 @@ struct mxChanTable_data {
 
 struct mxXconTable_data {
 	unsigned int mxXconTable_request;
+	char *mxSpanIndex;
+	size_t mxSpanIndexLen;
+	long mxChanIndex;
+	char *mxXconSpanIndex;
+	size_t mxXconSpanIndexLen;
+	long mxXconChanIndex;
 	long mxXconType;
 	long mxXconStorageType;
 	long mxXconRowStatus;
@@ -161,6 +172,8 @@ struct mxXconTable_data {
 
 struct mxBertTable_data {
 	unsigned int mxBertTable_request;
+	char *mxSpanIndex;
+	size_t mxSpanIndexLen;
 	long mxBertMode;
 	long mxBertSelect;
 	char *mxBertPattern;
@@ -174,6 +187,8 @@ struct mxBertTable_data {
 
 struct mxNearEndCurrentTable_data {
 	unsigned int mxNearEndCurrentTable_request;
+	char *mxSpanIndex;
+	size_t mxSpanIndexLen;
 	long mxNearEndCurrentTimeElapsed;
 	long mxNearEndCurrentESs;
 	long mxNearEndCurrentSESs;
@@ -189,6 +204,8 @@ struct mxNearEndCurrentTable_data {
 
 struct mxNearEndIntervalTable_data {
 	unsigned int mxNearEndIntervalTable_request;
+	char *mxSpanIndex;
+	size_t mxSpanIndexLen;
 	long mxNearEndIntervalIndex;
 	long mxNearEndIntervalESs;
 	long mxNearEndIntervalSESs;
@@ -205,6 +222,8 @@ struct mxNearEndIntervalTable_data {
 
 struct mxNearEndTotalTable_data {
 	unsigned int mxNearEndTotalTable_request;
+	char *mxSpanIndex;
+	size_t mxSpanIndexLen;
 	long mxNearEndTotalValidIntervals;
 	long mxNearEndTotalInvalidIntervals;
 	long mxNearEndTotalESs;
@@ -221,6 +240,8 @@ struct mxNearEndTotalTable_data {
 
 struct mxFarEndCurrentTable_data {
 	unsigned int mxFarEndCurrentTable_request;
+	char *mxSpanIndex;
+	size_t mxSpanIndexLen;
 	long mxFarEndCurrentTimeElapsed;
 	long mxFarEndCurrentESs;
 	long mxFarEndCurrentSESs;
@@ -235,6 +256,8 @@ struct mxFarEndCurrentTable_data {
 
 struct mxFarEndIntervalTable_data {
 	unsigned int mxFarEndIntervalTable_request;
+	char *mxSpanIndex;
+	size_t mxSpanIndexLen;
 	long mxFarEndIntervalIndex;
 	long mxFarEndIntervalESs;
 	long mxFarEndIntervalSESs;
@@ -250,6 +273,8 @@ struct mxFarEndIntervalTable_data {
 
 struct mxFarEndTotalTable_data {
 	unsigned int mxFarEndTotalTable_request;
+	char *mxSpanIndex;
+	size_t mxSpanIndexLen;
 	long mxFarEndTotalValidIntervals;
 	long mxFarEndTotalInvalidIntervals;
 	long mxFarEndTotalESs;
@@ -273,10 +298,10 @@ struct mxFarEndTotalTable_data {
 #define MXSPANTYPE_E3                            5
 #define MXSPANTYPE_T3                            6
 
-#define MXSPANMODE_LOCALLOOPBACK                 0
-#define MXSPANMODE_REMOTELOOPBACK                1
-#define MXSPANMODE_FRAMERLOOPBACK                2
-#define MXSPANMODE_PAYLOADLOOPBACK               3
+#define MXSPANMODE_LOCAL                         0
+#define MXSPANMODE_REMOTE                        1
+#define MXSPANMODE_FRAMER                        2
+#define MXSPANMODE_PAYLOAD                       3
 
 #define MXSPANCRC_NONE                           0
 #define MXSPANCRC_CRC4                           1
@@ -285,12 +310,11 @@ struct mxFarEndTotalTable_data {
 #define MXSPANCRC_CRC6J                          4
 
 #define MXSPANCLOCKING_NONE                      0
-#define MXSPANCLOCKING_INTERNAL                  1
-#define MXSPANCLOCKING_EXTERNAL                  2
-#define MXSPANCLOCKING_LOOP                      3
-#define MXSPANCLOCKING_MASTER                    4
-#define MXSPANCLOCKING_SLAVE                     5
-#define MXSPANCLOCKING_ADAPTIVE                  6
+#define MXSPANCLOCKING_LOOP                      1
+#define MXSPANCLOCKING_LOCAL                     2
+#define MXSPANCLOCKING_INTERNAL                  3
+#define MXSPANCLOCKING_EXTERNAL                  4
+#define MXSPANCLOCKING_ADAPTIVE                  5
 
 #define MXSPANCODING_NONE                        0
 #define MXSPANCODING_AMI                         1
@@ -401,12 +425,12 @@ struct mxFarEndTotalTable_data {
 #define MXSPANUNKNOWNSTATUS_FALSE                0
 #define MXSPANUNKNOWNSTATUS_TRUE                 1
 
-#define MXSPANLOOPBACKSTATUS_NEARENDINWARDLOOPBACK 0
-#define MXSPANLOOPBACKSTATUS_NEARENDLINELOOPBACK 1
-#define MXSPANLOOPBACKSTATUS_NEARENDFRAMERLOOPBACK 2
-#define MXSPANLOOPBACKSTATUS_NEARENDPAYLOADLOOPBACK 3
-#define MXSPANLOOPBACKSTATUS_FARENDLINELOOPBACK  4
-#define MXSPANLOOPBACKSTATUS_FARENDPAYLOADLOOPBACK 5
+#define MXSPANLOOPBACKSTATUS_NEARENDINWARD       0
+#define MXSPANLOOPBACKSTATUS_NEARENDLINE         1
+#define MXSPANLOOPBACKSTATUS_NEARENDFRAMER       2
+#define MXSPANLOOPBACKSTATUS_NEARENDPAYLOAD      3
+#define MXSPANLOOPBACKSTATUS_FARENDLINE          4
+#define MXSPANLOOPBACKSTATUS_FARENDPAYLOAD       5
 
 #define MXSPANLINESTATUS_NONE                    0
 #define MXSPANLINESTATUS_RCVFARENDLOF            1
@@ -566,6 +590,7 @@ WriteMethod write_mxSpanNumber;
 WriteMethod write_mxSpanMode;
 WriteMethod write_mxSpanCrc;
 WriteMethod write_mxSpanClocking;
+WriteMethod write_mxSpanPriority;
 WriteMethod write_mxSpanCoding;
 WriteMethod write_mxSpanFraming;
 WriteMethod write_mxSpanLineImpedance;
@@ -593,6 +618,8 @@ WriteMethod write_mxChanRate;
 WriteMethod write_mxChanMode;
 WriteMethod write_mxChanAdministrativeState;
 WriteMethod write_mxChanControlStatus;
+WriteMethod write_mxXconSpanIndex;
+WriteMethod write_mxXconChanIndex;
 WriteMethod write_mxXconType;
 WriteMethod write_mxXconStorageType;
 WriteMethod write_mxXconRowStatus;

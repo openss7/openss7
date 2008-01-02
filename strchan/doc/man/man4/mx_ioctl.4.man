@@ -1,1 +1,514 @@
-.so man4/mxi_ioctl.4.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strchan.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strchan.macros
+.\"
+.\"
+.TH MX-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B mx_ioctl
+\- Multiplex (MX) Device \- IO Controls
+.\"
+.\"
+.SH SYNOPSIS
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/mxi.h>
+.br
+.B #include <sys/mxi_ioctl.h>
+.HP
+.BI "struct strioctl *" arg;
+.HP
+.BI "int " mx_stream " = open(" \fR/dev/mx\fI ", " flags );
+.HP
+.BI "int " retval " = ioctl(" mx_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B MX-IOCTL
+is a definition of the managed object model for the
+.BR mx (4)
+driver using the IO controls defined in
+.BR lmi_ioctl (4).
+The
+.BR mx (4)
+driver is an implementation of a TDM Multiplex (MX) protocol as defined in
+ITU-T Recommendation M.3100.
+.B MX-IOCTL
+provides the definition of the managed objects for the
+.B mx (4)
+driver in accordance with the managed object model in
+ITU-T Recommdnation M.3100.
+.PP
+.B MX
+is am implementation of a Multiplex
+.RB ( MX )
+driver.
+.\"
+.SS "Protocol Service Interface"
+.PP
+.\"
+.SS "Object Model"
+.PP
+.B MX
+proivides for management of a number of managed objects.  These objects are of
+a number of types as follows:
+.\"
+.TP
+.B MX_OBJ_TYPE_DF
+The default object.
+This object refers to the system-wide collection of defaults and other
+global management information.
+.\"
+.TP
+.B MX_OBJ_TYPE_MU
+A user object.
+A user object is a service access point (SAP) at which users of the multiplex
+obtain service from the multiplex.
+A user object can be associated with a physical point of appearance
+corresponding to a complete span, set of channels within one span, or
+individual channel.
+A user object is identified by the device number associated with the MX user
+object.
+.\"
+.TP
+.B MX_OBJ_TYPE_SG
+A synchronization group.
+An MX synchronization group is a group of synchronization objects that can act
+as a source or sink of PDH timing information.  One synchronization object
+within the group and possibly one span within the synchronization object is
+selected as providing PDH timing information for the other objects in the
+group.  Each synchronization group is identified by its own idenitfier.
+.\"
+.TP
+.B MX_OBJ_TYPE_SS
+A synchronization set.
+An MX synchronization set is an equipment card or other span termination
+point container which provides for the dystribute of PDH timing information.
+Each syncrhonization set belongs to one and only one syncrhonization group.
+Each synchronization set is identified by its own global identifier.
+.\"
+.TP
+.B MX_OBJ_TYPE_SP
+A span object.
+A span object provides all of the management information necessary for the
+configuration and management of a T1 (J1) or E1 span.  Each span object
+belongs to one and only one containing syncrhonization object.
+A span object is identified by its global synchronization object identifier
+and a span index within the sycnhronization object.
+.\"
+.TP
+.B MX_OBJ_TYPE_CH
+A Channel object.
+A channel object provides all of the management information necessary for the
+configuration and management of channels within a T1 (J1) or E1 span.  Each
+channel object belongs to one an donly one containing span object.
+A channel object is identified within a span by its time slot number (1 to 24
+for T1(J1) and 1 to 31 for E1).
+.\"
+.TP
+.B MX_OBJ_TYPE_XC
+A cross-connect object.
+A cross-connect object provides all of the management information necessary
+for the configuration and management of a cross-connection between one or more
+channels in a T1 (J1) or E1 span.
+A cross-connect object is identified by the distinguished names of the
+channels that the cross connection provides.
+.\"
+.TP
+.B MX_OBJ_TYPE_MX
+A lower MX object.
+.\"
+.\"
+.SH CONFIGURATION
+.PP
+All objects must be configured using
+.I I_STR
+.I I_STR
+.BR streamio (7)
+.BR ioctl (2)
+calls before they are usable.  The structures required to specify
+configuration are as follows (in order of dependency).
+.\"
+.\"
+.SS "Default"
+.PP
+Although a configuration structure is defined for the default object, there is
+no need to configure the default object.  This object is configured at the
+time that the module loads.
+.\"
+.\"
+.PP
+.sp
+.nf
+\fC\s-2\
+typedef struct mx_conf_df {
+} mx_conf_df_t;
+\fR\s+2
+.fi
+.\"
+.\"
+.SS "Synchronization Group"
+.PP
+At least one Syncrhonization Group object of type
+.BR MX_OBJ_TYPE_SG
+must exist before any other objects (aside from the default object) can be
+created or configured.
+.PP
+The Syncrhonization Group object represents a group of related PDH timing
+sources or sinks in a collection.  The PDH timing sources and sinks are
+related in that one syncrhonization object within the group can act as a
+source while the other synchronization objects within the group can act as a
+sink.
+.\"
+.\"
+.PP
+The object-specific configuration structure for Syncrhonization Groups is
+formatted as follows:
+.sp
+.nf
+\fC\s-2\
+typedef struct mx_conf_sg {
+} mx_conf_sg_t;
+\fR\s+2
+.fi
+.\"
+.\"
+.SS "Synchronization Set"
+.PP
+At least one Synchronization object of type
+.BR MX_OBJ_TYPE_SS
+must exist before any span or objects contained by a span may be created or
+configured.
+.PP
+The Syncrhonization Set is a group of spans that share the same internal
+or external PDH timing synchronization source or bus.  Each synchronization
+object also belongs to a syncrhonization group.  The synchronization object
+has a priority within the syncrhonization group.  There may be constraints on
+the number of synchronization objects which are allowed to be at a given
+priority.
+.\"
+.\"
+.PP
+The object-specific configuration structure for Synchronization Sets is
+formated as follows:
+.sp
+.nf
+\fC\s-2\
+typedef struct mx_conf_ss {
+	struct simple_name group;
+	uint32_t priority;
+} mx_conf_ss_t;
+\fR\s+2
+.fi
+.\"
+.\"
+.TP
+.I group
+the name of the syncrhonization group object to which this synchronization
+object belongs.
+.\"
+.TP
+.I priority
+the priority of this synchronization object within the group.
+.\"
+.\"
+.SS "Span"
+.PP
+A Span object of type
+.BR MX_OBJ_TYPE_SP
+must exist before contained channel objects may be created or configured.
+.PP
+The Span object represents a T1(J1) or E1 transmission facility.  Each span
+belongs to a synchronization object and has a span number within that object.
+.\"
+.\"
+.PP
+The object-specific configuration structure for Span objects is formated as
+follows:
+.sp
+.nf
+\fC\s-2\
+typedef struct mx_conf_sp {
+	struct simple_name sync;
+	uint32_t number;
+} mx_conf_sp_t;
+\fR\s+2
+.fi
+.\"
+.\"
+.TP
+.I sync
+the name of the synchronization object to which this span object belongs.
+.TP
+.I number
+the number of the span within the syncrhonization object. 
+.PP
+If there is only one span in a syncrhonization set and the synchronization set
+would be the only set in a synchronization group (i.e. the span is
+disconnected from all PDH timing buses), it is not necessary to assign the
+span to a syncrhonization set and the
+.I sync
+member can be zero and the null string, and the
+.I number
+member can be zero or one.
+.\"
+.\"
+.SS "Channel"
+.PP
+A Channel object of type
+.BR MX_OBJ_TYPE_CH
+must exist before contained channel objects may be created or configured.
+.PP
+The Channel object represents a T1(J1) or E1 transmission facility TDM time
+slot.  Each channel belongs to a span and has a time slot number within the
+span.
+.\"
+.\"
+.PP
+The object-specific configuration structure for Channel objects is formated as
+follows:
+.sp
+.nf
+\fC\s-2\
+typedef struct mx_conf_ch {
+	struct simple_name span;
+	uint32_t timeslot;
+} mx_conf_ch_t;
+\fR\s+2
+.fi
+.\"
+.\"
+.TP
+.I span
+the name of the span object to which this channel object belongs.
+.TP
+.I timeslot
+the timeslot of the channel within the span object.
+.\"
+.\"
+.SS "Cross-Connect"
+.PP
+A Cross-Connect object of type
+.BR MX_OBJ_TYPE_XC
+represents an entire span, fractional span, or channel cross-connect within
+the system.
+.\"
+.\"
+.SS "User"
+.PP
+A User object of type
+.BR MX_OBJ_TYPE_MU
+represents a CH or MX user object within the system.
+.\"
+.\"
+.SH TIMERS
+.PP
+.\"
+.SS "Default"
+.PP
+.SS "Synchronization Group"
+.PP
+.SS "Synchronization Set"
+.PP
+.SS "Span"
+.PP
+.SS "Channel"
+.PP
+.SS "Cross-Connect"
+.PP
+.SS "User"
+.PP
+.\"
+.\"
+.SH OPTIONS
+.PP
+.\"
+.SS "Default"
+.PP
+.SS "Synchronization Group"
+.PP
+.SS "Synchronization Set"
+.PP
+.SS "Span"
+.PP
+.SS "Channel"
+.PP
+.SS "Cross-Connect"
+.PP
+.SS "User"
+.PP
+.\"
+.\"
+.SH STATE
+.PP
+.\"
+.SS "Default"
+.PP
+.SS "Synchronization Group"
+.PP
+.SS "Synchronization Set"
+.PP
+.SS "Span"
+.PP
+.SS "Channel"
+.PP
+.SS "Cross-Connect"
+.PP
+.SS "User"
+.PP
+.\"
+.\"
+.SH STATISTICS
+.PP
+.\"
+.SS "Default"
+.PP
+.SS "Synchronization Group"
+.PP
+.SS "Synchronization Set"
+.PP
+.SS "Span"
+.PP
+.SS "Channel"
+.PP
+.SS "Cross-Connect"
+.PP
+.SS "User"
+.PP
+.\"
+.\"
+.SH EVENTS
+.PP
+.\"
+.SS "Default"
+.PP
+.SS "Synchronization Group"
+.PP
+.SS "Synchronization Set"
+.PP
+.SS "Span"
+.PP
+.SS "Channel"
+.PP
+.SS "Cross-Connect"
+.PP
+.SS "User"
+.PP
+.\"
+.\"
+.SH CONTROLS
+.PP
+.\"
+.SS "Default"
+.PP
+.SS "Synchronization Group"
+.PP
+.SS "Synchronization Set"
+.PP
+.SS "Span"
+.PP
+.SS "Channel"
+.PP
+.SS "Cross-Connect"
+.PP
+.SS "User"
+.PP
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mx (4),
+.BR mxi (7),
+.BR mxmib (8).
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.\".SH VERSIONS
+.\".PP
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

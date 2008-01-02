@@ -1,6 +1,6 @@
 OpenSS7 STREAMS Binary Compatibility Modules -- read me CVS file.  2007-12-16
 $Id: README-cvs,v 0.9.2.19 2007/12/29 23:32:23 brian Exp $
-Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
@@ -186,7 +186,7 @@ is now often packaged on its own.
 
 =========================================================================
 
- Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.

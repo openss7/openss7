@@ -165,8 +165,8 @@ strStatistics		OBJECT IDENTIFIER ::= { strScalars	 2 }
 -- |  |  |  +нн(1) strApshTable
 -- |  |  |     +нн(1) strApshEntry
 -- |  |  |        |нн( 1) strApshName
--- |  |  |        |нн( 2) strApshMajor
--- |  |  |        |нн( 3) strApshMinor
+-- |  |  |        |нн( 2) strApshMinor
+-- |  |  |        |нн( 3) strApshMajor
 -- |  |  |        |нн( 4) strApshLastMinor
 -- |  |  |        |нн( 5) strApshModules
 -- |  |  |        +нн( 6) strApshRowStatus
@@ -877,7 +877,7 @@ strApshMajor OBJECT-TYPE
 		 with the driver."
 	REFERENCE
 		"autopush(8)"
-	::= { strApshEntry 2 }
+	::= { strApshEntry 3 }
 
 strApshMinor OBJECT-TYPE
 	SYNTAX		Unsigned32 (0..16383|'FFFFFFFF'X)
@@ -891,7 +891,7 @@ strApshMinor OBJECT-TYPE
 		 for this driver and LastMinor is ignored."
 	REFERENCE
 		"autopush(8)"
-	::= { strApshEntry 3 }
+	::= { strApshEntry 2 }
 
 strApshLastMinor OBJECT-TYPE
 	SYNTAX		Unsigned32 (0..16383)

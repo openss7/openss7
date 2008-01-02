@@ -3917,6 +3917,17 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
 
+%K x721
+%L X.721
+%A ITU
+%R ITU-T Recommendation X.721
+%C Geneva
+%D February 10, 1992
+%T Information Technology \- Open Systems Interconnection \- Structure of Management Information: Definition of Management Information
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation") [ISO/IEC 10165-2:1992]
+%U http://www.itu.int/
 
 %K h225.0
 %L H.225.0

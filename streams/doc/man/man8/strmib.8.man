@@ -289,10 +289,6 @@ and exit.
 .PD
 .\"
 .\"
-.SH ARGUMENTS
-.PP
-.\"
-.\"
 .SH DESCRIPTION
 .PP
 .B strmib

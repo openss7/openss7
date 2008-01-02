@@ -120,6 +120,7 @@ struct strModTable_data {
 
 struct strModInfoTable_data {
 	unsigned int strModInfoTable_request;
+	u_long strModIdnum;
 	u_long strModInfoIndex;
 	char *strModInfoQueues;
 	size_t strModInfoQueuesLen;
@@ -132,6 +133,7 @@ struct strModInfoTable_data {
 
 struct strModStatTable_data {
 	unsigned int strModStatTable_request;
+	u_long strModIdnum;
 	u_long strModStatIndex;
 	char *strModStatQueues;
 	size_t strModStatQueuesLen;
@@ -149,8 +151,8 @@ struct strApshTable_data {
 	unsigned int strApshTable_request;
 	char *strApshName;
 	size_t strApshNameLen;
-	u_long strApshMajor;
 	u_long strApshMinor;
+	u_long strApshMajor;
 	u_long strApshLastMinor;
 	char *strApshModules;
 	size_t strApshModulesLen;
