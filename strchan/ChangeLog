@@ -1,3 +1,17 @@
+2008-01-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/ds1.c: updates for new mib2c
+	* src/snmp/ds1.h: updates for new mib2c
+	* src/snmp/ds1EXT.c: updates for new mib2c
+	* src/snmp/ds1EXT.h: updates for new mib2c
+	* src/snmp/mxMIB.c: updates for new mib2c
+	* src/snmp/mxMIB.h: updates for new mib2c
+	* src/snmp/phyMIB.c: updates for new mib2c
+	* src/snmp/phyMIB.h: updates for new mib2c
+	* src/snmp/x400pMIB.c: updates for new mib2c
+	* src/snmp/mibs/OPENSS7-MX-MIB.mib: updates
+	* src/snmp/mibs/OPENSS7-X400P-MX-MIB.mib: updates
+
 2008-01-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates release files
