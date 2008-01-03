@@ -1,3 +1,10 @@
+2008-01-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/mib2c.openss7.conf: correct missing header_generic
+	* src/snmp/strMIB.c: updates
+	* src/snmp/strMIB.h: updates
+	* src/snmp/mibs/OPENSS7-STREAMS-MIB.mib: updates
+
 2007-12-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/man.am: perform more substitutions
