@@ -20,6 +20,8 @@
 
 #ifdef HAVE_UCD_SNMP_UTIL_FUNCS_H
 #include <ucd-snmp/util_funcs.h>
+/* Many recent net-snmp UCD compatible headers do not declard header_generic. */
+int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMethod **);
 #else				/* HAVE_UCD_SNMP_UTIL_FUNCS_H */
 #include "util_funcs.h"
 #endif				/* HAVE_UCD_SNMP_UTIL_FUNCS_H */
@@ -42,7 +44,7 @@
 #endif				/* HAVE_NET_SNMP_AGENT_MIB_MODULES_H */
 #endif				/* HAVE_UCD_SNMP_MIB_MODULES_H */
 
-#include "ds1_openss7.h"
+#include "ds1.h"
 
 #include <stdint.h>
 #include <signal.h>
@@ -336,7 +338,9 @@ struct variable4 ds1_variables[] = {
 	{DSX1FRACNUMBER, ASN_INTEGER, RONLY, var_dsx1FracTable, 3, {13, 1, 2}},
 #define   DSX1FRACIFINDEX       112
 	{DSX1FRACIFINDEX, ASN_INTEGER, RWRITE, var_dsx1FracTable, 3, {13, 1, 3}},
-#define   DSX1CHANMAPPEDIFINDEX  115
+#define   DSX1DS1CHANNELNUMBER  116
+	{DSX1DS1CHANNELNUMBER, ASN_INTEGER, RONLY, var_dsx1ChanMappingTable, 3, {6, 1, 19}},
+#define   DSX1CHANMAPPEDIFINDEX  117
 	{DSX1CHANMAPPEDIFINDEX, ASN_INTEGER, RONLY, var_dsx1ChanMappingTable, 3, {16, 1, 1}},
 
 };
@@ -1662,6 +1666,14 @@ dsx1ChanMappingTable_add(struct dsx1ChanMappingTable_data *thedata)
 	/* add the index variables to the varbind list, which is used by header_complex to index
 	   the data */
 
+	/* ifIndex */
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) &thedata->ifIndex,
+				  sizeof(thedata->ifIndex));
+	/* dsx1Ds1ChannelNumber */
+	snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER,
+				  (u_char *) &thedata->dsx1Ds1ChannelNumber,
+				  sizeof(thedata->dsx1Ds1ChannelNumber));
+
 	header_complex_add_data(&dsx1ChanMappingTableStorage, vars, thedata);
 	DEBUGMSGTL(("dsx1ChanMappingTable", "registered an entry\n"));
 
@@ -1686,6 +1698,10 @@ parse_dsx1ChanMappingTable(const char *token, char *line)
 		config_perror("malloc failure");
 		return;
 	}
+
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->ifIndex, &tmpint);
+
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dsx1Ds1ChannelNumber, &tmpint);
 
 	line =
 	    read_config_read_data(ASN_INTEGER, line, &StorageTmp->dsx1ChanMappedIfIndex, &tmpint);
@@ -1719,6 +1735,10 @@ store_dsx1ChanMappingTable(int majorID, int minorID, void *serverarg, void *clie
 		strcat(line, "dsx1ChanMappingTable ");
 		cptr = line + strlen(line);
 
+		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ifIndex, &tmpint);
+		cptr =
+		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1Ds1ChannelNumber,
+					   &tmpint);
 		cptr =
 		    read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1ChanMappedIfIndex,
 					   &tmpint);

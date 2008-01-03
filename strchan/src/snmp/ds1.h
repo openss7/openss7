@@ -144,6 +144,8 @@ struct dsx1FracTable_data {
 
 struct dsx1ChanMappingTable_data {
 	unsigned int dsx1ChanMappingTable_request;
+	long ifIndex;
+	long dsx1Ds1ChannelNumber;
 	long dsx1ChanMappedIfIndex;
 };
 
