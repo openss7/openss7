@@ -75,11 +75,13 @@
 OPENSS7-TMN-SMI DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
 		FROM SNMPv2-SMI
+	RowPointer, RowStatus, TimeStamp
+		FROM SNMPv2-TC
 	openss7Modules
 		FROM OPENSS7-SMI
-	ProbableCause
+	ProbableCause, SimpleNameType
 		FROM OPENSS7-TMN-TC;
 
 tmnMIB MODULE-IDENTITY
@@ -2803,10 +2805,175 @@ CurrentAlarmSummaryControlEntry ::=
 
 -- =====================================================================
 
+--
+-- From ITU-T Rec. X.733 (1992)/Cor.2 (1999)
+--
+-- cleared: The Cleared severity level indicates the clearing of one or 
+-- more previously reported alarms.  The alarms to be cleared are 
+-- indicated by the managed object, Event type, Probable cause, Specific 
+-- problems (if present) and Correlated notifications parameters as 
+-- follows:
+--
+-- a) If the Correlated notifications and Specific problem parameters 
+--    are not present or empty, all previous alarms with the same 
+--    managed object, Probable cause and Event type parameters are 
+--    cleared irresepctive of whether a Notification identifier or 
+--    Specific problem parameter was present in the alarms to be cleared 
+--    (i.e. can clear alarms without looking at Notification identifier 
+--    or Specific problem parameters).
+--
+-- b) If the Specific problems parameter is present and not empty, and 
+--    the Correlated notifications is not present or empty, then only 
+--    previous alarms that have an exact match on managed object, 
+--    Probable cause, Event type, and have a matching set or subset of 
+--    Specific problems will be cleared.
+--
+-- c) If the Correlated notifications parameter is present and not 
+--    empty, those alarms listed in this parameter are cleared 
+--    irrespective of the value for the managed object, Probable cause, 
+--    Event type and Specific problems parameters.  In addition, all 
+--    alarms which match managed object are also cleared as specified in 
+--    b) above, or as in a), ignoring the presence of the Correlated 
+--    notifications.
+--
 
 
 -- =====================================================================
 
+currentAlarmSummaryControlTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CurrentAlarmSummaryControlEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. Q.821 (2000) currentAlarmSummaryControl."
+	::= { currentAlarmSummaryControl 1 }
+
+
+currentAlarmSummaryControlEntry OBJECT-TYPE
+	SYNTAX		CurrentAlarmSummaryControlEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. Q.821 (2000) currentAlarmSummaryControl."
+	INDEX	{
+			currentAlarmSummaryControlId -- index
+		}
+	::= { currentAlarmSummaryControlTable 1 }
+
+CurrentAlarmSummaryControlEntry ::=
+	SEQUENCE {
+		currentAlarmSummaryControlId
+			SimpleNameType,
+		alarmStatusList
+			AlarmStatusList,
+		objectList
+			ObjectList,
+		perceivedSeverityList
+			PerceivedSeverityList,
+		probableCauseList
+			ProbableCauseList,
+		-- retrieveCurrentAlarmSummary action
+		-- currentAlarmSummaryReport notification
+		casStorageType
+			StorageType,
+		casRowStatus
+			RowStatus
+	}
+
+-- =====================================================================
+
+managementOperationsScheduleTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF ManagementOperationsScheduleEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. Q.821 (2000) currentAlarmSummaryControl."
+	::= { managementOperationsSchedule 1 }
+
+managementOperationsScheduleEntry OBJECT-TYPE
+	SYNTAX		ManagementOperationsScheduleEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. Q.821 (2000) currentAlarmSummaryControl."
+	INDEX	{
+			mosScheduleId -- index
+		}
+	::= { managementOperationsScheduleTable 1 }
+
+ManagementOperationsScheduleEntry ::=
+	SEQUENCE {
+		mosAdministrativeState
+			AdministrativeState,
+		-- mosAffectedObjectClass
+		mosAffectedObjectInstance
+			RowPointer,
+		mosBeginTime
+			TimeStamp,
+		mosDestinationAddress
+			,
+		mosEndTime
+			TimeStamp,
+		mosInterval
+			TimeInterval,
+		mosScheduleId
+			SimpleNameType,
+		mosStorageType
+			StorageType,
+		mosRowStatus
+			RowStatus
+	}
+
+-- =====================================================================
+
+enhancedCurrentAlarmSummaryControlTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF EnhancedCurrentAlarmSummaryControlEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. Q.821 (2000) currentAlarmSummaryControl."
+	::= { enhancedCurrentAlarmSummaryControl 1 }
+
+enhancedCurrentAlarmSummaryControlEntry OBJECT-TYPE
+	SYNTAX		EnhancedCurrentAlarmSummaryControlEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. Q.821 (2000) currentAlarmSummaryControl."
+	INDEX	{
+		}
+	::= { enhancedCurrentAlarmSummaryControlTable 1 }
+
+EnhancedCurrentAlarmSummaryControlEntry ::=
+	SEQUENCE {
+		enhancedCurrentAlarmSummaryControlId
+			SimpleNameType,
+		-- action alarmSynchronization
+		--	logRecordIdActionParameter
+		--	correlatedRecordNameActionParameter
+		--	invalidBaseManagedObjectErrorParameter
+		--	invalidObjectInstanceErrorParameter
+		--	suspectObjectListActionParameter
+		--	cancelledAlarmSynchronizationParameter
+		ecasStorageType
+			StorageType,
+		ecasRowStatus
+			RowStatus
+	}
+
+-- =====================================================================
 
 END
 
