@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strmib.8.man,v 0.9.2.3 2008/01/05 00:00:31 brian Exp $
+.\" @(#) $Id: x400pmib.8.man,v 0.9.2.1 2008/01/05 00:00:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,28 +53,19 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008/01/05 00:00:31 $ by $Author: brian $
+.\" Last Modified $Date: 2008/01/05 00:00:20 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: strmib.8.man,v $
-.\" Revision 0.9.2.3  2008/01/05 00:00:31  brian
+.\" $Log: x400pmib.8.man,v $
+.\" Revision 0.9.2.1  2008/01/05 00:00:20  brian
 .\" - added/updated manual pages
-.\"
-.\" Revision 0.9.2.2  2007/11/07 10:05:04  brian
-.\" - updates to pass check target
-.\"
-.\" Revision 0.9.2.1  2007/10/13 08:54:35  brian
-.\" - added MIB agent files
-.\"
-.\" Revision 0.9.2.10  2006/04/05 09:43:59  brian
-.\" - moved .so line and updated headers
 .\"
 .\" =========================================================================
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database streams.refs
+database strchan.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -83,15 +74,15 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
-.so streams.macros
+.so strchan.macros
 .\"
 .\"
-.TH STRMIB 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.TH X400PMIB 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .\"
 .\"
 .SH NAME
-.B strmib
-\- OPENSS7-STREAMS-MIB SNMP Agent and AgentX Sub-agent
+.B x400pmib
+\- OPENSS7-X400P-MX-MIB SNMP Agent and AgentX Sub-agent
 .\"
 .\"
 .SH SYNOPSIS
@@ -101,10 +92,10 @@ sort-adjacent-labels
 .HP
 \fBexport PATH="/usr/sbin:$PATH"\fP
 .HP
-\fBstrmib\fP [\fIGENERAL\-OPTIONS\fP] [\fIOPTIONS\fP] [\fIARGUMENTS\fP]
+\fBx400pmib\fP [\fIGENERAL\-OPTIONS\fP] [\fIOPTIONS\fP] [\fIARGUMENTS\fP]
 .ad l
 .HP
-\fBstrmib\fP\ [{\fB\-q\fP|\fB\-\-quiet\fP|\fB\-\-quick\fP}]
+\fBx400pmib\fP\ [{\fB\-q\fP|\fB\-\-quiet\fP|\fB\-\-quick\fP}]
 [{\fB\-d\fP|\fB\-\-debug\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
 [{\fB\-V\fP|\fB\-\-verbose\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
 .br
@@ -112,7 +103,7 @@ sort-adjacent-labels
 .ad b
 .ad l
 .HP
-\fBstrmib\fP\ [{\fB\-q\fP|\fB\-\-quiet\fP|\fB\-\-quick\fP}]
+\fBx400pmib\fP\ [{\fB\-q\fP|\fB\-\-quiet\fP|\fB\-\-quick\fP}]
 [{\fB\-d\fP|\fB\-\-debug\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
 [{\fB\-V\fP|\fB\-\-verbose\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
 .br
@@ -142,14 +133,14 @@ sort-adjacent-labels
 [\fIARGUMENT\fP[\ \fIARGUMENT\fP]*]
 .ad b
 .HP
-\fBstrmib\fP\ {\fB\-H\fP|\fB\-\-help\-directives\fP}\ [\fI...\fP]
+\fBx400pmib\fP\ {\fB\-H\fP|\fB\-\-help\-directives\fP}\ [\fI...\fP]
 .PD 0
 .HP
-\fBstrmib\fP\ {\fB\-h\fP|\fB\-\-help\fP}\ [\fI...\fP]
+\fBx400pmib\fP\ {\fB\-h\fP|\fB\-\-help\fP}\ [\fI...\fP]
 .HP
-\fBstrmib\fP\ {\fB\-v\fP|\fB\-\-version\fP}\ [\fI...\fP]
+\fBx400pmib\fP\ {\fB\-v\fP|\fB\-\-version\fP}\ [\fI...\fP]
 .HP
-\fBstrmib\fP\ {\fB\-y\fP|\fB\-\-copying\fP}\ [\fI...\fP]
+\fBx400pmib\fP\ {\fB\-y\fP|\fB\-\-copying\fP}\ [\fI...\fP]
 .PD
 .RE
 .\"
@@ -157,7 +148,7 @@ sort-adjacent-labels
 .SH OPTIONS
 .PP
 The options recognized by
-.B strmib
+.B x400pmib
 are summarized, alphabetically sorted by short option, as follows (see
 .RI \(lq DESCRIPTION ,\(rq
 below, for more detailed option descriptions):
@@ -294,28 +285,21 @@ and exit.
 .\"
 .SH DESCRIPTION
 .PP
-.B strmib
+.B x400pmib
 provides a daemon or foreground executable which provides an AgentX
 .[
 AgentX
 .]
 sub-agent implementation of the
-.I OPENSS7-STREAMS-MIB
-which provides a generic management information base for
-.I STREAMS
-in general, and
-.B Linux Fast-STREAMS
-specifically.
+.I OPENSS7-X400P-MX-MIB
+which provides a card-specific management information base for
+Tormenta II and III cards.
 The
-.I OPENSS7-STREAMS-MIB
-provides management station access to
-.I STREAMS
-subsystem, driver and module configuration information and statistics as well
-as system-wide
-.I STREAMS
-tunables.
+.I OPENSS7-X400P-MX-MIB
+provides management station access to the X400P Multiplex driver configuration
+information and statistics as well as driver-specific tunables.
 .PP
-.B strmib
+.B x400pmib
 is implemented as a typical UCD-SNMP or NET-SNMP SNMP master agent or AgentX
 .[
 agentx
@@ -324,7 +308,7 @@ sub-agent.  It is normally run as an AgentX sub-agent, with the NET-SNMP SNMP
 agent daemon,
 .BR snmpd (8),
 running as the master agent.  Running in this manner,
-.B strmib
+.B x400pmib
 running as an AgentX sub-agent takes most of its default configuration from
 the same configuration file as the master agent.
 .\"
@@ -341,16 +325,16 @@ connected to by an AgentX subagent.
 .SH OPTIONS
 .PP
 When executed without any options,
-.B strmib
+.B x400pmib
 will fork twice; become its own session leader; close standard input, error
 and output; begin logging to system logs; writes its daemon process id to
-.BR /var/run/strmib.pid ;
+.BR /var/run/x400pmib.pid ;
 and, runs as an AgentX sub-agent.
 .\"
 .SS UCD-SNMP and NET-SNMP Subagent Options
 .PP
 The following options are compatible with NET-SNMP automatically generated
-subagents.  Long options are STRMIB specific.
+subagents.  Long options are X400PMIB specific.
 .\"
 .TP
 \fB-D\fP, \fB--debug-tokens\fP [\fITOKEN\fP[\fB,\fP\fITOKEN\fP]*]
@@ -377,11 +361,11 @@ NET-SNMP autogenerated subagents.
 .TP
 \fB-f\fP, \fB--dont-fork\fP, \fB-n\fP, \fB--nodaemon\fP
 By default,
-.B strmib
+.B x400pmib
 will place itself in the background by forking twice, becoming its own session
 leader, redirecting standard error to a log file, and standard output to an
 output file, and close standard input.  This option causes
-.B strmib
+.B x400pmib
 to run in the foreground.  Errors are logged to standard error and output is
 generated to standard output.  This mode is primarily for testing and works
 well in conjunction with the debug and verbose options.
@@ -394,7 +378,7 @@ and NET-SNMP autogenerated subagents.
 .TP
 \fB-L\fP, \fB--log-console\fP
 Normally
-.B strmib
+.B x400pmib
 will open a log file to log errors and output, particularly when run as a
 daemon process.  This option suppresses the opening of a log file and causes
 both
@@ -419,12 +403,12 @@ and other NET-SNMP utility commands use the more sophisticated version.
 .TP
 \fB-M\fP, \fB--master\fP
 By default,
-.B strmib
+.B x400pmib
 will attempt to run as an AgentX sub-agent.  This option will cause
-.B strmib
+.B x400pmib
 to run as an SNMP master agent.
 Do not use this option.  Use a complete master agent and run
-.B strmib
+.B x400pmib
 as an AgentX sub-agent.
 This
 .B -M
@@ -472,9 +456,9 @@ option is provided for compatibility with
 .TP
 \fB-A\fP, \fB--append\fP
 Normally
-.B strmib
+.B x400pmib
 truncates existing log files when they are opened.  This option causes
-.B strmib
+.B x400pmib
 to append to existing log files instead of truncating them when opened.
 This
 .B -A
@@ -484,9 +468,9 @@ option is provided for compatibility with
 .TP
 \fB-c\fR, \fB--config-file\fP \fICONFIGFILE\fP
 Normally
-.B strmib
+.B x400pmib
 reads the default configuration file provided for the agent (the default is
-.RB \(lq strMIB.conf \(rq
+.RB \(lq x400pMIB.conf \(rq
 in the SNMP configuration directory (usually
 .RB \(lq /etc/snmp \(rq).
 This option causes the full pathname
@@ -500,10 +484,10 @@ option is provide for compatibility with
 .TP
 \fB-C\fP, \fB--config-only\fP
 Normally
-.B strmib
+.B x400pmib
 reads some files automatically when the SNMP library is configured.  This
 option causes
-.B strmib
+.B x400pmib
 to only read configuration files optionally specified with the
 .B -c
 option.  If no configuration file is specified with the
@@ -526,14 +510,14 @@ option is provided for compatibility with
 .TP
 \fB-g\fP, \fB--gid\fP, \fB--groupid\fP \fIGID\fP
 Normally
-.B strmib
+.B x400pmib
 runs with the real user and group id of the invoking process unless the
 executable is setuid or setgid in the filesystem.  This option causes
-.BR strmib ,
+.BR x400pmib ,
 after opening ports and files, to downgrade to group id,
 .IR GID .
 This option is effective both when
-.B strmib
+.B x400pmib
 is run in the foreground and as a daemon process.
 This
 .B -g
@@ -554,7 +538,7 @@ the
 specified represent the modules that should be initialized when the agent
 starts up.
 Note that the use of this option is only necessary if
-.B strmib
+.B x400pmib
 runs as a master agent.
 This
 .B -I
@@ -579,7 +563,7 @@ option is provided for compatibility with
 \fB-n\fP, \fB--name\fP \fINAME\fP
 Specifies an alternative application name (which will affect the configuration
 files and persistent data loaded).  By default this will be
-.IR strmib ,
+.IR x400pmib ,
 regardless of the name of the actual binary executable or path to the
 executable (i.e. symbolic link).
 This
@@ -617,14 +601,14 @@ process identifier file,
 .TP
 \fB-P\fP, \fB--pidfile\fP \fIPIDFILE\fP
 When
-.B strmib
+.B x400pmib
 runs as a daemon (the default),
 .I PIDFILE
 is the full path to the file to which the daemon process id is written.  This
 assists System V initscripts by helping them locate running daemons to
 terminate when shutting down subsystems.   The default pidfile, unless
 overridden by this option, is
-.BR /var/run/streams.pid .
+.BR /var/run/x400pmib.pid .
 This
 .B -P
 option is provided for compatibility with the UCD-SNMP master agent,
@@ -643,11 +627,11 @@ address arguments.
 .TP
 \fB-r\fP, \fB--noroot\fP
 Normally
-.B strmib
+.B x400pmib
 expects to run with super-user privilege and will terminate if permission
 errors occur when opening sockets or files, even if proceding is possible.
 When this option is specified,
-.B strmib
+.B x400pmib
 does not expect to run with super-user privilege and will not terminate if
 permission errors occur when opening sockets or files, providing that the
 agent can still proceed and function.
@@ -659,12 +643,12 @@ option is provided for compatibility with
 .TP
 \fB-s\fP, \fB--syslog\fP
 Normally
-.B strmib
+.B x400pmib
 logs to
 .I stderr
 and lets the SNMP library decide from configuration where standard error is
 redirected.  This option causes
-.B strmib
+.B x400pmib
 to log warnnings, errors and messages to the system logs.
 This
 .B -s
@@ -703,14 +687,14 @@ option is provided for compatibiltiy with
 .TP
 \fB-u\fP, \fB--uid\fP, \fB--userid\fP \fIUID\fP
 Normally
-.B strmib
+.B x400pmib
 runs with the real user and group id of the invoking process unless th
 executable is setuid or setgid in the filesystem.  This option causes
-.BR strmib ,
+.BR x400pmib ,
 after opening ports and files, to downgrade to user id,
 .IR UID .
 This option is effective both when
-.B strmib
+.B x400pmib
 is run in the foreground and as a daemon process.
 This
 .B -u
@@ -746,7 +730,7 @@ though the daemon exited abnormally.
 \fB-X\fP, \fB--agentx\fP
 Run as an AgentX sub-agent rather than an SNMP master agent.
 Note that the default behaviour of
-.I strmib
+.I x400pmib
 is to run as an AgentX sub-agent.  Therefore, this option has no effect unless
 the
 .B -M
@@ -756,22 +740,22 @@ This
 option is provided for compatibility with UCD-SNMP and NET-SNMP master agent,
 .BR snmpd (8).
 .\"
-.SS STRMIB Subagent Options
+.SS X400PMIB Subagent Options
 .PP
-The following options are specific to the STRMIB sub-agent.
+The following options are specific to the X400PMIB sub-agent.
 .\"
 .TP
 \fB-k\fP, \fB--keep-open\fP
 By default,
-.B strmib
+.B x400pmib
 will close open files and Streams between requests, causing them to be
 reopened on then next request.  This is less intrusive on the STREAMS
 subsystem, but is also less efficient if many closely spaced requests are
 issued.  This option causes
-.B strmib
+.B x400pmib
 to keep Streams and files open between requests.
 Note that even with this option in effect,
-.B strmib
+.B x400pmib
 can be made to close Streams and files by sending it a
 .RI { SIGHUP }
 signal.
@@ -791,12 +775,12 @@ option.
 The default is the system default system
 control configuration
 file,
-.BR "/etc/streams.conf" .
+.BR "/etc/strchan.conf" .
 .\"
 .TP
 \fB-t\fP, \fB--agent-alarms\fP
 By default,
-.B strmib
+.B x400pmib
 allows the agent library to use and intercept
 .RI { SIGALRM }
 signals.  When this option is set, the agent informs the SNMP library that
@@ -829,14 +813,14 @@ for more information.
 .\"\fB-d\fP, \fB--directory\fP \fIDIRECTORY\fP
 .\"Specifies a directory to contain output and error logs.  The default is to
 .\"serach for
-.\".RB \(lq /var/adm/streams \(rq
+.\".RB \(lq /var/adm/strchan \(rq
 .\"and then
-.\".RB \(lq /var/log/streams .\(rq
+.\".RB \(lq /var/log/strchan .\(rq
 .\"
 .\".TP
 .\"\fB-b\fP, \fB--basename\fP \fIBASENAME\fP
 .\"Specifiy the log file basename.  The default is
-.\".RB \(lq strmib .\(rq
+.\".RB \(lq x400pmib .\(rq
 .\"
 .\".TP
 .\"\fB-o\fP, \fB--outfile\fP \fIOUTFILE\fP
@@ -849,7 +833,7 @@ for more information.
 .\".IR stdout .
 .\"When specified, standard output is redirected to the specified file regardless
 .\"of whether
-.\".B strmib
+.\".B x400pmib
 .\"is being run in the foreground or as a daemon.
 .\"
 .\".TP
@@ -863,16 +847,16 @@ for more information.
 .\".IR stderr .
 .\"When specified, standard error is redirected to the specified file regardless
 .\"of whether
-.\".B strmib
+.\".B x400pmib
 .\"is being run in the foreground or as a daemon.
 .\"
 .SS Command Options
 .PP
 Command options invoke alternate behaviour of the
-.B strmib
+.B x400pmib
 daemon, as a command, such as displaying information and exiting.  When the
 following command options are encountered during option processing,
-.B strmib
+.B x400pmib
 invokes the appropriate command function and then exits.  No further
 processing of options or arguments is performed and no agent actions are
 taken.  Note that all options specified following the comand option are
@@ -881,7 +865,7 @@ ignored.
 .TP
 \fB-H\fP, \fB--help-directives\fP
 When this option is encountered during option processing,
-.B strmib
+.B x400pmib
 outputs a list of configuration file directives that are understood by the
 agent and then exits.
 No further processing of options or arguments is performed and no actions are
@@ -897,7 +881,7 @@ NET-SNMP autogenerated subagents.
 .TP
 \fB-h\fP, \fB--help\fP, \fB-?\fP, \fB--?\fP
 When this option is encountered during option processing,
-.B strmib
+.B x400pmib
 prints usage information to
 .I stdout
 and exits.
@@ -908,7 +892,7 @@ Note that all options specified following this option are ignored.
 .TP
 \fB-v\fP, \fB--version\fP
 When this option is encountered during option processing,
-.B strmib
+.B x400pmib
 prints version information to
 .I stdout
 and exits.
@@ -929,7 +913,7 @@ daemon.)
 .TP
 \fB-y\fP, \fB--copying\fP
 When this option is encountered during option processing,
-.B strmib
+.B x400pmib
 prints copying information to
 .I stdout
 and exits.
@@ -991,6 +975,428 @@ option is provided for compatibility with
 .BR snmpd (8).
 .\"
 .\"
+.SH "MIB FORMAT"
+.PP
+The
+.I OPENSS7-X400P-MX-MIB
+(1.3.6.1.4.1.29591.1.1.10)
+implements the following tables, rows and columns:
+.sp
+.nf
+\fC\s-1\
+ (1.3.6.1.4.1.29591.1.1.10) x400pMIB
+ +--(1) x400pObjects
+    +--(1) x400pTables
+       |--(1) x400pSync
+       |  +--(1) x400pSyncTable
+       |     +--(1) x400pSyncEntry
+       |        |--( 1) x400pSyncGroup
+       |        |--( 2) x400pSyncIndex
+       |        |--( 3) x400pSyncSpanId
+       |        +--( 4) x400pSyncRowStatus
+       |
+       +--(2) x400pCard
+          +--(1) x400pCardTable
+             +--(1) x400pCardEntry
+                |--( 1) x400pCardIndex
+                |--( 2) x400pCardType
+                |--( 3) x400pCardIdentifier
+                |--( 4) x400pCardRevision
+                |--( 5) x400pChipType
+                |--( 6) x400pChipRevision
+                |--( 7) x400pPciBus
+                |--( 8) x400pPciSlot
+                |--( 9) x400pPciIrq
+                |--(10) x400pCardSpanType
+                |--(11) x400pCardMode
+                |--(12) x400pCardSyncMaster
+                |--(13) x400pCardSyncSource
+                |--(14) x400pCardSyncGroup
+                |--(15) x400pCardAdministrativeState
+                |--(16) x400pCardOperationalState
+                |--(17) x400pCardUsageState
+                |--(18) x400pCardAlarmStatus
+                |--(19) x400pCardProceduralStatus
+                |--(20) x400pCardAvailabilityStatus
+                |--(21) x400pCardControlStatus
+                |--(22) x400pCardUnknownStatus
+                |--(23) x400pCardSyncSpanId
+                +--(24) x400pCardSyncTransitions
+\s+1\fP
+.fi
+.\"
+.SS "x400pSyncTable \fR.1.1.1.1.1"
+.PP
+This table identifies and defines the synchronization groups into which X400P
+cards can be placed.
+.PP
+The X400P synchronization table is a table of synchronization groups.
+Equipped X400P cards that are configured for automatic synchronzation are
+assigned to a synchronization group.
+.PP
+Each entry in the synchronization table represents a synchronization source to
+be used for automatic synchronization within each group in the order of the
+index.  Rows may be created and deleted explicitly by management stations.
+Rows may be deleted implicitly as a part of system operation when a card is
+disassociated with a synchroniation group.
+.TP
+.BR x400pSyncGroup " .1
+Provides an identification and index of the synchronization group defined by
+a group of conceptual rows.
+.sp
+Specifies the group number of the entry.  A synchronization group is a group
+of cards which share a common timing bus.  Membership in the group is the
+cards which have an synchronization group value equal to this index and a
+synchronization source setting of
+.IR syncAuto .
+.TP
+.BR x400pSyncIndex " .2
+Provides an identification and index of each entry belonging to a
+synchronization group.  This is also the priority of the entry within the
+group.
+.sp
+Specifies the index of the entry and the priority at which the entry will be
+used for synchronization of the card.  Index value 1 is the highest priority
+and index value 8 is the lowest priority.
+.TP
+.BR x400pSyncSpanId " .3
+Provides an identification of the X400P card and span to which the entry
+applies.
+.sp
+Specifies the card and span to be used as a card synchronization source at the
+priority of the corresponding index.  Cards 1 through 16 and spans 1 through 4
+can be specified in accordance with the
+.B X400pSpanId
+textual convention.  However, the card number specified must belong to the
+same synchronization group as the indexed group.  That is, the card must have
+its synchronization group set to the index of this entry, and the card
+synchronization source must be set to
+.IR syncAuto .
+.TP
+.BR x400pSyncRowStatus " .4
+Provides a mechanism whereby management stations may create or delete rows in
+this table.
+.sp
+Rows may be created or deleted explicitly by management stations or implicitly
+as a part of system oepration.  When a card is removed from a synchronization
+group (by having its sychronization group number changed or having its
+synchronization source set to other than
+.IR syncAuto ),
+the system may automatically delete rows from this table.
+.\"
+.SS "x400pCardTable \fR.1.1.2.1.1"
+.PP
+This table identifiers and defines all of the management information
+associated with X400P cards.
+.PP
+The X400P Card Table provides an entry for each of the equipped X400P cards in
+the system."
+.PP
+Rows are neither created nor deleted explicity by mangement stations but are
+present inherently as a part of system operation.  Each entry in the table
+corresponds to an existing and installed X400P card.
+.TP
+.BR x400pCardIndex " .1
+Provides an identification and index of the X400P card defined by a conceptual
+row in the table.
+.TP
+.BR x400pCardType " .2
+Provides the X400P card type.  This can be one of:
+.RS
+.TP \w'\fIplxDevBrd\fP\(em'u
+.I none
+unknown or unspecified;
+.PD 0
+.TP
+.I plx9030
+ancient PLX 9030 prototype board;
+.TP
+.I plxDevBrd
+ancient PLX 9030 development board;
+.TP
+.I x400p
+an old Digium X400P card (T1 or E1);
+.TP
+.I e400p
+an old Digium E400P card (E1 only);
+.TP
+.I t400p
+an old Digium T400P card (T1 only);
+.TP
+.I x400p-ss7
+an old Digium X400P-SS7 card (T1 or E1);
+.TP
+.I e400p-ss7
+an old Digium E400P-SS7 card (E1 only);
+.TP
+.I t400p-ss7
+an old Digium T400P-SS7 card (T1 only);
+.TP
+.I v400p
+an older Varion V400PE/T card (E1 or T1);
+.TP
+.I v400pe
+an older Varion V400PE card (E1 only);
+.TP
+.I v400pt
+an older Varion V400PT card (T1 only);
+.TP
+.I v401pe
+a recent Varion V401PE card (E1 or T1);
+.TP
+.I v401pt
+a recent Varian V401PT card (E1 or T1).
+.PD
+.RE
+.TP
+.BR x400pCardIdentifier " .3
+Provides the X400P card identifier (stored in EEPROM).
+.TP
+.BR x400pCardRevision " .4
+Provides the revision letter of the card.
+.TP
+.BR x400pChipType " .5
+Provides the Dallas frame chip type.
+.RS
+.TP \w'\fIds21554\fP\(em'u
+.I none
+unknown or unspecified;
+.PD 0
+.TP
+.I ds2152
+4 x DS2152 T1 chips;
+.TP
+.I ds21352
+DS21352 T1 chip;
+.TP
+.I ds21552
+DS21552 T1 chip;
+.TP
+.I ds2154
+4 x DS2154 E1 chips;
+.TP
+.I ds21354
+DS21354 E1 chip;
+.TP
+.I ds21554
+DS21554 E1 chip;
+.TP
+.I ds2155
+4 x DS2155 E1/T1/J1 chip;
+.TP
+.I ds2156
+4 x DS2156 E1/T1/J1 chip.
+.PD
+.RE
+.TP
+.BR x400pChipRevision " .6
+Provides the revision letter of the Dallas framer chip.
+.TP
+.BR x400pPciBus " .7
+Provides the PCI bus in which the card is installed.
+.TP
+.BR x400pPciSlot " .8
+Provides the PCI bus slot in which the card is installed.
+.TP
+.BR x400pPciIrq " .9
+Provides the PCI IRQ assigned to the card.
+.TP
+.BR x400pCardSpanType " .10
+Identifies the type of spans normally supported by the card.  Some cards can
+support multiple spans; some are dedicated to T1/J1 or E1.
+.RS
+.TP
+.I none
+unknown or unspecified;
+.PD 0
+.TP
+.I t1
+T1 chip and card;
+.TP
+.I e1
+E1 chip and card;
+.TP
+.I j1
+T1 chip and card in J1 mode.
+.PD
+.RE
+.TP
+.BR x400pCardMode "  .11
+Specifies the loopback mode for the entire card.
+.RS
+.TP
+.I remoteLoopback
+RSER is looped back on TSER for all spans; that is, all received bits are
+looped back to the transmit between the elastic store and the system bus.
+This is equivalent to a per-span payload loopback, but is performed through
+the elastic store and on a card basis.
+.TP
+.I localLoopback
+RxBuf is driven by TxBuf; that is, all transmitted data bits are passed to the
+corresponding receive data bits between the elastic store and the system bus.
+.RE
+.TP
+.BR x400pCardSyncMaster " .12
+Specifies whether the card is a slave or a master on the external timing bus.
+The value can be one of:
+.RS
+.TP
+.I slave
+The external timing bus may be used as a synchronization source for the card
+by setting the card synchronization source to
+.IR syncExtern .
+Spans that use the external timing source should have their span clocking set to
+.IR slave .
+.TP
+.I master
+The card drives the external timing bus and the synchronization source may not
+also be set to
+.IR syncExtern .
+.RE
+.TP
+.BR x400pCardSyncSource " .13
+Specifies the synchronization source for the entire card (the synchronization
+applied to the TCLK pin on all spans).  The synchronization source may be one
+of:
+.RS
+.TP
+.I syncSelf
+The internal clock will be used as a synchronization source for the card.
+.TP
+.I sync1, sync2, sync3, sync4
+The corresponding span RCLK output will be used as the TCLK input for all spans on the card.
+.TP
+.I syncExtern
+The TCLK input for all spans will be taken from the external timing bus.
+.TP
+.I syncAuto
+The driver will use the spans specified in the
+.B x400pSyncTable
+table for the card as synchronization sources.
+.RE
+.TP
+.BR x400pCardSyncGroup " .14
+Specifies the synchronization group to which this card belongs.  This value is
+only significant when the synchronization source is set to
+.IR syncAuto .
+A synchronization group is a group of cards, including the current card in the
+set, that are connected together with a timing cable and therefore share the
+same timing bus.  The order of cards and spans that will be used for timing
+are specified against the synchronization group that has an group index of the
+same value as this column.
+.TP
+.BR x400pCardAdministrativeState " .15
+Provides the administrative state of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B AdministrativeState
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR x400pCardOperationalState " .16
+Provides the operational state of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B OperationalState
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR x400pCardUsageState " .17
+Provides the usage state of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B UsageState
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR x400pCardAlarmStatus " .18
+Provides the alarm status of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B AlarmStatus
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR x400pCardProceduralStatus " .19
+Provides the procedural status of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B ProceduralStatus
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR x400pCardAvailabilityStatus " .20
+Provides the availability status of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B AvailabilityStatus
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR x400pCardControlStatus " .21
+Provides the control status of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B ControlStatus
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR x400pCardUnknownStatus " .22
+Provides the unknown status of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B UnknownStatus
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR x400pCardSyncSpanId " .23
+Indicates which card and span is being used as the current synchronization
+source for the indexed card.  When the synchronization source is set to
+.I syncSelf
+or
+.IR syncExtern ,
+this value will be the null octet string.  When
+the synchronization source is set to
+.IR sync1 ,
+.IR sync2 ,
+.IR sync3 ,
+or
+.IR sync4 ,
+the value will always ben the same as the identifier of span 1, 2, 3 or 4,
+respectively, for the indexed card.  When the synchronization source is set to
+.IR syncAuto ,
+the value reflectes the identifier of the span currently providing the
+synchronization source, or the null octet string if no span is providing the
+synchroniation source.
+.TP
+.BR x400pCardSyncTransitions " .24
+Indicates the number of times since the last discontinuity that the
+synchronization span has transitioned.  .\"
+.\"
 .SH DIAGNOSTICS
 .PP
 An exit status of zero
@@ -1017,18 +1423,18 @@ module.
 .SH ENVIRONMENT
 .PP
 The following environment variables have an effect on the behaviour of the
-.B strmib
+.B x400pmib
 agent:
 .TP
 .B SNMPCONFPATH
 When this environment variable is exported to
-.BR strmib ,
+.BR x400pmib ,
 the
 .BR read_config_files ()
 function will look for configuration and persistent data files in the paths
 specified in the exported envirnoment variable (separated by colons).
 If this variable is not exported to
-.BR strmib ,
+.BR x400pmib ,
 the
 .BR read_config_files ()
 function will look for configuration and persistent data in the default
@@ -1042,17 +1448,17 @@ option.
 .TP
 .B SNMP_PERSISTENT_FILE
 When this environment variable is exported to
-.BR strmib ,
+.BR x400pmib ,
 the
 .BR read_config ()
 functions will look for a peristent data file in the file specified in the
 value of the
 .B SNMP_PERSISTENT_FILE
 environment variable.  If this variable is not exported to
-.BR strmib ,
+.BR x400pmib ,
 the
 .BR read_config ()
-functions will look for a persistent data in the file "strMIB.conf" in the
+functions will look for a persistent data in the file "x400pMIB.conf" in the
 default persistent directory.
 Note that persistent data will not be read when the
 .B -C
@@ -1062,7 +1468,7 @@ option.
 .TP
 .B HOME
 When exported to
-.BR strmib ,
+.BR x400pmib ,
 this environment variable specifies the home directory of the real user
 associated with the executing process.  When the "$HOME/snmp/mibs" directory
 exists, it will be added to the default MIB directories searched.
@@ -1071,68 +1477,68 @@ explicity included in the the
 .B MIBDIRS
 evironment variable.
 The
-.BR strmib
+.BR x400pmib
 daemon does not require MIBs to be loaded, and for the most part this
 environment variable is ignored.
 .TP
 .B MIBDIRS
 When exported to
-.BR strmib ,
+.BR x400pmib ,
 this environment variable specifies the directories or directories in
 addition to the default directories (when prefixed with a '+'), that will be
 searched for MIBs.  If this variable is not exported to
-.BR strmib ,
+.BR x400pmib ,
 only the default directories (or premib defined default directories) will be
 loaded.
 The
-.BR strmib
+.BR x400pmib
 daemon does not require MIBs to be loaded, and for the most part this
 environment variable is ignored.
 .TP
 .B MIBS
 When exported to
-.BR strmib ,
+.BR x400pmib ,
 this environment variable specifies the MIBs or MIBs in addition to the
 default MIBs (when prefixed with a '+') or all MIBs (when "all" is specified),
 that will be loaded.  If this variable is not exported to
-.BR strmib ,
+.BR x400pmib ,
 only the default MIBs (or premib defined default MIBs) will be loaded.
 The
-.BR strmib
+.BR x400pmib
 daemon does not require MIBs to be loaded, and for the most part this
 environment variable is ignored.
 .TP
 .B MIBFILES
 When exported to
-.BR strmib ,
+.BR x400pmib ,
 this environment variable specifies MIB files or MIB files in addition to the
 default MIB files (when prefixed with a '+'), that will be loaded.  If this
 variable is not exported to
-.BR strmib ,
+.BR x400pmib ,
 only the default MIB files will be loaded.
 The
-.BR strmib
+.BR x400pmib
 daemon does not require MIBs to be loaded, and for the most part this
 environment variable is ignored.
 .TP
 .B PREFIX
 When exported to
-.BR strmib ,
+.BR x400pmib ,
 this environment varibale specifies an OID in numbers an dots notation that
 specifies the prefix of the MIB tree to be loaded.
 The
-.BR strmib
+.BR x400pmib
 daemon does not require MIBs to be loaded, and for the most part this
 environment variable is ignored.
 .TP
 .B SUFFIX
 When exported to
-.BR strmib ,
+.BR x400pmib ,
 regardless of its contents,
 this variable will cause only suffixes of OIDs to be output.  Otherwise, the
 default is to output complete OIDs.
 The
-.BR strmib
+.BR x400pmib
 daemon does not print OIDs except for debugging, and for the most part this
 environment variable is ignored.
 .\"
@@ -1140,22 +1546,19 @@ environment variable is ignored.
 .SH NOTICES
 .PP
 The
-.B strmib
+.B x400pmib
 AgentX sub-agent requires the
-.BR sc (4)
+.BR x400p_mx (4)
 .I STREAMS
-modules and the
-.BR sad (4)
-.I STREAMS
-driver.  If either one is not available, the
-.B strmib
+driver.  If the driver is not available, the
+.B x400pmib
 command will not be successful.  See
-.BR sc "(4) and " sad (4)
+.BR x400p_mx (4)
 for more information.
 .PP
-.B strmib
+.B x400pmib
 is normally invoked from the
-.B /etc/init.d/streams
+.B /etc/init.d/strchan
 init script when the presence of an SNMP master agent providing an AgentX interface
 on
 .IR /var/agentx/master ,
@@ -1166,7 +1569,7 @@ is detected.
 .\"
 .SH IMPLEMENTATION
 .PP
-.B strmib
+.B x400pmib
 is implemented using a subset of the UCD-SNMP application programming
 interfaces which are also provided in recent NET-SNMP releases (called the
 old-API).  This implementation maintains compatibility across as many
@@ -1177,7 +1580,7 @@ NET-SNMP master SNMP agents, such as
 Consult the NET-SNMP documentation on your specific distribution for more
 information.
 .PP
-.B strmib
+.B x400pmib
 is implemented and recommended to be run as an AgentX sub-agent to a running
 .BR snmpd (8)
 configured for master SNMP agent operation and supporting the AgentX
@@ -1194,36 +1597,28 @@ interface.
 .SH DEVICES
 .PP
 .TP
-.BR sad (4)
-.B strmib
+.BR x400p_mx (4)
+.B x400pmib
 uses the
-.BR sad (4)
-driver to provide information about autopush entries and to verify module
-lists.
+.BR x400p_mx (4)
+driver to provide information and control of X400P cards and synchronization
+groups.
 .\"
 .\"
-.SH MODULES
-.PP
-.TP
-.BR sc (4)
-.B strmib
-uses the
-.BR sc (4)
-driver to provide information on loaded modules and drivers as well as
-configuration information and statistics for drivers and modules as well as
-the overall STREAMS subsystem.
+.\".SH MODULES
+.\".PP
 .\"
 .\"
 .SH FILES
 .PP
 .TP
-.B /usr/sbin/strmib
+.B /usr/sbin/x400pmib
 contains the
-.B strmib
+.B x400pmib
 command.
 .PP
 The
-.B strmib
+.B x400pmib
 agent checks for the existence of and parses the following files:
 .TP
 .B /etc/snmp/snmp.conf
@@ -1231,15 +1626,15 @@ Common configuration file for the agent and applications.  See
 .BR snmp.conf (5)
 for more information.
 .TP
-.BR /etc/snmp/strMIB.conf ", " /etc/snmp/strMIB.local.conf
+.BR /etc/snmp/x400pMIB.conf ", " /etc/snmp/x400pMIB.local.conf
 Provides the
-.B strmib
+.B x400pmib
 agent-specific configuration.  See
 .BR snmpd.conf (5)
 for more information.  These files are optional and may be used to configure
 access control, trap generation, subagent protocols and more.  Also, the agent
 will read any files with the names
-.IR strMIB.conf " or " strMIB.local.conf
+.IR x400pMIB.conf " or " x400pMIB.local.conf
 in a colon separated path specified in the
 .B SNMPCONFPATH
 environment variable.
@@ -1257,34 +1652,32 @@ however, load an file that beings with a '.' or descend into subdirectories.
 .\"
 .SH BUGS
 .PP
-.B strmib
+.B x400pmib
 has no known bugs.  All bugs are unknown and have yet to be discovered.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B strmib
+.B x400pmib
 implements the
-.I OPENSS7-STREAMS-MIB
+.I OPENSS7-X400P-MX-MIB
 SNMPv2 management information base which provides SNMPv2c or SNMPv3 management
-of the
-.B Linux Fast-STREAMS
-subsystem.  The
-.I OPENSS7-STREAMS-MIB
+of the X400P Multiplex driver.  The
+.I OPENSS7-X400P-MX-MIB
 is an
 .B OpenSS7
 project specific MIB, but it is suitably generic to provide SNMP management of
-most STREAMS subsystems and implementations.
+most X400P driver implementations.
 .PP
 The
-.B strmib
+.B x400pmib
 executable is most suitable as an AgentX sub-agent.  The program uses the
 facilities of the UCD-SNMP or NET-SNMP packages and libraries found on almost
 Linux system distributions.
 .IP \(em \w'\(em\(em'u
 Although implemented using the UCD-SNMP application programming interfaces and
 UCD-SNMP or NET-SNMP libraries,
-.B strmib
+.B x400pmib
 is suitable as a standalone AgentX
 .[
 AgentX
@@ -1390,7 +1783,7 @@ OpenSS7 coding standards.
 .\"
 .SH CONFORMANCE
 .PP
-.B strmib
+.B x400pmib
 conforms to SNMPv1, SNMPv2,
 .[
 rfc2578
@@ -1409,11 +1802,11 @@ agentx
 .\"
 .SH HISTORY
 .PP
-.B strmib
+.B x400pmib
 is provided with the
 .I @PACKAGE_TITLE@
 package.
-.B strmib
+.B x400pmib
 was initially released in version
 .B 0.9.2.4
 of the
