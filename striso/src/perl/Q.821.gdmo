@@ -112,7 +112,7 @@ managementOperationsSchedule MANAGED OBJECT CLASS
 					DEFAULT VALUE Q821-ASN1Module.managementOperationsScheduleEndTimeDefault
 					GET-REPLACE,
 				interval GET-REPLACE,
-				scheduIeId GET;;;
+				scheduleId GET;;;
 	CONDITIONAL PACKAGES
 		managementOperationsScheduleOperationalStatePkg PACKAGE
 			ATTRIBUTES

@@ -597,7 +597,15 @@ refresh_strMIB(void)
 	int ival;
 	ulong val;
 	size_t len;
-	struct strMIB_data *StorageTmp = strMIBStorage;
+
+	if (strMIBStorage == NULL) {
+		if ((strMIBStorage = SNMP_MALLOC_STRUCT(strMIB_data)) == NULL)
+			return;
+
+		/* Update scalar defaults as required here... */
+
+		strMIB_refresh = 1;
+	}
 
 	if (strMIB_refresh == 0)
 		return;
@@ -606,165 +614,165 @@ refresh_strMIB(void)
 	/* Update scalars as required here... */
 
 	cvec[1] = STREAMS_CLTIME;
-	val = StorageTmp->strCltime * 10;
+	val = strMIBStorage->strCltime * 10;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strCltime = (val + 9) / 10;
+	strMIBStorage->strCltime = (val + 9) / 10;
 
 	cvec[1] = STREAMS_MAX_APUSH;
-	val = StorageTmp->strMaxApush;
+	val = strMIBStorage->strMaxApush;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strMaxApush = val;
+	strMIBStorage->strMaxApush = val;
 
 	cvec[1] = STREAMS_MAX_MBLK;
-	val = StorageTmp->strMaxMblk;
+	val = strMIBStorage->strMaxMblk;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strMaxMblk = val;
+	strMIBStorage->strMaxMblk = val;
 
 	cvec[1] = STREAMS_MAX_STRAMOD;
-	val = StorageTmp->strMaxStramod;
+	val = strMIBStorage->strMaxStramod;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strMaxStramod = val;
+	strMIBStorage->strMaxStramod = val;
 
 	cvec[1] = STREAMS_MAX_STRDEV;
-	val = StorageTmp->strMaxStrdev;
+	val = strMIBStorage->strMaxStrdev;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strMaxStrdev = val;
+	strMIBStorage->strMaxStrdev = val;
 
 	cvec[1] = STREAMS_MAX_STRMOD;
-	val = StorageTmp->strMaxStrmod;
+	val = strMIBStorage->strMaxStrmod;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strMaxStrmod = val;
+	strMIBStorage->strMaxStrmod = val;
 
 	cvec[1] = STREAMS_MSG_PRIORITY;
-	ival = (StorageTmp->strMsgPriority == TV_TRUE);
+	ival = (strMIBStorage->strMsgPriority == TV_TRUE);
 	len = sizeof(ival);
 	if (sysctl(cvec, clen, &ival, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strMsgPriority = ival ? TV_TRUE : TV_FALSE;
+	strMIBStorage->strMsgPriority = ival ? TV_TRUE : TV_FALSE;
 
 	cvec[1] = STREAMS_NBAND;
-	val = StorageTmp->strNband;
+	val = strMIBStorage->strNband;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strNband = val;
+	strMIBStorage->strNband = val;
 
 	cvec[1] = STREAMS_NSTRMSGS;
-	val = StorageTmp->strNstrmsgs;
+	val = strMIBStorage->strNstrmsgs;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strNstrmsgs = val;
+	strMIBStorage->strNstrmsgs = val;
 
 	cvec[1] = STREAMS_NSTRPUSH;
-	val = StorageTmp->strNstrpush;
+	val = strMIBStorage->strNstrpush;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strNstrpush = val;
+	strMIBStorage->strNstrpush = val;
 
 	cvec[1] = STREAMS_HIWAT;
-	val = StorageTmp->strHiwat;
+	val = strMIBStorage->strHiwat;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strHiwat = val;
+	strMIBStorage->strHiwat = val;
 
 	cvec[1] = STREAMS_LOWAT;
-	val = StorageTmp->strLowat;
+	val = strMIBStorage->strLowat;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strLowat = val;
+	strMIBStorage->strLowat = val;
 
 	cvec[1] = STREAMS_MAXPSZ;
-	val = StorageTmp->strMaxpsz;
+	val = strMIBStorage->strMaxpsz;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strMaxpsz = val;
+	strMIBStorage->strMaxpsz = val;
 
 	cvec[1] = STREAMS_MINPSZ;
-	val = StorageTmp->strMinpsz;
+	val = strMIBStorage->strMinpsz;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strMinpsz = val;
+	strMIBStorage->strMinpsz = val;
 
 	cvec[1] = STREAMS_REUSE_FMODSW;
-	ival = (StorageTmp->strReuseFmodsw == TV_TRUE);
+	ival = (strMIBStorage->strReuseFmodsw == TV_TRUE);
 	len = sizeof(ival);
 	if (sysctl(cvec, clen, &ival, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strReuseFmodsw = ival ? TV_TRUE : TV_FALSE;
+	strMIBStorage->strReuseFmodsw = ival ? TV_TRUE : TV_FALSE;
 
 	cvec[1] = STREAMS_RTIME;
-	val = StorageTmp->strRtime * 10;
+	val = strMIBStorage->strRtime * 10;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strRtime = (val + 9) / 10;
+	strMIBStorage->strRtime = (val + 9) / 10;
 
 	cvec[1] = STREAMS_STRHOLD;
-	val = StorageTmp->strStrhold * 10;
+	val = strMIBStorage->strStrhold * 10;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strStrhold = (val + 9) / 10;
+	strMIBStorage->strStrhold = (val + 9) / 10;
 
 	cvec[1] = STREAMS_STRCTLSZ;
-	val = StorageTmp->strStrctlsz;
+	val = strMIBStorage->strStrctlsz;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strStrctlsz = val;
+	strMIBStorage->strStrctlsz = val;
 
 	cvec[1] = STREAMS_STRMSGSZ;
-	val = StorageTmp->strStrmsgsz;
+	val = strMIBStorage->strStrmsgsz;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strStrmsgsz = val;
+	strMIBStorage->strStrmsgsz = val;
 
 	cvec[1] = STREAMS_STRTHRESH;
-	val = StorageTmp->strStrthresh;
+	val = strMIBStorage->strStrthresh;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strStrthresh = val;
+	strMIBStorage->strStrthresh = val;
 
 	cvec[1] = STREAMS_STRTHRESH;
-	val = StorageTmp->strLowthresh;
+	val = strMIBStorage->strLowthresh;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strLowthresh = val;
+	strMIBStorage->strLowthresh = val;
 
 	cvec[1] = STREAMS_STRTHRESH;
-	val = StorageTmp->strMedthresh;
+	val = strMIBStorage->strMedthresh;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strMedthresh = val;
+	strMIBStorage->strMedthresh = val;
 
 	cvec[1] = STREAMS_IOCTIME;
-	val = StorageTmp->strIoctime * 10;
+	val = strMIBStorage->strIoctime * 10;
 	len = sizeof(val);
 	if (sysctl(cvec, clen, &val, &len, NULL, 0))
 		snmp_perror(__FUNCTION__);
-	StorageTmp->strIoctime = (val + 9) / 10;
+	strMIBStorage->strIoctime = (val + 9) / 10;
 }
 
 /*
@@ -783,7 +791,7 @@ u_char *
 var_strMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
 	   WriteMethod ** write_method)
 {
-	struct strMIB_data *StorageTmp = strMIBStorage;
+	struct strMIB_data *StorageTmp;
 
 	if (header_generic(vp, name, length, exact, var_len, write_method)
 	    == MATCH_FAILED)
@@ -792,7 +800,8 @@ var_strMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *v
 	/* Refresh the MIB values if required. */
 	refresh_strMIB();
 
-	(void) StorageTmp;
+	if ((StorageTmp = strMIBStorage) == NULL)
+		return NULL;
 
 	/* This is where we do the value assignments for the mib results. */
 

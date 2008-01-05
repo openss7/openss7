@@ -706,6 +706,15 @@ store_mxMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 void
 refresh_mxMIB(void)
 {
+	if (mxMIBStorage == NULL) {
+		if ((mxMIBStorage = SNMP_MALLOC_STRUCT(mxMIB_data)) == NULL)
+			return;
+
+		/* Update scalar defaults as required here... */
+
+		mxMIB_refresh = 1;
+	}
+
 	if (mxMIB_refresh == 0)
 		return;
 	mxMIB_refresh = 0;
@@ -730,9 +739,8 @@ u_char *
 var_mxMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
 	  WriteMethod ** write_method)
 {
-	struct mxMIB_data *StorageTmp = mxMIBStorage;
+	struct mxMIB_data *StorageTmp;
 
-	snmp_log(MY_FACILITY(LOG_NOTICE), "entering var_mxMIB\n");
 	if (header_generic(vp, name, length, exact, var_len, write_method)
 	    == MATCH_FAILED)
 		return NULL;
@@ -740,7 +748,8 @@ var_mxMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *va
 	/* Refresh the MIB values if required. */
 	refresh_mxMIB();
 
-	(void) StorageTmp;
+	if ((StorageTmp = mxMIBStorage) == NULL)
+		return NULL;
 
 	/* This is where we do the value assignments for the mib results. */
 
@@ -2493,7 +2502,6 @@ var_mxSpanTable(struct variable *vp, oid * name, size_t *length, int exact, size
 
 	struct mxSpanTable_data *StorageTmp = NULL;
 
-	snmp_log(MY_FACILITY(LOG_NOTICE), "entering var_mxSpanTable\n");
 	DEBUGMSGTL(("mxMIB", "var_mxSpanTable: Entering...  \n"));
 
 	/* Make sure that the storage data does not need to be refreshed before checking the
@@ -2780,7 +2788,6 @@ var_mxChanTable(struct variable *vp, oid * name, size_t *length, int exact, size
 
 	struct mxChanTable_data *StorageTmp = NULL;
 
-	snmp_log(MY_FACILITY(LOG_NOTICE), "entering var_mxChanTable\n");
 	DEBUGMSGTL(("mxMIB", "var_mxChanTable: Entering...  \n"));
 
 	/* Make sure that the storage data does not need to be refreshed before checking the
@@ -2897,7 +2904,6 @@ var_mxXconTable(struct variable *vp, oid * name, size_t *length, int exact, size
 
 	struct mxXconTable_data *StorageTmp = NULL;
 
-	snmp_log(MY_FACILITY(LOG_NOTICE), "entering var_mxXconTable\n");
 	DEBUGMSGTL(("mxMIB", "var_mxXconTable: Entering...  \n"));
 
 	/* Make sure that the storage data does not need to be refreshed before checking the
@@ -2999,7 +3005,6 @@ var_mxBertTable(struct variable *vp, oid * name, size_t *length, int exact, size
 
 	struct mxBertTable_data *StorageTmp = NULL;
 
-	snmp_log(MY_FACILITY(LOG_NOTICE), "entering var_mxBertTable\n");
 	DEBUGMSGTL(("mxMIB", "var_mxBertTable: Entering...  \n"));
 
 	/* Make sure that the storage data does not need to be refreshed before checking the
@@ -3111,7 +3116,6 @@ var_mxNearEndCurrentTable(struct variable *vp, oid * name, size_t *length, int e
 
 	struct mxNearEndCurrentTable_data *StorageTmp = NULL;
 
-	snmp_log(MY_FACILITY(LOG_NOTICE), "entering var_mxNearEndCurrentTable\n");
 	DEBUGMSGTL(("mxMIB", "var_mxNearEndCurrentTable: Entering...  \n"));
 
 	/* Make sure that the storage data does not need to be refreshed before checking the
@@ -3243,7 +3247,6 @@ var_mxNearEndIntervalTable(struct variable *vp, oid * name, size_t *length, int 
 
 	struct mxNearEndIntervalTable_data *StorageTmp = NULL;
 
-	snmp_log(MY_FACILITY(LOG_NOTICE), "entering var_mxNearEndIntervalTable\n");
 	DEBUGMSGTL(("mxMIB", "var_mxNearEndIntervalTable: Entering...  \n"));
 
 	/* Make sure that the storage data does not need to be refreshed before checking the
@@ -3375,7 +3378,6 @@ var_mxNearEndTotalTable(struct variable *vp, oid * name, size_t *length, int exa
 
 	struct mxNearEndTotalTable_data *StorageTmp = NULL;
 
-	snmp_log(MY_FACILITY(LOG_NOTICE), "entering var_mxNearEndTotalTable\n");
 	DEBUGMSGTL(("mxMIB", "var_mxNearEndTotalTable: Entering...  \n"));
 
 	/* Make sure that the storage data does not need to be refreshed before checking the
@@ -3512,7 +3514,6 @@ var_mxFarEndCurrentTable(struct variable *vp, oid * name, size_t *length, int ex
 
 	struct mxFarEndCurrentTable_data *StorageTmp = NULL;
 
-	snmp_log(MY_FACILITY(LOG_NOTICE), "entering var_mxFarEndCurrentTable\n");
 	DEBUGMSGTL(("mxMIB", "var_mxFarEndCurrentTable: Entering...  \n"));
 
 	/* Make sure that the storage data does not need to be refreshed before checking the
@@ -3639,7 +3640,6 @@ var_mxFarEndIntervalTable(struct variable *vp, oid * name, size_t *length, int e
 
 	struct mxFarEndIntervalTable_data *StorageTmp = NULL;
 
-	snmp_log(MY_FACILITY(LOG_NOTICE), "entering var_mxFarEndIntervalTable\n");
 	DEBUGMSGTL(("mxMIB", "var_mxFarEndIntervalTable: Entering...  \n"));
 
 	/* Make sure that the storage data does not need to be refreshed before checking the
@@ -3766,7 +3766,6 @@ var_mxFarEndTotalTable(struct variable *vp, oid * name, size_t *length, int exac
 
 	struct mxFarEndTotalTable_data *StorageTmp = NULL;
 
-	snmp_log(MY_FACILITY(LOG_NOTICE), "entering var_mxFarEndTotalTable\n");
 	DEBUGMSGTL(("mxMIB", "var_mxFarEndTotalTable: Entering...  \n"));
 
 	/* Make sure that the storage data does not need to be refreshed before checking the
@@ -7261,13 +7260,7 @@ sa_mloop(int argc, char *argv[])
 				run_alarms();
 		}
 #endif
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: waiting for packets\n", argv[0]);
-
 		retval = agent_check_and_process(1);	/* 0 == don't block */
-
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: got packets\n", argv[0]);
 
 		if (retval == 0) {
 			/* alarm occurred, alarm conditions checked */
