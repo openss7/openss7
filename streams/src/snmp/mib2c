@@ -227,7 +227,9 @@ sub loadMib {
 	$mib->{'access'} =~ /ReadOnly|ReadWrite|WriteOnly|Create|NoAccess/) {
 	$count = $count + 1;
 	$subid = $mib->{'objectID'};
-	$subid =~ s/$fulloid\.//;
+	if  ( $subid =~ s/$fulloid\.// ) {
+	    $variables{$name}{'myoid'} = 1;
+	}
 	$subid =~ s/\./,/g;
 	if (!defined($variables{$mib->{'type'}})  && !defined($mib->{'indexes'})) {
 	    print STDERR "unknown type:  $mib->{type} for $mib->{label} $mib->{'access'}\n";
@@ -246,13 +248,25 @@ sub loadMib {
 	    $variables{$vroutine}{'indexes'} = $mib->{'indexes'};
 	    foreach $i (@{$mib->{'indexes'}}) {
 		$variables{$vroutine}{$i}{'isanindex'} = 1;
-		my $j = $SNMP::MIB{$i};
-		loadMib($j, $depth) unless ($j->{'label'} eq "mib-2");
 	    }
 	}
     }
     my $children = $$mib{'children'}; 
     my $i;
+    my $j;
+    foreach $i (@{$children}) {
+	foreach $j (@{$mib->{'indexes'}}) {
+	    if ($j eq $i->{'label'}) {
+		$variables{$vroutine}{$j}{'ismyindex'} = 1;
+	    }
+	}
+    }
+    foreach $j (@{$mib->{'indexes'}}) {
+	if ( $variables{$vroutine}{$j}{'ismyindex'} != 1 ) {
+	    $i = $SNMP::MIB{$j};
+	    loadMib($i, $depth) unless ($i->{'label'} eq "mib-2");
+	}
+    }
     my $newdepth = $depth;
     foreach $i (sort {$a->{subID} <=> $b->{subID}} @{$children}) {
 	if ( $name =~ /Table$/ ) {
@@ -260,18 +274,8 @@ sub loadMib {
 	    push @table_list, $name;
 	    $newdepth = max(loadMib($i, $depth), $newdepth);
 	    $vroutine="$mibName";
-	}
-	else {
-	    my $m;
-	    my $j;
-	    foreach $j (@{$mib->{'indexes'}}) {
-		    if ($j eq $i->{'label'}) {
-			    $m = $j;
-		    }
-	    }
-	    if ($m ne $i->{'label'}) {
-		    $newdepth = max(loadMib($i, $depth), $newdepth);
-	    }
+	} else {
+	    $newdepth = max(loadMib($i, $depth), $newdepth);
 	}
     }
     return $newdepth;
