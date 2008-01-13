@@ -1,3 +1,18 @@
+2008-01-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/snmp.am: added SNMP automake fragment for installing agents
+	* src/util/sysconfig/snmp: added SNMP deamon configuration file
+
+	* Makefile.am: added SNMP agent dlmod build and MIB installation
+	* am/man.am: substitute snmp directories
+	* lib32/Makefile.am: stubs for building 32-bit SNMP dlmods
+	* m4/snmp.m4: subsitute dlmod and mib directories
+	* src/kernel/strsched.c: correct kthread stop (don't kthread_bind())
+	* src/snmp/mib2c.openss7.conf: support for dlmod and agent build from same file
+	* src/snmp/strMIB.c: support for dlmod and agent build from same file
+	* src/util/sysconfig/README: added snmp config file description
+	* tests/local.at: update headers
+
 2008-01-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/mib2c.openss7.conf: correct missing header_generic

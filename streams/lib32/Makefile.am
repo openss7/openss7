@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/13 22:46:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008/01/13 21:53:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 22:46:12 $ by $Author: brian $
+# Last Modified $Date: 2008/01/13 21:53:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -319,6 +319,20 @@ libpLiS_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libpLiS_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 libpLiS_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 
+#if WITH_SNMP_AGENT
+#snmpdlmod32_LTLIBRARIES	+= strMIB.la
+#endif
+EXTRA_LTLIBRARIES		= strMIB.la
+
+strMIB_la_SOURCES		= $(top_srcdir)/src/snmp/strMIB.c \
+				  $(top_srcdir)/src/snmp/strMIB.h
+strMIB_la_DEPENDENCIES		= libstreams.la
+strMIB_la_LDFLAGS		= -module -avoid-version $(MACHINE_FLAGS) \
+				  -shared $(STREAMS_LDFLAGS) $(SNMP_LDFLAGS)
+strMIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
+strMIB_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+strMIB_la_LIBADD		= $(STREAMS_LDADD) $(SNMP_LDADD)
+
 ## RPM_BUILD_USER
 endif
 
@@ -333,6 +347,9 @@ include ../am/libraries.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.9  2008/01/13 21:53:03  brian
+# - dlmod SNMP agent build and installation
+#
 # Revision 0.9.2.8  2007/08/13 22:46:12  brian
 # - GPLv3 header updates
 #
