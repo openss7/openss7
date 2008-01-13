@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MTP-MIB2.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/15 20:19:14 $
+-- @(#) $RCSfile: OPENSS7-MTP-MIB2.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/01/10 19:55:42 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/12/15 20:19:14 $ by $Author: brian $
+-- Last Modified $Date: 2008/01/10 19:55:42 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MTP-MIB2.mib,v $
+-- Revision 0.9.2.3  2008/01/10 19:55:42  brian
+-- - updating mibs
+--
 -- Revision 0.9.2.2  2007/12/15 20:19:14  brian
 -- - updates
 --
@@ -75,7 +78,7 @@ IMPORTS
 	MtpTransmissionRate
 		FROM OPENSS7-MTP-TC
 
-	openss7Modules
+	openss7
 		FROM OPENSS7-SMI;
 
 mtpMIB2 MODULE-IDENTITY
@@ -95,7 +98,7 @@ mtpMIB2 MODULE-IDENTITY
 		 mailto:bidulock@openss7.org"
 	DESCRIPTION
 		"Second crack at SS7 MTP MIB."
-	::= { openss7Modules 3 }
+	::= { openss7 17 751 1 }
 
 -- top level organization of the MIB
 

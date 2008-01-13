@@ -1,7 +1,7 @@
 --< GDMO.Copyright
 -- =============================================================================
 -- 
--- @(#) $RCSfile: X.711.asn,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/29 14:28:10 $
+-- @(#) $RCSfile: X.711.asn,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/01/13 00:26:17 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +46,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/09/29 14:28:10 $ by $Author: brian $
+-- Last Modified $Date: 2008/01/13 00:26:17 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: X.711.asn,v $
+-- Revision 0.9.2.3  2008/01/13 00:26:17  brian
+-- - corrections to GDMOs
+--
 -- Revision 0.9.2.2  2007/09/29 14:28:10  brian
 -- - update gdmos and asns
 --
@@ -313,7 +316,11 @@ AttributeId ::= CHOICE {globalForm [0] IMPLICIT OBJECT IDENTIFIER, localForm [1]
 --  used, the permissible values for the integers and their meanings shall be defined as part of the application context in
 -- which they are used
 AttributeIdError ::= SEQUENCE {errorStatus ENUMERATED { accessDenied (2), noSuchAttribute (5) },attributeId AttributeId } BaseManagedObjectId ::= SEQUENCE {baseManagedObjectClass ObjectClass, baseManagedObjectInstance ObjectInstance}
-CMISFilter ::= CHOICE {item [8] FilterItem, and [9] IMPLICIT SET OF CMISFilter,or [10] IMPLICIT SET OF CMISFilter, not [11] CMISFilter}
+CMISFilter ::= CHOICE {
+	item [8] FilterItem,
+	and [9] IMPLICIT SET OF CMISFilter,
+	or [10] IMPLICIT SET OF CMISFilter,
+	not [11] CMISFilter}
 CMISSync ::= ENUMERATED { bestEffort (0),atomic (1) } ComplexityLimitation ::= SET {scope [0] Scope OPTIONAL, filter [1] CMISFilter OPTIONAL,sync [2] CMISSync OPTIONAL } CreateArgument ::= SEQUENCE {managedObjectClass ObjectClass,
 managedOrSuperiorObjectInstance CHOICE {managedObjectInstance ObjectInstance, superiorObjectInstance [8] ObjectInstance } OPTIONAL,accessControl [5] AccessControl OPTIONAL, referenceObjectInstance [6] ObjectInstance OPTIONAL,attributeList [7] IMPLICIT SET OF Attribute OPTIONAL } CreateResult ::= SEQUENCE {managedObjectClass ObjectClass OPTIONAL,
 managedObjectInstance ObjectInstance OPTIONAL, 
@@ -327,17 +334,28 @@ EventTypeId ::= CHOICE {globalForm [6] IMPLICIT OBJECT IDENTIFIER, localForm [7]
 -- This Recommendation | International Standard does not allo cate any values for localForm. Where this alternative is
 -- used, the permissible values for the integers and their meanings shall be defined as part of the application context in
 -- which they are used
-FilterItem ::= CHOICE {equality [0] IMPLICIT Attribute, substrings [1] IMPLICIT SEQUENCE OF CHOICE {initialString [0] IMPLICIT SEQUENCE { attributeIdAttributeId,string ANY DEFINED BY attributeId }, anyString [1] IMPLICIT SEQUENCE {attributeIdAttributeId, string ANY DEFINED BY attributeId },finalString [2] IMPLICIT SEQUENCE { attributeIdAttributeId,string ANY DEFINED BY attributeId} },
-greaterOrEqual [2] IMPLICIT Attribute,
--- asserted value >= attribute value
-lessOrEqual [3] IMPLICIT Attribute,
--- asserted value >= attribute
-valuepresent [4] AttributeId,
-subsetOf [5] IMPLICIT Attribute,
--- asserted value is a subset of attribute value
-supersetOf [6] IMPLICIT Attribute,
--- asserted value is a superset of attribute value
-nonNullSetIntersection [7] IMPLICIT Attribute
+FilterItem ::= CHOICE {
+	equality [0] IMPLICIT Attribute,
+	substrings [1] IMPLICIT SEQUENCE OF CHOICE {
+		initialString [0] IMPLICIT SEQUENCE {
+			attributeId AttributeId,
+			string ANY DEFINED BY attributeId },
+		anyString [1] IMPLICIT SEQUENCE {
+			attributeId AttributeId,
+			string ANY DEFINED BY attributeId },
+		finalString [2] IMPLICIT SEQUENCE {
+			attributeId AttributeId,
+			string ANY DEFINED BY attributeId} },
+	greaterOrEqual [2] IMPLICIT Attribute,
+	-- asserted value >= attribute value
+	lessOrEqual [3] IMPLICIT Attribute,
+	-- asserted value >= attribute
+	valuepresent [4] AttributeId,
+	subsetOf [5] IMPLICIT Attribute,
+	-- asserted value is a subset of attribute value
+	supersetOf [6] IMPLICIT Attribute,
+	-- asserted value is a superset of attribute value
+	nonNullSetIntersection [7] IMPLICIT Attribute
 }
 GetArgument ::= SEQUENCE {
 	COMPONENTS OF BaseManagedObjectId,

@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/01/01 13:59:39 $
+-- @(#) $RCSfile: OPENSS7-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/01/10 19:55:42 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008/01/01 13:59:39 $ by $Author: brian $
+-- Last Modified $Date: 2008/01/10 19:55:42 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MIB.mib,v $
+-- Revision 0.9.2.4  2008/01/10 19:55:42  brian
+-- - updating mibs
+--
 -- Revision 0.9.2.3  2008/01/01 13:59:39  brian
 -- - added new mibs
 --
@@ -92,18 +95,18 @@ openss7 MODULE-IDENTITY
 -- Uppermost arcs of the OpenSS7 tree.
 --
 
-OpenSS7MIBs OBJECT-IDENTITY
-	STATUS current
-	DESCRIPTION
-		"This is the arc under which OpenSS7 MIBS are defined."
-	::= { openss7 1 }
+-- OpenSS7MIBs OBJECT-IDENTITY
+-- 	STATUS current
+-- 	DESCRIPTION
+-- 		"This is the arc under which OpenSS7 MIBS are defined."
+-- 	::= { openss7 1 }
 
 OpenSS7Modules OBJECT-IDENTITY
 	STATUS current
 	DESCRIPTION
 		"This is the arc under which individual MIB modules are 
 		 registered."
-	::= { OpenSS7MIBs 1 }
+	::= { openss7 1 }
 
 --
 --  FIXME: document mib assigned values, at least as comments
@@ -114,7 +117,7 @@ OpenSS7Capabilities OBJECT-IDENTITY
 	DESCRIPTION
 		"This is the arg under which OpenSS7 agent capabilities 
 		 are registered."
-	::= { OpenSS7MIBs 2 }
+	::= { openss7 2 }
 
 
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
