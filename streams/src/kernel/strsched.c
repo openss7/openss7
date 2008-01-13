@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.168 $) $Date: 2007/12/15 20:19:56 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.169 $) $Date: 2008/01/13 21:53:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:56 $ by $Author: brian $
+ Last Modified $Date: 2008/01/13 21:53:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.169  2008/01/13 21:53:05  brian
+ - dlmod SNMP agent build and installation
+
  Revision 0.9.2.168  2007/12/15 20:19:56  brian
  - updates
 
@@ -189,10 +192,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.168 $) $Date: 2007/12/15 20:19:56 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.169 $) $Date: 2008/01/13 21:53:05 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.168 $) $Date: 2007/12/15 20:19:56 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.169 $) $Date: 2008/01/13 21:53:05 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -5428,7 +5431,7 @@ kstreamd(void *__bind_cpu)
 				goto reschedule;
 			}
 		}
-		set_current_state(TASK_RUNNING);
+		__set_current_state(TASK_RUNNING);
 
 		if (cpu_is_offline((long) __bind_cpu))
 			goto wait_to_die;
@@ -5436,10 +5439,12 @@ kstreamd(void *__bind_cpu)
 
 		preempt_enable_no_resched();
 		cond_resched();
+		preempt_disable();
+		preempt_enable();
 		prefetchw(t);
 		set_current_state(TASK_INTERRUPTIBLE);
 	}
-	set_current_state(TASK_RUNNING);
+	__set_current_state(TASK_RUNNING);
 	return (0);
       wait_to_die:
 	preempt_enable();
@@ -5643,12 +5648,14 @@ kill_kstreamd(void)
 {
 	int cpu;
 
+#if 0
 #ifndef HAVE_KTHREAD_BIND_EXPORT
 #ifdef HAVE_KTHREAD_BIND_ADDR
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
 	static const typeof(&kthread_bind) kthread_bind_funcp = (void *) HAVE_KTHREAD_BIND_ADDR;
 
 #define kthread_bind(x, y) (*kthread_bind_funcp)(x, y)
+#endif
 #endif
 #endif
 #ifndef HAVE_KTHREAD_STOP_EXPORT
@@ -5665,8 +5672,10 @@ kill_kstreamd(void)
 		struct task_struct *p = t->proc;
 
 		if (p) {
+#if 0
 			/* make it runnable on this processor */
 			kthread_bind(p, smp_processor_id());
+#endif
 			kthread_stop(p);
 			t->proc = NULL;
 		}

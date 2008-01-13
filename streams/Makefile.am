@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2007/12/15 20:19:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2008/01/13 21:53:01 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/12/15 20:19:25 $ by $Author: brian $
+# Last Modified $Date: 2008/01/13 21:53:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -233,7 +233,14 @@ endif
 lib_LTLIBRARIES			= libstreams.la \
 				  libLiS.la \
 				  libpLiS.la
+
 lib32_LTLIBRARIES		=
+
+snmpdlmod_LTLIBRARIES		=
+
+if WITH_SNMP_AGENT
+snmpdlmod_LTLIBRARIES		+= strMIB.la
+endif
 
 ## RPM_BUILD_USER
 endif
@@ -586,6 +593,16 @@ libpLiS_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 ##libpLiS_la_LDFLAGS		+= -version-info 0:0:0 -export-dynamic
 ##endif
 
+strMIB_la_SOURCES		= \
+				src/snmp/strMIB.c \
+				src/snmp/strMIB.h
+strMIB_la_DEPENDENCIES		= libstreams.la
+strMIB_la_LDFLAGS		= -module -avoid-version \
+				  -shared $(STREAMS_LDFLAGS) $(SNMP_LDFLAGS)
+strMIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
+strMIB_la_CFLAGS		= $(USER_CFLAGS)
+strMIB_la_LIBADD		= $(STREAMS_LDADD) $(SNMP_LDADD)
+
 EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 
 #bin_PROGRAMS			= timetst strtst $(LFS_EXTRA_TESTS)
@@ -720,7 +737,7 @@ strvf_CFLAGS			= $(USER_CFLAGS)
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
-strmib_SOURCES			= src/snmp/strMIB.c
+strmib_SOURCES			= src/snmp/strMIB.c src/snmp/strMIB.h
 strmib_LDFLAGS			= $(SNMP_LDFLAGS)
 strmib_LDADD			= libstreams.la $(SNMP_LDADD)
 strmib_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -1000,6 +1017,14 @@ endif
 ## INSTALL_INITSCRIPTS
 endif
 
+dist_snmpmib_DATA		= src/snmp/mibs/OPENSS7-MIB.mib \
+				  src/snmp/mibs/OPENSS7-SMI.mib \
+				  src/snmp/mibs/OPENSS7-TC.mib \
+				  src/snmp/mibs/OPENSS7-TMN-SMI.mib \
+				  src/snmp/mibs/OPENSS7-TMN-TC.mib \
+				  src/snmp/mibs/OPENSS7-STREAMS-MIB.mib \
+				  src/snmp/mibs/OPENSS7-STREAMS-EXT-MIB.mib
+
 ## PKG_BUILD_INDEP
 endif
 
@@ -1046,6 +1071,12 @@ include am/release.am
 ##
 include am/doxy.am
 
+##
+## Rules for SNMP modules.
+##
+SNMPORDER			= 01
+include am/snmp.am
+
 EXTRA_DIST			+= \
 				  README-LiS \
 				  debian/README.Debian \
@@ -1069,6 +1100,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.152  2008/01/13 21:53:01  brian
+# - dlmod SNMP agent build and installation
+#
 # Revision 0.9.2.151  2007/12/15 20:19:25  brian
 # - updates
 #

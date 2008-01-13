@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: local.at,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/12/15 20:20:22 $
+dnl @(#) $RCSfile: local.at,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008/01/13 21:53:09 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,7 +61,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2007/12/15 20:20:22 $ by $Author: brian $
+dnl Last Modified $Date: 2008/01/13 21:53:09 $ by $Author: brian $
 dnl
 dnl ==========================================================================
 
@@ -118,7 +118,7 @@ m4_ifdef([AT_COPYRIGHT],
 	 [m4_define([AT_NOTICE], [AT_BANNER([$1])])])
 
 AT_NOTICE(
-[Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+[Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
 All Rights Reserved.
@@ -145,8 +145,8 @@ provide any feature listed herein.
 
 As an exception to the above,  this software may be  distributed  under the  GNU
 Affero General Public License (GPL)  Version 3,  so  long  as  the  software  is
-distributed with, and only used for the testing of, OpenSS7 modules, drivers,
-and libraries.
+distributed with,  and only used for, the testing of,  OpenSS7 modules, drivers,
+and libraries, and that this restriction is not removed.
 
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
 of the  U.S. Government  ("Government"),  the following provisions apply to you.
@@ -169,6 +169,9 @@ Corporation  at a fee.  See http://www.openss7.com/]
 dnl ==========================================================================
 dnl
 dnl $Log: local.at,v $
+dnl Revision 0.9.2.13  2008/01/13 21:53:09  brian
+dnl - dlmod SNMP agent build and installation
+dnl
 dnl Revision 0.9.2.12  2007/12/15 20:20:22  brian
 dnl - updates
 dnl
