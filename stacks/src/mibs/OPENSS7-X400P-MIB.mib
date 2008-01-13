@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-X400P-MIB.mib,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/12/29 21:57:41 $
+-- @(#) $RCSfile: OPENSS7-X400P-MIB.mib,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008/01/10 19:55:44 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/12/29 21:57:41 $ by $Author: brian $
+-- Last Modified $Date: 2008/01/10 19:55:44 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-X400P-MIB.mib,v $
+-- Revision 0.9.2.6  2008/01/10 19:55:44  brian
+-- - updating mibs
+--
 -- Revision 0.9.2.5  2007/12/29 21:57:41  brian
 -- - updates
 --
@@ -74,7 +77,7 @@ OPENSS7-X400P-MIB DEFINITIONS ::= BEGIN
 IMPORTS
 	MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, DisplayString
 		FROM SNMPv2-SMI
-	openss7Modules
+	openss7
 		FROM OPENSS7-MIB;
 
 x400pMIB MODULE-IDENTITY
@@ -93,7 +96,7 @@ x400pMIB MODULE-IDENTITY
 		 E-Mail: bidulock@openss7.org"
 	DESCRIPTION
 		"MIB Module for the X400P Drivers and Cards."
-	::= { openss7Modules 10 }
+	::= { openss7 400 }
 
 -- top level oragnization of the MIB
 
@@ -238,7 +241,7 @@ x400pCardOperationalState OBJECT-TYPE
 		 to provide service to users.  When enabled(1), the card 
 		 is partially or fully operable and available for use."
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 operationalState."
 	DEFVAL		{ disabled(0) }
 	::= { x400pCardEntry 3 }
@@ -255,7 +258,7 @@ x400pCardUsageState OBJECT-TYPE
 		 in use.  When busy(2), all spans and channels are in 
 		 use."
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 usageState."
 	DEFVAL		{ idle(0) }
 	::= { x400pCardEntry 4 }
@@ -280,7 +283,7 @@ x400pCardAdministrativeState OBJECT-TYPE
 		   will be allowed to continue using channels until they 
 		   are released by the user."
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 administrativeState."
 	DEFVAL		{ locked(0) }
 	::= { x400pCardEntry 5 }
@@ -314,7 +317,7 @@ x400pCardAlarmStatus OBJECT-TYPE
 		   state attributes provide additional information, 
 		   particularly the carrier alarm related columns."
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 alarmStatus."
 	::= { x400pCardEntry 6 }
 
@@ -345,7 +348,7 @@ x400pCardProcedrualStatus OBJECT-TYPE
 		   phase and the driver is being unloaded.  The 
 		   operational state is disabled(0)."
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 proceduralStatus."
 	::= { x400pCardEntry 7 }
 
@@ -392,7 +395,7 @@ x400pCardAvailabilityStatus OBJECT-TYPE
 
 		 - logFull(8): Not applicable."
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 availabilityStatus."
 	::= { x400pCardEntry 8 }
 
@@ -415,7 +418,7 @@ x400pCardControlStatus OBJECT-TYPE
 
 		 - suspended(3): Not applicable."
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 controlStatus."
 	::= { x400pCardEntry 9 }
 
@@ -455,7 +458,7 @@ x400pCardStandbyStatus OBJECT-TYPE
 		 for another entire card is the only way that line 
 		 synchronization can be made the same for both cards."
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 standbyStatus."
 	::= { x400pCardEntry 10 }
 
@@ -467,7 +470,7 @@ x400pCardUnknownStatus OBJECT-TYPE
 	DESCRIPTION
 		""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 unknownStatus."
 	::= { x400pCardEntry 11 }
 
@@ -684,7 +687,7 @@ x400pSpanOperationalState OBJECT-TYPE
 		 disabled(0), the circuit is unusable.  When enabled(1), 
 		 the circuit is operational."
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 operationalState."
 	::= { x400pSpanEntry 2 }
 
@@ -698,7 +701,7 @@ x400pSpanUsageState OBJECT-TYPE
 		 active(1), data is being exchanged with the circuit; 
 		 busy(2), the card is consumed with transferring data."
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 usageState."
 	::= { x400pSpanEntry 3 }
 
@@ -713,7 +716,7 @@ x400pSpanAdministrativeState OBJECT-TYPE
 		 users can complete using the resource before the system 
 		 is shut down."
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 administrativeState."
 	::= { x400pSpanEntry 4 }
 
@@ -724,7 +727,7 @@ x400pSpanAlarmStatus OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 alarmStatus."
 	::= { x400pSpanEntry 5 }
 
@@ -734,7 +737,7 @@ x400pSpanProceduralStatus OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 proceduralStatus."
 	::= { x400pSpanEntry 6 }
 
@@ -744,7 +747,7 @@ x400pSpanAvailabilityStatus OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 availabilityStatus."
 	::= { x400pSpanEntry 7 }
 
@@ -754,7 +757,7 @@ x400pSpanControlStatus OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 controlStatus."
 	::= { x400pSpanEntry 8 }
 
@@ -764,7 +767,7 @@ x400pSpanStandbyStatus OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 standbyStatus."
 	::= { x400pSpanEntry 9 }
 
@@ -774,7 +777,7 @@ x400pSpanUnknownStatus OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 unknownStatus."
 	::= { x400pSpanEntry 10 }
 
@@ -1003,7 +1006,7 @@ x400pChanOperationalState OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 operationalState."
 	::= { x400pChanEntry xx }
 
@@ -1013,7 +1016,7 @@ x400pChanUsageState OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 usageState."
 	::= { x400pChanEntry xx }
 
@@ -1023,7 +1026,7 @@ x400pChanAdministativeState OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 administrativeState."
 	::= { x400pChanEntry xx }
 
@@ -1033,7 +1036,7 @@ x400pChanAlarmStatus OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 alarmStatus."
 	::= { x400pChanEntry xx }
 
@@ -1043,7 +1046,7 @@ x400pChanProceduralStatus OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 proceduralStatus."
 	::= { x400pChanEntry xx }
 
@@ -1053,7 +1056,7 @@ x400pChanAvailabilityStatus OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 availabilityStatus."
 	::= { x400pChanEntry xx }
 
@@ -1063,7 +1066,7 @@ x400pChanControlStatus OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 controlStatus."
 	::= { x400pChanEntry xx }
 
@@ -1073,7 +1076,7 @@ x400pChanStandbyStatus OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION	""
 	REFERENCE
-		"OPENSS7-TMN-TC, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 standbyStatus."
 	::= { x400pChanEntry xx }
 

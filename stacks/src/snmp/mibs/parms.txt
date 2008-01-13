@@ -1,0 +1,365 @@
+
+-- =====================================================================
+--
+-- TEXTUAL-CONVENTIONS for ISUP Parameters
+--
+-- =====================================================================
+
+AccessTransport ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(0..255))
+AddressPresentationRestrictionIndicator ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+AutomaticCongestionLevel ::= TEXTUAL-CONVENTION
+    SYNTAX INTEGER {
+	aCL1(1),
+	aCL2(2),
+	aCL3(3) }
+BackwardCallIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(2))
+BusinessGroup ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(7))
+CallModificationIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+CallReference ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"The first 3 octets in the string are the Call identity; the 
+	 second 3 octets in the string are the PointCode."
+    SYNTAX OCTET STRING (SIZE(6))
+CalledPartyNumber ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First octet, odd/even indicator and Nature of address 
+	 indicator, second octet numbering plan, third and remaining 
+	 octets, BCD coded digits (nibble reversed)."
+    SYNTAX OCTET STRING  (SIZE(2..26))
+CallingGeodeticLocation ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First to bytes identify the LPRI, Screening and Type of shape.  
+	 The remaining byts describe the shape."
+    SYNTAX OCTET STRING (SIZE(2..255))
+CallingPartyNumber ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First octet, odd/even indicator and Nature of address 
+	 indicator, second octet numbering plan, presentation and 
+	 screening, third and remaining octets, BCD coded digits (nibble 
+	 reversed)."
+    SYNTAX OCTET STRING (SIZE(2..26)))
+CallingPartyCategory ::= TEXTUAL-CONVENTION
+    SYNTAX INTEGER (0..255)
+CarrierIdentification ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"3-digit format is first octet network identification plan and type 
+	 of network, second octet is digits 1 and 2, third octet digit 3 
+	 and a filler.
+
+	 4-digit format is first octet network identification plan and 
+	 type of network, second octet is digitis 1 and 2, third octet 
+	 is digits 3 and 4."
+    SYNTAX OCTET STRING (SIZE(3))
+CarrierSelectionInformation ::= TEXTUAL-CONVENTION
+    SYNTAX INTEGER (0..255)
+CarrierServiceProviderIdentification ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First octet is CSPI type, S/P and Encoding Scheme, and the 
+	 remaining octets are the identifier.  The entire pattern may be 
+	 repeated."
+    SYNTAX OCTET STRING (SIZE(1..255))
+CauseIndicators ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First octet bits 4321 are location, 5 is spare, 76 are coding 
+	 standard, 8 is and extension bit; the second octet 7654321 si 
+	 the cause number and bit 8 is an extension bit; the remaining 
+	 octets zero or more diagnostic(s).  For an attribute identity 
+	 diagnostic, the first diagnositc octet is the attribute number, 
+	 the second is the rejected attribute and the third is the 
+	 available attribute."
+    SYNTAX OCTET STRING (SIZE(2..255))
+ChargeNumber ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"The first octet 7654321 is the nature of address indicator, bit 
+	 8 is the O/E bit; in the second octet 4321 are reserved, 765 is 
+	   the numbering plan, 8 is spare; the remaining octets encode 
+	   BCD digits (nibble reversed) with a filler if necessary."
+    SYNTAX OCTET STRING (SIZE(2..26))
+CircuitAssignmentMap ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"The first octet 654321 are the map type, 87 are spare; in the 
+	 second through third octet is the channel map with a 1 in the 
+	 channeld positions starting by counting channel 1 at the least 
+	 significant bit of octet 2 and numer through channel 24 at the 
+	 most significant bit of octet 4."
+    SYNTAX OCTET STRING (SIZE(4))
+CircuitGroupCharacteristicIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX INTEGER (0..255)
+CircuitGroupSupervisionMessageTypeIndicator ::= TEXTUAL-CONVENTION
+    SYNTAX INTEGER (0..255)
+CircuitIdentificationName ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First four octets are 4 trunk numebr digits coded in bit 
+	 positions 7654321 in each octet.  Octet 5 through 15 contain 
+	 the CLLI code for offize A and octest 16 through 26 contain the 
+	 CLLI code for office Z."
+    SYNTAX OCTET STRING (SIZE(26))
+CircuitStateIndicator ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Each octet in the string represents another circuit state 
+	 indicator."
+    SYNTAX OCTET STRING (SIZE(1..255))
+CircuitValidationResponseIndicator ::= TEXTUAL-CONVENTION
+    SYNTAX INTEGER (0..255)
+ClosedUserGroupCheckResponseIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+ClosedUserGroupInterlockCode ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+CommonLanguageLocationIdentificationCode ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Contains the characeters of the CLLI code, each character coded 
+	 in a separate octet."
+    SYNTAX OCTET STRING (SIZE(11))
+CompatibilityInformation ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+ConnectedNumber ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+ConnectionRequest ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Octets 1 through 3 contain the local reference, octets 4 
+	 through 6 contain the signalling point code, octet 7 contains 
+	 the protocol class and octet 8 contains the credit."
+    SYNTAX OCTET STRING (SIZE(8))
+ContinuityIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX INTEGER (0..255)
+EgressService ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1..255))
+EventIndicator ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Octet 1 bits 7654321 are the event indicator, and bit 8 
+	 indicates retrict."
+    SYNTAX OCTET STRING (SIZE(1))
+FacilityIndicator ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+FacilityInformationIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+ForwardCallIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(2))
+GenericAddressParameter ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Octet 1 is the type of address, octet 2 bits 7654321 are the 
+	 nature of address indicator, bit 8 is the O/E bit; octet 2 has 
+	 presentation in bits 43, bits 765 contain the numbering plan; 
+	 and the reamining octets contain the BCD encoded niblle swapped 
+	 address signals with filler if necessary."
+    SYNTAX OCTET STRING (SIZE(2..27))
+GenericDigitsParameter ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Octet 1 has the type of digits in bits 54321, the encoding 
+	 scheme in 876; the remaining octets contain the digits."
+    SYNTAX OCTET STRING (SIZE(1..255))
+GenericNameParameter ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Octet 1 contains the presentation in bits 21, availability in 
+	 bit, and type of name in 876; the remaining octets contain the 
+	 characters of the name."
+    SYNTAX OCTET STRING (SIZE(1..255))
+HopCounterParameter ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Sole octet contains hop counter in bits 54321."
+    SYNTAX OCTET STRING (SIZE(1))
+Index ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+InformationIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(2))
+InformationRequestIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(2))
+JurisdictionInformation ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Contents consist of 6 digits encoded in nibbles, LS nibble 
+	 first."
+    SYNTAX OCTET STRING (SIZE(3))
+LocalServiceProviderIdentification ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First octet contains LSPI type in bits 54321 followed by 
+	 ecnoding scheme in bits 876; second octet contains context 
+	 identification in bits 4321, rest of octet spare; remaining 
+	 octets contain the local service provider identity."
+    SYNTAX OCTET STRING (SIZE(2..255))
+MessageCompatibilityInformation ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Bits 7654321 contain the instruction indicators and bit 8 is 
+	 for expansion to further octets."
+    SYNTAX OCTET STRING (SIZE(1..255))
+NetworkSpecificFacility ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Octet 1 is the lenght of the network identification; octet 2 
+	 has the network identification plan in 4321; the type of 
+	 netowrk id in 765 and an extension bit in bit 8; the next two 
+	 octets contain digits, nibble encoded; and the remaining octets 
+	 contain the entwork specific facility indicator."
+    SYNTAX OCTET STRING (SIZE(1..255))
+NatureofConnectionIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(2))
+NetworkTransport ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Contains ISDN User Part parameters, length and contents."
+    SYNTAX OCTET STRING (SIZE(1..255))
+NetworkManagementControls ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+NotificationIndicator ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Bits 7654321 contain the notification number and bit 8 is used 
+	 for expansion."
+    SYNTAX OCTET STRING (SIZE(1))
+OptionalBackwardCallIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+OperatorServicesInformation ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+OptionalForwardCallIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+OriginalCalledNumber ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First octet contains nature of address and O/E bit in bit 8; 
+	 second octet contains presentation in 43 and nubering plan in 
+	 765; remaining octets containt address signals and padding."
+    SYNTAX OCTET STRING (SIZE(2..255))
+OriginatingLineInformation ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+OutgoingTrunkGroupNumber ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Contains 2, 4, or 6 digits, BCD coded and nibble reversed."
+    SYNTAX OCTET STRING (SIZE(1..3))
+Precedence ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First octet 4321 contain precedence level, 76 the LFB, and next 
+	 two cotets contain NI digis (not nibble swapped), and then 3  
+	 octets making up the MLPP service domain."
+    SYNTAX OCTET STRING (SIZE(6))
+ParamterCompatibilityInformation ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1..255))
+PivotCapability ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+PivotCounter ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+PivotCounterBackwardInformation ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+PivotCounterForwardIndication ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+PivotRoutingIndicator ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+PivotStatus ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+RangeandStatus ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First octet is the range and the remaining octets are the 
+	 status."
+    SYNTAX OCTET STRING (SIZE(1..255))
+RedirectingNumber ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First octet contains nature of address indicator and O/E bit; 
+	 second octet has presentation in 43 and numbering plan in 765; 
+	 the remaining octets are address signals and possible filler."
+    SYNTAX OCTET STRING (SIZE(2..26))
+RedirectBackwardInformation ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Contains TLV data."
+    SYNTAX OCTET STRING (SIZE(1..255))
+RedirectCapability ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+RedirectCounter ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+RedirectForwardInformation ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Contains TLV data."
+    SYNTAX OCTET STRING (SIZE(1..255))
+RedirectStatus ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+RedirectionIndicators ::= TEXTUAL-CONVENTION
+RedirectionInformation ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First octet bits 321 are redirecting indicator, bits 8765 are 
+	 the original redirecting reason; bits 4321 of the second octet 
+	 are the redirection counter; and 8765 of the second octet are 
+	 the redirecting reason."
+    SYNTAX OCTET STRING (SIZE(2))
+RedirectionNumber ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First octet is the nature of address indicator and O/E bit; 
+	 second octet contains only numbering plan in bits 765; 
+	 remianing octets are address signals and possible filler."
+    SYNTAX OCTET STRING (SIZE(2..26))
+RemoteOperations ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First octet is protocol profile in bits 54321; ext bit in bit 
+	 8; remaining octets are remote operations components."
+    SYNTAX OCTET STRING (SIZE(1..255))
+ServiceActivation ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"A list of feature codes, one per octet."
+    SYNTAX OCTET STRING (SIZE(1..255))
+ServiceCode ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+SignallingPointCode ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+SpecialProcessingRequest ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+SubsequentNumber ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+SuspendResumeIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+TransactionRequest ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First 4 octets are the transaction ID, and the remaining octets 
+	 are the SCCP address."
+    SYNTAX OCTET STRING (SIZE(5..255))
+TransitNetworkSelection ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"First octet 4321 is network identification plan; 765 are type 
+	 of network identificationl; for 3-digit TNS, the next two 
+	 octets contain the digits as signals (nibble swapped); for 
+	 4-digit the next 3 octets contain the digits as signals (nibble 
+	 swapped):  In both cases the final nibble is the circuit code."
+    SYNTAX OCTET STRING (SIZE(3|4))
+TransmissionMediumRequirement ::= TEXTUAL-CONVENTION
+    SYNTAX NULL
+TransmissionMediumUsed ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+UserServiceInformation ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Horribly complex fields."
+    SYNTAX OCTET STRING (SIZE(1..255))
+UserServiceInformationPrime ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Horribly complex fields."
+    SYNTAX OCTET STRING (SIZE(1..255))
+UsertoUserIndicators ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1))
+UsertoUserInformation ::= TEXTUAL-CONVENTION
+    SYNTAX OCTET STRING (SIZE(1..255))
+
+
+AccessTransport ::= [3] IMPLICIT OCTET STRING (SIZE(0..256))
+AutomaticCongestionLevel ::= [39] IMPLICIT INTEGER { aCL1(1), aCL2(1), aCL3(3) }
+BackwardCallIndicators ::= [17] IMPLICIT OCTET STRING (SIZE(2))
+BusinessGroup ::= [198] IMPLICIT OCTET STRING (SIZE(7))
+CallModificationIndicators ::= [23] IMPLICIT NULL
+CallReference ::= [1] IMPLICIT OCTET STRING (SIZE(6))
+CalledPartyNumber ::= [4] IMPLICIT OCTET STRING (SIZE(2..26))
+CallingGeodeticLocation ::= [129] IMPLICIT OCTET STRING (SIZE(2..255))
+CalingPartyNumber ::= [10] IMPLICIT OCTET STRING (SIZE(2..26))
+CallingPartyCategory ::= [9] IMPLICIT OCTET STRING (SIZE(1))
+CarrierIdentification ::= [197] IMPLICIT OCTET STRING (SIZE(3))
+CarrierSelectionInformation ::= [238] IMPLICIT OCTET STRING (SIZE(0..255))
+CarrierServiceProviderIdentification ::= [226] IMPLICIT OCTET STRING (SIZE(1..255))
+CauseIndicators ::= [18] IMPLICIT OCTET STRING (SIZE(2..255))
+ChargeNumber ::= [235] IMPLICIT OCTET STRING (SIZE(2..26))
+CircuitAssignmentMap ::= [37] IMPLICIT OCTET STRING (SIZE(4))
+CircuitGroupCharacteristicIndicator ::= [229] IMPLICIT OCTET STRING (SIZE(1))
+CircuitGroupSupervisionMessageTypeIndicator ::= [21] IMPLICIT OCTET STRING (SIZE(1))
+CircuitIdentificationName ::= [232] IMPLICIT OCTET STRING (SIZE(26))
+CircuitStateIndicator ::= [38] IMPLICIT OCTET STRING (SIZE(1..255))
+CircuitValidationResponseIndicator ::= [230] IMPLICIT OCTET STRING (SIZE(1))
+ClosedUserGroupCheckResponseIndicators ::= [28] IMPLICIT NULL
+ClosedUserGroupInterlockCode ::= [30] IMPLICIT NULL
+CommonLanguageLocationIdentificationCode ::= [233] IMPLICIT OCTET STRING (SIZE(11))
+ConnectedNumber ::= [33] IMPLICIT NULL
+ConnectionRequest ::= [13] IMPLICIT OCTET STRING (SIZE(8))
+ContinuityIndicators ::= [16] IMPLICIT OCTET STRING (SIZE(1))
+EgressService ::= [195] IMPLICIT OCTET STRING (SIZE(1..255))
+

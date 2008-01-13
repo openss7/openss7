@@ -1,4 +1,4 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
@@ -1417,7 +1417,7 @@ REGISTERED AS { q825Attribute 40 };
 
 
 operatorSpecific2Number ATTRIBUTE
-	WITH ATTRIBUTE SYNTAX Q825-CDR-ASN1Module.OperatorSpecific1Number;
+	WITH ATTRIBUTE SYNTAX Q825-CDR-ASN1Module.OperatorSpecific2Number;
 	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		operatorSpecific2NumberBehaviour BEHAVIOUR
@@ -1657,7 +1657,7 @@ REGISTERED AS { q825Attribute 56 };
 
 
 relatedCallNumber ATTRIBUTE
-	WITH ATTRIBUTE SYNTAX Q825-CDR-ASN1Module.RedirectionNumber;
+	WITH ATTRIBUTE SYNTAX Q825-CDR-ASN1Module.RelatedCallNumber;
 	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		relatedCallNumberBehaviour BEHAVIOUR

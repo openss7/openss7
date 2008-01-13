@@ -1,7 +1,7 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SS7-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/15 20:19:14 $
+-- @(#) $RCSfile: OPENSS7-SS7-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/01/10 19:55:43 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/12/15 20:19:14 $ by $Author: brian $
+-- Last Modified $Date: 2008/01/10 19:55:43 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SS7-MIB.mib,v $
+-- Revision 0.9.2.3  2008/01/10 19:55:43  brian
+-- - updating mibs
+--
 -- Revision 0.9.2.2  2007/12/15 20:19:14  brian
 -- - updates
 --
@@ -63,76 +66,74 @@
 OPENSS7-SS7-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY, OBJECT-IDENTITY
-		FROM SNMPv2-MIB
-
-	openss7Modules
-		FROM OPENSS7-SMI;
+    MODULE-IDENTITY, OBJECT-IDENTITY
+	FROM SNMPv2-MIB
+    openss7
+	FROM OPENSS7-SMI;
 
 -- top level layout of the MIB
 
 ss7MIB MODULE-IDENTITY
-	LAST-UPDATED
-		"200709301706Z"
-	ORGANIZATION
-		"The OpenSS7 Project"
-	CONTACT-INFO
-		"Brian Bidulock
-		 OpenSS7 Corporation
-		 1469 Jefferys Crescent
-		 Edmonton, Alberta  T6L 6T1
-		 CANADA
-		 Tel: +1 780 490 1141
-		 Fax: +1 780 490 1241
-		 Mob: +1 780 953 0557
-		 mailto:biduloock@openss7.org"
-	DESCRIPTION
-		"Basic SS7 MIB that provides some fundamental SS7 
-		 things."
-	::= { openss7Modules 10 }
+    LAST-UPDATED
+	"200709301706Z"
+    ORGANIZATION
+	"The OpenSS7 Project"
+    CONTACT-INFO
+	"Brian Bidulock
+	 OpenSS7 Corporation
+	 1469 Jefferys Crescent
+	 Edmonton, Alberta  T6L 6T1
+	 CANADA
+	 Tel: +1 780 490 1141
+	 Fax: +1 780 490 1241
+	 Mob: +1 780 953 0557
+	 mailto:biduloock@openss7.org"
+    DESCRIPTION
+	"Basic SS7 MIB that provides some fundamental SS7 things."
+    ::= { openss7 17 700 }
 
 -- top level layout of MIB
 
-ss7Notifications	OBJECT IDENTIFIER ::= { ss7MIB		 0 }
-ss7Objects		OBJECT IDENTIFIER ::= { ss7MIB		 1 }
-ss7Conformance		OBJECT IDENTIFIER ::= { ss7MIB		 2 }
+ss7Notifications    OBJECT IDENTIFIER ::= { ss7MIB       0 }
+ss7Objects	    OBJECT IDENTIFIER ::= { ss7MIB       1 }
+ss7Conformance      OBJECT IDENTIFIER ::= { ss7MIB       2 }
 
-ss7Scalars		OBJECT IDENTIFIER ::= { ss7Objects	 1 }
-ss7Tables		OBJECT IDENTIFIER ::= { ss7Objects	 2 }
-ss7Notifs		OBJECT IDENTIFIER ::= { ss7Objects	 3 }
-ss7Oids			OBJECT IDENTIFIER ::= { ss7Objects	 4 }
+ss7Scalars	    OBJECT IDENTIFIER ::= { ss7Objects   1 }
+ss7Tables	    OBJECT IDENTIFIER ::= { ss7Objects   2 }
+ss7Notifs	    OBJECT IDENTIFIER ::= { ss7Objects   3 }
+ss7Oids		    OBJECT IDENTIFIER ::= { ss7Objects   4 }
 
-ss7Protocols		OBJECT IDENTIFIER ::= { ss7Oids		 1 }
+ss7Protocols	    OBJECT IDENTIFIER ::= { ss7Oids      1 }
 
 ss7ProtocolItut OBJECT-IDENTITY
-	STATUS		current
-	DESCRIPTION
-		"Provides an autonomous type for the ITU-T protocol 
-		 variant or protocol variants based on ITU-T."
-	::= { ss7Protocols 1 }
+    STATUS current
+    DESCRIPTION
+	"Provides an autonomous type for the ITU-T protocol variant or 
+	 protocol variants based on ITU-T."
+    ::= { ss7Protocols 1 }
 
 ss7ProtocolEtsi OBJECT-IDENTITY
-	STATUS		current
-	DESCRIPTION
-		"Provides an autonomous type for the ETSI protocol 
-		 variant or protocol variants based on ETSI."
-	::= { ss7Protocols 2 }
+    STATUS current
+    DESCRIPTION
+	"Provides an autonomous type for the ETSI protocol variant or 
+	 protocol variants based on ETSI."
+    ::= { ss7Protocols 2 }
 
 ss7ProtocolAnsi OBJECT-IDENTITY
-	STATUS		current
-	DESCRIPTION
-		"Provides an autonomous type for the ANSI protocol 
-		 variant or protocol variants based on ANSI."
-	::= { ss7Protocols 3 }
+    STATUS current
+    DESCRIPTION
+	"Provides an autonomous type for the ANSI protocol variant or 
+	 protocol variants based on ANSI."
+    ::= { ss7Protocols 3 }
 
 ss7ProtocolJttc OBJECT-IDENTITY
-	STATUS		current
-	DESCRIPTION
-		"Provides an autonomous type for the JTTC protocol 
-		 variant or protocol variants based on JTTC."
-	::= { ss7Protocols 3 }
+    STATUS current
+    DESCRIPTION
+	"Provides an autonomous type for the JTTC protocol variant or 
+	 protocol variants based on JTTC."
+    ::= { ss7Protocols 3 }
 
 
 END
 
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
