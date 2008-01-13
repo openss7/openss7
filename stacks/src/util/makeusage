@@ -1,0 +1,7 @@
+#!/usr/bin/make -f
+
+usage: usage.c makeusage
+	gcc -Wall -o usage usage.c
+
+
+		
