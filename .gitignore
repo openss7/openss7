@@ -2222,3 +2222,14 @@ streams/strnlen.c
 streams/strtod.c
 striso/10030.txt
 strxns/src/snmp/mibs/.index
+hold.tar.bz2
+stacks/src/snmp/.cvsignore
+stacks/src/snmp/*_openss7.c
+stacks/src/snmp/*_openss7.h
+stacks/src/snmp/*_simple.c
+stacks/src/snmp/*_simple.h
+stacks/src/snmp/*_storage.c
+stacks/src/snmp/*_storage.h
+stacks/src/snmp/mibs/.index
+stacks/src/snmp/mibs/mibs.tar.gz
+stacks/src/util/usage
