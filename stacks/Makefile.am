@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2007/10/18 06:52:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2008/01/14 18:04:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/18 06:52:44 $ by $Author: brian $
+# Last Modified $Date: 2008/01/14 18:04:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -113,12 +113,18 @@ EXTRA_PROGRAMS			+= \
 				  test-x400p-sdt2 \
 				  test-x400p-sl \
 				  test-xnet \
-				  test-xnet_thr
+				  test-xnet_thr \
+				  test-usage
 
 pkglibexec_PROGRAMS		= \
 				  test-q781 \
 				  test-x100p \
 				  test-x400p
+
+if WITH_SNMP_AGENT
+pkglibexec_PROGRAMS		+= \
+				  test-usage
+endif
 
 if WITH_SCTP
 pkglibexec_PROGRAMS		+= \
@@ -279,6 +285,12 @@ test_x400p_LDADD		= $(STREAMS_LDADD)
 test_x400p_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_x400p_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p\"
 test_x400p_CFLAGS		= $(USER_CFLAGS)
+
+test_usage_SOURCES		= src/util/usage.c
+test_usage_LDADD		= $(STREAMS_LDADD)
+test_usage_LDFLAGS		= $(STREAMS_LDFLAGS)
+test_usage_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-usage\"
+test_usage_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_cap2_SOURCES	= src/test/x400p-ss7/test-x400p-cap2.c
 #test_x400p_cap2_LDADD		= $(STREAMS_LDADD)
@@ -647,6 +659,12 @@ test_x400p_LDADD		= $(STREAMS_LDADD)
 test_x400p_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_x400p_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p\"
 test_x400p_CFLAGS		= $(USER_CFLAGS)
+
+test_usage_SOURCES		= src/util/usage.c
+test_usage_LDADD		= $(STREAMS_LDADD)
+test_usage_LDFLAGS		= $(STREAMS_LDFLAGS)
+test_usage_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-usage\"
+test_usage_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_cap2_SOURCES		= src/test/x400p-ss7/test-x400p-cap2.c
 test_x400p_cap2_LDADD		= $(STREAMS_LDADD)
@@ -1462,6 +1480,9 @@ MAINTAINERCLEANFILES		+= \
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.101  2008/01/14 18:04:51  brian
+## - update tests and MIBS
+##
 ## Revision 0.9.2.100  2007/10/18 06:52:44  brian
 ## - new build support
 ##

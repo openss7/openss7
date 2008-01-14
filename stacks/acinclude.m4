@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2007/10/15 17:17:00 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2008/01/14 18:04:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/15 17:17:00 $ by $Author: brian $
+# Last Modified $Date: 2008/01/14 18:04:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,6 +79,10 @@ m4_include([m4/chan.m4])
 m4_include([m4/iso.m4])
 m4_include([m4/isdn.m4])
 m4_include([m4/doxy.m4])
+m4_include([m4/lib32.m4])
+m4_include([m4/perl.m4])
+m4_include([m4/snmp.m4])
+m4_include([m4/agent.m4])
 
 # =============================================================================
 # AC_SS7
@@ -175,6 +179,7 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     CPPFLAGS=
     CFLAGS=
     _SS7_OUTPUT
+    _AGENT
     _AUTOTEST
     _DOXY
 ])# AC_SS7
@@ -1624,6 +1629,9 @@ AC_DEFUN([_SS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.71  2008/01/14 18:04:52  brian
+# - update tests and MIBS
+#
 # Revision 0.9.2.70  2007/10/15 17:17:00  brian
 # - updates for 2.6.22.5-49.fc6 kernel
 #

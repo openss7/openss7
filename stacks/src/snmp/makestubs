@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2008/01/13 00:30:46 $
+# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/01/14 18:04:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/01/13 00:30:46 $ by $Author: brian $
+# Last Modified $Date: 2008/01/14 18:04:53 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: makestubs,v $
+# Revision 0.9.2.2  2008/01/14 18:04:53  brian
+# - update tests and MIBS
+#
 # Revision 0.9.2.1  2008/01/13 00:30:46  brian
 # - added stub makefile
 #
@@ -76,28 +79,28 @@ export MIBFILES
 all: basic storage openss7
 
 basic: \
-	cdrMIB_simple.c cdrMIB_simple.h
+	cdr2MIB_simple.c cdr2MIB_simple.h
 
-cdrMIB_simple.c cdrMIB_simple.h: MIBS=+OPENSS7-CDR-MIB
-cdrMIB_simple.c cdrMIB_simple.h: mib2c mib2c.conf mibs/
-	./mib2c -c ./mib2c.conf -f cdrMIB_simple cdrMIB
-	indent -nhnl cdrMIB_simple.[ch]
+cdr2MIB_simple.c cdr2MIB_simple.h: MIBS=+OPENSS7-CDR2-MIB
+cdr2MIB_simple.c cdr2MIB_simple.h: mib2c mib2c.conf mibs/
+	./mib2c -c ./mib2c.conf -f cdr2MIB_simple cdr2MIB
+	indent -nhnl cdr2MIB_simple.[ch]
 
 storage: \
-	cdrMIB_storage.c cdrMIB_storage.h
+	cdr2MIB_storage.c cdr2MIB_storage.h
 
-cdrMIB_storage.c cdrMIB_storage.h: MIBS+=OPENSS7-CDR-MIB
-cdrMIB_storage.c cdrMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-CDR-MIB.mib
-	./mib2c -c ./mib2c.storage.conf -f cdrMIB_storage cdrMIB
-	indent -nhnl cdrMIB_storage.[ch]
+cdr2MIB_storage.c cdr2MIB_storage.h: MIBS+=OPENSS7-CDR2-MIB
+cdr2MIB_storage.c cdr2MIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-CDR2-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f cdr2MIB_storage cdr2MIB
+	indent -nhnl cdr2MIB_storage.[ch]
 
 openss7: \
-	cdrMIB_openss7.c cdrMIB_openss7.h
+	cdr2MIB_openss7.c cdr2MIB_openss7.h
 
-cdrMIB_openss7.c cdrMIB_openss7.h: MIBS+=OPENSS7-CDR-MIB
-cdrMIB_openss7.c cdrMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-CDR-MIB.mib
-	./mib2c -c ./mib2c.openss7.conf -f cdrMIB_openss7 cdrMIB
-	indent -nhnl cdrMIB_openss7.[ch]
+cdr2MIB_openss7.c cdr2MIB_openss7.h: MIBS+=OPENSS7-CDR2-MIB
+cdr2MIB_openss7.c cdr2MIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-CDR2-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f cdr2MIB_openss7 cdr2MIB
+	indent -nhnl cdr2MIB_openss7.[ch]
 
 tables:
 	./mib2c -c ./mib2c.storage.conf x400pSyncTable
@@ -107,9 +110,9 @@ tables:
 	indent -nhnl str*Table.[ch]
 
 clean:
-	rm -f cdrMIB_simple.[ch]
-	rm -f cdrMIB_storage.[ch]
-	rm -f cdrMIB_openss7.[ch]
-	rm -f cdrMIB_simple.[ch]~
-	rm -f cdrMIB_storage.[ch]~
-	rm -f cdrMIB_openss7.[ch]~
+	rm -f cdr2MIB_simple.[ch]
+	rm -f cdr2MIB_storage.[ch]
+	rm -f cdr2MIB_openss7.[ch]
+	rm -f cdr2MIB_simple.[ch]~
+	rm -f cdr2MIB_storage.[ch]~
+	rm -f cdr2MIB_openss7.[ch]~

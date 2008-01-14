@@ -1,27 +1,28 @@
-## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+# vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/13 15:22:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008/01/14 18:04:47 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 3 of the License.
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU General Public License along with
-# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
-# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+# 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 15:22:14 $ by $Author: brian $
+# Last Modified $Date: 2008/01/14 18:04:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -119,9 +120,19 @@ TESTSUITE_DEPS		+= \
 ## WITH_SIGTRAN
 endif
 
+if WITH_SNMP_AGENT
+## WITH_SNMP_AGENT
+TESTSUITE_DEPS		+= \
+			$(TESTSUITE)-usage.at
+## WITH_SNMP_AGENT
+endif
+
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.18  2008/01/14 18:04:47  brian
+## - update tests and MIBS
+##
 ## Revision 0.9.2.17  2007/08/13 15:22:14  brian
 ## - header updates, added references
 ##

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: snmp.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2008/01/13 21:52:58 $
+# @(#) $RCSfile: snmp.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/01/14 18:04:57 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/01/13 21:52:58 $ by $Author: brian $
+## Last Modified $Date: 2008/01/14 18:04:57 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -102,15 +102,15 @@ post-snmp:
 	@$(ECHO) "Making $@ in `pwd`"
 	@snmp_dir=$(DESTDIR)$(sysconfdir)/snmp ; \
 	if test ! -f $$snmp_dir/snmpd.conf ; then \
-		test -f $$snmp_dird.conf || exit 0 ; ( \
+		test -f $$snmp_dir/../snmpd.conf || exit 0 ; ( \
 			$(ECHO) "cd $$snmp_dir" ; \
 			cd $$snmp_dir ; \
 			$(ECHO) "ln -sf ../snmpd.conf ." ; \
 			ln -sf ../snmpd.conf . ; \
 			$(ECHO) "cd .." ; \
 			cd .. ; \
-			$(ECHO) "ln -sf snmp/snmp.local.conf ." ; \
-			ln -sf snmp/snmp.local.conf . \
+			$(ECHO) "ln -sf snmp/snmpd.local.conf ." ; \
+			ln -sf snmp/snmpd.local.conf . \
 		) ; \
 	fi ; \
 	conf_dir=$$snmp_dir/snmp.d ; \
@@ -225,6 +225,9 @@ EXTRA_DIST		+= src/util/sysconfig/snmp
 ## =============================================================================
 ##
 ## $Log: snmp.am,v $
+## Revision 0.9.2.2  2008/01/14 18:04:57  brian
+## - update tests and MIBS
+##
 ## Revision 0.9.2.1  2008/01/13 21:52:58  brian
 ## - dlmod SNMP agent build and installation
 ##
