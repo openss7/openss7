@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/19 11:55:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008/01/14 18:04:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/19 11:55:41 $ by $Author: brian $
+# Last Modified $Date: 2008/01/14 18:04:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -263,6 +263,18 @@ test_x400p_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_x400p_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p\"
 test_x400p_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
+test_usage_SOURCES		= $(top_srcdir)/src/util/usage.c
+test_usage_LDADD		= $(STREAMS_LDADD32)
+test_usage_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
+test_usage_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-usage\"
+test_usage_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
+if WITH_SNMP_AGENT
+## WITH_SNMP_AGENT
+pkglibexec32_PROGRAMS		+= test-usage
+## WITH_SNMP_AGENT
+endif
+
 if PUBLIC_RELEASE
 ## PUBLIC_RELEASE
 
@@ -373,6 +385,9 @@ include ../am/libraries.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.10  2008/01/14 18:04:52  brian
+## - update tests and MIBS
+##
 ## Revision 0.9.2.9  2007/08/19 11:55:41  brian
 ## - move stdbool.h, obviate need for YFLAGS, general workup
 ##

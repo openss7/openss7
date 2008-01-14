@@ -1,0 +1,83 @@
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
+dnl =========================================================================
+dnl 
+dnl @(#) $RCSfile: testsuite-usage.at,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2008/01/14 18:04:47 $
+dnl
+dnl -------------------------------------------------------------------------
+dnl
+dnl Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+dnl
+dnl All Rights Reserved.
+dnl 
+dnl This program is free software; you can redistribute it and/or modify it
+dnl under the terms of the GNU Affero General Public License as published by
+dnl the Free Software Foundation; version 3 of the License.
+dnl 
+dnl This program is distributed in the hope that it will be useful, but
+dnl WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+dnl or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public
+dnl License for more details.
+dnl 
+dnl You should have received a copy of the GNU Affero General Public License
+dnl along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+dnl write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+dnl 02139, USA.
+dnl 
+dnl -------------------------------------------------------------------------
+dnl
+dnl U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+dnl behalf of the U.S. Government ("Government"), the following provisions
+dnl apply to you.  If the Software is supplied by the Department of Defense
+dnl ("DoD"), it is classified as "Commercial Computer Software" under
+dnl paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+dnl Regulations ("DFARS") (or any successor regulations) and the Government is
+dnl acquiring only the license rights granted herein (the license rights
+dnl customarily provided to non-Government users).  If the Software is
+dnl supplied to any unit or agency of the Government other than DoD, it is
+dnl classified as "Restricted Computer Software" and the Government's rights
+dnl in the Software are defined in paragraph 52.227-19 of the Federal
+dnl Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+dnl cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+dnl (or any successor regulations).
+dnl
+dnl -------------------------------------------------------------------------
+dnl
+dnl Commercial licensing and support of this software is available from
+dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+dnl
+dnl -------------------------------------------------------------------------
+dnl
+dnl Last Modified $Date: 2008/01/14 18:04:47 $ by $Author: brian $
+dnl
+dnl -------------------------------------------------------------------------
+dnl
+dnl $Log: testsuite-usage.at,v $
+dnl Revision 0.9.2.1  2008/01/14 18:04:47  brian
+dnl - update tests and MIBS
+dnl
+dnl =========================================================================
+
+m4_divert_push([DEFAULTS])
+function test_usage() {
+    export MIBDIRS="${at_top_srcdir}/src/snmp/mibs:/usr/share/snmp/mibs"
+    export MIBS=+OPENSS7-CDR2-MIB
+    snmpinform -v $1 -c "$2" localhost:13001 ${@+2}
+}
+function test_usage_root() {
+    export MIBDIRS="${at_top_srcdir}/src/snmp/mibs:/usr/share/snmp/mibs"
+    export MIBS=+OPENSS7-CDR2-MIB
+    snmpinform -v $1 -c "$2" localhost:162 ${@+2}
+}
+m4_divert_pop([DEFAULTS])
+
+AT_TESTED([usage snmpinform snmptrap])
+AT_BANNER([USAGE CALL DETAIL RECORDING tests])
+
+AT_SETUP([usage test 1.1])
+AT_KEYWORDS([usage])
+AT_CHECK([
+], [], [ignore], [], [], [])
+AT_CLEANUP
+
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

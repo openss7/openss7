@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2008/01/13 00:10:21 $
+ @(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/01/14 18:04:54 $
 
  -----------------------------------------------------------------------------
 
@@ -44,21 +44,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/01/13 00:10:21 $ by $Author: brian $
+ Last Modified $Date: 2008/01/14 18:04:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: usage.c,v $
+ Revision 0.9.2.2  2008/01/14 18:04:54  brian
+ - update tests and MIBS
+
  Revision 0.9.2.1  2008/01/13 00:10:21  brian
  - example program for SNMP usage metering
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2008/01/13 00:10:21 $"
+#ident "@(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/01/14 18:04:54 $"
 
-static char const ident[] = "$RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2008/01/13 00:10:21 $";
-
-#define _GNU_SOURCE
+static char const ident[] = "$RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/01/14 18:04:54 $";
 
 #include <stdbool.h>
 #include <ctype.h>
@@ -143,12 +144,16 @@ static int verbose = 1;
  * all 66 varbinds are necessary.  Usually only about 20 varbinds are
  * necessary, meaning an overhead of 19 x 20 = 360 bytes. */
 
-#define OID_cdr2MIB "\x2b\x06\x01\x04\x01\x81\xe7\x17\x11\x86\x39"
+/* 1.3.6.1.4.1.29591.17.825 */
+#define OID_cdr2MIB (unsigned char *) "\x2b\x06\x01\x04\x01\x81\xe7\x17\x11\x86\x39"
 #define LEN_cdr2MIB 11
+/* 2.1.11.1.1 */
 #define OID_callDetailRecordLogR2Entry OID_cdr2MIB "\x02\x01\x0b\x01\x01"
 #define LEN_callDetailRecordLogR2Entry LEN_cdr2MIB + 5
+/* 2.0 */
 #define OID_cdr2Notifications OID_cdr2MIB "\x02\00"
 #define LEN_cdr2Notifications LEN_cdr2MIB + 2
+/* 2.1.1 */
 #define OID_cdr2Scalars OID_cdr2MIB "\x02\x01\x01"
 #define LEN_cdr2Scalars LEN_cdr2MIB + 3
 
@@ -569,6 +574,8 @@ static int
 unpack_boolean(unsigned char **p, unsigned char *e, bool *val)
 {
 	uint len;
+
+	(void) unpack_boolean;
 	if ((len = e - *p) != 1) {
 		fprintf(stderr, "E: boolean length (%u) out of bounds\n", len);
 		return (-1);
