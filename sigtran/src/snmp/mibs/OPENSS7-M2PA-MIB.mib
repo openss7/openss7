@@ -1,7 +1,7 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-M2PA-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/15 20:16:33 $
+-- @(#) $RCSfile: OPENSS7-M2PA-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/01/24 17:40:54 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,66 +47,72 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/12/15 20:16:33 $ by $Author: brian $
+-- Last Modified $Date: 2008/01/24 17:40:54 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-M2PA-MIB.mib,v $
+-- Revision 0.9.2.2  2008/01/24 17:40:54  brian
+-- - updated mibs
+--
 -- Revision 0.9.2.1  2007/12/15 20:16:33  brian
 -- - added new mib files
 --
 -- =============================================================================
 
 OPENSS7-M2PA-MIB DEFINITIONS ::= BEGIN
-	IMPORTS
-		TruthValue, TimeInterval
-			FROM SNMPv2-TC
-		MilliSeconds
-			FROM OPENSS7-TC
 
-openss7		OBJECT IDENTIFIER ::= { enterprises 29591 }
-openss7MIBs	OBJECT IDENTIFIER ::= { openss7 1 }
-openss7Modules	OBJECT IDENTIFIER ::= { openss7MIBs 1 }
+IMPORTS
+    openss7Modules
+        FROM OPENSS7-SMI
+    SimpleNameType
+        FROM OPENSS7-SMI-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TimeInterval, TruthValue
+        FROM SNMPv2-TC;
 
-m2pa-MIB MODULE-IDENTITY
-	LAST-UPDATED
-		"20071128155459Z"
-	ORGANIZATION
-		"The OpenSS7 Project"
-	CONTACT-INFO
-		"Brian Bidulock
-		 OpenSS7 Corporation
-		 1469 Jefferys Crescent
-		 Edmonton, Alberta  T6L 6T1
-		 CANADA
-		 Tel: +1 780 490 1141
-		 Fax: +1 780 490 1241
-		 Mob: +1 780 953 0557
-		 mailto:bidulock@openss7.org"
-	DESCRIPTION
-		"This MIB provides configuration and status information 
-		 for an M2PA subsystem, where the M2PA is in accordance 
-		 with RFC 4165.  This MIB is intended on being used with 
-		 the OPENSS7-MTP3-MIB."
-	::= { openss7Modules 202 }
+m2paMIB MODULE-IDENTITY
+    LAST-UPDATED "200711281554Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta  T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         mailto:bidulock@openss7.org"
+    DESCRIPTION 
+        "This MIB provides configuration and status information 
+         for an M2PA subsystem, where the M2PA is in accordance 
+         with RFC 4165.  This MIB is intended on being used with 
+         the OPENSS7-MTP3-MIB."
+    REVISION    "200711281554Z"
+    DESCRIPTION 
+        "First release of this module."
+    ::= { openss7Modules 202 }
 
  -- top level organization of the MIB
 
-m2paNotifications	OBJECT IDENTIFIER ::= { m2pa-MIB	 0 }
-m2paObjects		OBJECT IDENTIFIER ::= { m2pa-MIB	 1 }
-m2paConformance		OBJECT IDENTIFIER ::= { m2pa-MIB	 2 }
+m2paNotifications OBJECT IDENTIFIER
+    ::= { m2paMIB 0 }
 
-m2paTables		OBJECT IDENTIFIER ::= { m2paObjects	 1 }
-m2paScalars		OBJECT IDENTIFIER ::= { m2paObjects	 2 }
-m2paNotifs		OBJECT IDENTIFIER ::= { m2paObjects	 3 }
-m2paOids		OBJECT IDENTIFIER ::= { m2paObjects	 4 }
+m2paObjects OBJECT IDENTIFIER
+    ::= { m2paMIB 1 }
 
-m2paComplicances	OBJECT IDENTIFIER ::= { m2paConformance	 1 }
-m2paGroups		OBJECT IDENTIFIER ::= { m2paConformance	 2 }
+m2paTables OBJECT IDENTIFIER
+    ::= { m2paObjects 1 }
 
--- =====================================================================
-
--- Scalars
+m2paScalars OBJECT IDENTIFIER
+    ::= { m2paObjects 2 }
 
 -- Default values:
 --
@@ -120,1462 +126,1402 @@ m2paGroups		OBJECT IDENTIFIER ::= { m2paConformance	 2 }
 -- system reboots.
 
 m2paDefaultSctpNoDelay OBJECT-TYPE
-	SYNTAX		TruthValue
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, by default whether the 
-		 Nagle algorithm should be applied to SCTP associations.  
-		 The Nagle algorithm increases the size of the packets 
-		 placed on the network at the expense of delaying the 
-		 transmission of some data during congestion episodes.  
-		 When set to true(1), the Nagle algorithm is suppressed; 
-		 otherwise, set to false(2), the Nagle algorithm is in 
-		 effect.
-
-		 The default default is true(1): send packets without 
-		 delay.  The default default value is only application 
-		 when never set by any management station.  When set, 
-		 the scalar value must persist across system reboots."
-	REFERENCE
-		"RFC 4960"
-	DEFVAL		{ true(1) }
-	::= { m2paScalars xx }
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, by default whether the 
+         Nagle algorithm should be applied to SCTP associations.  
+         The Nagle algorithm increases the size of the packets 
+         placed on the network at the expense of delaying the 
+         transmission of some data during congestion episodes.  
+         When set to true(1), the Nagle algorithm is suppressed; 
+         otherwise, set to false(2), the Nagle algorithm is in 
+         effect.
+         
+         The default default is true(1): send packets without 
+         delay.  The default default value is only application 
+         when never set by any management station.  When set, 
+         the scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960"
+    DEFVAL      { true }
+    ::= { m2paScalars 1 }
 
 m2paDefaultSctpMaxseg OBJECT-TYPE
-	SYNTAX		Unsigned32(1..65536)
-	UNITS		"octets"
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, the default maximum SCTP 
-		 payload size for outgoing packets.  Values greater than 
-		 the association MTU are ignored and have no effect.  
-		 The value determines the maximum size (in octets) above 
-		 which SCCP will fragment larger DATA chunis into 
-		 smaller DATA chunks, and beneath which SCTP will bundle 
-		 DATA chunks into a single packate or combine smaller 
-		 DATA chunks into larger DATA chunks.  Normally this 
-		 value is the association MTU value must the size of the 
-		 current IP and SCTP headers, minus the size of one DATA 
-		 chunk header.  When set to a lower value, the lower 
-		 value will be used.
-
-		 The default default allows the prevailing MTU to be 
-		 controlling (65536 octets).  The default default value 
-		 is only application when never set by any management 
-		 station.  When set, the scalar value must persist 
-		 across system reboots."
-	DEFVAL		{ 65536 }
-	REFERENCE
-		"RFC 4960"
-	::= { m2paScalars xx }
+    SYNTAX      Unsigned32 (1..65536)
+    UNITS       "octets"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default maximum SCTP 
+         payload size for outgoing packets.  Values greater than 
+         the association MTU are ignored and have no effect.  
+         The value determines the maximum size (in octets) above 
+         which SCCP will fragment larger DATA chunis into 
+         smaller DATA chunks, and beneath which SCTP will bundle 
+         DATA chunks into a single packate or combine smaller 
+         DATA chunks into larger DATA chunks.  Normally this 
+         value is the association MTU value must the size of the 
+         current IP and SCTP headers, minus the size of one DATA 
+         chunk header.  When set to a lower value, the lower 
+         value will be used.
+         
+         The default default allows the prevailing MTU to be 
+         controlling (65536 octets).  The default default value 
+         is only application when never set by any management 
+         station.  When set, the scalar value must persist 
+         across system reboots."
+    REFERENCE   
+        "RFC 4960"
+    DEFVAL      { 65536 }
+    ::= { m2paScalars 2 }
 
 m2paDefaultSctpHeartbeatItvl OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, the default time 
-		 interval (in milliseconds) between successive HEARTBEAT 
-		 messages used to probe destination transport addresses 
-		 for RTT calculation and activity.  Valid values are 
-		 zero (0) - do not heartbeat, or a value of 1 
-		 millisecond or greater.
-
-		 In general this value determines the amount of time 
-		 that it takes for an SCTP association to detect a 
-		 failure on a association which has no data to transmit 
-		 or retransmit.  M2PA, however, is used by MTP Level 3 
-		 which generates a test message every T2, where T2 is 
-		 defined in ITU-T Rec. Q.707 (1993) or ANSI T1.111.7 
-		 (2000) to have a range from 4 to 12 seconds.  
-		 Therefore, for M2PA, unless the SCTP heartbeat interval 
-		 is set below Q.707-T2, it will only have effect on 
-		 multihomed associations for checking the status of 
-		 non-primary or non-CMT destinations.
-
-		 Reducing this value will reduce the amount of time 
-		 taken to detect primary and non-primary, non-CMT path, 
-		 interface and destination failures, but may only affect 
-		 primary destinations if reduced below the coresponding 
-		 Q.707-T2 value.
-
-		 The default default value is that recommended by RFC 
-		 4960 (6000 centiseconds, or 60 seconds).  The default 
-		 default value is only application when never set by any 
-		 management station.  When set, the scalar value must 
-		 persist across system reboots."
-	REFERENCE
-		"RFC 4960 15. HB.interval, ITU-T Rec. Q.707 (1993), ANIS 
-		 T1.111.7 (2000)."
-	DEFVAL		{ 6000 } -- 60 seconds
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default time 
+         interval (in milliseconds) between successive HEARTBEAT 
+         messages used to probe destination transport addresses 
+         for RTT calculation and activity.  Valid values are 
+         zero (0) - do not heartbeat, or a value of 1 
+         millisecond or greater.
+         
+         In general this value determines the amount of time 
+         that it takes for an SCTP association to detect a 
+         failure on a association which has no data to transmit 
+         or retransmit.  M2PA, however, is used by MTP Level 3 
+         which generates a test message every T2, where T2 is 
+         defined in ITU-T Rec. Q.707 (1993) or ANSI T1.111.7 
+         (2000) to have a range from 4 to 12 seconds.  
+         Therefore, for M2PA, unless the SCTP heartbeat interval 
+         is set below Q.707-T2, it will only have effect on 
+         multihomed associations for checking the status of 
+         non-primary or non-CMT destinations.
+         
+         Reducing this value will reduce the amount of time 
+         taken to detect primary and non-primary, non-CMT path, 
+         interface and destination failures, but may only affect 
+         primary destinations if reduced below the coresponding 
+         Q.707-T2 value.
+         
+         The default default value is that recommended by RFC 
+         4960 (6000 centiseconds, or 60 seconds).  The default 
+         default value is only application when never set by any 
+         management station.  When set, the scalar value must 
+         persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. HB.interval, ITU-T Rec. Q.707 (1993), ANIS 
+         T1.111.7 (2000)."
+    DEFVAL      { 6000 } -- 60 seconds
+    ::= { m2paScalars 3 }
 
 m2paDefaultSctpHeartbeat OBJECT-TYPE
-	SYNTAX		TruthValue
-	MAX-ACCESS	read-write
-	DESCRIPTION
-		"This scalar defines, for M2PA, by default whether 
-		 HEARBEAT messages used to probe destination transport 
-		 addresses for RTT calculation and activity will be sent 
-		 periodically.
-
-		 Disabling the heart beat mechanism reduces the 
-		 protocol's repsonsiveness in detection of failures and 
-		 redirection of traffic away from failed paths and 
-		 interfaces, particularly, for M2PA, failed non-primary 
-		 and non-CMT destinations in an multi-homed association.  
-		 This scalar should normally be left at its default 
-		 value.
-
-		 The default default value from RFC 4960 is true(1).  
-		 The default default value is only application when 
-		 never set by any management station.  When set, the 
-		 scalar value must persist across system reboots."
-	REFERENCE
-		"RFC 4960"
-	::= { m2paScalars xx }
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, by default whether 
+         HEARBEAT messages used to probe destination transport 
+         addresses for RTT calculation and activity will be sent 
+         periodically.
+         
+         Disabling the heart beat mechanism reduces the 
+         protocol's repsonsiveness in detection of failures and 
+         redirection of traffic away from failed paths and 
+         interfaces, particularly, for M2PA, failed non-primary 
+         and non-CMT destinations in an multi-homed association.  
+         This scalar should normally be left at its default 
+         value.
+         
+         The default default value from RFC 4960 is true(1).  
+         The default default value is only application when 
+         never set by any management station.  When set, the 
+         scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960"
+    ::= { m2paScalars 4 }
 
 m2paDefaultSctpRtoInitial OBJECT-TYPE
-	SYNTAX		MilliSeconds
-	UNITS		"milliseconds"
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, the default initial time 
-		 interval (in milliseconds) that will be used as an 
-		 intial RTO (retransmission time out) value when sending 
-		 packets to a destination for the first time.  Valid 
-		 values are zero or greater but must be within the range 
-		 m2paDefaultSctpRtoMin to m2paDefaultSctpRtoMax.
-
-		 Note that, in general, the default RTO initial values 
-		 should not be less than the peer's maximum SACK delay, 
-		 otherwise, excessive retransmission might occur while 
-		 the peer is delaying acknowledgements.  That is, this 
-		 value should be greater than the corresponding 
-		 m2paDefaultSctpSackDelay at the peer.
-
-		 The default default value is that value recommended by 
-		 RFC 4960 (3000 milliseconds, or 3 seconds).  The 
-		 default default value is only application when never 
-		 set by any management station.  When set, the scalar 
-		 value must persist across system reboots."
-	REFERENCE
-		"RFC 4960 15. RTO.Initial"
-	DEFVAL		{ 3000 }
-	::= { m2paScalars xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default initial time 
+         interval (in milliseconds) that will be used as an 
+         intial RTO (retransmission time out) value when sending 
+         packets to a destination for the first time.  Valid 
+         values are zero or greater but must be within the range 
+         m2paDefaultSctpRtoMin to m2paDefaultSctpRtoMax.
+         
+         Note that, in general, the default RTO initial values 
+         should not be less than the peer's maximum SACK delay, 
+         otherwise, excessive retransmission might occur while 
+         the peer is delaying acknowledgements.  That is, this 
+         value should be greater than the corresponding 
+         m2paDefaultSctpSackDelay at the peer.
+         
+         The default default value is that value recommended by 
+         RFC 4960 (3000 milliseconds, or 3 seconds).  The 
+         default default value is only application when never 
+         set by any management station.  When set, the scalar 
+         value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. RTO.Initial"
+    DEFVAL      { 300 }
+    ::= { m2paScalars 5 }
 
 m2paDefaultSctpRtoMin OBJECT-TYPE
-	SYNTAX		MilliSeconds
-	UNITS		"milliseconds"
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, the default minmum time 
-		 interval (in milliseconds) that will be used as an RTO 
-		 (retransmission time out) value when sending packets to 
-		 a destination transport address and expecting 
-		 acknowledgements.  Valid values are zero or greater but 
-		 must be less than or equal to m2paDefaultSctpRtoInitial 
-		 and strictly less than m2paDefaultSctpRtoMax.
-
-		 Note that, in general, the RTO minimum should not be 
-		 less thatn the peer's maximum SACK delay, otherwise, 
-		 excessive retransmissions might occur while the peer is 
-		 delaying acknowledgements.  That is, this value should 
-		 not be less than the corresponding 
-		 m2paDefaultSctpSackDelay at the peer.
-
-		 The default default value is the value recommended by 
-		 RFC 4960 (1000 milliseconds, or 1 second).  The default 
-		 default value is only application when never set by any 
-		 management station.  When set, the scalar value must 
-		 persist across system reboots."
-	REFERENCE
-		"RFC 4960 15. RTO.Min"
-	DEFVAL		{ 1000 } -- 1 second
-	::= { m2paScalars xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default minmum time 
+         interval (in milliseconds) that will be used as an RTO 
+         (retransmission time out) value when sending packets to 
+         a destination transport address and expecting 
+         acknowledgements.  Valid values are zero or greater but 
+         must be less than or equal to m2paDefaultSctpRtoInitial 
+         and strictly less than m2paDefaultSctpRtoMax.
+         
+         Note that, in general, the RTO minimum should not be 
+         less thatn the peer's maximum SACK delay, otherwise, 
+         excessive retransmissions might occur while the peer is 
+         delaying acknowledgements.  That is, this value should 
+         not be less than the corresponding 
+         m2paDefaultSctpSackDelay at the peer.
+         
+         The default default value is the value recommended by 
+         RFC 4960 (1000 milliseconds, or 1 second).  The default 
+         default value is only application when never set by any 
+         management station.  When set, the scalar value must 
+         persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. RTO.Min"
+    DEFVAL      { 100 } -- 1 second
+    ::= { m2paScalars 6 }
 
 m2paDefaultSctpRtoMax OBJECT-TYPE
-	SYNTAX		MilliSeconds
-	UNITS		"milliseconds"
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, the default maximum time 
-		 interval (in milliseconds) that will be used as an RTO 
-		 (retransmission timeout) value when sending packets t a 
-		 destination transport address and expecting 
-		 acknowledgements.  Valid values are zero or greater but 
-		 must be greater than or equal to m2paSctpRtoInitial and 
-		 strictly greater than m2paSctpRtoMin.
-
-		 The default default value is the value recommended by 
-		 RFC 4960 (60000 milliseconds, or 60 seconds).  The 
-		 default default value is only application when never 
-		 set by any management station.  When set, the scalar 
-		 value must persist across system reboots."
-	REFERENCE
-		"RFC 4960 15. RTO.Max"
-	DEFVAL		{ 60000 } -- 60 seconds
-	::= { m2paScalars xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default maximum time 
+         interval (in milliseconds) that will be used as an RTO 
+         (retransmission timeout) value when sending packets t a 
+         destination transport address and expecting 
+         acknowledgements.  Valid values are zero or greater but 
+         must be greater than or equal to m2paSctpRtoInitial and 
+         strictly greater than m2paSctpRtoMin.
+         
+         The default default value is the value recommended by 
+         RFC 4960 (60000 milliseconds, or 60 seconds).  The 
+         default default value is only application when never 
+         set by any management station.  When set, the scalar 
+         value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. RTO.Max"
+    DEFVAL      { 6000 } -- 60 seconds
+    ::= { m2paScalars 7 }
 
 m2paDefaultSctpPathMaxRetrans OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"retransmissions"
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, the default number of 
-		 times that SCTP will attempt retransmitting a packet to 
-		 a given detination transport address before it 
-		 considers that destination transport address inactive.  
-		 Valid values are zero or greater.
-
-		 Adjusting this value has an effect on th period of time 
-		 taken to fail-over between destinations for multi-homed 
-		 connections.  Lower values (including zero) will yield 
-		 faster fail-over response times.  Lower values, 
-		 however, may cause thrashing between destinations 
-		 contributing to congestion in the network.  Default 
-		 default values are applicable to Internet applications.
-
-		 The default default value is the value recommended in 
-		 RFC 4960 (5 retransmissions).  The default default 
-		 value is only application when never set by any 
-		 management station.  When set, the scalar value must 
-		 persist across system reboots."
-	REFERENCE
-		"RFC 4960 15. Path.Max.Retrans"
-	DEFVAL		{ 5 } -- retransmissions
-	::= { m2paScalars xx }
+    SYNTAX      Unsigned32
+    UNITS       "retransmissions"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default number of 
+         times that SCTP will attempt retransmitting a packet to 
+         a given detination transport address before it 
+         considers that destination transport address inactive.  
+         Valid values are zero or greater.
+         
+         Adjusting this value has an effect on th period of time 
+         taken to fail-over between destinations for multi-homed 
+         connections.  Lower values (including zero) will yield 
+         faster fail-over response times.  Lower values, 
+         however, may cause thrashing between destinations 
+         contributing to congestion in the network.  Default 
+         default values are applicable to Internet applications.
+         
+         The default default value is the value recommended in 
+         RFC 4960 (5 retransmissions).  The default default 
+         value is only application when never set by any 
+         management station.  When set, the scalar value must 
+         persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. Path.Max.Retrans"
+    DEFVAL      { 5 } -- retransmissions
+    ::= { m2paScalars 8 }
 
 m2paDefaultSctpCookieLife OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, the default time 
-		 interval (in milliseconds) in conjunction with 
-		 m2paSctpCookieInc beyond which a COOKIE-ECHO received 
-		 with a cookie sent in an INIT-ACK will no longer be 
-		 accepted.  For SCTP, this also limits the maximum time 
-		 interval for which the HMAC secret key for the cookie 
-		 will be valid.  Valid values are zero or greater.  
-		 Values of zero will  be converted to a system clock 
-		 tick.
-
-		 Reducing this value will increase the probability that 
-		 passive connection attempts will fail due to expired 
-		 cookies.  Increasing the value will reduce the overall 
-		 security of the system by permitting attackers an 
-		 increased interval within which to crack HMACs and 
-		 guess verification tags.  This value may be adjusted in 
-		 conjunction with m2paSctpCookieInc to meet most 
-		 objectives for successful passive connection attempts 
-		 with the best security afforded by smaller values of 
-		 m2paSctpCookieLife.
-
-		 Unfortunately, the m2paSctpCookieLife and 
-		 m2paSctpCookieInc must be adjusted to accomodate the 
-		 slowest peer on the slowest connection.  The default 
-		 setting is adequate for Internet applications.
-
-		 The default default value is the value recommended by 
-		 RFC 4960 (6,000 centiseconds, or 60 seconds).  The 
-		 default default value is only application when never 
-		 set by any management station.  When set, the scalar 
-		 value must persist across system reboots."
-	REFERENCE
-		"RFC 4960 15. Valid.Cookie.Life"
-	DEFVAL		{ 6000 } -- 60 seconds
-	::= { m2paScalars xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default time 
+         interval (in milliseconds) in conjunction with 
+         m2paSctpCookieInc beyond which a COOKIE-ECHO received 
+         with a cookie sent in an INIT-ACK will no longer be 
+         accepted.  For SCTP, this also limits the maximum time 
+         interval for which the HMAC secret key for the cookie 
+         will be valid.  Valid values are zero or greater.  
+         Values of zero will  be converted to a system clock 
+         tick.
+         
+         Reducing this value will increase the probability that 
+         passive connection attempts will fail due to expired 
+         cookies.  Increasing the value will reduce the overall 
+         security of the system by permitting attackers an 
+         increased interval within which to crack HMACs and 
+         guess verification tags.  This value may be adjusted in 
+         conjunction with m2paSctpCookieInc to meet most 
+         objectives for successful passive connection attempts 
+         with the best security afforded by smaller values of 
+         m2paSctpCookieLife.
+         
+         Unfortunately, the m2paSctpCookieLife and 
+         m2paSctpCookieInc must be adjusted to accomodate the 
+         slowest peer on the slowest connection.  The default 
+         setting is adequate for Internet applications.
+         
+         The default default value is the value recommended by 
+         RFC 4960 (6,000 centiseconds, or 60 seconds).  The 
+         default default value is only application when never 
+         set by any management station.  When set, the scalar 
+         value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. Valid.Cookie.Life"
+    DEFVAL      { 6000 } -- 60 seconds
+    ::= { m2paScalars 9 }
 
 m2paDefaultSctpCookieInc OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, the default time 
-		 increment (in milliseconds) that will be added to the 
-		 lifespan of the cookie in an INIT-ACK if the recieved 
-		 INIT requests cookie preservative to lengthen the 
-		 lifespan of the cookie.  Valid values are zero or 
-		 greater.
-
-		 This value can be adjusted in conjunction with 
-		 m2paSctpCookieLife to meet objectives of successful 
-		 passive connection attempts and security.
-		 
-		 The default default value is the value recommended in 
-		 RFC 4960 5.2.6 (100 centiseconds, or 1 second).  The 
-		 default default setting is adequate for Internet 
-		 applications.  The default default value is only 
-		 application when never set by any management station.  
-		 When set, the scalar value must persist across system 
-		 reboots."
-	REFERENCE
-		"RFC 4960, 5.2.6, 3)"
-	DEFVAL		{ 100 } -- 1 second
-	::= { m2paScalars xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default time 
+         increment (in milliseconds) that will be added to the 
+         lifespan of the cookie in an INIT-ACK if the recieved 
+         INIT requests cookie preservative to lengthen the 
+         lifespan of the cookie.  Valid values are zero or 
+         greater.
+         
+         This value can be adjusted in conjunction with 
+         m2paSctpCookieLife to meet objectives of successful 
+         passive connection attempts and security.
+         
+         The default default value is the value recommended in 
+         RFC 4960 5.2.6 (100 centiseconds, or 1 second).  The 
+         default default setting is adequate for Internet 
+         applications.  The default default value is only 
+         application when never set by any management station.  
+         When set, the scalar value must persist across system 
+         reboots."
+    REFERENCE   
+        "RFC 4960, 5.2.6, 3)"
+    DEFVAL      { 100 } -- 1 second
+    ::= { m2paScalars 10 }
 
 m2paDefaultSctpMaxInitRetries OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"retries"
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, the default number of 
-		 times that an INIT or COOKIE-ECHO will be resent to a 
-		 given destination before abandoning an active open 
-		 attempt.  Value values are zero or greater.
-
-		 The default default value is the value recommended by 
-		 RFC 4960 (8 retries).  The default default value is 
-		 only application when never set by any management 
-		 station.  When set, the scalar value must persist 
-		 across system reboots."
-	REFERENCE
-		"RFC 4960 15. Max.Init.Retransmits"
-	DEFVAL		{ 8 }
-	::= { m2paScalars xx }
+    SYNTAX      Unsigned32
+    UNITS       "retries"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default number of 
+         times that an INIT or COOKIE-ECHO will be resent to a 
+         given destination before abandoning an active open 
+         attempt.  Value values are zero or greater.
+         
+         The default default value is the value recommended by 
+         RFC 4960 (8 retries).  The default default value is 
+         only application when never set by any management 
+         station.  When set, the scalar value must persist 
+         across system reboots."
+    REFERENCE   
+        "RFC 4960 15. Max.Init.Retransmits"
+    DEFVAL      { 8 }
+    ::= { m2paScalars 11 }
 
 m2paDefaultSctpMaxBurst OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"MTUs"
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, the default maximum 
-		 number of MTUs of new data chunks that will be sent in 
-		 a burst in accordance with SCTP Specification Errata 
-		 and Issues, RFC 4460 and RFC 4960.
-
-		 The default default value is the value recommended in 
-		 RFC 4960 (4 MTUs).  The default default value is only 
-		 application when never set by any management station.  
-		 When set, the scalar value must persist across system 
-		 reboots."
-	REFERENCE
-		"RFC 4960 15. Max.Burst"
-	DEFVAL		{ 4 }
-	::= { m2paScalars xx }
+    SYNTAX      Unsigned32
+    UNITS       "MTUs"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default maximum 
+         number of MTUs of new data chunks that will be sent in 
+         a burst in accordance with SCTP Specification Errata 
+         and Issues, RFC 4460 and RFC 4960.
+         
+         The default default value is the value recommended in 
+         RFC 4960 (4 MTUs).  The default default value is only 
+         application when never set by any management station.  
+         When set, the scalar value must persist across system 
+         reboots."
+    REFERENCE   
+        "RFC 4960 15. Max.Burst"
+    DEFVAL      { 4 }
+    ::= { m2paScalars 12 }
 
 m2paDefaultSctpAssocMaxRetrans OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"retransmissions"
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, the default number of 
-		 times that the sending endpoint will attempt 
-		 retransmitting a packet on any active destination 
-		 transport address before it aborts the association.  
-		 Value values are zero or greater.
-
-		 This value should be larger than sum of the default 
-		 path maximum number of retransmission values of each of 
-		 the destinations.
-
-		 Setting this value to less than the sum of the default 
-		 path maximum retransmission values for all of the 
-		 destinations has the interesting effect of permitting a 
-		 connection to persist even when all destinations have 
-		 been deemed inactive.
-
-		 The default default value is the value recommended in 
-		 RFC 4960 (10 retransmissions).  The default default 
-		 value is only application when never set by any 
-		 management station.  When set, the scalar value must 
-		 persist across system reboots."
-	REFERENCE
-		"RFC 4960 15. Association.Max.Retrans"
-	DEFVAL		{ 10 }
-	::= { m2paScalars xx }
+    SYNTAX      Unsigned32
+    UNITS       "retransmissions"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default number of 
+         times that the sending endpoint will attempt 
+         retransmitting a packet on any active destination 
+         transport address before it aborts the association.  
+         Value values are zero or greater.
+         
+         This value should be larger than sum of the default 
+         path maximum number of retransmission values of each of 
+         the destinations.
+         
+         Setting this value to less than the sum of the default 
+         path maximum retransmission values for all of the 
+         destinations has the interesting effect of permitting a 
+         connection to persist even when all destinations have 
+         been deemed inactive.
+         
+         The default default value is the value recommended in 
+         RFC 4960 (10 retransmissions).  The default default 
+         value is only application when never set by any 
+         management station.  When set, the scalar value must 
+         persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. Association.Max.Retrans"
+    DEFVAL      { 10 }
+    ::= { m2paScalars 13 }
 
 m2paDefaultSctpSackDelay OBJECT-TYPE
-	SYNTAX		MilliSeconds(0..500)
-	UNITS		"milliseconds"
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, the default interval of 
-		 time (in milliseconds) that will be used as an RTO 
-		 (retransmission time out) value when sending packets to 
-		 a destination transport address.  Valid values are zero 
-		 or to 500 milliseconds (RFC 4960 forbids setting this 
-		 value larger than 500 milliseconds).
-
-		 The default default value is the value recommended in 
-		 RFC 4960 (200 milliseconds).  The default default value 
-		 is only application when never set by any management 
-		 station.  When set, the scalar value must persist 
-		 across system reboots."
-	REFERENCE
-		"RFC 4960 15. 6.2"
-	DEFVAL		{ 200 }
-	::= { m2paScalars xx }
+    SYNTAX      TimeInterval (0..50)
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default interval of 
+         time (in milliseconds) that will be used as an RTO 
+         (retransmission time out) value when sending packets to 
+         a destination transport address.  Valid values are zero 
+         or to 500 milliseconds (RFC 4960 forbids setting this 
+         value larger than 500 milliseconds).
+         
+         The default default value is the value recommended in 
+         RFC 4960 (200 milliseconds).  The default default value 
+         is only application when never set by any management 
+         station.  When set, the scalar value must persist 
+         across system reboots."
+    REFERENCE   
+        "RFC 4960 15. 6.2"
+    DEFVAL      { 20 }
+    ::= { m2paScalars 14 }
 
 m2paDefaultSctpLifetime OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This scalar defines, for M2PA, the default life time 
-		 assigned to user data to be sent on the association.
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default life time 
+         assigned to user data to be sent on the association.
+         
+         The default default value is only application when 
+         never set by any management station.  When set, the 
+         scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 10.1 E)"
+    DEFVAL      { 0 }
+    ::= { m2paScalars 15 }
 
-		 The default default value is only application when 
-		 never set by any management station.  When set, the 
-		 scalar value must persist across system reboots."
-	REFERENCE
-		"RFC 4960 10.1 E)"
-	DEFVAL		{ 0 }
-	::= { m2paScalars xx }
+m2paNotifs OBJECT IDENTIFIER
+    ::= { m2paObjects 3 }
 
--- =====================================================================
+m2paOids OBJECT IDENTIFIER
+    ::= { m2paObjects 4 }
+
+m2paProtocolProfile OBJECT IDENTIFIER
+    ::= { m2paTables 1 }
 
 m2paProtocolProfileTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF M2PAProtocolProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"This table provides a table of protocol parameter 
-		 profiles for M2PA signalling links.  The entries in 
-		 this table are used when creating rows for M2PA 
-		 signalling links to determine the initial values of 
-		 protocol parameters associated with the link."
-	REFERENCE
-		"RFC 4165, ITU-T Rec. Q.703, ITU-T Rec. Q.751.1, ANSI 
-		 T1.116.1, ITU-T Rec. Q.2751.1."
-	::= { m2paProtocolProfile 1 }
+    SYNTAX      SEQUENCE OF M2paProtocolProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table provides a table of protocol parameter 
+         profiles for M2PA signalling links.  The entries in 
+         this table are used when creating rows for M2PA 
+         signalling links to determine the initial values of 
+         protocol parameters associated with the link."
+    REFERENCE   
+        "RFC 4165, ITU-T Rec. Q.703, ITU-T Rec. Q.751.1, ANSI 
+         T1.116.1, ITU-T Rec. Q.2751.1."
+    ::= { m2paProtocolProfile 1 }
 
 m2paProtocolProfileEntry OBJECT-TYPE
-	SYNTAX		M2PAProtocolProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"Each entry in the table provides one profile which may 
-		 be used when creating rows in the m2paLinkTable and is 
-		 used for default values of the protocol parameters.  
-		 Each entry is indexed by protocol variant."
-	REFERENCE
-		"RFC 4165, ITU-T Rec. Q.703, ITU-T Rec. Q.751.1, ANSI 
-		 T1.116.1, ITU-T Rec. Q.2751.1."
-	INDEX		{ m2paProtocolProfileId }
-	::= { m2paProtocolProfileTable 1 }
+    SYNTAX      M2paProtocolProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry in the table provides one profile which may 
+         be used when creating rows in the m2paLinkTable and is 
+         used for default values of the protocol parameters.  
+         Each entry is indexed by protocol variant."
+    REFERENCE   
+        "RFC 4165, ITU-T Rec. Q.703, ITU-T Rec. Q.751.1, ANSI 
+         T1.116.1, ITU-T Rec. Q.2751.1."
+    INDEX       { m2paProtocolProfileId }
+    ::= { m2paProtocolProfileTable 1 }
 
-M2PAProtocolProfileEntry ::=
-	SEQUENCE {
-		m2paProtocolProfileId
-			SimpleNameType, -- index
-		m2paN1
-			Unsigned32,
-		m2paProving
-			TruthValue,
-		m2paManagementProvingState
-			INTEGER,
-		m2paLoopDelayLower
-			MilliSeconds,
-		m2paLoopDelayUpper
-			MilliSeconds,
-		m2paTransmissionRateIntervalLower
-			Unsigned32,
-		m2paTransmissionRateIntervalUpper
-			Unsigned32,
-		m2paSctpNoDelay
-			TruthValue,
-		m2paSctpMaxseg
-			Unsigned32,
-		m2paSctpHeartbeatItvl
-			MilliSeconds,
-		m2paSctpHeartbeat
-			TruthValue,
-		m2paSctpRtoInitial
-			MilliSeconds,
-		m2paSctpRtoMin
-			MilliSeconds,
-		m2paSctpRtoMax
-			MilliSeconds,
-		m2paSctpPathMaxRetrans
-			Unsigned32,
-		m2paSctpCookieLife
-			MilliSeconds,
-		m2paSctpCookieInc
-			MilliSeconds,
-		m2paSctpMaxInitRetries
-			Unsigned32,
-		m2paSctpMaxBurst
-			Unsigned32,
-		m2paSctpAssocMaxRetrans
-			Unsigned32,
-		m2paSctpSackDelay
-			MilliSeconds,
-		m2paSctpLifetime
-			MilliSeconds,
-		m2paTimerT1
-			TimeInterval,
-		m2paTimerT2
-			TimeInterval,
-		m2paTimerT2L
-			TimeInterval,
-		m2paTimerT2H
-			TimeInterval,
-		m2paTimerT3
-			TimeInterval,
-		m2paTimerT4N
-			TimeInterval,
-		m2paTimerT4E
-			TimeInterval,
-		m2paTimerT6
-			TimeInterval,
-		m2paTimerT7
-			TimeInterval,
-		m2paTransCongThresholdAbatementL1Messages
-			Unsigned32,
-		m2paTransCongThresholdAbatementL1Octets
-			Unsigned32,
-		m2paTransCongThresholdOnsetL1Messages
-			Unsigned32,
-		m2paTransCongThresholdOnsetL1Messages
-			Unsigned32,
-		m2paProvingAttempts
-			Unsigned32,
-		-- bufferMechanismPackage
-		m2paNumberOfThresholdLevels
-			INTEGER,
-		-- congestionHandlingPackage
-		m2paCongestionCounting
-			INTEGER,
-		m2paCongestionReportingBaseObject
-			INTEGER,
-		-- multipleTransmissionCongestionStatesPackage
-		m2paTimerTx
-			TimeInterval,
-		m2paTimerTy
-			TimeInterval,
-		m2paNumberOfCongestionStates
-			INTEGER,
-		m2paInitialLevelOfCongestion
-			INTEGER,
-		-- receiveCongestionLevelPackage
-		m2paReceiveCongestionThresholdAbatement
-			MtpCongestionThreshold,
-		m2paReceiveCongestionThresholdOnset
-			MtpCongestionThreshold,
-		m2paReceiveCongestionThresholdDiscard
-			MtpCongestionThreshold,
-		-- m2paProtocolProfileNamePackage
-		m2paProtocolProfileName
-			CommonLanguageName,
-		-- thresholdsForMultCongLevelsPackage
-		m2paTransCongThresholdAbatementL2Messages
-			Unsigned32,
-		m2paTransCongThresholdAbatementL2Octets
-			Unsigned32,
-		m2paTransCongThresholdOnsetL2Message
-			Unsigned32,
-		m2paTransCongThresholdOnsetL2Octets
-			Unsigned32,
-		m2paTransCongThresholdAbatementL3Message
-			Unsigned32,
-		m2paTransCongThresholdAbatementL3Octets
-			Unsigned32,
-		m2paTransCongThresholdOnsetL3Messages
-			Unsigned32,
-		m2paTransCongThresholdOnsetL3Octets
-			Unsigned32,
-		-- thresholdsForMultCongLevelsWithPrioPackage
-		m2paTransCongThresholdDiscardL1Messages
-			Unsigned32,
-		m2paTransCongThresholdDiscardL1Octets
-			Unsigned32,
-		m2paTransCongThresholdDiscardL2Messages
-			Unsigned32,
-		m2paTransCongThresholdDiscardL2Octets
-			Unsigned32,
-		m2paTransCongThresholdDiscardL3Messages
-			Unsigned32,
-		m2paTransCongThresholdDiscardL3Octets
-			Unsigned32,
-		--
-		m2paProtocolProfileRowStatus
-			RowStatus
-	}
+M2paProtocolProfileEntry ::= SEQUENCE {
+    m2paProtocolProfileId                       SimpleNameType,
+    m2paN1                                      Unsigned32,
+    m2paProving                                 TruthValue,
+    m2paManagementProvingState                  INTEGER,
+    m2paLoopDelayLower                          TimeInterval,
+    m2paLoopDelayUpper                          TimeInterval,
+    m2paTransmissionRateIntervalLower           Unsigned32,
+    m2paTransmissionRateIntervalUpper           Unsigned32,
+    m2paSctpNoDelay                             TruthValue,
+    m2paSctpMaxseg                              Unsigned32,
+    m2paSctpHeartbeatItvl                       TimeInterval,
+    m2paSctpHeartbeat                           TruthValue,
+    m2paSctpRtoInitial                          TimeInterval,
+    m2paSctpRtoMin                              TimeInterval,
+    m2paSctpRtoMax                              TimeInterval,
+    m2paSctpPathMaxRetrans                      Unsigned32,
+    m2paSctpCookieLife                          TimeInterval,
+    m2paSctpCookieInc                           TimeInterval,
+    m2paSctpMaxInitRetries                      Unsigned32,
+    m2paSctpMaxBurst                            Unsigned32,
+    m2paSctpAssocMaxRetrans                     Unsigned32,
+    m2paSctpSackDelay                           TimeInterval,
+    m2paSctpLifetime                            TimeInterval,
+    m2paTimerT1                                 TimeInterval,
+    m2paTimerT2                                 TimeInterval,
+    m2paTimerT2L                                TimeInterval,
+    m2paTimerT2H                                TimeInterval,
+    m2paTimerT3                                 TimeInterval,
+    m2paTimerT4N                                TimeInterval,
+    m2paTimerT4E                                TimeInterval,
+    m2paTimerT6                                 TimeInterval,
+    m2paTimerT7                                 TimeInterval,
+    m2paTransCongThresholdAbatementL1Messages   Unsigned32,
+    m2paTransCongThresholdAbatementL1Octets     Unsigned32,
+    m2paTransCongThresholdOnsetL1Messages       Unsigned32,
+    m2paTransCongThresholdOnsetL1Octets         Unsigned32,
+    m2paProvingAttempts                         Unsigned32,
+    m2paNumberOfThresholdLevels                 Unsigned32,
+    m2paCongestionCounting                      INTEGER,
+    m2paCongestionReportingBaseObject           INTEGER,
+    m2paTimerTx                                 TimeInterval,
+    m2paTimerTy                                 TimeInterval,
+    m2paNumberOfCongestionStates                Unsigned32,
+    m2paInitialLevelOfCongestion                Unsigned32,
+    m2paReceiveCongestionThresholdAbatement     Unsigned32,
+    m2paReceiveCongestionThresholdOnset         Unsigned32,
+    m2paReceiveCongestionThresholdDiscard       Unsigned32,
+    m2paProtocolProfileName                     SnmpAdminString,
+    m2paTransCongThresholdAbatementL2Messages   Unsigned32,
+    m2paTransCongThresholdAbatementL2Octets     Unsigned32,
+    m2paTransCongThresholdOnsetL2Messages       Unsigned32,
+    m2paTransCongThresholdOnsetL2Octets         Unsigned32,
+    m2paTransCongThresholdAbatementL3Messages   Unsigned32,
+    m2paTransCongThresholdAbatementL3Octets     Unsigned32,
+    m2paTransCongThresholdOnsetL3Messages       Unsigned32,
+    m2paTransCongThresholdOnsetL3Octets         Unsigned32,
+    m2paTransCongThresholdDiscardL1Messages     Unsigned32,
+    m2paTransCongThresholdDiscardL1Octets       Unsigned32,
+    m2paTransCongThresholdDiscardL2Messages     Unsigned32,
+    m2paTransCongThresholdDiscardL2Octets       Unsigned32,
+    m2paTransCongThresholdDiscardL3Messages     Unsigned32,
+    m2paTransCongThresholdDiscardL3Octets       Unsigned32,
+    m2paProtocolProfileRowStatus                RowStatus
+}
 
 m2paProtocolProfileId OBJECT-TYPE
-	SYNTAX		SimpleNameType
-	MAX-ACCESS	not-accessible -- index
-	STATUS		current
-	DESCRIPTION
-		"Identifies an m2paProtocolProfile instance within the 
-		 managedSwitchingElement; this is an attribute type 
-		 whose distinguished value can be used as an RDN when 
-		 naming an instance of the m2paProtocolProfile MOC."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible -- index
+    STATUS      current
+    DESCRIPTION 
+        "Identifies an m2paProtocolProfile instance within the 
+         managedSwitchingElement; this is an attribute type 
+         whose distinguished value can be used as an RDN when 
+         naming an instance of the m2paProtocolProfile MOC."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 1 }
 
 m2paN1 OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the number of PDUs sent during 
-		 normal proving."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) n1."
-	DEFVAL		{ 1000 }
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the number of PDUs sent during 
+         normal proving."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) n1."
+    DEFVAL      { 1000 }
+    ::= { m2paProtocolProfileEntry 2 }
 
 m2paProving OBJECT-TYPE
-	SYNTAX		TruthValue
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines whether the M2PA signalling link 
-		 using this M2PA protocol profile will, when true(1),  
-		 perform proving in accordance with Q.703, ANSI 
-		 T1.111.3, and optional Q.2140 procedures, or whether 
-		 the M2PA signalling link will, when false(2), forego 
-		 proving althogether."
-	REFERENCE
-		""
-	DEFVAL		{ true(1) }
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines whether the M2PA signalling link 
+         using this M2PA protocol profile will, when true(1),  
+         perform proving in accordance with Q.703, ANSI 
+         T1.111.3, and optional Q.2140 procedures, or whether 
+         the M2PA signalling link will, when false(2), forego 
+         proving althogether."
+    REFERENCE   
+        ""
+    DEFVAL      { true }
+    ::= { m2paProtocolProfileEntry 3 }
 
 m2paManagementProvingState OBJECT-TYPE
-	SYNTAX		INTEGER { normal(0), emergency(1), neutral(2) }
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the type of proving required by 
-		 management.  The value of the management proving state 
-		 overrides the value of proving required by MTP L3.  It 
-		 can take the values:
-		 - normal: normal proving is always applied to the 
-		   signalling link;
-		 - emergency: emergency proving is always applied to the 
-		   signalling link;
-		 - neutral: whichever form of proving is requested by 
-		   MTP L3 is applied to the signalling link.
-		This column only takes effect when m2paProving is 
-		true(1).  When m2paProving is false(2), no proving is 
-		performed."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 nniLayerManagementProvingState."
-	::= { m2paProtocolProfileEntry xx }
-
+    SYNTAX      INTEGER { normal(0), emergency(1), neutral(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the type of proving required by 
+         management.  The value of the management proving state 
+         overrides the value of proving required by MTP L3.  It 
+         can take the values:
+         - normal: normal proving is always applied to the 
+           signalling link;
+         - emergency: emergency proving is always applied to the 
+           signalling link;
+         - neutral: whichever form of proving is requested by 
+           MTP L3 is applied to the signalling link.
+         This column only takes effect when m2paProving is 
+         true(1).  When m2paProving is false(2), no proving is 
+         performed."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         nniLayerManagementProvingState."
+    ::= { m2paProtocolProfileEntry 4 }
 
 m2paLoopDelayLower OBJECT-TYPE
-	SYNTAX		MilliSeconds
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the lower boundary for the loop 
-		 delay (round trip time) for which the other attributes 
-		 in the conceptual row are applicable.    The lower M2PA 
-		 loop delay must be less than the upper M2PA loop delay.  
-		 The range defined by the lower and upper M2PA loop 
-		 delay and the range defined by the lower and upper M2PA 
-		 transmission rate cannot overlap in conjunction with 
-		 another pair of ranges belonging to another entry 
-		 belonging to the same managed switching system and 
-		 network entity."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the lower boundary for the loop 
+         delay (round trip time) for which the other attributes 
+         in the conceptual row are applicable.    The lower M2PA 
+         loop delay must be less than the upper M2PA loop delay.  
+         The range defined by the lower and upper M2PA loop 
+         delay and the range defined by the lower and upper M2PA 
+         transmission rate cannot overlap in conjunction with 
+         another pair of ranges belonging to another entry 
+         belonging to the same managed switching system and 
+         network entity."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 5 }
 
 m2paLoopDelayUpper OBJECT-TYPE
-	SYNTAX		MilliSeconds
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the upper boundary for the loop 
-		 delay (round trip time) for which the other attributes 
-		 in the conceptual row are applicable.  The upper M2PA 
-		 loop delay must be greater than the lower M2PA loop 
-		 delay.  The range defined by the lower and upper M2PA 
-		 loop delay and the range defined by the lower and upper 
-		 M2PA transmission rate cannot overlap in conjunction 
-		 with another pair of ranges belonging to another entry 
-		 belonging to the same managed switching system and 
-		 network entity."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the upper boundary for the loop 
+         delay (round trip time) for which the other attributes 
+         in the conceptual row are applicable.  The upper M2PA 
+         loop delay must be greater than the lower M2PA loop 
+         delay.  The range defined by the lower and upper M2PA 
+         loop delay and the range defined by the lower and upper 
+         M2PA transmission rate cannot overlap in conjunction 
+         with another pair of ranges belonging to another entry 
+         belonging to the same managed switching system and 
+         network entity."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 6 }
 
 m2paTransmissionRateIntervalLower OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the lower boundary for the 
-		 transmission rate range for which the other attributes 
-		 in the conceptual row are applicable.  The lower M2PA 
-		 transmission rate must be less than the upper M2PA 
-		 transmission rate.  The range defined by the lower and 
-		 upper M2PA transmission rates and the range defined byt 
-		 he lower and upper M2PA loop delay cannot overlap in 
-		 conjunction with another pair of ranges belonging to 
-		 another entry belonging to the same managed switching 
-		 element and network entity."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "bits per second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the lower boundary for the 
+         transmission rate range for which the other attributes 
+         in the conceptual row are applicable.  The lower M2PA 
+         transmission rate must be less than the upper M2PA 
+         transmission rate.  The range defined by the lower and 
+         upper M2PA transmission rates and the range defined byt 
+         he lower and upper M2PA loop delay cannot overlap in 
+         conjunction with another pair of ranges belonging to 
+         another entry belonging to the same managed switching 
+         element and network entity."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 7 }
 
 m2paTransmissionRateIntervalUpper OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the upper boundary for the 
-		 transmission rate range for which the other attributes 
-		 in the conceptual row are applicable.  The upper M2PA 
-		 transmission rate must be greater than the lower M2PA 
-		 transmission rate.  The range defined by the lower and 
-		 upper M2PA transmission rates and the range defined byt 
-		 he lower and upper M2PA loop delay cannot overlap in 
-		 conjunction with another pair of ranges belonging to 
-		 another entry belonging to the same managed switching 
-		 element and network entity."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "bits per second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the upper boundary for the 
+         transmission rate range for which the other attributes 
+         in the conceptual row are applicable.  The upper M2PA 
+         transmission rate must be greater than the lower M2PA 
+         transmission rate.  The range defined by the lower and 
+         upper M2PA transmission rates and the range defined byt 
+         he lower and upper M2PA loop delay cannot overlap in 
+         conjunction with another pair of ranges belonging to 
+         another entry belonging to the same managed switching 
+         element and network entity."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 8 }
 
 m2paSctpNoDelay OBJECT-TYPE
-	SYNTAX		TruthValue
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines, under this M2PA profile, whether 
-		 the Nagle algorithm should be applied to SCTP 
-		 associations.  The Nagle algorithm increases the size 
-		 of the packets placed on the network at the expense of 
-		 delaying the transmission of some data during 
-		 congestion episodes.  When set to true(1), the Nagle 
-		 algorithm is suppresed; otherwise, set to false(2), the 
-		 Nagle algorithm is in effect.
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultSctpNoDelay."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines, under this M2PA profile, whether 
+         the Nagle algorithm should be applied to SCTP 
+         associations.  The Nagle algorithm increases the size 
+         of the packets placed on the network at the expense of 
+         delaying the transmission of some data during 
+         congestion episodes.  When set to true(1), the Nagle 
+         algorithm is suppresed; otherwise, set to false(2), the 
+         Nagle algorithm is in effect.
+         
+         The default value is determined by the setting of 
+         m2paDefaultSctpNoDelay."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 9 }
 
 m2paSctpMaxseg OBJECT-TYPE
-	SYNTAX		Unsigned32(1..65536)
-	UNITS		"octets"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the maximum SCTP payload size for 
-		 outgoing packets.  Values greater than the association 
-		 MTU are ignored and have no effect.  The value 
-		 determines the maximum size (in octets) above which 
-		 SCCP will fragment larger DATA chunis into smaller DATA 
-		 chunks, and beneath which SCTP will bundle DATA chunks 
-		 into a single packate or combine smaller DATA chunks 
-		 into larger DATA chunks.  Normally this value is the 
-		 association MTU value must the size of the current IP 
-		 and SCTP headers, minus the size of one DATA chunk 
-		 header.  When set to a lower value, the lower value 
-		 will be used.
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultSctpMaxseg."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32 (1..65536)
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the maximum SCTP payload size for 
+         outgoing packets.  Values greater than the association 
+         MTU are ignored and have no effect.  The value 
+         determines the maximum size (in octets) above which 
+         SCCP will fragment larger DATA chunis into smaller DATA 
+         chunks, and beneath which SCTP will bundle DATA chunks 
+         into a single packate or combine smaller DATA chunks 
+         into larger DATA chunks.  Normally this value is the 
+         association MTU value must the size of the current IP 
+         and SCTP headers, minus the size of one DATA chunk 
+         header.  When set to a lower value, the lower value 
+         will be used.
+         
+         The default value is determined by the setting of 
+         m2paDefaultSctpMaxseg."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 10 }
 
 m2paSctpHeartbeatItvl OBJECT-TYPE
-	SYNTAX		MilliSeconds
-	UNITS		"milliseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the time interval (in milliseconds) 
-		 between successive HEARTBEAT messages used to probe 
-		 destination transport addresses for RTT calculation and 
-		 activity.  Valid values are zero (0) - do not 
-		 heartbeat, or a value of 1 millisecond or greater.
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultHeartbeatItvl."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the time interval (in milliseconds) 
+         between successive HEARTBEAT messages used to probe 
+         destination transport addresses for RTT calculation and 
+         activity.  Valid values are zero (0) - do not 
+         heartbeat, or a value of 1 millisecond or greater.
+         
+         The default value is determined by the setting of 
+         m2paDefaultHeartbeatItvl."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 11 }
 
 m2paSctpHeartbeat OBJECT-TYPE
-	SYNTAX		TruthValue
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column determines whether HEARTBEAT messages used 
-		 to probe destination transport addresses for RTT 
-		 calculation and activity will be sent periodically.  
-		 The default value from RFC 2960 is true(1).
-
-		 Disabling heartbeats reduces the protocol's 
-		 responsiveness in detection of failures and redirection 
-		 of traffic away from failed paths and interfaces.  This 
-		 column should normally be left at its default value.
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultSctpHeartbeat."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column determines whether HEARTBEAT messages used 
+         to probe destination transport addresses for RTT 
+         calculation and activity will be sent periodically.  
+         The default value from RFC 2960 is true(1).
+         
+         Disabling heartbeats reduces the protocol's 
+         responsiveness in detection of failures and redirection 
+         of traffic away from failed paths and interfaces.  This 
+         column should normally be left at its default value.
+         
+         The default value is determined by the setting of 
+         m2paDefaultSctpHeartbeat."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 12 }
 
 m2paSctpRtoInitial OBJECT-TYPE
-	SYNTAX		MilliSeconds
-	UNITS		"milliseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the initial time interval (in 
-		 milliseconds) that will be used as an initial RTO 
-		 (retransmission timeout) value when sending packets to 
-		 a destination for the first time.  Valid values are 
-		 zero or greater but must be within the range 
-		 m2paSctpRtoMin to m2paSctpRtoMax.  The default value is 
-		 the value recommended by RFC 2960 and RFC 4960 (1000 
-		 milliseconds, or 1 second).
-
-		 Note that, in general, the RTO initial should not be 
-		 less than the peer's maximum SACK delay, otherwise, 
-		 excessive retransmission migh occur while the peer is 
-		 delaying acknowledgements.
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultSctpRtoInitial."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the initial time interval (in 
+         milliseconds) that will be used as an initial RTO 
+         (retransmission timeout) value when sending packets to 
+         a destination for the first time.  Valid values are 
+         zero or greater but must be within the range 
+         m2paSctpRtoMin to m2paSctpRtoMax.  The default value is 
+         the value recommended by RFC 2960 and RFC 4960 (1000 
+         milliseconds, or 1 second).
+         
+         Note that, in general, the RTO initial should not be 
+         less than the peer's maximum SACK delay, otherwise, 
+         excessive retransmission migh occur while the peer is 
+         delaying acknowledgements.
+         
+         The default value is determined by the setting of 
+         m2paDefaultSctpRtoInitial."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 13 }
 
 m2paSctpRtoMin OBJECT-TYPE
-	SYNTAX		MilliSeconds
-	UNITS		"milliseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the minimum timer interval (in 
-		 milliseconds) that will be used as an RTO 
-		 (retranmission timeout) value when sending packets to a 
-		 destination transport address and expecting 
-		 acknowledgements.  Valid values are zero or greater and 
-		 must be less than or equal to m2paSctpRtoInitial and 
-		 strictly less than and m2paSctpRtoMax.  The default 
-		 value is the value recommended by RFC 2960 and RFC 4960 
-		 (1000 milliseconds, or 1 second).
-
-		 Note that, in general, the RTO minimum should not be 
-		 less than the peer's maximum SACK delay, otherwise, 
-		 excessive retransmission migh occur while the peer is 
-		 delaying acknowledgements.
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultSctpRtoMin."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the minimum timer interval (in 
+         milliseconds) that will be used as an RTO 
+         (retranmission timeout) value when sending packets to a 
+         destination transport address and expecting 
+         acknowledgements.  Valid values are zero or greater and 
+         must be less than or equal to m2paSctpRtoInitial and 
+         strictly less than and m2paSctpRtoMax.  The default 
+         value is the value recommended by RFC 2960 and RFC 4960 
+         (1000 milliseconds, or 1 second).
+         
+         Note that, in general, the RTO minimum should not be 
+         less than the peer's maximum SACK delay, otherwise, 
+         excessive retransmission migh occur while the peer is 
+         delaying acknowledgements.
+         
+         The default value is determined by the setting of 
+         m2paDefaultSctpRtoMin."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 14 }
 
 m2paSctpRtoMax OBJECT-TYPE
-	SYNTAX		MilliSeconds
-	UNITS		"milliseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the maximum time interval (in 
-		 milliseconds) that will be used as an RTO 
-		 (retransmission timeout) value when sending packets t a 
-		 destination transport address and expecting 
-		 acknowledgements.  Valid values are zero or greater but 
-		 must be greater than or equal to m2paSctpRtoInitial and 
-		 strictly greater than m2paSctpRtoMin.  The default 
-		 value is the value recommended by RFC 2960 and RFC 4960 
-		 (60000 milliseconds, or 60 seconds).
-
-		 Note that, in general, the RTO maximum should not be 
-		 less than the peer's maximum SACK delay, otherwise, 
-		 excessive retransmission migh occur while the peer is 
-		 delaying acknowledgements.
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultSctpRtoMax."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the maximum time interval (in 
+         milliseconds) that will be used as an RTO 
+         (retransmission timeout) value when sending packets t a 
+         destination transport address and expecting 
+         acknowledgements.  Valid values are zero or greater but 
+         must be greater than or equal to m2paSctpRtoInitial and 
+         strictly greater than m2paSctpRtoMin.  The default 
+         value is the value recommended by RFC 2960 and RFC 4960 
+         (60000 milliseconds, or 60 seconds).
+         
+         Note that, in general, the RTO maximum should not be 
+         less than the peer's maximum SACK delay, otherwise, 
+         excessive retransmission migh occur while the peer is 
+         delaying acknowledgements.
+         
+         The default value is determined by the setting of 
+         m2paDefaultSctpRtoMax."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 15 }
 
 m2paSctpPathMaxRetrans OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"retransmissions"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the number of times that SCTP will 
-		 attempt retransmitting a packet to a given detination 
-		 transport address before it considers that destination 
-		 transport address inactive.  Valid values are zero or 
-		 greater.  The default value is the value recommended in 
-		 RFC 2960 (5 retransmissions).
-
-		 Adjusting this value has an effect on th period of time 
-		 taken to fail-over between destinations for multi-homed 
-		 connections.  Lower values (including zero) will yield 
-		 faster fail-over response times.  Lower values, 
-		 however, may cause thrashing between destinations 
-		 contributing to congestion in the network.  Deafult 
-		 values are applicable to Internet applicaions.
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultSctpPathMaxRetrans."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "retransmissions"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the number of times that SCTP will 
+         attempt retransmitting a packet to a given detination 
+         transport address before it considers that destination 
+         transport address inactive.  Valid values are zero or 
+         greater.  The default value is the value recommended in 
+         RFC 2960 (5 retransmissions).
+         
+         Adjusting this value has an effect on th period of time 
+         taken to fail-over between destinations for multi-homed 
+         connections.  Lower values (including zero) will yield 
+         faster fail-over response times.  Lower values, 
+         however, may cause thrashing between destinations 
+         contributing to congestion in the network.  Deafult 
+         values are applicable to Internet applicaions.
+         
+         The default value is determined by the setting of 
+         m2paDefaultSctpPathMaxRetrans."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 16 }
 
 m2paSctpCookieLife OBJECT-TYPE
-	SYNTAX		MilliSeconds
-	UNITS		"milliseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the time interval (in milliseconds) 
-		 in conjunction with m2paSctpCookieInc beyond which a 
-		 COOKIE-ECHO received with a cookie sent in an INIT-ACK 
-		 will no longer be accepted.  For SCTP, this also limits 
-		 the maximum time interval for which the HMAC secret key 
-		 for the cookie will be valid.  Valid values are zero or 
-		 greater.  Values of zero will  be converted to a system 
-		 clock tick.  The default value is the value recommended 
-		 by RFC 2960 (60,000 milliseconds, or 60 seconds).
-
-		 Reducing this value will increase the probability that 
-		 passive connection attempts will fail due to expired 
-		 cookies.  Increasing the value will reduce the overall 
-		 security of the system by permitting attackers an 
-		 increased interval within which to crack HMACs and 
-		 guess verification tags.  This value may be adjusted in 
-		 conjunction with m2paSctpCookieInc to meet most 
-		 objectives for successful passive connection attempts 
-		 with the best security afforded by smaller values of 
-		 m2paSctpCookieLife.
-
-		 Unfortunately, the m2paSctpCookieLife and 
-		 m2paSctpCookieInc must be adjusted to accomodate the 
-		 slowest peer on the slowest connection.  The default 
-		 setting is adequate for Internet applications.
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultSctpCookieLife."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the time interval (in milliseconds) 
+         in conjunction with m2paSctpCookieInc beyond which a 
+         COOKIE-ECHO received with a cookie sent in an INIT-ACK 
+         will no longer be accepted.  For SCTP, this also limits 
+         the maximum time interval for which the HMAC secret key 
+         for the cookie will be valid.  Valid values are zero or 
+         greater.  Values of zero will  be converted to a system 
+         clock tick.  The default value is the value recommended 
+         by RFC 2960 (60,000 milliseconds, or 60 seconds).
+         
+         Reducing this value will increase the probability that 
+         passive connection attempts will fail due to expired 
+         cookies.  Increasing the value will reduce the overall 
+         security of the system by permitting attackers an 
+         increased interval within which to crack HMACs and 
+         guess verification tags.  This value may be adjusted in 
+         conjunction with m2paSctpCookieInc to meet most 
+         objectives for successful passive connection attempts 
+         with the best security afforded by smaller values of 
+         m2paSctpCookieLife.
+         
+         Unfortunately, the m2paSctpCookieLife and 
+         m2paSctpCookieInc must be adjusted to accomodate the 
+         slowest peer on the slowest connection.  The default 
+         setting is adequate for Internet applications.
+         
+         The default value is determined by the setting of 
+         m2paDefaultSctpCookieLife."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 17 }
 
 m2paSctpCookieInc OBJECT-TYPE
-	SYNTAX		MilliSeconds
-	UNITS		"milliseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the time increment (in 
-		 milliseconds) that will be added to the lifespan of the 
-		 cookie in an INIT-ACK if the recieved INIT requests 
-		 cookie preservative to lengthen the lifespan of the 
-		 cookie.  Valid values are zero or greater.  The default 
-		 value is the value recommended in RFC 
-		 2960 5.2.6 (1000 milliseconds, or 1 second).
-
-		 This value can be adjusted in conjunction with 
-		 m2paSctpCookieLife to meet objectives of successful 
-		 passive connection attempts and security.  The default 
-		 setting is adequate for Internet applications.
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultSctpCookieInc."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the time increment (in 
+         milliseconds) that will be added to the lifespan of the 
+         cookie in an INIT-ACK if the recieved INIT requests 
+         cookie preservative to lengthen the lifespan of the 
+         cookie.  Valid values are zero or greater.  The default 
+         value is the value recommended in RFC 
+         2960 5.2.6 (1000 milliseconds, or 1 second).
+         
+         This value can be adjusted in conjunction with 
+         m2paSctpCookieLife to meet objectives of successful 
+         passive connection attempts and security.  The default 
+         setting is adequate for Internet applications.
+         
+         The default value is determined by the setting of 
+         m2paDefaultSctpCookieInc."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 18 }
 
 m2paSctpMaxInitRetries OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"retries"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the number of times that an INIT or 
-		 COOKIE-ECHO will be resent to a given destination 
-		 before abandoning an active open attempt.  Value values 
-		 are zero or greater.  The default value is the value 
-		 recommended by RFC 2960 (8 retries).
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultSctpMaxInitRetries."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "retries"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the number of times that an INIT or 
+         COOKIE-ECHO will be resent to a given destination 
+         before abandoning an active open attempt.  Value values 
+         are zero or greater.  The default value is the value 
+         recommended by RFC 2960 (8 retries).
+         
+         The default value is determined by the setting of 
+         m2paDefaultSctpMaxInitRetries."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 19 }
 
 m2paSctpMaxBurst OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"packets"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the maximum number of MTUs of new 
-		 data chunks that will be sent in a burst in accordance 
-		 with SCTP Specification Errata and Issues, RFC 4460 and 
-		 RFC 4960.  The default value is the value recommended 
-		 in RFC 4960 (4 MTUs).
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultSctpMaxBurst."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "packets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the maximum number of MTUs of new 
+         data chunks that will be sent in a burst in accordance 
+         with SCTP Specification Errata and Issues, RFC 4460 and 
+         RFC 4960.  The default value is the value recommended 
+         in RFC 4960 (4 MTUs).
+         
+         The default value is determined by the setting of 
+         m2paDefaultSctpMaxBurst."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 20 }
 
 m2paSctpAssocMaxRetrans OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"retransmissions"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the number of times that the 
-		 sending endpoint will attempt retransmitting a packet 
-		 on any active destination transport address before it 
-		 aborts the association.  Value values are zero or 
-		 greater.  The default value is the value recommended in 
-		 RFC 2960 (10 retransmissions).
-
-		 This value should be larger  than sum of the path 
-		 maximum number of retransmission values of each of the 
-		 destinations.
-
-		 Setting this value to less than the sum of the path 
-		 maximum retransmission values for all of the 
-		 destinations has the interesting effect of permitting a 
-		 connection to persist even when all destinations have 
-		 been deemed inactive.
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultAssocMaxRetrans."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "retransmissions"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the number of times that the 
+         sending endpoint will attempt retransmitting a packet 
+         on any active destination transport address before it 
+         aborts the association.  Value values are zero or 
+         greater.  The default value is the value recommended in 
+         RFC 2960 (10 retransmissions).
+         
+         This value should be larger  than sum of the path 
+         maximum number of retransmission values of each of the 
+         destinations.
+         
+         Setting this value to less than the sum of the path 
+         maximum retransmission values for all of the 
+         destinations has the interesting effect of permitting a 
+         connection to persist even when all destinations have 
+         been deemed inactive.
+         
+         The default value is determined by the setting of 
+         m2paDefaultAssocMaxRetrans."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 21 }
 
 m2paSctpSackDelay OBJECT-TYPE
-	SYNTAX		MilliSeconds(0..500)
-	UNITS		"milliseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column defines the interval of time (in 
-		 milliseconds) that will be used as an RTO 
-		 (retransmission timeout) value when sending packets to 
-		 a destination transport address.  Valid values are zero 
-		 or to 500 milliseconds (RFC 2960 forbits setting this 
-		 value larger than 500 milliseconds).  The default value 
-		 is the value recommended in RFC 2960 (200 
-		 milliseconds).
-		 
-		 The default value is determined by the setting of 
-		 m2paDefaultSctpSackDelay."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval (0..50)
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the interval of time (in 
+         milliseconds) that will be used as an RTO 
+         (retransmission timeout) value when sending packets to 
+         a destination transport address.  Valid values are zero 
+         or to 500 milliseconds (RFC 2960 forbits setting this 
+         value larger than 500 milliseconds).  The default value 
+         is the value recommended in RFC 2960 (200 
+         milliseconds).
+         
+         The default value is determined by the setting of 
+         m2paDefaultSctpSackDelay."
+    REFERENCE   
+        ""
+    DEFVAL      { 20 } -- 200 milliseconds
+    ::= { m2paProtocolProfileEntry 22 }
 
 m2paSctpLifetime OBJECT-TYPE
-	SYNTAX		MilliSeconds
-	UNITS		"milliseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"
-		 The default value is determined by the setting of 
-		 m2paDefaultSctpLifetime."
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The default value is determined by the setting of 
+         m2paDefaultSctpLifetime."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 23 }
 
 m2paTimerT1 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Q.703/T1.111.3: Level 2 timer 'Aligned ready'.
-
-		 According to ITU-T Rec. Q.703 (1996) the range for 64 
-		 kbit/s is 40 to 50 seconds; 4.8 kbit/s is 500 to 600 
-		 seconds.  For high-speed links (ITU-T Rec. Q.703 Annex 
-		 A) the range is is 25 to 350 seconds and the default is 
-		 300 seconds.  According to ANSI T1.111.3 (2000) the 
-		 range for 56 kbit/s and 64 kbit/s 12.9 to 16 seconds 
-		 with a nominal value of 13.0 seconds.  Accoding to ANSI 
-		 T1.111.3 (2000) for 1.544 Mbit/s the range is from 165 
-		 to 200 seconds with a nominal value of 170 seconds.
-
-		 RFC 4165 does not provide a default value for this 
-		 timer unless the link is emulating and restricted to 
-		 one of the signalling rates listed above.  Default 
-		 values are implementation specific."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 l2TimerT1."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Q.703/T1.111.3: Level 2 timer 'Aligned ready'.
+         
+         According to ITU-T Rec. Q.703 (1996) the range for 64 
+         kbit/s is 40 to 50 seconds; 4.8 kbit/s is 500 to 600 
+         seconds.  For high-speed links (ITU-T Rec. Q.703 Annex 
+         A) the range is is 25 to 350 seconds and the default is 
+         300 seconds.  According to ANSI T1.111.3 (2000) the 
+         range for 56 kbit/s and 64 kbit/s 12.9 to 16 seconds 
+         with a nominal value of 13.0 seconds.  Accoding to ANSI 
+         T1.111.3 (2000) for 1.544 Mbit/s the range is from 165 
+         to 200 seconds with a nominal value of 170 seconds.
+         
+         RFC 4165 does not provide a default value for this 
+         timer unless the link is emulating and restricted to 
+         one of the signalling rates listed above.  Default 
+         values are implementation specific."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         l2TimerT1."
+    ::= { m2paProtocolProfileEntry 24 }
 
 m2paTimerT2 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Q.703/T1.111.3: Level 2 timer 'Not aligned'.
-
-		 According to ITU-T Rec. Q.703 (1996) the range is 5 to 
-		 150 seconds."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 l2TimerT2."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Q.703/T1.111.3: Level 2 timer 'Not aligned'.
+         
+         According to ITU-T Rec. Q.703 (1996) the range is 5 to 
+         150 seconds."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         l2TimerT2."
+    ::= { m2paProtocolProfileEntry 25 }
 
 m2paTimerT2L OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Q.703/T1.111.3: Level 2 timer 'Automatic allocation of 
-		 signalling data links and terminals, low value'.
-
-		 According to ITU-T Rec. Q.703 (1996) the range is from 
-		 5 to 50 seconds.  ANSI T1.111.3 (2000), which strangely 
-		 does not support automatic allocation of signalling 
-		 data links and terminals, says the value is from 5 to 
-		 14 seconds with a default of 11.5 seconds.
-
-		 RFC 4165 does not provide a default value for this 
-		 timer unless the link is implementing one of the 
-		 standards listed above."
-	REFERENCE
-		"Neither ITU-T Rec. Q.751.1 nor ANSI T1.116.1 provide an 
-		 attribute for this timer."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Q.703/T1.111.3: Level 2 timer 'Automatic allocation of 
+         signalling data links and terminals, low value'.
+         
+         According to ITU-T Rec. Q.703 (1996) the range is from 
+         5 to 50 seconds.  ANSI T1.111.3 (2000), which strangely 
+         does not support automatic allocation of signalling 
+         data links and terminals, says the value is from 5 to 
+         14 seconds with a default of 11.5 seconds.
+         
+         RFC 4165 does not provide a default value for this 
+         timer unless the link is implementing one of the 
+         standards listed above."
+    REFERENCE   
+        "Neither ITU-T Rec. Q.751.1 nor ANSI T1.116.1 provide an 
+         attribute for this timer."
+    ::= { m2paProtocolProfileEntry 26 }
 
 m2paTimerT2H OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Q.703/T1.111.3: Level 2 timer 'Automatic allocation of 
-		 signalling data links and terminals, high value'.
-
-		 According to ITU-T Rec. Q.703 (1996) the range is from 
-		 70 to 150 seconds.  ANSI T1.111.3 (2000), which 
-		 strangely does not support automatic allocation of 
-		 signalling data links and terminals, says the value is 
-		 from 16 to 30 seconds with a default of 23.0 seconds.
-
-		 RFC 4165 does not provide a default value for this 
-		 timer unless the link is implementing one of the 
-		 standards listed above."
-	REFERENCE
-		"Neither ITU-T Rec. Q.751.1 nor ANSI T1.116.1 provide an 
-		 attribute for this timer."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Q.703/T1.111.3: Level 2 timer 'Automatic allocation of 
+         signalling data links and terminals, high value'.
+         
+         According to ITU-T Rec. Q.703 (1996) the range is from 
+         70 to 150 seconds.  ANSI T1.111.3 (2000), which 
+         strangely does not support automatic allocation of 
+         signalling data links and terminals, says the value is 
+         from 16 to 30 seconds with a default of 23.0 seconds.
+         
+         RFC 4165 does not provide a default value for this 
+         timer unless the link is implementing one of the 
+         standards listed above."
+    REFERENCE   
+        "Neither ITU-T Rec. Q.751.1 nor ANSI T1.116.1 provide an 
+         attribute for this timer."
+    ::= { m2paProtocolProfileEntry 27 }
 
 m2paTimerT3 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Q.703/T1.111.3: Level 2 timer 'Aligned'.
-
-		 According to ITU-T Rec. Q.703 (1996) the range is from 
-		 1 to 2 seconds.  According to ANSI T1.111.3 (2000) the 
-		 rage is from 5 to 14 seconds and the default value is 
-		 11.5 seconds.
-
-		 RFC 4165 does not provide a default value for this 
-		 timer unless the link is implementing one of the 
-		 standards listed above."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 l2TimerT3."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Q.703/T1.111.3: Level 2 timer 'Aligned'.
+         
+         According to ITU-T Rec. Q.703 (1996) the range is from 
+         1 to 2 seconds.  According to ANSI T1.111.3 (2000) the 
+         rage is from 5 to 14 seconds and the default value is 
+         11.5 seconds.
+         
+         RFC 4165 does not provide a default value for this 
+         timer unless the link is implementing one of the 
+         standards listed above."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         l2TimerT3."
+    ::= { m2paProtocolProfileEntry 28 }
 
 m2paTimerT4N OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Q.703/T1.111.3: Level 2 timer 'Proving period timer 
-		 normal'.
-
-		 According to ITU-T Rec. Q.703 (1996), for 64 kbit/s the 
-		 range is from 7.5 to 9.5 seconds with a nonminal value 
-		 of 8.2 seconds; for 4.8 kbit/s the range is from 100 to 
-		 120 seconds with a nominal value of 110 seconds, both 
-		 corresponding to 2**16 octet transmission time.  For 
-		 high-speed links (ITU-T Rec. Q.703 Annex A) is 3 to 70 
-		 seconds and the default is 30 seconds, for 2**16 octet 
-		 transmission time.  According to ANSI T1.111.3 (2000), 
-		 for 56 kbit/s and 64 kbit/s links the value is 2.3 
-		 seconds ± 10%; for 1.544 Mbit/s 30 seconds ± 10%, both 
-		 corresponding to 2**14 octet transmission time.
-
-		 RFC 4165 does not provide a default value for this 
-		 timer unless the link is emulating and restricted to 
-		 one of the signalling rates listed above.  Default 
-		 values are implementation specific."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 l2TimerT4N."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Q.703/T1.111.3: Level 2 timer 'Proving period timer 
+         normal'.
+         
+         According to ITU-T Rec. Q.703 (1996), for 64 kbit/s the 
+         range is from 7.5 to 9.5 seconds with a nonminal value 
+         of 8.2 seconds; for 4.8 kbit/s the range is from 100 to 
+         120 seconds with a nominal value of 110 seconds, both 
+         corresponding to 2**16 octet transmission time.  For 
+         high-speed links (ITU-T Rec. Q.703 Annex A) is 3 to 70 
+         seconds and the default is 30 seconds, for 2**16 octet 
+         transmission time.  According to ANSI T1.111.3 (2000), 
+         for 56 kbit/s and 64 kbit/s links the value is 2.3 
+         seconds plus or minus 10%; for 1.544 Mbit/s 30 seconds 
+         plus or minus 10%, both corresponding to 2**14 octet 
+         transmission time.
+         
+         RFC 4165 does not provide a default value for this 
+         timer unless the link is emulating and restricted to 
+         one of the signalling rates listed above.  Default 
+         values are implementation specific."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         l2TimerT4N."
+    ::= { m2paProtocolProfileEntry 29 }
 
 m2paTimerT4E OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Q.703/T1.111.3: Level 2 timer 'Proving period timer 
-		 emergency'.
-
-		 According to ITU-T Rec. Q.703 (1996), for 64 kbit/s the 
-		 range is from 400 to 600 milliseconds with a nominal 
-		 value of 500 milliseconds; for 4.8 kbit/s the range is 
-		 from 6 to 8 seconds with a nominal value of 7 seconds, 
-		 bot corresponding to 2**12 octet transmission time.  
-		 For high-speed links (ITU-T Rec. Q.703 Annex A) is 400 
-		 to 600 milliseconds and the default is 500 
-		 milliseconds, for 2**12 octet transmission time.  
-		 According to ANSI T1.111.3 (2000), for 56 kbit/s and 64 
-		 kbit/s links the value is 0.6 seconds ± 10%; for 1.544 
-		 Mbit/s links the value is 5 seconds ± 10%, both 
-		 corresponding to 2**12 octet transmission time.
-
-		 RFC 4165 does not provide a default value for this 
-		 timer unless the link is emulating and restricted to 
-		 one of the signalling rates listed above.  Default 
-		 values are implementation specific."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 l2TimerT4N."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Q.703/T1.111.3: Level 2 timer 'Proving period timer 
+         emergency'.
+         
+         According to ITU-T Rec. Q.703 (1996), for 64 kbit/s the 
+         range is from 400 to 600 milliseconds with a nominal 
+         value of 500 milliseconds; for 4.8 kbit/s the range is 
+         from 6 to 8 seconds with a nominal value of 7 seconds, 
+         bot corresponding to 2**12 octet transmission time.  
+         For high-speed links (ITU-T Rec. Q.703 Annex A) is 400 
+         to 600 milliseconds and the default is 500 
+         milliseconds, for 2**12 octet transmission time.  
+         According to ANSI T1.111.3 (2000), for 56 kbit/s and 64 
+         kbit/s links the value is 0.6 seconds plus or minus 
+         10%; for 1.544 Mbit/s links the value is 5 seconds plus 
+         or minus 10%, both corresponding to 2**12 octet 
+         transmission time.
+         
+         RFC 4165 does not provide a default value for this 
+         timer unless the link is emulating and restricted to 
+         one of the signalling rates listed above.  Default 
+         values are implementation specific."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         l2TimerT4N."
+    ::= { m2paProtocolProfileEntry 30 }
 
 m2paTimerT6 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Q.703/T1.111.3: Level 2 timer 'Remote congestion'.
-
-		 According to ITU-T Rec. Q.703 (1996) for 64 kbit/s the 
-		 range is from 3 to 6 seconds; for 4.8 kbit/s the range 
-		 is from 8 to 12 seconds.  According to ANSI T1.111.3 
-		 (2000) for 56 kbit/s, 64 kbit/s and 
-		 1.544 Mbit/s the range is from 1 to 6 seconds.
-
-		 RFC 4165 does not provide a default value for this 
-		 timer unless the link is emulating and restricted to 
-		 one of the signalling rates listed above.  Default 
-		 values are implementation specific.
-		 "
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), l2TimerT6."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Q.703/T1.111.3: Level 2 timer 'Remote congestion'.
+         
+         According to ITU-T Rec. Q.703 (1996) for 64 kbit/s the 
+         range is from 3 to 6 seconds; for 4.8 kbit/s the range 
+         is from 8 to 12 seconds.  According to ANSI T1.111.3 
+         (2000) for 56 kbit/s, 64 kbit/s and 
+         1.544 Mbit/s the range is from 1 to 6 seconds.
+         
+         RFC 4165 does not provide a default value for this 
+         timer unless the link is emulating and restricted to 
+         one of the signalling rates listed above.  Default 
+         values are implementation specific."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         l2TimerT6."
+    ::= { m2paProtocolProfileEntry 31 }
 
 m2paTimerT7 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Q.703/T1.111.3: Level 2 timer 'Excessive delay of 
-		 acknowledgement'.
-
-		 According to ITU-T Rec. Q.703 (1996) for 64 kbit/s the 
-		 range is from 0.5 to 2 seconds, but for PCR values less 
-		 than 0.8 seconds should not be used; for 4.8 kbit/s the 
-		 range is from 4 to 6 seconds.  According to ANSI 
-		 T1.111.3 (2000) for 56 kbit/s, 64 kbit/s and 1.544 
-		 Mbit/s links the range is from 0.5 to 2 seconds, but 
-		 for PC method, values less than 0.8 seconds should not 
-		 be used.
-
-		 RFC 4165 does not provide a default value for this 
-		 timer unless the link is emulating and restricted to 
-		 one of the signalling rates listed above.  Default 
-		 values are implementation specific.
-		 "
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 l2TimerT7."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Q.703/T1.111.3: Level 2 timer 'Excessive delay of 
+         acknowledgement'.
+         
+         According to ITU-T Rec. Q.703 (1996) for 64 kbit/s the 
+         range is from 0.5 to 2 seconds, but for PCR values less 
+         than 0.8 seconds should not be used; for 4.8 kbit/s the 
+         range is from 4 to 6 seconds.  According to ANSI 
+         T1.111.3 (2000) for 56 kbit/s, 64 kbit/s and 1.544 
+         Mbit/s links the range is from 0.5 to 2 seconds, but 
+         for PC method, values less than 0.8 seconds should not 
+         be used.
+         
+         RFC 4165 does not provide a default value for this 
+         timer unless the link is emulating and restricted to 
+         one of the signalling rates listed above.  Default 
+         values are implementation specific."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         l2TimerT7."
+    ::= { m2paProtocolProfileEntry 32 }
 
 m2paTransCongThresholdAbatementL1Messages OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages AND the number of octets in 
-		 the transmission buffer or transmission queue fall 
-		 below the values of the corresponding components of 
-		 this attribute, the coresponding link is no longer in 
-		 congestion level 1.  If the congestion control method 
-		 used supports multiple congestion levels without 
-		 congestion priorities, then the new congestion level is 
-		 given to MTP L3.  If teh congestion control method used 
-		 supports multiple congestion levels with congestion 
-		 priorities, then the new congestion level is given to 
-		 MTP L3 and messages with the corresponding priority are 
-		 now accepted by MTP L3.  If the congestion control 
-		 method used supports multiple congestion levels without 
-		 congestion priorities, then the new congestion level is 
-		 fiven to MTP L3.  If the international congestion 
-		 control method is used, then no congestion is announced 
-		 to MTP L3 (for more details see Q.704)."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdAbatementL1.messages."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages AND the number of octets in 
+         the transmission buffer or transmission queue fall 
+         below the values of the corresponding components of 
+         this attribute, the coresponding link is no longer in 
+         congestion level 1.  If the congestion control method 
+         used supports multiple congestion levels without 
+         congestion priorities, then the new congestion level is 
+         given to MTP L3.  If teh congestion control method used 
+         supports multiple congestion levels with congestion 
+         priorities, then the new congestion level is given to 
+         MTP L3 and messages with the corresponding priority are 
+         now accepted by MTP L3.  If the congestion control 
+         method used supports multiple congestion levels without 
+         congestion priorities, then the new congestion level is 
+         fiven to MTP L3.  If the international congestion 
+         control method is used, then no congestion is announced 
+         to MTP L3 (for more details see Q.704)."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdAbatementL1.messages."
+    ::= { m2paProtocolProfileEntry 33 }
 
 m2paTransCongThresholdAbatementL1Octets OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages AND the number of octets in 
-		 the transmission buffer or transmission queue fall 
-		 below the values of the corresponding components of 
-		 this attribute, the coresponding link is no longer in 
-		 congestion level 1.  If the congestion control method 
-		 used supports multiple congestion levels without 
-		 congestion priorities, then the new congestion level is 
-		 given to MTP L3.  If teh congestion control method used 
-		 supports multiple congestion levels with congestion 
-		 priorities, then the new congestion level is given to 
-		 MTP L3 and messages with the corresponding priority are 
-		 now accepted by MTP L3.  If the congestion control 
-		 method used supports multiple congestion levels without 
-		 congestion priorities, then the new congestion level is 
-		 fiven to MTP L3.  If the international congestion 
-		 control method is used, then no congestion is announced 
-		 to MTP L3 (for more details see Q.704)."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdAbatementL1.octets."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages AND the number of octets in 
+         the transmission buffer or transmission queue fall 
+         below the values of the corresponding components of 
+         this attribute, the coresponding link is no longer in 
+         congestion level 1.  If the congestion control method 
+         used supports multiple congestion levels without 
+         congestion priorities, then the new congestion level is 
+         given to MTP L3.  If teh congestion control method used 
+         supports multiple congestion levels with congestion 
+         priorities, then the new congestion level is given to 
+         MTP L3 and messages with the corresponding priority are 
+         now accepted by MTP L3.  If the congestion control 
+         method used supports multiple congestion levels without 
+         congestion priorities, then the new congestion level is 
+         fiven to MTP L3.  If the international congestion 
+         control method is used, then no congestion is announced 
+         to MTP L3 (for more details see Q.704)."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdAbatementL1.octets."
+    ::= { m2paProtocolProfileEntry 34 }
 
 m2paTransCongThresholdOnsetL1Messages OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages OR the number of octets in 
-		 the transmission buffer or transmission queue exceeds 
-		 the value of the corresponding component of this 
-		 attribute, the corresponding link is in congestion 
-		 level 1.  If the congestion control method used 
-		 supports multiple congestion levels with or without 
-		 congestion priorities, then the new congestion level is 
-		 given to MTP L3 for transfer to users and trasmission 
-		 in the TFC messages.
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages OR the number of octets in 
+         the transmission buffer or transmission queue exceeds 
+         the value of the corresponding component of this 
+         attribute, the corresponding link is in congestion 
+         level 1.  If the congestion control method used 
+         supports multiple congestion levels with or without 
+         congestion priorities, then the new congestion level is 
+         given to MTP L3 for transfer to users and trasmission 
+         in the TFC messages.
+         
+         If the international congestion control method is used, 
+         an indication of congestion is given to MTP L3 without 
+         congestion level in order to inform the users and cuase 
+         the generation of TFC messages."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdOnsetL1.messages."
+    ::= { m2paProtocolProfileEntry 35 }
 
-		 If the international congestion control method is used, 
-		 an indication of congestion is given to MTP L3 without 
-		 congestion level in order to inform the users and cuase 
-		 the generation of TFC messages."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdOnsetL1.messages."
-	::= { m2paProtocolProfileEntry xx }
-
-m2paTransCongThresholdOnsetL1Messages OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages OR the number of octets in 
-		 the transmission buffer or transmission queue exceeds 
-		 the value of the corresponding component of this 
-		 attribute, the corresponding link is in congestion 
-		 level 1.  If the congestion control method used 
-		 supports multiple congestion levels with or without 
-		 congestion priorities, then the new congestion level is 
-		 given to MTP L3 for transfer to users and trasmission 
-		 in the TFC messages.
-
-		 If the international congestion control method is used, 
-		 an indication of congestion is given to MTP L3 without 
-		 congestion level in order to inform the users and cuase 
-		 the generation of TFC messages."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdOnsetL1.octets."
-	::= { m2paProtocolProfileEntry xx }
+m2paTransCongThresholdOnsetL1Octets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages OR the number of octets in 
+         the transmission buffer or transmission queue exceeds 
+         the value of the corresponding component of this 
+         attribute, the corresponding link is in congestion 
+         level 1.  If the congestion control method used 
+         supports multiple congestion levels with or without 
+         congestion priorities, then the new congestion level is 
+         given to MTP L3 for transfer to users and trasmission 
+         in the TFC messages.
+         
+         If the international congestion control method is used, 
+         an indication of congestion is given to MTP L3 without 
+         congestion level in order to inform the users and cuase 
+         the generation of TFC messages."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdOnsetL1.octets."
+    ::= { m2paProtocolProfileEntry 36 }
 
 m2paProvingAttempts OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		""
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Defines the number of unsuccesful proving attempts that 
+         will be conducted during link alignment before the 
+         alignment procedures will be considered unsuccessful."
+    REFERENCE   
+        ""
+    ::= { m2paProtocolProfileEntry 37 }
 
 -- bufferMechanismPackage
 m2paNumberOfThresholdLevels OBJECT-TYPE
-	SYNTAX		INTEGER(2|3)
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column equals the number of threshold levels that 
-		 are used for congestion control."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 numberOfThresholdLevels."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32 (2..3)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column equals the number of threshold levels that 
+         are used for congestion control."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         numberOfThresholdLevels."
+    ::= { m2paProtocolProfileEntry 38 }
 
 -- congestionHandlingPackage
 m2paCongestionCounting OBJECT-TYPE
-	SYNTAX		INTEGER { octet(0), message(1), both(2) }
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column indicates whether congestion counting is 
-		 message based or octet based."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 congestionCounting."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      INTEGER { octet(0), message(1), both(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column indicates whether congestion counting is 
+         message based or octet based."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         congestionCounting."
+    ::= { m2paProtocolProfileEntry 39 }
 
 m2paCongestionReportingBaseObject OBJECT-TYPE
-	SYNTAX	INTEGER {
-			routeSet(0),
-			linkSetOfCongestedRouteSet(1),
-			linkOfCongestedRouteSet(2),
-			congestedLinkOfCongestedRoute(3)
-		}
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column indicates on what object congestion 
-		 counting is based."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 congestionReportingBaseObject."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      INTEGER { routeSet(0), linkSetOfCongestedRouteSet(1), 
+                    linkOfCongestedRouteSet(2), 
+                    congestedLinkOfCongestedRoute(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column indicates on what object congestion 
+         counting is based."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         congestionReportingBaseObject."
+    ::= { m2paProtocolProfileEntry 40 }
 
 -- multipleTransmissionCongestionStatesPackage
 --
@@ -1585,146 +1531,146 @@ m2paCongestionReportingBaseObject OBJECT-TYPE
 -- range of initialLevelofCongestion is [1,numberOfCongestionStats].
 --
 m2paTimerTx OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column identifies the Tx timer value for the 
-		 'multiple link congestion states without congestion 
-		 priority' mechanism described in 3.8.2.3/Q.704."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 timerTx."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column identifies the Tx timer value for the 
+         'multiple link congestion states without congestion 
+         priority' mechanism described in 3.8.2.3/Q.704."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         timerTx."
+    ::= { m2paProtocolProfileEntry 41 }
 
 m2paTimerTy OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column identifies the Ty timer value for the 
-		 'multiple link congestion states without congestion 
-		 priority' mechanism described in 3.8.2.3/Q.704."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 timerTy."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column identifies the Ty timer value for the 
+         'multiple link congestion states without congestion 
+         priority' mechanism described in 3.8.2.3/Q.704."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         timerTy."
+    ::= { m2paProtocolProfileEntry 42 }
 
 m2paNumberOfCongestionStates OBJECT-TYPE
-	SYNTAX		INTEGER
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column specifies the number of congestion states 
-		 used in the 'multiple link congestion states without 
-		 congestion priority' mechanism described in 
-		 3.8.2.3/Q.704."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 numberOfCongestionStates."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column specifies the number of congestion states 
+         used in the 'multiple link congestion states without 
+         congestion priority' mechanism described in 
+         3.8.2.3/Q.704."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         numberOfCongestionStates."
+    ::= { m2paProtocolProfileEntry 43 }
 
 m2paInitialLevelOfCongestion OBJECT-TYPE
-	SYNTAX		INTEGER
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column represents the initial level of congestion.  
-		 This is the values from B.1.2.9.2."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 initialLevelOfCongestion."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column represents the initial level of congestion.  
+         This is the values from B.1.2.9.2."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         initialLevelOfCongestion."
+    ::= { m2paProtocolProfileEntry 44 }
 
 -- receiveCongestionLevelPackage
 m2paReceiveCongestionThresholdAbatement OBJECT-TYPE
-	SYNTAX		MtpCongestionThreshold
-	UNITS		"messages"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of MSUs in the reception buffer gets 
-		 smaller than this number, Level 2 flow control measures 
-		 end.  The value has to be smaller than the respective 
-		 congestion onset and discard thresholds.
-
-		 Note that the threshold is always specified in terms of 
-		 the number of messages (MSUs), regardless of the 
-		 setting of the l2CongestionCounting column.  This is 
-		 the approach taken by ITU-T Rec. Q.751.1 and OpenSS7 L2 
-		 state machines: receive congestion on the basis of 
-		 octets does not make protocol sense."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 receiveCongestionThresholdAbatement."
-	DEFVAL		{ 3 } -- messages
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "messages"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of MSUs in the reception buffer gets 
+         smaller than this number, Level 2 flow control measures 
+         end.  The value has to be smaller than the respective 
+         congestion onset and discard thresholds.
+         
+         Note that the threshold is always specified in terms of 
+         the number of messages (MSUs), regardless of the 
+         setting of the l2CongestionCounting column.  This is 
+         the approach taken by ITU-T Rec. Q.751.1 and OpenSS7 L2 
+         state machines: receive congestion on the basis of 
+         octets does not make protocol sense."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         receiveCongestionThresholdAbatement."
+    DEFVAL      { 3 } -- messages
+    ::= { m2paProtocolProfileEntry 45 }
 
 m2paReceiveCongestionThresholdOnset OBJECT-TYPE
-	SYNTAX		MtpCongestionThreshold
-	UNITS		"messages"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of MSUs in the reception buffer gets 
-		 bigger than this value, but is less than the respective 
-		 congestion discard level, Level 2 flow control measures 
-		 begin.  MSUs are still accepted.  The value of this 
-		 threshold must be greater than the respective 
-		 congestion abatement level and must be smaller than the 
-		 respective congestion discard level.
-
-		 Note that the threshold is always specified in terms of 
-		 the number of messages (MSUs), regardless of the 
-		 setting of the l2CongestionCounting column.  This is 
-		 the approach taken by ITU-T Rec. Q.751.1 and OpenSS7 L2 
-		 state machines: receive congestion on the basis of 
-		 octets does not make protocol sense."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
-		 receiveCongestionThresholdOnset."
-	DEFVAL		{ 6 } -- 6 messages
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "messages"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of MSUs in the reception buffer gets 
+         bigger than this value, but is less than the respective 
+         congestion discard level, Level 2 flow control measures 
+         begin.  MSUs are still accepted.  The value of this 
+         threshold must be greater than the respective 
+         congestion abatement level and must be smaller than the 
+         respective congestion discard level.
+         
+         Note that the threshold is always specified in terms of 
+         the number of messages (MSUs), regardless of the 
+         setting of the l2CongestionCounting column.  This is 
+         the approach taken by ITU-T Rec. Q.751.1 and OpenSS7 L2 
+         state machines: receive congestion on the basis of 
+         octets does not make protocol sense."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
+         receiveCongestionThresholdOnset."
+    DEFVAL      { 6 } -- 6 messages
+    ::= { m2paProtocolProfileEntry 46 }
 
 m2paReceiveCongestionThresholdDiscard OBJECT-TYPE
-	SYNTAX		MtpCongestionThreshold
-	UNITS		"messages"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of MSUs in the reception buffer gets 
-		 bigger than this value, Level 2 flow control measures 
-		 begin (if they have not begun already).  MSUs are 
-		 discarded.
-		 The value must be greater than the respective 
-		 congestion abatement and onset levels.
-
-		 Note that the threshold is always specified in terms of 
-		 the number of messages (MSUs), regardless of the 
-		 setting of the l2CongestionCounting column.  This is 
-		 the approach taken by ITU-T Rec. Q.751.1 and OpenSS7 L2 
-		 state machines: receive congestion on the basis of 
-		 octets does not make protocol sense."
-	REFERENCE
-		"ITU-T Rec. Q.751.1 and ANSI T1.116.1 do not specify a 
-		 discard threshold, but the OpenSS7 L2 protocol state 
-		 machine does."
-	DEFVAL		{ 9 } -- 9 messages
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "messages"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of MSUs in the reception buffer gets 
+         bigger than this value, Level 2 flow control measures 
+         begin (if they have not begun already).  MSUs are 
+         discarded.
+         The value must be greater than the respective 
+         congestion abatement and onset levels.
+         
+         Note that the threshold is always specified in terms of 
+         the number of messages (MSUs), regardless of the 
+         setting of the l2CongestionCounting column.  This is 
+         the approach taken by ITU-T Rec. Q.751.1 and OpenSS7 L2 
+         state machines: receive congestion on the basis of 
+         octets does not make protocol sense."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 and ANSI T1.116.1 do not specify a 
+         discard threshold, but the OpenSS7 L2 protocol state 
+         machine does."
+    DEFVAL      { 9 } -- 9 messages
+    ::= { m2paProtocolProfileEntry 47 }
 
 -- m2paProtocolProfileNamePackage
 m2paProtocolProfileName OBJECT-TYPE
-	SYNTAX		CommonLanguageName
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"This column is an addtional name for instances of the 
-		 m2paProtocolProfile managed object class."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) sallNniProtocolProfileName."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column is an addtional name for instances of the 
+         m2paProtocolProfile managed object class."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) sallNniProtocolProfileName."
+    ::= { m2paProtocolProfileEntry 48 }
 
 -- thresholdsForMultCongLevelsPackage
 --
@@ -1732,375 +1678,1123 @@ m2paProtocolProfileName OBJECT-TYPE
 -- control methods with multiple levels without priorities.
 --
 m2paTransCongThresholdAbatementL2Messages OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"messages"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages AND the number of octets in 
-		 the transmission buffer and transmission queue fall 
-		 below the values of the corresponding components of 
-		 this attribute, the corresponding link is no longer in 
-		 congestion level 2.
-
-		 If the congestion control method used supports multiple 
-		 congestion levels without congestion priorities, then 
-		 the new congestion level is given to MTP L3.  If the 
-		 congestion control method used supports multiple 
-		 congestion levels with congestion priorities, then the 
-		 new congestion level is given to MTP L3 and messages 
-		 with the corresponding priority are now accepted by MTP 
-		 L3.  This attribute is not used for the international 
-		 congestion control method.
-
-		 See l2TransSaalCongThresholdAbatementL2Octets for the 
-		 octet setting."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdAbatementL2.messages."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "messages"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages AND the number of octets in 
+         the transmission buffer and transmission queue fall 
+         below the values of the corresponding components of 
+         this attribute, the corresponding link is no longer in 
+         congestion level 2.
+         
+         If the congestion control method used supports multiple 
+         congestion levels without congestion priorities, then 
+         the new congestion level is given to MTP L3.  If the 
+         congestion control method used supports multiple 
+         congestion levels with congestion priorities, then the 
+         new congestion level is given to MTP L3 and messages 
+         with the corresponding priority are now accepted by MTP 
+         L3.  This attribute is not used for the international 
+         congestion control method.
+         
+         See l2TransSaalCongThresholdAbatementL2Octets for the 
+         octet setting."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdAbatementL2.messages."
+    ::= { m2paProtocolProfileEntry 49 }
 
 m2paTransCongThresholdAbatementL2Octets OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"messages"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages AND the number of octets in 
-		 the transmission buffer and transmission queue fall 
-		 below the values of the corresponding components of 
-		 this attribute, the corresponding link is no longer in 
-		 congestion level 2.
-
-		 If the congestion control method used supports multiple 
-		 congestion levels without congestion priorities, then 
-		 the new congestion level is given to MTP L3.  If the 
-		 congestion control method used supports multiple 
-		 congestion levels with congestion priorities, then the 
-		 new congestion level is given to MTP L3 and messages 
-		 with the corresponding priority are now accepted by MTP 
-		 L3.  This attribute is not used for the international 
-		 congestion control method.
-
-		 See l2TransSaalCongThresholdAbatementL2Messages for the 
-		 message setting."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdAbatementL2.octets."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "messages"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages AND the number of octets in 
+         the transmission buffer and transmission queue fall 
+         below the values of the corresponding components of 
+         this attribute, the corresponding link is no longer in 
+         congestion level 2.
+         
+         If the congestion control method used supports multiple 
+         congestion levels without congestion priorities, then 
+         the new congestion level is given to MTP L3.  If the 
+         congestion control method used supports multiple 
+         congestion levels with congestion priorities, then the 
+         new congestion level is given to MTP L3 and messages 
+         with the corresponding priority are now accepted by MTP 
+         L3.  This attribute is not used for the international 
+         congestion control method.
+         
+         See l2TransSaalCongThresholdAbatementL2Messages for the 
+         message setting."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdAbatementL2.octets."
+    ::= { m2paProtocolProfileEntry 50 }
 
 m2paTransCongThresholdOnsetL2Messages OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"octets"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages OR the number of octets in 
-		 the transmission buffer or transmission queue exceeds 
-		 the value of the corresponding component of this 
-		 attribute, the corresponding link is in congestion 
-		 level 2.
-
-		 If the congestion control method used supports multiple 
-		 congestion levels with or without congestion 
-		 priorities, then the new congestion level is given to 
-		 MTP L3 for transfer to tusers and transmission in the 
-		 TFC messages.  Not used for the international 
-		 congestion control method.
-
-		 See l2TransSaalCongThresholdOnsetL2Messages for the 
-		 message component."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdOnsetL2.octets."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages OR the number of octets in 
+         the transmission buffer or transmission queue exceeds 
+         the value of the corresponding component of this 
+         attribute, the corresponding link is in congestion 
+         level 2.
+         
+         If the congestion control method used supports multiple 
+         congestion levels with or without congestion 
+         priorities, then the new congestion level is given to 
+         MTP L3 for transfer to tusers and transmission in the 
+         TFC messages.  Not used for the international 
+         congestion control method.
+         
+         See l2TransSaalCongThresholdOnsetL2Messages for the 
+         message component."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdOnsetL2.octets."
+    ::= { m2paProtocolProfileEntry 51 }
 
 m2paTransCongThresholdOnsetL2Octets OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"octets"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages OR the number of octets in 
-		 the transmission buffer or transmission queue exceeds 
-		 the value of the corresponding component of this 
-		 attribute, the corresponding link is in congestion 
-		 level 2.
-
-		 If the congestion control method used supports multiple 
-		 congestion levels with or without congestion 
-		 priorities, then the new congestion level is given to 
-		 MTP L3 for transfer to tusers and transmission in the 
-		 TFC messages.  Not used for the international 
-		 congestion control method.
-
-		 See l2TransSaalCongThresholdOnsetL2Messages for the 
-		 message component."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdOnsetL2.octets."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages OR the number of octets in 
+         the transmission buffer or transmission queue exceeds 
+         the value of the corresponding component of this 
+         attribute, the corresponding link is in congestion 
+         level 2.
+         
+         If the congestion control method used supports multiple 
+         congestion levels with or without congestion 
+         priorities, then the new congestion level is given to 
+         MTP L3 for transfer to tusers and transmission in the 
+         TFC messages.  Not used for the international 
+         congestion control method.
+         
+         See l2TransSaalCongThresholdOnsetL2Messages for the 
+         message component."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdOnsetL2.octets."
+    ::= { m2paProtocolProfileEntry 52 }
 
 m2paTransCongThresholdAbatementL3Messages OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"messages"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages AND the number of octets in 
-		 the transmission buffer and transmission queue fall 
-		 below the values of the correspoindg components of this 
-		 attribute, the corresponding link is no longer in 
-		 congestion level 3.
-
-		 If the congestion control method used supports multiple 
-		 congestion levels without congestion priorities, then 
-		 the new congestion level is given to MTP L3.  If the 
-		 congestion conteol method used supports multiple 
-		 congestion levels with congestion priorities, the new 
-		 congestion level is given to MTP L3 and messages with 
-		 the corresponding priority are now accepted by MTP L3.  
-		 This attributes is not used for the international 
-		 congestion  control method.
-
-		 See l2TransSaalCongThresholdAbatementL3Octets for the 
-		 octet component."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdAbatementL3.messages."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "messages"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages AND the number of octets in 
+         the transmission buffer and transmission queue fall 
+         below the values of the correspoindg components of this 
+         attribute, the corresponding link is no longer in 
+         congestion level 3.
+         
+         If the congestion control method used supports multiple 
+         congestion levels without congestion priorities, then 
+         the new congestion level is given to MTP L3.  If the 
+         congestion conteol method used supports multiple 
+         congestion levels with congestion priorities, the new 
+         congestion level is given to MTP L3 and messages with 
+         the corresponding priority are now accepted by MTP L3.  
+         This attributes is not used for the international 
+         congestion  control method.
+         
+         See l2TransSaalCongThresholdAbatementL3Octets for the 
+         octet component."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdAbatementL3.messages."
+    ::= { m2paProtocolProfileEntry 53 }
 
 m2paTransCongThresholdAbatementL3Octets OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"octets"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages AND the number of octets in 
-		 the transmission buffer and transmission queue fall 
-		 below the values of the correspoindg components of this 
-		 attribute, the corresponding link is no longer in 
-		 congestion level 3.
-
-		 If the congestion control method used supports multiple 
-		 congestion levels without congestion priorities, then 
-		 the new congestion level is given to MTP L3.  If the 
-		 congestion conteol method used supports multiple 
-		 congestion levels with congestion priorities, the new 
-		 congestion level is given to MTP L3 and messages with 
-		 the corresponding priority are now accepted by MTP L3.  
-		 This attributes is not used for the international 
-		 congestion  control method.
-
-		 See l2TransSaalCongThresholdAbatementL3Messages for the 
-		 message component."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdAbatementL3.octets."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages AND the number of octets in 
+         the transmission buffer and transmission queue fall 
+         below the values of the correspoindg components of this 
+         attribute, the corresponding link is no longer in 
+         congestion level 3.
+         
+         If the congestion control method used supports multiple 
+         congestion levels without congestion priorities, then 
+         the new congestion level is given to MTP L3.  If the 
+         congestion conteol method used supports multiple 
+         congestion levels with congestion priorities, the new 
+         congestion level is given to MTP L3 and messages with 
+         the corresponding priority are now accepted by MTP L3.  
+         This attributes is not used for the international 
+         congestion  control method.
+         
+         See l2TransSaalCongThresholdAbatementL3Messages for the 
+         message component."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdAbatementL3.octets."
+    ::= { m2paProtocolProfileEntry 54 }
 
 m2paTransCongThresholdOnsetL3Messages OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"messages"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages OR the number of octets in 
-		 the transmission buffer or transmission queue exceeds 
-		 the value fo the corresponding component of this 
-		 attribute, the correspoding link is in congestion level 
-		 3.
-
-		 If the congestion control method used supports multiple 
-		 congestion levesl with or without congestion 
-		 priorities, then the new congestion level is given to 
-		 MTP L3 for transfer to users and transmission in the 
-		 TFC messages.  Not use for the international congestion 
-		 control method.
-
-		 See l2TransSaalCongThresholdOnsetL3Octets for the octet 
-		 component."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdOnsetL3.messages."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "messages"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages OR the number of octets in 
+         the transmission buffer or transmission queue exceeds 
+         the value fo the corresponding component of this 
+         attribute, the correspoding link is in congestion level 
+         3.
+         
+         If the congestion control method used supports multiple 
+         congestion levesl with or without congestion 
+         priorities, then the new congestion level is given to 
+         MTP L3 for transfer to users and transmission in the 
+         TFC messages.  Not use for the international congestion 
+         control method.
+         
+         See l2TransSaalCongThresholdOnsetL3Octets for the octet 
+         component."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdOnsetL3.messages."
+    ::= { m2paProtocolProfileEntry 55 }
 
 m2paTransCongThresholdOnsetL3Octets OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"octets"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages OR the number of octets in 
-		 the transmission buffer or transmission queue exceeds 
-		 the value fo the corresponding component of this 
-		 attribute, the correspoding link is in congestion level 
-		 3.
-
-		 If the congestion control method used supports multiple 
-		 congestion levesl with or without congestion 
-		 priorities, then the new congestion level is given to 
-		 MTP L3 for transfer to users and transmission in the 
-		 TFC messages.  Not use for the international congestion 
-		 control method.
-
-		 See l2TransSaalCongThresholdOnsetL3Messages for the 
-		 message component."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdOnsetL3.octets."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages OR the number of octets in 
+         the transmission buffer or transmission queue exceeds 
+         the value fo the corresponding component of this 
+         attribute, the correspoding link is in congestion level 
+         3.
+         
+         If the congestion control method used supports multiple 
+         congestion levesl with or without congestion 
+         priorities, then the new congestion level is given to 
+         MTP L3 for transfer to users and transmission in the 
+         TFC messages.  Not use for the international congestion 
+         control method.
+         
+         See l2TransSaalCongThresholdOnsetL3Messages for the 
+         message component."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdOnsetL3.octets."
+    ::= { m2paProtocolProfileEntry 56 }
 
 -- thresholdsForMultCongLevelsWithPrioPackage
 m2paTransCongThresholdDiscardL1Messages OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"messages"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages OR the number of octest in 
-		 the transmission buffer or transmission queue exceeds 
-		 the value of the corresponding component of this 
-		 attribute, then all messages with a congestion priority 
-		 equal to this level 1 or lower are discarded.  This 
-		 attribute is not used for the international congestion 
-		 control method nor the method with multiple congestion 
-		 levels without priorities.
-
-		 See transSaalCongThresholdDiscardL1Octets for the octet 
-		 component."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdDiscardL1.messages."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "messages"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages OR the number of octest in 
+         the transmission buffer or transmission queue exceeds 
+         the value of the corresponding component of this 
+         attribute, then all messages with a congestion priority 
+         equal to this level 1 or lower are discarded.  This 
+         attribute is not used for the international congestion 
+         control method nor the method with multiple congestion 
+         levels without priorities.
+         
+         See transSaalCongThresholdDiscardL1Octets for the octet 
+         component."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdDiscardL1.messages."
+    ::= { m2paProtocolProfileEntry 57 }
 
 m2paTransCongThresholdDiscardL1Octets OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"octets"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages OR the number of octest in 
-		 the transmission buffer or transmission queue exceeds 
-		 the value of the corresponding component of this 
-		 attribute, then all messages with a congestion priority 
-		 equal to this level 1 or lower are discarded.  This 
-		 attribute is not used for the international congestion 
-		 control method nor the method with multiple congestion 
-		 levels without priorities.
-
-		 See transSaalCongThresholdDiscardL1Messages for the 
-		 message component."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdDiscardL1.octets."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages OR the number of octest in 
+         the transmission buffer or transmission queue exceeds 
+         the value of the corresponding component of this 
+         attribute, then all messages with a congestion priority 
+         equal to this level 1 or lower are discarded.  This 
+         attribute is not used for the international congestion 
+         control method nor the method with multiple congestion 
+         levels without priorities.
+         
+         See transSaalCongThresholdDiscardL1Messages for the 
+         message component."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdDiscardL1.octets."
+    ::= { m2paProtocolProfileEntry 58 }
 
 m2paTransCongThresholdDiscardL2Messages OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"messages"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages OR the number of octets in 
-		 the transmission buffer or transmission queue exceeds 
-		 the value of the corresponding component of this 
-		 attribute, then all messages with a congestion priority 
-		 equal to this level 2 or lower are discarded.  This 
-		 attribute is not used for the international congestion 
-		 control method nor the method with multiple congestion 
-		 levels without priorities.
-
-		 See l2TransSaalCongThresholdDiscardL2Octets for the 
-		 octet component."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdDiscardL2.messages."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "messages"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages OR the number of octets in 
+         the transmission buffer or transmission queue exceeds 
+         the value of the corresponding component of this 
+         attribute, then all messages with a congestion priority 
+         equal to this level 2 or lower are discarded.  This 
+         attribute is not used for the international congestion 
+         control method nor the method with multiple congestion 
+         levels without priorities.
+         
+         See l2TransSaalCongThresholdDiscardL2Octets for the 
+         octet component."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdDiscardL2.messages."
+    ::= { m2paProtocolProfileEntry 59 }
 
 m2paTransCongThresholdDiscardL2Octets OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"octets"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages OR the number of octets in 
-		 the transmission buffer or transmission queue exceeds 
-		 the value of the corresponding component of this 
-		 attribute, then all messages with a congestion priority 
-		 equal to this level 2 or lower are discarded.  This 
-		 attribute is not used for the international congestion 
-		 control method nor the method with multiple congestion 
-		 levels without priorities.
-
-		 See l2TransSaalCongThresholdDiscardL2Messages for the 
-		 message component."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdDiscardL2.octets."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages OR the number of octets in 
+         the transmission buffer or transmission queue exceeds 
+         the value of the corresponding component of this 
+         attribute, then all messages with a congestion priority 
+         equal to this level 2 or lower are discarded.  This 
+         attribute is not used for the international congestion 
+         control method nor the method with multiple congestion 
+         levels without priorities.
+         
+         See l2TransSaalCongThresholdDiscardL2Messages for the 
+         message component."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdDiscardL2.octets."
+    ::= { m2paProtocolProfileEntry 60 }
 
 m2paTransCongThresholdDiscardL3Messages OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"messages"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages OR the number of octets in 
-		 the transmission buffer or transmission queue exceeds 
-		 the value of the corresponding component of this 
-		 attribute, then all messages with a congestion priority 
-		 equal to this level 3 or lower are discarded.  This 
-		 attribute is not used for the international congestion 
-		 control method nor the method with multiple congestion 
-		 levels without priorities.
-
-		 See l2TransSaalCongThredholdDiscardL3Octets for the 
-		 octet component."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdDiscardL3.messages."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "messages"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages OR the number of octets in 
+         the transmission buffer or transmission queue exceeds 
+         the value of the corresponding component of this 
+         attribute, then all messages with a congestion priority 
+         equal to this level 3 or lower are discarded.  This 
+         attribute is not used for the international congestion 
+         control method nor the method with multiple congestion 
+         levels without priorities.
+         
+         See l2TransSaalCongThredholdDiscardL3Octets for the 
+         octet component."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdDiscardL3.messages."
+    ::= { m2paProtocolProfileEntry 61 }
 
 m2paTransCongThresholdDiscardL3Octets OBJECT-TYPE
-	SYNTAX		Unsigned32
-	UNITS		"octets"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"If the number of messages OR the number of octets in 
-		 the transmission buffer or transmission queue exceeds 
-		 the value of the corresponding component of this 
-		 attribute, then all messages with a congestion priority 
-		 equal to this level 3 or lower are discarded.  This 
-		 attribute is not used for the international congestion 
-		 control method nor the method with multiple congestion 
-		 levels without priorities.
-
-		 See l2TransSaalCongThredholdDiscardL3Messages for the 
-		 message component."
-	REFERENCE
-		"ITU-T Rec. Q.2751.1 (1997) 
-		 transSaalCongThresholdDiscardL3.octets."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the number of messages OR the number of octets in 
+         the transmission buffer or transmission queue exceeds 
+         the value of the corresponding component of this 
+         attribute, then all messages with a congestion priority 
+         equal to this level 3 or lower are discarded.  This 
+         attribute is not used for the international congestion 
+         control method nor the method with multiple congestion 
+         levels without priorities.
+         
+         See l2TransSaalCongThredholdDiscardL3Messages for the 
+         message component."
+    REFERENCE   
+        "ITU-T Rec. Q.2751.1 (1997) 
+         transSaalCongThresholdDiscardL3.octets."
+    ::= { m2paProtocolProfileEntry 62 }
 
 --
 m2paProtocolProfileRowStatus OBJECT-TYPE
-	SYNTAX		RowStatus
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Provides a mechanism whereby management stations, 
-		 following the RowStatus textual convention from the 
-		 SNMPv2-TC module, may create or destroy conceptual rows 
-		 in this table."
-	REFERENCE
-		"STD 58, SNMPv2-TC RowStatus."
-	::= { m2paProtocolProfileEntry xx }
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations, 
+         following the RowStatus textual convention from the 
+         SNMPv2-TC module, may create or destroy conceptual rows 
+         in this table."
+    REFERENCE   
+        "STD 58, SNMPv2-TC RowStatus."
+    ::= { m2paProtocolProfileEntry 63 }
 
+m2paConformance OBJECT IDENTIFIER
+    ::= { m2paMIB 2 }
 
--- =====================================================================
+m2paCompliances OBJECT IDENTIFIER
+    ::= { m2paConformance 1 }
 
-END
+m2paGroups OBJECT IDENTIFIER
+    ::= { m2paConformance 2 }
 
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+m2paObjectGroup OBJECT-GROUP
+    OBJECTS     { m2paDefaultSctpNoDelay, m2paDefaultSctpMaxseg, 
+                  m2paDefaultSctpHeartbeatItvl, m2paDefaultSctpHeartbeat, 
+                  m2paDefaultSctpRtoInitial, m2paDefaultSctpRtoMin, 
+                  m2paDefaultSctpRtoMax, m2paDefaultSctpPathMaxRetrans, 
+                  m2paDefaultSctpCookieLife, m2paDefaultSctpCookieInc, 
+                  m2paDefaultSctpMaxInitRetries, m2paDefaultSctpMaxBurst, 
+                  m2paDefaultSctpAssocMaxRetrans, 
+                  m2paDefaultSctpSackDelay, m2paDefaultSctpLifetime, 
+                  m2paN1, m2paProving, m2paManagementProvingState, 
+                  m2paLoopDelayLower, m2paLoopDelayUpper, 
+                  m2paTransmissionRateIntervalLower, 
+                  m2paTransmissionRateIntervalUpper, m2paSctpNoDelay, 
+                  m2paSctpMaxseg, m2paSctpHeartbeatItvl, 
+                  m2paSctpHeartbeat, m2paSctpRtoInitial, m2paSctpRtoMin, 
+                  m2paSctpRtoMax, m2paSctpPathMaxRetrans, 
+                  m2paSctpCookieLife, m2paSctpCookieInc, 
+                  m2paSctpMaxInitRetries, m2paSctpMaxBurst, 
+                  m2paSctpAssocMaxRetrans, m2paSctpSackDelay, 
+                  m2paSctpLifetime, m2paTimerT1, m2paTimerT2, 
+                  m2paTimerT2L, m2paTimerT2H, m2paTimerT3, m2paTimerT4N, 
+                  m2paTimerT4E, m2paTimerT6, m2paTimerT7, 
+                  m2paTransCongThresholdAbatementL1Messages, 
+                  m2paTransCongThresholdAbatementL1Octets, 
+                  m2paTransCongThresholdOnsetL1Messages, 
+                  m2paTransCongThresholdOnsetL1Octets, 
+                  m2paProvingAttempts, m2paNumberOfThresholdLevels, 
+                  m2paCongestionCounting, 
+                  m2paCongestionReportingBaseObject, m2paTimerTx, 
+                  m2paTimerTy, m2paNumberOfCongestionStates, 
+                  m2paInitialLevelOfCongestion, 
+                  m2paReceiveCongestionThresholdAbatement, 
+                  m2paReceiveCongestionThresholdOnset, 
+                  m2paReceiveCongestionThresholdDiscard, 
+                  m2paProtocolProfileName, 
+                  m2paTransCongThresholdAbatementL2Messages, 
+                  m2paTransCongThresholdAbatementL2Octets, 
+                  m2paTransCongThresholdOnsetL2Messages, 
+                  m2paTransCongThresholdOnsetL2Octets, 
+                  m2paTransCongThresholdAbatementL3Messages, 
+                  m2paTransCongThresholdAbatementL3Octets, 
+                  m2paTransCongThresholdOnsetL3Messages, 
+                  m2paTransCongThresholdOnsetL3Octets, 
+                  m2paTransCongThresholdDiscardL1Messages, 
+                  m2paTransCongThresholdDiscardL1Octets, 
+                  m2paTransCongThresholdDiscardL2Messages, 
+                  m2paTransCongThresholdDiscardL2Octets, 
+                  m2paTransCongThresholdDiscardL3Messages, 
+                  m2paTransCongThresholdDiscardL3Octets, 
+                  m2paProtocolProfileRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of all of the accessible objects in this 
+         module."
+    ::= { m2paGroups 1 }
+
+m2paBasicSS7Group OBJECT-GROUP
+    OBJECTS     { m2paLoopDelayLower, m2paLoopDelayUpper, 
+                  m2paTransmissionRateIntervalLower, 
+                  m2paTransmissionRateIntervalUpper, m2paTimerT1, 
+                  m2paTimerT2, m2paTimerT2L, m2paTimerT2H, m2paTimerT3, 
+                  m2paTimerT4N, m2paTimerT4E, m2paTimerT6, m2paTimerT7 }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects that provides for basic M2PA SS7 
+         management using this module."
+    ::= { m2paGroups 2 }
+
+m2paBasicSS7TransmitCongestionPackage OBJECT-GROUP
+    OBJECTS     { m2paCongestionCounting, 
+                  m2paCongestionReportingBaseObject, 
+                  m2paTransCongThresholdAbatementL1Messages, 
+                  m2paTransCongThresholdAbatementL1Octets, 
+                  m2paTransCongThresholdOnsetL1Messages, 
+                  m2paTransCongThresholdOnsetL1Octets }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objets that provides for basic M2PA SS7 
+         transmit congestion management using this module."
+    ::= { m2paGroups 3 }
+
+m2paBasicSCTPGroup OBJECT-GROUP
+    OBJECTS     { m2paSctpNoDelay, m2paSctpMaxseg, m2paSctpHeartbeatItvl, 
+                  m2paSctpHeartbeat, m2paSctpRtoInitial, m2paSctpRtoMin, 
+                  m2paSctpRtoMax, m2paSctpPathMaxRetrans, 
+                  m2paSctpCookieLife, m2paSctpCookieInc, 
+                  m2paSctpMaxInitRetries, m2paSctpMaxBurst, 
+                  m2paSctpAssocMaxRetrans, m2paSctpSackDelay, 
+                  m2paSctpLifetime }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects that provides for basic M2PA SCTP 
+         management using this module."
+    ::= { m2paGroups 4 }
+
+m2paProvingPackage OBJECT-GROUP
+    OBJECTS     { m2paN1, m2paProving, m2paManagementProvingState, 
+                  m2paProvingAttempts }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects that implements a proving package."
+    ::= { m2paGroups 5 }
+
+m2paBufferMechanismPackage OBJECT-GROUP
+    OBJECTS     { m2paNumberOfThresholdLevels }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects that implement the buffer mechanism 
+         package."
+    ::= { m2paGroups 6 }
+
+m2paCongestionHandlingPackage OBJECT-GROUP
+    OBJECTS     { m2paCongestionCounting, 
+                  m2paCongestionReportingBaseObject }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects that implement the congestion handling 
+         package."
+    ::= { m2paGroups 7 }
+
+m2paMultipleTransmissionCongestionStatesPackage OBJECT-GROUP
+    OBJECTS     { m2paTimerTx, m2paTimerTy, m2paNumberOfCongestionStates, 
+                  m2paInitialLevelOfCongestion }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects that implement the multiple 
+         transmission congestion states package."
+    ::= { m2paGroups 8 }
+
+m2paReceiveCongestionLevelPackage OBJECT-GROUP
+    OBJECTS     { m2paReceiveCongestionThresholdAbatement, 
+                  m2paReceiveCongestionThresholdOnset, 
+                  m2paReceiveCongestionThresholdDiscard }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects that implement the receive 
+         congestion level package."
+    ::= { m2paGroups 9 }
+
+m2paProtocolProfileNamePackage OBJECT-GROUP
+    OBJECTS     { m2paProtocolProfileName }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects that implement the protocol profile 
+         name package."
+    ::= { m2paGroups 10 }
+
+m2paThresholdsForMultCongLevelsPackage OBJECT-GROUP
+    OBJECTS     { m2paTransCongThresholdAbatementL2Messages, 
+                  m2paTransCongThresholdAbatementL2Octets, 
+                  m2paTransCongThresholdOnsetL2Messages, 
+                  m2paTransCongThresholdOnsetL2Octets, 
+                  m2paTransCongThresholdAbatementL3Messages, 
+                  m2paTransCongThresholdAbatementL3Octets, 
+                  m2paTransCongThresholdOnsetL3Messages, 
+                  m2paTransCongThresholdOnsetL3Octets }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects that implement the thresholds for 
+         multiple congestion levels package."
+    ::= { m2paGroups 11 }
+
+m2paThresholdsForMultCongLevelsWithPrioPackage OBJECT-GROUP
+    OBJECTS     { m2paTransCongThresholdDiscardL1Messages, 
+                  m2paTransCongThresholdDiscardL1Octets, 
+                  m2paTransCongThresholdDiscardL2Messages, 
+                  m2paTransCongThresholdDiscardL2Octets, 
+                  m2paTransCongThresholdDiscardL3Messages, 
+                  m2paTransCongThresholdDiscardL3Octets }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects that implement the thresholds for 
+         multiple congestion levels with message priority package."
+    ::= { m2paGroups 12 }
+
+m2paFullCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "A compliance profile for implementations that 
+         implement all of the features of this module."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { m2paObjectGroup }
+
+    ::= { m2paCompliances 1 }
+
+m2paCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "A compliance profile for implementations that implement 
+         some of the feaures of this module."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { m2paBasicSS7Group, 
+                  m2paBasicSS7TransmitCongestionPackage, 
+                  m2paBasicSCTPGroup, m2paProvingPackage }
+
+-- The proving package provides the ability to specify whether 
+-- proving is performed during signalling link alignment 
+-- procedures and the number of proving attempts that will be 
+-- peformed.  Because the proving characteristics of the 
+-- signalling link may be dictated by the pertinent SS7 
+-- signalling link protocol variant, this is a mandatory 
+-- package.
+
+        GROUP   m2paBufferMechanismPackage
+        DESCRIPTION   
+              "The buffer mechanism package provides for a 
+               number of congestion levels in contrast to the 
+               single congestion level of ITU-T international 
+               SS7 signalling variants.
+               
+               This group is required when the implementation 
+               supports congestion based on buffer occupancy."
+
+        GROUP   m2paCongestionHandlingPackage
+        DESCRIPTION   
+              "The congestion handling package provides a 
+               mechanism for transmit buffer congestion 
+               handling.  It specifies the basis (octets, 
+               messages or both) on which congestion is counted 
+               and specifies on what basis congestion is 
+               reported.  This group is required when the MTP 
+               Level 3 protocol requires congestion handling."
+
+        GROUP   m2paMultipleTransmissionCongestionStatesPackage
+        DESCRIPTION   
+              "When this package is present and in use for the 
+               M2PA instance, neither the thresholds for 
+               multiple congestion levels package nor the 
+               thresholds for multiple congestion levels with 
+               message priorities packages can be in use for the 
+               same M2PA instance.
+               
+               When present a in use, this group provides timers 
+               x and y, the number of congestion states and the 
+               initial level of congestion.  Support for this 
+               group is required when the implementation 
+               supports the multiple transmission congestion 
+               states feature of SS7."
+
+        GROUP   m2paReceiveCongestionLevelPackage
+        DESCRIPTION   
+              "When this package is present and in use for an 
+               M2PA instance, it specifies the abatement, onset 
+               and discard thresholds for receive congestion.  
+               Support for this group is required when the 
+               implementation supports receive congestion using 
+               receive buffer occupancy."
+
+        GROUP   m2paProtocolProfileNamePackage
+        DESCRIPTION   
+              "When this package is present and in use for an 
+               M2PA instance, a number of the parameters are 
+               populated from the named profile.  Support for 
+               this group is optional."
+
+        GROUP   m2paThresholdsForMultCongLevelsPackage
+        DESCRIPTION   
+              "When this package is present and in use for the 
+               M2PA instance, the M2PA mutliple transmission 
+               states package cannot also be in use for the same 
+               M2PA instance.
+               
+               When present and in use this group provides 
+               additional abatement and onset buffer occupancy 
+               thresholds for congestion levels two and three.  
+               Support for this group is required when the 
+               implementation supports the multiple congestion 
+               levels feature of SS7."
+
+        GROUP   m2paThresholdsForMultCongLevelsWithPrioPackage
+        DESCRIPTION   
+              "When this package is present and in use for the 
+               M2PA instances, the M2PA thresholds for multiple 
+               congestion levels package must also be present 
+               and in use for the M2PA isntance.
+               
+               When present and in use this group provides 
+               transmit buffer occupancy discard thresholds for 
+               levels one, two and three.  Support for this 
+               group is required when the implementation 
+               supports the multiple congestion levels with 
+               message priorities feature of SS7."
+
+        -- m2paBasicSS7Group
+        OBJECT  m2paLoopDelayLower
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paLoopDelayUpper
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransmissionRateIntervalLower
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransmissionRateIntervalUpper
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTimerT1
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTimerT2
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTimerT2L
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTimerT2H
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTimerT3
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTimerT4N
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTimerT4E
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTimerT6
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTimerT7
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        -- m2paBasicSS7TransmitCongestionPackage
+        OBJECT  m2paCongestionCounting
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paCongestionReportingBaseObject
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdAbatementL1Messages
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdAbatementL1Octets
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdOnsetL1Messages
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdOnsetL1Octets
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              ""
+
+        -- m2paBasicSCTPGroup
+        OBJECT  m2paSctpNoDelay
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpMaxseg
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpHeartbeatItvl
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpHeartbeat
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpRtoInitial
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpRtoMin
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpRtoMax
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpPathMaxRetrans
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpCookieLife
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpCookieInc
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpMaxInitRetries
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpMaxBurst
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpAssocMaxRetrans
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpSackDelay
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paSctpLifetime
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              ""
+
+        -- m2paProvingPackage OBJECT-GROUP
+        OBJECT  m2paN1
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "It is not required that the implementation 
+               support setting of the number of proving messages 
+               sent during the proving period, but it is 
+               required that the implementation report the 
+               setting.
+               
+               Where proving is performed on a timer basis (T4), 
+               this is the number of messages that would be 
+               transferred during the proving period if the 
+               association provides the expected tranmission 
+               bandwidth."
+
+        OBJECT  m2paProving
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "It is not required that the implementation 
+               support selection of proving, but it is required 
+               that the implementation report the current 
+               setting."
+
+        OBJECT  m2paManagementProvingState
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "It is not required that the implementation 
+               support setting of proving state, but it is 
+               required that the implementation report the 
+               current settings."
+
+        OBJECT  m2paProvingAttempts
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "For proving following Q.703 or ANSI T1.111.3 the 
+               number of proving attempts is fixed and can be a 
+               read-only value."
+
+        -- m2paBufferMechanismPackage OBJECT-GROUP
+        OBJECT  m2paNumberOfThresholdLevels
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "When the m2paBufferMechanismPackage is provided, 
+               this object is available."
+
+        -- m2paCongestionHandlingPackage OBJECT-GROUP
+        OBJECT  m2paCongestionCounting
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "When the m2paCongestionHandlingPackage is 
+               provided, this object is available.  However, 
+               some implementation may implement this as a 
+               read-only object, and the implementation might 
+               only one value."
+
+        OBJECT  m2paCongestionReportingBaseObject
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              "When the m2paCongestionHandlingPackage is 
+               provided, this object is available.  However, as 
+               the object applies more to MTP Level 3 than Level 
+               2, making the object accessible is optional."
+
+        -- m2paMultipleTransmissionCongestionStatesPackage OBJECT-GROUP
+        OBJECT  m2paTimerTx
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTimerTy
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paNumberOfCongestionStates
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paInitialLevelOfCongestion
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        -- m2paReceiveCongestionLevelPackage OBJECT-GROUP
+        OBJECT  m2paReceiveCongestionThresholdAbatement
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paReceiveCongestionThresholdOnset
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paReceiveCongestionThresholdDiscard
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        -- m2paProtocolProfileNamePackage OBJECT-GROUP
+        OBJECT  m2paProtocolProfileName
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        -- m2paThresholdsForMultCongLevelsPackage OBJECT-GROUP
+        OBJECT  m2paTransCongThresholdAbatementL2Messages
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdAbatementL2Octets
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdOnsetL2Messages
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdOnsetL2Octets
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdAbatementL3Messages
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdAbatementL3Octets
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdOnsetL3Messages
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdOnsetL3Octets
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        -- m2paThresholdsForMultCongLevelsWithPrioPackage OBJECT-GROUP
+        OBJECT  m2paTransCongThresholdDiscardL1Messages
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdDiscardL1Octets
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdDiscardL2Messages
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdDiscardL2Octets
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdDiscardL3Messages
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+        OBJECT  m2paTransCongThresholdDiscardL3Octets
+        MIN-ACCESS  read-write
+        DESCRIPTION   
+              ""
+
+    ::= { m2paCompliances 2 }
+
+m2paBasicCongestionCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "This compliance profile provides compliance for 
+         implementations providing basic transmission congestion 
+         handling."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { m2paBasicSS7Group, m2paBasicSCTPGroup, 
+                  m2paBasicSS7TransmitCongestionPackage, 
+                  m2paProvingPackage, m2paBufferMechanismPackage, 
+                  m2paCongestionHandlingPackage }
+
+        GROUP   m2paReceiveCongestionLevelPackage
+        DESCRIPTION   
+              "This group is optional."
+
+        GROUP   m2paProtocolProfileNamePackage
+        DESCRIPTION   
+              "This group is optional."
+
+    ::= { m2paCompliances 3 }
+
+m2paMultipleCongestionStatesCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "This compliance profile provides compliance for 
+         implementations providing transmission congestion 
+         handling based on multiple congestion states."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { m2paBasicSS7Group, m2paBasicSCTPGroup, 
+                  m2paBasicSS7TransmitCongestionPackage, 
+                  m2paProvingPackage, m2paBufferMechanismPackage, 
+                  m2paCongestionHandlingPackage, 
+                  m2paMultipleTransmissionCongestionStatesPackage }
+
+        GROUP   m2paReceiveCongestionLevelPackage
+        DESCRIPTION   
+              "This group is optional."
+
+        GROUP   m2paProtocolProfileNamePackage
+        DESCRIPTION   
+              "This group is optional."
+
+    ::= { m2paCompliances 4 }
+
+m2paMultipleCongestionLevelsCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "This compliance profile provides compliance for 
+         implementations providing transmission congestion based 
+         on multiple congestion levels without message 
+         priorities."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { m2paBasicSS7Group, m2paBasicSCTPGroup, 
+                  m2paBasicSS7TransmitCongestionPackage, 
+                  m2paProvingPackage, m2paBufferMechanismPackage, 
+                  m2paCongestionHandlingPackage, 
+                  m2paThresholdsForMultCongLevelsPackage }
+
+        GROUP   m2paReceiveCongestionLevelPackage
+        DESCRIPTION   
+              "This group is optional."
+
+        GROUP   m2paProtocolProfileNamePackage
+        DESCRIPTION   
+              "This group is optional."
+
+    ::= { m2paCompliances 5 }
+
+m2paMultipleCongestionLeveslWithMessagePriorityCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "This compliance profile provides compliance for 
+         implementations providing transmission congestoin based 
+         on multiple congestion levels with message priority."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { m2paBasicSS7Group, m2paBasicSCTPGroup, 
+                  m2paBasicSS7TransmitCongestionPackage, 
+                  m2paProvingPackage, m2paBufferMechanismPackage, 
+                  m2paCongestionHandlingPackage, 
+                  m2paThresholdsForMultCongLevelsPackage, 
+                  m2paThresholdsForMultCongLevelsWithPrioPackage }
+
+        GROUP   m2paReceiveCongestionLevelPackage
+        DESCRIPTION   
+              "This group is optional."
+
+        GROUP   m2paProtocolProfileNamePackage
+        DESCRIPTION   
+              "This group is optional."
+
+    ::= { m2paCompliances 6 }
+
+END -- end of module OPENSS7-M2PA-MIB.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et

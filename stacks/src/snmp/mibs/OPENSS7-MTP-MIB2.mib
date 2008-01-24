@@ -1,7 +1,7 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=64 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MTP-MIB2.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/01/10 19:55:42 $
+-- @(#) $RCSfile: OPENSS7-MTP-MIB2.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/01/24 17:40:57 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008/01/10 19:55:42 $ by $Author: brian $
+-- Last Modified $Date: 2008/01/24 17:40:57 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MTP-MIB2.mib,v $
+-- Revision 0.9.2.4  2008/01/24 17:40:57  brian
+-- - updated mibs
+--
 -- Revision 0.9.2.3  2008/01/10 19:55:42  brian
 -- - updating mibs
 --
@@ -66,2231 +69,2516 @@
 OPENSS7-MTP-MIB2 DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE
-		FROM SNMPv2-SMI
+    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
 
-	RowStatus, TimeInterval
-		FROM SNMPv2-TC
+    RowStatus, TimeInterval
+        FROM SNMPv2-TC
 
-	SnmpAdminString
-		FROM SNMP-FRAMEWORK-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
 
-	MtpTransmissionRate
-		FROM OPENSS7-MTP-TC
+    MtpTransmissionRate
+        FROM OPENSS7-MTP-TC
 
-	openss7
-		FROM OPENSS7-SMI;
+    openss7
+        FROM OPENSS7-SMI;
 
 mtpMIB2 MODULE-IDENTITY
-	LAST-UPDATED
-		"200709301118Z"
-	ORGANIZATION
-		"The OpenSS7 Project"
-	CONTACT-INFO
-		"Brian Bidulock
-		 OpenSS7 Corporation
-		 1469 Jefferys Crescent
-		 Edmonton, Alberta  T6L 6T1
-		 CANADA
-		 Tel: +1 780 490 1141
-		 Fax: +1 780 490 1241
-		 Mob: +1 780 953 0557
-		 mailto:bidulock@openss7.org"
-	DESCRIPTION
-		"Second crack at SS7 MTP MIB."
-	::= { openss7 17 751 1 }
+    LAST-UPDATED
+        "200709301118Z"
+    ORGANIZATION
+        "The OpenSS7 Project"
+    CONTACT-INFO
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta  T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         mailto:bidulock@openss7.org"
+    DESCRIPTION
+        "Second crack at SS7 MTP MIB."
+    ::= { openss7 17 751 1 }
 
 -- top level organization of the MIB
 
-mtpNotifications	OBJECT IDENTIFIER ::= { mtpMIB2		 0 }
-mtpObjects		OBJECT IDENTIFIER ::= { mtpMIB2		 1 }
-mtpConformance		OBJECT IDENTIFIER ::= { mtpMIB2		 2 }
+mtpNotifications OBJECT IDENTIFIER
+    ::= { mtpMIB2 0 }
 
-mtpScalars		OBJECT IDENTIFIER ::= { mtpObjects	 1 }
-mtpTables		OBJECT IDENTIFIER ::= { mtpObjects	 2 }
-mtpOids			OBJECT IDENTIFIER ::= { mtpObjects	 3 }
-mtpNotifObjects		OBJECT IDENTIFIER ::= { mtpObjects	 4 }
-
-mtpCompliances		OBJECT IDENTIFIER ::= { mtpConformance	 1 }
-mtpGroups		OBJECT IDENTIFIER ::= { mtpConformance	 2 }
-
-mtpL2Profile		OBJECT IDENTIFIER ::= { mtpTables	 1 }
-mtpLkProfile		OBJECT IDENTIFIER ::= { mtpTables	 2 }
-mtpLsProfile		OBJECT IDENTIFIER ::= { mtpTables	 3 }
-mtpRtProfile		OBJECT IDENTIFIER ::= { mtpTables	 4 }
-mtpRsProfile		OBJECT IDENTIFIER ::= { mtpTables	 5 }
-mtpSpProfile		OBJECT IDENTIFIER ::= { mtpTables	 6 }
-mtpNaProfile		OBJECT IDENTIFIER ::= { mtpTables	 7 }
-
-mtpNa			OBJECT IDENTIFIER ::= { mtpTables	 8 }
-mtpSp			OBJECT IDENTIFIER ::= { mtpTables	 9 }
-mtpRs			OBJECT IDENTIFIER ::= { mtpTables	10 }
-mtpRl			OBJECT IDENTIFIER ::= { mtpTables	11 }
-mtpRt			OBJECT IDENTIFIER ::= { mtpTables	12 }
-mtpLs			OBJECT IDENTIFIER ::= { mtpTables	13 }
-mtpLk			OBJECT IDENTIFIER ::= { mtpTables	14 }
-mtpSl			OBJECT IDENTIFIER ::= { mtpTables	15 }
-mtpL2			OBJECT IDENTIFIER ::= { mtpTables	16 }
-
-mtpProtocols		OBJECT IDENTIFIER ::= { mtpOids		 1 }
-
+mtpObjects OBJECT IDENTIFIER
+    ::= { mtpMIB2 1 }
 
 -- ====================================================================
 
 -- ====================================================================
 
 -- ====================================================================
+
+mtpL2 OBJECT IDENTIFIER
+    ::= { mtpObjects 1 }
+
+mtpL2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpL2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2 1 }
+
+mtpL2Entry OBJECT-TYPE
+    SYNTAX      MtpL2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mtpL2Index }
+    ::= { mtpL2Table 1 }
+
+MtpL2Entry ::= SEQUENCE {
+    mtpL2Index                  Unsigned32,
+    mtpL2Name                   CommonLanguageName,
+    mtpL2Profile                Unsigned32,
+    mtpL2TimerT1                TimeInterval,
+    mtpL2TimerT2                TimeInterval,
+    mtpL2TimerT2L               TimeInterval,
+    mtpL2TimerT2H               TimeInterval,
+    mtpL2TimerT3                TimeInterval,
+    mtpL2TimerT4N               TimeInterval,
+    mtpL2TimerT4E               TimeInterval,
+    mtpL2TimerT5                TimeInterval,
+    mtpL2TimerT6                TimeInterval,
+    mtpL2TimerT7                TimeInterval,
+    mtpL2N1                     Unsigned32,
+    mtpL2N2                     Unsigned32,
+    mtpL2RbAccept               Unsigned32,
+    mtpL2RbDiscard              Unsigned32,
+    mtpL2RbAbate                Unsigned32,
+    mtpL2TbAbate0               Unsigned32,
+    mtpL2TbOnset0               Unsigned32,
+    mtpL2TbDiscard0             Unsigned32,
+    mtpL2TbAbate1               Unsigned32,
+    mtpL2TbOnset1               Unsigned32,
+    mtpL2TbDiscard1             Unsigned32,
+    mtpL2TbAbate2               Unsigned32,
+    mtpL2TbOnset2               Unsigned32,
+    mtpL2TbDiscard2             Unsigned32,
+    mtpL2InserviceDuration      Counter32,  -- Q.752, 1.1
+    mtpL2AlignmentFailures      Counter32,  -- Q.752, 1.7
+    mtpL2SusInError             Counter32,  -- Q.752, 1.8
+    mtpL2NacksReceived          Counter32,  -- Q.752, 1.9
+    mtpL2OctetsSent             Counter32,  -- Q.752, 3.1
+    mtpL2OctetsReSent           Counter32,  -- Q.752, 3.2
+    mtpL2MsusSent               Counter32,  -- Q.752, 3.3
+    mtpL2OctetsRecv             Counter32,  -- Q.752, 3.4
+    mtpL2MsusRecv               Counter32,  -- Q.752, 3.5
+    mtpL2SibsSent               Counter32,  -- Q.752, 2.15
+    mtpL2TimeDiscontinuity      TimeStamp,
+    mtpL2Status                 RowStatus
+}
+
+mtpL2Index OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 1 }
+
+mtpL2Name OBJECT-TYPE
+    SYNTAX      CommonLanguageName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 2 }
+
+mtpL2Profile OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 3 }
+
+mtpL2TimerT1 OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 4 }
+
+mtpL2TimerT2 OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 5 }
+
+mtpL2TimerT2L OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 6 }
+
+mtpL2TimerT2H OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 7 }
+
+mtpL2TimerT3 OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 8 }
+
+mtpL2TimerT4N OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 9 }
+
+mtpL2TimerT4E OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 10 }
+
+mtpL2TimerT5 OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 11 }
+
+mtpL2TimerT6 OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 12 }
+
+mtpL2TimerT7 OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 13 }
+
+mtpL2N1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 14 }
+
+mtpL2N2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 15 }
+
+mtpL2RbAccept OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 16 }
+
+mtpL2RbDiscard OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 17 }
+
+mtpL2RbAbate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 18 }
+
+mtpL2TbAbate0 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 19 }
+
+mtpL2TbOnset0 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 20 }
+
+mtpL2TbDiscard0 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 21 }
+
+mtpL2TbAbate1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 22 }
+
+mtpL2TbOnset1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 23 }
+
+mtpL2TbDiscard1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 24 }
+
+mtpL2TbAbate2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 25 }
+
+mtpL2TbOnset2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 26 }
+
+mtpL2TbDiscard2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Entry 27 }
+
+mtpL2InserviceDuration OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE   
+        "ITU-T Rec. Q.752, Table 1.1"
+    ::= { mtpL2Entry 28 }
+
+mtpL2AlignmentFailures OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE   
+        "ITU-T Rec. Q.752, Table 1.7"
+    ::= { mtpL2Entry 29 }
+
+mtpL2SusInError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE   
+        "ITU-T Rec. Q.752, Table 1.8"
+    ::= { mtpL2Entry 30 }
+
+mtpL2NacksReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE   
+        "ITU-T Rec. Q.752, Table 1.9"
+    ::= { mtpL2Entry 31 }
+
+mtpL2OctetsSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE   
+        "ITU-T Rec. Q.752, Table 3.1"
+    ::= { mtpL2Entry 32 }
+
+mtpL2OctetsReSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE   
+        "ITU-T Rec. Q.752, Table 3.2"
+    ::= { mtpL2Entry 33 }
+
+mtpL2MsusSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE   
+        "ITU-T Rec. Q.752, Table 3.3"
+    ::= { mtpL2Entry 34 }
+
+mtpL2OctetsRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE   
+        "ITU-T Rec. Q.752, Table 3.4"
+    ::= { mtpL2Entry 35 }
+
+mtpL2MsusRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE   
+        "ITU-T Rec. Q.752, Table 3.5"
+    ::= { mtpL2Entry 36 }
+
+mtpL2SibsSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE   
+        "ITU-T Rec. Q.752, Table 2.15"
+    ::= { mtpL2Entry 37 }
+
+mtpL2TimeDiscontinuity OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpL2Entry 38 }
+
+mtpL2Status OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpL2Entry 39 }
+
+
+mtpL2Profile OBJECT IDENTIFIER
+    ::= { mtpL2 2 }
 
 mtpL2ProfileNextIndex OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Provides the next available index in the SL protocol 
-		 profile table.  When a get operation returns zero (0), 
-		 there are no more entries available for use in the 
-		 table (i.e. the table is full)."
-	REFERENCE	"STD 58"
-	::= { mtpL2Profile 1 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provides the next available index in the SL protocol 
+         profile table.  When a get operation returns zero (0), 
+         there are no more entries available for use in the 
+         table (i.e. the table is full)."
+    REFERENCE   "STD 58"
+    ::= { mtpL2Profile 1 }
 
 mtpL2ProfileTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF MtpL2ProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"Provides the MTP SL protocol profile table.  This able 
-		 contains MTP Level 2 protocol profiles for various 
-		 transmission rates."
-	::= { mtpL2Profile 2 }
+    SYNTAX      SEQUENCE OF MtpL2ProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides the MTP SL protocol profile table.  This able 
+         contains MTP Level 2 protocol profiles for various 
+         transmission rates."
+    ::= { mtpL2Profile 2 }
 
 mtpL2ProfileEntry OBJECT-TYPE
-	SYNTAX		MtpL2ProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"Provides the MTP SL protocol profile table entry.  
-		 Included in the entry is the transmission rate which is 
-		 applicable to the entry as well as the settings of the 
-		 various timer values and other fundamental protocol 
-		 parameters.  Each entry can be referred to by index or 
-		 by RowPointer.  When a table refers to this one, the 
-		 agent should ensure the consistency of MTP SL values 
-		 with the transmission rate of the referencing table, 
-		 and the MTP L3 protocol values associated with the 
-		 referenceing table."
-	INDEX	{
-			mtpL2ProfileIndex,
-			mtpL2ProfileTransmissionRate
-		}
-	::= { mtpL2ProfileTable 1 }
+    SYNTAX      MtpL2ProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides the MTP SL protocol profile table entry.  
+         Included in the entry is the transmission rate which is 
+         applicable to the entry as well as the settings of the 
+         various timer values and other fundamental protocol 
+         parameters.  Each entry can be referred to by index or 
+         by RowPointer.  When a table refers to this one, the 
+         agent should ensure the consistency of MTP SL values 
+         with the transmission rate of the referencing table, 
+         and the MTP L3 protocol values associated with the 
+         referenceing table."
+    INDEX   {
+            mtpL2ProfileIndex,
+            mtpL2ProfileTransmissionRate
+        }
+    ::= { mtpL2ProfileTable 1 }
 
-MtpL2ProfileEntry ::=
-	SEQUENCE {
-		mtpL2ProfileIndex
-			Unsigned32,
-		mtpL2ProfileTransmissionRate
-			MtpTransmissionRate,
-		mtpL2ProfileName
-			SnmpAdminString,
-		mtpL2ProfileTimerT1
-			TimeInterval,
-		mtpL2ProfileTimerT2
-			TimeInterval,
-		mtpL2ProfileTimerT2L
-			TimeInterval,
-		mtpL2ProfileTimerT2H
-			TimeInterval,
-		mtpL2ProfileTimerT3
-			TimeInterval,
-		mtpL2ProfileTimerT4N
-			TimeInterval,
-		mtpL2ProfileTimerT4E
-			TimeInterval,
-		mtpL2ProfileTimerT5
-			TimeInterval,
-		mtpL2ProfileTimerT6
-			TimeInterval,
-		mtpL2ProfileTimerT7
-			TimeInterval,
-		mtpL2ProfileN1
-			Unsigned32,
-		mtpL2ProfileN2
-			Unsigned32,
-		mtpL2ProfileRbAccept
-			Unsigned32,
-		mtpL2ProfileRbDiscard
-			Unsigned32,
-		mtpL2ProfileRbAbate
-			Unsigned32,
-		mtpL2ProfileTbAbate0
-			Unsigned32,
-		mtpL2ProfileTbOnset0
-			Unsigned32,
-		mtpL2ProfileTbDiscard0
-			Unsigned32,
-		mtpL2ProfileTbAbate1
-			Unsigned32,
-		mtpL2ProfileTbOnset1
-			Unsigned32,
-		mtpL2ProfileTbDiscard1
-			Unsigned32,
-		mtpL2ProfileTbAbate2
-			Unsigned32,
-		mtpL2ProfileTbOnset2
-			Unsigned32,
-		mtpL2ProfileTbDiscard2
-			Unsigned32,
-		mtpL2ProfileStatus
-			RowStatus
-	} 
+MtpL2ProfileEntry ::= SEQUENCE {
+    mtpL2ProfileIndex                   Unsigned32,
+    mtpL2ProfileTransmissionRate        MtpTransmissionRate,
+    mtpL2ProfileName                    SnmpAdminString,
+    mtpL2ProfileTimerT1                 TimeInterval,
+    mtpL2ProfileTimerT2                 TimeInterval,
+    mtpL2ProfileTimerT2L                TimeInterval,
+    mtpL2ProfileTimerT2H                TimeInterval,
+    mtpL2ProfileTimerT3                 TimeInterval,
+    mtpL2ProfileTimerT4N                TimeInterval,
+    mtpL2ProfileTimerT4E                TimeInterval,
+    mtpL2ProfileTimerT5                 TimeInterval,
+    mtpL2ProfileTimerT6                 TimeInterval,
+    mtpL2ProfileTimerT7                 TimeInterval,
+    mtpL2ProfileN1                      Unsigned32,
+    mtpL2ProfileN2                      Unsigned32,
+    mtpL2ProfileRbAccept                Unsigned32,
+    mtpL2ProfileRbDiscard               Unsigned32,
+    mtpL2ProfileRbAbate                 Unsigned32,
+    mtpL2ProfileTbAbate0                Unsigned32,
+    mtpL2ProfileTbOnset0                Unsigned32,
+    mtpL2ProfileTbDiscard0              Unsigned32,
+    mtpL2ProfileTbAbate1                Unsigned32,
+    mtpL2ProfileTbOnset1                Unsigned32,
+    mtpL2ProfileTbDiscard1              Unsigned32,
+    mtpL2ProfileTbAbate2                Unsigned32,
+    mtpL2ProfileTbOnset2                Unsigned32,
+    mtpL2ProfileTbDiscard2              Unsigned32,
+    mtpL2ProfileStatus                  RowStatus
+} 
 
 mtpL2ProfileIndex OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"Provides an index into the MTP SL protocol profile 
-		 table.  Rows in this table can be referred to using 
-		 this index or using the RowTable pointer.  Other 
-		 vendors requiring additional device specific profile 
-		 information can augment this table.  The index value 
-		 zero (0) has special semantics.  The zero index 
-		 contains default default values."
-	::= { mtpL2ProfileEntry 1 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides an index into the MTP SL protocol profile 
+         table.  Rows in this table can be referred to using 
+         this index or using the RowTable pointer.  Other 
+         vendors requiring additional device specific profile 
+         information can augment this table.  The index value 
+         zero (0) has special semantics.  The zero index 
+         contains default default values."
+    ::= { mtpL2ProfileEntry 1 }
 
 mtpL2ProfileTransmissionRate OBJECT-TYPE
-	SYNTAX		MtpTransmissionRate
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 2 }
+    SYNTAX      MtpTransmissionRate
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 2 }
 
 mtpL2ProfileName OBJECT-TYPE
-	SYNTAX		SnmpAdminString
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpL2ProfileEntry 3 }
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpL2ProfileEntry 3 }
 
 mtpL2ProfileTimerT1 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"MTP Level 2 T1 timer.
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "MTP Level 2 T1 timer.
 
-		 For modems, ITU-T specifies a range from 500 to 600 
-		 seconds with a nominal value of 550 seconds.  For ds0, 
-		 ITU-T specifies a range from 40 to 50 seconds with a 
-		 nominal value of 45 seconds.  For t1 and e1, ITU-T 
-		 specifies a range of 25 to 360 seconds with a nomiinal 
-		 value of 300 seconds.
+         For modems, ITU-T specifies a range from 500 to 600 
+         seconds with a nominal value of 550 seconds.  For ds0, 
+         ITU-T specifies a range from 40 to 50 seconds with a 
+         nominal value of 45 seconds.  For t1 and e1, ITU-T 
+         specifies a range of 25 to 360 seconds with a nomiinal 
+         value of 300 seconds.
 
-		 For ds0a and ds0, ANSI specifies a range from 12.9 to 16 
-		 seconds, with a nominal value of 13 seconds.  For t1, 
-		 ANSI specifies a range of 165 to 200 seconds with a 
-		 nominal value of 170 seconds.
+         For ds0a and ds0, ANSI specifies a range from 12.9 to 16 
+         seconds, with a nominal value of 13 seconds.  For t1, 
+         ANSI specifies a range of 165 to 200 seconds with a 
+         nominal value of 170 seconds.
 
-		 It is the responsibility of the agent to enforce any 
-		 necessary bounds."
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 4 }
+         It is the responsibility of the agent to enforce any 
+         necessary bounds."
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 4 }
 
 mtpL2ProfileTimerT2 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"MTP Level 2 T2 timer."
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 5 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "MTP Level 2 T2 timer."
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 5 }
 
 mtpL2ProfileTimerT2L OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"MTP Level 2 T2 timer: low value for automatic 
-		 allocation of signalling data terminals."
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 6 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "MTP Level 2 T2 timer: low value for automatic 
+         allocation of signalling data terminals."
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 6 }
 
 mtpL2ProfileTimerT2H OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"MTP Level 2 T2 timer: high value for automatic 
-		 allocation of signalling data terminals."
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 7 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "MTP Level 2 T2 timer: high value for automatic 
+         allocation of signalling data terminals."
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 7 }
 
 mtpL2ProfileTimerT3 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"MTP Level 2 T3 timer."
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 8 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "MTP Level 2 T3 timer."
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 8 }
 
 mtpL2ProfileTimerT4N OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"MTP Level 2 T4n (normal) timer.
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "MTP Level 2 T4n (normal) timer.
 
-		ITU-T 4800            110s (100-120s) (2^16)
-		ITU-T 64              8.2s (7.5-9.5s) (2^16)
-		ITU-T 1.536/1.984Mbps 30s (3-70s) (2^16)
-		ANSI  64/56           2.3s (+-10%) (2^14)
-		ANSI  1.536           30s (+-10%)
-		"
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 9 }
+        ITU-T 4800            110s (100-120s) (2^16)
+        ITU-T 64              8.2s (7.5-9.5s) (2^16)
+        ITU-T 1.536/1.984Mbps 30s (3-70s) (2^16)
+        ANSI  64/56           2.3s (+-10%) (2^14)
+        ANSI  1.536           30s (+-10%)
+        "
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 9 }
 
 mtpL2ProfileTimerT4E OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"MTP Level 2 T4e (emergency) timer.
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "MTP Level 2 T4e (emergency) timer.
 
-		ITU-T 4800            7s (6-8s) (2^12)
-		ITU-T 64              500ms (400-600ms) (2^12)
-		ITU-T 1.536/1.984Mbps 400-600ms (2^12)
-		ANSI  64/56           0.6s (+-10%) (2^12)
-		ANSI  1.536           5s (+-10%)
-		"
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 10 }
+        ITU-T 4800            7s (6-8s) (2^12)
+        ITU-T 64              500ms (400-600ms) (2^12)
+        ITU-T 1.536/1.984Mbps 400-600ms (2^12)
+        ANSI  64/56           0.6s (+-10%) (2^12)
+        ANSI  1.536           5s (+-10%)
+        "
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 10 }
 
 mtpL2ProfileTimerT5 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"MTP Level 2 T5 timer."
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 11 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "MTP Level 2 T5 timer."
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 11 }
 
 mtpL2ProfileTimerT6 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"MTP Level 2 T6 timer."
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 12 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "MTP Level 2 T6 timer."
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 12 }
 
 mtpL2ProfileTimerT7 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"MTP Level 2 T7 timer."
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 13 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "MTP Level 2 T7 timer."
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 13 }
 
 mtpL2ProfileN1 OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 14 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 14 }
 
 mtpL2ProfileN2 OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 15 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 15 }
 
 mtpL2ProfileRbAccept OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 16 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 16 }
 
 mtpL2ProfileRbDiscard OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 17 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 17 }
 
 mtpL2ProfileRbAbate OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
-	::= { mtpL2ProfileEntry 18 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.703 (1996), ANSI T1.111.3/2000"
+    ::= { mtpL2ProfileEntry 18 }
 
 mtpL2ProfileTbAbate0 OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
-	::= { mtpL2ProfileEntry 19 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
+    ::= { mtpL2ProfileEntry 19 }
 
 mtpL2ProfileTbOnset0 OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
-	::= { mtpL2ProfileEntry 20 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
+    ::= { mtpL2ProfileEntry 20 }
 
 mtpL2ProfileTbDiscard0 OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
-	::= { mtpL2ProfileEntry 21 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
+    ::= { mtpL2ProfileEntry 21 }
 
 mtpL2ProfileTbAbate1 OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
-	::= { mtpL2ProfileEntry 22 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
+    ::= { mtpL2ProfileEntry 22 }
 
 mtpL2ProfileTbOnset1 OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
-	::= { mtpL2ProfileEntry 23 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
+    ::= { mtpL2ProfileEntry 23 }
 
 mtpL2ProfileTbDiscard1 OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
-	::= { mtpL2ProfileEntry 24 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
+    ::= { mtpL2ProfileEntry 24 }
 
 mtpL2ProfileTbAbate2 OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
-	::= { mtpL2ProfileEntry 25 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
+    ::= { mtpL2ProfileEntry 25 }
 
 mtpL2ProfileTbOnset2 OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
-	::= { mtpL2ProfileEntry 26 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
+    ::= { mtpL2ProfileEntry 26 }
 
 mtpL2ProfileTbDiscard2 OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
-	::= { mtpL2ProfileEntry 27 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
+    ::= { mtpL2ProfileEntry 27 }
 
 mtpL2ProfileStatus OBJECT-TYPE
-	SYNTAX		RowStatus
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpL2ProfileEntry 28 }
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpL2ProfileEntry 28 }
+
+mtpL2Int5minTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpL2Int5minEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides a 5 minute interval table for MTP Level 2 
+         statistics."
+    ::= { mtpL2 3 }
+
+mtpL2Int5minEntry OBJECT-TYPE
+    SYNTAX      MtpL2Int5minEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in the table represents statistics collected 
+         for one 5 minute interval.  The first interval in the 
+         table is the most recent 5 minute interval, beginning 
+         with 1."
+    INDEX       { mtpL2Int5minInterval }
+    ::= { mtpL2Int5minTable 1 }
+
+MtpL2Int5minEntry ::= SEQUENCE {
+    mtpL2Int5minInterval                Unsigned32,
+    mtpL2Int5minTimestamp               TimeStamp,
+    mtpL2Int5minInserviceDuration       Gauge32,    -- Q.752, 1.1
+    mtpL2Int5minAlignmentFailures       Gauge32,    -- Q.752, 1.7
+    mtpL2Int5minSusInError              Gauge32,    -- Q.752, 1.8
+    mtpL2Int5minNacksReceived           Gauge32,    -- Q.752, 1.9
+    mtpL2Int5minOctetsSent              Gauge32,    -- Q.752, 3.1
+    mtpL2Int5minOctetsReSent            Gauge32,    -- Q.752, 3.2
+    mtpL2Int5minMsusSent                Gauge32,    -- Q.752, 3.3
+    mtpL2Int5minOctetsRecv              Gauge32,    -- Q.752, 3.4
+    mtpL2Int5minMsusRecv                Gauge32,    -- Q.752, 3.5
+    mtpL2Int5minSibsSent                Gauge32     -- Q.752, 2.15
+}
+
+mtpL2Int5minInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpL2Int5minEntry 1 }
+
+mtpL2Int5minTimestamp OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpL2Int5minEntry 2 }
+
+mtpL2Int5minInserviceDuration OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 1.1"
+    ::= { mtpL2Int5minEntry 3 }
+
+mtpL2Int5minAlignmentFailures OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 1.7"
+    ::= { mtpL2Int5minEntry 4 }
+
+mtpL2Int5minSusInError OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 1.8"
+    ::= { mtpL2Int5minEntry 5 }
+
+mtpL2Int5minNacksReceived OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 1.9"
+    ::= { mtpL2Int5minEntry 6 }
+
+mtpL2Int5minOctetsSent OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 3.1"
+    ::= { mtpL2Int5minEntry 7 }
+
+mtpL2Int5minOctetsReSent OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 3.2"
+    ::= { mtpL2Int5minEntry 8 }
+
+mtpL2Int5minMsusSent OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 3.3"
+    ::= { mtpL2Int5minEntry 9 }
+
+mtpL2Int5minOctetsRecv OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 3.4"
+    ::= { mtpL2Int5minEntry 10 }
+
+mtpL2Int5minMsusRecv OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 3.5"
+    ::= { mtpL2Int5minEntry 11 }
+
+mtpL2Int5minSibsSent OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 2.15"
+    ::= { mtpL2Int5minEntry 12 }
+
+
+mtpL2Int30minTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpL2Int30minEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a 30 minute interval table for MTP Level 2 
+         statistics."
+    ::= { mtpL2 4 }
+
+mtpL2Int30minEntry OBJECT-TYPE
+    SYNTAX      MtpL2Int30minEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry in the table represents statistics collected 
+         for one 30 minute interval.  The first interval in the 
+         table is the most recent 30 minute interval, beginning 
+         with 1."
+    INDEX       { mtpL2Int30minInterval }
+    ::= { mtpL2Int30minTable 1 }
+
+MtpL2Int30minEntry ::= SEQUENCE {
+    mtpL2Int30minInterval               Unsigned32,
+    mtpL2Int30minTimestamp              TimeStamp,
+    mtpL2Int30minInserviceDuration      Gauge32,    -- Q.752, 1.1
+    mtpL2Int30minAlignmentFailures      Gauge32,    -- Q.752, 1.7
+    mtpL2Int30minSusInError             Gauge32,    -- Q.752, 1.8
+    mtpL2Int30minNacksReceived          Gauge32,    -- Q.752, 1.9
+    mtpL2Int30minOctetsSent             Gauge32,    -- Q.752, 3.1
+    mtpL2Int30minOctetsReSent           Gauge32,    -- Q.752, 3.2
+    mtpL2Int30minMsusSent               Gauge32,    -- Q.752, 3.3
+    mtpL2Int30minOctetsRecv             Gauge32,    -- Q.752, 3.4
+    mtpL2Int30minMsusRecv               Gauge32,    -- Q.752, 3.5
+    mtpL2Int30minSibsSent               Gauge32     -- Q.752, 2.15
+}
+
+mtpL2Int30minInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Int30minEntry xx }
+
+mtpL2Int30minTimestamp OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mtpL2Int30minEntry xx }
+
+mtpL2Int30minInserviceDuration OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 1.1"
+    ::= { mtpL2Int30minEntry xx }
+
+mtpL2Int30minAlignmentFailures OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 1.7"
+    ::= { mtpL2Int30minEntry xx }
+
+mtpL2Int30minSusInError OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 1.8"
+    ::= { mtpL2Int30minEntry xx }
+
+mtpL2Int30minNacksReceived OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 1.9"
+    ::= { mtpL2Int30minEntry xx }
+
+mtpL2Int30minOctetsSent OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 3.1"
+    ::= { mtpL2Int30minEntry xx }
+
+mtpL2Int30minOctetsReSent OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 3.2"
+    ::= { mtpL2Int30minEntry xx }
+
+mtpL2Int30minMsusSent OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 3.3"
+    ::= { mtpL2Int30minEntry xx }
+
+mtpL2Int30minOctetsRecv OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 3.4"
+    ::= { mtpL2Int30minEntry xx }
+
+mtpL2Int30minMsusRecv OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 3.5"
+    ::= { mtpL2Int30minEntry xx }
+
+mtpL2Int30minSibsSent OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.752, Table 2.15"
+    ::= { mtpL2Int30minEntry xx }
+
 
 -- ====================================================================
+
+mtpSl OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+mtpSlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpSlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSl 1 }
+
+mtpSlEntry OBJECT-TYPE
+    SYNTAX      MtpSlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { mtpSlIndex }
+    ::= { mtpSlTable 1 }
+
+MtpSlEntry ::= SEQUENCE {
+    mtpSlIndex                  Unsigned32,
+    mtpSlName                   CommonLanguageName,
+    mtpSlProfile                Unsigned32,
+    mtpSlTimerT1                TimeInterval,
+    mtpSlTimerT2                TimeInterval,
+    mtpSlTimerT3                TimeInterval,
+    mtpSlTimerT4                TimeInterval,
+    mtpSlTimerT5                TimeInterval,
+    mtpSlTimerT12               TimeInterval,
+    mtpSlTimerT13               TimeInterval,
+    mtpSlTimerT14               TimeInterval,
+    mtpSlTimerT17               TimeInterval,
+    mtpSlTimerT19A              TimeInterval,
+    mtpSlTimerT20A              TimeInterval,
+    mtpSlTimerT21A              TimeInterval,
+    mtpSlTimerT22               TimeInterval,
+    mtpSlTimerT23               TimeInterval,
+    mtpSlTimerT24               TimeInterval,
+    mtpSlTimerT31A              TimeInterval,
+    mtpSlTimerT32A              TimeInterval,
+    mtpSlTimerT33A              TimeInterval,
+    mtpSlTimerT34A              TimeInterval,
+    mtpSlTimerT1T               TimeInterval,
+    mtpSlTimerT2T               TimeInterval,
+    mtpSlTimerT1S               TimeInterval,
+    mtpSlL2Default              Unsigned32,
+    mtpSlTimeDiscontinuity      TimeStamp,
+    mtpSlUnavailDuration        Counter32,  -- Q.752, 2.1
+    mtpSlLocInhibDuration       Counter32,  -- Q.752, 2.5
+    mtpSlRemInhibDuration       Counter32,  -- Q.752, 2.6
+    mtpSlFailedDuration         Counter32,  -- Q.752, 2.7
+    mtpSlRemProcOutDuration     Counter32,  -- Q.752, 2.9
+    mtpSlLocInhibEvent          Counter32,  -- Q.752, 2.13
+    mtpSlLocUninhibEvent        Counter32,  -- Q.752, 2.14
+    mtpSlCongInds               Counter32,  -- Q.752, 3.6
+    mtpSlCongDuration           Counter32,  -- Q.752, 3.7
+    mtpSlCongMsusDiscarded      Counter32,  -- Q.752. 3.10
+    mtpSlCongLossOfMsus         Counter32,  -- Q.752, 3.11
+    mtpSlChangeovers            Counter32,  -- Q.752, 1.10
+    mtpSlChangebacks            Counter32,  -- Q.752, 1.11
+    mtpSlRestorations           Counter32,  -- Q.752, 1.12
+    mtpSlStatus                 RowStatus
+}
+
+mtpSlProfile OBJECT IDENTIFIER
+    ::= { mtpMIB2 xx }
 
 mtpSlProfileNextIndex OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Provides the next available index in the SL profile 
-		 table or zero if full."
-	::= { mtpSlProfile 1 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provides the next available index in the SL profile 
+         table or zero if full."
+    ::= { mtpSlProfile 1 }
 
 mtpSlProfileTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF MtpSlProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfile 2 }
+    SYNTAX      SEQUENCE OF MtpSlProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfile 2 }
 
 mtpSlProfileEntry OBJECT-TYPE
-	SYNTAX		MtpSlProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	INDEX	{
-			mtpSlProfileIndex
-		}
-	::= { mtpSlProfile 2 }
+    SYNTAX      MtpSlProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX   {
+            mtpSlProfileIndex
+        }
+    ::= { mtpSlProfileTable 2 }
 
-MtpSlProfileEntry ::=
-	SEQUENCE {
-		mtpSlProfileIndex
-			Unsigned32,
-		mtpSlProfileName
-			SnmpAdminString,
-		mtpSlProfileTimerT1
-			TimeInterval,
-		mtpSlProfileTimerT2
-			TimeInterval,
-		mtpSlProfileTimerT3
-			TimeInterval,
-		mtpSlProfileTimerT4
-			TimeInterval,
-		mtpSlProfileTimerT5
-			TimeInterval,
-		mtpSlProfileTimerT12
-			TimeInterval,
-		mtpSlProfileTimerT13
-			TimeInterval,
-		mtpSlProfileTimerT14
-			TimeInterval,
-		mtpSlProfileTimerT17
-			TimeInterval,
-		mtpSlProfileTimerT19A
-			TimeInterval,
-		mtpSlProfileTimerT20A
-			TimeInterval,
-		mtpSlProfileTimerT21A
-			TimeInterval,
-		mtpSlProfileTimerT22
-			TimeInterval,
-		mtpSlProfileTimerT23
-			TimeInterval,
-		mtpSlProfileTimerT24
-			TimeInterval,
-		mtpSlProfileTimerT31A
-			TimeInterval,
-		mtpSlProfileTimerT32A
-			TimeInterval,
-		mtpSlProfileTimerT33A
-			TimeInterval,
-		mtpSlProfileTimerT34A
-			TimeInterval,
-		mtpSlProfileTimerT1T
-			TimeInterval,
-		mtpSlProfileTimerT2T
-			TimeInterval,
-		mtpSlProfileTimerT1S
-			TimeInterval,
-		mtpSlProfileL2Default
-			Unsigned32,
-		mtpSlProfileStatus
-			RowStatus
-	}
+MtpSlProfileEntry ::= SEQUENCE {
+    mtpSlProfileIndex           Unsigned32,
+    mtpSlProfileName            SnmpAdminString,
+    mtpSlProfileTimerT1         TimeInterval,
+    mtpSlProfileTimerT2         TimeInterval,
+    mtpSlProfileTimerT3         TimeInterval,
+    mtpSlProfileTimerT4         TimeInterval,
+    mtpSlProfileTimerT5         TimeInterval,
+    mtpSlProfileTimerT12        TimeInterval,
+    mtpSlProfileTimerT13        TimeInterval,
+    mtpSlProfileTimerT14        TimeInterval,
+    mtpSlProfileTimerT17        TimeInterval,
+    mtpSlProfileTimerT19A       TimeInterval,
+    mtpSlProfileTimerT20A       TimeInterval,
+    mtpSlProfileTimerT21A       TimeInterval,
+    mtpSlProfileTimerT22        TimeInterval,
+    mtpSlProfileTimerT23        TimeInterval,
+    mtpSlProfileTimerT24        TimeInterval,
+    mtpSlProfileTimerT31A       TimeInterval,
+    mtpSlProfileTimerT32A       TimeInterval,
+    mtpSlProfileTimerT33A       TimeInterval,
+    mtpSlProfileTimerT34A       TimeInterval,
+    mtpSlProfileTimerT1T        TimeInterval,
+    mtpSlProfileTimerT2T        TimeInterval,
+    mtpSlProfileTimerT1S        TimeInterval,
+    mtpSlProfileL2Default       Unsigned32,
+    mtpSlProfileStatus          RowStatus
+}
 
 mtpSlProfileIndex OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 1 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 1 }
 
 mtpSlProfileName OBJECT-TYPE
-	SYNTAX		SnmpAdminString
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 2 }
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 2 }
 
 mtpSlProfileTimerT1 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 3 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 3 }
 
 mtpSlProfileTimerT2 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 4 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 4 }
 
 mtpSlProfileTimerT3 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 5 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 5 }
 
 mtpSlProfileTimerT4 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 6 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 6 }
 
 mtpSlProfileTimerT5 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 7 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 7 }
 
 mtpSlProfileTimerT12 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 8 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 8 }
 
 mtpSlProfileTimerT13 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 9 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 9 }
 
 mtpSlProfileTimerT14 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 10 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 10 }
 
 mtpSlProfileTimerT17 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 11 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 11 }
 
 mtpSlProfileTimerT19A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 12 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 12 }
 
 mtpSlProfileTimerT20A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 13 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 13 }
 
 mtpSlProfileTimerT21A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 14 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 14 }
 
 mtpSlProfileTimerT22 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 15 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 15 }
 
 mtpSlProfileTimerT23 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 16 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 16 }
 
 mtpSlProfileTimerT24 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 17 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 17 }
 
 mtpSlProfileTimerT31A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 18 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 18 }
 
 mtpSlProfileTimerT32A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 19 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 19 }
 
 mtpSlProfileTimerT33A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 20 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 20 }
 
 mtpSlProfileTimerT34A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 21 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 21 }
 
 mtpSlProfileTimerT1T OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 22 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 22 }
 
 mtpSlProfileTimerT2T OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 23 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 23 }
 
 mtpSlProfileTimerT1S OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 24 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 24 }
 
 mtpSlProfileL2Default OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 25 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 25 }
 
 mtpSlProfileStatus OBJECT-TYPE
-	SYNTAX		RowStatus
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSlProfileEntry 26 }
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSlProfileEntry 26 }
 
+mtpSlInt5min OBJECT IDENTIFIER
+    ::= { mtpMIB2 xx }
+
+MtpSlInt5minEntry ::= SEQUENCE {
+    mtpSlInt5minInterval                Unsigned32,
+    mtpSlInt5minTimeStamp               TimeStamp,
+    mtpSlInt5minUnavailDuration         Gauge32,    -- Q.752, 2.1
+    mtpSlInt5minLocInhibDuration        Gauge32,    -- Q.752, 2.5
+    mtpSlInt5minRemInhibDuration        Gauge32,    -- Q.752, 2.6
+    mtpSlInt5minFailedDuration          Gauge32,    -- Q.752, 2.7
+    mtpSlInt5minRemProcOutDuration      Gauge32,    -- Q.752, 2.9
+    mtpSlInt5minLocInhibEvent           Gauge32,    -- Q.752, 2.13
+    mtpSlInt5minLocUninhibEvent         Gauge32,    -- Q.752, 2.14
+    mtpSlInt5minCongInds                Gauge32,    -- Q.752, 3.6
+    mtpSlInt5minCongDuration            Gauge32,    -- Q.752, 3.7
+    mtpSlInt5minCongMsusDiscarded       Gauge32,    -- Q.752. 3.10
+    mtpSlInt5minCongLossOfMsus          Gauge32,    -- Q.752, 3.11
+    mtpSlInt5minChangeovers             Gauge32,    -- Q.752, 1.10
+    mtpSlInt5minChangebacks             Gauge32,    -- Q.752, 1.11
+    mtpSlInt5minRestorations            Gauge32     -- Q.752, 1.12
+}
+
+mtpSlInt30min OBJECT IDENTIFIER
+    ::= { mtpMIB2 xx }
+
+MtpSlInt30minEntry ::= SEQUENCE {
+    mtpSlInt30minInterval               Unsigned32,
+    mtpSlInt30minTimeStamp              TimeStamp,
+    mtpSlInt30minUnavailDuration        Gauge32,    -- Q.752, 2.1
+    mtpSlInt30minLocInhibDuration       Gauge32,    -- Q.752, 2.5
+    mtpSlInt30minRemInhibDuration       Gauge32,    -- Q.752, 2.6
+    mtpSlInt30minFailedDuration         Gauge32,    -- Q.752, 2.7
+    mtpSlInt30minRemProcOutDuration     Gauge32,    -- Q.752, 2.9
+    mtpSlInt30minLocInhibEvent          Gauge32,    -- Q.752, 2.13
+    mtpSlInt30minLocUninhibEvent        Gauge32,    -- Q.752, 2.14
+    mtpSlInt30minCongInds               Gauge32,    -- Q.752, 3.6
+    mtpSlInt30minCongDuration           Gauge32,    -- Q.752, 3.7
+    mtpSlInt30minCongMsusDiscarded      Gauge32,    -- Q.752. 3.10
+    mtpSlInt30minCongLossOfMsus         Gauge32,    -- Q.752, 3.11
+    mtpSlInt30minChangeovers            Gauge32,    -- Q.752, 1.10
+    mtpSlInt30minChangebacks            Gauge32,    -- Q.752, 1.11
+    mtpSlInt30minRestorations           Gauge32     -- Q.752, 1.12
+}
 
 -- ====================================================================
+
+mtpLkProfile OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
 mtpLkProfileNextIndex OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Provides a direct link set protocol profile table."
-	::= { mtpLkProfile 1 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provides a direct link set protocol profile table."
+    ::= { mtpLkProfile 1 }
 
 mtpLkProfileTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF MtpLkProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpLkProfile 2 }
+    SYNTAX      SEQUENCE OF MtpLkProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpLkProfile 2 }
 
 mtpLkProfileEntry OBJECT-TYPE
-	SYNTAX		MtpLkProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpLkProfileTable 1 }
+    SYNTAX      MtpLkProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpLkProfileTable 1 }
 
-MtpLkProfileEntry ::=
-	SEQUENCE {
-		mtpLkProfileIndex
-			Unsigned32,
-		mtpLkProfileTimerT7
-			TimeInterval,
-		mtpLkProfileTimerT19
-			TimeInterval,
-		mtpLkProfileTimerT21
-			TimeInterval,
-		mtpLkProfileTimerT25A
-			TimeInterval,
-		mtpLkProfileTimerT28A
-			TimeInterval,
-		mtpLkProfileTimerT29A
-			TimeInterval,
-		mtpLkProfileTimerT30A
-			TimeInterval,
-		mtpLkProfileSlDefault
-			Unsigned32,
-		mtpLkProfileStatus
-			RowStatus
-	}
+MtpLkProfileEntry ::= SEQUENCE {
+    mtpLkProfileIndex           Unsigned32,
+    mtpLkProfileTimerT7         TimeInterval,
+    mtpLkProfileTimerT19        TimeInterval,
+    mtpLkProfileTimerT21        TimeInterval,
+    mtpLkProfileTimerT25A       TimeInterval,
+    mtpLkProfileTimerT28A       TimeInterval,
+    mtpLkProfileTimerT29A       TimeInterval,
+    mtpLkProfileTimerT30A       TimeInterval,
+    mtpLkProfileSlDefault       Unsigned32,
+    mtpLkProfileStatus          RowStatus
+}
 
 mtpLkProfileIndex OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpLkProfileEntry 1 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpLkProfileEntry 1 }
 
 mtpLkProfileTimerT7 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
-	::= { mtpLkProfileEntry 2 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.704 (1996), ANSI T1.111.4/2000"
+    ::= { mtpLkProfileEntry 2 }
 
 mtpLkProfileTimerT19 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.704 (1996)"
-	::= { mtpLkProfileEntry 3 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.704 (1996)"
+    ::= { mtpLkProfileEntry 3 }
 
 mtpLkProfileTimerT21 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. Q.704 (1996)"
-	::= { mtpLkProfileEntry 4 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.704 (1996)"
+    ::= { mtpLkProfileEntry 4 }
 
 mtpLkProfileTimerT25A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ANSI T1.111.4/2000"
-	::= { mtpLkProfileEntry 5 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ANSI T1.111.4/2000"
+    ::= { mtpLkProfileEntry 5 }
 
 mtpLkProfileTimerT28A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ANSI T1.111.4/2000"
-	::= { mtpLkProfileEntry 6 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ANSI T1.111.4/2000"
+    ::= { mtpLkProfileEntry 6 }
 
 mtpLkProfileTimerT29A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ANSI T1.111.4/2000"
-	::= { mtpLkProfileEntry 7 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ANSI T1.111.4/2000"
+    ::= { mtpLkProfileEntry 7 }
 
 mtpLkProfileTimerT30A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ANSI T1.111.4/2000"
-	::= { mtpLkProfileEntry 8 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ANSI T1.111.4/2000"
+    ::= { mtpLkProfileEntry 8 }
 
 mtpLkProfileSlDefault OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Specifies the index of the entry in the 
-		 mtpSlProfileTable to be used as the default for 
-		 signalling links created within this link set."
-	::= { mtpLkProfileEntry 9 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the index of the entry in the 
+         mtpSlProfileTable to be used as the default for 
+         signalling links created within this link set."
+    ::= { mtpLkProfileEntry 9 }
 
 mtpLkProfileStatus OBJECT-TYPE
-	SYNTAX		RowStatus
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ANSI T1.111.4/2000"
-	::= { mtpLkProfileEntry 10 }
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ANSI T1.111.4/2000"
+    ::= { mtpLkProfileEntry 10 }
 
 
 -- ====================================================================
+
+mtpRtProfile OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
 mtpRtProfileNextIndex OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRtProfile 1 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRtProfile 1 }
 
 mtpRtProfileTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF MtpRtProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRtProfile 2 }
+    SYNTAX      SEQUENCE OF MtpRtProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRtProfile 2 }
 
 mtpRtProfileEntry OBJECT-TYPE
-	SYNTAX		MtpRtProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRtProfileTable 1 }
+    SYNTAX      MtpRtProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRtProfileTable 1 }
 
-MtpRtProfileEntry ::=
-	SEQUENCE {
-		mtpRtProfileIndex
-			Unsigned32,
-		mtpRtProfileName
-			SnmpAdminString,
-		mtpRtProfileTimerT6
-			TimeInterval,
-		mtpRtProfileTimerT10
-			TimeInterval,
-		mtpRtProfileStatus
-			RowStatus
-	}
+MtpRtProfileEntry ::= SEQUENCE {
+    mtpRtProfileIndex           Unsigned32,
+    mtpRtProfileName            SnmpAdminString,
+    mtpRtProfileTimerT6         TimeInterval,
+    mtpRtProfileTimerT10        TimeInterval,
+    mtpRtProfileStatus          RowStatus
+}
 
 mtpRtProfileIndex OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRtProfileEntry 1 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRtProfileEntry 1 }
 
 mtpRtProfileName OBJECT-TYPE
-	SYNTAX		SnmpAdminString
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRtProfileEntry 2 }
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRtProfileEntry 2 }
 
 mtpRtProfileTimerT6 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRtProfileEntry 3 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRtProfileEntry 3 }
 
 mtpRtProfileTimerT10 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRtProfileEntry 4 }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRtProfileEntry 4 }
 
 mtpRtProfileStatus OBJECT-TYPE
-	SYNTAX		RowStatus
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRtProfileEntry 5 }
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRtProfileEntry 5 }
 
 -- ====================================================================
+
+mtpRsProfile OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
 mtpRsProfileNextIndex OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRsProfile 1 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRsProfile 1 }
 
 mtpRsProfileTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF MtpRsProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRsProfile 2 }
+    SYNTAX      SEQUENCE OF MtpRsProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRsProfile 2 }
 
 mtpRsProfileEntry OBJECT-TYPE
-	SYNTAX		MtpRsProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRsProfileTable 1 }
+    SYNTAX      MtpRsProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRsProfileTable 1 }
 
-MtpRsProfileEntry ::=
-	SEQUENCE {
-		mtpRsProfileIndex
-			Unsigned32,
-		mtpRsProfileName
-			SnmpAdminString,
-		mtpRsProfileTimerT8
-			TimeInterval,
-		mtpRsProfileTimerT11
-			TimeInterval,
-		mtpRsProfileTimerT15
-			TimeInterval,
-		mtpRsProfileTimerT16
-			TimeInterval,
-		mtpRsProfileTimerT18A
-			TimeInterval,
-		mtpRsProfileRtDefault
-			Unsigned32,
-		mtpRsProfileStatus
-			RowStatus
-	}
+MtpRsProfileEntry ::= SEQUENCE {
+    mtpRsProfileIndex           Unsigned32,
+    mtpRsProfileName            SnmpAdminString,
+    mtpRsProfileTimerT8         TimeInterval,
+    mtpRsProfileTimerT11        TimeInterval,
+    mtpRsProfileTimerT15        TimeInterval,
+    mtpRsProfileTimerT16        TimeInterval,
+    mtpRsProfileTimerT18A       TimeInterval,
+    mtpRsProfileRtDefault       Unsigned32,
+    mtpRsProfileStatus          RowStatus
+}
 
 mtpRsProfileIndex OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRsProfileEntry xx }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRsProfileEntry xx }
 
 mtpRsProfileName OBJECT-TYPE
-	SYNTAX		SnmpAdminString
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRsProfileEntry xx }
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRsProfileEntry xx }
 
 mtpRsProfileTimerT8 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRsProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRsProfileEntry xx }
 
 mtpRsProfileTimerT11 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRsProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRsProfileEntry xx }
 
 mtpRsProfileTimerT15 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRsProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRsProfileEntry xx }
 
 mtpRsProfileTimerT16 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRsProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRsProfileEntry xx }
 
 mtpRsProfileTimerT18A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRsProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRsProfileEntry xx }
 
 mtpRsProfileRtDefault OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRsProfileEntry xx }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRsProfileEntry xx }
 
 mtpRsProfileStatus OBJECT-TYPE
-	SYNTAX		RowStatus
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpRsProfileEntry xx }
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpRsProfileEntry xx }
 
 
 -- ====================================================================
+
+mtpSpProfile OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
 mtpSpProfileNextIndex OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfile 1 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfile 1 }
 
 mtpSpProfileTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF MtpSpProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfile 2 }
+    SYNTAX      SEQUENCE OF MtpSpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfile 2 }
 
 mtpSpProfileEntry OBJECT-TYPE
-	SYNTAX		MtpSpProfileEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileTable 1 }
+    SYNTAX      MtpSpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileTable 1 }
 
 
-MtpSpProfileEntry ::=
-	SEQUENCE {
-		mtpSpProfileIndex
-			Unsigned32,
-		mtpSpProfileName
-			SnmpAdminString,
-		mtpSpProfileTimerT1R
-			TimeInterval,
-		mtpSpProfileTimerT18
-			TimeInterval,
-		mtpSpProfileTimerT20
-			TimeInterval,
-		mtpSpProfileTimerT22A
-			TimeInterval,
-		mtpSpProfileTimerT23A
-			TimeInterval,
-		mtpSpProfileTimerT24A
-			TimeInterval,
-		mtpSpProfileTimerT26A
-			TimeInterval,
-		mtpSpProfileTimerT27A
-			TimeInterval,
-		mtpSpProfileRsDefault
-			Unsigned32,
-		mtpSpProfileLkDefault
-			Unsigned32,
-		mtpSpProfileStatus
-			RowStatus
-	}
+MtpSpProfileEntry ::= SEQUENCE {
+    mtpSpProfileIndex           Unsigned32,
+    mtpSpProfileName            SnmpAdminString,
+    mtpSpProfileTimerT1R        TimeInterval,
+    mtpSpProfileTimerT18        TimeInterval,
+    mtpSpProfileTimerT20        TimeInterval,
+    mtpSpProfileTimerT22A       TimeInterval,
+    mtpSpProfileTimerT23A       TimeInterval,
+    mtpSpProfileTimerT24A       TimeInterval,
+    mtpSpProfileTimerT26A       TimeInterval,
+    mtpSpProfileTimerT27A       TimeInterval,
+    mtpSpProfileRsDefault       Unsigned32,
+    mtpSpProfileLkDefault       Unsigned32,
+    mtpSpProfileStatus          RowStatus
+}
 
 mtpSpProfileIndex OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileEntry xx }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileEntry xx }
 
 mtpSpProfileName OBJECT-TYPE
-	SYNTAX		SnmpAdminString
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileEntry xx }
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileEntry xx }
 
 mtpSpProfileTimerT1R OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileEntry xx }
 
 mtpSpProfileTimerT18 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileEntry xx }
 
 mtpSpProfileTimerT20 OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileEntry xx }
 
 mtpSpProfileTimerT22A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileEntry xx }
 
 mtpSpProfileTimerT23A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileEntry xx }
 
 mtpSpProfileTimerT24A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileEntry xx }
 
 mtpSpProfileTimerT26A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileEntry xx }
 
 mtpSpProfileTimerT27A OBJECT-TYPE
-	SYNTAX		TimeInterval
-	UNITS		"centiseconds"
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileEntry xx }
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileEntry xx }
 
 mtpSpProfileRsDefault OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileEntry xx }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileEntry xx }
 
 mtpSpProfileLkDefault OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileEntry xx }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileEntry xx }
 
 mtpSpProfileStatus OBJECT-TYPE
-	SYNTAX		RowStatus
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { mtpSpProfileEntry xx }
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { mtpSpProfileEntry xx }
 
 
 -- ====================================================================
 
-MtpNaProfileEntry ::=
-	SEQUENCE {
-		mtpNaProfileIndex
-			Unsigned32,
-		mtpNaProfileName
-			SnmpAdminString,
-		mtpNaProtocolVariant
-			Ss7ProtocolVariant,
-		mtpNaProtocolYear
-			INTEGER,
-		mtpNaNetworkIndicator
-			INTEGER,
-		mtpNaPointCodeFormat
-			INTEGER,
-		mtpNaProfileSpDefault
-			Unsigned32,
-		mtpNaProfileStatus
-			RowStatus
-	}
+MtpNaProfileEntry ::= SEQUENCE {
+    mtpNaProfileIndex           Unsigned32,
+    mtpNaProfileName            SnmpAdminString,
+    mtpNaProtocolVariant        Ss7ProtocolVariant,
+    mtpNaProtocolYear           INTEGER,
+    mtpNaNetworkIndicator       INTEGER,
+    mtpNaPointCodeFormat        INTEGER,
+    mtpNaProfileSpDefault       Unsigned32,
+    mtpNaProfileStatus          RowStatus
+}
 
 
 -- ====================================================================
+
+mtpNa OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
 mtpNaNextIndex OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Provides the next available index in the network 
-		 table, or zero when the table is full."
-	::= { mtpNa 1 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provides the next available index in the network 
+         table, or zero when the table is full."
+    ::= { mtpNa 1 }
 
 mtpNaTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF MtpNaEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"Provides the network table which defines all of the 
-		 networks known to the managed element."
-	::= { mtpNa 2 }
+    SYNTAX      SEQUENCE OF MtpNaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides the network table which defines all of the 
+         networks known to the managed element."
+    ::= { mtpNa 2 }
 
 mtpNaEntry OBJECT-TYPE
-	SYNTAX		MtpNaEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"Provides an entry in the network table.  Each entry 
-		 provides fundamental information about the network as 
-		 well as protocol profile defaults for signalling points 
-		 created for operation in each network."
-	INDEX	{
-			mtpNaIndex
-		}
-	::= { mtpNaTable 1 }
+    SYNTAX      MtpNaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides an entry in the network table.  Each entry 
+         provides fundamental information about the network as 
+         well as protocol profile defaults for signalling points 
+         created for operation in each network."
+    INDEX   {
+            mtpNaIndex
+        }
+    ::= { mtpNaTable 1 }
 
-MtpNaEntry ::=
-	SEQUENCE {
-		mtpNaIndex
-			Unsigned32,
-		mtpNaName
-			SnmpAdminString,
-		mtpNaProfile
-			Unsigned32,
-		mtpNaNetworkIndicator
-			INTEGER,
-		mtpNaPointCodeFormat
-			INTEGER,
-		mtpNaSpDefault
-			Unsigned32,
-		mtpNaStatus
-			RowStatus
-	}
+MtpNaEntry ::= SEQUENCE {
+    mtpNaIndex                  Unsigned32,
+    mtpNaName                   SnmpAdminString,
+    mtpNaProfile                Unsigned32,
+    mtpNaNetworkIndicator       INTEGER,
+    mtpNaPointCodeFormat        INTEGER,
+    mtpNaSpDefault              Unsigned32,
+    mtpNaStatus                 RowStatus
+}
 
 mtpNaIndex OBJECT-TYPE
-	SYNTAX		Unsigned32 (0..255)
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"Provides an index for the network table.  The index is 
-		 restricted in the range 0..255 because the value is 
-		 also used as the first octet of a NetworkPointCode 
-		 texutal convention."
-	::= { mtpNaEntry 1 }
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides an index for the network table.  The index is 
+         restricted in the range 0..255 because the value is 
+         also used as the first octet of a NetworkPointCode 
+         texutal convention."
+    ::= { mtpNaEntry 1 }
 
 
 -- ====================================================================
 
-	INDEX	{
-			mtpNaIndex,
-			mtpSpIndex
-		}
+mtpSp OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
-MtpSpEntry ::=
-	SEQUENCE {
-		mtpSpIndex
-			Unsigned32,
-		mtpSpName
-			CommonLanguageName,
-		mtpSpProfile
-			Unsigned32,
-		mtpSpTimerT1R
-			TimeInterval,
-		mtpSpTimerT18
-			TimeInterval,
-		mtpSpTimerT20
-			TimeInterval,
-		mtpSpTimerT22A
-			TimeInterval,
-		mtpSpTimerT23A
-			TimeInterval,
-		mtpSpTimerT24A
-			TimeInterval,
-		mtpSpTimerT26A
-			TimeInterval,
-		mtpSpTimerT27A
-			TimeInterval,
-		mtpSpRsDefault
-			Unsigned32,
-		mtpSpLkDefault
-			Unsigned32,
-		mtpSpTimeDiscontinuity
-			TimeStamp,
-		mtpSpMsusRouteDiscard
-			Counter32,		-- Q.752, 5.5
-		mtpSpTfcRecvCong0
-			Counter32,		-- Q.752, 5.8
-		mtpSpTfcRecvCong1
-			Counter32,		-- Q.752, 5.8
-		mtpSpTfcRecvCong2
-			Counter32,		-- Q.752, 5.8
-		mtpSpOctetsXferred
-			Counter32,
-		mtpSpStatus
-			RowStatus
-	}
+    INDEX   {
+            mtpNaIndex,
+            mtpSpIndex
+        }
 
-MtpSpInt5minEntry ::=
-	SEQUENCE {
-		mtpSpInt5minInterval
-			Unsigned32,
-		mtpSpInt5minTimeStamp
-			TimeStamp,
-		mtpSpInt5minMsusRouteDiscard
-			Gauge32,		-- Q.752, 5.5
-		mtpSpInt5minTfcRecvCong0
-			Gauge32,		-- Q.752, 5.8
-		mtpSpInt5minTfcRecvCong1
-			Gauge32,		-- Q.752, 5.8
-		mtpSpInt5minTfcRecvCong2
-			Gauge32,		-- Q.752, 5.8
-		mtpSpInt5minOctetsXferred
-			Gauge32
-	}
+MtpSpEntry ::= SEQUENCE {
+    mtpSpIndex                  Unsigned32,
+    mtpSpName                   CommonLanguageName,
+    mtpSpProfile                Unsigned32,
+    mtpSpTimerT1R               TimeInterval,
+    mtpSpTimerT18               TimeInterval,
+    mtpSpTimerT20               TimeInterval,
+    mtpSpTimerT22A              TimeInterval,
+    mtpSpTimerT23A              TimeInterval,
+    mtpSpTimerT24A              TimeInterval,
+    mtpSpTimerT26A              TimeInterval,
+    mtpSpTimerT27A              TimeInterval,
+    mtpSpRsDefault              Unsigned32,
+    mtpSpLkDefault              Unsigned32,
+    mtpSpTimeDiscontinuity      TimeStamp,
+    mtpSpMsusRouteDiscard       Counter32,      -- Q.752, 5.5
+    mtpSpTfcRecvCong0           Counter32,      -- Q.752, 5.8
+    mtpSpTfcRecvCong1           Counter32,      -- Q.752, 5.8
+    mtpSpTfcRecvCong2           Counter32,      -- Q.752, 5.8
+    mtpSpOctetsXferred          Counter32,
+    mtpSpStatus                 RowStatus
+}
 
-MtpSpInt30minEntry ::=
-	SEQUENCE {
-		mtpSpInt30minInterval
-			Unsigned32,
-		mtpSpInt30minTimeStamp
-			TimeStamp,
-		mtpSpInt30minMsusRouteDiscard
-			Gauge32,		-- Q.752, 5.5
-		mtpSpInt30minTfcRecvCong0
-			Gauge32,		-- Q.752, 5.8
-		mtpSpInt30minTfcRecvCong1
-			Gauge32,		-- Q.752, 5.8
-		mtpSpInt30minTfcRecvCong2
-			Gauge32,		-- Q.752, 5.8
-		mtpSpInt30minOctetsXferred
-			Gauge32
-	}
+mtpSpInt5min OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
-	INDEX	{
-			mtpNaIndex,
-			mtpSpIndex,
-			mtpSpSiCode
-		}
+MtpSpInt5minEntry ::= SEQUENCE {
+    mtpSpInt5minInterval                Unsigned32,
+    mtpSpInt5minTimeStamp               TimeStamp,
+    mtpSpInt5minMsusRouteDiscard        Gauge32,        -- Q.752, 5.5
+    mtpSpInt5minTfcRecvCong0            Gauge32,        -- Q.752, 5.8
+    mtpSpInt5minTfcRecvCong1            Gauge32,        -- Q.752, 5.8
+    mtpSpInt5minTfcRecvCong2            Gauge32,        -- Q.752, 5.8
+    mtpSpInt5minOctetsXferred           Gauge32
+}
 
-MtpSpSiEntry ::=
-	SEQUENCE {
-		mtpSpSiCode
-			Unsigned32,
-		mtpSpSiTimeDiscontinuity
-			TimeStamp,
-		mtpSpSiUpuSent
-			Counter32,	-- Q.752, 5.6
-		mtpSpSiUpuRecv
-			Counter32,	-- Q.752, 5.7
-		mtpSpSiOctetsXferred
-			Counter32,	-- Q.752, 6.3
-		mtpSpSiStatus
-			RowStatus
-	}
+mtpSpInt30min OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
-MtpSpSiInt5minEntry ::=
-	SEQUENCE {
-		mtpSpSiInt5minInterval
-			Unsigned32,
-		mtpSpSiInt5minTimeStamp
-			TimeStamp,
-		mtpSpSiInt5minUpuSent
-			Gauge32,	-- Q.752, 5.6
-		mtpSpSiInt5minUpuRecv
-			Gauge32,	-- Q.752, 5.7
-		mtpSpSiInt5minOctetsXferred
-			Gauge32		-- Q.752, 6.3
-	}
+MtpSpInt30minEntry ::= SEQUENCE {
+    mtpSpInt30minInterval               Unsigned32,
+    mtpSpInt30minTimeStamp              TimeStamp,
+    mtpSpInt30minMsusRouteDiscard       Gauge32,        -- Q.752, 5.5
+    mtpSpInt30minTfcRecvCong0           Gauge32,        -- Q.752, 5.8
+    mtpSpInt30minTfcRecvCong1           Gauge32,        -- Q.752, 5.8
+    mtpSpInt30minTfcRecvCong2           Gauge32,        -- Q.752, 5.8
+    mtpSpInt30minOctetsXferred          Gauge32
+}
 
-MtpSpSiInt30minEntry ::=
-	SEQUENCE {
-		mtpSpSiInt30minInterval
-			Unsigned32,
-		mtpSpSiInt30minTimeStamp
-			TimeStamp,
-		mtpSpSiInt30minUpuSent
-			Gauge32,	-- Q.752, 5.6
-		mtpSpSiInt30minUpuRecv
-			Gauge32,	-- Q.752, 5.7
-		mtpSpSiInt30minOctetsXferred
-			Gauge32		-- Q.752, 6.3
-	}
+mtpSpSi OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
-MtpSpStudyEntry ::=
-	SEQUENCE {
-		mtpSpStudyIndex
-			Unsigned32,
-		mtpSpStudyTimeDiscontinuity
-			TimeStamp,
-		mtpSpStudyOctetsXferred
-			Counter32,	-- Q.752, 6.7
-		mtpSpStudyStatus
-			RowStatus
-	}
+    INDEX   {
+            mtpNaIndex,
+            mtpSpIndex,
+            mtpSpSiCode
+        }
 
-MtpSpStudyInt5minEntry ::=
-	SEQUENCE {
-		mtpSpStudyInt5minInterval
-			Unsigned32,
-		mtpSpStudyInt5minTimeStamp
-			TimeStamp,
-		mtpSpStudyInt5minOctetsXferred
-			Gauge32		-- Q.752, 6.7
-	}
+MtpSpSiEntry ::= SEQUENCE {
+    mtpSpSiCode                     Unsigned32,
+    mtpSpSiTimeDiscontinuity        TimeStamp,
+    mtpSpSiUpuSent                  Counter32,  -- Q.752, 5.6
+    mtpSpSiUpuRecv                  Counter32,  -- Q.752, 5.7
+    mtpSpSiOctetsXferred            Counter32,  -- Q.752, 6.3
+    mtpSpSiStatus                   RowStatus
+}
 
-MtpSpStudyInt30minEntry ::=
-	SEQUENCE {
-		mtpSpStudyInt30minInterval
-			Unsigned32,
-		mtpSpStudyInt30minOctetsXferred
-			Gauge32		-- Q.752, 6.7
-	}
+mtpSpSiInt5min OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
-	INDEX	{
-			mtpSpIndex,
-			mtpRsIndex,
-			mtpRsIndex,
-			mtpSpSiCode,
-			mtpSpStudyIndex
-		}
-MtpSpStudyMapEntry ::=
-	SEQUENCE {
-		mtpSpStudyMapStatus
-			RowStatus
-	}
+MtpSpSiInt5minEntry ::= SEQUENCE {
+    mtpSpSiInt5minInterval          Unsigned32,
+    mtpSpSiInt5minTimeStamp         TimeStamp,
+    mtpSpSiInt5minUpuSent           Gauge32,    -- Q.752, 5.6
+    mtpSpSiInt5minUpuRecv           Gauge32,    -- Q.752, 5.7
+    mtpSpSiInt5minOctetsXferred     Gauge32     -- Q.752, 6.3
+}
+
+mtpSpSiInt30min OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+MtpSpSiInt30minEntry ::= SEQUENCE {
+    mtpSpSiInt30minInterval             Unsigned32,
+    mtpSpSiInt30minTimeStamp            TimeStamp,
+    mtpSpSiInt30minUpuSent              Gauge32,    -- Q.752, 5.6
+    mtpSpSiInt30minUpuRecv              Gauge32,    -- Q.752, 5.7
+    mtpSpSiInt30minOctetsXferred        Gauge32     -- Q.752, 6.3
+}
+
+mtpSpStudy OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+MtpSpStudyEntry ::= SEQUENCE {
+    mtpSpStudyIndex                 Unsigned32,
+    mtpSpStudyTimeDiscontinuity     TimeStamp,
+    mtpSpStudyOctetsXferred         Counter32,  -- Q.752, 6.7
+    mtpSpStudyStatus                RowStatus
+}
+
+mtpSpStudyInt5min OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+MtpSpStudyInt5minEntry ::= SEQUENCE {
+    mtpSpStudyInt5minInterval           Unsigned32,
+    mtpSpStudyInt5minTimeStamp          TimeStamp,
+    mtpSpStudyInt5minOctetsXferred      Gauge32     -- Q.752, 6.7
+}
+
+mtpSpStudyInt30min OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+MtpSpStudyInt30minEntry ::= SEQUENCE {
+    mtpSpStudyInt30minInterval          Unsigned32,
+    mtpSpStudyInt30minOctetsXferred     Gauge32     -- Q.752, 6.7
+}
+
+mtpSpStudyMap OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+    INDEX   {
+            mtpSpIndex,
+            mtpRsIndex,
+            mtpRsIndex,
+            mtpSpSiCode,
+            mtpSpStudyIndex
+        }
+MtpSpStudyMapEntry ::= SEQUENCE {
+    mtpSpStudyMapStatus     RowStatus
+}
 
 -- ====================================================================
 
-MtpMsEntry ::=
-	SEQUENCE {
-		mtpMsIndex
-			Unsigned32,
-		mtpMsName
-			SnmpAdminString,
-		mtpMsStatus
-			RowStatus
-	}
+mtpMs OBJECT IDENTIFIER
+    ::= { mtpMIB2 xx }
+
+MtpMsEntry ::= SEQUENCE {
+    mtpMsIndex      Unsigned32,
+    mtpMsName       SnmpAdminString,
+    mtpMsStatus     RowStatus
+}
 
 
 -- ====================================================================
 
-MtpRsEntry ::=
-	SEQUENCE {
-		mtpRsIndex
-			Unsigned32,
-		mtpRsName
-			CommonLanguageName,
-		mtpRsProfile
-			Unsigned32,
-		mtpRsTimerT8
-			TimeInterval,
-		mtpRsTimerT11
-			TimeInterval,
-		mtpRsTimerT15
-			TimeInterval,
-		mtpRsTimerT16
-			TimeInterval,
-		mtpRsTimerT18A
-			TimeInterval,
-		mtpRsRtDefault
-			Unsigned32,
-		mtpRsTimeDiscontinuity
-			TimeStamp,
-		mtpRsOctetsRecv
-			Counter32,	-- Q.752, 6.1
-		mtpRsOctetsSent
-			Counter32,	-- Q.752, 6.2
-		mtpRsMsusRecv
-			Counter32,
-		mtpRsMsusSent
-			Counter32,
-		mtpRsInacEvents
-			Counter32,	-- Q.752, 4.9
-		mtpRsInacDuration
-			Counter32,	-- Q.752, 4.10
-		mtpRsStatus
-			RowStatus
-	}
+mtpRs OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
-MtpRsInt5minEntry ::=
-	SEQUENCE {
-		mtpRsInt5minInterval
-			Unsigned32,
-		mtpRsInt5minTimeStamp
-			TimeStamp,
-		mtpRsInt5minOctetsRecv
-			Gauge32,	-- Q.752, 6.1
-		mtpRsInt5minOctetsSent
-			Gauge32,	-- Q.752, 6.2
-		mtpRsInt5minMsusRecv
-			Gauge32,
-		mtpRsInt5minMsusSent
-			Gauge32,
-		mtpRsInt5minInacEvents
-			Gauge32,	-- Q.752, 4.9
-		mtpRsInt5minInacDuration
-			Gauge32		-- Q.752, 4.10
-	}
+MtpRsEntry ::= SEQUENCE {
+    mtpRsIndex                  Unsigned32,
+    mtpRsName                   CommonLanguageName,
+    mtpRsProfile                Unsigned32,
+    mtpRsTimerT8                TimeInterval,
+    mtpRsTimerT11               TimeInterval,
+    mtpRsTimerT15               TimeInterval,
+    mtpRsTimerT16               TimeInterval,
+    mtpRsTimerT18A              TimeInterval,
+    mtpRsRtDefault              Unsigned32,
+    mtpRsTimeDiscontinuity      TimeStamp,
+    mtpRsOctetsRecv             Counter32,  -- Q.752, 6.1
+    mtpRsOctetsSent             Counter32,  -- Q.752, 6.2
+    mtpRsMsusRecv               Counter32,
+    mtpRsMsusSent               Counter32,
+    mtpRsInacEvents             Counter32,  -- Q.752, 4.9
+    mtpRsInacDuration           Counter32,  -- Q.752, 4.10
+    mtpRsStatus                 RowStatus
+}
 
-MtpRsInt30minEntry ::=
-	SEQUENCE {
-		mtpRsInt30minInterval
-			Unsigned32,
-		mtpRsInt30minTimeStamp
-			TimeStamp,
-		mtpRsInt30minOctetsRecv
-			Gauge32,	-- Q.752, 6.1
-		mtpRsInt30minOctetsSent
-			Gauge32,	-- Q.752, 6.2
-		mtpRsInt30minMsusRecv
-			Gauge32,
-		mtpRsInt30minMsusSent
-			Gauge32,
-		mtpRsInt30minInacEvents
-			Gauge32,	-- Q.752, 4.9
-		mtpRsInt30minInacDuration
-			Gauge32		-- Q.752, 4.10
-	}
+mtpRsInt5min OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
-MtpRsSiEntry ::=
-	SEQUENCE {
-		mtpRsSiCode
-			Unsigned32,
-		mtpRsSiTimeDiscontinuity
-			TimeStamp,
-		mtpRsSiOctetsRecv
-			Counter32,	-- Q.752, 6.4
-		mtpRsSiOctetsSent
-			Counter32,	-- Q.752, 6.5
-		mtpRsSiMsusRecv
-			Counter32,
-		mtpRsSiMsusSent
-			Counter32,
-		mtpRsSiStatus
-			RowStatus
-	}
+MtpRsInt5minEntry ::= SEQUENCE {
+    mtpRsInt5minInterval            Unsigned32,
+    mtpRsInt5minTimeStamp           TimeStamp,
+    mtpRsInt5minOctetsRecv          Gauge32,    -- Q.752, 6.1
+    mtpRsInt5minOctetsSent          Gauge32,    -- Q.752, 6.2
+    mtpRsInt5minMsusRecv            Gauge32,
+    mtpRsInt5minMsusSent            Gauge32,
+    mtpRsInt5minInacEvents          Gauge32,    -- Q.752, 4.9
+    mtpRsInt5minInacDuration        Gauge32     -- Q.752, 4.10
+}
 
-MtpRsSiInt5minEntry ::=
-	SEQUENCE {
-		mtpRsSiInt5minInterval
-			Unsigned32,
-		mtpRsSiInt5minTimeStamp
-			TimeStamp,
-		mtpRsSiInt5minOctetsRecv
-			Gauge32,	-- Q.752, 6.4
-		mtpRsSiInt5minOctetsSent
-			Gauge32,	-- Q.752, 6.5
-		mtpRsSiInt5minMsusRecv
-			Gauge32,
-		mtpRsSiInt5minMsusSent
-			Gauge32
-	}
+mtpRsInt30min OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
-MtpRsSiInt30minEntry ::=
-	SEQUENCE {
-		mtpRsSiInt30minInterval
-			Unsigned32,
-		mtpRsSiInt30minTimeStamp
-			TimeStamp,
-		mtpRsSiInt30minOctetsRecv
-			Gauge32,	-- Q.752, 6.4
-		mtpRsSiInt30minOctetsSent
-			Gauge32,	-- Q.752, 6.5
-		mtpRsSiInt30minMsusRecv
-			Gauge32,
-		mtpRsSiInt30minMsusSent
-			Gauge32
-	}
+MtpRsInt30minEntry ::= SEQUENCE {
+    mtpRsInt30minInterval           Unsigned32,
+    mtpRsInt30minTimeStamp          TimeStamp,
+    mtpRsInt30minOctetsRecv         Gauge32,    -- Q.752, 6.1
+    mtpRsInt30minOctetsSent         Gauge32,    -- Q.752, 6.2
+    mtpRsInt30minMsusRecv           Gauge32,
+    mtpRsInt30minMsusSent           Gauge32,
+    mtpRsInt30minInacEvents         Gauge32,    -- Q.752, 4.9
+    mtpRsInt30minInacDuration       Gauge32     -- Q.752, 4.10
+}
+
+mtpRsSi OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+MtpRsSiEntry ::= SEQUENCE {
+    mtpRsSiCode                     Unsigned32,
+    mtpRsSiTimeDiscontinuity        TimeStamp,
+    mtpRsSiOctetsRecv               Counter32,  -- Q.752, 6.4
+    mtpRsSiOctetsSent               Counter32,  -- Q.752, 6.5
+    mtpRsSiMsusRecv                 Counter32,
+    mtpRsSiMsusSent                 Counter32,
+    mtpRsSiStatus                   RowStatus
+}
+
+mtpRsSiInt5min OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+MtpRsSiInt5minEntry ::= SEQUENCE {
+    mtpRsSiInt5minInterval          Unsigned32,
+    mtpRsSiInt5minTimeStamp         TimeStamp,
+    mtpRsSiInt5minOctetsRecv        Gauge32,    -- Q.752, 6.4
+    mtpRsSiInt5minOctetsSent        Gauge32,    -- Q.752, 6.5
+    mtpRsSiInt5minMsusRecv          Gauge32,
+    mtpRsSiInt5minMsusSent          Gauge32
+}
+
+mtpRsSiInt30min OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+MtpRsSiInt30minEntry ::= SEQUENCE {
+    mtpRsSiInt30minInterval         Unsigned32,
+    mtpRsSiInt30minTimeStamp        TimeStamp,
+    mtpRsSiInt30minOctetsRecv       Gauge32,    -- Q.752, 6.4
+    mtpRsSiInt30minOctetsSent       Gauge32,    -- Q.752, 6.5
+    mtpRsSiInt30minMsusRecv         Gauge32,
+    mtpRsSiInt30minMsusSent         Gauge32
+}
 
 -- ====================================================================
 
-MtpRlEntry ::=
-	SEQUENCE {
-		mtpRlIndex
-			Unsigned32,
-		mtpRlProfile
-			Unsigned32,
-		mtpRlRtDefault
-			Unsigned32,
-		mtpRlStatus
-			RowStatus
-	}
+mtpRl OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+MtpRlEntry ::= SEQUENCE {
+    mtpRlIndex          Unsigned32,
+    mtpRlProfile        Unsigned32,
+    mtpRlRtDefault      Unsigned32,
+    mtpRlStatus         RowStatus
+}
 
 -- ====================================================================
 
-MtpRtEntry ::=
-	SEQUENCE {
-		mtpRtIndex
-			Unsigned32,
-		mtpRtName
-			CommonLanguageName,
-		mtpRtProfile
-			Unsigned32,
-		mtpRtTimerT6
-			TimeInterval,
-		mtpRtTimerT10
-			TimeInterval,
-		mtpRtStatus
-			RowStatus
-	}
+mtpRt OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+MtpRtEntry ::= SEQUENCE {
+    mtpRtIndex          Unsigned32,
+    mtpRtName           CommonLanguageName,
+    mtpRtProfile        Unsigned32,
+    mtpRtTimerT6        TimeInterval,
+    mtpRtTimerT10       TimeInterval,
+    mtpRtStatus         RowStatus
+}
 
 -- ====================================================================
 
-MtpLsEntry ::=
-	SEQUENCE {
-		mtpLsIndex
-			Unsigned32,
-		mtpLsName
-			CommonLanguageName,
-		mtpLsLkDefault
-			Unsigned32,
-		mtpLsStatus
-			RowStatus
-	}
+mtpLs OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+MtpLsEntry ::= SEQUENCE {
+    mtpLsIndex          Unsigned32,
+    mtpLsName           CommonLanguageName,
+    mtpLsLkDefault      Unsigned32,
+    mtpLsStatus         RowStatus
+}
 
 -- ====================================================================
 
-MtpLkEntry ::=
-	SEQUENCE {
-		mtpLkIndex
-			Unsigned32,
-		mtpLkName
-			CommonLanguageName,
-		mtpLkProfile
-			Unsigned32,
-		mtpLkTimerT7
-			TimeInterval,
-		mtpLkTimerT19
-			TimeInterval,
-		mtpLkTimerT21
-			TimeInterval,
-		mtpLkTimerT25A
-			TimeInterval,
-		mtpLkTimerT28A
-			TimeInterval,
-		mtpLkTimerT29A
-			TimeInterval,
-		mtpLkTimerT30A
-			TimeInterval,
-		mtpLkSlDefault
-			Unsigned32,
-		mtpLkTimeDiscontinuity
-			TimeStamp,
-		mtpLkAdjSpInacEvents
-			Counter32,	-- Q.752, 5.1
-		mtpLkAdjSpInacDuration
-			Counter32,	-- Q.752, 5.2
-		mtpLkUnavailDuration
-			Counter32,	-- Q.752, 4.2
-		mtpLkStatus
-			RowStatus
-	}
+mtpLk OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
 
-MtpLkInt5minEntry ::=
-	SEQUENCE {
-		mtpLkInt5minInterval
-			Unsigned32,
-		mtpLkInt5minTimeStamp
-			TimeStamp,
-		mtpLkInt5minAdjSpInacEvents
-			Gauge32,	-- Q.752, 5.1
-		mtpLkInt5minAdjSpInacDuration
-			Gauge32,	-- Q.752, 5.2
-		mtpLkInt5minUnavailDuration
-			Gauge32		-- Q.752, 4.2
-	}
+MtpLkEntry ::= SEQUENCE {
+    mtpLkIndex                  Unsigned32,
+    mtpLkName                   CommonLanguageName,
+    mtpLkProfile                Unsigned32,
+    mtpLkTimerT7                TimeInterval,
+    mtpLkTimerT19               TimeInterval,
+    mtpLkTimerT21               TimeInterval,
+    mtpLkTimerT25A              TimeInterval,
+    mtpLkTimerT28A              TimeInterval,
+    mtpLkTimerT29A              TimeInterval,
+    mtpLkTimerT30A              TimeInterval,
+    mtpLkSlDefault              Unsigned32,
+    mtpLkTimeDiscontinuity      TimeStamp,
+    mtpLkAdjSpInacEvents        Counter32,  -- Q.752, 5.1
+    mtpLkAdjSpInacDuration      Counter32,  -- Q.752, 5.2
+    mtpLkUnavailDuration        Counter32,  -- Q.752, 4.2
+    mtpLkStatus                 RowStatus
+}
 
-MtpLkInt30minEntry ::=
-	SEQUENCE {
-		mtpLkInt30minInterval
-			Unsigned32,
-		mtpLkInt30minTimeStamp
-			TimeStamp,
-		mtpLkInt30minAdjSpInacEvents
-			Gauge32,	-- Q.752, 5.1
-		mtpLkInt30minAdjSpInacDuration
-			Gauge32,	-- Q.752, 5.2
-		mtpLkInt30minUnavailDuration
-			Gauge32		-- Q.752, 4.2
-	}
+mtpLkInt5min OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+MtpLkInt5minEntry ::= SEQUENCE {
+    mtpLkInt5minInterval                Unsigned32,
+    mtpLkInt5minTimeStamp               TimeStamp,
+    mtpLkInt5minAdjSpInacEvents         Gauge32,    -- Q.752, 5.1
+    mtpLkInt5minAdjSpInacDuration       Gauge32,    -- Q.752, 5.2
+    mtpLkInt5minUnavailDuration         Gauge32     -- Q.752, 4.2
+}
+
+mtpLkInt30min OBJECT IDENTIFIER
+    ::= { mtpObjects xx }
+
+MtpLkInt30minEntry ::= SEQUENCE {
+    mtpLkInt30minInterval               Unsigned32,
+    mtpLkInt30minTimeStamp              TimeStamp,
+    mtpLkInt30minAdjSpInacEvents        Gauge32,    -- Q.752, 5.1
+    mtpLkInt30minAdjSpInacDuration      Gauge32,    -- Q.752, 5.2
+    mtpLkInt30minUnavailDuration        Gauge32     -- Q.752, 4.2
+}
 
 -- ====================================================================
 
-MtpSlEntry ::=
-	SEQUENCE {
-		mtpSlIndex
-			Unsigned32,
-		mtpSlName
-			CommonLanguageName,
-		mtpSlProfile
-			Unsigned32,
-		mtpSlTimerT1
-			TimeInterval,
-		mtpSlTimerT2
-			TimeInterval,
-		mtpSlTimerT3
-			TimeInterval,
-		mtpSlTimerT4
-			TimeInterval,
-		mtpSlTimerT5
-			TimeInterval,
-		mtpSlTimerT12
-			TimeInterval,
-		mtpSlTimerT13
-			TimeInterval,
-		mtpSlTimerT14
-			TimeInterval,
-		mtpSlTimerT17
-			TimeInterval,
-		mtpSlTimerT19A
-			TimeInterval,
-		mtpSlTimerT20A
-			TimeInterval,
-		mtpSlTimerT21A
-			TimeInterval,
-		mtpSlTimerT22
-			TimeInterval,
-		mtpSlTimerT23
-			TimeInterval,
-		mtpSlTimerT24
-			TimeInterval,
-		mtpSlTimerT31A
-			TimeInterval,
-		mtpSlTimerT32A
-			TimeInterval,
-		mtpSlTimerT33A
-			TimeInterval,
-		mtpSlTimerT34A
-			TimeInterval,
-		mtpSlTimerT1T
-			TimeInterval,
-		mtpSlTimerT2T
-			TimeInterval,
-		mtpSlTimerT1S
-			TimeInterval,
-		mtpSlL2Default
-			Unsigned32,
-		mtpSlTimeDiscontinuity
-			TimeStamp,
-		mtpSlUnavailDuration
-			Counter32,	-- Q.752, 2.1
-		mtpSlLocInhibDuration
-			Counter32,	-- Q.752, 2.5
-		mtpSlRemInhibDuration
-			Counter32,	-- Q.752, 2.6
-		mtpSlFailedDuration
-			Counter32,	-- Q.752, 2.7
-		mtpSlRemProcOutDuration
-			Counter32,	-- Q.752, 2.9
-		mtpSlLocInhibEvent
-			Counter32,	-- Q.752, 2.13
-		mtpSlLocUninhibEvent
-			Counter32,	-- Q.752, 2.14
-		mtpSlCongInds
-			Counter32,	-- Q.752, 3.6
-		mtpSlCongDuration
-			Counter32,	-- Q.752, 3.7
-		mtpSlCongMsusDiscarded
-			Counter32,	-- Q.752. 3.10
-		mtpSlCongLossOfMsus
-			Counter32,	-- Q.752, 3.11
-		mtpSlChangeovers
-			Counter32,	-- Q.752, 1.10
-		mtpSlChangebacks
-			Counter32,	-- Q.752, 1.11
-		mtpSlRestorations
-			Counter32,	-- Q.752, 1.12
-		mtpSlStatus
-			RowStatus
-	}
-
-MtpSlInt5minEntry ::=
-	SEQUENCE {
-		mtpSlInt5minInterval
-			Unsigned32,
-		mtpSlInt5minTimeStamp
-			TimeStamp,
-		mtpSlInt5minUnavailDuration
-			Gauge32,	-- Q.752, 2.1
-		mtpSlInt5minLocInhibDuration
-			Gauge32,	-- Q.752, 2.5
-		mtpSlInt5minRemInhibDuration
-			Gauge32,	-- Q.752, 2.6
-		mtpSlInt5minFailedDuration
-			Gauge32,	-- Q.752, 2.7
-		mtpSlInt5minRemProcOutDuration
-			Gauge32,	-- Q.752, 2.9
-		mtpSlInt5minLocInhibEvent
-			Gauge32,	-- Q.752, 2.13
-		mtpSlInt5minLocUninhibEvent
-			Gauge32,	-- Q.752, 2.14
-		mtpSlInt5minCongInds
-			Gauge32,	-- Q.752, 3.6
-		mtpSlInt5minCongDuration
-			Gauge32,	-- Q.752, 3.7
-		mtpSlInt5minCongMsusDiscarded
-			Gauge32,	-- Q.752. 3.10
-		mtpSlInt5minCongLossOfMsus
-			Gauge32,	-- Q.752, 3.11
-		mtpSlInt5minChangeovers
-			Gauge32,	-- Q.752, 1.10
-		mtpSlInt5minChangebacks
-			Gauge32,	-- Q.752, 1.11
-		mtpSlInt5minRestorations
-			Gauge32		-- Q.752, 1.12
-	}
-
-MtpSlInt30minEntry ::=
-	SEQUENCE {
-		mtpSlInt30minInterval
-			Unsigned32,
-		mtpSlInt30minTimeStamp
-			TimeStamp,
-		mtpSlInt30minUnavailDuration
-			Gauge32,	-- Q.752, 2.1
-		mtpSlInt30minLocInhibDuration
-			Gauge32,	-- Q.752, 2.5
-		mtpSlInt30minRemInhibDuration
-			Gauge32,	-- Q.752, 2.6
-		mtpSlInt30minFailedDuration
-			Gauge32,	-- Q.752, 2.7
-		mtpSlInt30minRemProcOutDuration
-			Gauge32,	-- Q.752, 2.9
-		mtpSlInt30minLocInhibEvent
-			Gauge32,	-- Q.752, 2.13
-		mtpSlInt30minLocUninhibEvent
-			Gauge32,	-- Q.752, 2.14
-		mtpSlInt30minCongInds
-			Gauge32,	-- Q.752, 3.6
-		mtpSlInt30minCongDuration
-			Gauge32,	-- Q.752, 3.7
-		mtpSlInt30minCongMsusDiscarded
-			Gauge32,	-- Q.752. 3.10
-		mtpSlInt30minCongLossOfMsus
-			Gauge32,	-- Q.752, 3.11
-		mtpSlInt30minChangeovers
-			Gauge32,	-- Q.752, 1.10
-		mtpSlInt30minChangebacks
-			Gauge32,	-- Q.752, 1.11
-		mtpSlInt30minRestorations
-			Gauge32		-- Q.752, 1.12
-	}
-
 -- ====================================================================
-
-MtpL2Entry ::=
-	SEQUENCE {
-		mtpL2Index
-			Unsigned32,
-		mtpL2Name
-			CommonLanguageName,
-		mtpL2Profile
-			Unsigned32,
-		mtpL2TimerT1
-			TimeInterval,
-		mtpL2TimerT2
-			TimeInterval,
-		mtpL2TimerT2L
-			TimeInterval,
-		mtpL2TimerT2H
-			TimeInterval,
-		mtpL2TimerT3
-			TimeInterval,
-		mtpL2TimerT4N
-			TimeInterval,
-		mtpL2TimerT4E
-			TimeInterval,
-		mtpL2TimerT5
-			TimeInterval,
-		mtpL2TimerT6
-			TimeInterval,
-		mtpL2TimerT7
-			TimeInterval,
-		mtpL2N1
-			Unsigned32,
-		mtpL2N2
-			Unsigned32,
-		mtpL2RbAccept
-			Unsigned32,
-		mtpL2RbDiscard
-			Unsigned32,
-		mtpL2RbAbate
-			Unsigned32,
-		mtpL2TbAbate0
-			Unsigned32,
-		mtpL2TbOnset0
-			Unsigned32,
-		mtpL2TbDiscard0
-			Unsigned32,
-		mtpL2TbAbate1
-			Unsigned32,
-		mtpL2TbOnset1
-			Unsigned32,
-		mtpL2TbDiscard1
-			Unsigned32,
-		mtpL2TbAbate2
-			Unsigned32,
-		mtpL2TbOnset2
-			Unsigned32,
-		mtpL2TbDiscard2
-			Unsigned32,
-		mtpL2InserviceDuration
-			Counter32,	-- Q.752, 1.1
-		mtpL2AlignmentFailures
-			Counter32,	-- Q.752, 1.7
-		mtpL2SusInError
-			Counter32,	-- Q.752, 1.8
-		mtpL2NacksReceived
-			Counter32,	-- Q.752, 1.9
-		mtpL2OctetsSent
-			Counter32,	-- Q.752, 3.1
-		mtpL2OctetsReSent
-			Counter32,	-- Q.752, 3.2
-		mtpL2MsusSent
-			Counter32,	-- Q.752, 3.3
-		mtpL2OctetsRecv
-			Counter32,	-- Q.752, 3.4
-		mtpL2MsusRecv
-			Counter32,	-- Q.752, 3.5
-		mtpL2SibsSent
-			Counter32,	-- Q.752, 2.15
-		mtpL2TimeDicontinuity
-			TimeStamp,
-		mtpL2Status
-			RowStatus
-	}
-
-MtpL2Int5minEntry ::=
-	SEQUENCE {
-		mtpL2Int5minInterval
-			Unsigned32,
-		mtpL2Int5minTimestamp
-			TimeStamp,
-		mtpL2Int5minInserviceDuration
-			Gauge32,	-- Q.752, 1.1
-		mtpL2Int5minAlignmentFailures
-			Gauge32,	-- Q.752, 1.7
-		mtpL2Int5minSusInError
-			Gauge32,	-- Q.752, 1.8
-		mtpL2Int5minNacksReceived
-			Gauge32,	-- Q.752, 1.9
-		mtpL2Int5minOctetsSent
-			Gauge32,	-- Q.752, 3.1
-		mtpL2Int5minOctetsReSent
-			Gauge32,	-- Q.752, 3.2
-		mtpL2Int5minMsusSent
-			Gauge32,	-- Q.752, 3.3
-		mtpL2Int5minOctetsRecv
-			Gauge32,	-- Q.752, 3.4
-		mtpL2Int5minMsusRecv
-			Gauge32,	-- Q.752, 3.5
-		mtpL2Int5minSibsSent
-			Gauge32		-- Q.752, 2.15
-	}
-
-MtpL2Int30minEntry ::=
-	SEQUENCE {
-		mtpL2Int30minInterval
-			Unsigned32,
-		mtpL2Int30minTimestamp
-			TimeStamp,
-		mtpL2Int30minInserviceDuration
-			Gauge32,	-- Q.752, 1.1
-		mtpL2Int30minAlignmentFailures
-			Gauge32,	-- Q.752, 1.7
-		mtpL2Int30minSusInError
-			Gauge32,	-- Q.752, 1.8
-		mtpL2Int30minNacksReceived
-			Gauge32,	-- Q.752, 1.9
-		mtpL2Int30minOctetsSent
-			Gauge32,	-- Q.752, 3.1
-		mtpL2Int30minOctetsReSent
-			Gauge32,	-- Q.752, 3.2
-		mtpL2Int30minMsusSent
-			Gauge32,	-- Q.752, 3.3
-		mtpL2Int30minOctetsRecv
-			Gauge32,	-- Q.752, 3.4
-		mtpL2Int30minMsusRecv
-			Gauge32,	-- Q.752, 3.5
-		mtpL2Int30minSibsSent
-			Gauge32		-- Q.752, 2.15
-	}
 
 -- ====================================================================
 
 -- Protocols
 
+mtpProtocols OBJECT IDENTIFIER
+    ::= { mtpMIB2 xx }
+
 mtpProtocolItut OBJECT-IDENTITY
-	STATUS		current
-	DESCRIPTION	"Provides an autonomous type for ITU-T and ITU-T  
-			 based MTP protocols."
-	::= { mtpProtocols 1 }
+    STATUS      current
+    DESCRIPTION "Provides an autonomous type for ITU-T and ITU-T  
+             based MTP protocols."
+    ::= { mtpProtocols 1 }
 
 mtpProtocolEtsi OBJECT-IDENTITY
-	STATUS		current
-	DESCRIPTION	"Provides an autonomous type for ETSI and ETSI 
-			 based MTP protocols."
-	::= { mtpProtocols 2 }
+    STATUS      current
+    DESCRIPTION "Provides an autonomous type for ETSI and ETSI 
+             based MTP protocols."
+    ::= { mtpProtocols 2 }
 
 mtpProtocolAnsi OBJECT-IDENTITY
-	STATUS		current
-	DESCRIPTION	"Provides an autonomous type for ANSI and ANSI 
-			 based protocols."
-	::= { mtpProtocols 3 }
+    STATUS      current
+    DESCRIPTION "Provides an autonomous type for ANSI and ANSI 
+             based protocols."
+    ::= { mtpProtocols 3 }
 
 mtpProtocolJttc OBJECT-IDENTITY
-	STATUS		current
-	DESCRIPTION	"Provides an autonomous type for JTTC and JTTC 
-			 based protocols."
-	::= { mtpProtocols 4 }
+    STATUS      current
+    DESCRIPTION "Provides an autonomous type for JTTC and JTTC 
+             based protocols."
+    ::= { mtpProtocols 4 }
 
 mtpProtocolChin OBJECT-IDENTITY
-	STATUS		current
-	DESCRIPTION	"Provides an autonomous type for China and China 
-			 based protocols."
-	::= { mtpProtocols 5 }
+    STATUS      current
+    DESCRIPTION "Provides an autonomous type for China and China 
+             based protocols."
+    ::= { mtpProtocols 5 }
 
 mtpProtocolPnoc OBJECT-IDENTITY
-	STATUS		current
-	DESCRIPTION	"Provides an autonomous type for PNOC and PNOC 
-			 based protocols."
-	::= { mtpProtocols 6 }
+    STATUS      current
+    DESCRIPTION "Provides an autonomous type for PNOC and PNOC 
+             based protocols."
+    ::= { mtpProtocols 6 }
 
 mtpProtocolSing OBJECT-IDENTITY
-	STATUS		current
-	DESCRIPTION	"Provides an autonomous type for Singapore and 
-			 Singapore based protocols."
-	::= { mtpProtocols 7 }
+    STATUS      current
+    DESCRIPTION "Provides an autonomous type for Singapore and 
+             Singapore based protocols."
+    ::= { mtpProtocols 7 }
 
 mtpProtocolSpan OBJECT-IDENTITY
-	STATUS		current
-	DESCRIPTION	"Provides an autonomous type for Spain and Spain 
-			 based protocols."
-	::= { mtpProtocols 8 }
+    STATUS      current
+    DESCRIPTION "Provides an autonomous type for Spain and Spain 
+             based protocols."
+    ::= { mtpProtocols 8 }
 
 
 
@@ -2298,4 +2586,4 @@ mtpProtocolSpan OBJECT-IDENTITY
 
 END
 
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=64 nocin nosi sts=4 sw=4 et
