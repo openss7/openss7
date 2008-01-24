@@ -67,6 +67,9 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 
 static const char sa_program[] = "ds1";
 
+#define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
+
+#if !defined MODULE
 static int sa_dump = 0;			/* default packet dump */
 static int sa_debug = 0;		/* default no debug */
 static int sa_nomead = 1;		/* default daemon mode */
@@ -87,8 +90,6 @@ static char sa_logfile[256] = "/var/log/ds1.log";
 static char sa_pidfile[256] = "/var/run/ds1.pid";
 static char sa_sysctlf[256] = "/etc/ds1.conf";
 
-#define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
-
 int allow_severity = LOG_ERR;
 int deny_severity = LOG_ERR;
 
@@ -101,11 +102,12 @@ static int sa_fd = 0;
 /* indication to reread MIB configuration */
 static int sa_changed = 1;
 
-/* request number for per-request actions */
-static int sa_request = 1;
-
 /* indications that statistics, the mib or its tables need to be refreshed */
 static int sa_stats_refresh = 1;
+#endif				/* !defined MODULE */
+
+/* request number for per-request actions */
+static int sa_request = 1;
 
 static volatile int ds1_refresh = 1;
 
@@ -144,8 +146,6 @@ oid ds1_variables_oid[] = { 1, 3, 6, 1, 2, 1, 10, 18 };
 
 struct variable4 ds1_variables[] = {
 /*  magic number        , variable type , ro/rw , callback fn  , L, oidsuffix */
-#define   DSX1LINEINDEX         3
-	{DSX1LINEINDEX, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 1}},
 #define   DSX1IFINDEX           4
 	{DSX1IFINDEX, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 2}},
 #define   DSX1TIMEELAPSED       5
@@ -190,8 +190,6 @@ struct variable4 ds1_variables[] = {
 	{DSX1LINEBUILDOUT, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 22}},
 #define   DSX1LINEIMPEDANCE     25
 	{DSX1LINEIMPEDANCE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 23}},
-#define   DSX1CURRENTINDEX      28
-	{DSX1CURRENTINDEX, ASN_INTEGER, RONLY, var_dsx1CurrentTable, 3, {7, 1, 1}},
 #define   DSX1CURRENTESS        29
 	{DSX1CURRENTESS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 2}},
 #define   DSX1CURRENTSESS       30
@@ -212,10 +210,6 @@ struct variable4 ds1_variables[] = {
 	{DSX1CURRENTDMS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 10}},
 #define   DSX1CURRENTLCVS       38
 	{DSX1CURRENTLCVS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 11}},
-#define   DSX1INTERVALINDEX     41
-	{DSX1INTERVALINDEX, ASN_INTEGER, RONLY, var_dsx1IntervalTable, 3, {8, 1, 1}},
-#define   DSX1INTERVALNUMBER    42
-	{DSX1INTERVALNUMBER, ASN_INTEGER, RONLY, var_dsx1IntervalTable, 3, {8, 1, 2}},
 #define   DSX1INTERVALESS       43
 	{DSX1INTERVALESS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 3}},
 #define   DSX1INTERVALSESS      44
@@ -238,8 +232,6 @@ struct variable4 ds1_variables[] = {
 	{DSX1INTERVALLCVS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 12}},
 #define   DSX1INTERVALVALIDDATA  53
 	{DSX1INTERVALVALIDDATA, ASN_INTEGER, RONLY, var_dsx1IntervalTable, 3, {8, 1, 13}},
-#define   DSX1TOTALINDEX        56
-	{DSX1TOTALINDEX, ASN_INTEGER, RONLY, var_dsx1TotalTable, 3, {9, 1, 1}},
 #define   DSX1TOTALESS          57
 	{DSX1TOTALESS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 2}},
 #define   DSX1TOTALSESS         58
@@ -260,8 +252,6 @@ struct variable4 ds1_variables[] = {
 	{DSX1TOTALDMS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 10}},
 #define   DSX1TOTALLCVS         66
 	{DSX1TOTALLCVS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 11}},
-#define   DSX1FARENDCURRENTINDEX  69
-	{DSX1FARENDCURRENTINDEX, ASN_INTEGER, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 1}},
 #define   DSX1FARENDTIMEELAPSED  70
 	{DSX1FARENDTIMEELAPSED, ASN_INTEGER, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 2}},
 #define   DSX1FARENDVALIDINTERVALS  71
@@ -287,10 +277,6 @@ struct variable4 ds1_variables[] = {
 #define   DSX1FARENDINVALIDINTERVALS  81
 	{DSX1FARENDINVALIDINTERVALS, ASN_INTEGER, RONLY, var_dsx1FarEndCurrentTable, 3,
 	 {10, 1, 13}},
-#define   DSX1FARENDINTERVALINDEX  84
-	{DSX1FARENDINTERVALINDEX, ASN_INTEGER, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 1}},
-#define   DSX1FARENDINTERVALNUMBER  85
-	{DSX1FARENDINTERVALNUMBER, ASN_INTEGER, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 2}},
 #define   DSX1FARENDINTERVALESS  86
 	{DSX1FARENDINTERVALESS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 3}},
 #define   DSX1FARENDINTERVALSESS  87
@@ -312,8 +298,6 @@ struct variable4 ds1_variables[] = {
 #define   DSX1FARENDINTERVALVALIDDATA  95
 	{DSX1FARENDINTERVALVALIDDATA, ASN_INTEGER, RONLY, var_dsx1FarEndIntervalTable, 3,
 	 {11, 1, 12}},
-#define   DSX1FARENDTOTALINDEX  98
-	{DSX1FARENDTOTALINDEX, ASN_INTEGER, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 1}},
 #define   DSX1FARENDTOTALESS    99
 	{DSX1FARENDTOTALESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 2}},
 #define   DSX1FARENDTOTALSESS   100
@@ -332,10 +316,6 @@ struct variable4 ds1_variables[] = {
 	{DSX1FARENDTOTALBESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 9}},
 #define   DSX1FARENDTOTALDMS    107
 	{DSX1FARENDTOTALDMS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 10}},
-#define   DSX1FRACINDEX         110
-	{DSX1FRACINDEX, ASN_INTEGER, RONLY, var_dsx1FracTable, 3, {13, 1, 1}},
-#define   DSX1FRACNUMBER        111
-	{DSX1FRACNUMBER, ASN_INTEGER, RONLY, var_dsx1FracTable, 3, {13, 1, 2}},
 #define   DSX1FRACIFINDEX       112
 	{DSX1FRACIFINDEX, ASN_INTEGER, RWRITE, var_dsx1FracTable, 3, {13, 1, 3}},
 #define   DSX1DS1CHANNELNUMBER  116
@@ -380,6 +360,8 @@ init_ds1(void)
 
 	/* register ourselves with the agent to handle our mib tree */
 	REGISTER_MIB("ds1", ds1_variables, variable4, ds1_variables_oid);
+
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_SHUTDOWN, term_ds1, NULL);
 
 	/* register our config handler(s) to deal with registrations */
 	snmpd_register_config_handler("ds1", parse_ds1, NULL, "HELP STRING");
@@ -440,6 +422,48 @@ init_ds1(void)
 	/* place any other initialization junk you need here */
 
 	DEBUGMSGTL(("ds1", "done.\n"));
+}
+
+/*
+ * deinit_ds1():
+ *   Deinitialization routine.  This is called before the agent is unloaded.
+ *   At a minimum, deregistration of your variables should take place here.
+ */
+void
+deinit_ds1(void)
+{
+	DEBUGMSGTL(("ds1", "deinitializating...  "));
+
+	unregister_mib(ds1_variables_oid, sizeof(ds1_variables_oid) / sizeof(oid));
+	snmpd_unregister_config_handler("ds1");
+	snmpd_unregister_config_handler("dsx1ConfigTable");
+
+	snmpd_unregister_config_handler("dsx1CurrentTable");
+
+	snmpd_unregister_config_handler("dsx1IntervalTable");
+
+	snmpd_unregister_config_handler("dsx1TotalTable");
+
+	snmpd_unregister_config_handler("dsx1FarEndCurrentTable");
+
+	snmpd_unregister_config_handler("dsx1FarEndIntervalTable");
+
+	snmpd_unregister_config_handler("dsx1FarEndTotalTable");
+
+	snmpd_unregister_config_handler("dsx1FracTable");
+
+	snmpd_unregister_config_handler("dsx1ChanMappingTable");
+
+	/* place any other de-initialization junk you need here */
+
+	DEBUGMSGTL(("ds1", "done.\n"));
+}
+
+int
+term_ds1(int majorID, int minorID, void *serverarg, void *clientarg)
+{
+	deinit_ds1();
+	return 0;
 }
 
 /*
@@ -523,6 +547,15 @@ store_ds1(int majorID, int minorID, void *serverarg, void *clientarg)
 void
 refresh_ds1(void)
 {
+	if (ds1Storage == NULL) {
+		if ((ds1Storage = SNMP_MALLOC_STRUCT(ds1_data)) == NULL)
+			return;
+
+		/* Update scalar defaults as required here... */
+
+		ds1_refresh = 1;
+	}
+
 	if (ds1_refresh == 0)
 		return;
 	ds1_refresh = 0;
@@ -547,7 +580,7 @@ u_char *
 var_ds1(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len,
 	WriteMethod ** write_method)
 {
-	struct ds1_data *StorageTmp = ds1Storage;
+	struct ds1_data *StorageTmp;
 
 	if (header_generic(vp, name, length, exact, var_len, write_method)
 	    == MATCH_FAILED)
@@ -556,7 +589,8 @@ var_ds1(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_
 	/* Refresh the MIB values if required. */
 	refresh_ds1();
 
-	(void) StorageTmp;
+	if ((StorageTmp = ds1Storage) == NULL)
+		return NULL;
 
 	/* This is where we do the value assignments for the mib results. */
 
@@ -1820,11 +1854,6 @@ var_dsx1ConfigTable(struct variable *vp, oid * name, size_t *length, int exact, 
 
 	switch (vp->magic) {
 
-	case DSX1LINEINDEX:
-		*write_method = NULL;	/* read-only */
-		*var_len = sizeof(StorageTmp->dsx1LineIndex);
-		return (u_char *) &StorageTmp->dsx1LineIndex;
-
 	case DSX1IFINDEX:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->dsx1IfIndex);
@@ -2011,11 +2040,6 @@ var_dsx1CurrentTable(struct variable *vp, oid * name, size_t *length, int exact,
 
 	switch (vp->magic) {
 
-	case DSX1CURRENTINDEX:
-		*write_method = NULL;	/* read-only */
-		*var_len = sizeof(StorageTmp->dsx1CurrentIndex);
-		return (u_char *) &StorageTmp->dsx1CurrentIndex;
-
 	case DSX1CURRENTESS:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->dsx1CurrentESs);
@@ -2141,16 +2165,6 @@ var_dsx1IntervalTable(struct variable *vp, oid * name, size_t *length, int exact
 	/* This is where we do the value assignments for the mib results. */
 
 	switch (vp->magic) {
-
-	case DSX1INTERVALINDEX:
-		*write_method = NULL;	/* read-only */
-		*var_len = sizeof(StorageTmp->dsx1IntervalIndex);
-		return (u_char *) &StorageTmp->dsx1IntervalIndex;
-
-	case DSX1INTERVALNUMBER:
-		*write_method = NULL;	/* read-only */
-		*var_len = sizeof(StorageTmp->dsx1IntervalNumber);
-		return (u_char *) &StorageTmp->dsx1IntervalNumber;
 
 	case DSX1INTERVALESS:
 		*write_method = NULL;	/* read-only */
@@ -2283,11 +2297,6 @@ var_dsx1TotalTable(struct variable *vp, oid * name, size_t *length, int exact, s
 
 	switch (vp->magic) {
 
-	case DSX1TOTALINDEX:
-		*write_method = NULL;	/* read-only */
-		*var_len = sizeof(StorageTmp->dsx1TotalIndex);
-		return (u_char *) &StorageTmp->dsx1TotalIndex;
-
 	case DSX1TOTALESS:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->dsx1TotalESs);
@@ -2413,11 +2422,6 @@ var_dsx1FarEndCurrentTable(struct variable *vp, oid * name, size_t *length, int 
 	/* This is where we do the value assignments for the mib results. */
 
 	switch (vp->magic) {
-
-	case DSX1FARENDCURRENTINDEX:
-		*write_method = NULL;	/* read-only */
-		*var_len = sizeof(StorageTmp->dsx1FarEndCurrentIndex);
-		return (u_char *) &StorageTmp->dsx1FarEndCurrentIndex;
 
 	case DSX1FARENDTIMEELAPSED:
 		*write_method = NULL;	/* read-only */
@@ -2555,16 +2559,6 @@ var_dsx1FarEndIntervalTable(struct variable *vp, oid * name, size_t *length, int
 
 	switch (vp->magic) {
 
-	case DSX1FARENDINTERVALINDEX:
-		*write_method = NULL;	/* read-only */
-		*var_len = sizeof(StorageTmp->dsx1FarEndIntervalIndex);
-		return (u_char *) &StorageTmp->dsx1FarEndIntervalIndex;
-
-	case DSX1FARENDINTERVALNUMBER:
-		*write_method = NULL;	/* read-only */
-		*var_len = sizeof(StorageTmp->dsx1FarEndIntervalNumber);
-		return (u_char *) &StorageTmp->dsx1FarEndIntervalNumber;
-
 	case DSX1FARENDINTERVALESS:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->dsx1FarEndIntervalESs);
@@ -2691,11 +2685,6 @@ var_dsx1FarEndTotalTable(struct variable *vp, oid * name, size_t *length, int ex
 
 	switch (vp->magic) {
 
-	case DSX1FARENDTOTALINDEX:
-		*write_method = NULL;	/* read-only */
-		*var_len = sizeof(StorageTmp->dsx1FarEndTotalIndex);
-		return (u_char *) &StorageTmp->dsx1FarEndTotalIndex;
-
 	case DSX1FARENDTOTALESS:
 		*write_method = NULL;	/* read-only */
 		*var_len = sizeof(StorageTmp->dsx1FarEndTotalESs);
@@ -2816,16 +2805,6 @@ var_dsx1FracTable(struct variable *vp, oid * name, size_t *length, int exact, si
 	/* This is where we do the value assignments for the mib results. */
 
 	switch (vp->magic) {
-
-	case DSX1FRACINDEX:
-		*write_method = NULL;	/* read-only */
-		*var_len = sizeof(StorageTmp->dsx1FracIndex);
-		return (u_char *) &StorageTmp->dsx1FracIndex;
-
-	case DSX1FRACNUMBER:
-		*write_method = NULL;	/* read-only */
-		*var_len = sizeof(StorageTmp->dsx1FracNumber);
-		return (u_char *) &StorageTmp->dsx1FracNumber;
 
 	case DSX1FRACIFINDEX:
 		*write_method = write_dsx1FracIfIndex;
@@ -4954,3 +4933,4 @@ main(int argc, char *argv[])
 	sa_mloop(argc, argv);	/* execute main loop */
 	exit(0);
 }
+#endif				/* !defined MODULE */

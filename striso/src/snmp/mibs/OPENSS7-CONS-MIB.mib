@@ -1,7 +1,7 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-CONS-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/15 20:16:53 $
+-- @(#) $RCSfile: OPENSS7-CONS-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/01/15 10:41:42 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/12/15 20:16:53 $ by $Author: brian $
+-- Last Modified $Date: 2008/01/15 10:41:42 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-CONS-MIB.mib,v $
+-- Revision 0.9.2.2  2008/01/15 10:41:42  brian
+-- - updated and corrected mibs with smilint
+--
 -- Revision 0.9.2.1  2007/12/15 20:16:53  brian
 -- - added new mib files
 --
@@ -60,519 +63,593 @@
 OPENSS7-CONS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Integer32,
-	Unsigned32, enterprises
-		FROM SNMPv2-SMI
-	TEXTUAL-CONVENTION, DisplayString, MODULE-COMPLIANCE, 
-	OBJECT-GROUP, TruthValue, RowStatus, RowPointer
-		FROM SNMPv2-TC
-	AdministrativeState, OperationalState, UsageState, 
-	ProceduralStatus, AvailabilityStatus, AlarmStatus
-		FROM OPENSS7-TMN-TC
-
-openss7		OBJECT IDENTIFIER ::= { enterprises 29591 }
-openss7MIBs	OBJECT IDENTIFIER ::= { openss7 1 }
-openss7Modules	OBJECT IDENTIFIER ::= { openss7MIBs 1 }
+    openss7Modules
+        FROM OPENSS7-SMI
+    AdministrativeState, OperationalState, SimpleNameType
+        FROM OPENSS7-SMI-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
 
 cONS-MIB MODULE-IDENTITY
-	LAST-UPDATED
-		"20071126203635Z"
-	ORGANIZATION
-		"The OpenSS7 Project"
-	CONTACT-INFO
-		"Brian Bidulock
-		 OpenSS7 Corporation
-		 1469 Jefferys Crescent
-		 Edmonton, Alberta T6L 6T1
-		 CANADA
-		 Tel: +1 780 490 1141
-		 Fax: +1 780 490 1241
-		 Mob: +1 780 953 0557
-		 mailto:bidulock@openss7.org"
-	DESCRIPTION
-		"This MIB provides configuraion and status information 
-		 for an OSI CONS subsystem, where the CONS is in 
-		 accordance with ITU-T Rec. X.622 | ISO/IEC 8881 and 
-		 management information from ITU-T Rec. X.283 | ISO/IEC 
-		 10733.  In addition, this MIB supports SNARE operation 
-		 for both End-Systems and SNAREs in accordance with 
-		 ISO/IEC 10030.  The MIB makes use of the 
-		 OPENSS7-X25-PLP-MIB for the underlying X.25 Packet 
-		 Layer Protocol supporting the OSI CONS."
-	::= { openss7Modules 30 }
-
- -- top level organization of the MIB
-
-cONSNotifications	OBJECT IDENTIFIER ::= { cONS-MIB	 0 }
-cONSObjects		OBJECT IDENTIFIER ::= { cONS-MIB	 1 }
-cONSConformance		OBJECT IDENTIFIER ::= { cONS-MIB	 2 }
-
-cONSTables		OBJECT IDENTIFIER ::= { cONSObjects	 1 }
-cONSScalars		OBJECT IDENTIFIER ::= { cONSObjects	 2 }
-cONSNotifs		OBJECT IDENTIFIER ::= { cONSObjects	 3 }
-cONSOids		OBJECT IDENTIFIER ::= { cONSObjects	 4 }
-
-cONSCompliances		OBJECT IDENTIFIER ::= { cONSConformance	 1 }
-cONSGroups		OBJECT IDENTIFIER ::= { cONSConformance	 2 }
-
-cONSNSAPConfig		OBJECT IDENTIFIER ::= { cONSTables	 1 }
-cONSNSAPProfile		OBJECT IDENTIFIER ::= { cONSTables	 2 }
-cONSNSAPState		OBJECT IDENTIFIER ::= { cONSTables	 3 }
-cONSNSAPStats		OBJECT IDENTIFIER ::= { cONSTables	 4 }
-
-cONSSNConfig		OBJECT IDENTIFIER ::= { cONSTables	 5 }
-cONSSNProfile		OBJECT IDENTIFIER ::= { cONSTables	 5 }
-cONSSNState		OBJECT IDENTIFIER ::= { cONSTables	 5 }
-cONSSNStats		OBJECT IDENTIFIER ::= { cONSTables	 5 }
-
-cONSSNAREConfig		OBJECT IDENTIFIER ::= { cONSTables	 5 }
-cONSSNAREProfile	OBJECT IDENTIFIER ::= { cONSTables	 6 }
-cONSSNAREState		OBJECT IDENTIFIER ::= { cONSTables	 7 }
-cONSSNAREStats		OBJECT IDENTIFIER ::= { cONSTables	 8 }
-
--- =============================================================================
-
-CONSSystemTypes TEXTUAL-CONVENTION
-	STATUS		current
-	DESCRIPTION
-		""
-	SYNTAX		BITS { eS(0), iS(1) }
-
-CONSSystemType TEXTUAL-CONVENTION
-	STATUS		current
-	DESCRIPTION
-		""
-	SYNTAX		INTEGER { eS(0), iS(1) }
-
-CONSSNARESupport TEXTUAL-CONVENTION
-	STATUS		current
-	DESCRIPTION
-		""
-	SYNTAX		BITS { rISubset(0), cISubset(1) }
-
-CONSLLCSupport TEXTUAL-CONVENTION
-	STATUS		current
-	DESCRIPTION
-		""
-	SYNTAX		BITS { lLCType2(0), lLCType1(1), lLCType1Broadcast(2) }
-
-CONSNetworkAddress TEXTUAL-CONVENTION
-	STATUS		current
-	DESCRIPTION
-		""
-	SYNTAX		OCTET STRING(SIZE(0..20))
-
--- =============================================================================
-
--- CONS Scalars
-
-cONSAdministrativeState OBJECT-TYPE
-	::= { cONSScalars 1 }
-
-cONSOperationalState OBJECT-TYPE
-	::= { cONSScalars 2 }
-
-cONSSystemTypes OBJECT-TYPE
-	SYNTAX		CONSSystemTypes
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"The set of system roles supported by this Network 
-		 Entity.  This may be End System, Intermediate System, 
-		 SNARE or a combination of the three.  The actual role 
-		 in which a particular instance of the protocol machine 
-		 is operating is determined by the operationalSystemType 
-		 attribute of the cLNS or cONS managed object."
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733 systemTypes."
-	::= { cONSScalars 3 }
-
-cONSOperationalSystemType OBJECT-TYPE
-	SYNTAX		CONSSystemTypes
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"The system role in which this instance is operating.  A 
-		 value of ES indicates that the system shall perform 
-		 operations upon non-local PDUs.  A value of IS 
-		 indicates that the system is permitted to perform 
-		 forwarding operations, but the decision to forward 
-		 invividual PDUs, or not to forward them, shall be taken 
-		 on the basis of the available routing information.  A 
-		 value of SNARE
-
-		 If the MO is created by management operation (using the 
-		 cLNS-networkEntity-Management or 
-		 cONS-networkEntity-Management name binding), the 
-		 initial value of the operationalSystemType attribute 
-		 shall be specified in the CMIP create.  Otherwise, the 
-		 value shall be determined in an implementation specific 
-		 manner.  The value shall be one of those present in the 
-		 systemTypes attribute of the superior Network Entity 
-		 MO."
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733 operationalSystemType."
-	::= { cONSScalars 4 }
-
-cONSNetworkEntityTitles OBJECT-TYPE
-	DESCRIPTION
-		"The set of Network Entity Titles (having the same 
-		 abstract syntax as an NSAP address), which unabiguously 
-		 identify the Network Entity in an End or Intermediate 
-		 System.  The value may be entered by a system 
-		 management operation or it may be derived by some local 
-		 means, for example, by autoconfiguration."
-	::= { cONSScalars 5 }
-
--- =============================================================================
-
-cONSNetworkEntityTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF CONSNetworkEntityEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"There may be multiple entries in this table, each 
-		 representing network entity managed objects, within a 
-		 system.  Its definition permits it to be created and 
-		 deleted by management operation, or to be created and 
-		 deleted automatically as a part of system operation."
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733 networkEntity."
-	::= { cONSNetworkEntity 1 }
-
-cONSNetworkEntityEntry OBJECT-TYPE
-	SYNTAX		CONSNetworkEntityEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"There may be multiple entries in this table, each 
-		 representing a network entity maanged object.  Each 
-		 entry in this table has one or more entries in the 
-		 side-table providing network entity titles."
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733 networkEntity."
-	INDEX		{ cONSNetworkEntityId }
-	::= { cONSNewtorkEntityTable 1 }
-
-CONSNetworkEntityEntry ::=
-	SEQUENCE {
-		cONSNetworkEntityId
-			DisplayString,
-		cONSNetworkEntityLocalSapNames
-			,
-		cONSNetworkEntitySystemTypes
-			CONSSystemTypes,
-		cONSNetworkEntitySNARESupport
-			CONSSNARESupport
-	}
-
-cONSNetworkEntityId OBJECT-TYPE
-	SYNTAX		DisplayString
-	MAX-ACCESS	not-accessible -- shared index
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733 networkEntityId."
-	::= { cONSNetworkEntityEntry 1 }
-
-cONSNetworkEntityLocalSapNames OBJECT-TYPE
-	::= { cONSNetworkEntityEntry 2 }
-
-cONSNeworkEntitySystemTypes OBJECT-TYPE
-	SYNTAX		CONSSsystemTypes
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Indicates the support of the network entity for system 
-		 types.  System types supported can be End System, 
-		 eS(0), or Intermediate System, iS(1), or both, but not 
-		 neither.  This is the support of the underlying 
-		 implemenation to provide operational support for these 
-		 system types.
-
-		 End systems can support virtual calls or permanent 
-		 virtual circuits terminating on this network entity, to 
-		 any of the network entity titles present in the 
-		 network entity title side table associated with this 
-		 network entity.  End systems may also support SNARE 
-		 operation.
-
-		 Intermediate systems can support relay or redirection 
-		 and can support SNARE operation."
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733 systemTypes."
-	::= { cONSNetworkEntityEntry 3 }
-
-cONSNetworkEntitySNARESupport OBJECT-TYPE
-	SYNTAX		CONSSNARESupport
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Indicates the support of the network entity for SNARE 
-		 operation per ISO/IEC 10030.  SNARE support can support 
-		 the Redirection Information subset, rISubset(0), the 
-		 Configuration Information subset, cISubset(1), or both, 
-		 or neither.  This is the support of the underlying 
-		 implementation to provide operational support for SNARE 
-		 operation on this network entity and is dependent upon 
-		 the underlying implementation."
-	REFERENCE
-		"ISO/IEC 10030"
-	::= { cONSNetworkEntityEntry 4 }
+    LAST-UPDATED "200711262036Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         mailto:bidulock@openss7.org"
+    DESCRIPTION 
+	"This MIB provides configuraion and status information for an 
+	 OSI CONS subsystem, where the CONS is in accordance with ITU-T 
+	 Rec. X.622 | ISO/IEC 8881 and management information from ITU-T 
+	 Rec. X.283 | ISO/IEC 10733.  In addition, this MIB supports 
+	 SNARE operation for both End-Systems and SNAREs in accordance 
+	 with ISO/IEC 10030.  The MIB makes use of the 
+	 OPENSS7-X25-PLP-MIB for the underlying X.25 Packet Layer 
+	 Protocol supporting the OSI CONS."
+    REVISION    "200711262036Z"
+    DESCRIPTION 
+        "First release of this module."
+    ::= { openss7Modules 30 }
 
 
-		
+CONSSystemTypes ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    SYNTAX      BITS { eS(0), iS(1) }
 
--- =============================================================================
+CONSSystemType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    SYNTAX      INTEGER { eS(0), iS(1) }
 
-cONSNetworkEntityTitleTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF CONSNetworkEntityTitleEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"This is a side-table that lists network entity titles 
-		 that correspond to each network entity in the system.  
-		 Network entity titles can be created and deleted 
-		 explicitly by management stations or created and 
-		 deleted automatically as a part of system operations."
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733 networkEntityTitles."
-	::= { cONSNetworkEntityTitle 1 }
+CONSSNARESupport ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    SYNTAX      BITS { rISubset(0), cISubset(1) }
 
-cONSNetworkEntityTitleEntry OBJECT-TYPE
-	SYNTAX		CONSNetworkEntityTitleEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"Each entry in this table represents a network entity 
-		 title that has been assigned to a network entity."
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733 networkEntityTitles."
-	INDEX		{
-				cONSNetworkEntityId,	-- shared index
-				cONSNewtorkEntityTitle
-			}
-	::= { cONSNewtorkEntityTitleTable 1 }
+CONSLLCSupport ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    SYNTAX      BITS { lLCType2(0), lLCType1(1), lLCType1Broadcast(2) }
 
-CONSNetworkEntityTitle ::=
-	SEQUENCE {
-		cONSNetworkEntityTitle
-			CONSNetworkAddress,
-		cONSNetworkEntityTitleRowStatus
-			RowStatus
-	}
+CONSNetworkAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    SYNTAX      OCTET STRING (SIZE(0..20))
 
-cONSNetworkEntityTitle OBJECT-TYPE
-	SYNTAX		CONSNetworkAddress
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"Provides the network address for one network entity 
-		 title corresponding to a given network entity."
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733 nwtworkEntityTitles."
-	::= { cONSNetworkEntityTitleEntry 1 }
+cONSNotifications OBJECT IDENTIFIER
+    ::= { cONS-MIB 0 }
 
-cONSNetworkEntityTitleRowStatus OBJECT-TYPE
-	SYNTAX		RowStatus
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Provides a row status textual convention for creating 
-		 and deleting entries from this table.  Each entry 
-		 corresponds to an active Network Entity Title for a 
-		 given Network Entity."
-	REFERENCE
-		"SNMPv2-TC"
-	::= { cONSNetworkEntityTitleEntry 2 }
+cONSObjects OBJECT IDENTIFIER
+    ::= { cONS-MIB 1 }
 
--- =============================================================================
+cONSTables OBJECT IDENTIFIER
+    ::= { cONSObjects 1 }
 
-cONSTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF CONSEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733 cONS."
-	::= { cONS 1 }
-
-cONSEntry OBJECT-TYPE
-	SYNTAX		CONSEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"There is no more than one of these MOs per network 
-		 entity.  Its defintiion permits it ot be created and 
-		 deleted explicitly by management operation, but in some 
-		 systems it will exist inherently and neither creation 
-		 nor deletion by management operation will be possible.  
-
-		 When the protocol machine is operable, the 
-		 operationalState shall have the value 'enabled' 
-		 otherwise it shall have the value 'disabled'. 
-		 Transitions of operationState shall be reported using 
-		 the stateChange notification.  A cONS MO may be created 
-		 in the 'enabled' operational state."
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733 cONS."
-	INDEX		{ cONSNetworkEntityId } -- shared index
-	::= { cONSTable 1 }
-
-CONSEntry ::=
-	SEQUENCE {
-		cONSOperationalState
-			OperationalState,
-		cONSAdministrativeState
-			AdministrativeState,
-		cONSOperationalSystemType
-			CONSSystemTypes,
-		cONSSNARESupport
-			CONSSNARESupport,
-		cONSLLCSupport
-			CONSLLCSupport
-	}
-
-cONSOperationalState OBJECT-TYPE
-	SYNTAX		OperationalState
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Provides the operational state of the CONS protocol 
-		 machine in accordance with TMN textual conventions.  
-		 The operational state is 'enabled' when the protocol 
-		 machine is operable and 'disabled' otherwise."
-	REFERENCE
-		"ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState."
-	::= { cONSEntry 1 }
-
-cONSAdministrativeState OBJECT-TYPE
-	SYNTAX		AdministrativeState
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"Provides the administrative state of the CONS protocol 
-		 machine in accordance with TMN textual conventions.  
-		 Setting this columnar object to 'unlocked' hase the same 
-		 effect act the 'activate' action of X.721; to 
-		 'locked', the 'deactivate' action; to 'shuttingDown', 
-		 the 'deactivateWhenNoUsers' action."
-	REFERENCE
-		"ITU-T Rec. X.721 | ISO/IEC 10165-2 administrativeState."
-	::= { cONSEntry 2 }
-
-cONSOperationalSystemType OBJECT-TYPE
-	SYNTAX		CONSSystemType
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"This single-valued attribute provides the system type 
-		 for this protocol machine and network entity following 
-		 the CONSSystemType textual convention.  It may either 
-		 be End System or Intermediate System.  When acting as 
-		 an End System or Intermediate System, the system may 
-		 also support the operation of a SNARE per ISO/IEC 10030.
-
-		 The operationalSystemType may only be changed when the 
-		 CONS protocol machine is in the 'locked' administrative 
-		 state."
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733 operationalSystemType."
-	::= { cONSEntry 3 }
-
-cONSSNARESupport OBJECT-TYPE
-	SYNTAX		CONSSNARESupport
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"Specifies the support of the network entity CONS 
-		 protocol machine for SNARE operation per ISO/IEC 10030.  
-		 When the rISubset(0) is present, the Redirection 
-		 Information subset of ISO/IEC 10030 is operational.  
-		 When the cISubset(1) is present, the Configuration 
-		 Information subset of ISO/IEC 10030 is operational.
-
-		 Note that the subsets that are operational are 
-		 operational for all subnetwork linkages (SNDCF) 
-		 belonging to this network entity.
-
-		 SNARE support may only be changed while the CONS 
-		 protocol machine is in the 'locked' 
-		 administrativeState."
-	REFERENCE
-		"ISO/IEC 10030"
-	::= { cONSEntry 4 }
-
-cONSLLCSupport OBJECT-TYPE
-	SYNTAX		CONSLLCSupport
-	MAX-ACCESS	read-write
-	STATUS		current
-	DESCRIPTION
-		"Specififies the support for ISO/IEC 8881 CONS operation 
-		 per ISO/IEC 8881.  lLCType2(0) present indicates that 
-		 LLC Type 2 datalink procedures are supported.  
-		 lLCType1(1) present indicates that LLC Type 1 datalink 
-		 procedures are supported.  lLCType1Broadcast(2) present 
-		 indicates that LLC Type 1 Broadcast procedures from 
-		 ISO/IEC 8881 Annex A are supported."
-	REFERENCE
-		"ISO/IEC 8881"
-	::= { cONSEntry 5 }
-
-
--- =============================================================================
+cONSNSAPConfig OBJECT IDENTIFIER
+    ::= { cONSTables 1 }
 
 cONSNSAPConfigTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF CONSNSAPConfigEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"There is one entry in this table, corresponding to an 
-		 nSAP managed object, for each set of NSAPs supported by 
-		 the Network Sybsystem associated with a single 
-		 Transport Layer client.  Each NSAP MO corresponds to a 
-		 set of one or more NSAPs supported by the Network 
-		 Subsystem.  There is not more than one Transport layer 
-		 client associated with a single nSAP MO, but there may 
-		 be more than on nSAP MO, and corresponding sets of 
-		 NSAPs, associated with a single Transport layer client.  
-		 Its definition permits it to be created and deleted 
-		 explicitly by management operation or to be created and 
-		 deleted automaticlly as part of system operation."
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733."
-	::= { cONSNSAPConfig 1 }
+    SYNTAX      SEQUENCE OF CONSNSAPConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+	"There is one entry in this table, corresponding to an nSAP 
+	 managed object, for each set of NSAPs supported by the Network 
+	 Sybsystem associated with a single Transport Layer client.  
+	 Each NSAP MO corresponds to a set of one or more NSAPs 
+	 supported by the Network Subsystem.  There is not more than one 
+	 Transport layer client associated with a single nSAP MO, but 
+	 there may be more than on nSAP MO, and corresponding sets of 
+	 NSAPs, associated with a single Transport layer client.  Its 
+	 definition permits it to be created and deleted explicitly by 
+	 management operation or to be created and deleted automaticlly 
+	 as part of system operation."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733."
+    ::= { cONSNSAPConfig 1 }
 
 cONSNSAPConfigEntry OBJECT-TYPE
-	SYNTAX		CONSNSAPConfigEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. X.283 | ISO/IEC 10733."
-	::= { cONSNSAPConfigTable 1 }
+    SYNTAX      CONSNSAPConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733."
+    INDEX       { cONSNSAPConfigSapId }
+    ::= { cONSNSAPConfigTable 1 }
 
-CONSNSAPConfigEntry ::=
-	SEQUENCE {
-		cONSNSAPConfigSapId
-			,
-		cONSNSAPConfigSap2Address
-			,
-		-- This is really a set of addresses associated with an NSAP.
-		cONSNSAPConfigUserEntityNames
-			,
-		cONSNSAPConfigProviderEntityNames
-			,
-		cONSNSAPConfigRowStatus
-			RowStatus
-	}
+CONSNSAPConfigEntry ::= SEQUENCE {
+    cONSNSAPConfigSapId                 SimpleNameType,
+    cONSNSAPConfigSap2Address           OCTET STRING,
+    cONSNSAPConfigUserEntityNames       OCTET STRING,
+    cONSNSAPConfigProviderEntityNames   OCTET STRING,
+    cONSNSAPConfigRowStatus             RowStatus
+}
 
--- =============================================================================
+cONSNSAPConfigSapId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { cONSNSAPConfigEntry 1 }
 
+cONSNSAPConfigSap2Address OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { cONSNSAPConfigEntry 2 }
 
-END
+cONSNSAPConfigUserEntityNames OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { cONSNSAPConfigEntry 3 }
 
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+cONSNSAPConfigProviderEntityNames OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { cONSNSAPConfigEntry 4 }
+
+cONSNSAPConfigRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { cONSNSAPConfigEntry 5 }
+
+cONSNSAPProfile OBJECT IDENTIFIER
+    ::= { cONSTables 2 }
+
+cONSNSAPState OBJECT IDENTIFIER
+    ::= { cONSTables 3 }
+
+cONSNSAPStats OBJECT IDENTIFIER
+    ::= { cONSTables 4 }
+
+cONSSNConfig OBJECT IDENTIFIER
+    ::= { cONSTables 5 }
+
+cONSSNProfile OBJECT IDENTIFIER
+    ::= { cONSTables 6 }
+
+cONSSNState OBJECT IDENTIFIER
+    ::= { cONSTables 7 }
+
+cONSSNStats OBJECT IDENTIFIER
+    ::= { cONSTables 8 }
+
+cONSSNAREConfig OBJECT IDENTIFIER
+    ::= { cONSTables 9 }
+
+cONSSNAREProfile OBJECT IDENTIFIER
+    ::= { cONSTables 10 }
+
+cONSSNAREState OBJECT IDENTIFIER
+    ::= { cONSTables 11 }
+
+cONSSNAREStats OBJECT IDENTIFIER
+    ::= { cONSTables 12 }
+
+cONSNetworkEntity OBJECT IDENTIFIER
+    ::= { cONSTables 13 }
+
+cONSNetworkEntityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CONSNetworkEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+	"There may be multiple entries in this table, each representing 
+	 network entity managed objects, within a system.  Its 
+	 definition permits it to be created and deleted by management 
+	 operation, or to be created and deleted automatically as a part 
+	 of system operation."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 networkEntity."
+    ::= { cONSNetworkEntity 1 }
+
+cONSNetworkEntityEntry OBJECT-TYPE
+    SYNTAX      CONSNetworkEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+	"There may be multiple entries in this table, each representing 
+	 a network entity maanged object.  Each entry in this table has 
+	 one or more entries in the side-table providing network entity 
+	 titles."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 networkEntity."
+    INDEX       { cONSNetworkEntityId }
+    ::= { cONSNetworkEntityTable 1 }
+
+CONSNetworkEntityEntry ::= SEQUENCE {
+    cONSNetworkEntityId             SimpleNameType,
+    cONSNetworkEntityLocalSapNames  OCTET STRING,
+    cONSNetworkEntitySystemTypes    CONSSystemTypes,
+    cONSNetworkEntitySNARESupport   CONSSNARESupport
+}
+
+cONSNetworkEntityId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 networkEntityId."
+    ::= { cONSNetworkEntityEntry 1 }
+
+cONSNetworkEntityLocalSapNames OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { cONSNetworkEntityEntry 2 }
+
+cONSNetworkEntitySystemTypes OBJECT-TYPE
+    SYNTAX      CONSSystemTypes
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+	"Indicates the support of the network entity for system types.  
+	 System types supported can be End System, eS(0), or 
+	 Intermediate System, iS(1), or both, but not neither.  This is 
+	 the support of the underlying implemenation to provide 
+	 operational support for these system types.
+         
+	 End systems can support virtual calls or permanent virtual 
+	 circuits terminating on this network entity, to any of the 
+	 network entity titles present in the network entity title side 
+	 table associated with this network entity.  End systems may 
+	 also support SNARE operation.
+         
+	 Intermediate systems can support relay or redirection and can 
+	 support SNARE operation."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 systemTypes."
+    ::= { cONSNetworkEntityEntry 3 }
+
+cONSNetworkEntitySNARESupport OBJECT-TYPE
+    SYNTAX      CONSSNARESupport
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+	"Indicates the support of the network entity for SNARE operation 
+	 per ISO/IEC 10030.  SNARE support can support the Redirection 
+	 Information subset, rISubset(0), the Configuration Information 
+	 subset, cISubset(1), or both, or neither.  This is the support 
+	 of the underlying implementation to provide operational support 
+	 for SNARE operation on this network entity and is dependent 
+	 upon the underlying implementation."
+    REFERENCE   
+        "ISO/IEC 10030"
+    ::= { cONSNetworkEntityEntry 4 }
+
+cONSNetworkEntityTitle OBJECT IDENTIFIER
+    ::= { cONSTables 14 }
+
+cONSNetworkEntityTitleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CONSNetworkEntityTitleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+	"This is a side-table that lists network entity titles that 
+	 correspond to each network entity in the system.  Network 
+	 entity titles can be created and deleted explicitly by 
+	 management stations or created and deleted automatically as a 
+	 part of system operations."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 networkEntityTitles."
+    ::= { cONSNetworkEntityTitle 1 }
+
+cONSNetworkEntityTitleEntry OBJECT-TYPE
+    SYNTAX      CONSNetworkEntityTitleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+	"Each entry in this table represents a network entity title that 
+	 has been assigned to a network entity."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 networkEntityTitles."
+    INDEX       { cONSNetworkEntityId, cONSNetworkEntityTitleId }
+    ::= { cONSNetworkEntityTitleTable 1 }
+
+CONSNetworkEntityTitleEntry ::= SEQUENCE {
+    cONSNetworkEntityTitleId            CONSNetworkAddress,
+    cONSNetworkEntityTitleRowStatus     RowStatus
+}
+
+cONSNetworkEntityTitleId OBJECT-TYPE
+    SYNTAX      CONSNetworkAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+	"Provides the network address for one network entity title 
+	 corresponding to a given network entity."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 nwtworkEntityTitles."
+    ::= { cONSNetworkEntityTitleEntry 1 }
+
+cONSNetworkEntityTitleRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+	"Provides a row status textual convention for creating and 
+	 deleting entries from this table.  Each entry corresponds to an 
+	 active Network Entity Title for a given Network Entity."
+    REFERENCE   
+        "SNMPv2-TC"
+    ::= { cONSNetworkEntityTitleEntry 2 }
+
+cONS OBJECT IDENTIFIER
+    ::= { cONSTables 15 }
+
+cONSTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CONSEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 cONS."
+    ::= { cONS 1 }
+
+cONSEntry OBJECT-TYPE
+    SYNTAX      CONSEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+	"There is no more than one of these MOs per network entity.  Its 
+	 defintiion permits it ot be created and deleted explicitly by 
+	 management operation, but in some systems it will exist 
+	 inherently and neither creation nor deletion by management 
+	 operation will be possible.  
+         
+	 When the protocol machine is operable, the operationalState 
+	 shall have the value 'enabled' otherwise it shall have the 
+	 value 'disabled'.  Transitions of operationState shall be 
+	 reported using the stateChange notification.  A cONS MO may be 
+	 created in the 'enabled' operational state."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 cONS."
+    INDEX       { cONSNetworkEntityId }
+    ::= { cONSTable 1 }
+
+CONSEntry ::= SEQUENCE {
+    cONSOperationalState        OperationalState,
+    cONSAdministrativeState     AdministrativeState,
+    cONSOperationalSystemType   CONSSystemType,
+    cONSSNARESupport            CONSSNARESupport,
+    cONSLLCSupport              CONSLLCSupport
+}
+
+cONSOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+	"Provides the operational state of the CONS protocol machine in 
+	 accordance with TMN textual conventions.  The operational state 
+	 is 'enabled' when the protocol machine is operable and 
+	 'disabled' otherwise."
+    REFERENCE   
+        "ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState."
+    ::= { cONSEntry 1 }
+
+cONSAdministrativeState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+	"Provides the administrative state of the CONS protocol machine 
+	 in accordance with TMN textual conventions.  Setting this 
+	 columnar object to 'unlocked' hase the same effect act the 
+	 'activate' action of X.721; to 'locked', the 'deactivate' 
+	 action; to 'shuttingDown', the 'deactivateWhenNoUsers' action."
+    REFERENCE   
+        "ITU-T Rec. X.721 | ISO/IEC 10165-2 administrativeState."
+    ::= { cONSEntry 2 }
+
+cONSOperationalSystemType OBJECT-TYPE
+    SYNTAX      CONSSystemType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+	"This single-valued attribute provides the system type for this 
+	 protocol machine and network entity following the 
+	 CONSSystemType textual convention.  It may either be End System 
+	 or Intermediate System.  When acting as an End System or 
+	 Intermediate System, the system may also support the operation 
+	 of a SNARE per ISO/IEC 10030.
+         
+	 The operationalSystemType may only be changed when the CONS 
+	 protocol machine is in the 'locked' administrative state."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 operationalSystemType."
+    ::= { cONSEntry 3 }
+
+cONSSNARESupport OBJECT-TYPE
+    SYNTAX      CONSSNARESupport
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+	"Specifies the support of the network entity CONS protocol 
+	 machine for SNARE operation per ISO/IEC 10030.  When the 
+	 rISubset(0) is present, the Redirection Information subset of 
+	 ISO/IEC 10030 is operational.  When the cISubset(1) is present, 
+	 the Configuration Information subset of ISO/IEC 10030 is 
+	 operational.
+         
+	 Note that the subsets that are operational are operational for 
+	 all subnetwork linkages (SNDCF) belonging to this network 
+	 entity.
+         
+	 SNARE support may only be changed while the CONS protocol 
+	 machine is in the 'locked' administrativeState."
+    REFERENCE   
+        "ISO/IEC 10030"
+    ::= { cONSEntry 4 }
+
+cONSLLCSupport OBJECT-TYPE
+    SYNTAX      CONSLLCSupport
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+	"Specififies the support for ISO/IEC 8881 CONS operation per 
+	 ISO/IEC 8881.  lLCType2(0) present indicates that LLC Type 2 
+	 datalink procedures are supported.  lLCType1(1) present 
+	 indicates that LLC Type 1 datalink procedures are supported.  
+	 lLCType1Broadcast(2) present indicates that LLC Type 1 
+	 Broadcast procedures from ISO/IEC 8881 Annex A are supported."
+    REFERENCE   
+        "ISO/IEC 8881"
+    ::= { cONSEntry 5 }
+
+cONSScalars OBJECT IDENTIFIER
+    ::= { cONSObjects 2 }
+
+cONSEntityAdministrativeState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { cONSScalars 1 }
+
+cONSEntityOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { cONSScalars 2 }
+
+cONSEntitySystemTypes OBJECT-TYPE
+    SYNTAX      CONSSystemTypes
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+	"The set of system roles supported by this Network Entity.  This 
+	 may be End System, Intermediate System, SNARE or a combination 
+	 of the three.  The actual role in which a particular instance 
+	 of the protocol machine is operating is determined by the 
+	 operationalSystemType attribute of the cLNS or cONS managed 
+	 object."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 systemTypes."
+    ::= { cONSScalars 3 }
+
+cONSEntityOperationalSystemType OBJECT-TYPE
+    SYNTAX      CONSSystemTypes
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+	"The system role in which this instance is operating.  A value 
+	 of ES indicates that the system shall perform operations upon 
+	 non-local PDUs.  A value of IS indicates that the system is 
+	 permitted to perform forwarding operations, but the decision to 
+	 forward invividual PDUs, or not to forward them, shall be taken 
+	 on the basis of the available routing information.  A value of 
+	 SNARE
+         
+	 If the MO is created by management operation (using the 
+	 cLNS-networkEntity-Management or cONS-networkEntity-Management 
+	 name binding), the initial value of the operationalSystemType 
+	 attribute shall be specified in the CMIP create.  Otherwise, 
+	 the value shall be determined in an implementation specific 
+	 manner.  The value shall be one of those present in the 
+	 systemTypes attribute of the superior Network Entity MO."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 operationalSystemType."
+    ::= { cONSScalars 4 }
+
+cONSEntityNetworkEntityTitles OBJECT-TYPE
+    SYNTAX      CONSNetworkAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+	"The set of Network Entity Titles (having the same abstract 
+	 syntax as an NSAP address), which unabiguously identify the 
+	 Network Entity in an End or Intermediate System.  The value may 
+	 be entered by a system management operation or it may be 
+	 derived by some local means, for example, by 
+	 autoconfiguration."
+    ::= { cONSScalars 5 }
+
+cONSNotifs OBJECT IDENTIFIER
+    ::= { cONSObjects 3 }
+
+cONSOids OBJECT IDENTIFIER
+    ::= { cONSObjects 4 }
+
+cONSConformance OBJECT IDENTIFIER
+    ::= { cONS-MIB 2 }
+
+cONSCompliances OBJECT IDENTIFIER
+    ::= { cONSConformance 1 }
+
+cONSGroups OBJECT IDENTIFIER
+    ::= { cONSConformance 2 }
+
+cONSMandatoryGroup OBJECT-GROUP
+    OBJECTS     { cONSEntityAdministrativeState, 
+                  cONSEntityOperationalState, cONSEntitySystemTypes, 
+                  cONSEntityOperationalSystemType, 
+                  cONSEntityNetworkEntityTitles, 
+                  cONSNetworkEntityLocalSapNames, 
+                  cONSNetworkEntitySystemTypes, 
+                  cONSNetworkEntitySNARESupport, 
+                  cONSNetworkEntityTitleRowStatus, cONSOperationalState, 
+                  cONSAdministrativeState, cONSOperationalSystemType, 
+                  cONSSNARESupport, cONSLLCSupport, 
+                  cONSNSAPConfigSap2Address, 
+                  cONSNSAPConfigUserEntityNames, 
+                  cONSNSAPConfigProviderEntityNames, 
+                  cONSNSAPConfigRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { cONSGroups 1 }
+
+cONSBasicCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+	"Base compliance for this module."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { cONSMandatoryGroup }
+
+    ::= { cONSCompliances 1 }
+
+END -- end of module OPENSS7-CONS-MIB.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

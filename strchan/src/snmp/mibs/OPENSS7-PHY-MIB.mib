@@ -1,7 +1,7 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-PHY-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/01/01 13:59:39 $
+-- @(#) $RCSfile: OPENSS7-PHY-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/01/14 19:47:07 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +46,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008/01/01 13:59:39 $ by $Author: brian $
+-- Last Modified $Date: 2008/01/14 19:47:07 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-PHY-MIB.mib,v $
+-- Revision 0.9.2.4  2008/01/14 19:47:07  brian
+-- - updated and corrected mibs
+--
 -- Revision 0.9.2.3  2008/01/01 13:59:39  brian
 -- - added new mibs
 --
@@ -65,1063 +68,944 @@
 OPENSS7-PHY-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY, OBJECT-TYPE
-		FROM SNMPv2-SMI
-	Unsigned32, Counter64, RowStatus, DisplayString, RowPointer
-		FROM SNMPv2-TC
-	openss7Modules
-		FROM OPENSS7-SMI
-	OperationalState
-		FROM OPENSS7-TMN-TC;
+    openss7Modules
+        FROM OPENSS7-SMI
+    OperationalState, SimpleNameType
+        FROM OPENSS7-SMI-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter64, Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    AutonomousType, RowPointer, RowStatus
+        FROM SNMPv2-TC;
 
 phyMIB MODULE-IDENTITY
-	LAST-UPDATED
-		"200801011116Z"
-	ORGANIZATION
-		"The OpenSS7 Project"
-	CONTACT-INFO
-		"Brian Bidulock
-		 OpenSS7 Corporation
-		 1469 Jefferys Crescent
-		 Edmonton, Alberta  T6L 6T1
-		 CANADA
-		 Tel: +1 780 490 1141
-		 Fax: +1 780 490 1241
-		 Mob: +1 780 953 0557
-		 mailto:bidulock@openss7.org"
-	DESCRIPTION
-		"This MIB provides configuration and status information 
-		 for physical data circuits in accordance with ITU-T 
-		 Rec. X.281 | ISO/IEC 13642."
-	::= { openss7Modules 100 }
+    LAST-UPDATED "200801011116Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta  T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         mailto:bidulock@openss7.org"
+    DESCRIPTION 
+        "This MIB provides configuration and status information for 
+         physical data circuits in accordance with ITU-T Rec. X.281 | 
+         ISO/IEC 13642."
+    REVISION    "200801011116Z"
+    DESCRIPTION 
+        "First release of this module."
+    ::= { openss7Modules 100 }
 
- -- top level organization of the MIB
 
-phyNotifications	OBJECT IDENTIFIER ::= { phyMIB		 0 }
-phyObjects		OBJECT IDENTIFIER ::= { phyMIB		 1 }
-phyConformance		OBJECT IDENTIFIER ::= { phyMIB		 2 }
+phyNotifications OBJECT IDENTIFIER
+    ::= { phyMIB 0 }
 
-phyTables		OBJECT IDENTIFIER ::= { phyObjects	 1 }
-phyScalars		OBJECT IDENTIFIER ::= { phyObjects	 2 }
-phyNotifs		OBJECT IDENTIFIER ::= { phyObjects	 3 }
-phyOids			OBJECT IDENTIFIER ::= { phyObjects	 4 }
+phyObjects OBJECT IDENTIFIER
+    ::= { phyMIB 1 }
 
-phyCompliances		OBJECT IDENTIFIER ::= { phyConformance	 1 }
-phyGroups		OBJECT IDENTIFIER ::= { phyConformance	 2 }
+phyTables OBJECT IDENTIFIER
+    ::= { phyObjects 1 }
 
-physicalEntity		OBJECT IDENTIFIER ::= { phyTables	 1 }
-physicalSAP		OBJECT IDENTIFIER ::= { phyTables	 2 }
-dataCircuit		OBJECT IDENTIFIER ::= { phyTables	 3 }
-physicalConnection	OBJECT IDENTIFIER ::= { phyTables	 4 }
-
-phyGlobals		OBJECT IDENTIFIER ::= { phyScalars	 1 }
-phyDefaults		OBJECT IDENTIFIER ::= { phyScalars	 2 }
-
--- 1.3.5.1.4.1.29591.1.1
--- +нн(100)
---    |нн(0) phyNotifications
---    |
---    |нн(1) phyObjects
---    |  |нн(1) phyTables
---    |  |  |нн(1) physicalEntity
---    |  |  |  +нн(1) physicalEntityTable
---    |  |  |      +нн(1) physicalEntityEntry
---    |  |  |         |нн( 1) physicalEntityId
---    |  |  |         |нн( 2) physicalEntityLocalSapNames
---    |  |  |         |нн( 3) physicalEntityOperationalState
---    |  |  |         +нн( 4) physicalEntityTitles
---    |  |  |
---    |  |  |нн(2) physicalSAP
---    |  |  |  +нн(1) physicalSAPTable
---    |  |  |     +нн(1) physicalSAPEntry
---    |  |  |         |нн( 1) physicalSAPsapId
---    |  |  |         |нн( 2) physicalSAPsap1Address
---    |  |  |         |нн( 3) physicalSAPuserEntityNames
---    |  |  |         +нн( 4) physicalSAPRowStatus
---    |  |  |
---    |  |  |нн(3) dataCircuit
---    |  |  |  +нн(1) dataCircuitTable
---    |  |  |     +нн(1) dataCircuitEntry
---    |  |  |         |нн( 1) dataCircuitCoProtocolMachineId
---    |  |  |         |нн( 2) dataCircuitOperationalState
---    |  |  |         |нн( 3) dataCircuitBitErrorsReceived
---    |  |  |         |нн( 4) dataCircuitBitErrorsTransmitted
---    |  |  |         |нн( 5) dataCircuitBitErrorsThreshold
---    |  |  |         |нн( 6) dataCircuitType
---    |  |  |         |нн( 7) dataCircuitPhysicalMediaNames
---    |  |  |         |нн( 8) dataCircuitPhysicalInterfaceType
---    |  |  |         |нн( 9) dataCircuitPhysicalInterfaceStandard
---    |  |  |         |нн(10) dataCircuitSynchronizationMode
---    |  |  |         |нн(11) dataCircuitTransmissionCoding
---    |  |  |         |нн(12) dataCircuitTransmissionMode
---    |  |  |         |нн(13) dataCircuitTransmissionRate
---    |  |  |         +нн(14) dataCircuitRowStatus
---    |  |  |
---    |  |  +нн(4) physicalConnection
---    |  |     +нн(1) physicalConnectionTable
---    |  |         +нн(1) physicalConnectionEntry
---    |  |            |нн( 1) physicalConnectionId
---    |  |            |нн( 2) physicalConnectionUnderlyingConnectionNames
---    |  |            |нн( 3) physicalConnectionSupportedConnectionNames
---    |  |            |нн( 4) physicalConnectionEndpointIdentifier
---    |  |            |нн( 5) physicalConnectionPortNumber
---    |  |            +нн( 6) physicalConnectionRowStatus
---    |  |
---    |  |нн(2) phyScalars
---    |  |  |нн(1) phyGlobals
---    |  |  +нн(2) phyDefaults
---    |  |
---    |  |нн(3) phyNotifs
---    |  |  |нн( 1) physicalBitErrorThresholdReached
---    |  |  |нн( 2) physicalConnectionError
---    |  |  |нн( 3) phsyicalConnectionEstablished
---    |  |  |нн( 4) physicalLossOfSignal
---    |  |  +нн( 5) physicalLossOfSynchronization
---    |  |
---    |  +нн(4) phyOids
---    |
---    +нн(2) phyConformance
---       |нн(1) phyComplicanes
---       +нн(2) phyGroups
-
--- =====================================================================
-
-physicalBitErrorThresholdReached OBJECT-TYPE
-	SYNTAX		OCTET STRING
-	MAX-ACCESS	accessible-for-notify
-	STATUS		current
-	DESCRIPTION
-		"This parameter is used with a qualityofServiceAlarm 
-		 notification from the OPENSS7-TMN-SMI module 
-		 indicating the row in the dataCircuitTable to which the 
-		 qualityofServiceAlarm applies.  This parameter, then, 
-		 indicates that the bit error threshold has been 
-		 surpassed."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 
-		 bitErrorThresholdReached."
-	::= { phyNotifs 1 }
-
-physicalConnectionError OBJECT-TYPE
-	SYNTAX		OCTET STRING
-	MAX-ACCESS	accessible-for-notify
-	STATUS		current
-	DESCRIPTION
-		"This parameter is used with the communicationsAlarm 
-		 notification from the OPENSS7-TMN-SMI module indicating 
-		 the row in the dataCircuitTable to which the 
-		 communicationsAlarm applies.  This parameter, then, 
-		 indicates the connection error that occurred."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 connectionError."
-	::= { phyNotifs 2 }
-
-phsyicalConnectionEstablished OBJECT-TYPE
-	SYNTAX		OCTET STRING
-	MAX-ACCESS	accessible-for-notify
-	STATUS		current
-	DESCRIPTION
-		"This parameter is used with the 
-		 communicationsInformation notification from the 
-		 OPENSS7-TMN-SMI module indicating the row in the 
-		 dataCircuitTable to which the communicationsInformation  
-		 applies.  This parameter, then, indicates that the 
-		 connection has been established."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 connectionEstablished."
-	::= { phyNotifs 3 }
-
-physicalLossOfSignal OBJECT-TYPE
-	SYNTAX		OCTET STRING
-	MAX-ACCESS	accessible-for-notify
-	STATUS		current
-	DESCRIPTION
-		"This parameter is used with the communicationsAlarm 
-		 notification from the OPENSS7-TMN-SMI module indicating 
-		 the row in the dataCircuitTable to which the 
-		 communicationsAlarm applies.  This parameter, then, 
-		 indicates that a loss of signal error occured."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 lossOfSignal."
-	::= { phyNotifs 4 }
-
-physicalLossOfSynchronization OBJECT-TYPE
-	SYNTAX		OCTET STRING
-	MAX-ACCESS	accessible-for-notify
-	STATUS		current
-	DESCRIPTION
-		"This parameter is used with the communicationsAlarm 
-		 notification from the OPENSS7-TMN-SMImodule indicating 
-		 the row in the dataCircuitTable to which the 
-		 communicationsAlarm applies.  This parameter, then, 
-		 indcates that a loss of syncrhonization error occured."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 lossOfSynchronization."
-	::= { phyNotifs 5 }
-
--- =====================================================================
+physicalEntity OBJECT IDENTIFIER
+    ::= { phyTables 1 }
 
 physicalEntityTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF PhysicalEntityEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"One ore more physical entity MO and physical SAP MO 
-		 are contained in a physical subsystem.  The physical 
-		 entity MO represents the whole of the management aspect 
-		 of the entity that executes the functions of the 
-		 physical layer.  Plural instances of the physical 
-		 entity MO can exist in an open system.
-
-		 The communications entity manged object class is used 
-		 to represent an active functional element that performs 
-		 communication processing within a system, e.g. Network 
-		 Entity, Transport Entity, or, in this case, a Physical 
-		 Entity.
-
-		 The physical entity managed object class.  This table 
-		 represents all of the instances of the physical entity 
-		 managed object class.  There may be multiple instances 
-		 of these MOs within a system.  These managed objects 
-		 cannot be created nor deleted explicitly by management 
-		 stations.  They exist inherently in a system; created 
-		 and deleted as a part of system operations.
-		 
-		 The physical entity managed object class is derived 
-		 from the ITU-T Rec. X.723 | ISO/IEC 10165-5 
-		 communications entity managed object class."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642, physicalEntity MOC."
-	::= { physicalEntity 1 }
+    SYNTAX      SEQUENCE OF PhysicalEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "One ore more physical entity MO and physical SAP MO are 
+         contained in a physical subsystem.  The physical entity MO 
+         represents the whole of the management aspect of the entity 
+         that executes the functions of the physical layer.  Plural 
+         instances of the physical entity MO can exist in an open 
+         system.
+         
+         The communications entity manged object class is used to 
+         represent an active functional element that performs 
+         communication processing within a system, e.g. Network Entity, 
+         Transport Entity, or, in this case, a Physical Entity.
+         
+         The physical entity managed object class.  This table 
+         represents all of the instances of the physical entity managed 
+         object class.  There may be multiple instances of these MOs 
+         within a system.  These managed objects cannot be created nor 
+         deleted explicitly by management stations.  They exist 
+         inherently in a system; created and deleted as a part of system 
+         operations.
+         
+         The physical entity managed object class is derived from the 
+         ITU-T Rec. X.723 | ISO/IEC 10165-5 communications entity 
+         managed object class."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642, physicalEntity MOC."
+    ::= { physicalEntity 1 }
 
 physicalEntityEntry OBJECT-TYPE
-	SYNTAX		PhysicalEntityEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"The physical entity terminates the physical media of 
-		 the data circuits containing one or more physical 
-		 connections.
+    SYNTAX      PhysicalEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The physical entity terminates the physical media of the data 
+         circuits containing one or more physical connections.
+         
+         The physical entity MO has a localSapNames attribute inherited 
+         from GMI:communicationsEntity.  This attribute contains the 
+         local distinguished name(s) of SAP MO(s), representing the 
+         point at which services are provided to the entity.
+         
+         A physical entity managed object instance can contain a single 
+         ITU-T Rec. X.281 | ISO/EIC 13642 data circuit managed object 
+         instance.  The containment relationship name binding applies 
+         when a data circuit managed object is created as a subordinate 
+         object of a phsyical entity managed object instance and deleted 
+         by management.
+         
+         A stateChange notification is used to report changes to the 
+         operationalState attribute, and where present, the 
+         adminsitrativeState attribute.  A single parameter set is 
+         included in the state change definition field.  Only the 
+         (mandatory) attributeId and (optional) newAttributeValue 
+         parameters are used."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642, physicalEntity MO."
+    INDEX       { physicalEntityId }
+    ::= { physicalEntityTable 1 }
 
-		 The physical entity MO has a localSapNames attribute 
-		 inherited from GMI:communicationsEntity.  This 
-		 attribute contains the local distinguished name(s) of 
-		 SAP MO(s), representing the point at which services are 
-		 provided to the entity.
+PhysicalEntityEntry ::= SEQUENCE {
+    physicalEntityId                SimpleNameType,
+    physicalEntityLocalSapNames     RowPointer,
+    physicalEntityOperationalState  OperationalState,
+    physicalEntityTitles            RowPointer
+}
 
-		 A physical entity managed object instance can contain 
-		 a single ITU-T Rec. X.281 | ISO/EIC 13642 data circuit 
-		 managed object instance.  The containment relationship 
-		 name binding applies when a data circuit managed object 
-		 is created as a subordinate object of a phsyical entity 
-		 managed object instance and deleted by management.
-		 
-		 A stateChange notification is used to report changes to 
-		 the operationalState attribute, and where present, the 
-		 adminsitrativeState attribute.  A single parameter set 
-		 is included in the state change definition field.  Only 
-		 the (mandatory) attributeId and (optional) 
-		 newAttributeValue parameters are used."
-		 
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642, physicalEntity MO."
-	INDEX		{ physicalEntityId }
-	::= { physicalEntityTable 1 }
-
-PhysicalEntityEntry ::=
-	SEQUENCE {
-		-- X.723 communicationsEntity inherited attributes:
-		physicalEntityId
-			DisplayString, -- index
-		physicalEntityLocalSapNames
-			RowPointer,
-		physicalEntityOperationalState
-			OperationalState,
-		-- X.281 physicalEntity attributes:
-		physicalEntityTitles
-			RowPointer
-	}
-
--- X.723 communicationsEntity inherited attributes:
 physicalEntityId OBJECT-TYPE
-	SYNTAX		DisplayString
-	MAX-ACCESS	not-accessible	-- index
-	STATUS		current
-	DESCRIPTION
-		"
-		 In the OpenSS7 STREAMS implementation of physical 
-		 entities, the communication entity id is a driver name; 
-		 that is, it is the name of the driver node that 
-		 appears in /dev/streams, but with only the basename of 
-		 that path.  When the communications entity id is xxxx, 
-		 there exists a control stream at /dev/streams/xxxx/0 
-		 which provides control access to the physical entity.  
-		 There also exists a /dev/streams/clone/xxxx device 
-		 which is a clone device for creating Type 2 SAPs on the 
-		 physical entity.  There also may exist 
-		 /dev/streams/xxxx/nnnn, where nnnn != 0, Type 1 SAPs on 
-		 the physical entity.  Type 1 SAPs are inherently 
-		 associated with a sap1Address (Physical Point of 
-		 Attachment).  Type 2 SAPs must be bound by the user 
-		 before a sap1Address (Physical Point of Attachment) is 
-		 associated with the SAP."
-	REFERENCE
-		"ITU-T Rec. X.723 | ISO/IEC 10165-5 communicationsEntityId."
-	::= { physicalEntityEntry 1 }
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "In the OpenSS7 STREAMS implementation of physical entities, the 
+         communication entity id is a driver name; that is, it is the 
+         name of the driver node that appears in /dev/streams, but with 
+         only the basename of that path.  When the communications entity 
+         id is xxxx, there exists a control stream at 
+         /dev/streams/xxxx/0 which provides control access to the 
+         physical entity.  There also exists a /dev/streams/clone/xxxx 
+         device which is a clone device for creating Type 2 SAPs on the 
+         physical entity.  There also may exist /dev/streams/xxxx/nnnn, 
+         where nnnn != 0, Type 1 SAPs on the physical entity.  Type 1 
+         SAPs are inherently associated with a sap1Address (Physical 
+         Point of Attachment).  Type 2 SAPs must be bound by the user 
+         before a sap1Address (Physical Point of Attachment) is 
+         associated with the SAP."
+    REFERENCE   
+        "ITU-T Rec. X.723 | ISO/IEC 10165-5 communicationsEntityId."
+    ::= { physicalEntityEntry 1 }
 
 physicalEntityLocalSapNames OBJECT-TYPE
-	-- NOTE: this could, in fact, be represented by the physicalSAP 
-	-- table as a sidetable of the physicalEntity table.
-	SYNTAX		RowPointer
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"The localSapNames attribute of a communications entity 
-		 contains a set of distinguished names of layer (N-1) 
-		 SAPs or ports at which services are provided to the 
-		 entity.  In the case of a physical entity, the 
-		 localSapNames references the port at which physical 
-		 services are provided.
-
-		 The localSapNames attribute of a communications entity 
-		 managed object class indicate the local service access 
-		 points providing user access to the communications 
-		 entity.  In the case of a physical entity, the 
-		 localSapNames identify the single physicalSAP, if any, 
-		 associated with the physical entity.
-		 
-		 When there is no local service access point associated 
-		 with the physical entity (the entity is locally 
-		 isolated), this has the value zeroDotZero.  When there 
-		 is a service access point associated with the entity, 
-		 it is a RowPointer into the physicalSAP table of the 
-		 service access point associated with the physical 
-		 entity."
-		 -- In the OpenSS7 STREAMS implementation, the SAP is 
-		 -- the Stream associated with the physical entity.
-	REFERENCE
-		"ITU-T Rec. X.723 | ISO/IEC 10165-5 localSapNames."
-	::= { physicalEntityEntry 2 }
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The localSapNames attribute of a communications entity contains 
+         a set of distinguished names of layer (N-1) SAPs or ports at 
+         which services are provided to the entity.  In the case of a 
+         physical entity, the localSapNames references the port at which 
+         physical services are provided.
+         
+         The localSapNames attribute of a communications entity managed 
+         object class indicate the local service access points providing 
+         user access to the communications entity.  In the case of a 
+         physical entity, the localSapNames identify the single 
+         physicalSAP, if any, associated with the physical entity.
+         
+         When there is no local service access point associated with the 
+         physical entity (the entity is locally isolated), this has the 
+         value zeroDotZero.  When there is a service access point 
+         associated with the entity, it is a RowPointer into the 
+         physicalSAP table of the service access point associated with 
+         the physical entity."
+    REFERENCE   
+        "ITU-T Rec. X.723 | ISO/IEC 10165-5 localSapNames."
+    ::= { physicalEntityEntry 2 }
 
 physicalEntityOperationalState OBJECT-TYPE
-	SYNTAX		OperationalState
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Provides the operational state of the physical entity 
-		 in accordance with the OperationalState textual 
-		 convention of the OPENSS7-TMN-TC module.  When 
-		 'enabled', the phsyical entity is operational is 
-		 carrying user traffic; when 'disabled', it is not 
-		 operational and is not carrying user traffic.
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the physical entity in 
+         accordance with the OperationalState textual convention of the 
+         OPENSS7-TMN-TC module.  When 'enabled', the phsyical entity is 
+         operational is carrying user traffic; when 'disabled', it is 
+         not operational and is not carrying user traffic.
+         
+         An entity is disabled if it is inoperable or a resource on 
+         which it depends is inoperable.  An entity is enabled if it is 
+         operable.
+         
+         In the OpenSS7 STREAMS implementation, the physical entity is 
+         operational when the STREAMS driver is loaded  in the system 
+         and a control stream is available to the driver."
+    REFERENCE   
+        "ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState."
+    ::= { physicalEntityEntry 3 }
 
-		 An entity is disabled if it is inoperable or a resource 
-		 on which it depends is inoperable.  An entity is 
-		 enabled if it is operable.
-		 
-		 In the OpenSS7 STREAMS implementation, the physical 
-		 entity is operational when the STREAMS driver is loaded  
-		 in the system and a control stream is available to the 
-		 driver."
-	REFERENCE
-		"ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState."
-	::= { physicalEntityEntry 3 }
-
--- X.281 physicalEntity attributes:
 physicalEntityTitles OBJECT-TYPE
-	SYNTAX		RowPointer
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"The set of physical entity titles which unambiguously 
-		 identify the physical entity in an end or intermediate 
-		 system.  The value may be entered by a system 
-		 management operation or it may be derived by some local 
-		 means.
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The set of physical entity titles which unambiguously identify 
+         the physical entity in an end or intermediate system.  The 
+         value may be entered by a system management operation or it may 
+         be derived by some local means.
+         
+         The physicalEntityTitles attribute of a physical entity managed 
+         object indicates the user entities that are being provided 
+         service by the physical entity.  This would normally be a row 
+         pointer into a table of a managed object derived from the data 
+         link entity.  This could be, for example, a lAPBDLE, mACDLE or 
+         signDataLink table entry."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 physicalEntityTitles."
+    ::= { physicalEntityEntry 4 }
 
-		 The physicalEntityTitles attribute of a physical entity 
-		 managed object indicates the user entities that are 
-		 being provided service by the physical entity.  This 
-		 would normally be a row pointer into a table of a 
-		 managed object derived from the data link entity.  This 
-		 could be, for example, a lAPBDLE, mACDLE or 
-		 signDataLink table entry."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 physicalEntityTitles."
-	::= { physicalEntityEntry 4 }
-
-
--- =====================================================================
+physicalSAP OBJECT IDENTIFIER
+    ::= { phyTables 2 }
 
 physicalSAPTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF PhysicalSAPEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"The sap1 managed object class is used to represent a 
-		 service access point at which services are provided by 
-		 an entity to the user entity, where the SAP address is 
-		 dependent on the SAP address of the underlying layer.
-		 
-		 The sap1Address attribute contains the selector that is  
-		 contributed to the address of the SAP by this layer.
-
-		 The userEntityNames attribute contains the 
-		 distinguished names of the managed objects that 
-		 represent the user entities that are using the SAP."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642, physicalSAP MOC."
-	::= { physicalSAP 1 }
+    SYNTAX      SEQUENCE OF PhysicalSAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The sap1 managed object class is used to represent a service 
+         access point at which services are provided by an entity to the 
+         user entity, where the SAP address is dependent on the SAP 
+         address of the underlying layer.
+         
+         The sap1Address attribute contains the selector that is  
+         contributed to the address of the SAP by this layer.
+         
+         The userEntityNames attribute contains the distinguished names 
+         of the managed objects that represent the user entities that 
+         are using the SAP."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642, physicalSAP MOC."
+    ::= { physicalSAP 1 }
 
 physicalSAPEntry OBJECT-TYPE
-	SYNTAX		PhysicalSAPEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"There is a relationship between the physical SAP MO and 
-		 the managed objects that represent the data link user 
-		 entities that are using the SAP.  This is represented 
-		 by the userEntityNames attribute inherited from 
-		 GMI:sap1.
+    SYNTAX      PhysicalSAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "There is a relationship between the physical SAP MO and the 
+         managed objects that represent the data link user entities that 
+         are using the SAP.  This is represented by the userEntityNames 
+         attribute inherited from GMI:sap1.
+         
+         This managed object represents the point at which an entity 
+         provides services to the user entity.  Refer to the Basic 
+         Reference Model (ITU-T Rec. X.210) for the definition of 
+         (N)-SAP.
+         
+         SAP entries are in general communications entity specific when 
+         created as a part of system operation following the 
+         sap1-communicationsEntity name binding; however, when created 
+         by management per X.281, the physicalSAP-physicalSubsystem name 
+         binding is used instead.  Both name bindings use the sapId for 
+         naming.  One way to ensure that the sapId distingsuishes 
+         objects in the subsystem is to use a name derived from the full 
+         major and minor device number of the character special file."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642, physicalSAP MOC."
+    INDEX       { physicalEntityId, physicalSAPsapId }
+    ::= { physicalSAPTable 1 }
 
-		 This managed object represents the point at which an 
-		 entity provides services to the user entity.  Refer to 
-		 the Basic Reference Model (ITU-T Rec. X.210) for the 
-		 definition of (N)-SAP.
-		 
-		 SAP entries are in general communications entity 
-		 specific when created as a part of system operation 
-		 following the sap1-communicationsEntity name binding; 
-		 however, when created by management per X.281, the 
-		 physicalSAP-physicalSubsystem name binding is used 
-		 instead.  Both name bindings use the sapId for naming.  
-		 One way to ensure that the sapId distingsuishes objects 
-		 in the subsystem is to use a name derived from the full 
-		 major and minor device number of the character special 
-		 file."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642, physicalSAP MOC."
-	INDEX		{
-				physicalEntityId, -- shared index
-				physicalSAPsapId  -- index
-			}
-	::= { physicalSAPTable 1 }
-
-PhysicalSAPEntry ::=
-	SEQUENCE {
-		physicalSAPsapId
-			DisplayString, -- index
-		physicalSAPsap1Address
-			Unsigned32,
-		physicalSAPuserEntityNames
-			RowPointer,
-		physicalSAPRowStatus
-			RowStatus
-	}
+PhysicalSAPEntry ::= SEQUENCE {
+    physicalSAPsapId            SimpleNameType,
+    physicalSAPsap1Address      Unsigned32,
+    physicalSAPuserEntityNames  RowPointer,
+    physicalSAPRowStatus        RowStatus
+}
 
 physicalSAPsapId OBJECT-TYPE
-	SYNTAX		DisplayString -- GraphicString in X.723.
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"Provides the identifier of the SAP within the physical 
-		 subsystem and physical entity.  The SAP identifier is 
-		 implementation specific.  In the case of the OpenSS7 
-		 Streams implementation, a SAP identifier is the device 
-		 name of the minor device within the driver.  This is 
-		 either the instance number or minor device name 
-		 associated with the open Stream.  Streams opened by 
-		 opening the clone device /dev/streams/clone/xxxx, where 
-		 xxxx is the name of the physical entity will have SAP 
-		 identifiers of nnnn, where nnnn is the minor device 
-		 number assigned to the Stream.  Streams opened by 
-		 opening a specific minor device name or number 
-		 /dev/streams/xxxx/yyyy will have the name yyyy."
-	REFERENCE
-		"ITU-T Rec. X.723 | ISO/IEC 10165-5 sapId."
-	::= { physicalSAPEntry 1 }
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides the identifier of the SAP within the physical 
+         subsystem and physical entity.  The SAP identifier is 
+         implementation specific.  In the case of the OpenSS7 Streams 
+         implementation, a SAP identifier is the device name of the 
+         minor device within the driver.  This is either the instance 
+         number or minor device name associated with the open Stream.  
+         Streams opened by opening the clone device 
+         /dev/streams/clone/xxxx, where xxxx is the name of the physical 
+         entity will have SAP identifiers of nnnn, where nnnn is the 
+         minor device number assigned to the Stream.  Streams opened by 
+         opening a specific minor device name or number 
+         /dev/streams/xxxx/yyyy will have the name yyyy."
+    REFERENCE   
+        "ITU-T Rec. X.723 | ISO/IEC 10165-5 sapId."
+    ::= { physicalSAPEntry 1 }
 
 physicalSAPsap1Address OBJECT-TYPE
-	SYNTAX		Unsigned32
-	MAX-ACCESS	read-only -- should be read-create
-	STATUS		current
-	DESCRIPTION
-		"The sap1Address attribute contains the selector that is 
-		 contributed to the address of the SAP by this layer and 
-		 is dependent on the SAP address of the physical medium.  
-		 That is, the sap1Address is a relative distinguished 
-		 name of the physical medium providing underlying 
-		 services to the physical SAP.
-		 
-		 In the OpenSS7 STREAMS implementation, this is the 
-		 Physical Point of Attachment when the Stream is 
-		 attached, and zero when a Type 2 Stream is unattached."
-	REFERENCE
-		"ITU-T Rec. X.723 | ISO/IEC 10165-5 sap1Address."
-	::= { physicalSAPEntry 2 }
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The sap1Address attribute contains the selector that is 
+         contributed to the address of the SAP by this layer and is 
+         dependent on the SAP address of the physical medium.  That is, 
+         the sap1Address is a relative distinguished name of the 
+         physical medium providing underlying services to the physical 
+         SAP.
+         
+         In the OpenSS7 STREAMS implementation, this is the Physical 
+         Point of Attachment when the Stream is attached, and zero when 
+         a Type 2 Stream is unattached."
+    REFERENCE   
+        "ITU-T Rec. X.723 | ISO/IEC 10165-5 sap1Address."
+    ::= { physicalSAPEntry 2 }
 
 physicalSAPuserEntityNames OBJECT-TYPE
-	SYNTAX		RowPointer
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"The userEntityNames attribute contains the 
-		 distinguished names of the managed objects that 
-		 represent the user entities that are using the SAP.  
-		 For the physical layer, this is normally the data link 
-		 entity that is communicating via the data circuit.
-		 
-		 In the OpenSS7 STREAMS implementation, a user entity 
-		 name is assigned when the Stream is linked under a 
-		 multiplexing driver, or a pushable module is pushed 
-		 over the Stream.  In this case, the table entry 
-		 referenced is the driver or module entry in the 
-		 corresponding entity table."
-	REFERENCE
-		"ITU-T Rec. X.723 | ISO/IEC 10165-5 userEntityNames."
-	::= { physicalSAPEntry 3 }
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The userEntityNames attribute contains the distinguished names 
+         of the managed objects that represent the user entities that 
+         are using the SAP.  For the physical layer, this is normally 
+         the data link entity that is communicating via the data 
+         circuit.
+         
+         In the OpenSS7 STREAMS implementation, a user entity name is 
+         assigned when the Stream is linked under a multiplexing driver, 
+         or a pushable module is pushed over the Stream.  In this case, 
+         the table entry referenced is the driver or module entry in the 
+         corresponding entity table."
+    REFERENCE   
+        "ITU-T Rec. X.723 | ISO/IEC 10165-5 userEntityNames."
+    ::= { physicalSAPEntry 3 }
 
 physicalSAPRowStatus OBJECT-TYPE
-	SYNTAX		RowStatus
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Provides a mechansim whereby mnagement stations, 
-		 following the RowStatus textual convention of the 
-		 SNMPv2-TC module, may create or delete conceptual rows 
-		 in this table.
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechansim whereby mnagement stations, following the 
+         RowStatus textual convention of the SNMPv2-TC module, may 
+         create or delete conceptual rows in this table.
+         
+         The physicalSAP-PhysicalSubsystem name binding applies when a 
+         physicalSAPEntry is created by management as a subordinate 
+         entry of a physicalEntityEntry, or deleted by management.  
+         Management stations may only delete physicalSAP objects that do 
+         not contain any subordinate objects."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 
+         physicalSAP-physicalSubsystem."
+    ::= { physicalSAPEntry 4 }
 
-		 The physicalSAP-PhysicalSubsystem name binding applies 
-		 when a physicalSAPEntry is created by management as a 
-		 subordinate entry of a physicalEntityEntry, or deleted 
-		 by management.  Management stations may only delete 
-		 physicalSAP objects that do not contain any subordinate 
-		 objects."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 
-		 physicalSAP-physicalSubsystem."
-	::= { physicalSAPEntry 4 }
-
--- =====================================================================
+dataCircuit OBJECT IDENTIFIER
+    ::= { phyTables 3 }
 
 dataCircuitTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF DataCircuitEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"The data circuit MO is a generic managed object that 
-		 represents the management aspect of the entity that 
-		 executes the tranmission of bits."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642, dataCircuit MOC."
-	::= { dataCircuit 1 }
+    SYNTAX      SEQUENCE OF DataCircuitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The data circuit MO is a generic managed object that represents 
+         the management aspect of the entity that executes the 
+         tranmission of bits."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642, dataCircuit MOC."
+    ::= { dataCircuit 1 }
 
 dataCircuitEntry OBJECT-TYPE
-	SYNTAX		DataCircuitEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"A protocol machine which performs connection-mode 
-		 communications functions.  A connection oriented 
-		 protocol machine is contained within a communications 
-		 entity and can contain a single peer connection.
+    SYNTAX      DataCircuitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A protocol machine which performs connection-mode 
+         communications functions.  A connection oriented protocol 
+         machine is contained within a communications entity and can 
+         contain a single peer connection.
+         
+         A data circuit managed object derives from a connection 
+         oriented protocol machine and is contained by a physical entity 
+         and can contain a physical connection.
+         
+         A data circuit can only be created by management as a 
+         subordinate of a physical entity and can only be deleted by 
+         management when it does not contain a physical connection.
+         
+         An objectCreation notification is generated whenever an 
+         instance of the managed object class is created.  
+         Implementations may optionally include the sourceIndicator 
+         parameter in the notification.  If the creation occured as a 
+         result of internal operation of the resource, the value 
+         'resourceOperation' is used.  If creation occured in response 
+         to a management operation, the value 'managementOperation' is 
+         used.  A value of 'unknown' may be returned if it is not 
+         possible to determine the source of the operation.  None of the 
+         other optional parameters are used.
+         
+         An objectDeletion notification is generated whenever an 
+         instance of the managed object class is deleted.  
+         Implementations may optionally include the sourceIndicator 
+         parameter in the notification.  If deletion occured as a result 
+         of internal operation of the resource, the value 
+         'resourceOperation' is used.  If deletion occured in response 
+         to a managemetn operation, the value 'managementOperation' is 
+         used.  A value of 'unknown' may be returned if it is not 
+         possible to determine the source of the operation.  None of the 
+         other optional parameters are used.
+         
+         A stateChange notification is used to report changes to the 
+         operationalState attribute, and where present, the 
+         adminsitrativeState attribute.  A single parameter set is 
+         included in the state change definition field.  Only the 
+         (mandatory) attributeId and (optional) newAttributeValue 
+         parameters are used.
+         
+         A communicationsAlarm notification can be generated including a 
+         connectionError, lossOfSignal and lossOfSyncrhonization 
+         parameters.  The probableCause parameter is set to the value 
+         lossOfSignal.  The perceivedSeverity parameter is set to the 
+         value Critical.
+         
+         A communicationsInformation notification can be generated 
+         including a connectionEstablished parameter.  
+         
+         An equipmentAlarm notification can be generated.  The 
+         probableCause parameter is set to datasetOrModemError.  The 
+         perceivedSeverity parameter is set to the value Major.
+         
+         A qualityofServiceAlarm notification can be generated including 
+         a bitErrorThresholdReached parameter.  The probableCause 
+         parameter is set to thresholdCrossed.  The perceivedSeverity 
+         parameter is set to the value Warning."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642, dataCircuit MOC."
+    INDEX       { physicalEntityId, dataCircuitCoProtocolMachineId }
+    ::= { dataCircuitTable 1 }
 
-		 A data circuit managed object derives from a connection 
-		 oriented protocol machine and is contained by a 
-		 physical entity and can contain a physical connection.
+DataCircuitEntry ::= SEQUENCE {
+    dataCircuitCoProtocolMachineId          SimpleNameType,
+    dataCircuitOperationalState             OperationalState,
+    dataCircuitBitErrorsReceived            Counter64,
+    dataCircuitBitErrorsTransmitted         Counter64,
+    dataCircuitBitErrorsThreshold           OCTET STRING,
+    dataCircuitType                         INTEGER,
+    dataCircuitPhysicalMediaNames           OCTET STRING,
+    dataCircuitPhysicalInterfaceType        OCTET STRING,
+    dataCircuitPhysicalInterfaceStandard    AutonomousType,
+    dataCircuitSynchronizationMode          INTEGER,
+    dataCircuitTransmissionCoding           OCTET STRING,
+    dataCircuitTransmissionMode             INTEGER,
+    dataCircuitTransmissionRate             OCTET STRING,
+    dataCircuitRowStatus                    RowStatus
+}
 
-		 A data circuit can only be created by management as a 
-		 subordinate of a physical entity and can only be 
-		 deleted by management when it does not contain a 
-		 physical connection.
-
-		 An objectCreation notification is generated whenever an 
-		 instance of the managed object class is created.  
-		 Implementations may optionally include the 
-		 sourceIndicator parameter in the notification.  If the 
-		 creation occured as a result of internal operation of 
-		 the resource, the value 'resourceOperation' is used.  
-		 If creation occured in response to a management 
-		 operation, the value 'managementOperation' is used.  A 
-		 value of 'unknown' may be returned if it is not 
-		 possible to determine the source of the operation.  
-		 None of the other optional parameters are used.
-		 
-		 An objectDeletion notification is generated whenever an 
-		 instance of the managed object class is deleted.  
-		 Implementations may optionally include the 
-		 sourceIndicator parameter in the notification.  If 
-		 deletion occured as a result of internal operation of 
-		 the resource, the value 'resourceOperation' is used.  
-		 If deletion occured in response to a managemetn 
-		 operation, the value 'managementOperation' is used.  A 
-		 value of 'unknown' may be returned if it is not 
-		 possible to determine the source of the operation.  
-		 None of the other optional parameters are used.
-		 
-		 A stateChange notification is used to report changes to 
-		 the operationalState attribute, and where present, the 
-		 adminsitrativeState attribute.  A single parameter set 
-		 is included in the state change definition field.  Only 
-		 the (mandatory) attributeId and (optional) 
-		 newAttributeValue parameters are used.
-		 
-		 A communicationsAlarm notification can be generated 
-		 including a connectionError, lossOfSignal and 
-		 lossOfSyncrhonization parameters.  The probableCause 
-		 parameter is set to the value lossOfSignal.  The 
-		 perceivedSeverity parameter is set to the value 
-		 Critical.
-		 
-		 A communicationsInformation notification can be 
-		 generated including a connectionEstablished parameter.  
-		 
-		 An equipmentAlarm notification can be generated.  The 
-		 probableCause parameter is set to datasetOrModemError. 
-		 The perceivedSeverity parameter is set to the value 
-		 Major.
-		 
-		 A qualityofServiceAlarm notification can be generated 
-		 including a bitErrorThresholdReached parameter.  The 
-		 probableCause parameter is set to thresholdCrossed.  
-		 The perceivedSeverity parameter is set to the value 
-		 Warning."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642, dataCircuit MOC."
-	INDEX	{
-			physicalEntityId, -- shared index
-			dataCircuitCoProtocolMachineId -- index
-		}
-	::= { dataCircuitTable 1 }
-
-DataCircuitEntry ::=
-	SEQUENCE {
-		-- X.723 coProtocolMachine inherited attributes:
-		dataCircuitCoProtocolMachineId
-			DisplayString,
-		dataCircuitOperationalState
-			OperationalState,
-		-- X.281 dataCircuit attributes:
-		dataCircuitBitErrorsReceived
-			Counter64,
-		dataCircuitBitErrorsTransmitted
-			Counter64,
-		dataCircuitBitErrorsThreshold
-			OCTET STRING,
-		dataCircuitType
-			INTEGER,
-		dataCircuitPhysicalMediaNames
-			OCTET STRING,
-		dataCircuitPhysicalInterfaceType
-			OCTET STRING,
-		dataCircuitPhysicalInterfaceStandard
-			OCTET STRING,
-		dataCircuitSynchronizationMode
-			INTEGER,
-		dataCircuitTransmissionCoding
-			OCTET STRING,
-		dataCircuitTransmissionMode
-			INTEGER,
-		dataCircuitTransmissionRate
-			OCTET STRING,
-		dataCircuitRowStatus
-			RowStatus
-	}
-
--- X.723 coProtocolMachine inherited attributes:
 dataCircuitCoProtocolMachineId OBJECT-TYPE
-	SYNTAX		DisplayString
-	MAX-ACCESS	not-accessible -- index
-	STATUS		current
-	DESCRIPTION
-		"Provides a name for the entry."
-	::= { dataCircuitEntry 1 }
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a name for the entry."
+    ::= { dataCircuitEntry 1 }
 
 dataCircuitOperationalState OBJECT-TYPE
-	SYNTAX		OperationalState
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Provides the operational state of the data circuit 
-		 following the OperationalState textual convention of 
-		 the OPENSS7-TMN-TC module.  The operational state is 
-		 'enabled' when the data circuit is actively exchanging 
-		 bits with the physical medium; 'disabled' otherwise."
-	REFERENCE
-		"ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState."
-	::= { dataCircuitEntry 2 }
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the data circuit following 
+         the OperationalState textual convention of the OPENSS7-TMN-TC 
+         module.  The operational state is 'enabled' when the data 
+         circuit is actively exchanging bits with the physical medium; 
+         'disabled' otherwise."
+    REFERENCE   
+        "ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState."
+    ::= { dataCircuitEntry 2 }
 
--- X.281 dataCircuit attributes:
 dataCircuitBitErrorsReceived OBJECT-TYPE
-	SYNTAX		Counter64
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Data circuit bit errors received."
-	::= { dataCircuitEntry 3 }
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Data circuit bit errors received."
+    ::= { dataCircuitEntry 3 }
 
 dataCircuitBitErrorsTransmitted OBJECT-TYPE
-	SYNTAX		Counter64
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Data circuit bit errors transmitted."
-	::= { dataCircuitEntry 4 }
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Data circuit bit errors transmitted."
+    ::= { dataCircuitEntry 4 }
 
 dataCircuitBitErrorsThreshold OBJECT-TYPE
-	SYNTAX		OCTET STRING
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Data circuit bit errors threshold."
-	::= { dataCircuitEntry 5 }
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Data circuit bit errors threshold."
+    ::= { dataCircuitEntry 5 }
 
 dataCircuitType OBJECT-TYPE
-	SYNTAX		INTEGER { end-system(0), relay-system(1) }
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Indicates whether the data circuit is attached to an 
-		 end system or a relay system.  When attached to an 
-		 end-system, no switching occurs between the local and 
-		 remote systems and the circuit is always 
-		 semi-permanent.  When attached to a relay-system, the 
-		 circuit is either permanent, semi-permanent or 
-		 switched.  When switched, the circuit can be controlled 
-		 by the relay system, or controlled by the local 
-		 system."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 dataCircuitType."
-	::= { dataCircuitEntry 6 }
+    SYNTAX      INTEGER { endSystem(0), relaySystem(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether the data circuit is attached to an end system 
+         or a relay system.  When attached to an end-system, no 
+         switching occurs between the local and remote systems and the 
+         circuit is always semi-permanent.  When attached to a 
+         relay-system, the circuit is either permanent, semi-permanent 
+         or switched.  When switched, the circuit can be controlled by 
+         the relay system, or controlled by the local system."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 dataCircuitType."
+    ::= { dataCircuitEntry 6 }
 
 dataCircuitPhysicalMediaNames OBJECT-TYPE
-	SYNTAX		OCTET STRING
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { dataCircuitEntry 7 }
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The names of the physical media."
+    ::= { dataCircuitEntry 7 }
 
 dataCircuitPhysicalInterfaceType OBJECT-TYPE
-	SYNTAX		OCTET STRING
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { dataCircuitEntry 8 }
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The phsyical interface type."
+    ::= { dataCircuitEntry 8 }
 
 dataCircuitPhysicalInterfaceStandard OBJECT-TYPE
-	SYNTAX		OCTET STRING
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		""
-	::= { dataCircuitEntry 9 }
+    SYNTAX      AutonomousType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The physical inteface standard."
+    ::= { dataCircuitEntry 9 }
 
 dataCircuitSynchronizationMode OBJECT-TYPE
-	SYNTAX		INTEGER { syncrhonous(0), asyncrhonous(1) }
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Indicates whether the data circuit is syncrhonous or 
-		 asynchronous in terms of the definition provided in ISO 
-		 7776.  When HDLC is provided on the data circuit, the 
-		 form of bit or character patterns used by the data link 
-		 depend upon this syncrhonization mode.  This is a 
-		 read-only attribute as this is an intrinsic property of 
-		 the data circuit."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 synchronizationMode."
-	::= { dataCircuitEntry 10 }
-
+    SYNTAX      INTEGER { syncrhonous(0), asyncrhonous(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether the data circuit is syncrhonous or 
+         asynchronous in terms of the definition provided in ISO 7776.  
+         When HDLC is provided on the data circuit, the form of bit or 
+         character patterns used by the data link depend upon this 
+         syncrhonization mode.  This is a read-only attribute as this is 
+         an intrinsic property of the data circuit."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 synchronizationMode."
+    ::= { dataCircuitEntry 10 }
 
 dataCircuitTransmissionCoding OBJECT-TYPE
-	SYNTAX		OCTET STRING
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Indicates the transmission coding of the data circuit."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 transmissionCoding."
-	::= { dataCircuitEntry 11 }
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the transmission coding of the data circuit."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 transmissionCoding."
+    ::= { dataCircuitEntry 11 }
 
 dataCircuitTransmissionMode OBJECT-TYPE
-	SYNTAX		INTEGER {
-				simplex(0),
-				duplex(1),
-				half-duplex(2)
-			}
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"Indicates the transmission mode, either simplex(0), 
-		 one-way outgoing or one-way incoming, duplex(1), 
-		 two-way simultaneous communications, or half-duplex(2), 
-		 alternating two-way communications.  Normally the data 
-		 link entity must know whether the communications is 
-		 full or half duplex and most data link entities expect 
-		 duplex instead of simplex operation.  When the data 
-		 circuit only supports half-duplex operation, a 
-		 half-duplex module is required between the physical SAP 
-		 and the user data link entity to provide a convergence 
-		 sublayer.  This can be implemetned under STREAMS as a 
-		 separate pushable module (the HDM or half-duplex 
-		 module).  The use of such a module is described in 
-		 ITU-T Rec. X.211 (1995) | ISO/IEC 10022 : 1996 Annex 
-		 B."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 transmissionMode."
-	::= { dataCircuitEntry 12 }
-
+    SYNTAX      INTEGER { simplex(0), duplex(1), halfDuplex(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the transmission mode, either simplex(0), one-way 
+         outgoing or one-way incoming, duplex(1), two-way simultaneous 
+         communications, or half-duplex(2), alternating two-way 
+         communications.  Normally the data link entity must know 
+         whether the communications is full or half duplex and most data 
+         link entities expect duplex instead of simplex operation.  When 
+         the data circuit only supports half-duplex operation, a 
+         half-duplex module is required between the physical SAP and the 
+         user data link entity to provide a convergence sublayer.  This 
+         can be implemetned under STREAMS as a separate pushable module 
+         (the HDM or half-duplex module).  The use of such a module is 
+         described in ITU-T Rec. X.211 (1995) | ISO/IEC 10022 : 1996 
+         Annex B."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 transmissionMode."
+    ::= { dataCircuitEntry 12 }
 
 dataCircuitTransmissionRate OBJECT-TYPE
-	SYNTAX		OCTET STRING
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"This is a floating point number indicating the 
-		 transmission rate of the data circuit."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 transmissionRate."
-	::= { dataCircuitEntry 13 }
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This is a floating point number indicating the transmission 
+         rate of the data circuit."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 transmissionRate."
+    ::= { dataCircuitEntry 13 }
 
 dataCircuitRowStatus OBJECT-TYPE
-	SYNTAX		RowStatus
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Provides a mechanism whereby management stations, 
-		 following the RowStatus textual convention of the 
-		 SNMPv2-TC module, may create or delete conceptual rows 
-		 in this table.
-		 
-		 Data circuits can be deleted by management only if they 
-		 do not contain physical connections.  Data circuits may 
-		 not be created explicitly by management stations."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 
-		 dataCircuit-physicalEntity, STD 58, SNMPv2-TC 
-		 RowStatus."
-	::= { dataCircuitEntry 14 }
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations, following the 
+         RowStatus textual convention of the SNMPv2-TC module, may 
+         create or delete conceptual rows in this table.
+         
+         Data circuits can be deleted by management only if they do not 
+         contain physical connections.  Data circuits may not be created 
+         explicitly by management stations."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 dataCircuit-physicalEntity, 
+         STD 58, SNMPv2-TC RowStatus."
+    ::= { dataCircuitEntry 14 }
 
--- =====================================================================
+physicalConnection OBJECT IDENTIFIER
+    ::= { phyTables 4 }
 
 physicalConnectionTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF PhysicalConnectionEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"The physical connection MO represents the management 
-		 view of connections established using relaying 
-		 functions.
-		 
-		 Multiplexing consists of supporting multiple physical 
-		 connections on a single data circuit.
-		 
-		 A physical connection is associated with a single 
-		 physical SAP.  If more than one physical connection is 
-		 associated wtih a physical SAP, the endpoint 
-		 identification is used to distiguish between physical 
-		 connections accessible via the SAP.
-		 
-		 Physical connection identifiers are not globally known.  
-		 In the case of mujltiplexing, they will be conveyed 
-		 implicitly or explicitly via the Physical protocol."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642, physicalConnection MOC."
-	::= { physicalConnection 1 }
+    SYNTAX      SEQUENCE OF PhysicalConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The physical connection MO represents the management view of 
+         connections established using relaying functions.
+         
+         Multiplexing consists of supporting multiple physical 
+         connections on a single data circuit.
+         
+         A physical connection is associated with a single physical SAP.  
+         If more than one physical connection is associated wtih a 
+         physical SAP, the endpoint identification is used to distiguish 
+         between physical connections accessible via the SAP.
+         
+         Physical connection identifiers are not globally known.  In the 
+         case of mujltiplexing, they will be conveyed implicitly or 
+         explicitly via the Physical protocol."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642, physicalConnection MOC."
+    ::= { physicalConnection 1 }
 
 physicalConnectionEntry OBJECT-TYPE
-	SYNTAX		PhysicalConnectionEntry
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"There is a relationship between the physical connection 
-		 MO and the managed objects that represent the Data Link 
-		 connections.
+    SYNTAX      PhysicalConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "There is a relationship between the physical connection MO and 
+         the managed objects that represent the Data Link connections.
+         
+         An objectCreation notification is generated whenever an 
+         instance of the managed object class is created.  
+         Implementations may optionally include the sourceIndicator 
+         parameter in the notification.  If the creation occured as a 
+         result of internal operation of the resource, the value 
+         'resourceOperation' is used.  If creation occured in response 
+         to a management operation, the value 'managementOperation' is 
+         used.  A value of 'unknown' may be returned if it is not 
+         possible to determine the source of the operation.  None of the 
+         other optional parameters are used.
+         
+         An objectDeletion notification is generated whenever an 
+         instance of the managed object class is deleted.  
+         Implementations may optionally include the sourceIndicator 
+         parameter in the notification.  If deletion occured as a result 
+         of internal operation of the resource, the value 
+         'resourceOperation' is used.  If deletion occured in response 
+         to a managemetn operation, the value 'managementOperation' is 
+         used.  A value of 'unknown' may be returned if it is not 
+         possible to determine the source of the operation.  None of the 
+         other optional parameters are used.
+         
+         A stateChange notification is used to report changes to the 
+         operationalState attribute, and where present, the 
+         adminsitrativeState attribute.  A single parameter set is 
+         included in the state change definition field.  Only the 
+         (mandatory) attributeId and (optional) newAttributeValue 
+         parameters are used.
+         
+         The PhS provides for PhCs between PhS users.  Since connections 
+         cannot be established through the protocol at the Physical 
+         Layer but rather are configured when the service is created, 
+         the PhC, which is a logical concept, nevertheless must relate 
+         directly to the real physical media paths provided to the 
+         Physical Layer.  For this reason: a) There is no distinction 
+         between connection-mode and connectionless-mode at the Physical 
+         Layer.  The service is independent of whether the higher layers 
+         operate in connection-mode or connectionless-mode.  b) Each PhC 
+         is identified within the Physical Layer.  c) A PhC can only 
+         relate to a particular PhSAP (i.e. a PhC implies a specific 
+         source PhSAP, and a specific destination PhSAP or group of 
+         PhSAPs if a multi-endpoint connection).
+         
+         The PhC may traverse Physical Layer relay, or intermediate 
+         systems when several physical media are used in tandem.  Such 
+         relaying may be controlled through a mangement function 
+         exercised over a separate, but related, PhC, or may be 
+         controlled form the Network Layer, as specified in ITU-T Rec. 
+         X.200 | ISO/IEC 7498-1, 7.5.4.2, for the interconnection of 
+         data circuits.  The Physical Layer does not make any routing 
+         decisions.  Intermediate systems may also be used for mapping 
+         different Physical Layer protocols associated with a PhC."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642, physicalConnection MOC."
+    INDEX       { physicalEntityId, dataCircuitCoProtocolMachineId, 
+                  physicalConnectionId }
+    ::= { physicalConnectionTable 1 }
 
-		 An objectCreation notification is generated whenever an 
-		 instance of the managed object class is created.  
-		 Implementations may optionally include the 
-		 sourceIndicator parameter in the notification.  If the 
-		 creation occured as a result of internal operation of 
-		 the resource, the value 'resourceOperation' is used.  
-		 If creation occured in response to a management 
-		 operation, the value 'managementOperation' is used.  A 
-		 value of 'unknown' may be returned if it is not 
-		 possible to determine the source of the operation.  
-		 None of the other optional parameters are used.
-		 
-		 An objectDeletion notification is generated whenever an 
-		 instance of the managed object class is deleted.  
-		 Implementations may optionally include the 
-		 sourceIndicator parameter in the notification.  If 
-		 deletion occured as a result of internal operation of 
-		 the resource, the value 'resourceOperation' is used.  
-		 If deletion occured in response to a managemetn 
-		 operation, the value 'managementOperation' is used.  A 
-		 value of 'unknown' may be returned if it is not 
-		 possible to determine the source of the operation.  
-		 None of the other optional parameters are used.
-		 
-		 A stateChange notification is used to report changes to 
-		 the operationalState attribute, and where present, the 
-		 adminsitrativeState attribute.  A single parameter set 
-		 is included in the state change definition field.  Only 
-		 the (mandatory) attributeId and (optional) 
-		 newAttributeValue parameters are used.
-		 
-		 The PhS provides for PhCs between PhS users.  Since 
-		 connections cannot be established through the protocol 
-		 at the Physical Layer but rather are configured when 
-		 the service is created, the PhC, which is a logical 
-		 concept, nevertheless must relate directly to the real 
-		 physical media paths provided to the Physical Layer.  
-		 For this reason: a) There is no distinction between 
-		 connection-mode and connectionless-mode at the Physical 
-		 Layer.  The service is independent of whether the 
-		 higher layers operate in connection-mode or 
-		 connectionless-mode.  b) Each PhC is identified within 
-		 the Physical Layer.  c) A PhC can only relate to a 
-		 particular PhSAP (i.e. a PhC implies a specific source 
-		 PhSAP, and a specific destination PhSAP or group of 
-		 PhSAPs if a multi-endpoint connection).
+PhysicalConnectionEntry ::= SEQUENCE {
+    physicalConnectionId                            SimpleNameType,
+    physicalConnectionUnderlyingConnectionNames     RowPointer,
+    physicalConnectionSupportedConnectionNames      RowPointer,
+    physicalConnectionEndpointIdentifier            OCTET STRING,
+    physicalConnectionPortNumber                    Integer32,
+    physicalConnectionRowStatus                     RowStatus
+}
 
-		 The PhC may traverse Physical Layer relay, or 
-		 intermediate systems when several physical media are 
-		 used in tandem.  Such relaying may be controlled 
-		 through a mangement function exercised over a separate, 
-		 but related, PhC, or may be controlled form the Network 
-		 Layer, as specified in ITU-T Rec. X.200 | ISO/IEC 
-		 7498-1, 7.5.4.2, for the interconnection of data 
-		 circuits.  The Physical Layer does not make any routing 
-		 decisions.  Intermediate systems may also be used for 
-		 mapping different Physical Layer protocols associated 
-		 with a PhC.
-		 "
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642, physicalConnection MOC."
-	INDEX	{
-			physicalEntityId, -- shared index
-			dataCircuitCoProtocolMachineId, -- shared index
-			physicalConnectionId -- index
-		}
-	::= { physicalConnectionTable 1 }
-
-PhysicalConnectionEntry ::=
-	SEQUENCE {
-		-- X.723 singlePeerConnection inherited attributes:
-		physicalConnectionId
-			DisplayString,
-		physicalConnectionUnderlyingConnectionNames
-			RowPointer,
-		-- X.723 singlePeerConnectionP2 conditional package
-		physicalConnectionSupportedConnectionNames
-			RowPointer,
-		-- physicalConnection attributes:
-		physicalConnectionEndpointIdentifier
-			OCTET STRING,
-		physicalConnectionPortNumber
-			INTEGER,
-		physicalConnectionRowStatus
-			RowStatus
-	}
-
--- X.723 singlePeerConnection inherited attributes:
 physicalConnectionId OBJECT-TYPE
-	SYNTAX		DisplayString
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. X.723 | ISO/IEC 10165-5 connectionId."
-	::= { physicalConnectionEntry 1 }
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The physical connection identifier."
+    REFERENCE   
+        "ITU-T Rec. X.723 | ISO/IEC 10165-5 connectionId."
+    ::= { physicalConnectionEntry 1 }
 
 physicalConnectionUnderlyingConnectionNames OBJECT-TYPE
-	SYNTAX		RowPointer
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. X.723 | ISO/IEC 10165-5 
-		 underlyingConnectionNames."
-	::= { physicalConnectionEntry 2 }
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The underlying connection names."
+    REFERENCE   
+        "ITU-T Rec. X.723 | ISO/IEC 10165-5 underlyingConnectionNames."
+    ::= { physicalConnectionEntry 2 }
 
--- X.723 singlePeerConnectionP2 conditional package
 physicalConnectionSupportedConnectionNames OBJECT-TYPE
-	SYNTAX		RowPointer
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		""
-	REFERENCE
-		"ITU-T Rec. X.723 | ISO/IEC 10165-5 
-		 supportedConnectionNames."
-	::= { physicalConnectionEntry 3 }
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The supported connection names."
+    REFERENCE   
+        "ITU-T Rec. X.723 | ISO/IEC 10165-5 supportedConnectionNames."
+    ::= { physicalConnectionEntry 3 }
 
--- physicalConnection attributes:
 physicalConnectionEndpointIdentifier OBJECT-TYPE
-	SYNTAX		OCTET STRING
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"The physical endpoint identifier is only necessary when 
-		 there are multiple physical connections that are 
-		 associated with a given SAP, in which case, the 
-		 endpointIdentifier is used to distinguish between the 
-		 physical connections accessible via the SAP."
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 endpointIdentifier."
-	::= { physicalConnectionEntry 4 }
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The physical endpoint identifier is only necessary when there 
+         are multiple physical connections that are associated with a 
+         given SAP, in which case, the endpointIdentifier is used to 
+         distinguish between the physical connections accessible via the 
+         SAP."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 endpointIdentifier."
+    ::= { physicalConnectionEntry 4 }
 
 physicalConnectionPortNumber OBJECT-TYPE
-	SYNTAX		INTEGER
-	MAX-ACCESS	read-only
-	STATUS		current
-	DESCRIPTION
-		"The physical port number "
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 portNumber."
-	::= { physicalConnectionEntry 5 }
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The physical port number "
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 portNumber."
+    ::= { physicalConnectionEntry 5 }
 
 physicalConnectionRowStatus OBJECT-TYPE
-	SYNTAX		RowStatus
-	MAX-ACCESS	read-create
-	STATUS		current
-	DESCRIPTION
-		"Provides a mechanism whereby management stations, 
-		 following the RowStatustextual convetion of the 
-		 SNMPv2-TC module, may creat or delete conceptual rows 
-		 in this table.
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations, following the 
+         RowStatustextual convetion of the SNMPv2-TC module, may creat 
+         or delete conceptual rows in this table.
+         
+         Physical connections are contained by data circuits at two 
+         levels the singlePeerConnection-coProtocolMachine name binding 
+         from ITU-T Rec. X.723 | ISO/IEC 10165-5 and the 
+         physicalConnection-dataCircuit name binding, both which are 
+         named by attribute connectionId.  The former name binding 
+         permits neither creation nor deletion; the later, only 
+         deletion.
+         
+         Physical connections can be deleted by management only if they 
+         do not contain other objects.  Physical connection may not be 
+         created explicitly by management stations.  (I don't know what 
+         the value is in deleting physical connections from data 
+         circuits without the ability to create them.)"
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 
+         physicalConnection-dataCircuit, STD 58, SNMPv2-TC RowStatus."
+    ::= { physicalConnectionEntry 6 }
 
-		 Physical connections are contained by data circuits at 
-		 two levels the singlePeerConnection-coProtocolMachine 
-		 name binding from ITU-T Rec. X.723 | ISO/IEC 10165-5 
-		 and the physicalConnection-dataCircuit name binding, 
-		 both which are named by attribute connectionId.  The 
-		 former name binding permits neither creation nor 
-		 deletion; the later, only deletion.
+phyScalars OBJECT IDENTIFIER
+    ::= { phyObjects 2 }
 
-		 Physical connections can be deleted by management only 
-		 if they do not contain other objects.  Physical 
-		 connection may not be created explicitly by management 
-		 stations.  (I don't know what the value is in deleting 
-		 physical connections from data circuits without the 
-		 ability to create them.)"
-	REFERENCE
-		"ITU-T Rec. X.281 | ISO/IEC 13642 
-		 physicalConnection-dataCircuit, STD 58, SNMPv2-TC 
-		 RowStatus."
-	::= { physicalConnectionEntry 6 }
+phyGlobals OBJECT IDENTIFIER
+    ::= { phyScalars 1 }
 
--- =====================================================================
+phyDefaults OBJECT IDENTIFIER
+    ::= { phyScalars 2 }
 
--- =====================================================================
+phyNotifs OBJECT IDENTIFIER
+    ::= { phyObjects 3 }
 
-END
+physicalBitErrorThresholdReached OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This parameter is used with a qualityofServiceAlarm 
+         notification from the OPENSS7-TMN-SMI module indicating the row 
+         in the dataCircuitTable to which the qualityofServiceAlarm 
+         applies.  This parameter, then, indicates that the bit error 
+         threshold has been surpassed."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 bitErrorThresholdReached."
+    ::= { phyNotifs 1 }
 
+physicalConnectionError OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This parameter is used with the communicationsAlarm 
+         notification from the OPENSS7-TMN-SMI module indicating the row 
+         in the dataCircuitTable to which the communicationsAlarm 
+         applies.  This parameter, then, indicates the connection error 
+         that occurred."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 connectionError."
+    ::= { phyNotifs 2 }
 
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+phsyicalConnectionEstablished OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This parameter is used with the communicationsInformation 
+         notification from the OPENSS7-TMN-SMI module indicating the row 
+         in the dataCircuitTable to which the communicationsInformation  
+         applies.  This parameter, then, indicates that the connection 
+         has been established."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 connectionEstablished."
+    ::= { phyNotifs 3 }
 
+physicalLossOfSignal OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This parameter is used with the communicationsAlarm 
+         notification from the OPENSS7-TMN-SMI module indicating the row 
+         in the dataCircuitTable to which the communicationsAlarm 
+         applies.  This parameter, then, indicates that a loss of signal 
+         error occured."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 lossOfSignal."
+    ::= { phyNotifs 4 }
+
+physicalLossOfSynchronization OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This parameter is used with the communicationsAlarm 
+         notification from the OPENSS7-TMN-SMImodule indicating the row 
+         in the dataCircuitTable to which the communicationsAlarm 
+         applies.  This parameter, then, indcates that a loss of 
+         syncrhonization error occured."
+    REFERENCE   
+        "ITU-T Rec. X.281 | ISO/IEC 13642 lossOfSynchronization."
+    ::= { phyNotifs 5 }
+
+phyOids OBJECT IDENTIFIER
+    ::= { phyObjects 4 }
+
+phyConformance OBJECT IDENTIFIER
+    ::= { phyMIB 2 }
+
+phyCompliances OBJECT IDENTIFIER
+    ::= { phyConformance 1 }
+
+phyGroups OBJECT IDENTIFIER
+    ::= { phyConformance 2 }
+
+physicalGroup OBJECT-GROUP
+    OBJECTS     { physicalBitErrorThresholdReached, 
+                  physicalConnectionError, phsyicalConnectionEstablished, 
+                  physicalLossOfSignal, physicalLossOfSynchronization, 
+                  physicalEntityLocalSapNames, 
+                  physicalEntityOperationalState, physicalEntityTitles, 
+                  physicalSAPsap1Address, physicalSAPuserEntityNames, 
+                  physicalSAPRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects implementing the physical group."
+    ::= { phyGroups 1 }
+
+dataCircuitGroup OBJECT-GROUP
+    OBJECTS     { dataCircuitOperationalState, 
+                  dataCircuitBitErrorsReceived, 
+                  dataCircuitBitErrorsTransmitted, 
+                  dataCircuitBitErrorsThreshold, dataCircuitType, 
+                  dataCircuitPhysicalMediaNames, 
+                  dataCircuitPhysicalInterfaceType, 
+                  dataCircuitPhysicalInterfaceStandard, 
+                  dataCircuitSynchronizationMode, 
+                  dataCircuitTransmissionCoding, 
+                  dataCircuitTransmissionMode, 
+                  dataCircuitTransmissionRate, dataCircuitRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects implementing the data circuit group."
+    ::= { phyGroups 2 }
+
+physicalConnectionGroup OBJECT-GROUP
+    OBJECTS     { physicalConnectionUnderlyingConnectionNames, 
+                  physicalConnectionSupportedConnectionNames, 
+                  physicalConnectionEndpointIdentifier, 
+                  physicalConnectionPortNumber, 
+                  physicalConnectionRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects implementing the physical connection 
+         group."
+    ::= { phyGroups 3 }
+
+phyBasicCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Basic compliance to this module."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { physicalGroup, dataCircuitGroup, 
+                  physicalConnectionGroup }
+
+    ::= { phyCompliances 1 }
+
+END -- end of module OPENSS7-PHY-MIB.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

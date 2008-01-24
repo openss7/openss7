@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: test-usage,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2008/01/13 00:31:35 $
+# @(#) $RCSfile: test-usage,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/01/15 18:01:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,18 +46,24 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/01/13 00:31:35 $ by $Author: brian $
+# Last Modified $Date: 2008/01/15 18:01:19 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: test-usage,v $
+# Revision 0.9.2.2  2008/01/15 18:01:19  brian
+# - run from anywhere
+#
 # Revision 0.9.2.1  2008/01/13 00:31:35  brian
 # - added snmp trap generator for testing
 #
 # =============================================================================
 
-export MIBDIRS=/home/brian/os8/stacks/src/snmp/mibs:/usr/share/snmp/mibs
+where=`dirname $0`
+
+export MIBDIRS=$where/../snmp/mibs:/usr/share/snmp/mibs
 export MIBS=+OPENSS7-CDR2-MIB
+
 
 snmpinform -v 2c \
 	localhost \

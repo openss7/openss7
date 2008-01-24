@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-TC.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/01/10 19:55:43 $
+-- @(#) $RCSfile: OPENSS7-TC.mib,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008/01/14 13:01:08 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008/01/10 19:55:43 $ by $Author: brian $
+-- Last Modified $Date: 2008/01/14 13:01:08 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-TC.mib,v $
+-- Revision 0.9.2.5  2008/01/14 13:01:08  brian
+-- - updated mibs
+--
 -- Revision 0.9.2.4  2008/01/10 19:55:43  brian
 -- - updating mibs
 --
@@ -63,19 +66,18 @@
 OPENSS7-TC DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY
+    openss7Modules
+	FROM OPENSS7-SMI
+    Integer32, MODULE-IDENTITY
 	FROM SNMPv2-SMI
     TEXTUAL-CONVENTION
-	FROM SNMPv2-TC
-    openss7
-	FROM OPENSS7-SMI;
+	FROM SNMPv2-TC;
 
-openss7TextualConventions MODULE-IDENTITY
-    LAST-UPDATED
-	"200709220000Z"
-    ORGANIZATION
+openss7TC MODULE-IDENTITY
+    LAST-UPDATED "200709220000Z"
+    ORGANIZATION 
 	"OpenSS7 Corporation"
-    CONTACT-INFO
+    CONTACT-INFO 
 	"Brian Bidulock
 	 OpenSS7 Corporation
 	 1469 Jefferys Crescent
@@ -85,66 +87,63 @@ openss7TextualConventions MODULE-IDENTITY
 	 Fax: +1 780 490 1241
 	 Mob: +1 780 953 0557
 	 E-mail: bidulock@openss7.org"
-    DESCRIPTION
-	"This module defines textual conventions use throughout 
-	 the OpenSS7 enterprise MIBs."
-    ::= { openss7 0 }
+    DESCRIPTION 
+	"This module defines textual conventions use throughout the 
+	 OpenSS7 enterprise MIBs."
+    REVISION    "200709220000Z"
+    DESCRIPTION 
+	"First release of this document."
+    ::= { openss7Modules 0 }
 
-openss7ProfileId ::= TEXTUAL-CONVENTION
-    STATUS current
-    DESCRIPTION
+-- top level
+
+Ss7ProfileId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
 	"A configured name associated with an SS7 signalling protocol 
 	 profile."
-    SYNTAX OCTET STRING
+    SYNTAX      OCTET STRING
 
 MilliSeconds ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d-3"
-    STATUS current
-    DESCRIPTION
+    STATUS      current
+    DESCRIPTION 
 	"This textual convetion is used to represent time durations in 
 	 milliseconds instead of centiseconds as is TimeValue."
-    SYNTAX Unsigned32
+    SYNTAX      Unsigned32
 
-openss7Ss7ProtocolStandard ::= TEXTUAL-CONVENTION
-    STATUS current
-    DESCRIPTION
+Ss7ProtocolStandard ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
 	"This textual convention is used for identifying the protocol 
 	 standard.  This is the same values as are used by protocol 
 	 management."
-    SYNTAX INTEGER {
-	    itut(0),
-	    etsi(1),
-	    jttc(2),
-	    china(3), 
-	    ingapore(4),
-	    spain(5) }
+    SYNTAX      INTEGER { itut(0), etsi(1), jttc(2), china(3), 
+		    ingapore(4), spain(5) }
 
-openss7Ss7ProtocolYear ::= TEXTUAL-CONVENTION
-    STATUS current
-    DESCRIPTION
+Ss7ProtocolYear ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-0"
+    STATUS      current
+    DESCRIPTION 
 	"This textual convention is used for identifying the standard 
 	 issue year.  Only values within a 4 year interval are 
 	 significant; that is, 1988..1991 are all interpreted as 1988, 
 	 1992..1995 are interpreted as 1992, etc."
-    SYNTAX INTEGER (1984..2999)
+    SYNTAX      Integer32 (1984..2999)
 
-openss7Ss7ProtocolOptions ::= TEXTUAL-CONVENTION
-    STATUS current
-    DESCRIPTION
+Ss7ProtocolOptions ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
 	"This textual convention is used to specify protocol options 
 	 accross anumber of protocol levels.  Not all protocol options 
 	 apply to all levels.  When a protocol option is set for a level 
 	 to which it does not apply, it has no effect."
-    SYNTAX BITS {
-	    mplev(0),   -- multiple priority/congestion levels
-	    pcr(1),     -- preventative cyclic retransmission
-	    hsl(2),     -- high speed links
-	    xsn(3),     -- extended sequence numbers
-	    nopr(4) }   -- no proving
+    SYNTAX      BITS { mplev(0), pcr(1), hsl(2), xsn(3), nopr(4) }
 
 CircuitIdentificationCode ::= TEXTUAL-CONVENTION
-    STATUS current
-    DESCRIPTION
+    DISPLAY-HINT "d-0"
+    STATUS      current
+    DESCRIPTION 
 	"This an an SS7 circuit identification code as used by TUP or 
 	 ISUP to identify a circuit (channel) between two signalling 
 	 point codes (MTP instances).  In ITU-T based networks, this can 
@@ -156,12 +155,12 @@ CircuitIdentificationCode ::= TEXTUAL-CONVENTION
 	 are assigned pseudo-arbitrarily to circuits.  The only 
 	 constraint is that a contiguous range of CICs are assigned to 
 	 the channels making up a circuit group."
-    SYNTAX INTEGER (0..16383)
+    SYNTAX      Integer32 (0..16383)
 
 CommonLanguageName ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT "a"
-    STATUS current
-    DESCRIPTION
+    DISPLAY-HINT "1a"
+    STATUS      current
+    DESCRIPTION 
 	"In the Telcordia style, this is an extended Common Lanuage 
 	 Location Identifier.  The identifier is a Telcordia CLLI 
 	 extended by a brief text string identifying the equipment or 
@@ -170,18 +169,18 @@ CommonLanguageName ::= TEXTUAL-CONVENTION
 	 can be any fixed fielded ASCII identifier.  It should not 
 	 contain control characters, graphics characters, nor 
 	 whitespace"
-    SYNTAX OCTET STRING (SIZE(0..32))
+    SYNTAX      OCTET STRING (SIZE(0..32))
 
 CircuitCode ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1x-"
-    STATUS current
-    DESCRIPTION
+    STATUS      current
+    DESCRIPTION 
 	"This is a physical point of appearance (PPA) or circuit code 
 	 which uniquely identifies a circuit within the managed 
 	 switching element."
-    SYNTAX OCTET STRING (SIZE(4))
+    SYNTAX      OCTET STRING (SIZE(4))
 
-END
+END -- end of module OPENSS7-TC.
 
 -- =============================================================================
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

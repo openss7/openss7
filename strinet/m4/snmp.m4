@@ -3,27 +3,27 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/10/18 05:33:30 $
+# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008/01/13 21:53:04 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 3 of the License.
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU General Public License along with
-# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
-# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/18 05:33:30 $ by $Author: brian $
+# Last Modified $Date: 2008/01/13 21:53:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -433,6 +433,11 @@ AC_DEFUN([_SNMP_OUTPUT], [dnl
     AC_SUBST([SNMP_LDADD32])dnl
     AC_SUBST([SNMP_LDFLAGS])dnl
     AC_SUBST([SNMP_LDFLAGS32])dnl
+    _SNMP_DLMOD_LIBDIRS
+    AC_SUBST([snmpdlmoddir])dnl
+    AC_SUBST([snmpdlmod32dir])dnl
+    AC_SUBST([snmpdlmod64dir])dnl
+    AC_SUBST([snmpmibdir])dnl
 ])# _SNMP_OUTPUT
 # =============================================================================
 
@@ -448,6 +453,17 @@ AC_DEFUN([_SNMP_DEFINES], [dnl
 # =============================================================================
 
 # =============================================================================
+# _SNMP_DLMOD_LIBDIRS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SNMP_DLMOD_LIBDIRS], [dnl
+    snmpdlmoddir='${libdir}/snmp/dlmod'
+    snmpdlmod32dir='${lib32dir}/snmp/dlmod'
+    snmpdlmod64dir='${lib64dir}/snmp/dlmod'
+    snmpmibdir='${datarootdir}/snmp/mibs'
+])# _SNMP_DLMOD_LIBDIRS
+# =============================================================================
+
+# =============================================================================
 # _SNMP_
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SNMP_], [dnl
@@ -457,6 +473,9 @@ AC_DEFUN([_SNMP_], [dnl
 # =============================================================================
 #
 # $Log: snmp.m4,v $
+# Revision 0.9.2.6  2008/01/13 21:53:04  brian
+# - dlmod SNMP agent build and installation
+#
 # Revision 0.9.2.5  2007/10/18 05:33:30  brian
 # - better checking of NET-SNMP
 #
@@ -474,7 +493,7 @@ AC_DEFUN([_SNMP_], [dnl
 #
 # =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
