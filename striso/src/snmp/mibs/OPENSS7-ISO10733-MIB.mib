@@ -1,0 +1,1764 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=64 nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-ISO10733-MIB.mib,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2008/01/24 17:43:05 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2008/01/24 17:43:05 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-ISO10733-MIB.mib,v $
+-- Revision 0.9.2.1  2008/01/24 17:43:05  brian
+-- - added new mibs
+--
+-- =============================================================================
+
+nlmMIB MODULE-IDENTITY
+
+nlmNotifications OBJECT IDENTIFIER
+    ::= { nlmMIB 0 }
+
+nlmObjects OBJECT IDENTIFIER
+    ::= { nlmMIB 1 }
+
+nlmScalars OBJECT IDENTIFIER
+    ::= { nlmOBjects 1 }
+
+nlmTables OBJECT IDENTIFIER
+    ::= { nlmObjects 2 }
+
+
+networkSubsystem OBJECT IDENTIFIER
+    ::= { nlmTables 1 }
+
+networkSubsystemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NetworkSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 networkSubsystem MOC."
+    ::= { networkSubsystem 1 }
+
+networkSubsystemEntry OBJECT-TYPE
+    SYNTAX      NetworkSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 networkSubsystem MO."
+    INDEX       { subsystemId }
+    ::= { networkSubsystemTable 1 }
+
+NetworkSubsystemEntry ::= SEQUENCE {
+-- networkSubsystem-system NAME BINDING
+}
+
+networkEntity OBJECT IDENTIFIER
+    ::= { nlmTables 2 }
+
+networkEntityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NetworkEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 networkEntity MOC."
+    ::= { networkEntity 1 }
+
+networkEntityEntry OBJECT-TYPE
+    SYNTAX      NetworkEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 networkEntity MO."
+    INDEX       { communicationsEntityId }
+    ::= { networkEntityTable 1 }
+
+NetworkEntityEntry ::= SEQUENCE {
+    networkEntityTitles         NAddresses,
+    cLNSSystemTypes             SystemTypes
+-- networkEntity-networkSubsystem NAME BINDING
+}
+
+nSAP OBJECT IDENTIFIER
+    ::= { nlmTables 3 }
+
+nSAPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NSAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 nSAP MOC."
+    ::= { nSAP 1 }
+
+nSAPEntry OBJECT-TYPE
+    SYNTAX      NSAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 nSAP MO."
+    INDEX       { sap2Id }
+    ::= { nSAPTable 1 }
+
+NSAPEntry ::= SEQUENCE {
+    nSAPsap2Addresses
+-- nSAP-networkSubsystem-Automatic NAME BINDING
+-- nSAP-networkSubsystem-Management NAME BINDING CREATE; DELETE;
+    nSAPRowStatus           RowStatus
+}
+
+cLNS OBJECT IDENTIFIER
+    ::= { nlmTables 4 }
+
+cLNSTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CLNSEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 cLNS MOC."
+    ::= { cLNS 1 }
+
+cLNSEntry OBJECT-TYPE
+    SYNTAX      CLNSEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 cLNS MO."
+    INDEX       { clProtocolMachineId }
+    ::= { cLNSTable 1 }
+
+CLNSEntry ::= SEQUENCE {
+    cLNSAdministrativeState         AdministrativeState,
+    cLNSOperationalState            OperationalState,  -- also part of coProtocolMachine
+    cLNSActivationAction            ActivationAction,
+    octetsSentCounter               Counter64,
+    octetsReceivedCounter           Counter64,
+    operationalSystemType           SystemType,
+    supportedProtocols              Counter64,
+    segmentsReceived                Counter64,
+    segmentsDiscarded               Counter64,
+    assemblingSegmentsDiscarded     Counter64,
+    errorReportsReceived            Counter64,
+    pDUDiscards                     Counter64,
+    congestionDiscards              Counter64,
+    maximumLifetime                 Counter64,
+    enableChecksum                  TruthValue,
+
+    version
+    iSType
+    systemId
+    maximumPathSplits
+    minimumLSPTransmissionInterval
+    maximumLSPGenerationInterval
+    minimumBroadcastLSPTransmissionInterval
+    completeSNPInterval
+    originatingL1LSPBufferSize
+    manualAreaAddresses
+    maximumAreaAddresses
+    minimumLSPGenerationInterval
+    pollESHelloRate
+    partialSNPInterval
+    waitingTime
+    dRISISHelloTimer
+    l1State
+    areaAddresses
+    corruptedLSPsDetected
+    lSPL1DatabaseOverloads
+    manualAddressesDroppedFromArea
+    attemptsToExceedMaximumSequenceNumber
+    sequenceNumberSkips
+    ownLSPPurges
+    iDFieldLengthMismatches
+    maximumAreaAddressesMismatches
+    originatingLSPBufferSizeMismatches
+    lSPTooLargeToPropagate
+
+    areaTransmitPassword
+    areaReceivePasswords
+    authenticationFailures
+
+    maximumVirtualAdjacencies
+    partitionAreaAddresses
+    partitionDesignatedL2IntermediateSystem
+    partitionVirtualLinkChanges
+
+    originatingL2LSPBufferSize
+    l2State
+    lSPL2DatabaseOverloads
+
+    domainTransmitPassword
+    domainReceivePasswords
+
+-- cLNS-networkEntity-Management NAME BINDING CREATE; DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+-- cLNS-networkEntity-Automatic NAME BINDING
+    cLNSRowStatus       RowStatus
+}
+
+linkage OBJECT IDENTIFIER
+    ::= { nlmTables 5 }
+
+linkageTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LinkageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 linkage MOC."
+    ::= { linkage 1 }
+
+linkageEntry OBJECT-TYPE
+    SYNTAX      LinkageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 linkage MO."
+    INDEX       { }
+    ::= { linkageTable 1 }
+
+LinkageEntry ::= SEQUENCE {
+    linkageId                       SimpleNameType,
+    operationalState                OperationalState,
+    administrativeState             AdministrativeState,
+    sN-ServiceProvider              ObjectInstance,
+    sN-SA-P                         ObjectInstance,
+    operationalProtocols            AutonomousType,
+    activationAction                ActivationAction,
+
+    iSO9542OperationalSubsets       ISO9542Subsets,
+    holdingTimerMultiplier          Unsigned32,
+    iSConfigurationTimer            TimeInterval,
+    suggestedESConfigurationTimer   TimeInterval,
+    redirectHoldingTime             TimeInterval,
+    eSReachabilityChanges           Counter64,
+    invalid9542PDUs                 Counter64,
+
+    iSO9542OperationalSubsets       ISO9542Subsets,
+    holdingTimerMultiplier          Unsigned32,
+    manualISSNPAAddress             SNPAAddresses,
+    defaultESConfigTimer            TimeInterval,
+    activeESConfigTimer             TimeInterval,
+    iSReachabilityChanges           Counter64,
+    invalid9542PDUs                 Counter64,
+
+    initialMinimumTimer             TimeInterval,
+
+    reserveTimer                    TimeInterval,
+
+    idleTimer                       TimeInterval,
+
+    callsPlaced                     Counter64,
+    callsFailed                     Counter64,
+
+    callsPlaced                     Counter64,
+    callsFailed                     Counter64,
+
+    type                            CircuitType,
+    iSISHelloTimer                  TimeInterval,
+    l1DefaultMetric                 HopMetric,
+    l1DelayMetric                   HopMetric,
+    l1ExpenseMetric                 HopMetric,
+    l1ErrorMetric                   HopMetric,
+    externalDomain                  TruthValue,
+    changesInAdjacencyState         Counter64,
+    initialisationFailures          Counter64,
+    rejectedAdjacencies             Counter64,
+    iSISControlPDUsSent             Counter64,
+    iSISControlPDUsReceived         Counter64,
+    iDFieldLengthMismatches         Counter64,
+    maximumAreaAddressesMismatches  Counter64,
+
+    circuitTransmitPassword         Password,
+    circuitReceivePasswords         Passwords,
+    authenticationFailures          Counter64,
+
+    l1IntermediateSystemPriority    Unsigned32,
+    l1CircuitID                     CircuitID,
+    l1DesignatedIntermediateSystem  SystemId,
+    lanL1DesignatedIntermediateSystemChanges Counter64,
+
+    callEstablishmentDefaultMetricIncrement HopMetric,
+    callEstablishmentDelayMetricIncrement HopMetric,
+    callEstablishmentExpenseMetricIncrement HopMetric,
+    callEstablishmentErrorMetricIncrement HopMetric,
+
+    ptPtCircuitID                   CircuitID,
+
+    outgoingCallIVMO                ObjectInstance,
+    ptPtCircuitID                   CircuitID,
+    neighbourSNPAAddress            SNPAAddress,
+
+    l2DefaultMetric                 HopMetric,
+    l2DelayMetric                   HopMetric,
+    l2ExpenseMetric                 HopMetric,
+    l2ErrorMetric                   HopMetric,
+    manualL2OnlyMode                TruthValue,
+
+    l2IntermediateSystemPriority    Unsigned32,
+    l2CircuitID                     CircuitID,
+    l2DesignatedIntermediateSystem  SystemId,
+    lanL2DesignatedIntermediateSystemChanges Counter64,
+
+-- linkage-cLNS NAME BINDING CREATE WITH-REFERENCE-OBJECT; DELETE;
+-- linkage-cONS NAME BINDING CREATE WITH-REFERENCE-OBJECT; DELETE;
+    linkageRowStatus                RowStatus
+}
+
+cONS OBJECT IDENTIFIER
+    ::= { nlmTables 6 }
+
+cONSTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CONSEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 cONS MOC."
+    ::= { cONS 1 }
+
+cONSEntry OBJECT-TYPE
+    SYNTAX      CONSEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 cONS MO."
+    INDEX       { }
+    ::= { cONSTable 1 }
+
+CONSEntry ::= SEQUENCE {
+-- cONS-networkEntity-Management NAME BINDING CREATE; DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+-- cONS-networkEntity-Automatic NAME BINDING
+    cONSRowStatus       RowStatus
+}
+
+networkConnection OBJECT IDENTIFIER
+    ::= { nlmTables 7 }
+
+networkConnectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NetworkConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 networkConnection MOC."
+    ::= { networkConnection 1 }
+
+networkConnectionEntry OBJECT-TYPE
+    SYNTAX      NetworkConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 networkConnection MO."
+    INDEX       { }
+    ::= { networkConnectionTable 1 }
+
+NetworkConnectionEntry ::= SEQUENCE {
+-- networkConnection-cONS NAME BINDING
+}
+
+x25PLE OBJECT IDENTIFIER
+    ::= { nlmTables 8 }
+
+x25PLETable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF X25PLEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 x25PLE MOC."
+    ::= { x25PLE 1 }
+
+x25PLEEntry OBJECT-TYPE
+    SYNTAX      X25PLEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 x25PLE MO."
+    INDEX       { }
+    ::= { x25PLETable 1 }
+
+X25PLEEntry ::= SEQUENCE {
+-- x25PLE-networkSubsystem-Management NAME BINDING CREATE WITH-REFERENCE-OBJECT; DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+-- x25PLE-networkSubsystem-Automatic NAME BINDING DELETE;
+    x25PLERowStatus     RowStatus
+}
+
+x25PLEIVMO OBJECT IDENTIFIER
+    ::= { nlmTables 9 }
+
+x25PLEIVMOTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF X25PLEIVMOEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 x25PLEIVMO MOC."
+    ::= { x25PLEIVMO 1 }
+
+x25PLEIVMOEntry OBJECT-TYPE
+    SYNTAX      X25PLEIVMOEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 x25PLEIVMO MO."
+    INDEX       { }
+    ::= { x25PLEIVMOTable 1 }
+
+X25PLEIVMOEntry ::= SEQUENCE {
+-- x25PLEIVMO-networkSubsystem NAME BINDING CREATE WITH-REFERENCE-OBJECT; DELETE;
+    x25PLEIVMORowStatus RowStatus
+}
+
+virtualCall OBJECT IDENTIFIER
+    ::= { nlmTables 10 }
+
+virtualCallTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VirtualCallEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 virtualCall MOC."
+    ::= { virtualCall 1 }
+
+virtualCallEntry OBJECT-TYPE
+    SYNTAX      VirtualCallEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 virtualCall MO."
+    INDEX       { }
+    ::= { virtualCallTable 1 }
+
+VirtualCallEntry ::= SEQUENCE {
+}
+
+permanentVirtualCircuit OBJECT IDENTIFIER
+    ::= { nlmTables 11 }
+
+permanentVirtualCircuitTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PermanentVirtualCircuitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 permanentVirtualCall MOC."
+    ::= { permanentVirtualCircuit 1 }
+
+permanentVirtualCircuitEntry OBJECT-TYPE
+    SYNTAX      PermanentVirtualCircuitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 permanentVirtualCall MO."
+    INDEX       { }
+    ::= { permanentVirtualCircuitTable 1 }
+
+PermanentVirtualCircuitEntry ::= SEQUENCE {
+-- pVCMO-x25PLE NAME BINDING CREATE WITH-AUTOMATIC-INSTANCE-NAMING; DELETE;
+    pVCMORowStatus      RowStatus
+}
+
+virtualCallIVMO OBJECT IDENTIFIER
+    ::= { nlmTables 12 }
+
+virtualCallIVMOTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VirtualCallIVMOEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 virtualCallIVMO MOC."
+    ::= { virtualCallIVMO 1 }
+
+virtualCallIVMOEntry OBJECT-TYPE
+    SYNTAX      VirtualCallIVMOEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 virtualCallIVMO MO."
+    INDEX       { }
+    ::= { virtualCallIVMOTable 1 }
+
+VirtualCallIVMOEntry ::= SEQUENCE {
+-- virtualCallIVMO-x25PLE NAME BINDING CREATE; DELETE;
+    virtualCallIVMORowStatus    RowStatus
+}
+
+switchedVirtualCall OBJECT IDENTIFIER
+    ::= { nlmTables 13 }
+
+switchedVirtualCallTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwitchedVirtualCallEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 switchVirtualCall MOC."
+    ::= { switchedVirtualCall 1 }
+
+switchedVirtualCallEntry OBJECT-TYPE
+    SYNTAX      SwitchedVirtualCallEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 switchVirtualCall MO."
+    INDEX       { }
+    ::= { switchedVirtualCallTable 1 }
+
+SwitchedVirtualCallEntry ::= SEQUENCE {
+-- sVCMO-x25PLE NAME BINDING DELETE;
+    sVCMORowStatus      RowStatus
+}
+
+
+nlmNotifs OBJECT IDENTIFIER
+    ::= { nlmObjects 3 }
+
+notificationData OBJECT-TYPE
+    ::= { nlmNotifs 1 }
+
+notificationPDUHeader OBJECT-TYPE
+    ::= { nlmNotifs 2 }
+
+reachabilityChange OBJECT-TYPE
+    ::= { nlmNotifs 3 }
+
+
+nlmOids OBJECT IDENTIFIER
+    ::= { nlmMIB 2 }
+
+areaMismatch OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when an attempt to initialise with an 
+         adjacent system fails as a result of two level 1 ISs 
+         not sharing any area addresses in common.  The AREA 
+         ADDRESSES field and the ID field of the received PDU 
+         are reported in the additionalInformation field using 
+         the notificationAreaAddresses and notificationSystemId 
+         parameters respectively. The significance sub-parameter 
+         of each item of additionalInformation shall be set to 
+         the value 'false' (i.e. not significant) so that a 
+         managing system receiving the event report will be less 
+         likely to reject it. The value ISIS.areaMismatch shall 
+         be reported in the specificProblems parameter. The 
+         probableCause shall be set to 
+         NLM.configurationOrCustomisationError. The 
+         perceivedSeverity shall be set to 'Major'. A subsequent 
+         communicationsAlarm with a perceivedSeverity value of 
+         'Cleared' shall not be generated. No other fields or 
+         parameters shall be used, with the exception of further 
+         parameters in the additionalInformation field. The 
+         occurrence of this event is counted by the 
+         initialisationFailures counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.areaMismatch"
+    ::= { isisOids 0) }
+
+attemptToExceedMaximumSequenceNumber OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when an attempt is made to increment the 
+         sequence number of an LSP beyond the maximum sequence 
+         number. The value 
+         ISIS.attemptToExceedMaximumSequenceNumber shall be 
+         reported in the specificProblems parameter. The 
+         probableCause shall be set to 
+         NLM.communicationsProtocolError. The perceivedSeverity 
+         shall be set to 'Major'.  A subsequent 
+         communicationsAlarm with a perceivedSeverity value of 
+         'Cleared' shall not be generated. No other fields or 
+         parameters shall be used, with the exception of further 
+         parameters in the additionalInformation field. The 
+         occurrence of this event is counted by the 
+         attemptsToExceedMaximumSequenceNumber counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.attemptToExceedMaximumSequenceNumber"
+    ::= { isisOids 1) }
+
+authenticationFailure OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when a PDU is received with an incorrect 
+         Authentication information field. The SystemId of the 
+         source system shall be reported in the 
+         additionalInformation field using the 
+         notificationSystemId parameter. The significance 
+         sub-parameter of each item of additionalInformation 
+         shall be set to the value 'false' (i.e. not 
+         significant) so that a managing system receiving the 
+         event report will be less likely to reject it. The 
+         value ISIS.authenticationFailure shall be reported in 
+         the specificProblems parameter.  The probableCause 
+         shall be set to NLM.configurationOrCustomisationError. 
+         The perceivedSeverity shall be set to 'Major'. A 
+         subsequent communicationsAlarm with a perceivedSeverity 
+         value of 'Cleared' shall not be generated. No other 
+         fields or parameters shall be used, with the exception 
+         of further parameters in the additionalInformation 
+         field. The occurrence of this event is counted by the 
+         authenticationFailures counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.authenticationFailure"
+    ::= { isisOids 2) }
+
+corruptedLSPDetected OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when a corrupted Link State PDU is detected 
+         in memory. The value ISIS.corruptedLSPDetected shall be 
+         reported in the specificProblems parameter. The 
+         probableCause shall be set to NLM.corruptData.  The 
+         perceivedSeverity shall be set to 'Minor'. A subsequent 
+         communicationsAlarm with a perceivedSeverity value of 
+         'Cleared' shall not be generated. No other fields or 
+         parameters shall be used, with the exception of further 
+         parameters in the additionalInformation field. The 
+         occurrence of this event is counted by the 
+         corruptedLSPsDetected counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.corruptedLSPsDetected"
+    ::= { isisOids 3) }
+
+iDFieldLengthMismatch OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when a PDU is received with a different value 
+         for ID field length to that of the receiving 
+         Intermediate system. The received ID LENGTH and SOURCE 
+         ID are reported in the additionalInformation field 
+         using the notificationIDLength and notificationSourceId 
+         parameters respectively. The significance sub-parameter 
+         of each item of additionalInformation shall be set to 
+         the value 'false' (i.e. not significant) so that a 
+         managing system receiving the event report will be less 
+         likely to reject it. The value 
+         ISIS.iDFieldLengthMismatch shall be reported in the 
+         specificProblems parameter.  The probableCause shall be 
+         set to NLM.configurationOrCustomisationError. The 
+         perceivedSeverity shall be set to 'Major'. A subsequent 
+         communicationsAlarm with a perceivedSeverity value of 
+         'Cleared' shall not be generated. No other fields or 
+         parameters shall be used, with the exception of further 
+         parameters in the additionalInformation field. The 
+         occurence of this event is counted by the 
+         iDFieldLengthMismatches counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.iDFieldLengthMismatch"
+    ::= { isisOids 4) }
+
+lanL1DesignatedIntermediateSystemChange OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when the local system either elects itself or 
+         resigns as being the LAN L1 Designated Intermediate 
+         System on this circuit. The direction of the change is 
+         reported in the communicationData field using the 
+         notificationDesignatedIntermediateSystemChange 
+         parameter. The value 
+         ISIS.lanL1DesignatedIntermediateSystemChange shall be 
+         reported in the informationType parameter. No other 
+         fields or parameters shall be used, with the exception 
+         of further parameters in the informationData field. The 
+         relative order of these events must be preserved. The 
+         occurrence of this event is counted by the 
+         lanL1DesignatedIntermediateSystemChanges counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.lanL1DesignatedIntermediateSystemChange"
+    ::= { isisOids 5) }
+
+lSPL1DatabaseOverload OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when the l1State of the system changes 
+         between On and Waiting or Waiting and On. The resulting 
+         state, shall be reported in the additionalInformation 
+         field using the notificationOverloadStateChange 
+         parameter and in the case of Waiting the SourceId of 
+         the LSP which precipitated the overload shall be 
+         reported in the additionalInformation field using the 
+         notificationSourceId parameter. The significance 
+         sub-parameter of each item of additionalInformation 
+         shall be set to the value 'false' (i.e. not 
+         significant) so that a managing system receiving the 
+         event report will be less likely to reject it. The 
+         value ISIS.lSPL1DatabaseOverload shall be reported in 
+         the specificProblems parameter. The probableCause shall 
+         be set to NLM.resourceAtOrNearingCapacity. The 
+         perceivedSeverity shall be set to 'Major'.  A 
+         subsequent communicationsAlarm with a perceivedSeverity 
+         value of 'Cleared' shall not be generated. No other 
+         fields or parameters shall be used, with the exception 
+         of further parameters in the additionalInformation 
+         field. The occurrence of this event shall be counted by 
+         the lSPL1DatabaseOverloads counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.lSPL1DatabaseOverload"
+    ::= { isisOids 6) }
+
+lSPL2DatabaseOverload OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when the L2State of the system changes 
+         between On and Waiting or Waiting and On. The resulting 
+         state, shall be reported in the additionalInformation 
+         field using the notificationOverloadStateChange 
+         parameter and in the case of Waiting the SourceId of 
+         the LSP which precipitated the overload shall be 
+         reported in the additionalInformation field using the 
+         notificationSourceId parameter. The significance 
+         sub-parameter of each item of additionalInformation 
+         shall be set to the value 'false' (i.e. not 
+         significant) so that a managing system receiving the 
+         event report will be less likely to reject it. The 
+         value ISIS.lSPL2DatabaseOverload shall be reported in 
+         the specificProblems parameter. The probableCause shall 
+         be set to NLM.resourceAtOrNearingCapacity. The 
+         perceivedSeverity shall be set to 'Major'.  A 
+         subsequent communicationsAlarm with a perceivedSeverity 
+         value of 'Cleared' shall not be generated. No other 
+         fields or parameters shall be used, with the exception 
+         of further parameters in the additionalInformation 
+         field. The occurence of this event shall be counted by 
+         the lSPL2DatabaseOverloads counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.lSPL2DatabaseOverload"
+    ::= { isisOids 7) }
+
+manualAddressDroppedFromArea OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when one of the manualareaAddresses assigned 
+         to this system is ignored when computing 
+         partitionAreaAddresses or areaAddresses because there 
+         are more than MaximumAreaAddresses distinct Area 
+         Addresses. The ignored Area Address shall be reported 
+         in the additionalInformation field using the 
+         notificationAreaAddress parameter. The significance 
+         sub-parameter of each item of additionalInformation 
+         shall be set to the value 'false' (i.e. not 
+         significant) so that a managing system receiving the 
+         event report will be less likely to reject it. The 
+         event is generated once for each Area Address in 
+         manualAreaAddresses which is dropped. It is not 
+         generated again for that Area Address until after it 
+         has been reinstated into areaAddresses (i.e. it is only 
+         the action of dropping the Area Address and not the 
+         state of being dropped, which causes the event to be 
+         generated). The value ISIS.manualAddressDroppedFromArea 
+         shall be reported in the specificProblems parameter. 
+         The probableCause shall be set to 
+         NLM.configurationOrCustomisationError. The 
+         perceivedSeverity shall be set to 'Major'. A subsequent 
+         communicationsAlarm with a perceivedSeverity value of 
+         'Cleared' shall not be generated. No other fields or 
+         parameters shall be used, with the exception of further 
+         parameters in the additionalInformation field. The 
+         occurrence of this event shall be counted by the 
+         manualAddressDroppedFromAreas counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.manualAddressDroppedFromArea"
+    ::= { isisOids 8) }
+
+maximumAreaAddressesMismatch OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when a PDU is received with a different value 
+         for maximumAreaAddresses from that of the receiving 
+         Intermediate system.  The received Maximum Area 
+         Addresses and Source ID are reported in the 
+         additionalInformation field using the 
+         notificationMaximumAreaAddresses and 
+         notificationSourceId parameters respectively. The 
+         significance sub-parameter of each item of 
+         additionalInformation shall be set to the value 'false' 
+         (i.e. not significant) so that a managing system 
+         receiving the event report will be less likely to 
+         reject it. The value ISIS.MaximumAreaAddressesMismatch 
+         shall be reported in the specificProblems parameter. 
+         The probableCause shall be set to 
+         NLM.configurationOrCustomisationError. The 
+         perceivedSeverity shall be set to 'Major'. A subsequent 
+         communicationsAlarm with a perceivedSeverity value of 
+         'Cleared' shall not be generated. No other fields or 
+         parameters shall be used, with the exception of further 
+         parameters in the additionalInformation field. The 
+         occurence of this event is counted by the 
+         MaximumAreaAddressesMismatches counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.maximumAreaAddressesMismatch"
+    ::= { isisOids 9) }
+
+ownLSPPurge OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when a zero aged copy of a system's own LSP 
+         is received from some other system. This represents an 
+         erroneous attempt to purge the local system's LSP. The 
+         value ISIS.ownLSPPurge shall be reported in the 
+         specificProblems parameter. The probableCause shall be 
+         set to NLM.communicationsProtocolError. The 
+         perceivedSeverity shall be set to 'Minor'.  A 
+         subsequent communicationsAlarm with a perceivedSeverity 
+         value of 'Cleared' shall not be generated. No other 
+         fields or parameters shall be used, with the exception 
+         of further parameters in the additionalInformation 
+         field. The occurrence of this event is counted by the 
+         ownLSPPurges counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.ownLSPPurge"
+    ::= { isisOids 10) }
+
+partitionVirtualLinkChange OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when a virtual link (for the purposes of 
+         Level 1 partition repair) is either created or deleted. 
+         The direction of the change and the networkEntityTitle 
+         of the corresponding virtual adjacency managed object 
+         are reported in the communicationData field using the 
+         notificationVirtualLinkChange and 
+         notificationVirtualLinkAddress parameters respectively. 
+         The value ISIS.partitionVirtualLinkChange shall be 
+         reported in the informationType parameter. No other 
+         fields or parameters shall be used, with the exception 
+         of further parameters in the informationData field. The 
+         relative order of events relating to the same Virtual 
+         Link must be preserved. The occurrence of this event is 
+         counted by the partitionVirtualLinkChanges counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.partitionVirtualLinkChange"
+    ::= { isisOids 11) }
+
+rejectedAdjacency OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when an attempt to create a new adjacency is 
+         rejected, because of a lack of resources. The ID field 
+         of the received PDU is reported in the additionaldata 
+         field using the notificationSystemId parameter.  The 
+         value ISIS.rejectedAdjacency shall be reported in the 
+         specificProblems parameter. The probableCause shall be 
+         set to NLM.resourceAtOrNearingCapacity.  The 
+         perceivedSeverity shall be set to 'Major'. A subsequent 
+         communicationsAlarm with a perceivedSeverity value of 
+         'Cleared' shall not be generated. No other fields or 
+         parameters shall be used, with the exception of further 
+         parameters in the additionalInformation field. The 
+         occurrence of this event is counted by the 
+         rejectedAdjacencies counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.rejectedAdjacency"
+    ::= { isisOids 12) }
+
+sequenceNumberSkip OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when the sequence number of an LSP is 
+         incremented by more than one. The value 
+         ISIS.sequenceNumberSkip shall be reported in the 
+         informationType parameter. No other fields or 
+         parameters shall be used, with the exception of 
+         parameters in the informationData field. The occurrence 
+         of this event is counted by the sequenceNumberSkips 
+         counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.sequenceNumberSkip"
+    ::= { isisOids 13) }
+
+versionSkew OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when an attempt to initialise with an 
+         adjacent system fails as a result of the versions of 
+         the protocol are not compatible. The protocol version 
+         field from the received PDU shall be reported in the 
+         additionalInformation field using the 
+         notificationVersion parameter. The significance 
+         sub-parameter of each item of additionalInformation 
+         shall be set to the value 'false' (i.e. not 
+         significant) so that a managing system receiving the 
+         event report will be less likely to reject it. The 
+         value ISIS.versionSkew shall be reported in the 
+         specificProblems parameter. The probableCause shall be 
+         set to NLM.versionMismatch. The perceivedSeverity shall 
+         be set to 'Major'. A subsequent communicationsAlarm 
+         with a perceivedSeverity value of 'Cleared' shall not 
+         be generated. No other fields or parameters shall be 
+         used, with the exception of further parameters in the 
+         additionalInformation field. The occurrence of this 
+         event is counted by the initialisationFailures 
+         counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.versionSkew"
+    ::= { isisOids 14) }
+
+originatingLSPBufferSizeMismatch OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generated when a Level 1 LSP or Level 2 LSP is received 
+         which is larger than the local value for 
+         originatingL1LSPBufferSize or 
+         originatingL2LSPBufferSize respectively or when a Level 
+         1 LSP or Level2 LSP is received containing the 
+         originatingLSPBufferSize option and the value in the 
+         PDU option field does not match the local value for 
+         originatingL1LSPBufferSize or 
+         originatingL2LSPBufferSize respectively. The contents 
+         of the LSP header are reported in the 
+         additionalInformation field using the 
+         notificationLSPHeader parameter. The significance 
+         sub-parameter of each item of additionalInformation 
+         shall be set to False (i.e. not significant) so that a 
+         managing system receiving the event report will be less 
+         likely to reject it. The value 
+         ISIS.originatingLSPBufferSizeMismatch shall be reported 
+         in the specificProblems parameter. The probable cause 
+         shall be set to NLM.configurationOrCustomisationError. 
+         The perceivedSeverity shall be set to 'Minor'. A 
+         subsequent communicationsAlarm with a perceivedSeverity 
+         value of Cleared shall not be generated. No other 
+         fields or parameters shall be used, with the exception 
+         of further parameters in the additionalInformation 
+         field. The occurrence of this event is counted by the 
+         originatingLSPBufferSizeMismatches counter."
+    REFERENCE
+        "ISO/IEC 10689, ISIS.originatingLSPBufferSizeMismatch"
+    ::= { isisOids 15) }
+
+
+nlmConformance OBJECT IDENTIFIER
+    ::= { nlmMIB 3 }
+
+nlmGroups OBJECT IDENTIFIER
+    ::= { nlmConformance 1 }
+
+nlmComplicances OBJECT IDENTIFIER
+    ::= { nlmConformance 2 }
+
+nlmNetworkSubsystemPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         networkSubsystem-P package."
+    ::= { nlmGroups xx }
+
+nlmNetworkEntityPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         networkEntity-P package."
+    ::= { nlmGroups xx }
+
+nlmNSAPPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         nSAP-P package."
+    ::= { nlmGroups xx }
+
+nlmCLNSPackage OBJECT-GROUP
+    OBJECTS     {
+        cLNSAdministrativeState,
+        cLNSOperationalState,
+        cLNSActivationAction,
+        cLNSRowStatus
+    }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         cLNS-P package."
+    ::= { nlmGroups xx }
+
+nlmCLNS8473Package OBJECT-GROUP
+    OBJECTS     {
+        octetsSentCounter,
+        octetsReceivedCounter,
+        operationalSystemType,
+        supportedProtocols,
+        segmentsReceived,
+        segmentsDiscarded,
+        assemblingSegmentsDiscarded,
+        errorReportsReceived,
+        pDUDiscards,
+        congestionDiscards,
+        maximumLifetime
+    }
+    STATUS      current
+    DESCRIPTION 
+        "Present when 8473 is used to provide the CLNS."
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         cLNS8473-P package."
+    ::= { nlmGroups xx }
+
+nlmCLNSChecksumPackage OBJECT-GROUP
+    OBJECTS     { enableChecksum }
+    STATUS      current
+    DESCRIPTION 
+        "When present checksum generation is controlled by the 
+         8473 enableChecksum attribute."
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         cLNSChecksum-P package."
+    ::= { nlmGroups xx }
+
+nlmLinkagePackage OBJECT-GROUP
+    OBJECTS     { linkageId, operationalState, 
+                    administrativeState, sN-ServiceProvider, 
+                    sN-SA-P, operationalProtocols, 
+                    activationAction, linkageRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         linkage-P package."
+    ::= { nlmGroups xx }
+
+nlmLinkageCODLServicePackage OBJECT-GROUP
+    OBJECTS     { callsPlaced, callsFailed }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         linkageCODLService-P package."
+    ::= { nlmGroups xx }
+
+nlmLinkageIdleTimerPackage OBJECT-GROUP
+    OBJECTS     { idleTimer }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         linkageIdleTimer-P package."
+    ::= { nlmGroups xx }
+
+nlmLinkageInitialMinimumTimerPackage OBJECT-GROUP
+    OBJECTS     { initialMinimumTimer }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         linkageInitialMiminumTimer-P package."
+    ::= { nlmGroups xx }
+
+nlmLinkage-ISO8473-ISO8208SNDCFPackage OBJECT-GROUP
+    OBJECTS     { callsPlaced, callsFailed }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         linkage-ISO8473-ISO8208SNDCF-P package."
+    ::= { nlmGroups xx }
+
+nlmLinkage-ISO9542ESPackage OBJECT-GROUP
+    OBJECTS     { iSO9542OperationalSubsets, 
+                  holdingTimerMultiplier, manualISSNPAAddress, 
+                  defaultESConfigTimer, activeESConfigTimer, 
+                  iSReachabilityChanges, invalid9542PDUs }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         linkage-ISO9542ES-P package."
+    ::= { nlmGroups xx }
+
+nlmLinkage-ISO9542ISPackage OBJECT-GROUP
+    OBJECTS     { iSO9542OperationalSubsets, 
+                  holdingTimerMultiplier, iSConfigurationTimer, 
+                  suggestedESConfigurationTimer, 
+                  redirectHoldingTime, eSReachabilityChanges, 
+                  invalid9542PDUs }
+    STATUS      current
+    DESCRIPTION 
+        "Present when support for ISO 9542 operating as an IS."
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         linkage-ISO9542IS-P package."
+    ::= { nlmGroups xx }
+
+nlmLinkageReserveTimerPackage OBJECT-GROUP
+    OBJECTS     { reserveTimer }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         linkageReserveTimer-P package."
+    ::= { nlmGroups xx }
+
+nlmCONSPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         cONS-P package."
+    ::= { nlmGroups xx }
+
+nlmNetworkConnectionPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         networkConnection-P package."
+    ::= { nlmGroups xx }
+
+nlmX25PLEPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         x25PLE-P package."
+    ::= { nlmGroups xx }
+
+nlmX25PLEIVMOPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         x25PLEIVMO-P package."
+    ::= { nlmGroups xx }
+
+nlmOnlineRegistrationPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         onlineRegsitration-P package."
+    ::= { nlmGroups xx }
+
+nlmVCMOPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         vCMO-P package."
+    ::= { nlmGroups xx }
+
+nlmPVCMOPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         pVCMO-P package."
+    ::= { nlmGroups xx }
+
+nlmVirtualCallIVMOPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         virtualCallIVMO-P package."
+    ::= { nlmGroups xx }
+
+nlmSVCMOPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         sVCMO-P package."
+    ::= { nlmGroups xx }
+
+nlmPacketRetransmissionProceduresPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         packetRestransmissionProcedures-P package."
+    ::= { nlmGroups xx }
+
+nlmReceivingWindowRotationRecoveryProceduresPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         receivingWindowRotationRecoveryProcedures-P package."
+    ::= { nlmGroups xx }
+
+nlmTransmittingWindowRotationRecoveryProceduresPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Rec. X.283 | ISO/IEC 10733 
+         transmittingWindowRotationRecoveryProcedures-P package."
+    ::= { nlmGroups xx }
+
+isisCLNSISISBasicPackage OBJECT-GROUP
+    OBJECTS     {
+    }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, cLNSISISBasic-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisCLNSISISLevel2Package OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, cLNSISISLevel2-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisCLNSISISPartitionRepairPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, cLNSISISPartitionRepair-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisCLNSISISAuthenticationPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, cLNSISISAuthentication-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisCLNSISISLevel2AuthenticationPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, cLNSISISLevel2Authentication-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisLinkageISISBasicPackage OBJECT-GROUP
+    OBJECTS     { type, iSISHelloTimer, l1DefaultMetric, 
+                  l1DelayMetric, l1ExpenseMetric, l1ErrorMetric, 
+                  externalDomain, changesInAdjacencyState, 
+                  initialisationFailures, rejectedAdjacencies, 
+                  iSISControlPDUsSent, iSISControlPDUsReceived, 
+                  iDFieldLengthMismatches, 
+                  maximumAreaAddressesMismatches }
+    STATUS      current
+    DESCRIPTION 
+        "Imports the communicationsAlarm notification from 
+         ISO/IEC 10165-2. It is used to report the following 
+         protocol events.
+
+         versionSkew: generated when an attempt to initialise 
+         with an adjacent system fails as a result of the 
+         versions of the protocol are not compatible. The 
+         protocol version field from the received PDU shall be 
+         reported in the additionalInformation field using the 
+         notificationVersion parameter. The significance 
+         sub-parameter of each item of additionalInformation 
+         shall be set to the value 'false' (i.e. not 
+         significant) so that a managing system receiving the 
+         event report will be less likely to reject it. The 
+         value ISIS.versionSkew shall be reported in the 
+         specificProblems parameter. The probableCause shall be 
+         set to NLM.versionMismatch. The perceivedSeverity shall 
+         be set to 'Major'. A subsequent communicationsAlarm 
+         with a perceivedSeverity value of 'Cleared' shall not 
+         be generated. No other fields or parameters shall be 
+         used, with the exception of further parameters in the 
+         additionalInformation field. The occurrence of this 
+         event is counted by the initialisationFailures counter.
+
+         areaMismatch: generated when an attempt to initialise 
+         with an adjacent system fails as a result of two level 
+         1 ISs not sharing any area addresses in common.  The 
+         AREA ADDRESSES field and the ID field of the received 
+         PDU are reported in the additionalInformation field 
+         using the notificationAreaAddresses and 
+         notificationSystemId parameters respectively. The 
+         significance sub-parameter of each item of 
+         additionalInformation shall be set to the value 'false' 
+         (i.e. not significant) so that a managing system 
+         receiving the event report will be less likely to 
+         reject it. The value ISIS.areaMismatch shall be 
+         reported in the specificProblems parameter. The 
+         probableCause shall be set to 
+         NLM.configurationOrCustomisationError. The 
+         perceivedSeverity shall be set to 'Major'. A subsequent 
+         communicationsAlarm with a perceivedSeverity value of 
+         'Cleared' shall not be generated. No other fields or 
+         parameters shall be used, with the exception of further 
+         parameters in the additionalInformation field. The 
+         occurrence of this event is counted by the 
+         initialisationFailures counter.
+
+         rejectedAdjacency: generated when an attempt to create 
+         a new adjacency is rejected, because of a lack of 
+         resources. The ID field of the received PDU is reported 
+         in the additionaldata field using the 
+         notificationSystemId parameter.  The value 
+         ISIS.rejectedAdjacency shall be reported in the 
+         specificProblems parameter. The probableCause shall be 
+         set to NLM.resourceAtOrNearingCapacity.  The 
+         perceivedSeverity shall be set to 'Major'. A subsequent 
+         communicationsAlarm with a perceivedSeverity value of 
+         'Cleared' shall not be generated. No other fields or 
+         parameters shall be used, with the exception of further 
+         parameters in the additionalInformation field. The 
+         occurrence of this event is counted by the 
+         rejectedAdjacencies counter.
+
+         iDFieldLengthMismatch: generated when a PDU is received 
+         with a different value for ID field length to that of 
+         the receiving Intermediate system. The received ID 
+         LENGTH and SOURCE ID are reported in the 
+         additionalInformation field using the 
+         notificationIDLength and notificationSourceId 
+         parameters respectively. The significance sub-parameter 
+         of each item of additionalInformation shall be set to 
+         the value 'false' (i.e. not significant) so that a 
+         managing system receiving the event report will be less 
+         likely to reject it. The value 
+         ISIS.iDFieldLengthMismatch shall be reported in the 
+         specificProblems parameter.  The probableCause shall be 
+         set to NLM.configurationOrCustomisationError. The 
+         perceivedSeverity shall be set to 'Major'. A subsequent 
+         communicationsAlarm with a perceivedSeverity value of 
+         'Cleared' shall not be generated. No other fields or 
+         parameters shall be used, with the exception of further 
+         parameters in the additionalInformation field. The 
+         occurence of this event is counted by the 
+         iDFieldLengthMismatches counter.
+
+         maximumAreaAddressesMismatch: generated when a PDU is 
+         received with a different value for 
+         maximumAreaAddresses from that of the receiving 
+         Intermediate system.  The received MAXIMUM AREA 
+         ADDRESSES and SOURCE ID are reported in the 
+         additionalInformation field using the notification 
+         maximumAreaAddresses and notificationSourceId 
+         parameters respectively. The significance sub-parameter 
+         of each item of additionalInformation shall be set to 
+         the value 'false' (i.e. not significant) so that a 
+         managing system receiving the event report will be less 
+         likely to reject it. The value 
+         ISIS.maximumAreaAddressesMismatch shall be reported in 
+         the specificProblems parameter. The probableCause shall 
+         be set to NLM.configurationOrCustomisationError. The 
+         perceivedSeverity shall be set to 'Major'. A subsequent 
+         communicationsAlarm with a perceivedSeverity value of 
+         'Cleared' shall not be generated. No other fields or 
+         parameters shall be used, with the exception of further 
+         parameters in the additionalInformation field. The 
+         occurence of this event is counted by the 
+         maximumAreaAddressesMismatches counter."
+    REFERENCE
+        "ISO/IEC 10589, linkageISISBasic-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisLinkageISISBroadcastPackage OBJECT-GROUP
+    OBJECTS     { l1IntermediateSystemPriority, l1CircuitID, 
+                  l1DesignatedIntermediateSystem, 
+                  lanL1DesignatedIntermediateSystemChanges }
+    STATUS      current
+    DESCRIPTION 
+        "PRESENT IF the linkage is a broadcast circuit on an ISO 
+         10589 IS."
+    REFERENCE
+        "ISO/IEC 10589, linkageISISBroadcast-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisLinkageISISPtToPtPackage OBJECT-GROUP
+    OBJECTS     { ptPtCircuitID }
+    STATUS      current
+    DESCRIPTION 
+        "PRESENT IF the linkage is a point to point circuit on 
+         an ISO 10589 IS."
+    REFERENCE
+        "ISO/IEC 10589, linkageISISPtToPt-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisLinkageISISDACallEstablishmentMetricIncrementPackage OBJECT-GROUP
+    OBJECTS     { callEstablishmentDefaultMetricIncrement, 
+                  callEstablishmentDelayMetricIncrement, 
+                  callEstablishmentExpenseMetricIncrement, 
+                  callEstablishmentErrorMetricIncrement }
+    STATUS      current
+    DESCRIPTION 
+        "PRESENT IF the linkage is a DA Circuit and support is 
+         implemented for call establishment metric increment 
+         values greater than zero on an ISO 10589 IS."
+    REFERENCE
+        "ISO/IEC 10589, linkageISISDACallEstablishmentMetricIncrement-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisLinkageISISStaticPackage OBJECT-GROUP
+    OBJECTS     { outgoingCallIVMO, ptPtCircuitID, 
+                  neighbourSNPAAddress }
+    STATUS      current
+    DESCRIPTION 
+        "PRESENT IF the linkage is an X.25 static circuit (IN or 
+         OUT) on an ISO 10589 IS."
+    REFERENCE
+        "ISO/IEC 10589, linkageISISStatic-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisLinkageISISLevel2Package OBJECT-GROUP
+    OBJECTS     { l2DefaultMetric, l2DelayMetric, 
+                  l2ExpenseMetric, l2ErrorMetric, 
+                  manualL2OnlyMode }
+    STATUS      current
+    DESCRIPTION 
+        "PRESENT IF the system is an ISO 10589 level 2 IS."
+    REFERENCE
+        "ISO/IEC 10589, linkageISISLevel2-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisLinkageISISLevel2BroadcastPackage OBJECT-GROUP
+    OBJECTS     { l2IntermediateSystemPriority, l2CircuitID, 
+                  l2DesignatedIntermediateSystem, 
+                  lanL2DesignatedIntermediateSystemChanges }
+    STATUS      current
+    DESCRIPTION 
+        "PRESENT IF the linkage is a broadcast circuit on an ISO 
+         10589 level 2 IS."
+    REFERENCE
+        "ISO/IEC 10589, linkageISISLevel2Broadcast-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisLinkageISISAuthenticationPackage OBJECT-GROUP
+    OBJECTS     { circuitTransmitPassword, 
+                  circuitReceivePasswords, 
+                  authenticationFailures }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, linkageISISAuthentication-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisAdjacencyPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, adjacency-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisISAdjacencyPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, iSAdjacency-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisBroadcastISAdjacencyPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, broadcastISAdjacency-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisVirtualAdjacencyPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, virtualAdjacency-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisDestinationPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, destination-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisDestinationSystemPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, destinationSystem-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisDestinationAreaPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, destinationArea-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisReachableAddressPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, reachableAddress-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisExplicitSNPAPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, explicitSNPA-P PACKAGE"
+    ::= { isisGroups xx }
+
+isisExtractDSPPackage OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ISO/IEC 10589, extractDSP-P PACKAGE"
+    ::= { isisGroups xx }
+
+
+
+cLNSManagedObjectCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Complance for the cLNS managed object and corresponding 
+         cLNSTable."
+    MODULE
+        MANDATORY-GROUPS {
+        }
+        GROUP cLNS8473Package
+        DESCRIPTION
+            "Present when the protocol defined in 8473 is used 
+             to implement the CLNS."
+        GROUP cLNSChecksumPackage
+        DESCRIPTION
+            "Present when the 8473 Generate Checksum option is 
+             implemented."
+    MODULE OPENSS7-ISO10589-MIB
+        GROUP cLNSISISBasicPackage
+        DESCRIPTION
+            "The system is an ISO 10589 IS."
+        GROUP cLNSISISAuthenticationPackage
+        DESCRIPTION
+            "The system is an ISO 10589 IS and the 
+             authentication procedures are implemented."
+        GROUP cLNSISISPartitionRepairPackage
+        DESCRIPTION
+            "The system is an ISO 10589 Level 2 IS and the 
+             partition repair procedures are implemented."
+        GROUP cLNSISISLevel2Package
+        DESCRIPTION
+            "The system is an ISO 10589 Level 2 IS."
+        GROUP cLNSISISLevel2AuthenticationPackage
+        DESCRIPTION
+            "The system is an ISO 10589 Level 2 IS and the 
+             authentication procedures are implemented"
+    ::= { nlmCompliances 1 }
+
+linkageManagedObjectCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Compliance for the linkage managed object class and 
+         corresponding linkageTable."
+    MODULE
+        MANDATORY-GROUPS {
+            nlmLinkagePackage
+        }
+        GROUP nlmLinkage-ISO9542ISPackage
+        DESCRIPTION
+                "PRESENT IF support for ISO 9542 operating as an 
+                 IS."
+        GROUP nlmLinkage-ISO9542ESPackage
+        DESCRIPTION
+                "PRESENT IF support for ISO 9542 operating as an 
+                 ES."
+        GROUP nlmLinkageInitialMinimumTimerPackage
+        DESCRIPTION
+                "PRESENT IF support for the initial minimum 
+                 timer attribute of an ISO 8208 or CO Datalink 
+                 Service SNDCF for ISO 8473."
+        GROUP nlmLinkageReserveTimerPackage
+        DESCRIPTION
+                "PRESENT IF support for the reserve timer 
+                 attribute of an ISO 8208 or CO Datalink Service 
+                 SNDCF for ISO 8473."
+        GROUP nlmLinkageIdleTimerPackage
+        DESCRIPTION
+                "PRESENT IF support for the idle timer attribute 
+                 of an ISO 8208 or CO Datalink Service SNDCF for 
+                 ISO 8473."
+        GROUP nlmLinkage-ISO8473-ISO8208SNDCFPackage
+        DESCRIPTION
+                "PRESENT IF support for an ISO 8208 SNDCF for 
+                 ISO 8473."
+        GROUP nlmLinkageCODLServicePackage
+        DESCRIPTION
+                "PRESENT IF support for a CO Datalink SNDCF for 
+                 ISO8473/Add.3.."
+        GROUP isisLinkageISISBasicPackage
+        DESCRIPTION
+                "PRESENT IF the system is an ISO 10589 IS."
+        GROUP isisLinkageISISAuthenticationPackage
+        DESCRIPTION
+                "PRESENT IF the authentication procedures are 
+                 implemented on an ISO 10589 IS."
+        GROUP isisLinkageISISBroadcastPackage
+        DESCRIPTION
+                "PRESENT IF the linkage is a broadcast circuit 
+                 on an ISO 10589 IS."
+        GROUP isisLinkageISISDACallEstablishmentMetricIncrementPackage
+        DESCRIPTION
+                "PRESENT IF the linkage is a DA Circuit and 
+                 support is implemented for call establishment 
+                 metric increment values greater than zero on an 
+                 ISO 10589 IS."
+        GROUP isisLinkageISISPtToPtPackage
+        DESCRIPTION
+                "PRESENT IF the linkage is a point to point 
+                 circuit on an ISO 10589 IS."
+        GROUP isisLinkageISISStaticPackage
+        DESCRIPTION
+                "PRESENT IF the linkage is an X.25 static 
+                 circuit (IN or OUT) on an ISO 10589 IS."
+        GROUP isisLinkageISISLevel2Package
+        DESCRIPTION
+                "PRESENT IF the system is an ISO 10589 level 2 
+                 IS."
+        GROUP isisLinkageISISLevel2BroadcastPackage
+        DESCRIPTION
+                "PRESENT IF the linkage is a broadcast circuit 
+                 on an ISO 10589 level 2 IS."
+
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=64 nocin nosi sts=4 sw=4 et
