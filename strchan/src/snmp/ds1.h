@@ -232,6 +232,8 @@ struct dsx1ChanMappingTable_data {
 /* function prototypes */
 
 void init_ds1(void);
+void deinit_ds1(void);
+int term_ds1(int majorID, int minorID, void *serverarg, void *clientarg);
 
 FindVarMethod var_ds1;
 void parse_ds1(const char *, char *);

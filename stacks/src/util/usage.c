@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/01/14 18:04:54 $
+ @(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/01/15 17:53:34 $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/01/14 18:04:54 $ by $Author: brian $
+ Last Modified $Date: 2008/01/15 17:53:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: usage.c,v $
+ Revision 0.9.2.3  2008/01/15 17:53:34  brian
+ - add _GNU_SOURCE for independent compile
+
  Revision 0.9.2.2  2008/01/14 18:04:54  brian
  - update tests and MIBS
 
@@ -57,9 +60,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/01/14 18:04:54 $"
+#ident "@(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/01/15 17:53:34 $"
 
-static char const ident[] = "$RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/01/14 18:04:54 $";
+static char const ident[] = "$RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/01/15 17:53:34 $";
+
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 
 #include <stdbool.h>
 #include <ctype.h>
