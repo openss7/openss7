@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/08/15 05:33:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-10 23:24:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/15 05:33:47 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 23:24:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,7 @@ strinet_TEXINFOS	= \
 			  tree.texi \
 			  bugs.texi \
 			  texi/fdl.texi \
+			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  texi/quick.texi \
 			  texi/install.texi \
@@ -98,6 +99,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.29  2008-04-10 23:24:14  brian
+# - distribute agpl3.texi
+#
 # Revision 0.9.2.28  2007/08/15 05:33:47  brian
 # - GPLv3 updates
 #

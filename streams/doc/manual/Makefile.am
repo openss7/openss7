@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/12/15 20:19:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-04-10 23:24:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/12/15 20:19:35 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 23:24:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -74,6 +74,7 @@ STREAMS_TEXINFOS	= \
 			  utilities.texi \
 			  bugs.texi \
 			  texi/fdl.texi \
+			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  texi/quick.texi \
 			  texi/install.texi \
@@ -86,6 +87,7 @@ STREAMS_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 STREAMS_FAQ_TEXINFOS	= \
+			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  texi/fdl.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -94,6 +96,7 @@ STREAMS_FAQ_TEXINFOS	= \
 
 
 SPG2_TEXINFOS		= \
+			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  texi/fdl.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -101,6 +104,7 @@ SPG2_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 SPG_TEXINFOS		= \
+			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  texi/fdl.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -108,6 +112,7 @@ SPG_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 porting_TEXINFOS	= \
+			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  texi/fdl.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -211,6 +216,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.57  2008-04-10 23:24:13  brian
+# - distribute agpl3.texi
+#
 # Revision 0.9.2.56  2007/12/15 20:19:35  brian
 # - updates
 #

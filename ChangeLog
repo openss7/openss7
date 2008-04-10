@@ -1,5 +1,7 @@
 2008-04-10  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/Makefile.am: distribute agpl.texi
+
 	* am/openss7.am: add BUILT_SOURCES to accumuluate
 	* scripts/modpost.sh: handle new EXPORT_UNUSED_SYMBOL
 	* doc/manual/bugs.texi: remove deprecated Nexusware support
