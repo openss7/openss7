@@ -1,3 +1,7 @@
+2008-04-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/compat.texi: updated distros
+
 2007-12-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/man.am: perform more substitutions
