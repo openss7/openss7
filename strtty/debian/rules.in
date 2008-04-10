@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 03:04:20 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-10 10:35:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 03:04:20 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 10:35:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -222,7 +222,6 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 	  [ ! -f README-alpha ] || echo "README-alpha" ; \
 	  echo "README-cvs" ; \
 	  echo "README-make" ; \
-	  echo "README-nexusware" ; \
 	  [ ! -f RELEASE-NOTES ] || echo "RELEASE-NOTES" ; \
 	  echo "THANKS" ; \
 	  echo "TODO" ; \
@@ -474,6 +473,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.14  2008-04-10 10:35:46  brian
+# - removed deprecated Nexusware support
+#
 # Revision 0.9.2.13  2007/08/14 03:04:20  brian
 # - GPLv3 header update
 #

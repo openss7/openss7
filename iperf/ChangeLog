@@ -1,5 +1,7 @@
 2008-04-10  Brian Bidulock  <bidulock@openss7.org>
 
+	* debian/rules.in: removed deprecated Nexusware support
+
 	* doc/manual/compat.texi: removed deprecated Nexusware support
 	* doc/manual/install.texi: removed deprecated Nexusware support
 	* doc/manual/texi/install.texi: removed deprecated Nexusware support
