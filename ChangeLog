@@ -1,5 +1,8 @@
 2008-04-10  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/bugs.texi: remove deprecated Nexusware support
+	* openss7.spec.in: remove deprecated Nexusware support
+	* m4/kernel.m4: remove deprecated Nexusware support
 	* doc/manual/install.texi: remove deprecated Nexusware support
 	* doc/manual/texi/install.texi: remove deprecated Nexusware support
 	* doc/manual/todo.texi: remove deprecated Nexusware support
