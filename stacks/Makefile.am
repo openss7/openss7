@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2008-04-10 10:24:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2008-04-10 23:36:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-10 10:24:00 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 23:36:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -167,14 +167,16 @@ ss7statsd_CFLAGS		= $(USER_CFLAGS)
 
 slconfig_SOURCES		= src/util/slconf_yac.y \
 				  src/util/slconf_lex.l \
-				  src/util/slconf.c
+				  src/util/slconf.c \
+				  slconf_yac.h
 slconfig_LDADD			= $(STREAMS_LDADD)
 slconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
 slconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"slconfig\"
 slconfig_CFLAGS			= $(USER_CFLAGS)
 
 mtpconfig_SOURCES		= src/util/mtpconf_yac.y \
-				  src/util/mtpconf_lex.l
+				  src/util/mtpconf_lex.l \
+				  mtpconf_yac.h
 mtpconfig_LDADD			= $(STREAMS_LDADD)
 mtpconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
 mtpconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"mtpconfig\"
@@ -182,7 +184,8 @@ mtpconfig_CFLAGS		= $(USER_CFLAGS)
 
 x400config_SOURCES		= src/util/x400yac.y \
 				  src/util/x400lex.l \
-				  src/util/x400config.h
+				  src/util/x400config.h \
+				  x400yac.h
 x400config_LDADD		= $(STREAMS_LDADD)
 x400config_LDFLAGS		= $(STREAMS_LDFLAGS)
 x400config_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"x400config\"
@@ -190,7 +193,8 @@ x400config_CFLAGS		= $(USER_CFLAGS)
 
 sdlconfig_SOURCES		= src/util/sdlconf.c \
 				  src/util/sdlyac.y \
-				  src/util/sdllex.l
+				  src/util/sdllex.l \
+				  sdlyac.h
 sdlconfig_LDADD			= $(STREAMS_LDADD)
 sdlconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
 sdlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"sdlconfig\"
@@ -541,14 +545,16 @@ ss7statsd_CFLAGS		= $(USER_CFLAGS)
 
 slconfig_SOURCES		= src/util/slconf_yac.y \
 				  src/util/slconf_lex.l \
-				  src/util/slconf.c
+				  src/util/slconf.c \
+				  slconf_yac.h
 slconfig_LDADD			= $(STREAMS_LDADD)
 slconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
 slconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"slconfig\"
 slconfig_CFLAGS			= $(USER_CFLAGS)
 
 mtpconfig_SOURCES		= src/util/mtpconf_yac.y \
-				  src/util/mtpconf_lex.l
+				  src/util/mtpconf_lex.l \
+				  mtpconf_yac.h
 mtpconfig_LDADD			= $(STREAMS_LDADD)
 mtpconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
 mtpconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"mtpconfig\"
@@ -556,7 +562,8 @@ mtpconfig_CFLAGS		= $(USER_CFLAGS)
 
 x400config_SOURCES		= src/util/x400yac.y \
 				  src/util/x400lex.l \
-				  src/util/x400config.h
+				  src/util/x400config.h \
+				  x400yac.h
 x400config_LDADD		= $(STREAMS_LDADD)
 x400config_LDFLAGS		= $(STREAMS_LDFLAGS)
 x400config_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"x400config\"
@@ -564,7 +571,8 @@ x400config_CFLAGS		= $(USER_CFLAGS)
 
 sdlconfig_SOURCES		= src/util/sdlconf.c \
 				  src/util/sdlyac.y \
-				  src/util/sdllex.l
+				  src/util/sdllex.l \
+				  sdlyac.h
 sdlconfig_LDADD			= $(STREAMS_LDADD)
 sdlconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
 sdlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"sdlconfig\"
@@ -1480,6 +1488,9 @@ MAINTAINERCLEANFILES		+= \
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.103  2008-04-10 23:36:22  brian
+## - get Debian 4.0 deb/dsc build working
+##
 ## Revision 0.9.2.102  2008-04-10 10:24:00  brian
 ## - removed deprecated Nexusware support
 ##

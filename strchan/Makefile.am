@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-10 10:24:01 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-10 23:36:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-10 10:24:01 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 23:36:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -107,19 +107,37 @@ dist_sbin_SCRIPTS		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
-x400pmib_SOURCES		= src/snmp/x400pMIB.c src/snmp/x400pMIB.h
+x400pmib_SOURCES		= src/snmp/x400pMIB.c \
+				  src/snmp/x400pMIB.h \
+				  src/snmp/ds_agent.h \
+				  src/snmp/header_complex.h \
+				  src/snmp/mib_modules.h \
+				  src/snmp/struct.h \
+				  src/snmp/util_funcs.h
 x400pmib_LDFLAGS		= $(SNMP_LDFLAGS)
 x400pmib_LDADD			= $(STREAMS_LDADD) $(SNMP_LDADD)
 x400pmib_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 x400pmib_CFLAGS			= $(USER_CFLAGS)
 
-mxmib_SOURCES			= src/snmp/mxMIB.c src/snmp/mxMIB.h
+mxmib_SOURCES			= src/snmp/mxMIB.c \
+				  src/snmp/mxMIB.h \
+				  src/snmp/ds_agent.h \
+				  src/snmp/header_complex.h \
+				  src/snmp/mib_modules.h \
+				  src/snmp/struct.h \
+				  src/snmp/util_funcs.h
 mxmib_LDFLAGS			= $(SNMP_LDFLAGS)
 mxmib_LDADD			= $(STREAMS_LDADD) $(SNMP_LDADD)
 mxmib_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 mxmib_CFLAGS			= $(USER_CFLAGS)
 
-phymib_SOURCES			= src/snmp/phyMIB.c src/snmp/phyMIB.h
+phymib_SOURCES			= src/snmp/phyMIB.c \
+				  src/snmp/phyMIB.h \
+				  src/snmp/ds_agent.h \
+				  src/snmp/header_complex.h \
+				  src/snmp/mib_modules.h \
+				  src/snmp/struct.h \
+				  src/snmp/util_funcs.h
 phymib_LDFLAGS			= $(SNMP_LDFLAGS)
 phymib_LDADD			= $(STREAMS_LDADD) $(SNMP_LDADD)
 phymib_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -370,6 +388,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.11  2008-04-10 23:36:23  brian
+# - get Debian 4.0 deb/dsc build working
+#
 # Revision 0.9.2.10  2008-04-10 10:24:01  brian
 # - removed deprecated Nexusware support
 #

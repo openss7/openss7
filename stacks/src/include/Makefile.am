@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/13 15:22:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-10 23:36:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 15:22:13 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 23:36:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -216,6 +216,7 @@ ss7_headers = \
 	ss7/sdti.h \
 	ss7/sdti_ioctl.h \
 	ss7/sl.h \
+	ss7/sl_mux.h \
 	ss7/sli.h \
 	ss7/sli_ioctl.h \
 	ss7/slmi.h \
@@ -379,6 +380,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.15  2008-04-10 23:36:23  brian
+## - get Debian 4.0 deb/dsc build working
+##
 ## Revision 0.9.2.14  2007/08/13 15:22:13  brian
 ## - header updates, added references
 ##
