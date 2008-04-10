@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/10/18 06:52:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-04-10 10:23:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/18 06:52:37 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 10:23:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -152,8 +152,8 @@ endif
 ## PKG_BUILD_ARCH
 endif
 
-dist_noinst_SCRIPTS		+= configure.nexusware scripts/missing2
-EXTRA_SCRIPTS			+= configure.nexusware scripts/missing2
+dist_noinst_SCRIPTS		+= scripts/missing2
+EXTRA_SCRIPTS			+= scripts/missing2
 
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(dist_sbin_SCRIPTS)
 
@@ -293,6 +293,9 @@ EXTRA_DIST			+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.51  2008-04-10 10:23:59  brian
+# - removed deprecated Nexusware support
+#
 # Revision 0.9.2.50  2007/10/18 06:52:37  brian
 # - new build support
 #

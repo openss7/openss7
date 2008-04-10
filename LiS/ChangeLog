@@ -1,3 +1,12 @@
+2008-04-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: remove deprectated Nexusware support
+	* manual/install.texi: remove deprectated Nexusware support
+	* manual/news.texi: remove deprectated Nexusware support
+	* manual/texi/install.texi: remove deprectated Nexusware support
+	* scripts/texi/compat.texi: remove deprectated Nexusware support
+	* scripts/texi/install.texi: remove deprectated Nexusware support
+
 2007-12-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/man.am: perform more substitutions

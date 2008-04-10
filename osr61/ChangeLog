@@ -1,5 +1,10 @@
 2008-04-10  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: remove deprecated nexusware support
+	* doc/manual/texi/install.texi: remove deprecated nexusware support
+	* scripts/texi/compat.texi: remove deprecated nexusware support
+	* scripts/texi/install.texi: remove deprecated nexusware support
+
 	* AUTHORS: updated release files
 	* NEWS: updated release files
 	* README: updated release files

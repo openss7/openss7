@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2008/01/14 18:04:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2008-04-10 10:24:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/01/14 18:04:51 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 10:24:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1225,8 +1225,8 @@ EXTRA_TEX			+= \
 				scripts/texi/lesser.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= configure.nexusware scripts/missing2
-EXTRA_SCRIPTS			+= configure.nexusware scripts/missing2
+dist_noinst_SCRIPTS		+= scripts/missing2
+EXTRA_SCRIPTS			+= scripts/missing2
 
 ##
 ## Rules for building kernel objects
@@ -1480,6 +1480,9 @@ MAINTAINERCLEANFILES		+= \
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.102  2008-04-10 10:24:00  brian
+## - removed deprecated Nexusware support
+##
 ## Revision 0.9.2.101  2008/01/14 18:04:51  brian
 ## - update tests and MIBS
 ##

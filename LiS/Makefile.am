@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.50 $) $Date: 2007/10/18 06:52:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.51 $) $Date: 2008-04-10 10:23:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/18 06:52:33 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 10:23:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -282,8 +282,8 @@ EXTRA_TEX			+= \
 				scripts/texi/lesser.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= configure.nexusware scripts/missing2
-EXTRA_SCRIPTS			+= configure.nexusware scripts/missing2
+dist_noinst_SCRIPTS		+= scripts/missing2
+EXTRA_SCRIPTS			+= scripts/missing2
 
 ##
 ## Rules for building kernel objects
@@ -633,6 +633,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.6.51  2008-04-10 10:23:58  brian
+# - removed deprecated Nexusware support
+#
 # Revision 1.1.6.50  2007/10/18 06:52:33  brian
 # - new build support
 #

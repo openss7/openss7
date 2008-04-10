@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2008/01/13 21:53:01 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.153 $) $Date: 2008-04-10 10:24:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/01/13 21:53:01 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 10:24:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -481,8 +481,8 @@ EXTRA_TEX			+= \
 				scripts/texi/testsuite.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= configure.nexusware scripts/missing2
-EXTRA_SCRIPTS			+= configure.nexusware scripts/missing2
+dist_noinst_SCRIPTS		+= scripts/missing2
+EXTRA_SCRIPTS			+= scripts/missing2
 
 ##
 ## Rules for building kernel objects
@@ -1100,6 +1100,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.153  2008-04-10 10:24:02  brian
+# - removed deprecated Nexusware support
+#
 # Revision 0.9.2.152  2008/01/13 21:53:01  brian
 # - dlmod SNMP agent build and installation
 #
