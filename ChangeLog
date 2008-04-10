@@ -1,5 +1,13 @@
 2008-04-10  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/install.texi: remove deprecated Nexusware support
+	* doc/manual/texi/install.texi: remove deprecated Nexusware support
+	* doc/manual/todo.texi: remove deprecated Nexusware support
+	* Makefile.am: remove deprecated Nexusware support
+	* scripts/texi/compat.texi: remove deprecated Nexusware support
+	* scripts/texi/install.texi: remove deprecated Nexusware support
+	* texi/install.texi: remove deprecated Nexusware support
+
 	* scripts/text/compat.texi: added new distros
 
 	* AUTHORS: updated release files
