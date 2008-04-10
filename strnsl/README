@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Network Services Library -- read me first file.  2008-01-23
-$Id: README,v 0.9.2.28 2008/01/24 17:38:26 brian Exp $
+OpenSS7 STREAMS Network Services Library -- read me first file.  2008-04-10
+$Id: README,v 0.9.2.29 2008-04-10 08:14:43 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS Network Services Library
 =========================================
 
-Package strnsl-0.9.2.4 was released under AGPLv3 2008-01-23.
+Package strnsl-0.9.2.4 was released under AGPLv3 2008-04-10.
 
 `UNIX' has traditionally provided three components of the Network
 Services Library, `libnsl', two of which are associated with the X/Open
@@ -75,7 +75,7 @@ well.
  Release
 --------
 
-This is the `strnsl-0.9.2.4' package, released 2008-01-23.  This
+This is the `strnsl-0.9.2.4' package, released 2008-04-10.  This
 `0.9.2.4' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
