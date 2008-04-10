@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2007/12/15 20:19:28 $
+# @(#) $RCSfile: openss7.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.122 $) $Date: 2008-04-10 23:17:45 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/12/15 20:19:28 $ by $Author: brian $
+## Last Modified $Date: 2008-04-10 23:17:45 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -88,6 +88,12 @@ RETEST_AM		=
 MANS_AM			=
 INSTALL_MANS_AM		=
 UNINSTALL_MANS_AM	=
+
+##
+# Accumulate until the end
+##
+
+BUILT_SOURCES		=
 
 ##
 # In case we only need the files version:
@@ -668,6 +674,9 @@ SUFFIXES = $(MY_SUFFIXES)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.122  2008-04-10 23:17:45  brian
+## - BUILT_SOURCES accumulates
+##
 ## Revision 0.9.2.121  2007/12/15 20:19:28  brian
 ## - updates
 ##
