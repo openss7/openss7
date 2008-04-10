@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/10/18 06:52:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-04-10 10:15:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/18 06:52:32 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 10:15:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -128,8 +128,8 @@ EXTRA_TEX			+= \
 				scripts/texi/testsuite.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= configure.nexusware scripts/missing2
-EXTRA_SCRIPTS			+= configure.nexusware scripts/missing2
+dist_noinst_SCRIPTS		+= scripts/missing2
+EXTRA_SCRIPTS			+= scripts/missing2
 
 ##
 ## Rules for lsms
@@ -183,6 +183,9 @@ DISTCLEANFILES			+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.36  2008-04-10 10:15:52  brian
+# - removed deprecated Nexusware support
+#
 # Revision 0.9.2.35  2007/10/18 06:52:32  brian
 # - new build support
 #

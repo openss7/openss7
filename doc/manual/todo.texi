@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.7 2007/06/22 00:18:21 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.8 2008-04-10 10:15:52 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/22 00:18:21 $ by $Author: brian $
+@c Last Modified $Date: 2008-04-10 10:15:52 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -96,7 +96,9 @@ would also be nice to cross-test.  We can accomplish this nicely within the auto
 DejaGNU.  DejaGNU configured under the LiS, but we need a more general autoconf .m4 fragement check
 for the existence of DejaGNU, and automake and DejaGNU expect wrappers for the existing test
 programs (and integration into the make check-DEJAGNU target).  Then we could cross-build the
-package (e.g.  for NexusWare) and then execute the test scripts on the result on a remote board
+package
+@c (e.g.  for NexusWare)
+and then execute the test scripts on the result on a remote board
 using DEJAGNU.
 
 @item Distributed testing framework.
