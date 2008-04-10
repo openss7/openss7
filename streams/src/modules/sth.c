@@ -1229,7 +1229,8 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 			if ((access & FREAD) == 0)
 				return (-ENXIO);
 			if ((access & FNDELAY) == 0)
-				return (-ESTRPIPE);
+				if ((flags & (STRISFIFO | STRISPIPE | STRISTTY)))
+					return (-ESTRPIPE);
 		}
 		if ((flags & STRDERR) != 0) {
 			if ((access & FREAD) != 0) {
