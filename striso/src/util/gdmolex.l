@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:13 $
+ @(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-10 08:40:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/09/06 10:59:13 $ by $Author: brian $
+ Last Modified $Date: 2008-04-10 08:40:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: gdmolex.l,v $
+ Revision 0.9.2.2  2008-04-10 08:40:41  brian
+ - update todo and lex syntax error
+
  Revision 0.9.2.1  2007/09/06 10:59:13  brian
  - added new gdmo files
 
@@ -59,9 +62,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:13 $"
+#ident "@(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-10 08:40:41 $"
 
-static char const ident[] = "$RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:13 $";
+static char const ident[] = "$RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-10 08:40:41 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
@@ -433,9 +436,9 @@ WITH[- ]SYNTAX				{ return TOK_WITH_SYNTAX			; }
 <asn>{AMPERSAND}			{ return TOK_AMPERSAND				; }
 <asn>{SLASH}				{ return TOK_SLASH				; }
 <INITIAL,asn>{DOCID}			{ return TOK_DOCID				; }
-<INTIIAL,asn>{EXTERNREF}		{ return TOK_EXTERNREF				; }
+<INITIAL,asn>{EXTERNREF}		{ return TOK_EXTERNREF				; }
 <INITIAL,asn>{NAMEANDNUMBER}		{ return TOK_NAME_AND_NUMBER			; }
-<INTIIAL,asn>{IDLABEL}			{ return TOK_ID					; }
+<INITIAL,asn>{IDLABEL}			{ return TOK_ID					; }
 <INITIAL,asn>{LABEL}			{ return TOK_LABEL; goto find_rule		; }
 <INITIAL,asn>{NUMBER}			{ return TOK_NUMBER				; }
 
