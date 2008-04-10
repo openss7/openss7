@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.74 $) $Date: 2007/08/14 10:46:51 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.75 $) $Date: 2008-04-10 11:04:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 10:46:51 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 11:04:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1496,7 +1496,7 @@ fi
 %defattr(-,root,root)
 #doc ABOUT-NLS
 %doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
-%doc README README-alpha README-cvs README-make README-nexusware THANKS TODO
+%doc README README-alpha README-cvs README-make THANKS TODO
 %doc %{name}-%{version}.lsm
 %doc manual
 #doc doc/specs doc/projects doc/drafts
@@ -1511,7 +1511,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
-%doc README README-alpha README-cvs README-make README-nexusware THANKS TODO
+%doc README README-alpha README-cvs README-make THANKS TODO
 %doc %{name}-%{version}.lsm
 %doc manual
 #doc doc/specs doc/projects doc/drafts
@@ -1981,9 +1981,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.74  2007/08/14 10:46:51  brian
-# - GPLv3 header update
+# Revision 1.1.6.75  2008-04-10 11:04:50  brian
+# - removed deprecated Nexusware support
 #
+
+* Tue Aug 14 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.74  2007/08/14 10:46:51  brian
+- GPLv3 header update
 
 * Sun Jun 24 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.73  2007/06/24 12:10:05  brian
