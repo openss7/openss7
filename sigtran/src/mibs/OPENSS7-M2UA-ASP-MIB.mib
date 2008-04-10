@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-M2UA-ASP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:19:11 $
+-- @(#) $RCSfile: OPENSS7-M2UA-ASP-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.4 $) $Date: 2008-01-24 17:40:54 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/12/15 20:19:11 $ by $Author: brian $
+-- Last Modified $Date: 2008-01-24 17:40:54 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-M2UA-ASP-MIB.mib,v $
+-- Revision 0.9.2.4  2008-01-24 17:40:54  brian
+-- - updated mibs
+--
 -- Revision 0.9.2.3  2007/12/15 20:19:11  brian
 -- - updates
 --
@@ -66,8 +69,18 @@
 OPENSS7-M2UA-ASP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	RowStatus
+		FROM SNMPv2-TC
+	OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+		FROM SNMPv2-CONF
+	SnmpAdminString
+		FROM SNMP-FRAMEWORK-MIB
 	openss7Modules
 		FROM OPENSS7-SMI
+	AdministrativeState, ProceduralState, UsageState, SimpleNameType
+		FROM OPENSS7-SMI-MIB;
 
 m2ua-Asp-MIB MODULE-IDENTITY
 	LAST-UPDATED
@@ -85,16 +98,32 @@ m2ua-Asp-MIB MODULE-IDENTITY
 		 Mob: +1 780 953 0557
 		 E-Mail: bidulock@openss7.org"
 	DESCRIPTION
-		"MIB Module for SIGTRAN M2UA ASP management."
+		"MIB Module for SIGTRAN M2UA ASP management.
+
+		 Containment:
+
+		 Each Asp contains a number of Sg.  An Sg may be 
+		 contained by zero or more Asps.  An Sg contained by an 
+		 Asp is a signalling gateway that provides service to 
+		 the As for that Asp.
+
+		 Each Sg contains a number of As.  The As contained by 
+		 the Sg are application servers that are served by the 
+		 Sg.
+
+		 Each As served by an Sg contains a number of If.  The 
+		 If contained by the As are the interfaces associated 
+		 with the As.
+
+		 Each Asp contains a number of Sg.  The Sg contained by 
+		 the Asp are the Sgs that provide service to the Asp."
+	REVISION
+		"200709250000Z"
+	DESCRIPTION
+		"First release of this module."
 	::= { openss7Modules 21 }
 
 -- Top-level structure of the MIB
---
--- From STD 58: [To] achieve compatiblity with SNMPv1 traps, both when 
--- converting SMIv1 information modules to and from this SMI, and in the 
--- procedures employed by multi-lingual systems and proxy forwarding 
--- applications, the next to last subidentifier must have the value 
--- zero.
 
 m2uaAspNotifications	OBJECT IDENTIFIER ::= { m2ua-Asp-MIB		 0 }
 m2uaAspObjects		OBJECT IDENTIFIER ::= { m2ua-Asp-MIB		 1 }
@@ -138,46 +167,18 @@ m2uaAspAspSgAs		OBJECT IDENTIFIER ::= { m2uaAspTables		 9 }
 --    |  +--(4) m2uaAspOids
 --    +--(2) m2uaAspConformance
 
--- ====================================================================
---
--- NOTIFICATIONS
---
--- ====================================================================
-
-
-communicationsAlarn NOTIFICATION-TYPE
-
-
---
--- Containment:
---
--- Each Asp contains a number of Sg.  An Sg may be contained by zero or 
--- more Asps.  An Sg contained by an Asp is a signalling gateway that 
--- provides service to the As for that Asp.
---
--- Each Sg contains a number of As.  The As contained by the Sg are 
--- application servers that are served by the Sg.
---
--- Each As served by an Sg contains a number of If.  The If contained by 
--- the As are the interfaces associated with the As.
---
--- Each Asp contains a number of Sg.  The Sg contained by the Asp are 
--- the Sgs that provide service to the Asp.
-
-
---
---  m2uaAspAsp  The M2UA ASP table.
---
---  The ASP table provides a list of all of the ASPs known to this host.
---
-
 m2uaAspTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF M2uaAspEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides the ASP table.  The ASP table is a list of all 
-		 of the ASPs known to this host."
+		"m2uaAspAsp  The M2UA ASP table.
+
+		 Provides the ASP table.  The ASP table is a list of all 
+		 of the ASPs known to this host.
+
+		 The ASP table provides a list of all of the ASPs known 
+		 to this host."
 	::= { m2uaAspAsp 1 }
 
 m2uaAspEntry OBJECT-TYPE
@@ -185,10 +186,9 @@ m2uaAspEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This is an entry in the ASP table."
-	INDEX	{
-			m2uaAspId
-		}
+		"This is an entry in the ASP table.  The index is 
+		 provided by this table."
+	INDEX	{ m2uaAspId }
 	::= { m2uaAspTable 1 }
 
 M2uaAspEntry ::=
@@ -215,10 +215,11 @@ M2uaAspEntry ::=
 
 m2uaAspId OBJECT-TYPE
 	SYNTAX		SimpleNameType
-	MAX-ACCESS	not-accessible -- shared
+	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This is the index of the M2UA ASP table."
+		"This is the index of the M2UA ASP table.  This is a 
+		 shared index."
 	::= { m2uaAspEntry 1 }
 
 m2uaAspAdministrativeState OBJECT-TYPE
@@ -350,22 +351,22 @@ m2uaAspStatus OBJECT-TYPE
 		 add, modify and delete rows from this table."
 	::= { m2uaAspEntry xx }
 
---
--- m2uaAspSg  The M2UA SG Table.
---
--- The SG table provides a list of all the SGs known to this host.  The 
--- purpose of this table is to identify all of the remote SG that this 
--- host can contact and the information for contacting the SG.  It also 
--- contains the general options associated with the SG.
---
 
 m2uaSgTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF M2uaSgEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Provides the SG table.  The SG table is a list of all 
-		 the SGs known to this host."
+		"m2uaAspSg  The M2UA SG Table.
+
+		 Provides the SG table.  The SG table is a list of all 
+		 the SGs known to this host.
+
+		 The SG table provides a list of all the SGs known to 
+		 this host.  The purpose of this table is to identify 
+		 all of the remote SG that this host can contact and the 
+		 information for contacting the SG.  It also contains 
+		 the general options associated with the SG."
 	::= { m2uaAspSg 1 }
 
 m2uaSgEntry OBJECT-TYPE
@@ -374,10 +375,9 @@ m2uaSgEntry OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 		"This is an entry in the SG table.  The entry consists 
-		 of known characteristics about the remote SG."
-	INDEX	{
-			m2uaSgId
-		}
+		 of known characteristics about the remote SG.  The 
+		 index is provided by this table."
+	INDEX	{ m2uaSgId }
 	::= { m2uaSgTable 1 }
 
 M2uaSgEntry ::=
@@ -416,11 +416,11 @@ M2uaSgEntry ::=
 
 m2uaSgId OBJECT-TYPE
 	SYNTAX		SimpleNameType
-	MAX-ACCESS	not-accessible -- shared
+	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
 		"This is the index of an entry in the SG table.  It is 
-		 shared with other tables."
+		 shared with other tables.  This is a shared index."
 	::= { m2uaSgEntry 1 }
 
 m2uaSgName OBJECT-TYPE
@@ -645,22 +645,20 @@ m2uaSgStatus OBJECT-TYPE
 	::= { m2uaSgEntry 15 }
 
 
---
---  m2uaAspSg  The ASP-SG relation table.
---
---  The ASP-SG relation table lists all of the allowable connections 
---  between ASPs and SG and provides the ASP characeteristic of the 
---  association.
---
-
 m2uaAspSgTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF M2uaAspSgEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This provides the ASP-SG table.  Each entry in this 
+		"m2uaAspSg  The ASP-SG relation table.
+
+		 This provides the ASP-SG table.  Each entry in this 
 		 table is a possible SCTP association between an ASP and 
-		 the SG."
+		 the SG.
+		 
+		 The ASP-SG relation table lists all of the allowable 
+		 connections between ASPs and SG and provides the ASP 
+		 characeteristic of the association."
 	::= { m2uaAspAspSg 1 }
 
 m2uaAspSgEntry OBJECT-TYPE
@@ -671,11 +669,10 @@ m2uaAspSgEntry OBJECT-TYPE
 		"This provides an entry in the ASP-SG table.  When 
 		 combined with the informatoin in the ASP and SG tables, 
 		 it provides all of the information necessary to form an 
-		 association between the ASP and the SG."
-	INDEX	{
-			m2uaAspId,		-- shared
-			m2uaSgId		-- shared
-		}
+		 association between the ASP and the SG.  The m2uaAspId 
+		 and m2uaSgId indices are shared.  The indices represent 
+		 the relationship between the indexed ASP and SG."
+	INDEX	{ m2uaAspId, m2uaSgId }
 	::= { m2uaAspSgTable 1 }
 
 M2uaAspSgEntry ::=
@@ -872,20 +869,19 @@ m2uaAspSgStatus OBJECT-TYPE
 		 effect upon an existing association."
 	::= { m2uaAspSgEntry 10 }
 
---
--- m2uaAs  The AS table.
---
--- The AS table provides a list of all application servers know to this 
--- host.
---
 
 m2uaAsTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF M2uaAsEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This provides the AS table.  The AS table is a list of 
-		 all of the application servers known to this host."
+		"m2uaAs  The AS table.
+
+		 This provides the AS table.  The AS table is a list of 
+		 all of the application servers known to this host.
+
+		 The AS table provides a list of all application servers 
+		 know to this host."
 	::= { m2uaAspAs 1 }
 
 m2uaAsEntry OBJECT-TYPE
@@ -893,10 +889,9 @@ m2uaAsEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This is an entry in the AS table."
-	INDEX	{
-			m2uaAsId
-		}
+		"This is an entry in the AS table.  The index is 
+		 provided by this table."
+	INDEX	{ m2uaAsId }
 	::= { m2uaAsTable 1 }
 
 M2uaAsEntry ::=
@@ -921,11 +916,12 @@ M2uaAsEntry ::=
 
 m2uaAsId OBJECT-TYPE
 	SYNTAX		SimpleNameType
-	MAX-ACCESS	not-accessible	-- shared
+	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
 		"This is the index of the AS table.  This index may also 
-		 be used as a local application server identifier."
+		 be used as a local application server identifier.  This 
+		 is a shared index."
 	::= { m2uaAsEntry 1 }
 
 m2uaAsName OBJECT-TYPE
@@ -1040,21 +1036,18 @@ m2uaAsStatus OBJECT-TYPE
 	::= { m2uaAsEntry 8 }
 
 
-
-
---
--- m2uaIf The IF Table.
---
--- The IF table provides a list of all interfaces known to this host.
---
-
 m2uaIfTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF M2uaIfEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This is the IF table.  It provides a list of all 
-		 interfaces known to the host."
+		"m2uaIf The IF Table.
+
+		 This is the IF table.  It provides a list of all 
+		 interfaces known to the host.
+
+		 The IF table provides a list of all interfaces known to 
+		 this host."
 	::= { m2uaAspIf 1 }
 
 m2uaIfEntry OBJECT-TYPE
@@ -1062,10 +1055,9 @@ m2uaIfEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This is an entry in the IF table."
-	INDEX	{
-			m2uaIfId
-		}
+		"This is an entry in the IF table.  The index is 
+		 provided by this table."
+	INDEX	{ m2uaIfId }
 	::= { m2uaIfTable 1 }
 
 M2uaIfEntry ::=
@@ -1084,10 +1076,11 @@ M2uaIfEntry ::=
 
 m2uaIfId OBJECT-TYPE
 	SYNTAX		SimpleNameType
-	MAX-ACCESS	not-accessible -- shared
+	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This is an index into the IF table."
+		"This is an index into the IF table.  This is a shared 
+		 index."
 	::= { m2uaIfEntry 1 }
 
 
@@ -1132,22 +1125,20 @@ m2uaIfStatus OBJECT-TYPE
 		 the RowStatus textual convention."
 	::= { m2uaIfEntry 5 }
 
---
---  m2uaAsIf  The AS-IF table.
---
---  This table provides the containment relationship between application 
---  servers and interfaces.  It is a convenience table because 
---  interfaces are assigned to application server when the interface is 
---  created.
---
-
 m2uaAsIfTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF M2uaAsIfEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This is the AS-IF table that maps interfaces to 
-		 application servers."
+		"m2uaAsIf  The AS-IF table.
+
+		 This is the AS-IF table that maps interfaces to 
+		 application servers.
+
+		 This table provides the containment relationship 
+		 between application servers and interfaces.  It is a 
+		 convenience table because interfaces are assigned to 
+		 application server when the interface is created."
 	::= { m2uaAspAsIf 1 }
 
 m2uaAsIfEntry OBJECT-TYPE
@@ -1155,32 +1146,32 @@ m2uaAsIfEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This is an entry in the AS-IF table."
-	INDEX	{
-			m2uaAsId,		-- shared
-			m2uaIfId		-- shared
-		}
+		"This is an entry in the AS-IF table.  The m2uaASId and 
+		 m2uaIfId indices are shared.  The indices represent 
+		 that this entry is a relationship between the indexed 
+		 AS and interface."
+	INDEX	{ m2uaAsId, m2uaIfId }
 	::= { m2uaAsIfTable 1 }
 
 M2uaAsIfEntry ::=
 	SEQUENCE {
 	}
 
---
---  m2uaSgAs  The SG-AS table.
---
---  This table provides a mappoing of AS onto the SG that serve the AS.  
---  Note that an AS can be served by more than one SG.
---
 
 m2uaSgAsTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF M2uaSgAsEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This is the SG-AS table that maps AS onto the SG that 
+		"m2uaSgAs  The SG-AS table.
+
+		 This is the SG-AS table that maps AS onto the SG that 
 		 serve them.  Note that an AS can be served by more than 
-		 one SG."
+		 one SG.
+
+		 This table provides a mappoing of AS onto the SG that 
+		 serve the AS.  Note that an AS can be served by more 
+		 than one SG."
 	::= { m2uaAspSgAs 1 }
 
 m2uaSgAsEntry OBJECT-TYPE
@@ -1189,11 +1180,10 @@ m2uaSgAsEntry OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION
 		"This is an entry in the SG-AS table that represents an 
-		 AS served by an SG."
-	INDEX	{
-			m2uaSgId,		-- shared
-			m2uaAsId		-- shared
-		}
+		 AS served by an SG.  The m2uaSgId and m2uaASId indices 
+		 are shared.  The indices represent that this entry is a 
+		 relationship between the indexed SG and AS."
+	INDEX	{ m2uaSgId, m2uaAsId }
 	::= { m2uaSgAsTable 1 }
 
 M2uaSgAsEntry ::=
@@ -1319,19 +1309,18 @@ m2uaSgAsStatus OBJECT-TYPE
 		 the locked(0) administrative state."
 	::= { m2uaSgAsEntry 6 }
 
---
--- m2uaAspAs    The ASP AS table.
---
--- This tale provides a mapping of which AS are served to which ASPs.
---
 
 m2uaAspAsTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF M2uaAspAsEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This provides the ASP AS table that provides the state 
-		 of the AS at each ASP to which it is served."
+		"m2uaAspAs  The ASP AS table.
+		 This provides the ASP AS table that provides the state 
+		 of the AS at each ASP to which it is served.
+
+		 This table provides a mapping of which AS are served to 
+		 which ASPs."
 	::= { m2uaAspAspAs 1 }
 
 m2uaAspAsEntry OBJECT-TYPE
@@ -1339,11 +1328,11 @@ m2uaAspAsEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This is an entry in the ASP AS table."
-	INDEX	{
-			m2uaAspId,	-- shared
-			m2uaAsId	-- shared
-		}
+		"This is an entry in the ASP AS table.  The m2uaAspId 
+		 and m2uaASId are shared indices.  These indices 
+		 represent that this entry is a relationship between the 
+		 indexed ASP and AS."
+	INDEX	{ m2uaAspId, m2uaAsId }
 	::= { m2uaAspAsTable 1 }
 
 M2uaAspAsEntry ::=
@@ -1429,19 +1418,18 @@ m2uaAspAsStatus OBJECT-TYPE
 	::= { m2uaAspAsEntry 5 }
 
 
---
--- m2uaAspSgAs  The ASP-SG-AS table.
---
--- This table provides the state of each AS for each ASP-SG association.
---
-
 m2uaAspSgAsTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF M2uaAspSgAsEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This provides the ASP-SG-AS table that provides the 
-		 state of each AS for each ASP-SG association."
+		"m2uaAspSgAs  The ASP-SG-AS table.
+
+		 This provides the ASP-SG-AS table that provides the 
+		 state of each AS for each ASP-SG association.
+
+		 This table provides the state of each AS for each 
+		 ASP-SG association."
 	::= { m2uaAspAspSgAs 1 }
 
 m2uaAspSgAsEntry OBJECT-TYPE
@@ -1449,12 +1437,11 @@ m2uaAspSgAsEntry OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"This provides an entry in the ASP-SG AS table."
-	INDEX	{
-			m2uaAspId,	-- shared
-			m2uaSgId,	-- shared
-			m2uaAsId	-- shared
-		}
+		"This provides an entry in the ASP-SG AS table.  The 
+		 indices are shared.  The indices represent that this 
+		 entry is a relationship between the indexed ASP, SG and 
+		 AS."
+	INDEX	{ m2uaAspId, m2uaSgId, m2uaAsId }
 	::= { m2uaAspSgAsTable 1 }
 
 M2uaAspSgAsEntry ::=
