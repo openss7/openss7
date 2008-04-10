@@ -7,6 +7,7 @@
 	* scripts/texi/compat.texi: remove deprecated Nexusware support
 	* scripts/texi/install.texi: remove deprecated Nexusware support
 	* texi/install.texi: remove deprecated Nexusware support
+	* am/release.am: remove deprecated Nexusware support
 
 	* scripts/text/compat.texi: added new distros
 
