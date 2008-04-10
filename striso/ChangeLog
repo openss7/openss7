@@ -2,6 +2,7 @@
 
 	* doc/manual/todo.texi: updated todo text
 	* src/util/gdmolex.l: correct INITIAL syntax error
+	* src/util/gdmolex.l: more corrections
 
 	* AUTHORS: updated release files
 	* NEWS: updated release files

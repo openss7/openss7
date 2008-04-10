@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-10 08:40:41 $
+ @(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/04/10 09:13:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-10 08:40:41 $ by $Author: brian $
+ Last Modified $Date: 2008/04/10 09:13:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: gdmolex.l,v $
+ Revision 0.9.2.3  2008/04/10 09:13:21  brian
+ - more corrections
+
  Revision 0.9.2.2  2008-04-10 08:40:41  brian
  - update todo and lex syntax error
 
@@ -62,9 +65,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-10 08:40:41 $"
+#ident "@(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/04/10 09:13:21 $"
 
-static char const ident[] = "$RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-10 08:40:41 $";
+static char const ident[] = "$RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/04/10 09:13:21 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
@@ -439,7 +442,7 @@ WITH[- ]SYNTAX				{ return TOK_WITH_SYNTAX			; }
 <INITIAL,asn>{EXTERNREF}		{ return TOK_EXTERNREF				; }
 <INITIAL,asn>{NAMEANDNUMBER}		{ return TOK_NAME_AND_NUMBER			; }
 <INITIAL,asn>{IDLABEL}			{ return TOK_ID					; }
-<INITIAL,asn>{LABEL}			{ return TOK_LABEL; goto find_rule		; }
+<INITIAL,asn>{LABEL}			{ return TOK_LABEL				; }
 <INITIAL,asn>{NUMBER}			{ return TOK_NUMBER				; }
 
 <INITIAL,asn>[a-z]			{ yy_push_state(label); yymore();		; }
@@ -484,7 +487,6 @@ WITH[- ]SYNTAX				{ return TOK_WITH_SYNTAX			; }
 static void dummy(void) {
 	(void) dummy;
 	(void) yyunput;
-	(void) yy_flex_realloc;
 	(void) yy_push_state;
 	(void) yy_top_state;
 }
