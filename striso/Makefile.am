@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-10 10:24:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-10 23:36:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-10 10:24:04 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 23:36:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -88,13 +88,13 @@ EXTRA_PROGRAMS			+= \
 pkglibexec_PROGRAMS		= \
 				  gdmo
 
-asn_SOURCES			= src/util/asnyac.y src/util/asnlex.l
+asn_SOURCES			= src/util/asnyac.y src/util/asnlex.l asnyac.h
 asn_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 asn_LDADD			= 
 asn_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 asn_CFLAGS			= $(USER_CFLAGS)
 
-gdmo_SOURCES			= src/util/gdmoyac.y src/util/gdmolex.l
+gdmo_SOURCES			= src/util/gdmoyac.y src/util/gdmolex.l gdmoyac.h
 gdmo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 gdmo_LDADD			= 
 gdmo_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -183,13 +183,13 @@ EXTRA_PROGRAMS			+= asn
 pkglibexec_PROGRAMS		= \
 				  gdmo
 
-asn_SOURCES			= src/util/asnyac.y src/util/asnlex.l
+asn_SOURCES			= src/util/asnyac.y src/util/asnlex.l asnyac.h
 asn_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 asn_LDADD			= 
 asn_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 asn_CFLAGS			= $(USER_CFLAGS)
 
-gdmo_SOURCES			= src/util/gdmoyac.y src/util/gdmolex.l
+gdmo_SOURCES			= src/util/gdmoyac.y src/util/gdmolex.l gdmoyac.h
 gdmo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 gdmo_LDADD			= 
 gdmo_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -462,6 +462,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.19  2008-04-10 23:36:25  brian
+# - get Debian 4.0 deb/dsc build working
+#
 # Revision 0.9.2.18  2008-04-10 10:24:04  brian
 # - removed deprecated Nexusware support
 #

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-10 10:24:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-10 23:36:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-10 10:24:00 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 23:36:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -106,7 +106,8 @@ dist_sbin_SCRIPTS		=
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 m2paconfig_SOURCES		= src/util/m2payac.y \
-				  src/util/m2palex.l
+				  src/util/m2palex.l \
+				  m2payac.h
 m2paconfig_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 m2paconfig_LDADD		= $(STREAMS_LDADD)
 m2paconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
@@ -486,6 +487,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.17  2008-04-10 23:36:22  brian
+# - get Debian 4.0 deb/dsc build working
+#
 # Revision 0.9.2.16  2008-04-10 10:24:00  brian
 # - removed deprecated Nexusware support
 #

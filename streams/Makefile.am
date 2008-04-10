@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.153 $) $Date: 2008-04-10 10:24:02 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2008-04-10 23:36:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-10 10:24:02 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 23:36:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -594,8 +594,13 @@ libpLiS_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 ##endif
 
 strMIB_la_SOURCES		= \
-				src/snmp/strMIB.c \
-				src/snmp/strMIB.h
+				  src/snmp/strMIB.c \
+				  src/snmp/strMIB.h \
+				  src/snmp/ds_agent.h \
+				  src/snmp/header_complex.h \
+				  src/snmp/mib_modules.h \
+				  src/snmp/struct.h \
+				  src/snmp/util_funcs.h
 strMIB_la_DEPENDENCIES		= libstreams.la
 strMIB_la_LDFLAGS		= -module -avoid-version \
 				  -shared $(STREAMS_LDFLAGS) $(SNMP_LDFLAGS)
@@ -737,7 +742,13 @@ strvf_CFLAGS			= $(USER_CFLAGS)
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
-strmib_SOURCES			= src/snmp/strMIB.c src/snmp/strMIB.h
+strmib_SOURCES			= src/snmp/strMIB.c \
+				  src/snmp/strMIB.h \
+				  src/snmp/ds_agent.h \
+				  src/snmp/header_complex.h \
+				  src/snmp/mib_modules.h \
+				  src/snmp/struct.h \
+				  src/snmp/util_funcs.h
 strmib_LDFLAGS			= $(SNMP_LDFLAGS)
 strmib_LDADD			= libstreams.la $(SNMP_LDADD)
 strmib_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -1100,6 +1111,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.154  2008-04-10 23:36:24  brian
+# - get Debian 4.0 deb/dsc build working
+#
 # Revision 0.9.2.153  2008-04-10 10:24:02  brian
 # - removed deprecated Nexusware support
 #

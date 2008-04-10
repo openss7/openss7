@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.194 $) $Date: 2007/12/15 20:20:02 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.195 $) $Date: 2008-04-10 23:36:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:20:02 $ by $Author: brian $
+ Last Modified $Date: 2008-04-10 23:36:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.195  2008-04-10 23:36:25  brian
+ - get Debian 4.0 deb/dsc build working
+
  Revision 0.9.2.194  2007/12/15 20:20:02  brian
  - updates
 
@@ -242,10 +245,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.194 $) $Date: 2007/12/15 20:20:02 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.195 $) $Date: 2008-04-10 23:36:25 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.194 $) $Date: 2007/12/15 20:20:02 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.195 $) $Date: 2008-04-10 23:36:25 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -347,7 +350,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.194 $) $Date: 2007/12/15 20:20:02 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.195 $) $Date: 2008-04-10 23:36:25 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -449,7 +452,7 @@ struct streamtab str_info = {
 #if defined HAVE_KMEMB_STRUCT_INODE_I_LOCK
 #define stri_trylock(__i)   (int)({ spin_lock(&(__i)->i_lock); 0; })
 #define stri_lock(__i)	    spin_lock(&(__i)->i_lock)
-#define stri_unlock(__i)    spin_unlock(&(__i)->i_lock);
+#define stri_unlock(__i)    spin_unlock(&(__i)->i_lock)
 #else
 #if defined HAVE_KMEMB_STRUCT_INODE_I_MUTEX
 #define stri_trylock(__i)   mutex_lock_interruptible(&(__i)->i_mutex)
@@ -1229,8 +1232,7 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 			if ((access & FREAD) == 0)
 				return (-ENXIO);
 			if ((access & FNDELAY) == 0)
-				if ((flags & (STRISFIFO | STRISPIPE | STRISTTY)))
-					return (-ESTRPIPE);
+				return (-ESTRPIPE);
 		}
 		if ((flags & STRDERR) != 0) {
 			if ((access & FREAD) != 0) {
@@ -2073,6 +2075,12 @@ __strwaitgetfp(struct stdata *sd, queue_t *q)
 		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		if (likely((mp = strgetfp_slow(sd, q)) != NULL))
 			break;
+		/* Only error on a hung up stream when the read queue is empty
+		 * and we know that we are going to block. */
+		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
+			mp = ERR_PTR(err);
+			break;
+		}
 		srunlock(sd);
 
 		error = -EINTR;
@@ -2084,7 +2092,9 @@ __strwaitgetfp(struct stdata *sd, queue_t *q)
 		set_current_state(TASK_INTERRUPTIBLE);
 #endif
 		srlock(sd);
-		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
+		/* Don't error on a hung up Stream until we known that we are
+		 * about to block. */
+		if (unlikely((err = straccess(sd, (FREAD | FNDELAY))) != 0)) {
 			mp = ERR_PTR(err);
 			break;
 		}
@@ -4675,7 +4685,9 @@ __strwaithlist(struct stdata *sd, queue_t *q)
 		set_current_state(TASK_INTERRUPTIBLE);
 #endif
 		srlock(sd);
-		if (unlikely((err = straccess(sd, FREAD)) != 0))
+		/* Don't check for hung up Streams until we know that we are
+		 * going to block awaiting data. */
+		if (unlikely((err = straccess(sd, (FREAD | FNDELAY))) != 0))
 			break;
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
@@ -4878,6 +4890,12 @@ __strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band, in
 		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		if (likely((mp = strgetq_slow(sd, q, flags, band)) != NULL))
 			break;
+		/* When the read queue has no data, error if the stream is
+		 * hungup so that zero (0) will be returned. */
+		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
+			mp = ERR_PTR(err);
+			break;
+		}
 		srunlock(sd);
 
 		error = -EINTR;
@@ -4888,7 +4906,9 @@ __strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band, in
 		set_current_state(TASK_INTERRUPTIBLE);
 #endif
 		srlock(sd);
-		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
+		/* Don't error because of blocking on a a hunup up Stream
+		 * until we know that we are going to block. */
+		if (unlikely((err = straccess(sd, (FREAD | FNDELAY))) != 0)) {
 			mp = ERR_PTR(err);
 			break;
 		}
@@ -5103,7 +5123,9 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 
 	_printd(("%s: buf = %p, nbytes = %lu\n", __FUNCTION__, buf, (ulong) nbytes));
 
-	if (unlikely((err = straccess_rlock(sd, FREAD)) != 0))
+	/* Don't error because of a hung up Stream until we know that we are
+	 * about to block awaiting data on the read queue. */
+	if (unlikely((err = straccess_rlock(sd, (FREAD | FNDELAY))) != 0))
 		goto access_error;
 
 	/* First acquire QHLIST bit. */
@@ -6058,7 +6080,9 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 	if (unlikely((err = strcopyin_gstrbuf(file, datp, &dat, true)) < 0))
 		goto error;
 
-	if (likely((err = straccess_rlock(sd, FREAD)) == 0)) {
+	/* Don't error on a hung up Stream until we know that we are about to
+	 * block. */
+	if (likely((err = straccess_rlock(sd, (FREAD | FNDELAY))) == 0)) {
 
 		/* First acquire QHLIST bit. */
 		if (likely((err = strwaithlist(sd, q, file->f_flags)) == 0)) {
@@ -6326,7 +6350,8 @@ tty_tiocgpgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (!test_bit(STRISTTY_BIT, &sd->sd_flag))
 		return (-ENOTTY);
 #endif
-	if ((err = straccess_rlock(sd, FREAD)) == 0) {
+	/* Don't error on a hung up Stream. */
+	if ((err = straccess_rlock(sd, (FREAD | FNDELAY))) == 0) {
 		pid_t pgrp;
 
 		pgrp = sd->sd_pgrp;
@@ -6424,7 +6449,8 @@ sock_siocgpgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 
 	if (!test_bit(STRISSOCK_BIT, &sd->sd_flag))
 		return (-ENOTSOCK);
-	if ((err = straccess_rlock(sd, FREAD)) == 0) {
+	/* Don't error on a hung up Stream. */
+	if ((err = straccess_rlock(sd, (FREAD | FNDELAY))) == 0) {
 		pid_t pgrp;
 
 		pgrp = sd->sd_pgrp;
@@ -6485,7 +6511,8 @@ file_fiogetown(struct file *file, struct stdata *sd, unsigned long arg)
 	else {
 		int err;
 
-		if ((err = straccess_rlock(sd, FREAD)) == 0) {
+		/* Don't error on a hung up Stream. */
+		if ((err = straccess_rlock(sd, (FREAD | FNDELAY))) == 0) {
 			pid_t owner;
 
 #ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
@@ -6960,6 +6987,8 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 	*mp->b_wptr++ = bi.bi_flag | FLUSHBAND;
 	*mp->b_wptr++ = bi.bi_pri;
 
+	/* Note that the FNDELAY access flag permits I_FLUSHBAND on a Stream,
+	 * pipe, FIFO or TTY that is hung up. */
 	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY | FEXCL)))) {
 		srunlock(sd);
 		if (bi.bi_flag & FLUSHW)
@@ -7018,6 +7047,8 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 	mp->b_datap->db_type = M_FLUSH;
 	*mp->b_wptr++ = flags;
 
+	/* Note that the FNDELAY access flag permits I_FLUSH on a Stream,
+	 * pipe, FIFO or TTY that is hung up. */
 	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY | FEXCL)))) {
 		srunlock(sd);
 		if (flags & FLUSHW)

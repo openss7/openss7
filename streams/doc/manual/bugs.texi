@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.14 2007/12/15 20:19:44 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.16 2008-04-10 23:36:24 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,16 +53,32 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/12/15 20:19:44 $ by $Author: brian $
+@c Last Modified $Date: 2008-04-10 23:36:24 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 017.  2008-04-10T15:17:30+0000
+
+When M_DATA is sent upstream followed by M_HANGUP, read(2s) is returning zero (0) and not permitting
+the data associated with the M_DATA to be read.  This is a bug per documentation.  read(2s) should
+operate as normal following a hangup until all data is read and then return zero (0).
+
+The difficulty is that when waking up from a read sleep or when entering read the hangup condition
+was generating an internal ESTRPIPE error.  This was altered so that ESTRPIPE is only returned
+during the hangup condition after the read queue has been tested and the caller is about to sleep
+on read.
+
+A test case needs to be generated for this case, but the fix has been implemented.
+
+@emph{*fixed*} in @command{streams-0.9.2.4}
+
 @item 016.  2007-11-14T17:23:57+0000
 
 Read is blocking when data has been read an O_NONBLOCK and O_NDELAY unset and RFILL unset in
-non-SVR4 mode.  This violates POSIX specifications.  Corrected and test case added to verify
-regressions.
+non-SVR4 mode.  This violates POSIX specifications.
+
+A test case needs to be generated for this case and the fix needs to be implemented.
 
 @emph{*fixed*} in @command{streams-0.9.2.4}
 

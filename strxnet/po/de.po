@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: strxnet 0.9.2.9.rc3\n"
 "Report-Msgid-Bugs-To: bugs@openss7.org\n"
-"POT-Creation-Date: 2007-06-13 03:04-0600\n"
+"POT-Creation-Date: 2008-04-10 11:22-0600\n"
 "PO-Revision-Date: 2004-01-06 18:11-0700\n"
 "Last-Translator: Brian Bidulock <bidulock@openss7.org>\n"
 "Language-Team: German <de@li.org>\n"
@@ -23,7 +23,7 @@ msgstr ""
 #. TRANS are even permitted to change t_errno to some other value, when the call
 #. TRANS is actually successful.
 #.
-#: src/lib/xnet.c:5651
+#: src/lib/xnet.c:5655
 msgid "No error"
 msgstr "Erfolgreich"
 
@@ -31,7 +31,7 @@ msgstr "Erfolgreich"
 #. TRANS format.  This is not used to provide protocol errors but merely indicate
 #. TRANS an error in the syntactic formatting of the address.
 #.
-#: src/lib/xnet.c:5657
+#: src/lib/xnet.c:5661
 msgid "Bad address format"
 msgstr "Ungültige Adresse"
 
@@ -39,7 +39,7 @@ msgstr "Ungültige Adresse"
 #. TRANS This is not used to provide protocol errors but merely indicate an error
 #. TRANS in the the syntactic formatting of the options.
 #.
-#: src/lib/xnet.c:5663
+#: src/lib/xnet.c:5667
 msgid "Bad options format"
 msgstr "Ungültige Option"
 
@@ -47,13 +47,13 @@ msgstr "Ungültige Option"
 #. TRANS the XTI library call, or to use the specified address, or to use the
 #. TRANS specified options.
 #.
-#: src/lib/xnet.c:5669
+#: src/lib/xnet.c:5673
 msgid "Bad permissions"
 msgstr "Keine Berechtigung"
 
 #. TRANS The file descriptor is not known to the XTI library.
 #.
-#: src/lib/xnet.c:5673
+#: src/lib/xnet.c:5677
 msgid "Bad file descriptor"
 msgstr "Ungültiger Dateideskriptor"
 
@@ -61,7 +61,7 @@ msgstr "Ungültiger Dateideskriptor"
 #. TRANS underlying transport service provider is unable to choose and assign an
 #. TRANS address on the user's behalf.
 #.
-#: src/lib/xnet.c:5679
+#: src/lib/xnet.c:5683
 msgid "Unable to allocate an address"
 msgstr "Kann keinen Adresse anlegen"
 
@@ -70,7 +70,7 @@ msgstr "Kann keinen Adresse anlegen"
 #. TRANS state in which the XTI library call is not permitted.  The C-Locale text
 #. TRANS is traditional and does not really reflect the situation very well.
 #.
-#: src/lib/xnet.c:5686
+#: src/lib/xnet.c:5690
 msgid "Would place interface out of state"
 msgstr "Fehler im (intern verwendeten) endlichen Automaten"
 
@@ -80,14 +80,14 @@ msgstr "Fehler im (intern verwendeten) endlichen Automaten"
 #. TRANS is invalid (does not correspond to an outstanding connection
 #. TRANS indication).
 #.
-#: src/lib/xnet.c:5694
+#: src/lib/xnet.c:5698
 msgid "Bad call sequence number"
 msgstr ""
 
 #. TRANS A UNIX system error has occured and the errno variable indicates the
 #. TRANS UNIX system error.
 #.
-#: src/lib/xnet.c:5699
+#: src/lib/xnet.c:5703
 msgid "System error"
 msgstr ""
 
@@ -95,7 +95,7 @@ msgstr ""
 #. TRANS has occured requiring the user to call the t_look() XTI library call to
 #. TRANS process the asychronous event before proceeding.
 #.
-#: src/lib/xnet.c:5705
+#: src/lib/xnet.c:5709
 msgid "Has to t_look() for event"
 msgstr ""
 
@@ -107,7 +107,7 @@ msgstr ""
 #. TRANS limits provided by the transport service provider in response to a a
 #. TRANS t_getinfo() XTI library call.
 #.
-#: src/lib/xnet.c:5715
+#: src/lib/xnet.c:5719
 msgid "Bad amount of data"
 msgstr ""
 
@@ -116,7 +116,7 @@ msgstr ""
 #. TRANS accept the addresses or options that were received.  In the C-locale
 #. TRANS this is termed a buffer overflow.
 #.
-#: src/lib/xnet.c:5722
+#: src/lib/xnet.c:5726
 msgid "Buffer was too small"
 msgstr ""
 
@@ -126,7 +126,7 @@ msgstr ""
 #. TRANS conditions.  If O_NONBLOCK had not been set, the call would have blocked
 #. TRANS due to flow control.
 #.
-#: src/lib/xnet.c:5730
+#: src/lib/xnet.c:5734
 msgid "Would block due to flow control"
 msgstr ""
 
@@ -135,7 +135,7 @@ msgstr ""
 #. TRANS indictation and no such indication was present.  If O_NONBLOCK had not
 #. TRANS been set, the call would have blocked awaiting the indication.
 #.
-#: src/lib/xnet.c:5737
+#: src/lib/xnet.c:5741
 msgid "No data indication"
 msgstr ""
 
@@ -144,7 +144,7 @@ msgstr ""
 #. TRANS disconnect indication and no such indication was present.  If O_NONBLOCK
 #. TRANS had not been set, the call would have blocked awaiting the indication.
 #.
-#: src/lib/xnet.c:5744
+#: src/lib/xnet.c:5748
 msgid "No disconnect indication"
 msgstr ""
 
@@ -153,7 +153,7 @@ msgstr ""
 #. TRANS unit data indication and no such indication was present.  If O_NONBLOCK
 #. TRANS had not been set, the call would have blocked awaiting the indication.
 #.
-#: src/lib/xnet.c:5751
+#: src/lib/xnet.c:5755
 msgid "No unitdata error indication"
 msgstr ""
 
@@ -161,7 +161,7 @@ msgstr ""
 #. TRANS contained illegal information considerting the transport service or
 #. TRANS transport service provider type.
 #.
-#: src/lib/xnet.c:5757
+#: src/lib/xnet.c:5761
 msgid "Bad flags"
 msgstr ""
 
@@ -171,7 +171,7 @@ msgstr ""
 #. TRANS O_NONBLOCK had not been set, the call would have blocked awaiting the
 #. TRANS indication.
 #.
-#: src/lib/xnet.c:5765
+#: src/lib/xnet.c:5769
 msgid "No orderly release indication"
 msgstr ""
 
@@ -185,7 +185,7 @@ msgstr ""
 #. TRANS or that the underlying transport provider does not support the TPI
 #. TRANS primitives supplied by the XTI library.
 #.
-#: src/lib/xnet.c:5777
+#: src/lib/xnet.c:5781
 msgid "Not supported"
 msgstr ""
 
@@ -196,7 +196,7 @@ msgstr ""
 #. TRANS was changing state at the time that the call as generated and that the
 #. TRANS call failed for that reason.
 #.
-#: src/lib/xnet.c:5786
+#: src/lib/xnet.c:5790
 msgid "State is currently changing"
 msgstr ""
 
@@ -204,7 +204,7 @@ msgstr ""
 #. TRANS argument.  This error indicates that the structure type provided to
 #. TRANS these calls is either invalid or not supported by the XTI library.
 #.
-#: src/lib/xnet.c:5792
+#: src/lib/xnet.c:5796
 msgid "Structure type not supported"
 msgstr ""
 
@@ -212,7 +212,7 @@ msgstr ""
 #. TRANS correspond to a transport service provider or did not exist in the
 #. TRANS filesystem.
 #.
-#: src/lib/xnet.c:5798
+#: src/lib/xnet.c:5802
 msgid "Bad transport provider name"
 msgstr ""
 
@@ -220,7 +220,7 @@ msgstr ""
 #. TRANS of oustanding connection indications negotiated as zero (that is, a
 #. TRANS non-listening stream).
 #.
-#: src/lib/xnet.c:5804
+#: src/lib/xnet.c:5808
 msgid "Listener queue length limit is zero"
 msgstr ""
 
@@ -230,7 +230,7 @@ msgstr ""
 #. TRANS multiple transport endpoints to be bound to the same address.  The
 #. TRANS address is considered "busy".
 #.
-#: src/lib/xnet.c:5812
+#: src/lib/xnet.c:5816
 msgid "Address already in use"
 msgstr ""
 
@@ -239,7 +239,7 @@ msgstr ""
 #. TRANS endpoint has outstanding transport connection indications that have not
 #. TRANS been satisfied by accepting or refusing the connection indication.
 #.
-#: src/lib/xnet.c:5819
+#: src/lib/xnet.c:5823
 msgid "Outstanding connect indications"
 msgstr ""
 
@@ -250,7 +250,7 @@ msgstr ""
 #. TRANS service provider other than the transport service provider from which
 #. TRANS the connection indication was received.
 #.
-#: src/lib/xnet.c:5828
+#: src/lib/xnet.c:5832
 msgid "Not same transport provider"
 msgstr ""
 
@@ -259,7 +259,7 @@ msgstr ""
 #. TRANS indication on a listening stream for which outstanding connection
 #. TRANS indications exist (qlen > 0).
 #.
-#: src/lib/xnet.c:5835
+#: src/lib/xnet.c:5839
 msgid "Connection acceptor has qlen > 0"
 msgstr ""
 
@@ -269,7 +269,7 @@ msgstr ""
 #. TRANS same transport address as that for which the connection indication was
 #. TRANS provided.
 #.
-#: src/lib/xnet.c:5843
+#: src/lib/xnet.c:5847
 msgid "Connection acceptor bound to different address"
 msgstr ""
 
@@ -280,7 +280,7 @@ msgstr ""
 #. TRANS already has the maximum number of outstanding connection indications
 #. TRANS will receive this error.
 #.
-#: src/lib/xnet.c:5852
+#: src/lib/xnet.c:5856
 msgid "Connection indicator queue is full"
 msgstr ""
 
@@ -290,7 +290,7 @@ msgstr ""
 #. TRANS catch-all error code and thus has the vague C-locale "protocol error"
 #. TRANS description.
 #.
-#: src/lib/xnet.c:5860
+#: src/lib/xnet.c:5864
 msgid "Protocol error"
 msgstr ""
 
@@ -298,7 +298,7 @@ msgstr ""
 #. TRANS not known to the XTI library.  This message is used to describe all
 #. TRANS error codes not known to the XTI library.
 #.
-#: src/lib/xnet.c:5866
+#: src/lib/xnet.c:5870
 msgid "Unknown"
 msgstr ""
 
@@ -306,7 +306,7 @@ msgstr ""
 #. TRANS nc_error(3) variable.  The last netconfig(3) or netpath(3) operation was
 #. TRANS successful.
 #.
-#: src/lib/netselect.c:684
+#: src/lib/netselect.c:691
 #, fuzzy
 msgid "no error"
 msgstr "Erfolgreich"
@@ -314,7 +314,7 @@ msgstr "Erfolgreich"
 #. TRANS Corresponds to the NC_NOMEM constant.  Out of memory.  Memory could not be
 #. TRANS allocated to complete the last netconfig(3) or netpath(3) operation.
 #.
-#: src/lib/netselect.c:689
+#: src/lib/netselect.c:696
 msgid "out of memory"
 msgstr ""
 
@@ -322,14 +322,14 @@ msgstr ""
 #. TRANS endnetconfig(3), or endnetpath(3) function was called out of order: that
 #. TRANS is, before setnetconfig(3) or setnetpath(3) was called.
 #.
-#: src/lib/netselect.c:695
+#: src/lib/netselect.c:702
 msgid "routine called out of order"
 msgstr ""
 
 #. TRANS Corresponds to the NC_OPENFAIL constant.  The /etc/netconfig file could
 #. TRANS not be opened for reading.  %1$s is the name of the /etc/netconfig file.
 #.
-#: src/lib/netselect.c:700
+#: src/lib/netselect.c:707
 #, c-format
 msgid "could not open %s"
 msgstr ""
@@ -342,7 +342,7 @@ msgstr ""
 #. TRANS is the name of the /etc/netconfig file.  %2$d is the field number.  %3$d
 #. TRANS is the line number.
 #.
-#: src/lib/netselect.c:710
+#: src/lib/netselect.c:717
 #, c-format
 msgid "syntax error in %s: field %d of line %d"
 msgstr ""
@@ -351,7 +351,7 @@ msgstr ""
 #. TRANS argument to the getnetconfigent(3) subroutine was not found in any entry
 #. TRANS in the /etc/netconfig file.  %1$s is the name of the /etc/netconfig file.
 #.
-#: src/lib/netselect.c:716
+#: src/lib/netselect.c:723
 #, c-format
 msgid "netid not found in %s"
 msgstr ""
@@ -362,7 +362,7 @@ msgstr ""
 #. TRANS /etc/netconfig file contains no entries.  %1$s is the name of the
 #. TRANS /etc/netconfig file.
 #.
-#: src/lib/netselect.c:724
+#: src/lib/netselect.c:731
 #, c-format
 msgid "no more entries in %s"
 msgstr ""
@@ -372,7 +372,7 @@ msgstr ""
 #. TRANS situation should not occur and represents a bug in the library.  %1$d is
 #. TRANS the decimal value of the unknown error number.
 #.
-#: src/lib/netselect.c:731
+#: src/lib/netselect.c:738
 #, fuzzy, c-format
 msgid "unknown error number %d"
 msgstr "Erfolgreich"
@@ -380,14 +380,14 @@ msgstr "Erfolgreich"
 #. TRANS Corresponds to the ND_TRY_AGAIN constant.  This is a fatal error in the
 #. TRANS sense that name-to-address mapping translations will stop at this point.
 #.
-#: src/lib/netdir.c:728
+#: src/lib/netdir.c:732
 msgid "n2a: non-authoritative host not found"
 msgstr ""
 
 #. TRANS Corresponds to the ND_NO_RECOVERY constant.  This is a fatal error in the
 #. TRANS sense that name-to-address mapping translations will stop at this point.
 #.
-#: src/lib/netdir.c:733
+#: src/lib/netdir.c:737
 msgid "n2a: non-recoverable error"
 msgstr ""
 
@@ -395,27 +395,27 @@ msgstr ""
 #. TRANS error in the sense that name-to-address mapping translations will stop at
 #. TRANS this point.
 #.
-#: src/lib/netdir.c:739
+#: src/lib/netdir.c:743
 msgid "n2a: no data record of requested type"
 msgstr ""
 
 #. TRANS Corresponds to the ND_BADARG constant.  This is a fatal error in the sense
 #. TRANS that name-to-address mapping translations will stop at this point.
 #.
-#: src/lib/netdir.c:744
+#: src/lib/netdir.c:748
 msgid "n2a: bad arguments passed to routine"
 msgstr ""
 
 #. TRANS Corresponds to the ND_NOMEM constant.  This is a fatal error in the sense
 #. TRANS that name-to-address mapping translations will stop at this point.
 #.
-#: src/lib/netdir.c:749
+#: src/lib/netdir.c:753
 msgid "n2a: memory allocation failed"
 msgstr ""
 
 #. TRANS Corresponds to the ND_OK constant.  This is not an error.
 #.
-#: src/lib/netdir.c:753
+#: src/lib/netdir.c:757
 msgid "n2a: successful completion"
 msgstr ""
 
@@ -423,7 +423,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:759
+#: src/lib/netdir.c:763
 msgid "n2a: hostname not found"
 msgstr ""
 
@@ -431,7 +431,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:765
+#: src/lib/netdir.c:769
 msgid "n2a: service name not found"
 msgstr ""
 
@@ -439,7 +439,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.  %1$s is a dlerror(3) string.
 #.
-#: src/lib/netdir.c:771
+#: src/lib/netdir.c:775
 #, c-format
 msgid "n2a: symbol missing in shared object: %s"
 msgstr ""
@@ -448,7 +448,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.  %1$s is a dlerror(3) string.
 #.
-#: src/lib/netdir.c:777
+#: src/lib/netdir.c:781
 #, c-format
 msgid "n2a: could not open shared object: %s"
 msgstr ""
@@ -457,7 +457,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:783
+#: src/lib/netdir.c:787
 msgid "n2a: access denied for shared object"
 msgstr ""
 
@@ -465,7 +465,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:789
+#: src/lib/netdir.c:793
 msgid "n2a: attempt to free unknown object"
 msgstr ""
 
@@ -473,7 +473,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:795
+#: src/lib/netdir.c:799
 msgid "n2a: unknown option passed"
 msgstr ""
 
@@ -481,7 +481,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:801
+#: src/lib/netdir.c:805
 msgid "n2a: control operation failed"
 msgstr ""
 
@@ -489,7 +489,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:807
+#: src/lib/netdir.c:811
 msgid "n2a: system error"
 msgstr ""
 
@@ -497,7 +497,7 @@ msgstr ""
 #. TRANS the sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:813
+#: src/lib/netdir.c:817
 msgid "n2a: conversion not possible"
 msgstr ""
 
@@ -505,7 +505,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point. %1$d is the error number.
 #.
-#: src/lib/netdir.c:819
+#: src/lib/netdir.c:823
 #, fuzzy, c-format
 msgid "n2a: unknown error %d"
 msgstr "Erfolgreich"

@@ -1,16 +1,16 @@
 2008-04-10  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/include/Makefile.am: distribute missing sl_mux.h header
+	* po/de.po: I hate GNU gettext
+	* debian/changelog: corrected version number
+	* Makefile.am: added yacc built headers to sources
 	* doc/manual/Makefile.am: distribute agpl.texi
-
 	* stacks.spec.in: removed deprecated Nexusware support
-
 	* debian/rules.in: removed deprecated Nexusware support
-
 	* Makefile.am: remove deprecated Nexusware support
 	* doc/manual/texi/install.texi: remove deprecated Nexusware support
 	* scripts/texi/compat.texi: remove deprecated Nexusware support
 	* scripts/texi/install.texi: remove deprecated Nexusware support
-
 	* AUTHORS: updated release files
 	* NEWS: updated release files
 	* README: updated release files
