@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 18:08:02 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-10 18:00:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/12 18:08:02 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 18:00:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,7 +81,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 18:08:02 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-10 18:00:50 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -810,7 +810,7 @@ read_dump() {
 	    command_info "processed $count symbols"
 	fi
 	case "$exp" in
-	    (EXPORT_SYMBOL*) ;;
+	    (EXPORT_*SYMBOL*) ;;
 	    (*) junk="$exp${junk:+ $junk}" ;;
 	esac
 	if test :"$junk" != : ; then
@@ -1121,6 +1121,9 @@ exit $retval
 # =============================================================================
 #
 # $Log: modpost.sh,v $
+# Revision 0.9.2.23  2008-04-10 18:00:50  brian
+# - handle new EXPORT_UNUSED_SYMBOL
+#
 # Revision 0.9.2.22  2007/08/12 18:08:02  brian
 # - more header corrections
 #
