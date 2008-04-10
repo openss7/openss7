@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.161 $) $Date: 2007/10/17 20:00:27 $
+# @(#) $RCSfile: kernel.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.162 $) $Date: 2008-04-10 10:53:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/17 20:00:27 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 10:53:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1061,16 +1061,13 @@ dnl	    could be 2.4.18-13.1, another could be 2.4.18-12 and they do not necessa
 dnl	    running kernel.  In fact, on debian, there is no way to tell which exact version of the
 dnl	    kernel is running.  Ubuntu understandably has the same problem.
 dnl
-dnl	    Added some special search paths for newer and older NexusWare.
-dnl
 	    eval "k_sysmap_search_path=\"
 		${kbuilddir}/System.map-${kversion}
 		${kbuilddir}/System.map
 		${DESTDIR}${rootdir}/boot/System.map-${kversion}
 		${DESTDIR}${rootdir}/boot/System.map
 		${DESTDIR}/boot/System.map-${kversion}
-		${DESTDIR}/boot/System.map
-		${DESTDIR}/kernels/generic/System.map\""
+		${DESTDIR}/boot/System.map\""
 	    k_sysmap_search_path=`echo "$k_sysmap_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	    linux_cv_k_sysmap=
 	    for linux_file in $k_sysmap_search_path ; do
@@ -1861,17 +1858,7 @@ dnl
 	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cppflag-check | tail -1`"
 	linux_cv_k_cppflags_orig="$linux_cv_k_cppflags"
 	rm -f .config
-	if test :"${cross_compiling:-no}" = :no
-	then
-	    linux_tmp=
-	else
-dnl
-dnl	    Old NexusWare cross compilers do not set up iprefix correctly.
-dnl
-	    linux_tmp=`$CC -print-libgcc-file-name`
-	    linux_tmp="-iprefix `dirname $linux_tmp`/"
-	fi
-	linux_cv_k_cppflags="-nostdinc ${linux_tmp:+$linux_tmp }-iwithprefix include -DLINUX $linux_cv_k_cppflags"
+	linux_cv_k_cppflags="-nostdinc -iwithprefix include -DLINUX $linux_cv_k_cppflags"
 dnl
 dnl	Need to adjust 2.6.3 kernel stupid include includes to add the absolute
 dnl	location of the source directory.  include2 on the otherhand is properly
@@ -2629,6 +2616,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 0.9.2.162  2008-04-10 10:53:23  brian
+# - remove deprecated Nexusware support
+#
 # Revision 0.9.2.161  2007/10/17 20:00:27  brian
 # - slightly different path checks
 #
