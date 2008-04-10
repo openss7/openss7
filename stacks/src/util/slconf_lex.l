@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:03 $
+ @(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-10 09:18:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 11:24:03 $ by $Author: brian $
+ Last Modified $Date: 2008-04-10 09:18:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slconf_lex.l,v $
+ Revision 0.9.2.3  2008-04-10 09:18:20  brian
+ - corrections for compile
+
  Revision 0.9.2.2  2007/08/19 11:24:03  brian
  - flex version nuances
 
@@ -62,9 +65,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:03 $"
+#ident "@(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-10 09:18:20 $"
 
-static char const ident[] = "$RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:03 $";
+static char const ident[] = "$RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-10 09:18:20 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
@@ -315,7 +318,7 @@ OPTIONS		({OPTION})(","{OPTION})*
 
 "\\\n"			/* absorb continuation markers */
 
-"\n"			{ return TOK_EOL	; goto find_rule; }
+"\n"			{ return TOK_EOL	; }
 
 "usage"|"u"		{ return TOK_USAGE	; }
 "help"|"h"|"?"		{ return TOK_HELP	; }
@@ -644,7 +647,6 @@ OPTIONS		({OPTION})(","{OPTION})*
 static void dummy(void) {
 	(void) dummy;
 	(void) yyunput;
-	(void) yy_flex_realloc;
 }
 
 static YY_BUFFER_STATE buf = NULL;
