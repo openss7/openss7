@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat.spec.in,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/13 23:51:28 $
+# @(#) $RCSfile: strcompat.spec.in,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-04-10 11:04:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 23:51:28 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 11:04:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1462,7 +1462,7 @@ fi
 %defattr(-,root,root)
 %doc ABOUT-NLS
 %doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
-%doc README README-alpha README-cvs README-make README-nexusware THANKS TODO
+%doc README README-alpha README-cvs README-make THANKS TODO
 %doc %{name}-%{version}.lsm
 %doc doc/manual
 #doc doc/specs doc/projects doc/drafts
@@ -1477,7 +1477,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
-%doc README README-alpha README-cvs README-make README-nexusware THANKS TODO
+%doc README README-alpha README-cvs README-make THANKS TODO
 %doc %{name}-%{version}.lsm
 %doc doc/manual
 #doc doc/specs doc/projects doc/drafts
@@ -1937,9 +1937,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strcompat.spec.in,v $
-# Revision 0.9.2.47  2007/08/13 23:51:28  brian
-# - updated to GPLv3 headers
+# Revision 0.9.2.48  2008-04-10 11:04:55  brian
+# - removed deprecated Nexusware support
 #
+
+* Mon Aug 13 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.47  2007/08/13 23:51:28  brian
+- updated to GPLv3 headers
 
 * Sun Jun 24 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.46  2007/06/24 12:10:14  brian

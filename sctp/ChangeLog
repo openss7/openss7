@@ -1,5 +1,7 @@
 2008-04-10  Brian Bidulock  <bidulock@openss7.org>
 
+	* sctp.spec.in: removed deprecated Nexusware support
+
 	* debian/rules.in: removed deprecated Nexusware support
 
 	* Makefile.am: remove deprecated Nexusware support

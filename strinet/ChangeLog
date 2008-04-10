@@ -1,5 +1,7 @@
 2008-04-10  Brian Bidulock  <bidulock@openss7.org>
 
+	* strinet.spec.in: removed deprecated Nexusware support
+
 	* debian/rules.in: removed deprecated Nexusware support
 
 	* doc/manual/texi/install.texi: remove deprecated Nexusware support
