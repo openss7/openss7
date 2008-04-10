@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/15 05:18:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-04-10 23:24:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/15 05:18:16 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 23:24:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,6 +70,7 @@ strss7_TEXINFOS		= \
 			  tree.texi \
 			  bugs.texi \
 			  texi/fdl.texi \
+			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  texi/quick.texi \
 			  texi/install.texi \
@@ -83,6 +84,7 @@ strss7_TEXINFOS		= \
 
 x400p_TEXINFOS		= \
 			  texi/fdl.texi \
+			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  texi/lgpl3.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -91,6 +93,7 @@ x400p_TEXINFOS		= \
 
 libxnet_TEXINFOS	= \
 			  texi/fdl.texi \
+			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  texi/lgpl3.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -118,6 +121,9 @@ include ../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.37  2008-04-10 23:24:11  brian
+## - distribute agpl3.texi
+##
 ## Revision 0.9.2.36  2007/08/15 05:18:16  brian
 ## - GPLv3 updates
 ##

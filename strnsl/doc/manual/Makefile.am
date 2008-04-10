@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:34:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-10 23:24:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/15 05:34:26 $ by $Author: brian $
+# Last Modified $Date: 2008-04-10 23:24:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,7 @@ strnsl_TEXINFOS		= \
 			  tree.texi \
 			  bugs.texi \
 			  texi/fdl.texi \
+			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  texi/sunrpc.texi \
 			  texi/quick.texi \
@@ -83,6 +84,7 @@ strnsl_TEXINFOS		= \
 
 libxnsl_TEXINFOS	= \
 			  texi/fdl.texi \
+			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
@@ -109,6 +111,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2008-04-10 23:24:15  brian
+# - distribute agpl3.texi
+#
 # Revision 0.9.2.7  2007/08/15 05:34:26  brian
 # - GPLv3 updates
 #
