@@ -6,6 +6,8 @@
 	* README-cvs: updated release files
 	* THANKS: updated release files
 
+	* src/util/slconf_lex.l: corrections for compile
+
 2007-12-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/man.am: perform more substitutions
