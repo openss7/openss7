@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.6 2007/10/16 06:04:19 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.7 2008-04-10 11:12:57 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,16 +53,16 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/10/16 06:04:19 $ by $Author: brian $
+@c Last Modified $Date: 2008-04-10 11:12:57 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
-@item 003.  2007-10-16T05:59:20+0000
-
-It was reported that the AC_FUNC_REALLOC check was causing cross-compile builds of Nexusware to
-fail.  This was changed in all sub-packages to skip AC_FUNC_REALLOC when cross-compiling to avoid
-the wrong assumption.  (Thanks to John Wenker at Performance Technologies for reporting this bug.)
+@c @item 003.  2007-10-16T05:59:20+0000
+@c 
+@c It was reported that the AC_FUNC_REALLOC check was causing cross-compile builds of Nexusware to
+@c fail.  This was changed in all sub-packages to skip AC_FUNC_REALLOC when cross-compiling to avoid
+@c the wrong assumption.  (Thanks to John Wenker at Performance Technologies for reporting this bug.)
 
 @emph{*fixed*} in @command{openss7-0.9.2.G}
 
