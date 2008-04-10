@@ -1,5 +1,5 @@
-OpenSS7 XTI/TLI Networking -- read me first file.  2008-01-23
-$Id: README,v 0.9.2.41 2008/01/24 17:38:36 brian Exp $
+OpenSS7 XTI/TLI Networking -- read me first file.  2008-04-10
+$Id: README,v 0.9.2.42 2008-04-10 08:14:45 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,18 +7,19 @@ See the end for copying conditions (for this file).
  OpenSS7 XTI/TLI Networking
 ===========================
 
-Package strxnet-0.9.2.12 was released under AGPLv3 2008-01-23.
+Package strxnet-0.9.2.12 was released under AGPLv3 2008-04-10.
 
 The `OpenSS7 XTI/TLI Networking' package for `Linux Fast-STREAMS' is an
 implementation of the X/Open Transport Interface or SVID Transport
 Layer Interface library in accordance with SUSv2 and XNS 5.2 standards.
-It consists of user-space libraries (`libxnet') and a set of cooperating
-"STREAMS" modules (`timod(4)' and `tirdwr(4)').  The "STREAMS" module, `timod(4)',
-is pushed on any Stream implementing the Transport Provider Interface
-(TPI) Revision 1.5 or 2.0.0 service interface and provides XTI/TLI
-library access to the transport provider.  Definitions for the
-Transport Provider Interface (TPI) Revision 2.0.0 are also provided by
-header files included in the package.
+It consists of user-space libraries (`libxnet') and a set of
+cooperating "STREAMS" modules (`timod(4)' and `tirdwr(4)').  The
+"STREAMS" module, `timod(4)', is pushed on any Stream implementing the
+Transport Provider Interface (TPI) Revision 1.5 or 2.0.0 service
+interface and provides XTI/TLI library access to the transport
+provider.  Definitions for the Transport Provider Interface (TPI)
+Revision 2.0.0 are also provided by header files included in the
+package.
 
 The package contains the following standard `Open Systems Interconnect
 (OSI)' conforming header files:
@@ -67,7 +68,7 @@ well.
  Release
 --------
 
-This is the `strxnet-0.9.2.12' package, released 2008-01-23.  This
+This is the `strxnet-0.9.2.12' package, released 2008-04-10.  This
 `0.9.2.12' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
