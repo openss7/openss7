@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: asnyac.y,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:13 $
+ @(#) $RCSfile: asnyac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-11 16:58:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/09/06 10:59:13 $ by $Author: brian $
+ Last Modified $Date: 2008-04-11 16:58:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: asnyac.y,v $
+ Revision 0.9.2.2  2008-04-11 16:58:44  brian
+ - removed deprecated NEXUSWARE support
+
  Revision 0.9.2.1  2007/09/06 10:59:13  brian
  - added new gdmo files
 
@@ -59,9 +62,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: asnyac.y,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:13 $"
+#ident "@(#) $RCSfile: asnyac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-11 16:58:44 $"
 
-static char const ident[] = "$RCSfile: asnyac.y,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:13 $";
+static char const ident[] = "$RCSfile: asnyac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-11 16:58:44 $";
 
 #include <stdlib.h>
 #include <unistd.h>

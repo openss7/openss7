@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:13 $
+ @(#) $RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-11 16:58:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/09/06 10:59:13 $ by $Author: brian $
+ Last Modified $Date: 2008-04-11 16:58:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: asnlex.l,v $
+ Revision 0.9.2.2  2008-04-11 16:58:44  brian
+ - removed deprecated NEXUSWARE support
+
  Revision 0.9.2.1  2007/09/06 10:59:13  brian
  - added new gdmo files
 
@@ -59,9 +62,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:13 $"
+#ident "@(#) $RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-11 16:58:44 $"
 
-static char const ident[] = "$RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:13 $";
+static char const ident[] = "$RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-11 16:58:44 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
