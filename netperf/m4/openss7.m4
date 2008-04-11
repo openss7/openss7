@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2007/12/16 03:52:53 $
+# @(#) $RCSfile: openss7.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.59 $) $Date: 2008-04-11 16:23:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/12/16 03:52:53 $ by $Author: brian $
+# Last Modified $Date: 2008-04-11 16:23:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -790,14 +790,9 @@ AC_DEFUN([_OPENSS7_MISSING], [dnl
     AC_ARG_VAR([LATEX2HTML], [LaTeX to HTML command.])
     AC_PATH_PROG([LATEX2HTML], [latex2html], [${am_missing2_run}latex2html],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-dnl
-dnl
-dnl frags out automake
-dnl
-dnl    AC_ARG_VAR([DVIPS], [DVI to PS command.])
-dnl    AC_PATH_PROG([DVIPS], [dvips], [${am_missing2_run}dvips],
-dnl		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-
+    AC_ARG_VAR([DVI2PS], [DVI to PS command.])
+    AC_PATH_PROG([DVI2PS], [dvips], [${am_missing2_run}dvips],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
     AC_ARG_VAR([DVIPDF], [DVI to PDF command.])
     AC_PATH_PROG([DVIPDF], [dvipdf], [${am_missing2_run}dvipdf],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
@@ -829,7 +824,10 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
-# Revision 0.9.2.58  2007/12/16 03:52:53  brian
+# Revision 0.9.2.59  2008-04-11 16:23:21  brian
+# - define DVI2PS
+#
+# Revision 0.9.2.58  2007-12-16 03:52:53  brian
 # - updated release files
 #
 # Revision 0.9.2.57  2007/10/18 06:12:53  brian
