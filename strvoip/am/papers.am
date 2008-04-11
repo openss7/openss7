@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: papers.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-11 16:08:54 $
+# @(#) $RCSfile: papers.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.3 $) $Date: 2008-04-11 20:09:58 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-04-11 16:08:54 $ by $Author: brian $
+## Last Modified $Date: 2008-04-11 20:09:58 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -90,10 +90,10 @@ BIBTEXS	= $(LATEXS:%.tex=%.bib)
 		-scalable_fonts `echo $< | sed -e 's,.*/,,'`
 	cat org.css >> `echo $< | sed -e 's,.*/,,;s,\.tex,\.css,'`
 
-dvi-am: $(DVIS)
-ps-am: $(PSS)
-pdf-am: $(PDFS)
-html-am: $(HTMLS)
+dvi-local: $(DVIS)
+ps-local: $(PSS)
+pdf-local: $(PDFS)
+html-local: $(HTMLS)
 
 if DEVELOPMENT
 ## DEVELOPMENT
@@ -302,6 +302,9 @@ clean-html:
 		$(ECHO) "rm -f -- '$$b'"; \
 		rm -f -- "$$b"; \
 	fi
+	@d=images; \
+	$(ECHO) "rm -f -- '$$d.aux' '$$d.bbl' '$$d.blg' '$$d.glo' '$$d.log' '$$d.pl' '$$d.tex' img*.png"; \
+	rm -f -- "$$d.aux" "$$d.bbl" "$$d.blg" "$$d.glo" "$$d.log" "$$d.pl" "$$d.tex" img*.png
 
 clean-bibs:
 	@$(ECHO) "Making $@ in `pwd`"
@@ -609,6 +612,12 @@ endif
 ## =============================================================================
 ##
 ## $Log: papers.am,v $
+## Revision 0.9.2.3  2008-04-11 20:09:58  brian
+## - extra files to clean
+##
+## Revision 0.9.2.2  2008-04-11 16:58:38  brian
+## - removed deprecated NEXUSWARE support
+##
 ## Revision 0.9.2.1  2008-04-11 16:08:54  brian
 ## - added papers automake fragment
 ##

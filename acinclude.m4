@@ -835,7 +835,7 @@ dnl
 dnl
 dnl we have symbolic links in the master tarball, remove the h from chof
 dnl
-    am__tar='${AMTAR} cof - "$$tardir"'
+    am__tar='${AMTAR} cf - "$$tardir"'
 dnl
 dnl LiS or LFS.
 dnl
